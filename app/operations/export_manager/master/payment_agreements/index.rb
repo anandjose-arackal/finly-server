@@ -7,7 +7,9 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
   screen 'payment_agreements.index'
   system :vp
   validate :fetch_agreements
-  attr_accessor :header_collection, :sheets
+  attr_accessor :header_collection, :sheets, :sheet_names
+  attr_accessor :general_invoice_header, :rental_invoice_header, :security_deposit_header, :beneficiary_header
+  attr_accessor :general_invoice_rows, :rental_invoice_rows, :security_deposit_rows, :beneficiary_rows
 
   section :header do
     attribute :agreement_number
@@ -38,7 +40,7 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
     attribute :invoice_frequency
   end
 
-  section :rental_invoices do
+  section :rental_invoice do
     attribute :invoice_number
     attribute :vendor_name
     attribute :vendor_code
@@ -70,6 +72,33 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
     attribute :remaining_amount
   end
 
+  section :security_deposit do
+    attribute :security_deposit_vendor_name
+    attribute :security_deposit_vendor_code
+    attribute :security_deposit_gstin
+    attribute :security_deposit_address
+    attribute :security_deposit_account_name
+    attribute :security_deposit_account_number
+    attribute :security_deposit_account_ifsc
+    attribute :security_deposit_amount
+    attribute :security_deposit_balance_payable
+  end
+
+  section :beneficiary do
+    attribute :beneficiary_vendor_name
+    attribute :beneficiary_vendor_code
+    attribute :beneficiary_gstin
+    attribute :beneficiary_address
+    attribute :beneficiary_account_name
+    attribute :beneficiary_account_number
+    attribute :beneficiary_account_ifsc
+    attribute :beneficiary_payment_status
+    attribute :beneficiary_amount
+    attribute :beneficiary_tax_type
+    attribute :beneficiary_tax_amount
+    attribute :beneficiary_balance_payable
+  end
+
 
   def fetch_agreements
     agreement_presenter = ::PaymentAgreements::Index.(user, params)
@@ -87,40 +116,47 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
     general_agreements = GeneralInvoice.where(fixed_periodic_template: [nil, FALSE],payment_agreement_id: agreements.pluck(:id)).template_invoices
     rental_agreement_line_items = InvoiceLineItem.where(parent_type: 'RentalInvoice').includes(:category, :department, :tax_rate, :cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency}, :discount_amount, parent: [ :invoice_type, :vendor, :delivery_location, :invoice_status, :location, :tds_slab, :advance_amount, :balance_due, :discount_amount, :created_by, :gstin_location, {tds_amount: :currency}, :amount]).where(parent_id: rental_agreements.pluck(:id)).order(parent_id: :asc)
     general_agreement_line_items = InvoiceLineItem.where(parent_type: 'GeneralInvoice').includes(:category, :department, :tax_rate, :cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency}, :discount_amount, parent: [ :invoice_type, :vendor, :delivery_location, :invoice_status, :location, :tds_slab, :advance_amount, :balance_due, :discount_amount, :created_by, :gstin_location, {tds_amount: :currency}, :amount]).where(parent_id: general_agreements.pluck(:id)).order(parent_id: :asc)
-    {general_invoices: general_agreement_line_items, rental_invoices: rental_agreement_line_items}
+    security_deposit_items = SecurityDeposit.where(payment_agreement_id: general_agreements.pluck(:id))
+    beneficiary_items = BeneficiaryPayment.where(payment_agreement_id: general_agreements.pluck(:id))
+    {general_invoice: general_agreement_line_items, rental_invoice: rental_agreement_line_items,security_deposit: security_deposit_items, beneficiary: beneficiary_items }
   end
 
   def generate_rows
-    general_header =  ExportManager::Builders::Spreadsheet::Header.new
-    rental_header =  ExportManager::Builders::Spreadsheet::Header.new
-    general_rows = []
-    rental_rows = []
-    self.class.sections.each do |section|
-      next if section.name == :rental_invoices
-      section.attributes.each do |attr|
-        next unless add_field?(attr)
-        next if attr.dynamic
-        general_header.add attr.column_name
+    self.sheet_names=[:general_invoice,:rental_invoice, :security_deposit, :beneficiary]
+
+    self.general_invoice_header =  ExportManager::Builders::Spreadsheet::Header.new
+    self.rental_invoice_header =  ExportManager::Builders::Spreadsheet::Header.new
+    self.security_deposit_header = ExportManager::Builders::Spreadsheet::Header.new
+    self.beneficiary_header = ExportManager::Builders::Spreadsheet::Header.new
+    self.general_invoice_rows =[]
+    self.rental_invoice_rows = []
+    self.security_deposit_rows = []
+    self.beneficiary_rows =[]
+
+    self.sheet_names.each do |section_name|
+      self.class.sections.each do |section|
+        next if [:header,:item_details,section_name].exclude?(section.name)
+        section.attributes.each do |attr|
+          next unless add_field?(attr)
+          next if attr.dynamic
+          self.send("#{section_name.to_s}_header").add attr.column_name
+        end
       end
     end
 
-    self.class.sections.each do |section|
-      next if section.name == :general_invoice
-      section.attributes.each do |attr|
-        next unless add_field?(attr)
-        next if attr.dynamic
-        rental_header.add attr.column_name
-      end
-    end
-    self.header_collection={general_invoices: general_header, rental_invoices: rental_header}
+    self.header_collection={general_invoice: general_invoice_header,
+                            rental_invoice: rental_invoice_header,
+                            security_deposit: security_deposit_header,
+                            beneficiary: beneficiary_header}
     return unless export_job.total_records <= 0
 
     index = 1
-    data[:general_invoices].find_each do |record|
+    self.sheet_names.each do |section_name|
+    data[section_name].find_each do |record|
         update record: record
         row = ExportManager::Builders::Spreadsheet::Row.new(record: record, header: header)
         self.class.sections.each do |section|
-          next if section.name == :rental_invoices
+          next if [:header,:item_details,section_name].exclude?(section.name)
           section.attributes.each do |attribute|
             next unless add_field?(attribute)
 
@@ -131,35 +167,14 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
               row.add attribute.column_name, value
             end
           end
-      end
-        general_rows << row
-
-      progress_update(index)
-      index += 1
-    end
-
-    data[:rental_invoices].find_each do |record|
-      update record: record
-      row = ExportManager::Builders::Spreadsheet::Row.new(record: record, header: header)
-      self.class.sections.each do |section|
-        next if section.name == :general_invoices
-        section.attributes.each do |attribute|
-          next unless add_field?(attribute)
-
-          if attribute.dynamic
-            self.send attribute.name, row, record
-          else
-            value = self.send attribute.name, record
-            row.add attribute.column_name, value
-          end
         end
-      end
-      rental_rows << row
-
-      progress_update(index)
+        self.send("#{section_name}_rows") << row
+        progress_update(index)
       index += 1
     end
-    self.sheets ={general_invoices: general_rows, rental_invoices: rental_rows}
+    end
+
+    self.sheets = {general_invoice: general_invoice_rows, rental_invoice: rental_invoice_rows, security_deposit: security_deposit_rows, beneficiary: beneficiary_rows}
   end
 
 
@@ -323,7 +338,7 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
     line_item.taxable_amount&.value
   end
   def tax_rate(line_item)
-    line_item.tax_rate
+    line_item.tax_rate&.rate
   end
   def tax_amount(line_item)
     line_item.tax_amount&.value
@@ -340,4 +355,89 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
   def remaining_amount(line_item)
     line_item.parent.balance_due&.value
   end
+
+  def security_deposit_vendor_name(security_deposit)
+    security_deposit.vendor.display_name
+  end
+
+  def security_deposit_vendor_code(security_deposit)
+    security_deposit.vendor.vendoe_id
+  end
+
+  def security_deposit_gstin(security_deposit)
+    security_deposit.vendor_location&.gstin
+  end
+
+  def security_deposit_address(security_deposit)
+    security_deposit.vendor_location&.address
+  end
+
+  def security_deposit_account_name(security_deposit)
+    security_deposit.bank_account&.name
+  end
+
+  def security_deposit_account_number(security_deposit)
+    security_deposit.bank_account&.account_number
+  end
+
+  def security_deposit_account_ifsc(security_deposit)
+    security_deposit.bank_account&.ifsc
+  end
+
+  def security_deposit_amount(security_deposit)
+    security_deposit.original_amount&.value
+  end
+
+  def security_deposit_balance_payable(security_deposit)
+    security_deposit.payable_amoiunt&.value
+  end
+
+  def beneficiary_vendor_name(beneficiary)
+    beneficiary.vendor.display_name
+  end
+
+  def beneficiary_vendor_code(beneficiary)
+    beneficiary.vendor.vendoe_id
+  end
+
+  def beneficiary_gstin(beneficiary)
+    beneficiary.vendor_location&.gstin
+  end
+
+  def beneficiary_address(beneficiary)
+    beneficiary.vendor_location&.address
+  end
+
+  def beneficiary_account_name(beneficiary)
+    beneficiary.bank_account&.name
+  end
+
+  def beneficiary_account_number(beneficiary)
+    beneficiary.bank_account&.account_number
+  end
+
+  def beneficiary_account_ifsc(beneficiary)
+    beneficiary.bank_account&.ifsc
+  end
+
+  def beneficiary_amount(beneficiary)
+    beneficiary.original_amount&.value
+  end
+
+  def beneficiary_payment_status(beneficiary)
+    beneficiary.status&.name
+  end
+
+  def beneficiary_tax_type(beneficiary)
+    beneficiary.gst_type&.name
+  end
+
+  def beneficiary_tax_amount(beneficiary)
+    beneficiary.tax_amount&.value
+  end
+
+  def beneficiary_balance_payable(beneficiary)
+    beneficiary.payable_amoiunt&.value
+  end
+
 end
