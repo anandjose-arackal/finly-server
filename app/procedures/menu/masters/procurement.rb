@@ -15,34 +15,31 @@ class Menu::Masters::Procurement < Menu::API
 
   item :procure, icon: 'https://img.icons8.com/windows/22/ffffff/add-shopping-cart.png' do
     item :purchase_orders, permissions: [:purchase_order_initiator, :purchase_order_reviewer, :purchase_order_auditor], create: true
-    item :pr_approved_items, path: 'po_approval_items', permissions: [:purchase_order_initiator]
+    item :pr_approved_items, permissions: [:purchase_order_initiator]
   end
 
   item :receive, permissions: :goods_receiver, icon: 'https://img.icons8.com/windows/22/ffffff/borrow-book.png' do
-    item :receive_pending
-    item :receive_history
+    item :receive_pending, path: 'receive'
+    item :receive_history, path: 'receive/history'
   end
 
   item :payables, icon: "https://img.icons8.com/windows/22/ffffff/sales-performance.png" do
-    item :po_advances
-    item :invoices do
-      item :po_invoices
-      item :non_po_invoices, create: true
-      item :agreement_invoices
-      item :utility_bills
-    end
+    item :po_advances, permissions: [:bank_payment_request_initiator, :auditor]
+    item :invoices, permissions: [:bank_payment_request_initiator], create: true
+    item :utility_bills
     item :pending do
-      item :upcoming_agreement_invoices, permissions: [:agreement_invoice_initiator, :agreement_invoice_auditor]
+      item :upcoming_invoices, permissions: [:agreement_invoice_initiator, :agreement_invoice_auditor]
       # item :unbilled_items, permissions: [] # todo
     end
   end
 
   item :payments, icon: "https://img.icons8.com/windows/22/ffffff/sales-performance.png" do
-    item :payment_tickets, permissions: [:auditor] # Todo
-    # item :payments, permissions: [:auditor] # Todo
+    item :payment_tickets, permissions: [:bank_payment_request_initiator, :bank_payment_request_reviewer, :bank_payment_request_creditor, :auditor]
+    # item :payments, permissions: [:bank_payment_request_initiator, :bank_payment_request_reviewer, :bank_payment_request_creditor, :auditor] # Todo
   end
 
   item :manage, icon: "https://img.icons8.com/windows/22/ffffff/commercial-development-management.png" do
+    item :analytics, permissions: [:admin]
     item :vendors, create: true, permissions: [:vendor_creator, :vendor_reviewer, :vendor_manager, :vendor_auditor, :auditor]
     item :item_master, create: true, permissions: [:item_master_manager, :inventory_manager, :auditor]
     item :rate_contracts, create: true, permissions: [:inventory_manager, :auditor]
