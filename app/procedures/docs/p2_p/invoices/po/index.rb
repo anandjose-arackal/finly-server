@@ -98,7 +98,7 @@ class Docs::P2P::Invoices::Po::Index < Docs::P2P::Invoices::Index
   end
 
   def self.awaiting_approval_roles
-    :po_invoice_reviewer
+    [:po_invoice_reviewer, :admin]
   end
 
 end

@@ -102,7 +102,7 @@ class Docs::P2P::Invoices::Agreement::Index < Docs::P2P::Invoices::Index
   end
 
   def self.awaiting_approval_roles
-    :agreement_invoice_reviewer
+    [:agreement_invoice_reviewer, :admin]
   end
 
 end
