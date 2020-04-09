@@ -184,7 +184,7 @@ class ExportManager::Master::PaymentTickets::Index < ExportManager::Builders::Sp
         payment&.parent&.advance_amount&.value&.to_f
       end
     else
-      payment&.parent&.advance_amount&.value&.to_f || 0.0
+      0.to_f
     end
   end
   
