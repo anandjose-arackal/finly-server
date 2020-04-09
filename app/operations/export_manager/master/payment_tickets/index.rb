@@ -161,9 +161,11 @@ class ExportManager::Master::PaymentTickets::Index < ExportManager::Builders::Sp
   def original_amount ( payment )
     payment_type = payment.parent_type
     if payment_type.eql?('PurchaseOrder')
-      precision_value(payment&.parent&.total_after_tax&.value)
+      precision_value(payment&.purchase_order&.requested_advance_amount&.value)
     elsif payment_type.eql?('BeneficiaryPayment')
-      payment&.parent&.original_amount&.value.to_f
+      precision_value(payment&.parent&.original_amount&.value)
+    elsif payment_type.eql?('Invoice')
+      precision_value(payment&.parent&.item_amounts_total)
     else
       original_amount_invoice(payment)
     end
@@ -172,18 +174,26 @@ class ExportManager::Master::PaymentTickets::Index < ExportManager::Builders::Sp
   def advance_amount ( payment )
     payment_type = payment.parent_type
     if payment_type.eql?('PurchaseOrder')
-      precision_value(payment&.parent&.advance_amount&.value)
+      0.0
     elsif payment_type.eql?('BeneficiaryPayment')
-      payment&.parent&.advance_amount&.value.to_f
+      precision_value(payment&.parent&.advance_amount&.value).to_f
+    elsif payment_type.eql?('Invoice')
+      if payment.parent.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice)
+        payment&.parent&.po_adjusted_advance&.value&.to_f
+      else 
+        payment&.parent&.advance_amount&.value&.to_f
+      end
     else
-      payment&.invoice&.advance_amount&.value.to_f
+      payment&.parent&.advance_amount&.value&.to_f
     end
   end
   
   def discount ( payment )
     payment_type = payment.parent_type
     if ['PurchaseOrder', 'BeneficiaryPayment'].include? (payment_type)
-      0.0
+      0.to_f
+    elsif payment_type.eql?('Invoice')
+      precision_value(payment&.parent&.discount_amount&.value)
     else
       payment&.invoice&.discount_amount&.value.to_f
     end
@@ -192,24 +202,16 @@ class ExportManager::Master::PaymentTickets::Index < ExportManager::Builders::Sp
   def tax ( payment )
     payment_type = payment.parent_type
     if payment_type.eql?('PurchaseOrder')
-      0.0
-    elsif payment_type.eql?('BeneficiaryPayment')
-      payment&.parent&.tax_amount&.value || 0
+      0.to_f
+    elsif ['BeneficiaryPayment', 'Invoice' ].include?(payment_type)
+      precision_value(payment&.parent&.tax_amount&.value.to_f)
     else
       payment&.invoice&.tax.to_f
     end
   end
   
   def tds ( payment )
-    payment_type = payment.parent_type
-    if payment_type.eql?('PurchaseOrder')
-      "#{payment&.parent&.advance_tds_slab&.tds.to_f} %"
-    elsif payment_type.eql?('BeneficiaryPayment')
-      tds_value  = payment&.parent&.tds_amount
-      "#{tds_value&.value.to_f} #{tds_value&.currency&.country_code}"
-    else
-      "#{payment&.invoice&.tds.to_f} %"
-    end
+    tds_amount(payment)
   end
   
   def net_payable_amount ( payment )
