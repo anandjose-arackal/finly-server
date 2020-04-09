@@ -245,7 +245,7 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
   end
 
   def never_expire(line_item)
-    return line_item.payment_agreement.no_expiration if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
+    return (line_item.payment_agreement.no_expiration ? 'YES' :  'NO') if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
     (line_item.parent.payment_agreement.no_expiration ? 'YES' :  'NO')
   end
 
@@ -284,19 +284,19 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
   end
 
   def department(line_item)
-    line_item.parent.department.name
+    line_item.parent.department&.name
   end
 
   def location(line_item)
-    line_item.parent.location.name
+    line_item.parent.location&.name
   end
 
   def cost_center(line_item)
-    line_item.parent.cost_center.name
+    line_item.parent.cost_center&.name
   end
 
   def billing_type(line_item)
-    line_item.parent.billing_type.name
+    line_item.parent.billing_type&.name
   end
 
   def prepaid(line_item)
@@ -380,11 +380,11 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
   end
 
   def security_deposit_vendor_name(security_deposit)
-    security_deposit.vendor.display_name
+    security_deposit.vendor&.display_name
   end
 
   def security_deposit_vendor_code(security_deposit)
-    security_deposit.vendor.vendor_id
+    security_deposit.vendor&.vendor_id
   end
 
   def security_deposit_gstin(security_deposit)
@@ -416,11 +416,11 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
   end
 
   def beneficiary_vendor_name(beneficiary)
-    beneficiary.vendor.display_name
+    beneficiary.vendor&.display_name
   end
 
   def beneficiary_vendor_code(beneficiary)
-    beneficiary.vendor.vendor_id
+    beneficiary.vendor&.vendor_id
   end
 
   def beneficiary_gstin(beneficiary)
