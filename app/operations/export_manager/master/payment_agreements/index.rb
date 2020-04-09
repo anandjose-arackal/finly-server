@@ -3,14 +3,15 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
   label 'Export'
   description 'Agreements Export'
   configurable true
-  handle :invoices
+  handle :payment_agreements
   screen 'payment_agreements.index'
   system :vp
-  validate :fetch_invoices
+  validate :fetch_agreements
+  attr_accessor :header_collection, :sheets
 
   section :header do
     attribute :agreement_number
-    attribute :tittle
+    attribute :title
     attribute :policy
     attribute :agreement_date
     attribute :status
@@ -69,11 +70,9 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
     attribute :remaining_amount
   end
 
-  def custom_fields(row, invoice_line_item)
-  end
 
   def fetch_agreements
-    agreement_presenter = PaymentAgreements::Index.(user, params)
+    agreement_presenter = ::PaymentAgreements::Index.(user, params)
     unless agreement_presenter.success?
       add_message :error, agreement_presenter.messages[:error]
       return
@@ -86,17 +85,123 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
     agreements = agreement_presenter.payment_agreements
     rental_agreements = RentalInvoice.where(fixed_periodic_template: [nil, FALSE],payment_agreement_id:  agreements.pluck(:id)).template_invoices
     general_agreements = GeneralInvoice.where(fixed_periodic_template: [nil, FALSE],payment_agreement_id: agreements.pluck(:id)).template_invoices
-    rental_agreement_line_items =     InvoiceLineItem.where(parent_type: 'RentalInvoice').includes(:category, :department, :tax_rate, :cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency}, :discount_amount, parent: [:invoice_attachments, :invoice_type, :vendor, :delivery_location, :invoice_status, :location, :tds_slab, :advance_amount, :balance_due, :discount_amount, :created_by, :gstin_location, {tds_amount: :currency}, :amount]).where(parent_id: invoices.pluck(:id)).order(parent_id: :asc)
-    general_agreement_line_items =     InvoiceLineItem.where(parent_type: 'GeneralInvoice').includes(:category, :department, :tax_rate, :cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency}, :discount_amount, parent: [:invoice_attachments, :invoice_type, :vendor, :delivery_location, :invoice_status, :location, :tds_slab, :advance_amount, :balance_due, :discount_amount, :created_by, :gstin_location, {tds_amount: :currency}, :amount]).where(parent_id: invoices.pluck(:id)).order(parent_id: :asc)
+    rental_agreement_line_items =     InvoiceLineItem.where(parent_type: 'RentalInvoice').includes(:category, :department, :tax_rate, :cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency}, :discount_amount, parent: [ :invoice_type, :vendor, :delivery_location, :invoice_status, :location, :tds_slab, :advance_amount, :balance_due, :discount_amount, :created_by, :gstin_location, {tds_amount: :currency}, :amount]).where(parent_id: rental_agreements.pluck(:id)).order(parent_id: :asc)
+    general_agreement_line_items =     InvoiceLineItem.where(parent_type: 'GeneralInvoice').includes(:category, :department, :tax_rate, :cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency}, :discount_amount, parent: [ :invoice_type, :vendor, :delivery_location, :invoice_status, :location, :tds_slab, :advance_amount, :balance_due, :discount_amount, :created_by, :gstin_location, {tds_amount: :currency}, :amount]).where(parent_id: general_agreements.pluck(:id)).order(parent_id: :asc)
     {general_invoices: general_agreement_line_items, rental_invoices: rental_agreement_line_items}
+  end
+
+  def generate_rows
+    general_header =  ExportManager::Builders::Spreadsheet::Header.new
+    rental_header =  ExportManager::Builders::Spreadsheet::Header.new
+    general_rows = []
+    rental_rows = []
+    self.class.sections.each do |section|
+      next if section.name == :rental_invoices
+      section.attributes.each do |attr|
+        next unless add_field?(attr)
+        next if attr.dynamic
+        general_header.add attr.column_name
+      end
+    end
+
+    self.class.sections.each do |section|
+      next if section.name == :general_invoice
+      section.attributes.each do |attr|
+        next unless add_field?(attr)
+        next if attr.dynamic
+        rental_header.add attr.column_name
+      end
+    end
+    self.header_collection={general_invoices: general_header, rental_invoices: rental_header}
+    return unless export_job.total_records <= 0
+
+    index = 1
+    data[:general_invoices].find_each do |record|
+        update record: record
+        row = ExportManager::Builders::Spreadsheet::Row.new(record: record, header: header)
+        self.class.sections.each do |section|
+          next if section.name == :rental_invoices
+          section.attributes.each do |attribute|
+            next unless add_field?(attribute)
+
+            if attribute.dynamic
+              self.send attribute.name, row, record
+            else
+              value = self.send attribute.name, record
+              row.add attribute.column_name, value
+            end
+          end
+      end
+        general_rows << row
+
+      progress_update(index)
+      index += 1
+    end
+
+    data[:rental_invoices].find_each do |record|
+      update record: record
+      row = ExportManager::Builders::Spreadsheet::Row.new(record: record, header: header)
+      self.class.sections.each do |section|
+        next if section.name == :general_invoices
+        section.attributes.each do |attribute|
+          next unless add_field?(attribute)
+
+          if attribute.dynamic
+            self.send attribute.name, row, record
+          else
+            value = self.send attribute.name, record
+            row.add attribute.column_name, value
+          end
+        end
+      end
+      rental_rows << row
+
+      progress_update(index)
+      index += 1
+    end
+    self.sheets ={general_invoices: general_rows, rental_invoices: rental_rows}
+  end
+
+
+  def file_name
+    case format
+    when :csv
+      ['export', '.csv']
+    when :xls
+      ['export', '.xlsx']
+    end
+  end
+
+  def generate_spreadsheet
+    file = Tempfile.new(file_name)
+    workbook  = ::WriteXLSX.new(file)
+    self.sheets.each  do |name, sheet|
+      worksheet = workbook.add_worksheet(name)
+      headers = self.header_collection[name].list
+      contents =[]
+      sheet.each do |row|
+        contents << row.build
+      end
+      headers.each_with_index do |item, index|
+        worksheet.write( 0, index, item )
+      end
+
+      contents.each_with_index do |items, row|
+        items.each_with_index do |item, column|
+          worksheet.write(1 + row, column, item)
+        end
+      end
+    end
+    workbook.close
+    file
   end
 
   def agreement_number(line_item)
     line_item.parent.payment_agreement.get_agreement_number
   end
 
-  def tittle(line_item)
-    line_item.parent.payment_agreement.tittle
+  def title(line_item)
+    line_item.parent.payment_agreement.title
   end
   def policy(line_item)
     line_item.parent.payment_agreement.policy&.name
@@ -158,7 +263,7 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
   end
 
   def location(line_item)
-    line_item.parent..location.name
+    line_item.parent.location.name
   end
 
   def cost_center(line_item)
@@ -166,7 +271,7 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
   end
 
   def billing_type(line_item)
-    line_item.billing_type.name
+    line_item.parent.billing_type.name
   end
 
   def prepaid(line_item)
@@ -174,7 +279,7 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
   end
 
   def invoice_frequency(line_item)
-    line_item.parent.get_invoice_frequency_attributes&[:number]
+    line_item.parent.get_invoice_frequency_attributes[:number]
   end
 
   def lock_in_period(line_item)
