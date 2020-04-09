@@ -1,3 +1,5 @@
+# deprecated op
+# 
 class Budgets::Import < Budgets::Base
 
   attr_accessor :file, :sheet, :header, :content, :result_hash, :company

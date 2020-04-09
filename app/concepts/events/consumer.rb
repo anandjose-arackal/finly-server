@@ -6,89 +6,34 @@ module Events::Consumer
   end
 
   module ClassMethods
-    def consumes_event!(event, consumer_key:, name:, sync: false, options: {})
-      raise "Name is not defined for consumer #{self.event_name}" if name.nil?
-      raise "Event is not defined for consumer #{self.event_name}" if event.nil?
-      raise "Consumer Key is not defined for consumer #{self.event_name}" if consumer_key.nil?
-
+    def consumes_event!(*events, sync: false, options: {})
       async! unless sync
-      @event = event
+      @events = events
       @event_options = options
-      @consumer_key = consumer_key
       @consumes_event = true
-      @event_name = name
 
-      Events::Registry.add_event self, event, consumer_key
+      events.each do |event|
+        Events::Registry.add_event self, event
+      end
 
       if async?
-        include Sneakers::Worker
-        from_queue event, options
+        include Hutch::Consumer
+        consume(*events)
+
+        # include Sneakers::Worker
+        # from_queue event, options
       end
-    end
-
-    def scheduled!(name:, every:, hour:, minute:, day_of_the_week: nil, day_of_the_month: nil)
-      raise "Name is not defined for consumer #{self.event_name}" if name.nil?
-
-      @event_name = event_name
-      @scheduled = true
-      @schedule = {
-          every: every,
-          hour: hour,
-          minute: minute,
-          day_of_the_week: day_of_the_week,
-          day_of_the_month: day_of_the_month,
-      }
-
-      async!
-      validate_schedule
-
-      Events::Registry.add_scheduled_job self
-      setup_schedule_job
-    end
-
-    def event_name
-      @event_name
-    end
-
-    def consumer_key
-      @consumer_key
-    end
-
-    def consumes_event?
-      @consumes_event || false
-    end
-
-    def schedule
-      @schedule
-    end
-
-    def scheduled?
-      @scheduled || false
     end
 
     def async?
       @async || false
     end
 
-    def event
-      @event
+    def events
+      @events
     end
 
     protected
-
-    def validate_schedule
-      # Todo raise exception if the schedule is invalid
-    end
-
-    def setup_schedule_job
-      frequency = schedule[:every]
-      at = "#{schedule[:day_of_the_week]} " if schedule[:day_of_the_week]
-      at += "#{schedule[:hour].to_s.rjust(2, '0')}:#{schedule[:minute].to_s.rjust(2, '0')}"
-      # Todo handle day of the month
-      Clockwork.every frequency, self.event_name, at: at do
-        self.perform_async(type: :scheduled)
-      end
-    end
 
     def async!
       include Sidekiq::Worker
@@ -97,13 +42,8 @@ module Events::Consumer
 
   end
 
-  def work(payload)
-    # This is primarily to prevent database timeout exception that kept happening in production
-    # for sneakers
-    ActiveRecord::Base.connection_pool.with_connection do
-      perform payload
-    end
-    ack! if respond_to?(:ack!)
+  def process(payload)
+    perform payload.body
   end
 
   def perform(payload)
@@ -115,10 +55,9 @@ module Events::Consumer
     end
 
     data = data&.to_h&.with_indifferent_access
-    raise 'Invalid payload' if data.nil? or data[:type].blank?
+    raise 'Invalid payload' if data.nil?
 
     decoded_data = Events::Serializer.decode(data)
-    type = decoded_data[:type]
     message = decoded_data[:message]
     user = decoded_data&.dig(:current_user)
 
@@ -126,25 +65,18 @@ module Events::Consumer
     # request_store_properties = payload&.dig('request_store_properties')
     # RequestStoreUtil.from_hash request_store_properties
 
-    receive(type, user, message)
+    work(user, message)
   end
 
-  def receive(type, user, message)
-    case type
-    when :schedule, 'schedule'
-      self.send(:on_schedule) if self.respond_to?(:on_schedule)
-    when :event, 'event'
-      self.send(:on_event, user, message) if self.respond_to?(:on_event)
-    else
-      raise "Consumer cannot handle type #{type}"
-    end
+  def work(user, message)
+    puts "Work called #{self.class.name}"
   end
 
   # def on_schedule
   #   # implement me
   # end
 
-  # def on_event(user, message)
+  # def work(user, message)
   #   # implement me
   # end
 

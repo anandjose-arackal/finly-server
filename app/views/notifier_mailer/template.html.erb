@@ -1,0 +1,33 @@
+<div class="wrapper-main" style="background: #F5F7FA;height: 100%;overflow: auto;">
+
+  <div class="mail-container" style="max-width: 1000px;margin: 30px auto;height: 100%;display: table;">
+
+
+    <%= render partial: 'notifier_mailer/partials/banner', locals: {company: @payload["company"]} %>
+
+    <div class="section-body" style="overflow: hidden;">
+
+      <!-- END -->
+      <%= render partial: 'notifier_mailer/partials/hero', locals: {payload: @payload} %>
+
+      <!-- Message Body FOR "EXPENSE REPORTS" -->
+      <div class="mailer-details-wrapper" style="background: white; padding-top: 10px;">
+
+        <%= render partial: 'notifier_mailer/partials/body_header', locals: {payload: @payload} %>
+
+        <%= render partial: 'notifier_mailer/partials/body_quote', locals: {payload: @payload} %>
+
+        <%= render partial: 'notifier_mailer/partials/tables', locals: {tables: @payload["tables"]} %>
+
+        <%= render partial: 'notifier_mailer/partials/actions', locals: {actions: @payload["actions"]} %>
+
+      </div>
+      <!-- END -->
+    </div>
+
+    <%= render partial: 'notifier_mailer/partials/footer', locals: {payload: @payload} %>
+
+  </div>
+</div>
+
+

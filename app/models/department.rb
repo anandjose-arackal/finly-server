@@ -20,6 +20,7 @@ class Department < ApplicationRecord
   include SoftDeletable, AncestrySupport
   include Sequenced::ActsAsSequenced
   include LiquidDroppable
+  include Exposures::Model::Exposable
   include EventProducer
 
   event_channel 'department'
@@ -47,6 +48,8 @@ class Department < ApplicationRecord
   default_scope {unscope(:where)}
 
   scope :with_ids, -> (id) { where id: id }
+  scope :with_id, -> (id) {where id: id}
+
   scope :with_name, -> (name) {where name: name}
   # scope :only_sub_departments, -> {
   #   where(id: Department.pluck(:ancestry).compact.map { |e| e.split('/') }.flatten.uniq)

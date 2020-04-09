@@ -5,7 +5,7 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
 
   def pre_validate
     if user.blank? || params.blank?
-      add_message :error, "Invaoid parameters"
+      add_message :error, "Invalid parameters"
       return
     end
     if params[:file].blank?
@@ -92,18 +92,19 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
         # create a bank transaction for this particular payment
         amount = Amount.create(value: payment.amount_value, currency_id: 1)
         new_transactions << bank_transaction_class.new(transfer_type: payment.payment_mode,
-                                                  bank_reference_number: utr,
-                                                  company_id: user.company_id,
-                                                  transfer_status_id: BankTransferStatus.id_for(:completed),
-                                                  bank_transaction_type_id: BankTransactionType.id_for(:outside_finly),
-                                                  beneficiary_bank_account_id: payment.receiving_account&.id,
-                                                  reference_payment_id: payment.id,
-                                                  amount_id: amount.id,
-                                                  credited_at: credited_at)
+                                                       bank_reference_number: utr,
+                                                       company_id: user.company_id,
+                                                       transfer_status_id: BankTransferStatus.id_for(:completed),
+                                                       bank_transaction_type_id: BankTransactionType.id_for(:outside_finly),
+                                                       beneficiary_bank_account_id: payment.receiving_account&.id,
+                                                       reference_payment_id: payment.id,
+                                                       amount_id: amount.id,
+                                                       created_at: credited_at)
       end
       # add a success message to the result array
       self.result_array[index] << "Success!"
     end
+    update_details
   end
 
   def post_process

@@ -68,7 +68,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
     
     # checking for duplicates within this particular company
-    current_company_invoices = current_company.inward_invoices.scope_all_except_voided
+    current_company_invoices = current_company.inward_invoices.scope_all_except_voided_rejected
     invoice_number = self.inward_invoice_params[:invoice_number]
     vendor_id = self.inward_invoice.vendor_id || params[:vendor_id]
     duplicate_invoices = current_company_invoices.with_invoice_number(invoice_number).with_vendor_ids(vendor_id).without_id(self.inward_invoice.id)
@@ -111,9 +111,9 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     end
 
     if self.inward_invoice.procurement.present? && self.purchase_order.present?
-      if params[:invoice][:balance_amount_attributes][:value].to_i < 0
-        add_message :error, "Balance due amount cannot be less than zero"
-      end
+      # if params[:invoice][:balance_amount_attributes][:value].to_i < 0
+      #   add_message :error, "Balance due amount cannot be less than zero"
+      # end
       if params[:invoice][:balance_amount_attributes][:value].to_i > (self.purchase_order.balance_amount&.value + 1) # adding a buffer to account for roundoff amount
           add_message :error, "Payable amount for this invoice has exceeded the Purchase Order payable amount."
         return
@@ -376,11 +376,20 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     receiving_account = self.inward_invoice.vendor&.bank_accounts&.find_by(id: self.inward_invoice_params[:bank_account_id])
     self.inward_invoice.receiving_account = receiving_account
 
-      # if self.inward_invoice_params[:credit_note_adjusments_attributes].present?
-      #   self.inward_invoice_params[:credit_note_adjusments_attributes].each do |cna|
-      #     cna[:amount_attributes][:value] = precision_value(cna[:amount_attributes][:value])
-      #   end
-      # end
+    # remove this check permanently, causing customer issue with their internal process of tds deduction
+    #
+    # if self.inward_invoice.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice)
+    #   if self.purchase_order.advance_tds_slab_id.present? && (inward_invoice_params[:tds_slab_id] != self.purchase_order.advance_tds_slab_id) && self.purchase_order.advance_amount_required
+    #     add_message :error, "TDS slab selected for invoice has to match with the TDS slab for PO advance  - #{self.purchase_order.advance_tds_slab&.name}"
+    #     return
+    #   end
+    # end
+
+    # if self.inward_invoice_params[:credit_note_adjusments_attributes].present?
+    #   self.inward_invoice_params[:credit_note_adjusments_attributes].each do |cna|
+    #     cna[:amount_attributes][:value] = precision_value(cna[:amount_attributes][:value])
+    #   end
+    # end
   end
 
   def process

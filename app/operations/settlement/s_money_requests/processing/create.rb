@@ -208,6 +208,12 @@ class Settlement::SMoneyRequests::Processing::Create < Settlement::SMoneyRequest
         return
       end
 
+      if money_requests.pluck(:money_request_processor_mapping_id).compact.present?
+        ids = money_requests.where.not(money_request_processor_mapping_id: nil).pluck(:id).join(", ")
+        add_message :error, "Money Requests with ID #{ids} already linked to a batch"
+        return
+      end
+
       if has_amounts?
         total += config&.dig(:amount, :value)&.to_d
         currency_id = config&.dig(:amount, :currency_id)

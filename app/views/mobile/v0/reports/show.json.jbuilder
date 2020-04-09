@@ -1,4 +1,4 @@
-json.reviewers @result.report&.get_reviewers.map{|user| user.name}
+json.reviewers @result.report&.get_reviewers.map {|user| user.name}
 json.total do
   json.value @result.total
   json.currency do

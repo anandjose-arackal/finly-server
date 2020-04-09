@@ -12,26 +12,30 @@ class Docs::UtilityBills::Complaints::Ops::Raise < Transactions::API
   step :init
 
   def init(options, params:, **)
-    Bbps::ComplaintCreate.(params, "current_user" => User.first) do |op|
+    Bbps::ComplaintCreate.call_async({params: params, current_user: User.first}, {wait: true}) do |op|
       op.success do |op_result|
         result = {
-            'complaints' => op_result
+            'complaint' => op_result
         }
 
+        options['result'] = result
+      end
+
+      op.error do |op_result|
+        result = {
+            'complaint' => op_result
+        }
         options['result'] = result
       end
 
       op.failure do |op_result|
-        # todo - Remove below code
-        response = {"TxnStatusComplainResp" => {"txnList": nil, "customerDetails": nil, "msgId": "COMPLAINTMSGC13A3484AE2170627110227", "complaintId" => "DQ1498541548003", "openComplaint": nil, "complaintStatus": nil, "assigned": "XYZ Bank", "responseCode": "000", "responseReason": "SUCCESS"}}
-        data = {
-            'complaint_id': response["TxnStatusComplainResp"]["complaintId"],
-            'complaint_details' => response
+        result = {
+            'complaint' => op_result
         }
-        result = data
         options['result'] = result
-        # Send error response
       end
     end
+    true
   end
 end
+

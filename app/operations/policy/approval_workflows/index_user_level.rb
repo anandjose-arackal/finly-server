@@ -100,7 +100,7 @@ class Policy::ApprovalWorkflows::IndexUserLevel < Policy::ApprovalWorkflows::Bas
       when 'BbpsBillerSubscriptionProvider', :BbpsBillerSubscriptionProvider
         user_ids = PolicyUserRole.where(policy_id: policy.id, user_role_id: UserRole.id_for(:utility_bill_master_initiator)).pluck(:user_id).uniq rescue []
         user_ids += [user.id] if user.vp_admin_or_auditor? && user_ids.exclude?(user.id)
-      when 'BbpsBillProvider', :BbpsBillProvider
+      when 'BbpsBillAutofetchedProvider', :BbpsBillAutofetchedProvider, 'BbpsBillNonAutofetchedProvider', :BbpsBillNonAutofetchedProvider
         user_ids = PolicyUserRole.where(policy_id: policy.id, user_role_id: UserRole.id_for(:utility_bill_initiator)).pluck(:user_id).uniq rescue []
         user_ids += [user.id] if user.vp_admin_or_auditor? && user_ids.exclude?(user.id)
       when 'CreditNoteProvider', :CreditNoteProvider

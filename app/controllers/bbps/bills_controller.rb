@@ -64,6 +64,20 @@ class Bbps::BillsController < BaseControllers::WebBase
     endpoint Docs::UtilityBills::Bills::Ops::BillValidate
   end
 
+  def bulk_review_validate
+    endpoint Docs::UtilityBills::Bills::Ops::BulkReviewValidate
+    respond_to do |format|
+      format.json {}
+    end
+  end
+
+  def bulk_review
+    endpoint Docs::UtilityBills::Bills::Ops::BulkReview
+    respond_to do |format|
+      format.json {}
+    end
+  end
+
   def actions_config
     @result = ActionsManager::Processor.(current_user, params)
     respond

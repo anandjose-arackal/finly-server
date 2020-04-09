@@ -65,6 +65,20 @@ class ReportProcessorGroup < ApplicationRecord
         :status,
         :created_by_user)
   }
+
+  scope :include_for_index, -> {
+    includes(
+        {mappings:
+             [:user,
+              {amount: [:currency]},
+              :status,
+              :reports]
+        },
+        {total_amount: [:currency]},
+        {processed_amount: [:currency]},
+        :status,
+        :created_by_user)
+  }
   scope :pluck_status_id, -> { pluck :status_id }
   scope :not_completed, -> { where status_id: ReportProcessorGroupStatus.ids_for([:pending, :scheduled,
                                                                                   :processing, :partially_completed,

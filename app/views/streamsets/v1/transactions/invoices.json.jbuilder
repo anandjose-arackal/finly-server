@@ -18,7 +18,7 @@ json.result do
     json.vendor_ref_no invoice.vendor&.vendor_id
     json.vendor_gstin invoice.gstin_location&.gstin
     json.transaction_period_from invoice.transaction_service_period_from&.strftime("%Y-%m-%d %H:%M:%S")
-    json.transaction_period_to invoice.transaction_service_period_from&.strftime("%Y-%m-%d %H:%M:%S")
+    json.transaction_period_to invoice.transaction_service_period_to&.strftime("%Y-%m-%d %H:%M:%S")
     json.invoice_status invoice.status&.name&.humanize
     json.category invoice_line_item.category&.name
     json.quantity invoice_line_item.quantity
@@ -31,6 +31,7 @@ json.result do
     json.gst_group invoice_line_item&.tax_rate&.name
     json.hsn_sac invoice_line_item.hsn_sac
     json.cost_center invoice_line_item.cost_center&.name
+    json.cost_center_code invoice_line_item.cost_center&.cost_center_code
     json.item_code invoice_line_item.inventory_line_item&.item_code
     json.description invoice_line_item.description
     json.unit_of_measurement invoice_line_item.unit_of_measurement
@@ -48,8 +49,8 @@ json.result do
     json.line_item_cgst invoice_line_item.cgst || 0
     json.line_item_igst invoice_line_item.igst || 0
 
-    json.line_item_sgst_percentage (invoice_line_item.tax.to_f/2) || 0
-    json.line_item_cgst_percentage (invoice_line_item.tax.to_f/2) || 0
+    json.line_item_sgst_percentage (invoice_line_item.tax.to_f / 2) || 0
+    json.line_item_cgst_percentage (invoice_line_item.tax.to_f / 2) || 0
     json.line_item_igst_percentage invoice_line_item.tax || 0
 
     if invoice.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)
@@ -70,7 +71,7 @@ json.result do
     json.line_item_type invoice_line_item&.inventory_line_item&.supply_item_type&.name&.humanize
     json.line_item_expense_type invoice_line_item&.inventory_line_item&.item_expense_type&.name&.humanize
     json.nature_of_item invoice_line_item&.inventory_line_item&.product_type&.name&.humanize
-
+    json.user invoice.created_by&.json_for_trail({:streamsets => true})
     # extra fields
     json.buyer_location_state invoice.location&.state&.name
     json.buyer_location_code invoice.location&.location_code
@@ -79,16 +80,22 @@ json.result do
     json.delivery_location_code invoice.delivery_location&.location_code
 
     json.gstin_location_state invoice.gstin_location&.state&.name
+    json.gstin_location_city invoice.gstin_location&.location
     json.gstin_location_code invoice.gstin_location&.state&.state_code
 
     json.poc_email invoice.vendor_location&.poc_email
     json.poc_mobile_number invoice.vendor_location&.poc_mobile_number
 
     json.beneficiary_ifsc invoice.bank_account&.ifsc
+    json.beneficiary_account_number invoice.bank_account&.account_number
+    json.beneficiary_account_name invoice.bank_account&.name
 
     json.invoice_creator_name "#{invoice.created_by&.first_name} #{invoice.created_by&.last_name}"
     json.invoice_creator_employee_id invoice.created_by&.employee_id
     json.invoice_creator_email invoice.created_by&.email
+
+    # total count of items which are part of the invoice
+    json.total_items invoice.items&.count
   end
 end
 json.count @result.invoice_line_items.count

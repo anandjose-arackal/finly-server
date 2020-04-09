@@ -77,7 +77,8 @@ class KotakBankApi::Transfer < KotakBankApi::Base
       add_message :error, "Unauthorized."
       self.transfer_status_id = BankTransferStatus.id_for(:failed)
     when 500
-      self.parsed_response = Hash.from_xml(response.body)
+      add_message :error, "Schema Validation Error"
+      self.transfer_status_id = BankTransferStatus.id_for(:possible_failure)
     when 200
       self.parsed_response = Hash.from_xml(response.body)
 
@@ -235,7 +236,7 @@ class KotakBankApi::Transfer < KotakBankApi::Base
     #   beneficiary_name = beneficiary_name.sub(character, '')
     # end
     beneficiary_name = beneficiary_name.gsub(/[^0-9A-Za-z]/, '')
-    beneficiary_name = beneficiary_name[0..30]&.strip
+    beneficiary_name = beneficiary_name[0..29]&.strip
 
     beneficiary_ifsc = transfer_request.ifsc&.match(Constants::VALID_IFSC).to_s rescue ""
     self.template = liquid_template.render(
@@ -249,7 +250,7 @@ class KotakBankApi::Transfer < KotakBankApi::Base
         'BENEFICIARY_NAME' => beneficiary_name,
         'BENEFICIARY_ACCOUNT_NUMBER' => transfer_request.beneficiary_account_number&.strip,
         'BENEFICIARY_IFSC' => beneficiary_ifsc,
-        'DESCRIPTION' => "#{beneficiary_name} - #{payment&.id}",
+        'DESCRIPTION' => "#{beneficiary_name[0..28]} - #{payment&.id}",
         # 'TRANSFER_TYPE' => transfer_request.transfer_type&.strip&.upcase,
         'TRANSFER_TYPE' => resolve_transfer_type(beneficiary_ifsc, transfer_request.transfer_type),
         'TRANSFER_CURRENCY_CODE' => transfer_request.transfer_currency_code,

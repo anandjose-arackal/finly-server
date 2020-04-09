@@ -147,8 +147,10 @@ else
         json.item_amounts_total (parent.total_before_tax&.value + parent.discount_amount&.value).round(2) rescue 0
         json.tds_amount parent.advance_tds_amount&.value rescue 0
         json.net_payable_amount parent.balance_amount&.value
-        json.paid_amount parent.advance_payments.successful.joins(:amount).sum(:value)
-        json.remaining_amount (parent.balance_amount&.value.to_f - parent.advance_payments.successful.joins(:amount).sum(:value))
+        # json.paid_amount parent.advance_payments.successful.joins(:amount).sum(:value)
+        json.paid_amount parent.requested_advance_amount.value.round(2)
+        # json.remaining_amount (parent.balance_amount&.value.to_f - parent.advance_payments.successful.joins(:amount).sum(:value))
+        json.remaining_amount (parent.balance_amount&.value.to_f - parent.requested_advance_amount.value.round(2))
       end
     end
   end

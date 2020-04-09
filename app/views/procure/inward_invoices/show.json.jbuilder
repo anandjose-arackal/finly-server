@@ -69,6 +69,7 @@ json.invoice do
   json.po_prev_adjusted_advance invoice.po_prev_adjusted_advance
   json.po_adjusted_advance invoice.po_adjusted_advance
   json.advance_amount_required invoice.advance_amount_required
+  json.po_advance_tds_present (@result.respond_to?('purchase_order')) ? @result.purchase_order&.advance_tds_slab.present? : false
   json.user invoice.created_by.as_json rescue nil
   json.available_credits invoice.available_credits
 
@@ -389,13 +390,14 @@ json.locations do
   end
 end
 
-json.budgets do
-  json.array! @result.budgets do |budget|
-    json.extract! budget[:budget], :budgetable_id, :budgetable_type, :start_date, :id, :name, :purchase_order, :start_date, :end_date
-    json.user budget[:budget].user.as_json
-    json.spent_amount budget[:spent_amount]
-    json.budget_amount budget[:budget].budget_amount.as_json
-  end
-end
+# json.budgets do
+#   json.array! @result.budgets do |budget|
+#     json.extract! budget[:budget], :budgetable_id, :budgetable_type, :start_date, :id, :name, :purchase_order, :start_date, :end_date
+#     json.user budget[:budget].user.as_json
+#     json.spent_amount budget[:spent_amount]
+#     json.budget_amount budget[:budget].budget_amount.as_json
+#   end
+# end
 
 json.transfer_modes current_company.transfer_modes.as_json
+json.budgets @result.budgets

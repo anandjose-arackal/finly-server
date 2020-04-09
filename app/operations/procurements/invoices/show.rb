@@ -18,25 +18,23 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
 
   class Procurements::Invoices::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :invoice, :actions, :departments, :sub_departments, :cost_centers, :reviewal_chains, :policies,
-                  :tax_rates, :locations, :budgets, :gstin_locations, :variable_periodic_invoice, :bank_payment_request_policies
+                  :tax_rates, :locations, :budgets, :gstin_locations, :variable_periodic_invoice, :bank_payment_request_policies,
+                  :purchase_order
 
     def init
       self.invoice = params[:invoice]
-      # self.departments = user.company.departments.roots
-      # self.departments = user.company.departments
 
-      # self.locations = user.company.locations
-
-      case get_invoice_provider_name
-      when 'PoInvoiceProvider'
-        params[:filter_role_id] = [UserRole.id_for(:po_invoice_initiator)]
-      when 'NonPoInvoiceProvider'
-        params[:filter_role_id] = [UserRole.id_for(:non_po_invoice_initiator)]
-      when 'AgreementInvoiceProvider'
-        params[:filter_role_id] = [UserRole.id_for(:agreement_invoice_initiator)]
+      if InwardInvoiceStatus.status_ids_for_owner.include?(invoice.invoice_status_id)
+        case get_invoice_provider_name
+          when 'PoInvoiceProvider'
+            params[:filter_role_id] = [UserRole.id_for(:po_invoice_initiator)]
+          when 'NonPoInvoiceProvider'
+            params[:filter_role_id] = [UserRole.id_for(:non_po_invoice_initiator)]
+          when 'AgreementInvoiceProvider'
+            params[:filter_role_id] = [UserRole.id_for(:agreement_invoice_initiator)]
+        end
       end
 
-      # params[:filter_role_id] = [UserRole.id_for(:invoice_initiator)]
       self.departments = Company::Departments::Index.(invoice.created_by, params).policy_department_filter_mapping&.leaves
       self.locations = Company::Locations::Index.(invoice.created_by, params).policy_location_filter_mapping&.leaves
 
@@ -61,12 +59,9 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
 
       self.actions = get_actions
 
-      if self.invoice.items.present?
-        op = BudgetsCalculator::RelevantBudgets.(user, object: self.invoice)
-        if op.success?
-          self.budgets = op.budget_data
-        end
-      end
+      # calling budgets computer to get the consumed budgets
+      op = BudgetManager::BudgetsCalculator::ApplicableBudgets.({document: self.invoice, current_user: User.first})
+      self.budgets = op["result"][:budgets]
 
       if self.invoice.created_by_user_id == user.id && Invoice.status_ids(:open, :retracted, :rejected).include?(self.invoice.invoice_status_id)
         self.reviewal_chains = []
@@ -80,6 +75,17 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
           }
 
           self.reviewal_chains.push(chain)
+        end
+      end
+
+      if self.invoice.procurement.purchase_order.present?
+        procurement = self.invoice.procurement
+        self.purchase_order = procurement.purchase_order
+        if procurement.po_revisions.present?
+          po_revision = procurement.po_revisions.last
+          if po_revision.present?
+            self.purchase_order = po_revision
+          end
         end
       end
     end

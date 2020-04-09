@@ -17,13 +17,15 @@
 #  gl_code              :string(255)
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
+#  uuid                 :string(36)       not null
 #
 
 class Olap::Dimensions::Department < OlapRecord
+  include Events::Consumer
   include Analytics::Mapper
 
   transaction_model ::Department
-  events 'department.update', 'department.create', 'department.destroy'
+  consume 'department.update', 'department.create', 'department.destroy'
 
   map :name
   map :company_id

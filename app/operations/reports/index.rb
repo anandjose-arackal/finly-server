@@ -120,7 +120,7 @@ class Reports::Index < Reports::Base
 
   def post_process
     unless self.reports.nil?
-      self.reports = self.reports.exclude_deleted.includes(:policy, :status, expenses: [:amount]) rescue self.reports
+      self.reports = self.reports.exclude_deleted.includes({policy: [:settlement_currency, :base_currency]}, :status, :user, expenses: [:amount, :tds_amount]) rescue self.reports
     end
     if params[:ref] == '1' and params[:n_id].present?
       Event::EReport::Unset.(user, params)
@@ -150,6 +150,7 @@ class Reports::Index < Reports::Base
     has_scope :filter_group, type: :array
     has_scope :filter_report_status_id, type: :array
     has_scope :filter_report_status, type: :array # used for streamsets
+    has_scope :filter_ids, type: :array
 
     def init
       ScopeUtils.fix_for_scoping(params, :filter_custom_drop_down_selection, :array)

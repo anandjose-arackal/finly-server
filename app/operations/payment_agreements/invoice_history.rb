@@ -23,10 +23,14 @@ class PaymentAgreements::InvoiceHistory < PaymentAgreements::Base
 
   class PaymentAgreements::InvoiceHistory::UpcomingInvoicesPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :invoices
+    attr_accessor :invoices, :paginated_invoices
 
     def init
+      page = params[:page] || 1
+      per_page = params[:per_page] || 30
+
       self.invoices = params[:invoices]
+      self.paginated_invoices = self.invoices.paginate(page: page, per_page: per_page) rescue ::Invoice.none
     end
   end
 

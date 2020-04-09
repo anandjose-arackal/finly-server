@@ -82,6 +82,8 @@ class MoneyRequest < ApplicationRecord
   delegate :submitted_amount_value, to: :submitted_amount
 
   scope :with_id, ->(id) { where id: id }
+  scope :filter_id, ->(id) {with_id(id)}
+  scope :filter_ids, ->(id) {with_id(id)}
   scope :without_id, ->(id) { where.not id: id }
   scope :with_policy, ->(policy_id) { where policy_id: policy_id }
   scope :with_user, ->(user_id) { where user_id: user_id }
@@ -377,6 +379,16 @@ class MoneyRequest < ApplicationRecord
         errors.add(:cash, "money requests cannot be created without a destination account")
       end
     end
+  end
+
+  def utr
+    return self.bank_reference_number if self.bank_reference_number.present?
+    (self.money_request_processor_mapping&.bank_reference_number.present?) ? self.money_request_processor_mapping&.bank_reference_number : self.money_request_processor_mapping&.payment&.utr
+  end
+
+  def source_account
+    mrpm = self.money_request_processor_mapping&.processor
+    mrpm&.payment_type == 'bank_transfer' ? 'Bank Transfer' : super
   end
 
   private

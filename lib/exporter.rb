@@ -213,10 +213,10 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
       file = Tempfile.new(['export', '.csv'])
       CSV.open(file, 'w', write_headers: true, headers: headers) do |csv|
         self.contents&.each do |content|
-          row =[]
+          row = []
           content.each do |column|
             if column.is_a?(Hash)
-              (column[:type] == 'date' ?  row << column[:value].strftime('%d-%m-%Y') : row << column[:value])
+              (column[:type] == 'date' ? row << column[:value].strftime('%d-%m-%Y') : row << column[:value])
             else
               row << column
             end
@@ -254,7 +254,10 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
 
       # Write to xlsx file
       self.sheets.each do |sheet|
-        worksheet = workbook.add_worksheet(sheet[:name])
+        # refer this - https://www.rubydoc.info/gems/write_xlsx/0.76.3/Writexlsx%2FWorkbook:add_worksheet
+        # 
+        formatted_sheet_name = "#{sheet[:name].to_s[0..30].gsub(/[^0-9A-Za-z\-\_]/, '')}"
+        worksheet = workbook.add_worksheet(formatted_sheet_name)
 
         sheet[:item_headers].each_with_index do |item, index|
           format = workbook.add_format(:num_format => '@')

@@ -4,7 +4,7 @@ class Personalizer::Adapters::ExportBase < BaseOperation
 
   def success
     operation = Exporter::Spreadsheet.new(user, {headers: self.headers, contents: self.contents}, messages)
-    if params[:type] == 'xls'
+    if %w(xls xlsx).include?(params[:type])
       file = operation.generate_xls_file
     elsif params[:type] == 'csv'
       file = operation.generate_csv_file

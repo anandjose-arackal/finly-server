@@ -100,6 +100,7 @@ class MoneyRequests::Index < MoneyRequests::Base
     has_scope :filter_approved_date, using: [:from, :to], type: :hash
     has_scope :filter_policy
     has_scope :filter_required_by_date
+    has_scope :filter_ids, type: :array
 
     def init
       self.money_requests = params[:money_requests]

@@ -21,6 +21,8 @@ class BbpsBillsFetch < ApplicationJob
             will_create = true
           end
         end
+      else
+        will_create = true
       end
 
 
@@ -92,25 +94,6 @@ class BbpsBillsFetch < ApplicationJob
         )
       end
 
-      # Find by bill Number if present
-      # if result.bill_number.present? && result.bill_number != "NA"
-      #   bill = subscription.bbps_bills.where('bill_number = ?', result.bill_number).first
-      # if (result.bill_date.present? && result.bill_date != "NA") && (result.due_date.present? && result.due_date != "NA")
-      #   bill = subscription.bbps_bills.where("bill_date = ? AND due_date = ?", Date.parse(result.bill_date), Date.parse(result.due_date)).first
-      # elsif result.bill_period.present? && result.bill_period != "NA"
-      #   bill = subscription.bbps_bills.where('extract(year from bill_date) = ?', bill_date_year).where('lower(bill_period) = ?', bill_period.downcase).first
-      # end
-
-      # bill = subscription.bbps_bills.where()
-      # # Find by bill date or due date if present
-      # # find by
-      #
-      # if bill_period == "NA"
-      #   bill = subscription.bbps_bills.where('extract(year from bill_date) = ?', bill_date_year).first
-      # else
-      #   bill = subscription.bbps_bills.where('extract(year from bill_date) = ?', bill_date_year).where('lower(bill_period) = ?', bill_period.downcase).first
-      # end
-
 
       # Do not create bill if bill for same year and period exists
       # Update bill's reference number
@@ -138,6 +121,10 @@ class BbpsBillsFetch < ApplicationJob
           order_number_type: "BillFetch"
       }
       op = Docs::UtilityBills::Bills::Ops::Create.(params: params, current_user: User.first)
+      if op.success?
+        new_bill = op['model']
+        Docs::UtilityBills::Bills::Mailers::New::Autofetched.(params: {record: new_bill}, current_user: User.first)
+      end
     else
       params = {
           amount: 0,
@@ -150,7 +137,11 @@ class BbpsBillsFetch < ApplicationJob
           subscription_id: subscription.id,
           autofetched: autofetched
       }
-      op = Docs::UtilityBills::Bills::Ops::Create.(params)
+      op = Docs::UtilityBills::Bills::Ops::Create.(params: params, current_user: User.first)
+      if op.success?
+        new_bill = op['model']
+        Docs::UtilityBills::Bills::Mailers::New::Manual.(params: {record: new_bill}, current_user: User.first)
+      end
     end
   end
 
