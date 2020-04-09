@@ -4,9 +4,9 @@ class Docs::P2P::PurchaseOrders::Action < ActionManager::API
 
     action :template,
            :create,
-           label: "Create Non PO Invoice",
+           label: 'Create PO',
            icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
-           function: "non_po_invoice_create"
+           function: "po_create"
 
     action :button_group,
            :actions,
