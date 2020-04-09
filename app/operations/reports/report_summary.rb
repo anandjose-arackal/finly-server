@@ -1,4 +1,4 @@
- class Reports::ReportSummary < Reports::Base
+class Reports::ReportSummary < Reports::Base
 
   def post_process
     super()

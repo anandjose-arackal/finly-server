@@ -18,12 +18,12 @@ class Expense::ExTime::Create < Expense::ExTime::Base
 
   def personalizer
     {
-      pre_validate: {
-        before: Personalizer::Process.new([:expense, :time_create], :pre_validate, self)
-      },
-      pre_process: {
-        before: Personalizer::Process.new([:expense, :time_create], :pre_process, self)
-      }
+        pre_validate: {
+            before: Personalizer::Process.new([:expense, :time_create], :pre_validate, self)
+        },
+        pre_process: {
+            before: Personalizer::Process.new([:expense, :time_create], :pre_process, self)
+        }
     }
   end
 
@@ -97,7 +97,7 @@ class Expense::ExTime::Create < Expense::ExTime::Base
       add_message :error, 'Error in Spend Account'
       return
     end
-    
+
 
     if self.time_expense_params.dig(:time_expense_attributes, :time_object_attributes, :value).to_f <= 0
       add_message :error, 'Total time must be greater then 0'

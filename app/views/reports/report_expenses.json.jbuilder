@@ -24,9 +24,9 @@ json.expense_sections sorted_expenses do |category|
   json.extract! category, :section_name, :section_total
   json.expenses category[:expenses] do |expense|
     json.extract! expense, :id, :merchant_name, :amount_value, :expense_type_id,
-    :maps_distance_value,
+                  :maps_distance_value,
                   :distance_value, :distance_rate_value, :time_value, :time_rate_value,
-                  :expense_tax_type, :gst_percentage, :tds_percentage, :reimbursable_amount, :usage_date_type#, :usage_date_start, :usage_date_end
+                  :expense_tax_type, :gst_percentage, :tds_percentage, :reimbursable_amount, :usage_date_type #, :usage_date_start, :usage_date_end
     json.usage_date_start DateUtils.date_formatted expense.usage_date_start
     json.usage_date_end DateUtils.date_formatted expense.usage_date_end
     # adding potential duplicate flag in reports show

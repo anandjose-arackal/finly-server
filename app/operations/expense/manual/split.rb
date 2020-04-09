@@ -11,9 +11,9 @@ class Expense::Manual::Split < Expense::Manual::Base
 
   def personalizer
     {
-      init: {
-        before: Personalizer::Process.new([:expense, :manual_split], :init, self)
-      }
+        init: {
+            before: Personalizer::Process.new([:expense, :manual_split], :init, self)
+        }
     }
   end
 
@@ -61,7 +61,7 @@ class Expense::Manual::Split < Expense::Manual::Base
         end
       end
 
-      if expense_params.dig(:expense_params, :amount_attributes, :value).to_f <= 0 || expense_params.dig(:expense_params, :amount_attributes, :value).eql?('undefined' )
+      if expense_params.dig(:expense_params, :amount_attributes, :value).to_f <= 0 || expense_params.dig(:expense_params, :amount_attributes, :value).eql?('undefined')
         add_message :error, "Split #{expense_params[:index]}: Amount must be greater than 0"
       end
 

@@ -1,4 +1,4 @@
- class Reports::ReportComments < Reports::Base
+class Reports::ReportComments < Reports::Base
 
   def post_process
     super()

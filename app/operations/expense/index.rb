@@ -55,7 +55,7 @@ class Expense::Index < Expense::Base
       self.expenses = Expense.with_user_or_report(team_user_ids, report_ids) if team_user_ids.present? or report_ids.present?
     end
     self.expenses = Expense.none if self.expenses.nil?
-    
+
   end
 
   def post_process

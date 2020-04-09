@@ -11,8 +11,8 @@ class Expense::ExPerDiem::Multiple::Base < BaseOperation
       end
     end
     receipts = params_passed[:expense][:receipts_attributes] if params_passed[:expense].present?
-    p = params_passed.require(:expense).permit(:note, :category_id, :date, :expense_type_id, :report_id,:spent_from_id,
-                                        :receipt_id, :receipt, per_diem_expense_attributes: [:id, :quantity, :per_diem_id])
+    p = params_passed.require(:expense).permit(:note, :category_id, :date, :expense_type_id, :report_id, :spent_from_id,
+                                               :receipt_id, :receipt, per_diem_expense_attributes: [:id, :quantity, :per_diem_id])
     # Hack as image upload from API is failing in strong params
     receipts = [receipts] unless receipts.is_a?(Array)
     p[:receipts_attributes] = receipts if receipts.present? and not p.nil?

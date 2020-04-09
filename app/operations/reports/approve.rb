@@ -8,9 +8,9 @@ class Reports::Approve < Reports::Base
 
   def personalizer
     {
-      pre_process: {
-          before: Personalizer::Process.new([:report, :approve], :pre_process, self)
-      }
+        pre_process: {
+            before: Personalizer::Process.new([:report, :approve], :pre_process, self)
+        }
     }
   end
 
