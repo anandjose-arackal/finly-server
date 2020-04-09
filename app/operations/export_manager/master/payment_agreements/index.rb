@@ -85,8 +85,8 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
     agreements = agreement_presenter.payment_agreements
     rental_agreements = RentalInvoice.where(fixed_periodic_template: [nil, FALSE],payment_agreement_id:  agreements.pluck(:id)).template_invoices
     general_agreements = GeneralInvoice.where(fixed_periodic_template: [nil, FALSE],payment_agreement_id: agreements.pluck(:id)).template_invoices
-    rental_agreement_line_items =     InvoiceLineItem.where(parent_type: 'RentalInvoice').includes(:category, :department, :tax_rate, :cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency}, :discount_amount, parent: [ :invoice_type, :vendor, :delivery_location, :invoice_status, :location, :tds_slab, :advance_amount, :balance_due, :discount_amount, :created_by, :gstin_location, {tds_amount: :currency}, :amount]).where(parent_id: rental_agreements.pluck(:id)).order(parent_id: :asc)
-    general_agreement_line_items =     InvoiceLineItem.where(parent_type: 'GeneralInvoice').includes(:category, :department, :tax_rate, :cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency}, :discount_amount, parent: [ :invoice_type, :vendor, :delivery_location, :invoice_status, :location, :tds_slab, :advance_amount, :balance_due, :discount_amount, :created_by, :gstin_location, {tds_amount: :currency}, :amount]).where(parent_id: general_agreements.pluck(:id)).order(parent_id: :asc)
+    rental_agreement_line_items = InvoiceLineItem.where(parent_type: 'RentalInvoice').includes(:category, :department, :tax_rate, :cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency}, :discount_amount, parent: [ :invoice_type, :vendor, :delivery_location, :invoice_status, :location, :tds_slab, :advance_amount, :balance_due, :discount_amount, :created_by, :gstin_location, {tds_amount: :currency}, :amount]).where(parent_id: rental_agreements.pluck(:id)).order(parent_id: :asc)
+    general_agreement_line_items = InvoiceLineItem.where(parent_type: 'GeneralInvoice').includes(:category, :department, :tax_rate, :cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency}, :discount_amount, parent: [ :invoice_type, :vendor, :delivery_location, :invoice_status, :location, :tds_slab, :advance_amount, :balance_due, :discount_amount, :created_by, :gstin_location, {tds_amount: :currency}, :amount]).where(parent_id: general_agreements.pluck(:id)).order(parent_id: :asc)
     {general_invoices: general_agreement_line_items, rental_invoices: rental_agreement_line_items}
   end
 
@@ -185,7 +185,6 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
       headers.each_with_index do |item, index|
         worksheet.write( 0, index, item )
       end
-
       contents.each_with_index do |items, row|
         items.each_with_index do |item, column|
           worksheet.write(1 + row, column, item)
