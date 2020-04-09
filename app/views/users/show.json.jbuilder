@@ -10,6 +10,7 @@ json.user do
   json.gender @result.selected_user.profile.gender rescue nil
   json.employee_id @result.selected_user.profile&.employee_id
   json.editable (@result.user.company_admin? and params[:view] == 'admin')
+  json.active @result.user.active
   json.activateable @result.selected_user.manager_activateable?
   json.enforce_policy do
     json.enabled @result.selected_user.enforce_policy_enabled?
