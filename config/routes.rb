@@ -3731,6 +3731,7 @@ Rails.application.routes.draw do
       get 'show_payments', to: 'inward_invoices#show_payments', as: :show_payments
     end
 
+    delete 'vendor_types/bulk_destroy', to: 'vendor_types#bulk_destroy'
     resources :vendor_types
 
     resources :inward_invoices
