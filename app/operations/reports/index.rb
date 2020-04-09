@@ -110,7 +110,11 @@ class Reports::Index < Reports::Base
         self.reports = Report.admin_associated_items(user).not_open
       end
     when UserRole.id_for(:manager)
-      self.reports = Report.reviewer_associated_items(user).not_open
+      if self.user.admin?
+        self.reports = Report.admin_associated_items(user).not_open
+      else
+        self.reports = Report.reviewer_associated_items(user).not_open
+      end
     when UserRole.id_for(:finance_manager)
       self.reports = Report.finance_associated_items(user).not_open
     else

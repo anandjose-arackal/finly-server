@@ -69,7 +69,6 @@ class Budgets::ProcessTemplateFile < Budgets::Base
 
   def pre_process
     self.validate_operation = Budgets::BulkValidateFileData.(user, {item_details: self.parsed_data})
-    binding.pry
     if validate_operation.success?
 
     else

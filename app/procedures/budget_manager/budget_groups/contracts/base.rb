@@ -6,5 +6,6 @@ class BudgetManager::BudgetGroups::Contracts::Base < Reform::Form
   property :start_date, presence: true
   property :end_date, presence: true
   property :budget_date_type_id, presence: true
+  property :calculated_before_tax_amount
 
 end

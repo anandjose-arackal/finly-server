@@ -13,6 +13,7 @@
 #  subdomain        :string(255)
 #  group_id         :integer
 #  deleted_at       :datetime
+#  sub_domain       :string(255)
 #
 
 class Company < ApplicationRecord

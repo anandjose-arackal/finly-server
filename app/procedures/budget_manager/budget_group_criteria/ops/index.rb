@@ -13,7 +13,11 @@ class BudgetManager::BudgetGroupCriteria::Ops::Index < Transactions::API
 
   def index!(options, current_user:, params:, **)
     budget_group = options["model"]
-    options["budget_group_criteria"] = budget_group.budget_group_criteria.roots.include_for_index
+    if params[:include_children]
+      options["budget_group_criteria"] = budget_group.budget_group_criteria.include_for_index
+    else
+      options["budget_group_criteria"] = budget_group.budget_group_criteria.roots.include_for_index
+    end
     options["budget_group_criteria"] = apply_scopes(options["budget_group_criteria"], params)
   end
 end
