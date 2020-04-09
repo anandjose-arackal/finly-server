@@ -278,9 +278,7 @@ class Amount < ApplicationRecord
   scope :sum_INR, -> {sum(:INR)}
   scope :sum_value, -> {sum(:value)}
 
-  before_save do
-    set_base_currency_value
-  end
+  before_save :set_base_currency_value
 
   # i.e. updating the respective currency' column with value
   def set_base_currency_value

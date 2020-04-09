@@ -17,7 +17,6 @@ class Api::Fm::V1::UsersController < ApiApplicationController
   end
 
   def update
-    binding.pry
     params[:validate_password] = false
     unless params[:type]
       respond(response: :failure, message: 'Error while updating status. Type not found')

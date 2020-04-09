@@ -98,6 +98,12 @@ class Expense::ExTime::Create < Expense::ExTime::Base
       return
     end
 
+
+    if self.time_expense_params.dig(:time_expense_attributes, :time_object_attributes, :value).to_f <= 0
+      add_message :error, 'Total time must be greater then 0'
+      return
+    end
+
     # checking if the report is editable for personal view
     if personal_view? and expense_params[:report_id].present?
       report = user.reports.find_by(id: expense_params[:report_id])

@@ -76,7 +76,7 @@ class ActionsManager::Processor < BaseOperation
   protected
 
   def init_master
-    master = ActionsManager::Master::Base::MASTERS[self.params[:type]]
+    master = ActionsManager::Master::Base::MASTERS[self.params[:type]].to_s
     if master.present?
       return master.constantize unless master.is_a?(Class)
       return master

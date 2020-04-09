@@ -26,7 +26,9 @@ class TimeExpenseConfig < ApplicationRecord
 
   def rate
     return nil if super.nil?
-    Amount.new(value: super.value, currency: policy.base_currency)
+    amount = super
+    amount.currency = policy.base_currency
+    amount
   end
 
   def default_category_name
