@@ -161,7 +161,6 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
           next if section.name == :item_details && [:security_deposit, :beneficiary].include?(section_name)
           section.attributes.each do |attribute|
             next unless add_field?(attribute)
-
             if attribute.dynamic
               self.send attribute.name, row, record
             else
@@ -197,7 +196,7 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
       headers = self.header_collection[name].list
       contents =[]
       sheet.each do |row|
-        contents << row.build
+        contents << row.values&.values
       end
       headers.each_with_index do |item, index|
         worksheet.write( 0, index, item )
