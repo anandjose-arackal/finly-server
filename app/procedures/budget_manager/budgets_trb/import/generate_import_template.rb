@@ -25,7 +25,7 @@ class BudgetManager::BudgetsTrb::Import::GenerateImportTemplate < BudgetManager:
   end
 
   def process
-    self.budget_group.budget_group_criteria.each do |budget_group_criteria|
+    self.budget_group.budget_group_criteria.roots.each do |budget_group_criteria|
       budget_group_criteria.children.each do |child_group_criteria|
         child_group_criteria.budgets.each do |budget|
           self.contents << content_for_budget(budget)
