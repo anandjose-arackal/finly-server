@@ -120,6 +120,10 @@ class BeneficiaryPayment < ApplicationRecord
   after_create :update_creator_id, :update_company_id, :update_status
   delegate :paid?, to: :status
 
+  after_save :budget_trail_entry
+
+  after_destroy :budget_trail_destroy
+
   scope :with_id, -> (id) {where id: id}
   scope :without_id, -> (id) {where.not(id: id)}
   scope :only_unpaid, -> {where.not status_id: BeneficiaryPaymentStatus.id_for(:paid)}
@@ -429,6 +433,23 @@ class BeneficiaryPayment < ApplicationRecord
       if self.tax_rate_id.blank?
         errors.add(:tax, 'cannot be blank')
       end
+    end
+  end
+
+  def budget_trail_entry
+    self.payments.each do |payment|
+      if payment.failed?
+        # i.e. anytime this payment is updated and it moves to a failed state etc. destroy the respectie trail object
+        BudgetManager::BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.destroy_trail(payment)
+      else
+        BudgetManager::BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.save_trail(payment)
+      end
+    end
+  end
+
+  def budget_trail_destroy
+    self.payments.each do |payment|
+      BudgetManager::BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.destroy_trail(payment)
     end
   end
 end
