@@ -15,7 +15,7 @@ class BudgetManager::BudgetGroupCriteria::Ops::Update < Transactions::API
   step :destroy_old_mappings!
 
   # in the below step, we are telling TBZ which contract to use for this particular operation, inside "constant:"
-  step Contract::Build(constant: BudgetManager::BudgetGroupCriteria::Contracts::Base)
+  step Contract::Build(constant: BudgetManager::BudgetGroupCriteria::Contracts::Update)
 
   # This step actually performs the validations mentioned in the contract
   step Contract::Validate(key: 'budget_group_criterion')
