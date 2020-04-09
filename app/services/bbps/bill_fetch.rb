@@ -132,8 +132,8 @@ class Bbps::BillFetch < Bbps::Api
 
   def initiating_channel
     # "Mobile Banking (Pre-Login)"
-    # "MOB:<IP=13.126.31.9~IMEI=1234~OS=Android~APP=Finly>"
-    "MOB:<IP=13.232.176.84~IMEI=1234~OS=Android~APP=Finly>"
+    "MOB:<IP=13.126.31.9~IMEI=1234~OS=Android~APP=Finly>"
+      # "MOB:<IP=13.232.176.84~IMEI=1234~OS=Android~APP=Finly>"
     # "BSC:<TERMINAL_ID=1042~MOBILE=9723468155~GEOCODE=28.6139,78.5555~POSTAL_CODE=400004>"
     # "BSC:<TERMINAL_ID=1042~MOBILE=9723468155~GEOCODE=28.6139,78.5555~POSTAL_CODE=400004>"
     # BGP : 13.232.176.84
