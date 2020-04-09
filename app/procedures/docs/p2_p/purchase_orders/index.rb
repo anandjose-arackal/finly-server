@@ -43,15 +43,11 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
   end
 
   column :net_amount, default: true, includes: [net_amount: :currency] do
-    amount value: "{{record.net_amount.value}}",
-           currency_code: "{{record.net_amount.currency.country_code}}",
-           currency_symbol: "{{record.net_amount.currency.symbol}}"
+    amount value: :net_amount
   end
 
   column :gross_amount, default: true, includes: [gross_amount: :currency] do
-    amount value: "{{record.gross_amount.value}}",
-           currency_code: "{{record.gross_amount.currency.country_code}}",
-           currency_symbol: "{{record.gross_amount.currency.symbol}}"
+    amount value: :gross_amount
   end
 
   column :cost_center, default: true, includes: [:cost_center] do

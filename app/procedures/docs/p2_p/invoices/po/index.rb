@@ -54,27 +54,19 @@ class Docs::P2P::Invoices::Po::Index < Docs::P2P::Invoices::Index
   end
 
   column :net_amount, default: true, includes: [net_amount: :currency] do
-    amount value: "{{record.net_amount.value}}",
-           currency_code: "{{record.net_amount.currency.country_code}}",
-           currency_symbol: "{{record.net_amount.currency.symbol}}"
+    amount value: :net_amount
   end
 
   column :gross_amount, default: true, includes: [gross_amount: :currency] do
-    amount value: "{{record.gross_amount.value}}",
-           currency_code: "{{record.gross_amount.currency.country_code}}",
-           currency_symbol: "{{record.gross_amount.currency.symbol}}"
+    amount value: :gross_amount
   end
 
   column :balance_due, default: true, includes: [gross_amount: :currency] do
-    amount value: "{{record.balance_due.value}}",
-           currency_code: "{{record.balance_due.currency.country_code}}",
-           currency_symbol: "{{record.balance_due.currency.symbol}}"
+    amount value: :balance_due
   end
 
   column :tds_amount, default: true, includes: [tds_amount: :currency] do
-    amount value: "{{record.tds_amount.value}}",
-           currency_code: "{{record.tds_amount.currency.country_code}}",
-           currency_symbol: "{{record.tds_amount.currency.symbol}}"
+    amount value: :tds_amount
   end
 
   column :tds_slab, default: true, includes: [:tds_slab] do
