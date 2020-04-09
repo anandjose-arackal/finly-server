@@ -17,7 +17,7 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
   attribute :po_number
   attribute :invoice_number
   attribute :payment_id
-  attribute :report_id
+  attribute :expense_report_id
   attribute :category
   attribute :department
   attribute :cost_center
@@ -120,7 +120,7 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
     ""
   end
 
-  def report_id(item)
+  def expense_report_id(item)
     if item.entity.is_a?(Expense)
       return item.entity&.report&.id
     end
