@@ -136,7 +136,7 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
     self.sheet_names.each do |section_name|
       self.class.sections.each do |section|
         next if [:header,:item_details,section_name].exclude?(section.name)
-        next if section == :item_details && [:security_deposit, :beneficiary].include?(section_name)
+        next if section.name == :item_details && [:security_deposit, :beneficiary].include?(section_name)
         section.attributes.each do |attr|
           next unless add_field?(attr)
           next if attr.dynamic
@@ -158,7 +158,7 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
         row = ExportManager::Builders::Spreadsheet::Row.new(record: record, header: header)
         self.class.sections.each do |section|
           next if [:header,:item_details,section_name].exclude?(section.name)
-          next if section == :item_details && [:security_deposit, :beneficiary].include?(section_name)
+          next if section.name == :item_details && [:security_deposit, :beneficiary].include?(section_name)
           section.attributes.each do |attribute|
             next unless add_field?(attribute)
 
