@@ -26,7 +26,7 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
   end
 
   section :general_invoice do
-    attribute :invoice_number
+    attribute :invoice_serial_number
     attribute :vendor_name
     attribute :vendor_code
     attribute :start_date
@@ -41,7 +41,7 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
   end
 
   section :rental_invoice do
-    attribute :invoice_number
+    attribute :invoice_serial_number
     attribute :vendor_name
     attribute :vendor_code
     attribute :start_date
@@ -259,8 +259,8 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
     line_item.parent.payment_agreement.renewal_reminder_date&.strftime("%d-%b-%y")
   end
 
-  def invoice_number(line_item)
-    line_item.parent.invoice_number
+  def invoice_serial_number(line_item)
+    line_item.parent.invoice_id
   end
 
   def vendor_name(line_item)
