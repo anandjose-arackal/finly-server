@@ -426,7 +426,10 @@ class Budget < ApplicationRecord
   end
 
   def update_spent_amount_in_consumption_model
+    # updating the budget amount and the reamining amount in this model
     self.budget_consumption.budget_amount.update(value: self.budget_amount&.value)
+    remaining_amount = self.budget_consumption.budget_amount.value - self.budget_consumption.total_consumed_amount&.value.to_f
+    self.budget_consumption.remaining_amount.update(value: remaining_amount)
   end
 
 end

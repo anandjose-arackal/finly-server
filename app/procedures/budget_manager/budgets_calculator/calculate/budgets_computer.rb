@@ -154,6 +154,9 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
       paid_amount = self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_paid_amount_consideration).sum(paid_amount_to_be_considered)
       paid_amount += self.budget_trails.with_entity_type("PurchaseOrderItem").with_entity_status_id(PurchaseOrderStatus.ids_for_payment_processing_bucket).sum(paid_amount_to_be_considered)
 
+      # this is for POs that have been revised bu haven't had the chance to get approved yet
+      paid_amount += self.budget_trails.with_entity_type("PurchaseOrderItem").with_entity_status_id(PurchaseOrderStatus.status_ids_for_pending_bucket).sum(paid_amount_to_be_considered)
+
       # first is for all expenses that were reimbursed through Finly, and hence will have a "paid_amount_..." value that would have been created from the callback inside payments
       # paid_amount += self.budget_trails.with_entity_type("Expense").with_entity_status_id(ReportStatus.ids_for_paid_bucket).sum(paid_amount_to_be_considered)
       # the second is for all expenses that are paid / settled / closed outside of Finly - we look for all cases where "paid_amount_..." is 0 and sum the expense amounts

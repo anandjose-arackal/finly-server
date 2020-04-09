@@ -111,6 +111,11 @@ class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOr
   end
 
   def post_process
+    # here we are also taking the advance payments and explcitily triggering the callbacks because
+    # it seems to not be happening when we update the parents to the new PO
+    self.duplicate_po.advance_payments.each do |payment|
+      payment.save
+    end
     add_message :success, 'Successfully generated a revised purchase order.'
   end
 
