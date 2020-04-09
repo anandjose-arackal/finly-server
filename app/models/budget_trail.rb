@@ -50,7 +50,9 @@
 #  rcm_tax_value                              :decimal(20, 10)  default(0.0)
 #  paid_tds_value                             :decimal(20, 10)  default(0.0)
 #  processing_tds_value                       :decimal(20, )    default(0)
-#  cn_adjusted_amount_value                   :decimal(20, 10)  default(0.0)
+#  cn_adjusted_amount_before_tax_value        :decimal(20, 10)  default(0.0)
+#  cn_adjusted_amount_after_tax_value         :decimal(20, 10)  default(0.0)
+#  credit_note_tax_amount_value               :decimal(20, 10)  default(0.0)
 #
 
 class BudgetTrail < ApplicationRecord

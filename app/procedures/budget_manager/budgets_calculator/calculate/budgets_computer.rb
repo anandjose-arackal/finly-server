@@ -124,8 +124,8 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
         committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_pending_payment_bucket).sum("#{invoice_item_amount_to_be_considered} - #{paid_amount_to_be_considered} - #{payment_processing_amount_to_be_considered} - #{cn_adjusted_amount_to_be_considered}")
         committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").sum("rcm_tax_value")
       else
-        committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_committed_bucket).sum("#{invoice_item_amount_to_be_considered} - #{paid_amount_to_be_considered} - #{payment_processing_amount_to_be_considered} - #{cn_adjusted_amount_to_be_considered}")
-        committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_pending_payment_bucket).sum("#{invoice_item_amount_to_be_considered} - #{paid_amount_to_be_considered} - #{payment_processing_amount_to_be_considered} - #{cn_adjusted_amount_to_be_considered}")
+        committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_committed_bucket).sum("#{invoice_item_amount_to_be_considered} - #{paid_amount_to_be_considered} - #{payment_processing_amount_to_be_considered} - #{cn_adjusted_amount_to_be_considered} - credit_note_tax_amount_value")
+        committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_pending_payment_bucket).sum("#{invoice_item_amount_to_be_considered} - #{paid_amount_to_be_considered} - #{payment_processing_amount_to_be_considered} - #{cn_adjusted_amount_to_be_considered} - credit_note_tax_amount_value")
         # committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_tds_in_committed_bucket).sum("tds_value")
       end
 

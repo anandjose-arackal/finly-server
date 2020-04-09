@@ -221,6 +221,12 @@ class InvoiceLineItem < ApplicationRecord
     adjusted_amount
   end
 
+  def cn_tax_amount
+    applied_credit_notes = self.parent.credit_notes
+    tax_amount = applied_credit_notes.joins(:tax_amount).sum(:value) * ((self.before_tax_amount) / (self.parent.amount_before_tax)) rescue 0
+    tax_amount
+  end
+
 
   private
 
