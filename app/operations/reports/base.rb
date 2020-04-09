@@ -117,7 +117,8 @@ class Reports::Base < BaseOperation
       # end
 
       if self.actions[:reviewal_chain_editable][:value]
-        self.policies = retrieve_policies
+        # self.policies = retrieve_policies
+        self.policies = Policy::Index.(user, params).policies
         self.reviewal_chains = []
         params[:reviewal_document] = report
 
@@ -247,6 +248,34 @@ class Reports::Base < BaseOperation
       date_expenses
     end
 
+    def paginated_expenses_category_sorted
+      categorized_expenses = []
+      self.categories.roots.each do |category|
+        cat_ids = [category.id]
+        if category.children.present?
+          cat_ids += category.children.pluck(:id)
+        end
+        item_expenses = self.report.expenses.with_category(cat_ids)
+        params[:page] = params[:page] || 1
+        params[:per_page] = params[:per_page] || 500 # FE does not have pagination for now
+        case params[:sort_expenses]
+        when 'asc'
+          item_expenses = item_expenses.reorder(date: :asc)
+        when 'desc'
+          item_expenses = item_expenses.reorder(date: :desc)
+        else # by default sort for incresing date
+          item_expenses = item_expenses.reorder(date: :asc)
+        end
+        item_expenses = item_expenses.paginate(page: params[:page], per_page: params[:per_page])
+        if item_expenses.present?
+          item_name = category.name
+          item_sum = precision_value item_expenses.with_amount.sum(report.base_currency_code)
+          categorized_expenses << {section_name: item_name, expenses: item_expenses, section_total: item_sum}
+        end
+      end
+      categorized_expenses
+    end
+
     def paginated_expenses_date_sorted
       date_expenses = []
       dates = self.expenses.map(&:date).uniq
@@ -269,13 +298,13 @@ class Reports::Base < BaseOperation
 
         if item_expenses.present?
           item_name = DateUtils.date_formatted date
-          item_sum = precision_value item_expenses.with_amount.sum(report.base_currency_code)
+          # item_sum = precision_value item_expenses.with_amount.sum(report.base_currency_code)
+          item_sum = precision_value item_expenses.map {|e| e.amount.public_send(report.base_currency_code)}.compact.sum
           date_expenses << {section_name: item_name, expenses: item_expenses, section_total: item_sum}
         end
       end
       date_expenses
     end
-
 
     def load_actions
       actions = {

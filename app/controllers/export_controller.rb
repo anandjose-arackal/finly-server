@@ -1,7 +1,7 @@
 class ExportController < BaseControllers::WebBase
   include MathUtil
 
-  set_tokens_in_header :report, :expense, :atm_transactions, :statement, :money_request, :index_template, :export_template, :processor
+  set_tokens_in_header :report, :expense, :atm_transactions, :statement, :money_request, :index_template, :export_template, :processor, :bank_payment_request
 
   # def report
   #   params = RequestStore.store[:params]
@@ -152,6 +152,21 @@ class ExportController < BaseControllers::WebBase
 
   def money_request
     params[:type] = 'money_requests'
+    result = ExportManager::RequestHandler.(current_user, params)
+    if result.success?
+      @response = {
+          success: true,
+          job_id: result.export_job&.id,
+          messages: result.messages
+      }
+      render json: @response.as_json
+    else
+      respond response: :failure, message: result.messages[:error]
+    end
+  end
+
+  def bank_payment_request
+    params[:type] = 'bank_payment_requests'
     result = ExportManager::RequestHandler.(current_user, params)
     if result.success?
       @response = {

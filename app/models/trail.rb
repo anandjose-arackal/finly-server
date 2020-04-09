@@ -138,57 +138,59 @@ class Trail < ApplicationRecord
     body += user_name
 
     case self.action_id
-      when TrailAction.id_for(:submit)
+    when TrailAction.id_for(:submit)
         action = " submitted"
-      when TrailAction.id_for(:reject)
+    when TrailAction.id_for(:reject)
         action = " rejected"
-      when TrailAction.id_for(:create)
+    when TrailAction.id_for(:create)
         action = " created"
-      when TrailAction.id_for(:take_control)
+    when TrailAction.id_for(:take_control)
         action = " took control"
-      when TrailAction.id_for(:update)
+    when TrailAction.id_for(:update)
         action = " updated"
-      when TrailAction.id_for(:approve)
+    when TrailAction.id_for(:approve)
         action = " approved"
-      when TrailAction.id_for(:reject)
+    when TrailAction.id_for(:reject)
         action = " rejected"
-      when TrailAction.id_for(:retract)
+    when TrailAction.id_for(:retract)
         action = " retracted"
-      when TrailAction.id_for(:unapprove)
+    when TrailAction.id_for(:unapprove)
         action = " unapproved"
-      when TrailAction.id_for(:approve_and_forward)
+    when TrailAction.id_for(:approve_and_forward)
         action = " approved and forwarded"
-      when TrailAction.id_for(:auto_approve)
+    when TrailAction.id_for(:auto_approve)
         action = ""
-      when TrailAction.id_for(:credited)
+    when TrailAction.id_for(:credited)
         action = " credited"
-      when TrailAction.id_for(:settled)
+    when TrailAction.id_for(:settled)
         action = " settled"
-      when TrailAction.id_for(:settlement_confirmed)
+    when TrailAction.id_for(:settlement_confirmed)
         action = " confirmed settlement"
-      when TrailAction.id_for(:reimbursed)
+    when TrailAction.id_for(:reimbursed)
         action = " reimbursed"
-      when TrailAction.id_for(:notify_credit_reimbursement)
+    when TrailAction.id_for(:notify_credit_reimbursement)
         action = ""
-      when TrailAction.id_for(:reimbursement_confirmed)
+    when TrailAction.id_for(:reimbursement_confirmed)
         action = " confirmed reimbursement"
-      when TrailAction.id_for(:closed), TrailAction.id_for(:close)
+    when TrailAction.id_for(:closed), TrailAction.id_for(:close)
         action = " closed"
-      when TrailAction.id_for(:void)
+    when TrailAction.id_for(:void)
         action = " voided"
-      when TrailAction.id_for(:send_to_vendor)
+    when TrailAction.id_for(:send_to_vendor)
         action = " has sent to vendor"
-      when TrailAction.id_for(:revision)
+    when TrailAction.id_for(:revision)
         action = " created a revision for this"
-      when TrailAction.id_for(:reopen)
+    when TrailAction.id_for(:reopen)
         action = " reopened"
-      when TrailAction.id_for(:forward)
+    when TrailAction.id_for(:forward)
         action = " forwarded"
-      when TrailAction.id_for(:deactivate)
+    when TrailAction.id_for(:deactivate)
         action = " deactivated"
-      when TrailAction.id_for(:reactivate)
+    when TrailAction.id_for(:reactivate)
         action = " reactivated"
-      else
+    when TrailAction.id_for(:settle)
+      action = " settled"
+    else
         action = ""
     end
     if self.parent_type == 'YesBankVendor'
