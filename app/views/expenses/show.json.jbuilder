@@ -49,6 +49,7 @@ end
 json.vehicle_rates @result.vehicle_rates
 
 json.per_diem do
+  json.id @result.expense.per_diem_expense&.per_diem_id
   json.name @result.expense.per_diem_name
   json.rate_value @result.expense.per_diem_rate_value
   json.quantity_value @result.expense.per_diem_quantity_value

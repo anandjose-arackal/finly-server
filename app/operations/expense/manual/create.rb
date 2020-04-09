@@ -6,15 +6,15 @@ class Expense::Manual::Create < Expense::Manual::Base
 
   def personalizer
     {
-        pre_validate: {
-            before: Personalizer::Process.new([:expense, :manual_create], :pre_validate, self)
-        },
-        pre_process: {
-            before: Personalizer::Process.new([:expense, :manual_create], :pre_process, self)
-        },
-        validate: {
-            before: Personalizer::Process.new([:expense, :manual, :create], :validate, self)
-        }
+      pre_validate: {
+        before: Personalizer::Process.new([:expense, :manual_create], :pre_validate, self)
+      },
+      pre_process: {
+        before: Personalizer::Process.new([:expense, :manual_create], :pre_process, self)
+      },
+      validate: {
+        before: Personalizer::Process.new([:expense, :manual, :create], :validate, self)
+      }
     }
   end
 
@@ -91,8 +91,23 @@ class Expense::Manual::Create < Expense::Manual::Base
       return
     end
 
+    if self.expense_params.dig(:manual_expense_attributes, :merchant).blank?
+      add_message :error, 'Merchant can\'t be blank'
+      return
+    end
+
     if self.expense_params[:spent_from_id].present? && self.cash_pocket.blank?
       add_message :error, 'Error in Spend Account'
+      return
+    end
+
+    if self.expense_params[:tax_rate_id].eql?("")
+      add_message :error, 'Tax Value can\'t be blank'
+      return
+    end
+
+    if self.expense_params[:state_of_expense_id].eql?("")
+      add_message :error, 'State of expense can\'t be blank'
       return
     end
 
