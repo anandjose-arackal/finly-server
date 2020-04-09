@@ -34,7 +34,7 @@ class BudgetManager::BudgetsTrb::Import::ImportBudgets < BudgetManager::BudgetsT
       budget_id = data[:id]
       budget = user.company.budgets.find_by(id: budget_id)
       if budget.blank?
-        result_row += "Budget not found"
+        result_row << "Budget not found"
         self.contents << result_row
         next
       end
