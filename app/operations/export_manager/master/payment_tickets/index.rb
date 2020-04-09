@@ -87,97 +87,97 @@ class ExportManager::Master::PaymentTickets::Index < ExportManager::Builders::Sp
     payments
   end
 
-  def payment_order_id ( payment )
+  def payment_order_id (payment)
     payment&.payment_order&.bank_payment_request&.id
   end
-  
-  def payment_order_name ( payment )
+
+  def payment_order_name (payment)
     payment&.payment_order&.bank_payment_request&.name
   end
-  
-  def payment_id ( payment )
+
+  def payment_id (payment)
     payment&.id
   end
-  
-  def beneficiary_name ( payment )
+
+  def beneficiary_name (payment)
     payment&.receiving_account&.account_owner&.name.to_s
   end
-  
-  def beneficiary_code ( payment )
+
+  def beneficiary_code (payment)
     vendor = payment&.receiving_user_type == 'YesBankVendor' ? payment.receiving_user : nil
     vendor.present? ? vendor.vendor_id : ' '
   end
-  
-  def beneficiary_account_name ( payment )
+
+  def beneficiary_account_name (payment)
     payment&.receiving_account&.name.to_s
   end
-  
-  def beneficiary_account_number ( payment )
+
+  def beneficiary_account_number (payment)
     payment&.receiving_account&.account_number.to_s
   end
-  
-  def beneficiary_ifsc ( payment )
+
+  def beneficiary_ifsc (payment)
     payment&.receiving_account&.ifsc
   end
-  
-  def payment_mode ( payment )
+
+  def payment_mode (payment)
     payment&.payment_mode&.upcase
   end
-  
-  def initiated_by ( payment )
+
+  def initiated_by (payment)
     payment&.initiating_user&.name
   end
-  
-  def initiator_email ( payment )
+
+  def initiator_email (payment)
     payment&.initiating_user&.email
   end
-  
-  def payment_order_status ( payment )
+
+  def payment_order_status (payment)
     payment&.payment_order&.bank_payment_request&.status&.name&.humanize
   end
-  
-  def payment_order_schedule_date ( payment )
+
+  def payment_order_schedule_date (payment)
     payment&.payment_order&.scheduled_at&.strftime("%d-%b-%Y")
   end
-  
-  def payment_order_submitted_date ( payment )
+
+  def payment_order_submitted_date (payment)
     payment&.payment_order&.bank_payment_request&.submitted_at&.strftime("%d-%b-%Y")
   end
-  
-  def payment_order_processed_date ( payment )
+
+  def payment_order_processed_date (payment)
     payment&.payment_order&.processed_at&.strftime("%d-%b-%Y")
   end
 
-  def awaiting_action_from ( payment )
+  def awaiting_action_from (payment)
     payment&.payment_order.bank_payment_request.get_reviewers&.map(&:name)&.join(", ")
   end
-  
-  def policy ( payment )
+
+  def policy (payment)
     payment&.payment_order.bank_payment_request.policy&.name
   end
-  
-  def po_number ( payment )
+
+  def po_number (payment)
     purchase_order = (payment&.parent_type == 'PurchaseOrder' ? payment.parent : nil)
     purchase_order.present? ? purchase_order&.po_number : ''
   end
-  
-  def invoice_number ( payment )
+
+  def invoice_number (payment)
     payment&.invoice&.invoice_number
   end
-  
-  def invoice_due_date ( payment )
+
+  def invoice_due_date (payment)
     payment&.invoice&.due_date&.strftime("%d-%b-%Y")
   end
-  
-  def invoice_date ( payment )
+
+  def invoice_date (payment)
     payment&.invoice&.date&.strftime("%d-%b-%Y")
   end
-  
-  def invoice_id ( payment )
+
+  def invoice_id (payment)
     payment&.invoice&.invoice_id
   end
 
-  def original_amount ( payment )
+  def original_amount (payment)
     payment_type = payment.parent_type
     if payment_type.eql?('PurchaseOrder')
       precision_value(payment&.purchase_order&.requested_advance_amount&.value)
@@ -189,8 +189,8 @@ class ExportManager::Master::PaymentTickets::Index < ExportManager::Builders::Sp
       original_amount_invoice(payment)
     end
   end
-  
-  def advance_amount ( payment )
+
+  def advance_amount (payment)
     payment_type = payment.parent_type
     if payment_type.eql?('PurchaseOrder')
       0.to_f
@@ -199,15 +199,15 @@ class ExportManager::Master::PaymentTickets::Index < ExportManager::Builders::Sp
     elsif payment_type.eql?('Invoice')
       if payment&.parent&.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice)
         payment&.parent&.po_adjusted_advance&.value&.to_f
-      else 
+      else
         payment&.parent&.advance_amount&.value&.to_f
       end
     else
       0.to_f
     end
   end
-  
-  def discount ( payment )
+
+  def discount (payment)
     payment_type = payment.parent_type
     if ['PurchaseOrder', 'BeneficiaryPayment'].include? (payment_type)
       0.to_f
@@ -217,39 +217,39 @@ class ExportManager::Master::PaymentTickets::Index < ExportManager::Builders::Sp
       payment&.invoice&.discount_amount&.value.to_f
     end
   end
-  
-  def tax ( payment )
+
+  def tax (payment)
     payment_type = payment.parent_type
     if payment_type.eql?('PurchaseOrder')
       0.to_f
-    elsif ['BeneficiaryPayment', 'Invoice' ].include?(payment_type)
+    elsif ['BeneficiaryPayment', 'Invoice'].include?(payment_type)
       precision_value(payment&.parent&.tax_amount&.value.to_f)
     else
       payment&.invoice&.tax.to_f
     end
   end
-  
-  def tds ( payment )
+
+  def tds (payment)
     tds_amount(payment)
   end
-  
-  def net_payable_amount ( payment )
+
+  def net_payable_amount (payment)
     payment&.amount&.value.to_f
   end
 
-  def bank_reference_number ( payment )
+  def bank_reference_number (payment)
     payment&.utr
   end
-  
-  def note ( payment )
+
+  def note (payment)
     payment&.note
   end
-  
-  def payment_status ( payment )
+
+  def payment_status (payment)
     payment&.payment_status&.name&.humanize
   end
-  
-  def error_message ( payment )
+
+  def error_message (payment)
     payment&.system_messages.pluck(:content)&.to_sentence
   end
 
@@ -273,7 +273,7 @@ class ExportManager::Master::PaymentTickets::Index < ExportManager::Builders::Sp
     if payment.parent_type == 'PurchaseOrder'
       tds_amount = (payment.parent.advance_tds_amount&.value.to_f)
     else
-      tds_amount = (payment.invoice&.tds_amount&.value.to_f) 
+      tds_amount = (payment.invoice&.tds_amount&.value.to_f)
     end
     tds_amount
   end

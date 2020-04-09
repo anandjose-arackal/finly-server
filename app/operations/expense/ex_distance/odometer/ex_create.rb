@@ -78,7 +78,7 @@ class Expense::ExDistance::Odometer::ExCreate < Expense::ExDistance::Create
 
     super
     return if has_errors?
-      
+
     receipt_start_id = params&.dig(:expense, :distance_expense_attributes, :odometer_reading_receipt_start_id)
     receipt_end_id = params&.dig(:expense, :distance_expense_attributes, :odometer_reading_receipt_end_id)
     return add_message :error, 'Start Reading receipt not found' if receipt_start_id.present? and self.receipt_start.blank?

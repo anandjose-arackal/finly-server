@@ -178,7 +178,7 @@ class ExportController < BaseControllers::WebBase
     else
       respond response: :failure, message: result.messages[:error]
     end
-  end  
+  end
 
   def agreement_based_payment
     @result = Export::PaymentAgreement::AsXls.(current_user, params)

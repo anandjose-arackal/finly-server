@@ -5,12 +5,12 @@ class Expense::ExTime::Update < Expense::ExTime::Base
 
   def personalizer
     {
-      pre_validate: {
-        before: Personalizer::Process.new([:expense, :time_create], :pre_validate, self)
-      },
-      pre_process: {
-        before: Personalizer::Process.new([:expense, :time_update], :pre_process, self)
-      }
+        pre_validate: {
+            before: Personalizer::Process.new([:expense, :time_create], :pre_validate, self)
+        },
+        pre_process: {
+            before: Personalizer::Process.new([:expense, :time_update], :pre_process, self)
+        }
     }
   end
 

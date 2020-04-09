@@ -18,9 +18,9 @@ class Expense::ExTime::Multiple::Create < Expense::ExTime::Multiple::Base
 
   def personalizer
     {
-      pre_process: {
-        before: Personalizer::Process.new([:expense, :time_multiple_create], :pre_process, self)
-      }
+        pre_process: {
+            before: Personalizer::Process.new([:expense, :time_multiple_create], :pre_process, self)
+        }
     }
   end
 
