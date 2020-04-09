@@ -211,7 +211,7 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
   end
 
   def agreement_number(line_item)
-    return line_item.payment_agreement if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
+    return line_item.payment_agreement.get_agreement_number if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
     line_item.parent.payment_agreement.get_agreement_number
   end
 
@@ -224,23 +224,23 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
     line_item.parent.payment_agreement.policy&.name
   end
   def agreement_date(line_item)
-    return line_item.payment_agreement.agreement_date if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
-    line_item.parent.payment_agreement.agreement_date
+    return line_item.payment_agreement.agreement_date&.strftime("%d-%b-%y") if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
+    line_item.parent.payment_agreement.agreement_date&.strftime("%d-%b-%y")
   end
 
   def status(line_item)
-    return line_item.payment_agreement.status.name if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
-    line_item.parent.payment_agreement.status.name
+    return line_item.payment_agreement.status.name&.humanize if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
+    line_item.parent.payment_agreement.status.name&.humanize
   end
 
   def execution_date(line_item)
-    return line_item.payment_agreement.execution_date if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
-    line_item.parent.payment_agreement.execution_date
+    return line_item.payment_agreement.execution_date&.strftime("%d-%b-%y") if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
+    line_item.parent.payment_agreement.execution_date&.strftime("%d-%b-%y")
   end
 
   def expiration_date(line_item)
-    return line_item.payment_agreement.expiration_date if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
-    line_item.parent.payment_agreement.expiration_date
+    return line_item.payment_agreement.expiration_date&.strftime("%d-%b-%y") if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
+    line_item.parent.payment_agreement.expiration_date&.strftime("%d-%b-%y")
   end
 
   def never_expire(line_item)
@@ -249,13 +249,13 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
   end
 
   def renewal_date(line_item)
-    return line_item.payment_agreement.renewal_date if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
-    line_item.parent.payment_agreement.renewal_date
+    return line_item.payment_agreement.renewal_date&.strftime("%d-%b-%y") if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
+    line_item.parent.payment_agreement.renewal_date&.strftime("%d-%b-%y")
   end
 
   def renewal_reminder(line_item)
-    return line_item.payment_agreement.renewal_reminder_date if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
-    line_item.parent.payment_agreement.renewal_reminder_date
+    return line_item.payment_agreement.renewal_reminder_date&.strftime("%d-%b-%y") if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
+    line_item.parent.payment_agreement.renewal_reminder_date&.strftime("%d-%b-%y")
   end
 
   def invoice_number(line_item)
@@ -271,11 +271,11 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
   end
 
   def start_date(line_item)
-    line_item.parent.start_date
+    line_item.parent.start_date&.strftime("%d-%b-%y")
   end
 
   def end_date(line_item)
-    line_item.parent.end_date
+    line_item.parent.end_date&.strftime("%d-%b-%y")
   end
 
   def vendor_gstin(line_item)
@@ -447,11 +447,11 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
   end
 
   def beneficiary_payment_status(beneficiary)
-    beneficiary.status&.name
+    beneficiary.status&.name&.humanize
   end
 
   def beneficiary_tax_type(beneficiary)
-    beneficiary.gst_type&.name
+    beneficiary.gst_type&.name&.humanize
   end
 
   def beneficiary_tax_amount(beneficiary)
