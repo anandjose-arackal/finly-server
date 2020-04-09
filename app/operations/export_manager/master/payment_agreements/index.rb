@@ -211,40 +211,50 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
   end
 
   def agreement_number(line_item)
+    return line_item.payment_agreement if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
     line_item.parent.payment_agreement.get_agreement_number
   end
 
   def title(line_item)
+    return line_item.payment_agreement.title if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
     line_item.parent.payment_agreement.title
   end
   def policy(line_item)
+    return line_item.payment_agreement.policy&.name if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
     line_item.parent.payment_agreement.policy&.name
   end
   def agreement_date(line_item)
+    return line_item.payment_agreement.agreement_date if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
     line_item.parent.payment_agreement.agreement_date
   end
 
   def status(line_item)
+    return line_item.payment_agreement.status.name if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
     line_item.parent.payment_agreement.status.name
   end
 
   def execution_date(line_item)
+    return line_item.payment_agreement.excution_date if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
     line_item.parent.payment_agreement.execution_date
   end
 
   def expiration_date(line_item)
+    return line_item.payment_agreement.expiration_date if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
     line_item.parent.payment_agreement.expiration_date
   end
 
   def never_expire(line_item)
+    return line_item.payment_agreement.no_expiration if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
     (line_item.parent.payment_agreement.no_expiration ? 'YES' :  'NO')
   end
 
   def renewal_date(line_item)
+    return line_item.payment_agreement.renewal_date if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
     line_item.parent.payment_agreement.renewal_date
   end
 
   def renewal_reminder(line_item)
+    return line_item.payment_agreement.renewal_reminder_date if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
     line_item.parent.payment_agreement.renewal_reminder_date
   end
 
@@ -317,42 +327,54 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
   end
 
   def item_description(line_item)
+    return '' if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
     line_item.description
   end
   def tds_applicable(line_item)
+    return '' if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
     (line_item.tds_applicable? ? 'YES' : 'NO')
   end
   def comment(line_item)
+    return '' if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
     line_item.comment
   end
   def item_quantity(line_item)
+    return '' if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
     line_item.quantity
   end
   def expected_rate(line_item)
+    return '' if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
     line_item.rate
   end
   def discount(line_item)
+    return '' if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
     line_item.discount
   end
   def taxable_amount(line_item)
+    return '' if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
     line_item.taxable_amount&.value
   end
   def tax_rate(line_item)
+    return '' if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
     line_item.tax_rate&.rate
   end
   def tax_amount(line_item)
+    return '' if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
     line_item.tax_amount&.value
 
   end
   def item_total_amount(line_item)
+    return '' if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
     line_item.net_amount&.value
   end
 
   def net_payable_amount(line_item)
+    return '' if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
     line_item.parent.net_amount&.value
   end
 
   def remaining_amount(line_item)
+    return '' if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
     line_item.parent.balance_due&.value
   end
 
