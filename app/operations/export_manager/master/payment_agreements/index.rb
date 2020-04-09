@@ -383,7 +383,7 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
   end
 
   def security_deposit_vendor_code(security_deposit)
-    security_deposit.vendor.vendoe_id
+    security_deposit.vendor.vendor_id
   end
 
   def security_deposit_gstin(security_deposit)
@@ -411,7 +411,7 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
   end
 
   def security_deposit_balance_payable(security_deposit)
-    security_deposit.payable_amoiunt&.value
+    security_deposit.payable_amount&.value
   end
 
   def beneficiary_vendor_name(beneficiary)
@@ -419,7 +419,7 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
   end
 
   def beneficiary_vendor_code(beneficiary)
-    beneficiary.vendor.vendoe_id
+    beneficiary.vendor.vendor_id
   end
 
   def beneficiary_gstin(beneficiary)
@@ -459,7 +459,7 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
   end
 
   def beneficiary_balance_payable(beneficiary)
-    beneficiary.payable_amoiunt&.value
+    beneficiary.payable_amount&.value
   end
 
 end
