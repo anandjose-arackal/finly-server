@@ -2,7 +2,7 @@ class Choices::Builders::Base
   include DynamicAttributes
 
   class_attr :type
-  attr_accessor :config
+  attr_accessor :config, :form_entity
 
   def self.register!(type)
     Choices::Builder.register(type, self)
@@ -14,16 +14,13 @@ class Choices::Builders::Base
     self.new(*args)
   end
 
-  def serialize
-    Choices::Builder.serialize self, config
-  end
-
   def type
     self.class.type
   end
 
-  def initialize(config)
+  def initialize(config, form_entity: nil)
     self.config = config
+    self.form_entity = form_entity
   end
 
   def find_by_id(id, params: {}, user: nil)
@@ -46,8 +43,12 @@ class Choices::Builders::Base
     end
   end
 
-  def as_json(params: {}, user: {})
+  def build(params: {}, user: {})
     raise "JSON is not defined for #{self.name}"
+  end
+
+  def as_json(options = {})
+    Choices::Builder.serialize self, config
   end
 
 end

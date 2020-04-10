@@ -26,7 +26,7 @@ class Filters::API::Attribute
         simple: simple,
         operators: operators
     }
-    params[:choices] = choices.as_json(user: user) if choices.present?
+    params[:choices] = choices.build(user: user) if choices.present?
     params
   end
 

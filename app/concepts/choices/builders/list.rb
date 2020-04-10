@@ -7,6 +7,7 @@ class Choices::Builders::List < Choices::Builders::Base
   end
 
   def choices(params: {}, user: nil)
+    # Todo generalize away from form entity?
     form_entity.form_entity_choices
   end
 
@@ -18,7 +19,7 @@ class Choices::Builders::List < Choices::Builders::Base
     choices(params: params, user: user).find_by(name: name)
   end
 
-  def as_json(params: {}, user: nil)
+  def build(params: {}, user: nil)
     # Todo: Allow partial list based on the size of the choices
     {partial: false, choices: choices(params: params, user: user).as_json}
   end

@@ -34,7 +34,7 @@ class Choices::Builders::AutoComplete < Choices::Builders::Base
     result['model.records']
   end
 
-  def as_json(params: {}, user: nil)
+  def build(params: {}, user: {})
     params = params.with_indifferent_access.deep_merge(choice_params.with_indifferent_access)
     result = klass.(params: params, current_user: user)
 

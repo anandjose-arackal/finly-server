@@ -7,6 +7,7 @@ class Choices::Builders::CheckBox < Choices::Builders::Base
   end
 
   def choices(params: {}, user: nil)
+    # Todo Generalize!
     form_entity.form_entity_choices
   end
 
@@ -31,7 +32,7 @@ class Choices::Builders::CheckBox < Choices::Builders::Base
     false
   end
 
-  def as_json(params: {}, user: nil)
+  def build(params: {}, user: {})
     {partial: false, choices: choices(params: params, user: user).as_json}
   end
 

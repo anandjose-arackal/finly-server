@@ -22,9 +22,9 @@ class Choices::Builders::Enum < Choices::Builders::Base
     klass.all
   end
 
-  def choices_json(params: {}, user: nil)
-    choices(params: {}, user: nil).as_json
-  end
+  # def choices_json(params: {}, user: nil)
+  #   choices(params: {}, user: nil).as_json
+  # end
 
   def find_by_id(id, params: {}, user: nil)
     choices(params: params, user: user).where(id: id).first
@@ -34,7 +34,7 @@ class Choices::Builders::Enum < Choices::Builders::Base
     choices(params: params, user: user).where(name: name).first
   end
 
-  def as_json(options={})
+  def build(params: {}, user: {})
     list = []
     klass.all.each do |item|
       list << {
