@@ -317,7 +317,7 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
 
       data = {
           title: "Utility Bill Masters",
-          type: 'utility_bill_master',
+          type: 'utility_bill_masters',
           count: utility_bill_masters.count,
           filters: [{filter_status: 'awaiting_approval'}]
       }
@@ -344,7 +344,7 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
 
       data = {
           title: "Utility Bills",
-          type: 'utility_bill',
+          type: 'utility_bills',
           count: utility_bills.count,
           filters: [{filter_status: 'awaiting_approval'}]
       }
