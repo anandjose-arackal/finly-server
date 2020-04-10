@@ -114,8 +114,7 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     counter.add nil, "All", counts.values.reduce(0, :+)
     if user.has_permission?(awaiting_approval_roles)
       counter.add 99, 'Awaiting Approval',
-                  collection.where(invoice_status_id: InwardInvoiceStatus.id_for(:processing), controlling_user_id: user.id).count,
-                  params: {controlling_user_id: user.id}
+                  collection.where(invoice_status_id: InwardInvoiceStatus.id_for(:processing), controlling_user_id: user.id).count
     end
     InwardInvoiceStatus.all.each do |status|
       counter.add status.id, status.name.humanize, counts[status.id]

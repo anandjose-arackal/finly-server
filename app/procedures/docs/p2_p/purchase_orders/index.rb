@@ -103,7 +103,16 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
       counter.add 99, 'Awaiting Approval',
                   collection.where(purchase_order_status_id: PurchaseOrderStatus.id_for(:processing), controlling_user_id: user.id).count
     end
-    InwardInvoiceStatus.all.each do |status|
+    # open/retracted
+    # processing
+    # approved/auto_approved
+    # rejected
+    # voided
+    # sent_to_vendor
+    # vendor_confirmed
+    # po_revised
+    # closed
+    PurchaseOrderStatus.all.each do |status|
       counter.add status.id, status.name.humanize, counts[status.id]
     end
     counter
