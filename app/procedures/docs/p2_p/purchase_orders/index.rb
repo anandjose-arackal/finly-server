@@ -113,8 +113,8 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
     # Approved / Auto Approved
     counter.add 92, 'Approved', (counts[PurchaseOrderStatus.id_for(:approved)] + counts[PurchaseOrderStatus.id_for(:auto_approved)])
 
-    [:rejected, :voided, :sent_to_vendor, :vendor_confirmed, :closed, :po_revised].each do |status|
-      counter.add PurchaseOrderStatus.id_for(status), status.to_s.humanize, counts[PurchaseOrderStatus.id_for(status)]
+    [:rejected, :voided, :sent_to_vendor, :vendor_confirmed, :closed].each do |status|
+      counter.add PurchaseOrderStatus.id_for(status), status.to_s.titleize, counts[PurchaseOrderStatus.id_for(status)]
     end
 
     counter
