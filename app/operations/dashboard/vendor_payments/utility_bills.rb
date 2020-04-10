@@ -98,7 +98,7 @@ class Dashboard::VendorPayments::UtilityBills < Dashboard::VendorPayments::Base
                     ]
                 },
                 {
-                    title: "Awaiting Action",
+                    title: "Awaiting Submission",
                     count: utility_bills.filter_poc_awaiting_action(user.id)&.count,
                     filters: [
                         {filter_poc_awaiting_action: user.id}
