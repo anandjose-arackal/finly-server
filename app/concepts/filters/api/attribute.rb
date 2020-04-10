@@ -1,16 +1,15 @@
 class Filters::API::Attribute
 
-  attr_accessor :field_key, :label, :field_type, :auto_complete_route, :resolver_route, :hint, :simple
+  attr_accessor :field_key, :label, :field_type, :choices, :hint, :simple
 
   # Includes: Used for capturing the data points to be included to optimize the fetch for the current record
   # Simple is used to identify if the filter should be a part of the simple filter or not
-  def initialize(field_key:, label:, hint:, field_type:, auto_complete_route: nil, resolver_route: nil, simple: false)
+  def initialize(field_key:, label:, hint:, field_type:, choices: nil, simple: false)
     self.field_key = field_key
     self.label = label
     self.hint = hint
     self.field_type = field_type
-    self.auto_complete_route = auto_complete_route
-    self.resolver_route = resolver_route
+    self.choices = choices
     self.simple = simple
   end
 
@@ -27,24 +26,15 @@ class Filters::API::Attribute
         simple: simple,
         operators: operators
     }
-    # Todo replace this with forms ChoiceProvider once it is built
-    params[:auto_complete_route] = auto_complete_route if auto_complete_route
-    params[:choices] = build_choices(user) if resolver_route
+    params[:choices] = choices.as_json(user: user) if choices.present?
     params
-  end
-
-  def build_choices(user)
-    return nil unless resolver_route.present?
-
-    resolver = Resolver::Router[resolver_route]&.first&.klass&.new(user)
-    resolver.resolve
   end
 
   module Builder
     extend ActiveSupport::Concern
 
     included do
-      class_attr :attributes, default: {}
+      class_attr :attributes, default: {}.with_indifferent_access
     end
 
     class_methods do
@@ -53,7 +43,7 @@ class Filters::API::Attribute
         attributes[filter_key].present?
       end
 
-      def attribute(field_key, label: nil, type: :text, hint: "Select Value", auto_complete_route: nil, resolver_route: nil, simple: false)
+      def attribute(field_key, label: nil, type: :text, hint: "Select Value", choices: nil, simple: false)
         raise "#{field_key} is already defined for class #{self.name}" if exists?(field_key)
 
         label ||= field_key.to_s.humanize
@@ -64,8 +54,7 @@ class Filters::API::Attribute
                 label: label,
                 field_type: type,
                 hint: hint,
-                auto_complete_route: auto_complete_route,
-                resolver_route: resolver_route,
+                choices: choices,
                 simple: simple
             }
         )

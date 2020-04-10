@@ -1,9 +1,9 @@
-class Forms::ChoiceProviders::Enum < Forms::ChoiceProviders::Base
+class Choices::Builders::Enum < Choices::Builders::Base
 
   register! :enum
 
-  def self.config(klass, id: :id, name: :name)
-    {type: :enum, enum: klass.to_s, id: id, name: name}
+  def self.call(klass, id: :id, name: :name)
+    self.new({enum: klass.to_s, id: id, name: name})
   end
 
   def klass

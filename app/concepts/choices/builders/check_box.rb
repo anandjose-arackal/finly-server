@@ -1,9 +1,9 @@
-class Forms::ChoiceProviders::CheckBox < Forms::ChoiceProviders::Base
+class Choices::Builders::CheckBox < Choices::Builders::Base
 
   register! :checkbox
 
-  def self.config
-    {type: :checkbox, choices: [{name: "true", active: true}, {name: "false", active: true}]}
+  def self.call
+    self.new({choices: [{name: "true", active: true}, {name: "false", active: true}]})
   end
 
   def choices(params: {}, user: nil)

@@ -1,4 +1,4 @@
-class Docs::P2P::Invoices::NonPo::Policy < ApplicationPolicy
+class Docs::P2P::Invoices::Policy < ApplicationPolicy
 
   def update?
     owner?

@@ -1,9 +1,9 @@
-class Forms::ChoiceProviders::List < Forms::ChoiceProviders::Base
+class Choices::Builders::List < Choices::Builders::Base
 
   register! :list
 
-  def self.config(*args)
-    {type: :list, choices: args&.map {|m| m.slice(:name, :active)}}
+  def self.call(*args)
+    self.new({choices: args&.map {|m| m.slice(:name, :active)}})
   end
 
   def choices(params: {}, user: nil)

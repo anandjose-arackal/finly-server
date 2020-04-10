@@ -6,9 +6,9 @@ class Docs::Trips::Form < Forms::API
     auto_number :trip_id, sequence: {prefix: "TRF/{{\"now\" | date: \"%y-%m\" }}/", start_at: '000001'}
     dropdown :created_by, required: true, visible: false #, class_name: 'User'
     dropdown :company, required: true #, class_name: 'Company', internal: true
-    dropdown :status_id, choices_provider: Forms::ChoiceProvider[:enum].config(TripStatus, id: :id, name: :name), required: true, default_value: 1
-    dropdown :trip_type_id, choices_provider: Forms::ChoiceProvider[:enum].config(TripType), required: true
-    dropdown :policy_id, choices_provider: Forms::ChoiceProvider[:auto_complete].config('policies', q: {}, permissions: :utility_bill_initiator), required: true
+    dropdown :status_id, choices_provider: Choices[:enum].(TripStatus, id: :id, name: :name), required: true, default_value: 1
+    dropdown :trip_type_id, choices_provider: Choices[:enum].(TripType), required: true
+    dropdown :policy_id, choices_provider: Choices[:auto_complete].('policies', q: {}, permissions: :utility_bill_initiator), required: true
     date :start_date, required: true
     date :end_date, required: true
     text :purpose, required: true
@@ -38,9 +38,9 @@ class Docs::Trips::Form < Forms::API
     collection :transport_requests, populate_if_empty: TripTransportRequest, associate_custom_fields: true do
       text :from_location, required: true
       text :to_location, required: true
-      dropdown :mode, choices_provider: Forms::ChoiceProvider[:list].config({name: "Flight"}), required: true
+      dropdown :mode, choices_provider: Choices[:list].({name: "Flight"}), required: true
       datetime :depart_on, required: true
-      dropdown :preferred_timeframe, required: true, choices_provider: Forms::ChoiceProvider[:list].config(
+      dropdown :preferred_timeframe, required: true, choices_provider: Choices[:list].(
           {name: "6am to 9am"}, {name: "9am to 12pm"}, {name: "12pm to 3pm"},
           {name: "3pm to 6pm"}, {name: "6pm to 9pm"}, {name: "9pm to 12am"},
           {name: "12am to 3am"}, {name: "3am to 6am"}

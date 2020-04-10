@@ -1,13 +1,17 @@
-class Forms::ChoiceProviders::Resolver < Forms::ChoiceProviders::Base
+class Choices::Builders::Resolver < Choices::Builders::Base
 
   register! :resolver
 
+  def self.call(klass, *keys)
+    self.new({resolver: klass.to_s, keys: keys, filters: filters})
+  end
+
   def klass
-    Object.const_get(scope[:klass].to_s)
+    Object.const_get(config[:klass].to_s)
   end
 
   def keys
-    scope[:keys]
+    config[:keys]
   end
 
   def choices(params: {}, user: nil)
@@ -24,10 +28,6 @@ class Forms::ChoiceProviders::Resolver < Forms::ChoiceProviders::Base
   def find_by_name(name, params: {}, user: nil)
     params.deep_merge!({q: {name_eq: name}})
     choices(params: params, user: user)&.first
-  end
-
-  def self.scope(klass, *keys)
-    {type: :resolver, resolver: klass.to_s, keys: keys, filters: filters}
   end
 
 end

@@ -26,7 +26,7 @@ class PurchaseOrderExposure < Exposures::API
 
     record.controlling_user
   end
-  attribute :controlling_level, record_attribute: true, includes: [:controlling_level]
+  attribute :controlling_level, record_attribute: true, exposure: true, includes: [:controlling_level]
   attribute :cost_center, record_attribute: true, exposure: true, includes: [:cost_center]
   attribute :department, record_attribute: true, exposure: true, includes: [:department]
   attribute :billing_location, record_attribute: :location, exposure: true, includes: [:location]

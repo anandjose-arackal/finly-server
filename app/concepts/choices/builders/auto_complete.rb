@@ -1,9 +1,9 @@
-class Forms::ChoiceProviders::AutoComplete < Forms::ChoiceProviders::Base
+class Choices::Builders::AutoComplete < Choices::Builders::Base
 
   register! :auto_complete
 
-  def self.config(route, choice_params)
-    {type: :auto_complete, route: route.to_s, choice_params: choice_params}
+  def self.call(route, choice_params = {})
+    self.new({route: route.to_s, choice_params: choice_params})
   end
 
   def route
@@ -38,7 +38,7 @@ class Forms::ChoiceProviders::AutoComplete < Forms::ChoiceProviders::Base
     params = params.with_indifferent_access.deep_merge(choice_params.with_indifferent_access)
     result = klass.(params: params, current_user: user)
 
-    partial = result['model.records.json'].size == result["per_page"]
+    partial = result['model.records.json'].size == result['per_page']
     {
         partial: partial, choices: result['model.records.json']
     }

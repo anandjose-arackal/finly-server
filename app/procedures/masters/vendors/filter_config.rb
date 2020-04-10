@@ -7,9 +7,9 @@ class Masters::Vendors::FilterConfig < Filters::API
   attribute :updated_at, type: :datetime, simple: false
   attribute :submitted_at, type: :datetime, simple: false
   attribute :approved_at, type: :datetime, simple: false
-  attribute :vendor_type, type: :dropdown, resolver_route: 'vendor_types.default'
-  attribute :payment_terms, type: :dropdown, resolver_route: 'payment_terms.default'
-  attribute :policy, type: :lookup, auto_complete_route: 'policies'
+  # attribute :vendor_type, type: :dropdown, resolver_route: 'vendor_types.default'
+  # attribute :payment_terms, type: :dropdown, resolver_route: 'payment_terms.default'
+  # attribute :policy, type: :lookup, auto_complete_route: 'policies'
 
   # attribute :date, label: "Invoice Date", type: :datetime, simple: true
   # attribute :due_date, label: "Due Date", type: :datetime, simple: true

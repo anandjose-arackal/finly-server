@@ -1,26 +1,29 @@
-class Forms::ChoiceProviders::Base
+class Choices::Builders::Base
   include DynamicAttributes
 
   class_attr :type
-  attr_accessor :form_entity, :config
+  attr_accessor :config
 
   def self.register!(type)
-    Forms::ChoiceProvider.register(type, self)
+    Choices::Builder.register(type, self)
 
     type(type)
   end
 
-  def self.config(*args)
-    raise "config is not defined for #{self.name}"
+  def self.call(*args)
+    self.new(*args)
+  end
+
+  def serialize
+    Choices::Builder.serialize self, config
   end
 
   def type
     self.class.type
   end
 
-  def initialize(config, form_entity)
+  def initialize(config)
     self.config = config
-    self.form_entity = form_entity
   end
 
   def find_by_id(id, params: {}, user: nil)
@@ -43,8 +46,8 @@ class Forms::ChoiceProviders::Base
     end
   end
 
-  def as_json(options = {})
-    scope
+  def as_json(params: {}, user: {})
+    raise "JSON is not defined for #{self.name}"
   end
 
 end

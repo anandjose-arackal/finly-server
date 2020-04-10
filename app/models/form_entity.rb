@@ -88,7 +88,7 @@ class FormEntity < ApplicationRecord
     val = super()&.with_indifferent_access
     return nil unless val.present?
 
-    handler = Forms::ChoiceProvider.handler(val[:type])
+    handler = Choices.handler(val[:type])
     handler.new val, self
   end
 
