@@ -2,6 +2,8 @@ class ExportManager::Builders::Spreadsheet < ExportManager::API
   include DSL
   include MathUtil
 
+  attr_accessor :multiple_sheet
+
   type :spreadsheet
 
   def self.config
