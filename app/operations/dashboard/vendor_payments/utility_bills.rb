@@ -126,6 +126,8 @@ class Dashboard::VendorPayments::UtilityBills < Dashboard::VendorPayments::Base
                     title: "Rejected",
                     count: utility_bills.filter_user_id(user.id).filter_status('rejected')&.count,
                     filters: [
+                        {filter_user_id: user.id},
+                        {filter_user_name: user.name},
                         {filter_status: 'rejected'}
                     ]
                 },
@@ -133,6 +135,8 @@ class Dashboard::VendorPayments::UtilityBills < Dashboard::VendorPayments::Base
                     title: "Retracted",
                     count: utility_bills.filter_user_id(user.id).filter_status('retracted')&.count,
                     filters: [
+                        {filter_user_id: user.id},
+                        {filter_user_name: user.name},
                         {filter_status: 'retracted'}
                     ]
                 }
