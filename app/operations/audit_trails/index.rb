@@ -7,7 +7,7 @@ class AuditTrails::Index < AuditTrails::Base
 
     # WARNING: Make sure all the classes go below belongs_to Company model
     # Check validation
-    document_types = %w( PurchaseOrder Invoice YesBankVendor )
+    document_types = %w( PurchaseOrder Invoice Report YesBankVendor)
 
     if document_types.include?(document_type)
       self.document = document_type.classify.constantize.find_by id: document_id
@@ -25,8 +25,15 @@ class AuditTrails::Index < AuditTrails::Base
       return
     end
 
-    unless document.company_id == user.company.id
-      add_message :error, "You do not have permission for this action"
+    case document.class.name
+    when 'Report'
+      unless document.user.company_id == user.company.id
+        add_message :error, "You do not have permission for this action"
+      end
+    else
+      unless document.company_id == user.company.id
+        add_message :error, "You do not have permission for this action"
+      end
     end
   end
 

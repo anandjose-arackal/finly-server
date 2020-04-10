@@ -236,7 +236,8 @@ class ExportManager::Master::Reports::Index < ExportManager::Builders::Spreadshe
   end
 
   def bank_reference_number(expense)
-    expense.report&.bank_reference_number
+    # expense.report&.bank_reference_number
+    expense.report&.utr
   end
 
   def source_account(expense)

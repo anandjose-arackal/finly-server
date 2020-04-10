@@ -2,7 +2,7 @@ class Admin::Expenses::Base < Admin::Base
 
 
   def expense_params
-    params.require(:expense).permit(:note, :category_id, :date, :expense_status_id,
+    params.require(:expense).permit(:note, :category_id, :date,
                                     amount_attributes: [:value, :currency_id],
                                     manual_expense_attributes: [:merchant])
   end

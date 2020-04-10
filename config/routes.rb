@@ -3128,6 +3128,7 @@ Rails.application.routes.draw do
   get 'export/templates/index' => 'export#index_template'
   get 'export/templates/:template_key' => 'export#export_template'
   get 'export/money_request(.:format)' => 'export#money_request', as: :export_money_request
+  get 'export/bank_payment_request(.:format)' => 'export#bank_payment_request', as: :export_bank_payment_request
 
   resources :reports do
     post 'comment' => 'reports#comment', as: :comment
@@ -3142,6 +3143,9 @@ Rails.application.routes.draw do
     post 'add_expenses' => 'reports#add_expenses', as: :add_expenses
     delete 'remove_expenses' => 'reports#remove_expenses', as: :remove_expenses
     post 'toggle_receipt_hardcopy' => 'reports#toggle_receipt_hardcopy', as: :toggle_receipt_hardcopy
+    get 'report_expenses', to: 'reports#report_expenses', as: :expenses
+    get 'report_summary', to: 'reports#report_summary', as: :summary
+    get 'report_comments', to: 'reports#report_comments', as: :comments
   end
 
   # get 'test_take_control' => 'reports#test_take_control', as: :test_take_control
@@ -3727,6 +3731,7 @@ Rails.application.routes.draw do
       get 'show_payments', to: 'inward_invoices#show_payments', as: :show_payments
     end
 
+    delete 'vendor_types/bulk_destroy', to: 'vendor_types#bulk_destroy'
     resources :vendor_types
 
     resources :inward_invoices

@@ -100,6 +100,11 @@ class Expense::ExPerDiem::Create < Expense::ExPerDiem::Base
       return
     end
 
+    if self.expense_params.dig(:per_diem_expense_attributes, :per_diem_id).blank?
+      add_message :error, 'Per Diem name can\'t be blank'
+      return
+    end
+
     # checking if the user has enough cash on hand balance to mark this expense against it
     check_coh_availability_create(self.cash_pocket, expense_params)
 
