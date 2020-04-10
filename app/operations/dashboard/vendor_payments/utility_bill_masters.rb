@@ -86,7 +86,7 @@ class Dashboard::VendorPayments::UtilityBillMasters < Dashboard::VendorPayments:
         self.counts.push(admin_data)
       end
 
-      if user.is_utility_bill_master_initiator? || user.vp_admin_or_auditor?
+      if user.is_utility_bill_master_initiator?
         personal_data = {
             type: 'personal',
             data: [
