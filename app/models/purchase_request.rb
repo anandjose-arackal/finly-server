@@ -30,6 +30,8 @@ class PurchaseRequest < ApplicationRecord
 
   acts_as_sequenced column: :order_number, purpose: :purchase_request, editable: false, prefix: 'PR'
 
+  event_channel 'purchase_request'
+
   # belongs_to :purchase_request_status, optional: true
   belongs_to :status, optional: true, class_name: 'PurchaseRequestStatus', foreign_key: :purchase_request_status_id
   belongs_to :department, optional: true

@@ -121,6 +121,7 @@ class InvoiceLineItem < ApplicationRecord
   end
 
   def after_tax_amount
+
     self.net_amount&.value.to_f
   end
 
@@ -205,6 +206,27 @@ class InvoiceLineItem < ApplicationRecord
   def tds_amount
     service? ? calculate_tds(self.billable_amount&.value.to_f) : calculate_tds(self.taxable_amount&.value.to_f)
   end
+
+
+  def cn_adjusted_amount_with_tax
+    # applied_credit_notes = self.parent.credit_notes
+    # adjusted_amount = (applied_credit_notes.joins(:gross_receivable_amount).sum(:value) + applied_credit_notes.joins(:tax_amount).sum(:value)) * ((self.after_tax_amount) / (self.parent.amount_after_tax)) rescue 0
+    adjusted_amount = self.parent.credit_note_adjustments.joins(:amount).sum(:value) * ((self.after_tax_amount) / (self.parent.amount_after_tax)) rescue 0
+    adjusted_amount
+  end
+
+  def cn_adjusted_amount_without_tax
+    applied_credit_notes = self.parent.credit_notes
+    adjusted_amount = [(self.parent.credit_note_adjustments.joins(:amount).sum(:value) - applied_credit_notes.joins(:tax_amount).sum(:value)), 0].max * ((self.before_tax_amount) / (self.parent.amount_before_tax)) rescue 0
+    adjusted_amount
+  end
+
+  def cn_tax_amount
+    applied_credit_notes = self.parent.credit_notes
+    tax_amount = applied_credit_notes.joins(:tax_amount).sum(:value) * ((self.before_tax_amount) / (self.parent.amount_before_tax)) rescue 0
+    tax_amount
+  end
+
 
   private
 

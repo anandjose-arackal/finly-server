@@ -42,6 +42,25 @@ class ExportManager::Master::PaymentTickets::Index < ExportManager::Builders::Sp
   attribute :payment_status
   attribute :error_message
 
+  section :custom_fields do
+    attribute :custom_fields, dynamic: true
+  end
+
+  def custom_fields(row, payment)
+    payment&.invoice&.custom_fields&.includes(:field_configuration)&.each do |custom_field|
+      row.add(custom_field.field_configuration.field_name, custom_field.string_value)
+    end
+
+    payment&.purchase_order&.custom_fields&.includes(:field_configuration)&.each do |custom_field|
+      row.add(custom_field.field_configuration.field_name, custom_field.string_value)
+    end
+
+    # beneficiary_payment = BeneficiaryPayment.find_by(payment&.beneficiary_payment_id)
+    # beneficiary_payment&.custom_fields&.includes(:field_configuration)&.each do |custom_field|
+    #   row.add(custom_field.field_configuration.field_name, custom_field.string_value)
+    # end
+  end
+
   def input
     result = ::BankTransfer::PaymentRequest::Index.(user, params)
 
@@ -178,7 +197,7 @@ class ExportManager::Master::PaymentTickets::Index < ExportManager::Builders::Sp
     elsif payment_type.eql?('BeneficiaryPayment')
       precision_value(payment&.parent&.advance_amount&.value).to_f
     elsif payment_type.eql?('Invoice')
-      if payment.parent.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice)
+      if payment&.parent&.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice)
         payment&.parent&.po_adjusted_advance&.value&.to_f
       else
         payment&.parent&.advance_amount&.value&.to_f
