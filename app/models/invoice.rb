@@ -105,6 +105,7 @@ class Invoice < ApplicationRecord
   include Exposures::Model::Exposable
   include Exposures::Model::Exposable
   include Sequenced::ActsAsSequenced
+  include Ransacker
   # include EventProducer
 
   acts_as_sequenced column: :invoice_id, purpose: :invoice, editable: false, prefix: 'INV'
@@ -550,18 +551,6 @@ class Invoice < ApplicationRecord
     where.not invoice_status_id: [InwardInvoiceStatus.id_for(:voided),
                                   InwardInvoiceStatus.id_for(:rejected)]
   }
-
-  ransacker :created_at do
-    Arel.sql("date(invoices.created_at)")
-  end
-
-  ransacker :updated_at do
-    Arel.sql("date(invoices.updated_at)")
-  end
-
-  ransacker :deleted_at do
-    Arel.sql("date(invoices.deleted_at)")
-  end
 
   after_create :set_defaults
   after_save :budget_trail_entry

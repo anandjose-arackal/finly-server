@@ -86,7 +86,7 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
     text value: :invoice_status_text
   end
 
-  column :payment_status, default: true, includes: [procurement: [:status_tags]]do
+  column :payment_status, default: true, includes: [procurement: [:status_tags]] do
     text value: :payment_status_text
   end
 
@@ -96,25 +96,27 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
 
   counter -> (user, collection) do
     # Use custom scope to support awaiting approval status
-    counter = IndexBuilder::Counter.new :with_status_id
+    counter = IndexBuilder::Counter.new :with_status_ids
     counts = collection.group(:purchase_order_status_id).count
     counter.add nil, "All", counts.values.reduce(0, :+)
+    # Open / Retracted
+    counter.add 90, 'Open', (counts[PurchaseOrderStatus.id_for(:open)] + counts[PurchaseOrderStatus.id_for(:retracted)])
+
+    # Awaiting Approval
     if user.has_permission?(awaiting_approval_roles)
-      counter.add 99, 'Awaiting Approval',
+      counter.add 91, 'Awaiting Approval',
                   collection.where(purchase_order_status_id: PurchaseOrderStatus.id_for(:processing), controlling_user_id: user.id).count
     end
-    # open/retracted
-    # processing
-    # approved/auto_approved
-    # rejected
-    # voided
-    # sent_to_vendor
-    # vendor_confirmed
-    # po_revised
-    # closed
-    PurchaseOrderStatus.all.each do |status|
-      counter.add status.id, status.name.humanize, counts[status.id]
+
+    counter.add PurchaseOrderStatus.id_for(:processing), "Processing", counts[PurchaseOrderStatus.id_for(:processing)]
+
+    # Approved / Auto Approved
+    counter.add 92, 'Approved', (counts[PurchaseOrderStatus.id_for(:approved)] + counts[PurchaseOrderStatus.id_for(:auto_approved)])
+
+    [:rejected, :voided, :sent_to_vendor, :vendor_confirmed, :closed, :po_revised].each do |status|
+      counter.add PurchaseOrderStatus.id_for(status), status.to_s.humanize, counts[PurchaseOrderStatus.id_for(status)]
     end
+
     counter
   end
 

@@ -81,6 +81,7 @@
 class PurchaseOrder < ApplicationRecord
   include SoftDeletable, Templatable, Transitionable, MathUtil, CustomFieldFilterSupport
   include Sequenced::ActsAsSequenced
+  include Ransacker
 
   acts_as_sequenced column: :po_number, purpose: :purchase_order, editable: false, prefix: 'PO/{fiscal_year_start}-{fiscal_year_end}/', min_length: 4
 
@@ -163,7 +164,21 @@ class PurchaseOrder < ApplicationRecord
   scope :with_id, -> (id) { where id: id }
   scope :filter_ids, -> (id) { where id: id }
   scope :with_user_id, -> (user_ids) { where user_id: user_ids }
-  scope :with_status_ids, -> (status_ids) { where purchase_order_status_id: status_ids }
+  scope :with_status_ids, -> (status_ids) {
+    case status_ids
+    when 90
+      # Open / Retracted
+      where purchase_order_status_id: PurchaseOrderStatus.ids_for(:open, :retracted)
+    when 91
+      # Awaiting Approval
+      where(purchase_order_status_id: PurchaseOrderStatus.ids_for(:processing), controlling_user_id: RequestStoreUtil.current_user&.id).where.not(controlling_user_id: nil)
+    when 92
+      # Approved / Auto Approved
+      where purchase_order_status_id: PurchaseOrderStatus.ids_for(:approved, :auto_approved)
+    else
+      where purchase_order_status_id: status_ids
+    end
+  }
   scope :with_controlling_level_ids, -> (level_ids) { where controlling_level_id: level_ids }
   scope :with_controlling_user_id, -> (id) { where controlling_user_id: id }
   scope :with_procurement_id, ->(procurement_id) { where procurement_id: procurement_id }
@@ -465,6 +480,10 @@ class PurchaseOrder < ApplicationRecord
   after_create :purchase_request_tasks
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
+
+  def self.ransackable_scopes(auth_object = nil)
+    [:with_status_ids]
+  end
 
   def status_tag_details
     return @tags_data if @tags_data.present?
