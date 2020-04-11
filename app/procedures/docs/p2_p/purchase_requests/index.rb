@@ -32,7 +32,7 @@ class Docs::P2P::PurchaseRequests::Index < IndexBuilder::API
     text value: "{{record.policy.name}}"
   end
 
-  column :amount, default: true, sort: :total_amount_value, includes: [:total_amount] do
+  column :amount, default: true, sort: :total_amount_value, includes: [total_amount: :currency] do
     amount value: "{{record.total_amount.value}}",
            currency_code: "{{record.total_amount.currency.country_code}}",
            currency_symbol: "{{record.total_amount.currency.symbol}}"
@@ -43,12 +43,37 @@ class Docs::P2P::PurchaseRequests::Index < IndexBuilder::API
   end
 
   counter -> (user, collection) do
-    counter = IndexBuilder::Counter.new :purchase_request_status_id
+    counter = IndexBuilder::Counter.new :with_status_id
     counts = collection.group(:purchase_request_status_id).count
-    counter.add nil, "All", counts.values.reduce(0, :+)
-    PurchaseRequestStatus.all.each do |status|
-      counter.add status.id, status.name.humanize, counts[status.id]
+    counter.add nil, 'All', counts.values.reduce(0, :+)
+
+    # :draft, :retracted
+    counter.add 90, 'Open', ((counts[PurchaseRequestStatus.id_for(:draft)] || 0) + (counts[PurchaseRequestStatus.id_for(:retracted)] || 0))
+
+    # :awaiting_approval,
+    if user.has_permission?(:purchase_request_reviewer)
+      # Todo check logic for this from Abi
+      # counter.add 91, 'Awaiting Approval',
+      #             collection.where(purchase_request_status_id: PurchaseRequestStatus.id_for(:awaiting_approval), controlling_user_id: user.id).count
     end
+
+    # :processing
+    counter.add PurchaseRequestStatus.id_for(:awaiting_approval), 'Processing', counts[PurchaseRequestStatus.id_for(:awaiting_approval)]
+
+    # :approved, :auto_approved, :po_created, :partially_closed, :order_initiated
+    counter.add 92, 'Approved', (
+    (counts[PurchaseRequestStatus.id_for(:approved)] || 0) +
+        (counts[PurchaseRequestStatus.id_for(:auto_approved)] || 0) +
+        (counts[PurchaseRequestStatus.id_for(:po_created)] || 0) +
+        (counts[PurchaseRequestStatus.id_for(:partially_closed)] || 0) +
+        (counts[PurchaseRequestStatus.id_for(:order_initiated)] || 0)
+    )
+
+    # :rejected, :closed, :cancelled,
+    [:rejected, :closed, :cancelled].each do |status|
+      counter.add PurchaseRequestStatus.id_for(status), status.to_s.titleize, counts[PurchaseRequestStatus.id_for(status)]
+    end
+
     counter
   end
 

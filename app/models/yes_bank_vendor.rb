@@ -46,6 +46,7 @@ class YesBankVendor < ApplicationRecord
   include Sequenced::ActsAsSequenced
   include LiquidDroppable
   include Exposures::Model::Exposable
+  include Ransacker
 
   validates :business_name, presence: true
 
