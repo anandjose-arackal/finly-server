@@ -10,12 +10,16 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     text value: "Vendor ID: {{record.vendor.vendor_id}}"
   end
 
-  column :status, default: true do
-    badge value: "{{record.status.name | upcase}}", format: :format_status
-  end
-
   column :created_by, default: true, includes: [:created_by] do
     user value: :created_by
+  end
+
+  column :invoice_type, label: "Type", default: true, includes: [:invoice_type] do
+    text value: "{{record.invoice_type.name | upcase}}"
+  end
+
+  column :status, default: true, includes: [:status] do
+    badge value: :invoice_status, format: :format_status
   end
 
   column :created_at, default: true do
@@ -38,7 +42,7 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     date value: :due_date
   end
 
-  column :due_in_days, sort: :due_date do
+  column :due_in_days, sort: :due_date, default: true do
     text value: :due_in_days
   end
 
@@ -109,21 +113,49 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
 
   counter -> (user, collection) do
     # Use custom scope to support awaiting approval status
-    counter = IndexBuilder::Counter.new :invoice_status_id
+    counter = IndexBuilder::Counter.new :with_status_id
     counts = collection.group(:invoice_status_id).count
     counter.add nil, "All", counts.values.reduce(0, :+)
+
+    # Open - open/retracted
+    counter.add 90, 'Open', (
+    (counts[InwardInvoiceStatus.id_for(:open)] || 0) +
+        (counts[InwardInvoiceStatus.id_for(:retracted)] || 0)
+    )
+
+    # Awaiting Approval
     if user.has_permission?(awaiting_approval_roles)
-      counter.add 99, 'Awaiting Approval',
+      counter.add 91, 'Awaiting Approval',
                   collection.where(invoice_status_id: InwardInvoiceStatus.id_for(:processing), controlling_user_id: user.id).count
     end
-    InwardInvoiceStatus.all.each do |status|
-      counter.add status.id, status.name.humanize, counts[status.id]
+
+    # Processing
+    counter.add InwardInvoiceStatus.id_for(:processing), "Processing", counts[InwardInvoiceStatus.id_for(:processing)]
+
+    # Pending Payment - approved/auto_approved/partially_paid/unpaid/initiated
+    counter.add 92, 'Pending Payment', (
+    (counts[InwardInvoiceStatus.id_for(:approved)] || 0) +
+        (counts[InwardInvoiceStatus.id_for(:auto_approved)] || 0) +
+        (counts[InwardInvoiceStatus.id_for(:partially_paid)] || 0) +
+        (counts[InwardInvoiceStatus.id_for(:unpaid)] || 0) +
+        (counts[InwardInvoiceStatus.id_for(:initiated)] || 0)
+    )
+
+    [:rejected, :paid, :closed, :voided, :pending].each do |status|
+      counter.add InwardInvoiceStatus.id_for(status), status.to_s.titleize, counts[InwardInvoiceStatus.id_for(status)]
     end
+
     counter
   end
 
   def self.awaiting_approval_roles
     [:agreement_invoice_reviewer, :po_invoice_reviewer, :non_po_invoice_reviewer, :admin]
+  end
+
+  def self.invoice_status(user, record, record_exposure)
+    return 'Awaiting Approval'.upcase if record.invoice_status_id == InwardInvoiceStatus.id_for(:processing) and record.controlling_user_id == user.id
+
+    record.status&.name&.humanize&.upcase
   end
 
   def self.cost_center_name(user, record, record_exposure)
@@ -142,18 +174,18 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     case record.status&.name&.to_s&.to_sym
     when :rejected
       format = 'danger'
-    when :paid, :approved, :closed, :auto_approved
+    when :paid, :approved, :closed, :auto_approved, :unpaid, :partially_paid
       format = 'success'
     when :processing
-      if record.controlling_user_id == user
+      if record.controlling_user_id == user.id
         format = 'warning'
       else
         format = 'info'
       end
     when :open, :retracted, :pending, :voided, :initiated
       format = 'info'
-    when :unpaid, :partially_paid
-      format = 'warning'
+      # when :unpaid, :partially_paid
+      #   format = 'warning'
     else
       format = 'danger'
     end

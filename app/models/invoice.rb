@@ -134,7 +134,7 @@ class Invoice < ApplicationRecord
   belongs_to :created_by, optional: true, class_name: "User", foreign_key: :created_by_user_id
   belongs_to :company, optional: true
   belongs_to :invoice_status, optional: true, class_name: "InwardInvoiceStatus"
-  alias_attribute :status, :invoice_status
+  belongs_to :status, optional: true, class_name: "InwardInvoiceStatus", foreign_key: :invoice_status_id
   belongs_to :receiving_account, optional: true, polymorphic: true
   belongs_to :vendor, optional: true, class_name: "YesBankVendor"
   belongs_to :location, optional: true, class_name: 'BranchLocation'
@@ -223,20 +223,20 @@ class Invoice < ApplicationRecord
   # validates :net_amount, presence: true
   # validates :amount, presence: true
 
-  validates :invoice_number, :format => {with: /\A[a-zA-Z0-9 \\\/\-\#\&]*\Z/, :message => ' can only have letters, numbers, dashes and forward slash and no other special characters'}, :length => {minimum: 0, maximum:30}, :allow_blank => true
+  validates :invoice_number, :format => {with: /\A[a-zA-Z0-9 \\\/\-\#\&]*\Z/, :message => ' can only have letters, numbers, dashes and forward slash and no other special characters'}, :length => {minimum: 0, maximum: 30}, :allow_blank => true
 
   before_destroy :rollback_agreement_invoice
 
-  scope :with_id, -> (id) {where id: id}
-  scope :without_id, -> (id) {where.not(id: id)}
-  scope :with_cost_center_id, -> (id) {where cost_center_id: id}
-  scope :not_open, -> {where.not invoice_status_id: InwardInvoiceStatus.id_for(:open)}
-  scope :with_controlling_level_ids, -> (level_ids) {where controlling_level_id: level_ids}
-  scope :with_controlling_user_id, -> (id) {where controlling_user_id: id}
-  scope :with_procurement_id, ->(procurement_id) {where procurement_id: procurement_id}
-  scope :with_procurement, -> {where("invoices.procurement_id IS NOT NULL")}
-  scope :with_vendor_ids, -> (ids) {where vendor_id: ids}
-  scope :with_created_by_user_id, -> (user_ids) {where created_by_user_id: user_ids}
+  scope :with_id, -> (id) { where id: id }
+  scope :without_id, -> (id) { where.not(id: id) }
+  scope :with_cost_center_id, -> (id) { where cost_center_id: id }
+  scope :not_open, -> { where.not invoice_status_id: InwardInvoiceStatus.id_for(:open) }
+  scope :with_controlling_level_ids, -> (level_ids) { where controlling_level_id: level_ids }
+  scope :with_controlling_user_id, -> (id) { where controlling_user_id: id }
+  scope :with_procurement_id, ->(procurement_id) { where procurement_id: procurement_id }
+  scope :with_procurement, -> { where("invoices.procurement_id IS NOT NULL") }
+  scope :with_vendor_ids, -> (ids) { where vendor_id: ids }
+  scope :with_created_by_user_id, -> (user_ids) { where created_by_user_id: user_ids }
   scope :with_budgetable_department_ids, -> (department_ids) {
     if department_ids.present?
       ids = where(department_id: department_ids).pluck(:id)
@@ -270,8 +270,16 @@ class Invoice < ApplicationRecord
   }
 
   scope :with_status_id, -> (status_id) {
-    if status_id == 99
+    case status_id
+    when 90
+      # open / retracted
+      where invoice_status_id: InwardInvoiceStatus.ids_for(:open, :retracted)
+    when 91
+      # awaiting approval
       where(invoice_status_id: InwardInvoiceStatus.id_for(:processing), controlling_user_id: RequestStoreUtil.current_user&.id).where.not(controlling_user_id: nil)
+    when 92
+      # approved/auto_approved/partially_paid/unpaid/initiated
+      where invoice_status_id: InwardInvoiceStatus.ids_for(:approved, :auto_approved, :partially_paid, :unpaid, :initiated)
     else
       where(invoice_status_id: status_id)
     end
@@ -311,7 +319,7 @@ class Invoice < ApplicationRecord
     end
   }
 
-  scope :filter_reviewer_awaiting_approval, -> (user_id = nil){
+  scope :filter_reviewer_awaiting_approval, -> (user_id = nil) {
     if user_id.present?
       self.awaiting_action_items(user_id)
     end
@@ -330,19 +338,19 @@ class Invoice < ApplicationRecord
   }
 
   scope :invoice_date, -> (from, to) {
-    from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
+    from = Date.parse(from) rescue Date.parse('01-01-1990') unless from.is_a?(Date)
     to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
     where('date >= ? && date <= ?', from, to)
   }
 
   scope :filter_creation_date, -> (from, to) {
-    from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
+    from = Date.parse(from) rescue Date.parse('01-01-1990') unless from.is_a?(Date)
     to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
     where('invoices.created_at >= ? && invoices.created_at <= ?', from.beginning_of_day, to.end_of_day)
   }
 
   scope :filter_approved_date, -> (from, to) {
-    from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
+    from = Date.parse(from) rescue Date.parse('01-01-1990') unless from.is_a?(Date)
     to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
     where('invoices.approved_at >= ? && invoices.approved_at <= ?', from.beginning_of_day, to.end_of_day)
   }
@@ -362,7 +370,7 @@ class Invoice < ApplicationRecord
   scope :due_date, -> (from, to) {
     from = Date.parse('01-01-1990') if from.blank?
     to = Date.today if to.blank?
-    from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
+    from = Date.parse(from) rescue Date.parse('01-01-1990') unless from.is_a?(Date)
     to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
     where('due_date >= ? && due_date <= ?', from, to)
   }
@@ -372,18 +380,18 @@ class Invoice < ApplicationRecord
     where('due_date = ?', from)
   }
 
-  scope :created_at_desc, -> {order(created_at: :desc)}
-  scope :created_at_asc, -> {order(created_at: :asc)}
+  scope :created_at_desc, -> { order(created_at: :desc) }
+  scope :created_at_asc, -> { order(created_at: :asc) }
 
-  scope :with_cost_center_id, -> (id) {where cost_center_id: id}
-  scope :filter_cost_center_id, -> (id) {where cost_center_id: id} #somewhere FE is using this
+  scope :with_cost_center_id, -> (id) { where cost_center_id: id }
+  scope :filter_cost_center_id, -> (id) { where cost_center_id: id } #somewhere FE is using this
 
   # this scope checks for an exact match of invoice number
-  scope :with_invoice_number, -> (invoice_number) {where invoice_number: invoice_number}
+  scope :with_invoice_number, -> (invoice_number) { where invoice_number: invoice_number }
 
   # this scope checks for an approximate match - used in searches etc.
-  scope :filter_invoice_number, -> (invoice_number) {where 'invoices.invoice_number LIKE ?', "%#{invoice_number}%"}
-  scope :filter_invoice_id, -> (invoice_id) {where 'invoices.invoice_id like ?', "%#{invoice_id}%"}
+  scope :filter_invoice_number, -> (invoice_number) { where 'invoices.invoice_number LIKE ?', "%#{invoice_number}%" }
+  scope :filter_invoice_id, -> (invoice_id) { where 'invoices.invoice_id like ?', "%#{invoice_id}%" }
   scope :filter_inward_invoice_type, -> (invoice_type) {
     where invoice_type_id: InwardInvoiceType.id_for(invoice_type)
   }
@@ -392,8 +400,8 @@ class Invoice < ApplicationRecord
     where invoice_type_id: InwardInvoiceType.id_for(:tax_invoice)
   }
 
-  scope :filter_policy_id, -> (policy_id) {where policy_id: policy_id}
-  scope :filter_location_id, -> (location_id) {where("location_id = ? OR delivery_location_id = ?", location_id, location_id)}
+  scope :filter_policy_id, -> (policy_id) { where policy_id: policy_id }
+  scope :filter_location_id, -> (location_id) { where("location_id = ? OR delivery_location_id = ?", location_id, location_id) }
 
   scope :filter_non_po_invoice, -> {
     where invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)
@@ -495,7 +503,7 @@ class Invoice < ApplicationRecord
     where('extract(month from created_at) = ?', month)
   }
 
-  scope :filter_cost_center_id, -> (cost_center_id) {where(cost_center_id: cost_center_id)}
+  scope :filter_cost_center_id, -> (cost_center_id) { where(cost_center_id: cost_center_id) }
 
   scope :show_only_invoices_which_are_forwarded, -> (show_it = false) {
     if StringUtils.to_bool(show_it)
@@ -513,21 +521,21 @@ class Invoice < ApplicationRecord
 
 
   # Sorting
-  scope :sort_invoice_id, -> (type){
+  scope :sort_invoice_id, -> (type) {
     type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
       reorder("invoices.invoice_id #{type}")
     end
   }
 
-  scope :sort_date, -> (type){
+  scope :sort_date, -> (type) {
     type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
       reorder("invoices.date #{type}")
     end
   }
 
-  scope :sort_due_date, -> (type){
+  scope :sort_due_date, -> (type) {
     type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
       reorder("invoices.due_date #{type}")
@@ -570,7 +578,7 @@ class Invoice < ApplicationRecord
            :invoice_items, :invoice_attachments, :attachments, :custom_fields,
            :document_level_reviewer_mappings]
 
-    customize(lambda {|invoice, new_invoice|
+    customize(lambda { |invoice, new_invoice|
       new_invoice.trails.destroy_all
       new_invoice.comments.destroy_all
       new_invoice.attachments.destroy_all
@@ -631,11 +639,16 @@ class Invoice < ApplicationRecord
       user = RequestStore.store[:current_user]
       configuration = user.company.feature_subscription.srn_enabled rescue false
       if self.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice) && configuration # if srn feature enabled for company, return sum of billable amount for services, amount for goods
-        return self.invoice_items.includes(:inventory_line_item, :amount).map {|p| if p.inventory_line_item&.product_type_id == ProductType.id_for(:service) then p.billable_amount&.value else p.amount&.value end }.compact.sum
+        return self.invoice_items.includes(:inventory_line_item, :amount).map { |p|
+          if p.inventory_line_item&.product_type_id == ProductType.id_for(:service) then
+            p.billable_amount&.value
+          else
+            p.amount&.value
+          end }.compact.sum
       end
 
       # return self.invoice_items.joins(:amount).sum(:value)
-      return self.invoice_items.includes(:amount).map {|p| p.amount&.value }.compact.sum
+      return self.invoice_items.includes(:amount).map { |p| p.amount&.value }.compact.sum
     else
       return 0
     end
@@ -645,9 +658,9 @@ class Invoice < ApplicationRecord
     if self.payments.present?
       # return self.payments.successful.joins(:amount).sum(:value)
       if completed_only
-        return self.payments.map {|p| p.amount.value if (p.payment_status_id == PaymentStatus.id_for(:completed))}.compact.sum
+        return self.payments.map { |p| p.amount.value if (p.payment_status_id == PaymentStatus.id_for(:completed)) }.compact.sum
       else
-        return self.payments.map {|p| p.amount.value if (PaymentStatus.all_except_failed.include? p.payment_status_id)}.compact.sum
+        return self.payments.map { |p| p.amount.value if (PaymentStatus.all_except_failed.include? p.payment_status_id) }.compact.sum
       end
     else
       return 0
@@ -657,7 +670,7 @@ class Invoice < ApplicationRecord
   def item_quantity_total
     if self.invoice_items.present?
       # return self.invoice_items.sum(:quantity)
-      return self.invoice_items.map {|p| p.quantity}.sum
+      return self.invoice_items.map { |p| p.quantity }.sum
     else
       return 0
     end
@@ -745,7 +758,7 @@ class Invoice < ApplicationRecord
   #   self.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)
   # end
 
-  def as_json(options={})
+  def as_json(options = {})
     if options[:payment_history]
       return payment_history_json
     else
@@ -913,6 +926,7 @@ class Invoice < ApplicationRecord
     user = user.present? ? user : RequestStore.store[:current_user]
     user.has_policy_role?(UserRole.id_for(:agreement_invoice_auditor), self)
   end
+
   ############ End ############
 
   # def can_take_control?
@@ -953,7 +967,7 @@ class Invoice < ApplicationRecord
     # end
   end
 
-  def can_take_control?(user=nil)
+  def can_take_control?(user = nil)
     user = user.present? ? user : RequestStore.store[:current_user]
     return false if user.blank?
     return false if self.action_users(:approve).include?(user)
@@ -995,7 +1009,7 @@ class Invoice < ApplicationRecord
     end
   end
 
-  def self.role_based_initiator_associated_items(user, role_id, options={})
+  def self.role_based_initiator_associated_items(user, role_id, options = {})
     if [UserRole.id_for(:po_invoice_initiator), UserRole.id_for(:non_po_invoice_initiator), UserRole.id_for(:agreement_invoice_initiator)].include?(role_id)
       document_table_name = options[:document_table_name]
       if (document_table_name == "invoices") || ("#{self.table_name}" == "invoices")
@@ -1105,8 +1119,8 @@ class Invoice < ApplicationRecord
     current_user = RequestStore.store[:current_user]
     invoice_cf_ids = self.custom_fields.pluck(:field_configuration_id)
     configurations = current_user.company.field_configurations.where.not(id: invoice_cf_ids).exclude_deleted.root_fields.order_created_at_desc
-      custom_fields_config = configurations.with_parent_type(FieldParentType.id_for(:invoice))
-      return custom_fields_config
+    custom_fields_config = configurations.with_parent_type(FieldParentType.id_for(:invoice))
+    return custom_fields_config
   end
 
 
@@ -1152,7 +1166,7 @@ class Invoice < ApplicationRecord
     self.created_by_user_id = user.id
   end
 
-  def update_company(user=nil)
+  def update_company(user = nil)
     user = user.present? ? user : RequestStore.store[:current_user]
     if user.present?
       if self.company_id.blank?
@@ -1193,7 +1207,7 @@ class Invoice < ApplicationRecord
       status_ids.push InwardInvoiceStatus.id_for(status)
     end
 
-    status_ids.reject {|status_id| status_id.nil?}
+    status_ids.reject { |status_id| status_id.nil? }
   end
 
   def self.document_owner_attribute
@@ -1301,21 +1315,21 @@ class Invoice < ApplicationRecord
 
   def payment_history_json
     {
-      id: self.id,
-      invoice_number: self.invoice_number,
-      invoice_id: self.invoice_id,
-      vendor_name: self.vendor&.display_name,
-      due_date: self.due_date&.to_date,
-      net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
-      balance_due_attributes: {id: self.balance_due_id, value: precision_value(self.balance_due&.value), currency_id: self.amount&.currency_id},
-      status: self&.status&.name&.titleize,
-      creation_date: self.created_at.to_date,
-      tds_slab_attributes: { id: self.tds_slab_id, name: self.tds_slab&.name, tds: self.tds_slab&.tds },
-      agreement_type: self.class.name.underscore,
-      payment_agreement_id: self.payment_agreement_id,
-      vendor_id: self.vendor_id,
-      agreement_number: self.payment_agreement&.get_agreement_number,
-      procurement_id: self.procurement_id
+        id: self.id,
+        invoice_number: self.invoice_number,
+        invoice_id: self.invoice_id,
+        vendor_name: self.vendor&.display_name,
+        due_date: self.due_date&.to_date,
+        net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
+        balance_due_attributes: {id: self.balance_due_id, value: precision_value(self.balance_due&.value), currency_id: self.amount&.currency_id},
+        status: self&.status&.name&.titleize,
+        creation_date: self.created_at.to_date,
+        tds_slab_attributes: {id: self.tds_slab_id, name: self.tds_slab&.name, tds: self.tds_slab&.tds},
+        agreement_type: self.class.name.underscore,
+        payment_agreement_id: self.payment_agreement_id,
+        vendor_id: self.vendor_id,
+        agreement_number: self.payment_agreement&.get_agreement_number,
+        procurement_id: self.procurement_id
 
     }
   end

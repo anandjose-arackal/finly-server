@@ -35,7 +35,7 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
   end
 
   column :status, default: true, includes: [:status] do
-    badge value: "{{record.status.name | upcase}}", format: :format_status
+    badge value: :po_status, format: :format_status
   end
 
   column :policy, default: true, includes: [:policy] do
@@ -90,10 +90,6 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
     text value: :payment_status_text
   end
 
-  def self.awaiting_approval_roles
-    [:purchase_order_reviewer, :admin]
-  end
-
   counter -> (user, collection) do
     # Use custom scope to support awaiting approval status
     counter = IndexBuilder::Counter.new :with_status_ids
@@ -118,6 +114,16 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
     end
 
     counter
+  end
+
+  def self.awaiting_approval_roles
+    [:purchase_order_reviewer, :admin]
+  end
+
+  def self.po_status(user, record, record_exposure)
+    return 'Awaiting Approval'.upcase if record.purchase_order_status_id == PurchaseOrderStatus.id_for(:processing) and record.controlling_user_id == user.id
+
+    record.status&.name&.humanize&.upcase
   end
 
   def self.cost_center_name(user, record, record_exposure)
@@ -151,7 +157,7 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
     when :paid, :approved, :closed, :auto_approved, :sent_to_vendor, :po_revised, :vendor_confirmed
       format = 'success'
     when :processing
-      if record.controlling_user_id == user
+      if record.controlling_user_id == user.id
         format = 'warning'
       else
         format = 'info'

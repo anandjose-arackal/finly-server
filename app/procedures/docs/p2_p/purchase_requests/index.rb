@@ -59,7 +59,7 @@ class Docs::P2P::PurchaseRequests::Index < IndexBuilder::API
     when :approved, :auto_approved, :closed, :order_initiated, :po_created, :partially_closed
       format = 'success'
     when :awaiting_approval
-      # if record.controlling_user_id == user
+      # if record.controlling_user_id == user.id
       #   format = 'warning'
       # else
         format = 'info'

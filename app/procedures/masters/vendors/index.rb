@@ -94,7 +94,7 @@ class Masters::Vendors::Index < IndexBuilder::API
     when :approved, :auto_approved
       format = 'success'
     when :awaiting_approval
-      if record.controlling_user_id == user
+      if record.controlling_user_id == user.id
         format = 'warning'
       else
         format = 'info'
