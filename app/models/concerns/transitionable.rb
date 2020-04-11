@@ -898,4 +898,29 @@ module Transitionable
       data
     end
   end
+
+  def reviewal_pending?
+    false
+  end
+
+  def reviewal_completed?
+    false
+  end
+
+  def reviewal_in_progress?
+    false
+  end
+
+  def reviewal_progress
+    return 0 if reviewal_pending?
+    return 100 if reviewal_completed?
+    return 0 unless reviewal_in_progress?
+
+    levels = dlrms.reorder(level_number: :asc).map {|l| l.level_id}.uniq
+    level_count = levels.size
+    current_level_index = levels.find_index(controlling_level_id)
+    return 0 if current_level_index.nil? or current_level_index < 1
+
+    current_level_index*100/level_count
+  end
 end

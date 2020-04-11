@@ -1195,4 +1195,17 @@ class PurchaseOrder < ApplicationRecord
   def update_po_cost_allocation_items
     self.update_column('cost_allocation_items', true)
   end
+
+  # Used for tracking completion %
+  def reviewal_pending?
+    PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).include?(purchase_order_status_id)
+  end
+
+  def reviewal_completed?
+    PurchaseOrderStatus.ids_for(:approved, :auto_approved, :sent_to_vendor, :closed, :voided, :po_revised, :vendor_confirmed).include?(purchase_order_status_id)
+  end
+
+  def reviewal_in_progress?
+    PurchaseOrderStatus.ids_for(:processing).include?(purchase_order_status_id)
+  end
 end

@@ -70,6 +70,10 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
     text value: "{{record.shipping_location.name}}"
   end
 
+  column :progress, default: true, includes: [:dlrms] do
+    progress_bar value: :reviewal_progress
+  end
+
   column :controlling_user, default: true, includes: [:controlling_user] do
     user value: :controlling_user
   end

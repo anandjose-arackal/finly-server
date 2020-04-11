@@ -10,6 +10,7 @@ class PurchaseOrderExposure < Exposures::API
   attribute :gstin_location, record_attribute: true, exposure: true, includes: [:gstin_location]
   attribute :vendor_location, record_attribute: true, exposure: true, includes: [:vendor_location]
   attribute :vendor, record_attribute: true, exposure: true, includes: [:vendor]
+  attribute :reviewal_progress, record_attribute: true, includes: [:dlrms]
   attribute :submitted_at, record_attribute: true
   attribute :approved_at, record_attribute: true
   attribute :days_from_approval do
