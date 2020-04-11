@@ -10,7 +10,7 @@ class Masters::Vendors::Index < IndexBuilder::API
   end
 
   column :vendor_id, sort: :vendor_id, label: "Vendor ID", default: true do
-    badge value: :vendor_id, format: "success"
+    text value: :vendor_id, format: "primary"
   end
 
   column :created_at, sort: :created_at do

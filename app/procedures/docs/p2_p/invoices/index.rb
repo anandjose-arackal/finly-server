@@ -27,7 +27,7 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
   end
 
   column :invoice_id, default: true do
-    badge value: :invoice_id, format: "success"
+    text value: :invoice_id, format: 'primary'
   end
 
   column :invoice_number, default: true do

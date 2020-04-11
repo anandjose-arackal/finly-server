@@ -9,7 +9,7 @@ class Docs::P2P::PurchaseRequests::Index < IndexBuilder::API
   end
 
   column :request_id, sort: :order_number, label: "Request ID", default: true do
-    badge value: :request_id, format: "success"
+    text value: :request_id, format: 'primary'
   end
 
   column :created_at, sort: :created_at do
