@@ -103,6 +103,14 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     text value: "{{record.shipping_location.name}}"
   end
 
+  column :controlling_user, default: true, includes: [:controlling_user] do
+    user value: :controlling_user
+  end
+
+  column :controlling_level, default: true, includes: [:controlling_level] do
+    text value: "{{record.controlling_level.name}}"
+  end
+
   column :approved_at, default: true do
     date value: :approved_at
   end
