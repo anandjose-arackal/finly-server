@@ -11,7 +11,7 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
   end
 
   column :po_number, sort: :po_number, label: "PO Number", default: true do
-    badge value: :po_number, format: "success"
+    text value: :po_number, format: "primary"
   end
 
   column :name, label: "Name", default: true do
