@@ -164,6 +164,10 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchAndCreateBill < Transactions:
 
   def get_amount_from_response(response)
     return response.to_f unless response.to_s.include?("=")
-    response.to_s.split("=")[1].to_f / 100
+    if response.to_s.split("=").map(&:downcase).include?("circle")
+      return 0
+    else
+      response.to_s.split("=")[1].to_f / 100
+    end
   end
 end

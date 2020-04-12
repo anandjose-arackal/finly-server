@@ -82,10 +82,26 @@ class InwardInvoiceStatus < ApplicationRecord
         InwardInvoiceStatus.id_for(:unpaid),
         InwardInvoiceStatus.id_for(:partially_paid),
         InwardInvoiceStatus.id_for(:initiated),
-        InwardInvoiceStatus.id_for(:paid),
+        InwardInvoiceStatus.id_for(:paid)
     ]
   end
 
+  # the below is the bucket from which paid amount will be considered
+  def self.ids_for_paid_amount_consideration
+    [
+        InwardInvoiceStatus.id_for(:open),
+        InwardInvoiceStatus.id_for(:retracted),
+        InwardInvoiceStatus.id_for(:processing),
+        InwardInvoiceStatus.id_for(:approved),
+        InwardInvoiceStatus.id_for(:auto_approved),
+        InwardInvoiceStatus.id_for(:unpaid),
+        InwardInvoiceStatus.id_for(:partially_paid),
+        InwardInvoiceStatus.id_for(:initiated),
+        InwardInvoiceStatus.id_for(:paid)
+    ]
+  end
+
+  # THIS INCLUDES THE PAID BUCKET
   def self.ids_for_payment_processing_bucket
     [
         InwardInvoiceStatus.id_for(:initiated),

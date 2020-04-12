@@ -36,7 +36,7 @@
 #  tid                          :string(255)
 #  transaction_message          :text(65535)
 #  deleted_at                   :datetime
-#  uuid                         :string(36)
+#  reference_payment_id         :integer
 #
 
 class CardTransaction < ApplicationRecord

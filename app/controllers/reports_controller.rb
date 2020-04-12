@@ -22,6 +22,21 @@ class ReportsController < BaseControllers::WebBase
     respond render: :show
   end
 
+  def report_expenses
+    @result = Reports::ReportExpenses.(current_user, params)
+    respond
+  end
+
+  def report_summary
+    @result = Reports::ReportSummary.(current_user, params)
+    respond
+  end
+
+  def report_comments
+    @result = Reports::ReportComments.(current_user, params)
+    respond
+  end
+
   def destroy
     @result = Reports::Destroy.(current_user, params)
     respond response: :success

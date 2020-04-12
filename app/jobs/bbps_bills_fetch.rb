@@ -137,7 +137,7 @@ class BbpsBillsFetch < ApplicationJob
           subscription_id: subscription.id,
           autofetched: autofetched
       }
-      op = Docs::UtilityBills::Bills::Ops::Create.(params)
+      op = Docs::UtilityBills::Bills::Ops::Create.(params: params, current_user: User.first)
       if op.success?
         new_bill = op['model']
         Docs::UtilityBills::Bills::Mailers::New::Manual.(params: {record: new_bill}, current_user: User.first)
@@ -147,7 +147,12 @@ class BbpsBillsFetch < ApplicationJob
 
   def get_amount_from_response(response)
     return response.to_f unless response.to_s.include?("=")
-    response.to_s.split("=")[1].to_f / 100
+
+    if response.to_s.split("=").map(&:downcase).include?("circle")
+      return 0
+    else
+      response.to_s.split("=")[1].to_f / 100
+    end
   end
 
   def customer_params(subscription)

@@ -8,6 +8,7 @@ json.user do
   json.employee_id @result.selected_user.profile&.employee_id
   json.editable @result.user.vendor_payments_admin?
   json.profile_id @result&.selected_user&.profile&.id
+  json.active @result&.selected_user&.active
 end
 
 json.user_delegate do

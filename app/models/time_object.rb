@@ -27,13 +27,6 @@ class TimeObject < ApplicationRecord
   private
 
   def non_zero_value
-    if self.value.present?
-      if self.value < 0 || self.value == 0
-        errors.add(:time, "cannot be negative")
-      end
-    else
-      errors.add(:time, "cannot be empty")
-    end
+    errors.add(:time, '') if self.value.blank? || self.value <= 0
   end
-
 end

@@ -118,7 +118,8 @@ class ExportManager::Master::MoneyRequests::Index < ExportManager::Builders::Spr
   end
 
   def bank_reference_number(money_request)
-    money_request.bank_reference_number
+    # money_request.bank_reference_number
+    money_request.utr
   end
 
   def source_account(money_request)

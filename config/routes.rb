@@ -2847,9 +2847,11 @@ Rails.application.routes.draw do
       namespace :v1 do
         post 'auth', to: 'token#create'
         delete 'auth', to: 'token#destroy'
-        patch 'users/deactivate/:id', to: 'users#deactivate_user'
         post 'users/:id', to: 'users#update'
         resources :users, only: [:create, :show, :index, :update]
+        resources :users do
+          delete 'deactivate', to: 'users#deactivate'
+        end
         resources :cards, only: [:index, :show]
         resources :cards do
           get 'transactions', to: 'cards#transactions'
@@ -3126,6 +3128,7 @@ Rails.application.routes.draw do
   get 'export/templates/index' => 'export#index_template'
   get 'export/templates/:template_key' => 'export#export_template'
   get 'export/money_request(.:format)' => 'export#money_request', as: :export_money_request
+  get 'export/bank_payment_request(.:format)' => 'export#bank_payment_request', as: :export_bank_payment_request
 
   resources :reports do
     post 'comment' => 'reports#comment', as: :comment
@@ -3140,6 +3143,9 @@ Rails.application.routes.draw do
     post 'add_expenses' => 'reports#add_expenses', as: :add_expenses
     delete 'remove_expenses' => 'reports#remove_expenses', as: :remove_expenses
     post 'toggle_receipt_hardcopy' => 'reports#toggle_receipt_hardcopy', as: :toggle_receipt_hardcopy
+    get 'report_expenses', to: 'reports#report_expenses', as: :expenses
+    get 'report_summary', to: 'reports#report_summary', as: :summary
+    get 'report_comments', to: 'reports#report_comments', as: :comments
   end
 
   # get 'test_take_control' => 'reports#test_take_control', as: :test_take_control
@@ -3725,6 +3731,7 @@ Rails.application.routes.draw do
       get 'show_payments', to: 'inward_invoices#show_payments', as: :show_payments
     end
 
+    delete 'vendor_types/bulk_destroy', to: 'vendor_types#bulk_destroy'
     resources :vendor_types
 
     resources :inward_invoices

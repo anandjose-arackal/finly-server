@@ -25,7 +25,7 @@
 #  sequence_number         :integer
 #  deleted_at              :datetime
 #  printable               :boolean          default(TRUE)
-#  uuid                    :string(36)
+#  user_level_field        :boolean          default(FALSE)
 #
 
 class FieldConfiguration < ApplicationRecord
