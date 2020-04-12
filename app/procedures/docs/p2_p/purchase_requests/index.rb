@@ -43,7 +43,7 @@ class Docs::P2P::PurchaseRequests::Index < IndexBuilder::API
   end
 
   counter -> (user, collection) do
-    counter = IndexBuilder::Counter.new :with_status_id
+    counter = IndexBuilder::Counter.new :with_status_ids
     counts = collection.group(:purchase_request_status_id).count
     counter.add nil, 'All', counts.values.reduce(0, :+)
 
@@ -51,11 +51,11 @@ class Docs::P2P::PurchaseRequests::Index < IndexBuilder::API
     counter.add 90, 'Open', ((counts[PurchaseRequestStatus.id_for(:draft)] || 0) + (counts[PurchaseRequestStatus.id_for(:retracted)] || 0))
 
     # :awaiting_approval,
-    if user.has_permission?(:purchase_request_reviewer)
-      # Todo check logic for this from Abi
-      # counter.add 91, 'Awaiting Approval',
-      #             collection.where(purchase_request_status_id: PurchaseRequestStatus.id_for(:awaiting_approval), controlling_user_id: user.id).count
-    end
+    # if user.has_permission?(:purchase_request_reviewer)
+    #   Todo check logic for this from Abi
+    #   counter.add 91, 'Awaiting Approval',
+    #               collection.where(purchase_request_status_id: PurchaseRequestStatus.id_for(:awaiting_approval), controlling_user_id: user.id).count
+    # end
 
     # :processing
     counter.add PurchaseRequestStatus.id_for(:awaiting_approval), 'Processing', counts[PurchaseRequestStatus.id_for(:awaiting_approval)]
