@@ -18,6 +18,12 @@ class InvoiceExposure < Exposures::API
 
     days
   end
+  attribute :controlling_user, exposure: true, includes: [:controlling_user] do
+    next if record.controlling_level_id.blank?
+
+    record.controlling_user
+  end
+  attribute :controlling_level, record_attribute: true, exposure: true, includes: [:controlling_level]
   attribute :approved_at, record_attribute: true
   attribute :cost_center, record_attribute: true, exposure: true, includes: [:cost_center]
   attribute :department, record_attribute: true, exposure: true, includes: [:department]

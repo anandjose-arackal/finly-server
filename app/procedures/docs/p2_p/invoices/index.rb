@@ -10,6 +10,10 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     text value: "Vendor ID: {{record.vendor.vendor_id}}"
   end
 
+  column :invoice_id, default: true do
+    text value: :invoice_id, format: 'primary'
+  end
+
   column :created_by, default: true, includes: [:created_by] do
     user value: :created_by
   end
@@ -22,16 +26,12 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     badge value: :invoice_status, format: :format_status
   end
 
+  column :invoice_number, default: true do
+    text value: :invoice_number, format: 'primary'
+  end
+
   column :created_at, default: true do
     date value: :created_at
-  end
-
-  column :invoice_id, default: true do
-    text value: :invoice_id, format: 'primary'
-  end
-
-  column :invoice_number, default: true do
-    text value: :invoice_number
   end
 
   column :invoice_date, default: true do

@@ -204,6 +204,20 @@ class YesBankVendor < ApplicationRecord
   }
 
   scope :without_id, -> (id) {where.not(id: id)}
+  
+  scope :with_status_id, -> (id) do
+    case id
+    when 90
+      where status_id: VendorStatus.ids_for(:draft, :retracted)
+    when 91
+      # Todo check logic for this from Abi
+      # where(status_id: VendorStatus.ids_for(:awaiting_approval), controlling_user_id: RequestStoreUtil.current_user&.id).where.not(controlling_user_id: nil)
+    when 92
+      where status_id: VendorStatus.ids_for(:approved, :auto_approved)
+    else
+      where status_id: id
+    end
+  end
 
   # Scopes for ordering ends
 
@@ -217,6 +231,10 @@ class YesBankVendor < ApplicationRecord
     if self.vendor_account.blank?
       self.build_vendor_account(balance_attributes: {value: 0, currency_id: 1}).save
     end
+  end
+
+  def self.ransackable_scopes(auth_object = nil)
+    [:with_status_id]
   end
 
   def display_name
