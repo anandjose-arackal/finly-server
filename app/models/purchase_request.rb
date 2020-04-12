@@ -131,7 +131,7 @@ class PurchaseRequest < ApplicationRecord
       # Todo check logic for this from Abi
       # where(purchase_request_status_id: PurchaseRequestStatus.ids_for(:awaiting_approval), controlling_user_id: RequestStoreUtil.current_user&.id).where.not(controlling_user_id: nil)
     when 92
-      where purchase_order_status_id: PurchaseOrderStatus.ids_for(:approved, :auto_approved, :po_created, :partially_closed, :order_initiated)
+      where purchase_request_status_id: PurchaseOrderStatus.ids_for(:approved, :auto_approved, :po_created, :partially_closed, :order_initiated)
     else
       where purchase_request_status_id: status_ids
     end

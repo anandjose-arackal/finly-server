@@ -200,6 +200,24 @@ class BbpsBill < ApplicationRecord
     joins(:amount).where("value >= ? AND value <= ?", gteq, lteq)
   end
 
+  scope :with_status_id, -> (status_id) do
+    case status_id
+    when 90
+      where status_id: BbpsBillStatus.ids_for(:draft, :retracted)
+    when 91
+      # Todo check logic for this from Abi
+      # where(status_id: BbpsBillStatus.ids_for(:awaiting_approval), controlling_user_id: RequestStoreUtil.current_user&.id).where.not(controlling_user_id: nil)
+    when 92
+      where status_id: BbpsBillStatus.ids_for(:approved, :auto_approved, :payment_ticket_created, :payment_initiated, :payment_ticket_deleted)
+    else
+      where status_id: status_id
+    end
+  end
+
+  def self.ransackable_scopes(auth_object = nil)
+    [:with_status_id]
+  end
+
   def as_json(options = {})
     if options[:index]
       data = {

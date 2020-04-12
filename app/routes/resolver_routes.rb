@@ -67,4 +67,8 @@ Resolver::Router.draw do
     route 'default', Docs::P2P::PurchaseOrders::Resolver
   end
 
+  scope :bbps_bills do
+    route 'default', Docs::UtilityBills::Bills::Resolver
+  end
+
 end
