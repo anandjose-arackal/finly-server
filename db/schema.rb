@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_03_31_225347) do
+ActiveRecord::Schema.define(version: 2020_04_09_085529) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -1479,6 +1479,7 @@ ActiveRecord::Schema.define(version: 2020_03_31_225347) do
     t.integer "created_by_user_id"
     t.integer "company_id"
     t.datetime "deleted_at"
+    t.boolean "budget_creation_in_progress", default: false
     t.index ["budget_group_id"], name: "index_budget_group_criteria_on_budget_group_id"
     t.index ["deleted"], name: "index_budget_group_criteria_on_deleted"
   end
@@ -1510,6 +1511,7 @@ ActiveRecord::Schema.define(version: 2020_03_31_225347) do
     t.datetime "end_date"
     t.integer "budget_date_type_id"
     t.boolean "active", default: true
+    t.boolean "calculated_before_tax_amount", default: false
     t.index ["company_id"], name: "index_budget_groups_on_company_id"
     t.index ["created_by_user_id"], name: "index_budget_groups_on_created_by_user_id"
     t.index ["deleted_at"], name: "index_budget_groups_on_deleted_at"
@@ -1654,13 +1656,21 @@ ActiveRecord::Schema.define(version: 2020_03_31_225347) do
     t.decimal "billed_amount_after_tax_value", precision: 20, scale: 10
     t.decimal "remaining_amount_before_tax_value", precision: 20, scale: 10
     t.decimal "remaining_amount_after_tax_value", precision: 20, scale: 10
-    t.decimal "paid_amount_before_tax_value", precision: 20, scale: 10, default: "0.0"
+    t.decimal "effective_paid_amount_before_tax_value", precision: 20, scale: 10, default: "0.0"
     t.decimal "paid_amount_after_tax_value", precision: 20, scale: 10, default: "0.0"
     t.integer "billed_quantity"
     t.decimal "billed_rate", precision: 20, scale: 10
     t.integer "remaining_quantity"
     t.boolean "revised", default: false
     t.boolean "payment_confirmed", default: false
+    t.decimal "tax_amount_value", precision: 20, scale: 10, default: "0.0"
+    t.decimal "net_paid_amount_before_tax_value", precision: 20, scale: 10
+    t.decimal "rcm_tax_value", precision: 20, scale: 10, default: "0.0"
+    t.decimal "paid_tds_value", precision: 20, scale: 10, default: "0.0"
+    t.decimal "processing_tds_value", precision: 20, default: "0"
+    t.decimal "cn_adjusted_amount_before_tax_value", precision: 20, scale: 10, default: "0.0"
+    t.decimal "cn_adjusted_amount_after_tax_value", precision: 20, scale: 10, default: "0.0"
+    t.decimal "credit_note_tax_amount_value", precision: 20, scale: 10, default: "0.0"
     t.index ["entity_type", "entity_id"], name: "index_budget_trails_on_entity_type_and_entity_id"
   end
 
@@ -9247,6 +9257,7 @@ ActiveRecord::Schema.define(version: 2020_03_31_225347) do
     t.string "finly_id", limit: 36
     t.string "uuid", limit: 36
     t.datetime "deleted_at"
+    t.boolean "pending_activation", default: false
     t.index ["company_id"], name: "index_users_on_company_id"
     t.index ["email"], name: "index_users_on_email"
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
