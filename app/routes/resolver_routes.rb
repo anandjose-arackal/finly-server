@@ -47,6 +47,10 @@ Resolver::Router.draw do
     route 'default', Masters::PaymentTerms::Resolver
   end
 
+  scope :items do
+    route "default", Masters::Items::Resolver
+  end
+
   # Docs
   scope :trips do
     route 'default', Docs::Trips::Resolver

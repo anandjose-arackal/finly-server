@@ -47,6 +47,7 @@ class Item < ApplicationRecord
   belongs_to :supply_item_type, optional: true
   belongs_to :product_type, optional: true#, class_name: "ProductType", foreign_key: :product_type_id
   belongs_to :user, optional: true
+  belongs_to :created_by, optional: true, class_name: 'User', foreign_key: :user_id
   belongs_to :item_expense_type, optional: true
 
   has_many :rate_contract_line_items, foreign_key: :item_id

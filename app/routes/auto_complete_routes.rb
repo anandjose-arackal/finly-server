@@ -15,6 +15,7 @@ AutoComplete::Router.draw do
   route "categories", Masters::Categories::AutoComplete
   route "policies", Masters::Policies::AutoComplete
   route "vendor", Masters::Vendors::AutoComplete # Went with singular because plural was already being used by other areas of the app
+  route "items", Masters::Items::AutoComplete
 
   # Docs
   route 'purchase_requests', Docs::P2P::PurchaseRequests::AutoComplete
