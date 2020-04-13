@@ -6,9 +6,13 @@ class Choices::Builders::List < Choices::Builders::Base
     self.new({choices: args&.map {|m| m.slice(:name, :active)}})
   end
 
-  def choices(params: {}, user: nil)
-    # Todo generalize away from form entity?
-    form_entity.form_entity_choices
+  def choices(params: {}, user: nil, form_entity: nil)
+    if form_entity.present?
+      # Todo Generalize!
+      form_entity.form_entity_choices
+    else
+      config[:choices]
+    end
   end
 
   def find_by_id(id, params: {}, user: nil)

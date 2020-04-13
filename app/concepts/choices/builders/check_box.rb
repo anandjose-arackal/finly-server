@@ -6,9 +6,13 @@ class Choices::Builders::CheckBox < Choices::Builders::Base
     self.new({choices: [{name: "true", active: true}, {name: "false", active: true}]})
   end
 
-  def choices(params: {}, user: nil)
-    # Todo Generalize!
-    form_entity.form_entity_choices
+  def choices(params: {}, user: nil, form_entity: nil)
+    if form_entity.present?
+      # Todo Generalize!
+      form_entity.form_entity_choices
+    else
+      config[:choices]
+    end
   end
 
   def choices_json(params: {}, user: nil)

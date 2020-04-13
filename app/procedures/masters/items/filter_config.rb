@@ -1,23 +1,17 @@
 class Masters::Items::FilterConfig < Filters::API
 
-  attribute :vendor_id, label: "Vendor ID", type: :text, simple: true
-  attribute :legal_name, type: :text, simple: true
-  attribute :trade_name, type: :text, simple: true
-  attribute :created_at, type: :datetime, simple: false
-  attribute :updated_at, type: :datetime, simple: false
-  attribute :submitted_at, type: :datetime, simple: false
-  attribute :approved_at, type: :datetime, simple: false
-  # attribute :vendor_type, type: :dropdown, resolver_route: 'vendor_types.default'
-  # attribute :payment_terms, type: :dropdown, resolver_route: 'payment_terms.default'
-  # attribute :policy, type: :dropdown, auto_complete_route: 'policies'
-
-  # attribute :date, label: "Invoice Date", type: :datetime, simple: true
-  # attribute :due_date, label: "Due Date", type: :datetime, simple: true
-  # attribute :vendor_id, label: "Vendor", simple: true, type: :dropdown,  auto_complete_route: "vendor"
-  # attribute :vendor_vendor_id, label: "Vendor ID"
-  # attribute :location_id, label: "Billing Location", type: :dropdown, auto_complete_route: "locations"
-  # attribute :delivery_location_id, label: "Shipping Location", type: :dropdown, auto_complete_route: "locations"
-  # attribute :items_cost_center_id, label: "Cost Center", type: :dropdown, auto_complete_route: "cost_centers"
-  # attribute :items_department_id, label: "Department", type: :dropdown, auto_complete_route: "departments"
+  attribute :item_number, label: "Item ID", type: :text, simple: true
+  attribute :created_at, type: :datetime
+  attribute :updated_at, type: :datetime
+  attribute :sku, type: :text
+  attribute :rate, type: :amount
+  attribute :description, type: :text, simple: true
+  attribute :item_code, type: :text, simple: true
+  attribute :supply_item_type_id, label: "Scope", type: :dropdown, simple: true, choices: Choices[:enum].(SupplyItemType)
+  attribute :product_type_id, type: :dropdown, simple: true, choices: Choices[:enum].(ProductType)
+  attribute :unit_of_measurement, type: :text
+  # attribute :created_by, type: :dropdown, choices: Choices[:auto_complete].('users', permissions: [:item_master_manager])
+  attribute :item_expense_type_id, label: "Expense Type", simple: true, choices: Choices[:enum].(ItemExpenseType)
+  attribute :tds_applicable, choices: Choices[:checkbox].()
 
 end
