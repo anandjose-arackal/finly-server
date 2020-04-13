@@ -9,28 +9,20 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     text value: "{{record.name}}", format: 'primary'
   end
 
-  column :payment_ticket_id, sort: :id, label: "PO Number", default: true do
-    text value: :payment_ticket_id, format: "primary"
+  column :created_at, sort: :created_at do
+    date value: :created_at
   end
 
   column :created_by, default: true, includes: [:created_by] do
     user value: :created_by
   end
 
-  column :created_at, sort: :created_at do
-    date value: :created_at
-  end
-
-  column :submitted_at, sort: :submitted_at, default: true do
-    date value: :submitted_at
-  end
-
-  column :approved_at, sort: :approved_at, default: true do
-    date value: :approved_at
-  end
-
   column :scheduled_date, sort: :payment_order_scheduled_at, default: true, includes: [:payment_order] do
     date value: "{{record.payment_order.scheduled_at}}"
+  end
+
+  column :payment_ticket_id, sort: :id, label: "Payment Ticket ID", default: true do
+    text value: :payment_ticket_id, format: "primary"
   end
 
   column :status, default: true, includes: [:status] do
@@ -42,15 +34,23 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
   end
 
   column :requested, default: true, includes: [payment_order: {amount_requested: :currency}] do
-    amount value: "{{record.payment_order.amount_requested}}"
+    amount value: :amount_requested
   end
 
   column :processed, default: true, includes: [payment_order: {amount_processed: :currency}] do
-    amount value: "{{record.payment_order.amount_requested}}"
+    amount value: :amount_processed
   end
 
   column :progress, label: 'Approval Progress', default: true, includes: [:dlrms] do
     progress_bar value: :reviewal_progress
+  end
+
+  column :submitted_at, sort: :submitted_at, default: true do
+    date value: :submitted_at
+  end
+
+  column :approved_at, sort: :approved_at, default: true do
+    date value: :approved_at
   end
 
   column :controlling_user, default: true, includes: [:controlling_user] do
@@ -115,6 +115,14 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     return 'Awaiting Approval'.upcase if record.status_id == BankPaymentRequestStatus.id_for(:processing) and record.controlling_user_id == user.id
 
     record.status&.name&.humanize&.upcase
+  end
+
+  def self.amount_requested(user, record, record_exposure)
+    record.payment_order.amount_requested
+  end
+
+  def self.amount_processed(user, record, record_exposure)
+    record.payment_order.amount_processed
   end
 
   def self.format_status(user, record, record_exposure)
