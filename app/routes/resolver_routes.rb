@@ -75,4 +75,8 @@ Resolver::Router.draw do
     route 'default', Docs::UtilityBills::Bills::Resolver
   end
 
+  scope :payment_tickets do
+    route 'default', Docs::PaymentTickets::Resolver
+  end
+
 end

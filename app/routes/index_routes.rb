@@ -9,4 +9,5 @@ IndexBuilder::Router.draw do
   route 'purchase_requests', Docs::P2P::PurchaseRequests::Index
   route 'purchase_orders', Docs::P2P::PurchaseOrders::Index
   route 'utility_bills', Docs::UtilityBills::Bills::Index
+  route 'payment_tickets', Docs::PaymentTickets::Index
 end

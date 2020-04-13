@@ -54,6 +54,7 @@ class Menu::Item
     end
 
     init_parent
+    add_id_to_path
     # self.icon ||= "" todo add default icon
   end
 
@@ -78,6 +79,13 @@ class Menu::Item
         self.features += scope[:features]
       end
     end
+  end
+
+  def add_id_to_path
+    path, params = self.path.to_s.split("/params=")
+    params = params.present? ? JSON.parse(params) : {}
+    params[:id] = self.id
+    self.path = "#{path}/params=#{params.as_json}"
   end
 
   def as_json(options = {})
