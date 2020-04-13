@@ -25,7 +25,7 @@ class PaymentFiles::Formats::KotakMahindraBank::Process < PaymentFiles::Formats:
   end
 
   def process
-    headers = retrieve_kotak_headers
+    self.headers = retrieve_kotak_headers
     content = []
     sl_no = 0
     self.payment_file_data.each do |payment|
@@ -47,7 +47,11 @@ class PaymentFiles::Formats::KotakMahindraBank::Process < PaymentFiles::Formats:
           retrieve_note(payment[:note])
       ]
     end
-    self.response = Exporter.new(user, {spreadsheet: {headers: headers, contents: content}}, messages)
+    self.contents = content
+  end
+
+  def success
+    generate_export_file
   end
 
   def retrieve_kotak_headers

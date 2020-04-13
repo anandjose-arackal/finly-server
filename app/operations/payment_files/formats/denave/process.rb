@@ -49,7 +49,7 @@ class PaymentFiles::Formats::Denave::Process < PaymentFiles::Formats::BaseFormat
   end
 
   def process
-    headers = retrieve_denave_headers
+    self.headers = retrieve_denave_headers
     content = []
     pos = 0
     self.pre_processed_request.each do |report, details|
@@ -152,11 +152,11 @@ class PaymentFiles::Formats::Denave::Process < PaymentFiles::Formats::BaseFormat
     #   ]
     # Todo Remove the last entry of "payment[:initiating_user_email]", this was specifically built as per Toppr's requirements
     # end
-    self.response = Exporter.new(user, {spreadsheet: {headers: headers, contents: content}}, messages)
+    self.contents = content
   end
 
   def success
-    self.response
+    generate_export_file
   end
 
   def retrieve_denave_headers
