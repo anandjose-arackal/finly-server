@@ -225,7 +225,7 @@ class Report < ApplicationRecord
       date_to = date_to.to_date + 1 if date_to.present?
       # date_to = DateUtils.local_date if date_to.blank?
       reports = arel_table
-      where(reports[:approved_at].gteq(date_from).and(reports[:approved_at].lteq(date_to)))
+      where(reports[:approved_at].gteq(date_from.beginning_of_day).and(reports[:approved_at].lteq(date_to.end_of_day)))
     end
   end
   scope :filter_policy, -> (policy_id) {where(policy_id: policy_id)}
