@@ -36,9 +36,6 @@ class Choices::Builders::Resolver < Choices::Builders::Base
 
   def build(params: {}, user: {})
     params = params.with_indifferent_access.deep_merge(choice_params.with_indifferent_access)
-    if klass.nil?
-      debugger
-    end
     result = klass.(params: params, current_user: user).as_json
 
     {
