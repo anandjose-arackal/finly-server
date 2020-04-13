@@ -1,1 +1,1 @@
-json.data @op[:data]
+json.data @op[:data][:choices]

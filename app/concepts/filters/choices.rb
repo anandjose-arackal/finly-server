@@ -2,15 +2,24 @@ class Filters::Choices < Transactions::API
 
   schema do
     params do
-      required(:route).filled(inclusion?: Filters::Router.routes)
+      required(:route).filled
       required(:field_key).filled
     end
   end
 
+  step :verify_route
   pass :init_klass
   step :find_attribute
   step :verify_choices
   pass :build_choices
+
+  def verify_route(context, params:, **)
+    unless Filters::Router.routes.include?(params[:route])
+      return on_error context, :base, 'Route not found'
+    end
+
+    true
+  end
 
   def init_klass(context, params:, **)
     context[:filter_config] = Filters::Router[params[:route]]&.first&.klass
@@ -34,7 +43,7 @@ class Filters::Choices < Transactions::API
   end
 
   def build_choices(context, params:, current_user:, attribute:, **)
-    context[:data] = attribute.choices.as_json(params: params, user: current_user)
+    context[:data] = attribute.choices.build(params: params, user: current_user)
   end
 
 end
