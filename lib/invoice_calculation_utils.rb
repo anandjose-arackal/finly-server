@@ -55,7 +55,7 @@ class InvoiceCalculationUtils
           currently_adjusted_tds = (prev + purchase_order.advance_tds_amount&.value.to_f + self.tds_amount).ceil
 
           all_adjusted = (max_tds - currently_adjusted_tds)&.abs&.between?(0,1)
-          if all_adjusted
+          if all_adjusted && self.invoice.po_adjusted_advance&.value.to_f < 1
             self.tds_amount = self.tds_amount
             self.balance_due_amount = self.balance_due_amount
           else
