@@ -26,6 +26,7 @@ class Docs::UtilityBills::Bills::Ops::Index < Transactions::API
   has_scope :filter_ids, type: :array
   has_scope :filter_user_id
   has_scope :filter_poc_awaiting_action
+  has_scope :filter_overdue
 
 
   step Policy::Pundit(Docs::UtilityBills::Bills::Authorizer, :index?)
