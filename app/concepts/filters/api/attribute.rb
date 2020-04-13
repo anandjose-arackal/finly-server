@@ -26,7 +26,15 @@ class Filters::API::Attribute
         simple: simple,
         operators: operators
     }
-    params[:choices] = choices.build(user: user) if choices.present?
+    if choices.present?
+      choices_data = choices.build(user: user)
+      # If the choices is partial, then set the field type as lookup.
+      if StringUtils.to_bool(choices_data[:partial]) and field_type.to_s == 'dropdown'
+        params[:field_type] = :lookup
+      end
+
+      params[:choices] = choices_data[:choices]
+    end
     params
   end
 
