@@ -34,6 +34,7 @@ class InvoiceExposure < Exposures::API
   attribute :created_at, record_attribute: true
   attribute :created_by, record_attribute: true, exposure: true
   attribute :net_amount, exposure: true, record_attribute: true, includes: [:net_amount]
+  attribute :policy, exposure: true, record_attribute: true, includes: [:policy]
   attribute :net_amount_value, includes: [:net_amount] do
     record.net_amount&.value || 0
   end

@@ -85,7 +85,7 @@ class Menu::Item
     path, params = self.path.to_s.split("/params=")
     params = params.present? ? JSON.parse(params) : {}
     params[:id] = self.id
-    self.path = "#{path}/params=#{params.as_json}"
+    self.path = "#{path}/params=#{params.to_json}"
   end
 
   def as_json(options = {})

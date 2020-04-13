@@ -1,7 +1,7 @@
 class Docs::P2P::Invoices::Index < IndexBuilder::API
   include DynamicAttributes
 
-  resolver 'invoices.non_po'
+  resolver 'invoices.default'
   reference '{{record.id}}', procurement_id: '{{record.procurement_id}}', procurement_type: "{{record.invoice_type.key}}"
 
   # Fixed column is always default true

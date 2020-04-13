@@ -1,33 +1,14 @@
 class PaymentExposure < Exposures::API
+  attribute :date, record_attribute: true
+  attribute :narration, record_attribute: true
+  attribute :reference_id, record_attribute: true
+  attribute :gl_name, record_attribute: true
+  attribute :vendor, exposure: true do
+    next unless record.receiving_user_type == 'YesBankVendor'
 
-  def date
-    record.date
+    record.receiving_user
   end
-
-  def narration
-    record.note
-  end
-
-  def reference_id
-    record.external_reference_id
-  end
-
-  def gl_name
-    record.gl_name
-  end
-
-  def vendor
-    return nil unless record.receiving_user_type == "YesBankVendor"
-
-    record.receiving_user&.to_liquid
-  end
-
-  def beneficiary
-    vendor
-  end
-
-  def amount
-    record.amount&.value || 0
-  end
+  # attribute :beneficiary, record_attribute: true
+  attribute :amount, record_attribute: true
 
 end

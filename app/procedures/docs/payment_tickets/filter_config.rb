@@ -1,5 +1,7 @@
 class Docs::PaymentTickets::FilterConfig < Filters::API
 
+  attribute :id, type: :text
+
   # attribute :po_number, label: "PO Number", type: :text, simple: true
   # attribute :created_at, type: :datetime, simple: false
   # attribute :submitted_at, type: :datetime, simple: false
