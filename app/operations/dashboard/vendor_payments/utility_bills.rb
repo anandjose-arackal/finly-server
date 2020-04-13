@@ -152,7 +152,7 @@ class Dashboard::VendorPayments::UtilityBills < Dashboard::VendorPayments::Base
                 {
                     title: "Awaiting Payment",
                     count: utility_bills.filter_payable_bills(true)&.count,
-                    filters: []
+                    filters: [{filter_payable_bills: true}]
                 },
                 {
                     title: "Payment Ticket Created",
