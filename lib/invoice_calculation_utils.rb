@@ -43,9 +43,8 @@ class InvoiceCalculationUtils
           end
         end
         if self.invoice.procurement.invoices.count < 2
-            self.tds_amount = (self.tds_amount - purchase_order.advance_tds_amount&.value.to_f).abs
-            # self.balance_due_amount = self.balance_due_amount - self.invoice.po_adjusted_advance.value + purchase_order.advance_tds_amount&.value.to_f unless ( self.invoice.po_adjusted_advance.value > self.balance_due_amount )
-            self.balance_due_amount = self.balance_due_amount + purchase_order.advance_tds_amount&.value.to_f - self.invoice.po_adjusted_advance.value unless ( self.invoice.po_adjusted_advance.value > (self.balance_due_amount + purchase_order.advance_tds_amount&.value.to_f))
+            self.tds_amount = [(self.tds_amount - purchase_order.advance_tds_amount&.value.to_f), 0].max
+            self.balance_due_amount = [(self.balance_due_amount + purchase_order.advance_tds_amount&.value.to_f - self.invoice.po_adjusted_advance&.value.to_f), 0].max
         else
           taxable_amount_for_tds = purchase_order.items.joins(:inventory_line_item, :taxable_amount).where(items: {tds_applicable: true}).sum(:value).to_f
           max_tds = taxable_amount_for_tds -  TaxCalculationUtils.tds_amount(taxable_amount_for_tds, invoice.tds_slab&.tds)
@@ -54,14 +53,14 @@ class InvoiceCalculationUtils
           prev = self.invoice.procurement.invoices.where.not(id: invoice.id).joins(:tds_amount).sum(:value)
           currently_adjusted_tds = (prev + purchase_order.advance_tds_amount&.value.to_f + self.tds_amount).ceil
 
+          # we dont capture tds adjustment per invoice, like we do for po advance adjustment
           all_adjusted = (max_tds - currently_adjusted_tds)&.abs&.between?(0,1)
           if all_adjusted && self.invoice.po_adjusted_advance&.value.to_f < 1
             self.tds_amount = self.tds_amount
             self.balance_due_amount = self.balance_due_amount
           else
-            self.tds_amount = (self.tds_amount - purchase_order.advance_tds_amount&.value.to_f).abs
-            # self.balance_due_amount = self.balance_due_amount - self.invoice.po_adjusted_advance.value + purchase_order.advance_tds_amount&.value.to_f unless ( self.invoice.po_adjusted_advance.value > self.balance_due_amount )
-            self.balance_due_amount = self.balance_due_amount + purchase_order.advance_tds_amount&.value.to_f - self.invoice.po_adjusted_advance.value unless ( self.invoice.po_adjusted_advance.value > (self.balance_due_amount + purchase_order.advance_tds_amount&.value.to_f))
+            self.tds_amount = [(self.tds_amount - purchase_order.advance_tds_amount&.value.to_f), 0].max
+            self.balance_due_amount = [(self.balance_due_amount + purchase_order.advance_tds_amount&.value.to_f - self.invoice.po_adjusted_advance&.value.to_f), 0].max
           end
         end
       end
