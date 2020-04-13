@@ -216,20 +216,25 @@ class BbpsBill < ApplicationRecord
 
   scope :filter_poc_awaiting_action, -> (user_id) {
     subscription_ids = BbpsSubscriptionPoc.where(user_id: user_id).pluck(:subscription_id)
+    bills = where(subscription_id: subscription_ids)
 
-    orphan_bill_ids = BbpsBill.where(user_id: nil).where(subscription_id: subscription_ids).pluck(:id)
+    bills = bills.where(user_id: nil)
 
-    where(id: orphan_bill_ids)
+    # orphan_bill_ids = BbpsBill.where(user_id: nil).where(subscription_id: subscription_ids).pluck(:id)
+
+    where(id: bills.pluck(:id))
   }
 
   scope :filter_poc_id, -> (id) {
     subscription_ids = BbpsSubscriptionPoc.where(user_id: id).pluck(:subscription_id)
 
-    orphan_bill_ids = BbpsBill.where(user_id: nil).where(subscription_id: subscription_ids).pluck(:id)
+    bills = where(subscription_id: subscription_ids)
+
+    bill_ids = bills.where(user_id: nil).or(bills.where(user_id: id)).pluck(:id)
 
     user_bill_ids = BbpsBill.where(user_id: id).pluck(:id)
 
-    ids = orphan_bill_ids + user_bill_ids
+    ids = bill_ids + user_bill_ids
 
     where(id: ids)
   }
@@ -387,6 +392,13 @@ class BbpsBill < ApplicationRecord
 
   def self.role_based_initiator_associated_items(user, role_id, options = {})
     if [UserRole.id_for(:utility_bill_initiator)].include?(role_id)
+      subscription_ids = BbpsSubscriptionPoc.where(user_id: user_id).pluck(:subscription_id)
+
+      orphan_bill_ids = BbpsBill.where(user_id: nil).where(subscription_id: subscription_ids).pluck(:id)
+
+      where(id: orphan_bill_ids)
+
+
       ids = self.joins(subscription: [:pocs]).where("bbps_bills.company_id = ?", user&.company&.id).where("bbps_subscription_pocs.user_id = ?", user.id).pluck("bbps_bills.id")
       where(id: ids)
     elsif [UserRole.id_for(:utility_bill_master_initiator)].include?(role_id)
