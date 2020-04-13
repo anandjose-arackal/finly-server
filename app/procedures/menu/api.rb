@@ -52,6 +52,7 @@ class Menu::API < Transactions::API
   step :authorize!
   pass :build_menu
   pass :build_modules
+  pass :set_current_module
 
   def authorize!(context, current_user:, **)
     error = false
@@ -116,6 +117,15 @@ class Menu::API < Transactions::API
       end
 
       context[:entities] << conf
+    end
+  end
+
+  def set_current_module(context, options)
+    MODULES_CONFIG.each do |mod|
+      next unless [mod[:app].to_s, mod[:app]].include?(RequestStoreUtil.current_app)
+
+      context[:current_module] = mod&.dig(:config, :name)
+      break
     end
   end
 

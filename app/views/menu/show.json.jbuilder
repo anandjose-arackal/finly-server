@@ -15,6 +15,7 @@ json.data do
     json.email current_user.email
     json.mobile_number current_user.mobile_number
   end
+  json.module @op[:current_module]
   json.menu @op[:menu]
   json.entities @op[:entities]
 end

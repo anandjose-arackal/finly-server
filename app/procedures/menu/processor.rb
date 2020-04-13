@@ -23,6 +23,7 @@ class Menu::Processor < Transactions::API
     if result.success?
       context[:menu] = result[:menu]
       context[:entities] = result[:entities]
+      context[:current_module] = result[:current_module]
       return true
     end
 
