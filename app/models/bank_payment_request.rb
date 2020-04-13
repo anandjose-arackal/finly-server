@@ -46,6 +46,7 @@ class BankPaymentRequest < ApplicationRecord
           CustomFieldFilterSupport
   include LiquidDroppable
   include Exposures::Model::Exposable
+  include Ransacker
 
   belongs_to :status, optional: true, class_name: "BankPaymentRequestStatus"
   belongs_to :payment_order, optional: true, dependent: :destroy
@@ -388,13 +389,13 @@ class BankPaymentRequest < ApplicationRecord
   scope :with_status_id, -> (status_id) {
     case status_id
     when 90
-      where status_id: BankPaymentRequest.ids_for(:open, :retracted)
+      where status_id: BankPaymentRequestStatus.ids_for(:open, :retracted)
     when 91
-      where(status_id: BankPaymentRequest.ids_for(:processing), controlling_user_id: RequestStoreUtil.current_user&.id).where.not(controlling_user_id: nil)
+      where(status_id: BankPaymentRequestStatus.ids_for(:processing), controlling_user_id: RequestStoreUtil.current_user&.id).where.not(controlling_user_id: nil)
     when 92
-      where status_id: BankPaymentRequest.ids_for(:submitted, :processing, :unapprove)
+      where status_id: BankPaymentRequestStatus.ids_for(:submitted, :processing, :unapprove)
     when 93
-      where status_id: BankPaymentRequest.ids_for(:approved, :pending, :creation_in_progress, :auto_approved)
+      where status_id: BankPaymentRequestStatus.ids_for(:approved, :pending, :creation_in_progress, :auto_approved)
     else
       where status_id: status_id
     end
@@ -409,6 +410,10 @@ class BankPaymentRequest < ApplicationRecord
   end
 
   before_save :add_company
+
+  def self.ransackable_scopes(auth_object = nil)
+    [:with_status_id]
+  end
 
   def can_submit?
     open? || retracted? || rejected?

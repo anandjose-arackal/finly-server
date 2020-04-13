@@ -61,9 +61,10 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     text value: "{{record.controlling_level.name}}"
   end
 
-  column :payment_mode, includes: [:payment_order] do
-    text value: :payment_mode
-  end
+  # Avoiding this as this fetches data from payments as well, which would result in N+1 query
+  # column :payment_mode, includes: [:payment_order] do
+  #   text value: :payment_mode
+  # end
 
   counter -> (user, collection) do
     # 90 :open,  :retracted
@@ -74,7 +75,7 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     # :credited
 
     # Use custom scope to support awaiting approval status
-    counter = IndexBuilder::Counter.new :with_status_ids
+    counter = IndexBuilder::Counter.new :with_status_id
     counts = collection.group(:status_id).count
     counter.add nil, "All", counts.values.reduce(0, :+)
     # Open / Retracted
