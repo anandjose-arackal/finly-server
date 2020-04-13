@@ -47,7 +47,8 @@ class Docs::UtilityBills::Bills::Ops::Index < Transactions::API
 
     bbps_bills = apply_scopes(bbps_bills, params)
     result = {
-        "bills" => bbps_bills.paginate(page: page, per_page: per_page).includes_for_index
+        "bills" => bbps_bills,
+        "paginated_bills" => bbps_bills.paginate(page: page, per_page: per_page).includes_for_index
     }
 
     options['result'] = result
