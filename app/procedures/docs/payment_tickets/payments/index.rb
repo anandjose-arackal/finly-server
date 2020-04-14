@@ -9,8 +9,8 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
     text value: "{{record.id}}", format: 'primary'
   end
 
-  column :ticket_id, label: "Payment Ticket ID", sort: :payment_order_id, default: true do
-    text value: "{{record.payment_order_id}}"
+  column :payment_ticket_id, label: "Payment Ticket ID", default: true, includes: [payment_order: :bank_payment_request]  do
+    text value: "{{record.payment_order.bank_payment_request.id}}"
   end
 
   column :created_at, sort: :created_at do
@@ -57,7 +57,19 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
     text value: "{{record.payment_order.bank_payment_request.controlling_level.name}}"
   end
 
-  column :payment_mode do
+  column :initiating_account, default: true, includes: [:initiating_account] do
+    text value: "{{record.initiating_account_type_name}}"
+  end
+
+  column :initiating_user, default: true, includes: [:initiating_user] do
+    user value: :initiating_user
+  end
+
+  column :receiving_account, default: true, includes: [:receiving_account, :receiving_user] do
+    text value: "{{record.receiving_account_type_name}}"
+  end
+
+  column :payment_mode, default: true, sort: true do
     text value: :payment_mode
   end
 

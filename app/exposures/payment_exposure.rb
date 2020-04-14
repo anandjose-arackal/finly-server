@@ -1,4 +1,6 @@
 class PaymentExposure < Exposures::API
+
+  attribute :id, record_attribute: true
   attribute :date, record_attribute: true
   attribute :narration, record_attribute: true
   attribute :reference_id, record_attribute: true
@@ -12,11 +14,14 @@ class PaymentExposure < Exposures::API
   attribute :amount, record_attribute: true, exposure: true
   attribute :initiating_user, record_attribute: true, exposure: true
   attribute :initiating_account, record_attribute: true, exposure: true
+  attribute :initiating_account_type_name, record_attribute: true
   attribute :receiving_user, record_attribute: true, exposure: true
   attribute :receiving_account, record_attribute: true, exposure: true
+  attribute :receiving_account_type_name, record_attribute: true
   attribute :status, record_attribute: true, exposure: true
   attribute :payment_order_id, record_attribute: true, exposure: true
   attribute :payment_order, record_attribute: true, exposure: true
   attribute :payment_mode, record_attribute: true
+  attribute :parent_type_name, record_attribute: true
 
 end
