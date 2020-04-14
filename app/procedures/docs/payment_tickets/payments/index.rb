@@ -10,11 +10,11 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
     text value: '{{record.vendor.trade_name}}'
   end
 
-  column :id, label: 'Payment ID', sort: :id do
+  column :id, label: 'Payment ID', sort: true do
     text value: "{{record.id}}", format: 'primary'
   end
 
-  column :payment_ticket_id, label: "Payment Ticket ID", default: true, includes: [payment_order: :bank_payment_request] do
+  column :payment_ticket_id, label: "Payment Ticket ID", sort: true, default: true, includes: [payment_order: :bank_payment_request] do
     text value: "{{record.payment_order.bank_payment_request.id}}"
   end
 
@@ -34,11 +34,11 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
     text value: :utr
   end
 
-  column :submitted_at do
+  column :submitted_at, sort: true do
     date value: -> (context) { context[:record].payment_order.bank_payment_request.submitted_at }
   end
 
-  column :approved_at do
+  column :approved_at, sort: true do
     date value: -> (context) { context[:record].payment_order.bank_payment_request.approved_at }
   end
 
@@ -46,19 +46,19 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
     date value: -> (context) { context[:record].payment_order.scheduled_at }
   end
 
-  column :created_by, default: true, includes: [payment_order: {bank_payment_request: :created_by}] do
+  column :created_by, default: true, sort: :payment_order_bank_payment_request_created_by_id, includes: [payment_order: {bank_payment_request: :created_by}] do
     user value: -> (context) { context[:record].payment_order.bank_payment_request.created_by }
   end
 
-  column :status, default: true, includes: [:status] do
+  column :status, default: true, sort: :payment_status_id, includes: [:status] do
     badge value: "{{record.status.name}}", format: :format_status
   end
 
-  column :policy, default: true, includes: [payment_order: {bank_payment_request: :policy}] do
+  column :policy, sort: :payment_order_bank_payment_request_policy_id, default: true, includes: [payment_order: {bank_payment_request: :policy}] do
     text value: "{{record.payment_order.bank_payment_request.policy.name}}"
   end
 
-  column :payment_amount, default: true, includes: {amount: :currency} do
+  column :payment_amount, default: true, sort: :amount_value, includes: {amount: :currency} do
     amount value: :amount
   end
 
@@ -66,9 +66,9 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
   #   progress_bar value: :reviewal_progress
   # end
 
-  column :controlling_user, default: true, includes: [payment_order: {bank_payment_request: :controlling_user}] do
-    user value: -> (context) { context[:record].payment_order.bank_payment_request.controlling_user }
-  end
+  # column :controlling_user, default: true, includes: [payment_order: {bank_payment_request: :controlling_user}] do
+  #   user value: -> (context) { context[:record].payment_order.bank_payment_request.controlling_user }
+  # end
 
   column :controlling_level, default: true, includes: [payment_order: {bank_payment_request: :controlling_level}] do
     text value: "{{record.payment_order.bank_payment_request.controlling_level.name}}"
