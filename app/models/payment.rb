@@ -105,6 +105,7 @@ class Payment < ApplicationRecord
 
   belongs_to :payment_order, optional: true
   belongs_to :payment_status, optional: true
+  belongs_to :status, optional: true, foreign_key: :payment_status_id, class_name: 'PaymentStatus'
   belongs_to :payment_purpose, optional: true
   belongs_to :purchase_order, optional: true
 

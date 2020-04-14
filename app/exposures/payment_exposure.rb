@@ -9,6 +9,14 @@ class PaymentExposure < Exposures::API
     record.receiving_user
   end
   # attribute :beneficiary, record_attribute: true
-  attribute :amount, record_attribute: true
+  attribute :amount, record_attribute: true, exposure: true
+  attribute :initiating_user, record_attribute: true, exposure: true
+  attribute :initiating_account, record_attribute: true, exposure: true
+  attribute :receiving_user, record_attribute: true, exposure: true
+  attribute :receiving_account, record_attribute: true, exposure: true
+  attribute :status, record_attribute: true, exposure: true
+  attribute :payment_order_id, record_attribute: true, exposure: true
+  attribute :payment_order, record_attribute: true, exposure: true
+  attribute :payment_mode, record_attribute: true
 
 end

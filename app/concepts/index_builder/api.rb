@@ -47,7 +47,12 @@ class IndexBuilder::API
       (required_columns.blank? and attr.default) or (required_columns.present? and (required_columns.include?(column_key.to_s) or required_columns.include?(column_key.to_sym)))
     end
     attrs.each do |column_key, column|
-      includes += column.includes
+      if column.includes.is_a?(Hash)
+        includes += [column.includes]
+      else
+        includes += column.includes
+      end
+
     end
     collection.includes(includes.uniq)
   end
@@ -59,7 +64,8 @@ class IndexBuilder::API
       next if required_columns.present? and not (required_columns.include?(column_key.to_s) or required_columns.include?(column_key.to_sym))
       next if required_columns.blank? and not column.default
 
-      map[column.column_key] = column.build(self, user, record, record_exposure)
+      data_provider = data_provider(user, record, record_exposure)
+      map[column.column_key] = column.build(data_provider, user, record, record_exposure)
     end
     {reference: record_exposure.template(reference), columns: map}
   end
