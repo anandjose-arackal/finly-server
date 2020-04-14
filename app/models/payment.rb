@@ -506,7 +506,7 @@ class Payment < ApplicationRecord
     when 'BbpsBill'
       'Utility Bill'
     else
-      parent_type.titleize
+      parent_type&.titleize
     end
   end
 
@@ -758,7 +758,7 @@ class Payment < ApplicationRecord
   end
 
   def utr
-    return super unless super.blank?
+    return super() unless super().blank?
     return self.reference_resources.first&.utr || self.reference_resource&.utr
   end
 

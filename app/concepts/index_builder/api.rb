@@ -70,6 +70,7 @@ class IndexBuilder::API
     {reference: record_exposure.template(reference), columns: map}
   end
 
+  # Data provider is used for reusing classes for fetching data
   def self.data_provider(user, record, record_exposure)
     self
   end

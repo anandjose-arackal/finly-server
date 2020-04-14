@@ -5,16 +5,33 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
   reference '{{record.payment_order.bank_payment_request.id}}'
 
   # Fixed column is always default true
-  column :id, label: 'Payment ID', fixed: true, sort: :id do
+  column :vendor, fixed: true, includes: [:receiving_user] do
+    text value: '{{record.vendor.business_name}}', format: 'primary'
+    text value: '{{record.vendor.trade_name}}'
+  end
+
+  column :id, label: 'Payment ID', sort: :id do
     text value: "{{record.id}}", format: 'primary'
   end
 
-  column :payment_ticket_id, label: "Payment Ticket ID", default: true, includes: [payment_order: :bank_payment_request]  do
+  column :payment_ticket_id, label: "Payment Ticket ID", default: true, includes: [payment_order: :bank_payment_request] do
     text value: "{{record.payment_order.bank_payment_request.id}}"
+  end
+
+  column :vendor_id, label: "Vendor ID", includes: [:receiving_user] do
+    text value: "{{record.vendor.vendor_id}}"
   end
 
   column :created_at, sort: :created_at do
     date value: :created_at
+  end
+
+  column :note, default: true do
+    text value: :note
+  end
+
+  column :utr, label: "Bank Reference Number", default: true, includes: [:reference_resource] do
+    text value: :utr
   end
 
   column :submitted_at do
@@ -57,20 +74,69 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
     text value: "{{record.payment_order.bank_payment_request.controlling_level.name}}"
   end
 
-  column :initiating_account, default: true, includes: [:initiating_account] do
+  column :initiating_account, includes: [:initiating_account] do
     text value: "{{record.initiating_account_type_name}}"
   end
 
-  column :initiating_user, default: true, includes: [:initiating_user] do
+  column :initiating_user, includes: [:initiating_user] do
     user value: :initiating_user
   end
 
-  column :receiving_account, default: true, includes: [:receiving_account, :receiving_user] do
+  column :receiving_account, includes: [:receiving_account, :receiving_user] do
     text value: "{{record.receiving_account_type_name}}"
   end
 
   column :payment_mode, default: true, sort: true do
-    text value: :payment_mode
+    text value: "{{payment_mode | upcase}}"
+  end
+
+  column :type, default: true, sort: true do
+    text value: :parent_type_name
+  end
+
+  column :account, default: true, includes: [:receiving_account] do
+    text value: '{{record.receiving_account.account_number}}', format: 'primary'
+    text value: 'IFSC: {{record.receiving_account.ifsc | upcase}}'
+  end
+
+  column :verified_account, label: "Is Account Verified", includes: [:receiving_account] do
+    boolean value: '{{record.receiving_account.verified}}'
+  end
+
+  column :empaneled_vendor, label: "Is Vendor Empaneled", includes: [:receiving_user] do
+    boolean value: '{{record.vendor.authorized}}'
+  end
+
+  column :reverse_charge_vendor, label: "RCM Applicable Vendor", includes: [:receiving_account] do
+    boolean value: '{{record.vendor.rcm_enabled}}'
+  end
+
+  column :gst_registered, label: "GSTIN Vendor", includes: [:receiving_account] do
+    boolean value: '{{record.vendor.gst_registered}}'
+  end
+
+  column :vendor_type, label: "Vendor Type", includes: [:receiving_account] do
+    text value: '{{record.vendor.vendor_type.name}}'
+  end
+
+  column :pan_number, label: "PAN Number", includes: [:receiving_account] do
+    text value: '{{record.vendor.pan}}'
+  end
+
+  column :msme_registered, label: "MSME Registered Vendor", includes: [:receiving_account] do
+    boolean value: '{{record.vendor.msme_registered}}'
+  end
+
+  column :msme_registration_number, label: "MSME Registration Number", includes: [:receiving_account] do
+    text value: '{{record.vendor.msme_registration_number}}'
+  end
+
+  column :vendor_status, includes: [:receiving_account] do
+    text value: '{{record.vendor.status.name}}'
+  end
+
+  column :policy, includes: [{payment_order: {bank_payment_request: :policy}}] do
+    text value: '{{record.payment_order.bank_payment_request.policy.name}}'
   end
 
   counter -> (user, collection) do
@@ -124,7 +190,7 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
     when :scheduled, :possible_failure, :pending_credit
       # Todo show awaiting approvals
       # if context[:record].controlling_user_id == context[:user].id
-        format = 'warning'
+      format = 'warning'
       # else
       #   format = 'info'
       # end
@@ -135,20 +201,5 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
     end
     format
   end
-
-  # def self.data_provider(user, record, exposure)
-  #   case record.parent_type
-  #   when 'Invoice'
-  #     Docs::P2P::Invoices::Index
-  #   when 'PurchaseOrder'
-  #     Docs::P2P::PurchaseOrders::Index
-  #   when 'BeneficiaryPayment'
-  #     Docs::P2P::BeneficiaryPayment::Index
-  #   when 'BbpsBill'
-  #     Docs::UtilityBills::Bills::Index
-  #   else
-  #     self
-  #   end
-  # end
 
 end

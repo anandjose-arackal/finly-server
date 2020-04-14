@@ -33,7 +33,7 @@ class Menu::Masters::Procurement < Menu::API
     end
   end
 
-  item :payments, icon: "https://img.icons8.com/windows/22/ffffff/sales-performance.png" do
+  item :payments, icon: "https://img.icons8.com/windows/22/ffffff/online-money-transfer.png" do
     item :payment_tickets, permissions: [:bank_payment_request_initiator, :bank_payment_request_reviewer, :bank_payment_request_creditor, :auditor]
     item :payments, permissions: [:bank_payment_request_initiator, :bank_payment_request_reviewer, :bank_payment_request_creditor, :auditor]
   end

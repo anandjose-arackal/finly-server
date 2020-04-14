@@ -122,7 +122,7 @@ class PurchaseOrder < ApplicationRecord
   belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
 
   belongs_to :gstin_location, class_name: "GstinLocation", optional: true
-
+  belongs_to :vendor_location, class_name: "GstinLocation", optional: true, foreign_key: :gstin_location_id
 
   has_many :document_level_reviewer_mappings, as: :document_reviewer_mappable
 
