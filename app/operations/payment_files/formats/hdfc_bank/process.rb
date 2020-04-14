@@ -23,14 +23,14 @@ class PaymentFiles::Formats::HdfcBank::Process < PaymentFiles::Formats::BaseForm
   end
 
   def process
-    headers = retrieve_hdfc_headers
+    self.headers = retrieve_hdfc_headers
     content = []
     self.payment_file_data.each do |payment|
       content << [
           self.transaction_type,
-          payment[:receiving_user_name][0..7],
+          payment[:receiving_user_name].present? ? payment[:receiving_user_name][0..7] : '',
           payment[:beneficiary_account_number],
-          sprintf('%.2f',payment[:amount]),
+          {value:sprintf('%.2f',payment[:amount]), type: 'number'},
           payment[:receiving_user_name],
           '',
           '',
@@ -57,7 +57,7 @@ class PaymentFiles::Formats::HdfcBank::Process < PaymentFiles::Formats::BaseForm
           (self.beneficiary_email.present? ? self.beneficiary_email : payment[:receiving_user_email])
       ]
     end
-    self.response = Exporter.new(user, {spreadsheet: {headers: headers, contents: content}}, messages)
+    self.contents = content
   end
 
   def retrieve_hdfc_headers
@@ -92,4 +92,9 @@ class PaymentFiles::Formats::HdfcBank::Process < PaymentFiles::Formats::BaseForm
         'Beneficiary email id'
     ]
   end
+
+  def success
+    generate_export_file
+  end
+
 end

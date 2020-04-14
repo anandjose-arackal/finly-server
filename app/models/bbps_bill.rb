@@ -130,6 +130,19 @@ class BbpsBill < ApplicationRecord
     end
   }
 
+
+  scope :filter_overdue, -> (enabled) {
+    if enabled
+      where.not(status_id: BbpsBillStatus.id_for(:paid)).where.not(due_date: nil).where.not(due_date: Date.parse("01-01-9999")).where("due_date < ?", Date.today)
+    end
+  }
+
+  scope :filter_creation_date, -> (from, to) {
+    from = Date.parse(from) rescue Date.parse('01-01-1990') unless from.is_a?(Date)
+    to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
+    where('bbps_bills.created_at >= ? && bbps_bills.created_at <= ?', from, to)
+  }
+
   scope :with_id, -> (id) {
     where id: id
   }
@@ -164,6 +177,20 @@ class BbpsBill < ApplicationRecord
     where(subscription_id: id)
   }
 
+  scope :filter_year, -> (year) {
+    if year.blank?
+      year = Date.today.year
+    end
+    where('extract(year from created_at) = ?', year)
+  }
+
+  scope :filter_month, -> (month) {
+    if month.blank?
+      month = Date.today.month
+    end
+    where('extract(month from created_at) = ?', month)
+  }
+
   scope :filter_payable_bills, -> (enabled) {
     if enabled
       # where(status_id: BbpsBill.status_ids(:approved, :auto_approved))
@@ -183,8 +210,33 @@ class BbpsBill < ApplicationRecord
     joins(:biller).where("bbps_billers.biller_category_name = ?", "#{biller_type}")
   }
 
+  scope :filter_user_id, -> (id) {
+    filter_poc_id(id)
+  }
+
+  scope :filter_poc_awaiting_action, -> (user_id) {
+    subscription_ids = BbpsSubscriptionPoc.where(user_id: user_id).pluck(:subscription_id)
+    bills = where(subscription_id: subscription_ids)
+
+    bills = bills.where(user_id: nil)
+
+    # orphan_bill_ids = BbpsBill.where(user_id: nil).where(subscription_id: subscription_ids).pluck(:id)
+
+    where(id: bills.pluck(:id))
+  }
+
   scope :filter_poc_id, -> (id) {
-    where(user_id: id)
+    subscription_ids = BbpsSubscriptionPoc.where(user_id: id).pluck(:subscription_id)
+
+    bills = where(subscription_id: subscription_ids)
+
+    bill_ids = bills.where(user_id: nil).or(bills.where(user_id: id)).pluck(:id)
+
+    user_bill_ids = BbpsBill.where(user_id: id).pluck(:id)
+
+    ids = bill_ids + user_bill_ids
+
+    where(id: ids)
   }
 
   scope :filter_bill_date, -> (start_date, end_date) {where('bbps_bills.bill_date >= ? AND bbps_bills.bill_date <= ? ', Date.parse(start_date), Date.parse(end_date))}
@@ -342,8 +394,16 @@ class BbpsBill < ApplicationRecord
 
   def self.role_based_initiator_associated_items(user, role_id, options = {})
     if [UserRole.id_for(:utility_bill_initiator)].include?(role_id)
-      ids = self.joins(subscription: [:pocs]).where("bbps_bills.company_id = ?", user&.company&.id).where("bbps_subscription_pocs.user_id = ?", user.id).pluck("bbps_bills.id")
-      where(id: ids)
+      # subscription_ids = BbpsSubscriptionPoc.where(user_id: user_id).pluck(:subscription_id)
+      #
+      # orphan_bill_ids = BbpsBill.where(user_id: nil).where(subscription_id: subscription_ids).pluck(:id)
+      #
+      # where(id: orphan_bill_ids)
+      #
+      #
+      # ids = self.joins(subscription: [:pocs]).where("bbps_bills.company_id = ?", user&.company&.id).where("bbps_subscription_pocs.user_id = ?", user.id).pluck("bbps_bills.id")
+      # where(id: ids)
+      filter_poc_id(user&.id)
     elsif [UserRole.id_for(:utility_bill_master_initiator)].include?(role_id)
       ids = self.joins(:subscription).
           where("bbps_bills.company_id = ?", user&.company&.id).

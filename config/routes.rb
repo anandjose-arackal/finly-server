@@ -4073,6 +4073,8 @@ Rails.application.routes.draw do
     get 'vp/payment_agreements', to: 'vendor_payments#payment_agreements'
     get 'vp/purchase_request_approved_items', to: 'vendor_payments#purchase_request_approved_items'
     get 'vp/agreement_invoices', to: 'vendor_payments#agreement_invoices'
+    get 'vp/utility_bill_masters', to: 'vendor_payments#utility_bill_masters'
+    get 'vp/utility_bills', to: 'vendor_payments#utility_bills'
 
     get 'vp/budgets', to: 'vendor_payments#budgets'
 

@@ -18,10 +18,12 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
         grns: false,
         vendors: false,
         payment_agreements: false,
-        approved_purchase_request_items: false
+        approved_purchase_request_items: false,
+        utility_bill_masters: false,
+        utility_bills: false
     }
 
-    reviewer_role_ids = UserRole.ids_for(:admin, :purchase_request_reviewer, :purchase_order_reviewer, :non_po_invoice_reviewer,:po_invoice_reviewer, :agreement_invoice_reviewer, :vendor_reviewer, :bank_payment_request_reviewer, :payment_agreement_reviewer)
+    reviewer_role_ids = UserRole.ids_for(:admin, :purchase_request_reviewer, :purchase_order_reviewer, :non_po_invoice_reviewer, :po_invoice_reviewer, :agreement_invoice_reviewer, :vendor_reviewer, :bank_payment_request_reviewer, :payment_agreement_reviewer, :utility_bill_master_reviewer, :utility_bill_reviewer)
 
     if user.vendor_payments_admin?
       request_types.keys.map {|key| request_types[key] = true }
@@ -46,6 +48,11 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
       unless user.company.agreement_based_payment_system_enabled?
         request_types[:payment_agreements] = false
         request_types[:agreement_invoices] = false
+      end
+
+      unless user.company.utility_bills_enabled?
+        request_types[:utility_bill_masters] = false
+        request_types[:utility_bills] = false
       end
     else
       if user.enforce_policy_enabled?
@@ -82,6 +89,10 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
           request_types[:payment_agreements] = true
         when UserRole.id_for(:inventory_manager)
           request_types[:approved_purchase_request_items] = true
+        when UserRole.id_for(:utility_bill_master_initiator)
+          request_types[:utility_bill_masters] = true
+        when UserRole.id_for(:utility_bill_initiator)
+          request_types[:utility_bills] = true
         end
       end
     end
