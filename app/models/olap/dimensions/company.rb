@@ -23,7 +23,7 @@ class Olap::Dimensions::Company < OlapRecord
   include Analytics::Mapper
 
   transaction_model ::Company
-  consume 'company.update', 'company.create', 'company.destroy'
+  # consume 'company.update', 'company.create', 'company.destroy'
 
   map :name
   map :active
