@@ -29,7 +29,7 @@ class Olap::Dimensions::Category < OlapRecord
   include Analytics::Mapper
 
   transaction_model ::Category
-  consume 'category.update', 'category.create', 'category.destroy'
+  # consume 'category.update', 'category.create', 'category.destroy'
 
   map :name
   map :gl_code
