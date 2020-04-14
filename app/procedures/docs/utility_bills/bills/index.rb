@@ -85,7 +85,7 @@ class Docs::UtilityBills::Bills::Index < IndexBuilder::API
   end
 
   column :auto_fetched, default: true do
-    text value: :is_auto_fetched
+    boolean value: :auto_fetched
   end
 
   # column :controlling_user, default: true, includes: [:controlling_user] do
@@ -145,20 +145,20 @@ class Docs::UtilityBills::Bills::Index < IndexBuilder::API
     [:utility_bill_reviewer]
   end
 
-  def self.bbps_bill_status(user, record, record_exposure)
-    return 'Processing'.titleize if record.status_id == BbpsBillStatus.id_for(:awaiting_approval) and record.controlling_user_id != user.id
+  def self.bbps_bill_status(context)
+    return 'Processing'.titleize if context[:record].status_id == BbpsBillStatus.id_for(:awaiting_approval) and record.controlling_user_id != user.id
 
     record.status&.name&.titleize
   end
 
-  def self.format_status(user, record, record_exposure)
-    case record.status&.name&.to_s&.to_sym
+  def self.format_status(context)
+    case context[:record].status&.name&.to_s&.to_sym
     when :rejected, :failed
       format = 'danger'
     when :paid, :approved, :auto_approved, :payment_ticket_created, :payment_initiated, :payment_ticket_deleted
       format = 'success'
     when :awaiting_approval
-      if record.controlling_user_id == user.id
+      if context[:record].controlling_user_id == context[:user].id
         format = 'warning'
       else
         format = 'info'
@@ -173,26 +173,22 @@ class Docs::UtilityBills::Bills::Index < IndexBuilder::API
     format
   end
 
-  def self.customer_param_value_1(user, record, record_exposure)
-    return nil if record.customer_param_value_1.blank?
+  def self.customer_param_value_1(context)
+    return nil if context[:record].customer_param_value_1.blank?
 
-    "#{record.customer_param_key_1} - #{record.customer_param_value_1}"
+    "#{context[:record].customer_param_key_1} - #{context[:record].customer_param_value_1}"
   end
 
-  def self.customer_param_value_2(user, record, record_exposure)
-    return nil if record.customer_param_value_2.blank?
+  def self.customer_param_value_2(context)
+    return nil if context[:record].customer_param_value_2.blank?
 
-    "#{record.customer_param_key_2} - #{record.customer_param_value_2}"
+    "#{context[:record].customer_param_key_2} - #{context[:record].customer_param_value_2}"
   end
 
-  def self.customer_param_value_3(user, record, record_exposure)
-    return nil if record.customer_param_value_3.blank?
+  def self.customer_param_value_3(context)
+    return nil if context[:record].customer_param_value_3.blank?
 
-    "#{record.customer_param_key_3} - #{record.customer_param_value_3}"
-  end
-
-  def self.is_auto_fetched(user, record, record_exposure)
-    record.autofetched ? "Yes" : "No"
+    "#{context[:record].customer_param_key_3} - #{context[:record].customer_param_value_3}"
   end
 
 end

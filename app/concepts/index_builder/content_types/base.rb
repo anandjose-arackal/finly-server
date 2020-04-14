@@ -46,15 +46,22 @@ class IndexBuilder::ContentTypes::Base
       value = nil
       retriever = send(attribute[:name]) || attribute[:default]
 
+      retriever_context = {
+          attribute: self,
+          user: user,
+          record: record,
+          exposure: exposure
+      }
+
       if retriever.is_a?(Proc)
-        retriever = instance_exec &retriever
+        retriever = instance_exec retriever_context, &retriever
       end
 
       if retriever.is_a?(String)
         value = exposure.template(retriever)
       elsif retriever.is_a?(Symbol)
         if context.respond_to?(retriever)
-          value = context.send(retriever, user, record, exposure)
+          value = context.send(retriever, retriever_context)
         else
           value = exposure.send(retriever)
         end

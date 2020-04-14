@@ -14,6 +14,7 @@ class YesBankVendorExposure < Exposures::API
   attribute :created_by, record_attribute: true, exposure: true
   attribute :policy, record_attribute: true, exposure: true
   attribute :status, record_attribute: true, exposure: true
+  attribute :gst_registered, record_attribute: true
   attribute :gl_name do
     record.business_name
   end

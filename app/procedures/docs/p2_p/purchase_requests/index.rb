@@ -77,14 +77,14 @@ class Docs::P2P::PurchaseRequests::Index < IndexBuilder::API
     counter
   end
 
-  def self.format_status(user, record, record_exposure)
-    case record.status&.name&.to_s&.to_sym
+  def self.format_status(context)
+    case context[:record].status&.name&.to_s&.to_sym
     when :rejected, :cancelled
       format = 'danger'
     when :approved, :auto_approved, :closed, :order_initiated, :po_created, :partially_closed
       format = 'success'
     when :awaiting_approval
-      # if record.controlling_user_id == user.id
+      # if context[:record].controlling_user_id == context[:user].id
       #   format = 'warning'
       # else
         format = 'info'

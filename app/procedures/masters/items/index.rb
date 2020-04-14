@@ -80,10 +80,4 @@ class Masters::Items::Index < IndexBuilder::API
     counter
   end
 
-  def self.is_gst_registered(user, record, record_exposure)
-    return "Yes" if record.gst_registered
-
-    "No"
-  end
-
 end

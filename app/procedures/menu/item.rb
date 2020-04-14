@@ -38,7 +38,7 @@ class Menu::Item
   def init
     self.id = key
     self.path ||= key
-    self.label ||= path.to_s.titleize
+    self.label ||= key.to_s.titleize
     self.create ||= false
 
     if self.permissions and not self.permissions.respond_to?(:each)

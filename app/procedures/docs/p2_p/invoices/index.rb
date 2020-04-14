@@ -152,32 +152,32 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     [:agreement_invoice_reviewer, :po_invoice_reviewer, :non_po_invoice_reviewer, :admin]
   end
 
-  def self.invoice_status(user, record, record_exposure)
-    return 'Awaiting Approval'.upcase if record.invoice_status_id == InwardInvoiceStatus.id_for(:processing) and record.controlling_user_id == user.id
+  def self.invoice_status(context)
+    return 'Awaiting Approval'.upcase if context[:record].invoice_status_id == InwardInvoiceStatus.id_for(:processing) and context[:record].controlling_user_id == context[:user].id
 
-    record.status&.name&.humanize&.upcase
+    context[:record].status&.name&.humanize&.upcase
   end
 
-  def self.cost_center_name(user, record, record_exposure)
-    return "Multiple" if record_exposure.cost_allocation_items
+  def self.cost_center_name(context)
+    return "Multiple" if context[:exposure].cost_allocation_items
 
-    record_exposure.cost_center&.name
+    context[:exposure].cost_center&.name
   end
 
-  def self.department_name(user, record, record_exposure)
-    return "Multiple" if record_exposure.cost_allocation_items
+  def self.department_name(context)
+    return "Multiple" if context[:exposure].cost_allocation_items
 
-    record_exposure.department&.name
+    context[:exposure].department&.name
   end
 
-  def self.format_status(user, record, record_exposure)
-    case record.status&.name&.to_s&.to_sym
+  def self.format_status(context)
+    case context[:record].status&.name&.to_s&.to_sym
     when :rejected
       format = 'danger'
     when :paid, :approved, :closed, :auto_approved, :unpaid, :partially_paid
       format = 'success'
     when :processing
-      if record.controlling_user_id == user.id
+      if context[:record].controlling_user_id == context[:user].id
         format = 'warning'
       else
         format = 'info'

@@ -10,7 +10,7 @@ class Docs::PaymentTickets::Resolver < Resolver::API
     end
 
     if user.policy_user_roles.pluck(:user_role_id).uniq.present?
-      payment_tickets = ::BankPaymentRequest.associated_items(user, ::BankPaymentRequest.roles) || ::BankPaymentRequest.none
+      payment_tickets = ::BankPaymentRequest.associated_items(user, ::BankPaymentRequest.roles)# || ::BankPaymentRequest.none
     else
       payment_tickets = ::BankPaymentRequest.none
     end

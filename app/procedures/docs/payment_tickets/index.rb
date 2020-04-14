@@ -34,11 +34,11 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
   end
 
   column :requested, default: true, includes: [payment_order: {amount_requested: :currency}] do
-    amount value: :amount_requested
+    amount value: -> (context) {context[:exposure].payment_order.amount_requested}
   end
 
   column :processed, default: true, includes: [payment_order: {amount_processed: :currency}] do
-    amount value: :amount_processed
+    amount value: -> (context) {context[:exposure].payment_order.amount_processed}
   end
 
   column :progress, label: 'Approval Progress', default: true, includes: [:dlrms] do
@@ -112,28 +112,20 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     [:bank_payment_request_reviewer, :admin]
   end
 
-  def self.pt_status(user, record, record_exposure)
-    return 'Awaiting Approval'.upcase if record.status_id == BankPaymentRequestStatus.id_for(:processing) and record.controlling_user_id == user.id
+  def self.pt_status(context)
+    return 'Awaiting Approval'.upcase if context[:record].status_id == BankPaymentRequestStatus.id_for(:processing) and context[:record].controlling_user_id == context[:user].id
 
-    record.status&.name&.humanize&.upcase
+    context[:record].status&.name&.humanize&.upcase
   end
 
-  def self.amount_requested(user, record, record_exposure)
-    record.payment_order.amount_requested
-  end
-
-  def self.amount_processed(user, record, record_exposure)
-    record.payment_order.amount_processed
-  end
-
-  def self.format_status(user, record, record_exposure)
-    case record.status&.name&.to_s&.to_sym
+  def self.format_status(context)
+    case context[:record].status&.name&.to_s&.to_sym
     when :rejected
       format = 'danger'
     when :approved, :auto_approved, :pending, :creation_in_progress, :credited
       format = 'success'
     when :processing, :submitted, :unapprove
-      if record.controlling_user_id == user.id
+      if context[:record].controlling_user_id == context[:user].id
         format = 'warning'
       else
         format = 'info'

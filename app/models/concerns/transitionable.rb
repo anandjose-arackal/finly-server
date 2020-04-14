@@ -45,7 +45,7 @@ module Transitionable
       when 'all', :all # Users who have interacted + who will interact in future
       when 'interacted', :interacted # User who have taken action the document
         user_ids = self.document_level_reviewer_mappings.where(
-                                                            viewable: true
+            viewable: true
         ).pluck(:action_taken_by_id)
       else # Return all associated users
         return associated_users(:all)
@@ -183,7 +183,7 @@ module Transitionable
         data[:reviewers].push(reviewer)
 
 
-        
+
 
         if dlrm.taken_control_by_id.present?
           data[:taken_control_by] = {
@@ -209,9 +209,9 @@ module Transitionable
 
         if dlrm.rejected_by_id.present?
           data[:rejected_by] = {
-            id: dlrm.rejected_by_id,
-            name: dlrm.rejected_by&.name,
-            email: dlrm.rejected_by&.email
+              id: dlrm.rejected_by_id,
+              name: dlrm.rejected_by&.name,
+              email: dlrm.rejected_by&.email
           }
         end
 
@@ -436,7 +436,7 @@ module Transitionable
         self.document_level_reviewer_mappings.with_viewable.pluck(:forwarded_to_id).include?(user.id) rescue false
       end
     end
-    
+
     def validate_if_reviewer(user)
       policy = Policy.find_by id: self.policy_id
       if policy.present? && self.document_level_reviewer_mappings.present?
@@ -495,26 +495,26 @@ module Transitionable
 
         # Get all the documents without viewable
         document_ids = DocumentLevelReviewerMapping.where(
-                                                       reviewer_id: user.id,
-                                                       document_reviewer_mappable_type: self.name,
-                                                       level_id: controlling_level_ids
-        ).pluck(:document_reviewer_mappable_id)
+            reviewer_id: user.id,
+            document_reviewer_mappable_type: self.name,
+            level_id: controlling_level_ids
+        )
 
         # Get all the documents where the user had previously interacted with
-        document_ids += DocumentLevelReviewerMapping.where(
+        document_ids = document_ids.or(DocumentLevelReviewerMapping.where(
             reviewer_id: user.id,
             document_reviewer_mappable_type: self.name,
             viewable: true,
-        ).pluck(:document_reviewer_mappable_id)
+            ))
 
         # Get all the taken control items for admin user
-        document_ids += DocumentLevelReviewerMapping.where(
-                                                        taken_control: true,
-                                                        document_reviewer_mappable_type: self.name,
-                                                        taken_control_by_id: user.id
-        ).pluck(:document_reviewer_mappable_id)
+        document_ids = document_ids.or(DocumentLevelReviewerMapping.where(
+            taken_control: true,
+            document_reviewer_mappable_type: self.name,
+            taken_control_by_id: user.id
+        ))
 
-        self.where(id: document_ids)
+        self.where("id in (#{document_ids.select("document_reviewer_mappable_id").to_sql})")
       end
     end
 
@@ -536,75 +536,75 @@ module Transitionable
       # Find all level ids where user is a reviewer & is NOT forwarded
       all_level_ids = DocumentLevelReviewerMapping.with_document_type(self.name).with_reviewer_id(user.id).where(forwarded: false).pluck(:level_id)
 
-      document_ids_from_dlrms = DocumentLevelReviewerMapping.with_document_type(self.name).with_reviewer_id(user.id).where(forwarded: false).pluck(:document_reviewer_mappable_id)
+      document_ids_from_dlrms = DocumentLevelReviewerMapping.with_document_type(self.name).with_reviewer_id(user.id).where(forwarded: false)
 
       if admin
         taken_control_level_ids = DocumentLevelReviewerMapping.with_document_type(self.name).where(taken_control_by_id: user.id).pluck(:level_id)
-        taken_control_document_ids_from_dlrms = DocumentLevelReviewerMapping.with_document_type(self.name).where(taken_control_by_id: user.id).pluck(:document_reviewer_mappable_id)
+        taken_control_document_ids_from_dlrms = DocumentLevelReviewerMapping.with_document_type(self.name).where(taken_control_by_id: user.id)
       end
 
       forwarded_level_ids = DocumentLevelReviewerMapping.with_document_type(self.name).where(forwarded: true, forwarded_to_id: user.id).pluck(:level_id)
-      forwarded_document_ids_from_dlrms = DocumentLevelReviewerMapping.with_document_type(self.name).where(forwarded: true, forwarded_to_id: user.id).pluck(:document_reviewer_mappable_id)
+      forwarded_document_ids_from_dlrms = DocumentLevelReviewerMapping.with_document_type(self.name).where(forwarded: true, forwarded_to_id: user.id)
 
       if self.column_names.include? 'company_id'
-        document_ids = self.where(id: document_ids_from_dlrms, company_id: user.company_id).with_controlling_level_id(all_level_ids).pluck(:id)
+        document_ids = self.where("id in (#{document_ids_from_dlrms.select("document_reviewer_mappable_id").to_sql})").where(company_id: user.company_id).with_controlling_level_id(all_level_ids).pluck(:id)
         # Find controlling level of all those documents
         controlling_level_ids = self.where(company_id: user.company_id).with_controlling_level_id(all_level_ids).pluck(:controlling_level_id)
 
         if admin
-          taken_control_document_ids = self.where(company_id: user.company_id, id: taken_control_document_ids_from_dlrms).with_controlling_level_id(taken_control_level_ids)
+          taken_control_document_ids = self.where(company_id: user.company_id).where("id IN (#{taken_control_document_ids_from_dlrms.select('document_reviewer_mappable_id').to_sql})").with_controlling_level_id(taken_control_level_ids)
           taken_control_controlling_level_ids = self.where(company_id: user.company_id).with_controlling_level_id(taken_control_level_ids).pluck(:controlling_level_id)
         end
 
-        forwarded_document_ids = self.where(company_id: user.company_id, id: forwarded_document_ids_from_dlrms).with_controlling_level_id(forwarded_level_ids).pluck(:id)
+        forwarded_document_ids = self.where(company_id: user.company_id).where("id IN (#{forwarded_document_ids_from_dlrms.select("document_reviewer_mappable_id").to_sql})").with_controlling_level_id(forwarded_level_ids).pluck(:id)
         forwarded_controlling_level_ids = self.where(company_id: user.company_id).with_controlling_level_id(forwarded_level_ids).pluck(:controlling_level_id)
       else
         user_ids = user.company.users.pluck(:id)
-        document_ids = self.where(id: document_ids_from_dlrms).where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(all_level_ids).pluck(:id)
+        document_ids = self.where("id in (#{document_ids_from_dlrms.select("document_reviewer_mappable_id").to_sql})").where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(all_level_ids).pluck(:id)
         # Find controlling level of all those documents
         controlling_level_ids = self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(all_level_ids).pluck(:controlling_level_id)
 
         if admin
-          taken_control_document_ids = self.where(id: taken_control_document_ids_from_dlrms).where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(taken_control_level_ids)
+          taken_control_document_ids = self.where("id in (#{taken_control_document_ids_from_dlrms.select("document_reviewer_mappable_id").to_sql})").where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(taken_control_level_ids)
           taken_control_controlling_level_ids = self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(taken_control_level_ids).pluck(:controlling_level_id)
         end
 
-        forwarded_document_ids = self.where(id: forwarded_document_ids_from_dlrms).where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(forwarded_level_ids)
+        forwarded_document_ids = self.where("id IN (#{forwarded_document_ids_from_dlrms.select("document_reviewer_mappable_id").to_sql})").where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(forwarded_level_ids)
         forwarded_controlling_level_ids = self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(forwarded_level_ids).pluck(:controlling_level_id)
       end
 
       # final list of document ids
-      ids = []
+      ids = DocumentLevelReviewerMapping.none
 
       if admin
         # Find all taken control documents from DLRM with controlling level ids
-        ids += DocumentLevelReviewerMapping.with_level_id(taken_control_controlling_level_ids).
+        ids = DocumentLevelReviewerMapping.with_level_id(taken_control_controlling_level_ids).
             with_taken_control.
             where(viewable: true).
             with_taken_control_by_id(user.id).
             with_document_type(self.name).
             where(action_taken_by_id: nil).
-            with_document_id(taken_control_document_ids).pluck(:document_reviewer_mappable_id)
+            with_document_id(taken_control_document_ids)
       end
 
-      ids += DocumentLevelReviewerMapping.with_level_id(forwarded_controlling_level_ids).
-            with_forwarded.
-            with_forwarded_to_id(user.id).
-            where(viewable: true).
-            with_document_type(self.name).
-            where(action_taken_by_id: nil).
-            with_document_id(forwarded_document_ids).pluck(:document_reviewer_mappable_id)
+      ids = ids.or(DocumentLevelReviewerMapping.with_level_id(forwarded_controlling_level_ids).
+          with_forwarded.
+          with_forwarded_to_id(user.id).
+          where(viewable: true).
+          with_document_type(self.name).
+          where(action_taken_by_id: nil).
+          with_document_id(forwarded_document_ids))
 
       # Find all awaiting action documents from DLRMs with controlling level id
-      ids += DocumentLevelReviewerMapping.with_level_id(controlling_level_ids).
+      ids = ids.or(DocumentLevelReviewerMapping.with_level_id(controlling_level_ids).
           with_reviewer_id(user.id).
           where(forwarded: false).
           where(viewable: true).
           where(taken_control: false, action_taken_by_id: nil).
           with_document_type(self.name).
-          with_document_id(document_ids).pluck(:document_reviewer_mappable_id)
+          with_document_id(document_ids))
 
-      self.where(id: ids)
+      self.where("id in (#{ids.select("document_reviewer_mappable_id").to_sql})")
     end
 
 
@@ -847,7 +847,7 @@ module Transitionable
           where("(reviewer_id = #{user.id} AND (level_id IN (?) OR viewable IS TRUE)) OR (taken_control IS TRUE AND taken_control_by_id = #{user.id}) OR (forwarded IS TRUE AND forwarded_to_id = #{user.id})", controlling_level_ids)
 
 
-      documents = self.status_based_associated_items(user, role_id).where(id: dlrms.pluck(:document_reviewer_mappable_id), policy_id: policy_ids)
+      documents = self.status_based_associated_items(user, role_id).where("id IN (#{dlrms.select('document_reviewer_mappable_id').to_sql})").where(policy_id: policy_ids)
       open_status_ids = self.open_status_ids(user)
       documents = documents.where.not("#{self.table_name}.#{self.document_status_attribute} in (?)", open_status_ids).or(documents.where("#{self.table_name}.#{self.document_status_attribute} in (?)", open_status_ids).where("#{self.document_owner_attribute} = ?", user.id)) rescue self.none
       return documents

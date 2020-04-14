@@ -124,44 +124,44 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
     [:purchase_order_reviewer, :admin]
   end
 
-  def self.po_status(user, record, record_exposure)
-    return 'Awaiting Approval'.upcase if record.purchase_order_status_id == PurchaseOrderStatus.id_for(:processing) and record.controlling_user_id == user.id
+  def self.po_status(context)
+    return 'Awaiting Approval'.upcase if context[:record].purchase_order_status_id == PurchaseOrderStatus.id_for(:processing) and context[:record].controlling_user_id == context[:user].id
 
-    record.status&.name&.humanize&.upcase
+    context[:record].status&.name&.humanize&.upcase
   end
 
-  def self.cost_center_name(user, record, record_exposure)
-    return "Multiple" if record_exposure.cost_allocation_items
+  def self.cost_center_name(context)
+    return "Multiple" if context[:exposure].cost_allocation_items
 
-    record_exposure.cost_center&.name
+    context[:exposure].cost_center&.name
   end
 
-  def self.department_name(user, record, record_exposure)
-    return "Multiple" if record_exposure.cost_allocation_items
+  def self.department_name(context)
+    return "Multiple" if context[:exposure].cost_allocation_items
 
-    record_exposure.department&.name
+    context[:exposure].department&.name
   end
 
-  def self.grn_status_text(user, record, record_exposure)
-    record.status_tag_details&.dig(:grn, :status_text)
+  def self.grn_status_text(context)
+    context[:record].status_tag_details&.dig(:grn, :status_text)
   end
 
-  def self.invoice_status_text(user, record, record_exposure)
-    record.status_tag_details&.dig(:invoice, :status_text)
+  def self.invoice_status_text(context)
+    context[:record].status_tag_details&.dig(:invoice, :status_text)
   end
 
-  def self.payment_status_text(user, record, record_exposure)
-    record.status_tag_details&.dig(:payment, :status_text)
+  def self.payment_status_text(context)
+    context[:record].status_tag_details&.dig(:payment, :status_text)
   end
 
-  def self.format_status(user, record, record_exposure)
-    case record.status&.name&.to_s&.to_sym
+  def self.format_status(context)
+    case context[:record].status&.name&.to_s&.to_sym
     when :rejected
       format = 'danger'
     when :paid, :approved, :closed, :auto_approved, :sent_to_vendor, :po_revised, :vendor_confirmed
       format = 'success'
     when :processing
-      if record.controlling_user_id == user.id
+      if context[:record].controlling_user_id == context[:user].id
         format = 'warning'
       else
         format = 'info'

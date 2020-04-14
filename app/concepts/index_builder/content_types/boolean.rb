@@ -4,7 +4,7 @@ class IndexBuilder::ContentTypes::Boolean < IndexBuilder::ContentTypes::Base
 
   attribute :value
   attribute :format, default: "standard"
-  attribute :tool_tip, default: -> { value }
+  attribute :tool_tip, default: -> (context) { context[:attribute].value }
 
   # Send the content type as Yes/No in text format
   def content_type

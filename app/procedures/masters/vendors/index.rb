@@ -26,7 +26,7 @@ class Masters::Vendors::Index < IndexBuilder::API
   end
 
   column :gst_registered, default: true do
-    text value: :is_gst_registered
+    boolean value: :gst_registered
   end
 
   column :gstin, default: true, includes: [:gstin_locations] do
@@ -88,28 +88,22 @@ class Masters::Vendors::Index < IndexBuilder::API
     counter
   end
 
-  def self.is_gst_registered(user, record, record_exposure)
-    return "Yes" if record.gst_registered
-
-    "No"
+  def self.vendor_gstin(context)
+    context[:record].gstin_locations.map(&:gstin).join(', ')
   end
 
-  def self.vendor_gstin(user, record, record_exposure)
-    record.gstin_locations.map(&:gstin).join(', ')
+  def self.vendor_locations(context)
+    context[:record].gstin_locations.map(&:location)
   end
 
-  def self.vendor_locations(user, record, record_exposure)
-    record.gstin_locations.map(&:location)
-  end
-
-  def self.vendor_trade_name(user, record, record_exposure)
-    return "Trade Name: #{record.trade_name}" if record.trade_name.present?
+  def self.vendor_trade_name(context)
+    return "Trade Name: #{context[:record].trade_name}" if context[:record].trade_name.present?
 
     nil
   end
 
-  def self.format_status(user, record, record_exposure)
-    case record.status&.name&.to_s&.to_sym
+  def self.format_status(context)
+    case context[:record].status&.name&.to_s&.to_sym
     when :rejected
       format = 'danger'
     when :approved, :auto_approved
