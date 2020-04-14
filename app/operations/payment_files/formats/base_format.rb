@@ -44,7 +44,12 @@ class PaymentFiles::Formats::BaseFormat < BaseOperation
 
   def generate_export_file
     operation = Exporter::Spreadsheet.new(user, {headers: self.headers, contents: self.contents}, messages)
-    file = operation.generate_xls_file
+    params[:type].present?
+    if %w(csv CSV).include?(params[:type])
+      file = operation.generate_csv_file
+    else
+      file = operation.generate_xls_file
+    end
     # Create a temporary file to save it to s3 and provide the download link to frontend
     temp_file = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 7.days)
     file.close
