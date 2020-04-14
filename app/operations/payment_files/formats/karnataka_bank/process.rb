@@ -21,7 +21,7 @@ class PaymentFiles::Formats::KarnatakaBank::Process < PaymentFiles::Formats::Bas
   end
 
   def process
-    headers = retrieve_kbl_headers
+    self.headers = retrieve_kbl_headers
     content = []
     sl_no = 0
     self.payment_file_data.each do |payment|
@@ -42,7 +42,11 @@ class PaymentFiles::Formats::KarnatakaBank::Process < PaymentFiles::Formats::Bas
           payment[:receiving_mobile_number]
       ]
     end
-    self.response = Exporter.new(user, {spreadsheet: {headers: headers, contents: content}}, messages)
+    self.contents = content
+  end
+
+  def success
+    generate_export_file
   end
 
   def retrieve_kbl_headers

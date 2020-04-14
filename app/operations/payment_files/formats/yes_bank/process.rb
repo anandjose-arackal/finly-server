@@ -19,14 +19,17 @@ class PaymentFiles::Formats::YesBank::Process < PaymentFiles::Formats::BaseForma
   end
 
   def process
-    headers = ['report', 'username', 'expense']
-    contents = [['report_1', 'user_2', 'expense_3']]
-    self.response = Exporter.new(user, {spreadsheet: {headers: headers, contents: contents}}, messages)
+    self.headers = ['report', 'username', 'expense']
+    self.contents = [['report_1', 'user_2', 'expense_3']]
     # template = "#{File.expand_path(File.dirname(__FILE__))}/template.xls.erb"
     # customer_code = user.company.payment_file_configuration&.options&.dig(:customer_code)
     # total_amount = ''
     # contents = []
     # Exporter::Spreadsheet.new(user, {template: template, contents: contents, data: {customer_code: customer_code, total: total_amount}})
+  end
+
+  def success
+    generate_export_file
   end
 
 end

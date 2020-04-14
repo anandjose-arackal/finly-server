@@ -5,14 +5,16 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
 
   def init
     self.document_types = {
-      purchase_requests: false,
-      purchase_orders: false,
-      non_po_invoices: false,
-      po_invoices: false,
-      payment_tickets: false,
-      vendors: false,
-      grn: false,
-      payment_agreements: false
+        purchase_requests: false,
+        purchase_orders: false,
+        non_po_invoices: false,
+        po_invoices: false,
+        payment_tickets: false,
+        vendors: false,
+        grn: false,
+        payment_agreements: false,
+        utility_bill_masters: false,
+        utility_bills: false
     }
 
     if user.vendor_payments_admin?
@@ -34,6 +36,11 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
 
       unless user.company.agreement_based_payment_system_enabled?
         document_types[:payment_agreements] = false
+      end
+
+      unless user.company.utility_bills_enabled?
+        document_types[:utility_bill_masters] = false
+        document_types[:utility_bills] = false
       end
     else
       user_roles = user.policy_user_roles.pluck(:user_role_id).uniq
@@ -60,6 +67,10 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
           end
         when UserRole.id_for(:payment_agreement_reviewer)
           document_types[:payment_agreements] = true
+        when UserRole.id_for(:utility_bill_master_reviewer)
+          document_types[:utility_bill_masters] = true
+        when UserRole.id_for(:utility_bill_reviewer)
+          document_types[:utility_bills] = true
         end
       end
     end
@@ -294,6 +305,60 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
         filter_data = {'filter_by_date_range[to]': params[:filter_date_to]}
         data[:filters].push(filter_data)
       end
+      self.result.push data
+    end
+
+    if document_types[:utility_bill_masters]
+      utility_bill_masters = BbpsBillerSubscription.awaiting_action_items(user)
+
+      if params[:filter_date_from].present? || params[:filter_date_to].present?
+        utility_bill_masters = utility_bill_masters.filter_creation_date(params[:filter_date_from], params[:filter_date_to])
+      end
+
+      data = {
+          title: "Utility Bill Masters",
+          type: 'utility_bill_masters',
+          count: utility_bill_masters.count,
+          filters: [{filter_status: 'awaiting_approval'}]
+      }
+
+      if params[:filter_date_from].present?
+        filter_data = {'filter_creation_date[from]': params[:filter_date_from]}
+        data[:filters].push(filter_data)
+      end
+
+      if params[:filter_date_to].present?
+        filter_data = {'filter_creation_date[to]': params[:filter_date_to]}
+        data[:filters].push(filter_data)
+      end
+
+      self.result.push data
+    end
+
+    if document_types[:utility_bills]
+      utility_bills = BbpsBill.awaiting_action_items(user)
+
+      if params[:filter_date_from].present? || params[:filter_date_to].present?
+        utility_bills = utility_bills.filter_creation_date(params[:filter_date_from], params[:filter_date_to])
+      end
+
+      data = {
+          title: "Utility Bills",
+          type: 'utility_bills',
+          count: utility_bills.count,
+          filters: [{filter_status: 'awaiting_approval'}]
+      }
+
+      if params[:filter_date_from].present?
+        filter_data = {'filter_creation_date[from]': params[:filter_date_from]}
+        data[:filters].push(filter_data)
+      end
+
+      if params[:filter_date_to].present?
+        filter_data = {'filter_creation_date[to]': params[:filter_date_to]}
+        data[:filters].push(filter_data)
+      end
+
       self.result.push data
     end
 

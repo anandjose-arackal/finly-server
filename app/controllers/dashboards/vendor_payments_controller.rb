@@ -76,4 +76,14 @@ class Dashboards::VendorPaymentsController < BaseControllers::WebBase
     @result = Dashboard::VendorPayments::PurchaseRequestApprovedItems.(current_user, params)
     respond
   end
+
+  def utility_bill_masters
+    @result = Dashboard::VendorPayments::UtilityBillMasters.(current_user, params)
+    respond
+  end
+
+  def utility_bills
+    @result = Dashboard::VendorPayments::UtilityBills.(current_user, params)
+    respond
+  end
 end
