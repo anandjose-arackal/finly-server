@@ -64,4 +64,8 @@ class IndexBuilder::API
     {reference: record_exposure.template(reference), columns: map}
   end
 
+  def self.data_provider(user, record, record_exposure)
+    self
+  end
+
 end

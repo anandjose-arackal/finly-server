@@ -4,7 +4,7 @@ class TaskManager::Documents::Index < Transactions::API
   step :load_documents
 
   def load_documents(options)
-    options['documents'] = Documents::Master.list
+    # options['documents'] = Documents::Master.list
     true
   end
 
