@@ -57,7 +57,6 @@ class User::Configuration::UpdateState < BaseOperation
 
   def post_process
     unless to_user.active?
-      binding.pry
       to_user.user_sessions.where(status_id: UserSessionStatus.id_for(:authorized)).update_all(status_id: UserSessionStatus.id_for(:revoked))
     end
   end
