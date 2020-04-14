@@ -15,7 +15,7 @@ class Menu::Masters::Procurement < Menu::API
 
   item :procure, icon: 'https://img.icons8.com/windows/22/ffffff/add-shopping-cart.png' do
     item :purchase_orders, permissions: [:purchase_order_initiator, :purchase_order_reviewer, :purchase_order_auditor], create: true
-    item :pr_approved_items, permissions: [:purchase_order_initiator]
+    item :pr_approved_items, label: "PR Approved Items", permissions: [:purchase_order_initiator]
   end
 
   item :receive, permissions: :goods_receiver, icon: 'https://img.icons8.com/windows/22/ffffff/borrow-book.png' do
@@ -24,7 +24,7 @@ class Menu::Masters::Procurement < Menu::API
   end
 
   item :payables, icon: "https://img.icons8.com/windows/22/ffffff/sales-performance.png" do
-    item :po_advances, permissions: [:bank_payment_request_initiator, :auditor]
+    item :po_advances, label: "PO Advances", permissions: [:bank_payment_request_initiator, :auditor]
     item :invoices, permissions: [:bank_payment_request_initiator], create: true
     item :utility_bills
     item :pending do
@@ -35,13 +35,13 @@ class Menu::Masters::Procurement < Menu::API
 
   item :payments, icon: "https://img.icons8.com/windows/22/ffffff/sales-performance.png" do
     item :payment_tickets, permissions: [:bank_payment_request_initiator, :bank_payment_request_reviewer, :bank_payment_request_creditor, :auditor]
-    # item :payments, permissions: [:bank_payment_request_initiator, :bank_payment_request_reviewer, :bank_payment_request_creditor, :auditor] # Todo
+    item :payments, permissions: [:bank_payment_request_initiator, :bank_payment_request_reviewer, :bank_payment_request_creditor, :auditor]
   end
 
   item :manage, icon: "https://img.icons8.com/windows/22/ffffff/commercial-development-management.png" do
     item :analytics, permissions: [:admin]
     item :vendors, create: true, permissions: [:vendor_creator, :vendor_reviewer, :vendor_manager, :vendor_auditor, :auditor]
-    item :item_master, create: true, permissions: [:item_master_manager, :inventory_manager, :auditor]
+    item :items, create: true, permissions: [:item_master_manager, :inventory_manager, :auditor]
     item :rate_contracts, create: true, permissions: [:inventory_manager, :auditor]
     # user.is_agreement_invoice_initiator? || user.is_agreement_invoice_reviewer? || user.is_agreement_invoice_auditor? ||
     # user.is_payment_agreement_initiator? || user.vp_admin_or_auditor? || user.is_payment_agreement_auditor? || user.is_payment_agreement_reviewer?
