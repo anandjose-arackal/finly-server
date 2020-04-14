@@ -17,7 +17,7 @@ class PaymentFiles::Formats::Citi::Process < PaymentFiles::Formats::BaseFormat
   end
 
   def process
-    headers = retrieve_citi_headers
+    self.headers = retrieve_citi_headers
     content = []
     pos = 0
     self.payment_file_data.each do |payment|
@@ -34,7 +34,7 @@ class PaymentFiles::Formats::Citi::Process < PaymentFiles::Formats::BaseFormat
           payment[:note]
       ]
     end
-    self.response = Exporter.new(user, {spreadsheet: {headers: headers, contents: content}}, messages)
+    self.contents = content
   end
 
   def retrieve_citi_headers
@@ -50,6 +50,10 @@ class PaymentFiles::Formats::Citi::Process < PaymentFiles::Formats::BaseFormat
         "Amount",
         "Payment Details 1"
     ]
+  end
+
+  def success
+    generate_export_file
   end
 
 end
