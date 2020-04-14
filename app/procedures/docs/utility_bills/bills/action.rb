@@ -1,6 +1,6 @@
 class Docs::UtilityBills::Bills::Action < ActionManager::API
 
-  scope policy: Docs::UtilityBills::Bills::Policy, model: Invoice do
+  scope policy: Docs::UtilityBills::Bills::Policy, model: BbpsBill do
 
     action :button_group,
            :actions,

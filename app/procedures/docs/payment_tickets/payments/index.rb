@@ -2,7 +2,7 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
   include DynamicAttributes
 
   resolver 'payments.default'
-  reference '{{record.id}}'
+  reference '{{record.payment_order.bank_payment_request.id}}'
 
   # Fixed column is always default true
   column :description, label: 'Description', fixed: true, sort: :name do

@@ -1,6 +1,6 @@
 class Docs::P2P::PurchaseOrders::Action < ActionManager::API
 
-  scope policy: Docs::P2P::PurchaseOrders::Policy, model: Invoice do
+  scope policy: Docs::P2P::PurchaseOrders::Policy, model: PurchaseOrder do
 
     action :template,
            :create,

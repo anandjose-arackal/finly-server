@@ -1,6 +1,6 @@
 class Docs::PaymentTickets::Action < ActionManager::API
 
-  scope policy: Docs::PaymentTickets::Policy, model: Invoice do
+  scope policy: Docs::PaymentTickets::Policy, model: BankPaymentRequest do
 
     action :redirect,
            :create,

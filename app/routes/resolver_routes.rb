@@ -79,4 +79,7 @@ Resolver::Router.draw do
     route 'default', Docs::PaymentTickets::Resolver
   end
 
+  scope :payments do
+    route 'default', Docs::PaymentTickets::Payments::Resolver
+  end
 end
