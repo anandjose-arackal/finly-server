@@ -135,8 +135,44 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
     text value: '{{record.vendor.status.name}}'
   end
 
-  column :policy, includes: [{payment_order: {bank_payment_request: :policy}}] do
-    text value: '{{record.payment_order.bank_payment_request.policy.name}}'
+  column :cost_center, includes: {parent: :cost_center} do
+    text value: '{{record.cost_center.name}}'
+  end
+
+  column :department, includes: {parent: :department} do
+    text value: '{{record.department.name}}'
+  end
+
+  column :billing_location, includes: {parent: :location} do
+    text value: '{{record.billing_location.name}}'
+  end
+
+  column :vendor_location, includes: [:parent] do
+    text value: '{{record.vendor_location.name}}'
+  end
+
+  column :category, includes: [:parent] do
+    text value: '{{record.category.name}}'
+  end
+
+  column :invoice_date, includes: [:parent] do
+    date value: :invoice_date
+  end
+
+  column :due_date, includes: [:parent] do
+    date value: :due_date
+  end
+
+  column :due_in_days, includes: [:parent] do
+    text value: :due_in_days
+  end
+
+  column :transaction_period_from, includes: [:parent] do
+    date value: :transaction_period_from
+  end
+
+  column :transaction_period_to, includes: [:parent] do
+    date value: :transaction_period_to
   end
 
   counter -> (user, collection) do

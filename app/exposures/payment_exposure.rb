@@ -51,6 +51,7 @@ class PaymentExposure < Exposures::API
 
     record.receiving_account
   end
+
   attribute :cost_center, exposure: true do
     case record.parent_type
     when 'Invoice', 'PurchaseOrder'
@@ -59,10 +60,8 @@ class PaymentExposure < Exposures::API
       else
         record.parent.cost_center
       end
-    when 'BeneficiaryPayment', 'BbpsBill'
+    when 'BeneficiaryPayment', 'BbpsBill', 'SecurityDeposit'
       record.cost_center
-    when 'SecurityDeposit'
-      nil
     else
       nil
     end
@@ -76,10 +75,8 @@ class PaymentExposure < Exposures::API
       else
         record.parent.department
       end
-    when 'BeneficiaryPayment', 'BbpsBill'
+    when 'BeneficiaryPayment', 'BbpsBill', 'SecurityDeposit'
       record.department
-    when 'SecurityDeposit'
-      nil
     else
       nil
     end
@@ -92,7 +89,7 @@ class PaymentExposure < Exposures::API
   attribute :shipping_location, exposure: true do
     case record.parent_type
     when 'Invoice', 'PurchaseOrder'
-        record.parent.delivery_location
+      record.parent.delivery_location
     when 'BbpsBill', 'BeneficiaryPayment', 'SecurityDeposit'
       nil
     else
@@ -117,6 +114,60 @@ class PaymentExposure < Exposures::API
     else
       nil
     end
+  end
+
+  attribute :invoice_date do
+    case record.parent_type
+    when 'Invoice'
+      record.parent.date
+    when 'BeneficiaryPayment'
+      record.parent.invoice_date
+    when 'BbpsBill'
+      record.parent.bill_date
+    when 'PurchaseOrder', 'SecurityDeposit'
+      nil
+    else
+      nil
+    end
+  end
+
+  attribute :due_date do
+    case record.parent_type
+    when 'Invoice', 'BbpsBill'
+      record.parent.due_date
+    when 'BeneficiaryPayment'
+      record.parent.invoice_due_date
+    when 'PurchaseOrder', 'SecurityDeposit'
+      nil
+    else
+      nil
+    end
+  end
+
+  attribute :due_in_days do
+    next if record.payment_status_id == PaymentStatus.id_for(:completed)
+    next if due_date.blank?
+
+    days = (due_date - Date.today).to_i
+    if days < 0
+      "Overdue by #{days.abs} days"
+    else
+      "#{days} days"
+    end
+  end
+
+  attribute :transaction_period_from do
+    next unless record.parent_type == "Invoice"
+    next unless record.parent.transaction_service_period_from and record.parent.transaction_service_period_to
+
+    record.parent.transaction_service_period_from
+  end
+
+  attribute :transaction_period_to do
+    next unless record.parent_type == "Invoice"
+    next unless record.parent.transaction_service_period_from and record.parent.transaction_service_period_to
+
+    record.parent.transaction_service_period_to
   end
 
   private
