@@ -540,6 +540,10 @@ class Expense < ApplicationRecord
     end
   end
 
+  def company
+    self.user.company
+  end
+
   # this method is to purely show the amount values for the carious expenses
   def amount_value
     case self.expense_type_id
