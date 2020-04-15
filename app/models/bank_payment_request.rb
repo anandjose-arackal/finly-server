@@ -391,7 +391,12 @@ class BankPaymentRequest < ApplicationRecord
     when 90
       where status_id: BankPaymentRequestStatus.ids_for(:open, :retracted)
     when 91
-      where(status_id: BankPaymentRequestStatus.ids_for(:processing), controlling_user_id: RequestStoreUtil.current_user&.id).where.not(controlling_user_id: nil)
+      user_id = RequestStore.store[:current_user]&.id
+      if user_id.present?
+        where(status_id: BankPaymentRequestStatus.ids_for(:processing)).awaiting_action_items(user_id)
+      else
+        self.none
+      end
     when 92
       where status_id: BankPaymentRequestStatus.ids_for(:submitted, :processing, :unapprove)
     when 93

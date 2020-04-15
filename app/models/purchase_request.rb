@@ -128,8 +128,10 @@ class PurchaseRequest < ApplicationRecord
     when 90
       where purchase_request_status_id: PurchaseRequestStatus.ids_for(:draft, :retracted)
     when 91
-      # Todo check logic for this from Abi
-      # where(purchase_request_status_id: PurchaseRequestStatus.ids_for(:awaiting_approval), controlling_user_id: RequestStoreUtil.current_user&.id).where.not(controlling_user_id: nil)
+      user_id = RequestStore.store[:current_user]&.id
+      if user_id.present?
+        self.awaiting_action_items(user_id)
+      end
     when 92
       where purchase_request_status_id: PurchaseOrderStatus.ids_for(:approved, :auto_approved, :po_created, :partially_closed, :order_initiated)
     else
@@ -415,6 +417,19 @@ class PurchaseRequest < ApplicationRecord
         end
       end
     end
+  end
+
+  # Used for tracking completion %
+  def review_pending?
+    PurchaseRequestStatus.ids_for(:draft, :retracted, :rejected).include?(purchase_request_status_id)
+  end
+
+  def review_completed?
+    PurchaseRequestStatus.ids_for(:approved,:auto_approved,:closed,:order_initiated,:cancelled,:po_created,:partially_closed).include?(purchase_request_status_id)
+  end
+
+  def review_in_progress?
+    PurchaseRequestStatus.ids_for(:awaiting_approval).include?(purchase_request_status_id)
   end
 
   private

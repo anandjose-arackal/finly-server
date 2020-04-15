@@ -158,7 +158,7 @@ class Docs::UtilityBills::Bills::Index < IndexBuilder::API
     when :paid, :approved, :auto_approved, :payment_ticket_created, :payment_initiated, :payment_ticket_deleted
       format = 'success'
     when :awaiting_approval
-      if context[:record].controlling_user_id == context[:user].id
+      if context[:record].controlling_user?(context[:user])
         format = 'warning'
       else
         format = 'info'

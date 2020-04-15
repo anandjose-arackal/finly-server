@@ -62,6 +62,42 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
     amount value: :amount
   end
 
+  column :controlling_user, default: true, includes: [payment_order: {bank_payment_request: [:document_level_reviewer_mappings, :level]}] do
+    user value: -> (context) do
+      bank_payment_request = context[:record].payment_order.bank_payment_request
+      bank_payment_request.get_reviewers.first
+    end
+    text value: -> (context) do
+      bank_payment_request = context[:record].payment_order.bank_payment_request
+      count = bank_payment_request.get_reviewer_ids.count
+      if count > 2
+        "+ #{count} Reviewers"
+      else
+        # To avoid FE from keeping a dashed (--) placeholder
+        " "
+      end
+    end
+  end
+
+  column :controlling_level, default: true, includes: [payment_order: {bank_payment_request: :controlling_level}] do
+    text value: "{{record.payment_order.bank_payment_request.controlling_level.name}}"
+    text value: -> (context) do
+      bank_payment_request = context[:record].payment_order.bank_payment_request
+      if bank_payment_request.review_in_progress? and bank_payment_request.controlling_level.present?
+        "Level: #{bank_payment_request.controlling_level.level_number}"
+      else
+        " "
+      end
+    end
+  end
+
+  column :progress, label: 'Approval Progress', default: true, includes: [payment_order: {bank_payment_request: [:document_level_reviewer_mappings]}] do
+    progress_bar value: ->(context) do
+      bank_payment_request = context[:record].payment_order.bank_payment_request
+      bank_payment_request.review_progress || 0
+    end
+  end
+
   # column :progress, label: 'Approval Progress', default: true, includes: [:dlrms] do
   #   progress_bar value: :review_progress
   # end
@@ -70,9 +106,9 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
   #   user value: -> (context) { context[:record].payment_order.bank_payment_request.controlling_user }
   # end
 
-  column :controlling_level, default: true, includes: [payment_order: {bank_payment_request: :controlling_level}] do
-    text value: "{{record.payment_order.bank_payment_request.controlling_level.name}}"
-  end
+  # column :controlling_level, default: true, includes: [payment_order: {bank_payment_request: :controlling_level}] do
+  #   text value: "{{record.payment_order.bank_payment_request.controlling_level.name}}"
+  # end
 
   column :initiating_account, includes: [:initiating_account] do
     text value: "{{record.initiating_account_type_name}}"
@@ -289,7 +325,7 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
       format = 'success'
     when :scheduled, :possible_failure, :pending_credit
       # Todo show awaiting approvals
-      # if context[:record].controlling_user_id == context[:user].id
+      # if context[:record].controlling_user?(context[:user])
       format = 'warning'
       # else
       #   format = 'info'

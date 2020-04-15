@@ -33,14 +33,16 @@ class Docs::P2P::PurchaseRequests::Index < IndexBuilder::API
   end
 
   column :amount, default: true, sort: :total_amount_value, includes: [total_amount: :currency] do
-    amount value: "{{record.total_amount.value}}",
-           currency_code: "{{record.total_amount.currency.country_code}}",
-           currency_symbol: "{{record.total_amount.currency.symbol}}"
+    amount value: :total_amount
   end
 
   column :created_by, default: true, includes: [:creator] do
     user value: :created_by
   end
+
+  IndexBuilder::API::ColumnTemplate::ControllingUser(self)
+  IndexBuilder::API::ColumnTemplate::ControllingLevel(self)
+  IndexBuilder::API::ColumnTemplate::ReviewProgress(self)
 
   counter -> (user, collection) do
     counter = IndexBuilder::Counter.new :with_status_ids
@@ -51,11 +53,10 @@ class Docs::P2P::PurchaseRequests::Index < IndexBuilder::API
     counter.add 90, 'Open', ((counts[PurchaseRequestStatus.id_for(:draft)] || 0) + (counts[PurchaseRequestStatus.id_for(:retracted)] || 0))
 
     # :awaiting_approval,
-    # if user.has_permission?(:purchase_request_reviewer)
-    #   Todo check logic for this from Abi
-    #   counter.add 91, 'Awaiting Approval',
-    #               collection.where(purchase_request_status_id: PurchaseRequestStatus.id_for(:awaiting_approval), controlling_user_id: user.id).count
-    # end
+    if user.has_permission?(:purchase_request_reviewer)
+      counter.add 91, 'Awaiting Approval',
+                  PurchaseRequest.awaiting_action_items(user.id).count
+    end
 
     # :processing
     counter.add PurchaseRequestStatus.id_for(:awaiting_approval), 'Processing', counts[PurchaseRequestStatus.id_for(:awaiting_approval)]
@@ -84,7 +85,7 @@ class Docs::P2P::PurchaseRequests::Index < IndexBuilder::API
     when :approved, :auto_approved, :closed, :order_initiated, :po_created, :partially_closed
       format = 'success'
     when :awaiting_approval
-      # if context[:record].controlling_user_id == context[:user].id
+      # if context[:record].controlling_user?(context[:user])
       #   format = 'warning'
       # else
         format = 'info'

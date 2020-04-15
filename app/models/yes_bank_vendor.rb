@@ -214,8 +214,12 @@ class YesBankVendor < ApplicationRecord
     when 90
       where status_id: VendorStatus.ids_for(:draft, :retracted)
     when 91
-      # Todo check logic for this from Abi
-      # where(status_id: VendorStatus.ids_for(:awaiting_approval), controlling_user_id: RequestStoreUtil.current_user&.id).where.not(controlling_user_id: nil)
+      user_id = RequestStore.store[:current_user]&.id
+      if user_id.present?
+        where(status_id: VendorStatus.ids_for(:awaiting_approval)).awaiting_action_items(user_id)
+      else
+        self.none
+      end
     when 92
       where status_id: VendorStatus.ids_for(:approved, :auto_approved)
     else
@@ -391,5 +395,18 @@ class YesBankVendor < ApplicationRecord
 
   def name
     business_name
+  end
+
+  # Used for tracking completion %
+  def review_pending?
+    VendorStatus.ids_for(:draft, :retracted, :rejected).include?(status_id)
+  end
+
+  def review_completed?
+    PurchaseRequestStatus.ids_for(:approved, :auto_approved, :deactivated).include?(status_id)
+  end
+
+  def review_in_progress?
+    PurchaseRequestStatus.ids_for(:awaiting_approval).include?(status_id)
   end
 end

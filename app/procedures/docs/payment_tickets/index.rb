@@ -41,10 +41,6 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     amount value: -> (context) {context[:exposure].payment_order.amount_processed}
   end
 
-  column :progress, label: 'Approval Progress', default: true, includes: [:dlrms] do
-    progress_bar value: :review_progress
-  end
-
   column :submitted_at, sort: :submitted_at, default: true do
     date value: :submitted_at
   end
@@ -53,13 +49,9 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     date value: :approved_at
   end
 
-  column :controlling_user, default: true, includes: [:controlling_user] do
-    user value: :controlling_user
-  end
-
-  column :controlling_level, default: true, includes: [:controlling_level] do
-    text value: "{{record.controlling_level.name}}"
-  end
+  IndexBuilder::API::ColumnTemplate::ControllingUser(self)
+  IndexBuilder::API::ColumnTemplate::ControllingLevel(self)
+  IndexBuilder::API::ColumnTemplate::ReviewProgress(self)
 
   # Avoiding this as this fetches data from payments as well, which would result in N+1 query
   # column :payment_mode, includes: [:payment_order] do
@@ -84,7 +76,7 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     # Awaiting Approval
     if user.has_permission?(awaiting_approval_roles)
       counter.add 91, 'Awaiting Approval',
-                  collection.where(status_id: BankPaymentRequestStatus.id_for(:processing), controlling_user_id: user.id).count
+                  BankPaymentRequest.awaiting_action_items(user.id).count
     end
 
     counter.add 92, "Processing", (
@@ -113,7 +105,7 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
   end
 
   def self.pt_status(context)
-    return 'Awaiting Approval'.upcase if context[:record].status_id == BankPaymentRequestStatus.id_for(:processing) and context[:record].controlling_user_id == context[:user].id
+    return 'Awaiting Approval'.upcase if context[:record].status_id == BankPaymentRequestStatus.id_for(:processing) and context[:record].controlling_user?(context[:user])
 
     context[:record].status&.name&.humanize&.upcase
   end
@@ -125,7 +117,7 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     when :approved, :auto_approved, :pending, :creation_in_progress, :credited
       format = 'success'
     when :processing, :submitted, :unapprove
-      if context[:record].controlling_user_id == context[:user].id
+      if context[:record].controlling_user?(context[:user])
         format = 'warning'
       else
         format = 'info'

@@ -22,7 +22,7 @@ class Masters::Vendors::Index < IndexBuilder::API
   end
 
   column :status, default: true, includes: [:status] do
-    badge value: "{{record.status.name | upcase}}", format: :format_status
+    badge value: :status_name, format: :format_status
   end
 
   column :gst_registered, default: true do
@@ -57,6 +57,10 @@ class Masters::Vendors::Index < IndexBuilder::API
     user value: :created_by
   end
 
+  IndexBuilder::API::ColumnTemplate::ControllingUser(self)
+  IndexBuilder::API::ColumnTemplate::ControllingLevel(self)
+  IndexBuilder::API::ColumnTemplate::ReviewProgress(self)
+
   counter -> (user, collection) do
     counter = IndexBuilder::Counter.new :with_status_id
     counts = collection.group(:status_id).count
@@ -64,12 +68,10 @@ class Masters::Vendors::Index < IndexBuilder::API
     # draft retracted
     counter.add 90, 'Open', ((counts[VendorStatus.id_for(:draft)] || 0) + (counts[VendorStatus.id_for(:retracted)] || 0))
 
-    # awaiting_approval
-    # if user.has_permission?(:vendor_reviewer)
-    #   Todo check logic for this from Abi
-    #   counter.add 91, 'Awaiting Approval',
-    #               collection.where(purchase_request_status_id: PurchaseRequestStatus.id_for(:awaiting_approval), controlling_user_id: user.id).count
-    # end
+    if user.has_permission?(:vendor_reviewer)
+      counter.add 91, 'Awaiting Approval',
+                  YesBankVendor.awaiting_action_items(user.id).count
+    end
 
     # processing
     counter.add VendorStatus.id_for(:awaiting_approval), 'Processing', counts[VendorStatus.id_for(:awaiting_approval)]
@@ -102,6 +104,12 @@ class Masters::Vendors::Index < IndexBuilder::API
     nil
   end
 
+  def self.status_name(context)
+    return "Processing" unless context[:record].controlling_user?(context[:user])
+
+    context[:record].status&.name
+  end
+
   def self.format_status(context)
     case context[:record].status&.name&.to_s&.to_sym
     when :rejected
@@ -109,7 +117,7 @@ class Masters::Vendors::Index < IndexBuilder::API
     when :approved, :auto_approved
       format = 'success'
     when :awaiting_approval
-      if record.controlling_user_id == user.id
+      if context[:record].controlling_user?(context[:user])
         format = 'warning'
       else
         format = 'info'

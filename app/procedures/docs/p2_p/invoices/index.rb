@@ -95,13 +95,9 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     text value: "{{record.shipping_location.name}}"
   end
 
-  column :controlling_user, default: true, includes: [:controlling_user] do
-    user value: :controlling_user
-  end
-
-  column :controlling_level, default: true, includes: [:controlling_level] do
-    text value: "{{record.controlling_level.name}}"
-  end
+  IndexBuilder::API::ColumnTemplate::ControllingUser(self)
+  IndexBuilder::API::ColumnTemplate::ControllingLevel(self)
+  IndexBuilder::API::ColumnTemplate::ReviewProgress(self)
 
   column :approved_at, default: true do
     date value: :approved_at
@@ -126,7 +122,7 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     # Awaiting Approval
     if user.has_permission?(awaiting_approval_roles)
       counter.add 91, 'Awaiting Approval',
-                  collection.where(invoice_status_id: InwardInvoiceStatus.id_for(:processing), controlling_user_id: user.id).count
+                  Invoice.awaiting_action_items(user).count
     end
 
     # Processing
@@ -153,7 +149,7 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
   end
 
   def self.invoice_status(context)
-    return 'Awaiting Approval'.upcase if context[:record].invoice_status_id == InwardInvoiceStatus.id_for(:processing) and context[:record].controlling_user_id == context[:user].id
+    return 'Awaiting Approval'.upcase if context[:record].invoice_status_id == InwardInvoiceStatus.id_for(:processing) and context[:record].controlling_user?(context[:user])
 
     context[:record].status&.name&.humanize&.upcase
   end
@@ -177,7 +173,7 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     when :paid, :approved, :closed, :auto_approved, :unpaid, :partially_paid
       format = 'success'
     when :processing
-      if context[:record].controlling_user_id == context[:user].id
+      if context[:record].controlling_user?(context[:user])
         format = 'warning'
       else
         format = 'info'
