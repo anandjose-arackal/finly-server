@@ -929,6 +929,20 @@ module Transitionable
     current_level_index*100/level_count
   end
 
+  def reviewers_count
+    levels = document_level_reviewer_mappings.map {|l| l.level_id}.uniq
+    levels.size
+  end
+
+  def reviewers_completed_count
+    levels = document_level_reviewer_mappings.map {|l| l.level_id}.uniq
+    level_count = levels.size
+    current_level_index = levels.find_index(controlling_level_id)
+    return 0 if current_level_index.nil? or current_level_index < 1
+
+    current_level_index
+  end
+
   def controlling_user?(user)
     get_reviewer_ids&.include?(user.id) || false
   end

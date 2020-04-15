@@ -92,10 +92,19 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
   end
 
   column :progress, label: 'Approval Progress', default: true, includes: [payment_order: {bank_payment_request: [:document_level_reviewer_mappings]}] do
-    progress_bar value: ->(context) do
+    progress_bar value: ->(context) {
       bank_payment_request = context[:record].payment_order.bank_payment_request
       bank_payment_request.review_progress || 0
-    end
+    },
+                 completed_count: ->(context) {
+                   bank_payment_request = context[:record].payment_order.bank_payment_request
+                   bank_payment_request.reviewers_completed_count || 0
+                 },
+                 total_count: ->(context) {
+                   bank_payment_request = context[:record].payment_order.bank_payment_request
+                   bank_payment_request.reviewers_count || 0
+                 }
+
   end
 
   # column :progress, label: 'Approval Progress', default: true, includes: [:dlrms] do
@@ -110,8 +119,20 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
   #   text value: "{{record.payment_order.bank_payment_request.controlling_level.name}}"
   # end
 
-  column :initiating_account, includes: [:initiating_account] do
-    text value: "{{record.initiating_account_type_name}}"
+  # column :initiating_account, includes: [:initiating_account] do
+  #   text value: "{{record.initiating_account_type_name}}"
+  # end
+
+  column :initiating_account, default: true,
+         includes: [
+             :initiating_account_virtual_bank_account,
+             initiating_account_card: :user,
+             initiating_account_user_pocket: :user,
+             initiating_account_user_wallet: :user,
+             initiating_account_vendor_payment_wallet: :user
+         ] do
+    text value: '{{record.initiating_account_number | upcase}}', format: 'primary'
+    text value: '{{record.initiating_account_code | upcase}}'
   end
 
   column :initiating_user, includes: [:initiating_user] do

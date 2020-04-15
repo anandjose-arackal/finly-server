@@ -31,7 +31,9 @@ class IndexBuilder::API::ColumnTemplate
 
   def self.ReviewProgress(klass)
     klass.column :progress, label: 'Approval Progress', default: true, includes: [:document_level_reviewer_mappings] do
-      progress_bar value: ->(context) {context[:record].review_progress || 0}
+      progress_bar value: ->(context) {context[:record].review_progress || 0},
+                   completed_count: ->(context) {context[:record].reviewers_completed_count || 0},
+                   total_count: ->(context) {context[:record].reviewers_count || 0}
     end
   end
 end

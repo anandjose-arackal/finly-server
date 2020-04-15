@@ -54,14 +54,6 @@ class PaymentExposure < Exposures::API
     end
   end
 
-  attribute :initiating_account_type_name do
-    account_name(record.initiating_user, record.initiating_account)
-  end
-
-  attribute :receiving_account_type_name do
-    account_name(record.receiving_user, record.receiving_account)
-  end
-
   attribute :parent_type_name do
     case record.parent_type
     when 'Invoice', 'PurchaseOrder', 'BeneficiaryPayment', 'SecurityDeposit'
