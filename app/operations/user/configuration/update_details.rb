@@ -13,9 +13,22 @@ class User::Configuration::UpdateDetails < BaseOperation
   end
 
   def validate
-    if details_params[:name].blank? and details_params[:mobile_number].blank?
-      messages[:error] << 'Nothing to update'
-      # return false
+    # if details_params[:name].blank? and details_params[:mobile_number].blank?
+    #   messages[:error] << 'Nothing to update'
+    # end
+
+    if params[:employee_id].blank?
+      messages[:error] << 'Employee Id is not present'
+    end
+
+    if params[:email].blank?
+      messages[:error] << 'Email Id is not present'
+    end
+
+    if (['male', 'female'].include? (params[:gender].downcase) )
+      params[:gender] = params[:gender].downcase.split("").first
+    else
+      messages[:error] << 'Gender not specified correctly'
     end
   end
 
