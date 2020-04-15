@@ -72,8 +72,6 @@ class Payment < ApplicationRecord
 
   belongs_to :amount, optional: true
   belongs_to :payment_type, optional: true
-  belongs_to :initiating_user, optional: true, polymorphic: true
-  belongs_to :receiving_user, optional: true, polymorphic: true
   belongs_to :reference_resource, optional: true, polymorphic: true
   belongs_to :original_payment_for_refund, optional: true, class_name: "Payment"
   belongs_to :category, optional: true
@@ -102,6 +100,12 @@ class Payment < ApplicationRecord
   belongs_to :invoice, optional: true
 
   belongs_to :parent, optional: true, polymorphic: true
+  # These can be used for including deeply nested relationships related relationships
+  belongs_to :invoice_parent, -> { includes(:payments).where(payments: { parent_type: 'Invoice' }) }, foreign_key: :parent_id, class_name: 'Invoice', optional: true
+  belongs_to :purchase_order_parent, -> { includes(:payments).where(payments: { parent_type: 'PurchaseOrder' }) }, foreign_key: :parent_id, class_name: 'PurchaseOrder', optional: true
+  belongs_to :bbps_bill_parent, -> { includes(:payments).where(payments: { parent_type: 'BbpsBill' }) }, foreign_key: :parent_id, class_name: 'BbpsBill', optional: true
+  belongs_to :beneficiary_payment_parent, -> { includes(:payments).where(payments: { parent_type: 'BeneficiaryPayment' }) }, foreign_key: :parent_id, class_name: 'BeneficiaryPayment', optional: true
+  belongs_to :security_deposit_parent, -> { includes(:payments).where(payments: { parent_type: 'SecurityDeposit' }) }, foreign_key: :parent_id, class_name: 'SecurityDeposit', optional: true
 
   belongs_to :payment_order, optional: true
   belongs_to :payment_status, optional: true
@@ -111,8 +115,36 @@ class Payment < ApplicationRecord
 
   belongs_to :destination_pocket, optional: true, class_name: "UserPocket"
 
+  belongs_to :initiating_user, optional: true, polymorphic: true
+  # belongs_to :initiating_user_type_user, -> { includes(:initiating_payments).where(payments: { initiating_user_type: 'User' }) }, foreign_key: :initiating_user_id, class_name: 'User', optional: true
+
+  belongs_to :receiving_user, optional: true, polymorphic: true
+  belongs_to :receiving_user_type_user, -> { includes(:receiving_payments).where(payments: { receiving_user_type: 'User' }) }, foreign_key: :receiving_user_id, class_name: 'User', optional: true
+  belongs_to :receiving_user_bbps_biller_subscription, -> { includes(:receiving_payments).where(payments: { receiving_user_type: 'BbpsBillerSubscription' }) }, foreign_key: :receiving_user_id, class_name: 'BbpsBillerSubscription', optional: true
+  belongs_to :receiving_user_vendor, -> { includes(:receiving_payments).where(payments: { receiving_user_type: 'YesBankVendor' }) }, foreign_key: :receiving_user_id, class_name: 'YesBankVendor', optional: true
+
   belongs_to :initiating_account, optional: true, polymorphic: true
+  belongs_to :initiating_account_card, -> { includes(:initiating_payments).where(payments: { initiating_account_type: 'Card' }) }, foreign_key: :initiating_account_id, class_name: 'Card', optional: true
+  belongs_to :initiating_account_kotak_bank_company_account, -> { includes(:initiating_payments).where(payments: { initiating_account_type: 'KotakBankCompanyAccount' }) }, foreign_key: :initiating_account_id, class_name: 'KotakBankCompanyAccount', optional: true
+  belongs_to :initiating_account_icici_bank_company_account, -> { includes(:initiating_payments).where(payments: { initiating_account_type: 'IciciBankCompanyAccount' }) }, foreign_key: :initiating_account_id, class_name: 'IciciBankCompanyAccount', optional: true
+  belongs_to :initiating_account_itz_cash_company_account, -> { includes(:initiating_payments).where(payments: { initiating_account_type: 'ItzCashCompanyAccount' }) }, foreign_key: :initiating_account_id, class_name: 'ItzCashCompanyAccount', optional: true
+  belongs_to :initiating_account_utility_bills_account, -> { includes(:initiating_payments).where(payments: { initiating_account_type: 'UtilityBillsAccount' }) }, foreign_key: :initiating_account_id, class_name: 'UtilityBillsAccount', optional: true
+  belongs_to :initiating_account_yes_bank_company_account, -> { includes(:initiating_payments).where(payments: { initiating_account_type: 'YesBankCompanyAccount' }) }, foreign_key: :initiating_account_id, class_name: 'YesBankCompanyAccount', optional: true
+  belongs_to :initiating_account_virtual_bank_account, -> { includes(:initiating_payments).where(payments: { initiating_account_type: 'VirtualBankAccount' }) }, foreign_key: :initiating_account_id, class_name: 'VirtualBankAccount', optional: true
+  belongs_to :initiating_account_user_wallet, -> { includes(:initiating_payments).where(payments: { initiating_account_type: 'UserWallet' }) }, foreign_key: :initiating_account_id, class_name: 'UserWallet', optional: true
+  belongs_to :initiating_account_vendor_payment_wallet, -> { includes(:initiating_payments).where(payments: { initiating_account_type: 'VendorPaymentWallet' }) }, foreign_key: :initiating_account_id, class_name: 'VendorPaymentWallet', optional: true
+  belongs_to :initiating_account_user_pocket, -> { includes(:initiating_payments).where(payments: { initiating_account_type: 'UserPocket' }) }, foreign_key: :initiating_account_id, class_name: 'UserPocket', optional: true
+
   belongs_to :receiving_account, optional: true, polymorphic: true
+  belongs_to :receiving_account_bank_account, -> { includes(:receiving_payments).where(payments: { receiving_account_type: 'BankAccount' }) }, foreign_key: :receiving_account_id, class_name: 'BankAccount', optional: true
+  belongs_to :receiving_account_card, -> { includes(:receiving_payments).where(payments: { receiving_account_type: 'Card' }) }, foreign_key: :receiving_account_id, class_name: 'Card', optional: true
+  belongs_to :receiving_account_yes_bank_company_account, -> { includes(:receiving_payments).where(payments: { receiving_account_type: 'YesBankCompanyAccount' }) }, foreign_key: :receiving_account_id, class_name: 'YesBankCompanyAccount', optional: true
+  belongs_to :receiving_account_utility_bills_account, -> { includes(:receiving_payments).where(payments: { receiving_account_type: 'UtilityBillsAccount' }) }, foreign_key: :receiving_account_id, class_name: 'UtilityBillsAccount', optional: true
+  belongs_to :receiving_account_user_pocket, -> { includes(:receiving_payments).where(payments: { receiving_account_type: 'UserPocket' }) }, foreign_key: :receiving_account_id, class_name: 'UserPocket', optional: true
+  belongs_to :receiving_account_user_wallet, -> { includes(:receiving_payments).where(payments: { receiving_account_type: 'UserWallet' }) }, foreign_key: :receiving_account_id, class_name: 'UserWallet', optional: true
+  belongs_to :receiving_account_vendor_payment_wallet, -> { includes(:receiving_payments).where(payments: { receiving_account_type: 'VendorPaymentWallet' }) }, foreign_key: :receiving_account_id, class_name: 'VendorPaymentWallet', optional: true
+  belongs_to :receiving_account_bbps_biller, -> { includes(:receiving_payments).where(payments: { receiving_account_type: 'BbpsBiller' }) }, foreign_key: :receiving_account_id, class_name: 'BbpsBiller', optional: true
+  belongs_to :receiving_account_cash_on_hand, -> { includes(:receiving_payments).where(payments: { receiving_account_type: 'CashOnHand' }) }, foreign_key: :receiving_account_id, class_name: 'CashOnHand', optional: true
 
   belongs_to :transfer_mode, optional: true, class_name: 'TransferModeCompanyMapping'
 

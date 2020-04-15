@@ -19,7 +19,7 @@ class KotakBankCompanyAccount < ApplicationRecord
 
   has_many :initiating_payments, as: :initiating_account
   has_many :initiating_payment_trails, as: :initiating_account
-  has_many :receiving_payments, as: :receiving_account
+  has_many :receiving_payments, as: :receiving_account, class_name: "Payment"
   has_many :receiving_payment_trails, as: :receiving_account
   has_many :finly_transactions, as: :finly_account
 

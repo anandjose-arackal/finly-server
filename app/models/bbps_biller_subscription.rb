@@ -80,6 +80,9 @@ class BbpsBillerSubscription < ApplicationRecord
   has_many :bbps_bills, class_name: 'BbpsBill', foreign_key: :subscription_id
   has_many :attachments, as: :resource, dependent: :destroy
 
+  has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment'
+  has_many :receiving_payments, foreign_key: 'receiving_user_id', class_name: 'Payment'
+
   after_update :cleanup # Destroy Biller Subscription fields for other billers if any
 
   delegate :draft?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :deactivated?, :reactivated?, to: :status

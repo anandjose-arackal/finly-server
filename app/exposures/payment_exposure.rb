@@ -10,14 +10,48 @@ class PaymentExposure < Exposures::API
   attribute :initiating_account, record_attribute: true, exposure: true
   attribute :receiving_user, record_attribute: true, exposure: true
   attribute :receiving_account, record_attribute: true, exposure: true
+  attribute :receiving_account_bank_account, exposure: true, record_attribute: true
+  attribute :receiving_account_card, exposure: true, record_attribute: true
+  attribute :receiving_account_yes_bank_company_account, exposure: true, record_attribute: true
+  attribute :receiving_account_utility_bills_account, exposure: true, record_attribute: true
+  attribute :receiving_account_user_pocket, exposure: true, record_attribute: true
+  attribute :receiving_account_user_wallet, exposure: true, record_attribute: true
+  attribute :receiving_account_vendor_payment_wallet, exposure: true, record_attribute: true
+  attribute :receiving_account_bbps_biller, exposure: true, record_attribute: true
+  attribute :receiving_account_cash_on_hand, exposure: true, record_attribute: true
   attribute :status, record_attribute: true, exposure: true
   attribute :payment_order_id, record_attribute: true, exposure: true
   attribute :payment_order, record_attribute: true, exposure: true
   attribute :payment_mode, record_attribute: true
   attribute :created_at, record_attribute: true
   attribute :note, record_attribute: true
+  attribute :initiating_account_number do
+    account_name(record, :initiating_account)
+  end
+  attribute :initiating_account_code do
+    account_code(record, :initiating_account)
+  end
+  attribute :receiving_account_number do
+    account_name(record, :receiving_account)
+  end
+  attribute :receiving_account_code do
+    account_code(record, :receiving_account)
+  end
   attribute :utr do
-    record.reference_resource&.utr
+    case record.reference_resource_type
+    when 'BbpsYesBankTransaction'
+      record.reference_resource.bbps_ref_id
+    when 'CardTransaction'
+      record.reference_resource.reference_id
+    when 'IciciBankTransaction', 'KotakBankTransaction', 'YesBankTransaction'
+      record.reference_resource.utr
+    when 'Payment', 'Report', 'BankTransaction'
+      nil
+    when 'VirtualAccountTransaction'
+      record.reference_resource.transfer_id
+    else
+      nil
+    end
   end
 
   attribute :initiating_account_type_name do
@@ -45,11 +79,6 @@ class PaymentExposure < Exposures::API
     next unless record.receiving_user_type == 'YesBankVendor'
 
     record.receiving_user
-  end
-  attribute :vendor_account, exposure: true do
-    next unless record.receiving_user_type == 'YesBankVendor'
-
-    record.receiving_account
   end
 
   attribute :cost_center, exposure: true do
@@ -88,8 +117,10 @@ class PaymentExposure < Exposures::API
 
   attribute :shipping_location, exposure: true do
     case record.parent_type
-    when 'Invoice', 'PurchaseOrder'
-      record.parent.delivery_location
+    when 'Invoice'
+      record.invoice_parent.delivery_location
+    when 'PurchaseOrder'
+      record.purchase_order_parent.delivery_location
     when 'BbpsBill', 'BeneficiaryPayment', 'SecurityDeposit'
       nil
     else
@@ -99,8 +130,14 @@ class PaymentExposure < Exposures::API
 
   attribute :vendor_location, exposure: true do
     case record.parent_type
-    when 'Invoice', 'PurchaseOrder', 'BeneficiaryPayment', 'SecurityDeposit'
-      record.parent.vendor_location
+    when 'Invoice'
+      record.invoice_parent.vendor_location
+    when 'PurchaseOrder'
+      record.purchase_order_parent.vendor_location
+    when 'BeneficiaryPayment'
+      record.beneficiary_payment_parent.vendor_location
+    when 'SecurityDeposit'
+      record.security_deposit_parent.vendor_location
     when 'BbpsBill'
       nil
     else
@@ -109,11 +146,7 @@ class PaymentExposure < Exposures::API
   end
 
   attribute :category, exposure: true do
-    if record.parent_type == 'BeneficiaryPayment'
-      record.parent.category
-    else
-      nil
-    end
+    record.beneficiary_payment_parent&.category
   end
 
   attribute :invoice_date do
@@ -157,46 +190,74 @@ class PaymentExposure < Exposures::API
   end
 
   attribute :transaction_period_from do
-    next unless record.parent_type == "Invoice"
-    next unless record.parent.transaction_service_period_from and record.parent.transaction_service_period_to
-
-    record.parent.transaction_service_period_from
+    record.invoice_parent&.transaction_service_period_from
   end
 
   attribute :transaction_period_to do
-    next unless record.parent_type == "Invoice"
-    next unless record.parent.transaction_service_period_from and record.parent.transaction_service_period_to
-
-    record.parent.transaction_service_period_to
+    record.invoice_parent&.transaction_service_period_to
   end
 
   private
 
-  def account_name(user, account)
-    name = "#{user&.name.to_s}'s "
-
-    case account.class.name
-    when "Company", "ItzCashCompanyAccount"
-      name = "Company Credits (Card Transfer Pocket)"
-    when "CashOnHand"
-      name += "Cash on Hand"
-    when "Card"
-      card_type = Card.unscoped.find_by(id: account.id)&.card_program&.name&.humanize
-      name += "#{card_type} Card"
-    when "UserWallet"
-      name += "Finly Money"
-    when "YesBankCompanyAccount"
-      name = "Company Credits (Bank Transfer Pocket)"
-    when "VendorPaymentWallet"
-      name += "Finly Money (Bank Transfer Pocket)"
-    when "BankAccount"
-      name += "Bank Account (Number: #{account.account_number})"
-    when "UserPocket"
-      name += "#{account.name}"
+  def account_name(record, type)
+    case record.send("#{type}_type")
+    when 'BankAccount'
+      record.send("#{type}_bank_account").account_number
+    when 'Card'
+      record.send("#{type}_card").serial_id
+    when 'YesBankCompanyAccount'
+      "Company Credits (YesBank)"
+    when 'KotakBankCompanyAccount'
+      "Company Credits (Kotak)"
+    when 'ItzCashCompanyAccount'
+      "Company Credits (Card Transfer)"
+    when 'IciciBankCompanyAccount'
+      "Company Credits (ICICI)"
+    when 'UtilityBillsAccount'
+      "Company Credits (Utility Bills)"
+    when 'UserPocket'
+      record.send("#{type}_user_pocket").name
+    when 'UserWallet'
+      'Finly Money (Card Transfer)'
+    when 'VendorPaymentWallet'
+      'Finly Money (Bank Transfer)'
+    when 'BbpsBiller'
+      record.send("#{type}_bbps_biller").biller_name
+    when 'CashOnHand'
+      "Cash on Hand"
+    when 'VirtualBankAccount'
+      record.send("#{type}_virtual_account").account_number
     else
-      name = ""
+      nil
     end
-    name
+  end
+
+  def account_code(record, type)
+    case record.send("#{type}_type")
+    when 'BankAccount'
+      record.send("#{type}_bank_account").ifsc
+    when 'Card'
+      record.send("#{type}_card.user").name
+    when 'YesBankCompanyAccount'
+    when 'KotakBankCompanyAccount'
+    when 'IciciBankCompanyAccount'
+    when 'ItzCashCompanyAccount'
+    when 'UtilityBillsAccount'
+    when 'UserPocket'
+      record.send("#{type}_user_pocket").user.name
+    when 'UserWallet'
+      record.send("#{type}_user_wallet").user.name
+    when 'VendorPaymentWallet'
+      record.send("#{type}_vendor_payment_wallet").user.name
+    when 'BbpsBiller'
+      'Utility Bill'
+    when 'CashOnHand'
+      record.send("#{type}_cash_on_hand").user.name
+    when 'VirtualBankAccount'
+      record.send("#{type}_virtual_account").ifsc
+    else
+      nil
+    end
   end
 
 end

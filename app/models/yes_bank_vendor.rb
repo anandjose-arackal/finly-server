@@ -74,6 +74,8 @@ class YesBankVendor < ApplicationRecord
   has_many :gstin_locations, foreign_key: :vendor_id
   has_many :credit_notes, foreign_key: :vendor_id
 
+  has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment'
+  has_many :receiving_payments, foreign_key: 'receiving_user_id', class_name: 'Payment'
 
   default_scope { unscope(:where) }
 
@@ -83,6 +85,8 @@ class YesBankVendor < ApplicationRecord
   # has_one :gstin_certificate_attachment, class_name: "VendorAttachment", dependent: :destroy
 
   has_one :vendor_account, foreign_key: :vendor_id
+
+
 
   has_many :budget_criteria_mappings, as: :budgetable
   has_many :budgets, through: :budget_criteria_mappings

@@ -37,7 +37,7 @@ class BankAccount < ApplicationRecord
   belongs_to :purchase_order, optional: true
   belongs_to :bank_account_master, optional: true
 
-  has_many :receiving_payments, as: :receiving_account
+  has_many :receiving_payments, as: :receiving_account, class_name: "Payment"
   has_many :finly_transactions, as: :finly_account
   # belongs_to :company_id
 

@@ -30,15 +30,15 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
     text value: :note
   end
 
-  column :utr, label: "Bank Reference Number", default: true, includes: [:reference_resource] do
+  column :utr, label: "UTR", default: true, includes: [:reference_resource] do
     text value: :utr
   end
 
-  column :submitted_at, sort: true do
+  column :submitted_at, sort: true, includes: [:payment_order] do
     date value: -> (context) { context[:record].payment_order.bank_payment_request.submitted_at }
   end
 
-  column :approved_at, sort: true do
+  column :approved_at, sort: true, includes: [:payment_order] do
     date value: -> (context) { context[:record].payment_order.bank_payment_request.approved_at }
   end
 
@@ -82,10 +82,6 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
     user value: :initiating_user
   end
 
-  column :receiving_account, includes: [:receiving_account, :receiving_user] do
-    text value: "{{record.receiving_account_type_name}}"
-  end
-
   column :payment_mode, default: true, sort: true do
     text value: "{{payment_mode | upcase}}"
   end
@@ -94,45 +90,54 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
     text value: :parent_type_name
   end
 
-  column :account, default: true, includes: [:receiving_account] do
-    text value: '{{record.receiving_account.account_number}}', format: 'primary'
-    text value: 'IFSC: {{record.receiving_account.ifsc | upcase}}'
+  column :beneficiary_account, default: true,
+         includes: [
+             :receiving_account_bbps_biller,
+             :receiving_account_bank_account,
+             receiving_account_card: :user,
+             receiving_account_user_pocket: :user,
+             receiving_account_user_wallet: :user,
+             receiving_account_vendor_payment_wallet: :user,
+             receiving_account_cash_on_hand: :user
+         ] do
+    text value: '{{record.receiving_account_number | upcase}}', format: 'primary'
+    text value: '{{record.receiving_account_code | upcase}}'
   end
 
-  column :verified_account, label: "Is Account Verified", includes: [:receiving_account] do
-    boolean value: '{{record.receiving_account.verified}}'
+  column :verified_account, label: "Is Account Verified", includes: [:receiving_account_bank_account] do
+    boolean value: '{{record.receiving_account_bank_account.verified}}'
   end
 
-  column :empaneled_vendor, label: "Is Vendor Empaneled", includes: [:receiving_user] do
-    boolean value: '{{record.vendor.authorized}}'
+  column :empaneled_vendor, label: "Is Vendor Empaneled", includes: [:receiving_user_vendor] do
+    boolean value: '{{record.receiving_user_vendor.authorized}}'
   end
 
-  column :reverse_charge_vendor, label: "RCM Applicable Vendor", includes: [:receiving_account] do
-    boolean value: '{{record.vendor.rcm_enabled}}'
+  column :reverse_charge_vendor, label: "RCM Applicable Vendor", includes: [:receiving_user_vendor] do
+    boolean value: '{{record.receiving_user_vendor.rcm_enabled}}'
   end
 
-  column :gst_registered, label: "GSTIN Vendor", includes: [:receiving_account] do
-    boolean value: '{{record.vendor.gst_registered}}'
+  column :gst_registered, label: "GSTIN Vendor", includes: [:receiving_user_vendor] do
+    boolean value: '{{record.receiving_user_vendor.gst_registered}}'
   end
 
-  column :vendor_type, label: "Vendor Type", includes: [:receiving_account] do
-    text value: '{{record.vendor.vendor_type.name}}'
+  column :vendor_type, label: "Vendor Type", includes: [:receiving_user_vendor] do
+    text value: '{{record.receiving_user_vendor.vendor_type.name}}'
   end
 
-  column :pan_number, label: "PAN Number", includes: [:receiving_account] do
-    text value: '{{record.vendor.pan}}'
+  column :pan_number, label: "PAN Number", includes: [:receiving_user_vendor] do
+    text value: '{{record.receiving_user_vendor.pan}}'
   end
 
-  column :msme_registered, label: "MSME Registered Vendor", includes: [:receiving_account] do
-    boolean value: '{{record.vendor.msme_registered}}'
+  column :msme_registered, label: "MSME Registered Vendor", includes: [:receiving_user_vendor] do
+    boolean value: '{{record.receiving_user_vendor.msme_registered}}'
   end
 
-  column :msme_registration_number, label: "MSME Registration Number", includes: [:receiving_account] do
-    text value: '{{record.vendor.msme_registration_number}}'
+  column :msme_registration_number, label: "MSME Registration Number", includes: [:receiving_user_vendor] do
+    text value: '{{record.receiving_user_vendor.msme_registration_number}}'
   end
 
-  column :vendor_status, includes: [:receiving_account] do
-    text value: '{{record.vendor.status.name}}'
+  column :vendor_status, includes: [:receiving_user_vendor] do
+    text value: '{{record.receiving_user_vendor.status.name}}'
   end
 
   column :cost_center, includes: {parent: :cost_center} do
@@ -147,11 +152,25 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
     text value: '{{record.billing_location.name}}'
   end
 
-  column :vendor_location, includes: [:parent] do
+  column :shipping_location,
+         includes: [
+             invoice_parent: :delivery_location,
+             purchase_order_parent: :delivery_location
+         ] do
+    text value: '{{record.billing_location.name}}'
+  end
+
+  column :vendor_location,
+         includes: [
+             invoice_parent: :vendor_location,
+             purchase_order_parent: :vendor_location,
+             beneficiary_payment_parent: :vendor_location,
+             security_deposit_parent: :vendor_location
+         ] do
     text value: '{{record.vendor_location.name}}'
   end
 
-  column :category, includes: [:parent] do
+  column :category, includes: [:beneficiary_payment_parent] do
     text value: '{{record.category.name}}'
   end
 
@@ -167,11 +186,11 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
     text value: :due_in_days
   end
 
-  column :transaction_period_from, includes: [:parent] do
+  column :transaction_period_from, includes: [:invoice_parent] do
     date value: :transaction_period_from
   end
 
-  column :transaction_period_to, includes: [:parent] do
+  column :transaction_period_to, includes: [:invoice_parent] do
     date value: :transaction_period_to
   end
 
