@@ -58,6 +58,50 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
     text value: "{{record.payment_order.bank_payment_request.policy.name}}"
   end
 
+  column :gross_amount do
+    text value: :gross_amount
+  end
+
+  column :discount do
+    text value: :discount
+  end
+
+  column :cgst, label: 'CGST' do
+    text value: :cgst
+  end
+
+  column :sgst, label: 'SGST' do
+    text value: :sgst
+  end
+
+  column :igst, label: 'IGST' do
+    text value: :igst
+  end
+
+  column :tds_slab do
+    text value: :tds_slab
+  end
+
+  column :tds_amount do
+    text value: :tds_amount
+  end
+
+  column :freight do
+    text value: :freight
+  end
+
+  column :net_payable do
+    text value: :net_payable
+  end
+
+  column :advance_paid do
+    text value: :advance_paid
+  end
+
+  column :balance_payable do
+    text value: :balance_payable
+  end
+
   column :payment_amount, default: true, sort: :amount_value, includes: {amount: :currency} do
     amount value: :amount
   end
@@ -132,7 +176,7 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
              initiating_account_vendor_payment_wallet: :user
          ] do
     text value: '{{record.initiating_account_number | upcase}}', format: 'primary'
-    text value: '{{record.initiating_account_code | upcase}}'
+    text value: '{{record.initiating_account_code | upcase}} '
   end
 
   column :initiating_user, includes: [:initiating_user] do
@@ -249,50 +293,6 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
 
   column :transaction_period_to, includes: [:invoice_parent] do
     date value: :transaction_period_to
-  end
-
-  column :gross_amount do
-    text value: :gross_amount
-  end
-
-  column :discount do
-    text value: :discount
-  end
-
-  column :cgst do
-    text value: :cgst
-  end
-
-  column :sgst do
-    text value: :sgst
-  end
-
-  column :igst do
-    text value: :igst
-  end
-
-  column :tds_slab do
-    text value: :tds_slab
-  end
-
-  column :tds_amount do
-    text value: :tds_amount
-  end
-
-  column :freight do
-    text value: :freight
-  end
-
-  column :net_payable do
-    text value: :net_payable
-  end
-
-  column :advance_paid do
-    text value: :advance_paid
-  end
-
-  column :balance_payable do
-    text value: :balance_payable
   end
 
 
