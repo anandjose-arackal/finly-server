@@ -598,15 +598,15 @@ class BankPaymentRequest < ApplicationRecord
     self.transfer_mode&.mode&.name&.upcase
   end
 
-  def reviewal_pending?
+  def review_pending?
     BankPaymentRequestStatus.ids_for(:open, :retracted, :rejected,:creation_in_progress).include?(status_id)
   end
 
-  def reviewal_completed?
+  def review_completed?
     BankPaymentRequestStatus.ids_for(:approved, :auto_approved, :credited).include?(status_id)
   end
 
-  def reviewal_in_progress?
+  def review_in_progress?
     BankPaymentRequestStatus.ids_for(:processing, :submitted, :unapprove, :pending).include?(status_id)
   end
 

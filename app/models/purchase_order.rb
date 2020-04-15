@@ -168,7 +168,10 @@ class PurchaseOrder < ApplicationRecord
       where purchase_order_status_id: PurchaseOrderStatus.ids_for(:open, :retracted)
     when 91
       # Awaiting Approval
-      where(purchase_order_status_id: PurchaseOrderStatus.ids_for(:processing), controlling_user_id: RequestStoreUtil.current_user&.id).where.not(controlling_user_id: nil)
+      user_id = RequestStore.store[:current_user]&.id
+      if user_id.present?
+        self.awaiting_action_items(user_id)
+      end
     when 92
       # Approved / Auto Approved
       where purchase_order_status_id: PurchaseOrderStatus.ids_for(:approved, :auto_approved)
@@ -531,7 +534,7 @@ class PurchaseOrder < ApplicationRecord
       data[:procurement_status_text] = 'Invoice Processing'
     else
       data[:invoice][:status] = 'init'
-      if self.procurement.invoices.present?
+      if not self.procurement.invoices.nil?
         data[:invoice][:status_text] = 'Invoice Processing'
         data[:procurement_status_text] = 'Invoice Processing'
       else
@@ -849,6 +852,18 @@ class PurchaseOrder < ApplicationRecord
     self.total_after_tax&.value
   end
 
+  # Used for tracking completion %
+  def review_pending?
+    PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).include?(purchase_order_status_id)
+  end
+
+  def review_completed?
+    PurchaseOrderStatus.ids_for(:approved, :auto_approved, :sent_to_vendor, :closed, :voided, :po_revised, :vendor_confirmed).include?(purchase_order_status_id)
+  end
+
+  def review_in_progress?
+    PurchaseOrderStatus.ids_for(:processing).include?(purchase_order_status_id)
+  end
 
   private
 
@@ -1191,18 +1206,5 @@ class PurchaseOrder < ApplicationRecord
 
   def update_po_cost_allocation_items
     self.update_column('cost_allocation_items', true)
-  end
-
-  # Used for tracking completion %
-  def reviewal_pending?
-    PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).include?(purchase_order_status_id)
-  end
-
-  def reviewal_completed?
-    PurchaseOrderStatus.ids_for(:approved, :auto_approved, :sent_to_vendor, :closed, :voided, :po_revised, :vendor_confirmed).include?(purchase_order_status_id)
-  end
-
-  def reviewal_in_progress?
-    PurchaseOrderStatus.ids_for(:processing).include?(purchase_order_status_id)
   end
 end

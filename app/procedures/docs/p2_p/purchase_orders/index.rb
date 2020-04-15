@@ -70,27 +70,19 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
     text value: "{{record.shipping_location.name}}"
   end
 
-  column :progress, label: 'Approval Progress', default: true, includes: [:dlrms] do
-    progress_bar value: :reviewal_progress
-  end
+  IndexBuilder::API::ColumnTemplate::ControllingUser(self)
+  IndexBuilder::API::ColumnTemplate::ControllingLevel(self)
+  IndexBuilder::API::ColumnTemplate::ReviewProgress(self)
 
-  column :controlling_user, default: true, includes: [:controlling_user] do
-    user value: :controlling_user
-  end
-
-  column :controlling_level, default: true, includes: [:controlling_level] do
-    text value: "{{record.controlling_level.name}}"
-  end
-
-  column :grn_status, default: true, includes: [procurement: [:status_tags]] do
+  column :grn_status, default: true, includes: [procurement: [:status_tags, :invoices]] do
     text value: :grn_status_text
   end
 
-  column :invoice_status, default: true, includes: [procurement: [:status_tags]] do
+  column :invoice_status, default: true, includes: [procurement: [:status_tags, :invoices]] do
     text value: :invoice_status_text
   end
 
-  column :payment_status, default: true, includes: [procurement: [:status_tags]] do
+  column :payment_status, default: true, includes: [procurement: [:status_tags, :invoices]] do
     text value: :payment_status_text
   end
 
@@ -105,7 +97,7 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
     # Awaiting Approval
     if user.has_permission?(awaiting_approval_roles)
       counter.add 91, 'Awaiting Approval',
-                  collection.where(purchase_order_status_id: PurchaseOrderStatus.id_for(:processing), controlling_user_id: user.id).count
+                  PurchaseOrder.awaiting_action_items(user.id).count
     end
 
     counter.add PurchaseOrderStatus.id_for(:processing), "Processing", counts[PurchaseOrderStatus.id_for(:processing)]
@@ -125,7 +117,7 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
   end
 
   def self.po_status(context)
-    return 'Awaiting Approval'.upcase if context[:record].purchase_order_status_id == PurchaseOrderStatus.id_for(:processing) and context[:record].controlling_user_id == context[:user].id
+    return 'Awaiting Approval'.upcase if context[:record].purchase_order_status_id == PurchaseOrderStatus.id_for(:processing) and context[:record].controlling_user?(context[:user])
 
     context[:record].status&.name&.humanize&.upcase
   end
@@ -161,7 +153,7 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
     when :paid, :approved, :closed, :auto_approved, :sent_to_vendor, :po_revised, :vendor_confirmed
       format = 'success'
     when :processing
-      if context[:record].controlling_user_id == context[:user].id
+      if context[:record].controlling_user?(context[:user])
         format = 'warning'
       else
         format = 'info'

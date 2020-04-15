@@ -10,7 +10,7 @@ class PurchaseOrderExposure < Exposures::API
   attribute :gstin_location, record_attribute: true, exposure: true, includes: [:gstin_location]
   attribute :vendor_location, record_attribute: true, exposure: true, includes: [:vendor_location]
   attribute :vendor, record_attribute: true, exposure: true, includes: [:vendor]
-  attribute :reviewal_progress, record_attribute: true, includes: [:dlrms]
+  attribute :review_progress, record_attribute: true, includes: [:dlrms]
   attribute :submitted_at, record_attribute: true
   attribute :approved_at, record_attribute: true
   attribute :days_from_approval do
@@ -35,23 +35,15 @@ class PurchaseOrderExposure < Exposures::API
   attribute :note, record_attribute: true
   attribute :created_at, record_attribute: true
   attribute :created_by, record_attribute: true, exposure: true
-  attribute :gross_amount, record_attribute: true, exposure: true, includes: [:total_before_tax]
+  attribute :gross_amount, record_attribute: true, exposure: true, includes: [:gross_amount]
   attribute :gross_amount_value, includes: [:gross_amount] do
-    record.total_before_tax&.value || 0
-  end
-  attribute :net_amount, record_attribute: true, exposure: true, includes: [:balance_amount]
-  attribute :net_amount_value, includes: [:net_amont] do
-    record.balance_amount&.value || 0
+    record.gross_amount&.value || 0
   end
   attribute :discount_amount, record_attribute: true, exposure: true, includes: [:discount_amount]
   attribute :discount_amount_value, includes: [:discount_amount] do
     record.discount_amount&.value || 0
   end
-  attribute :roundoff_amount, record_attribute: true
-  # # Fixme: Performance incase the number of line items it high
-  attribute :line_items, record_attribute: :items, exposure: true, includes: [:items]
-  attribute :cost_allocation_items, record_attribute: true
-  attribute :status, record_attribute: true, exposure: true, includes: [:status]
+  attribute :tax_amount, record_attribute: true, exposure: true, includes: [:tax_amount]
   attribute :tax_type, record_attribute: true, exposure: true
   attribute :tax_type_name do
     case record.tax_type_id
@@ -63,5 +55,45 @@ class PurchaseOrderExposure < Exposures::API
       nil
     end
   end
+  attribute :cgst_amount do
+    case record.tax_type_id
+    when GstType.id_for(:cgst_sgst)
+      (tax_amount&.value || 0) / 2
+    when GstType.id_for(:igst)
+      0
+    else
+      0
+    end
+  end
+  attribute :sgst_amount do
+    cgst_amount
+  end
+  attribute :igst_amount do
+    case record.tax_type_id
+    when GstType.id_for(:cgst_sgst)
+      0
+    when GstType.id_for(:igst)
+      tax_amount&.value || 0
+    else
+      0
+    end
+  end
+  attribute :net_amount, record_attribute: true, exposure: true, includes: [:net_amount]
+  attribute :net_amount_value, includes: [:net_amount] do
+    record.net_amount&.value || 0
+  end
+  attribute :roundoff_amount, record_attribute: true
+
+  attribute :payable, record_attribute: true
+  # # Fixme: Performance incase the number of line items it high
+
+  # attribute :advance_amount
+  # attribute :advance_tds_slab
+  # attribute :advance_tds_amount
+  # attribute :advance_tds_payable
+
+  attribute :line_items, record_attribute: :items, exposure: true, includes: [:items]
+  attribute :cost_allocation_items, record_attribute: true
+  attribute :status, record_attribute: true, exposure: true, includes: [:status]
 
 end

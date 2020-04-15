@@ -197,6 +197,51 @@ class PaymentExposure < Exposures::API
     record.invoice_parent&.transaction_service_period_to
   end
 
+  attribute :gross_amount do
+
+  end
+
+  attribute :discount do
+
+  end
+
+  attribute :cgst do
+
+  end
+
+  attribute :sgst do
+
+  end
+
+  attribute :igst do
+
+  end
+
+  attribute :tds_slab do
+
+  end
+
+  attribute :tds_amount do
+
+  end
+
+  attribute :freight do
+
+  end
+
+  attribute :net_payable do
+
+  end
+
+  attribute :advance_paid do
+
+  end
+
+  attribute :balance_payable do
+
+  end
+
+
   private
 
   def account_name(record, type)

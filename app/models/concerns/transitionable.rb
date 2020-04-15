@@ -257,8 +257,7 @@ module Transitionable
       User.with_id(user_ids)
     end
 
-    # Get reviewers from current level
-    def get_reviewers(level_details=nil, provider_name=nil)
+    def get_reviewer_ids(level_details=nil, provider_name=nil)
       if [:next, :previous, :prev, 'next', 'previous', :current, 'current'].include? level_details
         level = get_level(level_details, provider_name)
       elsif level_details.is_a?(Integer)
@@ -294,7 +293,13 @@ module Transitionable
         # user_ids += taken_control_by_ids.present? ? taken_control_by_ids : self.document_level_reviewer_mappings.with_level_id(level.id).pluck(:reviewer_id)
       end
 
-      User.where(id: user_ids)
+      user_ids
+    end
+
+    # Get reviewers from current level
+    def get_reviewers(level_details=nil, provider_name=nil)
+      user_ids = get_reviewer_ids(level_details, provider_name)
+      user_ids.present? ? User.where(id: user_ids) : User.none
     end
 
     def get_level_with_id(level_id, provider_name=nil)
@@ -899,28 +904,32 @@ module Transitionable
     end
   end
 
-  def reviewal_pending?
+  def review_pending?
     false
   end
 
-  def reviewal_completed?
+  def review_completed?
     false
   end
 
-  def reviewal_in_progress?
+  def review_in_progress?
     false
   end
 
-  def reviewal_progress
-    return 0 if reviewal_pending?
-    return 100 if reviewal_completed?
-    return 0 unless reviewal_in_progress?
+  def review_progress
+    return 0 if review_pending?
+    return 100 if review_completed?
+    return 0 unless review_in_progress?
 
-    levels = dlrms.reorder(level_number: :asc).map {|l| l.level_id}.uniq
+    levels = document_level_reviewer_mappings.map {|l| l.level_id}.uniq
     level_count = levels.size
     current_level_index = levels.find_index(controlling_level_id)
     return 0 if current_level_index.nil? or current_level_index < 1
 
     current_level_index*100/level_count
+  end
+
+  def controlling_user?(user)
+    get_reviewer_ids&.include?(user.id) || false
   end
 end

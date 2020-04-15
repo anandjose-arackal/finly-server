@@ -42,7 +42,7 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
   end
 
   column :progress, label: 'Approval Progress', default: true, includes: [:dlrms] do
-    progress_bar value: :reviewal_progress
+    progress_bar value: :review_progress
   end
 
   column :submitted_at, sort: :submitted_at, default: true do

@@ -63,7 +63,7 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
   end
 
   # column :progress, label: 'Approval Progress', default: true, includes: [:dlrms] do
-  #   progress_bar value: :reviewal_progress
+  #   progress_bar value: :review_progress
   # end
 
   # column :controlling_user, default: true, includes: [payment_order: {bank_payment_request: :controlling_user}] do
@@ -170,7 +170,7 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
     text value: '{{record.vendor_location.name}}'
   end
 
-  column :category, includes: [:beneficiary_payment_parent] do
+  column :category, includes: [beneficiary_payment_parent: :category] do
     text value: '{{record.category.name}}'
   end
 
@@ -193,6 +193,51 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
   column :transaction_period_to, includes: [:invoice_parent] do
     date value: :transaction_period_to
   end
+
+  column :gross_amount do
+    text value: :gross_amount
+  end
+
+  column :discount do
+    text value: :discount
+  end
+
+  column :cgst do
+    text value: :cgst
+  end
+
+  column :sgst do
+    text value: :sgst
+  end
+
+  column :igst do
+    text value: :igst
+  end
+
+  column :tds_slab do
+    text value: :tds_slab
+  end
+
+  column :tds_amount do
+    text value: :tds_amount
+  end
+
+  column :freight do
+    text value: :freight
+  end
+
+  column :net_payable do
+    text value: :net_payable
+  end
+
+  column :advance_paid do
+    text value: :advance_paid
+  end
+
+  column :balance_payable do
+    text value: :balance_payable
+  end
+
 
   counter -> (user, collection) do
     # 90 :open,  :retracted
