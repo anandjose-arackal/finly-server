@@ -17,34 +17,32 @@
 #  entity_date                                :date
 #  sub_department_id                          :integer
 #  procurement_id                             :integer
+#  deleted_at                                 :datetime
+#  payment_processing_amount_before_tax_value :decimal(20, 10)  default(0.0)
+#  payment_processing_amount_after_tax_value  :decimal(20, 10)  default(0.0)
+#  tds_value                                  :decimal(20, 10)  default(0.0)
+#  billed                                     :boolean          default(FALSE)
 #  entity_status_id                           :integer
+#  reimbursable                               :boolean          default(FALSE)
 #  amount_before_tax_id                       :integer
 #  amount_after_tax_id                        :integer
 #  entity_created_at                          :datetime
 #  entity_submitted_at                        :datetime
-#  billed                                     :boolean          default(FALSE)
-#  deleted_at                                 :datetime
-#  date                                       :datetime
-#  amount_after_tax_value                     :decimal(20, 10)
-#  amount_before_tax_value                    :decimal(20, 10)
-#  po_trail_item_id                           :integer
-#  remaining_amount_value                     :decimal(20, 10)
-#  billed_quantity                            :integer
-#  remaining_quantity                         :integer
-#  revised                                    :boolean          default(FALSE)
-#  billed_amount_before_tax_value             :decimal(20, 10)
-#  remaining_amount_after_tax_value           :decimal(20, 10)
-#  billed_amount_after_tax_value              :decimal(20, 10)
-#  remaining_amount_before_tax_value          :decimal(20, 10)
 #  purchase_order_id                          :integer
 #  invoice_id                                 :integer
 #  payment_purpose_id                         :integer
+#  po_trail_item_id                           :integer
+#  billed_amount_before_tax_value             :decimal(20, 10)
+#  billed_amount_after_tax_value              :decimal(20, 10)
+#  remaining_amount_before_tax_value          :decimal(20, 10)
+#  remaining_amount_after_tax_value           :decimal(20, 10)
 #  effective_paid_amount_before_tax_value     :decimal(20, 10)  default(0.0)
 #  paid_amount_after_tax_value                :decimal(20, 10)  default(0.0)
-#  reimbursable                               :boolean          default(FALSE)
-#  payment_processing_amount_before_tax_value :decimal(20, 10)  default(0.0)
-#  payment_processing_amount_after_tax_value  :decimal(20, 10)  default(0.0)
-#  tds_value                                  :decimal(20, 10)  default(0.0)
+#  billed_quantity                            :integer
+#  billed_rate                                :decimal(20, 10)
+#  remaining_quantity                         :integer
+#  revised                                    :boolean          default(FALSE)
+#  payment_confirmed                          :boolean          default(FALSE)
 #  tax_amount_value                           :decimal(20, 10)  default(0.0)
 #  net_paid_amount_before_tax_value           :decimal(20, 10)
 #  rcm_tax_value                              :decimal(20, 10)  default(0.0)
