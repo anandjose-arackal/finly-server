@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_09_085529) do
+ActiveRecord::Schema.define(version: 2020_04_15_091350) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -1027,7 +1027,7 @@ ActiveRecord::Schema.define(version: 2020_04_09_085529) do
     t.date "invoice_date"
     t.date "invoice_due_date"
     t.integer "advance_amount_id"
-    t.json "payment_notification_users"
+    t.text "payment_notification_users"
     t.integer "payment_agreement_id"
     t.string "note"
     t.integer "location_id"
@@ -3981,7 +3981,7 @@ ActiveRecord::Schema.define(version: 2020_04_09_085529) do
   create_table "gatekeeper_blocks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "user_id"
     t.integer "company_id"
-    t.text "params"
+    t.text "params", limit: 16777215, collation: "utf8_bin"
     t.text "headers"
     t.string "act"
     t.string "premise"
@@ -8693,6 +8693,7 @@ ActiveRecord::Schema.define(version: 2020_04_09_085529) do
     t.integer "default_company_id"
     t.string "finly_id", limit: 36
     t.datetime "deleted_at"
+    t.boolean "pending_activation", default: false
     t.index ["company_id"], name: "index_users_on_company_id"
     t.index ["email"], name: "index_users_on_email"
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
