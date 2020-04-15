@@ -189,48 +189,179 @@ class PaymentExposure < Exposures::API
     record.invoice_parent&.transaction_service_period_to
   end
 
-  attribute :gross_amount do
+  attribute :gross_amount, exposure: true do
+    case record.parent_type
+    when 'Invoice'
+      record.invoice_parent.gross_amount
+    when 'BbpsBill'
 
+    when 'BeneficiaryPayment'
+
+    when 'PurchaseOrder'
+      record.purchase_order_parent.requested_advance_amount
+    when 'SecurityDeposit'
+
+    else
+      nil
+    end
   end
 
-  attribute :discount do
+  attribute :discount, exposure: true do
+    case record.parent_type
+    when 'Invoice'
+      record.invoice_parent.discount_amount
+    when 'BbpsBill'
 
+    when 'BeneficiaryPayment'
+
+    when 'PurchaseOrder'
+      nil
+    when 'SecurityDeposit'
+
+    else
+      nil
+    end
   end
 
   attribute :cgst do
+    case record.parent_type
+    when 'Invoice'
+      record.invoice_parent.to_exposure.cgst_amount
+    when 'BbpsBill'
 
+    when 'BeneficiaryPayment'
+
+    when 'PurchaseOrder'
+      nil
+    when 'SecurityDeposit'
+
+    else
+      nil
+    end
   end
 
   attribute :sgst do
-
+    cgst
   end
 
   attribute :igst do
+    case record.parent_type
+    when 'Invoice'
+      record.invoice_parent.to_exposure.igst_amount
+    when 'BbpsBill'
 
+    when 'BeneficiaryPayment'
+
+    when 'PurchaseOrder'
+      nil
+    when 'SecurityDeposit'
+
+    else
+      nil
+    end
   end
 
-  attribute :tds_slab do
+  attribute :tds_slab, exposure: true do
+    case record.parent_type
+    when 'Invoice'
+      record.invoice_parent.tds_slab
+    when 'BbpsBill'
 
+    when 'BeneficiaryPayment'
+
+    when 'PurchaseOrder'
+      record.purchase_order_parent.advance_tds_slab
+    when 'SecurityDeposit'
+
+    else
+      nil
+    end
   end
 
-  attribute :tds_amount do
+  attribute :tds_amount, exposure: true do
+    case record.parent_type
+    when 'Invoice'
+      record.invoice_parent.tds_amount
+    when 'BbpsBill'
 
+    when 'BeneficiaryPayment'
+
+    when 'PurchaseOrder'
+      record.purchase_order_parent.advance_tds_amount
+    when 'SecurityDeposit'
+
+    else
+      nil
+    end
   end
 
-  attribute :freight do
 
+  attribute :freight, exposure: true do
+    case record.parent_type
+    when 'Invoice'
+      record.invoice_parent.freight_amount
+    when 'BbpsBill'
+
+    when 'BeneficiaryPayment'
+
+    when 'PurchaseOrder'
+      nil
+    when 'SecurityDeposit'
+
+    else
+      nil
+    end
   end
 
-  attribute :net_payable do
+  attribute :net_payable, exposure: true do
+    case record.parent_type
+    when 'Invoice'
+      record.invoice_parent.net_amount
+    when 'BbpsBill'
 
+    when 'BeneficiaryPayment'
+
+    when 'PurchaseOrder'
+      record.purchase_order_parent.advance_amount
+    when 'SecurityDeposit'
+
+    else
+      nil
+    end
   end
 
-  attribute :advance_paid do
+  attribute :advance_paid, exposure: true do
+    case record.parent_type
+    when 'Invoice'
+      record.invoice_parent.advance_amount
+    when 'BbpsBill'
 
+    when 'BeneficiaryPayment'
+
+    when 'PurchaseOrder'
+      nil
+    when 'SecurityDeposit'
+
+    else
+      nil
+    end
   end
 
-  attribute :balance_payable do
+  attribute :balance_payable, exposure: true do
+    case record.parent_type
+    when 'Invoice'
+      record.invoice_parent.balance_due
+    when 'BbpsBill'
 
+    when 'BeneficiaryPayment'
+
+    when 'PurchaseOrder'
+      record.purchase_order_parent.advance_amount
+    when 'SecurityDeposit'
+
+    else
+      nil
+    end
   end
 
 

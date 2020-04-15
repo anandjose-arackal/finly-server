@@ -46,7 +46,7 @@ class PurchaseOrderExposure < Exposures::API
   attribute :tax_amount, record_attribute: true, exposure: true, includes: [:tax_amount]
   attribute :tax_type, record_attribute: true, exposure: true
   attribute :tax_type_name do
-    case record.tax_type_id
+    case record.gst_type_id
     when GstType.id_for(:cgst_sgst)
       'CGST + IGST'
     when GstType.id_for(:igst)
@@ -56,7 +56,7 @@ class PurchaseOrderExposure < Exposures::API
     end
   end
   attribute :cgst_amount do
-    case record.tax_type_id
+    case record.gst_type_id
     when GstType.id_for(:cgst_sgst)
       (tax_amount&.value || 0) / 2
     when GstType.id_for(:igst)
@@ -69,7 +69,7 @@ class PurchaseOrderExposure < Exposures::API
     cgst_amount
   end
   attribute :igst_amount do
-    case record.tax_type_id
+    case record.gst_type_id
     when GstType.id_for(:cgst_sgst)
       0
     when GstType.id_for(:igst)
@@ -84,13 +84,13 @@ class PurchaseOrderExposure < Exposures::API
   end
   attribute :roundoff_amount, record_attribute: true
 
-  attribute :payable, record_attribute: true
+  attribute :balance_amount, record_attribute: true
   # # Fixme: Performance incase the number of line items it high
 
-  # attribute :advance_amount
-  # attribute :advance_tds_slab
-  # attribute :advance_tds_amount
-  # attribute :advance_tds_payable
+  attribute :requested_advance_amount, record_attribute: true, exposure: true
+  attribute :advance_amount, record_attribute: true, exposure: true
+  attribute :advance_tds_amount, record_attribute: true, exposure: true
+  attribute :advance_tds_slab, record_attribute: true, exposure: true
 
   attribute :line_items, record_attribute: :items, exposure: true, includes: [:items]
   attribute :cost_allocation_items, record_attribute: true
