@@ -63,7 +63,7 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     amount value: :gross_amount
   end
 
-  column :balance_due, default: true, includes: [gross_amount: :currency] do
+  column :balance_due, default: true, includes: [balance_due: :currency] do
     amount value: :balance_due
   end
 
