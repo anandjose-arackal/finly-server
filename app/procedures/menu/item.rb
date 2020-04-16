@@ -18,9 +18,9 @@ class Menu::Item
     @items ||= []
   end
 
-  def item(key, path: nil, icon: nil, label: nil, create: false, permissions: [], features: [], &block)
+  def item(key, path: nil, icon: nil, label: nil, permissions: [], features: [], &block)
     items << Menu::Item.new(
-        key: key, path: path, icon: icon, label: label, create: create,
+        key: key, path: path, icon: icon, label: label,
         permissions: permissions, features: features, scopes: scopes, &block
     )
   end
@@ -29,8 +29,8 @@ class Menu::Item
     @scopes ||= []
   end
 
-  def scope(path: nil, create: false, permissions: [], features: nil, &block)
-    scopes.push({path: path, create: create, permissions: permissions, features: features})
+  def scope(path: nil, permissions: [], features: nil, &block)
+    scopes.push({path: path, permissions: permissions, features: features})
     instance_eval &block
     scopes.pop
   end
@@ -39,7 +39,6 @@ class Menu::Item
     self.id = key
     self.path ||= key
     self.label ||= key.to_s.titleize
-    self.create ||= false
 
     if self.permissions and not self.permissions.respond_to?(:each)
       self.permissions = [self.permissions]
@@ -67,7 +66,6 @@ class Menu::Item
   def init_scopes(scopes)
     scopes.each do |scope|
       self.path ||= scope[:path]
-      self.create ||= scope[:create] unless scope[:create].nil?
 
       if scope[:permissions].present?
         scope[:permissions] = [scope[:permissions]] unless scope[:permissions].respond_to?(:each)
@@ -96,7 +94,6 @@ class Menu::Item
         path: path,
         icon: icon,
         label: label,
-        create: create,
     }
 
     # Rejecting nil items as it would indicate that the tab should not be shown

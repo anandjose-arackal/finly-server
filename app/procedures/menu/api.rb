@@ -31,9 +31,9 @@ class Menu::API < Transactions::API
     @items ||= []
   end
 
-  def self.item(key, path: nil, icon: nil, label: nil, create: false, permissions: [], features: [], &block)
+  def self.item(key, path: nil, icon: nil, label: nil, permissions: [], features: [], &block)
     items << Menu::Item.new(
-        key: key, path: path, icon: icon, label: label, create: create,
+        key: key, path: path, icon: icon, label: label,
         permissions: permissions, features: features, scopes: scopes,
         &block
     )
@@ -43,8 +43,8 @@ class Menu::API < Transactions::API
     @scopes ||= []
   end
 
-  def self.scope(path: nil, create: false, permissions: [], features: nil, &block)
-    scopes.push({path: path, create: create, permissions: permissions, features: features})
+  def self.scope(path: nil, permissions: [], features: nil, &block)
+    scopes.push({path: path, permissions: permissions, features: features})
     instance_eval &block
     scopes.pop
   end
