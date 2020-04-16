@@ -10,7 +10,11 @@ class IndexBuilder::ContentTypes::Amount < IndexBuilder::ContentTypes::Base
 
   def format_value(context, user, record, exposure, data)
     return data unless data[:value].present?
-    return data unless [Amount.name, AmountExposure.name].include?(data[:value].class.name)
+    unless [Amount.name, AmountExposure.name].include?(data[:value].class.name)
+      data[:currency_code] = Currency.first.country_code if data[:currency_code].blank?
+      data[:currency_symbol] = Currency.first.symbol if data[:currency_symbol].blank?
+      return data
+    end
 
     amount = data[:value]
     data[:value] = amount.value
