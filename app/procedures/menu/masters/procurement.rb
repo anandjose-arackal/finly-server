@@ -6,28 +6,33 @@ class Menu::Masters::Procurement < Menu::API
 
   app :vp
 
-  item :create do
-
+  item :create, icon: 'https://img.icons8.com/windows/20/ffffff/request-money.png' do
+    item :new_purchase_request, path: 'purchase_requests/new', permissions: [:purchase_request_initiator]
+    item :new_purchase_order, path: 'purchase_orders/new', permissions: [:purchase_order_initiator]
+    item :new_non_po_invoice, path: 'invoices/new', permissions: [:non_po_invoice_initiator]
+    item :new_payment_ticket, path: 'payment_tickets/new', permissions: [:bank_payment_request_initiator]
+    item :new_agreement, path: 'agreements/new', permissions: [:agreement_invoice_initiator]
+    item :new_vendor, path: 'agreements/new', permissions: [:vendor_creator, :vendor_manager]
   end
 
-  item :dashboard, icon: 'https://img.icons8.com/windows/22/ffffff/speed.png'
+  item :dashboard, icon: 'https://img.icons8.com/windows/20/ffffff/speed.png'
 
   scope features: :purchase_requisition_system do
-    item :request, path: 'purchase_requests', icon: 'https://img.icons8.com/windows/22/ffffff/request-money.png',
+    item :request, path: 'purchase_requests', icon: 'https://img.icons8.com/windows/20/ffffff/request-money.png',
          permissions: [:purchase_request_initiator, :purchase_request_reviewer]
   end
 
-  item :procure, icon: 'https://img.icons8.com/windows/22/ffffff/add-shopping-cart.png' do
+  item :procure, icon: 'https://img.icons8.com/windows/20/ffffff/add-shopping-cart.png' do
     item :purchase_orders, permissions: [:purchase_order_initiator, :purchase_order_reviewer, :purchase_order_auditor]
     item :pr_approved_items, label: "PR Approved Items", permissions: [:purchase_order_initiator]
   end
 
-  item :receive, permissions: :goods_receiver, icon: 'https://img.icons8.com/windows/22/ffffff/borrow-book.png' do
+  item :receive, permissions: :goods_receiver, icon: 'https://img.icons8.com/windows/20/ffffff/borrow-book.png' do
     item :receive_pending, path: 'receive'
     item :receive_history, path: 'receive/history'
   end
 
-  item :payables, icon: "https://img.icons8.com/windows/22/ffffff/sales-performance.png" do
+  item :payables, icon: "https://img.icons8.com/windows/20/ffffff/sales-performance.png" do
     item :po_advances, label: "PO Advances", permissions: [:bank_payment_request_initiator, :auditor]
     item :invoices, permissions: [:bank_payment_request_initiator]
     item :utility_bills
@@ -35,12 +40,12 @@ class Menu::Masters::Procurement < Menu::API
     # item :unbilled_items, permissions: [] # todo
   end
 
-  item :payments, icon: "https://img.icons8.com/windows/22/ffffff/online-money-transfer.png" do
+  item :payments, icon: "https://img.icons8.com/windows/20/ffffff/online-money-transfer.png" do
     item :payment_tickets, permissions: [:bank_payment_request_initiator, :bank_payment_request_reviewer, :bank_payment_request_creditor, :auditor]
     item :payments, permissions: [:bank_payment_request_initiator, :bank_payment_request_reviewer, :bank_payment_request_creditor, :auditor]
   end
 
-  item :manage, icon: 'https://img.icons8.com/windows/22/ffffff/commercial-development-management.png' do
+  item :manage, icon: 'https://img.icons8.com/windows/20/ffffff/commercial-development-management.png' do
     item :analytics, permissions: [:admin]
     item :vendors, permissions: [:vendor_creator, :vendor_reviewer, :vendor_manager, :vendor_auditor, :auditor]
     item :items, permissions: [:item_master_manager, :inventory_manager, :auditor]
@@ -57,6 +62,6 @@ class Menu::Masters::Procurement < Menu::API
     item :users, permissions: [:admin]
   end
 
-  item :download_manager, icon: "https://img.icons8.com/windows/22/ffffff/software-installer.png"
+  item :download_manager, icon: "https://img.icons8.com/windows/20/ffffff/software-installer.png"
 
 end
