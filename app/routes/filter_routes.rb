@@ -10,4 +10,5 @@ Filters::Router.draw do
   route 'purchase_orders', Docs::P2P::PurchaseOrders::FilterConfig
   route 'utility_bills', Docs::UtilityBills::Bills::FilterConfig
   route 'payment_tickets', Docs::PaymentTickets::FilterConfig
+  route 'payments', Docs::PaymentTickets::Payments::FilterConfig
 end
