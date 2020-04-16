@@ -85,7 +85,7 @@ class Docs::UtilityBills::Bills::Index < IndexBuilder::API
   end
 
   column :auto_fetched, default: true do
-    boolean value: :auto_fetched
+    checkbox value: :auto_fetched
   end
 
   # column :controlling_user, default: true, includes: [:controlling_user] do

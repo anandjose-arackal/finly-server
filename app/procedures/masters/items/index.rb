@@ -37,11 +37,11 @@ class Masters::Items::Index < IndexBuilder::API
   end
 
   column :active, default: true, sort: :active do
-    boolean value: '{{record.active}}'
+    checkbox value: '{{record.active}}'
   end
 
   column :tds_applicable, default: true, label: "TDS Applicable", sort: :tds_applicable do
-    boolean value: '{{record.tds_applicable}}'
+    checkbox value: '{{record.tds_applicable}}'
   end
 
   column :unit_of_measurement, default: true, sort: :unit_of_measurement do

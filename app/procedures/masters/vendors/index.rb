@@ -26,7 +26,7 @@ class Masters::Vendors::Index < IndexBuilder::API
   end
 
   column :gst_registered, default: true do
-    boolean value: :gst_registered
+    checkbox value: :gst_registered
   end
 
   column :gstin, default: true, includes: [:gstin_locations] do

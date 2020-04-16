@@ -1,6 +1,6 @@
-class IndexBuilder::ContentTypes::Boolean < IndexBuilder::ContentTypes::Base
+class IndexBuilder::ContentTypes::CheckBox < IndexBuilder::ContentTypes::Base
 
-  register :boolean
+  register :checkbox
 
   attribute :value
   attribute :format, default: "standard"

@@ -256,19 +256,19 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
   end
 
   column :verified_account, label: "Is Account Verified", includes: [:receiving_account_bank_account] do
-    boolean value: '{{record.receiving_account_bank_account.verified}}'
+    checkbox value: '{{record.receiving_account_bank_account.verified}}'
   end
 
   column :empaneled_vendor, label: "Is Vendor Empaneled", includes: [:receiving_user_vendor] do
-    boolean value: '{{record.receiving_user_vendor.authorized}}'
+    checkbox value: '{{record.receiving_user_vendor.authorized}}'
   end
 
   column :reverse_charge_vendor, label: "RCM Applicable Vendor", includes: [:receiving_user_vendor] do
-    boolean value: '{{record.receiving_user_vendor.rcm_enabled}}'
+    checkbox value: '{{record.receiving_user_vendor.rcm_enabled}}'
   end
 
   column :gst_registered, label: "GSTIN Vendor", includes: [:receiving_user_vendor] do
-    boolean value: '{{record.receiving_user_vendor.gst_registered}}'
+    checkbox value: '{{record.receiving_user_vendor.gst_registered}}'
   end
 
   column :vendor_type, label: "Vendor Type", includes: [:receiving_user_vendor] do
@@ -280,7 +280,7 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
   end
 
   column :msme_registered, label: "MSME Registered Vendor", includes: [:receiving_user_vendor] do
-    boolean value: '{{record.receiving_user_vendor.msme_registered}}'
+    checkbox value: '{{record.receiving_user_vendor.msme_registered}}'
   end
 
   column :msme_registration_number, label: "MSME Registration Number", includes: [:receiving_user_vendor] do
