@@ -1702,8 +1702,9 @@ class User < ApplicationRecord
     return true if permissions.blank?
 
     permissions = [permissions] unless permissions.is_a?(Array)
+    permissions = UserRole.ids_for(permissions) unless permissions.first.is_a?(Integer)
     return true if permissions.include?(:admin) and admin?(RequestStoreUtil.current_app)
-    return true if has_roles?(UserRole.ids_for(permissions))
+    return true if has_roles?(permissions)
 
     false
   end
