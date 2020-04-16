@@ -6,6 +6,10 @@ class Menu::Masters::Procurement < Menu::API
 
   app :vp
 
+  item :create do
+
+  end
+
   item :dashboard, icon: 'https://img.icons8.com/windows/22/ffffff/speed.png'
 
   scope features: :purchase_requisition_system do

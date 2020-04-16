@@ -57,6 +57,7 @@ class ActionManager::API < Transactions::API
 
       context[:config] << hash
     end
+    context
   end
 
 end

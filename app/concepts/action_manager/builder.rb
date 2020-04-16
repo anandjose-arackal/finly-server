@@ -15,7 +15,10 @@ module ActionManager::Builder
     if actions.present?
       map[:actions] = []
       actions.each_pair do |id, action|
-        map[:actions] << action.build(user, params)
+        action = action.build(user, params)
+        next if action.blank?
+
+        map[:actions] << action
       end
     end
     map
