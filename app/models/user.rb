@@ -1701,9 +1701,9 @@ class User < ApplicationRecord
   def has_permission?(permissions)
     return true if permissions.blank?
 
-    permissions = [permissions] unless permissions.respond_to?(:each)
+    permissions = [permissions] unless permissions.is_a?(Array)
     return true if permissions.include?(:admin) and admin?(RequestStoreUtil.current_app)
-    return true if has_roles?(permissions)
+    return true if has_roles?(UserRole.ids_for(permissions))
 
     false
   end
