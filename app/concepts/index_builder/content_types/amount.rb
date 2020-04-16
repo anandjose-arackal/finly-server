@@ -9,8 +9,9 @@ class IndexBuilder::ContentTypes::Amount < IndexBuilder::ContentTypes::Base
   attribute :tool_tip, default: -> (context) { "#{context[:attribute].currency_code} #{context[:attribute].value}"}
 
   def format_value(context, user, record, exposure, data)
-    return data unless data[:value].present?
+    # return data unless data[:value].present?
     unless [Amount.name, AmountExposure.name].include?(data[:value].class.name)
+      data[:value] = 0 if data[:value].blank?
       data[:currency_code] = Currency.first.country_code if data[:currency_code].blank?
       data[:currency_symbol] = Currency.first.symbol if data[:currency_symbol].blank?
       return data
