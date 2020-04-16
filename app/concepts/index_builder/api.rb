@@ -15,6 +15,10 @@ class IndexBuilder::API
     @reference ||= {id: '{{record.id}}', args: {}}
   end
 
+  def self.includes(args)
+    @global_includes = args
+  end
+
   def self.config(user)
     config = {fixed: [], dynamic: []}
     columns.each do |column_key, column|
@@ -42,7 +46,9 @@ class IndexBuilder::API
   end
 
   def self.include_associations!(collection, required_columns)
-    includes = []
+    includes = @global_includes || []
+    includes = [includes] unless includes.is_a?(Array)
+
     attrs = columns.select do |column_key, attr|
       (required_columns.blank? and attr.default) or (required_columns.present? and (required_columns.include?(column_key.to_s) or required_columns.include?(column_key.to_sym)))
     end

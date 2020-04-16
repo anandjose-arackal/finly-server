@@ -3,6 +3,7 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
 
   resolver 'payments.default'
   reference '{{record.payment_order.bank_payment_request.id}}'
+  includes payment_order: :bank_payment_request
 
   # Fixed column is always default true
   column :vendor, fixed: true, includes: [:receiving_user] do
@@ -34,11 +35,11 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
     text value: :utr
   end
 
-  column :submitted_at, sort: true, includes: [:payment_order] do
+  column :submitted_at, sort: true, includes: [payment_order: :bank_payment_request] do
     date value: -> (context) { context[:record].payment_order.bank_payment_request.submitted_at }
   end
 
-  column :approved_at, sort: true, includes: [:payment_order] do
+  column :approved_at, sort: true, includes: [payment_order: :bank_payment_request] do
     date value: -> (context) { context[:record].payment_order.bank_payment_request.approved_at }
   end
 

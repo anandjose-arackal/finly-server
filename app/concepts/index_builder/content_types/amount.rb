@@ -12,8 +12,8 @@ class IndexBuilder::ContentTypes::Amount < IndexBuilder::ContentTypes::Base
     # return data unless data[:value].present?
     unless [Amount.name, AmountExposure.name].include?(data[:value].class.name)
       data[:value] = 0 if data[:value].blank?
-      data[:currency_code] = Currency.first.country_code if data[:currency_code].blank?
-      data[:currency_symbol] = Currency.first.symbol if data[:currency_symbol].blank?
+      data[:currency_code] = 'INR' if data[:currency_code].blank?
+      data[:currency_symbol] = '₹' if data[:currency_symbol].blank?
       return data
     end
 
