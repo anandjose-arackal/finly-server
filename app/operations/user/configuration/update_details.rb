@@ -1,21 +1,27 @@
 # action to update a particular user's details.
 class User::Configuration::UpdateDetails < BaseOperation
-  attr_accessor :details_params, :changes
+  attr_accessor :details_params, :changes, :users, :editable_user
 
   def authorized_user_types
     [:employee, :company_admin]
   end
 
   def pre_validate
-    if user.blank? or params.blank?
-      messages[:error] << 'No user or params passed'
+    return messages[:error] << 'No user or params passed' if user.blank? or params.blank?
+  end
+
+  def init
+    self.users = User::Index.(current_user, params)
+    if self.users.failure?
+        add_message :error, "Unable to fetch user details. Please refer the API documentation or contact Finly Customer Support"
+        return
     end
   end
 
   def validate
-    # if details_params[:name].blank? and details_params[:mobile_number].blank?
-    #   messages[:error] << 'Nothing to update'
-    # end
+    unless Constants::VALID_EMAIL_FORMAT.match? ( params[:email] )
+      return messages[:error] << 'Email Id is not correct format'
+    end
 
     if params[:employee_id].blank?
       messages[:error] << 'Employee Id is not present'
@@ -25,17 +31,16 @@ class User::Configuration::UpdateDetails < BaseOperation
       messages[:error] << 'Email Id is not present'
     end
 
+    return if has_errors?
+
     if (['male', 'female'].include? (params[:gender].downcase) )
       params[:gender] = params[:gender].downcase.split("").first
     else
-      messages[:error] << 'Gender not specified correctly'
+      return messages[:error] << 'Gender not specified correctly'
     end
 
-    users = User::Index.(current_user, params)
-    return messages[:error] << 'User not found with the given Email Id and Employee ID' if users.blank?
-
-    user = users&.team.find_by(email: params[:email])
-    if( user.blank? || (user.profile&.employee_id != params[:employee_id]))
+    self.editable_user = self.users&.team.find_by(email: params[:email])
+    if( editable_user.blank? || (editable_user.profile&.employee_id != params[:employee_id]))
       return messages[:error] << 'User not found with the given Email Id and Employee ID' 
     end
   end
@@ -44,8 +49,8 @@ class User::Configuration::UpdateDetails < BaseOperation
     before_save self.user, &method(:regenerate_otp)
   end
 
-  def process    
-    messages[:error] = user.errors.full_messages unless user.update_attributes!(details_params)
+  def process
+    messages[:error] = editable_user.errors.full_messages unless editable_user.update_attributes!(details_params)
   end
 
   def post_process
