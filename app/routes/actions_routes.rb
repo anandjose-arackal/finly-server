@@ -11,4 +11,5 @@ ActionManager::Router.draw do
   route 'purchase_orders', Docs::P2P::PurchaseOrders::Action
   route 'utility_bills', Docs::UtilityBills::Bills::Action
   route 'payment_tickets', Docs::PaymentTickets::Action
+  route 'payments', Docs::PaymentTickets::Payments::Action
 end
