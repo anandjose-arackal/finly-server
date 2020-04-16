@@ -30,15 +30,21 @@ class User::Configuration::UpdateDetails < BaseOperation
     else
       messages[:error] << 'Gender not specified correctly'
     end
+
+    users = User::Index.(current_user, params)
+    return messages[:error] << 'User not found with the given Email Id and Employee ID' if users.blank?
+
+    user = users&.team.find_by(email: params[:email])
+    if( user.blank? || (user.profile&.employee_id != params[:employee_id]))
+      return messages[:error] << 'User not found with the given Email Id and Employee ID' 
+    end
   end
 
   def subscribe
     before_save self.user, &method(:regenerate_otp)
   end
 
-  def process
-    user = User::Index.(current_user, params)&.team.left_outer_joins(:profile).find_by("users.email = ? AND user_profiles.employee_id = ?", params[:email], params[:employee_id])
-    messages[:error] << 'User not found with the given Email Id and Employee ID' if user.blank?
+  def process    
     messages[:error] = user.errors.full_messages unless user.update_attributes!(details_params)
   end
 
@@ -57,7 +63,7 @@ class User::Configuration::UpdateDetails < BaseOperation
     if params[:email].present?
       formatted_request = RequestFormatter::ApiParser::FmParser::V1::Users::Update.(user, params).formatted_request
       formatted_request.require(:user).permit(:first_name, :last_name, :mobile_number, :mothers_maiden_name,
-                                              :department_id, :active, :location_id, :email,
+                                              :department_id, :active, :location_id,
                                               profile_attributes: [:gender, :date_of_birth, :employee_id,
                                                 :payroll_id, :address_1, :address_2, :city, :state_id, :pin_code])
     else
