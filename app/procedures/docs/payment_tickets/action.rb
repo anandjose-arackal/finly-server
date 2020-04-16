@@ -2,13 +2,6 @@ class Docs::PaymentTickets::Action < ActionManager::API
 
   scope policy: Docs::PaymentTickets::Policy, model: BankPaymentRequest do
 
-    action :redirect,
-           :create,
-           permissions: :bank_payment_request_initiator,
-           label: 'Create PO',
-           icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
-           url: 'payment_tickets/new'
-
     action :button_group,
            :actions,
            contextual: true,
@@ -50,6 +43,14 @@ class Docs::PaymentTickets::Action < ActionManager::API
            icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
            route: "payment_ticket.index",
            authorize: :export?
+
+    action :redirect,
+           :create,
+           format: 'primary',
+           permissions: :bank_payment_request_initiator,
+           label: 'Create PO',
+           icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
+           url: 'payment_tickets/new'
 
   end
 

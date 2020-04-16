@@ -3,7 +3,6 @@ ActionManager::Router.draw do
   # Masters
   route 'vendors', Masters::Vendors::Action
   route 'items', Masters::Items::Action
-  route 'item_master', Masters::Items::Action
 
   # Docs
   route 'invoices', Docs::P2P::Invoices::Action

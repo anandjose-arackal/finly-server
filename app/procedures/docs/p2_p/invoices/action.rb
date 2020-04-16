@@ -2,12 +2,6 @@ class Docs::P2P::Invoices::Action < ActionManager::API
 
   scope policy: Docs::P2P::Invoices::Policy, model: Invoice do
 
-    action :template,
-           :create,
-           label: "Create Non PO Invoice",
-           icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
-           function: "non_po_invoice_create"
-
     action :button_group,
            :actions,
            contextual: true,
@@ -49,6 +43,14 @@ class Docs::P2P::Invoices::Action < ActionManager::API
            icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
            route: "invoices.index",
            authorize: :export?
+
+    action :template,
+           :create,
+           format: 'primary',
+           permissions: :non_po_invoice_initiator,
+           label: "Create Non PO Invoice",
+           icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
+           function: "non_po_invoice_create"
 
   end
 

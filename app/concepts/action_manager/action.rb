@@ -5,7 +5,7 @@ class ActionManager::Action
 
   attr_accessor :type, :id, :path, :parent, :root, :scopes,
                 :permissions, :label, :icon, :policy, :authorize,
-                :actions, :model
+                :actions, :model, :format
 
   class_attribute :registered_type
 
@@ -75,6 +75,10 @@ class ActionManager::Action
     @permissions += value
     @permissions.uniq!
     @permissions
+  end
+
+  def format
+    @format || 'standard'
   end
 
   def actions

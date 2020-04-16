@@ -4,12 +4,6 @@ class Docs::P2P::PurchaseRequests::Action < ActionManager::API
 
     scope permissions: :admin do
 
-      action :redirect,
-             :create,
-             label: 'New Purchase Request',
-             icon: 'https://img.icons8.com/windows/17/708090/--checkmark-yes.png',
-             url: 'purchase_request'
-
       action :button_group,
              :actions,
              contextual: true,
@@ -50,6 +44,14 @@ class Docs::P2P::PurchaseRequests::Action < ActionManager::API
            icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
            route: "purchase_requests.index",
            authorize: :export?
+
+    action :redirect,
+           :create,
+           format: 'primary',
+           permissions: :purchase_request_initiator,
+           label: 'New Purchase Request',
+           icon: 'https://img.icons8.com/windows/17/708090/--checkmark-yes.png',
+           url: 'purchase_request'
 
   end
 

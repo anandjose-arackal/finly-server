@@ -2,12 +2,6 @@ class Docs::P2P::PurchaseOrders::Action < ActionManager::API
 
   scope policy: Docs::P2P::PurchaseOrders::Policy, model: PurchaseOrder do
 
-    action :template,
-           :create,
-           label: 'Create PO',
-           icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
-           function: "po_create"
-
     action :button_group,
            :actions,
            contextual: true,
@@ -49,6 +43,14 @@ class Docs::P2P::PurchaseOrders::Action < ActionManager::API
            icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
            route: "invoices.index",
            authorize: :export?
+
+    action :template,
+           :create,
+           permissions: :purchase_order_initiator,
+           format: 'primary',
+           label: 'Create PO',
+           icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
+           function: "po_create"
 
   end
 

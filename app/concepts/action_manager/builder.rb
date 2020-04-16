@@ -9,6 +9,7 @@ module ActionManager::Builder
         label: self.label,
         icon: self.icon,
         type: self.type,
+        format: self.format,
         config: build_config(user, params),
     }
     if actions.present?

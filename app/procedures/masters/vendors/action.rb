@@ -3,13 +3,6 @@ class Masters::Vendors::Action < ActionManager::API
   scope policy: Masters::Vendors::Policy, model: YesBankVendor do
 
     scope permissions: :admin do
-
-      action :redirect,
-             :create,
-             label: 'Add Vendor',
-             icon: 'https://img.icons8.com/windows/17/708090/--checkmark-yes.png',
-             url: 'vendor/add'
-
       action :button_group,
              :actions,
              contextual: true,
@@ -50,6 +43,14 @@ class Masters::Vendors::Action < ActionManager::API
            icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
            route: "vendors.index",
            authorize: :export?
+
+    action :redirect,
+           :create,
+           permissions: [:vendor_creator, :vendor_manager],
+           format: 'primary',
+           label: 'Add Vendor',
+           icon: 'https://img.icons8.com/windows/17/708090/--checkmark-yes.png',
+           url: 'vendor/add'
 
   end
 
