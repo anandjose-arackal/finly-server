@@ -48,7 +48,7 @@ class Docs::PaymentTickets::Action < ActionManager::API
            :create,
            format: 'primary',
            permissions: :bank_payment_request_initiator,
-           label: 'Create PO',
+           label: 'Create Payment Ticket',
            icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
            url: 'payment_tickets/new'
 
