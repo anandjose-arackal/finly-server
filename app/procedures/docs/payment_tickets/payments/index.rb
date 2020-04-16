@@ -58,47 +58,89 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
     text value: "{{record.payment_order.bank_payment_request.policy.name}}"
   end
 
-  column :gross_amount do
+  column :gross_amount, includes: [
+      invoice_parent: {gross_amount: :currency},
+      bbps_bill_parent: {amount: :currency},
+      beneficiary_payment_parent: {gross_amount: :currency},
+      purchase_order_parent: {requested_advance_amount: :currency},
+      security_deposit_parent: {original_amount: :currency},
+  ] do
     text value: :gross_amount
   end
 
-  column :discount do
+  column :discount, includes: [
+      invoice_parent: {discount_amount: :currency},
+  ] do
     text value: :discount
   end
 
-  column :cgst, label: 'CGST' do
-    text value: :cgst
+  column :cgst_amount, label: 'CGST', includes: [
+      invoice_parent: {tax_amount: :currency},
+      beneficiary_payment_parent: {tax_amount: :currency},
+  ] do
+    text value: :cgst_amount
   end
 
-  column :sgst, label: 'SGST' do
-    text value: :sgst
+  column :sgst_amount, label: 'SGST', includes: [
+      invoice_parent: {tax_amount: :currency},
+      beneficiary_payment_parent: {tax_amount: :currency},
+  ]  do
+    text value: :sgst_amount
   end
 
-  column :igst, label: 'IGST' do
-    text value: :igst
+  column :igst, label: 'IGST', includes: [
+      invoice_parent: {tax_amount: :currency},
+      beneficiary_payment_parent: {tax_amount: :currency},
+  ]  do
+    text value: :igst_amount
   end
 
-  column :tds_slab do
+  column :tds_slab, includes: [
+      invoice_parent: :tds_slab,
+      beneficiary_payment_parent: :tds_slab,
+      purchase_order_parent: :advance_tds_slab,
+  ]  do
     text value: :tds_slab
   end
 
-  column :tds_amount do
+  column :tds_amount, includes: [
+      invoice_parent: {tds_amount: :currency},
+      beneficiary_payment_parent: {tds_amount: :currency},
+      purchase_order_parent: {advance_tds_amount: :currency},
+  ]  do
     text value: :tds_amount
   end
 
-  column :freight do
+  column :freight, includes: [
+      invoice_parent: {freight_amount: :currency},
+  ]  do
     text value: :freight
   end
 
-  column :net_payable do
-    text value: :net_payable
+  column :net_amount, includes: [
+      invoice_parent: {net_amount: :currency},
+      bbps_bill_parent: {total_amount: :currency},
+      beneficiary_payment_parent: {net_amount: :currency},
+      purchase_order_parent: {advance_amount: :currency},
+      security_deposit_parent: {original_amount: :currency},
+  ]  do
+    text value: :net_amount
   end
 
-  column :advance_paid do
+  column :advance_paid, includes: [
+      invoice_parent: {advance_amount: :currency},
+      beneficiary_payment_parent: {advance_amount: :currency},
+  ]  do
     text value: :advance_paid
   end
 
-  column :balance_payable do
+  column :balance_payable, includes: [
+      invoice_parent: {balance_due: :currency},
+      bbps_bill_parent: {total_amount: :currency},
+      beneficiary_payment_parent: {payable_amount: :currency},
+      purchase_order_parent: {advance_amount: :currency},
+      security_deposit_parent: {payable_amount: :currency},
+  ]  do
     text value: :balance_payable
   end
 
