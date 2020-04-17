@@ -6,7 +6,7 @@ class IndexBuilder::ContentTypes::Amount < IndexBuilder::ContentTypes::Base
   attribute :currency_code
   attribute :currency_symbol
   attribute :format, default: "default"
-  attribute :tool_tip, default: -> (context) { "#{context[:attribute].currency_code} #{context[:attribute].value}"}
+  attribute :tool_tip, default: -> (context) { "#{context&.dig(:data, :currency_code)} #{context&.dig(:data, :value)}" }
 
   def format_value(context, user, record, exposure, data)
     # return data unless data[:value].present?

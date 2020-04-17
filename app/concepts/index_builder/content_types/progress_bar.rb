@@ -5,6 +5,6 @@ class IndexBuilder::ContentTypes::ProgressBar < IndexBuilder::ContentTypes::Base
   attribute :value
   attribute :total_count
   attribute :completed_count
-  attribute :tool_tip, default: -> (context) { context[:attribute].value}
+  attribute :tool_tip, default: -> (context) { context&.dig(:data, :value)}
 
 end

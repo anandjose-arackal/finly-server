@@ -4,7 +4,7 @@ class IndexBuilder::ContentTypes::CheckBox < IndexBuilder::ContentTypes::Base
 
   attribute :value
   attribute :format, default: "standard"
-  attribute :tool_tip, default: -> (context) { context[:attribute].value }
+  attribute :tool_tip, default: -> (context) { context&.dig(:data, :value) }
 
   # Send the content type as Yes/No in text format
   def content_type

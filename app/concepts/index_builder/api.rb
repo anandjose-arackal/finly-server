@@ -110,6 +110,8 @@ class IndexBuilder::API
   end
 
   def self.build_custom_fields(map, user, record, record_exposure, required_columns)
+    return unless required_columns.present?
+
     required_columns.select { |column| column.starts_with?("cf_") }&.each do |custom_field_column|
       ids = custom_field_column.split("_")
       required_cf = record.custom_fields.select { |cf| ids.include?(cf.field_configuration_id.to_s) }&.first

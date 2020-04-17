@@ -50,7 +50,8 @@ class IndexBuilder::ContentTypes::Base
           attribute: self,
           user: user,
           record: record,
-          exposure: exposure
+          exposure: exposure,
+          data: data
       }
 
       if retriever.is_a?(Proc)

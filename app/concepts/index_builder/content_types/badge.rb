@@ -4,6 +4,6 @@ class IndexBuilder::ContentTypes::Badge < IndexBuilder::ContentTypes::Base
 
   attribute :value
   attribute :format, default: "success"
-  attribute :tool_tip, default: -> (context) { context[:attribute].value}
+  attribute :tool_tip, default: -> (context) { context&.dig(:data, :value)}
 
 end
