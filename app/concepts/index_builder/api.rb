@@ -87,7 +87,7 @@ class IndexBuilder::API
     end
 
     #include custom field
-    if required_columns.select { |column| column.starts_with?("cf_") }&.present?
+    if required_columns&.select { |column| column.starts_with?("cf_") }&.present?
       includes += (@custom_fields&.dig(:includes) || [])
     end
 
