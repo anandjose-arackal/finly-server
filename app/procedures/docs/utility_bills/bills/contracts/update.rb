@@ -6,5 +6,9 @@ class Docs::UtilityBills::Bills::Contracts::Update < Docs::UtilityBills::Bills::
     property :value, validates: {presence: true}
     property :currency_id, validates: {presence: true}
   end
+
+  property :selected_amount_type
+  validates :selected_amount_type, :inclusion => {:in => BbpsBill::AMOUNT_TYPES, message: "%{value} is not a valid"}
+
   private
 end

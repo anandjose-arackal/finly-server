@@ -47,9 +47,13 @@
 #  hsn_sac                    :string(255)
 #  paid_at                    :datetime
 #  review_note                :text(65535)
+#  selected_amount_type       :string(255)
 #
 
 class BbpsBill < ApplicationRecord
+
+  AMOUNT_TYPES = %w(base_amount early_payment_amount late_payment_amount)
+
   include SoftDeletable, Transitionable
   include Sequenced::ActsAsSequenced
   include EventProducer
@@ -60,6 +64,7 @@ class BbpsBill < ApplicationRecord
 
   before_save :resolve_bill_validation
   before_save :set_quick_pay
+  before_save :update_total_amount
 
   belongs_to :subscription, class_name: 'BbpsBillerSubscription', foreign_key: :subscription_id, optional: true
   belongs_to :biller, class_name: 'BbpsBiller', foreign_key: :bbps_biller_id, optional: true
@@ -84,7 +89,7 @@ class BbpsBill < ApplicationRecord
   accepts_nested_attributes_for :amount
 
   delegate :open?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :payment_ticket_created?, :payment_initiated?, :failed, :paid?, :voided?, :payment_ticket_deleted?, to: :status
-  delegate :amount_value, to: :amount
+  delegate :amount_value, to: :total_amount
 
   default_scope {order('bbps_bills.created_at DESC')}
 
@@ -271,7 +276,7 @@ class BbpsBill < ApplicationRecord
           status: status.as_json,
           pocs: subscription.pocs.as_json,
           # biller_category_name: biller_category_name,
-          amount: amount.as_json,
+          amount: total_amount.as_json,
           customer_fields: subscription.all_customer_fields,
           paid_at: paid_at&.strftime("%I:%M %p, %d %b %Y"),
       }
@@ -302,9 +307,6 @@ class BbpsBill < ApplicationRecord
 
         amount: amount.as_json,
         total_amount: total_amount.as_json,
-        late_payment_fee: late_payment_fee.as_json,
-        early_payment_fee: early_payment_fee.as_json,
-        convenience_fee: convenience_fee.as_json,
 
         due_date: due_date,
         bill_date: bill_date,
@@ -329,8 +331,17 @@ class BbpsBill < ApplicationRecord
         customer_name: subscription.customer_name,
         customer_pan: subscription.customer_pan,
         show_payment_details: false,
-        attachments: attachments.as_json
+        attachments: attachments.as_json,
+        selected_amount_type: selected_amount_type
     }
+
+    if self.late_payment_fee&.value.to_f > 0
+      data[:late_payment_fee] = late_payment_fee.as_json
+    end
+
+    if self.early_payment_fee&.value.to_f > 0
+      data[:early_payment_fee] = early_payment_fee.as_json
+    end
 
     if BbpsBill.status_ids(:paid, :failed).include?(self.status_id)
       data[:show_payment_details] = true
@@ -505,6 +516,25 @@ class BbpsBill < ApplicationRecord
     validation_support = self.biller&.support_bill_validation
     if (fetch_requirement == "NOT_SUPPORTED") && (validation_support == "NOT_SUPPORTED")
       self.quick_pay = "Y"
+    end
+  end
+
+  def update_total_amount
+    total_amount_value = 0
+
+    case selected_amount_type
+    when "base_amount"
+      total_amount_value += amount.value
+    when "early_payment_amount"
+      total_amount_value += early_payment_fee.value
+    when "late_payment_amount"
+      total_amount_value += late_payment_fee.value
+    end
+
+    if self.total_amount.present?
+      self.total_amount.update(value: total_amount_value)
+    else
+      self.total_amount = Amount.new(value: total_amount_value, currency_id: 1)
     end
   end
 

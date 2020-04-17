@@ -119,7 +119,7 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchAndCreateBill < Transactions:
     bill_period = Date.today.strftime("%B").upcase if bill_period == "NA"
 
     params = {
-        amount: (data.amount.to_f / 100).round(2),
+        amount: (data.amount.to_d / 100).round(2),
         bill_date: data.bill_date,
         bill_number: data.bill_number,
         due_date: data.due_date,

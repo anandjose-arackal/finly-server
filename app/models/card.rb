@@ -26,6 +26,7 @@
 #  card_processor_status    :string(255)
 #  replaced_card_id         :integer
 #  deleted_at               :datetime
+#  card_number              :string(255)
 #
 
 class Card < ApplicationRecord
