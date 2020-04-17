@@ -79,13 +79,13 @@ class Masters::Vendors::Index < IndexBuilder::API
 
     # approved auto_approved
     counter.add 92, 'Approved', (
-    (counts[VendorStatus.id_for(:approved)].to_i) +
-        (counts[VendorStatus.id_for(:auto_approved)].to_i)
+    counts[VendorStatus.id_for(:approved)].to_i +
+        counts[VendorStatus.id_for(:auto_approved)].to_i
     )
 
     # rejected, deactivated
     [:rejected, :deactivated].each do |status|
-      counter.add VendorStatus.id_for(status), status.to_s.titleize, counts[VendorStatus.id_for(status)]
+      counter.add VendorStatus.id_for(status), status.to_s.titleize, counts[VendorStatus.id_for(status)].to_i
     end
 
     counter

@@ -123,19 +123,19 @@ class Docs::UtilityBills::Bills::Index < IndexBuilder::API
     # end
 
     # Processing
-    counter.add BbpsBillStatus.id_for(:awaiting_approval), "Processing", counts[BbpsBillStatus.id_for(:awaiting_approval)]
+    counter.add BbpsBillStatus.id_for(:awaiting_approval), "Processing", counts[BbpsBillStatus.id_for(:awaiting_approval)].to_i
 
     # Pending Payment - approved/auto_approved/partially_paid/unpaid/initiated
     counter.add 92, 'Pending Payment', (
-        (counts[BbpsBillStatus.id_for(:approved)].to_i) +
-        (counts[BbpsBillStatus.id_for(:auto_approved)].to_i) +
-        (counts[BbpsBillStatus.id_for(:payment_ticket_created)].to_i) +
-        (counts[BbpsBillStatus.id_for(:payment_initiated)].to_i) +
-        (counts[BbpsBillStatus.id_for(:payment_ticket_deleted)].to_i)
+        counts[BbpsBillStatus.id_for(:approved)].to_i +
+        counts[BbpsBillStatus.id_for(:auto_approved)].to_i +
+        counts[BbpsBillStatus.id_for(:payment_ticket_created)].to_i +
+        counts[BbpsBillStatus.id_for(:payment_initiated)].to_i +
+        counts[BbpsBillStatus.id_for(:payment_ticket_deleted)].to_i
     )
 
     [:rejected, :failed, :paid, :voided].each do |status|
-      counter.add BbpsBillStatus.id_for(status), status.to_s.titleize, counts[BbpsBillStatus.id_for(status)]
+      counter.add BbpsBillStatus.id_for(status), status.to_s.titleize, counts[BbpsBillStatus.id_for(status)].to_i
     end
 
     counter
