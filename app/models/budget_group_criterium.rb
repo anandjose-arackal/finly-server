@@ -6,6 +6,7 @@
 #  name                        :string(255)
 #  budget_group_id             :integer
 #  ancestry                    :string(255)
+#  deleted                     :datetime
 #  created_at                  :datetime         not null
 #  updated_at                  :datetime         not null
 #  created_by_user_id          :integer

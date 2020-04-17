@@ -55,7 +55,7 @@ class BankTransfer::PaymentRequest::UtilityBills::CreateUtilityBillsTicket < Ban
     ids = params[:bbps_bill_id]
 
     self.bbps_bills = current_company.bbps_bills.with_id(ids)
-    self.requested_amount = self.bbps_bills.filter_status("payables").joins(:amount).sum(:value)
+    self.requested_amount = Amount.where("id in (?)", self.bbps_bills.filter_status("payables").pluck(:total_amount_id)).sum(:value)
 
     self.scheduled_at = params[:scheduled_at]
     self.payment_mode = params[:payment_mode]

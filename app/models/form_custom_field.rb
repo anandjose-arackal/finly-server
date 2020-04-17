@@ -11,6 +11,7 @@
 #  field_key      :string(255)      not null
 #  value          :string(255)
 #  value_text     :string(255)
+#  deleted_at     :datetime
 #
 
 class FormCustomField < ApplicationRecord
