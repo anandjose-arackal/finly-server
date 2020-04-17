@@ -280,6 +280,7 @@ class User < ApplicationRecord
   has_many :group_users, through: :users_with_group_mapping, foreign_key: :user_id
   # has_one :feature_access, as: :accessible
 
+  has_many :map_location_user_queries
   has_many :index_view_segments
 
   accepts_nested_attributes_for :role_mapping
