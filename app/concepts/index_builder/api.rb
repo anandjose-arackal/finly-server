@@ -28,6 +28,25 @@ class IndexBuilder::API
         config[:dynamic] << column.config(user)
       end
     end
+    if custom_fields
+      field_configurations = user.company.field_configurations
+                                 .where(is_deleted: false, deleted_at: nil)
+                                 .ransack(field_parent_types_field_parent_type_id_eq: FieldParentType.id_for(custom_fields))
+                                 .result(distinct: true)
+      map = {}
+      field_configurations&.each do |field_config|
+        map[field_config.field_name] ||= []
+        map[field_config.field_name] << field_config.id
+      end
+      map.each_pair do |field_name, ids|
+        config[:dynamic] << {
+            column_key: "cf_#{ids.join("_")}",
+            label: field_name,
+            sort: false,
+            default: false,
+        }
+      end
+    end
     config
   end
 
@@ -49,9 +68,11 @@ class IndexBuilder::API
     includes = @global_includes || []
     includes = [includes] unless includes.is_a?(Array)
 
+    # include system fields
     attrs = columns.select do |column_key, attr|
       (required_columns.blank? and attr.default) or (required_columns.present? and (required_columns.include?(column_key.to_s) or required_columns.include?(column_key.to_sym)))
     end
+
     attrs.each do |column_key, column|
       if column.includes.is_a?(Hash)
         includes += [column.includes]
@@ -60,6 +81,12 @@ class IndexBuilder::API
       end
 
     end
+
+    #include custom field
+    if required_columns.select {|column| column.starts_with?("cf_")}&.present?
+      includes += (@custom_fields&.dig(:includes) || [])
+    end
+
     collection.includes(includes.uniq)
   end
 
@@ -71,9 +98,20 @@ class IndexBuilder::API
       next if required_columns.blank? and not column.default
 
       data_provider = data_provider(user, record, record_exposure)
+
       map[column.column_key] = column.build(data_provider, user, record, record_exposure)
     end
+    build_custom_fields(map, user, record, record_exposure, required_columns)
     {reference: record_exposure.template(reference), columns: map}
+  end
+
+  def self.build_custom_fields(map, user, record, record_exposure, required_columns)
+    required_columns.select {|column| column.starts_with?("cf_")}&.each do |custom_field_column|
+      ids = custom_field_column.split("_")
+      required_cf = record.custom_fields.select {|cf| ids.include?(cf.field_configuration_id.to_s)}&.first
+      text_field = IndexBuilder::ContentTypes::Text.new({value: required_cf&.configured_field_value.to_s})
+      map[custom_field_column] = [text_field.build(self, user, record, record_exposure)]
+    end
   end
 
   # Data provider is used for reusing classes for fetching data

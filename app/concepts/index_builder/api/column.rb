@@ -56,14 +56,14 @@ class IndexBuilder::API::Column
         columns[column_key].present?
       end
 
-      def column(column_key, default: false, label: nil, sort: false, includes: [], fixed: false, fields:[], &block)
+      def column(column_key, default: false, label: nil, sort: false, includes: [], fixed: false, fields: [], &block)
         raise "#{column_key} is already defined for class #{self.name}" if exists?(column_key)
         raise "#{column_key} does not have associated fields" unless block_given? or fields.present?
 
         if not block_given? and fields.present?
           block = lambda do |*args|
             fields.each do |field_value|
-                field :text, value: field_value
+              field :text, value: field_value
             end
           end
         end
@@ -84,6 +84,16 @@ class IndexBuilder::API::Column
 
         fixed_column(column) if fixed
         columns[column_key] = column
+      end
+
+      def custom_fields(type=nil, path: nil, includes: [:custom_fields])
+        if type.present?
+          path ||= lambda do |record|
+            record.custom_fields
+          end
+          @custom_fields = {type: type, path: path, includes: includes}
+        end
+        @custom_fields
       end
     end
   end
