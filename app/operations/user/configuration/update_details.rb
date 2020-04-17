@@ -7,7 +7,19 @@ class User::Configuration::UpdateDetails < BaseOperation
   end
 
   def pre_validate
-    return messages[:error] << 'No user or params passed' if user.blank? or params.blank?
+    return messages[:error] << 'No user passed' if user.blank?
+    return messages[:error] << 'No params passed' if params.blank?
+    return messages[:error] << 'Employee Id is not present' if params[:employee_id].blank?
+    return  messages[:error] << 'Email Id is not present' if params[:email].blank?
+    
+    if params[:gender].present?
+      if (['male', 'female'].include? (params[:gender].downcase) )
+        params[:gender] = params[:gender].downcase.split("").first
+      else
+        return messages[:error] << 'Gender not specified correctly'
+      end
+    end
+    
   end
 
   def init
@@ -16,32 +28,17 @@ class User::Configuration::UpdateDetails < BaseOperation
         add_message :error, "Unable to fetch user details. Please refer the API documentation or contact Finly Customer Support"
         return
     end
-  end
-
-  def validate
-    unless Constants::VALID_EMAIL_FORMAT.match? ( params[:email] )
-      return messages[:error] << 'Email Id is not correct format'
-    end
-
-    if params[:employee_id].blank?
-      messages[:error] << 'Employee Id is not present'
-    end
-
-    if params[:email].blank?
-      messages[:error] << 'Email Id is not present'
-    end
-
-    return if has_errors?
-
-    if (['male', 'female'].include? (params[:gender].downcase) )
-      params[:gender] = params[:gender].downcase.split("").first
-    else
-      return messages[:error] << 'Gender not specified correctly'
-    end
-
+    
     self.editable_user = self.users&.team.find_by(email: params[:email])
     if( editable_user.blank? || (editable_user.profile&.employee_id != params[:employee_id]))
       return messages[:error] << 'User not found with the given Email Id and Employee ID' 
+    end
+  end
+
+  def validate
+    return if has_errors?
+    unless Constants::VALID_EMAIL_FORMAT.match? ( params[:email] )
+      return messages[:error] << 'Email Id is not correct format'
     end
   end
 
@@ -50,7 +47,7 @@ class User::Configuration::UpdateDetails < BaseOperation
   end
 
   def process
-    messages[:error] = editable_user.errors.full_messages unless editable_user.update_attributes!(details_params)
+    messages[:error] = editable_user.errors.full_messages unless editable_user.update_attributes(details_params)
   end
 
   def post_process
