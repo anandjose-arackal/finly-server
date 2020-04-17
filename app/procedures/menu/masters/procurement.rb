@@ -6,7 +6,7 @@ class Menu::Masters::Procurement < Menu::API
 
   app :vp
 
-  item :create, icon: 'https://img.icons8.com/windows/20/ffffff/request-money.png' do
+  item :create, icon: 'https://img.icons8.com/windows/20/ffffff/plus-math.png' do
     item :new_purchase_request, path: 'purchase_requests/new', permissions: [:purchase_request_initiator]
     item :new_purchase_order, path: 'purchase_orders/new', permissions: [:purchase_order_initiator]
     item :new_non_po_invoice, path: 'invoices/new', permissions: [:non_po_invoice_initiator]

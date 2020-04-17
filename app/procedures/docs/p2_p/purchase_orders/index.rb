@@ -93,7 +93,7 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
     counts = collection.group(:purchase_order_status_id).count
     counter.add nil, "All", counts.values.reduce(0, :+)
     # Open / Retracted
-    counter.add 90, 'Open', (counts[PurchaseOrderStatus.id_for(:open).to_i] + counts[PurchaseOrderStatus.id_for(:retracted)].to_i)
+    counter.add 90, 'Open', (counts[PurchaseOrderStatus.id_for(:open)].to_i + counts[PurchaseOrderStatus.id_for(:retracted)].to_i)
 
     # Awaiting Approval
     if user.has_permission?(awaiting_approval_roles)
@@ -104,10 +104,10 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
     counter.add PurchaseOrderStatus.id_for(:processing), "Processing", counts[PurchaseOrderStatus.id_for(:processing)]
 
     # Approved / Auto Approved
-    counter.add 92, 'Approved', (counts[PurchaseOrderStatus.id_for(:approved)] + counts[PurchaseOrderStatus.id_for(:auto_approved)])
+    counter.add 92, 'Approved', (counts[PurchaseOrderStatus.id_for(:approved)].to_i + counts[PurchaseOrderStatus.id_for(:auto_approved)].to_i)
 
     [:rejected, :voided, :sent_to_vendor, :vendor_confirmed, :closed].each do |status|
-      counter.add PurchaseOrderStatus.id_for(status), status.to_s.titleize, counts[PurchaseOrderStatus.id_for(status)]
+      counter.add PurchaseOrderStatus.id_for(status), status.to_s.titleize, counts[PurchaseOrderStatus.id_for(status)].to_i
     end
 
     counter

@@ -28,26 +28,30 @@ class IndexBuilder::API
         config[:dynamic] << column.config(user)
       end
     end
-    if custom_fields
-      field_configurations = user.company.field_configurations
-                                 .where(is_deleted: false, deleted_at: nil)
-                                 .ransack(field_parent_types_field_parent_type_id_eq: FieldParentType.id_for(custom_fields))
-                                 .result(distinct: true)
-      map = {}
-      field_configurations&.each do |field_config|
-        map[field_config.field_name] ||= []
-        map[field_config.field_name] << field_config.id
-      end
-      map.each_pair do |field_name, ids|
-        config[:dynamic] << {
-            column_key: "cf_#{ids.join("_")}",
-            label: field_name,
-            sort: false,
-            default: false,
-        }
-      end
-    end
+
+    self.config_custom_fields(user, config)
     config
+  end
+
+  def self.config_custom_fields(user, config)
+    return unless self.custom_fields
+
+    field_configurations = user.company.field_configurations.joins(:field_parent_mappings)
+                               .where(is_deleted: false, deleted_at: nil)
+                               .where(field_parent_mappings: {field_parent_type_id: FieldParentType.id_for(custom_fields[:type])})
+    map = {}
+    field_configurations&.each do |field_config|
+      map[field_config.field_name] ||= []
+      map[field_config.field_name] << field_config.id
+    end
+    map.each_pair do |field_name, ids|
+      config[:dynamic] << {
+          column_key: "cf_#{ids.join("_")}",
+          label: field_name,
+          sort: false,
+          default: false,
+      }
+    end
   end
 
   def self.resolve(context)
@@ -83,7 +87,7 @@ class IndexBuilder::API
     end
 
     #include custom field
-    if required_columns.select {|column| column.starts_with?("cf_")}&.present?
+    if required_columns.select { |column| column.starts_with?("cf_") }&.present?
       includes += (@custom_fields&.dig(:includes) || [])
     end
 
@@ -106,9 +110,9 @@ class IndexBuilder::API
   end
 
   def self.build_custom_fields(map, user, record, record_exposure, required_columns)
-    required_columns.select {|column| column.starts_with?("cf_")}&.each do |custom_field_column|
+    required_columns.select { |column| column.starts_with?("cf_") }&.each do |custom_field_column|
       ids = custom_field_column.split("_")
-      required_cf = record.custom_fields.select {|cf| ids.include?(cf.field_configuration_id.to_s)}&.first
+      required_cf = record.custom_fields.select { |cf| ids.include?(cf.field_configuration_id.to_s) }&.first
       text_field = IndexBuilder::ContentTypes::Text.new({value: required_cf&.configured_field_value.to_s})
       map[custom_field_column] = [text_field.build(self, user, record, record_exposure)]
     end
