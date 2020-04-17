@@ -1,21 +1,44 @@
 # action to update a particular user's details.
 class User::Configuration::UpdateDetails < BaseOperation
-  attr_accessor :details_params, :changes
+  attr_accessor :details_params, :changes, :users, :editable_user
 
   def authorized_user_types
     [:employee, :company_admin]
   end
 
   def pre_validate
-    if user.blank? or params.blank?
-      messages[:error] << 'No user or params passed'
+    return messages[:error] << 'No user passed' if user.blank?
+    return messages[:error] << 'No params passed' if params.blank?
+    return messages[:error] << 'Employee Id is not present' if params[:employee_id].blank?
+    return  messages[:error] << 'Email Id is not present' if params[:email].blank?
+    
+    if params[:gender].present?
+      if (['male', 'female'].include? (params[:gender].downcase) )
+        params[:gender] = params[:gender].downcase.split("").first
+      else
+        return messages[:error] << 'Gender not specified correctly'
+      end
+    end
+    
+  end
+
+  def init
+    self.users = User::Index.(current_user, params)
+    if self.users.failure?
+        add_message :error, "Unable to fetch user details. Please refer the API documentation or contact Finly Customer Support"
+        return
+    end
+    
+    self.editable_user = self.users&.team.find_by(email: params[:email])
+    if( editable_user.blank? || (editable_user.profile&.employee_id != params[:employee_id]))
+      return messages[:error] << 'User not found with the given Email Id and Employee ID' 
     end
   end
 
   def validate
-    if details_params[:name].blank? and details_params[:mobile_number].blank?
-      messages[:error] << 'Nothing to update'
-      # return false
+    return if has_errors?
+    unless Constants::VALID_EMAIL_FORMAT.match? ( params[:email] )
+      return messages[:error] << 'Email Id is not correct format'
     end
   end
 
@@ -24,9 +47,7 @@ class User::Configuration::UpdateDetails < BaseOperation
   end
 
   def process
-    user = User::Show.(current_user, params)&.selected_user
-    messages[:error] << 'User not found with the given Employee ID' if user.blank?
-    messages[:error] = user.errors.full_messages unless user.update_attributes!(details_params)
+    messages[:error] = editable_user.errors.full_messages unless editable_user.update_attributes(details_params)
   end
 
   def post_process
@@ -40,11 +61,13 @@ class User::Configuration::UpdateDetails < BaseOperation
   end
 
   def details_params
-    if params[:user_id].present?
+
+    if params[:email].present?
       formatted_request = RequestFormatter::ApiParser::FmParser::V1::Users::Update.(user, params).formatted_request
-      formatted_request.require(:user).permit(:user_id, :first_name, :last_name, :mobile_number, :mothers_maiden_name,
-                                              :department_id, :active, :location_id, profile_attributes: [:gender, :date_of_birth,
-                                                                                                          :employee_id, :payroll_id, :address_1, :address_2, :city, :state_id, :pin_code])
+      formatted_request.require(:user).permit(:first_name, :last_name, :mobile_number, :mothers_maiden_name,
+                                              :department_id, :active, :location_id,
+                                              profile_attributes: [:gender, :date_of_birth, :employee_id,
+                                                :payroll_id, :address_1, :address_2, :city, :state_id, :pin_code])
     else
       params.require(:user).permit(:name, :mobile_number)
     end
