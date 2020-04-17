@@ -53,6 +53,7 @@ class UserProfile < ApplicationRecord
   validates :city, length: {maximum: 100}, allow_blank: true
   # validates :state_id, presence: true
   validates :pin_code, format: Constants::VALID_PIN_CODE, allow_blank: true
+  validates :pan, format: Constants::VALID_PAN, allow_blank: true
 
   def state_name
     State.name_from_id(self.state_id)
