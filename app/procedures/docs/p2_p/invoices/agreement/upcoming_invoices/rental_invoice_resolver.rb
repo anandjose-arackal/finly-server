@@ -1,4 +1,6 @@
-class Docs::P2P::Invoices::Agreement::UpcomingInvoices::RentalInvoiceResolver < Docs::P2P::Invoices::Resolver
+class Docs::P2P::Invoices::Agreement::UpcomingInvoices::RentalInvoiceResolver < Resolver::API
+
+  entity RentalInvoice
 
   def load(params)
     one_time_ri_invoices = user.company.rental_invoices.where(billing_type_id: BillingType.id_for(:one_time)).where("start_date <= ? AND end_date >= ? AND payment_agreement_upcoming_date <= ?", Date.today, Date.today, Date.today).where(is_payment_agreement_upcoming_invoice: true) rescue RentalInvoice.none
