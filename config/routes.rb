@@ -2815,13 +2815,18 @@ Rails.application.routes.draw do
     end
 
     namespace :v2 do
-      get 'maps/config/:type', to: 'google_maps#maps_config'
       get 'available_expense_types', to: 'expenses#available_expense_types'
       resources :expenses, only: [:index, :show, :create, :update, :destroy]
       resources :reports, only: [:create, :show, :update]
       resources :reports do
         post 'comment' => 'reports#comment', as: :comment
       end
+
+      get 'maps/config/:type', to: 'maps#maps_config'
+      get 'maps/auto_complete', to: 'maps#auto_complete'
+      get 'maps/places/:id/details', to: 'maps#details'
+      get 'maps/places/recent', to: 'maps#recent_places'
+      post 'maps/distance_matrix', to: 'maps#distance_matrix'
     end
   end
 
@@ -4220,6 +4225,12 @@ Rails.application.routes.draw do
   get 'index/:route', to: "index#show"
 
   resources :views, controller: 'index_view_segments', except: [:show]
+
+  get 'maps/auto_complete', to: 'maps#auto_complete'
+  get 'maps/places/:id/details', to: 'maps#details'
+  get 'maps/places/recent', to: 'maps#recent_places'
+  post 'maps/distance_matrix', to: 'maps#distance_matrix'
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
   # The priority is based upon order of creation: first created -> highest priority.
