@@ -50,7 +50,7 @@ class Docs::P2P::PurchaseRequests::Index < IndexBuilder::API
     counter.add nil, 'All', counts.values.reduce(0, :+)
 
     # :draft, :retracted
-    counter.add 90, 'Open', ((counts[PurchaseRequestStatus.id_for(:draft)] || 0) + (counts[PurchaseRequestStatus.id_for(:retracted)] || 0))
+    counter.add 90, 'Open', ((counts[PurchaseRequestStatus.id_for(:draft)].to_i) + (counts[PurchaseRequestStatus.id_for(:retracted)].to_i))
 
     # :awaiting_approval,
     if user.has_permission?(:purchase_request_reviewer)
@@ -63,11 +63,11 @@ class Docs::P2P::PurchaseRequests::Index < IndexBuilder::API
 
     # :approved, :auto_approved, :po_created, :partially_closed, :order_initiated
     counter.add 92, 'Approved', (
-    (counts[PurchaseRequestStatus.id_for(:approved)] || 0) +
-        (counts[PurchaseRequestStatus.id_for(:auto_approved)] || 0) +
-        (counts[PurchaseRequestStatus.id_for(:po_created)] || 0) +
-        (counts[PurchaseRequestStatus.id_for(:partially_closed)] || 0) +
-        (counts[PurchaseRequestStatus.id_for(:order_initiated)] || 0)
+    (counts[PurchaseRequestStatus.id_for(:approved)].to_i) +
+        (counts[PurchaseRequestStatus.id_for(:auto_approved)].to_i) +
+        (counts[PurchaseRequestStatus.id_for(:po_created)].to_i) +
+        (counts[PurchaseRequestStatus.id_for(:partially_closed)].to_i) +
+        (counts[PurchaseRequestStatus.id_for(:order_initiated)].to_i)
     )
 
     # :rejected, :closed, :cancelled,

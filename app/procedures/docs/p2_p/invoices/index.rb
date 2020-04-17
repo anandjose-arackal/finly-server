@@ -115,8 +115,8 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
 
     # Open - open/retracted
     counter.add 90, 'Open', (
-    (counts[InwardInvoiceStatus.id_for(:open)] || 0) +
-        (counts[InwardInvoiceStatus.id_for(:retracted)] || 0)
+    (counts[InwardInvoiceStatus.id_for(:open)].to_i) +
+        (counts[InwardInvoiceStatus.id_for(:retracted)].to_i)
     )
 
     # Awaiting Approval
@@ -130,11 +130,11 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
 
     # Pending Payment - approved/auto_approved/partially_paid/unpaid/initiated
     counter.add 92, 'Pending Payment', (
-    (counts[InwardInvoiceStatus.id_for(:approved)] || 0) +
-        (counts[InwardInvoiceStatus.id_for(:auto_approved)] || 0) +
-        (counts[InwardInvoiceStatus.id_for(:partially_paid)] || 0) +
-        (counts[InwardInvoiceStatus.id_for(:unpaid)] || 0) +
-        (counts[InwardInvoiceStatus.id_for(:initiated)] || 0)
+    (counts[InwardInvoiceStatus.id_for(:approved)].to_i) +
+        (counts[InwardInvoiceStatus.id_for(:auto_approved)].to_i) +
+        (counts[InwardInvoiceStatus.id_for(:partially_paid)].to_i) +
+        (counts[InwardInvoiceStatus.id_for(:unpaid)].to_i) +
+        (counts[InwardInvoiceStatus.id_for(:initiated)].to_i)
     )
 
     [:rejected, :paid, :closed, :voided, :pending].each do |status|

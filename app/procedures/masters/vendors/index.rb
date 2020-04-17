@@ -66,7 +66,7 @@ class Masters::Vendors::Index < IndexBuilder::API
     counts = collection.group(:status_id).count
     counter.add nil, "All", counts.values.reduce(0, :+)
     # draft retracted
-    counter.add 90, 'Open', ((counts[VendorStatus.id_for(:draft)] || 0) + (counts[VendorStatus.id_for(:retracted)] || 0))
+    counter.add 90, 'Open', ((counts[VendorStatus.id_for(:draft)].to_i) + (counts[VendorStatus.id_for(:retracted)].to_i))
 
     if user.has_permission?(:vendor_reviewer)
       counter.add 91, 'Awaiting Approval',
@@ -78,8 +78,8 @@ class Masters::Vendors::Index < IndexBuilder::API
 
     # approved auto_approved
     counter.add 92, 'Approved', (
-    (counts[VendorStatus.id_for(:approved)] || 0) +
-        (counts[VendorStatus.id_for(:auto_approved)] || 0)
+    (counts[VendorStatus.id_for(:approved)].to_i) +
+        (counts[VendorStatus.id_for(:auto_approved)].to_i)
     )
 
     # rejected, deactivated

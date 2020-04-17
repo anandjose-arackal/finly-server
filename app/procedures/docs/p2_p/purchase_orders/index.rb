@@ -92,7 +92,7 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
     counts = collection.group(:purchase_order_status_id).count
     counter.add nil, "All", counts.values.reduce(0, :+)
     # Open / Retracted
-    counter.add 90, 'Open', (counts[PurchaseOrderStatus.id_for(:open)] + counts[PurchaseOrderStatus.id_for(:retracted)])
+    counter.add 90, 'Open', (counts[PurchaseOrderStatus.id_for(:open).to_i] + counts[PurchaseOrderStatus.id_for(:retracted)].to_i)
 
     # Awaiting Approval
     if user.has_permission?(awaiting_approval_roles)

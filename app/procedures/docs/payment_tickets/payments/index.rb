@@ -369,17 +369,17 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
     # end
     #
     # counter.add 92, "Processing", (
-    # (counts[BankPaymentRequestStatus.id_for(:processing)] || 0) +
-    #     (counts[BankPaymentRequestStatus.id_for(:submitted)] || 0) +
-    #     (counts[BankPaymentRequestStatus.id_for(:unapprove)] || 0)
+    # (counts[BankPaymentRequestStatus.id_for(:processing)].to_i) +
+    #     (counts[BankPaymentRequestStatus.id_for(:submitted)].to_i) +
+    #     (counts[BankPaymentRequestStatus.id_for(:unapprove)].to_i)
     # )
     #
     # # Approved / Auto Approved
     # counter.add 93, 'Approved', (
-    # (counts[BankPaymentRequestStatus.id_for(:approved)] || 0) +
-    #     (counts[BankPaymentRequestStatus.id_for(:auto_approved)] || 0) +
-    #     (counts[BankPaymentRequestStatus.id_for(:creation_in_progress)] || 0) +
-    #     (counts[BankPaymentRequestStatus.id_for(:pending)] || 0)
+    # (counts[BankPaymentRequestStatus.id_for(:approved)].to_i) +
+    #     (counts[BankPaymentRequestStatus.id_for(:auto_approved)].to_i) +
+    #     (counts[BankPaymentRequestStatus.id_for(:creation_in_progress)].to_i) +
+    #     (counts[BankPaymentRequestStatus.id_for(:pending)].to_i)
     # )
     #
     # [:rejected, :credited].each do |status|

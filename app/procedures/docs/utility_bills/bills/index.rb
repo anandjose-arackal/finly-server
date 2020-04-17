@@ -112,8 +112,8 @@ class Docs::UtilityBills::Bills::Index < IndexBuilder::API
 
     # Open - open/retracted
     counter.add 90, 'Open', (
-        (counts[BbpsBillStatus.id_for(:open)] || 0) +
-        (counts[BbpsBillStatus.id_for(:retracted)] || 0)
+        (counts[BbpsBillStatus.id_for(:open)].to_i) +
+        (counts[BbpsBillStatus.id_for(:retracted)].to_i)
     )
 
     # Awaiting Approval
@@ -127,11 +127,11 @@ class Docs::UtilityBills::Bills::Index < IndexBuilder::API
 
     # Pending Payment - approved/auto_approved/partially_paid/unpaid/initiated
     counter.add 92, 'Pending Payment', (
-        (counts[BbpsBillStatus.id_for(:approved)] || 0) +
-        (counts[BbpsBillStatus.id_for(:auto_approved)] || 0) +
-        (counts[BbpsBillStatus.id_for(:payment_ticket_created)] || 0) +
-        (counts[BbpsBillStatus.id_for(:payment_initiated)] || 0) +
-        (counts[BbpsBillStatus.id_for(:payment_ticket_deleted)] || 0)
+        (counts[BbpsBillStatus.id_for(:approved)].to_i) +
+        (counts[BbpsBillStatus.id_for(:auto_approved)].to_i) +
+        (counts[BbpsBillStatus.id_for(:payment_ticket_created)].to_i) +
+        (counts[BbpsBillStatus.id_for(:payment_initiated)].to_i) +
+        (counts[BbpsBillStatus.id_for(:payment_ticket_deleted)].to_i)
     )
 
     [:rejected, :failed, :paid, :voided].each do |status|
