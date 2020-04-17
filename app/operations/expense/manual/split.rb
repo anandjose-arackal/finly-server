@@ -47,12 +47,27 @@ class Expense::Manual::Split < Expense::Manual::Base
     self.expenses_params&.each do |expense_params|
       expense = user.expenses.build(expense_params[:expense_params])
       unless expense.valid?
-        expense.errors.full_messages&.each do |error|
-          add_message :error, "Split #{expense_params[:index]}: #{error}"
+        expense.errors.messages&.each do |error_key, error|
+          message = expense.errors.full_messages_for(error_key.to_sym)
+          if ['date'].include?(error_key.to_s)
+            add_message :error, message
+          elsif ['spent_from_id'].include?(error_key.to_s)
+            add_message :error, "Please select a Spend Account to create an expense"
+          elsif 'manual_expense.merchant' == error_key.to_s
+            add_message :error, "Merchant can't be blank"
+          else
+            add_message :error, "Split #{expense_params[:index]}: #{message.first}"
+          end
         end
       end
+
+      if expense_params.dig(:expense_params, :amount_attributes, :value).to_f <= 0 || expense_params.dig(:expense_params, :amount_attributes, :value).eql?('undefined')
+        add_message :error, "Split #{expense_params[:index]}: Amount must be greater than 0"
+      end
+
       return if has_errors?
       # Create custom fields only for validations. Fields will be saved later
+
       custom_fields = expense_params[:custom_fields]
       if custom_fields.present?
         validate_custom_fields(expense, custom_fields, expense_params[:index])
@@ -113,8 +128,7 @@ class Expense::Manual::Split < Expense::Manual::Base
 
   def split_expense_params
     expenses_params = []
-    base_params = params.require(:expense).permit(:expense_type_id, :expense_status_id,
-                                                  :usage_date_start, :usage_date_end, :usage_date_type,
+    base_params = params.require(:expense).permit(:expense_type_id, :usage_date_start, :usage_date_end, :usage_date_type,
                                                   :report_id, :reimbursable, :date, :spent_from_id, :created_by_id,
                                                   :expense_tax_type_id, :gst_type_id, :gst_percentage, :tds_slab_id,
                                                   :state_of_expense_id, :hsn_sac, :merchant_bill_no, :tax_rate_id,

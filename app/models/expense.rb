@@ -40,6 +40,7 @@
 #  created_by_id          :integer
 #  modified_by_id         :integer
 #  deleted_at             :datetime
+#  gst_details_id         :integer
 #  gstin_location_id      :integer
 #  state_of_expense_id    :integer
 #  hsn_sac                :string(255)
@@ -51,6 +52,8 @@ class Expense < ApplicationRecord
   include SoftDeletable,
           FieldCustomizer::CustomizableValidation,
           MathUtil
+
+  event_channel 'expense'
 
   belongs_to :amount, optional: true
   belongs_to :expense_status, optional: true
@@ -535,6 +538,10 @@ class Expense < ApplicationRecord
     else
       return nil
     end
+  end
+
+  def company
+    self.user.company
   end
 
   # this method is to purely show the amount values for the carious expenses

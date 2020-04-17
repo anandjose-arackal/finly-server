@@ -35,7 +35,7 @@ class Settlement::SReport::Processing::Index < Settlement::SReport::Processing::
       self.report_processor_groups = params[:report_processor_groups]
       per_page = params[:per_page] || 30
       self.report_processor_groups = apply_scopes(self.report_processor_groups, params)
-      self.paginated_report_processor_groups = self.report_processor_groups&.include_for_show.paginate(page: params[:page], per_page: per_page)
+      self.paginated_report_processor_groups = self.report_processor_groups&.include_for_index.paginate(page: params[:page], per_page: per_page)
     end
 
     def actions_for(processor_group)

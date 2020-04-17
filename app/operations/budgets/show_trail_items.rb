@@ -57,7 +57,7 @@ class Budgets::ShowTrailItems < Budgets::Base
         self.paginated_entities = self.spent_entities[2].paginate(per_page: per_page, page: page)
       when 'invoice_items'
         self.paginated_entities = self.spent_entities[3].paginate(per_page: per_page, page: page)
-      end   
+      end
     end
   end
 

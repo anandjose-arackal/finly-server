@@ -2,23 +2,24 @@
 #
 # Table name: budget_groups
 #
-#  id                  :bigint           not null, primary key
-#  company_id          :integer
-#  created_by_user_id  :integer
-#  created_at          :datetime         not null
-#  updated_at          :datetime         not null
-#  period_id           :integer
-#  purchase_order      :boolean
-#  payment             :boolean
-#  expense             :boolean
-#  purchase_request    :boolean
-#  invoice             :boolean
-#  name                :string(255)
-#  start_date          :datetime
-#  end_date            :datetime
-#  deleted_at          :datetime
-#  budget_date_type_id :integer
-#  active              :boolean          default(TRUE)
+#  id                           :bigint           not null, primary key
+#  company_id                   :integer
+#  created_by_user_id           :integer
+#  created_at                   :datetime         not null
+#  updated_at                   :datetime         not null
+#  period_id                    :integer
+#  purchase_order               :boolean
+#  payment                      :boolean
+#  expense                      :boolean
+#  purchase_request             :boolean
+#  invoice                      :boolean
+#  name                         :string(255)
+#  start_date                   :datetime
+#  end_date                     :datetime
+#  deleted_at                   :datetime
+#  budget_date_type_id          :integer
+#  active                       :boolean          default(TRUE)
+#  calculated_before_tax_amount :boolean          default(FALSE)
 #
 
 class BudgetGroup < ApplicationRecord
@@ -37,7 +38,10 @@ class BudgetGroup < ApplicationRecord
 
   validate :check_for_valid_start_end_date
 
-  default_scope { order(created_at: :desc) }
+  before_save :set_start_and_end_date
+  after_save :deactivate_budgets_if_deactivated
+
+  default_scope {order(created_at: :desc)}
 
   scope :with_id, -> (ids) {where id: ids}
   scope :filter_ids, -> (id) {
@@ -93,20 +97,23 @@ class BudgetGroup < ApplicationRecord
 
   def as_json(options = {})
     {
-      id: id,
-      name: name,
-      created_by_user: created_by_user&.name,
-      created_at: created_at.strftime("%d-%b-%Y"),
-      period_id: period_id,
-      period: period&.name,
-      purchase_order: purchase_order,
-      invoice: invoice,
-      purchase_request: purchase_request,
-      payment: payment,
-      expense: expense,
-      start_date: self.start_date&.strftime("%d-%b-%Y"),
-      end_date: self.end_date&.strftime("%d-%b-%Y"),
-      total_budgets: self.budgets.count
+        id: id,
+        name: name,
+        created_by_user: created_by_user&.name,
+        created_at: created_at.strftime("%d-%b-%Y"),
+        period_id: period_id,
+        period: period&.name,
+        purchase_order: purchase_order,
+        invoice: invoice,
+        purchase_request: purchase_request,
+        payment: payment,
+        expense: expense,
+        calculated_before_tax_amount: calculated_before_tax_amount,
+        start_date: self.start_date&.strftime("%d-%b-%Y"),
+        end_date: self.end_date&.strftime("%d-%b-%Y"),
+        total_amount: self.budgets.joins(:budget_amount).sum(:value).to_s,
+        consumed_amount: self.budgets.joins(:spent_amount).sum(:value).to_s,
+        total_budgets: self.budgets.count
     }
   end
 
@@ -135,5 +142,17 @@ class BudgetGroup < ApplicationRecord
         errors.add(:period, "cannot be less than the difference between start and end dates")
       end
     end
+  end
+
+  def deactivate_budgets_if_deactivated
+    unless self.active
+      self.budgets.update(active: false)
+    end
+  end
+
+  def set_start_and_end_date
+    # setting start and end date appropriately to adjust for timezone
+    self.start_date = self.start_date&.end_of_day
+    self.end_date = self.end_date&.beginning_of_day
   end
 end

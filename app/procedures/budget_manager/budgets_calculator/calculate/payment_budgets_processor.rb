@@ -10,13 +10,22 @@ class BudgetManager::BudgetsCalculator::Calculate::PaymentBudgetsProcessor < Bud
     if payment.payment_purpose_id == PaymentPurpose.id_for(:advance_against_purchase_order)
       purchase_order_id = payment.parent_id
       invoice_id = nil
-    elsif payment.payment_purpose_id = PaymentPurpose.id_for(:vendor_payment)
+    elsif payment.payment_purpose_id == PaymentPurpose.id_for(:vendor_payment)
       purchase_order_id = nil
       invoice_id = (payment.parent_type == "Invoice" ? payment.parent_id : nil)
     else
       purchase_order_id = nil
       invoice_id = nil
     end
+
+    if payment.parent_type == "BeneficiaryPayment"
+      tds_value = payment.parent&.tds_amount&.value.to_f
+      paid_amount = payment.parent&.advance_amount&.value.to_f
+    else
+      tds_value = 0
+      paid_amount = 0
+    end
+
     self.trail_hash = {
         id: trail_id,
         entity: payment,
@@ -33,6 +42,9 @@ class BudgetManager::BudgetsCalculator::Calculate::PaymentBudgetsProcessor < Bud
         payment_purpose_id: payment.payment_purpose_id,
         purchase_order_id: purchase_order_id,
         invoice_id: invoice_id,
+        tds_value: tds_value,
+        paid_amount_after_tax_value: paid_amount,
+        effective_paid_amount_before_tax_value: paid_amount,
         amount_attributes: {
             id: trail&.amount&.id,
             value: payment.amount.value,
@@ -40,12 +52,12 @@ class BudgetManager::BudgetsCalculator::Calculate::PaymentBudgetsProcessor < Bud
         },
         amount_before_tax_attributes: {
             id: trail&.amount_before_tax&.id,
-            value: payment.amount_value,
+            value: payment.amount_before_tax,
             currency_id: payment.amount.currency_id
         },
         amount_after_tax_attributes: {
             id: trail&.amount_after_tax&.id,
-            value: payment.amount_value,
+            value: payment.amount_after_tax,
             currency_id: payment.amount.currency_id
         }
     }

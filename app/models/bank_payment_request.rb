@@ -67,6 +67,8 @@ class BankPaymentRequest < ApplicationRecord
   accepts_nested_attributes_for :payment_order
   accepts_nested_attributes_for :requested_amount
 
+  event_channel 'bank_payment_request'
+
   # i.e. a payment request cannot exist without a payment order
   validates :payment_order, presence: true
 
@@ -271,7 +273,7 @@ class BankPaymentRequest < ApplicationRecord
 
   scope :includes_details, -> do
     includes(:level, :status, :owner, :policy, {requested_amount: :currency}, payment_order: [{amount_requested: :currency}, payments: [:payment_status, :system_messages, :receiving_account, :initiating_user, {amount: :currency},
-                                                                                                                                        invoice:[:invoice_attachments,:category, {invoice_items:[:category,:tax_rate,{amount: :currency},{net_amount: :currency},{tax_amount: :currency},{discount_amount: :currency}]}, {original_amount: :currency},{amount: :currency},{advance_amount: :currency}, {freight_amount: :currency},{net_amount: :currency},{gross_amount: :currency},{discount_amount: :currency},{tds_amount: :currency},{tax_amount: :currency}]]])
+                                                                                                                                        invoice: [:invoice_attachments, :category, {invoice_items: [:category, :tax_rate, {amount: :currency}, {net_amount: :currency}, {tax_amount: :currency}, {discount_amount: :currency}]}, {original_amount: :currency}, {amount: :currency}, {advance_amount: :currency}, {freight_amount: :currency}, {net_amount: :currency}, {gross_amount: :currency}, {discount_amount: :currency}, {tds_amount: :currency}, {tax_amount: :currency}]]])
   end
 
   scope :include_attachments, -> {includes(payment_order: [:payment_order_attachments, payments: [invoice: [:invoice_attachments]]])}
@@ -696,4 +698,5 @@ class BankPaymentRequest < ApplicationRecord
       end
     end
   end
+
 end

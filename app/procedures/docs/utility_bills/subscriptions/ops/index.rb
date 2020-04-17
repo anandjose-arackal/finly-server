@@ -11,6 +11,8 @@ class Docs::UtilityBills::Subscriptions::Ops::Index < Transactions::API
   has_scope :filter_biller_type
   has_scope :filter_biller_id
   has_scope :filter_user_id
+  has_scope :filter_ids, type: :array
+  has_scope :filter_creation_date, using: [:from, :to]
 
 
   step Policy::Pundit( Docs::UtilityBills::Subscriptions::Authorizer, :index? )
@@ -37,7 +39,8 @@ class Docs::UtilityBills::Subscriptions::Ops::Index < Transactions::API
     per_page = params[:per_page] || 30
     subscriptions = apply_scopes(subscriptions, params)
     result = {
-        "subscriptions" => subscriptions.paginate(page: page, per_page: per_page).includes_for_index
+        "subscriptions" => subscriptions,
+        "paginated_subscriptions" => subscriptions.paginate(page: page, per_page: per_page).includes_for_index
     }
     options['result'] = result
   end

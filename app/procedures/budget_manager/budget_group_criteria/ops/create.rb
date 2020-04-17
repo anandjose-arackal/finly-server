@@ -25,6 +25,7 @@ class BudgetManager::BudgetGroupCriteria::Ops::Create < Transactions::API
     parent_criterium = current_user.company.budget_group_criteria.find_by(id: params&.dig("budget_group_criterion", "ancestry"))
 
     budget_criterium.ancestry = parent_criterium&.id
+    budget_criterium.budget_creation_in_progress = true
     true
   end
 

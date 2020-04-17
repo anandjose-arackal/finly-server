@@ -16,7 +16,7 @@ class PaymentFiles::Formats::CitiBank::Process < PaymentFiles::Formats::BaseForm
   end
 
   def process
-    headers = retrieve_citi_bank_headers
+    self.headers = retrieve_citi_bank_headers
     content = []
     self.payment_file_data.each do |payment|
       content << [
@@ -30,7 +30,7 @@ class PaymentFiles::Formats::CitiBank::Process < PaymentFiles::Formats::BaseForm
           ""
       ]
     end
-    self.response = Exporter.new(user, {spreadsheet: {headers: headers, contents: content}}, messages)
+    self.contents = content
   end
 
   def retrieve_citi_bank_headers
@@ -44,6 +44,10 @@ class PaymentFiles::Formats::CitiBank::Process < PaymentFiles::Formats::BaseForm
         "Branch Code",
         "Validation Status"
     ]
+  end
+
+  def success
+    generate_export_file
   end
 
 end

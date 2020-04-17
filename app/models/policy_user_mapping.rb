@@ -30,4 +30,12 @@ class PolicyUserMapping < ApplicationRecord
   validates :user_id, presence: true, uniqueness: {:scope => :policy_id}
   validates :policy_id, presence: true
 
+  after_create :activate_user
+
+  def activate_user
+    return if self.policy.default
+    return unless self.user.pending_activation
+    user.update_attributes(pending_activation: false)
+  end
+
 end

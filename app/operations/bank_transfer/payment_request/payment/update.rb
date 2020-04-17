@@ -156,12 +156,14 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
         end
       end
 
-      if self.payment.parent.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice)
-        if purchase_order.advance_tds_slab_id.present? && (self.payment_params.dig(:invoice_attributes, :tds_slab_id).to_i != self.payment.parent.tds_slab_id) && purchase_order.advance_amount_required
-          add_message :error, "TDS slab selected for invoice has to match with the TDS slab for PO advance  - #{purchase_order.advance_tds_slab&.name}"
-          return
-        end
-      end
+      # remove this check permanently, causing customer issue with their internal process of tds deduction 
+      #
+      # if self.payment.parent.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice)
+      #   if purchase_order.advance_tds_slab_id.present? && (self.payment_params.dig(:invoice_attributes, :tds_slab_id).to_i != self.payment.parent.tds_slab_id) && purchase_order.advance_amount_required
+      #     add_message :error, "TDS slab selected for invoice has to match with the TDS slab for PO advance  - #{purchase_order.advance_tds_slab&.name}"
+      #     return
+      #   end
+      # end
     end
   end
 
@@ -228,7 +230,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
                                     invoice_attributes: [:tax, :gst_type_id, :tds, :tds_type_id, :category_id, :cost_center_id, :tds_slab_id,
                                                          :tax_type_id, :discount, :date, :discount_type_id, :due_date, :roundoff_amount,
                                                          :invoice_number, :inclusive_of_taxes, :advance, :advance_type_id,
-                                                         # payment_notification_users: {},
+                                                         # payment_notification_users: [:cc_emails],
                                                          original_amount_attributes: [:value, :currency_id],
                                                          freight_amount_attributes: [:value, :currency_id],
                                                          advance_amount_attributes: [:value, :currency_id],
@@ -308,7 +310,8 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     bp_payment[:advance_amount_attributes] = self.payment_params[:invoice_attributes][:advance_amount_attributes]
     bp_payment[:roundoff_amount] = self.payment_params[:invoice_attributes][:roundoff_amount]
     bp_payment[:tax_rate_id] = params[:payment][:invoice_attributes][:tax_rate_id]
-    bp_payment[:payment_notification_users] = params.require(:payment).dig(:invoice_attributes, :payment_notification_users) rescue nil
+    params.require(:payment).permit!
+    bp_payment[:payment_notification_users] = params.require(:payment).dig(:invoice_attributes, :payment_notification_users).to_h rescue nil
     self.bp_params = bp_payment
 
   end

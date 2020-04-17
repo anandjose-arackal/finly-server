@@ -2,15 +2,16 @@
 #
 # Table name: budget_group_criteria
 #
-#  id                 :bigint           not null, primary key
-#  name               :string(255)
-#  budget_group_id    :integer
-#  ancestry           :string(255)
-#  created_at         :datetime         not null
-#  updated_at         :datetime         not null
-#  created_by_user_id :integer
-#  company_id         :integer
-#  deleted_at         :datetime
+#  id                          :bigint           not null, primary key
+#  name                        :string(255)
+#  budget_group_id             :integer
+#  ancestry                    :string(255)
+#  created_at                  :datetime         not null
+#  updated_at                  :datetime         not null
+#  created_by_user_id          :integer
+#  company_id                  :integer
+#  deleted_at                  :datetime
+#  budget_creation_in_progress :boolean          default(FALSE)
 #
 
 class BudgetGroupCriterium < ApplicationRecord
@@ -35,9 +36,11 @@ class BudgetGroupCriterium < ApplicationRecord
   has_many :budgets
 
   after_create :include_parent_criteria_mappings
-  after_create :create_related_budgets
+  # after_create :create_related_budgets
 
   validate :cannot_create_empty_budget_criteria
+
+  event_channel 'budget_group_criteria'
 
   accepts_nested_attributes_for :budget_group_criteria_mappings
 
@@ -147,8 +150,8 @@ class BudgetGroupCriterium < ApplicationRecord
         id: id,
         name: name,
         created_at: created_at.strftime("%d-%b-%Y"),
-        period_id: self.budget_group.period_id,
-        period: self.budget_group.period&.name,
+        period_id: self.budget_group&.period_id,
+        period: self.budget_group&.period&.name,
         total_budgets: self.budgets.count,
         budget_group_criteria_mappings: budget_group_criteria_mappings,
         budgetable_vendors: budgetable_vendors,
@@ -158,7 +161,9 @@ class BudgetGroupCriterium < ApplicationRecord
         budgetable_users: budgetable_users,
         budgetable_departments: budgetable_departments,
         sub_criteria: self.children,
-        budgets: budgets,
+        # budgets: budgets.select(:start_date, :end_date, :budget_amount, :spent_amount, :id, :name),
+        budgets: budgets.includes(:budget_consumption),
+        budget_creation_in_progress: budget_creation_in_progress,
         time_periods: time_periods
     }
   end
@@ -182,13 +187,14 @@ class BudgetGroupCriterium < ApplicationRecord
       end_date = BudgetManagerUtils.next_date(start_date, final_end_date, self.budget_group.period_id)
       break if end_date.blank?
       budget = self.budgets.build(
-                               start_date: start_date,
-                               end_date: end_date,
-                               name: "#{start_date.strftime("%d %B, %Y")} - #{end_date.strftime("%d %B, %Y")}",
-                               company_id: self.company_id,
-                               budget_group_id: self.budget_group.id,
-                               user_id: self.budget_group.created_by_user_id,
-                               budget_date_type_id: self.budget_group.budget_date_type_id,
+          start_date: start_date,
+          end_date: end_date,
+          name: "#{start_date.strftime("%d %B, %Y")} - #{end_date.strftime("%d %B, %Y")}",
+          company_id: self.company_id,
+          budget_group_id: self.budget_group.id,
+          user_id: self.budget_group.created_by_user_id,
+          budget_date_type_id: self.budget_group.budget_date_type_id,
+          calculated_before_tax_amount: self.budget_group.calculated_before_tax_amount,
                                budget_amount_attributes: {
                                    value: 0,
                                    currency_id: 1

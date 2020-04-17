@@ -32,6 +32,9 @@
 
 class Budget < ApplicationRecord
   include SoftDeletable, AncestrySupport
+  include EventProducer
+
+  event_channel 'budget'
 
   has_ancestry
   has_many :budget_children, class_name: 'Budget', foreign_key: 'ancestry'
@@ -61,7 +64,7 @@ class Budget < ApplicationRecord
   has_many :budget_modification_trails
   has_one :budget_consumption
 
-  accepts_nested_attributes_for :budget_amount
+  accepts_nested_attributes_for :budget_amount, :spent_amount
   accepts_nested_attributes_for :budget_criteria_mappings
 
   validates :name, presence: true
@@ -70,10 +73,12 @@ class Budget < ApplicationRecord
 
   after_create :set_budget_consumption
   after_create :reflect_budget_group_attributes
-  after_save :update_consumption_model
+  after_create :update_consumption_model
+
 
   after_update :recalculate_parent_budget
   after_update :reassign_parent_mappings
+  after_update :update_spent_amount_in_consumption_model
 
   scope :with_id, -> (ids) {where id: ids}
   scope :filter_ids, -> (id) {
@@ -209,7 +214,7 @@ class Budget < ApplicationRecord
   }
 
   scope :active, -> {
-    where active: true
+    joins(:budget_group).where('budget_groups.active IS ?', true).where('budgets.active IS ?', true)
   }
 
   # scope :filter_criteria, -> (criteria) {
@@ -246,71 +251,73 @@ class Budget < ApplicationRecord
              ])
   }
 
-  def as_json(options={})
+  def as_json(options = {})
     budget_criteria_id = budget_group_criterium&.id
     get_budget_criteria_as_json(budget_criteria_id)
   end
 
-  def get_budget_criteria_as_json(budget_criteria_id=nil)
-  {
-      id: id,
-      name: name,
-      active: active,
-      start_date: start_date&.strftime("%d-%b-%Y"),
-      end_date: end_date&.strftime("%d-%b-%Y"),
-      budget_amount: budget_consumption.budget_amount.as_json,
-      spent_amount: budget_consumption.total_consumed_amount.as_json,
-      budget_consumption: budget_consumption,
-      budget_group: budget_group,
-      # spent_amount: processor_instance.spent_amount,
-      criteria_name: budget_group_criterium&.name,
-      associated_vendors: budget_group_criterium&.budgetable_vendors&.collect {|vendor| {id:vendor.id, name: (vendor.name || vendor.business_name) }},
-      associated_categories: budget_group_criterium&.budgetable_categories.as_json,
-      associated_cost_centers: budget_group_criterium&.budgetable_cost_centers.as_json,
-      associated_locations: budget_group_criterium&.budgetable_locations.as_json,
-      associated_departments: budget_group_criterium&.budgetable_departments.as_json,
-      associated_users: budget_group_criterium&.budgetable_users&.collect {|vendor| {id:vendor.id, name:vendor.name}},
-      user: {
-        id: user.id,
-        mobile_number: user.mobile_number,
-        email: user.email
+  def get_budget_criteria_as_json(budget_criteria_id = nil)
+    {
+        id: id,
+        name: name,
+        active: active,
+        start_date: start_date&.strftime("%d-%b-%Y"),
+        end_date: end_date&.strftime("%d-%b-%Y"),
+        budget_amount: budget_consumption.budget_amount.as_json,
+        spent_amount: budget_consumption.total_consumed_amount.as_json,
+        budget_consumption: budget_consumption,
+        budget_group: budget_group,
+        calculated_before_tax_amount: calculated_before_tax_amount,
+        # spent_amount: processor_instance.spent_amount,
+        criteria_name: budget_group_criterium&.name,
+        associated_vendors: budget_group_criterium&.budgetable_vendors&.collect {|vendor| {id:vendor.id, name: (vendor.name || vendor.business_name) }},
+        associated_categories: budget_group_criterium&.budgetable_categories.as_json,
+        associated_cost_centers: budget_group_criterium&.budgetable_cost_centers.as_json,
+        associated_locations: budget_group_criterium&.budgetable_locations.as_json,
+        associated_departments: budget_group_criterium&.budgetable_departments.as_json,
+        associated_users: budget_group_criterium&.budgetable_users&.collect {|vendor| {id:vendor.id, name:vendor.name}},
+        user: {
+          id: user.id,
+          mobile_number: user.mobile_number,
+          email: user.email
 
-      },
-      criteria_id: budget_criteria_id,
-      sub_budgets: get_sub_budgets_as_json(budget_criteria_id),
-      sub_budgets_count: budget_group_criterium&.children&.map(&:budgets)&.flatten&.count
+        },
+        criteria_id: budget_criteria_id,
+        sub_budgets: get_sub_budgets_as_json(budget_criteria_id),
+        sub_budgets_count: budget_group_criterium&.children&.map(&:budgets)&.flatten&.count
     }
   end
 
-  def get_sub_budgets_as_json(budget_criteria_id=nil)
+  def get_sub_budgets_as_json(budget_criteria_id = nil)
     data = []
-    budget_group_criterium&.children.each{|child| child.budgets&.each{|budget| data << budget.get_budget_criteria_as_json(budget_criteria_id)}}
+    budget_group_criterium&.children.each {|child| child.budgets&.each {|budget| data << budget.get_budget_criteria_as_json(budget_criteria_id)}}
     data
   end
 
-  def budget_criteria_as_json(options={})
-    budget_criteria_id= budget_group_criterium&.id
+  def budget_criteria_as_json(options = {})
+    budget_criteria_id = budget_group_criterium&.id
     get_budget_criteria_as_json(budget_criteria_id)
   end
 
-  def timeline_criteria_as_json(options={})
+  def timeline_criteria_as_json(options = {})
     {
-      id: id,
-      name: name,
-      start_date: start_date&.strftime("%d-%b-%Y"),
-      end_date: end_date&.strftime("%d-%b-%Y"),
-      budget_amount: budget_amount.as_json,
-      budget_consumption: budget_consumption,
-      sub_budgets: children.map(&:timeline_criteria_as_json),
-      sub_budgets_count: children.size,
+        id: id,
+        name: name,
+        start_date: start_date&.strftime("%d-%b-%Y"),
+        end_date: end_date&.strftime("%d-%b-%Y"),
+        budget_amount: budget_amount.as_json,
+        budget_consumption: budget_consumption,
+        sub_budgets: children.map(&:timeline_criteria_as_json),
+        sub_budgets_count: children.size,
+        calculated_before_tax_amount: calculated_before_tax_amount,
     }
   end
 
   def only_name_as_json
     {
-      id: id,
-      name: name,
-      sub_budgets: children.map(&:only_name_as_json)
+        id: id,
+        name: name,
+        sub_budgets: children.map(&:only_name_as_json)
     }
   end
 
@@ -339,10 +346,28 @@ class Budget < ApplicationRecord
     true if (start_date <= date and end_date >= date)
   end
 
+  def generate_modification_trails(old_amount)
+    current_user = RequestStoreUtil.current_user
+    new_amount = self.budget_amount.value
+    if new_amount > old_amount
+      budget_modification_type_id = BudgetModificationAction.id_for(:add_amount)
+    elsif new_amount < old_amount
+      budget_modification_type_id = BudgetModificationAction.id_for(:reduce_amount)
+    else
+      budget_modification_type_id = nil
+    end
+    # creating the budget modification trail object
+    if budget_modification_type_id
+      self.budget_modification_trails.build(action_user_id: current_user.id,
+                                            action_id: budget_modification_type_id,
+                                            current_value: new_amount).save
+    end
+  end
+
   private
 
   def processor_instance
-   BudgetManager::BudgetsCalculator::Calculate::BudgetsProcessor.new(self)
+    BudgetManager::BudgetsCalculator::Calculate::BudgetsProcessor.new(self)
   end
 
   def recalculate_parent_budget
@@ -369,38 +394,38 @@ class Budget < ApplicationRecord
   # currently being done here because TBZ doesn't have very good callbacks
   def set_budget_consumption
     budget_consumption = self.build_budget_consumption(
-            budget_amount_attributes: {
-                value: self.budget_amount.value,
-                currency: Currency.first
-            },
-            pending_amount_attributes: {
-                value: 0,
-                currency: Currency.first
-            },
-            committed_amount_attributes: {
-                value: 0,
-                currency: Currency.first
-            },
-            pending_payment_amount_attributes: {
-                value: 0,
-                currency: Currency.first
-            },
-            payment_processing_amount_attributes: {
-                value: 0,
-                currency: Currency.first
-            },
-            paid_amount_attributes: {
-                value: 0,
-                currency: Currency.first
-            },
-            remaining_amount_attributes: {
-                value: self.budget_amount.value,
-                currency: Currency.first
-            },
-            total_consumed_amount_attributes: {
-                value: 0,
-                currency: Currency.first
-            }
+        budget_amount_attributes: {
+            value: self.budget_amount.value,
+            currency: Currency.first
+        },
+        pending_amount_attributes: {
+            value: 0,
+            currency: Currency.first
+        },
+        committed_amount_attributes: {
+            value: 0,
+            currency: Currency.first
+        },
+        pending_payment_amount_attributes: {
+            value: 0,
+            currency: Currency.first
+        },
+        payment_processing_amount_attributes: {
+            value: 0,
+            currency: Currency.first
+        },
+        paid_amount_attributes: {
+            value: 0,
+            currency: Currency.first
+        },
+        remaining_amount_attributes: {
+            value: self.budget_amount.value,
+            currency: Currency.first
+        },
+        total_consumed_amount_attributes: {
+            value: 0,
+            currency: Currency.first
+        }
     )
     budget_consumption.save
   end
@@ -417,6 +442,13 @@ class Budget < ApplicationRecord
         expense: self.budget_group.expense,
         payment: self.budget_group.payment
     )
+  end
+
+  def update_spent_amount_in_consumption_model
+    # updating the budget amount and the reamining amount in this model
+    self.budget_consumption.budget_amount.update(value: self.budget_amount&.value)
+    remaining_amount = self.budget_consumption.budget_amount.value - self.budget_consumption.total_consumed_amount&.value.to_f
+    self.budget_consumption.remaining_amount.update(value: remaining_amount)
   end
 
 end

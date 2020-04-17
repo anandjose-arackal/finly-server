@@ -20,8 +20,13 @@ class Docs::UtilityBills::Bills::Ops::Index < Transactions::API
   has_scope :filter_due_date, using: [:from, :to], type: :hash
   has_scope :filter_paid_on_date, using: [:from, :to], type: :hash
   has_scope :filter_amount, using: [:gteq, :lteq], type: :hash
+  has_scope :filter_creation_date, using: [:from, :to]
 
   has_scope :filter_payable_bills
+  has_scope :filter_ids, type: :array
+  has_scope :filter_user_id
+  has_scope :filter_poc_awaiting_action
+  has_scope :filter_overdue
 
 
   step Policy::Pundit(Docs::UtilityBills::Bills::Authorizer, :index?)
@@ -42,7 +47,8 @@ class Docs::UtilityBills::Bills::Ops::Index < Transactions::API
 
     bbps_bills = apply_scopes(bbps_bills, params)
     result = {
-        "bills" => bbps_bills.paginate(page: page, per_page: per_page).includes_for_index
+        "bills" => bbps_bills,
+        "paginated_bills" => bbps_bills.paginate(page: page, per_page: per_page).includes_for_index
     }
 
     options['result'] = result

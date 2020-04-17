@@ -1,7 +1,7 @@
 class BankTransferProcess < ApplicationJob
 
   def perform
-    scheduled_payment_orders = PaymentOrder.with_receiving_account_type("BankAccount").scheduled_on_or_before(Date.tomorrow)
+    scheduled_payment_orders = PaymentOrder.with_receiving_account_type(["BankAccount", "BbpsBiller"]).scheduled_on_or_before(Date.tomorrow)
     scheduled_payment_orders.each do |order|
       crediting_payment_ids = order.payments.scheduled.pluck(:id)
       crediting_payments = order.payments.where(id: crediting_payment_ids)

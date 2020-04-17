@@ -40,10 +40,8 @@ class Expense::ExDistance::Odometer::ExCreate < Expense::ExDistance::Create
     end
     if self.params&.dig(:expense, :distance_expense_attributes, :odometer_reading_start).present? and
         self.params&.dig(:expense, :distance_expense_attributes, :odometer_reading_end).present?
-      start_val = self.params&.dig(:expense, :distance_expense_attributes, :odometer_reading_start)
-      start_val = start_val&.to_f
-      end_val = self.params&.dig(:expense, :distance_expense_attributes, :odometer_reading_end)
-      end_val = end_val&.to_f
+      start_val = self.params&.dig(:expense, :distance_expense_attributes, :odometer_reading_start).to_f
+      end_val = self.params&.dig(:expense, :distance_expense_attributes, :odometer_reading_end).to_f
       self.params[:expense][:distance_expense_attributes][:distance_attributes] = {
           value: (end_val - start_val),
           physical_unit_id: PhysicalUnit.kilometre_id
@@ -64,18 +62,27 @@ class Expense::ExDistance::Odometer::ExCreate < Expense::ExDistance::Create
   end
 
   def validate
+    start_reading = params&.dig(:expense, :distance_expense_attributes, :odometer_reading_start)
+    end_reading = params&.dig(:expense, :distance_expense_attributes, :odometer_reading_end)
+
+
+    if start_reading.blank? || end_reading.blank?
+      add_message :error, 'Start Reading can\'t be blank' if start_reading.blank?
+      add_message :error, 'End Reading can\'t be blank' if end_reading.blank?
+      return
+    end
+    if start_reading >= end_reading
+      add_message :error, 'Start Reading can\'t be greater than End Reading'
+      return
+    end
+
     super
     return if has_errors?
+
     receipt_start_id = params&.dig(:expense, :distance_expense_attributes, :odometer_reading_receipt_start_id)
     receipt_end_id = params&.dig(:expense, :distance_expense_attributes, :odometer_reading_receipt_end_id)
-    if receipt_start_id.present? and self.receipt_start.blank?
-      add_message :error, 'Start Reading receipt not found'
-      return
-    end
-    if receipt_end_id.present? and self.receipt_end.blank?
-      add_message :error, 'End Reading receipt not found'
-      return
-    end
+    return add_message :error, 'Start Reading receipt not found' if receipt_start_id.present? and self.receipt_start.blank?
+    return add_message :error, 'End Reading receipt not found' if receipt_end_id.present? and self.receipt_end.blank?
   end
 
   def process
@@ -91,7 +98,7 @@ class Expense::ExDistance::Odometer::ExCreate < Expense::ExDistance::Create
 
   def distance_expense_params
     params.require(:expense).permit(:note, :category_id, :date,
-                                    :expense_type_id, :expense_status_id,
+                                    :expense_type_id,
                                     :report_id, :reimbursable, :spent_from_id, :created_by_id,
                                     distance_expense_attributes: [:type_id, :odometer_reading_start, :odometer_reading_end,
                                                                   :odometer_reading_receipt_start_id, :odometer_reading_receipt_end_id,

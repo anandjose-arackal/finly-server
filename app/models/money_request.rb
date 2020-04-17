@@ -172,10 +172,11 @@ class MoneyRequest < ApplicationRecord
       date_from = "1990-01-01" if date_from.blank?
       date_to = "2100-01-01" if date_to.blank?
       date_from = date_from.to_date if date_from.present?
-      date_to = date_to.to_date + 1 if date_to.present?
+      # date_to = date_to.to_date + 1 if date_to.present?
+      date_to = date_to.to_date if date_to.present?
       # date_to = DateUtils.local_date if date_to.blank?
       money_requests = arel_table
-      where(money_requests[:approved_at].gteq(date_from).and(money_requests[:approved_at].lteq(date_to)))
+      where(money_requests[:approved_at].gteq(date_from.beginning_of_day).and(money_requests[:approved_at].lteq(date_to.end_of_day)))
     end
   end
 
@@ -379,6 +380,16 @@ class MoneyRequest < ApplicationRecord
         errors.add(:cash, "money requests cannot be created without a destination account")
       end
     end
+  end
+
+  def utr
+    return self.bank_reference_number if self.bank_reference_number.present?
+    (self.money_request_processor_mapping&.bank_reference_number.present?) ? self.money_request_processor_mapping&.bank_reference_number : self.money_request_processor_mapping&.payment&.utr
+  end
+
+  def source_account
+    mrpm = self.money_request_processor_mapping&.processor
+    mrpm&.payment_type == 'bank_transfer' ? 'Bank Transfer' : super
   end
 
   private

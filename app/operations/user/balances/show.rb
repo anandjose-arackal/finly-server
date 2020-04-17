@@ -44,6 +44,9 @@ class User::Balances::Show < User::Base
             set_yes_bank_balances
           end
         end
+        if selected_user.company.utility_bills_enabled? && selected_user.vendor_payments_enabled?
+          set_utility_account_balances
+        end
         # showing user pocket balances based on whether they have expense management enabled
         if selected_user.company.expense_management_enabled? && selected_user.expense_management_enabled?
           set_pocket_balances
@@ -56,6 +59,9 @@ class User::Balances::Show < User::Base
             set_icici_bank_balances
           else
             set_yes_bank_balances
+          end
+          if selected_user.company.utility_bills_enabled? && selected_user.vendor_payments_enabled?
+            set_utility_account_balances
           end
         end
       when 'ft'
@@ -115,6 +121,8 @@ class User::Balances::Show < User::Base
         return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(account)
       when 'IciciBankCompanyAccount'
         return AccountManager::IciciBankAccount::IciciBankCompanyAccountAdapter.new(account)
+      when 'UtilityBillsAccount'
+        return AccountManager::BillingAccount::UtilityBillsAccountAdapter.new(account)
       when 'CashOnHand'
         return AccountManager::CashOnHand::CashOnHandAdapter.new(account)
       when 'ItzCashCompanyAccount'
@@ -154,6 +162,7 @@ class User::Balances::Show < User::Base
     end
     wallet_adapter = retrieve_adapter user.wallet
     bank_wallet_adapter = retrieve_adapter user.bank_wallet
+    utility_account_adapter = retrieve_adapter self.company.utility_bills_account
 
     self.card_info = {}
     selected_user.cards.each do |card|
@@ -174,6 +183,9 @@ class User::Balances::Show < User::Base
         },
         itz_cash: {
             balance: comp_balance
+        },
+        utility_bills_account: {
+            balance: utility_account_adapter.balance
         }
     }
     self.wallet_info = {
@@ -244,6 +256,17 @@ class User::Balances::Show < User::Base
         type: "bank",
         balance: self.wallet_info[:yes_bank][:balance]
     }
+  end
+
+  def set_utility_account_balances
+    if selected_user.vendor_payments_admin? || selected_user.is_bank_payment_request_creditor?
+      self.balances[:company_credits] = [] if self.balances[:company_credits].blank?
+      self.balances[:company_credits] << {
+          name: "Utility Account Credits",
+          type: "bank",
+          balance: self.company_credits_info[:utility_bills_account][:balance]
+      }
+    end
   end
 
   def set_collect_balances
