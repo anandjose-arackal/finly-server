@@ -2,6 +2,7 @@ class Masters::Items::Index < IndexBuilder::API
 
   resolver 'items.default'
   reference '{{record.id}}'
+  custom_fields :item
 
   # Fixed column is always default true
   column :description, fixed: true, sort: :description do

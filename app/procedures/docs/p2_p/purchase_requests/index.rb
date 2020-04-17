@@ -2,6 +2,7 @@ class Docs::P2P::PurchaseRequests::Index < IndexBuilder::API
 
   resolver 'purchase_requests.default'
   reference '{{record.id}}'
+  custom_fields :purchase_request
 
   # Fixed column is always default true
   column :request, label: 'Name', fixed: true do

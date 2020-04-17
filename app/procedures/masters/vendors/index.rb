@@ -2,6 +2,7 @@ class Masters::Vendors::Index < IndexBuilder::API
 
   resolver 'vendors.default'
   reference '{{record.id}}'
+  custom_fields :yes_bank_vendor
 
   # Fixed column is always default true
   column :vendor, label: 'Name', fixed: true, sort: :business_name do

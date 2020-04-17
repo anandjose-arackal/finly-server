@@ -3,6 +3,7 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
 
   resolver 'purchase_orders.default'
   reference '{{record.id}}', procurement_id: '{{record.procurement_id}}', procurement_type: 'po'
+  custom_fields :purchase_order
 
   # Fixed column is always default true
   column :vendor, label: 'Vendor Details', fixed: true, sort: :vendor_business_name, includes: [:vendor] do
