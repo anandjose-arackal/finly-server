@@ -40,7 +40,7 @@ class Resolver::API
   alias_method :scope, :entity
 
   def load(params)
-    entity.all
+    # entity.all
   end
 
   # *q* is for queries
