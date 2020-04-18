@@ -12,7 +12,7 @@ class Menu::Masters::Procurement < Menu::API
     item :new_non_po_invoice, path: 'invoices/new', permissions: [:non_po_invoice_initiator]
     item :new_payment_ticket, path: 'payment_tickets/new', permissions: [:bank_payment_request_initiator]
     item :new_agreement, path: 'agreements/new', permissions: [:agreement_invoice_initiator]
-    item :new_vendor, path: 'agreements/new', permissions: [:vendor_creator, :vendor_manager]
+    item :new_vendor, path: 'vendors/new', permissions: [:vendor_creator, :vendor_manager]
   end
 
   item :dashboard, icon: 'https://img.icons8.com/windows/20/ffffff/speed.png'
