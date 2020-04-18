@@ -151,11 +151,11 @@ class ExportManager::Master::PaymentTickets::Index < ExportManager::Builders::Sp
   end
 
   def awaiting_action_from (payment)
-    payment&.payment_order.bank_payment_request.get_reviewers&.map(&:name)&.join(", ")
+    payment&.payment_order&.bank_payment_request&.get_reviewers&.map(&:name)&.join(", ")
   end
 
   def policy (payment)
-    payment&.payment_order.bank_payment_request.policy&.name
+    payment&.payment_order&.bank_payment_request&.policy&.name
   end
 
   def po_number (payment)
@@ -226,9 +226,9 @@ class ExportManager::Master::PaymentTickets::Index < ExportManager::Builders::Sp
     if payment_type.eql?('PurchaseOrder')
       0.to_f
     elsif 'BeneficiaryPayment'.eql?(payment_type)
-      payment&.invoice.gst_type_id == GstType.id_for(:cgst_sgst) ? precision_value(payment&.parent&.tax_amount&.value.to_f) : 0.to_f
+      payment&.invoice&.gst_type_id == GstType.id_for(:cgst_sgst) ? precision_value(payment&.parent&.tax_amount&.value.to_f) : 0.to_f
     elsif  'Invoice'.eql?(payment_type)
-      payment&.parent.gst_type_id == GstType.id_for(:cgst_sgst) ? precision_value(payment&.parent&.tax_amount&.value.to_f) : 0.to_f
+      payment&.parent&.gst_type_id == GstType.id_for(:cgst_sgst) ? precision_value(payment&.parent&.tax_amount&.value.to_f) : 0.to_f
     else
       0.to_f
     #   payment&.invoice&.tax.to_f
@@ -240,9 +240,9 @@ class ExportManager::Master::PaymentTickets::Index < ExportManager::Builders::Sp
     if payment_type.eql?('PurchaseOrder')
       0.to_f
     elsif 'BeneficiaryPayment'.eql?(payment_type)
-      payment&.invoice.gst_type_id == GstType.id_for(:igst_amount) ? precision_value(payment&.parent&.tax_amount&.value.to_f) : 0.to_f
+      payment&.invoice&.gst_type_id == GstType.id_for(:igst_amount) ? precision_value(payment&.parent&.tax_amount&.value.to_f) : 0.to_f
     elsif  'Invoice'.eql?(payment_type)
-      payment&.parent.gst_type_id == GstType.id_for(:igst_amount) ? precision_value(payment&.parent&.tax_amount&.value.to_f) : 0.to_f
+      payment&.parent&.gst_type_id == GstType.id_for(:igst_amount) ? precision_value(payment&.parent&.tax_amount&.value.to_f) : 0.to_f
     else
       payment&.invoice&.tax.to_f
     end
@@ -288,7 +288,7 @@ class ExportManager::Master::PaymentTickets::Index < ExportManager::Builders::Sp
     if payment.invoice.present?
       invoice = payment.invoice
       if invoice&.invoice_items.present?
-        original_amount = (invoice.amount&.value.to_f)
+        original_amount = (invoice&.amount&.value.to_f)
       else
         original_amount = (invoice&.original_amount&.value.to_f)
       end
@@ -301,7 +301,7 @@ class ExportManager::Master::PaymentTickets::Index < ExportManager::Builders::Sp
   def tds_amount(payment)
     tds_amount = 0.0
     if payment.parent_type == 'PurchaseOrder'
-      tds_amount = (payment.parent.advance_tds_amount&.value.to_f)
+      tds_amount = (payment.parent&.advance_tds_amount&.value.to_f)
     else
       tds_amount = (payment.invoice&.tds_amount&.value.to_f)
     end
