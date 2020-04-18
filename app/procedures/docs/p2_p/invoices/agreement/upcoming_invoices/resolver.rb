@@ -1,6 +1,6 @@
 class Docs::P2P::Invoices::Agreement::UpcomingInvoices::Resolver < Resolver::API
 
-  # As this supports general and rental invoices, not assigning the entity
+  # Not assigning the entity as this supports general and rental invoices
   # entity GeneralInvoice
 
   def load(params)
