@@ -56,24 +56,54 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     text value: :po_number
   end
 
-  column :net_amount, default: true, includes: [net_amount: :currency] do
-    amount value: :net_amount
+  # Todo: Data issue in invoice model. Gross amount is dynamically being calculated instead of pre-computation
+  # column :gross_amount, sort: :gross_amount_value, includes: [gross_amount: :currency] do
+  #   amount value: :gross_amount
+  # end
+
+  column :discount_amount, sort: :discount_amount_value, includes: [discount_amount: :currency] do
+    amount value: :discount_amount
   end
 
-  column :gross_amount, default: true, includes: [gross_amount: :currency] do
-    amount value: :gross_amount
+  column :cgst_amount, label: 'CGST', sort: :tax_amount_value, includes: [tax_amount: :currency] do
+    amount value: :cgst_amount
   end
 
-  column :balance_due, default: true, includes: [balance_due: :currency] do
-    amount value: :balance_due
+  column :sgst_amount, label: 'SGST', includes: [tax_amount: :currency]  do
+    amount value: :sgst_amount
   end
 
-  column :tds_amount, default: true, includes: [tds_amount: :currency] do
+  column :igst, label: 'IGST', includes: [tax_amount: :currency]  do
+    amount value: :igst_amount
+  end
+
+  column :tds_slab, includes: [:tds_slab]  do
+    text value: "{{record.tds_slab.name}}"
+  end
+
+  column :tds_rate, includes: [:tds_slab]  do
+    text value: :tds_rate
+  end
+
+  column :tds_amount, includes: [tds_amount: :currency]  do
     amount value: :tds_amount
   end
 
-  column :tds_slab, default: true, includes: [:tds_slab] do
-    text value: "{{record.tds_slab.name}}"
+  column :freight_amount, includes: [freight_amount: :currency]  do
+    amount value: :freight_amount
+  end
+
+  column :net_amount, includes: [net_amount: :currency]  do
+    amount value: :net_amount
+  end
+
+  # Todo: Data issue in invoice model. Gross amount is dynamically being calculated instead of pre-computation
+  # column :advance_amount, includes: [advance_amount: :currency]  do
+  #   amount value: :advance_amount
+  # end
+
+  column :balance_due, includes: [balance_due: :currency]  do
+    amount value: :balance_due
   end
 
   column :cost_center, default: true, includes: [:cost_center] do

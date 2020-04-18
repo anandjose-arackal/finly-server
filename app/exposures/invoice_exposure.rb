@@ -18,11 +18,6 @@ class InvoiceExposure < Exposures::API
 
     days
   end
-  attribute :controlling_user, exposure: true, includes: [:controlling_user] do
-    next if record.controlling_level_id.blank?
-
-    record.controlling_user
-  end
   attribute :controlling_level, record_attribute: true, exposure: true, includes: [:controlling_level]
   attribute :approved_at, record_attribute: true
   attribute :cost_center, record_attribute: true, exposure: true, includes: [:cost_center]
@@ -61,6 +56,8 @@ class InvoiceExposure < Exposures::API
       (record.tax_amount&.value || 0)/2
     when GstType.id_for(:igst)
       0
+    else
+      0
     end
   end
   attribute :sgst_amount do
@@ -84,6 +81,7 @@ class InvoiceExposure < Exposures::API
     record.freight_amount&.value || 0
   end
   attribute :tds_slab, record_attribute: true, exposure: true, includes: [:tds_slab]
+  attribute :tds_rate, record_attribute: true
   attribute :tds_amount, exposure: true, record_attribute: true, includes: [:tds_amount]
   attribute :tds_amount_value, includes: [:tds_amount] do
     record.tds_amount&.value || 0

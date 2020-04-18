@@ -82,4 +82,8 @@ Resolver::Router.draw do
   scope :payments do
     route 'default', Docs::PaymentTickets::Payments::Resolver
   end
+
+  scope :upcoming_invoices do
+    route 'default', Docs::P2P::Invoices::Agreement::UpcomingInvoices::Resolver
+  end
 end
