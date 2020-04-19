@@ -10,7 +10,7 @@ class Docs::P2P::Invoices::Agreement::UpcomingInvoices::Resolver < Resolver::API
     when 'rental'
       load_rental_invoices params
     else
-      load_rental_invoices params
+      load_rengtal_invoices params
     end
   end
 
