@@ -34,7 +34,7 @@ class ActionManager::Validate < Transactions::API
   end
 
   def authorize_action(context, action:, params:, current_user:, **)
-    unless current_user.has_permission?(action.permissions)
+    unless action.permitted?(current_user)
       return on_error context, :base, "Unauthorized!"
     end
 
@@ -48,8 +48,7 @@ class ActionManager::Validate < Transactions::API
     records = action.model.where(company_id: current_user.company_id, id: params[:record_id])
     context[:records] = {processable: [], unprocessable: []}
     records.each do |record|
-      policy = action.policy.new(current_user, record)
-      if policy.send(action.authorize)
+      if action.authorized?(current_user, record)
         context[:records][:processable] << record.id
       else
         context[:records][:unprocessable] << record.id

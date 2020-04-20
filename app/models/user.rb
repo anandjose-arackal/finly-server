@@ -1022,8 +1022,30 @@ class User < ApplicationRecord
     UserRole.where(id: role_ids)
   end
 
+  def has_application_role?(role_id, application)
+    role_id = [role_id] unless role_id.respond_to?(:each)
+
+    purpose_id = nil
+    case application.to_s
+    when 'em', 'expense_management', Purpose.id_for(:expense_management).to_s
+      purpose_id = Purpose.id_for(:expense_management)
+    when 'vp', 'vendor_payments', Purpose.id_for(:vendor_payments).to_s
+      purpose_id = Purpose.id_for(:vendor_payments)
+    else
+      return false
+    end
+
+    role_mapping.each do |mapping|
+      next unless mapping.purpose_id == purpose_id
+      next unless role_id.include?(mapping.user_role_id)
+
+      return true
+    end
+    false
+  end
+
   def company_admin?
-    role_mapping.expense_management.admin.present?
+    has_application_role?(UserRole.id_for(:admin), :em)
   end
 
   # If policy is passed checks if the user is the admin of the given policy
@@ -1098,7 +1120,7 @@ class User < ApplicationRecord
   alias_method :vendor_payments_creditor?, :vendor_payment_finance?
 
   def vendor_payment_admin?
-    self.role_mapping.vendor_payments.admin.present?
+    has_application_role?(UserRole.id_for(:admin), :vp)
   end
 
   alias_method :vendor_payments_admin?, :vendor_payment_admin?
@@ -1461,8 +1483,19 @@ class User < ApplicationRecord
     RequestStore.store[:current_user]
   end
 
+  # has_roles method is defined to support including policy_user_roles in users to prevent N+1 query problem
   def has_roles?(role_id)
-    policy_user_roles.where(user_id: self.id, user_role_id: role_id).count > 0
+    role_id = [role_id] unless role_id.respond_to?(:each)
+    role_id = UserRole.ids_for(role_id) unless role_id.first.is_a?(Integer)
+    policy_user_roles.each do |role|
+      next unless role.user_id == self.id
+      next unless role_id.include?(role.user_role_id)
+
+      return true
+    end
+
+    false
+    # policy_user_roles.where(user_id: self.id, user_role_id: role_id).count > 0
   end
 
   def has_policy_role?(role_id, document = nil)

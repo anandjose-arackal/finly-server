@@ -1,5 +1,6 @@
 class IndexBuilder::API::Column
   include IndexBuilder::ContentTypes::Registry
+  include ActionManager::DSL
 
   attr_accessor :column_key, :label, :default, :sort, :includes, :fixed, :block
 
@@ -36,6 +37,11 @@ class IndexBuilder::API::Column
     values = []
     fields.each do |field|
       values << field.build(context, user, record, record_exposure)
+    end
+    actions.each do |id, action|
+      next unless action.authorized?(user, record)
+
+      values << {content_type: 'action'}.merge(action.build(current_user: user, params: {}))
     end
     values
   end
@@ -86,7 +92,7 @@ class IndexBuilder::API::Column
         columns[column_key] = column
       end
 
-      def custom_fields(type=nil, path: nil, includes: [:custom_fields])
+      def custom_fields(type = nil, path: nil, includes: [:custom_fields])
         if type.present?
           path ||= lambda do |record|
             record.custom_fields

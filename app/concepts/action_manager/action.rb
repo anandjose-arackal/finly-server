@@ -91,6 +91,23 @@ class ActionManager::Action
     @registry
   end
 
+  def permitted?(user)
+    return false unless user.has_permission?(permissions)
+
+    true
+  end
+
+  def authorized?(user, record)
+    return false unless permitted?(user)
+    return true unless authorize.present?
+    raise "Policy has not been defined for the action #{self.id}" unless policy.present?
+
+    policy = action.policy.new(user, record)
+    return true if policy.send(action.authorize)
+
+    false
+  end
+
   # def actions
   #   @actions ||= {}
   # end

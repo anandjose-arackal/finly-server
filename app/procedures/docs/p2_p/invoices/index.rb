@@ -138,6 +138,14 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     text value: "{{record.policy.name}}"
   end
 
+  # column :action, default: true do
+  #   action :redirect,
+  #          :invoice_approve,
+  #          # permissions: :admin,
+  #          label: 'Approve Invoice',
+  #          url: 'purchase_request'
+  # end
+
   counter -> (user, collection) do
     # Use custom scope to support awaiting approval status
     counter = IndexBuilder::Counter.new :with_status_id

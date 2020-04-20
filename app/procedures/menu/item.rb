@@ -101,8 +101,10 @@ class Menu::Item
     # Rejecting nil items as it would indicate that the tab should not be shown
     if items.present?
       json[:items] = items.as_json(options).reject { |item| item.nil? }
+      json[:items] = json[:items]&.map {|item| {item_type: 'menu'}.merge(item)}
     elsif actions.present?
-      json[:items] = actions.values.as_json(options).reject { |item| item.nil? } if actions.present?
+      json[:items] = actions.values.as_json(options).reject { |item| item.nil? }
+      json[:items] = json[:items]&.map {|item| {item_type: 'action'}.merge(item)}
     end
     json
   end

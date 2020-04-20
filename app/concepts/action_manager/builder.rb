@@ -4,7 +4,7 @@ module ActionManager::Builder
   def build(options)
     user = options[:current_user]
     params = options[:params]
-    return unless user&.has_permission?(permissions)
+    return unless permitted?(user)
 
     map = {
         path: self.path,
