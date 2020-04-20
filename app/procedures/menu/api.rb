@@ -35,7 +35,7 @@ class Menu::API < Transactions::API
   def self.item(key, path: nil, icon: nil, label: nil, permissions: [], features: [], &block)
     items << Menu::Item.new(
         key: key, path: path, icon: icon, label: label,
-        permissions: permissions, features: features, scopes: scopes,
+        permissions: permissions, features: features, scopes: scopes, action_registry: self,
         &block
     )
   end

@@ -9,7 +9,7 @@ module ActionManager::DSL
     def action(type, id, config={}, &block)
       raise "Invalid action #{type}" unless ActionManager::Type[type].present?
 
-      actions[id] = ActionManager::Type[type].new(type, id, config: config, scopes: action_scopes, registry: registry, &block)
+      actions[id] = ActionManager::Type[type].new(type, id, config: config, scopes: action_scopes, registry: action_registry, &block)
     end
 
     def action_scopes
@@ -27,11 +27,11 @@ module ActionManager::DSL
       @paths ||= {}.with_indifferent_access
     end
 
-    def register_path(path, action)
+    def register_action(path, action)
       action_paths[path] = action
     end
 
-    def registry
+    def action_registry
       self
     end
   # end

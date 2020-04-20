@@ -44,7 +44,7 @@ class ActionManager::Action
 
     # If a registry is provider, it registers itself as an action. This registration can be used for validation etc
     # Not mandating it help decouple the action to be used independently
-    self.registry&.register_path(path, self)
+    self.registry&.register_action(path, self)
 
     scopes.each do |conf|
       conf.each_pair do |key, value|

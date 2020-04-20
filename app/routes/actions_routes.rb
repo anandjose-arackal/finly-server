@@ -1,4 +1,6 @@
 ActionManager::Router.draw do
+  # NavBar
+  route 'procurement', Menu::Masters::Procurement
 
   # Masters
   route 'vendors', Masters::Vendors::Action

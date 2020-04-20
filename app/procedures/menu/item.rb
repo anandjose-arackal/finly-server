@@ -1,7 +1,7 @@
 class Menu::Item
   include ActionManager::DSL
 
-  attr_accessor :key, :id, :path, :icon, :label, :create, :features, :user_subscriptions, :permissions, :parent
+  attr_accessor :key, :id, :path, :icon, :label, :create, :features, :user_subscriptions, :permissions, :parent, :action_registry
 
   def initialize(params = {}, &block)
     params.except(:scopes).each_pair do |attr, value|
@@ -22,6 +22,7 @@ class Menu::Item
   def item(key, path: nil, icon: nil, label: nil, permissions: [], features: [], &block)
     items << Menu::Item.new(
         key: key, path: path, icon: icon, label: label,
+        action_registry: action_registry,
         permissions: permissions, features: features, scopes: scopes, &block
     )
   end
