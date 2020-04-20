@@ -7,7 +7,7 @@
 # server 'example.com', user: 'deploy', roles: %w{app web}, other_property: :other_value
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
-server 'bgp.finly.io', user: 'centos', roles: %w{sidekiq_app crono_role poller_role hutch}
+server 'bgp.finly.io', user: 'centos', roles: %w{sidekiq_app crono_role poller_role hutch whenever_cron}
 server 'bgg.finly.io', user: 'centos', roles: %w{sidekiq_app email_tracker_role}
 server '172.32.59.38', user: 'centos', roles: %w{sidekiq_app email_tracker_role}
 set :stage, 'production'
@@ -22,6 +22,7 @@ set :balance_poller_role, :poller_role
 set :transaction_poller_role, :poller_role
 set :usage_tracker_role, :poller_role
 set :email_tracker_role, :email_tracker_role
+set :whenever_cron, :whenever_cron
 
 # set :sidekiq_config => File.join(shared_path, 'config', 'sidekiq.yml')
 # set :sidekiq_roles, :sidekiq_app

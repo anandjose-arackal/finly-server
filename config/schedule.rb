@@ -33,19 +33,19 @@ env :PATH, ENV['PATH']
 
 set :output, "#{path}/log/whenever.log"
 
-every 15.minutes do
+every 15.minutes, roles: [:whenever_cron] do
   runner "YesBankStatusChecker.perform"
   runner "IciciStatusChecker.perform"
   runner "KotakBankTransferStatusChecker.perform"
   runner "BbpsBillStatusChecker.perform"
 end
 
-# every 30.minutes do
-#   runner "IciciStatementsFetch.perform"
-#   runner "CheckForFailedNeftTransactions.perform"
-#   runner "BankTransferProcessRetry.perform"
-#   runner "ExpenseStatusUpdate.perform"
-# end
+every 30.minutes do
+  runner "IciciStatementsFetch.perform"
+  runner "CheckForFailedNeftTransactions.perform"
+  runner "BankTransferProcessRetry.perform"
+  runner "ExpenseStatusUpdate.perform"
+end
 #
 # every 1.hour do
 #   runner "UpdateCompanyBalances.perform"
