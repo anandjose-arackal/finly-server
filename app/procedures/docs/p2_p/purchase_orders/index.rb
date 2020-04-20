@@ -39,6 +39,10 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
     indicator value: :po_status, format: :format_status
   end
 
+  column :advance_status, default: true, includes: [:status] do
+    indicator value: "{{record.advance_amount_status.name}}", format: :format_status
+  end
+
   column :policy, default: true, includes: [:policy] do
     text value: "{{record.policy.name}}"
   end
@@ -118,9 +122,9 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
   end
 
   def self.po_status(context)
-    return 'Awaiting Approval'.upcase if context[:record].purchase_order_status_id == PurchaseOrderStatus.id_for(:processing) and context[:record].controlling_user?(context[:user])
+    return 'Awaiting Approval' if context[:record].purchase_order_status_id == PurchaseOrderStatus.id_for(:processing) and context[:record].controlling_user?(context[:user])
 
-    context[:record].status&.name&.humanize&.upcase
+    context[:record].status&.name&.titleize
   end
 
   def self.cost_center_name(context)
@@ -149,17 +153,17 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
 
   def self.format_status(context)
     case context[:record].status&.name&.to_s&.to_sym
-    when :rejected
+    when :rejected, :failed
       format = 'danger'
     when :paid, :approved, :closed, :auto_approved, :sent_to_vendor, :po_revised, :vendor_confirmed
       format = 'success'
-    when :processing
+    when :processing, :initiated
       if context[:record].controlling_user?(context[:user])
         format = 'warning'
       else
         format = 'info'
       end
-    when :open, :retracted, :voided
+    when :open, :retracted, :voided, :to_be_processed, :pending, :po_processing
       format = 'info'
     else
       format = 'danger'

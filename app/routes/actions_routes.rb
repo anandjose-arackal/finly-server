@@ -10,6 +10,7 @@ ActionManager::Router.draw do
   route 'invoices', Docs::P2P::Invoices::Action
   route 'purchase_requests', Docs::P2P::PurchaseRequests::Action
   route 'purchase_orders', Docs::P2P::PurchaseOrders::Action
+  route 'po_advances', Docs::P2P::PurchaseOrders::Advances::Action
   route 'utility_bills', Docs::UtilityBills::Bills::Action
   route 'payment_tickets', Docs::PaymentTickets::Action
   route 'payments', Docs::PaymentTickets::Payments::Action

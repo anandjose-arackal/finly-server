@@ -86,7 +86,7 @@ class PurchaseOrderExposure < Exposures::API
   attribute :advance_amount, record_attribute: true, exposure: true
   attribute :advance_tds_amount, record_attribute: true, exposure: true
   attribute :advance_tds_slab, record_attribute: true, exposure: true
-
+  attribute :advance_amount_status, record_attribute: true, exposure: true
   attribute :line_items, record_attribute: :items, exposure: true, includes: [:items]
   attribute :cost_allocation_items, record_attribute: true
   attribute :status, record_attribute: true, exposure: true, includes: [:status]

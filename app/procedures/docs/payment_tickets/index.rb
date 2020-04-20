@@ -105,9 +105,9 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
   end
 
   def self.pt_status(context)
-    return 'Awaiting Approval'.upcase if context[:record].status_id == BankPaymentRequestStatus.id_for(:processing) and context[:record].controlling_user?(context[:user])
+    return 'Awaiting Approval' if context[:record].status_id == BankPaymentRequestStatus.id_for(:processing) and context[:record].controlling_user?(context[:user])
 
-    context[:record].status&.name&.humanize&.upcase
+    context[:record].status&.name&.titleize
   end
 
   def self.format_status(context)

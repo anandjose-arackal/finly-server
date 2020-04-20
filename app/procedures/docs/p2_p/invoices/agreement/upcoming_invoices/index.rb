@@ -171,9 +171,9 @@ class Docs::P2P::Invoices::Agreement::UpcomingInvoices::Index < IndexBuilder::AP
   end
 
   def self.invoice_status(context)
-    return 'Awaiting Approval'.upcase if context[:record].invoice_status_id == InwardInvoiceStatus.id_for(:processing) and context[:record].controlling_user?(context[:user])
+    return 'Awaiting Approval' if context[:record].invoice_status_id == InwardInvoiceStatus.id_for(:processing) and context[:record].controlling_user?(context[:user])
 
-    context[:record].status&.name&.humanize&.upcase
+    context[:record].status&.name&.titleize
   end
 
   def self.cost_center_name(context)
