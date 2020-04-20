@@ -1,7 +1,7 @@
 class CheckForFailedNeftTransactions
 
   def self.perform
-    puts " ----------------------------- PERFORMING #{self.name} ------------------------------"
+    puts " ----------------------------- PERFORMING #{self.name} at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
 
     Company.all.each do |company|
       # first retrieve all statements for the past 2 days

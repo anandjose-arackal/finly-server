@@ -4,13 +4,13 @@
 class UpdateConvertedAmountValues
 
   def self.perform
-    puts " ----------------------------- PERFORMING #{self.name} ------------------------------"
+    puts " ----------------------------- PERFORMING #{self.name} at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")}------------------------------"
 
     Expense.all.where(date: DateUtils.yesterday_local_date).each do |expense|
       expense.update_other_currencies
     end
 
-    puts " ----------------------------- FINISHED #{self.name} ------------------------------"
+    puts " ----------------------------- FINISHED #{self.name}  at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")}------------------------------"
   end
 
 end

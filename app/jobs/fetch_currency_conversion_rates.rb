@@ -3,7 +3,7 @@
 class FetchCurrencyConversionRates
 
   def self.perform
-    puts " ----------------------------- PERFORMING #{self.name} ------------------------------"
+    puts " ----------------------------- PERFORMING #{self.name}  at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
 
     # update the currency conversion table with details of the conversion rates
     params = {
@@ -12,7 +12,7 @@ class FetchCurrencyConversionRates
     @result = Currency::FetchData.(nil, params)
     CurrencyConversionRate.create(@result.currency_data)
 
-    puts " ----------------------------- FINISHED #{self.name} ------------------------------"
+    puts " ----------------------------- FINISHED #{self.name} at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
   end
 
 end

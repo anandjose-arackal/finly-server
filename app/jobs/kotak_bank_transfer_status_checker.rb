@@ -2,7 +2,7 @@
 class KotakBankTransferStatusChecker
 
   def self.perform
-    puts " ----------------------------- PERFORMING #{self.name} ------------------------------"
+    puts " ----------------------------- PERFORMING #{self.name} at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
 
     # Find all kotak bank transaction where UTR is not present
     # Pass through Kotak Bank Status API and update bank transactions

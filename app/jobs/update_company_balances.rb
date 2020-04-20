@@ -1,7 +1,7 @@
 class UpdateCompanyBalances
 
   def self.perform
-    puts " ----------------------------- PERFORMING #{self.name} ------------------------------"
+    puts " ----------------------------- PERFORMING #{self.name}  at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
 
     Company.all.each do |company|
       # date = DateUtils.yesterday_local_date
@@ -12,7 +12,7 @@ class UpdateCompanyBalances
       ####################################### END ###########################################
     end
 
-    puts " ----------------------------- FINISHED #{self.name} ------------------------------"
+    puts " ----------------------------- FINISHED #{self.name} at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
   end
 
 end

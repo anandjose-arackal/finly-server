@@ -1,7 +1,7 @@
 class IciciStatementsFetch
 
   def self.perform
-    puts " ----------------------------- PERFORMING #{self.name} ------------------------------"
+    puts " ----------------------------- PERFORMING #{self.name} at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
 
     error_logger = Logger.new("#{Rails.root}/log/icici_statements_fetch_errors.log")
     Company.all.each do |company|
@@ -22,7 +22,7 @@ class IciciStatementsFetch
       end
     end
 
-    puts " ----------------------------- FINISHED #{self.name} ------------------------------"
+    puts " ----------------------------- FINISHED #{self.name} at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
   end
 
 end

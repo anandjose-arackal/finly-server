@@ -1,7 +1,7 @@
 class ReportAutoSubmit
 
   def self.perform
-    puts " ----------------------------- PERFORMING #{self.name} ------------------------------"
+    puts " ----------------------------- PERFORMING #{self.name} at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
 
     today = Date.today
     interval = :daily
@@ -25,7 +25,7 @@ class ReportAutoSubmit
       Reports::AutoSubmit.(nil, user: user)
     end
 
-    puts " ----------------------------- FINISHED #{self.name} ------------------------------"
+    puts " ----------------------------- FINISHED #{self.name} at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
   end
 
 end
