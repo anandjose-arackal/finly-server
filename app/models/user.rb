@@ -1767,6 +1767,18 @@ class User < ApplicationRecord
     false
   end
 
+  def active?
+    active and not default_password and first_name.present? and last_name.present?
+  end
+
+  def pending?
+    first_name.blank? or default_password
+  end
+
+  def inactive?
+    first_name.present? and not active
+  end
+
   protected
 
   # Checks whether a password is needed or not. For validations only.

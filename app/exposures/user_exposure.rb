@@ -6,5 +6,8 @@ class UserExposure < Exposures::API
   attribute :last_name, record_attribute: true
   attribute :email, record_attribute: true
   attribute :mobile_number, record_attribute: true
+  attribute :location, record_attribute: true, exposure: true
+  attribute :department, record_attribute: true, exposure: true
+  attribute :cost_center, record_attribute: true, exposure: true
 
 end

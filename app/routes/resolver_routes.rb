@@ -51,6 +51,10 @@ Resolver::Router.draw do
     route "default", Masters::Items::Resolver
   end
 
+  scope :users do
+    route 'default', Masters::Users::Resolver
+  end
+
   # Docs
   scope :trips do
     route 'default', Docs::Trips::Resolver
