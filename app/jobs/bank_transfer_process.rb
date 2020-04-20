@@ -1,4 +1,4 @@
-class BankTransferProcess
+class ScheduledBankTransferProcess
 
   def self.perform
     puts " ----------------------------- PERFORMING #{self.name} ------------------------------"

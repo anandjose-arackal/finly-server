@@ -34,15 +34,15 @@ env :PATH, ENV['PATH']
 set :output, "#{path}/log/whenever.log"
 
 every 15.minutes, roles: [:whenever_cron] do
-  runner "YesBankStatusChecker.perform"
-  runner "IciciStatusChecker.perform"
-  runner "KotakBankTransferStatusChecker.perform"
-  runner "BbpsBillStatusChecker.perform"
+  runner "YesBankStatusChecker.perform", output: "#{path}/log/whenever/yes_bank_status_checker.log"
+  runner "IciciStatusChecker.perform", output: "#{path}/log/whenever/icici_status_checker.log"
+  runner "KotakBankTransferStatusChecker.perform", output: "#{path}/log/whenever/kotak_status_checker.log"
+  runner "BbpsBillStatusChecker.perform", output: "#{path}/log/whenever/bbps_bill_status_checker.log"
 end
 
 every 30.minutes, roles: [:whenever_cron] do
-  runner "IciciStatementsFetch.perform"
-  runner "CheckForFailedNeftTransactions.perform"
+  runner "IciciStatementsFetch.perform", output: "#{path}/log/whenever/icici_statements_fetch.log"
+  runner "CheckForFailedNeftTransactions.perform", output: "#{path}/log/whenever/failed_neft_transactions_check.log"
   runner "BankTransferProcessRetry.perform"
   runner "ExpenseStatusUpdate.perform"
 end
@@ -57,15 +57,15 @@ end
 
 every 1.day, at: '8:30 am', roles: [:whenever_cron] do
   runner "TaxBenefitProcess.perform"
-  runner "BankTransferProcess.perform"
+  runner "ScheduledBankTransferProcess.perform", output: "#{path}/log/whenever/scheduled_bank_transfer_process.log"
 end
 
 every 1.day, at: '5:35 am', roles: [:whenever_cron] do
-  runner "FetchCurrencyConversionRates.perform"
+  runner "FetchCurrencyConversionRates.perform", output: "#{path}/log/whenever/fetch_currency_conversion_rates.log"
 end
 
 every 1.day, at: '5:45 am', roles: [:whenever_cron] do
-  runner "FetchCurrencyConversionRates.perform"
+  runner "UpdateConvertedAmountValues.perform", output: "#{path}/log/whenever/update_converted_amount_values.log"
 end
 
 every 1.day, at: '6:30 am', roles: [:whenever_cron] do
@@ -82,7 +82,7 @@ every 1.day, at: "9:30 am", roles: [:whenever_cron] do
 end
 
 every 1.day, at: "8:00 am", roles: [:whenever_cron] do
-  runner "BbpsBillsFetch.perform"
+  runner "BbpsBillsFetch.perform", output: "#{path}/log/whenever/bbps_bill_fetch.log"
 end
 
 every 1.day, at: "6:00 pm", roles: [:whenever_cron] do
@@ -90,5 +90,5 @@ every 1.day, at: "6:00 pm", roles: [:whenever_cron] do
 end
 
 every 1.day, at: "12:10 am", roles: [:whenever_cron] do
-  runner "BbpsBillerSync.perform"
+  runner "BbpsBillerSync.perform", output: "#{path}/log/whenever/bbps_biller_sync.log"
 end
