@@ -19,7 +19,7 @@ class CompanyAccountScheduledTransfer
 
   private
 
-  def transfer_today?(config)
+  def self.transfer_today?(config)
     day = config.frequency_day
     today = Date.today
     case conifg.frequency_name

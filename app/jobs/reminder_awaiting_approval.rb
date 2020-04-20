@@ -58,7 +58,7 @@ class ReminderAwaitingApproval
   #   end
   # end
 
-  def remind_document_reviewer
+  def self.remind_document_reviewer
     reviewer_role_ids = [UserRole.id_for(:purchase_request_reviewer), UserRole.id_for(:po_invoice_reviewer), UserRole.id_for(:non_po_invoice_reviewer), UserRole.id_for(:bank_payment_request_reviewer), UserRole.id_for(:purchase_order_reviewer)]
     reviewer_ids = Policy.where(company_id: [140, 209, 184, 211,221,228,229,227,199]).joins(:policy_user_roles).where('policy_user_roles.user_role_id IN (?)', reviewer_role_ids).pluck('policy_user_roles.user_id').uniq
 
