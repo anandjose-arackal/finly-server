@@ -1,7 +1,6 @@
 class RentalInvoiceExposure < Exposures::API
 
   attribute :id, record_attribute: true
-  attribute :vendor, record_attribute: true, exposure: true, includes: [:vendor]
   # attribute :template_invoice, record_attribute: true, exposure: true # todo no idea what this field is, hence commented
   attribute :created_by, record_attribute: true, exposure: true
   attribute :invoice_id, record_attribute: true
