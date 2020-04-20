@@ -1,6 +1,8 @@
-class BbpsBillStatusChecker < ApplicationJob
+class BbpsBillStatusChecker
 
-  def perform
+  def self.perform
+    puts " ----------------------------- PERFORMING #{self.name} ------------------------------"
+
     payments = Payment.where(parent_type: "BbpsBill").where(payment_status_id: [PaymentStatus.id_for(:processing), PaymentStatus.id_for(:possible_failure)])
     payments.each do |payment|
       bill = payment.parent
@@ -43,5 +45,7 @@ class BbpsBillStatusChecker < ApplicationJob
         end
       end
     end
+
+    puts " ----------------------------- FINISHED #{self.name} ------------------------------"
   end
 end

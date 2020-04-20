@@ -1,8 +1,10 @@
 # fetches the conversion rates for all the currencies from the fixer.io API
 
-class FetchCurrencyConversionRates < ApplicationJob
+class FetchCurrencyConversionRates
 
-  def perform
+  def self.perform
+    puts " ----------------------------- PERFORMING #{self.name} ------------------------------"
+
     # update the currency conversion table with details of the conversion rates
     params = {
       date: DateUtils.yesterday_local_date.strftime("%Y-%m-%d")
@@ -10,4 +12,6 @@ class FetchCurrencyConversionRates < ApplicationJob
     @result = Currency::FetchData.(nil, params)
     CurrencyConversionRate.create(@result.currency_data)
   end
+
+  puts " ----------------------------- FINISHED #{self.name} ------------------------------"
 end

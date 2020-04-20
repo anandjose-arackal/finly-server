@@ -1,6 +1,8 @@
-class UpdateCompanyBalances < ApplicationJob
+class UpdateCompanyBalances
 
-  def perform
+  def self.perform
+    puts " ----------------------------- PERFORMING #{self.name} ------------------------------"
+
     Company.all.each do |company|
       # date = DateUtils.yesterday_local_date
       # Company::Balances::SetBalances.(company, {date: date})
@@ -9,6 +11,8 @@ class UpdateCompanyBalances < ApplicationJob
       Company::Transaction::Show.(company, {start_date: Date.today, end_date: Date.today})
       ####################################### END ###########################################
     end
+
+    puts " ----------------------------- FINISHED #{self.name} ------------------------------"
   end
 
 end

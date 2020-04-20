@@ -1,12 +1,16 @@
-class ReminderAwaitingApproval < ApplicationJob
+class ReminderAwaitingApproval
 
-  def perform
+  def self.perform
+    puts " ----------------------------- PERFORMING #{self.name} ------------------------------"
+
     # Loop through Reviewers and find the awaiting approval items
     # remind_purchase_request_reviewer
     # remind_invoice_reviewer
     # remind_bank_payment_request_reviewer
     # remind_purchase_order_reviewer
     remind_document_reviewer
+
+    puts " ----------------------------- FINISHED #{self.name} ------------------------------"
   end
 
   private

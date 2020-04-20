@@ -1,6 +1,8 @@
-class ReportAutoSubmit < ApplicationJob
+class ReportAutoSubmit
 
-  def perform
+  def self.perform
+    puts " ----------------------------- PERFORMING #{self.name} ------------------------------"
+
     today = Date.today
     interval = :daily
     if today.beginning_of_year == today
@@ -22,6 +24,8 @@ class ReportAutoSubmit < ApplicationJob
       user = config.submitable
       Reports::AutoSubmit.(nil, user: user)
     end
+
+    puts " ----------------------------- FINISHED #{self.name} ------------------------------"
   end
 
 end
