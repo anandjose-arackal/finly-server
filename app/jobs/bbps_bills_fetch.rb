@@ -1,6 +1,8 @@
-class BbpsBillsFetch < ApplicationJob
+class BbpsBillsFetch
 
-  def perform
+  def self.perform
+    puts " ----------------------------- PERFORMING #{self.name} ------------------------------"
+
     # Fetch bills where automatic fetching is enabled
     status_ids = BbpsBillerSubscription.status_ids(:approved, :auto_approved, :reactivated)
     bbps_subscriptions = BbpsBillerSubscription.where(status_id: status_ids, auto_generate_bill: true).where(expected_bill_day: nil)
@@ -45,6 +47,8 @@ class BbpsBillsFetch < ApplicationJob
     bill_day = (Date.today + 2.days).day
     bbps_subscriptions = BbpsBillerSubscription.where(status_id: status_ids, auto_generate_bill: true).where(expected_bill_day: bill_day)
     bbps_subscriptions.each {|subscription| create_bill({}, subscription, autofetched)}
+
+    puts " ----------------------------- FINISHED #{self.name} ------------------------------"
   end
 
   def create_bill(result, subscription, autofetched)

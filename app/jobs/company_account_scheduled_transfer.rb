@@ -1,6 +1,8 @@
-class CompanyAccountScheduledTransfer < ApplicationJob
+class CompanyAccountScheduledTransfer
 
-  def perform
+  def self.perform
+    puts " ----------------------------- PERFORMING #{self.name} ------------------------------"
+
     configs = CompanyFundsAutoTransferConfig.enabled
 
     for config in configs
@@ -12,6 +14,7 @@ class CompanyAccountScheduledTransfer < ApplicationJob
       end
     end
 
+    puts " ----------------------------- FINISHED #{self.name} ------------------------------"
   end
 
   private
