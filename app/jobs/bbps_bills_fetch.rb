@@ -51,7 +51,7 @@ class BbpsBillsFetch
     puts " ----------------------------- FINISHED #{self.name} ------------------------------"
   end
 
-  def create_bill(result, subscription, autofetched)
+  def self.create_bill(result, subscription, autofetched)
     if autofetched
       return unless result.status == 'Y'
       return if result.ref_no.blank?
@@ -149,7 +149,7 @@ class BbpsBillsFetch
     end
   end
 
-  def get_amount_from_response(response)
+  def self.get_amount_from_response(response)
     return response.to_f unless response.to_s.include?("=")
 
     if response.to_s.split("=").map(&:downcase).include?("circle")
@@ -159,7 +159,7 @@ class BbpsBillsFetch
     end
   end
 
-  def customer_params(subscription)
+  def self.customer_params(subscription)
     parameters = {
         mobile_number: subscription.mobile_number,
         biller_id: subscription.biller&.biller_id,
@@ -179,7 +179,7 @@ class BbpsBillsFetch
     parameters
   end
 
-  def get_bill_period(bill_period)
+  def self.get_bill_period(bill_period)
     if bill_periods.include?(bill_period.to_s.downcase)
       bill_period
     elsif ["monthly"].includes?(bill_period.to_s.downcase)
@@ -191,7 +191,7 @@ class BbpsBillsFetch
 
   end
 
-  def bill_periods
+  def self.bill_periods
     ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec", "january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"]
   end
 end

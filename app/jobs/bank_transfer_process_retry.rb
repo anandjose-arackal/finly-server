@@ -20,7 +20,7 @@ class BankTransferProcessRetry
     puts " ----------------------------- FINISHED #{self.name} ------------------------------"
   end
 
-  def execute_callback(payment)
+  def self.execute_callback(payment)
     post_params = {
         payment_id: payment.id,
         payment_amount: payment.amount_value,

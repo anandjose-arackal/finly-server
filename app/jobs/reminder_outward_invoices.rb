@@ -24,7 +24,7 @@ class ReminderOutwardInvoices
 
   private
 
-  def get_reminder_date(invoice, reminder)
+  def self.get_reminder_date(invoice, reminder)
     date = nil
     if reminder.timeframe_type == 'before'
       if reminder.reference_date_type == 'due_date'
