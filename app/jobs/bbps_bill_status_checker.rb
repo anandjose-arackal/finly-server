@@ -1,7 +1,7 @@
 class BbpsBillStatusChecker
 
   def self.perform
-    puts " ----------------------------- PERFORMING #{self.name} ------------------------------"
+    puts " ----------------------------- PERFORMING #{self.name} at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
 
     payments = Payment.where(parent_type: "BbpsBill").where(payment_status_id: [PaymentStatus.id_for(:processing), PaymentStatus.id_for(:possible_failure)])
     payments.each do |payment|

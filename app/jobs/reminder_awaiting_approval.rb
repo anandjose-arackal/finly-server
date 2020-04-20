@@ -1,7 +1,7 @@
 class ReminderAwaitingApproval
 
   def self.perform
-    puts " ----------------------------- PERFORMING #{self.name} ------------------------------"
+    puts " ----------------------------- PERFORMING #{self.name}  at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")}------------------------------"
 
     # Loop through Reviewers and find the awaiting approval items
     # remind_purchase_request_reviewer
@@ -10,7 +10,7 @@ class ReminderAwaitingApproval
     # remind_purchase_order_reviewer
     remind_document_reviewer
 
-    puts " ----------------------------- FINISHED #{self.name} ------------------------------"
+    puts " ----------------------------- FINISHED #{self.name}  at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
   end
 
   private

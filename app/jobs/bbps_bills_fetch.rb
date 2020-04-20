@@ -1,7 +1,7 @@
 class BbpsBillsFetch
 
   def self.perform
-    puts " ----------------------------- PERFORMING #{self.name} ------------------------------"
+    puts " ----------------------------- PERFORMING #{self.name} at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
 
     # Fetch bills where automatic fetching is enabled
     status_ids = BbpsBillerSubscription.status_ids(:approved, :auto_approved, :reactivated)

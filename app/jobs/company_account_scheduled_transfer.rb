@@ -1,7 +1,7 @@
 class CompanyAccountScheduledTransfer
 
   def self.perform
-    puts " ----------------------------- PERFORMING #{self.name} ------------------------------"
+    puts " ----------------------------- PERFORMING #{self.name}  at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
 
     configs = CompanyFundsAutoTransferConfig.enabled
 
@@ -14,7 +14,7 @@ class CompanyAccountScheduledTransfer
       end
     end
 
-    puts " ----------------------------- FINISHED #{self.name} ------------------------------"
+    puts " ----------------------------- FINISHED #{self.name} at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")}  ------------------------------"
   end
 
   private

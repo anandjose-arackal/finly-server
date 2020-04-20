@@ -1,7 +1,7 @@
 class ReminderOutwardInvoices
 
   def self.perform
-    puts " ----------------------------- PERFORMING #{self.name} ------------------------------"
+    puts " ----------------------------- PERFORMING #{self.name}  at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
 
     outward_invoices = OutwardInvoice.exclude_deleted.unpaid
 
@@ -19,7 +19,7 @@ class ReminderOutwardInvoices
       end
     end
 
-    puts " ----------------------------- FINISHED #{self.name} ------------------------------"
+    puts " ----------------------------- FINISHED #{self.name} at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
   end
 
   private

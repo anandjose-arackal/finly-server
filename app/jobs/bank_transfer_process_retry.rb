@@ -1,7 +1,7 @@
 class BankTransferProcessRetry
 
   def self.perform
-    puts " ----------------------------- PERFORMING #{self.name} ------------------------------"
+    puts " ----------------------------- PERFORMING #{self.name}  at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")}------------------------------"
 
     failed_payments_for_retry = Payment.where(payment_status_id: PaymentStatus.id_for(:pending_retry))
     if failed_payments_for_retry.present?
@@ -17,7 +17,7 @@ class BankTransferProcessRetry
       end
     end
 
-    puts " ----------------------------- FINISHED #{self.name} ------------------------------"
+    puts " ----------------------------- FINISHED #{self.name} at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
   end
 
   def self.execute_callback(payment)
