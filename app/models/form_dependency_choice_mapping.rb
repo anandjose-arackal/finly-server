@@ -11,6 +11,11 @@
 #  deleted_at                 :datetime
 #  form_id                    :string(255)      not null
 #  dependent_choice_type      :string(255)
+#  controlling_entity_id      :string(255)
+#  controlling_choice_id      :string(255)
+#  controlling_choice_type    :string(255)
+#  controlling_entity_key     :string(255)
+#  dependent_entity_key       :string(255)
 #
 
 class FormDependencyChoiceMapping < ApplicationRecord

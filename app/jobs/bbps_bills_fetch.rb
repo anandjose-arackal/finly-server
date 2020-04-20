@@ -106,7 +106,7 @@ class BbpsBillsFetch < ApplicationJob
 
 
       params = {
-          amount: (result.amount.to_f / 100).round(2),
+          amount: (result.amount.to_d / 100).round(2),
           bill_date: result.bill_date,
           bill_number: result.bill_number,
           due_date: result.due_date,
@@ -151,7 +151,7 @@ class BbpsBillsFetch < ApplicationJob
     if response.to_s.split("=").map(&:downcase).include?("circle")
       return 0
     else
-      response.to_s.split("=")[1].to_f / 100
+      response.to_s.split("=")[1].to_d / 100
     end
   end
 

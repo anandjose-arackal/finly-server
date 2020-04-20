@@ -10,6 +10,7 @@ class Admin::Implementations::Master::Users::ImportTemplates < Admin::Implementa
       :mobile_number => "Mobile Number (mandatory)",
       :employee_id => "Employee ID",
       :dob => "DOB",
+      :pan => "PAN",
       :address_1 => "Address Line 1",
       :address_2 => "Address Line 2",
       :pin_code => "PIN CODE",

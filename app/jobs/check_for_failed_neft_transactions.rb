@@ -3,7 +3,7 @@ class CheckForFailedNeftTransactions < ApplicationJob
   def perform
     Company.all.each do |company|
       # first retrieve all statements for the past 2 days
-      past_two_days_statements = IciciStatement.where(company_id: company.id).where('txn_date >= ? AND txn_date <= ?', (Date.today - 2.days), Date.tomorrow)
+      past_two_days_statements = IciciStatement.where(company_id: company.id).where('txn_date >= ? AND txn_date <= ?', (Date.today - 30.days), Date.tomorrow)
       past_two_days_statements.each do |entry|
         # SAMPLE REMARKS FORMAT FOR NEFT RETURN
         # NEFT-RETURN-21954163111DC-S S REFRIGERATION-BENEFICIARY NAME DIFFERES  R05

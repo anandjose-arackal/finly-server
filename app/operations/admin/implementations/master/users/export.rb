@@ -11,6 +11,7 @@ class Admin::Implementations::Master::Users::Export < Admin::Implementations::Pr
       :mobile_number => "Mobile Number (mandatory)",
       :employee_id => "Employee ID",
       :dob => "DOB",
+      :pan => "PAN",
       :address_1 => "Address Line 1",
       :address_2 => "Address Line 2",
       :pin_code => "PIN CODE",
@@ -72,6 +73,10 @@ class Admin::Implementations::Master::Users::Export < Admin::Implementations::Pr
 
   def dob(user)
     user.date_of_birth&.strftime("%d-%m-%y") rescue ''
+  end
+
+  def pan(user)
+    user.profile.pan
   end
 
   def pin_code(user)

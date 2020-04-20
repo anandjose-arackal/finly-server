@@ -2815,13 +2815,18 @@ Rails.application.routes.draw do
     end
 
     namespace :v2 do
-      get 'maps/config/:type', to: 'google_maps#maps_config'
       get 'available_expense_types', to: 'expenses#available_expense_types'
       resources :expenses, only: [:index, :show, :create, :update, :destroy]
       resources :reports, only: [:create, :show, :update]
       resources :reports do
         post 'comment' => 'reports#comment', as: :comment
       end
+
+      get 'maps/config/:type', to: 'maps#maps_config'
+      get 'maps/auto_complete', to: 'maps#auto_complete'
+      get 'maps/places/:id/details', to: 'maps#details'
+      get 'maps/places/recent', to: 'maps#recent_places'
+      post 'maps/distance_matrix', to: 'maps#distance_matrix'
     end
   end
 
@@ -4073,6 +4078,8 @@ Rails.application.routes.draw do
     get 'vp/payment_agreements', to: 'vendor_payments#payment_agreements'
     get 'vp/purchase_request_approved_items', to: 'vendor_payments#purchase_request_approved_items'
     get 'vp/agreement_invoices', to: 'vendor_payments#agreement_invoices'
+    get 'vp/utility_bill_masters', to: 'vendor_payments#utility_bill_masters'
+    get 'vp/utility_bills', to: 'vendor_payments#utility_bills'
 
     get 'vp/budgets', to: 'vendor_payments#budgets'
 
@@ -4239,6 +4246,10 @@ Rails.application.routes.draw do
 
   get 'cards/:route/:id', to: 'hover_card#route'
 
+  get 'maps/auto_complete', to: 'maps#auto_complete'
+  get 'maps/places/:id/details', to: 'maps#details'
+  get 'maps/places/recent', to: 'maps#recent_places'
+  post 'maps/distance_matrix', to: 'maps#distance_matrix'
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
   # The priority is based upon order of creation: first created -> highest priority.

@@ -2,18 +2,24 @@
 #
 # Table name: form_dependency_mappings
 #
-#  id                      :bigint           not null
-#  company_id              :integer          not null
-#  form_dependency_id      :string(255)      not null
-#  controlling_choice_id   :string(255)      not null
-#  dependent_required      :boolean
-#  dependent_visible       :boolean
-#  dependent_editable      :boolean
-#  created_at              :datetime         not null
-#  updated_at              :datetime         not null
-#  deleted_at              :datetime
-#  form_id                 :string(255)      not null
-#  controlling_choice_type :string(255)
+#  id                          :bigint           not null
+#  company_id                  :integer          not null
+#  form_dependency_id          :string(255)      not null
+#  controlling_choice_id       :string(255)      not null
+#  dependent_required          :boolean
+#  dependent_visible           :boolean
+#  dependent_editable          :boolean
+#  created_at                  :datetime         not null
+#  updated_at                  :datetime         not null
+#  deleted_at                  :datetime
+#  form_id                     :string(255)      not null
+#  controlling_choice_type     :string(255)
+#  has_dependent_choices       :boolean
+#  lazy_load_dependent_choices :boolean
+#  controlling_entity_id       :integer
+#  controlling_entity_key      :string(255)
+#  dependent_entity_id         :integer
+#  dependent_entity_key        :string(255)
 #
 
 class FormDependencyMapping < ApplicationRecord

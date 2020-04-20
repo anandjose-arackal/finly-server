@@ -89,11 +89,12 @@
 #  billing_type_id                 :integer
 #  agreement_item_type             :string(255)
 #  agreement_item_id               :integer
+#  vendor_poc_id                   :integer
+#  vlpm_id                         :integer
+#  client_note                     :text(65535)
 #  payable                         :boolean          default(FALSE)
-#  rcm_enabled                     :boolean          default(FALSE)
 #  cn_adjusted_amount_id           :integer
 #  rcm_enabled                     :boolean          default(FALSE)
-#  uuid                            :string(36)
 #
 
 class Invoice < ApplicationRecord

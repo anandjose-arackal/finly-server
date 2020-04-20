@@ -28,7 +28,7 @@ class Olap::Dimensions::TaxRate < OlapRecord
   include Analytics::Mapper
 
   transaction_model ::TaxRate
-  consume 'tax_rate.update', 'tax_rate.create', 'tax_rate.destroy'
+  # consume 'tax_rate.update', 'tax_rate.create', 'tax_rate.destroy'
 
   map :name
   map :rate

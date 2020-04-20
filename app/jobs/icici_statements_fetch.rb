@@ -7,7 +7,7 @@ class IciciStatementsFetch < ActiveJob::Base
         next
       end
       begin
-        op = IciciBankApi::AccountStatement.(company, {start_date: (Date.today - 10.days), end_date: Date.today})
+        op = IciciBankApi::AccountStatement.(company, {start_date: (Date.today - 15.days), end_date: Date.today})
         unless op.success?
           # trigger email notifying the fact that the statement fetch failed
           # todo

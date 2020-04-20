@@ -107,6 +107,10 @@ class BbpsBillerSubscription < ApplicationRecord
       where(status_id: BbpsBillerSubscriptionStatus.id_for(:awaiting_approval))
     when 'draft', :draft
       where(status_id: BbpsBillerSubscriptionStatus.ids_for(:draft, :retracted, :rejected))
+    when 'rejected', :rejected
+      where(status_id: BbpsBillerSubscriptionStatus.ids_for(:rejected))
+    when 'retracted', :retracted
+      where(status_id: BbpsBillerSubscriptionStatus.ids_for(:retracted))
     when 'deactivated', :deactivated
       where(status_id: BbpsBillerSubscriptionStatus.id_for(:deactivated))
     when 'reactivated', :reactivated
@@ -117,6 +121,26 @@ class BbpsBillerSubscription < ApplicationRecord
       awaiting_action_items(RequestStore.store[:current_user]&.id)
       # end
     end
+  }
+
+  scope :filter_creation_date, -> (from, to) {
+    from = Date.parse(from) rescue Date.parse('01-01-1990') unless from.is_a?(Date)
+    to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
+    where('bbps_biller_subscriptions.created_at >= ? && bbps_biller_subscriptions.created_at <= ?', from, to)
+  }
+
+  scope :filter_year, -> (year) {
+    if year.blank?
+      year = Date.today.year
+    end
+    where('extract(year from created_at) = ?', year)
+  }
+
+  scope :filter_month, -> (month) {
+    if month.blank?
+      month = Date.today.month
+    end
+    where('extract(month from created_at) = ?', month)
   }
 
   scope :includes_for_index, -> {

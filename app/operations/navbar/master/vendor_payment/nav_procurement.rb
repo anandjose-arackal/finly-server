@@ -22,8 +22,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
       [
           :attachments, :users,
           :load_company_balance, :statements,
-          :organization_account,
-          :exports
+          :organization_account
       ]
   )
 

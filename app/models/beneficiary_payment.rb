@@ -30,7 +30,7 @@
 #  invoice_date                    :date
 #  invoice_due_date                :date
 #  advance_amount_id               :integer
-#  payment_notification_users      :json
+#  payment_notification_users      :text(65535)
 #  payment_agreement_id            :integer
 #  note                            :string(255)
 #  location_id                     :integer
@@ -109,6 +109,8 @@ class BeneficiaryPayment < ApplicationRecord
   has_many :payments, as: :parent
 
   has_many :trails, as: :parent
+
+  serialize :payment_notification_users, Hash
 
   accepts_nested_attributes_for :original_amount
   accepts_nested_attributes_for :tax_amount
