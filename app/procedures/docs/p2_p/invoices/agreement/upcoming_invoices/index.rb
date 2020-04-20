@@ -24,7 +24,7 @@ class Docs::P2P::Invoices::Agreement::UpcomingInvoices::Index < IndexBuilder::AP
 
   # Todo figure out how to provide the status
   # column :status, default: true, includes: [:status] do
-  #   badge value: :invoice_status, format: :format_status
+  #   indicator value: :invoice_status, format: :format_status
   # end
 
   column :invoice_date, sort: :date, default: true do

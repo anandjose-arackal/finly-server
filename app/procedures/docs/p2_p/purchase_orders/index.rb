@@ -36,7 +36,7 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
   end
 
   column :status, default: true, includes: [:status] do
-    badge value: :po_status, format: :format_status
+    indicator value: :po_status, format: :format_status
   end
 
   column :policy, default: true, includes: [:policy] do

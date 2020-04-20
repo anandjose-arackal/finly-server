@@ -52,7 +52,7 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
   end
 
   column :status, default: true, sort: :payment_status_id, includes: [:status] do
-    badge value: "{{record.status.name}}", format: :format_status
+    indicator value: "{{record.status.name}}", format: :format_status
   end
 
   column :policy, sort: :payment_order_bank_payment_request_policy_id, default: true, includes: [payment_order: {bank_payment_request: :policy}] do

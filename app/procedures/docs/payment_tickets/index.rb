@@ -26,7 +26,7 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
   end
 
   column :status, default: true, includes: [:status] do
-    badge value: :pt_status, format: :format_status
+    indicator value: :pt_status, format: :format_status
   end
 
   column :policy, default: true, includes: [:policy] do

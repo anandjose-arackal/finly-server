@@ -23,7 +23,7 @@ class Masters::Vendors::Index < IndexBuilder::API
   end
 
   column :status, default: true, includes: [:status] do
-    badge value: :status_name, format: :format_status
+    indicator value: :status_name, format: :format_status
   end
 
   column :gst_registered, default: true do

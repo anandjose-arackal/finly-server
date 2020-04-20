@@ -29,7 +29,7 @@ class Docs::UtilityBills::Bills::Index < IndexBuilder::API
   end
 
   column :status, default: true, includes: [:status] do
-    badge value: :bbps_bill_status, format: :format_status
+    indicator value: :bbps_bill_status, format: :format_status
   end
 
   column :bill_number, sort: :bill_number, default: true do

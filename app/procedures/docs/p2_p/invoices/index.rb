@@ -24,7 +24,7 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
   end
 
   column :status, default: true, includes: [:status] do
-    badge value: :invoice_status, format: :format_status
+    indicator value: :invoice_status, format: :format_status
   end
 
   column :invoice_number, default: true do
