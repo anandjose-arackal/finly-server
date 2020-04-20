@@ -1,8 +1,10 @@
 module ActionManager::Builder
   extend ActiveSupport::Concern
 
-  def build(user, params)
-    return unless user.has_permission?(permissions)
+  def build(options)
+    user = options[:current_user]
+    params = options[:params]
+    return unless user&.has_permission?(permissions)
 
     map = {
         path: self.path,
@@ -26,6 +28,10 @@ module ActionManager::Builder
 
   def build_config(user, params)
     config
+  end
+
+  def as_json(options)
+    build(options)
   end
 
 end

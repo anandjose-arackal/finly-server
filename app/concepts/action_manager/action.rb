@@ -1,13 +1,17 @@
 class ActionManager::Action
-  include ActionManager::Registry
+  include ActionManager::Type
   include ActionManager::Builder
+  include ActionManager::DSL
   include DynamicAttributes
 
-  attr_accessor :type, :id, :path, :parent, :root, :scopes,
+  attr_accessor :type, :id, :path, :parent, :registry, :scopes,
                 :permissions, :label, :icon, :policy, :authorize,
-                :actions, :model, :format
+                :model, :format
 
   class_attribute :registered_type
+
+  alias_method :scope, :action_scope
+  alias_method :paths, :action_paths
 
   # Todo type specific validations
   # Todo merging scopes
@@ -30,15 +34,17 @@ class ActionManager::Action
     end
   end
 
-  def initialize(type, id, config: {}, scopes: [], parent: nil, root: nil, &block)
+  def initialize(type, id, config: {}, scopes: [], parent: nil, registry: nil, &block)
     self.id = id
     self.type = type
     self.scopes = scopes
     self.parent = parent
-    self.root = root
+    self.registry = registry
     self.path = self.parent.present? ? "#{self.parent.path}/#{id}" : id
 
-    self.root.register_path(path, self)
+    # If a registry is provider, it registers itself as an action. This registration can be used for validation etc
+    # Not mandating it help decouple the action to be used independently
+    self.registry&.register_path(path, self)
 
     scopes.each do |conf|
       conf.each_pair do |key, value|
@@ -81,22 +87,26 @@ class ActionManager::Action
     @format || 'standard'
   end
 
-  def actions
-    @actions ||= {}
+  def registry
+    @registry
   end
 
-  def action(type, id, config = {}, &block)
-    actions[id] = ActionManager::Registry[type].new(type, id, config: config, scopes: scopes, parent: self, root: root, &block)
-  end
-
-  def scopes
-    @scopes ||= []
-  end
-
-  def scope(params = {}, &block)
-    scopes.push(params)
-    instance_eval &block
-    scopes.pop
-  end
+  # def actions
+  #   @actions ||= {}
+  # end
+  #
+  # def action(type, id, config = {}, &block)
+  #   actions[id] = ActionManager::Type[type].new(type, id, config: config, scopes: scopes, parent: self, registry: registry, &block)
+  # end
+  #
+  # def scopes
+  #   @scopes ||= []
+  # end
+  #
+  # def scope(params = {}, &block)
+  #   scopes.push(params)
+  #   instance_eval &block
+  #   scopes.pop
+  # end
 
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_09_085529) do
+ActiveRecord::Schema.define(version: 2020_04_17_144005) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -949,6 +949,7 @@ ActiveRecord::Schema.define(version: 2020_04_09_085529) do
     t.string "uuid", limit: 36
     t.datetime "paid_at"
     t.text "review_note"
+    t.string "selected_amount_type", default: "base_amount"
     t.index ["amount_id"], name: "index_bbps_bills_on_amount_id"
     t.index ["autofetched"], name: "index_bbps_bills_on_autofetched"
     t.index ["controlling_level_id"], name: "index_bbps_bills_on_controlling_level_id"
@@ -1062,7 +1063,7 @@ ActiveRecord::Schema.define(version: 2020_04_09_085529) do
     t.date "invoice_date"
     t.date "invoice_due_date"
     t.integer "advance_amount_id"
-    t.json "payment_notification_users"
+    t.text "payment_notification_users"
     t.integer "payment_agreement_id"
     t.string "note"
     t.integer "location_id"
@@ -1671,6 +1672,7 @@ ActiveRecord::Schema.define(version: 2020_04_09_085529) do
     t.decimal "cn_adjusted_amount_before_tax_value", precision: 20, scale: 10, default: "0.0"
     t.decimal "cn_adjusted_amount_after_tax_value", precision: 20, scale: 10, default: "0.0"
     t.decimal "credit_note_tax_amount_value", precision: 20, scale: 10, default: "0.0"
+    t.datetime "date"
     t.index ["entity_type", "entity_id"], name: "index_budget_trails_on_entity_type_and_entity_id"
   end
 
@@ -3825,6 +3827,7 @@ ActiveRecord::Schema.define(version: 2020_04_09_085529) do
     t.datetime "deleted_at"
     t.boolean "printable", default: true
     t.string "uuid", limit: 36
+    t.boolean "user_level_field", default: false
     t.index ["company_id"], name: "index_field_configurations_on_company_id"
     t.index ["configurable_id"], name: "index_field_configurations_on_configurable_id"
     t.index ["configurable_type"], name: "index_field_configurations_on_configurable_type"
@@ -6291,6 +6294,7 @@ ActiveRecord::Schema.define(version: 2020_04_09_085529) do
     t.integer "transfer_mode_id"
     t.string "uuid", limit: 36
     t.datetime "last_retried_at"
+    t.string "utr"
     t.index ["amount_id"], name: "index_payments_on_amount_id"
     t.index ["beneficiary_payment_id"], name: "index_payments_on_beneficiary_payment_id"
     t.index ["category_id"], name: "index_payments_on_category_id"
@@ -8990,7 +8994,9 @@ ActiveRecord::Schema.define(version: 2020_04_09_085529) do
     t.string "signature_title"
     t.string "uuid", limit: 36
     t.datetime "deleted_at"
+    t.string "pan"
     t.index ["default_currency_id"], name: "index_user_profiles_on_default_currency_id"
+    t.index ["pan"], name: "index_user_profiles_on_pan"
     t.index ["state_id"], name: "fk_rails_9207fd1f96"
     t.index ["user_id"], name: "index_user_profiles_on_user_id"
   end

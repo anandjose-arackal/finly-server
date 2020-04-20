@@ -7,12 +7,46 @@ class Menu::Masters::Procurement < Menu::API
   app :vp
 
   item :create, icon: 'https://img.icons8.com/windows/20/ffffff/plus-math.png' do
-    item :new_purchase_request, path: 'purchase_requests/new', permissions: [:purchase_request_initiator]
-    item :new_purchase_order, path: 'purchase_orders/new', permissions: [:purchase_order_initiator]
-    item :new_non_po_invoice, path: 'invoices/new', permissions: [:non_po_invoice_initiator]
-    item :new_payment_ticket, path: 'payment_tickets/new', permissions: [:bank_payment_request_initiator]
-    item :new_agreement, path: 'agreements/new', permissions: [:agreement_invoice_initiator]
-    item :new_vendor, path: 'vendors/new', permissions: [:vendor_creator, :vendor_manager]
+    action :redirect,
+           :new_purchase_request,
+           permissions: :purchase_request_initiator,
+           label: 'New Purchase Request',
+           url: 'purchase_requests/new'
+
+    action :template,
+           :new_purchase_order,
+           permissions: :purchase_order_initiator,
+           policy: Docs::P2P::PurchaseOrders::Policy,
+           model: PurchaseOrder,
+           label: 'Create PO',
+           function: "po_create"
+
+    action :template,
+           :new_non_po_invoice,
+           permissions: :non_po_invoice_initiator,
+           label: "Create Non PO Invoice",
+           policy: Docs::P2P::Invoices::Policy,
+           model: Invoice,
+           function: "non_po_invoice_create"
+
+    action :redirect,
+           :new_payment_ticket,
+           policy: ::Docs::PaymentTickets::Policy,
+           model: ::BankPaymentRequest,
+           permissions: :bank_payment_request_initiator,
+           label: 'Create Payment Ticket',
+           url: 'payment_tickets/new'
+
+    # Todo agreement
+    # action :new_agreement, path: 'agreements/new', permissions: [:agreement_invoice_initiator]
+
+    action :redirect,
+           :new_vendor,
+           permissions: [:vendor_creator, :vendor_manager],
+           policy: ::Masters::Vendors::Policy,
+           model: ::YesBankVendor,
+           label: 'Add Vendor',
+           url: 'vendor/add'
   end
 
   item :dashboard, icon: 'https://img.icons8.com/windows/20/ffffff/speed.png'

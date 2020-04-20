@@ -1,4 +1,5 @@
 class Menu::Item
+  include ActionManager::DSL
 
   attr_accessor :key, :id, :path, :icon, :label, :create, :features, :user_subscriptions, :permissions, :parent
 
@@ -97,7 +98,11 @@ class Menu::Item
     }
 
     # Rejecting nil items as it would indicate that the tab should not be shown
-    json[:items] = items.as_json(options).reject { |item| item.nil? } if items.present?
+    if items.present?
+      json[:items] = items.as_json(options).reject { |item| item.nil? }
+    elsif actions.present?
+      json[:items] = actions.values.as_json(options).reject { |item| item.nil? } if actions.present?
+    end
     json
   end
 

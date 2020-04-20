@@ -25,7 +25,7 @@ class ActionManager::Validate < Transactions::API
   end
 
   def init_action(context, route_klass:, params:, **)
-    context[:action] = route_klass.paths[params[:record_action]]
+    context[:action] = route_klass.action_paths[params[:record_action]]
     unless context[:action]
       return on_error context, :base, "Invalid action"
     end

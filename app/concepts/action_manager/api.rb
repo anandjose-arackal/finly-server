@@ -1,36 +1,11 @@
 class ActionManager::API < Transactions::API
   include DynamicAttributes
+  extend ActionManager::DSL
 
   class_attr :registered_type
 
-  def self.actions
-    @actions ||= {}
-  end
-
-  def self.action(type, id, config={}, &block)
-    raise "Invalid action #{type}" unless ActionManager::Registry[type].present?
-
-    actions[id] = ActionManager::Registry[type].new(type, id, config: config, scopes: scopes, root: self, &block)
-  end
-
-  def self.scopes
-    @scopes ||= []
-  end
-
-  def self.scope(params={}, &block)
-    scopes.push(params)
-    instance_eval &block
-    scopes.pop
-  end
-
-  # Path gives access to all nested actions as well. Easier to navigate to find the action instead of iterating through actions
-  def self.paths
-    @paths ||= {}.with_indifferent_access
-  end
-
-  def self.register_path(path, action)
-    paths[path] = action
-  end
+  singleton_class.send(:alias_method, :scope, :action_scope)
+  singleton_class.send(:alias_method, :paths, :action_paths)
 
   schema do
     params do
@@ -49,10 +24,10 @@ class ActionManager::API < Transactions::API
     true
   end
 
-  def build(context, params:, current_user:, **)
+  def build(context, options)
     context[:config] = []
     self.class.actions.each_pair do |id, action|
-      hash = action.build(current_user, params)
+      hash = action.build(options)
       next if hash.nil?
 
       context[:config] << hash

@@ -1,4 +1,4 @@
-module ActionManager::Registry
+module ActionManager::Type
   extend ActiveSupport::Concern
 
   def self.[](type)
@@ -12,9 +12,9 @@ module ActionManager::Registry
   class_methods do
     def register(type)
       self.registered_type = type
-      ActionManager::Registry.types[type] = self
+      ActionManager::Type.types[type] = self
 
-      ActionManager::Registry.module_eval do
+      ActionManager::Type.module_eval do
         define_method type do |args, &block|
           action type, name, args, &block
         end

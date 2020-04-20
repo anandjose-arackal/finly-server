@@ -1,5 +1,6 @@
 class Menu::API < Transactions::API
   include DynamicAttributes
+  extend ActionManager::DSL
 
   MODULES_CONFIG = [
       {
