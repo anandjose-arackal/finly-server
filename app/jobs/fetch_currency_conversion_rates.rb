@@ -11,7 +11,8 @@ class FetchCurrencyConversionRates
     }
     @result = Currency::FetchData.(nil, params)
     CurrencyConversionRate.create(@result.currency_data)
+
+    puts " ----------------------------- FINISHED #{self.name} ------------------------------"
   end
 
-  puts " ----------------------------- FINISHED #{self.name} ------------------------------"
 end

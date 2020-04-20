@@ -18,6 +18,8 @@ class ReminderOutwardInvoices
         end
       end
     end
+
+    puts " ----------------------------- FINISHED #{self.name} ------------------------------"
   end
 
   private
@@ -39,7 +41,6 @@ class ReminderOutwardInvoices
       end
     end
 
-    puts " ----------------------------- FINISHED #{self.name} ------------------------------"
   end
 
 end
