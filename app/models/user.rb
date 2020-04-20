@@ -1235,7 +1235,8 @@ class User < ApplicationRecord
         pin_code: self.profile&.pin_code,
         city: self.profile&.city,
         state_id: self.profile&.state_id,
-        state_name: self.profile&.state_name
+        state_name: self.profile&.state_name,
+        pan: self.profile&.pan
       }
     else
       {
