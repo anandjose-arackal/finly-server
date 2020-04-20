@@ -40,55 +40,55 @@ every 15.minutes do
   runner "BbpsBillStatusChecker.perform"
 end
 
-every 30.minutes do
-  runner "IciciStatementsFetch.perform"
-  runner "CheckForFailedNeftTransactions.perform"
-  runner "BankTransferProcessRetry.perform"
-  runner "ExpenseStatusUpdate.perform"
-end
-
-every 1.hour do
-  runner "UpdateCompanyBalances.perform"
-end
-
-every 1.day, at: '12:01 am' do
-  runner "ReportAutoSubmit.perform"
-end
-
-every 1.day, at: '8:30 am' do
-  runner "TaxBenefitProcess.perform"
-  runner "BankTransferProcess.perform"
-end
-
-every 1.day, at: '5:35 am' do
-  runner "FetchCurrencyConversionRates.perform"
-end
-
-every 1.day, at: '5:45 am' do
-  runner "FetchCurrencyConversionRates.perform"
-end
-
-every 1.day, at: '6:30 am' do
-  runner "FixSpuriousPayments.perform"
-end
-
-every :hour do
-  runner "SummaryMailersProcessor.perform"
-end
-
-every 1.day, at: "9:30 am" do
-  runner "ReminderOutwardInvoices.perform"
-  runner "SummaryMailersProcessor.perform"
-end
-
-every 1.day, at: "8:00 am" do
-  runner "BbpsBillsFetch.perform"
-end
-
-every 1.day, at: "6:00 pm" do
-  runner "ReminderAwaitingApproval.perform"
-end
-
-every 1.day, at: "12:10 am" do
-  runner "BbpsBillerSync.perform"
-end
+# every 30.minutes do
+#   runner "IciciStatementsFetch.perform"
+#   runner "CheckForFailedNeftTransactions.perform"
+#   runner "BankTransferProcessRetry.perform"
+#   runner "ExpenseStatusUpdate.perform"
+# end
+#
+# every 1.hour do
+#   runner "UpdateCompanyBalances.perform"
+# end
+#
+# every 1.day, at: '12:01 am' do
+#   runner "ReportAutoSubmit.perform"
+# end
+#
+# every 1.day, at: '8:30 am' do
+#   runner "TaxBenefitProcess.perform"
+#   runner "BankTransferProcess.perform"
+# end
+#
+# every 1.day, at: '5:35 am' do
+#   runner "FetchCurrencyConversionRates.perform"
+# end
+#
+# every 1.day, at: '5:45 am' do
+#   runner "FetchCurrencyConversionRates.perform"
+# end
+#
+# every 1.day, at: '6:30 am' do
+#   runner "FixSpuriousPayments.perform"
+# end
+#
+# every :hour do
+#   runner "SummaryMailersProcessor.perform"
+# end
+#
+# every 1.day, at: "9:30 am" do
+#   runner "ReminderOutwardInvoices.perform"
+#   runner "SummaryMailersProcessor.perform"
+# end
+#
+# every 1.day, at: "8:00 am" do
+#   runner "BbpsBillsFetch.perform"
+# end
+#
+# every 1.day, at: "6:00 pm" do
+#   runner "ReminderAwaitingApproval.perform"
+# end
+#
+# every 1.day, at: "12:10 am" do
+#   runner "BbpsBillerSync.perform"
+# end
