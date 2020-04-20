@@ -33,7 +33,7 @@ json.items do
         json.total_amount do
           json.partial! 'shared/amount', amount: Amount.new(value: money_request.total_amount, currency: currency)
         end
-        json.utr_number money_request.bank_reference_number
+        json.utr_number money_request.bank_reference_number.present? ? money_request.bank_reference_number : utr
         json.source_account money_request.source_account
       end
     end
