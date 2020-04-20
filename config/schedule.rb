@@ -78,7 +78,7 @@ end
 
 every 1.day, at: "9:30 am", roles: [:whenever_cron] do
   runner "ReminderOutwardInvoices.perform"
-  runner "SummaryMailersProcessor.perform"
+  runner "CompanyAccountScheduledTransfer.perform"
 end
 
 every 1.day, at: "8:00 am", roles: [:whenever_cron] do
