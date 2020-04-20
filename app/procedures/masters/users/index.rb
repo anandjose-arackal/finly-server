@@ -23,7 +23,7 @@ class Masters::Users::Index < IndexBuilder::API
     date value: :created_at
   end
 
-  column :status, sort: :status_name, default: true do
+  column :status, default: true do
     indicator value: :user_status, format: :format_status
   end
 
