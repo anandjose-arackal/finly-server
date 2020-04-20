@@ -12,12 +12,12 @@ module ActionManager::Builder
         icon: self.icon,
         type: self.type,
         format: self.format,
-        config: build_config(user, params),
+        config: build_config(options),
     }
     if actions.present?
       map[:actions] = []
       actions.each_pair do |id, action|
-        action = action.build(user, params)
+        action = action.build(options)
         next if action.blank?
 
         map[:actions] << action
@@ -26,7 +26,7 @@ module ActionManager::Builder
     map
   end
 
-  def build_config(user, params)
+  def build_config(options)
     config
   end
 
