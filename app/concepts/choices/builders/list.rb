@@ -3,7 +3,7 @@ class Choices::Builders::List < Choices::Builders::Base
   register! :list
 
   def self.call(*args)
-    self.new({choices: args&.map {|m| m.slice(:name, :active)}})
+    self.new({choices: args&.map {|m| m.slice(:id, :name, :active)}})
   end
 
   def choices(params: {}, user: nil, form_entity: nil)

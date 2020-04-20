@@ -60,9 +60,9 @@ class Masters::Users::Index < IndexBuilder::API
   counter -> (user, collection) do
     counter = IndexBuilder::Counter.new :filter_state
     counter.add nil, "All", collection.count
-    counter.add "1", "Active", collection.filter_state(1).count
-    counter.add "2", "Pending", collection.filter_state(2).count
-    counter.add "3", "Inactive", collection.filter_state(3).count
+    counter.add 1, "Active", collection.filter_state(1).count
+    counter.add 2, "Pending", collection.filter_state(2).count
+    counter.add 3, "Inactive", collection.filter_state(3).count
     counter
   end
 

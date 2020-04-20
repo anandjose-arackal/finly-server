@@ -1861,5 +1861,9 @@ class User < ApplicationRecord
     end
   end
 
+  def self.ransackable_scopes(auth_object = nil)
+    [:filter_state]
+  end
+
 
 end
