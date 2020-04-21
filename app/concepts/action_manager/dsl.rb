@@ -9,7 +9,8 @@ module ActionManager::DSL
     def action(type, id, config={}, &block)
       raise "Invalid action #{type}" unless ActionManager::Type[type].present?
 
-      actions[id] = ActionManager::Type[type].new(type, id, config: config, scopes: action_scopes, registry: action_registry, &block)
+      parent = self.class <= ActionManager::Action ? self : nil
+      actions[id] = ActionManager::Type[type].new(type, id, config: config, action_scopes: action_scopes, action_registry: action_registry, parent: parent, &block)
     end
 
     def action_scopes
@@ -24,7 +25,7 @@ module ActionManager::DSL
 
     # Path gives access to all nested actions as well. Easier to navigate to find the action instead of iterating through actions
     def action_paths
-      @paths ||= {}.with_indifferent_access
+      @action_paths ||= {}.with_indifferent_access
     end
 
     def register_action(path, action)
@@ -34,6 +35,7 @@ module ActionManager::DSL
     def action_registry
       self
     end
+
   # end
 
 end

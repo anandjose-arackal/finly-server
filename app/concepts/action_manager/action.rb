@@ -4,7 +4,7 @@ class ActionManager::Action
   include ActionManager::DSL
   include DynamicAttributes
 
-  attr_accessor :type, :id, :path, :parent, :registry, :scopes,
+  attr_accessor :type, :id, :path, :parent, :action_registry, :action_scopes,
                 :permissions, :label, :icon, :policy, :authorize,
                 :model, :format
 
@@ -34,19 +34,19 @@ class ActionManager::Action
     end
   end
 
-  def initialize(type, id, config: {}, scopes: [], parent: nil, registry: nil, &block)
+  def initialize(type, id, config: {}, action_scopes: [], parent: nil, action_registry: nil, &block)
     self.id = id
     self.type = type
-    self.scopes = scopes
+    self.action_scopes = action_scopes.deep_dup
     self.parent = parent
-    self.registry = registry
-    self.path = self.parent.present? ? "#{self.parent.path}/#{id}" : id
+    self.action_registry = action_registry
+    self.path = self.parent.present? ? "#{self.parent.path}/#{id}" : id.to_s
 
     # If a registry is provider, it registers itself as an action. This registration can be used for validation etc
     # Not mandating it help decouple the action to be used independently
-    self.registry&.register_action(path, self)
+    self.action_registry&.register_action(path, self)
 
-    scopes.each do |conf|
+    action_scopes.each do |conf|
       conf.each_pair do |key, value|
         self.send("#{key}=", value)
       end
@@ -87,9 +87,9 @@ class ActionManager::Action
     @format || 'standard'
   end
 
-  def registry
-    @registry
-  end
+  # def action_registry
+  #   @action_registry
+  # end
 
   def permitted?(user)
     return false unless user.has_permission?(permissions)
@@ -102,8 +102,8 @@ class ActionManager::Action
     return true unless authorize.present?
     raise "Policy has not been defined for the action #{self.id}" unless policy.present?
 
-    policy = action.policy.new(user, record)
-    return true if policy.send(action.authorize)
+    policy = self.policy.new(user, record)
+    return true if policy.send(authorize)
 
     false
   end

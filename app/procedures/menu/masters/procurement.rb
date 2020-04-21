@@ -16,8 +16,8 @@ class Menu::Masters::Procurement < Menu::API
     action :template,
            :new_purchase_order,
            permissions: :purchase_order_initiator,
-           policy: Docs::P2P::PurchaseOrders::Policy,
-           model: PurchaseOrder,
+           policy: ::Docs::P2P::PurchaseOrders::Policy,
+           model: ::PurchaseOrder,
            label: 'Create PO',
            function: "po_create"
 
@@ -25,8 +25,8 @@ class Menu::Masters::Procurement < Menu::API
            :new_non_po_invoice,
            permissions: :non_po_invoice_initiator,
            label: "Create Non PO Invoice",
-           policy: Docs::P2P::Invoices::Policy,
-           model: Invoice,
+           policy: ::Docs::P2P::Invoices::Policy,
+           model: ::Invoice,
            function: "non_po_invoice_create"
 
     action :redirect,
