@@ -9,6 +9,5 @@ class Docs::P2P::PurchaseOrders::Receipts::Pending::Resolver < Resolver::API
     po = user.company.purchase_orders.where("policy_id in (#{policies.select('id').to_sql})")
     proc_ids = ProcurementStatusTaggable.where("procurement_id in (#{po.select("procurement_id").to_sql})").with_status_tag_ids(st_ids).select('procurement_id').to_sql
     po.where("procurement_id in (#{proc_ids})").where.not('purchase_orders.purchase_order_status_id IN (?)', PurchaseOrderStatus.ids_for([:closed, :voided]))
-    user.company.purchase_orders
   end
 end
