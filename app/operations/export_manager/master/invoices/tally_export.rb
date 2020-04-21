@@ -7,23 +7,9 @@ class ExportManager::Master::Invoices::TallyExport < ExportManager::Builders::Ta
   system :vp
   tally_config_key :invoice_voucher_configuration
 
-  validate :fetch_invoices
-
-  def fetch_invoices
-    invoices_presenter = BankTransfer::InwardInvoices::Index.(user, params)
-
-    unless invoices_presenter.success?
-      add_message :error, invoices_presenter.messages[:error]
-      return
-    end
-    invoices_presenter
-  end
-
   def input
-    invoices_presenter = fetch_invoices
-    return if has_errors?
-
-    invoices_presenter.invoices.scope_all_except_voided
+    invoices = Resolver::Router.dispatch('invoices.default', params: params.merge(filter: true, paginate: false), current_user: user)
+    invoices.scope_all_except_voided
   end
 
   def generate_voucher(generator, invoice)
