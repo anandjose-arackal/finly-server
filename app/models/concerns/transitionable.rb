@@ -935,6 +935,9 @@ module Transitionable
   end
 
   def reviewers_completed_count
+    return reviewers_count if review_completed?
+    return 0 if review_pending?
+
     levels = document_level_reviewer_mappings.map {|l| l.level_id}.uniq
     level_count = levels.size
     current_level_index = levels.find_index(controlling_level_id)
