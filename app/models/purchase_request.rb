@@ -133,7 +133,7 @@ class PurchaseRequest < ApplicationRecord
         self.awaiting_action_items(user_id)
       end
     when 92
-      where purchase_request_status_id: PurchaseOrderStatus.ids_for(:approved, :auto_approved, :po_created, :partially_closed, :order_initiated)
+      where purchase_request_status_id: PurchaseRequestStatus.ids_for(:approved, :auto_approved, :po_created, :partially_closed, :order_initiated)
     else
       where purchase_request_status_id: status_ids
     end
