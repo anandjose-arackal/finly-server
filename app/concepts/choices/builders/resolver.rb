@@ -14,10 +14,6 @@ class Choices::Builders::Resolver < Choices::Builders::Base
     config[:choice_params]
   end
 
-  def klass
-    ::Resolver::Router.resolve(route)&.first&.klass
-  end
-
   def find_by_id(id, params: {}, user: nil)
     params.deep_merge!({q: {id_eq: id}})
     choices(params: params, user: user)&.first
@@ -30,13 +26,12 @@ class Choices::Builders::Resolver < Choices::Builders::Base
 
   def choices(params: {}, user: nil)
     params = params.with_indifferent_access.deep_merge(choice_params.with_indifferent_access)
-    result = klass.(params: params, current_user: user)
-    result['model.records']
+    ::Resolver::Router.dispatch(route, params: params, current_user: user)
   end
 
   def build(params: {}, user: {})
     params = params.with_indifferent_access.deep_merge(choice_params.with_indifferent_access)
-    result = klass.(params: params, current_user: user).as_json
+    result = ::Resolver::Router.dispatch(route, params: params, current_user: user)
 
     {
         partial: false, choices: result

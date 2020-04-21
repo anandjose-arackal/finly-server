@@ -63,13 +63,7 @@ class AutoComplete::API < Transactions::API
   end
 
   def resolver_builder(context, options)
-    if self.class.resolver.present?
-      resolver_klass = Resolver::Router[self.class.resolver]&.first&.klass
-      raise "Resolver with route #{self.class.resolver} not found" if resolver_klass.blank?
-      return resolver_klass
-    elsif self.class.model
-      return self.class.model&.resolver
-    end
+    return self.class.resolver if self.class.resolver.present?
 
     raise "Resolver route or model is not defined for #{self.class.name}"
   end
