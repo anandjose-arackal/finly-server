@@ -403,10 +403,10 @@ class YesBankVendor < ApplicationRecord
   end
 
   def review_completed?
-    PurchaseRequestStatus.ids_for(:approved, :auto_approved, :deactivated).include?(status_id)
+    VendorStatus.ids_for(:approved, :auto_approved, :deactivated).include?(status_id)
   end
 
   def review_in_progress?
-    PurchaseRequestStatus.ids_for(:awaiting_approval).include?(status_id)
+    VendorStatus.ids_for(:awaiting_approval).include?(status_id)
   end
 end

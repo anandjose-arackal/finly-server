@@ -1152,11 +1152,11 @@ class Invoice < ApplicationRecord
   end
 
   def review_completed?
-    PurchaseRequestStatus.ids_for(:unpaid, :partially_paid, :paid, :approved, :auto_approved, :closed, :pending, :initiated, :voided).include?(invoice_status_id)
+    InwardInvoiceStatus.ids_for(:unpaid, :partially_paid, :paid, :approved, :auto_approved, :closed, :pending, :initiated, :voided).include?(invoice_status_id)
   end
 
   def review_in_progress?
-    PurchaseRequestStatus.ids_for(:processing).include?(invoice_status_id)
+    InwardInvoiceStatus.ids_for(:processing).include?(invoice_status_id)
   end
 
   private
