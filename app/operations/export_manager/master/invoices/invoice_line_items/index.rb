@@ -27,20 +27,8 @@ class ExportManager::Master::Invoices::InvoiceLineItems::Index < ExportManager::
   attribute :total_amount
 
   def input
-    procurements_op = ::Procurements::Index.(user, params)
-
-    unless procurements_op.success?
-      add_message :error, procurements_op.messages[:error]
-      return
-    end
-
-    procurements = procurements_op.procurements
-
-    invoices = Invoice.with_procurement_id(procurements.pluck(:id))
-
-    invoice_line_items = InvoiceLineItem.with_parent_type('Invoice').with_parent_id(invoices.pluck(:id)).order(parent_id: :asc)
-
-    invoice_line_items
+    invoices = Resolver::Router.dispatch('invoices.default', params: params.merge(filter: true, paginate: false), current_user: user)
+    InvoiceLineItem.where(parent_type: "Invoice").where("parent_id IN (#{invoices.select('id').to_sql})").order(parent_id: :asc)
   end
 
   def procurement_name(item)
