@@ -24,16 +24,15 @@ class Resolver::Transactions
 
   class Resolve
     def self.with(options, klass: nil, route: nil, paginate: false, filter: true, includes: [])
-      dispatch_params = {
-          params: options[:params],
-          paginate: paginate,
-          filter: filter,
-          includes: includes
-      }
       if klass.present?
-        options['model.records'] = klass.new(options[:current_user]).resolve(dispatch_params)
+        options['model.records'] = klass.new(options[:current_user]).resolve(
+            params: options[:params],
+            paginate: paginate,
+            filter: filter,
+            includes: includes
+        )
       elsif route.present?
-        options['model.records'] = Resolver::Router.dispatch(route, current_user: options[:current_user], params: dispatch_params)
+        options['model.records'] = Resolver::Router.dispatch(route, current_user: options[:current_user], params: options[:params].merge({paginate: paginate, filter: filter, includes: includes}))
       else
         raise 'Klass or Route not provided for resolving'
       end
