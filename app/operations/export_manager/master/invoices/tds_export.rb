@@ -6,7 +6,6 @@ class ExportManager::Master::Invoices::TdsExport < ExportManager::Builders::Spre
   handle :tds_export
   screen 'invoices.index'
   system :vp
-  validate :fetch_invoices
 
   attribute :invoice_number
   attribute :finly_ref_no
@@ -29,21 +28,9 @@ class ExportManager::Master::Invoices::TdsExport < ExportManager::Builders::Spre
   attribute :igst_amount
   attribute :amount_paid
 
-  def fetch_invoices
-    invoices_presenter = BankTransfer::InwardInvoices::Index.(user, params)
-
-    unless invoices_presenter.success?
-      add_message :error, invoices_presenter.messages[:error]
-      return
-    end
-    invoices_presenter
-  end
-
   def input
-    invoices_presenter = fetch_invoices
-    return if has_errors?
-
-    invoices = invoices_presenter.invoices.where(invoice_status_id: InwardInvoiceStatus.ids_for([:partially_paid, :paid])).left_joins(:payments)
+    invoices = Resolver::Router.dispatch('invoices.default', {current_user: user, params: params})
+    invoices.where(invoice_status_id: InwardInvoiceStatus.ids_for([:partially_paid, :paid])).left_joins(:payments)
   end
 
   def finly_ref_no(invoice)
