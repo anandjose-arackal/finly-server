@@ -74,6 +74,9 @@ Resolver::Router.draw do
   scope :purchase_orders do
     route 'default', Docs::P2P::PurchaseOrders::Resolver
     route 'advances', Docs::P2P::PurchaseOrders::Advances::Resolver
+    scope :receipts do
+      route 'pending', Docs::P2P::PurchaseOrders::Receipts::Pending::Resolver
+    end
   end
 
   scope :bbps_bills do

@@ -16,4 +16,5 @@ ActionManager::Router.draw do
   route 'payment_tickets', Docs::PaymentTickets::Action
   route 'payments', Docs::PaymentTickets::Payments::Action
   route 'upcoming_invoices', Docs::P2P::Invoices::Agreement::UpcomingInvoices::Action
+  route 'receive', Docs::P2P::PurchaseOrders::Receipts::Pending::Action
 end

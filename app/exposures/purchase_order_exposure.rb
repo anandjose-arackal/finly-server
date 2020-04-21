@@ -13,6 +13,7 @@ class PurchaseOrderExposure < Exposures::API
   attribute :review_progress, record_attribute: true, includes: [:dlrms]
   attribute :submitted_at, record_attribute: true
   attribute :approved_at, record_attribute: true
+  attribute :expected_delivery_date, record_attribute: :delivery_date
   attribute :days_from_approval do
     next unless record.approved_at.present?
 

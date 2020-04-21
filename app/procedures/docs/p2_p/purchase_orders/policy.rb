@@ -16,6 +16,10 @@ class Docs::P2P::PurchaseOrders::Policy < ApplicationPolicy
     owner?
   end
 
+  def create_grn?
+    false
+  end
+
   def approve?
     return false if user.blank?
     (record.processing? rescue false) && record.get_reviewers.include?(user)

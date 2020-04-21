@@ -183,6 +183,24 @@ class PurchaseOrder < ApplicationRecord
       where purchase_order_status_id: status_ids
     end
   }
+  scope :with_grn_status_id, -> (status_id) {
+    case status_id
+    when 100
+      # Due this week
+      where 'delivery_date between ? and ?', Date.today, Date.today.end_of_week
+    when 101
+      # Due this month
+      where 'delivery_date between ? and ?', Date.today, Date.today.end_of_month
+    when 102
+      # Overdue
+      where 'delivery_date < ?', Date.today
+    when 103
+      # Overdue
+      where 'delivery_date IS NULL OR delivery_date > ?', Date.today.end_of_month
+    else
+      self.all
+    end
+  }
   scope :with_controlling_level_ids, -> (level_ids) { where controlling_level_id: level_ids }
   scope :with_controlling_user_id, -> (id) { where controlling_user_id: id }
   scope :with_procurement_id, ->(procurement_id) { where procurement_id: procurement_id }

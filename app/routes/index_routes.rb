@@ -14,4 +14,5 @@ IndexBuilder::Router.draw do
   route 'payments', Docs::PaymentTickets::Payments::Index
   # route 'beneficiary_payments', Docs::P2P::BeneficiaryPayment::Index
   route 'upcoming_invoices', Docs::P2P::Invoices::Agreement::UpcomingInvoices::Index
+  route 'receive', Docs::P2P::PurchaseOrders::Receipts::Pending::Index
 end
