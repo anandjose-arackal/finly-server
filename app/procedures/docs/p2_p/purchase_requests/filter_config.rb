@@ -1,7 +1,7 @@
 class Docs::P2P::PurchaseRequests::FilterConfig < Filters::API
 
   attribute :order_number, label: 'Purchase Request ID', type: :text, simple: true
-  attribute :policy, type: :dropdown, simple: true, choices: Choices[:auto_complete].('policies')
+  attribute :policy_id, type: :dropdown, simple: true, choices: Choices[:auto_complete].('policies')
   attribute :created_at, type: :datetime, simple: true
   attribute :updated_at, type: :datetime, simple: true
   attribute :submitted_at, type: :datetime, simple: true
