@@ -1,13 +1,13 @@
-class Docs::P2P::PurchaseOrders::Receipts::Pending::Index < IndexBuilder::API
+class Docs::P2P::Inwards::Pending::Index < IndexBuilder::API
   include DynamicAttributes
 
-  resolver 'purchase_orders.receipts.pending'
+  resolver 'inward_documents.pending'
   reference '{{record.procurement_id}}'
   custom_fields :purchase_order
 
   # Fixed column is always default true
   column :vendor, label: 'Vendor Details', fixed: true, sort: :vendor_business_name, includes: [:vendor] do
-    text value: "{{record.vendor.business_name}}", format: 'primary'
+    text value: '{{record.vendor.business_name}}', format: 'primary'
     text value: "Vendor ID: {{record.vendor.vendor_id}}"
   end
 

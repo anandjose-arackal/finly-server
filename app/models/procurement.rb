@@ -33,7 +33,7 @@ class Procurement < ApplicationRecord
   belongs_to :procurement_status, optional: true
   belongs_to :vendor, optional: true, class_name: "YesBankVendor"
 
-  has_one :purchase_order, dependent: :destroy
+  has_one :purchase_order, -> { where.not purchase_order_status_id: PurchaseOrderStatus.id_for(:po_revised) }, dependent: :destroy
   has_many :po_revisions, class_name: 'PurchaseOrder', dependent: :destroy, foreign_key: :revised_po_id
   has_many :inward_documents, dependent: :destroy
   has_many :invoices, dependent: :destroy

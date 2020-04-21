@@ -1,4 +1,4 @@
-class Docs::P2P::PurchaseOrders::Receipts::Pending::FilterConfig < Filters::API
+class Docs::P2P::Inwards::Pending::FilterConfig < Filters::API
 
   attribute :po_number, label: "PO Number", type: :text, simple: true
   attribute :created_at, type: :datetime, simple: false

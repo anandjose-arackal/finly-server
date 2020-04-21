@@ -1,4 +1,4 @@
-class Docs::P2P::PurchaseOrders::Receipts::Pending::Resolver < Resolver::API
+class Docs::P2P::Inwards::Pending::Resolver < Resolver::API
 
   entity PurchaseOrder
 

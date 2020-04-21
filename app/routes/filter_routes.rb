@@ -14,5 +14,6 @@ Filters::Router.draw do
   route 'payment_tickets', Docs::PaymentTickets::FilterConfig
   route 'payments', Docs::PaymentTickets::Payments::FilterConfig
   route 'upcoming_invoices', Docs::P2P::Invoices::Agreement::UpcomingInvoices::FilterConfig
-  route 'receive', Docs::P2P::PurchaseOrders::Receipts::Pending::FilterConfig
+  route 'receive', Docs::P2P::Inwards::Pending::FilterConfig
+  route 'receive_history', Docs::P2P::Inwards::Received::FilterConfig
 end
