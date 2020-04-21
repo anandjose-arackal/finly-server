@@ -97,5 +97,7 @@ class Menu::Masters::Procurement < Menu::API
   end
 
   item :download_manager, icon: "https://img.icons8.com/windows/20/ffffff/software-installer.png"
+  item :balances, icon: 'https://img.icons8.com/windows/20/ffffff/wallet.png'
+  item :settings, permissions: [:admin]
 
 end
