@@ -169,7 +169,7 @@ class InvoiceExposure < Exposures::API
   # end
   #
   # def invoice_status(invoice_line_item)
-  #   invoice_line_item.parent&.status&.name&.humanize
+  #   invoice_line_item.parent&.status&.name&.titleize
   # end
   #
   # def is_invoice_approved(invoice_line_item)

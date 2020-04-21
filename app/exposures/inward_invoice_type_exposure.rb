@@ -1,7 +1,7 @@
 class InwardInvoiceTypeExposure < Exposures::API
 
   attribute :name do
-    record.name.humanize
+    record.name.titleize
   end
 
   attribute :key do
