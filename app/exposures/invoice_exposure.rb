@@ -63,7 +63,7 @@ class InvoiceExposure < Exposures::API
   attribute :sgst_amount do
     case record.gst_type_id
     when GstType.id_for(:cgst_sgst)
-      cgst
+      cgst_amount
     when GstType.id_for(:igst)
       0
     end
