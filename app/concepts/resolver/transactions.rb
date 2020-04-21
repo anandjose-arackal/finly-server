@@ -32,7 +32,7 @@ class Resolver::Transactions
             includes: includes
         )
       elsif route.present?
-        options['model.records'] = Resolver::Router.dispatch(route, current_user: options[:current_user], params: options[:params])
+        options['model.records'] = Resolver::Router.dispatch(route, current_user: options[:current_user], params: options[:params].merge({paginate: paginate, filter: filter, includes: includes}))
       else
         raise 'Klass or Route not provided for resolving'
       end
