@@ -2,7 +2,7 @@ class Forms::API::Entity::Types::DropDown < Forms::API::Entity::Base
   register :dropdown
   hint 'Select value'
 
-  operators :eq_any, :not_eq_all, :blank, :present
+  operators :eq_any, :not_eq_all, :null, :not_null
 
   consumes_choices!
 
