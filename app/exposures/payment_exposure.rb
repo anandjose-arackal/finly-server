@@ -40,15 +40,15 @@ class PaymentExposure < Exposures::API
   attribute :utr do
     case record.reference_resource_type
     when 'BbpsYesBankTransaction'
-      record.reference_resource.bbps_ref_id
+      record.reference_resource&.bbps_ref_id
     when 'CardTransaction'
-      record.reference_resource.reference_id
+      record.reference_resource&.reference_id
     when 'IciciBankTransaction', 'KotakBankTransaction', 'YesBankTransaction'
-      record.reference_resource.utr
+      record.reference_resource&.utr
     when 'Payment', 'Report', 'BankTransaction'
       nil
     when 'VirtualAccountTransaction'
-      record.reference_resource.transfer_id
+      record.reference_resource&.transfer_id
     else
       nil
     end
