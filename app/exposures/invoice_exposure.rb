@@ -14,9 +14,13 @@ class InvoiceExposure < Exposures::API
     next unless record.due_date.present?
 
     days = record.due_date - Date.today
-    next unless days >= 0
+    next if InwardInvoiceStatus.ids_for(:paid, :closed, :voided).include?(record.invoice_status_id)
 
-    days
+    if days < 0
+      "Overdue by #{days.abs.to_i} days"
+    else
+      "#{days.to_i} days"
+    end
   end
   attribute :controlling_level, record_attribute: true, exposure: true, includes: [:controlling_level]
   attribute :approved_at, record_attribute: true

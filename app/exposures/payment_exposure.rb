@@ -174,10 +174,12 @@ class PaymentExposure < Exposures::API
     next if due_date.blank?
 
     days = (due_date - Date.today).to_i
+    next if PaymentStatus.id_for(:completed) == record.payment_status_id
+
     if days < 0
-      "Overdue by #{days.abs} days"
+      "Overdue by #{days.abs.to_i} days"
     else
-      "#{days} days"
+      "#{days.to_i} days"
     end
   end
 

@@ -23,9 +23,13 @@ class BbpsBillExposure < Exposures::API
     next unless record.due_date.present?
 
     days = record.due_date - Date.today
-    next unless days >= 0
+    next if BbpsBillStatus.ids_for(:paid).include?(record.status_id)
 
-    days
+    if days < 0
+      "Overdue by #{days.abs.to_i} days"
+    else
+      "#{days.to_i} days"
+    end
   end
   attribute :paid_at, record_attribute: true
   attribute :transaction_id, record_attribute: true
