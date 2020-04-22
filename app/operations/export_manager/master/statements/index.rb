@@ -12,8 +12,8 @@ class ExportManager::Master::Statements::Index < ExportManager::Builders::Spread
   attribute :type
   attribute :purpose
   attribute :merchant
-  # attribute :merchant_employee_id_id 
-  # attribute :card_number 
+  attribute :merchant_employee_id_id 
+  attribute :card_number 
   attribute :credit
   attribute :debit
   attribute :closing_balance
@@ -30,7 +30,6 @@ class ExportManager::Master::Statements::Index < ExportManager::Builders::Spread
     end
     
     result = result.scoped_finly_transactions.where(associated_transaction_type: "CardTransaction")
-    return if result.blank?
     result.success.sort_date_asc
   end
 
