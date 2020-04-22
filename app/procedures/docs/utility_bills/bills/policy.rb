@@ -61,6 +61,10 @@ class Docs::UtilityBills::Bills::Policy < ApplicationPolicy
     user.vendor_payment_admin? && record.awaiting_approval? && record.taken_control? && record.get_reviewers.include?(user)
   end
 
+  def export?
+    true
+  end
+
   # def return_control?
   #
   # end
