@@ -44,13 +44,13 @@ class Docs::P2P::PurchaseOrders::Action < ActionManager::API
            route: "invoices.index",
            authorize: :export?
 
-    action :template,
+`    action :template,
            :create,
            permissions: :purchase_order_initiator,
            format: 'primary',
            label: 'Create PO',
            icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
-           function: "po_create"
+           function: "po_create"`
 
   end
 

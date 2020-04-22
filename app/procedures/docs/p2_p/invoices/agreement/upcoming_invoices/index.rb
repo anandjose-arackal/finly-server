@@ -127,6 +127,14 @@ class Docs::P2P::Invoices::Agreement::UpcomingInvoices::Index < IndexBuilder::AP
     text value: "{{record.payment_agreement.policy.name}}"
   end
 
+  column :action, default: true do
+    action :template,
+           :create,
+           permissions: :agreement_invoice_initiator,
+           label: 'Create Invoice',
+           function: 'agreement_invoice_create'
+  end
+
   counter -> (user, collection) do
     # Use custom scope to support awaiting approval status
     counter = IndexBuilder::Counter.new :with_status_id
