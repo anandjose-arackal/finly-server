@@ -57,8 +57,12 @@ class Docs::UtilityBills::Bills::Index < IndexBuilder::API
     date value: :paid_at
   end
 
-  column :transaction_id, label: "Transaction ID", default: true do
-    text value: :transaction_id
+  column :utr, label: "UTR", default: true, includes: [:payments] do
+    text value: ->(context) {context[:record].payments&.first&.bbps_bank_transaction&.bbps_ref_id}
+  end
+
+  column :payment_status, label: "Payment Status", default: true, includes: [:payments] do
+    indicator value: ->(context) {context[:record].payments&.first&.payment_status&.to_exposure&.name || 'Pending'}, format: :format_payment_status
   end
 
   column :created_at do
@@ -73,7 +77,7 @@ class Docs::UtilityBills::Bills::Index < IndexBuilder::API
     date value: :approved_at
   end
 
-  column :total_amount, default: true, includes: [total_amount: :currency] do
+  column :amount, default: true, includes: [total_amount: :currency] do
     amount value: :total_amount
   end
 
@@ -93,13 +97,9 @@ class Docs::UtilityBills::Bills::Index < IndexBuilder::API
     checkbox value: :auto_fetched
   end
 
-  # column :controlling_user, default: true, includes: [:controlling_user] do
-  #   user value: :controlling_user
-  # end
-
-  column :controlling_level, default: true, includes: [:controlling_level] do
-    text value: "{{record.controlling_level.name}}"
-  end
+  IndexBuilder::API::ColumnTemplate::ControllingUser(self)
+  IndexBuilder::API::ColumnTemplate::ControllingLevel(self)
+  IndexBuilder::API::ColumnTemplate::ReviewProgress(self)
 
   column :policy, default: true, includes: [:policy] do
     text value: "{{record.policy.name}}"
@@ -178,22 +178,25 @@ class Docs::UtilityBills::Bills::Index < IndexBuilder::API
     format
   end
 
-  def self.customer_param_value_1(context)
-    return nil if context[:record].customer_param_value_1.blank?
-
-    "#{context[:record].customer_param_key_1} - #{context[:record].customer_param_value_1}"
-  end
-
-  def self.customer_param_value_2(context)
-    return nil if context[:record].customer_param_value_2.blank?
-
-    "#{context[:record].customer_param_key_2} - #{context[:record].customer_param_value_2}"
-  end
-
-  def self.customer_param_value_3(context)
-    return nil if context[:record].customer_param_value_3.blank?
-
-    "#{context[:record].customer_param_key_3} - #{context[:record].customer_param_value_3}"
+  def self.format_payment_status(context)
+    case context[:record].payments&.first&.payment_status&.name&.to_s&.to_sym
+    when :failed, :cancelled
+      format = 'danger'
+    when :completed
+      format = 'success'
+    when :scheduled, :possible_failure, :pending_credit
+      # Todo show awaiting approvals
+      # if context[:record].controlling_user?(context[:user])
+      format = 'warning'
+      # else
+      #   format = 'info'
+      # end
+    when :pending, :in_progress, :processing, :pending_approval, :pending_retry, :initiated
+      format = 'info'
+    else
+      format = 'info'
+    end
+    format
   end
 
 end

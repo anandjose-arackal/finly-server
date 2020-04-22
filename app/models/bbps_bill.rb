@@ -518,6 +518,20 @@ class BbpsBill < ApplicationRecord
     BbpsBillStatus.ids_for(:approved, :auto_approved).include?(self.status_id)
   end
 
+
+  # Used for tracking completion %
+  def review_pending?
+    BbpsBillStatus.ids_for(:open, :retracted, :rejected).include?(status_id)
+  end
+
+  def review_completed?
+    VendorStatus.ids_for(:approved, :auto_approved, :payment_ticket_created, :payment_initiated, :failed, :paid, :voided, :payment_ticket_deleted).include?(status_id)
+  end
+
+  def review_in_progress?
+    VendorStatus.ids_for(:awaiting_approval).include?(status_id)
+  end
+
   private
 
   def resolve_bill_validation
@@ -556,5 +570,6 @@ class BbpsBill < ApplicationRecord
       self.total_amount = Amount.new(value: total_amount_value, currency_id: 1)
     end
   end
+
 
 end

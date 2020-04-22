@@ -139,6 +139,7 @@ class PaymentExposure < Exposures::API
 
   attribute :category, exposure: true do
     record.beneficiary_payment_parent&.category
+    # Todo bbps biller
   end
 
   attribute :invoice_date do
