@@ -4,9 +4,9 @@ class ExportManager::Master::UtilityBills::Subscriptions::Index < ExportManager:
   description 'Utility Bill Masters'
   configurable true
   system :vp
-  screen 'bbps_biller_subscriptions.index'
+  screen 'utility_subscriptions.index'
+  resolver 'utility_subscriptions.default'
   handle :utility_bill_masters
-  validate :input
 
   attribute :id
   attribute :bbps_biller_id
@@ -52,17 +52,6 @@ class ExportManager::Master::UtilityBills::Subscriptions::Index < ExportManager:
   attribute :last_paid_at
   attribute :number_of_bills_present
   attribute :number_of_bills_paid
-
-  def input
-    result = ::Docs::UtilityBills::Subscriptions::Ops::Index.(params: params, current_user: user)
-
-    unless result.success?
-      add_message :error, result.messages[:error]
-      return
-    end
-
-    result['result']['subscriptions']
-  end
 
   def id(record)
     record.id
