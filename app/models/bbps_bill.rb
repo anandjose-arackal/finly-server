@@ -47,9 +47,13 @@
 #  hsn_sac                    :string(255)
 #  paid_at                    :datetime
 #  review_note                :text(65535)
+#  selected_amount_type       :string(255)
 #
 
 class BbpsBill < ApplicationRecord
+
+  AMOUNT_TYPES = %w(base_amount early_payment_amount late_payment_amount)
+
   include SoftDeletable, Transitionable
   include Sequenced::ActsAsSequenced
   include EventProducer
@@ -60,6 +64,7 @@ class BbpsBill < ApplicationRecord
 
   before_save :resolve_bill_validation
   before_save :set_quick_pay
+  before_save :update_total_amount
 
   belongs_to :subscription, class_name: 'BbpsBillerSubscription', foreign_key: :subscription_id, optional: true
   belongs_to :biller, class_name: 'BbpsBiller', foreign_key: :bbps_biller_id, optional: true
@@ -84,7 +89,7 @@ class BbpsBill < ApplicationRecord
   accepts_nested_attributes_for :amount
 
   delegate :open?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :payment_ticket_created?, :payment_initiated?, :failed, :paid?, :voided?, :payment_ticket_deleted?, to: :status
-  delegate :amount_value, to: :amount
+  delegate :amount_value, to: :total_amount
 
   default_scope {order('bbps_bills.created_at DESC')}
 
@@ -130,6 +135,19 @@ class BbpsBill < ApplicationRecord
     end
   }
 
+
+  scope :filter_overdue, -> (enabled) {
+    if enabled
+      where.not(status_id: BbpsBillStatus.id_for(:paid)).where.not(due_date: nil).where.not(due_date: Date.parse("01-01-9999")).where("due_date < ?", Date.today)
+    end
+  }
+
+  scope :filter_creation_date, -> (from, to) {
+    from = Date.parse(from) rescue Date.parse('01-01-1990') unless from.is_a?(Date)
+    to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
+    where('bbps_bills.created_at >= ? && bbps_bills.created_at <= ?', from, to)
+  }
+
   scope :with_id, -> (id) {
     where id: id
   }
@@ -164,6 +182,20 @@ class BbpsBill < ApplicationRecord
     where(subscription_id: id)
   }
 
+  scope :filter_year, -> (year) {
+    if year.blank?
+      year = Date.today.year
+    end
+    where('extract(year from created_at) = ?', year)
+  }
+
+  scope :filter_month, -> (month) {
+    if month.blank?
+      month = Date.today.month
+    end
+    where('extract(month from created_at) = ?', month)
+  }
+
   scope :filter_payable_bills, -> (enabled) {
     if enabled
       # where(status_id: BbpsBill.status_ids(:approved, :auto_approved))
@@ -183,8 +215,33 @@ class BbpsBill < ApplicationRecord
     joins(:biller).where("bbps_billers.biller_category_name = ?", "#{biller_type}")
   }
 
+  scope :filter_user_id, -> (id) {
+    filter_poc_id(id)
+  }
+
+  scope :filter_poc_awaiting_action, -> (user_id) {
+    subscription_ids = BbpsSubscriptionPoc.where(user_id: user_id).pluck(:subscription_id)
+    bills = where(subscription_id: subscription_ids)
+
+    bills = bills.where(user_id: nil)
+
+    # orphan_bill_ids = BbpsBill.where(user_id: nil).where(subscription_id: subscription_ids).pluck(:id)
+
+    where(id: bills.pluck(:id))
+  }
+
   scope :filter_poc_id, -> (id) {
-    where(user_id: id)
+    subscription_ids = BbpsSubscriptionPoc.where(user_id: id).pluck(:subscription_id)
+
+    bills = where(subscription_id: subscription_ids)
+
+    bill_ids = bills.where(user_id: nil).or(bills.where(user_id: id)).pluck(:id)
+
+    user_bill_ids = BbpsBill.where(user_id: id).pluck(:id)
+
+    ids = bill_ids + user_bill_ids
+
+    where(id: ids)
   }
 
   scope :filter_bill_date, -> (start_date, end_date) {where('bbps_bills.bill_date >= ? AND bbps_bills.bill_date <= ? ', Date.parse(start_date), Date.parse(end_date))}
@@ -219,8 +276,9 @@ class BbpsBill < ApplicationRecord
           status: status.as_json,
           pocs: subscription.pocs.as_json,
           # biller_category_name: biller_category_name,
-          amount: amount.as_json,
+          amount: total_amount.as_json,
           customer_fields: subscription.all_customer_fields,
+          paid_at: paid_at&.strftime("%I:%M %p, %d %b %Y"),
       }
       return data
     end
@@ -249,14 +307,12 @@ class BbpsBill < ApplicationRecord
 
         amount: amount.as_json,
         total_amount: total_amount.as_json,
-        late_payment_fee: late_payment_fee.as_json,
-        early_payment_fee: early_payment_fee.as_json,
-        convenience_fee: convenience_fee.as_json,
 
         due_date: due_date,
         bill_date: bill_date,
         bill_period: bill_period,
         bill_number: bill_number,
+        paid_at: paid_at&.strftime("%I:%M %p, %d %b %Y"),
 
         late_payment_fee_selected: late_payment_fee_selected,
         early_payment_fee_selected: early_payment_fee_selected,
@@ -275,8 +331,17 @@ class BbpsBill < ApplicationRecord
         customer_name: subscription.customer_name,
         customer_pan: subscription.customer_pan,
         show_payment_details: false,
-        attachments: attachments.as_json
+        attachments: attachments.as_json,
+        selected_amount_type: selected_amount_type
     }
+
+    if self.late_payment_fee&.value.to_f > 0
+      data[:late_payment_fee] = late_payment_fee.as_json
+    end
+
+    if self.early_payment_fee&.value.to_f > 0
+      data[:early_payment_fee] = early_payment_fee.as_json
+    end
 
     if BbpsBill.status_ids(:paid, :failed).include?(self.status_id)
       data[:show_payment_details] = true
@@ -340,8 +405,16 @@ class BbpsBill < ApplicationRecord
 
   def self.role_based_initiator_associated_items(user, role_id, options = {})
     if [UserRole.id_for(:utility_bill_initiator)].include?(role_id)
-      ids = self.joins(subscription: [:pocs]).where("bbps_bills.company_id = ?", user&.company&.id).where("bbps_subscription_pocs.user_id = ?", user.id).pluck("bbps_bills.id")
-      where(id: ids)
+      # subscription_ids = BbpsSubscriptionPoc.where(user_id: user_id).pluck(:subscription_id)
+      #
+      # orphan_bill_ids = BbpsBill.where(user_id: nil).where(subscription_id: subscription_ids).pluck(:id)
+      #
+      # where(id: orphan_bill_ids)
+      #
+      #
+      # ids = self.joins(subscription: [:pocs]).where("bbps_bills.company_id = ?", user&.company&.id).where("bbps_subscription_pocs.user_id = ?", user.id).pluck("bbps_bills.id")
+      # where(id: ids)
+      filter_poc_id(user&.id)
     elsif [UserRole.id_for(:utility_bill_master_initiator)].include?(role_id)
       ids = self.joins(:subscription).
           where("bbps_bills.company_id = ?", user&.company&.id).
@@ -443,6 +516,25 @@ class BbpsBill < ApplicationRecord
     validation_support = self.biller&.support_bill_validation
     if (fetch_requirement == "NOT_SUPPORTED") && (validation_support == "NOT_SUPPORTED")
       self.quick_pay = "Y"
+    end
+  end
+
+  def update_total_amount
+    total_amount_value = 0
+
+    case selected_amount_type
+    when "base_amount"
+      total_amount_value += amount.value
+    when "early_payment_amount"
+      total_amount_value += early_payment_fee.value
+    when "late_payment_amount"
+      total_amount_value += late_payment_fee.value
+    end
+
+    if self.total_amount.present?
+      self.total_amount.update(value: total_amount_value)
+    else
+      self.total_amount = Amount.new(value: total_amount_value, currency_id: 1)
     end
   end
 

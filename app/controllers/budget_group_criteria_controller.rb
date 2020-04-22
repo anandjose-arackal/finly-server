@@ -11,7 +11,10 @@ class BudgetGroupCriteriaController < BaseControllers::WebBase
   end
 
   def update
-
+    endpoint BudgetManager::BudgetGroupCriteria::Ops::Update
+    respond_to do |format|
+      format.json {}
+    end
   end
 
   def destroy

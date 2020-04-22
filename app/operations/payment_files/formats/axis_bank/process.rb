@@ -16,7 +16,7 @@ class PaymentFiles::Formats::AxisBank::Process < PaymentFiles::Formats::BaseForm
   end
 
   def process
-    headers = retrieve_axis_headers
+    self.headers = retrieve_axis_headers
     content = []
 
     self.payment_file_data.each do |payment|
@@ -29,7 +29,7 @@ class PaymentFiles::Formats::AxisBank::Process < PaymentFiles::Formats::BaseForm
           retrieve_report_data(payment)
       ]
     end
-    self.response = Exporter.new(user, {spreadsheet: {headers: headers, contents: content}}, messages)
+    self.contents = content
   end
 
   def retrieve_axis_headers
@@ -59,5 +59,9 @@ class PaymentFiles::Formats::AxisBank::Process < PaymentFiles::Formats::BaseForm
     else
       return payment[:amount]
     end
+  end
+
+  def success
+    generate_export_file
   end
 end

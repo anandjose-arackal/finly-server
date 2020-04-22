@@ -21,7 +21,7 @@ class PaymentFiles::Formats::IciciBank::Process < PaymentFiles::Formats::BaseFor
   end
 
   def process
-    headers = retrieve_icici_headers
+    self.headers = retrieve_icici_headers
     content = []
     self.payment_file_data.each do |payment|
       content << [
@@ -50,7 +50,11 @@ class PaymentFiles::Formats::IciciBank::Process < PaymentFiles::Formats::BaseFor
       ]
       # Todo Remove the last entry of "payment[:initiating_user_email]", this was specifically built as per Toppr's requirements
     end
-    self.response = Exporter.new(user, {spreadsheet: {headers: headers, contents: content}}, messages)
+    self.contents = content
+  end
+
+  def success
+    generate_export_file
   end
 
   def retrieve_icici_headers

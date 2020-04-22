@@ -17,34 +17,40 @@
 #  entity_date                                :date
 #  sub_department_id                          :integer
 #  procurement_id                             :integer
+#  deleted_at                                 :datetime
+#  payment_processing_amount_before_tax_value :decimal(20, 10)  default(0.0)
+#  payment_processing_amount_after_tax_value  :decimal(20, 10)  default(0.0)
+#  tds_value                                  :decimal(20, 10)  default(0.0)
+#  billed                                     :boolean          default(FALSE)
 #  entity_status_id                           :integer
+#  reimbursable                               :boolean          default(FALSE)
 #  amount_before_tax_id                       :integer
 #  amount_after_tax_id                        :integer
 #  entity_created_at                          :datetime
 #  entity_submitted_at                        :datetime
-#  billed                                     :boolean          default(FALSE)
-#  deleted_at                                 :datetime
-#  date                                       :datetime
-#  amount_after_tax_value                     :decimal(20, 10)
-#  amount_before_tax_value                    :decimal(20, 10)
-#  po_trail_item_id                           :integer
-#  remaining_amount_value                     :decimal(20, 10)
-#  billed_quantity                            :integer
-#  remaining_quantity                         :integer
-#  revised                                    :boolean          default(FALSE)
-#  billed_amount_before_tax_value             :decimal(20, 10)
-#  remaining_amount_after_tax_value           :decimal(20, 10)
-#  billed_amount_after_tax_value              :decimal(20, 10)
-#  remaining_amount_before_tax_value          :decimal(20, 10)
 #  purchase_order_id                          :integer
 #  invoice_id                                 :integer
 #  payment_purpose_id                         :integer
-#  paid_amount_before_tax_value               :decimal(20, 10)  default(0.0)
+#  po_trail_item_id                           :integer
+#  billed_amount_before_tax_value             :decimal(20, 10)
+#  billed_amount_after_tax_value              :decimal(20, 10)
+#  remaining_amount_before_tax_value          :decimal(20, 10)
+#  remaining_amount_after_tax_value           :decimal(20, 10)
+#  effective_paid_amount_before_tax_value     :decimal(20, 10)  default(0.0)
 #  paid_amount_after_tax_value                :decimal(20, 10)  default(0.0)
-#  reimbursable                               :boolean          default(FALSE)
-#  payment_processing_amount_before_tax_value :decimal(20, 10)  default(0.0)
-#  payment_processing_amount_after_tax_value  :decimal(20, 10)  default(0.0)
-#  tds_value                                  :decimal(20, 10)  default(0.0)
+#  billed_quantity                            :integer
+#  billed_rate                                :decimal(20, 10)
+#  remaining_quantity                         :integer
+#  revised                                    :boolean          default(FALSE)
+#  payment_confirmed                          :boolean          default(FALSE)
+#  tax_amount_value                           :decimal(20, 10)  default(0.0)
+#  net_paid_amount_before_tax_value           :decimal(20, 10)
+#  rcm_tax_value                              :decimal(20, 10)  default(0.0)
+#  paid_tds_value                             :decimal(20, 10)  default(0.0)
+#  processing_tds_value                       :decimal(20, )    default(0)
+#  cn_adjusted_amount_before_tax_value        :decimal(20, 10)  default(0.0)
+#  cn_adjusted_amount_after_tax_value         :decimal(20, 10)  default(0.0)
+#  credit_note_tax_amount_value               :decimal(20, 10)  default(0.0)
 #
 
 class BudgetTrail < ApplicationRecord
@@ -64,6 +70,8 @@ class BudgetTrail < ApplicationRecord
   belongs_to :po_trail_item, class_name: "BudgetTrail", optional: true
 
   after_save :set_po_trail_attributes
+
+  after_destroy :set_po_trail_attributes
 
   accepts_nested_attributes_for :amount, :amount_after_tax, :amount_before_tax
 
@@ -146,6 +154,10 @@ class BudgetTrail < ApplicationRecord
     where entity_status_id: entity_status_id
   }
 
+  scope :without_entity_status_id, -> (entity_status_id) {
+    where entity_status_id: entity_status_id
+  }
+
   private
 
   # here we are reducing the amounts against each line item to match the amount that has been invoices
@@ -155,7 +167,7 @@ class BudgetTrail < ApplicationRecord
     if self.po_trail_item_id.present?
       invoice_trails = BudgetTrail.where(entity_type: "InvoiceLineItem", po_trail_item_id: self.po_trail_item_id)
       remaining_amount_before_tax = po_trail_item.amount_before_tax&.value.to_f - invoice_trails.sum(:billed_amount_before_tax_value)
-      remaining_amount_after_tax = po_trail_item.amount_after_tax&.value.to_f - invoice_trails.sum(:billed_amount_after_tax_value)
+      remaining_amount_after_tax = po_trail_item.amount_after_tax&.value.to_f - invoice_trails.sum(:billed_amount_after_tax_value) - invoice_trails.sum(:rcm_tax_value)
       remaining_quantity = po_trail_item&.entity&.quantity - invoice_trails.sum(:billed_quantity)
       po_trail_item.update_columns(remaining_amount_before_tax_value: remaining_amount_before_tax, remaining_amount_after_tax_value: remaining_amount_after_tax, remaining_quantity: remaining_quantity)
     end

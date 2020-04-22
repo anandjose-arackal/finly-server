@@ -1,7 +1,9 @@
-class BankTransferProcess < ApplicationJob
+class ScheduledBankTransferProcess
 
-  def perform
-    scheduled_payment_orders = PaymentOrder.with_receiving_account_type("BankAccount").scheduled_on_or_before(Date.tomorrow)
+  def self.perform
+    puts " ----------------------------- PERFORMING #{self.name} at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
+
+    scheduled_payment_orders = PaymentOrder.with_receiving_account_type(["BankAccount", "BbpsBiller"]).scheduled_on_or_before(Date.tomorrow)
     scheduled_payment_orders.each do |order|
       crediting_payment_ids = order.payments.scheduled.pluck(:id)
       crediting_payments = order.payments.where(id: crediting_payment_ids)
@@ -17,6 +19,8 @@ class BankTransferProcess < ApplicationJob
       op = AccountManager::Payments::BulkPaymentExecutor.(order, options)
       puts op.messages[:error]
     end
+
+    puts " ----------------------------- FINISHED #{self.name} ------------------------------"
   end
 
 end

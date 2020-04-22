@@ -38,7 +38,7 @@ class Olap::Dimensions::Item < OlapRecord
   include Analytics::Mapper
 
   transaction_model ::Item
-  consume 'item.update', 'item.create', 'item.destroy'
+  # consume 'item.update', 'item.create', 'item.destroy'
 
   map :tax
   map :discount

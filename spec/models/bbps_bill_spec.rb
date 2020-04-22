@@ -47,6 +47,7 @@
 #  hsn_sac                    :string(255)
 #  paid_at                    :datetime
 #  review_note                :text(65535)
+#  selected_amount_type       :string(255)
 #
 
 require 'rails_helper'

@@ -42,7 +42,7 @@
 #  deleted_at                   :datetime
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
-#  scope                        :text(65535)
+#  choices_provider             :text(65535)
 #  internal                     :boolean          default(FALSE)
 #  is_modified                  :boolean          default(FALSE)
 #  field_path                   :string(255)

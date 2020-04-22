@@ -64,7 +64,6 @@ gem 'resque', '~> 2.0.0'
 gem 'ransack', '~> 2.3'
 gem 'crono', '~> 1.1.2'
 # gem 'haml', '~> 5.0.4'
-# gem 'sinatra', '~> 2.0.5', require: nil, github: 'sinatra/sinatra', branch: 'master'
 gem 'sinatra', '~> 2.1.0', require: nil, github: 'sinatra/sinatra', branch: 'master'
 gem 'gyoku', '~> 1.3'
 gem 'request_store', '~> 1.4.1'
@@ -103,7 +102,7 @@ gem 'mysql2', '~> 0.5'
 gem 'will_paginate', '~> 3.1.6'
 
 gem 'sneakers', '~> 2.12'
-gem 'hutch', '~> 0.27'
+gem 'hutch', '~> 1.0'
 
 gem 'jwt', '~> 2.2'
 
@@ -230,11 +229,13 @@ gem 'string_pattern', '~> 2.2', '>= 2.2.1'
 # gem 'aws-sdk'
 gem 'aws-sdk-s3', '~> 1.30.0'
 gem 'aws-sdk-sqs', '~> 1.10.0'
-# todo - temporary, will be removed during final deployment.
+
 gem 'awesome_print', '~> 1.8.0'
 
 # Fuzzy String Match
 gem 'fuzzy-string-match', '1.0.1'
+
+gem 'whenever'
 
 group :development, :test do
   gem 'byebug'

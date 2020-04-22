@@ -30,7 +30,7 @@
 #  invoice_date                    :date
 #  invoice_due_date                :date
 #  advance_amount_id               :integer
-#  payment_notification_users      :json
+#  payment_notification_users      :text(65535)
 #  payment_agreement_id            :integer
 #  note                            :string(255)
 #  location_id                     :integer
@@ -110,6 +110,8 @@ class BeneficiaryPayment < ApplicationRecord
 
   has_many :trails, as: :parent
 
+  serialize :payment_notification_users, Hash
+
   accepts_nested_attributes_for :original_amount
   accepts_nested_attributes_for :tax_amount
   accepts_nested_attributes_for :payable_amount
@@ -119,6 +121,10 @@ class BeneficiaryPayment < ApplicationRecord
   validate :payment_agreement_related_fields
   after_create :update_creator_id, :update_company_id, :update_status
   delegate :paid?, to: :status
+
+  after_save :budget_trail_entry
+
+  after_destroy :budget_trail_destroy
 
   scope :with_id, -> (id) {where id: id}
   scope :without_id, -> (id) {where.not(id: id)}
@@ -429,6 +435,23 @@ class BeneficiaryPayment < ApplicationRecord
       if self.tax_rate_id.blank?
         errors.add(:tax, 'cannot be blank')
       end
+    end
+  end
+
+  def budget_trail_entry
+    self.payments.each do |payment|
+      if payment.failed?
+        # i.e. anytime this payment is updated and it moves to a failed state etc. destroy the respectie trail object
+        BudgetManager::BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.destroy_trail(payment)
+      else
+        BudgetManager::BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.save_trail(payment)
+      end
+    end
+  end
+
+  def budget_trail_destroy
+    self.payments.each do |payment|
+      BudgetManager::BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.destroy_trail(payment)
     end
   end
 end

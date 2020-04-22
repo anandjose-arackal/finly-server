@@ -9,7 +9,7 @@
 #  form_section_id    :string(36)       not null
 #  form_entity_id     :string(36)       not null
 #  created_by_user_id :integer
-#  value              :string(255)      not null
+#  name               :string(255)      not null
 #  position           :integer          not null
 #  active             :boolean          default(TRUE)
 #  deleted_at         :datetime

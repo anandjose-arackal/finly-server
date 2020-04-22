@@ -24,7 +24,7 @@ class BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor 
         billed_quantity = invoice_item.quantity
         billed_ratio = (billed_quantity / po_item&.quantity.to_f) rescue 1
       else
-        billed_ratio = (invoice_item.net_amount&.value.to_f / po_item.total_amount&.value.to_f) rescue 1
+        billed_ratio = (invoice_item.taxable_amount&.value.to_f / po_item.taxable_amount&.value.to_f) rescue 1
       end
 
       billed_amount_after_tax = po_item.after_tax_amount * billed_ratio
@@ -36,10 +36,28 @@ class BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor 
       billed_amount_before_tax = invoice_item.before_tax_amount
     end
 
-    if (InwardInvoiceStatus.ids_for(:approved, :auto_approved, :unpaid, :partially_paid, :paid).include?(invoice_item.parent.invoice_status_id)) || (InwardInvoiceType.status_ids_for_committed_bucket.include?(invoice_item.parent.invoice_type_id))
+    if (InwardInvoiceStatus.ids_for(:approved, :auto_approved, :unpaid, :partially_paid, :paid).include?(invoice_item.parent.invoice_status_id)) || (InwardInvoiceType.types_for_committed_bucket.include?(invoice_item.parent.invoice_type_id))
       billed = true
     else
       billed = false
+    end
+
+    if InwardInvoiceStatus.ids_for_committed_bucket.include? invoice_item.parent.invoice_status_id
+      paid_amount_before_tax = invoice.advance_per_item
+      paid_amount_after_tax = invoice.advance_per_item
+    else
+      paid_amount_before_tax = trail&.effective_paid_amount_before_tax_value.to_f
+      paid_amount_after_tax = trail&.paid_amount_after_tax_value.to_f
+    end
+
+    if invoice.rcm_enabled
+      rcm_tax_value = invoice_item.tax_amount&.value.to_f
+      tax_amount = 0
+      # in case it's an RCM invoice we can always say that amount before and after tax is gonna be the same
+      billed_amount_after_tax = billed_amount_before_tax
+    else
+      rcm_tax_value = 0
+      tax_amount = invoice_item.tax_amount&.value.to_f
     end
 
     # extracting the PO Item's BudgetTrail object here to store the reference, because we need to update
@@ -66,6 +84,13 @@ class BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor 
         billed_amount_after_tax_value: billed_amount_after_tax,
         billed_quantity: invoice_item.quantity,
         tds_value: invoice_item.parent.tds_per_item,
+        tax_amount_value: tax_amount,
+        rcm_tax_value: rcm_tax_value,
+        paid_amount_after_tax_value: paid_amount_after_tax,
+        effective_paid_amount_before_tax_value: paid_amount_before_tax,
+        cn_adjusted_amount_after_tax_value: invoice_item.cn_adjusted_amount_with_tax,
+        cn_adjusted_amount_before_tax_value: invoice_item.cn_adjusted_amount_without_tax,
+        credit_note_tax_amount_value: invoice_item.cn_tax_amount,
         amount_attributes: {
             id: trail&.amount&.id,
             value: invoice_item.after_tax_amount,

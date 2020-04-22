@@ -52,6 +52,8 @@ class Expense < ApplicationRecord
           FieldCustomizer::CustomizableValidation,
           MathUtil
 
+  event_channel 'expense'
+
   belongs_to :amount, optional: true
   belongs_to :expense_status, optional: true
   belongs_to :user, optional: true, inverse_of: :expenses
@@ -535,6 +537,10 @@ class Expense < ApplicationRecord
     else
       return nil
     end
+  end
+
+  def company
+    self.user.company
   end
 
   # this method is to purely show the amount values for the carious expenses

@@ -97,8 +97,8 @@ class Bbps::BillFetch < Bbps::Api
           :bbps_ref_id, :agent_id, :customer_name, :customer_mobile, :customer_email, :customer_aadhar_no, :customer_pan_id,
           :channel_id, :biller_id, :amount, :bill_date, :due_date, :bill_number, :bill_period, :convenience_fee,
           :convenience_fee_desc, :late_payment_fee, :early_payment_fee,
-          :additional_field, :additional_field, :additional_field, :additional_field, :additional_field,
-          :additional_field
+          :additional_field_1, :additional_field_2, :additional_field_3, :additional_field_4, :additional_field_5,
+          :additional_field_6
       ]
   )
 
@@ -131,11 +131,14 @@ class Bbps::BillFetch < Bbps::Api
   end
 
   def initiating_channel
+    # "Mobile Banking (Pre-Login)"
+    # "MOB:<IP=13.126.31.9~IMEI=1234~OS=Android~APP=Finly>"
+    "MOB:<IP=13.232.176.84~IMEI=1234~OS=Android~APP=Finly>"
     # "BSC:<TERMINAL_ID=1042~MOBILE=9723468155~GEOCODE=28.6139,78.5555~POSTAL_CODE=400004>"
-    "BSC:<TERMINAL_ID=1042~MOBILE=9723468155~GEOCODE=28.6139,78.5555~POSTAL_CODE=400004>"
-      # BGP : 13.232.176.84
-      # UAT : 13.126.31.9
-      # "INTB:<IP=13.126.31.9~MAC=02:ca:d0:16:ce:60:00:00:00:00:00:00>"
+    # "BSC:<TERMINAL_ID=1042~MOBILE=9723468155~GEOCODE=28.6139,78.5555~POSTAL_CODE=400004>"
+    # BGP : 13.232.176.84
+    # UAT : 13.126.31.9
+    # "INTB:<IP=13.126.31.9~MAC=02:ca:d0:16:ce:60:00:00:00:00:00:00>"
   end
 
   def customer_param_1
@@ -195,6 +198,7 @@ class Bbps::BillFetch < Bbps::Api
             due_date: result['response.parsed']['due_date'],
             bill_number: result['response.parsed']['bill_number'],
             bill_period: result['response.parsed']['bill_period'],
+            biller_id: result['response.parsed']['biller_id'],
             convenience_fee: result['response.parsed']['convenience_fee'],
             convenience_fee_desc: result['response.parsed']['convenience_fee_desc'],
             late_payment_fee: result['response.parsed']['late_payment_fee'],
@@ -204,13 +208,20 @@ class Bbps::BillFetch < Bbps::Api
             ref_no: result['response.parsed']['ref_no'],
             agent_institution_id: result['response.parsed']['agent_institution_id'],
             channel_id: result['response.parsed']['channel_id'],
+            channel: result['response.parsed']['channel'],
             bbps_ref_id: result['response.parsed']['bbps_ref_id'],
             agent_id: result['response.parsed']['agent_id'],
             customer_name: result['response.parsed']['customer_name'],
             customer_mobile: result['response.parsed']['customer_mobile'],
             customer_email: result['response.parsed']['customer_email'],
             customer_aadhar_no: result['response.parsed']['customer_aadhar_no'],
-            customer_pan_id: result['response.parsed']['customer_pan_id']
+            customer_pan_id: result['response.parsed']['customer_pan_id'],
+            additional_field_1: result['response.parsed']['additional_field_1'],
+            additional_field_2: result['response.parsed']['additional_field_2'],
+            additional_field_3: result['response.parsed']['additional_field_3'],
+            additional_field_4: result['response.parsed']['additional_field_4'],
+            additional_field_5: result['response.parsed']['additional_field_5'],
+            additional_field_6: result['response.parsed']['additional_field_6']
         }
     )
   end

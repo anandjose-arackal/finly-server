@@ -44,8 +44,8 @@ class ExpenseTypes::ExTimeConfig::Update < ExpenseTypes::Base
     if update_params[:rate_attributes]
       update_params[:rate_attributes][:currency_id] = base_currency_id
       update_params[:period_id] = Period.id_for(:hour)
-      if time_config.rate.present?
-        update_params[:rate_attributes][:id] = time_config.rate.id
+      if time_config.rate_id.present?
+        update_params[:rate_attributes][:id] = time_config.rate_id
       end
     end
   end

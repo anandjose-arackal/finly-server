@@ -42,7 +42,6 @@
 #  source_account                     :string(255)
 #  location_id                        :integer
 #  cost_center_id                     :integer
-#  reference_payment_id               :integer
 #  company_id                         :integer
 #
 
@@ -53,6 +52,7 @@ class Report < ApplicationRecord
           FindByOrderedIds, Transitionable
 
 
+  event_channel 'report'
 
   has_many :email_authorizations, as: :authorizable
   belongs_to :user, optional: true, inverse_of: :reports
@@ -221,10 +221,11 @@ class Report < ApplicationRecord
       date_from = "1990-01-01" if date_from.blank?
       date_to = "2100-01-01" if date_to.blank?
       date_from = date_from.to_date if date_from.present?
-      date_to = date_to.to_date + 1 if date_to.present?
+      # date_to = date_to.to_date + 1 if date_to.present?
+      date_to = date_to.to_date if date_to.present?
       # date_to = DateUtils.local_date if date_to.blank?
       reports = arel_table
-      where(reports[:approved_at].gteq(date_from).and(reports[:approved_at].lteq(date_to)))
+      where(reports[:approved_at].gteq(date_from.beginning_of_day).and(reports[:approved_at].lteq(date_to.end_of_day)))
     end
   end
   scope :filter_policy, -> (policy_id) {where(policy_id: policy_id)}

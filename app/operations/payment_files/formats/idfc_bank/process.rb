@@ -18,7 +18,7 @@ class PaymentFiles::Formats::IdfcBank::Process < PaymentFiles::Formats::BaseForm
   end
 
   def process
-    headers = retrieve_idfc_headers
+    self.headers = retrieve_idfc_headers
     content = []
     self.payment_file_data.each do |payment|
       content << [
@@ -43,7 +43,11 @@ class PaymentFiles::Formats::IdfcBank::Process < PaymentFiles::Formats::BaseForm
           "INR"
       ]
     end
-    self.response = Exporter.new(user, {spreadsheet: {headers: headers, contents: content}}, messages)
+    self.contents = content
+  end
+
+  def success
+    generate_export_file
   end
 
   def retrieve_idfc_headers

@@ -2815,13 +2815,18 @@ Rails.application.routes.draw do
     end
 
     namespace :v2 do
-      get 'maps/config/:type', to: 'google_maps#maps_config'
       get 'available_expense_types', to: 'expenses#available_expense_types'
       resources :expenses, only: [:index, :show, :create, :update, :destroy]
       resources :reports, only: [:create, :show, :update]
       resources :reports do
         post 'comment' => 'reports#comment', as: :comment
       end
+
+      get 'maps/config/:type', to: 'maps#maps_config'
+      get 'maps/auto_complete', to: 'maps#auto_complete'
+      get 'maps/places/:id/details', to: 'maps#details'
+      get 'maps/places/recent', to: 'maps#recent_places'
+      post 'maps/distance_matrix', to: 'maps#distance_matrix'
     end
   end
 
@@ -3128,6 +3133,7 @@ Rails.application.routes.draw do
   get 'export/templates/index' => 'export#index_template'
   get 'export/templates/:template_key' => 'export#export_template'
   get 'export/money_request(.:format)' => 'export#money_request', as: :export_money_request
+  get 'export/bank_payment_request(.:format)' => 'export#bank_payment_request', as: :export_bank_payment_request
 
   resources :reports do
     post 'comment' => 'reports#comment', as: :comment
@@ -3142,6 +3148,9 @@ Rails.application.routes.draw do
     post 'add_expenses' => 'reports#add_expenses', as: :add_expenses
     delete 'remove_expenses' => 'reports#remove_expenses', as: :remove_expenses
     post 'toggle_receipt_hardcopy' => 'reports#toggle_receipt_hardcopy', as: :toggle_receipt_hardcopy
+    get 'report_expenses', to: 'reports#report_expenses', as: :expenses
+    get 'report_summary', to: 'reports#report_summary', as: :summary
+    get 'report_comments', to: 'reports#report_comments', as: :comments
   end
 
   # get 'test_take_control' => 'reports#test_take_control', as: :test_take_control
@@ -3727,6 +3736,7 @@ Rails.application.routes.draw do
       get 'show_payments', to: 'inward_invoices#show_payments', as: :show_payments
     end
 
+    delete 'vendor_types/bulk_destroy', to: 'vendor_types#bulk_destroy'
     resources :vendor_types
 
     resources :inward_invoices
@@ -4068,6 +4078,8 @@ Rails.application.routes.draw do
     get 'vp/payment_agreements', to: 'vendor_payments#payment_agreements'
     get 'vp/purchase_request_approved_items', to: 'vendor_payments#purchase_request_approved_items'
     get 'vp/agreement_invoices', to: 'vendor_payments#agreement_invoices'
+    get 'vp/utility_bill_masters', to: 'vendor_payments#utility_bill_masters'
+    get 'vp/utility_bills', to: 'vendor_payments#utility_bills'
 
     get 'vp/budgets', to: 'vendor_payments#budgets'
 
@@ -4213,6 +4225,12 @@ Rails.application.routes.draw do
   get 'index/:route', to: "index#show"
 
   resources :views, controller: 'index_view_segments', except: [:show]
+
+  get 'maps/auto_complete', to: 'maps#auto_complete'
+  get 'maps/places/:id/details', to: 'maps#details'
+  get 'maps/places/recent', to: 'maps#recent_places'
+  post 'maps/distance_matrix', to: 'maps#distance_matrix'
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
   # The priority is based upon order of creation: first created -> highest priority.

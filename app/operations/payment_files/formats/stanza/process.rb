@@ -16,7 +16,7 @@ class PaymentFiles::Formats::Stanza::Process < PaymentFiles::Formats::BaseFormat
   end
 
   def process
-    headers = retrieve_axis_headers
+    self.headers = retrieve_axis_headers
     content = []
     count = 1
     self.payment_file_data.each do |payment|
@@ -34,7 +34,11 @@ class PaymentFiles::Formats::Stanza::Process < PaymentFiles::Formats::BaseFormat
           payment[:email]
       ]
     end
-    self.response = Exporter.new(user, {spreadsheet: {headers: headers, contents: content}}, messages)
+    self.contents = content
+  end
+
+  def success
+    generate_export_file
   end
 
   def retrieve_axis_headers

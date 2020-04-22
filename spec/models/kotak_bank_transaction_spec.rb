@@ -24,7 +24,6 @@
 #  reversal_api_counter       :integer          default(0)
 #  deleted_at                 :datetime
 #  bank_error_message         :text(16777215)
-#  transfer_mode_id           :integer
 #
 
 require 'rails_helper'

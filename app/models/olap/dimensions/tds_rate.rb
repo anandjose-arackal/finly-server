@@ -21,7 +21,7 @@ class Olap::Dimensions::TdsRate < OlapRecord
   include Analytics::Mapper
 
   transaction_model ::TdsRatesList
-  consume 'tds_rate.update', 'tds_rate.create', 'tds_rate.destroy'
+  # consume 'tds_rate.update', 'tds_rate.create', 'tds_rate.destroy'
 
   map :name
   map :tds

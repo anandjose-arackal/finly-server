@@ -66,6 +66,8 @@ class Payment < ApplicationRecord
     CARD = 'Card'
   end
 
+  event_channel 'payment'
+
   belongs_to :amount, optional: true
   belongs_to :payment_type, optional: true
   belongs_to :initiating_user, optional: true, polymorphic: true
@@ -477,6 +479,24 @@ class Payment < ApplicationRecord
   after_destroy :calculate_paid_amount_in_parent_trails
   after_destroy :reset_status
 
+
+  def amount_before_tax
+    if self.parent_type == "BeneficiaryPayment"
+      if self.parent.inclusive_of_taxes
+        return (self.amount_value - self.parent&.tax_amount&.value.to_f)
+      else
+        return (self.amount_value - self.parent&.tax_amount&.value.to_f)
+      end
+    else
+      return self.amount_value
+    end
+  end
+
+  def amount_after_tax
+    self.amount_value
+  end
+
+
   def initiating_account_type_name
     name = "#{initiating_user&.name&.to_s}'s "
 
@@ -725,7 +745,7 @@ class Payment < ApplicationRecord
 
   def utr
     return super unless super.blank?
-    return self.reference_resources.first&.try(:utr) || self.reference_resource&.utr
+    return self.reference_resources.first&.utr || self.reference_resource&.utr
   end
 
   private
@@ -1184,22 +1204,35 @@ class Payment < ApplicationRecord
         # if there are no such trails, then we can return safely from this block and not execute any of the below statements
         return true if parent_trails.blank?
 
-        paid_amount = invoice.payments.successful.joins(:amount).sum(:value) + invoice.advance_amount&.value.to_f
+        paid_amount = invoice.payments.successful.joins(:amount).sum(:value)
         payment_processing_amount = invoice.payments.payment_processing_bucket.joins(:amount).sum(:value)
         paid_percent_before_tax = paid_amount / invoice.amount_before_tax
         paid_percent_after_tax = paid_amount / invoice.amount_after_tax
         processing_percent_before_tax = payment_processing_amount / invoice.amount_before_tax
         processing_percent_after_tax = payment_processing_amount / invoice.amount_after_tax
 
-        sql_before_tax = "UPDATE `budget_trails` SET `paid_amount_before_tax_value` = (#{paid_percent_before_tax} * (billed_amount_before_tax_value))
+        effective_sql_before_tax = "UPDATE `budget_trails` SET `effective_paid_amount_before_tax_value` = (GREATEST((#{paid_percent_before_tax} * (billed_amount_before_tax_value) - tax_amount_value), 0) + #{invoice.advance_per_item})
+                                                WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
+        ActiveRecord::Base.connection.execute(effective_sql_before_tax)
+
+        sql_before_tax = "UPDATE `budget_trails` SET `net_paid_amount_before_tax_value` = (#{paid_percent_before_tax} * (billed_amount_before_tax_value)), `paid_tds_value` = (#{paid_percent_before_tax} * (tds_value))
                                                 WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
         ActiveRecord::Base.connection.execute(sql_before_tax)
-        sql_before_tax = "UPDATE budget_trails SET `payment_processing_amount_before_tax_value` = (#{processing_percent_before_tax} * (billed_amount_before_tax_value))
-                                              WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
+
+        sql_before_tax = "UPDATE budget_trails SET `payment_processing_amount_before_tax_value` = GREATEST((#{processing_percent_before_tax} * (billed_amount_before_tax_value) - tax_amount_value + net_paid_amount_before_tax_value), 0), `processing_tds_value` = (#{processing_percent_before_tax} * (tds_value))
+                                              WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})
+                                              AND (net_paid_amount_before_tax_value < tax_amount_value)"
         ActiveRecord::Base.connection.execute(sql_before_tax)
-        sql_after_tax = "UPDATE `budget_trails` SET `paid_amount_after_tax_value` = (#{paid_percent_after_tax} * (billed_amount_after_tax_value))
+
+        sql_before_tax = "UPDATE budget_trails SET `payment_processing_amount_before_tax_value` = GREATEST((#{processing_percent_before_tax} * (billed_amount_before_tax_value)), 0), `processing_tds_value` = (#{processing_percent_before_tax} * (tds_value))
+                                              WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})
+                                              AND (net_paid_amount_before_tax_value >= tax_amount_value)"
+        ActiveRecord::Base.connection.execute(sql_before_tax)
+
+        sql_after_tax = "UPDATE `budget_trails` SET `paid_amount_after_tax_value` = (#{paid_percent_after_tax} * (billed_amount_after_tax_value) + #{invoice.advance_per_item})
                                                 WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
         ActiveRecord::Base.connection.execute(sql_after_tax)
+
         sql_after_tax = "UPDATE budget_trails SET `payment_processing_amount_after_tax_value` = (#{processing_percent_after_tax} * (billed_amount_after_tax_value))
                                              WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
         ActiveRecord::Base.connection.execute(sql_after_tax)
@@ -1216,7 +1249,7 @@ class Payment < ApplicationRecord
         processing_percent_before_tax = payment_processing_amount / purchase_order.amount_before_tax
         processing_percent_after_tax = payment_processing_amount / purchase_order.amount_after_tax
 
-        sql_before_tax = "UPDATE `budget_trails` SET `paid_amount_before_tax_value` = (#{paid_percent_before_tax} * remaining_amount_before_tax_value)
+        sql_before_tax = "UPDATE `budget_trails` SET `effective_paid_amount_before_tax_value` = (#{paid_percent_before_tax} * remaining_amount_before_tax_value)
                                                 WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
         ActiveRecord::Base.connection.execute(sql_before_tax)
         sql_before_tax = "UPDATE budget_trails SET `payment_processing_amount_before_tax_value` = (#{processing_percent_before_tax} * remaining_amount_before_tax_value)
@@ -1273,4 +1306,5 @@ class Payment < ApplicationRecord
   def budget_trail_destroy
     BudgetManager::BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.destroy_trail(self)
   end
+
 end

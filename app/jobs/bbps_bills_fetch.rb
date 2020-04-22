@@ -1,6 +1,8 @@
-class BbpsBillsFetch < ApplicationJob
+class BbpsBillsFetch
 
-  def perform
+  def self.perform
+    puts " ----------------------------- PERFORMING #{self.name} at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
+
     # Fetch bills where automatic fetching is enabled
     status_ids = BbpsBillerSubscription.status_ids(:approved, :auto_approved, :reactivated)
     bbps_subscriptions = BbpsBillerSubscription.where(status_id: status_ids, auto_generate_bill: true).where(expected_bill_day: nil)
@@ -45,9 +47,11 @@ class BbpsBillsFetch < ApplicationJob
     bill_day = (Date.today + 2.days).day
     bbps_subscriptions = BbpsBillerSubscription.where(status_id: status_ids, auto_generate_bill: true).where(expected_bill_day: bill_day)
     bbps_subscriptions.each {|subscription| create_bill({}, subscription, autofetched)}
+
+    puts " ----------------------------- FINISHED #{self.name} ------------------------------"
   end
 
-  def create_bill(result, subscription, autofetched)
+  def self.create_bill(result, subscription, autofetched)
     if autofetched
       return unless result.status == 'Y'
       return if result.ref_no.blank?
@@ -106,7 +110,7 @@ class BbpsBillsFetch < ApplicationJob
 
 
       params = {
-          amount: (result.amount.to_f / 100).round(2),
+          amount: (result.amount.to_d / 100).round(2),
           bill_date: result.bill_date,
           bill_number: result.bill_number,
           due_date: result.due_date,
@@ -145,12 +149,17 @@ class BbpsBillsFetch < ApplicationJob
     end
   end
 
-  def get_amount_from_response(response)
+  def self.get_amount_from_response(response)
     return response.to_f unless response.to_s.include?("=")
-    response.to_s.split("=")[1].to_f / 100
+
+    if response.to_s.split("=").map(&:downcase).include?("circle")
+      return 0
+    else
+      response.to_s.split("=")[1].to_d / 100
+    end
   end
 
-  def customer_params(subscription)
+  def self.customer_params(subscription)
     parameters = {
         mobile_number: subscription.mobile_number,
         biller_id: subscription.biller&.biller_id,
@@ -170,7 +179,7 @@ class BbpsBillsFetch < ApplicationJob
     parameters
   end
 
-  def get_bill_period(bill_period)
+  def self.get_bill_period(bill_period)
     if bill_periods.include?(bill_period.to_s.downcase)
       bill_period
     elsif ["monthly"].includes?(bill_period.to_s.downcase)
@@ -182,7 +191,7 @@ class BbpsBillsFetch < ApplicationJob
 
   end
 
-  def bill_periods
+  def self.bill_periods
     ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec", "january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"]
   end
 end

@@ -1,6 +1,8 @@
-class CompanyAccountScheduledTransfer < ApplicationJob
+class CompanyAccountScheduledTransfer
 
-  def perform
+  def self.perform
+    puts " ----------------------------- PERFORMING #{self.name}  at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
+
     configs = CompanyFundsAutoTransferConfig.enabled
 
     for config in configs
@@ -12,11 +14,12 @@ class CompanyAccountScheduledTransfer < ApplicationJob
       end
     end
 
+    puts " ----------------------------- FINISHED #{self.name} at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")}  ------------------------------"
   end
 
   private
 
-  def transfer_today?(config)
+  def self.transfer_today?(config)
     day = config.frequency_day
     today = Date.today
     case conifg.frequency_name

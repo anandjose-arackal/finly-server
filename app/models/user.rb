@@ -60,6 +60,7 @@
 #  default_company_id        :integer
 #  finly_id                  :string(36)
 #  deleted_at                :datetime
+#  pending_activation        :boolean          default(FALSE)
 #
 
 class User < ApplicationRecord
@@ -279,6 +280,7 @@ class User < ApplicationRecord
   has_many :group_users, through: :users_with_group_mapping, foreign_key: :user_id
   # has_one :feature_access, as: :accessible
 
+  has_many :map_location_user_queries
   has_many :index_view_segments
 
   accepts_nested_attributes_for :role_mapping
@@ -1233,7 +1235,8 @@ class User < ApplicationRecord
         pin_code: self.profile&.pin_code,
         city: self.profile&.city,
         state_id: self.profile&.state_id,
-        state_name: self.profile&.state_name
+        state_name: self.profile&.state_name,
+        pan: self.profile&.pan
       }
     else
       {
@@ -1253,8 +1256,8 @@ class User < ApplicationRecord
     if company_id.present?
       user = find_by(mobile_number: username, company_id: company_id) || find_by(email: username, company_id: company_id)
     else
-      user = find_by(mobile_number: username) || find_by(email: username)
-      users = User.with_email_or_mobile_number(user&.email, user&.mobile_number)
+      user = find_by(mobile_number: username,active: true) || find_by(email: username,active:true)
+      users = User.where(active: true).with_email_or_mobile_number(user&.email, user&.mobile_number)
       default_company_id = users.pluck(:default_company_id).uniq.first
       # if the default_company_id is present then replace the user object returned with the one from the default company
       if default_company_id.present?
