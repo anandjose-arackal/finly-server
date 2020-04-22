@@ -368,4 +368,8 @@ class BbpsBillerSubscription < ApplicationRecord
     BbpsBillerSubscriptionStatus.ids_for(:awaiting_approval).include?(status_id)
   end
 
+  def self.ransackable_scopes(auth_object = nil)
+    [:with_status_id]
+  end
+
 end

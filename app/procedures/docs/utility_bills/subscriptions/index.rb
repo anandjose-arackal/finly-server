@@ -6,8 +6,8 @@ class Docs::UtilityBills::Subscriptions::Index < IndexBuilder::API
 
   # Fixed column is always default true
   column :biller, fixed: true, sort: :name, includes: [:biller], default: true do
-    text value: '{{record.name}}', format: 'primary'
-    text value: '{{record.biller.biller_name}}'
+    text value: '{{record.biller.biller_name}}', format: 'primary'
+    text value: '{{record.name}}'
   end
 
   column :subscription_id, sort: :sequence_id, default: true do

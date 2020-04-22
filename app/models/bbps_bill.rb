@@ -263,8 +263,7 @@ class BbpsBill < ApplicationRecord
     when 90
       where status_id: BbpsBillStatus.ids_for(:draft, :retracted)
     when 91
-      # Todo check logic for this from Abi
-      # where(status_id: BbpsBillStatus.ids_for(:awaiting_approval), controlling_user_id: RequestStoreUtil.current_user&.id).where.not(controlling_user_id: nil)
+      awaiting_action_items(RequestStore.store[:current_user]&.id)
     when 92
       where status_id: BbpsBillStatus.ids_for(:approved, :auto_approved, :payment_ticket_created, :payment_initiated, :payment_ticket_deleted)
     else
@@ -530,6 +529,10 @@ class BbpsBill < ApplicationRecord
 
   def review_in_progress?
     BbpsBillStatus.ids_for(:awaiting_approval).include?(status_id)
+  end
+
+  def self.ransackable_scopes(auth_object = nil)
+    [:with_status_id]
   end
 
   private

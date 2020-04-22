@@ -6,8 +6,8 @@ class Docs::UtilityBills::Bills::Index < IndexBuilder::API
 
   # Fixed column is always default true
   column :biller, fixed: true, sort: :subscription_name, includes: [subscription: :biller], default: true do
-    text value: '{{record.subscription.name}}', format: 'primary'
-    text value: '{{record.subscription.biller.biller_name}}'
+    text value: '{{record.subscription.biller.biller_name}}', format: 'primary'
+    text value: '{{record.subscription.name}}'
   end
 
   column :bill_id, sort: :sequence_id, default: true do
@@ -129,11 +129,10 @@ class Docs::UtilityBills::Bills::Index < IndexBuilder::API
         (counts[BbpsBillStatus.id_for(:retracted)].to_i)
     )
 
-    # Awaiting Approval
-    # if user.has_permission?(awaiting_approval_roles)
-    #   counter.add 91, 'Awaiting Approval',
-    #               collection.where(status_id: BbpsBillStatus.id_for(:awaiting_approval), controlling_user_id: user.id).count
-    # end
+    Awaiting Approval
+    if user.has_permission?(awaiting_approval_roles)
+      counter.add 91, 'Awaiting Approval', BbpsBill.awaiting_action_items(user.id).count
+    end
 
     # Processing
     counter.add BbpsBillStatus.id_for(:awaiting_approval), "Processing", counts[BbpsBillStatus.id_for(:awaiting_approval)].to_i

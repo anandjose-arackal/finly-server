@@ -1,6 +1,6 @@
 class ExportManager::Master::UtilityBills::Subscriptions::Index < ExportManager::Builders::Spreadsheet
 
-  label 'Export'
+  label 'Spreadsheet'
   description 'Utility Bill Masters'
   configurable true
   system :vp
