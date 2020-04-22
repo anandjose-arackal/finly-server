@@ -33,7 +33,7 @@ env :PATH, ENV['PATH']
 
 set :output, "#{path}/log/whenever.log"
 
-every 15.minutes, roles: [:whenever_cron] do
+every 30.minutes, roles: [:whenever_cron] do
   runner "YesBankStatusChecker.perform", output: "#{path}/log/whenever/yes_bank_status_checker.log"
   runner "IciciStatusChecker.perform", output: "#{path}/log/whenever/icici_status_checker.log"
   runner "KotakBankTransferStatusChecker.perform", output: "#{path}/log/whenever/kotak_status_checker.log"
@@ -41,14 +41,13 @@ every 15.minutes, roles: [:whenever_cron] do
 end
 
 every 30.minutes, roles: [:whenever_cron] do
-  runner "IciciStatementsFetch.perform", output: "#{path}/log/whenever/icici_statements_fetch.log"
-  runner "CheckForFailedNeftTransactions.perform", output: "#{path}/log/whenever/failed_neft_transactions_check.log"
-  runner "BankTransferProcessRetry.perform"
+  runner "BankTransferProcessRetry.perform", output: "#{path}/log/whenever/bank_transfer_process_retry.log"
   runner "ExpenseStatusUpdate.perform"
 end
 
 every 1.hour, roles: [:whenever_cron] do
   runner "UpdateCompanyBalances.perform"
+  runner "IciciStatementsFetch.perform", output: "#{path}/log/whenever/icici_statements_fetch.log"
 end
 
 every 1.day, at: '12:01 am', roles: [:whenever_cron] do
@@ -66,6 +65,7 @@ end
 
 every 1.day, at: '5:45 am', roles: [:whenever_cron] do
   runner "UpdateConvertedAmountValues.perform", output: "#{path}/log/whenever/update_converted_amount_values.log"
+  runner "CheckForFailedNeftTransactions.perform", output: "#{path}/log/whenever/failed_neft_transactions_check.log"
 end
 
 every 1.day, at: '6:30 am', roles: [:whenever_cron] do
