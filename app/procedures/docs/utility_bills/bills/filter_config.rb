@@ -4,6 +4,8 @@ class Docs::UtilityBills::Bills::FilterConfig < Filters::API
   attribute :bill_number, label: 'Bill Number', type: :text, simple: true
   attribute :created_at, type: :datetime
   attribute :updated_at, type: :datetime
+  attribute :submitted_at, type: :datetime
+  attribute :approved_at, type: :datetime
   attribute :bill_date, label: 'Bill Date', type: :datetime, simple: true
   attribute :due_date, label: 'Due Date', type: :datetime, simple: true
   attribute :subscription_biller_biller_category_name, label: "Biller Category Name", type: :text
