@@ -13,7 +13,7 @@ class Docs::P2P::Invoices::Action < ActionManager::API
                icon: "https://img.icons8.com/windows/17/708090/credit-control.png",
                url: "procure/inward_invoices/bulk_take_control.json",
                authorize: :take_control?
-        scope permissions: :po_invoice_reviewer do
+        scope permissions: [:po_invoice_reviewer, :non_po_invoice_reviewer, :agreement_invoice_reviewer] do
           action :transition,
                  :approve,
                  label: "Approve",

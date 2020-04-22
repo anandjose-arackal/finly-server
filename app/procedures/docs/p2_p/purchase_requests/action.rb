@@ -1,19 +1,36 @@
 class Docs::P2P::PurchaseRequests::Action < ActionManager::API
 
-  scope policy: Docs::P2P::PurchaseRequests::Policy, model: YesBankVendor do
+  scope policy: Docs::P2P::PurchaseRequests::Policy, model: PurchaseRequest do
 
     scope permissions: :admin do
       action :button_group,
              :actions,
              contextual: true,
              label: "Actions" do
+        action :transition,
+               :take_control,
+               label: "Take Control",
+               icon: "https://img.icons8.com/windows/17/708090/credit-control.png",
+               url: "procure/inward_invoices/bulk_take_control.json"
         scope permissions: :purchase_request_reviewer do
           action :transition,
                  :approve,
                  label: "Approve",
                  icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
-                 url: "/procure/purchase_requests/bulk_approve.json",
-                 authorize: :approve?
+                 url: "procure/inward_invoices/bulk_approve.json",
+                 authorize: :review?
+          action :transition,
+                 :reject,
+                 label: "Reject",
+                 icon: "https://img.icons8.com/windows/17/708090/cancel-2.png",
+                 url: "procure/inward_invoices/bulk_reject.json",
+                 authorize: :review?
+          action :transition,
+                 :destroy,
+                 label: "Delete",
+                 icon: "https://img.icons8.com/windows/17/708090/cancel-2.png",
+                 url: "procure/inward_invoices/bulk_destroy.json",
+                 authorize: :destroy?
         end
       end
     end

@@ -7,7 +7,6 @@ class ExportManager::Master::PurchaseRequests::Index < ExportManager::Builders::
   system :vp
   screen 'purchase_requests.index'
   handle :purchase_request
-  validate :input
 
   attribute :request_id
   attribute :description
@@ -20,16 +19,7 @@ class ExportManager::Master::PurchaseRequests::Index < ExportManager::Builders::
   attribute :amount
 
   def input
-    return self.input_data unless self.input_data.nil?
-
-    purchase_request_presenter = ::Procurements::PurchaseRequests::Index.(user, params)
-
-    unless purchase_request_presenter.success?
-      add_message :error, purchase_request_presenter.messages[:error]
-      return
-    end
-
-    purchase_request_presenter.purchase_requests.includes(:total_amount, :status, :creator, :policy, :location, :department)
+    resolve('purchase_requests.default').includes(:total_amount, :status, :creator, :policy, :location, :department)
   end
 
   def request_id(purchase_request)
