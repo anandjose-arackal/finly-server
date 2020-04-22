@@ -63,6 +63,10 @@ Resolver::Router.draw do
     route 'default', Docs::UtilityBills::Subscriptions::Resolver
   end
 
+  scope :bbps_billers do
+    route 'default', Docs::UtilityBills::Billers::Resolver
+  end
+
   # Docs
   scope :trips do
     route 'default', Docs::Trips::Resolver

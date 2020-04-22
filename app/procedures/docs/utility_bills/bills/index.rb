@@ -20,6 +20,10 @@ class Docs::UtilityBills::Bills::Index < IndexBuilder::API
     text value: -> (context) { context[:record].subscription.customer_param_value_3.present? ? "#{context[:record].subscription.customer_param_key_3}: #{context[:record].subscription.customer_param_value_3}" : " " }
   end
 
+  column :subscription_id, label: "Subscription ID", default: true, includes: [:subscription] do
+    text value: "{{record.subscription.subscription_id}}"
+  end
+
   column :biller_category, sort: :subscription_biller_category_name, includes: [subscription: :biller], default: true do
     text value: '{{record.subscription.biller.biller_category_name}}'
   end
