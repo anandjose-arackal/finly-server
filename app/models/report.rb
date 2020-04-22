@@ -315,28 +315,28 @@ class Report < ApplicationRecord
     filter_status = []
     status = [status] unless status.is_a?(Array)
     if status.include?("1")
-      filter_status << ReportStatus.id_for(:Open)
+      filter_status << ReportStatus.id_for(:open)
     end
     if status.include?("2")
-      filter_status << ReportStatus.id_for(:Processing)
+      filter_status << ReportStatus.id_for(:processing)
     end
     if status.include?("3")
-      filter_status << ReportStatus.id_for(:Approved)
+      filter_status << ReportStatus.id_for(:approved)
     end
     if status.include?("4")
-      filter_status << ReportStatus.id_for(:Rejected)
+      filter_status << ReportStatus.id_for(:rejected)
     end
     if status.include?("5")
-      filter_status << ReportStatus.id_for(:Retracted)
+      filter_status << ReportStatus.id_for(:retracted)
     end
     if status.include?("6")
-      filter_status << ReportStatus.id_for(:Settled)
+      filter_status << ReportStatus.id_for(:settled)
     end
     if status.include?("7")
       filter_status << ReportStatus.id_for(:settlement_confirmed)
     end
     if status.include?("8")
-      filter_status << ReportStatus.id_for(:Closed)
+      filter_status << ReportStatus.id_for(:closed)
     end
     if status.blank?
       filter_status = ReportStatus.all.collect(&:id)
