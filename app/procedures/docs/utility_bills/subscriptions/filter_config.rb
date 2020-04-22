@@ -7,7 +7,7 @@ class Docs::UtilityBills::Subscriptions::FilterConfig < Filters::API
   attribute :bill_date, label: 'Bill Date', type: :datetime, simple: true
   attribute :due_date, label: 'Due Date', type: :datetime, simple: true
   attribute :subscription_biller_biller_category_name, label: "Biller Category Name", type: :text
-  attribute :policy, type: :dropdown, choices: Choices[:auto_complete].('policies')
+  attribute :policy_id, type: :dropdown, choices: Choices[:auto_complete].('policies')
   attribute :bbps_biller_id, type: :dropdown, simple: true, choices: Choices[:auto_complete].('bbps_billers')
   attribute :subscription_category_id, type: :dropdown, simple: true, choices: Choices[:auto_complete].('categories')
   attribute :subscription_sequence_id, label: 'Subscription ID', type: :text

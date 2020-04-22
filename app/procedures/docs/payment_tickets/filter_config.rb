@@ -6,7 +6,7 @@ class Docs::PaymentTickets::FilterConfig < Filters::API
   # attribute :created_at, type: :datetime, simple: false
   # attribute :submitted_at, type: :datetime, simple: false
   # attribute :approved_at, type: :datetime, simple: false
-  # attribute :policy, type: :dropdown, simple: true, choices: Choices[:auto_complete].("policies")
+  # attribute :policy_id, type: :dropdown, simple: true, choices: Choices[:auto_complete].("policies")
   # attribute :vendor_id, label: "Vendor", simple: true, type: :dropdown, choices: Choices[:auto_complete].('vendor')
   # attribute :vendor_vendor_id, label: "Vendor ID"
   # attribute :location_id, label: "Billing Location", type: :dropdown, choices: Choices[:auto_complete].("locations")
