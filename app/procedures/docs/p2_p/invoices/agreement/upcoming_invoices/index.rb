@@ -19,7 +19,7 @@ class Docs::P2P::Invoices::Agreement::UpcomingInvoices::Index < IndexBuilder::AP
   end
 
   column :invoice_type, label: "Type", default: true, includes: [:invoice_type] do
-    text value: -> (context) {context[:record].class.titleize}
+    text value: -> (context) { context[:record].class.titleize }
   end
 
   # Todo figure out how to provide the status
@@ -67,39 +67,39 @@ class Docs::P2P::Invoices::Agreement::UpcomingInvoices::Index < IndexBuilder::AP
     amount value: :cgst_amount
   end
 
-  column :sgst_amount, sort: :tax_amount_value, label: 'SGST', includes: [tax_amount: :currency]  do
+  column :sgst_amount, sort: :tax_amount_value, label: 'SGST', includes: [tax_amount: :currency] do
     amount value: :sgst_amount
   end
 
-  column :igst, sort: :tax_amount_value, label: 'IGST', includes: [tax_amount: :currency]  do
+  column :igst, sort: :tax_amount_value, label: 'IGST', includes: [tax_amount: :currency] do
     amount value: :igst_amount
   end
 
-  column :tds_slab, sort: :tds_slab_name, includes: [:tds_slab]  do
+  column :tds_slab, sort: :tds_slab_name, includes: [:tds_slab] do
     text value: "{{record.tds_slab.name}}"
   end
 
-  column :tds_rate, sort: :tds_slab_rate, includes: [:tds_rate]  do
+  column :tds_rate, sort: :tds_slab_rate, includes: [:tds_rate] do
     text value: "{{record.tds_slab.rate}}"
   end
 
-  column :tds_amount, sort: :tds_amount_value, includes: [tds_amount: :currency]  do
+  column :tds_amount, sort: :tds_amount_value, includes: [tds_amount: :currency] do
     amount value: :tds_amount
   end
 
-  column :freight_amount, sort: :freight_amount_value, includes: [freight_amount: :currency]  do
+  column :freight_amount, sort: :freight_amount_value, includes: [freight_amount: :currency] do
     amount value: :freight_amount
   end
 
-  column :net_amount, sort: :net_amount_value, includes: [net_amount: :currency]  do
+  column :net_amount, sort: :net_amount_value, includes: [net_amount: :currency] do
     amount value: :net_amount
   end
 
-  column :advance_amount, sort: :advance_amount_value, includes: [advance_amount: :currency]  do
+  column :advance_amount, sort: :advance_amount_value, includes: [advance_amount: :currency] do
     amount value: :advance_paid
   end
 
-  column :balance_payable, includes: [balance_due: :currency]  do
+  column :balance_payable, includes: [balance_due: :currency] do
     amount value: :balance_payable
   end
 
@@ -130,6 +130,7 @@ class Docs::P2P::Invoices::Agreement::UpcomingInvoices::Index < IndexBuilder::AP
   column :action, default: true do
     action :template,
            :create,
+           action_condition: :can_create?,
            permissions: :agreement_invoice_initiator,
            label: 'Create Invoice',
            function: 'agreement_invoice_create'
@@ -216,6 +217,10 @@ class Docs::P2P::Invoices::Agreement::UpcomingInvoices::Index < IndexBuilder::AP
       format = 'danger'
     end
     format
+  end
+
+  def self.can_create?(context)
+    false
   end
 
 end

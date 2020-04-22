@@ -6,7 +6,7 @@ class ActionManager::Action
 
   attr_accessor :type, :id, :path, :parent, :action_registry, :action_scopes,
                 :permissions, :label, :icon, :policy, :authorize,
-                :model, :format
+                :model, :format, :action_condition
 
   class_attribute :registered_type
 
@@ -97,13 +97,14 @@ class ActionManager::Action
     true
   end
 
-  def authorized?(user, record)
-    return false unless permitted?(user)
+  def authorized?(context)
+    return false unless permitted?(context[:current_user])
     return true unless authorize.present?
     raise "Policy has not been defined for the action #{self.id}" unless policy.present?
 
-    policy = self.policy.new(user, record)
+    policy = self.policy.new(context[:current_user], context[:record])
     return true if policy.send(authorize)
+    return true if action_condition.present? and Transactions::Evaluator.eval(action_registry, action_condition, context)
 
     false
   end

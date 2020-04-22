@@ -48,7 +48,7 @@ class ActionManager::Validate < Transactions::API
     records = action.model.where(company_id: current_user.company_id, id: params[:record_id])
     context[:records] = {processable: [], unprocessable: []}
     records.each do |record|
-      if action.authorized?(current_user, record)
+      if action.authorized?(current_user: current_user, record: record)
         context[:records][:processable] << record.id
       else
         context[:records][:unprocessable] << record.id
