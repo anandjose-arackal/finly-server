@@ -4,6 +4,7 @@ IndexBuilder::Router.draw do
   route "items", Masters::Items::Index
   route 'users', Masters::Users::Index
   route 'rate_contracts', Masters::RateContracts::Index
+  route 'utility_subscriptions', Docs::UtilityBills::Subscriptions::Index
 
   # Docs
   route "invoices", Docs::P2P::Invoices::Index

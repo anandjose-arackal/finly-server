@@ -23,7 +23,7 @@ class Docs::UtilityBills::Subscriptions::Ops::AddBill < Transactions::API
         'bill' => {}
     }
 
-    op = Docs::UtilityBills::Bills::Ops::Create.(params: params, current_user: current_user)
+    op = Docs::UtilityBills::Subscriptions::Ops::Create.(params: params, current_user: current_user)
 
     if op.success?
       options['result'] = {'bill' => op['model']}

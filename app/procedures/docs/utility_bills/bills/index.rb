@@ -1,7 +1,7 @@
 class Docs::UtilityBills::Bills::Index < IndexBuilder::API
   include DynamicAttributes
 
-  resolver 'bbps_bills.default'
+  resolver 'utility_bills.default'
   reference '{{record.id}}'
 
   # Fixed column is always default true
@@ -10,18 +10,23 @@ class Docs::UtilityBills::Bills::Index < IndexBuilder::API
     text value: '{{record.subscription.biller.biller_name}}'
   end
 
-  column :sequence_id, sort: :sequence_id, default: true do
-    text value: :sequence_id, format: 'primary'
+  column :bill_id, sort: :sequence_id, default: true do
+    text value: :bill_id, format: 'primary'
   end
 
-  column :subscription_details, default: true do
-    text value: :customer_param_value_1
-    text value: :customer_param_value_2
-    text value: :customer_param_value_3
+  column :subscription_details, default: true, includes: [:subscription] do
+    text value: -> (context) { context[:record].subscription.customer_param_value_1.present? ? "#{context[:record].subscription.customer_param_key_1}: #{context[:record].subscription.customer_param_value_1}" : " " }
+    text value: -> (context) { context[:record].subscription.customer_param_value_2.present? ? "#{context[:record].subscription.customer_param_key_2}: #{context[:record].subscription.customer_param_value_2}" : " " }
+    text value: -> (context) { context[:record].subscription.customer_param_value_3.present? ? "#{context[:record].subscription.customer_param_key_3}: #{context[:record].subscription.customer_param_value_3}" : " " }
   end
 
-  column :category, sort: :subscription_biller_category_name, includes: [:subscription], default: true do
-    text value: '{{record.subscription.biller_category_name}}'
+  column :biller_category, sort: :subscription_biller_category_name, includes: [subscription: :biller], default: true do
+    text value: '{{record.subscription.biller.biller_category_name}}'
+  end
+
+  column :category, sort: :subscription_biller_category_name, includes: [subscription: :category], default: true do
+    text value: '{{record.subscription.category.name}}'
+    text value: ->(context) {"Ledger: #{context[:record].subscription.category.gl_code}" if context[:record]&.subscription&.category&.gl_code.present?}
   end
 
   column :created_by, default: true, includes: [:created_by] do
@@ -125,7 +130,7 @@ class Docs::UtilityBills::Bills::Index < IndexBuilder::API
     # Processing
     counter.add BbpsBillStatus.id_for(:awaiting_approval), "Processing", counts[BbpsBillStatus.id_for(:awaiting_approval)].to_i
 
-    # Pending Payment - approved/auto_approved/partially_paid/unpaid/initiated
+    # Pending Payment - approved/auto_approved/partiallycustom_param_key_1_paid/unpaid/initiated
     counter.add 92, 'Pending Payment', (
         counts[BbpsBillStatus.id_for(:approved)].to_i +
         counts[BbpsBillStatus.id_for(:auto_approved)].to_i +
@@ -146,9 +151,9 @@ class Docs::UtilityBills::Bills::Index < IndexBuilder::API
   end
 
   def self.bbps_bill_status(context)
-    return 'Processing'.titleize if context[:record].status_id == BbpsBillStatus.id_for(:awaiting_approval) and record.controlling_user_id != user.id
+    return 'Processing'.titleize if context[:record].status_id == BbpsBillStatus.id_for(:awaiting_approval) and context[:record].controlling_user?(context[:user])
 
-    record.status&.name&.titleize
+    context[:record].status&.name&.titleize
   end
 
   def self.format_status(context)

@@ -1,20 +1,10 @@
 class BbpsBillExposure < Exposures::API
 
   attribute :id, record_attribute: true
-  attribute :sequence_id, record_attribute: true
+  attribute :bill_id, record_attribute: :sequence_id
   attribute :subscription, record_attribute: true, exposure: true, includes: [:subscription]
-  attribute :custom_param_key_1, record_attribute: true
-  attribute :custom_param_value_1, record_attribute: true
-  attribute :custom_param_key_2, record_attribute: true
-  attribute :custom_param_value_2, record_attribute: true
-  attribute :custom_param_key_3, record_attribute: true
-  attribute :custom_param_value_3, record_attribute: true
-  attribute :custom_param_key_4, record_attribute: true
-  attribute :custom_param_value_4, record_attribute: true
-  attribute :custom_param_key_5, record_attribute: true
-  attribute :custom_param_value_5, record_attribute: true
   attribute :user, record_attribute: true, exposure: true, includes: [:user]
-  attribute :created_by, record_attribute: :user, exposure: true, includes: [:user]
+  attribute :created_by, record_attribute: :created_by, exposure: true, includes: [:created_by]
   attribute :status, record_attribute: true, exposure: true, includes: [:status]
   attribute :bill_number, record_attribute: true
   attribute :bill_date, record_attribute: true
@@ -43,5 +33,6 @@ class BbpsBillExposure < Exposures::API
   attribute :department, record_attribute: true, exposure: true, includes: [:department]
   attribute :controlling_level, record_attribute: true, exposure: true, includes: [:controlling_level]
   attribute :policy, record_attribute: true, exposure: true, includes: [:policy]
+  attribute :auto_fetched, record_attribute: :autofetched
 
 end

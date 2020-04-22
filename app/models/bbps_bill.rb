@@ -73,6 +73,7 @@ class BbpsBill < ApplicationRecord
   belongs_to :company, optional: true
   belongs_to :location, class_name: 'BranchLocation', optional: true
   belongs_to :user, class_name: 'User', optional: true
+  belongs_to :created_by, class_name: 'User', optional: true, foreign_key: :user_id
   belongs_to :status, class_name: 'BbpsBillStatus', optional: true
   belongs_to :amount, optional: true
   belongs_to :total_amount, foreign_key: :total_amount_id, class_name: 'Amount', optional: true

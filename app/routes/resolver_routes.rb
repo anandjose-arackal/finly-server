@@ -59,6 +59,10 @@ Resolver::Router.draw do
     route 'default', Masters::RateContracts::Resolver
   end
 
+  scope :utility_subscriptions do
+    route 'default', Docs::UtilityBills::Subscriptions::Resolver
+  end
+
   # Docs
   scope :trips do
     route 'default', Docs::Trips::Resolver
@@ -85,7 +89,7 @@ Resolver::Router.draw do
     route 'received', Docs::P2P::Inwards::Received::Resolver
   end
 
-  scope :bbps_bills do
+  scope :utility_bills do
     route 'default', Docs::UtilityBills::Bills::Resolver
   end
 
