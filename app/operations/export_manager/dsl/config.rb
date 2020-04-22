@@ -8,6 +8,7 @@ module ExportManager::DSL::Config
     class_attr :screen
     class_attr :system
     class_attr :type, default: :generic
+    class_attr :resolver # Automatically generates the input using resolver if this is defined
     class_attr :description
     class_attr :company_scope, default: {}.with_indifferent_access
   end
