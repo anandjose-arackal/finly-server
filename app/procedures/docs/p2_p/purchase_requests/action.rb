@@ -48,7 +48,7 @@ class Docs::P2P::PurchaseRequests::Action < ActionManager::API
            permissions: :purchase_request_initiator,
            label: 'New Purchase Request',
            icon: 'https://img.icons8.com/windows/17/708090/--checkmark-yes.png',
-           url: 'purchase_requests/new'
+           url: 'purchase_request'
 
   end
 

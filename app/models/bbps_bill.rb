@@ -525,11 +525,11 @@ class BbpsBill < ApplicationRecord
   end
 
   def review_completed?
-    VendorStatus.ids_for(:approved, :auto_approved, :payment_ticket_created, :payment_initiated, :failed, :paid, :voided, :payment_ticket_deleted).include?(status_id)
+    BbpsBillStatus.ids_for(:approved, :auto_approved, :payment_ticket_created, :payment_initiated, :failed, :paid, :voided, :payment_ticket_deleted).include?(status_id)
   end
 
   def review_in_progress?
-    VendorStatus.ids_for(:awaiting_approval).include?(status_id)
+    BbpsBillStatus.ids_for(:awaiting_approval).include?(status_id)
   end
 
   private

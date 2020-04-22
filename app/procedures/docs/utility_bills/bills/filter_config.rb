@@ -12,5 +12,8 @@ class Docs::UtilityBills::Bills::FilterConfig < Filters::API
   attribute :subscription_category_id, type: :dropdown, simple: true, choices: Choices[:auto_complete].('categories')
   attribute :subscription_sequence_id, label: 'Subscription ID', type: :text
   attribute :subscription_name, label: 'Subscription Name', type: :text
+  attribute :location_id, label: "Location", type: :dropdown, choices: Choices[:auto_complete].("locations")
+  attribute :cost_center_id, label: "Cost Center", type: :dropdown, choices: Choices[:auto_complete].("cost_centers")
+  attribute :department_id, label: "Department", type: :dropdown, choices: Choices[:auto_complete].("departments")
 
 end

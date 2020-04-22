@@ -1,5 +1,9 @@
 class Docs::UtilityBills::Subscriptions::Policy < ApplicationPolicy
 
+  def export?
+    true
+  end
+
   def submit?
     user.has_policy_role?(UserRole.id_for(:utility_bill_initiator)) && record.subscription.pocs.include?(user) && (record.open? || record.retracted? || record.rejected?)
   end

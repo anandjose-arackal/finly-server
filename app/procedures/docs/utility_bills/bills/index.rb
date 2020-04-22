@@ -15,9 +15,9 @@ class Docs::UtilityBills::Bills::Index < IndexBuilder::API
   end
 
   column :subscription_details, default: true, includes: [:subscription] do
-    text value: -> (context) { context[:record].subscription.customer_param_value_1.present? ? "#{context[:record].subscription.customer_param_key_1}: #{context[:record].subscription.customer_param_value_1}" : " " }
-    text value: -> (context) { context[:record].subscription.customer_param_value_2.present? ? "#{context[:record].subscription.customer_param_key_2}: #{context[:record].subscription.customer_param_value_2}" : " " }
-    text value: -> (context) { context[:record].subscription.customer_param_value_3.present? ? "#{context[:record].subscription.customer_param_key_3}: #{context[:record].subscription.customer_param_value_3}" : " " }
+    text value: :customer_param_value_1
+    text value: :customer_param_value_2
+    text value: :customer_param_value_3
   end
 
   column :subscription_id, label: "Subscription ID", default: true, includes: [:subscription] do
@@ -63,6 +63,10 @@ class Docs::UtilityBills::Bills::Index < IndexBuilder::API
 
   column :utr, label: "UTR", default: true, includes: [:payments] do
     text value: ->(context) {context[:record].payments&.first&.bbps_bank_transaction&.bbps_ref_id}
+  end
+
+  column :tax_rate, sort: :tax_rate_value, default: true, includes: [:tax_rate] do
+    text value: "{{record.tax_rate.display_name}}"
   end
 
   column :payment_status, label: "Payment Status", default: true, includes: [:payments] do
@@ -201,6 +205,24 @@ class Docs::UtilityBills::Bills::Index < IndexBuilder::API
       format = 'info'
     end
     format
+  end
+
+  def self.customer_param_value_1(context)
+    return " " if context[:record].subscription.customer_param_value_1.blank?
+
+    "#{context[:record].subscription.customer_param_key_1}: #{context[:record].subscription.customer_param_value_1}"
+  end
+
+  def self.customer_param_value_2(context)
+    return " " if context[:record].subscription.customer_param_value_2.blank?
+
+    "#{context[:record].subscription.customer_param_key_2}: #{context[:record].subscription.customer_param_value_2}"
+  end
+
+  def self.customer_param_value_3(context)
+    return ' ' if context[:record].subscription.customer_param_value_3.blank?
+
+    "#{context[:record].subscription.customer_param_key_3}: #{context[:record].subscription.customer_param_value_3}"
   end
 
 end
