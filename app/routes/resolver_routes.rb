@@ -55,6 +55,10 @@ Resolver::Router.draw do
     route 'default', Masters::Users::Resolver
   end
 
+  scope :rate_contracts do
+    route 'default', Masters::RateContracts::Resolver
+  end
+
   # Docs
   scope :trips do
     route 'default', Docs::Trips::Resolver

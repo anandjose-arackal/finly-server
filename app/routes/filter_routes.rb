@@ -4,6 +4,7 @@ Filters::Router.draw do
   route 'items', Masters::Items::FilterConfig
   route 'item_master', Masters::Items::FilterConfig
   route 'users', Masters::Users::FilterConfig
+  route 'rate_contracts', Masters::RateContracts::FilterConfig
 
   # Docs
   route 'invoices', Docs::P2P::Invoices::FilterConfig

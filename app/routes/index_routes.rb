@@ -3,6 +3,7 @@ IndexBuilder::Router.draw do
   route "vendors", Masters::Vendors::Index
   route "items", Masters::Items::Index
   route 'users', Masters::Users::Index
+  route 'rate_contracts', Masters::RateContracts::Index
 
   # Docs
   route "invoices", Docs::P2P::Invoices::Index

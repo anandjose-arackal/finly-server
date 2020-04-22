@@ -6,6 +6,7 @@ ActionManager::Router.draw do
   route 'vendors', Masters::Vendors::Action
   route 'items', Masters::Items::Action
   route 'users', Masters::Users::Action
+  route 'rate_contracts', Masters::RateContracts::Action
 
   # Docs
   route 'invoices', Docs::P2P::Invoices::Action

@@ -27,6 +27,7 @@ class Company < ApplicationRecord
   belongs_to :status, optional: true, class_name: 'CompanyStatus'
   belongs_to :group, optional: true, class_name: 'CompanyGroup'
 
+  has_many :rate_contracts
   has_many :trips
   has_many :users
   has_many :cards
