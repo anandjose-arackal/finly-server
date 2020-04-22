@@ -29,8 +29,9 @@ class ExportManager::Master::Statements::Index < ExportManager::Builders::Spread
       return
     end
     
-    result = result.scoped_finly_transactions.where(associated_transaction_type: "CardTransaction").success.sort_date_asc
+    result = result.scoped_finly_transactions.where(associated_transaction_type: "CardTransaction")
     return if result.blank?
+    result.success.sort_date_asc
   end
 
   def date(transaction)
