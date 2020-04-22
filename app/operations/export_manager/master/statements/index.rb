@@ -12,6 +12,8 @@ class ExportManager::Master::Statements::Index < ExportManager::Builders::Spread
   attribute :type
   attribute :purpose
   attribute :merchant
+  attribute :merchant_employee_id_id 
+  attribute :card_number 
   attribute :credit
   attribute :debit
   attribute :closing_balance
@@ -19,14 +21,16 @@ class ExportManager::Master::Statements::Index < ExportManager::Builders::Spread
   attribute :transaction_id
   attribute :note
 
-
   def input
     result = ::Statements::Show.(user, params)
+
     unless result&.success?
       add_message :error, result.messages[:error]
       return
     end
-    result.scoped_finly_transactions.success.sort_date_asc
+    
+    result = result.scoped_finly_transactions.where(associated_transaction_type: "CardTransaction").success.sort_date_asc
+    return if result.blank?
   end
 
   def date(transaction)
@@ -43,6 +47,14 @@ class ExportManager::Master::Statements::Index < ExportManager::Builders::Spread
 
   def merchant(transaction)
     transaction.transaction_detail&.merchant
+  end
+
+  def merchant_employee_id_id(transaction)
+    transaction&.associated_transaction&.user&.employee_id
+  end
+    
+  def card_number(transaction)
+    transaction&.associated_transaction&.serial_id
   end
 
   def credit(transaction)
