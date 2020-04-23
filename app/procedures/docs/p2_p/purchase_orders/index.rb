@@ -35,7 +35,7 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
     date value: :approved_at
   end
 
-  column :status, default: true, includes: [:status] do
+  column :po_status, label: "PO Status", default: true, includes: [:status] do
     indicator value: :po_status, format: :format_status
   end
 
