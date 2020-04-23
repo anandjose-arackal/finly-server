@@ -41,7 +41,6 @@
 #
 
 class PurchaseOrderItem < ApplicationRecord
-  include SoftDeletable
   validates :inventory_line_item_id, presence: true
   # validates :purchase_order_id, presence: true
 

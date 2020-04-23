@@ -2,14 +2,7 @@ class Procurements::PurchaseRequests::BulkApprove < Procurements::PurchaseReques
   attr_accessor :purchase_requests
 
   def pre_validate
-    if params[:password].blank?
-      add_message :error, 'You need to provide your password to initiate the approval.'
-      return
-    end
-    unless user.valid_password?(params[:password])
-      add_message :error, 'Invalid Password'
-      return
-    end
+    user_present? and params_present?
   end
 
   def init

@@ -78,7 +78,7 @@
 #
 
 class PurchaseOrder < ApplicationRecord
-  include SoftDeletable, Templatable, Transitionable, MathUtil, CustomFieldFilterSupport
+  include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport
   include Sequenced::ActsAsSequenced
   include Ransacker
 
