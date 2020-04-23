@@ -59,6 +59,7 @@ class UserSessions::Create < BaseOperation
     enrich_device args
     enrich_ip args
     enrich_user_agent args
+    associate_admin_user args
     set_event args
     return if has_errors?
     self.session = UserSession.new args
@@ -206,6 +207,16 @@ class UserSessions::Create < BaseOperation
       args[:message] = user_agent_client.message
       return
     end
+  end
+
+  def associate_admin_user(args)
+    return unless user.present?
+    return unless params[:admin_user_id].present?
+
+    args[:admin_user_id] = params[:admin_user_id]
+    args[:admin_access_reason] = params[:admin_access_reason]
+    args[:admin_access_reason_details] = params[:admin_access_reason_details]
+    args[:admin_access_requested_by] = params[:admin_access_requested_by]
   end
 
   def set_event(args)
