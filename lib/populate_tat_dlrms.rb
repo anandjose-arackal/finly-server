@@ -59,7 +59,9 @@ class PopulateTatDlrms
 
               level_string += ",Level-#{key} - #{tat}"
 
-              val.each {|dlrm| dlrm.update_columns(tat: tat, tat_added_by_script: true)}
+              tat_value = tat.to_i < 2000000000 ? tat : 2000000000
+
+              val.each {|dlrm| dlrm.update_columns(tat: tat_value, tat_added_by_script: true)}
 
             else
               prev_val = grouped_dlrms[keys[index - 1]]
@@ -78,7 +80,9 @@ class PopulateTatDlrms
 
               level_string += ",Level-#{key} - #{tat}"
 
-              val.each {|dlrm| dlrm.update_columns(tat: tat.abs, tat_added_by_script: true)}
+              tat_value = tat.to_i < 2000000000 ? tat : 2000000000
+
+              val.each {|dlrm| dlrm.update_columns(tat: tat_value, tat_added_by_script: true)}
             end
           end; nil
 
