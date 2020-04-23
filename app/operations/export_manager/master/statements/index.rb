@@ -25,8 +25,7 @@ class ExportManager::Master::Statements::Index < ExportManager::Builders::Spread
     result = ::Statements::Show.(user, params)
 
     unless result&.success?
-      add_message :error, result.messages[:error]
-      return
+      return add_message :error, result.messages[:error]
     end
     
     result = result.scoped_finly_transactions.where(associated_transaction_type: "CardTransaction")
@@ -80,6 +79,4 @@ class ExportManager::Master::Statements::Index < ExportManager::Builders::Spread
   def note(transaction)
     transaction.transaction_detail&.get_note
   end
-
-
 end
