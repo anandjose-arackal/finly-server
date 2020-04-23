@@ -197,17 +197,17 @@ json.result do
       json.state_of_expense_id expense.state_of_expense_id
       json.tax_rate_id expense.tax_rate_id
       json.gstin_location_id expense.gstin_location_id
-      json.gst_percentage (gst_applicable ? expense.gst_percentage : nil)
+      json.gst_percentage (gst_applicable ? expense.gst_percentage : 0)
       json.gst_type (gst_applicable ? expense.gst_type&.name&.humanize&.upcase : nil)
-      json.gst_amount (gst_applicable ? expense.gst_amount&.value&.round(2) : nil)
-      json.igst_amount (gst_applicable ? (expense.gst_type&.name == 'igst' ? expense.gst_amount&.value : nil) : nil)
-      json.cgst_amount ((gst_applicable ? (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value) / 2).round(2) : nil) : nil) rescue nil)
-      json.sgst_amount ((gst_applicable ? (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value) / 2).round(2) : nil) : nil) rescue nil)
+      json.gst_amount (gst_applicable ? expense.gst_amount&.value&.round(2) : 0)
+      json.igst_amount (gst_applicable ? (expense.gst_type&.name == 'igst' ? expense.gst_amount&.value : 0) : 0)
+      json.cgst_amount ((gst_applicable ? (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value) / 2).round(2) : 0) : 0) rescue 0)
+      json.sgst_amount ((gst_applicable ? (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value) / 2).round(2) : 0) : 0) rescue 0)
       json.net_total_amount (gst_applicable ? ((expense.amount&.value || 0) - (expense.gst_amount&.value&.round(2) || 0))&.round(2) : expense.amount&.value)
       json.gst_location (gst_applicable ? expense.gstin_location&.location : '')
       json.merchant_state (gst_applicable ? expense.gstin_location&.state&.name : '')
       json.state_of_expense (gst_applicable ? expense.state_of_expense&.name : '')
-      json.tax_rate (gst_applicable ? expense.tax_rate&.rate&.to_f : '')
+      json.tax_rate (gst_applicable ? expense.tax_rate&.rate&.to_f : 0)
     end
 
     # report details

@@ -29,7 +29,7 @@ class ReminderSubmitPending < ApplicationJob
   # end
 
   private
-  def remind_document_submission
+  def self.remind_document_submission
     created_at = 30.days.ago.to_date
     # Get users with initiator role
     initiator_role_ids = [UserRole.id_for(:goods_receiver), UserRole.id_for(:invoice_initiator)]
