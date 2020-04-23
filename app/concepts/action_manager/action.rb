@@ -37,7 +37,7 @@ class ActionManager::Action
   def initialize(type, id, config: {}, action_scopes: [], parent: nil, action_registry: nil, &block)
     self.id = id
     self.type = type
-    self.action_scopes = action_scopes.deep_dup
+    self.action_scopes = action_scopes.dup
     self.parent = parent
     self.action_registry = action_registry
     self.path = self.parent.present? ? "#{self.parent.path}/#{id}" : id.to_s
