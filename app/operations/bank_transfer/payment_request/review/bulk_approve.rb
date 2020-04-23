@@ -20,7 +20,7 @@ class BankTransfer::PaymentRequest::Review::BulkApprove < BankTransfer::PaymentR
   end
 
   def init
-    ids = params[:ids] || params[:bank_payment_request_ids] || params[:payment_request_ids]
+    ids = params[:id] || params[:ids] || params[:bank_payment_request_ids] || params[:payment_request_ids]
     unless ids.is_a?(Array)
       ids = ids.split(',')
     end

@@ -15,7 +15,7 @@ class BankTransfer::PaymentRequest::Review::MarkAsCredited < BankTransfer::Payme
   end
 
   def init
-    ids = params[:id] || params[:bank_payment_request_ids] || params[:bank_payment_request_id]
+    ids = params[:id] || params[:ids] || params[:bank_payment_request_ids] || params[:bank_payment_request_id]
     unless ids.is_a?(Array)
       ids = ids.split(",")
     end

@@ -18,7 +18,7 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
   end
 
   def init
-    ids = params[:payment_request_ids] || params[:bank_payment_request_ids] || params[:ids]
+    ids = params[:id] || params[:payment_request_ids] || params[:bank_payment_request_ids] || params[:ids]
     self.otp = params[:otp]
     unless ids.is_a?(Array)
       ids = ids.split(",")

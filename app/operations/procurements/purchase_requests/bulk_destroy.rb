@@ -13,7 +13,7 @@ class Procurements::PurchaseRequests::BulkDestroy < Procurements::PurchaseReques
   end
 
   def init
-    purchase_request_ids = params[:ids] || params[:purchase_request_ids]
+    purchase_request_ids = params[:id] || params[:ids] || params[:purchase_request_ids]
     self.purchase_requests = user.purchase_requests.deleteable.with_ids(purchase_request_ids) # allow delete only for their own pr's
   end
 

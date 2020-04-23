@@ -21,7 +21,7 @@ class BankTransfer::PaymentRequest::Review::BulkTakeControl < BankTransfer::Paym
 
   def init
     # ids = params["bulk_take_control_ids"]
-    ids = params[:ids] || params[:bank_payment_request_ids] || params[:payment_request_ids]
+    ids = params[:id] || params[:ids] || params[:bank_payment_request_ids] || params[:payment_request_ids]
     unless ids.is_a?(Array)
       ids = ids.split(',')
     end

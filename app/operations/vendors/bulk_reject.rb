@@ -2,7 +2,7 @@ class Vendors::BulkReject < Vendors::Base
   attr_accessor :vendors
 
   def init
-    vendor_ids = params[:ids] || params[:vendor_ids]
+    vendor_ids = params[:id] || params[:ids] || params[:vendor_ids]
 
     unless vendor_ids.is_a?(Array)
       add_message :error, 'Invalid configuration'
