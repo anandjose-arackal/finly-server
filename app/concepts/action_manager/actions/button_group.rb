@@ -5,7 +5,7 @@ class ActionManager::Actions::ButtonGroup < ActionManager::Action
 
   def build(options)
     map = super(options)
-    return unless map[:actions].present?
+    return unless map.present? and map[:actions].present?
 
     map
   end
