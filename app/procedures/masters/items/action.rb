@@ -6,8 +6,7 @@ class Masters::Items::Action < ActionManager::API
            :export,
            label: "Export",
            icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
-           route: "item_master.index",
-           authorize: :export?
+           route: "item_master.index"
 
     action :template,
            :create,

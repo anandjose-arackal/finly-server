@@ -11,7 +11,8 @@ class Docs::P2P::PurchaseRequests::Action < ActionManager::API
                :take_control,
                label: "Take Control",
                icon: "https://img.icons8.com/windows/17/708090/credit-control.png",
-               url: "procure/purchase_requests/bulk_take_control.json"
+               url: "procure/purchase_requests/bulk_take_control.json",
+               authorize: :take_control?
         scope permissions: :purchase_request_reviewer do
           action :transition,
                  :approve,
@@ -39,8 +40,7 @@ class Docs::P2P::PurchaseRequests::Action < ActionManager::API
            :export,
            label: "Export",
            icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
-           route: "purchase_requests.index",
-           authorize: :export?
+           route: "purchase_requests.index"
 
     action :redirect,
            :create,

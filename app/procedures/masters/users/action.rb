@@ -7,8 +7,7 @@ class Masters::Users::Action < ActionManager::API
            permissions: [:admin],
            label: "Export",
            icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
-           route: 'users.vp.index',
-           authorize: :export?
+           route: 'users.vp.index'
 
     action :template,
            :create,

@@ -19,13 +19,13 @@ class Masters::Vendors::Action < ActionManager::API
                  label: "Approve",
                  icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
                  url: "vendors/bulk_approve.json",
-                 authorize: :reject?
+                 authorize: :review?
           action :transition,
                  :reject,
                  label: "Reject",
                  icon: "https://img.icons8.com/windows/17/708090/cancel-2.png",
                  url: "vendors/bulk_reject.json",
-                 authorize: :reject?
+                 authorize: :review?
         end
       end
     end
@@ -34,8 +34,7 @@ class Masters::Vendors::Action < ActionManager::API
            :export,
            label: "Export",
            icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
-           route: "vendors.index",
-           authorize: :export?
+           route: "vendors.index"
 
     action :redirect,
            :create,

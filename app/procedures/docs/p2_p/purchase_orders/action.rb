@@ -11,28 +11,28 @@ class Docs::P2P::PurchaseOrders::Action < ActionManager::API
                :take_control,
                label: "Take Control",
                icon: "https://img.icons8.com/windows/17/708090/credit-control.png",
-               url: "procure/inward_invoices/bulk_take_control.json",
+               url: "procure/purchase_orders/bulk_take_control.json",
                authorize: :take_control?
-        scope permissions: :po_invoice_reviewer do
+        scope permissions: :purchase_order_reviewer do
           action :transition,
                  :approve,
                  label: "Approve",
                  icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
-                 url: "procure/inward_invoices/bulk_approve.json",
-                 authorize: :reject?
+                 url: "procure/purchase_orders/bulk_approve.json",
+                 authorize: :review?
           action :transition,
                  :reject,
                  label: "Reject",
                  icon: "https://img.icons8.com/windows/17/708090/cancel-2.png",
-                 url: "procure/inward_invoices/bulk_reject.json",
-                 authorize: :reject?
+                 url: "procure/purchase_orders/bulk_reject.json",
+                 authorize: :review?
           action :reassign,
                  :forward,
                  label: "Forward",
                  icon: "https://img.icons8.com/windows/17/708090/fast-forward.png",
-                 url: "procure/inward_invoices/forward.json",
+                 url: "procure/purchase_orders/forward.json",
                  users_url: "forwardable_users.json",
-                 authorize: :forward?
+                 authorize: :review?
         end
       end
     end
@@ -41,16 +41,15 @@ class Docs::P2P::PurchaseOrders::Action < ActionManager::API
            :export,
            label: "Export",
            icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
-           route: "invoices.index",
-           authorize: :export?
+           route: "purchase_orders.index"
 
-`    action :template,
+    action :template,
            :create,
            permissions: :purchase_order_initiator,
            format: 'primary',
            label: 'Create PO',
            icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
-           function: "po_create"`
+           function: "po_create"
 
   end
 

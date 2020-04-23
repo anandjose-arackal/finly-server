@@ -5,8 +5,7 @@ class Docs::UtilityBills::Bills::Action < ActionManager::API
            :export,
            label: "Export",
            icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
-           route: "utility_bills.index",
-           authorize: :export?
+           route: "utility_bills.index"
   end
 
 end

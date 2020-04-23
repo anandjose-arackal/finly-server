@@ -11,28 +11,36 @@ class Docs::PaymentTickets::Action < ActionManager::API
                :take_control,
                label: "Take Control",
                icon: "https://img.icons8.com/windows/17/708090/credit-control.png",
-               url: "procure/inward_invoices/bulk_take_control.json",
+               url: "bank_transfer/bulk_take_control.json",
                authorize: :take_control?
         scope permissions: :bank_payment_request_reviewer do
           action :transition,
                  :approve,
                  label: "Approve",
                  icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
-                 url: "procure/inward_invoices/bulk_approve.json",
-                 authorize: :reject?
+                 url: "bank_transfer/bulk_approve.json",
+                 authorize: :review?
           action :transition,
                  :reject,
                  label: "Reject",
                  icon: "https://img.icons8.com/windows/17/708090/cancel-2.png",
-                 url: "procure/inward_invoices/bulk_reject.json",
-                 authorize: :reject?
-          action :reassign,
-                 :forward,
-                 label: "Forward",
-                 icon: "https://img.icons8.com/windows/17/708090/fast-forward.png",
-                 url: "procure/inward_invoices/forward.json",
-                 users_url: "forwardable_users.json",
-                 authorize: :forward?
+                 url: "bank_transfer/bulk_reject.json",
+                 authorize: :review?
+        end
+        scope permissions: :bank_payment_request_creditor do
+          action :transition,
+                 :mark_as_credited,
+                 label: "Approve",
+                 icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
+                 url: "bank_transfer/mark_as_credited.json",
+                 authorize: :mark_as_credited?
+          action :transition,
+                 :credit,
+                 label: "Credit",
+                 icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
+                 url: "bank_transfer/bulk_credit.json",
+                 otp: true, password: true,
+                 authorize: :credit?
         end
       end
     end
@@ -41,16 +49,15 @@ class Docs::PaymentTickets::Action < ActionManager::API
            :export,
            label: "Export",
            icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
-           route: "payment_ticket.index",
-           authorize: :export?
+           route: "payment_ticket.index"
 
     action :redirect,
            :create,
            format: 'primary',
            permissions: :bank_payment_request_initiator,
-           label: 'Create Payment Ticket',
+           label: 'New Payment Ticket',
            icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
-           url: 'payment_tickets/new'
+           url: 'new_payment_ticket'
 
   end
 

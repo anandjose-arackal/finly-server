@@ -6,8 +6,7 @@ class Docs::P2P::PurchaseOrders::Advances::Action < ActionManager::API
            :export,
            label: "Export",
            icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
-           route: "purchase_orders.index",
-           authorize: :export?
+           route: "purchase_orders.index"
 
   end
 

@@ -1,38 +1,16 @@
 class Masters::Vendors::Policy < ApplicationPolicy
 
-  def create?
-    true
-  end
 
-  def update?
-    owner?
-  end
-
-  def destroy?
-    owner?
-  end
-
-  def show?
-    owner?
-  end
-
-  def approve?
+  def review?
     return false if user.blank?
-    (record.processing? rescue false) && record.get_reviewers.include?(user)
-  end
 
-  def reject?
-    approve?
+    record.awaiting_approval? && record.controlling_user?(user)
   end
 
   def take_control?
     return false if user.blank?
     return false if record.action_users(:approve).include?(user)
-    (record.processing? rescue false) && user.vendor_payment_admin? && (record.dlrms&.find_by(level_id: record.level&.id)&.taken_control_by_id != user.id rescue false)
-  end
-
-  def owner?
-    record.user == user
+    record.awaiting_approval? && user.vendor_payment_admin? && (record.dlrms&.find_by(level_id: record.level&.id)&.taken_control_by_id != user.id rescue false)
   end
 
 end
