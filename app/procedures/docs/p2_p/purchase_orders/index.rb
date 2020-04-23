@@ -40,7 +40,7 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
   end
 
   column :advance_status, default: true, includes: [:status] do
-    indicator value: "{{record.advance_amount_status.name}}", format: :format_status
+    indicator value: :advance_amount_status, format: :format_advance_status
   end
 
   column :policy, default: true, includes: [:policy] do
@@ -163,11 +163,36 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
       else
         format = 'info'
       end
-    when :open, :retracted, :voided, :to_be_processed, :pending, :po_processing
+    when :open, :retracted, :voided, :to_be_processed, :pending, :po_processing, :saved
       format = 'info'
     else
       format = 'danger'
     end
     format
   end
+
+  def self.advance_amount_status(context)
+    context[:record].advance_amount_status&.name || 'Pending'
+  end
+
+  def self.format_advance_status(context)
+    case context[:record].status&.name&.to_s&.to_sym
+    when :failed
+      format = 'danger'
+    when :paid, :closed
+      format = 'success'
+    when :initiated
+      if context[:record].controlling_user?(context[:user])
+        format = 'warning'
+      else
+        format = 'info'
+      end
+    when :to_be_processed, :pending, :po_processing
+      format = 'info'
+    else
+      format = 'info'
+    end
+    format
+  end
+
 end

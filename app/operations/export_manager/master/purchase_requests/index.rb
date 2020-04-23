@@ -1,7 +1,7 @@
 class ExportManager::Master::PurchaseRequests::Index < ExportManager::Builders::Spreadsheet
   attr_accessor :input_data
 
-  label 'Export'
+  label 'Spreadsheet'
   description 'Purchase Requests Export'
   configurable true
   system :vp

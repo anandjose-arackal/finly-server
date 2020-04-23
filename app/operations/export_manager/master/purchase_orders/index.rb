@@ -1,6 +1,6 @@
 class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Spreadsheet
 
-  label 'Export'
+  label 'Spreadsheet'
   description 'Purchase Orders Export'
   configurable true
   system :vp
