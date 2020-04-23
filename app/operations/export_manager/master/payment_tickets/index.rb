@@ -7,7 +7,6 @@ class ExportManager::Master::PaymentTickets::Index < ExportManager::Builders::Sp
   system :vp
   screen 'payment_ticket.index'
   handle :bank_payment_requests
-  validate :input
 
   attribute :payment_order_id
   attribute :payment_order_name

@@ -8,7 +8,7 @@ class Docs::PaymentTickets::Payments::Action < ActionManager::API
            format: 'primary',
            label: 'Create Payment Ticket',
            icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
-           url: 'payment_tickets/new'
+           url: 'new_payment_ticket'
 
   end
 
