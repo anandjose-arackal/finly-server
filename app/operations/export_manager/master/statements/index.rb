@@ -28,8 +28,7 @@ class ExportManager::Master::Statements::Index < ExportManager::Builders::Spread
       return add_message :error, result.messages[:error]
     end
     
-    result = result.scoped_finly_transactions.where(associated_transaction_type: "CardTransaction")
-    result.success.sort_date_asc
+    result.scoped_finly_transactions.success.sort_date_asc
   end
 
   def date(transaction)
@@ -49,11 +48,19 @@ class ExportManager::Master::Statements::Index < ExportManager::Builders::Spread
   end
 
   def merchant_employee_id_id(transaction)
-    transaction&.associated_transaction&.user&.employee_id
+    if transaction.associated_transaction_type.eql?("CardTransaction")
+      transaction&.associated_transaction&.user&.employee_id
+    else
+      ''
+    end
   end
     
   def card_number(transaction)
-    transaction&.associated_transaction&.serial_id
+    if transaction.associated_transaction_type.eql?("CardTransaction")
+      transaction&.associated_transaction&.serial_id
+    else
+      ''
+    end
   end
 
   def credit(transaction)
