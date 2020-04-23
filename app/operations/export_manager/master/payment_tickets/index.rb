@@ -64,29 +64,8 @@ class ExportManager::Master::PaymentTickets::Index < ExportManager::Builders::Sp
   end
 
   def input
-    result = ::BankTransfer::PaymentRequest::Index.(user, params)
-
-    unless result.success?
-      add_message :error, result.messages[:error]
-      return
-    end
-    return [] if result.blank?
-
-    if params[:id].present?
-      bank_payment_requests = BankPaymentRequest.with_id(params[:id]).include_for_data_retrieval
-    else
-      bank_payment_requests = result.payment_requests
-    end
-
-    result_payments_ids = []
-    bank_payment_requests.each do |payment_request|
-      payment_request.payment_order.payments.each do |payment|
-        result_payments_ids.push(payment.id)
-      end
-    end
-
-    payments = Payment.where(id: result_payments_ids)
-    payments
+    bank_payment_requests = resolve('payment_tickets.default')
+    Payment.where('payment_order_id in (?)', bank_payment_requests.select("id").to_sql)
   end
 
   def payment_order_id (payment)
