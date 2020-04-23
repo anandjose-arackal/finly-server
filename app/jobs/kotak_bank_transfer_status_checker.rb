@@ -1,7 +1,9 @@
 # job that cycles through all users and sets the balances for all of them
-class KotakBankTransferStatusChecker < ApplicationJob
+class KotakBankTransferStatusChecker
 
-  def perform
+  def self.perform
+    puts " ----------------------------- PERFORMING #{self.name} at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
+
     # Find all kotak bank transaction where UTR is not present
     # Pass through Kotak Bank Status API and update bank transactions
     #
@@ -25,5 +27,7 @@ class KotakBankTransferStatusChecker < ApplicationJob
         p "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
       end
     end
+
+    puts " ----------------------------- FINISHED #{self.name} ------------------------------"
   end
 end

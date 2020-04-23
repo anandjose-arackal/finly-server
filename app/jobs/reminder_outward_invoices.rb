@@ -1,6 +1,8 @@
-class ReminderOutwardInvoices < ApplicationJob
+class ReminderOutwardInvoices
 
-  def perform
+  def self.perform
+    puts " ----------------------------- PERFORMING #{self.name}  at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
+
     outward_invoices = OutwardInvoice.exclude_deleted.unpaid
 
     for invoice in outward_invoices
@@ -16,11 +18,13 @@ class ReminderOutwardInvoices < ApplicationJob
         end
       end
     end
+
+    puts " ----------------------------- FINISHED #{self.name} at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
   end
 
   private
 
-  def get_reminder_date(invoice, reminder)
+  def self.get_reminder_date(invoice, reminder)
     date = nil
     if reminder.timeframe_type == 'before'
       if reminder.reference_date_type == 'due_date'
@@ -36,6 +40,7 @@ class ReminderOutwardInvoices < ApplicationJob
         date = invoice.date + reminder.days.days
       end
     end
+
   end
 
 end
