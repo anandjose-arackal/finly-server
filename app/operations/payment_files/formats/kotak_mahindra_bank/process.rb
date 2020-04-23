@@ -37,7 +37,7 @@ class PaymentFiles::Formats::KotakMahindraBank::Process < PaymentFiles::Formats:
           "",
           payment[:date]&.strftime("%d/%m/%Y"),
           {value: self.debit_account_number, type: 'string'},
-          {value: sprintf('%.2f', payment[:amount], type: 'number'},
+          {value: sprintf('%.2f', payment[:amount]), type: 'number'},
           "",
           payment[:receiving_user_name],
           payment[:beneficiary_ifsc],
