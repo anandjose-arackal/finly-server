@@ -39,10 +39,6 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
     indicator value: :po_status, format: :format_status
   end
 
-  column :advance_status, default: true, includes: [:status] do
-    indicator value: :advance_amount_status, format: :format_advance_status
-  end
-
   column :policy, default: true, includes: [:policy] do
     text value: "{{record.policy.name}}"
   end
@@ -78,6 +74,10 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
   IndexBuilder::API::ColumnTemplate::ControllingUser(self)
   IndexBuilder::API::ColumnTemplate::ControllingLevel(self)
   IndexBuilder::API::ColumnTemplate::ReviewProgress(self)
+
+  column :advance_status, default: true, includes: [:status] do
+    indicator value: :advance_amount_status, format: :format_advance_status
+  end
 
   column :grn_status, default: true, includes: [procurement: [:status_tags, :invoices]] do
     text value: :grn_status_text
