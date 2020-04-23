@@ -16,7 +16,11 @@ class MultiEntityLogin::TokenController < Oauth::TokenController
         {
             user_device: session.user_device,
             user_ip: session.user_ip,
-            user_agent_client: session.user_agent_client
+            user_agent_client: session.user_agent_client,
+            admin_user_id: session.admin_user_id,
+            admin_access_reason: session.admin_access_reason,
+            admin_access_reason_details: session.admin_access_reason_details,
+            admin_access_requested_by: session.admin_access_requested_by
         }
     )
     sessions_result = UserSessions::Create.(:authorized, merged_params)

@@ -51,7 +51,7 @@ class ExportManager::Master::Statements::Index < ExportManager::Builders::Spread
     if transaction.associated_transaction_type.eql?("CardTransaction")
       transaction&.associated_transaction&.user&.employee_id
     elsif transaction.payment.present?
-      transaction&.payment&.receiving_user&.employee_id
+      transaction.payment&.receiving_account&.user&.employee_id if transaction.payment.receiving_account_type.eql?('Card')
     else
       ''
     end
