@@ -50,6 +50,8 @@ class ExportManager::Master::Statements::Index < ExportManager::Builders::Spread
   def merchant_employee_id_id(transaction)
     if transaction.associated_transaction_type.eql?("CardTransaction")
       transaction&.associated_transaction&.user&.employee_id
+    elsif transaction.payment.present?
+      transaction&.payment&.receiving_user&.employee_id
     else
       ''
     end
@@ -58,6 +60,8 @@ class ExportManager::Master::Statements::Index < ExportManager::Builders::Spread
   def card_number(transaction)
     if transaction.associated_transaction_type.eql?("CardTransaction")
       transaction&.associated_transaction&.serial_id
+    elsif transaction.payment.present?
+      transaction.payment&.receiving_account&.proxy if transaction.payment.receiving_account_type.eql?('Card')
     else
       ''
     end
