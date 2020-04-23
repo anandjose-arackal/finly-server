@@ -1,6 +1,6 @@
-class ReportsAwaitingApproval < ApplicationJob
+class ReportsAwaitingApproval
 
-  def perform
+  def self.perform
     company_list = Company.where(id: [144])
     company_list.each do |company|
       remind_document_reviewer(company)      
@@ -9,7 +9,7 @@ class ReportsAwaitingApproval < ApplicationJob
 
   private
 
-  def remind_document_reviewer(company)
+  def self.remind_document_reviewer(company)
     users = company.managers
 
     users.each do |user|

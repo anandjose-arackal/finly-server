@@ -1,0 +1,3 @@
+class YesBankStatusCheckBackground
+
+end

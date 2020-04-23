@@ -185,6 +185,7 @@ GEM
       xpath (~> 3.2)
     carrot-top (0.0.7)
       json
+    chronic (0.10.2)
     climate_control (0.2.0)
     clockwork (2.0.4)
       activesupport
@@ -710,6 +711,8 @@ GEM
     websocket-driver (0.7.1)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.4)
+    whenever (1.0.0)
+      chronic (>= 0.6.3)
     wicked_pdf (1.1.0)
     will_paginate (3.1.8)
     wkhtmltopdf-binary (0.12.5.4)
@@ -876,6 +879,7 @@ DEPENDENCIES
   uglifier (~> 4.1.20)
   uuidtools (~> 2.1)
   web-console (~> 3.7.0)
+  whenever
   wicked_pdf (~> 1.1.0)
   will_paginate (~> 3.1.6)
   wkhtmltopdf-binary (~> 0.12.4)

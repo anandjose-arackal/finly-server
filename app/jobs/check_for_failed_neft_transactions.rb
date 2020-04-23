@@ -1,6 +1,8 @@
-class CheckForFailedNeftTransactions < ApplicationJob
+class CheckForFailedNeftTransactions
 
-  def perform
+  def self.perform
+    puts " ----------------------------- PERFORMING #{self.name} at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
+
     Company.all.each do |company|
       # first retrieve all statements for the past 2 days
       past_two_days_statements = IciciStatement.where(company_id: company.id).where('txn_date >= ? AND txn_date <= ?', (Date.today - 30.days), Date.tomorrow)
@@ -41,6 +43,8 @@ class CheckForFailedNeftTransactions < ApplicationJob
         end
       end
     end
+
+    puts " ----------------------------- FINISHED #{self.name} ------------------------------"
   end
 
 end

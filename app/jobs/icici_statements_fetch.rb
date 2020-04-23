@@ -1,6 +1,8 @@
-class IciciStatementsFetch < ActiveJob::Base
+class IciciStatementsFetch
 
-  def perform
+  def self.perform
+    puts " ----------------------------- PERFORMING #{self.name} at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
+
     error_logger = Logger.new("#{Rails.root}/log/icici_statements_fetch_errors.log")
     Company.all.each do |company|
       unless company.bank_service_provider == "ICICI"
@@ -19,6 +21,8 @@ class IciciStatementsFetch < ActiveJob::Base
         end
       end
     end
+
+    puts " ----------------------------- FINISHED #{self.name} at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
   end
 
 end
