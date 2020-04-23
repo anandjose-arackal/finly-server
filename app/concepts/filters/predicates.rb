@@ -55,6 +55,13 @@ class Filters::Predicates
       type: :integer
   }
 
+  # Added this as a work around for not_null not generating correct query for nested relationships
+  register :null_not, {
+      arel_predicate: 'not_eq',
+      formatter: proc { |value| nil },
+      compounds: false,
+  }
+
   def self.setup(config)
     predicates.each do |predicate, conf|
       config.add_predicate predicate, conf

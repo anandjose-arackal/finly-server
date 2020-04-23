@@ -99,7 +99,7 @@ class Filters::Schema::Validation
     PREDICATES = [
         'eq', 'not_eq', 'matches', 'does_not_match', 'matches_any', 'matches_all',
         'does_not_match_any', 'does_not_match_all', 'lt', 'lteq', 'gt',
-        'gteq', 'present', 'blank', 'null', 'not_null', 'in',
+        'gteq', 'present', 'blank', 'null', 'not_null', 'null_not', 'in',
         'not_in', 'lt_any', 'lteq_any', 'gt_any', 'gteq_any', 'matches_any',
         'lt_all', 'lteq_all', 'gt_all', 'gteq_all', 'matches_all',
         'does_not_match_all', 'not_eq_all', 'start', 'not_start', 'start_any',
