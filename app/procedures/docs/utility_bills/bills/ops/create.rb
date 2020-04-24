@@ -73,7 +73,7 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
 
     if bill.present?
       bill.update(order_number: params[:ref_number], order_number_type: "BillFetch")
-      return
+      return false
     end
 
     true
@@ -100,56 +100,6 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
 
     # Set bill validation
     bill['bill_validation_required'] = !bill[:autofetched]
-
-
-    # autofetched = params[:autofetched]
-    # if autofetched is false, bill is getting created manually
-    # In such cases only amount will be filled and the following will be ignored
-    #   - late_payment_fee
-    #   - fixed_charge
-    #   - additional_charge
-
-    # late_payment_fee = params[:late_payment_fee]&.to_f || 0
-    # early_payment_fee = params[:early_payment_fee]&.to_f || 0
-    # convenience_fee = params[:convenience_fee]&.to_f || 0
-    # amount = params[:amount]&.to_f || 0
-
-    # bill['bill_date'] = params[:bill_date]
-    # bill['bbps_biller_id'] = subscription.bbps_biller_id
-    # bill['bill_number'] = params[:bill_number]
-    # bill['due_date'] = params[:due_date]
-    # bill['bill_period'] = params[:bill_period]
-    #
-    # bill['order_number'] = params[:order_number] if params[:order_number].present?
-    # bill['order_number_type'] = params[:order_number_type] if params[:order_number_type].present?
-    #
-    # bill['category_id'] = subscription.category_id
-    # bill['tax_rate_id'] = subscription.tax_rate_id
-    # bill['hsn_sac'] = subscription.hsn_sac
-
-    # bill['subscription_id'] = subscription.id
-    # # bill['autofetched'] = autofetched
-    # bill['bill_validation_required'] = !autofetched
-
-    # bill['late_payment_fee'] = {
-    #     value: late_payment_fee,
-    #     currency_id: 1
-    # }
-    #
-    # bill['convenience_fee'] = {
-    #     value: convenience_fee,
-    #     currency_id: 1
-    # }
-    #
-    # bill['early_payment_fee'] = {
-    #     value: early_payment_fee,
-    #     currency_id: 1
-    # }
-    #
-    # bill['amount'] = {
-    #     value: amount,
-    #     currency_id: 1
-    # }
 
     params['bill'] = bill.with_indifferent_access
   end
