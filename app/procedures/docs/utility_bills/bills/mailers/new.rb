@@ -5,8 +5,9 @@ class Docs::UtilityBills::Bills::Mailers::New < Notifier::Mailer
     consumes_event! 'bbps_bill.new_bill'
 
     assign :to do |user, params|
-      bill = params[:record]
-      bill.subscription.pocs.pluck(:email)
+      # bill = params[:record]
+      # bill.subscription.pocs.pluck(:email)
+      "kumar.abinash@finly.io"
     end
 
     assign :subject do |user, params|
