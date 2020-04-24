@@ -23,9 +23,9 @@ class PaymentFiles::Formats::AxisBank::Process < PaymentFiles::Formats::BaseForm
       content << [
           payment[:receiving_user_name],
           payment[:beneficiary_account_name],
-          payment[:beneficiary_account_number],
+          {value: payment[:beneficiary_account_number], type: 'string'},
           payment[:beneficiary_ifsc],
-          retrieve_report_amount(payment),
+          {value: sprintf('%.2f', retrieve_report_amount(payment)), type: 'number'},
           retrieve_report_data(payment)
       ]
     end
