@@ -10,7 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+<<<<<<< HEAD
+ActiveRecord::Schema.define(version: 2020_04_17_144005) do
+=======
 ActiveRecord::Schema.define(version: 2020_04_17_211323) do
+>>>>>>> b4189ee166df8ca2506272d2d417b3580909525d
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
