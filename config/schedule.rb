@@ -41,7 +41,7 @@ every 30.minutes, roles: [:whenever_cron] do
 end
 
 every 30.minutes, roles: [:whenever_cron] do
-  runner "BankTransferProcessRetry.perform", output: "#{path}/log/whenever/bank_transfer_process_retry.log"
+  # runner "BankTransferProcessRetry.perform", output: "#{path}/log/whenever/bank_transfer_process_retry.log"
   runner "ExpenseStatusUpdate.perform"
 end
 
