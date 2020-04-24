@@ -34,9 +34,9 @@ env :PATH, ENV['PATH']
 set :output, "#{path}/log/whenever.log"
 
 every 30.minutes, roles: [:whenever_cron] do
-  # runner "YesBankStatusChecker.perform", output: "#{path}/log/whenever/yes_bank_status_checker.log"
-  # runner "IciciStatusChecker.perform", output: "#{path}/log/whenever/icici_status_checker.log"
-  # runner "KotakBankTransferStatusChecker.perform", output: "#{path}/log/whenever/kotak_status_checker.log"
+  runner "YesBankStatusChecker.perform", output: "#{path}/log/whenever/yes_bank_status_checker.log"
+  runner "IciciStatusChecker.perform", output: "#{path}/log/whenever/icici_status_checker.log"
+  runner "KotakBankTransferStatusChecker.perform", output: "#{path}/log/whenever/kotak_status_checker.log"
   runner "BbpsBillStatusChecker.perform", output: "#{path}/log/whenever/bbps_bill_status_checker.log"
 end
 
@@ -47,7 +47,7 @@ end
 
 every 1.hour, roles: [:whenever_cron] do
   runner "UpdateCompanyBalances.perform"
-  # runner "IciciStatementsFetch.perform", output: "#{path}/log/whenever/icici_statements_fetch.log"
+  runner "IciciStatementsFetch.perform", output: "#{path}/log/whenever/icici_statements_fetch.log"
 end
 
 every 1.day, at: '12:01 am', roles: [:whenever_cron] do
@@ -56,7 +56,7 @@ end
 
 every 1.day, at: '8:30 am', roles: [:whenever_cron] do
   runner "TaxBenefitProcess.perform"
-  # runner "ScheduledBankTransferProcess.perform", output: "#{path}/log/whenever/scheduled_bank_transfer_process.log"
+  runner "ScheduledBankTransferProcess.perform", output: "#{path}/log/whenever/scheduled_bank_transfer_process.log"
 end
 
 every 1.day, at: '5:35 am', roles: [:whenever_cron] do
@@ -65,7 +65,7 @@ end
 
 every 1.day, at: '5:45 am', roles: [:whenever_cron] do
   runner "UpdateConvertedAmountValues.perform", output: "#{path}/log/whenever/update_converted_amount_values.log"
-  # runner "CheckForFailedNeftTransactions.perform", output: "#{path}/log/whenever/failed_neft_transactions_check.log"
+  runner "CheckForFailedNeftTransactions.perform", output: "#{path}/log/whenever/failed_neft_transactions_check.log"
 end
 
 every 1.day, at: '6:30 am', roles: [:whenever_cron] do
