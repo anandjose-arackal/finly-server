@@ -18,4 +18,5 @@ Filters::Router.draw do
   route 'upcoming_invoices', Docs::P2P::Invoices::Agreement::UpcomingInvoices::FilterConfig
   route 'receive', Docs::P2P::Inwards::Pending::FilterConfig
   route 'receive_history', Docs::P2P::Inwards::Received::FilterConfig
+  route 'credit_notes', Docs::P2P::CreditNotes::FilterConfig
 end

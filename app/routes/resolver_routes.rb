@@ -93,6 +93,10 @@ Resolver::Router.draw do
     route 'received', Docs::P2P::Inwards::Received::Resolver
   end
 
+  scope :credit_notes do
+    route 'default', Docs::P2P::CreditNotes::Resolver
+  end
+
   scope :utility_bills do
     route 'default', Docs::UtilityBills::Bills::Resolver
   end

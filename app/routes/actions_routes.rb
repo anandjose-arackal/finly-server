@@ -20,4 +20,5 @@ ActionManager::Router.draw do
   route 'upcoming_invoices', Docs::P2P::Invoices::Agreement::UpcomingInvoices::Action
   route 'receive', Docs::P2P::Inwards::Pending::Action
   route 'receive_history', Docs::P2P::Inwards::Received::Action
+  route 'credit_notes', Docs::P2P::CreditNotes::Action
 end
