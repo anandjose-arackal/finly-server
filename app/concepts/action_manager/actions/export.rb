@@ -1,6 +1,7 @@
 class ActionManager::Actions::Export < ActionManager::Action
 
   config :route
+  config :contextual
   register :export
 
   def build_config(options)

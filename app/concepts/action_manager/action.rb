@@ -10,6 +10,7 @@ class ActionManager::Action
 
   class_attribute :registered_type
 
+
   alias_method :scope, :action_scope
   alias_method :paths, :action_paths
 
