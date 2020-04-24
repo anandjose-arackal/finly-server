@@ -30,4 +30,8 @@ class PaymentDrop < Drop
     record.amount&.value || 0
   end
 
+  def utr
+    record.utr rescue nil
+  end
+
 end

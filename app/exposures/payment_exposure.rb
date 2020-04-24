@@ -30,4 +30,8 @@ class PaymentExposure < Exposures::API
     record.amount&.value || 0
   end
 
+  def utr
+    record.utr
+  end
+
 end
