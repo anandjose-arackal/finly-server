@@ -68,4 +68,12 @@ class InvoiceDrop < Drop
     @object.invoice_items.to_a.map(&:to_liquid)
   end
 
+  def transaction_period_from
+    @object.transaction_service_period_from
+  end
+
+  def transaction_period_to
+    @object.transaction_service_period_to
+  end
+
 end
