@@ -26,6 +26,14 @@ class Docs::P2P::PurchaseRequests::Action < ActionManager::API
                icon: "https://img.icons8.com/windows/17/708090/cancel-2.png",
                url: "procure/purchase_requests/bulk_reject.json",
                authorize: :review?
+        action :transition,
+               :destroy,
+               contextual: true,
+               permissions: :purchase_request_initiator,
+               label: "Delete",
+               icon: "https://img.icons8.com/windows/17/708090/cancel-2.png",
+               url: "procure/purchase_requests/bulk_destroy.json",
+               authorize: :destroy?
       end
     end
 
@@ -34,15 +42,6 @@ class Docs::P2P::PurchaseRequests::Action < ActionManager::API
            label: "Export",
            icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
            route: "purchase_requests.index"
-
-    action :transition,
-           :destroy,
-           contextual: true,
-           permissions: :purchase_request_initiator,
-           label: "Delete",
-           icon: "https://img.icons8.com/windows/17/708090/cancel-2.png",
-           url: "procure/purchase_requests/bulk_destroy.json",
-           authorize: :destroy?
 
     action :redirect,
            :create,
