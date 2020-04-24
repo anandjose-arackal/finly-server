@@ -291,7 +291,6 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
 
   def analytics
     return nil unless RequestStoreUtil.current_company&.analytics_system_enabled?
-    return nil unless user.admin?('vp')
 
     {name: 'Analytics', id: 'admin', url: 'analytics/params={}'}
   end
