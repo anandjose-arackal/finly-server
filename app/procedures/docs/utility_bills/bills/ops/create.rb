@@ -95,7 +95,8 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
 
     # Add Amounts
     %i( amount late_payment_fee early_payment_fee ).each do |key|
-      bill.merge!({"#{key.to_s}": {value: params.dig(key), currency_id: 1}}) if params.dig(key).present?
+      bill.merge!(
+          {"#{key.to_s}": {value: (params.dig(key) || 0), currency_id: 1}})
     end
 
     # Set bill validation
