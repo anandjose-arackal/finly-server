@@ -80,15 +80,15 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
   end
 
   column :grn_status, default: true, includes: [procurement: [:status_tags, :invoices]] do
-    text value: :grn_status_text
+    indicator value: :grn_status_text, format: :grn_status_format
   end
 
   column :invoice_status, default: true, includes: [procurement: [:status_tags, :invoices]] do
-    text value: :invoice_status_text
+    indicator value: :invoice_status_text, format: :invoice_status_format
   end
 
   column :payment_status, default: true, includes: [procurement: [:status_tags, :invoices]] do
-    text value: :payment_status_text
+    indicator value: :payment_status_text, format: :payment_status_format
   end
 
   counter -> (user, collection) do
@@ -143,12 +143,54 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
     context[:record].status_tag_details&.dig(:grn, :status_text)
   end
 
+  def self.grn_status_format(context)
+    case context[:record].status_tag_details&.dig(:grn, :status)
+    when 'init'
+      return 'info'
+    when 'processing'
+      return 'warning'
+    when 'completed'
+      return 'success'
+    else
+      return 'info'
+    end
+  end
+
   def self.invoice_status_text(context)
     context[:record].status_tag_details&.dig(:invoice, :status_text)
   end
 
+  def self.invoice_status_format(context)
+    case context[:record].status_tag_details&.dig(:invoice, :status)
+    when 'init'
+      if context[:record].status_tag_details&.dig(:invoice, :status_text) == 'Invoice Processing'
+        return 'warning'
+      end
+      return 'info'
+    when 'processing'
+      return 'warning'
+    when 'completed'
+      return 'success'
+    else
+      return 'info'
+    end
+  end
+
   def self.payment_status_text(context)
     context[:record].status_tag_details&.dig(:payment, :status_text)
+  end
+
+  def self.payment_status_format(context)
+    case context[:record].status_tag_details&.dig(:payment, :status)
+    when 'init'
+      return 'info'
+    when 'processing'
+      return 'warning'
+    when 'completed'
+      return 'success'
+    else
+      return 'info'
+    end
   end
 
   def self.format_status(context)
