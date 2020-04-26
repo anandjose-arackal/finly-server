@@ -27,9 +27,13 @@ class Docs::P2P::Invoices::Agreement::UpcomingInvoices::Index < IndexBuilder::AP
   #   indicator value: :invoice_status, format: :format_status
   # end
 
-  # column :invoice_date, sort: :date, default: true do
-  #   date value: :date
-  # end
+  column :start_date, sort: true, default: true do
+    date value: :start_date
+  end
+
+  column :end_date, sort: true, default: true do
+    date value: :end_date
+  end
 
   column :due_date, sort: true, default: true do
     date value: :due_date
