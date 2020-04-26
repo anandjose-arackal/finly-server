@@ -19,7 +19,7 @@ class Docs::P2P::Invoices::Agreement::UpcomingInvoices::Index < IndexBuilder::AP
   end
 
   column :invoice_type, label: "Type", default: true, includes: [:invoice_type] do
-    text value: -> (context) { context[:record].class.titleize }
+    text value: -> (context) { context[:record].class.name.titleize }
   end
 
   # Todo figure out how to provide the status
@@ -27,17 +27,17 @@ class Docs::P2P::Invoices::Agreement::UpcomingInvoices::Index < IndexBuilder::AP
   #   indicator value: :invoice_status, format: :format_status
   # end
 
-  column :invoice_date, sort: :date, default: true do
-    date value: :date
-  end
+  # column :invoice_date, sort: :date, default: true do
+  #   date value: :date
+  # end
 
   column :due_date, sort: true, default: true do
     date value: :due_date
   end
 
-  column :upcoming_in_days, sort: :due_date, default: true do
-    text value: :upcoming_in_days
-  end
+  # column :upcoming_in_days, sort: :due_date, default: true do
+  #   text value: :upcoming_in_days
+  # end
 
   column :due_in_days, sort: :due_date, default: true do
     text value: :due_in_days
@@ -47,31 +47,35 @@ class Docs::P2P::Invoices::Agreement::UpcomingInvoices::Index < IndexBuilder::AP
     text value: "{{record.payment_agreement.agreement_number}}"
   end
 
-  column :start_date, sort: true, default: true do
-    date value: :start_date
+  column :agreement_date, sort: false, default: false, includes: [:payment_agreement] do
+    date value: "{{record.payment_agreement.agreement_date}}"
   end
 
-  column :end_date, sort: true, default: true do
-    date value: :end_date
+  column :agreement_execution_date, sort: false, default: false, includes: [:payment_agreement] do
+    date value: "{{record.payment_agreement.execution_date}}"
   end
 
-  column :gross_amount, sort: :gross_amount_value, includes: [gross_amount: :currency] do
+  column :agreement_expiry_date, sort: false, default: false, includes: [:payment_agreement] do
+    date value: "{{record.payment_agreement.expiration_date}}"
+  end
+
+  column :gross_amount, sort: :gross_amount_value, default: true, includes: [gross_amount: :currency] do
     amount value: :gross_amount
   end
 
-  column :discount_amount, sort: :discount_amount_value, includes: [discount_amount: :discount_amount] do
+  column :discount_amount, sort: :discount_amount_value, includes: [discount_amount: :currency] do
     amount value: :discount_amount
   end
 
-  column :cgst_amount, sort: :tax_amount_value, label: 'CGST', includes: [tax_amount: :currency] do
+  column :cgst_amount, sort: :tax_amount_value, label: 'CGST', default: true, includes: [tax_amount: :currency] do
     amount value: :cgst_amount
   end
 
-  column :sgst_amount, sort: :tax_amount_value, label: 'SGST', includes: [tax_amount: :currency] do
+  column :sgst_amount, sort: :tax_amount_value, label: 'SGST', default: true, includes: [tax_amount: :currency] do
     amount value: :sgst_amount
   end
 
-  column :igst, sort: :tax_amount_value, label: 'IGST', includes: [tax_amount: :currency] do
+  column :igst, sort: :tax_amount_value, label: 'IGST', default: true, includes: [tax_amount: :currency] do
     amount value: :igst_amount
   end
 
@@ -79,7 +83,7 @@ class Docs::P2P::Invoices::Agreement::UpcomingInvoices::Index < IndexBuilder::AP
     text value: "{{record.tds_slab.name}}"
   end
 
-  column :tds_rate, sort: :tds_slab_rate, includes: [:tds_rate] do
+  column :tds_rate, sort: :tds_slab_rate, includes: [:tds_slab] do
     text value: "{{record.tds_slab.rate}}"
   end
 
@@ -91,16 +95,16 @@ class Docs::P2P::Invoices::Agreement::UpcomingInvoices::Index < IndexBuilder::AP
     amount value: :freight_amount
   end
 
-  column :net_amount, sort: :net_amount_value, includes: [net_amount: :currency] do
+  column :net_amount, sort: :net_amount_value, default: true, includes: [net_amount: :currency] do
     amount value: :net_amount
   end
 
   column :advance_amount, sort: :advance_amount_value, includes: [advance_amount: :currency] do
-    amount value: :advance_paid
+    amount value: :advance_amount
   end
 
-  column :balance_payable, includes: [balance_due: :currency] do
-    amount value: :balance_payable
+  column :balance_due, includes: [balance_due: :currency] do
+    amount value: :balance_due
   end
 
   column :cost_center, default: true, includes: [:cost_center] do
@@ -137,41 +141,9 @@ class Docs::P2P::Invoices::Agreement::UpcomingInvoices::Index < IndexBuilder::AP
   end
 
   counter -> (user, collection) do
-    # Use custom scope to support awaiting approval status
     counter = IndexBuilder::Counter.new :with_status_id
-    # counts = collection.group(:invoice_status_id).count
-    counter.add "rental", "Rental", 0
-    counter.add "general", "General", 0
-    # counter.add nil, "All", counts.values.reduce(0, :+)
-    #
-    # # Open - open/retracted
-    # counter.add 90, 'Open', (
-    #     counts[InwardInvoiceStatus.id_for(:open)].to_i +
-    #     counts[InwardInvoiceStatus.id_for(:retracted)].to_i
-    # )
-    #
-    # # Awaiting Approval
-    # if user.has_permission?(awaiting_approval_roles)
-    #   counter.add 91, 'Awaiting Approval',
-    #               Invoice.awaiting_action_items(user).count
-    # end
-    #
-    # # Processing
-    # counter.add InwardInvoiceStatus.id_for(:processing), "Processing", counts[InwardInvoiceStatus.id_for(:processing)].to_i
-    #
-    # # Pending Payment - approved/auto_approved/partially_paid/unpaid/initiated
-    # counter.add 92, 'Pending Payment', (
-    # counts[InwardInvoiceStatus.id_for(:approved)].to_i +
-    #     counts[InwardInvoiceStatus.id_for(:auto_approved)].to_i +
-    #     counts[InwardInvoiceStatus.id_for(:partially_paid)].to_i +
-    #     counts[InwardInvoiceStatus.id_for(:unpaid)].to_i +
-    #     counts[InwardInvoiceStatus.id_for(:initiated)].to_i
-    # )
-    #
-    # [:rejected, :paid, :closed, :voided, :pending].each do |status|
-    #   counter.add InwardInvoiceStatus.id_for(status), status.to_s.titleize, counts[InwardInvoiceStatus.id_for(status)].to_i
-    # end
-
+    counter.add 'rental', "Rental", Docs::P2P::Invoices::Agreement::UpcomingInvoices::Resolver.new(user).load({invoice_type: :rental}).count
+    counter.add 'general', "General", Docs::P2P::Invoices::Agreement::UpcomingInvoices::Resolver.new(user).load({invoice_type: :general}).count
     counter
   end
 
