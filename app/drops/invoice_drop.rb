@@ -52,6 +52,10 @@ class InvoiceDrop < Drop
     @object.net_amount&.value || 0
   end
 
+  def balance_due
+    @object.balance_due&.value || 0
+  end
+
   def gross_amount
     @object.gross_amount&.value || 0
   end

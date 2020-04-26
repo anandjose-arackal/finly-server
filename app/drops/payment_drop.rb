@@ -34,4 +34,26 @@ class PaymentDrop < Drop
     record.utr rescue nil
   end
 
+  def parent
+    record.parent
+  end
+
+  def invoice
+    return nil unless record.parent_type == 'Invoice'
+
+    record.parent
+  end
+
+  def purchase_order
+    return nil unless record.parent_type == "PurchaseOrder"
+
+    record.parent
+  end
+
+  def beneficiary_payment
+    return nil unless record.parent_type == 'BeneficiaryPayment'
+
+    record.parent
+  end
+
 end
