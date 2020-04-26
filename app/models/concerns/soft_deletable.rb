@@ -17,7 +17,7 @@ module SoftDeletable
   module ClassMethods
     # Migration for transitioning to new paranoid
     def migrate_to_paranoid
-      unless TripStatus.has_attribute? :deleted_at
+      unless has_attribute? :deleted_at
         ActiveRecord::Migration.add_column self.table_name, :deleted_at, :datetime, index: true
       end
       if has_attribute? :is_deleted
