@@ -5,6 +5,7 @@ module SoftDeletable
     acts_as_paranoid(without_default_scope: true)
     # acts_as_paranoid
 
+    # Changed from where deleted_at: nil to this query as it was messing with ransack queries for not_null and not_eq_any
     default_scope {where("#{self.table_name}.deleted_at IS NULL")}
     scope :only_deleted, -> {include_soft_deleted.where.not(deleted_at: nil)}
     scope :exclude_deleted, -> {where(deleted_at: nil)}
