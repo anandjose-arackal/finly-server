@@ -107,7 +107,7 @@ class Integrations::Tally::BPRVouchers < Integrations::Tally::Base
 
   def add_beneficiary_ledger(voucher, payment_ticket, payment, configuration)
     ledger_data = LiquidHelper.interpolate(configuration['beneficiary'], "payment" => payment, "payment_ticket" => payment_ticket)
-    voucher.add ledger_data['gl_name'], payment.amount
+    voucher.add ledger_data['gl_name'], payment.amount, is_party_ledger: true, bill_allocations: ledger_data['bill_allocations']
   end
 
   def add_payment_ledger(voucher, payment_ticket, payment, configuration)
