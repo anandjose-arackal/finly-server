@@ -177,6 +177,8 @@ module Transitionable
             threshold: dlrm.threshold,
             min: dlrm.min,
             max: dlrm.max,
+            tat: dlrm.tat,
+            tat_added_by_s: dlrm.tat_added_by_script,
             action_taken: (dlrm.reviewer_id == dlrm.action_taken_by_id),
             action_name: dlrm.action&.name&.split("_")&.map(&:capitalize)&.join(" ")
         }

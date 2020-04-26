@@ -22,9 +22,9 @@ class PaymentFiles::Formats::CitiBank::Process < PaymentFiles::Formats::BaseForm
       content << [
           payment[:beneficiary_ifsc],
           "",
-          payment[:beneficiary_account_number],
+          {value: payment[:beneficiary_account_number], type: 'string'},
           payment[:receiving_user_name],
-          payment[:amount],
+          {value: sprintf('%.2f', payment[:amount]), type: 'number'},
           "",
           "",
           ""

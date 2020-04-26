@@ -47,7 +47,12 @@
 #  hsn_sac                    :string(255)
 #  paid_at                    :datetime
 #  review_note                :text(65535)
-#  selected_amount_type       :string(255)
+#  selected_amount_type       :string(255)      default("base_amount")
+#  disconn_tag                :string(255)
+#  bill_month                 :string(255)
+#  pc                         :string(255)
+#  early_payment_date         :date
+#  api_response               :text(65535)
 #
 
 require 'rails_helper'
