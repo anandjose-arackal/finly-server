@@ -141,9 +141,9 @@ class Docs::P2P::Invoices::Agreement::UpcomingInvoices::Index < IndexBuilder::AP
   end
 
   counter -> (user, collection) do
-    counter = IndexBuilder::Counter.new :with_status_id
-    counter.add 'rental', "Rental", Docs::P2P::Invoices::Agreement::UpcomingInvoices::Resolver.new(user).load({invoice_type: :rental}).count
-    counter.add 'general', "General", Docs::P2P::Invoices::Agreement::UpcomingInvoices::Resolver.new(user).load({invoice_type: :general}).count
+    counter = IndexBuilder::Counter.new :invoice_type
+    counter.add 'rental', "Rental", Docs::P2P::Invoices::Agreement::UpcomingInvoices::Resolver.new(user).load(qs: {invoice_type: :rental}).count
+    counter.add 'general', "General", Docs::P2P::Invoices::Agreement::UpcomingInvoices::Resolver.new(user).load(qs: {invoice_type: :general}).count
     counter
   end
 
