@@ -10,9 +10,9 @@ class Docs::P2P::Invoices::Agreement::UpcomingInvoices::Index < IndexBuilder::AP
     text value: "Vendor ID: {{record.vendor.vendor_id}}"
   end
 
-  column :invoice_id, default: true, sort: true do
-    text value: :template_invoice_id, format: 'primary'
-  end
+  # column :invoice_id, default: true, sort: true do
+  #   text value: :template_invoice_id, format: 'primary'
+  # end
 
   column :created_by, default: true, includes: [:created_by] do
     user value: :created_by
