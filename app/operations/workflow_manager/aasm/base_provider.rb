@@ -122,6 +122,9 @@ class WorkflowManager::Aasm::BaseProvider
                                      .where(level_id: previous_level.id, policy_id: document.policy_id).where.not(action_taken_by_id: nil)
 
           time_0 = previous_level_dlrms.map(&:action_taken_at).compact.max
+
+          # Some of the cases action_taken_at is missing for dlrms
+          time_0 = document.trails.with_action_id(TrailAction.id_for(:approve)).where(action_level_id: previous_level.id).map(&:created_at).max if time_0.blank?
         else
           time_0 = [document.submitted_at, document.trails.with_action_id(TrailAction.id_for(:submit)).last&.created_at].compact.max
         end
