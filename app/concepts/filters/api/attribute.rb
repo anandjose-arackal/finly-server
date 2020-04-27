@@ -1,20 +1,26 @@
 class Filters::API::Attribute
 
-  attr_accessor :field_key, :label, :field_type, :choices, :hint, :simple
+  attr_accessor :field_key, :label, :field_type, :choices, :hint, :simple, :custom_field_id
 
   # Includes: Used for capturing the data points to be included to optimize the fetch for the current record
   # Simple is used to identify if the filter should be a part of the simple filter or not
-  def initialize(field_key:, label:, hint:, field_type:, choices: nil, simple: false)
+  def initialize(field_key:, label:, hint:, field_type:, choices: nil, simple: false, custom_field_id: nil)
     self.field_key = field_key
     self.label = label
     self.hint = hint
     self.field_type = field_type
     self.choices = choices
     self.simple = simple
+    self.custom_field_id = custom_field_id
   end
 
   def operators
-    Forms::API::Entity::Registry.types[field_type].operators
+    op = Forms::API::Entity::Registry.types[field_type].operators
+
+    # as the ransacker :custom_fields_value_search has issues with not query, remove all not conditions
+    return op.reject { |o| o.to_s.start_with?("not_") } if custom_field_id.present?
+
+    op
   end
 
   def build(user)
@@ -24,8 +30,14 @@ class Filters::API::Attribute
         hint: hint,
         field_type: field_type,
         simple: simple,
-        operators: operators
+        operators: operators,
+        args: {filter_id: field_key}
     }
+    if custom_field_id.present?
+      # Generate unique ID for custom fields
+      params[:args] = {field_id: "#{field_key}_#{custom_field_id}", custom_field_id: custom_field_id}
+    end
+
     if choices.present?
       choices_data = choices.build(user: user)
       # If the choices is partial, then set the field type as lookup.

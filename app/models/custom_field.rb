@@ -27,7 +27,10 @@ class CustomField < ApplicationRecord
   accepts_nested_attributes_for :value
 
   ransacker :value_search, args: [:parent, :ransacker_args] do |parent, args|
-    field_configuration_id = args
+    field_configuration_id = 0
+    if args&.is_a?(Hash) and args[:custom_field_id].present?
+      field_configuration_id = args[:custom_field_id]
+    end
     # Note that Arel::Nodes::InfixOperation requires the fields to be from parent.table or of type Arel::Nodes.build_quoted
     # Arel::Nodes::InfixOperation.new(
     #     'AND',
