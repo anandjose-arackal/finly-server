@@ -12,13 +12,17 @@ module Ransacker
   class_methods do
     def inherited(sub_class)
       super(sub_class)
-      if ActiveRecord::Base.connection.data_source_exists? self.table_name
+      # if ActiveRecord::Base.connection.table_exists? self.table_name
+      begin
         sub_class.columns_hash.each_pair do |attribute_name, properties|
           next unless properties.type == :datetime
 
           sub_class.ransack_date attribute_name
         end
+      rescue
+        # Do nothing
       end
+      # end
     end
 
     def ransack_date(attribute)
