@@ -1,17 +1,6 @@
 class Procurements::PurchaseRequests::BulkDestroy < Procurements::PurchaseRequests::Base
   attr_accessor :purchase_requests
 
-  def pre_validate
-    if params[:password].blank?
-      add_message :error, 'You need to provide your password to delete multiple purchase requests at once.'
-      return
-    end
-    unless user.valid_password?(params[:password])
-      add_message :error, 'Invalid Password'
-      return
-    end
-  end
-
   def init
     purchase_request_ids = params[:id] || params[:ids] || params[:purchase_request_ids]
     self.purchase_requests = user.purchase_requests.deleteable.with_ids(purchase_request_ids) # allow delete only for their own pr's

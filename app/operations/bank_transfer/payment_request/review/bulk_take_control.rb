@@ -9,14 +9,6 @@ class BankTransfer::PaymentRequest::Review::BulkTakeControl < BankTransfer::Paym
   def pre_validate
     super
     return if has_errors?
-    if params[:password].blank?
-      add_message :error, 'You need to provide your password to initiate this action'
-      return
-    end
-    unless user.valid_password?(params[:password])
-      add_message :error, 'Invalid Password'
-      return
-    end
   end
 
   def init
