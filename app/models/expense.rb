@@ -124,6 +124,7 @@ class Expense < ApplicationRecord
   validate :valid_expense_type
   validate :valid_amount_value
   validate :at_least_one_type
+  validate :currency_conversion_rate_present?
 
   alias_attribute :purpose, :note
 
@@ -1267,5 +1268,11 @@ class Expense < ApplicationRecord
 
   def budget_trail_destroy
     BudgetManager::BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.destroy_trail(self)
+  end
+
+  def currency_conversion_rate_present?
+    rate = CurrencyConversionRate.find_by(date: self.date)
+    orig_curr = amount.currency.country_code
+    add_message :error, "Something went wrong. Please try again later" if rate.send(orig_curr.to_sym) == nil    
   end
 end
