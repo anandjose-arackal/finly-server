@@ -91,7 +91,7 @@ class Docs::P2P::Agreements::Index < IndexBuilder::API
     counter.add PaymentAgreementStatus.id_for(:awaiting_approval), "Processing", counts[PaymentAgreementStatus.id_for(:awaiting_approval)].to_i
 
     # Pending Payment - approved/auto_approved/partially_paid/unpaid/initiated
-    counter.add 92, 'Pending Payment', (
+    counter.add 92, 'Approved', (
     counts[PaymentAgreementStatus.id_for(:approved)].to_i +
         counts[PaymentAgreementStatus.id_for(:auto_approved)].to_i +
         counts[PaymentAgreementStatus.id_for(:invoice_created)].to_i +
