@@ -4,7 +4,7 @@ class BankTransfer::PaymentRequest::UtilityBills::UtilityBillsTicketBackground <
 
   attr_accessor :bank_payment_request, :payments_attributes, :payment_mode, :options,
                 :company_id, :execute, :payment_params, :bbps_bills, :company,
-                :transfer_mode_id, :transfer_mode
+                :transfer_mode_id, :transfer_mode, :ticket_type
 
   def self.call(user, options = {})
     self.new.perform(user, options)
@@ -17,6 +17,7 @@ class BankTransfer::PaymentRequest::UtilityBills::UtilityBillsTicketBackground <
     end
     self.bank_payment_request = BankPaymentRequest.find_by(id: options[:bank_payment_request_id])
     self.payments_attributes = options[:payments_attributes]
+    self.ticket_type = options[:ticket_type]
     self.bbps_bills = BbpsBill.where(id: options[:bbps_bill_ids])
     self.options = options
     self.run
