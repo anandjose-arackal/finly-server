@@ -2,23 +2,13 @@ class Docs::P2P::Agreements::FilterConfig < Filters::API
 
   attribute :order_number, label: "Agreement ID", type: :text, simple: true
   attribute :title, simple: true
-  attribute :agreement_date, simple: true
-  attribute :execution_date, simple: true
-  attribute :expiration_date, simple: true
-
-  # attribute :invoice_id, label: "Invoice ID", type: :text, simple: true
-  # attribute :invoice_number, label: "Invoice Number", type: :text, simple: true
-  # attribute :created_at, type: :datetime, simple: false
-  # attribute :updated_at, type: :datetime, simple: false
-  # attribute :date, label: "Invoice Date", type: :datetime, simple: true
-  # attribute :due_date, label: "Due Date", type: :datetime, simple: true
-  # attribute :invoice_type_id, label: "Type", type: :dropdown, choices: Choices[:enum].(InwardInvoiceType)
-  # attribute :policy_id, type: :dropdown, simple: false, choices: Choices[:auto_complete].('policies')
-  # attribute :vendor_id, label: "Vendor", simple: true, type: :dropdown,  choices: Choices[:auto_complete].("vendor")
-  # attribute :vendor_vendor_id, label: "Vendor ID", simple: false
-  # attribute :location_id, label: "Billing Location", type: :dropdown, choices: Choices[:auto_complete].("locations")
-  # attribute :delivery_location_id, label: "Shipping Location", type: :dropdown, choices: Choices[:auto_complete].("locations")
-  # attribute :items_cost_center_id, label: "Cost Center", type: :dropdown, choices: Choices[:auto_complete].("cost_centers")
-  # attribute :items_department_id, label: "Department", type: :dropdown, choices: Choices[:auto_complete].("departments")
+  attribute :agreement_date, type: :datetime, simple: true
+  attribute :execution_date, type: :datetime, simple: true
+  attribute :expiration_date, type: :datetime
+  attribute :created_at, type: :datetime
+  attribute :updated_at, type: :datetime
+  attribute :submitted_at, type: :datetime
+  attribute :approved_at, type: :datetime
+  attribute :policy_id, type: :dropdown, simple: false, choices: Choices[:auto_complete].('policies')
 
 end
