@@ -6,6 +6,7 @@ Filters::Router.draw do
   route 'users', Masters::Users::FilterConfig
   route 'rate_contracts', Masters::RateContracts::FilterConfig
   route 'utility_subscriptions', Docs::UtilityBills::Subscriptions::FilterConfig
+  route 'agreements', Docs::P2P::Agreements::FilterConfig
 
   # Docs
   route 'invoices', Docs::P2P::Invoices::FilterConfig

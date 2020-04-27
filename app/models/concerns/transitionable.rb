@@ -889,8 +889,9 @@ module Transitionable
       # role_ids = UserRole.where(name: document_roles).pluck(:id) rescue []
       # policy_ids = user.policy_user_roles.where(user_role_id: role_ids).pluck(:policy_id)&.uniq rescue nil
       user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
-        role_name = UserRole.find_by_id(role_id)&.name
-        valid_role = document_roles.include?(role_name&.to_sym)
+        valid_role = UserRole.ids_for(document_roles).include?(role_id)
+        # role_name = UserRole.find_by_id(role_id)&.name
+        # valid_role = document_roles.include?(role_name&.to_sym)
         # if valid_role && self.role_based_associated_items(user, role_id).present?
         #   if data.blank?
         #     data = self.role_based_associated_items(user, role_id)

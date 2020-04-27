@@ -67,6 +67,10 @@ Resolver::Router.draw do
     route 'default', Docs::UtilityBills::Billers::Resolver
   end
 
+  scope :agreements do
+    route 'default', Docs::P2P::Agreements::Resolver
+  end
+
   # Docs
   scope :trips do
     route 'default', Docs::Trips::Resolver
