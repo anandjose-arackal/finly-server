@@ -37,6 +37,14 @@ class Docs::P2P::PurchaseRequests::Index < IndexBuilder::API
     amount value: :total_amount
   end
 
+  column :cost_center, default: true, includes: [:cost_center] do
+    text value: :cost_center_name
+  end
+
+  column :department, default: true, includes: [:department] do
+    text value: :department_name
+  end
+
   column :created_by, default: true, includes: [:creator] do
     user value: :created_by
   end
@@ -97,6 +105,18 @@ class Docs::P2P::PurchaseRequests::Index < IndexBuilder::API
       format = 'danger'
     end
     format
+  end
+
+  def self.cost_center_name(context)
+    return "Multiple" if context[:exposure].cost_allocation_items
+
+    context[:exposure].cost_center&.name
+  end
+
+  def self.department_name(context)
+    return "Multiple" if context[:exposure].cost_allocation_items
+
+    context[:exposure].department&.name
   end
 
 end

@@ -18,6 +18,7 @@ class PurchaseRequestExposure < Exposures::API
   attribute :updated_at, record_attribute: true
   attribute :submitted_at, record_attribute: true
   attribute :approved_at, record_attribute: true
+  attribute :cost_allocation_items, record_attribute: true
   attribute :items do
     record.items.map(&:to_exposure)
   end
