@@ -12,7 +12,8 @@ module Ransacker
   class_methods do
     def inherited(sub_class)
       super(sub_class)
-      # if ActiveRecord::Base.connection.table_exists? self.table_name
+
+      # This block ensure that models where table does not exist does not crash
       begin
         sub_class.columns_hash.each_pair do |attribute_name, properties|
           next unless properties.type == :datetime
@@ -22,7 +23,6 @@ module Ransacker
       rescue
         # Do nothing
       end
-      # end
     end
 
     def ransack_date(attribute)
