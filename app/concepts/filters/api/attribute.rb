@@ -97,6 +97,8 @@ class Filters::API::Attribute
         filters
       end
 
+      # Dynamically adds all custom fields as attributes. Supported types are text and dropdown.
+      # Dropdown gives all dropdown options for selection. All other fields are added as text
       def build_custom_fields(user, filters)
         field_configurations = user.company.all_field_configurations.where(enabled: true)
                                    .ransack(field_parent_mappings_field_parent_type_id_eq: FieldParentType.id_for(custom_fields[:parent_type]))
@@ -112,6 +114,7 @@ class Filters::API::Attribute
                 simple: false,
                 custom_field_id: [field_configuration.id]
             }
+            # In-case the type is dropdown, set the type as dropdown and add all relevant choices
             if field_configuration.field_type_id == FieldType.id_for(:drop_down)
               configs[field_configuration.field_name][:field_type] = :dropdown
               configs[field_configuration.field_name][:choices] = Choices[:list].(*field_configuration.drop_down_items.map {|i| {id: i.name, name: i.name}})
