@@ -1,5 +1,5 @@
 class Tally::BankAllocation < NonPersistentModel
-  attr_accessor  :name, :date, :transaction_type, :payment_mode, :party_name
+  attr_accessor :name, :date, :transaction_type, :payment_mode, :party_name, :utr
   attr_writer :amount
 
   validates_presence_of :name, :date, :party_name
@@ -17,6 +17,8 @@ class Tally::BankAllocation < NonPersistentModel
         {
             name: name,
             date: date,
+            instrumentdate: date,
+            uniquereferencenumber: utr,
             transaction_type: transaction_type,
             payment_mode: payment_mode,
             party_name: party_name,

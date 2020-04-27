@@ -30,7 +30,7 @@ class PaymentFiles::Formats::HdfcBank::Process < PaymentFiles::Formats::BaseForm
           self.transaction_type,
           payment[:receiving_user_name].present? ? payment[:receiving_user_name][0..7] : '',
           {value: payment[:beneficiary_account_number], type: 'string'},
-          {value: sprintf('%.2f',payment[:amount]), type: 'number'},
+          {value: sprintf('%.2f', payment[:amount]), type: 'number'},
           payment[:receiving_user_name],
           '',
           '',

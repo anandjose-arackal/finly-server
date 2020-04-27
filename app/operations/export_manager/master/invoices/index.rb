@@ -182,7 +182,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
   end
 
   def transaction_period_to(invoice_line_item)
-    invoice_line_item.parent.transaction_service_period_from&.strftime("%d-%b-%y")
+    invoice_line_item.parent.transaction_service_period_to&.strftime("%d-%b-%y")
   end
 
   def invoice_status(invoice_line_item)
