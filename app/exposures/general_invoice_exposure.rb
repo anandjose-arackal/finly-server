@@ -26,15 +26,6 @@ class GeneralInvoiceExposure < Exposures::API
       "#{days.to_i} days"
     end
   end
-  attribute :upcoming_in_days do
-
-  end
-  attribute :start_date do
-
-  end
-  attribute :end_date do
-
-  end
   attribute :cost_center, record_attribute: true, exposure: true, includes: [:cost_center]
   attribute :department, record_attribute: true, exposure: true, includes: [:department]
   attribute :billing_location, record_attribute: :location, exposure: true, includes: [:location]
