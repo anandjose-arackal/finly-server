@@ -1,5 +1,7 @@
 class Docs::P2P::Invoices::FilterConfig < Filters::API
 
+  custom_fields :invoice
+
   attribute :invoice_id, label: "Invoice ID", type: :text, simple: true
   attribute :invoice_number, label: "Invoice Number", type: :text, simple: true
   attribute :created_at, type: :datetime, simple: false

@@ -35,7 +35,7 @@ class Filters::API::Attribute
     }
     if custom_field_id.present?
       # Generate unique ID for custom fields
-      params[:args] = {field_id: "#{field_key}_#{custom_field_id}", custom_field_id: custom_field_id}
+      params[:args] = {field_id: "#{field_key}_#{custom_field_id.first}", custom_field_id: custom_field_id}
     end
 
     if choices.present?
@@ -80,12 +80,51 @@ class Filters::API::Attribute
         )
       end
 
+      def custom_fields(parent_type = nil, path_prefix = nil)
+        @custom_fields = {parent_type: parent_type, path_prefix: path_prefix} if parent_type.present?
+
+        @custom_fields
+      end
+
       def build(user)
         filters = []
         attributes.each do |field_key, attribute|
           filters << attribute.build(user)
         end
+        if custom_fields.present?
+          build_custom_fields(user, filters)
+        end
         filters
+      end
+
+      def build_custom_fields(user, filters)
+        field_configurations = user.company.all_field_configurations.where(enabled: true)
+                                   .ransack(field_parent_mappings_field_parent_type_id_eq: FieldParentType.id_for(custom_fields[:parent_type]))
+                                   .result
+        configs = {}
+        field_configurations.each do |field_configuration|
+          if configs[field_configuration.field_name].blank?
+            configs[field_configuration.field_name] = {
+                field_key: "custom_fields_value_search",
+                hint: field_configuration.field_name,
+                label: field_configuration.field_name,
+                field_type: :text,
+                simple: false,
+                custom_field_id: [field_configuration.id]
+            }
+            if field_configuration.field_type_id == FieldType.id_for(:drop_down)
+              configs[field_configuration.field_name][:field_type] = :dropdown
+              configs[field_configuration.field_name][:choices] = Choices[:list].(*field_configuration.drop_down_items.map {|i| {id: i.name, name: i.name}})
+            end
+          else
+            configs[field_configuration.field_name][:custom_field_id] << field_configuration.id
+          end
+        end
+
+        configs.each_pair do |name, config|
+          attribute = Filters::API::Attribute.new(config)
+          filters << attribute.build(user)
+        end
       end
     end
   end

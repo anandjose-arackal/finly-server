@@ -23,14 +23,18 @@ class CustomField < ApplicationRecord
 
   # If the custom field is destroyed, destroyed its associated value
   belongs_to :value, optional: true, polymorphic: true, dependent: :destroy
+  belongs_to :drop_down_selection, -> { includes(:custom_field).where(custom_fields: { value_type: 'FieldDropDownSelection' }) }, foreign_key: :value_id, class_name: 'FieldDropDownSelection', optional: true
 
   accepts_nested_attributes_for :value
 
+  # Fixme: Limitation is that not based searches such as not_eq, not_cont, not_null does not generate the correct results
   ransacker :value_search, args: [:parent, :ransacker_args] do |parent, args|
-    field_configuration_id = 0
+    field_configuration_id = ['0']
     if args&.is_a?(Hash) and args[:custom_field_id].present?
       field_configuration_id = args[:custom_field_id]
     end
+    field_configuration_id = [field_configuration_id] unless field_configuration_id.respond_to?(:each)
+
     # Note that Arel::Nodes::InfixOperation requires the fields to be from parent.table or of type Arel::Nodes.build_quoted
     # Arel::Nodes::InfixOperation.new(
     #     'AND',
@@ -39,7 +43,7 @@ class CustomField < ApplicationRecord
     # )
 
     # This performs the same as above, easier to read
-    Arel.sql("`custom_fields`.`field_configuration_id` = #{field_configuration_id} AND `custom_fields`.`configured_field_value`")
+    Arel.sql("`custom_fields`.`field_configuration_id` IN (#{field_configuration_id.join(",")}) AND `custom_fields`.`configured_field_value`")
   end
 
   # validate :validate_field
