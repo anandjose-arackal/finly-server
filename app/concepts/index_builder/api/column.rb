@@ -13,6 +13,11 @@ class IndexBuilder::API::Column
     instance_eval &block if block.present?
   end
 
+  def sort
+    sort_key = @sort
+    sort_key == true ? self.column_key : sort_key
+  end
+
   def fields
     @fields ||= []
   end

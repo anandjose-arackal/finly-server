@@ -5,7 +5,7 @@ class Docs::P2P::Agreements::Index < IndexBuilder::API
   reference '{{record.id}}'
 
   # Fixed column is always default true
-  column :vendor, label: 'Title', fixed: true, sort: true do
+  column :title, label: 'Title', fixed: true, sort: true do
     text value: :title, format: 'primary'
   end
 

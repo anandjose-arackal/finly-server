@@ -1,5 +1,9 @@
 class Docs::P2P::Agreements::FilterConfig < Filters::API
 
+  attribute :order_number, label: "Agreement ID", type: :text, simple: true
+  attribute :title, simple: true
+  # attribute :
+
   # attribute :invoice_id, label: "Invoice ID", type: :text, simple: true
   # attribute :invoice_number, label: "Invoice Number", type: :text, simple: true
   # attribute :created_at, type: :datetime, simple: false
