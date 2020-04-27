@@ -103,7 +103,7 @@ class Invoice < ApplicationRecord
   include Exposures::Model::Exposable
   include Exposures::Model::Exposable
   include Sequenced::ActsAsSequenced
-  include Ransacker
+
   # include EventProducer
 
   acts_as_sequenced column: :invoice_id, purpose: :invoice, editable: false, prefix: 'INV'

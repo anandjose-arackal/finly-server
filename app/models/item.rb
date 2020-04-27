@@ -35,7 +35,7 @@ class Item < ApplicationRecord
   include Sequenced::ActsAsSequenced
   include MathUtil
   include EventProducer
-  include Ransacker
+
 
   event_channel 'item'
 

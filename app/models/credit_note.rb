@@ -44,7 +44,7 @@ class CreditNote < ApplicationRecord
   include SoftDeletable, Templatable, Transitionable, MathUtil, CustomFieldFilterSupport
   include Sequenced::ActsAsSequenced
   include EventProducer
-  include Ransacker
+
 
   event_channel 'credit_note'
 
