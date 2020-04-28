@@ -27,6 +27,10 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
     date value: :created_at
   end
 
+  column :updated_at, sort: :updated_at do
+    date value: :updated_at
+  end
+
   column :note, default: true do
     text value: :note
   end
