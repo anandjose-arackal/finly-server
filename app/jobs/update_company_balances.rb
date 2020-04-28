@@ -7,6 +7,7 @@ class UpdateCompanyBalances
       # date = DateUtils.yesterday_local_date
       # Company::Balances::SetBalances.(company, {date: date})
 
+      next unless company.d_code.present?
       #### Because the corporate balance API from ItzCash needs to be shown in the statements
       Company::Transaction::Show.(company, {start_date: Date.today, end_date: Date.today})
       ####################################### END ###########################################
