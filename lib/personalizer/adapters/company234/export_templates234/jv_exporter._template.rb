@@ -1,5 +1,5 @@
 class Personalizer::Adapters::Company234::ExportTemplates234::JVExporter < Personalizer::Adapters::ExportBase
-  attr_accessor :headers, :contents, :reports
+  attr_accessor :headers, :contents, :reports, :role_id
 
   has_scope :filter_approved_date, using: [:from, :to], type: :hash
 
