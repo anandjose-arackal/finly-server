@@ -25,19 +25,17 @@ class Filters::API::Attribute
 
   def build(user)
     params = {
-        field_id: field_key,
         field_key: field_key,
         label: label,
         hint: hint,
         field_type: field_type,
         simple: simple,
         operators: operators,
-        args: {}
+        args: {filter_id: field_key}
     }
     if custom_field_id.present?
       # Generate unique ID for custom fields
-      params[:field_id] = "#{field_key}_#{custom_field_id.first}"
-      params[:args][:custom_field_id] = custom_field_id
+      params[:args] = {field_id: "#{field_key}_#{custom_field_id.first}", custom_field_id: custom_field_id}
     end
 
     if choices.present?

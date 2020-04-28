@@ -36,7 +36,7 @@ class IndexSegment::SystemViews::API
         c: []
     }
     filters.each do |filter|
-      query[:c] << {a: {"0": {name: filter[:a], field_id: filter[:field_id]}, ransack_args: {}}, p: filter[:p], v: {"0": {value: filter[:v]}}}
+      query[:c] << {a: {"0": {name: filter[:a], ransack_args: {field_id: filter[:field_id]}}}, p: filter[:p], v: {"0": {value: filter[:v]}}}
     end
     {q: query}
   end
