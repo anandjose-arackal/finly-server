@@ -47,6 +47,14 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
     date value: -> (context) { context[:record].payment_order.scheduled_at }
   end
 
+  column :processed_date, sort: :processed_at, default: true do
+    date value: :processed_at
+  end
+
+  column :last_retried_on, sort: :last_retried_at, default: true do
+    date value: :last_retried_at
+  end
+
   column :created_by, default: true, sort: :payment_order_bank_payment_request_created_by_id, includes: [payment_order: {bank_payment_request: :created_by}] do
     user value: -> (context) { context[:record].payment_order.bank_payment_request.created_by }
   end
