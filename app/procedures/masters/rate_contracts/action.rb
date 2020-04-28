@@ -3,7 +3,7 @@ class Masters::RateContracts::Action < ActionManager::API
   scope policy: Masters::RateContracts::Policy, model: RateContract do
     action :redirect,
            :create,
-           permissions: [:inventory_manager],
+           permissions: [:inventory_manager, :admin],
            authorize: :create?,
            format: 'primary',
            label: 'New Rate Contract',
