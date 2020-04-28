@@ -1,12 +1,16 @@
-class ReminderAwaitingApproval < ApplicationJob
+class ReminderAwaitingApproval
 
-  def perform
+  def self.perform
+    puts " ----------------------------- PERFORMING #{self.name}  at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")}------------------------------"
+
     # Loop through Reviewers and find the awaiting approval items
     # remind_purchase_request_reviewer
     # remind_invoice_reviewer
     # remind_bank_payment_request_reviewer
     # remind_purchase_order_reviewer
     remind_document_reviewer
+
+    puts " ----------------------------- FINISHED #{self.name}  at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
   end
 
   private
@@ -54,7 +58,7 @@ class ReminderAwaitingApproval < ApplicationJob
   #   end
   # end
 
-  def remind_document_reviewer
+  def self.remind_document_reviewer
     reviewer_role_ids = [UserRole.id_for(:purchase_request_reviewer), UserRole.id_for(:po_invoice_reviewer), UserRole.id_for(:non_po_invoice_reviewer), UserRole.id_for(:bank_payment_request_reviewer), UserRole.id_for(:purchase_order_reviewer)]
     reviewer_ids = Policy.where(company_id: [140, 209, 184, 211,221,228,229,227,199]).joins(:policy_user_roles).where('policy_user_roles.user_role_id IN (?)', reviewer_role_ids).pluck('policy_user_roles.user_id').uniq
 

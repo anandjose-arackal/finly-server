@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_15_091350) do
+ActiveRecord::Schema.define(version: 2020_04_23_125644) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -904,6 +904,12 @@ ActiveRecord::Schema.define(version: 2020_04_15_091350) do
     t.string "hsn_sac"
     t.datetime "paid_at"
     t.text "review_note"
+    t.string "selected_amount_type", default: "base_amount"
+    t.string "disconn_tag"
+    t.string "bill_month"
+    t.string "pc"
+    t.date "early_payment_date"
+    t.text "api_response"
     t.index ["amount_id"], name: "index_bbps_bills_on_amount_id"
     t.index ["autofetched"], name: "index_bbps_bills_on_autofetched"
     t.index ["controlling_level_id"], name: "index_bbps_bills_on_controlling_level_id"
@@ -3008,6 +3014,8 @@ ActiveRecord::Schema.define(version: 2020_04_15_091350) do
     t.integer "rejected_by_id"
     t.datetime "action_taken_at"
     t.datetime "deleted_at"
+    t.integer "tat"
+    t.boolean "tat_added_by_script", default: false
     t.index ["document_reviewer_mappable_type", "document_reviewer_mappable_id"], name: "indx_doc_lvl_rvwr_mpng_on_doc_rvwr_mpble_tp_n_doc_rvwr_mpble_id"
     t.index ["document_reviewer_mappable_type", "provider_name", "policy_id"], name: "index_dlrm_provider_policy_mappable_type"
     t.index ["forwarded"], name: "index_document_level_reviewer_mappings_on_forwarded"
@@ -5044,6 +5052,56 @@ ActiveRecord::Schema.define(version: 2020_04_15_091350) do
     t.boolean "is_deleted", default: false
     t.datetime "deleted_at"
     t.index ["expense_id"], name: "index_manual_expenses_on_expense_id"
+  end
+
+  create_table "map_location_details", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
+    t.string "icon"
+    t.string "name"
+    t.string "place_id"
+    t.string "url"
+    t.text "address", limit: 4294967295
+    t.text "result", limit: 4294967295
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.decimal "latitude", precision: 20, scale: 10
+    t.decimal "longitude", precision: 20, scale: 10
+    t.index ["deleted_at"], name: "index_map_location_details_on_deleted_at"
+    t.index ["name"], name: "index_map_location_details_on_name"
+    t.index ["place_id"], name: "index_map_location_details_on_place_id"
+    t.index ["uuid"], name: "index_map_location_details_on_uuid"
+  end
+
+  create_table "map_location_searches", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
+    t.string "input"
+    t.text "result", limit: 4294967295
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_map_location_searches_on_deleted_at"
+    t.index ["input"], name: "index_map_location_searches_on_input"
+    t.index ["uuid"], name: "index_map_location_searches_on_uuid"
+  end
+
+  create_table "map_location_user_queries", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
+    t.bigint "user_id", null: false
+    t.string "name"
+    t.text "address"
+    t.string "place_id"
+    t.integer "map_location_detail_id", null: false
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.decimal "latitude", precision: 20, scale: 10
+    t.decimal "longitude", precision: 20, scale: 10
+    t.index ["deleted_at"], name: "index_map_location_user_queries_on_deleted_at"
+    t.index ["map_location_detail_id"], name: "index_map_location_user_queries_on_map_location_detail_id"
+    t.index ["place_id"], name: "index_map_location_user_queries_on_place_id"
+    t.index ["user_id"], name: "index_map_location_user_queries_on_user_id"
+    t.index ["uuid"], name: "index_map_location_user_queries_on_uuid"
   end
 
   create_table "mcc_category_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -8361,7 +8419,9 @@ ActiveRecord::Schema.define(version: 2020_04_15_091350) do
     t.datetime "signature_updated_at"
     t.string "signature_title"
     t.datetime "deleted_at"
+    t.string "pan"
     t.index ["default_currency_id"], name: "index_user_profiles_on_default_currency_id"
+    t.index ["pan"], name: "index_user_profiles_on_pan"
     t.index ["state_id"], name: "fk_rails_9207fd1f96"
     t.index ["user_id"], name: "index_user_profiles_on_user_id"
   end

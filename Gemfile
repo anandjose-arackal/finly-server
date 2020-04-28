@@ -229,11 +229,13 @@ gem 'string_pattern', '~> 2.2', '>= 2.2.1'
 # gem 'aws-sdk'
 gem 'aws-sdk-s3', '~> 1.30.0'
 gem 'aws-sdk-sqs', '~> 1.10.0'
-# todo - temporary, will be removed during final deployment.
+
 gem 'awesome_print', '~> 1.8.0'
 
 # Fuzzy String Match
 gem 'fuzzy-string-match', '1.0.1'
+
+gem 'whenever'
 
 group :development, :test do
   gem 'byebug'

@@ -86,7 +86,18 @@ class WorkflowManager::Aasm::BaseProvider
 
       # Set forwarding user
       if dlrms.present?
-        dlrms.update_all({forwarded: true, forwarded_by_id: user.id, forwarded_to_id: forwarded_to_user.id, active: false, taken_control: false, taken_control_by_id: nil, action_taken_at: DateTime.now})
+
+        # Calculate TAT
+        if previous_level.present?
+          previous_level_dlrms = document.document_level_reviewer_mappings
+                                     .where(level_id: previous_level.id, policy_id: document.policy_id).where.not(action_taken_by_id: nil)
+          time_0 = previous_level_dlrms.map(&:action_taken_at).compact.max
+        else
+          time_0 = [document.submitted_at, document.trails.with_action_id(TrailAction.id_for(:submit)).last.created_at].compact.max
+        end
+        tat = Time.now - time_0
+
+        dlrms.update_all({forwarded: true, forwarded_by_id: user.id, forwarded_to_id: forwarded_to_user.id, active: false, taken_control: false, taken_control_by_id: nil, action_taken_at: DateTime.now, tat: tat})
       end
     end
 
@@ -96,21 +107,49 @@ class WorkflowManager::Aasm::BaseProvider
     if [:approve].include?(aasm.current_event)
       dlrms = document.document_level_reviewer_mappings.with_level_id(current_level.id).with_policy_id(self.policy_id)
                  .where("taken_control_by_id = ? or reviewer_id = ? or forwarded_to_id = ?", user.id, user.id, user.id)
+
+      # Calculate TAT
+      # Handles scenario where document was rejected to level
+      last_rejected_at = dlrms.pluck(:rejected_by_id).compact.present? ? document.trails.with_action_id(TrailAction.id_for(:reject)).reorder(:created_at).last&.created_at : nil
+
+      # Find ifany submit/approve actions were after the last reject to level
+      approval_submission_post_rejection = last_rejected_at.present? ? document.trails.with_action_id(TrailAction.ids_for(:submit, :approve)).where("created_at > ?", last_rejected_at) : []
+
+      if approval_submission_post_rejection.present? || last_rejected_at.blank?
+        # ifany submit/approve actions are found after last reject to level, then continue to find tat from previous level or submitted at
+        if previous_level.present?
+          previous_level_dlrms = document.document_level_reviewer_mappings
+                                     .where(level_id: previous_level.id, policy_id: document.policy_id).where.not(action_taken_by_id: nil)
+
+          time_0 = previous_level_dlrms.map(&:action_taken_at).compact.max
+
+          # Some of the cases action_taken_at is missing for dlrms
+          time_0 = document.trails.with_action_id(TrailAction.id_for(:approve)).where(action_level_id: previous_level.id).map(&:created_at).max if time_0.blank?
+        else
+          time_0 = [document.submitted_at, document.trails.with_action_id(TrailAction.id_for(:submit)).last&.created_at].compact.max
+        end
+
+        tat = Time.now - time_0
+      else
+        # ifany submit/approve actions are NOT present after last reject to level, then tat will be considered from last rejection
+        tat = Time.now - last_rejected_at
+      end
+
       if dlrms.present?
         dlrms.update_all(
             action_id: TrailAction.id_for(aasm.current_event),
             action_taken_by_id: user.id,
-            action_taken_at: DateTime.now
+            action_taken_at: DateTime.now,
+            tat: tat
         )
       end
-    end
 
-    if [:approve].include?(aasm.current_event)
+      # Set Viewable True for Next Levels
       if next_level.present?
         next_dlrms = document.document_level_reviewer_mappings.with_level_id(next_level.id).with_policy_id(self.policy_id)
-
         next_dlrms.update_all(viewable: true)
       else
+        # If Approved; Set Approved at
         self.document_update_params[:approved_at] = DateTime.now
       end
     end
@@ -156,14 +195,15 @@ class WorkflowManager::Aasm::BaseProvider
           forwarded_to_id: nil,
           forwarded_by_id: nil,
           action_id: nil,
-          action_taken_at: nil
+          action_taken_at: nil,
+          tat: nil
       )
     end
 
     if [:reject].include?(aasm.current_event)
       if self.reject_to_user.present? && self.reject_to_level.present?
         # for the level where it is rejected, remove the action details so that user in that level can take action again after correcting the document
-        document.document_level_reviewer_mappings.where('level_id = ?', self.reject_to_level.id).update_all(action_taken_by_id: nil, action_id: nil, rejected_by_id: user.id)
+        document.document_level_reviewer_mappings.where('level_id = ?', self.reject_to_level.id).update_all(action_taken_by_id: nil, action_id: nil, rejected_by_id: user.id, action_taken_at: DateTime.now)
         # for levels above the rejected level, remove all action details
         dlrm = document.document_level_reviewer_mappings.where('level_id > ?', self.reject_to_level.id)
       else

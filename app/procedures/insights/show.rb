@@ -15,13 +15,48 @@ class Insights::Show < Transactions::API
 
     filters[:company_id] = 2 if Rails.env.uat?
 
-    filters[:from] = params[:from] || 1.month.ago.strftime('%Y-%m-%d') if model.can_filter_date
+    filters[:from] = params[:from] || 6.month.ago.beginning_of_month.strftime('%Y-%m-%d') if model.can_filter_date
     filters[:to] = params[:to] || Date.today.strftime('%Y-%m-%d') if model.can_filter_date
-    filters[:location_id] = Masters::Locations::Resolver.new(current_user).resolve(params: {q: {id_in: params[:location_id_in]}}).pluck(:id) if model.can_filter_location
-    filters[:cost_center_id] = Masters::CostCenters::Resolver.new(current_user).resolve(params: {q: {id_in: params[:cost_center_id_in]}}).pluck(:id) if model.can_filter_cost_center
-    filters[:department_id] = Masters::Departments::Resolver.new(current_user).resolve(params: {q: {id_in: params[:department_id_in]}}).pluck(:id) if model.can_filter_department
-    filters[:policy_id] = Masters::Policies::Resolver.new(current_user).resolve(params: {q: {id_in: params[:policy_id_in]}}).pluck(:id) if model.can_filter_policy
-    filters[:category_id] = Masters::Categories::Resolver.new(current_user).resolve(params: {q: {id_in: params[:category_id_in]}}).pluck(:id) if model.can_filter_category
+
+    if model.can_filter_location
+      if params[:location_id_in].present?
+        filters[:location_id] = Masters::Locations::Resolver.new(current_user).resolve(params: {q: {id_in: params[:location_id_in]}}).pluck(:id).join(",")
+      else
+        filters[:location_id] = '99999999'
+      end
+    end
+
+    if model.can_filter_cost_center
+      if params[:cost_center_id_in].present?
+        filters[:cost_center_id] = Masters::CostCenters::Resolver.new(current_user).resolve(params: {q: {id_in: params[:cost_center_id_in]}}).pluck(:id).join(",")
+      else
+        filters[:cost_center_id] = '99999999'
+      end
+    end
+
+    if model.can_filter_department
+      if params[:department_id_in].present?
+        filters[:department_id] = Masters::Departments::Resolver.new(current_user).resolve(params: {q: {id_in: params[:department_id_in]}}).pluck(:id).join(",")
+      else
+        filters[:department_id] = '99999999'
+      end
+    end
+
+    if model.can_filter_policy
+      if params[:policy_id_in].present?
+        filters[:policy_id] = Masters::Policies::Resolver.new(current_user).resolve(params: {q: {id_in: params[:policy_id_in]}}).pluck(:id).join(",")
+      else
+        filters[:policy_id] = '99999999'
+      end
+    end
+
+    if model.can_filter_category
+      if params[:category_id_in].present?
+        filters[:category_id] = Masters::Categories::Resolver.new(current_user).resolve(params: {q: {id_in: params[:category_id_in]}}).pluck(:id).join(",")
+      else
+        filters[:category_id] = '99999999'
+      end
+    end
 
     options['filters'] = filters
     true

@@ -159,6 +159,8 @@ set :puma_worker_timeout, nil
 set :puma_init_active_record, true
 set :puma_preload_app, false
 
+set :whenever_roles, ["whenever_cron"]
+
 set :slackistrano, {
     channel: '#general',
     team: 'finlyteam',

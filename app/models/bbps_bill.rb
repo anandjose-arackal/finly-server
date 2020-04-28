@@ -47,7 +47,12 @@
 #  hsn_sac                    :string(255)
 #  paid_at                    :datetime
 #  review_note                :text(65535)
-#  selected_amount_type       :string(255)
+#  selected_amount_type       :string(255)      default("base_amount")
+#  disconn_tag                :string(255)
+#  bill_month                 :string(255)
+#  pc                         :string(255)
+#  early_payment_date         :date
+#  api_response               :text(65535)
 #
 
 class BbpsBill < ApplicationRecord
@@ -61,6 +66,8 @@ class BbpsBill < ApplicationRecord
   acts_as_sequenced column: :sequence_id, purpose: :bbps_bill, editable: false, prefix: 'UB'
 
   event_channel 'bbps_bill'
+
+  serialize :api_response, JSON
 
   before_save :resolve_bill_validation
   before_save :set_quick_pay
@@ -276,7 +283,7 @@ class BbpsBill < ApplicationRecord
           status: status.as_json,
           pocs: subscription.pocs.as_json,
           # biller_category_name: biller_category_name,
-          amount: total_amount.as_json,
+          amount: total_amount.as_json(rounded: true),
           customer_fields: subscription.all_customer_fields,
           paid_at: paid_at&.strftime("%I:%M %p, %d %b %Y"),
       }
@@ -305,18 +312,20 @@ class BbpsBill < ApplicationRecord
         payment_ticket_id: self.payments&.first&.payment_order&.bank_payment_request&.id,
         # biller_category_name: biller_category_name,
 
-        amount: amount.as_json,
-        total_amount: total_amount.as_json,
+        amount: amount.as_json(rounded: true),
+        total_amount: total_amount.as_json(rounded: true),
 
         due_date: due_date,
         bill_date: bill_date,
-        bill_period: bill_period,
+        bill_period: (bill_month || bill_period),
         bill_number: bill_number,
+        disconn_tag: disconn_tag,
+        early_payment_date: early_payment_date,
         paid_at: paid_at&.strftime("%I:%M %p, %d %b %Y"),
 
-        late_payment_fee_selected: late_payment_fee_selected,
-        early_payment_fee_selected: early_payment_fee_selected,
-        convenience_fee_selected: convenience_fee_selected,
+        # late_payment_fee_selected: late_payment_fee_selected,
+        # early_payment_fee_selected: early_payment_fee_selected,
+        # convenience_fee_selected: convenience_fee_selected,
         subscription_id: subscription&.id,
         biller_category_name: subscription.biller_category_name,
         mobile_number: subscription.mobile_number,
@@ -336,11 +345,11 @@ class BbpsBill < ApplicationRecord
     }
 
     if self.late_payment_fee&.value.to_f > 0
-      data[:late_payment_fee] = late_payment_fee.as_json
+      data[:late_payment_fee] = late_payment_fee.as_json(rounded: true)
     end
 
     if self.early_payment_fee&.value.to_f > 0
-      data[:early_payment_fee] = early_payment_fee.as_json
+      data[:early_payment_fee] = early_payment_fee.as_json(rounded: true)
     end
 
     if BbpsBill.status_ids(:paid, :failed).include?(self.status_id)

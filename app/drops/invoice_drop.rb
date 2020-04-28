@@ -52,6 +52,10 @@ class InvoiceDrop < Drop
     @object.net_amount&.value || 0
   end
 
+  def balance_due
+    @object.balance_due&.value || 0
+  end
+
   def gross_amount
     @object.gross_amount&.value || 0
   end
@@ -66,6 +70,14 @@ class InvoiceDrop < Drop
 
   def line_items
     @object.invoice_items.to_a.map(&:to_liquid)
+  end
+
+  def transaction_period_from
+    @object.transaction_service_period_from
+  end
+
+  def transaction_period_to
+    @object.transaction_service_period_to
   end
 
 end

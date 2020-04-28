@@ -1,10 +1,11 @@
-class YesBankStatusChecker < ApplicationJob
+class YesBankStatusChecker
 
-  def perform
-    pending_transactions = YesBankTransaction.processing_transactions.non_penny_test.all
-    pending_transactions.each do |trans|
-      # where all the magic happens!
-      BankTransfer::YesBank::CheckStatus.(trans)
-    end
+  def self.perform
+    puts " ----------------------------- PERFORMING #{self.name} at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
+
+    handle = self.object_id
+    YesBankBalanceProvider.perform_async(handle, self.company.id)
+
+    puts " ----------------------------- FINISHED #{self.name} ------------------------------"
   end
 end

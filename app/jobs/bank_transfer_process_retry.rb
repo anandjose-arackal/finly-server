@@ -1,5 +1,8 @@
-class BankTransferProcessRetry < ActiveJob::Base
-  def perform
+class BankTransferProcessRetry
+
+  def self.perform
+    puts " ----------------------------- PERFORMING #{self.name}  at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")}------------------------------"
+
     failed_payments_for_retry = Payment.where(payment_status_id: PaymentStatus.id_for(:pending_retry))
     if failed_payments_for_retry.present?
       failed_payments_for_retry.each do |payment|
@@ -13,9 +16,11 @@ class BankTransferProcessRetry < ActiveJob::Base
         end
       end
     end
+
+    puts " ----------------------------- FINISHED #{self.name} at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
   end
 
-  def execute_callback(payment)
+  def self.execute_callback(payment)
     post_params = {
         payment_id: payment.id,
         payment_amount: payment.amount_value,
