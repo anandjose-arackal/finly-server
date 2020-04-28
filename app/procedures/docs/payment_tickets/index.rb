@@ -86,7 +86,7 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     )
 
     # Approved / Auto Approved
-    counter.add 93, 'Approved', (
+    counter.add 93, 'Pending Credit', (
         counts[BankPaymentRequestStatus.id_for(:approved)].to_i +
         counts[BankPaymentRequestStatus.id_for(:auto_approved)].to_i +
         counts[BankPaymentRequestStatus.id_for(:creation_in_progress)].to_i +
