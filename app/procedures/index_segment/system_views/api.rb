@@ -14,8 +14,8 @@ class IndexSegment::SystemViews::API
     @filters ||= []
   end
 
-  def self.filter(attribute, predicate, value)
-    filters << {a: attribute, p: predicate, v: value}
+  def self.filter(attribute, predicate, value, field_id: nil)
+    filters << {a: attribute, p: predicate, v: value, field_id: (field_id || attribute)}
   end
 
   def self.build(user)
@@ -36,7 +36,7 @@ class IndexSegment::SystemViews::API
         c: []
     }
     filters.each do |filter|
-      query[:c] << {a: {"0": {name: filter[:a]}}, p: filter[:p], v: {"0": {value: filter[:v]}}}
+      query[:c] << {a: {"0": {name: filter[:a]}, ransack_args: {field_id: filter[:field_id]}}, p: filter[:p], v: {"0": {value: filter[:v]}}}
     end
     {q: query}
   end
