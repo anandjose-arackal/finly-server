@@ -23,11 +23,11 @@ class Docs::P2P::Inwards::Received::Index < IndexBuilder::API
     text value: '{{record.purchase_order.po_number}}'
   end
 
-  column :expected_delivery_date, sort: :purchase_order_delivery_date, includes: [:purchase_order] do
+  column :expected_delivery_on, sort: :purchase_order_delivery_date, includes: [:purchase_order] do
     date value: "{{record.purchase_order.expected_delivery_date}}"
   end
 
-  column :delivery_date, sort: :delivery_date, default: true do
+  column :delivered_on, sort: :delivery_date, default: true do
     date value: :delivery_date
   end
 
@@ -35,7 +35,7 @@ class Docs::P2P::Inwards::Received::Index < IndexBuilder::API
     user value: :created_by
   end
 
-  column :created_at, sort: :created_at, default: true do
+  column :created_on, sort: :created_at, default: true do
     date value: :created_at
   end
 
