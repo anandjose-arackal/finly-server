@@ -11,7 +11,7 @@ class Docs::PaymentTickets::Payments::FilterConfig < Filters::API
   attribute :processed_at, label: "Processed On", type: :datetime
   attribute :last_retried_at, label: "Last Retried On", type: :datetime
   attribute :payment_order_bank_payment_request_policy_id, type: :dropdown, simple: true, choices: Choices[:auto_complete].("policies")
-  attribute :amount_value, type: :amount, label: 'Amount'
+  attribute :amount_value, type: :number, label: 'Amount'
   attribute :receiving_user_vendor_id, type: :dropdown, label: 'Vendor', choices: Choices[:auto_complete].("vendor"), simple: true
 
 end

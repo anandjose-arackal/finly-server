@@ -13,7 +13,7 @@ class Docs::P2P::CreditNotes::FilterConfig < Filters::API
   attribute :shipping_location_id, label: "Shipping Location", type: :dropdown, choices: Choices[:auto_complete].("locations")
   attribute :cost_center_id, label: "Cost Center", simple: true, type: :dropdown, choices: Choices[:auto_complete].("cost_centers")
   attribute :department_id, label: "Department", simple: true, type: :dropdown, choices: Choices[:auto_complete].("departments")
-  attribute :gross_receivable_amount_value, label: "Gross Receivable Amount", type: :amount
-  attribute :net_receivable_amount_value, label: "Net Receivable Amount", type: :amount
+  attribute :gross_receivable_amount_value, label: "Gross Receivable Amount", type: :number
+  attribute :net_receivable_amount_value, label: "Net Receivable Amount", type: :number
 
 end

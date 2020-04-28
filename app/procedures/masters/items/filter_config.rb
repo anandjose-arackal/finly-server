@@ -4,7 +4,7 @@ class Masters::Items::FilterConfig < Filters::API
   attribute :created_at, type: :datetime
   attribute :updated_at, type: :datetime
   attribute :sku, type: :text
-  attribute :rate, type: :amount
+  attribute :rate, type: :number
   attribute :description, type: :text, simple: true
   attribute :item_code, type: :text, simple: true
   attribute :category, type: :dropdown, simple: true, choices: Choices[:auto_complete].('categories')
