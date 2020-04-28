@@ -13,6 +13,10 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     date value: :created_at
   end
 
+  column :updated_at, sort: true do
+    date value: :updated_at
+  end
+
   column :created_by, default: true, includes: [:created_by] do
     user value: :created_by
   end
