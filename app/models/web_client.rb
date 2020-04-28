@@ -1,0 +1,2 @@
+class WebClient < ApplicationRecord
+end
