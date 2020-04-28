@@ -6,7 +6,7 @@ class Forms::API::Entity::Types::Number < Forms::API::Entity::Base
   option :min_value
   option :decimal, default: false
 
-  operators :gteq, :lteq, :eq_any, :not_eq_any, :in, :not_in, :not_null, :null
+  operators :gteq, :lteq, :in, :not_in, :not_null, :null
 
   contract do
     optional(:min_value).value(:int?)
