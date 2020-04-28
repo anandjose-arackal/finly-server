@@ -1,0 +1,5 @@
+development:
+  username: "test"
+  password: "test123"
+  authorized_ip:
+    - "127.0.0.1"
