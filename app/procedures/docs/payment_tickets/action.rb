@@ -30,7 +30,7 @@ class Docs::PaymentTickets::Action < ActionManager::API
       scope permissions: :bank_payment_request_creditor do
         action :transition,
                :mark_as_credited,
-               label: "Approve",
+               label: "Mark as Credited",
                icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
                url: "bank_transfer/mark_as_credited.json",
                authorize: :mark_as_credited?
