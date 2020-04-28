@@ -1414,6 +1414,7 @@ ActiveRecord::Schema.define(version: 2020_04_23_125644) do
     t.string "name"
     t.integer "budget_group_id"
     t.string "ancestry"
+    t.datetime "deleted"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "created_by_user_id"
@@ -1421,6 +1422,7 @@ ActiveRecord::Schema.define(version: 2020_04_23_125644) do
     t.datetime "deleted_at"
     t.boolean "budget_creation_in_progress", default: false
     t.index ["budget_group_id"], name: "index_budget_group_criteria_on_budget_group_id"
+    t.index ["deleted"], name: "index_budget_group_criteria_on_deleted"
   end
 
   create_table "budget_group_criteria_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -1575,8 +1577,6 @@ ActiveRecord::Schema.define(version: 2020_04_23_125644) do
     t.decimal "tds_value", precision: 20, scale: 10, default: "0.0"
     t.boolean "billed", default: false
     t.boolean "reimbursable", default: false
-    t.datetime "entity_created_at"
-    t.datetime "entity_submitted_at"
     t.integer "purchase_order_id"
     t.integer "invoice_id"
     t.integer "payment_purpose_id"
@@ -1600,7 +1600,6 @@ ActiveRecord::Schema.define(version: 2020_04_23_125644) do
     t.decimal "cn_adjusted_amount_before_tax_value", precision: 20, scale: 10, default: "0.0"
     t.decimal "cn_adjusted_amount_after_tax_value", precision: 20, scale: 10, default: "0.0"
     t.decimal "credit_note_tax_amount_value", precision: 20, scale: 10, default: "0.0"
-    t.datetime "date"
     t.index ["entity_type", "entity_id"], name: "index_budget_trails_on_entity_type_and_entity_id"
   end
 
@@ -3840,6 +3839,7 @@ ActiveRecord::Schema.define(version: 2020_04_23_125644) do
     t.string "field_key", null: false
     t.string "value"
     t.string "value_text"
+    t.datetime "deleted_at"
     t.index ["document_id"], name: "index_form_custom_fields_on_document_id"
     t.index ["document_type", "document_id"], name: "index_form_custom_fields_on_document_type_and_document_id"
     t.index ["document_type"], name: "index_form_custom_fields_on_document_type"
