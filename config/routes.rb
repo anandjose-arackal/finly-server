@@ -3646,17 +3646,17 @@ Rails.application.routes.draw do
     get 'export/payment_file(.:format)', to: 'bank_payment_requests#payment_file', as: :export_payment_file
     post 'export/payment_file(.:format)', to: 'bank_payment_requests#payment_file', as: :export_payment_file_post
     patch 'mark_as_credited', to: 'bank_payment_requests#mark_as_credited', as: :mark_as_credited_bulk
-    put 'mark_as_credited', to: 'bank_payment_requests#mark_as_credited', as: :mark_as_credited_bulk
+    put 'mark_as_credited', to: 'bank_payment_requests#mark_as_credited'
     patch 'mark_all_pending', to: 'bank_payment_requests#mark_all_pending', as: :mark_all_pending
-    put 'mark_all_pending', to: 'bank_payment_requests#mark_all_pending', as: :mark_all_pending
+    put 'mark_all_pending', to: 'bank_payment_requests#mark_all_pending'
     patch 'bulk_approve_validate', to: 'bank_payment_requests#bulk_approve_validate', as: :bulk_approve_validate
-    put 'bulk_approve_validate', to: 'bank_payment_requests#bulk_approve_validate', as: :bulk_approve_validate
+    put 'bulk_approve_validate', to: 'bank_payment_requests#bulk_approve_validate'
     patch 'bulk_approve', to: 'bank_payment_requests#bulk_approve', as: :bulk_approve
-    put 'bulk_approve', to: 'bank_payment_requests#bulk_approve', as: :bulk_approve
+    put 'bulk_approve', to: 'bank_payment_requests#bulk_approve'
     patch 'bulk_take_control' => 'bank_payment_requests#bulk_take_control', as: :bulk_take_control
-    put 'bulk_take_control' => 'bank_payment_requests#bulk_take_control', as: :bulk_take_control
+    put 'bulk_take_control' => 'bank_payment_requests#bulk_take_control'
     patch 'bulk_reject' => 'bank_payment_requests#bulk_reject', as: :bulk_reject
-    put 'bulk_reject' => 'bank_payment_requests#bulk_reject', as: :bulk_reject
+    put 'bulk_reject' => 'bank_payment_requests#bulk_reject'
     post 'bulk_actions' => 'bank_payment_requests#bulk_actions', as: :bulk_actions
 
     post 'new_pr' => 'bank_payment_requests#new_pr', as: :new_pr
