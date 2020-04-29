@@ -24,6 +24,7 @@ class PaymentExposure < Exposures::API
   attribute :payment_order, record_attribute: true, exposure: true
   attribute :payment_mode, record_attribute: true
   attribute :created_at, record_attribute: true
+  attribute :updated_at, record_attribute: true
   attribute :processed_at, record_attribute: true
   attribute :last_retried_at, record_attribute: true
   attribute :note, record_attribute: true
