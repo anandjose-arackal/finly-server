@@ -56,9 +56,9 @@ class Personalizer::Adapters::Company234::ExportTemplates234::JVExporter < Perso
     sl_no = 1
     reports.each do |report|
       total_amount = 0
+      selected_user = report.user
       report.expenses.each do |expense|
         total_amount += expense&.amount&.value
-        user = report.user
         self.contents << [
             expense.date&.strftime("%d/%m/%y"),
             '',
@@ -69,11 +69,11 @@ class Personalizer::Adapters::Company234::ExportTemplates234::JVExporter < Perso
             expense.amount&.value,
             '',
             'Branch',
+            selected_user&.cost_center&.name,
             '',
             '',
-            '',
-            user&.name,
-            user&.profile&.employee_id,
+            selected_user&.name,
+            selected_user&.profile&.employee_id,
             '',
             '',
             '$'
@@ -89,11 +89,11 @@ class Personalizer::Adapters::Company234::ExportTemplates234::JVExporter < Perso
           '',
           total_amount,
           'Branch',
+          selected_user&.cost_center&.name,
           '',
           '',
-          '',
-          'EMPLOYEE',
-          user&.profile&.employee_id,
+          selected_user&.name,
+          selected_user&.profile&.employee_id,
           '',
           '',
           '$'
