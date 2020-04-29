@@ -1165,6 +1165,17 @@ class Payment < ApplicationRecord
     end
   end
 
+  def custom_fields
+    case document_type
+    when 'Invoice'
+      self.invoice_parent.custom_fields
+    when 'PurchaseOrder'
+      self.purchase_order_parent.custom_fields
+    when 'BeneficiaryPayment'
+      self.invoice.custom_fields
+    end
+  end
+
   def get_attachment_details(document_type)
     case document_type
     when 'Invoice'

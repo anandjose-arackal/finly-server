@@ -24,6 +24,7 @@ class PaymentExposure < Exposures::API
   attribute :payment_order, record_attribute: true, exposure: true
   attribute :payment_mode, record_attribute: true
   attribute :created_at, record_attribute: true
+  attribute :processed_at, record_attribute: true
   attribute :note, record_attribute: true
   attribute :initiating_account_number do
     account_name(record, :initiating_account)
