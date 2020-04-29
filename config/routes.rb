@@ -3673,6 +3673,7 @@ Rails.application.routes.draw do
     get 'download_all_attachment', to: 'bank_payment_requests#download_all_attachment', as: :download_all_attachment
     patch 'bulk_credit_validate', to: 'bank_payment_requests#bulk_credit_validate', as: :bulk_credit_validate
     patch 'bulk_credit', to: 'bank_payment_requests#bulk_credit', as: :bulk_credit
+    put 'bulk_credit', to: 'bank_payment_requests#bulk_credit'
     get 'sample_import_format', to: 'bank_payment_requests#sample_import_file', as: :sample_import_file
     # patch 'bulk_credit_validate', to: 'bank_payment_requests#bulk_approve_validate', as: :bulk_credit_validate
 
