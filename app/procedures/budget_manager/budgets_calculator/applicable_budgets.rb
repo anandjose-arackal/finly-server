@@ -76,21 +76,46 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
   # above init step
   def criteria_based_budgets!(options, **)
     budget_criteria = self.company.budget_group_criteria
-    criteria_mappings = BudgetGroupCriteriaMapping.with_budget_group_criteria_id(budget_criteria.pluck(:id))
-    # first extract all criteria mappings that apply to this particular combination of departments, locations, cost centers etc
-    applicable_criteria_mappings = criteria_mappings.where("(budgetable_type = ? AND budgetable_id IN (?))
-                                                              OR (budgetable_type = ? AND budgetable_id IN (?))
-                                                              OR (budgetable_type = ? AND budgetable_id IN (?))
-                                                              OR (budgetable_type = ? AND budgetable_id IN (?))
-                                                              OR (budgetable_type = ? AND budgetable_id IN (?))
-                                                              OR (budgetable_type = ? AND budgetable_id IN (?))",
-                                                           "Department", self.departments.pluck(:id),
-                                                           "BranchLocation", self.locations.pluck(:id),
-                                                           "CostCenter", self.cost_centers.pluck(:id),
-                                                           "YesBankVendor", self.vendors.pluck(:id),
-                                                           "User", self.users.pluck(:id),
-                                                           "Category", self.categories.pluck(:id))
+    applicable_budget_group_criteria_ids = []
+    budget_criteria.each do |criterium|
+      criteria_mappings = criterium.budget_group_criteria_mappings
+      applicable_criteria_mappings = criteria_mappings.with_budgetable_departments(self.departments.pluck(:id))
+                                         .with_budgetable_locations(self.locations.pluck(:id))
+                                         .with_budgetable_cost_centers(self.cost_centers.pluck(:id))
+                                         .with_budgetable_vendors(self.vendors.pluck(:id))
+                                         .with_budgetable_users(self.users.pluck(:id))
+                                         .with_budgetable_categories(self.categories.pluck(:id))
+      if applicable_criteria_mappings.present?
+        applicable_budget_group_criteria_ids << criterium.id
+      end
+    end
+    self.applicable_budget_group_criteria = BudgetGroupCriterium.with_id(applicable_budget_group_criteria_ids)
+    # criteria_mappings = BudgetGroupCriteriaMapping.with_budget_group_criteria_id(budget_criteria.pluck(:id))
+    # # first extract all criteria mappings that apply to this particular combination of departments, locations, cost centers etc
+    # # the methodology we are using will be, to first extract the criteria mappings that have the respective department,
+    # # and then among those the ones that have the respective location,
+    # # and then among those the ones that have the respective cost center,
+    # # and then among those the ones that have the respective vendors
+    # # ... and so on
+    # applicable_criteria_mappings = criteria_mappings.with_budgetable_departments(self.departments.pluck(:id))
+    #                                                 .with_budgetable_locations(self.locations.pluck(:id))
+    #                                                 .with_budgetable_cost_centers(self.cost_centers.pluck(:id))
+    #                                                 .with_budgetable_vendors(self.vendors.pluck(:id))
+    #                                                 .with_budgetable_users(self.users.pluck(:id))
+    #                                                 .with_budgetable_categories(self.categories.pluck(:id))
 
+    # applicable_criteria_mappings = criteria_mappings.where("(budgetable_type = ? AND budgetable_id IN (?))
+    #                                                           OR (budgetable_type = ? AND budgetable_id IN (?))
+    #                                                           OR (budgetable_type = ? AND budgetable_id IN (?))
+    #                                                           OR (budgetable_type = ? AND budgetable_id IN (?))
+    #                                                           OR (budgetable_type = ? AND budgetable_id IN (?))
+    #                                                           OR (budgetable_type = ? AND budgetable_id IN (?))",
+    #                                                        "Department", self.departments.pluck(:id),
+    #                                                        "BranchLocation", self.locations.pluck(:id),
+    #                                                        "CostCenter", self.cost_centers.pluck(:id),
+    #                                                        "YesBankVendor", self.vendors.pluck(:id),
+    #                                                        "User", self.users.pluck(:id),
+    #                                                        "Category", self.categories.pluck(:id))
 
     # applicable_criteria_mapping_ids = criteria_mappings.with_budgetable_type("Department").with_budgetable_id(self.departments.pluck(:id)).pluck(:id)
     # applicable_criteria_mapping_ids += criteria_mappings.with_budgetable_type("CostCenter").with_budgetable_id(self.cost_centers.pluck(:id)).pluck(:id)
@@ -99,8 +124,7 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
     # applicable_criteria_mapping_ids += criteria_mappings.with_budgetable_type("YesBankVendor").with_budgetable_id(self.vendors.pluck(:id)).pluck(:id)
     # applicable_criteria_mapping_ids += criteria_mappings.with_budgetable_type("User").with_budgetable_id(self.users.pluck(:id)).pluck(:id)
 
-
-    self.applicable_budget_group_criteria = BudgetGroupCriterium.with_id(applicable_criteria_mappings.pluck(:budget_group_criterium_id))
+    # self.applicable_budget_group_criteria = BudgetGroupCriterium.with_id(applicable_criteria_mappings.pluck(:budget_group_criterium_id))
     true
   end
 

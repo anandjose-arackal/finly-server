@@ -10,9 +10,9 @@ class User::Index < User::Base
       add_message :error, (operation.messages[:error] + operation.messages[:failure])
     end
 
-    if RequestStore.store[:from_controller]
+    if RequestStore.store[:from_controller] && RequestStore.store[:current_app].to_sym.in?([:em, :fm, :ft, :vp]) # make sure we are sending the correct list of users based on the app
       mapping = self.users.joins(:role_mapping) rescue User.none
-      self.users = mapping.where(user_role_mappings: {purpose_id: Purpose.id_for(:expense_management)}) if RequestStore.store[:current_app].to_sym == :em
+      self.users = mapping.where(user_role_mappings: {purpose_id: Purpose.id_for(:expense_management)}) if RequestStore.store[:current_app].to_sym.in? [:em, :fm, :ft]
       self.users = mapping.where(user_role_mappings: {purpose_id: Purpose.id_for(:vendor_payments)}) if RequestStore.store[:current_app].to_sym == :vp
       self.users = self.users.group('user_role_mappings.user_id', :purpose_id)
     end
