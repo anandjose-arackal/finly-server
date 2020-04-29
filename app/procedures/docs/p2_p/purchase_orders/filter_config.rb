@@ -11,5 +11,6 @@ class Docs::P2P::PurchaseOrders::FilterConfig < Filters::API
   attribute :delivery_location_id, label: "Shipping Location", type: :dropdown, choices: Choices[:auto_complete].("locations")
   attribute :items_cost_center_id, label: "Cost Center", type: :dropdown, choices: Choices[:auto_complete].("cost_centers")
   attribute :items_department_id, label: "Department", type: :dropdown, choices: Choices[:auto_complete].("departments")
+  custom_fields :purchase_order
 
 end
