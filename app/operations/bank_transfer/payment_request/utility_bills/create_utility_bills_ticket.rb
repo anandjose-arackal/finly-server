@@ -3,7 +3,7 @@ class BankTransfer::PaymentRequest::UtilityBills::CreateUtilityBillsTicket < Ban
   attr_accessor :scheduled_at, :payment_mode, :policy_id, :bbps_bills,
                 :bank_payment_request, :payable_amount, :description,
                 :payment_request_params, :policy, :bank_payment_request_params, :payable_amounts, :requested_amount,
-                :payments, :transfer_mode_id, :transfer_mode
+                :payments, :transfer_mode_id, :transfer_mode, :ticket_type
 
 
   class BankTransfer::PaymentRequest::UtilityBills::CreateUtilityBillsTicket::UtilityBillsPresenter < BaseOperation::BasePresenter::SuccessPresenter
@@ -64,6 +64,7 @@ class BankTransfer::PaymentRequest::UtilityBills::CreateUtilityBillsTicket < Ban
     policy_id = params[:policy_id]
     self.policy = current_company.policies.find_by(id: policy_id)
     self.description = params[:description]
+    self.ticket_type = "utility_bill"
   end
 
   def validate
@@ -110,7 +111,7 @@ class BankTransfer::PaymentRequest::UtilityBills::CreateUtilityBillsTicket < Ban
 
       self.bbps_bills.update_all(status_id: BbpsBillStatus.id_for(:payment_ticket_created))
       payment_params = initialize_payment_objects
-      op = BankTransfer::PaymentRequest::UtilityBills::UtilityBillsTicketBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: payment_params, bbps_bill_ids: self.bbps_bills.pluck(:id)})
+      op = BankTransfer::PaymentRequest::UtilityBills::UtilityBillsTicketBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: payment_params, bbps_bill_ids: self.bbps_bills.pluck(:id), ticket_type: ticket_type})
     else
       add_message :error, self.bank_payment_request.errors.full_messages
     end
@@ -198,7 +199,8 @@ class BankTransfer::PaymentRequest::UtilityBills::CreateUtilityBillsTicket < Ban
         transfer_mode_id: self.transfer_mode_id,
         description: self.description,
         policy_id: self.policy&.id,
-        payment_order_attributes: payment_order_params
+        payment_order_attributes: payment_order_params,
+        ticket_type: ticket_type
     }
     return bank_payment_request_params
   end
