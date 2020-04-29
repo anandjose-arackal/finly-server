@@ -38,7 +38,7 @@ class DateUtils
   def self.parse_date(date_s)
     begin
       return Date.parse date_s
-    rescue ArgumentError
+    rescue ArgumentError, TypeError
       return nil
     end
   end

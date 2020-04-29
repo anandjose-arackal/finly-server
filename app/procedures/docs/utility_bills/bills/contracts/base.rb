@@ -1,7 +1,7 @@
 class Docs::UtilityBills::Bills::Contracts::Base < Reform::Form
 
   property :id
-  property :subscription_id #, validates: {presence: true}
+  property :subscription_id, validates: {presence: true}
   property :bbps_biller_id, validates: {presence: true}
   property :sequence_id
 
@@ -29,9 +29,14 @@ class Docs::UtilityBills::Bills::Contracts::Base < Reform::Form
   property :bill_period
   property :due_date
 
-  property :early_payment_fee_selected
-  property :late_payment_fee_selected
-  property :convenience_fee_selected
+  # property :early_payment_fee_selected
+  # property :late_payment_fee_selected
+  # property :convenience_fee_selected
+  property :disconn_tag
+  property :bill_month
+  property :pc
+  property :early_payment_date
+  property :api_response
 
   # property :user_id, validates: {presence: true}
 

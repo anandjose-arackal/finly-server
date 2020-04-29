@@ -15,7 +15,7 @@ class Insights::Show < Transactions::API
 
     filters[:company_id] = 2 if Rails.env.uat?
 
-    filters[:from] = params[:from] || 1.month.ago.strftime('%Y-%m-%d') if model.can_filter_date
+    filters[:from] = params[:from] || 6.month.ago.beginning_of_month.strftime('%Y-%m-%d') if model.can_filter_date
     filters[:to] = params[:to] || Date.today.strftime('%Y-%m-%d') if model.can_filter_date
 
     if model.can_filter_location

@@ -81,10 +81,11 @@ class BankPaymentRequest < ApplicationRecord
   delegate :scheduled?, to: :payment_order
 
   enum ticket_type: {
-    beneficiary: 'beneficiary_payment',
-    invoice: 'invoice',
-    purchase_order: 'purchase_order',
-    security_deposit: 'security_deposit'
+      beneficiary: 'beneficiary_payment',
+      invoice: 'invoice',
+      purchase_order: 'purchase_order',
+      security_deposit: 'security_deposit',
+      utility_bill: 'utility_bill'
   }
 
   scope :non_owner, -> (user_id) {where.not owner_id: user_id}

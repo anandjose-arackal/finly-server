@@ -69,7 +69,7 @@ class SummaryMailer::CompanyAdmin::ProcessReports < BaseOperation
     end
     set_company_expenses_summary(summary, user, start_date, end_date, application, options)
     unless summary.blank?
-      Event::ESummary::Reports.(user, user: user, summary: summary)
+      ::Event::ESummary::Report.(user, user: user, summary: summary)
     end
   end
 

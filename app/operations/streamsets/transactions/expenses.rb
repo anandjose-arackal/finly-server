@@ -28,7 +28,7 @@ class Streamsets::Transactions::Expenses < BaseOperation
     def init
       self.expenses = params[:expenses]
       page = params[:page] || 1
-      per_page = params[:per_page] || 500
+      per_page = params[:per_page] || 30
       self.paginated_expenses = self.expenses.order(report_id: :desc).paginate(page: page, per_page: per_page)
     end
   end
