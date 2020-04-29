@@ -9,6 +9,16 @@ class Users::Create < Admin::Users::Create
     [:company_admin]
   end
 
+  def pre_validate  
+    if params[:gender].present?
+      if (['male', 'female'].include? (params[:gender].downcase) )
+        params[:gender] = params[:gender].downcase.split("").first
+      else
+        return messages[:error] << 'Gender not specified correctly'
+      end
+    end
+  end
+
   def init
     self.company = user.company
     self.new_user_params = parse_user_params
