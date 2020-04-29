@@ -39,7 +39,8 @@ class Docs::PaymentTickets::Action < ActionManager::API
                label: "Credit",
                icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
                url: "bank_transfer/bulk_credit.json",
-               otp: true, password: true,
+               otp: 'api/bank_transfer/generate_otp',
+               password: true,
                authorize: :credit?
       end
     end
