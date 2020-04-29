@@ -4,6 +4,11 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
   resolver 'payments.default'
   reference '{{record.payment_order.bank_payment_request.id}}'
   includes payment_order: :bank_payment_request
+  custom_fields :invoice, :purchase_order,
+                includes: [invoice: :custom_fields, purchase_order_parent: :custom_fields],
+                path: -> (record) do
+                  record.invoice&.custom_fields || record.purchase_order_parent&.custom_fields
+                end
 
   # Fixed column is always default true
   column :vendor, fixed: true, includes: [:receiving_user] do
@@ -97,14 +102,14 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
   column :sgst_amount, label: 'SGST', includes: [
       invoice_parent: {tax_amount: :currency},
       beneficiary_payment_parent: {tax_amount: :currency},
-  ]  do
+  ] do
     amount value: :sgst_amount
   end
 
   column :igst, label: 'IGST', includes: [
       invoice_parent: {tax_amount: :currency},
       beneficiary_payment_parent: {tax_amount: :currency},
-  ]  do
+  ] do
     amount value: :igst_amount
   end
 
@@ -112,7 +117,7 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
       invoice_parent: :tds_slab,
       beneficiary_payment_parent: :tds_slab,
       purchase_order_parent: :advance_tds_slab,
-  ]  do
+  ] do
     text value: "{{record.tds_slab.name}}"
   end
 
@@ -120,7 +125,7 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
       invoice_parent: :tds_slab,
       beneficiary_payment_parent: :tds_slab,
       purchase_order_parent: :advance_tds_slab,
-  ]  do
+  ] do
     text value: "{{record.tds_slab.rate}}"
   end
 
@@ -128,13 +133,13 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
       invoice_parent: {tds_amount: :currency},
       beneficiary_payment_parent: {tds_amount: :currency},
       purchase_order_parent: {advance_tds_amount: :currency},
-  ]  do
+  ] do
     amount value: :tds_amount
   end
 
   column :freight, includes: [
       invoice_parent: {freight_amount: :currency},
-  ]  do
+  ] do
     amount value: :freight
   end
 
@@ -144,14 +149,14 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
       beneficiary_payment_parent: {net_amount: :currency},
       purchase_order_parent: {advance_amount: :currency},
       security_deposit_parent: {original_amount: :currency},
-  ]  do
+  ] do
     amount value: :net_amount
   end
 
   column :advance_paid, includes: [
       invoice_parent: {advance_amount: :currency},
       beneficiary_payment_parent: {advance_amount: :currency},
-  ]  do
+  ] do
     amount value: :advance_paid
   end
 
@@ -161,7 +166,7 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
       beneficiary_payment_parent: {payable_amount: :currency},
       purchase_order_parent: {advance_amount: :currency},
       security_deposit_parent: {payable_amount: :currency},
-  ]  do
+  ] do
     amount value: :balance_payable
   end
 

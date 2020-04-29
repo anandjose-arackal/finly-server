@@ -97,7 +97,7 @@ class IndexBuilder::API::Column
         columns[column_key] = column
       end
 
-      def custom_fields(type = nil, path: nil, includes: [:custom_fields])
+      def custom_fields(*type, path: nil, includes: [:custom_fields])
         if type.present?
           path ||= lambda do |record|
             record.custom_fields

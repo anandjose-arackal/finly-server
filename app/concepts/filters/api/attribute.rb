@@ -80,9 +80,9 @@ class Filters::API::Attribute
         )
       end
 
-      def custom_fields(parent_type = nil, path_prefix = nil)
-        @custom_fields = {parent_type: parent_type, path_prefix: path_prefix} if parent_type.present?
-
+      def custom_fields(*parent_type, prefix: nil)
+        @custom_fields ||= []
+        @custom_fields << {parent_type: parent_type, prefix: prefix} if parent_type.present?
         @custom_fields
       end
 
@@ -97,33 +97,43 @@ class Filters::API::Attribute
         filters
       end
 
+      def custom_field_configurations
+        parent_types = custom_fields.map { |cf| cf[:parent_type] }
+        user.company.all_field_configurations.where(enabled: true)
+            .ransack(field_parent_mappings_field_parent_type_id_in: FieldParentType.ids_for(*parent_types))
+            .result
+      end
+
       # Dynamically adds all custom fields as attributes. Supported types are text and dropdown.
       # Dropdown gives all dropdown options for selection. All other fields are added as text
       def build_custom_fields(user, filters)
-        field_configurations = user.company.all_field_configurations.where(enabled: true)
-                                   .ransack(field_parent_mappings_field_parent_type_id_eq: FieldParentType.id_for(custom_fields[:parent_type]))
-                                   .result
         configs = {}
-        field_configurations.includes(:drop_down_items).each do |field_configuration|
-          if configs[field_configuration.field_name].blank?
-            configs[field_configuration.field_name] = {
-                field_key: "custom_fields_value_search",
-                hint: field_configuration.field_name,
-                label: field_configuration.field_name,
-                field_type: :text,
-                simple: false,
-                custom_field_id: [field_configuration.id]
-            }
-          else
-            configs[field_configuration.field_name][:custom_field_id] << field_configuration.id
-          end
+        field_configurations = user.company.all_field_configurations.where(enabled: true).includes(:drop_down_items)
+        custom_fields.each do |custom_field_config|
+          fc = field_configurations.ransack(field_parent_mappings_field_parent_type_id_in: FieldParentType.ids_for(*custom_field_config[:parent_type])).result
+          fc.each do |field_configuration|
+            if configs[field_configuration.field_name].blank?
+              field_key = "custom_fields_value_search"
+              field_key = "#{custom_field_config[:prefix]}_#{field_key}" if custom_field_config[:prefix].present?
+              configs[field_configuration.field_name] = {
+                  field_key: field_key,
+                  hint: field_configuration.field_name,
+                  label: field_configuration.field_name,
+                  field_type: :text,
+                  simple: false,
+                  custom_field_id: [field_configuration.id]
+              }
+            else
+              configs[field_configuration.field_name][:custom_field_id] << field_configuration.id
+            end
 
-          # In-case the type is dropdown, set the type as dropdown and add all relevant choices
-          if field_configuration.field_type_id == FieldType.id_for(:drop_down)
-            configs[field_configuration.field_name][:field_type] ||= :dropdown
-            configs[field_configuration.field_name][:choices] ||= []
-            configs[field_configuration.field_name][:choices] += field_configuration.drop_down_items.map {|i| {id: i.name, name: i.name}}
-            configs[field_configuration.field_name][:choices].uniq!
+            # In-case the type is dropdown, set the type as dropdown and add all relevant choices
+            if field_configuration.field_type_id == FieldType.id_for(:drop_down)
+              configs[field_configuration.field_name][:field_type] = :dropdown
+              configs[field_configuration.field_name][:choices] ||= []
+              configs[field_configuration.field_name][:choices] += field_configuration.drop_down_items.map { |i| {id: i.name, name: i.name} }
+              configs[field_configuration.field_name][:choices].uniq!
+            end
           end
         end
 
