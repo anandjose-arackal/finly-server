@@ -143,7 +143,7 @@ class YesBankVendor < ApplicationRecord
     elsif status_id == 'awaiting_approval'
       user_id = RequestStore.store[:current_user]&.id
       if user_id.present?
-        self.awaiting_action_items(user_id)
+        self.awaiting_action_items(user_id).where.not(status_id: VendorStatus.id_for(:auto_approved))
       end
     else
       where status_id: status_id
