@@ -142,4 +142,23 @@ Rails.application.configure do
     Bullet.enable = true
     Bullet.bullet_logger = true
   end
+
+  ###################### S3 for local attachments ########################
+  # config.aws_config = config_for(:aws_config)
+  # config.paperclip_defaults = {
+  #     storage: :s3,
+  #     s3_region: config.aws_config["aws_region_name"],
+  #     s3_credentials: {
+  #         s3_host_name: config.aws_config["s3_host_name"],
+  #         bucket: config.aws_config["s3_attachment_bucket_name"],
+  #         s3_region: config.aws_config["aws_region_name"],
+  #         access_key_id: config.aws_config["aws_access_key_id"],
+  #         secret_access_key: config.aws_config["aws_secret_access_key"]
+  #     },
+  #     :s3_protocol => :https,
+  #     :s3_headers => {
+  #         :content_disposition => 'attachment'
+  #     }
+  # }
+  #########################################################################################
 end
