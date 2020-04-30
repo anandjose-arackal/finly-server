@@ -25,6 +25,7 @@ class BudgetCriteriaMapping < ApplicationRecord
     where budgetable_id: budgetable_id
   }
 
+
   def as_json(options = {})
     {
         id: id,

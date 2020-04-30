@@ -99,8 +99,28 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
     # applicable_criteria_mapping_ids += criteria_mappings.with_budgetable_type("YesBankVendor").with_budgetable_id(self.vendors.pluck(:id)).pluck(:id)
     # applicable_criteria_mapping_ids += criteria_mappings.with_budgetable_type("User").with_budgetable_id(self.users.pluck(:id)).pluck(:id)
 
-
     self.applicable_budget_group_criteria = BudgetGroupCriterium.with_id(applicable_criteria_mappings.pluck(:budget_group_criterium_id))
+
+    # now since the above criteria will have some extra items we have to filter them out individually,
+    # the idea is that for each dimension of criteria, either they need to be empty, or include the respective dimension of the document
+    # So in the below code:
+    # 1. For each dimension, first check if it's empty
+    # 2. If not, then it needs to include the respective dimension from the document
+    # 3. The above conditions needs to be satisfied for ALL dimensions, which is why they're ANDed
+    valid_criteria_mapping_ids = []
+    self.applicable_budget_group_criteria.each do |criteria|
+      if (criteria.budgetable_departments.blank? || (self.departments.pluck(:id) - criteria.budgetable_departments.pluck(:id)).empty?) and
+          (criteria.budgetable_locations.blank? || (self.locations.pluck(:id) - criteria.budgetable_locations.pluck(:id)).empty?) and
+          (criteria.budgetable_cost_centers.blank? || (self.cost_centers.pluck(:id) - criteria.budgetable_cost_centers.pluck(:id)).empty?) and
+          (criteria.budgetable_vendors.blank? || (self.vendors.pluck(:id) - criteria.budgetable_vendors.pluck(:id)).empty?) and
+          (criteria.budgetable_users.blank? || (self.users.pluck(:id) - criteria.budgetable_users.pluck(:id)).empty?) and
+          (criteria.budgetable_categories.blank? || (self.categories.pluck(:id) - criteria.budgetable_categories.pluck(:id)).empty?)
+
+        valid_criteria_mapping_ids << criteria.id
+      end
+    end
+
+    self.applicable_budget_group_criteria = BudgetGroupCriterium.with_id(valid_criteria_mapping_ids)
     true
   end
 
