@@ -1,5 +1,6 @@
 class YesBankVendorExposure < Exposures::API
 
+  attribute :id, record_attribute: true
   attribute :business_name, record_attribute: true
   attribute :trade_name, record_attribute: true
   attribute :vendor_id, record_attribute: true
