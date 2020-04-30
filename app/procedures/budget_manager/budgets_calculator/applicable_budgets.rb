@@ -109,12 +109,12 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
     # 3. The above conditions needs to be satisfied for ALL dimensions, which is why they're ANDed
     valid_criteria_mapping_ids = []
     self.applicable_budget_group_criteria.each do |criteria|
-      if (criteria.budgetable_departments.blank? || (self.departments.pluck(:id) - criteria.budgetable_departments.pluck(:id)).empty?) and
-          (criteria.budgetable_locations.blank? || (self.locations.pluck(:id) - criteria.budgetable_locations.pluck(:id)).empty?) and
-          (criteria.budgetable_cost_centers.blank? || (self.cost_centers.pluck(:id) - criteria.budgetable_cost_centers.pluck(:id)).empty?) and
-          (criteria.budgetable_vendors.blank? || (self.vendors.pluck(:id) - criteria.budgetable_vendors.pluck(:id)).empty?) and
-          (criteria.budgetable_users.blank? || (self.users.pluck(:id) - criteria.budgetable_users.pluck(:id)).empty?) and
-          (criteria.budgetable_categories.blank? || (self.categories.pluck(:id) - criteria.budgetable_categories.pluck(:id)).empty?)
+      if (criteria.budgetable_departments.blank? || (self.departments.pluck(:id) & criteria.budgetable_departments.pluck(:id)).present?) and
+          (criteria.budgetable_locations.blank? || (self.locations.pluck(:id) & criteria.budgetable_locations.pluck(:id)).present?) and
+          (criteria.budgetable_cost_centers.blank? || (self.cost_centers.pluck(:id) & criteria.budgetable_cost_centers.pluck(:id)).present?) and
+          (criteria.budgetable_vendors.blank? || (self.vendors.pluck(:id) & criteria.budgetable_vendors.pluck(:id)).present?) and
+          (criteria.budgetable_users.blank? || (self.users.pluck(:id) & criteria.budgetable_users.pluck(:id)).present?) and
+          (criteria.budgetable_categories.blank? || (self.categories.pluck(:id) & criteria.budgetable_categories.pluck(:id)).present?)
 
         valid_criteria_mapping_ids << criteria.id
       end
