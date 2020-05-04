@@ -115,16 +115,6 @@ module Forms::API::Entity::Schema
   end
 
   alias_method :scope=, :scope
-
-  # def auto_complete(route: nil, filters: {})
-  #   return nil unless self.class.consumes_choices?
-  #
-  #   @auto_complete = {route: route, filters: filters} if route
-  #   @auto_complete
-  # end
-  #
-  # alias_method :auto_complete=, :auto_complete
-
   def valid?
     self.class.valid_schema?(self.schema)
   end

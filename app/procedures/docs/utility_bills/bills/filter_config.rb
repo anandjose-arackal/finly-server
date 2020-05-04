@@ -9,13 +9,13 @@ class Docs::UtilityBills::Bills::FilterConfig < Filters::API
   attribute :bill_date, label: 'Bill Date', type: :datetime, simple: true
   attribute :due_date, label: 'Due Date', type: :datetime, simple: true
   attribute :subscription_biller_biller_category_name, label: "Biller Category Name", type: :text
-  attribute :policy_id, type: :dropdown, choices: Choices[:auto_complete].('policies')
-  attribute :bbps_biller_id, type: :dropdown, simple: true, choices: Choices[:auto_complete].('bbps_billers')
-  attribute :subscription_category_id, type: :dropdown, simple: true, choices: Choices[:auto_complete].('categories')
+  attribute :policy_id, type: :dropdown, choices: Choices[:lookup].('policies')
+  attribute :bbps_biller_id, type: :dropdown, simple: true, choices: Choices[:lookup].('bbps_billers')
+  attribute :subscription_category_id, type: :dropdown, simple: true, choices: Choices[:lookup].('categories')
   attribute :subscription_sequence_id, label: 'Subscription ID', type: :text
   attribute :subscription_name, label: 'Subscription Name', type: :text
-  attribute :location_id, label: "Location", type: :dropdown, choices: Choices[:auto_complete].("locations")
-  attribute :cost_center_id, label: "Cost Center", type: :dropdown, choices: Choices[:auto_complete].("cost_centers")
-  attribute :department_id, label: "Department", type: :dropdown, choices: Choices[:auto_complete].("departments")
+  attribute :location_id, label: "Location", type: :dropdown, choices: Choices[:lookup].("locations")
+  attribute :cost_center_id, label: "Cost Center", type: :dropdown, choices: Choices[:lookup].("cost_centers")
+  attribute :department_id, label: "Department", type: :dropdown, choices: Choices[:lookup].("departments")
 
 end

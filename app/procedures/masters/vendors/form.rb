@@ -6,7 +6,7 @@ class Masters::Vendors::Form < Forms::API
              required: true, editable: false, default_value: VendorStatus.id_for(:draft),
              can_editable_be_changed: false
     lookup :policy_id,
-           choices_provider: Choices[:auto_complete].('policies',
+           choices_provider: Choices[:lookup].('policies',
                permissions: [:vendor_creator, :vendor_manager]),
            required: true
     text :legal_name

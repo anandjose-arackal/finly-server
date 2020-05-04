@@ -1,6 +1,6 @@
-class Choices::Builders::AutoComplete < Choices::Builders::Base
+class Choices::Builders::Lookup < Choices::Builders::Base
 
-  register! :auto_complete
+  register! :lookup
 
   def self.call(route, choice_params = {})
     self.new({route: route.to_s, choice_params: choice_params})
