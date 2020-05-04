@@ -152,6 +152,7 @@ gem 'gcm', '~> 0.1.1'
 gem 'bootstrap-will_paginate', '~> 1.0'
 # gem for image manipulation
 gem 'paperclip', '~> 6.1.0'
+gem 'paperclip-azure', '~> 1.0'
 # Bundle for Bootstrap
 gem 'bootstrap-sass', '~> 3.4.0'
 
@@ -235,7 +236,11 @@ gem 'awesome_print', '~> 1.8.0'
 # Fuzzy String Match
 gem 'fuzzy-string-match', '1.0.1'
 
+# gem that schedules cron jobs for us
 gem 'whenever'
+
+# gem for all azure services
+gem 'azure'
 
 group :development, :test do
   gem 'byebug'

@@ -157,22 +157,32 @@ Rails.application.configure do
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
-  config.aws_config = config_for(:aws_config)
-  ###################### SETTINGS FOR USING S3 FOR ALL ATTACHMENTS ########################
-  config.paperclip_defaults = {
-      storage: :s3,
-      s3_region: config.aws_config["aws_region_name"],
-      s3_credentials: {
-          s3_host_name: config.aws_config["s3_host_name"],
-          bucket: config.aws_config["s3_attachment_bucket_name"],
-          s3_region: config.aws_config["aws_region_name"],
-          access_key_id: config.aws_config["aws_access_key_id"],
-          secret_access_key: config.aws_config["aws_secret_access_key"]
-      },
-      :s3_protocol => :https,
-      :s3_headers => {
-          :content_disposition => 'attachment'
-      }
-  }
+  # config.aws_config = config_for(:aws_config)
+  # ###################### SETTINGS FOR USING S3 FOR ALL ATTACHMENTS ########################
+  # config.paperclip_defaults = {
+  #     storage: :s3,
+  #     s3_region: config.aws_config["aws_region_name"],
+  #     s3_credentials: {
+  #         s3_host_name: config.aws_config["s3_host_name"],
+  #         bucket: config.aws_config["s3_attachment_bucket_name"],
+  #         s3_region: config.aws_config["aws_region_name"],
+  #         access_key_id: config.aws_config["aws_access_key_id"],
+  #         secret_access_key: config.aws_config["aws_secret_access_key"]
+  #     },
+  #     :s3_protocol => :https,
+  #     :s3_headers => {
+  #         :content_disposition => 'attachment'
+  #     }
+  # }
   #########################################################################################
+
+  config.azure_config = config_for(:azure_config)
+  ##################### SETTINGS FOR AZURE BLOB STORAGE ##################################
+  Paperclip::Attachment.default_options[:storage] = :azure
+  Paperclip::Attachment.default_options[:azure_credentials] = {
+      storage_account_name: config.azure_config["storage_account_name"],
+      storage_access_key:   config.azure_config["storage_access_key"],
+      container:            config.azure_config["container"]
+  }
+  ####################### SETTINGS FOR AZURE BLOB STORAGE #################################
 end
