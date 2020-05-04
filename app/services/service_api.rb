@@ -48,7 +48,7 @@ class ServiceApi < Transactions::API
     options['response'] = get_response
     end_time = Time.now
     log_generator.merge({duration: (end_time - start_time)})
-    puts "Response: #{options[:response]&.body}"
+    puts "Response: #{options[:response]&.body}" rescue nil
     true
   end
 
