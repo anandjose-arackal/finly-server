@@ -15,7 +15,7 @@ class Choices::Builders::Lookup < Choices::Builders::Base
   end
 
   def klass
-    ::AutoComplete::Router.resolve(route)&.first&.klass
+    ::Lookup::Router.resolve(route)&.first&.klass
   end
 
   def find_by_id(id, params: {}, user: nil)
