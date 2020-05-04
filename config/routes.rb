@@ -3428,7 +3428,9 @@ Rails.application.routes.draw do
 
   get 'autocomplete/customers', to: 'invoicing/autocomplete#customer'
   get 'autocomplete/vendors', to: 'autocomplete#vendors'
-  get 'autocomplete/:entity', to: 'autocomplete#route'
+  # get 'autocomplete/:entity', to: 'autocomplete#route' # Fixme Deprecated
+
+  get 'lookup/:route', to: 'lookup#route'
 
   # get 'features', to: 'static_pages#features'
 

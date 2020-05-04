@@ -72,18 +72,18 @@ class Docs::Trips::Form < Forms::API
     end
   end
 
-  dependency(
-      {
-          controlling_field: 'status_id',
-          dependent_field: 'transport_requests/preferred_timeframe',
-          dependency_mappings: [
-              {
-                  controlling_choice: 'draft',
-                  required: false, editable: true, visible: true,
-                  choices: ['6am to 9am']
-              }
-          ]
-      }
-  )
+  # dependency(
+  #     {
+  #         controlling_field: 'status_id',
+  #         dependent_field: 'transport_requests/preferred_timeframe',
+  #         dependency_mappings: [
+  #             {
+  #                 controlling_choice: 'draft',
+  #                 required: false, editable: true, visible: true,
+  #                 choices: ['6am to 9am']
+  #             }
+  #         ]
+  #     }
+  # )
 
 end

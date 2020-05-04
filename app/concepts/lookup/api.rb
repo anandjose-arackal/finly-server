@@ -1,16 +1,12 @@
-class AutoComplete::API < Transactions::API
+class Lookup::API < Transactions::API
   include DynamicAttributes
   extend Dry::Container::Mixin
-
-  class_attr :model
-  class_attr :resolver
-  class_attr :json_builder
-  class_attr :max_per_page, default: 10
-  class_attr :search_key
+  include Lookup::DSL
 
   pass :define_pagination
   pass :define_search
   step Resolver::Transactions::Load(builder: :resolver_builder, paginate: true)
+  pass :include_associations
   step :render
 
   def define_pagination(context, params:, **)
@@ -28,6 +24,10 @@ class AutoComplete::API < Transactions::API
     params[:q][self.class.search_key] = params["search"]
   end
 
+  def include_associations(context, params:, **)
+    context['model.records'] = context['model.records'].includes(self.class.associations_to_include)
+  end
+
   def render(context, options)
     list = []
     context['model.records'].each do |record|
@@ -38,28 +38,22 @@ class AutoComplete::API < Transactions::API
   end
 
   def render_record(context, record:, **)
-    raise "JSON Builder is not defined for #{self.class.name}" unless json_builder.present?
-
-    if json_builder[:block]
-      json_builder[:block].call(context, record)
-    elsif json_builder[:args]
-      json = {}
-      json_builder[:args].each do |attribute|
-        json[attribute] = record.send(attribute)
+    exposure = record.to_exposure
+    data = {}
+    attributes.each_pair do |id, attribute|
+      if attribute.value.is_a?(Symbol)
+        data[attribute.id] = exposure.send(attribute.value)
+      else
+        data[attribute.id] = exposure.template(attribute.value.to_s)
       end
-      json
     end
-
+    data
   end
 
   protected
 
-  def self.json(*args, &block)
-    json_builder({args: args, block: block})
-  end
-
-  def json_builder
-    self.class.json_builder
+  def attributes
+    self.class.attributes
   end
 
   def resolver_builder(context, options)
