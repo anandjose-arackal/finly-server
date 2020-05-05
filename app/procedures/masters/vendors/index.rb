@@ -14,10 +14,6 @@ class Masters::Vendors::Index < IndexBuilder::API
     text value: :vendor_id, format: "primary"
   end
 
-  column :created_at, sort: :created_at do
-    date value: :created_at
-  end
-
   column :vendor_type, sort: :vendor_type_name, default: true do
     text value: "{{record.vendor_type.name}}"
   end
@@ -54,6 +50,10 @@ class Masters::Vendors::Index < IndexBuilder::API
     text value: "{{record.policy.name}}"
   end
 
+  column :payment_term, sort: true, includes: [:payment_term] do
+    date value: "{{record.payment_term.name}}"
+  end
+
   column :created_by, default: true, includes: [:created_by] do
     user value: :created_by
   end
@@ -61,6 +61,14 @@ class Masters::Vendors::Index < IndexBuilder::API
   IndexBuilder::API::ColumnTemplate::ControllingUser(self)
   IndexBuilder::API::ColumnTemplate::ControllingLevel(self)
   IndexBuilder::API::ColumnTemplate::ReviewProgress(self)
+
+  column :created_at, sort: true do
+    date value: :created_at
+  end
+
+  column :updated_at, sort: true do
+    date value: :updated_at
+  end
 
   counter -> (user, collection) do
     counter = IndexBuilder::Counter.new :with_status_id
@@ -106,9 +114,9 @@ class Masters::Vendors::Index < IndexBuilder::API
   end
 
   def self.status_name(context)
-    return "Processing" unless context[:record].controlling_user?(context[:user])
+    return "Processing" if context[:record].status_id == VendorStatus.id_for(:awaiting_approval) and not context[:record].controlling_user?(context[:user])
 
-    context[:record].status&.name
+    context[:record].status&.name&.titleize
   end
 
   def self.format_status(context)
