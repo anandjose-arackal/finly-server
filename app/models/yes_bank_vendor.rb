@@ -204,6 +204,12 @@ class YesBankVendor < ApplicationRecord
 
   scope :without_id, -> (id) {where.not(id: id)}
 
+  scope :filter_approved_date, -> (from, to) {
+    from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
+    to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
+    where('yes_bank_vendors.approved_at >= ? && yes_bank_vendors.approved_at <= ?', from.beginning_of_day, to.end_of_day)
+  }
+
   # Scopes for ordering ends
 
   before_validation do
