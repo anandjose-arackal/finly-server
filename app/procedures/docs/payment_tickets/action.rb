@@ -33,6 +33,7 @@ class Docs::PaymentTickets::Action < ActionManager::API
                label: "Mark as Credited",
                icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
                url: "bank_transfer/mark_as_credited.json",
+               password: true,
                authorize: :mark_as_credited?
         action :transition,
                :credit,
