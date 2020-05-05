@@ -22,8 +22,12 @@ class Masters::RateContracts::Index < IndexBuilder::API
     text value: "{{record.vendor.vendor_id}}"
   end
 
-  column :created_at, sort: :created_at do
+  column :created_at, sort: true do
     date value: :created_at
+  end
+
+  column :updated_at, sort: true do
+    date value: :updated_at
   end
 
   column :is_renewable, sort: :renewable, default: true do
