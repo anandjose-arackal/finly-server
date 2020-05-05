@@ -3,7 +3,7 @@ class Choices::Builders::CheckBox < Choices::Builders::Base
   register! :checkbox
 
   def self.call
-    self.new({choices: [{name: "true", active: true}, {name: "false", active: true}]})
+    self.new({choices: [{id: 1, name: "true", active: true}, {id: 0, name: "false", active: true}]})
   end
 
   def choices(params: {}, user: nil, form_entity: nil)

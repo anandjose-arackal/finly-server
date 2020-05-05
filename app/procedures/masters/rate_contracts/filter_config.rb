@@ -5,6 +5,6 @@ class Masters::RateContracts::FilterConfig < Filters::API
   attribute :vendor_id, label: "Vendor", simple: true, type: :dropdown,  choices: Choices[:auto_complete].("vendor")
   attribute :created_at, type: :datetime
   attribute :updated_at, type: :datetime
-  attribute :renewable, type: :checkbox, choices: Choices[:checkbox].()
+  attribute :renewable, type: :dropdown, choices: Choices[:checkbox].()
 
 end
