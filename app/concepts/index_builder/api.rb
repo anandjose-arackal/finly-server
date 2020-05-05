@@ -1,4 +1,8 @@
+require 'action_view'
+require 'action_view/helpers'
+
 class IndexBuilder::API
+  include ActionView::Helpers::DateHelper
   include Column::Builder
   include DynamicAttributes
   include IndexBuilder::Counter::DSL
