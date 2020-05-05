@@ -21,6 +21,8 @@ class Form < ApplicationRecord
   has_many :sections, class_name: 'FormSection', dependent: :destroy
   has_many :entities, class_name: "FormEntity"
   has_many :dependencies, class_name: 'FormDependency'
+  has_many :conditions, class_name: 'FormCondition'
+  has_many :validations, class_name: 'FormEntityValidation'
 
   def as_json(options = {})
     {

@@ -1,5 +1,7 @@
 class Masters::Vendors::Form < Forms::API
 
+  model YesBankVendor
+
   section :header do
     auto_number :vendor_id, sequence: {prefix: "VNDR/", start_at: '000001'}
     dropdown :status_id, choices_scope: Choices[:enum].(VendorStatus),
@@ -20,19 +22,17 @@ class Masters::Vendors::Form < Forms::API
     end
   end
 
-  condition do
-    entity :policy_id
-    property :editable
+  condition entity_path: :policy_id, id: :policy_id_status_editable do
     rule :status_id, 'in', value: VendorStatus.ids_for(:draft, :rejected, :retracted)
+    action :editable, true
   end
 
-  condition do
-    entity 'locations/name'
-    property :editable
+  condition entity_path: 'locations/name', id: :status_location_name_mandatory do
     rule :status_id, 'in', value: VendorStatus.ids_for(:draft, :rejected, :retracted)
+    action :required, false
   end
 
-  validation :name do
+  validation entity_path: :name, id: :name_cont_validation do
     rule :name, 'not_cont', value: 'Hello'
   end
 

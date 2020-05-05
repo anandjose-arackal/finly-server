@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_05_111835) do
+ActiveRecord::Schema.define(version: 2020_05_05_144233) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -4022,6 +4022,23 @@ ActiveRecord::Schema.define(version: 2020_05_05_111835) do
     t.index ["transaction_type_id"], name: "index_finly_transactions_on_transaction_type_id"
   end
 
+  create_table "form_condition_actions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
+    t.bigint "company_id", null: false
+    t.string "form_id", null: false
+    t.string "form_condition_id", null: false
+    t.string "property"
+    t.string "value"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_form_condition_actions_on_company_id"
+    t.index ["created_at"], name: "index_form_condition_actions_on_created_at"
+    t.index ["form_condition_id"], name: "index_form_condition_actions_on_form_condition_id"
+    t.index ["form_id"], name: "index_form_condition_actions_on_form_id"
+    t.index ["updated_at"], name: "index_form_condition_actions_on_updated_at"
+    t.index ["uuid"], name: "index_form_condition_actions_on_uuid"
+  end
+
   create_table "form_condition_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "deleted_at"
@@ -4036,24 +4053,27 @@ ActiveRecord::Schema.define(version: 2020_05_05_111835) do
   create_table "form_conditions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "uuid", limit: 36, null: false
     t.bigint "company_id", null: false
-    t.bigint "form_id", null: false
+    t.string "form_id", null: false
+    t.string "reference_id", null: false
     t.string "reference_type", null: false
-    t.bigint "reference_id", null: false
-    t.string "form_entity_key", null: false
-    t.integer "condition_type_id", null: false
     t.integer "created_by_id"
     t.integer "updated_by_id"
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "condition_id"
+    t.boolean "custom"
+    t.boolean "internal"
+    t.boolean "is_updated"
+    t.boolean "can_be_updated"
     t.index ["company_id"], name: "index_form_conditions_on_company_id"
-    t.index ["condition_type_id"], name: "index_form_conditions_on_condition_type_id"
     t.index ["created_at"], name: "index_form_conditions_on_created_at"
     t.index ["created_by_id"], name: "index_form_conditions_on_created_by_id"
     t.index ["deleted_at"], name: "index_form_conditions_on_deleted_at"
-    t.index ["form_entity_key"], name: "index_form_conditions_on_form_entity_key"
     t.index ["form_id"], name: "index_form_conditions_on_form_id"
-    t.index ["reference_type", "reference_id"], name: "index_form_conditions_on_reference_type_and_reference_id"
+    t.index ["reference_id", "reference_type"], name: "index_form_conditions_on_reference_id_and_reference_type"
+    t.index ["reference_id"], name: "index_form_conditions_on_reference_id"
+    t.index ["reference_type"], name: "index_form_conditions_on_reference_type"
     t.index ["updated_at"], name: "index_form_conditions_on_updated_at"
     t.index ["updated_by_id"], name: "index_form_conditions_on_updated_by_id"
     t.index ["uuid"], name: "index_form_conditions_on_uuid"
@@ -4223,6 +4243,31 @@ ActiveRecord::Schema.define(version: 2020_05_05_111835) do
     t.index ["uuid"], name: "index_form_entity_choices_on_uuid"
   end
 
+  create_table "form_entity_validations", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
+    t.bigint "company_id", null: false
+    t.string "form_id", null: false
+    t.string "form_entity_id", null: false
+    t.string "error_message", null: false
+    t.integer "created_by_id"
+    t.integer "updated_by_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "validation_id"
+    t.boolean "custom"
+    t.boolean "internal"
+    t.boolean "is_updated"
+    t.boolean "can_be_updated"
+    t.index ["company_id"], name: "index_form_entity_validations_on_company_id"
+    t.index ["created_at"], name: "index_form_entity_validations_on_created_at"
+    t.index ["created_by_id"], name: "index_form_entity_validations_on_created_by_id"
+    t.index ["form_entity_id"], name: "index_form_entity_validations_on_form_entity_id"
+    t.index ["form_id"], name: "index_form_entity_validations_on_form_id"
+    t.index ["updated_at"], name: "index_form_entity_validations_on_updated_at"
+    t.index ["updated_by_id"], name: "index_form_entity_validations_on_updated_by_id"
+    t.index ["uuid"], name: "index_form_entity_validations_on_uuid"
+  end
+
   create_table "form_rule_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "deleted_at"
@@ -4237,15 +4282,15 @@ ActiveRecord::Schema.define(version: 2020_05_05_111835) do
   create_table "form_rules", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "uuid", limit: 36, null: false
     t.bigint "company_id", null: false
-    t.bigint "form_id", null: false
-    t.string "rule_parent_type"
-    t.bigint "rule_parent_id"
-    t.bigint "form_entity_id", null: false
+    t.string "form_id", null: false
+    t.string "rule_parent_id", null: false
+    t.string "rule_parent_type", null: false
+    t.string "form_entity_id", null: false
     t.string "predicate", null: false
-    t.string "rule_type_id", null: false
+    t.integer "rule_type_id", null: false
     t.text "match_value"
     t.string "match_formula"
-    t.integer "match_entity_id", null: false
+    t.string "match_entity_id", null: false
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -4255,7 +4300,9 @@ ActiveRecord::Schema.define(version: 2020_05_05_111835) do
     t.index ["form_entity_id"], name: "index_form_rules_on_form_entity_id"
     t.index ["form_id"], name: "index_form_rules_on_form_id"
     t.index ["match_entity_id"], name: "index_form_rules_on_match_entity_id"
-    t.index ["rule_parent_type", "rule_parent_id"], name: "index_form_rules_on_rule_parent_type_and_rule_parent_id"
+    t.index ["rule_parent_id", "rule_parent_type"], name: "index_form_rules_on_rule_parent_id_and_rule_parent_type"
+    t.index ["rule_parent_id"], name: "index_form_rules_on_rule_parent_id"
+    t.index ["rule_parent_type"], name: "index_form_rules_on_rule_parent_type"
     t.index ["rule_type_id"], name: "index_form_rules_on_rule_type_id"
     t.index ["updated_at"], name: "index_form_rules_on_updated_at"
     t.index ["uuid"], name: "index_form_rules_on_uuid"
@@ -10002,9 +10049,6 @@ ActiveRecord::Schema.define(version: 2020_05_05_111835) do
   add_foreign_key "finly_transactions", "payment_purposes"
   add_foreign_key "finly_transactions", "payments"
   add_foreign_key "finly_transactions", "transaction_types"
-  add_foreign_key "form_conditions", "forms"
-  add_foreign_key "form_rules", "form_entities"
-  add_foreign_key "form_rules", "forms"
   add_foreign_key "individual_kyc_tracks", "individual_kycs"
   add_foreign_key "individual_kycs", "admin_review_workflows"
   add_foreign_key "individual_kycs", "companies"

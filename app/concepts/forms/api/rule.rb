@@ -20,9 +20,9 @@ class Forms::API::Rule
       value = [value] if  value.present? and not value.respond_to?(:each)
 
       match_type_id = nil
-      match_type_id = FormRuleType.id_for(:value) if value.present?
-      match_type_id = FormRuleType.id_for(:formula) if formula.present?
-      match_type_id = FormRuleType.id_for(:entity) if match_entity_path.present?
+      # match_type_id = FormRuleType.id_for(:value) if value.present?
+      # match_type_id = FormRuleType.id_for(:formula) if formula.present?
+      # match_type_id = FormRuleType.id_for(:entity) if match_entity_path.present?
 
       rules << Forms::API::Rule.new(
           entity_path: entity_path,
