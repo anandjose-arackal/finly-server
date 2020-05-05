@@ -38,15 +38,15 @@ class Forms::Synchronizer
     entity_model = section_model.entities.where(form_id: form_model.id, form_section_id: section_model.id, field_key: entity.field_key, parent: parent).first
 
     unless entity_model.present?
-      entity_model = section_model.entities.new entity.schema.except(:section, :choices, :choices_provider)
+      entity_model = section_model.entities.new entity.schema.except(:section, :choices, :choices_scope)
       entity_model.parent = parent
       # Todo broken because of generalizing choices provider to be reused with filters
-      if entity.schema[:choices_provider].present?
-        entity_model.choices_provider = entity.schema[:choices_provider].as_json
-        if entity.schema&.dig(:choices_provider)&.config[:choices]&.present?
+      if entity.schema[:choices_scope].present?
+        entity_model.choices_scope = entity.schema[:choices_scope].as_json
+        if entity.schema&.dig(:choices_scope)&.config[:choices]&.present?
           pos = 0
           choices = []
-          entity.schema&.dig(:choices_provider).config[:choices].each do |choice|
+          entity.schema&.dig(:choices_scope).config[:choices].each do |choice|
             choices << {
                 name: choice[:name],
                 active: choice[:active],

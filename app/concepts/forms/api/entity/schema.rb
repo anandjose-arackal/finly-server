@@ -9,11 +9,18 @@ module Forms::API::Entity::Schema
     def schema
       return @class_schema if @class_schema
 
-      if self == Forms::API::Entity::Base
-        @class_schema ||= {options: {}}
-      else
-        @class_schema ||= Forms::API::Entity::Base.schema.deep_dup
-      end
+      @class_schema ||= {options: {}}
+
+      # if self == Forms::API::Entity::Base
+      #   @class_schema ||= {options: {}}
+      # else
+      #   @class_schema ||= Forms::API::Entity::Base.schema.deep_dup
+      # end
+    end
+
+    # This will be set during inheritance of Forms::Entity::Base
+    def schema=(value)
+      @class_schema = value
     end
 
     # Attribute is saved directly to the model and is comment for all types
@@ -107,14 +114,6 @@ module Forms::API::Entity::Schema
 
   alias_method :choices=, :choices
 
-  def scope(value = NoObject)
-    return nil unless self.class.consumes_choices?
-
-    @scope = value unless value == NoObject
-    @scope
-  end
-
-  alias_method :scope=, :scope
   def valid?
     self.class.valid_schema?(self.schema)
   end

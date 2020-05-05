@@ -29,7 +29,7 @@ class Forms::API::Entity::Base
   attribute :dependent, default: false
   attribute :conditional_required, default: false
   attribute :multiple, default: false
-  attribute :choices_provider
+  attribute :choices_scope
   attribute :internal, default: false
   attribute :is_modified, default: false
   attribute :populate_if_empty
@@ -104,6 +104,11 @@ class Forms::API::Entity::Base
         instance_eval &entity.build
       end
     end
+  end
+
+  def self.inherited(sub_klass)
+    super(sub_klass)
+    sub_klass.schema = self.schema.deep_dup
   end
 end
 

@@ -22,8 +22,8 @@ class Forms::API::Dependency
             controlling_entity_key: controlling_entity.field_key,
             dependent_entity: dependent_entity,
             dependent_entity_key: dependent_entity.field_key,
-            controlling_choice: controlling_entity.choices_provider.find_by_name(controlling_choice, user: user),
-            dependent_choice: dependent_entity.choices_provider.find_by_name(dependent_choice, user: user)
+            controlling_choice: controlling_entity.choices_scope.find_by_name(controlling_choice, user: user),
+            dependent_choice: dependent_entity.choices_scope.find_by_name(dependent_choice, user: user)
         }
       end
 
@@ -34,7 +34,7 @@ class Forms::API::Dependency
           controlling_entity_key: controlling_entity.field_key,
           dependent_entity: dependent_entity,
           dependent_entity_key: dependent_entity.field_key,
-          controlling_choice: controlling_entity.choices_provider.find_by_name(controlling_choice, user: user),
+          controlling_choice: controlling_entity.choices_scope.find_by_name(controlling_choice, user: user),
           dependent_required: self.dependent_required,
           dependent_editable: self.dependent_editable,
           dependent_visible: self.dependent_visible,

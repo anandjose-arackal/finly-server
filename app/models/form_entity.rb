@@ -42,7 +42,7 @@
 #  deleted_at                   :datetime
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
-#  choices_provider             :text(65535)
+#  choices_scope             :text(65535)
 #  internal                     :boolean          default(FALSE)
 #  is_modified                  :boolean          default(FALSE)
 #  field_path                   :string(255)
@@ -69,7 +69,7 @@ class FormEntity < ApplicationRecord
 
   serialize :options, JSON
   serialize :chained, JSON
-  serialize :choices_provider, JSON
+  serialize :choices_scope, JSON
 
   scope :root, -> {where parent_id: nil}
   scope :system_fields, -> {where.not custom_field: true}
@@ -83,7 +83,7 @@ class FormEntity < ApplicationRecord
     Object.const_get(val)
   end
 
-  def choices_provider
+  def choices_scope
     val = super()&.with_indifferent_access
     return nil unless val.present?
 
@@ -91,7 +91,7 @@ class FormEntity < ApplicationRecord
   end
 
   def choices(params: {}, user:)
-    choices_provider&.choices(params: params, user: user)
+    choices_scope&.choices(params: params, user: user)
   end
 
   def schema
@@ -126,7 +126,7 @@ class FormEntity < ApplicationRecord
         allow_clearing_default_value: allow_clearing_default_value,
         options: options,
         chained: chained,
-        choices_provider: choices_provider&.config,
+        choices_scope: choices_scope&.config,
         internal: internal,
         field_path: field_path
     }

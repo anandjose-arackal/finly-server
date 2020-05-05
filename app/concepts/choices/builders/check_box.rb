@@ -1,6 +1,6 @@
-class Choices::Builders::CheckBox < Choices::Builders::Base
+class Choices::Builders::Switch < Choices::Builders::Base
 
-  register! :checkbox
+  register! :switch
 
   def self.call
     self.new({choices: [{name: "true", active: true}, {name: "false", active: true}]})

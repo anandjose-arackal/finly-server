@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_02_185834) do
+ActiveRecord::Schema.define(version: 2020_05_05_111835) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -4182,7 +4182,7 @@ ActiveRecord::Schema.define(version: 2020_05_02_185834) do
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.text "choices_provider"
+    t.text "choices_scope"
     t.boolean "internal", default: false
     t.boolean "is_modified", default: false
     t.string "field_path"
@@ -4243,7 +4243,7 @@ ActiveRecord::Schema.define(version: 2020_05_02_185834) do
     t.bigint "form_entity_id", null: false
     t.string "predicate", null: false
     t.string "rule_type_id", null: false
-    t.string "match_value"
+    t.text "match_value"
     t.string "match_formula"
     t.integer "match_entity_id", null: false
     t.datetime "deleted_at"

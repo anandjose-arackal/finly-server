@@ -6,11 +6,11 @@ class Forms::API::Entity::Types::DropDown < Forms::API::Entity::Base
 
   consumes_choices!
 
-  option :min_choices
-  option :max_choices
+  option :min_items
+  option :min_items
 
   contract do
-    optional(:min_choices).value(:int?)
-    optional(:max_choices).value(:int?)
+    optional(:min_items).value(:int?)
+    optional(:min_items).value(:int?)
   end
 end

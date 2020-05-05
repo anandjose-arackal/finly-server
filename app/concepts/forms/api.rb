@@ -11,26 +11,14 @@ class Forms::API
     sections << Forms::API::Entity::Section.new(self, name, options, &block)
   end
 
-  def self.collection(name, options = {}, &block)
-    sections << Forms::API::Entity::Section.new(self, name, {collection: true}.merge(options), &block)
+  def self.condition(&block)
+    conditions << Forms::API::Condition.new(&block)
   end
 
-  # def self.dependency(map)
-  #   dependencies << Forms::API::Dependency.new(map)
-  # end
-
-  def self.condition(type, &block)
-    conditions << Form::API::Condition.new(type, &block)
-  end
-
-  def self.validation(entity_key, validation = nil, &block)
-    validations << Form::API::Validation.new(entity_key, validation, &block)
+  def self.validation(entity_path, &block)
+    validations << Forms::API::Validation.new(entity_path, &block)
   end
   singleton_class.send(:alias_method, :validate, :validation)
-
-  # def validate(entity_key, validation = nil, &block)
-  #   validation(entity_key, validation, block)
-  # end
 
   def self.find_entity(field_path)
     sections.each do |section|

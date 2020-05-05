@@ -13,6 +13,6 @@ class Masters::Items::FilterConfig < Filters::API
   attribute :unit_of_measurement, type: :text
   # attribute :created_by, type: :dropdown, choices: Choices[:lookup].('users', permissions: [:item_master_manager])
   attribute :item_expense_type_id, label: "Expense Type", type: :dropdown, simple: true, choices: Choices[:enum].(ItemExpenseType)
-  attribute :tds_applicable, choices: Choices[:checkbox].()
+  attribute :tds_applicable, choices: Choices[:switch].()
 
 end

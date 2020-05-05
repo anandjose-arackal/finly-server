@@ -33,8 +33,8 @@ class CreateFormEntityConditions < ActiveRecord::Migration[5.2]
       t.references :rule_parent, polymorphic: true, index: true
       t.references :form_entity, foreign_key: true, index: true, null: false
       t.string :predicate, null: false
-      t.string :rule_type_id, index: true, references: 'form_entity_rule_types', foreign_key: true, null: false
-      t.string :match_value
+      t.string :rule_type_id, index: true, references: 'form_rule_types', foreign_key: true, null: false
+      t.text :match_value
       t.string :match_formula
       t.integer :match_entity_id, references: 'form_entities', index: true, foreign_key: true, null: false
 
