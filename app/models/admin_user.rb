@@ -80,6 +80,10 @@ class AdminUser < ApplicationRecord
     true
   end
 
+  def active?
+    true
+  end
+
   # overriding devise's default method so that it compares against both email and phone number to authenticate
   def self.find_for_database_authentication(conditions={})
     find_by(email: conditions[:username])

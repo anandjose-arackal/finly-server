@@ -29,6 +29,7 @@ class Vendors::Index < Vendors::Base
     has_scope :sort_created_at
     has_scope :sort_business_name
     has_scope :filter_ids, type: :array
+    has_scope :filter_approved_date, using: [:from, :to], type: :hash
     
     def init
       # Todo temp workaround because of frontend format issue - START
