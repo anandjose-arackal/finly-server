@@ -9,4 +9,6 @@ class FormEntityValidation < ApplicationRecord
 
   has_many :rules, class_name: 'FormRule', as: :rule_parent
 
+  accepts_nested_attributes_for :rules
+
 end

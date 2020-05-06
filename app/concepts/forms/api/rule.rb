@@ -9,6 +9,10 @@ class Forms::API::Rule
     end
   end
 
+  def build(company, form_model)
+
+  end
+
   module Forms::API::Rule::DSL
     extend ActiveSupport::Concern
 

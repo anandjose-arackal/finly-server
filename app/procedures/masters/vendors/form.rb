@@ -33,6 +33,7 @@ class Masters::Vendors::Form < Forms::API
   end
 
   validation entity_path: :name, id: :name_cont_validation do
+    error_message "Name cannot contain Hello"
     rule :name, 'not_cont', value: 'Hello'
   end
 
