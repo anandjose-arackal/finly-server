@@ -9,6 +9,7 @@ class CreateFormEntityValidations < ActiveRecord::Migration[5.2]
       t.integer :created_by_id, index: true, references: 'users'
       t.integer :updated_by_id, index: true, references: 'users'
 
+      t.datetime :deleted_at, index: true
       t.timestamps null: false, index: true
     end
   end

@@ -42,4 +42,12 @@ class FormEntityValidation < ApplicationRecord
     )
   end
 
+  def as_json(options={})
+    {
+        entity_path: entity_path,
+        error_message: error_message,
+        rules: rules
+    }
+  end
+
 end

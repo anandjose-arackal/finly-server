@@ -36,7 +36,7 @@ class Masters::Vendors::Form < Forms::API
 
   validation entity_path: :name, validation_id: :name_cont_validation do
     self.error_message = "Name cannot contain Hello"
-    rule :name, 'not_cont', value: 'Hello'
+    rule 'locations/name', 'not_cont', value: 'Hello'
   end
 
 end

@@ -49,4 +49,14 @@ class FormCondition < ApplicationRecord
         match_entity_path: match_entity_path
     )
   end
+
+  def as_json(options={})
+    {
+        reference_type: reference_type,
+        reference_key: reference_key,
+        rules: rules,
+        actions: actions
+    }
+  end
+
 end
