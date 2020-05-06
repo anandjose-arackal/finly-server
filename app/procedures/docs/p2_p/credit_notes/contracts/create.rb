@@ -17,7 +17,7 @@ class Docs::P2P::CreditNotes::Contracts::Create < Reform::Form
   property :current_user, virtual: true
   property :status_id, default: CreditNoteStatus.id_for(:draft)
 
-  collection :items, populate_if_emtpy: CreditNoteItem, populator: :items! do
+  collection :items, populate_if_empty: CreditNoteItem, populator: :items! do
     # property :credit_note_item_type_id, validates:{ presence: true }
     property :item_id, validates: {presence: true}
     property :invoice_item_id, validates: {presence: true}

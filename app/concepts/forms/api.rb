@@ -4,7 +4,7 @@ class Forms::API
   class_attr :sections, default: []
   class_attr :conditions, default: {}
   class_attr :validations, default: {}
-  # class_attr :dependencies, default: []
+  class_attr :dependencies, default: []
   class_attr :model
 
   def self.section(name, options = {}, &block)

@@ -13,12 +13,6 @@ class Forms::Synchronizer
       form.sections.each do |section|
         sync_section company, form_model, section
       end
-      form.conditions.each do |condition|
-        sync_condition company, form_model, condition
-      end
-      form.validations.each do |validation|
-        sync_validation company, form_model, validation
-      end
       form.dependencies.each do |dependency|
         sync_dependency company, form_model, dependency
       end
@@ -81,14 +75,6 @@ class Forms::Synchronizer
     end
 
     entity_model
-  end
-
-  def self.sync_condition(company, form_model, condition)
-    condition.sync company.users.first, form_model
-  end
-
-  def self.sync_validation(company, form_model, validation)
-    validation.sync company.users.first, form_model
   end
 
   def self.sync_dependency(company, form_model, dependency)

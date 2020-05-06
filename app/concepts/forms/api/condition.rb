@@ -4,9 +4,7 @@ class Forms::API::Condition
 
   instance_attr :entity_path
   instance_attr :id
-  instance_attr :custom, default: false
   instance_attr :internal, default: true
-  instance_attr :is_updated, default: false
   instance_attr :can_be_updated, default: false
   instance_attr :actions, default: []
   instance_attr :rules, default: []
@@ -24,10 +22,6 @@ class Forms::API::Condition
 
   def action(property, value)
     actions << Action.new(property: property, value: value)
-  end
-
-  def sync(company, form_model)
-    # form_model.conditions.find_or_create condition_key:
   end
 
   class Forms::API::Condition::Action
