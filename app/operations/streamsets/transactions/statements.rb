@@ -19,7 +19,7 @@ class Streamsets::Transactions::Statements < BaseOperation
 
     start_date = Date.parse(start_date) rescue Date.today.beginning_of_month
     end_date = Date.parse(end_date) rescue Date.today
-    self.payments = Payment.where(id: payment_ids).or(Payment.where(receiving_account_type: 'UserPocket', company_id: user.company_id, created_at: start_date..end_date))
+    self.payments = Payment.where(id: payment_ids).or(Payment.where(receiving_account_type: ['UserPocket', 'UserWallet', 'Card'], company_id: user.company_id, created_at: start_date..end_date, payment_status_id: PaymentStatus.id_for(:completed)))
   end
 
   def success
