@@ -59,6 +59,7 @@ class IndexBuilder::API::Column
 
       class_attr :columns, default: {}
       class_attr :fixed_column
+      class_attr :selectable, default: true
     end
 
     class_methods do

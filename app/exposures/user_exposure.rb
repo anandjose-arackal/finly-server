@@ -9,5 +9,9 @@ class UserExposure < Exposures::API
   attribute :location, record_attribute: true, exposure: true
   attribute :department, record_attribute: true, exposure: true
   attribute :cost_center, record_attribute: true, exposure: true
+  attribute :created_at, record_attribute: true
+  attribute :updated_at, record_attribute: true
+  attribute :last_activity_at, record_attribute: true
+  attribute :profile, record_attribute: true, exposure: true
 
 end

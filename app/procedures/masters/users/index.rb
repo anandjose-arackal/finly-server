@@ -27,32 +27,27 @@ class Masters::Users::Index < IndexBuilder::API
     indicator value: :user_status, format: :format_status
   end
 
-  column :location, sort: :location_name, default: true do
-    text value: "{{record.location.name}}"
-  end
-
-  column :department, sort: :department_name, default: true do
-    text value: "{{record.department.name}}"
-  end
-
-  column :cost_center, sort: :cost_center_name, default: true do
-    text value: "{{record.cost_center.name}}"
-  end
+  # Todo this has to be enabled once we give companies an option to set cost center, location and department of the user
+  # column :location, sort: :location_name, default: true do
+  #   text value: "{{record.location.name}}"
+  # end
+  #
+  # column :department, sort: :department_name, default: true do
+  #   text value: "{{record.department.name}}"
+  # end
+  #
+  # column :cost_center, sort: :cost_center_name, default: true do
+  #   text value: "{{record.cost_center.name}}"
+  # end
 
   column :last_activity_at, sort: :last_activity_at, default: true do
     text value: -> (context) do
       user = context[:record]
       if user.last_activity_at
-        days = (Time.now - user.last_activity_at).to_i / 1.day
-        if days == 0
-          'Today'
-        elsif days == 1
-          'Yesterday'
-        else
-          "#{days} days ago"
-        end
+        val = time_ago_in_words(user.last_activity_at)
+        "#{val} ago" if val.present?
       else
-        'Never'
+        "Never"
       end
     end
   end

@@ -6,7 +6,7 @@ class Docs::P2P::PurchaseRequests::FilterConfig < Filters::API
   attribute :updated_at, type: :datetime, simple: true
   attribute :submitted_at, type: :datetime, simple: true
   attribute :approved_at, type: :datetime
-  attribute :total_amount, type: :number
+  attribute :total_amount_value, type: :number
   attribute :items_item_description, label: 'Description', type: :text, simple: true
   attribute :items_cost_center_id, label: 'Cost Center', type: :dropdown, choices: Choices[:lookup].('cost_centers')
   attribute :items_department_id, label: 'Department', type: :dropdown, choices: Choices[:lookup].('departments')

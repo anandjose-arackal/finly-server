@@ -33,6 +33,7 @@ class GeneralInvoiceExposure < Exposures::API
   attribute :narration, record_attribute: true
   attribute :invoice_number, record_attribute: true
   attribute :created_at, record_attribute: true
+  attribute :updated_at, record_attribute: true
   attribute :gross_amount, record_attribute: true, exposure: true, includes: [:gross_amount]
   attribute :gross_amount_value, includes: [:gross_amount] do
     record.gross_amount&.value || 0

@@ -135,6 +135,14 @@ class Docs::P2P::Invoices::Agreement::UpcomingInvoices::Index < IndexBuilder::AP
     text value: "{{record.payment_agreement.policy.name}}"
   end
 
+  column :created_at, sort: true do
+    date value: :created_at
+  end
+
+  column :updated_at, sort: true do
+    date value: :updated_at
+  end
+
   column :action, default: true do
     action :template,
            :create,

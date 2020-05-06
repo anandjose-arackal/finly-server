@@ -3,7 +3,7 @@ class Docs::P2P::Inwards::Pending::Index < IndexBuilder::API
 
   resolver 'inward_documents.pending'
   reference '{{record.procurement_id}}'
-  custom_fields :purchase_order
+  selectable false
 
   # Fixed column is always default true
   column :vendor, label: 'Vendor Details', fixed: true, sort: :vendor_business_name, includes: [:vendor] do

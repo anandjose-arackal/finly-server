@@ -12,6 +12,7 @@ class YesBankVendorExposure < Exposures::API
   attribute :submitted_at, record_attribute: true
   attribute :approved_at, record_attribute: true
   attribute :created_at, record_attribute: true
+  attribute :updated_at, record_attribute: true
   attribute :created_by, record_attribute: true, exposure: true
   attribute :policy, record_attribute: true, exposure: true
   attribute :status, record_attribute: true, exposure: true
@@ -20,5 +21,6 @@ class YesBankVendorExposure < Exposures::API
   attribute :gl_name do
     record.business_name
   end
+  attribute :payment_term, record_attribute: true, exposure: true
 
 end

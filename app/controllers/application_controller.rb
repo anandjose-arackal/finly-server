@@ -345,6 +345,7 @@ class ApplicationController < ActionController::Base
     end
 
     verify_user_session(doorkeeper_token)
+    current_user&.update(last_activity_at: DateTime.now)
   end
 
   def verify_user_session(doorkeeper_token)

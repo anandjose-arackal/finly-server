@@ -129,7 +129,6 @@ class Docs::UtilityBills::Bills::Index < IndexBuilder::API
         (counts[BbpsBillStatus.id_for(:retracted)].to_i)
     )
 
-    Awaiting Approval
     if user.has_permission?(awaiting_approval_roles)
       counter.add 91, 'Awaiting Approval', BbpsBill.awaiting_action_items(user.id).count
     end

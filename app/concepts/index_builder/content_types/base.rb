@@ -1,4 +1,7 @@
+require 'action_view'
+require 'action_view/helpers'
 class IndexBuilder::ContentTypes::Base
+  include ActionView::Helpers::DateHelper
   include DynamicAttributes
 
   attr_accessor :params

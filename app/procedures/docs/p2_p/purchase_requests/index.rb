@@ -13,8 +13,12 @@ class Docs::P2P::PurchaseRequests::Index < IndexBuilder::API
     text value: :request_id, format: 'primary'
   end
 
-  column :created_at, sort: :created_at do
+  column :created_at, sort: true do
     date value: :created_at
+  end
+
+  column :updated_at, sort: true do
+    date value: :updated_at
   end
 
   column :submitted_at, sort: :submitted_at, default: true do

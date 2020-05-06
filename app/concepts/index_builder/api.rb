@@ -1,4 +1,8 @@
+require 'action_view'
+require 'action_view/helpers'
+
 class IndexBuilder::API
+  include ActionView::Helpers::DateHelper
   include Column::Builder
   include DynamicAttributes
   include IndexBuilder::Counter::DSL
@@ -20,7 +24,7 @@ class IndexBuilder::API
   end
 
   def self.config(user)
-    config = {fixed: [], dynamic: []}
+    config = {selectable: self.selectable, fixed: [], dynamic: []}
     columns.each do |column_key, column|
       if column.fixed
         config[:fixed] << column.config(user)
