@@ -20,4 +20,12 @@ class FormsController < BaseControllers::WebBase
     end
   end
 
+  def form_conditions
+    endpoint Forms::Ops::Conditions
+  end
+
+  def form_validations
+
+  end
+
 end

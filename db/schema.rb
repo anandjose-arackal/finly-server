@@ -4054,7 +4054,7 @@ ActiveRecord::Schema.define(version: 2020_05_05_144233) do
     t.string "uuid", limit: 36, null: false
     t.bigint "company_id", null: false
     t.string "form_id", null: false
-    t.string "reference_id", null: false
+    t.string "reference_key", null: false
     t.string "reference_type", null: false
     t.integer "created_by_id"
     t.integer "updated_by_id"
@@ -4071,8 +4071,7 @@ ActiveRecord::Schema.define(version: 2020_05_05_144233) do
     t.index ["created_by_id"], name: "index_form_conditions_on_created_by_id"
     t.index ["deleted_at"], name: "index_form_conditions_on_deleted_at"
     t.index ["form_id"], name: "index_form_conditions_on_form_id"
-    t.index ["reference_id", "reference_type"], name: "index_form_conditions_on_reference_id_and_reference_type"
-    t.index ["reference_id"], name: "index_form_conditions_on_reference_id"
+    t.index ["reference_key"], name: "index_form_conditions_on_reference_key"
     t.index ["reference_type"], name: "index_form_conditions_on_reference_type"
     t.index ["updated_at"], name: "index_form_conditions_on_updated_at"
     t.index ["updated_by_id"], name: "index_form_conditions_on_updated_by_id"
@@ -4247,7 +4246,7 @@ ActiveRecord::Schema.define(version: 2020_05_05_144233) do
     t.string "uuid", limit: 36, null: false
     t.bigint "company_id", null: false
     t.string "form_id", null: false
-    t.string "form_entity_id", null: false
+    t.string "entity_path", null: false
     t.string "error_message", null: false
     t.integer "created_by_id"
     t.integer "updated_by_id"
@@ -4261,7 +4260,7 @@ ActiveRecord::Schema.define(version: 2020_05_05_144233) do
     t.index ["company_id"], name: "index_form_entity_validations_on_company_id"
     t.index ["created_at"], name: "index_form_entity_validations_on_created_at"
     t.index ["created_by_id"], name: "index_form_entity_validations_on_created_by_id"
-    t.index ["form_entity_id"], name: "index_form_entity_validations_on_form_entity_id"
+    t.index ["entity_path"], name: "index_form_entity_validations_on_entity_path"
     t.index ["form_id"], name: "index_form_entity_validations_on_form_id"
     t.index ["updated_at"], name: "index_form_entity_validations_on_updated_at"
     t.index ["updated_by_id"], name: "index_form_entity_validations_on_updated_by_id"
@@ -4285,21 +4284,21 @@ ActiveRecord::Schema.define(version: 2020_05_05_144233) do
     t.string "form_id", null: false
     t.string "rule_parent_id", null: false
     t.string "rule_parent_type", null: false
-    t.string "form_entity_id", null: false
+    t.string "entity_path", null: false
     t.string "predicate", null: false
     t.integer "rule_type_id", null: false
     t.text "match_value"
     t.string "match_formula"
-    t.string "match_entity_id", null: false
+    t.string "match_entity_path", null: false
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["company_id"], name: "index_form_rules_on_company_id"
     t.index ["created_at"], name: "index_form_rules_on_created_at"
     t.index ["deleted_at"], name: "index_form_rules_on_deleted_at"
-    t.index ["form_entity_id"], name: "index_form_rules_on_form_entity_id"
+    t.index ["entity_path"], name: "index_form_rules_on_entity_path"
     t.index ["form_id"], name: "index_form_rules_on_form_id"
-    t.index ["match_entity_id"], name: "index_form_rules_on_match_entity_id"
+    t.index ["match_entity_path"], name: "index_form_rules_on_match_entity_path"
     t.index ["rule_parent_id", "rule_parent_type"], name: "index_form_rules_on_rule_parent_id_and_rule_parent_type"
     t.index ["rule_parent_id"], name: "index_form_rules_on_rule_parent_id"
     t.index ["rule_parent_type"], name: "index_form_rules_on_rule_parent_type"

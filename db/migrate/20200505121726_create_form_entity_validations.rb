@@ -4,7 +4,7 @@ class CreateFormEntityValidations < ActiveRecord::Migration[5.2]
       t.uuid :uuid
       t.references :company, index: true, null: false
       t.string :form_id, index: true, null: false
-      t.string :form_entity_id, index: true, null: false
+      t.string :entity_path, index: true, null: false
       t.string :error_message, null: false
       t.integer :created_by_id, index: true, references: 'users'
       t.integer :updated_by_id, index: true, references: 'users'

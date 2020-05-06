@@ -22,18 +22,20 @@ class Masters::Vendors::Form < Forms::API
     end
   end
 
-  condition entity_path: :policy_id, id: :policy_id_status_editable do
+  condition condition_id: :policy_id_status_editable do
+    reference :entity, :policy_id
     rule :status_id, 'in', value: VendorStatus.ids_for(:draft, :rejected, :retracted)
     action :editable, true
   end
 
-  condition entity_path: 'locations/name', id: :status_location_name_mandatory do
+  condition condition_id: :status_location_name_mandatory do
+    reference :entity, 'locations/name'
     rule :status_id, 'in', value: VendorStatus.ids_for(:draft, :rejected, :retracted)
     action :required, false
   end
 
-  validation entity_path: :name, id: :name_cont_validation do
-    error_message "Name cannot contain Hello"
+  validation entity_path: :name, validation_id: :name_cont_validation do
+    self.error_message = "Name cannot contain Hello"
     rule :name, 'not_cont', value: 'Hello'
   end
 

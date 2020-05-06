@@ -1,6 +1,7 @@
 class Forms::API
   include DynamicAttributes
 
+  class_attr :form_key
   class_attr :sections, default: []
   class_attr :conditions, default: {}
   class_attr :validations, default: {}
@@ -12,21 +13,20 @@ class Forms::API
   end
 
   def self.condition(params = {}, &block)
-    condition = Forms::API::Condition.new(params, &block)
-    if conditions[condition.id].present?
-      raise "Validation #{condition.id} is not unique"
+    condition = FormCondition.system_condition(params, &block)
+    if conditions[condition.condition_id].present?
+      raise "Validation #{condition.condition_id} is not unique"
     end
-    conditions[condition.id] = condition
+    conditions[condition.condition_id] = condition
   end
 
   def self.validation(params, &block)
-    validation = Forms::API::Validation.new(params, &block)
-    if validations[validation.id].present?
-      raise "Validation #{validation.id} is not unique"
+    validation = FormEntityValidation.system_validation(params, &block)
+    if validations[validation.validation_id].present?
+      raise "Validation #{validation.validation_id} is not unique"
     end
-    validations[validation.id] = validation
+    validations[validation.validation_id] = validation
   end
-
   singleton_class.send(:alias_method, :validate, :validation)
 
   def self.find_entity(field_path)
