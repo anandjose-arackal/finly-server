@@ -24,7 +24,7 @@ class IndexBuilder::API
   end
 
   def self.config(user)
-    config = {fixed: [], dynamic: []}
+    config = {selectable: self.selectable, fixed: [], dynamic: []}
     columns.each do |column_key, column|
       if column.fixed
         config[:fixed] << column.config(user)
