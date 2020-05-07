@@ -37,6 +37,21 @@ PaymentProcessorRules::Checker.new 'PaymentChecker' do
           end
         end
       end
+
+      rule "BBPS Bills cannot have more than one non-failed payment attached to them" do
+        payment = params[:payment]
+        if payment.parent_type == "BbpsBill"
+          bill = payment.parent
+          non_failed_payments = bill.payments.without_id(payment.id).all_except_failed
+          if non_failed_payments.present?
+            add_system_message :error, payment, "This payment cannot be processed as there is a payment already pending against this bill"
+            message "This payment cannot be processed as there is a payment already pending against this bill"
+            # also marking the payment as failed here
+            payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+            fail
+          end
+        end
+      end
     end
   end
 
