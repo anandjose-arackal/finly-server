@@ -10,25 +10,15 @@ class FormsController < BaseControllers::WebBase
     endpoint Forms::Ops::Config
   end
 
-  def form_dependency_config
-    endpoint Forms::Ops::Config
+  def form_dependencies
+    endpoint Forms::Ops::Dependencies do |m|
+      m.success { |op| render json: op[:dependencies], status: 200 }
+    end
   end
 
   def form_entity_choices
     endpoint Forms::Ops::Choices do |m|
       m.success { |result| render json: result[:choices] }
-    end
-  end
-
-  def form_conditions
-    endpoint Forms::Ops::Conditions do |m|
-      m.success { |op| render json: op[:conditions], status: 200 }
-    end
-  end
-
-  def form_validations
-    endpoint Forms::Ops::Validations do |m|
-      m.success { |op| render json: op[:validations], status: 200 }
     end
   end
 

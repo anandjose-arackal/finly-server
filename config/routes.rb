@@ -4172,10 +4172,7 @@ Rails.application.routes.draw do
 
   # get 'form_entities', to: 'form_entities#index'
   # resources :form_entities
-  get 'forms/:route/conditions', to: 'forms#form_conditions'
-  get 'forms/:route/validations', to: 'forms#form_validations'
-  get 'forms/:route/config', to: 'forms#form_config'
-  get 'forms/:route/dependency', to: 'forms#form_dependency_config'
+  get 'forms/:route/dependencies', to: 'forms#form_dependencies'
   post 'forms/:route/entities/:entity_field_key/choices', to: 'forms#form_entity_choices'
   resources :forms
 
