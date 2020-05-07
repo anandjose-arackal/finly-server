@@ -10,7 +10,11 @@ class Forms::API::Entity::Types::DropDown < Forms::API::Entity::Base
   option :min_items
 
   contract do
-    optional(:min_items).value(:int?)
-    optional(:min_items).value(:int?)
+    required(:options) do
+      hash do
+        optional(:min_items).value(:int?)
+        optional(:min_items).value(:int?)
+      end
+    end
   end
 end

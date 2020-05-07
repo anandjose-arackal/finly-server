@@ -4,15 +4,19 @@ class Forms::API::Entity::Types::AutoNumber < Forms::API::Entity::Base
 
   consumes_choices!
 
-  option :sequence
+  config :sequence
 
   operators :eq_any, :not_eq_all, :cont_any, :not_cont_all, :blank, :present
 
   contract do
-    required(:sequence) do
+    required(:config) do
       hash do
-        required(:prefix).filled
-        required(:start_at).filled
+        required(:sequence) do
+          hash do
+            required(:prefix).filled
+            required(:start_at).filled
+          end
+        end
       end
     end
   end

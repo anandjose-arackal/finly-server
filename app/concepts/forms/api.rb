@@ -33,9 +33,9 @@ class Forms::API
   end
   singleton_class.send(:alias_method, :validate, :validation)
 
-  def self.find_entity(field_path)
+  def self.find_entity(entity_path)
     sections.each do |section|
-      entity = section.find_entity field_path
+      entity = section.find_entity entity_path
       return entity if entity
     end
     nil

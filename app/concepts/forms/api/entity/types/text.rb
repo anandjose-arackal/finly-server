@@ -9,11 +9,15 @@ class Forms::API::Entity::Types::Text < Forms::API::Entity::Base
   operators :eq_any, :not_eq_all, :cont_any, :not_cont_all, :blank, :present
 
   contract do
-    required(:char_limit).value(:int?, lteq?: 255)
-    optional(:regex).hash do
-      required(:format).filled
-      required(:message).filled
+    required(:options) do
+      hash do
+        required(:char_limit).value(:int?, lteq?: 255)
+        optional(:regex).hash do
+          required(:format).filled
+          required(:message).filled
+        end
+        optional(:format)
+      end
     end
-    optional(:format)
   end
 end

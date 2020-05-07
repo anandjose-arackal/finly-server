@@ -8,7 +8,7 @@ module Forms::Generators::Contracts::ModelHelpers::FormEntity
       property_options[:virtual] = true
       # property_options[:deserializer] = -> (input, represented, **) do
       #   associated_cf = represented.custom_fields.find {|custom_field| custom_field.form_entity_id == entity.uuid}
-      #   represented.send("#{entity.field_key}=", (associated_cf.value))
+      #   represented.send("#{entity.entity_key}=", (associated_cf.value))
       # end
     end
 
@@ -19,8 +19,8 @@ module Forms::Generators::Contracts::ModelHelpers::FormEntity
   end
 
   def contract
-    is_collection = (field_type == "collection")
-    builder_args = [self, field_key, schema, contract_property_options, contract_block, collection: is_collection]
+    is_collection = (entity_type == "collection")
+    builder_args = [self, entity_key, schema, contract_property_options, contract_block, collection: is_collection]
     transformer = Forms::Generators::Contracts::EntityBuilder.new(*builder_args)
     transformer.generate
   end

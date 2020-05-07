@@ -6,6 +6,10 @@ class Forms::API::Entity::Types::Reference < Forms::API::Entity::Base
   operators :eq_any, :blank, :present
 
   contract do
-    required(:class_name).filled
+    required(:options) do
+      hash do
+        required(:class_name).filled
+      end
+    end
   end
 end

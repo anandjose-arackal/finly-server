@@ -36,7 +36,7 @@ class Forms::Synchronizer
   end
 
   def self.sync_entity(company, form_model, section_model, entity, parent: nil)
-    entity_model = section_model.entities.where(form_id: form_model.id, form_section_id: section_model.id, field_key: entity.field_key, parent: parent).first
+    entity_model = section_model.entities.where(form_id: form_model.id, form_section_id: section_model.id, entity_key: entity.entity_key, parent: parent).first
 
     unless entity_model.present?
       entity_model = section_model.entities.new entity.schema.except(:section, :choices, :choices_scope)

@@ -8,11 +8,11 @@
 #  form_id                      :string(36)       not null
 #  form_section_id              :string(36)       not null
 #  created_by_user_id           :integer
-#  field_key                    :string(255)      not null
+#  entity_key                    :string(255)      not null
 #  label                        :string(255)
 #  placeholder                  :string(255)
 #  hint                         :string(255)
-#  field_type                   :string(255)
+#  entity_type                   :string(255)
 #  default_value                :string(255)
 #  multiple                     :boolean
 #  editable                     :boolean
@@ -45,7 +45,7 @@
 #  choices_scope                :text(65535)
 #  internal                     :boolean          default(FALSE)
 #  is_modified                  :boolean          default(FALSE)
-#  field_path                   :string(255)
+#  entity_path                   :string(255)
 #  parent_id                    :string(255)
 #  populate_if_empty            :string(255)
 #  associate_custom_fields      :boolean          default(FALSE)
@@ -68,8 +68,8 @@ class FormEntity < ApplicationRecord
   accepts_nested_attributes_for :form_entity_choices
 
   serialize :options, JSON
-  serialize :chained, JSON
   serialize :choices_scope, JSON
+  serialize :config, JSON
 
   scope :root, -> {where parent_id: nil}
   scope :system_fields, -> {where.not custom_field: true}
@@ -96,13 +96,13 @@ class FormEntity < ApplicationRecord
 
   def schema
     {
-        field_key: field_key,
+        entity_key: entity_key,
+        entity_path: entity_path,
         label: label,
         placeholder: placeholder,
         hint: hint,
-        field_type: field_type,
+        entity_type: entity_type,
         default_value: default_value,
-        multiple: multiple,
         editable: editable,
         required: required,
         active: active,
@@ -110,36 +110,29 @@ class FormEntity < ApplicationRecord
         visible: visible,
         position: position,
         custom_field: custom_field,
-        dependent: dependent,
-        conditional_required: conditional_required,
         can_visible_be_changed: can_visible_be_changed,
         can_editable_be_changed: can_editable_be_changed,
         can_required_be_changed: can_required_be_changed,
         can_uniqueness_be_changed: can_uniqueness_be_changed,
         can_be_disabled: can_be_disabled,
         can_label_be_renamed: can_label_be_renamed,
-        can_not_be_hidden: can_not_be_hidden,
-        can_be_filtered: can_be_filtered,
         can_choices_be_changed: can_choices_be_changed,
-        show_in_bulk_import: show_in_bulk_import,
-        allow_sort_in_filter: allow_sort_in_filter,
         allow_clearing_default_value: allow_clearing_default_value,
+        config: config,
         options: options,
-        chained: chained,
         choices_scope: choices_scope&.config,
-        internal: internal,
-        field_path: field_path
+        internal: internal
     }
   end
 
   def as_json(opts={})
     data = {
       id: uuid,
-      field_key: field_key,
+      entity_key: entity_key,
       label: label,
       placeholder: placeholder,
       hint: hint,
-      field_type: field_type,
+      entity_type: entity_type,
       default_value: default_value,
       editable: editable,
       required: required,
@@ -156,7 +149,7 @@ class FormEntity < ApplicationRecord
     if entities.present?
       data[:entities] = {}
       entities.each do |ent|
-        data[:entities][ent.field_path] = ent.as_json(opts)
+        data[:entities][ent.entity_path] = ent.as_json(opts)
       end
     end
     data

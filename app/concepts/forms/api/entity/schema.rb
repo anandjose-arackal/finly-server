@@ -9,7 +9,7 @@ module Forms::API::Entity::Schema
     def schema
       return @class_schema if @class_schema
 
-      @class_schema ||= {options: {}}
+      @class_schema ||= {options: {}, config: {}}
 
       # if self == Forms::API::Entity::Base
       #   @class_schema ||= {options: {}}
@@ -53,6 +53,21 @@ module Forms::API::Entity::Schema
       end
     end
 
+    # Options are type specific attributes
+    def config(key, default: nil)
+      schema[:config][key] = default if default
+      define_method key do |value = NoObject|
+        self.schema_builder[:config][key] = value unless value == NoObject
+        Transactions::Evaluator.eval_proc(self, schema_builder[:config][key])
+      end
+      alias_method "#{ key }=", key
+
+      define_singleton_method key do |value = NoObject|
+        schema[:config][key] = value unless value == NoObject
+        schema[:config][key]
+      end
+    end
+
     def consumes_choices?
       @consumes_choices ||= false
     end
@@ -79,13 +94,17 @@ module Forms::API::Entity::Schema
   def schema
     return @schema if @schema
 
-    @schema = {options: {}}
-    schema_builder.except(:options).keys.each do |key|
+    @schema = {options: {}, config: {}}
+    schema_builder.except(:options, :config).keys.each do |key|
       @schema[key] = self.send(key)
     end
 
     schema_builder[:options].keys.each do |key|
       @schema[:options][key] = self.send(key)
+    end
+
+    schema_builder[:config].keys.each do |key|
+      @schema[:config][key] = self.send(key)
     end
 
     if self.class.consumes_choices? and schema_builder[:choices].present?

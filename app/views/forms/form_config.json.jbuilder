@@ -5,7 +5,7 @@ form.sections.each do |section|
     json.title section.title
     json.entities do
       section.entities.exclude_internal.root.each do |entity|
-        json.set! entity.field_path, entity.as_json({params: @op[:params], current_user: @op[:current_user]})
+        json.set! entity.entity_path, entity.as_json({params: @op[:params], current_user: @op[:current_user]})
       end
     end
   end

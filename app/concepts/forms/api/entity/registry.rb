@@ -5,14 +5,14 @@ module Forms::API::Entity::Registry
     @types ||= {}.with_indifferent_access
   end
 
-  def find_entity(field_path)
+  def find_entity(entity_path)
     self.entities.each do |entity|
-      return entity if entity.field_path == field_path
+      return entity if entity.entity_path == entity_path
 
       entity.entities.each do |sub_entity|
-        return sub_entity if sub_entity.field_path == field_path
+        return sub_entity if sub_entity.entity_path == entity_path
 
-        matching_entity = sub_entity.find_entity(field_path)
+        matching_entity = sub_entity.find_entity(entity_path)
         return matching_entity if matching_entity
       end
     end
@@ -26,7 +26,7 @@ module Forms::API::Entity::Registry
   def entity(*args, &block)
     opts = args.extract_options!
     klass, name = klass_and_name_from args
-    entity = klass.new(section, name, field_path, opts, &block)
+    entity = klass.new(section, name, entity_path, opts, &block)
     result = entity.valid?
     unless result.success?
       raise "Invalid Form Field: #{self.form}##{name} (#{klass}) Failure: #{result.failure.to_json}"

@@ -5,7 +5,7 @@ class Forms::Generators::Contracts::EntityBuilder::CustomField
       collection :custom_fields, deserializer: Forms::Generators::Contracts::EntityBuilder::CustomField::Build(custom_fields) do
         property :uuid
         property :form_entity_id
-        property :field_key
+        property :entity_key
         property :value
         property :value_text
       end
@@ -22,12 +22,12 @@ class Forms::Generators::Contracts::EntityBuilder::CustomField
               {
                   form_entity: custom_field_entity,
                   form_id: custom_field_entity.form_id,
-                  field_key: custom_field_entity.field_key
+                  entity_key: custom_field_entity.entity_key
               }
           )
         end
-        if input[custom_field_entity.field_key]
-          custom_field.value = input[custom_field_entity.field_key]
+        if input[custom_field_entity.entity_key]
+          custom_field.value = input[custom_field_entity.entity_key]
         end
         represented.custom_fields.append(custom_field)
       end

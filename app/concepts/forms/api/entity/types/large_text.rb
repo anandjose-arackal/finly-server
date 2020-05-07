@@ -7,6 +7,10 @@ class Forms::API::Entity::Types::LargeText < Forms::API::Entity::Base
   operators :eq_any, :not_eq_all, :cont_any, :not_cont_all, :blank, :present
 
   contract do
-    required(:char_limit).value(:int?, lteq?: 65535)
+    required(:options) do
+      hash do
+        required(:char_limit).value(:int?, lteq?: 65535)
+      end
+    end
   end
 end

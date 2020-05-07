@@ -19,9 +19,9 @@ class Forms::API::Dependency
             form_id: form.id,
             company_id: user.company_id,
             controlling_entity: controlling_entity,
-            controlling_entity_key: controlling_entity.field_key,
+            controlling_entity_key: controlling_entity.entity_key,
             dependent_entity: dependent_entity,
-            dependent_entity_key: dependent_entity.field_key,
+            dependent_entity_key: dependent_entity.entity_key,
             controlling_choice: controlling_entity.choices_scope.find_by_name(controlling_choice, user: user),
             dependent_choice: dependent_entity.choices_scope.find_by_name(dependent_choice, user: user)
         }
@@ -31,9 +31,9 @@ class Forms::API::Dependency
           form_id: form.id,
           company_id: user.company_id,
           controlling_entity: controlling_entity,
-          controlling_entity_key: controlling_entity.field_key,
+          controlling_entity_key: controlling_entity.entity_key,
           dependent_entity: dependent_entity,
-          dependent_entity_key: dependent_entity.field_key,
+          dependent_entity_key: dependent_entity.entity_key,
           controlling_choice: controlling_entity.choices_scope.find_by_name(controlling_choice, user: user),
           dependent_required: self.dependent_required,
           dependent_editable: self.dependent_editable,
@@ -54,7 +54,7 @@ class Forms::API::Dependency
 
   def find_or_create(user, form)
     entities = {}.with_indifferent_access
-    form.entities.each { |f| entities[f.field_path] = f }
+    form.entities.each { |f| entities[f.entity_path] = f }
     dependency = form.dependencies.where(
         controlling_entity_id: entities[controlling_field].id,
         dependent_entity_id: entities[dependent_field].id).first
@@ -69,9 +69,9 @@ class Forms::API::Dependency
             form_id: form.id,
             company_id: user.company_id,
             controlling_entity_id: entities[controlling_field].id,
-            controlling_entity_key: entities[controlling_field].field_key,
+            controlling_entity_key: entities[controlling_field].entity_key,
             dependent_entity_id: entities[dependent_field].id,
-            dependent_entity_key: entities[dependent_field].field_key,
+            dependent_entity_key: entities[dependent_field].entity_key,
             dependency_mappings_attributes: dependency_mapping_attributes
         }
     )

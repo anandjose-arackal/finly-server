@@ -1,26 +1,26 @@
 module Forms::Generators::Filters::ModelHelpers::FormEntity
 
-  def field_type_klass
-    Forms::API::Entity::Registry.types[field_type]
+  def entity_type_klass
+    Forms::API::Entity::Registry.types[entity_type]
   end
 
   def operators
-    field_type_klass.operators
+    entity_type_klass.operators
   end
 
   def filter_form(options = {})
     filter = {
         label: label,
         hint: hint,
-        type: field_type,
-        filter_key: field_path.gsub("/", "_"),
+        type: entity_type,
+        filter_key: entity_path.gsub("/", "_"),
         operators: operators,
         multiple: multiple
     }
-    if field_type_klass.consumes_choices?
+    if entity_type_klass.consumes_choices?
       filter[:scope] = scope.as_json
     end
-    if field_type_klass.consumes_choices?
+    if entity_type_klass.consumes_choices?
       filter[:choices] = choices.as_json
     end
     filter

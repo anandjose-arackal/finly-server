@@ -1,7 +1,7 @@
 class Forms::API::Entity::Section
   include DynamicAttributes
   include Forms::API::Entity::Registry
-  attr_accessor :section_id, :title, :block, :form, :field_path, :options, :associate_custom_fields
+  attr_accessor :section_id, :title, :block, :form, :entity_path, :options, :associate_custom_fields
 
   def initialize(form, section_id, options, &block)
     self.form = form
