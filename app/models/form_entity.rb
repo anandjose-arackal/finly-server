@@ -132,4 +132,34 @@ class FormEntity < ApplicationRecord
     }
   end
 
+  def as_json(opts={})
+    data = {
+      id: uuid,
+      field_key: field_key,
+      label: label,
+      placeholder: placeholder,
+      hint: hint,
+      field_type: field_type,
+      default_value: default_value,
+      editable: editable,
+      required: required,
+      active: active,
+      visible: visible,
+      unique: unique,
+      position: position,
+      custom_field: custom_field,
+      options: options
+    }
+    if choices_scope.present?
+      data[:choices] = choices_scope.as_json(params: opts["params"], user: opts["current_user"])
+    end
+    if entities.present?
+      data[:entities] = {}
+      entities.each do |ent|
+        data[:entities][ent.field_path] = ent.as_json(opts)
+      end
+    end
+    data
+  end
+
 end
