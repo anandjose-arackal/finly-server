@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_05_144233) do
+ActiveRecord::Schema.define(version: 2020_05_07_073547) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -4096,70 +4096,6 @@ ActiveRecord::Schema.define(version: 2020_05_05_144233) do
     t.index ["uuid"], name: "index_form_custom_fields_on_uuid"
     t.index ["value"], name: "index_form_custom_fields_on_value"
     t.index ["value_text"], name: "index_form_custom_fields_on_value_text"
-  end
-
-  create_table "form_dependencies", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "company_id", null: false
-    t.string "controlling_entity_id", null: false
-    t.string "dependent_entity_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "uuid", limit: 36
-    t.string "form_id", null: false
-    t.datetime "deleted_at"
-    t.string "controlling_entity_key"
-    t.string "dependent_entity_key"
-    t.index ["company_id"], name: "index_form_dependencies_on_company_id"
-    t.index ["controlling_entity_id"], name: "index_form_dependencies_on_controlling_entity_id"
-    t.index ["dependent_entity_id"], name: "index_form_dependencies_on_dependent_entity_id"
-    t.index ["form_id"], name: "index_form_dependencies_on_form_id"
-  end
-
-  create_table "form_dependency_choice_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "company_id", null: false
-    t.string "form_dependency_mapping_id", null: false
-    t.string "dependent_choice_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "uuid", limit: 36
-    t.string "form_id", null: false
-    t.string "dependent_choice_type"
-    t.datetime "deleted_at"
-    t.string "controlling_entity_id"
-    t.string "controlling_choice_id"
-    t.string "controlling_choice_type"
-    t.string "controlling_entity_key"
-    t.string "dependent_entity_key"
-    t.integer "dependent_entity_id"
-    t.index ["company_id"], name: "index_form_dependency_choice_mappings_on_company_id"
-    t.index ["dependent_choice_id"], name: "index_form_dependency_choice_mappings_on_dependent_choice_id"
-    t.index ["form_dependency_mapping_id"], name: "index_form_dependency_choice_mappings_form_dependency_choice_id"
-    t.index ["form_id"], name: "index_form_dependency_choice_mappings_on_form_id"
-  end
-
-  create_table "form_dependency_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "company_id", null: false
-    t.string "form_dependency_id", null: false
-    t.string "controlling_choice_id", null: false
-    t.boolean "dependent_required"
-    t.boolean "dependent_visible"
-    t.boolean "dependent_editable"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "uuid", limit: 36
-    t.string "form_id", null: false
-    t.string "controlling_choice_type"
-    t.datetime "deleted_at"
-    t.boolean "has_dependent_choices"
-    t.boolean "lazy_load_dependent_choices"
-    t.integer "dependent_entity_id"
-    t.string "dependent_entity_key"
-    t.integer "controlling_entity_id"
-    t.string "controlling_entity_key"
-    t.index ["company_id"], name: "index_form_dependency_mappings_on_company_id"
-    t.index ["controlling_choice_id"], name: "index_form_dependency_mappings_on_controlling_choice_id"
-    t.index ["form_dependency_id"], name: "index_form_dependency_mappings_on_form_dependency_id"
-    t.index ["form_id"], name: "index_form_dependency_mappings_on_form_id"
   end
 
   create_table "form_entities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
