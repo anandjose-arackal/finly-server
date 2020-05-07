@@ -23,7 +23,8 @@ class Forms::Synchronizer
 
   def self.sync_section(company, form_model, section)
     section_model = form_model.sections.find_or_initialize_by(
-        name: section.name,
+        section_id: section.section_id,
+        title: section.title,
         company_id: company.id,
         form_id: form_model.id
     )

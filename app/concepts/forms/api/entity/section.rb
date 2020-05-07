@@ -1,11 +1,11 @@
 class Forms::API::Entity::Section
   include DynamicAttributes
   include Forms::API::Entity::Registry
-  attr_accessor :name, :block, :form, :field_path, :options, :associate_custom_fields
+  attr_accessor :section_id, :title, :block, :form, :field_path, :options, :associate_custom_fields
 
-  def initialize(form, name, options, &block)
+  def initialize(form, section_id, options, &block)
     self.form = form
-    self.name = name
+    self.section_id = section_id
     self.options = options || {}
     self.block = block
     initialize_with(options)
@@ -23,13 +23,13 @@ class Forms::API::Entity::Section
   def schema
     self.options.merge(
         {
-            name: name
+            section_id: section_id
         }
     )
   end
 
   def section
-    name
+    section_id
   end
 
 end

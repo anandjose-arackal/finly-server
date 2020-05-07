@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_07_073547) do
+ActiveRecord::Schema.define(version: 2020_05_07_114230) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -4247,7 +4247,7 @@ ActiveRecord::Schema.define(version: 2020_05_07_073547) do
 
   create_table "form_sections", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "uuid", limit: 36, null: false
-    t.string "name", null: false
+    t.string "section_id", null: false
     t.string "form_id", limit: 36, null: false
     t.integer "company_id", null: false
     t.boolean "active", default: true
@@ -4255,11 +4255,12 @@ ActiveRecord::Schema.define(version: 2020_05_07_073547) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "associate_custom_fields", default: false
+    t.string "title"
     t.index ["active"], name: "index_form_sections_on_active"
     t.index ["company_id"], name: "index_form_sections_on_company_id"
     t.index ["deleted_at"], name: "index_form_sections_on_deleted_at"
     t.index ["form_id"], name: "index_form_sections_on_form_id"
-    t.index ["name"], name: "index_form_sections_on_name"
+    t.index ["section_id"], name: "index_form_sections_on_section_id"
     t.index ["uuid"], name: "index_form_sections_on_uuid"
   end
 

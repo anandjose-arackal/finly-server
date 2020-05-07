@@ -8,8 +8,8 @@ class Forms::API
   class_attr :dependencies, default: []
   class_attr :model
 
-  def self.section(name, options = {}, &block)
-    sections << Forms::API::Entity::Section.new(self, name, options, &block)
+  def self.section(section_id, options = {}, &block)
+    sections << Forms::API::Entity::Section.new(self, section_id, options, &block)
   end
 
   def self.condition(params = {}, &block)
