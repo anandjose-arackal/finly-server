@@ -4250,6 +4250,7 @@ ActiveRecord::Schema.define(version: 2020_05_05_144233) do
     t.string "error_message", null: false
     t.integer "created_by_id"
     t.integer "updated_by_id"
+    t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "validation_id"
@@ -4260,6 +4261,7 @@ ActiveRecord::Schema.define(version: 2020_05_05_144233) do
     t.index ["company_id"], name: "index_form_entity_validations_on_company_id"
     t.index ["created_at"], name: "index_form_entity_validations_on_created_at"
     t.index ["created_by_id"], name: "index_form_entity_validations_on_created_by_id"
+    t.index ["deleted_at"], name: "index_form_entity_validations_on_deleted_at"
     t.index ["entity_path"], name: "index_form_entity_validations_on_entity_path"
     t.index ["form_id"], name: "index_form_entity_validations_on_form_id"
     t.index ["updated_at"], name: "index_form_entity_validations_on_updated_at"

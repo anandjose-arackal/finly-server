@@ -13,6 +13,8 @@ class Forms::API
   end
 
   def self.condition(params = {}, &block)
+    return unless ActiveRecord::Base.connection.table_exists?('form_conditions')
+
     condition = FormCondition.system_condition(params, &block)
     if conditions[condition.condition_id].present?
       raise "Validation #{condition.condition_id} is not unique"
@@ -21,6 +23,8 @@ class Forms::API
   end
 
   def self.validation(params, &block)
+    return unless ActiveRecord::Base.connection.table_exists?('form_entity_validations')
+
     validation = FormEntityValidation.system_validation(params, &block)
     if validations[validation.validation_id].present?
       raise "Validation #{validation.validation_id} is not unique"

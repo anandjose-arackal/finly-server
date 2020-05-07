@@ -10,7 +10,7 @@ class FormCondition < ApplicationRecord
   has_many :rules, class_name: 'FormRule', as: :rule_parent
   has_many :actions, class_name: 'FormConditionAction'
 
-  def self.system_condition(params={}, &block)
+  def self.system_condition(params = {}, &block)
     params[:custom] = false
     params[:internal] ||= false
     params[:is_updated] = false
@@ -33,7 +33,7 @@ class FormCondition < ApplicationRecord
   end
 
   def rule(entity_path, predicate, value: nil, formula: nil, match_entity_path: nil)
-    value = [value] if  value.present? and not value.respond_to?(:each)
+    value = [value] if value.present? and not value.respond_to?(:each)
 
     rule_type_id = nil
     rule_type_id = FormRuleType.id_for(:value) if value.present?
@@ -50,7 +50,7 @@ class FormCondition < ApplicationRecord
     )
   end
 
-  def as_json(options={})
+  def as_json(options = {})
     {
         reference_type: reference_type,
         reference_key: reference_key,
