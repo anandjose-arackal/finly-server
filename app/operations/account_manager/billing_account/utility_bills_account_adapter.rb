@@ -76,7 +76,7 @@ class AccountManager::BillingAccount::UtilityBillsAccountAdapter < AccountManage
 
   def debitable_accounts
     # insert account type for BBPS payments, whatever they may be
-    []
+    [BbpsBiller]
   end
 
   def accept_va_transaction?

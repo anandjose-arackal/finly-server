@@ -65,7 +65,7 @@ class CustomField::Configuration::Index < CustomField::Configuration::Base
 
     def init
       self.field_configurations = params[:field_configurations]
-      self.field_configurations = apply_scopes(self.field_configurations, params)
+      self.field_configurations = apply_scopes(self.field_configurations, params).distinct rescue FieldConfiguration.none
     end
 
   end

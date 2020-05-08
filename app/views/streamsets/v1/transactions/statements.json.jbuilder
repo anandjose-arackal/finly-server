@@ -65,6 +65,22 @@ json.result do
         json.currency payment.receiving_account.base_currency&.country_code
         json.user payment.receiving_account.user&.json_for_trail({:streamsets => true})
       end
+
+      if payment.receiving_account.class.name == 'UserWallet'
+        json.name payment.receiving_account.class.name
+        json.active payment.receiving_account.deleted_at.blank?
+        json.balance payment.receiving_account.balance&.value
+        json.currency payment.receiving_account.balance&.currency&.country_code
+        json.user payment.receiving_account.user&.json_for_trail({:streamsets => true})
+      end
+
+      if payment.receiving_account.class.name == 'Card'
+        json.name payment.receiving_account.card_program&.name
+        json.active payment.receiving_account.active
+        json.balance payment.receiving_account.balance
+        json.currency payment.receiving_account.card_balance&.currency&.country_code
+        json.user payment.receiving_account.user&.json_for_trail({:streamsets => true})
+      end
     end
   end
 end
