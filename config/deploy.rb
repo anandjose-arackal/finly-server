@@ -1,7 +1,7 @@
 # config valid only for current version of Capistrano
 lock '~> 3.11'
 
-if ['aws_production', 'foreground_production', 'api_production',
+if ['api_production',
     'background_production', 'background_production_bgg', 'background_production_bgp',
     'background_production_bgpc', 'yes_bank_balance_poller',
     'console_production'].include?(fetch(:stage)&.to_s)
