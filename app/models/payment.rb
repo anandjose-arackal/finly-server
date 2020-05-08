@@ -836,7 +836,7 @@ class Payment < ApplicationRecord
         parent_details.update(advance_amount_status_id: AdvanceAmountStatus.id_for(:paid))
       when "BbpsBill"
         parent = self.parent
-        parent.update(status_id: BbpsBillStatus.id_for(:paid))
+        parent&.update(status_id: BbpsBillStatus.id_for(:paid))
       when "SecurityDeposit"
         self.parent.update(status_id: SecurityDepositStatus.id_for(:paid)) if self.parent.payment_agreement_id.present?
       when "BeneficiaryPayment"
@@ -848,7 +848,7 @@ class Payment < ApplicationRecord
       case self.parent_type
       when "BbpsBill"
         parent = self.parent
-        parent.update(status_id: BbpsBillStatus.id_for(:payment_initiated))
+        parent&.update(status_id: BbpsBillStatus.id_for(:payment_initiated))
       else
         # do nothing?
       end
@@ -869,7 +869,7 @@ class Payment < ApplicationRecord
       when "BbpsBill"
         parent = self.parent
         # marking the bill as approved so that they can retry the payment by creating another payment ticket
-        parent.update(status_id: BbpsBillStatus.id_for(:approved))
+        parent&.update(status_id: BbpsBillStatus.id_for(:approved))
       end
     end
   end
