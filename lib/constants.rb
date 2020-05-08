@@ -27,8 +27,7 @@ module Constants
     YESBANK_EMAIL_ID = ['sreeram.nr@finly.io']
   end
 
-  # todo - to be removed once companies are done migrating from HDFC to RBL
-  MIGRATING_COMPANIES = []
+  PERSONAL_EMAIL_DOMAINS = ["gmail", "hotmail", "yahoo", "msn", "livemail", "live", "aol", "outlook", "test"]
 
   # PRODUCT_DEMO_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io', 'venu.reddy@finly.io']
   # PRODUCT_DEMO_EMAIL_ID = ['venu.reddy@finly.io', 'kashyap.bj@finly.io', 'ankit.bazari@finly.io', 'chandra@finly.io']
