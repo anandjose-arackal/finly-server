@@ -35,8 +35,13 @@ class Masters::Vendors::Form < Forms::API
   end
 
   validation entity_path: :name, validation_id: :name_cont_validation do
-    self.error_message = "Name cannot contain Hello"
+    error_message "Name cannot contain Hello"
     rule 'locations/name', 'not_cont', value: 'Hello'
+  end
+
+  choice_dependency entity_path: :policy_id, dependency_id: :policy_dependency do
+    controlling_entity_path :policy_id
+    dependency 'Company (Default)', ['6am to 9am']
   end
 
 end

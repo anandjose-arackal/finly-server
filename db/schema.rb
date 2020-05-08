@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_07_133746) do
+ActiveRecord::Schema.define(version: 2020_05_08_053324) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3840,6 +3840,49 @@ ActiveRecord::Schema.define(version: 2020_05_07_133746) do
     t.index ["transaction_type_id"], name: "index_finly_transactions_on_transaction_type_id"
   end
 
+  create_table "form_choice_dependencies", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
+    t.bigint "company_id", null: false
+    t.string "form_id", limit: 36, null: false
+    t.string "form_entity_id", limit: 36, null: false
+    t.string "controlling_entity_id", limit: 36, null: false
+    t.string "dependency_id"
+    t.boolean "custom"
+    t.boolean "is_updated"
+    t.boolean "can_be_updated"
+    t.integer "created_by_id"
+    t.integer "updated_by_id"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_form_choice_dependencies_on_company_id"
+    t.index ["controlling_entity_id"], name: "index_form_choice_dependencies_on_controlling_entity_id"
+    t.index ["created_at"], name: "index_form_choice_dependencies_on_created_at"
+    t.index ["created_by_id"], name: "index_form_choice_dependencies_on_created_by_id"
+    t.index ["deleted_at"], name: "index_form_choice_dependencies_on_deleted_at"
+    t.index ["dependency_id"], name: "index_form_choice_dependencies_on_dependency_id"
+    t.index ["form_entity_id"], name: "index_form_choice_dependencies_on_form_entity_id"
+    t.index ["form_id"], name: "index_form_choice_dependencies_on_form_id"
+    t.index ["updated_at"], name: "index_form_choice_dependencies_on_updated_at"
+    t.index ["updated_by_id"], name: "index_form_choice_dependencies_on_updated_by_id"
+    t.index ["uuid"], name: "index_form_choice_dependencies_on_uuid"
+  end
+
+  create_table "form_choice_dependency_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "dependency_id", limit: 36, null: false
+    t.string "form_rule_id", limit: 36, null: false
+    t.string "form_entity_choice_id", limit: 36, null: false
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_form_choice_dependency_mappings_on_created_at"
+    t.index ["deleted_at"], name: "index_form_choice_dependency_mappings_on_deleted_at"
+    t.index ["dependency_id"], name: "index_form_choice_dependency_mappings_on_dependency_id"
+    t.index ["form_entity_choice_id"], name: "index_form_choice_dependency_mappings_on_form_entity_choice_id"
+    t.index ["form_rule_id"], name: "index_form_choice_dependency_mappings_on_form_rule_id"
+    t.index ["updated_at"], name: "index_form_choice_dependency_mappings_on_updated_at"
+  end
+
   create_table "form_condition_actions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "uuid", limit: 36, null: false
     t.bigint "company_id", null: false
@@ -3954,7 +3997,7 @@ ActiveRecord::Schema.define(version: 2020_05_07_133746) do
     t.string "parent_id"
     t.string "populate_if_empty"
     t.string "type"
-    t.text "entity_config"
+    t.text "config"
     t.index ["company_id"], name: "index_form_entities_on_company_id"
     t.index ["created_at"], name: "index_form_entities_on_created_at"
     t.index ["created_by_user_id"], name: "index_form_entities_on_created_by_user_id"

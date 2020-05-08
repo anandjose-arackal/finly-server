@@ -42,6 +42,11 @@ class FormEntityValidation < ApplicationRecord
     )
   end
 
+  def error_message(value=NoObject)
+    self.error_message = value unless value == NoObject
+    super()
+  end
+
   def as_json(options={})
     {
         entity_path: entity_path,

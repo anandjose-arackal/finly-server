@@ -19,6 +19,7 @@ class Forms::Ops::Dependencies < Transactions::API
     form_klass = Forms::Router.klass(params[:route])
     context[:system_conditions] = form_klass.conditions
     context[:system_validations] = form_klass.validations
+    context[:choice_dependencies] = form_klass.choice_dependencies
   end
 
   def init_user_dependencies(context, model:, **)

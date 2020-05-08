@@ -5,7 +5,7 @@ class Forms::API
   class_attr :sections, default: []
   class_attr :conditions, default: {}
   class_attr :validations, default: {}
-  class_attr :dependencies, default: []
+  class_attr :dependencies, default: {}
   class_attr :model
 
   def self.section(section_id, options = {}, &block)
@@ -32,6 +32,13 @@ class Forms::API
     validations[validation.validation_id] = validation
   end
   singleton_class.send(:alias_method, :validate, :validation)
+
+  def self.choice_dependency(params, &block)
+    return unless ActiveRecord::Base.connection.table_exists?('form_choice_dependencies')
+
+    dependency = Forms::API::ChoiceDependency.new(params, &block)
+    dependencies[dependency.dependency_id] = dependency
+  end
 
   def self.find_entity(entity_path)
     sections.each do |section|

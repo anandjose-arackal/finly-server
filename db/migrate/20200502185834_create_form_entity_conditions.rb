@@ -36,7 +36,7 @@ class CreateFormEntityConditions < ActiveRecord::Migration[5.2]
       t.integer :rule_type_id, index: true, references: 'form_rule_types', foreign_key: true, null: false
       t.text :match_value
       t.string :match_formula
-      t.string :match_entity_path, index: true, null: false
+      t.string :match_entity_path, index: true
 
       t.datetime :deleted_at, index: true
       t.timestamps null: false, index: true

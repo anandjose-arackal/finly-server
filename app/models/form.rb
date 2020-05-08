@@ -20,7 +20,7 @@ class Form < ApplicationRecord
   belongs_to :company
   has_many :sections, class_name: 'FormSection', dependent: :destroy
   has_many :entities, class_name: "FormEntity"
-  has_many :dependencies, class_name: 'FormDependency'
+  has_many :choice_dependencies, class_name: 'FormChoiceDependency'
   has_many :conditions, class_name: 'FormCondition'
   has_many :validations, class_name: 'FormEntityValidation'
 

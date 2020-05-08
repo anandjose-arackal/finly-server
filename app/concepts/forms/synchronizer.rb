@@ -13,7 +13,7 @@ class Forms::Synchronizer
       form.sections.each do |section|
         sync_section company, form_model, section
       end
-      form.dependencies.each do |dependency|
+      form.dependencies.each do |id, dependency|
         sync_dependency company, form_model, dependency
       end
     end
@@ -80,7 +80,7 @@ class Forms::Synchronizer
 
   def self.sync_dependency(company, form_model, dependency)
     # Todo
-    # dependency.find_or_create(company.users.first, form_model)
+    dependency.sync(company.users.first, form_model)
   end
 
 end
