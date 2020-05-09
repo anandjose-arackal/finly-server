@@ -13,7 +13,13 @@ class Streamsets::Transactions::Statements < BaseOperation
     end
     payment_ids = op.money_requests.pluck(:payment_id)
 
-    self.payments = Payment.where(id: payment_ids).or(Payment.where(receiving_account_type: 'UserPocket', company_id: user.company_id, created_at: Date.today.beginning_of_month..Date.today))
+    # reusing the same filter name, this helps anybody to request data consistently with MR.
+    start_date = params.dig(:filter_approved_date, :from)
+    end_date = params.dig(:filter_approved_date, :to)
+
+    start_date = Date.parse(start_date) rescue Date.today.beginning_of_month
+    end_date = Date.parse(end_date) rescue Date.today
+    self.payments = Payment.where(id: payment_ids).or(Payment.where(receiving_account_type: ['UserPocket', 'UserWallet', 'Card'], company_id: user.company_id, created_at: start_date..end_date, payment_status_id: PaymentStatus.id_for(:completed)))
   end
 
   def success

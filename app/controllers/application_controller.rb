@@ -340,7 +340,7 @@ class ApplicationController < ActionController::Base
 
     load_global_variables
 
-    if current_user.present?
+    if current_user.present? && current_user.active?
       RequestStoreUtil.set_authorized_scopes scopes
     end
 
@@ -385,7 +385,7 @@ class ApplicationController < ActionController::Base
 
     result = Gatekeeper::Event.(:on_authenticated_request, user: current_user)
     unless result.success?
-      session_status = result.session_status_id || UserSessionStatus.id_for(:blocked)
+      session_status = result.session_status_id || UserSessionStatus.id_for(:blocked) 
       invalidate_session session_status, (result.message || result.full_description)
       return false
     end
