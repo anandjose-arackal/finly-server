@@ -52,6 +52,22 @@ class Docs::UtilityBills::Subscriptions::Index < IndexBuilder::API
     checkbox value: :auto_fetchable
   end
 
+  column :created_at, sort: true do
+    date value: :created_at
+  end
+
+  column :updated_at, sort: true do
+    date value: :updated_at
+  end
+
+  column :submitted_at, sort: true do
+    date value: :submitted_at
+  end
+
+  column :approved_at, sort: true do
+    date value: :approved_at
+  end
+
   IndexBuilder::API::ColumnTemplate::ControllingUser(self)
   IndexBuilder::API::ColumnTemplate::ControllingLevel(self)
   IndexBuilder::API::ColumnTemplate::ReviewProgress(self)
