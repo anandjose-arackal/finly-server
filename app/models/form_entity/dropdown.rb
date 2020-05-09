@@ -1,15 +1,13 @@
-class Forms::API::Entity::Types::DropDown < Forms::API::Entity::Base
+class FormEntity::DropDown < FormEntity
   register :dropdown
-  hint 'Select value'
+  set :hint, 'Select value'
 
   operators :eq_any, :not_eq_all, :not_null, :null
 
-  consumes_choices!
-
   option :min_items
   option :min_items
 
-  contract do
+  schema_validation do
     required(:options) do
       hash do
         optional(:min_items).value(:int?)

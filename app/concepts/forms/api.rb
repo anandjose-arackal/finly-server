@@ -8,8 +8,13 @@ class Forms::API
   class_attr :dependencies, default: {}
   class_attr :model
 
+  def self.form
+    @form ||= Form.new
+  end
+
   def self.section(section_id, options = {}, &block)
-    sections << Forms::API::Entity::Section.new(self, section_id, options, &block)
+    section = form.sections.new({section_id: section_id}.merge(options))
+    section.instance_eval &block
   end
 
   def self.condition(params = {}, &block)
@@ -20,6 +25,7 @@ class Forms::API
       raise "Validation #{condition.condition_id} is not unique"
     end
     conditions[condition.condition_id] = condition
+    form.conditions << condition
   end
 
   def self.validation(params, &block)
@@ -30,6 +36,7 @@ class Forms::API
       raise "Validation #{validation.validation_id} is not unique"
     end
     validations[validation.validation_id] = validation
+    form.validations << validation
   end
   singleton_class.send(:alias_method, :validate, :validation)
 

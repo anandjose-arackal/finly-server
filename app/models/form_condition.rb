@@ -1,3 +1,25 @@
+# == Schema Information
+#
+# Table name: form_conditions
+#
+#  id             :bigint           not null
+#  uuid           :string(36)       not null, primary key
+#  company_id     :bigint           not null
+#  form_id        :string(255)      not null
+#  reference_key  :string(255)      not null
+#  reference_type :string(255)      not null
+#  created_by_id  :integer
+#  updated_by_id  :integer
+#  deleted_at     :datetime
+#  created_at     :datetime         not null
+#  updated_at     :datetime         not null
+#  condition_id   :string(255)
+#  custom         :boolean
+#  internal       :boolean
+#  is_updated     :boolean
+#  can_be_updated :boolean
+#
+
 class FormCondition < ApplicationRecord
   include UUIDHelper
 
@@ -9,6 +31,14 @@ class FormCondition < ApplicationRecord
 
   has_many :rules, class_name: 'FormRule', as: :rule_parent
   has_many :actions, class_name: 'FormConditionAction'
+
+  amoeba do
+    clone [:rules, :actions]
+    nullify :uuid
+    nullify :company_id
+    nullify :created_by_id
+    nullify :updated_by_id
+  end
 
   def self.system_condition(params = {}, &block)
     params[:custom] = false

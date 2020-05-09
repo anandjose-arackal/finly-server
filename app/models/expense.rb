@@ -40,6 +40,7 @@
 #  created_by_id          :integer
 #  modified_by_id         :integer
 #  deleted_at             :datetime
+#  company_id             :integer
 #  gstin_location_id      :integer
 #  state_of_expense_id    :integer
 #  hsn_sac                :string(255)

@@ -24,6 +24,13 @@ class Form < ApplicationRecord
   has_many :conditions, class_name: 'FormCondition'
   has_many :validations, class_name: 'FormEntityValidation'
 
+  amoeba do
+    enable
+    clone [:sections, :conditions, :validations]
+    nullify :company_id
+    nullify :uuid
+  end
+
   def as_json(options = {})
     {
         id: id,

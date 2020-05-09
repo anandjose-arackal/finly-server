@@ -1,6 +1,6 @@
-class Forms::API::Entity::Types::Date < Forms::API::Entity::Base
+class FormEntity::Date < FormEntity
   register :datetime
-  hint "Select date and time"
+  set :hint, "Select date and time"
 
   operators :gteq_days, :lteq_days, :eq_days, :in_days, :eq_any, :gteq, :lteq, :blank
 end

@@ -4,6 +4,7 @@
 #
 #  id         :integer          not null, primary key
 #  name       :string(255)
+#  uuid       :string(36)
 #  deleted_at :datetime
 #
 

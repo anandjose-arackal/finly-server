@@ -19,19 +19,16 @@ module Forms::API::Entity::Registry
     nil
   end
 
-  def entities
-    @entities ||= []
-  end
-
   def entity(*args, &block)
     opts = args.extract_options!
-    klass, name = klass_and_name_from args
-    entity = klass.new(section, name, entity_path, opts, &block)
-    result = entity.valid?
-    unless result.success?
-      raise "Invalid Form Field: #{self.form}##{name} (#{klass}) Failure: #{result.failure.to_json}"
-    end
+    klass, entity_key = klass_and_name_from args
+    entity = klass.system_entity(section, entity_key, opts)
     entities << entity
+    result = entity.valid_schema?
+    unless result.success?
+      raise "Invalid Form Field: #{self.form}##{entity_key} (#{klass}) Failure: #{result.failure.to_json}"
+    end
+    entity.instance_eval &block if block_given?
   end
 
   def klass_and_name_from(args)
@@ -39,21 +36,21 @@ module Forms::API::Entity::Registry
     if Forms::API::Entity::Registry.types[type]
       [Forms::API::Entity::Registry.types[type], name]
     else
-      [Forms::API::Entity::Base, type]
+      [FormEntity, type]
     end
   end
 
   module ClassMethods
     def register(type)
-      self.registered_type = type
+      registered_type(type)
       Forms::API::Entity::Registry.types[type] = self
 
       Forms::API::Entity::Registry.module_eval do
         define_method type do |*args, &block|
           opts = args.extract_options!
-          name = args.first
+          entity_key = args.first
           @position ||= 0
-          entity type, name, opts.merge(position: @position), &block
+          entity type, entity_key, opts.merge(position: @position), &block
           @position += 1
         end
       end

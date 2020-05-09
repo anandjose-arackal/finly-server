@@ -8,13 +8,12 @@
 #  form_id                      :string(36)       not null
 #  form_section_id              :string(36)       not null
 #  created_by_user_id           :integer
-#  entity_key                    :string(255)      not null
+#  entity_key                   :string(255)      not null
 #  label                        :string(255)
 #  placeholder                  :string(255)
 #  hint                         :string(255)
-#  entity_type                   :string(255)
+#  entity_type                  :string(255)
 #  default_value                :string(255)
-#  multiple                     :boolean
 #  editable                     :boolean
 #  required                     :boolean
 #  active                       :boolean
@@ -22,42 +21,49 @@
 #  visible                      :boolean
 #  position                     :integer
 #  custom_field                 :boolean
-#  dependent                    :boolean
-#  conditional_required         :boolean
 #  can_visible_be_changed       :boolean
 #  can_editable_be_changed      :boolean
 #  can_required_be_changed      :boolean
 #  can_uniqueness_be_changed    :boolean
 #  can_be_disabled              :boolean
 #  can_label_be_renamed         :boolean
-#  can_not_be_hidden            :boolean
-#  can_be_filtered              :boolean
 #  can_choices_be_changed       :boolean
-#  show_in_bulk_import          :boolean
-#  allow_sort_in_filter         :boolean
 #  allow_clearing_default_value :boolean
 #  options                      :text(65535)
-#  chained                      :text(65535)
-#  data_provider                :text(65535)
 #  deleted_at                   :datetime
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
 #  choices_scope                :text(65535)
 #  internal                     :boolean          default(FALSE)
 #  is_modified                  :boolean          default(FALSE)
-#  entity_path                   :string(255)
+#  entity_path                  :string(255)
 #  parent_id                    :string(255)
 #  populate_if_empty            :string(255)
-#  associate_custom_fields      :boolean          default(FALSE)
+#  type                         :string(255)
+#  config                       :text(65535)
 #
 
 class FormEntity < ApplicationRecord
   include SoftDeletable, UUIDHelper
+  include DynamicAttributes
+  include Dry::Monads[:result]
   include Forms::Generators::Contracts::ModelHelpers::FormEntity
   include Forms::Generators::Filters::ModelHelpers::FormEntity
+  include Forms::Generators::Filters::ApiEntityHelper
+  include Forms::API::Entity::Registry
+  include Forms::API::Entity::Schema
+
+  class_attr :registered_type
+
+  amoeba do
+    enable
+    clone [:entities]
+    nullify :company_id
+    nullify :uuid
+  end
 
   belongs_to :company
-  belongs_to :form_section
+  belongs_to :section, class_name: "FormSection", foreign_key: :form_section_id
   belongs_to :form
   belongs_to :parent, class_name: 'FormEntity', optional: true, primary_key: :uuid, foreign_key: :parent_id
   belongs_to :created_by, optional: true, class_name: "User", foreign_key: :created_by_user_id
@@ -71,10 +77,10 @@ class FormEntity < ApplicationRecord
   serialize :choices_scope, JSON
   serialize :config, JSON
 
-  scope :root, -> {where parent_id: nil}
-  scope :system_fields, -> {where.not custom_field: true}
-  scope :custom_fields, -> {where custom_field: true}
-  scope :exclude_internal, -> {where.not internal: true}
+  scope :root, -> { where parent_id: nil }
+  scope :system_fields, -> { where.not custom_field: true }
+  scope :custom_fields, -> { where custom_field: true }
+  scope :exclude_internal, -> { where.not internal: true }
 
   def populate_if_empty
     val = super()
@@ -94,10 +100,10 @@ class FormEntity < ApplicationRecord
     choices_scope&.choices(params: params, user: user)
   end
 
-  def schema
-    {
+  def as_json(opts = {})
+    data = {
+        id: uuid,
         entity_key: entity_key,
-        entity_path: entity_path,
         label: label,
         placeholder: placeholder,
         hint: hint,
@@ -106,42 +112,11 @@ class FormEntity < ApplicationRecord
         editable: editable,
         required: required,
         active: active,
-        unique: unique,
         visible: visible,
+        unique: unique,
         position: position,
         custom_field: custom_field,
-        can_visible_be_changed: can_visible_be_changed,
-        can_editable_be_changed: can_editable_be_changed,
-        can_required_be_changed: can_required_be_changed,
-        can_uniqueness_be_changed: can_uniqueness_be_changed,
-        can_be_disabled: can_be_disabled,
-        can_label_be_renamed: can_label_be_renamed,
-        can_choices_be_changed: can_choices_be_changed,
-        allow_clearing_default_value: allow_clearing_default_value,
-        config: config,
-        options: options,
-        choices_scope: choices_scope&.config,
-        internal: internal
-    }
-  end
-
-  def as_json(opts={})
-    data = {
-      id: uuid,
-      entity_key: entity_key,
-      label: label,
-      placeholder: placeholder,
-      hint: hint,
-      entity_type: entity_type,
-      default_value: default_value,
-      editable: editable,
-      required: required,
-      active: active,
-      visible: visible,
-      unique: unique,
-      position: position,
-      custom_field: custom_field,
-      options: options
+        options: options
     }
     if choices_scope.present?
       data[:choices] = choices_scope.as_json(params: opts["params"], user: opts["current_user"])
@@ -153,6 +128,29 @@ class FormEntity < ApplicationRecord
       end
     end
     data
+  end
+
+
+  def self.system_entity(section, entity_key, attributes)
+    entity = self.new(
+        section: section,
+        entity_key: entity_key,
+        options: {},
+        config: {}
+    )
+    schema = DEFAULT_SYSTEM_SCHEMA.deep_dup
+    schema.deep_merge!(self.schema.deep_dup)
+    schema.deep_merge!(attributes)
+    schema[:options].each do |attr, value|
+      entity.set attr, value
+    end
+    schema[:config].each do |attr, value|
+      entity.set attr, value
+    end
+    schema.except(:options, :config)&.each do |attr, value|
+      entity.set attr, value
+    end
+    entity
   end
 
 end

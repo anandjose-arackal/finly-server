@@ -1,3 +1,23 @@
+# == Schema Information
+#
+# Table name: form_rules
+#
+#  id                :bigint           not null, primary key
+#  company_id        :bigint           not null
+#  form_id           :string(255)      not null
+#  rule_parent_id    :string(255)      not null
+#  rule_parent_type  :string(255)      not null
+#  entity_path       :string(255)      not null
+#  predicate         :string(255)      not null
+#  rule_type_id      :integer          not null
+#  match_value       :text(65535)
+#  match_formula     :string(255)
+#  match_entity_path :string(255)
+#  deleted_at        :datetime
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#
+
 class FormRule < ApplicationRecord
   belongs_to :company
   belongs_to :form
