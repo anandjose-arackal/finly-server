@@ -55,13 +55,6 @@ class FormEntity < ApplicationRecord
 
   class_attr :registered_type
 
-  amoeba do
-    enable
-    clone [:entities, :choices]
-    nullify :company_id
-    nullify :uuid
-  end
-
   belongs_to :company
   belongs_to :section, class_name: "FormSection", foreign_key: :form_section_id
   belongs_to :form

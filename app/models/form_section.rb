@@ -22,14 +22,6 @@ class FormSection < ApplicationRecord
   belongs_to :company
   belongs_to :form
   has_many :entities, class_name: 'FormEntity', dependent: :destroy
-  # has_many :root_entities, -> { root }, class_name: 'FormEntity', dependent: :destroy
-
-  amoeba do
-    enable
-    clone [:entities]
-    nullify :company_id
-    nullify :uuid
-  end
 
   def section
     self

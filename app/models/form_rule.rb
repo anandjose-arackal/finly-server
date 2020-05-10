@@ -32,15 +32,6 @@ class FormRule < ApplicationRecord
 
   delegate 'value?', 'entity?', 'formula?', to: :rule_type
 
-  amoeba do
-    enable
-    nullify :company_id
-    nullify :uuid
-    nullify :form_id
-    nullify :created_at
-    nullify :updated_at
-  end
-
   def as_json(options={})
     {
         entity_path: entity_path,

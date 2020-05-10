@@ -32,17 +32,6 @@ class FormCondition < ApplicationRecord
   has_many :rules, class_name: 'FormRule', as: :rule_parent
   has_many :actions, class_name: 'FormConditionAction'
 
-  amoeba do
-    clone [:rules, :actions]
-    nullify :uuid
-    nullify :form_id
-    nullify :company_id
-    nullify :created_by_id
-    nullify :updated_by_id
-    nullify :created_at
-    nullify :updated_at
-  end
-
   def self.system_condition(params = {}, &block)
     params[:custom] = false
     params[:internal] ||= false

@@ -20,15 +20,6 @@ class FormConditionAction < ApplicationRecord
   belongs_to :form
   belongs_to :form_condition
 
-  amoeba do
-    enable
-    nullify :uuid
-    nullify :company_id
-    nullify :form_id
-    nullify :created_at
-    nullify :updated_at
-  end
-
   def as_json(options={})
     {
         property: property,

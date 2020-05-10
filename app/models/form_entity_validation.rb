@@ -33,18 +33,6 @@ class FormEntityValidation < ApplicationRecord
 
   accepts_nested_attributes_for :rules
 
-  amoeba do
-    enable
-    clone [:rules]
-    nullify :uuid
-    nullify :form_id
-    nullify :company_id
-    nullify :created_by_id
-    nullify :updated_by_id
-    nullify :created_at
-    nullify :updated_at
-  end
-
   def self.system_validation(params={}, &block)
     params[:custom] = false
     params[:internal] ||= false

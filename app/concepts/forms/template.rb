@@ -60,4 +60,14 @@ class Forms::Template < Templates::API
     association :rules, &templates[:rules]
   end
 
+  # association :choice_dependencies do |exec_context|
+  #   matcher do |template, record|
+  #     record.dependency_id == template.dependency_id
+  #   end
+  #
+  #   set :company_id, exec_context[:company_id]
+  #   set :form, exec_context[:root_record]
+  #
+  # end
+
 end
