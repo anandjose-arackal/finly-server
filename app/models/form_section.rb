@@ -22,6 +22,7 @@ class FormSection < ApplicationRecord
   belongs_to :company
   belongs_to :form
   has_many :entities, class_name: 'FormEntity', dependent: :destroy
+  # has_many :root_entities, -> { root }, class_name: 'FormEntity', dependent: :destroy
 
   amoeba do
     enable
@@ -32,6 +33,14 @@ class FormSection < ApplicationRecord
 
   def section
     self
+  end
+
+  def find_entity(entity_path)
+    entities.each do |entity|
+      return entity if entity.entity_path == entity_path
+
+      entity.find_entity(entity_path)
+    end
   end
 
   def as_json(options = {})

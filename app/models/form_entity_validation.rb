@@ -25,13 +25,25 @@ class FormEntityValidation < ApplicationRecord
 
   belongs_to :company
   belongs_to :form
-  belongs_to :form_entity
+  # belongs_to :form_entity
   belongs_to :created_by, class_name: 'User', optional: true
   belongs_to :updated_by, class_name: 'User', optional: true
 
   has_many :rules, class_name: 'FormRule', as: :rule_parent
 
   accepts_nested_attributes_for :rules
+
+  amoeba do
+    enable
+    clone [:rules]
+    nullify :uuid
+    nullify :form_id
+    nullify :company_id
+    nullify :created_by_id
+    nullify :updated_by_id
+    nullify :created_at
+    nullify :updated_at
+  end
 
   def self.system_validation(params={}, &block)
     params[:custom] = false

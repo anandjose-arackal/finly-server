@@ -57,7 +57,7 @@ class FormEntity < ApplicationRecord
 
   amoeba do
     enable
-    clone [:entities]
+    clone [:entities, :choices]
     nullify :company_id
     nullify :uuid
   end
@@ -69,9 +69,18 @@ class FormEntity < ApplicationRecord
   belongs_to :created_by, optional: true, class_name: "User", foreign_key: :created_by_user_id
 
   has_many :entities, class_name: 'FormEntity', foreign_key: :parent_id, primary_key: :uuid
-  has_many :form_entity_choices, class_name: 'FormEntityChoice', dependent: :destroy
+  has_many :choices, class_name: 'FormEntityChoice', dependent: :destroy
+  has_many :validations, class_name: "FormEntityValidation"
 
-  accepts_nested_attributes_for :form_entity_choices
+  def find_entity(entity_path)
+    entities.each do |entity|
+      return entity if entity.entity_path == entity_path
+
+      entity.find_entity(entity_path)
+    end
+  end
+
+  accepts_nested_attributes_for :choices
 
   serialize :options, JSON
   serialize :choices_scope, JSON
@@ -96,9 +105,9 @@ class FormEntity < ApplicationRecord
     Choices[val[:type]].new(val[:config], form_entity: self)
   end
 
-  def choices(params: {}, user:)
-    choices_scope&.choices(params: params, user: user)
-  end
+  # def choices(params: {}, user:)
+  #   choices_scope&.choices(params: params, user: user)
+  # end
 
   def as_json(opts = {})
     data = {

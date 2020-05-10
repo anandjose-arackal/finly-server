@@ -19,6 +19,8 @@ class Masters::Vendors::Form < Forms::API
       text :name, required: true
       dropdown :state_id, required: true,
                choices_scope: Choices[:enum].(GstStateCode, name: :name)
+      text :age
+      text :size
     end
   end
 
@@ -28,9 +30,16 @@ class Masters::Vendors::Form < Forms::API
     action :editable, true
   end
 
+  condition condition_id: :name_status_editable do
+    reference :entity, :name
+    rule :status_id, 'in', value: VendorStatus.ids_for(:draft, :rejected, :retracted)
+    action :editable, true
+  end
+
   condition condition_id: :status_location_name_mandatory do
     reference :entity, 'locations/name'
     rule :status_id, 'in', value: VendorStatus.ids_for(:draft, :rejected, :retracted)
+    rule :age, 'in', value: VendorStatus.ids_for(:draft, :rejected, :retracted)
     action :required, false
   end
 

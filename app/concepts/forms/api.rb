@@ -9,7 +9,7 @@ class Forms::API
   class_attr :model
 
   def self.form
-    @form ||= Form.new
+    @form ||= Form.new(klass_name: self, model: self.model)
   end
 
   def self.section(section_id, options = {}, &block)

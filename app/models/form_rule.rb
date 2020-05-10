@@ -19,6 +19,8 @@
 #
 
 class FormRule < ApplicationRecord
+  include UUIDHelper
+
   belongs_to :company
   belongs_to :form
   belongs_to :rule_parent, polymorphic: true
@@ -29,6 +31,15 @@ class FormRule < ApplicationRecord
   serialize :match_value, JSON
 
   delegate 'value?', 'entity?', 'formula?', to: :rule_type
+
+  amoeba do
+    enable
+    nullify :company_id
+    nullify :uuid
+    nullify :form_id
+    nullify :created_at
+    nullify :updated_at
+  end
 
   def as_json(options={})
     {

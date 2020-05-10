@@ -15,4 +15,8 @@ class FormChoiceDependencyMapping < ApplicationRecord
   belongs_to :dependency, class_name: "FormChoiceDependency"
   belongs_to :form_rule
   # belongs_to :form_entity_choice
+
+  amoeba do
+    include_associations [:form_rule]
+  end
 end

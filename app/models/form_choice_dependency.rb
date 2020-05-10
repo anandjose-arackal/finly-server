@@ -32,9 +32,13 @@ class FormChoiceDependency < ApplicationRecord
   has_many :rules, class_name: 'FormRule', as: :rule_parent
   has_many :mappings, class_name: 'FormChoiceDependencyMapping', foreign_key: :dependency_id
 
-  # amoeba do
-  #
-  # end
+  amoeba do
+    clone [:mappings]
+    nullify :company_id
+    nullify :uuid
+    nullify :created_by_id
+    nullify :updated_by_id
+  end
 
   def as_json(options={})
     data = {}
