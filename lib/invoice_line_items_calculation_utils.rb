@@ -158,7 +158,7 @@ class InvoiceLineItemsCalculationUtils
             po_item_amount = po_item.rate.to_f * po_item.quantity.to_f
           end
           item_amount = po_item.present? ? po_item_amount : self.invoice_item_amount
-          rate = ((item.discount.to_f / item_amount) * 100).round(2) rescue 0
+          rate = ((item.discount.to_f / item_amount) * 100) rescue 0
           self.discount_amount = (rate.to_f * self.invoice_item_amount.to_f) / 100
         else
           self.discount_amount = (item.discount.to_f * self.invoice_item_amount.to_f)/100
