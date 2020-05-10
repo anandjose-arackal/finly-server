@@ -27,13 +27,14 @@ class FormSection < ApplicationRecord
     self
   end
 
-  def find_entity(entity_path)
-    entities.each do |entity|
-      return entity if entity.entity_path == entity_path
-
-      entity.find_entity(entity_path)
-    end
-  end
+  # Fixme: Delete this as it is available in Forms::API::Entity::Registry. Kept it commented for testing purpose
+  # def find_entity(entity_path)
+  #   entities.each do |entity|
+  #     return entity if entity.entity_path == entity_path
+  #
+  #     entity.find_entity(entity_path)
+  #   end
+  # end
 
   def as_json(options = {})
     {

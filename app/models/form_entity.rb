@@ -65,13 +65,14 @@ class FormEntity < ApplicationRecord
   has_many :choices, class_name: 'FormEntityChoice', dependent: :destroy
   has_many :validations, class_name: "FormEntityValidation"
 
-  def find_entity(entity_path)
-    entities.each do |entity|
-      return entity if entity.entity_path == entity_path
-
-      entity.find_entity(entity_path)
-    end
-  end
+  # Fixme: Delete this as it is available in Forms::API::Entity::Registry. Kept it commented for testing purpose
+  # def find_entity(entity_path)
+  #   entities.each do |entity|
+  #     return entity if entity.entity_path == entity_path
+  #
+  #     entity.find_entity(entity_path)
+  #   end
+  # end
 
   accepts_nested_attributes_for :choices
 

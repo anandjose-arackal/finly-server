@@ -24,6 +24,13 @@ class Form < ApplicationRecord
   has_many :conditions, class_name: 'FormCondition'
   has_many :validations, class_name: 'FormEntityValidation'
 
+  def find_entity(entity_path)
+    sections.each do |section|
+      entity = section.find_entity(entity_path)
+      return entity if entity.present?
+    end
+  end
+
   def as_json(options = {})
     {
         id: id,

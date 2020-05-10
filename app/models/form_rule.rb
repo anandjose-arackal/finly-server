@@ -2,7 +2,7 @@
 #
 # Table name: form_rules
 #
-#  id                :bigint           not null, primary key
+#  id                :bigint           not null
 #  company_id        :bigint           not null
 #  form_id           :string(255)      not null
 #  rule_parent_id    :string(255)      not null
@@ -16,6 +16,7 @@
 #  deleted_at        :datetime
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
+#  uuid              :string(36)       not null, primary key
 #
 
 class FormRule < ApplicationRecord

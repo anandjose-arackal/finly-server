@@ -1,3 +1,4 @@
+# Fixme : Migrate to template structure instead of the current structure
 class Forms::API::ChoiceDependency
   include DynamicAttributes
 

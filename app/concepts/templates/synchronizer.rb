@@ -48,7 +48,7 @@ class Templates::Synchronizer
       if association_record.nil?
         if condition.blank? or condition.call(association_template)
           record = exec_context[:parent].send("build_#{association_name}", clone(association_template))
-          sync_record record, association_template
+          sync_record association_template, record
         end
       end
     end
@@ -71,15 +71,16 @@ class Templates::Synchronizer
         matching_record = records.new(clone(temp_record))
       end
 
-      sync_record(matching_record, temp_record)
+      sync_record(temp_record, matching_record)
     end
   end
 
-  def sync_record(record, template)
+  def sync_record(template, record)
     # Evaluate associations of the matching records for cloning
     associations.each do |association_name, args|
       context = exec_context.dup
       context[:parent] = record
+      context[:template] = template
       eval = Templates::Synchronizer.new association_name, context, args, &args[:evaluator]
       eval.sync(template, record)
     end
