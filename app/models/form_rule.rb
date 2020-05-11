@@ -21,6 +21,7 @@
 
 class FormRule < ApplicationRecord
   include UUIDHelper
+  include Forms::Rules::Matcher
 
   belongs_to :company
   belongs_to :form
@@ -33,7 +34,29 @@ class FormRule < ApplicationRecord
 
   delegate 'value?', 'entity?', 'formula?', to: :rule_type
 
-  def as_json(options={})
+  validates :predicate, inclusion: {in: Forms::Rules::Predicates.all}
+
+  def nested_hash_value(obj, key)
+    if obj.respond_to?(:key?) && obj.key?(key)
+      obj[key]
+    elsif obj.respond_to?(:each)
+      r = nil
+      obj.find { |*a| r = nested_hash_value(a.last, key) }
+      r
+    end
+  end
+
+  def match?(data)
+    # Fixme: Use keys instead of path
+    input = nested_hash_value(data[:row], entity_path) if data[:row].present?
+    input ||= nested_hash_value(data[:form], entity_path)
+    entity = form.find_entity(entity_path)
+
+    value = match_value
+    entity.send("match_#{predicate}?", input, value)
+  end
+
+  def as_json(options = {})
     {
         entity_path: entity_path,
         predicate: predicate,

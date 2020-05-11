@@ -1,11 +1,15 @@
 require 'fuzzystringmatch'
 class StringUtils
 
+  TRUE_VALUES = [1, 'true', 'TRUE', true, '1', 'yes', 'on', 't', 'T', 'y', 'Y'].to_set
+  FALSE_VALUES = [0, 'false', 'FALSE', false, '0', 'no', 'off', 'f', 'F', 'n', 'N', nil].to_set
+  BOOLEAN_VALUES = (TRUE_VALUES + FALSE_VALUES).freeze
+
   def self.to_bool(string)
     return !!string if (!!string == string)
     # return nil unless string.kind_of?(String)
-    return true if [1, 'true', '1', 'yes', 'on', 't', 'y', 'Y'].include? string
-    return false if [0, 'false', '0', 'no', 'off', 'f', 'n', 'N'].include? string
+    return true if TRUE_VALUES.include? string
+    return false if FALSE_VALUES.include? string
     return nil
   end
 

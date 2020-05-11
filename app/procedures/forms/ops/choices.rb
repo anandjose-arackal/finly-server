@@ -3,13 +3,14 @@ class Forms::Ops::Choices < Transactions::API
   schema do
     params do
       required(:form_name).filled
-      optional(:controlling_entity_values).array do
-        hash do
-          required(:controlling_entity_key).filled
-          required(:controlling_choice_id).filled
-        end
-      end
-      required(:entity_field_key).filled
+      # optional(:controlling_entity_values).array do
+      #   hash do
+      #     required(:controlling_entity_path).filled
+      #     required(:controlling_choice_value).filled
+      #   end
+      # end
+      optional(:controlling_choices)
+      required(:entity_path).filled
     end
   end
 
@@ -17,7 +18,7 @@ class Forms::Ops::Choices < Transactions::API
   step :find_model
   step Policy::Pundit(Forms::Policy, :config?)
   step :init_entity
-  pass :init_dependency_mappings
+  pass :init_choice_dependencies
   pass :scope_choices
   pass :scope_user
   pass :fetch
@@ -38,30 +39,56 @@ class Forms::Ops::Choices < Transactions::API
     true
   end
 
-  def init_dependency_mappings(context, params:, model:, **)
-    controlling_entity_values = params[:controlling_entity_values]
-    if controlling_entity_values.present?
-      query = build_query(controlling_entity_values)
-      context[:dependency_choice_mappings] = FormDependencyChoiceMapping.where(query)
-    end
+  def init_choice_dependencies(context, model:, entity:, **)
+    context[:choice_dependencies] = model.choice_dependencies
+                                        .ransack(form_entity: entity)
+                                        .result
+                                        .includes(:rules, :mappings)
   end
 
-  def scope_choices(context, dependency_choice_mappings: [], **)
-    context[:filter_query] = {}
-    return if dependency_choice_mappings.count == 0
+  # def init_dependency_mappings(context, params:, model:, **)
+  #   controlling_entity_values = params[:controlling_entity_values]
+  #   if controlling_entity_values.present?
+  #     query = build_query(controlling_entity_values)
+  #     context[:dependency_choice_mappings] = FormDependencyChoiceMapping.where(query)
+  #   end
+  # end
 
-    map = {}
-    dependency_choice_mappings.each do |mapping|
-      map[mapping.controlling_entity_key] ||= []
-      map[mapping.controlling_entity_key] << mapping.dependent_choice_id
+  def scope_choices(context, choice_dependencies:, params:, **)
+    return if choice_dependencies.size == 0
+
+    choices = {}
+    choice_dependencies.each do |dependency|
+      choices[dependency] = []
+      dependency.rules.each do |rule|
+        if rule.match?(params[:controlling_choices])
+          choices[dependency] += dependency.mapping.map { |map| map.form_entity_choice_id }
+        end
+      end
     end
-    intersecting_choices = nil
-    map.values.each do |value_arr|
-      intersecting_choices ||= value_arr
-      intersecting_choices = intersecting_choices & value_arr
+    intersecting_choices = []
+    choices.values.each do |arr|
+      intersecting_choices = intersecting_choices & arr
     end
-    context[:filter_query] = {id_in: intersecting_choices}
+    params[:q] = {id_in: intersecting_choices}
   end
+
+  # def scope_choices_old(context, dependency_choice_mappings: [], **)
+  #   context[:filter_query] = {}
+  #   return if dependency_choice_mappings.count == 0
+  #
+  #   map = {}
+  #   dependency_choice_mappings.each do |mapping|
+  #     map[mapping.controlling_entity_key] ||= []
+  #     map[mapping.controlling_entity_key] << mapping.dependent_choice_id
+  #   end
+  #   intersecting_choices = nil
+  #   map.values.each do |value_arr|
+  #     intersecting_choices ||= value_arr
+  #     intersecting_choices = intersecting_choices & value_arr
+  #   end
+  #   context[:filter_query] = {id_in: intersecting_choices}
+  # end
 
   # Pick the document owner. If the document is not created, pick the current_user
   def scope_user(context, current_user:, **)
@@ -75,6 +102,7 @@ class Forms::Ops::Choices < Transactions::API
   end
 
   protected
+
   def build_query(values)
     query = ""
     values.each do |map|
