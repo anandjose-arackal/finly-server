@@ -12,6 +12,7 @@
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
 #  identifier                   :string(255)
+#  uuid                         :string(36)
 #  deleted_at                   :datetime
 #
 

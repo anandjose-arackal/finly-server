@@ -24,6 +24,7 @@
 #  updated_at                :datetime         not null
 #  marked_as_closed          :boolean
 #  tally_exported            :boolean          default(FALSE)
+#  uuid                      :string(36)
 #  deleted_at                :datetime
 #
 

@@ -29,6 +29,10 @@
 #  signature_title        :string(255)
 #  deleted_at             :datetime
 #  pan                    :string(255)
+#  vp_web_client_version  :string(255)
+#  vp_web_client_theme    :string(255)
+#  em_web_client_version  :string(255)
+#  em_web_client_theme    :string(255)
 #
 
 class UserProfile < ApplicationRecord
