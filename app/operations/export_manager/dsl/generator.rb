@@ -36,7 +36,7 @@ module ExportManager::DSL::Generator
     if sync?
       build
     else
-      Background.call(user, {export_job_id: self.export_job.id})
+      Background.call_async(user, {export_job_id: self.export_job.id})
     end
   end
 
