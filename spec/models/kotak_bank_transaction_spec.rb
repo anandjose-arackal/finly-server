@@ -14,7 +14,7 @@
 #  beneficiary_account_number :string(255)
 #  beneficiary_account_ifsc   :string(255)
 #  beneficiary_name           :string(255)
-#  narration                  :string(255)
+#  narration                  :text(65535)
 #  payment_date               :date
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
