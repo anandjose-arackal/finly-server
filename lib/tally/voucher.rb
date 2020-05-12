@@ -29,8 +29,9 @@ class Tally::Voucher < NonPersistentModel
       ledger.add_category_allocation allocation[:name], allocation[:cost_center], -allocation_amount
     end
     bank_allocations&.each do |allocation|
-      allocation_amount = allocation[:amount] || 0
-      ledger.add_bank_allocation allocation[:name], date, allocation[:transaction_type], allocation[:payment_mode], allocation[:party_name], allocation_amount
+      allocation[:amount] ||= 0
+      allocation[:amount] = allocation[:amount].to_f
+      ledger.add_bank_allocation allocation
     end
   end
 
