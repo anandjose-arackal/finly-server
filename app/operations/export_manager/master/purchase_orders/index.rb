@@ -283,7 +283,7 @@ class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Sp
   end
 
   def advance_tds_slab(purchase_order)
-    purchase_order&.advance_tds_slab
+    purchase_order&.advance_tds_slab&.name
   end
 
   def invoice_number(purchase_order)
