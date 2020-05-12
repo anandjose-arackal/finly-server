@@ -1,12 +1,12 @@
 class Tally::Voucher < NonPersistentModel
-  attr_accessor :voucher_type, :date, :effective_date, :voucher_number, :state, :gl_name, :gstin, :narration, :reference
+  attr_accessor :voucher_type, :date, :effective_date, :reference_date, :voucher_number, :state, :gl_name, :gstin, :narration, :reference
 
   validates_presence_of :voucher_type, :date, :gl_name
   validate :zero_sum_ledgers
   validate :ledgers_validation
 
   def find_ledger(name)
-    ledgers.find {|ledger| ledger.name == name}
+    ledgers.find { |ledger| ledger.name == name }
   end
 
   def ledgers
@@ -29,8 +29,9 @@ class Tally::Voucher < NonPersistentModel
       ledger.add_category_allocation allocation[:name], allocation[:cost_center], -allocation_amount
     end
     bank_allocations&.each do |allocation|
-      allocation_amount = allocation[:amount] || 0
-      ledger.add_bank_allocation allocation[:name], date, allocation[:transaction_type], allocation[:payment_mode], allocation[:party_name], allocation_amount
+      allocation[:amount] ||= 0
+      allocation[:amount] = allocation[:amount].to_f
+      ledger.add_bank_allocation allocation
     end
   end
 
@@ -39,7 +40,7 @@ class Tally::Voucher < NonPersistentModel
         {
             'voucher': {
                 "date": Tally::Utils.to_date(self.date),
-                "referencedate": Tally::Utils.to_date(self.date),
+                "referencedate": Tally::Utils.to_date((self.reference_date || self.date)),
                 "statename": self.state,
                 "narration": self.narration,
                 "countryofresidence": "India",

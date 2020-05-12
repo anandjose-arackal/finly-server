@@ -80,9 +80,9 @@ class Docs::UtilityBills::Subscriptions::Mailers::TableBulk
     if options.dig(:filter, :key).present?
       criteria = options[:filter][:criteria] || false
       key = options[:filter][:key].to_sym
-      records.filter {|record| record[key] == criteria}.each_with_index do |record, key|
+      records.filter {|record| record[key] == criteria}.each_with_index do |record, key2|
         datum = [
-            "#{key + 1}",
+            "#{key2 + 1}",
             record[:sequence_id],
             record[:biller][:biller_name],
             record[:user][:name]

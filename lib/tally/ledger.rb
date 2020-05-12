@@ -61,19 +61,13 @@ class Tally::Ledger < NonPersistentModel
     category_allocation.add cost_center, amount
   end
 
-  def add_bank_allocation(name, date, transaction_type, payment_mode, party_name, amount)
-    bank_allocation = find_bank_allocation name
+  def add_bank_allocation(params)
+    bank_allocation = find_bank_allocation params[:name]
     if bank_allocation.nil?
-      bank_allocation = Tally::BankAllocation.new(
-          name: name,
-          date: date,
-          transaction_type: transaction_type,
-          payment_mode: payment_mode,
-          party_name: party_name
-      )
+      bank_allocation = Tally::BankAllocation.new(params)
       bank_allocations << bank_allocation
     end
-    bank_allocation.add amount
+    bank_allocation.add params[:amount]
   end
 
   def as_json(options)

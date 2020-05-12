@@ -4,6 +4,14 @@ class PaymentDrop < Drop
     record.date
   end
 
+  def processed_at
+    record.processed_at
+  end
+
+  def updated_at
+    record.updated_at
+  end
+
   def narration
     record.note
   end
