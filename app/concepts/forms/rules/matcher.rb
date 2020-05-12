@@ -18,8 +18,8 @@ module Forms::Rules::Matcher
   def self.predicate(name, any: true, all: true, list: false, &block)
     predicates[name] = Predicate.new({name: name, any: any, all: all, list: list})
     define_method "match_#{name}?" do |input, rule_value|
-      # Unsupported predicate
-      return false unless self.class.operators.include?(name)
+      # todo Unsupported predicate
+      # return false unless self.class.operators.include?(name)
 
       rule_value = [rule_value] if list and not rule_value.respond_to?(:each)
       block.call(parse(input), parse(rule_value))

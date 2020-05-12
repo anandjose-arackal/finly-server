@@ -19,16 +19,16 @@ class Forms::API::ChoiceDependency
     mappings << Mapping.new(controlling_choice, values)
   end
 
-  def sync(user, form_model)
-    return if form_model.dependencies.select {|d| d.dependency_id == self.dependency_id.to_s}.present?
+  def sync(user, form_master, form)
+    return if form_master.dependencies.select {|dependency_id, d| dependency_id == self.dependency_id.to_s}.present?
 
-    form_entity = form_model.entities.select {|entity| entity.entity_path == self.entity_path.to_s}.first
-    controlling_entity = form_model.entities.select {|entity| entity.entity_path == self.controlling_entity_path.to_s}.first
+    form_entity = form.find_entity(entity_path)
+    controlling_entity = form.find_entity(controlling_entity_path)
 
-    dependency = form_model.dependencies.new(
+    dependency = form.choice_dependencies.new(
         {
             company_id: user.company_id,
-            form: form_model,
+            form: form,
             form_entity: form_entity,
             controlling_entity: controlling_entity,
             dependency_id: self.dependency_id,
@@ -39,7 +39,7 @@ class Forms::API::ChoiceDependency
     )
 
     mappings.each do |mapping|
-      mapping.build(user, form_model, dependency, form_entity, controlling_entity)
+      mapping.build(user, form_master, dependency, form_entity, controlling_entity)
     end
     dependency.save
   end
@@ -54,11 +54,11 @@ class Forms::API::ChoiceDependency
       self.values = [values] unless values.respond_to?(:each)
     end
 
-    def build(user, form_model, choice_dependency, form_entity, controlling_entity)
+    def build(user, form_master, choice_dependency, form_entity, controlling_entity)
       controlling_choice_id = controlling_entity.choices_scope.find_by_name(controlling_choice, user: user)&.id
       rule = choice_dependency.rules.new(
           company_id: user.company_id,
-          form: form_model,
+          form: form_entity.form,
           entity_path: controlling_entity.entity_path,
           predicate: 'eq',
           rule_type_id: FormRuleType.id_for(:value),

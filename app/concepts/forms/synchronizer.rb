@@ -1,14 +1,21 @@
 class Forms::Synchronizer
 
   def self.call
-    Forms::Router.forms.each { |master| Forms::Synchronizer.sync(master.form) }
+    Forms::Router.forms.each { |master| Forms::Synchronizer.sync(master) }
   end
 
-  def self.sync(form)
+  def self.sync(master)
+    form = master.form
     # Form.delete_all; FormSection.delete_all; FormEntity.delete_all; FormChoiceDependency.delete_all; FormChoiceDependencyMapping.delete_all; FormRule.delete_all; FormCondition.delete_all; FormConditionAction.delete_all;FormEntityValidation.delete_all;
     template = Forms::Template.new(form)
     Company.limit(2).last(1).each do |company|
-      template.sync(company_id: company.id)
+      # Synchronize form
+      company_form = template.sync(company_id: company.id)
+
+      # Synchronize dependencies
+      master.dependencies.each do |dependency_id, dependency|
+        dependency.sync(company.users.first, master, company_form)
+      end
     end
   end
 

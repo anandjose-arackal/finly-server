@@ -11,6 +11,8 @@ class Masters::Vendors::Form < Forms::API
            choices_scope: Choices[:lookup].('policies',
                permissions: [:vendor_creator, :vendor_manager]),
            required: true
+    lookup :department_id, choices_scope: Choices[:lookup].('departments')
+    lookup :cost_center_id, choices_scope: Choices[:lookup].('cost_centers')
     text :legal_name
   end
 
@@ -48,9 +50,9 @@ class Masters::Vendors::Form < Forms::API
     rule 'locations/name', 'not_cont', value: 'Hello'
   end
 
-  choice_dependency entity_path: :policy_id, dependency_id: :policy_dependency do
+  choice_dependency entity_path: :department_id, dependency_id: :policy_dependency do
     controlling_entity_path :policy_id
-    dependency 'Company (Default)', ['6am to 9am']
+    dependency "Company (Default)", ["test1"]
   end
 
 end

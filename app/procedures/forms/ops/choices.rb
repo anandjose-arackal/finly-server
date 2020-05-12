@@ -2,19 +2,14 @@ class Forms::Ops::Choices < Transactions::API
 
   schema do
     params do
-      required(:form_name).filled
-      # optional(:controlling_entity_values).array do
-      #   hash do
-      #     required(:controlling_entity_path).filled
-      #     required(:controlling_choice_value).filled
-      #   end
-      # end
+      required(:route).filled # Pointing to the form route
       optional(:controlling_choices)
       required(:entity_path).filled
     end
   end
 
   # step Model(Form, :find_by_uuid)
+  step :find_form
   step :find_model
   step Policy::Pundit(Forms::Policy, :config?)
   step :init_entity
@@ -23,15 +18,22 @@ class Forms::Ops::Choices < Transactions::API
   pass :scope_user
   pass :fetch
 
-  def find_model(context, params:, current_user:, **)
-    context[:model] = Form.find_by(model: params[:form_name], company_id: current_user.company_id)
+  def find_form(context, params:, **)
+    context[:form] = Forms::Router.klass(params[:route])
+    return on_error context, :base, "Invalid Route" if context[:form].blank?
+
+    true
+  end
+
+  def find_model(context, params:, form:, current_user:, **)
+    context[:model] = Form.find_by(model: form.model, company_id: current_user.company_id)
     return false unless context[:model].present?
 
     true
   end
 
   def init_entity(context, model:, params:, **)
-    context[:entity] = model.entities.find_by(field_key: params[:entity_field_key])
+    context[:entity] = model.entities.find_by(entity_path: params[:entity_path])
     if context[:entity].blank?
       return on_error context, :base, "field not found"
     end
@@ -46,14 +48,6 @@ class Forms::Ops::Choices < Transactions::API
                                         .includes(:rules, :mappings)
   end
 
-  # def init_dependency_mappings(context, params:, model:, **)
-  #   controlling_entity_values = params[:controlling_entity_values]
-  #   if controlling_entity_values.present?
-  #     query = build_query(controlling_entity_values)
-  #     context[:dependency_choice_mappings] = FormDependencyChoiceMapping.where(query)
-  #   end
-  # end
-
   def scope_choices(context, choice_dependencies:, params:, **)
     return if choice_dependencies.size == 0
 
@@ -62,33 +56,16 @@ class Forms::Ops::Choices < Transactions::API
       choices[dependency] = []
       dependency.rules.each do |rule|
         if rule.match?(params[:controlling_choices])
-          choices[dependency] += dependency.mapping.map { |map| map.form_entity_choice_id }
+          choices[dependency] += dependency.mappings.map { |map| map.form_entity_choice_id }
         end
       end
     end
-    intersecting_choices = []
+    intersecting_choices = choices.values.first
     choices.values.each do |arr|
       intersecting_choices = intersecting_choices & arr
     end
-    params[:q] = {id_in: intersecting_choices}
+    context[:filter_query] = {id_in: intersecting_choices}
   end
-
-  # def scope_choices_old(context, dependency_choice_mappings: [], **)
-  #   context[:filter_query] = {}
-  #   return if dependency_choice_mappings.count == 0
-  #
-  #   map = {}
-  #   dependency_choice_mappings.each do |mapping|
-  #     map[mapping.controlling_entity_key] ||= []
-  #     map[mapping.controlling_entity_key] << mapping.dependent_choice_id
-  #   end
-  #   intersecting_choices = nil
-  #   map.values.each do |value_arr|
-  #     intersecting_choices ||= value_arr
-  #     intersecting_choices = intersecting_choices & value_arr
-  #   end
-  #   context[:filter_query] = {id_in: intersecting_choices}
-  # end
 
   # Pick the document owner. If the document is not created, pick the current_user
   def scope_user(context, current_user:, **)
@@ -96,20 +73,9 @@ class Forms::Ops::Choices < Transactions::API
     context[:user] = current_user
   end
 
-  def fetch(context, filter_query:, entity:, user:, **)
+  def fetch(context, filter_query: nil, entity:, user:, **)
     params = {q: filter_query}
-    context[:choices] = entity.choices_scope.as_json(params: params, user: user)
-  end
-
-  protected
-
-  def build_query(values)
-    query = ""
-    values.each do |map|
-      query += " OR " if query.present?
-      query += " (`form_dependency_choice_mappings`.`controlling_entity_key` = '#{map[:controlling_entity_key]}' AND `form_dependency_choice_mappings`.`controlling_choice_id` = '#{map[:controlling_choice_id]}')"
-    end
-    query
+    context[:choices] = entity.choices_scope.build(params: params, user: user)
   end
 
 end

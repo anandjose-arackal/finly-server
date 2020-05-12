@@ -20,7 +20,7 @@ class Lookup::API < Transactions::API
   def define_search(context, params:, **)
     raise "Search key is not defined for #{self.class.name}" unless self.class.search_key.present?
 
-    params[:q] = {}
+    params[:q] = params[:q] || {}
     params[:q][self.class.search_key] = params["search"]
   end
 

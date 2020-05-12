@@ -6,6 +6,7 @@ module Forms::API::Entity::Registry
   end
 
   def find_entity(entity_path)
+    entity_path = entity_path.to_s
     self.entities.each do |entity|
       return entity if entity.entity_path == entity_path
 

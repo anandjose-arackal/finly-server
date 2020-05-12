@@ -36,21 +36,47 @@ class FormRule < ApplicationRecord
 
   validates :predicate, inclusion: {in: Forms::Rules::Predicates.all}
 
-  def nested_hash_value(obj, key)
-    if obj.respond_to?(:key?) && obj.key?(key)
-      obj[key]
-    elsif obj.respond_to?(:each)
-      r = nil
-      obj.find { |*a| r = nested_hash_value(a.last, key) }
-      r
+  # def nested_hash_value(obj, key)
+  #   if obj.respond_to?(:key?) && obj.key?(key)
+  #     obj[key]
+  #   elsif obj.respond_to?(:each)
+  #     r = nil
+  #     obj.find { |*a| r = nested_hash_value(a.last, key) }
+  #     r
+  #   end
+  # end
+
+  # Navigates through the entire form path to fetch the data
+  def fetch_form_data(data, path)
+    paths = path.split("/")
+    result = data
+    while (p = paths.shift)
+      return nil if result.nil?
+      # Final node
+      return result[p] if paths.blank?
+      return nil unless result <= Hash
+      result = result[p]
     end
+
+    nil
+  end
+
+  def fetch_flat_data(data, path)
+    data[path]
+  end
+
+  def fetch_row_data(data, path)
+    paths = path.split('/')
+    data&.dig(paths.last)
   end
 
   def match?(data)
-    # Fixme: Use keys instead of path
-    input = nested_hash_value(data[:row], entity_path) if data[:row].present?
-    input ||= nested_hash_value(data[:form], entity_path)
+    input = fetch_flat_data(data, entity_path)
+    input ||= fetch_row_data(data[:row], entity_path) if data[:row].present?
+    input ||= fetch_form_data(data[:form], entity_path)
     entity = form.find_entity(entity_path)
+    raise "Entity #{entity_path} not found" if entity.nil?
+    # return false unless entity.present?
 
     value = match_value
     entity.send("match_#{predicate}?", input, value)

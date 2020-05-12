@@ -25,10 +25,13 @@ class Form < ApplicationRecord
   has_many :validations, class_name: 'FormEntityValidation'
 
   def find_entity(entity_path)
+    entity_path = entity_path.to_s
     sections.each do |section|
       entity = section.find_entity(entity_path)
       return entity if entity.present?
     end
+
+    nil
   end
 
   def as_json(options = {})
