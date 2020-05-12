@@ -37,7 +37,7 @@ class Docs::UtilityBills::Bills::Mailers::TableBulk
     end
 
     tbody(filter: {key: "success", criteria: true}) && tbody(filter: {key: "success", criteria: true}).each do |row|
-      table[:content][:tbody].push(row) if row.all?
+      table[:content][:tbody].push(row)
     end
 
 
@@ -61,7 +61,7 @@ class Docs::UtilityBills::Bills::Mailers::TableBulk
     end
 
     tbody(filter: {key: "success", criteria: false}) && tbody(filter: {key: "success", criteria: false}).each do |row|
-      table[:content][:tbody].push(row) if row.all?
+      table[:content][:tbody].push(row)
     end
 
 
@@ -80,9 +80,9 @@ class Docs::UtilityBills::Bills::Mailers::TableBulk
     if options.dig(:filter, :key).present?
       criteria = options[:filter][:criteria] || false
       key = options[:filter][:key].to_sym
-      records.filter {|record| record[key] == criteria}.each_with_index do |record, key|
+      records.filter {|record| record[key] == criteria}.each_with_index do |record, key2|
         datum = [
-            "#{key + 1}",
+            "#{key2 + 1}",
             record[:sequence_id],
             record[:biller][:biller_name],
             record&.dig(:user, :name),
