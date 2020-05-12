@@ -21,8 +21,9 @@
 #  beneficiary_full_name       :string(255)
 #  transfer_mode_id            :integer
 #  deleted_at                  :datetime
-#  reference_payment_id        :integer
 #  bank_error_message          :text(16777215)
+#  reference_transaction_id    :integer
+#  reference_payment_id        :integer
 #
 
 class YesBankTransaction < ApplicationRecord

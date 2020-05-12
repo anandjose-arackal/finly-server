@@ -43,7 +43,6 @@
 #  remaining_quantity                         :integer
 #  revised                                    :boolean          default(FALSE)
 #  payment_confirmed                          :boolean          default(FALSE)
-#  date                                       :date
 #  tax_amount_value                           :decimal(20, 10)  default(0.0)
 #  net_paid_amount_before_tax_value           :decimal(20, 10)
 #  rcm_tax_value                              :decimal(20, 10)  default(0.0)
@@ -52,6 +51,7 @@
 #  cn_adjusted_amount_before_tax_value        :decimal(20, 10)  default(0.0)
 #  cn_adjusted_amount_after_tax_value         :decimal(20, 10)  default(0.0)
 #  credit_note_tax_amount_value               :decimal(20, 10)  default(0.0)
+#  date                                       :datetime
 #
 
 class BudgetTrail < ApplicationRecord

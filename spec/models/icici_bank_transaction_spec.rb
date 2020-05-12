@@ -17,7 +17,7 @@
 #  receiving_account_id  :integer
 #  otp                   :string(255)
 #  payee_name            :text(65535)
-#  remarks               :text(16777215)
+#  remarks               :text(65535)
 #  customer_induced      :boolean
 #  transfer_type         :string(255)
 #  unique_request_number :string(255)
@@ -27,7 +27,6 @@
 #  request_id            :string(255)
 #  transfer_mode_id      :integer
 #  deleted_at            :datetime
-#  reference_payment_id  :integer
 #  bank_error_message    :text(16777215)
 #
 
