@@ -14,7 +14,6 @@
 #  form_id                :string(255)      not null
 #  controlling_entity_key :string(255)
 #  dependent_entity_key   :string(255)
-#  uuid                   :string(36)       not null, primary key
 #
 
 class FormDependency < ApplicationRecord

@@ -71,9 +71,9 @@
 #  vendor_poc_mobile_number     :string(255)
 #  discount_type_id             :integer
 #  rejection_note               :text(65535)
-#  vendor_poc_id                :integer
-#  vlpm_id                      :integer
-#  vendor_note                  :text(65535)
+#  advance_gross_amount_id      :integer
+#  advance_gst_amount_id        :integer
+#  advance_type                 :string(255)
 #
 
 class PurchaseOrder < ApplicationRecord

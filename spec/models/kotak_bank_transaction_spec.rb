@@ -22,7 +22,9 @@
 #  reversal_status_code       :string(255)
 #  reversal_response          :text(65535)
 #  reversal_api_counter       :integer          default(0)
+#  transfer_mode_id           :integer
 #  deleted_at                 :datetime
+#  reference_payment_id       :integer
 #  bank_error_message         :text(16777215)
 #
 

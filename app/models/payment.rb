@@ -52,8 +52,9 @@
 #  on_hold                        :boolean
 #  disabled                       :boolean
 #  transfer_mode_id               :integer
-#  last_retried_at                :datetime
+#  reference_payment_id           :integer
 #  utr                            :string(255)
+#  last_retried_at                :datetime
 #
 
 class Payment < ApplicationRecord

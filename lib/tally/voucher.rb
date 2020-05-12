@@ -36,6 +36,7 @@ class Tally::Voucher < NonPersistentModel
   end
 
   def as_json(options = {})
+    debugger
     Tally::Utils.format(
         {
             'voucher': {
