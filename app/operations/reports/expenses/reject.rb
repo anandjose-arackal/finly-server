@@ -82,7 +82,7 @@ class Reports::Expenses::Reject < Reports::Base
 
       #if all expenses are rejected in report, report also moved to reject status
       if report.expenses.count == 0
-        Reports::Reject.(current_user, {id: report.id})
+        op = Reports::Reject.(current_user, {id: report.id, reject_note: "All Child Expenses Are Rejected"})
       end
 
     end
