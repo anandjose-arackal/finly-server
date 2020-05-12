@@ -45,12 +45,10 @@ class Forms::Ops::Choices < Transactions::API
     context[:choice_dependencies] = model.choice_dependencies
                                         .ransack(form_entity: entity)
                                         .result
-                                        .includes(:rules, :mappings)
+                                        .includes({rules: {form: :entities}}, :mappings)
   end
 
   def scope_choices(context, choice_dependencies:, params:, **)
-    return if choice_dependencies.size == 0
-
     choices = {}
     choice_dependencies.each do |dependency|
       choices[dependency] = []
@@ -61,6 +59,8 @@ class Forms::Ops::Choices < Transactions::API
       end
     end
     intersecting_choices = choices.values.first
+    return if intersecting_choices.blank?
+
     choices.values.each do |arr|
       intersecting_choices = intersecting_choices & arr
     end

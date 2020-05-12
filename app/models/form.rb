@@ -26,6 +26,9 @@ class Form < ApplicationRecord
 
   def find_entity(entity_path)
     entity_path = entity_path.to_s
+    entities.each do |entity|
+      return entity if entity.entity_path == entity_path
+    end
     sections.each do |section|
       entity = section.find_entity(entity_path)
       return entity if entity.present?
