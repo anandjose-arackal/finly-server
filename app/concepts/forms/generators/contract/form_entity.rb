@@ -12,6 +12,7 @@ class Forms::Generators::Contract::FormEntity
   def contract(reform)
     define_property(reform)
     define_validations(reform)
+    execute_contract_evaluators(reform)
   end
 
   protected
@@ -40,8 +41,16 @@ class Forms::Generators::Contract::FormEntity
         errors.add entity.entity_key, 'cannot be blank'
       end
 
-      # Todo unique
+    end
+  end
 
+  def execute_contract_evaluators(reform)
+    context = {
+        entity: entity,
+        reform: reform
+    }
+    entity.class.contract_evaluators.each do |name, evaluator|
+      evaluator.call(context)
     end
   end
 
@@ -62,7 +71,8 @@ class Forms::Generators::Contract::FormEntity
       visible = result['visible'] || entity.visible
 
       if editable and visible
-        represented.send("#{entity.entity_key}=", input[entity.entity_key])
+        value = input[entity.entity_key] || entity.default_value
+        represented.send("#{entity.entity_key}=", value)
       end
 
       # -> Computations are run here

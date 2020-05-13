@@ -162,4 +162,12 @@ class FormEntity < ApplicationRecord
     entity
   end
 
+  def self.contract_evaluators
+    @contract_evaluators ||= {}
+  end
+
+  def self.contract_eval(name, &block)
+    contract_evaluators[name] = block if block_given?
+  end
+
 end

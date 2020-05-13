@@ -47,14 +47,16 @@ class FormEntity::LargeText < FormEntity
   register :large_text
   set :hint, "Enter value"
 
-  option :char_limit, default: 65535 #{numericality: {greater_than_or_equal_to: 0, less_than_or_equal_to: 255, only_integer: true}}
+  option :maximum, default: 65535 #{numericality: {greater_than_or_equal_to: 0, less_than_or_equal_to: 255, only_integer: true}}
+  option :maximum, default: 0
 
   operators :eq_any, :not_eq_all, :cont_any, :not_cont_all, :blank, :present
 
   schema_validation do
     required(:options) do
       hash do
-        required(:char_limit).value(:int?, lteq?: 65535)
+        required(:maximum).value(:int?, lteq?: 65535)
+        required(:minimum).value(:int?, lteq?: 0)
       end
     end
   end

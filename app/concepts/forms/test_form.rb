@@ -20,12 +20,12 @@ class Forms::TestForm < Forms::API
 
   # section :header do
   #   auto_number :invoice_id, sequence:{prefix: "TF/{{\"now\" | date: \"%y-%m\" }}/", start_at: "000001"}
-  #   text :name, hint: "Please enter the name of the field", char_limit: 255
+  #   text :name, hint: "Please enter the name of the field", maximum: 255
   # end
   #
   # section :line_items do
   #   collection :line_items do
-  #     text :item_description, hint: "Please enter the name of the field", char_limit: 255
+  #     text :item_description, hint: "Please enter the name of the field", maximum: 255
   #     dropdown :status_id, scope: Choicess::List({value: 1, name: 'Approved'}, {value: 1, name: 'Pending'})
   #     dropdown :department_id, scope: Choicess::AutoComplete('departments', filters: {})
   #   end
