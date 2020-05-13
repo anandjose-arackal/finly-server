@@ -1,5 +1,5 @@
 # Responsible for running conditions and returning the applicable actions in result
-class Forms::Generators::Contract::Helpers::ConditionChecker
+class Forms::Contracts::Helpers::ConditionChecker
 
   def self.run(conditions, entity, properties, form: {}, row: {})
     result = {}.with_indifferent_access

@@ -1,14 +1,12 @@
-class Forms::Generators::Contract::CustomFieldMapper
+class Forms::Contracts::Builders::CustomField
 
-  def self.setup(custom_fields)
-    lambda do |*args|
-      collection :custom_fields, deserializer: Forms::Generators::Contract::CustomFieldMapper::Build(custom_fields) do
-        property :uuid
-        property :form_entity_id
-        property :entity_key
-        property :value
-        property :value_text
-      end
+  def self.call(reform, custom_fields)
+    reform.collection :custom_fields, deserializer: Forms::Contracts::Builders::CustomField::Build(custom_fields) do
+      property :uuid
+      property :form_entity_id
+      property :entity_key
+      property :value
+      property :value_text
     end
   end
 

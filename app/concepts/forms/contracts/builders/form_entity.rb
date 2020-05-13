@@ -1,9 +1,15 @@
-class Forms::Generators::Contract::FormEntity
+class Forms::Contracts::Builders::FormEntity
 
   SETTER_ACTIONS = %w(editable visible).freeze
   VALIDATION_ACTIONS = %w(required unique).freeze
 
   attr_accessor :entity
+
+  def self.call(entity, reform)
+    entity_builder = self.new(entity)
+    entity_builder.contract(reform)
+    entity_builder
+  end
 
   def initialize(entity)
     self.entity = entity
@@ -34,7 +40,7 @@ class Forms::Generators::Contract::FormEntity
     reform.validate -> do
       row = {}
       row[entity.entity_key] = self.send(entity.entity_key)
-      result = Forms::Generators::Contract::Helpers::ConditionChecker.run(entity.form.conditions, entity, VALIDATION_ACTIONS, form: contract_input, row: row)
+      result = Forms::Contracts::Helpers::ConditionChecker.run(entity.form.conditions, entity, VALIDATION_ACTIONS, form: contract_input, row: row)
       required = result['required'] || entity.required
 
       if required and send(entity.entity_key).blank?
@@ -66,7 +72,7 @@ class Forms::Generators::Contract::FormEntity
     entity = ent
     lambda do |input, represented, **|
       # -> Conditions like editable / visible are checked for deserialization
-      result = Forms::Generators::Contract::Helpers::ConditionChecker.run(entity.form.conditions, entity, SETTER_ACTIONS, form: represented.contract_input, row: input)
+      result = Forms::Contracts::Helpers::ConditionChecker.run(entity.form.conditions, entity, SETTER_ACTIONS, form: represented.contract_input, row: input)
       editable = result['editable'] || entity.editable
       visible = result['visible'] || entity.visible
 
@@ -88,7 +94,7 @@ class Forms::Generators::Contract::FormEntity
     entities = entity.entities
 
     lambda do |*args|
-      # instance_eval &Forms::Generators::Contract::CustomFieldMapper.setup(entities.custom_fields) if entity.associate_custom_fields
+      Forms::Contracts::Builders::CustomField.(self, entities.custom_fields) if entity.associate_custom_fields
 
       entities.each do |ent|
         ent.contract(self)

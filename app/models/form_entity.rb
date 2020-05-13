@@ -102,7 +102,7 @@ class FormEntity < ApplicationRecord
   end
 
   def contract(reform)
-    Forms::Generators::Contract::FormEntity.new(self).contract(reform)
+    Forms::Contracts::Builders::FormEntity.(self, reform)
   end
 
   # def choices(params: {}, user:)

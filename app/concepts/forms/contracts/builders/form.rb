@@ -1,12 +1,11 @@
-class Forms::Generators::Contract::Form
+class Forms::Contracts::Builders::Form
 
-  def self.build(form)
+  def self.call(form)
+    # FixMe : proper inclusion of conditions, validations and dependencies to avoid N+1
     sections = form.sections.includes(entities: {entities: {entities: {entities: [:entities]}}})
     # dependencies = form.dependencies
     Class.new(Reform::Form) do
-      # Fixme: this applies custom fields for the entire document root, need to scope it down based on the section specific custom fields
-      # Fixme: Low Priority
-      # instance_eval &Forms::Generators::Contracts::EntityBuilder::CustomField.setup(form.entities.root.custom_fields)
+      # Forms::Contracts::Builders::CustomField.(self, form.entities.root.custom_fields)
 
       sections.each do |section|
         section.entities.root.each do |entity|
