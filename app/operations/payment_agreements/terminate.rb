@@ -12,7 +12,7 @@ class PaymentAgreements::Terminate < PaymentAgreements::Base
       return
     end
     if params[:termination_reason].blank?
-      add_message :error, 'Please add reason for termiation of this agreement'
+      add_message :error, 'Please add reason for termination of this agreement'
     end
   end
 
@@ -27,6 +27,7 @@ class PaymentAgreements::Terminate < PaymentAgreements::Base
     end
     update_termination_details
     self.workflow_output = op.workflow_output
+    debugger
   end
 
   def post_process
