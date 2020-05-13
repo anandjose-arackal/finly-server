@@ -4,7 +4,7 @@ module Forms::Generators::Contracts::ModelHelpers::Form
     sections = self.sections.includes(entities: {entities: {entities: {entities: [:entities]}}})
     dependencies = self.dependencies
     form = self
-    Class.new(Forms::Reform) do
+    Class.new(Reform::Form) do
       # Fixme: this applies custom fields for the entire document root, need to scope it down based on the section specific custom fields
       # Fixme: Low Priority
       instance_eval &Forms::Generators::Contracts::EntityBuilder::CustomField.setup(form.entities.root.custom_fields)

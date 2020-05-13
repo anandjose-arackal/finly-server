@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_09_074034) do
+ActiveRecord::Schema.define(version: 2020_05_12_154142) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -518,7 +518,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.string "submitable_type", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "uuid", limit: 36
     t.datetime "deleted_at"
     t.index ["default_policy_id"], name: "index_auto_submit_configs_on_default_policy_id"
     t.index ["period_id"], name: "index_auto_submit_configs_on_period_id"
@@ -626,7 +625,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.string "ifsc_prefix"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "uuid", limit: 36
     t.datetime "deleted_at"
   end
 
@@ -1265,7 +1263,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.boolean "is_deleted", default: false
     t.integer "travel_request_id", null: false
     t.datetime "deleted_at"
-    t.string "uuid", limit: 36
     t.index ["booking_status_id"], name: "index_booking_requests_on_booking_status_id"
     t.index ["booking_type_id"], name: "index_booking_requests_on_booking_type_id"
     t.index ["deleted_at"], name: "index_booking_requests_on_deleted_at"
@@ -1532,7 +1529,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.integer "field_drop_down_item_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "uuid", limit: 36
     t.datetime "deleted_at"
     t.index ["budget_rule_id"], name: "index_budget_rule_field_mappings_on_budget_rule_id"
     t.index ["field_configuration_id"], name: "index_budget_rule_field_mappings_on_field_configuration_id"
@@ -1553,7 +1549,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.integer "with_receipt_amount_id"
     t.integer "without_receipt_amount_id"
     t.datetime "deleted_at"
-    t.string "uuid", limit: 36
     t.index ["amount_id"], name: "index_budget_rules_on_amount_id"
     t.index ["category_id"], name: "index_budget_rules_on_category_id"
     t.index ["deleted_at"], name: "index_budget_rules_on_deleted_at"
@@ -2002,7 +1997,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "uuid", limit: 36
     t.datetime "deleted_at"
   end
 
@@ -2031,7 +2025,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "uuid", limit: 36
     t.datetime "deleted_at"
   end
 
@@ -2185,7 +2178,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.datetime "updated_at", null: false
     t.boolean "enabled", default: false
     t.string "transfer_mode"
-    t.string "uuid", limit: 36
     t.datetime "deleted_at"
     t.index ["company_id"], name: "index_company_funds_auto_transfer_configs_on_company_id"
     t.index ["threshold_amount_id"], name: "index_company_funds_auto_transfer_configs_on_threshold_amount_id"
@@ -2227,7 +2219,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "identifier"
-    t.string "uuid", limit: 36
     t.datetime "deleted_at"
   end
 
@@ -2412,7 +2403,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
-    t.string "uuid", limit: 36
     t.index ["amount_id"], name: "index_credit_note_adjustments_on_amount_id"
     t.index ["credit_note_id"], name: "index_credit_note_adjustments_on_credit_note_id"
     t.index ["invoice_id"], name: "index_credit_note_adjustments_on_invoice_id"
@@ -2843,7 +2833,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.datetime "updated_at", null: false
     t.boolean "is_deleted", default: false, null: false
     t.datetime "deleted_at"
-    t.string "uuid", limit: 36
     t.index ["balance_amount_id"], name: "index_delivery_challans_on_balance_amount_id"
     t.index ["company_id"], name: "index_delivery_challans_on_company_id"
     t.index ["deleted_at"], name: "index_delivery_challans_on_deleted_at"
@@ -3312,7 +3301,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "uuid", limit: 36
     t.datetime "deleted_at"
   end
 
@@ -3355,7 +3343,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "uuid", limit: 36
     t.datetime "deleted_at"
   end
 
@@ -3529,7 +3516,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.integer "company_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "uuid", limit: 36
     t.datetime "deleted_at"
     t.index ["company_id"], name: "index_export_requests_on_company_id"
     t.index ["expires_on"], name: "index_export_requests_on_expires_on"
@@ -3892,6 +3878,7 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.string "value"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
     t.index ["company_id"], name: "index_form_condition_actions_on_company_id"
     t.index ["created_at"], name: "index_form_condition_actions_on_created_at"
     t.index ["form_condition_id"], name: "index_form_condition_actions_on_form_condition_id"
@@ -3998,6 +3985,7 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.string "populate_if_empty"
     t.string "type"
     t.text "config"
+    t.boolean "associate_custom_fields"
     t.index ["company_id"], name: "index_form_entities_on_company_id"
     t.index ["created_at"], name: "index_form_entities_on_created_at"
     t.index ["created_by_user_id"], name: "index_form_entities_on_created_by_user_id"
@@ -4147,7 +4135,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.string "rule"
     t.integer "level", default: 1, null: false
     t.integer "admin_user_id"
-    t.string "uuid", limit: 36
     t.datetime "deleted_at"
     t.index ["company_id"], name: "index_gatekeeper_blocks_on_company_id"
     t.index ["user_id"], name: "index_gatekeeper_blocks_on_user_id"
@@ -4251,7 +4238,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.integer "total_invoice_amount_id"
     t.integer "available_invoice_amount_id"
     t.boolean "include_tax_and_tds", default: false
-    t.string "uuid", limit: 36
     t.boolean "rcm_enabled"
     t.index ["template_invoice_id"], name: "index_general_invoices_on_template_invoice_id"
   end
@@ -4711,7 +4697,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "name"
-    t.string "uuid", limit: 36
     t.datetime "deleted_at"
     t.index ["company_id"], name: "index_invoice_reminders_on_company_id"
   end
@@ -4721,7 +4706,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.integer "va_transaction_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "uuid", limit: 36
     t.datetime "deleted_at"
     t.index ["invoice_id"], name: "index_invoice_transaction_mappings_on_invoice_id"
     t.index ["va_transaction_id"], name: "index_invoice_transaction_mappings_on_va_transaction_id"
@@ -5125,7 +5109,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "identifier"
-    t.string "uuid", limit: 36
     t.datetime "deleted_at"
     t.index ["company_kyc_document_type_id"], name: "index_kyc_documents_on_company_kyc_document_type_id"
     t.index ["company_kyc_id"], name: "index_kyc_documents_on_company_kyc_id"
@@ -5135,7 +5118,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "uuid", limit: 36
     t.datetime "deleted_at"
   end
 
@@ -5536,7 +5518,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.integer "status_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "uuid", limit: 36
     t.datetime "deleted_at"
     t.index ["card_type_id"], name: "index_new_card_requests_on_card_type_id"
     t.index ["company_id"], name: "index_new_card_requests_on_company_id"
@@ -5707,7 +5688,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "uuid", limit: 36
     t.datetime "deleted_at"
   end
 
@@ -5737,7 +5717,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
 
   create_table "outward_invoice_trail_actions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "name"
-    t.string "uuid", limit: 36
     t.datetime "deleted_at"
   end
 
@@ -6179,7 +6158,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
-    t.string "uuid", limit: 36
     t.index ["deleted_at"], name: "index_per_diem_expenses_on_deleted_at"
     t.index ["expense_id"], name: "index_per_diem_expenses_on_expense_id"
     t.index ["per_diem_id"], name: "index_per_diem_expenses_on_per_diem_id"
@@ -6284,7 +6262,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.integer "policy_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "uuid", limit: 36
     t.datetime "deleted_at"
     t.index ["field_configuration_id"], name: "index_policy_field_mappings_on_field_configuration_id"
     t.index ["policy_id"], name: "index_policy_field_mappings_on_policy_id"
@@ -6428,7 +6405,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.integer "status_tag_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "uuid", limit: 36
     t.datetime "deleted_at"
     t.index ["procurement_id"], name: "index_procurement_status_taggables_on_procurement_id"
     t.index ["status_tag_id"], name: "index_procurement_status_taggables_on_status_tag_id"
@@ -7295,7 +7271,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.datetime "updated_at", null: false
     t.boolean "marked_as_closed"
     t.boolean "tally_exported", default: false
-    t.string "uuid", limit: 36
     t.datetime "deleted_at"
     t.index ["company_id"], name: "index_report_processor_groups_on_company_id"
     t.index ["created_by_user_id"], name: "index_report_processor_groups_on_created_by_user_id"
@@ -7405,7 +7380,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.integer "company_id"
     t.string "bank_reference_number"
     t.string "source_account"
-    t.string "uuid", limit: 36
     t.integer "location_id"
     t.integer "cost_center_id"
     t.index ["card_expenses_total_id"], name: "index_reports_on_card_expenses_total_id"
@@ -7508,7 +7482,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.string "resource_file_name"
     t.text "source"
     t.text "source_description"
-    t.string "uuid", limit: 36
     t.datetime "deleted_at"
   end
 
@@ -7534,7 +7507,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.string "name"
     t.boolean "is_deleted", default: false, null: false
     t.datetime "deleted_at"
-    t.string "uuid", limit: 36
     t.index ["deleted_at"], name: "index_reviewal_levels_on_deleted_at"
     t.index ["policy_id"], name: "index_reviewal_levels_on_policy_id"
   end
@@ -7765,7 +7737,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.integer "igst_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "uuid", limit: 36
     t.datetime "deleted_at"
     t.index ["cgst_id"], name: "index_tax_per_items_on_cgst_id"
     t.index ["document_type", "document_id"], name: "index_tax_per_items_on_document_type_and_document_id"
@@ -7825,7 +7796,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.integer "rate_id"
     t.integer "period_id"
     t.integer "policy_id", null: false
-    t.string "uuid", limit: 36
     t.datetime "deleted_at"
     t.index ["default_category_id"], name: "index_time_expense_configs_on_default_category_id"
     t.index ["period_id"], name: "index_time_expense_configs_on_period_id"
@@ -8285,7 +8255,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.integer "company_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "uuid", limit: 36
     t.datetime "deleted_at"
     t.index ["company_id"], name: "index_unique_identifiers_on_company_id"
     t.index ["purpose_id"], name: "index_unique_identifiers_on_purpose_id"
@@ -8793,7 +8762,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "uuid", limit: 36
     t.datetime "deleted_at"
     t.index ["name"], name: "index_user_session_statuses_on_name"
   end
@@ -8898,7 +8866,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.integer "balance_after_action_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "uuid", limit: 36
     t.datetime "deleted_at"
     t.index ["action_user_id"], name: "index_user_wallet_tracks_on_action_user_id"
     t.index ["amount_id"], name: "index_user_wallet_tracks_on_amount_id"
@@ -9031,7 +8998,6 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
     t.integer "payment_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "uuid", limit: 36
     t.datetime "deleted_at"
     t.index ["amount_id"], name: "index_vendor_account_transactions_on_amount_id"
     t.index ["payment_id"], name: "index_vendor_account_transactions_on_payment_id"
@@ -9713,3 +9679,123 @@ ActiveRecord::Schema.define(version: 2020_05_09_074034) do
   add_foreign_key "procurement_comments", "users"
   add_foreign_key "procurement_status_taggables", "procurements"
   add_foreign_key "procurement_status_taggables", "status_tags"
+  add_foreign_key "procurement_terms", "companies"
+  add_foreign_key "procurements", "companies"
+  add_foreign_key "procurements", "procurement_statuses"
+  add_foreign_key "procurements", "procurement_tracks"
+  add_foreign_key "procurements", "users"
+  add_foreign_key "purchase_order_items", "items", column: "inventory_line_item_id"
+  add_foreign_key "purchase_order_items", "purchase_orders"
+  add_foreign_key "purchase_orders", "companies"
+  add_foreign_key "purchase_orders", "gst_types"
+  add_foreign_key "purchase_orders", "gstin_locations"
+  add_foreign_key "purchase_orders", "payment_terms"
+  add_foreign_key "purchase_orders", "policies"
+  add_foreign_key "purchase_orders", "procurement_terms"
+  add_foreign_key "purchase_orders", "procurements"
+  add_foreign_key "purchase_orders", "purchase_order_statuses"
+  add_foreign_key "purchase_orders", "users"
+  add_foreign_key "quickbooks_configurations", "quickbooks_payment_types"
+  add_foreign_key "quickbooks_configurations", "users"
+  add_foreign_key "quickbooks_departments", "companies"
+  add_foreign_key "quickbooks_finly_integrations_users", "companies"
+  add_foreign_key "quickbooks_finly_integrations_users", "users"
+  add_foreign_key "quickbooks_payment_types", "companies"
+  add_foreign_key "receipt_email_parse_failures", "users"
+  add_foreign_key "receipt_emails", "expenses"
+  add_foreign_key "receipt_emails", "receipt_email_statuses"
+  add_foreign_key "receipts", "receipt_emails"
+  add_foreign_key "receipts", "users"
+  add_foreign_key "report_comments", "expenses"
+  add_foreign_key "report_comments", "report_comment_actions"
+  add_foreign_key "report_comments", "reports"
+  add_foreign_key "report_comments", "users"
+  add_foreign_key "report_processor_group_mappings", "amounts"
+  add_foreign_key "report_processor_group_mappings", "payments"
+  add_foreign_key "report_processor_group_mappings", "users"
+  add_foreign_key "report_processor_groups", "companies"
+  add_foreign_key "report_processor_groups", "payment_orders"
+  add_foreign_key "report_tracks", "report_statuses"
+  add_foreign_key "report_tracks", "report_tracking_actions"
+  add_foreign_key "report_tracks", "reports"
+  add_foreign_key "reports", "policies"
+  add_foreign_key "reports", "report_processor_group_mappings"
+  add_foreign_key "reports", "report_statuses"
+  add_foreign_key "reports", "users"
+  add_foreign_key "resource_templates", "users"
+  add_foreign_key "reviewal_levels", "policies"
+  add_foreign_key "sso_keys", "companies"
+  add_foreign_key "tally_configurations", "companies"
+  add_foreign_key "task_file_manager_actions", "export_templates"
+  add_foreign_key "tax_rates", "companies"
+  add_foreign_key "time_expenses", "expenses"
+  add_foreign_key "time_objects", "physical_units"
+  add_foreign_key "transaction_details", "amounts"
+  add_foreign_key "transaction_details", "finly_transactions"
+  add_foreign_key "transcribed_expenses", "amounts"
+  add_foreign_key "transcribed_expenses", "expenses"
+  add_foreign_key "transcribed_expenses", "receipts"
+  add_foreign_key "transcribed_expenses", "users"
+  add_foreign_key "travel_members", "booking_requests"
+  add_foreign_key "travel_members", "bookings"
+  add_foreign_key "travel_request_comments", "travel_requests"
+  add_foreign_key "travel_request_comments", "users"
+  add_foreign_key "travel_request_destinations", "travel_requests"
+  add_foreign_key "travel_request_trails", "travel_requests"
+  add_foreign_key "travel_requests", "policies"
+  add_foreign_key "travel_requests", "users"
+  add_foreign_key "trips", "trip_types"
+  add_foreign_key "unique_identifiers", "companies"
+  add_foreign_key "unique_identifiers", "purposes"
+  add_foreign_key "user_balance_histories", "companies"
+  add_foreign_key "user_balance_histories", "users"
+  add_foreign_key "user_branch_location_mappings", "branch_locations"
+  add_foreign_key "user_branch_location_mappings", "users"
+  add_foreign_key "user_delegate_mappings", "users"
+  add_foreign_key "user_department_mappings", "departments"
+  add_foreign_key "user_department_mappings", "users"
+  add_foreign_key "user_group_item_mappings", "user_group_items"
+  add_foreign_key "user_group_item_mappings", "user_groups"
+  add_foreign_key "user_group_item_mappings", "users"
+  add_foreign_key "user_group_items", "user_groups"
+  add_foreign_key "user_groups", "companies"
+  add_foreign_key "user_login_tracks", "users"
+  add_foreign_key "user_manager_mappings", "policies"
+  add_foreign_key "user_manager_mappings", "users"
+  add_foreign_key "user_panel_subscriptions", "users"
+  add_foreign_key "user_permissions", "companies"
+  add_foreign_key "user_permissions", "users"
+  add_foreign_key "user_profiles", "states"
+  add_foreign_key "user_profiles", "users"
+  add_foreign_key "user_role_mappings", "user_roles"
+  add_foreign_key "user_role_mappings", "users"
+  add_foreign_key "user_session_notifications", "companies"
+  add_foreign_key "user_session_notifications", "users"
+  add_foreign_key "user_tags", "users"
+  add_foreign_key "user_team_group_item_mappings", "user_group_items"
+  add_foreign_key "user_team_group_item_mappings", "user_groups"
+  add_foreign_key "user_team_group_item_mappings", "user_teams"
+  add_foreign_key "user_wallet_tracks", "amounts"
+  add_foreign_key "user_wallet_tracks", "user_wallet_track_actions"
+  add_foreign_key "user_wallet_tracks", "user_wallets"
+  add_foreign_key "user_wallets", "users"
+  add_foreign_key "users", "companies"
+  add_foreign_key "vehicle_rates", "policies"
+  add_foreign_key "vendor_account_transactions", "amounts"
+  add_foreign_key "vendor_account_transactions", "payments"
+  add_foreign_key "vendor_account_transactions", "vendor_accounts"
+  add_foreign_key "vendor_payment_wallets", "users"
+  add_foreign_key "vendor_types", "companies"
+  add_foreign_key "web_hook_event_mappings", "web_hook_events"
+  add_foreign_key "web_hook_event_mappings", "web_hooks"
+  add_foreign_key "web_hook_tracks", "companies"
+  add_foreign_key "web_hook_tracks", "web_hook_events"
+  add_foreign_key "web_hook_tracks", "web_hooks"
+  add_foreign_key "whitelisted_ips", "companies"
+  add_foreign_key "yes_bank_company_accounts", "companies"
+  add_foreign_key "yes_bank_transactions", "amounts"
+  add_foreign_key "yes_bank_transactions", "companies"
+  add_foreign_key "yes_bank_vendors", "companies"
+  add_foreign_key "yes_bank_vendors", "tds_rates_lists"
+  add_foreign_key "yes_bank_vendors", "vendor_types"
+end

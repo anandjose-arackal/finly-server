@@ -2,7 +2,7 @@ if Rails.env.production?
   Sidekiq::Logstash.setup
 end
 
-if not Rails.env.development?
+if File.exists?("#{Rails.root}/config/redis_config.yml")
   redis_config = Rails.application.config_for(:redis_config)
   Sidekiq.configure_server do |config|
     config.redis = {url: redis_config['url'], password: redis_config['password']}
@@ -20,7 +20,6 @@ else
     config.redis = {url: 'redis://127.0.0.1:6379'}
   end
 end
-
 
 Sidekiq::Extensions.enable_delay!
 

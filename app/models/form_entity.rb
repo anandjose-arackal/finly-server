@@ -64,7 +64,8 @@ class FormEntity < ApplicationRecord
 
   has_many :entities, class_name: 'FormEntity', foreign_key: :parent_id, primary_key: :uuid
   has_many :choices, class_name: 'FormEntityChoice', dependent: :destroy
-  has_many :validations, class_name: "FormEntityValidation"
+  has_many :validations, class_name: 'FormEntityValidation'
+  has_many :conditions, -> { where(reference_type: 'entity') }, class_name: "FormCondition", primary_key: :entity_path, foreign_key: :reference_key
 
   # Fixme: Delete this as it is available in Forms::API::Entity::Registry. Kept it commented for testing purpose
   # def find_entity(entity_path)
