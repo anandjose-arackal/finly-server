@@ -13,6 +13,10 @@ class Masters::Items::Index < IndexBuilder::API
     text value: :item_number, format: "primary"
   end
 
+  column :item_code, sort: :item_code, default: true do
+    text value: :item_code
+  end
+
   column :created_at, sort: :created_at do
     date value: :created_at
   end
@@ -53,7 +57,7 @@ class Masters::Items::Index < IndexBuilder::API
     text value: '{{record.scope | upcase}}'
   end
 
-  column :tax_rate, sort: :tax_rate_id do
+  column :tax_rate, sort: :tax_rate_id, includes: [:tax_rate] do
     text value: '{{record.tax_rate.full_name}}'
   end
 

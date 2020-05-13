@@ -26,5 +26,6 @@ class ItemExposure < Exposures::API
     record.item_expense_type&.name
   end
   attribute :tds_applicable, record_attribute: true
+  attribute :hsn_sac, record_attribute: true
 
 end
