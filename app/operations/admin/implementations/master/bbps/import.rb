@@ -67,8 +67,7 @@ class Admin::Implementations::Master::BBPS::Import < Admin::Implementations::Pro
     end
 
     input = data.merge(format_data.success)
-
-    unless subscription.validate({input: input, current_user: User.find(input[:user_id])}) and subscription.save
+    unless subscription.validate(input) and subscription.save
       return result false, subscription.errors.full_messages.join(", ")
     end
 
@@ -82,7 +81,7 @@ class Admin::Implementations::Master::BBPS::Import < Admin::Implementations::Pro
   def build_params(data)
     params = {}
     params[:company_id] = company&.id
-    params[:current_user] = yield find_user(data[:initiator])
+    params[:current_user] = yield find_user(data[:initiator], required: true)
     params[:user_id] = params[:current_user]&.id
     params[:policy_id] = (yield find_policy(data[:policy]))&.id
     params[:department_id] = (yield find_department(data[:department]))&.id
