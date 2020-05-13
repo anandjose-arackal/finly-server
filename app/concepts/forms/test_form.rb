@@ -1,6 +1,23 @@
 class Forms::TestForm < Forms::API
 
-  # model Invoice
+  model User
+  section :header do
+    text :first_name
+    text :last_name, editable: false, required: false
+  end
+
+  condition condition_id: :last_name_editable do
+    reference :entity, :last_name
+    rule :first_name, 'cont', value: 'Han'
+    action :editable, true
+  end
+
+  condition condition_id: :last_name_required do
+    reference :entity, :last_name
+    rule :first_name, 'cont', value: 'Solo'
+    action :required, true
+  end
+
   # section :header do
   #   auto_number :invoice_id, sequence:{prefix: "TF/{{\"now\" | date: \"%y-%m\" }}/", start_at: "000001"}
   #   text :name, hint: "Please enter the name of the field", char_limit: 255

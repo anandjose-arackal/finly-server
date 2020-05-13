@@ -26,9 +26,7 @@ class FormRule < ApplicationRecord
   belongs_to :company
   belongs_to :form
   belongs_to :rule_parent, polymorphic: true
-  # belongs_to :form_entity
   belongs_to :rule_type, class_name: "FormRuleType"
-  # belongs_to :match_entity, class_name: 'FormEntity', optional: true
 
   serialize :match_value, JSON
 
@@ -45,6 +43,20 @@ class FormRule < ApplicationRecord
   #     r
   #   end
   # end
+
+  def match?(data)
+    input = fetch_flat_data(data, entity_path)
+    input ||= fetch_row_data(data[:row], entity_path) if data[:row].present?
+    input ||= fetch_form_data(data[:form], entity_path)
+    entity = form.find_entity(entity_path)
+    raise "Entity #{entity_path} not found" if entity.nil?
+    # return false unless entity.present?
+
+    rule_value = match_value
+    # todo Formula
+    # todo Entity
+    entity.send("match_#{predicate}?", input, rule_value)
+  end
 
   # Navigates through the entire form path to fetch the data
   def fetch_form_data(data, path)
@@ -68,18 +80,6 @@ class FormRule < ApplicationRecord
   def fetch_row_data(data, path)
     paths = path.split('/')
     data&.dig(paths.last)
-  end
-
-  def match?(data)
-    input = fetch_flat_data(data, entity_path)
-    input ||= fetch_row_data(data[:row], entity_path) if data[:row].present?
-    input ||= fetch_form_data(data[:form], entity_path)
-    entity = form.find_entity(entity_path)
-    raise "Entity #{entity_path} not found" if entity.nil?
-    # return false unless entity.present?
-
-    value = match_value
-    entity.send("match_#{predicate}?", input, value)
   end
 
   def as_json(options = {})

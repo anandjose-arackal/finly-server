@@ -14,8 +14,8 @@
 
 class Form < ApplicationRecord
   include UUIDHelper, SoftDeletable
-  include Forms::Generators::Contracts::ModelHelpers::Form
-  include Forms::Generators::Filters::ModelHelpers::Form
+  # include Forms::Generators::Contracts::ModelHelpers::Form
+  # include Forms::Generators::Filters::ModelHelpers::Form
 
   belongs_to :company
   has_many :sections, class_name: 'FormSection', dependent: :destroy
@@ -35,6 +35,10 @@ class Form < ApplicationRecord
     end
 
     nil
+  end
+
+  def contract
+    Forms::Generators::Contract::Form.build(self)
   end
 
   def as_json(options = {})

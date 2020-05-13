@@ -47,8 +47,8 @@ class FormEntity < ApplicationRecord
   include SoftDeletable, UUIDHelper
   include DynamicAttributes
   include Dry::Monads[:result]
-  include Forms::Generators::Contracts::ModelHelpers::FormEntity
-  include Forms::Generators::Filters::ModelHelpers::FormEntity
+  # include Forms::Generators::Contracts::ModelHelpers::FormEntity
+  # include Forms::Generators::Filters::ModelHelpers::FormEntity
   include Forms::Generators::Filters::ApiEntityHelper
   include Forms::API::Entity::Registry
   include Forms::API::Entity::Schema
@@ -65,7 +65,7 @@ class FormEntity < ApplicationRecord
   has_many :entities, class_name: 'FormEntity', foreign_key: :parent_id, primary_key: :uuid
   has_many :choices, class_name: 'FormEntityChoice', dependent: :destroy
   has_many :validations, class_name: 'FormEntityValidation'
-  has_many :conditions, -> { where(reference_type: 'entity') }, class_name: "FormCondition", primary_key: :entity_path, foreign_key: :reference_key
+  # has_many :conditions, -> { where(reference_type: 'entity') }, class_name: "FormCondition", primary_key: :entity_path, foreign_key: :reference_key
 
   # Fixme: Delete this as it is available in Forms::API::Entity::Registry. Kept it commented for testing purpose
   # def find_entity(entity_path)
@@ -99,6 +99,10 @@ class FormEntity < ApplicationRecord
     return nil unless val.present?
 
     Choices[val[:type]].new(val[:config], form_entity: self)
+  end
+
+  def contract(reform)
+    Forms::Generators::Contract::FormEntity.new(self).contract(reform)
   end
 
   # def choices(params: {}, user:)

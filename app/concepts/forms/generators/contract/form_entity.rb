@@ -1,14 +1,25 @@
 class Forms::Generators::Contract::FormEntity
 
-  def contract(reform, entity)
-    define_property(reform, entity)
-    define_validations(reform, entity)
+  SETTER_ACTIONS = %w(editable visible).freeze
+  VALIDATION_ACTIONS = %w(required unique).freeze
+
+  attr_accessor :entity
+
+  def initialize(entity)
+    self.entity = entity
+  end
+
+  def contract(reform)
+    define_property(reform)
+    define_validations(reform)
   end
 
   protected
 
-  def define_property(reform, entity)
-    type = entity.collection ? :collection : :property
+  def define_property(reform)
+    # debugger
+    # type = entity.collection ? :collection : :property
+    type = :property
     block = contract_block(entity)
     if block.present?
       reform.send(type, entity.entity_key, properties(entity), &block)
@@ -17,10 +28,20 @@ class Forms::Generators::Contract::FormEntity
     end
   end
 
-  def define_validations(reform, ent)
-    entity = ent
+  def define_validations(reform)
+    entity = self.entity
     reform.validate -> do
-      # value = self.send(entity.entity_key)
+      row = {}
+      row[entity.entity_key] = self.send(entity.entity_key)
+      result = Forms::Generators::Contract::Helpers::ConditionChecker.run(entity.form.conditions, entity, VALIDATION_ACTIONS, form: contract_input, row: row)
+      required = result['required'] || entity.required
+
+      if required and send(entity.entity_key).blank?
+        errors.add entity.entity_key, 'cannot be blank'
+      end
+
+      # Todo unique
+
     end
   end
 
@@ -36,35 +57,31 @@ class Forms::Generators::Contract::FormEntity
     entity = ent
     lambda do |input, represented, **|
       # -> Conditions like editable / visible are checked for deserialization
-      editable = entity.editable
-      visible = entity.visible
-      entity.form.conditions.each do |condition|
-        next unless condition.entity_path == entity.entity_path
-        applicable = false
-        condition.actions.each do |action|
+      result = Forms::Generators::Contract::Helpers::ConditionChecker.run(entity.form.conditions, entity, SETTER_ACTIONS, form: represented.contract_input, row: input)
+      editable = result['editable'] || entity.editable
+      visible = result['visible'] || entity.visible
 
-        end
-      end
       if editable and visible
-        represented = input[entity.entity_key]
+        represented.send("#{entity.entity_key}=", input[entity.entity_key])
       end
 
       # -> Computations are run here
-
+      # if visible and entity.server_computation
+      #
+      # end
     end
   end
 
   def contract_block(entity)
     return nil unless entity.entities.present?
 
-    entity = self
-    entities = self.entities
+    entities = entity.entities
 
     lambda do |*args|
-      instance_eval &Forms::Generators::Contract::CustomFieldMapper.setup(entities.custom_fields) if entity.associate_custom_fields
+      # instance_eval &Forms::Generators::Contract::CustomFieldMapper.setup(entities.custom_fields) if entity.associate_custom_fields
 
       entities.each do |ent|
-        instance_eval &ent.contract(self, entity)
+        ent.contract(self)
       end
     end
   end

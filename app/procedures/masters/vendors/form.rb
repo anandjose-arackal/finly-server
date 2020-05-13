@@ -11,7 +11,7 @@ class Masters::Vendors::Form < Forms::API
            choices_scope: Choices[:lookup].('policies',
                permissions: [:vendor_creator, :vendor_manager]),
            required: true
-    lookup :department_id, choices_scope: Choices[:lookup].('departments')
+    lookup :department_id, choices_scope: Choices[:lookup].('departments'), editable: false, visible: false
     lookup :cost_center_id, choices_scope: Choices[:lookup].('cost_centers')
     text :legal_name
   end
@@ -21,9 +21,13 @@ class Masters::Vendors::Form < Forms::API
       text :name, required: true
       dropdown :state_id, required: true,
                choices_scope: Choices[:enum].(GstStateCode, name: :name)
-      text :age
-      text :size
     end
+  end
+
+  condition condition_id: :department_id_editable do
+    reference :entity, :department_id
+    rule :policy_id, 'eq', value: 4
+    action :editable, true
   end
 
   condition condition_id: :policy_id_status_editable do

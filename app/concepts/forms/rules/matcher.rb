@@ -21,8 +21,13 @@ module Forms::Rules::Matcher
       # todo Unsupported predicate
       # return false unless self.class.operators.include?(name)
 
-      rule_value = [rule_value] if list and not rule_value.respond_to?(:each)
-      block.call(parse(input), parse(rule_value))
+      # rule_value = [rule_value] if list and not rule_value.respond_to?(:each)
+      if rule_value.respond_to?(:each)
+        # if rule is array, call _any? condition
+        send("match_#{name}_any?", input, rule_value)
+      else
+        block.call(parse(input), parse(rule_value))
+      end
     end
     if any
       define_method "match_#{name}_any?" do |input, rule_value|
@@ -43,7 +48,7 @@ module Forms::Rules::Matcher
   end
 
   def parse(value)
-    value
+    value.to_s
   end
 
   predicate :eq, any: true, all: true do |input, rule_value|
@@ -91,11 +96,11 @@ module Forms::Rules::Matcher
   # end
 
   predicate :cont, any: true, all: true do |input, rule_value|
-    rule_value.include?(input)
+    input.include?(rule_value)
   end
 
   predicate :not_cont, any: true, all: true do |input, rule_value|
-    !rule_value.include?(input)
+    !cont(input, rule_value)
   end
 
   predicate :start do |input, rule_value|
