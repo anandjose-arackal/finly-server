@@ -33,7 +33,7 @@ class Docs::UtilityBills::Subscriptions::Index < IndexBuilder::API
   end
 
   column :status, default: true, sort: :status_id, includes: [:status] do
-    indicator value: '{{record.status.name}}', format: :format_status
+    indicator value: :subscription_status, format: :format_status
   end
 
   column :cost_center, default: true, sort: :cost_center_id, includes: [:cost_center] do
@@ -84,9 +84,9 @@ class Docs::UtilityBills::Subscriptions::Index < IndexBuilder::API
     text value: "{{record.tax_rate.display_name}}"
   end
 
-  column :last_paid_at, default: true, sort: true do
-    date value: :last_paid_at
-  end
+  # column :last_paid_at, default: true, sort: true do
+  #   date value: :last_paid_at
+  # end
 
   counter -> (user, collection) do
     counter = IndexBuilder::Counter.new :with_status_id
@@ -126,9 +126,9 @@ class Docs::UtilityBills::Subscriptions::Index < IndexBuilder::API
   end
 
   def self.subscription_status(context)
-    return 'Processing'.titleize if context[:record].status_id == BbpsBillerSubscriptionStatus.id_for(:awaiting_approval) and record.controlling_user?(user)
+    return 'Processing'.titleize if context[:record].status_id == BbpsBillerSubscriptionStatus.id_for(:awaiting_approval) and not context[:record].controlling_user?(context[:user])
 
-    record.status&.name&.titleize
+    context[:record].status&.name&.titleize
   end
 
   def self.format_status(context)

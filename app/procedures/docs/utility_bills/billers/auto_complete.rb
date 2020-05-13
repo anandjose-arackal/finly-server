@@ -4,9 +4,9 @@ class Docs::UtilityBills::Billers::AutoComplete < AutoComplete::API
   json do |context, record|
     {
         id: record.id,
-        name: "#{record.biller_id} - #{record.biller_name}"
+        name: "#{record.biller_name} - #{record.biller_id}"
     }
   end
-  search_key :biller_id_biller_name_or_biller_category_name_biller_alias_name
+  search_key :biller_id_or_biller_name_or_biller_category_name_or_biller_alias_name_cont
 
 end

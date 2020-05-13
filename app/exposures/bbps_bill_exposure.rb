@@ -35,5 +35,6 @@ class BbpsBillExposure < Exposures::API
   attribute :policy, record_attribute: true, exposure: true, includes: [:policy]
   attribute :auto_fetched, record_attribute: :autofetched
   attribute :tax_rate, record_attribute: true, exposure: true, includes: [:tax_rate]
+  attribute :hsn_sac, record_attribute: true
 
 end

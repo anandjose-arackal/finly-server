@@ -9,13 +9,13 @@ class Masters::Users::Action < ActionManager::API
            icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
            route: 'users.vp.index'
 
-    action :template,
+    action :redirect,
            :create,
            permissions: [:admin],
            format: 'primary',
            label: 'Invite User',
            icon: 'https://img.icons8.com/windows/17/708090/--checkmark-yes.png',
-           function: 'users_invite'
+           url: 'user_invite'
 
   end
 
