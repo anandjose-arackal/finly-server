@@ -94,6 +94,7 @@ class ExportController < BaseControllers::WebBase
 
   def expense
     params[:type] = 'expenses'
+    params[:export_format] = params[:download_type]
     result = ExportManager::RequestHandler.(current_user, params)
     if result.success?
       @response = {
