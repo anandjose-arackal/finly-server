@@ -4,7 +4,7 @@ class Docs::PaymentTickets::Payments::Resolver < Docs::PaymentTickets::Resolver
 
   def load(params)
     payment_tickets = super(params)
-    Payment.where("`payments.payment_order_id` IN (#{payment_tickets.select('payment_order_id').to_sql})")
+    Payment.where("payments.payment_order_id IN (#{payment_tickets.select('bank_payment_requests.payment_order_id').to_sql})")
   end
 
 end
