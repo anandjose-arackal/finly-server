@@ -4,7 +4,7 @@ class Docs::P2P::Inwards::Pending::Resolver < Resolver::API
 
   def load(params)
     # Todo do we show all records for admins?
-    st_ids = StatusTag.where(id: StatusTag.ids_for(:receiving_shipment,:po_approved,:po_sent)).select("id").to_sql
+    st_ids = StatusTag.where(id: StatusTag.ids_for(:receiving_shipment,:po_approved,:po_sent)).pluck(:id)
     if user.vendor_payment_admin?
       po = user.company.purchase_orders
     else
