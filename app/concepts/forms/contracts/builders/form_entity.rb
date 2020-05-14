@@ -69,7 +69,7 @@ class Forms::Contracts::Builders::FormEntity
     properties = {}
     properties[:virtual] = true if entity.custom_field
     properties[:populate_if_empty] = entity.populate_if_empty if entity.populate_if_empty.present?
-    properties[:deserializer] = deserializer(entity)
+    properties[:deserializer] = deserializer(entity) unless entity.entity_type.to_s == 'data_map'
     properties
   end
 

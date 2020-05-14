@@ -144,6 +144,7 @@ class FormEntity < ApplicationRecord
     entity = self.new(
         section: section,
         entity_key: entity_key,
+        parent: attributes[:parent],
         options: {},
         config: {}
     )
@@ -151,13 +152,13 @@ class FormEntity < ApplicationRecord
     schema.deep_merge!(self.schema.deep_dup)
     schema.deep_merge!(attributes)
     schema[:options].each do |attr, value|
-      entity.set attr, value
+      entity.set attr, value, args: schema
     end
     schema[:config].each do |attr, value|
-      entity.set attr, value
+      entity.set attr, value, args: schema
     end
     schema.except(:options, :config)&.each do |attr, value|
-      entity.set attr, value
+      entity.set attr, value, args: schema
     end
     entity
   end

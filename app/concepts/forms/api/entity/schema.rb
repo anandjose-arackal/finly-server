@@ -2,10 +2,10 @@ module Forms::API::Entity::Schema
   extend ActiveSupport::Concern
 
   DEFAULT_SYSTEM_SCHEMA = {
-      entity_path: ->(*args) { self.entity_key&.to_s },
-      label: ->(*args) { self.entity_key&.to_s&.humanize },
+      entity_path: ->(schema) { self.parent.present? ? "#{self.parent.entity_path}/#{self.entity_key}" : self.entity_key&.to_s },
+      label: ->(schema) { self.entity_key&.to_s&.humanize },
       placeholder: "Enter value",
-      entity_type: ->(*args) { self.class.registered_type },
+      entity_type: ->(schema) { self.class.registered_type },
       editable: true,
       required: false,
       active: true,
@@ -66,8 +66,8 @@ module Forms::API::Entity::Schema
     end
   end
 
-  def set(attribute, value)
-    val = Transactions::Evaluator.eval_proc(self, value)
+  def set(attribute, value, args: nil)
+    val = Transactions::Evaluator.eval_proc(self, value, args)
     if self.class.options[attribute].present?
       self.options[attribute] = val
     elsif self.class.configs[attribute].present?

@@ -66,7 +66,7 @@ class FormRule < ApplicationRecord
       return nil if result.nil?
       # Final node
       return result[p] if paths.blank?
-      return nil unless result <= Hash
+      return nil unless result.class <= Hash
       result = result[p]
     end
 

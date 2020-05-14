@@ -4,6 +4,10 @@ class Forms::TestForm < Forms::API
   section :header do
     text :first_name
     text :last_name, editable: false, required: false
+    data_map :profile, populate_if_empty: UserProfile do
+      text :employee_id
+      text :pan
+    end
   end
 
   condition condition_id: :last_name_editable do
@@ -12,8 +16,20 @@ class Forms::TestForm < Forms::API
     action :editable, true
   end
 
+  condition condition_id: :last_name_required_pan do
+    reference :entity, :last_name
+    rule 'profile/pan', 'present', value: "a"
+    action :required, true
+  end
+
   condition condition_id: :last_name_required do
     reference :entity, :last_name
+    rule :first_name, 'cont', value: 'Solo'
+    action :required, true
+  end
+
+  condition condition_id: :pan_required do
+    reference :entity, 'profile/pan'
     rule :first_name, 'cont', value: 'Solo'
     action :required, true
   end

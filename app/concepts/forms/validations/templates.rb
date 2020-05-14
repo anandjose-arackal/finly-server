@@ -23,13 +23,13 @@ class Forms::Validations::Templates
   end
 
   validates :minimum do |reform:, entity:, **|
-    if entity.options['minimum'].present?
+    if entity.options['minimum'].present? and entity.options['minimum'] > 0
       reform.validates entity.entity_key.to_sym, length: {minimum: entity.options['minimum']}
     end
   end
 
   validates :maximum do |reform:, entity:, **|
-    if entity.options['maximum'].present?
+    if entity.options['maximum'].present? and entity.options['maximum'] > 0
       reform.validates entity.entity_key.to_sym, length: {maximum: entity.options['maximum']}
     end
   end

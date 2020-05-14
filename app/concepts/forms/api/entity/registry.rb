@@ -23,7 +23,9 @@ module Forms::API::Entity::Registry
   def entity(*args, &block)
     opts = args.extract_options!
     klass, entity_key = klass_and_name_from args
+    opts[:parent] = self if self.class <= FormEntity
     entity = klass.system_entity(section, entity_key, opts)
+    # debugger if entity_key == :pan
     entities << entity
     result = entity.valid_schema?
     unless result.success?
