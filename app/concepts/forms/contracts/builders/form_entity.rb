@@ -17,6 +17,7 @@ class Forms::Contracts::Builders::FormEntity
 
   def contract(reform)
     define_property(reform)
+    define_choice_dependencies(reform)
     define_validations(reform)
     execute_contract_evaluators(reform)
   end
@@ -58,6 +59,10 @@ class Forms::Contracts::Builders::FormEntity
     entity.class.contract_evaluators.each do |name, evaluator|
       evaluator.call(context)
     end
+  end
+
+  def define_choice_dependencies(reform)
+
   end
 
   def properties(entity)
