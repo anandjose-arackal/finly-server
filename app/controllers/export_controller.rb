@@ -58,6 +58,7 @@ class ExportController < BaseControllers::WebBase
       end and return
     end
 
+    params[:export_format] = params[:download_type]
     params[:type] = 'reports'
     result = ExportManager::RequestHandler.(current_user, params)
     if result.success?
