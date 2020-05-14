@@ -198,15 +198,15 @@ class PaymentExposure < Exposures::API
   attribute :gross_amount, exposure: true do
     case record.parent_type
     when 'Invoice'
-      record.invoice_parent.gross_amount
+      record.invoice_parent&.gross_amount
     when 'BbpsBill'
-      record.bbps_bill_parent.amount
+      record.bbps_bill_parent&.amount
     when 'BeneficiaryPayment'
-      record.beneficiary_payment_parent.gross_amount
+      record.beneficiary_payment_parent&.gross_amount
     when 'PurchaseOrder'
-      record.purchase_order_parent.requested_advance_amount
+      record.purchase_order_parent&.requested_advance_amount
     when 'SecurityDeposit'
-      record.security_deposit_parent.original_amount
+      record.security_deposit_parent&.original_amount
     else
       nil
     end
