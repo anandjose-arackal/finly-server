@@ -27,7 +27,6 @@ class PaymentAgreements::Terminate < PaymentAgreements::Base
     end
     update_termination_details
     self.workflow_output = op.workflow_output
-    debugger
   end
 
   def post_process

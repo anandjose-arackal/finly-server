@@ -153,7 +153,7 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
   end
 
   def post_process
-    add_message :success, "Payment Orders credit initiated"
+    add_message :success, "Payment Ticket credit initiated"
   end
 
   private

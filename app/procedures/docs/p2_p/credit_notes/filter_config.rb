@@ -5,7 +5,7 @@ class Docs::P2P::CreditNotes::FilterConfig < Filters::API
   attribute :updated_at, type: :datetime, simple: false
   attribute :submitted_at, type: :datetime, simple: false
   attribute :approved_at, type: :datetime, simple: false
-  attribute :credit_note_date, label: "Invoice Date", type: :datetime, simple: true
+  attribute :credit_note_date, label: "Credit Note Date", type: :datetime, simple: true
   attribute :policy_id, type: :dropdown, simple: true, choices: Choices[:auto_complete].('policies')
   attribute :vendor_id, label: "Vendor", simple: true, type: :dropdown,  choices: Choices[:auto_complete].("vendor")
   attribute :vendor_vendor_id, label: "Vendor ID", simple: false

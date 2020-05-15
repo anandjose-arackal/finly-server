@@ -46,5 +46,9 @@ class BankTransfer::PaymentRequest::Review::BulkApprove < BankTransfer::PaymentR
     # op = BankTransfer::PaymentRequest::Review::ApproveBackground.call(ids, initiating_user_id: user.id)
   end
 
+  def post_process
+    add_message :success, "Your request for approving #{self.bank_payment_requests.length} payment tickets is being processed."
+  end
+
 
 end

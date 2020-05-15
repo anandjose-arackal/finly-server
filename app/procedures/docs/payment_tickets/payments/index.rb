@@ -44,11 +44,11 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
     text value: :utr
   end
 
-  column :submitted_at, sort: true, includes: [payment_order: :bank_payment_request] do
+  column :submitted_at, sort: :payment_order_bank_payment_request_submitted_at, includes: [payment_order: :bank_payment_request] do
     date value: -> (context) { context[:record].payment_order.bank_payment_request.submitted_at }
   end
 
-  column :approved_at, sort: true, includes: [payment_order: :bank_payment_request] do
+  column :approved_at, sort: :payment_order_bank_payment_request_approved_at, includes: [payment_order: :bank_payment_request] do
     date value: -> (context) { context[:record].payment_order.bank_payment_request.approved_at }
   end
 
@@ -56,13 +56,17 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
     date value: -> (context) { context[:record].payment_order.scheduled_at }
   end
 
-  column :processed_date, sort: :processed_at, default: true do
-    date value: :processed_at
+  column :date, sort: true, default: true do
+    date value: :date
   end
 
-  column :last_retried_on, sort: :last_retried_at, default: true do
-    date value: :last_retried_at
-  end
+  # column :processed_date, sort: :processed_at, default: true do
+  #   date value: :processed_at
+  # end
+
+  # column :last_retried_on, sort: :last_retried_at, default: true do
+  #   date value: :last_retried_at
+  # end
 
   column :created_by, default: true, sort: :payment_order_bank_payment_request_created_by_id, includes: [payment_order: {bank_payment_request: :created_by}] do
     user value: -> (context) { context[:record].payment_order.bank_payment_request.created_by }

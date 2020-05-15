@@ -19,7 +19,7 @@ class Procurements::PurchaseOrders::BulkRejectProcessor < BackgroundOperation
     purchase_order_ids.each do |id|
       data_success = {}
       data_error = {}
-      op = Procurements::PurchaseOrders::Reject.(user, {purchase_order_id: id})
+      op = Procurements::PurchaseOrders::Reject.(user, {purchase_order_id: id, skip_reject_reason: true})
       po = PurchaseOrder.find_by id: id
       unless op.success?
         data_error[:messages] = op.messages[:error]

@@ -504,7 +504,7 @@ class PurchaseOrder < ApplicationRecord
   after_destroy :budget_trail_destroy
 
   def self.ransackable_scopes(auth_object = nil)
-    [:with_status_ids]
+    [:with_status_ids, :with_grn_status_id]
   end
 
   def status_tag_details
