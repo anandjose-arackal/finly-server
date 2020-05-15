@@ -1,5 +1,16 @@
 class Forms::TestInvoiceForm < Forms::API
 
+  model Invoice
+  section :header do
+
+  end
+
+  section :line_items do
+    table :line_items do
+
+    end
+  end
+
   # model Invoice
   # section :header do
   #   auto_number :invoice_id, prefix: "INV/{{\"now\" | date: \"%y-%m\" }}/", start_at: '000001', required: true

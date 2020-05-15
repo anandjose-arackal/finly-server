@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_12_154142) do
+ActiveRecord::Schema.define(version: 2020_05_14_101325) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3986,6 +3986,9 @@ ActiveRecord::Schema.define(version: 2020_05_12_154142) do
     t.string "type"
     t.text "config"
     t.boolean "associate_custom_fields"
+    t.integer "computation_type_id", null: false
+    t.integer "computation_lookup_entity_id"
+    t.string "computation_formula"
     t.index ["company_id"], name: "index_form_entities_on_company_id"
     t.index ["created_at"], name: "index_form_entities_on_created_at"
     t.index ["created_by_user_id"], name: "index_form_entities_on_created_by_user_id"
@@ -4018,6 +4021,17 @@ ActiveRecord::Schema.define(version: 2020_05_12_154142) do
     t.index ["form_id"], name: "index_form_entity_choices_on_form_id"
     t.index ["form_section_id"], name: "index_form_entity_choices_on_form_section_id"
     t.index ["uuid"], name: "index_form_entity_choices_on_uuid"
+  end
+
+  create_table "form_entity_computation_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_form_entity_computation_types_on_created_at"
+    t.index ["deleted_at"], name: "index_form_entity_computation_types_on_deleted_at"
+    t.index ["name"], name: "index_form_entity_computation_types_on_name"
+    t.index ["updated_at"], name: "index_form_entity_computation_types_on_updated_at"
   end
 
   create_table "form_entity_validations", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|

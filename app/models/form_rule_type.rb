@@ -12,6 +12,6 @@
 class FormRuleType < ApplicationRecord
   include Seedable
 
-  set_values :value, :entity, :formula
+  set_values :value, :entity, :formula, :none
 
 end

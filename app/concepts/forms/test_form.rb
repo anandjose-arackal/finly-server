@@ -18,7 +18,8 @@ class Forms::TestForm < Forms::API
 
   condition condition_id: :last_name_required_pan do
     reference :entity, :last_name
-    rule 'profile/pan', 'present', value: "a"
+    # Fixme present/true should accept without values
+    rule 'profile/pan', 'present'#, value: "a"
     action :required, true
   end
 

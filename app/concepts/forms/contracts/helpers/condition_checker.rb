@@ -1,7 +1,7 @@
 # Responsible for running conditions and returning the applicable actions in result
 class Forms::Contracts::Helpers::ConditionChecker
 
-  def self.run(conditions, entity, properties, form: {}, row: {})
+  def self.call(conditions, entity, properties, form: {}, row: {})
     result = {}.with_indifferent_access
     conditions.each do |condition|
       # reference_key is where entity path is stored

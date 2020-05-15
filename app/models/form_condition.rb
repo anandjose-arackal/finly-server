@@ -61,6 +61,7 @@ class FormCondition < ApplicationRecord
     rule_type_id = FormRuleType.id_for(:value) if value.present?
     rule_type_id = FormRuleType.id_for(:formula) if formula.present?
     rule_type_id = FormRuleType.id_for(:entity) if match_entity_path.present?
+    rule_type_id ||= FormRuleType.id_for(:none)
 
     rules.new(
         entity_path: entity_path,
