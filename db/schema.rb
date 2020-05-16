@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_08_065957) do
+ActiveRecord::Schema.define(version: 2020_05_16_130418) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -1600,6 +1600,7 @@ ActiveRecord::Schema.define(version: 2020_05_08_065957) do
     t.decimal "cn_adjusted_amount_before_tax_value", precision: 20, scale: 10, default: "0.0"
     t.decimal "cn_adjusted_amount_after_tax_value", precision: 20, scale: 10, default: "0.0"
     t.decimal "credit_note_tax_amount_value", precision: 20, scale: 10, default: "0.0"
+    t.datetime "date"
     t.index ["entity_type", "entity_id"], name: "index_budget_trails_on_entity_type_and_entity_id"
   end
 
@@ -4526,6 +4527,7 @@ ActiveRecord::Schema.define(version: 2020_05_08_065957) do
     t.integer "billable_amount_id"
     t.integer "purchase_order_item_id"
     t.datetime "deleted_at"
+    t.boolean "tds_applicable", default: false
     t.index ["category_id"], name: "index_invoice_line_items_on_category_id"
     t.index ["department_id"], name: "index_invoice_line_items_on_department_id"
     t.index ["discount_amount_id"], name: "index_invoice_line_items_on_discount_amount_id"
@@ -6324,6 +6326,7 @@ ActiveRecord::Schema.define(version: 2020_05_08_065957) do
     t.decimal "igst", precision: 20, scale: 5, default: "0.0"
     t.integer "taxable_amount_id"
     t.decimal "previously_billed_amount", precision: 20, scale: 5, default: "0.0"
+    t.boolean "tds_applicable", default: false
     t.index ["department_id"], name: "index_purchase_order_items_on_department_id"
     t.index ["discount_amount_id"], name: "index_purchase_order_items_on_discount_amount_id"
     t.index ["inventory_line_item_id"], name: "index_purchase_order_items_on_inventory_line_item_id"
