@@ -12,5 +12,12 @@
 #
 
 class FormChoiceDependencyMapping < ApplicationRecord
+  include TemplateClonable
+
   belongs_to :dependency, class_name: "FormChoiceDependency"
+
+  def reference(controlling_choice, dependent_choice)
+    self.template_reference[:controlling_choice] = controlling_choice
+    self.template_reference[:dependent_choice] = dependent_choice
+  end
 end

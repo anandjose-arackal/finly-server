@@ -53,7 +53,7 @@ class Templates::Synchronizer
       if association_record.nil?
         if condition.blank? or condition.call(association_template)
           context = exec_context.dup
-          context[:parent] = nil
+          # context[:parent] = nil
           context[:template] = association_template
           record = exec_context[:parent].send("build_#{association_name}", clone(association_template, context))
           context[:parent] = record
@@ -76,7 +76,7 @@ class Templates::Synchronizer
       end
 
       context = exec_context.dup
-      context[:parent] = nil
+      # context[:parent] = nil
       context[:template] = temp_record
       # Clone if no matching record is found
       if matching_record.nil?

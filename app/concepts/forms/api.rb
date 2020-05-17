@@ -45,7 +45,11 @@ class Forms::API
 
     # dependency = Forms::API::ChoiceDependency.new(params, &block)
     dependency = FormChoiceDependency.system_dependency(params, &block)
+    if dependencies[dependency.dependency_id].present?
+      raise "Dependency #{dependency.dependency_id} is not unique"
+    end
     dependencies[dependency.dependency_id] = dependency
+    form.choice_dependencies << dependency
   end
 
   def self.find_entity(entity_path)

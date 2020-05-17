@@ -51,8 +51,17 @@ class FormChoiceDependency < ApplicationRecord
   end
 
   def reference(controller:, dependent:)
-    template_reference[:controlling_entity] = controller
-    template_reference[:dependent_entity] = dependent
+    template_reference[:controlling_entity_path] = controller
+    template_reference[:dependent_entity_path] = dependent
+  end
+
+  def dependency(controlling_choice, dependent_choice)
+    dependent_choice = [dependent_choice] unless dependent_choice.respond_to?(:each)
+    dependent_choice.each do |dep_ch|
+      mapping = mappings.new
+      mapping.reference(controlling_choice, dep_ch)
+    end
+    mappings
   end
 
 end
