@@ -133,10 +133,8 @@ class FormEntity < ApplicationRecord
             required: required,
             active: active,
             visible: visible,
-            unique: unique,
         },
         position: position,
-        custom_field: custom_field,
         options: options
     }
     if choices_scope.present?
