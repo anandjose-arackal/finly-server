@@ -41,23 +41,37 @@ class Forms::Ops::Choices < Transactions::API
     true
   end
 
-  def init_choice_dependencies(context, model:, entity:, **)
-    context[:choice_dependencies] = model.choice_dependencies
-                                        .ransack(form_entity: entity)
-                                        .result
-                                        .includes({rules: {form: :entities}}, :mappings)
+  def init_choice_dependencies(context, model:, entity:, params:, **)
+    query = ''
+    params[:controlling_choices].each do |controlling_entity_path, value|
+      query += " AND " unless query.blank?
+      query += "(`form_entities`.`entity_path` = '#{controlling_entity_path}' AND controlling_choice_id = #{value})"
+    end
+    context[:choice_dependency_mapping] = FormChoiceDependencyMapping.joins(dependency: :controlling_entity)
+                                              .where("form_choice_dependencies.dependent_entity_id = '#{entity.id}'")
+                                              .where(query)
+    # context[:choice_dependencies] = model.choice_dependencies.joins(:mapping)
+    #                                     .where(query)
+    #                                     .ransack(form_entity: entity)
+    #                                     .result
+    #                                     .includes(:controlling_entity, :mappings)
   end
 
-  def scope_choices(context, choice_dependencies:, params:, **)
+  def scope_choices(context, choice_dependency_mapping:, params:, **)
     choices = {}
-    choice_dependencies.each do |dependency|
-      choices[dependency] = []
-      dependency.rules.each do |rule|
-        if rule.match?(params[:controlling_choices])
-          choices[dependency] += dependency.mappings.map { |map| map.form_entity_choice_id }
-        end
-      end
+    choice_dependency_mapping.each do |mapping|
+      choices[mapping.controlling_choice_id] = [] if choices[mapping.controlling_choice_id].blank?
+      choices[mapping.controlling_choice_id] << mapping.dependent_choice_id
     end
+
+    # choice_dependencies.each do |dependency|
+    #   choices[dependency] = []
+    #   dependency.rules.each do |rule|
+    #     if rule.match?(params[:controlling_choices])
+    #       choices[dependency] += dependency.mappings.map { |map| map.form_entity_choice_id }
+    #     end
+    #   end
+    # end
     intersecting_choices = choices.values.first
     return if intersecting_choices.blank?
 
