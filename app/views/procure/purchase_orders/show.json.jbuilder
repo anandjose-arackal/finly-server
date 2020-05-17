@@ -145,7 +145,7 @@ json.items do
       product = "service"
     end
     json.product_type product
-    json.tds_applicable (item.inventory_line_item&.tds_applicable) ? "yes" : "no"
+    json.tds_applicable (item&.tds_applicable) ? "yes" : "no"
 
     json.department_attributes do
       json.id item.department_id

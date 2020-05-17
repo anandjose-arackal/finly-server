@@ -76,6 +76,7 @@ class InvoiceLineItem < ApplicationRecord
   # removing for now
   # validates_presence_of :unit_of_measurement
   # validates_presence_of :department, if: :check_outward_invoice?
+
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
 
@@ -131,7 +132,7 @@ class InvoiceLineItem < ApplicationRecord
   end
 
   def tds_applicable?
-    self.inventory_line_item&.tds_applicable?
+    self&.inventory_line_item&.tds_applicable?
   end
 
   def as_json(options = {})
