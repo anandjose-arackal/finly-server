@@ -42,6 +42,8 @@ class Forms::Ops::Choices < Transactions::API
   end
 
   def init_choice_dependencies(context, model:, entity:, params:, **)
+    return unless params[:controlling_choices].present?
+
     query = ''
     params[:controlling_choices].each do |controlling_entity_path, value|
       query += " AND " unless query.blank?
@@ -57,7 +59,9 @@ class Forms::Ops::Choices < Transactions::API
     #                                     .includes(:controlling_entity, :mappings)
   end
 
-  def scope_choices(context, choice_dependency_mapping:, params:, **)
+  def scope_choices(context, choice_dependency_mapping: nil, params:, **)
+    return unless choice_dependency_mapping.present?
+
     choices = {}
     choice_dependency_mapping.each do |mapping|
       choices[mapping.controlling_choice_id] = [] if choices[mapping.controlling_choice_id].blank?
