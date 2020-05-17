@@ -128,13 +128,13 @@ class FormEntity < ApplicationRecord
         hint: hint,
         entity_type: entity_type,
         default_value: default_value,
+        position: position,
         properties: {
             editable: editable,
             required: required,
             active: active,
             visible: visible,
         },
-        position: position,
         options: options
     }
     if choices_scope.present?
