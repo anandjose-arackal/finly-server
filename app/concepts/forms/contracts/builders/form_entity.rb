@@ -3,25 +3,6 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
   SETTER_ACTIONS = %w(editable visible).freeze
   VALIDATION_ACTIONS = %w(required unique).freeze
 
-  # attr_accessor :entity
-  #
-  # def self.call(entity, reform)
-  #   entity_builder = self.new(entity)
-  #   entity_builder.contract(reform)
-  #   entity_builder
-  # end
-  #
-  # def initialize(entity)
-  #   self.entity = entity
-  # end
-  #
-  # def contract(reform)
-  #   define_property(reform)
-  #   define_choice_dependencies(reform)
-  #   define_validations(reform)
-  #   execute_contract_evaluators(reform)
-  # end
-
   schema do
     params do
       required(:reform).filled
@@ -29,6 +10,11 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
     end
   end
 
+  # Sequence
+  # ☐ Deserialize -> Assign values unless conditionally editable / visible
+  # ☐ Assign conditional values + Run all computations
+  # ☐ Validate System
+  # ☐ Validate Custom
   pass :init
   pass :define_entity
   pass :assign_and_compute_entity
