@@ -31,13 +31,13 @@ class Forms::TestForm < Forms::API
   end
 
   validation validation_id: :first_name_value do
-    entity_path :first_name
+    reference :first_name
     rule rule_builder[:first_name].eq(value: "Hann")
     error_message "is a bad name"
   end
 
   validation validation_id: :pan_value do
-    entity_path 'profile/pan'
+    reference 'profile/pan'
     rule rule_builder['row.pan'].eq(value: "123")
     error_message "is not legal"
   end

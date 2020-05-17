@@ -32,7 +32,14 @@ class Templates::Synchronizer
 
   def clone(template)
     attrs = template.attributes.except('id', 'uuid', 'created_at', 'updated_at', 'deleted_at')
-    attrs.merge(setters)
+    assignment = {}
+    assignment_context = exec_context.dup
+    assignment_context[:template] = template
+    setters.each do |attribute, value|
+      assignment[attribute] = Transactions::Evaluator.eval_proc(self, value, assignment_context)
+    end
+    assignment
+    attrs.merge(assignment)
   end
 
   def sync(template, record)

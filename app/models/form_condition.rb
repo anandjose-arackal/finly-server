@@ -22,11 +22,11 @@
 #
 
 class FormCondition < ApplicationRecord
-  include UUIDHelper
+  include UUIDHelper, TemplateClonable
 
   belongs_to :company
   belongs_to :form
-  # belongs_to :reference, polymorphic: true
+  belongs_to :referencable, polymorphic: true
   belongs_to :created_by, class_name: 'User', optional: true
   belongs_to :updated_by, class_name: 'User', optional: true
 
@@ -48,8 +48,10 @@ class FormCondition < ApplicationRecord
   end
 
   def reference(reference_type, reference_key)
-    self.reference_type = reference_type
-    self.reference_key = reference_key
+    # self.reference_type = reference_type
+    # self.reference_key = reference_key
+    template_reference[:reference_key] = reference_key
+    template_reference[:reference_type] = reference_type
   end
 
   def action(property, value)

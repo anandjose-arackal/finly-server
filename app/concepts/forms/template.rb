@@ -43,6 +43,9 @@ class Forms::Template < Templates::API
 
     set :company_id, exec_context[:company_id]
     set :form, exec_context[:root_record]
+    set :referencable, -> (ref_context) do
+      ref_context[:root_record].find_entity(ref_context[:template].template_reference[:reference_key])
+    end
     # association :rule, &templates[:rule]
     association :actions do |action_context|
       set :company_id, action_context[:company_id]
@@ -57,6 +60,9 @@ class Forms::Template < Templates::API
 
     set :company_id, exec_context[:company_id]
     set :form, exec_context[:root_record]
+    set :form_entity, -> (ref_context) do
+      ref_context[:root_record].find_entity(ref_context[:template].template_reference[:entity_path])
+    end
     # association :rule, &templates[:rule]
   end
 

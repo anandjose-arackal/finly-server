@@ -45,7 +45,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
 
     reform.validate -> do
       input = row_input
-      result = Forms::Contracts::Helpers::ConditionChecker.(entity.form.conditions, entity, SETTER_ACTIONS, form: contract_input, row: input)
+      result = Forms::Contracts::Helpers::ConditionChecker.(entity.conditions, entity, SETTER_ACTIONS, form: contract_input, row: input)
       editable = result['editable'] || entity.editable
       visible = result['visible'] || entity.visible
       if editable and visible and input.has_key?(entity.entity_key)
@@ -65,7 +65,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
     reform.validate -> do
       # Using as_nested_hash instead of input as the input need not always
       result = Forms::Contracts::Helpers::ConditionChecker.(
-          entity.form.conditions, entity, VALIDATION_ACTIONS, form: contract_root.to_nested_hash, row: to_nested_hash
+          entity.conditions, entity, VALIDATION_ACTIONS, form: contract_root.to_nested_hash, row: to_nested_hash
       )
       required = result['required'] || entity.required
 
@@ -78,8 +78,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
 
   def custom_validate_entity(context, reform:, entity:, **)
     reform.validate -> do
-      entity.form.validations.each do |validation|
-        next unless validation.entity_path == entity.entity_path
+      entity.validations.each do |validation|
         next unless validation.rule.apply?({form: contract_root.to_nested_hash, row: to_nested_hash}.with_indifferent_access)
         errors.add entity.entity_key, validation.error_message
       end
@@ -117,7 +116,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
       # Check if conditional editable / visible is applicable on the entity, assign unless editable / visible can be modified
       dynamic_editable = false
       dynamic_visible = false
-      entity.form.conditions.each do |condition|
+      entity.conditions.each do |condition|
         condition.actions.each do |action|
           dynamic_editable ||= (action.property == 'editable')
           dynamic_visible ||= (action.property == 'visible')
@@ -132,7 +131,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
       # Assign value only if conditional editable/visible does not apply the field
       represented.send("#{entity.entity_key}=", input[entity.entity_key])
 
-      # result = Forms::Contracts::Helpers::ConditionChecker.(entity.form.conditions, entity, SETTER_ACTIONS, form: represented.contract_input, row: input)
+      # result = Forms::Contracts::Helpers::ConditionChecker.(entity.conditions, entity, SETTER_ACTIONS, form: represented.contract_input, row: input)
       # editable = result['editable'] || entity.editable
       # visible = result['visible'] || entity.visible
       #

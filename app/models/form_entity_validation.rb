@@ -22,15 +22,17 @@
 #
 
 class FormEntityValidation < ApplicationRecord
-  include UUIDHelper
+  include UUIDHelper, TemplateClonable
 
   belongs_to :company
   belongs_to :form
-  # belongs_to :form_entity
+  belongs_to :form_entity
   belongs_to :created_by, class_name: 'User', optional: true
   belongs_to :updated_by, class_name: 'User', optional: true
 
   serialize :rule, Forms::Rules::Ransack
+
+  delegate :entity_path, to: :form_entity
 
   def self.system_validation(params = {}, &block)
     params[:custom] = false
@@ -72,9 +74,8 @@ class FormEntityValidation < ApplicationRecord
   #   )
   # end
 
-  def entity_path(entity_path = NoObject)
-    self.entity_path = entity_path unless entity_path == NoObject
-    super()
+  def reference(entity_path)
+    template_reference[:entity_path] = entity_path
   end
 
   def error_message(error_message = NoObject)

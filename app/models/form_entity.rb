@@ -70,8 +70,8 @@ class FormEntity < ApplicationRecord
 
   has_many :entities, class_name: 'FormEntity', foreign_key: :parent_id, primary_key: :uuid
   has_many :choices, class_name: 'FormEntityChoice', dependent: :destroy
-  # has_many :validations, class_name: 'FormEntityValidation', through: :form
-  # has_many :conditions, -> { where(reference_type: 'entity') }, class_name: "FormCondition", primary_key: :entity_path, foreign_key: :reference_key
+  has_many :validations, class_name: 'FormEntityValidation'
+  has_many :conditions, class_name: "FormCondition", as: :referencable
 
   # Fixme: Delete this as it is available in Forms::API::Entity::Registry. Kept it commented for testing purpose
   # def find_entity(entity_path)
@@ -92,14 +92,6 @@ class FormEntity < ApplicationRecord
   scope :system_fields, -> { where.not custom_field: true }
   scope :custom_fields, -> { where custom_field: true }
   scope :exclude_internal, -> { where.not internal: true }
-
-  def validations
-    form.validations.where(entity_path: entity_path)
-  end
-
-  def conditions
-    form.conditions.where(reference_type: 'entity', reference_key: entity_path)
-  end
 
   def populate_if_empty
     val = super()

@@ -13,7 +13,7 @@
 #
 
 class Form < ApplicationRecord
-  include UUIDHelper, SoftDeletable
+  include UUIDHelper, SoftDeletable, TemplateClonable
   # include Forms::Generators::Contracts::ModelHelpers::Form
   # include Forms::Generators::Filters::ModelHelpers::Form
 
