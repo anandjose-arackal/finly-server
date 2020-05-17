@@ -43,7 +43,8 @@ class Forms::API
   def self.choice_dependency(params, &block)
     return unless ActiveRecord::Base.connection.table_exists?('form_choice_dependencies')
 
-    dependency = Forms::API::ChoiceDependency.new(params, &block)
+    # dependency = Forms::API::ChoiceDependency.new(params, &block)
+    dependency = FormChoiceDependency.system_dependency(params, &block)
     dependencies[dependency.dependency_id] = dependency
   end
 

@@ -14,5 +14,6 @@ class RestructureFormDependencies < ActiveRecord::Migration[5.2]
     add_index :form_conditions, [:referencable_id, :referencable_type]
     add_column :form_entity_validations, :form_entity_id, :string, index: true, null: false
     remove_column :form_entity_validations, :entity_path
+    add_column :form_choice_dependencies, :internal, :boolean, index: true
   end
 end

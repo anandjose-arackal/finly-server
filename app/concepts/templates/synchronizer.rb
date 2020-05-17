@@ -30,13 +30,11 @@ class Templates::Synchronizer
     associations[name] = {evaluator: evaluator, condition: condition}
   end
 
-  def clone(template)
+  def clone(template, context)
     attrs = template.attributes.except('id', 'uuid', 'created_at', 'updated_at', 'deleted_at')
     assignment = {}
-    assignment_context = exec_context.dup
-    assignment_context[:template] = template
     setters.each do |attribute, value|
-      assignment[attribute] = Transactions::Evaluator.eval_proc(self, value, assignment_context)
+      assignment[attribute] = Transactions::Evaluator.eval_proc(self, value, context)
     end
     assignment
     attrs.merge(assignment)
@@ -54,8 +52,12 @@ class Templates::Synchronizer
     else
       if association_record.nil?
         if condition.blank? or condition.call(association_template)
-          record = exec_context[:parent].send("build_#{association_name}", clone(association_template))
-          sync_record association_template, record
+          context = exec_context.dup
+          context[:parent] = nil
+          context[:template] = association_template
+          record = exec_context[:parent].send("build_#{association_name}", clone(association_template, context))
+          context[:parent] = record
+          sync_record association_template, record, context
         end
       end
     end
@@ -73,22 +75,23 @@ class Templates::Synchronizer
         matching_record = record
       end
 
+      context = exec_context.dup
+      context[:parent] = nil
+      context[:template] = temp_record
       # Clone if no matching record is found
       if matching_record.nil?
-        matching_record = records.new(clone(temp_record))
+        matching_record = records.new(clone(temp_record, context))
       end
+      context[:parent] = matching_record
 
-      sync_record(temp_record, matching_record)
+      sync_record(temp_record, matching_record, context)
     end
   end
 
-  def sync_record(template, record)
+  def sync_record(template, record, context)
     # Evaluate associations of the matching records for cloning
     associations.each do |association_name, args|
-      context = exec_context.dup
-      context[:parent] = record
-      context[:template] = template
-      eval = Templates::Synchronizer.new association_name, context, args, &args[:evaluator]
+      eval = Templates::Synchronizer.new association_name, context.dup, args, &args[:evaluator]
       eval.sync(template, record)
     end
 

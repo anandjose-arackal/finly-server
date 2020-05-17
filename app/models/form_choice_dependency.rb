@@ -20,7 +20,7 @@
 #
 
 class FormChoiceDependency < ApplicationRecord
-  include UUIDHelper
+  include UUIDHelper, TemplateClonable
 
   belongs_to :company
   belongs_to :form
@@ -32,9 +32,27 @@ class FormChoiceDependency < ApplicationRecord
   # has_many :rules, class_name: 'FormRule', as: :rule_parent
   has_many :mappings, class_name: 'FormChoiceDependencyMapping', foreign_key: :dependency_id
 
-  def as_json(options={})
+  def as_json(options = {})
     data = {}
 
+  end
+
+  def self.system_dependency(params, &block)
+    params[:custom] = false
+    params[:internal] ||= false
+    params[:is_updated] = false
+    params[:can_be_updated] ||= false
+    dependency = self.new(params)
+    dependency.instance_eval &block if block_given?
+    if dependency.dependency_id.blank?
+      raise "Dependency ID cannot be blank for #{dependency}"
+    end
+    dependency
+  end
+
+  def reference(controller:, dependent:)
+    template_reference[:controlling_entity] = controller
+    template_reference[:dependent_entity] = dependent
   end
 
 end
