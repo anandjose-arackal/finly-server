@@ -34,7 +34,9 @@ class Forms::Rules::JSONLogic
       if func[:value].present?
         return func[:value]
       else
-        return {var: (func[:formula] || func[:entity])}.as_json
+        var = (func[:formula] || func[:entity]).to_s
+        var = "form.#{var}" unless var.start_with?('form.') or var.start_with?('row.')
+        return {var: var}.as_json
       end
     end
 

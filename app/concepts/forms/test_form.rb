@@ -19,12 +19,11 @@ class Forms::TestForm < Forms::API
     action :editable, true
   end
 
-  condition condition_id: :last_name_required_pan do
-    reference :entity, :last_name
-    # Fixme present/true should accept without values
-    rule rule_builder[:first_name].present(value: 1)
-    action :required, true
-  end
+  # condition condition_id: :last_name_required_pan do
+  #   reference :entity, :last_name
+  #   rule rule_builder['profile/pan'].present
+  #   action :required, true
+  # end
 
   condition condition_id: :last_name_required do
     reference :entity, :last_name

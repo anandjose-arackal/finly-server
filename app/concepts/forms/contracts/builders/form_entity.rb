@@ -29,6 +29,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
     end
   end
 
+  pass :init
   pass :define_entity
   pass :system_validate_entity
   pass :custom_validate_entity
@@ -40,11 +41,11 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
     context[:entity] = params[:entity]
   end
 
-  def define_entity(context, reform:, entity:, **)
+  def define_entity(context, reform:, entity:, current_user:, **)
     # debugger
     # type = entity.collection ? :collection : :property
     type = :property
-    block = contract_block(entity)
+    block = contract_block(entity, current_user)
     if block.present?
       reform.send(type, entity.entity_key, properties(entity), &block)
     else
@@ -119,7 +120,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
     end
   end
 
-  def contract_block(entity)
+  def contract_block(entity, user)
     return nil unless entity.entities.present?
 
     entities = entity.entities
@@ -128,7 +129,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
       Forms::Contracts::Builders::CustomField.(self, entities.custom_fields) if entity.associate_custom_fields
 
       entities.each do |ent|
-        ent.contract(self)
+        ent.contract(self, user)
       end
     end
   end

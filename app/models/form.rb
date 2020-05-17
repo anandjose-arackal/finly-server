@@ -37,8 +37,8 @@ class Form < ApplicationRecord
     nil
   end
 
-  def contract
-    Forms::Contracts::Builders::Form.(self)
+  def contract(user)
+    Forms::Contracts::Builders::Form.(self, user)
   end
 
   def as_json(options = {})

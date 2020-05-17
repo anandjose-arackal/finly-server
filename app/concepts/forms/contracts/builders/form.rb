@@ -1,6 +1,6 @@
 class Forms::Contracts::Builders::Form
 
-  def self.call(form)
+  def self.call(form, user)
     # FixMe : proper inclusion of conditions, validations and dependencies to avoid N+1
     sections = form.sections.includes(entities: {entities: {entities: {entities: [:entities]}}})
     Class.new(Reform::Form) do
@@ -8,7 +8,7 @@ class Forms::Contracts::Builders::Form
       sections.each do |section|
         associate_custom_fields ||= section.associate_custom_fields
         section.entities.root.each do |entity|
-          entity.contract(self)
+          entity.contract(self, user)
         end
       end
 
