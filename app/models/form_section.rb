@@ -38,11 +38,10 @@ class FormSection < ApplicationRecord
 
   def as_json(options = {})
     {
-        id: id,
-        name: name,
+        title: title,
         active: active,
-        form_id: form_id,
-        entities: entities
+        config_path: section_id.to_s,
+        entities: entities.exclude_internal.root.as_json(options.merge({config_path: "#{section_id}/entities"}))
     }
   end
 end

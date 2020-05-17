@@ -117,8 +117,9 @@ class FormEntity < ApplicationRecord
   # end
 
   def as_json(opts = {})
+    config_path = "#{opts[:config_path]}/#{entity_key}"
     data = {
-        id: uuid,
+        # id: uuid,
         entity_key: entity_key,
         label: label,
         placeholder: placeholder,
@@ -132,7 +133,8 @@ class FormEntity < ApplicationRecord
         unique: unique,
         position: position,
         custom_field: custom_field,
-        options: options
+        options: options,
+        config_path: config_path
     }
     if choices_scope.present?
       data[:choices] = choices_scope.as_json(params: opts["params"], user: opts["current_user"])
@@ -140,7 +142,7 @@ class FormEntity < ApplicationRecord
     if entities.present?
       data[:entities] = {}
       entities.each do |ent|
-        data[:entities][ent.entity_path] = ent.as_json(opts)
+        data[:entities][ent.entity_path] = ent.as_json(opts.merge(config_path: "#{config_path}/entities"))
       end
     end
     data
