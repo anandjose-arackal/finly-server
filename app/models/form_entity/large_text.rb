@@ -41,6 +41,12 @@
 #  populate_if_empty            :string(255)
 #  type                         :string(255)
 #  config                       :text(65535)
+#  associate_custom_fields      :boolean
+#  compute                      :boolean
+#  compute_enabled              :boolean
+#  compute_type_id              :integer
+#  compute_formula              :string(255)
+#  compute_lookup_entity_path   :string(255)
 #
 
 class FormEntity::LargeText < FormEntity
@@ -48,7 +54,7 @@ class FormEntity::LargeText < FormEntity
   set :hint, "Enter value"
 
   option :maximum, default: 65535 #{numericality: {greater_than_or_equal_to: 0, less_than_or_equal_to: 255, only_integer: true}}
-  option :maximum, default: 0
+  option :minimum, default: 0
 
   operators :eq_any, :not_eq_all, :cont_any, :not_cont_all, :blank, :present
 
@@ -56,7 +62,7 @@ class FormEntity::LargeText < FormEntity
     required(:options) do
       hash do
         required(:maximum).value(:int?, lteq?: 65535)
-        required(:minimum).value(:int?, lteq?: 0)
+        required(:minimum).value(:int?, gteq?: 0)
       end
     end
   end

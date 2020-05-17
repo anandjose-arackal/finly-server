@@ -10,7 +10,7 @@ class AddComputationToFormEntity < ActiveRecord::Migration[5.2]
     FormEntityComputationType.seed_data
     add_column :form_entities, :compute_enabled, :boolean
     add_column :form_entities, :compute_type_id, :integer, index: true
-    add_column :form_entities, :compute_lookup_entity_id, :integer, index: true
+    add_column :form_entities, :compute_lookup_entity_path, :string
     add_column :form_entities, :compute_formula, :string, index: true
   end
 end

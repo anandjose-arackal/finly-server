@@ -12,7 +12,6 @@
 #  is_deleted                    :boolean          default(FALSE)
 #  travel_request_id             :integer          not null
 #  deleted_at                    :datetime
-#  uuid                          :string(36)
 #
 
 class BookingRequest < ApplicationRecord

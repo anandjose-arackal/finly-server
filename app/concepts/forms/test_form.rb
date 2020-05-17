@@ -7,23 +7,17 @@ class Forms::TestForm < Forms::API
     data_map :profile, populate_if_empty: UserProfile do
       text :employee_id
       text :pan
+      number :state
+      number :city
+      number :gender, computed: "{{form.first_name}} : {{row.state | times: row.city}}", editable: false
     end
   end
 
   condition condition_id: :last_name_editable do
     reference :entity, :last_name
-    # builder = Forms::Rule.new
-    # rule builder[:first_name].cont(value: "Han").or(builder[:last_name].eq("Solo"))
-    # FormRule(:first_name).cont(value: "Han").or(FormRule)
     rule rule_builder[:first_name].cont(value: 'Han')
     action :editable, true
   end
-
-  # condition condition_id: :last_name_required_pan do
-  #   reference :entity, :last_name
-  #   rule rule_builder['profile/pan'].present
-  #   action :required, true
-  # end
 
   condition condition_id: :last_name_required do
     reference :entity, :last_name

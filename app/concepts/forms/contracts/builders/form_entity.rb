@@ -48,10 +48,10 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
       result = Forms::Contracts::Helpers::ConditionChecker.(entity.form.conditions, entity, SETTER_ACTIONS, form: contract_input, row: input)
       editable = result['editable'] || entity.editable
       visible = result['visible'] || entity.visible
-      next unless editable and visible and input.has_key?(entity.entity_key)
-
-      value = input[entity.entity_key] # || entity.default_value
-      send("#{entity.entity_key}=", value)
+      if editable and visible and input.has_key?(entity.entity_key)
+        value = input[entity.entity_key] # || entity.default_value
+        send("#{entity.entity_key}=", value)
+      end
 
       # -> Computations are run here
       if entity.compute_enabled and not editable

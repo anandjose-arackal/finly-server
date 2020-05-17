@@ -17,7 +17,7 @@ class Forms::Contracts::Helpers::ComputeRunner
   end
 
   def self.compute_via_form(represented, entity, value, form: {}, row: {})
-    value = LiquidHelper.interpolate(entity.compute_formula, row.merge(form: form))
+    value = LiquidHelper.interpolate(entity.compute_formula, {row: row, form: form}.as_json)
     represented.send("#{entity.entity_key}=", value)
   end
 end

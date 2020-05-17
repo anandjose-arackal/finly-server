@@ -41,6 +41,12 @@
 #  populate_if_empty            :string(255)
 #  type                         :string(255)
 #  config                       :text(65535)
+#  associate_custom_fields      :boolean
+#  compute                      :boolean
+#  compute_enabled              :boolean
+#  compute_type_id              :integer
+#  compute_formula              :string(255)
+#  compute_lookup_entity_path   :string(255)
 #
 
 class FormEntity < ApplicationRecord
@@ -60,6 +66,7 @@ class FormEntity < ApplicationRecord
   belongs_to :form
   belongs_to :parent, class_name: 'FormEntity', optional: true, primary_key: :uuid, foreign_key: :parent_id
   belongs_to :created_by, optional: true, class_name: "User", foreign_key: :created_by_user_id
+  belongs_to :compute_type, class_name: 'FormEntityComputationType', optional: true
 
   has_many :entities, class_name: 'FormEntity', foreign_key: :parent_id, primary_key: :uuid
   has_many :choices, class_name: 'FormEntityChoice', dependent: :destroy
@@ -112,6 +119,17 @@ class FormEntity < ApplicationRecord
     Forms::Contracts::Builders::FormEntity.({params: {entity: self, reform: reform}, current_user: user})
   end
 
+  def computed=(formula, lookup_entity: nil)
+    self.compute_enabled = true
+    self.compute_formula = formula
+    if lookup_entity
+      self.compute_type_id = FormEntityComputationType.id_for(:lookup)
+      self.compute_lookup_entity_path = lookup_entity
+    else
+      self.compute_type_id = FormEntityComputationType.id_for(:form)
+    end
+  end
+
   # def choices(params: {}, user:)
   #   choices_scope&.choices(params: params, user: user)
   # end
@@ -129,6 +147,12 @@ class FormEntity < ApplicationRecord
         entity_type: entity_type,
         default_value: default_value,
         position: position,
+        compute: {
+            enabled: compute_enabled,
+            type: compute_type&.name,
+            lookup: compute_lookup_entity_path,
+            formula: compute_formula
+        },
         properties: {
             editable: editable,
             required: required,

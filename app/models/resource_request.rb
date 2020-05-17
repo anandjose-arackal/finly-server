@@ -9,7 +9,6 @@
 #  resource_file_name :string(255)
 #  source             :text(65535)
 #  source_description :text(65535)
-#  uuid               :string(36)
 #  deleted_at         :datetime
 #
 

@@ -18,6 +18,7 @@
 #  internal       :boolean
 #  is_updated     :boolean
 #  can_be_updated :boolean
+#  rule           :text(65535)
 #
 
 class FormEntityValidation < ApplicationRecord
