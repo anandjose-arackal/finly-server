@@ -31,7 +31,9 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
 
   pass :init
   pass :define_entity
+  pass :assign_and_compute_entity
   pass :validate_entity
+  pass :custom_validate_entity
   pass :validate_choices
   pass :execute_contract_evaluators
 
@@ -52,6 +54,27 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
     end
   end
 
+  def assign_and_compute_entity(context, reform:, entity:, **)
+    return if entity.entities.present?
+
+    reform.validate -> do
+      input = row_input
+      result = Forms::Contracts::Helpers::ConditionChecker.(entity.form.conditions, entity, SETTER_ACTIONS, form: contract_input, row: input)
+      editable = result['editable'] || entity.editable
+      visible = result['visible'] || entity.visible
+      next unless editable and visible and input.has_key?(entity.entity_key)
+
+      value = input[entity.entity_key] # || entity.default_value
+      send("#{entity.entity_key}=", value)
+
+      # -> Computations are run here
+      if entity.compute_enabled and not editable
+        value = send(entity.entity_key)
+        Forms::Contracts::Helpers::ComputeRunner.(self, entity, value, form: contract_input, row: input)
+      end
+    end
+  end
+
   def validate_entity(context, reform:, entity:, **)
     reform.validate -> do
       # Using as_nested_hash instead of input as the input need not always
@@ -60,10 +83,15 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
       )
       required = result['required'] || entity.required
 
+      # Required validation ( System Validation )
       if required and send(entity.entity_key).blank?
         errors.add entity.entity_key, 'cannot be blank'
       end
+    end
+  end
 
+  def custom_validate_entity(context, reform:, entity:, **)
+    reform.validate -> do
       entity.form.validations.each do |validation|
         next unless validation.entity_path == entity.entity_path
         next unless validation.rule.apply?({form: contract_root.to_nested_hash, row: to_nested_hash}.with_indifferent_access)
@@ -72,9 +100,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
     end
   end
 
-  def validate_choices(context, reform:, entity:, **)
-
-  end
+  def validate_choices(context, reform:, entity:, **) end
 
   def execute_contract_evaluators(context, reform:, entity:, **)
     context = {
@@ -92,29 +118,49 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
     properties = {}
     properties[:virtual] = true if entity.custom_field
     properties[:populate_if_empty] = entity.populate_if_empty if entity.populate_if_empty.present?
-    properties[:deserializer] = deserializer(entity) unless entity.entity_type.to_s == 'data_map'
+    properties[:deserializer] = deserializer(entity) unless entity.entities.present?
     properties
   end
 
   def deserializer(ent)
     entity = ent
     lambda do |input, represented, **|
+      next unless input.has_key?(entity.entity_key)
+
       # -> Conditions like editable / visible are checked for deserialization
-      result = Forms::Contracts::Helpers::ConditionChecker.(entity.form.conditions, entity, SETTER_ACTIONS, form: represented.contract_input, row: input)
-      editable = result['editable'] || entity.editable
-      visible = result['visible'] || entity.visible
-
-      if editable and visible and input.has_key?(entity.entity_key)
-        value = input[entity.entity_key]# || entity.default_value
-        represented.send("#{entity.entity_key}=", value)
-      else
-        value = represented.send(entity.entity_key)
+      # Check if conditional editable / visible is applicable on the entity, assign unless editable / visible can be modified
+      dynamic_editable = false
+      dynamic_visible = false
+      entity.form.conditions.each do |condition|
+        condition.actions.each do |action|
+          dynamic_editable ||= (action.property == 'editable')
+          dynamic_visible ||= (action.property == 'visible')
+        end
       end
 
-      # -> Computations are run here
-      if visible and not editable and entity.compute_enabled
-        Forms::Contracts::Helpers::ComputeRunner.(represented, entity, value, form: represented.contract_input, row: input)
-      end
+      next if dynamic_editable
+      next if dynamic_visible
+      next unless entity.editable
+      next unless entity.visible
+
+      # Assign value only if conditional editable/visible does not apply the field
+      represented.send("#{entity.entity_key}=", input[entity.entity_key])
+
+      # result = Forms::Contracts::Helpers::ConditionChecker.(entity.form.conditions, entity, SETTER_ACTIONS, form: represented.contract_input, row: input)
+      # editable = result['editable'] || entity.editable
+      # visible = result['visible'] || entity.visible
+      #
+      # if editable and visible and input.has_key?(entity.entity_key)
+      #   value = input[entity.entity_key] # || entity.default_value
+      #   represented.send("#{entity.entity_key}=", value)
+      # else
+      #   value = represented.send(entity.entity_key)
+      # end
+      #
+      # # -> Computations are run here
+      # if visible and not editable and entity.compute_enabled
+      #   Forms::Contracts::Helpers::ComputeRunner.(represented, entity, value, form: represented.contract_input, row: input)
+      # end
     end
   end
 
