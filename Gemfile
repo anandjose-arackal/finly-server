@@ -236,6 +236,7 @@ gem 'awesome_print', '~> 1.8.0'
 gem 'fuzzy-string-match', '1.0.1'
 
 gem 'whenever'
+gem 'json_logic', '~> 0.4'
 
 group :development, :test do
   gem 'byebug'

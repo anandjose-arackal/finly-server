@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_14_101325) do
+ActiveRecord::Schema.define(version: 2020_05_16_091125) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3914,6 +3914,7 @@ ActiveRecord::Schema.define(version: 2020_05_14_101325) do
     t.boolean "internal"
     t.boolean "is_updated"
     t.boolean "can_be_updated"
+    t.text "rules"
     t.index ["company_id"], name: "index_form_conditions_on_company_id"
     t.index ["created_at"], name: "index_form_conditions_on_created_at"
     t.index ["created_by_id"], name: "index_form_conditions_on_created_by_id"
@@ -3986,9 +3987,11 @@ ActiveRecord::Schema.define(version: 2020_05_14_101325) do
     t.string "type"
     t.text "config"
     t.boolean "associate_custom_fields"
-    t.integer "computation_type_id", null: false
-    t.integer "computation_lookup_entity_id"
-    t.string "computation_formula"
+    t.boolean "compute"
+    t.boolean "compute_enabled"
+    t.integer "compute_type_id"
+    t.integer "compute_lookup_entity_id"
+    t.string "compute_formula"
     t.index ["company_id"], name: "index_form_entities_on_company_id"
     t.index ["created_at"], name: "index_form_entities_on_created_at"
     t.index ["created_by_user_id"], name: "index_form_entities_on_created_by_user_id"

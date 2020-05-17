@@ -24,35 +24,35 @@ class Masters::Vendors::Form < Forms::API
     end
   end
 
-  condition condition_id: :department_id_editable do
-    reference :entity, :department_id
-    rule :policy_id, 'eq', value: 4
-    action :editable, true
-  end
-
-  condition condition_id: :policy_id_status_editable do
-    reference :entity, :policy_id
-    rule :status_id, 'in', value: VendorStatus.ids_for(:draft, :rejected, :retracted)
-    action :editable, true
-  end
-
-  condition condition_id: :name_status_editable do
-    reference :entity, :name
-    rule :status_id, 'in', value: VendorStatus.ids_for(:draft, :rejected, :retracted)
-    action :editable, true
-  end
-
-  condition condition_id: :status_location_name_mandatory do
-    reference :entity, 'locations/name'
-    rule :status_id, 'in', value: VendorStatus.ids_for(:draft, :rejected, :retracted)
-    rule :age, 'in', value: VendorStatus.ids_for(:draft, :rejected, :retracted)
-    action :required, false
-  end
-
-  validation entity_path: :name, validation_id: :name_cont_validation do
-    error_message "Name cannot contain Hello"
-    rule 'locations/name', 'not_cont', value: 'Hello'
-  end
+  # condition condition_id: :department_id_editable do
+  #   reference :entity, :department_id
+  #   rule :policy_id, 'eq', value: 4
+  #   action :editable, true
+  # end
+  #
+  # condition condition_id: :policy_id_status_editable do
+  #   reference :entity, :policy_id
+  #   rule :status_id, 'in', value: VendorStatus.ids_for(:draft, :rejected, :retracted)
+  #   action :editable, true
+  # end
+  #
+  # condition condition_id: :name_status_editable do
+  #   reference :entity, :name
+  #   rule :status_id, 'in', value: VendorStatus.ids_for(:draft, :rejected, :retracted)
+  #   action :editable, true
+  # end
+  #
+  # condition condition_id: :status_location_name_mandatory do
+  #   reference :entity, 'locations/name'
+  #   rule :status_id, 'in', value: VendorStatus.ids_for(:draft, :rejected, :retracted)
+  #   rule :age, 'in', value: VendorStatus.ids_for(:draft, :rejected, :retracted)
+  #   action :required, false
+  # end
+  #
+  # validation entity_path: :name, validation_id: :name_cont_validation do
+  #   error_message "Name cannot contain Hello"
+  #   rule 'locations/name', 'not_cont', value: 'Hello'
+  # end
 
   choice_dependency entity_path: :department_id, dependency_id: :policy_dependency do
     controlling_entity_path :policy_id

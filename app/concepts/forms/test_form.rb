@@ -12,26 +12,28 @@ class Forms::TestForm < Forms::API
 
   condition condition_id: :last_name_editable do
     reference :entity, :last_name
-    rule :first_name, 'cont', value: 'Han'
+    # builder = Forms::Rule.new
+    # rule builder[:first_name].cont(value: "Han").or(builder[:last_name].eq("Solo"))
+    # FormRule(:first_name).cont(value: "Han").or(FormRule)
+    rule rule_builder[:first_name].cont(value: 'Han')
     action :editable, true
   end
 
   condition condition_id: :last_name_required_pan do
     reference :entity, :last_name
     # Fixme present/true should accept without values
-    rule 'profile/pan', 'present'#, value: "a"
+    rule rule_builder[:first_name].present(value: 1)
     action :required, true
   end
 
   condition condition_id: :last_name_required do
     reference :entity, :last_name
-    rule :first_name, 'cont', value: 'Solo'
+    rule rule_builder[:first_name].cont(value: 'Han')
     action :required, true
   end
-
   condition condition_id: :pan_required do
     reference :entity, 'profile/pan'
-    rule :first_name, 'cont', value: 'Solo'
+    rule rule_builder[:first_name].cont(value: 'Han').or(rule_builder[:last_name].eq(value: "Solo"))
     action :required, true
   end
 

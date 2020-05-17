@@ -52,7 +52,6 @@ class FormEntity < ApplicationRecord
   include Forms::Generators::Filters::ApiEntityHelper
   include Forms::API::Entity::Registry
   include Forms::API::Entity::Schema
-  include Forms::Rules::Matcher
 
   class_attr :registered_type
 

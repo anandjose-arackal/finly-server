@@ -1,0 +1,1 @@
+Forms::Rules::Predicates.setup

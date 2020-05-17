@@ -18,11 +18,12 @@ class Forms::Contracts::Helpers::ConditionChecker
       end
       next unless applicable
 
-      match = true
-      condition.rules.each do |rule|
-        match = false unless rule.match?({form: form, row: row}.with_indifferent_access)
-      end
-      next unless match
+      return unless condition.rules.apply?({form: form, row: row}.with_indifferent_access)
+      # match = true
+      # condition.rules.each do |rule|
+      #   match = false unless rule.match?({form: form, row: row}.with_indifferent_access)
+      # end
+      # next unless match
 
       condition.actions.each do |action|
         value = StringUtils.to_bool(action.value)

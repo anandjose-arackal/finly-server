@@ -13,11 +13,11 @@ class Forms::TestContract < Forms::Generators::Contracts::API
   end
 
   class Forms::TestContract::Test < Reform::Form
-    feature Disposable::Twin::Parent
+    # feature Disposable::Twin::Parent
 
     property :first_name
     property :profile do
-      property :employee_id, deserializer: -> (input, represented, *args) {debugger}
+      property :employee_id#, deserializer: -> (input, represented, *args) {debugger}
 
       validate :test_em_id
 

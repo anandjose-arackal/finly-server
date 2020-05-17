@@ -21,7 +21,6 @@
 
 class FormRule < ApplicationRecord
   include UUIDHelper
-  include Forms::Rules::Matcher
 
   belongs_to :company
   belongs_to :form
