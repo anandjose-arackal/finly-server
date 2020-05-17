@@ -36,6 +36,18 @@ class Forms::TestForm < Forms::API
     action :required, true
   end
 
+  validation validation_id: :first_name_value do
+    entity_path :first_name
+    rule rule_builder[:first_name].eq(value: "Hann")
+    error_message "is a bad name"
+  end
+
+  validation validation_id: :pan_value do
+    entity_path 'profile/pan'
+    rule rule_builder['row.pan'].eq(value: "123")
+    error_message "is not legal"
+  end
+
   # section :header do
   #   auto_number :invoice_id, sequence:{prefix: "TF/{{\"now\" | date: \"%y-%m\" }}/", start_at: "000001"}
   #   text :name, hint: "Please enter the name of the field", maximum: 255

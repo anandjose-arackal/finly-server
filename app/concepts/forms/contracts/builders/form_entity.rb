@@ -31,8 +31,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
 
   pass :init
   pass :define_entity
-  pass :system_validate_entity
-  pass :custom_validate_entity
+  pass :validate_entity
   pass :validate_choices
   pass :execute_contract_evaluators
 
@@ -53,23 +52,22 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
     end
   end
 
-  def system_validate_entity(context, reform:, entity:, **)
+  def validate_entity(context, reform:, entity:, **)
     reform.validate -> do
-      row = {}
-      row[entity.entity_key] = self.send(entity.entity_key)
-      result = Forms::Contracts::Helpers::ConditionChecker.(entity.form.conditions, entity, VALIDATION_ACTIONS, form: contract_input, row: row)
+      # Using as_nested_hash instead of input as the input need not always
+      result = Forms::Contracts::Helpers::ConditionChecker.(
+          entity.form.conditions, entity, VALIDATION_ACTIONS, form: contract_root.to_nested_hash, row: to_nested_hash
+      )
       required = result['required'] || entity.required
 
       if required and send(entity.entity_key).blank?
         errors.add entity.entity_key, 'cannot be blank'
       end
-    end
-  end
 
-  def custom_validate_entity(context, reform:, entity:, **)
-    entity.validations.each do |validation|
-      reform.validate -> do
-
+      entity.form.validations.each do |validation|
+        next unless validation.entity_path == entity.entity_path
+        next unless validation.rule.apply?({form: contract_root.to_nested_hash, row: to_nested_hash}.with_indifferent_access)
+        errors.add entity.entity_key, validation.error_message
       end
     end
   end
@@ -106,8 +104,8 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
       editable = result['editable'] || entity.editable
       visible = result['visible'] || entity.visible
 
-      if editable and visible
-        value = input[entity.entity_key] || entity.default_value
+      if editable and visible and input.has_key?(entity.entity_key)
+        value = input[entity.entity_key]# || entity.default_value
         represented.send("#{entity.entity_key}=", value)
       else
         value = represented.send(entity.entity_key)

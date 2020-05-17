@@ -71,8 +71,13 @@ class FormEntityValidation < ApplicationRecord
   #   )
   # end
 
-  def error_message(value = NoObject)
-    self.error_message = value unless value == NoObject
+  def entity_path(entity_path = NoObject)
+    self.entity_path = entity_path unless entity_path == NoObject
+    super()
+  end
+
+  def error_message(error_message = NoObject)
+    self.error_message = error_message unless error_message == NoObject
     super()
   end
 

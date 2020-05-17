@@ -36,7 +36,7 @@ module Transactions::Contract
     RequestStore[:contract_root] = nil
     RequestStore[:contract_input] = nil
     RequestStore[:contract_parent] = nil
-        result
+    result
   end
 
 end

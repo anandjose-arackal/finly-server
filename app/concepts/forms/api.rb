@@ -28,7 +28,7 @@ class Forms::API
     form.conditions << condition
   end
 
-  def self.validation(params, &block)
+  def self.validation(params = {}, &block)
     return unless ActiveRecord::Base.connection.table_exists?('form_entity_validations')
 
     validation = FormEntityValidation.system_validation(params, &block)
