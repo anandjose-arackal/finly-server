@@ -121,6 +121,8 @@ class FormEntity < ApplicationRecord
     data = {
         # id: uuid,
         entity_key: entity_key,
+        entity_path: entity_path,
+        config_path: config_path,
         label: label,
         placeholder: placeholder,
         hint: hint,
@@ -133,8 +135,7 @@ class FormEntity < ApplicationRecord
         unique: unique,
         position: position,
         custom_field: custom_field,
-        options: options,
-        config_path: config_path
+        options: options
     }
     if choices_scope.present?
       data[:choices] = choices_scope.as_json(params: opts["params"], user: opts["current_user"])
