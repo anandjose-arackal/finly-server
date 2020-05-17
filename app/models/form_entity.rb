@@ -128,11 +128,13 @@ class FormEntity < ApplicationRecord
         hint: hint,
         entity_type: entity_type,
         default_value: default_value,
-        editable: editable,
-        required: required,
-        active: active,
-        visible: visible,
-        unique: unique,
+        properties: {
+            editable: editable,
+            required: required,
+            active: active,
+            visible: visible,
+            unique: unique,
+        },
         position: position,
         custom_field: custom_field,
         options: options
