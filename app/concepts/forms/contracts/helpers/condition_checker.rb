@@ -18,7 +18,7 @@ class Forms::Contracts::Helpers::ConditionChecker
       end
       next unless applicable
 
-      next unless condition.rules.apply?({form: form, row: row}.with_indifferent_access)
+      next unless condition.rule.apply?({form: form, row: row}.with_indifferent_access)
       # match = true
       # condition.rules.each do |rule|
       #   match = false unless rule.match?({form: form, row: row}.with_indifferent_access)

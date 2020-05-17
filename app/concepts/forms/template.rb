@@ -20,11 +20,11 @@ class Forms::Template < Templates::API
     end
   end
 
-  template :rules do |exec_context|
-    set :company_id, exec_context[:company_id]
-    set :rule_parent, exec_context[:parent]
-    set :form, exec_context[:root_record]
-  end
+  # template :rule do |exec_context|
+  #   set :company_id, exec_context[:company_id]
+  #   set :rule_parent, exec_context[:parent]
+  #   set :form, exec_context[:root_record]
+  # end
 
   association :sections do |exec_context|
     matcher do |template, record|
@@ -43,7 +43,7 @@ class Forms::Template < Templates::API
 
     set :company_id, exec_context[:company_id]
     set :form, exec_context[:root_record]
-    association :rules, &templates[:rules]
+    # association :rule, &templates[:rule]
     association :actions do |action_context|
       set :company_id, action_context[:company_id]
       set :form, action_context[:root_record]
@@ -57,7 +57,7 @@ class Forms::Template < Templates::API
 
     set :company_id, exec_context[:company_id]
     set :form, exec_context[:root_record]
-    association :rules, &templates[:rules]
+    # association :rule, &templates[:rule]
   end
 
 end

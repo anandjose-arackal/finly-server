@@ -29,10 +29,9 @@ class FormCondition < ApplicationRecord
   belongs_to :created_by, class_name: 'User', optional: true
   belongs_to :updated_by, class_name: 'User', optional: true
 
-  # has_many :rules, class_name: 'FormRule', as: :rule_parent
   has_many :actions, class_name: 'FormConditionAction'
 
-  serialize :rules, Forms::Rules::Ransack
+  serialize :rule, Forms::Rules::Ransack
 
   def self.system_condition(params = {}, &block)
     params[:custom] = false
@@ -60,26 +59,9 @@ class FormCondition < ApplicationRecord
     @rule_builder ||= Forms::Rules::Builder.new
   end
 
-  def rule(rules)
-    self.rules = rules
-    # value = [value] if value.present? and not value.respond_to?(:each)
-    #
-    # rule_type_id = nil
-    # rule_type_id = FormRuleType.id_for(:value) if value.present?
-    # rule_type_id = FormRuleType.id_for(:formula) if formula.present?
-    # rule_type_id = FormRuleType.id_for(:entity) if match_entity_path.present?
-    # rule_type_id ||= FormRuleType.id_for(:none)
-
-    # self.rules =
-
-    # rules.new(
-    #     entity_path: entity_path,
-    #     predicate: predicate,
-    #     rule_type_id: rule_type_id,
-    #     match_value: value,
-    #     match_formula: formula,
-    #     match_entity_path: match_entity_path
-    # )
+  def rule(rule=NoObject)
+    self.rule = rule unless rule == NoObject
+    super()
   end
 
   def as_json(options = {})
