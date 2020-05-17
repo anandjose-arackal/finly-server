@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_16_091125) do
+ActiveRecord::Schema.define(version: 2020_05_17_121018) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3830,7 +3830,7 @@ ActiveRecord::Schema.define(version: 2020_05_16_091125) do
     t.string "uuid", limit: 36, null: false
     t.bigint "company_id", null: false
     t.string "form_id", limit: 36, null: false
-    t.string "form_entity_id", limit: 36, null: false
+    t.string "dependent_entity_id", limit: 36, null: false
     t.string "controlling_entity_id", limit: 36, null: false
     t.string "dependency_id"
     t.boolean "custom"
@@ -3847,7 +3847,7 @@ ActiveRecord::Schema.define(version: 2020_05_16_091125) do
     t.index ["created_by_id"], name: "index_form_choice_dependencies_on_created_by_id"
     t.index ["deleted_at"], name: "index_form_choice_dependencies_on_deleted_at"
     t.index ["dependency_id"], name: "index_form_choice_dependencies_on_dependency_id"
-    t.index ["form_entity_id"], name: "index_form_choice_dependencies_on_form_entity_id"
+    t.index ["dependent_entity_id"], name: "index_form_choice_dependencies_on_dependent_entity_id"
     t.index ["form_id"], name: "index_form_choice_dependencies_on_form_id"
     t.index ["updated_at"], name: "index_form_choice_dependencies_on_updated_at"
     t.index ["updated_by_id"], name: "index_form_choice_dependencies_on_updated_by_id"
@@ -3856,16 +3856,15 @@ ActiveRecord::Schema.define(version: 2020_05_16_091125) do
 
   create_table "form_choice_dependency_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "dependency_id", limit: 36, null: false
-    t.string "form_rule_id", limit: 36, null: false
-    t.string "form_entity_choice_id", limit: 36, null: false
+    t.string "dependent_choice_id", limit: 36, null: false
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "controlling_choice_id"
     t.index ["created_at"], name: "index_form_choice_dependency_mappings_on_created_at"
     t.index ["deleted_at"], name: "index_form_choice_dependency_mappings_on_deleted_at"
     t.index ["dependency_id"], name: "index_form_choice_dependency_mappings_on_dependency_id"
-    t.index ["form_entity_choice_id"], name: "index_form_choice_dependency_mappings_on_form_entity_choice_id"
-    t.index ["form_rule_id"], name: "index_form_choice_dependency_mappings_on_form_rule_id"
+    t.index ["dependent_choice_id"], name: "index_form_choice_dependency_mappings_on_dependent_choice_id"
     t.index ["updated_at"], name: "index_form_choice_dependency_mappings_on_updated_at"
   end
 
@@ -3914,7 +3913,7 @@ ActiveRecord::Schema.define(version: 2020_05_16_091125) do
     t.boolean "internal"
     t.boolean "is_updated"
     t.boolean "can_be_updated"
-    t.text "rules"
+    t.text "rule"
     t.index ["company_id"], name: "index_form_conditions_on_company_id"
     t.index ["created_at"], name: "index_form_conditions_on_created_at"
     t.index ["created_by_id"], name: "index_form_conditions_on_created_by_id"
@@ -3990,8 +3989,8 @@ ActiveRecord::Schema.define(version: 2020_05_16_091125) do
     t.boolean "compute"
     t.boolean "compute_enabled"
     t.integer "compute_type_id"
-    t.integer "compute_lookup_entity_id"
     t.string "compute_formula"
+    t.string "compute_lookup_entity_path"
     t.index ["company_id"], name: "index_form_entities_on_company_id"
     t.index ["created_at"], name: "index_form_entities_on_created_at"
     t.index ["created_by_user_id"], name: "index_form_entities_on_created_by_user_id"
@@ -4053,6 +4052,7 @@ ActiveRecord::Schema.define(version: 2020_05_16_091125) do
     t.boolean "internal"
     t.boolean "is_updated"
     t.boolean "can_be_updated"
+    t.text "rule"
     t.index ["company_id"], name: "index_form_entity_validations_on_company_id"
     t.index ["created_at"], name: "index_form_entity_validations_on_created_at"
     t.index ["created_by_id"], name: "index_form_entity_validations_on_created_by_id"

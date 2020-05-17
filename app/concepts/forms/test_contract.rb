@@ -1,5 +1,4 @@
-require 'disposable/twin/parent'
-class Forms::TestContract < Forms::Generators::Contracts::API
+class Forms::TestContract < Reform::Form
 
   class Forms::TestContract::Form < Forms::API
 
