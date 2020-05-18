@@ -5,6 +5,11 @@ class IndexController < BaseControllers::WebBase
     endpoint IndexBuilder::Config
   end
 
+  def index_view_config
+    @index_config = endpoint IndexBuilder::Config
+    @view_config = endpoint IndexSegment::Ops::Index
+  end
+
   def show
     endpoint IndexBuilder::Show
   end
