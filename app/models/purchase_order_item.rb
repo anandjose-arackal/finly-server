@@ -122,6 +122,10 @@ class PurchaseOrderItem < ApplicationRecord
     self.total_amount&.value.to_f
   end
 
+  def set_tds_applicable
+    self.tds_applicable = self.inventory_line_item.tds_applicable
+  end
+
   private
 
   def budget_trail_entry
@@ -134,10 +138,6 @@ class PurchaseOrderItem < ApplicationRecord
 
   def budget_trail_destroy
     BudgetManager::BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(self)
-  end
-
-  def set_tds_applicable
-    self.tds_applicable = self.inventory_line_item.tds_applicable
   end
 
 end
