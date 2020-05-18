@@ -87,7 +87,7 @@ class FormEntityValidation < ApplicationRecord
     {
         entity_path: entity_path,
         error_message: error_message,
-        rules: rules
+        rule: rule,
     }
   end
 
