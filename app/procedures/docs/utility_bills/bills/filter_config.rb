@@ -1,6 +1,8 @@
 class Docs::UtilityBills::Bills::FilterConfig < Filters::API
 
-  attribute :bill_id, label: 'Bill ID', type: :text, simple: true
+  BBPS_BILLER_CATEGORY_CHOICES = [{id:"Electricity", name:"Electricity"}, {id:"Gas", name:"Gas"}, {id:"Mobile Postpaid", name:"Mobile Postpaid"}, {id:"Landline Postpaid", name:"Landline Postpaid"}, {id:"DTH", name:"DTH"}, {id:"Broadband Postpaid", name:"Broadband Postpaid"}, {id:"Water", name:"Water"}, {id:"LPG Gas", name:"LPG Gas"}, {id:"Loan Repayment", name:"Loan Repayment"}, {id:"Life Insurance", name:"Life Insurance"}, {id:"Fastag", name:"Fastag"}, {id:"Cable TV", name:"Cable TV"}, {id:"Health Insurance", name:"Health Insurance"}].freeze
+
+  attribute :sequence_id, label: 'Bill ID', type: :text, simple: true
   attribute :bill_number, label: 'Bill Number', type: :text, simple: true
   attribute :created_at, type: :datetime
   attribute :updated_at, type: :datetime
@@ -8,7 +10,7 @@ class Docs::UtilityBills::Bills::FilterConfig < Filters::API
   attribute :approved_at, type: :datetime
   attribute :bill_date, label: 'Bill Date', type: :datetime, simple: true
   attribute :due_date, label: 'Due Date', type: :datetime, simple: true
-  attribute :subscription_biller_biller_category_name, label: "Biller Category Name", type: :text
+  attribute :subscription_biller_biller_category_name, label: "Biller Category Name", type: :dropdown, choices: Choices[:list].(*BBPS_BILLER_CATEGORY_CHOICES)
   attribute :policy_id, type: :dropdown, choices: Choices[:lookup].('policies')
   attribute :bbps_biller_id, type: :dropdown, simple: true, choices: Choices[:lookup].('bbps_billers')
   attribute :subscription_category_id, type: :dropdown, simple: true, choices: Choices[:lookup].('categories')

@@ -39,7 +39,7 @@ class Choices::Builders::Enum < Choices::Builders::Base
     klass.all.each do |item|
       list << {
           id: item.send(id),
-          name: item.send(name),
+          name: item.send(name).titleize,
       }
     end
 

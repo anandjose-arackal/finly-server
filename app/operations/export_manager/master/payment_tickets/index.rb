@@ -64,7 +64,7 @@ class ExportManager::Master::PaymentTickets::Index < ExportManager::Builders::Sp
 
   def input
     bank_payment_requests = resolve('payment_tickets.default')
-    Payment.where('payment_order_id in (?)', bank_payment_requests.select("id").to_sql)
+    Payment.where("`payments`.`payment_order_id` IN (#{bank_payment_requests.select("payment_order_id").to_sql})")
   end
 
   def payment_order_id (payment)

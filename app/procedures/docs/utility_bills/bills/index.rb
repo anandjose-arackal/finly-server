@@ -77,6 +77,10 @@ class Docs::UtilityBills::Bills::Index < IndexBuilder::API
     date value: :created_at
   end
 
+  column :updated_at do
+    date value: :updated_at
+  end
+
   column :submitted_at, default: true, sort: :submitted_at do
     date value: :submitted_at
   end

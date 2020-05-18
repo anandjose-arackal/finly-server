@@ -1,7 +1,7 @@
 class Docs::UtilityBills::Billers::Lookup < Lookup::API
 
   resolver 'bbps_billers.default'
-  search_key :biller_id_biller_name_or_biller_category_name_biller_alias_name
+  search_key :biller_id_or_biller_name_or_biller_category_name_or_biller_alias_name_cont
 
   attribute :id, visible: false
   attribute :biller_id

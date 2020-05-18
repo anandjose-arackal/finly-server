@@ -98,6 +98,6 @@ class Menu::Masters::Procurement < Menu::API
 
   item :download_manager, icon: "https://img.icons8.com/windows/20/ffffff/software-installer.png"
   item :balances, icon: 'https://img.icons8.com/windows/20/ffffff/wallet.png'
-  item :settings, permissions: [:admin], icon: "https://img.icons8.com/windows/20/ffffff/settings.png"
+  item :settings, path: 'organization_account', permissions: [:admin], icon: "https://img.icons8.com/windows/20/ffffff/settings.png"
 
 end

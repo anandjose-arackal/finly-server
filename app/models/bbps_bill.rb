@@ -268,7 +268,7 @@ class BbpsBill < ApplicationRecord
   scope :with_status_id, -> (status_id) do
     case status_id
     when 90
-      where status_id: BbpsBillStatus.ids_for(:draft, :retracted)
+      where status_id: BbpsBillStatus.ids_for(:open, :retracted)
     when 91
       awaiting_action_items(RequestStore.store[:current_user]&.id)
     when 92

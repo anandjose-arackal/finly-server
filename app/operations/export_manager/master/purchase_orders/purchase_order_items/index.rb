@@ -69,7 +69,7 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
 
   def input
     po = resolve 'purchase_orders.default'
-    PurchaseOrderItem.where "purchase_order_id in (?)", po.select('id').to_sql
+    PurchaseOrderItem.where "purchase_order_id in (#{po.select('id').to_sql})"
   end
 
   def procurement_name(item)

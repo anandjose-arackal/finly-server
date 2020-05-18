@@ -95,6 +95,11 @@ class BankTransfer::PaymentRequest::Review::BulkTakeControl < BankTransfer::Paym
     # BankTransfer::PaymentRequest::Review::BulkTakeControlBackground.call(ids, {initiating_user_id: user.id, params: params[:bulk_take_control_ids]})
   end
 
+  def post_process
+    add_message :success, "Your request for taking Control of #{self.bank_payment_requests.length} payment tickets is being processed."
+  end
+
+
   private
 
   def user_already_in_control?(bank_payment_request)

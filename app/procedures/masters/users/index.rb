@@ -15,7 +15,7 @@ class Masters::Users::Index < IndexBuilder::API
     text value: :mobile_number
   end
 
-  column :emp_id, label: 'Employee ID', sort: :profile_employee_id, default: true do
+  column :emp_id, label: 'Employee ID', sort: :profile_employee_id, default: true, includes: [:profile] do
     text value: "{{record.profile.employee_id}}", format: 'primary'
   end
 

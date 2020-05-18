@@ -31,7 +31,7 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     text value: :invoice_number, format: 'primary'
   end
 
-  column :created_at, default: true do
+  column :created_at do
     date value: :created_at
   end
 

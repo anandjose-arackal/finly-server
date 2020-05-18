@@ -41,7 +41,7 @@ class IndexBuilder::API
     return unless self.custom_fields
 
     field_configurations = user.company.field_configurations.joins(:field_parent_mappings)
-                               .where(is_deleted: false, deleted_at: nil)
+                               .where(is_deleted: false, deleted_at: nil, enabled: true)
                                .where(field_parent_mappings: {field_parent_type_id: FieldParentType.ids_for(*custom_fields[:type])})
     map = {}
     field_configurations&.each do |field_config|
@@ -118,9 +118,11 @@ class IndexBuilder::API
     required_columns.select { |column| column.starts_with?("cf_") }&.each do |custom_field_column|
       ids = custom_field_column.split("_")
       custom_fields = self.custom_fields[:path].call(record)
-      required_cf = custom_fields.select { |cf| ids.include?(cf.field_configuration_id.to_s) }&.first
-      text_field = IndexBuilder::ContentTypes::Text.new({value: required_cf&.configured_field_value.to_s})
-      map[custom_field_column] = [text_field.build(self, user, record, record_exposure)]
+      if custom_fields.present?
+        required_cf = custom_fields.select { |cf| ids.include?(cf.field_configuration_id.to_s) }&.first
+        text_field = IndexBuilder::ContentTypes::Text.new({value: required_cf&.configured_field_value.to_s})
+        map[custom_field_column] = [text_field.build(self, user, record, record_exposure)]
+      end
     end
   end
 

@@ -115,7 +115,7 @@ class PaymentExposure < Exposures::API
     when 'Invoice'
       record.invoice_parent.delivery_location
     when 'PurchaseOrder'
-      record.purchase_order_parent.delivery_location
+      record.purchase_order_parent&.delivery_location
     when 'BbpsBill', 'BeneficiaryPayment', 'SecurityDeposit'
       nil
     else
@@ -128,7 +128,7 @@ class PaymentExposure < Exposures::API
     when 'Invoice'
       record.invoice_parent.vendor_location
     when 'PurchaseOrder'
-      record.purchase_order_parent.vendor_location
+      record.purchase_order_parent&.vendor_location
     when 'BeneficiaryPayment'
       record.beneficiary_payment_parent.vendor_location
     when 'SecurityDeposit'
@@ -198,15 +198,15 @@ class PaymentExposure < Exposures::API
   attribute :gross_amount, exposure: true do
     case record.parent_type
     when 'Invoice'
-      record.invoice_parent.gross_amount
+      record.invoice_parent&.gross_amount
     when 'BbpsBill'
-      record.bbps_bill_parent.amount
+      record.bbps_bill_parent&.amount
     when 'BeneficiaryPayment'
-      record.beneficiary_payment_parent.gross_amount
+      record.beneficiary_payment_parent&.gross_amount
     when 'PurchaseOrder'
-      record.purchase_order_parent.requested_advance_amount
+      record.purchase_order_parent&.requested_advance_amount
     when 'SecurityDeposit'
-      record.security_deposit_parent.original_amount
+      record.security_deposit_parent&.original_amount
     else
       nil
     end
@@ -270,7 +270,7 @@ class PaymentExposure < Exposures::API
     when 'BeneficiaryPayment'
       record.beneficiary_payment_parent.tds_slab
     when 'PurchaseOrder'
-      record.purchase_order_parent.advance_tds_slab
+      record.purchase_order_parent&.advance_tds_slab
     when 'SecurityDeposit'
       nil
     else
@@ -281,13 +281,13 @@ class PaymentExposure < Exposures::API
   attribute :tds_amount, exposure: true do
     case record.parent_type
     when 'Invoice'
-      record.invoice_parent.tds_amount
+      record.invoice_parent&.tds_amount
     when 'BbpsBill'
       nil
     when 'BeneficiaryPayment'
-      record.beneficiary_payment_parent.tds_amount
+      record.beneficiary_payment_parent&.tds_amount
     when 'PurchaseOrder'
-      record.purchase_order_parent.advance_tds_amount
+      record.purchase_order_parent&.advance_tds_amount
     when 'SecurityDeposit'
       nil
     else
@@ -334,7 +334,7 @@ class PaymentExposure < Exposures::API
     when 'BeneficiaryPayment'
       record.beneficiary_payment_parent.net_amount
     when 'PurchaseOrder'
-      record.purchase_order_parent.advance_amount
+      record.purchase_order_parent&.advance_amount
     when 'SecurityDeposit'
       record.security_deposit_parent.original_amount
     else
@@ -368,7 +368,7 @@ class PaymentExposure < Exposures::API
     when 'BeneficiaryPayment'
       record.beneficiary_payment_parent.payable_amount
     when 'PurchaseOrder'
-      record.purchase_order_parent.advance_amount
+      record.purchase_order_parent&.advance_amount
     when 'SecurityDeposit'
       record.security_deposit_parent.payable_amount
     else
