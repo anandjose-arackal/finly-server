@@ -12,7 +12,7 @@ class ExportManager::Master::Statements::Index < ExportManager::Builders::Spread
   attribute :type
   attribute :purpose
   attribute :merchant
-  attribute :merchant_employee_id_id
+  attribute :employee_id_id
   attribute :card_number
   attribute :credit
   attribute :debit
@@ -27,7 +27,6 @@ class ExportManager::Master::Statements::Index < ExportManager::Builders::Spread
     unless result&.success?
       return add_message :error, result.messages[:error]
     end
-
     result.scoped_finly_transactions.success.sort_date_asc
   end
 
@@ -47,7 +46,7 @@ class ExportManager::Master::Statements::Index < ExportManager::Builders::Spread
     transaction.transaction_detail&.merchant
   end
 
-  def merchant_employee_id_id(transaction)
+  def employee_id_id(transaction)
     if transaction.associated_transaction_type.eql?("CardTransaction")
       transaction&.associated_transaction&.user&.employee_id
     elsif transaction.payment.present?

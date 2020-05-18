@@ -60,16 +60,13 @@ class Admin::Implementations::Master::BBPS::Import < Admin::Implementations::Pro
     unless subscription_model.present?
       return result false, "Subscription not found"
     end
-
     subscription = Docs::UtilityBills::Subscriptions::Contracts::Base.new(subscription_model)
     format_data = build_params data
-
     unless format_data.success?
       return result false, format_data.failure
     end
 
     input = data.merge(format_data.success)
-
     unless subscription.validate(input) and subscription.save
       return result false, subscription.errors.full_messages.join(", ")
     end
@@ -84,7 +81,7 @@ class Admin::Implementations::Master::BBPS::Import < Admin::Implementations::Pro
   def build_params(data)
     params = {}
     params[:company_id] = company&.id
-    params[:current_user] = yield find_user(data[:initiator])
+    params[:current_user] = yield find_user(data[:initiator], required: true)
     params[:user_id] = params[:current_user]&.id
     params[:policy_id] = (yield find_policy(data[:policy]))&.id
     params[:department_id] = (yield find_department(data[:department]))&.id

@@ -148,7 +148,7 @@ class YesBankVendor < ApplicationRecord
     elsif status_id == 'awaiting_approval'
       user_id = RequestStore.store[:current_user]&.id
       if user_id.present?
-        self.awaiting_action_items(user_id)
+        self.awaiting_action_items(user_id).where.not(status_id: VendorStatus.id_for(:auto_approved))
       end
     else
       where status_id: status_id
@@ -226,6 +226,12 @@ class YesBankVendor < ApplicationRecord
       where status_id: id
     end
   end
+
+  scope :filter_approved_date, -> (from, to) {
+    from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
+    to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
+    where('yes_bank_vendors.approved_at >= ? && yes_bank_vendors.approved_at <= ?', from.beginning_of_day, to.end_of_day)
+  }
 
   # Scopes for ordering ends
 

@@ -17,7 +17,7 @@ module Transitionable
     end
 
     def taken_control?(level_id = nil)
-      level_id ||= self.level_id
+      level_id ||= self.controlling_level_id
       if level_id.present?
         self.document_level_reviewer_mappings.with_level_id(level_id).first&.taken_control
       else

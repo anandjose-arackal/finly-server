@@ -13,7 +13,7 @@ class ExportManager::Master::Invoices::TallyExport < ExportManager::Builders::Ta
   end
 
   def generate_voucher(generator, invoice)
-    voucher_data = LiquidHelper.interpolate(configuration.slice('date', 'state', 'voucher_number', 'voucher_type', 'narration', 'reference'), "invoice" => invoice)
+    voucher_data = LiquidHelper.interpolate(configuration.slice('date', 'reference_date', 'effective_date', 'state', 'voucher_number', 'voucher_type', 'narration', 'reference'), "invoice" => invoice)
     vendor_data = LiquidHelper.interpolate(configuration['vendor'].slice('gl_name', 'gstin'), "invoice" => invoice)
     generator.add_voucher(voucher_data.merge(vendor_data))
   end

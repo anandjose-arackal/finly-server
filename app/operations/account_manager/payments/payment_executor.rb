@@ -97,13 +97,13 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
     ####################### End Receiving account validations ######################
 
 
-    op = PaymentProcessorRules::Event.(:check_receiving_account_creditable, {payment: self.payment, options: self.options,
-                                                                             receiving_account_adapter: self.receiving_account_adapter,
-                                                                             source_account_adapter: self.source_account_adapter})
-    unless op.success?
-      add_message :error, op.message
-      return
-    end
+    # op = PaymentProcessorRules::Event.(:check_receiving_account_creditable, {payment: self.payment, options: self.options,
+    #                                                                          receiving_account_adapter: self.receiving_account_adapter,
+    #                                                                          source_account_adapter: self.source_account_adapter})
+    # unless op.success?
+    #   add_message :error, op.message
+    #   return
+    # end
 
     op = PaymentProcessorRules::Event.(:ensure_payments_are_pending_before_processing, {payment: self.payment, options: self.options})
     unless op.success?
