@@ -99,21 +99,18 @@ class Filters::API::Attribute
 
       def custom_field_configurations
         parent_types = custom_fields.map { |cf| cf[:parent_type] }
-        user.company.all_field_configurations.where(enabled: true)
+        user.company.all_field_configurations.where(is_deleted: false, deleted_at: nil, enabled: true)
             .ransack(field_parent_mappings_field_parent_type_id_in: FieldParentType.ids_for(*parent_types))
             .result
-            .where(enabled: true)
       end
 
       # Dynamically adds all custom fields as attributes. Supported types are text and dropdown.
       # Dropdown gives all dropdown options for selection. All other fields are added as text
       def build_custom_fields(user, filters)
         configs = {}
-        field_configurations = user.company.all_field_configurations.where(enabled: true).includes(:drop_down_items)
+        field_configurations = user.company.all_field_configurations.where(is_deleted: false, deleted_at: nil, enabled: true).includes(:drop_down_items)
         custom_fields.each do |custom_field_config|
-          fc = field_configurations.ransack(field_parent_mappings_field_parent_type_id_in: FieldParentType.ids_for(*custom_field_config[:parent_type]))
-                   .result
-                   .where(enabled: true)
+          fc = field_configurations.ransack(field_parent_mappings_field_parent_type_id_in: FieldParentType.ids_for(*custom_field_config[:parent_type])).result
           fc.each do |field_configuration|
             if configs[field_configuration.field_name].blank?
               field_key = "custom_fields_value_search"

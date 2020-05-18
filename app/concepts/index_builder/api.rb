@@ -41,7 +41,7 @@ class IndexBuilder::API
     return unless self.custom_fields
 
     field_configurations = user.company.field_configurations.joins(:field_parent_mappings)
-                               .where(is_deleted: false, deleted_at: nil)
+                               .where(is_deleted: false, deleted_at: nil, enabled: true)
                                .where(field_parent_mappings: {field_parent_type_id: FieldParentType.ids_for(*custom_fields[:type])})
     map = {}
     field_configurations&.each do |field_config|
