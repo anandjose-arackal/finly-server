@@ -100,14 +100,14 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
   end
 
 
-  def fetch_agreements
-    agreement_presenter = ::PaymentAgreements::Index.(user, params)
-    unless agreement_presenter.success?
-      add_message :error, agreement_presenter.messages[:error]
-      return
-    end
-    agreement_presenter
-  end
+  # def fetch_agreements
+  #   agreement_presenter = ::PaymentAgreements::Index.(user, params)
+  #   unless agreement_presenter.success?
+  #     add_message :error, agreement_presenter.messages[:error]
+  #     return
+  #   end
+  #   agreement_presenter
+  # end
 
   def input
     agreements = resolve 'agreements.default'
