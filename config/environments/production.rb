@@ -128,21 +128,31 @@ Rails.application.configure do
   config.action_mailer.raise_delivery_errors = true
 
   ################### SETTINGS FOR EMAIL ##########################
+  # config.mailer_config = config_for(:mailer_config)
+  # config.action_mailer.default_url_options = {host: config.mailer_config['host']}
+  # config.action_mailer.delivery_method = :smtp
+  # config.action_mailer.smtp_settings = {
+  #     address: config.mailer_config['address'],
+  #     port: config.mailer_config['port'],
+  #     domain: config.mailer_config['domain'],
+  #     user_name: config.mailer_config['username'],
+  #     password: config.mailer_config['password'],
+  #     # ssl:                  true,
+  #     # tls:                  true,
+  #     authentication: :plain,
+  #     enable_starttls_auto: true,
+  #     :openssl_verify_mode => 'none'
+  # }
+
+
+  ############# TEMPORARY FOR AZZURE TRANSITION ###################
   config.mailer_config = config_for(:mailer_config)
+  config.action_mailer.deliver_later_queue_name = 'mailer_queue'
   config.action_mailer.default_url_options = {host: config.mailer_config['host']}
   config.action_mailer.delivery_method = :smtp
-  config.action_mailer.smtp_settings = {
-      address: config.mailer_config['address'],
-      port: config.mailer_config['port'],
-      domain: config.mailer_config['domain'],
-      user_name: config.mailer_config['username'],
-      password: config.mailer_config['password'],
-      # ssl:                  true,
-      # tls:                  true,
-      authentication: :plain,
-      enable_starttls_auto: true,
-      :openssl_verify_mode => 'none'
-  }
+  config.action_mailer.smtp_settings = {address: "localhost", port: 1025}
+  ##################################################################
+
 
   # Use a different logger for distributed setups.
   # require 'syslog/logger'
