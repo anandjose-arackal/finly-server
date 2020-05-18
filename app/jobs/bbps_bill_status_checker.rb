@@ -24,7 +24,7 @@ class BbpsBillStatusChecker
           # transaction_date = result&.transaction_details&.
           transaction_details = JSON.parse result.transaction_details rescue {}
           date = transaction_details&.dig("TxnStatusComplainResp")&.dig("txnList")&.dig("txnDetail")&.first&.dig("txnDate")
-          parsed_datetime = DateUtils.parseDatetime(date)
+          parsed_datetime = DateUtils.parse_datetime(date)
           if date.present? && parsed_datetime.present?
             payment&.parent&.update(paid_at: parsed_datetime)
             payment&.parent&.subscription&.update(last_paid_at: parsed_datetime)
