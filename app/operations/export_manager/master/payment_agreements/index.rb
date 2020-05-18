@@ -6,7 +6,7 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
   handle :payment_agreements
   screen 'payment_agreements.index'
   system :vp
-  validate :fetch_agreements
+  # validate :fetch_agreements
   attr_accessor :header_collection, :sheets, :sheet_names
   attr_accessor :general_invoice_header, :rental_invoice_header, :security_deposit_header, :beneficiary_header
   attr_accessor :general_invoice_rows, :rental_invoice_rows, :security_deposit_rows, :beneficiary_rows
@@ -110,8 +110,7 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
   end
 
   def input
-    agreement_presenter = fetch_agreements
-    agreements = agreement_presenter.payment_agreements
+    agreements = resolve 'agreements.default'
     rental_agreements = RentalInvoice.where(fixed_periodic_template: [nil, FALSE],payment_agreement_id:  agreements.pluck(:id)).template_invoices
     general_agreements = GeneralInvoice.where(fixed_periodic_template: [nil, FALSE],payment_agreement_id: agreements.pluck(:id)).template_invoices
     rental_agreement_line_items = InvoiceLineItem.where(parent_type: 'RentalInvoice').includes(:category, :department, :tax_rate, :cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency}, :discount_amount, parent: [ :invoice_type, :vendor, :delivery_location, :invoice_status, :location, :tds_slab, :advance_amount, :balance_due, :discount_amount, :created_by, :gstin_location, {tds_amount: :currency}, :amount]).where(parent_id: rental_agreements.pluck(:id))
