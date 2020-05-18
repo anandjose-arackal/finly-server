@@ -80,6 +80,11 @@ class Reports::Expenses::Reject < Reports::Base
         Event::EReport::EExpense::Reject.(user, {report: report, rejected_expense: expenses.first})
       end
 
+      #if all expenses are rejected in report, report also moved to reject status
+      if report.expenses.count == 0
+        op = Reports::Reject.(current_user, {id: report.id, reject_note: "All Child Expenses Are Rejected"})
+      end
+
     end
     messages[:success] << 'Expenses rejected!'
   end

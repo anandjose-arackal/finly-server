@@ -57,6 +57,10 @@ class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Sp
   attribute :invoice_submitted_on
   attribute :invoice_approved_on
   attribute :is_invoice_approved
+  attribute :po_advance_status
+  attribute :advance_amount
+  attribute :advance_tds_amount
+  attribute :advance_tds_slab
   attribute :invoice_sent_on
   attribute :invoice_cgst
   attribute :invoice_sgst
@@ -264,6 +268,22 @@ class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Sp
 
   def last_inward_received_on(purchase_order)
     # todo
+  end
+
+  def po_advance_status(purchase_order)
+    purchase_order&.advance_amount_status&.name&.humanize
+  end
+
+  def advance_amount(purchase_order)
+    purchase_order&.advance_amount&.value
+  end
+
+  def advance_tds_amount(purchase_order)
+    purchase_order&.advance_tds_amount&.value
+  end
+
+  def advance_tds_slab(purchase_order)
+    purchase_order&.advance_tds_slab&.name
   end
 
   def invoice_number(purchase_order)
