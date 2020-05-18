@@ -21,7 +21,7 @@ class BankTransfer::PaymentRequest::Review::MarkAsCredited < BankTransfer::Payme
     end
     self.bank_payment_requests = BankTransfer::PaymentRequest::Index.(user, params).payment_requests.with_id(ids) rescue nil
     # self.bank_payment_request = BankPaymentRequest.find_by(id: id)
-    self.view_role = UserRole.id_for(params[:view].to_sym)
+    # self.view_role = UserRole.id_for(params[:view].to_sym)
   end
 
   def validate
