@@ -29,7 +29,6 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
   end
 
   def define_entity(context, reform:, entity:, current_user:, **)
-    # debugger
     # type = entity.collection ? :collection : :property
     type = :property
     block = contract_block(entity, current_user)
