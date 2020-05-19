@@ -1,5 +1,6 @@
 class Docs::P2P::Invoices::Views::PendingPayment < IndexSegment::SystemViews::API
 
+  system_subscription 'vp'
   screen 'invoices.index'
   label 'Pending Payment'
   permissions UserRole.ids_for(%w(

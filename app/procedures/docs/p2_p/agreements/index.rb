@@ -1,6 +1,10 @@
 class Docs::P2P::Agreements::Index < IndexBuilder::API
   include DynamicAttributes
 
+  system_subscription :vp
+  feature_subscription :agreement_based_payment_system
+  permissions :agreement_invoice_initiator, :agreement_invoice_reviewer, :agreement_invoice_auditor,
+      :payment_agreement_initiator, :payment_agreement_reviewer, :payment_agreement_auditor, :auditor, :admin
   resolver 'agreements.default'
   reference '{{record.id}}'
 

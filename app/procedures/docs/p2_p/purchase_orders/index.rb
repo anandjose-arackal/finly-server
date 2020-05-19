@@ -1,6 +1,8 @@
 class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
   include DynamicAttributes
 
+  system_subscription :vp
+  permissions :purchase_order_initiator, :purchase_order_reviewer, :purchase_order_auditor, :admin
   resolver 'purchase_orders.default'
   reference '{{record.id}}', procurement_id: '{{record.procurement_id}}', procurement_type: 'po'
   custom_fields :purchase_order

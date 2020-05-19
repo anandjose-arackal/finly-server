@@ -10,7 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+<<<<<<< HEAD
 ActiveRecord::Schema.define(version: 2020_05_17_121018) do
+=======
+ActiveRecord::Schema.define(version: 2020_05_19_151632) do
+>>>>>>> b132e7adbdbbfef2a631bc754403a1e30b2553e0
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3841,6 +3845,10 @@ ActiveRecord::Schema.define(version: 2020_05_17_121018) do
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+<<<<<<< HEAD
+=======
+    t.boolean "internal"
+>>>>>>> b132e7adbdbbfef2a631bc754403a1e30b2553e0
     t.index ["company_id"], name: "index_form_choice_dependencies_on_company_id"
     t.index ["controlling_entity_id"], name: "index_form_choice_dependencies_on_controlling_entity_id"
     t.index ["created_at"], name: "index_form_choice_dependencies_on_created_at"
@@ -3901,8 +3909,11 @@ ActiveRecord::Schema.define(version: 2020_05_17_121018) do
     t.string "uuid", limit: 36, null: false
     t.bigint "company_id", null: false
     t.string "form_id", null: false
+<<<<<<< HEAD
     t.string "reference_key", null: false
     t.string "reference_type", null: false
+=======
+>>>>>>> b132e7adbdbbfef2a631bc754403a1e30b2553e0
     t.integer "created_by_id"
     t.integer "updated_by_id"
     t.datetime "deleted_at"
@@ -3914,13 +3925,22 @@ ActiveRecord::Schema.define(version: 2020_05_17_121018) do
     t.boolean "is_updated"
     t.boolean "can_be_updated"
     t.text "rule"
+<<<<<<< HEAD
+=======
+    t.string "referencable_id", null: false
+    t.string "referencable_type", null: false
+>>>>>>> b132e7adbdbbfef2a631bc754403a1e30b2553e0
     t.index ["company_id"], name: "index_form_conditions_on_company_id"
     t.index ["created_at"], name: "index_form_conditions_on_created_at"
     t.index ["created_by_id"], name: "index_form_conditions_on_created_by_id"
     t.index ["deleted_at"], name: "index_form_conditions_on_deleted_at"
     t.index ["form_id"], name: "index_form_conditions_on_form_id"
+<<<<<<< HEAD
     t.index ["reference_key"], name: "index_form_conditions_on_reference_key"
     t.index ["reference_type"], name: "index_form_conditions_on_reference_type"
+=======
+    t.index ["referencable_id", "referencable_type"], name: "index_form_conditions_on_referencable_id_and_referencable_type"
+>>>>>>> b132e7adbdbbfef2a631bc754403a1e30b2553e0
     t.index ["updated_at"], name: "index_form_conditions_on_updated_at"
     t.index ["updated_by_id"], name: "index_form_conditions_on_updated_by_id"
     t.index ["uuid"], name: "index_form_conditions_on_uuid"
@@ -3990,8 +4010,13 @@ ActiveRecord::Schema.define(version: 2020_05_17_121018) do
     t.boolean "compute_enabled"
     t.integer "compute_type_id"
     t.string "compute_formula"
+<<<<<<< HEAD
     t.string "compute_lookup_entity_path"
+=======
+    t.string "compute_lookup_entity_id"
+>>>>>>> b132e7adbdbbfef2a631bc754403a1e30b2553e0
     t.index ["company_id"], name: "index_form_entities_on_company_id"
+    t.index ["compute_lookup_entity_id"], name: "index_form_entities_on_compute_lookup_entity_id"
     t.index ["created_at"], name: "index_form_entities_on_created_at"
     t.index ["created_by_user_id"], name: "index_form_entities_on_created_by_user_id"
     t.index ["deleted_at"], name: "index_form_entities_on_deleted_at"
@@ -4040,7 +4065,10 @@ ActiveRecord::Schema.define(version: 2020_05_17_121018) do
     t.string "uuid", limit: 36, null: false
     t.bigint "company_id", null: false
     t.string "form_id", null: false
+<<<<<<< HEAD
     t.string "entity_path", null: false
+=======
+>>>>>>> b132e7adbdbbfef2a631bc754403a1e30b2553e0
     t.string "error_message", null: false
     t.integer "created_by_id"
     t.integer "updated_by_id"
@@ -4053,11 +4081,18 @@ ActiveRecord::Schema.define(version: 2020_05_17_121018) do
     t.boolean "is_updated"
     t.boolean "can_be_updated"
     t.text "rule"
+<<<<<<< HEAD
+=======
+    t.string "form_entity_id", null: false
+>>>>>>> b132e7adbdbbfef2a631bc754403a1e30b2553e0
     t.index ["company_id"], name: "index_form_entity_validations_on_company_id"
     t.index ["created_at"], name: "index_form_entity_validations_on_created_at"
     t.index ["created_by_id"], name: "index_form_entity_validations_on_created_by_id"
     t.index ["deleted_at"], name: "index_form_entity_validations_on_deleted_at"
+<<<<<<< HEAD
     t.index ["entity_path"], name: "index_form_entity_validations_on_entity_path"
+=======
+>>>>>>> b132e7adbdbbfef2a631bc754403a1e30b2553e0
     t.index ["form_id"], name: "index_form_entity_validations_on_form_id"
     t.index ["updated_at"], name: "index_form_entity_validations_on_updated_at"
     t.index ["updated_by_id"], name: "index_form_entity_validations_on_updated_by_id"
@@ -4418,6 +4453,7 @@ ActiveRecord::Schema.define(version: 2020_05_17_121018) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "default", default: false
+    t.string "application"
     t.index ["company_id"], name: "index_index_view_segments_on_company_id"
     t.index ["deleted_at"], name: "index_index_view_segments_on_deleted_at"
     t.index ["last_viewed_at"], name: "index_index_view_segments_on_last_viewed_at"

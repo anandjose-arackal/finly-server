@@ -1,5 +1,7 @@
 class Masters::Users::Index < IndexBuilder::API
 
+  system_subscription :em, :vp
+  permissions :admin
   resolver 'users.default'
   reference '{{record.id}}'
 

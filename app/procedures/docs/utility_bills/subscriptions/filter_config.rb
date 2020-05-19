@@ -1,5 +1,7 @@
 class Docs::UtilityBills::Subscriptions::FilterConfig < Filters::API
 
+  index_builder 'utility_subscriptions'
+
   attribute :name, type: :text, simple: true
   attribute :bbps_biller_id, label: "Biller", type: :dropdown, simple: true, choices: Choices[:lookup].('bbps_billers')
   attribute :sequence_id, label: "Subscription ID", type: :text

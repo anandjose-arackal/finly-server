@@ -1,5 +1,7 @@
 class Masters::RateContracts::Index < IndexBuilder::API
 
+  system_subscription :vp
+  permissions :inventory_manager, :auditor, :admin
   resolver 'rate_contracts.default'
   reference '{{record.id}}'
   custom_fields :rate_contract

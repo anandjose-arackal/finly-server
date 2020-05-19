@@ -7,6 +7,9 @@ class IndexBuilder::API
   include DynamicAttributes
   include IndexBuilder::Counter::DSL
 
+  class_attr :feature_subscription
+  class_attr :user_subscription
+
   def self.resolver(route = nil, params: {})
     @resolver = {route: route, params: params} if route
 
@@ -21,6 +24,18 @@ class IndexBuilder::API
 
   def self.includes(args)
     @global_includes = args
+  end
+
+  def self.permissions(*permissions)
+    @permissions = permissions if permissions.present?
+
+    @permissions
+  end
+
+  def self.system_subscription(*system_subscription)
+    @system_subscription = system_subscription if system_subscription.present?
+
+    @system_subscription
   end
 
   def self.config(user)

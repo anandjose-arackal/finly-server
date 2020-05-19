@@ -1,6 +1,8 @@
 class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
   include DynamicAttributes
 
+  system_subscription :vp
+  permissions :bank_payment_request_initiator, :bank_payment_request_reviewer, :bank_payment_request_creditor, :auditor, :admin
   resolver 'payments.default'
   reference '{{record.payment_order.bank_payment_request.id}}'
   includes payment_order: :bank_payment_request

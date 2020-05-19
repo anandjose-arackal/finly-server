@@ -1,5 +1,7 @@
 class Masters::Vendors::FilterConfig < Filters::API
 
+  index_builder 'vendors'
+
   attribute :vendor_id, label: "Vendor ID", type: :text, simple: true
   attribute :business_name, type: :text, simple: true
   attribute :trade_name, type: :text, simple: true

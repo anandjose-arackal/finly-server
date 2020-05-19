@@ -1,6 +1,8 @@
 class Docs::P2P::Inwards::Received::Index < IndexBuilder::API
   include DynamicAttributes
 
+  system_subscription :vp
+  permissions :goods_receiver, :admin
   resolver 'inward_documents.received'
   reference '{{record.id}}', procurement_id: '{{record.procurement_id}}'
   selectable false

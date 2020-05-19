@@ -1,6 +1,8 @@
 class Docs::P2P::PurchaseOrders::Advances::Index < Docs::P2P::PurchaseOrders::Index
   include DynamicAttributes
 
+  system_subscription :vp
+  permissions :bank_payment_request_initiator, :auditor, :admin
   resolver 'purchase_orders.advances'
   reference '{{record.id}}', procurement_id: '{{record.procurement_id}}', procurement_type: 'po'
   custom_fields :purchase_order

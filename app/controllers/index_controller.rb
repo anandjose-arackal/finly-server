@@ -1,13 +1,12 @@
 class IndexController < BaseControllers::WebBase
   layout 'trailblazers'
 
+  # def fetch_old_config
+  #   endpoint IndexBuilder::OldConfig
+  # end
+
   def fetch_config
     endpoint IndexBuilder::Config
-  end
-
-  def index_view_config
-    @index_config = endpoint IndexBuilder::Config
-    @view_config = endpoint IndexSegment::Ops::Index
   end
 
   def show

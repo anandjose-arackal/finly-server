@@ -1,6 +1,8 @@
 class Docs::P2P::CreditNotes::Index < IndexBuilder::API
   include DynamicAttributes
 
+  system_subscription :vp
+  permissions :credit_note_initiator, :credit_note_reviewer, :credit_note_auditor
   resolver 'credit_notes.default'
   reference '{{record.id}}', procurement_id: '{{record.procurement_id}}'
 

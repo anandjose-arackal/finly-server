@@ -1,5 +1,6 @@
 class Docs::P2P::Invoices::FilterConfig < Filters::API
 
+  index_builder 'invoices'
   custom_fields :invoice
 
   attribute :invoice_id, label: "Invoice ID", type: :text, simple: true

@@ -1,5 +1,7 @@
 class Masters::Vendors::Index < IndexBuilder::API
 
+  system_subscription :vp
+  permissions :vendor_creator, :vendor_reviewer, :vendor_manager, :vendor_auditor, :auditor, :admin
   resolver 'vendors.default'
   reference '{{record.id}}'
   custom_fields :yes_bank_vendor
