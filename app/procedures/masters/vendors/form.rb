@@ -1,7 +1,7 @@
 class Masters::Vendors::Form < Forms::API
 
   model YesBankVendor
-  document_owner :created_by
+  # document_owner :created_by
 
   section :header do
     auto_number :vendor_id, sequence: {prefix: "VNDR/", start_at: '000001'}
