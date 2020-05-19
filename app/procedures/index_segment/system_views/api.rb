@@ -4,6 +4,7 @@ class IndexSegment::SystemViews::API
   class_attr :label
   class_attr :columns
   class_attr :permissions
+  class_attr :system_subscription
 
   def self.screen(handle)
     @screen = handle
