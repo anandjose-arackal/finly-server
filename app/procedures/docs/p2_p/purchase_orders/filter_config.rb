@@ -1,5 +1,7 @@
 class Docs::P2P::PurchaseOrders::FilterConfig < Filters::API
 
+  index_builder 'purchase_orders'
+
   attribute :po_number, label: "PO Number", type: :text, simple: true
   attribute :created_at, type: :datetime, simple: false
   attribute :submitted_at, type: :datetime, simple: false

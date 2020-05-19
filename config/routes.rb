@@ -4230,13 +4230,15 @@ Rails.application.routes.draw do
   get 'accounting_exports', to: 'accounting_exports#index'
 
   # Adding GET and POST support for all URL's as get does not support very large URL's
-  get 'filters/:route', to: "filters#index"
-  post 'filters/:route', to: "filters#index"
+  get 'filters', to: "filters#index"
+  post 'filters', to: "filters#index"
   get 'filters/:route/choices/:field_key', to: "filters#choices"
   post 'filters/:route/choices/:field_key', to: "filters#choices"
 
-  get 'index/:route/config', to: "index#fetch_config"
-  post 'index/:route/config', to: "index#fetch_config"
+  get 'index/config', to: 'index#fetch_config'
+  post 'index/config', to: 'index#fetch_config'
+  # get 'index/:route/config', to: "index#fetch_old_config"
+  # post 'index/:route/config', to: "index#fetch_config"
   get 'index/:route/record_counts', to: 'index#record_counts'
   post 'index/:route/record_counts', to: 'index#record_counts'
   get 'index/:route/status_counts', to: 'index#status_counts'

@@ -68,8 +68,12 @@ class Menu::Masters::Procurement < Menu::API
 
   item :payables, icon: "https://img.icons8.com/windows/20/ffffff/sales-performance.png" do
     item :po_advances, label: "PO Advances", permissions: [:bank_payment_request_initiator, :auditor]
-    item :invoices, permissions: [:bank_payment_request_initiator]
-    item :utility_bills, permissions: [:utility_bill_initiator, :utility_bill_reviewer]
+    item :invoices, permissions: [
+        :bank_payment_request_initiator, :invoice_initiator, :invoice_reviewer,
+        :invoice_auditor, :po_invoice_initiator, :po_invoice_reviewer, :po_invoice_auditor,
+        :non_po_invoice_initiator, :non_po_invoice_reviewer, :non_po_invoice_auditor
+    ]
+    item :utility_bills, permissions: [:utility_bill_initiator, :utility_bill_reviewer, :bank_payment_request_initiator]
     item :upcoming_invoices, permissions: [:agreement_invoice_initiator, :agreement_invoice_auditor]
     # item :unbilled_items, permissions: [] # todo
   end
@@ -91,7 +95,7 @@ class Menu::Masters::Procurement < Menu::API
              :agreement_invoice_initiator, :agreement_invoice_reviewer, :agreement_invoice_auditor,
              :payment_agreement_initiator, :payment_agreement_reviewer, :payment_agreement_auditor, :auditor
          ]
-    item :credit_notes, permissions: [:credit_note_initiator,:credit_note_reviewer,:credit_note_auditor]
+    item :credit_notes, permissions: [:credit_note_initiator, :credit_note_reviewer, :credit_note_auditor]
     item :utility_subscriptions, permissions: [:utility_bill_master_initiator, :utility_bill_master_reviewer]
     item :users, permissions: [:admin]
   end

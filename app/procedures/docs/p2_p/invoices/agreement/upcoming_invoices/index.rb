@@ -1,5 +1,7 @@
 class Docs::P2P::Invoices::Agreement::UpcomingInvoices::Index < IndexBuilder::API
 
+  system_subscription :vp
+  permissions :agreement_invoice_initiator, :agreement_invoice_auditor, :admin
   resolver 'upcoming_invoices.default'
   reference '{{record.id}}', procurement_id: '{{record.procurement_id}}', procurement_type: "{{record.invoice_type.key}}"
   # custom_fields :invoice

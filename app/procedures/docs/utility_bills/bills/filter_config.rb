@@ -1,5 +1,7 @@
 class Docs::UtilityBills::Bills::FilterConfig < Filters::API
 
+
+  index_builder 'utility_bills'
   BBPS_BILLER_CATEGORY_CHOICES = [{id:"Electricity", name:"Electricity"}, {id:"Gas", name:"Gas"}, {id:"Mobile Postpaid", name:"Mobile Postpaid"}, {id:"Landline Postpaid", name:"Landline Postpaid"}, {id:"DTH", name:"DTH"}, {id:"Broadband Postpaid", name:"Broadband Postpaid"}, {id:"Water", name:"Water"}, {id:"LPG Gas", name:"LPG Gas"}, {id:"Loan Repayment", name:"Loan Repayment"}, {id:"Life Insurance", name:"Life Insurance"}, {id:"Fastag", name:"Fastag"}, {id:"Cable TV", name:"Cable TV"}, {id:"Health Insurance", name:"Health Insurance"}].freeze
 
   attribute :sequence_id, label: 'Bill ID', type: :text, simple: true

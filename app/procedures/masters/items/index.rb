@@ -1,5 +1,7 @@
 class Masters::Items::Index < IndexBuilder::API
 
+  system_subscription :vp
+  permissions :item_master_manager, :inventory_manager, :auditor, :admin
   resolver 'items.default'
   reference '{{record.id}}'
   custom_fields :item

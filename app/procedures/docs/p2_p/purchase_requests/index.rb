@@ -1,5 +1,8 @@
 class Docs::P2P::PurchaseRequests::Index < IndexBuilder::API
 
+  system_subscription :vp
+  feature_subscription :purchase_requisition_system
+  permissions :purchase_request_initiator, :purchase_request_reviewer, :admin
   resolver 'purchase_requests.default'
   reference '{{record.id}}'
   custom_fields :purchase_request

@@ -1,6 +1,10 @@
 class Docs::P2P::Invoices::Index < IndexBuilder::API
   include DynamicAttributes
 
+  system_subscription :vp
+  permissions :bank_payment_request_initiator, :invoice_initiator, :invoice_reviewer,
+              :invoice_auditor, :po_invoice_initiator, :po_invoice_reviewer, :po_invoice_auditor,
+              :non_po_invoice_initiator, :non_po_invoice_reviewer, :non_po_invoice_auditor, :auditor, :admin
   resolver 'invoices.default'
   reference '{{record.id}}', procurement_id: '{{record.procurement_id}}', procurement_type: "{{record.invoice_type.key}}"
   custom_fields :invoice
@@ -69,31 +73,31 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     amount value: :cgst_amount
   end
 
-  column :sgst_amount, label: 'SGST', includes: [tax_amount: :currency]  do
+  column :sgst_amount, label: 'SGST', includes: [tax_amount: :currency] do
     amount value: :sgst_amount
   end
 
-  column :igst, label: 'IGST', includes: [tax_amount: :currency]  do
+  column :igst, label: 'IGST', includes: [tax_amount: :currency] do
     amount value: :igst_amount
   end
 
-  column :tds_slab, includes: [:tds_slab]  do
+  column :tds_slab, includes: [:tds_slab] do
     text value: "{{record.tds_slab.name}}"
   end
 
-  column :tds_rate, includes: [:tds_slab]  do
+  column :tds_rate, includes: [:tds_slab] do
     text value: :tds_rate
   end
 
-  column :tds_amount, includes: [tds_amount: :currency]  do
+  column :tds_amount, includes: [tds_amount: :currency] do
     amount value: :tds_amount
   end
 
-  column :freight_amount, includes: [freight_amount: :currency]  do
+  column :freight_amount, includes: [freight_amount: :currency] do
     amount value: :freight_amount
   end
 
-  column :net_amount, includes: [net_amount: :currency]  do
+  column :net_amount, includes: [net_amount: :currency] do
     amount value: :net_amount
   end
 
@@ -102,7 +106,7 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
   #   amount value: :advance_amount
   # end
 
-  column :balance_due, includes: [balance_due: :currency]  do
+  column :balance_due, includes: [balance_due: :currency] do
     amount value: :balance_due
   end
 
@@ -154,7 +158,7 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
 
     # Open - open/retracted
     counter.add 90, 'Open', (
-        counts[InwardInvoiceStatus.id_for(:open)].to_i +
+    counts[InwardInvoiceStatus.id_for(:open)].to_i +
         counts[InwardInvoiceStatus.id_for(:retracted)].to_i
     )
 

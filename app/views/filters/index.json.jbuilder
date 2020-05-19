@@ -1,1 +1,1 @@
-json.data @op[:filters]
+json.data @op[:config]

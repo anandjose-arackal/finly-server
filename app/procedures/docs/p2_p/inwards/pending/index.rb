@@ -1,6 +1,8 @@
 class Docs::P2P::Inwards::Pending::Index < IndexBuilder::API
   include DynamicAttributes
 
+  system_subscription :vp
+  permissions :goods_receiver, :admin
   resolver 'inward_documents.pending'
   reference '{{record.procurement_id}}'
   selectable false
