@@ -13,7 +13,7 @@ class Forms::Contracts::Helpers::ComputeRunner
   end
 
   def self.compute_via_lookup(represented, entity, value, form: {}, row: {})
-
+    # entity.compute_lookup_entity.choices_scope.find_by_id()
   end
 
   def self.compute_via_form(represented, entity, value, form: {}, row: {})

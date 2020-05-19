@@ -14,6 +14,10 @@ class Forms::Template < Templates::API
     set :section, exec_context[:parent].section
     set :form, exec_context[:root_record]
     set :parent, exec_context[:parent] if exec_context[:parent].class <=> FormEntity
+    set :compute_lookup_entity, -> (ref_context) do
+      next unless ref_context[:template].template_reference[:compute_lookup_entity_path].present?
+      ref_context[:root_record].find_entity(ref_context[:template].template_reference[:compute_lookup_entity_path])
+    end
     association :entities, &templates[:entities]
     association :choices do |choice_context|
       set :company_id, choice_context[:company_id]

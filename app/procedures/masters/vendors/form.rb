@@ -1,6 +1,7 @@
 class Masters::Vendors::Form < Forms::API
 
   model YesBankVendor
+  document_owner :created_by
 
   section :header do
     auto_number :vendor_id, sequence: {prefix: "VNDR/", start_at: '000001'}
@@ -13,7 +14,7 @@ class Masters::Vendors::Form < Forms::API
            required: true
     lookup :department_id, choices_scope: Choices[:lookup].('departments'), editable: false, visible: false
     lookup :cost_center_id, choices_scope: Choices[:lookup].('cost_centers')
-    text :legal_name
+    text :legal_name, computed: Forms::Compute::Lookup('policy_id', '{{record.name}}'), editable: false
   end
 
   section :locations do

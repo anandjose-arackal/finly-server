@@ -51,4 +51,12 @@ class Choices::Builders::Base
     Choices::Builder.serialize self, config
   end
 
+  protected
+  def finder_cache
+    return nil unless form_entity.present?
+
+    RequestStore[:contract_finder_cache] ||= {}.with_indifferent_access
+    RequestStore[:contract_finder_cache][form_entity.id] ||= {name: {}, id: {}}
+  end
+
 end

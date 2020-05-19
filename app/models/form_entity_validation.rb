@@ -6,7 +6,6 @@
 #  uuid           :string(36)       not null, primary key
 #  company_id     :bigint           not null
 #  form_id        :string(255)      not null
-#  entity_path    :string(255)      not null
 #  error_message  :string(255)      not null
 #  created_by_id  :integer
 #  updated_by_id  :integer
@@ -19,6 +18,7 @@
 #  is_updated     :boolean
 #  can_be_updated :boolean
 #  rule           :text(65535)
+#  form_entity_id :string(255)      not null
 #
 
 class FormEntityValidation < ApplicationRecord

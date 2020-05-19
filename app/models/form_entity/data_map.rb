@@ -46,7 +46,7 @@
 #  compute_enabled              :boolean
 #  compute_type_id              :integer
 #  compute_formula              :string(255)
-#  compute_lookup_entity_path   :string(255)
+#  compute_lookup_entity_id     :string(255)
 #
 
 class FormEntity::DataMap < FormEntity

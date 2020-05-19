@@ -22,4 +22,10 @@ class FormsController < BaseControllers::WebBase
     end
   end
 
+  def form_lookup_details
+    endpoint Forms::Ops::LookupDetails do |m|
+      m.success { |result| render json: {data: result[:data]}, status: 200 }
+    end
+  end
+
 end

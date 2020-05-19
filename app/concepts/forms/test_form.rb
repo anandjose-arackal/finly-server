@@ -9,7 +9,7 @@ class Forms::TestForm < Forms::API
       text :pan
       number :state
       number :city
-      number :gender, computed: "{{form.first_name}} : {{row.state | times: row.city}}", editable: false
+      number :gender, computed: Forms::Compute::Form("{{form.first_name}} : {{row.state | times: row.city}}"), editable: false
     end
   end
 

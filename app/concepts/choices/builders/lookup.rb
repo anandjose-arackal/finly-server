@@ -19,11 +19,15 @@ class Choices::Builders::Lookup < Choices::Builders::Base
   end
 
   def find_by_id(id, params: {}, user: nil)
+    return finder_cache[:id][id] if finder_cache[:id][id].present?
+
     params.deep_merge!({q: {id_eq: id}})
     choices(params: params, user: user)&.first
   end
 
   def find_by_name(name, params: {}, user: nil)
+    return finder_cache[:id][name] if finder_cache[:id][name].present?
+
     params.deep_merge!({q: {name_eq: name}})
     choices(params: params, user: user)&.first
   end

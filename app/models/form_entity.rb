@@ -46,11 +46,12 @@
 #  compute_enabled              :boolean
 #  compute_type_id              :integer
 #  compute_formula              :string(255)
-#  compute_lookup_entity_path   :string(255)
+#  compute_lookup_entity_id     :string(255)
 #
 
 class FormEntity < ApplicationRecord
   include SoftDeletable, UUIDHelper
+  include TemplateClonable
   include DynamicAttributes
   include Dry::Monads[:result]
   # include Forms::Generators::Contracts::ModelHelpers::FormEntity
@@ -67,6 +68,7 @@ class FormEntity < ApplicationRecord
   belongs_to :parent, class_name: 'FormEntity', optional: true, primary_key: :uuid, foreign_key: :parent_id
   belongs_to :created_by, optional: true, class_name: "User", foreign_key: :created_by_user_id
   belongs_to :compute_type, class_name: 'FormEntityComputationType', optional: true
+  belongs_to :compute_lookup_entity, class_name: 'FormEntity', optional: true
 
   has_many :entities, class_name: 'FormEntity', foreign_key: :parent_id, primary_key: :uuid
   has_many :choices, class_name: 'FormEntityChoice', dependent: :destroy
@@ -113,14 +115,15 @@ class FormEntity < ApplicationRecord
     Forms::Contracts::Builders::FormEntity.({params: {entity: self, reform: reform}, current_user: user})
   end
 
-  def computed=(formula, lookup_entity: nil)
+  def computed=(data)
     self.compute_enabled = true
-    self.compute_formula = formula
-    if lookup_entity
-      self.compute_type_id = FormEntityComputationType.id_for(:lookup)
-      self.compute_lookup_entity_path = lookup_entity
-    else
+    if data[:form].present?
       self.compute_type_id = FormEntityComputationType.id_for(:form)
+      self.compute_formula = data&.dig(:form, :formula)
+    elsif data[:lookup].present?
+      self.compute_type_id = FormEntityComputationType.id_for(:lookup)
+      self.compute_formula = data&.dig(:lookup, :formula)
+      template_reference[:compute_lookup_entity_path] = data&.dig(:lookup, :lookup_entity_path)
     end
   end
 
