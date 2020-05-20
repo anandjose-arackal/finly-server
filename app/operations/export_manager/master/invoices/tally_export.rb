@@ -35,6 +35,7 @@ class ExportManager::Master::Invoices::TallyExport < ExportManager::Builders::Ta
   def add_ledgers(voucher, invoice)
     add_vendor_ledgers voucher, invoice, configuration
     add_tds_ledgers voucher, invoice, configuration
+    add_round_off_ledgers voucher, invoice, configuration
     invoice.line_items.each do |item_obj|
       item = item_obj.to_liquid
       add_item_ledgers voucher, invoice, item, configuration
@@ -72,6 +73,13 @@ class ExportManager::Master::Invoices::TallyExport < ExportManager::Builders::Ta
     voucher.add ledger_data['cgst'], (-item.cgst_amount) if item.cgst_amount.present?
     voucher.add ledger_data['sgst'], (-item.sgst_amount) if item.sgst_amount.present?
     voucher.add ledger_data['igst'], (-item.igst_amount) if item.igst_amount.present?
+  end
+
+  def add_round_off_ledgers(voucher, invoice, configuration)
+    ledger_name = LiquidHelper.interpolate(configuration['roundoff_gl_name'], "invoice" => invoice)
+    return if ledger_name.blank?
+
+    voucher.add ledger_name, invoice.roundoff_amount, is_party_ledger: false
   end
 
 
