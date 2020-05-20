@@ -4,6 +4,11 @@ class Forms::Contracts::Builders::Form
     # FixMe : proper inclusion of conditions, validations and dependencies to avoid N+1
     sections = form.sections.includes(entities: {entities: {entities: {entities: [:entities]}}})
     Class.new(Reform::Form) do
+
+      property :created_by, deserializer: -> (input, represented, **) do
+        represented.created_by = RequestStoreUtil.current_user unless model.persisted?
+      end
+
       associate_custom_fields = false
       sections.each do |section|
         associate_custom_fields ||= section.associate_custom_fields
