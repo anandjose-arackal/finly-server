@@ -12,7 +12,7 @@ class Docs::UtilityBills::Bills::Index < IndexBuilder::API
     text value: '{{record.subscription.name}}'
   end
 
-  column :bill_id, sort: :sequence_id, default: true do
+  column :bill_id, label: "Bill ID", sort: :sequence_id, default: true do
     text value: :bill_id, format: 'primary'
   end
 
