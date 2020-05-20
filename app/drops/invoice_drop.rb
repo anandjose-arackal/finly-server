@@ -68,6 +68,10 @@ class InvoiceDrop < Drop
     @object.tds_slab.to_liquid
   end
 
+  def roundoff_amount
+    @object.roundoff_amount || -0
+  end
+
   def line_items
     @object.invoice_items.to_a.map(&:to_liquid)
   end
