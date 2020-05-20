@@ -18,7 +18,8 @@ class Personalizer::Adapters::Company190::Report190::Violation190::PostProcess <
 
   def process
     self.report.expenses.each do |expense|
-      if expense.category.gst_applicable? && expense.manual_expense?
+      currency = expense.amount&.currency
+      if expense.category.gst_applicable? && expense.manual_expense? && currency&.country_code ==  "INR"
         errors = []
         if expense.tax_rate_id.blank?
           errors += ["tax rate"]
