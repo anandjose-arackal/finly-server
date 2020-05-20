@@ -5,7 +5,9 @@ class PaymentDrop < Drop
   end
 
   def processed_at
-    record.processed_at
+    return nil unless record.payment_status_id == PaymentStatus.id_for(:completed)
+
+    record.reference_resources.first&.updated_at || record.reference_resource&.updated_at
   end
 
   def updated_at
