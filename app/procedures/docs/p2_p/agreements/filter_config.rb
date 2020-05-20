@@ -1,6 +1,6 @@
 class Docs::P2P::Agreements::FilterConfig < Filters::API
 
-  index_builder 'agreements'
+  index_builder Docs::P2P::Agreements::Index
 
   attribute :order_number, label: "Agreement ID", type: :text, simple: true
   attribute :title, simple: true

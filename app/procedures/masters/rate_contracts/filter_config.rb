@@ -1,6 +1,6 @@
 class Masters::RateContracts::FilterConfig < Filters::API
 
-  index_builder 'rate_contracts'
+  index_builder Masters::RateContracts::Index
 
   attribute :name, type: :text, simple: true
   attribute :rate_contract_number, label: 'Rate Contract ID', type: :text, simple: true

@@ -1,6 +1,6 @@
 class Docs::P2P::Inwards::Received::FilterConfig < Filters::API
 
-  index_builder 'receive_history'
+  index_builder Docs::P2P::Inwards::Received::Index
 
   attribute :purchase_order_po_number, label: "PO Number", type: :text, simple: true
   attribute :created_at, type: :datetime, simple: false

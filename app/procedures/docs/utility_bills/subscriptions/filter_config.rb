@@ -1,6 +1,6 @@
 class Docs::UtilityBills::Subscriptions::FilterConfig < Filters::API
 
-  index_builder 'utility_subscriptions'
+  index_builder Docs::UtilityBills::Subscriptions::Index
 
   attribute :name, type: :text, simple: true
   attribute :bbps_biller_id, label: "Biller", type: :dropdown, simple: true, choices: Choices[:auto_complete].('bbps_billers')

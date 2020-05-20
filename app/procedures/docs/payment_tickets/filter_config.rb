@@ -1,6 +1,6 @@
 class Docs::PaymentTickets::FilterConfig < Filters::API
 
-  index_builder 'payment_tickets'
+  index_builder Docs::PaymentTickets::Index
 
   attribute :id, label: 'Payment Ticket ID', type: :text, simple: true
   attribute :payment_order_payments_id, label: "Payment ID", type: :text, simple: true

@@ -1,6 +1,6 @@
 class Docs::P2P::PurchaseOrders::FilterConfig < Filters::API
 
-  index_builder 'purchase_orders'
+  index_builder Docs::P2P::PurchaseOrders::Index
 
   attribute :po_number, label: "PO Number", type: :text, simple: true
   attribute :created_at, type: :datetime, simple: false

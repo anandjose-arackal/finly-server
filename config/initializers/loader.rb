@@ -9,8 +9,6 @@ Loader.watch! "Transaction Contract PreProcessors", dir: "app/concepts/transacti
 
 Loader.watch! "Menu Masters", dir: "app/procedures/menu/masters/**/*.rb"
 
-Loader.watch! "Index Routes", dir: "app/routes/index_routes.rb"
-
 # Clear and reload all routers
 Loader.watch! "Routes Loader" do
   Routers::Registry.routers.each do |router|

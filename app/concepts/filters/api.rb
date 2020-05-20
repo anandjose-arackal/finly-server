@@ -20,8 +20,7 @@ class Filters::API < Transactions::API
   end
 
   # Load permissions / subscription / systems from index builder
-  def self.index_builder(route)
-    index_builder = IndexBuilder::Router[route]&.first&.klass
+  def self.index_builder(index_builder)
     permissions *index_builder.permissions if index_builder.permissions.present?
     system_subscription *index_builder.system_subscription if index_builder.system_subscription.present?
     feature_subscription index_builder.feature_subscription
