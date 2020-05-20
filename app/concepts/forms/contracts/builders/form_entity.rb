@@ -12,16 +12,17 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
 
   # Sequence
   # ☐ Deserialize -> Assign values unless conditionally editable / visible
-  # ☐ Assign conditional values + Run all computations
-  # ☐ Validate System
-  # ☐ Validate Custom
+  # ☐ Assign conditional values
+  # ☐ Run all computations on fields which are not editable (Run in the same step as above)
+  # ☐ Check System Validations
+  # ☐ Check Custom Validations
   pass :init
-  pass :define_entity
-  pass :assign_and_compute_entity
-  pass :validate_entity
-  pass :custom_validate_entity
-  pass :validate_choices
-  pass :execute_contract_evaluators
+  pass :define_entity # Deserialize
+  pass :assign_and_compute_entity # Assign conditional editable/visible values + Run Computations on non-editable fields
+  pass :validate_entity # Check System Validations
+  pass :custom_validate_entity # Check Custom Validations
+  pass :validate_choices # Validate all dropdown choices
+  pass :execute_contract_evaluators # Contract evaluators help in checking entity specific validations such as max_items, min_items. Todo : Rename maybe?
 
   def init(context, params:, **)
     context[:reform] = params[:reform]
@@ -40,22 +41,23 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
   end
 
   def assign_and_compute_entity(context, reform:, entity:, **)
-    return if entity.entities.present?
+    return if entity.entities.present? # Nothing to assign if the entity has sub-entities
 
     reform.validate -> do
-      input = row_input
-      result = Forms::Contracts::Helpers::ConditionChecker.(entity.conditions, entity, SETTER_ACTIONS, form: contract_input, row: input)
+      row_data = Transactions::Contract.to_form(self)
+      form_data = Transactions::Contract.to_form(contract_root)
+      result = Forms::Contracts::Helpers::ConditionChecker.(entity.conditions, entity, SETTER_ACTIONS, form: form_data, row: row_data)
       editable = result['editable'] || entity.editable
       visible = result['visible'] || entity.visible
-      if editable and visible and input.has_key?(entity.entity_key)
-        value = input[entity.entity_key] # || entity.default_value
+      if editable and visible and row_data.has_key?(entity.entity_key)
+        value = row_data[entity.entity_key] # || entity.default_value
         send("#{entity.entity_key}=", value)
       end
 
       # -> Computations are run here
       if entity.compute_enabled and not editable
         value = send(entity.entity_key)
-        Forms::Contracts::Helpers::ComputeRunner.(self, entity, value, form: contract_input, row: input)
+        Forms::Contracts::Helpers::ComputeRunner.(self, entity, value, form: form_data, row: row_data)
       end
     end
   end
@@ -64,7 +66,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
     reform.validate -> do
       # Using as_nested_hash instead of input as the input need not always
       result = Forms::Contracts::Helpers::ConditionChecker.(
-          entity.conditions, entity, VALIDATION_ACTIONS, form: contract_root.to_nested_hash, row: to_nested_hash
+          entity.conditions, entity, VALIDATION_ACTIONS, form: Transactions::Contract.to_form(contract_root), row: Transactions::Contract.to_form(self)
       )
       required = result['required'] || entity.required
 
@@ -78,13 +80,16 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
   def custom_validate_entity(context, reform:, entity:, **)
     reform.validate -> do
       entity.validations.each do |validation|
-        next unless validation.rule.apply?({form: contract_root.to_nested_hash, row: to_nested_hash}.with_indifferent_access)
+        next unless validation.rule.apply?({form: Transactions::Contract.to_form(contract_root), row: Transactions::Contract.to_form(self)}.with_indifferent_access)
+
         errors.add entity.entity_key, validation.error_message
       end
     end
   end
 
-  def validate_choices(context, reform:, entity:, **) end
+  def validate_choices(context, reform:, entity:, **)
+    # Todo
+  end
 
   def execute_contract_evaluators(context, reform:, entity:, **)
     context = {

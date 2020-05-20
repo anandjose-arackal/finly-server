@@ -52,6 +52,8 @@ class Choices::Builders::Base
   end
 
   protected
+  # Cache used to prevent database queries for fetching the same record in find_by_id or find_by_name
+  # This is helpful while building contracts for forms entity lookup and for validating selected choices
   def finder_cache
     return nil unless form_entity.present?
 

@@ -5,8 +5,10 @@ class Forms::Contracts::Builders::Form
     sections = form.sections.includes(entities: {entities: {entities: {entities: [:entities]}}})
     Class.new(Reform::Form) do
 
-      property :created_by, deserializer: -> (input, represented, **) do
-        represented.created_by = RequestStoreUtil.current_user unless model.persisted?
+      if form.model.has_attribute?(:created_by)
+        property :created_by, deserializer: -> (input, represented, **) do
+          represented.created_by = RequestStoreUtil.current_user unless model.persisted?
+        end
       end
 
       associate_custom_fields = false
