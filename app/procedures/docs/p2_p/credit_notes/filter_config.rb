@@ -1,6 +1,6 @@
 class Docs::P2P::CreditNotes::FilterConfig < Filters::API
 
-  index_builder 'credit_notes'
+  index_builder Docs::P2P::CreditNotes::Index
 
   attribute :sequence_id, label: "Credit Note Number", type: :text, simple: true
   attribute :created_at, type: :datetime, simple: false

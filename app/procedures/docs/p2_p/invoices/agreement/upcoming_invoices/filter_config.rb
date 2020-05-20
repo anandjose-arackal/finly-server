@@ -1,6 +1,6 @@
 class Docs::P2P::Invoices::Agreement::UpcomingInvoices::FilterConfig < Filters::API
 
-  index_builder 'upcoming_invoices'
+  index_builder Docs::P2P::Invoices::Agreement::UpcomingInvoices::Index
 
   # attribute :invoice_id, label: "Invoice ID", type: :text, simple: true
   # attribute :invoice_number, label: "Invoice Number", type: :text, simple: true

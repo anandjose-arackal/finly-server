@@ -1,6 +1,6 @@
 class Masters::Items::FilterConfig < Filters::API
 
-  index_builder 'items'
+  index_builder Masters::Items::Index
 
   attribute :item_number, label: "Item ID", type: :text, simple: true
   attribute :created_at, type: :datetime

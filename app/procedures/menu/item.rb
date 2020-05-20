@@ -44,7 +44,7 @@ class Menu::Item
 
     if self.permissions and not self.permissions.respond_to?(:each)
       self.permissions = [self.permissions]
-    else
+    elsif self.permissions.nil?
       self.permissions = []
     end
 
@@ -102,9 +102,11 @@ class Menu::Item
     if items.present?
       json[:items] = items.as_json(options).reject { |item| item.nil? }
       json[:items] = json[:items]&.map {|item| {item_type: 'menu'}.merge(item)}
+      return nil if json[:items].blank?
     elsif actions.present?
       json[:items] = actions.values.as_json(options).reject { |item| item.nil? }
       json[:items] = json[:items]&.map {|item| {item_type: 'action'}.merge(item)}
+      return nil if json[:items].blank?
     end
     json
   end
@@ -112,6 +114,7 @@ class Menu::Item
   def authorized?(options = {})
     current_user = options[:current_user]
     return false unless current_user.present?
+    puts "Path : #{path} : Has Permissions: #{current_user.has_permission?(permissions)} permissions : #{permissions}"
     return false unless current_user.has_permission?(permissions)
     return false unless company_subscribed?(current_user)
     return false unless user_subscribed?(current_user)

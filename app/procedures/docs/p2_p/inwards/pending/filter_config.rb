@@ -1,6 +1,6 @@
 class Docs::P2P::Inwards::Pending::FilterConfig < Filters::API
 
-  index_builder 'receive'
+  index_builder Docs::P2P::Inwards::Pending::Index
 
   attribute :po_number, label: "PO Number", type: :text, simple: true
   attribute :created_at, type: :datetime, simple: false

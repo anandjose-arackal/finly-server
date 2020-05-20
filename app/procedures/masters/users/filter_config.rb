@@ -1,6 +1,6 @@
 class Masters::Users::FilterConfig < Filters::API
 
-  index_builder 'users'
+  index_builder Masters::Users::Index
 
   attribute :first_name, type: :text, simple: true
   attribute :last_name, type: :text, simple: true
