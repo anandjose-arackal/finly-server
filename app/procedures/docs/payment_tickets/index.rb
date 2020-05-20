@@ -40,11 +40,11 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
   end
 
   column :requested, default: true, includes: [payment_order: {amount_requested: :currency}] do
-    amount value: -> (context) {context[:exposure].payment_order.amount_requested}
+    amount value: -> (context) { context[:exposure].payment_order.amount_requested }
   end
 
   column :processed, default: true, includes: [payment_order: {amount_processed: :currency}] do
-    amount value: -> (context) {context[:exposure].payment_order.amount_processed}
+    amount value: -> (context) { context[:exposure].payment_order.amount_processed }
   end
 
   column :submitted_at, sort: :submitted_at, default: true do
@@ -77,7 +77,11 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     counts = collection.group(:status_id).count
     counter.add nil, "All", counts.values.reduce(0, :+)
     # Open / Retracted
-    counter.add 90, 'Open', (counts[BankPaymentRequestStatus.id_for(:open)].to_i + counts[BankPaymentRequestStatus.id_for(:retracted)].to_i)
+    counter.add 90, 'Open', (
+        counts[BankPaymentRequestStatus.id_for(:open)].to_i +
+        counts[BankPaymentRequestStatus.id_for(:retracted)].to_i +
+            counts[BankPaymentRequestStatus.id_for(:creation_in_progress)].to_i
+    )
 
     # Awaiting Approval
     if user.has_permission?(awaiting_approval_roles)
@@ -86,16 +90,15 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     end
 
     counter.add 92, "Processing", (
-        counts[BankPaymentRequestStatus.id_for(:processing)].to_i +
+    counts[BankPaymentRequestStatus.id_for(:processing)].to_i +
         counts[BankPaymentRequestStatus.id_for(:submitted)].to_i +
         counts[BankPaymentRequestStatus.id_for(:unapprove)].to_i
     )
 
     # Approved / Auto Approved
     counter.add 93, 'Pending Credit', (
-        counts[BankPaymentRequestStatus.id_for(:approved)].to_i +
+    counts[BankPaymentRequestStatus.id_for(:approved)].to_i +
         counts[BankPaymentRequestStatus.id_for(:auto_approved)].to_i +
-        counts[BankPaymentRequestStatus.id_for(:creation_in_progress)].to_i +
         counts[BankPaymentRequestStatus.id_for(:pending)].to_i
     )
 

@@ -390,7 +390,7 @@ class BankPaymentRequest < ApplicationRecord
   scope :with_status_id, -> (status_id) {
     case status_id
     when 90
-      where status_id: BankPaymentRequestStatus.ids_for(:open, :retracted)
+      where status_id: BankPaymentRequestStatus.ids_for(:open, :retracted, :creation_in_progress)
     when 91
       user_id = RequestStore.store[:current_user]&.id
       if user_id.present?
@@ -401,7 +401,7 @@ class BankPaymentRequest < ApplicationRecord
     when 92
       where status_id: BankPaymentRequestStatus.ids_for(:submitted, :processing, :unapprove)
     when 93
-      where status_id: BankPaymentRequestStatus.ids_for(:approved, :pending, :creation_in_progress, :auto_approved)
+      where status_id: BankPaymentRequestStatus.ids_for(:approved, :pending, :auto_approved)
     else
       where status_id: status_id
     end
