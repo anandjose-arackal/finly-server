@@ -2481,6 +2481,7 @@ ActiveRecord::Schema.define(version: 2020_05_16_130418) do
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
     t.integer "tax_amount_id"
+    t.boolean "tds_applicable", default: false
     t.index ["category_id"], name: "index_credit_note_items_on_category_id"
     t.index ["credit_note_id"], name: "index_credit_note_items_on_credit_note_id"
     t.index ["credit_note_item_type_id"], name: "index_credit_note_items_on_credit_note_item_type_id"
