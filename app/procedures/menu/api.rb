@@ -110,7 +110,7 @@ class Menu::API < Transactions::API
         if mod[:permissions].present?
           permissions = mod[:permissions]
           permissions = [permissions] unless permissions.respond_to?(:each)
-          next if permissions.present? and not user.has_roles?(permissions)
+          next if permissions.present? and not user.has_permission?(permissions)
         end
 
         selected = (current_user == user and [mod[:app].to_s, mod[:app]].include?(RequestStoreUtil.current_app))
