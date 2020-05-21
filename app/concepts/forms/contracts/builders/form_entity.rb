@@ -85,7 +85,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
     # Choices scope is used to determine if the form has choices or not
     return unless reform.choices_scope.present?
 
-
+    # controlling_choices
   end
 
   def execute_contract_evaluators(context, reform:, entity:, **)

@@ -76,6 +76,7 @@ class FormEntity < ApplicationRecord
   has_many :conditions, class_name: "FormCondition", as: :referencable
 
   has_many :choice_dependencies, class_name: "FormChoiceDependency", foreign_key: :dependent_entity_id
+  has_many :choice_controlling_entities, through: :choice_dependencies, class_name: 'FormEntity', source: :controlling_entity
 
   # Fixme: Delete this as it is available in Forms::API::Entity::Registry. Kept it commented for testing purpose
   # def find_entity(entity_path)

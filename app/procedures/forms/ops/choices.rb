@@ -5,6 +5,8 @@ class Forms::Ops::Choices < Transactions::API
       optional(:route) # Pointing to the form route
       optional(:form)
       optional(:controlling_choices)
+      optional(:form_data)
+      optional(:row_data)
       required(:entity_path).filled
     end
   end
@@ -49,7 +51,8 @@ class Forms::Ops::Choices < Transactions::API
       query += " AND " unless query.blank?
       query += "(`form_entities`.`entity_path` = '#{controlling_entity_path}' AND controlling_choice_id = #{value})"
     end
-    context[:choice_dependency_mapping] = FormChoiceDependencyMapping.joins(dependency: :controlling_entity)
+    context[:choice_dependency_mapping] = FormChoiceDependencyMapping
+                                              .joins(dependency: :controlling_entity)
                                               .where("form_choice_dependencies.dependent_entity_id = '#{entity.id}'")
                                               .where(query)
     # context[:choice_dependencies] = model.choice_dependencies.joins(:mapping)
