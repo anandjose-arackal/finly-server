@@ -2,7 +2,8 @@ class Forms::Ops::Choices < Transactions::API
 
   schema do
     params do
-      required(:route).filled # Pointing to the form route
+      optional(:route) # Pointing to the form route
+      optional(:form)
       optional(:controlling_choices)
       required(:entity_path).filled
     end
@@ -18,25 +19,24 @@ class Forms::Ops::Choices < Transactions::API
   pass :scope_user
   pass :fetch
 
-  def find_form(context, params:, **)
-    context[:form] = Forms::Router.klass(params[:route])
-    return on_error context, :base, "Invalid Route" if context[:form].blank?
-
-    true
-  end
-
   def find_model(context, params:, form:, current_user:, **)
-    context[:model] = Form.find_by(model: form.model, company_id: current_user.company_id)
-    return false unless context[:model].present?
+    if params[:form_record].present?
+      context[:model] = params[:form_record]
+      context[:form] = context[:model].form_klass
+    else
+      context[:form] = Forms::Router.klass(params[:route])
+      return on_error context, :base, "Invalid Route" if context[:form].blank?
+
+      context[:model] = Form.find_by(model: form.model, company_id: current_user.company_id)
+      return false unless context[:model].present?
+    end
 
     true
   end
 
   def init_entity(context, model:, params:, **)
-    context[:entity] = model.entities.find_by(entity_path: params[:entity_path])
-    if context[:entity].blank?
-      return on_error context, :base, "field not found"
-    end
+    context[:entity] = model.find_entity(params[:entity_path])
+    return on_error context, :base, "field not found" if context[:entity].blank?
 
     true
   end

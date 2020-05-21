@@ -37,6 +37,10 @@ class Form < ApplicationRecord
     nil
   end
 
+  def form_klass
+    Object.const_get(klass_name) if klass_name.present?
+  end
+
   def contract(user)
     Forms::Contracts::Builders::Form.(self, user)
   end

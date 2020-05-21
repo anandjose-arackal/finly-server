@@ -10,14 +10,8 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
     end
   end
 
-  # Sequence
-  # ☐ Deserialize -> Assign values unless conditionally editable / visible
-  # ☐ Assign conditional values
-  # ☐ Run all computations on fields which are not editable (Run in the same step as above)
-  # ☐ Check System Validations
-  # ☐ Check Custom Validations
   pass :init
-  pass :define_entity # Deserialize
+  pass :define_entity # Deserialize JSON to property unless the property has conditional editable/visible conditions
   pass :assign_and_compute_entity # Assign conditional editable/visible values + Run Computations on non-editable fields
   pass :validate_entity # Check System Validations
   pass :custom_validate_entity # Check Custom Validations
@@ -88,7 +82,10 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
   end
 
   def validate_choices(context, reform:, entity:, **)
-    # Todo
+    # Choices scope is used to determine if the form has choices or not
+    return unless reform.choices_scope.present?
+
+
   end
 
   def execute_contract_evaluators(context, reform:, entity:, **)
