@@ -2,8 +2,8 @@ class Docs::PaymentTickets::FilterConfig < Filters::API
 
   index_builder Docs::PaymentTickets::Index
 
-  attribute :id, label: 'Payment Ticket ID', type: :text, simple: true
-  attribute :payment_order_payments_id, label: "Payment ID", type: :text, simple: true
+  attribute :id, label: 'Payment Ticket ID', type: :number, simple: true
+  attribute :payment_order_payments_id, label: "Payment ID", type: :number, simple: true
   attribute :status_id, type: :dropdown, choices: Choices[:enum].(BankPaymentRequestStatus)
   attribute :name, type: :text, simple: true
   attribute :created_at, type: :datetime
