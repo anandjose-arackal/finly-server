@@ -13,7 +13,7 @@ class Forms::Contracts::Helpers::ComputeRunner
   end
 
   def self.compute_via_lookup(represented, entity, value, form: {}, row: {})
-    lookup_value = Forms::Extractor.fetch(entity.compute_lookup_entity, form: form, row: row)
+    lookup_value = Forms::RequestParser.new(form: form, row: row).fetch(entity.compute_lookup_entity.entity_path)
     return unless lookup_value.present?
 
     # Use the document owner or the current user for fetching the lookup choices

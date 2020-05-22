@@ -37,7 +37,7 @@ class Choices::Builders::Switch < Choices::Builders::Base
   end
 
   def build(params: {}, user: {})
-    {partial: false, choices: choices(params: params, user: user).as_json}
+    Choices::Provider.new(partial: false, data: choices(params: params, user: user))
   end
 
 end

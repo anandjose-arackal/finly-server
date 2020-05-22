@@ -18,7 +18,7 @@ class FormsController < BaseControllers::WebBase
 
   def form_entity_choices
     endpoint Forms::Ops::Choices do |m|
-      m.success { |result| render json: result[:choices], status: 200 }
+      m.success { |result| render json: result[:choices].as_json, status: 200 }
     end
   end
 

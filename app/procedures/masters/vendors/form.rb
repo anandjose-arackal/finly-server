@@ -3,26 +3,26 @@ class Masters::Vendors::Form < Forms::API
   model YesBankVendor
 
   section :header do
-    auto_number :vendor_id, sequence: {prefix: "VNDR/", start_at: '000001'}
-    dropdown :status_id, choices_scope: Choices[:enum].(VendorStatus),
-             required: true, editable: false, default_value: VendorStatus.id_for(:draft),
-             can_editable_be_changed: false
+    # auto_number :vendor_id, sequence: {prefix: "VNDR/", start_at: '000001'}
+    # dropdown :status_id, choices_scope: Choices[:enum].(VendorStatus),
+    #          required: true, editable: false, default_value: VendorStatus.id_for(:draft),
+    #          can_editable_be_changed: false
     lookup :policy_id,
            choices_scope: Choices[:lookup].('policies',
                permissions: [:vendor_creator, :vendor_manager]),
            required: true
-    lookup :department_id, choices_scope: Choices[:lookup].('departments'), editable: false, visible: false
-    lookup :cost_center_id, choices_scope: Choices[:lookup].('cost_centers')
-    text :legal_name, computed: Forms::Compute::Lookup('policy_id', '{{record.name}}'), editable: false
+    lookup :department_id, choices_scope: Choices[:lookup].('departments')#, editable: false, visible: false
+    # lookup :cost_center_id, choices_scope: Choices[:lookup].('cost_centers')
+    # text :legal_name, computed: Forms::Compute::Lookup('policy_id', '{{record.name}}'), editable: false
   end
 
-  section :locations do
-    data_map :locations, populate_if_empty: GstinLocation, min_items: 1 do
-      text :name, required: true
-      dropdown :state_id, required: true,
-               choices_scope: Choices[:enum].(GstStateCode, name: :name)
-    end
-  end
+  # section :locations do
+  #   data_map :locations, populate_if_empty: GstinLocation, min_items: 1 do
+  #     text :name, required: true
+  #     dropdown :state_id, required: true,
+  #              choices_scope: Choices[:enum].(GstStateCode, name: :name)
+  #   end
+  # end
 
   # condition condition_id: :department_id_editable do
   #   reference :entity, :department_id

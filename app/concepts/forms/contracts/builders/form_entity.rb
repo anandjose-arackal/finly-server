@@ -81,11 +81,28 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
     end
   end
 
-  def validate_choices(context, reform:, entity:, **)
+  def validate_choices(context, reform:, entity:, current_user:, **)
     # Choices scope is used to determine if the form has choices or not
-    return unless reform.choices_scope.present?
+    return unless entity.choices_scope.present?
 
     # controlling_choices
+    reform.validate -> do
+      form_data = Transactions::Contract.to_form(contract_root)
+      row_data = Transactions::Contract.to_form(self)
+      entity_value = Forms::RequestParser.new(form: form_data, row: row_data).fetch(entity.entity_path)
+      result = Forms::Ops::Choices.(
+          params: {
+              form_data: form_data,
+              row_data: row_data,
+              entity_path: entity.entity_path,
+              form_record: entity.form,
+              qs: {id_in: entity_value} # Pass the ID as a simple filter
+          }, current_user: current_user
+      )
+      unless result[:choices].data.present?
+        errors.add entity.entity_key, 'has an invalid choice'
+      end
+    end
   end
 
   def execute_contract_evaluators(context, reform:, entity:, **)
@@ -131,22 +148,6 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
 
       # Assign value only if conditional editable/visible does not apply the field
       represented.send("#{entity.entity_key}=", input[entity.entity_key])
-
-      # result = Forms::Contracts::Helpers::ConditionChecker.(entity.conditions, entity, SETTER_ACTIONS, form: represented.contract_input, row: input)
-      # editable = result['editable'] || entity.editable
-      # visible = result['visible'] || entity.visible
-      #
-      # if editable and visible and input.has_key?(entity.entity_key)
-      #   value = input[entity.entity_key] # || entity.default_value
-      #   represented.send("#{entity.entity_key}=", value)
-      # else
-      #   value = represented.send(entity.entity_key)
-      # end
-      #
-      # # -> Computations are run here
-      # if visible and not editable and entity.compute_enabled
-      #   Forms::Contracts::Helpers::ComputeRunner.(represented, entity, value, form: represented.contract_input, row: input)
-      # end
     end
   end
 

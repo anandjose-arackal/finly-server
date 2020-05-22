@@ -43,8 +43,6 @@ class Choices::Builders::Lookup < Choices::Builders::Base
     result = klass.(params: params, current_user: user)
 
     partial = result['model.records.json'].size == result['per_page']
-    {
-        partial: partial, choices: result['model.records.json']
-    }
+    Choices::Provider.new(data: result['model.records'], partial: partial, json: result['model.records.json'])
   end
 end
