@@ -36,7 +36,7 @@ class Forms::Rules::Ransack
     else
       values = {}
       if rule.rule_value[:value].respond_to?(:each)
-        rule.rule_value[:value].each_with_index { |val, index| values[index] = val }
+        rule.rule_value[:value].each_with_index { |val, index| values[index] = {value: val} }
       else
         values['0'] = {value: rule.rule_value[:value]}
       end

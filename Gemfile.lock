@@ -190,6 +190,7 @@ GEM
     clockwork (2.0.4)
       activesupport
       tzinfo
+    coderay (1.1.2)
     coffee-rails (4.2.2)
       coffee-script (>= 2.2.0)
       railties (>= 4.0.0)
@@ -469,6 +470,9 @@ GEM
     polyamorous (2.3.2)
       activerecord (>= 5.2.1)
     power_assert (1.2.0)
+    pry (0.13.1)
+      coderay (~> 1.1)
+      method_source (~> 1.0)
     public_suffix (4.0.5)
     puma (3.12.4)
     pundit (2.1.0)
@@ -819,6 +823,7 @@ DEPENDENCIES
   parallel (~> 1.18)
   paranoia (~> 2.4)
   parslet (~> 1.8.2)
+  pry (~> 0.13)
   puma (~> 3.12.0)
   pundit (~> 2.1)
   quickbooks-ruby!

@@ -240,7 +240,7 @@ gem 'json_logic', '~> 0.4'
 
 group :development, :test do
   gem 'byebug'
-  # gem 'pry', '~> 0.13'
+  gem 'pry', '~> 0.13'
   # gem 'rb-readline', '~> 0.5'
   gem 'capistrano', '~> 3.11.0'
   gem 'capistrano3-puma', '~> 3.1.1'

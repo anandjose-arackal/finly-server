@@ -3,6 +3,12 @@ class Forms::Contracts::Helpers::ConditionChecker
 
   def self.call(conditions, entity, properties, form: {}, row: {})
     result = {}.with_indifferent_access
+
+    # Set the default values of properties
+    properties.each do |property|
+      result[property] = entity.send(property)
+    end
+
     conditions.each do |condition|
       # Applicable only if the required properties is impact by the condition.
       # This helps in running different conditions at deserialization stage (editable/visible) vs validation stage(required)

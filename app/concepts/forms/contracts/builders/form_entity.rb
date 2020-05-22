@@ -41,8 +41,8 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
       row_data = Transactions::Contract.to_form(self)
       form_data = Transactions::Contract.to_form(contract_root)
       result = Forms::Contracts::Helpers::ConditionChecker.(entity.conditions, entity, SETTER_ACTIONS, form: form_data, row: row_data)
-      editable = result['editable'] || entity.editable
-      visible = result['visible'] || entity.visible
+      editable = result['editable']
+      visible = result['visible']
       if editable and visible and row_data.has_key?(entity.entity_key)
         value = row_data[entity.entity_key] # || entity.default_value
         send("#{entity.entity_key}=", value)
@@ -62,7 +62,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
       result = Forms::Contracts::Helpers::ConditionChecker.(
           entity.conditions, entity, VALIDATION_ACTIONS, form: Transactions::Contract.to_form(contract_root), row: Transactions::Contract.to_form(self)
       )
-      required = result['required'] || entity.required
+      required = result['required']
 
       # Required validation ( System Validation )
       if required and send(entity.entity_key).blank?
