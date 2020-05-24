@@ -14,6 +14,7 @@ class Masters::Vendors::Form < Forms::API
     lookup :department_id, choices_scope: Choices[:lookup].('departments'), editable: false, visible: false
     lookup :cost_center_id, choices_scope: Choices[:lookup].('cost_centers')
     text :legal_name, computed: Forms::Compute::Lookup('policy_id', '{{record.name}}'), editable: false
+    text :business_name
   end
 
   section :locations do
@@ -37,7 +38,7 @@ class Masters::Vendors::Form < Forms::API
   end
 
   condition condition_id: :name_status_editable do
-    reference :entity, :name
+    reference :entity, 'locations/name'
     rule rule_builder[:status_id].in(value: VendorStatus.ids_for(:draft, :rejected, :retracted))
     action :editable, true
   end

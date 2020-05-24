@@ -8,19 +8,12 @@ class Templates::API
 
   def initialize(template)
     self.template = template
+    # instance_exec params, &self.class.root
   end
 
   def sync(params)
-    root_record = instance_exec params, &self.class.root
-    if root_record.blank?
-      root_record = template.class.new(template.attributes.except('id', 'uuid', 'created_at', 'updated_at', 'deleted_at'))
-      root_record.company_id = params[:company_id]
-    end
-    context = params.merge(templates: self.class.templates, template: template, parent: root_record, root_record: root_record)
-    self.class.associations.each do |key, args|
-      eval = Templates::Synchronizer.new(key, context, args, &args[:evaluator])
-      eval.sync(template, root_record)
-    end
+    # context = {params: params, templates: self.class.templates, template: template, parent: root_record, root_record: root_record}
+    root_record = Templates::Builder.(template: template, params: params, api: self, template: template, &self.class.root)
     root_record.save unless root_record.persisted?
     root_record
   end
@@ -32,10 +25,6 @@ class Templates::API
 
   def self.template(name, &evaluator)
     templates[name] = evaluator
-  end
-
-  def self.association(name, condition: nil, &evaluator)
-    associations[name] = {evaluator: evaluator, condition: condition}
   end
 
 end
