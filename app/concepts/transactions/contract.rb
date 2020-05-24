@@ -12,13 +12,6 @@ module Transactions::Contract
     HashUtils.deep_reject(contract.to_nested_hash) { |k, v| %w(row_input contract_input contract_root contract_parent).include?(k)}
   end
 
-  included do
-    property :contract_root, virtual: true, deserializer: {parse_pipeline: ->(*) { ->(input, represented:, **) { represented.contract_root = RequestStore[:contract_root] } }}
-    property :contract_parent, virtual: true, deserializer: {parse_pipeline: ->(*) { ->(input, represented:, **) { represented.contract_parent = RequestStore[:contract_parent] } }}
-    property :contract_input, virtual: true, deserializer: {parse_pipeline: ->(*) { ->(input, represented:, **) { represented.contract_input = RequestStore[:contract_input] } }}
-    property :row_input, virtual: true, deserializer: {parse_pipeline: ->(*) { ->(input, represented:, **) { represented.row_input = input } }}
-  end
-
   class_methods do
     def property(name, options = {}, &block)
       args = {contract: self, type: :property, name: name, options: options, block: block}
@@ -33,16 +26,9 @@ module Transactions::Contract
     end
   end
 
-  def validate(input)
-    # Fixme : This a workaround for setting root, parent and input of the contract. Need a better way
-    RequestStore[:contract_input] = input #if RequestStore[:contract_input].nil?
-    RequestStore[:contract_root] = self #if RequestStore[:contract_root].nil?
-    RequestStore[:contract_parent] = self
-    result = super(input)
-    RequestStore[:contract_root] = nil
-    RequestStore[:contract_input] = nil
-    RequestStore[:contract_parent] = nil
-    result
+  # Build the JSON input from the current state of the form
+  def to_form
+    self.class.to_form(self)
   end
 
 end

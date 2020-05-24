@@ -157,6 +157,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
     entities = entity.entities
 
     lambda do |*args|
+      Forms::Contracts::Helpers::SetupBase.(self)
       Forms::Contracts::Builders::CustomField.(self, entities.custom_fields) if entity.associate_custom_fields
 
       entities.each do |ent|

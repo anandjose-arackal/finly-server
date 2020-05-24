@@ -3,7 +3,9 @@ class Forms::Contracts::Builders::Form
   def self.call(form, user)
     # FixMe : proper inclusion of conditions, validations and dependencies to avoid N+1
     sections = form.sections.includes(entities: {entities: {entities: {entities: [:entities]}}})
-    Class.new(Reform::Form) do
+    Class.new(Forms::Contracts::Base) do
+
+      Forms::Contracts::Helpers::SetupBase.(self)
 
       if form.model.has_attribute?(:created_by)
         property :created_by, deserializer: -> (input, represented, **) do
