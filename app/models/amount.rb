@@ -345,7 +345,7 @@ class Amount < ApplicationRecord
     end
     date = date.strftime("%Y-%m-%d")
     update_hash = {}
-    rate = CurrencyConversionRate.find_by(date: date)
+    rate = CurrencyConversionRate.find_by(date: date) || CurrencyConversionRate.last
     if rate.nil?
       # calculate the respective currency rate for the date in question
       params = {date: Date.parse(date).strftime("%Y-%m-%d")} rescue nil

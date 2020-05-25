@@ -106,7 +106,8 @@ class ExportManager::Master::Reports::Index < ExportManager::Builders::Spreadshe
   end
 
   def report_status_name(expense)
-    expense.report.status&.name
+    status_name(expense.report)
+    # expense.report.status&.name
   end
 
   def report_creator(expense)
@@ -250,6 +251,17 @@ class ExportManager::Master::Reports::Index < ExportManager::Builders::Spreadshe
 
   def finance_approved_date(expense)
     expense.report&.approved_at&.strftime("%d-%b-%Y")
+  end
+
+  def status_name(report)
+    return nil if report.blank?
+    if report.processing? and report.controlling_user?(user)
+      'Awaiting Approval'
+    elsif report.auto_approved?
+      'Auto Approved'
+    else
+      report.status_name
+    end
   end
 
 end
