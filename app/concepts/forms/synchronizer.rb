@@ -12,12 +12,8 @@ class Forms::Synchronizer
     Company.limit(2).last(1).each do |company|
       user = company.users.first
       # Synchronize form
-      company_form = template.sync(company_id: company.id, user: user)
-      dependency_form = dependency_template.sync(company_id: company.id, user: user)
-      # Synchronize dependencies
-      # master.dependencies.each do |dependency_id, dependency|
-      #   dependency.sync(company.users.first, master, company_form)
-      # end
+      template.sync(company_id: company.id, user: user)
+      dependency_template.sync(company_id: company.id, user: user)
     end
   end
 

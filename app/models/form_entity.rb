@@ -148,7 +148,7 @@ class FormEntity < ApplicationRecord
         compute: {
             enabled: compute_enabled,
             type: compute_type&.name,
-            lookup: compute_lookup_entity_path,
+            lookup: compute_lookup_entity&.entity_path,
             formula: compute_formula
         },
         properties: {
