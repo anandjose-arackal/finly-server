@@ -5,6 +5,8 @@ class Forms::Rules::Ransack
 
     data = JSON.load(data) if data.is_a?(String)
     data = data.with_indifferent_access unless data.is_a?(ActiveSupport::HashWithIndifferentAccess)
+    data = data[:g] if data[:g].present?
+
     if Forms::Rules::Constants::LOGICAL_OPERATORS.include?(data[:m].to_s)
       rule = nil
       data[:c].each_pair do |pos, d|
@@ -22,7 +24,11 @@ class Forms::Rules::Ransack
       value = data&.dig('v', '0', 'value')
       formula = data&.dig('f')
       entity = data&.dig('e')
-      Forms::Rules::Operator.new(attribute).send(predicate, type: type, value: value, formula: formula, entity: entity)
+      begin
+        Forms::Rules::Operator.new(attribute).send(predicate, type: type, value: value, formula: formula, entity: entity)
+      rescue
+        debugger
+      end
     end
   end
 

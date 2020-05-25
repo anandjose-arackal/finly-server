@@ -20,11 +20,17 @@ class Forms::Rules::Rule
     Forms::Rules::Ransack.as_json(self)
   end
 
-  def as_ransack(options={})
-    as_json(mode: 'ransack')
+  def as_ransack(options = {})
+    json = as_json(mode: 'ransack')
+    if json[:m].present?
+      json = {g: json}
+    else
+      json = {g: {m: 'and', c: {'0' => json}}}
+    end
+    json
   end
 
-  def as_json_logic(options={})
+  def as_json_logic(options = {})
     as_json(mode: 'json_logic')
   end
 
