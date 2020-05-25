@@ -44,7 +44,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
       editable = result['editable']
       visible = result['visible']
       if editable and visible and row_data.has_key?(entity.entity_key)
-        value = row_data[entity.entity_key] # || entity.default_value
+        value = self.row_input[entity.entity_key] # || entity.default_value
         send("#{entity.entity_key}=", value)
       end
 
