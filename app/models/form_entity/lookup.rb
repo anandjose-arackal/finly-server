@@ -54,4 +54,7 @@ class FormEntity::Lookup < FormEntity
   set :hint, 'Select value'
 
   operators :eq_any#, :blank, :present
+
+  has_many :lookup_filters, class_name: 'FormEntityLookupFilter', foreign_key: :form_entity_id
+
 end

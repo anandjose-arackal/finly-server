@@ -10,11 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-<<<<<<< HEAD
-ActiveRecord::Schema.define(version: 2020_05_17_121018) do
-=======
-ActiveRecord::Schema.define(version: 2020_05_19_151632) do
->>>>>>> b132e7adbdbbfef2a631bc754403a1e30b2553e0
+ActiveRecord::Schema.define(version: 2020_05_25_131716) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3845,10 +3841,7 @@ ActiveRecord::Schema.define(version: 2020_05_19_151632) do
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-<<<<<<< HEAD
-=======
     t.boolean "internal"
->>>>>>> b132e7adbdbbfef2a631bc754403a1e30b2553e0
     t.index ["company_id"], name: "index_form_choice_dependencies_on_company_id"
     t.index ["controlling_entity_id"], name: "index_form_choice_dependencies_on_controlling_entity_id"
     t.index ["created_at"], name: "index_form_choice_dependencies_on_created_at"
@@ -3909,11 +3902,6 @@ ActiveRecord::Schema.define(version: 2020_05_19_151632) do
     t.string "uuid", limit: 36, null: false
     t.bigint "company_id", null: false
     t.string "form_id", null: false
-<<<<<<< HEAD
-    t.string "reference_key", null: false
-    t.string "reference_type", null: false
-=======
->>>>>>> b132e7adbdbbfef2a631bc754403a1e30b2553e0
     t.integer "created_by_id"
     t.integer "updated_by_id"
     t.datetime "deleted_at"
@@ -3925,22 +3913,14 @@ ActiveRecord::Schema.define(version: 2020_05_19_151632) do
     t.boolean "is_updated"
     t.boolean "can_be_updated"
     t.text "rule"
-<<<<<<< HEAD
-=======
     t.string "referencable_id", null: false
     t.string "referencable_type", null: false
->>>>>>> b132e7adbdbbfef2a631bc754403a1e30b2553e0
     t.index ["company_id"], name: "index_form_conditions_on_company_id"
     t.index ["created_at"], name: "index_form_conditions_on_created_at"
     t.index ["created_by_id"], name: "index_form_conditions_on_created_by_id"
     t.index ["deleted_at"], name: "index_form_conditions_on_deleted_at"
     t.index ["form_id"], name: "index_form_conditions_on_form_id"
-<<<<<<< HEAD
-    t.index ["reference_key"], name: "index_form_conditions_on_reference_key"
-    t.index ["reference_type"], name: "index_form_conditions_on_reference_type"
-=======
     t.index ["referencable_id", "referencable_type"], name: "index_form_conditions_on_referencable_id_and_referencable_type"
->>>>>>> b132e7adbdbbfef2a631bc754403a1e30b2553e0
     t.index ["updated_at"], name: "index_form_conditions_on_updated_at"
     t.index ["updated_by_id"], name: "index_form_conditions_on_updated_by_id"
     t.index ["uuid"], name: "index_form_conditions_on_uuid"
@@ -4010,11 +3990,7 @@ ActiveRecord::Schema.define(version: 2020_05_19_151632) do
     t.boolean "compute_enabled"
     t.integer "compute_type_id"
     t.string "compute_formula"
-<<<<<<< HEAD
-    t.string "compute_lookup_entity_path"
-=======
     t.string "compute_lookup_entity_id"
->>>>>>> b132e7adbdbbfef2a631bc754403a1e30b2553e0
     t.index ["company_id"], name: "index_form_entities_on_company_id"
     t.index ["compute_lookup_entity_id"], name: "index_form_entities_on_compute_lookup_entity_id"
     t.index ["created_at"], name: "index_form_entities_on_created_at"
@@ -4061,14 +4037,40 @@ ActiveRecord::Schema.define(version: 2020_05_19_151632) do
     t.index ["updated_at"], name: "index_form_entity_computation_types_on_updated_at"
   end
 
+  create_table "form_entity_lookup_filters", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
+    t.string "form_id", null: false
+    t.string "form_entity_id", null: false
+    t.string "filter_id"
+    t.boolean "custom"
+    t.boolean "internal"
+    t.boolean "is_updated"
+    t.boolean "can_be_updated"
+    t.text "rule"
+    t.integer "created_by_id"
+    t.integer "updated_by_id"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["can_be_updated"], name: "index_form_entity_lookup_filters_on_can_be_updated"
+    t.index ["created_at"], name: "index_form_entity_lookup_filters_on_created_at"
+    t.index ["created_by_id"], name: "index_form_entity_lookup_filters_on_created_by_id"
+    t.index ["custom"], name: "index_form_entity_lookup_filters_on_custom"
+    t.index ["deleted_at"], name: "index_form_entity_lookup_filters_on_deleted_at"
+    t.index ["filter_id"], name: "index_form_entity_lookup_filters_on_filter_id"
+    t.index ["form_entity_id"], name: "index_form_entity_lookup_filters_on_form_entity_id"
+    t.index ["form_id"], name: "index_form_entity_lookup_filters_on_form_id"
+    t.index ["internal"], name: "index_form_entity_lookup_filters_on_internal"
+    t.index ["is_updated"], name: "index_form_entity_lookup_filters_on_is_updated"
+    t.index ["updated_at"], name: "index_form_entity_lookup_filters_on_updated_at"
+    t.index ["updated_by_id"], name: "index_form_entity_lookup_filters_on_updated_by_id"
+    t.index ["uuid"], name: "index_form_entity_lookup_filters_on_uuid"
+  end
+
   create_table "form_entity_validations", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "uuid", limit: 36, null: false
     t.bigint "company_id", null: false
     t.string "form_id", null: false
-<<<<<<< HEAD
-    t.string "entity_path", null: false
-=======
->>>>>>> b132e7adbdbbfef2a631bc754403a1e30b2553e0
     t.string "error_message", null: false
     t.integer "created_by_id"
     t.integer "updated_by_id"
@@ -4081,18 +4083,11 @@ ActiveRecord::Schema.define(version: 2020_05_19_151632) do
     t.boolean "is_updated"
     t.boolean "can_be_updated"
     t.text "rule"
-<<<<<<< HEAD
-=======
     t.string "form_entity_id", null: false
->>>>>>> b132e7adbdbbfef2a631bc754403a1e30b2553e0
     t.index ["company_id"], name: "index_form_entity_validations_on_company_id"
     t.index ["created_at"], name: "index_form_entity_validations_on_created_at"
     t.index ["created_by_id"], name: "index_form_entity_validations_on_created_by_id"
     t.index ["deleted_at"], name: "index_form_entity_validations_on_deleted_at"
-<<<<<<< HEAD
-    t.index ["entity_path"], name: "index_form_entity_validations_on_entity_path"
-=======
->>>>>>> b132e7adbdbbfef2a631bc754403a1e30b2553e0
     t.index ["form_id"], name: "index_form_entity_validations_on_form_id"
     t.index ["updated_at"], name: "index_form_entity_validations_on_updated_at"
     t.index ["updated_by_id"], name: "index_form_entity_validations_on_updated_by_id"
@@ -4708,6 +4703,7 @@ ActiveRecord::Schema.define(version: 2020_05_19_151632) do
     t.index ["amount_id"], name: "index_invoice_line_items_on_amount_id"
     t.index ["category_id"], name: "index_invoice_line_items_on_category_id"
     t.index ["cost_center_id"], name: "index_invoice_line_items_on_cost_center_id"
+    t.index ["deleted_at"], name: "index_invoice_line_items_on_deleted_at"
     t.index ["department_id"], name: "index_invoice_line_items_on_department_id"
     t.index ["discount_amount_id"], name: "index_invoice_line_items_on_discount_amount_id"
     t.index ["gst_type_id"], name: "index_invoice_line_items_on_gst_type_id"
@@ -4715,6 +4711,8 @@ ActiveRecord::Schema.define(version: 2020_05_19_151632) do
     t.index ["invoice_id"], name: "index_invoice_line_items_on_invoice_id"
     t.index ["net_amount_id"], name: "index_invoice_line_items_on_net_amount_id"
     t.index ["parent_id", "parent_type"], name: "index_invoice_line_items_on_parent_id_and_parent_type"
+    t.index ["parent_id"], name: "index_invoice_line_items_on_parent_id"
+    t.index ["parent_type"], name: "index_invoice_line_items_on_parent_type"
     t.index ["purchase_order_item_id"], name: "index_invoice_line_items_on_purchase_order_item_id"
     t.index ["tax_amount_id"], name: "index_invoice_line_items_on_tax_amount_id"
     t.index ["tax_rate_id"], name: "index_invoice_line_items_on_tax_rate_id"

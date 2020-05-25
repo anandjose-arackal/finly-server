@@ -14,7 +14,6 @@ class Templates::API
   def sync(params)
     # context = {params: params, templates: self.class.templates, template: template, parent: root_record, root_record: root_record}
     root_record = Templates::Builder.(template: template, params: params, api: self, template: template, &self.class.root)
-    root_record.save unless root_record.persisted?
     root_record
   end
 

@@ -6,6 +6,7 @@ class Forms::API
   class_attr :conditions, default: {}
   class_attr :validations, default: {}
   class_attr :dependencies, default: {}
+  class_attr :lookup_filters, default: {}
   class_attr :model
 
   def self.form
@@ -40,7 +41,7 @@ class Forms::API
   end
   singleton_class.send(:alias_method, :validate, :validation)
 
-  def self.choice_dependency(params, &block)
+  def self.choice_dependency(params = {}, &block)
     return unless ActiveRecord::Base.connection.table_exists?('form_choice_dependencies')
 
     # dependency = Forms::API::ChoiceDependency.new(params, &block)
@@ -52,16 +53,27 @@ class Forms::API
     form.choice_dependencies << dependency
   end
 
-  def self.find_entity(entity_path)
-    sections.each do |section|
-      entity = section.find_entity entity_path
-      return entity if entity
+  def self.lookup_filter(params = {}, &block)
+    return unless ActiveRecord::Base.connection.table_exists?('form_entity_lookup_filters')
+
+    lookup_filter = FormEntityLookupFilter.system_lookup_filter(params, &block)
+    if lookup_filters[lookup_filter.filter_id].present?
+      raise "Lookup Filter #{lookup_filter.filter_id} is not unique"
     end
-    nil
+    lookup_filters[lookup_filter.filter_id] = lookup_filter
+    form.lookup_filters << lookup_filter
   end
 
-  def self.fetch(user)
-    ::Form.find_by(company_id: user.company_id, klass_name: self.name)
-  end
+  # def self.find_entity(entity_path)
+  #   sections.each do |section|
+  #     entity = section.find_entity entity_path
+  #     return entity if entity
+  #   end
+  #   nil
+  # end
+  #
+  # def self.fetch(user)
+  #   ::Form.find_by(company_id: user.company_id, klass_name: self.name)
+  # end
 
 end
