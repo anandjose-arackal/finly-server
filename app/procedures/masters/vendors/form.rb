@@ -11,7 +11,7 @@ class Masters::Vendors::Form < Forms::API
            choices_scope: Choices[:lookup].('policies', permissions: [:vendor_creator, :vendor_manager]),
            required: true
     lookup :department_id, choices_scope: Choices[:lookup].('departments'), editable: false, visible: false,
-           filters: Rules::Builder[:name].cont(value: 'Test')
+           filters: Rules::Builder[:name].cont(value: 'Bangalore')
     lookup :cost_center_id, choices_scope: Choices[:lookup].('cost_centers')
     text :legal_name, computed: Forms::Compute::Lookup('policy_id', '{{record.name}}'), editable: false
     text :business_name
