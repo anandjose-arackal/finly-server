@@ -1218,15 +1218,18 @@ class Payment < ApplicationRecord
   def calculate_tds_applicable_sum(document)
     amount_arr = []
     case document.class.name
+    
     when 'Invoice'
       # Get value from line items
+      
       if ["non_po_invoice", "recurring_invoice", "agreement_invoice"].include?(document.invoice_type.name)
-        document.items.joins(:inventory_line_item).where('items.tds_applicable = ?', true).each do |item|
+        document.items.where('tds_applicable = ?', true).each do |item|
           amount_arr << item.taxable_amount&.value
         end
+
       elsif document.invoice_type.name == 'tax_invoice'
-        document.items.joins(:inventory_line_item).where('items.tds_applicable = ?', true).each do |item|
-          if item.inventory_line_item.product_type.goods?
+        document.items.where('tds_applicable = ?', true).each do |item|
+          if item.product_type.goods?
             amount_arr << item.taxable_amount&.value
           else
             amount_arr << item.billable_amount&.value

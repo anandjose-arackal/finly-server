@@ -22,13 +22,13 @@ config/yes_bank_config.yml
 config/mailer_config.yml
 config/redis_config.yml
 config/gstin_verification_config.yml
-config/insights_config.yml
 config/bbps_config.yml
 config/web_client.yml
+config/icici_prepaid_card.yml
+
 .rubocop.yml
 .vscode/
 reference_resource_migration.log
-config/web_client.yml
 
 # Ignore all logfiles and tempfiles.
 /log/*
@@ -59,7 +59,6 @@ public/system/vendor_attachments/*
 /Sample transactions
 /sample_bank_transfer.xls
 config/data/bypass_authorized_users.yml
-config/gstin_verification_config.yml
 config/hutch.yml
 public/system/temporary_files/
 public/system/admin_implementation_requests/*
@@ -81,9 +80,7 @@ dump.rdb
 .idea/
 config/secure_storage_config.yml
 config/elastic_apm.yml
-config/deploy/config/*
 config/sidekiq.yml
-config/hutch.yml
 .ruby-version
 
 public/tmp
