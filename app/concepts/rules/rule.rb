@@ -1,4 +1,4 @@
-class Forms::Rules::Rule
+class Rules::Rule
   attr_accessor :input, :operator, :rule_value
 
   def initialize(input, operator, rule_value)
@@ -7,17 +7,31 @@ class Forms::Rules::Rule
     self.rule_value = rule_value
   end
 
-  Forms::Rules::Constants::LOGICAL_OPERATORS.each do |operator|
+  Rules::Constants::LOGICAL_OPERATORS.each do |operator|
     define_method operator do |rule|
-      Forms::Rules::Rule.new(self, operator, rule)
+      Rules::Rule.new(self, operator, rule)
     end
   end
 
   def as_json(options = {})
-    if options[:mode].to_s == 'json_logic'
-      return Forms::Rules::JSONLogic.as_json(self)
+    case options[:mode].to_s
+    when 'json_logic'
+      Rules::Adapters::JSONLogic.as_json(self)
+    when 'ransack'
+      Rules::Adapters::Ransack.as_json(self)
+    else
+      Rules::Adapters::Store.as_json(self)
     end
-    Forms::Rules::Ransack.as_json(self)
+  end
+
+  def as_store(options = {})
+    json = as_json(mode: 'store')
+    if json[:m].present?
+      json = {g: json}
+    else
+      json = {g: {m: 'and', c: {'0' => json}}}
+    end
+    json
   end
 
   def as_ransack(options = {})
@@ -27,7 +41,8 @@ class Forms::Rules::Rule
     else
       json = {g: {m: 'and', c: {'0' => json}}}
     end
-    json
+    data = options[:data] || {}
+    LiquidHelper.interpolate json, data
   end
 
   def as_json_logic(options = {})

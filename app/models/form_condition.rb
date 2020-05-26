@@ -32,7 +32,7 @@ class FormCondition < ApplicationRecord
 
   has_many :actions, class_name: 'FormConditionAction'
 
-  serialize :rule, Forms::Rules::Ransack
+  serialize :rule, Rules::Adapters::Store
 
   def self.system_condition(params = {}, &block)
     params[:custom] = false
@@ -59,7 +59,7 @@ class FormCondition < ApplicationRecord
   end
 
   def rule_builder
-    @rule_builder ||= Forms::Rules::Builder.new
+    @rule_builder ||= Rules::Builder.new
   end
 
   def rule(rule=NoObject)

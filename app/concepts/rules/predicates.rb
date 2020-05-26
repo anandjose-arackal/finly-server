@@ -1,4 +1,4 @@
-module Forms::Rules::Predicates
+module Rules::Predicates
 
   class Predicate
     attr_accessor :name, :any, :all, :block

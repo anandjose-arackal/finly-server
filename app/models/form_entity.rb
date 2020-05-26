@@ -47,6 +47,7 @@
 #  compute_type_id              :integer
 #  compute_formula              :string(255)
 #  compute_lookup_entity_id     :string(255)
+#  filters                      :text(65535)
 #
 
 class FormEntity < ApplicationRecord
@@ -97,6 +98,8 @@ class FormEntity < ApplicationRecord
   scope :system_fields, -> { where.not custom_field: true }
   scope :custom_fields, -> { where custom_field: true }
   scope :exclude_internal, -> { where.not internal: true }
+
+  serialize :filters, Rules::Adapters::Store
 
   def populate_if_empty
     val = super()

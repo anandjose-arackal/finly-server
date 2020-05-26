@@ -81,16 +81,5 @@ class Forms::Template < Templates::API
         set :form_entity, builder_context.root_record.find_entity(builder_context.template.template_reference[:entity_path])
       end
     end
-
-    association :lookup_filters do
-      matcher do |template, record|
-        record.filter_id == template.filter_id
-      end
-      clone do |builder_context|
-        set :company_id, builder_context.params[:company_id]
-        set :form, builder_context.root_record
-        set :form_entity, builder_context.root_record.find_entity(builder_context.template.template_reference[:entity_path])
-      end
-    end
   end
 end

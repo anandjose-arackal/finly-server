@@ -96,7 +96,7 @@ class Filters::Schema::Validation
       required(:v).hash
     end
 
-    PREDICATES = Forms::Rules::Constants::PREDICATES
+    PREDICATES = Rules::Constants::PREDICATES
 
     # PREDICATES = %w(
     #   eq eq_any eq_all

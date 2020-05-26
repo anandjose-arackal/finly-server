@@ -1,4 +1,4 @@
-class Forms::Rules::Constants
+class Rules::Constants
   LOGICAL_OPERATORS = %w(and or).freeze
   PREDICATES = %w(
       eq eq_any eq_all

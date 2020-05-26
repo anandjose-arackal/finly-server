@@ -31,7 +31,7 @@ class FormRule < ApplicationRecord
 
   delegate 'value?', 'entity?', 'formula?', to: :rule_type
 
-  validates :predicate, inclusion: {in: Forms::Rules::Constants::PREDICATES}
+  validates :predicate, inclusion: {in: Rules::Constants::PREDICATES}
 
   # def nested_hash_value(obj, key)
   #   if obj.respond_to?(:key?) && obj.key?(key)

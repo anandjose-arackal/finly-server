@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_25_131716) do
+ActiveRecord::Schema.define(version: 2020_05_25_161939) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3991,6 +3991,7 @@ ActiveRecord::Schema.define(version: 2020_05_25_131716) do
     t.integer "compute_type_id"
     t.string "compute_formula"
     t.string "compute_lookup_entity_id"
+    t.text "filters"
     t.index ["company_id"], name: "index_form_entities_on_company_id"
     t.index ["compute_lookup_entity_id"], name: "index_form_entities_on_compute_lookup_entity_id"
     t.index ["created_at"], name: "index_form_entities_on_created_at"
@@ -4035,36 +4036,6 @@ ActiveRecord::Schema.define(version: 2020_05_25_131716) do
     t.index ["deleted_at"], name: "index_form_entity_computation_types_on_deleted_at"
     t.index ["name"], name: "index_form_entity_computation_types_on_name"
     t.index ["updated_at"], name: "index_form_entity_computation_types_on_updated_at"
-  end
-
-  create_table "form_entity_lookup_filters", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.string "uuid", limit: 36, null: false
-    t.string "form_id", null: false
-    t.string "form_entity_id", null: false
-    t.string "filter_id"
-    t.boolean "custom"
-    t.boolean "internal"
-    t.boolean "is_updated"
-    t.boolean "can_be_updated"
-    t.text "rule"
-    t.integer "created_by_id"
-    t.integer "updated_by_id"
-    t.datetime "deleted_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["can_be_updated"], name: "index_form_entity_lookup_filters_on_can_be_updated"
-    t.index ["created_at"], name: "index_form_entity_lookup_filters_on_created_at"
-    t.index ["created_by_id"], name: "index_form_entity_lookup_filters_on_created_by_id"
-    t.index ["custom"], name: "index_form_entity_lookup_filters_on_custom"
-    t.index ["deleted_at"], name: "index_form_entity_lookup_filters_on_deleted_at"
-    t.index ["filter_id"], name: "index_form_entity_lookup_filters_on_filter_id"
-    t.index ["form_entity_id"], name: "index_form_entity_lookup_filters_on_form_entity_id"
-    t.index ["form_id"], name: "index_form_entity_lookup_filters_on_form_id"
-    t.index ["internal"], name: "index_form_entity_lookup_filters_on_internal"
-    t.index ["is_updated"], name: "index_form_entity_lookup_filters_on_is_updated"
-    t.index ["updated_at"], name: "index_form_entity_lookup_filters_on_updated_at"
-    t.index ["updated_by_id"], name: "index_form_entity_lookup_filters_on_updated_by_id"
-    t.index ["uuid"], name: "index_form_entity_lookup_filters_on_uuid"
   end
 
   create_table "form_entity_validations", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|

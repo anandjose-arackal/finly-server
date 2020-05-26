@@ -6,7 +6,6 @@ class Forms::API
   class_attr :conditions, default: {}
   class_attr :validations, default: {}
   class_attr :dependencies, default: {}
-  class_attr :lookup_filters, default: {}
   class_attr :model
 
   def self.form
@@ -51,17 +50,6 @@ class Forms::API
     end
     dependencies[dependency.dependency_id] = dependency
     form.choice_dependencies << dependency
-  end
-
-  def self.lookup_filter(params = {}, &block)
-    return unless ActiveRecord::Base.connection.table_exists?('form_entity_lookup_filters')
-
-    lookup_filter = FormEntityLookupFilter.system_lookup_filter(params, &block)
-    if lookup_filters[lookup_filter.filter_id].present?
-      raise "Lookup Filter #{lookup_filter.filter_id} is not unique"
-    end
-    lookup_filters[lookup_filter.filter_id] = lookup_filter
-    form.lookup_filters << lookup_filter
   end
 
   # def self.find_entity(entity_path)

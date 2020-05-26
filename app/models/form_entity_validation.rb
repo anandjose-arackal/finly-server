@@ -30,7 +30,7 @@ class FormEntityValidation < ApplicationRecord
   belongs_to :created_by, class_name: 'User', optional: true
   belongs_to :updated_by, class_name: 'User', optional: true
 
-  serialize :rule, Forms::Rules::Ransack
+  serialize :rule, Rules::Adapters::Store
 
   delegate :entity_path, to: :form_entity
 
@@ -48,7 +48,7 @@ class FormEntityValidation < ApplicationRecord
   end
 
   def rule_builder
-    @rule_builder ||= Forms::Rules::Builder.new
+    @rule_builder ||= Rules::Builder.new
   end
 
   def rule(rule=NoObject)

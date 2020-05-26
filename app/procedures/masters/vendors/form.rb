@@ -62,9 +62,4 @@ class Masters::Vendors::Form < Forms::API
     dependency "Company (Default)", ["test1"]
   end
 
-  lookup_filter filter_id: :department_lookup_filter do
-    reference 'department_id'
-    rule rule_builder['name'].not_cont(value: "Hello")
-  end
-
 end

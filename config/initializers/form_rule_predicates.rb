@@ -1,1 +1,1 @@
-Forms::Rules::Predicates.setup
+Rules::Predicates.setup

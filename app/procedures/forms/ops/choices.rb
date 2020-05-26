@@ -42,6 +42,12 @@ class Forms::Ops::Choices < Transactions::API
     true
   end
 
+  def init_lookup_filters(context, entity:, **)
+    return true unless entity.class.name == "FormEntity::Lookup"
+
+    entity.filters.as_ransack
+  end
+
   def init_choice_dependencies(context, model:, entity:, params:, **)
     return unless params[:form_data].present? or params[:row_data].present?
 
