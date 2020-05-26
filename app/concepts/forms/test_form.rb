@@ -15,30 +15,30 @@ class Forms::TestForm < Forms::API
 
   condition condition_id: :last_name_editable do
     reference :entity, :last_name
-    rule rule_builder[:first_name].cont(value: 'Han')
+    rule Rules::Builder[:first_name].cont(value: 'Han')
     action :editable, true
   end
 
   condition condition_id: :last_name_required do
     reference :entity, :last_name
-    rule rule_builder[:first_name].cont(value: 'Han')
+    rule Rules::Builder[:first_name].cont(value: 'Han')
     action :required, true
   end
   condition condition_id: :pan_required do
     reference :entity, 'profile/pan'
-    rule rule_builder[:first_name].cont(value: 'Han').or(rule_builder[:last_name].eq(value: "Solo"))
+    rule Rules::Builder[:first_name].cont(value: 'Han').or(Rules::Builder[:last_name].eq(value: "Solo"))
     action :required, true
   end
 
   validation validation_id: :first_name_value do
     reference :first_name
-    rule rule_builder[:first_name].eq(value: "Hann")
+    rule Rules::Builder[:first_name].eq(value: "Hann")
     error_message "is a bad name"
   end
 
   validation validation_id: :pan_value do
     reference 'profile/pan'
-    rule rule_builder['row.pan'].eq(value: "123")
+    rule Rules::Builder['row.pan'].eq(value: "123")
     error_message "is not legal"
   end
 

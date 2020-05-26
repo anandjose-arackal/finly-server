@@ -15,6 +15,7 @@ class Forms::Ops::Choices < Transactions::API
   step :find_model
   step Policy::Pundit(Forms::Policy, :config?)
   step :init_entity
+  pass :init_lookup_filters
   pass :init_choice_dependencies
   pass :scope_choices
   pass :scope_user
@@ -42,10 +43,11 @@ class Forms::Ops::Choices < Transactions::API
     true
   end
 
-  def init_lookup_filters(context, entity:, **)
-    return true unless entity.class.name == "FormEntity::Lookup"
+  def init_lookup_filters(context, params:, current_user:, entity:, **)
+    return unless entity.class.name == 'FormEntity::Lookup'
+    return unless entity.filters.present?
 
-    entity.filters.as_ransack
+    params[:qa] = entity.filters.as_ransack(data: {form: params[:form_data], row: params[:row_data]})
   end
 
   def init_choice_dependencies(context, model:, entity:, params:, **)

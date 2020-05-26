@@ -57,9 +57,6 @@ class Forms::Template < Templates::API
       clone do |builder_context|
         set :company_id, builder_context.params[:company_id]
         set :form, builder_context.root_record
-        if builder_context.root_record.find_entity(template.template_reference[:reference_key]).blank?
-          debugger
-        end
         set :referencable, builder_context.root_record.find_entity(builder_context.template.template_reference[:reference_key])
       end
 

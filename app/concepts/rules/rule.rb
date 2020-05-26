@@ -27,9 +27,9 @@ class Rules::Rule
   def as_store(options = {})
     json = as_json(mode: 'store')
     if json[:m].present?
-      json = {g: json}
+      json = {g: {'0': json}}
     else
-      json = {g: {m: 'and', c: {'0' => json}}}
+      json = {g: {'0': {m: 'and', c: {'0' => json}}}}
     end
     json
   end
@@ -37,9 +37,9 @@ class Rules::Rule
   def as_ransack(options = {})
     json = as_json(mode: 'ransack')
     if json[:m].present?
-      json = {g: json}
+      json = {g: {'0': json}}
     else
-      json = {g: {m: 'and', c: {'0' => json}}}
+      json = {g: {'0': {m: 'and', c: {'0' => json}}}}
     end
     data = options[:data] || {}
     LiquidHelper.interpolate json, data

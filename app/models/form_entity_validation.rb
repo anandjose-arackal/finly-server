@@ -47,10 +47,6 @@ class FormEntityValidation < ApplicationRecord
     validation
   end
 
-  def rule_builder
-    @rule_builder ||= Rules::Builder.new
-  end
-
   def rule(rule=NoObject)
     self.rule = rule unless rule == NoObject
     super()
