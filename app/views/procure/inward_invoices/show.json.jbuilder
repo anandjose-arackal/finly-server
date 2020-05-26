@@ -180,7 +180,7 @@ json.invoice do
 
       json.item_number item.inventory_line_item&.item_number rescue nil
       json.gl_code item.inventory_line_item&.category.gl_code rescue nil
-      json.tds_applicable (item.inventory_line_item&.tds_applicable) ? "yes" : "no"
+      json.tds_applicable (item&.tds_applicable) ? "yes" : "no"
 
 
       json.tax_amount precision_value item.tax_amount&.value
