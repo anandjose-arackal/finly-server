@@ -2,7 +2,7 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
   include DynamicAttributes
 
   system_subscription :vp
-  permissions :bank_payment_request_initiator, :bank_payment_request_reviewer, :bank_payment_request_creditor, :auditor, :admin
+  permissions :bank_payment_request_initiator, :bank_payment_request_reviewer, :bank_payment_request_creditor, :bank_payment_request_auditor, :auditor, :admin
   resolver 'payment_tickets.default'
   reference '{{record.id}}'
 
