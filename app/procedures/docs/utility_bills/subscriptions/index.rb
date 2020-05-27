@@ -2,7 +2,7 @@ class Docs::UtilityBills::Subscriptions::Index < IndexBuilder::API
   include DynamicAttributes
 
   system_subscription :vp
-  permissions :utility_bill_master_initiator, :utility_bill_master_reviewer, :admin
+  permissions :utility_bill_initiator, :utility_bill_reviewer, :utility_bill_master_initiator, :utility_bill_master_reviewer, :bank_payment_request_initiator, :admin
   resolver 'utility_subscriptions.default'
   reference '{{record.id}}'
 

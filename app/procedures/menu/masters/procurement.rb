@@ -53,50 +53,41 @@ class Menu::Masters::Procurement < Menu::API
 
   scope features: :purchase_requisition_system do
     item :request, path: 'purchase_requests', icon: 'https://img.icons8.com/windows/20/ffffff/request-money.png',
-         permissions: [:purchase_request_initiator, :purchase_request_reviewer, :admin]
+         permissions: Docs::P2P::PurchaseRequests::Index.permissions
   end
 
   item :procure, icon: 'https://img.icons8.com/windows/20/ffffff/add-shopping-cart.png' do
-    item :purchase_orders, permissions: [:purchase_order_initiator, :purchase_order_reviewer, :purchase_order_auditor, :admin]
+    item :purchase_orders, permissions: Docs::P2P::PurchaseOrders::Index.permissions
     item :pr_approved_items, label: "PR Approved Items", permissions: [:purchase_order_initiator, :admin]
   end
 
-  item :receive, permissions: :goods_receiver, icon: 'https://img.icons8.com/windows/20/ffffff/borrow-book.png' do
+  item :receive, permissions: Docs::P2P::Inwards::Received::Index.permissions, icon: 'https://img.icons8.com/windows/20/ffffff/borrow-book.png' do
     item :receive_pending, path: 'receive'
     item :receive_history, path: 'receive/history'
   end
 
   item :payables, icon: "https://img.icons8.com/windows/20/ffffff/sales-performance.png" do
-    item :po_advances, label: "PO Advances", permissions: [:bank_payment_request_initiator, :auditor, :admin]
-    item :invoices, permissions: [
-        :bank_payment_request_initiator, :invoice_initiator, :invoice_reviewer,
-        :invoice_auditor, :po_invoice_initiator, :po_invoice_reviewer, :po_invoice_auditor,
-        :non_po_invoice_initiator, :non_po_invoice_reviewer, :non_po_invoice_auditor, :admin
-    ]
-    item :utility_bills, permissions: [:utility_bill_initiator, :utility_bill_reviewer, :bank_payment_request_initiator, :admin]
-    item :upcoming_invoices, permissions: [:agreement_invoice_initiator, :agreement_invoice_auditor, :admin]
+    item :po_advances, label: "PO Advances", permissions: Docs::P2P::PurchaseOrders::Advances::Index.permissions
+    item :invoices, permissions: Docs::P2P::Invoices::Index.permissions
+    item :utility_bills, permissions: Docs::UtilityBills::Subscriptions::Index.permissions
+    item :upcoming_invoices, permissions: Docs::P2P::Invoices::Agreement::UpcomingInvoices::Index.permissions
     # item :unbilled_items, permissions: [] # todo
   end
 
   item :payments, icon: "https://img.icons8.com/windows/20/ffffff/online-money-transfer.png" do
-    item :payment_tickets, permissions: [:bank_payment_request_initiator, :bank_payment_request_reviewer, :bank_payment_request_creditor, :auditor, :admin]
-    item :payments, permissions: [:bank_payment_request_initiator, :bank_payment_request_reviewer, :bank_payment_request_creditor, :auditor, :admin]
+    item :payment_tickets, permissions: Docs::PaymentTickets::Index.permissions
+    item :payments, permissions: Docs::PaymentTickets::Payments::Index.permissions
   end
 
   item :manage, icon: 'https://img.icons8.com/windows/20/ffffff/commercial-development-management.png' do
     item :analytics, permissions: [:admin]
-    item :vendors, permissions: [:vendor_creator, :vendor_reviewer, :vendor_manager, :vendor_auditor, :auditor, :admin]
-    item :items, permissions: [:item_master_manager, :inventory_manager, :auditor, :admin]
-    item :rate_contracts, permissions: [:inventory_manager, :auditor, :admin]
-    # user.is_agreement_invoice_initiator? || user.is_agreement_invoice_reviewer? || user.is_agreement_invoice_auditor? ||
-    # user.is_payment_agreement_initiator? || user.vp_admin_or_auditor? || user.is_payment_agreement_auditor? || user.is_payment_agreement_reviewer?
+    item :vendors, permissions: Masters::Vendors::Index.permissions
+    item :items, permissions: Masters::Items::Index.permissions
+    item :rate_contracts, permissions: Masters::RateContracts::Index.permissions
     item :agreements, features: :agreement_based_payment_system,
-         permissions: [
-             :agreement_invoice_initiator, :agreement_invoice_reviewer, :agreement_invoice_auditor,
-             :payment_agreement_initiator, :payment_agreement_reviewer, :payment_agreement_auditor, :auditor, :admin
-         ]
-    item :credit_notes, permissions: [:credit_note_initiator, :credit_note_reviewer, :credit_note_auditor, :admin]
-    item :utility_subscriptions, permissions: [:utility_bill_master_initiator, :utility_bill_master_reviewer, :admin]
+         permissions: Docs::P2P::Agreements::Index.permissions
+    item :credit_notes, permissions: Docs::P2P::CreditNotes::Index.permissions
+    item :utility_subscriptions, permissions: Docs::UtilityBills::Subscriptions::Index.permissions
     item :users, permissions: [:admin]
   end
 
