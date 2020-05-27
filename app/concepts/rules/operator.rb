@@ -7,6 +7,11 @@ class Rules::Operator
 
   Rules::Constants::PREDICATES.each do |predicate|
     define_method predicate do |type: nil, value: nil, formula: nil, entity: nil|
+      if Rules::Constants::NON_VALUE_PREDICATES.include?(predicate)
+        value = 1
+        formula = nil
+        entity = nil
+      end
       type ||= :value if value.present?
       type ||= :formula if formula.present?
       type ||= :entity if entity.present?

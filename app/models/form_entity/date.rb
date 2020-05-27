@@ -54,5 +54,52 @@ class FormEntity::Date < FormEntity
   register :date
   set :hint, "Select date"
 
+  RESTRICTIONS = %w(
+    in_the_future
+    in_the_past
+    not_in_the_future
+    not_in_the_past
+  ).freeze
+
+  option :restriction
+
   operators :gteq_days, :lteq_days, :eq_days, :in_days, :eq_any, :gteq, :lteq, :blank
+
+  contract_eval 'Restriction' do |reform:, entity:, **|
+    if entity.options['restriction'].present?
+      reform.validate do
+        value = reform.send(entity.entity_key)
+        next unless value.present?
+
+        case entity.options['restriction']
+        when 'in_the_future'
+          if value <= DateTime.today.end_of_day
+            errors.add entity.entity_key, "can only be in the future"
+          end
+        when 'in_the_past'
+          if value >= DateTime.today.end_of_day
+            errors.add entity.entity_key, "can only be in the past"
+          end
+        when 'not_in_the_future'
+          if value > DateTime.today.end_of_day
+            errors.add entity.entity_key, "cannot be in the future"
+          end
+        when 'not_in_the_past'
+          if value < DateTime.today.end_of_day
+            errors.add entity.entity_key, "cannot be in the past"
+          end
+        else
+          # Do nothing
+        end
+      end
+    end
+  end
+
+  schema_validation do
+    required(:options) do
+      hash do
+        optional(:restriction).value(included_in?: RESTRICTIONS)
+      end
+    end
+  end
 end

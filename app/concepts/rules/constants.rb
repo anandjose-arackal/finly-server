@@ -24,4 +24,13 @@ class Rules::Constants
       null
       not_null
     ).freeze
+
+  NON_VALUE_PREDICATES = %w(
+      true
+      false
+      present
+      blank
+      null
+      not_null
+  ).freeze
 end
