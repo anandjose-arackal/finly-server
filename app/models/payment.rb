@@ -749,7 +749,7 @@ class Payment < ApplicationRecord
     return self.reference_resources.first&.utr || self.reference_resource&.utr
   end
 
-  private
+  # private
 
   def recalculate_order_summary
     self.payment_order&.update_requested_amount
@@ -1174,10 +1174,13 @@ class Payment < ApplicationRecord
 
       elsif document.invoice_type.name == 'tax_invoice'
         document.items.where('tds_applicable = ?', true).each do |item|
-          if item.product_type.goods?
-            amount_arr << item.taxable_amount&.value
-          else
-            amount_arr << item.billable_amount&.value
+          master_item = item.inventory_line_item
+          if master_item.present?
+            if master_item.product_type.goods?
+              amount_arr << item.taxable_amount&.value
+            else
+              amount_arr << item.billable_amount&.value
+            end
           end
         end
       end
