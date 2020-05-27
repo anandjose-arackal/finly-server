@@ -4,6 +4,7 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
   system_subscription :vp
   permissions :purchase_order_initiator, :purchase_order_reviewer, :purchase_order_auditor,
               :po_invoice_initiator, :po_invoice_reviewer, :po_invoice_auditor,
+              :credit_note_initiator, :credit_note_reviewer, :credit_note_auditor,
               :bank_payment_request_initiator, :bank_payment_request_reviewer, :bank_payment_request_creditor, :bank_payment_request_auditor
               :admin
   resolver 'purchase_orders.default'
