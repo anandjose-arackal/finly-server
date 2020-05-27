@@ -749,7 +749,7 @@ class Payment < ApplicationRecord
     return self.reference_resources.first&.utr || self.reference_resource&.utr
   end
 
-  # private
+  private
 
   def recalculate_order_summary
     self.payment_order&.update_requested_amount
