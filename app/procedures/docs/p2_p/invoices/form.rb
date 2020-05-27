@@ -55,7 +55,11 @@ class Docs::P2P::Invoices::Form < Forms::API
   end
 
   section :line_items do
+    table :line_items do
+      lookup :item_id, choices_scope: Choices[:lookup].('items')
+      text :product_type, editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.product_type}}')
 
+    end
   end
 
   condition condition_id: :receiving_account_type_setter do
