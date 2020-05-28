@@ -24,7 +24,7 @@ class Policy::Mappings::LocationMapping::Index < Policy::Base
 
     def init
       self.policy = params[:policy]
-      self.location_mapping = policy.company.locations.arrange_serializable(order: :name) do |parent, children|
+      self.location_mapping = policy.company.locations.non_deleted.arrange_serializable(order: :name) do |parent, children|
         { id: parent.id,
           name: parent.name,
           ancestry: parent.ancestry,
@@ -33,5 +33,4 @@ class Policy::Mappings::LocationMapping::Index < Policy::Base
       end
     end
   end
-
 end
