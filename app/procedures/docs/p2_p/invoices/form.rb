@@ -72,7 +72,7 @@ class Docs::P2P::Invoices::Form < Forms::API
       number :discount_rate, max_value: 100, min_value: 0
       amount :discount_amount, editable: false, computed: Forms::Compute::Form("{{ row.amount | times: row.discount | divided_by: 100 }}")
       amount :gross_amount, editable: false, computed: Forms::Compute::Form("{{ row.amount | minus: row.discount_amount }}")
-      dropdown :tax_rate_id, choices_scope: Choices[:lookup].('tax_rates'), computed: Forms::Compute::Lookup('inventory_line_item_id', '{{record.tax_rate_id}}')gi
+      dropdown :tax_rate_id, choices_scope: Choices[:lookup].('tax_rates'), computed: Forms::Compute::Lookup('inventory_line_item_id', '{{record.tax_rate_id}}')
       number :tax_rate, editable: false, visible: false, computed: Forms::Compute::Lookup('tax_rate_id', '{{record.rate}}')
       amount :tax_amount, editable: false, computed: Forms::Compute::Form("{{ row.taxable_amount | times: row.discount_amount }}")
       amount :net_amount, editable: false, computed: Forms::Compute::Form("{{ row.gross_amount | minus: row.tax_amount }}")
