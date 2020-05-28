@@ -52,6 +52,8 @@
 
 class FormEntity::Text < FormEntity
 
+  FORMAT = %w(text email).freeze
+
   register :text
   set :hint, 'Enter value'
   option :maximum, default: 255
@@ -74,7 +76,7 @@ class FormEntity::Text < FormEntity
           required(:format).filled
           required(:message).filled
         end
-        optional(:format)
+        optional(:format).value(inclusion?: FORMAT)
       end
     end
   end

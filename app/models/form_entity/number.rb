@@ -54,9 +54,12 @@ class FormEntity::Number < FormEntity
   register :number
   set :hint, 'Enter value'
 
+  FORMAT = %w(number decimal percentage)
+
   option :max_value
   option :min_value
-  option :decimal, default: false
+  # option :decimal, default: false
+  option :format
 
   operators :gteq, :lteq, :in, :not_in, :not_null, :null
 
@@ -65,7 +68,7 @@ class FormEntity::Number < FormEntity
       hash do
         optional(:min_value).value(:int?)
         optional(:max_value).value(:int?)
-        optional(:decimal).value(:bool?)
+        optional(:format).value(inclusion?: FORMAT)
       end
     end
   end

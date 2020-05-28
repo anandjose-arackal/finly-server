@@ -16,7 +16,7 @@ class Docs::P2P::Invoices::Form < Forms::API
            choices_scope: Choices[:lookup].('policies',
                permissions: [:non_po_invoice_initiator]),
            required: true
-    dropdown :cost_allocation, choices_scope: Choices[:list].({id: 1, name: "Header"}, {id: 2, name: "Line Item"}),
+    dropdown :cost_allocation_items, choices_scope: Choices[:list].({id: 1, name: "Header"}, {id: 2, name: "Line Item"}),
              required: true, can_choices_be_changed: false, default_value: 1
     lookup :department_id, choices_scope: Choices[:lookup].('departments') #, editable: false, visible: false
     lookup :cost_center_id, choices_scope: Choices[:lookup].('cost_centers')
@@ -56,16 +56,75 @@ class Docs::P2P::Invoices::Form < Forms::API
 
   section :line_items do
     table :line_items do
-      lookup :item_id, choices_scope: Choices[:lookup].('items')
-      text :product_type, editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.product_type}}')
-
+      lookup :inventory_line_item_id, choices_scope: Choices[:lookup].('items')
+      text :description, editable: false, computed: Forms::Compute::Lookup('inventory_line_item_id', '{{record.description}}')
+      text :comment
+      text :item_number, editable: false, computed: Forms::Compute::Lookup('inventory_line_item_id', '{{record.item_code}}')
+      dropdown :product_type_id, choices_scope: Choices[:enum].(ProductType), editable: false, computed: Forms::Compute::Lookup('inventory_line_item_id', '{{record.product_type_id}}')
+      dropdown :department_id, editable: false, visible: false, choices_scope:  Choices[:lookup].('departments'), computed: Forms::Compute::Form('{{form.department_id}}')
+      dropdown :cost_center_id, editable: false, visible: false, choices_scope:  Choices[:lookup].('cost_centers'), computed: Forms::Compute::Form('{{form.cost_center_id}}')
+      dropdown :category_id, choices_scope:  Choices[:lookup].('categories'), required: true, computed: Forms::Compute::Lookup('inventory_line_item_id', '{{record.category_id}}')
+      text :hsn_sac, computed: Forms::Compute::Lookup('inventory_line_item_id', '{{record.hsn_sac}}')
+      number :quantity, required: true, min_value: 1
+      dropdown :unit_of_measurement, choices_scope: Choices[:list].({id: "KG", value: "KG"})
+      amount :rate, required: true
+      amount :amount, editable: false, visible: false, computed: Forms::Compute::Form("{{ row.rate | times: row.quantity }}")
+      number :discount_rate, max_value: 100, min_value: 0
+      amount :discount_amount, editable: false, computed: Forms::Compute::Form("{{ row.amount | times: row.discount | divided_by: 100 }}")
+      amount :gross_amount, editable: false, computed: Forms::Compute::Form("{{ row.amount | minus: row.discount_amount }}")
+      dropdown :tax_rate_id, choices_scope: Choices[:lookup].('tax_rates'), computed: Forms::Compute::Lookup('inventory_line_item_id', '{{record.tax_rate_id}}')gi
+      number :tax_rate, editable: false, visible: false, computed: Forms::Compute::Lookup('tax_rate_id', '{{record.rate}}')
+      amount :tax_amount, editable: false, computed: Forms::Compute::Form("{{ row.taxable_amount | times: row.discount_amount }}")
+      amount :net_amount, editable: false, computed: Forms::Compute::Form("{{ row.gross_amount | minus: row.tax_amount }}")
     end
   end
 
   condition condition_id: :receiving_account_type_setter do
     reference 'entity', 'receiving_account_type'
-    rule Rules::Builder['due_date'].present
+    rule Rules::Builder['receiving_account_id'].present
     action :active, true
+  end
+
+  condition condition_id: :cost_allocation_department_setter do
+    reference 'entity', 'line_items/department_id'
+    rule Rules::Builder['cost_allocation_items'].true
+    action :visible, true
+    action :editable, true
+  end
+
+  condition condition_id: :cost_allocation_cost_center_setter do
+    reference 'entity', 'line_items/cost_center_id'
+    rule Rules::Builder['cost_allocation_items'].true
+    action :visible, true
+    action :editable, true
+  end
+
+  condition condition_id: :cost_allocation_department_unsetter do
+    reference 'entity', 'line_items/department_id'
+    rule Rules::Builder['cost_allocation_items'].false
+    action :visible, false
+    action :editable, false
+  end
+
+  condition condition_id: :cost_allocation_cost_center_unsetter do
+    reference 'entity', 'line_items/cost_center_id'
+    rule Rules::Builder['cost_allocation_items'].false
+    action :visible, false
+    action :editable, false
+  end
+
+  condition condition_id: :cost_allocation_department_visible_toggle do
+    reference 'entity', 'department_id'
+    rule Rules::Builder['cost_allocation_items'].true
+    action :visible, false
+    action :editable, false
+  end
+
+  condition condition_id: :cost_allocation_cost_center_visible_toggle do
+    reference 'entity', 'cost_center_id'
+    rule Rules::Builder['cost_allocation_items'].true
+    action :visible, false
+    action :editable, false
   end
 
   validation validation_id: :due_date_gteq_invoice_date do
