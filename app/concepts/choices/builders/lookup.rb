@@ -40,6 +40,8 @@ class Choices::Builders::Lookup < Choices::Builders::Base
 
   def build(params: {}, user: {})
     params = params.with_indifferent_access.deep_merge(choice_params.with_indifferent_access)
+    raise "Lookup with route #{route} not found" if klass.blank?
+
     result = klass.(params: params, current_user: user)
 
     partial = result['model.records.json'].size == result['per_page']

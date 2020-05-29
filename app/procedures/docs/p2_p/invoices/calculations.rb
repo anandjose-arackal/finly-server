@@ -16,4 +16,12 @@ class Docs::P2P::Invoices::Calculations
 {{ row.taxable_amount | times: row.discount_amount }}
   CALC
 
+  GROSS_TOTAL = <<-CALC
+{% assign gross_total = 0 %}\
+{% for item in form.line_items %}\
+  {% gross_total = gross_total | plus: item.taxable_amount %}\
+{% endfor %}\
+{{ gross_total }}
+  CALC
+
 end

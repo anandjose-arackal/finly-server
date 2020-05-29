@@ -7,7 +7,10 @@ Lookup::Router.draw do
   route "cost_centers", Masters::CostCenters::Lookup
   route "categories", Masters::Categories::Lookup
   route "vendors", Masters::Vendors::Lookup # Went with singular because plural was already being used by other areas of the app
+  route 'vendor_locations', Masters::Vendors::Locations::Lookup
+  route 'vendor_bank_accounts', Masters::Vendors::BankAccounts::Lookup
   route "items", Masters::Items::Lookup
+  route "tax_rates", Masters::TaxRates::Lookup
   route 'bbps_billers', Docs::UtilityBills::Billers::Lookup
 
   # Docs

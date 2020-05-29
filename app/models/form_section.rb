@@ -37,11 +37,15 @@ class FormSection < ApplicationRecord
   # end
 
   def as_json(options = {})
-    {
+    data = {
         title: title,
         active: active,
         config_path: section_id.to_s,
-        entities: entities.exclude_internal.root.as_json(options.merge({config_path: "#{section_id}/entities"}))
+        entities: {}
     }
+    entities.exclude_internal.root.each do |ent|
+      data[:entities][ent.entity_key] = ent.as_json(options.merge(config_path: "#{section_id}/entities"))
+    end
+    data
   end
 end

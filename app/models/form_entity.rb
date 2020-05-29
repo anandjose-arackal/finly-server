@@ -154,7 +154,7 @@ class FormEntity < ApplicationRecord
             lookup: compute_lookup_entity&.entity_path,
             formula: compute_formula
         },
-        properties: {
+        behavior: {
             editable: editable,
             required: required,
             active: active,
@@ -163,12 +163,12 @@ class FormEntity < ApplicationRecord
         options: options
     }
     if choices_scope.present?
-      data[:choices] = choices_scope.as_json(params: opts["params"], user: opts["current_user"])
+      data[:choices] = choices_scope.build(params: opts[:params], user: opts[:current_user])
     end
     if entities.present?
       data[:entities] = {}
       entities.each do |ent|
-        data[:entities][ent.entity_path] = ent.as_json(opts.merge(config_path: "#{config_path}/entities"))
+        data[:entities][ent.entity_key] = ent.as_json(opts.merge(config_path: "#{config_path}/entities"))
       end
     end
     data
