@@ -93,6 +93,7 @@ class FormEntity < ApplicationRecord
   serialize :options, JSON
   serialize :choices_scope, JSON
   serialize :config, JSON
+  serialize :compute_formula, JSON
 
   scope :root, -> { where parent_id: nil }
   scope :system_fields, -> { where.not custom_field: true }

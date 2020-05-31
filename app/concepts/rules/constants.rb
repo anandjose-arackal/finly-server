@@ -33,4 +33,19 @@ class Rules::Constants
       null
       not_null
   ).freeze
+
+  MATH_PREDICATE_MAP = {
+      '==': 'eq',
+      '=': 'eq',
+      '>=': 'gteq',
+      '<=': 'lteq',
+      '&&': 'and',
+      '||': 'or'
+  }.with_indifferent_access
+
+  MATH_OPERATORS = %w( + - * / % ^ ).freeze
+
+  FUNCTIONS = %w(
+
+  ).freeze
 end

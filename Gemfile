@@ -235,6 +235,7 @@ gem 'fuzzy-string-match', '1.0.1'
 
 gem 'whenever'
 gem 'json_logic', '~> 0.4'
+gem 'kalc'
 gem 'wit', '~> 6.0'
 group :development, :test do
   gem 'byebug'

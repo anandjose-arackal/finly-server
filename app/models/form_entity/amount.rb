@@ -54,12 +54,8 @@ class FormEntity::Amount < FormEntity
   register :amount
   set :hint, 'Amount'
 
-  operators :eq_any, :gteq, :lteq, :blank
+  option :default_currency
+  option :currencies
 
-  # def initialize(section, entity_key, parent_path, opts = {}, &block)
-  #   super(section, entity_key, parent_path, opts.merge(populate_if_empty: ::Amount)) do
-  #     number :value, decimal: true
-  #     number :currency_id, choices_scope: Choices[:enum].(Currency, name: :display_text)
-  #   end
-  # end
+  operators :eq_any, :gteq, :lteq, :blank
 end

@@ -23,7 +23,10 @@ class Rules::Adapters::JSONLogic
 
   def self.as_json(rule)
     json = {}
-    json[rule.operator] = [build_json(rule.input), build_json(rule.rule_value)]
+    operator = Rules::Constants::MATH_PREDICATE_MAP[rule.operator.to_s] || rule.operator.to_s
+    json[operator] = []
+    json[operator] += [build_json(rule.attribute)] if rule.attribute.present?
+    json[operator] += rule.values.map { |value| build_json(value) }
     json
   end
 
@@ -32,10 +35,10 @@ class Rules::Adapters::JSONLogic
   def self.build_json(func)
     if func.class.name == Hash.name
       if func[:value].present?
-        return func[:value]
+        return func[:value].to_s.strip
       else
         var = (func[:formula] || func[:entity]).to_s
-        var = "form.#{var}" unless var.start_with?('form.') or var.start_with?('row.')
+        var = "form.#{var}".strip unless var.start_with?('form.') or var.start_with?('row.')
         return {var: var}.as_json
       end
     end

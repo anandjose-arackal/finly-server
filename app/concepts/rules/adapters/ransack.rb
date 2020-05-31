@@ -5,7 +5,7 @@ class Rules::Adapters::Ransack
 
     data = JSON.load(data) if data.is_a?(String)
     data = data.with_indifferent_access unless data.is_a?(ActiveSupport::HashWithIndifferentAccess)
-    data = data[:g] if data[:g].present?
+    data = data.dig('g', '0') if data['g'].present?
 
     if Rules::Constants::LOGICAL_OPERATORS.include?(data[:m].to_s)
       rule = nil
@@ -37,29 +37,22 @@ class Rules::Adapters::Ransack
   end
 
   def self.as_json(rule)
-    if Rules::Constants::LOGICAL_OPERATORS.include?(rule.operator.to_s)
-      {m: rule.operator, c: {'0' => rule.input.as_json(mode: "ransack"), '1' => rule.rule_value.as_json(mode: "ransack")}}
-    else
+    operator = Rules::Constants::MATH_PREDICATE_MAP[rule.operator.to_s] || rule.operator.to_s
+    if Rules::Constants::PREDICATES.include?(operator)
       values = {}
-      if rule.rule_value[:value].respond_to?(:each)
-        rule.rule_value[:value].each_with_index { |val, index| values[index] = {value: val} }
-      else
-        # case rule.rule_value[:type]
-        # when FormRuleType.id_for(:value)
-        #   value = rule.rule_value[:value]
-        # when FormRuleType.id_for(:formula)
-        #   value = rule.rule_value[:formula]
-        # when FormRuleType.id_for(:entity)
-        #   value = rule.rule_value[:entity]
-        # when FormRuleType.id_for(:none)
-        #   value = 1
-        # else
-        #   value = 1
-        # end
-        value = rule.rule_value[:value] || rule.rule_value[:formula] || rule.rule_value[:entity] || 1
-        values['0'] = { value: value }
+      rule.values.each_with_index { |val, index|
+        value = val[:value] || val[:formula] || val[:entity] || 1
+        values[index.to_s] = {value: value}
+      }
+      {a: {'0': {name: rule.attribute[:entity]}}, p: operator, v: values}
+    else
+      json = {m: operator, c: {}}
+      # index_add = 0
+      # json[:c]['0'] = rule.attribute.as_json(mode: "ransack") if rule.attribute.present?
+      rule.values.each_with_index do |value, index|
+        json[:c][index.to_s] = value.as_json(mode: "ransack")
       end
-      {a: {'0': {name: rule.input[:entity]}}, p: rule.operator, v: values}
+      json
     end
   end
 

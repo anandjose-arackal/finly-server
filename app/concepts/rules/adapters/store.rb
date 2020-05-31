@@ -5,11 +5,12 @@ class Rules::Adapters::Store
 
     data = JSON.load(data) if data.is_a?(String)
     data = data.with_indifferent_access unless data.is_a?(ActiveSupport::HashWithIndifferentAccess)
-    data = data[:g] if data[:g].present?
+    # data = data[:g] if data[:g].present?
+
 
     if Rules::Constants::LOGICAL_OPERATORS.include?(data[:m].to_s)
       rule = nil
-      data[:c].each_pair do |pos, d|
+      data[:c].each do |d|
         if rule.nil?
           rule = Rules::Adapters::Store.load(d)
         else
@@ -18,13 +19,10 @@ class Rules::Adapters::Store
       end
       rule
     else
-      attribute = data&.dig('a', '0', 'name')
+      attribute = data&.dig('a')
       predicate = data&.dig('p')
-      type = data&.dig('t')
-      value = data&.dig('v', '0', 'value')
-      formula = data&.dig('f')
-      entity = data&.dig('e')
-      Rules::Operator.new(attribute).send(predicate, type: type, value: value, formula: formula, entity: entity)
+      values = data&.dig('v')
+      Rules::Operator.new(attribute[:entity]).send(predicate, *values)
     end
   end
 
@@ -33,17 +31,24 @@ class Rules::Adapters::Store
   end
 
   def self.as_json(rule)
+    json = {}
     if Rules::Constants::LOGICAL_OPERATORS.include?(rule.operator.to_s)
-      {m: rule.operator, c: {'0' => rule.input.as_json(mode: "store"), '1' => rule.rule_value.as_json(mode: "store")}}
+      json = {m: rule.operator, c: []}
+      json[:c] << rule.attribute.as_json(mode: 'store') if rule.attribute.present?
+      json[:c] += rule.values.map {|val| val.as_json(mode: 'store')}
     else
-      values = {}
-      if rule.rule_value[:value].respond_to?(:each)
-        rule.rule_value[:value].each_with_index { |val, index| values[index] = {value: val} }
-      else
-        values['0'] = {value: rule.rule_value[:value]}
-      end
-      {a: {'0': {name: rule.input[:entity]}}, p: rule.operator, t: rule.rule_value[:type], v: values, f: rule.rule_value[:formula], e: rule.rule_value[:entity]}
+      json[:p] = rule.operator
+      json[:a] = rule.attribute.as_json(mode: 'store')
+      json[:v] = rule.values.map {|val| val.as_json(mode: 'store')}
     end
+    # values = {}
+    # if rule.rule_value[:value].respond_to?(:each)
+    #   rule.rule_value[:value].each_with_index { |val, index| values[index] = {value: val} }
+    # else
+    #   values['0'] = {value: rule.rule_value[:value]}
+    # end
+    # {a: {'0': {name: rule.input[:entity]}}, p: rule.operator, t: rule.rule_value[:type], v: values, f: rule.rule_value[:formula], e: rule.rule_value[:entity]}
+    json
   end
 
 end

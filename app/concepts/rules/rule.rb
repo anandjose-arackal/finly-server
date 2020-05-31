@@ -1,15 +1,15 @@
 class Rules::Rule
-  attr_accessor :input, :operator, :rule_value
+  attr_accessor :operator, :attribute, :values
 
-  def initialize(input, operator, rule_value)
-    self.input = input
+  def initialize(operator, attribute: nil, value: )
     self.operator = operator
-    self.rule_value = rule_value
+    self.attribute = attribute
+    self.values = value
   end
 
   Rules::Constants::LOGICAL_OPERATORS.each do |operator|
-    define_method operator do |rule|
-      Rules::Rule.new(self, operator, rule)
+    define_method operator do |*values|
+      Rules::Rule.new(operator, attribute: self, value: values)
     end
   end
 
@@ -25,13 +25,11 @@ class Rules::Rule
   end
 
   def as_store(options = {})
-    json = as_json(mode: 'store')
-    if json[:m].present?
-      json = {g: {'0': json}}
-    else
-      json = {g: {'0': {m: 'and', c: {'0' => json}}}}
-    end
-    json
+    as_json(mode: 'store')
+  end
+
+  def as_json_logic(options = {})
+    as_json(mode: 'json_logic')
   end
 
   def as_ransack(options = {})
@@ -43,10 +41,6 @@ class Rules::Rule
     end
     data = options[:data] || {}
     LiquidHelper.interpolate json, data
-  end
-
-  def as_json_logic(options = {})
-    as_json(mode: 'json_logic')
   end
 
   def apply?(data)

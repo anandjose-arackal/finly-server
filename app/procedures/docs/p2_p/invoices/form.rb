@@ -76,9 +76,9 @@ class Docs::P2P::Invoices::Form < Forms::API
       dropdown :tax_rate_id, choices_scope: Choices[:lookup].('tax_rates'), computed: Forms::Compute::Lookup('inventory_line_item_id', '{{record.tax_rate_id}}')
       number :tax_rate, editable: false, visible: false, computed: Forms::Compute::Lookup('tax_rate_id', '{{record.rate}}')
       amount :tax_amount, editable: false, computed: Forms::Compute::Form("{{ row.taxable_amount | times: row.discount_amount }}")
-      amount :net_amount, editable: false, computed: Forms::Compute::Form("{{ row.taxable_amount | minus: row.tax_amount }}")
+      amount :net_amount, editable: false, computed: Forms::Compute::Form({value: "{{ row.taxable_amount | minus: row.tax_amount }}", currency_id: "1"})
     end
-#     summary :line_items_summary do
+#     table_summary :line_items_summary do
 #       amount :gross_amount, editable: false, computed: Forms::Compute::Form(
 #           <<-CALC
 # {% assign gross_total = 0 %}\
@@ -116,52 +116,66 @@ class Docs::P2P::Invoices::Form < Forms::API
 #     end
   end
 
-  condition condition_id: :receiving_account_type_setter do
+  condition condition_id: "Receiving Account Type can only be active if Receiving Account ID is set" do
     reference 'entity', 'receiving_account_type'
     rule Rules::Builder['receiving_account_id'].present
     action :active, true
   end
 
-  condition condition_id: :cost_allocation_department_setter do
+  condition condition_id: 'Enable line item department for item level cost allocation' do
     reference 'entity', 'line_items/department_id'
     rule Rules::Builder['cost_allocation_items'].true
     action :visible, true
     action :editable, true
   end
 
-  condition condition_id: :cost_allocation_cost_center_setter do
+  condition condition_id: 'Enable line item cost center for item level cost allocation' do
     reference 'entity', 'line_items/cost_center_id'
     rule Rules::Builder['cost_allocation_items'].true
     action :visible, true
     action :editable, true
   end
 
-  condition condition_id: :cost_allocation_department_unsetter do
+  condition condition_id: 'Disable line item department for header level cost allocation' do
     reference 'entity', 'line_items/department_id'
     rule Rules::Builder['cost_allocation_items'].false
     action :visible, false
     action :editable, false
   end
 
-  condition condition_id: :cost_allocation_cost_center_unsetter do
+  condition condition_id: 'Disable line item cost center for header level cost allocation' do
     reference 'entity', 'line_items/cost_center_id'
     rule Rules::Builder['cost_allocation_items'].false
     action :visible, false
     action :editable, false
   end
 
-  condition condition_id: :cost_allocation_department_visible_toggle do
+  condition condition_id: 'Disable header department for item level cost allocation' do
     reference 'entity', 'department_id'
     rule Rules::Builder['cost_allocation_items'].true
     action :visible, false
     action :editable, false
   end
 
-  condition condition_id: :cost_allocation_cost_center_visible_toggle do
+  condition condition_id: 'Disable header cost_center for item level cost allocation' do
     reference 'entity', 'cost_center_id'
     rule Rules::Builder['cost_allocation_items'].true
     action :visible, false
     action :editable, false
+  end
+
+  condition condition_id: 'Enabled header department for header level cost allocation' do
+    reference 'entity', 'department_id'
+    rule Rules::Builder['cost_allocation_items'].false
+    action :visible, true
+    action :editable, true
+  end
+
+  condition condition_id: 'Enabled header cost_center for header level cost allocation' do
+    reference 'entity', 'cost_center_id'
+    rule Rules::Builder['cost_allocation_items'].false
+    action :visible, true
+    action :editable, true
   end
 
   validation validation_id: :due_date_gteq_invoice_date do

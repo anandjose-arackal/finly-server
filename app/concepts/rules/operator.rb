@@ -6,17 +6,21 @@ class Rules::Operator
   end
 
   Rules::Constants::PREDICATES.each do |predicate|
-    define_method predicate do |type: nil, value: nil, formula: nil, entity: nil|
+    define_method predicate do |*values|
       if Rules::Constants::NON_VALUE_PREDICATES.include?(predicate)
-        value = 1
-        formula = nil
-        entity = nil
+        values = [
+            {
+                value: 1
+            }
+        ]
+      else
+        values = values.map {|val| val.slice(:value, :entity, :formula)}
       end
-      type ||= :value if value.present?
-      type ||= :formula if formula.present?
-      type ||= :entity if entity.present?
-      type ||= :none
-      Rules::Rule.new({entity: entity_path}, predicate, type: type, value: value, formula: formula, entity: entity)
+      Rules::Rule.new(
+          predicate,
+          attribute: {entity: entity_path},
+          value: values
+      )
     end
   end
 end
