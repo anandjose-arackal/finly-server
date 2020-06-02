@@ -37,6 +37,8 @@ class Statements::Show < Statements::Base
         else
           self.account = user.company.yes_bank_company_account
         end
+      when :utility_bills_account
+        self.account = user.company.utility_bills_account
       end
     when :user
       user_presenter = User::Show.(user, params)
