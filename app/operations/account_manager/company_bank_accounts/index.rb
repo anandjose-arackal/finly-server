@@ -66,7 +66,7 @@ class AccountManager::CompanyBankAccounts::Index < AccountManager::CompanyBankAc
   private
 
   def retrieve_balance(account)
-    return 0 unless account.present?
+    return 0 unless account.present? and account.enabled
 
     case account.class.name
     when "YesBankCompanyAccount"
