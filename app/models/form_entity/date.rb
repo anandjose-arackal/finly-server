@@ -68,24 +68,24 @@ class FormEntity::Date < FormEntity
   contract_eval 'Restriction' do |reform:, entity:, **|
     if entity.options['restriction'].present?
       reform.validate do
-        value = reform.send(entity.entity_key)
+        value = send(entity.entity_key)
         next unless value.present?
 
         case entity.options['restriction']
         when 'in_the_future'
-          if value <= DateTime.today.end_of_day
+          if value <= DateTime.now.end_of_day
             errors.add entity.entity_key, "can only be in the future"
           end
         when 'in_the_past'
-          if value >= DateTime.today.end_of_day
+          if value >= DateTime.now.end_of_day
             errors.add entity.entity_key, "can only be in the past"
           end
         when 'not_in_the_future'
-          if value > DateTime.today.end_of_day
+          if value > DateTime.now.end_of_day
             errors.add entity.entity_key, "cannot be in the future"
           end
         when 'not_in_the_past'
-          if value < DateTime.today.end_of_day
+          if value < DateTime.now.end_of_day
             errors.add entity.entity_key, "cannot be in the past"
           end
         else

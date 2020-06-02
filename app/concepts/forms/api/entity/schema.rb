@@ -28,6 +28,15 @@ module Forms::API::Entity::Schema
 
   class_methods do
 
+    # Sets the flag to mark this entity type as a collection
+    def collection!
+      @collection = true
+    end
+
+    def collection?
+      @collection || false
+    end
+
     def schema_validation(&block)
       @schema_validation = SchemaValidation.build(&block) if block_given?
       @schema_validation ||= SchemaValidation.build

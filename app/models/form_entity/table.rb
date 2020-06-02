@@ -53,6 +53,7 @@
 class FormEntity::Table < FormEntity
 
   register :table
+  collection!
 
   option :min_items
 

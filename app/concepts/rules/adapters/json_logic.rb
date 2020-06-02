@@ -33,7 +33,7 @@ class Rules::Adapters::JSONLogic
   protected
 
   def self.build_json(func)
-    if func.class.name == Hash.name
+    if func.class <= Hash
       if func[:value].present?
         return func[:value].to_s.strip
       else

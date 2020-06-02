@@ -15,7 +15,10 @@ class Forms::Template < Templates::API
       set :form, builder_context.root_record
       set :parent, builder_context.parent if builder_context.parent.class <=> FormEntity
       if builder_context.template.template_reference[:compute_lookup_entity_path].present?
-        set :compute_lookup_entity, builder_context.root_record.find_entity(builder_context.template.template_reference[:compute_lookup_entity_path])
+        path = builder_context.template.template_reference[:compute_lookup_entity_path]
+        entity = builder_context.root_record.find_entity(path)
+        raise "Entity with path : #{path} not found (#{builder_context.template.entity_path})" if entity.nil?
+        set :compute_lookup_entity, entity
       end
     end
 
@@ -57,7 +60,11 @@ class Forms::Template < Templates::API
       clone do |builder_context|
         set :company_id, builder_context.params[:company_id]
         set :form, builder_context.root_record
-        set :referencable, builder_context.root_record.find_entity(builder_context.template.template_reference[:reference_key])
+        path = builder_context.template.template_reference[:reference_key]
+        entity = builder_context.root_record.find_entity(path)
+        raise "Entity with path : #{path} not found" if entity.nil?
+
+        set :referencable, entity
       end
 
       association :actions do |action_context|
@@ -75,7 +82,11 @@ class Forms::Template < Templates::API
       clone do |builder_context|
         set :company_id, builder_context.params[:company_id]
         set :form, builder_context.root_record
-        set :form_entity, builder_context.root_record.find_entity(builder_context.template.template_reference[:entity_path])
+
+        path = builder_context.template.template_reference[:entity_path]
+        entity = builder_context.root_record.find_entity(path)
+        raise "Entity with path : #{path} not found" if entity.nil?
+        set :form_entity, entity
       end
     end
   end

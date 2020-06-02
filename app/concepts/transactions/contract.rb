@@ -28,7 +28,7 @@ module Transactions::Contract
 
   # Build the JSON input from the current state of the form
   def to_form
-    self.class.to_form(self)
+    Transactions::Contract.to_form(self)
   end
 
 end

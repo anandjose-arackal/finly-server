@@ -5,6 +5,16 @@ class HashUtils
       unless block.call(k, v)
         if v.is_a?(Hash)
           memo[k] = deep_reject(v, &block)
+        elsif v.is_a?(Array)
+          arr = []
+          v.each do |val|
+            if val.is_a?(Hash)
+              arr << deep_reject(val, &block)
+            else
+              arr << val
+            end
+          end
+          memo[k] = arr
         else
           memo[k] = v
         end

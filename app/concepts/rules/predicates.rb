@@ -11,6 +11,16 @@ module Rules::Predicates
     end
   end
 
+  def self.to_number(arr)
+    arr.map {|val|
+      if val.respond_to?(:strftime)
+        val.strftime("%s").to_f
+      else
+        val.to_f
+      end
+    }
+  end
+
   def self.predicates
     @predicates ||= {}.with_indifferent_access
   end
@@ -66,19 +76,20 @@ module Rules::Predicates
   # end
 
   predicate :lt do |v, d|
-    v[0] < v[1]
+    Rules::Predicates.to_number(v).each_cons(2).all? { |i, j| i < j }
+    # v.map(&:to_f).each_cons(2).all? { |i, j| i < j }
   end
 
   predicate :lteq do |v, d|
-    v[0] <= v[1]
+    Rules::Predicates.to_number(v).each_cons(2).all? { |i, j| i <= j }
   end
 
   predicate :gt do |v, d|
-    v[0] > v[1]
+    Rules::Predicates.to_number(v).each_cons(2).all? { |i, j| i > j }
   end
 
   predicate :gteq do |v, d|
-    v[0] >= v[1]
+    Rules::Predicates.to_number(v).each_cons(2).all? { |i, j| i >= j }
   end
 
   # Fixme: check if in is really required as it is is covered by eq_any case in the context of form rules

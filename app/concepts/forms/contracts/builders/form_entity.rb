@@ -24,8 +24,8 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
   end
 
   def define_entity(context, reform:, entity:, current_user:, **)
-    # type = entity.collection ? :collection : :property
-    type = :property
+    type = entity.class.collection? ? :collection : :property
+    # type = :property
     block = contract_block(entity, current_user)
     if block.present?
       reform.send(type, entity.entity_key, properties(entity), &block)
@@ -38,8 +38,8 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
     return if entity.entities.present? # Nothing to assign if the entity has sub-entities
 
     reform.validate -> do
-      row_data = Transactions::Contract.to_form(self)
-      form_data = Transactions::Contract.to_form(contract_root)
+      row_data = self.to_form
+      form_data = contract_root.to_form
       result = Forms::Contracts::Helpers::ConditionChecker.(entity.conditions, entity, SETTER_ACTIONS, form: form_data, row: row_data)
       editable = result['editable']
       visible = result['visible']
@@ -60,12 +60,12 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
     reform.validate -> do
       # Using as_nested_hash instead of input as the input need not always
       result = Forms::Contracts::Helpers::ConditionChecker.(
-          entity.conditions, entity, VALIDATION_ACTIONS, form: Transactions::Contract.to_form(contract_root), row: Transactions::Contract.to_form(self)
+          entity.conditions, entity, VALIDATION_ACTIONS, form: contract_root.to_form, row: self.to_form
       )
       required = result['required']
 
       # Required validation ( System Validation )
-      if required and send(entity.entity_key).blank?
+      if required and send(entity.entity_key).nil?
         errors.add entity.entity_key, 'cannot be blank'
       end
     end
@@ -74,7 +74,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
   def custom_validate_entity(context, reform:, entity:, **)
     reform.validate -> do
       entity.validations.each do |validation|
-        next unless validation.rule.apply?({form: Transactions::Contract.to_form(contract_root), row: Transactions::Contract.to_form(self)}.with_indifferent_access)
+        next unless validation.rule.apply?({form: contract_root.to_form, row: self.to_form}.with_indifferent_access)
 
         errors.add entity.entity_key, validation.error_message
       end
@@ -87,8 +87,8 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
 
     # controlling_choices
     reform.validate -> do
-      form_data = Transactions::Contract.to_form(contract_root)
-      row_data = Transactions::Contract.to_form(self)
+      form_data = contract_root.to_form
+      row_data = self.to_form
       entity_value = Forms::RequestParser.new(form: form_data, row: row_data).fetch(entity.entity_path)
       result = Forms::Ops::Choices.(
           params: {

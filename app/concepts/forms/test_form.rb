@@ -5,6 +5,7 @@ class Forms::TestForm < Forms::API
     text :first_name
     text :last_name, editable: false, required: false
     data_map :profile, populate_if_empty: UserProfile do
+      number :id, visible: false, editable: false, internal: true, can_visible_be_changed: false, can_editable_be_changed: false
       text :employee_id
       text :pan
       number :state
@@ -41,18 +42,5 @@ class Forms::TestForm < Forms::API
     rule Rules::Builder['row.pan'].eq(value: "123")
     error_message "is not legal"
   end
-
-  # section :header do
-  #   auto_number :invoice_id, sequence:{prefix: "TF/{{\"now\" | date: \"%y-%m\" }}/", start_at: "000001"}
-  #   text :name, hint: "Please enter the name of the field", maximum: 255
-  # end
-  #
-  # section :line_items do
-  #   collection :line_items do
-  #     text :item_description, hint: "Please enter the name of the field", maximum: 255
-  #     dropdown :status_id, scope: Choicess::List({value: 1, name: 'Approved'}, {value: 1, name: 'Pending'})
-  #     dropdown :department_id, scope: Choicess::AutoComplete('departments', filters: {})
-  #   end
-  # end
 
 end

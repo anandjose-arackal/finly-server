@@ -47,7 +47,7 @@ class Forms::Ops::Choices < Transactions::API
     return unless entity.class.name == 'FormEntity::Lookup'
     return unless entity.filters.present?
 
-    params[:qa] = entity.filters.as_ransack(data: {form: params[:form_data], row: params[:row_data]})
+    params[:qa] = entity.filters.as_ransack(data: {form: params[:form_data], row: params[:row_data]}.as_json)
   end
 
   def init_choice_dependencies(context, model:, entity:, params:, **)

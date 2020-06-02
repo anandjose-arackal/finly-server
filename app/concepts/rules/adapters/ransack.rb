@@ -41,7 +41,10 @@ class Rules::Adapters::Ransack
     if Rules::Constants::PREDICATES.include?(operator)
       values = {}
       rule.values.each_with_index { |val, index|
-        value = val[:value] || val[:formula] || val[:entity] || 1
+        value = val[:value] # || val[:formula] || val[:entity] || 1
+        value ||= val[:formula]
+        value ||= "{{form.#{val[:entity].gsub("/", ".")}}}" if val[:entity].present?
+        value ||= 1
         values[index.to_s] = {value: value}
       }
       {a: {'0': {name: rule.attribute[:entity]}}, p: operator, v: values}
