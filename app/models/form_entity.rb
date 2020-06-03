@@ -69,6 +69,7 @@ class FormEntity < ApplicationRecord
   belongs_to :parent, class_name: 'FormEntity', optional: true, primary_key: :uuid, foreign_key: :parent_id
   belongs_to :created_by, optional: true, class_name: "User", foreign_key: :created_by_user_id
   belongs_to :compute_type, class_name: 'FormEntityComputationType', optional: true
+  delegate :compute_lookup?, :compute_form?, to: :compute_type, allow_nil: true
   belongs_to :compute_lookup_entity, class_name: 'FormEntity', optional: true
 
   has_many :entities, class_name: 'FormEntity', foreign_key: :parent_id, primary_key: :uuid

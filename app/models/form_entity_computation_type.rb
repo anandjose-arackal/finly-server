@@ -14,4 +14,12 @@ class FormEntityComputationType < ApplicationRecord
 
   set_values :form, :lookup
 
+  def compute_form?
+    form?
+  end
+
+  def compute_lookup?
+    lookup?
+  end
+
 end
