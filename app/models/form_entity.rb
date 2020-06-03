@@ -150,12 +150,6 @@ class FormEntity < ApplicationRecord
         entity_type: entity_type,
         default_value: default_value,
         position: position,
-        compute: {
-            enabled: compute_enabled,
-            type: compute_type&.name,
-            lookup: compute_lookup_entity&.entity_path,
-            formula: compute_formula
-        },
         behavior: {
             editable: editable,
             required: required,
