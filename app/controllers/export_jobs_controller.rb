@@ -6,6 +6,7 @@ class ExportJobsController < BaseControllers::WebBase
   end
 
   def export_jobs_config
+    Personalizer::Adapters::Company137::ExportTemplates137::TallyJournalTemplate
     @result = ExportManager::Config.(current_user, params)
     respond
   end
