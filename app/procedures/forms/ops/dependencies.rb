@@ -4,7 +4,7 @@ class Forms::Ops::Dependencies < Transactions::API
   pass :init_dependencies
   pass :init_computations
 
-  def find_form(context, params:, current_user:,**)
+  def find_form(context, params:, current_user:, **)
     result = Forms::Ops::Config.(params: params, current_user: current_user)
     return Transactions::API.on_schema_error(context, result.errors) unless result.success?
 
@@ -20,7 +20,12 @@ class Forms::Ops::Dependencies < Transactions::API
     context[:dependencies][:computations] = []
     model.entities.where(compute_enabled: true).includes(:compute_lookup_entity, :parent).each do |entity|
       computation = {entity_path: entity.entity_path, config_path: entity.config_path, type: entity.compute_type.name}
-      computation[:collection_config_path] = entity.parent.config_path if entity.parent.present? and entity.parent.class.collection?
+      if entity.parent.present? and entity.parent.class.collection?
+        computation[:collection] = {
+            entity_key: entity.parent.entity_key,
+            config_path: entity.parent.config_path
+        }
+      end
       if entity.compute_lookup?
 
         computation[:lookup_entity_path] = entity.compute_lookup_entity.entity_path
