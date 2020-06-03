@@ -7,7 +7,7 @@ class Personalizer::Adapters::Company137::ExportTemplates137::TallyJournalTempla
   screen 'invoices.index'
   system :vp
   scope 'development', 1, 'L&C Ltd.'
-  scope "staging", 2, 'L&C Ltd.'
+  scope "staging", 1, 'L&C Ltd.'
   scope "production", 137, 'Metropolitan Stock Exchange'
   validate :fetch_invoices
 
