@@ -18,8 +18,9 @@ class Forms::Ops::Dependencies < Transactions::API
 
   def init_computations(context, model:, **)
     context[:dependencies][:computations] = []
-    model.entities.where(compute_enabled: true).includes(:compute_lookup_entity).each do |entity|
-      computation = {entity_path: entity.entity_path, type: entity.compute_type.name}
+    model.entities.where(compute_enabled: true).includes(:compute_lookup_entity, :parent).each do |entity|
+      computation = {entity_path: entity.entity_path, config_path: entity.config_path, type: entity.compute_type.name}
+      computation[:collection_config_path] = entity.parent.config_path if entity.parent.present? and entity.parent.class.collection?
       if entity.compute_lookup?
 
         computation[:lookup_entity_path] = entity.compute_lookup_entity.entity_path

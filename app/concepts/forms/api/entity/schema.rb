@@ -3,6 +3,11 @@ module Forms::API::Entity::Schema
 
   DEFAULT_SYSTEM_SCHEMA = {
       entity_path: ->(schema) { self.parent.present? ? "#{self.parent.entity_path}/#{self.entity_key}" : self.entity_key&.to_s },
+      config_path: ->(schema) {
+        return "#{self.parent.config_path}/entities/#{self.entity_key}" if self.parent.present?
+
+        "#{self.section.section_id}/entities/#{self.entity_key}"
+      },
       label: ->(schema) { self.entity_key&.to_s&.humanize },
       placeholder: "Enter value",
       entity_type: ->(schema) { self.class.registered_type },

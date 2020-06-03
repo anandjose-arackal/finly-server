@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_31_170858) do
+ActiveRecord::Schema.define(version: 2020_06_03_055905) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3993,6 +3993,7 @@ ActiveRecord::Schema.define(version: 2020_05_31_170858) do
     t.string "compute_formula"
     t.string "compute_lookup_entity_id"
     t.text "filters"
+    t.string "config_path"
     t.index ["company_id"], name: "index_form_entities_on_company_id"
     t.index ["compute_lookup_entity_id"], name: "index_form_entities_on_compute_lookup_entity_id"
     t.index ["created_at"], name: "index_form_entities_on_created_at"

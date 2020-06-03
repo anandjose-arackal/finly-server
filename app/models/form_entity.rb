@@ -138,7 +138,6 @@ class FormEntity < ApplicationRecord
   # end
 
   def as_json(opts = {})
-    config_path = "#{opts[:config_path]}/#{entity_key}"
     data = {
         # id: uuid,
         entity_key: entity_key,
@@ -164,7 +163,7 @@ class FormEntity < ApplicationRecord
     if entities.present?
       data[:entities] = {}
       entities.each do |ent|
-        data[:entities][ent.entity_key] = ent.as_json(opts.merge(config_path: "#{config_path}/entities"))
+        data[:entities][ent.entity_key] = ent.as_json(opts)
       end
     end
     data
