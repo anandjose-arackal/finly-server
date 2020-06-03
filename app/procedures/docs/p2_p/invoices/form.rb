@@ -36,7 +36,7 @@ class Docs::P2P::Invoices::Form < Forms::API
     lookup :receiving_account_id, choices_scope: Choices[:lookup].('vendor_bank_accounts'),
            filters: Rules::Builder[:account_owner_id].eq(entity: 'vendor_id')
                         .and(Rules::Builder[:account_owner_type].eq(value: 'YesBankVendor'))
-    text :receiving_account_type, default_value: 'BankAccount', internal: true, editable: false
+    text :receiving_account_type, internal: true, editable: false, computed: Forms::Compute::Form("BankAccount")
   end
 
   section :bill_to do
