@@ -89,6 +89,7 @@ class AccountManager::BaseAdapter
   end
 
   def store_transaction(payment, type, status, opening_balance, closing_balance, company_id, system_messages = {})
+    # debugger
     type_id = TransactionType.id_for(type)
     status_id = TransactionStatus.id_for(status)
     currency_id = Currency.id_for(:INR)
