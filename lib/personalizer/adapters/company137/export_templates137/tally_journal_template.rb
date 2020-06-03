@@ -6,7 +6,7 @@ class Personalizer::Adapters::Company137::ExportTemplates137::TallyJournalTempla
   handle :tally_invoices_export
   screen 'invoices.index'
   system :vp
-  scope 'development', 2, 'L&C Ltd.'
+  scope 'development', 1, 'L&C Ltd.'
   scope "staging", 2, 'L&C Ltd.'
   scope "production", 137, 'Metropolitan Stock Exchange'
   validate :fetch_invoices
@@ -43,42 +43,41 @@ class Personalizer::Adapters::Company137::ExportTemplates137::TallyJournalTempla
   end
 
   def line_item_entries(invoice, item, grn)
-      entries=[]
-      row = ExportManager::Builders::Spreadsheet::Row.new(record: item, header: header)
-      {
-        'Vch Type': get_voucher_type(invoice),
-        'Date':Date.today&.strftime("%b %d, %y"),
-        'Supplier Inv No':invoice&.invoice_number,
-        'Supplier Inv Date':invoice&.date&.strftime("%b %d, %y"),
-        'Ref No':invoice&.invoice_number,
-        'Cost center 1': invoice.cost_center&.name,
-        'Cost Center':invoice.gstin_location&.state&.name&.upcase,
-        'Vendor Code':invoice.vendor&.vendor_id,
-        'Vendor Name':invoice.vendor&.business_name,
-        'Receipt Note No':grn&.grn_number,
-        'Receipt Note Date':grn&.delivery_date&.strftime("%d %b %y"),
-        'Order No':get_order_number(invoice),
-        'Order Date':get_order_date(invoice),
-        'Approval Date':invoice.approved_at&.strftime("%d %b %y"),
-        'GL Code':item&.category&.gl_code,
-        'GST Rate':item&.tax&.to_f,
-        'Tax Classification':'Purchase Taxable',
-        'Taxble value':item&.taxable_amount&.value,
-        'Ledger Name':item&.category&.name,
-        'Amount1':item&.net_amount&.value,
-        'CGST Ledger':((item&.cgst.present? && item&.cgst > 0) ? get_cgst_ledger(invoice) : ''),
-        'CGST Amt':item&.cgst,
-        'SGST Ledger':((item&.sgst.present? && item&.sgst > 0) ? get_sgst_ledger(invoice) : ''),
-        'SGST Amt':item&.sgst,
-        'IGST Ledger':((item&.igst.present? && item&.igst > 0) ? get_igst_ledger(invoice) : ''),
-        'IGST Amt':item.igst,
-        'Total':item&.net_amount&.value,
-        'Verify':retrieve_approved_by(invoice)
-      }.each do |k, v|
-        row.add k, v
-      end
-      entries << row
-
+    entries=[]
+    row = ExportManager::Builders::Spreadsheet::Row.new(record: item, header: header)
+    {
+      'Vch Type': get_voucher_type(invoice),
+      'Date':Date.today&.strftime("%b %d, %y"),
+      'Supplier Inv No':invoice&.invoice_number,
+      'Supplier Inv Date':invoice&.date&.strftime("%b %d, %y"),
+      'Ref No':invoice&.invoice_number,
+      'Cost center 1': invoice.cost_center&.name,
+      'Cost Center':invoice.gstin_location&.state&.name&.upcase,
+      'Vendor Code':invoice.vendor&.vendor_id,
+      'Vendor Name':invoice.vendor&.business_name,
+      'Receipt Note No':grn&.grn_number,
+      'Receipt Note Date':grn&.delivery_date&.strftime("%d %b %y"),
+      'Order No':get_order_number(invoice),
+      'Order Date':get_order_date(invoice),
+      'Approval Date':invoice.approved_at&.strftime("%d %b %y"),
+      'GL Code':item&.category&.gl_code,
+      'GST Rate':item&.tax&.to_f,
+      'Tax Classification':'Purchase Taxable',
+      'Taxble value':item&.taxable_amount&.value,
+      'Ledger Name':item&.category&.name,
+      'Amount1':item&.net_amount&.value,
+      'CGST Ledger':((item&.cgst.present? && item&.cgst > 0) ? get_cgst_ledger(invoice) : ''),
+      'CGST Amt':item&.cgst,
+      'SGST Ledger':((item&.sgst.present? && item&.sgst > 0) ? get_sgst_ledger(invoice) : ''),
+      'SGST Amt':item&.sgst,
+      'IGST Ledger':((item&.igst.present? && item&.igst > 0) ? get_igst_ledger(invoice) : ''),
+      'IGST Amt':item.igst,
+      'Total':item&.net_amount&.value,
+      'Verify':retrieve_approved_by(invoice)
+    }.each do |k, v|
+      row.add k, v
+    end
+    entries << row
   end
 
 ###############################################################################
