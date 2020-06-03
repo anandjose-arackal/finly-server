@@ -62,12 +62,12 @@ class SummaryMailer::Manager::ProcessReports < BaseOperation
     manager_request_count = 0
     finance_request_count = 0
     if manager
-      manager_reports = user.manager_reports.awaiting_approval_of_user(user.id, UserRole.id_for(:manager))
+      manager_reports = Report.awaiting_action_items(user.id)
       manager_request_count = manager_reports.count
       summary[:manager_reports] = {count: manager_request_count, reports: manager_reports}
     end
     if finance_manager
-      finance_reports = user.finance_reports.awaiting_approval_of_user(user.id, UserRole.id_for(:finance_manager))
+      finance_reports =  Report.finance_associated_items(user).filter_report_status('approved')
       finance_request_count = finance_reports.count
       summary[:finance_reports] = {count: finance_request_count, reports: finance_reports}
     end

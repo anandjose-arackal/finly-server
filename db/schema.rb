@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_08_065957) do
+ActiveRecord::Schema.define(version: 2020_05_16_130418) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -1913,6 +1913,7 @@ ActiveRecord::Schema.define(version: 2020_05_08_065957) do
     t.string "card_processor_status"
     t.integer "replaced_card_id"
     t.datetime "deleted_at"
+    t.string "card_number"
     t.index ["card_type_id"], name: "index_cards_on_card_type_id"
     t.index ["company_id"], name: "index_cards_on_company_id"
     t.index ["user_id"], name: "index_cards_on_user_id"
@@ -2438,6 +2439,7 @@ ActiveRecord::Schema.define(version: 2020_05_08_065957) do
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
     t.integer "tax_amount_id"
+    t.boolean "tds_applicable", default: false
     t.index ["category_id"], name: "index_credit_note_items_on_category_id"
     t.index ["credit_note_id"], name: "index_credit_note_items_on_credit_note_id"
     t.index ["credit_note_item_type_id"], name: "index_credit_note_items_on_credit_note_item_type_id"
@@ -4510,6 +4512,7 @@ ActiveRecord::Schema.define(version: 2020_05_08_065957) do
     t.integer "purchase_order_item_id"
     t.integer "billable_amount_id"
     t.datetime "deleted_at"
+    t.boolean "tds_applicable", default: false
     t.index ["amount_id"], name: "index_invoice_line_items_on_amount_id"
     t.index ["category_id"], name: "index_invoice_line_items_on_category_id"
     t.index ["cost_center_id"], name: "index_invoice_line_items_on_cost_center_id"
@@ -6360,6 +6363,7 @@ ActiveRecord::Schema.define(version: 2020_05_08_065957) do
     t.decimal "igst", precision: 20, scale: 5, default: "0.0"
     t.integer "taxable_amount_id"
     t.decimal "previously_billed_amount", precision: 20, scale: 5, default: "0.0"
+    t.boolean "tds_applicable", default: false
     t.index ["category_id"], name: "index_purchase_order_items_on_category_id"
     t.index ["cost_center_id"], name: "index_purchase_order_items_on_cost_center_id"
     t.index ["deleted_at"], name: "index_purchase_order_items_on_deleted_at"

@@ -156,8 +156,6 @@ gem 'paperclip-azure', '~> 1.0'
 # Bundle for Bootstrap
 gem 'bootstrap-sass', '~> 3.4.0'
 
-gem 'faker', '~> 1.9.1'
-
 # gem 'paper_trail', '~> 10.1.0'
 # gem 'paper_trail-association_tracking', '~> 1.1.0'
 # gem 'turboboost'
@@ -283,6 +281,7 @@ group :test do
 end
 
 group :development do
+  gem 'faker', '~> 1.9.1'
   # Access an IRB console on exception pages or by using <%= console %> in views
   gem 'web-console', '~> 3.7.0'
   gem 'foreman', '~> 0.85.0'

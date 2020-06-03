@@ -10,7 +10,8 @@ class AccountManagerUtils
       {class: BankAccount, name: 'Bank Account', code: 'BAC'},
       {class: UserPocket, name: "User Pocket", code: "USP"},
       {class: KotakBankCompanyAccount, name: 'Kotak Bank Account Credits', code: 'KBA'},
-      {class: IciciBankCompanyAccount, name: 'Icici Bank Account Credits', code: 'IBA'}
+      {class: IciciBankCompanyAccount, name: 'Icici Bank Account Credits', code: 'IBA'},
+      {class: UtilityBillsAccount, name: 'Utility Bills Account Credits', code: 'UBA'},
   ]
 
   def self.available_accounts(options = {})

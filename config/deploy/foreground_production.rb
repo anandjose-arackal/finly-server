@@ -11,13 +11,13 @@
 server 'm1_azure.finly.io', user: 'centos', roles: %w{web app db}
 server 'm2_azure.finly.io', user: 'centos', roles: %w{web app}
 server 'm3_azure.finly.io', user: 'centos', roles: %w{web app}
-server 'm4_azure.finly.io', user: 'centos', roles: %w{web app}
-server 'm5_azure.finly.io', user: 'centos', roles: %w{web app}
-server 'm6_azure.finly.io', user: 'centos', roles: %w{web app}
-server 'm7_azure.finly.io', user: 'centos', roles: %w{web app}
-server 'm8_azure.finly.io', user: 'centos', roles: %w{web app}
-server 'm9_azure.finly.io', user: 'centos', roles: %w{web app}
-server 'm10_azure.finly.io', user: 'centos', roles: %w{web app}
+# server 'm4_azure.finly.io', user: 'centos', roles: %w{web app}
+# server 'm5_azure.finly.io', user: 'centos', roles: %w{web app}
+# server 'm6_azure.finly.io', user: 'centos', roles: %w{web app}
+# server 'm7_azure.finly.io', user: 'centos', roles: %w{web app}
+# server 'm8_azure.finly.io', user: 'centos', roles: %w{web app}
+# server 'm9_azure.finly.io', user: 'centos', roles: %w{web app}
+# server 'm10_azure.finly.io', user: 'centos', roles: %w{web app}
 
 set :stage, 'production'
 # set :stage, 'staging'

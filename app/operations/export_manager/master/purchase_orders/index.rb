@@ -29,6 +29,11 @@ class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Sp
   attribute :department
   attribute :sub_department
   attribute :cost_center
+  ############################### PR Details ################################
+  attribute :pr_number
+  attribute :pr_created_by
+  attribute :pr_date
+  ############################### PR Details ################################
   attribute :po_user
   attribute :po_status
   attribute :po_number
@@ -57,6 +62,10 @@ class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Sp
   attribute :invoice_submitted_on
   attribute :invoice_approved_on
   attribute :is_invoice_approved
+  attribute :po_advance_status
+  attribute :advance_amount
+  attribute :advance_tds_amount
+  attribute :advance_tds_slab
   attribute :invoice_sent_on
   attribute :invoice_cgst
   attribute :invoice_sgst
@@ -266,6 +275,22 @@ class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Sp
     # todo
   end
 
+  def po_advance_status(purchase_order)
+    purchase_order&.advance_amount_status&.name&.humanize
+  end
+
+  def advance_amount(purchase_order)
+    purchase_order&.advance_amount&.value
+  end
+
+  def advance_tds_amount(purchase_order)
+    purchase_order&.advance_tds_amount&.value
+  end
+
+  def advance_tds_slab(purchase_order)
+    purchase_order&.advance_tds_slab&.name
+  end
+
   def invoice_number(purchase_order)
     purchase_order.procurement.invoices&.first&.invoice_number
   end
@@ -369,6 +394,21 @@ class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Sp
     # todo
   end
 
+  def pr_number purchase_order
+    request = purchase_order.purchase_request_items.first&.purchase_request
+    request.present? ? request&.order_number : ''
+  end
+
+  def pr_created_by purchase_order
+    request = purchase_order.purchase_request_items.first&.purchase_request
+    request.present? ? request&.creator&.name : ''
+  end
+
+  def pr_date purchase_order
+    request = purchase_order.purchase_request_items.first&.purchase_request
+    request.present? ? request&.created_at&.strftime("%d-%b-%Y") : ''
+  end
+
   protected
 
   def invoice(purchase_order)
@@ -378,5 +418,4 @@ class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Sp
   # def purchase_order(purchase_order)
   #   procurement&.purchase_order
   # end
-
 end

@@ -1,10 +1,11 @@
 class Personalizer::Adapters::Company190::Expense190::Manual190::Create190::Validate < Personalizer::Adapters::Base
 
-  attr_accessor :expense_params, :category,:validate_keys
+  attr_accessor :expense_params, :category,:validate_keys, :currency
 
   def init
     self.expense_params = op_instance.expense_params
     self.category = current_company.categories.find_by_id expense_params[:category_id]
+    self.currency = Currency.find_by_id expense_params.dig(:amount_attributes,:currency_id)
     self.validate_keys = %w(
                        tax_rate_id
                        gst_type_id
@@ -18,7 +19,8 @@ class Personalizer::Adapters::Company190::Expense190::Manual190::Create190::Vali
 
   def process
     return if self.category.blank?
-    if category.gst_applicable?
+    return if self.currency.blank?
+    if category.gst_applicable? && self.currency&.country_code ==  "INR"
       validate_keys.each do |field_key|
         field_keys = field_key.split('.')
         user_value = field_keys[0...-1].inject(expense_params) do |hash, expence_param|
