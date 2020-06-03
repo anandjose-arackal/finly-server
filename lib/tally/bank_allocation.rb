@@ -19,6 +19,7 @@ class Tally::BankAllocation < NonPersistentModel
             date: Tally::Utils.to_date(date),
             instrumentdate: Tally::Utils.to_date(instrument_date || date),
             uniquereferencenumber: utr,
+            instrumentnumber: utr,
             transaction_type: transaction_type,
             payment_mode: payment_mode,
             party_name: party_name,
