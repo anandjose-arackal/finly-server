@@ -1,6 +1,6 @@
 class Forms::Contracts::Builders::FormEntity < Transactions::API
 
-  SETTER_ACTIONS = %w(editable visible active).freeze
+  SETTER_ACTIONS = %w(editable visible active internal).freeze
   VALIDATION_ACTIONS = %w(required unique).freeze
 
   schema do
@@ -43,13 +43,14 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
       result = Forms::Contracts::Helpers::ConditionChecker.(entity.conditions, entity, SETTER_ACTIONS, form: form_data, row: row_data)
       editable = result['editable']
       visible = result['visible']
+      internal = result['internal']
       if editable and visible and row_data.has_key?(entity.entity_key)
         value = self.row_input[entity.entity_key] # || entity.default_value
         send("#{entity.entity_key}=", value)
       end
 
       # -> Computations are run here
-      if entity.compute_enabled and not editable
+      if entity.compute_enabled and (internal or not editable or not visible)
         value = send(entity.entity_key)
         Forms::Contracts::Helpers::ComputeRunner.(self, entity, value, form: form_data, row: row_data)
       end
