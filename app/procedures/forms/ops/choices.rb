@@ -47,6 +47,10 @@ class Forms::Ops::Choices < Transactions::API
     return unless entity.class.name == 'FormEntity::Lookup'
     return unless entity.filters.present?
 
+    # If QA is already defined, then do not interpolate. When FE is requesting for choices, it will interpolate and share the filters.
+    # When BE is validating, QA will be blank
+    return if params[:qa].present?
+
     params[:qa] = entity.filters.as_ransack(data: {form: params[:form_data], row: params[:row_data]}.as_json)
   end
 
