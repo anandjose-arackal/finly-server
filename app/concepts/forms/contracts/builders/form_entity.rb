@@ -123,7 +123,8 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
       internal = result['internal']
       if editable and visible and row_data.has_key?(entity.entity_key)
         value = input[entity.entity_key] # || entity.default_value
-        represented.send("#{entity.entity_key}=", value)
+        entity.assign(represented, value)
+        # represented.send("#{entity.entity_key}=", entity.format(value))
       end
 
       # -> Computations are run here

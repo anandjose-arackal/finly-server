@@ -71,14 +71,14 @@ class Docs::P2P::Invoices::Form < Forms::API
       number :quantity, required: true, min_value: 1
       dropdown :unit_of_measurement, choices_scope: Choices[:list].({id: "KG", value: "KG"})
       amount :rate, required: true
-      amount :amount, editable: false, visible: false, computed: Forms::Compute::Form("{{ row.rate | times: row.quantity }}")
+      amount :amount, editable: false, visible: false, computed: Forms::Compute::Form({value: "{{ row.rate.value | times: row.quantity }}", currency_id: "1"})
       number :discount_rate, max_value: 100, min_value: 0, format: 'percentage'
-      amount :discount_amount, editable: false, computed: Forms::Compute::Form("{{ row.amount | times: row.discount_rate | divided_by: 100 }}")
-      amount :taxable_amount, editable: false, computed: Forms::Compute::Form("{{ row.amount | minus: row.discount_amount }}")
+      amount :discount_amount, editable: false, computed: Forms::Compute::Form({value: "{{ row.amount.value | times: row.discount_rate | divided_by: 100 }}", currency_id: "1"})
+      amount :taxable_amount, editable: false, computed: Forms::Compute::Form({value: "{{ row.amount.value | minus: row.discount_amount.value }}", currency_id: "1"})
       dropdown :tax_rate_id, choices_scope: Choices[:lookup].('tax_rates'), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.tax_rate_id}}')
       number :tax_rate, editable: false, visible: false, computed: Forms::Compute::Lookup('items.tax_rate_id', '{{record.rate}}')
-      amount :tax_amount, editable: false, computed: Forms::Compute::Form("{{ row.taxable_amount | times: row.tax_rate | divided_by: 100 }}")
-      amount :net_amount, populate_if_empty: Amount, editable: false, computed: Forms::Compute::Form({value: "{{ row.taxable_amount | minus: row.tax_amount }}", currency_id: "1"})
+      amount :tax_amount, editable: false, computed: Forms::Compute::Form({value: "{{ row.taxable_amount.value | times: row.tax_rate | divided_by: 100 }}", currency_id: "1"})
+      amount :net_amount, editable: false, computed: Forms::Compute::Form({value: "{{ row.taxable_amount.value | minus: row.tax_amount.value }}", currency_id: "1"})
     end
 #     table_summary :items_summary do
 #       amount :gross_amount, editable: false, computed: Forms::Compute::Form(

@@ -9,7 +9,7 @@ module Transactions::Contract
 
   # Build the JSON input from the current state of the form
   def self.to_form(contract)
-    HashUtils.deep_reject(contract.to_nested_hash) { |k, v| %w(row_input contract_input contract_root contract_parent).include?(k)}
+    HashUtils.deep_reject(contract.to_nested_hash) { |k, v| %w(row_input contract_input contract_root contract_parent).include?(k)}.as_json
   end
 
   class_methods do

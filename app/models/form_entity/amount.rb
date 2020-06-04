@@ -58,4 +58,8 @@ class FormEntity::Amount < FormEntity
   option :currencies
 
   operators :eq_any, :gteq, :lteq, :blank
+
+  def populate_if_empty
+    super() || ::Amount
+  end
 end

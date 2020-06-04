@@ -24,11 +24,13 @@ class Forms::Contracts::Helpers::ComputeRunner
     return unless lookup_record.present?
 
     value = lookup_record.to_exposure.template(entity.compute_formula)
-    represented.send("#{entity.entity_key}=", value)
+    # represented.send("#{entity.entity_key}=", value)
+    entity.assign(represented, value)
   end
 
   def self.compute_via_form(represented, entity, value, form: {}, row: {})
     value = LiquidHelper.interpolate(entity.compute_formula, {row: row, form: form}.as_json)
-    represented.send("#{entity.entity_key}=", value)
+    entity.assign(represented, value)
+    # represented.send("#{entity.entity_key}=", value)
   end
 end
