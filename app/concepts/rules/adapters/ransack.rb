@@ -43,7 +43,7 @@ class Rules::Adapters::Ransack
       rule.values.each_with_index { |val, index|
         value = val[:value] # || val[:formula] || val[:entity] || 1
         value ||= val[:formula]
-        value ||= "{{form.#{val[:entity].gsub("/", ".")}}}" if val[:entity].present?
+        value ||= "{{form.#{val[:entity]}}}" if val[:entity].present?
         value ||= 1
         values[index.to_s] = {value: value}
       }
@@ -51,9 +51,9 @@ class Rules::Adapters::Ransack
     else
       json = {m: operator, c: {}}
       # index_add = 0
-      # json[:c]['0'] = rule.attribute.as_json(mode: "ransack") if rule.attribute.present?
+      # json[:c]['0'] = rule.attribute.as_json(mode: 'ransack') if rule.attribute.present?
       rule.values.each_with_index do |value, index|
-        json[:c][index.to_s] = value.as_json(mode: "ransack")
+        json[:c][index.to_s] = value.as_json(mode: 'ransack')
       end
       json
     end

@@ -59,15 +59,15 @@ class Docs::P2P::Invoices::Form < Forms::API
     table :items, populate_if_empty: InvoiceLineItem do
       number :id, visible: false, editable: false, internal: true, can_visible_be_changed: false, can_editable_be_changed: false
       lookup :inventory_line_item_id, choices_scope: Choices[:lookup].('items')
-      text :description, editable: false, computed: Forms::Compute::Lookup('items/inventory_line_item_id', '{{record.description}}')
+      text :description, editable: false, computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.description}}')
       text :comment
-      # text :item_number, editable: false, computed: Forms::Compute::Lookup('items/inventory_line_item_id', '{{record.item_code}}')
-      # dropdown :product_type_id, choices_scope: Choices[:enum].(ProductType), editable: false, computed: Forms::Compute::Lookup('items/inventory_line_item_id', '{{record.product_type_id}}')
+      # text :item_number, editable: false, computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.item_code}}')
+      # dropdown :product_type_id, choices_scope: Choices[:enum].(ProductType), editable: false, computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.product_type_id}}')
       dropdown :department_id, editable: false, visible: false, choices_scope:  Choices[:lookup].('departments'), computed: Forms::Compute::Form('{{form.department_id}}')
       dropdown :cost_center_id, editable: false, visible: false, choices_scope:  Choices[:lookup].('cost_centers'), computed: Forms::Compute::Form('{{form.cost_center_id}}')
-      dropdown :category_id, choices_scope:  Choices[:lookup].('categories'), required: true, computed: Forms::Compute::Lookup('items/inventory_line_item_id', '{{record.category_id}}')
-      # text :gl_code, editable: false, computed: Forms::Compute::Lookup('items/category_id', '{{record.gl_code}}')
-      text :hsn_sac, computed: Forms::Compute::Lookup('items/inventory_line_item_id', '{{record.hsn_sac}}')
+      dropdown :category_id, choices_scope:  Choices[:lookup].('categories'), required: true, computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.category_id}}')
+      # text :gl_code, editable: false, computed: Forms::Compute::Lookup('items.category_id', '{{record.gl_code}}')
+      text :hsn_sac, computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.hsn_sac}}')
       number :quantity, required: true, min_value: 1
       dropdown :unit_of_measurement, choices_scope: Choices[:list].({id: "KG", value: "KG"})
       amount :rate, required: true
@@ -75,8 +75,8 @@ class Docs::P2P::Invoices::Form < Forms::API
       number :discount_rate, max_value: 100, min_value: 0, format: 'percentage'
       amount :discount_amount, editable: false, computed: Forms::Compute::Form("{{ row.amount | times: row.discount_rate | divided_by: 100 }}")
       amount :taxable_amount, editable: false, computed: Forms::Compute::Form("{{ row.amount | minus: row.discount_amount }}")
-      dropdown :tax_rate_id, choices_scope: Choices[:lookup].('tax_rates'), computed: Forms::Compute::Lookup('items/inventory_line_item_id', '{{record.tax_rate_id}}')
-      number :tax_rate, editable: false, visible: false, computed: Forms::Compute::Lookup('items/tax_rate_id', '{{record.rate}}')
+      dropdown :tax_rate_id, choices_scope: Choices[:lookup].('tax_rates'), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.tax_rate_id}}')
+      number :tax_rate, editable: false, visible: false, computed: Forms::Compute::Lookup('items.tax_rate_id', '{{record.rate}}')
       amount :tax_amount, editable: false, computed: Forms::Compute::Form("{{ row.taxable_amount | times: row.tax_rate | divided_by: 100 }}")
       amount :net_amount, populate_if_empty: Amount, editable: false, computed: Forms::Compute::Form({value: "{{ row.taxable_amount | minus: row.tax_amount }}", currency_id: "1"})
     end
@@ -125,28 +125,28 @@ class Docs::P2P::Invoices::Form < Forms::API
   end
 
   condition condition_id: 'Enable line item department for item level cost allocation' do
-    reference 'entity', 'items/department_id'
+    reference 'entity', 'items.department_id'
     rule Rules::Builder['cost_allocation_items'].true
     action :visible, true
     action :editable, true
   end
 
   condition condition_id: 'Enable line item cost center for item level cost allocation' do
-    reference 'entity', 'items/cost_center_id'
+    reference 'entity', 'items.cost_center_id'
     rule Rules::Builder['cost_allocation_items'].true
     action :visible, true
     action :editable, true
   end
 
   condition condition_id: 'Disable line item department for header level cost allocation' do
-    reference 'entity', 'items/department_id'
+    reference 'entity', 'items.department_id'
     rule Rules::Builder['cost_allocation_items'].false
     action :visible, false
     action :editable, false
   end
 
   condition condition_id: 'Disable line item cost center for header level cost allocation' do
-    reference 'entity', 'items/cost_center_id'
+    reference 'entity', 'items.cost_center_id'
     rule Rules::Builder['cost_allocation_items'].false
     action :visible, false
     action :editable, false

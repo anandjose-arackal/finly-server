@@ -26,7 +26,7 @@ class Forms::TestForm < Forms::API
     action :required, true
   end
   condition condition_id: :pan_required do
-    reference :entity, 'profile/pan'
+    reference :entity, 'profile.pan'
     rule Rules::Builder[:first_name].cont(value: 'Han').or(Rules::Builder[:last_name].eq(value: "Solo"))
     action :required, true
   end
@@ -38,7 +38,7 @@ class Forms::TestForm < Forms::API
   end
 
   validation validation_id: :pan_value do
-    reference 'profile/pan'
+    reference 'profile.pan'
     rule Rules::Builder['row.pan'].eq(value: "123")
     error_message "is not legal"
   end

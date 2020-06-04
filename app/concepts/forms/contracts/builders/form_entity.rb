@@ -83,6 +83,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
               qs: {id_in: entity_value} # Pass the ID as a simple filter
           }, current_user: current_user
       )
+      # Fixme: This is working only for lookup
       unless result[:choices].data.present?
         errors.add entity.entity_key, 'has an invalid choice'
       end

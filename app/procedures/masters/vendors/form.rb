@@ -3,7 +3,7 @@ class Masters::Vendors::Form < Forms::API
   model YesBankVendor
 
   section :header do
-    # auto_number :vendor_id, sequence: {prefix: "VNDR/", start_at: '000001'}
+    # auto_number :vendor_id, sequence: {prefix: "VNDR.", start_at: '000001'}
     dropdown :status_id, choices_scope: Choices[:enum].(VendorStatus),
              required: true, editable: false, default_value: VendorStatus.id_for(:draft),
              can_editable_be_changed: false
@@ -38,13 +38,13 @@ class Masters::Vendors::Form < Forms::API
   end
 
   condition condition_id: :name_status_editable do
-    reference :entity, 'locations/name'
+    reference :entity, 'locations.name'
     rule Rules::Builder[:status_id].in(value: VendorStatus.ids_for(:draft, :rejected, :retracted))
     action :editable, true
   end
 
   condition condition_id: :status_location_name_mandatory do
-    reference :entity, 'locations/name'
+    reference :entity, 'locations.name'
     rule Rules::Builder[:status_id].in(value: VendorStatus.ids_for(:draft, :rejected, :retracted)).and(
         Rules::Builder[:age].not_eq(value: 20)
     )
@@ -52,9 +52,9 @@ class Masters::Vendors::Form < Forms::API
   end
 
   validation validation_id: :name_cont_validation do
-    reference 'locations/name'
+    reference 'locations.name'
     error_message "Name cannot contain Hello"
-    rule Rules::Builder['locations/name'].not_cont(value: "Hello")
+    rule Rules::Builder['locations.name'].not_cont(value: "Hello")
   end
 
   choice_dependency dependency_id: :policy_dependency do

@@ -39,8 +39,10 @@ class Rules::Rule
     else
       json = {g: {'0': {m: 'and', c: {'0' => json}}}}
     end
+    return json unless options.has_key?(:data)
+
     data = options[:data] || {}
-    LiquidHelper.interpolate json, data
+    LiquidHelper.interpolate(json, data).as_json
   end
 
   def apply?(data)

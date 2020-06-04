@@ -100,6 +100,8 @@ class FormEntity < ApplicationRecord
   scope :system_fields, -> { where.not custom_field: true }
   scope :custom_fields, -> { where custom_field: true }
   scope :exclude_internal, -> { where.not internal: true }
+  scope :computed, -> { where compute_enabled: true }
+  scope :with_compute_type, -> (compute_type_id) { where compute_type_id: compute_type_id }
 
   serialize :filters, Rules::Adapters::Store
 
