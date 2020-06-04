@@ -4,7 +4,8 @@ class Forms::Ops::Dependencies < Transactions::API
   pass :init_dependencies
   pass :init_conditions
   pass :init_validations
-  pass :init_computations
+  pass :init_form_computations
+  pass :init_lookup_computations
   pass :init_lookup_filters
   pass :init_choice_dependencies
 
@@ -28,24 +29,36 @@ class Forms::Ops::Dependencies < Transactions::API
     dependencies[:validations] = model.validations
   end
 
-  def init_computations(context, model:, dependencies:, **)
-    dependencies[:computations] = []
-    model.entities.where(compute_enabled: true).includes(:compute_lookup_entity, :parent).each do |entity|
+  def init_form_computations(context, model:, dependencies:, **)
+    dependencies[:form_computations] = []
+    model.entities.where(compute_enabled: true, compute_type_id: FormEntityComputationType.id_for(:form)).includes(:compute_lookup_entity, :parent).each do |entity|
       computation = {entity_path: entity.entity_path, config_path: entity.config_path, type: entity.compute_type.name}
       if entity.parent.present? and entity.parent.class.collection?
-        computation[:collection] = {
-            entity_key: entity.parent.entity_key,
-            config_path: entity.parent.config_path
-        }
+        computation[:collection_entity_key] = entity.parent.entity_key
+        computation[:collection_config_path] = entity.parent.config_path
       end
-      if entity.compute_lookup?
-
-        computation[:lookup_entity_path] = entity.compute_lookup_entity.entity_path
-      elsif entity.compute_form?
-        computation[:formula] = entity.compute_formula
-      end
-      dependencies[:computations] << computation
+      computation[:formula] = entity.compute_formula
+      dependencies[:form_computations] << computation
     end
+  end
+
+  def init_lookup_computations(context, model:, dependencies:, **)
+    lookup_computations = {}
+    model.entities.where(
+        compute_enabled: true,
+        compute_type_id: FormEntityComputationType.id_for(:lookup))
+        .includes(:compute_lookup_entity, :parent).each do |entity|
+      lookup_computations[entity.compute_lookup_entity.entity_path] ||= {
+          lookup_entity_path: entity.compute_lookup_entity.entity_path,
+          lookup_config_path: entity.compute_lookup_entity.config_path,
+          dependent_entities: []
+      }
+      lookup_computations[entity.compute_lookup_entity.entity_path][:dependent_entities] << {
+          entity_path: entity.entity_path,
+          config_path: entity.config_path
+      }
+    end
+    dependencies[:lookup_computations] = lookup_computations.values
   end
 
   def init_lookup_filters(context, dependencies:, model:, **)
