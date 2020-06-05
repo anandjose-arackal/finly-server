@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_03_055905) do
+ActiveRecord::Schema.define(version: 2020_06_05_102647) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -4675,6 +4675,10 @@ ActiveRecord::Schema.define(version: 2020_06_03_055905) do
     t.datetime "deleted_at"
     t.boolean "tds_applicable", default: false
     t.decimal "discount_rate", precision: 10
+    t.decimal "tax_percentage", precision: 20, scale: 5
+    t.string "item_number"
+    t.string "product_type_id"
+    t.string "gl_code"
     t.index ["amount_id"], name: "index_invoice_line_items_on_amount_id"
     t.index ["category_id"], name: "index_invoice_line_items_on_category_id"
     t.index ["cost_center_id"], name: "index_invoice_line_items_on_cost_center_id"
@@ -4830,6 +4834,7 @@ ActiveRecord::Schema.define(version: 2020_06_03_055905) do
     t.boolean "payable", default: false
     t.integer "cn_adjusted_amount_id"
     t.boolean "rcm_enabled", default: false
+    t.decimal "tds_percentage", precision: 20, scale: 5
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["advance_amount_id"], name: "index_invoices_on_advance_amount_id"
     t.index ["amount_id"], name: "index_invoices_on_amount_id"

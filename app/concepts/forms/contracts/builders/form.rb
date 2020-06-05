@@ -9,7 +9,13 @@ class Forms::Contracts::Builders::Form
 
       if form.model.has_attribute?(:created_by)
         property :created_by, deserializer: -> (input, represented, **) do
-          represented.created_by = RequestStoreUtil.current_user unless model.persisted?
+          represented.created_by = RequestStoreUtil.current_user if represented.created_by.blank?
+        end
+      end
+
+      if form.model.has_attribute?(:company_id)
+        property :company_id, deserializer: -> (input, represented, **) do
+          represented.company_id = RequestStoreUtil.current_user.company_id if represented.company_id.blank?
         end
       end
 

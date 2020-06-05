@@ -172,12 +172,13 @@ class Invoice < ApplicationRecord
   has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
   has_many :items, class_name: "InvoiceLineItem", as: :parent
   # Standardizing where all attachments are stored
-  # Fixme: Migration of all invoice_attachment to attachments is still pending
-  has_many :attachments
   has_many :invoice_attachments
 
   # Attachments created for procurement
   has_many :attachments, class_name: 'ProcurementAttachment', as: :procurement_document
+  # Fixme: Migration of all invoice_attachment to attachments is still pending
+  # Fixme: Need to check where the previous attachments was being used as this is overriding it
+  has_many :attachments, as: :resource
   has_many :custom_fields, as: :parent, dependent: :destroy
 
   # From Procurement workflow
