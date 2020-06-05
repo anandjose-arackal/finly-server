@@ -1,15 +1,8 @@
 class TdsRatesListExposure < Exposures::API
 
-  def name
-    record.name
-  end
-
-  def rate
-    record.tds
-  end
-
-  def gl_code
-    record.gl_code
-  end
+  attribute :id, record_attribute: true
+  attribute :name, record_attribute: true
+  attribute :tds, record_attribute: true
+  attribute :gl_code, record_attribute: true
 
 end

@@ -171,6 +171,9 @@ class Invoice < ApplicationRecord
 
   has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
   has_many :items, class_name: "InvoiceLineItem", as: :parent
+  # Standardizing where all attachments are stored
+  # Fixme: Migration of all invoice_attachment to attachments is still pending
+  has_many :attachments
   has_many :invoice_attachments
 
   # Attachments created for procurement

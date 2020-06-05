@@ -17,7 +17,17 @@ class Forms::Contracts::Builders::Form
       sections.each do |section|
         associate_custom_fields ||= section.associate_custom_fields
         section.entities.root.each do |entity|
-          entity.contract(self, user)
+
+          Forms::Contracts::Builders::Form.setup_entity self, entity, user
+          # If the entity has sub-entities and is not a collection, then define the properties without wrapping in the entity
+          # Fixme: This has to be generalized
+          # if entity.entities.present? and not entity.class.collection?
+          #   entity.entities.each do |ent|
+          #     ent.contract(self, user)
+          #   end
+          # else
+          #   entity.contract(self, user)
+          # end
         end
       end
 
@@ -26,6 +36,16 @@ class Forms::Contracts::Builders::Form
       # dependencies.each do |dependency|
       #   class_eval &dependency.contract
       # end
+    end
+  end
+
+  def self.setup_entity(contract_klass, entity, user)
+    if entity.entities.present? and not entity.class.collection?
+      entity.entities.each do |ent|
+        setup_entity(contract_klass, ent, user)
+      end
+    else
+      entity.contract(contract_klass, user)
     end
   end
 

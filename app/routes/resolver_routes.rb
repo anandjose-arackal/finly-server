@@ -61,6 +61,10 @@ Resolver::Router.draw do
     route 'default', Masters::TaxRates::Resolver
   end
 
+  scope :tds_slabs do
+    route 'default', Masters::TdsSlabs::Resolver
+  end
+
   scope :users do
     route 'default', Masters::Users::Resolver
   end

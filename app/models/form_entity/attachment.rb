@@ -75,4 +75,8 @@ class FormEntity::Attachment < FormEntity
     end
   end
 
+  def populate_if_empty
+    super() || ::Attachment
+  end
+
 end

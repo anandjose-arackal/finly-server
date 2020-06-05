@@ -11,6 +11,7 @@ Lookup::Router.draw do
   route 'vendor_bank_accounts', Masters::Vendors::BankAccounts::Lookup
   route "items", Masters::Items::Lookup
   route "tax_rates", Masters::TaxRates::Lookup
+  route "tds_slabs", Masters::TdsSlabs::Lookup
   route 'bbps_billers', Docs::UtilityBills::Billers::Lookup
 
   # Docs

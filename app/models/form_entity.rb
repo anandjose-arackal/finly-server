@@ -203,7 +203,7 @@ class FormEntity < ApplicationRecord
     contract_evaluators[name] = block if block_given?
   end
 
-  def assign(represented, value)
+  def populate(represented, value)
     if populate_if_empty.present?
       populator = represented.send(entity_key)
       populator ||= populate_if_empty.new

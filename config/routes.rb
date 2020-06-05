@@ -4174,8 +4174,8 @@ Rails.application.routes.draw do
   # resources :form_entities
   get 'forms/:route/config', to: 'forms#form_config'
   get 'forms/:route/dependencies', to: 'forms#form_dependencies'
-  post 'forms/:route/choices', to: 'forms#form_entity_choices'
-  post 'forms/:route/lookup_details', to: 'forms#form_lookup_details'
+  post 'forms/choices', to: 'forms#form_entity_choices'
+  post 'forms/lookup_details', to: 'forms#form_lookup_details'
   resources :forms
 
   resources :insights

@@ -14,7 +14,7 @@ class Docs::P2P::Invoices::Form < Forms::API
     date :due_date, restriction: 'not_in_the_past'
     lookup :policy_id,
            choices_scope: Choices[:lookup].('policies'),
-               #permissions: [:non_po_invoice_initiator]),
+           #permissions: [:non_po_invoice_initiator]),
            required: true
     dropdown :cost_allocation_items, choices_scope: Choices[:list].({id: false, name: "Header"}, {id: true, name: "Line Item"}),
              required: true, can_choices_be_changed: false, default_value: false
@@ -63,9 +63,9 @@ class Docs::P2P::Invoices::Form < Forms::API
       text :comment
       # text :item_number, editable: false, computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.item_code}}')
       # dropdown :product_type_id, choices_scope: Choices[:enum].(ProductType), editable: false, computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.product_type_id}}')
-      dropdown :department_id, editable: false, visible: false, choices_scope:  Choices[:lookup].('departments'), computed: Forms::Compute::Form('{{form.department_id}}')
-      dropdown :cost_center_id, editable: false, visible: false, choices_scope:  Choices[:lookup].('cost_centers'), computed: Forms::Compute::Form('{{form.cost_center_id}}')
-      dropdown :category_id, choices_scope:  Choices[:lookup].('categories'), required: true, computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.category_id}}')
+      dropdown :department_id, editable: false, visible: false, choices_scope: Choices[:lookup].('departments'), computed: Forms::Compute::Form('{{form.department_id}}')
+      dropdown :cost_center_id, editable: false, visible: false, choices_scope: Choices[:lookup].('cost_centers'), computed: Forms::Compute::Form('{{form.cost_center_id}}')
+      dropdown :category_id, choices_scope: Choices[:lookup].('categories'), required: true, computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.category_id}}')
       # text :gl_code, editable: false, computed: Forms::Compute::Lookup('items.category_id', '{{record.gl_code}}')
       text :hsn_sac, computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.hsn_sac}}')
       number :quantity, required: true, min_value: 1
@@ -78,44 +78,45 @@ class Docs::P2P::Invoices::Form < Forms::API
       dropdown :tax_rate_id, choices_scope: Choices[:lookup].('tax_rates'), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.tax_rate_id}}')
       number :tax_rate, editable: false, visible: false, computed: Forms::Compute::Lookup('items.tax_rate_id', '{{record.rate}}')
       amount :tax_amount, editable: false, computed: Forms::Compute::Form({value: "{{ row.taxable_amount.value | times: row.tax_rate | divided_by: 100 }}", currency_id: "1"})
-      amount :net_amount, editable: false, computed: Forms::Compute::Form({value: "{{ row.taxable_amount.value | minus: row.tax_amount.value }}", currency_id: "1"})
+      amount :net_amount, editable: false, computed: Forms::Compute::Form({value: "{{ row.taxable_amount.value | plus: row.tax_amount.value }}", currency_id: "1"})
     end
-#     table_summary :items_summary do
-#       amount :gross_amount, editable: false, computed: Forms::Compute::Form(
-#           <<-CALC
-# {% assign gross_total = 0 %}\
-# {% for item in form.items %}\
-# {% gross_total = gross_total | plus: item.taxable_amount %}\
-# {% endfor %}\
-# {{ gross_total }}
-#       CALC
-#       )
-#       amount :discount_amount, editable: false, computed: Forms::Compute::Form(
-#       <<-CALC
-# {% assign discount_amount = 0 %}\
-# {% for item in form.items %}\
-# {% discount_amount = discount_amount | plus: item.discount_amount %}\
-# {% endfor %}\
-# {{ discount_amount }}
-#       CALC
-#       )
-#       amount :tax_amount, editable: false, computed: Forms::Compute::Form(
-#           <<-CALC
-# {% assign tax_amount = 0 %}\
-# {% for item in form.items %}\
-# {% tax_amount = tax_amount | plus: item.tax_amount %}\
-# {% endfor %}\
-# {{ tax_amount }}
-#       CALC
-#       )
-#       dropdown :tds_slab_id, choices_scope: Choices[:lookup].('tds_slabs')
-#       number :tds_rate, computed: Forms::Compute::Lookup('tds_slab_id', '{{record.rate}}')
-#       amount :tds_amount, editable: false, computed: Forms::Compute::Form('{{ form.gross_amount | times: form.tds_rate | divided_by: 100 }}')
-#       amount :net_amount do
-#         number :value, decimal: true, computed: Forms::Compute::Form('{{ form.gross_amount.value | plus: form.tax_amount.value | divided_by: 100 }}')
-#         text :currency_id, choices_scope: Choices[:list].(Currency.as_json), default_value: 1
-#       end
-#     end
+    table_summary :items_summary do
+      amount :gross_amount, editable: false, computed: Forms::Compute::Form(
+          value: "\
+{% assign gross_total = 0 %}\
+{% for item in form.items %}\
+{% assign gross_total = gross_total | plus: item.amount.value %}\
+{% endfor %}\
+{{ gross_total }}",
+          currency_id: "1"
+      )
+      amount :discount_amount, editable: false, computed: Forms::Compute::Form(
+          value: "\
+{% assign discount_amount = 0 %}\
+{% for item in form.items %}\
+{% assign discount_amount = discount_amount | plus: item.discount_amount.value %}\
+{% endfor %}\
+{{ discount_amount }}",
+          currency_id: ""
+      )
+      amount :tax_amount, editable: false, computed: Forms::Compute::Form(
+          value: "\
+{% assign tax_amount = 0 %}\
+{% for item in form.items %}\
+{% assign tax_amount = tax_amount | plus: item.tax_amount.value %}\
+{% endfor %}\
+{{ tax_amount }}",
+          currency_id: "1"
+      )
+      dropdown :tds_slab_id, choices_scope: Choices[:lookup].('tds_slabs')
+      number :tds_rate, internal: true, editable: false, computed: Forms::Compute::Lookup('items_summary.tds_slab_id', '{{record.rate}}')
+      amount :tds_amount, editable: false, computed: Forms::Compute::Form(value: '{{ form.gross_amount.value | times: form.tds_rate | divided_by: 100 }}', currency_id: 1)
+      amount :net_amount, editable: false, computed: Forms::Compute::Form(value: '{{ form.gross_amount.value | minus: form.discount_amount.value | plus: form.tax_amount.value }}', currency_id: 1)
+    end
+  end
+
+  section :attachments do
+    attachment :attachments
   end
 
   condition condition_id: "Receiving Account Type can only be active if Receiving Account ID is set" do

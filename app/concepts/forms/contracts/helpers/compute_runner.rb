@@ -25,12 +25,12 @@ class Forms::Contracts::Helpers::ComputeRunner
 
     value = lookup_record.to_exposure.template(entity.compute_formula)
     # represented.send("#{entity.entity_key}=", value)
-    entity.assign(represented, value)
+    entity.populate(represented, value)
   end
 
   def self.compute_via_form(represented, entity, value, form: {}, row: {})
     value = LiquidHelper.interpolate(entity.compute_formula, {row: row, form: form}.as_json)
-    entity.assign(represented, value)
+    entity.populate(represented, value)
     # represented.send("#{entity.entity_key}=", value)
   end
 end

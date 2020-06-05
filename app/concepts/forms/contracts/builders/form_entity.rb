@@ -123,7 +123,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
       internal = result['internal']
       if editable and visible and row_data.has_key?(entity.entity_key)
         value = input[entity.entity_key] # || entity.default_value
-        entity.assign(represented, value)
+        entity.populate(represented, value)
         # represented.send("#{entity.entity_key}=", entity.format(value))
       end
 
@@ -145,7 +145,8 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
       Forms::Contracts::Builders::CustomField.(self, entities.custom_fields) if entity.associate_custom_fields
 
       entities.each do |ent|
-        ent.contract(self, user)
+        Forms::Contracts::Builders::Form.setup_entity self, ent, user
+        # ent.contract(self, user)
       end
     end
   end
