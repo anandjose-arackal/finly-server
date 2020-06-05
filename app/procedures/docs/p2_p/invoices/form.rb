@@ -80,7 +80,10 @@ class Docs::P2P::Invoices::Form < Forms::API
       amount :tax_amount, editable: false, computed: Forms::Compute::Form({value: "{{ row.taxable_amount.value | times: row.tax_rate | divided_by: 100 }}", currency_id: "1"})
       amount :net_amount, editable: false, computed: Forms::Compute::Form({value: "{{ row.taxable_amount.value | plus: row.tax_amount.value }}", currency_id: "1"})
     end
-    table_summary :items_summary do
+  end
+
+  section :summary do
+    summary :items_summary do
       amount :gross_amount, editable: false, computed: Forms::Compute::Form(
           value: "\
 {% assign gross_total = 0 %}\

@@ -50,8 +50,8 @@
 #  filters                      :text(65535)
 #
 
-class FormEntity::TableSummary < FormEntity
+class FormEntity::Summary < FormEntity
 
-  register :table_summary
+  register :summary
 
 end
