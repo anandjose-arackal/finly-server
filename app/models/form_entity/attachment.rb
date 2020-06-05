@@ -55,6 +55,7 @@ class FormEntity::Attachment < FormEntity
   FORMAT = %w(txt pdf doc docx xls xlsx).freeze
 
   register :attachment
+  collection!
 
   option :maximum, default: 255
   option :minimum, default: 0
@@ -75,8 +76,18 @@ class FormEntity::Attachment < FormEntity
     end
   end
 
-  def populate_if_empty
-    super() || ::Attachment
+  def populator
+    -> (model: nil, collection:, fragment: nil, index: nil, options:, **) do
+      id = (fragment["id"] || fragment[:id] || fragment["uuid"] || fragment[:uuid]).to_s
+      item = collection.find { |item| id == item.id.to_s }
+
+      if fragment["_destroy"]
+        collection.destroy(item) if item
+        return skip!
+      end
+
+      item ? item : collection.append(::Attachment.find(id))
+    end
   end
 
 end

@@ -42,6 +42,15 @@ module Forms::API::Entity::Schema
       @collection || false
     end
 
+    def layout!
+      @layout = true
+    end
+
+    # all collections are layouts
+    def layout?
+      @layout || collection? || false
+    end
+
     def schema_validation(&block)
       @schema_validation = SchemaValidation.build(&block) if block_given?
       @schema_validation ||= SchemaValidation.build

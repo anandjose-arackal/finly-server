@@ -106,7 +106,9 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
     properties = {}
     properties[:virtual] = true if entity.custom_field
     properties[:populate_if_empty] = entity.populate_if_empty if entity.populate_if_empty.present?
-    properties[:deserializer] = deserializer(entity) unless entity.entities.present?
+    properties[:deserializer] = deserializer(entity) unless entity.class.layout?
+    populator = entity.populator
+    properties[:populator] = populator if populator.present?
     properties
   end
 
@@ -136,7 +138,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
   end
 
   def contract_block(entity, user)
-    return nil unless entity.entities.present?
+    return nil unless entity.class.layout?
 
     entities = entity.entities
 

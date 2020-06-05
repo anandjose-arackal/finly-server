@@ -214,4 +214,8 @@ class FormEntity < ApplicationRecord
     end
   end
 
+  def populator
+    nil
+  end
+
 end
