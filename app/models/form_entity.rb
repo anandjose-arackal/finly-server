@@ -140,6 +140,25 @@ class FormEntity < ApplicationRecord
   # end
 
   def as_json(opts = {})
+    return form_reference_json(opts) if opts&.dig(:json_format)&.to_s == 'form_reference'
+    form_json(opts)
+  end
+
+  def form_reference_json(opts = {})
+    json = {
+        entity_key: entity_key,
+        entity_path: entity_path,
+        config_path: config_path,
+    }
+    if parent.present? and parent.class.collection?
+      json[:collection_entity_key] = parent.entity_key
+      json[:collection_entity_path] = parent.entity_path
+      json[:collection_config_path] = parent.config_path
+    end
+    json
+  end
+
+  def form_json(opts={})
     data = {
         # id: uuid,
         entity_key: entity_key,

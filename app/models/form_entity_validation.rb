@@ -80,12 +80,12 @@ class FormEntityValidation < ApplicationRecord
   end
 
   def as_json(options = {})
-    {
-        entity_path: entity_path,
-        config_path: form_entity.config_path,
-        error_message: error_message,
-        rule: rule.as_json_logic,
-    }
+    form_entity.as_json(json_format: "form_reference").merge(
+        {
+            error_message: error_message,
+            rule: rule.as_json_logic,
+        }
+    )
   end
 
 end

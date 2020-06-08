@@ -58,18 +58,18 @@ class FormCondition < ApplicationRecord
     actions.new property: property, value: value
   end
 
-  def rule(rule=NoObject)
+  def rule(rule = NoObject)
     self.rule = rule unless rule == NoObject
     super()
   end
 
   def as_json(options = {})
-    {
-        entity_path: referencable.entity_path,
-        config_path: referencable.config_path,
-        rule: rule.as_json_logic,
-        actions: actions
-    }
+    referencable.as_json(json_format: "form_reference").merge(
+        {
+            rule: rule.as_json_logic,
+            actions: actions
+        }
+    )
   end
 
 end
