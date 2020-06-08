@@ -855,7 +855,8 @@ class Payment < ApplicationRecord
       end
     end
 
-    if PaymentStatus.all_except_failed.exclude? self.payment_status_id
+    # if PaymentStatus.all_except_failed.exclude? self.payment_status_id
+    if self.failed? ||  self.possible_failure?
       case self.parent_type
       when 'Invoice'
         parent_details = initiating_user.company.inward_invoices.non_beneficiary.find_by(id: self.parent_id)

@@ -45,7 +45,7 @@ class Docs::UtilityBills::Bills::Ops::BillValidate < Transactions::API
     end
 
     param[:amount_1] = model.amount.value if model.amount.present? && model.amount.value > 0
-    param[:amount_2] = model.labe_payment_fee.value if model.late_payment_fee.present? && model.late_payment_fee.value > 0
+    param[:amount_2] = model.late_payment_fee.value if model.late_payment_fee.present? && model.late_payment_fee.value > 0
     param[:amount_3] = model.early_payment_fee.value if model.early_payment_fee.present? && model.early_payment_fee.value > 0
     param[:amount_4] = model.convenience_fee.value if model.convenience_fee.present? && model.convenience_fee.value > 0
 

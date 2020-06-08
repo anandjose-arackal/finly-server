@@ -77,16 +77,16 @@ class Bbps::BillPay < Bbps::Api
   # Customer Reference Field2=20|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|Y|0
   request_fields(
       [
-          :message_code, :order_number, :agent_institution_id, :channel_id, :agent_id,
-          :quick_pay,:split_pay, :split_pay_amount, :customer_name, :customer_mobile,
-          :customer_email, :customer_aadhar_no, :customer_pan_id,
-          :amount, :bill_date, :due_date, :bill_number, :bill_period,
-          :convenience_fee, :convenience_fee_desc,
-          :initiating_channel, :payment_mode, :debit_account_number, :biller_id,
-          :customer_param_1, :customer_param_2, :customer_param_3, :customer_param_4, :customer_param_5,
-          :additional_field, :additional_field, :additional_field, :additional_field, :additional_field,
-          :additional_field, :additional_field, :additional_field, :additional_field, :additional_field,
-          :additional_field, :additional_field, :additional_field, :on_us_off_us, :ccf_charges
+        :message_code, :order_number, :agent_institution_id, :channel_id, :agent_id,
+        :quick_pay,:split_pay, :split_pay_amount, :customer_name, :customer_mobile,
+        :customer_email, :customer_aadhar_no, :customer_pan_id,
+        :amount, :bill_date, :due_date, :bill_number, :bill_period,
+        :convenience_fee, :convenience_fee_desc,
+        :initiating_channel, :payment_mode, :debit_account_number, :biller_id,
+        :customer_param_1, :customer_param_2, :customer_param_3, :customer_param_4, :customer_param_5,
+        :additional_field, :additional_field, :additional_field, :additional_field, :additional_field,
+        :additional_field, :additional_field, :additional_field, :additional_field, :additional_field,
+        :additional_field, :additional_field, :additional_field, :on_us_off_us, :ccf_charges
       ]
 
   # 1:message_code, 2:order_number, 3:agent_institution_id, 4:channel_id, 5:agent_id,
@@ -137,14 +137,14 @@ class Bbps::BillPay < Bbps::Api
   # ASD1503901571142PAYMSG1734460509172|2016-07-01|2016- 09-30|
   # 12303091|Sept|NA|NA|Y|0
   response_fields(
-      [
-          :message_code, :status, :error_code, :error_desc, :order_number, :agent_institution_id, :channel_id,
-          :bbps_ref_id, :agent_id, :customer_name, :customer_mobile, :customer_email, :customer_aadhar_no, :customer_pan_id,
-          :channel_id, :biller_id, :amount, :bill_date, :due_date, :bill_number, :bill_period, :convenience_fee,
-          :convenience_fee_desc, :late_payment_fee, :early_payment_fee,
-          :additional_field, :additional_field, :additional_field, :additional_field, :additional_field,
-          :additional_field
-      ]
+    [
+      :message_code, :status, :error_code, :error_desc, :order_number, :agent_institution_id, :channel_id,
+      :bbps_ref_id, :agent_id, :customer_name, :customer_mobile, :customer_email, :customer_aadhar_no, :customer_pan_id,
+      :channel_id, :biller_id, :amount, :bill_date, :due_date, :bill_number, :bill_period, :convenience_fee,
+      :convenience_fee_desc, :late_payment_fee, :early_payment_fee,
+      :additional_field, :additional_field, :additional_field, :additional_field, :additional_field,
+      :additional_field
+    ]
   )
 
   def message_code

@@ -78,10 +78,12 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:possible_failure))
         payment.update(payment_status_id: PaymentStatus.id_for(:possible_failure))
         result.errors.each do |error|
+
           payment.system_messages.build(content: error,
                                         system_message_type_id: SystemMessageType.id_for(:error)).save
         end
         return false
+        # any error code
       end
       op.failure do |result|
         puts "Failure:Result: #{result}"
@@ -92,6 +94,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
                                         system_message_type_id: SystemMessageType.id_for(:error)).save
         end
         return false
+        # 200
       end
     end
 
