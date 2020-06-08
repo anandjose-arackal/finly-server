@@ -2989,7 +2989,8 @@ Rails.application.routes.draw do
   post 'virtual_accounts', to: 'api/fc/invoices/virtual_bank_accounts#create'
   patch 'virtual_accounts/:account_number', to: 'api/fc/invoices/virtual_bank_accounts#update'
   delete 'virtual_accounts/:account_number', to: 'api/fc/invoices/virtual_bank_accounts#deactivate'
-  post 'invoices', to: 'api/fc/invoices/outward_invoices#create_valid'
+  # Deprecated in leu of the new invoices APIs
+  # post 'invoices', to: 'api/fc/invoices/outward_invoices#create_valid'
   post 'invoices/customers', to: 'api/fc/invoices/customers#create'
   patch 'invoices/customers/:id', to: 'api/fc/invoices/customers#update'
   get 'invoices/customers/:id', to: 'api/fc/invoices/customers#show'
@@ -4266,6 +4267,10 @@ Rails.application.routes.draw do
   patch 'users/:id/profile', to: 'user_profiles#update'
 
   post 'clients/web', to: 'web_clients#create'
+
+
+  resources :invoices, only: [:create, :update, :show]
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
   # The priority is based upon order of creation: first created -> highest priority.

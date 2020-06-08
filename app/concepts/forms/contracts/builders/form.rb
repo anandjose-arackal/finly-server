@@ -14,7 +14,6 @@ class Forms::Contracts::Builders::Form
 
       if form.model.has_attribute?(:company_id)
         property :company_id, deserializer: -> (input, represented, **) do
-          puts "Company : #{RequestStoreUtil.current_user.company_id}"
           represented.company_id = RequestStoreUtil.current_user.company_id if represented.company_id.blank?
         end
       end
@@ -28,23 +27,10 @@ class Forms::Contracts::Builders::Form
           next unless entity.parent_id.blank?
 
           Forms::Contracts::Builders::Form.setup_entity self, entity, user
-          # If the entity has sub-entities and is not a collection, then define the properties without wrapping in the entity
-          # Fixme: This has to be generalized
-          # if entity.entities.present? and not entity.class.collection?
-          #   entity.entities.each do |ent|
-          #     ent.contract(self, user)
-          #   end
-          # else
-          #   entity.contract(self, user)
-          # end
         end
       end
 
       Forms::Contracts::Builders::CustomField.(self, form.entities.root.custom_fields) if associate_custom_fields.present?
-
-      # dependencies.each do |dependency|
-      #   class_eval &dependency.contract
-      # end
     end
   end
 
