@@ -1,11 +1,10 @@
 class Forms::Contracts::Builders::Form
 
   def self.call(form, user)
+    form  = Form.where(uuid: form.uuid).includes(:entities, {sections: {entities: [:compute_lookup_entity, :form, {conditions: :actions}, :validations, {entities: [:compute_lookup_entity, :form, {conditions: :actions}, :validations, {entities: [:compute_lookup_entity, :form, {conditions: :actions}, :validations, entities: [:compute_lookup_entity, :form, {conditions: :actions}, :validations, :entities]]}]}]}}).first
     # FixMe : proper inclusion of conditions, validations and dependencies to avoid N+1
-    sections = form.sections.includes(entities: {entities: {entities: {entities: [:entities]}}})
-    Class.new(Forms::Contracts::Base) do
-
-      Forms::Contracts::Helpers::SetupBase.(self)
+    sections = form.sections
+    Class.new(Reform::Form) do
 
       if form.model.has_attribute?(:created_by)
         property :created_by, deserializer: -> (input, represented, **) do
@@ -15,6 +14,7 @@ class Forms::Contracts::Builders::Form
 
       if form.model.has_attribute?(:company_id)
         property :company_id, deserializer: -> (input, represented, **) do
+          puts "Company : #{RequestStoreUtil.current_user.company_id}"
           represented.company_id = RequestStoreUtil.current_user.company_id if represented.company_id.blank?
         end
       end
@@ -22,7 +22,10 @@ class Forms::Contracts::Builders::Form
       associate_custom_fields = false
       sections.each do |section|
         associate_custom_fields ||= section.associate_custom_fields
-        section.entities.root.each do |entity|
+        section.entities.each do |entity|
+
+          # Only root entities
+          next unless entity.parent_id.blank?
 
           Forms::Contracts::Builders::Form.setup_entity self, entity, user
           # If the entity has sub-entities and is not a collection, then define the properties without wrapping in the entity

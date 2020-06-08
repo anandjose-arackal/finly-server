@@ -59,7 +59,17 @@ class FormEntity::Amount < FormEntity
 
   operators :eq_any, :gteq, :lteq, :blank
 
-  def populate_if_empty
-    super() || ::Amount
+  # def populate_if_empty
+  #   super() || ::Amount
+  # end
+
+  def populate(represented, value)
+    populator = represented.send(entity_key)
+    populator ||= ::Amount.new
+    # Fixme: Hard coded first currency to check performance
+    currency = RequestStore[:currency] ||= Currency.first
+    attributes = {value: value[:value], currency: currency}
+    populator.assign_attributes(attributes)
+    represented.send("#{entity_key}=", populator)
   end
 end
