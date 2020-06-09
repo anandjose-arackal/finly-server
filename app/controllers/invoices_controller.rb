@@ -9,7 +9,7 @@ class InvoicesController < BaseControllers::WebBase
   end
 
   def show
-
+    endpoint Docs::P2P::Invoices::Show
   end
 
 end
