@@ -4,6 +4,7 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
   system_subscription :vp
   permissions :bank_payment_request_initiator, :bank_payment_request_reviewer, :bank_payment_request_creditor, :bank_payment_request_auditor,
               :invoice_initiator, :invoice_reviewer, :invoice_auditor, :po_invoice_initiator, :po_invoice_reviewer, :po_invoice_auditor,
+              :credit_note_initiator, :credit_note_reviewer, :credit_note_auditor,
               :non_po_invoice_initiator, :non_po_invoice_reviewer, :non_po_invoice_auditor, :auditor, :admin
   resolver 'invoices.default'
   reference '{{record.id}}', procurement_id: '{{record.procurement_id}}', procurement_type: "{{record.invoice_type.key}}"
