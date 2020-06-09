@@ -84,7 +84,7 @@ class Filters::Schema::Validation
 
   class GroupSchema < Transactions::Schema
     params do
-      required(:m).filled(inclusion?: %w(and or))
+      required(:m).filled(included_in?: %w(and or))
       required(:c).hash
     end
   end

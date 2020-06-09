@@ -2,7 +2,7 @@ class Forms::Ops::Config < Transactions::API
 
   schema do
     params do
-      required(:route).value(inclusion?: Forms::Router.map.keys)
+      required(:route).value(included_in?: Forms::Router.map.keys)
     end
   end
 

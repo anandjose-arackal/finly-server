@@ -18,5 +18,6 @@ class AddAmountFieldsToInvoices < ActiveRecord::Migration[5.2]
     add_column :invoice_line_items, :taxable_amount, :decimal, precision: 20, scale: 10, index: true
     add_column :invoice_line_items, :tax_amount, :decimal, precision: 20, scale: 10, index: true
     add_column :invoice_line_items, :net_amount, :decimal, precision: 20, scale: 10, index: true
+    add_column :invoice_line_items, :currency_code, :string, index: true
   end
 end

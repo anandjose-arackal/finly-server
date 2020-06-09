@@ -2,7 +2,7 @@ class Forms::Ops::LookupDetails < Transactions::API
 
   schema do
     params do
-      required(:route).value(inclusion?: Forms::Router.map.keys)
+      required(:route).value(included_in?: Forms::Router.map.keys)
       required(:entity_path).filled
       required(:value).filled
     end

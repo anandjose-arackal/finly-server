@@ -56,6 +56,7 @@ class Docs::P2P::Invoices::Form < Forms::API
   end
 
   section :items do
+    currency :currency_code
     table :items, populate_if_empty: InvoiceLineItem do
       number :id, visible: false, editable: false, internal: true, can_visible_be_changed: false, can_editable_be_changed: false
       lookup :inventory_line_item_id, choices_scope: Choices[:lookup].('items')
@@ -68,6 +69,7 @@ class Docs::P2P::Invoices::Form < Forms::API
       dropdown :category_id, choices_scope: Choices[:lookup].('categories'), required: true, computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.category_id}}')
       text :gl_code, editable: false, computed: Forms::Compute::Lookup('items.category_id', '{{record.gl_code}}')
       text :hsn_sac, computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.hsn_sac}}')
+      currency :currency_code, editable: false, visible: false, computed: Forms::Compute::Form("{{ form.currency_code }}")
       number :quantity, required: true, min_value: 1
       dropdown :unit_of_measurement, choices_scope: Choices[:list].({id: "KG", value: "KG"})
       amount :rate, required: true

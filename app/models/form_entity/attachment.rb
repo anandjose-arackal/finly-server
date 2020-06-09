@@ -71,7 +71,7 @@ class FormEntity::Attachment < FormEntity
       hash do
         required(:maximum).value(:int?, lteq?: 255)
         required(:minimum).value(:int?, gteq?: 0)
-        optional(:format).each(inclusion?: FORMAT)
+        optional(:format).each(included_in?: FORMAT)
       end
     end
   end
@@ -86,6 +86,7 @@ class FormEntity::Attachment < FormEntity
         return skip!
       end
 
+      # Fixme: Scope based on company
       item ? item : collection.append(::Attachment.find(id))
     end
   end

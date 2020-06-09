@@ -76,7 +76,7 @@ class FormEntity::Text < FormEntity
           required(:format).filled
           required(:message).filled
         end
-        optional(:format).value(inclusion?: FORMAT)
+        optional(:format).value(included_in?: FORMAT)
       end
     end
   end
