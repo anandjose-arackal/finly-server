@@ -119,8 +119,8 @@ class FormEntity < ApplicationRecord
     Choices[val[:type]].new(val[:config], form_entity: self)
   end
 
-  def contract(reform, user)
-    Forms::Contracts::Builders::FormEntity.({params: {entity: self, reform: reform}, current_user: user})
+  def contract(contract, user)
+    Forms::Contracts::Builders::FormEntity.({params: {entity: self, contract: contract}, current_user: user})
   end
 
   def computed=(data)

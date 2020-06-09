@@ -18,18 +18,24 @@ class Choices::Builders::Lookup < Choices::Builders::Base
     ::Lookup::Router.resolve(route)&.first&.klass
   end
 
-  def find_by_id(id, params: {}, user: nil)
-    return finder_cache[:id][id] if finder_cache[:id][id].present?
+  def with_id(id, params: {}, user: nil)
+    id = [id] unless id.respond_to?(:each)
+    params.deep_merge!({q: {id_in: id}})
+    choices(params: params, user: user)
+  end
 
-    params.deep_merge!({q: {id_eq: id}})
-    choices(params: params, user: user)&.first
+  def with_name(name, params: {}, user: nil)
+    name = [name] unless name.respond_to?(:each)
+    params.deep_merge!({q: {name_in: name}})
+    choices(params: params, user: user)
+  end
+
+  def find_by_id(id, params: {}, user: nil)
+    with_id(id, params: params, user: user)&.first
   end
 
   def find_by_name(name, params: {}, user: nil)
-    return finder_cache[:id][name] if finder_cache[:id][name].present?
-
-    params.deep_merge!({q: {name_eq: name}})
-    choices(params: params, user: user)&.first
+    with_name(id, params: params, user: user)&.first
   end
 
   def choices(params: {}, user: nil)

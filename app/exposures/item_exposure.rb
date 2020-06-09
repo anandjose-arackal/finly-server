@@ -15,6 +15,7 @@ class ItemExposure < Exposures::API
     record.supply_item_type&.name&.gsub("_item", "")
   end
   attribute :deleted_at, record_attribute: true
+  attribute :product_type_id, record_attribute: true
   attribute :product_type do
     record.product_type&.name
   end

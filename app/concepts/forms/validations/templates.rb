@@ -10,31 +10,31 @@ class Forms::Validations::Templates
     @validates
   end
 
-  validates :max_value do |reform:, entity:, **|
+  validates :max_value do |contract:, entity:, **|
     if entity.options['max_value'].present?
-      reform.validates entity.entity_key.to_sym, numericality: {less_than_or_equal_to: entity.options['max_value']}
+      contract.validates entity.entity_key.to_sym, numericality: {less_than_or_equal_to: entity.options['max_value']}
     end
   end
 
-  validates :min_value do |reform:, entity:, **|
+  validates :min_value do |contract:, entity:, **|
     if entity.options['min_value'].present?
-      reform.validates entity.entity_key.to_sym, numericality: {greater_than_or_equal_to: entity.options['min_value']}
+      contract.validates entity.entity_key.to_sym, numericality: {greater_than_or_equal_to: entity.options['min_value']}
     end
   end
 
-  validates :minimum do |reform:, entity:, **|
+  validates :minimum do |contract:, entity:, **|
     if entity.options['minimum'].present? and entity.options['minimum'] > 0
-      reform.validates entity.entity_key.to_sym, length: {minimum: entity.options['minimum']}
+      contract.validates entity.entity_key.to_sym, length: {minimum: entity.options['minimum']}
     end
   end
 
-  validates :maximum do |reform:, entity:, **|
+  validates :maximum do |contract:, entity:, **|
     if entity.options['maximum'].present? and entity.options['maximum'] > 0
-      reform.validates entity.entity_key.to_sym, length: {maximum: entity.options['maximum']}
+      contract.validates entity.entity_key.to_sym, length: {maximum: entity.options['maximum']}
     end
   end
 
-  validates :choices do |reform:, entity:, **|
+  validates :choices do |contract:, entity:, **|
 
   end
 

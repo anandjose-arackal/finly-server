@@ -65,9 +65,9 @@ class FormEntity::Date < FormEntity
 
   operators :gteq_days, :lteq_days, :eq_days, :in_days, :eq_any, :gteq, :lteq, :blank
 
-  contract_eval 'Restriction' do |reform:, entity:, **|
+  contract_eval 'Restriction' do |contract:, entity:, **|
     if entity.options['restriction'].present?
-      reform.validate do
+      contract.validate do
         value = send(entity.entity_key)
         next unless value.present?
 

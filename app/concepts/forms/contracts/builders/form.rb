@@ -4,7 +4,11 @@ class Forms::Contracts::Builders::Form
     form  = Form.where(uuid: form.uuid).includes(:entities, {sections: {entities: [:compute_lookup_entity, :form, {conditions: :actions}, :validations, {entities: [:compute_lookup_entity, :form, {conditions: :actions}, :validations, {entities: [:compute_lookup_entity, :form, {conditions: :actions}, :validations, entities: [:compute_lookup_entity, :form, {conditions: :actions}, :validations, :entities]]}]}]}}).first
     # FixMe : proper inclusion of conditions, validations and dependencies to avoid N+1
     sections = form.sections
-    Class.new(Reform::Form) do
+    Class.new(Forms::Contracts::Base) do
+
+      define_method :current_user do
+        user
+      end
 
       if form.model.has_attribute?(:created_by)
         property :created_by, deserializer: -> (input, represented, **) do
@@ -34,13 +38,13 @@ class Forms::Contracts::Builders::Form
     end
   end
 
-  def self.setup_entity(contract_klass, entity, user)
+  def self.setup_entity(contract, entity, user)
     if entity.entities.present? and not entity.class.collection?
       entity.entities.each do |ent|
-        setup_entity(contract_klass, ent, user)
+        setup_entity(contract, ent, user)
       end
     else
-      entity.contract(contract_klass, user)
+      entity.contract(contract, user)
     end
   end
 
