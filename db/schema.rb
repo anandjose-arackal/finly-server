@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_05_102647) do
+ActiveRecord::Schema.define(version: 2020_06_09_051051) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -4679,6 +4679,10 @@ ActiveRecord::Schema.define(version: 2020_06_05_102647) do
     t.string "item_number"
     t.string "product_type_id"
     t.string "gl_code"
+    t.decimal "gross_amount", precision: 20, scale: 10
+    t.decimal "discount_amount", precision: 20, scale: 10
+    t.decimal "tax_amount", precision: 20, scale: 10
+    t.decimal "net_amount", precision: 20, scale: 10
     t.index ["amount_id"], name: "index_invoice_line_items_on_amount_id"
     t.index ["category_id"], name: "index_invoice_line_items_on_category_id"
     t.index ["cost_center_id"], name: "index_invoice_line_items_on_cost_center_id"
@@ -4835,6 +4839,17 @@ ActiveRecord::Schema.define(version: 2020_06_05_102647) do
     t.integer "cn_adjusted_amount_id"
     t.boolean "rcm_enabled", default: false
     t.decimal "tds_percentage", precision: 20, scale: 5
+    t.decimal "gross_amount", precision: 20, scale: 10
+    t.decimal "discount_amount", precision: 20, scale: 10
+    t.decimal "freight_amount", precision: 20, scale: 10
+    t.decimal "tax_amount", precision: 20, scale: 10
+    t.decimal "tds_amount", precision: 20, scale: 10
+    t.decimal "net_amount", precision: 20, scale: 10
+    t.decimal "po_advance_amount", precision: 20, scale: 10
+    t.decimal "advance_paid_amount", precision: 20, scale: 10
+    t.decimal "total_paid_amount", precision: 20, scale: 10
+    t.decimal "balance_due_amount", precision: 20, scale: 10
+    t.string "currency_code"
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["advance_amount_id"], name: "index_invoices_on_advance_amount_id"
     t.index ["amount_id"], name: "index_invoices_on_amount_id"

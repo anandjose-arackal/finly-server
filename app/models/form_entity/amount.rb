@@ -53,23 +53,18 @@
 class FormEntity::Amount < FormEntity
   register :amount
   set :hint, 'Amount'
+  option :max_value
+  option :min_value
 
-  option :default_currency
-  option :currencies
+  operators :gteq, :lteq, :in, :not_in, :not_null, :null
 
-  operators :eq_any, :gteq, :lteq, :blank
-
-  # def populate_if_empty
-  #   super() || ::Amount
-  # end
-
-  def populate(represented, value)
-    populator = represented.send(entity_key)
-    populator ||= ::Amount.new
-    # Fixme: Hard coded first currency to check performance
-    currency = RequestStore[:currency] ||= Currency.first
-    attributes = {value: value[:value], currency: currency}
-    populator.assign_attributes(attributes)
-    represented.send("#{entity_key}=", populator)
+  schema_validation do
+    required(:options) do
+      hash do
+        optional(:min_value).value(:int?)
+        optional(:max_value).value(:int?)
+      end
+    end
   end
+
 end

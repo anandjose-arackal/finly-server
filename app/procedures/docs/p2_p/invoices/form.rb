@@ -71,50 +71,46 @@ class Docs::P2P::Invoices::Form < Forms::API
       number :quantity, required: true, min_value: 1
       dropdown :unit_of_measurement, choices_scope: Choices[:list].({id: "KG", value: "KG"})
       amount :rate, required: true
-      amount :amount, editable: false, visible: false, computed: Forms::Compute::Form({value: "{{ row.rate.value | times: row.quantity }}", currency_id: "1"})
+      amount :gross_amount, editable: false, visible: false, computed: Forms::Compute::Form("{{ row.rate | times: row.quantity }}")
       number :discount_rate, max_value: 100, min_value: 0, format: 'percentage'
-      amount :discount_amount, editable: false, computed: Forms::Compute::Form({value: "{{ row.amount.value | times: row.discount_rate | divided_by: 100 }}", currency_id: "1"})
-      amount :taxable_amount, editable: false, computed: Forms::Compute::Form({value: "{{ row.amount.value | minus: row.discount_amount.value }}", currency_id: "1"})
+      amount :discount_amount, editable: false, computed: Forms::Compute::Form("{{ row.gross_amount | times: row.discount_rate | divided_by: 100 }}")
+      amount :taxable_amount, editable: false, computed: Forms::Compute::Form("{{ row.gross_amount | minus: row.discount_amount }}")
       dropdown :tax_rate_id, choices_scope: Choices[:lookup].('tax_rates'), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.tax_rate_id}}')
       number :tax_percentage, editable: true, visible: false, computed: Forms::Compute::Lookup('items.tax_rate_id', '{{record.rate}}')
-      amount :tax_amount, editable: false, computed: Forms::Compute::Form({value: "{{ row.taxable_amount.value | times: row.tax_percentage | divided_by: 100 }}", currency_id: "1"})
-      amount :net_amount, editable: false, computed: Forms::Compute::Form({value: "{{ row.taxable_amount.value | plus: row.tax_amount.value }}", currency_id: "1"})
+      amount :tax_amount, editable: false, computed: Forms::Compute::Form("{{ row.taxable_amount | times: row.tax_percentage | divided_by: 100 }}")
+      amount :net_amount, editable: false, computed: Forms::Compute::Form("{{ row.taxable_amount | plus: row.tax_amount }}")
     end
   end
 
   section :summary do
     summary :items_summary do
-      amount :gross_amount, editable: false, computed: Forms::Compute::Form(
-          value: "\
+      amount :gross_amount, editable: false, computed: Forms::Compute::Form("\
 {% assign gross_total = 0 %}\
 {% for item in form.items %}\
-{% assign gross_total = gross_total | plus: item.amount.value %}\
+{% assign gross_total = gross_total | plus: item.gross_amount %}\
 {% endfor %}\
 {{ gross_total }}",
-          currency_id: "1"
       )
       amount :discount_amount, editable: false, computed: Forms::Compute::Form(
-          value: "\
+          "\
 {% assign discount_amount = 0 %}\
 {% for item in form.items %}\
-{% assign discount_amount = discount_amount | plus: item.discount_amount.value %}\
+{% assign discount_amount = discount_amount | plus: item.discount_amount %}\
 {% endfor %}\
 {{ discount_amount }}",
-          currency_id: "1"
       )
       amount :tax_amount, editable: false, computed: Forms::Compute::Form(
-          value: "\
+          "\
 {% assign tax_amount = 0 %}\
 {% for item in form.items %}\
-{% assign tax_amount = tax_amount | plus: item.tax_amount.value %}\
+{% assign tax_amount = tax_amount | plus: item.tax_amount %}\
 {% endfor %}\
 {{ tax_amount }}",
-          currency_id: "1"
       )
       dropdown :tds_slab_id, choices_scope: Choices[:lookup].('tds_slabs')
       number :tds_percentage, internal: true, editable: false, computed: Forms::Compute::Lookup('items_summary.tds_slab_id', '{{record.rate}}')
-      amount :tds_amount, editable: false, computed: Forms::Compute::Form(value: '{{ form.gross_amount.value | times: form.tds_percentage | divided_by: 100 }}', currency_id: 1)
-      amount :net_amount, editable: false, computed: Forms::Compute::Form(value: '{{ form.gross_amount.value | minus: form.discount_amount.value | plus: form.tax_amount.value }}', currency_id: 1)
+      amount :tds_amount, editable: false, computed: Forms::Compute::Form('{{ form.gross_amount | times: form.tds_percentage | divided_by: 100 }}')
+      amount :net_amount, editable: false, computed: Forms::Compute::Form('{{ form.gross_amount | minus: form.discount_amount | plus: form.tax_amount }}')
     end
   end
 
