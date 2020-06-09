@@ -88,8 +88,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     end
 
     if self.purchase_order&.advance_payments.blank? && StringUtils.to_bool(params[:invoice][:advance_amount_required])
-      add_message :error, "No PO advance payments found. You would need to process the PO advance amount in this Invoice. To proceed, please set the Advance Adjustment Amount to \"NO\" and continue."
-      return
+      params[:invoice][:advance_amount_required] = false
     end
 
     if StringUtils.to_bool(params[:invoice][:advance_amount_required])

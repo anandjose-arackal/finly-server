@@ -45,7 +45,7 @@ every 30.minutes, roles: [:whenever_cron] do
   runner "ExpenseStatusUpdate.perform"
 end
 
-every 1.hour, roles: [:whenever_cron] do
+every 6.hours, roles: [:whenever_cron] do
   runner "UpdateCompanyBalances.perform"
   runner "IciciStatementsFetch.perform", output: "#{path}/log/whenever/icici_statements_fetch.log"
 end
