@@ -11,7 +11,7 @@ class Menu::Masters::Procurement < Menu::API
            :new_purchase_request,
            permissions: :purchase_request_initiator,
            label: 'New Purchase Request',
-           url: 'purchase_requests/new'
+           url: 'purchase_request'
 
     action :template,
            :new_purchase_order,
@@ -35,7 +35,7 @@ class Menu::Masters::Procurement < Menu::API
            model: ::BankPaymentRequest,
            permissions: :bank_payment_request_initiator,
            label: 'Create Payment Ticket',
-           url: 'payment_tickets/new'
+           url: 'new_payment_ticket'
 
     # Todo agreement
     # action :new_agreement, path: 'agreements/new', permissions: [:agreement_invoice_initiator]
