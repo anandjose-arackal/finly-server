@@ -147,8 +147,9 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
   end
 
   def validate
+    
     if expense.report_id and personal_view?
-      unless expense.report.editable?
+      unless expense.report.editable? || expense.report.processing?
         messages[:error] << 'Expense cannot be edited at this stage'
         return
       end
