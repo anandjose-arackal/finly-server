@@ -14,7 +14,7 @@ class Dashboard::VendorPayments::PurchaseOrders < Dashboard::VendorPayments::Bas
   end
 
 
-  class Dashboard::VendorPayments::PurchaseOrders::DashboardPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class Dashboard::VendorPayments::PurchaseOrders::DashboardPresenter < Dashboard::VendorPayments::Base::Presenter
     attr_accessor :purchase_orders, :counts
 
     has_scope :filter_status_id
@@ -51,31 +51,31 @@ class Dashboard::VendorPayments::PurchaseOrders < Dashboard::VendorPayments::Bas
             {
               title: "Total",
               count: purchase_orders.count,
-              path: purchase_order_path("All", nil)
+              url: build_path("purchase_orders", "All", nil)
             },
             {
               title: "Processing",
               # count: apply_scopes(purchase_orders, {filter_status_id: PurchaseOrderStatus.id_for(:processing)})&.count,
               count: purchase_orders.filter_status('processing')&.count,
-              path: purchase_order_path("Processing", PurchaseOrderStatus.id_for(:processing))
+              url: build_path("purchase_orders", "Processing", PurchaseOrderStatus.id_for(:processing))
             },
             {
               title: "Approved",
               # count: apply_scopes(purchase_orders, {filter_status_id: PurchaseOrderStatus.id_for(:approved)})&.count,
               count: purchase_orders.filter_status('approved')&.count,
-              path: purchase_order_path("Approved", PurchaseOrderStatus::GROUP_APPROVED)
+              url: build_path("purchase_orders", "Approved", PurchaseOrderStatus::GROUP_APPROVED)
             },
             {
               title: "Sent to Vendor",
               # count: apply_scopes(purchase_orders, {filter_status_id: PurchaseOrderStatus.id_for(:sent_to_vendor)})&.count,
               count: purchase_orders.filter_status('sent_to_vendor')&.count,
-              path: purchase_order_path("Sent to Vendor", PurchaseOrderStatus.id_for(:sent_to_vendor))
+              url: build_path("purchase_orders", "Sent to Vendor", PurchaseOrderStatus.id_for(:sent_to_vendor))
             },
             {
               title: "Vendor Confirmed",
               # count: apply_scopes(purchase_orders, {filter_status_id: PurchaseOrderStatus.id_for(:vendor_confirmed)})&.count,
               count: purchase_orders.filter_status('vendor_confirmed')&.count,
-              path: purchase_order_path("Vendor Confirmed", PurchaseOrderStatus.id_for(:vendor_confirmed))
+              url: build_path("purchase_orders", "Vendor Confirmed", PurchaseOrderStatus.id_for(:vendor_confirmed))
             }
           ]
         }
@@ -92,31 +92,31 @@ class Dashboard::VendorPayments::PurchaseOrders < Dashboard::VendorPayments::Bas
               title: "Total",
               # count: apply_scopes(purchase_orders, {filter_user_id: user.id})&.count,
               count: purchase_orders.filter_user_id(user.id)&.count,
-              path: purchase_order_path("All", nil, rule: rule)
+              url: build_path("purchase_orders", "All", nil, rule: rule)
             },
             {
               title: "Processing",
               # count: apply_scopes(purchase_orders, {filter_user_id: user.id, filter_status_id: PurchaseOrderStatus.id_for(:processing)})&.count,
               count: purchase_orders.filter_user_id(user.id).filter_status('processing')&.count,
-              path: purchase_order_path("Processing", PurchaseOrderStatus.id_for(:processing), rule: rule)
+              url: build_path("purchase_orders", "Processing", PurchaseOrderStatus.id_for(:processing), rule: rule)
             },
             {
               title: "Approved",
               # count: apply_scopes(purchase_orders, {filter_user_id: user.id, filter_status_id: PurchaseOrderStatus.id_for(:approved)})&.count
               count: purchase_orders.filter_user_id(user.id).filter_status('approved')&.count,
-              path: purchase_order_path("Approved", PurchaseOrderStatus::GROUP_APPROVED, rule: rule)
+              url: build_path("purchase_orders", "Approved", PurchaseOrderStatus::GROUP_APPROVED, rule: rule)
             },
             {
                 title: "Sent to Vendor",
                 # count: apply_scopes(purchase_orders, {filter_status_id: PurchaseOrderStatus.id_for(:sent_to_vendor)})&.count,
                 count: purchase_orders.filter_user_id(user.id).filter_status('sent_to_vendor')&.count,
-                path: purchase_order_path("Sent to Vendor", PurchaseOrderStatus.id_for(:sent_to_vendor), rule: rule)
+                url: build_path("purchase_orders", "Sent to Vendor", PurchaseOrderStatus.id_for(:sent_to_vendor), rule: rule)
             },
             {
                 title: "Vendor Confirmed",
                 # count: apply_scopes(purchase_orders, {filter_status_id: PurchaseOrderStatus.id_for(:vendor_confirmed)})&.count,
                 count: purchase_orders.filter_user_id(user.id).filter_status('vendor_confirmed')&.count,
-                path: purchase_order_path("Vendor Confirmed", PurchaseOrderStatus.id_for(:vendor_confirmed), rule: rule)
+                url: build_path("purchase_orders", "Vendor Confirmed", PurchaseOrderStatus.id_for(:vendor_confirmed), rule: rule)
             }
           ]
         }
@@ -139,15 +139,6 @@ class Dashboard::VendorPayments::PurchaseOrders < Dashboard::VendorPayments::Bas
           end
         end
       end
-    end
-
-    def purchase_order_path(status_name, status_id, rule: nil)
-      params = {
-          filter_status: {identifier: status_name, _id: status_id},
-          id: "purchase_orders",
-      }
-      params[:q] = rule.as_ransack if rule.present?
-      "purchase_orders/params=#{params.to_json}"
     end
   end
 end

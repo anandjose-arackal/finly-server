@@ -50,7 +50,9 @@ class Rules::Adapters::Ransack
       json = {logic_type: 'condition', a: {'0': {name: rule.attribute[:entity]}}, p: operator, v: values}
 
       # Fixme: FE is currently build to parse auto_complete keyword, hence maintaining it here
-      json[:auto_complete] = rule.meta if rule.meta.present?
+      if rule.meta.present?
+        json[:auto_complete] = rule.meta
+      end
 
       json
     else

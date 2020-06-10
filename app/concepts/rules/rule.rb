@@ -42,7 +42,7 @@ class Rules::Rule
     if json[:m].present?
       json = {g: {'0': json}}
     else
-      json = {g: {'0': {m: 'and', c: {'0' => json}}}}
+      json = {g: {'0': {logic_type: "group", m: 'and', c: {'0' => json}}}}
     end
     return json unless options.has_key?(:data)
 
