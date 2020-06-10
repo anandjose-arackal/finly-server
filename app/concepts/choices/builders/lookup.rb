@@ -35,7 +35,7 @@ class Choices::Builders::Lookup < Choices::Builders::Base
   end
 
   def find_by_name(name, params: {}, user: nil)
-    with_name(id, params: params, user: user)&.first
+    with_name(name, params: params, user: user)&.first
   end
 
   def choices(params: {}, user: nil)
