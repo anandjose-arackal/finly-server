@@ -56,6 +56,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
     params.merge!(customer_params(bill.subscription))
 
     Bbps::BillPay.(params: params, current_user: payment.initiating_user) do |op|
+      binding.pry
       op.success do |result|
         puts "Success:Result: #{result}"
         # here we are assuming that the bill gets paid through the BillPay API
@@ -78,7 +79,8 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:possible_failure))
         payment.update(payment_status_id: PaymentStatus.id_for(:possible_failure))
         result.errors.each do |error|
-
+          binding.pry
+          add_error_message( payment, error )
           payment.system_messages.build(content: error,
                                         system_message_type_id: SystemMessageType.id_for(:error)).save
         end
@@ -90,6 +92,8 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
         payment.update(payment_status_id: PaymentStatus.id_for(:failed))
         result.errors.each do |error|
+          binding.pry
+          add_error_message( payment, error )
           payment.system_messages.build(content: error,
                                         system_message_type_id: SystemMessageType.id_for(:error)).save
         end
@@ -205,6 +209,15 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
       end
     end
     parameters.symbolize_keys!
+  end
+
+  def add_error_message payment, error
+    if ERROR_MESSAGE[error.to_s].present?
+      payment.errors.add(:error, ERROR_MESSAGE[error.to_s] )
+    else
+      payment.errors.add(:error, 'Payment Server Failure' ) # add default error
+      # add error to yml
+    end
   end
 
 end
