@@ -235,7 +235,7 @@ gem 'fuzzy-string-match', '1.0.1'
 
 gem 'whenever'
 
-group :development, :test do
+group :development, :test, :staging do
   gem 'byebug'
   gem 'pry', '~> 0.12.2'
   gem 'rb-readline', '~> 0.5'
