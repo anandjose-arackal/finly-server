@@ -18,7 +18,7 @@ class Procurements::PurchaseRequests::BulkApprove < Procurements::PurchaseReques
 
   def validate
     if self.purchase_requests.empty?
-      add_message :error, 'No Purchase Requests found'
+      add_message :error, 'You need to select atleast one purchase order to approve'
       return
     end
     accept_pr = []
