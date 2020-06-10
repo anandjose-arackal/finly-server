@@ -1,7 +1,7 @@
 class Forms::Contracts::Builders::Form
 
   def self.call(form, user)
-    form  = Form.where(uuid: form.uuid).includes(:entities, {sections: {entities: [:compute_lookup_entity, :form, {conditions: :actions}, :validations, {entities: [:compute_lookup_entity, :form, {conditions: :actions}, :validations, {entities: [:compute_lookup_entity, :form, {conditions: :actions}, :validations, entities: [:compute_lookup_entity, :form, {conditions: :actions}, :validations, :entities]]}]}]}}).first
+    form  = Form.where(uuid: form.uuid).includes(:entities, {sections: {entities: [:compute_lookup_entity, :form, {conditions: :actions}, :validations, {choice_dependencies: :controlling_entity}, {entities: [:compute_lookup_entity, :form, {conditions: :actions}, :validations, {choice_dependencies: :controlling_entity}, {entities: [:compute_lookup_entity, :form, {conditions: :actions}, :validations, {choice_dependencies: :controlling_entity}, entities: [:compute_lookup_entity, :form, {conditions: :actions}, :validations, {choice_dependencies: :controlling_entity}, :entities]]}]}]}}).first
     # FixMe : proper inclusion of conditions, validations and dependencies to avoid N+1
     sections = form.sections
     Class.new(Forms::Contracts::Base) do
