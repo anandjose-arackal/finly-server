@@ -51,39 +51,31 @@ class Dashboard::VendorPayments::PurchaseOrders < Dashboard::VendorPayments::Bas
             {
               title: "Total",
               count: purchase_orders.count,
-              filters: []
+              path: purchase_order_path("All", nil)
             },
             {
               title: "Processing",
               # count: apply_scopes(purchase_orders, {filter_status_id: PurchaseOrderStatus.id_for(:processing)})&.count,
               count: purchase_orders.filter_status('processing')&.count,
-              filters: [
-                {filter_status: 'processing'}
-              ]
+              path: purchase_order_path("Processing", PurchaseOrderStatus.id_for(:processing))
             },
             {
               title: "Approved",
               # count: apply_scopes(purchase_orders, {filter_status_id: PurchaseOrderStatus.id_for(:approved)})&.count,
               count: purchase_orders.filter_status('approved')&.count,
-              filters: [
-                {filter_status: 'approved'}
-              ]
+              path: purchase_order_path("Approved", PurchaseOrderStatus::GROUP_APPROVED)
             },
             {
               title: "Sent to Vendor",
               # count: apply_scopes(purchase_orders, {filter_status_id: PurchaseOrderStatus.id_for(:sent_to_vendor)})&.count,
               count: purchase_orders.filter_status('sent_to_vendor')&.count,
-              filters: [
-                {filter_status: 'sent_to_vendor'}
-              ]
+              path: purchase_order_path("Sent to Vendor", PurchaseOrderStatus.id_for(:sent_to_vendor))
             },
             {
               title: "Vendor Confirmed",
               # count: apply_scopes(purchase_orders, {filter_status_id: PurchaseOrderStatus.id_for(:vendor_confirmed)})&.count,
               count: purchase_orders.filter_status('vendor_confirmed')&.count,
-              filters: [
-                {filter_status: 'vendor_confirmed'}
-              ]
+              path: purchase_order_path("Vendor Confirmed", PurchaseOrderStatus.id_for(:vendor_confirmed))
             }
           ]
         }
@@ -92,6 +84,7 @@ class Dashboard::VendorPayments::PurchaseOrders < Dashboard::VendorPayments::Bas
       end
 
       if user.is_purchase_order_initiator? || user.vp_admin_or_auditor?
+        rule = Rules::Builder[:user_id].eq_any(value: user.id).with_meta([{id: user.id, name: user.name}])
         personal_data = {
           type: 'personal',
           data: [
@@ -99,46 +92,31 @@ class Dashboard::VendorPayments::PurchaseOrders < Dashboard::VendorPayments::Bas
               title: "Total",
               # count: apply_scopes(purchase_orders, {filter_user_id: user.id})&.count,
               count: purchase_orders.filter_user_id(user.id)&.count,
-              filters: [
-                {filter_user_id: user.id},
-                {filter_user_name: user.name}
-              ]
+              path: purchase_order_path("All", nil, rule: rule)
             },
             {
               title: "Processing",
               # count: apply_scopes(purchase_orders, {filter_user_id: user.id, filter_status_id: PurchaseOrderStatus.id_for(:processing)})&.count,
               count: purchase_orders.filter_user_id(user.id).filter_status('processing')&.count,
-              filters: [
-                {filter_user_id: user.id},
-                {filter_user_name: user.name},
-                {filter_status: 'processing'}
-              ]
+              path: purchase_order_path("Processing", PurchaseOrderStatus.id_for(:processing), rule: rule)
             },
             {
               title: "Approved",
               # count: apply_scopes(purchase_orders, {filter_user_id: user.id, filter_status_id: PurchaseOrderStatus.id_for(:approved)})&.count
               count: purchase_orders.filter_user_id(user.id).filter_status('approved')&.count,
-              filters: [
-                {filter_user_id: user.id},
-                {filter_user_name: user.name},
-                {filter_status: 'approved'}
-              ]
+              path: purchase_order_path("Approved", PurchaseOrderStatus::GROUP_APPROVED, rule: rule)
             },
             {
                 title: "Sent to Vendor",
                 # count: apply_scopes(purchase_orders, {filter_status_id: PurchaseOrderStatus.id_for(:sent_to_vendor)})&.count,
                 count: purchase_orders.filter_user_id(user.id).filter_status('sent_to_vendor')&.count,
-                filters: [
-                    {filter_status: 'sent_to_vendor'}
-                ]
+                path: purchase_order_path("Sent to Vendor", PurchaseOrderStatus.id_for(:sent_to_vendor), rule: rule)
             },
             {
                 title: "Vendor Confirmed",
                 # count: apply_scopes(purchase_orders, {filter_status_id: PurchaseOrderStatus.id_for(:vendor_confirmed)})&.count,
                 count: purchase_orders.filter_user_id(user.id).filter_status('vendor_confirmed')&.count,
-                filters: [
-                    {filter_status: 'vendor_confirmed'}
-                ]
+                path: purchase_order_path("Vendor Confirmed", PurchaseOrderStatus.id_for(:vendor_confirmed), rule: rule)
             }
           ]
         }
@@ -147,7 +125,7 @@ class Dashboard::VendorPayments::PurchaseOrders < Dashboard::VendorPayments::Bas
 
 
       # Set Date Filters in Filters
-      # Done becauase the filters in index page and the filters passed in dashboard for date filters are different
+      # Done because the filters in index page and the filters passed in dashboard for date filters are different
       self.counts.each do |count_object|
         count_object[:data].each do |data|
           if params[:filter_creation_date_from].present?
@@ -161,20 +139,15 @@ class Dashboard::VendorPayments::PurchaseOrders < Dashboard::VendorPayments::Bas
           end
         end
       end
+    end
 
-      # if user.is_purchase_order_reviewer?
-      #   reviewer_data = {
-      #     type: "reviewer",
-      #     data: [
-      #       {
-      #         title: "Awaiting Approval",
-      #         count: PurchaseOrder.awaiting_action_items(user)&.count,
-      #         filters: [{filter_awaiting_approval: true}]
-      #       }
-      #     ]
-      #   }
-      #   self.counts.push(reviewer_data)
-      # end
+    def purchase_order_path(status_name, status_id, rule: nil)
+      params = {
+          filter_status: {identifier: status_name, _id: status_id},
+          id: "purchase_orders",
+      }
+      params[:q] = rule.as_ransack if rule.present?
+      "purchase_orders/params=#{params.to_json}"
     end
   end
 end

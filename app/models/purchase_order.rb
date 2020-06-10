@@ -166,16 +166,16 @@ class PurchaseOrder < ApplicationRecord
   scope :with_user_id, -> (user_ids) { where user_id: user_ids }
   scope :with_status_ids, -> (status_ids) {
     case status_ids
-    when 90
+    when PurchaseOrderStatus::GROUP_OPEN
       # Open / Retracted
       where purchase_order_status_id: PurchaseOrderStatus.ids_for(:open, :retracted)
-    when 91
+    when PurchaseOrderStatus::GROUP_AWAITING_APPROVAL
       # Awaiting Approval
       user_id = RequestStore.store[:current_user]&.id
       if user_id.present?
         self.awaiting_action_items(user_id)
       end
-    when 92
+    when PurchaseOrderStatus::GROUP_APPROVED
       # Approved / Auto Approved
       where purchase_order_status_id: PurchaseOrderStatus.ids_for(:approved, :auto_approved)
     else

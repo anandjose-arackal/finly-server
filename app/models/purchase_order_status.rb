@@ -15,6 +15,10 @@ class PurchaseOrderStatus < ApplicationRecord
     %w( open retracted processing approved rejected auto_approved sent_to_vendor closed voided po_revised vendor_confirmed )
   end
 
+  GROUP_OPEN = 90
+  GROUP_AWAITING_APPROVAL = 91
+  GROUP_APPROVED = 92
+
   def self.groups
     map = {}
     map[90] = {id: ids_for(:open, :retracted), name: 'Open'}
