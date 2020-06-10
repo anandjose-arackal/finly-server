@@ -4,7 +4,7 @@ class YesBankStatusChecker
     puts " ----------------------------- PERFORMING #{self.name} at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
 
     handle = self.object_id
-    YesBankBalanceProvider.perform_async(handle, self.company.id)
+    YesBankStatusCheckerBackground.perform_async(handle, nil)
 
     puts " ----------------------------- FINISHED #{self.name} ------------------------------"
   end

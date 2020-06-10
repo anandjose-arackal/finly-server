@@ -96,7 +96,7 @@ class Expense::ExPerDiem::Update < Expense::ExPerDiem::Base
 
   def validate
     if expense.report_id and personal_view?
-      unless expense.report.editable?
+      unless expense.report.editable? || expense.report.processing?
         add_message :error, 'Expense cannot be edited at this stage'
         return
       end
