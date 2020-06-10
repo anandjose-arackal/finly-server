@@ -89,14 +89,14 @@ class Procurement < ApplicationRecord
   scope :filter_creation_date_from, -> (creation_date){
     date = Date.parse(creation_date) rescue nil
     if date
-      where("created_at >= ?", date.beginning_of_day)
+      where("procurements.created_at >= ?", date.beginning_of_day)
     end
   }
 
   scope :filter_creation_date_to, -> (creation_date){
     date = Date.parse(creation_date) rescue nil
     if date
-      where("created_at <= ?", date.end_of_day)
+      where("procurements.created_at <= ?", date.end_of_day)
     end
   }
 
