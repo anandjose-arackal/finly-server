@@ -415,9 +415,9 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
   def self.business_name(context)
     case context[:record].receiving_user_type
     when 'BbpsBillerSubscription'
-      context[:record].name
+      context[:record].receiving_user_bbps_biller_subscription.name
     when 'YesBankVendor'
-      context[:record].business_name
+      context[:record].receiving_user_vendor.business_name
     else
       # Do nothing
     end
@@ -428,7 +428,7 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
     when 'BbpsBillerSubscription'
       # Do nothing
     when 'YesBankVendor'
-      context[:record].trade_name
+      context[:record].receiving_user_vendor.trade_name
     else
       # Do nothing
     end
