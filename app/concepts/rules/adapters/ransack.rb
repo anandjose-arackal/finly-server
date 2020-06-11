@@ -57,10 +57,13 @@ class Rules::Adapters::Ransack
       json
     else
       json = {logic_type: 'group', m: operator, c: {}}
-      # index_add = 0
-      # json[:c]['0'] = rule.attribute.as_json(mode: 'ransack') if rule.attribute.present?
+      pos = 0
+      if rule.attribute.present?
+        json[:c][pos.to_s] = rule.attribute.as_json(mode: 'ransack')
+        pos += 1
+      end
       rule.values.each_with_index do |value, index|
-        json[:c][index.to_s] = value.as_json(mode: 'ransack')
+        json[:c][(index + pos).to_s] = value.as_json(mode: 'ransack')
       end
       json
     end

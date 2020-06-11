@@ -12,15 +12,10 @@ class Dashboard::Row
     @tiles ||= []
   end
 
-  def tile(options = {})
-    @tiles << Dashboard::Tile.new(self.options.merge(options))
+  def tile(title, options = {})
+    tiles << Dashboard::Tile.new(title, self.options.merge(options))
   end
 
-  def build(card)
-    {
-        type: type,
-        data: tiles.map { |tile| tile.build(card) }
-    }
-  end
+
 
 end
