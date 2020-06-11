@@ -43,6 +43,20 @@ class Dashboard::VendorPayments::PurchaseOrders < Dashboard::VendorPayments::Bas
       self.purchase_orders = params[:purchase_orders]
       self.purchase_orders = apply_scopes(self.purchase_orders, general_filter_params)
       self.counts = []
+      rule = nil
+      if params[:filter_creation_date_from].present?
+        rule = Rules::Builder[:created_at].gteq(value: params[:filter_creation_date_from])
+      end
+
+      if params[:filter_creation_date_to].present?
+        rule_to = Rules::Builder[:created_at].lteq(value: params[:filter_creation_date_to])
+        if rule.present?
+          rule.and(rule_to)
+        else
+          rule = rule_to
+        end
+      end
+
 
       if user.vendor_payments_admin?
         admin_data = {
@@ -57,25 +71,25 @@ class Dashboard::VendorPayments::PurchaseOrders < Dashboard::VendorPayments::Bas
               title: "Processing",
               # count: apply_scopes(purchase_orders, {filter_status_id: PurchaseOrderStatus.id_for(:processing)})&.count,
               count: purchase_orders.filter_status('processing')&.count,
-              url: build_path("purchase_orders", "Processing", PurchaseOrderStatus.id_for(:processing))
+              url: build_path("purchase_orders", "Processing", PurchaseOrderStatus.id_for(:processing), rule: rule)
             },
             {
               title: "Approved",
               # count: apply_scopes(purchase_orders, {filter_status_id: PurchaseOrderStatus.id_for(:approved)})&.count,
               count: purchase_orders.filter_status('approved')&.count,
-              url: build_path("purchase_orders", "Approved", PurchaseOrderStatus::GROUP_APPROVED)
+              url: build_path("purchase_orders", "Approved", PurchaseOrderStatus::GROUP_APPROVED, rule: rule)
             },
             {
               title: "Sent to Vendor",
               # count: apply_scopes(purchase_orders, {filter_status_id: PurchaseOrderStatus.id_for(:sent_to_vendor)})&.count,
               count: purchase_orders.filter_status('sent_to_vendor')&.count,
-              url: build_path("purchase_orders", "Sent to Vendor", PurchaseOrderStatus.id_for(:sent_to_vendor))
+              url: build_path("purchase_orders", "Sent to Vendor", PurchaseOrderStatus.id_for(:sent_to_vendor), rule: rule)
             },
             {
               title: "Vendor Confirmed",
               # count: apply_scopes(purchase_orders, {filter_status_id: PurchaseOrderStatus.id_for(:vendor_confirmed)})&.count,
               count: purchase_orders.filter_status('vendor_confirmed')&.count,
-              url: build_path("purchase_orders", "Vendor Confirmed", PurchaseOrderStatus.id_for(:vendor_confirmed))
+              url: build_path("purchase_orders", "Vendor Confirmed", PurchaseOrderStatus.id_for(:vendor_confirmed), rule: rule)
             }
           ]
         }
@@ -84,7 +98,12 @@ class Dashboard::VendorPayments::PurchaseOrders < Dashboard::VendorPayments::Bas
       end
 
       if user.is_purchase_order_initiator? || user.vp_admin_or_auditor?
-        rule = Rules::Builder[:user_id].eq_any(value: user.id).with_meta([{id: user.id, name: user.name}])
+        rule_user = Rules::Builder[:user_id].eq_any(value: user.id).with_meta([{id: user.id, name: user.name}])
+        if rule.present?
+          rule.and(rule_user)
+        else
+          rule = rule_user
+        end
         personal_data = {
           type: 'personal',
           data: [
@@ -124,21 +143,21 @@ class Dashboard::VendorPayments::PurchaseOrders < Dashboard::VendorPayments::Bas
       end
 
 
-      # Set Date Filters in Filters
-      # Done because the filters in index page and the filters passed in dashboard for date filters are different
-      self.counts.each do |count_object|
-        count_object[:data].each do |data|
-          if params[:filter_creation_date_from].present?
-            date_filter_from = {filter_creation_date_from: params[:filter_creation_date_from]}
-            data[:filters].push(date_filter_from)
-          end
-
-          if params[:filter_creation_date_to].present?
-            date_filter_to = {filter_creation_date_to: params[:filter_creation_date_to]}
-            data[:filters].push(date_filter_to)
-          end
-        end
-      end
+      # # Set Date Filters in Filters
+      # # Done because the filters in index page and the filters passed in dashboard for date filters are different
+      # self.counts.each do |count_object|
+      #   count_object[:data].each do |data|
+      #     if params[:filter_creation_date_from].present?
+      #       date_filter_from = {filter_creation_date_from: params[:filter_creation_date_from]}
+      #       data[:filters].push(date_filter_from)
+      #     end
+      #
+      #     if params[:filter_creation_date_to].present?
+      #       date_filter_to = {filter_creation_date_to: params[:filter_creation_date_to]}
+      #       data[:filters].push(date_filter_to)
+      #     end
+      #   end
+      # end
     end
   end
 end

@@ -2,7 +2,7 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
   include DynamicAttributes
 
   system_subscription :vp
-  permissions Docs::PaymentTickets::Index.permissions
+  permissions *Docs::PaymentTickets::Index.permissions
   resolver 'payments.default'
   reference '{{record.payment_order.bank_payment_request.id}}'
   includes payment_order: :bank_payment_request
