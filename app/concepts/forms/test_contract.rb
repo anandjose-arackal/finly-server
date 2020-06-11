@@ -16,7 +16,7 @@ class Forms::TestContract < Reform::Form
 
     property :first_name#, deserializer: -> (*args) {debugger}
     property :profile do
-      property :employee_id, deserializer: -> (input, represented, *args) {debugger}
+      property :employee_id#, deserializer: -> (input, represented, *args) {debugger}
 
       validate :test_em_id
 
