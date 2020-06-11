@@ -208,12 +208,16 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
     parameters.symbolize_keys!
   end
 
-  def add_error_message payment, error
+  def self.add_error_message payment, error
+    
     if ERROR_MESSAGE[error.to_s].present?
       payment.errors.add(:error, ERROR_MESSAGE[error.to_s] )
     else
       payment.errors.add(:error, 'Payment Server Failure' ) # add default error
-      # add error to yml
+      
+      message = YAML.load_file(File.expand_path("config/new_bbps_errors.yml") )
+      message[error.to_s] = error.to_s
+      File.open(File.expand_path("config/new_bbps_errors.yml"), 'w') { |file| YAML.dump(message, file) }
     end
   end
 
