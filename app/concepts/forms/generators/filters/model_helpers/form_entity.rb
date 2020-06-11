@@ -1,7 +1,7 @@
 module Forms::Generators::Filters::ModelHelpers::FormEntity
 
   def entity_type_klass
-    Forms::API::Entity::Registry.types[entity_type]
+    Forms::Entity::Registry.types[entity_type]
   end
 
   def operators

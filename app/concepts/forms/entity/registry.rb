@@ -1,4 +1,4 @@
-module Forms::API::Entity::Registry
+module Forms::Entity::Registry
   extend ActiveSupport::Concern
 
   def self.types
@@ -36,8 +36,8 @@ module Forms::API::Entity::Registry
 
   def klass_and_name_from(args)
     type, name = args
-    if Forms::API::Entity::Registry.types[type]
-      [Forms::API::Entity::Registry.types[type], name]
+    if Forms::Entity::Registry.types[type]
+      [Forms::Entity::Registry.types[type], name]
     else
       [FormEntity, type]
     end
@@ -46,9 +46,9 @@ module Forms::API::Entity::Registry
   module ClassMethods
     def register(type)
       registered_type(type)
-      Forms::API::Entity::Registry.types[type] = self
+      Forms::Entity::Registry.types[type] = self
 
-      Forms::API::Entity::Registry.module_eval do
+      Forms::Entity::Registry.module_eval do
         define_method type do |*args, &block|
           opts = args.extract_options!
           entity_key = args.first

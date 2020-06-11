@@ -1,4 +1,4 @@
-module Forms::API::Entity::Schema
+module Forms::Entity::Schema
   extend ActiveSupport::Concern
 
   DEFAULT_SYSTEM_SCHEMA = {

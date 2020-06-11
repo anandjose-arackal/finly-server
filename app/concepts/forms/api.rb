@@ -1,3 +1,4 @@
+Dir.glob(Rails.root.join('app/models/form_entity**/*.rb')).each {|f| require(f)}
 class Forms::API
   include DynamicAttributes
 

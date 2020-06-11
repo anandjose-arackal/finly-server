@@ -58,8 +58,8 @@ class FormEntity < ApplicationRecord
   # include Forms::Generators::Contracts::ModelHelpers::FormEntity
   # include Forms::Generators::Filters::ModelHelpers::FormEntity
   include Forms::Generators::Filters::ApiEntityHelper
-  include Forms::API::Entity::Registry
-  include Forms::API::Entity::Schema
+  include Forms::Entity::Registry
+  include Forms::Entity::Schema
 
   class_attr :registered_type
 
@@ -80,7 +80,7 @@ class FormEntity < ApplicationRecord
   has_many :choice_dependencies, class_name: "FormChoiceDependency", foreign_key: :dependent_entity_id
   has_many :choice_controlling_entities, through: :choice_dependencies, class_name: 'FormEntity', source: :controlling_entity
 
-  # Fixme: Delete this as it is available in Forms::API::Entity::Registry. Kept it commented for testing purpose
+  # Fixme: Delete this as it is available in Forms::Entity::Registry. Kept it commented for testing purpose
   # def find_entity(entity_path)
   #   entities.each do |entity|
   #     return entity if entity.entity_path == entity_path

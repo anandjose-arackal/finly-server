@@ -17,7 +17,7 @@
 
 class FormSection < ApplicationRecord
   include UUIDHelper, SoftDeletable
-  include Forms::API::Entity::Registry
+  include Forms::Entity::Registry
 
   belongs_to :company
   belongs_to :form
@@ -27,7 +27,7 @@ class FormSection < ApplicationRecord
     self
   end
 
-  # Fixme: Delete this as it is available in Forms::API::Entity::Registry. Kept it commented for testing purpose
+  # Fixme: Delete this as it is available in Forms::Entity::Registry. Kept it commented for testing purpose
   # def find_entity(entity_path)
   #   entities.each do |entity|
   #     return entity if entity.entity_path == entity_path
