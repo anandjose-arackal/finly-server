@@ -15,5 +15,6 @@ class Docs::PaymentTickets::FilterConfig < Filters::API
   attribute :payment_order_amount_requested_value, type: :number, label: 'Requested Amount'
   attribute :payment_order_amount_processed_value, type: :number, label: 'Processed Amount'
   attribute :payment_order_payments_receiving_user_vendor_id, type: :dropdown, label: 'Vendor', choices: Choices[:auto_complete].("vendor"), simple: true
+  attribute :owner_id, label: "Created By", type: :dropdown, choices: Choices[:auto_complete].("users")
 
 end

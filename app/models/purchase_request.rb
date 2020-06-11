@@ -125,14 +125,14 @@ class PurchaseRequest < ApplicationRecord
 
   scope :with_status_ids, -> (status_ids) {
     case status_ids
-    when 90
+    when PurchaseRequestStatus::GROUP_OPEN
       where purchase_request_status_id: PurchaseRequestStatus.ids_for(:draft, :retracted)
-    when 91
+    when PurchaseRequestStatus::GROUP_AWAITING_APPROVAL
       user_id = RequestStore.store[:current_user]&.id
       if user_id.present?
         self.awaiting_action_items(user_id)
       end
-    when 92
+    when PurchaseRequestStatus::GROUP_APPROVED
       where purchase_request_status_id: PurchaseRequestStatus.ids_for(:approved, :auto_approved, :po_created, :partially_closed, :order_initiated)
     else
       where purchase_request_status_id: status_ids

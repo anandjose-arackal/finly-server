@@ -1,10 +1,6 @@
 class Dashboard::Card < Transactions::API
   include DynamicAttributes
 
-  class_attr :resolver
-  class_attr :path
-  class_attr :created_by, default: :user_id
-  class_attr :status
   class_attr :department, default: :department_id
   class_attr :location, default: :location_id
   class_attr :cost_center, default: :cost_center_id
@@ -68,13 +64,14 @@ class Dashboard::Card < Transactions::API
 
   def count(tile, rule, context)
     query = {}
+    qs = {}
     if tile.filter_status
-      rule = add_rule rule, Rules::Builder[self.class.status].eq_any(value: tile.filter_status)
+      qs[self.class.status] = tile.filter_status
     end
     if rule.present?
       query = rule.as_ransack
     end
-    records = Resolver::Router.dispatch(self.class.resolver, current_user: context[:current_user], params: {q: query})
+    records = Resolver::Router.dispatch(self.class.resolver, current_user: context[:current_user], params: {q: query, qs: qs})
     records.count
   end
 
