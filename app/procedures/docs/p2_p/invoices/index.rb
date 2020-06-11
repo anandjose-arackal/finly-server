@@ -158,14 +158,14 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     counter.add nil, "All", counts.values.reduce(0, :+)
 
     # Open - open/retracted
-    counter.add 90, 'Open', (
+    counter.add InwardInvoiceStatus::GROUP_OPEN, 'Open', (
     counts[InwardInvoiceStatus.id_for(:open)].to_i +
         counts[InwardInvoiceStatus.id_for(:retracted)].to_i
     )
 
     # Awaiting Approval
     if user.has_permission?(awaiting_approval_roles)
-      counter.add 91, 'Awaiting Approval',
+      counter.add InwardInvoiceStatus::GROUP_AWAITING_APPROVAL, 'Awaiting Approval',
                   Invoice.awaiting_action_items(user).count
     end
 
@@ -173,7 +173,7 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     counter.add InwardInvoiceStatus.id_for(:processing), "Processing", counts[InwardInvoiceStatus.id_for(:processing)].to_i
 
     # Pending Payment - approved/auto_approved/partially_paid/unpaid/initiated
-    counter.add 92, 'Pending Payment', (
+    counter.add InwardInvoiceStatus::GROUP_PENDING_PAYMENT, 'Pending Payment', (
     counts[InwardInvoiceStatus.id_for(:approved)].to_i +
         counts[InwardInvoiceStatus.id_for(:auto_approved)].to_i +
         counts[InwardInvoiceStatus.id_for(:partially_paid)].to_i +

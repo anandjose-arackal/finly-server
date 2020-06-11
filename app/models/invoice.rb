@@ -272,10 +272,10 @@ class Invoice < ApplicationRecord
 
   scope :with_status_id, -> (status_id) {
     case status_id
-    when 90
+    when InwardInvoiceStatus::GROUP_OPEN
       # open / retracted
       where invoice_status_id: InwardInvoiceStatus.ids_for(:open, :retracted)
-    when 91
+    when InwardInvoiceStatus::GROUP_AWAITING_APPROVAL
       # awaiting approval
       user_id = RequestStore.store[:current_user]&.id
       if user_id.present?
@@ -283,7 +283,7 @@ class Invoice < ApplicationRecord
       else
         self.none
       end
-    when 92
+    when InwardInvoiceStatus::GROUP_PENDING_PAYMENT
       # approved/auto_approved/partially_paid/unpaid/initiated
       where invoice_status_id: InwardInvoiceStatus.ids_for(:approved, :auto_approved, :partially_paid, :unpaid, :initiated)
     else

@@ -48,7 +48,7 @@ class Dashboard::Card < Transactions::API
     rule = nil
     params = context[:params]
     if tile.filter_created_by
-      rule = add_rule rule, Rules::Builder[self.class.created_by].eq_any(value: context[:current_user].id)
+      rule = add_rule rule, Rules::Builder[self.class.created_by].eq_any(value: context[:current_user].id).with_meta([{id: context[:current_user].id, name: context[:current_user].name}])
     end
     if params[:filter_policy].present?
       rule = add_rule rule, Rules::Builder[self.class.policy].eq_any(value: params[:filter_policy])
@@ -86,7 +86,6 @@ class Dashboard::Card < Transactions::API
     if rule.present?
       filter = rule.as_ransack
       params[:input_filters] = {advanced: [filter[:g][:'0']]}
-      params[:q] = filter
     end
     "#{self.class.path}/params=#{params.to_json}"
   end

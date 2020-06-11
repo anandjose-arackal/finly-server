@@ -4071,6 +4071,7 @@ Rails.application.routes.draw do
 
 
   ######## Dashboards ##################
+  # Fixme: old routes for supporting v1 of dashboards in dynamic index. This can deleted when the support is removed
   namespace :dashboards do
     get 'vp/awaiting_action', to: 'vendor_payments#awaiting_action'
     get 'vp/configs', to: 'vendor_payments#configs'
@@ -4097,6 +4098,9 @@ Rails.application.routes.draw do
     get 'em/awaiting_action', to: 'expense_management#awaiting_action'
     get 'em/configs', to: 'expense_management#configs'
   end
+
+  get 'dashboards/configs', to: 'dashboards#configs'
+  get 'dashboards/:route', to: 'dashboards#show'
   ######## Dashbaord Ends ##############
 
   ######### New Vendor Empanelment ########

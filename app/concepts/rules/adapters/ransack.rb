@@ -39,15 +39,17 @@ class Rules::Adapters::Ransack
   def self.as_json(rule)
     operator = Rules::Constants::MATH_PREDICATE_MAP[rule.operator.to_s] || rule.operator.to_s
     if Rules::Constants::PREDICATES.include?(operator)
-      values = {}
+      values_hash = {}
+      raw_value = []
       rule.values.each_with_index { |val, index|
         value = val[:value] # || val[:formula] || val[:entity] || 1
         value ||= val[:formula]
         value ||= "{{form.#{val[:entity]}}}" if val[:entity].present?
         value ||= 1
-        values[index.to_s] = {value: value}
+        values_hash[index.to_s] = {value: value}
+        raw_value << value
       }
-      json = {logic_type: 'condition', a: {'0': {name: rule.attribute[:entity]}}, p: operator, v: values}
+      json = {logic_type: 'condition', a: {'0': {name: rule.attribute[:entity], ransacker_args: {filter_id: rule.attribute[:entity]}}}, p: operator, v: values_hash, raw_value: raw_value}
 
       # Fixme: FE is currently build to parse auto_complete keyword, hence maintaining it here
       if rule.meta.present?
