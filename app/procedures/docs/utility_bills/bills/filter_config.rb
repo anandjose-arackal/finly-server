@@ -21,5 +21,6 @@ class Docs::UtilityBills::Bills::FilterConfig < Filters::API
   attribute :location_id, label: "Location", type: :dropdown, choices: Choices[:auto_complete].("locations")
   attribute :cost_center_id, label: "Cost Center", type: :dropdown, choices: Choices[:auto_complete].("cost_centers")
   attribute :department_id, label: "Department", type: :dropdown, choices: Choices[:auto_complete].("departments")
+  attribute :user_id, label: "Created By", type: :dropdown, choices: Choices[:auto_complete].("users")
 
 end

@@ -12,5 +12,6 @@ class Docs::P2P::PurchaseRequests::FilterConfig < Filters::API
   attribute :items_item_description, label: 'Description', type: :text, simple: true
   attribute :items_cost_center_id, label: 'Cost Center', type: :dropdown, choices: Choices[:auto_complete].('cost_centers')
   attribute :items_department_id, label: 'Department', type: :dropdown, choices: Choices[:auto_complete].('departments')
+  attribute :creator_id, label: "Created By", type: :dropdown, choices: Choices[:auto_complete].("users")
 
 end

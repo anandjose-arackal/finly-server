@@ -17,5 +17,6 @@ class Docs::P2P::CreditNotes::FilterConfig < Filters::API
   attribute :department_id, label: "Department", simple: true, type: :dropdown, choices: Choices[:auto_complete].("departments")
   attribute :gross_receivable_amount_value, label: "Gross Receivable Amount", type: :number
   attribute :net_receivable_amount_value, label: "Net Receivable Amount", type: :number
+  attribute :user_id, label: "Created By", type: :dropdown, choices: Choices[:auto_complete].("users")
 
 end

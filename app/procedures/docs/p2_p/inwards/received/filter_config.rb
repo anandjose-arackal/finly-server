@@ -9,5 +9,6 @@ class Docs::P2P::Inwards::Received::FilterConfig < Filters::API
   attribute :vendor_vendor_id, label: "Vendor ID"
   attribute :delivery_date, label: "Delivered On", type: :datetime
   attribute :grn_number, label: "Reference Number", simple: true
+  attribute :user_id, label: "Created By", type: :dropdown, choices: Choices[:auto_complete].("users")
 
 end
