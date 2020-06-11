@@ -137,6 +137,8 @@ class BbpsBill < ApplicationRecord
       where(status_id: BbpsBillStatus.id_for(:payment_initiated))
     when 'payment_ticket_deleted', :payment_ticket_deleted
       where(status_id: BbpsBillStatus.id_for(:payment_ticket_deleted))
+    when 'expired', :expired
+      where(status_id: BbpsBillStatus.id_for(:expired))
     else
       # do nothing
     end
@@ -473,11 +475,11 @@ class BbpsBill < ApplicationRecord
     if user.policy_user_roles.pluck(:user_role_id).uniq.present?
       user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
         if UserRole.ids_for(:bank_payment_request_initiator, :bank_payment_request_reviewer, :bank_payment_request_auditor, :bank_payment_request_creditor).include?(role_id.to_i)
-          statuses += [:approved, :auto_approved, :payment_ticket_created, :payment_initiated, :failed, :paid, :voided, :payment_ticket_deleted]
+          statuses += [:approved, :auto_approved, :payment_ticket_created, :payment_initiated, :failed, :paid, :voided, :payment_ticket_deleted, :expired]
         elsif UserRole.ids_for(:utility_bill_master_initiator, :utility_bill_master_reviewer, :utility_bill_initiator, :utility_bill_reviewer).include?(role_id.to_i)
-          statuses += [:open, :awaiting_approval, :retracted, :rejected, :approved, :auto_approved, :payment_ticket_created, :payment_initiated, :failed, :paid, :voided, :payment_ticket_deleted]
+          statuses += [:open, :awaiting_approval, :retracted, :rejected, :approved, :auto_approved, :payment_ticket_created, :payment_initiated, :failed, :paid, :voided, :payment_ticket_deleted, :expired]
         elsif UserRole.id_for(:admin) == role_id.to_i
-          statuses += [:open, :awaiting_approval, :retracted, :rejected, :approved, :auto_approved, :payment_ticket_created, :payment_initiated, :failed, :paid, :voided, :payment_ticket_deleted]
+          statuses += [:open, :awaiting_approval, :retracted, :rejected, :approved, :auto_approved, :payment_ticket_created, :payment_initiated, :failed, :paid, :voided, :payment_ticket_deleted, :expired]
         end
       end
     end
@@ -485,7 +487,7 @@ class BbpsBill < ApplicationRecord
   end
 
   def self.finance_associated_status_ids
-    BbpsBill.status_ids(:approved, :auto_approved, :payment_ticket_created, :payment_initiated, :failed, :paid, :voided, :payment_ticket_deleted)
+    BbpsBill.status_ids(:approved, :auto_approved, :payment_ticket_created, :payment_initiated, :failed, :paid, :voided, :payment_ticket_deleted )
   end
 
   def self.auditor_associated_status_ids
