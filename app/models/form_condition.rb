@@ -27,6 +27,7 @@ class FormCondition < ApplicationRecord
   belongs_to :company
   belongs_to :form
   belongs_to :referencable, polymorphic: true
+  belongs_to :referencable_entity, -> { includes(:conditions).where(internal: false) }, foreign_key: :referencable_id, class_name: 'FormEntity', optional: true
   belongs_to :created_by, class_name: 'User', optional: true
   belongs_to :updated_by, class_name: 'User', optional: true
 

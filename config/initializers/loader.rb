@@ -8,7 +8,7 @@ Loader.watch! "Setup Transaction Contract" do
   Reform::Form.include Transactions::Contract
 end
 Loader.watch! "Actions Manager Actions", dir: "app/concepts/action_manager/actions/**/*.rb"
-Loader.watch! "Forms Types", dir: 'app/models/form_entity**/*.rb'
+Loader.watch! "Forms Types", dir: 'app/models/form_entity/**/*.rb'
 Loader.watch! "Choices", dir: 'app/concepts/choices/builders/**/*.rb'
 
 Loader.watch! "Form Contract Transformers", dir: "app/concepts/forms/generators/contracts/entity_builder/validations/**/*.rb"
