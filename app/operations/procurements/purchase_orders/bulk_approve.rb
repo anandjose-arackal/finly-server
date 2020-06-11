@@ -14,7 +14,8 @@ class Procurements::PurchaseOrders::BulkApprove < Procurements::PurchaseOrders::
 
   def validate
     if self.purchase_orders.empty?
-      add_message :error, 'No Purchase Orders found'
+      add_message :error, "None of the purchase orders are in a state to be approved"
+      return
     end
     accept_po = []
     self.purchase_orders.each do |purchase_order|
@@ -27,7 +28,7 @@ class Procurements::PurchaseOrders::BulkApprove < Procurements::PurchaseOrders::
  
     self.purchase_orders = self.purchase_orders.where(id: accept_po)
 
-    if self.purchase_orders.blank?
+    if self.purchase_orders.empty?
       add_message :error, "None of the purchase orders are in a state to be approved"
       return
     end
