@@ -1,5 +1,3 @@
-binding.pry
-puts 'apple'
 json.summary do
   json.order_status do
     json.name @result.bank_payment_request.status_name(current_user.id)&.humanize

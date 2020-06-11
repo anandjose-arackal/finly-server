@@ -234,10 +234,10 @@ gem 'awesome_print', '~> 1.8.0'
 gem 'fuzzy-string-match', '1.0.1'
 
 gem 'whenever'
-gem 'pry', '~> 0.12.2'
+
 group :development, :test do
   gem 'byebug'
-  
+  gem 'pry', '~> 0.12.2'  
   gem 'rb-readline', '~> 0.5'
   gem 'capistrano', '~> 3.11.0'
   gem 'capistrano3-puma', '~> 3.1.1'
