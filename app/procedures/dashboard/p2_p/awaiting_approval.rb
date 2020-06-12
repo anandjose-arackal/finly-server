@@ -77,6 +77,13 @@ class Dashboard::P2P::AwaitingApproval < Dashboard::IndexCard
       }
   ]
 
+  def build_personal_row(context, current_user:, **)
+    return unless current_user.has_permission?(self.class.permissions) or current_user.vp_admin_or_auditor?
+    return if self.class.skip_personal?
+
+    context[:data] << build_tiles(context, filter_created_by: true)
+  end
+
   def build_tiles(context, filter_created_by: nil)
     query = {}
     rule = build_rule(context, filter_created_by: filter_created_by)
