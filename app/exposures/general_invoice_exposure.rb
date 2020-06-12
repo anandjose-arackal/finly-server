@@ -11,6 +11,7 @@ class GeneralInvoiceExposure < Exposures::API
   attribute :gstin_location, record_attribute: true, exposure: true, includes: [:gstin_location]
   attribute :vendor_location, record_attribute: true, exposure: true, includes: [:vendor_location]
   attribute :vendor, record_attribute: true, exposure: true, includes: [:vendor]
+  attribute :vendor_id, record_attribute: true
   attribute :payment_agreement, record_attribute: true, exposure: true, includes: [:payment_agreement]
   attribute :start_date, record_attribute: true
   attribute :end_date, record_attribute: true
