@@ -1,7 +1,7 @@
 class Menu::Masters::Procurement < Menu::API
 
   def self.accept?(user)
-    true
+    user.user_panel_subscription.yes_bank_account_transfer
   end
 
   app :vp
@@ -10,12 +10,14 @@ class Menu::Masters::Procurement < Menu::API
     action :redirect,
            :new_purchase_request,
            permissions: :purchase_request_initiator,
+           features: :procurement,
            label: 'New Purchase Request',
            url: 'purchase_request'
 
     action :template,
            :new_purchase_order,
            permissions: :purchase_order_initiator,
+           features: :procurement,
            policy: ::Docs::P2P::PurchaseOrders::Policy,
            model: ::PurchaseOrder,
            label: 'New PO',
@@ -24,6 +26,7 @@ class Menu::Masters::Procurement < Menu::API
     action :template,
            :new_non_po_invoice,
            permissions: :non_po_invoice_initiator,
+           features: :procurement,
            label: "New Non PO Invoice",
            policy: ::Docs::P2P::Invoices::Policy,
            model: ::Invoice,
@@ -41,6 +44,7 @@ class Menu::Masters::Procurement < Menu::API
            :create,
            format: 'primary',
            permissions: :payment_agreement_initiator,
+           features: :agreement_based_payment_system,
            label: 'New Agreement',
            icon: 'https://img.icons8.com/windows/17/708090/--checkmark-yes.png',
            url: 'agreements/new'
@@ -61,17 +65,17 @@ class Menu::Masters::Procurement < Menu::API
          permissions: Docs::P2P::PurchaseRequests::Index.permissions
   end
 
-  item :procure, icon: 'https://img.icons8.com/windows/20/ffffff/add-shopping-cart.png' do
+  item :procure, features: :procurement, icon: 'https://img.icons8.com/windows/20/ffffff/add-shopping-cart.png' do
     item :purchase_orders, permissions: Docs::P2P::PurchaseOrders::Index.permissions
     item :pr_approved_items, label: "PR Approved Items", permissions: [:purchase_order_initiator, :admin]
   end
 
-  item :receive, permissions: Docs::P2P::Inwards::Received::Index.permissions, icon: 'https://img.icons8.com/windows/20/ffffff/borrow-book.png' do
+  item :receive, features: [:procurement, :grn_enabled], permissions: Docs::P2P::Inwards::Received::Index.permissions, icon: 'https://img.icons8.com/windows/20/ffffff/borrow-book.png' do
     item :receive_pending, path: 'receive'
     item :receive_history, path: 'receive/history'
   end
 
-  item :payables, icon: "https://img.icons8.com/windows/20/ffffff/sales-performance.png" do
+  item :payables, features: :procurement, icon: "https://img.icons8.com/windows/20/ffffff/sales-performance.png" do
     item :po_advances, label: "PO Advances", permissions: Docs::P2P::PurchaseOrders::Advances::Index.permissions
     item :invoices, permissions: Docs::P2P::Invoices::Index.permissions
     item :utility_bills, permissions: Docs::UtilityBills::Subscriptions::Index.permissions
@@ -85,14 +89,14 @@ class Menu::Masters::Procurement < Menu::API
   end
 
   item :manage, icon: 'https://img.icons8.com/windows/20/ffffff/commercial-development-management.png' do
-    item :analytics, permissions: [:admin]
+    item :analytics, permissions: [:admin], features: :analytics_system
     item :vendors, permissions: Masters::Vendors::Index.permissions
     item :items, permissions: Masters::Items::Index.permissions
-    item :rate_contracts, permissions: Masters::RateContracts::Index.permissions
+    item :rate_contracts, permissions: Masters::RateContracts::Index.permissions, features: :procurement
     item :agreements, features: :agreement_based_payment_system,
          permissions: Docs::P2P::Agreements::Index.permissions
-    item :credit_notes, permissions: Docs::P2P::CreditNotes::Index.permissions
-    item :utility_subscriptions, permissions: Docs::UtilityBills::Subscriptions::Index.permissions
+    item :credit_notes, permissions: Docs::P2P::CreditNotes::Index.permissions, features: :procurement
+    item :utility_subscriptions, permissions: Docs::UtilityBills::Subscriptions::Index.permissions, features: :utility_bills_enabled
     item :users, permissions: [:admin]
   end
 
