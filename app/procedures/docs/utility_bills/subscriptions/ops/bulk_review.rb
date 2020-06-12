@@ -4,7 +4,7 @@ class Docs::UtilityBills::Subscriptions::Ops::BulkReview < Transactions::API
   step :init
   step :validate
   step :process
-  step Transactions::Messages::SuccessMessage("Bulk Operation in Process. A Confirmation Mail will Be Sent with the Result upon Completion")
+  step Transactions::Messages::SuccessMessage("Bulk Operation in process. A confirmation mail will Be sent with the result upon completion")
 
 
   def pre_validate(options, params:, **)
