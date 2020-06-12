@@ -10,7 +10,7 @@ class DashboardsController < BaseControllers::WebBase
     handler = nil
     case params[:route].to_s
     when 'awaiting_action'
-      handler = Dashboard::P2P::PurchaseOrders
+      handler = Dashboard::P2P::AwaitingApproval
     when 'purchase_orders'
       handler = Dashboard::P2P::PurchaseOrders
     when 'purchase_requests'

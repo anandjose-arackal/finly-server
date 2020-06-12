@@ -13,6 +13,8 @@ class PaymentAgreementStatus < ApplicationRecord
 
   include Seedable
 
+  GROUP_AWAITING_APPROVAL = 91
+
   def self.values
     [
         :draft,
