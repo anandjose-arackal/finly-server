@@ -10,7 +10,11 @@ class Masters::Items::FilterConfig < Filters::API
   attribute :description, type: :text, simple: true
   attribute :item_code, type: :text, simple: true
   attribute :category_id, type: :dropdown, simple: true, choices: Choices[:auto_complete].('categories')
-  attribute :supply_item_type_id, label: "Scope", type: :dropdown, simple: true, choices: Choices[:enum].(SupplyItemType)
+  attribute :supply_item_type_id, label: "Scope", type: :dropdown, simple: true, choices: Choices[:list].(
+      {id: SupplyItemType.id_for(:po_item), name: "PO"},
+          {id: SupplyItemType.id_for(:non_po_item), name: "Non-PO"},
+          {id: SupplyItemType.id_for(:po_non_po_item), name: 'All'}
+  )
   attribute :product_type_id, type: :dropdown, simple: true, choices: Choices[:enum].(ProductType)
   attribute :unit_of_measurement, type: :text
   # attribute :created_by, type: :dropdown, choices: Choices[:auto_complete].('users', permissions: [:item_master_manager])
