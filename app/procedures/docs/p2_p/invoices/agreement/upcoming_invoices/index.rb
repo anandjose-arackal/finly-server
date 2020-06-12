@@ -3,7 +3,7 @@ class Docs::P2P::Invoices::Agreement::UpcomingInvoices::Index < IndexBuilder::AP
   system_subscription :vp
   permissions :agreement_invoice_initiator, :agreement_invoice_auditor, :admin
   resolver 'upcoming_invoices.default'
-  reference '{{record.id}}', procurement_id: '{{record.procurement_id}}', procurement_type: "{{record.invoice_type.key}}", payment_agreement_id: "{{record.payment_agreement.id}}", invoice_type: "{{record.invoice_type_name}}"
+  reference '{{record.id}}', procurement_id: '{{record.procurement_id}}', procurement_type: "{{record.invoice_type.key}}", payment_agreement_id: "{{record.payment_agreement.id}}", invoice_type: "{{record.invoice_type}}"
   includes [:payment_agreement, :invoice_type]
   # custom_fields :invoice
 
