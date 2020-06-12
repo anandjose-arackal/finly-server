@@ -4,7 +4,7 @@ class Docs::P2P::Inwards::Received::Index < IndexBuilder::API
   system_subscription :vp
   permissions :goods_receiver, :admin
   resolver 'inward_documents.received'
-  reference '{{record.id}}', procurement_id: '{{record.procurement_id}}'
+  reference '{{record.id}}', procurement_id: '{{record.procurement_id}}', document_type: "inward_document"
   selectable false
 
   # Fixed column is always default true
