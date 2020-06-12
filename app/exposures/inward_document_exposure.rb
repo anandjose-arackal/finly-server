@@ -10,6 +10,7 @@ class InwardDocumentExposure < Exposures::API
   attribute :receipt_note_number, record_attribute: :doc_number
   attribute :purchase_order, record_attribute: true, exposure: true
   attribute :procurement, record_attribute: true, exposure: true
+  attribute :procurement_id, record_attribute: true
   attribute :vendor, record_attribute: true, exposure: true
 
 end
