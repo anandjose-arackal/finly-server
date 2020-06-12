@@ -48,10 +48,9 @@ class Menu::Item
       self.permissions = []
     end
 
-    if self.features and not self.features.respond_to?(:each)
+    self.features ||= []
+    unless self.features.respond_to?(:each)
       self.features = [self.features]
-    else
-      self.features = []
     end
 
     init_parent
@@ -114,7 +113,6 @@ class Menu::Item
   def authorized?(options = {})
     current_user = options[:current_user]
     return false unless current_user.present?
-    puts "Path : #{path} : Has Permissions: #{current_user.has_permission?(permissions)} permissions : #{permissions}"
     return false unless current_user.has_permission?(permissions)
     return false unless company_subscribed?(current_user)
     return false unless user_subscribed?(current_user)

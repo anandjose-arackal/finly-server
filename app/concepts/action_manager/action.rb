@@ -102,6 +102,7 @@ class ActionManager::Action
   def feature_subscribed?(user)
     return true if features.blank?
 
+    self.features ||= []
     self.features = [self.features] unless self.features.respond_to?(:each)
     self.features.each do |feature|
       return false unless !!user.company.feature_subscription.send(feature)
