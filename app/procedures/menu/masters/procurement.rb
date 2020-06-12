@@ -18,13 +18,13 @@ class Menu::Masters::Procurement < Menu::API
            permissions: :purchase_order_initiator,
            policy: ::Docs::P2P::PurchaseOrders::Policy,
            model: ::PurchaseOrder,
-           label: 'Create PO',
+           label: 'New PO',
            function: "po_create"
 
     action :template,
            :new_non_po_invoice,
            permissions: :non_po_invoice_initiator,
-           label: "Create Non PO Invoice",
+           label: "New Non PO Invoice",
            policy: ::Docs::P2P::Invoices::Policy,
            model: ::Invoice,
            function: "non_po_invoice_create"
@@ -34,18 +34,23 @@ class Menu::Masters::Procurement < Menu::API
            policy: ::Docs::PaymentTickets::Policy,
            model: ::BankPaymentRequest,
            permissions: :bank_payment_request_initiator,
-           label: 'Create Payment Ticket',
+           label: 'New Payment Ticket',
            url: 'new_payment_ticket'
 
-    # Todo agreement
-    # action :new_agreement, path: 'agreements/new', permissions: [:agreement_invoice_initiator]
+    action :redirect,
+           :create,
+           format: 'primary',
+           permissions: :payment_agreement_initiator,
+           label: 'New Agreement',
+           icon: 'https://img.icons8.com/windows/17/708090/--checkmark-yes.png',
+           url: 'agreements/new'
 
     action :redirect,
            :new_vendor,
            permissions: [:vendor_creator, :vendor_manager],
            policy: ::Masters::Vendors::Policy,
            model: ::YesBankVendor,
-           label: 'Add Vendor',
+           label: 'New Vendor',
            url: 'vendor/add'
   end
 
