@@ -283,11 +283,11 @@ class CreditNote < ApplicationRecord
   scope :with_status_id, -> (status_id) {
     case status_id
     when 90
-      where status_id: BbpsBillStatus.ids_for(:draft, :retracted)
+      where status_id: CreditNoteStatus.ids_for(:draft, :retracted)
     when 91
       awaiting_action_items(RequestStore.store[:current_user]&.id)
     when 92
-      where status_id: BbpsBillStatus.ids_for(:approved, :auto_approved, :partially_adjusted, :unadjusted)
+      where status_id: CreditNoteStatus.ids_for(:approved, :auto_approved, :partially_adjusted, :unadjusted)
     else
       where status_id: status_id
     end
