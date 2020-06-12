@@ -1083,7 +1083,7 @@ class User < ApplicationRecord
 
   # todo - temporarily disabling policy admin screen for the admin? role
   def admin?(application = "em")
-    case application
+    case application.to_s
     when "em"
       company_admin?
     when "vp"

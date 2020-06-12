@@ -3974,6 +3974,7 @@ Rails.application.routes.draw do
     put 'purchase_requests/bulk_reject', to: 'purchase_requests#bulk_reject'
     put 'purchase_requests/bulk_take_control', to: 'purchase_requests#bulk_take_control'
     delete 'purchase_requests/bulk_destroy', to: 'purchase_requests#bulk_destroy'
+    put 'purchase_requests/bulk_destroy', to: 'purchase_requests#bulk_destroy'
     get 'purchase_requests/filter_config', to: 'purchase_requests#filter_config'
     resources :purchase_requests do
       get 'edit_config', to: "purchase_requests#edit_config", as: :edit_config

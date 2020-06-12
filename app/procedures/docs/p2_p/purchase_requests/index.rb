@@ -95,7 +95,7 @@ class Docs::P2P::PurchaseRequests::Index < IndexBuilder::API
   end
 
   def self.status(context)
-    return "Processing" if context[:record].purchase_request_status_id == PurchaseRequestStatus.id_for(:awaiting_approval) and not context[:record].controlling_user?(context[:user])
+    return 'Processing' if context[:record].purchase_request_status_id == PurchaseRequestStatus.id_for(:awaiting_approval) and not context[:record].controlling_user?(context[:user])
 
     context[:record].status&.name&.titleize
   end
