@@ -4,7 +4,9 @@ class GeneralInvoiceExposure < Exposures::API
   # attribute :template_invoice, record_attribute: true, exposure: true # todo no idea what this field is, hence commented
   attribute :created_by, record_attribute: true, exposure: true
   attribute :invoice_id, record_attribute: true
-  attribute :invoice_type, record_attribute: true, exposure: true
+  attribute :invoice_type do
+    'general_invoice'
+  end
   attribute :company, record_attribute: true, exposure: true, includes: [:company]
   attribute :gstin_location, record_attribute: true, exposure: true, includes: [:gstin_location]
   attribute :vendor_location, record_attribute: true, exposure: true, includes: [:vendor_location]
