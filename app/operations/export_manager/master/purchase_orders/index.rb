@@ -30,6 +30,11 @@ class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Sp
   attribute :department
   attribute :sub_department
   attribute :cost_center
+  ############################### PR Details ################################
+  attribute :pr_number
+  attribute :pr_created_by
+  attribute :pr_date
+  ############################### PR Details ################################
   attribute :po_user
   attribute :po_status
   attribute :po_number
@@ -390,6 +395,21 @@ class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Sp
     # todo
   end
 
+  def pr_number purchase_order
+    request = purchase_order.purchase_request_items.first&.purchase_request
+    request.present? ? request&.order_number : ''
+  end
+
+  def pr_created_by purchase_order
+    request = purchase_order.purchase_request_items.first&.purchase_request
+    request.present? ? request&.creator&.name : ''
+  end
+
+  def pr_date purchase_order
+    request = purchase_order.purchase_request_items.first&.purchase_request
+    request.present? ? request&.created_at&.strftime("%d-%b-%Y") : ''
+  end
+
   protected
 
   def invoice(purchase_order)
@@ -399,5 +419,4 @@ class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Sp
   # def purchase_order(purchase_order)
   #   procurement&.purchase_order
   # end
-
 end

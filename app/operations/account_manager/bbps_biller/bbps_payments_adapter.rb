@@ -50,7 +50,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         bill_period: bank_transaction.bill_period,
         biller_id: bank_transaction.biller_id,
         quick_pay: bank_transaction.quick_pay,
-        order_number: bank_transaction.order_number
+        order_number: bill.order_number
     }
 
     params.merge!(customer_params(bill.subscription))
@@ -62,7 +62,8 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         # have to add a check for cases when it's a timeout or any other status other than
         # a 200 OK response
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:processing),
-                                bbps_ref_id: result.bbps_ref_id)
+                                bbps_ref_id: result.bbps_ref_id,
+                                order_number: bill.order_number)
 
         # clearing old system messages as well
         payment.system_messages.destroy_all

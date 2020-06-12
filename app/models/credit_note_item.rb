@@ -33,6 +33,7 @@
 class CreditNoteItem < ApplicationRecord
   include MathUtil, SoftDeletable
 
+  before_save :set_tds_applicable
   before_save :calculate_total
 
   belongs_to :item, class_name: 'Item', optional: true
@@ -73,7 +74,7 @@ class CreditNoteItem < ApplicationRecord
   end
 
   def tds_applicable?
-    self.item&.tds_applicable?
+    self&.tds_applicable
   end
 
   def total_amount_value
@@ -186,4 +187,7 @@ class CreditNoteItem < ApplicationRecord
     end
   end
 
+  def set_tds_applicable
+    self.tds_applicable = self&.item&.tds_applicable
+  end
 end

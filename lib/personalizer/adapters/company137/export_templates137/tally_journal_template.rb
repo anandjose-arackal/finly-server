@@ -47,6 +47,7 @@ class Personalizer::Adapters::Company137::ExportTemplates137::TallyJournalTempla
       row = ExportManager::Builders::Spreadsheet::Row.new(record: item, header: header)
       {
         'Vch Type': get_voucher_type(invoice),
+        'Tally VoucherVch No.':invoice&.invoice_id,
         'Date':Date.today&.strftime("%b %d, %y"),
         'Supplier Inv No':invoice&.invoice_number,
         'Supplier Inv Date':invoice&.date&.strftime("%b %d, %y"),
@@ -73,6 +74,7 @@ class Personalizer::Adapters::Company137::ExportTemplates137::TallyJournalTempla
         'IGST Ledger':((item&.igst.present? && item&.igst > 0) ? get_igst_ledger(invoice) : ''),
         'IGST Amt':item.igst,
         'Total':item&.net_amount&.value,
+        'Narration':invoice&.narration,
         'Verify':retrieve_approved_by(invoice)
       }.each do |k, v|
         row.add k, v

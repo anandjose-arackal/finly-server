@@ -7,6 +7,7 @@ class YesBankApi::Balance::GetBalance < YesBankApi::Base
 
   def initialize(company)
     self.company = company
+    self.params = {}
   end
 
   def self.call(company)
@@ -57,29 +58,33 @@ class YesBankApi::Balance::GetBalance < YesBankApi::Base
   end
 
   def success
-    YesBankApi::Transfer::BankTransfer::SuccessBalancePresenter.new(balance)
+    params[:balance] = self.balance
+    YesBankApi::Transfer::BankTransfer::SuccessBalancePresenter.new(user, params, messages)
   end
 
   def failure
-    YesBankApi::Transfer::BankTransfer::FailureBalancePresenter.new
+    params[:balance] = 0
+    YesBankApi::Transfer::BankTransfer::FailureBalancePresenter.new(user, params, messages)
   end
 
   class YesBankApi::Transfer::BankTransfer::SuccessBalancePresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :balance
 
-    def initialize(balance)
-      self.balance = balance
+    def init
+      self.balance = params[:balance]
     end
+
   end
 
   class YesBankApi::Transfer::BankTransfer::FailureBalancePresenter < BaseOperation::BasePresenter::FailurePresenter
 
     attr_accessor :balance
 
-    def initialize
+    def init
       self.balance = 0
     end
+
   end
 
   private
