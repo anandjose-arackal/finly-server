@@ -1,6 +1,6 @@
 class RentalInvoiceExposure < GeneralInvoiceExposure
 
-  attribute :invoice_type do
+  def invoice_type
     'rental_invoice'
   end
 
