@@ -12,11 +12,15 @@ class ItemExposure < Exposures::API
   attribute :item_code, record_attribute: true
   attribute :account, record_attribute: true
   attribute :scope, includes: [:supply_item_type] do
-    record.supply_item_type&.name&.gsub("_item", "")
+    if record.supply_item_type&.name == "po_non_po_item"
+      "All"
+    else
+      record.supply_item_type&.name&.gsub("_item", "")&.titleize
+    end
   end
   attribute :deleted_at, record_attribute: true
   attribute :product_type do
-    record.product_type&.name
+    record.product_type&.name&.titleize
   end
   attribute :item_number, record_attribute: true
   attribute :unit_of_measurement, record_attribute: true
