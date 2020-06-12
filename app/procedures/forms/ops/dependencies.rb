@@ -31,7 +31,7 @@ class Forms::Ops::Dependencies < Transactions::API
 
   def init_form_computations(context, model:, dependencies:, **)
     dependencies[:form_computations] = []
-    model.entities.where(compute_enabled: true, compute_type_id: FormEntityComputationType.id_for(:form)).includes(:compute_lookup_entity, :parent).each do |entity|
+    model.entities.where(internal: false, compute_enabled: true, compute_type_id: FormEntityComputationType.id_for(:form)).includes(:compute_lookup_entity, :parent).each do |entity|
       computation = entity.form_reference_json
       computation[:type] = entity.compute_type.name
       computation[:formula] = entity.compute_formula
@@ -42,6 +42,7 @@ class Forms::Ops::Dependencies < Transactions::API
   def init_lookup_computations(context, model:, dependencies:, **)
     dependencies[:lookup_computations] = []
     model.entities.where(
+        internal: false,
         compute_enabled: true,
         compute_type_id: FormEntityComputationType.id_for(:lookup))
         .includes({compute_lookup_entity: :parent}, :parent).each do |entity|
