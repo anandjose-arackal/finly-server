@@ -85,8 +85,9 @@ class Dashboard::P2P::AwaitingApproval < Dashboard::IndexCard
   # end
 
   def build_tiles(context, filter_created_by: nil)
+    query = {}
     rule = build_rule(context, filter_created_by: false)
-    query = rule.as_ransack
+    query = rule.as_ransack if rule.present?
 
     tiles = []
     TILES.each do |tile|
