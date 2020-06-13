@@ -36,7 +36,7 @@ class Procurements::Invoices::BulkTakeControl < Procurements::Invoices::Base
   end
 
   def process
-    Procurements::Invoices::BulkTakeControlProcessor.call_async(user.id, {invoice_ids: invoices.pluck(:id)})
+    Procurements::Invoices::BulkTakeControlProcessor.call(user.id, {invoice_ids: invoices.pluck(:id)})
   end
 
   def post_process
