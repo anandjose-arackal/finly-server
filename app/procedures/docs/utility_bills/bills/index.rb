@@ -163,7 +163,7 @@ class Docs::UtilityBills::Bills::Index < IndexBuilder::API
   end
 
   def self.bbps_bill_status(context)
-    return 'Processing'.titleize if context[:record].status_id == BbpsBillStatus.id_for(:awaiting_approval) and context[:record].controlling_user?(context[:user])
+    return 'Processing'.titleize if context[:record].status_id == BbpsBillStatus.id_for(:awaiting_approval) and not context[:record].controlling_user?(context[:user])
 
     context[:record].status&.name&.titleize
   end
