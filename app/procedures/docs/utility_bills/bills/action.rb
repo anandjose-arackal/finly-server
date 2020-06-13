@@ -30,13 +30,13 @@ class Docs::UtilityBills::Bills::Action < ActionManager::API
                label: "Approve",
                icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
                url: "bbps/bills/bulk_review.json?action_type=approve",
-               authorize: :review?
+               authorize: :approve?
         action :transition,
                :reject,
                label: "Reject",
                icon: "https://img.icons8.com/windows/17/708090/cancel-2.png",
                url: "bbps/bills/bulk_review.json?action_type=reject",
-               authorize: :review?
+               authorize: :reject?
       end
     end
   end
