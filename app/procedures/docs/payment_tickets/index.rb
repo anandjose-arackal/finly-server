@@ -122,16 +122,16 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
   def self.pt_status(context)
     return 'Awaiting Approval' if context[:record].status_id == BankPaymentRequestStatus.id_for(:processing) and context[:record].controlling_user?(context[:user])
 
-    context[:record].status&.name&.titleize
+    context[:record].status_name&.titleize
   end
 
   def self.format_status(context)
-    case context[:record].status&.name&.to_s&.to_sym
+    case context[:record].status_name&.to_s&.to_sym
     when :rejected
       format = 'danger'
-    when :approved, :auto_approved, :pending, :creation_in_progress, :credited
+    when :approved, :auto_approved, :pending, :creation_in_progress, :credited, :pending_credit
       format = 'success'
-    when :processing, :submitted, :unapprove
+    when :processing, :submitted, :unapprove, :awaiting_approval
       if context[:record].controlling_user?(context[:user])
         format = 'warning'
       else

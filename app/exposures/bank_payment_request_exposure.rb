@@ -11,6 +11,9 @@ class BankPaymentRequestExposure < Exposures::API
   attribute :approved_at, record_attribute: true
   attribute :policy, record_attribute: true, exposure: true, includes: [:policy]
   attribute :status, record_attribute: true, exposure: true, includes: [:status]
+  attribute :status_name do
+    record.status_name(user)
+  end
   attribute :review_progress, record_attribute: true, includes: [:dlrms]
   attribute :controlling_level, record_attribute: true, exposure: true, includes: [:controlling_level]
   attribute :payment_mode, record_attribute: true
