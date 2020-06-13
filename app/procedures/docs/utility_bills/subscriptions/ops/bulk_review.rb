@@ -17,7 +17,7 @@ class Docs::UtilityBills::Subscriptions::Ops::BulkReview < Transactions::API
 
 
   def init(options, params:, current_user:, **)
-    params[:ids] = params[:ids]
+    params[:ids] = params[:ids] || params[:id]
 
     index_op = Docs::UtilityBills::Subscriptions::Ops::Index.(params: params, current_user: current_user)
     records = index_op['result']&.dig('subscriptions').with_id(params[:ids])
