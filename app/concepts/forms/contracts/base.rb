@@ -22,6 +22,16 @@ class Forms::Contracts::Base < Reform::Form
     @computation_queue ||= Forms::Contracts::Helpers::ComputationQueue.new
   end
 
+  def profiler
+    @profiler ||= Forms::Profiler.new id: "root"
+  end
+
+  def validate(data = {})
+    profiler.monitor do
+      super(data)
+    end
+  end
+
   validate :run_computations
   validate :run_choice_validations
 

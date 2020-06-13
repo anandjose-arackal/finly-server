@@ -42,25 +42,34 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
 
   def validate_entity(context, contract:, entity:, **)
     contract.validate -> do
-      # Using as_nested_hash instead of input as the input need not always
-      result = Forms::Contracts::Helpers::ConditionChecker.(
-          entity.conditions, entity, VALIDATION_ACTIONS, form: contract_root.to_form, row: self.to_form
-      )
-      required = result['required']
+      contract_root.profiler.step 'validate_entity', entity.entity_path do
+        # Using as_nested_hash instead of input as the input need not always
 
-      # Required validation ( System Validation )
-      if required and send(entity.entity_key).nil?
-        errors.add entity.entity_key, 'cannot be blank'
+        result = contract_root.profiler.step('condition_checker', entity.entity_path) {
+          form_data = contract_root.profiler.step('contract.to_form', entity.entity_path) { contract_root.to_form}
+          row_data = contract_root.profiler.step('row.to_form', entity.entity_path) { self.to_form }
+          Forms::Contracts::Helpers::ConditionChecker.(
+              self, entity.conditions, entity, VALIDATION_ACTIONS, form: form_data, row: row_data
+          )
+        }
+        required = result['required']
+
+        # Required validation ( System Validation )
+        if required and send(entity.entity_key).nil?
+          errors.add entity.entity_key, 'cannot be blank'
+        end
       end
     end
   end
 
   def custom_validate_entity(context, contract:, entity:, **)
     contract.validate -> do
-      entity.validations.each do |validation|
-        next unless validation.rule.apply?({form: contract_root.to_form, row: self.to_form}.with_indifferent_access)
+      contract_root.profiler.step 'custom_validate_entity', entity.entity_path do
+        entity.validations.each do |validation|
+          next unless validation.rule.apply?({form: contract_root.to_form, row: self.to_form}.with_indifferent_access)
 
-        errors.add entity.entity_key, validation.error_message
+          errors.add entity.entity_key, validation.error_message
+        end
       end
     end
   end
@@ -71,26 +80,30 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
 
     # controlling_choices
     contract.validate -> do
-      form_data = contract_root.to_form
-      row_data = self.to_form
-      entity_value = Forms::RequestParser.new(form: form_data, row: row_data).fetch(entity.entity_path)
-      next if entity_value.blank?
+      contract_root.profiler.step 'validate_choices', entity.entity_path do
+        form_data = contract_root.profiler.step('contract.to_form', entity.entity_path) { contract_root.to_form}
+        row_data = contract_root.profiler.step('row.to_form', entity.entity_path) { self.to_form }
+        # form_data = contract_root.to_form
+        # row_data = self.to_form
+        entity_value = Forms::RequestParser.new(form: form_data, row: row_data).fetch(entity.entity_path)
+        next if entity_value.blank?
 
-      if entity.filters.blank? and entity.choice_dependencies.size == 0
-        contract_root.bulk_validate_choice entity, entity_value
-      else
-        result = Forms::Ops::Choices.(
-            params: {
-                form_data: form_data,
-                row_data: row_data,
-                entity_path: entity.entity_path,
-                form_record: entity.form,
-                qs: {id_in: entity_value} # Pass the ID as a simple filter
-            }, current_user: current_user
-        )
-        # Fixme: This is working only for lookup
-        unless result[:choices].data.present?
-          errors.add entity.entity_key, 'has an invalid choice'
+        if entity.filters.blank? and entity.choice_dependencies.size == 0
+          contract_root.bulk_validate_choice entity, entity_value
+        else
+          result = Forms::Ops::Choices.(
+              params: {
+                  form_data: form_data,
+                  row_data: row_data,
+                  entity_path: entity.entity_path,
+                  form_record: entity.form,
+                  qs: {id_in: entity_value} # Pass the ID as a simple filter
+              }, current_user: current_user
+          )
+          # Fixme: This is working only for lookup
+          unless result[:choices].data.present?
+            errors.add entity.entity_key, 'has an invalid choice'
+          end
         end
       end
     end
@@ -123,22 +136,26 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
     lambda do |input, represented, **|
       # next unless input.has_key?(entity.entity_key)
 
-      row_data = represented.to_form
-      form_data = represented.contract_root.to_form
-      result = Forms::Contracts::Helpers::ConditionChecker.(entity.conditions, entity, SETTER_ACTIONS, form: form_data, row: row_data)
-      editable = result['editable']
-      visible = result['visible']
-      internal = result['internal']
-      if editable and visible and row_data.has_key?(entity.entity_key)
-        value = input[entity.entity_key] # || entity.default_value
-        entity.populate(represented, value)
-        # represented.send("#{entity.entity_key}=", entity.format(value))
-      end
+      represented.contract_root.profiler.step 'deserialize', ent.entity_path do
+        form_data = represented.contract_root.profiler.step('contract.to_form', entity.entity_path) { represented.contract_root.to_form}
+        row_data = represented.contract_root.profiler.step('row.to_form', entity.entity_path) { represented.to_form }
+        result = represented.contract_root.profiler.step('condition_checker', ent.entity_path) {
+          Forms::Contracts::Helpers::ConditionChecker.(represented, entity.conditions, entity, SETTER_ACTIONS, form: form_data, row: row_data)
+        }
+        editable = result['editable']
+        visible = result['visible']
+        internal = result['internal']
+        if editable and visible and row_data.has_key?(entity.entity_key)
+          value = input[entity.entity_key] # || entity.default_value
+          entity.populate(represented, value)
+          # represented.send("#{entity.entity_key}=", entity.format(value))
+        end
 
 
-      # -> Computations are run here
-      if entity.compute_enabled and (internal or not editable or not visible)
-        represented.contract_root.queue_computation represented, entity
+        # -> Computations are run here
+        if entity.compute_enabled and (internal or not editable or not visible)
+          represented.contract_root.queue_computation represented, entity
+        end
       end
     end
   end
