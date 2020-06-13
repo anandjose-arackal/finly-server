@@ -141,21 +141,23 @@ class Dashboard::P2P::AwaitingApproval < Dashboard::IndexCard
   def build_rule(context, tile, filter_created_by: false)
     rule = []
     params = context[:params]
-    if filter_created_by
-      rule << Rules::Builder[self.class.created_by].eq_any(value: context[:current_user].id).with_meta([{id: context[:current_user].id, name: context[:current_user].name}])
-    end
     if params[:filter_policy].present? and tile[:filters][:policy].present?
-      rule << Rules::Builder[self.class.policy].eq_any(value: params[:filter_policy])
+      policy = ::Policy.find_by(company_id: context[:current_user].company_id, id: params[:filter_policy])
+      rule << Rules::Builder[tile[:filters][:policy]].eq_any(value: params[:filter_policy]).with_meta([{id: policy&.id, name: policy&.name}])
     end
     if (params[:filter_department].present? or params[:filter_sub_department].present?) and tile[:filters][:department].present?
-      department_id = params[:filter_sub_department] or params[:filter_department]
-      rule << Rules::Builder[self.class.department].eq_any(value: department_id)
+      department_id = params[:filter_sub_department]
+      department_id = params[:filter_department] if department_id.blank?
+      department = Department.find_by(company_id: context[:current_user].company_id, id: department_id)
+      rule << Rules::Builder[tile[:filters][:department]].eq_any(value: department_id).with_meta([{id: department&.id, name: department&.name}])
     end
     if params[:filter_location].present? and tile[:filters][:location].present?
-      rule << Rules::Builder[self.class.location].eq_any(value: params[:filter_location])
+      location = BranchLocation.find_by(company_id: context[:current_user].company_id, id: params[:filter_location])
+      rule << Rules::Builder[tile[:filters][:location]].eq_any(value: params[:filter_location]).with_meta([{id: location&.id, name: location&.name}])
     end
     if params[:filter_cost_center].present? and tile[:filters][:cost_center].present?
-      rule << Rules::Builder[self.class.cost_center].eq_any(value: params[:filter_cost_center])
+      cost_center = CostCenter.find_by(company_id: context[:current_user].company_id, id: params[:filter_cost_center])
+      rule << Rules::Builder[tile[:filters][:cost_center]].eq_any(value: params[:filter_cost_center]).with_meta([{id: cost_center&.id, name: cost_center&.name}])
     end
     attribute_rule = rule.shift
     return attribute_rule if rule.blank? or attribute_rule.blank?
