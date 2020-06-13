@@ -68,7 +68,7 @@ class Dashboard::IndexCard < Transactions::API
   def build_tiles(context, filter_created_by: false)
     query = {}
     rule = build_rule(context, filter_created_by: filter_created_by)
-    query = rule.as_ransack if rule
+    query = rule.as_ransack if rule.present?
     result = IndexBuilder::StatusCount.(params: {route: self.class.index_route, q: query}, current_user: context[:current_user])
     return nil unless result.success?
 
