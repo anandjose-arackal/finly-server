@@ -16,6 +16,7 @@ class Docs::UtilityBills::Subscriptions::FilterConfig < Filters::API
   attribute :cost_center_id, label: "Cost Center", type: :dropdown, choices: Choices[:auto_complete].("cost_centers")
   attribute :department_id, label: "Department", type: :dropdown, choices: Choices[:auto_complete].("departments")
   attribute :policy_id, label: "Policy", type: :dropdown, choices: Choices[:auto_complete].("policies")
+  attribute :user_id, label: "Created By", type: :dropdown, choices: Choices[:auto_complete].("users")
   # attribute :last_paid_at, type: :datetime
 
 end

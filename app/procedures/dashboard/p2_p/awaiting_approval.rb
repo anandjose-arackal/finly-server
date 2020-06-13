@@ -8,6 +8,12 @@ class Dashboard::P2P::AwaitingApproval < Dashboard::IndexCard
           path: "purchase_requests",
           status_id: PurchaseRequestStatus::GROUP_AWAITING_APPROVAL,
           model: PurchaseRequest,
+          filters: {
+              policy: :policy_id,
+              location: :items_delivery_location_id,
+              department: :items_department_id,
+              cost_center: :items_cost_center_id
+          },
           permission: -> (context, current_user:, **) {
             current_user.company.purchase_requisition_enabled? and current_user.has_permission?(:purchase_request_reviewer)
           }
@@ -17,6 +23,12 @@ class Dashboard::P2P::AwaitingApproval < Dashboard::IndexCard
           path: "purchase_orders",
           status_id: PurchaseOrderStatus::GROUP_AWAITING_APPROVAL,
           model: PurchaseOrder,
+          filters: {
+              policy: :policy_id,
+              location: :delivery_location_id,
+              department: :items_department_id,
+              cost_center: :items_cost_center_id
+          },
           permission: -> (context, current_user:, **) {
             current_user.company.procurement_enabled? and current_user.has_permission?(:purchase_order_reviewer)
           }
@@ -26,6 +38,12 @@ class Dashboard::P2P::AwaitingApproval < Dashboard::IndexCard
           path: "invoices",
           status_id: InwardInvoiceStatus::GROUP_AWAITING_APPROVAL,
           model: Invoice,
+          filters: {
+              policy: :policy_id,
+              location: :delivery_location_id,
+              department: :items_department_id,
+              cost_center: :items_cost_center_id
+          },
           permission: -> (context, current_user:, **) {
             current_user.company.procurement_enabled? and current_user.has_permission?([:non_po_invoice_reviewer, :po_invoice_reviewer, :agreement_invoice_reviewer])
           }
@@ -35,6 +53,12 @@ class Dashboard::P2P::AwaitingApproval < Dashboard::IndexCard
           path: "utility_bills",
           status_id: BbpsBillStatus::GROUP_AWAITING_APPROVAL,
           model: BbpsBill,
+          filters: {
+              policy: :policy_id,
+              location: :location_id,
+              department: :department_id,
+              cost_center: :cost_center_id
+          },
           permission: -> (context, current_user:, **) {
             current_user.company.utility_bills_enabled? and current_user.has_permission?(:utility_bill_reviewer)
           }
@@ -44,6 +68,9 @@ class Dashboard::P2P::AwaitingApproval < Dashboard::IndexCard
           path: "payment_tickets",
           status_id: BankPaymentRequestStatus::GROUP_AWAITING_APPROVAL,
           model: BankPaymentRequest,
+          filters: {
+              policy: :policy_id,
+          },
           permission: -> (context, current_user:, **) {
             current_user.has_permission?(:bank_payment_request_reviewer)
           }
@@ -53,6 +80,9 @@ class Dashboard::P2P::AwaitingApproval < Dashboard::IndexCard
           path: "vendors",
           status_id: VendorStatus::GROUP_AWAITING_APPROVAL,
           model: YesBankVendor,
+          filters: {
+              policy: :policy_id,
+          },
           permission: -> (context, current_user:, **) {
             current_user.company.vendor_empanelment_workflow_enabled? and current_user.has_permission?(:vendor_reviewer)
           }
@@ -62,6 +92,9 @@ class Dashboard::P2P::AwaitingApproval < Dashboard::IndexCard
           path: "agreements",
           status_id: PaymentAgreementStatus::GROUP_AWAITING_APPROVAL,
           model: PaymentAgreement,
+          filters: {
+              policy: :policy_id,
+          },
           permission: -> (context, current_user:, **) {
             current_user.company.agreement_based_payment_system_enabled? and current_user.has_permission?(:payment_agreement_reviewer)
           }
@@ -71,6 +104,12 @@ class Dashboard::P2P::AwaitingApproval < Dashboard::IndexCard
           path: "utility_subscriptions",
           status_id: BbpsBillerSubscriptionStatus::GROUP_AWAITING_APPROVAL,
           model: BbpsBillerSubscription,
+          filters: {
+              policy: :policy_id,
+              location: :location_id,
+              department: :department_id,
+              cost_center: :cost_center_id
+          },
           permission: -> (context, current_user:, **) {
             current_user.company.utility_bills_enabled? and current_user.has_permission?(:utility_bill_master_reviewer)
           }
@@ -85,18 +124,40 @@ class Dashboard::P2P::AwaitingApproval < Dashboard::IndexCard
   # end
 
   def build_tiles(context, filter_created_by: nil)
-    query = {}
-    rule = build_rule(context, filter_created_by: false)
-    query = rule.as_ransack if rule.present?
-
     tiles = []
     TILES.each do |tile|
       next if tile[:permission] and not tile[:permission].call(context, **context)
+
+      query = {}
+      rule = build_rule(context, tile, filter_created_by: false)
+      query = rule.as_ransack if rule.present?
 
       count = tile[:model].ransack(query).result.awaiting_action_items(context[:current_user]).count
       tiles << build_tile(count: count, rule: rule, title: tile[:title], path: tile[:path], status_id: PurchaseRequestStatus::GROUP_AWAITING_APPROVAL)
     end
     tiles
+  end
+
+  def build_rule(context, tile, filter_created_by: false)
+    rule = nil
+    params = context[:params]
+    if filter_created_by
+      rule = add_rule rule, Rules::Builder[self.class.created_by].eq_any(value: context[:current_user].id).with_meta([{id: context[:current_user].id, name: context[:current_user].name}])
+    end
+    if params[:filter_policy].present? and tile[:filters][:policy].present?
+      rule = add_rule rule, Rules::Builder[tile[:filters][:policy]].eq_any(value: params[:filter_policy])
+    end
+    if (params[:filter_department].present? or params[:filter_sub_department].present?) and tile[:filters][:department].present?
+      department_id = params[:filter_sub_department] or params[:filter_department]
+      rule = add_rule rule, Rules::Builder[tile[:filters][:department]].eq_any(value: department_id)
+    end
+    if params[:filter_location].present? and tile[:filters][:location].present?
+      rule = add_rule rule, Rules::Builder[tile[:filters][:location]].eq_any(value: params[:filter_location])
+    end
+    if params[:filter_cost_center].present? and tile[:filters][:cost_center].present?
+      rule = add_rule rule, Rules::Builder[tile[:filters][:cost_center]].eq_any(value: params[:filter_cost_center])
+    end
+    rule
   end
 
   def build_tile(count:, rule:, title:, path:, status_id:)

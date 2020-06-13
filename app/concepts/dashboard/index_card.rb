@@ -6,10 +6,10 @@ class Dashboard::IndexCard < Transactions::API
   class_attr :id
   class_attr :created_by, default: :user_id
   class_attr :status
-  class_attr :department, default: :department_id
-  class_attr :location, default: :location_id
-  class_attr :cost_center, default: :cost_center_id
-  class_attr :policy, default: :policy_id
+  class_attr :department
+  class_attr :location
+  class_attr :cost_center
+  class_attr :policy
 
   class_attr :index_route
   class_attr :permissions
@@ -89,17 +89,17 @@ class Dashboard::IndexCard < Transactions::API
     if filter_created_by
       rule = add_rule rule, Rules::Builder[self.class.created_by].eq_any(value: context[:current_user].id).with_meta([{id: context[:current_user].id, name: context[:current_user].name}])
     end
-    if params[:filter_policy].present?
+    if params[:filter_policy].present? and self.class.policy.present?
       rule = add_rule rule, Rules::Builder[self.class.policy].eq_any(value: params[:filter_policy])
     end
-    if params[:filter_department].present? or params[:filter_sub_department].present?
+    if (params[:filter_department].present? or params[:filter_sub_department].present?) and self.class.department.present?
       department_id = params[:filter_sub_department] or params[:filter_department]
       rule = add_rule rule, Rules::Builder[self.class.department].eq_any(value: department_id)
     end
-    if params[:filter_location].present?
+    if params[:filter_location].present? and self.class.location.present?
       rule = add_rule rule, Rules::Builder[self.class.location].eq_any(value: params[:filter_location])
     end
-    if params[:filter_cost_center].present?
+    if params[:filter_cost_center].present? and self.class.cost_center.present?
       rule = add_rule rule, Rules::Builder[self.class.cost_center].eq_any(value: params[:filter_cost_center])
     end
     rule

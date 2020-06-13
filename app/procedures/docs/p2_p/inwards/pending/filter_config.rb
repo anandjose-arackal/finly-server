@@ -13,5 +13,7 @@ class Docs::P2P::Inwards::Pending::FilterConfig < Filters::API
   attribute :delivery_location_id, label: "Shipping Location", type: :dropdown, choices: Choices[:auto_complete].("locations")
   attribute :items_cost_center_id, label: "Cost Center", type: :dropdown, choices: Choices[:auto_complete].("cost_centers")
   attribute :items_department_id, label: "Department", type: :dropdown, choices: Choices[:auto_complete].("departments")
+  attribute :policy_id, label: "Department", type: :dropdown, choices: Choices[:auto_complete].("policies")
+  attribute :user_id, label: "Created By", type: :dropdown, choices: Choices[:auto_complete].("users")
 
 end

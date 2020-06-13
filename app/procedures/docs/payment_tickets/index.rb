@@ -111,7 +111,6 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
       counter.add BankPaymentRequestStatus.id_for(status), status.to_s.titleize, counts[BankPaymentRequestStatus.id_for(status)].to_i
     end
 
-
     counter
   end
 
@@ -131,7 +130,7 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
       format = 'danger'
     when :approved, :auto_approved, :pending, :creation_in_progress, :credited, :pending_credit
       format = 'success'
-    when :processing, :submitted, :unapprove, :awaiting_approval
+    when :processing, :submitted, :unapprove, :awaiting_approval, :scheduled
       if context[:record].controlling_user?(context[:user])
         format = 'warning'
       else
