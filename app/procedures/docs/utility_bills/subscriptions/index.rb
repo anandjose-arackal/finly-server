@@ -103,7 +103,7 @@ class Docs::UtilityBills::Subscriptions::Index < IndexBuilder::API
 
     # Awaiting Approval
     if user.has_permission?(awaiting_approval_roles)
-      counter.add 91, 'Awaiting Approval', BbpsBillerSubscription.awaiting_action_items(user.id).count
+      counter.add 91, 'Awaiting Approval', collection.awaiting_action_items(user.id).count
     end
 
     # Processing

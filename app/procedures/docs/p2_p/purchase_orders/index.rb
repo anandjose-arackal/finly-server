@@ -107,7 +107,7 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
     # Awaiting Approval
     if user.has_permission?(awaiting_approval_roles)
       counter.add PurchaseOrderStatus::GROUP_AWAITING_APPROVAL, 'Awaiting Approval',
-                  PurchaseOrder.awaiting_action_items(user.id).count
+                  collection.awaiting_action_items(user.id).count
     end
 
     counter.add PurchaseOrderStatus.id_for(:processing), "Processing", counts[PurchaseOrderStatus.id_for(:processing)].to_i

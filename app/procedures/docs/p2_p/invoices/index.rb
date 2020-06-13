@@ -166,7 +166,7 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     # Awaiting Approval
     if user.has_permission?(awaiting_approval_roles)
       counter.add InwardInvoiceStatus::GROUP_AWAITING_APPROVAL, 'Awaiting Approval',
-                  Invoice.awaiting_action_items(user).count
+                  collection.awaiting_action_items(user).count
     end
 
     # Processing

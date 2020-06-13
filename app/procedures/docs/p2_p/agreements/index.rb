@@ -88,7 +88,7 @@ class Docs::P2P::Agreements::Index < IndexBuilder::API
     # Awaiting Approval
     if user.has_permission?(awaiting_approval_roles)
       counter.add 91, 'Awaiting Approval',
-                  PaymentAgreement.awaiting_action_items(user).count
+                  collection.awaiting_action_items(user).count
     end
 
     # Processing
