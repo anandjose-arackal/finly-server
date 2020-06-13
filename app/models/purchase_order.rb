@@ -186,16 +186,16 @@ class PurchaseOrder < ApplicationRecord
     case status_id
     when 100
       # Due this week
-      where 'delivery_date between ? and ?', Date.today, Date.today.end_of_week
+      where 'purchase_orders.delivery_date between ? and ?', Date.today, Date.today.end_of_week
     when 101
       # Due this month
-      where 'delivery_date between ? and ?', Date.today, Date.today.end_of_month
+      where 'purchase_orders.delivery_date between ? and ?', Date.today, Date.today.end_of_month
     when 102
       # Overdue
-      where 'delivery_date < ?', Date.today
+      where 'purchase_orders.delivery_date < ?', Date.today
     when 103
       # Overdue
-      where 'delivery_date IS NULL OR delivery_date > ?', Date.today.end_of_month
+      where 'purchase_orders.delivery_date IS NULL OR purchase_orders.delivery_date > ?', Date.today.end_of_month
     else
       self.all
     end
