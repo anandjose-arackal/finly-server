@@ -3,6 +3,7 @@ class Dashboard::IndexCard < Transactions::API
 
   class_attr :resolver
   class_attr :path
+  class_attr :id
   class_attr :created_by, default: :user_id
   class_attr :status
   class_attr :department, default: :department_id
@@ -107,7 +108,7 @@ class Dashboard::IndexCard < Transactions::API
   def build_path(item, rule, context = {})
     params = {
         filter_status: {_id: item[:filter_id]&.to_s, identifier: item[:label]},
-        id: self.class.path
+        id: (self.class.id || self.class.path)
     }
     if rule.present?
       filter = rule.as_ransack
