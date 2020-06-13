@@ -167,11 +167,11 @@ class Dashboard::P2P::AwaitingApproval < Dashboard::IndexCard
       cost_center = CostCenter.find_by(company_id: context[:current_user].company_id, id: params[:filter_cost_center])
       rule << Rules::Builder[tile[:filters][:cost_center]].eq_any(value: params[:filter_cost_center]).with_meta([{id: cost_center&.id, name: cost_center&.name}])
     end
-    if params[:filter_date_from].present? and tile[:filters][:date_from].present?
-      rule << Rules::Builder[tile[:filters][:date_from]].gteq(value: params[:filter_date_from])
+    if params[:filter_date_from].present? and tile[:filters][:date].present?
+      rule << Rules::Builder[tile[:filters][:date]].gteq(value: params[:filter_date_from])
     end
-    if params[:filter_date_to].present? and tile[:filters][:date_to].present?
-      rule << Rules::Builder[tile[:filters][:date_to]].lteq(value: params[:filter_date_to])
+    if params[:filter_date_to].present? and tile[:filters][:date].present?
+      rule << Rules::Builder[tile[:filters][:date]].lteq(value: params[:filter_date_to])
     end
     attribute_rule = rule.shift
     return attribute_rule if rule.blank? or attribute_rule.blank?
