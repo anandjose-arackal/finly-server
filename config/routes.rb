@@ -4191,6 +4191,7 @@ Rails.application.routes.draw do
     get 'subscriptions/filters_config', to: 'subscriptions#filters_config'
     patch 'subscriptions/bulk_review_validate', to: 'subscriptions#bulk_review_validate'
     patch 'subscriptions/bulk_review', to: 'subscriptions#bulk_review'
+    put 'subscriptions/bulk_review', to: 'subscriptions#bulk_review'
     put 'subscriptions/validate_customer_params', to: 'subscriptions#validate_customer_params'
     resources :subscriptions do
       patch 'review', to: 'subscriptions#review'
@@ -4206,7 +4207,6 @@ Rails.application.routes.draw do
     get 'bills/payables', to: 'bills#payable_bills'
     patch 'bills/bulk_review_validate', to: 'bills#bulk_review_validate'
     patch 'bills/bulk_review', to: 'bills#bulk_review'
-    put 'bills/bulk_review_validate', to: 'bills#bulk_review_validate'
     put 'bills/bulk_review', to: 'bills#bulk_review'
     resources :bills do
       patch 'review', to: 'bills#review'

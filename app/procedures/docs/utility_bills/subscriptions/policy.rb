@@ -1,7 +1,7 @@
 class Docs::UtilityBills::Subscriptions::Policy < ApplicationPolicy
 
-  def submit?
-    user.has_policy_role?(UserRole.id_for(:utility_bill_initiator)) && record.subscription.pocs.include?(user) && (record.open? || record.retracted? || record.rejected?)
+  def create?
+    user.has_policy_role?(UserRole.id_for(:utility_bill_master_initiator))
   end
 
   def approve?
@@ -9,40 +9,45 @@ class Docs::UtilityBills::Subscriptions::Policy < ApplicationPolicy
   end
 
   def update?
-    ((record.open? || record.retracted? || record.rejected?) && record.subscription.pocs.include?(user) && user.has_policy_role?(UserRole.id_for(:utility_bill_initiator))) || (record.awaiting_approval? && record.get_reviewers.include?(user))
+    # Owner of Document When in Open State
+    # Controlling User When in awaiting_approval state
+    # Admin Post Approval
+    (BbpsBillerSubscription.open_statuses.include?(record.status_id) && record.user_id == user.id) ||
+        (record.awaiting_approval? && record.get_reviewers.include?(user)) ||
+        (BbpsBillerSubscriptionStatus.ids_for(:approved, :auto_approved, :deactivated, :reactivated).include?(record.status_id) && user.vendor_payment_admin?)
   end
 
   def index?
     user.vendor_payment_admin? ||
-        user.has_policy_role?(UserRole.id_for(:utility_bill_master_initiator)) ||
-        user.has_policy_role?(UserRole.id_for(:utility_bill_master_reviewer)) ||
         user.has_policy_role?(UserRole.id_for(:utility_bill_initiator)) ||
         user.has_policy_role?(UserRole.id_for(:utility_bill_reviewer)) ||
+        user.has_policy_role?(UserRole.id_for(:utility_bill_master_initiator)) ||
+        user.has_policy_role?(UserRole.id_for(:utility_bill_master_reviewer)) ||
         user.has_policy_role?(UserRole.id_for(:bank_payment_request_initiator)) ||
         user.has_policy_role?(UserRole.id_for(:bank_payment_request_reviewer)) ||
-        user.has_policy_role?(UserRole.id_for(:bank_payment_request_auditor)) ||
-        user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor))
+        user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor)) ||
+        user.has_policy_role?(UserRole.id_for(:bank_payment_request_auditor))
   end
 
   def show?
     (record.company_id == user.company_id) &&
-        (
         user.vendor_payment_admin? ||
-            record.user_id == user.id ||
-            reviewing_user? ||
-            record.subscription.pocs.include?(user) ||
-            user.has_policy_role?(UserRole.id_for(:utility_bill_reviewer)) ||
-            user.has_policy_role?(UserRole.id_for(:utility_bill_master_initiator)) ||
-            user.has_policy_role?(UserRole.id_for(:utility_bill_master_reviewer)) ||
-            user.has_policy_role?(UserRole.id_for(:bank_payment_request_initiator)) ||
-            user.has_policy_role?(UserRole.id_for(:bank_payment_request_reviewer)) ||
-            user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor)) ||
-            user.has_policy_role?(UserRole.id_for(:bank_payment_request_auditor))
-        )
+        record.user_id == user.id ||
+        reviewing_user? ||
+        poc? ||
+        user.has_policy_role?(UserRole.id_for(:utility_bill_initiator)) ||
+        user.has_policy_role?(UserRole.id_for(:utility_bill_reviewer)) ||
+        user.has_policy_role?(UserRole.id_for(:bank_payment_request_initiator)) ||
+        user.has_policy_role?(UserRole.id_for(:bank_payment_request_reviewer)) ||
+        user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor))
   end
 
   def reject?
-    record.awaiting_approval? && record.get_reviewers.include?(user)
+    record.get_reviewers.include?(user)
+  end
+
+  def submit?
+    BbpsBillerSubscription.open_statuses.include?(record.status_id) && record.user_id == user.id
   end
 
   def retract?
@@ -50,7 +55,7 @@ class Docs::UtilityBills::Subscriptions::Policy < ApplicationPolicy
   end
 
   def destroy?
-    !record.autofetched && (user.vendor_payment_admin? || (user.has_policy_role?(UserRole.id_for(:utility_bill_initiator)) && record.subscription.pocs.include?(user) && (record.open? || record.retracted? || record.rejected?)))
+    BbpsBillerSubscription.open_statuses.include?(record.status_id) && record.user_id == user.id
   end
 
   def take_control?
@@ -61,9 +66,17 @@ class Docs::UtilityBills::Subscriptions::Policy < ApplicationPolicy
     user.vendor_payment_admin? && record.awaiting_approval? && record.taken_control? && record.get_reviewers.include?(user)
   end
 
-  # def return_control?
-  #
-  # end
+  def deactivate?
+    user.vendor_payment_admin? && (record.approved? || record.auto_approved? || record.reactivated?)
+  end
+
+  def reactivate?
+    user.vendor_payment_admin? && (record.deactivated?)
+  end
+
+  def add_bill?
+    (record.pocs.include?(user) || user.vendor_payment_admin?) && (BbpsBillerSubscription.status_ids(:approved, :auto_approved, :reactivated).include?(record.status_id))
+  end
 
   private
 
@@ -73,7 +86,7 @@ class Docs::UtilityBills::Subscriptions::Policy < ApplicationPolicy
   end
 
   def poc?
-    record.subscription_pocs.pluck(:user_id).include?(user.id)
+    record.pocs.include?(user)
   end
 
 end
