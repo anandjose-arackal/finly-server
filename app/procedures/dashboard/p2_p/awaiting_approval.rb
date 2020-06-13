@@ -93,7 +93,7 @@ class Dashboard::P2P::AwaitingApproval < Dashboard::IndexCard
     TILES.each do |tile|
       next if tile[:permission] and not tile[:permission].call(context, **context)
 
-      count = tile[:model].awaiting_action_items(context[:current_user]).ransack(query).result.count
+      count = tile[:model].ransack(query).awaiting_action_items(context[:current_user]).result.count
       tiles << build_tile(count: count, rule: rule, title: tile[:title], path: tile[:path], status_id: PurchaseRequestStatus::GROUP_AWAITING_APPROVAL)
     end
     tiles
