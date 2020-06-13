@@ -12,6 +12,8 @@
 class BbpsBillerSubscriptionStatus < ApplicationRecord
   include Seedable
 
+  GROUP_AWAITING_APPROVAL = 91
+
   def self.values
     %i(draft awaiting_approval retracted rejected approved auto_approved deactivated reactivated)
   end

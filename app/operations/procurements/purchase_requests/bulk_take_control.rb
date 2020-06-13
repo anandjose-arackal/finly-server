@@ -14,7 +14,7 @@ class Procurements::PurchaseRequests::BulkTakeControl < Procurements::PurchaseRe
 
   def validate
     if self.purchase_requests.empty?
-      add_message :error, 'No Purchase Requests found'
+      add_message :error, 'You need to select atleast one purchase order to take control'
       return
     end
 

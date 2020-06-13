@@ -46,8 +46,8 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
         # Using as_nested_hash instead of input as the input need not always
 
         result = contract_root.profiler.step('condition_checker', entity.entity_path) {
-          form_data = contract_root.profiler.step('contract.to_form', entity.entity_path) { contract_root.to_form}
-          row_data = contract_root.profiler.step('row.to_form', entity.entity_path) { self.to_form }
+          form_data = contract_root.profiler.step('contract.to_form', entity.entity_path) { contract_root.form_data}
+          row_data = contract_root.profiler.step('row.to_form', entity.entity_path) { self.form_data }
           Forms::Contracts::Helpers::ConditionChecker.(
               self, entity.conditions, entity, VALIDATION_ACTIONS, form: form_data, row: row_data
           )
@@ -166,6 +166,12 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
     entities = entity.entities
 
     lambda do |*args|
+      property :form_data, deserializer: -> (input, represented, **) do
+        represented.form_data = {}
+
+
+        represented.contract_root
+      end
       Forms::Contracts::Builders::CustomField.(self, entities.custom_fields) if entity.associate_custom_fields
 
       entities.each do |ent|

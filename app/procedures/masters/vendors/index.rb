@@ -81,7 +81,7 @@ class Masters::Vendors::Index < IndexBuilder::API
 
     if user.has_permission?(:vendor_reviewer)
       counter.add 91, 'Awaiting Approval',
-                  YesBankVendor.awaiting_action_items(user.id).count
+                  collection.awaiting_action_items(user.id).count
     end
 
     # processing

@@ -5,7 +5,7 @@ class ActionManager::Action
   include DynamicAttributes
 
   attr_accessor :type, :id, :path, :parent, :action_registry, :action_scopes,
-                :permissions, :label, :icon, :policy, :authorize,
+                :permissions, :label, :icon, :policy, :authorize, :features,
                 :model, :format, :action_condition
 
   class_attribute :registered_type
@@ -93,7 +93,20 @@ class ActionManager::Action
   # end
 
   def permitted?(user)
+    return false unless feature_subscribed?(user)
     return false unless user.has_permission?(permissions)
+
+    true
+  end
+
+  def feature_subscribed?(user)
+    return true if features.blank?
+
+    self.features ||= []
+    self.features = [self.features] unless self.features.respond_to?(:each)
+    self.features.each do |feature|
+      return false unless !!user.company.feature_subscription.send(feature)
+    end
 
     true
   end

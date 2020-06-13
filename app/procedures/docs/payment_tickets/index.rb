@@ -72,12 +72,13 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     # :rejected,
     # :credited
 
+    collection = collection.joins(:payment_order)
     # Use custom scope to support awaiting approval status
     counter = IndexBuilder::Counter.new :with_status_id
     counts = collection.group(:status_id).count
     counter.add nil, "All", counts.values.reduce(0, :+)
     # Open / Retracted
-    counter.add 90, 'Open', (
+    counter.add BankPaymentRequestStatus::GROUP_OPEN, 'Open', (
         counts[BankPaymentRequestStatus.id_for(:open)].to_i +
         counts[BankPaymentRequestStatus.id_for(:retracted)].to_i +
             counts[BankPaymentRequestStatus.id_for(:creation_in_progress)].to_i
@@ -85,24 +86,28 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
 
     # Awaiting Approval
     if user.has_permission?(awaiting_approval_roles)
-      counter.add 91, 'Awaiting Approval',
-                  BankPaymentRequest.awaiting_action_items(user.id).count
+      counter.add BankPaymentRequestStatus::GROUP_AWAITING_APPROVAL, 'Awaiting Approval',
+                  collection.with_status_id(BankPaymentRequestStatus::GROUP_AWAITING_APPROVAL).count
     end
 
-    counter.add 92, "Processing", (
+    counter.add BankPaymentRequestStatus::GROUP_PROCESSING, "Processing", (
     counts[BankPaymentRequestStatus.id_for(:processing)].to_i +
         counts[BankPaymentRequestStatus.id_for(:submitted)].to_i +
         counts[BankPaymentRequestStatus.id_for(:unapprove)].to_i
     )
 
     # Approved / Auto Approved
-    counter.add 93, 'Pending Credit', (
+    counter.add BankPaymentRequestStatus::GROUP_PENDING_CREDIT, 'Pending Credit', (
     counts[BankPaymentRequestStatus.id_for(:approved)].to_i +
         counts[BankPaymentRequestStatus.id_for(:auto_approved)].to_i +
         counts[BankPaymentRequestStatus.id_for(:pending)].to_i
     )
 
-    [:rejected, :credited].each do |status|
+    counter.add BankPaymentRequestStatus::GROUP_SCHEDULED, 'Scheduled', collection.with_status_id(BankPaymentRequestStatus::GROUP_SCHEDULED).count
+    counter.add BankPaymentRequestStatus::GROUP_PARTIALLY_COMPLETED, "Partially Completed", collection.with_status_id(BankPaymentRequestStatus::GROUP_PARTIALLY_COMPLETED).count
+    counter.add BankPaymentRequestStatus::GROUP_FAILED, 'Failed', collection.with_status_id(BankPaymentRequestStatus::GROUP_FAILED).count
+
+    [:credited, :rejected].each do |status|
       counter.add BankPaymentRequestStatus.id_for(status), status.to_s.titleize, counts[BankPaymentRequestStatus.id_for(status)].to_i
     end
 
@@ -116,16 +121,16 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
   def self.pt_status(context)
     return 'Awaiting Approval' if context[:record].status_id == BankPaymentRequestStatus.id_for(:processing) and context[:record].controlling_user?(context[:user])
 
-    context[:record].status&.name&.titleize
+    context[:record].status_name(context[:user])&.titleize
   end
 
   def self.format_status(context)
-    case context[:record].status&.name&.to_s&.to_sym
+    case context[:record].status_name(context[:user])&.to_s&.to_sym
     when :rejected
       format = 'danger'
-    when :approved, :auto_approved, :pending, :creation_in_progress, :credited
+    when :approved, :auto_approved, :pending, :creation_in_progress, :credited, :pending_credit
       format = 'success'
-    when :processing, :submitted, :unapprove
+    when :processing, :submitted, :unapprove, :awaiting_approval, :scheduled
       if context[:record].controlling_user?(context[:user])
         format = 'warning'
       else

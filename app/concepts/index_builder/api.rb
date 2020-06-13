@@ -73,7 +73,7 @@ class IndexBuilder::API
     end
   end
 
-  def self.resolve(context)
+  def self.resolve(context, paginate: true, filter: true)
     if context["params"]["q"].present?
       context["params"]["q"] = Filters::Sanitizer.perform(context["params"]["q"])
     end
@@ -83,7 +83,7 @@ class IndexBuilder::API
 
     raise 'Resolver not found' if resolver[:route].blank?
 
-    Resolver::Transactions::Resolve.with(context, route: resolver[:route], paginate: true, filter: true)
+    Resolver::Transactions::Resolve.with(context, route: resolver[:route], paginate: paginate, filter: filter)
   end
 
   def self.include_associations!(collection, required_columns)

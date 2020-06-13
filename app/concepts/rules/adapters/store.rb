@@ -22,7 +22,8 @@ class Rules::Adapters::Store
       attribute = data&.dig('a')
       predicate = data&.dig('p')
       values = data&.dig('v')
-      Rules::Operator.new(attribute[:entity]).send(predicate, *values)
+      meta = data&.dig('m')
+      Rules::Operator.new(attribute[:entity]).send(predicate, *values).with_meta(meta)
     end
   end
 
@@ -40,14 +41,8 @@ class Rules::Adapters::Store
       json[:p] = rule.operator
       json[:a] = rule.attribute.as_json(mode: 'store')
       json[:v] = rule.values.map {|val| val.as_json(mode: 'store')}
+      json[:m] = rule.meta
     end
-    # values = {}
-    # if rule.rule_value[:value].respond_to?(:each)
-    #   rule.rule_value[:value].each_with_index { |val, index| values[index] = {value: val} }
-    # else
-    #   values['0'] = {value: rule.rule_value[:value]}
-    # end
-    # {a: {'0': {name: rule.input[:entity]}}, p: rule.operator, t: rule.rule_value[:type], v: values, f: rule.rule_value[:formula], e: rule.rule_value[:entity]}
     json
   end
 

@@ -179,12 +179,12 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
   end
 
   def final_reviewers
-    r_ids = purchase_request.get_reviewal_chain.last[:reviewers].pluck(:id)
+    r_ids = purchase_request.get_reviewal_chain.last.dig(:reviewers).pluck(:id)
   end
 
   def last_level?
     if purchase_request.awaiting_approval?
-      purchase_request.get_reviewal_chain&.last[:level_number] == purchase_request.level&.level_number
+      purchase_request.get_reviewal_chain&.last&.dig(:level_number) == purchase_request.level&.level_number
     end
   end
 

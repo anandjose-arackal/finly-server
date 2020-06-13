@@ -7,6 +7,7 @@ class YesBankApi::Balance::GetBalance < YesBankApi::Base
 
   def initialize(company)
     self.company = company
+    self.params = {}
   end
 
   def self.call(company)
@@ -81,7 +82,7 @@ class YesBankApi::Balance::GetBalance < YesBankApi::Base
     attr_accessor :balance
 
     def init
-      self.balance = params[:balance]
+      self.balance = 0
     end
 
   end

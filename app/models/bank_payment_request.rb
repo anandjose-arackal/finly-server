@@ -389,19 +389,27 @@ class BankPaymentRequest < ApplicationRecord
 
   scope :with_status_id, -> (status_id) {
     case status_id
-    when 90
+    when BankPaymentRequestStatus::GROUP_OPEN
       where status_id: BankPaymentRequestStatus.ids_for(:open, :retracted, :creation_in_progress)
-    when 91
+    when BankPaymentRequestStatus::GROUP_AWAITING_APPROVAL
       user_id = RequestStore.store[:current_user]&.id
       if user_id.present?
         where(status_id: BankPaymentRequestStatus.ids_for(:processing)).awaiting_action_items(user_id)
       else
         self.none
       end
-    when 92
+    when BankPaymentRequestStatus::GROUP_PROCESSING
       where status_id: BankPaymentRequestStatus.ids_for(:submitted, :processing, :unapprove)
-    when 93
+    when BankPaymentRequestStatus::GROUP_PENDING_CREDIT
       where status_id: BankPaymentRequestStatus.ids_for(:approved, :pending, :auto_approved)
+    when BankPaymentRequestStatus::GROUP_FAILED
+      joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:failed))
+    when BankPaymentRequestStatus::GROUP_SCHEDULED
+      joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:scheduled))
+    when BankPaymentRequestStatus::GROUP_PENDING
+      joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:pending))
+    when BankPaymentRequestStatus::GROUP_PARTIALLY_COMPLETED
+      joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:partially_completed))
     else
       where status_id: status_id
     end

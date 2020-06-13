@@ -69,21 +69,6 @@ class Menu::API < Transactions::API
     context[:menu] = self.class.items.as_json(current_user: current_user).reject { |item| item.nil? }
   end
 
-  # def build_modules(context, current_user:, **)
-  #   context[:modules] = []
-  #   MODULES_CONFIG.each do |mod|
-  #     next if [mod[:app].to_s, mod[:app]].include?(RequestStoreUtil.current_app)
-  #     next if mod[:feature] and not current_user.company.feature_subscription.send(mod[:feature])
-  #     next if mod[:user_subscription] and not current_user.user_panel_subscription.send(mod[:user_subscription])
-  #     if mod[:permissions].present?
-  #       permissions = mod[:permissions]
-  #       permissions = [permissions] unless permissions.respond_to?(:each)
-  #       next if permissions.present? and not current_user.has_roles?(permissions)
-  #     end
-  #
-  #     context[:modules] << mod[:config]
-  #   end
-  # end
   def build_modules(context, current_user:, **)
     context[:entities] = []
 

@@ -2,7 +2,7 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
   include DynamicAttributes
 
   system_subscription :vp
-  permissions Docs::PaymentTickets::Index.permissions
+  permissions *Docs::PaymentTickets::Index.permissions
   resolver 'payments.default'
   reference '{{record.payment_order.bank_payment_request.id}}'
   includes payment_order: :bank_payment_request
@@ -14,8 +14,8 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
 
   # Fixed column is always default true
   column :vendor, fixed: true, includes: [:receiving_user] do
-    text value: '{{record.vendor.business_name}}', format: 'primary'
-    text value: '{{record.vendor.trade_name}}'
+    text value: :business_name, format: 'primary'
+    text value: :trade_name
   end
 
   column :id, label: 'Payment ID', sort: true do
@@ -410,6 +410,28 @@ class Docs::PaymentTickets::Payments::Index < IndexBuilder::API
     # end
 
     counter
+  end
+
+  def self.business_name(context)
+    case context[:record].receiving_user_type
+    when 'BbpsBillerSubscription'
+      context[:record].receiving_user_bbps_biller_subscription.name
+    when 'YesBankVendor'
+      context[:record].receiving_user_vendor.business_name
+    else
+      # Do nothing
+    end
+  end
+
+  def self.trade_name(context)
+    case context[:record].receiving_user_type
+    when 'BbpsBillerSubscription'
+      # Do nothing
+    when 'YesBankVendor'
+      context[:record].receiving_user_vendor.trade_name
+    else
+      # Do nothing
+    end
   end
 
   def self.format_status(context)

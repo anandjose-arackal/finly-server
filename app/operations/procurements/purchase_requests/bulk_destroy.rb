@@ -8,7 +8,7 @@ class Procurements::PurchaseRequests::BulkDestroy < Procurements::PurchaseReques
 
   def validate
     if self.purchase_requests.blank?
-      add_message :error, "No purchase requests found."
+      add_message :error, 'You need to select atleast one purchase order to delete'
       return
     end
   end
@@ -17,9 +17,9 @@ class Procurements::PurchaseRequests::BulkDestroy < Procurements::PurchaseReques
   def process
     # if self.cost_center.delete_all
     if self.purchase_requests.destroy_all
-      add_message :success, 'Successfully Removed Multiple Purchase Requests'
+      add_message :success, 'Successfully deleted the selected Purchase Requests'
     else
-      add_message :error, "Couldn't remove multiple Purchase Requests"
+      add_message :error, "Error while deleting the Purchase Requests"
     end
   end
 

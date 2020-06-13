@@ -2,9 +2,9 @@ class Docs::P2P::Inwards::Pending::Index < IndexBuilder::API
   include DynamicAttributes
 
   system_subscription :vp
-  permissions Docs::P2P::Inwards::Received::Index.permissions
+  permissions *Docs::P2P::Inwards::Received::Index.permissions
   resolver 'inward_documents.pending'
-  reference '{{record.procurement_id}}'
+  reference '{{record.procurement_id}}', document_type: "purchase_order", procurement_id: "{{record.procurement_id}}"
   selectable false
 
   # Fixed column is always default true

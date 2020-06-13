@@ -10,6 +10,10 @@ class Forms::Contracts::Builders::Form
         user
       end
 
+      property :form_data, deserializer: -> (input, represented, **) do
+        represented.form_data = {}
+      end
+
       if form.model.has_attribute?(:created_by)
         property :created_by, deserializer: -> (input, represented, **) do
           represented.created_by = RequestStoreUtil.current_user if represented.created_by.blank?

@@ -16,8 +16,7 @@ class Dashboards::VendorPaymentsController < BaseControllers::WebBase
   end
 
   def purchase_orders
-    @result = Dashboard::VendorPayments::PurchaseOrders.(current_user, params)
-    respond
+    endpoint Dashboard::VendorPayments::PurchaseOrders
   end
 
   def po_advances

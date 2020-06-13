@@ -29,7 +29,7 @@ class IndexBuilder::StatusCount < Transactions::API
   end
 
   def resolve(context, builder:, params:, **)
-    builder.resolve(context)
+    builder.resolve(context, paginate: false)
   end
 
 

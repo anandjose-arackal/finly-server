@@ -1,7 +1,7 @@
 class Rules::Rule
-  attr_accessor :operator, :attribute, :values
+  attr_accessor :operator, :attribute, :values, :meta
 
-  def initialize(operator, attribute: nil, value: )
+  def initialize(operator, attribute: nil, value:)
     self.operator = operator
     self.attribute = attribute
     self.values = value
@@ -11,6 +11,11 @@ class Rules::Rule
     define_method operator do |*values|
       Rules::Rule.new(operator, attribute: self, value: values)
     end
+  end
+
+  def with_meta(meta = NoObject)
+    self.meta = meta unless meta == NoObject
+    self
   end
 
   def as_json(options = {})
@@ -37,7 +42,7 @@ class Rules::Rule
     if json[:m].present?
       json = {g: {'0': json}}
     else
-      json = {g: {'0': {m: 'and', c: {'0' => json}}}}
+      json = {g: {'0': {logic_type: "group", m: 'and', c: {'0' => json}}}}
     end
     return json unless options.has_key?(:data)
 

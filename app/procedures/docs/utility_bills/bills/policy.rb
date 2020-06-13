@@ -1,12 +1,5 @@
 class Docs::UtilityBills::Bills::Policy < ApplicationPolicy
 
-  def submit?
-    user.has_policy_role?(UserRole.id_for(:utility_bill_initiator)) && record.subscription.pocs.include?(user) && (record.open? || record.retracted? || record.rejected?)
-  end
-
-  def approve?
-    record.awaiting_approval? && record.get_reviewers.include?(user)
-  end
 
   def update?
     ((record.open? || record.retracted? || record.rejected?) && record.subscription.pocs.include?(user) && user.has_policy_role?(UserRole.id_for(:utility_bill_initiator))) || (record.awaiting_approval? && record.get_reviewers.include?(user))
@@ -41,8 +34,16 @@ class Docs::UtilityBills::Bills::Policy < ApplicationPolicy
         )
   end
 
-  def reject?
+  def submit?
+    user.has_policy_role?(UserRole.id_for(:utility_bill_initiator)) && record.subscription.pocs.include?(user) && (record.open? || record.retracted? || record.rejected?)
+  end
+
+  def approve?
     record.awaiting_approval? && record.get_reviewers.include?(user)
+  end
+
+  def reject?
+    approve?
   end
 
   def retract?

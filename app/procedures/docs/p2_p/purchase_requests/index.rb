@@ -33,7 +33,7 @@ class Docs::P2P::PurchaseRequests::Index < IndexBuilder::API
   end
 
   column :status, sort: :status_name, default: true, includes: [:status] do
-    indicator value: "{{record.status.name}}", format: :format_status
+    indicator value: :status, format: :format_status
   end
 
   column :policy, default: true, includes: [:policy] do
@@ -66,19 +66,19 @@ class Docs::P2P::PurchaseRequests::Index < IndexBuilder::API
     counter.add nil, 'All', counts.values.reduce(0, :+)
 
     # :draft, :retracted
-    counter.add 90, 'Open', (counts[PurchaseRequestStatus.id_for(:draft)].to_i + counts[PurchaseRequestStatus.id_for(:retracted)].to_i)
+    counter.add PurchaseRequestStatus::GROUP_OPEN, 'Open', (counts[PurchaseRequestStatus.id_for(:draft)].to_i + counts[PurchaseRequestStatus.id_for(:retracted)].to_i)
 
     # :awaiting_approval,
     if user.has_permission?(:purchase_request_reviewer)
-      counter.add 91, 'Awaiting Approval',
-                  PurchaseRequest.awaiting_action_items(user.id).count
+      counter.add PurchaseRequestStatus::GROUP_AWAITING_APPROVAL, 'Awaiting Approval',
+                  collection.awaiting_action_items(user.id).count
     end
 
     # :processing
     counter.add PurchaseRequestStatus.id_for(:awaiting_approval), 'Processing', counts[PurchaseRequestStatus.id_for(:awaiting_approval)].to_i
 
     # :approved, :auto_approved, :po_created, :partially_closed, :order_initiated
-    counter.add 92, 'Approved', (
+    counter.add PurchaseRequestStatus::GROUP_APPROVED, 'Approved', (
         counts[PurchaseRequestStatus.id_for(:approved)].to_i +
         counts[PurchaseRequestStatus.id_for(:auto_approved)].to_i +
         counts[PurchaseRequestStatus.id_for(:po_created)].to_i +
@@ -92,6 +92,12 @@ class Docs::P2P::PurchaseRequests::Index < IndexBuilder::API
     end
 
     counter
+  end
+
+  def self.status(context)
+    return 'Processing' if context[:record].purchase_request_status_id == PurchaseRequestStatus.id_for(:awaiting_approval) and not context[:record].controlling_user?(context[:user])
+
+    context[:record].status&.name&.titleize
   end
 
   def self.format_status(context)

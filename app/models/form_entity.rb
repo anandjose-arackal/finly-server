@@ -135,6 +135,13 @@ class FormEntity < ApplicationRecord
     end
   end
 
+  def parent_entity_path
+    return nil if parent_id.nil?
+
+    splits = entity_path.split(".")
+    splits.pop
+  end
+
   # def choices(params: {}, user:)
   #   choices_scope&.choices(params: params, user: user)
   # end

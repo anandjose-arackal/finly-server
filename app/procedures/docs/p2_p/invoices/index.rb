@@ -4,6 +4,7 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
   system_subscription :vp
   permissions :bank_payment_request_initiator, :bank_payment_request_reviewer, :bank_payment_request_creditor, :bank_payment_request_auditor,
               :invoice_initiator, :invoice_reviewer, :invoice_auditor, :po_invoice_initiator, :po_invoice_reviewer, :po_invoice_auditor,
+              :credit_note_initiator, :credit_note_reviewer, :credit_note_auditor,
               :non_po_invoice_initiator, :non_po_invoice_reviewer, :non_po_invoice_auditor, :auditor, :admin
   resolver 'invoices.default'
   reference '{{record.id}}', procurement_id: '{{record.procurement_id}}', procurement_type: "{{record.invoice_type.key}}"
@@ -157,22 +158,22 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     counter.add nil, "All", counts.values.reduce(0, :+)
 
     # Open - open/retracted
-    counter.add 90, 'Open', (
+    counter.add InwardInvoiceStatus::GROUP_OPEN, 'Open', (
     counts[InwardInvoiceStatus.id_for(:open)].to_i +
         counts[InwardInvoiceStatus.id_for(:retracted)].to_i
     )
 
     # Awaiting Approval
     if user.has_permission?(awaiting_approval_roles)
-      counter.add 91, 'Awaiting Approval',
-                  Invoice.awaiting_action_items(user).count
+      counter.add InwardInvoiceStatus::GROUP_AWAITING_APPROVAL, 'Awaiting Approval',
+                  collection.awaiting_action_items(user).count
     end
 
     # Processing
     counter.add InwardInvoiceStatus.id_for(:processing), "Processing", counts[InwardInvoiceStatus.id_for(:processing)].to_i
 
     # Pending Payment - approved/auto_approved/partially_paid/unpaid/initiated
-    counter.add 92, 'Pending Payment', (
+    counter.add InwardInvoiceStatus::GROUP_PENDING_PAYMENT, 'Pending Payment', (
     counts[InwardInvoiceStatus.id_for(:approved)].to_i +
         counts[InwardInvoiceStatus.id_for(:auto_approved)].to_i +
         counts[InwardInvoiceStatus.id_for(:partially_paid)].to_i +

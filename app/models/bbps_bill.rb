@@ -269,7 +269,7 @@ class BbpsBill < ApplicationRecord
     case status_id
     when 90
       where status_id: BbpsBillStatus.ids_for(:open, :retracted)
-    when 91
+    when BbpsBillStatus::GROUP_AWAITING_APPROVAL
       awaiting_action_items(RequestStore.store[:current_user]&.id)
     when 92
       where status_id: BbpsBillStatus.ids_for(:approved, :auto_approved, :payment_ticket_created, :payment_initiated, :payment_ticket_deleted)

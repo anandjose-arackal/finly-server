@@ -13,6 +13,7 @@ Lookup::Router.draw do
   route "tax_rates", Masters::TaxRates::Lookup
   route "tds_slabs", Masters::TdsSlabs::Lookup
   route 'bbps_billers', Docs::UtilityBills::Billers::Lookup
+  route 'users', Masters::Users::Lookup
 
   # Docs
   route 'purchase_requests', Docs::P2P::PurchaseRequests::Lookup
