@@ -11,7 +11,7 @@ class Docs::P2P::Invoices::Form < Forms::API
   section :header do
     text :invoice_number
     date :date, restriction: 'not_in_the_future'
-    date :due_date, restriction: 'not_in_the_past'
+    date :due_date#, restriction: 'not_in_the_past'
     lookup :policy_id,
            choices_scope: Choices[:lookup].('policies'),
            #permissions: [:non_po_invoice_initiator]),

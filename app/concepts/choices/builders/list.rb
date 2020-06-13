@@ -25,7 +25,7 @@ class Choices::Builders::List < Choices::Builders::Base
 
   def build(params: {}, user: nil)
     # Todo: Allow partial list based on the size of the choices
-    Choices::Provider.new(partial: false, data: choices(params: params, user: user))
+    Choices::Provider.new(provider: self, partial: false, data: choices(params: params, user: user))
   end
 
 end

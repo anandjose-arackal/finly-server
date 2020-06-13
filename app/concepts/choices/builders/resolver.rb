@@ -32,7 +32,7 @@ class Choices::Builders::Resolver < Choices::Builders::Base
   def build(params: {}, user: {})
     params = params.with_indifferent_access.deep_merge(choice_params.with_indifferent_access)
     result = ::Resolver::Router.dispatch(route, params: params, current_user: user)
-    Choices::Provider.new(partial: false, data: result)
+    Choices::Provider.new(provider: self, partial: false, data: result)
   end
 
 end

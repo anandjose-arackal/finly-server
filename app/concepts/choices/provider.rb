@@ -1,7 +1,8 @@
 class Choices::Provider
-  attr_accessor :data, :partial, :json
+  attr_accessor :data, :partial, :json, :provider
 
-  def initialize(data:, partial: false, json: nil)
+  def initialize(provider: ,data:, partial: false, json: nil)
+    self.provider = provider
     self.data = data
     self.partial = partial
     self.json = json
