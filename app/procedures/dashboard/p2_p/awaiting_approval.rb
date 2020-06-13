@@ -139,25 +139,28 @@ class Dashboard::P2P::AwaitingApproval < Dashboard::IndexCard
   end
 
   def build_rule(context, tile, filter_created_by: false)
-    rule = nil
+    rule = []
     params = context[:params]
     if filter_created_by
-      rule = add_rule rule, Rules::Builder[self.class.created_by].eq_any(value: context[:current_user].id).with_meta([{id: context[:current_user].id, name: context[:current_user].name}])
+      rule << Rules::Builder[self.class.created_by].eq_any(value: context[:current_user].id).with_meta([{id: context[:current_user].id, name: context[:current_user].name}])
     end
     if params[:filter_policy].present? and tile[:filters][:policy].present?
-      rule = add_rule rule, Rules::Builder[tile[:filters][:policy]].eq_any(value: params[:filter_policy])
+      rule << Rules::Builder[self.class.policy].eq_any(value: params[:filter_policy])
     end
     if (params[:filter_department].present? or params[:filter_sub_department].present?) and tile[:filters][:department].present?
       department_id = params[:filter_sub_department] or params[:filter_department]
-      rule = add_rule rule, Rules::Builder[tile[:filters][:department]].eq_any(value: department_id)
+      rule << Rules::Builder[self.class.department].eq_any(value: department_id)
     end
     if params[:filter_location].present? and tile[:filters][:location].present?
-      rule = add_rule rule, Rules::Builder[tile[:filters][:location]].eq_any(value: params[:filter_location])
+      rule << Rules::Builder[self.class.location].eq_any(value: params[:filter_location])
     end
     if params[:filter_cost_center].present? and tile[:filters][:cost_center].present?
-      rule = add_rule rule, Rules::Builder[tile[:filters][:cost_center]].eq_any(value: params[:filter_cost_center])
+      rule << Rules::Builder[self.class.cost_center].eq_any(value: params[:filter_cost_center])
     end
-    rule
+    attribute_rule = rule.shift
+    return attribute_rule if rule.blank? or attribute_rule.blank?
+
+    attribute_rule.and(*rule)
   end
 
   def build_tile(count:, rule:, title:, path:, status_id:)

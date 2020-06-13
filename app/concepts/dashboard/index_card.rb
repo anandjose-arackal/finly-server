@@ -84,25 +84,28 @@ class Dashboard::IndexCard < Transactions::API
   end
 
   def build_rule(context, filter_created_by: false)
-    rule = nil
+    rule = []
     params = context[:params]
     if filter_created_by
-      rule = add_rule rule, Rules::Builder[self.class.created_by].eq_any(value: context[:current_user].id).with_meta([{id: context[:current_user].id, name: context[:current_user].name}])
+      rule << Rules::Builder[self.class.created_by].eq_any(value: context[:current_user].id).with_meta([{id: context[:current_user].id, name: context[:current_user].name}])
     end
     if params[:filter_policy].present? and self.class.policy.present?
-      rule = add_rule rule, Rules::Builder[self.class.policy].eq_any(value: params[:filter_policy])
+      rule << Rules::Builder[self.class.policy].eq_any(value: params[:filter_policy])
     end
     if (params[:filter_department].present? or params[:filter_sub_department].present?) and self.class.department.present?
       department_id = params[:filter_sub_department] or params[:filter_department]
-      rule = add_rule rule, Rules::Builder[self.class.department].eq_any(value: department_id)
+      rule << Rules::Builder[self.class.department].eq_any(value: department_id)
     end
     if params[:filter_location].present? and self.class.location.present?
-      rule = add_rule rule, Rules::Builder[self.class.location].eq_any(value: params[:filter_location])
+      rule << Rules::Builder[self.class.location].eq_any(value: params[:filter_location])
     end
     if params[:filter_cost_center].present? and self.class.cost_center.present?
-      rule = add_rule rule, Rules::Builder[self.class.cost_center].eq_any(value: params[:filter_cost_center])
+      rule << Rules::Builder[self.class.cost_center].eq_any(value: params[:filter_cost_center])
     end
-    rule
+    attribute_rule = rule.shift
+    return attribute_rule if rule.blank? or attribute_rule.blank?
+
+    attribute_rule.and(*rule)
   end
 
   def build_path(item, rule, context = {})
@@ -115,14 +118,6 @@ class Dashboard::IndexCard < Transactions::API
       params[:input_filters] = {advanced: [filter[:g][:'0']]}
     end
     "#{self.class.path}/params=#{params.to_json}"
-  end
-
-  def add_rule(rule_1, rule_2)
-    if rule_1.present?
-      rule_1.and(rule_2)
-    else
-      rule_2
-    end
   end
 
 end
