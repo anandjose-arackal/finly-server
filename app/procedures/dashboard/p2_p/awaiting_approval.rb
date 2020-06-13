@@ -12,7 +12,8 @@ class Dashboard::P2P::AwaitingApproval < Dashboard::IndexCard
               policy: :policy_id,
               location: :items_delivery_location_id,
               department: :items_department_id,
-              cost_center: :items_cost_center_id
+              cost_center: :items_cost_center_id,
+              date: :submitted_at
           },
           permission: -> (context, current_user:, **) {
             current_user.company.purchase_requisition_enabled? and current_user.has_permission?(:purchase_request_reviewer)
@@ -27,7 +28,8 @@ class Dashboard::P2P::AwaitingApproval < Dashboard::IndexCard
               policy: :policy_id,
               location: :delivery_location_id,
               department: :items_department_id,
-              cost_center: :items_cost_center_id
+              cost_center: :items_cost_center_id,
+              date: :submitted_at
           },
           permission: -> (context, current_user:, **) {
             current_user.company.procurement_enabled? and current_user.has_permission?(:purchase_order_reviewer)
@@ -42,7 +44,8 @@ class Dashboard::P2P::AwaitingApproval < Dashboard::IndexCard
               policy: :policy_id,
               location: :delivery_location_id,
               department: :items_department_id,
-              cost_center: :items_cost_center_id
+              cost_center: :items_cost_center_id,
+              date: :submitted_at
           },
           permission: -> (context, current_user:, **) {
             current_user.company.procurement_enabled? and current_user.has_permission?([:non_po_invoice_reviewer, :po_invoice_reviewer, :agreement_invoice_reviewer])
@@ -57,7 +60,8 @@ class Dashboard::P2P::AwaitingApproval < Dashboard::IndexCard
               policy: :policy_id,
               location: :location_id,
               department: :department_id,
-              cost_center: :cost_center_id
+              cost_center: :cost_center_id,
+              date: :submitted_at
           },
           permission: -> (context, current_user:, **) {
             current_user.company.utility_bills_enabled? and current_user.has_permission?(:utility_bill_reviewer)
@@ -70,6 +74,7 @@ class Dashboard::P2P::AwaitingApproval < Dashboard::IndexCard
           model: BankPaymentRequest,
           filters: {
               policy: :policy_id,
+              date: :submitted_at
           },
           permission: -> (context, current_user:, **) {
             current_user.has_permission?(:bank_payment_request_reviewer)
@@ -82,6 +87,7 @@ class Dashboard::P2P::AwaitingApproval < Dashboard::IndexCard
           model: YesBankVendor,
           filters: {
               policy: :policy_id,
+              date: :submitted_at
           },
           permission: -> (context, current_user:, **) {
             current_user.company.vendor_empanelment_workflow_enabled? and current_user.has_permission?(:vendor_reviewer)
@@ -94,6 +100,7 @@ class Dashboard::P2P::AwaitingApproval < Dashboard::IndexCard
           model: PaymentAgreement,
           filters: {
               policy: :policy_id,
+              date: :submitted_at
           },
           permission: -> (context, current_user:, **) {
             current_user.company.agreement_based_payment_system_enabled? and current_user.has_permission?(:payment_agreement_reviewer)
@@ -108,7 +115,8 @@ class Dashboard::P2P::AwaitingApproval < Dashboard::IndexCard
               policy: :policy_id,
               location: :location_id,
               department: :department_id,
-              cost_center: :cost_center_id
+              cost_center: :cost_center_id,
+              date: :submitted_at
           },
           permission: -> (context, current_user:, **) {
             current_user.company.utility_bills_enabled? and current_user.has_permission?(:utility_bill_master_reviewer)
@@ -158,6 +166,12 @@ class Dashboard::P2P::AwaitingApproval < Dashboard::IndexCard
     if params[:filter_cost_center].present? and tile[:filters][:cost_center].present?
       cost_center = CostCenter.find_by(company_id: context[:current_user].company_id, id: params[:filter_cost_center])
       rule << Rules::Builder[tile[:filters][:cost_center]].eq_any(value: params[:filter_cost_center]).with_meta([{id: cost_center&.id, name: cost_center&.name}])
+    end
+    if params[:filter_date_from].present? and tile[:filters][:date_from].present?
+      rule << Rules::Builder[tile[:filters][:date_from]].gteq(value: params[:filter_date_from])
+    end
+    if params[:filter_date_to].present? and tile[:filters][:date_to].present?
+      rule << Rules::Builder[tile[:filters][:date_to]].lteq(value: params[:filter_date_to])
     end
     attribute_rule = rule.shift
     return attribute_rule if rule.blank? or attribute_rule.blank?

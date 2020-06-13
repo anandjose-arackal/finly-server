@@ -13,6 +13,7 @@ class Docs::P2P::Invoices::FilterConfig < Filters::API
   attribute :invoice_number, label: "Invoice Number", type: :text, simple: true
   attribute :created_at, type: :datetime, simple: false
   attribute :updated_at, type: :datetime, simple: false
+  attribute :submitted_at, type: :datetime, simple: false
   attribute :date, label: "Invoice Date", type: :datetime, simple: true
   attribute :due_date, label: "Due Date", type: :datetime, simple: true
   attribute :invoice_type_id, label: "Type", type: :dropdown, choices: Choices[:list].(*INVOICE_TYPES)
