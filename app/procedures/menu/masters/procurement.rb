@@ -76,7 +76,7 @@ class Menu::Masters::Procurement < Menu::API
   end
 
   item :payables, features: :procurement, icon: "https://img.icons8.com/windows/20/ffffff/sales-performance.png" do
-    item :po_advances, label: "PO Advances", permissions: Docs::P2P::PurchaseOrders::Advances::Index.permissions
+    item :po_advances, label: 'PO Advances', permissions: Docs::P2P::PurchaseOrders::Advances::Index.permissions
     item :invoices, permissions: Docs::P2P::Invoices::Index.permissions
     item :utility_bills, permissions: Docs::UtilityBills::Subscriptions::Index.permissions
     item :upcoming_invoices, permissions: Docs::P2P::Invoices::Agreement::UpcomingInvoices::Index.permissions

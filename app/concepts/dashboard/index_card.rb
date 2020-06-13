@@ -10,6 +10,7 @@ class Dashboard::IndexCard < Transactions::API
   class_attr :location
   class_attr :cost_center
   class_attr :policy
+  class_attr :date, default: 'submitted_at'
 
   class_attr :index_route
   class_attr :permissions
@@ -106,6 +107,12 @@ class Dashboard::IndexCard < Transactions::API
     if params[:filter_cost_center].present? and self.class.cost_center.present?
       cost_center = CostCenter.find_by(company_id: context[:current_user].company_id, id: params[:filter_cost_center])
       rule << Rules::Builder[self.class.cost_center].eq_any(value: params[:filter_cost_center]).with_meta([{id: cost_center&.id, name: cost_center&.name}])
+    end
+    if params[:filter_date_from].present? and self.class.date.present?
+      rule << Rules::Builder[self.class.date].gteq(value: params[:filter_date_from])
+    end
+    if params[:filter_date_to].present? and self.class.date.present?
+      rule << Rules::Builder[self.class.date].lteq(value: params[:filter_date_to])
     end
     attribute_rule = rule.shift
     return attribute_rule if rule.blank? or attribute_rule.blank?
