@@ -4,7 +4,7 @@ class Docs::UtilityBills::Bills::Ops::BulkReview < Transactions::API
   step :init
   step :validate
   step :process
-  step Transactions::Messages::SuccessMessage("Bulk Operation in Process. A Confirmation Mail will Be Sent with the Result upon Completion")
+  step Transactions::Messages::SuccessMessage("Bulk Operation in process. A confirmation mail will Be sent with the result upon completion")
 
 
   def pre_validate(options, params:, **)
@@ -17,7 +17,7 @@ class Docs::UtilityBills::Bills::Ops::BulkReview < Transactions::API
 
 
   def init(options, params:, current_user:, **)
-    params[:ids] = params[:ids]
+    params[:ids] = params[:ids] || params[:id]
 
     index_op = Docs::UtilityBills::Bills::Ops::Index.(params: params, current_user: current_user)
     records = index_op['result']&.dig('bills').with_id(params[:ids])

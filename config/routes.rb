@@ -4206,6 +4206,8 @@ Rails.application.routes.draw do
     get 'bills/payables', to: 'bills#payable_bills'
     patch 'bills/bulk_review_validate', to: 'bills#bulk_review_validate'
     patch 'bills/bulk_review', to: 'bills#bulk_review'
+    put 'bills/bulk_review_validate', to: 'bills#bulk_review_validate'
+    put 'bills/bulk_review', to: 'bills#bulk_review'
     resources :bills do
       patch 'review', to: 'bills#review'
       get 'transaction_status', to: 'bills#transaction_status'
