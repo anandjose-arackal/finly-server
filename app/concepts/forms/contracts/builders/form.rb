@@ -10,7 +10,7 @@ class Forms::Contracts::Builders::Form
         user
       end
 
-      property :form_data, deserializer: -> (input, represented, **) do
+      property :form_data, virtual: true, deserializer: -> (input, represented, **) do
         represented.form_data = {}
       end
 

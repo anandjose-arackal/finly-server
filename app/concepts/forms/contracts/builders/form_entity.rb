@@ -32,7 +32,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
   def define_and_deserialize_entity(context, contract:, entity:, current_user:, **)
     type = entity.class.collection? ? :collection : :property
     # type = :property
-    block = contract_block(**context)
+    block = contract_block(type, **context)
     if block.present?
       contract.send(type, entity.entity_key, properties(entity), &block)
     else
@@ -66,7 +66,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
     contract.validate -> do
       contract_root.profiler.step 'custom_validate_entity', entity.entity_path do
         entity.validations.each do |validation|
-          next unless validation.rule.apply?({form: contract_root.to_form, row: self.to_form}.with_indifferent_access)
+          next unless validation.rule.apply?({form: contract_root.form_data, row: self.form_data}.with_indifferent_access)
 
           errors.add entity.entity_key, validation.error_message
         end
@@ -81,10 +81,8 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
     # controlling_choices
     contract.validate -> do
       contract_root.profiler.step 'validate_choices', entity.entity_path do
-        form_data = contract_root.profiler.step('contract.to_form', entity.entity_path) { contract_root.to_form}
-        row_data = contract_root.profiler.step('row.to_form', entity.entity_path) { self.to_form }
-        # form_data = contract_root.to_form
-        # row_data = self.to_form
+        form_data = contract_root.profiler.step('contract.to_form', entity.entity_path) { contract_root.form_data}
+        row_data = contract_root.profiler.step('row.to_form', entity.entity_path) { self.form_data }
         entity_value = Forms::RequestParser.new(form: form_data, row: row_data).fetch(entity.entity_path)
         next if entity_value.blank?
 
@@ -137,20 +135,19 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
       # next unless input.has_key?(entity.entity_key)
 
       represented.contract_root.profiler.step 'deserialize', ent.entity_path do
-        form_data = represented.contract_root.profiler.step('contract.to_form', entity.entity_path) { represented.contract_root.to_form}
-        row_data = represented.contract_root.profiler.step('row.to_form', entity.entity_path) { represented.to_form }
+        form_data = represented.contract_root.profiler.step('contract.to_form', entity.entity_path) { represented.contract_root.form_data}
+        row_data = represented.contract_root.profiler.step('row.to_form', entity.entity_path) { represented.form_data }
         result = represented.contract_root.profiler.step('condition_checker', ent.entity_path) {
           Forms::Contracts::Helpers::ConditionChecker.(represented, entity.conditions, entity, SETTER_ACTIONS, form: form_data, row: row_data)
         }
         editable = result['editable']
         visible = result['visible']
         internal = result['internal']
-        if editable and visible and row_data.has_key?(entity.entity_key)
+        if editable and visible and input.has_key?(entity.entity_key)
           value = input[entity.entity_key] # || entity.default_value
           entity.populate(represented, value)
           # represented.send("#{entity.entity_key}=", entity.format(value))
         end
-
 
         # -> Computations are run here
         if entity.compute_enabled and (internal or not editable or not visible)
@@ -160,18 +157,22 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
     end
   end
 
-  def contract_block(entity:, current_user:, **)
+  def contract_block(type, entity:, current_user:, **)
     return nil unless entity.class.layout?
 
     entities = entity.entities
 
     lambda do |*args|
-      property :form_data, deserializer: -> (input, represented, **) do
+      property :form_data, virtual: true, deserializer: -> (input, represented, **) do
         represented.form_data = {}
-
-
-        represented.contract_root
+        if type == :collection
+          represented.contract_parent.form_data[entity.entity_key] ||= []
+          represented.contract_parent.form_data[entity.entity_key] << represented.form_data
+        else
+          represented.contract_parent.form_data[entity.entity_key] = represented.form_data
+        end
       end
+
       Forms::Contracts::Builders::CustomField.(self, entities.custom_fields) if entity.associate_custom_fields
 
       entities.each do |ent|

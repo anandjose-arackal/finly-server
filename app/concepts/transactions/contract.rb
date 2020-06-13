@@ -11,7 +11,7 @@ module Transactions::Contract
     end
   end
 
-  SKIP_KEYS = %w(contract_row_input contract_input contract_root contract_parent).freeze
+  SKIP_KEYS = %w(form_data contract_row_input contract_input contract_root contract_parent).freeze
 
   # Build the JSON input from the current state of the form
   def self.to_form(data)

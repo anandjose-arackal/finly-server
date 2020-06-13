@@ -35,8 +35,8 @@ class Forms::Contracts::Helpers::ComputationQueue
       user = nil
       lookup_values = {}
       represented_list.each do |represented|
-        form = represented.contract_root.to_form
-        row = represented.to_form
+        form = represented.contract_root.form_data
+        row = represented.form_data
         lookup_value = Forms::RequestParser.new(form: form, row: row).fetch(entity.compute_lookup_entity.entity_path)
         return unless lookup_value.present?
 
@@ -68,8 +68,8 @@ class Forms::Contracts::Helpers::ComputationQueue
     def self.call(contract, entity, represented_list)
       transformer = Liquid::Template.parse(entity.compute_formula)
       represented_list.each do |represented|
-        form = contract.to_form
-        row = represented.to_form
+        form = contract.form_data
+        row = represented.form_data
         value = transformer.render({row: row, form: form}.as_json)
         entity.populate(represented, value)
       end

@@ -140,6 +140,15 @@ class FormEntity < ApplicationRecord
 
     splits = entity_path.split(".")
     splits.pop
+    splits.join('.')
+  end
+
+  def parent_entity_key
+    return nil if parent_id.nil?
+
+    splits = entity_path.split(".")
+    splits.pop
+    splits.last
   end
 
   # def choices(params: {}, user:)
@@ -234,10 +243,11 @@ class FormEntity < ApplicationRecord
       populator = represented.send(entity_key)
       populator ||= populate_if_empty.new
       populator.assign_attributes(value)
-      represented.send("#{entity_key}=", populator)
-    else
-      represented.send("#{entity_key}=", value)
+      value = populator
     end
+    # represented.send(entity_key).replace(value)
+    represented.send("#{entity_key}=", value)
+    represented.form_data[entity_key] = value
   end
 
   def populator
