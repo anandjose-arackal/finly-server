@@ -46,8 +46,8 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
         # Using as_nested_hash instead of input as the input need not always
 
         result = contract_root.profiler.step('condition_checker', entity.entity_path) {
-          form_data = contract_root.profiler.step('contract.to_form', entity.entity_path) { contract_root.form_data}
-          row_data = contract_root.profiler.step('row.to_form', entity.entity_path) { self.form_data }
+          form_data = contract_root.form_data
+          row_data = self.form_data
           Forms::Contracts::Helpers::ConditionChecker.(
               self, entity.conditions, entity, VALIDATION_ACTIONS, form: form_data, row: row_data
           )
@@ -81,8 +81,8 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
     # controlling_choices
     contract.validate -> do
       contract_root.profiler.step 'validate_choices', entity.entity_path do
-        form_data = contract_root.profiler.step('contract.to_form', entity.entity_path) { contract_root.form_data}
-        row_data = contract_root.profiler.step('row.to_form', entity.entity_path) { self.form_data }
+        form_data = contract_root.form_data
+        row_data = self.form_data
         entity_value = Forms::RequestParser.new(form: form_data, row: row_data).fetch(entity.entity_path)
         next if entity_value.blank?
 
@@ -135,8 +135,8 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
       # next unless input.has_key?(entity.entity_key)
 
       represented.contract_root.profiler.step 'deserialize', ent.entity_path do
-        form_data = represented.contract_root.profiler.step('contract.to_form', entity.entity_path) { represented.contract_root.form_data}
-        row_data = represented.contract_root.profiler.step('row.to_form', entity.entity_path) { represented.form_data }
+        form_data = represented.contract_root.form_data
+        row_data = represented.form_data
         result = represented.contract_root.profiler.step('condition_checker', ent.entity_path) {
           Forms::Contracts::Helpers::ConditionChecker.(represented, entity.conditions, entity, SETTER_ACTIONS, form: form_data, row: row_data)
         }
