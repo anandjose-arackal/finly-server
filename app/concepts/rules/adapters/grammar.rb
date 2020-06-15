@@ -66,16 +66,19 @@ class Rules::Adapters::Grammar
     end
   end
 
+  # In case the attribute (left) is being set, then it cannot be a value or a formula. It has to be an entity
   def self.to_value(value)
     return value unless value.class.name == String.name
 
+    # if attribute
+    #   return {entity: value.sub("$", "").squish}
     if value&.start_with?("$form.") or value&.start_with?("$row.") or value&.start_with?("$parent.")
-      return {formula: value.sub("$", "")}
+      return {formula: value.sub("$", "").squish}
     elsif value&.start_with?("$")
-      return {entity: value.sub("$", "")}
+      return {entity: value.sub("$", "").squish}
     end
 
-    {value: value}
+    {value: value.squish}
   end
 
 end

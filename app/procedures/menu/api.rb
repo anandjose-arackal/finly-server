@@ -5,7 +5,7 @@ class Menu::API < Transactions::API
   MODULES_CONFIG = [
       {
           config: {name: 'Expense Management', id: 'expense_management', url: '/'},
-          feature: :expense_management_enabled, app: :em
+          feature: :expense_management_enabled, user_subscription: :expense_management, app: :em
       },
       {
           config: {name: 'Vendor Payments', id: 'vendor_payments', url: '/payments'},
@@ -13,7 +13,7 @@ class Menu::API < Transactions::API
       },
       {
           config: {name: 'Finly Budgets', id: 'insights', url: '/insights'},
-          feature: :budgeting_system, permissions: :budget_manager, app: :fi
+          feature: :budgeting_system, permissions: [:admin, :budget_manager], app: :fi
       }
   ]
 

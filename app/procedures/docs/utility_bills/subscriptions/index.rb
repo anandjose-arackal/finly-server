@@ -137,7 +137,7 @@ class Docs::UtilityBills::Subscriptions::Index < IndexBuilder::API
     case context[:record].status&.name&.to_s&.to_sym
     when :rejected, :failed
       format = 'danger'
-    when :paid, :approved, :auto_approved, :payment_ticket_created, :payment_initiated, :payment_ticket_deleted, :completed
+    when :paid, :approved, :auto_approved, :payment_ticket_created, :payment_initiated, :payment_ticket_deleted, :completed, :reactivated
       format = 'success'
     when :awaiting_approval
       if context[:record].controlling_user?(context[:user])

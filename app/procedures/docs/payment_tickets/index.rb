@@ -128,7 +128,7 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     case context[:record].status_name(context[:user])&.to_s&.to_sym
     when :rejected
       format = 'danger'
-    when :approved, :auto_approved, :pending, :creation_in_progress, :credited, :pending_credit
+    when :approved, :auto_approved, :pending, :creation_in_progress, :credited, :pending_credit, :completed
       format = 'success'
     when :processing, :submitted, :unapprove, :awaiting_approval, :scheduled
       if context[:record].controlling_user?(context[:user])
