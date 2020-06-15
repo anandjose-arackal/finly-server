@@ -13,7 +13,7 @@ class Menu::API < Transactions::API
       },
       {
           config: {name: 'Finly Budgets', id: 'insights', url: '/insights'},
-          feature: :budgeting_system, permissions: :budget_manager, app: :fi
+          feature: :budgeting_system, permissions: [:admin, :budget_manager], app: :fi
       }
   ]
 
