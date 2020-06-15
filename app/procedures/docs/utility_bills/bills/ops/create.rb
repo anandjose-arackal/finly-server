@@ -109,10 +109,11 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
   end
 
   def void_old_bills(options, params:, **)
+
     subscription = BbpsBillerSubscription.find_by id: params[:subscription_id]
     # find_old bills for the subscription
     status_ids = BbpsBill.status_ids(:open, :awaiting_approval, :approved, :auto_approved, :payment_ticket_created )
-    bills = subscription.bbps_bills.where(status_id: status_ids).where(order_number: params[:ref_number])
+    bills = subscription.bbps_bills.where(status_id: status_ids).where.not(order_number: params[:order_number])
     if bills.count > 0
       bills.each do |bill|
         # update status and add error
