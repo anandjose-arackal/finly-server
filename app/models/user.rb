@@ -1037,7 +1037,7 @@ class User < ApplicationRecord
     admin_policies.with_id(policy_id).present?
   end
 
-  # todo - temporarily disabling policy admin screen for the admin? role
+  # this method returns if they're an admin in either app, unless specified
   def admin?(application = "em")
     case application
     when "em"
@@ -1045,7 +1045,7 @@ class User < ApplicationRecord
     when "vp"
       vendor_payment_admin?
     else
-      company_admin?
+      company_admin? || vendor_payment_admin?
     end
   end
 
