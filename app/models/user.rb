@@ -1038,7 +1038,7 @@ class User < ApplicationRecord
   end
 
   # this method returns if they're an admin in either app, unless specified
-  def admin?(application = "em")
+  def admin?(application = nil)
     case application
     when "em"
       company_admin?
