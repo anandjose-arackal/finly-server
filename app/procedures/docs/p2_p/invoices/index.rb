@@ -102,7 +102,7 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     amount value: :freight_amount
   end
 
-  column :net_amount, includes: [net_amount: :currency] do
+  column :net_amount, includes: [net_amount: :currency], default: true do
     amount value: :net_amount
   end
 
@@ -111,11 +111,11 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
   #   amount value: :advance_amount
   # end
 
-  column :paid_amount, includes: {successful_payments: :amount} do
-    amount value: :balance_payable_value
+  column :paid_amount, includes: {successful_payments: :amount}, default: true do
+    amount value: :paid_amount_value
   end
 
-  column :balance_due, includes: [:balance_due, {successful_payments: :amount}] do
+  column :balance_due, includes: [:balance_due, {successful_payments: :amount}], default: true do
     amount value: :balance_payable_value
   end
 
