@@ -19,6 +19,7 @@ class BbpsBillStatusChecker
           payment.payment_order.update_order_status
           payment.payment_order.update_processed_amount
           bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed))
+          bill.update(status_id: BbpsBillStatus.id_for(:paid))
 
           # Update last paid on date for subscription
           # transaction_date = result&.transaction_details&.
