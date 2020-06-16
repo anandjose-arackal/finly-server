@@ -36,8 +36,12 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     text value: :invoice_number, format: 'primary'
   end
 
-  column :submitted_at, default: true do
+  column :submitted_on, default: true do
     date value: :submitted_at
+  end
+
+  column :approved_on, default: true do
+    date value: :approved_at
   end
 
   column :invoice_date, default: true do
