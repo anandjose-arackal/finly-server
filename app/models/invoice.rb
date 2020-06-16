@@ -168,6 +168,7 @@ class Invoice < ApplicationRecord
 
   # because multiple payments can be made against one invoice
   has_many :payments
+  has_many :successful_payments, -> {successful}, class_name: 'Payment'
 
   has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
   has_many :items, class_name: "InvoiceLineItem", as: :parent
@@ -712,6 +713,14 @@ class Invoice < ApplicationRecord
     # awaiting_action
     return false if user.blank?
     self.get_reviewers.include? user
+  end
+
+  def balance_payable
+    balance_due&.value.to_f - paid_amount_value
+  end
+
+  def paid_amount_value
+    successful_payments.map {|i| (i&.amount&.value || 0)}.inject(0, :+) || 0
   end
 
   # this method updates the invoice status based on the associated
