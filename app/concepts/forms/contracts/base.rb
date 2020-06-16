@@ -26,9 +26,9 @@ class Forms::Contracts::Base < Reform::Form
     @profiler ||= Forms::Profiler.new id: "root"
   end
 
-  def validate(data = {})
+  def trace(data)
     profiler.monitor do
-      super(data)
+      self.validate(data)
     end
   end
 
