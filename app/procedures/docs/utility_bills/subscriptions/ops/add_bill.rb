@@ -27,8 +27,8 @@ class Docs::UtilityBills::Subscriptions::Ops::AddBill < Transactions::API
 
     if op.success?
       options['result'] = {'bill' => op['model']}
+      options['result']['bill']['autofetched'] = true
     end
-    options['result']['bill']['autofetched'] = true
     options
 
     op.success?
