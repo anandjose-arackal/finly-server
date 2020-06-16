@@ -12,6 +12,8 @@
 class VendorStatus < ApplicationRecord
   include Seedable
 
+  GROUP_AWAITING_APPROVAL = 91
+
   def self.values
     %w( draft awaiting_approval retracted rejected approved auto_approved deactivated )
   end

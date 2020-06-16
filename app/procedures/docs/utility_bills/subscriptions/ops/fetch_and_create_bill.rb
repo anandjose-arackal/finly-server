@@ -133,7 +133,7 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchAndCreateBill < Transactions:
         order_number: data.ref_no,
         order_number_type: "BillFetch"
     }
-    op = Docs::UtilityBills::Bills::Ops::Create.(params: params, current_user: current_user)
+    op = Docs::UtilityBills::Subscriptions::Ops::Create.(params: params, current_user: current_user)
     op.messages.each do |key, val|
       next if key == :errors_meta
       add_message options, key, :base, val

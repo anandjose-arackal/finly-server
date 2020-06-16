@@ -1,7 +1,72 @@
-class Filters::Schema::Validation
+# g -> Group
+# m -> Operator : And / Or
+# c -> Condition
+# a -> Attribute
+# p -> Predicate
+# v -> Value
+# {
+#   "g": {
+#     "0": {
+#       "m": "and",
+#       "c": {
+#         "0": {
+#           "a": {"0": {"name": "invoice_number"}},
+#           "p": "cont",
+#           "v": {"0": {"value": "001"}}
+#         }
+#       }
+#     }
+#   }
+# }
 
+# {
+#   g: {
+#     0: {
+#       m: "and",
+#       c: {
+#         0: {
+#           a: {0: {name: "first_name"}},
+#           p: "cont",
+#           v: {0: {value: "A"}}
+#         },
+#         1: {
+#           a: {0: {name: "last_name"}},
+#           p: "cont",
+#           v: {1: {value: "B"}}
+#         },
+#         2: {
+#           m: "or",
+#           c: {
+#             0: {
+
+#             },
+#             1: {
+
+#             }
+#           }
+#         }
+#       }
+#     },
+#     {
+#       m: "or",
+#       c: {
+#         0: {
+
+#         },
+#         1: {
+
+#         }
+#       }
+#     }
+#   }
+# }
+
+class Filters::Schema::Validation
+  extend Dry::Monads[:result]
+
+  # Fixme: Not validating filters unless the params has "g" attribute
   def self.check(params)
-    return nil unless params&.dig(:g).present?
+    return Success() unless params&.dig(:g).present?
 
     errors = {g: {}}
     has_errors = false
@@ -12,7 +77,7 @@ class Filters::Schema::Validation
         errors[:g][position] = e
       end
     end
-    has_errors ? errors : nil
+    has_errors ? Failure(errors) : Success()
   end
 
   protected

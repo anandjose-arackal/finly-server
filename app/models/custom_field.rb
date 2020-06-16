@@ -24,8 +24,28 @@ class CustomField < ApplicationRecord
 
   # If the custom field is destroyed, destroyed its associated value
   belongs_to :value, optional: true, polymorphic: true, dependent: :destroy
+  belongs_to :drop_down_selection, -> { includes(:custom_field).where(custom_fields: { value_type: 'FieldDropDownSelection' }) }, foreign_key: :value_id, class_name: 'FieldDropDownSelection', optional: true
 
   accepts_nested_attributes_for :value
+
+  # Fixme: Limitation is that not based searches such as not_eq, not_cont, not_null does not generate the correct results
+  ransacker :value_search, args: [:parent, :ransacker_args] do |parent, args|
+    field_configuration_id = ['0']
+    if args&.is_a?(Hash) and args[:custom_field_id].present?
+      field_configuration_id = args[:custom_field_id]
+    end
+    field_configuration_id = [field_configuration_id] unless field_configuration_id.respond_to?(:each)
+
+    # Note that Arel::Nodes::InfixOperation requires the fields to be from parent.table or of type Arel::Nodes.build_quoted
+    # Arel::Nodes::InfixOperation.new(
+    #     'AND',
+    #     Arel::Nodes::InfixOperation.new("=", parent.table[:field_configuration_id], Arel::Nodes.build_quoted(field_configuration_id)),
+    #     parent.table[:configured_field_value]
+    # )
+
+    # This performs the same as above, easier to read
+    Arel.sql("`custom_fields`.`field_configuration_id` IN (#{field_configuration_id.join(",")}) AND `custom_fields`.`configured_field_value`")
+  end
 
   # validate :validate_field
 
@@ -43,7 +63,7 @@ class CustomField < ApplicationRecord
     text_value_ids = FieldText.where('value like ?', "%#{text}%")
     where(value_type: "FieldText", value_id: text_value_ids)
   }
-  scope :with_parent, -> (parent_id, parent_type) { where parent_id: parent_id, parent_type: parent_type}
+  scope :with_parent, -> (parent_id, parent_type) { where parent_id: parent_id, parent_type: parent_type }
   scope :with_multi_select_selection, -> (multiselect_selection_id) {
     multi_select_ids = self.where(value_type: "FieldMultiselectSelection").pluck(:value_id)
     multi_select_ids = FieldMultiselectSelectionItem.with_value(multiselect_selection_id).with_field_multiselect_selection(multi_select_ids).pluck(:field_multiselect_selection_id)
@@ -85,88 +105,88 @@ class CustomField < ApplicationRecord
     field_type_id = field_configuration.field_type_id
 
     case field_type_id
-      when FieldType.id_for(:text)
-        if self.value.blank?
-          self.value = FieldText.new
-        end
-        self.configured_field_value = value
-        self.value.value = value
-      when FieldType.id_for(:number)
-        if self.value.blank?
-          self.value = FieldNumber.new
-        end
-        self.value.value = value
-      when FieldType.id_for(:decimal)
-        if self.value.blank?
-          self.value = FieldDecimal.new
-        end
-        self.value.value = value
-      when FieldType.id_for(:boolean)
-        if self.value.blank?
-          self.value = FieldBoolean.new
-        end
-        self.value.value = value
-      when FieldType.id_for(:drop_down)
-        if self.value.blank?
-          self.value = FieldDropDownSelection.new
-        end
-        value_text = FieldDropDownItem.find_by_id(value)&.name
-        if self.field_configuration.present? and self.field_configuration.drop_down_items.present? and self.field_configuration.drop_down_items.with_id(value).present?
-          self.value.value_id = value
-          self.configured_field_value = value_text
-        end
-      when FieldType.id_for(:date)
-        if self.value.blank?
-          self.value = FieldDate.new
-        end
-        self.value.value = DateUtils.datetime_in_ist(value)
-      when FieldType.id_for(:datetime)
-        if self.value.blank?
-          self.value = FieldDateTime.new
-        end
-        self.value.value = DateUtils.datetime_in_ist(value)
-      when FieldType.id_for(:amount)
-        if self.value.blank?
-          self.value = FieldAmount.new
-        end
-        if self.value.value_id.blank?
-          # value.value is Amount
-          self.value.value = Amount.new
-        end
-        # value.value is Amount, so setting Amounts value becomes value(CustomField.value).value(FieldAmount.value).value(Amount.value)
-        self.value.value.value = value
-        # value.value is Amount, so setting Amounts currency_id becomes value(CustomField.value).value(FieldAmount.value).currency_id(Amount.currency_id)
-        self.value.value.currency_id = 1
-      when FieldType.id_for(:multiselect)
-        # here self.value should ideally be an object of FieldMultiselectSelection
-        if self.value.blank?
-          self.value = FieldMultiselectSelection.new(field_multiselect_selection_items_attributes: [])
-        end
-        # now set the individual values that are passed as the new values of the multi select
-        self.value.field_multiselect_selection_items.destroy_all # destroy the existing ones and create the new ones, I guess?
-        value.each do |val|
-          item = self.value.field_multiselect_selection_items.build(value_id: val)
-        end
-      else
-        # do nothing?
+    when FieldType.id_for(:text)
+      if self.value.blank?
+        self.value = FieldText.new
+      end
+      self.configured_field_value = value
+      self.value.value = value
+    when FieldType.id_for(:number)
+      if self.value.blank?
+        self.value = FieldNumber.new
+      end
+      self.value.value = value
+    when FieldType.id_for(:decimal)
+      if self.value.blank?
+        self.value = FieldDecimal.new
+      end
+      self.value.value = value
+    when FieldType.id_for(:boolean)
+      if self.value.blank?
+        self.value = FieldBoolean.new
+      end
+      self.value.value = value
+    when FieldType.id_for(:drop_down)
+      if self.value.blank?
+        self.value = FieldDropDownSelection.new
+      end
+      value_text = FieldDropDownItem.find_by_id(value)&.name
+      if self.field_configuration.present? and self.field_configuration.drop_down_items.present? and self.field_configuration.drop_down_items.with_id(value).present?
+        self.value.value_id = value
+        self.configured_field_value = value_text
+      end
+    when FieldType.id_for(:date)
+      if self.value.blank?
+        self.value = FieldDate.new
+      end
+      self.value.value = DateUtils.datetime_in_ist(value)
+    when FieldType.id_for(:datetime)
+      if self.value.blank?
+        self.value = FieldDateTime.new
+      end
+      self.value.value = DateUtils.datetime_in_ist(value)
+    when FieldType.id_for(:amount)
+      if self.value.blank?
+        self.value = FieldAmount.new
+      end
+      if self.value.value_id.blank?
+        # value.value is Amount
+        self.value.value = Amount.new
+      end
+      # value.value is Amount, so setting Amounts value becomes value(CustomField.value).value(FieldAmount.value).value(Amount.value)
+      self.value.value.value = value
+      # value.value is Amount, so setting Amounts currency_id becomes value(CustomField.value).value(FieldAmount.value).currency_id(Amount.currency_id)
+      self.value.value.currency_id = 1
+    when FieldType.id_for(:multiselect)
+      # here self.value should ideally be an object of FieldMultiselectSelection
+      if self.value.blank?
+        self.value = FieldMultiselectSelection.new(field_multiselect_selection_items_attributes: [])
+      end
+      # now set the individual values that are passed as the new values of the multi select
+      self.value.field_multiselect_selection_items.destroy_all # destroy the existing ones and create the new ones, I guess?
+      value.each do |val|
+        item = self.value.field_multiselect_selection_items.build(value_id: val)
+      end
+    else
+      # do nothing?
     end
     self.value.save if self.value.present? and save
   end
 
   def string_value
     case field_configuration.field_type_id
-      when FieldType.id_for(:text)
-        return self.value&.value
-      when FieldType.id_for(:drop_down)
-        return self.value&.value&.name
-      when FieldType.id_for(:multiselect)
-        names = []
-        self.value&.field_multiselect_selection_items&.each do |item|
-          names << item.value&.name
-        end
-        return names.to_sentence
-      else
-        # do nothing?
+    when FieldType.id_for(:text)
+      return self.value&.value
+    when FieldType.id_for(:drop_down)
+      return self.value&.value&.name
+    when FieldType.id_for(:multiselect)
+      names = []
+      self.value&.field_multiselect_selection_items&.each do |item|
+        names << item.value&.name
+      end
+      return names.to_sentence
+    else
+      # do nothing?
     end
   end
 
@@ -177,7 +197,7 @@ class CustomField < ApplicationRecord
       return report_show
     when options[:report_mailer_show] # Show page when user navigates from email
       return report_mailer_show
-    else 
+    else
       options = []
       dependent_field_configuration_ids = []
       has_dependent_cf = false
@@ -209,21 +229,21 @@ class CustomField < ApplicationRecord
               root_field: self.field_configuration.root_field,
               dependent_field_configuration_ids: dependent_field_configuration_ids&.uniq,
               has_dependent_cf: has_dependent_cf
-              }
+      }
       case self.field_configuration.field_type_id
-        when FieldType.id_for(:multiselect)
-          ids = []
-          names = []
-          self.value&.field_multiselect_selection_items&.each do |item|
-            ids << item.value_id
-            names << item.value&.name
-          end
-          json["#{field_configuration.field_type.name.to_sym}_field_value"] = {
-              ids: ids,
-              names: names
-          }
-        else
-          json["#{field_configuration.field_type.name.to_sym}_field_value"] = self.value
+      when FieldType.id_for(:multiselect)
+        ids = []
+        names = []
+        self.value&.field_multiselect_selection_items&.each do |item|
+          ids << item.value_id
+          names << item.value&.name
+        end
+        json["#{field_configuration.field_type.name.to_sym}_field_value"] = {
+            ids: ids,
+            names: names
+        }
+      else
+        json["#{field_configuration.field_type.name.to_sym}_field_value"] = self.value
       end
       json
     end
@@ -231,15 +251,15 @@ class CustomField < ApplicationRecord
 
   def report_show
     json = {
-     id: field_configuration.id,
-      label: field_configuration.field_name,
-      field_type: {id: field_configuration.field_type.id,
-      name: field_configuration.field_type.name},
-      mandatory: field_configuration.mandatory,
-      options: {},
-      root_field: self.field_configuration.root_field,
-      dependent_field_configuration_ids: [],
-      has_dependent_cf: false
+        id: field_configuration.id,
+        label: field_configuration.field_name,
+        field_type: {id: field_configuration.field_type.id,
+                     name: field_configuration.field_type.name},
+        mandatory: field_configuration.mandatory,
+        options: {},
+        root_field: self.field_configuration.root_field,
+        dependent_field_configuration_ids: [],
+        has_dependent_cf: false
     }
     json["#{field_configuration.field_type.name.to_sym}_field_value"] = self.value
     return json

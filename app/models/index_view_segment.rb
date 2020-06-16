@@ -16,18 +16,30 @@
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
 #  default        :boolean          default(FALSE)
+#  application    :string(255)
 #
 
 class IndexViewSegment < ApplicationRecord
-  include UUIDHelper
+  include UUIDHelper, ::Filters::Store
 
   belongs_to :user
   belongs_to :company
 
-  serialize :filters, JSON
+  filter_store :filters
+  # serialize :filters, JSON
   serialize :columns, JSON
 
   event_channel :index_view_segments
 
-  default_scope {order(name: :asc)}
+  default_scope { order(name: :asc) }
+
+  def as_json(options = {})
+    {
+        id: id,
+        name: name,
+        filters: filters,
+        default: default,
+        columns: columns
+    }
+  end
 end

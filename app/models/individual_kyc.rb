@@ -76,7 +76,6 @@
 #  kyc_2_back_updated_at       :datetime
 #  kyc_1_number                :string(255)
 #  kyc_2_number                :string(255)
-#  deleted_at                  :datetime
 #  initiated                   :boolean
 #  id_proof_front_file_name    :string(255)
 #  id_proof_front_content_type :string(255)
@@ -86,6 +85,7 @@
 #  id_proof_back_content_type  :string(255)
 #  id_proof_back_file_size     :bigint
 #  id_proof_back_updated_at    :datetime
+#  deleted_at                  :datetime
 #
 
 require 'fileutils'

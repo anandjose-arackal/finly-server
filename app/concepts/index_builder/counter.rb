@@ -20,7 +20,8 @@ class IndexBuilder::Counter
   end
 
   def add(filter_id, label, count)
-    counts << {filter_id: filter_id, label: label, count: (count || 0)}
+    count = {filter_id: filter_id, label: label.to_s.titleize, count: (count || 0)}
+    counts << count
   end
 
   def as_json(options = {})

@@ -28,7 +28,9 @@ class InwardDocument < ApplicationRecord
   acts_as_sequenced column: :grn_number, purpose: :grn, editable: false, prefix: 'GRN'
 
   belongs_to :procurement, optional: true
+  has_one :purchase_order, through: :procurement, source: :purchase_order
   belongs_to :user, optional: true
+  belongs_to :created_by, foreign_key: :user_id, class_name: 'User'
   belongs_to :company, optional: true
 
   belongs_to :vendor, optional: true, class_name: "YesBankVendor"

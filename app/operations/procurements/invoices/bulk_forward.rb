@@ -6,6 +6,7 @@ class Procurements::Invoices::BulkForward < Procurements::Invoices::Base
       success: [],
       error: []
     }
+    params[:document_ids] ||= params[:id]
     unless params[:document_ids].present? || params[:document_ids].is_a?(Array)
       add_message :error, "Invalid Type"
     end

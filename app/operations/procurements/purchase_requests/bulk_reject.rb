@@ -2,7 +2,7 @@ class Procurements::PurchaseRequests::BulkReject < Procurements::PurchaseRequest
   attr_accessor :purchase_requests
 
   def init
-    purchase_request_ids = params[:ids] || params[:purchase_request_ids]
+    purchase_request_ids = params[:id] || params[:ids] || params[:purchase_request_ids]
 
     unless purchase_request_ids.is_a?(Array)
       add_message :error, 'Invalid configuration'
@@ -14,7 +14,7 @@ class Procurements::PurchaseRequests::BulkReject < Procurements::PurchaseRequest
 
   def validate
     if self.purchase_requests.empty?
-      add_message :error, 'No Purchase Requests found'
+      add_message :error, 'You need to select atleast one purchase order to reject'
       return
     end
 

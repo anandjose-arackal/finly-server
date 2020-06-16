@@ -41,6 +41,12 @@
 #  populate_if_empty            :string(255)
 #  type                         :string(255)
 #  config                       :text(65535)
+#  associate_custom_fields      :boolean
+#  compute                      :boolean
+#  compute_enabled              :boolean
+#  compute_type_id              :integer
+#  compute_formula              :string(255)
+#  compute_lookup_entity_id     :string(255)
 #
 
 require 'rails_helper'

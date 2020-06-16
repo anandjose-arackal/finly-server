@@ -1,0 +1,2 @@
+module HoverCardHelper
+end

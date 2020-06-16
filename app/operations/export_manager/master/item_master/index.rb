@@ -7,7 +7,6 @@ class ExportManager::Master::ItemMaster::Index < ExportManager::Builders::Spread
   system :vp
   screen 'item_master.index'
   handle :inventory_items
-  validate :input
 
   attribute :item_number
   attribute :gl_code
@@ -27,13 +26,7 @@ class ExportManager::Master::ItemMaster::Index < ExportManager::Builders::Spread
   attribute :created_at
 
   def input
-    result = ::ItemMaster::Item::Index.(user, params)
-    unless result.success?
-      add_message :error, result.messages[:error]
-      return
-    end
-    items = result.inventory_line_items.includes_for_export
-    items
+    resolve('items.default').includes_for_export
   end
 
   def item_number(item)

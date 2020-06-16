@@ -3,11 +3,12 @@ class PolicyUserRoles::ForwardableUsers < PolicyUserRoles::Base
 
   def init
 
-    self.document_types = %w( purchase_order_provider po_invoice_provider non_po_invoice_provider agreement_invoice_provider )
+    self.document_types = %w( purchase_order_provider invoice_provider )
     unless document_types.include?(params[:document_type])
       add_message :error, "Invalid Type"
     end
 
+    params[:document_ids] ||= params[:id]
     unless params[:document_ids].present? || params[:document_ids].is_a?(Array)
       add_message :error, "Invalid Type"
     end
@@ -53,14 +54,8 @@ class PolicyUserRoles::ForwardableUsers < PolicyUserRoles::Base
     case params[:document_type]
     when 'purchase_order_provider'
       role_id = UserRole.id_for(:purchase_order_reviewer)
-    # when 'invoice_provider'
-    #   role_id = UserRole.id_for(:invoice_reviewer)
-    when 'po_invoice_provider'
-      role_id = UserRole.id_for(:po_invoice_reviewer)
-    when 'non_po_invoice_provider'
-      role_id = UserRole.id_for(:non_po_invoice_reviewer)
-    when 'agreement_invoice_provider'
-      role_id = UserRole.id_for(:agreement_invoice_reviewer)
+    when 'invoice_provider'
+      role_id = UserRole.ids_for(:po_invoice_reviewer, :non_po_invoice_reviewer, :agreement_invoice_reviewer)
     end
     self.policy_user_roles = self.policy.policy_user_roles.with_role_id(role_id)
   end
@@ -103,18 +98,7 @@ class PolicyUserRoles::ForwardableUsers < PolicyUserRoles::Base
     if document_type == 'purchase_order_provider'
       params[:filter_awaiting_approval] = true
       self.documents = Procurements::PurchaseOrders::Index.(user, params).purchase_orders.with_id(document_ids)
-    # elsif document_type == 'invoice_provider'
-    #   params[:filter_awaiting_approval] = true
-    #   self.documents = Procurements::Invoices::Index.(user, params).invoices.with_id(document_ids)
-    elsif document_type == 'po_invoice_provider'
-      params[:filter_awaiting_approval] = true
-      # params[:filter_inward_invoice_type] = 'tax_invoice'
-      self.documents = Procurements::Invoices::Index.(user, params).invoices.with_id(document_ids)
-    elsif document_type == 'non_po_invoice_provider'
-      # params[:filter_inward_invoice_type] = 'non_po_invoice'
-      params[:filter_awaiting_approval] = true
-      self.documents = Procurements::Invoices::Index.(user, params).invoices.with_id(document_ids)
-    elsif document_type == 'agreement_invoice_provider'
+    elsif document_type == 'invoice_provider'
       params[:filter_awaiting_approval] = true
       self.documents = Procurements::Invoices::Index.(user, params).invoices.with_id(document_ids)
     else

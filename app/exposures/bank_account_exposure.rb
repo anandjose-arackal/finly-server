@@ -1,0 +1,9 @@
+class BankAccountExposure < Exposures::API
+
+  attribute :account_owner, record_attribute: true, exposure: true, includes: [:account_owner]
+  attribute :account_number, record_attribute: true
+  attribute :ifsc, record_attribute: true
+  attribute :name, record_attribute: true
+  attribute :verified, record_attribute: :yes_bank_verified
+
+end

@@ -1,12 +1,13 @@
 class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Spreadsheet
 
-  label 'Export'
+  label 'Spreadsheet'
   description 'Purchase Orders Export'
   configurable true
   system :vp
+  resolver 'purchase_orders.default'
   screen ['purchase_orders.index', 'po_advances.index']
   handle :purchase_orders
-  validate :input
+  # validate :input
 
   attribute :procurement_name
   attribute :vendor_name
@@ -83,19 +84,19 @@ class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Sp
   attribute :invoice_delivery_address
   attribute :invoice_custom_fields
 
-  def input
-    # if params[:filter_po_status].present?
-    #   unless params[:filter_po_status].is_a?(Integer)
-    #     params[:filter_po_status] = PurchaseOrderStatus.id_for(params[:filter_po_status]&.to_sym)
-    #   end
-    # end
-    result = ::Procurements::PurchaseOrders::Index.(user, params)
-    unless result.success?
-      add_message :error, result.messages[:error]
-      return
-    end
-    result.purchase_orders.includes(:policy, :vendor, :gstin_location, :controlling_level, :level, :department, :sub_department, :cost_center, :user, :status, :total_before_tax, procurement: [invoices: [:gst_type, :tax_amount, :tds_slab, :discount_amount, :net_amount, :invoice_items]])
-  end
+  # def input
+  #   # if params[:filter_po_status].present?
+  #   #   unless params[:filter_po_status].is_a?(Integer)
+  #   #     params[:filter_po_status] = PurchaseOrderStatus.id_for(params[:filter_po_status]&.to_sym)
+  #   #   end
+  #   # end
+  #   result = ::Procurements::PurchaseOrders::Index.(user, params)
+  #   unless result.success?
+  #     add_message :error, result.messages[:error]
+  #     return
+  #   end
+  #   result.purchase_orders.includes(:policy, :vendor, :gstin_location, :controlling_level, :level, :department, :sub_department, :cost_center, :user, :status, :total_before_tax, procurement: [invoices: [:gst_type, :tax_amount, :tds_slab, :discount_amount, :net_amount, :invoice_items]])
+  # end
 
   def procurement_name(purchase_order)
     purchase_order.procurement.name

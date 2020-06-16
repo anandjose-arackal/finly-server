@@ -1,7 +1,7 @@
 class Forms::Synchronizer
 
   def self.call
-    Forms::Router.forms.each {|form| Forms::Synchronizer.sync(form)}
+    Forms::Router.forms.each { |form| Forms::Synchronizer.sync(form) }
   end
 
   def self.sync(form)
@@ -38,24 +38,28 @@ class Forms::Synchronizer
     entity_model = section_model.entities.where(form_id: form_model.id, form_section_id: section_model.id, field_key: entity.field_key, parent: parent).first
 
     unless entity_model.present?
-      entity_model = section_model.entities.new entity.schema.except(:section, :choices)
+      entity_model = section_model.entities.new entity.schema.except(:section, :choices, :choices_provider)
       entity_model.parent = parent
-      if entity.schema&.dig(:scope, :choices)
-        pos = 0
-        choices = []
-        entity.schema&.dig(:scope, :choices).each do |choice|
-          choices << choice.merge!(
-              {
-                  company: company,
-                  form: form_model,
-                  form_section: section_model,
-                  form_entity: entity_model,
-                  position: pos
-              }
-          )
-          pos += 1
+      # Todo broken because of generalizing choices provider to be reused with filters
+      if entity.schema[:choices_provider].present?
+        entity_model.choices_provider = entity.schema[:choices_provider].as_json
+        if entity.schema&.dig(:choices_provider)&.config[:choices]&.present?
+          pos = 0
+          choices = []
+          entity.schema&.dig(:choices_provider).config[:choices].each do |choice|
+            choices << {
+                name: choice[:name],
+                active: choice[:active],
+                company: company,
+                form: form_model,
+                form_section: section_model,
+                form_entity: entity_model,
+                position: pos
+            }
+            pos += 1
+          end
+          entity_model.assign_attributes(form_entity_choices_attributes: choices)
         end
-        entity_model.assign_attributes(choices_attributes: choices)
       end
 
       entity_model.form = form_model
@@ -74,7 +78,7 @@ class Forms::Synchronizer
   end
 
   def self.sync_dependency(company, form_model, dependency)
-    # dependency.find_or_create(company.users.first, dependency)
+    dependency.find_or_create(company.users.first, form_model)
   end
 
 end

@@ -28,6 +28,7 @@ class PurchaseRequest < ApplicationRecord
   include Transitionable, CustomFieldFilterSupport
   include Sequenced::ActsAsSequenced
 
+
   acts_as_sequenced column: :order_number, purpose: :purchase_request, editable: false, prefix: 'PR'
 
   event_channel 'purchase_request'
@@ -61,7 +62,6 @@ class PurchaseRequest < ApplicationRecord
   accepts_nested_attributes_for :purchase_request_items, :custom_fields, :attachments, allow_destroy: true
 
 
-
   scope :search_by_email, -> (email) {
     user = RequestStore.store[:current_user]
     if user.present?
@@ -71,11 +71,11 @@ class PurchaseRequest < ApplicationRecord
   }
   scope :not_draft, -> { where.not purchase_request_status_id: PurchaseRequestStatus.id_for(:draft) }
 
-  scope :deleteable, -> { where purchase_request_status_id: [PurchaseRequestStatus.id_for(:draft), PurchaseRequestStatus.id_for(:retracted), PurchaseRequestStatus.id_for(:rejected)]}
+  scope :deleteable, -> { where purchase_request_status_id: [PurchaseRequestStatus.id_for(:draft), PurchaseRequestStatus.id_for(:retracted), PurchaseRequestStatus.id_for(:rejected)] }
 
   scope :with_ids, -> (ids) { where id: ids }
 
-  scope :filter_by_status_id,  -> (status_id) {
+  scope :filter_by_status_id, -> (status_id) {
     if status_id == 'awaiting_approval'
       user_id = RequestStore.store[:current_user]&.id
       if user_id.present?
@@ -123,7 +123,21 @@ class PurchaseRequest < ApplicationRecord
     end
   }
 
-  scope :with_status_ids, -> (status_ids) {where purchase_request_status_id: status_ids}
+  scope :with_status_ids, -> (status_ids) {
+    case status_ids
+    when PurchaseRequestStatus::GROUP_OPEN
+      where purchase_request_status_id: PurchaseRequestStatus.ids_for(:draft, :retracted)
+    when PurchaseRequestStatus::GROUP_AWAITING_APPROVAL
+      user_id = RequestStore.store[:current_user]&.id
+      if user_id.present?
+        self.awaiting_action_items(user_id)
+      end
+    when PurchaseRequestStatus::GROUP_APPROVED
+      where purchase_request_status_id: PurchaseRequestStatus.ids_for(:approved, :auto_approved, :po_created, :partially_closed, :order_initiated)
+    else
+      where purchase_request_status_id: status_ids
+    end
+  }
 
   scope :filter_status_id, -> (status_ids) {
     with_status_ids(status_ids)
@@ -133,9 +147,9 @@ class PurchaseRequest < ApplicationRecord
     where creator_id: ids
   }
 
-  scope :filter_policy_id, -> (policy_id) {where policy_id: policy_id}
+  scope :filter_policy_id, -> (policy_id) { where policy_id: policy_id }
 
-  scope :filter_location_id, -> (location_id) {where location_id: location_id}
+  scope :filter_location_id, -> (location_id) { where location_id: location_id }
 
   scope :filter_department_id, -> (ids) {
     where department_id: ids
@@ -156,32 +170,32 @@ class PurchaseRequest < ApplicationRecord
   }
 
   # Sorting
-  scope :sort_order_number, -> (type){
+  scope :sort_order_number, -> (type) {
     type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
       reorder("purchase_requests.order_number #{type}")
     end
   }
 
-  scope :sort_description, -> (type){
+  scope :sort_description, -> (type) {
     type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
       reorder("purchase_requests.description #{type}")
     end
   }
 
-  scope :sort_date, -> (type){
+  scope :sort_date, -> (type) {
     type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
       reorder("purchase_requests.created_at #{type}")
     end
   }
 
-  scope :filter_pr_creator_id, -> (creator_id){
+  scope :filter_pr_creator_id, -> (creator_id) {
     where(creator_id: creator_id)
   }
 
-  scope :filter_pr_approver_id, -> (approver_id){
+  scope :filter_pr_approver_id, -> (approver_id) {
     if approver_id.present?
       ids = self.awaiting_action_items(approver_id)&.pluck(:id)
       with_ids(ids)
@@ -199,6 +213,10 @@ class PurchaseRequest < ApplicationRecord
     end
   }
 
+  def self.ransackable_scopes(auth_object = nil)
+    [:with_status_ids]
+  end
+
 
   # scope :sort_amount, -> (type){
   #   type = type&.strip&.upcase
@@ -212,23 +230,22 @@ class PurchaseRequest < ApplicationRecord
   end
 
 
-
   def as_json
     {
-      id: self.id,
-      purchase_request_number: self.order_number,
-      description: self.description,
-      location_attributes: {id: self.location_id, name: self.location&.name},
-      department_attributes: {id: self.department_id, name: self.department&.name},
-      policy_attributes: {id: self.policy_id, name: self.policy&.name},
-      status_attributes: {status_id: self.purchase_request_status_id, status_name: self.status&.name, display_name: self.status&.name&.humanize},
-      creator_attributes: {creator_id: self.creator_id, creator_name: self.creator&.name, created_at: self.created_at.to_date },
-      total_cost: self&.total_amount&.value,
-      controlling_user: self.get_reviewers&.first&.name,
-      rejection_note: self.reject_note,
-      department: self.department&.name,
-      cost_center: self.cost_center&.name,
-      cost_allocation_items: cost_allocation_items
+        id: self.id,
+        purchase_request_number: self.order_number,
+        description: self.description,
+        location_attributes: {id: self.location_id, name: self.location&.name},
+        department_attributes: {id: self.department_id, name: self.department&.name},
+        policy_attributes: {id: self.policy_id, name: self.policy&.name},
+        status_attributes: {status_id: self.purchase_request_status_id, status_name: self.status&.name, display_name: self.status&.name&.humanize},
+        creator_attributes: {creator_id: self.creator_id, creator_name: self.creator&.name, created_at: self.created_at.to_date},
+        total_cost: self&.total_amount&.value,
+        controlling_user: self.get_reviewers&.first&.name,
+        rejection_note: self.reject_note,
+        department: self.department&.name,
+        cost_center: self.cost_center&.name,
+        cost_allocation_items: cost_allocation_items
     }
   end
 
@@ -272,7 +289,7 @@ class PurchaseRequest < ApplicationRecord
     user.has_policy_role?(UserRole.id_for(:purchase_request_reviewer), self)
   end
 
-  def reject_purchase_request_items(options={}, user)
+  def reject_purchase_request_items(options = {}, user)
     rejected_item_ids = options[:rejected_purchase_request_items]
     # Filter rejected ids
     filtered_rejected_item_ids = user.company.purchase_requests.joins(:purchase_request_items).where("purchase_request_items.id IN (?)", rejected_item_ids).pluck('purchase_request_items.id')
@@ -280,14 +297,14 @@ class PurchaseRequest < ApplicationRecord
     PurchaseRequestItem.with_ids(filtered_rejected_item_ids).each do |item|
       item.rejected = true
       item.status_id = PurchaseRequestItemStatus.id_for(:rejected)
-      unless item.save && PurchaseRequest.create_status_change_trail(item, user, action_id=TrailAction.id_for(:reject))
+      unless item.save && PurchaseRequest.create_status_change_trail(item, user, action_id = TrailAction.id_for(:reject))
         return false
       end
     end unless filtered_rejected_item_ids.blank?
     true
   end
 
-  def approve_purchase_request_items(options={}, user)
+  def approve_purchase_request_items(options = {}, user)
     approved_item_ids = options[:approved_purchase_request_items]
     # Filter rejected ids
     filtered_approved_item_ids = user.company.purchase_requests.joins(:purchase_request_items).where("purchase_request_items.id IN (?)", approved_item_ids).pluck('purchase_request_items.id')
@@ -301,7 +318,7 @@ class PurchaseRequest < ApplicationRecord
       elsif pr_status == 'auto_approved'
         trail_status = 'auto_approve'
       end
-      unless item.save && PurchaseRequest.create_status_change_trail(item, user, action_id=TrailAction.id_for(trail_status))
+      unless item.save && PurchaseRequest.create_status_change_trail(item, user, action_id = TrailAction.id_for(trail_status))
         return false
       end
     end unless filtered_approved_item_ids.blank?
@@ -343,11 +360,11 @@ class PurchaseRequest < ApplicationRecord
     # Since PR line item does not have policy, trail has PR data
     role_id = item.purchase_request.is_reviewing_user? ? UserRole.id_for(:purchase_request_reviewer) : UserRole.id_for(:admin)
     trail = item.trails.new action_user: user,
-                           action_id: action_id,
-                           action_user_role_id: role_id,
-                           # Current level if previous level is not present
-                           action_level_id: item.purchase_request.get_level(:previous).id || item.purchase_request.level.id,
-                           modified_level_id: item.purchase_request&.level&.id
+                            action_id: action_id,
+                            action_user_role_id: role_id,
+                            # Current level if previous level is not present
+                            action_level_id: item.purchase_request.get_level(:previous).id || item.purchase_request.level.id,
+                            modified_level_id: item.purchase_request&.level&.id
     trail.save
   end
 
@@ -378,11 +395,11 @@ class PurchaseRequest < ApplicationRecord
     # end
   end
 
-  def can_take_control?(user=nil)
+  def can_take_control?(user = nil)
     user = user.present? ? user : RequestStore.store[:current_user]
     return false if user.blank?
     return false if self.action_users(:approve).include?(user)
-    awaiting_approval? && user.vendor_payment_admin? && (self.document_level_reviewer_mappings&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id rescue false)# todo, add dlrm logic
+    awaiting_approval? && user.vendor_payment_admin? && (self.document_level_reviewer_mappings&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id rescue false) # todo, add dlrm logic
   end
 
   def can_delete?
@@ -400,6 +417,19 @@ class PurchaseRequest < ApplicationRecord
         end
       end
     end
+  end
+
+  # Used for tracking completion %
+  def review_pending?
+    PurchaseRequestStatus.ids_for(:draft, :retracted, :rejected).include?(purchase_request_status_id)
+  end
+
+  def review_completed?
+    PurchaseRequestStatus.ids_for(:approved,:auto_approved,:closed,:order_initiated,:cancelled,:po_created,:partially_closed).include?(purchase_request_status_id)
+  end
+
+  def review_in_progress?
+    PurchaseRequestStatus.ids_for(:awaiting_approval).include?(purchase_request_status_id)
   end
 
   private

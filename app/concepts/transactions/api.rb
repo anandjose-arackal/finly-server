@@ -32,8 +32,8 @@ class Transactions::API < Trailblazer::Operation
     end
   end
 
-  def self.call(options = {}, &handlers)
-    result = super(options)
+  def self.call(options = {}, *args, &handlers)
+    result = super(options, *args)
     match_result(options, result, &handlers)
     # if matcher.present?
     #   if matcher.is_a?(Symbol)

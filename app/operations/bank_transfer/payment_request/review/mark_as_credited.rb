@@ -15,13 +15,13 @@ class BankTransfer::PaymentRequest::Review::MarkAsCredited < BankTransfer::Payme
   end
 
   def init
-    ids = params[:id] || params[:bank_payment_request_ids] || params[:bank_payment_request_id]
+    ids = params[:id] || params[:ids] || params[:bank_payment_request_ids] || params[:bank_payment_request_id]
     unless ids.is_a?(Array)
       ids = ids.split(",")
     end
     self.bank_payment_requests = BankTransfer::PaymentRequest::Index.(user, params).payment_requests.with_id(ids) rescue nil
     # self.bank_payment_request = BankPaymentRequest.find_by(id: id)
-    self.view_role = UserRole.id_for(params[:view].to_sym)
+    # self.view_role = UserRole.id_for(params[:view].to_sym)
   end
 
   def validate

@@ -1,0 +1,84 @@
+require 'action_view'
+require 'action_view/helpers'
+class IndexBuilder::ContentTypes::Base
+  include ActionView::Helpers::DateHelper
+  include DynamicAttributes
+
+  attr_accessor :params
+  class_attr :content_type
+
+  def self.register(type)
+    self.content_type(type)
+
+    IndexBuilder::ContentTypes::Registry.register(type, self)
+  end
+
+  def self.attribute(name, default: nil)
+    attributes << {name: name, default: default}
+    attr_accessor name
+  end
+
+  def self.attributes
+    @attributes ||= []
+  end
+
+  def self.call(params)
+    self.new(params)
+  end
+
+  def initialize(params)
+    self.params = params
+
+    if params.present? and not params.is_a?(Hash)
+      raise "Invalid field params #{params}"
+    end
+
+    params.each_pair do |key, value|
+      next if value.nil?
+      send :"#{ key }=", value
+    end
+  end
+
+  def content_type
+    self.class.content_type
+  end
+
+  def build(context, user, record, exposure)
+    data = {content_type: content_type}
+    self.class.attributes.each do |attribute|
+      value = nil
+      retriever = send(attribute[:name]) || attribute[:default]
+
+      retriever_context = {
+          attribute: self,
+          user: user,
+          record: record,
+          exposure: exposure,
+          data: data
+      }
+
+      if retriever.is_a?(Proc)
+        retriever = instance_exec retriever_context, &retriever
+      end
+
+      if retriever.is_a?(String)
+        value = exposure.template(retriever)
+      elsif retriever.is_a?(Symbol)
+        if context.respond_to?(retriever)
+          value = context.send(retriever, retriever_context)
+        else
+          value = exposure.send(retriever)
+        end
+      else
+        value = retriever
+      end
+      data[attribute[:name]] = value
+    end
+    format_value(context, user, record, exposure, data)
+  end
+
+  def format_value(context, user, record, exposure, data)
+    data
+  end
+
+end

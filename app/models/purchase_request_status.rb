@@ -13,6 +13,10 @@ class PurchaseRequestStatus < ApplicationRecord
 
   include Seedable
 
+  GROUP_OPEN = 90
+  GROUP_AWAITING_APPROVAL = 91
+  GROUP_APPROVED = 92
+
   def self.values
     [
         :draft,

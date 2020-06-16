@@ -9,19 +9,11 @@ class BankTransfer::PaymentRequest::Review::BulkTakeControl < BankTransfer::Paym
   def pre_validate
     super
     return if has_errors?
-    if params[:password].blank?
-      add_message :error, 'You need to provide your password to initiate this action'
-      return
-    end
-    unless user.valid_password?(params[:password])
-      add_message :error, 'Invalid Password'
-      return
-    end
   end
 
   def init
     # ids = params["bulk_take_control_ids"]
-    ids = params[:ids] || params[:bank_payment_request_ids] || params[:payment_request_ids]
+    ids = params[:id] || params[:ids] || params[:bank_payment_request_ids] || params[:payment_request_ids]
     unless ids.is_a?(Array)
       ids = ids.split(',')
     end
@@ -102,6 +94,11 @@ class BankTransfer::PaymentRequest::Review::BulkTakeControl < BankTransfer::Paym
     BankTransfer::PaymentRequest::Review::BulkTakeControlBackground.call_async(ids, {initiating_user_id: current_user.id, bulk_take_control_ids: params["bulk_take_control_ids"]})
     # BankTransfer::PaymentRequest::Review::BulkTakeControlBackground.call(ids, {initiating_user_id: user.id, params: params[:bulk_take_control_ids]})
   end
+
+  def post_process
+    add_message :success, "Your request for taking Control of #{self.bank_payment_requests.length} payment tickets is being processed."
+  end
+
 
   private
 

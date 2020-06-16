@@ -3646,11 +3646,17 @@ Rails.application.routes.draw do
     get 'export/payment_file(.:format)', to: 'bank_payment_requests#payment_file', as: :export_payment_file
     post 'export/payment_file(.:format)', to: 'bank_payment_requests#payment_file', as: :export_payment_file_post
     patch 'mark_as_credited', to: 'bank_payment_requests#mark_as_credited', as: :mark_as_credited_bulk
+    put 'mark_as_credited', to: 'bank_payment_requests#mark_as_credited'
     patch 'mark_all_pending', to: 'bank_payment_requests#mark_all_pending', as: :mark_all_pending
+    put 'mark_all_pending', to: 'bank_payment_requests#mark_all_pending'
     patch 'bulk_approve_validate', to: 'bank_payment_requests#bulk_approve_validate', as: :bulk_approve_validate
+    put 'bulk_approve_validate', to: 'bank_payment_requests#bulk_approve_validate'
     patch 'bulk_approve', to: 'bank_payment_requests#bulk_approve', as: :bulk_approve
+    put 'bulk_approve', to: 'bank_payment_requests#bulk_approve'
     patch 'bulk_take_control' => 'bank_payment_requests#bulk_take_control', as: :bulk_take_control
+    put 'bulk_take_control' => 'bank_payment_requests#bulk_take_control'
     patch 'bulk_reject' => 'bank_payment_requests#bulk_reject', as: :bulk_reject
+    put 'bulk_reject' => 'bank_payment_requests#bulk_reject'
     post 'bulk_actions' => 'bank_payment_requests#bulk_actions', as: :bulk_actions
 
     post 'new_pr' => 'bank_payment_requests#new_pr', as: :new_pr
@@ -3667,6 +3673,7 @@ Rails.application.routes.draw do
     get 'download_all_attachment', to: 'bank_payment_requests#download_all_attachment', as: :download_all_attachment
     patch 'bulk_credit_validate', to: 'bank_payment_requests#bulk_credit_validate', as: :bulk_credit_validate
     patch 'bulk_credit', to: 'bank_payment_requests#bulk_credit', as: :bulk_credit
+    put 'bulk_credit', to: 'bank_payment_requests#bulk_credit'
     get 'sample_import_format', to: 'bank_payment_requests#sample_import_file', as: :sample_import_file
     # patch 'bulk_credit_validate', to: 'bank_payment_requests#bulk_approve_validate', as: :bulk_credit_validate
 
@@ -3967,6 +3974,7 @@ Rails.application.routes.draw do
     put 'purchase_requests/bulk_reject', to: 'purchase_requests#bulk_reject'
     put 'purchase_requests/bulk_take_control', to: 'purchase_requests#bulk_take_control'
     delete 'purchase_requests/bulk_destroy', to: 'purchase_requests#bulk_destroy'
+    put 'purchase_requests/bulk_destroy', to: 'purchase_requests#bulk_destroy'
     get 'purchase_requests/filter_config', to: 'purchase_requests#filter_config'
     resources :purchase_requests do
       get 'edit_config', to: "purchase_requests#edit_config", as: :edit_config
@@ -4064,6 +4072,7 @@ Rails.application.routes.draw do
 
 
   ######## Dashboards ##################
+  # Fixme: old routes for supporting v1 of dashboards in dynamic index. This can deleted when the support is removed
   namespace :dashboards do
     get 'vp/awaiting_action', to: 'vendor_payments#awaiting_action'
     get 'vp/configs', to: 'vendor_payments#configs'
@@ -4090,6 +4099,9 @@ Rails.application.routes.draw do
     get 'em/awaiting_action', to: 'expense_management#awaiting_action'
     get 'em/configs', to: 'expense_management#configs'
   end
+
+  get 'dashboards/configs', to: 'dashboards#configs'
+  get 'dashboards/:route', to: 'dashboards#show'
   ######## Dashbaord Ends ##############
 
   ######### New Vendor Empanelment ########
@@ -4163,6 +4175,9 @@ Rails.application.routes.draw do
 
   # get 'form_entities', to: 'form_entities#index'
   # resources :form_entities
+  get 'forms/config/:name', to: 'forms#form_config'
+  get 'forms/config/:name/dependency', to: 'forms#form_dependency_config'
+  post 'forms/:form_name/entities/:entity_field_key/choices', to: 'forms#form_entity_choices'
   resources :forms
 
   resources :insights
@@ -4176,6 +4191,7 @@ Rails.application.routes.draw do
     get 'subscriptions/filters_config', to: 'subscriptions#filters_config'
     patch 'subscriptions/bulk_review_validate', to: 'subscriptions#bulk_review_validate'
     patch 'subscriptions/bulk_review', to: 'subscriptions#bulk_review'
+    put 'subscriptions/bulk_review', to: 'subscriptions#bulk_review'
     put 'subscriptions/validate_customer_params', to: 'subscriptions#validate_customer_params'
     resources :subscriptions do
       patch 'review', to: 'subscriptions#review'
@@ -4191,6 +4207,7 @@ Rails.application.routes.draw do
     get 'bills/payables', to: 'bills#payable_bills'
     patch 'bills/bulk_review_validate', to: 'bills#bulk_review_validate'
     patch 'bills/bulk_review', to: 'bills#bulk_review'
+    put 'bills/bulk_review', to: 'bills#bulk_review'
     resources :bills do
       patch 'review', to: 'bills#review'
       get 'transaction_status', to: 'bills#transaction_status'
@@ -4219,18 +4236,40 @@ Rails.application.routes.draw do
 
   get 'accounting_exports', to: 'accounting_exports#index'
 
-  get 'filters/:route', to: "filters#index"
-  get 'index/:route/config', to: "index#fetch_config"
-  get 'index/:route/counts', to: 'index#counts'
+  # Adding GET and POST support for all URL's as get does not support very large URL's
+  get 'filters', to: "filters#index"
+  post 'filters', to: "filters#index"
+  get 'filters/:route/choices/:field_key', to: "filters#choices"
+  post 'filters/:route/choices/:field_key', to: "filters#choices"
+
+  get 'index/config', to: 'index#fetch_config'
+  post 'index/config', to: 'index#fetch_config'
+  # get 'index/:route/config', to: "index#fetch_old_config"
+  # post 'index/:route/config', to: "index#fetch_config"
+  get 'index/:route/record_counts', to: 'index#record_counts'
+  post 'index/:route/record_counts', to: 'index#record_counts'
+  get 'index/:route/status_counts', to: 'index#status_counts'
+  post 'index/:route/status_counts', to: 'index#status_counts'
   get 'index/:route', to: "index#show"
+  post 'index/:route', to: "index#show"
+
+  get 'menu', to: 'menu#show'
+
+  get 'actions/:route', to: "actions#show"
+  get 'actions/:route/validate', to: "actions#validate"
 
   resources :views, controller: 'index_view_segments', except: [:show]
+
+  get 'cards/:route/:id', to: 'hover_card#route'
 
   get 'maps/auto_complete', to: 'maps#auto_complete'
   get 'maps/places/:id/details', to: 'maps#details'
   get 'maps/places/recent', to: 'maps#recent_places'
   post 'maps/distance_matrix', to: 'maps#distance_matrix'
 
+  patch 'users/:id/profile', to: 'user_profiles#update'
+
+  post 'clients/web', to: 'web_clients#create'
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
   # The priority is based upon order of creation: first created -> highest priority.

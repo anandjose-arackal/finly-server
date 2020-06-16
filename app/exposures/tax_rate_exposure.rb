@@ -1,28 +1,12 @@
 class TaxRateExposure < Exposures::API
 
-  def name
-    record.name
+  attribute :name, record_attribute: true
+  attribute :rate, record_attribute: true
+  attribute :cgst, record_attribute: true
+  attribute :sgst, record_attribute: true
+  attribute :igst, record_attribute: true
+  attribute :display_name do
+    "#{rate}% - #{name}"
   end
-
-  def rate
-    record.rate
-  end
-
-  def cgst
-    record.cgst
-  end
-
-  def sgst
-    record.sgst
-  end
-
-  def igst
-    record.igst
-  end
-
-  def display_name
-    record.display_name
-  end
-
 
 end

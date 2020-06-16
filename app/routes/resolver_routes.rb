@@ -7,6 +7,8 @@ Resolver::Router.draw do
   #   route "departments", Masters::Departments::AutoComplete, :department_2, options: {company: 156, env: :dev}
   #   route "departments", :department
   # end
+
+  # Masters
   scope :department do
     route "default", Masters::Departments::Resolver
   end
@@ -25,16 +27,93 @@ Resolver::Router.draw do
     route 'default', Masters::Categories::Resolver
   end
 
+  scope :index_view_segments do
+    route "default", IndexSegment::Resolver
+  end
+
+  scope :policies do
+    route "default", Masters::Policies::Resolver
+  end
+
+  scope :vendors do
+    route "default", Masters::Vendors::Resolver
+  end
+
+  scope :vendor_types do
+    route 'default', Masters::Vendors::Types::Resolver
+  end
+
+  scope :payment_terms do
+    route 'default', Masters::PaymentTerms::Resolver
+  end
+
+  scope :items do
+    route "default", Masters::Items::Resolver
+  end
+
+  scope :users do
+    route 'default', Masters::Users::Resolver
+  end
+
+  scope :rate_contracts do
+    route 'default', Masters::RateContracts::Resolver
+  end
+
+  scope :utility_subscriptions do
+    route 'default', Docs::UtilityBills::Subscriptions::Resolver
+  end
+
+  scope :bbps_billers do
+    route 'default', Docs::UtilityBills::Billers::Resolver
+  end
+
+  scope :agreements do
+    route 'default', Docs::P2P::Agreements::Resolver
+  end
+
+  # Docs
   scope :trips do
     route 'default', Docs::Trips::Resolver
   end
 
   scope :invoices do
     route "default", Docs::P2P::Invoices::Resolver
+    route "po", Docs::P2P::Invoices::Po::Resolver
+    route "non_po", Docs::P2P::Invoices::NonPo::Resolver
+    route "agreement", Docs::P2P::Invoices::Agreement::Resolver
   end
 
-  scope :index_view_segments do
-    route "default", IndexSegment::Resolver
+  scope :purchase_requests do
+    route 'default', Docs::P2P::PurchaseRequests::Resolver
   end
 
+  scope :purchase_orders do
+    route 'default', Docs::P2P::PurchaseOrders::Resolver
+    route 'advances', Docs::P2P::PurchaseOrders::Advances::Resolver
+  end
+
+  scope :inward_documents do
+    route 'pending', Docs::P2P::Inwards::Pending::Resolver
+    route 'received', Docs::P2P::Inwards::Received::Resolver
+  end
+
+  scope :credit_notes do
+    route 'default', Docs::P2P::CreditNotes::Resolver
+  end
+
+  scope :utility_bills do
+    route 'default', Docs::UtilityBills::Bills::Resolver
+  end
+
+  scope :payment_tickets do
+    route 'default', Docs::PaymentTickets::Resolver
+  end
+
+  scope :payments do
+    route 'default', Docs::PaymentTickets::Payments::Resolver
+  end
+
+  scope :upcoming_invoices do
+    route 'default', Docs::P2P::Invoices::Agreement::UpcomingInvoices::Resolver
+  end
 end

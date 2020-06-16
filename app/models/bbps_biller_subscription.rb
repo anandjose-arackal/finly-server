@@ -69,6 +69,7 @@ class BbpsBillerSubscription < ApplicationRecord
   belongs_to :cost_center, optional: true
   belongs_to :location, class_name: 'BranchLocation', optional: true
   belongs_to :user, class_name: 'User', optional: true
+  belongs_to :created_by, class_name: 'User', optional: true, foreign_key: :user_id
   belongs_to :status, class_name: 'BbpsBillerSubscriptionStatus', optional: true
   belongs_to :agreement, class_name: 'PaymentAgreement', optional: true
 
@@ -81,6 +82,9 @@ class BbpsBillerSubscription < ApplicationRecord
   has_many :pocs, class_name: 'User', through: :subscription_pocs, source: :user
   has_many :bbps_bills, class_name: 'BbpsBill', foreign_key: :subscription_id
   has_many :attachments, as: :resource, dependent: :destroy
+
+  has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment'
+  has_many :receiving_payments, foreign_key: 'receiving_user_id', class_name: 'Payment'
 
   after_update :cleanup # Destroy Biller Subscription fields for other billers if any
 
@@ -119,6 +123,19 @@ class BbpsBillerSubscription < ApplicationRecord
       # BbpsBillerSubscription.awaiting_action_items(user)
       awaiting_action_items(RequestStore.store[:current_user]&.id)
       # end
+    end
+  }
+
+  scope :with_status_id, -> (status_id) {
+    case status_id
+    when 90
+      where status_id: BbpsBillerSubscriptionStatus.ids_for(:draft, :retracted)
+    when BbpsBillerSubscriptionStatus::GROUP_AWAITING_APPROVAL
+      awaiting_action_items(RequestStore.store[:current_user]&.id)
+    when 92
+      where status_id: BbpsBillerSubscriptionStatus.ids_for(:approved, :auto_approved, :reactivated)
+    else
+      where status_id: status_id
     end
   }
 
@@ -339,4 +356,22 @@ class BbpsBillerSubscription < ApplicationRecord
   def self.human_name(options = {})
     options[:plural] ? 'Utility Bill Masters' : 'Utility Bill Master'
   end
+
+  # Used for tracking completion %
+  def review_pending?
+    BbpsBillerSubscriptionStatus.ids_for(:draft, :retracted, :rejected).include?(status_id)
+  end
+
+  def review_completed?
+    BbpsBillerSubscriptionStatus.ids_for(:approved, :auto_approved, :deactivated, :reactivated).include?(status_id)
+  end
+
+  def review_in_progress?
+    BbpsBillerSubscriptionStatus.ids_for(:awaiting_approval).include?(status_id)
+  end
+
+  def self.ransackable_scopes(auth_object = nil)
+    [:with_status_id]
+  end
+
 end
