@@ -122,7 +122,7 @@ class ImportBudgetUrbanCompany
                 invoice: budget_group.invoice,
                 purchase_request: budget_group.purchase_request,
                 budget_amount_attributes: {
-                    value: value,
+                    value: amount,
                     currency_id: 1
                 }
             )
