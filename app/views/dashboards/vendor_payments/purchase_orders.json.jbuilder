@@ -1,1 +1,1 @@
-json.result @op[:data]
+json.result @result.counts
