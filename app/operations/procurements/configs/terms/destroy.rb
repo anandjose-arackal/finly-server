@@ -13,7 +13,8 @@ class Procurements::Configs::Terms::Destroy < Procurements::Configs::Terms::Base
   end
 
   def process
-    if self.procurement_term.destroy?
+    
+    if self.procurement_term.destroy
       add_message :success, 'Successfully Deleted Procurement Term'
     else
       add_message :error, "Couldn't Delete Procurement Term"
