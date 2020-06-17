@@ -10,9 +10,9 @@ json.summary do
 end
 
 json.users do
-  json.array! @result.paginated_policy_user_roles do |pur|
-    json.merge! pur.user.as_json
+  json.array! @result.paginated_users do |user|
+    json.merge! user.as_json
   end
 end
 
-json.count @result.policy_user_roles.count
+json.count @result.users.count
