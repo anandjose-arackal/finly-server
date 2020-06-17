@@ -3,7 +3,27 @@ class BbpsBillStatusChecker
   def self.perform
     puts " ----------------------------- PERFORMING #{self.name} at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
 
+<<<<<<< HEAD
     BbpsBillStatusChecker::Background.perform_async
+=======
+    payments = Payment.where(parent_type: "BbpsBill").where(payment_status_id: [PaymentStatus.id_for(:processing), PaymentStatus.id_for(:possible_failure)])
+    payments.each do |payment|
+      bill = payment.parent
+      next unless bill.present? && bill.class.name == "BbpsBill"
+      order_number = bill.order_number
+      bank_transaction = payment.bbps_bank_transaction
+      params = {
+          order_number: order_number
+      }
+      Bbps::TransactionStatus.({params: params, "current_user" => payment.initiating_user}) do |op|
+        op.success do |result|
+          puts "SUCCESS: #{result}"
+          payment.update(payment_status_id: PaymentStatus.id_for(:completed))
+          payment.payment_order.update_order_status
+          payment.payment_order.update_processed_amount
+          bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed))
+          bill.update(status_id: BbpsBillStatus.id_for(:paid))
+>>>>>>> c1dee0795094a2af3ccd595c84fd08af333f3cd8
 
     puts " ----------------------------- FINISHED #{self.name} ------------------------------"
   end

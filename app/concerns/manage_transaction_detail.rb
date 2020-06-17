@@ -80,7 +80,12 @@
         merchant += finly_transaction.associated_transaction&.virtual_account&.account_number
       when PaymentPurpose.id_for(:utility_bill_payment)
         bill = finly_transaction.payment&.parent
-        merchant = "Bill ID: #{bill&.id} (Bill no. #{bill&.bill_number}) at #{bill.biller&.biller_name}"
+        if finly_transaction.credit?
+          merchant = "Reversal for Bill ID: #{bill&.id} (Bill no. #{bill&.bill_number}) at #{bill.biller&.biller_name}"
+        elsif finly_transaction.debit?
+          merchant = "Bill ID: #{bill&.id} (Bill no. #{bill&.bill_number}) at #{bill.biller&.biller_name}"
+        end
+        merchant
       end
       merchant
     end
