@@ -27,11 +27,12 @@ class Exposures::API::Attribute
             value = record.send(name)
           end
         else
-          value = block.call
+          value = instance_eval &block
         end
 
         return value unless exposure
         return value if value.class <= Exposures::API
+        return value if value.nil?
         raise "#{value.class.name} does not have an exposure defined" unless value.respond_to?(:to_exposure)
         return value.to_exposure
       end

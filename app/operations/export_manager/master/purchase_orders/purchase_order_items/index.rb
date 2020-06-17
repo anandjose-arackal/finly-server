@@ -1,8 +1,8 @@
 class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportManager::Builders::Spreadsheet
 
 
-  label 'Export Item wise'
-  description 'Purchase Orders Export'
+  label 'Spreadsheet (Line Items)'
+  description 'Purchase Orders Export (Line Items)'
   configurable true
   system :vp
   screen ['purchase_orders.index', 'po_advances.index']
@@ -68,14 +68,8 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
   end
 
   def input
-    result = ::Procurements::PurchaseOrders::Index.(user, params)
-    unless result.success?
-      add_message :error, result.messages[:error]
-      return
-    end
-    po = result.purchase_orders
-
-    purchase_order_items = PurchaseOrderItem.with_purchase_order_id(po.pluck(:id))
+    po = resolve 'purchase_orders.default'
+    PurchaseOrderItem.where "purchase_order_id in (#{po.select('id').to_sql})"
   end
 
   def procurement_name(item)
@@ -214,7 +208,7 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
   end
 
   def approved_reviewers(item)
-    purchase_order(item)&.dlrms&.where(action_id: TrailAction.id_for(:approve))&.includes(:reviewer)&.map {|dlr| dlr.reviewer.name}&.join(" ,")
+    purchase_order(item)&.dlrms&.where(action_id: TrailAction.id_for(:approve))&.includes(:reviewer)&.map { |dlr| dlr.reviewer.name }&.join(" ,")
   end
 
   def department(item)

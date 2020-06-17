@@ -53,33 +53,59 @@ class Notification < ApplicationRecord
   validates :user_id, presence: true
   validates :notification_type_id, presence: true
 
+  def record_type
+    case object_type
+    when "Report"
+      object = "Report"
+    when "Money Request"
+      object = "Money Request"
+    when "Expense"
+      object = "Expense"
+    when "Card"
+      object = "Card"
+    when "Wallet"
+      object = "Finly Money"
+    when "Payment"
+      object = "Cash"
+    when "PaymentOrder", "Payment Order"
+      object = "Payment Order"
+    when "Purchase Order"
+      object = "Purchase Order"
+    when 'Invoice' # Inward Invoice
+      object = 'Invoice'
+    else
+      object = nil
+    end
+    object
+  end
+
   def generate_title
     content = ""
-    object = ""
-    case object_type
-      when "Report"
-        object = "Report"
-      when "Money Request"
-        object = "Money Request"
-      when "Expense"
-        object = "Expense"
-      when "Card"
-        object = "Card"
-      when "Wallet"
-        object = "Finly Money"
-      when "Payment"
-        object = "Cash"
-      when "PaymentOrder", "Payment Order"
-        object = "Payment Order"
-      when "Purchase Order"
-        object = "Purchase Order"
-      when 'Invoice' # Inward Invoice
-        object = 'Invoice'
-      else
-        # do nothing
-    end
+    object = record_type
+    # case object_type
+    #   when "Report"
+    #     object = "Report"
+    #   when "Money Request"
+    #     object = "Money Request"
+    #   when "Expense"
+    #     object = "Expense"
+    #   when "Card"
+    #     object = "Card"
+    #   when "Wallet"
+    #     object = "Finly Money"
+    #   when "Payment"
+    #     object = "Cash"
+    #   when "PaymentOrder", "Payment Order"
+    #     object = "Payment Order"
+    #   when "Purchase Order"
+    #     object = "Purchase Order"
+    #   when 'Invoice' # Inward Invoice
+    #     object = 'Invoice'
+    #   else
+    #     # do nothing
+    # end
 
-    content += object
+    content += object if object.present?
 
     action = ""
     case self.action_type_id

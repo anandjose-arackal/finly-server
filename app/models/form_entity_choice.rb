@@ -29,9 +29,9 @@ class FormEntityChoice < ApplicationRecord
   def as_json(options = {})
     {
         id: uuid,
-        value: value,
-        position: position,
-        active: active,
+        name: name,
+        # position: position,
+        # active: active,
     }
   end
 

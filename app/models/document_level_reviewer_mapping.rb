@@ -82,4 +82,6 @@ class DocumentLevelReviewerMapping < ApplicationRecord
   validates :level_id, presence: true
   validates :document_reviewer_mappable_id, presence: true
   validates :document_reviewer_mappable_type, presence: true
+
+  default_scope {order(level_number: :asc)}
 end

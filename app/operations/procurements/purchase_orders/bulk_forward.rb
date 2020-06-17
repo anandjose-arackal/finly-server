@@ -6,6 +6,7 @@ class Procurements::PurchaseOrders::BulkForward < Procurements::PurchaseOrders::
         success: [],
         error: []
     }
+    params[:document_ids] ||= params[:id]
     unless params[:document_ids].present? || params[:document_ids].is_a?(Array)
       add_message :error, "Invalid Type"
     end
@@ -49,9 +50,9 @@ class Procurements::PurchaseOrders::BulkForward < Procurements::PurchaseOrders::
       data_success = {}
       data_error = {}
       workflow_input = {
-        document: purchase_order,
-        aasm_event: 'forward',
-        forwarded_to_user: forwarded_to_user
+          document: purchase_order,
+          aasm_event: 'forward',
+          forwarded_to_user: forwarded_to_user
       }
 
       op = WorkflowManager::Base.(user, workflow_input)

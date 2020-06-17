@@ -3,4 +3,6 @@ class Forms::API::Entity::Types::Lookup < Forms::API::Entity::Base
   hint 'Select value'
 
   consumes_choices!
+
+  operators :eq_any#, :blank, :present
 end

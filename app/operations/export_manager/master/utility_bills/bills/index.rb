@@ -1,13 +1,12 @@
 class ExportManager::Master::UtilityBills::Bills::Index < ExportManager::Builders::Spreadsheet
 
-  label 'Export'
+  label 'Spreadsheet'
   description 'Utility Bills'
   configurable true
   system :vp
-  screen 'bbps_bills.index'
+  screen 'utility_bills.index'
+  resolver 'utility_bills.default'
   handle :utility_bills
-  validate :input
-
 
   attribute :id
   attribute :bill_sequence_id
@@ -66,19 +65,6 @@ class ExportManager::Master::UtilityBills::Bills::Index < ExportManager::Builder
   attribute :category
   attribute :hsn_sac
   attribute :paid_at
-
-
-  def input
-    result = ::Docs::UtilityBills::Bills::Ops::Index.(params: params, current_user: user)
-
-    unless result.success?
-      add_message :error, result.messages[:error]
-      return
-    end
-
-    result['result']['bills']
-  end
-
 
   def id(record)
     record.id

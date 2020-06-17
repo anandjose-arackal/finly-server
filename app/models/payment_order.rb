@@ -186,7 +186,7 @@ class PaymentOrder < ApplicationRecord
 
   def payment_mode
     if mode.blank?
-      return self.payments.first&.payment_mode
+      return self.payments.limit(1).first&.payment_mode
     end
     mode || super
   end

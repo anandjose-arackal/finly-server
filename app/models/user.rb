@@ -123,6 +123,8 @@ class User < ApplicationRecord
   has_many :finance_report_tracks, -> {finance_manager_role}, class_name: 'ReportTrack', foreign_key: :modified_user_id
   has_many :finance_reports, -> {distinct}, source: :report, through: :finance_report_tracks
   has_many :policy_user_roles
+  # Fixme: Replace this with policies as policies should ideally be deprecated
+  has_many :policy_user_roles_policies, -> { where(:'policy_user_roles.deleted_at' => nil) }, through: :policy_user_roles, dependent: :destroy
   # has_many :reviewed_reports, class_name: 'Report'
   has_one :balance_sheet, dependent: :destroy
   has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment'
@@ -414,6 +416,26 @@ class User < ApplicationRecord
         relevant_user_ids = UserPanelSubscription.where(user_id: ids).where(app.to_sym => true).pluck(:user_id)
       end
       where(id: relevant_user_ids)
+    end
+  }
+
+  # Simplified version of the above query
+  scope :with_application, -> (application=nil) {
+    case application
+    when 'vp', :vp
+      app = 'yes_bank_account_transfer'
+    when 'em', 'ft', :em, :ft
+      app = 'expense_management'
+    when 'fc', :fc
+      app = 'invoicing_system'
+    when 'fi', :fc
+      app = 'finly_insights'
+    else
+      # do nothing?
+      app = nil
+    end
+    if app.present? and not app == 'finly_insights'
+      joins(:user_panel_subscription).where(user_panel_subscriptions: {app.to_sym => true})
     end
   }
 
@@ -1020,8 +1042,30 @@ class User < ApplicationRecord
     UserRole.where(id: role_ids)
   end
 
+  def has_application_role?(role_id, application)
+    role_id = [role_id] unless role_id.respond_to?(:each)
+
+    purpose_id = nil
+    case application.to_s
+    when 'em', 'expense_management', Purpose.id_for(:expense_management).to_s
+      purpose_id = Purpose.id_for(:expense_management)
+    when 'vp', 'vendor_payments', Purpose.id_for(:vendor_payments).to_s
+      purpose_id = Purpose.id_for(:vendor_payments)
+    else
+      return false
+    end
+
+    role_mapping.each do |mapping|
+      next unless mapping.purpose_id == purpose_id
+      next unless role_id.include?(mapping.user_role_id)
+
+      return true
+    end
+    false
+  end
+
   def company_admin?
-    role_mapping.expense_management.admin.present?
+    has_application_role?(UserRole.id_for(:admin), :em)
   end
 
   # If policy is passed checks if the user is the admin of the given policy
@@ -1039,7 +1083,7 @@ class User < ApplicationRecord
 
   # this method returns if they're an admin in either app, unless specified
   def admin?(application = nil)
-    case application
+    case application.to_s
     when "em"
       company_admin?
     when "vp"
@@ -1096,7 +1140,7 @@ class User < ApplicationRecord
   alias_method :vendor_payments_creditor?, :vendor_payment_finance?
 
   def vendor_payment_admin?
-    self.role_mapping.vendor_payments.admin.present?
+    has_application_role?(UserRole.id_for(:admin), :vp)
   end
 
   alias_method :vendor_payments_admin?, :vendor_payment_admin?
@@ -1209,14 +1253,14 @@ class User < ApplicationRecord
   def json_for_trail(options = {})
     if options[:vendor_show]
       data = {
-        id: id,
-        name: name,
-        email: email,
-        employee_id: self.profile&.employee_id,
-        mobile_number: self.mobile_number,
-        location_name: self.location&.name,
-        department_name: self.department&.full_name,
-        status: self.active
+          id: id,
+          name: name,
+          email: email,
+          employee_id: self.profile&.employee_id,
+          mobile_number: self.mobile_number,
+          location_name: self.location&.name,
+          department_name: self.department&.full_name,
+          status: self.active
       }
       return data
     elsif options[:streamsets]
@@ -1460,6 +1504,21 @@ class User < ApplicationRecord
     RequestStore.store[:current_user]
   end
 
+  # has_roles method is defined to support including policy_user_roles in users to prevent N+1 query problem
+  def has_roles?(role_id)
+    role_id = [role_id] unless role_id.respond_to?(:each)
+    role_id = UserRole.ids_for(role_id) unless role_id.first.is_a?(Integer)
+    policy_user_roles.each do |role|
+      next unless role.user_id == self.id
+      next unless role_id.include?(role.user_role_id)
+
+      return true
+    end
+
+    false
+    # policy_user_roles.where(user_id: self.id, user_role_id: role_id).count > 0
+  end
+
   def has_policy_role?(role_id, document = nil)
     if document.present?
       policy = Policy.with_company_id(self.company_id).find_by_id document.policy_id
@@ -1589,6 +1648,7 @@ class User < ApplicationRecord
   def is_agreement_invoice_auditor?(document = nil)
     self.has_policy_role?(UserRole.id_for(:agreement_invoice_auditor), document)
   end
+
   ########### Agreement Based Payments Role End #############
 
   def is_po_invoice_initiator?(document = nil)
@@ -1695,6 +1755,29 @@ class User < ApplicationRecord
     UserRoleMapping.with_user_id(associated_user_ids).pluck(:user_role_id).uniq + PolicyUserRole.with_user_id(associated_user_ids).pluck(:user_role_id).uniq
   end
 
+  def has_permission?(permissions)
+    return true if permissions.blank?
+
+    permissions = [permissions] unless permissions.is_a?(Array)
+    permissions = UserRole.ids_for(permissions) unless permissions.first.is_a?(Integer)
+    return true if permissions.include?(UserRole.id_for(:admin)) and admin?(RequestStoreUtil.current_app)
+    return true if has_roles?(permissions)
+
+    false
+  end
+
+  def active?
+    active and not default_password and first_name.present? and last_name.present?
+  end
+
+  def pending?
+    first_name.blank? or default_password
+  end
+
+  def inactive?
+    first_name.present? and not active
+  end
+
   protected
 
   # Checks whether a password is needed or not. For validations only.
@@ -1775,6 +1858,10 @@ class User < ApplicationRecord
     unless self.save
       raise "Failed to save unique ID: #{self.errors.full_messages}"
     end
+  end
+
+  def self.ransackable_scopes(auth_object = nil)
+    [:filter_state]
   end
 
 

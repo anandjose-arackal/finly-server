@@ -18,7 +18,7 @@ class BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor 
     # if this an invoice from a PO, a few things need to be sorted out first.
     # Firstly, the amount considered in the invoice item should reduce the proporionate amount consumed from the PO invoice item it is linked to
     # now based on whether it's a good ors service, we have to put the billed_amount_value attribute - which contains the amount we want to consider in the budget
-    if invoice_item.purchase_order_item_id.present?
+    if invoice_item.purchase_order_item_id.present? and invoice_item.purchase_order_item.present?
       po_item = invoice_item.purchase_order_item
       if invoice_item.inventory_line_item.goods?
         billed_quantity = invoice_item.quantity

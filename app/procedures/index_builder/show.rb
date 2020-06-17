@@ -2,6 +2,7 @@ class IndexBuilder::Show < Transactions::API
 
   step :find_builder
   step :resolve
+  pass :sanitize_columns
   step :include_associations
   step :load_config
 
@@ -22,9 +23,15 @@ class IndexBuilder::Show < Transactions::API
   end
 
   def resolve(context, builder:, params:, **)
-    # Todo fetch includes
-    Resolver::Transactions::Resolve.with(context, builder.resolver, paginate: true, filter: true, includes: builder)
+    builder.resolve(context)
+
     true
+  end
+
+  def sanitize_columns(context, params:, **)
+    if params[:columns].present? and not params[:columns].respond_to?(:each)
+      params[:columns] = params[:columns].split(",")
+    end
   end
 
   def include_associations(context, builder:, params:, **)
@@ -36,7 +43,7 @@ class IndexBuilder::Show < Transactions::API
   def load_config(context, builder:, current_user:, params:, **)
     context['model.index'] = []
     context['model.records'].each do |record|
-      context['model.index'] << builder.build(current_user, record.to_exposure, params[:columns])
+      context['model.index'] << builder.build(current_user, record, params[:columns])
     end
 
     true

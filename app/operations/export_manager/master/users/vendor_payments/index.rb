@@ -7,7 +7,7 @@ class ExportManager::Master::Users::VendorPayments::Index < ExportManager::Build
   system :vp
   screen 'users.vp.index'
   handle :vp_users
-  validate :input
+  # validate :input
 
   attribute :employee_id
   attribute :name
@@ -16,13 +16,7 @@ class ExportManager::Master::Users::VendorPayments::Index < ExportManager::Build
   attribute :status
 
   def input
-    result = ::BankTransfer::Users::Index.(user, params)
-    unless result.success?
-      add_message :error, result.messages[:error]
-      return
-    end
-    users = result.users.includes(:profile)
-    users
+    resolve('users.default').includes(:profile)
   end
 
 

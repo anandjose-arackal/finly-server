@@ -2,7 +2,7 @@ class Procurements::PurchaseOrders::Reject < Procurements::PurchaseOrders::Base
   attr_accessor :purchase_order, :procurement, :purchase_order_params
 
   def pre_validate
-    if params[:note].blank?
+    if params[:note].blank? and not StringUtils.to_bool(params[:skip_reject_reason])
       add_message :error, "Please input a reason for rejection."
       return
     end

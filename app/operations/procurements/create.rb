@@ -62,7 +62,7 @@ class Procurements::Create < Procurements::Base
 
     end
     if op.success?
-      add_message :success, 'Successfully created new procurement'
+      add_message :success, "Successfully created new #{params[:document_type].titleize}"
     else
       add_message :error, op.messages[:error]
     end

@@ -2,7 +2,7 @@ class Procurements::Invoices::BulkApprove < Procurements::Invoices::Base
   attr_accessor :invoices
 
   def init
-    invoice_ids = params[:ids] || params[:invoice_ids]
+    invoice_ids = params[:id] || params[:ids] || params[:invoice_ids]
 
     unless invoice_ids.is_a?(Array)
       add_message :error, 'Invalid configuration'

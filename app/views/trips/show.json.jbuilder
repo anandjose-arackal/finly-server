@@ -9,6 +9,9 @@ json.start_date model.start_date
 json.end_date model.end_date
 json.purpose model.purpose
 json.trip_type_id model.trip_type_id
+model.custom_fields.each do |custom_field|
+  json.set! custom_field.field_key, custom_field.value
+end
 json.passengers do
   json.array! model.passengers
 end

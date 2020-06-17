@@ -7,7 +7,7 @@ class ExportManager::Builders::Spreadsheet < ExportManager::API
   type :spreadsheet
 
   def self.config
-    sections = self.sections.reject {|s| s.attributes.blank?}.as_json
+    sections = self.sections.reject { |s| s.attributes.blank? }.as_json
     config = super()
     config[:fields] = sections if config.present?
     config

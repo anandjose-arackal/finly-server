@@ -304,7 +304,9 @@ class ApplicationController < ActionController::Base
     authorized_list = [authorized_list] if authorized_list.class.name == String.name
     unless authorized_list.include?(request.remote_ip)
       head 403
+      return false
     end
+    true
   end
 
   def whitelisted?(ip, type_id)
@@ -343,6 +345,7 @@ class ApplicationController < ActionController::Base
     end
 
     verify_user_session(doorkeeper_token)
+    current_user&.update(last_activity_at: DateTime.now)
   end
 
   def verify_user_session(doorkeeper_token)
