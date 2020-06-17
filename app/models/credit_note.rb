@@ -45,6 +45,7 @@ class CreditNote < ApplicationRecord
   include Sequenced::ActsAsSequenced
   include EventProducer
 
+
   event_channel 'credit_note'
 
   acts_as_sequenced column: :sequence_id, purpose: :credit_note, editable: false, prefix: 'CN'
@@ -53,6 +54,7 @@ class CreditNote < ApplicationRecord
 
   belongs_to :company, optional: true
   belongs_to :user, optional: true
+  belongs_to :created_by, class_name: 'User', optional: true, foreign_key: :user_id
   belongs_to :status, class_name: "CreditNoteStatus", optional: true
   belongs_to :invoice, optional: true
   belongs_to :procurement, optional: true
@@ -252,9 +254,9 @@ class CreditNote < ApplicationRecord
     joins(:net_adjustable_amount).where("amounts.value > ?", 0).where(status_id: CreditNoteStatus.ids_for(:approved, :auto_approved, :partially_adjusted, :unadjusted))
   }
 
-  scope :filter_date, -> (start_date, end_date) {where('credit_note_date >= ? AND credit_note_date =< ? ', Date.parse(start_date), Date.parse(end_date))}
-  scope :filter_created_on_date, -> (start_date, end_date) {where("created_at >= ? AND created_at <= ?", Date.parse(start_date).beginning_of_day, Date.parse(end_date).end_of_day)}
-  scope :filter_approved_on_date, -> (start_date, end_date) {where("approved_at >= ? AND approved_at <= ?", Date.parse(start_date).beginning_of_day, Date.parse(end_date).end_of_day)}
+  scope :filter_date, -> (start_date, end_date) { where('credit_note_date >= ? AND credit_note_date =< ? ', Date.parse(start_date), Date.parse(end_date)) }
+  scope :filter_created_on_date, -> (start_date, end_date) { where("created_at >= ? AND created_at <= ?", Date.parse(start_date).beginning_of_day, Date.parse(end_date).end_of_day) }
+  scope :filter_approved_on_date, -> (start_date, end_date) { where("approved_at >= ? AND approved_at <= ?", Date.parse(start_date).beginning_of_day, Date.parse(end_date).end_of_day) }
 
   scope :filter_amount, -> (gteq, lteq) do
     gteq = gteq.to_f
@@ -276,6 +278,19 @@ class CreditNote < ApplicationRecord
   scope :order_created_at, -> (order_type = "ASC") {
     order_type = format_order_type(order_type)
     reorder("credit_notes.created_at #{order_type}")
+  }
+
+  scope :with_status_id, -> (status_id) {
+    case status_id
+    when 90
+      where status_id: CreditNoteStatus.ids_for(:draft, :retracted)
+    when 91
+      awaiting_action_items(RequestStore.store[:current_user]&.id)
+    when 92
+      where status_id: CreditNoteStatus.ids_for(:approved, :auto_approved, :partially_adjusted, :unadjusted)
+    else
+      where status_id: status_id
+    end
   }
 
   def self.format_order_type(order_type)
@@ -413,14 +428,29 @@ class CreditNote < ApplicationRecord
       status_ids.push CreditNoteStatus.id_for(status)
     end
 
-    status_ids.reject {|status_id| status_id.nil?}
+    status_ids.reject { |status_id| status_id.nil? }
   end
 
   def self.open_statuses
     self.status_ids(:draft, :retracted, :rejected)
   end
 
-  # Transitionable Methods End #
+  def self.ransackable_scopes(auth_object = nil)
+    [:with_status_id]
+  end
+
+  # Used for tracking completion %
+  def review_pending?
+    CreditNoteStatus.ids_for(:draft, :retracted, :rejected).include?(status_id)
+  end
+
+  def review_completed?
+    CreditNoteStatus.ids_for(:approved, :auto_approved, :partially_adjusted, :adjusted, :voided, :unadjusted).include?(status_id)
+  end
+
+  def review_in_progress?
+    CreditNoteStatus.ids_for(:awaiting_approval).include?(status_id)
+  end
 
   private
 
@@ -430,8 +460,8 @@ class CreditNote < ApplicationRecord
     # Gross Receivable Amount
     # Only picks from the items where item type is QTY Change / Price Drop
     gross_receivable_amount_value = items.
-        filter {|item| CreditNoteItemType.ids_for(:qty_change, :price_drop).include?(item.credit_note_item_type_id)}.
-        map {|item| item.taxable_amount&.value}.compact.sum
+        filter { |item| CreditNoteItemType.ids_for(:qty_change, :price_drop).include?(item.credit_note_item_type_id) }.
+        map { |item| item.taxable_amount&.value }.compact.sum
 
     gross_receivable_amount_value = precision_value(gross_receivable_amount_value)
 
@@ -443,7 +473,7 @@ class CreditNote < ApplicationRecord
     end
 
     # Tax Amount (GST)
-    tax_amount_value = items.map {|item| item.tax_amount&.value}.compact.sum
+    tax_amount_value = items.map { |item| item.tax_amount&.value }.compact.sum
     if tax_amount.present?
       tax_amount.update(value: tax_amount_value)
     else
@@ -453,8 +483,8 @@ class CreditNote < ApplicationRecord
     # Where TDS Applicable is yes
     # Only picks from the items where item type is QTY Change / Price Drop
     tds_applicable_amount = items.
-        filter {|item| item.tds_applicable? and CreditNoteItemType.ids_for(:qty_change, :price_drop).include?(item.credit_note_item_type_id)}.
-        map {|item| item.taxable_amount&.value}.compact.sum
+        filter { |item| item.tds_applicable? and CreditNoteItemType.ids_for(:qty_change, :price_drop).include?(item.credit_note_item_type_id) }.
+        map { |item| item.taxable_amount&.value }.compact.sum
     tds_amount_value = 0
     tds_rate_percentage = tds_rate&.tds
     if tds_rate_percentage.present?
@@ -496,7 +526,7 @@ class CreditNote < ApplicationRecord
     # gross_receivable_amount_value = items.map {|item| item.taxable_amount&.value}.compact.sum
     # Only picks from the items where item type is QTY Change / Price Drop
     gross_receivable_amount_value = items.
-        filter {|item| CreditNoteItemType.ids_for(:qty_change, :price_drop).include?(item.credit_note_item_type_id)}.
+        filter { |item| CreditNoteItemType.ids_for(:qty_change, :price_drop).include?(item.credit_note_item_type_id) }.
         map(&:get_taxable_amount).compact.sum
 
 
@@ -518,7 +548,7 @@ class CreditNote < ApplicationRecord
     # Where TDS Applicable is yes
     # Only picks from the items where item type is QTY Change / Price Drop
     tds_applicable_amount = items.
-        filter {|item| item.tds_applicable? and CreditNoteItemType.ids_for(:qty_change, :price_drop).include?(item.credit_note_item_type_id)}.
+        filter { |item| item.tds_applicable? and CreditNoteItemType.ids_for(:qty_change, :price_drop).include?(item.credit_note_item_type_id) }.
         map(&:get_taxable_amount).compact.sum
 
     tds_amount_value = 0

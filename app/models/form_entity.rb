@@ -8,13 +8,12 @@
 #  form_id                      :string(36)       not null
 #  form_section_id              :string(36)       not null
 #  created_by_user_id           :integer
-#  field_key                    :string(255)      not null
+#  entity_key                   :string(255)      not null
 #  label                        :string(255)
 #  placeholder                  :string(255)
 #  hint                         :string(255)
-#  field_type                   :string(255)
+#  entity_type                  :string(255)
 #  default_value                :string(255)
-#  multiple                     :boolean
 #  editable                     :boolean
 #  required                     :boolean
 #  active                       :boolean
@@ -22,33 +21,32 @@
 #  visible                      :boolean
 #  position                     :integer
 #  custom_field                 :boolean
-#  dependent                    :boolean
-#  conditional_required         :boolean
 #  can_visible_be_changed       :boolean
 #  can_editable_be_changed      :boolean
 #  can_required_be_changed      :boolean
 #  can_uniqueness_be_changed    :boolean
 #  can_be_disabled              :boolean
 #  can_label_be_renamed         :boolean
-#  can_not_be_hidden            :boolean
-#  can_be_filtered              :boolean
 #  can_choices_be_changed       :boolean
-#  show_in_bulk_import          :boolean
-#  allow_sort_in_filter         :boolean
 #  allow_clearing_default_value :boolean
 #  options                      :text(65535)
-#  chained                      :text(65535)
-#  data_provider                :text(65535)
 #  deleted_at                   :datetime
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
-#  choices_provider             :text(65535)
+#  choices_scope                :text(65535)
 #  internal                     :boolean          default(FALSE)
 #  is_modified                  :boolean          default(FALSE)
-#  field_path                   :string(255)
+#  entity_path                  :string(255)
 #  parent_id                    :string(255)
 #  populate_if_empty            :string(255)
-#  associate_custom_fields      :boolean          default(FALSE)
+#  type                         :string(255)
+#  config                       :text(65535)
+#  associate_custom_fields      :boolean
+#  compute                      :boolean
+#  compute_enabled              :boolean
+#  compute_type_id              :integer
+#  compute_formula              :string(255)
+#  compute_lookup_entity_id     :string(255)
 #
 
 class FormEntity < ApplicationRecord
@@ -60,19 +58,21 @@ class FormEntity < ApplicationRecord
   belongs_to :form_section
   belongs_to :form
   belongs_to :parent, class_name: 'FormEntity', optional: true, primary_key: :uuid, foreign_key: :parent_id
+  belongs_to :created_by, optional: true, class_name: "User", foreign_key: :created_by_user_id
 
   has_many :entities, class_name: 'FormEntity', foreign_key: :parent_id, primary_key: :uuid
-  has_many :choices, class_name: 'FormEntityChoice', dependent: :destroy
+  has_many :form_entity_choices, class_name: 'FormEntityChoice', dependent: :destroy
 
-  accepts_nested_attributes_for :choices
+  accepts_nested_attributes_for :form_entity_choices
 
   serialize :options, JSON
   serialize :chained, JSON
-  serialize :scope, JSON
+  serialize :choices_provider, JSON
 
   scope :root, -> {where parent_id: nil}
   scope :system_fields, -> {where.not custom_field: true}
   scope :custom_fields, -> {where custom_field: true}
+  scope :exclude_internal, -> {where.not internal: true}
 
   def populate_if_empty
     val = super()
@@ -81,12 +81,15 @@ class FormEntity < ApplicationRecord
     Object.const_get(val)
   end
 
-  def scope
+  def choices_provider
     val = super()&.with_indifferent_access
     return nil unless val.present?
 
-    handler = Forms::API::Entity::Scope.handler(val[:type])
-    handler.new val, self
+    Choices[val[:type]].new(val[:config], form_entity: self)
+  end
+
+  def choices(params: {}, user:)
+    choices_provider&.choices(params: params, user: user)
   end
 
   def schema
@@ -121,9 +124,10 @@ class FormEntity < ApplicationRecord
         allow_clearing_default_value: allow_clearing_default_value,
         options: options,
         chained: chained,
-        scope: scope,
+        choices_provider: choices_provider&.config,
         internal: internal,
         field_path: field_path
     }
   end
+
 end

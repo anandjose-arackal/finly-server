@@ -1,20 +1,8 @@
 class Procurements::PurchaseOrders::BulkApprove < Procurements::PurchaseOrders::Base
   attr_accessor :purchase_orders
 
-  def pre_validate
-    super
-    if params[:password].blank?
-      add_message :error, 'You need to provide your password to initiate the transfer'
-      return
-    end
-    unless user.valid_password?(params[:password])
-      add_message :error, 'Invalid Password'
-      return
-    end
-  end
-
   def init
-    purchase_order_ids = params[:ids] || params[:purchase_order_ids]
+    purchase_order_ids = params[:id] || params[:ids] || params[:purchase_order_ids]
 
     unless purchase_order_ids.is_a?(Array)
       add_message :error, 'Invalid configuration'
@@ -26,7 +14,8 @@ class Procurements::PurchaseOrders::BulkApprove < Procurements::PurchaseOrders::
 
   def validate
     if self.purchase_orders.empty?
-      add_message :error, 'No Purchase Orders found'
+      add_message :error, "None of the purchase orders are in a state to be approved"
+      return
     end
     accept_po = []
     self.purchase_orders.each do |purchase_order|
@@ -39,7 +28,7 @@ class Procurements::PurchaseOrders::BulkApprove < Procurements::PurchaseOrders::
  
     self.purchase_orders = self.purchase_orders.where(id: accept_po)
 
-    if self.purchase_orders.blank?
+    if self.purchase_orders.empty?
       add_message :error, "None of the purchase orders are in a state to be approved"
       return
     end

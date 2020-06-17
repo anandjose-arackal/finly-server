@@ -15,7 +15,7 @@ class Dashboard::VendorPayments::Invoices < Dashboard::VendorPayments::Base
   end
 
 
-  class Dashboard::VendorPayments::Invoices::DashboardPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class Dashboard::VendorPayments::Invoices::DashboardPresenter < Dashboard::VendorPayments::Base::Presenter
     attr_accessor :invoices, :counts
 
     has_scope :filter_status_id
@@ -42,49 +42,30 @@ class Dashboard::VendorPayments::Invoices < Dashboard::VendorPayments::Base
       self.invoices = apply_scopes(self.invoices, general_filter_params)
       self.counts = []
 
-      if params[:action] == 'non_po_invoices'
-        invoice_type = 'non_po_invoice'
-      elsif params[:action] == 'po_invoices'
-        invoice_type = 'po_invoice'
-      else
-        # nothin
-      end
-          
-
       if user.vendor_payments_admin?
+        # rule = Rules::Builder[]
         admin_data = {
           type: 'admin',
           data: [
             {
               title: "Total",
               count: invoices.count,
-              filters: [
-                {filter_invoice_type: invoice_type}
-              ]
+              url: build_path("invoices", "All", nil),
             },
             {
               title: "Processing",
               count: apply_scopes(invoices, {filter_status_id: InwardInvoiceStatus.id_for(:processing)})&.count,
-              filters: [
-                {filter_invoice_type: invoice_type},
-                {filter_status: "processing"}
-              ]
+              url: build_path("invoices", "Processing", InwardInvoiceStatus.id_for(:processing))
             },
             {
               title: "Approved",
               count: apply_scopes(invoices, {filter_status_id: InwardInvoiceStatus.id_for(:approved)})&.count,
-              filters: [
-                {filter_invoice_type: invoice_type},
-                {filter_status: "approved"}
-              ]
+              url: build_path("invoices", "Approved", InwardInvoiceStatus.id_for(:approved))
             },
             {
               title: "Paid",
               count: apply_scopes(invoices, {filter_status_id: InwardInvoiceStatus.id_for(:paid)})&.count,
-              filters: [
-                {filter_invoice_type: invoice_type},
-                {filter_status: "paid"}
-              ]
+              url: build_path("invoices", "Paid", InwardInvoiceStatus.id_for(:paid))
             }
           ]
         }
@@ -93,72 +74,44 @@ class Dashboard::VendorPayments::Invoices < Dashboard::VendorPayments::Base
       end
 
       if user.is_po_invoice_initiator? || user.is_non_po_invoice_initiator?
+        rule = Rules::Builder[:created_by_user_id].eq_any(value: user.id).with_meta([{id: user.id, name: user.name}])
         personal_data = {
           type: 'personal',
           data: [
             {
               title: "Total",
               count: apply_scopes(invoices, {with_created_by_user_id: user.id})&.count,
-              filters: [
-                {filter_invoice_type: invoice_type},
-                {filter_user: true}
-              ]
+              url: build_path("invoices", "All", nil, rule: rule),
             },
             {
               title: "Processing",
               count: apply_scopes(invoices, {with_created_by_user_id: user.id, filter_status_id: InwardInvoiceStatus.id_for(:processing)})&.count,
-              filters: [
-                {filter_invoice_type: invoice_type},
-                {filter_user: true},
-                {filter_status: "processing"}
-              ]
+              url: build_path("invoices", "Processing", InwardInvoiceStatus.id_for(:processing), rule: rule)
             },
             {
               title: "Approved",
               count: apply_scopes(invoices, {with_created_by_user_id: user.id, filter_status_id: InwardInvoiceStatus.id_for(:approved)})&.count,
-              filters: [
-                {filter_invoice_type: invoice_type},
-                {filter_user: true},
-                {filter_status: "approved"}
-              ]
+              url: build_path("invoices", "Approved", InwardInvoiceStatus.id_for(:approved), rule: rule)
             }
           ]
         }
         self.counts.push(personal_data)
       end
 
-      # Set Date Filters in Filters
-      # Done because the filters in index page and the filters passed in dashboard for date filters are different
-      self.counts.each do |count_object|
-        count_object[:data].each do |data|
-           if params[:filter_creation_date].present? && params[:filter_creation_date][:from].present?
-             filter_date = {'filter_creation_date[from]': params[:filter_creation_date][:from]}
-             data[:filters].push(filter_date)
-           end
-
-          if params[:filter_creation_date].present? && params[:filter_creation_date][:to].present?
-             filter_date = {'filter_creation_date[to]': params[:filter_creation_date][:to]}
-             data[:filters].push(filter_date)
-           end
-        end
-      end
-
-      # if user.is_invoice_reviewer? || user.vendor_payments_admin?
-      #   awaiting_invoices = Invoice.awaiting_action_items(user)
-      #   data = {
-      #     type: "reviewer",
-      #     data: [
-      #       {
-      #         title: "Awaiting Approval",
-      #         count: apply_scopes(awaiting_invoices, {filter_inward_invoice_type: params[:filter_inward_invoice_type]})&.count,
-      #         filters: [
-      #           {filter_invoice_type: invoice_type},
-      #           {filter_awaiting_approval: true}
-      #         ]
-      #       }
-      #     ]
-      #   }
-      #   self.counts.push(data)
+      # # Set Date Filters in Filters
+      # # Done because the filters in index page and the filters passed in dashboard for date filters are different
+      # self.counts.each do |count_object|
+      #   count_object[:data].each do |data|
+      #      if params[:filter_creation_date].present? && params[:filter_creation_date][:from].present?
+      #        filter_date = {'filter_creation_date[from]': params[:filter_creation_date][:from]}
+      #        data[:filters].push(filter_date)
+      #      end
+      #
+      #     if params[:filter_creation_date].present? && params[:filter_creation_date][:to].present?
+      #        filter_date = {'filter_creation_date[to]': params[:filter_creation_date][:to]}
+      #        data[:filters].push(filter_date)
+      #      end
+      #   end
       # end
     end
   end

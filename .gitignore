@@ -24,6 +24,9 @@ config/redis_config.yml
 config/gstin_verification_config.yml
 config/insights_config.yml
 config/bbps_config.yml
+config/web_client.yml
+config/icici_prepaid_card.yml
+
 .rubocop.yml
 .vscode/
 reference_resource_migration.log

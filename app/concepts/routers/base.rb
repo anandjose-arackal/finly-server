@@ -28,6 +28,10 @@ class Routers::Base
     global_options.pop
   end
 
+  def self.routes
+    map.keys
+  end
+
   def self.route(key, *args, options: {})
     if not allow_multiple_associations? and map(key).present?
       return if args.count == 1 and map(key).first.klass == args.first

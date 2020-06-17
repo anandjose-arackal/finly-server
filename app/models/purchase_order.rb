@@ -66,20 +66,20 @@
 #  cost_allocation_items        :boolean          default(FALSE)
 #  internal_note                :text(65535)
 #  vendor_address               :text(65535)
-#  discount_type_id             :integer
 #  vendor_poc_name              :string(255)
 #  vendor_poc_email             :string(255)
 #  vendor_poc_mobile_number     :string(255)
+#  discount_type_id             :integer
 #  rejection_note               :text(65535)
-#  taxable_amount_id            :integer
 #  vendor_poc_id                :integer
 #  vlpm_id                      :integer
 #  vendor_note                  :text(65535)
 #
 
 class PurchaseOrder < ApplicationRecord
-  include SoftDeletable, Templatable, Transitionable, MathUtil, CustomFieldFilterSupport
+  include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport
   include Sequenced::ActsAsSequenced
+
 
   acts_as_sequenced column: :po_number, purpose: :purchase_order, editable: false, prefix: 'PO/{fiscal_year_start}-{fiscal_year_end}/', min_length: 4
 
@@ -87,6 +87,7 @@ class PurchaseOrder < ApplicationRecord
 
   belongs_to :company, optional: true
   belongs_to :user, optional: true
+  belongs_to :created_by, optional: true, foreign_key: 'user_id', class_name: 'User'
   belongs_to :procurement, optional: true
   belongs_to :location, optional: true, class_name: 'BranchLocation'
   belongs_to :delivery_location, optional: true, class_name: 'BranchLocation'
@@ -107,10 +108,13 @@ class PurchaseOrder < ApplicationRecord
   belongs_to :controlling_for_user_role, optional: true, class_name: 'UserRole'
 
   belongs_to :total_before_tax, optional: true, class_name: "Amount"
+  belongs_to :gross_amount, optional: true, class_name: "Amount", foreign_key: :total_before_tax_id
+
   belongs_to :tax_amount, optional: true, class_name: "Amount"
   belongs_to :total_after_tax, optional: true, class_name: "Amount"
   belongs_to :discount_amount, optional: true, class_name: "Amount", autosave: true
   belongs_to :balance_amount, optional: true, class_name: "Amount", autosave: true
+  belongs_to :net_amount, optional: true, class_name: "Amount", foreign_key: :balance_amount_id
   # IF PO HAS ANY ADVANCE AMOUNT, WE ADD IT HERE
   belongs_to :requested_advance_amount, optional: true, class_name: "Amount"
   belongs_to :advance_amount, optional: true, class_name: "Amount"
@@ -121,7 +125,7 @@ class PurchaseOrder < ApplicationRecord
   belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
 
   belongs_to :gstin_location, class_name: "GstinLocation", optional: true
-
+  belongs_to :vendor_location, class_name: "GstinLocation", optional: true, foreign_key: :gstin_location_id
 
   has_many :document_level_reviewer_mappings, as: :document_reviewer_mappable
 
@@ -155,18 +159,53 @@ class PurchaseOrder < ApplicationRecord
   validates :purchase_order_status_id, presence: true
   # validates :policy_id, presence: true
   # validates :items, presence: true
-  scope :document_number_generated_in_finly, -> {where override_po_number: [false, nil]}
-  scope :not_open, -> {where.not purchase_order_status_id: PurchaseOrderStatus.id_for(:open)}
-  scope :with_id, -> (id) {where id: id}
-  scope :filter_ids, -> (id) {where id: id}
-  scope :with_user_id, -> (user_ids) {where user_id: user_ids}
-  scope :with_status_ids, -> (status_ids) {where purchase_order_status_id: status_ids}
-  scope :with_controlling_level_ids, -> (level_ids) {where controlling_level_id: level_ids}
-  scope :with_controlling_user_id, -> (id) {where controlling_user_id: id}
-  scope :with_procurement_id, ->(procurement_id) {where procurement_id: procurement_id}
-  scope :filter_po_number, -> (po_number) {where('purchase_orders.po_number LIKE ?', "%#{po_number}%")}
-  scope :with_vendor_ids, -> (ids) {where vendor_id: ids}
-  scope :with_po_number, -> (po_number) {where po_number: po_number}
+  scope :document_number_generated_in_finly, -> { where override_po_number: [false, nil] }
+  scope :not_open, -> { where.not purchase_order_status_id: PurchaseOrderStatus.id_for(:open) }
+  scope :with_id, -> (id) { where id: id }
+  scope :filter_ids, -> (id) { where id: id }
+  scope :with_user_id, -> (user_ids) { where user_id: user_ids }
+  scope :with_status_ids, -> (status_ids) {
+    case status_ids
+    when PurchaseOrderStatus::GROUP_OPEN
+      # Open / Retracted
+      where purchase_order_status_id: PurchaseOrderStatus.ids_for(:open, :retracted)
+    when PurchaseOrderStatus::GROUP_AWAITING_APPROVAL
+      # Awaiting Approval
+      user_id = RequestStore.store[:current_user]&.id
+      if user_id.present?
+        self.awaiting_action_items(user_id)
+      end
+    when PurchaseOrderStatus::GROUP_APPROVED
+      # Approved / Auto Approved
+      where purchase_order_status_id: PurchaseOrderStatus.ids_for(:approved, :auto_approved)
+    else
+      where purchase_order_status_id: status_ids
+    end
+  }
+  scope :with_grn_status_id, -> (status_id) {
+    case status_id
+    when 100
+      # Due this week
+      where 'purchase_orders.delivery_date between ? and ?', Date.today, Date.today.end_of_week
+    when 101
+      # Due this month
+      where 'purchase_orders.delivery_date between ? and ?', Date.today, Date.today.end_of_month
+    when 102
+      # Overdue
+      where 'purchase_orders.delivery_date < ?', Date.today
+    when 103
+      # Overdue
+      where 'purchase_orders.delivery_date IS NULL OR purchase_orders.delivery_date > ?', Date.today.end_of_month
+    else
+      self.all
+    end
+  }
+  scope :with_controlling_level_ids, -> (level_ids) { where controlling_level_id: level_ids }
+  scope :with_controlling_user_id, -> (id) { where controlling_user_id: id }
+  scope :with_procurement_id, ->(procurement_id) { where procurement_id: procurement_id }
+  scope :filter_po_number, -> (po_number) { where('purchase_orders.po_number LIKE ?', "%#{po_number}%") }
+  scope :with_vendor_ids, -> (ids) { where vendor_id: ids }
+  scope :with_po_number, -> (po_number) { where po_number: po_number }
   scope :with_budgetable_department_ids, -> (department_ids) {
     if department_ids.present?
       ids = where(department_id: department_ids).pluck(:id)
@@ -218,9 +257,9 @@ class PurchaseOrder < ApplicationRecord
     with_status_ids(status_ids)
   }
 
-  scope :filter_policy_id, -> (policy_id) {where policy_id: policy_id}
-  scope :filter_location_id, -> (location_id) {where("location_id = ? OR delivery_location_id = ?", location_id, location_id)}
-  scope :filter_cost_center_id, -> (cost_center_id) {where(cost_center_id: cost_center_id)}
+  scope :filter_policy_id, -> (policy_id) { where policy_id: policy_id }
+  scope :filter_location_id, -> (location_id) { where("location_id = ? OR delivery_location_id = ?", location_id, location_id) }
+  scope :filter_cost_center_id, -> (cost_center_id) { where(cost_center_id: cost_center_id) }
 
   scope :filter_sub_department_id, -> (ids) {
     where sub_department_id: ids
@@ -257,11 +296,11 @@ class PurchaseOrder < ApplicationRecord
 
   scope :filter_all_advances, -> {
     where.not(advance_amount_status_id: [nil, AdvanceAmountStatus.ids_for([:po_processing, :closed])], advance_amount_id: nil,
-              purchase_order_status_id: [ PurchaseOrderStatus.id_for(:closed), PurchaseOrderStatus.id_for(:po_revised), 
-                                          PurchaseOrderStatus.id_for(:processing), PurchaseOrderStatus.id_for(:voided),
-                                          PurchaseOrderStatus.id_for(:rejected), PurchaseOrderStatus.id_for(:retracted),
-                                          PurchaseOrderStatus.id_for(:open)
-                                        ])
+              purchase_order_status_id: [PurchaseOrderStatus.id_for(:closed), PurchaseOrderStatus.id_for(:po_revised),
+                                         PurchaseOrderStatus.id_for(:processing), PurchaseOrderStatus.id_for(:voided),
+                                         PurchaseOrderStatus.id_for(:rejected), PurchaseOrderStatus.id_for(:retracted),
+                                         PurchaseOrderStatus.id_for(:open)
+              ])
   }
 
   scope :show_only_po_which_have_advances, -> (show_it = false) {
@@ -293,7 +332,7 @@ class PurchaseOrder < ApplicationRecord
     end
   }
 
-  scope :filter_status, -> (status_name){
+  scope :filter_status, -> (status_name) {
     case status_name
     when 'draft', :draft
       filter_status_id PurchaseOrder.status_ids(:open, :rejected, :retracted)
@@ -326,14 +365,14 @@ class PurchaseOrder < ApplicationRecord
     joins(:procurement).where("procurements.name LIKE ?", "%#{name}%")
   }
 
-  scope :filter_creation_date_from, -> (creation_date){
+  scope :filter_creation_date_from, -> (creation_date) {
     date = Date.parse(creation_date) rescue nil
     if date
       where("created_at >= ?", date.beginning_of_day)
     end
   }
 
-  scope :filter_creation_date_to, -> (creation_date){
+  scope :filter_creation_date_to, -> (creation_date) {
     date = Date.parse(creation_date) rescue nil
     if date
       where("created_at <= ?", date.end_of_day)
@@ -414,7 +453,7 @@ class PurchaseOrder < ApplicationRecord
     where('created_at >= ? && created_at <= ?', from, to)
   }
 
-  scope :filter_delivery_date, -> (delivery_date) { where 'delivery_date = ?', delivery_date}
+  scope :filter_delivery_date, -> (delivery_date) { where 'delivery_date = ?', delivery_date }
   scope :exclude_revision_of_po, -> { where(revision_of_id: nil) }
 
   scope :includes_for_index, -> {
@@ -422,25 +461,25 @@ class PurchaseOrder < ApplicationRecord
   }
 
   # Sorting
-  scope :sort_po_number, -> (type){
+  scope :sort_po_number, -> (type) {
     type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
       reorder("purchase_orders.po_number #{type}")
     end
   }
 
-  scope :sort_po_name, -> (type){
+  scope :sort_po_name, -> (type) {
     type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
       includes(:procurement).reorder("procurements.name #{type}")
     end
   }
 
-  scope :filter_pr_number, -> (pr_number){
+  scope :filter_pr_number, -> (pr_number) {
     user = RequestStore.store[:current_user]
     if user.present?
-      pr_item_ids = user.company.purchase_requests.where('purchase_requests.order_number LIKE ?', "%#{pr_number}%" ).joins(:purchase_request_items).pluck('purchase_request_items.id')
-        joins(:items).where('purchase_order_items.purchase_request_item_id IN (?)', pr_item_ids)
+      pr_item_ids = user.company.purchase_requests.where('purchase_requests.order_number LIKE ?', "%#{pr_number}%").joins(:purchase_request_items).pluck('purchase_request_items.id')
+      joins(:items).where('purchase_order_items.purchase_request_item_id IN (?)', pr_item_ids)
     end
   }
 
@@ -463,7 +502,13 @@ class PurchaseOrder < ApplicationRecord
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
 
+  def self.ransackable_scopes(auth_object = nil)
+    [:with_status_ids, :with_grn_status_id]
+  end
+
   def status_tag_details
+    return @tags_data if @tags_data.present?
+
     tag_ids = self.procurement.status_tags.pluck(:id)
 
     data = {
@@ -487,7 +532,7 @@ class PurchaseOrder < ApplicationRecord
     end
 
     if tag_ids.include?(StatusTag.id_for(:shipment_received))
-      data[:grn][:status] = 'copmleted'
+      data[:grn][:status] = 'completed'
       data[:grn][:status_text] = 'Shipment Received'
       data[:procurement_status_text] = 'Shipment Received'
     elsif tag_ids.include?(StatusTag.id_for(:receiving_shipment))
@@ -510,7 +555,7 @@ class PurchaseOrder < ApplicationRecord
       data[:procurement_status_text] = 'Invoice Processing'
     else
       data[:invoice][:status] = 'init'
-      if self.procurement.invoices.present?
+      if not self.procurement.invoices.nil?
         data[:invoice][:status_text] = 'Invoice Processing'
         data[:procurement_status_text] = 'Invoice Processing'
       else
@@ -526,6 +571,7 @@ class PurchaseOrder < ApplicationRecord
     else
       # nothing
     end
+    @tags_data = data
     data
   end
 
@@ -537,7 +583,7 @@ class PurchaseOrder < ApplicationRecord
     clone [:extra_charges, :items, :document_level_reviewer_mappings, :total_before_tax,
            :tax_amount, :total_after_tax, :discount_amount, :custom_fields]
 
-    customize(lambda {|po, new_po|
+    customize(lambda { |po, new_po|
       new_po.trails.destroy_all
       new_po.comments.destroy_all
       new_po.attachments.destroy_all
@@ -578,7 +624,7 @@ class PurchaseOrder < ApplicationRecord
   def all_items_accepted?(inward_document = nil)
     shipped = true
     self.items.each do |item|
-      next if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
+      next if (item.inventory_line_item.product_type_id == ProductType.id_for(:service))
       # Commenting this fetch for value for now.
       # previously_delivered = inward_document.items.detect {|iw| iw if iw.purchase_order_item_id == item.id}.previously_delivered rescue 0
       unless item.quantity == (item.accepted + 0)
@@ -592,7 +638,7 @@ class PurchaseOrder < ApplicationRecord
   def all_items_billed?
     billed = true
     self.items.each do |item|
-      next if ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
+      next if (item.inventory_line_item.product_type_id == ProductType.id_for(:goods))
       unless item.previously_billed_amount.to_f.round(2) == item.taxable_amount&.value.to_f.round(2)
         billed = false
         return
@@ -602,7 +648,7 @@ class PurchaseOrder < ApplicationRecord
   end
 
   def partial_items_accepted?
-    any_item = self.items.map { |item| item if ( item.accepted > 0 || (item.inventory_line_item.product_type_id == ProductType.id_for(:service)) ) }.compact
+    any_item = self.items.map { |item| item if (item.accepted > 0 || (item.inventory_line_item.product_type_id == ProductType.id_for(:service))) }.compact
     any_item.present?
   end
 
@@ -667,7 +713,7 @@ class PurchaseOrder < ApplicationRecord
     # end
   end
 
-  def can_take_control?(user=nil)
+  def can_take_control?(user = nil)
     user = user.present? ? user : RequestStore.store[:current_user]
     return false if user.blank?
     return false if self.action_users(:approve).include?(user)
@@ -827,6 +873,18 @@ class PurchaseOrder < ApplicationRecord
     self.total_after_tax&.value
   end
 
+  # Used for tracking completion %
+  def review_pending?
+    PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).include?(purchase_order_status_id)
+  end
+
+  def review_completed?
+    PurchaseOrderStatus.ids_for(:approved, :auto_approved, :sent_to_vendor, :closed, :voided, :po_revised, :vendor_confirmed).include?(purchase_order_status_id)
+  end
+
+  def review_in_progress?
+    PurchaseOrderStatus.ids_for(:processing).include?(purchase_order_status_id)
+  end
 
   private
 
@@ -858,14 +916,14 @@ class PurchaseOrder < ApplicationRecord
 
         case self.discount_type_id
           # i.e. discount is given as a rate
-          when 1
-            item_discount = (item.discount || 0).to_f
-            item_discount_amount = item_amount * item_discount / 100
-          when 2
-            item_discount_amount = item.discount
-          else
-            item_discount = (item.discount || 0).to_f
-            item_discount_amount = item_amount * item_discount / 100
+        when 1
+          item_discount = (item.discount || 0).to_f
+          item_discount_amount = item_amount * item_discount / 100
+        when 2
+          item_discount_amount = item.discount
+        else
+          item_discount = (item.discount || 0).to_f
+          item_discount_amount = item_amount * item_discount / 100
         end
 
         # Exclusive of tax
@@ -898,18 +956,18 @@ class PurchaseOrder < ApplicationRecord
         # also set the CGST, SGST, and IGST amounts in the PO Line item
         case self.gst_type_id
           # i.e. it's a CGST + SGST case
-          when GstType.id_for(:cgst_sgst)
-            item.cgst = item_tax_amount / 2
-            item.sgst = item_tax_amount / 2
-            item.igst = 0
-          when GstType.id_for(:igst)
-            item.igst = item_tax_amount
-            item.cgst = 0
-            item.sgst = 0
-          else
-            item.igst = 0
-            item.cgst = 0
-            item.sgst = 0
+        when GstType.id_for(:cgst_sgst)
+          item.cgst = item_tax_amount / 2
+          item.sgst = item_tax_amount / 2
+          item.igst = 0
+        when GstType.id_for(:igst)
+          item.igst = item_tax_amount
+          item.cgst = 0
+          item.sgst = 0
+        else
+          item.igst = 0
+          item.cgst = 0
+          item.sgst = 0
         end
 
         if item.discount_amount.present?
@@ -1035,7 +1093,7 @@ class PurchaseOrder < ApplicationRecord
       status_ids.push PurchaseOrderStatus.id_for(status)
     end
 
-    status_ids.reject {|status_id| status_id.nil?}
+    status_ids.reject { |status_id| status_id.nil? }
   end
 
   def self.finance_associated_status_ids
@@ -1100,9 +1158,9 @@ class PurchaseOrder < ApplicationRecord
   def build_params_from_pr_item(pr_item)
     item_hsn_sac = pr_item.hsn_sac.present? ? pr_item.hsn_sac : pr_item.item&.hsn_sac
     {
-      # purchase_order_id: pr_item.purchase_order_id, inventory_line_item_id: pr_item.item_id, product_id: nil, description: pr_item&.item&.description, hsn_sac: pr_item&.item&.hsn_sac, quantity: pr_item.quantity, rate: pr_item&.item&.rate, tax: nil, tds: nil, discount: nil, tax_amount_id: nil, tds_amount_id: nil, discount_amount_id: nil, total_amount_id: pr_item.estimated_amount_id, delivery_date: nil, comment: nil, created_at: nil, updated_at: nil, delivered: 0, accepted: 0, rejected: 0, category_id: nil, cost_center_id: nil, is_deleted: false, account: nil, tax_rate_id: nil, deleted_at: nil, unit_of_measurement: nil
+        # purchase_order_id: pr_item.purchase_order_id, inventory_line_item_id: pr_item.item_id, product_id: nil, description: pr_item&.item&.description, hsn_sac: pr_item&.item&.hsn_sac, quantity: pr_item.quantity, rate: pr_item&.item&.rate, tax: nil, tds: nil, discount: nil, tax_amount_id: nil, tds_amount_id: nil, discount_amount_id: nil, total_amount_id: pr_item.estimated_amount_id, delivery_date: nil, comment: nil, created_at: nil, updated_at: nil, delivered: 0, accepted: 0, rejected: 0, category_id: nil, cost_center_id: nil, is_deleted: false, account: nil, tax_rate_id: nil, deleted_at: nil, unit_of_measurement: nil
 
-      purchase_order_id: pr_item.purchase_order_id, inventory_line_item_id: pr_item.item_id, product_id: nil, description: pr_item&.item&.description, hsn_sac: item_hsn_sac, quantity: pr_item.quantity, rate: pr_item&.per_unit_estimated_amount&.value, purchase_request_item_id: pr_item.id, tax_rate_id: pr_item&.item&.tax_rate_id, unit_of_measurement: pr_item.unit_of_measurement, department_id: pr_item.department_id, cost_center_id: pr_item.cost_center_id, category_id: pr_item.category_id, comment: pr_item.purpose
+        purchase_order_id: pr_item.purchase_order_id, inventory_line_item_id: pr_item.item_id, product_id: nil, description: pr_item&.item&.description, hsn_sac: item_hsn_sac, quantity: pr_item.quantity, rate: pr_item&.per_unit_estimated_amount&.value, purchase_request_item_id: pr_item.id, tax_rate_id: pr_item&.item&.tax_rate_id, unit_of_measurement: pr_item.unit_of_measurement, department_id: pr_item.department_id, cost_center_id: pr_item.cost_center_id, category_id: pr_item.category_id, comment: pr_item.purpose
     }
   end
 
@@ -1125,7 +1183,7 @@ class PurchaseOrder < ApplicationRecord
     end
   end
 
-  def perform_status_transition(options={})
+  def perform_status_transition(options = {})
     user = options[:user]
     params = options[:params]
     case options[:status_to]
@@ -1133,7 +1191,7 @@ class PurchaseOrder < ApplicationRecord
       item_ids = options[:item_ids]
 
       # Update Purchase request item statuses
-       # TODO- create status change trail 
+      # TODO- create status change trail
       # PurchaseRequestItem.with_ids(item_ids).update_all(status_id: PurchaseRequestItemStatus.id_for(:po_created))
       PurchaseRequestItem.with_ids(item_ids).each do |purchase_request_item|
         purchase_request_item.status_id = PurchaseRequestItemStatus.id_for(:po_created)

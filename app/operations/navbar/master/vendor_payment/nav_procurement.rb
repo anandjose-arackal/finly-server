@@ -1,3 +1,4 @@
+
 class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
 
   register_app :vp

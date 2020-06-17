@@ -6,21 +6,8 @@ class BankTransfer::PaymentRequest::Review::BulkApprove < BankTransfer::PaymentR
   attr_accessor :bank_payment_requests, :processing_status_id,
                 :errors_found, :validate_result
 
-  def pre_validate
-    super
-    return if has_errors?
-    if params[:password].blank?
-      add_message :error, 'You need to provide your password to initiate this action'
-      return
-    end
-    unless user.valid_password?(params[:password])
-      add_message :error, 'Invalid Password'
-      return
-    end
-  end
-
   def init
-    ids = params[:ids] || params[:bank_payment_request_ids] || params[:payment_request_ids]
+    ids = params[:id] || params[:ids] || params[:bank_payment_request_ids] || params[:payment_request_ids]
     unless ids.is_a?(Array)
       ids = ids.split(',')
     end
@@ -57,6 +44,10 @@ class BankTransfer::PaymentRequest::Review::BulkApprove < BankTransfer::PaymentR
     ids = self.bank_payment_requests.map { |b| b[:id] }
     BankTransfer::PaymentRequest::Review::ApproveBackground.call_async(ids, initiating_user_id: user.id)
     # op = BankTransfer::PaymentRequest::Review::ApproveBackground.call(ids, initiating_user_id: user.id)
+  end
+
+  def post_process
+    add_message :success, "Your request for approving #{self.bank_payment_requests.length} payment tickets is being processed."
   end
 
 

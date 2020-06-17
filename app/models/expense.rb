@@ -40,6 +40,7 @@
 #  created_by_id          :integer
 #  modified_by_id         :integer
 #  deleted_at             :datetime
+#  company_id             :integer
 #  gstin_location_id      :integer
 #  state_of_expense_id    :integer
 #  hsn_sac                :string(255)
@@ -162,9 +163,10 @@ class Expense < ApplicationRecord
     end
 
     # setting gst_percentage, if it isn't set at the time of saving
-    if self.gst_percentage.blank? || self.gst_percentage == 0
-      self.gst_percentage = self.tax_rate&.rate
-    end
+    # if self.gst_percentage.blank? || self.gst_percentage == 0
+    #   self.gst_percentage = self.tax_rate&.rate
+    # end
+    self.gst_percentage = self.tax_rate&.rate
     compute_gst_amount
     compute_tds_amount
   end

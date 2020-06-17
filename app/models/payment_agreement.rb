@@ -43,6 +43,7 @@ class PaymentAgreement < ApplicationRecord
   belongs_to :company, optional: true
   belongs_to :status, optional: true, class_name: "PaymentAgreementStatus"
   belongs_to :creator, optional: true, class_name: 'User'
+  belongs_to :created_by, optional: true, class_name: "User", foreign_key: :creator_id
   belongs_to :policy, optional: true
   belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
   belongs_to :total_amount, optional: true, class_name: 'Amount'
@@ -280,7 +281,25 @@ class PaymentAgreement < ApplicationRecord
 
   scope :include_for_index, -> {includes(:policy, :creator, :status, :security_deposits,:beneficiary_payments,:rental_invoices, :general_invoices )}
 
-
+  scope :with_status_id, -> (status_id) {
+    case status_id
+    when 90
+      # open / retracted
+      where status_id: PaymentAgreementStatus.ids_for(:draft, :retracted)
+    when 91
+      # awaiting approval
+      user_id = RequestStore.store[:current_user]&.id
+      if user_id.present?
+        where(status_id: PaymentAgreementStatus.id_for(:awaiting_approval)).awaiting_action_items(user_id)
+      else
+        self.none
+      end
+    when 92
+      where status_id: PaymentAgreementStatus.ids_for(:approved, :auto_approved, :invoice_created, :payment_ticket_created, :revised)
+    else
+      where(status_id: status_id)
+    end
+  }
 
   def as_json(options={})
     {
@@ -341,6 +360,10 @@ class PaymentAgreement < ApplicationRecord
 
   def self.roles
     [:admin, :payment_agreement_initiator, :payment_agreement_reviewer, :payment_agreement_auditor, :agreement_invoice_initiator, :agreement_invoice_reviewer, :agreement_invoice_auditor]
+  end
+
+  def self.agreement_master_roles
+    [:admin, :payment_agreement_initiator, :payment_agreement_reviewer, :payment_agreement_auditor]
   end
 
   def get_default_provider
@@ -520,6 +543,23 @@ class PaymentAgreement < ApplicationRecord
     elsif options[:load_custom_fields] && options[:load_custom_fields] == false
       nil
     end
+  end
+
+  def self.ransackable_scopes(auth_object = nil)
+    [:with_status_id]
+  end
+
+# Used for tracking completion %
+  def review_pending?
+    PaymentAgreementStatus.ids_for(:draft, :retracted, :rejected).include?(status_id)
+  end
+
+  def review_completed?
+    PaymentAgreementStatus.ids_for(:approved, :auto_approved, :closed, :invoice_created, :payment_ticket_created, :terminated, :revised).include?(status_id)
+  end
+
+  def review_in_progress?
+    PaymentAgreementStatus.ids_for(:awaiting_approval).include?(status_id)
   end
 
 end

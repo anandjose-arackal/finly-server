@@ -45,6 +45,19 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
     if distance_value.present? and distance_value <= 0
       messages[:error] << 'Distance cannot be less than or equal to 0'
     end
+
+    locations = params.dig(:expense, :distance_expense_attributes, :locations_attributes)
+    
+    if locations.blank?
+      messages[:error].push(" Location1 not specified correctly")
+      messages[:error].push(" Location2 not specified correctly")
+      return
+    end
+
+    location1, location2 = locations.first, locations.last
+    messages[:error].push(" Location1 not specified correctly") if( location1[:name].blank? || location1[:maps_id].blank? )
+    messages[:error].push(" Location2 not specified correctly") if( location2[:name].blank? || location2[:maps_id].blank? )
+    return if has_errors?
   end
 
   def init

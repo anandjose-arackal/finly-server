@@ -1,31 +1,24 @@
 class IndexController < BaseControllers::WebBase
   layout 'trailblazers'
 
+  # def fetch_old_config
+  #   endpoint IndexBuilder::OldConfig
+  # end
+
   def fetch_config
     endpoint IndexBuilder::Config
-    if @op.success?
-      render json: {success: true, data: @op[:config]}
-    else
-      respond response: :failure, message: "Invalid Request"
-    end
   end
 
   def show
     endpoint IndexBuilder::Show
-    if @op.success?
-      render json: {success: true, data: @op['model.index']}
-    else
-      respond response: :failure, message: "Invalid Request"
-    end
   end
 
-  def counts
-    endpoint IndexBuilder::Count
-    if @op.success?
-      render json: {success: true, data: @op['counter']}
-    else
-      respond response: :failure, message: "Invalid Request"
-    end
+  def status_counts
+    endpoint IndexBuilder::StatusCount
+  end
+
+  def record_counts
+    endpoint IndexBuilder::RecordCount
   end
 
 end

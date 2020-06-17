@@ -1,12 +1,13 @@
 class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Spreadsheet
 
-  label 'Export'
+  label 'Spreadsheet'
   description 'Purchase Orders Export'
   configurable true
   system :vp
+  resolver 'purchase_orders.default'
   screen ['purchase_orders.index', 'po_advances.index']
   handle :purchase_orders
-  validate :input
+  # validate :input
 
   attribute :procurement_name
   attribute :vendor_name
@@ -29,6 +30,11 @@ class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Sp
   attribute :department
   attribute :sub_department
   attribute :cost_center
+  ############################### PR Details ################################
+  attribute :pr_number
+  attribute :pr_created_by
+  attribute :pr_date
+  ############################### PR Details ################################
   attribute :po_user
   attribute :po_status
   attribute :po_number
@@ -57,6 +63,10 @@ class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Sp
   attribute :invoice_submitted_on
   attribute :invoice_approved_on
   attribute :is_invoice_approved
+  attribute :po_advance_status
+  attribute :advance_amount
+  attribute :advance_tds_amount
+  attribute :advance_tds_slab
   attribute :invoice_sent_on
   attribute :invoice_cgst
   attribute :invoice_sgst
@@ -74,19 +84,19 @@ class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Sp
   attribute :invoice_delivery_address
   attribute :invoice_custom_fields
 
-  def input
-    # if params[:filter_po_status].present?
-    #   unless params[:filter_po_status].is_a?(Integer)
-    #     params[:filter_po_status] = PurchaseOrderStatus.id_for(params[:filter_po_status]&.to_sym)
-    #   end
-    # end
-    result = ::Procurements::PurchaseOrders::Index.(user, params)
-    unless result.success?
-      add_message :error, result.messages[:error]
-      return
-    end
-    result.purchase_orders.includes(:policy, :vendor, :gstin_location, :controlling_level, :level, :department, :sub_department, :cost_center, :user, :status, :total_before_tax, procurement: [invoices: [:gst_type, :tax_amount, :tds_slab, :discount_amount, :net_amount, :invoice_items]])
-  end
+  # def input
+  #   # if params[:filter_po_status].present?
+  #   #   unless params[:filter_po_status].is_a?(Integer)
+  #   #     params[:filter_po_status] = PurchaseOrderStatus.id_for(params[:filter_po_status]&.to_sym)
+  #   #   end
+  #   # end
+  #   result = ::Procurements::PurchaseOrders::Index.(user, params)
+  #   unless result.success?
+  #     add_message :error, result.messages[:error]
+  #     return
+  #   end
+  #   result.purchase_orders.includes(:policy, :vendor, :gstin_location, :controlling_level, :level, :department, :sub_department, :cost_center, :user, :status, :total_before_tax, procurement: [invoices: [:gst_type, :tax_amount, :tds_slab, :discount_amount, :net_amount, :invoice_items]])
+  # end
 
   def procurement_name(purchase_order)
     purchase_order.procurement.name
@@ -266,6 +276,22 @@ class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Sp
     # todo
   end
 
+  def po_advance_status(purchase_order)
+    purchase_order&.advance_amount_status&.name&.humanize
+  end
+
+  def advance_amount(purchase_order)
+    purchase_order&.advance_amount&.value
+  end
+
+  def advance_tds_amount(purchase_order)
+    purchase_order&.advance_tds_amount&.value
+  end
+
+  def advance_tds_slab(purchase_order)
+    purchase_order&.advance_tds_slab&.name
+  end
+
   def invoice_number(purchase_order)
     purchase_order.procurement.invoices&.first&.invoice_number
   end
@@ -369,6 +395,21 @@ class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Sp
     # todo
   end
 
+  def pr_number purchase_order
+    request = purchase_order.purchase_request_items.first&.purchase_request
+    request.present? ? request&.order_number : ''
+  end
+
+  def pr_created_by purchase_order
+    request = purchase_order.purchase_request_items.first&.purchase_request
+    request.present? ? request&.creator&.name : ''
+  end
+
+  def pr_date purchase_order
+    request = purchase_order.purchase_request_items.first&.purchase_request
+    request.present? ? request&.created_at&.strftime("%d-%b-%Y") : ''
+  end
+
   protected
 
   def invoice(purchase_order)
@@ -378,5 +419,4 @@ class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Sp
   # def purchase_order(purchase_order)
   #   procurement&.purchase_order
   # end
-
 end

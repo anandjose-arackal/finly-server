@@ -26,7 +26,6 @@
 #  card_processor_status    :string(255)
 #  replaced_card_id         :integer
 #  deleted_at               :datetime
-#  card_number              :string(255)
 #
 
 class Card < ApplicationRecord
@@ -43,10 +42,10 @@ class Card < ApplicationRecord
   belongs_to :card_status, optional: true
   belongs_to :replaced_card, optional: true, class_name: "Card"
   has_many :transactions, class_name: 'CardTransaction'
-  has_many :initiating_payments, as: :initiating_account
-  has_many :initiating_payment_trails, as: :initiating_account
-  has_many :receiving_payments, as: :receiving_account
-  has_many :receiving_payment_trails, as: :receiving_account
+  has_many :initiating_payments, as: :initiating_account, class_name: "Payment"
+  has_many :initiating_payment_trails, as: :initiating_account, class_name: "Payment"
+  has_many :receiving_payments, as: :receiving_account, class_name: "Payment"
+  has_many :receiving_payment_trails, as: :receiving_account, class_name: "Payment"
   has_many :finly_transactions, as: :finly_account
 
   has_one :card_restriction

@@ -6,8 +6,8 @@ class ExportManager::Master::Vendors::Index < ExportManager::Builders::Spreadshe
   configurable true
   system :vp
   screen 'vendors.index'
+  resolver 'vendors.default'
   handle :vendors
-  validate :input
 
   attribute :vendor_business_name
   attribute :vendor_trade_name
@@ -41,33 +41,6 @@ class ExportManager::Master::Vendors::Index < ExportManager::Builders::Spreadshe
   attribute :fourth_account_ifsc
   attribute :created_at
   attribute :active
-
-  def input
-    result = ::Vendors::Index.(user, params)
-
-    unless result.success?
-      add_message :error, result.messages[:error]
-      return
-    end
-
-    vendors = result.vendors.
-        sort_for_index.
-        non_deleted.
-        authorized.
-        preload(:bank_accounts, :state_code, :created_by, :vendor_type).
-        left_joins(:gstin_locations)
-    # .
-    # select('
-    #                       yes_bank_vendors.*,
-    #                       gstin_locations.address,
-    #                       gstin_locations.location,
-    #                       gstin_locations.gstin,
-    #                       gstin_locations.poc_name,
-    #                       gstin_locations.poc_email
-    #                     ')
-
-    vendors
-  end
 
   def vendor_business_name(vendor)
     vendor.business_name

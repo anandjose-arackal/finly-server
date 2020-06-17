@@ -1,9 +1,16 @@
 class Company::Locations::Create < Company::Locations::Base
-
+  attr_accessor :location_parameters
 
   def init
     super
     self.location_parameters = location_params
+  end
+
+  def validate
+    if ( self.company.locations.where(name: location_parameters[:name]).count > 0 )
+      add_message :error, 'Location with the given name already present'
+      return
+    end
   end
 
   def process

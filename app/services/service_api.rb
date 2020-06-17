@@ -53,7 +53,7 @@ class ServiceApi < Transactions::API
   end
 
   def parse(options, params:, current_user:, response:, **)
-    result = response.body
+    body = result = response.body
     parser = self.class.parse
 
     result = instance_exec(current_user, params, response, &parser) if parser.present?
@@ -66,7 +66,7 @@ class ServiceApi < Transactions::API
     # options['response.status_code'] = response.status_code
     options['response.status_code'] = response.status
     options['response.parsed'] = result
-    log_generator.merge({response: {parsed: result, status: response.status}})
+    log_generator.merge({response: {body: body, parsed: result, status: response.status}})
     true
   end
 
@@ -108,8 +108,11 @@ class ServiceApi < Transactions::API
     fetch(:client).send(method) do |request|
       request.url ep
       request.params = fetch(:query_params) if fetch(:query_params)
-      request.body = fetch(:body).to_json if fetch(:body)
-      puts "Body: #{request.body}"
+      if fetch(:body)
+        request.body = fetch(:body).to_json
+        log_generator.merge({request: {body: request.body}})
+        puts "Body: #{request.body}"
+      end
       request.options.timeout = fetch(:timeout)
       request.options.open_timeout = fetch(:open_timeout)
       request.headers['Accept'] = fetch(:mime_type)

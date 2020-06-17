@@ -76,7 +76,7 @@ class Admin::Implementations::Master::Users::Export < Admin::Implementations::Pr
   end
 
   def pan(user)
-    user.profile.pan
+    user.profile&.pan rescue ''
   end
 
   def pin_code(user)

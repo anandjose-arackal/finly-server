@@ -1,6 +1,7 @@
 class Masters::Policies::AutoComplete < AutoComplete::API
 
-  resolver Masters::Policies::Resolver
+  resolver 'policies.default'
   json :id, :name
+  search_key :name_cont
 
 end

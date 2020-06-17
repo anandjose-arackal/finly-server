@@ -1,13 +1,13 @@
 class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsheet
 
-  label 'Export'
+  label 'Spreadsheet'
   description 'Invoices Export'
   configurable true
   handle :invoices
   screen 'invoices.index'
   system :vp
   # scope "development", 156, 'Bundl Technologies Pvt Ltd'
-  validate :fetch_invoices
+  # validate :fetch_invoices
 
   section :header do
     attribute :finly_ref_no
@@ -89,22 +89,9 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
     end
   end
 
-  def fetch_invoices
-    invoices_presenter = BankTransfer::InwardInvoices::Index.(user, params)
-
-    unless invoices_presenter.success?
-      add_message :error, invoices_presenter.messages[:error]
-      return
-    end
-    invoices_presenter
-  end
-
   def input
-    invoices_presenter = fetch_invoices
-    return if has_errors?
-
-    invoices = invoices_presenter.invoices.scope_all_except_voided
-    InvoiceLineItem.where(parent_type: 'Invoice').includes({purchase_order_item: :purchase_order}, :category, :department, :tax_rate, :cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency}, :discount_amount, parent: [:invoice_attachments, :invoice_type, :vendor, :delivery_location, :invoice_status, :location, :tds_slab, :advance_amount, :balance_due, :discount_amount, :created_by, :gstin_location, {dlrms: [:reviewer, :taken_control_by, :forwarded_to]}, {custom_fields: [:value, :field_configuration]}, {tds_amount: :currency}, :amount, {procurement: [{purchase_order: :advance_amount}]}]).where(parent_id: invoices.pluck(:id)).order(parent_id: :asc)
+    invoices = resolve 'invoices.default'
+    InvoiceLineItem.where(parent_type: "Invoice").where("parent_id IN (#{invoices.select('id').to_sql})").includes({purchase_order_item: :purchase_order}, :category, :department, :tax_rate, :cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency}, :discount_amount, parent: [:invoice_attachments, :invoice_type, :vendor, :delivery_location, :invoice_status, :location, :tds_slab, :advance_amount, :balance_due, :discount_amount, :created_by, :gstin_location, {dlrms: [:reviewer, :taken_control_by, :forwarded_to]}, {custom_fields: [:value, :field_configuration]}, {tds_amount: :currency}, :amount, {procurement: [{purchase_order: :advance_amount}]}]).order(parent_id: :asc)
   end
 
   def po_number(invoice_line_item)
@@ -275,12 +262,12 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
   end
 
   def tds_nature(invoice_line_item)
-    return false unless invoice_line_item&.inventory_line_item&.tds_applicable
+    return false unless invoice_line_item&.tds_applicable
     invoice_line_item.parent.tds_slab&.name
   end
 
   def tds_amount(invoice_line_item)
-    return 0.0 unless invoice_line_item&.tds_applicable?
+    return 0.0 unless invoice_line_item&.tds_applicable
     invoice_line_item.tds_amount # show line item wise tds instead of header
     # invoice_line_item.parent.tds_amount&.value || 0.0
   end
@@ -290,7 +277,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
   end
 
   def tds_percentage(invoice_line_item)
-    return 0.0 unless invoice_line_item&.inventory_line_item&.tds_applicable
+    return 0.0 unless invoice_line_item&.tds_applicable
     invoice_line_item.parent.tds_slab&.tds || 0.0
   end
 

@@ -12,8 +12,19 @@
 class BankPaymentRequestStatus < ApplicationRecord
   include Seedable
 
+  GROUP_OPEN = 90
+  GROUP_AWAITING_APPROVAL = 91
+  GROUP_PROCESSING = 92
+  GROUP_PENDING_CREDIT = 93
+  GROUP_FAILED = 94
+  GROUP_SCHEDULED = 95
+  GROUP_PENDING = 96
+  GROUP_PARTIALLY_COMPLETED = 97
+
   def self.values
-    [:open, :processing, :submitted, :retracted, :rejected, :approved, :unapprove, :credited, :pending, :creation_in_progress, :auto_approved]
+    [:open, :processing, :submitted, :retracted, :rejected,
+     :approved, :unapprove, :credited, :pending,
+     :creation_in_progress, :auto_approved]
   end
 
   def open?

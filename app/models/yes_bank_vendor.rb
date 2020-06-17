@@ -47,6 +47,7 @@ class YesBankVendor < ApplicationRecord
   include LiquidDroppable
   include Exposures::Model::Exposable
 
+
   validates :business_name, presence: true
 
   include SoftDeletable
@@ -73,6 +74,8 @@ class YesBankVendor < ApplicationRecord
   has_many :gstin_locations, foreign_key: :vendor_id
   has_many :credit_notes, foreign_key: :vendor_id
 
+  has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment'
+  has_many :receiving_payments, foreign_key: 'receiving_user_id', class_name: 'Payment'
 
   default_scope { unscope(:where) }
 
@@ -82,6 +85,8 @@ class YesBankVendor < ApplicationRecord
   # has_one :gstin_certificate_attachment, class_name: "VendorAttachment", dependent: :destroy
 
   has_one :vendor_account, foreign_key: :vendor_id
+
+
 
   has_many :budget_criteria_mappings, as: :budgetable
   has_many :budgets, through: :budget_criteria_mappings
@@ -203,6 +208,24 @@ class YesBankVendor < ApplicationRecord
   }
 
   scope :without_id, -> (id) {where.not(id: id)}
+  
+  scope :with_status_id, -> (id) do
+    case id
+    when 90
+      where status_id: VendorStatus.ids_for(:draft, :retracted)
+    when 91
+      user_id = RequestStore.store[:current_user]&.id
+      if user_id.present?
+        where(status_id: VendorStatus.ids_for(:awaiting_approval)).awaiting_action_items(user_id)
+      else
+        self.none
+      end
+    when 92
+      where status_id: VendorStatus.ids_for(:approved, :auto_approved)
+    else
+      where status_id: id
+    end
+  end
 
   scope :filter_approved_date, -> (from, to) {
     from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
@@ -222,6 +245,10 @@ class YesBankVendor < ApplicationRecord
     if self.vendor_account.blank?
       self.build_vendor_account(balance_attributes: {value: 0, currency_id: 1}).save
     end
+  end
+
+  def self.ransackable_scopes(auth_object = nil)
+    [:with_status_id]
   end
 
   def display_name
@@ -370,5 +397,22 @@ class YesBankVendor < ApplicationRecord
     return false if user.blank?
     return false if self.action_users(:approve).include?(user)
     (awaiting_approval? rescue false) && user.vendor_payment_admin? && ( self.dlrms&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id rescue false)
+  end
+
+  def name
+    business_name
+  end
+
+  # Used for tracking completion %
+  def review_pending?
+    VendorStatus.ids_for(:draft, :retracted, :rejected).include?(status_id)
+  end
+
+  def review_completed?
+    VendorStatus.ids_for(:approved, :auto_approved, :deactivated).include?(status_id)
+  end
+
+  def review_in_progress?
+    VendorStatus.ids_for(:awaiting_approval).include?(status_id)
   end
 end

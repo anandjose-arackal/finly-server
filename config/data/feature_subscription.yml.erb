@@ -18,4 +18,11 @@ user:
   disburse: <%= current_user.user_panel_subscription.disburse && current_user.company.feature_subscription.cards_enabled %>
   vendor_payments: <%= current_user.user_panel_subscription.yes_bank_account_transfer && current_user.company.feature_subscription.yes_bank_account %>
   collect: <%= current_user.user_panel_subscription.invoicing_system && current_user.company.feature_subscription.invoicing_system %>
-  insights: <%= current_user.company.feature_subscription.budgeting_system && (current_user.company_admin? || current_user.vendor_payments_admin?) %>
+  insights: <%= current_user.company.feature_subscription.budgeting_system && (current_user.company_admin? || current_user.vendor_payments_admin? || current_user.is_budget_manager?) %>
+  configurations:
+    theme:
+      vp: <%= current_user.profile.vp_web_client_theme %>
+      em: <%= current_user.profile.em_web_client_theme %>
+    client_version:
+      vp: <%= current_user.profile.vp_web_client_version %>
+      em: <%= current_user.profile.em_web_client_version %>

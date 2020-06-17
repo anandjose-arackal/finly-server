@@ -37,11 +37,19 @@ class FieldParentType < ApplicationRecord
       item: 23,
       rate_contract: 24,
       yes_bank_vendor: 25
-  }
+  }.with_indifferent_access
 
   scope :with_name, -> (name) { where name: name }
   def self.id_for(sym)
     TYPES[sym]
+  end
+
+  def self.ids_for(*list)
+    ids = []
+    list.each do |name|
+      ids << TYPES[name]
+    end
+    ids.uniq.reject {|id| id.nil?}
   end
 
   def self.seed_data
