@@ -2,7 +2,7 @@ class ImportBudgetUrbanCompany
 
   def self.perform
     company = Company.find 220
-    file_path = "/home/centos/abi_scripts/uc_budgets_template.xlsx"
+    file_path = "/home/centos/finly_scripts/urban_company/uc_budgets_template_wo_amount_18_06_20.xlsx"
     admin = company.users.only_admins.first
 
     Saxlsx::Workbook.open file_path do |excel|
@@ -10,18 +10,25 @@ class ImportBudgetUrbanCompany
         # sheet = excel.sheets.first
         # first create the budget group which will be saved for each sheet
         budget_group_name = "#{sheet.name} Budget"
-        budget_group = BudgetGroup.new(name: budget_group_name,
-                                       company_id: company.id,
-                                       period_id: Period.id_for(:month),
-                                       start_date: Date.parse("01-05-2020").end_of_day,
-                                       end_date: Date.parse("30-04-2021").beginning_of_day,
-                                       budget_date_type_id: BudgetDateType.id_for(:entity_submitted_at),
-                                       created_by_user_id: admin.id,
-                                       payment: true,
-                                       purchase_order: true,
-                                       invoice: true,
-                                       purchase_request: true)
-        budget_group.save
+        budget_group = company.budget_groups.active.find_by(name: budget_group_name)
+        # budget_group = BudgetGroup.new(name: budget_group_name,
+        #                                company_id: company.id,
+        #                                period_id: Period.id_for(:month),
+        #                                start_date: Date.parse("01-05-2020").end_of_day,
+        #                                end_date: Date.parse("30-04-2021").beginning_of_day,
+        #                                budget_date_type_id: BudgetDateType.id_for(:entity_submitted_at),
+        #                                created_by_user_id: admin.id,
+        #                                payment: true,
+        #                                purchase_order: true,
+        #                                invoice: true,
+        #                                purchase_request: true)
+        # budget_group.save
+
+        if budget_group.blank?
+          puts "Budget group with name #{budget_group_name} not found!"
+          next
+        end
+
         sheet.rows.each_with_index do |row, index|
           # now each row has the list of items in an array, and it will
           # be used to create ONE budget_group_criteria object that will hold all budgets
@@ -35,7 +42,7 @@ class ImportBudgetUrbanCompany
 
           # puts "Length is #{length}"
 
-          next if amount == 0
+          # next if amount == 0
 
           category_gl_codes = row[length - 3]
           if length > 7
@@ -94,11 +101,12 @@ class ImportBudgetUrbanCompany
           while start_date < final_end_date do
             end_date = BudgetManagerUtils.next_date(start_date, final_end_date, criteria.budget_group.period_id)
             break if end_date.blank?
-            if start_date.month == 5
-              value = amount
-            else
-              value = 0
-            end
+            # if start_date.month == 5
+            #   value = amount
+            # else
+            #   value = 0
+            # end
+            amount = 0
             budget = criteria.budgets.build(
                 start_date: start_date.beginning_of_day,
                 end_date: end_date.end_of_day,
