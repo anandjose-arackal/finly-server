@@ -12,6 +12,10 @@
 class InwardInvoiceStatus < ApplicationRecord
   include Seedable
 
+  GROUP_OPEN = 90
+  GROUP_AWAITING_APPROVAL = 91
+  GROUP_PENDING_PAYMENT = 92
+
   def self.values
     [:unpaid, :partially_paid, :paid, :open, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending, :initiated, :voided]
   end

@@ -38,7 +38,7 @@ class FinlyTransaction < ApplicationRecord
   belongs_to :payment, optional: true
   belongs_to :company, optional: true
   has_many :system_messages, as: :messagable, dependent: :destroy
-  has_one :transaction_detail
+  has_one :transaction_detail, dependent: :destroy
 
   accepts_nested_attributes_for :amount, :opening_balance, :closing_balance
 
@@ -94,6 +94,7 @@ class FinlyTransaction < ApplicationRecord
 
   after_save :set_sequence_number
   after_create :save_transaction_detail
+  after_save :save_transaction_detail # this is so that any update to the finly transaction automatically triggers an update to the transaction detail object
 
   before_create do
     ref_id = payment&.reference_id

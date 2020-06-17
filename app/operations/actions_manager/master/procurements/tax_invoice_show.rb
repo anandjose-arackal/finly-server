@@ -167,7 +167,7 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
   def last_level?
     if invoice.processing?
       provider_name = invoice.get_invoice_provider_name
-      invoice.get_reviewal_chain(provider_name)&.last[:level_number] == invoice.level&.level_number
+      invoice.get_reviewal_chain(provider_name)&.last&.dig(:level_number) == invoice.level&.level_number
     end
   end
 

@@ -16,7 +16,6 @@ class Routers::Registry
   def self.routers
     @routers ||= [
         AutoComplete::Router,
-        Resolver::Router,
         Filters::Router,
         IndexBuilder::Router,
         Resolver::Router,

@@ -3,6 +3,8 @@ class Forms::API::Entity::Types::Reference < Forms::API::Entity::Base
 
   option :class_name
 
+  operators :eq_any, :blank, :present
+
   contract do
     required(:class_name).filled
   end

@@ -1,11 +1,6 @@
 class StateExposure < Exposures::API
 
-  def code
-    record.code
-  end
-
-  def name
-    record.name
-  end
+  attribute :code, record_attribute: true
+  attribute :name, record_attribute: true
 
 end

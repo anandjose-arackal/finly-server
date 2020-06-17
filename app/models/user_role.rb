@@ -235,7 +235,7 @@ class UserRole < ApplicationRecord
     end
     ids = []
     VALUES.each do |key, value|
-      ids << value if keys.include? key&.to_sym&.downcase
+      ids << value if keys.include?(key&.to_sym&.downcase) or keys.include?(key&.to_s&.downcase)
     end
     ids
   end

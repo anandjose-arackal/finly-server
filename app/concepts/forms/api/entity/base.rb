@@ -29,7 +29,7 @@ class Forms::API::Entity::Base
   attribute :dependent, default: false
   attribute :conditional_required, default: false
   attribute :multiple, default: false
-  attribute :scope
+  attribute :choices_provider
   attribute :internal, default: false
   attribute :is_modified, default: false
   attribute :populate_if_empty

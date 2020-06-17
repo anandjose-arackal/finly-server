@@ -2,7 +2,7 @@ class Procurements::PurchaseOrders::BulkReject < Procurements::PurchaseOrders::B
   attr_accessor :purchase_orders
 
   def init
-    purchase_order_ids = params[:ids] || params[:purchase_order_ids]
+    purchase_order_ids = params[:id] || params[:ids] || params[:purchase_order_ids]
 
     unless purchase_order_ids.is_a?(Array)
       add_message :error, 'Invalid configuration'

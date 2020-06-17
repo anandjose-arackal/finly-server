@@ -80,6 +80,7 @@ class BbpsBill < ApplicationRecord
   belongs_to :company, optional: true
   belongs_to :location, class_name: 'BranchLocation', optional: true
   belongs_to :user, class_name: 'User', optional: true
+  belongs_to :created_by, class_name: 'User', optional: true, foreign_key: :user_id
   belongs_to :status, class_name: 'BbpsBillStatus', optional: true
   belongs_to :amount, optional: true
   belongs_to :total_amount, foreign_key: :total_amount_id, class_name: 'Amount', optional: true
@@ -262,6 +263,23 @@ class BbpsBill < ApplicationRecord
     lteq = lteq.present? ? lteq.to_f : 9999999999999999
 
     joins(:amount).where("value >= ? AND value <= ?", gteq, lteq)
+  end
+
+  scope :with_status_id, -> (status_id) do
+    case status_id
+    when 90
+      where status_id: BbpsBillStatus.ids_for(:open, :retracted)
+    when BbpsBillStatus::GROUP_AWAITING_APPROVAL
+      awaiting_action_items(RequestStore.store[:current_user]&.id)
+    when 92
+      where status_id: BbpsBillStatus.ids_for(:approved, :auto_approved, :payment_ticket_created, :payment_initiated, :payment_ticket_deleted)
+    else
+      where status_id: status_id
+    end
+  end
+
+  def self.ransackable_scopes(auth_object = nil)
+    [:with_status_id]
   end
 
   def as_json(options = {})
@@ -508,6 +526,24 @@ class BbpsBill < ApplicationRecord
     BbpsBillStatus.ids_for(:approved, :auto_approved).include?(self.status_id)
   end
 
+
+  # Used for tracking completion %
+  def review_pending?
+    BbpsBillStatus.ids_for(:open, :retracted, :rejected).include?(status_id)
+  end
+
+  def review_completed?
+    BbpsBillStatus.ids_for(:approved, :auto_approved, :payment_ticket_created, :payment_initiated, :failed, :paid, :voided, :payment_ticket_deleted).include?(status_id)
+  end
+
+  def review_in_progress?
+    BbpsBillStatus.ids_for(:awaiting_approval).include?(status_id)
+  end
+
+  def self.ransackable_scopes(auth_object = nil)
+    [:with_status_id]
+  end
+
   private
 
   def resolve_bill_validation
@@ -546,5 +582,6 @@ class BbpsBill < ApplicationRecord
       self.total_amount = Amount.new(value: total_amount_value, currency_id: 1)
     end
   end
+
 
 end

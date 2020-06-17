@@ -2,18 +2,11 @@ class Procurements::PurchaseRequests::BulkApprove < Procurements::PurchaseReques
   attr_accessor :purchase_requests
 
   def pre_validate
-    if params[:password].blank?
-      add_message :error, 'You need to provide your password to initiate the approval.'
-      return
-    end
-    unless user.valid_password?(params[:password])
-      add_message :error, 'Invalid Password'
-      return
-    end
+    user_present? and params_present?
   end
 
   def init
-    purchase_request_ids = params[:ids] || params[:purchase_request_ids]
+    purchase_request_ids = params[:id] || params[:ids] || params[:purchase_request_ids]
 
     unless purchase_request_ids.is_a?(Array)
       add_message :error, 'Invalid configuration'
@@ -25,7 +18,7 @@ class Procurements::PurchaseRequests::BulkApprove < Procurements::PurchaseReques
 
   def validate
     if self.purchase_requests.empty?
-      add_message :error, 'No Purchase Requests found'
+      add_message :error, 'You need to select atleast one purchase order to approve'
       return
     end
     accept_pr = []

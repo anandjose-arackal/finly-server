@@ -1,11 +1,6 @@
 class CostCenterExposure < Exposures::API
 
-  def gl_code
-    record.gl_code
-  end
-
-  def name
-    record.name
-  end
+  attribute :name, record_attribute: true
+  attribute :gl_code, record_attribute: true
 
 end

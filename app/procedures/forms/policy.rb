@@ -12,4 +12,8 @@ class Forms::Policy < ApplicationPolicy
     @user.admin?
   end
 
+  def config?
+    true
+  end
+
 end

@@ -1,16 +1,11 @@
 module Forms::Generators::Filters::ApiEntityHelper
   extend ActiveSupport::Concern
 
-  DEFAULT_OPERATORS = %i(
-            eq
-            not_eq
-            cont_any
-            not_cont_any
-            in
-            not_in
-            blank
-            present
-        )
+  DEFAULT_OPERATORS = []#%i(
+        #     eq_any
+        #     blank
+        #     present
+        # )
 
   module ClassMethods
     def operators(*list)

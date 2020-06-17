@@ -24,6 +24,7 @@ class RateContract < ApplicationRecord
   acts_as_sequenced column: :rate_contract_number, purpose: :rate_contract, editable: false, prefix: 'RTCT-'
 
   belongs_to :creator, optional: true, class_name: 'User'
+  belongs_to :created_by, optional: true, class_name: 'User', foreign_key: :creator_id
   belongs_to :vendor, optional: true, class_name: 'YesBankVendor'
   belongs_to :item, optional: true, class_name: 'Item'
   belongs_to :renewal_alert_period, optional: true, class_name: 'Period', foreign_key: :renewal_alert_period_id

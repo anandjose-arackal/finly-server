@@ -55,6 +55,11 @@ class BbpsBiller < ApplicationRecord
     where(biller_category_name: name)
   }
 
+  has_many :initiating_payments, as: :initiating_account, class_name: "Payment"
+  has_many :initiating_payment_trails, as: :initiating_account, class_name: "Payment"
+  has_many :receiving_payments, as: :receiving_account, class_name: "Payment"
+  has_many :receiving_payment_trails, as: :receiving_account, class_name: "Payment"
+
   # defining a few methods for consistency here
   def name
     self.biller_name

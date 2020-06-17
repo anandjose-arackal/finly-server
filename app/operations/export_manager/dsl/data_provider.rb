@@ -17,7 +17,11 @@ module ExportManager::DSL::DataProvider
   end
 
   def input
-    nil
+    resolve(self.class.resolver)
+  end
+
+  def resolve(route)
+    Resolver::Router.dispatch(route, params: params.merge(filter: true, paginate: false), current_user: user)
   end
 
 end
