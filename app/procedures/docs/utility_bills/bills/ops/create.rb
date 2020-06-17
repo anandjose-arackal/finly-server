@@ -13,6 +13,10 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
   step Contract::Validate(key: 'bill')
 
   step Contract::Persist()
+  
+  step :void_old_bills
+
+  # add method
 
   def skip_user_authorization!(context, options)
     true
@@ -57,17 +61,17 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
       else
         # None of the attributes for checking for existing bills exist in the response
         Event::EAlert::Create.(nil,
-            title: "Ambiguous Bill Creation #{subscription.id} . #{bill&.id}",
-            description: "Subscription: #{subscription.as_json} \n Bills: #{subscription.bbps_bills.last.as_json} \n Response: #{result.as_json["table"]}",
-            subject: "Ambiguous Bill Creation #{subscription.id} . #{bill&.id}"
+          title: "Ambiguous Bill Creation #{subscription.id} . #{bill&.id}",
+          description: "Subscription: #{subscription.as_json} \n Bills: #{subscription.bbps_bills.last.as_json} \n Response: #{result.as_json["table"]}",
+          subject: "Ambiguous Bill Creation #{subscription.id} . #{bill&.id}"
         )
       end
     else
       # None of the attributes for checking for existing bills exist in the response
       Event::EAlert::Create.(nil,
-          title: "Ambiguous Bill Creation #{subscription.id} . #{bill&.id}",
-          description: "Subscription: #{subscription.as_json} \n Bills: #{subscription.bbps_bills.last.as_json} \n Response: #{result.as_json["table"]}",
-          subject: "Ambiguous Bill Creation #{subscription.id} . #{bill&.id}"
+        title: "Ambiguous Bill Creation #{subscription.id} . #{bill&.id}",
+        description: "Subscription: #{subscription.as_json} \n Bills: #{subscription.bbps_bills.last.as_json} \n Response: #{result.as_json["table"]}",
+        subject: "Ambiguous Bill Creation #{subscription.id} . #{bill&.id}"
       )
     end
 
@@ -102,6 +106,23 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
     bill['bill_validation_required'] = !bill[:autofetched]
 
     params['bill'] = bill.with_indifferent_access
+  end
+
+  def void_old_bills(options, params:, **)
+
+    subscription = BbpsBillerSubscription.find_by id: params[:subscription_id]
+    # find_old bills for the subscription
+    status_ids = BbpsBill.status_ids(:open, :awaiting_approval, :approved, :auto_approved, :payment_ticket_created )
+    bills = subscription.bbps_bills.where(status_id: status_ids).where.not(order_number: params[:order_number])
+    if bills.count > 0
+      bills.each do |bill|
+        # update status and add error
+        bill.errors.add(:error, 'This bill is expired' )
+        bill.payments.each { | payment | payment.errors.add(:error, 'Bill expired' )}
+        bill.update(status_id: BbpsBillStatus.id_for(:expired))
+        bill.payments.update_all(payment_status_id: PaymentStatus.id_for(:failed))
+      end
+    end
   end
 
   private

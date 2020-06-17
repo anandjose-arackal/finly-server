@@ -15,7 +15,7 @@ class BbpsBillStatus < ApplicationRecord
   GROUP_AWAITING_APPROVAL = 91
 
   def self.values
-    %i( open awaiting_approval retracted rejected approved auto_approved payment_ticket_created payment_initiated failed paid voided payment_ticket_deleted)
+    %i( open awaiting_approval retracted rejected approved auto_approved payment_ticket_created payment_initiated failed paid voided payment_ticket_deleted expired )
   end
 
   def open?
@@ -64,6 +64,10 @@ class BbpsBillStatus < ApplicationRecord
 
   def voided?
     self.id == BbpsBillStatus.id_for(:voided)
+  end
+
+  def self.expired?
+    self.id == BbpsBillStatus.id_for(:expired)
   end
 
   def as_json
