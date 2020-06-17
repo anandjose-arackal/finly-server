@@ -1,20 +1,23 @@
 class Lookup::Attribute
 
-  attr_accessor :id, :label, :value, :visible, :includes
+  attr_accessor :id, :label, :visible, :includes, :primary, :value
 
   def initialize(params)
     params.each_pair do |key, value|
       self.send("#{key}=", value)
     end
     self.label ||= id.to_s.titleize
+    self.visible ||= true
+    self.primary ||= false
     self.value ||= id
   end
 
-  def config
+  def as_json(options={})
     {
-        id: id,
+        column: id,
         label: label,
-        visible: visible
+        visible: visible,
+        primary: primary
     }
   end
 

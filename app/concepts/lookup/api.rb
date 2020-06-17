@@ -7,6 +7,7 @@ class Lookup::API < Transactions::API
   pass :define_search
   step Resolver::Transactions::Load(builder: :resolver_builder, paginate: true)
   pass :include_associations
+  step :render_headers
   step :render
 
   def define_pagination(context, params:, **)
@@ -26,6 +27,10 @@ class Lookup::API < Transactions::API
 
   def include_associations(context, params:, **)
     context['model.records'] = context['model.records'].includes(self.class.associations_to_include)
+  end
+
+  def render_headers(context, **)
+    context[:headers] = attributes.as_json
   end
 
   def render(context, options)

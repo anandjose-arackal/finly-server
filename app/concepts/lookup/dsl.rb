@@ -12,8 +12,8 @@ module Lookup::DSL
   end
 
   class_methods do
-    def attribute(id, label: nil, value: nil, visible: true, includes: [])
-      self.attributes[id] = Lookup::Attribute.new(id: id, label: label, value: value, includes: includes, visible: visible)
+    def attribute(id, label: nil, visible: true, primary: false, value: nil, includes: [])
+      self.attributes[id] = Lookup::Attribute.new(id: id, label: label, value: value, primary: primary, visible: visible, includes: includes)
     end
 
     def associations_to_include
