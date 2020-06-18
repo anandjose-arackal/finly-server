@@ -6,7 +6,7 @@ class Docs::P2P::Inwards::Pending::FilterConfig < Filters::API
   attribute :created_at, type: :datetime, simple: false
   attribute :submitted_at, type: :datetime, simple: false
   attribute :approved_at, type: :datetime, simple: false
-  attribute :vendor_id, label: "Vendor", simple: true, type: :dropdown, choices: Choices[:lookup].('vendor')
+  attribute :vendor_id, label: "Vendor", simple: true, type: :dropdown, choices: Choices[:lookup].('vendors')
   attribute :vendor_vendor_id, label: "Vendor ID"
   attribute :delivery_date, label: "Expected Delivery Date", type: :datetime
   attribute :location_id, label: "Billing Location", type: :dropdown, choices: Choices[:lookup].("locations")

@@ -14,7 +14,7 @@ class Docs::PaymentTickets::Payments::FilterConfig < Filters::API
   # attribute :last_retried_at, label: "Last Retried On", type: :datetime
   attribute :payment_order_bank_payment_request_policy_id, label: "Policy", type: :dropdown, simple: true, choices: Choices[:lookup].("policies")
   attribute :amount_value, type: :number, label: 'Amount'
-  attribute :receiving_user_vendor_id, type: :dropdown, label: 'Vendor', choices: Choices[:lookup].("vendor"), simple: true
+  attribute :receiving_user_vendor_id, type: :dropdown, label: 'Vendor', choices: Choices[:lookup].("vendors"), simple: true
   custom_fields :purchase_order, prefix: :purchase_order_parent
   custom_fields :invoice, prefix: :invoice
 

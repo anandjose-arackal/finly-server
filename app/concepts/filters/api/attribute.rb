@@ -39,13 +39,13 @@ class Filters::API::Attribute
     end
 
     if choices.present?
-      choices_data = choices.build(user: user)
+      choice_provider = choices.build(user: user)
       # If the choices is partial, then set the field type as lookup.
-      if StringUtils.to_bool(choices_data[:partial]) and field_type.to_s == 'dropdown'
+      if StringUtils.to_bool(choice_provider.partial) and field_type.to_s == 'dropdown'
         params[:field_type] = :lookup
       end
 
-      params[:choices] = choices_data[:choices]
+      params[:data] = choice_provider.as_json
     end
     params
   end
