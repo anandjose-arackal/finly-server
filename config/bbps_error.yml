@@ -1,3 +1,4 @@
-"BillerResponse Mandatory": "Bank server unreachable"
-"Payment amount is unacceptable": "Wrong payment amount"
-"Successful Validation API is mandatory before executing Payment Request for this Biller": "Bank server unreachable"
+BILLPAY:
+  "BillerResponse Mandatory": "Bank server unreachable"
+  "Payment amount is unacceptable": "Wrong payment amount"
+  "Successful Validation API is mandatory before executing Payment Request for this Biller": "Bank server unreachable"

@@ -210,8 +210,8 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
 
   def self.add_error_message payment, error
     
-    if ERROR_MESSAGE[error.to_s].present?
-      payment.errors.add(:error, ERROR_MESSAGE[error.to_s] )
+    if ERROR_MESSAGE['BILLPAY'][error.to_s].present?
+      payment.errors.add(:error, ERROR_MESSAGE['BILLPAY'][error.to_s] )
     else
       payment.errors.add(:error, 'Payment Server Failure' ) # add default error
       
