@@ -67,7 +67,7 @@ class PolicyUserRoles::ForwardableUsers < PolicyUserRoles::Base
   end
 
   class PolicyUserRoles::ForwardableUsers::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :policy_user_roles, :paginated_policy_user_roles, :documents
+    attr_accessor :policy_user_roles, :paginated_policy_user_roles, :documents, :users, :paginated_users
     include HasScope
 
     has_scope :filter_role_id
@@ -88,6 +88,8 @@ class PolicyUserRoles::ForwardableUsers < PolicyUserRoles::Base
       per_page = params[:per_page] || 10000 # hardcoded as pagination on frontend is not there
 
       self.paginated_policy_user_roles = self.policy_user_roles.paginate(page: page, per_page: per_page).includes_for_index
+      self.users = user.company.users.where("id in (#{policy_user_roles.select(:user_id).to_sql})")
+      self.paginated_users = self.users.paginate(page: page, per_page: per_page)
       # self.user_roles = params[:user_roles]
     end
   end
