@@ -36,25 +36,20 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
         request_types[:grns] = false
       end
 
-      # Disabled vendors as the card was not providing any useful information
-      request_types[:vendors] = false
       unless user.company.vendor_empanelment_workflow_enabled?
         request_types[:vendors] = false
       end
 
-      request_types[:approved_purchase_request_items] = false
       unless user.company.purchase_requisition_enabled?
         request_types[:purchase_requests] = false
         request_types[:approved_purchase_request_items] = false
       end
 
-      request_types[:payment_agreements] = false
       unless user.company.agreement_based_payment_system_enabled?
         request_types[:payment_agreements] = false
         request_types[:agreement_invoices] = false
       end
 
-      request_types[:utility_bill_masters] = false
       unless user.company.utility_bills_enabled?
         request_types[:utility_bill_masters] = false
         request_types[:utility_bills] = false
@@ -79,13 +74,10 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
           request_types[:grns] = true
         when UserRole.id_for(:po_invoice_initiator)
           request_types[:po_invoices] = true
-          request_types[:invoices] = true
         when UserRole.id_for(:non_po_invoice_initiator)
           request_types[:non_po_invoices] = true
-          request_types[:invoices] = true
         when UserRole.id_for(:agreement_invoice_initiator)
           request_types[:non_po_invoices] = true
-          request_types[:invoices] = true
         when UserRole.id_for(:bank_payment_request_initiator)
           request_types[:payment_tickets] = true
         when UserRole.id_for(:bank_payment_request_creditor)
