@@ -60,8 +60,8 @@ class InvoiceLineItem < ApplicationRecord
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 
-  delegate :goods?, :service?, to: :inventory_line_item
-# , allow_nil: true
+  delegate :goods?, :service?, to: :inventory_line_item, allow_nil: true
+
   accepts_nested_attributes_for :discount_amount
   accepts_nested_attributes_for :tax_amount
   accepts_nested_attributes_for :amount
