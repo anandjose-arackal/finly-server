@@ -7,8 +7,8 @@ class Lookup::Attribute
       self.send("#{key}=", value)
     end
     self.label ||= id.to_s.titleize
-    self.visible ||= true
-    self.primary ||= false
+    self.visible = true if self.visible.nil?
+    self.primary = false if self.primary.nil?
     self.value ||= id
   end
 
