@@ -5,7 +5,5 @@ class Masters::Policies::Lookup < Lookup::API
 
   attribute :id, visible: false
   attribute :name
-  attribute :created_at, value: "{{record.created_at}}"
-  attribute :updated_at
 
 end
