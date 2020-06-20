@@ -27,7 +27,7 @@ class ExportManager::Master::Statements::Index < ExportManager::Builders::Spread
     unless result&.success?
       return add_message :error, result.messages[:error]
     end
-    result.scoped_finly_transactions
+    result.scoped_finly_transactions.success.sort_by_sequence_number
   end
 
   def date(transaction)
