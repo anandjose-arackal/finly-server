@@ -91,7 +91,7 @@ class FinlyTransaction < ApplicationRecord
   scope :sort_date_asc, -> {unscope(:order).order(date: :asc, id: :desc)}
   scope :sort_date_desc, -> {unscope(:order).order(date: :desc, id: :desc)}
   scope :limit_to_one, -> {limit 1}
-  scope :scope_by_sequence_number, -> {reorder(sequence_number: :desc)}
+  scope :sort_by_sequence_number, -> {reorder(sequence_number: :desc)}
 
   after_save :set_sequence_number
   after_create :save_transaction_detail
