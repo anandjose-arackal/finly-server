@@ -210,14 +210,20 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
 
   def self.add_error_message payment, error
     
-    if ERROR_MESSAGE['BILLPAY'][error.to_s].present?
-      payment.errors.add(:error, ERROR_MESSAGE['BILLPAY'][error.to_s] )
+    if BBPS_ERROR_MESSAGES['BillPayErrorsResponses'][error.to_s].present?
+      payment.system_messages.create({
+        content: BBPS_ERROR_MESSAGES['BillPayErrorsResponses'][error.to_s],
+        system_message_type_id: SystemMessageType.id_for(:error)
+      })
     else
-      payment.errors.add(:error, 'Payment Server Failure' ) # add default error
-      
-      message = YAML.load_file(File.expand_path("config/new_bbps_errors.yml") )
+      payment.system_messages.create({
+        content: "Unknown Error Occurred",
+        system_message_type_id: SystemMessageType.id_for(:error)
+      })
+
+      message = YAML.load_file("#{Rails.root}/config/new_bbps_errors.yml" )
       message[error.to_s] = error.to_s
-      File.open(File.expand_path("config/new_bbps_errors.yml"), 'w') { |file| YAML.dump(message, file) }
+      File.open("#{Rails.root}/config/new_bbps_errors.yml", 'w') { |file| YAML.dump(message, file) }
     end
   end
 
