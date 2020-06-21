@@ -18,7 +18,7 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
 
   step :update_subscription
 
-  fail :update_subscription
+  # fail :update_subscription
 
   # add method
 
