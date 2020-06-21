@@ -83,6 +83,12 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
                                 bbps_ref_id: result.bbps_ref_id,
                                 order_number: bill.order_number)
 
+        # Add log to api response in bill
+        api_response = bill.api_response.is_a?(Array) ? bill.api_response : []
+        api_response.push(result.as_json&.dig('table').merge({created_at: DateTime.now, api_type: "BillPay"}))
+
+        bill.update(api_response: api_response)
+
         # clearing old system messages as well
         payment.system_messages.destroy_all
         payment.update(payment_status_id: PaymentStatus.id_for(:processing))
