@@ -1,7 +1,7 @@
 BillPayErrorsResponses:
-  - "BillerResponse Mandatory": "Bank server unreachable"
-  - "Payment amount is unacceptable": "Wrong payment amount"
-  - "Successful Validation API is mandatory before executing Payment Request for this Biller": "Bank server unreachable"
+  "BillerResponse Mandatory": "Bank server unreachable"
+  "Payment amount is unacceptable": "Wrong payment amount"
+  "Successful Validation API is mandatory before executing Payment Request for this Biller": "Bank server unreachable"
 
 BillFetchNoDueResponses:
   - Payment received for the billing period - no bill due
@@ -16,4 +16,3 @@ BillFetchErrorResponses:
   - Incorrect / invalid customer account
   - Invalid Customer Mobile number
   - Biller/SubBiller not valid for Bill
-

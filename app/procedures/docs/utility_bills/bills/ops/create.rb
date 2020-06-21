@@ -13,8 +13,8 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
   step Contract::Validate(key: 'bill')
 
   step Contract::Persist()
-  
-  step :void_old_bills
+
+  step :expire_old_bills
 
   step :update_subscription
 
@@ -114,7 +114,7 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
     params['bill'] = bill.with_indifferent_access
   end
 
-  def void_old_bills(options, params:, **)
+  def expire_old_bills(options, params:, **)
 
     subscription = BbpsBillerSubscription.find_by id: params[:subscription_id]
     # find_old bills for the subscription
@@ -124,7 +124,12 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
       bills.each do |bill|
         # update status and add error
         bill.errors.add(:error, 'This bill is expired' )
-        bill.payments.each { | payment | payment.errors.add(:error, 'Bill expired' )}
+        bill.payments.each do |payment|
+          payment.system_messages.create({
+                                             content: 'Bill expired',
+                                             system_message_type_id: SystemMessageType.id_for(:error)
+                                         })
+        end
         bill.update(status_id: BbpsBillStatus.id_for(:expired))
         bill.payments.update_all(payment_status_id: PaymentStatus.id_for(:failed))
       end

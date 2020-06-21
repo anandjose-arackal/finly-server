@@ -96,7 +96,7 @@ class BbpsBill < ApplicationRecord
 
   accepts_nested_attributes_for :amount
 
-  delegate :open?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :payment_ticket_created?, :payment_initiated?, :failed, :paid?, :voided?, :payment_ticket_deleted?, to: :status
+  delegate :open?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :payment_ticket_created?, :payment_initiated?, :failed, :paid?, :voided?, :payment_ticket_deleted?, :expired?, to: :status
   delegate :amount_value, to: :total_amount
 
   default_scope {order('bbps_bills.created_at DESC')}
