@@ -23,7 +23,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
     # first we determine if the associated payment to this particular transaction is completed or not
     # bill = payment.parent
 
-    bill_fetch_op = Docs::UtilityBills::Subscriptions::Ops::ProcessBillPrePayment.(params: {bill_id: payment.parent_id}, current_user: User.first)
+    bill_fetch_op = Docs::UtilityBills::Subscriptions::Ops::SyncBillPrePayment.(params: {bill_id: payment.parent_id}, current_user: User.first)
 
     if bill_fetch_op.success?
       bill = bill_fetch_op['result'][:bill]

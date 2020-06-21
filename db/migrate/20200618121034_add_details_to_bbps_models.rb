@@ -1,7 +1,7 @@
 class AddDetailsToBbpsModels < ActiveRecord::Migration[5.2]
   def change
     add_column :bbps_biller_subscriptions, :refreshed_at, :datetime
-    add_column :bbps_biller_subscriptions, :auto_fetch_enabled, :boolean, default: true
+    add_column :bbps_biller_subscriptions, :auto_fetch_enabled, :boolean, default: true, index: true
     add_column :bbps_biller_subscriptions, :biller_response, :text
     add_column :bbps_biller_subscriptions, :last_bill_generated_at, :datetime
     add_column :bbps_biller_subscriptions, :last_bill_due_date, :date
@@ -21,6 +21,16 @@ class AddDetailsToBbpsModels < ActiveRecord::Migration[5.2]
           last_bill_bill_date: bill.bill_date.present? && bill.bill_date.to_s != "0000-01-01" ? bill.bill_date : nil
       }
       sub.update(update_params)
+    end
+
+    BbpsBill.where(autofetched: true).each do |bill|
+      api_response = bill.api_response
+
+      next if api_response.blank?
+
+      api_response.merge!({created_at: bill.created_at, api_type: "BillFetch", fetch_type: 'AutoFetch'})
+
+      bill.update_columns(:api_response, [api_response])
     end
   end
 end

@@ -6,7 +6,7 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchBill < Transactions::API
 
   step :validate
 
-  step :set_params
+  # step :set_params
 
   step :bill_fetch
 
@@ -36,28 +36,25 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchBill < Transactions::API
     true
   end
 
-  def set_params(options, model:, params:, **)
-    fetch_params = customer_params(model).with_indifferent_access
-    options[:fetch_params] = fetch_params
-    true
-  end
+  # def set_params(options, model:, params:, **)
+  #   fetch_params = customer_params(model).with_indifferent_access
+  #   options[:fetch_params] = fetch_params
+  #   true
+  # end
 
   def bill_fetch(options, model:, fetch_params:, **)
     # op = Bbps::BillFetch.call_async({params: fetch_params, "current_user" => User.first}, {wait: true})
     options['result'] = {}
-    Bbps::BillFetch.call_async({params: fetch_params, "current_user" => User.first}, {wait: true}) do |op|
+    Bbps::BillFetch.call_async({params: model.generate_billfetch_params, "current_user" => User.first}, {wait: true}) do |op|
       op.success do |result|
-        p "SUCCESS"
         options['result']['data'] = result
       end
 
       op.error do |result|
-        p "ERROR"
         options['result']['data'] = result
       end
 
       op.failure do |result|
-        p "FAILURE"
 
         if result["errors"].present? && result["errors"].is_a?(Hash)
           messages = result["errors"].values.flatten
@@ -132,9 +129,9 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchBill < Transactions::API
   def update_bill(options, result:, **)
     return true if result['bill'].blank?
 
-    api_response = result['bill']&.api_response || []
+    api_response = result['bill']&.api_response.is_a?(Array) ? result['bill']&.api_response : []
 
-    api_response.push(data.as_json&.dig("table").merge({created_at: DateTime.now, api_type: "BillFetch"}))
+    api_response.push(data.as_json&.dig("table").merge({created_at: DateTime.now, api_type: "BillFetch", fetch_type: 'UserFetch'}))
 
     # Update Bill with Reference Number
     bill_update_params = {
@@ -173,24 +170,24 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchBill < Transactions::API
 
   private
 
-  def customer_params(subscription)
-    parameters = {
-        mobile_number: subscription.mobile_number,
-        biller_id: subscription.biller&.biller_id,
-    }
-
-    (1..5).to_a.each do |i|
-      key = subscription.send("customer_param_key_#{i}")
-      value = subscription.send("customer_param_value_#{i}")
-      if key.present? && value.present?
-        parameters["customer_param_#{i}"] = {
-            key: key,
-            value: value
-        }
-      end
-    end
-    parameters
-  end
+  # def customer_params(subscription)
+  #   parameters = {
+  #       mobile_number: subscription.mobile_number,
+  #       biller_id: subscription.biller&.biller_id,
+  #   }
+  #
+  #   (1..5).to_a.each do |i|
+  #     key = subscription.send("customer_param_key_#{i}")
+  #     value = subscription.send("customer_param_value_#{i}")
+  #     if key.present? && value.present?
+  #       parameters["customer_param_#{i}"] = {
+  #           key: key,
+  #           value: value
+  #       }
+  #     end
+  #   end
+  #   parameters
+  # end
 
   def get_amount_from_response(response)
     return response.to_f unless response.to_s.include?("=")

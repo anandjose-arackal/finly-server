@@ -1,4 +1,4 @@
-class Docs::UtilityBills::Subscriptions::Ops::ProcessBillPrePayment < Transactions::API
+class Docs::UtilityBills::Subscriptions::Ops::SyncBillPrePayment < Transactions::API
 
   step :init
 
@@ -119,7 +119,7 @@ class Docs::UtilityBills::Subscriptions::Ops::ProcessBillPrePayment < Transactio
           :bill_period, :early_payment_date))
 
       api_response = bill.api_response.is_a?(Array) ? bill.api_response : []
-      api_response.push(parsed_bill_data[:api_response].merge({fetch_type: 'PrePayment'}))
+      api_response.push(parsed_bill_data[:api_response].merge({fetch_type: 'PrePaymentFetch'}))
 
       bill_update_params.merge({
                                    api_response: api_response,
