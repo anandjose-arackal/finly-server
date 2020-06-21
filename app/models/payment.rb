@@ -53,7 +53,6 @@
 #  disabled                       :boolean
 #  transfer_mode_id               :integer
 #  last_retried_at                :datetime
-#  utr                            :string(255)
 #
 
 class Payment < ApplicationRecord

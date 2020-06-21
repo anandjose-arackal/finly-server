@@ -132,19 +132,18 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchBill < Transactions::API
   def update_bill(options, result:, **)
     return true if result['bill'].blank?
 
+    api_response = result['bill']&.api_response || []
+
+    api_response.push(data.as_json&.dig("table").merge({created_at: DateTime.now, api_type: "BillFetch"}))
+
     # Update Bill with Reference Number
     bill_update_params = {
         order_number: result['data'].ref_no,
-        order_number_type: 'BillFetch'
+        order_number_type: 'BillFetch',
+        api_response: api_response
     }
 
-    # Create Contract
-
-    # Validate Contract
-
-    # Persist Contract
-
-    result['bill'].update(order_number: result['data'].ref_no, order_number_type: "BillFetch")
+    result['bill'].update(bill_update_params)
   end
 
   def check_create_permission(options, current_user:, model:, result:, **)

@@ -407,6 +407,17 @@ class BbpsBill < ApplicationRecord
     bill_validation_required
   end
 
+  def generate_changelog_message(prefix = "")
+    changes = self.changes
+    keys = changes.keys
+
+    return nil if keys.blank?
+
+    keys.reduce(prefix) do |memo, value|
+      memo += "#{value} from #{changes[value][0].present? ? changes[value][0] : "''"} to #{changes[value][1].present? ? changes[value][1] : "''"} \n "
+    end
+  end
+
   def self.document_owner_attribute
     'user_id'
   end

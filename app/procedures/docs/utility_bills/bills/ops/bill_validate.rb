@@ -90,8 +90,19 @@ class Docs::UtilityBills::Bills::Ops::BillValidate < Transactions::API
   end
 
   def update_bill(options, model:, result:, **)
-    order_number = result['data'].order_number
-    model.update(order_number: order_number, order_number_type: "BillValidate", bill_validation_required: false)
+    data = result['data']
+
+    api_response = model&.api_response || []
+    api_response.push(data.as_json&.dig("table").merge({created_at: DateTime.now, api_type: "BillValidate"}))
+
+    update_params = {
+        order_number: data.order_number,
+        order_number_type: "BillValidate",
+        bill_validation_required: false,
+        api_response: api_response
+    }
+
+    model.update(update_params)
   end
 
   private
@@ -103,6 +114,5 @@ class Docs::UtilityBills::Bills::Ops::BillValidate < Transactions::API
         value: subscription.send("customer_param_value_#{index}")
     }
   end
-
 
 end

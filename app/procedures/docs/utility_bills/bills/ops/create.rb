@@ -16,6 +16,10 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
   
   step :void_old_bills
 
+  step :update_subscription
+
+  fail :update_subscription
+
   # add method
 
   def skip_user_authorization!(context, options)
@@ -29,6 +33,8 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
     subscription_id = params[:subscription_id]
 
     subscription = BbpsBillerSubscription.find_by id: subscription_id
+
+    options[:subscription] = subscription
 
     return false if autofetched and subscription.blank?
 
@@ -123,6 +129,18 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
         bill.payments.update_all(payment_status_id: PaymentStatus.id_for(:failed))
       end
     end
+  end
+
+  def update_subscription(options, params:, subscription:, model:, **)
+    update_params = {
+        refreshed_at: model.generated_at,
+        biler_response: nil
+    }
+    update_params[:last_bill_generated_at] = model.generated_at if model.present?
+    update_params[:last_bill_due_date] = model.due_date if model.present? and model.due_date.present? and model.due_date.to_s != "9999-01-01"
+    update_params[:last_bill_bill_date] = model.bill_date if model.present? and model.bill_date.present? and model.bill_date.to_s != "0000-01-01"
+
+    subscription.update(update_params)
   end
 
   private

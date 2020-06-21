@@ -11,11 +11,26 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
     return true
   end
 
+
   # this method will consume YesBank's APIs so that they can fulfill our
   # BBPS billers. Have to understand the adapters to implement this
+
+
+  # New Flow : Before bill pay, a bill fetch will be done to avoid failures
+  # If due is different but amount is same, it will update the bill with new due date and proceed with payment
+  # If amount is different while fetching again irrespective of due date, it will mark the payment as failed and stop the flow here
   def credit(payment, options = {})
     # first we determine if the associated payment to this particular transaction is completed or not
-    bill = payment.parent
+    # bill = payment.parent
+
+    bill_fetch_op = Docs::UtilityBills::Subscriptions::Ops::ProcessBillPrePayment.(params: {bill_id: payment.parent_id}, current_user: User.first)
+
+    if bill_fetch_op.success?
+      bill = bill_fetch_op['result'][:bill]
+    else
+      self.errors << bill_fetch_op.errors.values
+      return false
+    end
 
     # now the bank transaction will be the first in the list of reference resources
     bank_transaction = payment.reference_resources.first
