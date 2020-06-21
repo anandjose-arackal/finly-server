@@ -30,7 +30,7 @@ class AddDetailsToBbpsModels < ActiveRecord::Migration[5.2]
 
       api_response.merge!({created_at: bill.created_at, api_type: "BillFetch", fetch_type: 'AutoFetch'})
 
-      bill.update_columns(:api_response, [api_response])
+      bill.update_column(:api_response, [api_response])
     end
   end
 end
