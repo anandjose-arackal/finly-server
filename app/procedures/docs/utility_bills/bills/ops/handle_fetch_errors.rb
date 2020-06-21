@@ -43,7 +43,7 @@ class Docs::UtilityBills::Bills::Ops::HandleFetchErrors < Transactions::API
 
     end
 
-    subscription.update(update_params) if update_params.present?
+    # subscription.update(update_params) if update_params.present?
 
     true
 
