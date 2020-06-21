@@ -108,7 +108,7 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
       bill.merge!({"#{key.to_s}": {value: (params.dig(key) || 0), currency_id: 1}})
     end
 
-    bill[:api_response]&.merge({fetch_type: 'AutoFetch'}) if bill[:api_response].is_a?(Array) && bill[:api_response][0].present?
+    bill[:api_response][0].merge({fetch_type: 'AutoFetch'}) if bill[:api_response].is_a?(Array) && bill[:api_response][0].present?
 
     # Set bill validation
     bill['bill_validation_required'] = !bill[:autofetched]
