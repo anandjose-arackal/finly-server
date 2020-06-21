@@ -142,7 +142,7 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
   def update_subscription(options, params:, subscription:, model:, **)
     update_params = {
         refreshed_at: model.generated_at,
-        biler_response: nil
+        biller_response: nil
     }
     update_params[:last_bill_generated_at] = model.generated_at if model.present?
     update_params[:last_bill_due_date] = model.due_date if model.present? and model.due_date.present? and model.due_date.to_s != "9999-01-01"
