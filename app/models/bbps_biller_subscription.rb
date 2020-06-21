@@ -227,7 +227,9 @@ class BbpsBillerSubscription < ApplicationRecord
         customer_name: customer_name,
         last_paid_at: last_paid_at&.strftime("%I:%M %p, %d %b %Y"),
         customer_pan: customer_pan,
-        attachments: attachments.as_json
+        attachments: attachments.as_json,
+        auto_fetch_enabled: auto_fetch_enabled,
+        biller_response: biller_response
     }
   end
 

@@ -13,7 +13,7 @@ class Docs::UtilityBills::Subscriptions::Ops::SyncBillPrePayment < Transactions:
   def init(options, params:, **)
     options[:bill] = BbpsBill.find_by id: params[:bill_id]
     options[:subscription] = bill&.subscription
-    options[:biller] = options[:subscription].biller
+    options[:biller] = options[:subscription]&.biller
 
   end
 

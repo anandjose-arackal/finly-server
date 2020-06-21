@@ -66,7 +66,7 @@ class BbpsBillStatus < ApplicationRecord
     self.id == BbpsBillStatus.id_for(:voided)
   end
 
-  def self.expired?
+  def expired?
     self.id == BbpsBillStatus.id_for(:expired)
   end
 

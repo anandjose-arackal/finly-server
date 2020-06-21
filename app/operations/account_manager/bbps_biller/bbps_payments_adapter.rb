@@ -32,6 +32,9 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
       return false
     end
 
+    # Reload Bill
+    bill.reload
+
     # now the bank transaction will be the first in the list of reference resources
     bank_transaction = payment.reference_resources.first
     if bank_transaction.present? and !bank_transaction.retriable?
