@@ -136,6 +136,7 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
         bill.payments.update_all(payment_status_id: PaymentStatus.id_for(:failed))
       end
     end
+    true
   end
 
   def update_subscription(options, params:, subscription:, model:, **)
