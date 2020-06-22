@@ -8,8 +8,8 @@
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
 server 'bgp.finly.io', user: 'centos', roles: %w{sidekiq_app crono_role poller_role app}
-server 'bgg.finly.io', user: 'centos', roles: %w{sidekiq_app email_tracker_role}
-server '172.32.59.38', user: 'centos', roles: %w{sidekiq_app email_tracker_role}
+# server 'bgg.finly.io', user: 'centos', roles: %w{sidekiq_app email_tracker_role}
+# server '172.32.59.38', user: 'centos', roles: %w{sidekiq_app email_tracker_role}
 set :stage, 'production'
 set :use_sudo, false
 set :rbenv_type, :user

@@ -31,6 +31,7 @@ class InvoiceExposure < Exposures::API
   attribute :narration, record_attribute: true
   attribute :invoice_number, record_attribute: true
   attribute :created_at, record_attribute: true
+  attribute :submitted_at, record_attribute: true
   attribute :created_by, record_attribute: true, exposure: true
   attribute :policy, exposure: true, record_attribute: true, includes: [:policy]
   attribute :gross_amount, record_attribute: true, exposure: true, includes: [:gross_amount]
@@ -98,7 +99,13 @@ class InvoiceExposure < Exposures::API
   attribute :advance_amount, record_attribute: true, exposure: true
   attribute :balance_due, includes: [:balance_due], record_attribute: true, exposure: true
   attribute :balance_due_value, includes: [:balance_due] do
-    record.balance_due&.value || 0
+    record.balance_payable&.value || 0
+  end
+  attribute :paid_amount_value, includes: [:balance_due, {successful_payments: :amount}] do
+    record.paid_amount_value || 0
+  end
+  attribute :balance_payable_value, includes: [:balance_due, {successful_payments: :amount}] do
+    record.balance_payable || 0
   end
 
   # Fixme: Performance incase the number of line items it high

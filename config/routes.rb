@@ -4275,6 +4275,9 @@ Rails.application.routes.draw do
 
   post 'clients/web', to: 'web_clients#create'
 
+  get 'lookup/:route', to: 'lookup#route'
+
+
 
   resources :invoices, only: [:create, :update, :show]
 

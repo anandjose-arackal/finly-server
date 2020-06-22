@@ -36,8 +36,12 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     text value: :invoice_number, format: 'primary'
   end
 
-  column :created_at do
-    date value: :created_at
+  column :submitted_on, default: true do
+    date value: :submitted_at
+  end
+
+  column :approved_on, default: true do
+    date value: :approved_at
   end
 
   column :invoice_date, default: true do
@@ -98,7 +102,7 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     amount value: :freight_amount
   end
 
-  column :net_amount, includes: [net_amount: :currency] do
+  column :net_amount, includes: [net_amount: :currency], default: true do
     amount value: :net_amount
   end
 
@@ -107,8 +111,12 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
   #   amount value: :advance_amount
   # end
 
-  column :balance_due, includes: [balance_due: :currency] do
-    amount value: :balance_due
+  column :paid_amount, includes: {successful_payments: :amount}, default: true do
+    amount value: :paid_amount_value
+  end
+
+  column :balance_due, includes: [:balance_due, {successful_payments: :amount}], default: true do
+    amount value: :balance_payable_value
   end
 
   column :cost_center, default: true, includes: [:cost_center] do
