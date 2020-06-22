@@ -26,7 +26,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
     bill_fetch_op = Docs::UtilityBills::Subscriptions::Ops::SyncBillPrePayment.(params: {bill_id: payment.parent_id}, current_user: User.first)
 
     if bill_fetch_op.success?
-      bill = bill_fetch_op['result']['bill']
+      bill = bill_fetch_op['bill']
     else
       self.errors << bill_fetch_op.errors.values
       return false
