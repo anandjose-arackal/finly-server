@@ -84,7 +84,7 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
     end
 
     if bill.present?
-      api_response = bill.get_api_response
+      api_response = bill.get_api_responses
       api_response.push(params[:api_response]&.first&.merge({fetch_type: "AutoFetch"}))
       bill.update(order_number: params[:order_number], order_number_type: "BillFetch", api_response: api_response)
       return false
