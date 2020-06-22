@@ -27,7 +27,7 @@ class Dashboard::P2P::Configs < Dashboard::VendorPayments::Base
     reviewer_role_ids = UserRole.ids_for(:admin, :purchase_request_reviewer, :purchase_order_reviewer, :non_po_invoice_reviewer, :po_invoice_reviewer, :agreement_invoice_reviewer, :vendor_reviewer, :bank_payment_request_reviewer, :payment_agreement_reviewer, :utility_bill_master_reviewer, :utility_bill_reviewer)
 
     if user.vendor_payments_admin?
-      request_types.keys.map {|key| request_types[key] = true }
+      request_types.keys.map {|key| request_types[key] = true}
       unless user.company.procurement_enabled?
         request_types[:po_advances] = false
         request_types[:purchase_orders] = false
@@ -105,7 +105,7 @@ class Dashboard::P2P::Configs < Dashboard::VendorPayments::Base
         end
       end
     end
-    
+
     unless user.company.feature_subscription.grn_enabled || user.company.feature_subscription.srn_enabled
       request_types[:grns] = false
     end
