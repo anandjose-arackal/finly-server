@@ -82,7 +82,7 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
     end
 
     if bill.present?
-      bill.update(order_number: params[:ref_number], order_number_type: "BillFetch")
+      bill.update(order_number: params[:order_number], order_number_type: "BillFetch")
       return false
     end
 
