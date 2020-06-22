@@ -16,7 +16,7 @@ class Docs::P2P::Invoices::FilterConfig < Filters::API
   attribute :submitted_at, type: :datetime, simple: false
   attribute :date, label: "Invoice Date", type: :datetime, simple: true
   attribute :due_date, label: "Due Date", type: :datetime, simple: true
-  attribute :invoice_type_id, label: "Type", type: :dropdown, choices: Choices[:list].(*INVOICE_TYPES)
+  attribute :invoice_type_id, label: "Type", type: :dropdown, simple: true, choices: Choices[:list].(*INVOICE_TYPES)
   attribute :policy_id, type: :dropdown, simple: false, choices: Choices[:auto_complete].('policies')
   attribute :vendor_id, label: "Vendor", simple: true, type: :dropdown,  choices: Choices[:auto_complete].("vendor")
   attribute :vendor_vendor_id, label: "Vendor ID", simple: false
