@@ -44,11 +44,11 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
     early_payment_date = DateUtils.parse_date(params[:early_payment_date])
 
     if (due_date.present? && due_date != "NA" && due_date != "9999-01-01") && (due_date.present? && due_date != "NA" && due_date != "0001-01-01")
-      bill = subscription.bbps_bills.where("bill_date = ? AND due_date = ?", Date.parse(due_date), Date.parse(due_date)).first
+      bill = subscription.bbps_bills.where("bill_date = ? AND due_date = ?", Date.parse(bill_date), Date.parse(due_date)).first
     elsif due_date.present? && due_date != "NA" && due_date != "9999-01-01"
       bill = subscription.bbps_bills.where("due_date = ?", Date.parse(due_date)).first
-    elsif due_date.present? && due_date != "NA" && due_date != "0000-01-01"
-      bill = subscription.bbps_bills.where("bill_date = ?", Date.parse(due_date)).first
+    elsif bill_date.present? && bill_date != "NA" && bill_date != "0000-01-01"
+      bill = subscription.bbps_bills.where("bill_date = ?", Date.parse(bill_date)).first
     elsif bill_month.present?
       bill = subscription.bbps_bills.where(bill_month: bill_month)
     elsif early_payment_date.present?

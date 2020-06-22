@@ -1,4 +1,4 @@
-class Docs::UtilityBills::Subscriptions::Ops::SyncBillPrePayment < Transactions::API
+class Docs::UtilityBills::Bills::Ops::SyncBillPrePayment < Transactions::API
 
   step :init
 
@@ -93,14 +93,14 @@ class Docs::UtilityBills::Subscriptions::Ops::SyncBillPrePayment < Transactions:
   end
 
   def validate_bill(options, subscription:, bill:, result:, **)
-    return true unless subscription.auto_fetchable
     data = result['data']
-
     amount = (data.amount.to_f / 100).round(2)
 
-    return true if bill.amount == amount and new_bills.blank?
+    return true unless subscription.auto_fetchable
+    return true if bill.amount == amount
 
     add_message(options, :error, :base, "New Bill Available with Updated Amount") if bill.amount != amount
+    false
   end
 
   def update_bill(options, subscription:, bill:, result:, **)
