@@ -110,7 +110,7 @@ class Docs::UtilityBills::Subscriptions::Ops::SyncBillPrePayment < Transactions:
 
     if subscription.auto_fetchable
 
-      bill_parse_op = Docs::UtilityBills::Bills::Ops::BillParser.(params: {data: result}, current_user: User.first)
+      bill_parse_op = Docs::UtilityBills::Bills::Ops::BillParser.(params: {data: result['data']}, current_user: User.first)
 
       parsed_bill_data = bill_parse_op[:result]
 
@@ -119,7 +119,7 @@ class Docs::UtilityBills::Subscriptions::Ops::SyncBillPrePayment < Transactions:
           :bill_period, :early_payment_date))
 
       api_response = bill.api_response.is_a?(Array) ? bill.api_response : []
-      api_response.push(parsed_bill_data[:api_response].merge({fetch_type: 'PrePaymentFetch'}))
+      api_response.push(parsed_bill_data[:api_response][0].merge({fetch_type: 'PrePaymentFetch'}))
 
       bill_update_params.merge({
                                    api_response: api_response,
@@ -128,7 +128,7 @@ class Docs::UtilityBills::Subscriptions::Ops::SyncBillPrePayment < Transactions:
     end
 
 
-    bill.assign(bill_update_params)
+    bill.assign_attributes(bill_update_params)
 
     bill.save
   end
