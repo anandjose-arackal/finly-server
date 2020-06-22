@@ -84,7 +84,7 @@ class BbpsBillerSubscription < ApplicationRecord
   has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment'
   has_many :receiving_payments, foreign_key: 'receiving_user_id', class_name: 'Payment'
 
-  after_update :cleanup # Destroy Biller Subscription fields for other billers if any
+  before_update :cleanup # Destroy Biller Subscription fields for other billers if any
 
   delegate :draft?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :deactivated?, :reactivated?, to: :status
 
@@ -190,8 +190,9 @@ class BbpsBillerSubscription < ApplicationRecord
   }
 
   def cleanup
-    self.update_column('auto_fetch_enabled', true)
-
+    unless self.changes.keys.include?("auto_fetch_enabled")
+      self.auto_fetch_enabled = true
+    end
   end
 
   def as_json(options={})
