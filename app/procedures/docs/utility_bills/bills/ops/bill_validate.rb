@@ -92,8 +92,8 @@ class Docs::UtilityBills::Bills::Ops::BillValidate < Transactions::API
   def update_bill(options, model:, result:, **)
     data = result['data']
 
-    api_response = model&.api_response || []
-    api_response.push(data.as_json&.dig("table").merge({created_at: DateTime.now, api_type: "BillValidate"}))
+    api_response = model.get_api_responses
+    api_response.push(data.as_json&.dig("table")&.merge({created_at: DateTime.now, api_type: "BillValidate"}))
 
     update_params = {
         order_number: data.order_number,
