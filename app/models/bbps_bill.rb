@@ -418,6 +418,10 @@ class BbpsBill < ApplicationRecord
     end
   end
 
+  def get_api_responses
+    self.api_response.is_a?(Array) ? self.api_response : []
+  end
+
   def self.document_owner_attribute
     'user_id'
   end
