@@ -16,7 +16,9 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
 
   step :expire_old_bills
 
-  step :update_subscription
+  step :update_subscription_w_bill
+
+  fail :update_subscription_wo_bill
 
   # fail :update_subscription
 
@@ -139,7 +141,7 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
     true
   end
 
-  def update_subscription(options, params:, subscription:, model:, **)
+  def update_subscription_w_bill(options, params:, subscription:, model:, **)
     update_params = {
         refreshed_at: DateTime.now,
         biller_response: nil
@@ -149,6 +151,10 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
     update_params[:last_bill_bill_date] = model.bill_date if model.present? and model.bill_date.present? and model.bill_date.to_s != "0000-01-01"
 
     subscription.update(update_params)
+  end
+
+  def update_subscription_wo_bill(options, params:, subscription:, model:, **)
+    subscription.update(refreshed_at: nil, biller_response: nil)
   end
 
   private
