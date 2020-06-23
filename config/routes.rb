@@ -4257,6 +4257,7 @@ Rails.application.routes.draw do
 
   get 'actions/:route', to: "actions#show"
   get 'actions/:route/validate', to: "actions#validate"
+  post 'actions/:route/validate', to: "actions#validate"
 
   resources :views, controller: 'index_view_segments', except: [:show]
 
