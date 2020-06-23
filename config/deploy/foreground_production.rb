@@ -10,7 +10,7 @@
 server 'm1.finly.io', user: 'centos', roles: %w{web app db}
 server 'm2.finly.io', user: 'centos', roles: %w{web app}
 server 'm3.finly.io', user: 'centos', roles: %w{web app}
-server 'm4.finly.io', user: 'centos', roles: %w{web app}
+# server 'm4.finly.io', user: 'centos', roles: %w{web app}
 server 'm5.finly.io', user: 'centos', roles: %w{web app}
 server 'm6.finly.io', user: 'centos', roles: %w{web app}
 server 'm7.finly.io', user: 'centos', roles: %w{web app}
