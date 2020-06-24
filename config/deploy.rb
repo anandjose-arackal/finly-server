@@ -5,7 +5,7 @@ if ['aws_production', 'foreground_production', 'api_production',
     'background_production', 'background_production_bgg', 'background_production_bgp',
     'background_production_bgpc', 'yes_bank_balance_poller',
     'console_production'].include?(fetch(:stage)&.to_s)
-  load_secure_storage(:production)
+  # load_secure_storage(:production)
 elsif ['background_production_console'].include?(fetch(:stage)&.to_s)
   load_secure_storage(:background_production_console)
 end

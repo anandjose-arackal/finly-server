@@ -26,6 +26,8 @@ gem 'daemons', '~> 1.3.1'
 # gem for crash reports
 gem 'rollbar'#, '~> 2.18.2'
 gem 'oj', '~> 3.7.6'
+gem "memory_profiler", '~> 0.9'
+gem "derailed_benchmarks", '~> 1.7.0'
 
 # Firewall
 gem 'rack-attack', '5.4.2'
@@ -254,7 +256,7 @@ group :development, :test do
   gem 'rack-mini-profiler', '~> 1.0.1'
   # gem 'flamegraph'
   gem 'stackprof', '~> 0.2.12' # ruby 2.1+ only
-  gem 'memory_profiler', '~> 0.9.12'
+  # gem 'memory_profiler', '~> 0.9.12'
   gem 'brakeman'
   # gem 'active_record_query_trace', '~> 1.5.4'
   # gem 'better_errors'
