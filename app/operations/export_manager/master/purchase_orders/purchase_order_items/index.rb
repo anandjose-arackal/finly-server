@@ -105,7 +105,7 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
   end
 
   def gl_code(item)
-    item.category&.gl_code
+    inventory_line_item(item)&.category&.gl_code
   end
 
   def hsn_sac(item)

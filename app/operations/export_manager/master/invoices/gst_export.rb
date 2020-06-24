@@ -69,7 +69,7 @@ class ExportManager::Master::Invoices::GstExport < ExportManager::Builders::Spre
   end
 
   def gl_code(invoice_line_item)
-    invoice_line_item.category&.gl_code
+    invoice_line_item&.inventory_line_item&.category&.gl_code
   end
 
   def description(invoice_line_item)
