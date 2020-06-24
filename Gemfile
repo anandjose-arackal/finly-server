@@ -24,7 +24,7 @@ gem 'daemons', '~> 1.3.1'
 # grm for mocking and stubbing in test cases
 
 # gem for crash reports
-gem 'rollbar', '~> 2.18.2'
+gem 'rollbar'#, '~> 2.18.2'
 gem 'oj', '~> 3.7.6'
 
 # Firewall
