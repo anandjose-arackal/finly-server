@@ -129,7 +129,7 @@ gem 'jbuilder', '~> 2.9.0'
 
 gem 'rake', '~> 12.3.2'
 
-gem 'bootsnap', '1.3.2', require: false
+gem 'bootsnap', '~> 1.4', require: false
 
 gem 'handlebars_assets', '~> 0.23.2'
 

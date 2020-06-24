@@ -32,7 +32,7 @@ when :aws_production, :background_production, :foreground_production, :console_p
   # unless ['master', :master].include?(branch)
   #   raise 'This branch cannot be deploy to production. Please select the correct branch'
   # end
-  set :deploy_to, '/home/centos/app'
+  set :deploy_to, '/home/ubuntu/app'
   set :rails_env, 'production'
 when :yes_bank_balance_poller
   branch = fetch :branch
