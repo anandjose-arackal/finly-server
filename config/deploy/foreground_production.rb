@@ -7,7 +7,7 @@
 # server 'example.com', user: 'deploy', roles: %w{app web}, other_property: :other_value
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
-server 'azure_m1.finly.io', user: 'ubuntu', roles: %w{web app db}
+server '52.172.206.210', user: 'ubuntu', roles: %w{web app db}
 # server 'm2.finly.io', user: 'centos', roles: %w{web app}
 # server 'm3.finly.io', user: 'centos', roles: %w{web app}
 # server 'm4.finly.io', user: 'centos', roles: %w{web app}
