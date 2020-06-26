@@ -1,7 +1,7 @@
 # config valid only for current version of Capistrano
 lock '~> 3.11'
 
-if ['aws_production', 'foreground_production', 'api_production',
+if ['api_production',
     'background_production', 'background_production_bgg', 'background_production_bgp',
     'background_production_bgpc', 'yes_bank_balance_poller',
     'console_production'].include?(fetch(:stage)&.to_s)
@@ -116,6 +116,7 @@ linked_files = %w{
   config/sidekiq.yml
   config/hutch.yml
   config/web_client.yml
+  config/azure_config.yml
 }
 case fetch(:stage)
 when :itzcash_production, :aws_production, :background_production, :foreground_production, :console_production, :api_production, :background_production_console,
@@ -159,6 +160,7 @@ set :puma_workers, 0
 set :puma_worker_timeout, nil
 set :puma_init_active_record, true
 set :puma_preload_app, false
+set :ssh_options, :keepalive => true
 
 set :whenever_roles, ["whenever_cron"]
 
