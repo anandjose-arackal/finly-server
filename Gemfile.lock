@@ -1,8 +1,8 @@
 GIT
   remote: git@gitlab.com:finlycore/finly-secure_storage-sdk.git
-  revision: 9ac70c0a33835beb84fc19f9efee47cdcf215898
+  revision: 42054e97c6207cd5240f7b50840467ef42655bf2
   specs:
-    finly-secure_storage-sdk (0.1.44)
+    finly-secure_storage-sdk (0.1.45)
       aws-sdk-ec2 (>= 1.24.0)
       rails (>= 4.2)
 
@@ -107,13 +107,13 @@ GEM
       execjs
     awesome_print (1.8.0)
     aws-eventstream (1.1.0)
-    aws-partitions (1.333.0)
-    aws-sdk-core (3.101.0)
+    aws-partitions (1.335.0)
+    aws-sdk-core (3.102.1)
       aws-eventstream (~> 1, >= 1.0.2)
       aws-partitions (~> 1, >= 1.239.0)
       aws-sigv4 (~> 1.1)
       jmespath (~> 1.0)
-    aws-sdk-ec2 (1.170.0)
+    aws-sdk-ec2 (1.171.0)
       aws-sdk-core (~> 3, >= 3.99.0)
       aws-sigv4 (~> 1.1)
     aws-sdk-kms (1.35.0)
@@ -126,7 +126,7 @@ GEM
     aws-sdk-sqs (1.10.0)
       aws-sdk-core (~> 3, >= 3.39.0)
       aws-sigv4 (~> 1.0)
-    aws-sigv4 (1.2.0)
+    aws-sigv4 (1.2.1)
       aws-eventstream (~> 1, >= 1.0.2)
     bcrypt (3.1.13)
     benchmark-ips (2.8.2)
@@ -619,9 +619,9 @@ GEM
     saxlsx (1.9.0)
       ox (~> 2.1)
       rubyzip (~> 1.0)
-    scout_apm (2.6.7)
+    scout_apm (2.6.8)
       parser
-    sendgrid-ruby (6.2.1)
+    sendgrid-ruby (6.3.1)
       ruby_http_client (~> 3.4)
     serverengine (2.1.1)
       sigdump (~> 0.2.2)
