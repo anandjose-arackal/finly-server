@@ -9,7 +9,7 @@ class Admin::Implementations::Master::Budgets::ImportCriteria < Admin::Implement
               :budget_group_name => "Budget Group Name",
               :name => "Criteria Name",
               :department_id => "Department IDs",
-              :category_id => "Category Code",
+              :category_id => "Category ID",
               :cost_center_id => "Cost Center IDs",
               :location_id => "Location IDs",
               :vendor_id => "Vendor IDs",
@@ -31,12 +31,14 @@ class Admin::Implementations::Master::Budgets::ImportCriteria < Admin::Implement
         # i.e. process the rows only if it's the Budget Group Criterium sheet
         (2..sheet.last_row).each do |index|
           row = sheet.row(index)
-          result = process_row(row)
+          result, criteria_id = process_row(row)
+          # debugger
           if result.success?
             item_complete true
           else
             item_complete false
           end
+          row[0] = criteria_id.to_s
           row << result.message
           output[name] << row
         end
@@ -55,6 +57,7 @@ class Admin::Implementations::Master::Budgets::ImportCriteria < Admin::Implement
   def export(headers, contents)
     file = Tempfile.new(['budget_import_result', '.xlsx'])
     workbook  = ::WriteXLSX.new(file)
+
     contents.each do |sheet_name, sheet_contents|
       worksheet = workbook.add_worksheet(sheet_name)
 
@@ -93,22 +96,31 @@ class Admin::Implementations::Master::Budgets::ImportCriteria < Admin::Implement
     # here unless we're going to be destroying this row of records, we need to set up the
     # data to create the budget group criterium and then create or update it based on
     # the requirement
-
+    #
+    # First finding the Budget Group and the Budget Group Criterium
     id = data[0]
-    name = data[2]
     budget_group_id = data[1]
-    departments = Department.where(id: data[3].split(",")) rescue []
-    categories = Category.where(id: data[4].split(",")) rescue []
-    cost_centers = CostCenter.where(id: data[5].split(",")) rescue []
-    locations = BranchLocation.where(id: data[6].split(",")) rescue []
-    vendors = YesBankVendor.where(id: data[7].split(",")) rescue []
-    users = User.where(id: data[8].split(",")) rescue []
-
-
     budget_group = company.budget_groups.find_by(id: budget_group_id)
     if budget_group.blank?
       return result fail, "Could not find budget group criterium"
     end
+
+    # finding the budget criteria in case it's already there and is an update Op
+    criteria = budget_group.budget_group_criteria.find_by(id: id)
+
+    # Let's deal with the destroy case first
+    destroy = data.last
+    if StringUtils.to_bool(destroy)
+      return destroy_row(criteria)
+    end
+
+    name = data[3]
+    departments = Department.where(id: ((data[4].is_a?(String) ? data[4].split(",") : data[4]) rescue []))
+    categories = Category.where(id: ((data[5].is_a?(String) ? data[5].split(",") : data[5]) rescue []))
+    cost_centers = CostCenter.where(id: ((data[6].is_a?(String) ? data[6].split(",") : data[6]) rescue []))
+    locations = BranchLocation.where(id: ((data[7].is_a?(String) ? data[7].split(",") : data[7]) rescue []))
+    vendors = YesBankVendor.where(id: ((data[8].is_a?(String) ? data[8].split(",") : data[8]) rescue []))
+    users = User.where(id: ((data[9].is_a?(String) ? data[9].split(",") : data[9]) rescue []))
 
     # setting up the various mappings of the budget criteria so that it can be
     # built to create the budget group criteria that we want
@@ -132,27 +144,37 @@ class Admin::Implementations::Master::Budgets::ImportCriteria < Admin::Implement
       budget_group_criteria_mappings << {budgetable_type: "User", budgetable_id: user.id}
     end
 
-    criteria = budget_group.budget_group_criteria.find_by(id: id)
+    # now checking for duplicate criteria for cases
+    # where the NGC is being updated
+    budget_group_criteria_mappings.each do |bgc|
+      prev_criteria = criteria&.budget_group_criteria_mappings&.find_by(budgetable_type: bgc[:budgetable_type], budgetable_id: bgc[:budgetable_id])
+      if prev_criteria.present?
+        bgc[:id] = prev_criteria.id
+      end
+    end
+
+
     if criteria.present?
-      criteria = budget_group.budget_group_criteria.assign_attributes(name: name,
-                                                          company_id: company.id,
-                                                          created_by_user_id: user.id,
-                                                          budget_group_criteria_mappings_attributes: budget_group_criteria_mappings)
-      update_row(criteria)
+      criteria.assign_attributes(name: name,
+                                 company_id: company.id,
+                                 created_by_user_id: user.id,
+                                 budget_group_criteria_mappings_attributes: budget_group_criteria_mappings)
+
+      [update_row(criteria), criteria.id]
     else
       criteria = budget_group.budget_group_criteria.build(name: name,
                                                           company_id: company.id,
                                                           created_by_user_id: user.id,
-                                                          budget_group_criteria_mappings_attributes: budget_group_criteria_mappings)
-      create_row(criteria)
+                                                          budget_group_criteria_mappings_attributes: budget_group_criteria_mappings,
+                                                          budget_creation_in_progress: true)
+      [create_row(criteria), criteria.id]
     end
-
-
-
   end
 
-  def crete_row(criteria)
+  def create_row(criteria)
     if criteria.save
+      # create all related budgets here
+      create_related_budgets(criteria)
       return result true, "Criteria created!"
     else
       return result false, criteria.errors.full_messages.to_sentence
@@ -162,7 +184,15 @@ class Admin::Implementations::Master::Budgets::ImportCriteria < Admin::Implement
 
   def update_row(criteria)
     if criteria.save
-      return result true, "Criteria created!"
+      return result true, "Criteria updated!"
+    else
+      return result false, criteria.errors.full_messages.to_sentence
+    end
+  end
+
+  def destroy_row(criteria)
+    if criteria.destroy
+      return result true, "Criteria destroyed!"
     else
       return result false, criteria.errors.full_messages.to_sentence
     end
@@ -184,5 +214,40 @@ class Admin::Implementations::Master::Budgets::ImportCriteria < Admin::Implement
         "Email",
         "Mobile Number"
     ]
+  end
+
+  def create_related_budgets(criteria)
+    budget_group_criteria = criteria
+    budget_group = budget_group_criteria.budget_group
+    start_date = budget_group_criteria.budget_group.start_date
+    final_end_date = budget_group_criteria.budget_group.end_date
+    while start_date < final_end_date do
+      end_date = BudgetManagerUtils.next_date(start_date, final_end_date, budget_group_criteria.budget_group.period_id)
+      break if end_date.blank?
+      budget = budget_group_criteria.budgets.build(
+          start_date: start_date,
+          end_date: end_date,
+          name: "#{start_date.strftime("%d %B, %Y")} - #{end_date.strftime("%d %B, %Y")}",
+          company_id: budget_group_criteria.company_id,
+          budget_group_id: budget_group_criteria.budget_group.id,
+          user_id: budget_group_criteria.budget_group.created_by_user_id,
+          budget_date_type_id: budget_group_criteria.budget_group.budget_date_type_id,
+          calculated_before_tax_amount: budget_group_criteria.budget_group.calculated_before_tax_amount,
+          expense: budget_group.expense,
+          purchase_order: budget_group.purchase_order,
+          payment: budget_group.payment,
+          invoice: budget_group.invoice,
+          purchase_request: budget_group.purchase_request,
+          budget_amount_attributes: {
+              value: 0,
+              currency_id: 1
+          }
+      )
+      budget.save
+
+      # now setting the start date as the next day of the end date
+      start_date = end_date + 1.day
+    end
+    budget_group_criteria.update(budget_creation_in_progress: false)
   end
 end
