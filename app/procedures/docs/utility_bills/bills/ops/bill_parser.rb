@@ -17,6 +17,8 @@ class Docs::UtilityBills::Bills::Ops::BillParser < Transactions::API
 
     additional_info = get_additional_info(data)
 
+    api_response = [data.as_json&.dig("table").merge({created_at: DateTime.now, api_type: "BillFetch"})]
+
     result = {
         amount: (data.amount.to_d / 100).round(2),
         bill_date: data.bill_date,
@@ -33,7 +35,7 @@ class Docs::UtilityBills::Bills::Ops::BillParser < Transactions::API
         early_payment_date: additional_info[:early_payment_date],
         disconn_tag: additional_info[:disconn_tag],
         pc: additional_info[:pc],
-        api_response: data.as_json&.dig("table")
+        api_response: api_response
     }
 
     options[:result] = result

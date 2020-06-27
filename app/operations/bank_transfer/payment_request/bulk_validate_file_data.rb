@@ -276,8 +276,13 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
         self.issue_item[:advance_amount] = 'Invalid advance amount'
       end
 
+      # check if payable is > 0
       if advance_amount.present? && validate_amount(advance_amount.to_s)
-        if advance_amount.to_f > amount.to_f
+        
+        tax = tax_rates.find_by(id: item[:tax_rate_id].to_i)&.rate || 0
+        payable_amount = calculate_tds(inclusive_of_taxes, amount, advance_amount, tds_slab_id, tax)
+        # if advance_amount.to_f > amount.to_f 
+        if payable_amount < 0
           self.valid = false
           self.error_messages << 'Advance amount is more than the original amount'
           self.issue_item[:advance_amount] = 'Advance amount is more than the original amount'
