@@ -7,12 +7,12 @@
 # server 'example.com', user: 'deploy', roles: %w{app web}, other_property: :other_value
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
-# server 'm1.finly.io', user: 'ubuntu', roles: %w{web app db}
-# server 'm2.finly.io', user: 'ubuntu', roles: %w{web app}
-# server 'm3.finly.io', user: 'ubuntu', roles: %w{web app}
-# server 'm4.finly.io', user: 'ubuntu', roles: %w{web app}
-# server 'm5.finly.io', user: 'ubuntu', roles: %w{web app}
-# server 'm6.finly.io', user: 'ubuntu', roles: %w{web app}
+server 'm1.finly.io', user: 'ubuntu', roles: %w{web app db}
+server 'm2.finly.io', user: 'ubuntu', roles: %w{web app}
+server 'm3.finly.io', user: 'ubuntu', roles: %w{web app}
+server 'm4.finly.io', user: 'ubuntu', roles: %w{web app}
+server 'm5.finly.io', user: 'ubuntu', roles: %w{web app}
+server 'm6.finly.io', user: 'ubuntu', roles: %w{web app}
 
 set :stage, 'production'
 # set :stage, 'staging'
