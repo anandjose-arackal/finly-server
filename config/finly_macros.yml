@@ -1,7 +1,0 @@
-development:
-  ip_address:
-    - '127.0.0.1'
-    - 'localhost'
-    - "::1"
-  username: 'test'
-  password: 'test123'
