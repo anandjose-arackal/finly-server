@@ -100,7 +100,6 @@ class Admin::Implementations::Master::Budgets::ImportCriteriaTemplate < Admin::I
         "ID",
         "Name",
         "Email",
-        "Code",
         "Mobile Number"
     ]
   end
