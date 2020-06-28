@@ -28,6 +28,7 @@ class TransactionsMsgQueuePoller
     #
     # ######################## AWS Code to extract the messages from the queue ###################
 
+
     ###################### Initializing the client and other details for pulling messages from Azure Service Bus ###########################
 
     azure_config = Rails.application.config_for(:azure_config)
