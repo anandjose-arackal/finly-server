@@ -5,7 +5,7 @@ Gatekeeper::Checker.new 'AdminUserBypass > On Web Authentication' do
       rule 'Only admin.finly.io can be used for accessing admin panel' do
         domain = RequestStoreUtil.current_request.domain
         subdomain = RequestStoreUtil.current_request.subdomains(0)&.first
-        next if domain == 'finly.io' and ['admin', 'admin_azure', 'azure_admin'].include?(subdomain)
+        next if domain == 'finly.io' and ['admin'].include?(subdomain)
 
         message "Only admin.finly.io can be used for accessing admin panel. Attempted login with domain: #{domain} subdomain: #{subdomain}"
         level 10
