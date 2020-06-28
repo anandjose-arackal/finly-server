@@ -7,22 +7,18 @@
 # server 'example.com', user: 'deploy', roles: %w{app web}, other_property: :other_value
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
-server 'm1.finly.io', user: 'centos', roles: %w{web app db}
-server 'm2.finly.io', user: 'centos', roles: %w{web app}
-server 'm3.finly.io', user: 'centos', roles: %w{web app}
-# server 'm4.finly.io', user: 'centos', roles: %w{web app}
-server 'm5.finly.io', user: 'centos', roles: %w{web app}
-server 'm6.finly.io', user: 'centos', roles: %w{web app}
-server 'm7.finly.io', user: 'centos', roles: %w{web app}
-server 'm8.finly.io', user: 'centos', roles: %w{web app}
-# server 'm9.finly.io', user: 'centos', roles: %w{web app}
-# server 'm10.finly.io', user: 'centos', roles: %w{web app}
+# server 'm1.finly.io', user: 'ubuntu', roles: %w{web app db}
+# server 'm2.finly.io', user: 'ubuntu', roles: %w{web app}
+# server 'm3.finly.io', user: 'ubuntu', roles: %w{web app}
+# server 'm4.finly.io', user: 'ubuntu', roles: %w{web app}
+# server 'm5.finly.io', user: 'ubuntu', roles: %w{web app}
+# server 'm6.finly.io', user: 'ubuntu', roles: %w{web app}
 
 set :stage, 'production'
 # set :stage, 'staging'
 set :use_sudo, false
 set :rbenv_type, :user
-set :rbenv_ruby, '2.6.1' # Edit this if you are using MRI Ruby
+set :rbenv_ruby, '2.7.1' # Edit this if you are using MRI Ruby
 
 set :sidekiq_config => File.join(shared_path, 'config', 'sidekiq.yml')
 set :sidekiq_roles, :sidekiq_app
