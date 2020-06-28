@@ -1,9 +1,8 @@
 # config valid only for current version of Capistrano
 lock '~> 3.11'
 
-if ['aws_production', 'foreground_production', 'api_production',
-    'background_production', 'background_production_bgg', 'background_production_bgp',
-    'background_production_bgpc', 'yes_bank_balance_poller',
+if ['api_production',
+    'background_production', 'background_production_bgpc', 'yes_bank_balance_poller',
     'console_production'].include?(fetch(:stage)&.to_s)
   load_secure_storage(:production)
 elsif ['background_production_console'].include?(fetch(:stage)&.to_s)
@@ -32,14 +31,14 @@ when :aws_production, :background_production, :foreground_production, :console_p
   # unless ['master', :master].include?(branch)
   #   raise 'This branch cannot be deploy to production. Please select the correct branch'
   # end
-  set :deploy_to, '/home/centos/app'
+  set :deploy_to, '/home/ubuntu/app'
   set :rails_env, 'production'
 when :yes_bank_balance_poller
   branch = fetch :branch
   unless ['master', :master].include?(branch)
     raise 'This branch cannot be deploy to production. Please select the correct branch'
   end
-  set :deploy_to, '/home/centos/app_yb_balance'
+  set :deploy_to, '/home/ubuntu/app_yb_balance'
   set :rails_env, 'production'
 when :background_production_olap
   branch = fetch :branch
@@ -116,12 +115,14 @@ linked_files = %w{
   config/sidekiq.yml
   config/hutch.yml
   config/web_client.yml
+  config/azure_config.yml
 }
 case fetch(:stage)
 when :itzcash_production, :aws_production, :background_production, :foreground_production, :console_production, :api_production, :background_production_console,
     :background_production_bgg, :background_production_bgp, :background_production_bgpc, :background_production_olap
   linked_files << 'config/elastic_apm.yml'
   linked_files << 'config/bunny.yml'
+  linked_files << 'config/master_users.yml'
   # linked_files << "config/sentry.yml"
 when :yes_bank_balance_poller
   linked_files << "config/sidekiq_yes_bank_balance_poller.yml"
@@ -159,6 +160,7 @@ set :puma_workers, 0
 set :puma_worker_timeout, nil
 set :puma_init_active_record, true
 set :puma_preload_app, false
+set :ssh_options, :keepalive => true
 
 set :whenever_roles, ["whenever_cron"]
 

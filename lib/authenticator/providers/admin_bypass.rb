@@ -15,8 +15,11 @@ class Authenticator::Providers::AdminBypass < Authenticator::Providers::Base
     fail_with_event :on_admin_bypass_invalid_request, 'For user ID is blank' and return unless params[:for_user_id].present?
 
 
-    master_users = Finly::SecureStorage::Connector.read('core/master_users')
-    unless master_users.include?(unauthenticated_user.email)
+    masters_path = "#{Rails.root}/config/master_users.yml"
+    file_exists = File.exists?(masters_path)
+    master_users = file_exists ? File.read(masters_path) : nil
+    # master_users = Finly::SecureStorage::Connector.read('core/master_users')
+    unless master_users.present? and master_users.include?(unauthenticated_user.email)
       fail_with_event :on_unauthorized_master_login_attempt, 'User does not have the permission to login'
       return
     end
