@@ -44,19 +44,33 @@ class Admin::Implementations::Master::Budgets::ImportCriteriaTemplate < Admin::I
     file = Tempfile.new(['budget_criteria_import_template', '.xlsx'])
     workbook  = ::WriteXLSX.new(file)
     sheet_names.each_with_index do |sheet_name, index|
+
+      # getting the records of each model
+
+      records = sheet_name.constantize.where(company_id: company.id) rescue []
+      contents = []
+
       worksheet = workbook.add_worksheet(sheet_name)
 
       if ["YesBankVendor", "User"].include?(sheet_name)
         vendor_user_headers.each_with_index do |header_name, header_index|
           worksheet.write(0, header_index, header_name)
         end
-      elsif ["ImportData"].include?(sheet_name)
+        records.each do |record|
+          row = [record.id, record.name, record.email, record.mobile_number]
+          contents << row
+        end
+      elsif ["BudgetGroupCriterium"].include?(sheet_name)
         self.headers.values.each_with_index do |header_name, header_index|
           worksheet.write(0, header_index, header_name)
         end
       else
         master_headers.each_with_index do |header_name, header_index|
           worksheet.write(0, header_index, header_name)
+        end
+        records.each do |record|
+          row = [record.id, record.name, record.code]
+          contents << row
         end
       end
 

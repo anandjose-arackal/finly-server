@@ -144,17 +144,21 @@ class Admin::Implementations::Master::Budgets::ImportCriteria < Admin::Implement
       budget_group_criteria_mappings << {budgetable_type: "User", budgetable_id: user.id}
     end
 
-    # now checking for duplicate criteria for cases
-    # where the NGC is being updated
-    budget_group_criteria_mappings.each do |bgc|
-      prev_criteria = criteria&.budget_group_criteria_mappings&.find_by(budgetable_type: bgc[:budgetable_type], budgetable_id: bgc[:budgetable_id])
-      if prev_criteria.present?
-        bgc[:id] = prev_criteria.id
-      end
-    end
+    # # now checking for duplicate criteria for cases
+    # # where the NGC is being updated
+    # budget_group_criteria_mappings.each do |bgc|
+    #   prev_criteria = criteria&.budget_group_criteria_mappings&.find_by(budgetable_type: bgc[:budgetable_type], budgetable_id: bgc[:budgetable_id])
+    #   if prev_criteria.present?
+    #     bgc[:id] = prev_criteria.id
+    #   end
+    # end
 
 
     if criteria.present?
+      old_mappings = criteria.budget_group_criteria_mappings
+      # destroy old mappings before you can assign the new, updated ones
+      old_mappings.destroy_all
+
       criteria.assign_attributes(name: name,
                                  company_id: company.id,
                                  created_by_user_id: user.id,
