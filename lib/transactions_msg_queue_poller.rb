@@ -3,8 +3,8 @@ class TransactionsMsgQueuePoller
   def self.run
 
 
-    unless File.exists?('config/aws_config.yml')
-      raise 'aws_config.yml not found'
+    unless File.exists?('config/azure_config.yml')
+      raise 'azure_config.yml not found'
     end
 
     # ####################### Initializing the client and other details for pulling messages from AWS Queue #########
@@ -37,7 +37,8 @@ class TransactionsMsgQueuePoller
 
     signer = Azure::ServiceBus::Auth::SharedAccessSigner.new(sb_sas_key_name, sb_sas_key)
     sb_host = "https://#{sb_namespace}.servicebus.windows.net"
-    queue_name = "transactions_message_queue"
+
+    queue_name = azure_config["transactions_queue_name"]
 
     azure_service_bus_service = Azure::ServiceBus::ServiceBusService.new(sb_host, { signer: signer})
 
