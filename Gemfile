@@ -229,8 +229,8 @@ gem 'string_pattern', '~> 2.2', '>= 2.2.1'
 
 # adding aws-sdk gem for using their API enabled services
 # gem 'aws-sdk'
-gem 'aws-sdk-s3', '~> 1.30.0'
-gem 'aws-sdk-sqs', '~> 1.10.0'
+# gem 'aws-sdk-s3', '~> 1.30.0'
+# gem 'aws-sdk-sqs', '~> 1.10.0'
 
 gem 'awesome_print', '~> 1.8.0'
 
