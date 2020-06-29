@@ -52,7 +52,12 @@ class TransactionsMsgQueuePoller
 
     loop do
 
-      message = azure_service_bus_service.receive_queue_message(queue_name, {peek_lock: false})
+      begin
+        puts "Listening...."
+        message = azure_service_bus_service.receive_queue_message(queue_name, {peek_lock: false})
+      rescue Faraday::TimeoutError
+        next
+      end
 
       puts message.body
 
