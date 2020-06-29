@@ -59,6 +59,11 @@ class TransactionsMsgQueuePoller
         next
       end
 
+      # again, going to the next loop in case the message is blank
+      if message.blank?
+        next
+      end
+
       puts message.body
 
       data = message.body.split(delimiter)
