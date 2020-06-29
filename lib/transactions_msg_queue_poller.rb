@@ -47,6 +47,8 @@ class TransactionsMsgQueuePoller
 
     file_logger = LogStashLogger.new(type: :file, path: 'log/logstash_transaction_poller.log', sync: true)
 
+    delimiter = '$'
+
     puts "Listening...."
     ############################################################# END OF SERVICE BUS CODE ##################################################
 
