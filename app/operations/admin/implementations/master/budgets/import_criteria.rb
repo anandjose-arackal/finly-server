@@ -43,7 +43,7 @@ class Admin::Implementations::Master::Budgets::ImportCriteria < Admin::Implement
           output[name] << row
         end
       else
-        (1..sheet.last_row).each do |index|
+        (2..sheet.last_row).each do |index|
           row = sheet.row(index)
           output[name] << row
         end
