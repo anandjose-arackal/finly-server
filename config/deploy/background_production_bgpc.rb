@@ -9,7 +9,8 @@
 
 # server 'bgpc.finly.io', user: 'centos', roles: %w{sidekiq_app email_tracker_role whenever_cron}
 # server 'bgpc_azure.finly.io', user: 'centos', roles: %w{sidekiq_app email_tracker_role whenever_cron}
-server '52.172.220.47', user: 'ubuntu', roles: %w{sidekiq_app email_tracker_role whenever_cron}
+server 'bgpc.finly.io', user: 'ubuntu', roles: %w{sidekiq_app email_tracker_role whenever_cron}
+
 set :stage, 'production'
 set :use_sudo, false
 set :rbenv_type, :user

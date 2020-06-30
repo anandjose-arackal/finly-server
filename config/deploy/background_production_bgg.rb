@@ -7,7 +7,8 @@
 # server 'example.com', user: 'deploy', roles: %w{app web}, other_property: :other_value
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
-server 'bgg_azure.finly.io', user: 'centos', roles: %w{sidekiq_app email_tracker_role}
+server 'bgg.finly.io', user: 'ubuntu', roles: %w{sidekiq_app email_tracker_role}
+
 set :stage, 'production'
 set :use_sudo, false
 set :rbenv_type, :user

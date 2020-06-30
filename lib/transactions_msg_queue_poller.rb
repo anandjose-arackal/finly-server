@@ -28,6 +28,7 @@ class TransactionsMsgQueuePoller
     #
     # ######################## AWS Code to extract the messages from the queue ###################
 
+
     ###################### Initializing the client and other details for pulling messages from Azure Service Bus ###########################
 
     azure_config = Rails.application.config_for(:azure_config)
@@ -46,12 +47,24 @@ class TransactionsMsgQueuePoller
 
     file_logger = LogStashLogger.new(type: :file, path: 'log/logstash_transaction_poller.log', sync: true)
 
+    delimiter = '$'
+
     puts "Listening...."
     ############################################################# END OF SERVICE BUS CODE ##################################################
 
     loop do
 
-      message = azure_service_bus_service.receive_queue_message(queue_name, {peek_lock: false})
+      begin
+        puts "Listening...."
+        message = azure_service_bus_service.receive_queue_message(queue_name, {peek_lock: false})
+      rescue Faraday::TimeoutError
+        next
+      end
+
+      # again, going to the next loop in case the message is blank
+      if message.blank?
+        next
+      end
 
       puts message.body
 

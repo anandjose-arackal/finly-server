@@ -261,6 +261,8 @@ class KotakBankApi::TransactionStatus < KotakBankApi::Base
 
   def failure
     params[:request_status] = request_status
+    params[:bank_message_type] = self.bank_message_type
+    params[:bank_message] = self.bank_message
     KotakBankApi::TransactionStatus::FailureStatusPresenter.new(params)
   end
 
@@ -279,10 +281,12 @@ class KotakBankApi::TransactionStatus < KotakBankApi::Base
 
   class KotakBankApi::TransactionStatus::FailureStatusPresenter < BaseOperation::BasePresenter::FailurePresenter
 
-    attr_accessor :request_status
+    attr_accessor :request_status, :bank_message, :bank_message_type
 
     def initialize(params)
       self.request_status = params[:request_status]
+      self.bank_message = params[:bank_message]
+      self.bank_message_type = params[:bank_message_type]
     end
   end
 
