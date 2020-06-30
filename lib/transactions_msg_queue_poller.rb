@@ -3,33 +3,69 @@ class TransactionsMsgQueuePoller
   def self.run
 
 
-    unless File.exists?('config/aws_config.yml')
-      raise 'aws_config.yml not found'
+    unless File.exists?('config/azure_config.yml')
+      raise 'azure_config.yml not found'
     end
 
-    ####################### Initializing the client and other details for pulling messages from AWS Queue #########
-    aws_config = Rails.application.config_for(:aws_config)
-    region_name = aws_config["aws_region_name"]
-    access_key_id = aws_config["aws_access_key_id"]
-    secret_access_key = aws_config["aws_secret_access_key"]
+    # ####################### Initializing the client and other details for pulling messages from AWS Queue #########
+    # aws_config = Rails.application.config_for(:aws_config)
+    # region_name = aws_config["aws_region_name"]
+    # access_key_id = aws_config["aws_access_key_id"]
+    # secret_access_key = aws_config["aws_secret_access_key"]
+    #
+    # sqs_client = Aws::SQS::Client.new(region: region_name, access_key_id: access_key_id, secret_access_key: secret_access_key)
+    #
+    # queue_url_base = aws_config["sqs_queue_url_base"]
+    # queue_name = aws_config["transaction_poller_queue"]
+    #
+    # queue_url = queue_url_base + queue_name
+    # delimiter = '$'
+    #
+    # # initializing the log file that will hold the errors if necessary
+    # error_logger = Logger.new("#{Rails.root}/log/transactions_msg_queue_errors.log")
+    # poller = Aws::SQS::QueuePoller.new(queue_url, {client: sqs_client})
+    # file_logger = LogStashLogger.new(type: :file, path: 'log/logstash_transaction_poller.log', sync: true)
+    #
+    # ######################## AWS Code to extract the messages from the queue ###################
 
-    sqs_client = Aws::SQS::Client.new(region: region_name, access_key_id: access_key_id, secret_access_key: secret_access_key)
 
-    queue_url_base = aws_config["sqs_queue_url_base"]
-    queue_name = aws_config["transaction_poller_queue"]
+    ###################### Initializing the client and other details for pulling messages from Azure Service Bus ###########################
 
-    queue_url = queue_url_base + queue_name
-    delimiter = '$'
+    azure_config = Rails.application.config_for(:azure_config)
+    sb_namespace = azure_config["sb_namespace"]
+    sb_sas_key_name = azure_config["sb_sas_key_name"]
+    sb_sas_key = azure_config["sb_sas_key"]
 
-    # initializing the log file that will hold the errors if necessary
+    signer = Azure::ServiceBus::Auth::SharedAccessSigner.new(sb_sas_key_name, sb_sas_key)
+    sb_host = "https://#{sb_namespace}.servicebus.windows.net"
+
+    queue_name = azure_config["transactions_queue_name"]
+
+    azure_service_bus_service = Azure::ServiceBus::ServiceBusService.new(sb_host, { signer: signer})
+
     error_logger = Logger.new("#{Rails.root}/log/transactions_msg_queue_errors.log")
-    poller = Aws::SQS::QueuePoller.new(queue_url, {client: sqs_client})
+
     file_logger = LogStashLogger.new(type: :file, path: 'log/logstash_transaction_poller.log', sync: true)
 
-    puts "Listening...."
-    ######################## AWS Code to extract the messages from the queue ###################
+    delimiter = '$'
 
-    poller.poll do |message|
+    puts "Listening...."
+    ############################################################# END OF SERVICE BUS CODE ##################################################
+
+    loop do
+
+      begin
+        puts "Listening...."
+        message = azure_service_bus_service.receive_queue_message(queue_name, {peek_lock: false})
+      rescue Faraday::TimeoutError
+        next
+      end
+
+      # again, going to the next loop in case the message is blank
+      if message.blank?
+        next
+      end
+
       puts message.body
 
       data = message.body.split(delimiter)
