@@ -1,0 +1,18 @@
+BillPayErrorsResponses:
+  "BillerResponse Mandatory": "Bank server unreachable"
+  "Payment amount is unacceptable": "Wrong payment amount"
+  "Successful Validation API is mandatory before executing Payment Request for this Biller": "Bank server unreachable"
+
+BillFetchNoDueResponses:
+  - Payment received for the billing period - no bill due
+  - PAYMENT RECEIVED FOR THE BILLING, NO BILL DUE
+  - Unable to get bill details from biller
+  - No bill data available
+  - Bill due date has expired - bill details are not available
+
+BillFetchErrorResponses:
+  - Fetch Request not supported, only QuickPay permitted
+  - Invalid combination of customer parameters
+  - Incorrect / invalid customer account
+  - Invalid Customer Mobile number
+  - Biller/SubBiller not valid for Bill

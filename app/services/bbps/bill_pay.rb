@@ -77,16 +77,16 @@ class Bbps::BillPay < Bbps::Api
   # Customer Reference Field2=20|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|Y|0
   request_fields(
       [
-          :message_code, :order_number, :agent_institution_id, :channel_id, :agent_id,
-          :quick_pay,:split_pay, :split_pay_amount, :customer_name, :customer_mobile,
-          :customer_email, :customer_aadhar_no, :customer_pan_id,
-          :amount, :bill_date, :due_date, :bill_number, :bill_period,
-          :convenience_fee, :convenience_fee_desc,
-          :initiating_channel, :payment_mode, :debit_account_number, :biller_id,
-          :customer_param_1, :customer_param_2, :customer_param_3, :customer_param_4, :customer_param_5,
-          :additional_field, :additional_field, :additional_field, :additional_field, :additional_field,
-          :additional_field, :additional_field, :additional_field, :additional_field, :additional_field,
-          :additional_field, :additional_field, :additional_field, :on_us_off_us, :ccf_charges
+        :message_code, :order_number, :agent_institution_id, :channel_id, :agent_id,
+        :quick_pay,:split_pay, :split_pay_amount, :customer_name, :customer_mobile,
+        :customer_email, :customer_aadhar_no, :customer_pan_id,
+        :amount, :bill_date, :due_date, :bill_number, :bill_period,
+        :convenience_fee, :convenience_fee_desc,
+        :initiating_channel, :payment_mode, :debit_account_number, :biller_id,
+        :customer_param_1, :customer_param_2, :customer_param_3, :customer_param_4, :customer_param_5,
+        :additional_field, :additional_field, :additional_field, :additional_field, :additional_field,
+        :additional_field, :additional_field, :additional_field, :additional_field, :additional_field,
+        :additional_field, :additional_field, :additional_field, :on_us_off_us, :ccf_charges
       ]
 
   # 1:message_code, 2:order_number, 3:agent_institution_id, 4:channel_id, 5:agent_id,
@@ -136,15 +136,14 @@ class Bbps::BillPay < Bbps::Api
   # BXXCG7754K|BSC|Cash|ASD1503901 571142PAYREF173446050917E|
   # ASD1503901571142PAYMSG1734460509172|2016-07-01|2016- 09-30|
   # 12303091|Sept|NA|NA|Y|0
+  # B2001|Y|000|Successful|R20062020051032182|YB28|C1001|YB01f6fef28a|YB01YB28MOB519101711|NA|8451888620|NA|NA|NA|MOB|NEFT|R20062020051032182FETCHREF200511200|R20062020051032182PAYMSG20131120062|2020-05-26|2020-06-15|504974258|N8A|NA|NA|928ee2d5|NA
   response_fields(
-      [
-          :message_code, :status, :error_code, :error_desc, :order_number, :agent_institution_id, :channel_id,
-          :bbps_ref_id, :agent_id, :customer_name, :customer_mobile, :customer_email, :customer_aadhar_no, :customer_pan_id,
-          :channel_id, :biller_id, :amount, :bill_date, :due_date, :bill_number, :bill_period, :convenience_fee,
-          :convenience_fee_desc, :late_payment_fee, :early_payment_fee,
-          :additional_field, :additional_field, :additional_field, :additional_field, :additional_field,
-          :additional_field
-      ]
+    [
+        :message_code, :status, :error_code, :error_desc, :order_number, :agent_institution_id, :channel_id,
+        :bbps_ref_id, :agent_id, :customer_name, :customer_mobile, :customer_email, :customer_aadhar_no, :customer_pan_id,
+        :channel, :payment_mode, :additional_field_1, :additional_field_2, :additional_field_3, :additional_field_4, :additional_field_5,
+        :additional_field_6, :additional_field_7, :additional_field_8, :on_us_off_us_flag, :ccf2_charges
+    ]
   )
 
   def message_code
@@ -270,18 +269,32 @@ class Bbps::BillPay < Bbps::Api
     # :convenience_fee_desc, :late_payment_fee, :early_payment_fee
     OpenStruct.new(
         {
-            amount: result['response.parsed']['amount'],
+            message_code: result['response.parsed']['message_code'],
             status: result['response.parsed']['status'],
-            bill_date: result['response.parsed']['bill_date'],
-            response_code: result['response.status_code'],
-            due_date: result['response.parsed']['due_date'],
-            bill_number: result['response.parsed']['bill_number'],
-            bill_period: result['response.parsed']['bill_period'],
-            convenience_fee: result['response.parsed']['convenience_fee'],
-            convenience_fee_desc: result['response.parsed']['convenience_fee_desc'],
-            late_payment_fee: result['response.parsed']['late_payment_fee'],
-            early_payment_fee: result['response.parsed']['early_payment_fee'],
-            bbps_ref_id: result['response.parsed']['bbps_ref_id']
+            error_code: result['response.parsed']['error_code'],
+            error_desc: result['response.parsed']['error_desc'],
+            order_number: result['response.parsed']['order_number'],
+            agent_institution_id: result['response.parsed']['agent_institution_id'],
+            channel_id: result['response.parsed']['channel_id'],
+            bbps_ref_id: result['response.parsed']['bbps_ref_id'],
+            agent_id: result['response.parsed']['agent_id'],
+            customer_name: result['response.parsed']['customer_name'],
+            customer_mobile: result['response.parsed']['customer_mobile'],
+            customer_email: result['response.parsed']['customer_email'],
+            customer_aadhar_no: result['response.parsed']['customer_aadhar_no'],
+            customer_pan_id: result['response.parsed']['customer_pan_id'],
+            channel: result['response.parsed']['channel'],
+            payment_mode: result['response.parsed']['payment_mode'],
+            additional_field_1: result['response.parsed']['additional_field_1'],
+            additional_field_2: result['response.parsed']['additional_field_2'],
+            additional_field_3: result['response.parsed']['additional_field_3'],
+            additional_field_4: result['response.parsed']['additional_field_4'],
+            additional_field_5: result['response.parsed']['additional_field_5'],
+            additional_field_6: result['response.parsed']['additional_field_6'],
+            additional_field_7: result['response.parsed']['additional_field_7'],
+            additional_field_8: result['response.parsed']['additional_field_8'],
+            on_us_off_us_flag: result['response.parsed']['on_us_off_us_flag'],
+            ccf2_charges: result['response.parsed']['ccf2_charges']
         }
     )
   end

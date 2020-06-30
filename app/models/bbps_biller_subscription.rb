@@ -2,55 +2,53 @@
 #
 # Table name: bbps_biller_subscriptions
 #
-#  id                       :bigint           not null, primary key
-#  bbps_biller_id           :bigint           not null
-#  name                     :string(255)      not null
-#  department_id            :integer
-#  cost_center_id           :integer
-#  location_id              :integer
-#  policy_id                :integer
-#  note                     :text(65535)
-#  active                   :boolean          default(TRUE)
-#  created_at               :datetime         not null
-#  updated_at               :datetime         not null
-#  status_id                :integer          not null
-#  deleted_at               :datetime
-#  subscription_id          :string(255)
-#  require_poc_verification :boolean          default(TRUE)
-#  user_id                  :integer
-#  agreement_id             :integer
-#  expected_bill_day        :string(255)
-#  controlling_level_id     :integer
-#  reminder_before_days     :string(255)
-#  biller_category_name     :string(255)
-#  submitted_at             :datetime
-#  approved_at              :datetime
-#  company_id               :integer
-#  mobile_number            :string(255)
-#  customer_param_key_1     :string(255)
-#  customer_param_value_1   :string(255)
-#  customer_param_key_2     :string(255)
-#  customer_param_value_2   :string(255)
-#  customer_param_key_3     :string(255)
-#  customer_param_value_3   :string(255)
-#  customer_param_key_4     :string(255)
-#  customer_param_value_4   :string(255)
-#  customer_param_key_5     :string(255)
-#  customer_param_value_5   :string(255)
-#  fetch_requirement        :string(255)
-#  auto_generate_bill       :boolean          default(TRUE)
-#  support_bill_validation  :string(255)
-#  customer_name            :string(255)
-#  customer_email           :string(255)
-#  customer_aadhar_number   :string(255)
-#  customer_pan             :string(255)
-#  tax_rate_id              :integer
-#  category_id              :integer
-#  hsn_sac                  :string(255)
-#  quick_pay                :string(255)      default("N")
-#  sequence_id              :string(255)
-#  last_paid_at             :datetime
-#  review_note              :text(65535)
+#  id                      :bigint           not null, primary key
+#  bbps_biller_id          :bigint           not null
+#  name                    :string(255)      not null
+#  sequence_id             :string(255)      not null
+#  department_id           :integer
+#  cost_center_id          :integer
+#  location_id             :integer
+#  policy_id               :integer
+#  deleted_at              :datetime
+#  active                  :boolean          default(TRUE)
+#  note                    :text(65535)
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
+#  status_id               :integer          not null
+#  user_id                 :integer
+#  agreement_id            :integer
+#  expected_bill_day       :string(255)
+#  controlling_level_id    :integer
+#  reminder_before_days    :string(255)
+#  biller_category_name    :string(255)
+#  submitted_at            :datetime
+#  approved_at             :datetime
+#  company_id              :integer
+#  mobile_number           :string(255)
+#  customer_param_key_1    :string(255)
+#  customer_param_value_1  :string(255)
+#  customer_param_key_2    :string(255)
+#  customer_param_value_2  :string(255)
+#  customer_param_key_3    :string(255)
+#  customer_param_value_3  :string(255)
+#  customer_param_key_4    :string(255)
+#  customer_param_value_4  :string(255)
+#  customer_param_key_5    :string(255)
+#  customer_param_value_5  :string(255)
+#  fetch_requirement       :string(255)
+#  auto_generate_bill      :boolean          default(TRUE)
+#  support_bill_validation :string(255)
+#  customer_name           :string(255)
+#  customer_email          :string(255)
+#  customer_aadhar_number  :string(255)
+#  customer_pan            :string(255)
+#  tax_rate_id             :integer
+#  category_id             :integer
+#  hsn_sac                 :string(255)
+#  quick_pay               :string(255)      default("N")
+#  last_paid_at            :datetime
+#  review_note             :text(65535)
 #
 
 class BbpsBillerSubscription < ApplicationRecord
@@ -86,7 +84,7 @@ class BbpsBillerSubscription < ApplicationRecord
   has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment'
   has_many :receiving_payments, foreign_key: 'receiving_user_id', class_name: 'Payment'
 
-  after_update :cleanup # Destroy Biller Subscription fields for other billers if any
+  before_update :cleanup # Destroy Biller Subscription fields for other billers if any
 
   delegate :draft?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :deactivated?, :reactivated?, to: :status
 
@@ -192,7 +190,9 @@ class BbpsBillerSubscription < ApplicationRecord
   }
 
   def cleanup
-    self.customer_fields.without_biller_id(bbps_biller_id).destroy_all
+    unless self.changes.keys.include?("auto_fetch_enabled")
+      self.auto_fetch_enabled = true
+    end
   end
 
   def as_json(options={})
@@ -228,7 +228,9 @@ class BbpsBillerSubscription < ApplicationRecord
         customer_name: customer_name,
         last_paid_at: last_paid_at&.strftime("%I:%M %p, %d %b %Y"),
         customer_pan: customer_pan,
-        attachments: attachments.as_json
+        attachments: attachments.as_json,
+        auto_fetch_enabled: auto_fetch_enabled,
+        biller_response: biller_response
     }
   end
 
@@ -259,6 +261,24 @@ class BbpsBillerSubscription < ApplicationRecord
     fields
   end
 
+  def generate_billfetch_params
+    parameters = {
+        mobile_number: mobile_number,
+        biller_id: biller&.biller_id,
+    }
+
+    (1..5).to_a.each do |i|
+      key = self.send("customer_param_key_#{i}")
+      value = self.send("customer_param_value_#{i}")
+      if key.present? && value.present?
+        parameters["customer_param_#{i}"] = {
+            key: key,
+            value: value
+        }
+      end
+    end
+    parameters.with_indifferent_access
+  end
   # display_name  used  in  payment  file  creation method to  print the  beneficiary name
   def display_name
       self.biller&.biller_name

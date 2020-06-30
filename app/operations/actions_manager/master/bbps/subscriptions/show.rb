@@ -4,7 +4,7 @@ class ActionsManager::Master::Bbps::Subscriptions::Show < ActionsManager::Master
 
   register_handle :bbps_subscriptions_show
   register_actions [:update_and_submit, :edit, :policy_editable, :retract, :approve, :reject, :take_control, :return_control,
-                    :deactivate, :reactivate, :add_bill, :raise_dispute, :destroy, :fetch_bill]
+                    :deactivate, :reactivate, :add_bill, :raise_dispute, :destroy, :fetch_bill, :subscription_editable]
 
   def initialize(user = nil, params = {})
     super
@@ -26,13 +26,17 @@ class ActionsManager::Master::Bbps::Subscriptions::Show < ActionsManager::Master
     # Owner of Document When in Open State
     # Controlling User When in awaiting_approval state
     # Admin Post Approval
-    (BbpsBillerSubscription.open_statuses.include?(bbps_subscription.status_id) && bbps_subscription.user_id == user.id) ||
-        (bbps_subscription.awaiting_approval? && bbps_subscription.get_reviewers.include?(user)) ||
-        (BbpsBillerSubscriptionStatus.ids_for(:approved, :auto_approved, :deactivated, :reactivated).include?(bbps_subscription.status_id) && user.vendor_payment_admin?)
+    (open_state_edit ) || (reviewer_edit) || (admin_edit)
+        
   end
 
   def policy_editable
-    BbpsBillerSubscription.open_statuses.include?(bbps_subscription.status_id) && bbps_subscription.user_id == user.id
+    open_state_edit 
+  end
+
+  def subscription_editable
+    (open_state_edit ) || (reviewer_edit) || (admin_edit) || 
+      (BbpsBillerSubscriptionStatus.ids_for(:deactivated, :reactivated).include?(bbps_subscription.status_id) && bbps_subscription.user_id == user.id )
   end
 
   def retract
@@ -84,5 +88,17 @@ class ActionsManager::Master::Bbps::Subscriptions::Show < ActionsManager::Master
 
   def has_taken_control?
     bbps_subscription.dlrms.where(level_id: bbps_subscription.controlling_level_id).map(&:taken_control_by_id).include?(user.id)
+  end
+
+  def open_state_edit
+    BbpsBillerSubscription.open_statuses.include?(bbps_subscription.status_id) && bbps_subscription.user_id == user.id
+  end
+
+  def reviewer_edit
+    bbps_subscription.awaiting_approval? && bbps_subscription.get_reviewers.include?(user)
+  end
+
+  def admin_edit
+    (BbpsBillerSubscriptionStatus.ids_for(:approved, :auto_approved, :deactivated, :reactivated).include?(bbps_subscription.status_id) && user.vendor_payment_admin?)
   end
 end

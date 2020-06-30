@@ -1,7 +1,7 @@
 class DemoMailer < ApplicationMailer
   def preview_welcome(preview_registration)
     @preview_registration = preview_registration
-    mail to: preview_registration.email, subject: 'Welcome to Finly!'
+    mail to: preview_registration.email, subject: 'Finly: Accounts Payable at your service'
   end
 
   def notify_preview(preview_registration, recipient)

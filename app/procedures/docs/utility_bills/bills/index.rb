@@ -151,7 +151,7 @@ class Docs::UtilityBills::Bills::Index < IndexBuilder::API
         counts[BbpsBillStatus.id_for(:payment_ticket_deleted)].to_i
     )
 
-    [:rejected, :failed, :paid, :voided].each do |status|
+    [:rejected, :failed, :paid, :voided, :expired].each do |status|
       counter.add BbpsBillStatus.id_for(status), status.to_s.titleize, counts[BbpsBillStatus.id_for(status)].to_i
     end
 

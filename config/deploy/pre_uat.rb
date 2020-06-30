@@ -9,7 +9,7 @@
 
 # server 'dev2.finly.io', user: 'centos', roles: %w{web app db}, port: 22
 # server '35.154.209.41', user: 'centos', roles: %w{web app db}, port: 22
-server 'featuretesting.finly.io', user: 'centos', roles: %w{web app db}, port: 22
+server 'pre_uat.finly.io', user: 'centos', roles: %w{web app db}, port: 22
 
 set :stage, 'staging'
 set :use_sudo, false
