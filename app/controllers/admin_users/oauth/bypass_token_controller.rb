@@ -105,7 +105,8 @@ class AdminUsers::Oauth::BypassTokenController < Oauth::TokenController
         "ts": Time.now.to_i
     }
 
-    SLACK_NOTIFIER.ping nil, attachments: [attachment], channel: '#admin_access'
+      # Todo - Replace with google chat
+    # SLACK_NOTIFIER.ping nil, attachments: [attachment], channel: '#admin_access'
   end
 
 end

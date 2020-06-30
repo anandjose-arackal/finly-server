@@ -9,7 +9,7 @@
 
 # server 'dev2.finly.io', user: 'centos', roles: %w{web app db}, port: 22
 # server '35.154.209.41', user: 'centos', roles: %w{web app db}, port: 22
-server 'migrated.finly.io', user: 'centos', roles: %w{web app db}, port: 22
+server 'pre_uat.finly.io', user: 'centos', roles: %w{web app db}, port: 22
 
 set :stage, 'staging'
 set :use_sudo, false
@@ -25,7 +25,7 @@ set :rbenv_ruby, '2.6.1' # Edit this if you are using MRI Ruby
 # Don't use `:all`, it's a meta role.
 
 # role :app, %w{deploy@example.com}, my_property: :my_value
-# role :web, %w{user1@primary.com user2@additional.com}, other_property: :other_value
+# role :web, %w{user1@primary.com user2@additional.migcom}, other_property: :other_value
 # role :db,  %w{deploy@example.com}
 
 
