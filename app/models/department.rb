@@ -66,6 +66,11 @@ class Department < ApplicationRecord
     where("departments.ancestry IS NOT NULL")
   }
 
+  def code
+    self.department_code
+  end
+
+
   def as_json(options={})
     args = {id: self.id}
     args[:name] = options&.dig(:tree) ? full_name : name
