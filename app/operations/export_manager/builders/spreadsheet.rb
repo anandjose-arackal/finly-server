@@ -75,6 +75,8 @@ class ExportManager::Builders::Spreadsheet < ExportManager::API
 
       progress_update(index)
       index += 1
+
+      GC.start if index % 1000 == 0
     end
 
     workbook.close
