@@ -53,6 +53,8 @@
 #  pc                         :string(255)
 #  early_payment_date         :date
 #  api_response               :text(65535)
+#  generated_at               :datetime
+#  biller_response            :text(65535)
 #
 
 require 'rails_helper'

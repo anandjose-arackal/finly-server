@@ -16,15 +16,6 @@ set :repo_url, 'git@gitlab.com:finlycore/finly-server.git'
 set :branch, ENV['REFERENCE'] || ENV['BRANCH'] || :master
 
 case fetch(:stage)
-when :itzcash_production
-  raise 'Cannot deploy this to itzcash. Deploy it to AWS instead'
-  # branch = fetch :branch
-  # unless ['staging', :staging].include?(branch)
-  #   raise 'This branch cannot be deploy to production. Please select the correct branch'
-  # end
-  # set :deploy_to, '/home/viveka/app'
-  # set :rails_env, 'production'
-  # todo - configure this for production once everything is set up
 when :aws_production, :background_production, :foreground_production, :console_production,
     :api_production, :background_production_bgg, :background_production_bgp, :background_production_bgpc, :background_production_console
   branch = fetch :branch
@@ -99,7 +90,7 @@ linked_files = %w{
 }
 case fetch(:stage)
 when :itzcash_production, :aws_production, :background_production, :foreground_production, :console_production, :api_production, :background_production_console,
-    :background_production_bgg, :background_production_bgp, :background_production_bgpc, :background_production_olap
+    :background_production_bgg, :background_production_bgp, :background_production_bgpc
   linked_files << 'config/elastic_apm.yml'
   linked_files << 'config/bunny.yml'
   linked_files << 'config/master_users.yml'
