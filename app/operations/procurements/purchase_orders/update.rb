@@ -10,6 +10,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
                 :gstin_location, :cost_allocation_items, :policy
 
   def init
+    binding.pry
     self.purchase_order_params = purchase_order_parameters
     # self.procurement = user.company.procurements.find_by params[:procurement_id]
     purchase_order_id = params[:id] || params[:purchase_order_id]

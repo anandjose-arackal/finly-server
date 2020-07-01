@@ -129,9 +129,9 @@ json.items do
                   :rate, :tax, :tds, :discount, :delivery_date, :comment, :tax_rate_id, :department_id, :cost_center_id,
                   :sgst, :cgst, :igst
     
-    json.item_number item.inventory_line_item&.item_number rescue nil
-    json.gl_code item&.inventory_line_item.category&.gl_code
-    json.category_name item&.inventory_line_item&.category&.name
+    json.item_number item&.item_number rescue nil
+    json.gl_code item&.category&.gl_code
+    json.category_name item&.category&.name
     json.category_id item&.inventory_line_item&.category_id
     json.purchase_request_number item&.purchase_request_item&.purchase_request&.order_number
     json.purchase_request_id item&.purchase_request_item&.purchase_request_id

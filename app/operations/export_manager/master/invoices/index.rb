@@ -181,7 +181,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
   end
 
   def category(invoice_line_item)
-    invoice_line_item&.inventory_line_item&.category&.name
+    invoice_line_item&.category&.name
   end
 
   def quantity(invoice_line_item)

@@ -178,9 +178,9 @@ json.invoice do
                     :unit_of_measurement, :description, :hsn_sac, :inventory_line_item_id, :tax_rate_id, :department_id, :cost_center_id, :sgst, :cgst, :igst,
                     :purchase_order_item_id
 
-      json.category_id item&.inventory_line_item&.category_id rescue nil
-      json.item_number item&.inventory_line_item&.item_number rescue nil
-      json.gl_code item&.inventory_line_item&.category.gl_code rescue nil
+      json.category_id item&.category_id rescue nil
+      json.item_number item&.item_number rescue nil
+      json.gl_code item&.category.gl_code rescue nil
       json.tds_applicable (item&.tds_applicable) ? "yes" : "no"
 
 
@@ -188,7 +188,7 @@ json.invoice do
       json.discount_amount precision_value item.discount_amount&.value
       json.discount_rate precision_value((item.discount_amount&.value/(item.rate * item.quantity) * 100)) rescue 0
       json.amount precision_value item.amount&.value
-      json.category_name item&.inventory_line_item&.category&.name
+      json.category_name item&.category&.name
       json.description item.description
       json.total_amount precision_value item.net_amount&.value
       json.taxable_amount precision_value item.taxable_amount&.value
@@ -202,8 +202,8 @@ json.invoice do
         json.name item&.cost_center&.name
       end
       json.category_attributes do
-        json.id item&.inventory_line_item.category_id
-        json.name item&.inventory_line_item&.category&.name
+        json.id item&.category_id
+        json.name item&.category&.name
       end
 
 
