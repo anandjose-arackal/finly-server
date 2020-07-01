@@ -7,33 +7,14 @@
 # server 'example.com', user: 'deploy', roles: %w{app web}, other_property: :other_value
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
-server '172.32.59.38', user: 'centos', roles: %w{sneakers olap}
-set :stage, 'production'
+# server 'dev2.finly.io', user: 'centos', roles: %w{web app db}, port: 22
+# server '35.154.209.41', user: 'centos', roles: %w{web app db}, port: 22
+server 'pre_uat2.finly.io', user: 'centos', roles: %w{web app db}, port: 22
+
+set :stage, 'staging'
 set :use_sudo, false
 set :rbenv_type, :user
 set :rbenv_ruby, '2.6.1' # Edit this if you are using MRI Ruby
-
-set :sidekiq_config => File.join(shared_path, 'config', 'sidekiq.yml')
-set :sidekiq_roles, :sidekiq_app
-set :crono_role, :crono_role
-set :balance_poller_role, :poller_role
-set :transaction_poller_role, :poller_role
-set :usage_tracker_role, :poller_role
-set :email_tracker_role, :email_tracker_role
-
-# set :sneakers_default_hooks => true
-# set :sneakers_pid => File.join(shared_path, 'tmp', 'pids', 'sneakers.pid') # ensure this path exists in production before deploying
-# set :sneakers_env => fetch(:rack_env, fetch(:rails_env, fetch(:stage)))
-# set :sneakers_log => File.join(shared_path, 'log', 'sneakers.log')
-# set :sneakers_roles => :sneakers
-# set :sneakers_processes => 1
-
-# set :sidekiq_config => File.join(shared_path, 'config', 'sidekiq.yml')
-# set :sidekiq_roles, :sidekiq_app
-# set :crono_role, :crono_role
-# set :balance_poller_role, :poller_role
-# set :transaction_poller_role, :poller_role
-# set :usage_tracker_role, :poller_role
 
 # role-based syntax
 # ==================
@@ -48,6 +29,7 @@ set :email_tracker_role, :email_tracker_role
 # role :db,  %w{deploy@example.com}
 
 
+
 # Configuration
 # =============
 # You can set any configuration variable like in config/deploy.rb
@@ -55,6 +37,7 @@ set :email_tracker_role, :email_tracker_role
 # For available Capistrano configuration variables see the documentation page.
 # http://capistranorb.com/documentation/getting-started/configuration/
 # Feel free to add new variables to customise your setup.
+
 
 
 # Custom SSH Options

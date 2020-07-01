@@ -7,13 +7,14 @@
 # server 'example.com', user: 'deploy', roles: %w{app web}, other_property: :other_value
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
-server 'bgp.finly.io', user: 'centos', roles: %w{sidekiq_app}
+server 'bgp.finly.io', user: 'ubuntu', roles: %w{sidekiq_app}
+# server '104.211.113.12', user: 'ubuntu', roles: %w{sidekiq_app}
 
 set :stage, 'production'
 # set :stage, 'staging'
 set :use_sudo, false
 set :rbenv_type, :user
-set :rbenv_ruby, '2.6.1' # Edit this if you are using MRI Ruby
+set :rbenv_ruby, '2.7.1' # Edit this if you are using MRI Ruby
 
 set :sidekiq_config, -> {File.join(shared_path, 'config', 'sidekiq_yes_bank_balance_poller.yml')}
 set :sidekiq_pid, -> {File.join(shared_path, 'tmp', 'pids', 'sidekiq_yes_bank_balance.pid')}
