@@ -229,8 +229,8 @@ gem 'string_pattern', '~> 2.2', '>= 2.2.1'
 
 # adding aws-sdk gem for using their API enabled services
 # gem 'aws-sdk'
-gem 'aws-sdk-s3', '~> 1.30.0'
-gem 'aws-sdk-sqs', '~> 1.10.0'
+# gem 'aws-sdk-s3', '~> 1.30.0'
+# gem 'aws-sdk-sqs', '~> 1.10.0'
 
 gem 'awesome_print', '~> 1.8.0'
 
@@ -293,7 +293,7 @@ group :development do
   gem 'spring', '~> 2.0.0'
   gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'spring-commands-rspec', '~> 1.0.4'
-  gem "lol_dba"
+  # gem "lol_dba"
 end
 
 
@@ -319,6 +319,5 @@ end
 
 group :production do
   gem 'elastic-apm', '~> 2.8.1'
-  gem "skylight", '~> 3.1'
-  gem 'scout_apm', '~> 2.4'
+  # gem 'scout_apm', '~> 2.4'
 end
