@@ -130,7 +130,7 @@ class Item < ApplicationRecord
         tax: tax,
         account: account,
         item_code: item_code,
-        gl_code: item_code,
+        gl_code: self.category.gl_code,
         supply_item_type_id: supply_item_type_id,
         item_type: supply_item_type.as_json,
         product_type: product_type_id,
