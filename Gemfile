@@ -162,7 +162,7 @@ gem 'bootstrap-sass', '~> 3.4.0'
 # gem 'paper_trail', '~> 10.1.0'
 # gem 'paper_trail-association_tracking', '~> 1.1.0'
 # gem 'turboboost'
-
+gem 'rbtrace', '~> 0.4'
 gem 'remotipart', '~> 1.4'
 
 gem 'bootbox-rails', '0.5.0'
