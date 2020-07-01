@@ -179,7 +179,7 @@ json.invoice do
                     :purchase_order_item_id
 
       json.category_id item&.category_id rescue nil
-      json.item_number item&.item_number rescue nil
+      json.item_number item&.inventory_line_item&.item_number rescue nil
       json.gl_code item&.category.gl_code rescue nil
       json.tds_applicable (item&.tds_applicable) ? "yes" : "no"
 
