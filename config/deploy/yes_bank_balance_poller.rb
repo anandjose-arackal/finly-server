@@ -7,8 +7,8 @@
 # server 'example.com', user: 'deploy', roles: %w{app web}, other_property: :other_value
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
-# server 'bgp.finly.io', user: 'centos', roles: %w{sidekiq_app}
-server '104.211.113.12', user: 'ubuntu', roles: %w{sidekiq_app}
+server 'bgp.finly.io', user: 'ubuntu', roles: %w{sidekiq_app}
+# server '104.211.113.12', user: 'ubuntu', roles: %w{sidekiq_app}
 
 set :stage, 'production'
 # set :stage, 'staging'

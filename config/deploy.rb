@@ -2,7 +2,7 @@
 lock '~> 3.11'
 
 if ['api_production',
-    'background_production', 'background_production_bgpc', 'yes_bank_balance_poller',
+    'background_production', 'background_production_bgp', 'yes_bank_balance_poller',
     'console_production'].include?(fetch(:stage)&.to_s)
   load_secure_storage(:production)
 elsif ['background_production_console'].include?(fetch(:stage)&.to_s)
@@ -31,7 +31,7 @@ when :yes_bank_balance_poller
   end
   set :deploy_to, '/home/ubuntu/app_yb_balance'
   set :rails_env, 'production'
-when :staging, :development, :combined_development, :insights, :demo_2, :shapoorji, :olx, :migrated_test
+when :staging, :development
   set :deploy_to, '/home/centos/app'
   set :rails_env, 'staging'
 when :development_2
@@ -55,26 +55,16 @@ when :development_7
 when :development_8
   set :deploy_to, '/home/centos/app_8'
   set :rails_env, 'staging'
-when :original_test
-  set :deploy_to, '/home/centos/app_2'
-  set :rails_env, 'staging'
-when :migrated_script_testing
-  set :deploy_to, '/home/centos/app_3'
-  set :rails_env, 'staging'
-when :migrated_test_2
-  set :deploy_to, '/home/centos/app_3'
-  set :rails_env, 'staging'
 when :uat
   set :deploy_to, '/home/centos/app'
   set :rails_env, 'uat'
 when :uat_2, :bbps
   set :deploy_to, '/home/centos/app_2'
   set :rails_env, 'uat'
-when :feature_testing
-  # branch = fetch :branch
-  # unless ['feature-testing', :'feature-testing'].include?(branch)
-  #   raise 'This branch cannot be deploy to feature testing. Please select the correct branch'
-  # end
+when :pre_uat
+  set :deploy_to, '/home/centos/app'
+  set :rails_env, 'staging'
+when :pre_uat2
   set :deploy_to, '/home/centos/app_3'
   set :rails_env, 'staging'
 end
