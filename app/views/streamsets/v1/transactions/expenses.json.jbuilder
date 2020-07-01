@@ -4,6 +4,7 @@ json.result do
   json.array!(@result.paginated_expenses) do |expense|
     sl_no = 0 if prev_report_id != expense.report_id
     sl_no += 1
+    prev_report_id = expense.report_id
     user = expense.user
     report = expense.report
     json.extract! expense, :id, :note, :merchant_name, :expense_type_id,
