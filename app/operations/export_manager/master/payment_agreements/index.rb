@@ -175,7 +175,6 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
     end
 
     self.sheets = {general_invoice: general_invoice_rows, rental_invoice: rental_invoice_rows, security_deposit: security_deposit_rows, beneficiary: beneficiary_rows}
-    generate_spreadsheet
   end
 
 
