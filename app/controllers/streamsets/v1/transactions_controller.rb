@@ -25,4 +25,8 @@ class Streamsets::V1::TransactionsController < BaseControllers::StreamsetsBase
     respond
   end
 
+  def users
+    @result = Streamsets::Transactions::Users.(current_user, params)
+  end
+
 end
