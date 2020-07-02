@@ -1,4 +1,4 @@
-class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate < ExportManager::Builders::Spreadsheet
+class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate < ExportManager::Builders::SpreadsheetOld
 
   label 'LMS Export'
   description 'LMS Export'

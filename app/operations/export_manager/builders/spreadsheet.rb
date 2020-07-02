@@ -15,8 +15,8 @@ class ExportManager::Builders::Spreadsheet < ExportManager::API
 
   def generate
     # generate_rows
-    # file = generate_spreadsheet
-    file = generate_rows
+    # file = generate_rows
+    file = generate_spreadsheet
     if file
       save_attachment file
       success!
@@ -25,9 +25,13 @@ class ExportManager::Builders::Spreadsheet < ExportManager::API
     end
   end
 
-  def header
-    @header ||= Header.new
-  end
+  # def rows
+  #   @rows ||= []
+  # end
+
+  # def header
+  #   @header ||= Header.new
+  # end
 
   def fields
     self.params[:fields] || self.params['fields'] || []
@@ -37,7 +41,8 @@ class ExportManager::Builders::Spreadsheet < ExportManager::API
     (fields.blank? and attribute.default) or fields.include?(attribute.name.to_s)
   end
 
-  def generate_rows
+  def generate_spreadsheet
+    header = Header.new
     self.class.attributes.each do |attr|
       next unless add_field?(attr)
       next if attr.dynamic
@@ -68,15 +73,12 @@ class ExportManager::Builders::Spreadsheet < ExportManager::API
           row.add attribute.column_name, value
         end
       end
-      # rows << row
       row.build.each_with_index do |item, column|
         worksheet.write(index, column, item)
       end
 
       progress_update(index)
       index += 1
-
-      GC.start if index % 1000 == 0
     end
 
     workbook.close
@@ -147,10 +149,6 @@ class ExportManager::Builders::Spreadsheet < ExportManager::API
 
   def format
     params[:export_format]&.to_sym || :xls
-  end
-
-  def rows
-    @rows ||= []
   end
 
 end
