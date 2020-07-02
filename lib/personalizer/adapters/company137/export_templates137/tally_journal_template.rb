@@ -40,7 +40,6 @@ class Personalizer::Adapters::Company137::ExportTemplates137::TallyJournalTempla
       sl_no +=1
       progress_update sl_no
     end
-    generate_spreadsheet
   end
 
   def line_item_entries(invoice, item, grn)
