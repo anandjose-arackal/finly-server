@@ -32,7 +32,7 @@ json.result do
     json.hsn_sac invoice_line_item.hsn_sac
     json.cost_center invoice_line_item.cost_center&.name
     json.cost_center_code invoice_line_item.cost_center&.cost_center_code
-    json.item_code invoice_line_item.inventory_line_item&.item_code
+    json.item_code invoice_line_item.inventory_line_item&.item_number
     json.description invoice_line_item.description
     json.unit_of_measurement invoice_line_item.unit_of_measurement
     json.total_amount invoice_line_item.amount&.value

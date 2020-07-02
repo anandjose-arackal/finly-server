@@ -7,11 +7,8 @@
 # server 'example.com', user: 'deploy', roles: %w{app web}, other_property: :other_value
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
-# server 'dev2.finly.io', user: 'centos', roles: %w{web app db}, port: 22
-# server '35.154.209.41', user: 'centos', roles: %w{web app db}, port: 22
-server 'migrated.finly.io', user: 'centos', roles: %w{web app db}, port: 22
-
-set :stage, 'staging'
+server '13.126.31.9', user: 'centos', roles: %w{web app db}, port: 22
+set :stage, 'uat'
 set :use_sudo, false
 set :rbenv_type, :user
 set :rbenv_ruby, '2.6.1' # Edit this if you are using MRI Ruby
@@ -29,7 +26,6 @@ set :rbenv_ruby, '2.6.1' # Edit this if you are using MRI Ruby
 # role :db,  %w{deploy@example.com}
 
 
-
 # Configuration
 # =============
 # You can set any configuration variable like in config/deploy.rb
@@ -37,7 +33,6 @@ set :rbenv_ruby, '2.6.1' # Edit this if you are using MRI Ruby
 # For available Capistrano configuration variables see the documentation page.
 # http://capistranorb.com/documentation/getting-started/configuration/
 # Feel free to add new variables to customise your setup.
-
 
 
 # Custom SSH Options

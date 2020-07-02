@@ -1,5 +1,5 @@
-if Rails.env.production?
+if Rails.env.production? and Socket.gethostname == 'finly-core-bgp'
   Finly::SecureStorage::Connector.configuration do |config|
-      config.keys = %w(core/finly_collect core/yes_bank core/icici_bank core/database core/master_users core/whitelisted_ip_list core/kotak_bank)
+      config.keys = %w(core/finly_collect core/yes_bank core/icici_bank core/kotak_bank)
   end
 end

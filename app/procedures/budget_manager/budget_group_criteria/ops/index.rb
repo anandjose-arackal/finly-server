@@ -18,6 +18,11 @@ class BudgetManager::BudgetGroupCriteria::Ops::Index < Transactions::API
     else
       options["budget_group_criteria"] = budget_group.budget_group_criteria.roots.include_for_index
     end
+    page = params[:page] || 1
+    per_page = params[:per_page] || 30
+
     options["budget_group_criteria"] = apply_scopes(options["budget_group_criteria"], params)
+    options["paginated_budget_group_criteria"] = options["budget_group_criteria"].paginate(page: page, per_page: per_page)
+
   end
 end

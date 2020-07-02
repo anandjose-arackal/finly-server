@@ -50,11 +50,11 @@ json.invoice do
       json.quantity item.quantity
       json.tax item.tax
       json.discount item.discount
-      json.category_id item.category_id
+      json.category_id item&.category_id
       json.tax_amount precision_value item.tax_amount&.value
       json.discount_amount precision_value item.discount_amount&.value
       json.amount precision_value item.amount&.value
-      json.category_name item.category&.name
+      json.category_name item&.category&.name
       json.id item.id
       json.description item.description
       json.total_amount precision_value item.net_amount&.value

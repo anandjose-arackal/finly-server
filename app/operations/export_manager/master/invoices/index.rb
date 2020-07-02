@@ -119,7 +119,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
   end
 
   def finly_ref_no(invoice_line_item)
-    invoice_line_item.parent.invoice_id
+    invoice_line_item.parent&.invoice_id
   end
 
   def invoice_type(invoice_line_item)
@@ -137,7 +137,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
   end
 
   def invoice_no(invoice_line_item)
-    invoice_line_item.parent.invoice_number
+    invoice_line_item.parent&.invoice_number
   end
 
   def vendor_name(invoice_line_item)
@@ -145,7 +145,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
   end
 
   def vendor_ref_no(invoice_line_item)
-    invoice_line_item.parent.vendor.vendor_id
+    invoice_line_item.parent.vendor&.vendor_id
   end
 
   def vendor_gstin(invoice_line_item)
@@ -181,11 +181,11 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
   end
 
   def category(invoice_line_item)
-    invoice_line_item.category&.name
+    invoice_line_item&.category&.name
   end
 
   def quantity(invoice_line_item)
-    invoice_line_item.quantity
+    invoice_line_item&.quantity
   end
 
   def rate(invoice_line_item)
@@ -193,7 +193,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
   end
 
   def narration(invoice_line_item)
-    invoice_line_item.parent.narration
+    invoice_line_item.parent&.narration
   end
 
   def location_name(invoice_line_item)
@@ -233,11 +233,11 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
   end
 
   def description(invoice_line_item)
-    invoice_line_item.description
+    invoice_line_item&.description
   end
 
   def unit_of_measurement(invoice_line_item)
-    invoice_line_item.unit_of_measurement
+    invoice_line_item&.unit_of_measurement
   end
 
   def total_amount(invoice_line_item)
@@ -273,7 +273,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
   end
 
   def rcm_enabled(invoice_line_item)
-    return invoice_line_item.parent.rcm_enabled
+    return invoice_line_item.parent&.rcm_enabled
   end
 
   def tds_percentage(invoice_line_item)

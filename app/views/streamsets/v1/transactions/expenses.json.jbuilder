@@ -1,5 +1,10 @@
 json.result do
+  sl_no = 0
+  prev_report_id = nil
   json.array!(@result.paginated_expenses) do |expense|
+    sl_no = 0 if prev_report_id != expense.report_id
+    sl_no += 1
+    prev_report_id = expense.report_id
     user = expense.user
     report = expense.report
     json.extract! expense, :id, :note, :merchant_name, :expense_type_id,
@@ -18,7 +23,7 @@ json.result do
     json.operating_unit expense.user.gl_config[:operation_unit] rescue ''
     json.expense_type expense.expense_type&.name
     json.total_expenses report&.expenses&.count
-
+    json.expense_sl_no (expense.report_id.present? ? sl_no : nil)
     json.usage_dates do
       json.type expense.usage_date_type
       json.start DateUtils.date_formatted expense.usage_date_start

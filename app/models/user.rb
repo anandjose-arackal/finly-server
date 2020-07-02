@@ -1864,5 +1864,4 @@ class User < ApplicationRecord
     [:filter_state]
   end
 
-
 end
