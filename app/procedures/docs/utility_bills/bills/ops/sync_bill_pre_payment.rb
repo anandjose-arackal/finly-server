@@ -97,7 +97,7 @@ class Docs::UtilityBills::Bills::Ops::SyncBillPrePayment < Transactions::API
     amount = (data.amount.to_f / 100).round(2)
 
     return true unless subscription.auto_fetchable
-    return true if bill.amount.value == amount
+    return true if bill.amount&.value == amount
 
     add_message(options, :error, :base, "New Bill Available with Updated Amount") if bill.amount != amount
     false
