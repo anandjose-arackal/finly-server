@@ -139,6 +139,10 @@ class Category < ApplicationRecord
     }
   end
 
+  def code
+    self.gl_code
+  end
+
   private
 
   # def at_least_one_application

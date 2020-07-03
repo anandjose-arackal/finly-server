@@ -117,6 +117,10 @@ class BudgetGroup < ApplicationRecord
     }
   end
 
+  def code
+    ""
+  end
+
   private
 
   def check_for_valid_start_end_date
