@@ -29,7 +29,7 @@ class Filters::API::Attribute
         label: label,
         hint: hint,
         field_type: field_type,
-        simple: simple,
+        simple: (simple ? simple_filter : false),
         operators: operators,
         args: {filter_id: field_key}
     }
