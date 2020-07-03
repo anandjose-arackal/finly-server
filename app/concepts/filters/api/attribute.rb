@@ -23,6 +23,10 @@ class Filters::API::Attribute
     op
   end
 
+  def simple_filter
+    Forms::API::Entity::Registry.types[field_type].simple_filter
+  end
+
   def build(user)
     params = {
         field_key: field_key,
