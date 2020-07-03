@@ -73,7 +73,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
 
     params.merge!(customer_params(bill.subscription))
 
-    Bbps::BillPay.(params: params, current_user: payment.initiating_user) do |op|
+    Bbps::BillPay.call_async({params: params, current_user: payment.initiating_user}, {wait: true}) do |op|
       op.success do |result|
         puts "Success:Result: #{result}"
         # here we are assuming that the bill gets paid through the BillPay API
@@ -232,7 +232,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
     parameters.symbolize_keys!
   end
 
-  def self.add_error_message payment, error
+  def add_error_message payment, error
 
     if BBPS_ERROR_MESSAGES['BillPayErrorsResponses'][error.to_s].present?
       payment.system_messages.create({
