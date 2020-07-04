@@ -1,4 +1,4 @@
-class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders::Spreadsheet
+class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders::SpreadsheetOld
 
   label 'Export'
   description 'Agreements Export'

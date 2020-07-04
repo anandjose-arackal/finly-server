@@ -23,13 +23,17 @@ class Filters::API::Attribute
     op
   end
 
+  def simple_filter
+    Forms::API::Entity::Registry.types[field_type].simple_filter
+  end
+
   def build(user)
     params = {
         field_key: field_key,
         label: label,
         hint: hint,
         field_type: field_type,
-        simple: simple,
+        simple: (simple ? simple_filter : false),
         operators: operators,
         args: {filter_id: field_key}
     }

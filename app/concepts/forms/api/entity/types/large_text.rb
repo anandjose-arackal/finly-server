@@ -5,6 +5,7 @@ class Forms::API::Entity::Types::LargeText < Forms::API::Entity::Base
   option :char_limit, default: 65535 #{numericality: {greater_than_or_equal_to: 0, less_than_or_equal_to: 255, only_integer: true}}
 
   operators :eq_any, :not_eq_all, :cont_any, :not_cont_all, :blank, :present
+  simple_filter :cont_any
 
   contract do
     required(:char_limit).value(:int?, lteq?: 65535)
