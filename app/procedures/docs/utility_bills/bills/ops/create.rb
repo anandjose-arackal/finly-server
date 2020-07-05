@@ -14,6 +14,16 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
 
   step Contract::Persist()
 
+  step :expire_old_bills
+
+  step :update_subscription_w_bill
+
+  fail :update_subscription_wo_bill
+
+  # fail :update_subscription
+
+  # add method
+
   def skip_user_authorization!(context, options)
     true
   end
@@ -26,6 +36,8 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
 
     subscription = BbpsBillerSubscription.find_by id: subscription_id
 
+    options[:subscription] = subscription
+
     return false if autofetched and subscription.blank?
 
     bill = nil
@@ -34,11 +46,11 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
     early_payment_date = DateUtils.parse_date(params[:early_payment_date])
 
     if (due_date.present? && due_date != "NA" && due_date != "9999-01-01") && (due_date.present? && due_date != "NA" && due_date != "0001-01-01")
-      bill = subscription.bbps_bills.where("bill_date = ? AND due_date = ?", Date.parse(due_date), Date.parse(due_date)).first
+      bill = subscription.bbps_bills.where("bill_date = ? AND due_date = ?", Date.parse(bill_date), Date.parse(due_date)).first
     elsif due_date.present? && due_date != "NA" && due_date != "9999-01-01"
       bill = subscription.bbps_bills.where("due_date = ?", Date.parse(due_date)).first
-    elsif due_date.present? && due_date != "NA" && due_date != "0000-01-01"
-      bill = subscription.bbps_bills.where("bill_date = ?", Date.parse(due_date)).first
+    elsif bill_date.present? && bill_date != "NA" && bill_date != "0000-01-01"
+      bill = subscription.bbps_bills.where("bill_date = ?", Date.parse(bill_date)).first
     elsif bill_month.present?
       bill = subscription.bbps_bills.where(bill_month: bill_month)
     elsif early_payment_date.present?
@@ -57,22 +69,24 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
       else
         # None of the attributes for checking for existing bills exist in the response
         Event::EAlert::Create.(nil,
-            title: "Ambiguous Bill Creation #{subscription.id} . #{bill&.id}",
-            description: "Subscription: #{subscription.as_json} \n Bills: #{subscription.bbps_bills.last.as_json} \n Response: #{result.as_json["table"]}",
-            subject: "Ambiguous Bill Creation #{subscription.id} . #{bill&.id}"
+          title: "Ambiguous Bill Creation #{subscription.id} . #{bill&.id}",
+          description: "Subscription: #{subscription.as_json} \n Bills: #{subscription.bbps_bills.last.as_json} \n Response: #{result.as_json["table"]}",
+          subject: "Ambiguous Bill Creation #{subscription.id} . #{bill&.id}"
         )
       end
     else
       # None of the attributes for checking for existing bills exist in the response
       Event::EAlert::Create.(nil,
-          title: "Ambiguous Bill Creation #{subscription.id} . #{bill&.id}",
-          description: "Subscription: #{subscription.as_json} \n Bills: #{subscription.bbps_bills.last.as_json} \n Response: #{result.as_json["table"]}",
-          subject: "Ambiguous Bill Creation #{subscription.id} . #{bill&.id}"
+        title: "Ambiguous Bill Creation #{subscription.id} . #{bill&.id}",
+        description: "Subscription: #{subscription.as_json} \n Bills: #{subscription.bbps_bills.last.as_json} \n Response: #{result.as_json["table"]}",
+        subject: "Ambiguous Bill Creation #{subscription.id} . #{bill&.id}"
       )
     end
 
     if bill.present?
-      bill.update(order_number: params[:ref_number], order_number_type: "BillFetch")
+      api_response = bill.get_api_responses
+      api_response.push(params[:api_response]&.first&.merge({fetch_type: "AutoFetch"}))
+      bill.update(order_number: params[:order_number], order_number_type: "BillFetch", api_response: api_response)
       return false
     end
 
@@ -98,10 +112,51 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
       bill.merge!({"#{key.to_s}": {value: (params.dig(key) || 0), currency_id: 1}})
     end
 
+    bill[:api_response][0].merge({fetch_type: 'AutoFetch'}) if bill[:api_response].is_a?(Array) && bill[:api_response][0].present?
+
     # Set bill validation
     bill['bill_validation_required'] = !bill[:autofetched]
 
     params['bill'] = bill.with_indifferent_access
+  end
+
+  def expire_old_bills(options, params:, **)
+
+    subscription = BbpsBillerSubscription.find_by id: params[:subscription_id]
+    # find_old bills for the subscription
+    status_ids = BbpsBill.status_ids(:open, :awaiting_approval, :approved, :auto_approved, :payment_ticket_created )
+    bills = subscription.bbps_bills.where(status_id: status_ids).where.not(order_number: params[:order_number])
+    if bills.count > 0
+      bills.each do |bill|
+        # update status and add error
+        bill.errors.add(:error, 'This bill is expired' )
+        bill.payments.each do |payment|
+          payment.system_messages.create({
+                                             content: 'Bill expired',
+                                             system_message_type_id: SystemMessageType.id_for(:error)
+                                         })
+        end
+        bill.update(status_id: BbpsBillStatus.id_for(:expired))
+        bill.payments.update_all(payment_status_id: PaymentStatus.id_for(:failed))
+      end
+    end
+    true
+  end
+
+  def update_subscription_w_bill(options, params:, subscription:, model:, **)
+    update_params = {
+        refreshed_at: DateTime.now,
+        biller_response: nil
+    }
+    update_params[:last_bill_generated_at] = model.created_at if model.present?
+    update_params[:last_bill_due_date] = model.due_date if model.present? and model.due_date.present? and model.due_date.to_s != "9999-01-01"
+    update_params[:last_bill_bill_date] = model.bill_date if model.present? and model.bill_date.present? and model.bill_date.to_s != "0000-01-01"
+
+    subscription.update(update_params)
+  end
+
+  def update_subscription_wo_bill(options, params:, subscription:, model:, **)
+    subscription.update(refreshed_at: DateTime.now, biller_response: nil)
   end
 
   private

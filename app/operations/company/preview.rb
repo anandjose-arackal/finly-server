@@ -18,6 +18,18 @@ class Company::Preview < BaseOperation
     preview_parameters[:phone_number] = CleanUpUtils.mobile_number_cleanup(preview_parameters[:phone_number]) if preview_parameters[:phone_number]
   end
 
+  def validate
+    # this will validate for business emails and ensure people aren't sharing their
+    # personal email IDs. Essentially is going to filter out a list of usual suspects
+    # that people use for personal Emails
+    email = preview_params[:email]
+    domain = email.split("@").last&.split(".").first
+    if Constants::PERSONAL_EMAIL_DOMAINS.include?(domain)
+      add_message :error, "Please enter your company email address for a demo"
+      return
+    end
+  end
+
   def process
     self.preview_company = PreviewRegistration.new(preview_parameters)
     unless preview_company.save

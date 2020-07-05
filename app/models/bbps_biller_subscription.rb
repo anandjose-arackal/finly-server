@@ -51,6 +51,12 @@
 #  sequence_id              :string(255)
 #  last_paid_at             :datetime
 #  review_note              :text(65535)
+#  refreshed_at             :datetime
+#  auto_fetch_enabled       :boolean          default(TRUE)
+#  biller_response          :text(65535)
+#  last_bill_generated_at   :datetime
+#  last_bill_due_date       :date
+#  last_bill_bill_date      :date
 #
 
 class BbpsBillerSubscription < ApplicationRecord
@@ -86,7 +92,7 @@ class BbpsBillerSubscription < ApplicationRecord
   has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment'
   has_many :receiving_payments, foreign_key: 'receiving_user_id', class_name: 'Payment'
 
-  after_update :cleanup # Destroy Biller Subscription fields for other billers if any
+  before_update :cleanup # Destroy Biller Subscription fields for other billers if any
 
   delegate :draft?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :deactivated?, :reactivated?, to: :status
 
@@ -192,7 +198,9 @@ class BbpsBillerSubscription < ApplicationRecord
   }
 
   def cleanup
-    self.customer_fields.without_biller_id(bbps_biller_id).destroy_all
+    unless self.changes.keys.include?("auto_fetch_enabled")
+      self.auto_fetch_enabled = true
+    end
   end
 
   def as_json(options={})
@@ -228,7 +236,9 @@ class BbpsBillerSubscription < ApplicationRecord
         customer_name: customer_name,
         last_paid_at: last_paid_at&.strftime("%I:%M %p, %d %b %Y"),
         customer_pan: customer_pan,
-        attachments: attachments.as_json
+        attachments: attachments.as_json,
+        auto_fetch_enabled: auto_fetch_enabled,
+        biller_response: biller_response
     }
   end
 
@@ -259,6 +269,24 @@ class BbpsBillerSubscription < ApplicationRecord
     fields
   end
 
+  def generate_billfetch_params
+    parameters = {
+        mobile_number: mobile_number,
+        biller_id: biller&.biller_id,
+    }
+
+    (1..5).to_a.each do |i|
+      key = self.send("customer_param_key_#{i}")
+      value = self.send("customer_param_value_#{i}")
+      if key.present? && value.present?
+        parameters["customer_param_#{i}"] = {
+            key: key,
+            value: value
+        }
+      end
+    end
+    parameters.with_indifferent_access
+  end
   # display_name  used  in  payment  file  creation method to  print the  beneficiary name
   def display_name
       self.biller&.biller_name

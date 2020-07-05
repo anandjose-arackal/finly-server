@@ -21,6 +21,7 @@
 #  encrypted_master_password :string(255)
 #  authorized_ip             :string(255)
 #  deleted_at                :datetime
+#  last_activity_at          :datetime
 #
 
 require 'bcrypt'

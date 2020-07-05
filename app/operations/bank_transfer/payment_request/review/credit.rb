@@ -9,9 +9,9 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
 
   def personalizer
     {
-        validate: {
-            before: Personalizer::Process.new([:bank_payment_requests, :credit], :validate, self)
-        }
+      validate: {
+        before: Personalizer::Process.new([:bank_payment_requests, :credit], :validate, self)
+      }
     }
   end
 

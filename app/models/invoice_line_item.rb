@@ -35,6 +35,18 @@
 #  purchase_order_item_id :integer
 #  billable_amount_id     :integer
 #  deleted_at             :datetime
+#  tds_applicable         :boolean          default(FALSE)
+#  discount_rate          :decimal(10, )
+#  tax_percentage         :decimal(20, 5)
+#  item_number            :string(255)
+#  product_type_id        :string(255)
+#  gl_code                :string(255)
+#  gross_amount           :decimal(20, 10)
+#  discount_amount        :decimal(20, 10)
+#  taxable_amount         :decimal(20, 10)
+#  tax_amount             :decimal(20, 10)
+#  net_amount             :decimal(20, 10)
+#  currency_code          :string(255)
 #
 
 class InvoiceLineItem < ApplicationRecord
@@ -64,7 +76,7 @@ class InvoiceLineItem < ApplicationRecord
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 
-  delegate :goods?, :service?, to: :inventory_line_item
+  delegate :goods?, :service?, to: :inventory_line_item, allow_nil: true
 
   # #### Fixme: These associations are deprecated to support amount number fields with the same name.
   # #### Fixme: This can be cleared once this has been deployed to production

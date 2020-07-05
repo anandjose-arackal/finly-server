@@ -80,8 +80,8 @@
 #  proforma_advance                :integer
 #  total_proforma_advance          :decimal(20, 2)
 #  cost_allocation_items           :boolean          default(FALSE)
-#  narration                       :text(65535)
 #  po_number                       :string(255)
+#  narration                       :text(65535)
 #  bank_account_id                 :integer
 #  rejection_note                  :text(65535)
 #  payment_agreement_id            :integer
@@ -95,6 +95,19 @@
 #  payable                         :boolean          default(FALSE)
 #  cn_adjusted_amount_id           :integer
 #  rcm_enabled                     :boolean          default(FALSE)
+#  tds_percentage                  :decimal(20, 5)
+#  gross_amount                    :decimal(20, 10)
+#  discount_amount                 :decimal(20, 10)
+#  freight_amount                  :decimal(20, 10)
+#  taxable_amount                  :decimal(20, 10)
+#  tax_amount                      :decimal(20, 10)
+#  tds_amount                      :decimal(20, 10)
+#  net_amount                      :decimal(20, 10)
+#  po_advance_amount               :decimal(20, 10)
+#  advance_paid_amount             :decimal(20, 10)
+#  total_paid_amount               :decimal(20, 10)
+#  balance_due_amount              :decimal(20, 10)
+#  currency_code                   :string(255)
 #
 
 class Invoice < ApplicationRecord
