@@ -55,6 +55,8 @@ class FormEntity::Text < FormEntity
   FORMAT = %w(text email).freeze
 
   register :text
+  simple_filter :cont_any
+
   set :hint, 'Enter value'
   option :maximum, default: 255
   option :minimum, default: 0

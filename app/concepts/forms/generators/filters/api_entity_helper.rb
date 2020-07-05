@@ -1,7 +1,12 @@
 module Forms::Generators::Filters::ApiEntityHelper
   extend ActiveSupport::Concern
 
-  DEFAULT_OPERATORS = []
+  DEFAULT_OPERATORS = [] #%i(
+  #     eq_any
+  #     blank
+  #     present
+  # )
+  DEFAULT_SIMPLE_FILTER ||= :eq_any
 
   module ClassMethods
     def operators(*list)
@@ -11,6 +16,11 @@ module Forms::Generators::Filters::ApiEntityHelper
         @operators.uniq!
       end
       @operators
+    end
+
+    def simple_filter(filter = nil)
+      @simple_filter = filter if filter.present?
+      @simple_filter ||= DEFAULT_SIMPLE_FILTER
     end
   end
 

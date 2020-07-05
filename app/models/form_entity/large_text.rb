@@ -58,6 +58,7 @@ class FormEntity::LargeText < FormEntity
   option :minimum, default: 0
 
   operators :eq_any, :not_eq_all, :cont_any, :not_cont_all, :blank, :present
+  simple_filter :cont_any
 
   schema_validation do
     required(:options) do
