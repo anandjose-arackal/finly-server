@@ -24,12 +24,15 @@ require 'capistrano/rails/assets'
 require 'capistrano/rails/migrations'
 require 'capistrano/puma'
 require "whenever/capistrano"
+require 'capistrano/puma/monit'
 install_plugin Capistrano::Puma  # Default puma tasks
+install_plugin Capistrano::Puma::Monit
 
 # require 'capistrano/passenger'
 
 require 'capistrano/crono'
 require 'capistrano/sidekiq'
+require 'capistrano/sidekiq/monit'
 # require 'capistrano/sneakers'
 require 'capistrano/rails/console'
 
