@@ -10,9 +10,9 @@ class Docs::P2P::Inwards::Received::FilterConfig < Filters::API
   attribute :delivery_date, label: "Delivered On", type: :datetime
   attribute :grn_number, label: "Reference Number", simple: true
   attribute :user_id, label: "Created By", type: :dropdown, choices: Choices[:lookup].("users")
-  attribute :items_purchase_order_item_purchase_order_policy_id, label: "PO Policy", choices: Choices[:lookup].("policies")
-  attribute :items_purchase_order_item_department_id, label: "PO Department", choices: Choices[:lookup].("departments")
-  attribute :items_purchase_order_item_cost_center_id, label: "PO Cost Center", choices: Choices[:lookup].("cost_centers")
-  attribute :items_purchase_order_item_purchase_order_delivery_location_id, label: "PO Delivery Location", choices: Choices[:lookup].("locations")
+  attribute :items_purchase_order_item_purchase_order_policy_id, type: :dropdown, label: "PO Policy", choices: Choices[:lookup].("policies")
+  attribute :items_purchase_order_item_department_id, type: :dropdown, label: "PO Department", choices: Choices[:lookup].("departments")
+  attribute :items_purchase_order_item_cost_center_id, type: :dropdown, label: "PO Cost Center", choices: Choices[:lookup].("cost_centers")
+  attribute :items_purchase_order_item_purchase_order_delivery_location_id, type: :dropdown, label: "PO Delivery Location", choices: Choices[:lookup].("locations")
 
 end
