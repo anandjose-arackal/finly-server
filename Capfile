@@ -24,19 +24,18 @@ require 'capistrano/rails/assets'
 require 'capistrano/rails/migrations'
 require 'capistrano/puma'
 require "whenever/capistrano"
-install_plugin Capistrano::Puma  # Default puma tasks
+install_plugin Capistrano::Puma # Default puma tasks
+install_plugin Capistrano::Puma::Workers
 # require 'capistrano/passenger'
 
-require 'capistrano/crono'
+# require 'capistrano/crono'
+require 'capistrano/puma/monit'
+install_plugin Capistrano::Puma::Monit, load_hooks: false
+
 require 'capistrano/sidekiq'
-task :use_monit do
-  require 'capistrano/puma/monit'
-  install_plugin Capistrano::Puma::Monit
-
-  require 'capistrano/sidekiq/monit'
-end
-
-task 'production' => [:use_monit]
+require 'capistrano/sidekiq/monit'
+# install_plugin Capistrano::Sidekiq
+# install_plugin Capistrano::Sidekiq::Monit, load_hooks: false
 
 # require 'capistrano/sneakers'
 require 'capistrano/rails/console'
