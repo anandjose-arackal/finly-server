@@ -782,7 +782,7 @@ DEPENDENCIES
   capistrano-rbenv (~> 2.1.4)
   capistrano-rvm (~> 0.1.2)
   capistrano-sidekiq (~> 1.0.2)
-  capistrano3-puma
+  capistrano3-puma (~> 4.0)
   capybara (~> 3.29)
   clockwork (~> 2.0)
   coffee-rails (~> 4.2.2)
