@@ -135,6 +135,9 @@ set :ssh_options, :keepalive => true
 set :puma_user, fetch(:user)
 set :sidekiq_user, fetch(:user)
 
+# Since we do not run monit on all instances, we skip default_hooks so it can be manually set in required env
+set :sidekiq_monit_default_hooks, false
+
 set :whenever_roles, ["whenever_cron"]
 
 set :slackistrano, {
