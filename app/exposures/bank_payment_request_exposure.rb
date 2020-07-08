@@ -20,5 +20,21 @@ class BankPaymentRequestExposure < Exposures::API
   attribute :payments, includes: [:payments] do
     record.payment_order.payments.map(&:to_exposure)
   end
+  attribute :ticket_type do
+    case record.ticket_type
+    when "beneficiary"
+      "Beneficiary Payment"
+    when "invoice"
+      "Invoice Payment"
+    when "purchase_order"
+      "Purchase Order"
+    when "security_deposit"
+      "Security Deposit"
+    when "utility_bill"
+      "Utility Bill"
+    else
+      nil
+    end
+  end
 
 end

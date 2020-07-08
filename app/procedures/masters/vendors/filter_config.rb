@@ -11,7 +11,7 @@ class Masters::Vendors::FilterConfig < Filters::API
   attribute :approved_at, type: :datetime, simple: false
   attribute :vendor_type_id, type: :dropdown, choices: Choices[:resolver].("vendor_types.default")
   attribute :payment_term_id, type: :dropdown, choices: Choices[:resolver].("payment_terms.default")
-  attribute :policy_id, type: :dropdown, choices: Choices[:auto_complete].("policies")
-  attribute :created_by_id, label: "Created By", type: :dropdown, choices: Choices[:auto_complete].("users")
+  attribute :policy_id, type: :dropdown, choices: Choices[:lookup].("policies")
+  attribute :created_by_id, label: "Created By", type: :dropdown, choices: Choices[:lookup].("users")
 
 end

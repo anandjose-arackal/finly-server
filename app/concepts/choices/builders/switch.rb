@@ -1,6 +1,6 @@
-class Choices::Builders::CheckBox < Choices::Builders::Base
+class Choices::Builders::Switch < Choices::Builders::Base
 
-  register! :checkbox
+  register! :switch
 
   def self.call
     self.new({choices: [{id: 1, name: "true", active: true}, {id: 0, name: "false", active: true}]})
@@ -37,7 +37,7 @@ class Choices::Builders::CheckBox < Choices::Builders::Base
   end
 
   def build(params: {}, user: {})
-    {partial: false, choices: choices(params: params, user: user).as_json}
+    Choices::Provider.new(provider: self, partial: false, data: choices(params: params, user: user))
   end
 
 end
