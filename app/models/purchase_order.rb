@@ -401,8 +401,8 @@ class PurchaseOrder < ApplicationRecord
     end
 
     if user_id.present?
-      ids = self.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
-      with_id(ids)
+      ids = self.select(:id).awaiting_action_items(user_id)
+      where(id: ids)
     end
   }
 
@@ -485,7 +485,7 @@ class PurchaseOrder < ApplicationRecord
 
   scope :filter_po_approver_id, -> (approver_id) {
     if approver_id.present?
-      ids = self.awaiting_action_items(approver_id)&.pluck(:id)
+      ids = self.select(:id).awaiting_action_items(approver_id)
       where(id: ids)
     end
   }
@@ -1219,8 +1219,8 @@ class PurchaseOrder < ApplicationRecord
 
   def self.role_based_initiator_associated_items(user, role_id, options = {})
     if UserRole.ids_for([:bank_payment_request_initiator, :po_invoice_initiator]).include? role_id
-      policy_ids = PolicyUserRole.where(user_id: user.id, user_role_id: role_id).pluck(:policy_id)
-      return user.company.purchase_orders.where(policy_id: policy_ids, purchase_order_status_id: finance_associated_status_ids)
+      policy_ids = PolicyUserRole.select(:policy_id).where(user_id: user.id, user_role_id: role_id)
+      return user.company.purchase_orders.where(policy_id: policy_ids).where(purchase_order_status_id: finance_associated_status_ids)
     end
     user.send("#{self.table_name}")
   end
