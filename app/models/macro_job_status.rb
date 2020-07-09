@@ -15,4 +15,11 @@ class MacroJobStatus < FinlyMacrosRecord
     [:in_progress, :completed]
   end
 
+  def as_json(options={})
+    {
+        id: id,
+        name: name.titleize
+    }
+  end
+
 end
