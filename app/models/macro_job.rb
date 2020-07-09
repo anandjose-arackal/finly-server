@@ -32,4 +32,15 @@ class MacroJob < FinlyMacrosRecord
     end
   end
 
+  def as_json(options={})
+    {
+        id: id,
+        started_at: started_at&.strftime("%d-%B-%Y %H:%M:%S"),
+        ended_at: ended_at&.strftime("%d-%B-%Y %H:%M:%S"),
+        execution_time: execution_time,
+        status: status.as_json(options),
+        logs: logs.as_json(options)
+    }
+  end
+
 end

@@ -3866,6 +3866,22 @@ Rails.application.routes.draw do
     end
   end
 
+  namespace :admin do
+    resources :macros, only: [:create, :update, :destroy, :index, :show]
+    resources :macro_jobs, only: [:index, :show]
+
+    get 'index/config', to: 'index#fetch_config'
+    post 'index/config', to: 'index#fetch_config'
+    # get 'index/:route/config', to: "index#fetch_old_config"
+    # post 'index/:route/config', to: "index#fetch_config"
+    get 'index/record_counts', to: 'index#record_counts'
+    post 'index/record_counts', to: 'index#record_counts'
+    get 'index/status_counts', to: 'index#status_counts'
+    post 'index/status_counts', to: 'index#status_counts'
+    get 'index', to: "index#show"
+    post 'index', to: "index#show"
+  end
+
 
   namespace :summary do
     get 'configurations', to: 'configuration#index'

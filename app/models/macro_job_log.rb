@@ -15,4 +15,12 @@
 class MacroJobLog < FinlyMacrosRecord
   belongs_to :macro
   belongs_to :macro_job
+
+  def as_json(options={})
+    {
+        log_type: log_type.titleize,
+        message: message
+    }
+  end
+
 end

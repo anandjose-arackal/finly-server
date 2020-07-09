@@ -11,6 +11,8 @@
 class MacroJobStatus < FinlyMacrosRecord
   include Seedable
 
-  set_values :in_progress, :completed
+  def self.values
+    [:in_progress, :completed]
+  end
 
 end

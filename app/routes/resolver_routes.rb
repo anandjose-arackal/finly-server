@@ -8,15 +8,26 @@ Resolver::Router.draw do
   #   route "departments", :department
   # end
 
+  # Admin
+  scope :admin do
+    scope :macros do
+      route 'default', Admin::Masters::Macros::Resolver
+    end
+
+    scope :macro_jobs do
+      route 'default', Admin::Masters::Macros::Jobs::Resolver
+    end
+  end
+
   # Masters
   scope :department do
-    route "default", Masters::Departments::Resolver
+    route 'default', Masters::Departments::Resolver
   end
   scope :location do
-    route "default", Masters::Locations::Resolver
+    route 'default', Masters::Locations::Resolver
   end
   scope :cost_center do
-    route "default", Masters::CostCenters::Resolver
+    route 'default', Masters::CostCenters::Resolver
   end
 
   scope :insight_dashboard do

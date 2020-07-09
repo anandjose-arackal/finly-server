@@ -21,12 +21,28 @@
 
 class Macro < FinlyMacrosRecord
   belongs_to :macro_type
+  belongs_to :user
+  belongs_to :company
+  belongs_to :created_by, class_name: 'User', optional: true
+  belongs_to :created_by_admin, class_name: 'AdminUser'
 
   has_many :jobs, class_name: 'MacroJob'
   has_many :schedules, class_name: 'MacroSchedule'
-  belongs_to :user
-  belongs_to :company
-  belongs_to :created_by, class_name: 'User'
-  belongs_to :created_by_admin, class_name: 'AdminUser'
+
+  def as_json(options={})
+    {
+        id: id,
+        macro_id: macro_id,
+        name: name,
+        description: description,
+        script: script,
+        macro_type: macro_type.as_json,
+        active: active,
+        user: user.as_json,
+        created_by_admin: created_by_admin.as_json,
+        last_run_at: last_run_at,
+        schedules: schedules.as_json(options)
+    }
+  end
 
 end

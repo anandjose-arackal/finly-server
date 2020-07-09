@@ -32,19 +32,16 @@ class Transactions::Authorization
   module Transactions::Authorization::DSL
 
     def self.included(base)
+      base.include DynamicAttributes
       base.extend ClassMethods
       base.extend Dry::Monads[:result]
+      base.class_attr :user_model, default: User
       base.send(:step, :authorize_user_presence!)
     end
 
     module ClassMethods
       def skip_user_authorization!
         step nil, delete: :authorize_user_presence!
-      end
-
-      # Ability to set a different user model user for role verification
-      def user_model(model = User)
-        @model ||= model
       end
 
       def authorized_roles(*list)

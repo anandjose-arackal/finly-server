@@ -15,19 +15,24 @@
 #
 
 class MacroSchedule < FinlyMacrosRecord
-  EVERY = {day: 1, week: 2, month: 3}.with_indifferent_access
-  DAY_OF_THE_WEEK = {sunday: 0, monday: 1, tuesday: 2, wednesday: 3, thursday: 4, friday: 5, saturday: 6}.with_indifferent_access
+  FREQUENCY = {
+      monthly: 1, weekly: 2, daily: 3, hourly: 4, last_day_of_month: 5
+  }.with_indifferent_access
 
-  belongs_to :schedulable, polymorphic: true
+  DAY_OF_THE_WEEK = {
+      sunday: 0, monday: 1, tuesday: 2, wednesday: 3, thursday: 4, friday: 5, saturday: 6
+  }.with_indifferent_access
 
-  def frequency
-    case every
-    when :day
-      1.day
-    when :week
-      1.week
-    when :month
-      1.month
-    end
+  belongs_to :macro
+
+  def as_json(options={})
+    {
+        id: id,
+        frequency: frequency,
+        hour: hour,
+        minute: minute,
+        day_of_the_week: day_of_the_week,
+        day_of_the_month: day_of_the_month
+    }
   end
 end

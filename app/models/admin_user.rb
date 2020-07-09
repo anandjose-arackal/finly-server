@@ -110,4 +110,11 @@ class AdminUser < ApplicationRecord
     hashed_password = BCrypt::Password.new self.encrypted_master_password
     (hashed_password == password)
   end
+
+  def as_json(options={})
+    {
+        name: name,
+        email: email
+    }
+  end
 end
