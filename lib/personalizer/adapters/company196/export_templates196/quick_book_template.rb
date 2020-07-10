@@ -1,4 +1,4 @@
-class Personalizer::Adapters::Company196::ExportTemplates196::QuickBookTemplate < ExportManager::Builders::Spreadsheet
+class Personalizer::Adapters::Company196::ExportTemplates196::QuickBookTemplate < ExportManager::Builders::SpreadsheetOld
 
   label 'Quick Book Export'
   description 'Quick Book Export'

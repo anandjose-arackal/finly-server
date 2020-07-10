@@ -53,7 +53,7 @@ class Policy::ApprovalWorkflows::Configs::ImportReviewers < Policy::ApprovalWork
         end
       end
     end
-    add_message :success, 'Reviwer Level Imported Successfully'
+    add_message :success, 'Reviewer Level Imported Successfully'
   end
 
   def failure

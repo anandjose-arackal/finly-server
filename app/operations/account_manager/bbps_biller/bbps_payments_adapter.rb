@@ -73,7 +73,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
 
     params.merge!(customer_params(bill.subscription))
 
-    Bbps::BillPay.(params: params, current_user: payment.initiating_user) do |op|
+    Bbps::BillPay.call_async({params: params, current_user: payment.initiating_user}, {wait: true}) do |op|
       op.success do |result|
         puts "Success:Result: #{result}"
         # here we are assuming that the bill gets paid through the BillPay API
@@ -101,8 +101,8 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         puts "Error:Result: #{result}"
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:possible_failure))
         payment.update(payment_status_id: PaymentStatus.id_for(:possible_failure))
-        result.errors.each do |error|
-          add_error_message( payment, error )
+        result["errors"]&.values&.flatten&.each do |error|
+          # add_error_message( payment, error )
           payment.system_messages.build(content: error,
                                         system_message_type_id: SystemMessageType.id_for(:error)).save
         end
@@ -113,8 +113,8 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         puts "Failure:Result: #{result}"
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
         payment.update(payment_status_id: PaymentStatus.id_for(:failed))
-        result.errors.each do |error|
-          add_error_message( payment, error )
+        result["errors"]&.values&.flatten&.each do |error|
+          # add_error_message( payment, error )
           payment.system_messages.build(content: error,
                                         system_message_type_id: SystemMessageType.id_for(:error)).save
         end
@@ -232,7 +232,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
     parameters.symbolize_keys!
   end
 
-  def self.add_error_message payment, error
+  def add_error_message payment, error
 
     if BBPS_ERROR_MESSAGES['BillPayErrorsResponses'][error.to_s].present?
       payment.system_messages.create({

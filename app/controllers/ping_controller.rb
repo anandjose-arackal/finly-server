@@ -25,11 +25,11 @@ class PingController < BaseControllers::PublicBase
     hostname = nil
     case params[:type]
     when 'general'
-      hostname = 'ip-172-33-215-128.ap-south-1.compute.internal'
+      hostname = 'finly-core-bgg'
     when 'payments'
-      hostname = 'ip-172-32-19-108.ap-south-1.compute.internal'
+      hostname = 'finly-core-bgp'
     when 'payments_creation'
-      hostname = 'ip-172-32-59-38.ap-south-1.compute.internal'
+      hostname = 'finly-core-bgpc'
     else
       # Nothing
       raise 'Sidekiq machine not found'

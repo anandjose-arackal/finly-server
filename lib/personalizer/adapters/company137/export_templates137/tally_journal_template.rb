@@ -1,4 +1,4 @@
-class Personalizer::Adapters::Company137::ExportTemplates137::TallyJournalTemplate < ExportManager::Builders::Spreadsheet
+class Personalizer::Adapters::Company137::ExportTemplates137::TallyJournalTemplate < ExportManager::Builders::SpreadsheetOld
 
   label 'Tally Invoices Export'
   description 'Tally Invoices Export'

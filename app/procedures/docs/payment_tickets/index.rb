@@ -31,6 +31,10 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     text value: :payment_ticket_id, format: "primary"
   end
 
+  column :ticket_type, label: "Ticket Type", default: true do
+    text value: :ticket_type
+  end
+
   column :status, default: true, includes: [:status] do
     indicator value: :pt_status, format: :format_status
   end

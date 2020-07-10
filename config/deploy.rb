@@ -1,9 +1,8 @@
 # config valid only for current version of Capistrano
 lock '~> 3.11'
 
-if ['aws_production', 'foreground_production', 'api_production',
-    'background_production', 'background_production_bgg', 'background_production_bgp',
-    'background_production_bgpc', 'yes_bank_balance_poller',
+if ['api_production',
+    'background_production', 'background_production_bgp', 'yes_bank_balance_poller',
     'console_production'].include?(fetch(:stage)&.to_s)
   load_secure_storage(:production)
 elsif ['background_production_console'].include?(fetch(:stage)&.to_s)
@@ -17,41 +16,22 @@ set :repo_url, 'git@gitlab.com:finlycore/finly-server.git'
 set :branch, ENV['REFERENCE'] || ENV['BRANCH'] || :master
 
 case fetch(:stage)
-when :itzcash_production
-  raise 'Cannot deploy this to itzcash. Deploy it to AWS instead'
-  # branch = fetch :branch
-  # unless ['staging', :staging].include?(branch)
-  #   raise 'This branch cannot be deploy to production. Please select the correct branch'
-  # end
-  # set :deploy_to, '/home/viveka/app'
-  # set :rails_env, 'production'
-  # todo - configure this for production once everything is set up
 when :aws_production, :background_production, :foreground_production, :console_production,
     :api_production, :background_production_bgg, :background_production_bgp, :background_production_bgpc, :background_production_console
   branch = fetch :branch
-  # unless ['master', :master].include?(branch)
-  #   raise 'This branch cannot be deploy to production. Please select the correct branch'
-  # end
-  set :deploy_to, '/home/centos/app'
+  unless ['master', :master].include?(branch)
+    raise 'This branch cannot be deploy to production. Please select the correct branch'
+  end
+  set :deploy_to, '/home/ubuntu/app'
   set :rails_env, 'production'
 when :yes_bank_balance_poller
   branch = fetch :branch
   unless ['master', :master].include?(branch)
     raise 'This branch cannot be deploy to production. Please select the correct branch'
   end
-  set :deploy_to, '/home/centos/app_yb_balance'
+  set :deploy_to, '/home/ubuntu/app_yb_balance'
   set :rails_env, 'production'
-when :background_production_olap
-  branch = fetch :branch
-  # unless ['master', :master].include?(branch)
-  #   raise 'This branch cannot be deploy to production. Please select the correct branch'
-  # end
-  set :deploy_to, '/home/centos/app_olap'
-  set :rails_env, 'production'
-when :itzcash
-  set :deploy_to, '/usr/local/app'
-  set :rails_env, 'itzcash_uat'
-when :staging, :development, :combined_development, :insights, :demo_2, :shapoorji, :olx, :migrated_test
+when :staging, :development
   set :deploy_to, '/home/centos/app'
   set :rails_env, 'staging'
 when :development_2
@@ -75,26 +55,16 @@ when :development_7
 when :development_8
   set :deploy_to, '/home/centos/app_8'
   set :rails_env, 'staging'
-when :original_test
-  set :deploy_to, '/home/centos/app_2'
-  set :rails_env, 'staging'
-when :migrated_script_testing
-  set :deploy_to, '/home/centos/app_3'
-  set :rails_env, 'staging'
-when :migrated_test_2
-  set :deploy_to, '/home/centos/app_3'
-  set :rails_env, 'staging'
 when :uat
   set :deploy_to, '/home/centos/app'
   set :rails_env, 'uat'
 when :uat_2, :bbps
   set :deploy_to, '/home/centos/app_2'
   set :rails_env, 'uat'
-when :feature_testing
-  # branch = fetch :branch
-  # unless ['feature-testing', :'feature-testing'].include?(branch)
-  #   raise 'This branch cannot be deploy to feature testing. Please select the correct branch'
-  # end
+when :pre_uat
+  set :deploy_to, '/home/centos/app'
+  set :rails_env, 'staging'
+when :pre_uat2
   set :deploy_to, '/home/centos/app_3'
   set :rails_env, 'staging'
 end
@@ -116,12 +86,14 @@ linked_files = %w{
   config/sidekiq.yml
   config/hutch.yml
   config/web_client.yml
+  config/azure_config.yml
 }
 case fetch(:stage)
 when :itzcash_production, :aws_production, :background_production, :foreground_production, :console_production, :api_production, :background_production_console,
-    :background_production_bgg, :background_production_bgp, :background_production_bgpc, :background_production_olap
+    :background_production_bgg, :background_production_bgp, :background_production_bgpc
   linked_files << 'config/elastic_apm.yml'
   linked_files << 'config/bunny.yml'
+  linked_files << 'config/master_users.yml'
   # linked_files << "config/sentry.yml"
 when :yes_bank_balance_poller
   linked_files << "config/sidekiq_yes_bank_balance_poller.yml"
@@ -159,6 +131,12 @@ set :puma_workers, 0
 set :puma_worker_timeout, nil
 set :puma_init_active_record, true
 set :puma_preload_app, false
+set :ssh_options, :keepalive => true
+set :puma_user, fetch(:user)
+set :sidekiq_user, fetch(:user)
+
+# Since we do not run monit on all instances, we skip default_hooks so it can be manually set in required env
+set :sidekiq_monit_default_hooks, false
 
 set :whenever_roles, ["whenever_cron"]
 

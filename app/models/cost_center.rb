@@ -59,4 +59,8 @@ class CostCenter < ApplicationRecord
     }
   end
 
+  def code
+    self.cost_center_code
+  end
+
 end

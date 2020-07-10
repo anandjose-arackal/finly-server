@@ -4169,6 +4169,7 @@ Rails.application.routes.draw do
       get 'transactions/payments', to: 'streamsets/v1/transactions#payments'
       get 'transactions/statements', to: 'streamsets/v1/transactions#statements'
       get 'transactions/vendors', to: 'streamsets/v1/transactions#vendors'
+      get 'transactions/users', to: 'streamsets/v1/transactions#users'
     end
   end
 
@@ -4271,6 +4272,9 @@ Rails.application.routes.draw do
   patch 'users/:id/profile', to: 'user_profiles#update'
 
   post 'clients/web', to: 'web_clients#create'
+
+  get 'lookup/:route', to: 'lookup#route'
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
   # The priority is based upon order of creation: first created -> highest priority.

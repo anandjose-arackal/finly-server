@@ -156,7 +156,7 @@ class Gatekeeper::Log < BaseOperation
         "ts": Time.now.to_i
     }
 
-    SLACK_NOTIFIER.ping nil, attachments: [attachment] if Rails.env.production?
+    # SLACK_NOTIFIER.ping nil, attachments: [attachment] if Rails.env.production?
   end
 
 end

@@ -1,0 +1,43 @@
+class Choices::Builders::Switch < Choices::Builders::Base
+
+  register! :switch
+
+  def self.call
+    self.new({choices: [{id: 1, name: "true", active: true}, {id: 0, name: "false", active: true}]})
+  end
+
+  def choices(params: {}, user: nil, form_entity: nil)
+    if form_entity.present?
+      # Todo Generalize!
+      form_entity.form_entity_choices
+    else
+      config[:choices]
+    end
+  end
+
+  def choices_json(params: {}, user: nil)
+    choices(params: {}, user: nil).as_json
+  end
+
+  def find_by_id(id, params: {}, user: nil)
+    choices(params: params, user: user).find_by("name = #{id} OR id = #{id}")
+  end
+
+  def find_by_name(name, params: {}, user: nil)
+    choices(params: params, user: user).find_by("name = #{name} OR id = #{name}")
+  end
+
+  def valid?(id: nil, name: nil, user: nil)
+    return true if [true, "true", "false", false].include?(id)
+    return true if [true, "true", "false", false].include?(name)
+    return true if find_by_id(choice, user: user).present?
+    return true if find_by_name(choice, user: user).present?
+
+    false
+  end
+
+  def build(params: {}, user: {})
+    Choices::Provider.new(provider: self, partial: false, data: choices(params: params, user: user))
+  end
+
+end

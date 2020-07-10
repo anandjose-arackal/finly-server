@@ -85,7 +85,7 @@ class Menu::Masters::Procurement < Menu::API
 
   item :payments, icon: "https://img.icons8.com/windows/20/ffffff/online-money-transfer.png" do
     item :payment_tickets, permissions: Docs::PaymentTickets::Index.permissions
-    item :payments, permissions: Docs::PaymentTickets::Payments::Index.permissions
+    item :payments, label: "Payment Items", permissions: Docs::PaymentTickets::Payments::Index.permissions
   end
 
   item :manage, icon: 'https://img.icons8.com/windows/20/ffffff/commercial-development-management.png' do
@@ -100,8 +100,12 @@ class Menu::Masters::Procurement < Menu::API
     item :users, permissions: [:admin]
   end
 
+  item :accounts, icon: 'https://img.icons8.com/windows/20/ffffff/wallet.png' do
+    item :statements, permissions: [:admin]
+    item :balances
+  end
+
   item :download_manager, icon: "https://img.icons8.com/windows/20/ffffff/software-installer.png"
-  item :balances, icon: 'https://img.icons8.com/windows/20/ffffff/wallet.png'
   item :settings, path: 'organization_account', permissions: [:admin], icon: "https://img.icons8.com/windows/20/ffffff/settings.png"
 
 end
