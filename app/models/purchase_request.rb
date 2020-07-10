@@ -130,7 +130,7 @@ class PurchaseRequest < ApplicationRecord
     when PurchaseRequestStatus::GROUP_AWAITING_APPROVAL
       user_id = RequestStore.store[:current_user]&.id
       if user_id.present?
-        self.awaiting_action_items(user_id)
+        where("#{table_name}.purchase_request_status_id": PurchaseRequestStatus.id_for(:awaiting_approval)).awaiting_action_items(user_id)
       end
     when PurchaseRequestStatus::GROUP_APPROVED
       where purchase_request_status_id: PurchaseRequestStatus.ids_for(:approved, :auto_approved, :po_created, :partially_closed, :order_initiated)

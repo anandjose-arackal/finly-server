@@ -293,7 +293,7 @@ class Invoice < ApplicationRecord
       # awaiting approval
       user_id = RequestStore.store[:current_user]&.id
       if user_id.present?
-        where(invoice_status_id: InwardInvoiceStatus.id_for(:processing)).awaiting_action_items(user_id)
+        where("#{table_name}.invoice_status_id": InwardInvoiceStatus.id_for(:processing)).awaiting_action_items(user_id)
       else
         self.none
       end
@@ -334,8 +334,8 @@ class Invoice < ApplicationRecord
     end
 
     if user_id.present?
-      ids = self.awaiting_action_items(user_id)&.pluck(:id)
-      with_id(ids)
+      ids = self.select(:id).awaiting_action_items(user_id)
+      where(id: ids)
     end
   }
 
@@ -1045,11 +1045,11 @@ class Invoice < ApplicationRecord
       end
       document_table_name.present? ? user.send("#{document_table_name}") : user.send("#{self.table_name}")
     elsif role_id == UserRole.id_for(:bank_payment_request_initiator)
-      policy_ids = PolicyUserRole.where(user_id: user.id, user_role_id: role_id).pluck(:policy_id)
-      user.company.inward_invoices.where(policy_id: policy_ids, invoice_status_id: finance_associated_status_ids)
+      policy_ids = PolicyUserRole.select(:policy_id).where(user_id: user.id, user_role_id: role_id)
+      user.company.inward_invoices.where(policy_id: policy_ids).where(invoice_status_id: finance_associated_status_ids)
     elsif [UserRole.id_for(:credit_note_initiator), UserRole.id_for(:credit_note_reviewer)].include?(role_id)
-      policy_ids = PolicyUserRole.where(user_id: user.id, user_role_id: role_id).pluck(:policy_id)
-      user.company.inward_invoices.where(policy_id: policy_ids, invoice_status_id: finance_associated_status_ids)
+      policy_ids = PolicyUserRole.select(:policy_id).where(user_id: user.id, user_role_id: role_id)
+      user.company.inward_invoices.where(policy_id: policy_ids).where(invoice_status_id: finance_associated_status_ids)
     end
   end
 
