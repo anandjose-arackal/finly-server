@@ -117,7 +117,9 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
             when "PENDING FOR PROCESSING"
               self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:pending_for_processing))
             when "SUCCESS"
-              self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:pending_utr))
+              utr = self.parsed_response["UTRNUMBER"]
+              self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:pending_utr),
+                                                 utr: utr)
             when "FAILURE"
               self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
               error_message = self.parsed_response["Message"]
