@@ -49,7 +49,7 @@ class Dashboard::ExpenseManagement::AwaitingAction < Dashboard::ExpenseManagemen
       data = {
           title: "Reports awaiting approval",
           type: 'reports',
-          count: Report.reviewer_associated_items(user).not_open.exclude_deleted.awaiting_action_items(user.id).count,
+          count: Report.reviewer_associated_items(user).not_open.exclude_deleted.where("#{Report.table_name}.report_status_id": ReportStatus.id_for(:processing)).awaiting_action_items(user.id).count,
           filters: [{view: 'manager', filter_status: 99}],
           awaiting_action: true # FE requires this to handle some logic in UI
       }
@@ -73,7 +73,7 @@ class Dashboard::ExpenseManagement::AwaitingAction < Dashboard::ExpenseManagemen
       data = {
           title: "Money Requests awaiting approval",
           type: 'requests',
-          count: MoneyRequest.reviewer_associated_items(user).not_open.exclude_deleted.awaiting_action_items(user.id).count,
+          count: MoneyRequest.reviewer_associated_items(user).not_open.exclude_deleted.where("#{MoneyRequest.table_name}.status_id": MoneyRequestStatus.id_for(:processing)).awaiting_action_items(user.id).count,
           filters: [{view: 'manager', filter_status: 99}],
           awaiting_action: true # FE requires this to handle some logic in UI
       }
