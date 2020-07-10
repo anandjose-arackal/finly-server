@@ -32,7 +32,7 @@ class BankTransfer::PaymentRequest::Review::BulkApprove < BankTransfer::PaymentR
     self.bank_payment_requests = self.bank_payment_requests.where(id: accept_bpr)
 
     if self.bank_payment_requests.blank?
-      add_message :error, "None of the payment tickets are in a state to be apporved."
+      add_message :error, "None of the payment tickets are in a state to be approved."
       return
     end
   end

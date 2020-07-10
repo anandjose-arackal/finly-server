@@ -4,7 +4,7 @@ class BankTransfer::Vendors::Import < BankTransfer::Vendors::Base
 
   def pre_validate
     if user.blank? || params.blank?
-      add_message :error, "Invaoid parameters"
+      add_message :error, "Invalid parameters"
       return
     end
     if params[:file].blank?
