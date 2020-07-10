@@ -19,9 +19,9 @@ case fetch(:stage)
 when :aws_production, :background_production, :foreground_production, :console_production,
     :api_production, :background_production_bgg, :background_production_bgp, :background_production_bgpc, :background_production_console
   branch = fetch :branch
-  unless ['master', :master].include?(branch)
-    raise 'This branch cannot be deploy to production. Please select the correct branch'
-  end
+  # unless ['master', :master].include?(branch)
+  #   raise 'This branch cannot be deploy to production. Please select the correct branch'
+  # end
   set :deploy_to, '/home/ubuntu/app'
   set :rails_env, 'production'
 when :yes_bank_balance_poller
