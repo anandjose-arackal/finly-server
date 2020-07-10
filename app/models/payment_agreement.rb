@@ -290,7 +290,7 @@ class PaymentAgreement < ApplicationRecord
       # awaiting approval
       user_id = RequestStore.store[:current_user]&.id
       if user_id.present?
-        where(status_id: PaymentAgreementStatus.id_for(:awaiting_approval)).awaiting_action_items(user_id)
+        where("#{table_name}.status_id": PaymentAgreementStatus.id_for(:awaiting_approval)).awaiting_action_items(user_id)
       else
         self.none
       end

@@ -489,7 +489,7 @@ module Transitionable
           controlling_level_ids = self.select(:controlling_level_id).where(company_id: user.company.id).where.not(controlling_level_id: nil)
         else
           user_ids = User.select(:id).where(company_id: user.company_id)
-          controlling_level_ids = self.select(:controlling_level_id).where(self.document_owner_attribute => user_ids).where.not(controlling_level_id: nil)
+          controlling_level_ids = self.select(:controlling_level_id).where("#{self.table_name}.#{self.document_owner_attribute}" => user_ids).where.not(controlling_level_id: nil)
         end
         document_ids = DocumentLevelReviewerMapping.where(
             reviewer_id: user.id,
@@ -938,7 +938,7 @@ module Transitionable
       else
         # Models like Report doesn't has company_id attribute
         user_ids = User.select(:id).where(company_id: user.company_id)
-        controlling_level_ids = self.select(:controlling_level_id).where("#{self.document_owner_attribute}" => user_ids).where.not(controlling_level_id: nil)
+        controlling_level_ids = self.select(:controlling_level_id).where("#{self.table_name}.#{self.document_owner_attribute}" => user_ids).where.not(controlling_level_id: nil)
       end
 
       # consolidated above 4 queries into 1
@@ -949,7 +949,7 @@ module Transitionable
 
       documents = self.status_based_associated_items(user, role_id).where("#{table_name}.id IN (#{dlrms.select('document_reviewer_mappable_id').to_sql})").where(policy_id: policy_ids)
       open_status_ids = self.open_status_ids(user)
-      documents = documents.where.not("#{self.table_name}.#{self.document_status_attribute} in (?)", open_status_ids).or(documents.where("#{self.table_name}.#{self.document_status_attribute} in (?)", open_status_ids).where("#{self.document_owner_attribute} = ?", user.id)) rescue self.none
+      documents = documents.where.not("#{self.table_name}.#{self.document_status_attribute} in (?)", open_status_ids).or(documents.where("#{self.table_name}.#{self.document_status_attribute} in (?)", open_status_ids).where("#{self.table_name}.#{self.document_owner_attribute} = ?", user.id)) rescue self.none
       documents
     end
 

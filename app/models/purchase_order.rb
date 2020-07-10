@@ -173,7 +173,7 @@ class PurchaseOrder < ApplicationRecord
       # Awaiting Approval
       user_id = RequestStore.store[:current_user]&.id
       if user_id.present?
-        self.awaiting_action_items(user_id)
+        where("#{table_name}.purchase_order_status_id": PurchaseOrderStatus.id_for(:processing)).awaiting_action_items(user_id)
       end
     when PurchaseOrderStatus::GROUP_APPROVED
       # Approved / Auto Approved

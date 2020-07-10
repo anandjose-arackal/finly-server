@@ -293,7 +293,7 @@ class Invoice < ApplicationRecord
       # awaiting approval
       user_id = RequestStore.store[:current_user]&.id
       if user_id.present?
-        where(invoice_status_id: InwardInvoiceStatus.id_for(:processing)).awaiting_action_items(user_id)
+        where("#{table_name}.invoice_status_id": InwardInvoiceStatus.id_for(:processing)).awaiting_action_items(user_id)
       else
         self.none
       end

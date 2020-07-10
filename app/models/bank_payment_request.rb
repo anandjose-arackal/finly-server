@@ -394,7 +394,7 @@ class BankPaymentRequest < ApplicationRecord
     when BankPaymentRequestStatus::GROUP_AWAITING_APPROVAL
       user_id = RequestStore.store[:current_user]&.id
       if user_id.present?
-        where(status_id: BankPaymentRequestStatus.ids_for(:processing)).awaiting_action_items(user_id)
+        where("#{table_name}.status_id": BankPaymentRequestStatus.ids_for(:processing)).awaiting_action_items(user_id)
       else
         self.none
       end

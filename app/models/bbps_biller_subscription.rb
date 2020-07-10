@@ -137,7 +137,7 @@ class BbpsBillerSubscription < ApplicationRecord
     when 90
       where status_id: BbpsBillerSubscriptionStatus.ids_for(:draft, :retracted)
     when BbpsBillerSubscriptionStatus::GROUP_AWAITING_APPROVAL
-      awaiting_action_items(RequestStore.store[:current_user]&.id)
+      where("#{table_name}.status_id": BbpsBillerSubscriptionStatus.id_for(:awaiting_approval)).awaiting_action_items(RequestStore.store[:current_user]&.id)
     when 92
       where status_id: BbpsBillerSubscriptionStatus.ids_for(:approved, :auto_approved, :reactivated)
     else
