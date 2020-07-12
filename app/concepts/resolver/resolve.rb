@@ -14,7 +14,7 @@ class Resolver::Resolve < Transactions::API
 
   def assign_defaults(context, params:, **)
     params[:per_page] ||= MAX_PER_PAGE
-    params[:per_page] = [params[:per_page], MAX_PER_PAGE].min
+    params[:per_page] = [params[:per_page].to_i, MAX_PER_PAGE].min
   end
 
 end
