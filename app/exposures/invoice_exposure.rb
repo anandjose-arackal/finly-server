@@ -115,6 +115,13 @@ class InvoiceExposure < Exposures::API
     record&.procurement&.purchase_order&.po_number
   end
   attribute :cost_allocation_items, record_attribute: true
+  attribute :cost_allocation do
+    if record.cost_allocation_items
+      :line_items
+    else
+      :header
+    end
+  end
   attribute :status, record_attribute: true, exposure: true, includes: [:status]
 
   # def vendor_ref_num(invoice_line_item)

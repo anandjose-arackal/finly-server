@@ -4288,6 +4288,14 @@ Rails.application.routes.draw do
   patch 'users/:id/profile', to: 'user_profiles#update'
 
   post 'clients/web', to: 'web_clients#create'
+
+
+  namespace :macros do
+    namespace :v1 do
+      resources :invoices, only: [:index, :show]
+    end
+  end
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
   # The priority is based upon order of creation: first created -> highest priority.

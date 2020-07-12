@@ -17,10 +17,10 @@ class BaseControllers::MacrosBase < ApplicationController
   end
 
   def current_user
-    current_task.user
+    current_macro.user
   end
 
-  def current_task
+  def current_macro
     Macro.find_by macro_id: params[:macro_id]
   end
 

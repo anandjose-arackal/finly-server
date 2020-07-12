@@ -38,7 +38,7 @@ class GstinLocation < ApplicationRecord
 
   # belongs_to :location, class_name: "BranchLocation", optional: true
 
-  def as_json
+  def as_json(options={})
     {
       id: self.id,
       location: self.location,
