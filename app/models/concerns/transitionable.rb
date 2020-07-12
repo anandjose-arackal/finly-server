@@ -633,7 +633,7 @@ module Transitionable
           with_document_type(self.name).
           where(document_reviewer_mappable_id: document_ids))
 
-      self.where("#{table_name}.id" => ids.pluck("document_reviewer_mappable_id"))
+      self.where("#{table_name}.id" => ids.select("document_reviewer_mappable_id"))
 
     end
 
