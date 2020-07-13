@@ -27,9 +27,9 @@ class Settlement::SReport::Completed::BatchIndex < Settlement::SReport::Complete
     has_scope :filter_user_id
     has_scope :filter_created_by_user_id
     has_scope :filter_payment_type
-    has_scope :filter_date
-    has_scope :filter_scheduled_date
-    has_scope :filter_completed_date
+    has_scope :filter_date, using: [:from, :to], type: :hash
+    has_scope :filter_scheduled_date, using: [:from, :to], type: :hash
+    has_scope :filter_completed_date, using: [:from, :to], type: :hash
 
     def init
       self.report_processor_groups = params[:report_processor_groups]
