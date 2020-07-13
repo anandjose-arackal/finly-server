@@ -554,7 +554,7 @@ module Transitionable
     #todo below
     # Displays all document. Need to remove draft state
     # # Only gives result for admins and reviewers
-    def awaiting_action_items(user)
+    def old_awaiting_action_items(user)
 
       if user.instance_of?(User)
         # Do nothing
@@ -637,7 +637,7 @@ module Transitionable
 
     end
 
-    def old_awaiting_action_items(user)
+    def awaiting_action_items(user)
 
 
 
