@@ -11,7 +11,10 @@ class BankTransfer::PaymentRequest::Review::BulkApprove < BankTransfer::PaymentR
     unless ids.is_a?(Array)
       ids = ids.split(',')
     end
-    self.bank_payment_requests = BankTransfer::PaymentRequest::Index.(user, params).payment_requests.with_id(ids) rescue nil
+
+    bprs = BankTransfer::PaymentRequest::Index.(user, params).payment_requests.with_id(ids) rescue nil
+
+    self.bank_payment_requests = BankPaymentRequest.with_id(bprs&.pluck(:id))
     self.bank_payment_requests = self.bank_payment_requests.includes_details
   end
 
