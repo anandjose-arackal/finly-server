@@ -23,10 +23,20 @@ class BankTransfer::PaymentRequest::GenerateOtpForCredit < BankTransfer::Payment
     end
 
     # self.bank_payment_request = BankPaymentRequest.where(id: id).first
-    self.bank_payment_requests = BankTransfer::PaymentRequest::Index.(user, params).payment_requests.with_id(id)
+    bprs = BankTransfer::PaymentRequest::Index.(user, params).payment_requests.with_id(id) rescue nil
+
+    # Extracting BPRs with Ids from index operation as Mysql update statement cannot have a select statement using the target table
+    # https://dev.mysql.com/doc/refman/5.6/en/update.html
+    # ERROR 1093 (HY000): You can't specify target table 'items' for update in FROM clause
+
+    self.bank_payment_requests = BankPaymentRequest.with_id(bprs&.pluck(:id))
   end
 
   def validate
+    if bank_payment_requests.empty?
+      add_message :error, "Payment orders not found"
+    end
+
     self.bank_payment_requests.each do |bpr|
       unless bpr.can_credit?
         add_message :error, "Payment ticket ID #{bpr.id} cannot be credited at this stage"

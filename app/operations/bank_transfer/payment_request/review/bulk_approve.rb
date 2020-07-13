@@ -14,6 +14,10 @@ class BankTransfer::PaymentRequest::Review::BulkApprove < BankTransfer::PaymentR
 
     bprs = BankTransfer::PaymentRequest::Index.(user, params).payment_requests.with_id(ids) rescue nil
 
+    # Extracting BPRs with Ids from index operation as Mysql update statement cannot have a select statement using the target table
+    # https://dev.mysql.com/doc/refman/5.6/en/update.html
+    # ERROR 1093 (HY000): You can't specify target table 'items' for update in FROM clause
+
     self.bank_payment_requests = BankPaymentRequest.with_id(bprs&.pluck(:id))
     self.bank_payment_requests = self.bank_payment_requests.includes_details
   end
