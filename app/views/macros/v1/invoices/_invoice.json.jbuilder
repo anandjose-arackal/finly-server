@@ -35,7 +35,7 @@ json.vendor_location record.gstin_location
 json.billing_location record.location
 json.shipping_location record.delivery_location
 json.line_items do
-  json.array record.items do |item|
+  json.array! record.items do |item|
     json.id item.id
     json.item_code item.inventory_line_item&.item_number
     json.description item.description
