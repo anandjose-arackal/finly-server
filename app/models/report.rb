@@ -228,6 +228,21 @@ class Report < ApplicationRecord
       where(reports[:approved_at].gteq(date_from.beginning_of_day).and(reports[:approved_at].lteq(date_to.end_of_day)))
     end
   end
+
+  scope :filter_completed_date, ->(date_from = nil, date_to = nil) do
+    # sample params: filter_date[expense, 2016-03-01, 2016-03-20]
+    unless date_from.blank? && date_to.blank?
+      date_from = "1990-01-01" if date_from.blank?
+      date_to = "2100-01-01" if date_to.blank?
+      date_from = date_from.to_date if date_from.present?
+      date_to = date_to.to_date + 1 if date_to.present?
+      reports = arel_table
+      report_processor_group_mappings = Arel::Table.new(:report_processor_group_mappings)
+      report_ids = joins(:report_processor_group_mapping).where(report_processor_group_mappings[:completed_at].gteq(date_from).and(report_processor_group_mappings[:completed_at].lteq(date_to))).pluck('reports.id')
+      where(id: report_ids)
+
+    end
+  end
   scope :filter_policy, -> (policy_id) {where(policy_id: policy_id)}
 
   scope :sort_for_personal, -> {joins(:report_status).reorder('report_statuses.order ASC, reports.submitted_at DESC, reports.created_at DESC')}
