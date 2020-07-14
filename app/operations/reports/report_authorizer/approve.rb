@@ -6,7 +6,7 @@ class Reports::ReportAuthorizer::Approve < Reports::ReportAuthorizer::Base
       add_message :error, result.messages[:error]
       add_message :failure, result.messages[:failure]
     else
-      add_message :success, "Successfully Apporved Report"
+      add_message :success, "Successfully Approved Report"
     end
   end
 end

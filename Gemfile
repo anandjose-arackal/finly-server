@@ -61,7 +61,7 @@ gem 'health-monitor-rails', '~> 8.4.0'
 
 # puma web server
 gem 'figaro', '~> 1.1.1'
-gem 'puma', '~> 3.12.0'
+gem 'puma', '~> 4.1'
 
 gem 'resque', '~> 2.0.0'
 gem 'ransack', '~> 2.3'
@@ -251,7 +251,7 @@ group :development, :test do
   gem 'pry', '~> 0.13'
   # gem 'rb-readline', '~> 0.5'
   gem 'capistrano', '~> 3.11.0'
-  gem 'capistrano3-puma', '~> 3.1.1'
+  gem 'capistrano3-puma', '~> 4.0'
   gem 'capistrano-rails', '~> 1.4.0', require: false
   gem 'capistrano-bundler', '~> 1.5.0', require: false
   gem 'capistrano-rvm', '~> 0.1.2'

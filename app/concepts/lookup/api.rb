@@ -24,6 +24,7 @@ class Lookup::API < Transactions::API
 
     params[:q] = params[:q] || {}
     params[:q][self.class.search_key] = params['search']
+    params[:q]['deleted_at_null'] = 1 # Show only non-deleted records
   end
 
   def include_associations(context, params:, **)

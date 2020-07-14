@@ -9,7 +9,7 @@ class Docs::P2P::CreditNotes::FilterConfig < Filters::API
   attribute :approved_at, type: :datetime, simple: false
   attribute :credit_note_date, label: "Credit Note Date", type: :datetime, simple: true
   attribute :policy_id, type: :dropdown, simple: true, choices: Choices[:lookup].('policies')
-  attribute :vendor_id, label: "Vendor", simple: true, type: :dropdown,  choices: Choices[:lookup].("vendors")
+  attribute :vendor_id, label: "Vendor", simple: true, type: :dropdown, choices: Choices[:lookup].("vendors")
   attribute :vendor_vendor_id, label: "Vendor ID", simple: false
   attribute :billing_location_id, label: "Billing Location", type: :dropdown, choices: Choices[:lookup].("locations")
   attribute :shipping_location_id, label: "Shipping Location", type: :dropdown, choices: Choices[:lookup].("locations")

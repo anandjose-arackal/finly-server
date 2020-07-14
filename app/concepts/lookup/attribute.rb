@@ -12,7 +12,7 @@ class Lookup::Attribute
     self.value ||= id
   end
 
-  def as_json(options={})
+  def as_json(options = {})
     {
         column: id,
         label: label,

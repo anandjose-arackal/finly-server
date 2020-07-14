@@ -130,7 +130,7 @@ class MoneyRequest < ApplicationRecord
   scope :filter_status, ->(status_id, user_id) do
     case status_id
     when 99, '99'
-      awaiting_action_items(user_id)
+      where("#{table_name}.status_id": MoneyRequestStatus.id_for(:processing)).awaiting_action_items(user_id)
     else
       where status_id: status_id
     end

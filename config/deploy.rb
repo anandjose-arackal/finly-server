@@ -17,7 +17,7 @@ set :branch, ENV['REFERENCE'] || ENV['BRANCH'] || :master
 
 case fetch(:stage)
 when :aws_production, :background_production, :foreground_production, :console_production,
-    :api_production, :background_production_bgg, :background_production_bgp, :background_production_bgpc, :background_production_console, :background_production_bgp_aws_bbps
+    :api_production, :background_production_bgg, :background_production_bgp, :background_production_bgpc, :background_production_console
   branch = fetch :branch
   unless ['master', :master].include?(branch)
     raise 'This branch cannot be deploy to production. Please select the correct branch'
@@ -90,7 +90,7 @@ linked_files = %w{
 }
 case fetch(:stage)
 when :itzcash_production, :aws_production, :background_production, :foreground_production, :console_production, :api_production, :background_production_console,
-    :background_production_bgg, :background_production_bgp, :background_production_bgpc, :background_production_bgp_aws_bbps
+    :background_production_bgg, :background_production_bgp, :background_production_bgpc
   linked_files << 'config/elastic_apm.yml'
   linked_files << 'config/bunny.yml'
   linked_files << 'config/master_users.yml'
@@ -132,6 +132,11 @@ set :puma_worker_timeout, nil
 set :puma_init_active_record, true
 set :puma_preload_app, false
 set :ssh_options, :keepalive => true
+set :puma_user, fetch(:user)
+set :sidekiq_user, fetch(:user)
+
+# Since we do not run monit on all instances, we skip default_hooks so it can be manually set in required env
+set :sidekiq_monit_default_hooks, false
 
 set :whenever_roles, ["whenever_cron"]
 

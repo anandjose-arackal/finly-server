@@ -41,6 +41,6 @@ class Expense::Cancelled::Unmark < Expense::Cancelled::Mark
       trans.update(cancelled_against_expense_id: nil)
     end
 
-    add_message :success, "Expnse un-cancelled"
+    add_message :success, "Expense un-cancelled"
   end
 end
