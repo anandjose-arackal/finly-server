@@ -23,6 +23,10 @@ module Ransacker
       rescue
         # Do nothing
       end
+
+      sub_class.ransacker :id do
+        Arel.sql("CONVERT(#{sub_class.table_name}.id, CHAR(12))")
+      end
     end
 
     def ransack_date(attribute)
