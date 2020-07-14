@@ -1,30 +1,17 @@
 GIT
-  remote: git://github.com/rack/rack.git
-  revision: f690bb71425aa31d7b9b3113829af773950d8ab5
-  ref: f690bb71425aa31d7b9b3113829af773950d8ab5
-  specs:
-    rack (2.2.0)
-
-GIT
-  remote: git://github.com/sinatra/sinatra.git
-  revision: 49fc62e8216c6811e4b6cfbeddd47b80edb10960
-  branch: master
-  specs:
-    rack-protection (2.1.0)
-      rack
-    sinatra (2.1.0)
-      mustermann (~> 1.0)
-      rack (~> 2.2)
-      rack-protection (= 2.1.0)
-      tilt (~> 2.0)
-
-GIT
   remote: git@gitlab.com:finlycore/finly-secure_storage-sdk.git
   revision: 42054e97c6207cd5240f7b50840467ef42655bf2
   specs:
     finly-secure_storage-sdk (0.1.45)
       aws-sdk-ec2 (>= 1.24.0)
       rails (>= 4.2)
+
+GIT
+  remote: https://github.com/rack/rack
+  revision: f690bb71425aa31d7b9b3113829af773950d8ab5
+  ref: f690bb71425aa31d7b9b3113829af773950d8ab5
+  specs:
+    rack (2.2.0)
 
 GIT
   remote: https://github.com/ruckus/quickbooks-ruby.git
@@ -37,6 +24,19 @@ GIT
       nokogiri
       oauth (= 0.5.1)
       roxml (= 3.3.1)
+
+GIT
+  remote: https://github.com/sinatra/sinatra
+  revision: 49fc62e8216c6811e4b6cfbeddd47b80edb10960
+  branch: master
+  specs:
+    rack-protection (2.1.0)
+      rack
+    sinatra (2.1.0)
+      mustermann (~> 1.0)
+      rack (~> 2.2)
+      rack-protection (= 2.1.0)
+      tilt (~> 2.0)
 
 GEM
   remote: https://rubygems.org/
