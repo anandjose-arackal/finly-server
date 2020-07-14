@@ -176,6 +176,8 @@ class Invoice < ApplicationRecord
   belongs_to :payment_agreement, optional: true
   belongs_to :agreement_item, optional: true, polymorphic: true
 
+  belongs_to :erp_sync_status
+
   has_one :credit_note
   has_many :document_level_reviewer_mappings, as: :document_reviewer_mappable
 

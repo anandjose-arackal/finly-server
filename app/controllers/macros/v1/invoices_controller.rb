@@ -7,7 +7,11 @@ class Macros::V1::InvoicesController < BaseControllers::MacrosBase
   end
 
   def show
-    endpoint Docs::P2P::Invoices::Show
+    endpoint Docs::P2P::Invoices::Ops::Show
+  end
+
+  def update
+    endpoint Docs::P2P::Invoices::Ops::Update
   end
 
 end

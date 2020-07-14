@@ -4292,7 +4292,7 @@ Rails.application.routes.draw do
 
   namespace :macros do
     namespace :v1 do
-      resources :invoices, only: [:index, :show]
+      resources :invoices, only: [:index, :show, :update]
     end
   end
 

@@ -1,4 +1,5 @@
 exposure = record.to_exposure
+json.id record.id
 json.invoice_id record.invoice_id
 json.invoice_number record.invoice_number
 json.created_by record.created_by
@@ -65,3 +66,6 @@ json.attachments do
     json.content_type attachment&.file_content_type
   end
 end
+json.erp_sync_status record.erp_sync_status&.name
+json.erp_sync_message record.erp_sync_message
+json.erp_sync_id record.erp_sync_id
