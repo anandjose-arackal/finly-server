@@ -11,11 +11,29 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
     return true
   end
 
+
   # this method will consume YesBank's APIs so that they can fulfill our
   # BBPS billers. Have to understand the adapters to implement this
+
+
+  # New Flow : Before bill pay, a bill fetch will be done to avoid failures
+  # If due is different but amount is same, it will update the bill with new due date and proceed with payment
+  # If amount is different while fetching again irrespective of due date, it will mark the payment as failed and stop the flow here
   def credit(payment, options = {})
     # first we determine if the associated payment to this particular transaction is completed or not
-    bill = payment.parent
+    # bill = payment.parent
+
+    bill_fetch_op = Docs::UtilityBills::Bills::Ops::SyncBillPrePayment.(params: {bill_id: payment.parent_id}, current_user: User.first)
+
+    if bill_fetch_op.success?
+      bill = bill_fetch_op['bill']
+    else
+      self.errors << bill_fetch_op.errors.values
+      return false
+    end
+
+    # Reload Bill
+    bill.reload
 
     # now the bank transaction will be the first in the list of reference resources
     bank_transaction = payment.reference_resources.first
@@ -55,7 +73,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
 
     params.merge!(customer_params(bill.subscription))
 
-    Bbps::BillPay.(params: params, current_user: payment.initiating_user) do |op|
+    Bbps::BillPay.call_async({params: params, current_user: payment.initiating_user}, {wait: true}) do |op|
       op.success do |result|
         puts "Success:Result: #{result}"
         # here we are assuming that the bill gets paid through the BillPay API
@@ -64,6 +82,12 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:processing),
                                 bbps_ref_id: result.bbps_ref_id,
                                 order_number: bill.order_number)
+
+        # Add log to api response in bill
+        api_response = bill.api_response.is_a?(Array) ? bill.api_response : []
+        api_response.push(result.as_json&.dig('table').merge({created_at: DateTime.now, api_type: "BillPay"}))
+
+        bill.update(api_response: api_response)
 
         # clearing old system messages as well
         payment.system_messages.destroy_all
@@ -77,21 +101,25 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         puts "Error:Result: #{result}"
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:possible_failure))
         payment.update(payment_status_id: PaymentStatus.id_for(:possible_failure))
-        result.errors.each do |error|
+        result["errors"]&.values&.flatten&.each do |error|
+          # add_error_message( payment, error )
           payment.system_messages.build(content: error,
                                         system_message_type_id: SystemMessageType.id_for(:error)).save
         end
         return false
+        # any error code
       end
       op.failure do |result|
         puts "Failure:Result: #{result}"
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
         payment.update(payment_status_id: PaymentStatus.id_for(:failed))
-        result.errors.each do |error|
+        result["errors"]&.values&.flatten&.each do |error|
+          # add_error_message( payment, error )
           payment.system_messages.build(content: error,
                                         system_message_type_id: SystemMessageType.id_for(:error)).save
         end
         return false
+        # 200
       end
     end
 
@@ -202,6 +230,25 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
       end
     end
     parameters.symbolize_keys!
+  end
+
+  def add_error_message payment, error
+
+    if BBPS_ERROR_MESSAGES['BillPayErrorsResponses'][error.to_s].present?
+      payment.system_messages.create({
+                                         content: BBPS_ERROR_MESSAGES['BillPayErrorsResponses'][error.to_s],
+                                         system_message_type_id: SystemMessageType.id_for(:error)
+                                     })
+    else
+      payment.system_messages.create({
+                                         content: "Unknown Error Occurred",
+                                         system_message_type_id: SystemMessageType.id_for(:error)
+                                     })
+
+      message = YAML.load_file("#{Rails.root}/config/new_bbps_errors.yml")
+      message[error.to_s] = error.to_s
+      File.open("#{Rails.root}/config/new_bbps_errors.yml", 'w') {|file| YAML.dump(message, file)}
+    end
   end
 
 end

@@ -1,4 +1,4 @@
-class Personalizer::Adapters::Company234::ExportTemplates234::TallyInvoicesTemplate < ExportManager::Builders::Spreadsheet
+class Personalizer::Adapters::Company234::ExportTemplates234::TallyInvoicesTemplate < ExportManager::Builders::SpreadsheetOld
 
   label 'Tally Invoices Export'
   description 'Tally Invoices Export'

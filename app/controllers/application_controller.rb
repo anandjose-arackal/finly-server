@@ -25,13 +25,10 @@ class ApplicationController < ActionController::Base
   before_action :after_finly_authorize
   # before_action :set_raven_context
 
-  before_action :initialize_query_logger
-
   before_action :init_elastic_apm
 
   before_action :store_location
 
-  after_action :set_queries_counter
   # after_action :track_request
 
   # handling exceptions and other errors through redirects to 404s and 500s
@@ -450,42 +447,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def initialize_query_logger
-    QueryLogger.reset if ENABLE_QUERY_LOGGER
-  end
-
   FILE_LOGGER = LogStashLogger.new(type: :file, path: "log/logstash_query_details.log", sync: true)
-
-  def set_queries_counter
-    return unless ENABLE_QUERY_LOGGER
-    return if params[:controller] == "notifications" && params[:action] == "unread"
-    log = {
-      path: request.path,
-      controller: request.params[:controller],
-      action: request.params[:action],
-      total_query_time: QueryLogger.time,
-      queries_count: QueryLogger.count,
-      queries_summary: QueryLogger.summary,
-      # queries: QueryLogger.queries,
-      current_app: current_app,
-      current_device: current_device,
-      request_id: Security.generate_hmac_hex(self.object_id.to_s, DateTime.now.to_s),
-    }
-    user = current_user rescue nil
-    if user.present?
-      log[:user_id] = user&.id
-      log[:user_name] = (user&.name rescue nil)
-      log[:user_email] = user&.email
-      log[:user_mobile_number] = user&.mobile_number
-      log[:current_app] = current_app
-      log[:current_device] = current_device
-      log[:company_name] = (current_company&.name rescue nil)
-      log[:company_id] = (current_company&.id rescue nil)
-      view = (params&.dig(:view) rescue nil)
-      log[:current_view] = view
-    end
-    FILE_LOGGER.info(log)
-  end
 
   def set_cache_buster
     response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate"

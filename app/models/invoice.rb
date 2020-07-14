@@ -80,8 +80,8 @@
 #  proforma_advance                :integer
 #  total_proforma_advance          :decimal(20, 2)
 #  cost_allocation_items           :boolean          default(FALSE)
-#  narration                       :text(65535)
 #  po_number                       :string(255)
+#  narration                       :text(65535)
 #  bank_account_id                 :integer
 #  rejection_note                  :text(65535)
 #  payment_agreement_id            :integer
@@ -95,6 +95,19 @@
 #  payable                         :boolean          default(FALSE)
 #  cn_adjusted_amount_id           :integer
 #  rcm_enabled                     :boolean          default(FALSE)
+#  tds_percentage                  :decimal(20, 5)
+#  gross_amount                    :decimal(20, 10)
+#  discount_amount                 :decimal(20, 10)
+#  freight_amount                  :decimal(20, 10)
+#  taxable_amount                  :decimal(20, 10)
+#  tax_amount                      :decimal(20, 10)
+#  tds_amount                      :decimal(20, 10)
+#  net_amount                      :decimal(20, 10)
+#  po_advance_amount               :decimal(20, 10)
+#  advance_paid_amount             :decimal(20, 10)
+#  total_paid_amount               :decimal(20, 10)
+#  balance_due_amount              :decimal(20, 10)
+#  currency_code                   :string(255)
 #
 
 class Invoice < ApplicationRecord
@@ -280,7 +293,7 @@ class Invoice < ApplicationRecord
       # awaiting approval
       user_id = RequestStore.store[:current_user]&.id
       if user_id.present?
-        where(invoice_status_id: InwardInvoiceStatus.id_for(:processing)).awaiting_action_items(user_id)
+        where("#{table_name}.invoice_status_id": InwardInvoiceStatus.id_for(:processing)).awaiting_action_items(user_id)
       else
         self.none
       end
@@ -321,8 +334,8 @@ class Invoice < ApplicationRecord
     end
 
     if user_id.present?
-      ids = self.awaiting_action_items(user_id)&.pluck(:id)
-      with_id(ids)
+      ids = self.select(:id).awaiting_action_items(user_id)
+      where(id: ids)
     end
   }
 
@@ -1032,11 +1045,11 @@ class Invoice < ApplicationRecord
       end
       document_table_name.present? ? user.send("#{document_table_name}") : user.send("#{self.table_name}")
     elsif role_id == UserRole.id_for(:bank_payment_request_initiator)
-      policy_ids = PolicyUserRole.where(user_id: user.id, user_role_id: role_id).pluck(:policy_id)
-      user.company.inward_invoices.where(policy_id: policy_ids, invoice_status_id: finance_associated_status_ids)
+      policy_ids = PolicyUserRole.select(:policy_id).where(user_id: user.id, user_role_id: role_id)
+      user.company.inward_invoices.where(policy_id: policy_ids).where(invoice_status_id: finance_associated_status_ids)
     elsif [UserRole.id_for(:credit_note_initiator), UserRole.id_for(:credit_note_reviewer)].include?(role_id)
-      policy_ids = PolicyUserRole.where(user_id: user.id, user_role_id: role_id).pluck(:policy_id)
-      user.company.inward_invoices.where(policy_id: policy_ids, invoice_status_id: finance_associated_status_ids)
+      policy_ids = PolicyUserRole.select(:policy_id).where(user_id: user.id, user_role_id: role_id)
+      user.company.inward_invoices.where(policy_id: policy_ids).where(invoice_status_id: finance_associated_status_ids)
     end
   end
 

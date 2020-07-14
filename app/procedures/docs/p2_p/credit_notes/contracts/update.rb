@@ -35,7 +35,8 @@ class Docs::P2P::CreditNotes::Contracts::Update < Reform::Form
   end
 
   def company_entities
-    params = {filter_role_id: [UserRole.id_for(:credit_note_initiator)], current_app: :vp}
+    # params = {filter_role_id: [UserRole.id_for(:credit_note_initiator)], current_app: :vp}
+    params = {filter_role_id: [UserRole.id_for(:credit_note_initiator), UserRole.id_for(:credit_note_reviewer)], current_app: :vp}
     errors.add(:policy_id, "Invalid Policy") unless ::Policy::VendorPayments::Index.(current_user, params).policies.find_by(id: policy_id).present?
     true
   end

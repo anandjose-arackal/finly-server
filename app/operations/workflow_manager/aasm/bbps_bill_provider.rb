@@ -10,6 +10,7 @@ class WorkflowManager::Aasm::BbpsBillProvider < WorkflowManager::Aasm::BaseProvi
     state :paid
     state :failed
     state :voided
+    state :expired
 
 
     event :submit do
@@ -64,6 +65,11 @@ class WorkflowManager::Aasm::BbpsBillProvider < WorkflowManager::Aasm::BaseProvi
 
     event :void do
       transitions from: [:approved, :auto_approved], :to => :voided
+    end
+
+    # for now just replicating void, will have to add other states later
+    event :expire do
+      transitions from: [:open, :awaiting_approval, :approved, :auto_approved, :payment_ticket_created, :payment_initiated], :to => :expired
     end
 
     after_all_events :change_state

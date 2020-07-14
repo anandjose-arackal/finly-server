@@ -51,6 +51,12 @@
 #  sequence_id              :string(255)
 #  last_paid_at             :datetime
 #  review_note              :text(65535)
+#  refreshed_at             :datetime
+#  auto_fetch_enabled       :boolean          default(TRUE)
+#  biller_response          :text(65535)
+#  last_bill_generated_at   :datetime
+#  last_bill_due_date       :date
+#  last_bill_bill_date      :date
 #
 
 require 'rails_helper'

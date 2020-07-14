@@ -19,7 +19,7 @@ class Addresses::Index < Addresses::Base
 
   def pre_validate
     if user.blank? || params.blank?
-      add_message :error, "Invaoid "
+      add_message :error, "Invalid parameters"
     end
   end
 

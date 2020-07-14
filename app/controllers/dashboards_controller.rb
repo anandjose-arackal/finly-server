@@ -1,8 +1,8 @@
 class DashboardsController < BaseControllers::WebBase
 
-  # Fixme: Migration to new structure.
+  # Fixme: Migration to new structure. Legacy code
   def configs
-    @result = Dashboard::VendorPayments::Configs.(current_user, params)
+    @result = Dashboard::P2P::Configs.(current_user, params)
     respond
   end
 

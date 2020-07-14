@@ -47,6 +47,8 @@
 #  compute_type_id              :integer
 #  compute_formula              :string(255)
 #  compute_lookup_entity_id     :string(255)
+#  filters                      :text(65535)
+#  config_path                  :string(255)
 #
 
 class FormEntity < ApplicationRecord

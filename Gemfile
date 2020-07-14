@@ -16,6 +16,7 @@ gem 'rack', github: 'rack/rack', :ref => 'f690bb71425aa31d7b9b3113829af773950d8a
 gem 'rufus-scheduler', '~> 3.6'
 gem 'clockwork', '~> 2.0'
 
+
 # adding gems for activeMQ
 gem 'daemons', '~> 1.3.1'
 # gem 'stomp', '~> 1.4.8'
@@ -24,8 +25,10 @@ gem 'daemons', '~> 1.3.1'
 # grm for mocking and stubbing in test cases
 
 # gem for crash reports
-gem 'rollbar', '~> 2.18.2'
+gem 'rollbar'#, '~> 2.18.2'
 gem 'oj', '~> 3.7.6'
+gem "memory_profiler", '~> 0.9'
+gem "derailed_benchmarks", '~> 1.7.0'
 
 # Firewall
 gem 'rack-attack', '5.4.2'
@@ -58,7 +61,7 @@ gem 'health-monitor-rails', '~> 8.4.0'
 
 # puma web server
 gem 'figaro', '~> 1.1.1'
-gem 'puma', '~> 3.12.0'
+gem 'puma', '~> 4.1'
 
 gem 'resque', '~> 2.0.0'
 gem 'ransack', '~> 2.3'
@@ -129,7 +132,7 @@ gem 'jbuilder', '~> 2.9.0'
 
 gem 'rake', '~> 12.3.2'
 
-gem 'bootsnap', '1.3.2', require: false
+gem 'bootsnap', '~> 1.4', require: false
 
 gem 'handlebars_assets', '~> 0.23.2'
 
@@ -152,13 +155,14 @@ gem 'gcm', '~> 0.1.1'
 gem 'bootstrap-will_paginate', '~> 1.0'
 # gem for image manipulation
 gem 'paperclip', '~> 6.1.0'
+gem 'paperclip-azure', '~> 1.0'
 # Bundle for Bootstrap
 gem 'bootstrap-sass', '~> 3.4.0'
 
 # gem 'paper_trail', '~> 10.1.0'
 # gem 'paper_trail-association_tracking', '~> 1.1.0'
 # gem 'turboboost'
-
+gem 'rbtrace', '~> 0.4'
 gem 'remotipart', '~> 1.4'
 
 gem 'bootbox-rails', '0.5.0'
@@ -225,22 +229,26 @@ gem 'string_pattern', '~> 2.2', '>= 2.2.1'
 
 # adding aws-sdk gem for using their API enabled services
 # gem 'aws-sdk'
-gem 'aws-sdk-s3', '~> 1.30.0'
-gem 'aws-sdk-sqs', '~> 1.10.0'
+# gem 'aws-sdk-s3', '~> 1.30.0'
+# gem 'aws-sdk-sqs', '~> 1.10.0'
 
 gem 'awesome_print', '~> 1.8.0'
 
 # Fuzzy String Match
 gem 'fuzzy-string-match', '1.0.1'
 
+# gem that schedules cron jobs for us
 gem 'whenever'
+
+# gem for all azure services
+gem 'azure'
 
 group :development, :test do
   gem 'byebug'
-  gem 'pry', '~> 0.12.2'
+  gem 'pry', '~> 0.12.2'  
   gem 'rb-readline', '~> 0.5'
   gem 'capistrano', '~> 3.11.0'
-  gem 'capistrano3-puma', '~> 3.1.1'
+  gem 'capistrano3-puma', '~> 4.0'
   gem 'capistrano-rails', '~> 1.4.0', require: false
   gem 'capistrano-bundler', '~> 1.5.0', require: false
   gem 'capistrano-rvm', '~> 0.1.2'
@@ -254,7 +262,7 @@ group :development, :test do
   gem 'rack-mini-profiler', '~> 1.0.1'
   # gem 'flamegraph'
   gem 'stackprof', '~> 0.2.12' # ruby 2.1+ only
-  gem 'memory_profiler', '~> 0.9.12'
+  # gem 'memory_profiler', '~> 0.9.12'
   gem 'brakeman'
   # gem 'active_record_query_trace', '~> 1.5.4'
   # gem 'better_errors'
@@ -285,7 +293,7 @@ group :development do
   gem 'spring', '~> 2.0.0'
   gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'spring-commands-rspec', '~> 1.0.4'
-  gem "lol_dba"
+  # gem "lol_dba"
 end
 
 
@@ -311,6 +319,5 @@ end
 
 group :production do
   gem 'elastic-apm', '~> 2.8.1'
-  gem "skylight", '~> 3.1'
-  gem 'scout_apm', '~> 2.4'
+  # gem 'scout_apm', '~> 2.4'
 end
