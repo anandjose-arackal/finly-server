@@ -8,7 +8,7 @@ class Docs::Trips::Form < Forms::API
     dropdown :company, required: true #, class_name: 'Company', internal: true
     dropdown :status_id, choices_provider: Choices[:enum].(TripStatus, id: :id, name: :name), required: true, default_value: 1
     dropdown :trip_type_id, choices_provider: Choices[:enum].(TripType), required: true
-    dropdown :policy_id, choices_provider: Choices[:auto_complete].('policies', q: {}, permissions: :utility_bill_initiator), required: true
+    dropdown :policy_id, choices_provider: Choices[:lookup].('policies', q: {}, permissions: :utility_bill_initiator), required: true
     date :start_date, required: true
     date :end_date, required: true
     text :purpose, required: true

@@ -216,7 +216,7 @@ class YesBankVendor < ApplicationRecord
     when 91
       user_id = RequestStore.store[:current_user]&.id
       if user_id.present?
-        where(status_id: VendorStatus.ids_for(:awaiting_approval)).awaiting_action_items(user_id)
+        where("#{table_name}.status_id": VendorStatus.ids_for(:awaiting_approval)).awaiting_action_items(user_id)
       else
         self.none
       end

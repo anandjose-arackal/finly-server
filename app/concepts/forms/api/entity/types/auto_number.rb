@@ -7,6 +7,7 @@ class Forms::API::Entity::Types::AutoNumber < Forms::API::Entity::Base
   option :sequence
 
   operators :eq_any, :not_eq_all, :cont_any, :not_cont_all, :blank, :present
+  simple_filter :cont_any
 
   contract do
     required(:sequence) do

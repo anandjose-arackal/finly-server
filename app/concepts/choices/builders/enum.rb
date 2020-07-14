@@ -43,10 +43,7 @@ class Choices::Builders::Enum < Choices::Builders::Base
       }
     end
 
-    {
-        partial: false,
-        choices: list
-    }
+    Choices::Provider.new(provider: self, partial: false, data: list)
   end
 
 end

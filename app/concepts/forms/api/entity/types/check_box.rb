@@ -4,7 +4,7 @@ class Forms::API::Entity::Types::CheckBox < Forms::API::Entity::Base
   operators :true, :false
 
   def initialize(section, field_key, parent_path, opts = {}, &block)
-    super(section, field_key, parent_path, opts.merge(choices_provider: Choices[:checkbox].()), &block)
+    super(section, field_key, parent_path, opts.merge(choices_provider: Choices[:switch].()), &block)
   end
 
   # hint 'Select option'

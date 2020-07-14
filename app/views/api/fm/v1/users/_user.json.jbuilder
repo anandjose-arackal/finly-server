@@ -2,6 +2,7 @@ json.id user.id
 json.name user.name
 json.mobile_number user.mobile_number
 json.email user.email
+json.active (user.active? ? 'active' : 'inactive')
 json.finly_money do
   json.id user.wallet.id
   json.balance user.wallet.balance
@@ -10,7 +11,7 @@ json.cards do
   json.array! user.cards do |card|
     json.id card.id
     json.serial_id card.proxy
-    json.active card.active
+    json.active (card.active? ? 'active' : 'inactive')
     json.ending_number card.ending_number
     json.description card.description
     json.balance card.card_balance

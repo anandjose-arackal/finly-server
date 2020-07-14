@@ -106,13 +106,13 @@ GEM
       execjs
     awesome_print (1.8.0)
     aws-eventstream (1.1.0)
-    aws-partitions (1.335.0)
-    aws-sdk-core (3.102.1)
+    aws-partitions (1.338.0)
+    aws-sdk-core (3.103.0)
       aws-eventstream (~> 1, >= 1.0.2)
       aws-partitions (~> 1, >= 1.239.0)
       aws-sigv4 (~> 1.1)
       jmespath (~> 1.0)
-    aws-sdk-ec2 (1.171.0)
+    aws-sdk-ec2 (1.174.0)
       aws-sdk-core (~> 3, >= 3.99.0)
       aws-sigv4 (~> 1.1)
     aws-sigv4 (1.2.1)
@@ -179,10 +179,10 @@ GEM
     capistrano-sidekiq (1.0.3)
       capistrano (>= 3.9.0)
       sidekiq (>= 3.4, < 6.0)
-    capistrano3-puma (3.1.1)
+    capistrano3-puma (4.0.0)
       capistrano (~> 3.7)
       capistrano-bundler
-      puma (~> 3.4)
+      puma (~> 4.0)
     capybara (3.33.0)
       addressable
       mini_mime (>= 0.1.3)
@@ -215,7 +215,7 @@ GEM
       activesupport (>= 4.0)
     daemons (1.3.1)
     database_cleaner (1.8.5)
-    declarative (0.0.10)
+    declarative (0.0.20)
     declarative-builder (0.1.0)
       declarative-option (< 0.2.0)
     declarative-option (0.1.0)
@@ -248,7 +248,7 @@ GEM
     devise_zxcvbn (4.4.1)
       devise
       zxcvbn-js (~> 4.4.1)
-    diff-lcs (1.4.2)
+    diff-lcs (1.4.4)
     disposable (0.4.7)
       declarative (>= 0.0.9, < 1.0.0)
       declarative-builder (< 0.2.0)
@@ -403,7 +403,7 @@ GEM
       thor (>= 0.14, < 2.0)
     jquery-ui-rails (6.0.1)
       railties (>= 3.2.16)
-    json (2.3.0)
+    json (2.3.1)
     jwt (2.2.1)
     liquid (4.0.3)
     listen (3.1.5)
@@ -455,7 +455,7 @@ GEM
       net-ssh (>= 2.6.5, < 7.0.0)
     net-ssh (6.1.0)
     nio4r (2.5.2)
-    nokogiri (1.10.9)
+    nokogiri (1.10.10)
       mini_portile2 (~> 2.4.0)
     oauth (0.5.1)
     oj (3.7.12)
@@ -469,9 +469,9 @@ GEM
       omniauth (~> 1.0)
     omniauth-quickbooks (0.0.2)
       omniauth-oauth (~> 1.0)
-    omniauth-saml (1.10.1)
+    omniauth-saml (1.10.2)
       omniauth (~> 1.3, >= 1.3.2)
-      ruby-saml (~> 1.7)
+      ruby-saml (~> 1.9)
     optimist (3.0.1)
     orm_adapter (0.5.0)
     ox (2.13.2)
@@ -497,7 +497,8 @@ GEM
       coderay (~> 1.1.0)
       method_source (~> 0.9.0)
     public_suffix (4.0.5)
-    puma (3.12.6)
+    puma (4.3.5)
+      nio4r (~> 2.0)
     pundit (2.1.0)
       activesupport (>= 3.0.0)
     raabro (1.3.1)
@@ -549,7 +550,7 @@ GEM
     redis (4.1.4)
     redis-namespace (1.7.0)
       redis (>= 3.0.4)
-    reform (2.3.1)
+    reform (2.3.2)
       disposable (>= 0.4.2, < 0.5.0)
       representable (>= 2.4.0, < 3.1.0)
       uber (< 0.2.0)
@@ -690,12 +691,12 @@ GEM
       trailblazer-macro (>= 2.1.0, < 2.2.0)
       trailblazer-macro-contract (>= 2.1.0, < 2.2.0)
       trailblazer-operation
-    trailblazer-activity (0.10.1)
-      trailblazer-context (>= 0.2.0, < 0.3.0)
-    trailblazer-activity-dsl-linear (0.2.8)
+    trailblazer-activity (0.11.0)
+      trailblazer-context (>= 0.3.0, < 0.4.0)
+    trailblazer-activity-dsl-linear (0.2.9)
       trailblazer-activity (>= 0.9.1, < 1.0.0)
-    trailblazer-context (0.2.0)
-    trailblazer-developer (0.0.12)
+    trailblazer-context (0.3.0)
+    trailblazer-developer (0.0.14)
       hirb
       representable
       trailblazer-activity (>= 0.10.0, < 1.0.0)
@@ -744,7 +745,7 @@ GEM
       chronic (>= 0.6.3)
     wicked_pdf (1.1.0)
     will_paginate (3.1.8)
-    wkhtmltopdf-binary (0.12.6)
+    wkhtmltopdf-binary (0.12.6.2)
     write_xlsx (0.85.7)
       rubyzip (>= 1.0.0)
       zip-zip
@@ -782,7 +783,7 @@ DEPENDENCIES
   capistrano-rbenv (~> 2.1.4)
   capistrano-rvm (~> 0.1.2)
   capistrano-sidekiq (~> 1.0.2)
-  capistrano3-puma (~> 3.1.1)
+  capistrano3-puma (~> 4.0)
   capybara (~> 3.29)
   coffee-rails (~> 4.2.2)
   cronex (~> 0.10)
@@ -852,7 +853,7 @@ DEPENDENCIES
   paranoia (~> 2.4)
   parslet (~> 1.8.2)
   pry (~> 0.12.2)
-  puma (~> 3.12.0)
+  puma (~> 4.1)
   pundit (~> 2.1)
   quickbooks-ruby!
   rack!
@@ -916,5 +917,3 @@ DEPENDENCIES
 RUBY VERSION
    ruby 2.7.1p83
 
-BUNDLED WITH
-   2.1.4

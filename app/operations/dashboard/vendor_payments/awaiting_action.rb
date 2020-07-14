@@ -84,7 +84,7 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
 
   def process
     if document_types[:purchase_requests]
-      purchase_requests = PurchaseRequest.awaiting_action_items(user)
+      purchase_requests = PurchaseRequest.where("#{PurchaseRequest.table_name}.purchase_request_status_id": PurchaseRequestStatus.id_for(:awaiting_approval)).awaiting_action_items(user)
       if params[:filter_date_from].present? || params[:filter_date_to].present?
         purchase_requests = purchase_requests.filter_by_date_range(params[:filter_date_from], params[:filter_date_to])
       end
@@ -109,7 +109,7 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
 
 
     if document_types[:purchase_orders]
-      purchase_orders = PurchaseOrder.awaiting_action_items(user)
+      purchase_orders = PurchaseOrder.where("#{PurchaseOrder.table_name}.purchase_order_status_id": PurchaseOrderStatus.id_for(:processing)).awaiting_action_items(user)
       if params[:filter_date_from].present?
         purchase_orders = purchase_orders.filter_creation_date_from(params[:filter_date_from])
       end
@@ -138,7 +138,7 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
 
 
     if document_types[:po_invoices] || document_types[:non_po_invoices]
-      awaiting_invoices = Invoice.awaiting_action_items(user)
+      awaiting_invoices = Invoice.where("#{Invoice.table_name}.invoice_status_id": InwardInvoiceStatus.id_for(:processing)).awaiting_action_items(user)
 
       if document_types[:po_invoices]
 
@@ -201,7 +201,7 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
     end
 
     if document_types[:payment_tickets]
-      payment_tickets = BankPaymentRequest.awaiting_action_items(user)
+      payment_tickets = BankPaymentRequest.where("#{BankPaymentRequest.table_name}.status_id": BankPaymentRequestStatus.id_for(:processing)).awaiting_action_items(user)
 
       if params[:filter_date_from].present? || params[:filter_date_to].present?
         payment_tickets = payment_tickets.filter_date(params[:filter_date_from], params[:filter_date_to])
@@ -228,7 +228,7 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
     end
     
     if document_types[:vendors]
-      vendors = YesBankVendor.awaiting_action_items(user)
+      vendors = YesBankVendor.where("#{YesBankVendor.table_name}.status_id": VendorStatus.ids_for(:awaiting_approval)).awaiting_action_items(user)
 
       if params[:filter_date_from].present? || params[:filter_date_to].present?
         vendors = vendors.filter_creation_date(params[:filter_date_from], params[:filter_date_to])
@@ -285,7 +285,7 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
     end
 
     if document_types[:payment_agreements]
-      payment_agreements = PaymentAgreement.awaiting_action_items(user)
+      payment_agreements = PaymentAgreement.where("#{PaymentAgreement.table_name}.status_id": PaymentAgreementStatus.id_for(:awaiting_approval)).awaiting_action_items(user)
       if params[:filter_date_from].present? || params[:filter_date_to].present?
         payment_agreements = payment_agreements.filter_by_date_range(params[:filter_date_from], params[:filter_date_to])
       end
@@ -309,7 +309,7 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
     end
 
     if document_types[:utility_bill_masters]
-      utility_bill_masters = BbpsBillerSubscription.awaiting_action_items(user)
+      utility_bill_masters = BbpsBillerSubscription.where("#{BbpsBillerSubscription.table_name}.status_id": BbpsBillerSubscriptionStatus.id_for(:awaiting_approval)).awaiting_action_items(user)
 
       if params[:filter_date_from].present? || params[:filter_date_to].present?
         utility_bill_masters = utility_bill_masters.filter_creation_date(params[:filter_date_from], params[:filter_date_to])
@@ -336,7 +336,7 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
     end
 
     if document_types[:utility_bills]
-      utility_bills = BbpsBill.awaiting_action_items(user)
+      utility_bills = BbpsBill.where("#{BbpsBill.table_name}.status_id": BbpsBillStatus.id_for(:awaiting_approval)).awaiting_action_items(user)
 
       if params[:filter_date_from].present? || params[:filter_date_to].present?
         utility_bills = utility_bills.filter_creation_date(params[:filter_date_from], params[:filter_date_to])

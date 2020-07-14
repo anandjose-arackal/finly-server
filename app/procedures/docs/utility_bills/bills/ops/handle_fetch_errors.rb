@@ -38,7 +38,6 @@ class Docs::UtilityBills::Bills::Ops::HandleFetchErrors < Transactions::API
       subscription.update({
                               refreshed_at: DateTime.now,
                               biller_response: error_message,
-                              auto_fetch_enabled: false,
                           })
 
     end
