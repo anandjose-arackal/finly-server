@@ -43,9 +43,9 @@ class Masters::Items::Index < IndexBuilder::API
     text value: '{{record.product_type | upcase}}'
   end
 
-  column :active, default: true, sort: :active do
-    checkbox value: '{{record.active}}'
-  end
+  # column :active, default: true, sort: :active do
+  #   checkbox value: '{{record.active}}'
+  # end
 
   column :tds_applicable, default: true, label: "TDS Applicable", sort: :tds_applicable do
     checkbox value: '{{record.tds_applicable}}'
