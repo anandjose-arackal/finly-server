@@ -9,6 +9,7 @@ class Masters::Items::FilterConfig < Filters::API
   attribute :rate, type: :number
   attribute :description, type: :text, simple: true
   attribute :item_code, type: :text, simple: true
+  attribute :hsn_sac, label: 'HSN/SAC', type: :text, simple: true
   attribute :category_id, type: :dropdown, simple: true, choices: Choices[:lookup].('categories')
   attribute :supply_item_type_id, label: "Scope", type: :dropdown, simple: true, choices: Choices[:list].(
       {id: SupplyItemType.id_for(:po_item), name: "PO"},
