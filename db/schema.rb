@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_13_140603) do
+ActiveRecord::Schema.define(version: 2020_07_15_093055) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -1616,7 +1616,52 @@ ActiveRecord::Schema.define(version: 2020_07_13_140603) do
     t.decimal "cn_adjusted_amount_after_tax_value", precision: 20, scale: 10, default: "0.0"
     t.decimal "credit_note_tax_amount_value", precision: 20, scale: 10, default: "0.0"
     t.datetime "date"
+    t.index ["amount_after_tax_id"], name: "index_budget_trails_on_amount_after_tax_id"
+    t.index ["amount_before_tax_id"], name: "index_budget_trails_on_amount_before_tax_id"
+    t.index ["amount_id"], name: "index_budget_trails_on_amount_id"
+    t.index ["billed"], name: "index_budget_trails_on_billed"
+    t.index ["billed_amount_after_tax_value"], name: "index_budget_trails_on_billed_amount_after_tax_value"
+    t.index ["billed_amount_before_tax_value"], name: "index_budget_trails_on_billed_amount_before_tax_value"
+    t.index ["billed_quantity"], name: "index_budget_trails_on_billed_quantity"
+    t.index ["billed_rate"], name: "index_budget_trails_on_billed_rate"
+    t.index ["category_id"], name: "index_budget_trails_on_category_id"
+    t.index ["cn_adjusted_amount_after_tax_value"], name: "index_budget_trails_on_cn_adjusted_amount_after_tax_value"
+    t.index ["cn_adjusted_amount_before_tax_value"], name: "index_budget_trails_on_cn_adjusted_amount_before_tax_value"
+    t.index ["cost_center_id"], name: "index_budget_trails_on_cost_center_id"
+    t.index ["credit_note_tax_amount_value"], name: "index_budget_trails_on_credit_note_tax_amount_value"
+    t.index ["date"], name: "index_budget_trails_on_date"
+    t.index ["deleted_at"], name: "index_budget_trails_on_deleted_at"
+    t.index ["department_id"], name: "index_budget_trails_on_department_id"
+    t.index ["effective_paid_amount_before_tax_value"], name: "index_budget_trails_on_effective_paid_amount_before_tax_value"
+    t.index ["entity_created_at"], name: "index_budget_trails_on_entity_created_at"
+    t.index ["entity_date"], name: "index_budget_trails_on_entity_date"
+    t.index ["entity_status_id"], name: "index_budget_trails_on_entity_status_id"
+    t.index ["entity_submitted_at"], name: "index_budget_trails_on_entity_submitted_at"
     t.index ["entity_type", "entity_id"], name: "index_budget_trails_on_entity_type_and_entity_id"
+    t.index ["invoice_id"], name: "index_budget_trails_on_invoice_id"
+    t.index ["location_id"], name: "index_budget_trails_on_location_id"
+    t.index ["net_paid_amount_before_tax_value"], name: "index_budget_trails_on_net_paid_amount_before_tax_value"
+    t.index ["paid_amount_after_tax_value"], name: "index_budget_trails_on_paid_amount_after_tax_value"
+    t.index ["paid_tds_value"], name: "index_budget_trails_on_paid_tds_value"
+    t.index ["payment_confirmed"], name: "index_budget_trails_on_payment_confirmed"
+    t.index ["payment_processing_amount_after_tax_value"], name: "idx_budget_trails_on_pmt_processing_amt_aftr_tax_value"
+    t.index ["payment_processing_amount_before_tax_value"], name: "idx_budget_trails_on_pmt_processing_amt_b4_tax_value"
+    t.index ["payment_purpose_id"], name: "index_budget_trails_on_payment_purpose_id"
+    t.index ["po_trail_item_id"], name: "index_budget_trails_on_po_trail_item_id"
+    t.index ["processing_tds_value"], name: "index_budget_trails_on_processing_tds_value"
+    t.index ["procurement_id"], name: "index_budget_trails_on_procurement_id"
+    t.index ["purchase_order_id"], name: "index_budget_trails_on_purchase_order_id"
+    t.index ["rcm_tax_value"], name: "index_budget_trails_on_rcm_tax_value"
+    t.index ["reimbursable"], name: "index_budget_trails_on_reimbursable"
+    t.index ["remaining_amount_after_tax_value"], name: "index_budget_trails_on_remaining_amount_after_tax_value"
+    t.index ["remaining_amount_before_tax_value"], name: "index_budget_trails_on_remaining_amount_before_tax_value"
+    t.index ["remaining_quantity"], name: "index_budget_trails_on_remaining_quantity"
+    t.index ["revised"], name: "index_budget_trails_on_revised"
+    t.index ["sub_department_id"], name: "index_budget_trails_on_sub_department_id"
+    t.index ["tax_amount_value"], name: "index_budget_trails_on_tax_amount_value"
+    t.index ["tds_value"], name: "index_budget_trails_on_tds_value"
+    t.index ["user_id"], name: "index_budget_trails_on_user_id"
+    t.index ["vendor_id"], name: "index_budget_trails_on_vendor_id"
   end
 
   create_table "budgets", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -3278,6 +3323,32 @@ ActiveRecord::Schema.define(version: 2020_07_13_140603) do
     t.index ["updated_at"], name: "index_erp_sync_statuses_on_updated_at"
   end
 
+  create_table "erp_syncs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "record_id", null: false
+    t.string "record_type", null: false
+    t.integer "status_id", null: false
+    t.integer "company_id", null: false
+    t.integer "macro_id"
+    t.integer "macro_job_id"
+    t.string "message"
+    t.text "reference_id"
+    t.datetime "attempted_at", null: false
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_erp_syncs_on_company_id"
+    t.index ["created_at"], name: "index_erp_syncs_on_created_at"
+    t.index ["deleted_at"], name: "index_erp_syncs_on_deleted_at"
+    t.index ["macro_id"], name: "index_erp_syncs_on_macro_id"
+    t.index ["macro_job_id"], name: "index_erp_syncs_on_macro_job_id"
+    t.index ["message"], name: "index_erp_syncs_on_message"
+    t.index ["record_id", "record_type"], name: "index_erp_syncs_on_record_id_and_record_type"
+    t.index ["record_id"], name: "index_erp_syncs_on_record_id"
+    t.index ["record_type"], name: "index_erp_syncs_on_record_type"
+    t.index ["status_id"], name: "index_erp_syncs_on_status_id"
+    t.index ["updated_at"], name: "index_erp_syncs_on_updated_at"
+  end
+
   create_table "expense_data_extract_sources", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
@@ -4874,8 +4945,6 @@ ActiveRecord::Schema.define(version: 2020_07_13_140603) do
     t.string "currency_code"
     t.decimal "taxable_amount", precision: 20, scale: 10
     t.integer "erp_sync_status_id"
-    t.text "erp_sync_message", limit: 4294967295
-    t.string "erp_sync_id"
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["advance_amount_id"], name: "index_invoices_on_advance_amount_id"
     t.index ["amount_id"], name: "index_invoices_on_amount_id"

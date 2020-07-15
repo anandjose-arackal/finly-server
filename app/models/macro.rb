@@ -9,10 +9,13 @@
 #  script              :text(65535)      not null
 #  macro_type_id       :integer          not null
 #  active              :boolean
+#  start_date          :date
+#  end_date            :date
 #  company_id          :integer
 #  user_id             :integer          not null
 #  created_by_id       :integer
 #  created_by_admin_id :integer
+#  long_running_job    :boolean
 #  last_run_at         :datetime
 #  deleted_at          :datetime
 #  created_at          :datetime         not null

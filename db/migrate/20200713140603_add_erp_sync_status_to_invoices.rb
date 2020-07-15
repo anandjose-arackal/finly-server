@@ -7,8 +7,5 @@ class AddErpSyncStatusToInvoices < ActiveRecord::Migration[5.2]
       t.timestamps null: false, index: true
     end
     ErpSyncStatus.seed_data
-    add_column :invoices, :erp_sync_status_id, :integer, references: 'erp_sync_statuses'
-    add_column :invoices, :erp_sync_message, :text, limit: 4294967295
-    add_column :invoices, :erp_sync_id, :string
   end
 end

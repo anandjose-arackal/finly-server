@@ -4293,6 +4293,9 @@ Rails.application.routes.draw do
   namespace :macros do
     namespace :v1 do
       resources :invoices, only: [:index, :show, :update]
+      resources :invoices do
+        post 'new_sync_attempt', to: 'invoices#new_sync_attempt'
+      end
     end
   end
 

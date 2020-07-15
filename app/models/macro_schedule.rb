@@ -4,7 +4,9 @@
 #
 #  id               :bigint           not null, primary key
 #  macro_id         :integer
-#  every            :integer
+#  start_date       :datetime
+#  end_date         :datetime
+#  frequency        :integer
 #  hour             :integer
 #  minute           :integer
 #  day_of_the_week  :integer

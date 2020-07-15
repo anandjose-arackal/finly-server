@@ -2,16 +2,19 @@
 #
 # Table name: macro_jobs
 #
-#  id              :bigint           not null, primary key
-#  macro_id        :integer          not null
-#  started_at      :datetime
-#  ended_at        :datetime
-#  execution_time  :integer
-#  request_options :text(65535)
-#  status_id       :integer          not null
-#  deleted_at      :datetime
-#  created_at      :datetime         not null
-#  updated_at      :datetime         not null
+#  id               :bigint           not null, primary key
+#  macro_id         :integer          not null
+#  started_at       :datetime
+#  ended_at         :datetime
+#  execution_time   :integer
+#  request_options  :text(65535)
+#  return_value     :text(4294967295)
+#  crash_message    :text(4294967295)
+#  crash_stacktrace :text(4294967295)
+#  status_id        :integer          not null
+#  deleted_at       :datetime
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
 #
 
 class MacroJob < FinlyMacrosRecord
