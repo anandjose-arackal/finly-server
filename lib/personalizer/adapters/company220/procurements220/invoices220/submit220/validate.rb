@@ -22,7 +22,7 @@ class Personalizer::Adapters::Company220::Procurements220::Invoices220::Submit22
     if self.invoice.procurement&.non_po_procurement?
       budget_exceeded = false
       self.budgets.each do |budget|
-        budget_criteria = budget.budget_group_criteria
+        budget_criteria = budget.budget_group_criterium
         budget_amount = budget.budget_consumption&.budget_amount&.value
         budget_spent_amount = budget.budget_consumption&.total_consumed_amount&.value
 
