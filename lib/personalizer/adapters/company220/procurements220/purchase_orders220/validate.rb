@@ -24,7 +24,7 @@ class Personalizer::Adapters::Company220::Procurements220::PurchaseOrders220::Va
 
       spent_amount = budget_spent_amount
 
-      if spent_amount > budget_amount
+      if spent_amount > budget_amount or budget_amount == 0
         add_message :error, "Purchase Order Amount exceeding Budget - #{budget_criteria.name}"
       end
     end

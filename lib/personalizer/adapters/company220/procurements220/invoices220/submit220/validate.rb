@@ -28,7 +28,7 @@ class Personalizer::Adapters::Company220::Procurements220::Invoices220::Submit22
 
         spent_amount = budget_spent_amount
 
-        if spent_amount > budget_amount
+        if spent_amount > budget_amount or budget_amount == 0
           budget_exceeded = false
           add_message :error,  "Invoice Amount exceeding Budget - #{budget_criteria.name}"
         end
