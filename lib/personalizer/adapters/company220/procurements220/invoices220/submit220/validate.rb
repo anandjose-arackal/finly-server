@@ -1,4 +1,4 @@
-class Personalizer::Adapters::Company140::Procurements140::Invoices140::Submit140::Validate < Personalizer::Adapters::Base
+class Personalizer::Adapters::Company220::Procurements220::Invoices220::Submit220::Validate < Personalizer::Adapters::Base
   attr_accessor :invoice, :purchase_order, :procurement, :budgets
 
   def init
