@@ -1,4 +1,5 @@
 class InvoiceExposure < Exposures::API
+  include Concerns::ErpSyncConcern
 
   attribute :id, record_attribute: true
   attribute :procurement_id, record_attribute: true
@@ -123,6 +124,7 @@ class InvoiceExposure < Exposures::API
     end
   end
   attribute :status, record_attribute: true, exposure: true, includes: [:status]
+
 
   # def vendor_ref_num(invoice_line_item)
   #   invoice_line_item.parent&.vendor_id
