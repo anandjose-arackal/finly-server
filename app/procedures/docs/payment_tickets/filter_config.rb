@@ -25,7 +25,7 @@ class Docs::PaymentTickets::FilterConfig < Filters::API
   attribute :payment_order_amount_processed_value, type: :number, label: 'Processed Amount'
   attribute :payment_order_payments_receiving_user_vendor_id, type: :dropdown, label: 'Vendor', choices: Choices[:lookup].("vendors"), simple: true
   attribute :owner_id, label: "Created By", type: :dropdown, choices: Choices[:lookup].("users")
-  custom_fields :purchase_order, prefix: :payments_purchase_order_parent
-  custom_fields :invoice, prefix: :payments_invoice
+  custom_fields :purchase_order, prefix: :payment_order_payments_purchase_order_parent
+  custom_fields :invoice, prefix: :payment_order_payments_invoice
 
 end
