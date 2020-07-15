@@ -474,7 +474,7 @@ module Transitionable
     end
 
     def update_if_reviewer(user)
-      self.get_reviewers_ids&.include?(user.id) rescue false
+      self.get_reviewer_ids&.include?(user.id) rescue false
     end
 
   end
