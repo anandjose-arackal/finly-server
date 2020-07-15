@@ -66,6 +66,9 @@ json.attachments do
     json.content_type attachment&.file_content_type
   end
 end
-json.erp_sync_status record.erp_sync_status&.name
-json.erp_sync_message record.erp_sync_message
-json.erp_sync_id record.erp_sync_id
+json.erp_sync do
+  json.status record.erp_sync_status&.name
+  json.message record.erp_sync_message
+  json.reference_id record.erp_sync_reference_id
+  json.attempted_at record.erp_sync_attempted_at
+end
