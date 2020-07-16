@@ -1,5 +1,7 @@
 class Admin::Masters::Macros::Jobs::Index < IndexBuilder::API
 
+  permissions :admin
+  system_subscription :ap
   resolver 'admin.macro_jobs.default'
   reference '{{record.id}}'
 

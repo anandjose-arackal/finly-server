@@ -60,7 +60,11 @@ class Transactions::Authorization
 
     def authorize_user_presence!(context, options)
       return true if user_model.nil?
-      return unauthorized!(context) if context[:current_user].nil? or options[:current_user].class.name != user_model.name
+      return unauthorized!(context) if context[:current_user].nil?
+      user_models = self.user_model
+      user_models = [user_models] unless user_models.respond_to?(:each)
+
+      return unauthorized!(context) unless user_models.include?(options[:current_user].class)
 
       true
     end

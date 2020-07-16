@@ -2,19 +2,19 @@ class Admin::IndexController < BaseControllers::AdminBase
   layout 'trailblazers'
 
   def fetch_config
-    endpoint Admin::Index::Config
+    endpoint IndexBuilder::Config
   end
 
   def show
-    endpoint Admin::Index::Show
+    endpoint IndexBuilder::Show
   end
 
   def status_counts
-    endpoint Admin::Index::StatusCount
+    endpoint IndexBuilder::StatusCount
   end
 
   def record_counts
-    endpoint Admin::Index::RecordCount
+    endpoint IndexBuilder::RecordCount
   end
 
 end

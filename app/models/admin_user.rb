@@ -85,6 +85,18 @@ class AdminUser < ApplicationRecord
     true
   end
 
+  def has_permission?(permissions)
+    true
+    # return true if permissions.blank?
+    #
+    # permissions = [permissions] unless permissions.is_a?(Array)
+    # permissions = UserRole.ids_for(permissions) unless permissions.first.is_a?(Integer)
+    # return true if permissions.include?(UserRole.id_for(:admin)) and admin?(RequestStoreUtil.current_app)
+    # return true if has_roles?(permissions)
+    #
+    # false
+  end
+
   # overriding devise's default method so that it compares against both email and phone number to authenticate
   def self.find_for_database_authentication(conditions={})
     find_by(email: conditions[:username])
