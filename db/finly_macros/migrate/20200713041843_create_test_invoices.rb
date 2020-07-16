@@ -1,4 +1,4 @@
-class CreateTestInvoices < ActiveRecord::Migration[6.0]
+class CreateTestInvoices < ActiveRecord::Migration[5.2]
   def change
     if Rails.env.development?
       create_table :test_invoices do |t|

@@ -1,4 +1,4 @@
-class CreateMacroJobStatuses < ActiveRecord::Migration[6.0]
+class CreateMacroJobStatuses < ActiveRecord::Migration[5.2]
   def change
     create_table :macro_job_statuses do |t|
       t.string :name, index: true

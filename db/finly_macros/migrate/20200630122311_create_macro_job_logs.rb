@@ -1,4 +1,4 @@
-class CreateMacroJobLogs < ActiveRecord::Migration[6.0]
+class CreateMacroJobLogs < ActiveRecord::Migration[5.2]
   def change
     create_table :macro_job_logs do |t|
       t.integer :macro_id, index: true, foreign_key: true, null: false, references: 'macros'

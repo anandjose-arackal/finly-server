@@ -1,4 +1,4 @@
-class CreateMacroSchedules < ActiveRecord::Migration[6.0]
+class CreateMacroSchedules < ActiveRecord::Migration[5.2]
   def change
     create_table :macro_schedules do |t|
       t.integer :macro_id, index: true, foreign_key: true, references: 'macros'

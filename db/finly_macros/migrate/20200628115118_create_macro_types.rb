@@ -1,4 +1,4 @@
-class CreateMacroTypes < ActiveRecord::Migration[6.0]
+class CreateMacroTypes < ActiveRecord::Migration[5.2]
   def change
     create_table :macro_types do |t|
       t.string :name, index: true

@@ -1,4 +1,4 @@
-class CreateMacros < ActiveRecord::Migration[6.0]
+class CreateMacros < ActiveRecord::Migration[5.2]
   def change
     create_table :macros do |t|
       t.string :macro_id, index: true, null: false
