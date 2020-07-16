@@ -1,7 +1,7 @@
 ActionManager::Router.draw do
 
   scope 'admin' do
-    route 'macros', Admin::Masters::Macros::Ops::Action
+    route 'macros', Admin::Masters::Macros::Action
     route 'macro_jobs', Admin::Masters::Macros::Jobs::Action
   end
 
