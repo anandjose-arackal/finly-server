@@ -1,5 +1,6 @@
 class FormsController < BaseControllers::WebBase
 
+  # Form Renderer
   def show
     endpoint Forms::Ops::Show do |m|
       m.success { |op| render json: op['model'], status: 200 }
@@ -26,6 +27,33 @@ class FormsController < BaseControllers::WebBase
     endpoint Forms::Ops::LookupDetails do |m|
       m.success { |result| render json: {data: result[:data]}, status: 200 }
     end
+  end
+
+  # Form Builder
+
+  def index
+    # All forms available for a company
+    endpoint Forms::Ops::Index
+  end
+
+  def entity_config
+    endpoint Forms::Ops::EntityConfig
+  end
+
+  def builder_config
+    endpoint Forms::Ops::BuilderConfig
+  end
+
+  def create_entity
+    endpoint Forms::Ops::EntityCreate
+  end
+
+  def update_entity
+    # endpoint Forms::Ops::EntityUpdate
+  end
+
+  def sync_order
+    # endpoint Forms::Ops::EntitySyncOrder
   end
 
 end

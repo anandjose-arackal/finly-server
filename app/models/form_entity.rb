@@ -177,7 +177,7 @@ class FormEntity < ApplicationRecord
 
   def form_json(opts={})
     data = {
-        # id: uuid,
+        id: uuid,
         entity_key: entity_key,
         entity_path: entity_path,
         config_path: config_path,
