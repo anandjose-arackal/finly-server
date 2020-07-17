@@ -138,8 +138,11 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
           add_message :error, error_message
           self.transfer_request.bank_error_message = error_message
         end
-    else
-      # do nothing?
+      else
+        # this will be the catch-all in case the response is not one we expect
+        self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:possible_failure))
+        add_message :error, "Service temporarily unavailable"
+        self.transfer_request.bank_error_message = "Service temporarily unavailable"
     end
   end
 
