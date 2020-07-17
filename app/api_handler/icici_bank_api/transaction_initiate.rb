@@ -124,7 +124,7 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
               add_message :error, error_message
               self.transfer_request.bank_error_message = error_message
             else
-              # again, as a catch-all to handle cases where it returns a "SUCCESS but doesn't fall under a
+              # as a catch-all to handle cases where it returns a "SUCCESS but doesn't fall under a
               # familiar pattern of what the other attributes should look like
               self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:pending_for_processing))
               # handle it gracefully

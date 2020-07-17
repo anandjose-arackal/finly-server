@@ -118,7 +118,7 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
         self.errors << error_message
         return false
       else
-        # again, this is a catch-all for the payment in case the operation failed
+        # this is a catch-all for the payment in case the operation failed
         # but it isn't in any status that was handled in the previous cases
         payment.update(payment_status_id: PaymentStatus.id_for(:possible_failure))
         create_system_message_for_possible_failure(payment)
