@@ -3,8 +3,8 @@ class BaseControllers::MacrosBase < ApplicationController
   protect_from_forgery with: :null_session
   before_action { authorize_ip(Rails.application.config_for(:finly_macros)['ip_address']) }
 
-  http_basic_authenticate_with :name => Rails.application.config_for(:finly_macros)["username"],
-                               :password => Rails.application.config_for(:finly_macros)["password"]
+  http_basic_authenticate_with :name => Rails.application.config_for(:finly_macros)["inbound"]["username"],
+                               :password => Rails.application.config_for(:finly_macros)["inbound"]["password"]
 
   before_action { validate_request }
 
