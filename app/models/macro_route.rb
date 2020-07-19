@@ -1,0 +1,17 @@
+# == Schema Information
+#
+# Table name: macro_routes
+#
+#  id         :bigint           not null, primary key
+#  macro_id   :integer          not null
+#  route      :string(255)      not null
+#  deleted_at :datetime
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
+
+class MacroRoute < FinlyMacrosRecord
+
+  belongs_to :macro
+
+end

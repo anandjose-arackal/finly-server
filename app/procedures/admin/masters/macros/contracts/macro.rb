@@ -1,8 +1,5 @@
 class Admin::Masters::Macros::Contracts::Macro < Reform::Form
 
-  property :macro_id, validates: {presence: true, format: {with: /\A\w+\z/}}, deserializer: -> (input, represented, **) {
-    represented.macro_id ||= input[:macro_id]
-  }
   property :name, validates: {presence: true}
   property :description
   property :script, validates: {presence: true}
@@ -22,5 +19,8 @@ class Admin::Masters::Macros::Contracts::Macro < Reform::Form
     represented.user_id ||= user&.id if user.present?
   }
   collection :schedules, populate_if_empty: MacroSchedule, form: Admin::Masters::Macros::Contracts::Schedule
+  collection :routes, populate_if_empty: MacroRoute do
+    property :route, validates: {presence: true}
+  end
 
 end

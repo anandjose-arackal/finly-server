@@ -3,7 +3,6 @@
 # Table name: macros
 #
 #  id                  :bigint           not null, primary key
-#  macro_id            :string(255)      not null
 #  name                :string(255)      not null
 #  description         :text(65535)
 #  script              :text(65535)      not null
@@ -31,6 +30,11 @@ class Macro < FinlyMacrosRecord
 
   has_many :jobs, class_name: 'MacroJob'
   has_many :schedules, class_name: 'MacroSchedule'
+  has_many :routes, class_name: 'MacroRoute'
+
+  scope :active, -> { where(active: true).where('start_date >= ? and end_date <= ?', DateTime.now, DateTime.now)}
+
+  serialize :permissions, JSON
 
   def as_json(options={})
     {
