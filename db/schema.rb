@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_15_093055) do
+ActiveRecord::Schema.define(version: 2020_07_19_042009) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3312,6 +3312,32 @@ ActiveRecord::Schema.define(version: 2020_07_15_093055) do
     t.index ["enforceable_type", "enforceable_id"], name: "index_enforce_policies_on_enforceable_type_and_enforceable_id"
   end
 
+  create_table "erp_sync_attempts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "record_id", null: false
+    t.string "record_type", null: false
+    t.integer "status_id", null: false
+    t.integer "company_id", null: false
+    t.integer "macro_id"
+    t.integer "macro_job_id"
+    t.string "message"
+    t.datetime "attempted_at", null: false
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "reference_id"
+    t.index ["company_id"], name: "index_erp_sync_attempts_on_company_id"
+    t.index ["created_at"], name: "index_erp_sync_attempts_on_created_at"
+    t.index ["deleted_at"], name: "index_erp_sync_attempts_on_deleted_at"
+    t.index ["macro_id"], name: "index_erp_sync_attempts_on_macro_id"
+    t.index ["macro_job_id"], name: "index_erp_sync_attempts_on_macro_job_id"
+    t.index ["message"], name: "index_erp_sync_attempts_on_message"
+    t.index ["record_id", "record_type"], name: "index_erp_sync_attempts_on_record_id_and_record_type"
+    t.index ["record_id"], name: "index_erp_sync_attempts_on_record_id"
+    t.index ["record_type"], name: "index_erp_sync_attempts_on_record_type"
+    t.index ["status_id"], name: "index_erp_sync_attempts_on_status_id"
+    t.index ["updated_at"], name: "index_erp_sync_attempts_on_updated_at"
+  end
+
   create_table "erp_sync_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "deleted_at"
@@ -3321,32 +3347,6 @@ ActiveRecord::Schema.define(version: 2020_07_15_093055) do
     t.index ["deleted_at"], name: "index_erp_sync_statuses_on_deleted_at"
     t.index ["name"], name: "index_erp_sync_statuses_on_name"
     t.index ["updated_at"], name: "index_erp_sync_statuses_on_updated_at"
-  end
-
-  create_table "erp_syncs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "record_id", null: false
-    t.string "record_type", null: false
-    t.integer "status_id", null: false
-    t.integer "company_id", null: false
-    t.integer "macro_id"
-    t.integer "macro_job_id"
-    t.string "message"
-    t.text "reference_id"
-    t.datetime "attempted_at", null: false
-    t.datetime "deleted_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["company_id"], name: "index_erp_syncs_on_company_id"
-    t.index ["created_at"], name: "index_erp_syncs_on_created_at"
-    t.index ["deleted_at"], name: "index_erp_syncs_on_deleted_at"
-    t.index ["macro_id"], name: "index_erp_syncs_on_macro_id"
-    t.index ["macro_job_id"], name: "index_erp_syncs_on_macro_job_id"
-    t.index ["message"], name: "index_erp_syncs_on_message"
-    t.index ["record_id", "record_type"], name: "index_erp_syncs_on_record_id_and_record_type"
-    t.index ["record_id"], name: "index_erp_syncs_on_record_id"
-    t.index ["record_type"], name: "index_erp_syncs_on_record_type"
-    t.index ["status_id"], name: "index_erp_syncs_on_status_id"
-    t.index ["updated_at"], name: "index_erp_syncs_on_updated_at"
   end
 
   create_table "expense_data_extract_sources", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -4945,6 +4945,10 @@ ActiveRecord::Schema.define(version: 2020_07_15_093055) do
     t.string "currency_code"
     t.decimal "taxable_amount", precision: 20, scale: 10
     t.integer "erp_sync_status_id"
+    t.string "erp_sync_message"
+    t.string "erp_sync_reference_id"
+    t.integer "erp_sync_attempts_count"
+    t.datetime "erp_sync_attempted_at"
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["advance_amount_id"], name: "index_invoices_on_advance_amount_id"
     t.index ["amount_id"], name: "index_invoices_on_amount_id"
@@ -5351,6 +5355,7 @@ ActiveRecord::Schema.define(version: 2020_07_15_093055) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "macro_id", null: false
+    t.string "macro_key", null: false
     t.index ["created_at"], name: "index_macros_on_created_at"
     t.index ["created_by_admin_id"], name: "index_macros_on_created_by_admin_id"
     t.index ["created_by_id"], name: "index_macros_on_created_by_id"

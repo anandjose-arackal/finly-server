@@ -1,5 +1,5 @@
 class Admin::Masters::Macros::Contracts::Schedule < Reform::Form
-  property :frequency, validates: {presence: true, inclusion: {in: MacroSchedule::FREQUENCY.values}}
+  property :frequency, validates: {presence: true, inclusion: {in: MacroSchedule::FREQUENCY}}
   property :hour
   property :minute
   property :day_of_the_week
@@ -18,17 +18,14 @@ class Admin::Masters::Macros::Contracts::Schedule < Reform::Form
 
     valid_minutes = (0..11).to_a.map { |i| i * 5 }
     unless valid_minutes.include?(self.minute.to_i)
-      error.add :minute, 'is invalid'
+      errors.add :minute, 'is invalid'
     end
   end
 
   def hour_format
-    required = [
-        MacroSchedule::FREQUENCY[:daily],
-        MacroSchedule::FREQUENCY[:weekly],
-        MacroSchedule::FREQUENCY[:monthly],
-        MacroSchedule::FREQUENCY[:last_day_of_month]
-    ].include?(frequency)
+    required = %w(
+        daily weekly monthly last_day_of_month
+    ).include?(frequency.to_s)
 
     if required
       if self.hour.blank?
@@ -37,19 +34,19 @@ class Admin::Masters::Macros::Contracts::Schedule < Reform::Form
       end
 
       unless (1..24).to_a.include?(self.hour.to_i)
-        error.add :hour, 'is invalid'
+        errors.add :hour, 'is invalid'
       end
     else
       if self.hour.present?
-        error.add :hour, 'cannot be set'
+        errors.add :hour, 'cannot be set'
       end
     end
   end
 
   def day_of_the_week_format
-    required = [
-        MacroSchedule::FREQUENCY[:weekly],
-    ].include?(frequency)
+    required =%w(
+        weekly
+    ).include?(frequency.to_s)
 
     if required
       if self.day_of_the_week.blank?
@@ -57,20 +54,20 @@ class Admin::Masters::Macros::Contracts::Schedule < Reform::Form
         return
       end
 
-      unless MacroSchedule::DAY_OF_THE_WEEK.values.include?(self.day_of_the_week)
+      unless MacroSchedule::DAY_OF_THE_WEEK.values.include?(self.day_of_the_week.to_s)
         errors.add :day_of_the_week, 'is invalid'
       end
     else
-      if self.hour.present?
-        error.add :day_of_the_week, 'cannot be set'
+      if self.day_of_the_week.present?
+        errors.add :day_of_the_week, 'cannot be set'
       end
     end
   end
 
   def day_of_the_month_format
-    required = [
-        MacroSchedule::FREQUENCY[:monthly],
-    ].include?(frequency)
+    required = %w(
+        monthly
+    ).include?(frequency)
 
     if required
       if self.day_of_the_month.blank?
@@ -79,11 +76,11 @@ class Admin::Masters::Macros::Contracts::Schedule < Reform::Form
       end
 
       unless (1..30).to_a.include?(self.day_of_the_month.to_i)
-        error.add :day_of_the_month, 'is invalid'
+        errors.add :day_of_the_month, 'is invalid'
       end
     else
       if self.day_of_the_month.present?
-        error.add :day_of_the_month, 'cannot be set'
+        errors.add :day_of_the_month, 'cannot be set'
       end
     end
   end

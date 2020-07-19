@@ -14,4 +14,10 @@ class MacroRoute < FinlyMacrosRecord
 
   belongs_to :macro
 
+  def as_json(options={})
+    {
+        route: route
+    }
+  end
+
 end

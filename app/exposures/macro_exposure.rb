@@ -1,7 +1,7 @@
 class MacroExposure < Exposures::API
 
   attribute :id, record_attribute: true
-  attribute :macro_id, record_attribute: true
+  attribute :macro_key, record_attribute: true
   attribute :name, record_attribute: true
   attribute :description, record_attribute: true
   attribute :script, record_attribute: true

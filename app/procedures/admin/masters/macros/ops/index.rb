@@ -6,8 +6,8 @@ class Admin::Masters::Macros::Ops::Index < IndexBuilder::API
   reference '{{record.id}}'
 
   # Fixed column is always default true
-  column :macro_id, label: 'Macro ID', fixed: true, sort: true do
-    text value: :macro_id, format: 'primary'
+  column :macro_key, label: 'Macro Key', fixed: true, sort: true do
+    text value: :macro_key, format: 'primary'
   end
 
   column :name, default: true, sort: true do
@@ -26,7 +26,7 @@ class Admin::Masters::Macros::Ops::Index < IndexBuilder::API
     text value: -> (context) do
       user = context[:record]
       if user.last_run_at
-        val = time_ago_in_words(user.last_activity_at)
+        val = time_ago_in_words(user.last_run_at)
         "#{val} ago" if val.present?
       else
         "Never"

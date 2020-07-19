@@ -3,6 +3,7 @@
 # Table name: macros
 #
 #  id                  :bigint           not null, primary key
+#  macro_key           :string(255)      not null
 #  name                :string(255)      not null
 #  description         :text(65535)
 #  script              :text(65535)      not null
@@ -22,6 +23,10 @@
 #
 
 class Macro < FinlyMacrosRecord
+  include Sequenced::ActsAsSequenced
+
+  acts_as_sequenced column: :macro_key, purpose: :macro, editable: false, prefix: 'MACRO/'
+
   belongs_to :macro_type
   belongs_to :user
   belongs_to :company
@@ -39,7 +44,7 @@ class Macro < FinlyMacrosRecord
   def as_json(options={})
     {
         id: id,
-        macro_id: macro_id,
+        macro_key: macro_key,
         name: name,
         description: description,
         script: script,
@@ -48,7 +53,8 @@ class Macro < FinlyMacrosRecord
         user: user.as_json,
         created_by_admin: created_by_admin.as_json,
         last_run_at: last_run_at,
-        schedules: schedules.as_json(options)
+        schedules: schedules.as_json(options),
+        routes: routes.as_json(options)
     }
   end
 
