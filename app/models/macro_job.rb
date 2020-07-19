@@ -24,18 +24,31 @@ class MacroJob < FinlyMacrosRecord
   has_many :logs, class_name: 'MacroJobLog'
 
   serialize :request_options, JSON
+  serialize :crash_stacktrace, JSON
 
   def std_pretty_print
     puts "#{"=" * 10} #{macro.name} #{"=" * 10}"
     puts "Macro\t\t\t:\t#{macro.name}"
     puts "Description\t\t:\t#{macro.name}"
     puts "Run Time\t\t:\t#{execution_time} seconds"
+    puts "Status\t\t\t:\t#{status.name.titleize}"
+    if crash_message.present?
+      puts "Crash Message\t:\t#{crash_message}"
+    end
+    if crash_stacktrace.present?
+      puts "Stacktrace\t\t:"
+      puts crash_message
+      crash_stacktrace.each do |trace|
+        puts trace
+      end
+    end
     logs.each do |log|
       puts "==> [#{log.created_at} - #{log.log_type}\t]\t#{log.message.as_json}"
     end
+    nil
   end
 
-  def as_json(options={})
+  def as_json(options = {})
     {
         id: id,
         started_at: started_at&.strftime("%d-%B-%Y %H:%M:%S"),

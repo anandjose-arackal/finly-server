@@ -12,9 +12,10 @@ class Macros::Run < Transactions::API
   step :run!
 
   def run!(context, model:, params:, current_user:, **)
-    MacrosConnector::Run.(params: params, current_user: current_user) do |m|
+    params[:macro_id] = params[:id]
+    MacrosConnector::Run.(params: params.except(:controller, :action, :format), current_user: current_user) do |m|
       m.success { |result| return true }
-      m.failure { |result| return on_error(context, :error, 'in request') }
+      m.failure { |result| return on_error(context, :base, result.errors[:base]) }
     end
 
     true

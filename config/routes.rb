@@ -3890,6 +3890,8 @@ Rails.application.routes.draw do
     end
   end
 
+  post 'macros/:id/jobs', to: 'macro_jobs#create'
+
 
   namespace :summary do
     get 'configurations', to: 'configuration#index'

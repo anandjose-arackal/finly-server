@@ -18,14 +18,14 @@ class MacrosConnector::Run < ServiceApi
     end
   end
   body -> (user, params) do
-    params.merge(macro_id: params[:id], current_user: user).as_json
+    params.merge(current_user: user).as_json
   end
   parse -> (user, params, response) do
     return Failure() unless response&.success?
     body = JSON.parse(response.body)
-    return Failure() unless body['success']
+    return Failure(body['message']) unless body['success']
 
-    {}
+    {success: true}.with_indifferent_access
   end
   matcher :build_matcher
 
