@@ -38,6 +38,7 @@ class Macro < FinlyMacrosRecord
   has_many :routes, class_name: 'MacroRoute'
 
   scope :active, -> { where(active: true).where('start_date >= ? and end_date <= ?', DateTime.now, DateTime.now)}
+  scope :with_route, -> (route) { joins(:routes).where(macro_routes: {route: route}) }
 
   serialize :permissions, JSON
 

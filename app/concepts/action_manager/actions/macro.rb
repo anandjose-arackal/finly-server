@@ -5,14 +5,15 @@ class ActionManager::Actions::Macro < ActionManager::Action
 
   def build_config(options)
     user = options[:current_user]
+    route = self.config[:route]
     config = []
-    user.company.macros.each do |macro|
+    user.company.macros.with_route(route).each do |macro|
       next unless Macros::Jobs::Policy.new(user, macro).create?
 
       config << {
-          macro_key: macro.macro_key,
-          name: name,
-          description: description
+          id: macro.id,
+          name: macro.name,
+          description: macro.description
       }
     end
     config
