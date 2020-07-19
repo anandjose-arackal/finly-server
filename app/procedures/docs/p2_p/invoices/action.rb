@@ -38,6 +38,8 @@ class Docs::P2P::Invoices::Action < ActionManager::API
 
     action :macro,
            :jobs,
+           policy: Macros::Jobs::Policy,
+           authorize: :create?,
            route: 'invoices.index'
 
     action :export,
