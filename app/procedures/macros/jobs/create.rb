@@ -8,7 +8,7 @@ class Macros::Jobs::Create < Transactions::API
   end
 
   step Model(Macro, :find_by_id)
-  step Policy::Pundit(Macros::Policy, :create?)
+  step Policy::Pundit(Macros::Jobs::Policy, :create?)
   step :run!
 
   def run!(context, model:, params:, current_user:, **)

@@ -1,4 +1,4 @@
-class Macros::Policy < ApplicationPolicy
+class Macros::Jobs::Policy < ApplicationPolicy
 
   def create?
     return false unless record.company_id == user.company_id
