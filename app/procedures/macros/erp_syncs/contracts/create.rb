@@ -6,7 +6,7 @@ class Macros::ErpSyncs::Contracts::Create < Reform::Form
     represented.status_id = ErpSyncStatus.id_for(input[:status])
   }
   property :macro, deserializer: -> (input, represented, **) {
-    represented.macro = Macro.find_by(company_id: represented.current_user.company&.id, macro_id: input[:macro_id])
+    represented.macro = Macro.find_by(company_id: represented.current_user.company&.id, id: input[:macro_id])
   }
   property :reference_id
   property :message

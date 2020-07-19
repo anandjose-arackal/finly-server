@@ -7,10 +7,7 @@ class ActionManager::Actions::Macro < ActionManager::Action
     user = options[:current_user]
     config = []
     user.company.macros.each do |macro|
-      permissions = macro.permissions
-      # Permissions are not defined, scope it only to 'admin'
-      permissions = [:admin] if permissions.blank?
-      next unless user.has_permission?(permissions)
+      next unless Macros::Policy.new(user, macro).run?
 
       config << {
           macro_key: macro.macro_key,

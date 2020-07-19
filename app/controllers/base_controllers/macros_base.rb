@@ -21,7 +21,7 @@ class BaseControllers::MacrosBase < ApplicationController
   end
 
   def current_macro
-    Macro.find_by macro_id: params[:macro_id]
+    Macro.find_by id: params[:macro_id]
   end
 
   def skip_finly_authorize?
