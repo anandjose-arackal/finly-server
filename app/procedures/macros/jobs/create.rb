@@ -1,4 +1,4 @@
-class Macros::Run < Transactions::API
+class Macros::Jobs::Create < Transactions::API
 
   schema do
     params do
@@ -8,7 +8,7 @@ class Macros::Run < Transactions::API
   end
 
   step Model(Macro, :find_by_id)
-  step Policy::Pundit(Macros::Policy, :run?)
+  step Policy::Pundit(Macros::Policy, :create?)
   step :run!
 
   def run!(context, model:, params:, current_user:, **)

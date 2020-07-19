@@ -7,7 +7,7 @@ class ActionManager::Actions::Macro < ActionManager::Action
     user = options[:current_user]
     config = []
     user.company.macros.each do |macro|
-      next unless Macros::Policy.new(user, macro).run?
+      next unless Macros::Jobs::Policy.new(user, macro).create?
 
       config << {
           macro_key: macro.macro_key,

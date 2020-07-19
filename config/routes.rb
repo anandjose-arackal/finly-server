@@ -3870,6 +3870,8 @@ Rails.application.routes.draw do
     resources :macros, only: [:create, :update, :destroy, :index, :show]
     resources :macro_jobs, only: [:index, :show]
 
+    post 'macros/:id/jobs', to: 'macro_jobs#create'
+
     scope :index do
       get 'config', to: 'index#fetch_config'
       post 'config', to: 'index#fetch_config'

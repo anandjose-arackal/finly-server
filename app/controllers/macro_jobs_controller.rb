@@ -2,7 +2,7 @@ class MacroJobsController < BaseControllers::WebBase
   layout 'trailblazers'
 
   def create
-    endpoint Macros::Run
+    endpoint Macros::Jobs::Create
   end
 
 end

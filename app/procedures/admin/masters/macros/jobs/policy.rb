@@ -4,4 +4,8 @@ class Admin::Masters::Macros::Jobs::Policy < ApplicationPolicy
     true
   end
 
+  def create?
+    true
+  end
+
 end
