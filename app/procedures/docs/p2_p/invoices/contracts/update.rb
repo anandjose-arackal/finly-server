@@ -6,6 +6,6 @@ class Docs::P2P::Invoices::Contracts::Update < Reform::Form
     end
   }
   property :erp_sync_message
-  property :erp_sync_id
+  property :erp_sync_reference_id
 
 end

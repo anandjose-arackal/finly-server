@@ -43,7 +43,13 @@ class GstinLocation < ApplicationRecord
       id: self.id,
       location: self.location,
       gstin: self.gstin,
-      address: self.address
+      address: self.address,
+      state: self.state,
+      poc: {
+          name: poc_name,
+          email: poc_email,
+          mobile_number: poc_mobile_number
+      }
     }
   end
 
