@@ -123,7 +123,7 @@ class ItzCash::AccountDetails < ItzCash::Base
     unless card.card_status_id == status_id
       card.update(card_status_id: status_id)
     end
-    if status == :upgraded and card.user.individual_kyc.kyc_status_id != KycStatus.id_for(:completed) and !(Constants::MIGRATING_COMPANIES.include?(card.user.company_id))
+    if status == :upgraded and card.user.individual_kyc.kyc_status_id != KycStatus.id_for(:completed)
       card.user.individual_kyc.update(kyc_status_id: KycStatus.id_for(:completed), review_position: nil)
     end
 

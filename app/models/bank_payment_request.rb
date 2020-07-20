@@ -128,8 +128,8 @@ class BankPaymentRequest < ApplicationRecord
     when 'awaiting_approval', :awaiting_approval
       user_id = RequestStore.store[:current_user]&.id
       if user_id.present?
-        ids = self.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
-        with_id(ids)
+        ids = self.select(:id).awaiting_action_items(user_id)
+        where(id: ids)
       end
     when 'in_progress'
       joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:in_progress))
@@ -165,8 +165,8 @@ class BankPaymentRequest < ApplicationRecord
     when '10', 10 # i.e awaiting approval from current user
       user_id = RequestStore.store[:current_user]&.id
       if user_id.present?
-        ids = self.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
-        with_id(ids)
+        ids = self.select(:id).awaiting_action_items(user_id)
+        where(id: ids)
       end
       # case UserRole.id_for(RequestStore.store[:params]&.dig(:view)&.to_sym)
       # when UserRole.id_for(:admin)
@@ -394,7 +394,7 @@ class BankPaymentRequest < ApplicationRecord
     when BankPaymentRequestStatus::GROUP_AWAITING_APPROVAL
       user_id = RequestStore.store[:current_user]&.id
       if user_id.present?
-        where(status_id: BankPaymentRequestStatus.ids_for(:processing)).awaiting_action_items(user_id)
+        where("#{table_name}.status_id": BankPaymentRequestStatus.ids_for(:processing)).awaiting_action_items(user_id)
       else
         self.none
       end
@@ -404,6 +404,8 @@ class BankPaymentRequest < ApplicationRecord
       where status_id: BankPaymentRequestStatus.ids_for(:approved, :pending, :auto_approved)
     when BankPaymentRequestStatus::GROUP_FAILED
       joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:failed))
+    when BankPaymentRequestStatus::GROUP_COMPLETED
+      joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:completed))
     when BankPaymentRequestStatus::GROUP_SCHEDULED
       joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:scheduled))
     when BankPaymentRequestStatus::GROUP_PENDING

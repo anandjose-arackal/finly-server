@@ -5,7 +5,7 @@ class Masters::Vendors::Resolver < Resolver::API
   def load(params)
     if user.vendor_payments_admin?
       vendors = ::YesBankVendor.role_based_admin_associated_items(user, UserRole.id_for(:admin)).non_draft.or(user.vendors)
-      return vendors
+      return vendors.non_deleted
     end
 
     if user.policy_user_roles.count > 0
@@ -15,7 +15,7 @@ class Masters::Vendors::Resolver < Resolver::API
       vendors = user.company.yes_bank_vendors.approved
     end
 
-    return vendors unless vendors.nil?
+    return vendors.non_deleted unless vendors.nil?
     ::YesBankVendor.none
   end
 

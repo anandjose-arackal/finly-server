@@ -23,6 +23,26 @@ class Reports::Index < Reports::Base
     end
   end
 
+  def pre_process
+    # filter_date work as combination with report status,
+    # if user selected any specific status the usage of filter date will be change based associated date
+    if params[:filter_date].present?
+      if params[:filter_status].present?
+        case params[:filter_status]
+        when ReportStatus.id_for(:approved).to_s
+          params[:filter_approved_date] = params[:filter_date]
+          params.delete(:filter_date)
+        when ReportStatus.id_for(:submitted).to_s
+          params[:filter_submitted_date] = params[:filter_date]
+          params.delete(:filter_date)
+        when ReportStatus.id_for(:settled).to_s
+          params[:filter_completed_date] = params[:filter_date]
+          params.delete(:filter_date)
+        end
+      end
+    end
+  end
+
   def process
     # case self.role_id
     # when UserRole.id_for(:admin), UserRole.id_for(:auditor)
@@ -148,6 +168,7 @@ class Reports::Index < Reports::Base
     has_scope :filter_date, using: [:from, :to], type: :hash
     has_scope :filter_submitted_date, using: [:from, :to], type: :hash
     has_scope :filter_approved_date, using: [:from, :to], type: :hash
+    has_scope :filter_completed_date, using: [:from, :to], type: :hash
     has_scope :filter_policy
     has_scope :filter_custom_drop_down_selection, type: :array
     has_scope :filter_category

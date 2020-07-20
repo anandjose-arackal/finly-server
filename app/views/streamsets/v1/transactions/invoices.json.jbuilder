@@ -20,6 +20,8 @@ json.result do
     json.transaction_period_from invoice.transaction_service_period_from&.strftime("%Y-%m-%d %H:%M:%S")
     json.transaction_period_to invoice.transaction_service_period_to&.strftime("%Y-%m-%d %H:%M:%S")
     json.invoice_status invoice.status&.name&.humanize
+    json.gst_registered invoice.vendor&.gst_registered
+    json.rcm invoice.rcm_enabled
     json.category invoice_line_item.category&.name
     json.quantity invoice_line_item.quantity
     json.rate invoice_line_item&.rate
@@ -93,6 +95,12 @@ json.result do
     json.invoice_creator_name "#{invoice.created_by&.first_name} #{invoice.created_by&.last_name}"
     json.invoice_creator_employee_id invoice.created_by&.employee_id
     json.invoice_creator_email invoice.created_by&.email
+    json.custom_fields do
+      json.array!(invoice.custom_fields) do |custom_field|
+        json.field_label custom_field&.field_configuration&.field_name
+        json.configured_value custom_field&.string_value
+      end
+    end
 
     # total count of items which are part of the invoice
     json.total_items invoice.items&.count

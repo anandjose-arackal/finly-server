@@ -12,7 +12,7 @@ class Docs::P2P::Invoices::Agreement::UpcomingInvoices::FilterConfig < Filters::
   attribute :payment_agreement_order_number, label: "Agreement Number", type: :text, simple: true
   attribute :due_date, label: "Due Date", type: :datetime, simple: true
   # attribute :policy_id, type: :dropdown, simple: false, choices: Choices[:lookup].('policies')
-  attribute :vendor_id, label: "Vendor", simple: true, type: :dropdown,  choices: Choices[:lookup].("vendors")
+  attribute :vendor_id, label: "Vendor", simple: true, type: :dropdown, choices: Choices[:lookup].("vendors")
   attribute :vendor_vendor_id, label: "Vendor ID", simple: false
   attribute :location_id, label: "Billing Location", type: :dropdown, choices: Choices[:lookup].("locations")
   attribute :delivery_location_id, label: "Shipping Location", type: :dropdown, choices: Choices[:lookup].("locations")

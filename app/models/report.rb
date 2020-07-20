@@ -176,7 +176,7 @@ class Report < ApplicationRecord
   scope :filter_status, ->(status_id, user_id) do
     case status_id
     when 99, '99'
-      awaiting_action_items(user_id)
+      where("#{table_name}.report_status_id": ReportStatus.id_for(:processing)).awaiting_action_items(user_id)
     else
       where report_status_id: status_id
     end
@@ -226,6 +226,21 @@ class Report < ApplicationRecord
       # date_to = DateUtils.local_date if date_to.blank?
       reports = arel_table
       where(reports[:approved_at].gteq(date_from.beginning_of_day).and(reports[:approved_at].lteq(date_to.end_of_day)))
+    end
+  end
+
+  scope :filter_completed_date, ->(date_from = nil, date_to = nil) do
+    # sample params: filter_date[expense, 2016-03-01, 2016-03-20]
+    unless date_from.blank? && date_to.blank?
+      date_from = "1990-01-01" if date_from.blank?
+      date_to = "2100-01-01" if date_to.blank?
+      date_from = date_from.to_date if date_from.present?
+      date_to = date_to.to_date + 1 if date_to.present?
+      reports = arel_table
+      report_processor_group_mappings = Arel::Table.new(:report_processor_group_mappings)
+      report_ids = joins(:report_processor_group_mapping).where(report_processor_group_mappings[:completed_at].gteq(date_from).and(report_processor_group_mappings[:completed_at].lteq(date_to))).pluck('reports.id')
+      where(id: report_ids)
+
     end
   end
   scope :filter_policy, -> (policy_id) {where(policy_id: policy_id)}
