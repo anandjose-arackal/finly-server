@@ -23,7 +23,7 @@ class User::Configuration::UpdateDetails < BaseOperation
     
     if params[:status].present?
       if (['active', 'inactive'].include? (params[:status].downcase) )
-        params[:status] = ( params[:status].downcase == 'active' ) ? true : false
+        params[:status] = ( params[:status].downcase == 'active' ) ? true.to_s : false.to_s
       else
         return messages[:error] << 'Sataus not specified correctly'
       end
