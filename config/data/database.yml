@@ -1,0 +1,8 @@
+staging:
+  adapter: mysql2
+  encoding: utf8
+  pool: 5
+  username: root
+  password: Hapitoe@007
+  database: Finly_web
+  host: localhost
