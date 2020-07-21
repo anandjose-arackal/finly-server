@@ -82,7 +82,7 @@ class Integrations::Tally::Vouchers < Integrations::Tally::Base
         storage_access_key: azure_config["storage_access_key"],
     )
     container_name = azure_config["container"]
-    options = { content_type: application/xml, content_disposition: 'attachment;' }
+    options = { content_type: 'application/xml', content_disposition: 'attachment;' }
 
     file = Paperclip::Tempfile.new(['export', '.xml'])
     open(file.path, 'wb') { |f| f.write data }
