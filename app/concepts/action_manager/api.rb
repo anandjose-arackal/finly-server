@@ -7,6 +7,8 @@ class ActionManager::API < Transactions::API
   singleton_class.send(:alias_method, :scope, :action_scope)
   singleton_class.send(:alias_method, :paths, :action_paths)
 
+  user_model [User, AdminUser]
+
   schema do
     params do
       required(:route).filled

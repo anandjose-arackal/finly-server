@@ -15,7 +15,7 @@ class ServiceApi < Transactions::API
   class_attr :body
   class_attr :parse
   class_attr :client, default: -> (user, params) do
-    Faraday.new(url: self.class.url) do |faraday|
+    Faraday.new(url: fetch(:url)) do |faraday|
       faraday.request :url_encoded
       faraday.adapter Faraday.default_adapter
     end
@@ -128,7 +128,7 @@ class ServiceApi < Transactions::API
   end
 
   def log_generator
-    @log_generator ||= LogGenerator.new("services")
+    @log_generator ||= LogGenerator.new('services')
   end
 
 end
