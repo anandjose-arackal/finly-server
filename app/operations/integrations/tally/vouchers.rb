@@ -89,7 +89,7 @@ class Integrations::Tally::Vouchers < Integrations::Tally::Base
 
     if file
       file_name = File.basename(file)
-      blob_client.create_block_blob(container.name, file_name, file, options)
+      blob_client.create_block_blob(container_name, file_name, file, options)
       url = "https://#{azure_config["storage_account_name"]}.blob.core.windows.net/#{container_name}/#{file_name}"
     end
     url
