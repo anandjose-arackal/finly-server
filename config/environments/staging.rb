@@ -170,7 +170,7 @@ Rails.application.configure do
   Paperclip::Attachment.default_options[:azure_credentials] = {
       storage_account_name: config.azure_config["storage_account_name"],
       storage_access_key:   config.azure_config["storage_access_key"],
-      container:            config.azure_config["container"]
+      container: "finly-images-test"
   }
 
 end
