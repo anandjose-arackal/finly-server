@@ -20,6 +20,7 @@ class BankPaymentRequestStatus < ApplicationRecord
   GROUP_SCHEDULED = 95
   GROUP_PENDING = 96
   GROUP_PARTIALLY_COMPLETED = 97
+  GROUP_COMPLETED = 98
 
   def self.values
     [:open, :processing, :submitted, :retracted, :rejected,

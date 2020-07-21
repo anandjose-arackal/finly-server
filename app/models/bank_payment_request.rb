@@ -404,6 +404,8 @@ class BankPaymentRequest < ApplicationRecord
       where status_id: BankPaymentRequestStatus.ids_for(:approved, :pending, :auto_approved)
     when BankPaymentRequestStatus::GROUP_FAILED
       joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:failed))
+    when BankPaymentRequestStatus::GROUP_COMPLETED
+      joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:completed))
     when BankPaymentRequestStatus::GROUP_SCHEDULED
       joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:scheduled))
     when BankPaymentRequestStatus::GROUP_PENDING
