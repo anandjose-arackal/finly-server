@@ -59,7 +59,8 @@ class Macro < FinlyMacrosRecord
         permissions: permissions,
         last_run_at: last_run_at,
         schedules: schedules.as_json(options),
-        routes: routes.as_json(options)
+        routes: routes.as_json(options),
+        company: company.as_json(options)
     }
   end
 

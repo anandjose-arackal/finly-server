@@ -231,6 +231,14 @@ class Company < ApplicationRecord
 
   scope :with_subdomain, ->(subdomain) {find_by subdomain: subdomain}
 
+  def as_json(options={})
+    {
+        id: id,
+        name: name,
+        active: active
+    }
+  end
+
   def vendor_payment_policies
     ids = self.policies.with_application("vp").pluck(:id)
     ids << self.default_policy.id
