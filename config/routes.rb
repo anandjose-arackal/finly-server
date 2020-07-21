@@ -3890,6 +3890,9 @@ Rails.application.routes.draw do
       post 'validate', to: "actions#validate"
       get '/', to: "actions#show"
     end
+
+    get 'filters', to: "filters#index"
+    get 'views', to: "index_view_segments#index"
   end
 
   post 'macros/:id/jobs', to: 'macro_jobs#create'
