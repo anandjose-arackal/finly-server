@@ -85,6 +85,7 @@ class AdminUser < ApplicationRecord
     true
   end
 
+  # Todo implement permission logic
   def has_permission?(permissions)
     true
     # return true if permissions.blank?
