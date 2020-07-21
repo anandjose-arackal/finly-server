@@ -20,6 +20,7 @@
 #  deleted_at          :datetime
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
+#  permissions         :text(65535)
 #
 
 class Macro < FinlyMacrosRecord
@@ -51,8 +52,11 @@ class Macro < FinlyMacrosRecord
         script: script,
         macro_type: macro_type.as_json,
         active: active,
-        user: user.as_json,
+        user: (user&.email || user&.mobile_number),
         created_by_admin: created_by_admin.as_json,
+        start_date: start_date,
+        end_date: end_date,
+        permissions: permissions,
         last_run_at: last_run_at,
         schedules: schedules.as_json(options),
         routes: routes.as_json(options)
