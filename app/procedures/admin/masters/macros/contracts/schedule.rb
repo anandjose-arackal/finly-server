@@ -11,7 +11,7 @@ class Admin::Masters::Macros::Contracts::Schedule < Reform::Form
   validate :day_of_the_month_format
 
   def minute_format
-    if self.hour.blank?
+    if self.minute.blank?
       errors.add :hour, 'cannot be blank'
       return
     end
