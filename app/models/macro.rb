@@ -52,6 +52,7 @@ class Macro < FinlyMacrosRecord
         script: script,
         macro_type: macro_type.as_json,
         active: active,
+        company: company.as_json(options),
         user: (user&.email || user&.mobile_number),
         created_by_admin: created_by_admin.as_json,
         start_date: start_date,
@@ -60,7 +61,6 @@ class Macro < FinlyMacrosRecord
         last_run_at: last_run_at,
         schedules: schedules.as_json(options),
         routes: routes.as_json(options),
-        company: company.as_json(options)
     }
   end
 
