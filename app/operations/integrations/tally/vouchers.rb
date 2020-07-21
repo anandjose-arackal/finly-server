@@ -61,10 +61,7 @@ class Integrations::Tally::Vouchers < Integrations::Tally::Base
         template = "#{current_class_path}/vouchers.xml"
       end
       data = Exporter.new(user, {xml: {template: template, local_variables: {expenses: expenses, configuration: current_company.tally_configuration}}}, messages).xml_exporter.generate_xml
-      file = Paperclip::Tempfile.new(['export', '.xml'])
-      open(file.path, 'wb') { |f| f.write data }
-      temp_file = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 7.day)
-      self.file_url = temp_file.file.url
+      save_file(data)
     end
   end
 
@@ -76,6 +73,27 @@ class Integrations::Tally::Vouchers < Integrations::Tally::Base
     Integrations::Tally::Vouchers::SuccessPresenter.new(user, {file_url: self.file_url}, messages)
   end
 
+
+  def save_file(data)
+    url =""
+    azure_config = Rails.application.config_for(:azure_config)&.with_indifferent_access
+    blob_client = Azure::Storage::Blob::BlobService.create(
+        storage_account_name: azure_config["storage_account_name"],
+        storage_access_key: azure_config["storage_access_key"],
+    )
+    container_name = azure_config["container"]
+    options = { content_type: application/xml, content_disposition: 'attachment;' }
+
+    file = Paperclip::Tempfile.new(['export', '.xml'])
+    open(file.path, 'wb') { |f| f.write data }
+
+    if file
+      file_name = File.basename(file)
+      blob_client.create_block_blob(container.name, file_name, file, options)
+      url = "https://#{azure_config["storage_account_name"]}.blob.core.windows.net/#{container_name}/#{file_name}"
+    end
+    url
+  end
   # class Personalizer::Adapters::Company2::ExportTemplates2::Tally::Presenter < Exporter
   #
   #   def render(controller)

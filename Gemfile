@@ -242,6 +242,7 @@ gem 'whenever'
 
 # gem for all azure services
 gem 'azure'
+gem 'azure-storage-blob'
 
 group :development, :test do
   gem 'byebug'

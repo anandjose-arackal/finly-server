@@ -163,6 +163,14 @@ Rails.application.configure do
   #     }
   # }
   #########################################################################################
-  
+
+  config.azure_config = config_for(:azure_config)
+  ##################### SETTINGS FOR AZURE BLOB STORAGE ##################################
+  Paperclip::Attachment.default_options[:storage] = :azure
+  Paperclip::Attachment.default_options[:azure_credentials] = {
+      storage_account_name: config.azure_config["storage_account_name"],
+      storage_access_key:   config.azure_config["storage_access_key"],
+      container:            config.azure_config["container"]
+  }
 
 end
