@@ -52,6 +52,7 @@ class Macro < FinlyMacrosRecord
         script: script,
         macro_type: macro_type.as_json,
         active: active,
+        long_running_job: long_running_job,
         company: company.as_json(options),
         user: (user&.email || user&.mobile_number),
         created_by_admin: created_by_admin.as_json,

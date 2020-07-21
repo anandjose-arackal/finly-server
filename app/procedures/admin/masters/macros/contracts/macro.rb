@@ -18,6 +18,7 @@ class Admin::Masters::Macros::Contracts::Macro < Reform::Form
     user = User.where(company_id: input[:company_id]).where('id = ? or email = ?', user_id, user_id).first
     represented.user_id ||= user&.id if user.present?
   }
+  property :permissions
   collection :schedules, populate_if_empty: MacroSchedule, form: Admin::Masters::Macros::Contracts::Schedule
   collection :routes, populate_if_empty: MacroRoute do
     property :route, validates: {presence: true}

@@ -16,6 +16,7 @@ class MacroRoute < FinlyMacrosRecord
 
   def as_json(options={})
     {
+        id: id,
         route: route
     }
   end
