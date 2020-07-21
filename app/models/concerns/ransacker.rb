@@ -9,6 +9,10 @@ module Ransacker
   #   end
   # end
 
+  included do
+
+  end
+
   class_methods do
     def inherited(sub_class)
       super(sub_class)
@@ -33,6 +37,15 @@ module Ransacker
       ransacker attribute do
         Arel.sql("date(#{table_name}.#{attribute})")
       end
+    end
+
+    def ransack_scopes(*scopes)
+      @ransack_scopes ||= []
+      @ransack_scopes += scopes
+    end
+
+    def ransackable_scopes(auth_object = nil)
+      @ransack_scopes
     end
   end
 

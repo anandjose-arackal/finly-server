@@ -119,7 +119,6 @@ class Invoice < ApplicationRecord
   include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport
   include LiquidDroppable
   include Exposures::Model::Exposable
-  include Exposures::Model::Exposable
   include Sequenced::ActsAsSequenced
   include ErpSyncable
 
@@ -630,9 +629,7 @@ class Invoice < ApplicationRecord
     set :invoice_status_id => InwardInvoiceStatus.id_for(:open)
   end
 
-  def self.ransackable_scopes(auth_object = nil)
-    [:with_status_id]
-  end
+  ransack_scopes :with_status_id
 
   def policy
     return super if self.policy_id.present?

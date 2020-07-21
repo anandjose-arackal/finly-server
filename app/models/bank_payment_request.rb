@@ -425,9 +425,7 @@ class BankPaymentRequest < ApplicationRecord
 
   before_save :add_company
 
-  def self.ransackable_scopes(auth_object = nil)
-    [:with_status_id]
-  end
+  ransack_scopes :with_status_id
 
   def can_submit?
     open? || retracted? || rejected?

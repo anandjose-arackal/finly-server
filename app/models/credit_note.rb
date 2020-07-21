@@ -293,6 +293,8 @@ class CreditNote < ApplicationRecord
     end
   }
 
+  ransack_scopes :with_status_id
+
   def self.format_order_type(order_type)
     order_type = "ASC" unless ["ASC", "DESC"].include?(order_type.to_s.upcase)
     order_type
@@ -433,10 +435,6 @@ class CreditNote < ApplicationRecord
 
   def self.open_statuses
     self.status_ids(:draft, :retracted, :rejected)
-  end
-
-  def self.ransackable_scopes(auth_object = nil)
-    [:with_status_id]
   end
 
   # Used for tracking completion %
