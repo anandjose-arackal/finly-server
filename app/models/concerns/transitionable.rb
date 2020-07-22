@@ -474,7 +474,7 @@ module Transitionable
     end
 
     def update_if_reviewer(user)
-      self.controlling_level.reviewers.pluck(:id).include?(user.id) rescue false
+      self.get_reviewer_ids&.include?(user.id) rescue false
     end
 
   end

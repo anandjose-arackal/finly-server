@@ -124,7 +124,8 @@ class BranchLocation < ApplicationRecord
         location_code: self.location_code,
         state_code: self.state&.state_code,
         billable: self.billable_location,
-        shippable: self.shippable_location
+        shippable: self.shippable_location,
+        state: self.state
     }
   end
 

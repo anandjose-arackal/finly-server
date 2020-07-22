@@ -19,7 +19,7 @@ class Purpose < ApplicationRecord
         :outward_invoice_items, :collect, :travel_request, :report, :money_request, :procurement, :vendor,
         :grn, :item_master, :rate_contract, :purchase_request, :branch_location, :department, :cost_center,
         :category, :purchase_order, :payment_agreement, :general_invoice, :rental_invoice, :bbps_biller_subscription, :bbps_bill, :credit_note,
-        :trip
+        :trip, :macro
     ]
   end
 

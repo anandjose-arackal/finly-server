@@ -55,7 +55,8 @@ class CostCenter < ApplicationRecord
   def as_json(options={})
     {
         id: id,
-        name: name
+        name: name,
+        cost_center_code: cost_center_code
     }
   end
 
