@@ -61,7 +61,7 @@ end
 
 every 1.day, at: '5:35 am', roles: [:whenever_cron] do
   runner "FetchCurrencyConversionRates.perform", output: "#{path}/log/whenever/fetch_currency_conversion_rates.log"
-  runner "CreateMissedCardTransactions", output: "#{path}/log/whenever/card_transaction_recon.log"
+  runner "CreateMissedCardTransactions.perform", output: "#{path}/log/whenever/card_transaction_recon.log"
 end
 
 every 1.day, at: '5:45 am', roles: [:whenever_cron] do
