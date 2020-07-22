@@ -12,7 +12,7 @@ module ErpSyncable
       end
     }
 
-    belongs_to :erp_sync_status
+    belongs_to :erp_sync_status, optional: true
     has_many :erp_sync_attempts, as: :record
 
     ransack_scopes :pending_erp_sync
