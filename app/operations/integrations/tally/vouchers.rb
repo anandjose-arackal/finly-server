@@ -84,9 +84,9 @@ class Integrations::Tally::Vouchers < Integrations::Tally::Base
     container_name = azure_config["container"]
     options = { content_type: 'application/xml', content_disposition: 'attachment;' }
 
-    file = Paperclip::Tempfile.new(['export', '.xml'])
-    open(file.path, 'wb') { |f| f.write data }
-
+    unique_file_name = create_uniq_file_name
+    file = File.open("/tmp/#{unique_file_name}",'wb')
+    file.write data
     if file
       file_name = File.basename(file)
       blob_client.create_block_blob(container_name, file_name, file, options)
@@ -94,13 +94,10 @@ class Integrations::Tally::Vouchers < Integrations::Tally::Base
     end
     url
   end
-  # class Personalizer::Adapters::Company2::ExportTemplates2::Tally::Presenter < Exporter
-  #
-  #   def render(controller)
-  #     controller.send_data 'this, is, a, test, csv', file_name: 'hello.csv'
-  #   end
-  #
-  # end
+
+  def create_uniq_file_name
+    "export-#{Time.now.utc.strftime("%Y%m%d%H%M%S")}-#{SecureRandom.uuid}}"
+  end
 
 end
 
