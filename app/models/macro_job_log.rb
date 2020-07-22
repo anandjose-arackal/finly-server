@@ -19,7 +19,8 @@ class MacroJobLog < FinlyMacrosRecord
   def as_json(options={})
     {
         log_type: log_type.titleize,
-        message: message
+        message: message,
+        datetime: created_at.strftime("%I:%M:%S %p, %d %b %Y")
     }
   end
 
