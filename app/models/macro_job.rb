@@ -26,6 +26,8 @@ class MacroJob < FinlyMacrosRecord
   serialize :request_options, JSON
   serialize :crash_stacktrace, JSON
 
+  default_scope {order(created_at: :desc)}
+
   def std_pretty_print
     puts "#{"=" * 10} #{macro.name} #{"=" * 10}"
     puts "Macro\t\t\t:\t#{macro.name}"

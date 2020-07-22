@@ -12,8 +12,13 @@ class MacroExposure < Exposures::API
   attribute :created_by, record_attribute: true, exposure: true, includes: [:created_by]
   attribute :created_by_admin, record_attribute: true, exposure: true, includes: [:created_by_admin]
   attribute :last_run_at, record_attribute: true
+  attribute :start_date, record_attribute: true
+  attribute :end_date, record_attribute: true
+  attribute :active?, record_attribute: true
   attribute :deleted_at, record_attribute: true
   attribute :created_at, record_attribute: true
   attribute :updated_at, record_attribute: true
+  attribute :job, record_attribute: true, exposure: true, includes: [:job]
+  attribute :jobs, record_attribute: true, exposure: true, includes: [:jobs]
 
 end

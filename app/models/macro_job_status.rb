@@ -13,7 +13,7 @@ class MacroJobStatus < FinlyMacrosRecord
   include Seedable
 
   def self.values
-    [:in_progress, :completed]
+    [:in_progress, :completed, :failed]
   end
 
   def as_json(options={})

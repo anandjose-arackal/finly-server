@@ -1,4 +1,5 @@
 class BaseControllers::MacrosBase < ApplicationController
+  layout 'trailblazers'
 
   protect_from_forgery with: :null_session
   before_action { authorize_ip(Rails.application.config_for(:finly_macros)['inbound']['ip_address']) }

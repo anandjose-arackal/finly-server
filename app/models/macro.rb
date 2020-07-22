@@ -34,6 +34,7 @@ class Macro < FinlyMacrosRecord
   belongs_to :created_by, class_name: 'User', optional: true
   belongs_to :created_by_admin, class_name: 'AdminUser'
 
+  has_one :job, class_name: "MacroJob"
   has_many :jobs, class_name: 'MacroJob'
   has_many :schedules, class_name: 'MacroSchedule'
   has_many :routes, class_name: 'MacroRoute'
@@ -42,6 +43,8 @@ class Macro < FinlyMacrosRecord
   scope :with_route, -> (route) { joins(:routes).where(macro_routes: {route: route}) }
 
   serialize :permissions, JSON
+
+  default_scope {order(created_at: :desc)}
 
   def active?
     return false if start_date.present? and start_date > Date.today

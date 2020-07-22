@@ -18,10 +18,6 @@ class Admin::Masters::Macros::Ops::Index < IndexBuilder::API
     text value: :description
   end
 
-  column :active, default: true, includes: [:macro_type] do
-    text value: :macro_status
-  end
-
   column :last_run_at, sort: true, default: true do
     text value: -> (context) do
       user = context[:record]
@@ -32,6 +28,30 @@ class Admin::Masters::Macros::Ops::Index < IndexBuilder::API
         "Never"
       end
     end
+  end
+
+  column :last_run_status, default: true, includes: [:job] do
+    indicator value: "{{record.job.status.name}}", format: :format_macro_job_status
+  end
+
+  column :active, default: true, includes: [:macro_type] do
+    indicator value: :macro_status, format: :format_macro_status
+  end
+
+  column :start_date, default: true do
+    date value: :start_date
+  end
+
+  column :end_date, default: true do
+    date value: :end_date
+  end
+
+  column :run_as_user, default: true do
+    text value: "{{record.user.name}}"
+  end
+
+  column :permissions, default: true do
+    text value: -> (context) { context[:record].permissions&.map {|perm| perm.humanize}&.join(", ") }
   end
 
   counter -> (user, collection) do
@@ -46,10 +66,32 @@ class Admin::Masters::Macros::Ops::Index < IndexBuilder::API
 
   def self.macro_status(context)
     user = context[:record]
-    if user.active
+    if user.active?
       'Active'
     else
       'Inactive'
+    end
+  end
+
+  def self.format_macro_status(context)
+    user = context[:record]
+    if user.active
+      'success'
+    else
+      'danger'
+    end
+  end
+
+  def self.format_macro_job_status(context)
+    case context[:exposure].job&.status&.id
+    when MacroJobStatus.id_for(:in_progress)
+      return 'info'
+    when MacroJobStatus.id_for(:completed)
+      return 'success'
+    when MacroJobStatus.id_for(:failed)
+      return 'danger'
+    else
+      return 'warning'
     end
   end
 
