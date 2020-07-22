@@ -1,12 +1,14 @@
-class CreateMissedCardTransactions < ApplicationJob
+class CreateMissedCardTransactions
 
-  def perform
+  def self.perform
+
+    puts " ----------------------------- PERFORMING #{self.name} at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
+
+
     # step 1 - read the file that is sent by Ebix Cash
-    filename = "finly_transactions_#{Date.today.strftime("%Y%b%d")}"
+    filename = "finly_transactions_#{Date.today.strftime("%Y%m%d")}.csv"
     file_path = "#{Dir.home}/ebix_transactions/#{filename}"
-
-    error_logger = Logger.new("#{Rails.root}/log/coh_recon_errors.log")
-
+    error_logger = Logger.new("#{Rails.root}/log/card_transaction_recon_errors.log")
     result = []
 
     ############################# PRIMER #####################################
@@ -17,6 +19,7 @@ class CreateMissedCardTransactions < ApplicationJob
       CSV.foreach(file_path) do |row|
         # now parse each row for the various cases
         string = row.first
+
         data = string.split("$")
 
         transaction_params = extract_transaction_params(data)
@@ -24,7 +27,7 @@ class CreateMissedCardTransactions < ApplicationJob
         # EBix sends us details of failed transactions as well but we don't need to
         # handle them at our end for the reconciliation, so skip them
         if transaction_params["reference_id"] == "failed"
-          result << {"Ebix Reference ID": "", "Success": "No", "Reason for failure": "Failed transaction"}
+          result << {"Ebix Reference ID": "", "Success": "No", "Comments": "Failed transaction"}
         end
 
 
@@ -33,12 +36,12 @@ class CreateMissedCardTransactions < ApplicationJob
         ebix_reference_id = transaction_params[:reference_id]
 
         if card.blank?
-          result << {"Ebix Reference ID": ebix_reference_id, "Success": "No", "Reason for failure": "Card not found"}
+          result << {"Ebix Reference ID": ebix_reference_id, "Success": "No", "Comments": "Card not found"}
           next
         end
 
         if user.blank?
-          result << {"Ebix Reference ID": ebix_reference_id, "Success": "No", "Reason for failure": "User not found"}
+          result << {"Ebix Reference ID": ebix_reference_id, "Success": "No", "Comments": "User not found"}
           next
         end
 
@@ -54,9 +57,9 @@ class CreateMissedCardTransactions < ApplicationJob
           begin
             @result = Card::Transaction::Create.(transaction_params)
             if @result.success?
-              result << {"Ebix Reference ID": ebix_reference_id, "Success": "Yes"}
+              result << {"Ebix Reference ID": ebix_reference_id, "Success": "Yes", "Comments": "Successfully created card transaction"}
             else
-              result << {"Ebix Reference ID": ebix_reference_id, "Success": "No", "Reason for failure": @result.messages[:error].to_sentence}
+              result << {"Ebix Reference ID": ebix_reference_id, "Success": "No", "Comments": @result.messages[:error].to_sentence}
             end
           rescue => error
             error_logger.error("Following transaction could not be created: #{string} because of the following error: #{error.message}")
@@ -65,7 +68,7 @@ class CreateMissedCardTransactions < ApplicationJob
             end
 
             # also add to result file with details
-            result << {"Ebix Reference ID": ebix_reference_id, "Success": "No", "Reason for failure": "#{error.message}"}
+            result << {"Ebix Reference ID": ebix_reference_id, "Success": "No", "Comments": "#{error.message}"}
           end
 
           next
@@ -91,13 +94,17 @@ class CreateMissedCardTransactions < ApplicationJob
           # as reference_payment
           if ct.transaction_mode == "ATM" && ct.transaction_type == "Debit"
             # When type_of_details is T, then it's an actual ATM withdrawal
-            if ct.type_of_details == "T"
+            if ct.type_of_details == "T" || ct.type_of_details == "S"
               reference_payment = ct.reference_payment
               # if the reference_payment is present what that means is that the COH has been
               # successfully added to the user's cash pocket and we don't need to do anything else
               if reference_payment.present?
+                result << {"Ebix Reference ID": ebix_reference_id, "Success": "Yes", "Comments": "Cash on Hand already added"}
                 next
               else
+                # only create the if the COH addition is not present and the card is an expense card
+                next unless card.card_program.create_expense
+
                 atm_pocket = user.user_pockets.atm_withdrawal_pockets.first
                 payment_request = PaymentRequest.(user, nil, UserPocket.name, :credit, :atm_withdrawal)
                 payment_request.add_payment_item(PaymentRequest::PaymentItem.(user, atm_pocket, ct.transaction_amount_value, reference_resource: ct))
@@ -106,10 +113,10 @@ class CreateMissedCardTransactions < ApplicationJob
                   # i.e. if successful, associate this transaction with the payment
                   payment = op.payments.first
                   ct.update(reference_payment_id: op.payments.first&.id)
-                  payment.finly_transactions.update(associated_transaction: transaction)
-                  return true
+                  payment.finly_transactions.update(associated_transaction: ct)
+                  result << {"Ebix Reference ID": ebix_reference_id, "Success": "Yes", "Comments": "COH successfully added"}
                 else
-                  result << {"Ebix Reference ID": ebix_reference_id, "Success": "No", "Reason for failure": "COH couldn't be added because: #{@result.messages[:error].to_sentence}"}
+                  result << {"Ebix Reference ID": ebix_reference_id, "Success": "No", "Comments": "COH couldn't be added because: #{@result.messages[:error].to_sentence}"}
                 end
 
                 next
@@ -119,14 +126,17 @@ class CreateMissedCardTransactions < ApplicationJob
             elsif ct.type_of_details == "F"
               card_expense = CardExpense.find_by(card_transaction_id: ct&.id)
               if card_expense.present?
+                result << {"Ebix Reference ID": ebix_reference_id, "Success": "Yes", "Comments": "Card expense for ATM fees already created"}
                 next
               else
-                # only create the if the card expense is not present
-                @result = Expense::ExCard::Create.(transaction, card)
+                # only create the if the card expense is not present and the card is an expense card
+                next unless card.card_program.create_expense
+
+                @result = Expense::ExCard::Create.(ct, card)
                 if @result.success?
-                  result << {"Ebix Reference ID": ebix_reference_id, "Success": "Yes"}
+                  result << {"Ebix Reference ID": ebix_reference_id, "Success": "Yes", "Comments": "Successfully created card expense for ATM fees"}
                 else
-                  result << {"Ebix Reference ID": ebix_reference_id, "Success": "No", "Reason for failure": "Expense couldn't be created because: #{@result.messages[:error].to_sentence}"}
+                  result << {"Ebix Reference ID": ebix_reference_id, "Success": "No", "Comments": "Expense couldn't be created because: #{@result.messages[:error].to_sentence}"}
                 end
                 next
               end
@@ -139,13 +149,17 @@ class CreateMissedCardTransactions < ApplicationJob
           if ["ECOM", "POS"].include?(ct.transaction_mode) && ct.transaction_type == "Debit"
             card_expense = CardExpense.find_by(card_transaction_id: ct&.id)
             if card_expense.present?
+              result << {"Ebix Reference ID": ebix_reference_id, "Success": "Yes", "Comments": "Card expense already created"}
               next
             else
-              @result = Expense::ExCard::Create.(transaction, card)
+              # only create the if the card expense is not present and the card is an expense card
+              next unless card.card_program.create_expense
+
+              @result = Expense::ExCard::Create.(ct, card)
               if @result.success?
-                result << {"Ebix Reference ID": ebix_reference_id, "Success": "Yes"}
+                result << {"Ebix Reference ID": ebix_reference_id, "Success": "Yes", "Comments": "Successfully created card expense"}
               else
-                result << {"Ebix Reference ID": ebix_reference_id, "Success": "No", "Reason for failure": "Expense couldn't be created because: #{@result.messages[:error].to_sentence}"}
+                result << {"Ebix Reference ID": ebix_reference_id, "Success": "No", "Comments": "Expense couldn't be created because: #{@result.messages[:error].to_sentence}"}
               end
               next
             end
@@ -156,19 +170,21 @@ class CreateMissedCardTransactions < ApplicationJob
             # reduced the respective COH of the user
             reference_payment = ct.reference_payment
             if reference_payment.present?
+              result << {"Ebix Reference ID": ebix_reference_id, "Success": "Yes", "Comments": "Reversal already processed"}
               next
             else
               atm_pocket = user.user_pockets.atm_withdrawal_pockets.first
               payment_request = PaymentRequest.(user, nil, UserPocket.name, :debit, :cash_on_hand_reversal)
-              payment_request.add_payment_item(PaymentRequest::PaymentItem.(user, atm_pocket, ct.transaction_amount_value, reference_resource: self.transaction))
+              payment_request.add_payment_item(PaymentRequest::PaymentItem.(user, atm_pocket, ct.transaction_amount_value, reference_resource: ct))
               op = AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
 
               if op.success?
                 payment = op.payments.first
                 ct.update(reference_payment_id: op.payments.first&.id)
                 payment.finly_transactions.update(associated_transaction: ct)
+                result << {"Ebix Reference ID": ebix_reference_id, "Success": "Yes", "Comments": "Successfully deducted COH for reversal"}
               else
-                result << {"Ebix Reference ID": ebix_reference_id, "Success": "No", "Reason for failure": "COH couldn't be reversed because: #{@result.messages[:error].to_sentence}"}
+                result << {"Ebix Reference ID": ebix_reference_id, "Success": "No", "Comments": "COH couldn't be reversed because: #{@result.messages[:error].to_sentence}"}
               end
             end
             next
@@ -181,6 +197,13 @@ class CreateMissedCardTransactions < ApplicationJob
         error_logger.error "\t #{line}"
       end
     end
+
+    puts "Results\n -----------------------------------######################---------------------------------------"
+    puts result
+    puts "-----------------------------------######################---------------------------------------"
+
+
+    puts " ----------------------------- FINISHED #{self.name} ------------------------------"
 
   end
 
@@ -241,6 +264,11 @@ class CreateMissedCardTransactions < ApplicationJob
         transaction_message: transaction_message,
         success: success
     }
+
+    transaction_params[:billing_amount_attributes] = billing_amount_attributes if billing_amount_attributes.present?
+    transaction_params[:transaction_amount_attributes] = transaction_amount_attributes if transaction_amount_attributes
+
+    transaction_params
   end
 
 end
