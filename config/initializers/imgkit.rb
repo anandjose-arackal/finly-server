@@ -1,4 +1,4 @@
 # config/initializers/imgkit.rb
 IMGKit.configure do |config|
-  config.wkhtmltoimage = '~/.rbenv/shims/'
+  config.wkhtmltoimage = '/usr/bin/wkhtmltoimage'
 end
