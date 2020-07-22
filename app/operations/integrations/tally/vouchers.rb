@@ -61,7 +61,7 @@ class Integrations::Tally::Vouchers < Integrations::Tally::Base
         template = "#{current_class_path}/vouchers.xml"
       end
       data = Exporter.new(user, {xml: {template: template, local_variables: {expenses: expenses, configuration: current_company.tally_configuration}}}, messages).xml_exporter.generate_xml
-      save_file(data)
+      self.file_url = save_file(data)
     end
   end
 
@@ -85,8 +85,12 @@ class Integrations::Tally::Vouchers < Integrations::Tally::Base
     options = { content_type: 'application/xml', content_disposition: 'attachment;' }
 
     unique_file_name = create_uniq_file_name
-    file = File.open("/tmp/#{unique_file_name}",'w+')
+    full_file_path = "/tmp/#{unique_file_name}.xml"
+    file = File.open(full_file_path,'w+')
     file.write data
+    file.close
+
+    file = File.open(full_file_path, 'r+')
     if file
       file_name = File.basename(file)
       blob_client.create_block_blob(container_name, file_name, file, options)
