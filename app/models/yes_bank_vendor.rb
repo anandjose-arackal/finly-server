@@ -247,9 +247,7 @@ class YesBankVendor < ApplicationRecord
     end
   end
 
-  def self.ransackable_scopes(auth_object = nil)
-    [:with_status_id]
-  end
+  ransack_scopes :with_status_id
 
   def display_name
     self.business_name.blank? ? self.name : self.business_name

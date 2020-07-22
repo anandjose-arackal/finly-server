@@ -2,6 +2,8 @@ class Filters::Config < Transactions::API
 
   pass :load_config
 
+  user_model [User, AdminUser]
+
   def load_config(context, params:, current_user:, **)
     routes = Filters::Router.map
     context[:config] = {}

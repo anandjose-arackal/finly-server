@@ -36,6 +36,12 @@ class Docs::P2P::Invoices::Action < ActionManager::API
       end
     end
 
+    action :macro,
+           :jobs,
+           policy: Macros::Jobs::Policy,
+           authorize: :create?,
+           route: 'invoices.index'
+
     action :export,
            :export,
            label: "Export",

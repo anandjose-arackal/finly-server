@@ -1241,6 +1241,8 @@ class User < ApplicationRecord
   alias_method :approves_finance_to_name, :user_name
   alias_method :finance?, :finance_manager?
 
+  ransack_scopes :filter_state
+
   def as_json(options = {})
     {
         id: id,
@@ -1858,10 +1860,6 @@ class User < ApplicationRecord
     unless self.save
       raise "Failed to save unique ID: #{self.errors.full_messages}"
     end
-  end
-
-  def self.ransackable_scopes(auth_object = nil)
-    [:filter_state]
   end
 
 end
