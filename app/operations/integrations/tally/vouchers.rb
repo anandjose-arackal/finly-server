@@ -90,6 +90,8 @@ class Integrations::Tally::Vouchers < Integrations::Tally::Base
     file.write data
     file.close
 
+    options = { content_type: 'application/xml', content_disposition: "attachment; filename=#{File.basename(file)}"}
+
     file = File.open(full_file_path, 'r+')
     if file
       file_name = File.basename(file)
