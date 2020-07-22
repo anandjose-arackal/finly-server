@@ -43,6 +43,14 @@ class Macro < FinlyMacrosRecord
 
   serialize :permissions, JSON
 
+  def active?
+    return false if start_date.present? and start_date > Date.today
+    return false if end_date.present? and end_date < Date.today
+    return false unless active
+
+    true
+  end
+
   def as_json(options={})
     {
         id: id,
