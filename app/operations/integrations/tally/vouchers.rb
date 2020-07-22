@@ -85,7 +85,7 @@ class Integrations::Tally::Vouchers < Integrations::Tally::Base
     options = { content_type: 'application/xml', content_disposition: 'attachment;' }
 
     unique_file_name = create_uniq_file_name
-    file = File.open("/tmp/#{unique_file_name}",'wb')
+    file = File.open("/tmp/#{unique_file_name}",'w+')
     file.write data
     if file
       file_name = File.basename(file)
@@ -96,7 +96,7 @@ class Integrations::Tally::Vouchers < Integrations::Tally::Base
   end
 
   def create_uniq_file_name
-    "export-#{Time.now.utc.strftime("%Y%m%d%H%M%S")}-#{SecureRandom.uuid}}"
+    "export#{Time.now.utc.strftime("%Y%m%d%H%M%S")}#{SecureRandom.hex(10)}"
   end
 
 end
