@@ -5,12 +5,12 @@ class Admin::Masters::Macros::Contracts::Macro < Reform::Form
   property :script, validates: {presence: true}
   property :macro_type_id, validates: {presence: true}
   property :active, deserializer: -> (input, represented, **) {
-    represented.active ||= (input[:active].nil? ? true : input[:active])
+    represented.active = (input[:active].nil? ? true : input[:active])
   }
   property :start_date
   property :end_date
   property :long_running_job, deserializer: -> (input, represented, **) {
-    represented.long_running_job ||= (input[:long_running_job].nil? ? false : input[:long_running_job])
+    represented.long_running_job = (input[:long_running_job].nil? ? false : input[:long_running_job])
   }
   property :company_id, presence: true
   property :user_id, presence: true, deserializer: -> (input, represented, **) {
