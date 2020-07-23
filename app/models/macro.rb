@@ -55,7 +55,7 @@ class Macro < FinlyMacrosRecord
 
   default_scope { order(created_at: :desc) }
 
-  ransack_scopes :is_active
+  ransack_scopes :filter_active
 
   def active?
     return false if start_date.present? and start_date > Date.today
