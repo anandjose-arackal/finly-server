@@ -39,14 +39,16 @@ class Macro < FinlyMacrosRecord
   has_many :schedules, class_name: 'MacroSchedule'
   has_many :routes, class_name: 'MacroRoute'
 
-  scope :active, -> (value = "active") do
-    if value == 'active'
+  scope :active, -> (value = true) do
+    filter_active(value)
+  end
+  scope :filter_active, -> (value = true) {
+    if [99, 'active', true].include?(value)
       where(active: true).where('(start_date IS NULL OR start_date <= ?) AND (end_date IS NULL OR end_date >= ?)', Date.today, Date.today)
-    else
+    elsif [98, 'inactive', false].include?(value)
       where('active = FALSE OR active IS NULL OR start_date > ? OR end_date < ?', Date.today, Date.today)
     end
-  end
-  scope :is_active, -> (value = true) { active(value) }
+  }
   scope :with_route, -> (route) { joins(:routes).where(macro_routes: {route: route}) }
 
   serialize :permissions, JSON
