@@ -59,8 +59,8 @@ class Admin::Masters::Macros::Ops::Index < IndexBuilder::API
     counter = IndexBuilder::Counter.new :is_active
     counts = collection.group(:active).count
     counter.add nil, "All", counts.values.reduce(0, :+)
-    counter.add 1, "Active", collection.is_active(true).count
-    counter.add 0, "Inactive", collection.is_active(false).count
+    counter.add "true", "Active", collection.is_active(true).count
+    counter.add "false", "Inactive", collection.is_active(false).count
     counter
   end
 
