@@ -8,6 +8,7 @@ class ActionManager::Actions::Macro < ActionManager::Action
     route = self.config[:route]
     config = []
     user.company.macros.with_route(route).each do |macro|
+      next unless macro.active?
       next unless Macros::Jobs::Policy.new(user, macro).create?
 
       config << {

@@ -46,7 +46,7 @@ class YesBankVendor < ApplicationRecord
   include Sequenced::ActsAsSequenced
   include LiquidDroppable
   include Exposures::Model::Exposable
-
+  include ErpSyncable
 
   validates :business_name, presence: true
 

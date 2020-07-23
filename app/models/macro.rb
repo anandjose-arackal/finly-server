@@ -34,16 +34,38 @@ class Macro < FinlyMacrosRecord
   belongs_to :created_by, class_name: 'User', optional: true
   belongs_to :created_by_admin, class_name: 'AdminUser'
 
+  has_one :job, class_name: "MacroJob"
   has_many :jobs, class_name: 'MacroJob'
   has_many :schedules, class_name: 'MacroSchedule'
   has_many :routes, class_name: 'MacroRoute'
 
-  scope :active, -> { where(active: true).where('start_date >= ? and end_date <= ?', DateTime.now, DateTime.now)}
+  scope :active, -> (value = true) do
+    filter_active(value)
+  end
+  scope :filter_active, -> (value = true) {
+    if [99, 'active', true].include?(value)
+      where(active: true).where('(start_date IS NULL OR start_date <= ?) AND (end_date IS NULL OR end_date >= ?)', Date.today, Date.today)
+    elsif [98, 'inactive', false].include?(value)
+      where('active = FALSE OR active IS NULL OR start_date > ? OR end_date < ?', Date.today, Date.today)
+    end
+  }
   scope :with_route, -> (route) { joins(:routes).where(macro_routes: {route: route}) }
 
   serialize :permissions, JSON
 
-  def as_json(options={})
+  default_scope { order(created_at: :desc) }
+
+  ransack_scopes :filter_active
+
+  def active?
+    return false if start_date.present? and start_date > Date.today
+    return false if end_date.present? and end_date < Date.today
+    return false unless active
+
+    true
+  end
+
+  def as_json(options = {})
     {
         id: id,
         macro_key: macro_key,

@@ -18,10 +18,6 @@ class Admin::Masters::Macros::Ops::Index < IndexBuilder::API
     text value: :description
   end
 
-  column :active, default: true, includes: [:macro_type] do
-    text value: :macro_status
-  end
-
   column :last_run_at, sort: true, default: true do
     text value: -> (context) do
       user = context[:record]
@@ -34,22 +30,67 @@ class Admin::Masters::Macros::Ops::Index < IndexBuilder::API
     end
   end
 
+  column :last_run_status, default: true, includes: [:job] do
+    indicator value: "{{record.job.status.name}}", format: :format_macro_job_status
+  end
+
+  column :active, default: true, includes: [:macro_type] do
+    indicator value: :macro_status, format: :format_macro_status
+  end
+
+  column :start_date, default: true do
+    date value: :start_date
+  end
+
+  column :end_date, default: true do
+    date value: :end_date
+  end
+
+  column :run_as_user, default: true do
+    text value: "{{record.user.name}}"
+  end
+
+  column :permissions, default: true do
+    text value: -> (context) { context[:record].permissions&.map {|perm| perm.humanize}&.join(", ") }
+  end
+
   counter -> (user, collection) do
     # Use custom scope to support awaiting approval status
-    counter = IndexBuilder::Counter.new :active_eq
-    counts = collection.group(:active).count
-    counter.add nil, "All", counts.values.reduce(0, :+)
-    counter.add true, "Active", counts[true].to_i
-    counter.add true, "Inactive", counts[false].to_i + counts[nil].to_i
+    counter = IndexBuilder::Counter.new :filter_active
+    counter.add nil, "All", collection.count
+    counter.add 99, "Active", collection.filter_active(99).count
+    counter.add 98, "Inactive", collection.filter_active(98).count
     counter
   end
 
   def self.macro_status(context)
-    user = context[:record]
-    if user.active
+    macro = context[:record]
+    if macro.active?
       'Active'
     else
       'Inactive'
+    end
+  end
+
+  def self.format_macro_status(context)
+    macro = context[:record]
+    if macro.active?
+      'success'
+    else
+      'danger'
+    end
+  end
+
+  def self.format_macro_job_status(context)
+    case context[:exposure].job&.status&.id
+    when MacroJobStatus.id_for(:in_progress)
+      return 'info'
+    when MacroJobStatus.id_for(:completed)
+      return 'success'
+    when MacroJobStatus.id_for(:failed)
+      return 'danger'
+    else
+      return 'warning'
     end
   end
 

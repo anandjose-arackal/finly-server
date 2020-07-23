@@ -21,7 +21,7 @@ class MacrosConnector::Run < ServiceApi
     params.merge(current_user: user).as_json
   end
   parse -> (user, params, response) do
-    return Failure() unless response&.success?
+    return Failure("Error while initiating request") unless response&.success?
     body = JSON.parse(response.body)
     return Failure(body['message']) unless body['success']
 

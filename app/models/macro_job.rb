@@ -26,6 +26,8 @@ class MacroJob < FinlyMacrosRecord
   serialize :request_options, JSON
   serialize :crash_stacktrace, JSON
 
+  default_scope {order(created_at: :desc)}
+
   def std_pretty_print
     puts "#{"=" * 10} #{macro.name} #{"=" * 10}"
     puts "Macro\t\t\t:\t#{macro.name}"
@@ -48,12 +50,22 @@ class MacroJob < FinlyMacrosRecord
     nil
   end
 
+  def execution_time
+    return nil if started_at.blank?
+    return nil if ended_at.blank?
+    ended_at - started_at
+  end
+
+  def execution_time_humanized
+    TimeUtils.humanize_seconds(execution_time)
+  end
+
   def as_json(options = {})
     {
         id: id,
         started_at: started_at&.strftime("%d-%B-%Y %H:%M:%S"),
         ended_at: ended_at&.strftime("%d-%B-%Y %H:%M:%S"),
-        execution_time: execution_time,
+        execution_time: execution_time_humanized,
         status: status.as_json(options),
         logs: logs.as_json(options)
     }
