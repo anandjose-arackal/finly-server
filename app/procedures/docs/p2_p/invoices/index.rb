@@ -151,6 +151,8 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     text value: "{{record.policy.name}}"
   end
 
+  IndexBuilder::API::ColumnTemplate::ErpSync(self)
+
   # column :action, default: true do
   #   action :redirect,
   #          :invoice_approve,

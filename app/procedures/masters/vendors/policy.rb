@@ -1,5 +1,9 @@
 class Masters::Vendors::Policy < ApplicationPolicy
 
+  def show?
+    # Todo condition to check if user can view the document. Currently scoping it to admin for test pu
+    user.admin?
+  end
 
   def review?
     return false if user.blank?

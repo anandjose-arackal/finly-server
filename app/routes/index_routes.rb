@@ -1,4 +1,10 @@
 IndexBuilder::Router.draw do
+
+  scope 'admin' do
+    route 'macros', Admin::Masters::Macros::Ops::Index
+    route 'macro_jobs', Admin::Masters::Macros::Jobs::Index
+  end
+
   # Masters
   route "vendors", Masters::Vendors::Index
   route "items", Masters::Items::Index
