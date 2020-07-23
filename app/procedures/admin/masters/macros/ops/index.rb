@@ -64,8 +64,8 @@ class Admin::Masters::Macros::Ops::Index < IndexBuilder::API
   end
 
   def self.macro_status(context)
-    user = context[:record]
-    if user.active?
+    macro = context[:record]
+    if macro.active?
       'Active'
     else
       'Inactive'
@@ -73,8 +73,8 @@ class Admin::Masters::Macros::Ops::Index < IndexBuilder::API
   end
 
   def self.format_macro_status(context)
-    user = context[:record]
-    if user.active
+    macro = context[:record]
+    if macro.active?
       'success'
     else
       'danger'
