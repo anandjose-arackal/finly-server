@@ -56,7 +56,7 @@ class Admin::Masters::Macros::Ops::Index < IndexBuilder::API
 
   counter -> (user, collection) do
     # Use custom scope to support awaiting approval status
-    counter = IndexBuilder::Counter.new :is_active
+    counter = IndexBuilder::Counter.new :filter_active
     counts = collection.group(:active).count
     counter.add nil, "All", counts.values.reduce(0, :+)
     counter.add 99, "Active", collection.is_active(true).count
