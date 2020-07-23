@@ -60,7 +60,7 @@ class Admin::Masters::Macros::Ops::Index < IndexBuilder::API
     counts = collection.group(:active).count
     counter.add nil, "All", counts.values.reduce(0, :+)
     counter.add true, "Active", counts[true].to_i
-    counter.add true, "Inactive", counts[false].to_i + counts[nil].to_i
+    counter.add false, "Inactive", counts[false].to_i + counts[nil].to_i
     counter
   end
 

@@ -18,7 +18,7 @@ class BaseControllers::MacrosBase < ApplicationController
   end
 
   def current_user
-    current_macro.user
+    current_macro&.user
   end
 
   def current_macro

@@ -1,5 +1,5 @@
 includes = [
-    :vendor_type, :payment_term, :policy, :tds_rates, {locations: :state},
+    :vendor_type, :payment_term, :policy, :tds_rates, {gstin_locations: :state},
     :bank_accounts, :vendor_attachments, {custom_fields: :field_configuration}
 ]
 json.data do
