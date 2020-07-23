@@ -39,8 +39,8 @@ class Macro < FinlyMacrosRecord
   has_many :schedules, class_name: 'MacroSchedule'
   has_many :routes, class_name: 'MacroRoute'
 
-  scope :active, -> (value = true) do
-    if StringUtils.to_bool(value)
+  scope :active, -> (value = "active") do
+    if value == 'active'
       where(active: true).where('(start_date IS NULL OR start_date <= ?) AND (end_date IS NULL OR end_date >= ?)', Date.today, Date.today)
     else
       where('active = FALSE OR active IS NULL OR start_date > ? OR end_date < ?', Date.today, Date.today)
