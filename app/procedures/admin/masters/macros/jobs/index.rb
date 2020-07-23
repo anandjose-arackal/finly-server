@@ -19,7 +19,7 @@ class Admin::Masters::Macros::Jobs::Index < IndexBuilder::API
   end
 
   column :execution_time, default: true do
-    text value: :execution_time
+    text value: :execution_time_humanized
   end
 
   column :status, default: true do
@@ -31,13 +31,6 @@ class Admin::Masters::Macros::Jobs::Index < IndexBuilder::API
     counter = IndexBuilder::Counter.new :active_eq
     counter.add nil, "All", collection.count
     counter
-  end
-
-  def self.execution_time(context)
-    return nil if context[:record].started_at.blank?
-    return nil if context[:record].ended_at.blank?
-    secs = context[:record].ended_at - context[:record].started_at
-    TimeUtils.humanize_seconds(secs)
   end
 
   def self.format_status(context)
