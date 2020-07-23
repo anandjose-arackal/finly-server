@@ -41,9 +41,9 @@ class Macro < FinlyMacrosRecord
 
   scope :active, -> (value = true) do
     if StringUtils.to_bool(value)
-      where(active: true).where('(start_date IS NULL OR start_date >= ?) AND (end_date IS NULL OR end_date <= ?)', Date.today, Date.today)
+      where(active: true).where('(start_date IS NULL OR start_date <= ?) AND (end_date IS NULL OR end_date >= ?)', Date.today, Date.today)
     else
-      where('active = FALSE OR active IS NULL OR start_date < ? OR end_date > ?', Date.today, Date.today)
+      where('active = FALSE OR active IS NULL OR start_date > ? OR end_date < ?', Date.today, Date.today)
     end
   end
   scope :is_active, -> (value = true) { active(value) }
