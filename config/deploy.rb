@@ -88,6 +88,7 @@ linked_files = %w{
   config/web_client.yml
   config/azure_config.yml
   config/finly_macros.yml
+  config/finly_collect.yml
 }
 case fetch(:stage)
 when :itzcash_production, :aws_production, :background_production, :foreground_production, :console_production, :api_production, :background_production_console,

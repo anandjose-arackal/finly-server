@@ -1,7 +1,4 @@
+# config/initializers/imgkit.rb
 IMGKit.configure do |config|
-  config.default_options = {
-    quality: 100,
-    encoding: 'UTF-8'
-  }
-  config.default_format = :jpg
+  config.wkhtmltoimage = '/usr/bin/wkhtmltoimage'
 end

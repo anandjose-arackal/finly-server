@@ -68,7 +68,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
     
     # checking for duplicates within this particular company
-    current_company_invoices = current_company.inward_invoices.scope_all_except_voided_rejected
+    current_company_invoices = current_company.inward_invoices.scope_all_except_voided_rejected_retracted
     invoice_number = self.inward_invoice_params[:invoice_number]
     vendor_id = self.inward_invoice.vendor_id || params[:vendor_id]
     duplicate_invoices = current_company_invoices.with_invoice_number(invoice_number).with_vendor_ids(vendor_id).without_id(self.inward_invoice.id)

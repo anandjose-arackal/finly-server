@@ -135,6 +135,13 @@ GEM
       faraday (~> 0.9)
       faraday_middleware (~> 0.10)
       nokogiri (~> 1.6, >= 1.6.8)
+    azure-storage-blob (1.1.0)
+      azure-core (~> 0.1.13)
+      azure-storage-common (~> 1.0)
+      nokogiri (~> 1.6, >= 1.6.8)
+    azure-storage-common (1.1.0)
+      azure-core (~> 0.1.13)
+      nokogiri (~> 1.6, >= 1.6.8)
     bcrypt (3.1.13)
     benchmark-ips (2.8.2)
     bindex (0.8.1)
@@ -745,6 +752,7 @@ GEM
       chronic (>= 0.6.3)
     wicked_pdf (1.1.0)
     will_paginate (3.1.8)
+    wkhtmltoimage-binary (0.12.5)
     wkhtmltopdf-binary (0.12.6.2)
     write_xlsx (0.85.7)
       rubyzip (>= 1.0.0)
@@ -768,6 +776,7 @@ DEPENDENCIES
   autoprefixer-rails (~> 9.4.4)
   awesome_print (~> 1.8.0)
   azure
+  azure-storage-blob
   bootbox-rails (= 0.5.0)
   bootsnap (~> 1.4)
   bootstrap-sass (~> 3.4.0)
@@ -911,6 +920,7 @@ DEPENDENCIES
   whenever
   wicked_pdf (~> 1.1.0)
   will_paginate (~> 3.1.6)
+  wkhtmltoimage-binary
   wkhtmltopdf-binary (~> 0.12.4)
   write_xlsx (~> 0.85.6)
 
