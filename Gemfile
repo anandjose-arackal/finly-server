@@ -4,7 +4,7 @@ ruby '~> 2.6'
 
 # gem for pdf export and its executable
 gem 'wicked_pdf', '~> 1.1.0'
-gem 'wkhtmltopdf-binary', '~> 0.12.4'
+#gem 'wkhtmltopdf-binary', '~> 0.12.4'
 
 gem 'nokogiri', '~> 1.10.0'
 gem 'autoprefixer-rails', '~> 9.4.4'
@@ -187,7 +187,7 @@ gem 'griddler-sendgrid', '~> 1.2'
 
 gem 'rmagick', '~> 2.16.0'
 gem 'imgkit', '~> 1.6.1'
-gem 'wkhtmltoimage-binary'
+#gem 'wkhtmltoimage-binary'
 # gem 'proselytism', git: 'git@bitbucket.org:finlycore/proselytism.git'
 
 gem 'require_all', '~> 2.0.0'
