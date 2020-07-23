@@ -39,13 +39,19 @@ class Macro < FinlyMacrosRecord
   has_many :schedules, class_name: 'MacroSchedule'
   has_many :routes, class_name: 'MacroRoute'
 
-  scope :active, -> (value=true) { where(active: value).where('(start_date IS NULL OR start_date >= ?) and (end_date IS NULL OR end_date <= ?)', DateTime.now, DateTime.now)}
-  scope :is_active, -> (value=true) { active(value) }
+  scope :active, -> (value = true) do
+    if StringUtils.to_bool(value)
+      where(active: true).where('(start_date IS NULL OR start_date >= ?) AND (end_date IS NULL OR end_date <= ?)', Date.today, Date.today)
+    else
+      where('active = FALSE OR active IS NULL OR start_date < ? OR end_date > ?', Date.today, Date.today)
+    end
+  end
+  scope :is_active, -> (value = true) { active(value) }
   scope :with_route, -> (route) { joins(:routes).where(macro_routes: {route: route}) }
 
   serialize :permissions, JSON
 
-  default_scope {order(created_at: :desc)}
+  default_scope { order(created_at: :desc) }
 
   ransack_scopes :is_active
 
@@ -57,7 +63,7 @@ class Macro < FinlyMacrosRecord
     true
   end
 
-  def as_json(options={})
+  def as_json(options = {})
     {
         id: id,
         macro_key: macro_key,
