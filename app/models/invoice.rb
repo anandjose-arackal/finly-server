@@ -580,9 +580,10 @@ class Invoice < ApplicationRecord
     where.not invoice_status_id: InwardInvoiceStatus.id_for(:voided)
   }
 
-  scope :scope_all_except_voided_rejected, -> {
+  scope :scope_all_except_voided_rejected_retracted, -> {
     where.not invoice_status_id: [InwardInvoiceStatus.id_for(:voided),
-                                  InwardInvoiceStatus.id_for(:rejected)]
+                                  InwardInvoiceStatus.id_for(:rejected),
+                                  InwardInvoiceStatus.id_for(:retracted)]
   }
 
   after_create :set_defaults
