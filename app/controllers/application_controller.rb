@@ -299,15 +299,11 @@ class ApplicationController < ActionController::Base
 
   def authorize_ip(authorized_list)
     authorized_list = [authorized_list] if authorized_list.class.name == String.name
-    unless authorized_list.present? and authorized_list.include?(real_ip)
+    unless authorized_list.present? and authorized_list.include?(request.remote_ip)
       head 403
       return false
     end
     true
-  end
-
-  def real_ip
-    request.env['HTTP_X_FORWARDED_FOR'] || request.remote_ip
   end
 
   def whitelisted?(ip, type_id)
