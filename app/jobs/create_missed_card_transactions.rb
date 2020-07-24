@@ -210,7 +210,7 @@ class CreateMissedCardTransactions
 
   private
 
-  def extract_transaction_params(data)
+  def self.extract_transaction_params(data)
 
     # if it's info about failed transactions, just skip this
     if data[0].present? && data[0].downcase == "failed"
