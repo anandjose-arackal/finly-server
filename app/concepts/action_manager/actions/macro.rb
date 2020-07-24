@@ -3,6 +3,13 @@ class ActionManager::Actions::Macro < ActionManager::Action
   config :route
   register :macro
 
+  def build(options)
+    map = super(options)
+    return unless map.present? and map[:config].present?
+
+    map
+  end
+
   def build_config(options)
     user = options[:current_user]
     route = self.config[:route]
