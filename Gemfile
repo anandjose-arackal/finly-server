@@ -4,7 +4,7 @@ ruby '~> 2.6'
 
 # gem for pdf export and its executable
 gem 'wicked_pdf', '~> 1.1.0'
-gem 'wkhtmltopdf-binary', '~> 0.12.4'
+#gem 'wkhtmltopdf-binary', '~> 0.12.4'
 
 gem 'nokogiri', '~> 1.10.0'
 gem 'autoprefixer-rails', '~> 9.4.4'
@@ -14,8 +14,8 @@ gem 'fiscali', '~> 2.4'
 gem 'parslet', '~> 1.8.2'
 gem 'rack', github: 'rack/rack', :ref => 'f690bb71425aa31d7b9b3113829af773950d8ab5'
 gem 'rufus-scheduler', '~> 3.6'
-gem 'clockwork', '~> 2.0'
-
+# gem 'clockwork', '~> 2.0'
+gem 'cronex', '~> 0.10'
 
 # adding gems for activeMQ
 gem 'daemons', '~> 1.3.1'
@@ -187,7 +187,7 @@ gem 'griddler-sendgrid', '~> 1.2'
 
 gem 'rmagick', '~> 2.16.0'
 gem 'imgkit', '~> 1.6.1'
-# gem 'wkhtmltoimage-binary'
+#gem 'wkhtmltoimage-binary'
 # gem 'proselytism', git: 'git@bitbucket.org:finlycore/proselytism.git'
 
 gem 'require_all', '~> 2.0.0'
@@ -242,6 +242,7 @@ gem 'whenever'
 
 # gem for all azure services
 gem 'azure'
+gem 'azure-storage-blob'
 
 group :development, :test do
   gem 'byebug'

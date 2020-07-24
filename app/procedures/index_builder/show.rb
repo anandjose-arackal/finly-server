@@ -1,5 +1,7 @@
 class IndexBuilder::Show < Transactions::API
 
+  user_model [User, AdminUser]
+
   step :find_builder
   step :resolve
   pass :sanitize_columns

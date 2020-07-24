@@ -110,6 +110,8 @@ class Filters::API::Attribute
 
       # Dynamically adds all custom fields as attributes. Supported types are text and dropdown.
       # Dropdown gives all dropdown options for selection. All other fields are added as text
+      # This uses the example `6: Passing arguments to a ransacker:` in https://github.com/activerecord-hackery/ransack/wiki/Using-Ransackers
+      # The ransacker is defined in CustomField model as `ransacker :value_search, args: [:parent, :ransacker_args]`
       def build_custom_fields(user, filters)
         configs = {}
         field_configurations = user.company.all_field_configurations.where(is_deleted: false, deleted_at: nil, enabled: true).includes(:drop_down_items)
