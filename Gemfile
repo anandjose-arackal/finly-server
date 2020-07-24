@@ -291,7 +291,7 @@ group :development do
   gem 'foreman', '~> 0.85.0'
   gem 'bullet', '~> 5.9.0'
   gem 'listen', '>= 3.0.5', '< 3.2'
-  gem 'spring', '~> 2.0.0'
+  gem 'spring', '~> 2.1.0'
   gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'spring-commands-rspec', '~> 1.0.4'
   # gem "lol_dba"
