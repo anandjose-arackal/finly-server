@@ -10,6 +10,7 @@ class Admin::Masters::Macros::Jobs::Create < Admin::Transactions::API
   step Model(Macro, :find_by_id)
   step Policy::Pundit(Admin::Masters::Macros::Jobs::Policy, :create?)
   step :run!
+  step Transactions::Messages::SuccessMessage('Initiated the execution of macro')
 
   def run!(context, model:, params:, **)
     params[:macro_id] = params[:id]

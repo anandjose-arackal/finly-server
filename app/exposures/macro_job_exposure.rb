@@ -5,6 +5,7 @@ class MacroJobExposure < Exposures::API
   attribute :started_at, record_attribute: true
   attribute :ended_at, record_attribute: true
   attribute :execution_time, record_attribute: true
+  attribute :execution_time_humanized, record_attribute: true
   attribute :status, record_attribute: true, exposure: true
 
 end
