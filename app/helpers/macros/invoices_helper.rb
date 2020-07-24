@@ -1,0 +1,2 @@
+module Macros::InvoicesHelper
+end

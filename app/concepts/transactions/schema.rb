@@ -25,6 +25,7 @@ class Transactions::Schema < Dry::Validation::Contract
     end
 
     module ClassMethods
+      # Fixme: Limitation -> The validation is supported only for incoming `params`. Since multiple arguments are supported for the params, such as current user, we should allow validations against all arguments instead of just the params
       def schema(&block)
         klass = Class.new(Transactions::Schema)
         klass.instance_eval &block

@@ -1,5 +1,7 @@
 class ActionManager::Validate < Transactions::API
 
+  user_model [User, AdminUser]
+
   schema do
     params do
       required(:route).filled

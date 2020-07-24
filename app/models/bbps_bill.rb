@@ -282,9 +282,7 @@ class BbpsBill < ApplicationRecord
     end
   end
 
-  def self.ransackable_scopes(auth_object = nil)
-    [:with_status_id]
-  end
+  ransack_scopes :with_status_id
 
   def as_json(options = {})
     if options[:index]
@@ -559,9 +557,7 @@ class BbpsBill < ApplicationRecord
     BbpsBillStatus.ids_for(:awaiting_approval).include?(status_id)
   end
 
-  def self.ransackable_scopes(auth_object = nil)
-    [:with_status_id]
-  end
+  ransack_scopes :with_status_id
 
   private
 
