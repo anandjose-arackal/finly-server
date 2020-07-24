@@ -4,7 +4,7 @@ ruby '~> 2.6'
 
 # gem for pdf export and its executable
 gem 'wicked_pdf', '~> 1.1.0'
-#gem 'wkhtmltopdf-binary', '~> 0.12.4'
+gem 'wkhtmltopdf-binary', '0.12.5'
 
 gem 'nokogiri', '~> 1.10.0'
 gem 'autoprefixer-rails', '~> 9.4.4'
