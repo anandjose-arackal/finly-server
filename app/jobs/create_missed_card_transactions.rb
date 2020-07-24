@@ -6,7 +6,7 @@ class CreateMissedCardTransactions
 
 
     # step 1 - read the file that is sent by Ebix Cash
-    filename = "finly_transactions_#{Date.today.strftime("%Y%m%d")}.csv"
+    filename = "finly_transactions_#{Date.yesterday.strftime("%Y%m%d")}.csv"
     file_path = "#{Dir.home}/ebix_transactions/#{filename}"
     error_logger = Logger.new("#{Rails.root}/log/card_transaction_recon_errors.log")
     result = []
