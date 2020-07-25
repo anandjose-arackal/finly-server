@@ -116,7 +116,7 @@ class CreateMissedCardTransactions
                   payment.finly_transactions.update(associated_transaction: ct)
                   result << {"Ebix Reference ID": ebix_reference_id, "Success": "Yes", "Comments": "COH successfully added"}
                 else
-                  result << {"Ebix Reference ID": ebix_reference_id, "Success": "No", "Comments": "COH couldn't be added because: #{@result.messages[:error].to_sentence}"}
+                  result << {"Ebix Reference ID": ebix_reference_id, "Success": "No", "Comments": "COH couldn't be added because: #{op.messages[:error].to_sentence}"}
                 end
 
                 next
@@ -136,7 +136,7 @@ class CreateMissedCardTransactions
                 if @result.success?
                   result << {"Ebix Reference ID": ebix_reference_id, "Success": "Yes", "Comments": "Successfully created card expense for ATM fees"}
                 else
-                  result << {"Ebix Reference ID": ebix_reference_id, "Success": "No", "Comments": "Expense couldn't be created because: #{@result.messages[:error].to_sentence}"}
+                  result << {"Ebix Reference ID": ebix_reference_id, "Success": "No", "Comments": "Expense couldn't be created because: #{op.messages[:error].to_sentence}"}
                 end
                 next
               end
@@ -159,7 +159,7 @@ class CreateMissedCardTransactions
               if @result.success?
                 result << {"Ebix Reference ID": ebix_reference_id, "Success": "Yes", "Comments": "Successfully created card expense"}
               else
-                result << {"Ebix Reference ID": ebix_reference_id, "Success": "No", "Comments": "Expense couldn't be created because: #{@result.messages[:error].to_sentence}"}
+                result << {"Ebix Reference ID": ebix_reference_id, "Success": "No", "Comments": "Expense couldn't be created because: #{op.messages[:error].to_sentence}"}
               end
               next
             end
@@ -184,7 +184,7 @@ class CreateMissedCardTransactions
                 payment.finly_transactions.update(associated_transaction: ct)
                 result << {"Ebix Reference ID": ebix_reference_id, "Success": "Yes", "Comments": "Successfully deducted COH for reversal"}
               else
-                result << {"Ebix Reference ID": ebix_reference_id, "Success": "No", "Comments": "COH couldn't be reversed because: #{@result.messages[:error].to_sentence}"}
+                result << {"Ebix Reference ID": ebix_reference_id, "Success": "No", "Comments": "COH couldn't be reversed because: #{op.messages[:error].to_sentence}"}
               end
             end
             next
