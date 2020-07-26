@@ -5,6 +5,11 @@ class Macros::V1::InvoicesController < BaseControllers::MacrosBase
     endpoint Resolver::Resolve
   end
 
+  def count
+    params[:route] = 'invoices.default'
+    endpoint Resolver::Resolve
+  end
+
   def show
     endpoint Docs::P2P::Invoices::Ops::Show
   end

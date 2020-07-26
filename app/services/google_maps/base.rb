@@ -6,7 +6,7 @@ class GoogleMaps::Base < ServiceApi
   end
 
   def key
-    "AIzaSyCedNssy3m7S0j16zER3PbVn7vENxjEDIs"
+    'AIzaSyDkuIlJgAkFWEnpC8jTT3XEqpPM1C9Quso'
   end
 
 end
