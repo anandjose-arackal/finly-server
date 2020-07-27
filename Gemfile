@@ -4,7 +4,7 @@ ruby '~> 2.6'
 
 # gem for pdf export and its executable
 gem 'wicked_pdf', '~> 1.1.0'
-#gem 'wkhtmltopdf-binary', '~> 0.12.4'
+gem 'wkhtmltopdf-binary', '0.12.5'
 
 gem 'nokogiri', '~> 1.10.0'
 gem 'autoprefixer-rails', '~> 9.4.4'
@@ -291,7 +291,7 @@ group :development do
   gem 'foreman', '~> 0.85.0'
   gem 'bullet', '~> 5.9.0'
   gem 'listen', '>= 3.0.5', '< 3.2'
-  gem 'spring', '~> 2.0.0'
+  gem 'spring', '~> 2.1.0'
   gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'spring-commands-rspec', '~> 1.0.4'
   # gem "lol_dba"

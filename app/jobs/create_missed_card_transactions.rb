@@ -108,7 +108,7 @@ class CreateMissedCardTransactions
                 atm_pocket = user.user_pockets.atm_withdrawal_pockets.first
                 payment_request = PaymentRequest.(user, nil, UserPocket.name, :credit, :atm_withdrawal)
                 payment_request.add_payment_item(PaymentRequest::PaymentItem.(user, atm_pocket, ct.transaction_amount_value, reference_resource: ct))
-                op = AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
+                op = ::AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
                 if op.success?
                   # i.e. if successful, associate this transaction with the payment
                   payment = op.payments.first
@@ -116,7 +116,7 @@ class CreateMissedCardTransactions
                   payment.finly_transactions.update(associated_transaction: ct)
                   result << {"Ebix Reference ID": ebix_reference_id, "Success": "Yes", "Comments": "COH successfully added"}
                 else
-                  result << {"Ebix Reference ID": ebix_reference_id, "Success": "No", "Comments": "COH couldn't be added because: #{@result.messages[:error].to_sentence}"}
+                  result << {"Ebix Reference ID": ebix_reference_id, "Success": "No", "Comments": "COH couldn't be added because: #{op.messages[:error].to_sentence}"}
                 end
 
                 next
@@ -136,7 +136,7 @@ class CreateMissedCardTransactions
                 if @result.success?
                   result << {"Ebix Reference ID": ebix_reference_id, "Success": "Yes", "Comments": "Successfully created card expense for ATM fees"}
                 else
-                  result << {"Ebix Reference ID": ebix_reference_id, "Success": "No", "Comments": "Expense couldn't be created because: #{@result.messages[:error].to_sentence}"}
+                  result << {"Ebix Reference ID": ebix_reference_id, "Success": "No", "Comments": "Expense couldn't be created because: #{op.messages[:error].to_sentence}"}
                 end
                 next
               end
@@ -159,7 +159,7 @@ class CreateMissedCardTransactions
               if @result.success?
                 result << {"Ebix Reference ID": ebix_reference_id, "Success": "Yes", "Comments": "Successfully created card expense"}
               else
-                result << {"Ebix Reference ID": ebix_reference_id, "Success": "No", "Comments": "Expense couldn't be created because: #{@result.messages[:error].to_sentence}"}
+                result << {"Ebix Reference ID": ebix_reference_id, "Success": "No", "Comments": "Expense couldn't be created because: #{op.messages[:error].to_sentence}"}
               end
               next
             end
@@ -176,7 +176,7 @@ class CreateMissedCardTransactions
               atm_pocket = user.user_pockets.atm_withdrawal_pockets.first
               payment_request = PaymentRequest.(user, nil, UserPocket.name, :debit, :cash_on_hand_reversal)
               payment_request.add_payment_item(PaymentRequest::PaymentItem.(user, atm_pocket, ct.transaction_amount_value, reference_resource: ct))
-              op = AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
+              op = ::AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
 
               if op.success?
                 payment = op.payments.first
@@ -184,7 +184,7 @@ class CreateMissedCardTransactions
                 payment.finly_transactions.update(associated_transaction: ct)
                 result << {"Ebix Reference ID": ebix_reference_id, "Success": "Yes", "Comments": "Successfully deducted COH for reversal"}
               else
-                result << {"Ebix Reference ID": ebix_reference_id, "Success": "No", "Comments": "COH couldn't be reversed because: #{@result.messages[:error].to_sentence}"}
+                result << {"Ebix Reference ID": ebix_reference_id, "Success": "No", "Comments": "COH couldn't be reversed because: #{op.messages[:error].to_sentence}"}
               end
             end
             next
@@ -210,7 +210,7 @@ class CreateMissedCardTransactions
 
   private
 
-  def extract_transaction_params(data)
+  def self.extract_transaction_params(data)
 
     # if it's info about failed transactions, just skip this
     if data[0].present? && data[0].downcase == "failed"
