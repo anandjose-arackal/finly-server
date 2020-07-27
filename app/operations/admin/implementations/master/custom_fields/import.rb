@@ -108,7 +108,7 @@ class Admin::Implementations::Master::CustomFields::Import < Admin::Implementati
     unless custom_field.present?
       custom_field = FieldConfiguration.new (field_configuration_params)
       unless custom_field.save
-        result false, custom_fields.errors
+        result false, custom_field.errors
       else
         if custom_field.field_type_id == 5
           self.drop_down_items << {id: custom_field.id, field_name: custom_field.field_name}
