@@ -40,25 +40,35 @@ class Settlement::SReport::Unapproved < Reports::Base
       return
     end
 
-    ######## Cash on Hand Addition ###############
+    # perform the below COH addition only if there was a corresponding debit of the COH from this particular report
+    # What this does is ensure that only if a report had its COH deducted should we consider deducing COH
+    reference_payment = self.report.reference_payment
+    if reference_payment.present? && reference_payment.debit? && reference_payment.payment_purpose_id == PaymentPurpose.id_for(:settlement_against_advance)
 
-    user_pocket_ids = report.expenses.pluck(:spent_from_id).uniq
-    cash_pockets = report.user.user_pockets.cash_pockets_only.with_id(user_pocket_ids)
-    cash_pockets.each do |pocket|
-      deduction = self.report.expenses.with_spent_from_id(pocket.id).joins(:amount).sum(pocket.base_currency&.country_code)
-      if deduction.present? && deduction > 0
-        payment_request = PaymentRequest.(self.report.user, nil, "UserPocket", :credit, :advance_against_report_unapproval)
-        payment_request.add_payment_item(PaymentRequest::PaymentItem.(self.report.user, pocket, deduction))
-        op = AccountManager::Payments::PaymentProcessor.(self.report.user, payment_request: payment_request)
-        if op.success?
-          payment = op.payment_order.payments.first
-          # updating the reference payment of the report to the payment in question
-          self.report.update(reference_payment_id: payment.id)
-          payment.update(reference_resource_type: self.report.class.name)
-          # payment.update(reference_resource: self.report)
-        else
-          # add a condition here so that if this fails, we are notified or at least initimated in some way
+      ######## Cash on Hand Addition ###############
 
+      user_pocket_ids = report.expenses.pluck(:spent_from_id).uniq
+      cash_pockets = report.user.user_pockets.cash_pockets_only.with_id(user_pocket_ids)
+      cash_pockets.each do |pocket|
+        deduction = self.report.expenses.with_spent_from_id(pocket.id).joins(:amount).sum(pocket.base_currency&.country_code)
+        if deduction.present? && deduction > 0
+          payment_request = PaymentRequest.(self.report.user, nil, "UserPocket", :credit, :advance_against_report_unapproval)
+          payment_request.add_payment_item(PaymentRequest::PaymentItem.(self.report.user, pocket, deduction))
+          op = AccountManager::Payments::PaymentProcessor.(self.report.user, payment_request: payment_request)
+          if op.success?
+            payment = op.payment_order.payments.first
+            # updating the reference payment of the report to the payment in question
+            self.report.update(reference_payment_id: payment.id)
+            payment.update(reference_resource_type: self.report.class.name)
+            # payment.update(reference_resource: self.report)
+          else
+            # this will send an email to us telling us that COH deduction failed for this user
+            Event::EAlert::Create.(nil, {
+                title: 'COH addition on report unapproval failed',
+                description: "Addition to COH for unapproval of report ID: #{self.report.id} failed because: #{op.messages[:error]}",
+                subject: "Addition to COH for unapproval of report ID: #{self.report.id} failed because: #{op.messages[:error]}"
+            })
+          end
         end
       end
     end
