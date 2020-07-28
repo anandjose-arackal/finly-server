@@ -46,7 +46,7 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
     end
 
     self.initiating_account = retrieve_initiating_account
-    self.view_role = UserRole.id_for(params[:view].to_sym)
+    # self.view_role = UserRole.id_for(params[:view].to_sym)
   end
 
   def validate
