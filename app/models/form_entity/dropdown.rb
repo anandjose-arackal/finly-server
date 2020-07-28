@@ -4,7 +4,7 @@ class FormEntity::DropDown < FormEntity
 
   operators :eq_any, :not_eq_all, :not_null, :null
 
-  option :min_items
+  option :max_items
   option :min_items
 
   schema_validation do
