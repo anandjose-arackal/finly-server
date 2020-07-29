@@ -24,4 +24,14 @@ class Admin::Masters::Macros::Contracts::Macro < Reform::Form
     property :route, validates: {presence: true}
   end
 
+  validate :script_syntax_validation
+
+  def script_syntax_validation
+    begin
+      RubyVM::InstructionSequence.compile self.script
+    rescue Exception => e
+      errors.add(:script, e.message)
+    end
+  end
+
 end
