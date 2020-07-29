@@ -533,8 +533,7 @@ class User < ApplicationRecord
     end
     if inactive
       query += ' OR ' unless query.blank?
-      query += "`users`.`active` = 0 AND (NOT ((`users`.`first_name` = '' OR `users`.`first_name` IS NULL)))"
-      # query += "active = 0 AND (NOT ((first_name = '' OR first_name IS NULL))) AND (mobile_only_invite != 1)"
+      query += "`users`.`active` = 0 AND (NOT ((`users`.`first_name` = '' OR `users`.`first_name` IS NULL OR `users`.`default_password` = 1)))"
     end
     if query.present?
       where(query)
