@@ -2,15 +2,14 @@ module ErpSyncable
   extend ActiveSupport::Concern
 
   included do
-    scope :pending_erp_sync, -> (value) {
-      pending_ids = ErpSyncStatus.ids_for(:pending, :failed)
+
+    scope :with_erp_sync_status_pending, -> {
+      pending_ids = ErpSyncStatus.ids_for(:pending)
       pending_ids << nil
-      if value.to_s == '1'
-        where erp_sync_status_id: pending_ids
-      else
-        where.not erp_sync_status_id: pending_ids
-      end
+      where erp_sync_status_id: pending_ids
     }
+
+    # Define pending_erp_sync in the model
 
     belongs_to :erp_sync_status, optional: true
     has_many :erp_sync_attempts, as: :record

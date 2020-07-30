@@ -134,6 +134,13 @@ class PaymentStatus < ApplicationRecord
     ]
   end
 
+  def as_json(options = nil)
+    {
+        id: id,
+        name: name
+    }
+  end
+
 end
 
 

@@ -233,6 +233,11 @@ class YesBankVendor < ApplicationRecord
     where('yes_bank_vendors.approved_at >= ? && yes_bank_vendors.approved_at <= ?', from.beginning_of_day, to.end_of_day)
   }
 
+  scope :pending_erp_sync, -> (*args) {
+    with_erp_sync_status_pending.
+        where(status_id: VendorStatus.ids_for(%i(approved auto_approved)))
+  }
+
   # Scopes for ordering ends
 
   before_validation do
