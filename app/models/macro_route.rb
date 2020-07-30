@@ -3,7 +3,7 @@
 # Table name: macro_routes
 #
 #  id         :bigint           not null, primary key
-#  macro_id   :integer          not null
+#  macro_id   :integer
 #  route      :string(255)      not null
 #  deleted_at :datetime
 #  created_at :datetime         not null
