@@ -4308,9 +4308,16 @@ Rails.application.routes.draw do
   namespace :macros do
     namespace :v1 do
       get 'invoices/count', to: 'invoices#count'
-      resources :invoices, only: [:index, :show, :update]
-      resources :vendors, only: [:index, :show, :update]
       post 'invoices/new_sync_attempt', to: 'invoices#new_sync_attempt'
+      resources :invoices, only: [:index, :show, :update]
+
+      get 'vendors/count', to: 'vendors#count'
+      post 'vendors/new_sync_attempt', to: 'vendors#new_sync_attempt'
+      resources :vendors, only: [:index, :show, :update]
+
+      get 'payments/count', to: 'payments#count'
+      post 'payments/new_sync_attempt', to: 'payments#new_sync_attempt'
+      resources :payments, only: [:index, :show, :update]
     end
   end
 

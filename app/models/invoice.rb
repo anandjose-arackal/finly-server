@@ -586,6 +586,11 @@ class Invoice < ApplicationRecord
                                   InwardInvoiceStatus.id_for(:retracted)]
   }
 
+  scope :pending_erp_sync, -> (*args) {
+    with_erp_sync_status_pending.
+        where(invoice_status_id: InwardInvoiceStatus.ids_for(:unpaid, :partially_paid, :paid, :approved, :auto_approved, :closed))
+  }
+
   after_create :set_defaults
   after_save :budget_trail_entry
   # the below callback deals with cases where the PO advance has been paid, and then an invoice is being raised
