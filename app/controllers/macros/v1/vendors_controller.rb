@@ -5,6 +5,11 @@ class Macros::V1::VendorsController < BaseControllers::MacrosBase
     endpoint Resolver::Resolve
   end
 
+  def count
+    params[:route] = 'vendors.default'
+    endpoint Resolver::Resolve
+  end
+
   def show
     endpoint Masters::Vendors::Ops::Show
   end
