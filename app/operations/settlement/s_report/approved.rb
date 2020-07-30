@@ -101,8 +101,10 @@ class Settlement::SReport::Approved < Reports::Base
 
     unless report.save
       messages[:error] = report.errors.full_messages
+      return
     end
 
+    
     ########### Cash Pocket Deductions ###############
 
     user_pocket_ids = report.expenses.pluck(:spent_from_id).uniq
@@ -120,8 +122,12 @@ class Settlement::SReport::Approved < Reports::Base
           payment.update(reference_resource_type: self.report.class.name)
           # payment.update(reference_resource: self.report)
         else
-          # add a condition here so that if this fails, we are notified or at least initimated in some way
-
+          # this will send an email to us telling us that COH deduction failed for this user
+          Event::EAlert::Create.(nil, {
+              title: 'COH addition on report unapproval failed',
+              description: "Addition to COH for unapproval of report ID: #{self.report.id} failed because: #{op.messages[:error]}",
+              subject: "Addition to COH for unapproval of report ID: #{self.report.id} failed because: #{op.messages[:error]}"
+          })
         end
       end
     end
