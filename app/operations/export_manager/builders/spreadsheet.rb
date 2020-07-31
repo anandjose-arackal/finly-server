@@ -2,7 +2,7 @@ class ExportManager::Builders::Spreadsheet < ExportManager::API
   include DSL
   include MathUtil
 
-  attr_accessor :multiple_sheet
+  attr_accessor :multiple_sheet, :header
 
   type :spreadsheet
 
@@ -42,12 +42,12 @@ class ExportManager::Builders::Spreadsheet < ExportManager::API
   end
 
   def generate_spreadsheet
-    header = Header.new
+    self.header = Header.new
     self.class.attributes.each do |attr|
       next unless add_field?(attr)
       next if attr.dynamic
 
-      header.add attr.column_name
+      self.header.add attr.column_name
     end
 
     return unless export_job.total_records <= 0
@@ -55,10 +55,6 @@ class ExportManager::Builders::Spreadsheet < ExportManager::API
     file = Paperclip::Tempfile.new(file_name)
     workbook = ::WriteXLSX.new(file, strings_to_urls: false)
     worksheet = workbook.add_worksheet('Sheet 1')
-    header.list.each_with_index do |item, index|
-      worksheet.write(0, index, item)
-    end
-
     index = 1
     data.find_each do |record|
       update record: record
@@ -80,7 +76,9 @@ class ExportManager::Builders::Spreadsheet < ExportManager::API
       progress_update(index)
       index += 1
     end
-
+    self.header.list.each_with_index do |item, index|
+      worksheet.write(0, index, item)
+    end
     workbook.close
 
     file.rewind

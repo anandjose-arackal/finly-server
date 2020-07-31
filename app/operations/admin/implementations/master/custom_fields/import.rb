@@ -197,7 +197,7 @@ class Admin::Implementations::Master::CustomFields::Import < Admin::Implementati
   def set_drop_down_items
     sheet = input.sheet(1)
     drop_down_names = input.sheet(1).row(2)
-    (3..sheet.last_row).each do |i|
+    (2..sheet.last_row).each do |i|
       row = sheet.row(i)
       lower_limit = 0
       size= row.size
