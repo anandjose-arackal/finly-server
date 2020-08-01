@@ -50,10 +50,16 @@ class ExportManager::Master::PaymentTickets::Index < ExportManager::Builders::Sp
   def custom_fields(row, payment)
     payment&.invoice&.custom_fields&.includes(:field_configuration)&.each do |custom_field|
       row.add(custom_field.field_configuration.field_name, custom_field.string_value)
+      unless header.list.include?(custom_field.field_configuration.field_name)
+        self.header.add custom_field.field_configuration.field_name
+      end
     end
 
     payment&.purchase_order&.custom_fields&.includes(:field_configuration)&.each do |custom_field|
       row.add(custom_field.field_configuration.field_name, custom_field.string_value)
+      unless header.list.include?(custom_field.field_configuration.field_name)
+        self.header.add custom_field.field_configuration.field_name
+      end
     end
 
     # beneficiary_payment = BeneficiaryPayment.find_by(payment&.beneficiary_payment_id)
