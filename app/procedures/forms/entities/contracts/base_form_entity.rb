@@ -36,6 +36,7 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
   # property :config_path #todo
 
   property :current_user, virtual: true
+  property :options
 
   # property :type
 

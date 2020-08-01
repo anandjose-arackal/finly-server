@@ -70,4 +70,23 @@ class FormEntity::AutoNumber < FormEntity
       end
     end
   end
+
+  def self.option_validation
+    Proc.new do
+      validation :options_config do
+        params do
+          required(:config) do
+            hash do
+              required(:sequence) do
+                hash do
+                  required(:prefix).filled
+                  required(:start_at).filled
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+  end
 end

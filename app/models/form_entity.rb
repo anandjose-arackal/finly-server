@@ -125,8 +125,18 @@ class FormEntity < ApplicationRecord
   end
 
   # Class method `contract` is used in Form Builder
-  def self.contract()
+  def self.contract(model, current_user)
+    base_class = model.system_field ? Forms::Entities::Contracts::SystemFormEntity : Forms::Entities::Contracts::CustomFormEntity
 
+    option_validation_proc = self.respond_to?(:option_validation) ? self.option_validation : nil
+
+    dynamic_contract = Class.new(base_class) do
+
+      instance_exec &option_validation_proc if option_validation_proc.present? && option_validation_proc.class == Proc
+
+    end
+
+    dynamic_contract.new(model, current_user: current_user)
   end
 
   def computed=(data)

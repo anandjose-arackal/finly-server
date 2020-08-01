@@ -64,4 +64,18 @@ class FormEntity::Reference < FormEntity
       end
     end
   end
+
+  def self.option_validation
+    Proc.new do
+      validation :options_config do
+        params do
+          required(:options) do
+            hash do
+              required(:class_name).filled
+            end
+          end
+        end
+      end
+    end
+  end
 end

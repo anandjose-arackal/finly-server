@@ -56,4 +56,14 @@ class FormEntity::Lookup < FormEntity
 
   operators :eq_any#, :blank, :present
 
+  def self.option_validation
+    Proc.new do
+      validation :options_config do
+        params do
+
+        end
+      end
+    end
+  end
+
 end

@@ -85,9 +85,7 @@ class FormEntity::Text < FormEntity
 
   def self.option_validation
     Proc.new do
-      property :options
-
-      validation :options do
+      validation :options_config do
         params do
           required(:options) do
             hash do
