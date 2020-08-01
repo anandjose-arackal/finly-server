@@ -32,6 +32,14 @@ class PaymentStatus < ApplicationRecord
     VALUES[key]
   end
 
+  def self.ids_for(*keys)
+    ids = []
+    keys.each do |key|
+      ids << id_for(key)
+    end
+    keys
+  end
+
   def self.seed_data
     count == PaymentStatus.count
     VALUES.each do |key, value|

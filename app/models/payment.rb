@@ -491,6 +491,10 @@ class Payment < ApplicationRecord
              invoice: [:category, :cost_center, :invoice_status, :invoice_type],
              payment_order: [bank_payment_request: [:status]])
   }
+  scope :pending_erp_sync, -> (*args) {
+    with_erp_sync_status_pending.
+        where(payment_status_id: PaymentStatus.id_for(:completed))
+  }
 
   # validates :amount_id, presence: true
   validates :date, presence: true
