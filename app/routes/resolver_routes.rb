@@ -128,7 +128,7 @@ Resolver::Router.draw do
     route 'default', Docs::P2P::Invoices::Agreement::UpcomingInvoices::Resolver
   end
 
-  scope :expenses do
-    route 'default', Docs::ExpenseManagement::Expenses::Resolver
+  scope :reports do
+    route 'default', Docs::ExpenseManagement::Reports::Resolver
   end
 end

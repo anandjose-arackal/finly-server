@@ -50,7 +50,7 @@ class Report < ApplicationRecord
   include SoftDeletable,
           FieldCustomizer::CustomizableValidation,
           FindByOrderedIds, Transitionable
-
+  include ErpSyncable
 
   event_channel 'report'
 
@@ -367,6 +367,11 @@ class Report < ApplicationRecord
     status = permitted_status & status
     status = permitted_status if status.blank?
     where report_status_id: ReportStatus.ids_for(status)
+  }
+
+  scope :pending_erp_sync, -> (*args) {
+    with_erp_sync_status_pending
+        .where(report_status_id: ReportStatus.ids_for(:approved, :settled, :settlement_confirmed, :closed, :auto_approved))
   }
 
   delegate :status_name, to: :status

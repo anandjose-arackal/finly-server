@@ -5,11 +5,6 @@ json.extract! record, :id, :note, :merchant_name, :expense_type_id,
 json.created_at record.created_at
 json.updated_at record.updated_at
 
-json.user do
-  json.partial! 'macros/v1/users/user', record: record.user
-  json.bank_account record.user.default_bank_account
-end
-
 json.expense_type record.expense_type&.name
 json.usage_dates do
   json.type record.usage_date_type
@@ -143,24 +138,3 @@ json.tax_details do
   json.state_of_expense (gst_applicable ? record.state_of_expense&.name : '')
   json.tax_rate (gst_applicable ? record.tax_rate&.rate&.to_f : 0)
 end
-
-# report details
-json.report do
-  if record.report.present?
-    json.id record.report_id
-    json.approved_at record.report.approved_at
-    json.created_at record.report.created_at
-    json.note record.report.memo
-    json.bank_reference_number record.report.bank_reference_number
-    json.source_account record.report.source_account
-    json.submitted_at record.report.submitted_at
-    json.policy record.report.policy
-  end
-end
-
-
-json.erp_sync_status record.erp_sync_status&.name
-json.erp_sync_message record.erp_sync_message
-json.erp_sync_reference_id record.erp_sync_reference_id
-json.erp_sync_attempts_count record.erp_sync_attempts_count
-json.erp_sync_attempted_at record.erp_sync_attempted_at

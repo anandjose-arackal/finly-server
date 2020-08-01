@@ -52,7 +52,6 @@ class Expense < ApplicationRecord
   include SoftDeletable,
           FieldCustomizer::CustomizableValidation,
           MathUtil
-  include ErpSyncable
 
   event_channel 'expense'
 
@@ -526,11 +525,6 @@ class Expense < ApplicationRecord
           :payment, :system_messages, :duplicate_expenses
       ]
   ) }
-
-  scope :pending_erp_sync, -> (*args) {
-    joins(:report).with_erp_sync_status_pending
-        .where(reports: {report_status_id: ReportStatus.ids_for(:approved, :settled, :settlement_confirmed, :closed, :auto_approved)})
-  }
 
   # scope :category_budget_expenses, -> {
   #   where('expenses.category_id = ?')
