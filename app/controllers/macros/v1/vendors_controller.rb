@@ -23,7 +23,7 @@ class Macros::V1::VendorsController < BaseControllers::MacrosBase
     endpoint Macros::ErpSyncs::Create, args: [
         params: params.to_unsafe_h,
         current_user: current_user,
-        record_class: Invoice
+        record_class: YesBankVendor
     ]
   end
 
