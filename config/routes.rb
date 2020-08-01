@@ -4318,6 +4318,10 @@ Rails.application.routes.draw do
       get 'payments/count', to: 'payments#count'
       post 'payments/new_sync_attempt', to: 'payments#new_sync_attempt'
       resources :payments, only: [:index, :show, :update]
+
+      get 'users/count', to: 'users#count'
+      post 'users/new_sync_attempt', to: 'users#new_sync_attempt'
+      resources :users, only: [:index, :show, :update]
     end
   end
 
