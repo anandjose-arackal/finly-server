@@ -20,10 +20,11 @@ class Rules::Adapters::Store
       rule
     else
       attribute = data&.dig('a')
+      attribute = attribute.first if attribute.is_a?(Array)
       predicate = data&.dig('p')
       values = data&.dig('v')
       meta = data&.dig('m')
-      Rules::Operator.new(attribute[:entity]).send(predicate, *values).with_meta(meta)
+      Rules::Operator.new(attribute[:name]).send(predicate, *values).with_meta(meta)
     end
   end
 
@@ -39,7 +40,7 @@ class Rules::Adapters::Store
       json[:c] += rule.values.map {|val| val.as_json(mode: 'store')}
     else
       json[:p] = rule.operator
-      json[:a] = rule.attribute.as_json(mode: 'store')
+      json[:a] = [rule.attribute.as_json(mode: 'store')]
       json[:v] = rule.values.map {|val| val.as_json(mode: 'store')}
       json[:m] = rule.meta
     end
