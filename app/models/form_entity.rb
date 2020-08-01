@@ -98,8 +98,8 @@ class FormEntity < ApplicationRecord
   serialize :compute_formula, JSON
 
   scope :root, -> { where parent_id: nil }
-  scope :system_fields, -> { where.not custom_field: true }
-  scope :custom_fields, -> { where custom_field: true }
+  scope :system_fields, -> { where system_field: true }
+  scope :custom_fields, -> { where.not system_field: true }
   scope :exclude_internal, -> { where.not internal: true }
   scope :computed, -> { where compute_enabled: true }
   scope :with_compute_type, -> (compute_type_id) { where compute_type_id: compute_type_id }
@@ -122,6 +122,11 @@ class FormEntity < ApplicationRecord
 
   def contract(contract, user)
     Forms::Contracts::Builders::FormEntity.({params: {entity: self, contract: contract}, current_user: user})
+  end
+
+  # Class method `contract` is used in Form Builder
+  def self.contract()
+
   end
 
   def computed=(data)
@@ -158,7 +163,65 @@ class FormEntity < ApplicationRecord
 
   def as_json(opts = {})
     return form_reference_json(opts) if opts&.dig(:json_format)&.to_s == 'form_reference'
+    return form_builder_json(opts) if opts&.dig(:json_format)&.to_s == 'form_builder'
     form_json(opts)
+  end
+
+  def form_builder_json(opts = {})
+    params = opts[:params] || {}
+    data = {
+        id: id,
+        uuid: uuid,
+        company_id: company_id,
+        form_id: form_id,
+        form_section_id: form_section_id,
+        created_by_user_id: created_by_user_id,
+        entity_key: entity_key,
+        label: label,
+        placeholder: placeholder,
+        hint: hint,
+        entity_type: entity_type,
+        default_value: default_value,
+        behaviour: {
+            editable: editable,
+            required: required,
+            active: active,
+            visible: visible,
+        },
+        unique: unique,
+        position: position,
+        custom_field: !system_field,
+        can_visible_be_changed: can_visible_be_changed,
+        can_editable_be_changed: can_editable_be_changed,
+        can_required_be_changed: can_required_be_changed,
+        can_uniqueness_be_changed: can_uniqueness_be_changed,
+        can_be_disabled: can_be_disabled,
+        can_label_be_renamed: can_label_be_renamed,
+        can_choices_be_changed: can_choices_be_changed,
+        allow_clearing_default_value: allow_clearing_default_value,
+        options: options,
+        deleted_at: deleted_at,
+        created_at: created_at,
+        updated_at: updated_at,
+        choices_scope: choices_scope,
+        internal: internal,
+        is_modified: is_modified,
+        entity_path: entity_path,
+        parent_id: parent_id,
+        populate_if_empty: populate_if_empty,
+        type: type,
+        config: config,
+        associate_custom_fields: associate_custom_fields,
+        compute_enabled: compute_enabled,
+        compute_type_id: compute_type_id,
+        compute_formula: compute_formula,
+        compute_lookup_entity_id: compute_lookup_entity_id,
+        filters: filters,
+        config_path: config_path,
+        validations: validations.as_json(options),
+        conditions: conditions.as_json(options),
+        choices: choices_scope.present? ? choices_scope.build(params: params, user: opts[:current_user]) : nil
+    }
   end
 
   def form_reference_json(opts = {})
@@ -255,4 +318,17 @@ class FormEntity < ApplicationRecord
     nil
   end
 
+
+  def meta_attributes
+    [
+        {:can_visible_be_changed => :visible},
+        {:can_editable_be_changed => :editable},
+        {:can_required_be_changed => :required},
+        {:can_uniqueness_be_changed => :unique},
+        {:can_be_disabled => :active},
+        {:can_label_be_renamed => :label},
+        {:can_choices_be_changed => :choices},
+        {:allow_clearing_default_value => :default_value}
+    ]
+  end
 end

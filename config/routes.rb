@@ -4176,19 +4176,17 @@ Rails.application.routes.draw do
     end
   end
 
-
   # get 'form_entities', to: 'form_entities#index'
   # resources :form_entities
   get 'forms', to: 'forms#index'
   get 'forms/entities/:entity_id', to: 'forms#entity_config'
   get 'forms/:route/config', to: 'forms#form_config'
 
-
-
   get 'forms/:route/dependencies', to: 'forms#form_dependencies'
   post 'forms/choices', to: 'forms#form_entity_choices'
   post 'forms/lookup_details', to: 'forms#form_lookup_details'
   resources :forms
+
   resources :form_entities
 
   resources :insights

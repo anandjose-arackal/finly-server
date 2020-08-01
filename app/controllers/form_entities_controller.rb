@@ -1,7 +1,4 @@
 class FormEntitiesController < BaseControllers::WebBase
-
-
-
   def show
     endpoint Forms::Entities::Ops::Show
   end
@@ -11,7 +8,15 @@ class FormEntitiesController < BaseControllers::WebBase
   end
 
   def create
-    endpoint Forms::Entities::Ops::Create
+    @op = Forms::Entities::Ops::Create.(params: params.to_unsafe_h, current_user: current_user)
+    if @op.success?
+      render :show
+    end
+  end
+
+  def update
+    endpoint Forms::Entities::Ops::Update
+    render :show
   end
 
   def update_entity

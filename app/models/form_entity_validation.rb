@@ -35,7 +35,7 @@ class FormEntityValidation < ApplicationRecord
   delegate :entity_path, to: :form_entity
 
   def self.system_validation(params = {}, &block)
-    params[:custom] = false
+    params[:system_validation] = false
     params[:internal] ||= false
     params[:is_updated] = false
     params[:can_be_updated] ||= false

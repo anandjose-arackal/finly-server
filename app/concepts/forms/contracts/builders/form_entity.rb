@@ -121,7 +121,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
 
   def properties(entity)
     properties = {}
-    properties[:virtual] = true if entity.custom_field
+    properties[:virtual] = true unless entity.system_field
     properties[:populate_if_empty] = entity.populate_if_empty if entity.populate_if_empty.present?
     properties[:deserializer] = deserializer(entity) unless entity.class.layout?
     populator = entity.populator
