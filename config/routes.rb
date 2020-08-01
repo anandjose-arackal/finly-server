@@ -4322,6 +4322,10 @@ Rails.application.routes.draw do
       get 'users/count', to: 'users#count'
       post 'users/new_sync_attempt', to: 'users#new_sync_attempt'
       resources :users, only: [:index, :show, :update]
+
+      get 'expenses/count', to: 'expenses#count'
+      post 'expenses/new_sync_attempt', to: 'expenses#new_sync_attempt'
+      resources :expenses, only: [:index, :show, :update]
     end
   end
 

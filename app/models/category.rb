@@ -134,8 +134,8 @@ class Category < ApplicationRecord
     {
         id: id,
         name: name,
-        gl_code: gl_code
-
+        gl_code: gl_code,
+        gst_applicable: gst_applicable
     }
   end
 

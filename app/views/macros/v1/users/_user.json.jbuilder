@@ -8,4 +8,3 @@ json.date_of_birth profile&.date_of_birth
 json.gender profile&.gender
 json.address "#{profile&.address_1},#{profile&.address_2}"
 json.city profile&.city
-json.bank_account record.default_bank_account
