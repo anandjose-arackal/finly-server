@@ -127,4 +127,8 @@ Resolver::Router.draw do
   scope :upcoming_invoices do
     route 'default', Docs::P2P::Invoices::Agreement::UpcomingInvoices::Resolver
   end
+
+  scope :expenses do
+    route 'default', Docs::ExpenseManagement::Expenses::Resolver
+  end
 end
