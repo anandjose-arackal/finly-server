@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_30_085001) do
+ActiveRecord::Schema.define(version: 2020_08_01_043412) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -9144,6 +9144,11 @@ ActiveRecord::Schema.define(version: 2020_07_30_085001) do
     t.string "finly_id", limit: 36
     t.datetime "deleted_at"
     t.boolean "pending_activation", default: false
+    t.integer "erp_sync_status_id"
+    t.string "erp_sync_message"
+    t.string "erp_sync_reference_id"
+    t.integer "erp_sync_attempts_count", default: 0
+    t.datetime "erp_sync_attempted_at"
     t.index ["company_id"], name: "index_users_on_company_id"
     t.index ["email"], name: "index_users_on_email"
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
