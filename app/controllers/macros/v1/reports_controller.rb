@@ -1,12 +1,12 @@
-class Macros::V1::ExpensesController  < BaseControllers::MacrosBase
+class Macros::V1::ReportsController < BaseControllers::MacrosBase
 
   def index
-    params[:route] = 'expenses.default'
+    params[:route] = 'reports.default'
     endpoint Resolver::Resolve
   end
 
   def count
-    params[:route] = 'expenses.default'
+    params[:route] = 'reports.default'
     endpoint Resolver::Resolve
   end
 
@@ -24,7 +24,7 @@ class Macros::V1::ExpensesController  < BaseControllers::MacrosBase
     endpoint Macros::ErpSyncs::Create, args: [
         params: params.to_unsafe_h,
         current_user: current_user,
-        record_class: Expense
+        record_class: Report
     ]
   end
 
