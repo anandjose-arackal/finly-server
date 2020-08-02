@@ -12,7 +12,7 @@ gem 'autoprefixer-rails', '~> 9.4.4'
 gem 'fiscali', '~> 2.4'
 
 gem 'parslet', '~> 1.8.2'
-gem 'rack', github: 'rack/rack', :ref => 'f690bb71425aa31d7b9b3113829af773950d8ab5'
+gem 'rack', git: 'https://github.com/rack/rack', :ref => 'f690bb71425aa31d7b9b3113829af773950d8ab5'
 gem 'rufus-scheduler', '~> 3.6'
 # gem 'clockwork', '~> 2.0'
 gem 'cronex', '~> 0.10'
@@ -67,7 +67,7 @@ gem 'resque', '~> 2.0.0'
 gem 'ransack', '~> 2.3'
 gem 'crono', '~> 1.1.2'
 # gem 'haml', '~> 5.0.4'
-gem 'sinatra', '~> 2.1.0', require: nil, github: 'sinatra/sinatra', branch: 'master'
+gem 'sinatra', '~> 2.1.0', require: nil, git: 'https://github.com/sinatra/sinatra', branch: 'master'
 gem 'gyoku', '~> 1.3'
 gem 'request_store', '~> 1.4.1'
 gem 'simpleconfig', '~> 2.0.1'
@@ -239,6 +239,9 @@ gem 'fuzzy-string-match', '1.0.1'
 
 # gem that schedules cron jobs for us
 gem 'whenever'
+gem 'json_logic', '~> 0.4'
+gem 'kalc'
+gem 'wit', '~> 6.0'
 
 # gem for all azure services
 gem 'azure'
@@ -246,8 +249,8 @@ gem 'azure-storage-blob'
 
 group :development, :test do
   gem 'byebug'
-  gem 'pry', '~> 0.12.2'  
-  gem 'rb-readline', '~> 0.5'
+  gem 'pry', '~> 0.13'
+  # gem 'rb-readline', '~> 0.5'
   gem 'capistrano', '~> 3.11.0'
   gem 'capistrano3-puma', '~> 4.0'
   gem 'capistrano-rails', '~> 1.4.0', require: false

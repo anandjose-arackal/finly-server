@@ -7,9 +7,9 @@ class Transactions::Contracts::PreProcessors::SkipDestroy < Transactions::Contra
 
     name = self.name
     if model_klass and not StringUtils.to_bool(options[:skip_destroy])
-      options[:populator] = -> (model: nil, collection:, fragment:, index: nil, options:, **) do
+      options[:populator] = -> (model: nil, collection:, fragment: nil, index: nil, options:, **) do
         if collection && collection.respond_to?(:find)
-          item = collection.find {|item| [fragment["id"], fragment["uuid"]].compact.map(&:to_s).include?(item.id.to_s)}
+          item = collection.find {|item| [fragment["id"], fragment[:id], fragment["uuid"], fragment[:uuid]].compact.map(&:to_s).include?(item.id.to_s)}
 
           if fragment["_destroy"]
             collection.destroy(item) if item

@@ -9,4 +9,8 @@ class Forms::Router < Routers::Base
     forms
   end
 
+  def self.klass(route)
+    Forms::Router.map[route]&.first&.klass
+  end
+
 end

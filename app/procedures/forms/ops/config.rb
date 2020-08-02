@@ -2,7 +2,7 @@ class Forms::Ops::Config < Transactions::API
 
   schema do
     params do
-      required(:name).value(inclusion?: Forms::Router.forms.map {|form| form.model.to_s.underscore})
+      required(:route).value(included_in?: Forms::Router.map.keys)
     end
   end
 
@@ -11,7 +11,7 @@ class Forms::Ops::Config < Transactions::API
   step Policy::Pundit(Forms::Policy, :config?)
 
   def find_model(context, params:, current_user:, **)
-    context[:model] = Form.find_by(model: params[:name], company_id: current_user.company_id)
+    context[:model] = Form.where.not(klass_name: nil).find_by(klass_name: Forms::Router.klass(params[:route])&.name, company_id: current_user.company_id)
   end
 
   def validate_model(context, model:, **)

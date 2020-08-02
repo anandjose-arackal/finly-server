@@ -2989,7 +2989,8 @@ Rails.application.routes.draw do
   post 'virtual_accounts', to: 'api/fc/invoices/virtual_bank_accounts#create'
   patch 'virtual_accounts/:account_number', to: 'api/fc/invoices/virtual_bank_accounts#update'
   delete 'virtual_accounts/:account_number', to: 'api/fc/invoices/virtual_bank_accounts#deactivate'
-  post 'invoices', to: 'api/fc/invoices/outward_invoices#create_valid'
+  # Deprecated in leu of the new invoices APIs
+  # post 'invoices', to: 'api/fc/invoices/outward_invoices#create_valid'
   post 'invoices/customers', to: 'api/fc/invoices/customers#create'
   patch 'invoices/customers/:id', to: 'api/fc/invoices/customers#update'
   get 'invoices/customers/:id', to: 'api/fc/invoices/customers#show'
@@ -3428,7 +3429,9 @@ Rails.application.routes.draw do
 
   get 'autocomplete/customers', to: 'invoicing/autocomplete#customer'
   get 'autocomplete/vendors', to: 'autocomplete#vendors'
-  get 'autocomplete/:entity', to: 'autocomplete#route'
+  # get 'autocomplete/:entity', to: 'autocomplete#route' # Fixme Deprecated
+
+  get 'lookup/:route', to: 'lookup#route'
 
   # get 'features', to: 'static_pages#features'
 
@@ -4207,9 +4210,10 @@ Rails.application.routes.draw do
 
   # get 'form_entities', to: 'form_entities#index'
   # resources :form_entities
-  get 'forms/config/:name', to: 'forms#form_config'
-  get 'forms/config/:name/dependency', to: 'forms#form_dependency_config'
-  post 'forms/:form_name/entities/:entity_field_key/choices', to: 'forms#form_entity_choices'
+  get 'forms/:route/config', to: 'forms#form_config'
+  get 'forms/:route/dependencies', to: 'forms#form_dependencies'
+  post 'forms/choices', to: 'forms#form_entity_choices'
+  post 'forms/lookup_details', to: 'forms#form_lookup_details'
   resources :forms
 
   resources :insights
@@ -4331,6 +4335,10 @@ Rails.application.routes.draw do
 
 
   get 'lookup/:route', to: 'lookup#route'
+
+
+
+  resources :invoices, only: [:create, :update, :show]
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

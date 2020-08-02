@@ -27,9 +27,6 @@ class Trip < ApplicationRecord
   include SoftDeletable
   include UUIDHelper
   include Sequenced::ActsAsSequenced
-  include Forms::Reform::ModelHelper
-
-  owner_scope :created_by
 
   belongs_to :company
   belongs_to :created_by, class_name: 'User'

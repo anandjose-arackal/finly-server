@@ -18,7 +18,7 @@ class Rules::Operator
       end
       Rules::Rule.new(
           predicate,
-          attribute: {entity: entity_path},
+          attribute: {name: entity_path},
           value: values
       )
     end
