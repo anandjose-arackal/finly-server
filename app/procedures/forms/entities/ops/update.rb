@@ -4,7 +4,7 @@ class Forms::Entities::Ops::Update < Transactions::API
     params do
       required(:form_entity) do
         hash do
-          required(:type).filled
+          required(:entity_type).filled
         end
       end
     end
@@ -25,7 +25,7 @@ class Forms::Entities::Ops::Update < Transactions::API
   fail :check_failure
 
   # Helper methods
-  def check(ctx, options)
+  def check_success(ctx, options)
     true
   end
   def check_failure(ctx, options)

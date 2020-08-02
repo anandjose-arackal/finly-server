@@ -213,7 +213,6 @@ class FormEntity < ApplicationRecord
         deleted_at: deleted_at,
         created_at: created_at,
         updated_at: updated_at,
-        choices_scope: choices_scope,
         internal: internal,
         is_modified: is_modified,
         entity_path: entity_path,

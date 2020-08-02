@@ -4,9 +4,11 @@ class Forms::Entities::Contracts::CustomFormEntity < Forms::Entities::Contracts:
   property :form_id, deserializer: -> (input, represented, *args) {represented.form_id = input[:form_id] if represented.model.form_id.blank?}
   property :form_section_id
   property :entity_type, deserializer: -> (input, represented, *args) {represented.entity_type = input[:entity_type] if represented.model.entity_type.blank?}
-  property :system_field # true if nil  #todo migration to rename field to system_field  #todo -search and destroy
+  property :system_field, deserializer: -> (input, represented, *args) {represented.system_field = false}
   property :company_id, deserializer: -> (input, represented, *args) {represented.company_id = represented.current_user.company_id}
 
+
+  property :created_by_user_id, deserializer: -> (input, represented, *args) {represented.created_by_user_id = represented.contract_root.current_user.id}
   property  :can_visible_be_changed, deserializer: -> (input, represented, *args) {represented.can_visible_be_changed = true}
   property  :can_editable_be_changed, deserializer: -> (input, represented, *args) {represented.can_editable_be_changed = true}
   property  :can_required_be_changed, deserializer: -> (input, represented, *args) {represented.can_required_be_changed = true}

@@ -4,7 +4,7 @@ class Forms::Entities::Ops::Create < Transactions::API
     params do
       required(:form_entity) do
         hash do
-          required(:type).filled
+          required(:entity_type).filled
         end
       end
     end
@@ -13,7 +13,7 @@ class Forms::Entities::Ops::Create < Transactions::API
   step :retrieve_model
 
   def retrieve_model(options, params:, **)
-    options[:model] = Forms::Entity::Registry.types[params[:form_entity][:type]].new
+    options[:model] = Forms::Entity::Registry.types[params[:form_entity][:entity_type]].new
     true
   end
 

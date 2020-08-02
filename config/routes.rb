@@ -4187,7 +4187,12 @@ Rails.application.routes.draw do
   post 'forms/lookup_details', to: 'forms#form_lookup_details'
   resources :forms
 
+  get 'form_entities/entity_types', to: "form_entities#entity_types"
   resources :form_entities
+
+  patch 'form_choice_dependencies/:id/enable', to: 'form_choice_dependencies#enable'
+  patch 'form_choice_dependencies/:id/disable', to: 'form_choice_dependencies#disable'
+  resources :form_choice_dependencies
 
   resources :insights
 

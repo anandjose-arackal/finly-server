@@ -8,28 +8,23 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
   property :entity_key # Cannot be changed
   property :label
   property :placeholder
+
+
   property :hint, deserializer: -> (input, represented, *args){ represented.hint = "Enter Value" if input[:hint].blank? }
   property :position
 
-  property :behaviour, virtual: true
+  property :behavior, virtual: true
 
-  property :editable, deserializer: -> (input, represented, *args){ represented.editable = input[:behavior][:editable] if represented.model.can_editable_be_changed }
-  property :required, deserializer: -> (input, represented, *args){ represented.required = input[:behaviour][:required] if represented.model.can_required_be_changed }
-  property :active, deserializer: -> (input, represented, *args){ represented.active = input[:behaviour][:active] if represented.model.can_be_disabled }
-  property :visible, deserializer: -> (input, represented, *args){ represented.visible = input[:behaviour][:visible] if represented.model.can_visible_be_changed }
-  property :unique, deserializer: -> (input, represented, *args){ represented.unique = input[:unique] if represented.model.can_uniqueness_be_changed }
-  property :default_value, deserializer: -> (input, represented, *args) { represented.default_value = input[:default_value] if (input[:default_value].present? || (input[:default_value].nil? and represented.model.allow_clearing_default_value))}
+  # property :editable, deserializer: -> (input, represented, *args){ debugger }
+  property :editable, deserializer: -> (input, represented, *args){ represented.editable = input[:behavior][:editable] if (represented.model.persisted? and represented.model.can_editable_be_changed) or true }
+  property :required, deserializer: -> (input, represented, *args){ represented.required = input[:behavior][:required] if (represented.model.persisted? and represented.model.can_required_be_changed) or true }
+  property :active, deserializer: -> (input, represented, *args){ represented.active = input[:behavior][:active] if (represented.model.persisted? and represented.model.can_be_disabled) or true }
+  property :visible, deserializer: -> (input, represented, *args){ represented.visible = input[:behavior][:visible] if (represented.model.persisted? and represented.model.can_visible_be_changed) or true }
+  property :unique, deserializer: -> (input, represented, *args){ represented.unique = input[:unique] if (represented.model.persisted? and represented.model.can_uniqueness_be_changed) or true }
+  property :default_value, deserializer: -> (input, represented, *args) { represented.default_value = input[:default_value] if (input[:default_value].present? || (input[:default_value].nil? and ((represented.model.persisted? and represented.model.allow_clearing_default_value) or true)))}
   # property :system_field
   # property :company_id, deserializer: -> (input, represented, *args) {represented.company_id = represented.current_user.company_id}
 
-  # property  :can_visible_be_changed, default: true
-  # property  :can_editable_be_changed, default: true
-  # property  :can_required_be_changed, default: true
-  # property  :can_uniqueness_be_changed, default: true
-  # property  :can_be_disabled, default: true
-  # property  :can_label_be_renamed, default: true
-  # property  :can_choices_be_changed, default: true
-  # property  :allow_clearing_default_value, default: true
 
   # property :entity_path #todo populate it - model level
   # property :parent_id # Cannot be changed
@@ -46,7 +41,6 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
     # property :company_id, deserializer: -> (input, represented, *args) {represented.company_id = represented.contract_root.current_user.company_id}
     # property :form_id, deserializer: -> (input, represented, *args) {represented.form_id = represented.contract_root.form_id}
     property :error_message
-    # property :created_by_id, deserializer: -> (input, represented, *args) {represented.created_by_id = represented.contract_root.current_user.id}
     property :updated_by_id, deserializer: -> (input, represented, *args) {represented.updated_by_id = represented.contract_root.current_user.id}
     # property :validation_id  # ignored in case of custom fields
     property :custom # doubt # todo - replace with system validation
@@ -85,8 +79,13 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
 
   validation do
     params do
-      required(:placeholder).filled
+      optional(:placeholder)
+      required(:entity_key).filled
+      required(:label).filled
+      required(:position).filled
     end
+
+    rule(:position)
   end
 
   # Computation

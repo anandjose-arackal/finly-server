@@ -34,7 +34,24 @@ class FormChoiceDependency < ApplicationRecord
   has_many :mappings, class_name: 'FormChoiceDependencyMapping', foreign_key: :dependency_id
 
   def as_json(options = {})
-    data = {}
+    data = {
+        id: id,
+        uuid: uuid,
+        form_id: form_id,
+        dependent_entity_id: dependent_entity_id,
+        controlling_entity_id: controlling_entity_id,
+        dependency_id: dependency_id,
+        custom: custom,
+        is_updated: is_updated,
+        can_be_updated: can_be_updated,
+        created_by_id: created_by_id,
+        updated_by_id: updated_by_id,
+        deleted_at: deleted_at,
+        created_at: created_at,
+        updated_at: updated_at,
+        internal: internal,
+        mappings: mappings.as_json(options)
+    }
 
   end
 
