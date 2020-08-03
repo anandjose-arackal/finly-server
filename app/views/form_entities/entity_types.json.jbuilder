@@ -1,6 +1,9 @@
 types = @op['model.types']
 
-json.array! types do |type|
-  json.name type.first
-  json.options type.second.options
+json.result do
+
+  json.array! types do |type|
+    json.name type.first
+    json.options type.second.options
+  end
 end
