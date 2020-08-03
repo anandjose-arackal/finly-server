@@ -83,6 +83,14 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
       required(:entity_key).filled
       required(:label).filled
       required(:position).filled
+      required(:behavior).filled do
+        hash do
+          required(:editable).filled
+          required(:visible).filled
+          required(:active).filled
+          required(:required).filled
+        end
+      end
     end
 
     rule(:position)
