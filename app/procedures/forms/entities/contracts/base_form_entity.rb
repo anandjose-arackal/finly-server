@@ -5,6 +5,26 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
   feature Reform::Form::Dry # override the default activemodel validation
   # property :form_id # Cannot be changed
   # property :form_section_id # Cannot be changed
+
+
+  validation do
+    params do
+      optional(:placeholder)
+      required(:entity_key).filled
+      required(:label).filled
+      required(:position).filled
+      required(:behavior).filled do
+        hash do
+          required(:editable).filled
+          required(:visible).filled
+          required(:active).filled
+          required(:required).filled
+        end
+      end
+    end
+  end
+
+
   property :entity_key # Cannot be changed
   property :label
   property :placeholder
@@ -77,24 +97,7 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
     end
   end
 
-  validation do
-    params do
-      optional(:placeholder)
-      required(:entity_key).filled
-      required(:label).filled
-      required(:position).filled
-      required(:behavior).filled do
-        hash do
-          required(:editable).filled
-          required(:visible).filled
-          required(:active).filled
-          required(:required).filled
-        end
-      end
-    end
 
-    rule(:position)
-  end
 
   # Computation
 
