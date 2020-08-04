@@ -91,4 +91,20 @@ class FormEntity::Attachment < FormEntity
     end
   end
 
+  def self.option_validation
+    Proc.new do
+      validation :options_config do
+        params do
+          required(:options) do
+            hash do
+              required(:maximum).value(:int?, lteq?: 255)
+              required(:minimum).value(:int?, gteq?: 0)
+              optional(:format).each(included_in?: FORMAT)
+            end
+          end
+        end
+      end
+    end
+  end
+
 end

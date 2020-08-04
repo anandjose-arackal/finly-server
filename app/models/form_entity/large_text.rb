@@ -68,4 +68,19 @@ class FormEntity::LargeText < FormEntity
       end
     end
   end
+
+  def self.option_validation
+    Proc.new do
+      validation :options_config do
+        params do
+          required(:options) do
+            hash do
+              required(:maximum).value(:int?, lteq?: 65535)
+              required(:minimum).value(:int?, gteq?: 0)
+            end
+          end
+        end
+      end
+    end
+  end
 end

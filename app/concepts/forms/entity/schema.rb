@@ -16,7 +16,7 @@ module Forms::Entity::Schema
       active: true,
       unique: false,
       visible: true,
-      custom_field: false,
+      system_field: true,
       internal: false,
       is_modified: false,
       can_visible_be_changed: false,
@@ -136,7 +136,7 @@ module Forms::Entity::Schema
           optional(:unique).filled(:bool?)
           optional(:visible).filled(:bool?)
           optional(:position).filled(:int?)
-          optional(:custom_field).filled(:bool?)
+          optional(:system_field).filled(:bool?)
           optional(:can_visible_be_changed).filled(:bool?)
           optional(:can_editable_be_changed).filled(:bool?)
           optional(:can_required_be_changed).filled(:bool?)

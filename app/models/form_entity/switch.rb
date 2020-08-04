@@ -59,4 +59,14 @@ class FormEntity::Switch < FormEntity
   #   super(section, entity_key, parent_path, opts.merge(choices_scope: Choices[:switch].()), &block)
   # end
 
+  def self.option_validation
+    Proc.new do
+      validation :options_config do
+        params do
+
+        end
+      end
+    end
+  end
+
 end

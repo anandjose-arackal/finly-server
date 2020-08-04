@@ -1,9 +1,19 @@
 class FormsController < BaseControllers::WebBase
 
+  # Form Renderer
+  # def show
+  #   endpoint Forms::Ops::Show do |m|
+  #     m.success { |op| render json: op['model'], status: 200 }
+  #   end
+  # end
+
+  # Used in form builder
   def show
-    endpoint Forms::Ops::Show do |m|
-      m.success { |op| render json: op['model'], status: 200 }
-    end
+    endpoint Forms::Ops::Show
+  end
+
+  def index
+    endpoint Forms::Ops::Index
   end
 
   def form_config
@@ -27,5 +37,7 @@ class FormsController < BaseControllers::WebBase
       m.success { |result| render json: {data: result[:data]}, status: 200 }
     end
   end
+
+
 
 end

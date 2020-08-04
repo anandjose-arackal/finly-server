@@ -13,10 +13,12 @@ class Forms::Ops::Create < Transactions::API
   step Contract::Validate()
   step Contract::Persist()
 
-  def set_custom_field(options, params:, **)
-    params[:custom_field] = true
-    true
-  end
+
+  # Remvoed it after renaming custom_field to system_field
+  # def set_custom_field(options, params:, **)
+  #   params[:custom_field] = true
+  #   true
+  # end
 
   def build_contract(options, params:, model:, **)
     field_type = params['field_type']

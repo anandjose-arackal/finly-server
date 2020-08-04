@@ -67,4 +67,19 @@ class FormEntity::Amount < FormEntity
     end
   end
 
+  def self.option_validation
+    Proc.new do
+      validation :options_config do
+        params do
+          required(:options) do
+            hash do
+              optional(:min_value).value(:int?)
+              optional(:max_value).value(:int?)
+            end
+          end
+        end
+      end
+    end
+  end
+
 end

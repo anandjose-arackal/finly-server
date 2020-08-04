@@ -57,9 +57,9 @@ class Masters::Vendors::Form < Forms::API
     rule Rules::Builder['locations.name'].not_cont(value: "Hello")
   end
 
-  # choice_dependency dependency_id: :policy_dependency do
-  #   reference controller: :policy_id, dependent: :department_id
-  #   dependency "Company (Default)", ["test1"]
-  # end
+  choice_dependency dependency_id: :policy_dependency do
+    reference controller: :policy_id, dependent: :department_id
+    dependency "Company (Default)", ["test1"]
+  end
 
 end

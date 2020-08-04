@@ -4207,14 +4207,23 @@ Rails.application.routes.draw do
     end
   end
 
-
   # get 'form_entities', to: 'form_entities#index'
   # resources :form_entities
+  get 'forms', to: 'forms#index'
+  get 'forms/entities/:entity_id', to: 'forms#entity_config'
   get 'forms/:route/config', to: 'forms#form_config'
+
   get 'forms/:route/dependencies', to: 'forms#form_dependencies'
   post 'forms/choices', to: 'forms#form_entity_choices'
   post 'forms/lookup_details', to: 'forms#form_lookup_details'
   resources :forms
+
+  get 'form_entities/entity_types', to: "form_entities#entity_types"
+  resources :form_entities
+
+  patch 'form_choice_dependencies/:id/enable', to: 'form_choice_dependencies#enable'
+  patch 'form_choice_dependencies/:id/disable', to: 'form_choice_dependencies#disable'
+  resources :form_choice_dependencies
 
   resources :insights
 

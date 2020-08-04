@@ -72,4 +72,20 @@ class FormEntity::Number < FormEntity
       end
     end
   end
+
+  def self.option_validation
+    Proc.new do
+      validation :options_config do
+        params do
+          required(:options) do
+            hash do
+              optional(:min_value).value(:int?)
+              optional(:max_value).value(:int?)
+              optional(:format).value(included_in?: FORMAT)
+            end
+          end
+        end
+      end
+    end
+  end
 end

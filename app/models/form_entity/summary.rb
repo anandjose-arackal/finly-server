@@ -54,4 +54,14 @@ class FormEntity::Summary < FormEntity
 
   register :summary
 
+  def self.option_validation
+    Proc.new do
+      validation :options_config do
+        params do
+
+        end
+      end
+    end
+  end
+
 end

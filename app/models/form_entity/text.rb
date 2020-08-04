@@ -83,4 +83,34 @@ class FormEntity::Text < FormEntity
     end
   end
 
+  def self.option_validation
+    Proc.new do
+      validation :options_config do
+        params do
+          required(:options) do
+            hash do
+              required(:maximum).value(:int?, lteq?: 255)
+              required(:minimum).value(:int?, gteq?: 0)
+              optional(:regex).hash do
+                required(:format).filled
+                required(:message).filled
+              end
+              optional(:format).value(included_in?: FORMAT)
+            end
+          end
+        end
+      end
+    end
+  end
+
+  def self.config_validation
+    Proc.new do
+      property :configs
+
+      # validate :options, -> () {
+      #   FormEntity::Text.options
+      #   errors.add(:options, "Invalid Options")
+      # }
+    end
+  end
 end
