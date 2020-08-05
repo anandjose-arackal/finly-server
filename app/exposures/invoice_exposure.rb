@@ -100,7 +100,7 @@ class InvoiceExposure < Exposures::API
   attribute :advance_amount, record_attribute: true, exposure: true
   attribute :balance_due, includes: [:balance_due], record_attribute: true, exposure: true
   attribute :balance_due_value, includes: [:balance_due] do
-    record.balance_payable&.value || 0
+    record.balance_due&.value || 0
   end
   attribute :paid_amount_value, includes: [:balance_due, {successful_payments: :amount}] do
     record.paid_amount_value || 0
@@ -124,6 +124,9 @@ class InvoiceExposure < Exposures::API
     end
   end
   attribute :status, record_attribute: true, exposure: true, includes: [:status]
+  attribute :base_amount do
+    record.include_original_amount
+  end
 
 
   # def vendor_ref_num(invoice_line_item)

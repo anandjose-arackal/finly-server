@@ -1,5 +1,19 @@
 class InvoiceLineItemExposure < Exposures::API
 
+  attribute :invoice, record_attribute: :parent, exposure: true, includes: [:parent]
+  attribute :description, record_attribute: true
+  attribute :rate, record_attribute: true
+  attribute :tax_rate, record_attribute: true, exposure: true, includes: [:tax_rate]
+  attribute :itc_qualified do
+    record.parent.items.map {|i| i.tax_rate.present?}.compact.present?
+  end
+  attribute :department, record_attribute: true, exposure: true, includes: [:department]
+  attribute :hsn_sac, record_attribute: true
+  attribute :country, includes: [:amount] do
+    record.amount&.currency&.country
+  end
+  attribute :tax_amount, record_attribute: true, exposure: true, includes: [:tax_amount]
+
   def category
     record.category.to_liquid
   end
@@ -14,10 +28,6 @@ class InvoiceLineItemExposure < Exposures::API
 
   def billable_amount
     record.billable_amount&.value || 0
-  end
-
-  def tax_amount
-    record.tax_amount
   end
 
   def net_amount
@@ -36,6 +46,21 @@ class InvoiceLineItemExposure < Exposures::API
     [nil, 1].include? record.parent.gst_type_id
   end
 
+  def cgst
+    return 0 unless cgst?
+    record.tax&.to_f / 2 || 0
+  end
+
+  def sgst
+    return 0 unless sgst?
+    record.tax&.to_f / 2 || 0
+  end
+
+  def igst
+    return 0 unless igst?
+    record.tax&.to_f
+  end
+
   def cgst_amount
     return 0 unless cgst?
     record.tax_amount&.value / 2 || 0
@@ -49,10 +74,6 @@ class InvoiceLineItemExposure < Exposures::API
   def igst_amount
     return 0 unless igst?
     record.tax_amount&.value
-  end
-
-  def tax_rate
-    record.tax_rate&.to_liquid
   end
 
 end
