@@ -35,6 +35,8 @@ class Category < ApplicationRecord
 
   event_channel 'category'
 
+  alias_attribute :parent_id, :ancestry
+
   belongs_to :company, optional: true
 
   has_one :quickbooks_category, dependent: :destroy

@@ -5457,7 +5457,6 @@ ActiveRecord::Schema.define(version: 2020_08_04_113604) do
   create_table "master_entities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "uuid", limit: 36, null: false
     t.string "master_schema_id", null: false
-    t.string "parent_id"
     t.integer "company_id"
     t.string "type", null: false
     t.string "hint"
@@ -5483,7 +5482,6 @@ ActiveRecord::Schema.define(version: 2020_08_04_113604) do
     t.index ["deleted_at"], name: "index_master_entities_on_deleted_at"
     t.index ["entity_key"], name: "index_master_entities_on_entity_key"
     t.index ["master_schema_id"], name: "index_master_entities_on_master_schema_id"
-    t.index ["parent_id"], name: "index_master_entities_on_parent_id"
     t.index ["system_entity"], name: "index_master_entities_on_system_entity"
     t.index ["type"], name: "index_master_entities_on_type"
     t.index ["updated_at"], name: "index_master_entities_on_updated_at"
@@ -5495,6 +5493,8 @@ ActiveRecord::Schema.define(version: 2020_08_04_113604) do
     t.integer "company_id"
     t.string "name", null: false
     t.string "table_name", null: false
+    t.string "model"
+    t.string "klass_name"
     t.boolean "active", default: true
     t.boolean "system_master"
     t.boolean "can_name_be_changed"

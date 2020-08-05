@@ -5,7 +5,6 @@
 #  id                        :bigint           not null
 #  uuid                      :string(36)       not null, primary key
 #  master_schema_id          :string(255)      not null
-#  parent_id                 :string(255)
 #  company_id                :integer
 #  type                      :string(255)      not null
 #  hint                      :string(255)

@@ -7,6 +7,8 @@
 #  company_id                :integer
 #  name                      :string(255)      not null
 #  table_name                :string(255)      not null
+#  model                     :string(255)
+#  klass_name                :string(255)
 #  active                    :boolean          default(TRUE)
 #  system_master             :boolean
 #  can_name_be_changed       :boolean
@@ -32,21 +34,28 @@ class MasterSchema < ApplicationRecord
   alias_attribute :master_key, :table_name
 
   def dynamic_model
+    model = self.model
+    return model if model.present?
     return @dynamic_model if @dynamic_model.present?
 
     table_name = self.table_name
-    entities = self.entities
     @dynamic_model = Class.new(ApplicationRecord) do
       self.table_name = table_name
-
-      define_method :as_json do |options = {}|
-        json = {id: self.id}
-        entities.each do |entity|
-          json[entity.entity_key] = send(entity.entity_key)
-        end
-        json
-      end
     end
+  end
+
+  def model
+    val = super()
+    return nil unless val.present?
+
+    Object.const_get(val)
+  end
+
+  def klass_name
+    val = super()
+    return nil unless val.present?
+
+    Object.const_get(val)
   end
 
 end

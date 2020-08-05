@@ -14,6 +14,8 @@ class Masters::API
   def self.schema(args = {}, &block)
     args[:name] = name
     args[:table_name] = model.table_name
+    args[:model] = model
+    args[:klass_name] = self
     @schema ||= MasterSchema.new(args)
     @schema.instance_eval &block if block_given?
     @schema
