@@ -3,7 +3,6 @@ class CreateMasterEntities < ActiveRecord::Migration[5.2]
     create_table :master_entities do |t|
       t.uuid
       t.string :master_schema_id, index: true, null: false
-      t.string :parent_id, index: true
       t.integer :company_id, index: true, foreign_key: true, references: 'companies'
       t.string :type, index: true, null: false
       t.string :hint

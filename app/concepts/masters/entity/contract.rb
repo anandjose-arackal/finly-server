@@ -12,9 +12,6 @@ class Masters::Entity::Contract < Reform::Form
   end
 
   property :master_schema
-  property :parent_id, deserializer: ->(input, represented, **) {
-    represented.parent_id = input[:parent_id] if input[:parent_id].present? and represented.schema&.can_attributes_be_nested
-  }
   property :company_id
   property :hint
   property :required, default: false

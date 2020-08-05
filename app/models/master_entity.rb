@@ -34,11 +34,8 @@ class MasterEntity < ApplicationRecord
   include Masters::Entity::Schema
   include Masters::Entity::Filters
 
-  has_ancestry ancestry_column: :parent_id
-
   belongs_to :company
   belongs_to :master_schema
-  belongs_to :parent, class_name: 'MasterEntity', optional: true, primary_key: :uuid, foreign_key: :parent_id
 
   scope :system_fields, -> { where system_entity: true }
   scope :custom_fields, -> { where.not system_entity: true }
