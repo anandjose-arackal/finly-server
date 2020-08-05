@@ -1,4 +1,3 @@
-
 require 'reform/form/dry'
 class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
 
@@ -6,13 +5,14 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
   # property :form_id # Cannot be changed
   # property :form_section_id # Cannot be changed
 
-
   validation do
     params do
       optional(:placeholder)
       required(:entity_key).filled
       required(:label).filled
-      required(:position).filled
+      optional(:placeholder)
+      optional(:hint)
+      optional(:position) # Position will be saved in a different API Call
       required(:behavior).filled do
         hash do
           required(:editable).filled
@@ -24,36 +24,35 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
     end
   end
 
-
-  property :entity_key # Cannot be changed
+  property :entity_key # Cannot be changed for system fields
   property :label
   property :placeholder
-
-
   property :hint, deserializer: -> (input, represented, *args){ represented.hint = "Enter Value" if input[:hint].blank? }
   property :position
 
   property :behavior, virtual: true
+  property :editable, deserializer: -> (input, represented, *args) {represented.editable = input.dig(:behavior)&.dig(:editable) if (represented.model.persisted? and represented.model.can_editable_be_changed) or true}
+  property :required, deserializer: -> (input, represented, *args) {represented.required = input.dig(:behavior)&.dig(:required) if (represented.model.persisted? and represented.model.can_required_be_changed) or true}
+  property :active, deserializer: -> (input, represented, *args) {represented.active = input.dig(:behavior)&.dig(:active) if (represented.model.persisted? and represented.model.can_be_disabled) or true}
+  property :visible, deserializer: -> (input, represented, *args) {represented.visible = input.dig(:behavior)&.dig(:visible) if (represented.model.persisted? and represented.model.can_visible_be_changed) or true}
 
-  # property :editable, deserializer: -> (input, represented, *args){ debugger }
-  property :editable, deserializer: -> (input, represented, *args){ represented.editable = input[:behavior][:editable] if (represented.model.persisted? and represented.model.can_editable_be_changed) or true }
-  property :required, deserializer: -> (input, represented, *args){ represented.required = input[:behavior][:required] if (represented.model.persisted? and represented.model.can_required_be_changed) or true }
-  property :active, deserializer: -> (input, represented, *args){ represented.active = input[:behavior][:active] if (represented.model.persisted? and represented.model.can_be_disabled) or true }
-  property :visible, deserializer: -> (input, represented, *args){ represented.visible = input[:behavior][:visible] if (represented.model.persisted? and represented.model.can_visible_be_changed) or true }
   property :unique, deserializer: -> (input, represented, *args){ represented.unique = input[:unique] if (represented.model.persisted? and represented.model.can_uniqueness_be_changed) or true }
   property :default_value, deserializer: -> (input, represented, *args) { represented.default_value = input[:default_value] if (input[:default_value].present? || (input[:default_value].nil? and ((represented.model.persisted? and represented.model.allow_clearing_default_value) or true)))}
+
   # property :system_field
   # property :company_id, deserializer: -> (input, represented, *args) {represented.company_id = represented.current_user.company_id}
-
-
   # property :entity_path #todo populate it - model level
-  # property :parent_id # Cannot be changed
+  # property :parent_id # Handled in sub classes
   # property :config_path #todo
 
   property :current_user, virtual: true
   property :options
 
-  # property :type
+  # Computation
+  property :compute_enabled
+  property :compute_type_id
+  property :compute_formula
+  property :compute_lookup_entity_id
 
   # Validations
   collection :validations, populator: :validations! do
@@ -97,18 +96,7 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
     end
   end
 
-
-
-  # Computation
-
-
-  property :compute_enabled
-  property :compute_type_id
-  property :compute_formula
-  property :compute_lookup_entity_id
-
   # validates :compute_type_id, :inclusion => {in: FormEntityComputationType.pluck(:id) }
-
   def validations!(collection:, fragment:, index:, options:, **)
     validation = validations.find {|validation| validation.id.to_s == fragment["id"].to_s}
 

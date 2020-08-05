@@ -72,11 +72,11 @@ class FormEntity::Text < FormEntity
   schema_validation do
     required(:options) do
       hash do
-        required(:maximum).value(:int?, lteq?: 255)
-        required(:minimum).value(:int?, gteq?: 0)
+        required(:maximum).filled
+        required(:minimum).filled
         optional(:regex).hash do
           required(:format).filled
-          required(:message).filled
+          optional(:message)
         end
         optional(:format).value(included_in?: FORMAT)
       end
@@ -89,11 +89,11 @@ class FormEntity::Text < FormEntity
         params do
           required(:options) do
             hash do
-              required(:maximum).value(:int?, lteq?: 255)
-              required(:minimum).value(:int?, gteq?: 0)
+              required(:maximum).filled
+              required(:minimum).filled
               optional(:regex).hash do
                 required(:format).filled
-                required(:message).filled
+                optional(:message)
               end
               optional(:format).value(included_in?: FORMAT)
             end

@@ -7,7 +7,6 @@ class Forms::ChoiceDependencies::Ops::Update < Transactions::API
 
   step Contract::Build(builder: :build_contract)
 
-
   step Contract::Validate(key: :form_choice_dependency)
 
   step Contract::Persist()
@@ -17,12 +16,10 @@ class Forms::ChoiceDependencies::Ops::Update < Transactions::API
 
   # Helper methods
   def check_success(ctx, options)
-    debugger
     true
   end
   def check_failure(ctx, options)
     true
-    debugger
   end
 
 
