@@ -29,13 +29,23 @@ class MasterSchema < ApplicationRecord
 
   scope :active, -> { where active: true }
 
+  alias_attribute :master_key, :table_name
+
   def dynamic_model
     return @dynamic_model if @dynamic_model.present?
 
-    @dynamic_model = Class.new(ApplicationRecord) do
-      belongs_to :company
-    end
+    entities = self.entities
+    @dynamic_model = Class.new(ApplicationRecord)
     @dynamic_model.table_name = table_name
+    @dynamic_model.define_method :as_json do |options = {}|
+      json = {
+          id: self.id,
+      }
+      entities.each do |entity|
+        json[entity.entity_key] = send(entity.entity_key)
+      end
+      json
+    end
     @dynamic_model
   end
 

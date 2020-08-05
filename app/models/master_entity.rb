@@ -46,4 +46,16 @@ class MasterEntity < ApplicationRecord
     Masters::Entity::Registry.register self, key
   end
 
+  def as_json(options={})
+    {
+        label: label,
+        hint: hint,
+        type: self.class.registered_type,
+        position: position,
+        required: required,
+        unique: unique,
+        entity_key: entity_key
+    }
+  end
+
 end

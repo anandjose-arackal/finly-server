@@ -4,4 +4,8 @@ class Masters::Schema::Policy < ApplicationPolicy
     user.admin?("vp")
   end
 
+  def show?
+    user.admin?("vp")
+  end
+
 end
