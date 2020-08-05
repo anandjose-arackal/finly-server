@@ -9,7 +9,7 @@
 #  company_id                :integer
 #  type                      :string(255)      not null
 #  hint                      :string(255)
-#  mandatory                 :boolean
+#  required                  :boolean
 #  unique                    :boolean
 #  position                  :string(255)
 #  entity_key                :string(255)      not null

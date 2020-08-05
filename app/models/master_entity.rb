@@ -9,7 +9,7 @@
 #  company_id                :integer
 #  type                      :string(255)      not null
 #  hint                      :string(255)
-#  mandatory                 :boolean
+#  required                  :boolean
 #  unique                    :boolean
 #  position                  :string(255)
 #  entity_key                :string(255)      not null
@@ -33,6 +33,8 @@ class MasterEntity < ApplicationRecord
   include Dry::Monads[:result]
   include Masters::Entity::Schema
   include Masters::Entity::Filters
+
+  has_ancestry ancestry_column: :parent_id
 
   belongs_to :company
   belongs_to :master_schema
