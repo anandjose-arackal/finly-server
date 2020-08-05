@@ -91,11 +91,6 @@ class FormEntity::Text < FormEntity
             hash do
               required(:maximum).filled
               required(:minimum).filled
-              optional(:regex).hash do
-                required(:format).filled
-                optional(:message)
-              end
-              optional(:format).value(included_in?: FORMAT)
             end
           end
         end
