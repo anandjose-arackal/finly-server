@@ -20,12 +20,18 @@ Resolver::Router.draw do
   end
 
   # Masters
+  scope :master_schemas do
+    route 'default', Masters::Schema::Resolver
+  end
+
   scope :department do
     route 'default', Masters::Departments::Resolver
   end
+
   scope :location do
     route 'default', Masters::Locations::Resolver
   end
+
   scope :cost_center do
     route 'default', Masters::CostCenters::Resolver
   end

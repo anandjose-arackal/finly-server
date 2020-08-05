@@ -4349,6 +4349,8 @@ Rails.application.routes.draw do
 
   resources :invoices, only: [:create, :update, :show]
 
+  resources :masters, only: [:index, :show]
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
   # The priority is based upon order of creation: first created -> highest priority.

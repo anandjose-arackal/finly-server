@@ -27,7 +27,11 @@ module DynamicAttributes
     def class_attr(name, default: nil)
       # attribute = "attribute_#{name}"
       # class_attribute attribute, default: default
-      def_val = default.deep_dup if default.respond_to?(:deep_dup)
+      if default.respond_to?(:deep_dup) and not default.is_a?(Class)
+        def_val = default.deep_dup
+      elsif default.present?
+        def_val = default
+      end
       define_singleton_method name do |value = NoObject|
         if value == NoObject # Value has not been provided
           # Check if value is already present

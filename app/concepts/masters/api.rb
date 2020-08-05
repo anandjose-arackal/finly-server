@@ -8,7 +8,7 @@ class Masters::API
 
   def self.name(name = NoObject)
     @name = name unless name == NoObject
-    @name || model&.name
+    @name ||= model&.name
   end
 
   def self.schema(args = {}, &block)

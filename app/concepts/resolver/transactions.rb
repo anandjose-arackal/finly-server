@@ -8,9 +8,10 @@ class Resolver::Transactions
         route_path = model.resolver_route(scope)
       elsif builder
         route_path = Trailblazer::Option(builder).(context, context, circuit_options)
-      elsif klass.blank?
-        route = [route] unless route.respond_to?(:each)
-        route_path = context[:params]&.dig(*route)
+      elsif klass.blank? and route.present?
+        route_path = route
+        # route = [route] unless route.respond_to?(:each)
+        # route_path = context[:params]&.dig(*route)
       end
 
       # route = [route] unless route.respond_to?(:each)

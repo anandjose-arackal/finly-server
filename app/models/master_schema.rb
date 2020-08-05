@@ -26,4 +26,17 @@ class MasterSchema < ApplicationRecord
   belongs_to :owner, optional: true
 
   has_many :entities, class_name: "MasterEntity"
+
+  scope :active, -> { where active: true }
+
+  def dynamic_model
+    return @dynamic_model if @dynamic_model.present?
+
+    @dynamic_model = Class.new(ApplicationRecord) do
+      belongs_to :company
+    end
+    @dynamic_model.table_name = table_name
+    @dynamic_model
+  end
+
 end
