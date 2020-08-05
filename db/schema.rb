@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_01_091949) do
+ActiveRecord::Schema.define(version: 2020_08_04_113604) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -4061,7 +4061,7 @@ ActiveRecord::Schema.define(version: 2020_08_01_091949) do
     t.boolean "unique"
     t.boolean "visible"
     t.integer "position"
-    t.boolean "custom_field"
+    t.boolean "system_field"
     t.boolean "can_visible_be_changed"
     t.boolean "can_editable_be_changed"
     t.boolean "can_required_be_changed"
@@ -4147,7 +4147,7 @@ ActiveRecord::Schema.define(version: 2020_08_01_091949) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "validation_id"
-    t.boolean "custom"
+    t.boolean "system_validation"
     t.boolean "internal"
     t.boolean "is_updated"
     t.boolean "can_be_updated"
@@ -5452,6 +5452,68 @@ ActiveRecord::Schema.define(version: 2020_08_01_091949) do
     t.index ["place_id"], name: "index_map_location_user_queries_on_place_id"
     t.index ["user_id"], name: "index_map_location_user_queries_on_user_id"
     t.index ["uuid"], name: "index_map_location_user_queries_on_uuid"
+  end
+
+  create_table "master_entities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
+    t.string "master_schema_id", null: false
+    t.string "parent_id"
+    t.integer "company_id"
+    t.string "type", null: false
+    t.string "hint"
+    t.boolean "required"
+    t.boolean "unique"
+    t.string "position"
+    t.string "entity_key", null: false
+    t.boolean "system_entity", default: false
+    t.string "label", null: false
+    t.string "active"
+    t.boolean "can_label_be_changed"
+    t.boolean "can_uniqueness_be_changed"
+    t.boolean "can_mandatory_be_changed"
+    t.boolean "can_active_be_changed"
+    t.boolean "can_be_destroyed"
+    t.boolean "show_in_lookup"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["active"], name: "index_master_entities_on_active"
+    t.index ["company_id"], name: "index_master_entities_on_company_id"
+    t.index ["created_at"], name: "index_master_entities_on_created_at"
+    t.index ["deleted_at"], name: "index_master_entities_on_deleted_at"
+    t.index ["entity_key"], name: "index_master_entities_on_entity_key"
+    t.index ["master_schema_id"], name: "index_master_entities_on_master_schema_id"
+    t.index ["parent_id"], name: "index_master_entities_on_parent_id"
+    t.index ["system_entity"], name: "index_master_entities_on_system_entity"
+    t.index ["type"], name: "index_master_entities_on_type"
+    t.index ["updated_at"], name: "index_master_entities_on_updated_at"
+    t.index ["uuid"], name: "index_master_entities_on_uuid"
+  end
+
+  create_table "master_schemas", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
+    t.integer "company_id"
+    t.string "name", null: false
+    t.string "table_name", null: false
+    t.boolean "active", default: true
+    t.boolean "system_master"
+    t.boolean "can_name_be_changed"
+    t.boolean "can_attributes_be_nested"
+    t.boolean "can_attributes_be_changed"
+    t.datetime "deleted_at"
+    t.integer "owner_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["active"], name: "index_master_schemas_on_active"
+    t.index ["company_id"], name: "index_master_schemas_on_company_id"
+    t.index ["created_at"], name: "index_master_schemas_on_created_at"
+    t.index ["deleted_at"], name: "index_master_schemas_on_deleted_at"
+    t.index ["name"], name: "index_master_schemas_on_name"
+    t.index ["owner_id"], name: "index_master_schemas_on_owner_id"
+    t.index ["system_master"], name: "index_master_schemas_on_system_master"
+    t.index ["table_name"], name: "index_master_schemas_on_table_name"
+    t.index ["updated_at"], name: "index_master_schemas_on_updated_at"
+    t.index ["uuid"], name: "index_master_schemas_on_uuid"
   end
 
   create_table "mcc_category_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -7576,6 +7638,11 @@ ActiveRecord::Schema.define(version: 2020_08_01_091949) do
     t.string "source_account"
     t.integer "location_id"
     t.integer "cost_center_id"
+    t.integer "erp_sync_status_id"
+    t.string "erp_sync_message"
+    t.string "erp_sync_reference_id"
+    t.integer "erp_sync_attempts_count", default: 0
+    t.datetime "erp_sync_attempted_at"
     t.index ["card_expenses_total_id"], name: "index_reports_on_card_expenses_total_id"
     t.index ["cash_in_hand_deduction_id"], name: "index_reports_on_cash_in_hand_deduction_id"
     t.index ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id"

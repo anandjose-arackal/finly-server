@@ -20,7 +20,7 @@
 #  unique                       :boolean
 #  visible                      :boolean
 #  position                     :integer
-#  custom_field                 :boolean
+#  system_field                 :boolean
 #  can_visible_be_changed       :boolean
 #  can_editable_be_changed      :boolean
 #  can_required_be_changed      :boolean

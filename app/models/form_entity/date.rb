@@ -20,7 +20,7 @@
 #  unique                       :boolean
 #  visible                      :boolean
 #  position                     :integer
-#  custom_field                 :boolean
+#  system_field                 :boolean
 #  can_visible_be_changed       :boolean
 #  can_editable_be_changed      :boolean
 #  can_required_be_changed      :boolean
@@ -48,13 +48,14 @@
 #  compute_formula              :string(255)
 #  compute_lookup_entity_id     :string(255)
 #  filters                      :text(65535)
+#  config_path                  :string(255)
 #
 
 class FormEntity::Date < FormEntity
   register :date
   set :hint, "Select date"
 
-  RESTRICTIONS = %w(
+  RESTRICTIONS ||= %w(
     in_the_future
     in_the_past
     not_in_the_future

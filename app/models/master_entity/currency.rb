@@ -1,0 +1,39 @@
+# == Schema Information
+#
+# Table name: master_entities
+#
+#  id                        :bigint           not null
+#  uuid                      :string(36)       not null, primary key
+#  master_schema_id          :string(255)      not null
+#  parent_id                 :string(255)
+#  company_id                :integer
+#  type                      :string(255)      not null
+#  hint                      :string(255)
+#  mandatory                 :boolean
+#  unique                    :boolean
+#  position                  :string(255)
+#  entity_key                :string(255)      not null
+#  system_entity             :boolean          default(FALSE)
+#  label                     :string(255)      not null
+#  active                    :string(255)
+#  can_label_be_changed      :boolean
+#  can_uniqueness_be_changed :boolean
+#  can_mandatory_be_changed  :boolean
+#  can_active_be_changed     :boolean
+#  can_be_destroyed          :boolean
+#  show_in_lookup            :boolean
+#  deleted_at                :datetime
+#  created_at                :datetime         not null
+#  updated_at                :datetime         not null
+#
+
+class MasterEntity::Currency < MasterEntity
+  register :currency
+  set :hint, 'Select value'
+
+  # Todo move CURRENCIES to constants
+  CURRENCIES = FormEntity::Currency::CURRENCIES
+
+  operators :eq_any, :not_eq_all, :not_null, :null
+
+end
