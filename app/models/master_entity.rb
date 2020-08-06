@@ -38,6 +38,7 @@ class MasterEntity < ApplicationRecord
 
   scope :system_fields, -> { where system_entity: true }
   scope :custom_fields, -> { where.not system_entity: true }
+  scope :show_in_lookup, -> { where show_in_lookup: true }
 
   class_attr :registered_type
 
@@ -45,7 +46,7 @@ class MasterEntity < ApplicationRecord
     Masters::Entity::Registry.register self, key
   end
 
-  def as_json(options={})
+  def as_json(options = {})
     {
         label: label,
         hint: hint,

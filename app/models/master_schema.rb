@@ -33,17 +33,6 @@ class MasterSchema < ApplicationRecord
 
   alias_attribute :master_key, :table_name
 
-  def dynamic_model
-    model = self.model
-    return model if model.present?
-    return @dynamic_model if @dynamic_model.present?
-
-    table_name = self.table_name
-    @dynamic_model = Class.new(ApplicationRecord) do
-      self.table_name = table_name
-    end
-  end
-
   def model
     val = super()
     return nil unless val.present?
@@ -56,6 +45,21 @@ class MasterSchema < ApplicationRecord
     return nil unless val.present?
 
     Object.const_get(val)
+  end
+
+  def record_model
+    model = self.model
+    return model if model.present?
+    return @record_model if @record_model.present?
+
+    table_name = self.table_name
+    @record_model = Class.new(ApplicationRecord) do
+      self.table_name = table_name
+    end
+  end
+
+  def contract
+    Masters::Schema::Records::Contract.build(self)
   end
 
 end

@@ -1,5 +1,7 @@
 Lookup::Router.draw do
 
+
+
   # Masters
   route 'policies', Masters::Policies::Lookup
   route "departments", Masters::Departments::Lookup
@@ -17,5 +19,7 @@ Lookup::Router.draw do
 
   # Docs
   route 'purchase_requests', Docs::P2P::PurchaseRequests::Lookup
+
+  route 'masters.*', Masters::Schema::Records::Lookup
 
 end

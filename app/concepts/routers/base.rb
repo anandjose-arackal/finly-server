@@ -49,12 +49,42 @@ class Routers::Base
     resolve(key)
   end
 
-  def self.resolve(key)
+  def self.resolve(required_key)
+    key = resolve_key(required_key)
+    return nil if key.blank?
+
     map[key]
   end
 
+  # Resolves and returns and relevant route matching the provided key
+  # Supports wildcards: Ex: masters.*.default will match masters.categories.default
+  def self.resolve_key(required_key)
+    map.each_pair do |route_key, map_value|
+      failed = false
+
+      route_splits = route_key.split(".")
+      required_key_splits = required_key.split(".")
+      route_splits.each_with_index do |val, index|
+        match = false
+        match = true if val == required_key_splits[index]
+        match = true if val == "*" and required_key_splits[index] != nil
+
+        next if match
+
+        failed = true
+        break
+      end
+
+      next if failed
+
+      return route_key
+    end
+
+    nil
+  end
+
   def self.dispatch(key, options)
-    routes = map[key]
+    routes = resolve(key)
     # Todo raise exception?
     return Failure("Route not found") if routes.blank?
 
