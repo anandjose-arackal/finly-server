@@ -194,7 +194,7 @@ class FormEntity < ApplicationRecord
         hint: hint,
         entity_type: entity_type,
         default_value: default_value,
-        behaviour: {
+        behavior: {
             editable: editable,
             required: required,
             active: active,
