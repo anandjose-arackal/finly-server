@@ -254,6 +254,7 @@ class FormEntity < ApplicationRecord
         id: uuid,
         entity_key: entity_key,
         parent_id: parent_id,
+        system_field: system_field,
         entity_path: entity_path,
         config_path: config_path,
         label: label,
