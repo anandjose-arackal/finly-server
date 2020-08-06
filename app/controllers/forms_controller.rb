@@ -1,5 +1,7 @@
 class FormsController < BaseControllers::WebBase
 
+  layout :resolve_layout
+
   # Form Renderer
   # def show
   #   endpoint Forms::Ops::Show do |m|
@@ -40,6 +42,12 @@ class FormsController < BaseControllers::WebBase
 
   def sync_positions
     endpoint Forms::Ops::SyncPositions
+  end
+
+  private
+
+  def resolve_layout
+    'trailblazers'
   end
 
 

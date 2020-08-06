@@ -18,6 +18,8 @@ class Forms::Ops::SyncPositions < Transactions::API
 
   step Contract::Persist()
 
+  step Transactions::Messages::SuccessMessage('Saved Form Fields with Positions')
+
   fail :check_failure
 
   # Helper methods
@@ -31,26 +33,24 @@ class Forms::Ops::SyncPositions < Transactions::API
 
   def build_contract!(options, model:, current_user:, **)
 
-    dynamic_contract = Class.new(Reform::Form) do
+    dynamic_contract = Class.new(Forms::Contracts::SyncPositions) do
+
       model.sections.each do |section|
         collection :sections do
           property :id
-          collection :entities, populator: :entities! do
+          collection :entities do
             property :id
             property :position
-          end
 
-          def entities!(collection:, fragment:, options:, **)
-            entities.find {|entity| entity.id.to_s == fragment["id"].to_s}
+            validation :unique_positions do
+              params do
+                required(:position).filled
+              end
+            end
           end
-        end
-
-        def sections!(collection:, fragment:, options:, **)
-          sections.find {|section| section.id.to_s == fragment["id"].to_s}
         end
       end
     end
-
 
     dynamic_contract.new(model, current_user: current_user)
   end
