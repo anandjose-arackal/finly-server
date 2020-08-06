@@ -4185,6 +4185,7 @@ Rails.application.routes.draw do
   get 'forms/:route/dependencies', to: 'forms#form_dependencies'
   post 'forms/choices', to: 'forms#form_entity_choices'
   post 'forms/lookup_details', to: 'forms#form_lookup_details'
+  patch 'forms/:id/sync_positions', to: 'forms#sync_positions'
   resources :forms
 
   get 'form_entities/entity_types', to: "form_entities#entity_types"

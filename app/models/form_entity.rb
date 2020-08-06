@@ -253,6 +253,7 @@ class FormEntity < ApplicationRecord
     data = {
         id: uuid,
         entity_key: entity_key,
+        parent_id: parent_id,
         entity_path: entity_path,
         config_path: config_path,
         label: label,

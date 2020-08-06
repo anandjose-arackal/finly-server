@@ -38,6 +38,9 @@ class FormsController < BaseControllers::WebBase
     end
   end
 
+  def sync_positions
+    endpoint Forms::Ops::SyncPositions
+  end
 
 
 end
