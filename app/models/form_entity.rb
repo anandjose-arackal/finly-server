@@ -330,7 +330,6 @@ class FormEntity < ApplicationRecord
     nil
   end
 
-  private
 
   def generate_config_path(path = [], obj = self)
     return path if obj.blank?
@@ -370,6 +369,7 @@ class FormEntity < ApplicationRecord
   end
 
 
+  private
   def sanitize
     # Set entity path & config path
     self.entity_path = generate_entity_path.join(".")
