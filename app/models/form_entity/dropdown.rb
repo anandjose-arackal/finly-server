@@ -34,8 +34,8 @@ class FormEntity::DropDown < FormEntity
           end
           required(:options) do
             hash do
-              optional(:min_items).value(:int?)
-              optional(:max_items).value(:int?)
+              optional(:min_items)
+              optional(:max_items)
             end
           end
         end
