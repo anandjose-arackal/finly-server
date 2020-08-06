@@ -337,15 +337,15 @@ class FormEntity < ApplicationRecord
       # Obj is an entity
       if obj.parent.present?
         path.unshift("entities", obj.entity_key)
-        generate_entity_path(path, obj.parent)
+        return generate_config_path(path, obj.parent)
       else
         path.unshift(obj.entity_key)
-        generate_entity_path(path, obj.section)
+        return generate_config_path(path, obj.section)
       end
 
     elsif obj.class.ancestors.map(&:name).include?('FormSection')
       path.unshift(obj&.section&.section_id, "entities")
-      generate_entity_path(path, obj.form)
+      return generate_config_path(path, obj.form)
     else
       path
     end
