@@ -124,9 +124,10 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
       po_item_params[:previously_billed_amount] = previously_billed_amount
     end
 
-    purchase_order_item.assign_attributes(po_item_params)
-    purchase_order_item.save
-
+    if purchase_order_item.present?
+      purchase_order_item.assign_attributes(po_item_params)
+      purchase_order_item.save
+    end
   end
 
   def previous_state
