@@ -4346,11 +4346,18 @@ Rails.application.routes.draw do
 
   get 'lookup/:route', to: 'lookup#route'
 
-
-
   resources :invoices, only: [:create, :update, :show]
 
-  resources :masters, only: [:index, :show]
+  namespace :masters do
+    scope ":master_key/records" do
+      get 'import/template', to: 'records#import_template'
+      get 'import', to: 'records#import'
+    end
+
+
+    get '/', to: "schemas#index"
+    get '/:id', to: 'schemas#show'
+  end
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

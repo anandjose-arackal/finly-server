@@ -2,7 +2,7 @@ class Masters::Template < Templates::API
 
   root do
     finder do |finder_context, template|
-      MasterSchema.find_by(company_id: finder_context.params[:company_id], table_name: template.table_name)
+      MasterSchema.find_by(company_id: finder_context.params[:company_id], master_key: template.master_key)
     end
 
     clone do |root_builder_context|

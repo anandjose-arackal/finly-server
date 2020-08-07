@@ -6,7 +6,7 @@
 #  uuid                      :string(36)       not null, primary key
 #  company_id                :integer
 #  name                      :string(255)      not null
-#  table_name                :string(255)      not null
+#  master_key                :string(255)      not null
 #  model                     :string(255)
 #  klass_name                :string(255)
 #  active                    :boolean          default(TRUE)
@@ -31,8 +31,6 @@ class MasterSchema < ApplicationRecord
 
   scope :active, -> { where active: true }
 
-  alias_attribute :master_key, :table_name
-
   def model
     val = super()
     return nil unless val.present?
@@ -52,9 +50,9 @@ class MasterSchema < ApplicationRecord
     return model if model.present?
     return @record_model if @record_model.present?
 
-    table_name = self.table_name
+    master_key = self.master_key
     @record_model = Class.new(ApplicationRecord) do
-      self.table_name = table_name
+      self.table_name = master_key
     end
   end
 

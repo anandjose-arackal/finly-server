@@ -1,0 +1,2 @@
+module Masters::RecordsHelper
+end

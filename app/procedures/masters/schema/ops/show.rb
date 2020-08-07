@@ -6,7 +6,7 @@ class Masters::Schema::Ops::Show < Transactions::API
   step :resolve_dynamic_model
 
   def find_model(context, params:, current_user:, **)
-    context[:model] = MasterSchema.find_by(company_id: current_user.company_id, table_name: params[:id])
+    context[:model] = MasterSchema.find_by(company_id: current_user.company_id, master_key: params[:id])
   end
 
   def build_record_model(context, model:, **)

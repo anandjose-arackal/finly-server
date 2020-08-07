@@ -5492,7 +5492,7 @@ ActiveRecord::Schema.define(version: 2020_08_04_113604) do
     t.string "uuid", limit: 36, null: false
     t.integer "company_id"
     t.string "name", null: false
-    t.string "table_name", null: false
+    t.string "master_key", null: false
     t.string "model"
     t.string "klass_name"
     t.boolean "active", default: true
@@ -5508,10 +5508,10 @@ ActiveRecord::Schema.define(version: 2020_08_04_113604) do
     t.index ["company_id"], name: "index_master_schemas_on_company_id"
     t.index ["created_at"], name: "index_master_schemas_on_created_at"
     t.index ["deleted_at"], name: "index_master_schemas_on_deleted_at"
+    t.index ["master_key"], name: "index_master_schemas_on_master_key"
     t.index ["name"], name: "index_master_schemas_on_name"
     t.index ["owner_id"], name: "index_master_schemas_on_owner_id"
     t.index ["system_master"], name: "index_master_schemas_on_system_master"
-    t.index ["table_name"], name: "index_master_schemas_on_table_name"
     t.index ["updated_at"], name: "index_master_schemas_on_updated_at"
     t.index ["uuid"], name: "index_master_schemas_on_uuid"
   end

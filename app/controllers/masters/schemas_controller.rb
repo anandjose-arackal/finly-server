@@ -1,4 +1,4 @@
-class MastersController < BaseControllers::WebBase
+class Masters::SchemasController < BaseControllers::WebBase
 
   def index
     endpoint Masters::Schema::Ops::Index
