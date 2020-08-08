@@ -53,6 +53,8 @@ class MasterSchema < ApplicationRecord
 
     master_key = self.master_key
     @record_model = Class.new(ApplicationRecord) do
+      include SoftDeletable
+
       self.table_name = master_key
     end
   end

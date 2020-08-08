@@ -37,13 +37,13 @@ class Masters::Schema::Records::Base < Transactions::API
       when :new
         context[:model] = context[:master_schema].record_model&.new
       when :find
-        context[:model] = context[:master_schema].record_model&.send(type, id)
+        context[:model] = context[:master_schema].record_model&.send(:find_by_id, id)
       else
         raise "Invalid type :#{type}"
       end
 
       unless context[:model].present?
-        next on_error context, :base, 'master not found'
+        next on_error context, :base, 'record not found'
       end
 
       true

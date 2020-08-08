@@ -4354,6 +4354,7 @@ Rails.application.routes.draw do
       post 'import', to: 'records#import'
       post '/', to: 'records#create'
       patch '/:id', to: 'records#update'
+      delete '/:id', to: 'records#destroy'
     end
 
 

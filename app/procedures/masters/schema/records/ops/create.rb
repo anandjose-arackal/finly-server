@@ -8,6 +8,7 @@ class Masters::Schema::Records::Ops::Create < Masters::Schema::Records::Base
 
   # This is defined in base class
   step RecordModel(:new)
+  step Policy::Pundit(Masters::Schema::Records::Policy, :create?)
   step AssignModelUser(key: :created_by)
   step Masters::Schema::Records::Contract::Build()
   step Contract::Build()

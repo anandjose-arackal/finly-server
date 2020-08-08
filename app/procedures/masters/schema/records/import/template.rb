@@ -9,7 +9,7 @@ class Masters::Schema::Records::Import::Template < Transactions::API
 
   step :find_schema
   # Todo check user permission to ensure he can import masters
-  # step Policy::Pundit
+  step Policy::Pundit(Masters::Schema::Records::Policy, :import?)
   pass :build_headers
   pass :build_template
 
