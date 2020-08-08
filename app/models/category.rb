@@ -38,6 +38,7 @@ class Category < ApplicationRecord
   alias_attribute :parent_id, :ancestry
 
   belongs_to :company, optional: true
+  belongs_to :created_by, optional: true, class_name: 'User'
 
   has_one :quickbooks_category, dependent: :destroy
 

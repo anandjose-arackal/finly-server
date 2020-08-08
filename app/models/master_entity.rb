@@ -15,6 +15,9 @@
 #  system_entity             :boolean          default(FALSE)
 #  label                     :string(255)      not null
 #  active                    :string(255)
+#  visible                   :boolean          default(TRUE)
+#  identifier                :boolean          default(FALSE)
+#  options                   :text(65535)
 #  can_label_be_changed      :boolean
 #  can_uniqueness_be_changed :boolean
 #  can_mandatory_be_changed  :boolean
@@ -42,8 +45,18 @@ class MasterEntity < ApplicationRecord
 
   class_attr :registered_type
 
+  serialize :options, JSON
+
   def self.register(key)
     Masters::Entity::Registry.register self, key
+  end
+
+  def self.contract_evaluators
+    @contract_evaluators ||= {}
+  end
+
+  def self.contract_eval(name, &block)
+    contract_evaluators[name] = block if block_given?
   end
 
   def as_json(options = {})

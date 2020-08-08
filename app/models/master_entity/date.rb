@@ -15,6 +15,9 @@
 #  system_entity             :boolean          default(FALSE)
 #  label                     :string(255)      not null
 #  active                    :string(255)
+#  visible                   :boolean          default(TRUE)
+#  identifier                :boolean          default(FALSE)
+#  options                   :text(65535)
 #  can_label_be_changed      :boolean
 #  can_uniqueness_be_changed :boolean
 #  can_mandatory_be_changed  :boolean

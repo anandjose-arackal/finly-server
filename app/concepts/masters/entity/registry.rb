@@ -23,7 +23,7 @@ module Masters::Entity::Registry
     raise "Invalid type #{type}" if klass.nil?
 
     entity = klass.new(master_schema: self)
-    contract = Masters::Entity::Contract::System.new(entity)
+    contract = klass.build_schema_contract(system: true).new(entity)
     params = klass.schema.deep_dup
     params[:position] = entities.size
     params[:entity_key] = entity_key

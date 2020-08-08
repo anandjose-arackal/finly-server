@@ -10,17 +10,17 @@ class Masters::Schema::Records::Import::Template < Transactions::API
   step :find_schema
   # Todo check user permission to ensure he can import masters
   # step Policy::Pundit
-  pass :build_content
+  pass :build_headers
   pass :build_template
 
   def find_schema(context, params:, current_user:, **)
     context[:master_schema] = MasterSchema.find_by(company_id: current_user.company_id, master_key: params[:master_key])
   end
 
-  def build_content(context, params:, master_schema:, **)
+  def build_headers(context, params:, master_schema:, **)
     context[:headers] = []
     master_schema.entities.each do |entity|
-      context[:headers] << entity.entity_key
+      context[:headers] << entity.label
     end
   end
 

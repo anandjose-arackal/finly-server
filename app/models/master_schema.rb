@@ -28,6 +28,7 @@ class MasterSchema < ApplicationRecord
   belongs_to :owner, optional: true
 
   has_many :entities, class_name: "MasterEntity"
+  has_one :sequence_entity, -> { where type: 'MasterEntity::Sequence' }, class_name: "MasterEntity"
 
   scope :active, -> { where active: true }
 

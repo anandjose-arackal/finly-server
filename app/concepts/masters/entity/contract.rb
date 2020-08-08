@@ -24,6 +24,16 @@ class Masters::Entity::Contract < Reform::Form
   }
   property :active, default: true
   property :show_in_lookup, default: false
+  property :options, deserializer: -> (input, represented, **) {
+    represented.options ||= {}
+    represented.model.class.options.each do |key, value|
+      if input[key].present?
+        represented.options[key] = input[key]
+      elsif represented.options[key].blank? and value[:default].present? and not value[:default] == NoObject
+        represented.options[key] = value[:default]
+      end
+    end
+  }
 
   class Masters::Entity::Contract::Custom < Masters::Entity::Contract
 

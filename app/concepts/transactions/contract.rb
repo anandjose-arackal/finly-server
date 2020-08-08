@@ -35,6 +35,26 @@ module Transactions::Contract
     end
   end
 
+  def callbacks
+    self.class.callbacks
+  end
+
+  def trigger_callbacks(event)
+    return true if callbacks[event].blank?
+
+    callbacks[event].each do |handler|
+      instance_exec &handler
+    end
+
+    true
+  end
+
+  def save
+    result = super
+    trigger_callbacks :after_save if result
+    result
+  end
+
   class_methods do
     def property(name, options = {}, &block)
       args = {contract: self, type: :property, name: name, options: options, block: block}
@@ -46,6 +66,16 @@ module Transactions::Contract
       args = {contract: self, type: :collection, name: name, options: options, block: block}
       Transactions::Contracts::PreProcessor.execute(args)
       super(args[:name], args[:options], &args[:block])
+    end
+
+    def callbacks
+      @callbacks ||= {
+          after_save: []
+      }.with_indifferent_access
+    end
+
+    def after_save(&block)
+      callbacks[:after_save] << block
     end
   end
 

@@ -4351,7 +4351,9 @@ Rails.application.routes.draw do
   namespace :masters do
     scope ":master_key/records" do
       get 'import/template', to: 'records#import_template'
-      get 'import', to: 'records#import'
+      post 'import', to: 'records#import'
+      post '/', to: 'records#create'
+      patch '/:id', to: 'records#update'
     end
 
 
