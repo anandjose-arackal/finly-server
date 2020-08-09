@@ -4353,6 +4353,8 @@ Rails.application.routes.draw do
       get 'import/template', to: 'records#import_template'
       post 'import', to: 'records#import'
       post '/', to: 'records#create'
+      get '/', to: 'records#index'
+      get '/:id', to: 'records#show'
       patch '/:id', to: 'records#update'
       delete '/:id', to: 'records#destroy'
     end

@@ -16,13 +16,13 @@ class Masters::RecordsController < BaseControllers::WebBase
     endpoint Masters::Schema::Records::Ops::Update
   end
 
-  # def index
-  #
-  # end
-  #
-  # def show
-  #
-  # end
+  def index
+    endpoint Masters::Schema::Records::Ops::Index
+  end
+
+  def show
+    endpoint Masters::Schema::Records::Ops::Show
+  end
 
   def destroy
     endpoint Masters::Schema::Records::Ops::Destroy
