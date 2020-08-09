@@ -10,11 +10,11 @@ class Masters::Schema::Ops::Show < Transactions::API
   end
 
   def build_record_model(context, model:, **)
-    context[:record_model] = model.record_model
+    context[:record_model_class] = model.record_model_class
   end
 
-  def resolve_dynamic_model(context, params:, **)
-    params[:record_model] = context[:record_model]
+  def resolve_dynamic_model(context, params:, record_model_class:, **)
+    params[:model_class] = record_model_class
     Resolver::Transactions::Resolve.with(context, klass: Masters::Schema::Records::Resolver, paginate: true)
     true
   end

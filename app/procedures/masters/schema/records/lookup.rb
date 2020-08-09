@@ -1,9 +1,9 @@
 class Masters::Schema::Records::Lookup < Lookup::API
 
-  step :init_record_model, after: :define_search
+  step :init_record_model_class, after: :define_search
   step Resolver::Transactions::Load(klass: Masters::Schema::Records::Resolver, paginate: true), replace: "transactions.resolver.model"
 
-  def init_record_model(context, params:, current_user:, **)
+  def init_record_model_class(context, params:, current_user:, **)
     # master_key can be fetched from the route with the format masters.<master_key>
     master_key = params[:route].split(".")[1]
 
@@ -11,8 +11,8 @@ class Masters::Schema::Records::Lookup < Lookup::API
     unless context[:model].present?
       return on_error context, :base, 'master not found'
     end
-    context[:record_model] = params[:record_model] = context[:model].record_model
-    unless params[:record_model].present?
+    context[:model_class] = params[:model_class] = context[:model].record_model_class
+    unless params[:model_class].present?
       return on_error context, :base, 'master not found'
     end
 

@@ -18,7 +18,7 @@ class Masters::Schema::Records::Import::Create < Transactions::API
   end
 
   def build_record_model(context, master_schema:, **)
-    context[:record_model] = master_schema.record_model
+    context[:model_class] = master_schema.record_model_class
   end
 
   def build_contract(context, master_schema:, **)
@@ -34,7 +34,7 @@ class Masters::Schema::Records::Import::Create < Transactions::API
     end
   end
 
-  def import_data(context, contract:, record_model:, params:, **)
+  def import_data(context, contract:, params:, model_class:, **)
     context[:result] = [
         # Append the headers
         context[:headers].values
@@ -42,7 +42,7 @@ class Masters::Schema::Records::Import::Create < Transactions::API
     spreadsheet = ImportUtil.open_spreadsheet(params[:file])
     spreadsheet.sheet(0).each(context[:headers]) do |row|
       data = row.values
-      data << import_row(context, contract, record_model, row)
+      data << import_row(context, contract, model_class, row)
       context[:result] << data
     end
   end
@@ -53,11 +53,11 @@ class Masters::Schema::Records::Import::Create < Transactions::API
 
   protected
 
-  def import_row(context, contract_klass, record_model, row)
+  def import_row(context, contract_klass, model_class, row)
 
-    record_model.where(company_id: context[:current_user].company_id)
+    model_class.where(company_id: context[:current_user].company_id)
 
-    record = record_model.new(row)
+    record = model_class.new(row)
     contract = contract_klass.new(record)
     unless contract.validate(row)
       return contract.errors.full_messages.join(",")

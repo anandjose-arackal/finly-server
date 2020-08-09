@@ -46,13 +46,13 @@ class MasterSchema < ApplicationRecord
     Object.const_get(val)
   end
 
-  def record_model
+  def record_model_class
     model = self.model
     return model if model.present?
-    return @record_model if @record_model.present?
+    return @record_model_class if @record_model_class.present?
 
     master_key = self.master_key
-    @record_model = Class.new(ApplicationRecord) do
+    @record_model_class = Class.new(ApplicationRecord) do
       include SoftDeletable
 
       self.table_name = master_key

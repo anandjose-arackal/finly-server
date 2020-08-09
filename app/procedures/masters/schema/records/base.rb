@@ -28,16 +28,17 @@ class Masters::Schema::Records::Base < Transactions::API
       end
 
       id = params[:id]
+      context[:model_class] = context[:master_schema].record_model_class
 
       case type
       when :find_or_new
         # if nil, find, new if not found
-        context[:model] = context[:master_schema].record_model&.send(type, id)
-        context[:model] = context[:master_schema].record_model&.new if context[:model].nil?
+        context[:model] = context[:model_class]&.send(type, id)
+        context[:model] = context[:model_class]&.new if context[:model].nil?
       when :new
-        context[:model] = context[:master_schema].record_model&.new
+        context[:model] = context[:model_class]&.new
       when :find
-        context[:model] = context[:master_schema].record_model&.send(:find_by_id, id)
+        context[:model] = context[:model_class]&.send(:find_by_id, id)
       else
         raise "Invalid type :#{type}"
       end
