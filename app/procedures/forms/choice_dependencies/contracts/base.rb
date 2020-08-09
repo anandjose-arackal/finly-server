@@ -22,7 +22,7 @@ class Forms::ChoiceDependencies::Contracts::Base < Reform::Form
     property :controlling_choice_id
   end
 
-  property :internal, deserializer: -> (input, represented, *args) {debugger}
+  # property :internal, deserializer: -> (input, represented, *args) {debugger}
 
   def mappings!(collection:, fragment:, index:, options:, **)
     mapping = mappings.find {|mapping| mapping.id.to_s == fragment["id"].to_s}
