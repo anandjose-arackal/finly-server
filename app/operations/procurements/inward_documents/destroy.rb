@@ -26,12 +26,12 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
     self.procurement = self.inward_document.procurement
     self.purchase_order = self.procurement&.purchase_order
 
-    if self.procurement.po_revisions.present?
-      self.po_revision = self.procurement.po_revisions.last
-      if po_revision.present?
-        self.purchase_order = self.po_revision
-      end
-    end
+    # if self.procurement.po_revisions.present?
+    #   self.po_revision = self.procurement.po_revisions.last
+    #   if po_revision.present?
+    #     self.purchase_order = self.po_revision
+    #   end
+    # end
 
     unless self.purchase_order.present?
       add_message :error, 'Purchase Order not found for this procurement, cannot delete Receipt Note'
