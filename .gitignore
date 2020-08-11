@@ -63,6 +63,7 @@ config/data/bypass_authorized_users.yml
 config/hutch.yml
 public/system/temporary_files/
 public/system/admin_implementation_requests/*
+public/system/import_job/*
 
 /yes_bank_api_call_logs
 .vagrant/
