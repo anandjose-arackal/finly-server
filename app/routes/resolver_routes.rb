@@ -94,6 +94,10 @@ Resolver::Router.draw do
     route "agreement", Docs::P2P::Invoices::Agreement::Resolver
   end
 
+  scope :invoice_line_items do
+    route "default", Docs::P2P::Invoices::InvoiceLineItems::Resolver
+  end
+
   scope :purchase_requests do
     route 'default', Docs::P2P::PurchaseRequests::Resolver
   end

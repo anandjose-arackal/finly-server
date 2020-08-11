@@ -1,140 +1,41 @@
 class ExportManager::Template::TemplateExport < ExportManager::API
+  attr_accessor :export_template
 
-  # TODO: Do this in different way
+  def initialize(user, params)
+    super(user, params)
+    self.export_template = ExportTemplateNew.find(template_id)
+  end
+
+  # TODO: remove this function
+  def self.sync
+    true
+  end
+
   def input
-    ExportManager::Template::InvoiceLineItems::Index.input user, params
+    # TODO: merge default query params in template to params
+    # TODO: figure out how to do `includes` to solve N+1 queries
+
+    Resolver::Router.dispatch("#{resource_type}.default", { current_user: user, params: params })
+  end
+
+  def resource_type
+    export_template.resource
+  end
+
+  def template_id
+    params[:template_id]
   end
 
   def template
-    # TODO: change this to fetch from db
-    {
-      "columns": [
-        {
-          "label": "Invoice number",
-          "value": "{{ record.invoice.invoice_number }}"
-        },
-        {
-          "label": "Finly ref no.",
-          "value": "{{ record.invoice.invoice_id }}"
-        },
-        {
-          "label": "Finly approved date",
-          "value": "{{ record.invoice.approved_at | date: '%d-%b-%Y' }}"
-        },
-        {
-          "label": "Vendor gstin",
-          "value": "{{ record.invoice.gstin_location.gstin }}"
-        },
-        {
-          "label": "Billing location",
-          "value": "{{ record.invoice.billing_location.name }}"
-        },
-        {
-          "label": "Shipping location",
-          "value": "{{ record.invoice.shipping_location.name }}"
-        },
-        {
-          "label": "Gl code",
-          "value": "{{ record.category.gl_code }}"
-        },
-        {
-          "label": "Description",
-          "value": "{{ record.description }}"
-        },
-        {
-          "label": "Invoice net payable amount",
-          "value": "{{ record.invoice.balance_due_value }}"
-        },
-        {
-          "label": "Invoice base amount",
-          "value": "{{ record.invoice.base_amount }}"
-        },
-        {
-          "label": "Total tax",
-          "value": "{{ record.tax_amount.value }}"
-        },
-        {
-          "label": "Item rate",
-          "value": "{{ record.rate }}"
-        },
-        {
-          "label": "Item igst amount",
-          "value": "{{ record.igst_amount }}"
-        },
-        {
-          "label": "Item cgst amount",
-          "value": "{{ record.cgst_amount }}"
-        },
-        {
-          "label": "Item sgst amount",
-          "value": "{{ record.sgst_amount }}"
-        },
-        {
-          "label": "Item igst",
-          "value": "{{ record.igst }}"
-        },
-        {
-          "label": "Item cgst",
-          "value": "{{ record.cgst }}"
-        },
-        {
-          "label": "Item sgst",
-          "value": "{{ record.sgst }}"
-        },
-        {
-          "label": "Igst account number",
-          "value": "{{ record.tax_rate.igst_account_number }}"
-        },
-        {
-          "label": "Cgst account number",
-          "value": "{{ record.tax_rate.cgst_account_number }}"
-        },
-        {
-          "label": "Sgst account number",
-          "value": "{{ record.tax_rate.sgst_account_number }}"
-        },
-        {
-          "label": "Hsn sac",
-          "value": "{{ record.hsn_sac }}"
-        },
-        {
-          "label": "Reverse charge",
-          "value": "0"
-        },
-        {
-          "label": "Reverse charge tax gl account",
-          "value": "N"
-        },
-        {
-          "label": "Calculate tax for rct",
-          "value": "N"
-        },
-        {
-          "label": "Invoice status",
-          "value": "{{ record.invoice.status.name }}"
-        },
-        {
-          "label": "Itc qualified",
-          "value": "{{ record.itc_qualified }}"
-        },
-        {
-          "label": "Country",
-          "value": "{{ record.country }}"
-        },
-        {
-          "label": "Vendor name",
-          "value": "{{ record.invoice.vendor.business_name }}"
-        },
-        {
-          "label": "Department code",
-          "value": "{{ record.department.department_code }}"
-        }
-      ]
-    }
+    case format
+    when :csv, :xls
+      JSON.parse(export_template.template)
+    else
+      export_template.template
+    end
   end
 
   def processor_class
-    # TODO: relook at this to see if there is a good way to get processor
     case format
     when :xls
       ExportManager::Template::Processors::XlsProcessor
@@ -177,7 +78,6 @@ class ExportManager::Template::TemplateExport < ExportManager::API
   end
 
   def format
-    params[:export_format]&.to_sym || :xls
+    export_template.export_format.to_sym
   end
-
 end

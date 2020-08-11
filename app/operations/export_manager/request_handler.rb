@@ -62,7 +62,7 @@ class ExportManager::RequestHandler < BaseOperation
   protected
 
   def init_master
-    if self.template_id
+    if template_id
       ExportManager::Template::TemplateExport
     else
       # Todo fix this to find the valid handler instead of picking the first one. This creates an issue if the user defines 2 exports with the same handler
