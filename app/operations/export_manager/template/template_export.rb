@@ -13,9 +13,20 @@ class ExportManager::Template::TemplateExport < ExportManager::API
 
   def input
     # TODO: merge default query params in template to params
-    # TODO: figure out how to do `includes` to solve N+1 queries
 
-    Resolver::Router.dispatch("#{resource_type}.default", { current_user: user, params: params })
+    results = Resolver::Router.dispatch("#{resource_type}.default", { current_user: user, params: params })
+
+    case format
+    when :csv, :xls
+      includes = results.model.exposure_class.calculate_includes(
+        template['columns'].map do |column|
+          column['value']
+        end
+      )
+      results = results.includes(includes)
+    end
+
+    results
   end
 
   def resource_type
