@@ -1,13 +1,9 @@
 class Masters::ExportTemplates::Helpers::Config
   def self.export_formats
-    # TODO: move these to DB??
-    %w[csv xls json xml]
+    ExportFormat.pluck(:value)
   end
 
   def self.resources
-    # TODO: move these to DB??
-    %w[
-      invoice_line_items
-    ]
+    ExportResource.pluck(:value)
   end
 end

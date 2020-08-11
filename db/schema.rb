@@ -3538,6 +3538,15 @@ ActiveRecord::Schema.define(version: 2020_08_01_091949) do
     t.datetime "deleted_at"
   end
 
+  create_table "export_formats", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.string "value"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_export_formats_on_deleted_at"
+  end
+
   create_table "export_job_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -3621,6 +3630,15 @@ ActiveRecord::Schema.define(version: 2020_08_01_091949) do
     t.index ["model_class"], name: "index_export_requests_on_model_class"
     t.index ["scheduled_on"], name: "index_export_requests_on_scheduled_on"
     t.index ["user_id"], name: "index_export_requests_on_user_id"
+  end
+
+  create_table "export_resources", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.string "value"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_export_resources_on_deleted_at"
   end
 
   create_table "export_template_news", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
