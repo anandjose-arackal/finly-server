@@ -135,4 +135,8 @@ Resolver::Router.draw do
   scope :reports do
     route 'default', Docs::ExpenseManagement::Reports::Resolver
   end
+
+  scope :export_templates do
+    route 'default', Masters::ExportTemplates::Resolver
+  end
 end
