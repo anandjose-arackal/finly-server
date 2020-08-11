@@ -1,3 +1,15 @@
+# == Schema Information
+#
+# Table name: export_formats
+#
+#  id         :bigint           not null, primary key
+#  name       :string(255)
+#  value      :string(255)
+#  deleted_at :datetime
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
+
 class ExportFormat < ApplicationRecord
   FORMATS = [
     {
