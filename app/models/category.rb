@@ -21,6 +21,7 @@
 #  gst_applicable             :boolean          default(FALSE)
 #  tds_applicable             :boolean
 #  deleted_at                 :datetime
+#  created_by_id              :integer
 #
 
 class Category < ApplicationRecord
@@ -30,7 +31,7 @@ class Category < ApplicationRecord
   include Exposures::Model::Exposable
   include EventProducer
 
-  acts_as_sequenced column: :category_code, purpose: :category, editable: false, prefix: 'CAT'
+  # acts_as_sequenced column: :category_code, purpose: :category, editable: false, prefix: 'CAT'
   has_ancestry
 
   event_channel 'category'

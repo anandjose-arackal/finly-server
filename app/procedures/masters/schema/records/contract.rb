@@ -11,15 +11,7 @@ class Masters::Schema::Records::Contract
   end
 
   def self.with(master_schema)
-    contract = Class.new(Reform::Form) do
-      define_method :as_json do |options={}|
-        json = {id: self.id}
-        master_schema.entities.each do |entity|
-          json[entity.entity_key] = self.send(entity.entity_key)
-        end
-        json
-      end
-    end
+    contract = Class.new(Reform::Form)
 
     # Setup Entities
     setup_entities(master_schema, contract)

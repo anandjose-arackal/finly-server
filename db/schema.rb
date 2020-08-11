@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_08_212231) do
+ActiveRecord::Schema.define(version: 2020_08_10_145203) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -4502,6 +4502,52 @@ ActiveRecord::Schema.define(version: 2020_08_08_212231) do
     t.datetime "updated_at", null: false
     t.boolean "reconciled", default: false
     t.datetime "deleted_at"
+  end
+
+  create_table "import_job_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_import_job_statuses_on_created_at"
+    t.index ["deleted_at"], name: "index_import_job_statuses_on_deleted_at"
+    t.index ["name"], name: "index_import_job_statuses_on_name"
+    t.index ["updated_at"], name: "index_import_job_statuses_on_updated_at"
+  end
+
+  create_table "import_jobs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "type"
+    t.integer "created_by_id"
+    t.bigint "company_id", null: false
+    t.text "request_params", limit: 4294967295
+    t.datetime "completed_at"
+    t.integer "total_records"
+    t.integer "created_records"
+    t.integer "updated_records"
+    t.integer "failed_records"
+    t.integer "completed_records"
+    t.integer "completion_percentage"
+    t.string "attachment_file_name"
+    t.string "attachment_content_type"
+    t.bigint "attachment_file_size"
+    t.datetime "attachment_updated_at"
+    t.datetime "deleted_at"
+    t.text "options", limit: 4294967295
+    t.string "description"
+    t.text "crash_stacktrace", limit: 4294967295
+    t.integer "status_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_import_jobs_on_company_id"
+    t.index ["completed_at"], name: "index_import_jobs_on_completed_at"
+    t.index ["created_at"], name: "index_import_jobs_on_created_at"
+    t.index ["created_by_id"], name: "index_import_jobs_on_created_by_id"
+    t.index ["deleted_at"], name: "index_import_jobs_on_deleted_at"
+    t.index ["name"], name: "index_import_jobs_on_name"
+    t.index ["status_id"], name: "index_import_jobs_on_status_id"
+    t.index ["type"], name: "index_import_jobs_on_type"
+    t.index ["updated_at"], name: "index_import_jobs_on_updated_at"
   end
 
   create_table "index_view_segments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|

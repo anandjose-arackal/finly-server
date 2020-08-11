@@ -27,8 +27,9 @@ class MasterSchema < ApplicationRecord
   belongs_to :company
   belongs_to :owner, optional: true
 
-  has_many :entities, class_name: "MasterEntity"
-  has_one :sequence_entity, -> { where type: 'MasterEntity::Sequence' }, class_name: "MasterEntity"
+  has_many :entities, class_name: 'MasterEntity'
+  has_one :sequence_entity, -> { where type: 'MasterEntity::Sequence' }, class_name: 'MasterEntity'
+  has_many :unique_entities, -> { where unique: true }, class_name: 'MasterEntity'
 
   scope :active, -> { where active: true }
 
@@ -56,11 +57,19 @@ class MasterSchema < ApplicationRecord
       include SoftDeletable
 
       self.table_name = master_key
+
+      define_method :as_json do |options={}|
+        json = {id: self.id}
+        master_schema.entities.each do |entity|
+          json[entity.entity_key] = self.send(entity.entity_key)
+        end
+        json
+      end
     end
   end
 
   def contract
-    Masters::Schema::Records::Contract.build(self)
+    Masters::Schema::Records::Contract.with(self)
   end
 
 end

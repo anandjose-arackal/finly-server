@@ -20,4 +20,8 @@ class Masters::Schema::Records::Policy < ApplicationPolicy
     user.admin?("vp")
   end
 
+  def import?
+    true
+  end
+
 end

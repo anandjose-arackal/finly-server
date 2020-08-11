@@ -35,8 +35,10 @@ class MasterEntity::Sequence < MasterEntity
   set :hint, 'Auto-Generated'
   operators :eq_any, :not_eq_all, :cont_any, :not_cont_all, :blank, :present
 
+  MIN_LENGTH_DEFAULT = 5
+
   option :prefix
-  option :min_length, default: 5
+  option :min_length, default: MIN_LENGTH_DEFAULT
 
   schema_contract do
     validation do
@@ -58,9 +60,17 @@ class MasterEntity::Sequence < MasterEntity
     end
   end
 
-  contract_eval "Set sequence" do |context|
-    context[:contract].after_save do
-      # Todo add after save handler here
+  contract_eval "Set sequence" do |contract:, entity:, **|
+    contract.after_save do
+      if model.send(entity.entity_key).blank?
+        prefix = entity.options['prefix']
+        min_length = entity.options['min_length'] || MasterEntity::Sequence::MIN_LENGTH_DEFAULT
+        prefix = LiquidHelper.interpolate(prefix, {'record' => model})
+        sequence = REDIS.incr("MasterEntity::Sequence##{entity.id}##{prefix}")
+        sequence = sequence.to_s.rjust(min_length, "0")
+        model.send("#{entity.entity_key}=", "#{prefix}#{sequence}")
+        model.save
+      end
     end
   end
 end

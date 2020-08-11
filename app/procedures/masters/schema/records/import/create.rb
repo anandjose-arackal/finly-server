@@ -1,71 +1,16 @@
 class Masters::Schema::Records::Import::Create < Transactions::API
+  include Transactions::BackgroundWorker
 
-  schema do
-    params do
-      required(:master_key).filled
-      required(:file).filled
-    end
-  end
-
-  step :find_schema
-  # Todo check user permission to ensure he can import masters
+  step RecordModelClass()
   step Policy::Pundit(Masters::Schema::Records::Policy, :import?)
-  pass :build_headers
-  pass :import_data
+  step Contract::Build(constant: Masters::Schema::Records::Import::Contract)
+  step Contract::Validate()
+  step Contract::Persist()
+  pass :run_background_job
+  step Transactions::Messages::SuccessMessage('Import in progress')
 
-  def find_schema(context, params:, current_user:, **)
-    context[:master_schema] = MasterSchema.find_by(company_id: current_user.company_id, master_key: params[:master_key])
-  end
-
-  def build_record_model(context, master_schema:, **)
-    context[:model_class] = master_schema.record_model_class
-  end
-
-  def build_contract(context, master_schema:, **)
-    context[:contract] = master_schema.contract
-  end
-
-  def build_headers(context, params:, master_schema:, **)
-    context[:headers] = {}
-    context[:sequence] = nil
-    master_schema.entities.each do |entity|
-      context[:headers][entity.entity_key] = entity.label
-      context[:sequence] = entity.entity_key if entity.class.registered_type == 'sequence'
-    end
-  end
-
-  def import_data(context, contract:, params:, model_class:, **)
-    context[:result] = [
-        # Append the headers
-        context[:headers].values
-    ]
-    spreadsheet = ImportUtil.open_spreadsheet(params[:file])
-    spreadsheet.sheet(0).each(context[:headers]) do |row|
-      data = row.values
-      data << import_row(context, contract, model_class, row)
-      context[:result] << data
-    end
-  end
-
-  def build_result(context, contract, result:, **)
-    #
-  end
-
-  protected
-
-  def import_row(context, contract_klass, model_class, row)
-
-    model_class.where(company_id: context[:current_user].company_id)
-
-    record = model_class.new(row)
-    contract = contract_klass.new(record)
-    unless contract.validate(row)
-      return contract.errors.full_messages.join(",")
-    end
-
-    contract.save
-
-    'Saved'
+  def run_background_job(context, model:, current_user:, **)
+    Masters::Schema::Records::Import::Job.call_async(params: {id: model.id}, current_user: current_user)
   end
 
 end

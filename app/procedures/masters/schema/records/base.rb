@@ -14,7 +14,7 @@ class Masters::Schema::Records::Base < Transactions::API
     end
   end
 
-  def self.RecordModelClass()
+  def self. RecordModelClass()
     Transactions::Task.build id: "build_record_model_class" do |context, flow_options, circuit_options|
       current_user = context[:current_user]
       params = context[:params]
