@@ -45,6 +45,7 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
     created_records = 0
     updated_records = 0
     failed_records = 0
+    skipped_records = 0
     context[:spreadsheet].sheet(0).each(context[:headers]) do |row|
       # Skip headers
       next if (row.values - context[:headers].values).blank?
@@ -58,6 +59,8 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
           created_records += 1
         when :update
           updated_records += 1
+        when :skip
+          skipped_records += 1
         else
           # Invalid action?
         end
@@ -65,17 +68,18 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
         failed_records += 1
         data << res.failure
       end
-      progress_update(model, created_records, updated_records, failed_records)
+      progress_update(model, created_records, updated_records, skipped_records, failed_records)
       context[:result] << data
     end
   end
 
-  def progress_update(model, created_records, updated_records, failed_records)
-    completed = created_records + updated_records + failed_records
+  def progress_update(model, created_records, updated_records, skipped_records, failed_records)
+    completed = created_records + updated_records + skipped_records + failed_records
     model.update(
         completed_records: completed,
         created_records: created_records,
         updated_records: updated_records,
+        skipped_records: skipped_records,
         failed_records: failed_records,
         completion_percentage: (completed * 100 / model.total_records)
     )
@@ -99,9 +103,13 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
   def import_row(context, contract_klass, model_class, row)
     record = find_record(context, row[identifier_key(context)])
     action = :update
+
     if record.blank?
       action = :create
       record = model_class.new
+    elsif record.present? and context[:model].options['mode'] != 'create_update'
+      # Skip record
+      return Success(message: "Skipped", action: :skip)
     end
 
     record.created_by = context[:current_user]
@@ -117,7 +125,6 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
     end
 
     unless contract.save
-      debugger
       return Failure(contract.model.errors.full_messages.join(','))
     end
 
