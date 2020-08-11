@@ -52,6 +52,7 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
       data = row.values
       res = import_row(context, contract, model_class, row)
       if res.success?
+        data << res.value![:message]
         case res.value![:action]
         when :create
           created_records += 1
@@ -62,9 +63,9 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
         end
       else
         failed_records += 1
+        data << res.failure
       end
       progress_update(model, created_records, updated_records, failed_records)
-      data << res.value!['message']
       context[:result] << data
     end
   end
@@ -96,33 +97,44 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
   protected
 
   def import_row(context, contract_klass, model_class, row)
-    identifier_key = context[:identifier_key]
-    record = nil
+    record = find_record(context, row[identifier_key(context)])
     action = :update
-    if identifier_key.present?
-      query = {}
-      query[identifier_key]
-      record = model_class.find_by(query)
-    end
-
     if record.blank?
       action = :create
       record = model_class.new
     end
 
-    record.assign_attributes(row)
     record.created_by = context[:current_user]
     record.company = context[:current_user].company
+
+    if row['parent_id'].present?
+      row['parent_id'] = find_record(context, row['parent_id'])&.id
+    end
+
     contract = contract_klass.new(record)
     unless contract.validate(row)
-      return Failure({message: contract.errors.full_messages.join(',')})
+      return Failure(contract.errors.full_messages.join(','))
     end
 
     unless contract.save
-      return Failure({message: contract.model.errors.full_messages.join(',')})
+      debugger
+      return Failure(contract.model.errors.full_messages.join(','))
     end
 
     Success({message: 'Saved', action: action})
+  end
+
+  # Finds the record using the unique identifier
+  def find_record(context, id)
+    return nil unless identifier_key(context).present?
+
+    query = {}
+    query[identifier_key(context)] = id
+    context[:model_class].find_by(query)
+  end
+
+  def identifier_key(context)
+    context[:identifier_key]
   end
 
 end

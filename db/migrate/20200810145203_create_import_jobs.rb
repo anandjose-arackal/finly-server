@@ -18,6 +18,7 @@ class CreateImportJobs < ActiveRecord::Migration[5.2]
       t.integer :total_records
       t.integer :created_records
       t.integer :updated_records
+      t.integer :skipped_records
       t.integer :failed_records
       t.integer :completed_records
       t.integer :completion_percentage

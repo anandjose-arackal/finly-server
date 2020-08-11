@@ -4525,6 +4525,7 @@ ActiveRecord::Schema.define(version: 2020_08_10_145203) do
     t.integer "total_records"
     t.integer "created_records"
     t.integer "updated_records"
+    t.integer "skipped_records"
     t.integer "failed_records"
     t.integer "completed_records"
     t.integer "completion_percentage"
