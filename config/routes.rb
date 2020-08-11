@@ -4335,6 +4335,12 @@ Rails.application.routes.draw do
   resources :export_templates do
   end
 
+  resources :export_formats do
+  end
+
+  resources :export_resources do
+  end
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
   # The priority is based upon order of creation: first created -> highest priority.

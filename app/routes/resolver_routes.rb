@@ -139,4 +139,12 @@ Resolver::Router.draw do
   scope :export_templates do
     route 'default', Masters::ExportTemplates::Resolver
   end
+
+  scope :export_formats do
+    route 'default', Masters::ExportFormats::Resolver
+  end
+
+  scope :export_resources do
+    route 'default', Masters::ExportResources::Resolver
+  end
 end
