@@ -19,6 +19,7 @@ class ExportManager::Template::TemplateExport < ExportManager::API
     case format
     when :csv, :xls
       includes = results.model.exposure_class.calculate_includes(
+        results.model,
         template['columns'].map do |column|
           column['value']
         end

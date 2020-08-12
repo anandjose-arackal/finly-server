@@ -56,7 +56,7 @@ class InvoiceExposure < Exposures::API
       nil
     end
   end
-  attribute :cgst_amount do
+  attribute :cgst_amount, includes: [:tax_amount] do
     case record.gst_type_id
     when GstType.id_for(:cgst_sgst)
       (record.tax_amount&.value || 0)/2
@@ -66,7 +66,7 @@ class InvoiceExposure < Exposures::API
       0
     end
   end
-  attribute :sgst_amount do
+  attribute :sgst_amount, includes: [:tax_amount] do
     case record.gst_type_id
     when GstType.id_for(:cgst_sgst)
       (record.tax_amount&.value || 0)/2
@@ -74,7 +74,7 @@ class InvoiceExposure < Exposures::API
       0
     end
   end
-  attribute :igst_amount do
+  attribute :igst_amount, includes: [:tax_amount] do
     case record.gst_type_id
     when GstType.id_for(:cgst_sgst)
       0
@@ -124,7 +124,7 @@ class InvoiceExposure < Exposures::API
     end
   end
   attribute :status, record_attribute: true, exposure: true, includes: [:status]
-  attribute :base_amount do
+  attribute :base_amount, includes: [:invoice_items, :amount, :original_amount] do
     record.include_original_amount
   end
 
