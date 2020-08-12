@@ -2,6 +2,8 @@
 # The challenge is that since all masters are dynamically generated, we cannot add a belongs_to, has_one, has_many relationships
 # when one master refers another master. For this purpose, Masters::JsonBuilder maintains a data provider
 # which pre-loads all the associations to avoid N+1 query problem.
+#
+# This supports building deeply nested jsons
 # Flow:
 #   build
 #     -> pre-load all the records from lookup fields
@@ -66,17 +68,17 @@ class Masters::JsonBuilder
     end
 
     def find_record(master_key, record_id)
-      records&.dig(master_key, record_id)
-      # record = records&.dig(master_key, record_id)
-      # return record if record.present?
-      #
-      # master_schema = find_master_schema(master_key)
-      # master_model_class = master_schema.record_model_class
-      # record = master_model_class.find_by(id: record_id)
-      # return nil if record.blank?
-      #
-      # self.records(master_key)[record.id] = record
-      # record
+      # records&.dig(master_key, record_id)
+      record = records&.dig(master_key, record_id)
+      return record if record.present?
+
+      master_schema = find_master_schema(master_key)
+      master_model_class = master_schema.record_model_class
+      record = master_model_class.find_by(id: record_id)
+      return nil if record.blank?
+
+      self.records(master_key)[record.id] = record
+      record
     end
 
     def find_master_schema(master_key)
