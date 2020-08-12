@@ -1,1 +1,1 @@
-json.data @op[:model]
+json.data Masters::JsonBuilder.(@op[:master_schema], @op[:model])
