@@ -3,7 +3,7 @@
 # when one master refers another master. For this purpose, Masters::JsonBuilder maintains a data provider
 # which pre-loads all the associations to avoid N+1 query problem.
 #
-# This supports building deeply nested jsons
+# For nested records, this will load the id and the name
 # Flow:
 #   build
 #     -> pre-load all the records from lookup fields
@@ -18,14 +18,15 @@ class Masters::JsonBuilder
     data_provider = DataProvider.new(master_schema.company) if data_provider.nil?
 
     if record.respond_to?(:each)
+      records = record # Making it easier to read
       # Build collection
       json = []
       master_schema.entities.each do |entity|
         if entity.type == 'MasterEntity::Lookup'
-          data_provider.pre_load(record, lookup_master_key(entity), entity.entity_key)
+          data_provider.pre_load(records, lookup_master_key(entity), entity.entity_key)
         end
       end
-      record.each do |rec|
+      records.each do |rec|
         json << build_record(master_schema, rec, data_provider)
       end
       json
@@ -38,16 +39,11 @@ class Masters::JsonBuilder
     return nil if record.blank?
 
     json = {id: record.id}
+    json[:display_name] = record.send(master_schema.display_name)
     master_schema.entities.each do |entity|
       case entity.type
       when 'MasterEntity::Lookup'
-        json[entity.entity_key] = build(
-            data_provider.find_master_schema(lookup_master_key(entity)),
-            data_provider.find_record(
-                lookup_master_key(entity),
-                record.send(entity.entity_key)
-            )
-        )
+        json[entity.entity_key] = build_lookup_entity(data_provider, record, entity)
       else
         json[entity.entity_key] = record.send(entity.entity_key)
       end
@@ -57,6 +53,20 @@ class Masters::JsonBuilder
 
   def self.lookup_master_key(entity)
     entity.choices_scope.route.split(".").last
+  end
+
+  def self.build_lookup_entity(data_provider, record, entity)
+    lookup_master_schema = data_provider.find_master_schema(lookup_master_key(entity))
+    lookup_record = data_provider.find_record(
+        lookup_master_key(entity),
+        record.send(entity.entity_key)
+    )
+    return nil if lookup_record.nil?
+
+    {
+        id: lookup_record.id,
+        name: lookup_record.send(lookup_master_schema.display_name)
+    }
   end
 
   class DataProvider
@@ -91,7 +101,7 @@ class Masters::JsonBuilder
       @master_schemas ||= {}.with_indifferent_access
     end
 
-    def records(master_key=nil)
+    def records(master_key = nil)
       @records ||= {}.with_indifferent_access
       return @records if master_key.nil?
 

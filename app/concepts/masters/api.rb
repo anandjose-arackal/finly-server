@@ -1,10 +1,8 @@
 class Masters::API
   include DynamicAttributes
 
-  def self.model(model = NoObject)
-    @model = model unless model == NoObject
-    @model
-  end
+  class_attr :model
+  class_attr :display_name
 
   def self.name(name = NoObject)
     @name = name unless name == NoObject
@@ -16,6 +14,7 @@ class Masters::API
     args[:master_key] = model.table_name
     args[:model] = model
     args[:klass_name] = self
+    args[:display_name] = self.display_name
     @schema ||= MasterSchema.new(args)
     @schema.instance_eval &block if block_given?
     @schema

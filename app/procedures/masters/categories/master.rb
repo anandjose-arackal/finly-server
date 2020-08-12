@@ -1,6 +1,7 @@
 class Masters::Categories::Master < Masters::API
 
   model Category
+  display_name :name
 
   schema can_attributes_be_nested: true do
     sequence :category_code, prefix: "CAT/", min_length: 6, show_in_lookup: true

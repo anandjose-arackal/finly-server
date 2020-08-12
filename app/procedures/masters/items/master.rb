@@ -1,6 +1,7 @@
 class Masters::Items::Master < Masters::API
 
   model Item
+  display_name :description
 
   schema do
     sequence :item_number, prefix: 'ITEM/', min_length: 6, show_in_lookup: true
