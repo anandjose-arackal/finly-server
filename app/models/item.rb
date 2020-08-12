@@ -112,7 +112,7 @@ class Item < ApplicationRecord
 
   after_save :budget_trail_entry
 
-  def as_json
+  def as_json(options={})
     {
         id: id,
         item_number: item_number,

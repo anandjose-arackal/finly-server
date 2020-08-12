@@ -69,7 +69,7 @@ class MasterEntity < ApplicationRecord
 
   contract_eval "Uniqueness check" do |contract:, entity:, **|
     if entity.unique
-      contract.validates_uniqueness_of entity.entity_key, scope: [:company_id, :ancestry], conditions: -> { where deleted_at: nil }
+      contract.validates_uniqueness_of entity.entity_key, scope: [:company_id], conditions: -> { where deleted_at: nil }
     end
   end
 
@@ -78,7 +78,11 @@ class MasterEntity < ApplicationRecord
       contract.validate do
         id = send(entity.entity_key)
         if id.present?
-          entity.choices_scope.valid?(id: id, user: contract.contract_root.created_by)
+          # If the master has a created by, use the created by field for scoping down the master
+          user = contract_root.respond_to?(:created_by) ? contract_root.created_by : RequestStoreUtil.current_user
+          unless entity.choices_scope.valid?(id: id, user: user)
+            errors.add entity.entity_key, 'is invalid'
+          end
         end
       end
     end

@@ -40,6 +40,7 @@ class Choices::Builders::Lookup < Choices::Builders::Base
 
   def choices(params: {}, user: nil)
     params = params.with_indifferent_access.deep_merge(choice_params.with_indifferent_access)
+    params[:route] = route
     result = klass.(params: params, current_user: user)
     result['model.records']
   end

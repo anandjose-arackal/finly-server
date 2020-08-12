@@ -48,15 +48,19 @@ class MasterSchema < ApplicationRecord
   end
 
   def record_model_class
-    model = self.model
-    return model if model.present?
     return @record_model_class if @record_model_class.present?
 
+    base_class = self.model.present? ? self.model : ApplicationRecord
     master_key = self.master_key
-    @record_model_class = Class.new(ApplicationRecord) do
+    master_schema = self
+    @record_model_class = Class.new(base_class) do
       include SoftDeletable
 
       self.table_name = master_key
+
+      def self.name
+        "Master#{table_name}"
+      end
 
       define_method :as_json do |options={}|
         json = {id: self.id}
