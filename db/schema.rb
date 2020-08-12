@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_10_145203) do
+ActiveRecord::Schema.define(version: 2020_08_12_021519) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -4516,6 +4516,7 @@ ActiveRecord::Schema.define(version: 2020_08_10_145203) do
   end
 
   create_table "import_jobs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
     t.string "name", null: false
     t.string "type"
     t.integer "created_by_id"
@@ -4549,6 +4550,7 @@ ActiveRecord::Schema.define(version: 2020_08_10_145203) do
     t.index ["status_id"], name: "index_import_jobs_on_status_id"
     t.index ["type"], name: "index_import_jobs_on_type"
     t.index ["updated_at"], name: "index_import_jobs_on_updated_at"
+    t.index ["uuid"], name: "index_import_jobs_on_uuid"
   end
 
   create_table "index_view_segments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -5527,6 +5529,7 @@ ActiveRecord::Schema.define(version: 2020_08_10_145203) do
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "choices_scope"
     t.index ["active"], name: "index_master_entities_on_active"
     t.index ["company_id"], name: "index_master_entities_on_company_id"
     t.index ["created_at"], name: "index_master_entities_on_created_at"
@@ -5537,6 +5540,27 @@ ActiveRecord::Schema.define(version: 2020_08_10_145203) do
     t.index ["type"], name: "index_master_entities_on_type"
     t.index ["updated_at"], name: "index_master_entities_on_updated_at"
     t.index ["uuid"], name: "index_master_entities_on_uuid"
+  end
+
+  create_table "master_entity_choices", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
+    t.integer "company_id", null: false
+    t.string "name", null: false
+    t.integer "position"
+    t.string "master_entity_id", null: false
+    t.integer "created_by_id"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_master_entity_choices_on_company_id"
+    t.index ["created_at"], name: "index_master_entity_choices_on_created_at"
+    t.index ["created_by_id"], name: "index_master_entity_choices_on_created_by_id"
+    t.index ["deleted_at"], name: "index_master_entity_choices_on_deleted_at"
+    t.index ["master_entity_id"], name: "index_master_entity_choices_on_master_entity_id"
+    t.index ["name"], name: "index_master_entity_choices_on_name"
+    t.index ["position"], name: "index_master_entity_choices_on_position"
+    t.index ["updated_at"], name: "index_master_entity_choices_on_updated_at"
+    t.index ["uuid"], name: "index_master_entity_choices_on_uuid"
   end
 
   create_table "master_schemas", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|

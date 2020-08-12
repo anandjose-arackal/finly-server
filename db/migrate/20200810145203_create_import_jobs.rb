@@ -9,6 +9,7 @@ class CreateImportJobs < ActiveRecord::Migration[5.2]
     ImportJobStatus.seed_data
 
     create_table :import_jobs do |t|
+      t.uuid
       t.string :name, index: true, null: false
       t.string :type, index: true
       t.integer :created_by_id, index: true, references: 'users'

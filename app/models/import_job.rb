@@ -2,7 +2,8 @@
 #
 # Table name: import_jobs
 #
-#  id                      :bigint           not null, primary key
+#  id                      :bigint           not null
+#  uuid                    :string(36)       not null, primary key
 #  name                    :string(255)      not null
 #  type                    :string(255)
 #  created_by_id           :integer
@@ -10,6 +11,10 @@
 #  request_params          :text(4294967295)
 #  completed_at            :datetime
 #  total_records           :integer
+#  created_records         :integer
+#  updated_records         :integer
+#  skipped_records         :integer
+#  failed_records          :integer
 #  completed_records       :integer
 #  completion_percentage   :integer
 #  attachment_file_name    :string(255)
@@ -26,6 +31,7 @@
 #
 
 class ImportJob < ApplicationRecord
+  include UUIDHelper
 
   belongs_to :created_by, class_name: 'User'
   belongs_to :company

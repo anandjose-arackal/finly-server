@@ -27,6 +27,7 @@
 #  deleted_at                :datetime
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
+#  choices_scope             :text(65535)
 #
 
 class MasterEntity < ApplicationRecord
@@ -39,24 +40,55 @@ class MasterEntity < ApplicationRecord
   belongs_to :company
   belongs_to :master_schema
 
+  has_many :choices, class_name: 'MasterEntityChoice', dependent: :destroy
+
   scope :system_fields, -> { where system_entity: true }
   scope :custom_fields, -> { where.not system_entity: true }
   scope :show_in_lookup, -> { where show_in_lookup: true }
 
   class_attr :registered_type
 
+  class_attr :contract_evaluators, default: {}
+
   serialize :options, JSON
+  serialize :choices_scope, JSON
 
   def self.register(key)
     Masters::Entity::Registry.register self, key
   end
 
-  def self.contract_evaluators
-    @contract_evaluators ||= {}
-  end
-
   def self.contract_eval(name, &block)
     contract_evaluators[name] = block if block_given?
+  end
+
+  contract_eval "Required check" do |contract:, entity:, **|
+    if entity.required
+      contract.validates entity.entity_key, presence: true
+    end
+  end
+
+  contract_eval "Uniqueness check" do |contract:, entity:, **|
+    if entity.unique
+      contract.validates_uniqueness_of entity.entity_key, scope: [:company_id, :ancestry], conditions: -> { where deleted_at: nil }
+    end
+  end
+
+  contract_eval "Choices Scope" do |contract:, entity:, **|
+    if entity.choices_scope.present?
+      contract.validate do
+        id = send(entity.entity_key)
+        if id.present?
+          entity.choices_scope.valid?(id: id, user: contract.contract_root.created_by)
+        end
+      end
+    end
+  end
+
+  def choices_scope
+    val = super()&.with_indifferent_access
+    return nil unless val.present?
+
+    Choices[val[:type]].new(val[:config], entity: self)
   end
 
   def as_json(options = {})

@@ -6,10 +6,10 @@ class Choices::Builders::List < Choices::Builders::Base
     self.new({choices: args&.map {|m| m.slice(:id, :name, :active)}})
   end
 
-  def choices(params: {}, user: nil, form_entity: nil)
-    if form_entity.present?
+  def choices(params: {}, user: nil, entity: nil)
+    if entity.present?
       # Todo Generalize!
-      form_entity.form_entity_choices
+      entity.choices
     else
       config[:choices]
     end

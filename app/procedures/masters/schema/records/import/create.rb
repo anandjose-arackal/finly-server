@@ -1,4 +1,4 @@
-class Masters::Schema::Records::Import::Create < Transactions::API
+class Masters::Schema::Records::Import::Create < Masters::Schema::Records::Base
   include Transactions::BackgroundWorker
 
   step RecordModelClass()

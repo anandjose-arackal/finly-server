@@ -2,7 +2,7 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
   include Transactions::BackgroundWorker
   include Dry::Monads[:result]
 
-  step Model(ImportJob::Master, :find_by)
+  step Model(ImportJob::Master, :find_by_uuid)
   step Policy::Pundit(Masters::Schema::Records::Policy, :import?)
   step :init_record_model
   step RecordModelClass()

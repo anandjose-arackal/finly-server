@@ -34,6 +34,16 @@ class Masters::Entity::Contract < Reform::Form
       end
     end
   }
+  property :choices_scope
+  collection :choices, populate_if_empty: MasterEntityChoice do
+    property :company, deserializer: -> (input, represented) {
+      represented.company ||= contract_root.model.company
+    }
+    property :created_by, deserializer: -> (input, represented) {``
+      represented.created_by ||= contract_root.model.created_by
+    }
+    property :name
+  end
 
   class Masters::Entity::Contract::Custom < Masters::Entity::Contract
 

@@ -117,7 +117,7 @@ class FormEntity < ApplicationRecord
     val = super()&.with_indifferent_access
     return nil unless val.present?
 
-    Choices[val[:type]].new(val[:config], form_entity: self)
+    Choices[val[:type]].new(val[:config], entity: self)
   end
 
   def contract(contract, user)

@@ -6,10 +6,10 @@ class Choices::Builders::Switch < Choices::Builders::Base
     self.new({choices: [{id: 1, name: "true", active: true}, {id: 0, name: "false", active: true}]})
   end
 
-  def choices(params: {}, user: nil, form_entity: nil)
-    if form_entity.present?
+  def choices(params: {}, user: nil, entity: nil)
+    if entity.present?
       # Todo Generalize!
-      form_entity.form_entity_choices
+      entity.choices
     else
       config[:choices]
     end

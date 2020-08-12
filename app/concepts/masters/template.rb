@@ -18,6 +18,12 @@ class Masters::Template < Templates::API
         set :company_id, builder_context.params[:company_id]
         set :master_schema, builder_context.root_record
       end
+
+      association :choices do
+        clone do |ch_builder_context|
+          set :company_id, ch_builder_context.params[:company_id]
+        end
+      end
     end
   end
 end

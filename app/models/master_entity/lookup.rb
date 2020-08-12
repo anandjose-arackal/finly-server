@@ -27,10 +27,11 @@
 #  deleted_at                :datetime
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
+#  choices_scope             :text(65535)
 #
 
 class MasterEntity::Lookup < MasterEntity
   register :lookup
   set :hint, 'Select value'
-  operators :eq_any#, :blank, :present
+  operators :eq_any #, :blank, :present
 end

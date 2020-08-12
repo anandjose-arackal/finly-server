@@ -2,7 +2,7 @@ class Masters::Schema::Records::Contract
 
   def self.Build()
     Transactions::Task.build id: "find_master_schema" do |context, flow_options, circuit_options|
-      master_schema = context[:master_schema]# || context[:model]
+      master_schema = context[:master_schema] # || context[:model]
       context[:'contract.default.class'] = Masters::Schema::Records::Contract.with(master_schema)
       context[:'contract.default'] = context[:'contract.default.class'].new(context[:model])
 
@@ -11,38 +11,19 @@ class Masters::Schema::Records::Contract
   end
 
   def self.with(master_schema)
-    contract = Class.new(Reform::Form)
+    Class.new(Reform::Form) do
+      master_schema.entities.each do |entity|
+        next unless entity.active
 
-    # Setup Entities
-    setup_entities(master_schema, contract)
+        property entity.entity_key
 
-    # Validate parent_associations
-    # Todo
-
-    # Validate lookup fields
-    # Todo
-
-    contract
-  end
-
-  def self.setup_entities(master_schema, contract)
-    master_schema.entities.each do |entity|
-      next unless entity.active
-
-      validates = {}
-      validates[:presence] = true if entity.required
-      validates[:uniqueness] = true if entity.unique
-      args = {}
-      args[:validates] = validates if validates.present?
-
-      contract.send(:property, entity.entity_key, args)
-
-      context = {
-          entity: entity,
-          contract: contract
-      }
-      entity.class.contract_evaluators.each do |name, evaluator|
-        evaluator.call(context)
+        context = {
+            entity: entity,
+            contract: self
+        }
+        entity.class.contract_evaluators.each do |name, evaluator|
+          instance_exec context, &evaluator
+        end
       end
     end
   end
