@@ -56,9 +56,10 @@ class Masters::JsonBuilder
   end
 
   def self.build_lookup_entity(data_provider, record, entity)
-    lookup_master_schema = data_provider.find_master_schema(lookup_master_key(entity))
+    master_key = lookup_master_key(entity)
+    lookup_master_schema = data_provider.find_master_schema(master_key)
     lookup_record = data_provider.find_record(
-        lookup_master_key(entity),
+        master_key,
         record.send(entity.entity_key)
     )
     return nil if lookup_record.nil?
