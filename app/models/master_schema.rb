@@ -63,11 +63,7 @@ class MasterSchema < ApplicationRecord
       end
 
       define_method :as_json do |options={}|
-        json = {id: self.id}
-        master_schema.entities.each do |entity|
-          json[entity.entity_key] = self.send(entity.entity_key)
-        end
-        json
+        Masters::JsonBuilder.(master_schema, self)
       end
     end
   end
