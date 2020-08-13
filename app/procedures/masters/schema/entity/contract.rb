@@ -31,7 +31,7 @@ class Masters::Schema::Entity::Contract < Reform::Form
     represented.label = input[:label] if input[:label].present?
     represented.label ||= represented.entity_key.to_s.titleize
   }
-  property :system_entity, deserializer: -> (input, represented) {
+  property :system_entity, deserializer: -> (input, represented, **) {
     represented.system_entity ||= false
   }
   property :active, default: true
@@ -57,19 +57,19 @@ class Masters::Schema::Entity::Contract < Reform::Form
     property :name
   end
 
-  property :can_label_be_changed, deserializer: -> (input, represented) {
+  property :can_label_be_changed, deserializer: -> (input, represented, **) {
     represented.can_label_be_changed = true unless represented.system_entity
   }
-  property :can_uniqueness_be_changed, deserializer: -> (input, represented) {
+  property :can_uniqueness_be_changed, deserializer: -> (input, represented, **) {
     represented.can_uniqueness_be_changed = true unless represented.system_entity
   }
-  property :can_mandatory_be_changed, deserializer: -> (input, represented) {
+  property :can_mandatory_be_changed, deserializer: -> (input, represented, **) {
     represented.can_mandatory_be_changed = true unless represented.system_entity
   }
-  property :can_active_be_changed, deserializer: -> (input, represented) {
+  property :can_active_be_changed, deserializer: -> (input, represented, **) {
     represented.can_active_be_changed = true unless represented.system_entity
   }
-  property :can_be_destroyed, deserializer: -> (input, represented) {
+  property :can_be_destroyed, deserializer: -> (input, represented, **) {
     represented.can_be_destroyed = true unless represented.system_entity
   }
 

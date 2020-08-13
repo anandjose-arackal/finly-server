@@ -7,6 +7,7 @@ module Masters::Entity::Schema
 
       base_class = Masters::Schema::Entity::Contract
 
+      schema_contract = self.schema_contract
       return base_class unless schema_contract.present?
       @contract = Class.new(base_class) do
         instance_exec &schema_contract

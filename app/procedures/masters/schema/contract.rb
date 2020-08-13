@@ -1,6 +1,14 @@
 class Masters::Schema::Contract < Reform::Form
 
-  class EntityForm < Reform::Form
+  # Every entity type has a different form. Ex: Form for text is different from lookup.
+  # To handle this scenario we use a proxy form which will basically call the relevant
+  # entity form for validation.
+  #
+  # This has 3 main purpose
+  # 1. Assign master_schema as the root contract's model (master schema contracts model)
+  # 2. Assign company from the root contract's model (master schema contracts model)
+  # 3. Run the entity specific validation
+  class ProxyEntityForm < Reform::Form
     property :master_schema, deserializer: -> (input, represented, **) {
       represented.master_schema ||= contract_root.model
     }
@@ -50,7 +58,7 @@ class Masters::Schema::Contract < Reform::Form
     represented.can_attributes_be_changed = true unless represented.system_master
   }
 
-  collection :entities, populate_if_empty: MasterEntity, form: EntityForm
+  collection :entities, populate_if_empty: MasterEntity, form: ProxyEntityForm
 
   validate :set_primary_key
   validates :name, presence: true
