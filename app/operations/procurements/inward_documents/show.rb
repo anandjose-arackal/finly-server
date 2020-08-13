@@ -19,12 +19,12 @@ class Procurements::InwardDocuments::Show < Procurements::InwardDocuments::Base
     procurement = inward_document.procurement
 
     self.purchase_order = procurement.purchase_order
-    if procurement.po_revisions.present?
-      po_revision = procurement.po_revisions.last
-      if po_revision.present?
-        self.purchase_order = po_revision
-      end
-    end
+    # if procurement.po_revisions.present?
+    #   po_revision = procurement.po_revisions.last
+    #   if po_revision.present?
+    #     self.purchase_order = po_revision
+    #   end
+    # end
   end
 
   def success

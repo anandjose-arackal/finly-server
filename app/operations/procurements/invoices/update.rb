@@ -11,13 +11,13 @@ class Procurements::Invoices::Update < Procurements::Invoices::Base
     self.invoice = user.company.invoices.scope_all_except_voided.find_by(id: invoice_id)
     self.invoice_params = set_invoice_parameters
 
-    if self.procurement.po_revisions.present?
-      # self.po_revision = self.procurement.po_revisions.find_by(id: params[:po_id])
-      self.po_revision = self.procurement.po_revisions.last
-      if po_revision.present?
-        self.purchase_order = self.po_revision
-      end
-    end
+    # if self.procurement.po_revisions.present?
+    #   # self.po_revision = self.procurement.po_revisions.find_by(id: params[:po_id])
+    #   self.po_revision = self.procurement.po_revisions.last
+    #   if po_revision.present?
+    #     self.purchase_order = self.po_revision
+    #   end
+    # end
 
     self.custom_fields = params&.dig(:custom_fields) || params&.dig(:invoice, :custom_fields)
   end

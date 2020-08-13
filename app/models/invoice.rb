@@ -80,8 +80,8 @@
 #  proforma_advance                :integer
 #  total_proforma_advance          :decimal(20, 2)
 #  cost_allocation_items           :boolean          default(FALSE)
-#  po_number                       :string(255)
 #  narration                       :text(65535)
+#  po_number                       :string(255)
 #  bank_account_id                 :integer
 #  rejection_note                  :text(65535)
 #  payment_agreement_id            :integer
@@ -99,7 +99,6 @@
 #  gross_amount                    :decimal(20, 10)
 #  discount_amount                 :decimal(20, 10)
 #  freight_amount                  :decimal(20, 10)
-#  taxable_amount                  :decimal(20, 10)
 #  tax_amount                      :decimal(20, 10)
 #  tds_amount                      :decimal(20, 10)
 #  net_amount                      :decimal(20, 10)
@@ -108,14 +107,20 @@
 #  total_paid_amount               :decimal(20, 10)
 #  balance_due_amount              :decimal(20, 10)
 #  currency_code                   :string(255)
+#  taxable_amount                  :decimal(20, 10)
+#  erp_sync_status_id              :integer
+#  erp_sync_message                :string(255)
+#  erp_sync_reference_id           :string(255)
+#  erp_sync_attempts_count         :integer
+#  erp_sync_attempted_at           :datetime
 #
 
 class Invoice < ApplicationRecord
   include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport
   include LiquidDroppable
   include Exposures::Model::Exposable
-  include Exposures::Model::Exposable
   include Sequenced::ActsAsSequenced
+  include ErpSyncable
 
   # include EventProducer
 
@@ -575,9 +580,15 @@ class Invoice < ApplicationRecord
     where.not invoice_status_id: InwardInvoiceStatus.id_for(:voided)
   }
 
-  scope :scope_all_except_voided_rejected, -> {
+  scope :scope_all_except_voided_rejected_retracted, -> {
     where.not invoice_status_id: [InwardInvoiceStatus.id_for(:voided),
-                                  InwardInvoiceStatus.id_for(:rejected)]
+                                  InwardInvoiceStatus.id_for(:rejected),
+                                  InwardInvoiceStatus.id_for(:retracted)]
+  }
+
+  scope :pending_erp_sync, -> (*args) {
+    with_erp_sync_status_pending.
+        where(invoice_status_id: InwardInvoiceStatus.ids_for(:unpaid, :partially_paid, :paid, :approved, :auto_approved, :closed))
   }
 
   after_create :set_defaults
@@ -624,9 +635,7 @@ class Invoice < ApplicationRecord
     set :invoice_status_id => InwardInvoiceStatus.id_for(:open)
   end
 
-  def self.ransackable_scopes(auth_object = nil)
-    [:with_status_id]
-  end
+  ransack_scopes :with_status_id
 
   def policy
     return super if self.policy_id.present?

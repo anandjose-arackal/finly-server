@@ -11,12 +11,12 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
 
     self.purchase_order = self.procurement&.purchase_order
 
-    if self.procurement.po_revisions.present?
-      self.po_revision = self.procurement.po_revisions.last
-      if po_revision.present?
-        self.purchase_order = self.po_revision
-      end
-    end
+    # if self.procurement.po_revisions.present?
+    #   self.po_revision = self.procurement.po_revisions.last
+    #   if po_revision.present?
+    #     self.purchase_order = self.po_revision
+    #   end
+    # end
   end
 
   def validate

@@ -299,7 +299,7 @@ class ApplicationController < ActionController::Base
 
   def authorize_ip(authorized_list)
     authorized_list = [authorized_list] if authorized_list.class.name == String.name
-    unless authorized_list.include?(request.remote_ip)
+    unless authorized_list.present? and authorized_list.include?(request.remote_ip)
       head 403
       return false
     end

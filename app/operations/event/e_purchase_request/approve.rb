@@ -62,12 +62,15 @@ class Event::EPurchaseRequest::Approve < Event::EPurchaseRequest::Base
   end
 
   def mailer_body(user)
+    # i.e. this is the user who approved the PR
     if user == self.approving_user
       "You have approved the purchase request: #{self.purchase_request.order_number}"
+    # i.e. the PR is approved and is awaiting the initiators to create a PO from it
     elsif po_initiators.present? && po_initiators.include?(user)
       "#{approving_user.name} has approved the purchase request: #{self.purchase_request.order_number} and is awaiting your action in approved items"
+    # now the PR hasn't been approved yet and is waiting someone else's approval
     else
-      "#{self.approving_user.name} has approved the purchase request: #{self.purchase_request.order_number}"
+      "#{self.approving_user.name} has approved the purchase request: #{self.purchase_request.order_number} and is awaiting your further approval"
     end
   end
 

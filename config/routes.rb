@@ -3866,6 +3866,37 @@ Rails.application.routes.draw do
     end
   end
 
+  namespace :admin do
+    resources :macros, only: [:create, :update, :destroy, :index, :show]
+    resources :macro_jobs, only: [:index, :show]
+
+    post 'macros/:id/jobs', to: 'macro_jobs#create'
+
+    scope :index do
+      get 'config', to: 'index#fetch_config'
+      post 'config', to: 'index#fetch_config'
+      # get 'index/:route/config', to: "index#fetch_old_config"
+      # post 'index/:route/config', to: "index#fetch_config"
+      get 'record_counts', to: 'index#record_counts'
+      post 'record_counts', to: 'index#record_counts'
+      get 'status_counts', to: 'index#status_counts'
+      post 'status_counts', to: 'index#status_counts'
+      get '/', to: "index#show"
+      post '/', to: "index#show"
+    end
+
+    scope :actions do
+      get 'validate', to: "actions#validate"
+      post 'validate', to: "actions#validate"
+      get '/', to: "actions#show"
+    end
+
+    get 'filters', to: "filters#index"
+    get 'views', to: "index_view_segments#index"
+  end
+
+  post 'macros/:id/jobs', to: 'macro_jobs#create'
+
 
   namespace :summary do
     get 'configurations', to: 'configuration#index'
@@ -4272,6 +4303,32 @@ Rails.application.routes.draw do
   patch 'users/:id/profile', to: 'user_profiles#update'
 
   post 'clients/web', to: 'web_clients#create'
+
+
+  namespace :macros do
+    namespace :v1 do
+      get 'invoices/count', to: 'invoices#count'
+      post 'invoices/new_sync_attempt', to: 'invoices#new_sync_attempt'
+      resources :invoices, only: [:index, :show, :update]
+
+      get 'vendors/count', to: 'vendors#count'
+      post 'vendors/new_sync_attempt', to: 'vendors#new_sync_attempt'
+      resources :vendors, only: [:index, :show, :update]
+
+      get 'payments/count', to: 'payments#count'
+      post 'payments/new_sync_attempt', to: 'payments#new_sync_attempt'
+      resources :payments, only: [:index, :show, :update]
+
+      get 'users/count', to: 'users#count'
+      post 'users/new_sync_attempt', to: 'users#new_sync_attempt'
+      resources :users, only: [:index, :show, :update]
+
+      get 'reports/count', to: 'reports#count'
+      post 'reports/new_sync_attempt', to: 'reports#new_sync_attempt'
+      resources :reports, only: [:index, :show, :update]
+    end
+  end
+
 
   get 'lookup/:route', to: 'lookup#route'
 

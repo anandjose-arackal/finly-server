@@ -68,6 +68,7 @@ class User < ApplicationRecord
   include LiquidDroppable
   include Exposures::Model::Exposable
   include EventProducer
+  include ErpSyncable
 
   event_channel 'user'
 
@@ -151,6 +152,7 @@ class User < ApplicationRecord
 
 
   has_many :bank_accounts, as: :account_owner, dependent: :destroy
+  has_one :default_bank_account, -> { where default_account: true }, class_name: "BankAccount", as: :account_owner
   has_many :authentications
   has_many :cards, dependent: :destroy
   has_many :payroll_cards, -> {where(card_program_id: CardProgram.id_for(:payroll))}, class_name: 'Card'
@@ -533,8 +535,7 @@ class User < ApplicationRecord
     end
     if inactive
       query += ' OR ' unless query.blank?
-      query += "`users`.`active` = 0 AND (NOT ((`users`.`first_name` = '' OR `users`.`first_name` IS NULL)))"
-      # query += "active = 0 AND (NOT ((first_name = '' OR first_name IS NULL))) AND (mobile_only_invite != 1)"
+      query += "`users`.`active` = 0 AND (NOT ((`users`.`first_name` = '' OR `users`.`first_name` IS NULL OR `users`.`default_password` = 1)))"
     end
     if query.present?
       where(query)
@@ -850,6 +851,9 @@ class User < ApplicationRecord
     where id: ids
   }
 
+  scope :pending_erp_sync, -> (*args) {
+    with_erp_sync_status_pending.active
+  }
 
   before_save :strip_whitespace
 
@@ -1240,6 +1244,8 @@ class User < ApplicationRecord
   alias_method :approves_to_name, :user_name
   alias_method :approves_finance_to_name, :user_name
   alias_method :finance?, :finance_manager?
+
+  ransack_scopes :filter_state
 
   def as_json(options = {})
     {
@@ -1858,10 +1864,6 @@ class User < ApplicationRecord
     unless self.save
       raise "Failed to save unique ID: #{self.errors.full_messages}"
     end
-  end
-
-  def self.ransackable_scopes(auth_object = nil)
-    [:filter_state]
   end
 
 end

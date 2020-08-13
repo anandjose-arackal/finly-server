@@ -54,12 +54,18 @@
 #  transfer_mode_id               :integer
 #  last_retried_at                :datetime
 #  utr                            :string(255)
+#  erp_sync_status_id             :integer
+#  erp_sync_message               :string(255)
+#  erp_sync_reference_id          :string(255)
+#  erp_sync_attempts_count        :integer          default(0)
+#  erp_sync_attempted_at          :datetime
 #
 
 class Payment < ApplicationRecord
   include PostOperationExecution, SoftDeletable, MathUtil
   include LiquidDroppable
   include Exposures::Model::Exposable
+  include ErpSyncable
 
   class Payment::AccountType
     VIRTUAL_ACCOUNT = 'Company'
@@ -484,6 +490,10 @@ class Payment < ApplicationRecord
              :receiving_account,
              invoice: [:category, :cost_center, :invoice_status, :invoice_type],
              payment_order: [bank_payment_request: [:status]])
+  }
+  scope :pending_erp_sync, -> (*args) {
+    with_erp_sync_status_pending.
+        where(payment_status_id: PaymentStatus.id_for(:completed))
   }
 
   # validates :amount_id, presence: true

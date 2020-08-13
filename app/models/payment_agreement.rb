@@ -301,6 +301,8 @@ class PaymentAgreement < ApplicationRecord
     end
   }
 
+  ransack_scopes :with_status_id
+
   def as_json(options={})
     {
         id: self.id,
@@ -543,10 +545,6 @@ class PaymentAgreement < ApplicationRecord
     elsif options[:load_custom_fields] && options[:load_custom_fields] == false
       nil
     end
-  end
-
-  def self.ransackable_scopes(auth_object = nil)
-    [:with_status_id]
   end
 
 # Used for tracking completion %

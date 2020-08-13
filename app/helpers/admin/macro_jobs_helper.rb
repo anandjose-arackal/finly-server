@@ -1,0 +1,2 @@
+module Admin::MacroJobsHelper
+end

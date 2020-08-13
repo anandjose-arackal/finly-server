@@ -1,5 +1,7 @@
 class IndexSegment::Ops::Index < Transactions::API
 
+  user_model [User, AdminUser]
+
   step Resolver::Transactions::Load(model: IndexViewSegment)
   pass :load_system_views
   pass :load_user_views

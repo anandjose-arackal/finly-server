@@ -404,6 +404,8 @@ class BankPaymentRequest < ApplicationRecord
       where status_id: BankPaymentRequestStatus.ids_for(:approved, :pending, :auto_approved)
     when BankPaymentRequestStatus::GROUP_FAILED
       joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:failed))
+    when BankPaymentRequestStatus::GROUP_COMPLETED
+      joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:completed))
     when BankPaymentRequestStatus::GROUP_SCHEDULED
       joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:scheduled))
     when BankPaymentRequestStatus::GROUP_PENDING
@@ -425,9 +427,7 @@ class BankPaymentRequest < ApplicationRecord
 
   before_save :add_company
 
-  def self.ransackable_scopes(auth_object = nil)
-    [:with_status_id]
-  end
+  ransack_scopes :with_status_id
 
   def can_submit?
     open? || retracted? || rejected?

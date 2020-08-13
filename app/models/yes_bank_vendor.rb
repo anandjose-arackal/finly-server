@@ -28,7 +28,6 @@
 #  vendor_id                :string(255)
 #  disabled                 :boolean          default(FALSE)
 #  deleted_at               :datetime
-#  vedor_code               :string(255)
 #  msme_registered          :boolean          default(FALSE)
 #  msme_registration_number :string(255)
 #  status_id                :integer
@@ -36,9 +35,15 @@
 #  controlling_level_id     :integer
 #  submitted_at             :datetime
 #  approved_at              :datetime
+#  vedor_code               :string(255)
 #  trade_name               :string(255)
 #  reject_note              :text(65535)
 #  rcm_enabled              :boolean          default(FALSE)
+#  erp_sync_status_id       :integer
+#  erp_sync_message         :string(255)
+#  erp_sync_reference_id    :string(255)
+#  erp_sync_attempts_count  :integer          default(0)
+#  erp_sync_attempted_at    :datetime
 #
 
 class YesBankVendor < ApplicationRecord
@@ -46,7 +51,7 @@ class YesBankVendor < ApplicationRecord
   include Sequenced::ActsAsSequenced
   include LiquidDroppable
   include Exposures::Model::Exposable
-
+  include ErpSyncable
 
   validates :business_name, presence: true
 
@@ -233,6 +238,11 @@ class YesBankVendor < ApplicationRecord
     where('yes_bank_vendors.approved_at >= ? && yes_bank_vendors.approved_at <= ?', from.beginning_of_day, to.end_of_day)
   }
 
+  scope :pending_erp_sync, -> (*args) {
+    with_erp_sync_status_pending.
+        where(status_id: VendorStatus.ids_for(%i(approved auto_approved)))
+  }
+
   # Scopes for ordering ends
 
   before_validation do
@@ -247,9 +257,7 @@ class YesBankVendor < ApplicationRecord
     end
   end
 
-  def self.ransackable_scopes(auth_object = nil)
-    [:with_status_id]
-  end
+  ransack_scopes :with_status_id
 
   def display_name
     self.business_name.blank? ? self.name : self.business_name

@@ -96,6 +96,12 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
         payment.update(payment_status_id: PaymentStatus.id_for(:processing))
         create_system_message_for_processing(payment)
         store_transaction payment, :credit, :success, nil, nil, payment.initiating_user&.company_id
+      else
+        # handling any other case of the operation being a success from the API end
+        # we will later update this payment after a final check on the status using the transaction status inquiry
+        payment.update(payment_status_id: PaymentStatus.id_for(:processing))
+        create_system_message_for_processing(payment)
+        store_transaction payment, :credit, :success, nil, nil, payment.initiating_user&.company_id
       end
     else
       # the difference between this and a failure is that the money is not debited back to the account till we're sure
@@ -111,6 +117,12 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
         store_transaction payment, :credit, :failure, nil, nil, payment.initiating_user&.company_id, {error: self.errors}
         self.errors << error_message
         return false
+      else
+        # this is a catch-all for the payment in case the operation failed
+        # but it isn't in any status that was handled in the previous cases
+        payment.update(payment_status_id: PaymentStatus.id_for(:possible_failure))
+        create_system_message_for_possible_failure(payment)
+        store_transaction payment, :credit, :processing, nil, nil, payment.initiating_user&.company_id
       end
     end
     true

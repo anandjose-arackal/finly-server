@@ -110,8 +110,9 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     counter.add BankPaymentRequestStatus::GROUP_SCHEDULED, 'Scheduled', collection.with_status_id(BankPaymentRequestStatus::GROUP_SCHEDULED).count
     counter.add BankPaymentRequestStatus::GROUP_PARTIALLY_COMPLETED, "Partially Completed", collection.with_status_id(BankPaymentRequestStatus::GROUP_PARTIALLY_COMPLETED).count
     counter.add BankPaymentRequestStatus::GROUP_FAILED, 'Failed', collection.with_status_id(BankPaymentRequestStatus::GROUP_FAILED).count
+    counter.add BankPaymentRequestStatus::GROUP_COMPLETED, 'Completed', collection.with_status_id(BankPaymentRequestStatus::GROUP_COMPLETED).count
 
-    [:credited, :rejected].each do |status|
+    [:rejected].each do |status|
       counter.add BankPaymentRequestStatus.id_for(status), status.to_s.titleize, counts[BankPaymentRequestStatus.id_for(status)].to_i
     end
 
