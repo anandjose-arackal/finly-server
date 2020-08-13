@@ -39,7 +39,7 @@ class Masters::JsonBuilder
     return nil if record.blank?
 
     json = {id: record.id}
-    json[:display_name] = record.send(master_schema.display_name)
+    json[:display_name] = record.send(master_schema.primary_entity_key) if master_schema.primary_entity_key.present?
     master_schema.entities.each do |entity|
       case entity.type
       when 'MasterEntity::Lookup'
@@ -64,10 +64,15 @@ class Masters::JsonBuilder
     )
     return nil if lookup_record.nil?
 
-    {
-        id: lookup_record.id,
-        name: lookup_record.send(lookup_master_schema.display_name)
-    }
+    name = nil
+    if lookup_master_schema.primary_entity_key.present?
+      name = lookup_record.send(lookup_master_schema.primary_entity_key)
+    end
+      {
+          id: lookup_record.id,
+          name: name
+      }
+
   end
 
   class DataProvider
