@@ -13,6 +13,7 @@ includes = [
             {tax_amount: :currency}, {net_amount: :currency}
         ]
     },
+    {custom_fields: :field_configuration},
     :attachments
 ]
 json.data do
