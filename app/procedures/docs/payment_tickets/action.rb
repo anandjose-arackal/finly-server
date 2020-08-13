@@ -49,9 +49,9 @@ class Docs::PaymentTickets::Action < ActionManager::API
     action :template,
            :upload_utr,
            contextual: false,
-           format: 'primary',
+           format: 'standard',
            label: "Upload UTR",
-           icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
+           icon: "https://img.icons8.com/windows/17/708090/upload.png",
            function: 'upload_utr'
 
     action :export,
