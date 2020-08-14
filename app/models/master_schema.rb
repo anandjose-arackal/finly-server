@@ -37,6 +37,10 @@ class MasterSchema < ApplicationRecord
     klass_name&.model
   end
 
+  def table_name
+    system_entity ? master_key : "schema_#{company_id}_#{master_key}"
+  end
+
   def klass_name
     val = super()
     return nil unless val.present?
@@ -50,10 +54,11 @@ class MasterSchema < ApplicationRecord
     base_class = self.model.present? ? self.model : ApplicationRecord
     master_key = self.master_key
     master_schema = self
+    table_name = self.table_name
     @record_model_class = Class.new(base_class) do
       include SoftDeletable
 
-      self.table_name = master_key
+      self.table_name = table_name
 
       def self.name
         "Master#{table_name}"
