@@ -21,6 +21,7 @@ class Personalizer::Adapters::Company220::Procurements220::Invoices220::Submit22
     # adding logic for checking if budget is being exceeded
     if self.invoice.procurement&.non_po_procurement?
       budget_exceeded = false
+      sleep 0.5   # NOTE: There is a race condition between updating accessing total_consumed_amount value
       self.budgets.each do |budget|
         budget_criteria = budget.budget_group_criterium
         budget_amount = budget.budget_consumption&.budget_amount&.value
