@@ -5,7 +5,6 @@ class CreateMasterSchemas < ActiveRecord::Migration[5.2]
       t.integer :company_id, index: true, foreign_key: true, references: 'companies'
       t.string :name, index: true, null: false
       t.string :master_key, index: true, null: false
-      t.string :model
       t.string :klass_name
       t.boolean :active, index: true, default: true
       t.boolean :system_master, index: true

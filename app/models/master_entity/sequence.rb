@@ -42,21 +42,18 @@ class MasterEntity::Sequence < MasterEntity
   option :min_length, default: MIN_LENGTH_DEFAULT
 
   schema_contract do
-    validation do
-      params do
-        required(:options)
-      end
+    validates :options, presence: true
+    validate :options_structure
 
-      rule :options do
-        if value[:prefix].blank?
-          key.failure "Prefix cannot be blank"
-        elsif value[:min_length].blank?
-          key.failure "Min length cannot be blank"
-        elsif value[:min_length] < 0
-          key.failure "Min length has to be greater than 0"
-        elsif value[:min_length] > 10
-          key.failure "Min length has to be less than 10"
-        end
+    def options_structure
+      if options['prefix'].blank?
+        errors.add :prefix,  "cannot be blank"
+      elsif options['min_length'].blank?
+        errors.add :min_length, "cannot be blank"
+      elsif options['min_length'] < 0
+        errors.add :min_length, "has to be greater than 0"
+      elsif options['min_length'] > 10
+        errors.add :min_length, "has to be less than 10"
       end
     end
   end

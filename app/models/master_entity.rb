@@ -95,14 +95,24 @@ class MasterEntity < ApplicationRecord
     Choices[val[:type]].new(val[:config], entity: self)
   end
 
+  def type?(name)
+    self.class.registered_type.to_s == name.to_s
+  end
+
   def as_json(options = {})
+    registered_type = self.class.registered_type
+    if registered_type.nil? and type.present?
+      registered_type = Object.const_get(type).registered_type
+    end
     {
+        id: id,
         label: label,
         hint: hint,
-        type: self.class.registered_type,
+        entity_type: registered_type,
         position: position,
         required: required,
         unique: unique,
+        primary_key: primary_key,
         entity_key: entity_key
     }
   end

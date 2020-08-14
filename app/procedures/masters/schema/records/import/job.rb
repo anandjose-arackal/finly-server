@@ -135,9 +135,9 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
   def find_record(context, id)
     return nil unless identifier_key(context).present?
 
-    query = {}
-    query[identifier_key(context)] = id
-    context[:model_class].find_by(query)
+    # query = {}
+    # query[identifier_key(context)] = id
+    context[:model_class].find_by(identifier_key(context) => id)
   end
 
   def identifier_key(context)

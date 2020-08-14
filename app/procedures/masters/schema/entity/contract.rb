@@ -1,27 +1,30 @@
-require 'reform/form/dry'
+require "reform/form/validation/unique_validator"
 
 class Masters::Schema::Entity::Contract < Reform::Form
-  feature Reform::Form::Dry
 
-  validation do
-    params do
-      required(:master_schema).filled
-      required(:entity_key).filled
-      required(:label).filled
-      optional(:unique).value(:bool?)
-      optional(:primary_key).value(:bool?)
-    end
-
-    rule :unique do
-      if values[:primary_key] and not value
-        key.failure 'should be set for primary key'
+  property :master_schema, deserializer: -> (input, represented, **) {
+    represented.master_schema ||= represented.contract_parent&.model
+  }
+  property :company, deserializer: -> (input, represented, **) {
+    represented.company ||= represented.contract_parent&.model&.company
+  }
+  property :type, deserializer: -> (input, represented, **) {
+    if represented.type.blank?
+      type = input[:entity_type]
+      if type.is_a?(String)
+        if type.starts_with?("MasterEntity")
+          represented.type = Object.const_get(type)
+        else
+          represented.type = Masters::Entity::Registry.types[type]
+        end
+      else
+        represented.type = type
       end
     end
-  end
-
-  property :master_schema
-  property :company_id
-  property :hint
+  }
+  property :hint, deserializer: -> (input, represented, **) {
+    represented.hint = input[:hint] || represented.type.schema[:hint]
+  }
   property :required, default: false
   property :unique, default: false
   property :primary_key, default: false
@@ -72,5 +75,19 @@ class Masters::Schema::Entity::Contract < Reform::Form
   property :can_be_destroyed, deserializer: -> (input, represented, **) {
     represented.can_be_destroyed = true unless represented.system_entity
   }
+
+  # validates :master_schema, presence: true
+  validates :entity_key, presence: true
+  # validates_uniqueness_of :entity_key, scope: [:master_schema]
+  validates :label, presence: true
+  validates :type, presence: true
+
+  validate :primary_key_should_be_unique
+
+  def primary_key_should_be_unique
+    if primary_key and not unique
+      errors.add :primary_key, 'should be unique'
+    end
+  end
 
 end

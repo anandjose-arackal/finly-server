@@ -34,10 +34,7 @@ class MasterSchema < ApplicationRecord
   scope :active, -> { where active: true }
 
   def model
-    val = super()
-    return nil unless val.present?
-
-    Object.const_get(val)
+    klass_name&.model
   end
 
   def klass_name
@@ -70,6 +67,14 @@ class MasterSchema < ApplicationRecord
 
   def contract
     Masters::Schema::Records::Contract.with(self)
+  end
+
+  def as_json(options={})
+    {
+        name: name,
+        master_key: master_key,
+        entities: entities
+    }
   end
 
 end

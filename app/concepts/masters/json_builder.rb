@@ -22,7 +22,7 @@ class Masters::JsonBuilder
       # Build collection
       json = []
       master_schema.entities.each do |entity|
-        if entity.type == 'MasterEntity::Lookup'
+        if entity.type?(:lookup)
           data_provider.pre_load(records, lookup_master_key(entity), entity.entity_key)
         end
       end
