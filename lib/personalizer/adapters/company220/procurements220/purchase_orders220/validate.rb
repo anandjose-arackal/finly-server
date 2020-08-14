@@ -17,7 +17,7 @@ class Personalizer::Adapters::Company220::Procurements220::PurchaseOrders220::Va
   end
 
   def process
-    sleep 2   # NOTE: There is a race condition between updating accessing total_consumed_amount value
+    sleep 0.5   # NOTE: There is a race condition between updating accessing total_consumed_amount value
     budgets.each do |budget|
       budget_criteria = budget.budget_group_criterium
       budget_amount = budget.budget_consumption&.budget_amount&.value
