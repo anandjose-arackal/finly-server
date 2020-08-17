@@ -2,64 +2,97 @@ class Masters::Vendors::Form < Forms::API
 
   model YesBankVendor
 
-  section :header do
-    # auto_number :vendor_id, sequence: {prefix: "VNDR.", start_at: '000001'}
+  section :status do
     dropdown :status_id, choices_scope: Choices[:enum].(VendorStatus),
-             required: true, editable: false, default_value: VendorStatus.id_for(:draft),
+             required: false, editable: false, default_value: VendorStatus.id_for(:draft),
              can_editable_be_changed: false
+  end
+
+  section :vendor_details do
+    # auto_number :vendor_id, sequence: {prefix: "VNDR.", start_at: '000001'}
     lookup :policy_id,
            choices_scope: Choices[:lookup].('policies', permissions: [:vendor_creator, :vendor_manager]),
            required: true
-    lookup :department_id, choices_scope: Choices[:lookup].('departments'), editable: false, visible: false,
-           filters: Rules::Builder[:name].cont(value: 'Bangalore')
-    lookup :cost_center_id, choices_scope: Choices[:lookup].('cost_centers')
-    text :legal_name, computed: Forms::Compute::Lookup('policy_id', '{{record.name}}'), editable: false
+    text :name, computed: Forms::Compute::Lookup('policy_id', '{{record.name}}'), editable: false
     text :business_name
   end
 
-  section :locations do
-    data_map :locations, populate_if_empty: GstinLocation, min_items: 1 do
-      text :name, required: true
+  section :tax_information do
+
+    text :pan
+    switch :msme_registered
+    text :msme_registration_number    # dropdown :tds_rates_list_id, choices_scope: Choices[:lookup].('')
+  end
+
+  section :location_details do
+    data_map :gstin_locations, populate_if_empty: GstinLocation, min_items: 1 do
       dropdown :state_id, required: true,
                choices_scope: Choices[:enum].(GstStateCode, name: :name)
+      text :poc_name, label: "Point of Contact"
+      text :poc_mobile_number
+      text :poc_email
+      text :poc_fax
+      text :poc_designation
+      large_text :address
+      lookup :gstin_id, visible: false
+      text :gstin
     end
   end
 
-  condition condition_id: :department_id_editable do
-    reference :entity, :department_id
-    rule Rules::Builder[:policy_id].eq(value: 4)
-    action :editable, true
+  section :account_details do
+    data_map :bank_accounts, populate_if_empty: BankAccount, min_items: 1 do
+      text :name, required: true
+      text :account_number, required: true
+      text :ifsc, required: true
+      switch :default_account
+      switch :disabled
+    end
   end
 
-  condition condition_id: :policy_id_status_editable do
-    reference :entity, :policy_id
-    rule Rules::Builder[:status_id].in(value: VendorStatus.ids_for(:draft, :rejected, :retracted))
-    action :editable, true
-  end
+  # section :attachments do
+  #   collection :vendor_attachments
+  #   attachment :pan_card
+  #   attachment :gstin_certificate
+  #   attachment :cancelled_cheque
+  # end
 
-  condition condition_id: :name_status_editable do
-    reference :entity, 'locations.name'
-    rule Rules::Builder[:status_id].in(value: VendorStatus.ids_for(:draft, :rejected, :retracted))
-    action :editable, true
-  end
 
-  condition condition_id: :status_location_name_mandatory do
-    reference :entity, 'locations.name'
-    rule Rules::Builder[:status_id].in(value: VendorStatus.ids_for(:draft, :rejected, :retracted)).and(
-        Rules::Builder[:age].not_eq(value: 20)
-    )
-    action :required, false
-  end
 
-  validation validation_id: :name_cont_validation do
-    reference 'locations.name'
-    error_message "Name cannot contain Hello"
-    rule Rules::Builder['locations.name'].not_cont(value: "Hello")
-  end
-
-  choice_dependency dependency_id: :policy_dependency do
-    reference controller: :policy_id, dependent: :department_id
-    dependency "Company (Default)", ["test1"]
-  end
+  # condition condition_id: :department_id_editable do
+  #   reference :entity, :department_id
+  #   rule Rules::Builder[:policy_id].eq(value: 4)
+  #   action :editable, true
+  # end
+  #
+  # condition condition_id: :policy_id_status_editable do
+  #   reference :entity, :policy_id
+  #   rule Rules::Builder[:status_id].in(value: VendorStatus.ids_for(:draft, :rejected, :retracted))
+  #   action :editable, true
+  # end
+  #
+  # condition condition_id: :name_status_editable do
+  #   reference :entity, 'locations.name'
+  #   rule Rules::Builder[:status_id].in(value: VendorStatus.ids_for(:draft, :rejected, :retracted))
+  #   action :editable, true
+  # end
+  #
+  # condition condition_id: :status_location_name_mandatory do
+  #   reference :entity, 'locations.name'
+  #   rule Rules::Builder[:status_id].in(value: VendorStatus.ids_for(:draft, :rejected, :retracted)).and(
+  #       Rules::Builder[:age].not_eq(value: 20)
+  #   )
+  #   action :required, false
+  # end
+  #
+  # validation validation_id: :name_cont_validation do
+  #   reference 'locations.name'
+  #   error_message "Name cannot contain Hello"
+  #   rule Rules::Builder['locations.name'].not_cont(value: "Hello")
+  # end
+  #
+  # choice_dependency dependency_id: :policy_dependency do
+  #   reference controller: :policy_id, dependent: :department_id
+  #   dependency "Company (Default)", ["test1"]
+  # end
 
 end

@@ -1,1 +1,1 @@
-json.id @result.vendor.id
+# json.id @result.vendor.id

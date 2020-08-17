@@ -1,7 +1,8 @@
 class Forms::Synchronizer
-
   def self.call
-    Forms::Router.forms.each { |master| Forms::Synchronizer.sync(master) }
+    # Forms::Router.forms.each { |master| Forms::Synchronizer.sync(master) }
+
+    Forms::Synchronizer.sync Forms::Router.forms[0]
   end
 
   def self.sync(master)
@@ -16,7 +17,6 @@ class Forms::Synchronizer
       dependency_template.sync(company_id: company.id, user: user)
     end
   end
-
 end
 # class Forms::Synchronizer
 #

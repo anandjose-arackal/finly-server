@@ -187,6 +187,4 @@ class Docs::P2P::Invoices::Form < Forms::API
     error_message "Due Date cannot be before the invoice date"
     rule Rules::Builder['due_date'].lt(entity: "date")
   end
-
-
 end

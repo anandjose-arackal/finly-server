@@ -1,5 +1,7 @@
 class VendorsController < BaseControllers::WebBase
 
+  layout :resolve_layout
+
   def filter_config
     @result = Vendors::FilterConfig.(current_user, params)
     respond
@@ -34,8 +36,10 @@ class VendorsController < BaseControllers::WebBase
   end
 
   def create
-    @result = Vendors::Create.(current_user, params)
-    respond
+    # @result = Vendors::Create.(current_user, params)
+    # respond
+
+    endpoint Docs::P2P::Vendors::Create
   end
 
   def create_and_submit
@@ -44,8 +48,9 @@ class VendorsController < BaseControllers::WebBase
   end
 
   def update
-    @result = Vendors::Update.(current_user, params)
-    respond
+    # @result = Vendors::Update.(current_user, params)
+    # respond
+    endpoint Docs::P2P::Vendors::Update
   end
 
   def submit
@@ -133,5 +138,13 @@ class VendorsController < BaseControllers::WebBase
   def export
     @result = Vendors::Exports::Generate.(current_user, params)
     respond
+  end
+
+  def resolve_layout
+    if ["create", "update"].include?(action_name)
+      'trailblazers'
+    else
+      'application'
+    end
   end
 end

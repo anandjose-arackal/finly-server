@@ -106,5 +106,4 @@ class FormEntity::Attachment < FormEntity
       end
     end
   end
-
 end

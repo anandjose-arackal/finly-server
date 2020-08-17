@@ -53,7 +53,7 @@
 class FormEntity::DataMap < FormEntity
 
   register :data_map
-  # collection!
+  collection!
 
   option :min_items
 

@@ -31,5 +31,4 @@ class Forms::Contracts::Builders::CustomField
       end
     end
   end
-
 end
