@@ -23,6 +23,8 @@
 class MasterSchema < ApplicationRecord
   include UUIDHelper, SoftDeletable, TemplateClonable
   include Masters::Entity::Registry
+  include Masters::Entity::Record # Define the generation of anonymous record models
+  include Masters::Entity::Exposure # Define the generation of anonymous exposures
 
   belongs_to :company
   belongs_to :owner, optional: true
@@ -48,33 +50,6 @@ class MasterSchema < ApplicationRecord
     return nil unless val.present?
 
     Object.const_get(val)
-  end
-
-  def clear_record_model_class
-    @record_model_class = nil
-  end
-
-  def record_model_class
-    if @record_model_class.present?
-      return @record_model_class
-    end
-
-    base_class = self.model.present? ? self.model : ApplicationRecord
-    master_schema = self
-    table_name = self.table_name
-    @record_model_class = Class.new(base_class) do
-      include SoftDeletable
-
-      self.table_name = table_name
-
-      def self.name
-        "Master#{table_name}"
-      end
-
-      define_method :as_json do |options = {}|
-        Masters::JsonBuilder.(master_schema, self)
-      end
-    end
   end
 
   def contract

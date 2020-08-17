@@ -57,6 +57,8 @@ class MasterEntity < ApplicationRecord
     Masters::Entity::Registry.register self, key
   end
 
+  # Contract evaluators are executed in the context of the dynamically generated contract class
+  # which is used for validations at the time of create and update of the records
   def self.contract_eval(name, &block)
     contract_evaluators[name] = block if block_given?
   end

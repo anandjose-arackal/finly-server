@@ -76,6 +76,7 @@ class Company < ApplicationRecord
   has_many :security_deposits
   has_many :icici_statements
   has_many :insight_dashboards
+  has_many :master_schemas
 
   has_many :forms
 
