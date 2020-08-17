@@ -22,7 +22,7 @@ module Masters::Entity::Record
           attr = entity.entity_key
           if attr.end_with?('_id')
             attr = attr[0..(attr.length - 4)]
-            belongs_to attr.to_sym, anonymous_class: entity.lookup_master_schema.record_model_class
+            belongs_to attr.to_sym, -> { where company_id: entity.company_id }, anonymous_class: entity.lookup_master_schema.record_model_class
           end
         end
       end
