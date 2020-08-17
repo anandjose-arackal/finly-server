@@ -85,7 +85,7 @@ json.result do
       json.partial! 'shared/amount', amount: expense&.reimbursable_amount
     end
     json.total_amount do
-      json.partial! 'shared/amount', amount: expense.amount
+      json.partial! 'shared/amount', amount: expense&.report&.total_amount
     end
 
     json.tds_slab do
