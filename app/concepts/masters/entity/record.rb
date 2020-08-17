@@ -1,6 +1,10 @@
 module Masters::Entity::Record
   include ActiveSupport::Concern
 
+  def clear_record_model_class
+    @record_model_class = nil
+  end
+
   def record_model_class
     return @record_model_class if @record_model_class.present?
 

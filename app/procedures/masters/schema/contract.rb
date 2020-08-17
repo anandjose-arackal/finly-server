@@ -1,14 +1,8 @@
 class Masters::Schema::Contract < Reform::Form
 
-  # class ProxyContract < Reform::Form
-  #   def self.new(value, options)
-  #     debugger
-  #     value.schema_contract.new(value, options.merge(properties))
-  #   end
-  # end
-
   property :name
   property :master_key
+  property :company_id, deserializer: -> (input, represented, **) {}
   property :klass_name, deserializer: -> (input, represented, **) {}
   property :system_master, deserializer: -> (input, represented, **) {
     represented.system_master ||= false
@@ -31,7 +25,9 @@ class Masters::Schema::Contract < Reform::Form
   validate :set_primary_key
   validates :name, presence: true
   validates :master_key, presence: true #, unique: {scope: [:company_id]}
-  # validates_uniqueness_of :master_key, scope: [:company_id]
+  validates_uniqueness_of :master_key, scope: [:company_id]
+
+  validate :entity_key_uniqueness
 
   # System schema validations
   validates :klass_name, presence: true, if: -> { self.system_master }
@@ -59,6 +55,17 @@ class Masters::Schema::Contract < Reform::Form
     end
     if self.primary_entity_key.blank?
       errors.add :primary_key, 'is not set'
+    end
+  end
+
+  def entity_key_uniqueness
+    used_keys = []
+    entities.each do |entity|
+      if used_keys.include?(entity.entity_key)
+        errors.add :base, "Entity Key #{entity.entity_key} is not unique"
+      end
+
+      used_keys << entity.entity_key
     end
   end
 
