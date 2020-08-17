@@ -30,15 +30,15 @@ class Masters::Schema::Ops::MigrationRunner < Transactions::API
   end
 
   def create_table(context, record_model_class:, **)
-    return true if record_model_class.table_exists?
+    unless record_model_class.table_exists?
+      ActiveRecord::Migration.create_table record_model_class.table_name do |t|
+        t.datetime :deleted_at, index: true
 
-    ActiveRecord::Migration.create_table record_model_class.table_name do |t|
-      t.datetime :deleted_at, index: true
-
-      t.timestamps index: true, null: false
+        t.timestamps index: true, null: false
+      end
     end
 
-    true
+    record_model_class.update(is_table_created: true)
   end
 
   def sync_attributes(context, model:, record_model_class:, **)
