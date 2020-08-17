@@ -32,6 +32,7 @@
 
 class MasterEntity::Date < MasterEntity
   register :date
+  database_type :date
   set :hint, "Select date"
   operators :gteq_days, :lteq_days, :eq_days, :in_days, :eq_any, :gteq, :lteq, :blank
 end

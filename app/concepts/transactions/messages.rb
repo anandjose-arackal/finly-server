@@ -29,10 +29,8 @@ module Transactions::Messages
     false
   end
 
-  def evaluate_result(options, result)
-    if result.errors.present?
-
-    end
+  def merge_result(options, result)
+    Transactions::API.merge(result(options, result))
   end
 
   def on_schema_error(options, errors_list)
@@ -59,6 +57,18 @@ module Transactions::Messages
     def on_error(options, key, message)
       add_message options, :error, key, message
       false
+    end
+
+    def merge_result(options, result)
+      if result.failure?
+        result.errors.each do |key, value|
+          on_error options, key, value
+        end
+
+        return false
+      end
+
+      true
     end
 
     def on_schema_error(options, errors_list)

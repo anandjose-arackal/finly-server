@@ -33,6 +33,7 @@
 class MasterEntity::Currency < MasterEntity
   register :currency
   set :hint, 'Select value'
+  database_type :string
 
   # Todo move CURRENCIES to constants
   CURRENCIES = FormEntity::Currency::CURRENCIES

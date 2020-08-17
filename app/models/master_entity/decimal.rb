@@ -30,10 +30,9 @@
 #  choices_scope             :text(65535)
 #
 
-class MasterEntity::Amount < MasterEntity
-  register :amount
-  set :hint, 'Amount'
-
+class MasterEntity::Decimal < MasterEntity
+  register :decimal
+  database_type :decimal
+  set :hint, 'Enter value'
   operators :gteq, :lteq, :in, :not_in, :not_null, :null
-
 end

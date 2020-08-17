@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_12_112753) do
+ActiveRecord::Schema.define(version: 2020_08_17_062625) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -2012,6 +2012,7 @@ ActiveRecord::Schema.define(version: 2020_08_12_112753) do
     t.boolean "tds_applicable"
     t.datetime "deleted_at"
     t.integer "created_by_id"
+    t.string "parent_id"
     t.index ["active"], name: "index_categories_on_active"
     t.index ["ancestry"], name: "index_categories_on_ancestry"
     t.index ["company_id"], name: "index_categories_on_company_id"
@@ -5518,7 +5519,6 @@ ActiveRecord::Schema.define(version: 2020_08_12_112753) do
     t.string "label", null: false
     t.string "active"
     t.boolean "visible", default: true
-    t.boolean "identifier", default: false
     t.text "options"
     t.boolean "can_label_be_changed"
     t.boolean "can_uniqueness_be_changed"
@@ -5530,6 +5530,7 @@ ActiveRecord::Schema.define(version: 2020_08_12_112753) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "choices_scope"
+    t.boolean "primary_key"
     t.index ["active"], name: "index_master_entities_on_active"
     t.index ["company_id"], name: "index_master_entities_on_company_id"
     t.index ["created_at"], name: "index_master_entities_on_created_at"
@@ -5579,7 +5580,8 @@ ActiveRecord::Schema.define(version: 2020_08_12_112753) do
     t.integer "owner_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.text "display_name", null: false
+    t.string "primary_entity_key", null: false
+    t.datetime "last_migration_at"
     t.index ["active"], name: "index_master_schemas_on_active"
     t.index ["company_id"], name: "index_master_schemas_on_company_id"
     t.index ["created_at"], name: "index_master_schemas_on_created_at"
@@ -7853,6 +7855,43 @@ ActiveRecord::Schema.define(version: 2020_08_12_112753) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
+  end
+
+  create_table "schema_2_categories", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "category_code"
+    t.string "parent_id"
+    t.string "name"
+    t.string "gl_code"
+    t.index ["created_at"], name: "index_schema_2_categories_on_created_at"
+    t.index ["deleted_at"], name: "index_schema_2_categories_on_deleted_at"
+    t.index ["updated_at"], name: "index_schema_2_categories_on_updated_at"
+  end
+
+  create_table "schema_2_items", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "item_number"
+    t.string "description"
+    t.string "hsn_sac"
+    t.string "category_id"
+    t.index ["created_at"], name: "index_schema_2_items_on_created_at"
+    t.index ["deleted_at"], name: "index_schema_2_items_on_deleted_at"
+    t.index ["updated_at"], name: "index_schema_2_items_on_updated_at"
+  end
+
+  create_table "schema_2_projects", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "name"
+    t.integer "description"
+    t.index ["created_at"], name: "index_schema_2_projects_on_created_at"
+    t.index ["deleted_at"], name: "index_schema_2_projects_on_deleted_at"
+    t.index ["updated_at"], name: "index_schema_2_projects_on_updated_at"
   end
 
   create_table "security_deposit_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|

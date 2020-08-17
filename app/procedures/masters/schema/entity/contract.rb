@@ -23,7 +23,7 @@ class Masters::Schema::Entity::Contract < Reform::Form
     end
   }
   property :hint, deserializer: -> (input, represented, **) {
-    represented.hint = input[:hint] || represented.type.schema[:hint]
+    represented.hint = input[:hint] || represented.type&.schema&.dig(:hint)
   }
   property :required, default: false
   property :unique, default: false
@@ -76,9 +76,11 @@ class Masters::Schema::Entity::Contract < Reform::Form
     represented.can_be_destroyed = true unless represented.system_entity
   }
 
+  validates :type, presence: true
+  validates :hint, presence: true
   # validates :master_schema, presence: true
   validates :entity_key, presence: true
-  # validates_uniqueness_of :entity_key, scope: [:master_schema]
+  validates_uniqueness_of :entity_key, scope: [:master_schema]
   validates :label, presence: true
   validates :type, presence: true
 

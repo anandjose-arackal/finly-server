@@ -30,8 +30,9 @@
 #  choices_scope             :text(65535)
 #
 
-class MasterEntity::Number < MasterEntity
-  register :number
+class MasterEntity::Integer < MasterEntity
+  register :integer
+  database_type :integer
   set :hint, 'Enter value'
   operators :gteq, :lteq, :in, :not_in, :not_null, :null
 end

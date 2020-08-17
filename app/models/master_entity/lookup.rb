@@ -32,6 +32,7 @@
 
 class MasterEntity::Lookup < MasterEntity
   register :lookup
+  database_type :string
   set :hint, 'Select value'
   operators :eq_any #, :blank, :present
 end

@@ -33,12 +33,14 @@ class MasterSchema < ApplicationRecord
 
   scope :active, -> { where active: true }
 
+  default_scope { order(created_at: :asc) }
+
   def model
     klass_name&.model
   end
 
   def table_name
-    system_entity ? master_key : "schema_#{company_id}_#{master_key}"
+    system_master ? master_key : "schema_#{company_id}_#{master_key}"
   end
 
   def klass_name
@@ -48,11 +50,16 @@ class MasterSchema < ApplicationRecord
     Object.const_get(val)
   end
 
+  def clear_record_model_class
+    @record_model_class = nil
+  end
+
   def record_model_class
-    return @record_model_class if @record_model_class.present?
+    if @record_model_class.present?
+      return @record_model_class
+    end
 
     base_class = self.model.present? ? self.model : ApplicationRecord
-    master_key = self.master_key
     master_schema = self
     table_name = self.table_name
     @record_model_class = Class.new(base_class) do
@@ -64,7 +71,7 @@ class MasterSchema < ApplicationRecord
         "Master#{table_name}"
       end
 
-      define_method :as_json do |options={}|
+      define_method :as_json do |options = {}|
         Masters::JsonBuilder.(master_schema, self)
       end
     end
@@ -74,7 +81,7 @@ class MasterSchema < ApplicationRecord
     Masters::Schema::Records::Contract.with(self)
   end
 
-  def as_json(options={})
+  def as_json(options = {})
     {
         name: name,
         master_key: master_key,

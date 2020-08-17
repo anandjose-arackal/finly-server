@@ -1,6 +1,12 @@
 module Masters::Entity::Schema
   extend ActiveSupport::Concern
 
+  included do
+    include DynamicAttributes
+
+    class_attr :database_type
+  end
+
   class_methods do
     def build_schema_contract
       return @contract if @contract.present?
@@ -39,6 +45,10 @@ module Masters::Entity::Schema
         schema[attribute] = value
       end
     end
+  end
+
+  def database_type
+    self.class.database_type
   end
 
   def schema_contract

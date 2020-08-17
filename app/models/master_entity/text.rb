@@ -32,6 +32,7 @@
 
 class MasterEntity::Text < MasterEntity
   register :text
+  database_type :string
   simple_filter :cont_any
   set :hint, 'Enter value'
   operators :eq_any, :not_eq_all, :cont_any, :not_cont_all, :blank, :present
