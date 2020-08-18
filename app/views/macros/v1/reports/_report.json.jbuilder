@@ -14,7 +14,7 @@ json.expenses record.expenses do |expense|
   json.partial! 'expense', record: expense
 end
 json.total_amount do
-  json.partial! 'shared/amount', amount: record&.total_amount
+  json.partial! 'shared/amount', amount: Amount.new(value:record&.total_amount, currency_id: record.policy&.base_currency_id)
 end
 
 json.erp_sync_status record.erp_sync_status&.name
