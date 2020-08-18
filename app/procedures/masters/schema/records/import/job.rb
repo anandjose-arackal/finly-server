@@ -9,6 +9,8 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
   step :build_contract
   step :update_properties
   pass :build_headers
+  pass :build_input
+  pass :cache_lookup_associations
   pass :import_data
   pass :build_result
 
@@ -40,21 +42,68 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
     end
   end
 
-  def import_data(context, contract:, params:, model:, model_class:, **)
+  def build_input(context, params:, master_schema:, **)
+    context[:input] = []
+
+    context[:spreadsheet].sheet(0).each(context[:headers]) do |row|
+      next if (row.values - context[:headers].values).blank?
+
+      context[:input] << row
+    end
+
+    true
+  end
+
+  # Lookup cache is used for bulk fetching all the associations for lookup entities
+  # key is always the referring entity
+  # value is an hash having inputs as keys and the association ID as the value
+  def cache_lookup_associations(context, input:, master_schema:, **)
+    context[:lookup_cache] = lookup_cache = {}
+    context[:input].each do |row|
+      master_schema.entities.each do |entity|
+        next unless entity.type?(:lookup)
+
+        lookup_cache[entity] ||= {}
+        lookup_cache[entity][row[entity.entity_key]] = nil
+      end
+    end
+
+    lookup_cache.each do |entity, inputs|
+      entity.lookup_master_schema.record_model_class.where(company_id: entity.company_id, entity.lookup_master_schema.primary_entity_key => inputs.keys).each { |record|
+        inputs[record.send(entity.lookup_master_schema.primary_entity_key)] = record.id
+      }
+    end
+  end
+
+  def import_data(context, contract:, master_schema:, lookup_cache:, params:, model:, model_class:, **)
     context[:result] = []
     created_records = 0
     updated_records = 0
     failed_records = 0
     skipped_records = 0
-    context[:spreadsheet].sheet(0).each(context[:headers]) do |row|
-      # Skip headers
-      next if (row.values - context[:headers].values).blank?
-
+    context[:input].each do |row|
       data = row.values
-      res = import_row(context, contract, model_class, row)
-      if res.success?
-        data << res.value![:message]
-        case res.value![:action]
+      lookup_errors = []
+      if lookup_cache.present?
+        lookup_cache.each do |entity, inputs|
+          value = row[entity.entity_key]
+          next if value.blank?
+
+          if inputs[value].blank?
+            lookup_errors << "#{value} not found for #{entity.label}"
+          else
+            row[entity.entity_key] = inputs[value]
+          end
+        end
+      end
+
+      import_result = nil
+      import_result = Failure(lookup_errors.join(", ")) if lookup_errors.present?
+
+      import_result ||= import_row(context, master_schema, contract, model_class, row)
+      if import_result.success?
+        data << 'Success'
+        case import_result.success[:action]
         when :create
           created_records += 1
         when :update
@@ -66,7 +115,8 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
         end
       else
         failed_records += 1
-        data << res.failure
+        data << 'Failed'
+        data << import_result.failure
       end
       progress_update(model, created_records, updated_records, skipped_records, failed_records)
       context[:result] << data
@@ -85,8 +135,11 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
     )
   end
 
-  def build_result(context, result:, headers:, model:, current_user:, **)
-    spreadsheet_builder = Exporter::Spreadsheet.new(current_user, {headers: context[:headers].values, contents: result}, {})
+  def build_result(context, result:, model:, current_user:, **)
+    headers = context[:headers].values
+    headers << 'Status'
+    headers << 'Message'
+    spreadsheet_builder = Exporter::Spreadsheet.new(current_user, {headers: headers, contents: result}, {})
 
     if model.attachment_file_name.end_with?(".csv")
       # CSV
@@ -100,7 +153,7 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
 
   protected
 
-  def import_row(context, contract_klass, model_class, row)
+  def import_row(context, master_schema, contract_klass, model_class, row)
     record = find_record(context, row[identifier_key(context)])
     action = :update
 
@@ -128,11 +181,12 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
       return Failure(contract.model.errors.full_messages.join(','))
     end
 
-    Success({message: 'Saved', action: action})
+    Success({action: action})
   end
 
   # Finds the record using the unique identifier
   def find_record(context, id)
+    return nil if id.blank?
     return nil unless identifier_key(context).present?
 
     # query = {}

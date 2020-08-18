@@ -83,7 +83,7 @@ class MasterEntity < ApplicationRecord
           # If the master has a created by, use the created by field for scoping down the master
           user = contract_root.respond_to?(:created_by) ? contract_root.created_by : RequestStoreUtil.current_user
           unless entity.choices_scope.valid?(id: id, user: user)
-            errors.add entity.entity_key, 'is invalid'
+            errors.add entity.label, 'is invalid'
           end
         end
       end

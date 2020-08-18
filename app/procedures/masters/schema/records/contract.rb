@@ -12,6 +12,10 @@ class Masters::Schema::Records::Contract
 
   def self.with(master_schema)
     Class.new(Reform::Form) do
+
+      property :created_by, deserializer: -> (input, represented, **) {}
+      property :company, deserializer: -> (input, represented, **) {}
+
       master_schema.entities.each do |entity|
         next unless entity.active
 
