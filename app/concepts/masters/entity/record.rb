@@ -18,7 +18,9 @@ module Masters::Entity::Record
       self.table_name = table_name
 
       # Avoiding memory leak with Anonymous ActiveRecords as per https://github.com/rails/rails/issues/31395
+      # Clearing it from descendants of superclass as well as ApplicationRecord
       superclass.direct_descendants.delete(self)
+      ApplicationRecord.descendants.delete(self)
 
       # For entities of lookup type, add a belongs_to association
       master_schema.entities.each do |entity|
