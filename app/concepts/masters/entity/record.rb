@@ -14,7 +14,11 @@ module Masters::Entity::Record
     @record_model_class = Class.new(base_class) do
       include SoftDeletable
 
+
       self.table_name = table_name
+
+      # Avoiding memory leak with Anonymous ActiveRecords as per https://github.com/rails/rails/issues/31395
+      superclass.direct_descendants.delete(self)
 
       # For entities of lookup type, add a belongs_to association
       master_schema.entities.each do |entity|
