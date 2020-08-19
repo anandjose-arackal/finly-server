@@ -13,8 +13,8 @@ class Masters::Locations::Master < Masters::API
     text :state
     dropdown :country_id
     text :pin
-    switch :billing_location
-    switch :shipping_location
+    switch :billable_location
+    switch :shippable_location
   end
 
 end
