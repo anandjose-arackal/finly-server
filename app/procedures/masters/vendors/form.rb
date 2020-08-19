@@ -15,10 +15,10 @@ class Masters::Vendors::Form < Forms::API
            required: true
     text :name, computed: Forms::Compute::Lookup('policy_id', '{{record.name}}'), editable: false
     text :business_name
+    attachment :files, system_field: false
   end
 
   section :tax_information do
-
     text :pan
     switch :msme_registered
     text :msme_registration_number    # dropdown :tds_rates_list_id, choices_scope: Choices[:lookup].('')

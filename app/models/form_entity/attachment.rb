@@ -76,20 +76,19 @@ class FormEntity::Attachment < FormEntity
     end
   end
 
-  def populator
-    -> (model: nil, collection:, fragment: nil, index: nil, options:, **) do
-      id = (fragment["id"] || fragment[:id] || fragment["uuid"] || fragment[:uuid]).to_s
-      item = collection.find { |item| id == item.id.to_s }
-
-      if fragment["_destroy"]
-        collection.destroy(item) if item
-        return skip!
-      end
-
-      # Fixme: Scope based on company
-      item ? item : collection.append(::Attachment.find(id))
-    end
-  end
+  # def populator
+  #   -> (model: nil, collection:, fragment: nil, index: nil, options:, **) do
+  #     id = (fragment["id"] || fragment[:id] || fragment["uuid"] || fragment[:uuid]).to_s
+  #     item = collection.find { |item| id == item.id.to_s }
+  #
+  #     if fragment["_destroy"]
+  #       collection.destroy(item) if item
+  #       return skip!
+  #     end
+  #
+  #     item ? item : collection.append(::Attachment.find(id))
+  #   end
+  # end
 
   def self.option_validation
     Proc.new do

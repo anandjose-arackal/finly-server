@@ -1,0 +1,2 @@
+class FormCustomFieldAttachment < ApplicationRecord
+end

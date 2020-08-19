@@ -21,3 +21,8 @@ class FormCustomField < ApplicationRecord
   belongs_to :form_entity
   belongs_to :document, polymorphic: true
 end
+
+
+# value
+# attachments
+# values

@@ -6,6 +6,13 @@ class Docs::P2P::Vendors::Create < Transactions::API
   step Forms::Contracts::Build()
 
   step Contract::Validate()
+
+  step :check
+  def check(ctx, options)
+    debugger
+    true
+  end
+
   step Contract::Persist()
   step Transactions::Messages::SuccessMessage('Saved')
 

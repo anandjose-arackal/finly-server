@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_29_132010) do
+ActiveRecord::Schema.define(version: 2020_08_19_011200) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3959,6 +3959,13 @@ ActiveRecord::Schema.define(version: 2020_07_29_132010) do
     t.index ["updated_at"], name: "index_form_conditions_on_updated_at"
     t.index ["updated_by_id"], name: "index_form_conditions_on_updated_by_id"
     t.index ["uuid"], name: "index_form_conditions_on_uuid"
+  end
+
+  create_table "form_custom_field_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "attachment_file_name"
+    t.string "attachment_content_type"
+    t.bigint "attachment_file_size"
+    t.datetime "attachment_updated_at"
   end
 
   create_table "form_custom_fields", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
