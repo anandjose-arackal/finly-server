@@ -83,24 +83,14 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
     skipped_records = 0
     context[:input].each do |row|
       data = row.values
-      lookup_errors = []
-      if lookup_cache.present?
-        lookup_cache.each do |entity, inputs|
-          value = row[entity.entity_key]
-          next if value.blank?
+      pre_process_result = pre_process(context, row)
 
-          if inputs[value].blank?
-            lookup_errors << "#{value} not found for #{entity.label}"
-          else
-            row[entity.entity_key] = inputs[value]
-          end
-        end
+      if pre_process_result.failure?
+        import_result = pre_process_result
+      else
+        import_result = import_row(context, master_schema, contract, model_class, row)
       end
 
-      import_result = nil
-      import_result = Failure(lookup_errors.join(", ")) if lookup_errors.present?
-
-      import_result ||= import_row(context, master_schema, contract, model_class, row)
       if import_result.success?
         data << 'Success'
         case import_result.success[:action]
@@ -169,7 +159,10 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
     record.company = context[:current_user].company
 
     if row['parent_id'].present?
-      row['parent_id'] = find_record(context, row['parent_id'])&.id
+      parent_id = find_record(context, row['parent_id'])&.id
+      return Failure("#{row['parent_id']} not found") if parent_id.blank?
+
+      row['parent_id'] = parent_id
     end
 
     contract = contract_klass.new(record)
@@ -196,6 +189,32 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
 
   def identifier_key(context)
     context[:identifier_key]
+  end
+
+  def pre_process(context, row)
+    pre_process_lookup(context[:lookup_cache], row)
+  end
+
+  def pre_process_lookup(lookup_cache, row)
+    lookup_errors = []
+    if lookup_cache.present?
+      lookup_cache.each do |entity, inputs|
+        value = row[entity.entity_key]
+        next if value.blank?
+
+        if inputs[value].blank?
+          lookup_errors << "#{value} not found for #{entity.label}"
+        else
+          row[entity.entity_key] = inputs[value]
+        end
+      end
+    end
+
+    if lookup_errors.blank?
+      Success()
+    else
+      Failure(lookup_errors.join(", "))
+    end
   end
 
 end

@@ -29,6 +29,8 @@ class Department < ApplicationRecord
 
   has_ancestry
 
+  alias_attribute :parent_id, :ancestry
+
   belongs_to :company, optional: true
   belongs_to :cost_center, optional: true
 

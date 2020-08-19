@@ -28,6 +28,8 @@ class CostCenter < ApplicationRecord
 
   has_ancestry
 
+  alias_attribute :parent_id, :ancestry
+
   belongs_to :company, optional: true
 
   has_many :budget_criteria_mappings, as: :budgetable
