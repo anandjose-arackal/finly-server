@@ -62,7 +62,7 @@ class ExportManager::Template::TemplateExport < ExportManager::API
     when :csv
       ExportManager::Template::Processors::CSVProcessor
     when :xml
-      ExportManager::Template::Processors::XMLProcessor
+      ExportManager::Template::Processors::XmlProcessor
     when :json
       ExportManager::Template::Processors::JSONProcessor
     when :other
