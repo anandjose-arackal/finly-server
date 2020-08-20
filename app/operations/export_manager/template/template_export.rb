@@ -18,12 +18,20 @@ class ExportManager::Template::TemplateExport < ExportManager::API
 
     case format
     when :csv, :xls
-      includes = results.model.exposure_class.calculate_includes(
+      includes = Exposures::IncludesCalculator.(
         results.model,
         template['columns'].map do |column|
           column['value']
-        end
+        end,
+        'record'
       )
+    else
+      includes = Exposures::IncludesCalculator.(
+        results.model,
+        [template],
+        'records'
+      )
+
       results = results.includes(includes)
     end
 

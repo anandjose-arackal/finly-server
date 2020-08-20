@@ -3,7 +3,7 @@ module Exposures::Model::Exposable
 
   class_methods do
     def exposure_class
-      Object.const_get("#{self}Exposure")
+      Object.const_get("#{self}Exposure") rescue nil
     end
   end
 

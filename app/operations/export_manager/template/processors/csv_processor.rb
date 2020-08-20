@@ -1,5 +1,4 @@
 class ExportManager::Template::Processors::CSVProcessor < ExportManager::Template::Processor
-
   def generate(template, data, file_name)
     file = Paperclip::Tempfile.new(file_name)
     CSV.open(file.path, 'w') do |csv|

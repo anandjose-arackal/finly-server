@@ -18,14 +18,6 @@ module Exposures::PreLoader
     associations.includes(incl)
   end
 
-  def self.calculate_includes(model_klass, templates)
-    exp = Exposures::FakeExposure.new([model_klass], [{}])
-    templates.each do |template|
-      exp.template(template)
-    end
-    exp.all_includes.first
-  end
-
   class_methods do
     def includes_for(*fields)
       Exposures::PreLoader.includes_for(self, *fields)
@@ -34,10 +26,5 @@ module Exposures::PreLoader
     def preload!(associations, *fields)
       Exposures::PreLoader.preload!(self, associations, *fields)
     end
-
-    def calculate_includes(model_klass, templates)
-      Exposures::PreLoader.calculate_includes(model_klass, templates)
-    end
   end
-
 end
