@@ -64,7 +64,7 @@ class ExportManager::Template::TemplateExport < ExportManager::API
     when :xml
       ExportManager::Template::Processors::XmlProcessor
     when :json
-      ExportManager::Template::Processors::JSONProcessor
+      ExportManager::Template::Processors::JsonProcessor
     when :other
       ExportManager::Template::Processors::TextProcessor
     end
