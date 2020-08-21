@@ -4307,6 +4307,7 @@ Rails.application.routes.draw do
 
   resources :views, controller: 'index_view_segments', except: [:show]
 
+  get 'cards/:id', to: 'hover_card#route'
   get 'cards/:route/:id', to: 'hover_card#route'
 
   get 'maps/auto_complete', to: 'maps#auto_complete'

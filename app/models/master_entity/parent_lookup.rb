@@ -29,11 +29,10 @@
 #  primary_key               :boolean
 #
 
-class MasterEntity::ParentLookup < MasterEntity
+class MasterEntity::ParentLookup < MasterEntity::Lookup
   register :parent_lookup
   database_type :parent_lookup
   set :hint, 'Select Parent'
-  operators :eq_any, :blank
 
   ATTRIBUTES = {
       entity_key: 'parent_id',

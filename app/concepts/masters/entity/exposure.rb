@@ -11,7 +11,7 @@ module Masters::Entity::Exposure
       attribute :id, record_attribute: true
 
       master_schema.entities.each do |entity|
-        if entity.type?(:lookup)
+        if entity.type?(:lookup) or entity.type?(:parent_lookup)
           attribute entity.association_name, record_attribute: true, exposure: true, includes: [entity.association_name]
         else
           attribute entity.entity_key, record_attribute: true

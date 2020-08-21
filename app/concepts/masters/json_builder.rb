@@ -20,7 +20,7 @@ class Masters::JsonBuilder
       # Preload all lookup associations to data store to prevent lookup rendering from N+1 query problem
       includes = []
       master_schema.entities.each do |entity|
-        next unless entity.type?(:lookup)
+        next unless entity.type?(:lookup) or entity.type?(:parent_lookup)
 
         includes << entity.association_name
       end
@@ -43,7 +43,7 @@ class Masters::JsonBuilder
     end
 
     master_schema.entities.each do |entity|
-      if entity.type?(:lookup)
+      if entity.type?(:lookup) or entity.type?(:parent_lookup)
         json[entity.association_name] = build_lookup(record, entity)
       else
         json[entity.entity_key] = record.send(entity.entity_key)

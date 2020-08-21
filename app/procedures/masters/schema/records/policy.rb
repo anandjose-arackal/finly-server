@@ -24,4 +24,8 @@ class Masters::Schema::Records::Policy < ApplicationPolicy
     true
   end
 
+  def hover_card?
+    true
+  end
+
 end

@@ -23,11 +23,12 @@ module Masters::Entity::Record
 
       # For entities of lookup type, add a belongs_to association
       master_schema.entities.each do |entity|
-        if entity.type?(:lookup)
+        if entity.type?(:lookup) or entity.type?(:parent_lookup)
           attr = entity.entity_key
+          anonymous_class = entity.type?(:lookup) ? entity.lookup_master_schema.record_model_class : self
           if attr.end_with?('_id')
             attr = attr[0..(attr.length - 4)]
-            belongs_to attr.to_sym, -> { where company_id: entity.company_id }, anonymous_class: entity.lookup_master_schema.record_model_class
+            belongs_to attr.to_sym, -> { where company_id: entity.company_id }, anonymous_class: anonymous_class
           end
         end
       end
