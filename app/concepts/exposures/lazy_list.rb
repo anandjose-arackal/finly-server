@@ -23,7 +23,7 @@ class Exposures::LazyList < Exposures::API
   attr_accessor :relation, :batch_size
 
   def initialize(relation, batch_size: 100)
-    self.relation = relation
+    self.relation = relation.all
     self.batch_size = batch_size
   end
 
@@ -31,9 +31,11 @@ class Exposures::LazyList < Exposures::API
     new(relation)
   end
 
-  def length
+  def count
     relation.count
   end
+
+  alias_method :length, :count
 
   def empty?
     relation.empty?

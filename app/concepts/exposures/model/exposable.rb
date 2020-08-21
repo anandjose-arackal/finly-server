@@ -2,6 +2,10 @@ module Exposures::Model::Exposable
   extend ActiveSupport::Concern
 
   class_methods do
+    def to_exposures
+      Exposures::LazyList.(self)
+    end
+
     def exposure_class
       Object.const_get("#{self}Exposure") rescue nil
     end
