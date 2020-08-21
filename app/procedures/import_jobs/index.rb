@@ -8,10 +8,6 @@ class ImportJobs::Index < IndexBuilder::API
     text value: "{{record.name}}", format: 'primary'
   end
 
-  column :completed_records do
-    text value: "{{record.completed_records}} ({{record.completion_percentage}}%)"
-  end
-
   column :progress do
     progress_bar value: ->(context) { context[:record].completion_percentage || 0 },
                  completed_count: ->(context) { context[:record].completed_records || 0 },
