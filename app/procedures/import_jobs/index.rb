@@ -8,18 +8,18 @@ class ImportJobs::Index < IndexBuilder::API
     text value: "{{record.name}}", format: 'primary'
   end
 
-  column :progress do
+  column :progress, default: true do
     progress_bar value: ->(context) { context[:record].completion_percentage || 0 },
                  completed_count: ->(context) { context[:record].completed_records || 0 },
                  total_count: ->(context) { context[:record].total_records || 0 }
   end
 
-  column :created do
+  column :created, default: true do
     text value: "Created: {{record.created_records}}, Updated: {{record.updated_records}}"
     text value: "Failed: {{record.failed_records}}, Skipped: {{record.skipped_records}}"
   end
 
-  column :attachment do
+  column :attachment, default: true do
     # Todo
   end
 
