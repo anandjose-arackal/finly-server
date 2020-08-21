@@ -1,10 +1,23 @@
 module Masters::Entity::Schema
   extend ActiveSupport::Concern
 
+  SYSTEM_DEFAULTS = {
+      can_label_be_changed: true,
+      can_uniqueness_be_changed: false,
+      can_required_be_changed: false,
+      can_active_be_changed: false,
+      can_be_destroyed: false,
+  }
+
   included do
     include DynamicAttributes
 
     class_attr :database_type
+
+    def self.inherited(sub_class)
+      super
+      sub_class.schema(schema.deep_dup)
+    end
   end
 
   class_methods do
@@ -25,7 +38,8 @@ module Masters::Entity::Schema
       @schema_contract
     end
 
-    def schema
+    def schema(value=nil)
+      @schema = value if value.present?
       @schema ||= {options: {}}.with_indifferent_access
     end
 

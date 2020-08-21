@@ -15,12 +15,10 @@
 #  system_entity             :boolean          default(FALSE)
 #  label                     :string(255)      not null
 #  active                    :string(255)
-#  visible                   :boolean          default(TRUE)
-#  identifier                :boolean          default(FALSE)
 #  options                   :text(65535)
 #  can_label_be_changed      :boolean
 #  can_uniqueness_be_changed :boolean
-#  can_mandatory_be_changed  :boolean
+#  can_required_be_changed   :boolean
 #  can_active_be_changed     :boolean
 #  can_be_destroyed          :boolean
 #  show_in_lookup            :boolean
@@ -28,16 +26,40 @@
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
 #  choices_scope             :text(65535)
+#  primary_key               :boolean
 #
 
-class MasterEntity::Currency < MasterEntity
-  register :currency
-  set :hint, 'Select value'
-  database_type :string
+class MasterEntity::ParentLookup < MasterEntity
+  register :parent_lookup
+  database_type :parent_lookup
+  set :hint, 'Select Parent'
+  operators :eq_any, :blank
 
-  # Todo move CURRENCIES to constants
-  CURRENCIES = FormEntity::Currency::CURRENCIES
+  ATTRIBUTES = {
+      entity_key: 'parent_id',
+      required: false,
+      unique: false,
+      can_label_be_changed: true,
+      can_uniqueness_be_changed: false,
+      can_required_be_changed: false,
+      can_active_be_changed: false,
+      can_be_destroyed: false,
+      show_in_lookup: true,
+      primary_key: false
+  }.with_indifferent_access
 
-  operators :eq_any, :not_eq_all, :not_null, :null
+  def initialize(attributes = {})
+    super(attributes.merge(ATTRIBUTES))
+  end
+
+  schema do
+    validate :entity_key_format
+
+    def entity_key_format
+      unless entity_key == 'parent_id'
+        errors.add :entity_key, 'has be to parent_id'
+      end
+    end
+  end
 
 end

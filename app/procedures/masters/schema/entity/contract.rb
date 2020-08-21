@@ -9,17 +9,16 @@ class Masters::Schema::Entity::Contract < Reform::Form
     represented.company ||= represented.contract_parent&.model&.company
   }
   property :type, deserializer: -> (input, represented, **) {
-    if represented.type.blank?
-      type = input[:entity_type]
-      if type.is_a?(String)
-        if type.starts_with?("MasterEntity")
-          represented.type = Object.const_get(type)
-        else
-          represented.type = Masters::Entity::Registry.types[type]
-        end
+    type = represented.type
+    type = input[:entity_type] if represented.type.blank?
+    if type.is_a?(String)
+      if type.starts_with?("MasterEntity")
+        represented.type = Object.const_get(type)
       else
-        represented.type = type
+        represented.type = Masters::Entity::Registry.types[type]
       end
+    else
+      represented.type = type
     end
   }
   property :hint, deserializer: -> (input, represented, **) {
@@ -66,8 +65,8 @@ class Masters::Schema::Entity::Contract < Reform::Form
   property :can_uniqueness_be_changed, deserializer: -> (input, represented, **) {
     represented.can_uniqueness_be_changed = true unless represented.system_entity
   }
-  property :can_mandatory_be_changed, deserializer: -> (input, represented, **) {
-    represented.can_mandatory_be_changed = true unless represented.system_entity
+  property :can_required_be_changed, deserializer: -> (input, represented, **) {
+    represented.can_required_be_changed = true unless represented.system_entity
   }
   property :can_active_be_changed, deserializer: -> (input, represented, **) {
     represented.can_active_be_changed = true unless represented.system_entity

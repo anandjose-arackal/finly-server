@@ -64,7 +64,7 @@ class ExportManager::Master::TallyVouchers::Expenses < ExportManager::Builders::
   end
 
   # Jugaad for stanza to handle their direct and indirect employee GL Codes
-  STANZA_INDIRECT_GL_MAPPING = {
+  STANZA_INDIRECT_GL_MAPPING ||= {
       "210004": 321006,
       "202005": 321002,
       "221001": 321001,

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_17_062625) do
+ActiveRecord::Schema.define(version: 2020_08_20_164942) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -1356,7 +1356,7 @@ ActiveRecord::Schema.define(version: 2020_08_17_062625) do
 
   create_table "branch_locations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
-    t.string "gstin"
+    t.string "tax_registration_number"
     t.string "pan"
     t.integer "company_id"
     t.text "address_1"
@@ -1364,7 +1364,7 @@ ActiveRecord::Schema.define(version: 2020_08_17_062625) do
     t.string "city"
     t.integer "state_id"
     t.string "country"
-    t.string "pin"
+    t.string "pin_code"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "contact_name"
@@ -1377,6 +1377,8 @@ ActiveRecord::Schema.define(version: 2020_08_17_062625) do
     t.boolean "billable_location", default: true
     t.boolean "shippable_location", default: true
     t.string "gl_code"
+    t.datetime "start_date"
+    t.datetime "end_date"
     t.index ["ancestry"], name: "index_branch_locations_on_ancestry"
     t.index ["company_id"], name: "index_branch_locations_on_company_id"
     t.index ["deleted_at"], name: "index_branch_locations_on_deleted_at"
@@ -2005,18 +2007,19 @@ ActiveRecord::Schema.define(version: 2020_08_17_062625) do
     t.boolean "vendor_payments"
     t.boolean "outward_invoices"
     t.boolean "inward_invoice_line_items"
-    t.string "ancestry"
+    t.string "parent_id"
     t.boolean "outward_invoice_line_items"
     t.string "category_code"
     t.boolean "gst_applicable", default: false
     t.boolean "tds_applicable"
     t.datetime "deleted_at"
     t.integer "created_by_id"
-    t.string "parent_id"
+    t.date "start_date"
+    t.date "end_date"
     t.index ["active"], name: "index_categories_on_active"
-    t.index ["ancestry"], name: "index_categories_on_ancestry"
     t.index ["company_id"], name: "index_categories_on_company_id"
     t.index ["name"], name: "index_categories_on_name"
+    t.index ["parent_id"], name: "index_categories_on_parent_id"
   end
 
   create_table "channel_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -2447,6 +2450,8 @@ ActiveRecord::Schema.define(version: 2020_08_17_062625) do
     t.string "cost_center_code"
     t.string "ancestry"
     t.string "gl_code"
+    t.date "start_date"
+    t.date "end_date"
     t.index ["ancestry"], name: "index_cost_centers_on_ancestry"
     t.index ["company_id"], name: "index_cost_centers_on_company_id"
     t.index ["deleted_at"], name: "index_cost_centers_on_deleted_at"
@@ -2914,16 +2919,18 @@ ActiveRecord::Schema.define(version: 2020_08_17_062625) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "is_deleted", default: false, null: false
-    t.string "ancestry"
+    t.string "parent_id"
     t.integer "cost_center_id"
     t.datetime "deleted_at"
     t.string "department_code"
     t.string "code"
     t.string "gl_code"
-    t.index ["ancestry"], name: "index_departments_on_ancestry"
+    t.date "start_date"
+    t.date "end_date"
     t.index ["company_id"], name: "index_departments_on_company_id"
     t.index ["cost_center_id"], name: "index_departments_on_cost_center_id"
     t.index ["deleted_at"], name: "index_departments_on_deleted_at"
+    t.index ["parent_id"], name: "index_departments_on_parent_id"
   end
 
   create_table "desktop_users", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -5156,6 +5163,8 @@ ActiveRecord::Schema.define(version: 2020_08_17_062625) do
     t.boolean "active", default: true
     t.integer "item_expense_type_id"
     t.boolean "tds_applicable", default: true
+    t.date "start_date"
+    t.date "end_date"
     t.index ["active"], name: "index_items_on_active"
     t.index ["category_id"], name: "index_items_on_category_id"
     t.index ["company_id", "active"], name: "index_items_on_company_id_and_active"
@@ -5518,11 +5527,10 @@ ActiveRecord::Schema.define(version: 2020_08_17_062625) do
     t.boolean "system_entity", default: false
     t.string "label", null: false
     t.string "active"
-    t.boolean "visible", default: true
     t.text "options"
     t.boolean "can_label_be_changed"
     t.boolean "can_uniqueness_be_changed"
-    t.boolean "can_mandatory_be_changed"
+    t.boolean "can_required_be_changed"
     t.boolean "can_active_be_changed"
     t.boolean "can_be_destroyed"
     t.boolean "show_in_lookup"
@@ -5582,6 +5590,7 @@ ActiveRecord::Schema.define(version: 2020_08_17_062625) do
     t.datetime "updated_at", null: false
     t.string "primary_entity_key", null: false
     t.datetime "last_migration_at"
+    t.boolean "is_table_created", default: false
     t.index ["active"], name: "index_master_schemas_on_active"
     t.index ["company_id"], name: "index_master_schemas_on_company_id"
     t.index ["created_at"], name: "index_master_schemas_on_created_at"
@@ -6353,6 +6362,8 @@ ActiveRecord::Schema.define(version: 2020_08_17_062625) do
     t.boolean "default"
     t.boolean "is_deleted", default: false, null: false
     t.datetime "deleted_at"
+    t.date "start_date"
+    t.date "end_date"
     t.index ["deleted_at"], name: "index_payment_terms_on_deleted_at"
   end
 
@@ -7870,6 +7881,48 @@ ActiveRecord::Schema.define(version: 2020_08_17_062625) do
     t.index ["updated_at"], name: "index_schema_2_categories_on_updated_at"
   end
 
+  create_table "schema_2_depotis", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "name"
+    t.index ["created_at"], name: "index_schema_2_depotis_on_created_at"
+    t.index ["deleted_at"], name: "index_schema_2_depotis_on_deleted_at"
+    t.index ["updated_at"], name: "index_schema_2_depotis_on_updated_at"
+  end
+
+  create_table "schema_2_depotiss", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "name"
+    t.index ["created_at"], name: "index_schema_2_depotiss_on_created_at"
+    t.index ["deleted_at"], name: "index_schema_2_depotiss_on_deleted_at"
+    t.index ["updated_at"], name: "index_schema_2_depotiss_on_updated_at"
+  end
+
+  create_table "schema_2_depotisss", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "name"
+    t.index ["created_at"], name: "index_schema_2_depotisss_on_created_at"
+    t.index ["deleted_at"], name: "index_schema_2_depotisss_on_deleted_at"
+    t.index ["updated_at"], name: "index_schema_2_depotisss_on_updated_at"
+  end
+
+  create_table "schema_2_depots", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "name"
+    t.integer "description"
+    t.date "start_date"
+    t.index ["created_at"], name: "index_schema_2_depots_on_created_at"
+    t.index ["deleted_at"], name: "index_schema_2_depots_on_deleted_at"
+    t.index ["updated_at"], name: "index_schema_2_depots_on_updated_at"
+  end
+
   create_table "schema_2_items", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
@@ -9336,6 +9389,8 @@ ActiveRecord::Schema.define(version: 2020_08_17_062625) do
     t.string "erp_sync_reference_id"
     t.integer "erp_sync_attempts_count", default: 0
     t.datetime "erp_sync_attempted_at"
+    t.date "start_date"
+    t.date "end_date"
     t.index ["company_id"], name: "index_users_on_company_id"
     t.index ["email"], name: "index_users_on_email"
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true

@@ -13,11 +13,10 @@ class CreateMasterEntities < ActiveRecord::Migration[5.2]
       t.boolean :system_entity, index: true, default: false
       t.string :label, null: false
       t.string :active, index: true
-      t.boolean :visible, default: true
       t.text :options
       t.boolean :can_label_be_changed
       t.boolean :can_uniqueness_be_changed
-      t.boolean :can_mandatory_be_changed
+      t.boolean :can_required_be_changed
       t.boolean :can_active_be_changed
       t.boolean :can_be_destroyed
       t.boolean :show_in_lookup

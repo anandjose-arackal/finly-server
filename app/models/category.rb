@@ -15,13 +15,15 @@
 #  vendor_payments            :boolean
 #  outward_invoices           :boolean
 #  inward_invoice_line_items  :boolean
-#  ancestry                   :string(255)
+#  parent_id                  :string(255)
 #  outward_invoice_line_items :boolean
 #  category_code              :string(255)
 #  gst_applicable             :boolean          default(FALSE)
 #  tds_applicable             :boolean
 #  deleted_at                 :datetime
 #  created_by_id              :integer
+#  start_date                 :date
+#  end_date                   :date
 #
 
 class Category < ApplicationRecord
@@ -32,11 +34,11 @@ class Category < ApplicationRecord
   include EventProducer
 
   # acts_as_sequenced column: :category_code, purpose: :category, editable: false, prefix: 'CAT'
-  has_ancestry
+  has_ancestry ancestry_column: :parent_id
 
   event_channel 'category'
 
-  alias_attribute :parent_id, :ancestry
+  alias_attribute  :ancestry, :parent_id
 
   belongs_to :company, optional: true
   belongs_to :created_by, optional: true, class_name: 'User'

@@ -13,11 +13,10 @@ module Masters::Entity::Record
     table_name = self.table_name
     @record_model_class = Class.new(base_class) do
       include SoftDeletable
-
-
       self.table_name = table_name
 
       # Avoiding memory leak with Anonymous ActiveRecords as per https://github.com/rails/rails/issues/31395
+      # Anonymous Classes are added as descendants to the parent AR or Application record causing a memory leak
       # Clearing it from descendants of superclass as well as ApplicationRecord
       superclass.direct_descendants.delete(self)
       ApplicationRecord.descendants.delete(self)

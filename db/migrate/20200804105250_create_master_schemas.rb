@@ -9,8 +9,8 @@ class CreateMasterSchemas < ActiveRecord::Migration[5.2]
       t.boolean :active, index: true, default: true
       t.boolean :system_master, index: true
       t.boolean :can_name_be_changed
-      t.boolean :can_attributes_be_nested
       t.boolean :can_attributes_be_changed
+      t.boolean :can_primary_key_be_changed
       t.datetime :deleted_at, index: true
       t.integer :owner_id, index: true, references: 'users', foreign_key: true
 

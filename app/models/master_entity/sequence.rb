@@ -15,12 +15,10 @@
 #  system_entity             :boolean          default(FALSE)
 #  label                     :string(255)      not null
 #  active                    :string(255)
-#  visible                   :boolean          default(TRUE)
-#  identifier                :boolean          default(FALSE)
 #  options                   :text(65535)
 #  can_label_be_changed      :boolean
 #  can_uniqueness_be_changed :boolean
-#  can_mandatory_be_changed  :boolean
+#  can_required_be_changed   :boolean
 #  can_active_be_changed     :boolean
 #  can_be_destroyed          :boolean
 #  show_in_lookup            :boolean
@@ -28,6 +26,7 @@
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
 #  choices_scope             :text(65535)
+#  primary_key               :boolean
 #
 
 class MasterEntity::Sequence < MasterEntity
@@ -37,7 +36,7 @@ class MasterEntity::Sequence < MasterEntity
   set :hint, 'Auto-Generated'
   operators :eq_any, :not_eq_all, :cont_any, :not_cont_all, :blank, :present
 
-  MIN_LENGTH_DEFAULT = 5
+  MIN_LENGTH_DEFAULT ||= 5
 
   option :prefix
   option :min_length, default: MIN_LENGTH_DEFAULT

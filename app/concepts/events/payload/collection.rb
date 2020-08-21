@@ -1,6 +1,6 @@
 class Events::Payload::Record
 
-  VALID_OPTIONS= %i(filters from_status role changes)
+  VALID_OPTIONS ||= %i(filters from_status role changes)
   def self.call(record_class, action_user, action, options = {})
     {
         record_class: record_class,

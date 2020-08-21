@@ -12,9 +12,6 @@ class Masters::Schema::Contract < Reform::Form
   property :can_name_be_changed, deserializer: -> (input, represented, **) {
     represented.can_name_be_changed = true unless represented.system_master
   }
-  property :can_attributes_be_nested, deserializer: -> (input, represented, **) {
-    represented.can_attributes_be_nested = true unless represented.system_master
-  }
   property :can_attributes_be_changed, deserializer: -> (input, represented, **) {
     represented.can_attributes_be_changed = true unless represented.system_master
   }
