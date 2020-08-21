@@ -151,4 +151,8 @@ Resolver::Router.draw do
   scope :reports do
     route 'default', Docs::ExpenseManagement::Reports::Resolver
   end
+
+  scope :import_jobs do
+    route 'default', ImportJobs::Resolver
+  end
 end

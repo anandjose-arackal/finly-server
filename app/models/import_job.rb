@@ -35,6 +35,13 @@ class ImportJob < ApplicationRecord
 
   belongs_to :created_by, class_name: 'User'
   belongs_to :company
+  belongs_to :status, class_name: 'ImportJobStatus'
+
+  scope :with_status_id, ->(status_id) {
+    where status_id: status_id
+  }
+
+  ransack_scopes :with_status_id
 
   has_attached_file :attachment, :use_timestamp => false
   validates_attachment_content_type :attachment,
@@ -42,4 +49,9 @@ class ImportJob < ApplicationRecord
 
   serialize :request_params, JSON
   serialize :options, JSON
+
+  def to_exposure
+    ImportJobExposure.new(self)
+  end
+
 end

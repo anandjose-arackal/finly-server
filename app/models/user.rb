@@ -153,6 +153,7 @@ class User < ApplicationRecord
   has_many :user_pockets
 
   has_many :export_jobs, foreign_key: :created_by_id
+  has_many :import_jobs, foreign_key: :created_by_id
 
   # adding association to drop down items
   has_many :user_drop_down_item_mappings
