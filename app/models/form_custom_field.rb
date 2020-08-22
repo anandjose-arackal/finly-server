@@ -20,4 +20,7 @@ class FormCustomField < ApplicationRecord
   belongs_to :form
   belongs_to :form_entity
   belongs_to :document, polymorphic: true
+
+  has_one :form_cf_dropdown_selection
+  has_many :form_cf_attachments
 end
