@@ -69,6 +69,7 @@ class StatementsController < BaseControllers::WebBase
       }
       render json: @response.as_json
     else
+      request.format = :json
       respond response: :failure, message: result.messages[:error]
     end
   end

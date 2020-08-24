@@ -38,12 +38,12 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
         self.gstin_location = self.inward_invoice&.vendor&.gstin_locations.find_by(id: inward_invoice_params[:gstin_location_id]) || self.inward_invoice.vendor&.gstin_locations&.first
       end
 
-      if self.procurement.po_revisions.present?
-        self.po_revision = self.procurement.po_revisions.last
-        if po_revision.present?
-          self.purchase_order = self.po_revision
-        end
-      end
+      # if self.procurement.po_revisions.present?
+      #   self.po_revision = self.procurement.po_revisions.last
+      #   if po_revision.present?
+      #     self.purchase_order = self.po_revision
+      #   end
+      # end
     end
 
     # Check if department and cost center are to be saved globally for the non-po invoice or individually for each item
