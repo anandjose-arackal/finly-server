@@ -128,6 +128,16 @@ class InvoiceExposure < Exposures::API
     record.include_original_amount
   end
 
+  attribute :total_invoice_amount, includes: [:gross_amount, :tax_amount] do
+    record.gross_amount&.value.to_f + record.tax_amount&.value.to_f
+  end
+
+  attribute :payment_amounts_total, record_attribute: true, includes: [{ payments: :amount }]
+
+  attribute :legal_status, includes: [{ vender_location: :gstin_master }] do
+    record.vendor_location&.gstin_master&.constitution_of_business
+  end
+
 
   # def vendor_ref_num(invoice_line_item)
   #   invoice_line_item.parent&.vendor_id

@@ -22,5 +22,5 @@ class YesBankVendorExposure < Exposures::API
     record.business_name
   end
   attribute :payment_term, record_attribute: true, exposure: true
-
+  attribute :display_name, record_attribute: true
 end
