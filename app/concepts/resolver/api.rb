@@ -49,7 +49,13 @@ class Resolver::API
   # this helps in applying multiple types of filters for producing the results
   # Ex: In index, if you apply the status filter from the NavBar while applying advanced filters
   def filter(collection, params)
-    collection.ransack(params[:q]).result.ransack(params[:qs]).result.ransack(params[:qa]).result(distinct: true)
+    collection = collection.ransack(params[:q]).result.ransack(params[:qs]).result.ransack(params[:qa]).result(distinct: true)
+    if params[:additional_filters].present?
+      params[:additional_filters].each do |par|
+        collection = collection.ransack(par[:q]).result.ransack(par[:qs]).result.ransack(par[:qa]).result(distinct: true)
+      end
+    end
+    collection
   end
 
   def paginate(collection, params)

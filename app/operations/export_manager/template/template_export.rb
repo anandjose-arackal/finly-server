@@ -12,8 +12,9 @@ class ExportManager::Template::TemplateExport < ExportManager::API
   end
 
   def input
-    # TODO: merge default query params in template to params
-
+    unless self.export_template.query.nil?
+      params[:additional_filters] = [JSON.parse(self.export_template.query)]
+    end
     results = Resolver::Router.dispatch("#{resource_type}.default", { current_user: user, params: params })
 
     case format
