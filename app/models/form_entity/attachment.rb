@@ -55,7 +55,7 @@ class FormEntity::Attachment < FormEntity
   FORMAT = %w(txt pdf doc docx xls xlsx).freeze
 
   register :attachment
-  collection!
+  # collection!
 
   option :maximum, default: 255
   option :minimum, default: 0
@@ -63,8 +63,8 @@ class FormEntity::Attachment < FormEntity
 
   # operators :eq_any, :not_eq_all, :cont_any, :not_cont_all, :blank, :present
 
-  contract_eval 'Max Items Check', &Forms::Validations::Templates[:maximum]
-  contract_eval 'Min Items Check', &Forms::Validations::Templates[:minimum]
+  # contract_eval 'Max Items Check', &Forms::Validations::Templates[:maximum]
+  # contract_eval 'Min Items Check', &Forms::Validations::Templates[:minimum]
 
   schema_validation do
     required(:options) do
@@ -98,7 +98,7 @@ class FormEntity::Attachment < FormEntity
             hash do
               required(:maximum).value(:int?, lteq?: 255)
               required(:minimum).value(:int?, gteq?: 0)
-              optional(:format).each(included_in?: FORMAT)
+              # optional(:format).each(included_in?: FORMAT)
             end
           end
         end

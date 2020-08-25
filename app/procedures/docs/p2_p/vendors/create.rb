@@ -9,7 +9,7 @@ class Docs::P2P::Vendors::Create < Transactions::API
 
   step :check
   def check(ctx, options)
-    debugger
+    # debugger
     true
   end
 

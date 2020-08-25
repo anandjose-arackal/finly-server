@@ -20,6 +20,27 @@ class FormCustomField < ApplicationRecord
   belongs_to :form
   belongs_to :form_entity
   belongs_to :document, polymorphic: true
+
+  has_one :selection, class_name: 'CustomFieldSelection'
+  has_many :selections, class_name: 'CustomFieldSelection'
+  has_many :attachments, class_name: 'CustomFieldAttachment'
+
+  def value(value=nil)
+    self.value = value if value.present?
+
+    case self.form_entity&.entity_type
+    when 'text'
+      value_text
+    when 'dropdown'
+      selection&.form_entity_choice&.name
+    when 'multiselect'
+      selections.map(&:form_entity_choice).map(&:name)
+    when 'attachment'
+      attachments.map(&:attachment) if self.persisted?
+    else
+      super()
+    end
+  end
 end
 
 

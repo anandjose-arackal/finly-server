@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_19_011200) do
+ActiveRecord::Schema.define(version: 2020_08_23_140301) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -2775,6 +2775,30 @@ ActiveRecord::Schema.define(version: 2020_08_19_011200) do
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
     t.index ["configurable_id", "configurable_type"], name: "index_custom_export_configurations_on_configurable"
+  end
+
+  create_table "custom_field_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
+    t.string "form_custom_field_id"
+    t.string "attachment_file_name"
+    t.string "attachment_content_type"
+    t.bigint "attachment_file_size"
+    t.datetime "attachment_updated_at"
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_custom_field_attachments_on_deleted_at"
+    t.index ["form_custom_field_id"], name: "index_custom_field_attachments_on_form_custom_field_id"
+    t.index ["uuid"], name: "index_custom_field_attachments_on_uuid"
+  end
+
+  create_table "custom_field_selections", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
+    t.string "form_entity_choice_id"
+    t.string "form_custom_field_id"
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_custom_field_selections_on_deleted_at"
+    t.index ["form_custom_field_id"], name: "index_custom_field_selections_on_form_custom_field_id"
+    t.index ["form_entity_choice_id"], name: "index_custom_field_selections_on_form_entity_choice_id"
+    t.index ["uuid"], name: "index_custom_field_selections_on_uuid"
   end
 
   create_table "custom_fields", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|

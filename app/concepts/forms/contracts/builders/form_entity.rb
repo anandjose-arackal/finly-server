@@ -24,6 +24,11 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
   # Contract evaluators help in checking entity specific validations such as max_items, min_items. Todo : Rename maybe?
   pass :execute_contract_evaluators
 
+  def check_success(ctx, options)
+    # debugger
+    true
+  end
+
   def init(context, params:, **)
     context[:contract] = params[:contract]
     context[:entity] = params[:entity]

@@ -16,7 +16,6 @@ class Forms::ChoiceDependencies::Ops::Create < Transactions::API
 
   # Helper methods
   def check_success(ctx, options)
-    debugger
     true
   end
   def check_failure(ctx, options)
