@@ -136,7 +136,7 @@ Resolver::Router.draw do
     route 'default', Docs::ExpenseManagement::Reports::Resolver
   end
 
-  scope :export_templates do
+  scope :export_template_news do
     route 'default', Masters::ExportTemplates::Resolver
   end
 

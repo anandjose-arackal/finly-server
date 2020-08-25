@@ -1,4 +1,4 @@
 json.results do
-  json.array! @op['export_templates']
+  json.array! @op['model.records']
 end
-json.count @op['export_templates'].count
+json.count @op['model.records'].count

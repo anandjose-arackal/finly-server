@@ -2,15 +2,16 @@ class Masters::ExportTemplates::Ops::Index < Transactions::API
   include HasScope
 
   # step Transactions::Authorization::Roles()
-  step :index!
+  # step :index!
+  step Resolver::Transactions::Load(model: ExportTemplateNew)
 
-  def index!(options, current_user:, params:, **)
-    # TODO: can we use resolver 'export_templates.default' instead of rewriting??
-    options['export_templates'] = ExportTemplateNew.where('company_id = ? AND (created_by_id = ? AND personal = ?) OR (personal = ?)', current_user.company.id, current_user.id, true, false)
+  # def index!(options, current_user:, params:, **)
+  #   # TODO: can we use resolver 'export_templates.default' instead of rewriting??
+  #   options['export_templates'] = ExportTemplateNew.where('company_id = ? AND (created_by_id = ? AND personal = ?) OR (personal = ?)', current_user.company.id, current_user.id, true, false)
 
-    # TODO: need to check filtering
-    options['export_templates'] = apply_scopes(options['export_templates'], params)
-  end
+  #   # TODO: need to check filtering
+  #   options['export_templates'] = apply_scopes(options['export_templates'], params)
+  # end
 end
 
 # TODO: Using IndexBuilder is not working. Check!!
