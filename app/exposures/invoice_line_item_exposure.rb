@@ -44,38 +44,50 @@ class InvoiceLineItemExposure < Exposures::API
   end
 
   attribute :cgst do
-    return 0 unless cgst?
-
-    record.tax&.to_f / 2 || 0
+    if cgst?
+      (record.tax&.to_f || 0) / 2
+    else
+      0
+    end
   end
 
   attribute :sgst do
-    return 0 unless sgst?
-
-    record.tax&.to_f / 2 || 0
+    if sgst?
+      (record.tax&.to_f || 0) / 2
+    else
+      0
+    end
   end
 
   attribute :igst do
-    return 0 unless igst?
-
-    record.tax&.to_f
+    if igst?
+      record.tax&.to_f
+    else
+      0
+    end
   end
 
   attribute :cgst_amount, includes: [:tax_amount] do
-    return 0 unless cgst?
-
-    record.tax_amount&.value / 2 || 0
+    if cgst?
+      (record.tax_amount&.value || 0) / 2
+    else
+      0
+    end
   end
 
   attribute :sgst_amount, includes: [:tax_amount] do
-    return 0 unless sgst?
-
-    record.tax_amount&.value / 2 || 0
+    if sgst?
+      (record.tax_amount&.value || 0) / 2
+    else
+      0
+    end
   end
 
   attribute :igst_amount, includes: [:tax_amount] do
-    return 0 unless igst?
-
-    record.tax_amount&.value
+    if igst?
+      record.tax_amount&.value
+    else
+      0
+    end
   end
 end
