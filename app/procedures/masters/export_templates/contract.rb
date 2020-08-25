@@ -9,4 +9,5 @@ class Masters::ExportTemplates::Contract < Reform::Form
   property :personal, default: true
   property :created_by_id, validates: { presence: true }
   property :company_id, validates: { presence: true }
+  property :include_custom_fields
 end

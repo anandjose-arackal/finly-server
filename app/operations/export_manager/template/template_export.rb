@@ -72,7 +72,7 @@ class ExportManager::Template::TemplateExport < ExportManager::API
 
   def generate
     processor = processor_class.new export_job
-    file = processor.generate template, data, file_name
+    file = processor.generate template, data, file_name, export_template.include_custom_fields
     if file
       save_attachment file
       success!
