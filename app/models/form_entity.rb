@@ -231,7 +231,7 @@ class FormEntity < ApplicationRecord
         config_path: config_path,
         validations: validations.as_json(options),
         conditions: conditions.as_json(options),
-        choices: choices_scope.present? ? choices_scope.build(params: params, user: opts[:current_user]) : nil
+        choices: choices_scope.present? ? choices_scope.build(params: params, user: opts[:current_user]) : choices.as_json
     }
   end
 
