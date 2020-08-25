@@ -15,6 +15,9 @@
     <h4>Referrer: <%= @preview_registration.referrer %></h4>
     <br/>
     <br/>
+    <% if @sales_person %>
+    <h3>URL (page from which user sign up): <%= @preview_registration.url %></h3>
+    <% end %>
 <% end %>
 
 <%= render 'application_mailer/template' %>
