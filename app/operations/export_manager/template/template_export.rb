@@ -32,9 +32,8 @@ class ExportManager::Template::TemplateExport < ExportManager::API
         [template],
         'records'
       )
-
-      results = results.includes(includes)
     end
+    results = results.includes(includes)
 
     results
   end
