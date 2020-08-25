@@ -51,6 +51,7 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
   end
 
   def process
+    self.purchase_order.paper_trail_event = "Submit"
     params[:document] = self.purchase_order
     params[:aasm_event] = 'submit'
     params[:violation_present] = false

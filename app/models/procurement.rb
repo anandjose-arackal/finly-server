@@ -24,6 +24,7 @@ class Procurement < ApplicationRecord
   include SoftDeletable, FindByOrderedIds, Sequenced::ActsAsSequenced
 
   acts_as_sequenced column: :transaction_id, purpose: :procurement, editable: false
+  has_paper_trail
 
   # procurement_type ['purchase_order', 'invoice', 'non_po_invoice'] # will be moved to model
 

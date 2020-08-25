@@ -482,6 +482,13 @@ GEM
     optimist (3.0.1)
     orm_adapter (0.5.0)
     ox (2.13.2)
+    paper_trail (11.0.0)
+      activerecord (>= 5.2)
+      request_store (~> 1.1)
+    paper_trail-association_tracking (2.1.0)
+    paper_trail-globalid (0.2.0)
+      globalid
+      paper_trail (>= 3.0.0)
     paperclip (6.1.0)
       activemodel (>= 4.2.0)
       activesupport (>= 4.2.0)
@@ -854,6 +861,9 @@ DEPENDENCIES
   omniauth-multi-provider (~> 0.2)
   omniauth-quickbooks (~> 0.0.2)
   omniauth-saml (~> 1.10)
+  paper_trail
+  paper_trail-association_tracking
+  paper_trail-globalid
   paperclip (~> 6.1.0)
   paperclip-azure (~> 1.0)
   parallel (~> 1.18)
