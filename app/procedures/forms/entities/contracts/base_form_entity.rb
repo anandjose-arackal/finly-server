@@ -62,8 +62,8 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
     property :error_message
     property :updated_by_id, deserializer: -> (input, represented, *args) {represented.updated_by_id = represented.contract_root.current_user.id}
     # property :validation_id  # ignored in case of custom fields
-    property :custom # doubt # todo - replace with system validation
-    property :internal # todo - migration to remove
+    # property :custom # doubt # todo - replace with system validation
+    property :system_validation, deserializer: -> (input, represented, *args) {represented.updated_by_id = represented.system_validation ? represented.system_validation : false} # todo - migration to remove
     property :is_updated
     property :rule_text, virtual: true
     property :rule, deserializer: -> (input, represented, *args){ represented.rule = Rules::Adapters::Store.load(represented.rule_text) } #todo - validate rule
