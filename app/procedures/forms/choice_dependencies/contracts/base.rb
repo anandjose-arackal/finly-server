@@ -28,8 +28,8 @@ class Forms::ChoiceDependencies::Contracts::Base < Reform::Form
     mapping = mappings.find {|mapping| mapping.id.to_s == fragment["id"].to_s}
 
     if fragment["_destroy"]
-      mappings.destroy(mapping)
-      return skip!
+      mapping.destroy
+      skip!
     end
 
     mapping || mappings.append(FormChoiceDependencyMapping.new)

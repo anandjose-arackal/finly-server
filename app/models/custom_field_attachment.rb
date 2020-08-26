@@ -1,3 +1,17 @@
+# == Schema Information
+#
+# Table name: custom_field_attachments
+#
+#  id                      :bigint           not null
+#  uuid                    :string(36)       not null, primary key
+#  form_custom_field_id    :string(255)
+#  attachment_file_name    :string(255)
+#  attachment_content_type :string(255)
+#  attachment_file_size    :bigint
+#  attachment_updated_at   :datetime
+#  deleted_at              :datetime
+#
+
 class CustomFieldAttachment < ApplicationRecord
 
   include SoftDeletable, UUIDHelper

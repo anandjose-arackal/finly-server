@@ -20,11 +20,10 @@ class FormEntity::DropDown < FormEntity
     Proc.new do
 
       # property :choices, virtual: true
-
-      # property :choices_scope, deserializer: -> (input, represented, *args) do
-      #   # todo - handle types other than list
-      #   represented.choices_scope = Choices[represented.choices[:type]].(*represented.choices[:config][:choices])
-      # end
+      property :choices_scope, deserializer: -> (input, represented, *args) do
+        choices = input[:choices].filter {|item| !item[:_destroy]}
+        represented.choices_scope = Choices['list'].(*choices) unless represented.system_field
+      end
 
       collection :choices, populate_if_empty: FormEntityChoice, populator: :choices! do
         property :id
