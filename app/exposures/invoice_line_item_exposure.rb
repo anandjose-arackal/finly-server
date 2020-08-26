@@ -90,4 +90,8 @@ class InvoiceLineItemExposure < Exposures::API
       0
     end
   end
+
+  attribute :custom_fields, includes: [{ parent: { custom_fields: [:field_configuration, :value] } }] do
+    record.parent.custom_fields
+  end
 end

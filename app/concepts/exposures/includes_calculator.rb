@@ -38,7 +38,14 @@ class Exposures::IncludesCalculator
       next if exposure_klass.nil?
 
       attribute = exposure_klass.attributes[lookups[0].to_sym]
-      next unless attribute.present?
+      unless attribute.present?
+        attribute = exposure_klass.attributes[:custom_fields]
+        next unless attribute.present?
+
+        merge_includes all_includes[index], attribute.includes
+        next
+      end
+
 
       merge_includes all_includes[index], attribute.includes
 

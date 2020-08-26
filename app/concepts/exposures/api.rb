@@ -40,6 +40,24 @@ class Exposures::API < Liquid::Drop
     class_eval &attributes[name].define!
   end
 
+  # Handle custom_fields keys as methods
+  def method_missing(method)
+    if methods.include? :custom_fields
+      custom_fields.each do |cf|
+        if cf.field_key == method.to_s
+          return cf.string_value
+        end
+      end
+      return '' # returning empty to not raise issue in case custom_fields is defined and field_key does not exists.
+    end
+    super
+  end
+
+  # Pass through method_missing from liquid to instance's
+  def liquid_method_missing(method)
+    method_missing method.to_sym
+  end
+
   def initialize(object)
     @object = object
   end
