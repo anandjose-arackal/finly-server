@@ -16,7 +16,6 @@
 #  deleted_at            :datetime
 #  created_at            :datetime         not null
 #  updated_at            :datetime         not null
-#  include_custom_fields :boolean          default(FALSE)
 #
 
 class ExportTemplateNew < ApplicationRecord

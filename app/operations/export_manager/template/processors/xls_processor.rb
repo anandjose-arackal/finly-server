@@ -1,5 +1,5 @@
 class ExportManager::Template::Processors::XlsProcessor < ExportManager::Template::Processor
-  def generate(template, data, file_name, include_custom_fields)
+  def generate(template, data, file_name)
     header = ExportManager::Builders::Spreadsheet::Header.new
     template['columns'].each do |column|
       header.add column['label']
@@ -16,12 +16,6 @@ class ExportManager::Template::Processors::XlsProcessor < ExportManager::Templat
       template['columns'].each do |column|
         value = exposure.template(column['value'])
         row.add column['label'], value
-      end
-
-      if include_custom_fields
-        exposure.custom_fields.each do |cf|
-          row.add cf[:name], cf[:value]
-        end
       end
 
       row.build.each_with_index do |item, column|

@@ -138,16 +138,6 @@ class InvoiceExposure < Exposures::API
     record.vendor_location&.gstin_master&.constitution_of_business
   end
 
-  attribute :custom_fields do
-    data = []
-    record.custom_fields.each do |custom_field|
-      data << {
-        name: custom_field.field_configuration.field_name,
-        value: custom_field.string_value
-      }
-    end
-    data
-  end
 
 
   # def vendor_ref_num(invoice_line_item)

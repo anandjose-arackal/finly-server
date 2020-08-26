@@ -90,8 +90,4 @@ class InvoiceLineItemExposure < Exposures::API
       0
     end
   end
-
-  attribute :custom_fields do
-    record.parent.to_exposure.custom_fields
-  end
 end
