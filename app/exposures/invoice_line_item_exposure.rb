@@ -13,6 +13,9 @@ class InvoiceLineItemExposure < Exposures::API
     record.amount&.currency&.country
   end
   attribute :tax_amount, record_attribute: true, exposure: true, includes: [:tax_amount]
+  attribute :tax_amount_value, includes: [:tax_amount] do
+    record.tax_amount&.value || 0
+  end
 
   attribute :category, record_attribute: true, exposure: true, includes: [:category]
   attribute :gl_code, includes: [:category] do
@@ -88,6 +91,56 @@ class InvoiceLineItemExposure < Exposures::API
       record.tax_amount&.value
     else
       0
+    end
+  end
+
+  attribute :po_date, includes: [{purchase_order_item: :purchase_order}] do
+    record.purchase_order_item&.purchase_order&.created_at
+  end
+
+  attribute :tds_nature, includes: [{ parent: :tds_slab }] do
+    if record.tds_applicable
+      record.parent.tds_slab&.name
+    else
+      ''
+    end
+  end
+
+  attribute :tds_percentage do
+    if record.tds_applicable
+      record.parent.tds_slab&.tds || 0.0
+    else
+      0.0
+    end
+  end
+
+  attribute :tds_amount, includes: [:billable_amount, :taxable_amount] do
+    if record.tds_applicable
+      record.tds_amount || 0.0
+    else
+      0.0
+    end
+  end
+
+  attribute :quantity, record_attribute: true
+  attribute :unit_of_measurement, record_attribute: true
+  attribute :cost_center, record_attribute: true, exposure: true
+
+  attribute :discount_amount_value, includes: [:discount_amount] do
+    record.discount_amount&.value || 0
+  end
+
+  attribute :item_code do
+    record.inventory_line_item&.item_code
+  end
+
+  attribute :total_amount, includes: [:parent, :amount, :inventory_line_item, :billable_amount, :amount] do
+    if record.parent&.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)
+      record.amount&.value.to_f
+    elsif record.inventory_line_item&.product_type_id == ProductType.id_for(:service)
+      record.billable_amount&.value.to_f
+    else
+      record.amount&.value.to_f
     end
   end
 
