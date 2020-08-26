@@ -2,7 +2,7 @@ class Forms::Synchronizer
   def self.call(options = {})
     if options[:master].present? && options[:company_id].present?
       master = Forms::Router.forms.filter {|item| item.name == options[:master]}.first
-      Forms::Synchronizer.sync(master, company_id)
+      Forms::Synchronizer.sync(master, options[:company_id])
     else
       Forms::Router.forms.each { |master| Forms::Synchronizer.sync(master) }
     end
