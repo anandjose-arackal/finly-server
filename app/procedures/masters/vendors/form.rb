@@ -8,20 +8,30 @@ class Masters::Vendors::Form < Forms::API
              can_editable_be_changed: false
   end
 
-  section :vendor_details do
-    # auto_number :vendor_id, sequence: {prefix: "VNDR.", start_at: '000001'}
+  section :business_details do
+    auto_number :vendor_id, sequence: {prefix: "VNDR.", start_at: '000001'}
     lookup :policy_id,
            choices_scope: Choices[:lookup].('policies', permissions: [:vendor_creator, :vendor_manager]),
            required: true
-    text :name, computed: Forms::Compute::Lookup('policy_id', '{{record.name}}'), editable: false
-    text :business_name
-    attachment :files, system_field: false
+    # text :name, computed: Forms::Compute::Lookup('policy_id', '{{record.name}}'), editable: false
+
+    text :business_name, label: 'Legal Name', required: true
+    text :name, label: 'Trade Name'
+    text :pan
+    switch :gst_registered
+    large_text :address
+    dropdown :vendor_type, Choices[:lookup].('vendor_types')
   end
 
   section :tax_information do
-    text :pan
     switch :msme_registered
     text :msme_registration_number    # dropdown :tds_rates_list_id, choices_scope: Choices[:lookup].('')
+  end
+
+  section :tds do
+    dropdown :tds_rates_list_id, Choices[:lookup].('tds_slabs')
+    date :effective_start_date, system_field: false
+    date :effective_end_date, system_field: false
   end
 
   section :location_details do
@@ -49,12 +59,15 @@ class Masters::Vendors::Form < Forms::API
     end
   end
 
-  # section :attachments do
-  #   collection :vendor_attachments
-  #   attachment :pan_card
-  #   attachment :gstin_certificate
-  #   attachment :cancelled_cheque
-  # end
+  section :attachments do
+    attachment :pan_card, system_field: false
+    attachment :gstin_certificate, system_field: false
+    attachment :cancelled_cheque, system_field: false
+    attachment :tax_exemption_certificate, system_field: false
+    attachment :lower_exception_certificate, system_field: false
+    attachment :msme_registration_certificate, system_field: false
+    attachment :other_documents, system_field: false
+  end
 
 
 
