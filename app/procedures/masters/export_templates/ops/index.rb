@@ -1,7 +1,8 @@
 class Masters::ExportTemplates::Ops::Index < Transactions::API
   include HasScope
 
-  # step Transactions::Authorization::Roles()
+  # allow users with following roles
+  step Transactions::Authorization::Roles(:export_manager, :admin)
   # step :index!
   step Resolver::Transactions::Load(model: ExportTemplateNew)
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_01_091949) do
+ActiveRecord::Schema.define(version: 2020_08_26_093906) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3664,6 +3664,17 @@ ActiveRecord::Schema.define(version: 2020_08_01_091949) do
     t.index ["name"], name: "index_export_template_news_on_name"
     t.index ["personal"], name: "index_export_template_news_on_personal"
     t.index ["resource"], name: "index_export_template_news_on_resource"
+  end
+
+  create_table "export_template_user_role_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "template_id", null: false
+    t.integer "user_role_id", null: false
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_export_template_user_role_mappings_on_deleted_at"
+    t.index ["template_id"], name: "index_export_template_user_role_mappings_on_template_id"
+    t.index ["user_role_id"], name: "index_export_template_user_role_mappings_on_user_role_id"
   end
 
   create_table "export_templates", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
