@@ -73,8 +73,8 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
   # Conditions
   collection :conditions, populator: :conditions! do
     property :id
-    property :company_id, deserializer: -> (input, represented, *args) {represented.company_id = represented.contract_root.current_user.company_id}
-    property :form_id, deserializer: -> (input, represented, *args) {represented.form_id = represented.contract_root.form_id}
+    property :company_id, deserializer: -> (input, represented, *args) {represented.company_id ||= represented.contract_root.current_user.company_id}
+    property :form_id, deserializer: -> (input, represented, *args) {represented.form_id ||= represented.contract_root.form_id}
     property :created_by_id, deserializer: -> (input, represented, *args) {represented.created_by_id = represented.contract_root.current_user.id}
     property :updated_by_id, deserializer: -> (input, represented, *args) {represented.updated_by_id = represented.contract_root.current_user.id}
     # property :condition_id
