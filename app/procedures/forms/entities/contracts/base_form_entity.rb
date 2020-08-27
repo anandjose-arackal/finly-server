@@ -67,6 +67,9 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
     property :is_updated
     property :rule, deserializer: -> (input, represented, *args){ represented.rule = Rules::Adapters::Store.load(input[:rule]) } #todo - validate rule
     property :can_be_updated # goes for system field
+
+    validates :rule, presence: true
+    validates :error_message, presence: true
   end
 
   # Conditions
@@ -81,7 +84,6 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
     property :internal
     property :is_updated
     property :can_be_updated
-    property :rule_text, virtual: true
     property :rule, deserializer: -> (input, represented, *args){ represented.rule = Rules::Adapters::Store.load(input[:rule]) }
     property :referencable_id
     property :referencable_type
@@ -93,6 +95,8 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
       property :property#, validates: {presence: true}
       property :value#, validates: {presence: true, inclusion: {in: [true, false]}}
     end
+
+    validates :rule, presence: true
 
     def actions!(collection:, fragment:, index:, options:, **)
       action = actions.find {|action| actions.id.to_s == fragment["id"].to_s}
