@@ -1,9 +1,9 @@
 require 'reform/form/dry'
 class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
-
   feature Reform::Form::Dry # override the default activemodel validation
-  # property :form_id # Cannot be changed
-  # property :form_section_id # Cannot be changed
+
+  property :form_id, deserializer: -> (input, represented, *args) {} # Cannot be changed
+  property :form_section_id, deserializer: -> (input, represented, *args) {} # Cannot be changed
 
   validation do
     params do
@@ -57,10 +57,8 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
   # Validations
   collection :validations, populator: :validations! do
     property :id
-    # property :company_id, deserializer: -> (input, represented, *args) {represented.company_id = represented.contract_root.current_user.company_id}
-    # property :form_id, deserializer: -> (input, represented, *args) {represented.form_id = represented.contract_root.form_id}
-    property :company_id, deserializer: -> (input, represented, *args) {represented.company_id = represented.contract_root.current_user.company_id}
-    property :form_id, deserializer: -> (input, represented, *args) {represented.form_id = represented.contract_root.form_id}
+    property :company_id, deserializer: -> (input, represented, *args) {represented.company_id ||= represented.contract_root.current_user.company_id}
+    property :form_id, deserializer: -> (input, represented, *args) {represented.form_id ||= represented.contract_root.form_id}
     property :error_message
     property :updated_by_id, deserializer: -> (input, represented, *args) {represented.updated_by_id = represented.contract_root.current_user.id}
     # property :validation_id  # ignored in case of custom fields
