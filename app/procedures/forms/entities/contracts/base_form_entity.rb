@@ -30,11 +30,10 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
   property :hint, deserializer: -> (input, represented, *args){ represented.hint = "Enter Value" if input[:hint].blank? }
   property :position
 
-  property :behavior, virtual: true
-  property :editable, deserializer: -> (input, represented, *args) {represented.editable = input.dig(:behavior)&.dig(:editable) if (represented.model.persisted? and represented.model.can_editable_be_changed) or true}
-  property :required, deserializer: -> (input, represented, *args) {represented.required = input.dig(:behavior)&.dig(:required) if (represented.model.persisted? and represented.model.can_required_be_changed) or true}
-  property :active, deserializer: -> (input, represented, *args) {represented.active = input.dig(:behavior)&.dig(:active) if (represented.model.persisted? and represented.model.can_be_disabled) or true}
-  property :visible, deserializer: -> (input, represented, *args) {represented.visible = input.dig(:behavior)&.dig(:visible) if (represented.model.persisted? and represented.model.can_visible_be_changed) or true}
+  property :editable, deserializer: -> (input, represented, *args) {represented.editable = input.dig(:behavior, :editable) if (represented.model.persisted? and represented.model.can_editable_be_changed) or true}
+  property :required, deserializer: -> (input, represented, *args) {represented.required = input.dig(:behavior, :required) if (represented.model.persisted? and represented.model.can_required_be_changed) or true}
+  property :active, deserializer: -> (input, represented, *args) {represented.active = input.dig(:behavior, :active) if (represented.model.persisted? and represented.model.can_be_disabled) or true}
+  property :visible, deserializer: -> (input, represented, *args) {represented.visible = input.dig(:behavior, :visible) if (represented.model.persisted? and represented.model.can_visible_be_changed) or true}
 
   property :unique, deserializer: -> (input, represented, *args){ represented.unique = input[:unique] if (represented.model.persisted? and represented.model.can_uniqueness_be_changed) or true }
   property :default_value, deserializer: -> (input, represented, *args) { represented.default_value = input[:default_value] if (input[:default_value].present? || (input[:default_value].nil? and ((represented.model.persisted? and represented.model.allow_clearing_default_value) or true)))}
@@ -102,7 +101,7 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
 
     validation do
       params do
-        required(:rule).filled¬
+        required(:rule).filled
       end
     end
 
