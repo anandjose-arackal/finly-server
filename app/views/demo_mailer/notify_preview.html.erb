@@ -1,5 +1,5 @@
 <% content_for :body do %>
-    <h3><%= "#{@preview_registration.company}" %> has requested for a demo of our product. The details are as follows: </h3>
+    <h3><%= "#{@preview_registration.email}" %> has requested for a demo of our product. The details are as follows: </h3>
 
     <h4>Requester Name: <%= @preview_registration.name %></h4>
     <br/>
@@ -8,12 +8,6 @@
     <h4>Requester Mobile Number: <%= @preview_registration.phone_number %></h4>
     <br/>
     <h4>Company: <%= @preview_registration.company %></h4>
-    <br/>
-    <h4>Lead Source: <%= @preview_registration.source %></h4>
-    <h4>Lead Source Description: <%= @preview_registration.source_description %></h4>
-    <br/>
-    <h4>Referrer: <%= @preview_registration.referrer %></h4>
-    <br/>
     <br/>
     <% if @sales_person %>
     <h3>URL (page from which user sign up): <%= @preview_registration.url %></h3>
