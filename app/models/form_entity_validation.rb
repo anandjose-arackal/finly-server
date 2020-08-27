@@ -80,10 +80,16 @@ class FormEntityValidation < ApplicationRecord
   end
 
   def as_json(options = {})
+    case options[:json_format]
+    when 'form_builder'
+      rule = self.rule.as_store
+    else
+      rule = self.rule.as_json_logic
+    end
     form_entity.as_json(json_format: "form_reference").merge(
         {
             error_message: error_message,
-            rule: rule.as_json_logic,
+            rule: rule,
         }
     )
   end
