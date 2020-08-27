@@ -68,8 +68,12 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
     property :rule, deserializer: -> (input, represented, *args){ represented.rule = Rules::Adapters::Store.load(input[:rule]) } #todo - validate rule
     property :can_be_updated # goes for system field
 
-    validates :rule, presence: true
-    validates :error_message, presence: true
+    validation do
+      params do
+        required(:rule).filled
+        required(:error_message).filled
+      end
+    end
   end
 
   # Conditions
@@ -96,7 +100,11 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
       property :value#, validates: {presence: true, inclusion: {in: [true, false]}}
     end
 
-    validates :rule, presence: true
+    validation do
+      params do
+        required(:rule).filled¬
+      end
+    end
 
     def actions!(collection:, fragment:, index:, options:, **)
       action = actions.find {|action| actions.id.to_s == fragment["id"].to_s}
