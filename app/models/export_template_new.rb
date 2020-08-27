@@ -108,7 +108,7 @@ class ExportTemplateNew < ApplicationRecord
       "query": JSON.generate(
         {
           "qs": {
-            "invoice_status_id_eq_any": InwardInvoiceStatus.ids_for([:partially_paid, :paid])
+            "invoice_status_id_eq_any": InwardInvoiceStatus.ids_for(%i[partially_paid paid])
           }
         }
       ),
@@ -178,6 +178,55 @@ class ExportTemplateNew < ApplicationRecord
             { "label": 'Tax Amount', "value": '{{ record.tax_amount_value }}' },
             { "label": 'Tax Rate', "value": '{{ record.tax_rate.rate }}' },
             { "label": 'Tax Type', "value": '{{ record.tax_rate.name }}' }
+          ]
+        }
+      ),
+      "query": JSON.generate({}),
+      "personal": false
+    },
+    {
+      "name": 'Payment Ticket Export',
+      "description": '',
+      "export_format": 'csv',
+      "resource": 'payments',
+      "created_by_id": 1,
+      "company_id": 1,
+      "template": JSON.generate(
+        {
+          "columns": [
+            { "label": 'Payment Order ID', "value": '{{ record.payment_order.bank_payment_request.id }}' },
+            { "label": 'Payment Order Name', "value": '{{ record.payment_order.bank_payment_request.name }}' },
+            { "label": 'Payment ID', "value": '{{ record.id }}' },
+            { "label": 'Beneficiary Name', "value": '{{ record.receiving_account.account_owner.name }}' },
+            { "label": 'Beneficiary Code', "value": '{{ record.vendor.vendor_id }}' },
+            { "label": 'Beneficiary Account Name', "value": '{{ record.receiving_account.name }}' },
+            { "label": 'Beneficiary Account Number', "value": '{{ record.receiving_account.account_number }}' },
+            { "label": 'Beneficiary IFSC', "value": '{{ record.receiving_account.ifsc }}' },
+            { "label": 'Payment Mode', "value": '{{ record.payment_mode | upcase }}' },
+            { "label": 'Initiated By', "value": '{{ record.initiating_user.name }}' },
+            { "label": 'Initiator Email', "value": '{{ record.initiating_user.email }}' },
+            { "label": 'Payment Order Status', "value": '{{ record.payment_order.bank_payment_request.status.name }}' },
+            { "label": 'Payment Order Schedule Date', "value": "{{ record.payment_order.scheduled_at | date: '%d-%b-%Y' }}" },
+            { "label": 'Payment Order Submitted Date', "value": "{{ record.payment_order.bank_payment_request.submitted_at | date: '%d-%b-%Y' }}" },
+            { "label": 'Payment Order Processed Date', "value": "{{ record.payment_order.processed_at | date: '%d-%b-%Y' }}" },
+            { "label": 'Awaiting Action From', "value": '{{ record.payment_order.bank_payment_request.get_reviewers_names }}' },
+            { "label": 'Policy', "value": '{{ record.payment_order.bank_payment_request.policy.name }}' },
+            { "label": 'PO Number', "value": '{{ record.po_number }}' },
+            { "label": 'Invoice Number', "value": '{{ record.invoice.invoice_number }}' },
+            { "label": 'Invoice Due Date', "value": "{{ record.invoice.due_date | date: '%d-%b-%Y' }}" },
+            { "label": 'Invoice Date', "value": "{{ record.invoice.date | date: '%d-%b-%Y' }}" },
+            { "label": 'Invoice ID', "value": '{{ record.invoice.invoice_id }}' },
+            { "label": 'Original Amount', "value": '{{ record.gross_amount.value }}' },
+            { "label": 'Advance Amount', "value": '{{ record.advance_paid.value }}' },
+            { "label": 'Discount', "value": '{{ record.discount.value }}' },
+            { "label": 'CGST SGST Amount', "value": '{{ record.cgst_amount }}' },
+            { "label": 'IGST Amount', "value": '{{ record.igst_amount }}' },
+            { "label": 'TDS', "value": '{{ record.tds_amount.value }}' },
+            { "label": 'Net Payable Amount', "value": '{{ record.amount.value }}' },
+            { "label": 'Bank Reference Number', "value": '{{ record.utr }}' },
+            { "label": 'Note', "value": '{{ record.note }}' },
+            { "label": 'Payment Status', "value": '{{ record.status.name }}' },
+            { "label": 'Error Message', "value": '{{ record.error_message }}' }
           ]
         }
       ),

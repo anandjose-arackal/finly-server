@@ -28,6 +28,7 @@ class PaymentExposure < Exposures::API
   attribute :processed_at, record_attribute: true
   attribute :last_retried_at, record_attribute: true
   attribute :note, record_attribute: true
+  attribute :invoice, record_attribute: true, exposure: true
   attribute :initiating_account_number do
     account_name(record, :initiating_account)
   end
@@ -40,7 +41,7 @@ class PaymentExposure < Exposures::API
   attribute :receiving_account_code do
     account_code(record, :receiving_account)
   end
-  attribute :utr do
+  attribute :utr, includes: [:reference_resource] do
     case record.reference_resource_type
     when 'BbpsYesBankTransaction'
       record.reference_resource&.bbps_ref_id
@@ -70,13 +71,13 @@ class PaymentExposure < Exposures::API
     end
   end
 
-  attribute :vendor, exposure: true do
+  attribute :vendor, exposure: true, includes: [:receiving_user] do
     next unless record.receiving_user_type == 'YesBankVendor'
 
     record.receiving_user
   end
 
-  attribute :cost_center, exposure: true do
+  attribute :cost_center, exposure: true, includes: [:parent, :cost_center] do
     case record.parent_type
     when 'Invoice', 'PurchaseOrder'
       if record.parent.cost_allocation_items
@@ -91,7 +92,7 @@ class PaymentExposure < Exposures::API
     end
   end
 
-  attribute :department, exposure: true do
+  attribute :department, exposure: true, includes: [:parent, :department] do
     case record.parent_type
     when 'Invoice', 'PurchaseOrder'
       if record.parent.cost_allocation_items
@@ -106,11 +107,16 @@ class PaymentExposure < Exposures::API
     end
   end
 
-  attribute :billing_location, exposure: true do
+  attribute :billing_location, exposure: true, includes: [
+    parent: [:location]
+  ] do
     record.parent.location
   end
 
-  attribute :shipping_location, exposure: true do
+  attribute :shipping_location, exposure: true, includes: [
+    invoice_parent: [:delivery_location],
+    purchase_order_parent: [:delivery_location]
+  ] do
     case record.parent_type
     when 'Invoice'
       record.invoice_parent.delivery_location
@@ -123,7 +129,12 @@ class PaymentExposure < Exposures::API
     end
   end
 
-  attribute :vendor_location, exposure: true do
+  attribute :vendor_location, exposure: true, includes: [
+    invoice_parent: [:vendor_location],
+    beneficiary_payment_parent: [:vendor_location],
+    purchase_order_parent: [:vendor_location],
+    security_deposit_parent: [:vendor_location]
+  ] do
     case record.parent_type
     when 'Invoice'
       record.invoice_parent.vendor_location
@@ -140,12 +151,14 @@ class PaymentExposure < Exposures::API
     end
   end
 
-  attribute :category, exposure: true do
+  attribute :category, exposure: true, includes: [
+    beneficiary_payment_parent: [:category],
+  ] do
     record.beneficiary_payment_parent&.category
     # Todo bbps biller
   end
 
-  attribute :invoice_date do
+  attribute :invoice_date, includes: [:parent] do
     case record.parent_type
     when 'Invoice'
       record.parent.date
@@ -160,7 +173,7 @@ class PaymentExposure < Exposures::API
     end
   end
 
-  attribute :due_date do
+  attribute :due_date, includes: [:parent] do
     case record.parent_type
     when 'Invoice', 'BbpsBill'
       record.parent.due_date
@@ -187,15 +200,21 @@ class PaymentExposure < Exposures::API
     end
   end
 
-  attribute :transaction_period_from do
+  attribute :transaction_period_from, includes: [:invoice_parent] do
     record.invoice_parent&.transaction_service_period_from
   end
 
-  attribute :transaction_period_to do
+  attribute :transaction_period_to, includes: [:invoice_parent] do
     record.invoice_parent&.transaction_service_period_to
   end
 
-  attribute :gross_amount, exposure: true do
+  attribute :gross_amount, exposure: true, includes: [
+    invoice_parent: { gross_amount: :currency },
+    bbps_bill_parent: { amount: :currency },
+    beneficiary_payment_parent: { gross_amount: :currency },
+    purchase_order_parent: { requested_advance_amount: :currency },
+    security_deposit_parent: { original_amount: :currency }
+  ] do
     case record.parent_type
     when 'Invoice'
       record.invoice_parent&.gross_amount
@@ -212,7 +231,9 @@ class PaymentExposure < Exposures::API
     end
   end
 
-  attribute :discount, exposure: true do
+  attribute :discount, exposure: true, includes: [
+    invoice_parent: { discount_amount: :currency }
+  ] do
     case record.parent_type
     when 'Invoice'
       record.invoice_parent.discount_amount
@@ -223,7 +244,10 @@ class PaymentExposure < Exposures::API
     end
   end
 
-  attribute :cgst_amount do
+  attribute :cgst_amount, includes: [
+    invoice_parent: [:tax_amount],
+    beneficiary_payment_parent: [:tax_amount]
+  ] do
     case record.parent_type
     when 'Invoice'
       record.invoice_parent.to_exposure.cgst_amount
@@ -240,11 +264,17 @@ class PaymentExposure < Exposures::API
     end
   end
 
-  attribute :sgst_amount do
+  attribute :sgst_amount, includes: [
+    invoice_parent: [:tax_amount],
+    beneficiary_payment_parent: [:tax_amount]
+  ] do
     cgst_amount
   end
 
-  attribute :igst_amount do
+  attribute :igst_amount, includes: [
+    invoice_parent: [:tax_amount],
+    beneficiary_payment_parent: [:tax_amount]
+  ] do
     case record.parent_type
     when 'Invoice'
       record.invoice_parent.to_exposure.igst_amount
@@ -261,7 +291,11 @@ class PaymentExposure < Exposures::API
     end
   end
 
-  attribute :tds_slab, exposure: true do
+  attribute :tds_slab, exposure: true, includes: [
+    invoice_parent: [:tds_slab],
+    beneficiary_payment_parent: [:tds_slab],
+    purchase_order_parent: [:advance_tds_slab]
+  ] do
     case record.parent_type
     when 'Invoice'
       record.invoice_parent.tds_slab
@@ -278,7 +312,11 @@ class PaymentExposure < Exposures::API
     end
   end
 
-  attribute :tds_amount, exposure: true do
+  attribute :tds_amount, exposure: true, includes: [
+    invoice_parent: [:tds_amount],
+    beneficiary_payment_parent: [:tds_amount],
+    purchase_order_parent: [:advance_tds_amount]
+  ] do
     case record.parent_type
     when 'Invoice'
       record.invoice_parent&.tds_amount
@@ -296,7 +334,9 @@ class PaymentExposure < Exposures::API
   end
 
 
-  attribute :freight, exposure: true do
+  attribute :freight, exposure: true, includes: [
+    invoice_parent: [:freight_amount]
+  ] do
     case record.parent_type
     when 'Invoice'
       record.invoice_parent.freight_amount
@@ -325,7 +365,13 @@ class PaymentExposure < Exposures::API
     end
   end
 
-  attribute :net_amount, exposure: true do
+  attribute :net_amount, exposure: true, includes: [
+    invoice_parent: [:net_amount],
+    bbps_bill_parent: [:total_amount],
+    beneficiary_payment_parent: [:net_amount],
+    purchase_order_parent: [:advance_amount],
+    security_deposit_parent: [:original_amount]
+  ] do
     case record.parent_type
     when 'Invoice'
       record.invoice_parent.net_amount
@@ -342,7 +388,10 @@ class PaymentExposure < Exposures::API
     end
   end
 
-  attribute :advance_paid, exposure: true do
+  attribute :advance_paid, exposure: true, includes: [
+    invoice_parent: [:advance_amount],
+    beneficiary_payment_parent: [:advance_amount],
+  ] do
     case record.parent_type
     when 'Invoice'
       record.invoice_parent.advance_amount
@@ -359,7 +408,13 @@ class PaymentExposure < Exposures::API
     end
   end
 
-  attribute :balance_payable, exposure: true do
+  attribute :balance_payable, exposure: true, includes: [
+    invoice_parent: [:balance_due],
+    bbps_bill_parent: [:total_amount],
+    beneficiary_payment_parent: [:payable_amount],
+    purchase_order_parent: [:advance_amount],
+    security_deposit_parent: [:payable_amount]
+  ] do
     case record.parent_type
     when 'Invoice'
       record.invoice_parent.balance_due
@@ -374,6 +429,15 @@ class PaymentExposure < Exposures::API
     else
       nil
     end
+  end
+
+  attribute :po_number, includes: [:parent] do
+    purchase_order = (record&.parent_type == 'PurchaseOrder' ? record.parent : nil)
+    purchase_order.present? ? purchase_order&.po_number : ''
+  end
+
+  attribute :error_message, includes: [:system_messages] do
+    record.system_messages.pluck(:content)&.to_sentence
   end
 
 
