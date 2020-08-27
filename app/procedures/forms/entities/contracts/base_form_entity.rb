@@ -59,6 +59,8 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
     property :id
     # property :company_id, deserializer: -> (input, represented, *args) {represented.company_id = represented.contract_root.current_user.company_id}
     # property :form_id, deserializer: -> (input, represented, *args) {represented.form_id = represented.contract_root.form_id}
+    property :company_id, deserializer: -> (input, represented, *args) {represented.company_id = represented.contract_root.current_user.company_id}
+    property :form_id, deserializer: -> (input, represented, *args) {represented.form_id = represented.contract_root.form_id}
     property :error_message
     property :updated_by_id, deserializer: -> (input, represented, *args) {represented.updated_by_id = represented.contract_root.current_user.id}
     # property :validation_id  # ignored in case of custom fields
