@@ -50,16 +50,19 @@ class Exposures::IncludesCalculator
       merge_includes all_includes[index], attribute.includes
 
       next unless attribute.exposure
+      next unless attribute.record_attribute
 
-      name = attribute.record_attribute == true ? attribute.name.to_sym : attribute.record_attribute.to_sym
+      name = attribute.record_attribute.is_a?(Symbol) ? attribute.record_attribute : attribute.name.to_sym
 
       unless all_includes[index].include?(name)
         all_includes[index][name] = {}
       end
 
       association = model_klass.reflect_on_association(name)
+      next unless association.present?
+
       class_names = if association.polymorphic?
-                      model_klass.distinct.pluck("#{name}_type")
+                      model_klass.distinct.unscope(:order).pluck("#{name}_type")
                     else
                       [association.class_name]
                     end
