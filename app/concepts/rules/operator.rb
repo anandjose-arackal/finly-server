@@ -14,7 +14,6 @@ class Rules::Operator
             }
         ]
       else
-        # debugger
         values = values.map {|val| val.slice(:value, :entity, :formula)}
       end
       Rules::Rule.new(

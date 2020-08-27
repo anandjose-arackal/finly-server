@@ -77,7 +77,7 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
     property :form_id, deserializer: -> (input, represented, *args) {represented.form_id = represented.contract_root.form_id}
     property :created_by_id, deserializer: -> (input, represented, *args) {represented.created_by_id = represented.contract_root.current_user.id}
     property :updated_by_id, deserializer: -> (input, represented, *args) {represented.updated_by_id = represented.contract_root.current_user.id}
-    property :condition_id
+    # property :condition_id
     property :custom
     property :internal
     property :is_updated
@@ -93,6 +93,17 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
       property :form_id, deserializer: -> (input, represented, *args) {represented.form_id = represented.contract_root.form_id}
       property :property#, validates: {presence: true}
       property :value#, validates: {presence: true, inclusion: {in: [true, false]}}
+    end
+
+    def actions!(collection:, fragment:, index:, options:, **)
+      action = actions.find {|action| actions.id.to_s == fragment["id"].to_s}
+
+      if fragment["_destroy"]
+        actions.destroy(action)
+        return skip!
+      end
+
+      action || actions.append(FormConditionAction.new)
     end
   end
 
@@ -116,7 +127,7 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
       return skip!
     end
 
-    condition || conditions.append(FormEntityValidation.new)
+    condition || conditions.append(FormCondition.new)
   end
 
 end
