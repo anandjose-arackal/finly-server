@@ -8,7 +8,8 @@ class ExportManager::Template::Processors::CSVProcessor < ExportManager::Templat
 
       index = 1
       data.find_each do |record|
-        update record: record
+        self.current_record = record
+
         exposure = record.to_exposure
         csv << template['columns'].map do |column|
           exposure.template(column['value'])

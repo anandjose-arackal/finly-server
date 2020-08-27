@@ -10,7 +10,7 @@ class ExportManager::Template::Processors::XlsProcessor < ExportManager::Templat
     worksheet = workbook.add_worksheet('Sheet 1')
     index = 1
     data.find_each do |record|
-      update record: record
+      self.current_record = record
       row = ExportManager::Builders::Spreadsheet::Row.new(record: record, header: header)
       exposure = record.to_exposure
       template['columns'].each do |column|

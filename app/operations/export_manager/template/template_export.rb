@@ -1,5 +1,5 @@
 class ExportManager::Template::TemplateExport < ExportManager::API
-  attr_accessor :export_template
+  attr_accessor :export_template, :processor
 
   def initialize(user, params)
     super(user, params)
@@ -71,14 +71,18 @@ class ExportManager::Template::TemplateExport < ExportManager::API
   end
 
   def generate
-    processor = processor_class.new export_job
-    file = processor.generate template, data, file_name
+    self.processor = processor_class.new export_job
+    file = self.processor.generate template, data, file_name
     if file
       save_attachment file
       success!
     else
       failure!
     end
+  end
+
+  def update_current_record
+    self.processor.update_current_record
   end
 
   def file_name
