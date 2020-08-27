@@ -22,9 +22,12 @@ class ExportManager::Template::Processors::XlsProcessor < ExportManager::Templat
         worksheet.write(index, column, item)
       end
 
-      progress_update(index)
+      progress_update(index, force_update: false)
       index += 1
     end
+    # Force update the final count
+    progress_update(index - 1, force_update: true)
+
     header.list.each_with_index do |item, header_index|
       worksheet.write(0, header_index, item)
     end

@@ -13,10 +13,13 @@ class ExportManager::Template::Processors::CSVProcessor < ExportManager::Templat
         csv << template['columns'].map do |column|
           exposure.template(column['value'])
         end
+        progress_update(index, force_update: false)
 
-        progress_update(index)
         index += 1
       end
+
+      # Force update the final count
+      progress_update(index - 1, force_update: true)
     end
 
     file.rewind

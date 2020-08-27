@@ -3,7 +3,7 @@ class ExportManager::Template::Processors::TextProcessor < ExportManager::Templa
     file_data = Liquid::Template.parse(template).render('records' => data.to_exposures)
     file = Paperclip::Tempfile.new(file_name)
     open(file.path, 'wb') { |f| f.write file_data }
-    progress_update(data.count)
+    progress_update(data.count, force_update: true)
 
     file.rewind
     file
