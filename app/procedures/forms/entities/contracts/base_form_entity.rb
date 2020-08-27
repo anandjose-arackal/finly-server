@@ -65,8 +65,7 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
     # property :custom # doubt # todo - replace with system validation
     property :system_validation, deserializer: -> (input, represented, *args) {represented.updated_by_id = represented.system_validation ? represented.system_validation : false} # todo - migration to remove
     property :is_updated
-    property :rule_text, virtual: true
-    property :rule, deserializer: -> (input, represented, *args){ represented.rule = Rules::Adapters::Store.load(represented.rule_text) } #todo - validate rule
+    property :rule, deserializer: -> (input, represented, *args){ represented.rule = Rules::Adapters::Store.load(input[:rule]) } #todo - validate rule
     property :can_be_updated # goes for system field
   end
 
@@ -83,7 +82,7 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
     property :is_updated
     property :can_be_updated
     property :rule_text, virtual: true
-    property :rule, deserializer: -> (input, represented, *args){ represented.rule = Rules::Adapters::Store.load(represented.rule_text) }
+    property :rule, deserializer: -> (input, represented, *args){ represented.rule = Rules::Adapters::Store.load(input[:rule]) }
     property :referencable_id
     property :referencable_type
 
