@@ -82,9 +82,9 @@ class FormEntityValidation < ApplicationRecord
   def as_json(options = {})
     case options[:json_format]
     when 'form_builder'
-      rule = self.rule.as_store
+      rule = self.rule.as_ransack
     else
-      rule = self.rule.as_json_logic
+      rule = self.rule.as_ransack
     end
     form_entity.as_json(json_format: "form_reference").merge(
         {

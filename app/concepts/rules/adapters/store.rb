@@ -5,8 +5,6 @@ class Rules::Adapters::Store
 
     data = JSON.load(data) if data.is_a?(String)
     data = data.with_indifferent_access unless data.is_a?(ActiveSupport::HashWithIndifferentAccess)
-    # data = data[:g] if data[:g].present?
-
 
     if Rules::Constants::LOGICAL_OPERATORS.include?(data[:m].to_s)
       rule = nil
@@ -19,12 +17,13 @@ class Rules::Adapters::Store
       end
       rule
     else
-      attribute = data&.dig('a')
-      attribute = attribute.first if attribute.is_a?(Array)
+      attribute = data&.dig('a', '0', 'name')
       predicate = data&.dig('p')
-      values = data&.dig('v')
-      meta = data&.dig('m')
-      Rules::Operator.new(attribute[:name]).send(predicate, *values).with_meta(meta)
+      type = data&.dig('t')&.to_sym || :value
+      values = data&.dig('v').map do |pos, val|
+        {type => val[:value]}
+      end
+      Rules::Operator.new(attribute).send(predicate, *values)
     end
   end
 
@@ -33,18 +32,38 @@ class Rules::Adapters::Store
   end
 
   def self.as_json(rule)
-    json = {}
-    if Rules::Constants::LOGICAL_OPERATORS.include?(rule.operator.to_s)
-      json = {m: rule.operator, c: []}
-      json[:c] << rule.attribute.as_json(mode: 'store') if rule.attribute.present?
-      json[:c] += rule.values.map {|val| val.as_json(mode: 'store')}
+    operator = Rules::Constants::MATH_PREDICATE_MAP[rule.operator.to_s] || rule.operator.to_s
+    if Rules::Constants::PREDICATES.include?(operator)
+      values_hash = {}
+      type = :value
+      rule.values.each_with_index { |val, index|
+        value = 1
+        if val.has_key?(:value)
+          type = :value
+          value = val[:value]
+        elsif val.has_key?(:formula)
+          type = :formula
+          value = val[:formula]
+        elsif val.has_key?(:entity)
+          type = :entity
+          value = val[:entity]
+        end
+        # value = val[:value] || val[:formula] || val[:entity] || 1
+        values_hash[index.to_s] = {value: value}
+      }
+      json = {logic_type: 'condition', a: {'0': {name: rule.attribute[:name], ransacker_args: {filter_id: rule.attribute[:name]}}}, p: operator, v: values_hash, t: type.to_s}
+
+      json
     else
-      json[:p] = rule.operator
-      json[:a] = [rule.attribute.as_json(mode: 'store')]
-      json[:v] = rule.values.map {|val| val.as_json(mode: 'store')}
-      json[:m] = rule.meta
+      json = {logic_type: 'group', m: operator, c: []}
+      if rule.attribute.present?
+        json[:c] << rule.attribute.as_json(mode: 'store')
+      end
+      rule.values.each_with_index do |value, index|
+        json[:c] << value.as_json(mode: 'store')
+      end
+      json
     end
-    json
   end
 
 end
