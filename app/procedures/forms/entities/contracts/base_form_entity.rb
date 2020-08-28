@@ -30,6 +30,8 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
   property :hint, deserializer: -> (input, represented, *args){ represented.hint = "Enter Value" if input[:hint].blank? }
   property :position
 
+  property :behavior, virtual: true
+
   property :editable, deserializer: -> (input, represented, *args) {represented.editable = input.dig(:behavior, :editable) if (represented.model.persisted? and represented.model.can_editable_be_changed) or true}
   property :required, deserializer: -> (input, represented, *args) {represented.required = input.dig(:behavior, :required) if (represented.model.persisted? and represented.model.can_required_be_changed) or true}
   property :active, deserializer: -> (input, represented, *args) {represented.active = input.dig(:behavior, :active) if (represented.model.persisted? and represented.model.can_be_disabled) or true}
