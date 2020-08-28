@@ -91,6 +91,8 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
         entity_value = Forms::RequestParser.new(form: form_data, row: row_data).fetch(entity.entity_path)
         next if entity_value.blank?
 
+        # debugger if entity.entity_key == 'vendor_location'
+
         if entity.filters.blank? and entity.choice_dependencies.size == 0
           contract_root.bulk_validate_choice entity, entity_value
         else

@@ -181,6 +181,12 @@ class FormEntity < ApplicationRecord
 
   def form_builder_json(opts = {})
     params = opts[:params] || {}
+    if choices_scope.present?
+      choices_data = choices_scope.build(params: params, user: opts[:current_user])
+    else
+      choices_data = {choices: choices.as_json}
+    end
+
     data = {
         id: id,
         uuid: uuid,
@@ -231,7 +237,8 @@ class FormEntity < ApplicationRecord
         config_path: config_path,
         validations: validations.as_json(options),
         conditions: conditions.as_json(options),
-        choices: choices.as_json
+        # choices: choices_scope(params: options[:params], user: options[:current_user]),
+        choices: choices_data
     }
   end
 

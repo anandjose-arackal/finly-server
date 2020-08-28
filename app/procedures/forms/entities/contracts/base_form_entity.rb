@@ -8,6 +8,8 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
   validation do
     params do
       optional(:placeholder)
+      required(:form_id).filled
+      required(:form_section_id).filled
       required(:entity_key).filled
       required(:label).filled
       optional(:placeholder)
@@ -22,13 +24,24 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
         end
       end
     end
+
+    rule(:entity_key, :form_id, :id) do
+      # Checks uniqueness of entity_key within a form
+      entity = Form.find_by(uuid: values[:form_id])&.entities.find_by(entity_key: values[:entity_key])
+      if entity.present?
+        if entity.uuid != values[:id]
+          key.failure('must be unique within a form')
+        end
+      end
+    end
   end
 
-  property :entity_key # Cannot be changed for system fields
+  property :entity_key, deserializer: -> (input, represented, *args) {represented.entity_key = input[:entity_key] if represented.entity_key.blank?}
   property :label
   property :placeholder
   property :hint, deserializer: -> (input, represented, *args){ represented.hint = "Enter Value" if input[:hint].blank? }
   property :position
+  property :behavior, virtual: true
 
   property :editable, deserializer: -> (input, represented, *args) {represented.editable = input.dig(:behavior, :editable) if (represented.model.persisted? and represented.model.can_editable_be_changed) or true}
   property :required, deserializer: -> (input, represented, *args) {represented.required = input.dig(:behavior, :required) if (represented.model.persisted? and represented.model.can_required_be_changed) or true}
@@ -40,9 +53,7 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
 
   # property :system_field
   # property :company_id, deserializer: -> (input, represented, *args) {represented.company_id = represented.current_user.company_id}
-  # property :entity_path #todo populate it - model level
   # property :parent_id # Handled in sub classes
-  # property :config_path #todo
 
   property :current_user, virtual: true
   property :options
@@ -87,7 +98,8 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
     property :internal
     property :is_updated
     property :can_be_updated
-    property :rule, deserializer: -> (input, represented, *args){ represented.rule = Rules::Adapters::Store.load(input[:rule]) }
+    property :rule_text, virtual: true
+    property :rule, deserializer: -> (input, represented, *args) {represented.rule = Rules::Adapters::Store.load(input[:rule_text])}
     property :referencable_id
     property :referencable_type
 
@@ -99,9 +111,9 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
       property :value#, validates: {presence: true, inclusion: {in: [true, false]}}
     end
 
-    validation do
+    validation :conditions do
       params do
-        required(:rule).filled
+        required(:rule_text).filled
       end
     end
 

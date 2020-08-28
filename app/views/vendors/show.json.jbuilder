@@ -144,7 +144,7 @@ json.edit_config do
     end
   end
 
-  json.custom_fields_config @result.edit_config.field_configurations
+  # json.custom_fields_config @result.edit_config.field_configurations
 
   json.policies do
     json.array! @result.edit_config.policies do |policy|

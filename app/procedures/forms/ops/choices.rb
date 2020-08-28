@@ -66,15 +66,17 @@ class Forms::Ops::Choices < Transactions::API
     query = ''
     controlling_choices.each do |controlling_entity_path, value|
       query += " AND " unless query.blank?
-      query += "(`form_entities`.`entity_path` = '#{controlling_entity_path}' AND controlling_choice_id = #{value})"
+      query += "(`form_entities`.`entity_path` = '#{controlling_entity_path}' AND controlling_choice_id = '#{value}')"
     end
-    context[:dependency_mapping] = FormChoiceDependencyMapping
-                                       .joins(dependency: :controlling_entity)
-                                       .where("form_choice_dependencies.dependent_entity_id = '#{entity.id}'")
-                                       .where(query)
+
+    context[:dependency_mapping] = FormChoiceDependencyMapping.
+        joins(dependency: :controlling_entity).
+        where("form_choice_dependencies.dependent_entity_id = '#{entity.id}'").
+        where(query)
+    true
   end
 
-  def scope_choices(context, dependency_mapping: nil, params:, **)
+  def scope_choices(context, entity:, dependency_mapping: nil, params:, **)
     return unless dependency_mapping.present?
 
     choices = {}
@@ -83,14 +85,21 @@ class Forms::Ops::Choices < Transactions::API
       choices[mapping.controlling_choice_id] << mapping.dependent_choice_id
     end
 
-    intersecting_choices = choices.values.first
+    # debugger
+
+    intersecting_choices = [Forms::RequestParser.new(form: params[:form_data], row: params[:row_data]).fetch(entity.entity_path)].compact
     return if intersecting_choices.blank?
+
+    # intersecting_choices = choices.values.first
+    # return if intersecting_choices.blank?
 
     choices.values.each do |arr|
       intersecting_choices = intersecting_choices & arr
     end
+
     context[:intersecting_choices] = intersecting_choices
     context[:filter_query] = {id_in: intersecting_choices}
+    true
   end
 
   # Pick the document owner. If the document is not created, pick the current_user
