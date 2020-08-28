@@ -3,7 +3,7 @@
 # Table name: form_choice_dependency_mappings
 #
 #  id                    :bigint           not null, primary key
-#  dependency_id         :string(36)       not null
+#  dependency_id         :string(36)
 #  dependent_choice_id   :string(36)       not null
 #  deleted_at            :datetime
 #  created_at            :datetime         not null

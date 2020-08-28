@@ -15,12 +15,15 @@
 #  vendor_payments            :boolean
 #  outward_invoices           :boolean
 #  inward_invoice_line_items  :boolean
-#  ancestry                   :string(255)
+#  parent_id                  :string(255)
 #  outward_invoice_line_items :boolean
 #  category_code              :string(255)
 #  gst_applicable             :boolean          default(FALSE)
 #  tds_applicable             :boolean
 #  deleted_at                 :datetime
+#  created_by_id              :integer
+#  start_date                 :date
+#  end_date                   :date
 #
 
 class Category < ApplicationRecord

@@ -13,6 +13,8 @@
 #  cost_center_code :string(255)
 #  ancestry         :string(255)
 #  gl_code          :string(255)
+#  start_date       :date
+#  end_date         :date
 #
 
 class CostCenter < ApplicationRecord
