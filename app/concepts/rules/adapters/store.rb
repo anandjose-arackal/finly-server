@@ -35,6 +35,7 @@ class Rules::Adapters::Store
     operator = Rules::Constants::MATH_PREDICATE_MAP[rule.operator.to_s] || rule.operator.to_s
     if Rules::Constants::PREDICATES.include?(operator)
       values_hash = {}
+      raw_value = []
       type = :value
       rule.values.each_with_index { |val, index|
         value = 1
@@ -50,8 +51,14 @@ class Rules::Adapters::Store
         end
         # value = val[:value] || val[:formula] || val[:entity] || 1
         values_hash[index.to_s] = {value: value}
+        raw_value << value
       }
-      json = {logic_type: 'condition', a: {'0': {name: rule.attribute[:name], ransacker_args: {filter_id: rule.attribute[:name]}}}, p: operator, v: values_hash, t: type.to_s}
+      json = {logic_type: 'condition', a: {'0': {name: rule.attribute[:name], ransacker_args: {filter_id: rule.attribute[:name]}}}, p: operator, v: values_hash, t: type.to_s, raw_value: raw_value}
+
+      # Fixme: FE is currently build to parse auto_complete keyword, hence maintaining it here
+      if rule.meta.present?
+        json[:auto_complete] = rule.meta
+      end
 
       json
     else
