@@ -107,6 +107,10 @@ Resolver::Router.draw do
     route 'advances', Docs::P2P::PurchaseOrders::Advances::Resolver
   end
 
+  scope :purchase_order_items do
+    route 'default', Docs::P2P::PurchaseOrders::PurchaseOrderItems::Resolver
+  end
+
   scope :inward_documents do
     route 'pending', Docs::P2P::Inwards::Pending::Resolver
     route 'received', Docs::P2P::Inwards::Received::Resolver
