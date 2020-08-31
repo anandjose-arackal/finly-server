@@ -23,4 +23,8 @@ class YesBankVendorExposure < Exposures::API
   end
   attribute :payment_term, record_attribute: true, exposure: true
   attribute :display_name, record_attribute: true
+  attribute :mobile_number, record_attribute: true
+  attribute :state_code, record_attribute: true, exposure: true
+  attribute :description, record_attribute: true
+  attribute :address, record_attribute: true
 end

@@ -111,7 +111,7 @@ class InvoiceExposure < Exposures::API
   end
 
   # Fixme: Performance incase the number of line items it high
-  attribute :line_items, record_attribute: :invoice_items, exposure: true, includes: [:line_items]
+  attribute :line_items, record_attribute: :invoice_items, exposure: true, includes: [:invoice_items]
 
   attribute :po_number, includes: [{procurement: :purchase_order}] do
     record&.procurement&.purchase_order&.po_number
@@ -190,6 +190,7 @@ class InvoiceExposure < Exposures::API
 
   attribute :custom_fields, record_attribute: true, includes: [{ custom_fields: [:field_configuration, :value] }]
 
+  attribute :item_amounts_total, record_attribute: true, includes: [{invoice_items: [:inventory_line_item, :amount, :billable_amount]}]
 
   # def vendor_ref_num(invoice_line_item)
   #   invoice_line_item.parent&.vendor_id
