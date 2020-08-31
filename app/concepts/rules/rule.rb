@@ -30,7 +30,11 @@ class Rules::Rule
   end
 
   def as_store(options = {})
-    as_json(mode: 'store')
+    json = as_json(mode: 'store')
+    unless json[:m].present?
+      json ={logic_type: "group", m: 'and', c: [json]}
+    end
+    json
   end
 
   def as_json_logic(options = {})
@@ -42,7 +46,7 @@ class Rules::Rule
     if json[:m].present?
       json = {g: {'0': json}}
     else
-      json = {g: {'0': {logic_type: "group", m: 'and', c: {'0' => json}}}}
+      json = {g: {'0': {logic_type: "group", m: 'and', c: [json]}}}
     end
     return json unless options.has_key?(:data)
 
