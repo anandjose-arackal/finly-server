@@ -73,7 +73,7 @@ class ExportTemplateNew < ApplicationRecord
           ]
         }
       ),
-      "query": JSON.generate({}),
+      "query": {},
       "personal": false
     },
     {
@@ -107,13 +107,11 @@ class ExportTemplateNew < ApplicationRecord
           ]
         }
       ),
-      "query": JSON.generate(
-        {
-          "qs": {
-            "invoice_status_id_eq_any": InwardInvoiceStatus.ids_for(%i[partially_paid paid])
-          }
+      "query": {
+        "qs": {
+          "invoice_status_id_eq_any": InwardInvoiceStatus.ids_for(%i[partially_paid paid])
         }
-      ),
+      },
       "personal": false
     },
     {
@@ -182,7 +180,7 @@ class ExportTemplateNew < ApplicationRecord
           ]
         }
       ),
-      "query": JSON.generate({}),
+      "query": {},
       "personal": false
     },
     {
@@ -230,7 +228,7 @@ class ExportTemplateNew < ApplicationRecord
           ]
         }
       ),
-      "query": JSON.generate({}),
+      "query": {},
       "personal": false
     },
     {
@@ -274,7 +272,7 @@ class ExportTemplateNew < ApplicationRecord
           ]
         }
       ),
-      "query": JSON.generate({}),
+      "query": {},
       "personal": false
     },
     {
@@ -298,7 +296,7 @@ class ExportTemplateNew < ApplicationRecord
           ]
         }
       ),
-      "query": JSON.generate({}),
+      "query": {},
       "personal": false
     },
     {
@@ -385,7 +383,7 @@ class ExportTemplateNew < ApplicationRecord
           ]
         }
       ),
-      "query": JSON.generate({}),
+      "query": {},
       "personal": false
     },
     {
@@ -447,7 +445,7 @@ class ExportTemplateNew < ApplicationRecord
           ]
         }
       ),
-      "query": JSON.generate({}),
+      "query": {},
       "personal": false
     },
     {
@@ -467,7 +465,7 @@ class ExportTemplateNew < ApplicationRecord
           ]
         }
       ),
-      "query": JSON.generate({}),
+      "query": {},
       "personal": false
     },
     {
@@ -498,7 +496,7 @@ class ExportTemplateNew < ApplicationRecord
           ]
         }
       ),
-      "query": JSON.generate({}),
+      "query": {},
       "personal": false
     },
     {
@@ -545,7 +543,7 @@ class ExportTemplateNew < ApplicationRecord
           ]
         }
       ),
-      "query": JSON.generate({}),
+      "query": {},
       "personal": false
     },
     {
@@ -614,7 +612,7 @@ class ExportTemplateNew < ApplicationRecord
           ]
         }
       ),
-      "query": JSON.generate({}),
+      "query": {},
       "personal": false
     },
     {
@@ -623,7 +621,7 @@ class ExportTemplateNew < ApplicationRecord
       "export_format": 'xml',
       "resource": 'invoices',
       "template": File.open("/Users/avinashwork/finly/src/finly-server/app/operations/export_manager/master/invoices/tally_exposure.xml").read,
-      "query": JSON.generate({}),
+      "query": {},
       "personal": false
     }
   ].freeze
