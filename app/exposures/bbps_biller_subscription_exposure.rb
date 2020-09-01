@@ -30,5 +30,11 @@ class BbpsBillerSubscriptionExposure < Exposures::API
   attribute :updated_at, record_attribute: true
   attribute :submitted_at, record_attribute: true
   attribute :approved_at, record_attribute: true
-
+  attribute :pocs, record_attribute: true, exposure: true
+  attribute :mobile_number, record_attribute: true
+  attribute :support_bill_validation, record_attribute: true
+  attribute :customer_name, record_attribute: true
+  attribute :customer_email, record_attribute: true
+  attribute :customer_aadhar_number, record_attribute: true
+  attribute :customer_pan, record_attribute: true
 end

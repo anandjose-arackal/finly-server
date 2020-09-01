@@ -5,5 +5,6 @@ class BankAccountExposure < Exposures::API
   attribute :ifsc, record_attribute: true
   attribute :name, record_attribute: true
   attribute :verified, record_attribute: :yes_bank_verified
+  attribute :default_account, record_attribute: true
 
 end
