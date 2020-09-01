@@ -192,6 +192,11 @@ class InvoiceExposure < Exposures::API
 
   attribute :item_amounts_total, record_attribute: true, includes: [{invoice_items: [:inventory_line_item, :amount, :billable_amount]}]
 
+  attribute :voucher_data do
+    ExportManager::Master::Invoices::TallyExportBase.(record)
+  end
+  
+
   # def vendor_ref_num(invoice_line_item)
   #   invoice_line_item.parent&.vendor_id
   # end

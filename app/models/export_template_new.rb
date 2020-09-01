@@ -602,6 +602,15 @@ class ExportTemplateNew < ApplicationRecord
       ),
       "query": JSON.generate({}),
       "personal": false
+    },
+    {
+      "name": 'Tally Export',
+      "description": '',
+      "export_format": 'xml',
+      "resource": 'invoices',
+      "template": File.open("/Users/avinashwork/finly/src/finly-server/app/operations/export_manager/master/invoices/tally_exposure.xml").read,
+      "query": JSON.generate({}),
+      "personal": false
     }
   ].freeze
 
