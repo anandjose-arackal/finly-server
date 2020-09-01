@@ -1,4 +1,4 @@
-class Docs::P2P::Vendors::Create < Transactions::API
+class Docs::P2P::Vendors::Ops::Create < Transactions::API
 
   step Form(route: 'vendors')
   step Model(YesBankVendor, :new)

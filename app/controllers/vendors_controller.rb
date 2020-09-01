@@ -15,9 +15,10 @@ class VendorsController < BaseControllers::WebBase
   end
 
   def show
-    params[:non_deleted] = true
-    @result = Vendors::Show.(current_user, params)
-    respond
+    # params[:non_deleted] = true
+    # @result = Vendors::Show.(current_user, params)
+    # respond
+    endpoint Docs::P2P::Vendors::Ops::Show
   end
 
   def procurements
@@ -39,7 +40,7 @@ class VendorsController < BaseControllers::WebBase
     # @result = Vendors::Create.(current_user, params)
     # respond
 
-    endpoint Docs::P2P::Vendors::Create
+    endpoint Docs::P2P::Vendors::Ops::Create
   end
 
   def create_and_submit
@@ -50,7 +51,7 @@ class VendorsController < BaseControllers::WebBase
   def update
     # @result = Vendors::Update.(current_user, params)
     # respond
-    endpoint Docs::P2P::Vendors::Update
+    endpoint Docs::P2P::Vendors::Ops::Update
   end
 
   def submit

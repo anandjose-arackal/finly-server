@@ -1,4 +1,4 @@
-class Docs::P2P::Vendors::Update < Transactions::API
+class Docs::P2P::Vendors::Ops::Update < Transactions::API
 
   step Form(route: 'vendors')
   step Model(YesBankVendor, :find_by)
