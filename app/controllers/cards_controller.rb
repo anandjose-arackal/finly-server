@@ -67,6 +67,14 @@ class CardsController < BaseControllers::WebBase
     respond
   end
 
+  def reassigned
+    @result = Card::Unassigned.(current_user, params)
+    respond
+  end
 
+  def new_card_activate
+    @result = Card::Activate.(current_user, params)
+    respond
+  end
 
 end
