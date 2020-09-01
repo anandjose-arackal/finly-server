@@ -81,6 +81,19 @@ class FormEntity::LargeText < FormEntity
             end
           end
         end
+        rule(:options) do
+          max = value[:maximum]
+          min = value[:minimum]
+
+          key.failure("> minimum can't be less than 0") if min.to_i < 0
+          key.failure("> maximum can't be greater than 65535") if max.to_i > 65535
+
+          if min.present? && max.present?
+            if min > max
+              key.failure('> maximum cannot be less than minimum')
+            end
+          end
+        end
       end
     end
   end

@@ -95,6 +95,18 @@ class FormEntity::Text < FormEntity
             end
           end
         end
+        rule(:options) do
+          min = value[:minimum]
+          max = value[:maximum]
+          key.failure("> minimum can't be less than 0") if min.to_i < 0
+          key.failure("> maximum can't be greater than 255") if max.to_i > 255
+
+          if min.present? && max.present?
+            if min > max
+              key.failure('> maximum cannot be less than minimum')
+            end
+          end
+        end
       end
     end
   end

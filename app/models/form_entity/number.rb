@@ -86,6 +86,25 @@ class FormEntity::Number < FormEntity
             end
           end
         end
+        rule(:options) do
+          max = value[:min_value]
+          min = value[:max_value]
+          format = value[:format]
+
+          if format.present?
+            if format.is_a?(Array)
+              key.failure("> formats must be one of #{FormEntity::Number::FORMAT.join(", ")}") if (format - FormEntity::Number::FORMAT).present?
+            else
+              key.failure('> formats must be sent as an array')
+            end
+          end
+
+          if min.present? && max.present?
+            if min.to_f > max.to_f
+              key.failure('> max value cannot be less than min value')
+            end
+          end
+        end
       end
     end
   end

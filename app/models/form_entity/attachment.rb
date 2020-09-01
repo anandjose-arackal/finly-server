@@ -97,9 +97,32 @@ class FormEntity::Attachment < FormEntity
         params do
           required(:options) do
             hash do
-              required(:maximum).value(:int?, lteq?: 255)
-              required(:minimum).value(:int?, gteq?: 0)
-              # optional(:format).each(included_in?: FORMAT)
+              optional(:maximum)
+              optional(:minimum)
+              optional(:format)
+            end
+          end
+        end
+
+        rule(:options) do
+          max = value[:maximum]
+          min = value[:minimum]
+          format = value[:format]
+
+          if format.present?
+            if format.is_a?(Array)
+              key.failure("> formats must be one of #{FormEntity::Attachment::FORMAT.join(", ")}") if (format - FormEntity::Attachment::FORMAT).present?
+            else
+              key.failure('> formats must be sent as an array')
+            end
+          end
+
+          key.failure("> minimum can't be less than 0") if min.to_i < 0
+          key.failure("> maximum can't be less than 10") if max.to_i > 10
+
+          if min.present? && max.present?
+            if min > max
+              key.failure('> maximum cannot be less than minimum')
             end
           end
         end

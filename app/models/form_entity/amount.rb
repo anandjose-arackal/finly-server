@@ -74,8 +74,22 @@ class FormEntity::Amount < FormEntity
         params do
           required(:options) do
             hash do
-              optional(:min_value).value(:int?)
-              optional(:max_value).value(:int?)
+              optional(:min_value)
+              optional(:max_value)
+            end
+          end
+        end
+
+        rule(:options) do
+          max = value[:min_value]
+          min = value[:max_value]
+
+          key.failure("> min value can't be less than 0") if min.to_i < 0
+          key.failure("> max value can't be less than 10") if min.to_i > 10
+
+          if min.present? && max.present?
+            if min > max
+              key.failure('> max value cannot be less than minimum')
             end
           end
         end

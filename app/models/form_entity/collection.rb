@@ -71,9 +71,14 @@ class FormEntity::Collection < FormEntity
         params do
           required(:options) do
             hash do
-              optional(:min_items).value(:int?)
+              optional(:min_items)
             end
           end
+        end
+
+        rule(:options) do
+          max = value[:min_items]
+          key.failure("> min items can't be less than 0") if min.to_i < 0
         end
       end
     end

@@ -83,14 +83,20 @@ class FormEntity::Currency < FormEntity
             hash do
               required(:currencies).array do
                 hash do
-                  required(:currency).filled(included_in?: CURRENCIES.map {|item| item[:currency]})
-                  required(:currency_code).filled(included_in?: CURRENCIES.map {|item| item[:currency_code]})
-                  optional(:symbol).value(included_in?: CURRENCIES.map {|item| item[:symbol]})
+                  required(:currency)
+                  # required(:currency_code).filled(included_in?: CURRENCIES.map {|item| item[:currency_code]})
+                  # optional(:symbol).value(included_in?: CURRENCIES.map {|item| item[:symbol]})
                 end
               end
             end
           end
         end
+
+          # rule(:options) do
+          #   if FormEntity::Currency::CURRENCIES.map {|item| item[:currency_code]}.exclude?(value[:currency])
+          #     key.failure('invalid currency provided')
+          #   end
+          # end
       end
     end
   end

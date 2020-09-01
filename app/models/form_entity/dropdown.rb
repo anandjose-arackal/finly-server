@@ -64,6 +64,17 @@ class FormEntity::DropDown < FormEntity
             end
           end
         end
+        rule(:options) do
+          min = value[:min_items]
+          max = value[:max_items]
+          key.failure("> min items can't be less than 0") if min.to_i < 0
+
+          if min.present? && max.present?
+            if min > max
+              key.failure('> max items cannot be less than min items')
+            end
+          end
+        end
       end
     end
   end

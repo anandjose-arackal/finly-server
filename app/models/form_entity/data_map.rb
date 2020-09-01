@@ -76,6 +76,10 @@ class FormEntity::DataMap < FormEntity
             end
           end
         end
+        rule(:options) do
+          max = value[:min_items]
+          key.failure("> min items can't be less than 0") if min.to_i < 0
+        end
       end
     end
   end

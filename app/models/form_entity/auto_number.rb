@@ -87,6 +87,13 @@ class FormEntity::AutoNumber < FormEntity
             end
           end
         end
+        rule(:config) do
+          sequence = value[:sequence]
+          prefix = sequence&.dig(:prefix)
+          start_at = sequence&.dig(:start_at)
+          key.failure("prefix must be present") if prefix.blank?
+          key.failure("start_at must be present") if start_at.blank?
+        end
       end
     end
   end
