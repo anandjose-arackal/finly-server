@@ -17,12 +17,12 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     id = params[:id] || params[:procurement_id]
     self.procurement = user.company.procurements.find_by(id: id)
     self.purchase_order = self.procurement.purchase_order
-    if self.procurement.po_revisions.present?
-      self.po_revision = self.procurement.po_revisions.last
-      if po_revision.present?
-        self.purchase_order = self.po_revision
-      end
-    end
+    # if self.procurement.po_revisions.present?
+    #   self.po_revision = self.procurement.po_revisions.last
+    #   if po_revision.present?
+    #     self.purchase_order = self.po_revision
+    #   end
+    # end
 
     self.previous_invoices = (self.procurement.invoices.scope_all_except_voided.present?) ? self.procurement.invoices.scope_all_except_voided.includes(:invoice_items) : nil
 
