@@ -26,6 +26,10 @@ class ExportTemplateNew < ApplicationRecord
   has_many :user_roles, through: :role_mappings, dependent: :destroy
 
   serialize :query, JSON
+
+  scope :filter_resource, -> (resource) { where resource: resource }
+  scope :filter_default, -> { where default: true }
+
   # TODO: update seeding to add roles
   DEFAULT_TEMPLATES = [
     {
@@ -77,6 +81,7 @@ class ExportTemplateNew < ApplicationRecord
       "description": '',
       "export_format": 'csv',
       "resource": 'invoices',
+      "default": true,
       "template": JSON.generate(
         {
           "columns": [
@@ -116,6 +121,7 @@ class ExportTemplateNew < ApplicationRecord
       "description": '',
       "export_format": 'csv',
       "resource": 'invoice_line_items',
+      "default": true,
       "template": JSON.generate(
         {
           "columns": [
@@ -184,6 +190,7 @@ class ExportTemplateNew < ApplicationRecord
       "description": '',
       "export_format": 'csv',
       "resource": 'payments',
+      "default": true,
       "template": JSON.generate(
         {
           "columns": [
@@ -275,6 +282,7 @@ class ExportTemplateNew < ApplicationRecord
       "description": 'Purchase Requests Export',
       "export_format": 'csv',
       "resource": 'purchase_requests',
+      "default": true,
       "template": JSON.generate(
         {
           "columns": [
@@ -298,6 +306,7 @@ class ExportTemplateNew < ApplicationRecord
       "description": 'Purchase Requests Export',
       "export_format": 'csv',
       "resource": 'purchase_orders',
+      "default": true,
       "template": JSON.generate(
         {
           "columns": [
@@ -384,6 +393,7 @@ class ExportTemplateNew < ApplicationRecord
       "description": 'Purchase Orders Export (Line Items)',
       "export_format": 'csv',
       "resource": 'purchase_order_items',
+      "default": true,
       "template": JSON.generate(
         {
           "columns": [
@@ -445,6 +455,7 @@ class ExportTemplateNew < ApplicationRecord
       "description": '',
       "export_format": 'csv',
       "resource": 'users',
+      "default": true,
       "template": JSON.generate(
         {
           "columns": [
@@ -464,6 +475,7 @@ class ExportTemplateNew < ApplicationRecord
       "description": '',
       "export_format": 'csv',
       "resource": 'items',
+      "default": true,
       "template": JSON.generate(
         {
           "columns": [
@@ -494,6 +506,7 @@ class ExportTemplateNew < ApplicationRecord
       "description": '',
       "export_format": 'csv',
       "resource": 'vendors',
+      "default": true,
       "template": JSON.generate(
         {
           "columns": [
@@ -540,6 +553,7 @@ class ExportTemplateNew < ApplicationRecord
       "description": 'Utility Bills',
       "export_format": 'csv',
       "resource": 'utility_bills',
+      "default": true,
       "template": JSON.generate(
         {
           "columns": [

@@ -140,7 +140,7 @@ Resolver::Router.draw do
     route 'default', Docs::ExpenseManagement::Reports::Resolver
   end
 
-  scope :export_template_news do
+  scope :export_templates do
     route 'default', Masters::ExportTemplates::Resolver
   end
 
