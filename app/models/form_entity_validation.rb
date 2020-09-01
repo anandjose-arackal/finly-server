@@ -84,7 +84,7 @@ class FormEntityValidation < ApplicationRecord
     when 'form_builder'
       rule = self.rule.as_store
     else
-      rule = self.rule.as_json_logic
+      rule = self.rule.as_store
     end
     form_entity.as_json(json_format: "form_reference").merge(
         {

@@ -8,12 +8,14 @@
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
 #  is_deleted      :boolean          default(FALSE), not null
-#  ancestry        :string(255)
+#  parent_id       :string(255)
 #  cost_center_id  :integer
 #  deleted_at      :datetime
 #  department_code :string(255)
 #  code            :string(255)
 #  gl_code         :string(255)
+#  start_date      :date
+#  end_date        :date
 #
 
 class Department < ApplicationRecord

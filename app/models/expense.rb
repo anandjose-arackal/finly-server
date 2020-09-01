@@ -2,49 +2,55 @@
 #
 # Table name: expenses
 #
-#  id                     :integer          not null, primary key
-#  amount_id              :integer
-#  expense_status_id      :integer
-#  note                   :text(65535)
-#  date                   :date
-#  user_id                :integer
-#  expense_type_id        :integer
-#  created_at             :datetime         not null
-#  updated_at             :datetime         not null
-#  manager_memo           :text(65535)
-#  rejecting_manager_id   :integer
-#  report_id              :integer
-#  category_id            :integer
-#  is_deleted             :boolean          default(FALSE), not null
-#  transcribed            :boolean          default(FALSE)
-#  personal               :boolean          default(FALSE)
-#  reimbursable           :boolean
-#  synced_with_quickbooks :boolean          default(FALSE)
-#  split_link             :string(255)
-#  deleted_to_split       :boolean          default(FALSE)
-#  from_cash_on_hand      :boolean          default(FALSE)
-#  cash_on_hand_blocked   :boolean
-#  expense_tax_type_id    :integer
-#  gst_percentage         :decimal(10, 5)
-#  tds_percentage         :decimal(10, 5)
-#  tds_amount_id          :integer
-#  gst_type_id            :integer
-#  tds_slab_id            :integer
-#  gst_amount_id          :integer
-#  usage_date_start       :datetime
-#  usage_date_end         :datetime
-#  usage_date_type        :string(255)
-#  spent_from_id          :integer
-#  custom_conversion_rate :boolean          default(FALSE)
-#  cost_center_id         :integer
-#  created_by_id          :integer
-#  modified_by_id         :integer
-#  deleted_at             :datetime
-#  gstin_location_id      :integer
-#  state_of_expense_id    :integer
-#  hsn_sac                :string(255)
-#  merchant_bill_no       :string(255)
-#  tax_rate_id            :integer
+#  id                      :integer          not null, primary key
+#  amount_id               :integer
+#  expense_status_id       :integer
+#  note                    :text(65535)
+#  date                    :date
+#  user_id                 :integer
+#  expense_type_id         :integer
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
+#  manager_memo            :text(65535)
+#  rejecting_manager_id    :integer
+#  report_id               :integer
+#  category_id             :integer
+#  is_deleted              :boolean          default(FALSE), not null
+#  transcribed             :boolean          default(FALSE)
+#  personal                :boolean          default(FALSE)
+#  reimbursable            :boolean
+#  synced_with_quickbooks  :boolean          default(FALSE)
+#  split_link              :string(255)
+#  deleted_to_split        :boolean          default(FALSE)
+#  from_cash_on_hand       :boolean          default(FALSE)
+#  cash_on_hand_blocked    :boolean
+#  expense_tax_type_id     :integer
+#  gst_percentage          :decimal(10, 5)
+#  tds_percentage          :decimal(10, 5)
+#  tds_amount_id           :integer
+#  gst_type_id             :integer
+#  tds_slab_id             :integer
+#  gst_amount_id           :integer
+#  usage_date_start        :datetime
+#  usage_date_end          :datetime
+#  usage_date_type         :string(255)
+#  spent_from_id           :integer
+#  custom_conversion_rate  :boolean          default(FALSE)
+#  cost_center_id          :integer
+#  created_by_id           :integer
+#  modified_by_id          :integer
+#  deleted_at              :datetime
+#  company_id              :integer
+#  gstin_location_id       :integer
+#  state_of_expense_id     :integer
+#  hsn_sac                 :string(255)
+#  merchant_bill_no        :string(255)
+#  tax_rate_id             :integer
+#  erp_sync_status_id      :integer
+#  erp_sync_message        :string(255)
+#  erp_sync_reference_id   :string(255)
+#  erp_sync_attempts_count :integer          default(0)
+#  erp_sync_attempted_at   :datetime
 #
 
 class Expense < ApplicationRecord
