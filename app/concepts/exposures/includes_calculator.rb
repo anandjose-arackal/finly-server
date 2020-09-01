@@ -190,9 +190,9 @@ class Exposures::IncludesCalculator
 
     merge_lookups all_lookups, handle_variable(node.from)
 
-    node.nodelist.each do |block_node|
-      merge_lookups all_lookups, handle_document(block_node)
-    end
+    # node.nodelist.each do |block_node|
+    #   merge_lookups all_lookups, handle_document(block_node)
+    # end
 
     all_lookups
   end
