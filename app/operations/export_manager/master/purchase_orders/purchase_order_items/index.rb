@@ -101,7 +101,7 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
   end
 
   def category(item)
-    inventory_line_item(item)&.category&.name
+    item&.category&.name
   end
 
   def gl_code(item)
