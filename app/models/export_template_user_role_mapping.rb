@@ -11,6 +11,6 @@
 #
 
 class ExportTemplateUserRoleMapping < ApplicationRecord
-  belongs_to :template, class_name: 'ExportTemplateNew'
+  belongs_to :template, class_name: 'ExportTemplateNew', optional: true
   belongs_to :user_role
 end
