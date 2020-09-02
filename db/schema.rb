@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_01_091949) do
+ActiveRecord::Schema.define(version: 2020_09_01_181822) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -181,6 +181,8 @@ ActiveRecord::Schema.define(version: 2020_08_01_091949) do
     t.string "authorized_ip"
     t.datetime "deleted_at"
     t.datetime "last_activity_at"
+    t.boolean "admin_panel_access", default: true
+    t.boolean "active", default: true
     t.index ["email"], name: "index_admin_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
   end
@@ -916,7 +918,7 @@ ActiveRecord::Schema.define(version: 2020_08_01_091949) do
     t.string "bill_month"
     t.string "pc"
     t.date "early_payment_date"
-    t.text "api_response"
+    t.text "api_response", limit: 16777215
     t.datetime "generated_at"
     t.text "biller_response"
     t.index ["amount_id"], name: "index_bbps_bills_on_amount_id"
@@ -3350,17 +3352,6 @@ ActiveRecord::Schema.define(version: 2020_08_01_091949) do
     t.index ["record_type"], name: "index_erp_sync_attempts_on_record_type"
     t.index ["status_id"], name: "index_erp_sync_attempts_on_status_id"
     t.index ["updated_at"], name: "index_erp_sync_attempts_on_updated_at"
-  end
-
-  create_table "erp_sync_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.string "name", null: false
-    t.datetime "deleted_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["created_at"], name: "index_erp_sync_statuses_on_created_at"
-    t.index ["deleted_at"], name: "index_erp_sync_statuses_on_deleted_at"
-    t.index ["name"], name: "index_erp_sync_statuses_on_name"
-    t.index ["updated_at"], name: "index_erp_sync_statuses_on_updated_at"
   end
 
   create_table "expense_data_extract_sources", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -6265,6 +6256,7 @@ ActiveRecord::Schema.define(version: 2020_08_01_091949) do
     t.text "source_description"
     t.string "referrer"
     t.datetime "deleted_at"
+    t.text "url"
   end
 
   create_table "procurement_attachments", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
