@@ -5,28 +5,29 @@
 #   user_id: id of the user for which the card is being assigned
 # }
 
-class Admin::Cards::Activate < Card::Base
+class Admin::Cards::Activate < Admin::Cards::Base
 
   attr_accessor :old_card,:new_card
-
-  def authorized_user_types
-    [:admin_user ]
-  end
 
   def pre_validate
     super()
     if user.blank? || params.blank?
       add_message :error, "Invalid parameters"
+      return
+    end
+    
+    if params.dig(:card, :old_card_id).blank? || params.dig(:card, :new_card_id).blank?
+      add_message :error, "Invalid parameters"
     end
   end
 
   def init
-    self.old_card = user.cards.unscoped.find_by(id: params[:old_card_id])
-    self.new_card = user.cards.unscoped.find_by(id: params[:new_card_id])
+    card_user = User.find_by(id: params[:id])
+    self.old_card = card_user.cards.unscoped.find_by(id: active_params[:old_card_id])
+    self.new_card = card_user.cards.unscoped.find_by(id: active_params[:new_card_id])
   end
 
-  def validate
-
+  def validate 
   end
 
   def process
@@ -43,5 +44,10 @@ class Admin::Cards::Activate < Card::Base
 
   def success
     Admin::Cards::Base::CardsPresenter.new(user, {card: self.new_card}, messages)
+  end
+
+private
+  def active_params
+    params.require(:card).permit( :old_card_id, :new_card_id )
   end
 end
