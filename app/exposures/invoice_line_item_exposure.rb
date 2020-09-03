@@ -31,7 +31,7 @@ class InvoiceLineItemExposure < Exposures::API
   end
 
   attribute :net_amount, includes: [:net_amount] do
-    record.net_amount.value
+    record.net_amount&.value || 0
   end
 
   attribute :cgst?, includes: [:parent] do

@@ -615,15 +615,15 @@ class ExportTemplateNew < ApplicationRecord
       "query": {},
       "personal": false
     },
-    {
-      "name": 'Tally Export',
-      "description": '',
-      "export_format": 'xml',
-      "resource": 'invoices',
-      "template": File.open("/Users/avinashwork/finly/src/finly-server/app/operations/export_manager/master/invoices/tally_exposure.xml").read,
-      "query": {},
-      "personal": false
-    }
+    # {
+    #   "name": 'Tally Export',
+    #   "description": '',
+    #   "export_format": 'xml',
+    #   "resource": 'invoices',
+    #   "template": File.open("tally_export_template.xml").read,
+    #   "query": {},
+    #   "personal": false
+    # }
   ].freeze
 
   def self.seed_data
