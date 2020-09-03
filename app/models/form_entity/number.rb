@@ -92,11 +92,7 @@ class FormEntity::Number < FormEntity
           format = value[:format]
 
           if format.present?
-            if format.is_a?(Array)
-              key.failure("> formats must be one of #{FormEntity::Number::FORMAT.join(", ")}") if (format - FormEntity::Number::FORMAT).present?
-            else
-              key.failure('> formats must be sent as an array')
-            end
+            key.failure("> formats must be one of #{FormEntity::Number::FORMAT.join(", ")}") if FormEntity::Number::FORMAT.exclude?(format)
           end
 
           if min.present? && max.present?

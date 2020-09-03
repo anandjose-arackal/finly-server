@@ -85,7 +85,6 @@ class FormEntity::Amount < FormEntity
           min = value[:max_value]
 
           key.failure("> min value can't be less than 0") if min.to_i < 0
-          key.failure("> max value can't be less than 10") if min.to_i > 10
 
           if min.present? && max.present?
             if min > max

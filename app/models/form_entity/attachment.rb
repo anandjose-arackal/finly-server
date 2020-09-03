@@ -118,7 +118,7 @@ class FormEntity::Attachment < FormEntity
           end
 
           key.failure("> minimum can't be less than 0") if min.to_i < 0
-          key.failure("> maximum can't be less than 10") if max.to_i > 10
+          key.failure("> maximum can't be greater than 10") if max.to_i > 10
 
           if min.present? && max.present?
             if min > max

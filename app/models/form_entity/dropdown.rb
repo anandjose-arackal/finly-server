@@ -34,7 +34,7 @@ class FormEntity::DropDown < FormEntity
         property :form_section_id, deserializer: -> (input, represented, *args) {represented.form_section_id = represented.contract_root.form_section_id}
         # property :form_entity_id
         property :created_by_user_id, deserializer: -> (input, represented, *args) {represented.created_by_user_id = represented.contract_root.current_user.id}
-        property :position
+        property :position, deserializer: -> (input, represented, *args) {represented.position = 1}
         property :active, deserializer: -> (input, represented, *args) {represented.active = true}
       end
 
