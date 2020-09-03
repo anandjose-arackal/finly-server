@@ -55,6 +55,7 @@ class Masters::Schema::Ops::MigrationRunner < Transactions::API
     attr_to_remove = existing_attributes - required_attributes.keys - system_attributes - DEFAULT_COLUMNS
 
     attr_to_add.each do |attr|
+      # Todo - move this logic to MasterEntity so it can be overridden if required
       ActiveRecord::Migration.add_column record_model_class.table_name, attr, required_attributes[attr], COLUMN_ARGS
     end
 

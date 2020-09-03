@@ -5,6 +5,9 @@ module Masters::Entity::Record
     @record_model_class = nil
   end
 
+  # Responsible for generating anonymous model using the metadata provided in MasterSchema and MasterEntity
+  #
+  # @return [Class]
   def record_model_class
     return @record_model_class if @record_model_class.present?
 
