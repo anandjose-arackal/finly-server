@@ -25,8 +25,6 @@ class ExportTemplateNew < ApplicationRecord
   has_many :role_mappings, class_name: 'ExportTemplateUserRoleMapping', foreign_key: 'template_id', dependent: :destroy
   has_many :user_roles, through: :role_mappings, dependent: :destroy
 
-  serialize :query, JSON
-
   scope :filter_resource, -> (resource) { where resource: resource }
   scope :filter_default, -> { where default: true }
 
@@ -73,7 +71,7 @@ class ExportTemplateNew < ApplicationRecord
           ]
         }
       ),
-      "query": {},
+      "query": JSON.generate({}),
       "personal": false
     },
     {
@@ -107,11 +105,11 @@ class ExportTemplateNew < ApplicationRecord
           ]
         }
       ),
-      "query": {
+      "query": JSON.generate({
         "qs": {
           "invoice_status_id_eq_any": InwardInvoiceStatus.ids_for(%i[partially_paid paid])
         }
-      },
+      }),
       "personal": false
     },
     {
@@ -180,7 +178,7 @@ class ExportTemplateNew < ApplicationRecord
           ]
         }
       ),
-      "query": {},
+      "query": JSON.generate({}),
       "personal": false
     },
     {
@@ -228,7 +226,7 @@ class ExportTemplateNew < ApplicationRecord
           ]
         }
       ),
-      "query": {},
+      "query": JSON.generate({}),
       "personal": false
     },
     {
@@ -272,7 +270,7 @@ class ExportTemplateNew < ApplicationRecord
           ]
         }
       ),
-      "query": {},
+      "query": JSON.generate({}),
       "personal": false
     },
     {
@@ -296,7 +294,7 @@ class ExportTemplateNew < ApplicationRecord
           ]
         }
       ),
-      "query": {},
+      "query": JSON.generate({}),
       "personal": false
     },
     {
@@ -383,7 +381,7 @@ class ExportTemplateNew < ApplicationRecord
           ]
         }
       ),
-      "query": {},
+      "query": JSON.generate({}),
       "personal": false
     },
     {
@@ -445,7 +443,7 @@ class ExportTemplateNew < ApplicationRecord
           ]
         }
       ),
-      "query": {},
+      "query": JSON.generate({}),
       "personal": false
     },
     {
@@ -465,7 +463,7 @@ class ExportTemplateNew < ApplicationRecord
           ]
         }
       ),
-      "query": {},
+      "query": JSON.generate({}),
       "personal": false
     },
     {
@@ -496,7 +494,7 @@ class ExportTemplateNew < ApplicationRecord
           ]
         }
       ),
-      "query": {},
+      "query": JSON.generate({}),
       "personal": false
     },
     {
@@ -543,7 +541,7 @@ class ExportTemplateNew < ApplicationRecord
           ]
         }
       ),
-      "query": {},
+      "query": JSON.generate({}),
       "personal": false
     },
     {
@@ -612,7 +610,7 @@ class ExportTemplateNew < ApplicationRecord
           ]
         }
       ),
-      "query": {},
+      "query": JSON.generate({}),
       "personal": false
     },
     # {
@@ -621,7 +619,7 @@ class ExportTemplateNew < ApplicationRecord
     #   "export_format": 'xml',
     #   "resource": 'invoices',
     #   "template": File.open("tally_export_template.xml").read,
-    #   "query": {},
+    #   "query": JSON.generate({}),
     #   "personal": false
     # }
   ].freeze

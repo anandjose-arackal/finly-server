@@ -13,7 +13,7 @@ class ExportManager::Template::TemplateExport < ExportManager::API
 
   def input
     unless self.export_template.query.nil?
-      params[:additional_filters] = [self.export_template.query]
+      params[:additional_filters] = [JSON.parse(self.export_template.query)]
     end
     results = Resolver::Router.dispatch("#{resource_type}.default", { current_user: user, params: params })
 
