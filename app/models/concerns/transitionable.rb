@@ -165,7 +165,7 @@ module Transitionable
         data[:awaiting_action] = (self.controlling_level_id == dlrm.level_id)
         data[:action_taken] = data[:action_taken] || (dlrm.action_taken_by_id.present?)
         if data[:action_taken]
-          data[:action_taken_at] = (dlrm.action_taken_at.present? ? dlrm.action_taken_at.strftime("%I:%M %p, %d %b %Y") : dlrm.updated_at.strftime("%I:%M %p, %d %b %Y"))
+          data[:action_taken_at] =  data[:action_taken_at] || (dlrm.action_taken_at.present? ? dlrm.action_taken_at.strftime("%I:%M %p, %d %b %Y") : dlrm.updated_at.strftime("%I:%M %p, %d %b %Y"))
         end
         data[:reviewers] = data[:reviewers] || []
         reviewer = {

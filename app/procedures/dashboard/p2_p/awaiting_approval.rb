@@ -189,7 +189,7 @@ class Dashboard::P2P::AwaitingApproval < Dashboard::IndexCard
 
   def build_path(rule, label, path, status_id)
     params = {
-        filter_status: {_id: status_id&.to_s, identifier: label},
+        filter_status: {_id: status_id&.to_s, identifier: 'with_status_id'},
         id: self.class.path
     }
     if rule.present?
