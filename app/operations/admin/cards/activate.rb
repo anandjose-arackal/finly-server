@@ -5,7 +5,7 @@
 #   user_id: id of the user for which the card is being assigned
 # }
 
-class Card::Activate < Card::Base
+class Admin::Cards::Activate < Card::Base
 
   attr_accessor :old_card,:new_card
 
@@ -14,8 +14,9 @@ class Card::Activate < Card::Base
   end
 
   def pre_validate
+    super()
     if user.blank? || params.blank?
-      add_message :error, "Invalid parameters, try again"
+      add_message :error, "Invalid parameters"
     end
   end
 
@@ -37,11 +38,10 @@ class Card::Activate < Card::Base
   end
 
   def post_process
-
+    add_message :success, "Card successfully activated"
   end
 
   def success
-    params[:card] = self.new_card
-    Card::Show::SuccessPresenter.new(user, params, messages)
+    Admin::Cards::Base::CardsPresenter.new(user, {card: self.new_card}, messages)
   end
 end

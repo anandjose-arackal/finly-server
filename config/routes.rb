@@ -2928,6 +2928,8 @@ Rails.application.routes.draw do
     resources :expenses
     resources :cards do
       patch 'block', to: 'cards#block', as: :block
+      post 'cards/new_card_activate', to: 'cards#new_card_activate', as: :new_card_activate
+      post '', to: 'cards#acti'
     end
     post 'import_cards', to: 'cards#import', as: :import_cards
     namespace :kyc do
@@ -3123,7 +3125,6 @@ Rails.application.routes.draw do
   post 'cards/details' => 'cards#details', as: :card_details
   post 'cards/update_balance' => 'cards#update_balance', as: :update_balance
   post 'cards/update_status' => 'cards#update_status', as: :update_card_status
-  post 'cards/new_card_activate', to: 'cards#new_card_activate', as: :new_card_activate
   patch 'cards/assign', to: 'cards#assign', as: :assign_card
   patch 'cards/assign/:id/cancel', to: 'cards#cancel_assign', as: :cancel_assign_request
   get 'cards/unassigned', to: 'cards#unassigned', as: :unassigned_cards

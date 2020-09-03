@@ -93,4 +93,9 @@ class AdminUsers::CardsController < BaseControllers::AdminBase
     end
   end
 
+
+  def new_card_activate
+    @result = Admin::Cards::Activate.(current_user, params)
+    respond
+  end
 end
