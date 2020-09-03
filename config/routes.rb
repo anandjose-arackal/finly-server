@@ -2928,8 +2928,7 @@ Rails.application.routes.draw do
     resources :expenses
     resources :cards do
       patch 'block', to: 'cards#block', as: :block
-      post 'cards/new_card_activate', to: 'cards#new_card_activate', as: :new_card_activate
-      post '', to: 'cards#acti'
+			post 'cards/new_card_activate', to: 'cards#new_card_activate', as: :new_card_activate
     end
     post 'import_cards', to: 'cards#import', as: :import_cards
     namespace :kyc do
