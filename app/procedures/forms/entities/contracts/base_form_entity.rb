@@ -4,9 +4,14 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
 
   property :form_id, deserializer: -> (input, represented, *args) {} # Cannot be changed
   property :form_section_id, deserializer: -> (input, represented, *args) {} # Cannot be changed
+  property :id
+  property :uuid
+
 
   validation do
     params do
+      optional(:id)
+      optional(:uuid)
       optional(:placeholder)
       required(:form_id).filled
       required(:form_section_id).filled
@@ -25,11 +30,12 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
       end
     end
 
-    rule(:entity_key, :form_id, :id) do
+    rule(:entity_key, :form_id, :uuid, :id) do
       # Checks uniqueness of entity_key within a form
       entity = Form.find_by(uuid: values[:form_id])&.entities.find_by(entity_key: values[:entity_key])
       if entity.present?
-        if entity.uuid != values[:id]
+        uuid = values[:uuid] || values[:id]
+        if entity.uuid != uuid
           key.failure('must be unique within a form')
         end
       end

@@ -81,8 +81,8 @@ class FormEntity::Amount < FormEntity
         end
 
         rule(:options) do
-          max = value[:min_value]
-          min = value[:max_value]
+          max = value[:max_value]
+          min = value[:min_value]
 
           key.failure("> min value can't be less than 0") if min.to_i < 0
 

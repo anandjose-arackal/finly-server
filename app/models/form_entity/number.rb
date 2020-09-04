@@ -87,8 +87,8 @@ class FormEntity::Number < FormEntity
           end
         end
         rule(:options) do
-          max = value[:min_value]
-          min = value[:max_value]
+          max = value[:max_value]
+          min = value[:min_value]
           format = value[:format]
 
           if format.present?

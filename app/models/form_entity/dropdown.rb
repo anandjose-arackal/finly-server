@@ -64,6 +64,9 @@ class FormEntity::DropDown < FormEntity
             end
           end
         end
+        # rule(:choices) do
+        #   key.failure("must be an array") unless value.is_a?(Array)
+        # end
         rule(:options) do
           min = value[:min_items]
           max = value[:max_items]
