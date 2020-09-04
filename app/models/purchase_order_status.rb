@@ -101,7 +101,7 @@ class PurchaseOrderStatus < ApplicationRecord
   # this will encapsulate all IDs of an invoice that come under the pending bucket of a budget
   def self.status_ids_for_pending_bucket
     [
-        PurchaseOrderStatus.id_for(:open),
+        # PurchaseOrderStatus.id_for(:open),
         PurchaseOrderStatus.id_for(:retracted),
         PurchaseOrderStatus.id_for(:processing)
     ]
