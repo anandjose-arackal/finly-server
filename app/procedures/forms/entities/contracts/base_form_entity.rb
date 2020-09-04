@@ -127,7 +127,7 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
     end
 
     def actions!(collection:, fragment:, index:, options:, **)
-      action = actions.find {|action| actions.id.to_s == fragment["id"].to_s}
+      action = actions.find {|action| action.id.to_s == fragment["id"].to_s}
 
       if fragment["_destroy"]
         actions.destroy(action)
