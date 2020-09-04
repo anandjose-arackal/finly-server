@@ -2,8 +2,7 @@
 #
 # Table name: master_schemas
 #
-#  id                         :bigint           not null
-#  uuid                       :string(36)       not null, primary key
+#  id                         :bigint           not null, primary key
 #  company_id                 :integer
 #  name                       :string(255)      not null
 #  master_key                 :string(255)      not null
@@ -24,7 +23,7 @@
 #
 
 class MasterSchema < ApplicationRecord
-  include UUIDHelper, SoftDeletable, TemplateClonable
+  include SoftDeletable, TemplateClonable
   include Masters::Entity::Registry
   include Masters::Entity::Record # Define the generation of anonymous record models
   include Masters::Entity::Exposure # Define the generation of anonymous exposures

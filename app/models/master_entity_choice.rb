@@ -3,7 +3,6 @@
 # Table name: master_entity_choices
 #
 #  id               :bigint           not null, primary key
-#  uuid             :string(36)       not null
 #  company_id       :integer          not null
 #  name             :string(255)      not null
 #  position         :integer

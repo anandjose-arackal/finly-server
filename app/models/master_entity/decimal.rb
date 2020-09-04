@@ -2,8 +2,7 @@
 #
 # Table name: master_entities
 #
-#  id                        :bigint           not null
-#  uuid                      :string(36)       not null, primary key
+#  id                        :bigint           not null, primary key
 #  master_schema_id          :string(255)      not null
 #  company_id                :integer
 #  type                      :string(255)      not null
