@@ -1,3 +1,4 @@
 app/concepts/masters/**/*.rb
+app/concepts/masters.rb
 
 --output guides

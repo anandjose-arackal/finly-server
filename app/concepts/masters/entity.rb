@@ -1,0 +1,2 @@
+module Masters::Entity
+end

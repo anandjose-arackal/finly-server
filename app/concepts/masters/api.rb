@@ -17,35 +17,41 @@
 #
 #   end
 #
-module Masters
-  class API
-    include DynamicAttributes
+class Masters::API
+  include DynamicAttributes
 
-    # @!attribute [rw]
-    #   @return ApplicationRecord
-    class_attr :model
+  # @!attribute [rw]
+  #   @return ApplicationRecord
+  class_attr :model
 
-    # Used for defining the name of the master. This defaults to the model name unless its defined
-    def self.name(name = NoObject)
-      @name = name unless name == NoObject
-      @name ||= model&.name
-    end
+  # Used for defining the name of the master. This defaults to the model name unless its defined
+  #
+  # @param [String] name
+  #   Used for assigning the name of the master.
+  #
+  # @return [String, nil]
+  #     Returns the name of the master. If the name is not explicitly assigned,
+  #     it returns the name of the model
+  def self.name(name = NoObject)
+    @name = name unless name == NoObject
+    @name ||= model&.name
+  end
 
-    def self.schema(args = {}, &block)
-      raise "Model not defined" if model.blank?
 
-      args[:name] = name
-      args[:master_key] = model.table_name
-      args[:model] = model
-      args[:klass_name] = self
-      args[:system_master] = true
-      @schema ||= MasterSchema.new(args)
-      @schema.instance_eval &block if block_given?
-      contract = Masters::Schema::Contract.new(@schema)
-      raise "Invalid Master Schema: #{contract.errors}" unless contract.validate({})
-      contract.sync
+  def self.schema(args = {}, &block)
+    raise "Model not defined" if model.blank?
 
-      @schema
-    end
+    args[:name] = name
+    args[:master_key] = model.table_name
+    args[:model] = model
+    args[:klass_name] = self
+    args[:system_master] = true
+    @schema ||= MasterSchema.new(args)
+    @schema.instance_eval &block if block_given?
+    contract = Masters::Schema::Contract.new(@schema)
+    raise "Invalid Master Schema: #{contract.errors}" unless contract.validate({})
+    contract.sync
+
+    @schema
   end
 end
