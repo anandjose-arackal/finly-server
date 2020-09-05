@@ -74,10 +74,8 @@ class Masters::Schema::Ops::MigrationRunner < Transactions::API
       required_attributes[entity.entity_key] = entity.database_type
     end
 
-    attr_to_add = required_attributes.keys - existing_attributes - INTERNAL_COLUMNS
+    attr_to_add = required_attributes.keys + INTERNAL_COLUMNS - existing_attributes
     attr_to_remove = existing_attributes - required_attributes.keys - system_attributes - INTERNAL_COLUMNS
-
-    # Todo create INTERNAL_COLUMNS unless present
 
     attr_to_add.each do |attr|
       # Todo - move this logic to MasterEntity so it can be overridden if required
