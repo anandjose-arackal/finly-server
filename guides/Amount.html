@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Amount
+  
+    &mdash; Documentation by YARD 0.9.25
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "Amount";
+  relpath = '';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="_index.html">Index (A)</a> &raquo;
+    
+    
+    <span class="title">Amount</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Amount
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName"><span class='object_link'><a href="ApplicationRecord.html" title="ApplicationRecord (class)">ApplicationRecord</a></span></span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">ActiveRecord::Base</li>
+          
+            <li class="next"><span class='object_link'><a href="ApplicationRecord.html" title="ApplicationRecord (class)">ApplicationRecord</a></span></li>
+          
+            <li class="next">Amount</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd>MathUtil, <span class='object_link'><a href="SoftDeletable.html" title="SoftDeletable (module)">SoftDeletable</a></span></dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>app/models/amount.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<h2 id="label-Schema+Information">Schema Information</h2>
+
+<p>Table name: amounts</p>
+
+<pre class="code ruby"><code class="ruby">id          :integer          not null, primary key
+value       :decimal(64, 12)
+currency_id :integer          not null
+created_at  :datetime         not null
+updated_at  :datetime         not null
+INR         :decimal(20, 5)
+USD         :decimal(20, 5)
+GBP         :decimal(20, 5)
+CAD         :decimal(20, 5)
+EUR         :decimal(20, 5)
+HRK         :decimal(20, 5)
+RUB         :decimal(20, 5)
+BGN         :decimal(20, 5)
+BRL         :decimal(20, 5)
+CHF         :decimal(20, 5)
+CNY         :decimal(20, 5)
+CZK         :decimal(20, 5)
+DKK         :decimal(20, 5)
+HKD         :decimal(20, 5)
+HUF         :decimal(20, 5)
+IDR         :decimal(20, 5)
+ILS         :decimal(20, 5)
+JPY         :decimal(20, 5)
+KRW         :decimal(20, 5)
+MXN         :decimal(20, 5)
+NOK         :decimal(20, 5)
+NZD         :decimal(20, 5)
+PHP         :decimal(20, 5)
+PLN         :decimal(20, 5)
+RON         :decimal(20, 5)
+SEK         :decimal(20, 5)
+SGD         :decimal(20, 5)
+THB         :decimal(20, 5)
+TRY         :decimal(20, 5)
+ZAR         :decimal(20, 5)
+AUD         :decimal(20, 5)
+AED         :decimal(20, 5)
+AFN         :decimal(20, 5)
+ALL         :decimal(20, 5)
+AMD         :decimal(20, 5)
+ANG         :decimal(20, 5)
+AOA         :decimal(20, 5)
+ARS         :decimal(20, 5)
+AWG         :decimal(20, 5)
+AZN         :decimal(20, 5)
+BAM         :decimal(20, 5)
+BBD         :decimal(20, 5)
+BDT         :decimal(20, 5)
+BHD         :decimal(20, 5)
+BIF         :decimal(20, 5)
+BMD         :decimal(20, 5)
+BND         :decimal(20, 5)
+BOB         :decimal(20, 5)
+BSD         :decimal(20, 5)
+BTC         :decimal(20, 5)
+BTN         :decimal(20, 5)
+BWP         :decimal(20, 5)
+BYN         :decimal(20, 5)
+BYR         :decimal(20, 5)
+BZD         :decimal(20, 5)
+CDF         :decimal(20, 5)
+CLF         :decimal(20, 5)
+CLP         :decimal(20, 5)
+COP         :decimal(20, 5)
+CRC         :decimal(20, 5)
+CUC         :decimal(20, 5)
+CUP         :decimal(20, 5)
+CVE         :decimal(20, 5)
+DJF         :decimal(20, 5)
+DOP         :decimal(20, 5)
+DZD         :decimal(20, 5)
+EEK         :decimal(20, 5)
+EGP         :decimal(20, 5)
+ERN         :decimal(20, 5)
+ETB         :decimal(20, 5)
+FJD         :decimal(20, 5)
+FKP         :decimal(20, 5)
+GEL         :decimal(20, 5)
+GGP         :decimal(20, 5)
+GHS         :decimal(20, 5)
+GIP         :decimal(20, 5)
+GMD         :decimal(20, 5)
+GNF         :decimal(20, 5)
+GTQ         :decimal(20, 5)
+GYD         :decimal(20, 5)
+HNL         :decimal(20, 5)
+HTG         :decimal(20, 5)
+IMP         :decimal(20, 5)
+IQD         :decimal(20, 5)
+IRR         :decimal(20, 5)
+ISK         :decimal(20, 5)
+JEP         :decimal(20, 5)
+JMD         :decimal(20, 5)
+JOD         :decimal(20, 5)
+KES         :decimal(20, 5)
+KGS         :decimal(20, 5)
+KHR         :decimal(20, 5)
+KMF         :decimal(20, 5)
+KPW         :decimal(20, 5)
+KWD         :decimal(20, 5)
+KYD         :decimal(20, 5)
+KZT         :decimal(20, 5)
+LAK         :decimal(20, 5)
+LBP         :decimal(20, 5)
+LKR         :decimal(20, 5)
+LRD         :decimal(20, 5)
+LSL         :decimal(20, 5)
+LTL         :decimal(20, 5)
+LVL         :decimal(20, 5)
+LYD         :decimal(20, 5)
+MAD         :decimal(20, 5)
+MDL         :decimal(20, 5)
+MGA         :decimal(20, 5)
+MKD         :decimal(20, 5)
+MMK         :decimal(20, 5)
+MNT         :decimal(20, 5)
+MOP         :decimal(20, 5)
+MRO         :decimal(20, 5)
+MUR         :decimal(20, 5)
+MVR         :decimal(20, 5)
+MWK         :decimal(20, 5)
+MZN         :decimal(20, 5)
+NAD         :decimal(20, 5)
+NGN         :decimal(20, 5)
+NIO         :decimal(20, 5)
+NPR         :decimal(20, 5)
+OMR         :decimal(20, 5)
+PAB         :decimal(20, 5)
+PEN         :decimal(20, 5)
+PGK         :decimal(20, 5)
+PKR         :decimal(20, 5)
+PYG         :decimal(20, 5)
+QAR         :decimal(20, 5)
+RSD         :decimal(20, 5)
+RWF         :decimal(20, 5)
+SAR         :decimal(20, 5)
+SBD         :decimal(20, 5)
+SCR         :decimal(20, 5)
+SDG         :decimal(20, 5)
+SHP         :decimal(20, 5)
+SLL         :decimal(20, 5)
+SOS         :decimal(20, 5)
+SRD         :decimal(20, 5)
+STD         :decimal(20, 5)
+SVC         :decimal(20, 5)
+SYP         :decimal(20, 5)
+SZL         :decimal(20, 5)
+TJS         :decimal(20, 5)
+TMT         :decimal(20, 5)
+TND         :decimal(20, 5)
+TOP         :decimal(20, 5)
+TTD         :decimal(20, 5)
+TWD         :decimal(20, 5)
+TZS         :decimal(20, 5)
+UAH         :decimal(20, 5)
+UGX         :decimal(20, 5)
+UYU         :decimal(20, 5)
+UZS         :decimal(20, 5)
+VEF         :decimal(20, 5)
+VND         :decimal(20, 5)
+VUV         :decimal(20, 5)
+WST         :decimal(20, 5)
+XAF         :decimal(20, 5)
+XAG         :decimal(20, 5)
+XAU         :decimal(20, 5)
+XCD         :decimal(20, 5)
+XDR         :decimal(20, 5)
+XOF         :decimal(20, 5)
+XPF         :decimal(20, 5)
+YER         :decimal(20, 5)
+ZMK         :decimal(20, 5)
+ZMW         :decimal(20, 5)
+ZWL         :decimal(20, 5)
+is_deleted  :boolean          default(FALSE)
+MYR         :decimal(20, 5)
+deleted_at  :datetime
+</code></pre>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#amount_value-instance_method" title="#amount_value (instance method)">#<strong>amount_value</strong>  &#x21d2; Object </a>
+    
+
+    
+      (also: #transaction_amount_value, #pending_reimbursement_value, #billing_amount_value, #card_balance_value, #submitted_amount_value, #card_amount_value, #cash_on_hand_load_value, #cash_on_hand_withdrawal_value, #cash_on_hand_balance_value, #card_load_value, #card_withdrawal_value, #card_expenses_value, #finly_money_load_value, #finly_money_balance_value, #finly_money_withdrawal_value, #company_balance_value, #company_load_from_card_value, #company_load_from_wallet, #company_withdrawal_to_card_value, #company_withdrawal_to_wallet_value, #card_withdrawal_to_card_value, #card_withdrawal_to_wallet_value, #card_withdrawal_to_virtual_account_value, #card_load_from_card_value, #card_load_from_wallet_value, #card_load_from_virtual_account_value, #wallet_load_from_card_value, #wallet_load_from_wallet_value, #wallet_load_from_virtual_account_value, #wallet_withdrawal_to_card_value, #wallet_withdrawal_to_wallet_value, #wallet_withdrawal_to_virtual_account_value, #wallet_balance_value, #minimum_balance_value, #rate_value, #balance_value, #amount_requested_value, #amount_processed_value, #requested_amount_value, #gross_amount_value, #net_amount_value, #tds_amount_value, #tax_amount_value, #discount_amount_value, #maximum_amount_value, #maximum_transaction_amount_value, #minimum_transaction_amount_value, #exact_transaction_amount_value)
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>method that returns the amount value.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#amount_with_currency-instance_method" title="#amount_with_currency (instance method)">#<strong>amount_with_currency</strong>(currency_code)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>def precision_value(val=nil)   super((val || self.value)) end.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#as_json-instance_method" title="#as_json (instance method)">#<strong>as_json</strong>(options = {})  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#budget_value-instance_method" title="#budget_value (instance method)">#<strong>budget_value</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>method that returns the value of the amount.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#currency_country_code-instance_method" title="#currency_country_code (instance method)">#<strong>currency_country_code</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>method that returns the currency code.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#destroy_currencies-instance_method" title="#destroy_currencies (instance method)">#<strong>destroy_currencies</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#greater_than_amount_currency_id-instance_method" title="#greater_than_amount_currency_id (instance method)">#<strong>greater_than_amount_currency_id</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#greater_than_amount_value-instance_method" title="#greater_than_amount_value (instance method)">#<strong>greater_than_amount_value</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#precision_value-instance_method" title="#precision_value (instance method)">#<strong>precision_value</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>def value   precision_value(super()) end.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#set_base_currency_value-instance_method" title="#set_base_currency_value (instance method)">#<strong>set_base_currency_value</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>i.e.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#update_currencies-instance_method" title="#update_currencies (instance method)">#<strong>update_currencies</strong>(date)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="EventProducer.html" title="EventProducer (module)">EventProducer</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="EventProducer.html#after_save_callbacks-instance_method" title="EventProducer#after_save_callbacks (method)">#after_save_callbacks</a></span>, <span class='object_link'><a href="EventProducer.html#before_destroy_callbacks-instance_method" title="EventProducer#before_destroy_callbacks (method)">#before_destroy_callbacks</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="LiquidDroppable.html" title="LiquidDroppable (module)">LiquidDroppable</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="LiquidDroppable.html#to_liquid-instance_method" title="LiquidDroppable#to_liquid (method)">#to_liquid</a></span></p>
+
+  
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="amount_value-instance_method">
+  
+    #<strong>amount_value</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='transaction_amount_value-instance_method'>transaction_amount_value</span>, <span id='pending_reimbursement_value-instance_method'>pending_reimbursement_value</span>, <span id='billing_amount_value-instance_method'>billing_amount_value</span>, <span id='card_balance_value-instance_method'>card_balance_value</span>, <span id='submitted_amount_value-instance_method'>submitted_amount_value</span>, <span id='card_amount_value-instance_method'>card_amount_value</span>, <span id='cash_on_hand_load_value-instance_method'>cash_on_hand_load_value</span>, <span id='cash_on_hand_withdrawal_value-instance_method'>cash_on_hand_withdrawal_value</span>, <span id='cash_on_hand_balance_value-instance_method'>cash_on_hand_balance_value</span>, <span id='card_load_value-instance_method'>card_load_value</span>, <span id='card_withdrawal_value-instance_method'>card_withdrawal_value</span>, <span id='card_expenses_value-instance_method'>card_expenses_value</span>, <span id='finly_money_load_value-instance_method'>finly_money_load_value</span>, <span id='finly_money_balance_value-instance_method'>finly_money_balance_value</span>, <span id='finly_money_withdrawal_value-instance_method'>finly_money_withdrawal_value</span>, <span id='company_balance_value-instance_method'>company_balance_value</span>, <span id='company_load_from_card_value-instance_method'>company_load_from_card_value</span>, <span id='company_load_from_wallet-instance_method'>company_load_from_wallet</span>, <span id='company_withdrawal_to_card_value-instance_method'>company_withdrawal_to_card_value</span>, <span id='company_withdrawal_to_wallet_value-instance_method'>company_withdrawal_to_wallet_value</span>, <span id='card_withdrawal_to_card_value-instance_method'>card_withdrawal_to_card_value</span>, <span id='card_withdrawal_to_wallet_value-instance_method'>card_withdrawal_to_wallet_value</span>, <span id='card_withdrawal_to_virtual_account_value-instance_method'>card_withdrawal_to_virtual_account_value</span>, <span id='card_load_from_card_value-instance_method'>card_load_from_card_value</span>, <span id='card_load_from_wallet_value-instance_method'>card_load_from_wallet_value</span>, <span id='card_load_from_virtual_account_value-instance_method'>card_load_from_virtual_account_value</span>, <span id='wallet_load_from_card_value-instance_method'>wallet_load_from_card_value</span>, <span id='wallet_load_from_wallet_value-instance_method'>wallet_load_from_wallet_value</span>, <span id='wallet_load_from_virtual_account_value-instance_method'>wallet_load_from_virtual_account_value</span>, <span id='wallet_withdrawal_to_card_value-instance_method'>wallet_withdrawal_to_card_value</span>, <span id='wallet_withdrawal_to_wallet_value-instance_method'>wallet_withdrawal_to_wallet_value</span>, <span id='wallet_withdrawal_to_virtual_account_value-instance_method'>wallet_withdrawal_to_virtual_account_value</span>, <span id='wallet_balance_value-instance_method'>wallet_balance_value</span>, <span id='minimum_balance_value-instance_method'>minimum_balance_value</span>, <span id='rate_value-instance_method'>rate_value</span>, <span id='balance_value-instance_method'>balance_value</span>, <span id='amount_requested_value-instance_method'>amount_requested_value</span>, <span id='amount_processed_value-instance_method'>amount_processed_value</span>, <span id='requested_amount_value-instance_method'>requested_amount_value</span>, <span id='gross_amount_value-instance_method'>gross_amount_value</span>, <span id='net_amount_value-instance_method'>net_amount_value</span>, <span id='tds_amount_value-instance_method'>tds_amount_value</span>, <span id='tax_amount_value-instance_method'>tax_amount_value</span>, <span id='discount_amount_value-instance_method'>discount_amount_value</span>, <span id='maximum_amount_value-instance_method'>maximum_amount_value</span>, <span id='maximum_transaction_amount_value-instance_method'>maximum_transaction_amount_value</span>, <span id='minimum_transaction_amount_value-instance_method'>minimum_transaction_amount_value</span>, <span id='exact_transaction_amount_value-instance_method'>exact_transaction_amount_value</span></span>
+    </span>
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>method that returns the amount value</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+215
+216
+217</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/amount.rb', line 215</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_amount_value'>amount_value</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_precision_value'>precision_value</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="amount_with_currency-instance_method">
+  
+    #<strong>amount_with_currency</strong>(currency_code)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>def precision_value(val=nil)</p>
+
+<pre class="code ruby"><code class="ruby"><span class='kw'>super</span><span class='lparen'>(</span><span class='lparen'>(</span><span class='id identifier rubyid_val'>val</span> <span class='op'>||</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span><span class='rparen'>)</span>
+</code></pre>
+
+<p>end</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+317
+318
+319
+320
+321
+322
+323</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/amount.rb', line 317</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_amount_with_currency'>amount_with_currency</span><span class='lparen'>(</span><span class='id identifier rubyid_currency_code'>currency_code</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_currency_code'>currency_code</span> <span class='op'>=</span> <span class='id identifier rubyid_currency_code'>currency_code</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span> <span class='kw'>unless</span> <span class='id identifier rubyid_currency_code'>currency_code</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Symbol</span><span class='rparen'>)</span>
+  <span class='kw'>unless</span> <span class='const'><span class='object_link'><a href="" title="Amount (class)">Amount</a></span></span><span class='period'>.</span><span class='id identifier rubyid_column_names'>column_names</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_currency_code'>currency_code</span><span class='rparen'>)</span>
+    <span class='kw'>return</span>
+  <span class='kw'>end</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='id identifier rubyid_currency_code'>currency_code</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="as_json-instance_method">
+  
+    #<strong>as_json</strong>(options = {})  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/amount.rb', line 325</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_as_json'>as_json</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_data'>data</span> <span class='op'>=</span> <span class='lbrace'>{</span>
+      <span class='label'>value:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span><span class='comma'>,</span>
+      <span class='label'>currency:</span> <span class='lbrace'>{</span>
+          <span class='label'>id:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_currency'>currency</span><span class='op'>&amp;.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span>
+          <span class='label'>country:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_currency'>currency</span><span class='op'>&amp;.</span><span class='id identifier rubyid_country'>country</span><span class='comma'>,</span>
+          <span class='label'>country_code:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_currency'>currency</span><span class='op'>&amp;.</span><span class='id identifier rubyid_country_code'>country_code</span><span class='comma'>,</span>
+          <span class='label'>symbol:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_currency'>currency</span><span class='op'>&amp;.</span><span class='id identifier rubyid_symbol'>symbol</span>
+      <span class='rbrace'>}</span>
+  <span class='rbrace'>}</span>
+
+  <span class='kw'>return</span> <span class='id identifier rubyid_data'>data</span> <span class='kw'>unless</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:rounded</span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_data'>data</span><span class='lbracket'>[</span><span class='symbol'>:value</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_precision_value'>precision_value</span>
+  <span class='id identifier rubyid_data'>data</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="budget_value-instance_method">
+  
+    #<strong>budget_value</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>method that returns the value of the amount</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+220
+221
+222</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/amount.rb', line 220</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_budget_value'>budget_value</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_precision_value'>precision_value</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="currency_country_code-instance_method">
+  
+    #<strong>currency_country_code</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>method that returns the currency code</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+301
+302
+303</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/amount.rb', line 301</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_currency_country_code'>currency_country_code</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_currency'>currency</span><span class='period'>.</span><span class='id identifier rubyid_country_code'>country_code</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="destroy_currencies-instance_method">
+  
+    #<strong>destroy_currencies</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+368
+369
+370
+371
+372
+373
+374
+375</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/amount.rb', line 368</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_destroy_currencies'>destroy_currencies</span>
+  <span class='id identifier rubyid_update_hash'>update_hash</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='id identifier rubyid_currencies'>currencies</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="" title="Amount (class)">Amount</a></span></span><span class='period'>.</span><span class='id identifier rubyid_column_names'>column_names</span><span class='period'>.</span><span class='id identifier rubyid_reject'>reject</span> <span class='lbrace'>{</span><span class='op'>|</span><span class='id identifier rubyid_el'>el</span><span class='op'>|</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>created_at</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>updated_at</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>date</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>id</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_currency'>currency</span><span class='period'>.</span><span class='id identifier rubyid_country_code'>country_code</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>value</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>currency_id</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>is_deleted</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_el'>el</span><span class='rparen'>)</span><span class='rbrace'>}</span>
+  <span class='id identifier rubyid_currencies'>currencies</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_curr'>curr</span><span class='op'>|</span>
+    <span class='id identifier rubyid_update_hash'>update_hash</span><span class='lbracket'>[</span><span class='id identifier rubyid_curr'>curr</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='kw'>end</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_update'>update</span><span class='lparen'>(</span><span class='id identifier rubyid_update_hash'>update_hash</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="greater_than_amount_currency_id-instance_method">
+  
+    #<strong>greater_than_amount_currency_id</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+296
+297
+298</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/amount.rb', line 296</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_greater_than_amount_currency_id'>greater_than_amount_currency_id</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_currency_id'>currency_id</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="greater_than_amount_value-instance_method">
+  
+    #<strong>greater_than_amount_value</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+292
+293
+294</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/amount.rb', line 292</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_greater_than_amount_value'>greater_than_amount_value</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="precision_value-instance_method">
+  
+    #<strong>precision_value</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>def value</p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_precision_value'>precision_value</span><span class='lparen'>(</span><span class='kw'>super</span><span class='lparen'>(</span><span class='rparen'>)</span><span class='rparen'>)</span>
+</code></pre>
+
+<p>end</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+309
+310
+311</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/amount.rb', line 309</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_precision_value'>precision_value</span>
+  <span class='kw'>super</span><span class='lparen'>(</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="set_base_currency_value-instance_method">
+  
+    #<strong>set_base_currency_value</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>i.e. updating the respective currency&#39; column with value</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+284
+285
+286
+287
+288
+289
+290</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/amount.rb', line 284</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_set_base_currency_value'>set_base_currency_value</span>
+  <span class='kw'>if</span> <span class='const'><span class='object_link'><a href="" title="Amount (class)">Amount</a></span></span><span class='period'>.</span><span class='id identifier rubyid_column_names'>column_names</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_currency'>currency</span><span class='op'>&amp;.</span><span class='id identifier rubyid_country_code'>country_code</span><span class='rparen'>)</span>
+    <span class='comment'># self.update((self.currency.country_code) =&gt; self.value)
+</span>    <span class='comment'># Setting the value without updating
+</span>    <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_currency'>currency</span><span class='period'>.</span><span class='id identifier rubyid_country_code'>country_code</span><span class='embexpr_end'>}</span><span class='tstring_content'>=</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="update_currencies-instance_method">
+  
+    #<strong>update_currencies</strong>(date)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+341
+342
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/amount.rb', line 341</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_update_currencies'>update_currencies</span><span class='lparen'>(</span><span class='id identifier rubyid_date'>date</span><span class='rparen'>)</span>
+  <span class='comment'># i.e. if the expense is today&#39;s and the currency conversion data is not present
+</span>  <span class='kw'>if</span> <span class='id identifier rubyid_date'>date</span> <span class='op'>==</span> <span class='const'>DateUtils</span><span class='period'>.</span><span class='id identifier rubyid_local_date'>local_date</span>
+    <span class='kw'>return</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_date'>date</span> <span class='op'>=</span> <span class='id identifier rubyid_date'>date</span><span class='period'>.</span><span class='id identifier rubyid_strftime'>strftime</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>%Y-%m-%d</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_update_hash'>update_hash</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='id identifier rubyid_rate'>rate</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="CurrencyConversionRate.html" title="CurrencyConversionRate (class)">CurrencyConversionRate</a></span></span><span class='period'>.</span><span class='id identifier rubyid_find_by'>find_by</span><span class='lparen'>(</span><span class='label'>date:</span> <span class='id identifier rubyid_date'>date</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='const'><span class='object_link'><a href="CurrencyConversionRate.html" title="CurrencyConversionRate (class)">CurrencyConversionRate</a></span></span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_rate'>rate</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+    <span class='comment'># calculate the respective currency rate for the date in question
+</span>    <span class='id identifier rubyid_params'>params</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='label'>date:</span> <span class='const'>Date</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_date'>date</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_strftime'>strftime</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>%Y-%m-%d</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='rbrace'>}</span> <span class='kw'>rescue</span> <span class='kw'>nil</span>
+    <span class='id identifier rubyid_res'>res</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Currency.html" title="Currency (class)">Currency</a></span></span><span class='op'>::</span><span class='const'>FetchData</span><span class='period'>.</span><span class='lparen'>(</span><span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_params'>params</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_currency_data'>currency_data</span> <span class='op'>=</span> <span class='id identifier rubyid_res'>res</span><span class='period'>.</span><span class='id identifier rubyid_currency_data'>currency_data</span><span class='period'>.</span><span class='id identifier rubyid_as_json'>as_json</span><span class='period'>.</span><span class='id identifier rubyid_with_indifferent_access'>with_indifferent_access</span>
+    <span class='id identifier rubyid_rate'>rate</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="CurrencyConversionRate.html" title="CurrencyConversionRate (class)">CurrencyConversionRate</a></span></span><span class='period'>.</span><span class='id identifier rubyid_create'>create</span><span class='lparen'>(</span><span class='id identifier rubyid_currency_data'>currency_data</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_currencies'>currencies</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="CurrencyConversionRate.html" title="CurrencyConversionRate (class)">CurrencyConversionRate</a></span></span><span class='period'>.</span><span class='id identifier rubyid_column_names'>column_names</span><span class='period'>.</span><span class='id identifier rubyid_reject'>reject</span> <span class='lbrace'>{</span><span class='op'>|</span><span class='id identifier rubyid_el'>el</span><span class='op'>|</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>created_at</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>updated_at</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>date</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>id</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_el'>el</span><span class='rparen'>)</span><span class='rbrace'>}</span>
+  <span class='id identifier rubyid_orig_curr'>orig_curr</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_currency'>currency</span><span class='period'>.</span><span class='id identifier rubyid_country_code'>country_code</span>
+  <span class='id identifier rubyid_currencies'>currencies</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_curr'>curr</span><span class='op'>|</span>
+    <span class='kw'>if</span> <span class='const'><span class='object_link'><a href="" title="Amount (class)">Amount</a></span></span><span class='period'>.</span><span class='id identifier rubyid_column_names'>column_names</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_curr'>curr</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_currency_rate'>currency_rate</span> <span class='op'>=</span> <span class='id identifier rubyid_rate'>rate</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='id identifier rubyid_curr'>curr</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_f'>to_f</span>
+      <span class='id identifier rubyid_normalized_amt'>normalized_amt</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_amount_value'>amount_value</span> <span class='op'>*</span> <span class='id identifier rubyid_currency_rate'>currency_rate</span>
+      <span class='id identifier rubyid_update_hash'>update_hash</span><span class='lbracket'>[</span><span class='id identifier rubyid_curr'>curr</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_normalized_amt'>normalized_amt</span> <span class='op'>/</span> <span class='id identifier rubyid_rate'>rate</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='id identifier rubyid_orig_curr'>orig_curr</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span><span class='rparen'>)</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_update'>update</span><span class='lparen'>(</span><span class='id identifier rubyid_update_hash'>update_hash</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sat Sep  5 16:06:03 2020 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.25 (ruby-2.7.1).
+</div>
+
+    </div>
+  </body>
+</html>

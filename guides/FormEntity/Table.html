@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: FormEntity::Table
+  
+    &mdash; Documentation by YARD 0.9.25
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "FormEntity::Table";
+  relpath = '../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../_index.html">Index (T)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../FormEntity.html" title="FormEntity (class)">FormEntity</a></span></span>
+     &raquo; 
+    <span class="title">Table</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: FormEntity::Table
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName"><span class='object_link'><a href="../FormEntity.html" title="FormEntity (class)">FormEntity</a></span></span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">ActiveRecord::Base</li>
+          
+            <li class="next"><span class='object_link'><a href="../ApplicationRecord.html" title="ApplicationRecord (class)">ApplicationRecord</a></span></li>
+          
+            <li class="next"><span class='object_link'><a href="../FormEntity.html" title="FormEntity (class)">FormEntity</a></span></li>
+          
+            <li class="next">FormEntity::Table</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>app/models/form_entity/table.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<h2 id="label-Schema+Information">Schema Information</h2>
+
+<p>Table name: form_entities</p>
+
+<pre class="code ruby"><code class="ruby">id                           :bigint           not null
+uuid                         :string(36)       not null, primary key
+company_id                   :integer          not null
+form_id                      :string(36)       not null
+form_section_id              :string(36)       not null
+created_by_user_id           :integer
+entity_key                   :string(255)      not null
+label                        :string(255)
+placeholder                  :string(255)
+hint                         :string(255)
+entity_type                  :string(255)
+default_value                :string(255)
+editable                     :boolean
+required                     :boolean
+active                       :boolean
+unique                       :boolean
+visible                      :boolean
+position                     :integer
+system_field                 :boolean
+can_visible_be_changed       :boolean
+can_editable_be_changed      :boolean
+can_required_be_changed      :boolean
+can_uniqueness_be_changed    :boolean
+can_be_disabled              :boolean
+can_label_be_renamed         :boolean
+can_choices_be_changed       :boolean
+allow_clearing_default_value :boolean
+options                      :text(65535)
+deleted_at                   :datetime
+created_at                   :datetime         not null
+updated_at                   :datetime         not null
+choices_scope                :text(65535)
+internal                     :boolean          default(FALSE)
+is_modified                  :boolean          default(FALSE)
+entity_path                  :string(255)
+parent_id                    :string(255)
+populate_if_empty            :string(255)
+type                         :string(255)
+config                       :text(65535)
+associate_custom_fields      :boolean
+compute                      :boolean
+compute_enabled              :boolean
+compute_type_id              :integer
+compute_formula              :string(255)
+compute_lookup_entity_id     :string(255)
+filters                      :text(65535)
+config_path                  :string(255)
+</code></pre>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+
+
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#option_validation-class_method" title="option_validation (class method)">.<strong>option_validation</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods inherited from <span class='object_link'><a href="../FormEntity.html" title="FormEntity (class)">FormEntity</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../FormEntity.html#as_json-instance_method" title="FormEntity#as_json (method)">#as_json</a></span>, <span class='object_link'><a href="../FormEntity.html#choices_scope-instance_method" title="FormEntity#choices_scope (method)">#choices_scope</a></span>, <span class='object_link'><a href="../FormEntity.html#computed=-instance_method" title="FormEntity#computed= (method)">#computed=</a></span>, <span class='object_link'><a href="../FormEntity.html#contract-class_method" title="FormEntity.contract (method)">contract</a></span>, <span class='object_link'><a href="../FormEntity.html#contract-instance_method" title="FormEntity#contract (method)">#contract</a></span>, <span class='object_link'><a href="../FormEntity.html#contract_eval-class_method" title="FormEntity.contract_eval (method)">contract_eval</a></span>, <span class='object_link'><a href="../FormEntity.html#contract_evaluators-class_method" title="FormEntity.contract_evaluators (method)">contract_evaluators</a></span>, <span class='object_link'><a href="../FormEntity.html#form_builder_json-instance_method" title="FormEntity#form_builder_json (method)">#form_builder_json</a></span>, <span class='object_link'><a href="../FormEntity.html#form_json-instance_method" title="FormEntity#form_json (method)">#form_json</a></span>, <span class='object_link'><a href="../FormEntity.html#form_reference_json-instance_method" title="FormEntity#form_reference_json (method)">#form_reference_json</a></span>, <span class='object_link'><a href="../FormEntity.html#meta_attributes-instance_method" title="FormEntity#meta_attributes (method)">#meta_attributes</a></span>, <span class='object_link'><a href="../FormEntity.html#parent_entity_key-instance_method" title="FormEntity#parent_entity_key (method)">#parent_entity_key</a></span>, <span class='object_link'><a href="../FormEntity.html#parent_entity_path-instance_method" title="FormEntity#parent_entity_path (method)">#parent_entity_path</a></span>, <span class='object_link'><a href="../FormEntity.html#populate-instance_method" title="FormEntity#populate (method)">#populate</a></span>, <span class='object_link'><a href="../FormEntity.html#populate_if_empty-instance_method" title="FormEntity#populate_if_empty (method)">#populate_if_empty</a></span>, <span class='object_link'><a href="../FormEntity.html#populator-instance_method" title="FormEntity#populator (method)">#populator</a></span>, <span class='object_link'><a href="../FormEntity.html#system_entity-class_method" title="FormEntity.system_entity (method)">system_entity</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="../TemplateClonable.html" title="TemplateClonable (module)">TemplateClonable</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../TemplateClonable.html#template_reference-instance_method" title="TemplateClonable#template_reference (method)">#template_reference</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="../UUIDHelper.html" title="UUIDHelper (module)">UUIDHelper</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../UUIDHelper.html#included-class_method" title="UUIDHelper.included (method)">included</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="../EventProducer.html" title="EventProducer (module)">EventProducer</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../EventProducer.html#after_save_callbacks-instance_method" title="EventProducer#after_save_callbacks (method)">#after_save_callbacks</a></span>, <span class='object_link'><a href="../EventProducer.html#before_destroy_callbacks-instance_method" title="EventProducer#before_destroy_callbacks (method)">#before_destroy_callbacks</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="../LiquidDroppable.html" title="LiquidDroppable (module)">LiquidDroppable</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../LiquidDroppable.html#to_liquid-instance_method" title="LiquidDroppable#to_liquid (method)">#to_liquid</a></span></p>
+
+  
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="option_validation-class_method">
+  
+    .<strong>option_validation</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/form_entity/table.rb', line 70</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_option_validation'>option_validation</span>
+  <span class='const'>Proc</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> <span class='kw'>do</span>
+    <span class='id identifier rubyid_validation'>validation</span> <span class='symbol'>:options_config</span> <span class='kw'>do</span>
+      <span class='id identifier rubyid_params'>params</span> <span class='kw'>do</span>
+        <span class='id identifier rubyid_required'>required</span><span class='lparen'>(</span><span class='symbol'>:options</span><span class='rparen'>)</span> <span class='kw'>do</span>
+          <span class='id identifier rubyid_hash'>hash</span> <span class='kw'>do</span>
+            <span class='id identifier rubyid_optional'>optional</span><span class='lparen'>(</span><span class='symbol'>:min_items</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span><span class='lparen'>(</span><span class='symbol'>:int?</span><span class='rparen'>)</span>
+          <span class='kw'>end</span>
+        <span class='kw'>end</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sat Sep  5 16:06:24 2020 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.25 (ruby-2.7.1).
+</div>
+
+    </div>
+  </body>
+</html>

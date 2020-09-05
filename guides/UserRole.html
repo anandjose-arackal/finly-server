@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: UserRole
+  
+    &mdash; Documentation by YARD 0.9.25
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "UserRole";
+  relpath = '';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="_index.html">Index (U)</a> &raquo;
+    
+    
+    <span class="title">UserRole</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: UserRole
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName"><span class='object_link'><a href="ApplicationRecord.html" title="ApplicationRecord (class)">ApplicationRecord</a></span></span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">ActiveRecord::Base</li>
+          
+            <li class="next"><span class='object_link'><a href="ApplicationRecord.html" title="ApplicationRecord (class)">ApplicationRecord</a></span></li>
+          
+            <li class="next">UserRole</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd><span class='object_link'><a href="Seedable.html" title="Seedable (module)">Seedable</a></span></dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>app/models/user_role.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<h2 id="label-Schema+Information">Schema Information</h2>
+
+<p>Table name: user_roles</p>
+
+<pre class="code ruby"><code class="ruby">id         :integer          not null, primary key
+name       :string(255)
+created_at :datetime         not null
+updated_at :datetime         not null
+deleted_at :datetime
+</code></pre>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="VALUES-constant" class="">VALUES =
+          <div class="docstring">
+  <div class="discussion">
+    
+<p>ENSURE SECURITY POLICY IS CONFIGURED FOR THE USER ROLE in SecurityPolicy::Config ###</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+    <span class='label'>admin:</span> <span class='int'>1</span><span class='comma'>,</span>
+    <span class='label'>finance_manager:</span> <span class='int'>2</span><span class='comma'>,</span>
+    <span class='comment'># creditor: 2,
+</span>    <span class='label'>manager:</span> <span class='int'>3</span><span class='comma'>,</span>
+    <span class='label'>reviewer:</span> <span class='int'>3</span><span class='comma'>,</span>
+    <span class='label'>employee:</span> <span class='int'>4</span><span class='comma'>,</span>
+    <span class='label'>initiator:</span> <span class='int'>4</span><span class='comma'>,</span>
+    <span class='label'>personal:</span> <span class='int'>4</span><span class='comma'>,</span>
+    <span class='label'>auditor:</span> <span class='int'>5</span><span class='comma'>,</span>
+    <span class='label'>travel_manager:</span> <span class='int'>6</span><span class='comma'>,</span>
+    <span class='label'>purchaser:</span> <span class='int'>7</span><span class='comma'>,</span>
+    <span class='label'>receiver:</span> <span class='int'>8</span><span class='comma'>,</span>
+    <span class='label'>creditor:</span> <span class='int'>9</span><span class='comma'>,</span>
+    <span class='label'>purchase_request_initiator:</span> <span class='int'>10</span><span class='comma'>,</span>
+    <span class='label'>purchase_request_reviewer:</span> <span class='int'>11</span><span class='comma'>,</span>
+    <span class='label'>purchase_order_initiator:</span> <span class='int'>12</span><span class='comma'>,</span>
+    <span class='label'>purchase_order_reviewer:</span> <span class='int'>13</span><span class='comma'>,</span>
+    <span class='label'>goods_receiver:</span> <span class='int'>14</span><span class='comma'>,</span>
+    <span class='label'>invoice_initiator:</span> <span class='int'>15</span><span class='comma'>,</span>
+    <span class='label'>invoice_reviewer:</span> <span class='int'>16</span><span class='comma'>,</span>
+    <span class='label'>bank_payment_request_initiator:</span> <span class='int'>17</span><span class='comma'>,</span>
+    <span class='label'>bank_payment_request_reviewer:</span> <span class='int'>18</span><span class='comma'>,</span>
+    <span class='label'>bank_payment_request_creditor:</span> <span class='int'>19</span><span class='comma'>,</span>
+    <span class='label'>item_master_manager:</span> <span class='int'>20</span><span class='comma'>,</span>
+    <span class='label'>inventory_manager:</span> <span class='int'>21</span><span class='comma'>,</span>
+    <span class='label'>vendor_creator:</span> <span class='int'>22</span><span class='comma'>,</span>
+    <span class='label'>vendor_reviewer:</span> <span class='int'>23</span><span class='comma'>,</span>
+    <span class='label'>policy_admin:</span> <span class='int'>24</span><span class='comma'>,</span>
+    <span class='label'>vendor_manager:</span> <span class='int'>25</span><span class='comma'>,</span>
+    <span class='label'>bank_payment_request_auditor:</span> <span class='int'>26</span><span class='comma'>,</span>
+    <span class='label'>budget_manager:</span> <span class='int'>27</span><span class='comma'>,</span>
+    <span class='label'>non_po_initiator:</span> <span class='int'>28</span><span class='comma'>,</span>
+    <span class='label'>purchase_request_auditor:</span> <span class='int'>29</span><span class='comma'>,</span>
+    <span class='label'>purchase_order_auditor:</span> <span class='int'>30</span><span class='comma'>,</span>
+    <span class='label'>invoice_auditor:</span> <span class='int'>31</span><span class='comma'>,</span>
+    <span class='label'>vendor_auditor:</span> <span class='int'>32</span><span class='comma'>,</span>
+    <span class='label'>payment_agreement_initiator:</span> <span class='int'>33</span><span class='comma'>,</span>
+    <span class='label'>payment_agreement_reviewer:</span> <span class='int'>34</span><span class='comma'>,</span>
+    <span class='label'>payment_agreement_auditor:</span> <span class='int'>35</span><span class='comma'>,</span>
+    <span class='label'>po_invoice_initiator:</span> <span class='int'>36</span><span class='comma'>,</span>
+    <span class='label'>po_invoice_reviewer:</span> <span class='int'>37</span><span class='comma'>,</span>
+    <span class='label'>po_invoice_auditor:</span> <span class='int'>38</span><span class='comma'>,</span>
+    <span class='label'>non_po_invoice_initiator:</span> <span class='int'>39</span><span class='comma'>,</span>
+    <span class='label'>non_po_invoice_reviewer:</span> <span class='int'>40</span><span class='comma'>,</span>
+    <span class='label'>non_po_invoice_auditor:</span> <span class='int'>41</span><span class='comma'>,</span>
+
+    <span class='comment'># BBPS Roles
+</span>    <span class='label'>utility_bill_master_initiator:</span> <span class='int'>42</span><span class='comma'>,</span>
+    <span class='label'>utility_bill_master_reviewer:</span> <span class='int'>43</span><span class='comma'>,</span>
+    <span class='label'>utility_bill_initiator:</span> <span class='int'>44</span><span class='comma'>,</span>
+    <span class='label'>utility_bill_reviewer:</span> <span class='int'>45</span><span class='comma'>,</span>
+
+    <span class='comment'># Credit Notes
+</span>    <span class='label'>credit_note_initiator:</span> <span class='int'>46</span><span class='comma'>,</span>
+    <span class='label'>credit_note_reviewer:</span> <span class='int'>47</span><span class='comma'>,</span>
+    <span class='label'>credit_note_auditor:</span> <span class='int'>48</span><span class='comma'>,</span>
+
+    <span class='comment'># Payment Agreement Invoice
+</span>    <span class='label'>agreement_invoice_initiator:</span> <span class='int'>49</span><span class='comma'>,</span>
+    <span class='label'>agreement_invoice_reviewer:</span> <span class='int'>50</span><span class='comma'>,</span>
+    <span class='label'>agreement_invoice_auditor:</span> <span class='int'>51</span>
+<span class='rbrace'>}</span></pre></dd>
+      
+        <dt id="VALUES_EM-constant" class="">VALUES_EM =
+          <div class="docstring">
+  <div class="discussion">
+    
+<p>ENSURE SECURITY POLICY IS CONFIGURED FOR THE USER ROLE in SecurityPolicy::Config ###</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+    <span class='label'>admin:</span> <span class='int'>1</span><span class='comma'>,</span>
+    <span class='label'>finance_manager:</span> <span class='int'>2</span><span class='comma'>,</span>
+    <span class='label'>manager:</span> <span class='int'>3</span><span class='comma'>,</span>
+    <span class='label'>employee:</span> <span class='int'>4</span><span class='comma'>,</span>
+    <span class='label'>auditor:</span> <span class='int'>5</span><span class='comma'>,</span>
+    <span class='label'>travel_manager:</span> <span class='int'>6</span><span class='comma'>,</span>
+    <span class='label'>purchaser:</span> <span class='int'>7</span><span class='comma'>,</span>
+    <span class='label'>receiver:</span> <span class='int'>8</span>
+<span class='rbrace'>}</span></pre></dd>
+      
+        <dt id="VALUES_VP-constant" class="">VALUES_VP =
+          
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+    <span class='label'>admin:</span> <span class='int'>1</span><span class='comma'>,</span>
+    <span class='comment'># creditor: 2,
+</span>    <span class='label'>reviewer:</span> <span class='int'>3</span><span class='comma'>,</span>
+    <span class='label'>initiator:</span> <span class='int'>4</span><span class='comma'>,</span>
+    <span class='label'>auditor:</span> <span class='int'>5</span><span class='comma'>,</span>
+    <span class='label'>travel_manager:</span> <span class='int'>6</span><span class='comma'>,</span>
+    <span class='label'>purchaser:</span> <span class='int'>7</span><span class='comma'>,</span>
+    <span class='label'>receiver:</span> <span class='int'>8</span><span class='comma'>,</span>
+    <span class='label'>creditor:</span> <span class='int'>9</span><span class='comma'>,</span>
+    <span class='label'>purchase_request_initiator:</span> <span class='int'>10</span><span class='comma'>,</span>
+    <span class='label'>purchase_request_reviewer:</span> <span class='int'>11</span><span class='comma'>,</span>
+    <span class='label'>purchase_order_initiator:</span> <span class='int'>12</span><span class='comma'>,</span>
+    <span class='label'>purchase_order_reviewer:</span> <span class='int'>13</span><span class='comma'>,</span>
+    <span class='label'>goods_receiver:</span> <span class='int'>14</span><span class='comma'>,</span>
+    <span class='label'>invoice_initiator:</span> <span class='int'>15</span><span class='comma'>,</span>
+    <span class='label'>invoice_reviewer:</span> <span class='int'>16</span><span class='comma'>,</span>
+    <span class='label'>bank_payment_request_initiator:</span> <span class='int'>17</span><span class='comma'>,</span>
+    <span class='label'>bank_payment_request_reviewer:</span> <span class='int'>18</span><span class='comma'>,</span>
+    <span class='label'>bank_payment_request_creditor:</span><span class='int'>19</span><span class='comma'>,</span>
+    <span class='label'>item_master_manager:</span> <span class='int'>20</span><span class='comma'>,</span>
+    <span class='label'>inventory_manager:</span> <span class='int'>21</span><span class='comma'>,</span>
+    <span class='label'>vendor_creator:</span> <span class='int'>22</span><span class='comma'>,</span>
+    <span class='label'>vendor_reviewer:</span> <span class='int'>23</span><span class='comma'>,</span>
+    <span class='label'>policy_admin:</span> <span class='int'>24</span><span class='comma'>,</span>
+    <span class='label'>vendor_manager:</span> <span class='int'>25</span><span class='comma'>,</span>
+    <span class='label'>bank_payment_request_auditor:</span> <span class='int'>26</span><span class='comma'>,</span>
+    <span class='label'>budget_manager:</span> <span class='int'>27</span><span class='comma'>,</span>
+    <span class='label'>non_po_initiator:</span> <span class='int'>28</span><span class='comma'>,</span>
+    <span class='label'>purchase_request_auditor:</span> <span class='int'>29</span><span class='comma'>,</span>
+    <span class='label'>purchase_order_auditor:</span> <span class='int'>30</span><span class='comma'>,</span>
+    <span class='label'>invoice_auditor:</span> <span class='int'>31</span><span class='comma'>,</span>
+    <span class='label'>vendor_auditor:</span> <span class='int'>32</span><span class='comma'>,</span>
+    <span class='label'>payment_agreement_initiator:</span> <span class='int'>33</span><span class='comma'>,</span>
+    <span class='label'>payment_agreement_reviewer:</span> <span class='int'>34</span><span class='comma'>,</span>
+    <span class='label'>payment_agreement_auditor:</span> <span class='int'>35</span><span class='comma'>,</span>
+    <span class='label'>po_invoice_initiator:</span> <span class='int'>36</span><span class='comma'>,</span>
+    <span class='label'>po_invoice_reviewer:</span> <span class='int'>37</span><span class='comma'>,</span>
+    <span class='label'>po_invoice_auditor:</span> <span class='int'>38</span><span class='comma'>,</span>
+    <span class='label'>non_po_invoice_initiator:</span> <span class='int'>39</span><span class='comma'>,</span>
+    <span class='label'>non_po_invoice_reviewer:</span> <span class='int'>40</span><span class='comma'>,</span>
+    <span class='label'>non_po_invoice_auditor:</span> <span class='int'>41</span><span class='comma'>,</span>
+    <span class='comment'># BBPS Roles
+</span>    <span class='label'>utility_bill_master_initiator:</span> <span class='int'>42</span><span class='comma'>,</span>
+    <span class='label'>utility_bill_master_reviewer:</span> <span class='int'>43</span><span class='comma'>,</span>
+    <span class='label'>utility_bill_initiator:</span> <span class='int'>44</span><span class='comma'>,</span>
+    <span class='label'>utility_bill_reviewer:</span> <span class='int'>45</span><span class='comma'>,</span>
+
+    <span class='comment'># Credit Notes
+</span>    <span class='label'>credit_note_initiator:</span> <span class='int'>46</span><span class='comma'>,</span>
+    <span class='label'>credit_note_reviewer:</span> <span class='int'>47</span><span class='comma'>,</span>
+    <span class='label'>credit_note_auditor:</span> <span class='int'>48</span><span class='comma'>,</span>
+
+    <span class='comment'># Payment Agreement Invoice
+</span>    <span class='label'>agreement_invoice_initiator:</span> <span class='int'>49</span><span class='comma'>,</span>
+    <span class='label'>agreement_invoice_reviewer:</span> <span class='int'>50</span><span class='comma'>,</span>
+    <span class='label'>agreement_invoice_auditor:</span> <span class='int'>51</span>
+<span class='rbrace'>}</span></pre></dd>
+      
+        <dt id="VP_ROLES-constant" class="">VP_ROLES =
+          <div class="docstring">
+  <div class="discussion">
+    
+<p>This is used for segregating VP specific policies Do not put user specific roles like :initiator, :creditor, :admin, :reviewer here</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+    <span class='label'>purchase_request_initiator:</span> <span class='int'>10</span><span class='comma'>,</span>
+    <span class='label'>purchase_request_reviewer:</span> <span class='int'>11</span><span class='comma'>,</span>
+    <span class='label'>purchase_request_auditor:</span> <span class='int'>29</span><span class='comma'>,</span>
+    <span class='label'>purchase_order_initiator:</span> <span class='int'>12</span><span class='comma'>,</span>
+    <span class='label'>purchase_order_reviewer:</span> <span class='int'>13</span><span class='comma'>,</span>
+    <span class='label'>purchase_order_auditor:</span> <span class='int'>30</span><span class='comma'>,</span>
+    <span class='label'>bank_payment_request_initiator:</span> <span class='int'>17</span><span class='comma'>,</span>
+    <span class='label'>bank_payment_request_reviewer:</span> <span class='int'>18</span><span class='comma'>,</span>
+    <span class='label'>bank_payment_request_creditor:</span> <span class='int'>19</span><span class='comma'>,</span>
+    <span class='label'>bank_payment_request_auditor:</span> <span class='int'>26</span><span class='comma'>,</span>
+    <span class='label'>item_master_manager:</span> <span class='int'>20</span><span class='comma'>,</span>
+    <span class='label'>inventory_manager:</span> <span class='int'>21</span><span class='comma'>,</span>
+    <span class='label'>goods_receiver:</span> <span class='int'>14</span><span class='comma'>,</span>
+    <span class='label'>vendor_creator:</span> <span class='int'>22</span><span class='comma'>,</span>
+    <span class='label'>vendor_reviewer:</span> <span class='int'>23</span><span class='comma'>,</span>
+    <span class='label'>vendor_auditor:</span> <span class='int'>32</span><span class='comma'>,</span>
+    <span class='label'>vendor_manager:</span> <span class='int'>25</span><span class='comma'>,</span>
+    <span class='label'>policy_admin:</span> <span class='int'>24</span><span class='comma'>,</span>
+    <span class='label'>budget_manager:</span> <span class='int'>27</span><span class='comma'>,</span>
+    <span class='label'>non_po_initiator:</span> <span class='int'>28</span><span class='comma'>,</span>
+    <span class='label'>po_invoice_initiator:</span> <span class='int'>36</span><span class='comma'>,</span>
+    <span class='label'>po_invoice_reviewer:</span> <span class='int'>37</span><span class='comma'>,</span>
+    <span class='label'>po_invoice_auditor:</span> <span class='int'>38</span><span class='comma'>,</span>
+    <span class='label'>non_po_invoice_initiator:</span> <span class='int'>39</span><span class='comma'>,</span>
+    <span class='label'>non_po_invoice_reviewer:</span> <span class='int'>40</span><span class='comma'>,</span>
+    <span class='label'>non_po_invoice_auditor:</span> <span class='int'>41</span><span class='comma'>,</span>
+    <span class='label'>payment_agreement_initiator:</span> <span class='int'>33</span><span class='comma'>,</span>
+    <span class='label'>payment_agreement_reviewer:</span> <span class='int'>34</span><span class='comma'>,</span>
+    <span class='label'>payment_agreement_auditor:</span> <span class='int'>35</span><span class='comma'>,</span>
+
+    <span class='comment'># BBPS Roles
+</span>    <span class='label'>utility_bill_master_initiator:</span> <span class='int'>42</span><span class='comma'>,</span>
+    <span class='label'>utility_bill_master_reviewer:</span> <span class='int'>43</span><span class='comma'>,</span>
+    <span class='label'>utility_bill_initiator:</span> <span class='int'>44</span><span class='comma'>,</span>
+    <span class='label'>utility_bill_reviewer:</span> <span class='int'>45</span><span class='comma'>,</span>
+
+    <span class='comment'># Credit Notes
+</span>    <span class='label'>credit_note_initiator:</span> <span class='int'>46</span><span class='comma'>,</span>
+    <span class='label'>credit_note_reviewer:</span> <span class='int'>47</span><span class='comma'>,</span>
+    <span class='label'>credit_note_auditor:</span> <span class='int'>48</span><span class='comma'>,</span>
+
+    <span class='comment'># Payment Agreement Invoice
+</span>    <span class='label'>agreement_invoice_initiator:</span> <span class='int'>49</span><span class='comma'>,</span>
+    <span class='label'>agreement_invoice_reviewer:</span> <span class='int'>50</span><span class='comma'>,</span>
+    <span class='label'>agreement_invoice_auditor:</span> <span class='int'>51</span>
+<span class='rbrace'>}</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#id_for-class_method" title="id_for (class method)">.<strong>id_for</strong>(role)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#ids_for-class_method" title="ids_for (class method)">.<strong>ids_for</strong>(*keys)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#name_for-class_method" title="name_for (class method)">.<strong>name_for</strong>(role_id)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#seed_data-class_method" title="seed_data (class method)">.<strong>seed_data</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#as_json-instance_method" title="#as_json (instance method)">#<strong>as_json</strong>(options = {})  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="Seedable.html" title="Seedable (module)">Seedable</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="Seedable.html#refresh_all_caches-class_method" title="Seedable.refresh_all_caches (method)">refresh_all_caches</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="EventProducer.html" title="EventProducer (module)">EventProducer</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="EventProducer.html#after_save_callbacks-instance_method" title="EventProducer#after_save_callbacks (method)">#after_save_callbacks</a></span>, <span class='object_link'><a href="EventProducer.html#before_destroy_callbacks-instance_method" title="EventProducer#before_destroy_callbacks (method)">#before_destroy_callbacks</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="LiquidDroppable.html" title="LiquidDroppable (module)">LiquidDroppable</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="LiquidDroppable.html#to_liquid-instance_method" title="LiquidDroppable#to_liquid (method)">#to_liquid</a></span></p>
+
+  
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="id_for-class_method">
+  
+    .<strong>id_for</strong>(role)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+227
+228
+229
+230</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/user_role.rb', line 227</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_id_for'>id_for</span><span class='lparen'>(</span><span class='id identifier rubyid_role'>role</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_role'>role</span> <span class='op'>==</span> <span class='symbol'>:finance_manager</span> <span class='kw'>if</span> <span class='id identifier rubyid_role'>role</span> <span class='op'>==</span> <span class='symbol'>:finance</span>
+  <span class='const'><span class='object_link'><a href="#VALUES-constant" title="UserRole::VALUES (constant)">VALUES</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_role'>role</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="ids_for-class_method">
+  
+    .<strong>ids_for</strong>(*keys)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/user_role.rb', line 232</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_ids_for'>ids_for</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_keys'>keys</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_keys'>keys</span><span class='period'>.</span><span class='id identifier rubyid_present?'>present?</span> <span class='kw'>and</span> <span class='id identifier rubyid_keys'>keys</span><span class='period'>.</span><span class='id identifier rubyid_first'>first</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span> <span class='op'>==</span> <span class='const'>Array</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span>
+    <span class='id identifier rubyid_keys'>keys</span> <span class='op'>=</span> <span class='id identifier rubyid_keys'>keys</span><span class='period'>.</span><span class='id identifier rubyid_first'>first</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_ids'>ids</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='const'><span class='object_link'><a href="#VALUES-constant" title="UserRole::VALUES (constant)">VALUES</a></span></span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='op'>|</span>
+    <span class='id identifier rubyid_ids'>ids</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_value'>value</span> <span class='kw'>if</span> <span class='id identifier rubyid_keys'>keys</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_sym'>to_sym</span><span class='op'>&amp;.</span><span class='id identifier rubyid_downcase'>downcase</span><span class='rparen'>)</span> <span class='kw'>or</span> <span class='id identifier rubyid_keys'>keys</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='op'>&amp;.</span><span class='id identifier rubyid_downcase'>downcase</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_ids'>ids</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="name_for-class_method">
+  
+    .<strong>name_for</strong>(role_id)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/user_role.rb', line 243</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_name_for'>name_for</span><span class='lparen'>(</span><span class='id identifier rubyid_role_id'>role_id</span><span class='rparen'>)</span>
+  <span class='kw'>case</span> <span class='const'>RequestStore</span><span class='period'>.</span><span class='id identifier rubyid_store'>store</span><span class='lbracket'>[</span><span class='symbol'>:current_app</span><span class='rbracket'>]</span>
+    <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>em</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='symbol'>:em</span>
+      <span class='const'><span class='object_link'><a href="#VALUES_EM-constant" title="UserRole::VALUES_EM (constant)">VALUES_EM</a></span></span><span class='period'>.</span><span class='id identifier rubyid_key'>key</span><span class='lparen'>(</span><span class='id identifier rubyid_role_id'>role_id</span><span class='rparen'>)</span>
+    <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>vp</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='symbol'>:vp</span>
+      <span class='const'><span class='object_link'><a href="#VALUES_VP-constant" title="UserRole::VALUES_VP (constant)">VALUES_VP</a></span></span><span class='period'>.</span><span class='id identifier rubyid_key'>key</span><span class='lparen'>(</span><span class='id identifier rubyid_role_id'>role_id</span><span class='rparen'>)</span>
+    <span class='kw'>else</span>
+      <span class='const'><span class='object_link'><a href="#VALUES-constant" title="UserRole::VALUES (constant)">VALUES</a></span></span><span class='period'>.</span><span class='id identifier rubyid_key'>key</span><span class='lparen'>(</span><span class='id identifier rubyid_role_id'>role_id</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="seed_data-class_method">
+  
+    .<strong>seed_data</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+211
+212
+213
+214
+215
+216
+217</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/user_role.rb', line 211</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_seed_data'>seed_data</span>
+  <span class='const'><span class='object_link'><a href="#VALUES-constant" title="UserRole::VALUES (constant)">VALUES</a></span></span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='op'>|</span>
+    <span class='kw'>if</span> <span class='const'><span class='object_link'><a href="" title="UserRole (class)">UserRole</a></span></span><span class='period'>.</span><span class='id identifier rubyid_find_by'>find_by</span><span class='lparen'>(</span><span class='label'>id:</span> <span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_blank?'>blank?</span>
+      <span class='const'><span class='object_link'><a href="" title="UserRole (class)">UserRole</a></span></span><span class='period'>.</span><span class='id identifier rubyid_create'>create</span> <span class='label'>id:</span> <span class='id identifier rubyid_value'>value</span><span class='comma'>,</span> <span class='label'>name:</span> <span class='id identifier rubyid_name'>name</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="as_json-instance_method">
+  
+    #<strong>as_json</strong>(options = {})  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+254
+255
+256
+257
+258
+259</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/user_role.rb', line 254</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_as_json'>as_json</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='op'>=</span><span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='lbrace'>{</span>
+      <span class='label'>id:</span> <span class='id identifier rubyid_id'>id</span><span class='comma'>,</span>
+      <span class='label'>name:</span> <span class='id identifier rubyid_name'>name</span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sat Sep  5 16:06:09 2020 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.25 (ruby-2.7.1).
+</div>
+
+    </div>
+  </body>
+</html>

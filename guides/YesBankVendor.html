@@ -1,0 +1,1879 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: YesBankVendor
+  
+    &mdash; Documentation by YARD 0.9.25
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "YesBankVendor";
+  relpath = '';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="_index.html">Index (Y)</a> &raquo;
+    
+    
+    <span class="title">YesBankVendor</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: YesBankVendor
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName"><span class='object_link'><a href="ApplicationRecord.html" title="ApplicationRecord (class)">ApplicationRecord</a></span></span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">ActiveRecord::Base</li>
+          
+            <li class="next"><span class='object_link'><a href="ApplicationRecord.html" title="ApplicationRecord (class)">ApplicationRecord</a></span></li>
+          
+            <li class="next">YesBankVendor</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd><span class='object_link'><a href="CustomFieldFilterSupport.html" title="CustomFieldFilterSupport (module)">CustomFieldFilterSupport</a></span>, <span class='object_link'><a href="ErpSyncable.html" title="ErpSyncable (module)">ErpSyncable</a></span>, Exposures::Model::Exposable, <span class='object_link'><a href="LiquidDroppable.html" title="LiquidDroppable (module)">LiquidDroppable</a></span>, Sequenced::ActsAsSequenced, <span class='object_link'><a href="SoftDeletable.html" title="SoftDeletable (module)">SoftDeletable</a></span>, <span class='object_link'><a href="Transitionable.html" title="Transitionable (module)">Transitionable</a></span></dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>app/models/yes_bank_vendor.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<h2 id="label-Schema+Information">Schema Information</h2>
+
+<p>Table name: yes_bank_vendors</p>
+
+<pre class="code ruby"><code class="ruby">id                       :integer          not null, primary key
+name                     :string(255)
+company_id               :integer
+created_at               :datetime         not null
+updated_at               :datetime         not null
+email                    :string(255)
+mobile_number            :string(255)
+authorized               :boolean
+description              :text(65535)
+is_deleted               :boolean          default(FALSE)
+pan                      :string(255)
+tin                      :string(255)
+gst                      :string(255)
+gst_registered           :boolean
+state                    :string(255)
+state_code_id            :integer
+created_by_id            :integer
+vendor_type_id           :integer
+address                  :string(255)
+business_name            :string(255)
+payment_term_id          :integer
+currency_id              :integer
+tds_rates_list_id        :integer
+vendor_id                :string(255)
+disabled                 :boolean          default(FALSE)
+deleted_at               :datetime
+msme_registered          :boolean          default(FALSE)
+msme_registration_number :string(255)
+status_id                :integer
+policy_id                :integer
+controlling_level_id     :integer
+submitted_at             :datetime
+approved_at              :datetime
+vedor_code               :string(255)
+trade_name               :string(255)
+reject_note              :text(65535)
+rcm_enabled              :boolean          default(FALSE)
+erp_sync_status_id       :integer
+erp_sync_message         :string(255)
+erp_sync_reference_id    :string(255)
+erp_sync_attempts_count  :integer          default(0)
+erp_sync_attempted_at    :datetime
+</code></pre>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+
+
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#auditor_associated_status_ids-class_method" title="auditor_associated_status_ids (class method)">.<strong>auditor_associated_status_ids</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#document_owner_attribute-class_method" title="document_owner_attribute (class method)">.<strong>document_owner_attribute</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#document_status_attribute-class_method" title="document_status_attribute (class method)">.<strong>document_status_attribute</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#document_status_class_name-class_method" title="document_status_class_name (class method)">.<strong>document_status_class_name</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#finance_associated_status_ids-class_method" title="finance_associated_status_ids (class method)">.<strong>finance_associated_status_ids</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#human_name-class_method" title="human_name (class method)">.<strong>human_name</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initiator_associated_items-class_method" title="initiator_associated_items (class method)">.<strong>initiator_associated_items</strong>(user, role_id = nil)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#open_status_ids-class_method" title="open_status_ids (class method)">.<strong>open_status_ids</strong>(user)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#role_based_associated_status_ids-class_method" title="role_based_associated_status_ids (class method)">.<strong>role_based_associated_status_ids</strong>(user)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#role_based_statuses-class_method" title="role_based_statuses (class method)">.<strong>role_based_statuses</strong>(user)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#roles-class_method" title="roles (class method)">.<strong>roles</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#status_ids-class_method" title="status_ids (class method)">.<strong>status_ids</strong>(*statuses)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#as_json-instance_method" title="#as_json (instance method)">#<strong>as_json</strong>(options = {})  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#can_approve%3F-instance_method" title="#can_approve? (instance method)">#<strong>can_approve?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#can_really_approve%3F-instance_method" title="#can_really_approve? (instance method)">#<strong>can_really_approve?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#can_really_reject%3F-instance_method" title="#can_really_reject? (instance method)">#<strong>can_really_reject?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#can_reject%3F-instance_method" title="#can_reject? (instance method)">#<strong>can_reject?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#can_take_control%3F-instance_method" title="#can_take_control? (instance method)">#<strong>can_take_control?</strong>(user = nil)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#display_name-instance_method" title="#display_name (instance method)">#<strong>display_name</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#generate_sequential_id%3F-instance_method" title="#generate_sequential_id? (instance method)">#<strong>generate_sequential_id?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#name-instance_method" title="#name (instance method)">#<strong>name</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#review_completed%3F-instance_method" title="#review_completed? (instance method)">#<strong>review_completed?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#review_in_progress%3F-instance_method" title="#review_in_progress? (instance method)">#<strong>review_in_progress?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#review_pending%3F-instance_method" title="#review_pending? (instance method)">#<strong>review_pending?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Used for tracking completion %.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="LiquidDroppable.html" title="LiquidDroppable (module)">LiquidDroppable</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="LiquidDroppable.html#to_liquid-instance_method" title="LiquidDroppable#to_liquid (method)">#to_liquid</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="Transitionable.html" title="Transitionable (module)">Transitionable</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="Transitionable.html#controlling_user%3F-instance_method" title="Transitionable#controlling_user? (method)">#controlling_user?</a></span>, <span class='object_link'><a href="Transitionable.html#review_progress-instance_method" title="Transitionable#review_progress (method)">#review_progress</a></span>, <span class='object_link'><a href="Transitionable.html#reviewers_completed_count-instance_method" title="Transitionable#reviewers_completed_count (method)">#reviewers_completed_count</a></span>, <span class='object_link'><a href="Transitionable.html#reviewers_count-instance_method" title="Transitionable#reviewers_count (method)">#reviewers_count</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="EventProducer.html" title="EventProducer (module)">EventProducer</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="EventProducer.html#after_save_callbacks-instance_method" title="EventProducer#after_save_callbacks (method)">#after_save_callbacks</a></span>, <span class='object_link'><a href="EventProducer.html#before_destroy_callbacks-instance_method" title="EventProducer#before_destroy_callbacks (method)">#before_destroy_callbacks</a></span></p>
+
+  
+  
+  
+  
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="auditor_associated_status_ids-class_method">
+  
+    .<strong>auditor_associated_status_ids</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+345
+346
+347</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/yes_bank_vendor.rb', line 345</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_auditor_associated_status_ids'>auditor_associated_status_ids</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_status_ids'>status_ids</span><span class='lparen'>(</span><span class='symbol'>:awaiting_approval</span><span class='comma'>,</span> <span class='symbol'>:retracted</span><span class='comma'>,</span> <span class='symbol'>:rejected</span><span class='comma'>,</span> <span class='symbol'>:approved</span><span class='comma'>,</span> <span class='symbol'>:auto_approved</span><span class='comma'>,</span> <span class='symbol'>:deactivated</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="document_owner_attribute-class_method">
+  
+    .<strong>document_owner_attribute</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+308
+309
+310</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/yes_bank_vendor.rb', line 308</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_document_owner_attribute'>document_owner_attribute</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>created_by_id</span><span class='tstring_end'>&#39;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="document_status_attribute-class_method">
+  
+    .<strong>document_status_attribute</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+312
+313
+314</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/yes_bank_vendor.rb', line 312</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_document_status_attribute'>document_status_attribute</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>status_id</span><span class='tstring_end'>&#39;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="document_status_class_name-class_method">
+  
+    .<strong>document_status_class_name</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+316
+317
+318</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/yes_bank_vendor.rb', line 316</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_document_status_class_name'>document_status_class_name</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>VendorStatus</span><span class='tstring_end'>&#39;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="finance_associated_status_ids-class_method">
+  
+    .<strong>finance_associated_status_ids</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+329
+330
+331</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/yes_bank_vendor.rb', line 329</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_finance_associated_status_ids'>finance_associated_status_ids</span>
+  <span class='const'><span class='object_link'><a href="PurchaseOrderStatus.html" title="PurchaseOrderStatus (class)">PurchaseOrderStatus</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ids_for'>ids_for</span><span class='lparen'>(</span><span class='symbol'>:approved</span><span class='comma'>,</span> <span class='symbol'>:auto_approved</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="human_name-class_method">
+  
+    .<strong>human_name</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+304
+305
+306</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/yes_bank_vendor.rb', line 304</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_human_name'>human_name</span>
+  <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Vendor</span><span class='tstring_end'>&#39;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="initiator_associated_items-class_method">
+  
+    .<strong>initiator_associated_items</strong>(user, role_id = nil)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+365
+366
+367</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/yes_bank_vendor.rb', line 365</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_initiator_associated_items'>initiator_associated_items</span><span class='lparen'>(</span><span class='id identifier rubyid_user'>user</span><span class='comma'>,</span> <span class='id identifier rubyid_role_id'>role_id</span><span class='op'>=</span><span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_where'>where</span><span class='lparen'>(</span><span class='label'>id:</span> <span class='id identifier rubyid_user'>user</span><span class='period'>.</span><span class='id identifier rubyid_yes_bank_vendors'>yes_bank_vendors</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="open_status_ids-class_method">
+  
+    .<strong>open_status_ids</strong>(user)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+337
+338
+339</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/yes_bank_vendor.rb', line 337</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_open_status_ids'>open_status_ids</span><span class='lparen'>(</span><span class='id identifier rubyid_user'>user</span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="VendorStatus.html" title="VendorStatus (class)">VendorStatus</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ids_for'>ids_for</span><span class='lparen'>(</span><span class='lbracket'>[</span><span class='symbol'>:open</span><span class='comma'>,</span> <span class='symbol'>:draft</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="role_based_associated_status_ids-class_method">
+  
+    .<strong>role_based_associated_status_ids</strong>(user)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+341
+342
+343</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/yes_bank_vendor.rb', line 341</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_role_based_associated_status_ids'>role_based_associated_status_ids</span><span class='lparen'>(</span><span class='id identifier rubyid_user'>user</span><span class='rparen'>)</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_status_ids'>status_ids</span><span class='lparen'>(</span><span class='op'>*</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_role_based_statuses'>role_based_statuses</span><span class='lparen'>(</span><span class='id identifier rubyid_user'>user</span><span class='rparen'>)</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="role_based_statuses-class_method">
+  
+    .<strong>role_based_statuses</strong>(user)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/yes_bank_vendor.rb', line 349</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_role_based_statuses'>role_based_statuses</span><span class='lparen'>(</span><span class='id identifier rubyid_user'>user</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_statuses'>statuses</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_user'>user</span><span class='period'>.</span><span class='id identifier rubyid_policy_user_roles'>policy_user_roles</span><span class='period'>.</span><span class='id identifier rubyid_pluck'>pluck</span><span class='lparen'>(</span><span class='symbol'>:user_role_id</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_uniq'>uniq</span><span class='period'>.</span><span class='id identifier rubyid_present?'>present?</span>
+    <span class='id identifier rubyid_user'>user</span><span class='period'>.</span><span class='id identifier rubyid_policy_user_roles'>policy_user_roles</span><span class='period'>.</span><span class='id identifier rubyid_pluck'>pluck</span><span class='lparen'>(</span><span class='symbol'>:user_role_id</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_uniq'>uniq</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_role_id'>role_id</span><span class='op'>|</span>
+      <span class='kw'>if</span> <span class='lparen'>(</span><span class='const'><span class='object_link'><a href="UserRole.html" title="UserRole (class)">UserRole</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id_for'><span class='object_link'><a href="UserRole.html#id_for-class_method" title="UserRole.id_for (method)">id_for</a></span></span><span class='lparen'>(</span><span class='symbol'>:vendor_creator</span><span class='rparen'>)</span> <span class='op'>==</span> <span class='id identifier rubyid_role_id'>role_id</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_statuses'>statuses</span> <span class='op'>+=</span> <span class='lbracket'>[</span><span class='symbol'>:retracted</span><span class='comma'>,</span> <span class='symbol'>:rejected</span><span class='comma'>,</span> <span class='symbol'>:draft</span><span class='comma'>,</span> <span class='symbol'>:awaiting_approval</span><span class='comma'>,</span> <span class='symbol'>:approved</span><span class='comma'>,</span> <span class='symbol'>:auto_approved</span><span class='rbracket'>]</span>
+      <span class='kw'>elsif</span> <span class='lparen'>(</span><span class='const'><span class='object_link'><a href="UserRole.html" title="UserRole (class)">UserRole</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id_for'><span class='object_link'><a href="UserRole.html#id_for-class_method" title="UserRole.id_for (method)">id_for</a></span></span><span class='lparen'>(</span><span class='symbol'>:vendor_reviewer</span><span class='rparen'>)</span> <span class='op'>==</span> <span class='id identifier rubyid_role_id'>role_id</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_statuses'>statuses</span> <span class='op'>+=</span> <span class='lbracket'>[</span><span class='symbol'>:awaiting_approval</span><span class='comma'>,</span> <span class='symbol'>:retracted</span><span class='comma'>,</span> <span class='symbol'>:rejected</span><span class='comma'>,</span> <span class='symbol'>:approved</span><span class='comma'>,</span> <span class='symbol'>:auto_approved</span><span class='rbracket'>]</span>
+      <span class='kw'>elsif</span> <span class='const'><span class='object_link'><a href="UserRole.html" title="UserRole (class)">UserRole</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id_for'><span class='object_link'><a href="UserRole.html#id_for-class_method" title="UserRole.id_for (method)">id_for</a></span></span><span class='lparen'>(</span><span class='symbol'>:admin</span><span class='rparen'>)</span> <span class='op'>==</span> <span class='id identifier rubyid_role_id'>role_id</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
+        <span class='id identifier rubyid_statuses'>statuses</span> <span class='op'>+=</span> <span class='lbracket'>[</span><span class='symbol'>:retracted</span><span class='comma'>,</span> <span class='symbol'>:rejected</span><span class='comma'>,</span> <span class='symbol'>:awaiting_approval</span><span class='comma'>,</span> <span class='symbol'>:approved</span><span class='comma'>,</span> <span class='symbol'>:auto_approved</span><span class='rbracket'>]</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_statuses'>statuses</span><span class='period'>.</span><span class='id identifier rubyid_uniq'>uniq</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="roles-class_method">
+  
+    .<strong>roles</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+333
+334
+335</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/yes_bank_vendor.rb', line 333</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_roles'>roles</span>
+  <span class='lbracket'>[</span><span class='symbol'>:vendor_creator</span><span class='comma'>,</span> <span class='symbol'>:vendor_reviewer</span><span class='comma'>,</span> <span class='symbol'>:vendor_manager</span><span class='comma'>,</span> <span class='symbol'>:vendor_auditor</span><span class='comma'>,</span> <span class='symbol'>:admin</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="status_ids-class_method">
+  
+    .<strong>status_ids</strong>(*statuses)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+320
+321
+322
+323
+324
+325
+326
+327</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/yes_bank_vendor.rb', line 320</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_status_ids'>status_ids</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_statuses'>statuses</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_status_ids'>status_ids</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_statuses'>statuses</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_status'>status</span><span class='op'>|</span>
+    <span class='id identifier rubyid_status_ids'>status_ids</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span> <span class='const'><span class='object_link'><a href="VendorStatus.html" title="VendorStatus (class)">VendorStatus</a></span></span><span class='period'>.</span><span class='id identifier rubyid_id_for'>id_for</span><span class='lparen'>(</span><span class='id identifier rubyid_status'>status</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_status_ids'>status_ids</span><span class='period'>.</span><span class='id identifier rubyid_reject'>reject</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_status_id'>status_id</span><span class='op'>|</span> <span class='id identifier rubyid_status_id'>status_id</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="as_json-instance_method">
+  
+    #<strong>as_json</strong>(options = {})  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/yes_bank_vendor.rb', line 275</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_as_json'>as_json</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='op'>=</span><span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_display_name'>display_name</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_business_name'>business_name</span> <span class='op'>||</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span>
+  <span class='lbrace'>{</span>
+      <span class='label'>id:</span> <span class='id identifier rubyid_id'>id</span><span class='comma'>,</span>
+      <span class='label'>display_name:</span> <span class='id identifier rubyid_display_name'>display_name</span><span class='comma'>,</span>
+      <span class='label'>vendor_id:</span> <span class='id identifier rubyid_vendor_id'>vendor_id</span><span class='comma'>,</span>
+      <span class='label'>name:</span> <span class='id identifier rubyid_name'>name</span><span class='comma'>,</span>
+      <span class='label'>created_at:</span> <span class='id identifier rubyid_created_at'>created_at</span><span class='comma'>,</span>
+      <span class='label'>email:</span> <span class='id identifier rubyid_email'>email</span><span class='comma'>,</span>
+      <span class='label'>mobile_number:</span> <span class='id identifier rubyid_mobile_number'>mobile_number</span><span class='comma'>,</span>
+      <span class='label'>authorized:</span> <span class='id identifier rubyid_authorized'>authorized</span><span class='comma'>,</span>
+      <span class='label'>description:</span> <span class='id identifier rubyid_description'>description</span><span class='comma'>,</span>
+      <span class='label'>is_deleted:</span> <span class='id identifier rubyid_is_deleted'>is_deleted</span><span class='comma'>,</span>
+      <span class='label'>pan:</span> <span class='id identifier rubyid_pan'>pan</span><span class='comma'>,</span>
+      <span class='label'>tin:</span> <span class='id identifier rubyid_tin'>tin</span><span class='comma'>,</span>
+      <span class='label'>gst:</span> <span class='id identifier rubyid_gst'>gst</span><span class='comma'>,</span>
+      <span class='label'>gst_registered:</span> <span class='id identifier rubyid_gst_registered'>gst_registered</span><span class='comma'>,</span>
+      <span class='label'>state:</span> <span class='id identifier rubyid_state'>state</span><span class='comma'>,</span>
+      <span class='label'>state_code_id:</span> <span class='id identifier rubyid_state_code_id'>state_code_id</span><span class='comma'>,</span>
+      <span class='label'>tds_id:</span> <span class='id identifier rubyid_tds_rates_list_id'>tds_rates_list_id</span><span class='comma'>,</span>
+      <span class='label'>bank_accounts:</span> <span class='id identifier rubyid_bank_accounts'>bank_accounts</span><span class='period'>.</span><span class='id identifier rubyid_enabled'>enabled</span><span class='comma'>,</span>
+      <span class='label'>state_code:</span> <span class='id identifier rubyid_state_code'>state_code</span><span class='op'>&amp;.</span><span class='id identifier rubyid_state_code'>state_code</span><span class='comma'>,</span>
+      <span class='label'>address:</span> <span class='id identifier rubyid_address'>address</span><span class='comma'>,</span>
+      <span class='label'>trade_name:</span> <span class='id identifier rubyid_trade_name'>trade_name</span><span class='comma'>,</span>
+      <span class='label'>rcm_enabled:</span> <span class='id identifier rubyid_rcm_enabled'>rcm_enabled</span><span class='comma'>,</span>
+      <span class='label'>custom_fields:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_custom_fields'>custom_fields</span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="can_approve?-instance_method">
+  
+    #<strong>can_approve?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+369
+370
+371</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/yes_bank_vendor.rb', line 369</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_can_approve?'>can_approve?</span>
+  <span class='lparen'>(</span><span class='id identifier rubyid_awaiting_approval?'>awaiting_approval?</span> <span class='kw'>rescue</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="can_really_approve?-instance_method">
+  
+    #<strong>can_really_approve?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383
+384</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/yes_bank_vendor.rb', line 373</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_can_really_approve?'>can_really_approve?</span>
+  <span class='id identifier rubyid_user'>user</span> <span class='op'>=</span> <span class='id identifier rubyid_user'>user</span><span class='period'>.</span><span class='id identifier rubyid_present?'>present?</span> <span class='op'>?</span> <span class='id identifier rubyid_user'>user</span> <span class='op'>:</span> <span class='const'>RequestStore</span><span class='period'>.</span><span class='id identifier rubyid_store'>store</span><span class='lbracket'>[</span><span class='symbol'>:current_user</span><span class='rbracket'>]</span>
+  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='id identifier rubyid_user'>user</span><span class='period'>.</span><span class='id identifier rubyid_blank?'>blank?</span>
+  <span class='lparen'>(</span><span class='id identifier rubyid_awaiting_approval?'>awaiting_approval?</span> <span class='kw'>rescue</span> <span class='kw'>false</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_get_reviewers'>get_reviewers</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_user'>user</span><span class='rparen'>)</span>
+  <span class='comment'># if self.action_users(:take_control).include?(user)
+</span>  <span class='comment'>#   awaiting_approval? rescue false
+</span>  <span class='comment'># elsif self.action_users(:approve).include?(user)
+</span>  <span class='comment'>#   awaiting_approval? rescue false
+</span>  <span class='comment'># else
+</span>  <span class='comment'>#   false
+</span>  <span class='comment'># end
+</span><span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="can_really_reject?-instance_method">
+  
+    #<strong>can_really_reject?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+390
+391
+392
+393
+394
+395
+396
+397
+398
+399
+400
+401</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/yes_bank_vendor.rb', line 390</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_can_really_reject?'>can_really_reject?</span>
+  <span class='id identifier rubyid_user'>user</span> <span class='op'>=</span> <span class='id identifier rubyid_user'>user</span><span class='period'>.</span><span class='id identifier rubyid_present?'>present?</span> <span class='op'>?</span> <span class='id identifier rubyid_user'>user</span> <span class='op'>:</span> <span class='const'>RequestStore</span><span class='period'>.</span><span class='id identifier rubyid_store'>store</span><span class='lbracket'>[</span><span class='symbol'>:current_user</span><span class='rbracket'>]</span>
+  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='id identifier rubyid_user'>user</span><span class='period'>.</span><span class='id identifier rubyid_blank?'>blank?</span>
+  <span class='lparen'>(</span><span class='id identifier rubyid_awaiting_approval?'>awaiting_approval?</span> <span class='kw'>rescue</span> <span class='kw'>false</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_get_reviewers'>get_reviewers</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_user'>user</span><span class='rparen'>)</span>
+  <span class='comment'># if self.action_users(:take_control).include?(user)
+</span>  <span class='comment'>#   awaiting_approval? rescue false
+</span>  <span class='comment'># elsif self.action_users(:approve).include?(user) # If user can approve, they can also reject
+</span>  <span class='comment'>#   awaiting_approval? rescue false
+</span>  <span class='comment'># else
+</span>  <span class='comment'>#   false
+</span>  <span class='comment'># end
+</span><span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="can_reject?-instance_method">
+  
+    #<strong>can_reject?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+386
+387
+388</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/yes_bank_vendor.rb', line 386</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_can_reject?'>can_reject?</span>
+  <span class='lparen'>(</span><span class='id identifier rubyid_awaiting_approval?'>awaiting_approval?</span> <span class='kw'>rescue</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="can_take_control?-instance_method">
+  
+    #<strong>can_take_control?</strong>(user = nil)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+403
+404
+405
+406
+407
+408</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/yes_bank_vendor.rb', line 403</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_can_take_control?'>can_take_control?</span><span class='lparen'>(</span><span class='id identifier rubyid_user'>user</span><span class='op'>=</span><span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_user'>user</span> <span class='op'>=</span> <span class='id identifier rubyid_user'>user</span><span class='period'>.</span><span class='id identifier rubyid_present?'>present?</span> <span class='op'>?</span> <span class='id identifier rubyid_user'>user</span> <span class='op'>:</span> <span class='const'>RequestStore</span><span class='period'>.</span><span class='id identifier rubyid_store'>store</span><span class='lbracket'>[</span><span class='symbol'>:current_user</span><span class='rbracket'>]</span>
+  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='id identifier rubyid_user'>user</span><span class='period'>.</span><span class='id identifier rubyid_blank?'>blank?</span>
+  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_action_users'>action_users</span><span class='lparen'>(</span><span class='symbol'>:approve</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_user'>user</span><span class='rparen'>)</span>
+  <span class='lparen'>(</span><span class='id identifier rubyid_awaiting_approval?'>awaiting_approval?</span> <span class='kw'>rescue</span> <span class='kw'>false</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_user'>user</span><span class='period'>.</span><span class='id identifier rubyid_vendor_payment_admin?'>vendor_payment_admin?</span> <span class='op'>&amp;&amp;</span> <span class='lparen'>(</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_dlrms'>dlrms</span><span class='op'>&amp;.</span><span class='id identifier rubyid_find_by'>find_by</span><span class='lparen'>(</span><span class='label'>level_id:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_level'>level</span><span class='op'>&amp;.</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span><span class='op'>&amp;.</span><span class='id identifier rubyid_taken_control_by_id'>taken_control_by_id</span> <span class='op'>!=</span> <span class='id identifier rubyid_user'>user</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span> <span class='kw'>rescue</span> <span class='kw'>false</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="display_name-instance_method">
+  
+    #<strong>display_name</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+262
+263
+264</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/yes_bank_vendor.rb', line 262</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_display_name'>display_name</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_business_name'>business_name</span><span class='period'>.</span><span class='id identifier rubyid_blank?'>blank?</span> <span class='op'>?</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span> <span class='op'>:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_business_name'>business_name</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="generate_sequential_id?-instance_method">
+  
+    #<strong>generate_sequential_id?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+266
+267
+268
+269
+270
+271
+272
+273</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/yes_bank_vendor.rb', line 266</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_generate_sequential_id?'>generate_sequential_id?</span>
+  <span class='comment'># if the vendor is authorized or if the vendor already has a vendor ID from the frontend,
+</span>  <span class='comment'># do NOT generate a custom sequential ID for them
+</span>  <span class='kw'>if</span> <span class='op'>!</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_authorized'>authorized</span> <span class='op'>||</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_vendor_id'>vendor_id</span><span class='period'>.</span><span class='id identifier rubyid_present?'>present?</span>
+    <span class='kw'>return</span> <span class='kw'>false</span>
+  <span class='kw'>end</span>
+  <span class='kw'>true</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="name-instance_method">
+  
+    #<strong>name</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+410
+411
+412</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/yes_bank_vendor.rb', line 410</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_name'>name</span>
+  <span class='id identifier rubyid_business_name'>business_name</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="review_completed?-instance_method">
+  
+    #<strong>review_completed?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+419
+420
+421</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/yes_bank_vendor.rb', line 419</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_review_completed?'>review_completed?</span>
+  <span class='const'><span class='object_link'><a href="VendorStatus.html" title="VendorStatus (class)">VendorStatus</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ids_for'>ids_for</span><span class='lparen'>(</span><span class='symbol'>:approved</span><span class='comma'>,</span> <span class='symbol'>:auto_approved</span><span class='comma'>,</span> <span class='symbol'>:deactivated</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_status_id'>status_id</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="review_in_progress?-instance_method">
+  
+    #<strong>review_in_progress?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+423
+424
+425</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/yes_bank_vendor.rb', line 423</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_review_in_progress?'>review_in_progress?</span>
+  <span class='const'><span class='object_link'><a href="VendorStatus.html" title="VendorStatus (class)">VendorStatus</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ids_for'>ids_for</span><span class='lparen'>(</span><span class='symbol'>:awaiting_approval</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_status_id'>status_id</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="review_pending?-instance_method">
+  
+    #<strong>review_pending?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Used for tracking completion %</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+415
+416
+417</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/yes_bank_vendor.rb', line 415</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_review_pending?'>review_pending?</span>
+  <span class='const'><span class='object_link'><a href="VendorStatus.html" title="VendorStatus (class)">VendorStatus</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ids_for'>ids_for</span><span class='lparen'>(</span><span class='symbol'>:draft</span><span class='comma'>,</span> <span class='symbol'>:retracted</span><span class='comma'>,</span> <span class='symbol'>:rejected</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_status_id'>status_id</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sat Sep  5 16:06:22 2020 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.25 (ruby-2.7.1).
+</div>
+
+    </div>
+  </body>
+</html>

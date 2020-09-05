@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: BranchLocation
+  
+    &mdash; Documentation by YARD 0.9.25
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "BranchLocation";
+  relpath = '';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="_index.html">Index (B)</a> &raquo;
+    
+    
+    <span class="title">BranchLocation</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: BranchLocation
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName"><span class='object_link'><a href="ApplicationRecord.html" title="ApplicationRecord (class)">ApplicationRecord</a></span></span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">ActiveRecord::Base</li>
+          
+            <li class="next"><span class='object_link'><a href="ApplicationRecord.html" title="ApplicationRecord (class)">ApplicationRecord</a></span></li>
+          
+            <li class="next">BranchLocation</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd><span class='object_link'><a href="AncestrySupport.html" title="AncestrySupport (module)">AncestrySupport</a></span>, <span class='object_link'><a href="EventProducer.html" title="EventProducer (module)">EventProducer</a></span>, Exposures::Model::Exposable, <span class='object_link'><a href="LiquidDroppable.html" title="LiquidDroppable (module)">LiquidDroppable</a></span>, Sequenced::ActsAsSequenced, <span class='object_link'><a href="SoftDeletable.html" title="SoftDeletable (module)">SoftDeletable</a></span></dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>app/models/branch_location.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<h2 id="label-Schema+Information">Schema Information</h2>
+
+<p>Table name: branch_locations</p>
+
+<pre class="code ruby"><code class="ruby">id                      :integer          not null, primary key
+name                    :string(255)
+tax_registration_number :string(255)
+pan                     :string(255)
+company_id              :integer
+address_1               :text(65535)
+address_2               :text(65535)
+city                    :string(255)
+state_id                :integer
+country                 :string(255)
+pin_code                :string(255)
+created_at              :datetime         not null
+updated_at              :datetime         not null
+contact_name            :string(255)
+contact_mobile_number   :string(255)
+is_deleted              :boolean          default(FALSE), not null
+deleted_at              :datetime
+location_code           :string(255)
+ancestry                :string(255)
+nature_of_office        :string(255)
+billable_location       :boolean          default(TRUE)
+shippable_location      :boolean          default(TRUE)
+gl_code                 :string(255)
+start_date              :datetime
+end_date                :datetime
+</code></pre>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#address-instance_method" title="#address (instance method)">#<strong>address</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#as_json-instance_method" title="#as_json (instance method)">#<strong>as_json</strong>(options = {})  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#as_json2-instance_method" title="#as_json2 (instance method)">#<strong>as_json2</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>def as_json   {     id: self.id,     name: self.name,     gstin: self.gstin,     pan: self.pan,     address_1: self.address_1,     address_2: self.address_2,     city: self.city,     country: self.country,     pin: self.pin,     address: self.address,     location_code: self.location_code,     parent: [self.parent&amp;.id, self.parent&amp;.name]&amp;.compact   } end.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#code-instance_method" title="#code (instance method)">#<strong>code</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#location_name-instance_method" title="#location_name (instance method)">#<strong>location_name</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#state_code-instance_method" title="#state_code (instance method)">#<strong>state_code</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="EventProducer.html" title="EventProducer (module)">EventProducer</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="EventProducer.html#after_save_callbacks-instance_method" title="EventProducer#after_save_callbacks (method)">#after_save_callbacks</a></span>, <span class='object_link'><a href="EventProducer.html#before_destroy_callbacks-instance_method" title="EventProducer#before_destroy_callbacks (method)">#before_destroy_callbacks</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="LiquidDroppable.html" title="LiquidDroppable (module)">LiquidDroppable</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="LiquidDroppable.html#to_liquid-instance_method" title="LiquidDroppable#to_liquid (method)">#to_liquid</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="AncestrySupport.html" title="AncestrySupport (module)">AncestrySupport</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="AncestrySupport.html#full_name-instance_method" title="AncestrySupport#full_name (method)">#full_name</a></span>, <span class='object_link'><a href="AncestrySupport.html#json_tree-instance_method" title="AncestrySupport#json_tree (method)">#json_tree</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="address-instance_method">
+  
+    #<strong>address</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/branch_location.rb', line 73</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_address'>address</span>
+  <span class='id identifier rubyid_address'>address</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>if</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_address_1'>address_1</span><span class='period'>.</span><span class='id identifier rubyid_present?'>present?</span>
+    <span class='id identifier rubyid_address'>address</span> <span class='op'>+=</span> <span class='lparen'>(</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_address_1'>address_1</span> <span class='op'>+</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>,\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+  <span class='kw'>if</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_address_2'>address_2</span><span class='period'>.</span><span class='id identifier rubyid_present?'>present?</span>
+    <span class='id identifier rubyid_address'>address</span> <span class='op'>+=</span> <span class='lparen'>(</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_address_2'>address_2</span> <span class='op'>+</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>,\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+  <span class='kw'>if</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_city'>city</span><span class='period'>.</span><span class='id identifier rubyid_present?'>present?</span>
+    <span class='id identifier rubyid_address'>address</span> <span class='op'>+=</span> <span class='lparen'>(</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_city'>city</span> <span class='op'>+</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>, </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+  <span class='kw'>if</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_state'>state</span><span class='period'>.</span><span class='id identifier rubyid_present?'>present?</span>
+    <span class='id identifier rubyid_address'>address</span> <span class='op'>+=</span> <span class='lparen'>(</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_state'>state</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span> <span class='op'>+</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>,\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+  <span class='kw'>if</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_pin'>pin</span><span class='period'>.</span><span class='id identifier rubyid_present?'>present?</span>
+    <span class='id identifier rubyid_address'>address</span> <span class='op'>+=</span> <span class='lparen'>(</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_pin'>pin</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_address'>address</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="as_json-instance_method">
+  
+    #<strong>as_json</strong>(options = {})  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/branch_location.rb', line 117</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_as_json'>as_json</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='op'>=</span><span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_display_name'>display_name</span> <span class='op'>=</span> <span class='id identifier rubyid_options'>options</span><span class='op'>&amp;.</span><span class='id identifier rubyid_dig'>dig</span><span class='lparen'>(</span><span class='symbol'>:tree</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_full_name'>full_name</span> <span class='op'>:</span> <span class='id identifier rubyid_name'>name</span>
+  <span class='lbrace'>{</span>
+      <span class='label'>id:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span>
+      <span class='label'>name:</span> <span class='id identifier rubyid_display_name'>display_name</span><span class='comma'>,</span>
+      <span class='label'>gstin:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_gstin'>gstin</span><span class='comma'>,</span>
+      <span class='label'>pan:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_pan'>pan</span><span class='comma'>,</span>
+      <span class='label'>address_1:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_address_1'>address_1</span><span class='comma'>,</span>
+      <span class='label'>address_2:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_address_2'>address_2</span><span class='comma'>,</span>
+      <span class='label'>city:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_city'>city</span><span class='comma'>,</span>
+      <span class='label'>country:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_country'>country</span><span class='comma'>,</span>
+      <span class='label'>pin:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_pin'>pin</span><span class='comma'>,</span>
+      <span class='label'>address:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_address'>address</span><span class='comma'>,</span>
+      <span class='label'>location_code:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_location_code'>location_code</span><span class='comma'>,</span>
+      <span class='label'>state_code:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_state'>state</span><span class='op'>&amp;.</span><span class='id identifier rubyid_state_code'>state_code</span><span class='comma'>,</span>
+      <span class='label'>billable:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_billable_location'>billable_location</span><span class='comma'>,</span>
+      <span class='label'>shippable:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_shippable_location'>shippable_location</span><span class='comma'>,</span>
+      <span class='label'>state:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_state'>state</span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="as_json2-instance_method">
+  
+    #<strong>as_json2</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>def as_json</p>
+
+<pre class="code ruby"><code class="ruby"><span class='lbrace'>{</span>
+  <span class='label'>id:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span>
+  <span class='label'>name:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span>
+  <span class='label'>gstin:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_gstin'>gstin</span><span class='comma'>,</span>
+  <span class='label'>pan:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_pan'>pan</span><span class='comma'>,</span>
+  <span class='label'>address_1:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_address_1'>address_1</span><span class='comma'>,</span>
+  <span class='label'>address_2:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_address_2'>address_2</span><span class='comma'>,</span>
+  <span class='label'>city:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_city'>city</span><span class='comma'>,</span>
+  <span class='label'>country:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_country'>country</span><span class='comma'>,</span>
+  <span class='label'>pin:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_pin'>pin</span><span class='comma'>,</span>
+  <span class='label'>address:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_address'>address</span><span class='comma'>,</span>
+  <span class='label'>location_code:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_location_code'>location_code</span><span class='comma'>,</span>
+  <span class='label'>parent:</span> <span class='lbracket'>[</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_parent'>parent</span><span class='op'>&amp;.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_parent'>parent</span><span class='op'>&amp;.</span><span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span><span class='op'>&amp;.</span><span class='id identifier rubyid_compact'>compact</span>
+<span class='rbrace'>}</span>
+</code></pre>
+
+<p>end</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+110
+111
+112
+113
+114
+115</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/branch_location.rb', line 110</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_as_json2'>as_json2</span>
+  <span class='lbrace'>{</span>
+    <span class='label'>id:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span>
+    <span class='label'>name:</span> <span class='id identifier rubyid_full_name'>full_name</span><span class='comma'>,</span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="code-instance_method">
+  
+    #<strong>code</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+142
+143
+144</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/branch_location.rb', line 142</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_code'>code</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_location_code'>location_code</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="location_name-instance_method">
+  
+    #<strong>location_name</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+138
+139
+140</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/branch_location.rb', line 138</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_location_name'>location_name</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_parent'>parent</span><span class='period'>.</span><span class='id identifier rubyid_blank?'>blank?</span> <span class='op'>?</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_ancestors'>ancestors</span><span class='op'>&amp;.</span><span class='id identifier rubyid_pluck'>pluck</span><span class='lparen'>(</span><span class='symbol'>:name</span><span class='rparen'>)</span><span class='op'>&amp;.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'> / </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'> / </span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="state_code-instance_method">
+  
+    #<strong>state_code</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+69
+70
+71</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/branch_location.rb', line 69</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_state_code'>state_code</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_state'>state</span><span class='op'>&amp;.</span><span class='id identifier rubyid_state_code'>state_code</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sat Sep  5 16:06:20 2020 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.25 (ruby-2.7.1).
+</div>
+
+    </div>
+  </body>
+</html>

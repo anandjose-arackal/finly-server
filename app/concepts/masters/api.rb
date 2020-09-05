@@ -17,14 +17,17 @@
 #
 #   end
 #
+# @!attribute [rw] model
+#   @return ApplicationRecord
+#
+# @!attribute [rw] name
+#   @return String
 class Masters::API
   include DynamicAttributes
 
-  # @!attribute [rw]
-  #   @return ApplicationRecord
   class_attr :model
 
-  # Used for defining the name of the master. This defaults to the model name unless its defined
+  # Getting and setter for the name of the master. This defaults to the model name if not set
   #
   # @param [String] name
   #   Used for assigning the name of the master.
@@ -37,7 +40,16 @@ class Masters::API
     @name ||= model&.name
   end
 
-
+  # Creates an instance of {MasterSchema}.
+  # The instance of {MasterSchema} is validated using {Masters::Schema::Contract}.
+  #
+  # @raise [RuntimeError] if the contract validation fails
+  #
+  # @param [Hash] args would be assigned as attributes while initializing {MasterSchema}
+  #   This will not override +table_name+, +model+, +klass_name+ and +system_master+ attributes.
+  #
+  # @param [Proc] block will be executed in the context of the instance of the MasterSchema.
+  #   This is used for building the associated +entities+ (MasterEntity) in the {MasterSchema}
   def self.schema(args = {}, &block)
     raise "Model not defined" if model.blank?
 
