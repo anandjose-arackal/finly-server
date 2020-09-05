@@ -1,0 +1,10 @@
+app/concepts/masters/api.rb d7fd5059f7e33e0ab98a238bf37b990593dbd4cd
+app/concepts/masters/router.rb 028612ea54b4c301b49fc099bcb8af360caada7d
+app/concepts/masters/template.rb d9a3cd8d906493c9a14ce5fdcde04710c594292f
+app/concepts/masters/json_builder.rb 9ee49ec57d6860ab8d6c76fcd7375b4435fe6ced
+app/concepts/masters/synchronizer.rb c6e7ba8403d0a52ebacfe3b613d162ffe713f718
+app/concepts/masters/entity/record.rb 300281fdad18754b8c529ef6581d7bd4e5be5fdb
+app/concepts/masters/entity/schema.rb 796dbd14f307856c66019c0e1feaa4114ec5347b
+app/concepts/masters/entity/filters.rb 56729716ad6be9ce8261493b528c844679d57503
+app/concepts/masters/entity/exposure.rb ed29a1fa17583764c76853933d6d8de4154f8e43
+app/concepts/masters/entity/registry.rb 8acbe2b23cd9ebdc8835a3e985add8a4f9668c8e

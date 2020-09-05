@@ -300,6 +300,9 @@ group :development do
   # gem "lol_dba"
 end
 
+gem 'yard', '~> 0.9'
+gem 'rdoc', '~> 6.2'
+
 
 # gem 'backup'
 

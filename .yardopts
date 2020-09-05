@@ -1,0 +1,3 @@
+app/concepts/masters/**/*.rb
+
+--output guides
