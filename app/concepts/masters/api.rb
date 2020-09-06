@@ -1,7 +1,7 @@
 # Masters::API is the base class which provides the DSL for defining system masters
 #
 # === Example
-# Reference is from {Masters::Categories::Master}
+# Reference is from {Masters::Categories::Master} for Model {Models::Category}
 #   class Masters::Categories::Master < Masters::API
 #
 #     model Category
@@ -40,7 +40,10 @@ class Masters::API
     @name ||= model&.name
   end
 
-  # Creates an instance of {MasterSchema}.
+  # Creates an instance of {MasterSchema}. This instance will not be directly persisted to the database but
+  # used as a template which will be used by the {Masters::Synchronizer} for seeding this template to every company
+  #
+  # === Validation
   # The instance of {MasterSchema} is validated using {Masters::Schema::Contract}.
   #
   # @raise [RuntimeError] if the contract validation fails
@@ -49,7 +52,9 @@ class Masters::API
   #   This will not override +table_name+, +model+, +klass_name+ and +system_master+ attributes.
   #
   # @param [Proc] block will be executed in the context of the instance of the MasterSchema.
-  #   This is used for building the associated +entities+ (MasterEntity) in the {MasterSchema}
+  #   This is used for building the associated +entities+ (MasterEntity) in the {MasterSchema}'
+  #
+  # @return [MasterSchema]
   def self.schema(args = {}, &block)
     raise "Model not defined" if model.blank?
 

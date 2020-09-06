@@ -762,6 +762,8 @@ GEM
     xpath (3.2.0)
       nokogiri (~> 1.8)
     yard (0.9.25)
+    yard-activerecord (0.0.16)
+      yard (>= 0.8.3)
     zip-zip (0.3)
       rubyzip (>= 1.0.0)
     zxcvbn-js (4.4.3)
@@ -929,6 +931,7 @@ DEPENDENCIES
   wkhtmltopdf-binary (= 0.12.5)
   write_xlsx (~> 0.85.6)
   yard (~> 0.9)
+  yard-activerecord
 
 RUBY VERSION
    ruby 2.7.1p83
