@@ -1,3 +1,4 @@
+# Configuration for Synchronization of Simple Masters using Templates::API
 class Masters::Template < Templates::API
 
   root do
@@ -19,6 +20,9 @@ class Masters::Template < Templates::API
         set :master_schema, builder_context.root_record
       end
 
+      # Since choices does not have finder or matcher defined,
+      # it will not support differential sync.
+      # It will only be generated when the entity is created
       association :choices do
         clone do |ch_builder_context|
           set :company_id, ch_builder_context.params[:company_id]

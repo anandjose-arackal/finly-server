@@ -1,6 +1,12 @@
 module Masters::Entity::Exposure
   include ActiveSupport::Concern
 
+  # Creates a new Anonymous Exposure for the {Models::MasterSchema}
+  #
+  # @example
+  #   MasterSchema.first.record_exposure_class
+  #
+  # @return [Class] Exposure Class for the {Models::MasterSchema}
   def record_exposure_class
     if @record_exposure_class.present?
       return @record_exposure_class

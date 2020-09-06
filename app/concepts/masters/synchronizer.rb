@@ -1,3 +1,10 @@
+# Synchronizer is responsible for seeding the system masters (defined using DSL) for every company.
+# This internally uses the Templates::API.
+# This allows differential synchronization where only the newly added fields/masters
+# will be synchronized for every company.
+#
+# Everytime a new master is added, or the entities have changed you should
+# run the Synchronizer in a migration by calling Masters::Synchronizer.()
 class Masters::Synchronizer
 
   def self.call
