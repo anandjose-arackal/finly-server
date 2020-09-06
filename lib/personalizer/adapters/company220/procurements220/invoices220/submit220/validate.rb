@@ -21,13 +21,22 @@ class Personalizer::Adapters::Company220::Procurements220::Invoices220::Submit22
     # adding logic for checking if budget is being exceeded
     if self.invoice.procurement&.non_po_procurement?
       budget_exceeded = false
-      sleep 0.5   # NOTE: There is a race condition between updating accessing total_consumed_amount value
       self.budgets.each do |budget|
         budget_criteria = budget.budget_group_criterium
         budget_amount = budget.budget_consumption&.budget_amount&.value
         budget_spent_amount = budget.budget_consumption&.total_consumed_amount&.value
 
         spent_amount = budget_spent_amount
+
+        if budget.purchase_order || budget.invoice
+          op = BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer.({budget: budget, current_user: User.first, calculate_buckets: false, calculate_trail_items: true})
+
+          if budget.calculated_before_tax_amount
+            spent_amount += op['result'][:budget_trails].where(entity: invoice.items).sum('billed_amount_before_tax_value')
+          else
+            spent_amount += op['result'][:budget_trails].where(entity: invoice.items).sum('billed_amount_after_tax_value')
+          end
+        end
 
         if spent_amount > budget_amount or budget_amount == 0
           budget_exceeded = false
