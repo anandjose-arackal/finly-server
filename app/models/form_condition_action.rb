@@ -24,7 +24,8 @@ class FormConditionAction < ApplicationRecord
   def as_json(options={})
     {
         property: property,
-        value: value
+        value: value,
+        id: id,
     }
   end
 end
