@@ -102,7 +102,7 @@ class PurchaseOrderStatus < ApplicationRecord
   def self.status_ids_for_pending_bucket
     [
         # PurchaseOrderStatus.id_for(:open),
-        PurchaseOrderStatus.id_for(:retracted),
+        # PurchaseOrderStatus.id_for(:retracted),
         PurchaseOrderStatus.id_for(:processing)
     ]
   end
