@@ -88,6 +88,7 @@ class FormEntityValidation < ApplicationRecord
     end
     form_entity.as_json(json_format: "form_reference").merge(
         {
+            id: id,
             error_message: error_message,
             rule: rule,
         }

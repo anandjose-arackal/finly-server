@@ -75,6 +75,7 @@ class FormCondition < ApplicationRecord
     end
     referencable.as_json(json_format: "form_reference").merge(
         {
+            id: id,
             rule: rule,
             actions: actions
         }
