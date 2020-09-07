@@ -9,7 +9,7 @@ Rails.application.config.assets.version = '1.0'
 Rails.application.config.assets.paths << Rails.root.join('node_modules')
 
 # todo Commented during migration from Rails 4.2 to Rails 5.2
-# Rails.application.config.assets.precompile += %w( application_static.css application_static.js application_backbone.js application_backbone.css manifests/pdf/paginated_bootstrap.css )
+#Rails.application.config.assets.precompile += %w( application_static.css application_static.js application_backbone.js application_backbone.css manifests/pdf/paginated_bootstrap.css )
 
 # Precompile additional assets.
 # application.js, application.css, and all non-JS/CSS in the app/assets
