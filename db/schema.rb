@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_01_091949) do
+ActiveRecord::Schema.define(version: 2020_09_04_063401) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -8931,6 +8931,7 @@ ActiveRecord::Schema.define(version: 2020_08_01_091949) do
     t.integer "version_id"
     t.string "foreign_key_name", null: false
     t.integer "foreign_key_id"
+    t.string "foreign_type"
     t.index ["foreign_key_name", "foreign_key_id"], name: "index_version_associations_on_foreign_key"
     t.index ["version_id"], name: "index_version_associations_on_version_id"
   end
@@ -8943,6 +8944,9 @@ ActiveRecord::Schema.define(version: 2020_08_01_091949) do
     t.text "object", limit: 4294967295
     t.datetime "created_at", precision: 6
     t.integer "transaction_id"
+    t.string "user_ip"
+    t.string "user_agent"
+    t.text "object_changes"
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
     t.index ["transaction_id"], name: "index_versions_on_transaction_id"
   end
