@@ -16,4 +16,8 @@ class ExportTemplatesController < BaseControllers::WebBase
   def show
     endpoint Masters::ExportTemplates::Ops::Show
   end
+
+  def default
+    endpoint Masters::ExportTemplates::Ops::Default
+  end
 end

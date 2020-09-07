@@ -4334,6 +4334,7 @@ Rails.application.routes.draw do
 
   resources :export_templates do
   end
+  get 'export_templates/default/:resource', to: 'export_templates#default'
 
   resources :export_formats do
   end

@@ -10,4 +10,8 @@ class Masters::ExportTemplates::Policy < ApplicationPolicy
   def update?
     @record.created_by == @user
   end
+
+  def default?
+    true
+  end
 end
