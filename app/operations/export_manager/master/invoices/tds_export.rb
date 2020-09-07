@@ -7,11 +7,11 @@ class ExportManager::Master::Invoices::TdsExport < ExportManager::Builders::Temp
   subscribe 'invoices'
   default true
 
-  query {
-    "qs": {
-      "invoice_status_id_eq_any": InwardInvoiceStatus.ids_for(%i[partially_paid paid])
+  query Hash({
+    qs: {
+      invoice_status_id_eq_any: InwardInvoiceStatus.ids_for(%i[partially_paid paid])
     }
-  }
+  })
 
   attribute :invoice_number, template: '{{ record.invoice_number }}'
   attribute :finly_ref_no, template: '{{ record.invoice_id }}'
