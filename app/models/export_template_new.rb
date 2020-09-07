@@ -20,7 +20,7 @@
 
 class ExportTemplateNew < ApplicationRecord
   belongs_to :company
-  belongs_to :created_by, class_name: 'User'
+  belongs_to :created_by, class_name: 'User', optional: true
 
   has_many :role_mappings, class_name: 'ExportTemplateUserRoleMapping', foreign_key: 'template_id', dependent: :destroy
   has_many :user_roles, through: :role_mappings, dependent: :destroy
