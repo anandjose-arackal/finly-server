@@ -625,9 +625,20 @@ class ExportTemplateNew < ApplicationRecord
   ].freeze
 
   def self.seed_data
+    # TODO: remove this method in favor of new method
     Company.find_each do |company|
       DEFAULT_TEMPLATES.each do |template|
         ExportTemplateNew.create! template.merge(company_id: company.id, created_by_id: 1)
+      end
+    end
+  end
+
+  def self.seed_data2
+    Company.find_each do |company|
+      ExportManager::TemplateMaster.subscribers.each do |_, list|
+        list.each do |master|
+          ExportTemplateNew.create!(**master.build, company_id: company.id)
+        end
       end
     end
   end
