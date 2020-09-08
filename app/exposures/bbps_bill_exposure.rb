@@ -39,6 +39,9 @@ class BbpsBillExposure < Exposures::API
   attribute :awaiting_approval, record_attribute: :awaiting_approval?
   attribute :get_reviewers, record_attribute: :get_reviewers
   attribute :amount, record_attribute: true, exposure: true, includes: [:amount]
+  attribute :late_payment_fee, record_attribute: true, exposure: true, includes: [:late_payment_fee]
+  attribute :early_payment_fee, record_attribute: true, exposure: true, includes: [:early_payment_fee]
+  attribute :convenience_fee, record_attribute: true, exposure: true, includes: [:convenience_fee]
   attribute :early_payment_fee_selected, record_attribute: true
   attribute :late_payment_fee_selected, record_attribute: true
   attribute :convenience_fee_selected, record_attribute: true
