@@ -637,7 +637,10 @@ class ExportTemplateNew < ApplicationRecord
     Company.find_each do |company|
       ExportManager::TemplateMaster.subscribers.each do |_, list|
         list.each do |master|
-          ExportTemplateNew.create!(**master.build, company_id: company.id)
+          existing_template = ExportTemplateNew.where(master: master.to_s, company_id: company.id).first
+          unless existing_template.present?
+            ExportTemplateNew.create!(**master.build, company_id: company.id)
+          end
         end
       end
     end
