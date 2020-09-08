@@ -3651,6 +3651,7 @@ ActiveRecord::Schema.define(version: 2020_09_01_052141) do
     t.boolean "include_custom_fields", default: false
     t.boolean "default", default: false
     t.boolean "modified", default: false
+    t.string "master"
     t.index ["active"], name: "index_export_template_news_on_active"
     t.index ["company_id"], name: "index_export_template_news_on_company_id"
     t.index ["created_by_id"], name: "index_export_template_news_on_created_by_id"

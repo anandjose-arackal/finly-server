@@ -12,6 +12,10 @@ class ExportManager::Builders::Template
   class_attr :default, default: false
   class_attr :query, default: {}
 
+  def self.master
+    self.to_s
+  end
+
   def self.build
     {
       name: label,
@@ -25,13 +29,14 @@ class ExportManager::Builders::Template
       }),
       query: JSON.generate(query),
       default: default,
+      master: master,
     }
   end
 
   def self.update_template!
     Company.find_each do |company|
-      ExportTemplateNew.where(company_id: company.id, name: label, modified: false).find_each do |export_template|
-        export_template.update(**build, company_id: company.id)
+      ExportTemplateNew.where(company_id: company.id, master: master, modified: false).find_each do |export_template|
+        export_template.update(**build)
       end
     end
   end
