@@ -45,9 +45,7 @@ class Docs::P2P::Invoices::Form < Forms::API
     # text :name, editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.gstin}}')
     # text :gstin, editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.name}}')
     large_text :billing_address, computed: Forms::Compute::Lookup('location_id', '{{record.address}}')
-  end
 
-  section :ship_to do
     lookup :delivery_location_id, label: 'Shipping Address', choices_scope: Choices[:lookup].('locations'),
            filters: Rules::Builder['shippable_location'].true, required: true
     # text :name, editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.gstin}}')
