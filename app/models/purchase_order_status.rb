@@ -128,6 +128,14 @@ class PurchaseOrderStatus < ApplicationRecord
     ]
   end
 
+  # Status IDs for budget trails which are not calculated into budgets
+  def self.status_ids_for_unbudgetables
+    [
+        PurchaseOrderStatus.id_for(:open),
+        PurchaseOrderStatus.id_for(:retracted),
+    ]
+  end
+
   def self.status_ids_for_grn_addable
     [
         PurchaseOrderStatus.id_for(:approved),

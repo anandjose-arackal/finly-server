@@ -114,6 +114,15 @@ class InwardInvoiceStatus < ApplicationRecord
     ]
   end
 
+  # Status IDs for budget trails which are not calculated into budgets
+  def self.status_ids_for_unbudgetables
+    [
+        InwardInvoiceStatus.id_for(:open),
+        InwardInvoiceStatus.id_for(:rejected),
+        InwardInvoiceStatus.id_for(:retracted)
+    ]
+  end
+
   def voided?
     self.id == InwardInvoiceStatus.id_for(:voided)
   end
