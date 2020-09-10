@@ -36,7 +36,7 @@ class FormCustomField < ApplicationRecord
     when 'multiselect'
       selections.map(&:form_entity_choice).map(&:name)
     when 'attachment'
-      attachments.map(&:attachment) if self.persisted?
+      attachments.as_json if self.persisted?
     else
       super()
     end

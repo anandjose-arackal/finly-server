@@ -18,7 +18,7 @@ class CustomFieldAttachment < ApplicationRecord
 
   include Attachable
 
-  belongs_to :form_custom_field
+  belongs_to :form_custom_field, optional: true
 
   CONTENT_TYPES = {content_type: []}
 
