@@ -41,7 +41,7 @@ class Admin::Payments::StatusCheck < Admin::Payments::Base
       YesBankTransactionStatusCheck.perform(reference_resources, company)
     end
     else
-
+      #do nothing..
     end
     # "#{reference_resource_type}StatusCheck".perform(reference_resources, company)
     sleep 3
