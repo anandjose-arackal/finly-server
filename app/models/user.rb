@@ -1772,6 +1772,10 @@ class User < ApplicationRecord
     false
   end
 
+  def feature_toggle
+    @feature_toggle ||= FeatureToggle.new(self)
+  end
+
   def active?
     active and not default_password and first_name.present? and last_name.present?
   end
