@@ -39,8 +39,8 @@ class Admin::Payments::StatusCheck < Admin::Payments::Base
       KotakBankTransactionStatusCheck.perform(reference_resources, company)
     when 'YesBankTransaction'
       YesBankTransactionStatusCheck.perform(reference_resources, company)
-    end
     else
+      nil
       #do nothing..
     end
     # "#{reference_resource_type}StatusCheck".perform(reference_resources, company)
