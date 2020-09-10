@@ -36,6 +36,7 @@ json.cards do
 
 
     card = card_hash[:card]
+    json.current_card_id card.id if card.card_status_id == CardStatus.id_for(:assign_requested)
     json.configurable_restrictions card.card_program.spend_restrictions
     if card.card_program.spend_restrictions
       json.restrictions do
