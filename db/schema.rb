@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_30_175252) do
+ActiveRecord::Schema.define(version: 2020_09_06_193417) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3972,8 +3972,8 @@ ActiveRecord::Schema.define(version: 2020_08_30_175252) do
     t.boolean "is_updated"
     t.boolean "can_be_updated"
     t.text "rule"
-    t.string "referencable_id", null: false
-    t.string "referencable_type", null: false
+    t.string "referencable_id"
+    t.string "referencable_type"
     t.index ["company_id"], name: "index_form_conditions_on_company_id"
     t.index ["created_at"], name: "index_form_conditions_on_created_at"
     t.index ["created_by_id"], name: "index_form_conditions_on_created_by_id"

@@ -29,8 +29,8 @@ class GstinLocation < ApplicationRecord
   belongs_to :state, class_name: "GstStateCode", optional: true
 
   # validates :location, presence: true
-  # validates :state_id, presence: true, if: :check_vendor_gstin_registered?
-  # validates :gstin, format: Constants::VALID_GSTIN, length: {is: 15}, allow_blank: true
+  validates :state_id, presence: true, if: :check_vendor_gstin_registered?
+  validates :gstin, format: Constants::VALID_GSTIN, length: {is: 15}, allow_blank: true
 
   def state_code
     self.state&.state_code
