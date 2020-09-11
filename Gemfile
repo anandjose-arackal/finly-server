@@ -257,6 +257,7 @@ group :development, :test do
   gem 'capistrano-rbenv', '~> 2.1.4'
   gem 'capistrano-crono', '~> 0.1.2'
   gem 'capistrano-sidekiq', '~> 1.0.2'
+  gem 'capistrano-hutch', '~> 0.1'
   # gem 'capistrano-sneakers', github: 'inventionlabsSydney/capistrano-sneakers'
   gem 'capistrano-rails-console', '~> 2.3.0', require: false
   gem 'hirb', '~> 0.7.3'
