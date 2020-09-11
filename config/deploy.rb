@@ -158,7 +158,6 @@ set :slackistrano, {
 
 before "deploy:assets:precompile", "deploy:yarn_install"
 
-before "deploy:assets:precompile", "deploy:webpacker_install"
 
 namespace :deploy do
   desc 'Run rake yarn:install'
@@ -166,15 +165,6 @@ namespace :deploy do
     on roles(:web) do
       within release_path do
         execute("cd #{release_path} && yarn install")
-      end
-    end
-  end
-
-  desc 'Run rake webpacker:install'
-  task :webpacker_install do
-    on roles(:web) do
-      within release_path do
-        execute("cd #{release_path} && rails webpacker:install")
       end
     end
   end
