@@ -18,5 +18,6 @@ Loader.watch! "Routes Loader" do
 end
 
 Loader.watch! "Bullet Train" do
-  BULLET_TRAIN = BulletTrain.new(api_key: 'MfYrnHH2JPtrvAz6HLDZdR', url: 'https://control-panel.finly.io/api/v1/')
+  config = Rails.application.config_for(:feature_flipper)
+  BULLET_TRAIN = BulletTrain.new(api_key: config['api_key'], url: config['url'])
 end
