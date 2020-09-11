@@ -24,6 +24,10 @@ class FeatureToggle
     flag[:value]
   end
 
+  def incr_counter(trait)
+    BULLET_TRAIN&.incr_counter user.id, trait
+  end
+
   def set_trait(trait, value)
     BULLET_TRAIN&.set_trait user.id, trait, value
   end

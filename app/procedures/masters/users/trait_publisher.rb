@@ -21,7 +21,7 @@ module Masters
           end
         end
 
-        def work(u, payload)
+        def work(current_user, payload)
           company = payload[:record]
           return if IGNORE_LIST.include?(company.id)
           return if BULLET_TRAIN.nil?
@@ -72,6 +72,7 @@ module Masters
           BULLET_TRAIN.set_trait user.id, 'verified', !!user.verified
           BULLET_TRAIN.set_trait user.id, 'has_set_password', !!user.default_password
           BULLET_TRAIN.set_trait user.id, 'point_of_contact', !!user.point_of_contact
+          BULLET_TRAIN.set_trait user.id, 'otp_verified', !!user.otp_verified
           BULLET_TRAIN.set_trait user.id, 'deleted_at', user.deleted_at unless user.deleted_at.nil?
 
           true
@@ -105,7 +106,7 @@ module Masters
           end
         end
 
-        def work(u, payload)
+        def work(current_user, payload)
           return if BULLET_TRAIN.nil?
 
           role_mapping = payload[:record]
@@ -115,6 +116,33 @@ module Masters
           # Role is assigned to the user if the deleted_at flag is set
           assigned = role_mapping.deleted_at.nil?
           BULLET_TRAIN.set_trait user.id, "permission_#{role_mapping.user_role.name}", assigned
+        end
+      end
+
+      class UserSessionTracker
+        include Events::Consumer
+
+        consumes_event! 'user_sessions.create'
+
+        def self.refresh(changed_since)
+          return if changed_since.nil?
+          return if BULLET_TRAIN.nil?
+
+          User.where('updated_at > ?', changed_since)
+              .where(company_id: 2)
+              .where.not(company_id: Masters::Users::TraitPublisher::IGNORE_LIST)
+              .find_in_batches do |batch|
+            UserSession.where(user_id: batch.pluck(:id)).group(:user_id).count.each do |user_id, count|
+              BULLET_TRAIN.set_trait user_id, 'user_sessions', count
+            end
+          end
+        end
+
+        def work(current_user, payload)
+          user_session = payload[:record]
+          return if user_session.blank?
+
+          BULLET_TRAIN.incr_counter user.id, 'user_sessions'
         end
       end
 
@@ -132,6 +160,9 @@ module Masters
 
           # Set role traits for all users
           Masters::Users::TraitPublisher::UserRoleHandler.refresh(timeframe)
+
+          # Track user logins / sessions
+          Masters::Users::TraitPublisher::UserSessionTracker.refresh(timeframe)
         end
 
       end

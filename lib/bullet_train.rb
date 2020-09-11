@@ -49,8 +49,8 @@ class BulletTrain
     raise StandardError, 'user_id cannot be nil' if user_id.nil?
 
     trait = {
-        identity:    { identifier: user_id },
-        trait_key:   normalize_key(trait),
+        identity: {identifier: user_id},
+        trait_key: normalize_key(trait),
         trait_value: value
     }
     res = @bt_api.post('traits/', trait.to_json)
@@ -64,6 +64,18 @@ class BulletTrain
     traits_to_hash(res.body)
   end
 
+  def incr_counter(user_id, trait, incr_by = 1)
+    raise StandardError, 'user_id cannot be nil' if user_id.nil?
+
+    trait = {
+        identifier: user_id,
+        trait_key: normalize_key(trait),
+        increment_by: incr_by
+    }
+    res = @bt_api.post('traits/increment-value/', trait.to_json)
+    res.body
+  end
+
   # def remove_trait(user_id, trait_id)
   #   # Request URL: https://api.bullet-train.io/api/v1/environments/API_KEY/identities/12345/traits/54321/
   #   # Request Method: DELETE
@@ -72,9 +84,9 @@ class BulletTrain
   def transform_flags(flags)
     flags.map do |flag|
       {
-          name:    flag['feature']['name'],
+          name: flag['feature']['name'],
           enabled: flag['enabled'],
-          value:   flag['feature_state_value'],
+          value: flag['feature_state_value'],
           segment: flag['feature_segment']
       }
     end
@@ -103,7 +115,7 @@ class BulletTrain
   end
 
   def determine_opts(opts)
-    opts = { api_key: opts } if opts.is_a? String
+    opts = {api_key: opts} if opts.is_a? String
 
     {
         api_key: opts[:api_key] || self.class.api_key,
