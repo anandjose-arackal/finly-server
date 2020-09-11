@@ -70,8 +70,6 @@ class User < ApplicationRecord
   include EventProducer
   include ErpSyncable
 
-  event_channel 'user'
-
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
 

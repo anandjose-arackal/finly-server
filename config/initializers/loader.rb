@@ -14,5 +14,9 @@ Loader.watch! "Routes Loader" do
   Routers::Registry.routers.each do |router|
     router.clear_map
   end
-  Dir.glob(Rails.root.join("app/routes/**/*.rb")).each {|f| load f}
+  Dir.glob(Rails.root.join("app/routes/**/*.rb")).each { |f| load f }
+end
+
+Loader.watch! "Bullet Train" do
+  BULLET_TRAIN = BulletTrain.new(api_key: 'MfYrnHH2JPtrvAz6HLDZdR', url: 'https://control-panel.finly.io/api/v1/')
 end

@@ -56,6 +56,7 @@ class Events::Publisher
         return
       end
 
+      puts "New event #{routing_key}"
       # Publish to all consumers
       Hutch.publish(
           routing_key,
