@@ -70,6 +70,10 @@ class User < ApplicationRecord
   include EventProducer
   include ErpSyncable
 
+  ACTIVE = 1
+  PENDING = 2
+  INACTIVE = 3
+
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
 
