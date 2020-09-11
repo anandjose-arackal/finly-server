@@ -2933,8 +2933,9 @@ Rails.application.routes.draw do
     get 'temp_import', to: 'users#temp_import'
     resources :expenses
     resources :cards do
-      patch 'block', to: 'cards#block', as: :block
+      patch 'block', to: 'cards#block', as: :block 
     end
+    post 'cards/new_card_activate', to: 'cards#new_card_activate', as: :new_card_activate
     post 'import_cards', to: 'cards#import', as: :import_cards
     namespace :kyc do
       resources :companies do
