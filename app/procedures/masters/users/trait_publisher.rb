@@ -14,6 +14,8 @@ module Masters
         consumes_event! 'companies.*'
 
         def self.refresh(changed_since)
+          return if BULLET_TRAIN.nil?
+
           Company.where('updated_at > ?', changed_since).all.each do |c|
             new.work(nil, record: c)
           end
@@ -22,6 +24,7 @@ module Masters
         def work(u, payload)
           company = payload[:record]
           return if IGNORE_LIST.include?(company.id)
+          return if BULLET_TRAIN.nil?
 
           company.users.where.not(company_id: Masters::Users::TraitPublisher::IGNORE_LIST).find_each do |user|
             BULLET_TRAIN.set_trait user.id, "company_id", company.id if company.id.present?
@@ -46,6 +49,7 @@ module Masters
 
         def self.refresh(changed_since)
           return if changed_since.nil?
+          return if BULLET_TRAIN.nil?
 
           User.where('updated_at > ?', changed_since)
               .where.not(company_id: Masters::Users::TraitPublisher::IGNORE_LIST)
@@ -55,6 +59,8 @@ module Masters
         end
 
         def work(current_user, payload)
+          return if BULLET_TRAIN.nil?
+
           user = payload[:record]
           return if Masters::Users::TraitPublisher::IGNORE_LIST.include?(user.company_id)
 
@@ -80,6 +86,7 @@ module Masters
 
         def self.refresh(changed_since)
           return if changed_since.nil?
+          return if BULLET_TRAIN.nil?
 
           UserRoleMapping.where('user_role_mappings.updated_at > ?', changed_since)
               .includes(:user, :user_role)
@@ -99,6 +106,8 @@ module Masters
         end
 
         def work(u, payload)
+          return if BULLET_TRAIN.nil?
+
           role_mapping = payload[:record]
           return if IGNORE_LIST.include?(role_mapping.user.company_id)
           return if role_mapping.user_role&.name.blank?
@@ -112,6 +121,8 @@ module Masters
       class RefreshUserTraits
 
         def self.call
+          return if BULLET_TRAIN.nil?
+
           timeframe = 10.years.ago
           # Set company specific traits for all users
           Masters::Users::TraitPublisher::CompanyHandler.refresh(timeframe)

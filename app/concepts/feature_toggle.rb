@@ -7,7 +7,7 @@ class FeatureToggle
   end
 
   def flags
-    @flags ||= BULLET_TRAIN.get_flags(user.id)
+    @flags ||= BULLET_TRAIN&.get_flags(user.id)
   end
 
   def enabled?(feature, default = false)
@@ -25,7 +25,7 @@ class FeatureToggle
   end
 
   def set_trait(trait, value)
-    BULLET_TRAIN.set_trait user.id, trait, value
+    BULLET_TRAIN&.set_trait user.id, trait, value
   end
 
   def normalize_key(key)
