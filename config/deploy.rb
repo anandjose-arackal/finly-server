@@ -158,7 +158,7 @@ set :slackistrano, {
 
 before "deploy:assets:precompile", "deploy:yarn_install"
 
-after "deploy:bundle:updated", "deploy:webpacker_install"
+after "deploy:updated", "deploy:webpacker_install"
 
 namespace :deploy do
   desc 'Run rake yarn:install'
