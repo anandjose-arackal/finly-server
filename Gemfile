@@ -299,7 +299,6 @@ group :development do
   # gem "lol_dba"
 end
 gem 'sneakers', '~> 2.12'
-gem "webpacker"
 
 # gem 'backup'
 
