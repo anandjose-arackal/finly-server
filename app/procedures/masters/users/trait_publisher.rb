@@ -9,9 +9,9 @@ module Masters
       ]
 
       class CompanyHandler
-        include Events::Consumer
+        # include Events::Consumer
 
-        consumes_event! 'companies.*'
+        # consumes_event! 'companies.*'
 
         def self.refresh(changed_since)
           return if BULLET_TRAIN.nil?
@@ -43,9 +43,9 @@ module Masters
 
       # Updates the user and user profile attributes by using the +users.create+ and +users.update+ hooks.
       class UserHandler
-        include Events::Consumer
+        # include Events::Consumer
 
-        consumes_event! 'users.*'
+        # consumes_event! 'users.*'
 
         def self.refresh(changed_since)
           return if changed_since.nil?
@@ -81,9 +81,9 @@ module Masters
 
       # For capturing user permissions and roles
       class UserRoleHandler
-        include Events::Consumer
+        # include Events::Consumer
 
-        consumes_event! 'user_role_mappings.*', 'policy_user_roles.*'
+        # consumes_event! 'user_role_mappings.*', 'policy_user_roles.*'
 
         def self.refresh(changed_since)
           return if changed_since.nil?
@@ -120,9 +120,9 @@ module Masters
       end
 
       class UserSessionTracker
-        include Events::Consumer
+        # include Events::Consumer
 
-        consumes_event! 'user_sessions.create'
+        # consumes_event! 'user_sessions.create'
 
         def self.refresh(changed_since)
           return if changed_since.nil?
