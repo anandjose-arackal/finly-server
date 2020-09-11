@@ -13,15 +13,14 @@ class Admin::Payments::StatusCheck < Admin::Payments::Base
     payment_id = params[:id] || params[:payment_id]
     company_id = params[:company_id]
     self.payment = Payment.find_by(id: payment_id, company_id: company_id )
-    self.reference_resource_type = payment.reference_resource_type
-  end
-
-  def validation
     if payment.blank?
         add_message :error, "Cannot find the Payment"
       return
     end
+    self.reference_resource_type = payment.reference_resource_type
+  end
 
+  def validation
     unless ['IciciBankTransaction', 'KotakBankTransaction', 'YesBankTransaction'].include?(reference_resource_type)
       add_message :error, "Please specify correct payment type."
       return
@@ -43,7 +42,6 @@ class Admin::Payments::StatusCheck < Admin::Payments::Base
       nil
       #do nothing..
     end
-    # "#{reference_resource_type}StatusCheck".perform(reference_resources, company)
     sleep 3
   end
 
