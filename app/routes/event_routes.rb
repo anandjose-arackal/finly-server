@@ -1,23 +1,33 @@
 Events::Router.draw do
 
-  route 'companies.*' do
-    to Masters::Users::TraitPublisher::CompanyHandler
+  scope 'companies' do
+    route '*' do
+      to Masters::Users::TraitPublisher::CompanyHandler
+    end
   end
 
-  route 'users.*' do
-    to Masters::Users::TraitPublisher::UserHandler
+  scope 'users' do
+    route '*' do
+      to Masters::Users::TraitPublisher::UserHandler
+    end
   end
 
-  route 'user_role_mappings.*' do
-    to Masters::Users::TraitPublisher::UserRoleHandler
+  scope 'user_role_mappings' do
+    route '*' do
+      to Masters::Users::TraitPublisher::UserRoleHandler
+    end
   end
 
-  route 'policy_user_roles.*' do
-    to Masters::Users::TraitPublisher::UserRoleHandler
+  scope 'policy_user_roles' do
+    route '*' do
+      to Masters::Users::TraitPublisher::UserRoleHandler
+    end
   end
 
-  route 'user_sessions.create' do
-    to Masters::Users::TraitPublisher::UserSessionTracker
+  scope 'user_sessions' do
+    route 'create' do
+      to Masters::Users::TraitPublisher::UserSessionTracker
+    end
   end
 
   # route 'companies.create' do
