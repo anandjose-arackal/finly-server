@@ -20,7 +20,7 @@ class Admin::Payments::StatusCheck < Admin::Payments::Base
     self.reference_resource_type = payment.reference_resource_type
   end
 
-  def validation
+  def validate
     unless ['IciciBankTransaction', 'KotakBankTransaction', 'YesBankTransaction'].include?(reference_resource_type)
       add_message :error, "Please specify correct payment type."
       return
@@ -29,20 +29,24 @@ class Admin::Payments::StatusCheck < Admin::Payments::Base
 
   def process      
     reference_resources = payment.reference_resources.first
-    reference_resources.update(transfer_status_id: BankTransferStatus.id_for(:pending_for_processing))
+    if reference_resources.present?
+      reference_resources.update(transfer_status_id: BankTransferStatus.id_for(:pending_for_processing))
 
-    case reference_resource_type
-    when 'IciciBankTransaction'
-      IciciBankTransactionStatusCheck.perform(reference_resources, company)
-    when 'KotakBankTransaction'
-      KotakBankTransactionStatusCheck.perform(reference_resources, company)
-    when 'YesBankTransaction'
-      YesBankTransactionStatusCheck.perform(reference_resources, company)
+      case reference_resource_type
+      when 'IciciBankTransaction'
+        IciciStatusChecker.perform()
+      when 'KotakBankTransaction'
+        KotakBankTransferStatusChecker.perform()
+      when 'YesBankTransaction'
+        YesBankStatusChecker.perform()
+      else
+        nil
+        #do nothing..
+      end
+      sleep 3
     else
-      nil
-      #do nothing..
+      add_message :info, "Could not fetch status from bank."
     end
-    sleep 3
   end
 
   def success
