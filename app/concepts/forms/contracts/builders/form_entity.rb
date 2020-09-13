@@ -133,6 +133,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
     properties[:deserializer] = deserializer(entity) unless entity.class.layout?
     populator = entity.populator
     properties[:populator] = populator if populator.present?
+    properties[:default] = entity.default_value if entity.default_value.present?
     properties
   end
 
