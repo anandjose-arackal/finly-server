@@ -15,6 +15,7 @@ Lookup::Router.draw do
   route "tds_slabs", Masters::TdsSlabs::Lookup
   route 'bbps_billers', Docs::UtilityBills::Billers::Lookup
   route 'users', Masters::Users::Lookup
+  route "payment_terms", Masters::PaymentTerms
 
   # Docs
   route 'purchase_requests', Docs::P2P::PurchaseRequests::Lookup

@@ -21,10 +21,12 @@ class FormConditionAction < ApplicationRecord
   belongs_to :form
   belongs_to :form_condition
 
+  TRUTHY_VALUES = ["true", true, 1, "1", "TRUE"]
+
   def as_json(options={})
     {
         property: property,
-        value: value,
+        value: FormConditionAction::TRUTHY_VALUES.include?(value) ? true : false,
         id: id,
     }
   end
