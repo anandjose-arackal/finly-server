@@ -246,6 +246,13 @@ class PurchaseRequest < ApplicationRecord
     }
   end
 
+  def self.awaiting_records user
+    user_id = user.id
+    if user_id.present?
+      where("#{table_name}.purchase_request_status_id": PurchaseRequestStatus.id_for(:awaiting_approval)).awaiting_action_items(user_id)
+    end
+  end
+
   def calculate_total_amount
     self.purchase_request_items.non_rejected.joins(:estimated_amount).pluck(:value)&.flatten&.compact&.sum rescue nil
   end
