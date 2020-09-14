@@ -32,7 +32,7 @@ class Routers::Base
     map.keys
   end
 
-  def self.route(key, *args, options = {}, &block)
+  def self.route(key, *args, options: {}, &block)
     if not allow_multiple_associations? and map(key).present?
       return if args.count == 1 and map(key).first.klass == args.first
 
