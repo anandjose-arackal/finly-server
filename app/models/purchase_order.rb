@@ -742,6 +742,13 @@ class PurchaseOrder < ApplicationRecord
     advance_to_be_processed? || advance_failed?
   end
 
+  def self.awaiting_records user
+    user_id = user.id
+    if user_id.present?
+      where("#{table_name}.purchase_order_status_id": PurchaseOrderStatus.id_for(:processing)).awaiting_action_items(user_id)
+    end
+  end
+
   def advance_amount_status_empty
     self.advance_amount_status.blank?
   end
