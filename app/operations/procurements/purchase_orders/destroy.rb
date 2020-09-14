@@ -20,14 +20,12 @@ class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
         self.po_previous_status = PurchaseOrderStatus.id_for(:vendor_confirmed)
       end
     end
-        
-        
-
   end
 
   def validate
     unless PurchaseOrderStatus.ids_for([:open, :retracted, :rejected]).include? purchase_order.status.id
       add_message :error, "You can't delete purchase order at this state."
+      return
     end
   end
 
@@ -106,7 +104,7 @@ class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
     if self.procurement.po_revisions.present? && (self.procurement.po_revisions.count > 1)
       ps = self.procurement.reload.po_revisions[-2].trails.where(action_id: [TrailAction.id_for(:approve), TrailAction.id_for(:auto_approve), TrailAction.id_for(:send_to_vendor), TrailAction.id_for(:vendor_confirmed)])
     else
-      ps = self.procurement.reload.purchase_order.trails.where(action_id: [TrailAction.id_for(:approve), TrailAction.id_for(:auto_approve), TrailAction.id_for(:send_to_vendor), TrailAction.id_for(:vendor_confirmed)])
+      ps = self.procurement.reload.po_revisions.last.trails.where(action_id: [TrailAction.id_for(:approve), TrailAction.id_for(:auto_approve), TrailAction.id_for(:send_to_vendor), TrailAction.id_for(:vendor_confirmed)])
     end
     ps.last.action_id
   end
