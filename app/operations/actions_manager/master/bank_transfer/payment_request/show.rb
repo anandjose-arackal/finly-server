@@ -36,7 +36,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
         return true
       end
 
-      if (bank_payment_request.approved? || bank_payment_request.auto_approved?) && !bank_payment_request.credited? && !bank_payment_request.open? && !bank_payment_request.rejected? && !bank_payment_request.retracted?
+      if (bank_payment_request.approved? || bank_payment_request.auto_approved? || bank_payment_request.failed? ) && !bank_payment_request.credited? && !bank_payment_request.open? && !bank_payment_request.rejected? && !bank_payment_request.retracted?
         return true
       end
     end
@@ -79,7 +79,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     # end
 
     if bank_payment_request.is_crediting_user? && !bank_payment_request.open? && !bank_payment_request.retracted? && !bank_payment_request.rejected?
-      if bank_payment_request.document_role_users(:creditor).include?(user) && (!bank_payment_request.credited? || bank_payment_request.payment_order.partially_completed?) && bank_payment_request.approved?
+      if bank_payment_request.document_role_users(:creditor).include?(user) && (!bank_payment_request.credited? || bank_payment_request.payment_order.partially_completed?) && ( bank_payment_request.approved? || bank_payment_request.failed? )
         if !bank_payment_request.credit_card?
           return true
         end

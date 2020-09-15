@@ -58,8 +58,8 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
         self.result_array[index] << "This payment was not found."
         next
       end
-      unless payment.completed?
-        self.result_array[index] << "Only completed payments can have an attached UTR"
+      unless payment.completed? || payment.failed?
+        self.result_array[index] << "Only completed or failed payments can have an attached UTR"
         next
       end
       if payment.reference_resources.present? && payment.utr.present?
