@@ -136,7 +136,7 @@ class Docs::UtilityBills::Bills::Index < IndexBuilder::API
     )
 
     if user.has_permission?(awaiting_approval_roles)
-      counter.add 91, 'Awaiting Approval', collection.awaiting_action_items(user.id).count
+      counter.add 91, 'Awaiting Approval', collection.with_status_id(91).awaiting_action_items(user.id).count
     end
 
     # Processing
