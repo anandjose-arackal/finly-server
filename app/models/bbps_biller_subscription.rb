@@ -289,6 +289,11 @@ class BbpsBillerSubscription < ApplicationRecord
     end
     parameters.with_indifferent_access
   end
+
+  def self.awaiting_records user
+    where("#{table_name}.status_id": BbpsBillerSubscriptionStatus.id_for(:awaiting_approval)).awaiting_action_items(user&.id)
+  end
+
   # display_name  used  in  payment  file  creation method to  print the  beneficiary name
   def display_name
       self.biller&.biller_name

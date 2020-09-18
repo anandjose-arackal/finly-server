@@ -41,18 +41,13 @@ class Company::Preview < BaseOperation
     messages[:success] = "Thank you for the request! We will contact you soon"
     # trigger mailer acknowledging the preview request.
     DemoMailer.delay.preview_welcome(preview_company)
-    Constants::PRODUCT_DEMO_EMAIL_ID.each do |recipient_email|
-      DemoMailer.delay.notify_preview(preview_company, recipient_email, false)
+    AdminUser.active.admin_panel_not_accessable.each do |admin_user|
+      DemoMailer.delay.notify_preview(preview_company, admin_user.email, true)
     end
 
     if referrer == 'techombay'
       ['chetan.r@techombay.com', 'contactus@techombay.com'].each do |recipient_email|
         DemoMailer.delay.notify_preview(preview_company, recipient_email)
-      end
-    elsif referrer == 'finly'
-      # For testing purpose
-      AdminUser.active.admin_panel_not_accessable.each do |admin_user|
-        DemoMailer.delay.notify_preview(preview_company, admin_user.email, true)
       end
     end
   end

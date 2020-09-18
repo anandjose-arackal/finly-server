@@ -465,6 +465,15 @@ class PaymentAgreement < ApplicationRecord
     end
   end
 
+  def self.awaiting_records user
+    # awaiting approval
+    user_id = user&.id
+    if user_id.present?
+      where("#{table_name}.status_id": PaymentAgreementStatus.id_for(:awaiting_approval)).awaiting_action_items(user_id)
+    else
+      self.none
+    end
+  end
 
   def expiration_date_if_allowed
     if self.no_expiration.blank? && self.expiration_date.blank?
