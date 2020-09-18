@@ -13,6 +13,7 @@ class Admin::Payments::ChangeStatus < Admin::Payments::Base
     payment_id = params[:id] || params[:payment_id]
     company_id = params[:company_id]
     self.payment = Payment.find_by(id: payment_id, company_id: company_id )
+    self.initiating_user = payment.initiating_user
   end
 
   def validate
@@ -37,6 +38,9 @@ class Admin::Payments::ChangeStatus < Admin::Payments::Base
     parent = payment.parent
     if parent.present? && payment.parent_type == 'Invoice'
       parent.(invoice_status_id: InwardInvoiceStatus.id_for(:unpaid), payable: true )
+    elsif parent.present? && payment.parent_type == 'PurchaseOrder'
+      parent_details = initiating_user.company.purchase_orders.find_by(id: self.parent_id)
+      parent_details.update(advance_amount_status_id: AdvanceAmountStatus.id_for(:failed))
     end
   end
 
