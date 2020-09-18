@@ -244,6 +244,9 @@ gem 'whenever'
 gem 'azure'
 gem 'azure-storage-blob'
 
+gem 'money'
+gem 'money-open-exchange-rates'
+
 group :development, :test do
   gem 'byebug'
   gem 'pry', '~> 0.12.2'  
