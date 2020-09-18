@@ -1,6 +1,6 @@
 class Admin::Payments::ChangeStatus < Admin::Payments::Base
 
-  attr_accessor :payment, :company, :reference_resource_type
+  attr_accessor :payment, :company, :reference_resource_type, :initiating_user
 
   def pre_validate
     if params.blank? || params[:payment_id].blank? || user.blank?
