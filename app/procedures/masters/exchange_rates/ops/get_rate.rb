@@ -13,7 +13,7 @@ class Masters::ExchangeRates::Ops::GetRate < Transactions::API
       add_message options, :error, :base, "Invalid to currency code"
       return
     end
-    unless params[:date] && Date.parse(params[:date]) < Date.today
+    unless params[:date] && Date.parse(params[:date]) <= Date.today
       add_message options, :error, :base, "Invalid date. Date should be less than today."
       return
     end

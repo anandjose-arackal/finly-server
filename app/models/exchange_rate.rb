@@ -26,6 +26,13 @@ class ExchangeRate < ApplicationRecord
       return 1.0
     end
 
+    if date == Date.today
+      unless ::LATEST_EXCHANGE_RATES.rates.present?
+        ::LATEST_EXCHANGE_RATES.update_rates
+      end
+      return ::LATEST_EXCHANGE_RATES.get_rate(from_iso_code, to_iso_code)
+    end
+
     if from_iso_code == 'USD'
       rate = find_by(date: date, from: 'USD', to: to_iso_code)
       if rate.present?
