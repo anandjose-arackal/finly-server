@@ -13,7 +13,7 @@
 class ExchangeRate < ApplicationRecord
   def self.populate_rates(date)
     oxr = Money::Bank::OpenExchangeRatesBank.new
-    oxr.app_id = OPEN_EXCHANGE_RATES['api_id']
+    oxr.app_id = OPEN_EXCHANGE_RATES['app_id']
     oxr.date = date.strftime('%Y-%m-%d')
     oxr.update_rates
     oxr.oer_rates.each do |to_currency, rate|
