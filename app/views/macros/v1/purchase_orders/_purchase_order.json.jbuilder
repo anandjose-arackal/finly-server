@@ -28,7 +28,7 @@ json.line_items do
     json.taxable_amount item.taxable_amount&.value
     json.tax_rate item.tax_rate
     json.tax_amount item.tax_amount&.value
-    json.net_amount item.total_amount&.value
+    json.total_amount item.total_amount&.value
   end
 end
 json.attachments do
