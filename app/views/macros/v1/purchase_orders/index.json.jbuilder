@@ -1,7 +1,7 @@
 includes = [
   :vendor, :status, :created_by,
   :policy, :gstin_location, :location, :delivery_location,
-  :user, :balance_amount, procurement: [:status_tags],
+  :user, :balance_amount,
   {
       items: [
           :inventory_line_item, :category, :department, :cost_center, :tax_rate,
