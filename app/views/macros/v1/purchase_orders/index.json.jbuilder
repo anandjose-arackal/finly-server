@@ -1,17 +1,15 @@
 includes = [
     :vendor, :status, :created_by,
-    :policy, :gstin_location, :location, :delivery_location,
+    :policy, :gstin_location, :location, :delivery_location, :attachments,
     {
         items: [
             :inventory_line_item, :category, :department, :cost_center, :tax_rate,
-            {amount: :currency}, {discount_amount: :currency}, {taxable_amount: :currency}, :tax_rate,
-            {tax_amount: :currency}, {net_amount: :currency}
+            {total_amount: :currency}, {discount_amount: :currency}, {taxable_amount: :currency}, :tax_rate,
+            {tax_amount: :currency}, {net_amount: :currency}, (tds_amount: :currency)
         ]
     },
-    # ,
-    # {dlrms: [:level, :action, :action_taken_by]},
+    {dlrms: [:level, :action, :action_taken_by]},
     # {custom_fields: :field_configuration},
-    :attachments
 ]
 
 json.data do

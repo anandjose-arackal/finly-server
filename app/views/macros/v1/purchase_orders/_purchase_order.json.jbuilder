@@ -1,4 +1,4 @@
-json.partial! 'purchase_order', record: record
+json.partial! 'purchase_order_header', record: record
 custom_fields = {}
 record.custom_fields.each do |custom_field|
   custom_fields[custom_field.field_configuration.field_name] = custom_field.configured_field_value
@@ -23,13 +23,12 @@ json.line_items do
     json.unit_of_measurement item.unit_of_measurement
     json.quantity item.quantity
     json.rate item.rate
-    json.gross_amount item.amount&.value
     json.discount item.discount
     json.discount_amount item.discount_amount&.value
     json.taxable_amount item.taxable_amount&.value
     json.tax_rate item.tax_rate
     json.tax_amount item.tax_amount&.value
-    json.net_amount item.net_amount&.value
+    json.net_amount item.total_amount&.value
   end
 end
 json.attachments do
