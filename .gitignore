@@ -27,6 +27,7 @@ config/web_client.yml
 config/icici_prepaid_card.yml
 config/finly_macros.yml
 public/*
+config/feature_flipper.yml
 
 .rubocop.yml
 .vscode/

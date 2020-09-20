@@ -49,6 +49,7 @@ module Rules::Predicates
         JSONLogic.add_operation "#{name}_any", ->(v, d) do
           input = v[0]
           rule_value = v[1]
+          rule_value = [rule_value] unless rule_value.respond_to?(:each)
           rule_value.each do |val|
             return true if block.call([input, val], d)
           end
@@ -59,6 +60,7 @@ module Rules::Predicates
         JSONLogic.add_operation "#{name}_all", ->(v, d) do
           input = v[0]
           rule_value = v[1]
+          rule_value = [rule_value] unless rule_value.respond_to?(:each)
           rule_value.each do |val|
             return false unless block.call([input, val], d)
           end
