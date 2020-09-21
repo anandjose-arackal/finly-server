@@ -188,11 +188,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
 
     def get_reviewal_chain
       op = ::ReviewalManager::ReviewalChain.(user, params)
-      if op.chain.present?
-        op.chain
-      else
-        []
-      end
+      op.chain
     end
 
     def document_owner?
