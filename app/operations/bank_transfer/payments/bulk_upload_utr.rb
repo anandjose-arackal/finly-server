@@ -105,6 +105,9 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
       self.result_array[index] << "Success!"
     end
     update_details
+    all_payments.each do |payment|
+      Payment.update_payment_status payment
+    end
   end
 
   def post_process

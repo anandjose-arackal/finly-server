@@ -930,6 +930,17 @@ class Payment < ApplicationRecord
     end
   end
 
+  def self.update_payment_status payment
+    if payment.failed?
+      payment.update(payment_status_id: PaymentStatus.id_for(:completed))
+      payment.system_messages.create(
+        system_message_type_id: SystemMessageType.id_for(:success), 
+        content: 'Updated to completed via utr upload'
+        )
+      payment.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
+    end
+  end
+
   def payment_request_show_json(document_type)
     {document_type: document_type,
      document_details: get_document_details(document_type),
