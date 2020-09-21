@@ -1,5 +1,0 @@
-staging:
- inbound:
-  ip_address: "0.0.0.0"
-  user_name: "test"
-  password: "test"
