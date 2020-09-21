@@ -37,6 +37,7 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
   def process
     self.new_transactions = []
     self.existing_transactions = []
+    file_payments = []
 
     self.payments_data.each_with_index do |payment_data, index|
       self.result_array << payment_data.values
@@ -66,6 +67,7 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
         self.result_array[index] << "This payment already has an associated UTR"
         next
       end
+      file_payments.push(payment)
       if payment.reference_resources.present? && payment.receiving_account_type == "BankAccount"
         # payment.reference_resource.update(bank_reference_number: utr)
         reference_resource = payment.reference_resources.first
@@ -105,7 +107,7 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
       self.result_array[index] << "Success!"
     end
     update_details
-    all_payments.each do |payment|
+    file_payments.each do |payment|
       Payment.update_payment_status payment
     end
   end
