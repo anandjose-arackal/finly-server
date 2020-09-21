@@ -84,6 +84,14 @@ class BranchLocation < ApplicationRecord
     address
   end
 
+  def gstin
+
+  end
+
+  def pin
+
+  end
+
   # def as_json
   #   {
   #     id: self.id,
