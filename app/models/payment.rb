@@ -933,11 +933,20 @@ class Payment < ApplicationRecord
   def self.update_payment_status payment
     if payment.failed?
       payment.update(payment_status_id: PaymentStatus.id_for(:completed))
+      payment.system_messages.destroy_all
       payment.system_messages.create(
         system_message_type_id: SystemMessageType.id_for(:success), 
         content: 'Updated to completed via utr upload'
-        )
-      payment.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
+      )
+
+      payment_order = payment.payment_order
+      payments_status_ids = payment_order.payments.pluck(:payment_status_id).uniq
+      if payments_status_ids.include?(PaymentStatus.id_for(:failed)) && payments_status_ids.include?(PaymentStatus.id_for(:completed))
+        payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:partially_completed))
+      else payments_status_ids.length == 1  && payments_status_ids.include?(PaymentStatus.id_for(:completed) )
+        payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
+      end
+
     end
   end
 

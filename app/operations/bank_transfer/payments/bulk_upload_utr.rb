@@ -29,7 +29,7 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
   end
 
   def pre_process
-    payment_order_ids = user.company.payment_orders.with_purpose_id(PaymentPurpose.ids_for(:vendor_payment, :advance_against_purchase_order)).pluck(:id)
+    payment_order_ids = user.company.payment_orders.with_purpose_id(PaymentPurpose.ids_for(:vendor_payment, :advance_against_purchase_order, :utility_bill_payment)).pluck(:id)
     self.all_payments = Payment.with_payment_order_id(payment_order_ids).to_a
     self.all_transactions = bank_transaction_class.where(company_id: user.company_id).pluck(:bank_reference_number)
   end
@@ -67,7 +67,7 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
         self.result_array[index] << "This payment already has an associated UTR"
         next
       end
-      file_payments.push(payment)
+
       if payment.reference_resources.present? && payment.receiving_account_type == "BankAccount"
         # payment.reference_resource.update(bank_reference_number: utr)
         reference_resource = payment.reference_resources.first
@@ -79,6 +79,7 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
         else
           reference_resource.utr = utr
         end
+        
         existing_transactions << reference_resource
       else
         # disallow duplicate utr to be updated
@@ -104,6 +105,7 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
                                                        created_at: credited_at)
       end
       # add a success message to the result array
+      file_payments.push(payment)
       self.result_array[index] << "Success!"
     end
     update_details
