@@ -201,6 +201,8 @@ gem 'doorkeeper', '~> 5.0.2'
 
 gem 'faraday', '~> 0.15.4'
 gem 'faraday_middleware', '~> 0.12.2'
+
+gem 'posthog-ruby', '~> 1.0'
 # gem for xml parsing
 gem 'liquid', '~> 4.0.1'
 
