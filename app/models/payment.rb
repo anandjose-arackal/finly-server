@@ -930,13 +930,13 @@ class Payment < ApplicationRecord
     end
   end
 
-  def self.update_payment_status payment
+  def self.update_payment_status payment, user
     if payment.failed?
       payment.update(payment_status_id: PaymentStatus.id_for(:completed))
       payment.system_messages.destroy_all
       payment.system_messages.create(
         system_message_type_id: SystemMessageType.id_for(:success), 
-        content: 'Updated to completed via utr upload'
+        content: "Updated to completed via utr upload by #{user.name}."
       )
 
       payment_order = payment.payment_order

@@ -43,7 +43,14 @@ json.payments do
       json.bank_reference_number bank_transaction.bank_reference_number if bank_transaction.present?
     end
 
-    json.credited_at payment.reference_resources.first&.created_at&.strftime("%B %d, %Y - %H:%M:%S")
+    credited_at = payment.reference_resources.first&.created_at&.strftime("%B %d, %Y - %H:%M:%S")
+
+    if credited_at.blank?
+      bank_transaction = bank_transaction_class.find_by(reference_payment_id: payment.id)
+      credited_at = bank_transaction&.credited_at&.strftime("%B %d, %Y - %H:%M:%S") if bank_transaction.present?
+    end
+
+    json.credited_at credited_at
     json.payment_notification_users payment&.parent&.payment_notification_users rescue nil
     json.category_id payment.category_id
     json.category_name payment.category&.name

@@ -110,7 +110,7 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
     end
     update_details
     file_payments.each do |payment|
-      Payment.update_payment_status payment
+      Payment.update_payment_status( payment, user )
     end
   end
 
