@@ -36,6 +36,7 @@ json.cards do
 
     card = card_hash[:card]
     if CardStatus.ids_for([:unassigned, :assign_requested, :assigned]).include?(card.card_status_id)
+      json.activation_request true 
       json.current_card_id card.id 
     end
     json.configurable_restrictions card.card_program.spend_restrictions
