@@ -47,7 +47,7 @@ json.payments do
 
     if credited_at.blank?
       bank_transaction = bank_transaction_class.find_by(reference_payment_id: payment.id)
-      credited_at = bank_transaction&.credited_at&.strftime("%B %d, %Y - %H:%M:%S") if bank_transaction.present?
+      credited_at = bank_transaction&.created_at&.strftime("%B %d, %Y - %H:%M:%S") if bank_transaction.present?
     end
 
     json.credited_at credited_at
