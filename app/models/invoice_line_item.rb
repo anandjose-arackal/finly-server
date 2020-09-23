@@ -2,62 +2,72 @@
 #
 # Table name: invoice_line_items
 #
-#  id                     :integer          not null, primary key
-#  invoice_id             :integer
-#  description            :text(65535)
-#  quantity               :decimal(20, 5)
-#  rate                   :decimal(20, 10)
-#  tax                    :decimal(20, 10)
-#  discount               :decimal(20, 10)
-#  category_id            :integer
-#  gst_type_id            :integer
-#  tax_amount_id          :integer
-#  discount_amount_id     :integer
-#  amount_id              :integer
-#  created_at             :datetime         not null
-#  updated_at             :datetime         not null
-#  net_amount_id          :integer
-#  hsn_sac                :string(255)
-#  taxable_amount_id      :integer
-#  parent_type            :string(255)
-#  parent_id              :string(255)
-#  inventory_line_item_id :integer
-#  item_info              :text(65535)
-#  comment                :text(65535)
-#  account                :string(255)
-#  tax_rate_id            :integer
-#  cost_center_id         :integer
-#  unit_of_measurement    :string(255)
-#  department_id          :integer
-#  sgst                   :decimal(20, 5)   default(0.0)
-#  cgst                   :decimal(20, 5)   default(0.0)
-#  igst                   :decimal(20, 5)   default(0.0)
-#  purchase_order_item_id :integer
-#  billable_amount_id     :integer
-#  deleted_at             :datetime
-#  tds_applicable         :boolean          default(FALSE)
-#  discount_rate          :decimal(10, )
-#  tax_percentage         :decimal(20, 5)
-#  item_number            :string(255)
-#  product_type_id        :string(255)
-#  gl_code                :string(255)
-#  gross_amount           :decimal(20, 10)
-#  discount_amount        :decimal(20, 10)
-#  taxable_amount         :decimal(20, 10)
-#  tax_amount             :decimal(20, 10)
-#  net_amount             :decimal(20, 10)
-#  currency_code          :string(255)
-#  item_tds_amount        :decimal(20, 5)
-#  item_net_amount        :decimal(20, 5)
-#  item_tax_amount        :decimal(20, 5)
-#  item_taxable_amount    :decimal(20, 5)
-#  item_discount_amount   :decimal(20, 5)
+#  id                             :integer          not null, primary key
+#  invoice_id                     :integer
+#  description                    :text(65535)
+#  quantity                       :decimal(20, 5)
+#  rate                           :decimal(20, 10)
+#  tax                            :decimal(20, 10)
+#  discount                       :decimal(20, 10)
+#  category_id                    :integer
+#  gst_type_id                    :integer
+#  tax_amount_id                  :integer
+#  discount_amount_id             :integer
+#  amount_id                      :integer
+#  created_at                     :datetime         not null
+#  updated_at                     :datetime         not null
+#  net_amount_id                  :integer
+#  hsn_sac                        :string(255)
+#  taxable_amount_id              :integer
+#  parent_type                    :string(255)
+#  parent_id                      :string(255)
+#  inventory_line_item_id         :integer
+#  item_info                      :text(65535)
+#  comment                        :text(65535)
+#  account                        :string(255)
+#  tax_rate_id                    :integer
+#  cost_center_id                 :integer
+#  unit_of_measurement            :string(255)
+#  department_id                  :integer
+#  sgst                           :decimal(20, 5)   default(0.0)
+#  cgst                           :decimal(20, 5)   default(0.0)
+#  igst                           :decimal(20, 5)   default(0.0)
+#  purchase_order_item_id         :integer
+#  billable_amount_id             :integer
+#  deleted_at                     :datetime
+#  tds_applicable                 :boolean          default(FALSE)
+#  discount_rate                  :decimal(10, )
+#  tax_percentage                 :decimal(20, 5)
+#  item_number                    :string(255)
+#  product_type_id                :string(255)
+#  gl_code                        :string(255)
+#  gross_amount                   :decimal(20, 10)
+#  discount_amount                :decimal(20, 10)
+#  taxable_amount                 :decimal(20, 10)
+#  tax_amount                     :decimal(20, 10)
+#  net_amount                     :decimal(20, 10)
+#  currency_code                  :string(255)
+#  item_tds_amount                :decimal(20, 5)
+#  item_net_amount                :decimal(20, 5)
+#  item_tax_amount                :decimal(20, 5)
+#  item_taxable_amount            :decimal(20, 5)
+#  item_discount_amount           :decimal(20, 5)
+#  item_gross_amount              :decimal(20, 5)
+#  item_gross_amount_converted    :decimal(20, 5)
+#  item_discount_amount_converted :decimal(20, 5)
+#  item_taxable_amount_converted  :decimal(20, 5)
+#  item_tax_amount_converted      :decimal(20, 5)
+#  item_tds_amount_converted      :decimal(20, 5)
+#  item_net_amount_converted      :decimal(20, 5)
+#  item_billable_amount           :decimal(20, 5)
+#  item_billable_amount_converted :decimal(20, 5)
 #
 
 class InvoiceLineItem < ApplicationRecord
   include LiquidDroppable
   include Exposures::Model::Exposable
   include MathUtil
+  include FormsHelper
 
   belongs_to :invoice, optional: true
   belongs_to :category, optional: true
