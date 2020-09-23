@@ -1,8 +1,8 @@
 class RemoveUnnecessaryFormEntityFields < ActiveRecord::Migration[5.2]
   def change
-    rename_column :form_entities, :field_key, :entity_key
-    rename_column :form_entities, :field_path, :entity_path
-    rename_column :form_entities, :field_type, :entity_type
+    # rename_column :form_entities, :field_key, :entity_key
+    # rename_column :form_entities, :field_path, :entity_path
+    # rename_column :form_entities, :field_type, :entity_type
 
     remove_column :form_entities, :chained
     remove_column :form_entities, :dependent
