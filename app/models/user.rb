@@ -135,7 +135,7 @@ class User < ApplicationRecord
   has_one :enforce_policy, as: :enforceable, dependent: :destroy
   has_one :auto_reload_config, as: :reloadable, dependent: :destroy
   has_one :itz_cash_dmt_sender
-  has_one :user_panel_subscription, dependent: :destroy
+  has_one :user_panel_subscription
   has_one :cash_on_hand, dependent: :destroy
   has_one :quickbooks_user, class_name: "QuickbooksFinlyIntegrationsUser"
   has_one :permission, class_name: "UserPermission"
