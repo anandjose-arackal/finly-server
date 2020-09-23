@@ -268,7 +268,7 @@ class Docs::P2P::Invoices::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:sub_total_amount])
 
-      amount :roundoff_amount, computed: Forms::Compute::Form(SUMMARY_ROUNDOFF_AMOUNT)
+      amount :roundoff_amount, computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:roundoff_amount])
 
       amount :total_amount, editable: false, visible: true,
              can_editable_be_changed: false,
@@ -305,18 +305,18 @@ class Docs::P2P::Invoices::Form < Forms::API
     rule Rules::Builder['due_date'].lt(entity: "date")
   end
 
-  validation validation_id: "Advance Amount cannot be greater than total amount" do
-    reference 'advance_paid_amount'
-    error_message "Advance Amount Cannot be Greater Than Invoice Total"
-    rule Rules::Builder['advance_paid_amount'].gt(entity: "total_amount")
-  end
+  # validation validation_id: "Advance Amount cannot be greater than total amount" do
+  #   reference 'advance_paid_amount'
+  #   error_message "Advance Amount Cannot be Greater Than Invoice Total"
+  #   rule Rules::Builder['advance_paid_amount'].gt(entity: "total_amount")
+  # end
 
   # CONDITIONS
 
-  condition condition_id: "GSTIN Field to be visible when vendor is Indian" do
-    reference 'entity', 'gstin'
-    rule Rules::Builder['']
-  end
+  # condition condition_id: "GSTIN Field to be visible when vendor is Indian" do
+  #   reference 'entity', 'gstin'
+  #   rule Rules::Builder['']
+  # end
 
 
 
