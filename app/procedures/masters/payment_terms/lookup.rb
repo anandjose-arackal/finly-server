@@ -1,4 +1,4 @@
-class Masters::PaymentTerms < Lookup::API
+class Masters::PaymentTerms::Lookup < Lookup::API
 
   resolver 'payment_terms.default'
   search_key :name_cont

@@ -39,11 +39,12 @@
 #  trade_name               :string(255)
 #  reject_note              :text(65535)
 #  rcm_enabled              :boolean          default(FALSE)
-#  erp_sync_status_id       :integer
-#  erp_sync_message         :string(255)
-#  erp_sync_reference_id    :string(255)
-#  erp_sync_attempts_count  :integer          default(0)
-#  erp_sync_attempted_at    :datetime
+#  vendor_country           :string(255)
+#  ldc_upper_limit_id       :integer
+#  ldc_effective_start_date :date
+#  ldc_effective_end_date   :date
+#  tds_effective_start_date :date
+#  tds_effective_end_date   :date
 #
 
 class YesBankVendor < ApplicationRecord

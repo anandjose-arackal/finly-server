@@ -28,8 +28,6 @@
 #  active               :boolean          default(TRUE)
 #  item_expense_type_id :integer
 #  tds_applicable       :boolean          default(TRUE)
-#  start_date           :date
-#  end_date             :date
 #
 
 class Item < ApplicationRecord

@@ -47,6 +47,11 @@
 #  tax_amount             :decimal(20, 10)
 #  net_amount             :decimal(20, 10)
 #  currency_code          :string(255)
+#  item_tds_amount        :decimal(20, 5)
+#  item_net_amount        :decimal(20, 5)
+#  item_tax_amount        :decimal(20, 5)
+#  item_taxable_amount    :decimal(20, 5)
+#  item_discount_amount   :decimal(20, 5)
 #
 
 class InvoiceLineItem < ApplicationRecord

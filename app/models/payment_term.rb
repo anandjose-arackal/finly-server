@@ -12,8 +12,6 @@
 #  default     :boolean
 #  is_deleted  :boolean          default(FALSE), not null
 #  deleted_at  :datetime
-#  start_date  :date
-#  end_date    :date
 #
 
 class PaymentTerm < ApplicationRecord

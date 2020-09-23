@@ -61,13 +61,6 @@
 #  finly_id                  :string(36)
 #  deleted_at                :datetime
 #  pending_activation        :boolean          default(FALSE)
-#  erp_sync_status_id        :integer
-#  erp_sync_message          :string(255)
-#  erp_sync_reference_id     :string(255)
-#  erp_sync_attempts_count   :integer          default(0)
-#  erp_sync_attempted_at     :datetime
-#  start_date                :date
-#  end_date                  :date
 #
 
 require 'rails_helper'

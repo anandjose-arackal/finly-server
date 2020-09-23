@@ -38,16 +38,11 @@
 #  modified_by_id                     :integer
 #  deleted_at                         :datetime
 #  controlling_level_id               :integer
-#  company_id                         :integer
 #  bank_reference_number              :string(255)
 #  source_account                     :string(255)
 #  location_id                        :integer
 #  cost_center_id                     :integer
-#  erp_sync_status_id                 :integer
-#  erp_sync_message                   :string(255)
-#  erp_sync_reference_id              :string(255)
-#  erp_sync_attempts_count            :integer          default(0)
-#  erp_sync_attempted_at              :datetime
+#  company_id                         :integer
 #
 
 class Report < ApplicationRecord

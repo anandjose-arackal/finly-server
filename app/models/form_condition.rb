@@ -17,8 +17,8 @@
 #  is_updated        :boolean
 #  can_be_updated    :boolean
 #  rule              :text(65535)
-#  referencable_id   :string(255)      not null
-#  referencable_type :string(255)      not null
+#  referencable_id   :string(255)
+#  referencable_type :string(255)
 #
 
 class FormCondition < ApplicationRecord

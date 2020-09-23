@@ -80,8 +80,8 @@
 #  proforma_advance                :integer
 #  total_proforma_advance          :decimal(20, 2)
 #  cost_allocation_items           :boolean          default(FALSE)
-#  narration                       :text(65535)
 #  po_number                       :string(255)
+#  narration                       :text(65535)
 #  bank_account_id                 :integer
 #  rejection_note                  :text(65535)
 #  payment_agreement_id            :integer
@@ -99,6 +99,7 @@
 #  gross_amount                    :decimal(20, 10)
 #  discount_amount                 :decimal(20, 10)
 #  freight_amount                  :decimal(20, 10)
+#  taxable_amount                  :decimal(20, 10)
 #  tax_amount                      :decimal(20, 10)
 #  tds_amount                      :decimal(20, 10)
 #  net_amount                      :decimal(20, 10)
@@ -107,12 +108,20 @@
 #  total_paid_amount               :decimal(20, 10)
 #  balance_due_amount              :decimal(20, 10)
 #  currency_code                   :string(255)
-#  taxable_amount                  :decimal(20, 10)
-#  erp_sync_status_id              :integer
-#  erp_sync_message                :string(255)
-#  erp_sync_reference_id           :string(255)
-#  erp_sync_attempts_count         :integer
-#  erp_sync_attempted_at           :datetime
+#  vendor_sequence_id              :string(255)
+#  vendor_trade_name               :string(255)
+#  vendor_gstin                    :string(255)
+#  vendor_pan                      :string(255)
+#  vendor_bank_account_number      :string(255)
+#  vendor_bank_account_ifsc        :string(255)
+#  invoice_gross_amount            :decimal(20, 5)
+#  invoice_discount_amount         :decimal(20, 5)
+#  invoice_tax_amount              :decimal(20, 5)
+#  invoice_tds_amount              :decimal(20, 5)
+#  payment_outside_finly_amount    :decimal(20, 5)
+#  sub_total_amount                :decimal(20, 5)
+#  total_amount                    :decimal(20, 5)
+#  base_currency                   :string(255)
 #
 
 class Invoice < ApplicationRecord
@@ -131,18 +140,18 @@ class Invoice < ApplicationRecord
   belongs_to :address, optional: true
   # #### Fixme: These associations are deprecated to support amount number fields with the same name.
   # #### Fixme: This can be cleared once this has been deployed to production
-  # belongs_to :amount, optional: true
-  # belongs_to :gross_amount, optional: true, class_name: "Amount"
-  # belongs_to :net_amount, optional: true, class_name: "Amount"
-  # belongs_to :tds_amount, optional: true, class_name: "Amount"
-  # belongs_to :tax_amount, optional: true, class_name: "Amount"
-  # belongs_to :discount_amount, optional: true, class_name: "Amount"
-  # belongs_to :freight_amount, optional: true, class_name: "Amount"
-  # belongs_to :original_amount, optional: true, class_name: "Amount"
-  # belongs_to :advance_amount, optional: true, class_name: "Amount"
-  # belongs_to :balance_due, optional: true, class_name: "Amount"
-  # belongs_to :taxable_amount, optional: true, class_name: "Amount"
-  # belongs_to :paid_amount, optional: true, class_name: "Amount"
+  belongs_to :amount, optional: true
+  belongs_to :gross_amount, optional: true, class_name: "Amount"
+  belongs_to :net_amount, optional: true, class_name: "Amount"
+  belongs_to :tds_amount, optional: true, class_name: "Amount"
+  belongs_to :tax_amount, optional: true, class_name: "Amount"
+  belongs_to :discount_amount, optional: true, class_name: "Amount"
+  belongs_to :freight_amount, optional: true, class_name: "Amount"
+  belongs_to :original_amount, optional: true, class_name: "Amount"
+  belongs_to :advance_amount, optional: true, class_name: "Amount"
+  belongs_to :balance_due, optional: true, class_name: "Amount"
+  belongs_to :taxable_amount, optional: true, class_name: "Amount"
+  belongs_to :paid_amount, optional: true, class_name: "Amount"
   #
   # Captures PO advance if any and how much is adjusted in the tax invoice
   # belongs_to :po_prev_adjusted_advance, optional: true, class_name: "Amount", foreign_key: :po_prev_adjusted_advance
