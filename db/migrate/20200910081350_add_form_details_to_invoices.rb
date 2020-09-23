@@ -11,6 +11,7 @@ class AddFormDetailsToInvoices < ActiveRecord::Migration[5.2]
     add_column :invoices, :invoice_discount_amount, :decimal, :precision => 20, :scale => 5
     add_column :invoices, :invoice_tax_amount, :decimal, :precision => 20, :scale => 5
     add_column :invoices, :invoice_tds_amount, :decimal, :precision => 20, :scale => 5
+    add_column :invoices, :invoice_freight_amount, :decimal, :precision => 20, :scale => 5
     add_column :invoices, :payment_outside_finly_amount, :decimal, :precision => 20, :scale => 5
     add_column :invoices, :sub_total_amount, :decimal, :precision => 20, :scale => 5
     add_column :invoices, :total_amount, :decimal, :precision => 20, :scale => 5
