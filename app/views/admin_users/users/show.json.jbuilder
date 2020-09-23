@@ -34,9 +34,11 @@ json.cards do
     json.balance card_hash[:balance]&.to_f
     json.available_eligibility card_hash[:eligibility]&.to_f
 
-
     card = card_hash[:card]
-    json.current_card_id card.id if card.card_status_id == CardStatus.id_for(:assign_requested)
+    if CardStatus.ids_for([:unassigned, :assign_requested, :assigned]).include?(card.card_status_id)
+      json.activation_request true 
+      json.current_card_id card.id 
+    end
     json.configurable_restrictions card.card_program.spend_restrictions
     if card.card_program.spend_restrictions
       json.restrictions do
