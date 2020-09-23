@@ -17,6 +17,7 @@ json.created_at record.created_at
 json.updated_at record.updated_at
 json.submitted_at record.submitted_at
 json.approved_at record.approved_at
+json.created_by record.created_by
 type_map = {}
 record.vendor_attachments.each do |attachment|
   type_map[attachment.attachment_type] ||= []
