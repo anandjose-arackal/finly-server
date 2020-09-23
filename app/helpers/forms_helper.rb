@@ -17,8 +17,8 @@ module FormsHelper
       if form_entity.system_field && model.respond_to?(form_entity.entity_key)
         form_data.merge!({form_entity.entity_key => model.send(form_entity.entity_key)})
       else
-        if model.respond_to?(:custom_fields)
-          value = model.custom_fields.joins(:form_entity).where("form_entities.entity_key = ?", form_entity.entity_key).first&.retrieve_value
+        if model.respond_to?(:form_custom_fields)
+          value = model.form_custom_fields.joins(:form_entity).where("form_entities.entity_key = ?", form_entity.entity_key).first&.retrieve_value
           form_data.merge!({form_entity.entity_key => value})
         end
       end

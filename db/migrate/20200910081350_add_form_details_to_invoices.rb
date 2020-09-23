@@ -1,8 +1,8 @@
 class AddFormDetailsToInvoices < ActiveRecord::Migration[5.2]
   def change
-    # add_column :invoices, :vendor_sequence_id, :string
+    add_column :invoices, :vendor_sequence_id, :string
     # add_column :invoices, :vendor_trade_name, :string
-    # add_column :invoices, :vendor_gstin, :string
+    add_column :invoices, :vendor_gstin, :string
     # add_column :invoices, :vendor_pan, :string
     add_column :invoices, :vendor_bank_account_number, :string
     add_column :invoices, :vendor_bank_account_ifsc, :string

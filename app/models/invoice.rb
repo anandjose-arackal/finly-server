@@ -130,6 +130,7 @@ class Invoice < ApplicationRecord
   include Exposures::Model::Exposable
   include Exposures::Model::Exposable
   include Sequenced::ActsAsSequenced
+  include FormsHelper
 
   # include EventProducer
 
@@ -211,6 +212,7 @@ class Invoice < ApplicationRecord
   # Fixme: Need to check where the previous attachments was being used as this is overriding it
   has_many :attachments, as: :resource
   has_many :custom_fields, as: :parent, dependent: :destroy
+  has_many :form_custom_fields, class_name: 'FormCustomField', as: :document, dependent: :destroy
 
   # From Procurement workflow
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable

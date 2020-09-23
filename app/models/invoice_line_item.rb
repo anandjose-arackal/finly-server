@@ -65,12 +65,12 @@ class InvoiceLineItem < ApplicationRecord
 
   # #### Fixme: These associations are deprecated to support amount number fields with the same name.
   # #### Fixme: This can be cleared once this has been deployed to production
-  # belongs_to :amount, optional: true
-  # belongs_to :discount_amount, optional: true, class_name: "Amount"
-  # belongs_to :net_amount, optional: true, class_name: "Amount"
-  # belongs_to :taxable_amount, optional: true, class_name: "Amount"
-  # belongs_to :tax_amount, optional: true, class_name: "Amount"
-  # belongs_to :billable_amount, optional: true, class_name: "Amount"
+  belongs_to :amount, optional: true
+  belongs_to :discount_amount, optional: true, class_name: "Amount"
+  belongs_to :net_amount, optional: true, class_name: "Amount"
+  belongs_to :taxable_amount, optional: true, class_name: "Amount"
+  belongs_to :tax_amount, optional: true, class_name: "Amount"
+  belongs_to :billable_amount, optional: true, class_name: "Amount"
   # ####
   belongs_to :inventory_line_item, optional: true, class_name: 'Item'
   belongs_to :gst_type, optional: true
@@ -85,12 +85,12 @@ class InvoiceLineItem < ApplicationRecord
 
   # #### Fixme: These associations are deprecated to support amount number fields with the same name.
   # #### Fixme: This can be cleared once this has been deployed to production
-  # accepts_nested_attributes_for :discount_amount
-  # accepts_nested_attributes_for :tax_amount
-  # accepts_nested_attributes_for :amount
-  # accepts_nested_attributes_for :net_amount
-  # accepts_nested_attributes_for :taxable_amount
-  # accepts_nested_attributes_for :billable_amount
+  accepts_nested_attributes_for :discount_amount
+  accepts_nested_attributes_for :tax_amount
+  accepts_nested_attributes_for :amount
+  accepts_nested_attributes_for :net_amount
+  accepts_nested_attributes_for :taxable_amount
+  accepts_nested_attributes_for :billable_amount
   # ####
 
   validates :description, presence: true
