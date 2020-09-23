@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_30_175252) do
+ActiveRecord::Schema.define(version: 2020_09_10_081350) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3972,8 +3972,8 @@ ActiveRecord::Schema.define(version: 2020_08_30_175252) do
     t.boolean "is_updated"
     t.boolean "can_be_updated"
     t.text "rule"
-    t.string "referencable_id", null: false
-    t.string "referencable_type", null: false
+    t.string "referencable_id"
+    t.string "referencable_type"
     t.index ["company_id"], name: "index_form_conditions_on_company_id"
     t.index ["created_at"], name: "index_form_conditions_on_created_at"
     t.index ["created_by_id"], name: "index_form_conditions_on_created_by_id"
@@ -4772,6 +4772,11 @@ ActiveRecord::Schema.define(version: 2020_08_30_175252) do
     t.decimal "tax_amount", precision: 20, scale: 10
     t.decimal "net_amount", precision: 20, scale: 10
     t.string "currency_code"
+    t.decimal "item_tds_amount", precision: 20, scale: 5
+    t.decimal "item_net_amount", precision: 20, scale: 5
+    t.decimal "item_tax_amount", precision: 20, scale: 5
+    t.decimal "item_taxable_amount", precision: 20, scale: 5
+    t.decimal "item_discount_amount", precision: 20, scale: 5
     t.index ["amount_id"], name: "index_invoice_line_items_on_amount_id"
     t.index ["category_id"], name: "index_invoice_line_items_on_category_id"
     t.index ["cost_center_id"], name: "index_invoice_line_items_on_cost_center_id"
@@ -4937,6 +4942,20 @@ ActiveRecord::Schema.define(version: 2020_08_30_175252) do
     t.decimal "total_paid_amount", precision: 20, scale: 10
     t.decimal "balance_due_amount", precision: 20, scale: 10
     t.string "currency_code"
+    t.string "vendor_sequence_id"
+    t.string "vendor_trade_name"
+    t.string "vendor_gstin"
+    t.string "vendor_pan"
+    t.string "vendor_bank_account_number"
+    t.string "vendor_bank_account_ifsc"
+    t.decimal "invoice_gross_amount", precision: 20, scale: 5
+    t.decimal "invoice_discount_amount", precision: 20, scale: 5
+    t.decimal "invoice_tax_amount", precision: 20, scale: 5
+    t.decimal "invoice_tds_amount", precision: 20, scale: 5
+    t.decimal "payment_outside_finly_amount", precision: 20, scale: 5
+    t.decimal "sub_total_amount", precision: 20, scale: 5
+    t.decimal "total_amount", precision: 20, scale: 5
+    t.string "base_currency"
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["advance_amount_id"], name: "index_invoices_on_advance_amount_id"
     t.index ["amount_id"], name: "index_invoices_on_amount_id"
