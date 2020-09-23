@@ -101,7 +101,7 @@ class User < ApplicationRecord
   belongs_to :location, optional: true, class_name: "BranchLocation"
   belongs_to :department, optional: true
 
-  has_one :profile, class_name: 'UserProfile', dependent: :destroy
+  has_one :profile, class_name: 'UserProfile'
   has_one :wallet, class_name: 'UserWallet', foreign_key: :user_id, dependent: :destroy
   has_one :bank_wallet, class_name: 'VendorPaymentWallet', foreign_key: :user_id, dependent: :destroy
   has_many :role_mapping, class_name: 'UserRoleMapping', dependent: :destroy
