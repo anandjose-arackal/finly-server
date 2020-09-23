@@ -31,38 +31,22 @@ class Forms::Contracts::Builders::CustomField
         when 'attachment'
           custom_field.value = ""
           input[custom_field_entity.entity_key].present? && input[custom_field_entity.entity_key].is_a?(Array) && input[custom_field_entity.entity_key].each do |attachment_obj|
-            custom_field.attachments.find_by(uuid: attachment_obj[:id])&.mark_for_destruction if attachment_obj[:_destroy].present?
-            custom_field.attachments.new(attachment: attachment_obj[:attachment]) unless attachment_obj[:id].present?
+            attachment = CustomFieldAttachment.find_by uuid: attachment_obj[:id]
+
+            # debugger
+
+            if attachment.present?
+              custom_field.attachments << attachment
+              attachment.mark_for_destruction if attachment_obj[:_destroy].present?
+              # custom_field.attachments.find_by(id: attachment_obj[:id])&.mark_for_destruction if attachment_obj[:_destroy].present?
+              # custom_field.attachments.new(attachment: attachment_obj[:attachment]) unless attachment_obj[:id].present?
+            end
           end
         when 'multiselect'
           # Implement later - #todo
         else
           custom_field.value = input[custom_field_entity.entity_key]
         end
-
-
-
-        # Method 1
-        # Transform Data
-        # case custom_field_entity.entity_type
-        # when 'dropdown'
-        #   input[custom_field_entity.entity_key] = {
-        #       selection: {
-        #           form_entity_choice_id: input[custom_field_entity.entity_key]
-        #       }
-        #   }
-        # when 'attachment'
-        #   input[custom_field_entity.entity_key] = {
-        #       attachments:  input[custom_field_entity.entity_key].map {|file| {attachment: file}}
-        #   }
-        # else
-        #   # do nothing
-        # end
-        #
-        # debugger
-        # if input[custom_field_entity.entity_key]
-        #   custom_field.value = input[custom_field_entity.entity_key]
-        # end
         represented.custom_fields.append(custom_field)
       end
     end

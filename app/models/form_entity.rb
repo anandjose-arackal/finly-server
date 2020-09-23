@@ -235,8 +235,8 @@ class FormEntity < ApplicationRecord
         compute_lookup_entity_id: compute_lookup_entity_id,
         filters: filters,
         config_path: config_path,
-        validations: validations.as_json(options),
-        conditions: conditions.as_json(options),
+        validations: validations.as_json(opts),
+        conditions: conditions.as_json(opts),
         # choices: choices_scope(params: options[:params], user: options[:current_user]),
         choices: choices_data
     }
@@ -383,5 +383,4 @@ class FormEntity < ApplicationRecord
     self.entity_path = generate_entity_path.join(".")
     self.config_path = generate_config_path.join(".")
   end
-
 end

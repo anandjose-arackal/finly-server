@@ -25,22 +25,21 @@ class FormCustomField < ApplicationRecord
   has_many :selections, class_name: 'CustomFieldSelection'
   has_many :attachments, class_name: 'CustomFieldAttachment'
 
-  def value(value=nil)
-    self.value = value if value.present?
-
+  def retrieve_value
     case self.form_entity&.entity_type
     when 'text'
-      value_text
+      value || value_text
     when 'dropdown'
       selection&.form_entity_choice&.name
     when 'multiselect'
       selections.map(&:form_entity_choice).map(&:name)
     when 'attachment'
-      attachments.map(&:attachment) if self.persisted?
+      attachments.as_json if self.persisted?
     else
-      super()
+      value
     end
   end
+
 end
 
 

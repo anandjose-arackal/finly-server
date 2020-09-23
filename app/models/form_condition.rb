@@ -71,7 +71,7 @@ class FormCondition < ApplicationRecord
     else
       # rule = self.rule.as_json_logic
       # Todo temporary patch to unblock FE, this has to generate as_json_logic
-      rule = self.rule.as_store
+      rule = self.rule.as_json_logic
     end
     referencable.as_json(json_format: "form_reference").merge(
         {

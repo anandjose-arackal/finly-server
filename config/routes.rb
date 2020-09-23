@@ -4195,6 +4195,9 @@ Rails.application.routes.draw do
   patch 'form_choice_dependencies/:id/disable', to: 'form_choice_dependencies#disable'
   resources :form_choice_dependencies
 
+
+  post 'attachments/custom_field_attachment', to: 'attachments#create_custom_field_attachment'
+
   resources :insights
 
   # Utility Bill Payments / BBPS Start #
@@ -4292,6 +4295,8 @@ Rails.application.routes.draw do
 
 
   resources :invoices, only: [:create, :update, :show]
+
+  resources :approval_matrix, only: [:index]
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

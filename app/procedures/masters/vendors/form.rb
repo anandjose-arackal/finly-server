@@ -96,7 +96,7 @@ class Masters::Vendors::Form < Forms::API
 
   section :business_details, associate_custom_fields: true do
     auto_number :vendor_id, sequence: {prefix: "VNDR.", start_at: '000001'}
-    dropdown :vendor_country, Choices[:list].({id: false, name: "India"}, {id: true, name: "Foreign"}),
+    dropdown :vendor_country, choices_scope: Choices[:list].({id: 'India', name: "India"}, {id: 'International', name: "International"}),
              required: true
     lookup :policy_id,
            choices_scope: Choices[:lookup].('policies', permissions: [:vendor_creator, :vendor_manager]),
@@ -107,8 +107,8 @@ class Masters::Vendors::Form < Forms::API
     text :name, label: 'Trade Name', required: true
     switch :gst_registered, label: "GST Registered"
     large_text :address, label: "Full Address"
-    dropdown :vendor_type_id, Choices[:lookup].('vendor_types'), label: "Vendor Type"
-    dropdown :payment_term_id, Choices[:lookup].('payment_terms'), label: "Payment Term"
+      # dropdown :vendor_type_id, choices_scope: Choices[:lookup].('vendor_types'), label: "Vendor Type"
+      # dropdown :payment_term_id, choices_scope: Choices[:lookup].('payment_terms'), label: "Payment Term"
   end
 
   section :tax_information, title: "Tax Information & Details", associate_custom_fields: true do
@@ -118,7 +118,7 @@ class Masters::Vendors::Form < Forms::API
     switch :rcm_enabled, label: "RCM Enabled"
 
     # TDS
-    dropdown :tds_rates_list_id, Choices[:lookup].('tds_slabs'), label: "TDS Percentage"
+    dropdown :tds_rates_list_id, choices_scope: Choices[:lookup].('tds_slabs'), label: "TDS Percentage"
     date :tds_effective_start_date, label: "TDS Effective Start Date"
     date :tds_effective_end_date, label: "TDS Effective End Date"
 
