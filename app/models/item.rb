@@ -105,7 +105,6 @@ class Item < ApplicationRecord
 
   def searchable_document
     {
-        record_id: id,
         description: description,
         category_name: category&.name,
         category_code: category&.category_code,

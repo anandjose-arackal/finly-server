@@ -58,9 +58,9 @@ class SearchIndex::API
       model.includes(model.searchable_includes).find_in_batches do |batch|
         data = []
         batch.each do |record|
-          data << record.searchable_document if record.show_in_search_index?
+          data << record.searchable_document_data if record.show_in_search_index?
         end
-        index.add_documents data
+        index.add_documents data.compact
       end
     end
 
@@ -112,6 +112,10 @@ class SearchIndex::API
     ids = [ids] unless ids.respond_to?(:each)
 
     index.delete_documents(ids)
+  end
+
+  def get_all_update_status
+    index.get_all_update_status
   end
 
 end
