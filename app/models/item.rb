@@ -35,18 +35,18 @@ class Item < ApplicationRecord
   include Sequenced::ActsAsSequenced
   include MathUtil
   include EventProducer
+  include SearchIndex::Document
 
-
-  event_channel 'item'
+  register_search_index! RecordsIndex
 
   acts_as_sequenced column: :item_number, purpose: :item_master, min_length: 8, editable: false, prefix: -> (record) { record.goods? ? "G" : "S" }
 
-  default_scope {unscope(where: :deleted_at)}
+  default_scope { unscope(where: :deleted_at) }
   belongs_to :company, optional: true
   belongs_to :category, optional: true
   belongs_to :tax_rate, optional: true
   belongs_to :supply_item_type, optional: true
-  belongs_to :product_type, optional: true#, class_name: "ProductType", foreign_key: :product_type_id
+  belongs_to :product_type, optional: true #, class_name: "ProductType", foreign_key: :product_type_id
   belongs_to :user, optional: true
   belongs_to :created_by, optional: true, class_name: 'User', foreign_key: :user_id
   belongs_to :item_expense_type, optional: true
@@ -97,9 +97,26 @@ class Item < ApplicationRecord
     where id: ids
   }
 
-  scope :includes_for_export, -> {includes(:category,:item_expense_type,:product_type, :supply_item_type, :tax_rate)}
+  scope :includes_for_export, -> { includes(:category, :item_expense_type, :product_type, :supply_item_type, :tax_rate) }
 
   delegate :po_item?, :non_po_item?, to: :supply_item_type
+
+  searchable_includes(:item_expense_type, :product_type, :supply_item_type, :category)
+
+  def searchable_document
+    {
+        record_id: id,
+        description: description,
+        category_name: category&.name,
+        category_code: category&.category_code,
+        sequence_id: item_number,
+        gl_code: self&.category&.gl_code
+    }
+  end
+
+  def show_in_search_index?
+    deleted_at.nil? and active
+  end
 
   def goods?
     self.product_type_id == ProductType.id_for(:goods)
@@ -175,7 +192,7 @@ class Item < ApplicationRecord
   end
 
   def rate_contract_vendors
-    rate_contract_line_items.joins(:rate_contract).map{|line_item| { vendor_id: line_item.rate_contract.vendor.id, vendor_name: line_item.rate_contract.vendor.display_name, rate:  precision_value(line_item&.amount&.value), rate_contract_item_id: line_item.id}}
+    rate_contract_line_items.joins(:rate_contract).map { |line_item| {vendor_id: line_item.rate_contract.vendor.id, vendor_name: line_item.rate_contract.vendor.display_name, rate: precision_value(line_item&.amount&.value), rate_contract_item_id: line_item.id} }
   end
 
   def get_custom_description

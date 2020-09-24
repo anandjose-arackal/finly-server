@@ -1,0 +1,5 @@
+class SearchIndex::EventListener
+
+
+
+end

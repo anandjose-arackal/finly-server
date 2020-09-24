@@ -199,6 +199,8 @@ gem 'devise', '~> 4.5.0'
 gem 'devise_invitable', '~> 1.7.5'
 gem 'doorkeeper', '~> 5.0.2'
 
+gem 'meilisearch', '~> 0.13'
+
 gem 'faraday', '~> 0.15.4'
 gem 'faraday_middleware', '~> 0.12.2'
 # gem for xml parsing
