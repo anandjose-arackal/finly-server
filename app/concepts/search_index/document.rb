@@ -22,7 +22,7 @@ module SearchIndex::Document
     document = searchable_document
     return nil if document.nil?
 
-    searchable_document.merge({record_id: searchable_record_id})
+    {id: searchable_record_id, record_id: id, record_type: searchable_record_type}.merge(searchable_document)
   end
 
   def searchable_record_id

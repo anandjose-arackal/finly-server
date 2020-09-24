@@ -31,7 +31,7 @@ module EventProducer
     end
 
     def setup_event_producers
-      after_save :after_save_callbacks
+      after_commit :after_save_callbacks
       before_destroy :before_destroy_callbacks
     end
   end

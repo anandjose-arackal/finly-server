@@ -2,8 +2,9 @@ class RecordsIndex < SearchIndex::API
 
   index_name 'records'
 
-  attribute :record_id, primary_key: true, searchable: false
-  attribute :record_type
+  attribute :id, primary_key: true, searchable: false, displayed: false
+  attribute :record_id, searchable: false, displayed: true
+  attribute :record_type, searchable: false, displayed: true
   attribute :sequence_id
   attribute :description
   attribute :line_items

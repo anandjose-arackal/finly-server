@@ -96,7 +96,7 @@ class SearchIndex::API
   end
 
   def add_document(document)
-    index.add_document document, self.class.primary_key.name
+    add_documents document
   end
 
   def add_documents(documents)
