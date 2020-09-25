@@ -14,6 +14,6 @@ class User::Permission::Base < User::Base
   end
 
   def permission_params
-    params.require(:permission).permit(:create_beneficiaries)
+    params.require(:permission).permit(:create_beneficiaries,:edit_terms_within_po)
   end
 end
