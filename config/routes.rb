@@ -2919,6 +2919,12 @@ Rails.application.routes.draw do
       patch 'update_panel', to: 'users#update_panel', as: :update_panel
       patch 'reset_password', to: 'users#reset_password', as: :reset_password
     end
+
+    resources :payments do
+      get 'status_check', to: 'payments#status_check', as: :status_check
+      patch 'change_status', to: 'payments#change_status', as: :change_status
+    end
+
     post 'welcome', to: 'users#admin_welcome', as: :welcome
     post 'agreements_mail', to: 'users#agreements_mail', as: :agreements_mail
     post 'users/set_role', to: 'users#set_role', as: :set_role
@@ -2927,8 +2933,9 @@ Rails.application.routes.draw do
     get 'temp_import', to: 'users#temp_import'
     resources :expenses
     resources :cards do
-      patch 'block', to: 'cards#block', as: :block
+      patch 'block', to: 'cards#block', as: :block 
     end
+    post 'cards/new_card_activate', to: 'cards#new_card_activate', as: :new_card_activate
     post 'import_cards', to: 'cards#import', as: :import_cards
     namespace :kyc do
       resources :companies do

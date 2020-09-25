@@ -13,6 +13,8 @@ includes = [
             {tax_amount: :currency}, {net_amount: :currency}
         ]
     },
+    {dlrms: [:level, :action, :action_taken_by]},
+    {custom_fields: :field_configuration},
     :attachments
 ]
 json.data do

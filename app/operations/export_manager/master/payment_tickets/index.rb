@@ -99,7 +99,7 @@ class ExportManager::Master::PaymentTickets::Index < ExportManager::Builders::Sp
   end
 
   def beneficiary_account_number (payment)
-    payment&.receiving_account&.account_number.to_s
+    "\t" + (payment&.receiving_account&.account_number).to_s
   end
 
   def beneficiary_ifsc (payment)
