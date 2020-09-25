@@ -84,9 +84,9 @@ class BranchLocation < ApplicationRecord
     address
   end
 
-  def gstin
+  # def gstin
 
-  end
+  # end
 
   def pin
 
