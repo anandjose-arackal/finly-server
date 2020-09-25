@@ -8,7 +8,7 @@ class User::Permission::Base < User::Base
   end
 
   def validate
-    unless self.selected_user && self.permission
+    unless self.selected_user.present? && self.permission.present?
       add_message :error, "User not found"
     end
   end
