@@ -1,0 +1,1 @@
+json.data @op[:response]&.dig('hits')

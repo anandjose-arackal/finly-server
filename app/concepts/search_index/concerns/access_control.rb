@@ -58,48 +58,62 @@ module SearchIndex::Concerns::AccessControl
   }
 
   DRAFT_STATUS = %i(draft open)
+  TOKEN_EXPIRY = 3.hours
 
   # AC -> AccessControl
-  def vp_search_index_ac
+  def build_search_index_token
     filters = []
 
     # Do not filter
-    ROLE_MAP[:vp][:admin_access].each do |admin_role|
-      if has_permission?(admin_role)
+    if ROLE_MAP[:vp][:admin_access].present?
+      ROLE_MAP[:vp][:admin_access].each do |admin_role|
+        next unless has_permission?(admin_role)
+        filter = []
         DRAFT_STATUS.each do |status|
-          filters << "status_name != #{status}"
+          filter << "status_name != #{status}"
         end
-        return "(#{filters.join(" AND ")}) OR (collaborators_ids = #{id})"
+        filters << "(#{filter.join(" AND ")})"
+        filters << "(collaborators_ids = #{id})"
+
+        break
       end
-    end
+    else
+      ROLE_MAP[:vp][:documents_access].each do |document_name, access|
+        if access[:full_access]
+          # Do nothing
+        else
+          if access[:policy_access].present?
+            policies = []
+            policy_user_roles.each do |role|
+              access[:policy_access].each do |policy_role|
+                next unless UserRole.id_for(policy_role) == role.user_role_id
 
+                policies << role.policy_id
+              end
+            end
+            filters << "(record_type = #{document_name} AND (#{policies.map { |policy_id| "policy_id = #{policy_id}" }.join(" OR ")}))" if policies.present?
+          end
 
-    ROLE_MAP[:vp][:documents_access].each do |document_name, access|
-      if access[:full_access]
-        # Do nothing
-      else
-        if access[:policy_access].present?
-          policies = []
-          policy_user_roles.each do |role|
-            access[:policy_access].each do |policy_role|
-              next unless UserRole.id_for(policy_role) == role.user_role_id
+          if access[:collaborators_access].present?
+            access[:collaborators_access].each do |collaborator_role|
+              next unless has_permission?(collaborator_role)
 
-              policies << role.policy_id
+              filters << "(record_type = #{document_name} AND collaborators_ids = #{id})"
+              break
             end
           end
-          filters << "(record_type = #{document_name} AND (#{policies.map { |policy_id| "policy_id = #{policy_id}" }.join(" OR ")}))" if policies.present?
-        end
-
-        if access[:collaborators_access].present?
-          access[:collaborators_access].each do |collaborator_role|
-            next unless has_permission?(collaborator_role)
-
-            filters << "(record_type = #{document_name} AND collaborators_ids = #{id})"
-            break
-          end
         end
       end
     end
+
+    config = {filters: filters.join(" OR "), facets: ["company_id:#{company_id}"]}.to_json
+
+    token = SecureRandom.hex(32)
+    redis = Rails.configuration.redis
+    redis.set(token, config)
+    redis.expire(token, TOKEN_EXPIRY)
+
+    token
   end
 
 end

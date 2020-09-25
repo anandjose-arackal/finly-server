@@ -876,6 +876,7 @@ DEPENDENCIES
   ransack (~> 2.3)
   rb-readline (~> 0.5)
   rbtrace (~> 0.4)
+  redis (~> 4.1)
   reform (~> 2.2)
   reform-rails (~> 0.1)
   remotipart (~> 1.4)

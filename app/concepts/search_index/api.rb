@@ -38,7 +38,7 @@ class SearchIndex::API
     validate
 
     begin
-      index = MEILISEARCH_CLIENT.create_index(self.index_name, primaryKey: self.primary_key.name)
+      index = Rails.configuration.meilisearch.create_index(self.index_name, primaryKey: self.primary_key.name)
 
       index.update_searchable_attributes(searchable_attributes)
       index.update_displayed_attributes(displayed_attributes)
@@ -87,7 +87,7 @@ class SearchIndex::API
 
   def self.delete_index
     begin
-      MEILISEARCH_CLIENT.delete_index(self.index_name)
+      Rails.configuration.meilisearch.delete_index(self.index_name)
       return true
     rescue MeiliSearch::ApiError => e
       # Index already exists
@@ -99,7 +99,7 @@ class SearchIndex::API
   attr_accessor :index
 
   def initialize
-    self.index = MEILISEARCH_CLIENT.index(self.class.index_name)
+    self.index = Rails.configuration.meilisearch.index(self.class.index_name)
   end
 
   def add_document(document)
@@ -125,9 +125,10 @@ class SearchIndex::API
     index.get_all_update_status
   end
 
-  def search(q, filters: nil)
+  def search(q, filters: nil, facets: nil)
     options = {}
     options['filters'] = filters if filters.present?
+    options['facetFilters'] = facets if facets.present?
     index.search(q, options)
   end
 

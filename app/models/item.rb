@@ -110,7 +110,8 @@ class Item < ApplicationRecord
         category_code: category&.category_code,
         sequence_id: item_number,
         gl_code: self&.category&.gl_code,
-        status_name: 'active'
+        status_name: 'active',
+        company_id: company_id.to_s
     }
   end
 

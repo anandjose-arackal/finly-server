@@ -4339,6 +4339,9 @@ Rails.application.routes.draw do
 
   get 'lookup/:route', to: 'lookup#route'
 
+  post 'search', to: 'global_search#create'
+  get 'search', to: 'global_search#index'
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
   # The priority is based upon order of creation: first created -> highest priority.

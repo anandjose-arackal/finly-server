@@ -16,7 +16,3 @@ Loader.watch! "Routes Loader" do
   end
   Dir.glob(Rails.root.join("app/routes/**/*.rb")).each {|f| load f}
 end
-
-Loader.watch! "MeiliSearch Client" do
-  MEILISEARCH_CLIENT = MeiliSearch::Client.new('http://127.0.0.1:7700', '')
-end
