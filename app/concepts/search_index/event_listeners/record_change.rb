@@ -1,4 +1,4 @@
-class SearchIndex::EventListener
+class SearchIndex::EventListeners::RecordChange
 
   def work(user, params)
     record = params[:record]

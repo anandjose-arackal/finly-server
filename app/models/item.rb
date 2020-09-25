@@ -35,9 +35,9 @@ class Item < ApplicationRecord
   include Sequenced::ActsAsSequenced
   include MathUtil
   include EventProducer
-  include SearchIndex::Document
+  include SearchIndex::Concerns::Document
 
-  register_search_index! RecordsIndex
+  register_search_index! VpRecordsIndex
 
   acts_as_sequenced column: :item_number, purpose: :item_master, min_length: 8, editable: false, prefix: -> (record) { record.goods? ? "G" : "S" }
 
@@ -109,7 +109,8 @@ class Item < ApplicationRecord
         category_name: category&.name,
         category_code: category&.category_code,
         sequence_id: item_number,
-        gl_code: self&.category&.gl_code
+        gl_code: self&.category&.gl_code,
+        status_name: 'active'
     }
   end
 
@@ -125,12 +126,12 @@ class Item < ApplicationRecord
     self.product_type_id == ProductType.id_for(:service)
   end
 
-
   after_save :budget_trail_entry
 
   def as_json
     {
         id: id,
+        company_id: company_id,
         item_number: item_number,
         unit_of_measurement: unit_of_measurement,
         hsn_sac: hsn_sac,

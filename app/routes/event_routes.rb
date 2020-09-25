@@ -32,7 +32,7 @@ Events::Router.draw do
 
   scope :items do
     route '*' do
-      to SearchIndex::EventListener
+      to SearchIndex::EventListeners::RecordChange
     end
   end
 end

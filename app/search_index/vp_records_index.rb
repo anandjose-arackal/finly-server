@@ -1,8 +1,9 @@
-class RecordsIndex < SearchIndex::API
+class VpRecordsIndex < SearchIndex::API
 
-  index_name 'records'
+  index_name 'vp_records'
 
   attribute :id, primary_key: true, searchable: false, displayed: false
+  attribute :company_id, faceted: true, displayed: false
   attribute :record_id, searchable: false, displayed: true
   attribute :record_type, searchable: false, displayed: true
   attribute :sequence_id
@@ -33,8 +34,5 @@ class RecordsIndex < SearchIndex::API
   attribute :collaborators_ids, faceted: true, searchable: false, displayed: false
   attribute :collaborators_emails
   attribute :collaborators_names
-  attribute :initiator_ids, faceted: true, searchable: false, displayed: false
-  attribute :initiator_name
-  attribute :initiator_email
 
 end

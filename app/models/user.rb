@@ -69,6 +69,7 @@ class User < ApplicationRecord
   include Exposures::Model::Exposable
   include EventProducer
   include ErpSyncable
+  include SearchIndex::Concerns::AccessControl
 
   event_channel 'user'
 

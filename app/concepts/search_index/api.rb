@@ -86,7 +86,14 @@ class SearchIndex::API
   end
 
   def self.delete_index
-    MEILISEARCH_CLIENT.delete_index(self.index_name)
+    begin
+      MEILISEARCH_CLIENT.delete_index(self.index_name)
+      return true
+    rescue MeiliSearch::ApiError => e
+      # Index already exists
+      return false
+      # raise e unless e.code == 'index_already_exists'
+    end
   end
 
   attr_accessor :index
@@ -116,6 +123,12 @@ class SearchIndex::API
 
   def get_all_update_status
     index.get_all_update_status
+  end
+
+  def search(q, filters: nil)
+    options = {}
+    options['filters'] = filters if filters.present?
+    index.search(q, options)
   end
 
 end

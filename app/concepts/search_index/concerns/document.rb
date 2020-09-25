@@ -1,4 +1,4 @@
-module SearchIndex::Document
+module SearchIndex::Concerns::Document
   extend ActiveSupport::Concern
 
   class_methods do
@@ -22,7 +22,8 @@ module SearchIndex::Document
     document = searchable_document
     return nil if document.nil?
 
-    {id: searchable_record_id, record_id: id, record_type: searchable_record_type}.merge(searchable_document)
+    raise 'Company ID is mandatory for building search index' if document[:company_id].blank?
+    {id: searchable_record_id, record_id: id, record_type: searchable_record_type}.merge(document)
   end
 
   def searchable_record_id
