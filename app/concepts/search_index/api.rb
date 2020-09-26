@@ -1,4 +1,4 @@
-class SearchIndex::API
+class SearchIndex::Api
   include DynamicAttributes
 
   class_attr :index_name
@@ -11,16 +11,17 @@ class SearchIndex::API
     attribute
   end
 
-  def self.register(model)
-    models << model
+  # Uses +SearchIndex::DocumentConfig+
+  def self.register(document_config)
+    document_configs << document_config
   end
 
   def self.attributes
     @attributes ||= []
   end
 
-  def self.models
-    @models ||= []
+  def self.document_configs
+    @document_configs ||= []
   end
 
   def self.index
@@ -53,15 +54,8 @@ class SearchIndex::API
   end
 
   def self.seed_index
-    index = self.index
-    models.each do |model|
-      model.includes(model.searchable_includes).find_in_batches do |batch|
-        data = []
-        batch.each do |record|
-          data << record.searchable_document_data if record.show_in_search_index?
-        end
-        index.add_documents data.compact
-      end
+    document_configs.each do |document_config|
+      document_config.rebuild_documents
     end
 
     true

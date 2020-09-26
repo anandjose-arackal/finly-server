@@ -1,4 +1,4 @@
-class VpRecordsIndex < SearchIndex::API
+class Indexes::VpRecords < SearchIndex::Api
 
   index_name 'vp_records'
 

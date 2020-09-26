@@ -1,60 +1,23 @@
 module SearchIndex::Concerns::Document
   extend ActiveSupport::Concern
 
+  included do
+    # Fixme : Ideally the respective SearchIndex DocumentConfig class should be loaded for development env using Loader, but since it is throwing a superclass mismatch, this is a temporary workaround where the classes are loaded through the model
+    search_index
+  end
+
   class_methods do
-    def register_search_index!(klass)
-      klass.register(self)
-
-      @search_index = klass
-    end
-
     def search_index
-      @search_index
+      Object.const_get("#{self.name}Index")
     end
 
-    def searchable_includes(*associations)
-      @searchable_includes = associations if associations.present?
-      @searchable_includes
+    def rebuild_search_index
+      search_index.rebuild_index
     end
   end
 
-  def searchable_document_data
-    document = searchable_document
-    return nil if document.nil?
-
-    raise 'Company ID is mandatory for building search index' if document[:company_id].blank?
-    {id: searchable_record_id, record_id: id, record_type: searchable_record_type}.merge(document)
-  end
-
-  def searchable_record_id
-    "#{searchable_record_type}_#{id}"
-  end
-
-  def searchable_record_type
-    self.class.table_name
-  end
-
-  def searchable_document
-    # Implement in the ActiveRecord
-  end
-
-  def show_in_search_index?
-    deleted_at.nil?
-  end
-
-  def rebuild_search_index
-    index_api = self.class.search_index
-    return if index_api.blank?
-
-    index = index_api.index
-    if show_in_search_index?
-      data = searchable_document_data
-      return if data.blank?
-
-      index.add_document searchable_document_data
-    else
-      index.delete_document searchable_record_id
-    end
+  def search_index
+    self.class.search_index
   end
 
 end

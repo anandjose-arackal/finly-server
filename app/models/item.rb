@@ -37,8 +37,6 @@ class Item < ApplicationRecord
   include EventProducer
   include SearchIndex::Concerns::Document
 
-  register_search_index! VpRecordsIndex
-
   acts_as_sequenced column: :item_number, purpose: :item_master, min_length: 8, editable: false, prefix: -> (record) { record.goods? ? "G" : "S" }
 
   default_scope { unscope(where: :deleted_at) }
@@ -100,24 +98,6 @@ class Item < ApplicationRecord
   scope :includes_for_export, -> { includes(:category, :item_expense_type, :product_type, :supply_item_type, :tax_rate) }
 
   delegate :po_item?, :non_po_item?, to: :supply_item_type
-
-  searchable_includes(:item_expense_type, :product_type, :supply_item_type, :category)
-
-  def searchable_document
-    {
-        description: description,
-        category_name: category&.name,
-        category_code: category&.category_code,
-        sequence_id: item_number,
-        gl_code: self&.category&.gl_code,
-        status_name: 'active',
-        company_id: company_id.to_s
-    }
-  end
-
-  def show_in_search_index?
-    deleted_at.nil? and active
-  end
 
   def goods?
     self.product_type_id == ProductType.id_for(:goods)
