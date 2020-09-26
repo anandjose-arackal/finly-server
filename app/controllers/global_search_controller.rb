@@ -14,7 +14,7 @@ class GlobalSearchController < BaseControllers::WebBase
   end
 
   def set_client_version
-
+    # Displaying to reduce the query
   end
 
 end
