@@ -13,4 +13,8 @@ class GlobalSearchController < BaseControllers::WebBase
     endpoint SearchIndex::Query
   end
 
+  def set_client_version
+
+  end
+
 end

@@ -8,7 +8,7 @@ class SearchIndex::Query < Transactions::API
 
   def fetch_token(context, **)
     context[:token] = RequestStoreUtil.current_request.headers['Authorization']
-    return unauthorized! if context[:token].blank?
+    return unauthorized!(context) if context[:token].blank?
 
     true
   end
@@ -16,7 +16,7 @@ class SearchIndex::Query < Transactions::API
   def fetch_filters(context, token:, **)
     context[:config] = Rails.configuration.redis.get(token)
     context[:config] = JSON.parse(context[:config]).with_indifferent_access if context[:config]
-    return unauthorized! if context[:config].blank? or context[:config][:filters].blank? or context[:config][:facets].blank?
+    return unauthorized!(context) if context[:config].blank? or context[:config][:filters].blank? or context[:config][:facets].blank?
 
     true
   end
@@ -24,7 +24,7 @@ class SearchIndex::Query < Transactions::API
   def query(context, config:, params:, **)
     filters = config[:filters]
     facets = config[:facets]
-    context[:response] = VpRecordsIndex.index.search(params[:q], {filters: filters, facets: facets})
+    context[:response] = Indexes::VpRecords.index.search(params[:q], {filters: filters, facets: facets})
   end
 
 end
