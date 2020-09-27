@@ -24,7 +24,7 @@ class SearchIndex::Query < Transactions::API
   def query(context, config:, params:, **)
     filters = config[:filters]
     facets = config[:facets]
-    context[:response] = Indexes::VpRecords.index.search(params[:q], {filters: filters, facets: facets})
+    context[:response] = Indexes::VpRecords.index.search(params[:q], {filters: filters, facets: facets, facets_distribution: ['record_type']})
   end
 
 end

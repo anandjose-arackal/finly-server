@@ -21,7 +21,9 @@ class SearchIndex::DocumentConfig
 
   def condition(&block)
     @condition = block if block_given?
-    @condition
+    @condition ||= lambda do |record|
+      record.deleted_at.nil?
+    end
   end
 
   def document_id(&block)
@@ -35,6 +37,13 @@ class SearchIndex::DocumentConfig
     @record_type = block if block_given?
     @record_type ||= lambda { |record|
       record.class.table_name
+    }
+  end
+
+  def company_id(&block)
+    @company_id = block if block_given?
+    @company_id ||= lambda { |record|
+      record.company_id.to_s
     }
   end
 
@@ -68,6 +77,7 @@ class SearchIndex::DocumentConfig
     return nil if serialize.nil?
 
     document = serialize.call(record)
+    document[:company_id] = company_id.call(record)
     raise 'Company ID is mandatory for building search index' if document[:company_id].blank?
 
     {id: document_id.call(record), record_id: record.id, record_type: record_type.call(record)}.merge(document)

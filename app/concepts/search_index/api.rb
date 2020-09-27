@@ -39,11 +39,7 @@ class SearchIndex::Api
     validate
 
     begin
-      index = Rails.configuration.meilisearch.create_index(self.index_name, primaryKey: self.primary_key.name)
-
-      index.update_searchable_attributes(searchable_attributes)
-      index.update_displayed_attributes(displayed_attributes)
-      index.update_attributes_for_faceting(attributes_for_faceting)
+      Rails.configuration.meilisearch.create_index(self.index_name, primaryKey: self.primary_key.name)
 
       true
     rescue MeiliSearch::ApiError => e
@@ -65,6 +61,14 @@ class SearchIndex::Api
     delete_index
     create_index
     seed_index
+    set_index_properties
+  end
+
+  def self.set_index_properties
+    index = Rails.configuration.meilisearch.index(self.index_name)
+    index.update_searchable_attributes(searchable_attributes)
+    index.update_displayed_attributes(displayed_attributes)
+    index.update_attributes_for_faceting(attributes_for_faceting)
   end
 
   def self.searchable_attributes
@@ -119,10 +123,11 @@ class SearchIndex::Api
     index.get_all_update_status
   end
 
-  def search(q, filters: nil, facets: nil)
+  def search(q, filters: nil, facets: nil, facets_distribution: nil)
     options = {}
     options['filters'] = filters if filters.present?
     options['facetFilters'] = facets if facets.present?
+    options['facetsDistribution'] = facets_distribution if facets_distribution.present?
     index.search(q, options)
   end
 

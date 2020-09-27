@@ -52,6 +52,7 @@ class YesBankVendor < ApplicationRecord
   include LiquidDroppable
   include Exposures::Model::Exposable
   include ErpSyncable
+  include SearchIndex::Concerns::Document
 
   validates :business_name, presence: true
 
