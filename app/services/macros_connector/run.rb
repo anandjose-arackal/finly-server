@@ -6,7 +6,8 @@ class MacrosConnector::Run < ServiceApi
     end
   end
 
-  url -> (user, params) { Rails.application.config_for(:finly_macros)["outbound"]["base_url"] }
+  # url -> (user, params) { Rails.application.config_for(:finly_macros)["outbound"]["base_url"] }
+  url -> (user, params) { "https://macros_dev.finly.io" }
   path 'jobs'
   http_method 'post'
   client -> (user, params) do
