@@ -20,6 +20,7 @@
 class Policy < ApplicationRecord
   include SoftDeletable
   include EventProducer
+  include SearchIndex::Concerns::Document
 
   event_channel 'policy'
 

@@ -6,6 +6,7 @@ class Indexes::VpRecords < SearchIndex::Api
   attribute :company_id, faceted: true, displayed: false
   attribute :record_id, searchable: false, displayed: true
   attribute :record_type, faceted: true, searchable: false, displayed: true
+  attribute :invoice_number
   attribute :sequence_id
   attribute :description
   attribute :line_items

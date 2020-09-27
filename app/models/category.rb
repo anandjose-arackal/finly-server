@@ -29,6 +29,7 @@ class Category < ApplicationRecord
   include LiquidDroppable
   include Exposures::Model::Exposable
   include EventProducer
+  include SearchIndex::Concerns::Document
 
   acts_as_sequenced column: :category_code, purpose: :category, editable: false, prefix: 'CAT'
   has_ancestry

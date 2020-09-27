@@ -21,6 +21,7 @@ class CostCenter < ApplicationRecord
   include LiquidDroppable
   include Exposures::Model::Exposable
   include EventProducer
+  include SearchIndex::Concerns::Document
 
   event_channel 'cost_center'
 

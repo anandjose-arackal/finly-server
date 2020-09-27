@@ -62,8 +62,8 @@
 class BbpsBillerSubscription < ApplicationRecord
   include Sequenced::ActsAsSequenced
   include SoftDeletable, Transitionable
-
   include EventProducer
+  include SearchIndex::Concerns::Document
 
   event_channel 'bbps_biller_subscription'
 

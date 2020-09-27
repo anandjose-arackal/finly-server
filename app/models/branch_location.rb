@@ -33,6 +33,7 @@ class BranchLocation < ApplicationRecord
   include LiquidDroppable
   include Exposures::Model::Exposable
   include EventProducer
+  include SearchIndex::Concerns::Document
 
   event_channel 'location'
 
