@@ -12,17 +12,17 @@ class Indexes::VpRecords < SearchIndex::Api
   attribute :category_code
   attribute :category_name
   attribute :gl_code
-  attribute :cost_center_name
-  attribute :cost_center_code
-  attribute :department_name
-  attribute :department_code
-  attribute :location_name
-  attribute :location_code
+  attribute :cost_center_names
+  attribute :cost_center_codes
+  attribute :department_names
+  attribute :department_codes
+  attribute :location_names
+  attribute :location_codes
   attribute :narration
-  attribute :billing_location
-  attribute :shipping_location
-  attribute :submitted_at
-  attribute :approved_at
+  attribute :billing_location_name
+  attribute :billing_location_code
+  attribute :shipping_location_name
+  attribute :shipping_location_code
   attribute :status_id, searchable: false, displayed: false
   attribute :status_name
   attribute :vendor_name
@@ -33,8 +33,9 @@ class Indexes::VpRecords < SearchIndex::Api
   attribute :policy_id, searchable: false, displayed: false
   attribute :policy_name
   attribute :collaborators_ids, displayed: false
-  attribute :collaborators_emails
-  attribute :collaborators_names
+  attribute :collaborators_emails, displayed: false
+  attribute :collaborators_names, displayed: false
+  attribute :unique_transaction_references
 
   class Indexes::VpRecords::Helpers
 
@@ -46,6 +47,11 @@ class Indexes::VpRecords < SearchIndex::Api
         document[:collaborator_ids] = []
         document[:collaborator_emails] = []
         document[:collaborator_names] = []
+        if record.created_by.present?
+          document[:collaborator_ids] << record.created_by.id
+          document[:collaborator_emails] << record.created_by.email
+          document[:collaborator_names] << record.created_by.name
+        end
         record.dlrms.each do |dlrm|
           if dlrm.taken_control_by.present?
             document[:collaborator_ids] << dlrm.taken_control_by.id
@@ -77,13 +83,9 @@ class Indexes::VpRecords < SearchIndex::Api
             document[:collaborator_emails] << dlrm.rejected_by.email
           end
         end
-        document[:collaborator_ids].uniq!
-        document[:collaborator_names].uniq!
-        document[:collaborator_emails].uniq!
       end
       document
     end
-
   end
 
 end

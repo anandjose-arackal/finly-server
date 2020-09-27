@@ -46,6 +46,7 @@ class BankPaymentRequest < ApplicationRecord
           CustomFieldFilterSupport
   include LiquidDroppable
   include Exposures::Model::Exposable
+  include SearchIndex::Concerns::Document
 
 
   belongs_to :status, optional: true, class_name: "BankPaymentRequestStatus"

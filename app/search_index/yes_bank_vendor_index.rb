@@ -1,7 +1,7 @@
 class YesBankVendorIndex < SearchIndex::Model
 
   index Indexes::VpRecords do
-    include_associations :policy, :status, Indexes::VpRecords::Helpers::INCLUDE_COLLABORATORS, :gstin_locations
+    include_associations :policy, :status, Indexes::VpRecords::Helpers::INCLUDE_COLLABORATORS, :gstin_locations, :created_by
 
     record_type do |record|
       'vendors'

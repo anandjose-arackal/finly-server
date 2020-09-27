@@ -128,6 +128,7 @@ class SearchIndex::Api
     options['filters'] = filters if filters.present?
     options['facetFilters'] = facets if facets.present?
     options['facetsDistribution'] = facets_distribution if facets_distribution.present?
+    options['matches'] = true
     index.search(q, options)
   end
 

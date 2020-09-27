@@ -51,12 +51,14 @@ class SearchIndex::DocumentConfig
     model.includes(include_associations).find_in_batches do |batch|
       data = []
       batch.each do |record|
+        next if condition.present? and not condition.call(record)
         record_data = build_record_data(record)
         next if record_data.blank?
 
-        data << record_data if condition.blank? or condition.call(record)
+        data << record_data
       end
       index_api.index.add_documents data.compact
+      break
     end
   end
 
@@ -80,6 +82,11 @@ class SearchIndex::DocumentConfig
     document[:company_id] = company_id.call(record)
     raise 'Company ID is mandatory for building search index' if document[:company_id].blank?
 
+    document.each do |k, v|
+      v.compact! if v.respond_to?(:compact)
+      v.uniq! if v.respond_to?(:uniq!)
+    end
+    document.compact!
     {id: document_id.call(record), record_id: record.id, record_type: record_type.call(record)}.merge(document)
   end
 
