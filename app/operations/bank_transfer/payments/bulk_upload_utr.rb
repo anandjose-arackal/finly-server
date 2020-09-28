@@ -19,6 +19,7 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
     self.result_array = []
     self.headers = retrieve_headers
     self.bank_transaction_class = user.company.feature_subscription.bank_transaction_class
+
   end
 
   def validate
@@ -31,7 +32,11 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
   def pre_process
     payment_order_ids = user.company.payment_orders.with_purpose_id(PaymentPurpose.ids_for(:vendor_payment, :advance_against_purchase_order, :utility_bill_payment)).pluck(:id)
     self.all_payments = Payment.with_payment_order_id(payment_order_ids).to_a
-    self.all_transactions = bank_transaction_class.where(company_id: user.company_id).pluck(:bank_reference_number)
+    if bank_transaction_class&.column_names&.include?("bank_reference_number")
+      self.all_transactions = bank_transaction_class.where(company_id: user.company_id).pluck(:bank_reference_number)
+    else
+      self.all_transactions = bank_transaction_class.where(company_id: user.company_id).pluck(:utr)
+    end
   end
 
   def process
