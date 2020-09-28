@@ -103,8 +103,8 @@ class User < ApplicationRecord
   belongs_to :location, optional: true, class_name: "BranchLocation"
   belongs_to :department, optional: true
 
-  has_one :profile, class_name: 'UserProfile', dependent: :destroy
-  has_one :wallet, class_name: 'UserWallet', foreign_key: :user_id, dependent: :destroy
+  has_one :profile, class_name: 'UserProfile'
+  has_one :wallet, class_name: 'UserWallet', foreign_key: :user_id
   has_one :bank_wallet, class_name: 'VendorPaymentWallet', foreign_key: :user_id, dependent: :destroy
   has_many :role_mapping, class_name: 'UserRoleMapping', dependent: :destroy
   has_many :user_roles, through: :role_mapping, dependent: :destroy
@@ -137,7 +137,7 @@ class User < ApplicationRecord
   has_one :enforce_policy, as: :enforceable, dependent: :destroy
   has_one :auto_reload_config, as: :reloadable, dependent: :destroy
   has_one :itz_cash_dmt_sender
-  has_one :user_panel_subscription, dependent: :destroy
+  has_one :user_panel_subscription
   has_one :cash_on_hand, dependent: :destroy
   has_one :quickbooks_user, class_name: "QuickbooksFinlyIntegrationsUser"
   has_one :permission, class_name: "UserPermission"

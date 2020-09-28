@@ -249,7 +249,8 @@ class Card::Transaction::Create < BaseOperation
 
   def post_process
     # Create Finly Transaction
-    if self.transaction.present? and transaction.success? and not ['Branch TopUp', 'Balance Adjustment Debit'].include?(self.transaction.merchant_name)
+    same_transactions_count = CardTransaction.where(reference_id: self.transaction.reference_id).count
+    if self.transaction.present? and transaction.success? and same_transactions_count <= 1 and not ['Branch TopUp', 'Balance Adjustment Debit'].include?(self.transaction.merchant_name) 
       account = self.transaction.card
       if transaction.credit?
         transaction_type_id = TransactionType.id_for(:credit)

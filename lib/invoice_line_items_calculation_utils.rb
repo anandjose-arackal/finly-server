@@ -100,7 +100,7 @@ class InvoiceLineItemsCalculationUtils
         item.taxable_amount = Amount.new(value: taxable_amount_value.abs, currency_id: 1)
       end
 
-      if invoice.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice) # for some wierd reason billable amount was removed from list of attr to be updated by some genius. This is a workaround so that it does not affect po invoice
+      if InwardInvoiceType.ids_for(:non_po_invoice, :recurring_invoice).include?invoice.invoice_type_id # for some wierd reason billable amount was removed from list of attr to be updated by some genius. This is a workaround so that it does not affect po invoice
         if item.billable_amount.present?
           item.billable_amount.value = item.taxable_amount.value
           item.billable_amount.currency_id = Currency.first.id
