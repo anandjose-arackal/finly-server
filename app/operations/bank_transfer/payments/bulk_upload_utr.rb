@@ -89,7 +89,11 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
       else
         # disallow duplicate utr to be updated
         if self.all_transactions.include? utr.to_s.strip
-          p_id = bank_transaction_class.where(company_id: user.company_id, bank_reference_number: utr).first&.payment&.id
+          if bank_transaction_class&.column_names&.include?("bank_reference_number")
+            p_id = bank_transaction_class.where(company_id: user.company_id, bank_reference_number: utr).first&.payment&.id
+          else
+            p_id = bank_transaction_class.where(company_id: user.company_id, utr: utr).first&.payment&.id
+          end
           self.result_array[index] << "UTR already exists for some other payment. See Payment ID - #{p_id}"
           next
         elsif self.payments_data[0, index].to_a.pluck(:utr).include? utr.to_s.strip
