@@ -7,7 +7,7 @@ class FeatureToggle
   end
 
   def flags
-    @flags ||= BULLET_TRAIN&.get_flags(user.id)
+    @flags ||= Rails.configuration.bullet_train&.get_flags(user.id)
   end
 
   def enabled?(feature, default = false)
@@ -25,11 +25,11 @@ class FeatureToggle
   end
 
   def incr_counter(trait)
-    BULLET_TRAIN&.incr_counter user.id, trait
+    Rails.configuration.bullet_train&.incr_counter user.id, trait
   end
 
   def set_trait(trait, value)
-    BULLET_TRAIN&.set_trait user.id, trait, value
+    Rails.configuration.bullet_train&.set_trait user.id, trait, value
   end
 
   def normalize_key(key)

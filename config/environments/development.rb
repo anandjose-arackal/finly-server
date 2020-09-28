@@ -12,6 +12,13 @@ Rails.application.configure do
   # Show full error reports.
   config.consider_all_requests_local = true
 
+  feature_flipper_config = Rails.application.config_for(:feature_flipper)
+  if feature_flipper_config.dig('api_key').present? and feature_flipper_config.dig('url').present?
+    config.bullet_train = BulletTrain.new(api_key: feature_flipper_config['api_key'], url: feature_flipper_config['url'])
+  else
+    config.bullet_train = nil
+  end
+
   # Enable/disable caching. By default caching is disabled.
   # Run rails dev:cache to toggle caching.
   if Rails.root.join('tmp', 'caching-dev.txt').exist?
