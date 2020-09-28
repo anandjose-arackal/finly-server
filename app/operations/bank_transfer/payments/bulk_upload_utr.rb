@@ -99,7 +99,8 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
         end
         # create a bank transaction for this particular payment
         amount = Amount.create(value: payment.amount_value, currency_id: 1)
-        new_transactions << bank_transaction_class.new(transfer_type: payment.payment_mode,
+        if bank_transaction_class&.column_names&.include?("bank_reference_number")
+          new_transactions << bank_transaction_class.new(transfer_type: payment.payment_mode,
                                                        bank_reference_number: utr,
                                                        company_id: user.company_id,
                                                        transfer_status_id: BankTransferStatus.id_for(:completed),
@@ -108,6 +109,17 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
                                                        reference_payment_id: payment.id,
                                                        amount_id: amount.id,
                                                        created_at: credited_at)
+        else
+          new_transactions << bank_transaction_class.new(transfer_type: payment.payment_mode,
+                                                         utr: utr,
+                                                         company_id: user.company_id,
+                                                         transfer_status_id: BankTransferStatus.id_for(:completed),
+                                                         bank_transaction_type_id: BankTransactionType.id_for(:outside_finly),
+                                                         beneficiary_bank_account_id: payment.receiving_account&.id,
+                                                         reference_payment_id: payment.id,
+                                                         amount_id: amount.id,
+                                                         created_at: credited_at)
+        end
       end
       # add a success message to the result array
       file_payments.push(payment)
@@ -140,7 +152,11 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
 
   def update_details
     # it will update the existing bank transactions with the bank_reference_number if present
-    exec_statement self.existing_transactions, true, [:bank_reference_number]
+    if bank_transaction_class&.column_names&.include?("bank_reference_number")
+      exec_statement self.existing_transactions, true, [:bank_reference_number]
+    else
+      exec_statement self.existing_transactions, true, [:utr]
+    end
     # will insert new records into bank transactions
     exec_statement self.new_transactions
     # payments_without_transactions = payment_details
