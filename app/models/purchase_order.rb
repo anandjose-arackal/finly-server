@@ -79,6 +79,7 @@
 class PurchaseOrder < ApplicationRecord
   include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport
   include Sequenced::ActsAsSequenced
+  include Concerns::ErpSyncConcern
 
 
   acts_as_sequenced column: :po_number, purpose: :purchase_order, editable: false, prefix: 'PO/{fiscal_year_start}-{fiscal_year_end}/', min_length: 4
