@@ -35,7 +35,8 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
     subscription_id = params[:subscription_id]
 
     subscription = BbpsBillerSubscription.find_by id: subscription_id
-
+    last_bill = subscription.bbps_bills.reorder('created_at asc').last
+    return true if last_bill&.paid?
     options[:subscription] = subscription
 
     return false if autofetched and subscription.blank?
