@@ -940,6 +940,10 @@ class User < ApplicationRecord
     end
   end
 
+  def analytics_id
+    "user:#{id}"
+  end
+
   # def min_password_score
   #   level_3_req = UserRole.ids_for(
   #       :admin,

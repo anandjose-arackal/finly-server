@@ -19,6 +19,15 @@ Rails.application.configure do
     config.bullet_train = nil
   end
 
+  posthog_config = Rails.application.config_for(:posthog)
+  config.posthog = PostHog::Client.new(
+      {
+          api_key: posthog_config['api_key'],
+          api_host: posthog_config['api_host'],
+          on_error: Proc.new { |status, msg| print msg }
+      }
+  )
+
   # Enable/disable caching. By default caching is disabled.
   # Run rails dev:cache to toggle caching.
   if Rails.root.join('tmp', 'caching-dev.txt').exist?
