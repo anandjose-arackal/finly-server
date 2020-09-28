@@ -70,6 +70,7 @@ class User < ApplicationRecord
   include EventProducer
   include ErpSyncable
   include SearchIndex::Concerns::AccessControl
+  include SearchIndex::Concerns::Document
 
   event_channel 'user'
 
