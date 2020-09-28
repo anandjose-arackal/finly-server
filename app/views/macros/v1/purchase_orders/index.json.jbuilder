@@ -1,6 +1,7 @@
 includes = [
     :vendor, :status, :created_by,
     :policy, :gstin_location, :location, :delivery_location, :attachments,
+    { procurement: { inward_documents: [ :company, :vendor ] } },
     {
         items: [
             :inventory_line_item, :category, :department, :cost_center, :tax_rate,

@@ -31,6 +31,21 @@ json.line_items do
     json.total_amount item.total_amount&.value
   end
 end
+
+json.inward_documents do
+  json.array! record&.procurement&.inward_documents do |inward_document|    
+    json.company inward_document.company&.name
+    json.procurement_id inward_document.procurement_id
+    json.vendor inward_document.vendor.&name
+    json.doc_number inward_document.doc_number
+    json.delivery_date inward_document.delivery_date&.strftime("%d-%m-%Y")
+    json.transported_name inward_document&.transported_name
+    json.transporter_document_number inward_document&.transporter_document_number
+    json.vehicle_number inward_document&.vehicle_number
+    json.grn_number inward_document&.grn_number.to_s
+  end
+end
+
 json.attachments do
   json.array! record.attachments.reject { |attachment| attachment.file_file_size.nil? } do |attachment|
     json.extract! attachment, :description
