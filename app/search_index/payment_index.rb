@@ -10,6 +10,7 @@ class PaymentIndex < SearchIndex::Model
           status_id: record.status&.id,
           status_name: record.status&.name,
           sequence_id: record.id,
+          description: record.payment_order&.bank_payment_request&.description,
           narration: record.note,
           unique_transaction_references: ([record.to_exposure.utr] if record.reference_resource.present?)
       }
