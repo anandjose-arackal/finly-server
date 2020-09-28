@@ -163,7 +163,7 @@ namespace :deploy do
   task :yarn_install do
     on roles(:web) do
       within release_path do
-        execute("cd #{release_path} && sudo yum install yarn && yarn install")
+        execute("cd #{release_path} && yum install yarn && yarn install")
       end
     end
   end
