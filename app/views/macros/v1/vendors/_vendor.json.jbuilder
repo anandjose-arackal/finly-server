@@ -13,6 +13,11 @@ json.msme_registration_number record.msme_registration_number
 json.tds_rates record.tds_rates
 json.locations record.gstin_locations
 json.bank_accounts record.bank_accounts
+json.created_at record.created_at
+json.updated_at record.updated_at
+json.submitted_at record.submitted_at
+json.approved_at record.approved_at
+json.created_by record.created_by
 type_map = {}
 record.vendor_attachments.each do |attachment|
   type_map[attachment.attachment_type] ||= []
@@ -23,6 +28,9 @@ json.custom_fields do
   record.custom_fields.each do |custom_field|
     json.set! custom_field.field_configuration&.field_name, custom_field.configured_field_value
   end
+end
+json.approval_workflow record.dlrms do |dlrm|
+  json.partial! 'macros/v1/shared/approval_workflow', dlrm: dlrm
 end
 json.erp_sync_status record.erp_sync_status&.name
 json.erp_sync_message record.erp_sync_message

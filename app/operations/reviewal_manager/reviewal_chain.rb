@@ -31,10 +31,10 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
       return
     end
 
-    unless policy.present?
-      add_message :error, 'Invalid Policy'
-      return
-    end
+    # unless policy.present?
+    #   add_message :error, 'Invalid Policy'
+    #   return
+    # end
   end
 
   def process
