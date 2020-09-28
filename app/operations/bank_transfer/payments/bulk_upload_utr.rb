@@ -114,7 +114,7 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
                                                          utr: utr,
                                                          company_id: user.company_id,
                                                          transfer_status_id: BankTransferStatus.id_for(:completed),
-                                                         beneficiary_bank_account_id: payment.receiving_account&.id,
+                                                         receiving_account_id: payment.receiving_account&.id,
                                                          reference_payment_id: payment.id,
                                                          amount_id: amount.id,
                                                          created_at: credited_at)
