@@ -1,6 +1,8 @@
 module Masters
   module Users
+    # Trait publisher is responsible for publishing user traits to PostHog (Product Analytics) and BulletTrain (FeatureFlags)
     module TraitPublisher
+
       # Production having very large number of users but not active at the moment
       IGNORE_LIST = [
           1, # Demo Account
@@ -8,6 +10,7 @@ module Masters
           54 # Jotun India
       ]
 
+      # Responsible for publishing company properties
       class CompanyHandler
         # include Events::Consumer
 
@@ -29,13 +32,13 @@ module Masters
           company.users.where.not(company_id: Masters::Users::TraitPublisher::IGNORE_LIST).find_each do |user|
             properties = {
                 'company_id' => company.id,
-                "company_name" =>company.name,
-                "company_active" =>!!company.active,
-                "company_subdomain" =>company.subdomain,
-                "company_test_account" =>!!company.test_account,
-                "company_group_name" =>company.group&.name,
-                "company_status" =>company.status&.name,
-                'company_deleted_at' =>company.deleted_at,
+                "company_name" => company.name,
+                "company_active" => !!company.active,
+                "company_subdomain" => company.subdomain,
+                "company_test_account" => !!company.test_account,
+                "company_group_name" => company.group&.name,
+                "company_status" => company.status&.name,
+                'company_deleted_at' => company.deleted_at,
             }.compact
 
             if Rails.configuration.bullet_train.present?
@@ -152,6 +155,7 @@ module Masters
         end
       end
 
+      # Tracks user sessions in bullet train
       class UserSessionTracker
         # include Events::Consumer
 
@@ -180,6 +184,7 @@ module Masters
         end
       end
 
+      # Responsible for refreshing all user traits
       class RefreshUserTraits
 
         def self.call(timeframe = 10.years.ago)
