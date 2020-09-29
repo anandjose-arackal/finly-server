@@ -14,7 +14,7 @@ module Masters
         # consumes_event! 'companies.*'
 
         def self.refresh(changed_since)
-          return if Rails.configuration.bullet_train.nil?
+          return if Rails.configuration.bullet_train.nil? and Rails.configuration.posthog.nil?
 
           Company.where('updated_at > ?', changed_since).all.each do |c|
             new.work(nil, record: c)
@@ -24,43 +24,31 @@ module Masters
         def work(current_user, payload)
           company = payload[:record]
           return if IGNORE_LIST.include?(company.id)
-          return if Rails.configuration.bullet_train.nil?
+          return if Rails.configuration.bullet_train.nil? and Rails.configuration.posthog.nil?
 
           company.users.where.not(company_id: Masters::Users::TraitPublisher::IGNORE_LIST).find_each do |user|
-            posthog_properties = {}
-            if company.id.present?
-              Rails.configuration.bullet_train.set_trait user.analytics_id, "company_id", company.id
-              posthog_properties["company_id"] = company.id
-            end
-            if company.name.present?
-              Rails.configuration.bullet_train.set_trait user.analytics_id, "company_name", company.name
-              posthog_properties["company_name"] = company.name
-            end
-            Rails.configuration.bullet_train.set_trait user.analytics_id, "company_active", !!company.active
-            posthog_properties["company_active"] = !!company.active
-            if company.subdomain.present?
-              Rails.configuration.bullet_train.set_trait user.analytics_id, "company_subdomain", company.subdomain
-              posthog_properties["company_subdomain"] = company.subdomain
-            end
-            Rails.configuration.bullet_train.set_trait user.analytics_id, "company_test_account", !!company.test_account
-            posthog_properties["company_test_account"] = !!company.test_account
-            if company.group&.name.present?
-              Rails.configuration.bullet_train.set_trait user.analytics_id, "company_group_name", company.group&.name
-              posthog_properties["company_group_name"] = company.group&.name
-            end
-            if company.status&.name.present?
-              Rails.configuration.bullet_train.set_trait user.analytics_id, "company_status", company.status&.name
-              posthog_properties["company_status"] = company.status&.name
-            end
-            unless company.deleted_at.nil?
-              Rails.configuration.bullet_train.set_trait user.analytics_id, 'company_deleted_at', company.deleted_at
-              posthog_properties['company_deleted_at'] = company.deleted_at
-            end
+            properties = {
+                'company_id' => company.id,
+                "company_name" =>company.name,
+                "company_active" =>!!company.active,
+                "company_subdomain" =>company.subdomain,
+                "company_test_account" =>!!company.test_account,
+                "company_group_name" =>company.group&.name,
+                "company_status" =>company.status&.name,
+                'company_deleted_at' =>company.deleted_at,
+            }.compact
 
-            Rails.configuration.posthog.identify(
-                distinct_id: user.analytics_id,
-                properties: posthog_properties
-            )
+            if Rails.configuration.bullet_train.present?
+              properties.each_pair do |key, value|
+                Rails.configuration.bullet_train.set_trait user.analytics_id, key, value
+              end
+            end
+            if Rails.configuration.posthog.present?
+              Rails.configuration.posthog.identify(
+                  distinct_id: user.analytics_id,
+                  properties: properties
+              )
+            end
 
             true
           end
@@ -75,7 +63,7 @@ module Masters
 
         def self.refresh(changed_since)
           return if changed_since.nil?
-          return if Rails.configuration.bullet_train.nil?
+          return if Rails.configuration.bullet_train.nil? and Rails.configuration.posthog.nil?
 
           User.where('updated_at > ?', changed_since)
               .where.not(company_id: Masters::Users::TraitPublisher::IGNORE_LIST)
@@ -85,49 +73,35 @@ module Masters
         end
 
         def work(current_user, payload)
-          return if Rails.configuration.bullet_train.nil?
+          return if Rails.configuration.bullet_train.nil? and Rails.configuration.posthog.nil?
 
           user = payload[:record]
           return if Masters::Users::TraitPublisher::IGNORE_LIST.include?(user.company_id)
 
-          posthog_properties = {}
+          properties = {
+              'email' => user.email,
+              'mobile_number' => user.mobile_number,
+              'first_name' => user.first_name,
+              'last_name' => user.last_name,
+              'deleted_at' => user.deleted_at,
+              'verified' => !!user.verified,
+              'has_set_password' => !!user.default_password,
+              'point_of_contact' => !!user.point_of_contact,
+              'otp_verified' => !!user.otp_verified,
+              'status' => user.status
+          }.compact
 
-          if user.email.present?
-            Rails.configuration.bullet_train.set_trait user.id, 'email', user.email
-            posthog_properties['email'] = user.email
+          if Rails.configuration.bullet_train.present?
+            properties.each_pair do |key, value|
+              Rails.configuration.bullet_train.set_trait user.analytics_id, key, value
+            end
           end
-          if user.mobile_number.present?
-            Rails.configuration.bullet_train.set_trait user.id, 'mobile_number', user.mobile_number
-            posthog_properties['mobile_number'] = user.mobile_number
+          if Rails.configuration.posthog.present?
+            Rails.configuration.posthog.identify(
+                distinct_id: user.analytics_id,
+                properties: properties
+            )
           end
-          if user.first_name.present?
-            Rails.configuration.bullet_train.set_trait user.id, 'first_name', user.first_name
-            posthog_properties['first_name'] = user.first_name
-          end
-          if user.last_name.present?
-            Rails.configuration.bullet_train.set_trait user.id, 'last_name', user.last_name
-            posthog_properties['last_name'] = user.last_name
-          end
-          unless user.deleted_at.nil?
-            Rails.configuration.bullet_train.set_trait user.id, 'deleted_at', user.deleted_at
-            posthog_properties['deleted_at'] = user.deleted_at
-          end
-
-          Rails.configuration.bullet_train.set_trait user.id, 'verified', !!user.verified
-          posthog_properties['verified'] = !!user.verified
-          Rails.configuration.bullet_train.set_trait user.id, 'has_set_password', !!user.default_password
-          posthog_properties['has_set_password'] = !!user.default_password
-          Rails.configuration.bullet_train.set_trait user.id, 'point_of_contact', !!user.point_of_contact
-          posthog_properties['point_of_contact'] = !!user.point_of_contact
-          Rails.configuration.bullet_train.set_trait user.id, 'otp_verified', !!user.otp_verified
-          posthog_properties['otp_verified'] = !!user.otp_verified
-          Rails.configuration.bullet_train.set_trait user.id, 'status', user.status
-          posthog_properties['status'] = user.status
-
-          Rails.configuration.posthog.identify(
-              distinct_id: user.analytics_id,
-              properties: posthog_properties
-          )
           true
         end
       end
@@ -140,7 +114,7 @@ module Masters
 
         def self.refresh(changed_since)
           return if changed_since.nil?
-          return if Rails.configuration.bullet_train.nil?
+          return if Rails.configuration.bullet_train.nil? and Rails.configuration.posthog.nil?
 
           UserRoleMapping.unscoped.where('user_role_mappings.updated_at > ?', changed_since)
               .includes(:user, :user_role)
@@ -160,7 +134,7 @@ module Masters
         end
 
         def work(current_user, payload)
-          return if Rails.configuration.bullet_train.nil?
+          return if Rails.configuration.bullet_train.nil? and Rails.configuration.posthog.nil?
 
           role_mapping = payload[:record]
           return if IGNORE_LIST.include?(role_mapping.user.company_id)
@@ -168,8 +142,8 @@ module Masters
 
           # Role is assigned to the user if the deleted_at flag is not set
           assigned = role_mapping.deleted_at.nil?
-          Rails.configuration.bullet_train.set_trait user.id, "permission_#{role_mapping.user_role.name}", assigned
-          Rails.configuration.posthog.identify(
+          Rails.configuration.bullet_train&.set_trait user.analytics_id, "permission_#{role_mapping.user_role.name}", assigned
+          Rails.configuration.posthog&.identify(
               distinct_id: user.analytics_id,
               properties: {
                   "permission_#{role_mapping.user_role.name}" => assigned
@@ -185,14 +159,14 @@ module Masters
 
         def self.refresh(changed_since)
           return if changed_since.nil?
-          return if Rails.configuration.bullet_train.nil?
+          return if Rails.configuration.bullet_train.nil? and Rails.configuration.posthog.nil?
 
           User.where('updated_at > ?', changed_since)
               .where(company_id: 2)
               .where.not(company_id: Masters::Users::TraitPublisher::IGNORE_LIST)
               .find_in_batches do |batch|
             UserSession.where(user_id: batch.pluck(:id)).group(:user_id).count.each do |user_id, count|
-              Rails.configuration.bullet_train.set_trait user_id, 'user_sessions', count
+              Rails.configuration.bullet_train&.set_trait "user:#{user_id}", 'user_sessions', count
             end
           end
         end
@@ -200,14 +174,15 @@ module Masters
         def work(current_user, payload)
           user_session = payload[:record]
           return if user_session.blank?
+          return if Rails.configuration.bullet_train.nil? and Rails.configuration.posthog.nil?
 
-          Rails.configuration.bullet_train.incr_counter user.id, 'user_sessions'
+          Rails.configuration.bullet_train&.incr_counter user.analytics_id, 'user_sessions'
         end
       end
 
       class RefreshUserTraits
 
-        def self.call(timeframe=10.years.ago)
+        def self.call(timeframe = 10.years.ago)
           return if Rails.configuration.bullet_train.nil? and Rails.configuration.posthog.nil?
 
           # Set company specific traits for all users
