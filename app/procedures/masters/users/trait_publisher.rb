@@ -79,7 +79,6 @@ module Masters
 
           User.where('updated_at > ?', changed_since)
               .where.not(company_id: Masters::Users::TraitPublisher::IGNORE_LIST)
-              .limit(1)
               .find_each do |user|
             self.new.work(nil, record: user)
           end
