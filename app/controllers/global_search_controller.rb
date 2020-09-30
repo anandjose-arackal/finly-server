@@ -9,7 +9,8 @@ class GlobalSearchController < BaseControllers::WebBase
     # Going with direct rendering as it is faster than jbuilder
     if @op.success?
       render json: {
-          token: @op[:token]
+          token: @op[:token],
+          filters: @op[:documents]
       }
     end
   end
