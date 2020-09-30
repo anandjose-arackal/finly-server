@@ -3,6 +3,8 @@ class SearchIndex::UpdateMonitor
   REDIS_QUEUE = 'meilisearch_update_queue'
 
   def self.with_tracking(index_name, &block)
+    return unless Rails.configuration.meilisearch_monitor
+
     response = block.call
     update_id = response['updateId']
     if update_id.present?
@@ -12,6 +14,8 @@ class SearchIndex::UpdateMonitor
   end
 
   def self.run
+    return unless Rails.configuration.meilisearch_monitor
+
     logger = LogStashLogger.new(type: :file, path: 'log/meilisearch_error.log', sync: true)
     puts 'Listening...'
     begin

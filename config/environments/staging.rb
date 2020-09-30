@@ -23,6 +23,7 @@ Rails.application.configure do
   if meilisearch_config['enabled']
     config.meilisearch = MeiliSearch::Client.new(meilisearch_config['url'], meilisearch_config['api_key'])
     config.meilisearch_index_prefix = meilisearch_config['index_prefix']
+    config.meilisearch_monitor = false
   else
     config.meilisearch = nil
   end
