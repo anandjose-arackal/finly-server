@@ -81,7 +81,7 @@ class SearchIndex::DocumentConfig
     document = serialize.call(record)
     return if document.nil?
 
-    document[:company_id] = company_id.call(record)
+    document[:company_id] = company_id.call(record).to_s
     return if document[:company_id].blank?
     # raise 'Company ID is mandatory for building search index' if document[:company_id].blank?
 
