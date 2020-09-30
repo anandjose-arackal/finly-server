@@ -20,6 +20,16 @@ Rails.application.configure do
   #   config.dsn = YAML.load_file(Rails.root.join('config/sentry.yml'))['dsn']
   # end
 
+  redis_config = Rails.application.config_for(:redis_config)
+  config.redis = Redis.new(redis_config.slice('url', 'password'))
+
+  meilisearch_config = Rails.application.config_for(:meilisearch)
+  if meilisearch_config['enabled']
+    config.meilisearch = MeiliSearch::Client.new(meilisearch_config['url'], meilisearch_config['api_key'])
+  else
+    config.meilisearch = nil
+  end
+
   config.lograge.enabled = true
   # config.lograge.keep_original_rails_log = true
   config.lograge.logger = ActiveSupport::Logger.new "#{Rails.root}/log/logstash_#{Rails.env}.log"

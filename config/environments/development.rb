@@ -12,8 +12,15 @@ Rails.application.configure do
   # Show full error reports.
   config.consider_all_requests_local = true
 
-  config.redis = Redis.new
-  config.meilisearch = MeiliSearch::Client.new('http://127.0.0.1:7700', '')
+  redis_config = Rails.application.config_for(:redis_config)
+  config.redis = Redis.new(redis_config.slice('url', 'password'))
+
+  meilisearch_config = Rails.application.config_for(:meilisearch)
+  if meilisearch_config['enabled']
+    config.meilisearch = MeiliSearch::Client.new(meilisearch_config['url'], meilisearch_config['api_key'])
+  else
+    config.meilisearch = nil
+  end
 
   # Enable/disable caching. By default caching is disabled.
   # Run rails dev:cache to toggle caching.
@@ -22,7 +29,7 @@ Rails.application.configure do
 
     config.cache_store = :memory_store
     config.public_file_server.headers = {
-      'Cache-Control' => "public, max-age=#{2.days.to_i}"
+        'Cache-Control' => "public, max-age=#{2.days.to_i}"
     }
   else
     config.action_controller.perform_caching = false
