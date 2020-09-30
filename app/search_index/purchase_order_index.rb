@@ -18,7 +18,7 @@ class PurchaseOrderIndex < SearchIndex::Model
           department_names: record.line_items.map { |line_item| line_item.department&.name },
           department_codes: record.line_items.map { |line_item| line_item.department&.department_code },
           line_items: record.line_items.pluck(:description),
-          line_item_numbers: record.line_items.map { |line_item| line_item.inventory_line_item.item_number },
+          line_item_numbers: record.line_items.map { |line_item| line_item.inventory_line_item&.item_number },
           billing_location_name: record.location&.name,
           billing_location_code: record.location&.location_code,
           shipping_location_name: record.delivery_location&.name,
