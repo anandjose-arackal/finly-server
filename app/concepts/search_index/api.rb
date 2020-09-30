@@ -143,7 +143,7 @@ class SearchIndex::Api
     options['attributesToHighlight'] = ['*'] if facets_distribution.present?
     options['attributesToCrop'] = self.class.attributes_to_crop if self.class.attributes_to_crop.present?
     options['matches'] = true
-    options['offset'] = offset.to_i
+    options['offset'] = offset.to_i || 0
     options['limit'] = limit.to_i || 20
     index.search(q, options)
   end
