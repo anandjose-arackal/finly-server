@@ -16,6 +16,10 @@ class PaymentIndex < SearchIndex::Model
       }
     end
 
+    company_id do |record|
+      record.company_id || record.payment_order&.bank_payment_request&.company_id
+    end
+
   end
 
 end
