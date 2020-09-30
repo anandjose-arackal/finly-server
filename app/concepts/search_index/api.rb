@@ -135,14 +135,16 @@ class SearchIndex::Api
     index.get_all_update_status
   end
 
-  def search(q, filters: nil, facets: nil, facets_distribution: nil)
+  def search(q, filters: nil, facets: nil, facets_distribution: nil, offset: 0, limit: 20)
     options = {}
     options['filters'] = filters if filters.present?
-    # options['facetFilters'] = facets if facets.present?
+    options['facetFilters'] = facets if facets.present?
     options['facetsDistribution'] = facets_distribution if facets_distribution.present?
     options['attributesToHighlight'] = ['*'] if facets_distribution.present?
     options['attributesToCrop'] = self.class.attributes_to_crop if self.class.attributes_to_crop.present?
     options['matches'] = true
+    options['offset'] = offset.to_i
+    options['limit'] = limit.to_i || 20
     index.search(q, options)
   end
 
