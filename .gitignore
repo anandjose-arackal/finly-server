@@ -30,6 +30,7 @@ config/finly_macros.yml
 public/system/import_job/*
 config/feature_flipper.yml
 data.ms/*
+config/posthog.yml
 
 .rubocop.yml
 .vscode/

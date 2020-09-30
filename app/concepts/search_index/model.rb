@@ -21,9 +21,9 @@ class SearchIndex::Model
     true
   end
 
-  def self.rebuild_index
+  def self.rebuild_index(dry_run: false)
     document_configs.each do |document_config|
-      document_config.rebuild_documents
+      document_config.rebuild_documents(dry_run: dry_run)
     end
 
     true

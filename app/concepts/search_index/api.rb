@@ -4,8 +4,8 @@ class SearchIndex::Api
   class_attr :index_name
   class_attr :primary_key
 
-  def self.attribute(name, faceted: false, searchable: true, displayed: true, primary_key: false)
-    attribute = SearchIndex::Attribute.new(name, faceted: faceted, searchable: searchable, displayed: displayed, primary_key: primary_key)
+  def self.attribute(name, faceted: false, searchable: true, displayed: true, primary_key: false, crop_length: nil)
+    attribute = SearchIndex::Attribute.new(name, faceted: faceted, searchable: searchable, displayed: displayed, primary_key: primary_key, crop_length: crop_length)
     attributes << attribute
     primary_key(attribute) if primary_key
     attribute
@@ -49,18 +49,18 @@ class SearchIndex::Api
     end
   end
 
-  def self.seed_index
+  def self.seed_index(dry_run: false)
     document_configs.each do |document_config|
-      document_config.rebuild_documents
+      document_config.rebuild_documents(dry_run: dry_run)
     end
 
     true
   end
 
-  def self.rebuild_index
+  def self.rebuild_index(dry_run: false)
     delete_index
     create_index
-    seed_index
+    seed_index(dry_run: dry_run)
     set_index_properties
   end
 
@@ -92,6 +92,18 @@ class SearchIndex::Api
       return false
       # raise e unless e.code == 'index_already_exists'
     end
+  end
+
+  def self.attributes_to_crop
+    return @attributes_to_crop if @attributes_to_crop.present?
+
+    @attributes_to_crop = ["*"]
+    attributes.each do |attr|
+      next if attr.crop_length.nil?
+
+      @attributes_to_crop << "#{attr.name}:#{attr.crop_length}"
+    end
+    @attributes_to_crop
   end
 
   attr_accessor :index
@@ -126,8 +138,10 @@ class SearchIndex::Api
   def search(q, filters: nil, facets: nil, facets_distribution: nil)
     options = {}
     options['filters'] = filters if filters.present?
-    options['facetFilters'] = facets if facets.present?
+    # options['facetFilters'] = facets if facets.present?
     options['facetsDistribution'] = facets_distribution if facets_distribution.present?
+    options['attributesToHighlight'] = ['*'] if facets_distribution.present?
+    options['attributesToCrop'] = self.class.attributes_to_crop if self.class.attributes_to_crop.present?
     options['matches'] = true
     index.search(q, options)
   end

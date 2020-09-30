@@ -47,7 +47,7 @@ class SearchIndex::DocumentConfig
     }
   end
 
-  def rebuild_documents
+  def rebuild_documents(dry_run: false)
     model.includes(include_associations).find_in_batches do |batch|
       data = []
       batch.each do |record|
@@ -58,7 +58,7 @@ class SearchIndex::DocumentConfig
         data << record_data
       end
       index_api.index.add_documents data.compact
-      break
+      break if dry_run
     end
   end
 
@@ -85,6 +85,9 @@ class SearchIndex::DocumentConfig
     document.each do |k, v|
       v.compact! if v.respond_to?(:compact)
       v.uniq! if v.respond_to?(:uniq!)
+      if v.respond_to?(:each)
+        document[k] = v.join(', ')
+      end
     end
     document.compact!
     {id: document_id.call(record), record_id: record.id, record_type: record_type.call(record)}.merge(document)

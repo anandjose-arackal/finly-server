@@ -18,7 +18,8 @@ class PurchaseRequestIndex < SearchIndex::Model
           cost_center_codes: record.line_items.map { |line_item| line_item.cost_center&.cost_center_code },
           department_names: record.line_items.map { |line_item| line_item.department&.name },
           department_codes: record.line_items.map { |line_item| line_item.department&.department_code },
-          line_items: record.line_items.map {|line_item| line_item.item.description} + record.line_items.map {|line_item| line_item.item.item_number}
+          line_items: record.line_items.map { |line_item| line_item.item.description },
+          line_item_numbers: record.line_items.map { |line_item| line_item.item.item_number },
       }.merge(Indexes::VpRecords::Helpers::Collaborators(record))
     end
 

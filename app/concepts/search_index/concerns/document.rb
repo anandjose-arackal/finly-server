@@ -11,8 +11,8 @@ module SearchIndex::Concerns::Document
       Object.const_get("#{self.name}Index")
     end
 
-    def rebuild_search_index
-      search_index.rebuild_index
+    def rebuild_search_index(dry_run: false)
+      search_index.rebuild_index(dry_run: dry_run)
     end
   end
 

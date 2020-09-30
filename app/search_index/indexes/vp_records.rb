@@ -10,6 +10,7 @@ class Indexes::VpRecords < SearchIndex::Api
   attribute :sequence_id
   attribute :description
   attribute :line_items
+  attribute :line_item_numbers
   attribute :category_code
   attribute :category_name
   attribute :gl_code

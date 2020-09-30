@@ -18,7 +18,7 @@ class YesBankVendorIndex < SearchIndex::Model
           sequence_id: record.vendor_id,
           description: record.description,
           tax_id: record.pan,
-          tax_registration_number: record.gstin_locations.pluck(:gstin),
+          tax_registration_number: record.gstin_locations.pluck(:gstin).join(", "),
       }.merge(Indexes::VpRecords::Helpers::Collaborators(record))
     end
 
