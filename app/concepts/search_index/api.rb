@@ -129,21 +129,31 @@ class SearchIndex::Api
 
   def add_documents(documents)
     documents = [documents] unless documents.respond_to?(:each)
-    index.add_documents documents, self.class.primary_key.name
+    SearchIndex::UpdateTracker.with_tracking(self.class.full_index_name) do
+      index.add_documents documents, self.class.primary_key.name
+    end
   end
 
   def delete_document(id)
-    index.delete_documents(id)
+    SearchIndex::UpdateTracker.with_tracking(self.class.full_index_name) do
+      index.delete_documents(id)
+    end
   end
 
   def delete_documents(ids)
     ids = [ids] unless ids.respond_to?(:each)
 
-    index.delete_documents(ids)
+    SearchIndex::UpdateTracker.with_tracking(self.class.full_index_name) do
+      index.delete_documents(ids)
+    end
   end
 
   def get_all_update_status
     index.get_all_update_status
+  end
+
+  def get_update_status(update_id)
+    index.get_update_status(update_id)
   end
 
   def search(q, filters: nil, facets: nil, facets_distribution: nil, offset: 0, limit: 20)
@@ -156,7 +166,9 @@ class SearchIndex::Api
     options['matches'] = true
     options['offset'] = offset.to_i || 0
     options['limit'] = limit.to_i || 20
-    index.search(q, options)
+    SearchIndex::UpdateTracker.with_tracking(self.class.full_index_name) do
+      index.search(q, options)
+    end
   end
 
 end
