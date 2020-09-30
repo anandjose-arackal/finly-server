@@ -82,7 +82,8 @@ class SearchIndex::DocumentConfig
     return if document.nil?
 
     document[:company_id] = company_id.call(record)
-    raise 'Company ID is mandatory for building search index' if document[:company_id].blank?
+    return if document[:company_id].blank?
+    # raise 'Company ID is mandatory for building search index' if document[:company_id].blank?
 
     document.each do |k, v|
       v.compact! if v.respond_to?(:compact)
