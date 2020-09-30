@@ -1,4 +1,4 @@
-class SearchIndex::UpdateTracker
+class SearchIndex::UpdateMonitor
 
   REDIS_QUEUE = 'meilisearch_update_queue'
 
@@ -11,7 +11,7 @@ class SearchIndex::UpdateTracker
     response
   end
 
-  def self.monitor
+  def self.run
     logger = LogStashLogger.new(type: :file, path: 'log/meilisearch_error.log', sync: true)
     puts 'Listening...'
     begin
