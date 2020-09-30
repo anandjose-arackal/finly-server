@@ -40,7 +40,7 @@ class SearchIndex::Api
   # Ex: dev1, dev2 can have separate index prefix to separate out the searches
   def self.full_index_name
     if Rails.configuration.meilisearch_index_prefix.present?
-      return "#{Rails.configuration.meilisearch_index_prefix_}_#{self.index_name}"
+      return "#{Rails.configuration.meilisearch_index_prefix}_#{self.index_name}"
     end
 
     self.index_name
