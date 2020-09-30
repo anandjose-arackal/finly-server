@@ -35,11 +35,22 @@ class SearchIndex::Api
     raise "Index Name is not defined" if self.index_name.blank?
   end
 
+  # Adds an env prefix to the index name if available.
+  # This is used for generating a separate index per env within the same instance
+  # Ex: dev1, dev2 can have separate index prefix to separate out the searches
+  def self.full_index_name
+    if Rails.configuration.meilisearch_index_prefix.present?
+      return "#{Rails.configuration.meilisearch_index_prefix_}_#{self.index_name}"
+    end
+
+    self.index_name
+  end
+
   def self.create_index
     validate
 
     begin
-      Rails.configuration.meilisearch.create_index(self.index_name, primaryKey: self.primary_key.name)
+      Rails.configuration.meilisearch.create_index(self.full_index_name, primaryKey: self.primary_key.name)
 
       true
     rescue MeiliSearch::ApiError => e
@@ -65,7 +76,7 @@ class SearchIndex::Api
   end
 
   def self.set_index_properties
-    index = Rails.configuration.meilisearch.index(self.index_name)
+    index = Rails.configuration.meilisearch.index(self.full_index_name)
     index.update_searchable_attributes(searchable_attributes)
     index.update_displayed_attributes(displayed_attributes)
     index.update_attributes_for_faceting(attributes_for_faceting)
@@ -85,7 +96,7 @@ class SearchIndex::Api
 
   def self.delete_index
     begin
-      Rails.configuration.meilisearch.delete_index(self.index_name)
+      Rails.configuration.meilisearch.delete_index(self.full_index_name)
       return true
     rescue MeiliSearch::ApiError => e
       # Index already exists
@@ -109,7 +120,7 @@ class SearchIndex::Api
   attr_accessor :index
 
   def initialize
-    self.index = Rails.configuration.meilisearch.index(self.class.index_name)
+    self.index = Rails.configuration.meilisearch.index(self.class.full_index_name)
   end
 
   def add_document(document)
