@@ -139,7 +139,7 @@ class UserOnboarding::BuildUsersForImport < BaseOperation
       user_list = new_users
     end
 
-    maximum_users = Masters::Users::Toggle.new(current_user).maximum_users
+    maximum_users = UserToggle.new(current_user).maximum_users
     if maximum_users.present? and maximum_users > 0
       existing_users_count = current_company.users.filter_state([User::ACTIVE, User::PENDING]).count
       new_users = user_list.size
