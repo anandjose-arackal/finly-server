@@ -22,8 +22,9 @@ class GlobalSearchController < BaseControllers::WebBase
     if @op.success?
       render json: {
           data: {
-              hits: @op[:response]&.dig('hits').group_by {|hit| hit['record_type']},
-              facets_distribution: @op[:response]&.dig('facetsDistribution')
+              records: @op[:response]&.dig('hits').group_by {|hit| hit['record_type']},
+              facets_distribution: @op[:response]&.dig('facetsDistribution')['record_type'],
+              count: @op[:response]['nbHits']
           }
       }
     end

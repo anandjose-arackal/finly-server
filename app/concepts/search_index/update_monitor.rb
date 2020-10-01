@@ -3,11 +3,9 @@ class SearchIndex::UpdateMonitor
   REDIS_QUEUE = 'meilisearch_update_queue'
 
   def self.with_tracking(index_name, &block)
-    return unless Rails.configuration.meilisearch_monitor
-
     response = block.call
     update_id = response['updateId']
-    if update_id.present?
+    if update_id.present? and Rails.configuration.meilisearch_monitor
       Rails.configuration.redis.lpush(REDIS_QUEUE, {index: index_name, update_id: update_id}.to_json)
     end
     response
