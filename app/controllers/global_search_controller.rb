@@ -10,7 +10,7 @@ class GlobalSearchController < BaseControllers::WebBase
     if @op.success?
       render json: {
           token: @op[:token],
-          filters: @op[:documents]
+          documents: @op[:documents]
       }
     end
   end

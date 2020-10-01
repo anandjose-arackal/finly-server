@@ -3,54 +3,69 @@ class SearchIndex::GenerateToken < Transactions::API
   DOCUMENT_PERMISSIONS = {
       purchase_requests: {
           features: [:procurement, :purchase_requisition_system],
-          permissions: Docs::P2P::PurchaseRequests::Index.permissions
+          permissions: Docs::P2P::PurchaseRequests::Index.permissions,
+          category: :transactions
       },
       purchase_orders: {
           features: [:procurement],
-          permissions: Docs::P2P::PurchaseOrders::Index.permissions
+          permissions: Docs::P2P::PurchaseOrders::Index.permissions,
+          category: :transactions
       },
       invoices: {
           features: [:procurement],
-          permissions: Docs::P2P::Invoices::Index.permissions
+          permissions: Docs::P2P::Invoices::Index.permissions,
+          category: :transactions
       },
       payments: {
-          permissions: Docs::PaymentTickets::Payments::Index.permissions
+          permissions: Docs::PaymentTickets::Payments::Index.permissions,
+          category: :transactions
       },
       utility_bills: {
           features: [:procurement],
-          permissions: Docs::UtilityBills::Subscriptions::Index.permissions
+          permissions: Docs::UtilityBills::Subscriptions::Index.permissions,
+          category: :transactions
       },
       vendors: {
-          permissions: Masters::Vendors::Index.permissions
+          permissions: Masters::Vendors::Index.permissions,
+          category: :masters
       },
       items: {
-          permissions: Masters::Items::Index.permissions
+          permissions: Masters::Items::Index.permissions,
+          category: :masters
       },
       categories: {
-          permissions: [:admin]
+          permissions: [:admin],
+          category: :masters
       },
       policies: {
-          permissions: [:admin]
+          permissions: [:admin],
+          category: :masters
       },
       departments: {
-          permissions: [:admin]
+          permissions: [:admin],
+          category: :masters
       },
       locations: {
-          permissions: [:admin]
+          permissions: [:admin],
+          category: :masters
       },
       cost_centers: {
-          permissions: [:admin]
+          permissions: [:admin],
+          category: :masters
       },
       payment_agreements: {
           features: :agreement_based_payment_system,
-          permissions: Docs::P2P::Agreements::Index.permissions
+          permissions: Docs::P2P::Agreements::Index.permissions,
+          category: :masters
       },
       utility_subscriptions: {
           features: :utility_bills_enabled,
           permissions: Docs::UtilityBills::Subscriptions::Index.permissions,
+          category: :masters
       },
       users: {
-          permissions: [:admin]
+          permissions: [:admin],
+          category: :masters
       }
   }
 
@@ -62,10 +77,12 @@ class SearchIndex::GenerateToken < Transactions::API
   end
 
   def generate_filters(context, current_user:, **)
-    context[:documents] = []
+    context[:documents] = {transactions: [], masters: []}
     DOCUMENT_PERMISSIONS.each_pair do |document, config|
-      context[:documents] << document if authorized?(current_user, config)
+      context[:documents][config[:category]] << document if authorized?(current_user, config)
     end
+    context[:documents][:masters] = context[:documents][:masters].sort_by {|document| document}
+    context[:documents][:transactions] = context[:documents][:transactions].sort_by {|document| document}
 
     true
   end
