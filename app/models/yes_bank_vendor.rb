@@ -58,6 +58,8 @@ class YesBankVendor < ApplicationRecord
 
   include SoftDeletable
 
+  event_channel 'vendors'
+
   acts_as_sequenced column: :vendor_id, purpose: :vendor, editable: false, prefix: 'VNDR-'
 
   belongs_to :company, optional: true

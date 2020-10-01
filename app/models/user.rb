@@ -72,8 +72,6 @@ class User < ApplicationRecord
   include SearchIndex::Concerns::AccessControl
   include SearchIndex::Concerns::Document
 
-  event_channel 'user'
-
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
 

@@ -34,8 +34,6 @@ class Category < ApplicationRecord
   acts_as_sequenced column: :category_code, purpose: :category, editable: false, prefix: 'CAT'
   has_ancestry
 
-  event_channel 'category'
-
   belongs_to :company, optional: true
 
   has_one :quickbooks_category, dependent: :destroy

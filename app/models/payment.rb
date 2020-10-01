@@ -74,8 +74,6 @@ class Payment < ApplicationRecord
     CARD = 'Card'
   end
 
-  event_channel 'payment'
-
   belongs_to :amount, optional: true
   belongs_to :payment_type, optional: true
   belongs_to :reference_resource, optional: true, polymorphic: true

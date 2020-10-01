@@ -65,8 +65,6 @@ class BbpsBillerSubscription < ApplicationRecord
   include EventProducer
   include SearchIndex::Concerns::Document
 
-  event_channel 'bbps_biller_subscription'
-
   acts_as_sequenced column: :sequence_id, purpose: :bbps_biller_subscription, editable: false, prefix: 'UBM'
 
   belongs_to :biller, class_name: 'BbpsBiller', foreign_key: :bbps_biller_id, optional: true

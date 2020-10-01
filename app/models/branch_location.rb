@@ -35,7 +35,7 @@ class BranchLocation < ApplicationRecord
   include EventProducer
   include SearchIndex::Concerns::Document
 
-  event_channel 'location'
+  event_channel 'locations'
 
   acts_as_sequenced column: :location_code, purpose: :branch_location, editable: false, prefix: 'LOC'
   has_ancestry

@@ -70,8 +70,6 @@ class BankPaymentRequest < ApplicationRecord
   accepts_nested_attributes_for :payment_order
   accepts_nested_attributes_for :requested_amount
 
-  event_channel 'bank_payment_request'
-
   # i.e. a payment request cannot exist without a payment order
   validates :payment_order, presence: true
 

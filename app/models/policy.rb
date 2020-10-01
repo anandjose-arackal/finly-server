@@ -22,8 +22,6 @@ class Policy < ApplicationRecord
   include EventProducer
   include SearchIndex::Concerns::Document
 
-  event_channel 'policy'
-
   belongs_to :company, optional: true
   belongs_to :base_currency, optional: true, class_name: 'Currency'
   belongs_to :settlement_currency, optional: true, class_name: 'Currency'

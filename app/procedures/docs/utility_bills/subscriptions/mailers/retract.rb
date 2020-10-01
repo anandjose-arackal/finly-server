@@ -3,7 +3,7 @@ class Docs::UtilityBills::Subscriptions::Mailers::Retract < Docs::UtilityBills::
 
   class Docs::UtilityBills::Subscriptions::Mailers::Retract::RetractedBy < Docs::UtilityBills::Subscriptions::Mailers::Retract
 
-    consumes_event! 'bbps_biller_subscription.retract'
+    consumes_event! 'bbps_biller_subscriptions.retract'
 
     assign :to do |user, params|
       [user.email]
@@ -24,7 +24,7 @@ class Docs::UtilityBills::Subscriptions::Mailers::Retract < Docs::UtilityBills::
 
   class Docs::UtilityBills::Subscriptions::Mailers::Retract::RetractedFrom < Docs::UtilityBills::Subscriptions::Mailers::Retract
 
-    consumes_event! 'bbps_biller_subscription.retract'
+    consumes_event! 'bbps_biller_subscriptions.retract'
 
     assign :to do |user, params|
       record = params[:record]

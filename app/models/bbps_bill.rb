@@ -68,8 +68,6 @@ class BbpsBill < ApplicationRecord
 
   acts_as_sequenced column: :sequence_id, purpose: :bbps_bill, editable: false, prefix: 'UB'
 
-  event_channel 'bbps_bill'
-
   serialize :api_response, JSON
 
   before_save :resolve_bill_validation

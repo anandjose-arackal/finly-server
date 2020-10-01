@@ -24,8 +24,6 @@ class Department < ApplicationRecord
   include EventProducer
   include SearchIndex::Concerns::Document
 
-  event_channel 'department'
-
   acts_as_sequenced column: :department_code, purpose: :department, editable: false, prefix: 'DPT'
 
   has_ancestry

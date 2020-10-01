@@ -34,8 +34,6 @@ class Budget < ApplicationRecord
   include SoftDeletable, AncestrySupport
   include EventProducer
 
-  event_channel 'budget'
-
   has_ancestry
   has_many :budget_children, class_name: 'Budget', foreign_key: 'ancestry'
   has_one :budget_consumption, dependent: :destroy

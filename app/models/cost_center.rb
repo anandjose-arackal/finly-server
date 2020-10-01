@@ -23,8 +23,6 @@ class CostCenter < ApplicationRecord
   include EventProducer
   include SearchIndex::Concerns::Document
 
-  event_channel 'cost_center'
-
   acts_as_sequenced column: :cost_center_code, purpose: :cost_center, editable: false, prefix: 'CC'
 
   has_ancestry
