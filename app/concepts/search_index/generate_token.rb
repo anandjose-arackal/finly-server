@@ -95,10 +95,10 @@ class SearchIndex::GenerateToken < Transactions::API
   def generate_filters(context, current_user:, **)
     context[:documents] = {transactions: [], masters: []}
     DOCUMENT_PERMISSIONS.each_pair do |document, config|
-      context[:documents][config[:category]] << {record_type: document, route: config[:route]} if authorized?(current_user, config)
+      context[:documents][config[:category]] << {document_type: document, route: config[:route]} if authorized?(current_user, config)
     end
-    context[:documents][:masters] = context[:documents][:masters].sort_by {|document| document}
-    context[:documents][:transactions] = context[:documents][:transactions].sort_by {|document| document}
+    context[:documents][:masters] = context[:documents][:masters].sort_by {|document| document[:document_type]}
+    context[:documents][:transactions] = context[:documents][:transactions].sort_by {|document| document[:document_type]}
 
     true
   end
