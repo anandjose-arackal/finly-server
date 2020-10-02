@@ -893,7 +893,7 @@ DEPENDENCIES
   sass-rails (~> 5.0.7)
   saxlsx (~> 1.9)
   sendgrid-ruby (~> 6.0)
-  sentry-raven
+  sentry-raven (~> 2.13)
   sidekiq (~> 5.2.3)
   sidekiq-logstash (~> 1.0.1)
   simpleconfig (~> 2.0.1)
