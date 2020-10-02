@@ -21,6 +21,10 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
 
   def init!(options, document:, **)
     self.document = document
+
+    # Reverting to nil to resolve https://sentry.finly.io/organizations/finly/issues/17
+    return if self.document.nil?
+
     self.company = document.company
     case document.class.name
     when "PurchaseOrder", "Invoice"
