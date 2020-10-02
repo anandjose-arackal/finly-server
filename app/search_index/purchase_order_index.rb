@@ -7,6 +7,8 @@ class PurchaseOrderIndex < SearchIndex::Model
 
     serialize do |record|
       {
+          parent_id: record.procurement_id,
+          parent_type: 'po',
           policy_id: record.policy_id,
           policy_name: record.policy&.name,
           status_id: record.status&.id,

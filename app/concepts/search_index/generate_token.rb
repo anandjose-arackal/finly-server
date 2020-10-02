@@ -12,7 +12,7 @@ class SearchIndex::GenerateToken < Transactions::API
           features: [:procurement],
           permissions: Docs::P2P::PurchaseOrders::Index.permissions,
           category: :transactions,
-          route: 'payments#procure_purchase_order/{{record_id}}/params={"procurement_id":"{{parent_id}}","procurement_type":"po"}'
+          route: 'payments#procure_purchase_order/{{record_id}}/params={"procurement_id":"{{parent_id}}","procurement_type":"{{parent_type}}"}'
       },
       invoices: {
           features: [:procurement],
@@ -23,7 +23,7 @@ class SearchIndex::GenerateToken < Transactions::API
       payments: {
           permissions: Docs::PaymentTickets::Payments::Index.permissions,
           category: :transactions,
-          route: 'payments#orders/{{parent_record_id}}/params={}'
+          route: 'payments#orders/{{parent_id}}/params={}'
       },
       utility_bills: {
           features: [:procurement],

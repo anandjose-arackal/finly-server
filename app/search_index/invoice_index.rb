@@ -7,6 +7,8 @@ class InvoiceIndex < SearchIndex::Model
 
     serialize do |record|
       {
+          parent_id: record.procurement_id,
+          parent_type: record.invoice_type&.name,
           policy_id: record.policy_id,
           policy_name: record.policy&.name,
           status_id: record.status&.id,
