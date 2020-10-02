@@ -7,7 +7,6 @@ class ApplicationController < ActionController::Base
   # include AbstractController::Callbacks
   # include ActionController::Head
   include Doorkeeper::Rails::Helpers
-  include Helpers::RequestImpressionHelper
   include Transactions::Endpoint::Controller
 
   # Prevent CSRF attacks by raising an exception.
@@ -18,7 +17,6 @@ class ApplicationController < ActionController::Base
 
   before_action :set_cache_buster
 
-  around_action :save_request_impression
   before_action :finly_authorize!
 
   # before_action :load_global_variables
