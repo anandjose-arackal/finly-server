@@ -361,7 +361,6 @@ class ApplicationController < ActionController::Base
         params: params.to_unsafe_h,
         url: request.url,
         app: RequestStoreUtil.current_app,
-        device: RequestStoreUtil.current_device&.id,
         admin_user_id: RequestStoreUtil.current_admin_user&.id,
         is_admin_login: RequestStoreUtil.current_admin_user.present?
     )
