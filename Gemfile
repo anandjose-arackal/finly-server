@@ -21,7 +21,7 @@ gem 'cronex', '~> 0.10'
 gem 'daemons', '~> 1.3.1'
 # gem 'stomp', '~> 1.4.8'
 # gem 'activemessaging'
-
+gem "sentry-raven"
 # grm for mocking and stubbing in test cases
 
 # gem for crash reports
