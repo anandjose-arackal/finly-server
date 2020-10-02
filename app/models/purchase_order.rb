@@ -80,6 +80,7 @@ class PurchaseOrder < ApplicationRecord
   include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport
   include Sequenced::ActsAsSequenced
   include SearchIndex::Concerns::Document
+  include Concerns::ErpSyncConcern
 
 
   acts_as_sequenced column: :po_number, purpose: :purchase_order, editable: false, prefix: 'PO/{fiscal_year_start}-{fiscal_year_end}/', min_length: 4
@@ -496,6 +497,11 @@ class PurchaseOrder < ApplicationRecord
   #     includes(:balance_amount).reorder("amounts.value #{type}")
   #   end
   # }
+
+  scope :pending_erp_sync, -> (*args) {
+    with_erp_sync_status_pending.
+        where(purchase_order_status_id: PurchaseOrderStatus.ids_for([ :released, :invoice_created, :received, :change_order, :approved, :auto_approved, :sent_to_vendor, :vendor_confirmed, :vendor_rejected ]))
+  }
 
   before_save :calculate_line_items
   after_create :purchase_request_tasks
