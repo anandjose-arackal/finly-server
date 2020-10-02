@@ -28,6 +28,7 @@ class ApplicationController < ActionController::Base
   before_action :init_elastic_apm
 
   before_action :store_location
+  before_action :set_raven_context
 
   # after_action :track_request
 
@@ -343,6 +344,27 @@ class ApplicationController < ActionController::Base
 
     verify_user_session(doorkeeper_token)
     current_user&.update(last_activity_at: DateTime.now)
+  end
+
+  def set_raven_context
+    return if current_user.nil?
+
+    Raven.user_context(
+        id: current_user&.id,
+        name: current_user&.name,
+        email: current_user&.email,
+        company_id: current_company&.id,
+        company_name: current_company&.name,
+        session_id: RequestStoreUtil.current_session&.id
+    ) # or anything else in session
+    Raven.extra_context(
+        params: params.to_unsafe_h,
+        url: request.url,
+        app: RequestStoreUtil.current_app,
+        device: RequestStoreUtil.current_device&.id,
+        admin_user_id: RequestStoreUtil.current_admin_user&.id,
+        is_admin_login: RequestStoreUtil.current_admin_user.present?
+    )
   end
 
   def verify_user_session(doorkeeper_token)
