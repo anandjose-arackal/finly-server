@@ -60,6 +60,8 @@ class Menu::Masters::Procurement < Menu::API
 
   item :dashboard, icon: 'https://img.icons8.com/windows/20/ffffff/speed.png'
 
+  item :global_search, icon: 'https://img.icons8.com/windows/20/ffffff/speed.png'
+
   scope features: [:procurement, :purchase_requisition_system] do
     item :purchase_requests, label: 'Request', path: 'purchase_requests', icon: 'https://img.icons8.com/windows/20/ffffff/request-money.png',
          permissions: Docs::P2P::PurchaseRequests::Index.permissions
