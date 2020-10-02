@@ -2,7 +2,7 @@ class InvoiceIndex < SearchIndex::Model
 
   index Indexes::VpRecords do
     include_associations :policy, :status, Indexes::VpRecords::Helpers::INCLUDE_COLLABORATORS, :created_by,
-                         :location, :delivery_location,
+                         :location, :delivery_location, :invoice_type,
                          {line_items: [:cost_center, :department, :inventory_line_item]}
 
     serialize do |record|
