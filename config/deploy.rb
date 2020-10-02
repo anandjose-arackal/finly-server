@@ -125,6 +125,9 @@ set :sentry_organization, 'finly' # fetch(:application) by default
 set :sentry_project, 'finly-server'     # fetch(:application) by default
 set :sentry_repo, 'finlycore/finly-server' # computed from repo_url by default
 
+before 'deploy:starting', 'sentry:validate_config'
+after 'deploy:published', 'sentry:notice_deployment'
+
 set :puma_rackup, -> { File.join(current_path, 'config.ru') }
 set :puma_state, "#{shared_path}/tmp/pids/puma.state"
 set :puma_pid, "#{shared_path}/tmp/pids/puma.pid"
