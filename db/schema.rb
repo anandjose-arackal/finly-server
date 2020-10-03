@@ -6991,6 +6991,7 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
     t.integer "vendor_poc_id"
     t.integer "vlpm_id"
     t.text "vendor_note"
+    t.integer "erp_sync_status_id"
     t.index ["advance_amount_id"], name: "index_purchase_orders_on_advance_amount_id"
     t.index ["advance_amount_status_id"], name: "index_purchase_orders_on_advance_amount_status_id"
     t.index ["advance_tds_amount_id"], name: "index_purchase_orders_on_advance_tds_amount_id"
@@ -9412,7 +9413,6 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
     t.datetime "erp_sync_attempted_at"
     t.date "start_date"
     t.date "end_date"
-    t.text "vp_search_index_ac"
     t.index ["company_id"], name: "index_users_on_company_id"
     t.index ["email"], name: "index_users_on_email"
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true

@@ -6,6 +6,7 @@ class Menu::Masters::Procurement < Menu::API
 
   app :vp
 
+  item :global_search, label: "Search (Alt+/)", icon: 'https://img.icons8.com/windows/20/ffffff/search.png'
   item :create, icon: 'https://img.icons8.com/windows/20/ffffff/plus-math.png' do
     action :redirect,
            :new_purchase_request,
@@ -59,8 +60,6 @@ class Menu::Masters::Procurement < Menu::API
   end
 
   item :dashboard, icon: 'https://img.icons8.com/windows/20/ffffff/speed.png'
-
-  item :global_search, icon: 'https://img.icons8.com/windows/20/000000/search.png'
 
   scope features: [:procurement, :purchase_requisition_system] do
     item :purchase_requests, label: 'Request', path: 'purchase_requests', icon: 'https://img.icons8.com/windows/20/ffffff/request-money.png',
