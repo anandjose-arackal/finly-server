@@ -38,7 +38,9 @@ class DashboardsController < BaseControllers::WebBase
     else
       respond render: :failure
     end
-    endpoint handler if handler.present?
+    if handler.present?
+      endpoint handler
+    end
   end
 
 end
