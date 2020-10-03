@@ -23,22 +23,22 @@ class DashboardsController < BaseControllers::WebBase
       handler = Dashboard::P2P::POAdvances
     when 'grns'
       handler = Dashboard::P2P::Inwards
-    # when 'vendors'
-    #   handler = Dashboard::P2P::Vendors
-    # when 'payment_agreements'
-    #   handler = Dashboard::P2P::Agreements
-    # when 'purchase_request_approved_items'
-    #   handler = Dashboard::P2P::PurchaseOrders
-    # when 'agreement_invoices'
-    #   handler = Dashboard::P2P::PurchaseOrders
-    # when 'utility_bill_masters'
-    #   handler = Dashboard::P2P::PurchaseOrders
+      # when 'vendors'
+      #   handler = Dashboard::P2P::Vendors
+      # when 'payment_agreements'
+      #   handler = Dashboard::P2P::Agreements
+      # when 'purchase_request_approved_items'
+      #   handler = Dashboard::P2P::PurchaseOrders
+      # when 'agreement_invoices'
+      #   handler = Dashboard::P2P::PurchaseOrders
+      # when 'utility_bill_masters'
+      #   handler = Dashboard::P2P::PurchaseOrders
     when 'utility_bills'
       handler = Dashboard::P2P::UtilityBills
     else
       respond render: :failure
     end
-    endpoint handler
+    endpoint handler if handler.present?
   end
 
 end
