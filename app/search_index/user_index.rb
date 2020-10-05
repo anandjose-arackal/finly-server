@@ -8,7 +8,7 @@ class UserIndex < SearchIndex::Model
           name: record.name,
           email: record.email,
           employee_id: record.profile&.employee_id,
-          status_name: record.status
+          status_name: record.status&.titleize
       }
     end
 

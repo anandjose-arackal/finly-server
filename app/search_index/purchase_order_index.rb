@@ -12,7 +12,7 @@ class PurchaseOrderIndex < SearchIndex::Model
           policy_id: record.policy_id,
           policy_name: record.policy&.name,
           status_id: record.status&.id,
-          status_name: record.status&.name,
+          status_name: record.status&.name&.titleize,
           sequence_id: record.purchase_order_number,
           narration: record.note,
           cost_center_names: record.line_items.map { |line_item| line_item.cost_center&.name },
@@ -25,6 +25,9 @@ class PurchaseOrderIndex < SearchIndex::Model
           billing_location_code: record.location&.location_code,
           shipping_location_name: record.delivery_location&.name,
           shipping_location_code: record.delivery_location&.location_code,
+          vendor_name: record.vendor&.business_name,
+          vendor_trade_name: record.vendor&.trade_name,
+          vendor_sequence_id: record.vendor&.vendor_id,
       }.merge(Indexes::VpRecords::Helpers::Collaborators(record))
     end
 

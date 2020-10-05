@@ -36,6 +36,8 @@ class Indexes::VpRecords < SearchIndex::Api
   attribute :tax_registration_number
   attribute :policy_id, searchable: false, displayed: false
   attribute :policy_name
+  attribute :created_by_name
+  attribute :created_by_email
   attribute :collaborators_ids, displayed: false
   attribute :collaborators_emails, displayed: false
   attribute :collaborators_names, displayed: false
@@ -55,6 +57,9 @@ class Indexes::VpRecords < SearchIndex::Api
           document[:collaborator_ids] << record.created_by.id
           document[:collaborator_emails] << record.created_by.email
           document[:collaborator_names] << record.created_by.name
+
+          document[:created_by_name] = record.created_by&.name
+          document[:created_by_email] = record.created_by&.email
         end
         record.dlrms.each do |dlrm|
           if dlrm.taken_control_by.present?

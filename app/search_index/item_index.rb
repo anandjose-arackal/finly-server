@@ -10,7 +10,7 @@ class ItemIndex < SearchIndex::Model
           category_code: record.category&.category_code,
           sequence_id: record.item_number,
           gl_code: record&.category&.gl_code,
-          status_name: 'active',
+          status_name: 'Active',
           company_id: record.company_id.to_s
       }
     end

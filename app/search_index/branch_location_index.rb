@@ -7,8 +7,8 @@ class BranchLocationIndex < SearchIndex::Model
 
     serialize do |record|
       {
-          location_names: [record.name],
-          location_codes: [record.location_code],
+          description: record.name,
+          sequence_id: record.location_code,
           gl_code: record.gl_code
       }
     end

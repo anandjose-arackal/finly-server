@@ -8,7 +8,7 @@ class BbpsBillIndex < SearchIndex::Model
           policy_id: record.policy_id,
           policy_name: record.policy&.name,
           status_id: record.status&.id,
-          status_name: record.status&.name,
+          status_name: record.status&.name&.titleize,
           sequence_id: record.bill_id,
           narration: record.note,
           invoice_number: record.bill_number,

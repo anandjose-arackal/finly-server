@@ -14,7 +14,7 @@ class YesBankVendorIndex < SearchIndex::Model
           policy_id: record.policy_id,
           policy_name: record.policy&.name,
           status_id: record.status_id,
-          status_name: record.status&.name,
+          status_name: record.status&.name&.titleize,
           sequence_id: record.vendor_id,
           description: record.description,
           tax_id: record.pan,
