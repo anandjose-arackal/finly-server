@@ -64,7 +64,7 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
   # property :parent_id # Handled in sub classes
 
   property :current_user, virtual: true
-  property :options
+  property :options, deserializer: -> (input, represented, *args) {represented.options = {} if input[:options].blank?}
 
   # Computation
   property :compute_enabled
@@ -90,6 +90,10 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
       params do
         required(:rule).filled
         required(:error_message).filled
+      end
+
+      rule(:error_message) do
+        key.failure("cannot be greater than 256 characters") if value.length > 256
       end
     end
   end
@@ -117,6 +121,17 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
       property :form_id, deserializer: -> (input, represented, *args) {represented.form_id = represented.contract_root.form_id}
       property :property#, validates: {presence: true}
       property :value#, validates: {presence: true, inclusion: {in: [true, false]}}
+
+      validation :condition_actions do
+        params do
+          required(:property).filled
+          required(:value).filled
+        end
+
+        rule(:value) do
+          key.failure("must be either TRUE or FALSE") unless [true, false].include?(value)
+        end
+      end
     end
 
     validation :conditions do

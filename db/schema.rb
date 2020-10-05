@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_23_111610) do
+ActiveRecord::Schema.define(version: 2020_10_01_190741) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -4121,7 +4121,7 @@ ActiveRecord::Schema.define(version: 2020_09_23_111610) do
     t.boolean "is_updated"
     t.boolean "can_be_updated"
     t.text "rule"
-    t.string "form_entity_id", null: false
+    t.string "form_entity_id"
     t.index ["company_id"], name: "index_form_entity_validations_on_company_id"
     t.index ["created_at"], name: "index_form_entity_validations_on_created_at"
     t.index ["created_by_id"], name: "index_form_entity_validations_on_created_by_id"
@@ -4981,6 +4981,13 @@ ActiveRecord::Schema.define(version: 2020_09_23_111610) do
     t.decimal "invoice_total_amount_converted", precision: 20, scale: 5
     t.decimal "invoice_paid_outside_amount_converted", precision: 20, scale: 5
     t.decimal "invoice_balance_due_converted", precision: 20, scale: 5
+    t.date "conversion_date"
+    t.decimal "conversion_rate", precision: 10, scale: 5
+    t.boolean "retrieve_conversion_rate", default: true
+    t.decimal "invoice_advance_paid_amount", precision: 20, scale: 5
+    t.decimal "invoice_advance_paid_amount_converted", precision: 20, scale: 5
+    t.decimal "invoice_net_total_amount", precision: 20, scale: 5
+    t.decimal "invoice_net_total_amount_converted", precision: 20, scale: 5
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["advance_amount_id"], name: "index_invoices_on_advance_amount_id"
     t.index ["amount_id"], name: "index_invoices_on_amount_id"

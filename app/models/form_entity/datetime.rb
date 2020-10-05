@@ -8,7 +8,10 @@ class FormEntity::Date < FormEntity
     Proc.new do
       validation :options_config do
         params do
-
+          required(:options) do
+            hash do
+            end
+          end
         end
       end
     end

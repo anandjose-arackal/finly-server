@@ -76,8 +76,8 @@ class FormEntity::LargeText < FormEntity
         params do
           required(:options) do
             hash do
-              required(:maximum)
-              required(:minimum)
+              optional(:maximum)
+              optional(:minimum)
             end
           end
         end

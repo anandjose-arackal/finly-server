@@ -74,7 +74,8 @@ class YesBankVendor < ApplicationRecord
   has_many :bank_accounts, as: :account_owner, dependent: :destroy
   has_many :receiving_payments, as: :receiving_user, class_name: 'Payment'
   has_many :vendor_attachments
-  has_many :custom_fields, as: :parent, dependent: :destroy
+  # has_many :custom_fields, as: :parent, dependent: :destroy
+  has_many :custom_fields, as: :document, class_name: "FormCustomField", dependent: :destroy
   has_many :form_custom_fields, class_name: 'FormCustomField', as: :document, dependent: :destroy
   has_many :vendor_tds_rates, dependent: :destroy, foreign_key: :vendor_id
   has_many :tds_rates, through: :vendor_tds_rates
