@@ -1,16 +1,16 @@
 class AddConvertedAmountsToInvoices < ActiveRecord::Migration[5.2]
   def change
     # Invoice
-    add_column :invoices, :reporting_currency, :string
-    add_column :invoices, :conversion_date, :date
-    add_column :invoices, :conversion_rate, :decimal, :precision => 10, :scale => 5
-    add_column :invoices, :retrieve_conversion_rate, :boolean, default: true
+    # add_column :invoices, :reporting_currency, :string
+    # add_column :invoices, :conversion_date, :date
+    # add_column :invoices, :conversion_rate, :decimal, :precision => 10, :scale => 5
+    # add_column :invoices, :retrieve_conversion_rate, :boolean, default: true
 
-    add_column :invoices, :invoice_taxable_amount, :decimal, :precision => 20, :scale => 5
-    add_column :invoices, :invoice_freight_amount, :decimal, :precision => 20, :scale => 5
-    rename_column :invoices, :sub_total_amount, :invoice_sub_total_amount
-    rename_column :invoices, :total_amount, :invoice_total_amount
-    rename_column :invoices, :payment_outside_finly_amount, :invoice_paid_outside_amount
+    # add_column :invoices, :invoice_taxable_amount, :decimal, :precision => 20, :scale => 5
+    # add_column :invoices, :invoice_freight_amount, :decimal, :precision => 20, :scale => 5
+    # rename_column :invoices, :sub_total_amount, :invoice_sub_total_amount
+    # rename_column :invoices, :total_amount, :invoice_total_amount
+    # rename_column :invoices, :payment_outside_finly_amount, :invoice_paid_outside_amount
     add_column :invoices, :invoice_roundoff_amount, :decimal, :precision => 20, :scale => 5
     add_column :invoices, :invoice_balance_due, :decimal, :precision => 20, :scale => 5
 
