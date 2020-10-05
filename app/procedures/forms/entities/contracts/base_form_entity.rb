@@ -64,7 +64,8 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
   # property :parent_id # Handled in sub classes
 
   property :current_user, virtual: true
-  property :options, deserializer: -> (input, represented, *args) {represented.options = {} if input[:options].blank?}
+  # property :options, deserializer: -> (input, represented, *args) {represented.options = {} if input[:options].blank?}
+  property :options, deserializer: -> (input, represented, *args) {represented.options = input[:options].is_a?(Hash) ? input[:options] : {}}
 
   # Computation
   property :compute_enabled
