@@ -10,6 +10,7 @@ class GlobalSearchController < BaseControllers::WebBase
     if @op.success?
       render json: {
           token: @op[:token],
+          expires_at: DateTime.now + 2.hours + 59.minutes,
           documents: @op[:documents],
           indicator_map: @op[:indicator_map]
       }
