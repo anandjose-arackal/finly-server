@@ -10,7 +10,8 @@ class GlobalSearchController < BaseControllers::WebBase
     if @op.success?
       render json: {
           token: @op[:token],
-          documents: @op[:documents]
+          documents: @op[:documents],
+          indicator_map: @op[:indicator_map]
       }
     end
   end
