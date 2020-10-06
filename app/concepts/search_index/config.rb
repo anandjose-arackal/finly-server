@@ -177,6 +177,7 @@ class SearchIndex::Config < Transactions::API
 
   def generate_token(context, current_user:, **)
     context[:token] = current_user.build_search_index_token
+    context[:expires_in] = SearchIndex::Concerns::AccessControl::TOKEN_EXPIRY.to_i
   end
 
   def generate_filters(context, current_user:, **)
