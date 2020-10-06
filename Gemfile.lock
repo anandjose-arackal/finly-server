@@ -89,6 +89,9 @@ GEM
       i18n (>= 0.7, < 2)
       minitest (~> 5.1)
       tzinfo (~> 1.1)
+    acts_as_tenant (0.4.4)
+      rails (>= 4.0)
+      request_store (>= 1.0.5)
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
     airbrussh (1.4.0)
@@ -769,6 +772,7 @@ PLATFORMS
 DEPENDENCIES
   aasm (~> 5.0.1)
   activerecord-import (~> 1.0, >= 1.0.3)
+  acts_as_tenant
   amoeba (~> 3.1.0)
   ancestry (~> 3.0.5)
   annotate (~> 2.7)

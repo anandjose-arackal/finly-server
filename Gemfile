@@ -244,6 +244,8 @@ gem 'whenever'
 gem 'azure'
 gem 'azure-storage-blob'
 
+gem 'acts_as_tenant'
+
 group :development, :test do
   gem 'byebug'
   gem 'pry', '~> 0.12.2'  
