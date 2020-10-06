@@ -39,14 +39,14 @@ module EventProducer
   def after_save_callbacks
     if previous_changes['created_at'].present?
       # New record
-      Events::Publisher::Record::Create(self, RequestStoreUtil.current_user)
+      Events::Publisher::Record::Create(self, RequestStoreUtil.current_user, RequestStoreUtil.current_company)
     else
       # Old record
-      Events::Publisher::Record::Update(self, RequestStoreUtil.current_user, previous_changes)
+      Events::Publisher::Record::Update(self, RequestStoreUtil.current_user, RequestStoreUtil.current_company, previous_changes)
     end
   end
 
   def before_destroy_callbacks
-    Events::Publisher::Record::Destroy(self, RequestStoreUtil.current_user)
+    Events::Publisher::Record::Destroy(self, RequestStoreUtil.current_user, RequestStoreUtil.current_company)
   end
 end

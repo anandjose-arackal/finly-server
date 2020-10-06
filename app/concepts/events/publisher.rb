@@ -5,9 +5,9 @@ class Events::Publisher
 
   protected
 
-  def self.broadcast(routing_key, message, current_user: nil, ignore_failure: false)
+  def self.broadcast(routing_key, message, current_user: nil, current_company: nil, ignore_failure: false)
 
-    payload = {message: message, current_user: (current_user || RequestStoreUtil.current_user)}
+    payload = {message: message, current_user: (current_user || RequestStoreUtil.current_user), current_company: (current_company || RequestStoreUtil.current_company)}
     payload.reject! {|k, v| v.nil?} # Remove all nil values
 
     Async.(routing_key, payload, current_user: current_user)

@@ -60,12 +60,15 @@ module Events::Consumer
     decoded_data = Events::Serializer.decode(data)
     message = decoded_data[:message]
     user = decoded_data&.dig(:current_user)
+    company = decoded_data&.dig(:current_company)
 
     # Todo load request store properties
     # request_store_properties = payload&.dig('request_store_properties')
     # RequestStoreUtil.from_hash request_store_properties
 
-    work(user, message)
+    ActsAsTenant.with_tenant company do
+      work(user, message)
+    end
   end
 
   def work(user, message)
