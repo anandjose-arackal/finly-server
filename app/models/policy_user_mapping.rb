@@ -16,6 +16,7 @@ class PolicyUserMapping < ApplicationRecord
   # include PolicyVersion
   include SoftDeletable
 
+  belongs_to :company, optional: true
   belongs_to :user, optional: true
   belongs_to :policy, optional: true
 
