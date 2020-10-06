@@ -61,7 +61,7 @@ class SearchIndex::DocumentConfig
       break if dry_run
 
       # This is to avoid Net::ReadTimeout (Net::ReadTimeout)
-      sleep 2
+      sleep 1
     end
   end
 
