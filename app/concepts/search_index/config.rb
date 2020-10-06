@@ -83,7 +83,7 @@ class SearchIndex::Config < Transactions::API
           category: :masters,
           route: 'policies/{{record_id}}/params={}',
           layout: {
-              fixed_left: [:policy],
+              fixed_left: [:policy_name],
               fixed_right: []
           }
       },
