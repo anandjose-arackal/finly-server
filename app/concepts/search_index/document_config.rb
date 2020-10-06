@@ -59,6 +59,9 @@ class SearchIndex::DocumentConfig
       end
       index_api.index.add_documents data.compact
       break if dry_run
+
+      # This is to avoid Net::ReadTimeout (Net::ReadTimeout)
+      sleep 2
     end
   end
 
