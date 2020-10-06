@@ -76,7 +76,7 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     # :rejected,
     # :credited
 
-    collection = collection.joins(:payment_order)
+    collection = collection.joins(:payment_order).unscope(:order)
     # Use custom scope to support awaiting approval status
     counter = IndexBuilder::Counter.new :with_status_id
     counts = collection.group(:status_id).count

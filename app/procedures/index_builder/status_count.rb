@@ -36,7 +36,7 @@ class IndexBuilder::StatusCount < Transactions::API
 
 
   def count(context, builder:, current_user:, **)
-    counter = builder.instance_exec current_user, context['model.records'], &builder.counter
+    counter = builder.instance_exec current_user, context['model.records'].unscope(:order), &builder.counter
     context['counter'] = counter.as_json
 
     true

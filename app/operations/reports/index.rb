@@ -201,7 +201,7 @@ class Reports::Index < Reports::Base
     end
 
     def get_counts
-      type_counts = reports.group(:report_status_id).count
+      type_counts = reports.unscope(:order).group(:report_status_id).count
       self.counts = {}
       counts[:open] = (type_counts[ReportStatus.open_id] or 0)
       counts[:processing] = (type_counts[ReportStatus.processing_id] or 0)

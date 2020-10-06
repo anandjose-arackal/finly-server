@@ -163,7 +163,10 @@ class ApplicationController < ActionController::Base
     if doorkeeper_token.present? and doorkeeper_token&.resource_owner_id&.present?
       scopes = doorkeeper_token[:scopes]
       if scopes.include?("web") or scopes.include?("mobile") or scopes.include?("chrome") or scopes.include?("api") or scopes.include?("streamsets")
-        @curr_user ||= User.find_by(id: doorkeeper_token[:resource_owner_id])
+        @curr_user ||= ActsAsTenant.without_tenant do
+          User.find_by(id: doorkeeper_token[:resource_owner_id])
+        end
+        ActsAsTenant.current_tenant = @curr_user&.company
       elsif scopes.include?("admin")
         @curr_user ||= AdminUser.find_by(id: doorkeeper_token[:resource_owner_id])
       end

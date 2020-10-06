@@ -89,7 +89,7 @@ class Analytics::Charts < BaseOperation
     total = 0
     case field
       when 'category'
-        set = expenses.select('category_id as category, SUM(value) as category_sum, expenses.*').joins(:amount).group(:category_id).sum(:value)
+        set = expenses.select('category_id as category, SUM(value) as category_sum, expenses.*').joins(:amount).unscope(:order).group(:category_id).sum(:value)
         set.each do |key, value|
           category = Category.find(key)
           cat_name = category.name
