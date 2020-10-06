@@ -31,7 +31,7 @@
 #  note                    :text(65535)
 #
 
-class ExportJob < ApplicationRecord
+class ExportJob < NonTenantedApplicationRecord
   include SoftDeletable
 
   belongs_to :status, class_name: 'ExportJobStatus'

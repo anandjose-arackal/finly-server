@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class AdminReviewWorkflow < ApplicationRecord
+class AdminReviewWorkflow < NonTenantedApplicationRecord
 
   has_many :levels, class_name: 'AdminReviewWorkflowLevel', dependent: :destroy
 

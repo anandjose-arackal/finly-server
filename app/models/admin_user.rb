@@ -25,7 +25,7 @@
 #
 
 require 'bcrypt'
-class AdminUser < ApplicationRecord
+class AdminUser < NonTenantedApplicationRecord
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable,

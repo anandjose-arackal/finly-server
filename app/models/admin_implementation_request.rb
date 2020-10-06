@@ -31,7 +31,7 @@
 #  deleted_at                :datetime
 #
 
-class AdminImplementationRequest < ApplicationRecord
+class AdminImplementationRequest < NonTenantedApplicationRecord
   belongs_to :company
   belongs_to :admin_user
 

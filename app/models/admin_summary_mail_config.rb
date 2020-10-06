@@ -16,7 +16,7 @@
 #  deleted_at             :datetime
 #
 
-class AdminSummaryMailConfig < ApplicationRecord
+class AdminSummaryMailConfig < NonTenantedApplicationRecord
   belongs_to :user, optional: true
   belongs_to :period, optional: true
 
