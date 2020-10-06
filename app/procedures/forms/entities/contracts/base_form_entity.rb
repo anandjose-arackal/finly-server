@@ -45,7 +45,7 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
   property :entity_key, deserializer: -> (input, represented, *args) {represented.entity_key = input[:entity_key] if represented.entity_key.blank?}
   property :label
   property :placeholder
-  property :hint, deserializer: -> (input, represented, *args){ represented.hint = "Enter Value" if input[:hint].blank? }
+  property :hint, deserializer: -> (input, represented, *args) {represented.hint = input[:hint].blank? ? "Enter Value" : input[:hint]}
   property :position
   property :behavior, virtual: true
 
