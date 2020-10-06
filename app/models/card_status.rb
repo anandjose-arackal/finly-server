@@ -10,7 +10,7 @@
 #
 
 
-class CardStatus < ApplicationRecord
+class CardStatus < NonTenantedApplicationRecord
   include Seedable
 
   def self.values

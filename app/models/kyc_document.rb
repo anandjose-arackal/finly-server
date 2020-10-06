@@ -18,6 +18,7 @@
 class KycDocument < ApplicationRecord
   include Attachable
 
+  belongs_to :company, optional: true
   belongs_to :company_kyc_document_type, optional: true
   belongs_to :company_kyc, optional: true
 

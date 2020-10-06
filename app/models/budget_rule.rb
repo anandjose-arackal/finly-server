@@ -25,6 +25,8 @@
 class BudgetRule < ApplicationRecord
   include SoftDeletable
 
+  belongs_to :company, optional: true
+
   # belongs_to :category, optional: true
   has_many :budget_rule_category_mappings
   has_many :categories, through: :budget_rule_category_mappings

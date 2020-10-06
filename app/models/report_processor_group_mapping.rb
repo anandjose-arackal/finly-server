@@ -22,6 +22,7 @@
 
 class ReportProcessorGroupMapping < ApplicationRecord
 
+  belongs_to :company, optional: true
   belongs_to :user, optional: true
   belongs_to :amount, optional: true, dependent: :destroy
   belongs_to :processor_group, optional: true, class_name: 'ReportProcessorGroup'

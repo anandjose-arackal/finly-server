@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class TravelRequestTrailAction < ApplicationRecord
+class TravelRequestTrailAction < NonTenantedApplicationRecord
   include Seedable
 
   def self.values

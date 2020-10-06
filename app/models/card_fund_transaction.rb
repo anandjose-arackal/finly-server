@@ -17,6 +17,7 @@
 #
 
 class CardFundTransaction < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :requesting_user, optional: true
   belongs_to :for_user, optional: true
 end

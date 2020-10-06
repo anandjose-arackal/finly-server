@@ -14,6 +14,7 @@
 class ManualExpense < ApplicationRecord
   include SoftDeletable
 
+  belongs_to :company, optional: true
   belongs_to :expense, optional: true # foreign key expense_id
   has_many :custom_fields, as: :parent, dependent: :destroy
   accepts_nested_attributes_for :custom_fields

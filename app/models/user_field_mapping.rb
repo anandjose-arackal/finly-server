@@ -13,6 +13,7 @@
 class UserFieldMapping < ApplicationRecord
   include SoftDeletable
 
+  belongs_to :company, optional: true
   belongs_to :user
   belongs_to :field_configuration
 end

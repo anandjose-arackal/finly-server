@@ -18,6 +18,7 @@ class ReviewalLevel < ApplicationRecord
 
   after_destroy :reassign_level_numbers
 
+  belongs_to :company, optional: true
   belongs_to :policy, optional: true
   has_many :level_reviewer_mappings, foreign_key: :level_id, dependent: :destroy
   has_many :reviewers, class_name: 'User', through: :level_reviewer_mappings

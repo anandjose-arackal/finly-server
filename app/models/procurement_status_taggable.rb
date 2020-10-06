@@ -11,6 +11,7 @@
 #
 
 class ProcurementStatusTaggable < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :procurement, optional: true
   belongs_to :status_tag, optional: true
 

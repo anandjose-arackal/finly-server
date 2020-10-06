@@ -55,6 +55,7 @@ class Expense < ApplicationRecord
 
   event_channel 'expense'
 
+  belongs_to :company, optional: true
   belongs_to :amount, optional: true
   belongs_to :expense_status, optional: true
   belongs_to :user, optional: true, inverse_of: :expenses

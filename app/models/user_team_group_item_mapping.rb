@@ -13,6 +13,7 @@
 
 class UserTeamGroupItemMapping < ApplicationRecord
 
+  belongs_to :company, optional: true
   belongs_to :user_team, optional: true
   belongs_to :user_group, optional: true
   belongs_to :user_group_item, optional: true

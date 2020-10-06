@@ -16,6 +16,7 @@
 class VehicleRate < ApplicationRecord
   include SoftDeletable
 
+  belongs_to :company, optional: true
   belongs_to :policy, optional: true
   belongs_to :rate, optional: true, class_name: 'Amount'
   belongs_to :distance_unit, optional: true, class_name: 'PhysicalUnit'

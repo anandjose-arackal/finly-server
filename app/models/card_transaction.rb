@@ -41,6 +41,7 @@
 class CardTransaction < ApplicationRecord
   include SoftDeletable
 
+  belongs_to :company, optional: true
   belongs_to :user, optional: true
   belongs_to :card, optional: true
 

@@ -19,6 +19,7 @@
 
 class AutoReloadConfig < ApplicationRecord
 
+  belongs_to :company, optional: true
   belongs_to :reloadable, optional: true, polymorphic: true
   belongs_to :minimum_balance, optional: true, class_name: 'Amount'
   belongs_to :threshold_balance, optional: true, class_name: "Amount"

@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class IndividualKycTrackAction < ApplicationRecord
+class IndividualKycTrackAction < NonTenantedApplicationRecord
   include Seedable
 
   validates :name, presence: true

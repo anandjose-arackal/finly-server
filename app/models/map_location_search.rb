@@ -11,7 +11,7 @@
 #  updated_at :datetime         not null
 #
 
-class MapLocationSearch < ApplicationRecord
+class MapLocationSearch < NonTenantedApplicationRecord
   include UUIDHelper
 
   serialize :result, JSON

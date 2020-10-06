@@ -19,6 +19,7 @@
 #
 
 class CustomField < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :field_configuration, optional: true
   belongs_to :parent, optional: true, polymorphic: true
 

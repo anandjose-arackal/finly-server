@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class VendorStatus < ApplicationRecord
+class VendorStatus < NonTenantedApplicationRecord
   include Seedable
 
   GROUP_AWAITING_APPROVAL = 91

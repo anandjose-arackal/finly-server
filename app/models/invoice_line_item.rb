@@ -54,6 +54,7 @@ class InvoiceLineItem < ApplicationRecord
   include Exposures::Model::Exposable
   include MathUtil
 
+  belongs_to :company, optional: true
   belongs_to :invoice, optional: true
   belongs_to :category, optional: true
   belongs_to :amount, optional: true

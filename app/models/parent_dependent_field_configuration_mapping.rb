@@ -13,6 +13,7 @@
 
 class ParentDependentFieldConfigurationMapping < ApplicationRecord
 
+  belongs_to :company, optional: true
   belongs_to :parent, optional: true, polymorphic: true
   belongs_to :dependent_field_configuration, optional: true, class_name: "FieldConfiguration"
 

@@ -28,6 +28,7 @@
 #
 
 class Authentication < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :user, optional: true
 
   scope :quickbooks, -> { where(provider: QuickbooksFinlyIntegratable::ALLOWED_INTEGRATION_TYPES[0]) }

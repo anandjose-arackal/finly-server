@@ -20,6 +20,7 @@
 #
 
 class ReportTrack < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :report, optional: true
   belongs_to :report_status, optional: true
   belongs_to :tracking_action, optional: true, class_name: 'ReportTrackingAction'

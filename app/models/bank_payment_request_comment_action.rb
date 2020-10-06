@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class BankPaymentRequestCommentAction < ApplicationRecord
+class BankPaymentRequestCommentAction < NonTenantedApplicationRecord
   include Seedable
 
   def self.values

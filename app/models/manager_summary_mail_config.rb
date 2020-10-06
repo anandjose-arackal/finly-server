@@ -16,6 +16,7 @@
 #
 
 class ManagerSummaryMailConfig < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :user, optional: true
   belongs_to :user_mailer_type, optional: true
   belongs_to :period, optional: true

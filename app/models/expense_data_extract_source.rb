@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class ExpenseDataExtractSource < ApplicationRecord
+class ExpenseDataExtractSource < NonTenantedApplicationRecord
   include Seedable
 
   def self.values

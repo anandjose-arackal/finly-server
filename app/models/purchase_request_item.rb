@@ -51,6 +51,7 @@ class PurchaseRequestItem < ApplicationRecord
   field_customization_key :purchase_request_item
   customizable_validate :purpose, presence: true, scope: [:purchase_request, :company]
 
+  belongs_to :company, optional: true
   belongs_to :purchase_request, optional: true
   belongs_to :item, optional: true
   belongs_to :per_unit_estimated_amount, optional: true, class_name: "Amount", dependent: :destroy

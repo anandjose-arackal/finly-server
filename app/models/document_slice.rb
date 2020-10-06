@@ -15,6 +15,7 @@
 #
 
 class DocumentSlice < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :receipt, optional: true
 
   validates :image, presence: true

@@ -10,7 +10,7 @@
 #  deleted_at :datetime
 #
 
-class PhysicalUnit < ApplicationRecord
+class PhysicalUnit < NonTenantedApplicationRecord
 
   VALUES = {1 => {name: "Kilometre", symbol: "km"},
             2 => {name: "Mile", symbol: "mi"},

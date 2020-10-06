@@ -9,7 +9,7 @@
 #  updated_at :datetime         not null
 #
 
-class WebClient < ApplicationRecord
+class WebClient < NonTenantedApplicationRecord
 
   default_scope {order(updated_at: :desc)}
 

@@ -45,6 +45,7 @@ class PurchaseOrderItem < ApplicationRecord
   validates :inventory_line_item_id, presence: true
   # validates :purchase_order_id, presence: true
 
+  belongs_to :company, optional: true
   belongs_to :tax_rate, optional: true
   belongs_to :purchase_order, optional: true
   belongs_to :inventory_line_item, optional: true, class_name: 'Item'

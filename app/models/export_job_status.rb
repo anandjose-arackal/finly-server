@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class ExportJobStatus < ApplicationRecord
+class ExportJobStatus < NonTenantedApplicationRecord
   include Seedable
 
   def self.values

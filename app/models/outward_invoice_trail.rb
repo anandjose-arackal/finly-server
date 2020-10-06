@@ -20,6 +20,7 @@
 
 class OutwardInvoiceTrail < ApplicationRecord
   belongs_to :customer_account_transaction, optional: true
+  belongs_to :company, optional: true
   belongs_to :user, optional: true
   belongs_to :amount, optional: true
   belongs_to :invoice, optional: true, class_name: 'OutwardInvoice'

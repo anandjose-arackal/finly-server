@@ -14,6 +14,7 @@
 
 class BbpsSubscriptionField < ApplicationRecord
 
+  belongs_to :company, optional: true
   belongs_to :subscription, class_name: 'BbpsBillerSubscription', foreign_key: :subscription_id, optional: true
   belongs_to :biller, class_name: 'BbpsBiller', foreign_key: :biller_id, optional: true
 

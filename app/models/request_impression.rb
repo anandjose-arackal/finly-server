@@ -49,7 +49,7 @@
 #  deleted_at       :datetime
 #
 
-class RequestImpression < ApplicationRecord
+class RequestImpression < NonTenantedApplicationRecord
 
   validates :ip, presence: true
   validates :http_method, presence: true

@@ -10,5 +10,5 @@
 #
 
 
-class MoneyRequestAction < ApplicationRecord
+class MoneyRequestAction < NonTenantedApplicationRecord
 end

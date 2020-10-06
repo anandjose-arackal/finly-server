@@ -9,4 +9,6 @@ class ApplicationRecord < ActiveRecord::Base
 
   include SoftDeletable
 
+  acts_as_tenant(:company)
+
 end

@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class PaymentAgreementStatus < ApplicationRecord
+class PaymentAgreementStatus < NonTenantedApplicationRecord
 
   include Seedable
 

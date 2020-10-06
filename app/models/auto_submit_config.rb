@@ -16,6 +16,7 @@
 #
 
 class AutoSubmitConfig < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :period, optional: true
   belongs_to :submitable, optional: true, polymorphic: true
   belongs_to :default_policy, optional: true, class_name: 'Policy'

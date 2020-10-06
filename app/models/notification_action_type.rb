@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class NotificationActionType < ApplicationRecord
+class NotificationActionType < NonTenantedApplicationRecord
 
   scope :with_name, -> (name) { where name: name}
 

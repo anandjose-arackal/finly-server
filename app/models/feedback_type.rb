@@ -10,7 +10,7 @@
 #  deleted_at  :datetime
 #
 
-class FeedbackType < ApplicationRecord
+class FeedbackType < NonTenantedApplicationRecord
 
   VALUES = {issue_report: 1, feature_request: 2, appreciation: 3, others: 4}
 

@@ -10,7 +10,7 @@
 #  deleted_at         :datetime
 #
 
-class CompanyGroup < ApplicationRecord
+class CompanyGroup < NonTenantedApplicationRecord
 
   has_many :companies, foreign_key: :group_id
 end

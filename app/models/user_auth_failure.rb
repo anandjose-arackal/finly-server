@@ -16,7 +16,7 @@
 #  deleted_at       :datetime
 #
 
-class UserAuthFailure < ApplicationRecord
+class UserAuthFailure < NonTenantedApplicationRecord
   belongs_to :user, optional: true
 
   scope :within_time, ->(time) {where 'created_at >= ?', time}

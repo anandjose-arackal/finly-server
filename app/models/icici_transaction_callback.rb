@@ -18,5 +18,5 @@
 #  deleted_at :datetime
 #
 
-class IciciTransactionCallback < ApplicationRecord
+class IciciTransactionCallback < NonTenantedApplicationRecord
 end

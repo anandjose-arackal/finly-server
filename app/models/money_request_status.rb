@@ -10,7 +10,7 @@
 #  deleted_at :datetime
 #
 
-class MoneyRequestStatus < ApplicationRecord
+class MoneyRequestStatus < NonTenantedApplicationRecord
   include Seedable
 
   VALUES = {open: 1, processing: 2, retracted: 3, rejected: 4, approved: 5, credited: 6, pending: 7, auto_approved: 8, trip_open: 9, trip_processing: 10, trip_retracted: 11, trip_rejected: 12, trip_approved: 13}

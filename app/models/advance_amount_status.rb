@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class AdvanceAmountStatus < ApplicationRecord
+class AdvanceAmountStatus < NonTenantedApplicationRecord
   include Seedable
   def self.values
     %w( to_be_processed initiated paid failed pending po_processing closed)

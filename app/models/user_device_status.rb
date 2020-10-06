@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class UserDeviceStatus < ApplicationRecord
+class UserDeviceStatus < NonTenantedApplicationRecord
   include Seedable
 
   def self.values

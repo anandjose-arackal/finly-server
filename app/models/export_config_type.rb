@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class ExportConfigType < ApplicationRecord
+class ExportConfigType < NonTenantedApplicationRecord
   include Seedable
 
   def self.values

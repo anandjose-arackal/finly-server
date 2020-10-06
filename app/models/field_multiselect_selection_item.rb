@@ -11,6 +11,7 @@
 #
 
 class FieldMultiselectSelectionItem < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :field_multiselect_selection, optional: true
 
   belongs_to :value, optional: true, class_name: 'FieldMultiselectItem'

@@ -24,6 +24,7 @@
 #
 
 class UserSessionEvent < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :user_session
   belongs_to :status, class_name: 'UserSessionStatus'
 

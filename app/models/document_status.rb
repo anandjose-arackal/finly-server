@@ -9,6 +9,6 @@
 #  deleted_at :datetime
 #
 
-class DocumentStatus < ApplicationRecord
+class DocumentStatus < NonTenantedApplicationRecord
   
 end

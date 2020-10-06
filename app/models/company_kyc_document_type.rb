@@ -10,7 +10,7 @@
 #  deleted_at :datetime
 #
 
-class CompanyKycDocumentType < ApplicationRecord
+class CompanyKycDocumentType < NonTenantedApplicationRecord
 
 
   scope :with_name, -> (name){where name: name}

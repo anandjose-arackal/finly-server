@@ -21,6 +21,7 @@ class TripRoute < ApplicationRecord
   include SoftDeletable
   include UUIDHelper
 
+  belongs_to :company, optional: true
   belongs_to :trip
 
   has_many :custom_fields, as: :document, class_name: "FormCustomField", primary_key: :uuid

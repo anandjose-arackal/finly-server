@@ -11,5 +11,6 @@
 #
 
 class MccCategoryMapping < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :category, optional: true
 end

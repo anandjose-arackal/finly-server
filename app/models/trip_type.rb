@@ -9,7 +9,7 @@
 #  updated_at :datetime         not null
 #
 
-class TripType < ApplicationRecord
+class TripType < NonTenantedApplicationRecord
   include Seedable
 
   def self.values

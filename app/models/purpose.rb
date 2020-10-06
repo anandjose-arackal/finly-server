@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class Purpose < ApplicationRecord
+class Purpose < NonTenantedApplicationRecord
 
   include Seedable
 

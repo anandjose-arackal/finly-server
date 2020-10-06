@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class BookingFlightClass < ApplicationRecord
+class BookingFlightClass < NonTenantedApplicationRecord
   include Seedable
 
   def self.values

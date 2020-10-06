@@ -13,6 +13,7 @@
 #
 
 class MoneyRequestItem < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :category, optional: true
   belongs_to :amount, optional: true
   belongs_to :money_request, optional: true

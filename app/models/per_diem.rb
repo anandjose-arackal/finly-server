@@ -16,6 +16,7 @@
 class PerDiem < ApplicationRecord
   include SoftDeletable
 
+  belongs_to :company, optional: true
   belongs_to :configurable, optional: true, polymorphic: true
 
   belongs_to :rate, optional: true, class_name: "Amount"

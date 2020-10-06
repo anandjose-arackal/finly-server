@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class ExportField < ApplicationRecord
+class ExportField < NonTenantedApplicationRecord
   include Seedable
 
   scope :with_id, ->(id) { where id: id }

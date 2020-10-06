@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class UserPocketType < ApplicationRecord
+class UserPocketType < NonTenantedApplicationRecord
 
   include Seedable
 

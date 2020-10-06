@@ -22,6 +22,7 @@
 class DocumentMessage < ApplicationRecord
   include SoftDeletable
 
+  belongs_to :company, optional: true
   belongs_to :user
   belongs_to :type, class_name: 'DocumentMessageType'
   belongs_to :messageable_document, polymorphic: true

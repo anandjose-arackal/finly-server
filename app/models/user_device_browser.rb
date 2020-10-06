@@ -41,7 +41,7 @@
 #  deleted_at             :datetime
 #
 
-class UserDeviceBrowser < ApplicationRecord
+class UserDeviceBrowser < NonTenantedApplicationRecord
   attr_accessor :timestamp_s
 
   before_validation :set_timestamp

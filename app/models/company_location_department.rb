@@ -11,6 +11,7 @@
 #
 
 class CompanyLocationDepartment < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :branch_location, optional: true
   belongs_to :company_department, optional: true
 end

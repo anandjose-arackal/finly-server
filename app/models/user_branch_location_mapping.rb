@@ -11,6 +11,7 @@
 #
 
 class UserBranchLocationMapping < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :user
   belongs_to :branch_location
 end

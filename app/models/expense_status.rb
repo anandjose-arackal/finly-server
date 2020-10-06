@@ -10,7 +10,7 @@
 #  deleted_at :datetime
 #
 
-class ExpenseStatus < ApplicationRecord
+class ExpenseStatus < NonTenantedApplicationRecord
   include Seedable
 
   validates :name, presence: true

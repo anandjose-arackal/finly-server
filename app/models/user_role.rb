@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class UserRole < ApplicationRecord
+class UserRole < NonTenantedApplicationRecord
   include Seedable
 
   has_many :users, through: :user_role_mappings

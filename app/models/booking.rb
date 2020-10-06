@@ -19,6 +19,7 @@
 
 class Booking < ApplicationRecord
 
+  belongs_to :company, optional: true
   belongs_to :booking_type, optional: true
   belongs_to :booking_status, optional: true
   # belongs_to :booking_request, optional: true

@@ -15,6 +15,7 @@
 class FieldDropDownItem < ApplicationRecord
   include SoftDeletable
 
+  belongs_to :company, optional: true
   belongs_to :field_configuration, optional: true
 
   has_many :parent_dependent_field_configuration_mappings, foreign_key: :parent_id

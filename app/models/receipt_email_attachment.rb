@@ -22,6 +22,7 @@ class ReceiptEmailAttachment < ApplicationRecord
 
   has_many :system_messages, as: :messagable, dependent: :destroy
 
+  belongs_to :company, optional: true
   belongs_to :receipt_email, optional: true
   has_attached_file :original_attachment
 

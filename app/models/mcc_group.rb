@@ -10,7 +10,7 @@
 #  deleted_at :datetime
 #
 
-class MccGroup < ApplicationRecord
+class MccGroup < NonTenantedApplicationRecord
 
   CODE_MAP = {
       1 => {code: "ALCOHOL", name: "Liquor/Bar/Clubs"},

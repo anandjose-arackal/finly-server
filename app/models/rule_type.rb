@@ -10,7 +10,7 @@
 #
 
 
-class RuleType < ApplicationRecord
+class RuleType < NonTenantedApplicationRecord
 
   validates :name, presence: true
 

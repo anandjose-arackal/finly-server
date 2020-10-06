@@ -17,6 +17,7 @@
 class CustomerAttachment < ApplicationRecord
   include Attachable
 
+  belongs_to :company, optional: true
   belongs_to :customer, optional: true
 
   CONTENT_TYPES = {content_type: []}

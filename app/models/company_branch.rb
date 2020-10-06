@@ -20,5 +20,6 @@
 #
 
 class CompanyBranch < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :collect_company_detail, optional: true
 end

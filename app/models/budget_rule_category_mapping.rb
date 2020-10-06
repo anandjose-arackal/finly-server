@@ -11,6 +11,7 @@
 #
 
 class BudgetRuleCategoryMapping < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :budget_rule, optional: true
   belongs_to :category, optional: true
 end

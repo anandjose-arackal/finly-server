@@ -17,6 +17,7 @@
 class SystemMessage < ApplicationRecord
   include SoftDeletable
 
+  belongs_to :company, optional: true
   belongs_to :system_message_type, optional: true
   belongs_to :messagable, optional: true, polymorphic: true
 

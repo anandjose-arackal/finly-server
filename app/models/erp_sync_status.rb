@@ -9,7 +9,7 @@
 #  updated_at :datetime         not null
 #
 
-class ErpSyncStatus < ApplicationRecord
+class ErpSyncStatus < NonTenantedApplicationRecord
   include Seedable
 
   def self.values

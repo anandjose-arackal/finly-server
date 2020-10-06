@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class OutwardInvoiceStatus < ApplicationRecord
+class OutwardInvoiceStatus < NonTenantedApplicationRecord
   include Seedable
 
   def self.values

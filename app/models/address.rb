@@ -21,6 +21,7 @@
 #
 
 class Address < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :state, optional: true, class_name: "GstStateCode"
   belongs_to :parent, optional: true, polymorphic: true
 

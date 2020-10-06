@@ -31,6 +31,7 @@ class BookingFlight < ApplicationRecord
           FieldCustomizer::CustomizableValidation
 
   # belongs_to :parent, optional: true, polymorphic: true
+  belongs_to :company, optional: true
   belongs_to :booking, optional: true, inverse_of: :booking_flight
   belongs_to :booking_class, optional: true, class_name: 'BookingFlightClass'
   belongs_to :cost, optional: true, class_name: 'Amount', dependent: :destroy

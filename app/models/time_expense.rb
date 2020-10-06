@@ -15,6 +15,7 @@ class TimeExpense < ApplicationRecord
 
   include SoftDeletable
 
+  belongs_to :company, optional: true
   belongs_to :expense, optional: true
   has_many :custom_fields, as: :parent, dependent: :destroy
   accepts_nested_attributes_for :custom_fields

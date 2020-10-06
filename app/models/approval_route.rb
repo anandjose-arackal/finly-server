@@ -16,6 +16,7 @@
 #
 
 class ApprovalRoute < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :purpose, optional: true
   belongs_to :user, optional: true
   belongs_to :created_by_user, optional: true, class_name: 'User'

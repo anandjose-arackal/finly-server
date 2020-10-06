@@ -12,6 +12,7 @@
 #
 
 class CardBalanceHistory < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :card, optional: true
   belongs_to :amount, optional: true
 

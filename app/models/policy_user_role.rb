@@ -15,6 +15,7 @@
 
 class PolicyUserRole < ApplicationRecord
   belongs_to :policy, optional: true
+  belongs_to :company, optional: true
   belongs_to :user, optional: true
   belongs_to :user_role, optional: true
 

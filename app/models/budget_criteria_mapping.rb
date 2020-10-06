@@ -13,6 +13,7 @@
 
 class BudgetCriteriaMapping < ApplicationRecord
 
+  belongs_to :company, optional: true
   # many-to-many mapping between budgets and entities
   belongs_to :budget, optional: true
   belongs_to :budgetable, optional: true, polymorphic: true # this will be the reference to the object for whom a budget can be applied (i.e. a criterion - like category, cost center, vendor etc.)

@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class WhitelistedIpType < ApplicationRecord
+class WhitelistedIpType < NonTenantedApplicationRecord
 
   TYPES = {api: 1, admin_panel: 2}
 

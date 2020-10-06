@@ -14,6 +14,7 @@
 #
 
 class CompanyKycTrail< ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :company_kyc, optional: true
   belongs_to :action_resource, optional: true, polymorphic: true
   belongs_to :action, optional: true, class_name: "CompanyKycTrailAction"

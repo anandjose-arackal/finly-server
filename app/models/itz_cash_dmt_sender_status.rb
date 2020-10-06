@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class ItzCashDmtSenderStatus < ApplicationRecord
+class ItzCashDmtSenderStatus < NonTenantedApplicationRecord
 
   VALUES = {active: 1, disabled: 2}
 

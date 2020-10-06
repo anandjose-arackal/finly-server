@@ -32,6 +32,7 @@ class BookingCarRental < ApplicationRecord
           FieldCustomizer::CustomizableValidation
 
   # belongs_to :parent, optional: true, polymorphic: true
+  belongs_to :company, optional: true
   belongs_to :booking, optional: true, inverse_of: :booking_car_rental
   belongs_to :cost, optional: true, class_name: 'Amount', dependent: :destroy
   belongs_to :pickup_city, optional: true, class_name: 'Location', dependent: :destroy

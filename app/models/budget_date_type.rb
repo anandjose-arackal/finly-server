@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class BudgetDateType < ApplicationRecord
+class BudgetDateType < NonTenantedApplicationRecord
   include Seedable
 
   def self.values

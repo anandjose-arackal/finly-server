@@ -19,6 +19,7 @@
 #
 
 class UserAgentClient < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :user, primary_key: :finly_id, foreign_key: :user_finly_id, class_name: "User"
   belongs_to :status, class_name: 'UserAgentClientStatus'
 

@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class SystemMessageType < ApplicationRecord
+class SystemMessageType < NonTenantedApplicationRecord
 
   VALUES = {
       info: 1,

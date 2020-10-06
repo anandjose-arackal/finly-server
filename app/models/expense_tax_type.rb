@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class ExpenseTaxType < ApplicationRecord
+class ExpenseTaxType < NonTenantedApplicationRecord
   include Seedable
 
   def self.values

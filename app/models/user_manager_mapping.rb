@@ -28,6 +28,7 @@
 class UserManagerMapping < ApplicationRecord
   # include PolicyVersion
 
+  belongs_to :company, optional: true
   belongs_to :user, optional: true
   belongs_to :manager, optional: true, class_name: 'User'
   belongs_to :finance_manager, optional: true, class_name: 'User'

@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class TravelRequestStatus < ApplicationRecord
+class TravelRequestStatus < NonTenantedApplicationRecord
 
   include Seedable
 

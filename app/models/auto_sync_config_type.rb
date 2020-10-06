@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class AutoSyncConfigType < ApplicationRecord
+class AutoSyncConfigType < NonTenantedApplicationRecord
 
   VALUES = { quickbooks: 1, tally: 2 }
 

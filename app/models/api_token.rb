@@ -17,6 +17,6 @@
 #  deleted_at    :datetime
 #
 
-class ApiToken < ApplicationRecord
+class ApiToken < NonTenantedApplicationRecord
   scope :with_name, -> (name) {where name: name}
 end

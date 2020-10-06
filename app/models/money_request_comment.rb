@@ -25,6 +25,7 @@ class MoneyRequestComment < ApplicationRecord
 
   default_scope {order(created_at: :desc)}
 
+  belongs_to :company, optional: true
   belongs_to :money_request, optional: true
   belongs_to :comment_action, optional: true, class_name: 'MoneyRequestCommentAction'
   belongs_to :user, optional: true

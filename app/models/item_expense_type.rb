@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class ItemExpenseType < ApplicationRecord
+class ItemExpenseType < NonTenantedApplicationRecord
   include Seedable
 
   def self.values

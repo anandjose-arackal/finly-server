@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class PurchaseRequestItemStatus < ApplicationRecord
+class PurchaseRequestItemStatus < NonTenantedApplicationRecord
 
   include Seedable
 

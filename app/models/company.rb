@@ -15,7 +15,7 @@
 #  deleted_at       :datetime
 #
 
-class Company < ApplicationRecord
+class Company < NonTenantedApplicationRecord
   include Constants
   include LiquidDroppable
   include Exposures::Model::Exposable

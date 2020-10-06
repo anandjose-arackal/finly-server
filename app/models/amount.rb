@@ -180,7 +180,7 @@
 #  deleted_at  :datetime
 #
 
-class Amount < ApplicationRecord
+class Amount < NonTenantedApplicationRecord
   include MathUtil
   include SoftDeletable
 

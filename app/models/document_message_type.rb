@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class DocumentMessageType < ApplicationRecord
+class DocumentMessageType < NonTenantedApplicationRecord
   include Seedable
 
   def self.values

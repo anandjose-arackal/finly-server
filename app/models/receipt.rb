@@ -27,6 +27,7 @@
 class Receipt < ApplicationRecord
   include SoftDeletable
   belongs_to :parent, optional: true, polymorphic: true # so that it can be attached to expense as well as report
+  belongs_to :company, optional: true
   belongs_to :user, optional: true
   belongs_to :receipt_email, optional: true
   belongs_to :sourcable, optional: true, polymorphic: true

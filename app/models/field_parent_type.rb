@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class FieldParentType < ApplicationRecord
+class FieldParentType < NonTenantedApplicationRecord
 
   TYPES = {
       report: 1,

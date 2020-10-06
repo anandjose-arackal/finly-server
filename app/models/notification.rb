@@ -26,6 +26,7 @@
 #
 
 class Notification < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :notification_type, optional: true
   belongs_to :user, optional: true
   belongs_to :action_type, optional: true, class_name: "NotificationActionType"

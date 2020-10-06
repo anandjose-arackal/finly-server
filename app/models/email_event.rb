@@ -15,6 +15,7 @@
 #
 
 class EmailEvent < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :email
 
   # Events

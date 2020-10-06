@@ -11,7 +11,7 @@
 #  deleted_at :datetime
 #
 
-class State < ApplicationRecord
+class State < NonTenantedApplicationRecord
   include Seedable
   include LiquidDroppable
   include Exposures::Model::Exposable

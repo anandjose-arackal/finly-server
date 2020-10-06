@@ -8,7 +8,7 @@
 #  deleted_at   :datetime
 #
 
-class ChannelType < ApplicationRecord
+class ChannelType < NonTenantedApplicationRecord
 
   TYPES = {atm: 1, pos: 2, ecom: 3, ecom_pos: 4}
 

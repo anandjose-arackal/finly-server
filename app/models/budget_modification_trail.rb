@@ -15,6 +15,7 @@
 #
 
 class BudgetModificationTrail < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :budget, optional: true
   belongs_to :budget_modification_action, optional: true
   belongs_to :action_user, optional: true, class_name: 'User'

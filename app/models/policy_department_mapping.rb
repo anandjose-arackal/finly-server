@@ -13,6 +13,8 @@
 
 class PolicyDepartmentMapping < ApplicationRecord
 
+  belongs_to :company, optional: true
+
   belongs_to :policy, optional: true
   belongs_to :department, optional: true
 

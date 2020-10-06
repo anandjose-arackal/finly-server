@@ -11,6 +11,7 @@
 #
 
 class CustomerAccount < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :customer, optional: true
   belongs_to :balance, optional: true, class_name: 'Amount'
 

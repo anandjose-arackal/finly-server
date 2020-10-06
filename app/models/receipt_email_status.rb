@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class ReceiptEmailStatus < ApplicationRecord
+class ReceiptEmailStatus < NonTenantedApplicationRecord
   include Seedable
 
   VALUES = {

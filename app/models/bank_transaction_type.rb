@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class BankTransactionType < ApplicationRecord
+class BankTransactionType < NonTenantedApplicationRecord
 
   include Seedable
 

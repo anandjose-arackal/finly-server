@@ -15,6 +15,7 @@
 
 class CustomExportConfiguration < ApplicationRecord
 
+  belongs_to :company, optional: true
   belongs_to :configurable, optional: true, polymorphic: true
 
 end

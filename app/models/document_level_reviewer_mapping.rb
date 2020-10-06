@@ -37,6 +37,7 @@ class DocumentLevelReviewerMapping < ApplicationRecord
   # When a single reviewer is selected from each level in the reviewal chain
   # a new mapping is created. If nothing is selected it falls back to reviewer(s) in the
   # level
+  belongs_to :company, optional: true
   belongs_to :policy, optional: true
   belongs_to :level, class_name: 'ReviewalLevel', optional: true
   belongs_to :reviewer, class_name: 'User', optional: true

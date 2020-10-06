@@ -12,6 +12,7 @@
 #
 
 class Feedback < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :feedback_type, optional: true
   belongs_to :user, optional: true
 end

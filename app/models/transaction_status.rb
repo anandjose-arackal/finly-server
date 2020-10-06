@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class TransactionStatus < ApplicationRecord
+class TransactionStatus < NonTenantedApplicationRecord
   include Seedable
 
   def self.values

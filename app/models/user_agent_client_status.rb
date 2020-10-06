@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class UserAgentClientStatus < ApplicationRecord
+class UserAgentClientStatus < NonTenantedApplicationRecord
   include Seedable
 
   def self.values

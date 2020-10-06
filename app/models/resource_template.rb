@@ -13,6 +13,7 @@
 #
 
 class ResourceTemplate < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :user, optional: true
 
   validates :name, presence: true

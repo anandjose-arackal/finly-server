@@ -18,6 +18,7 @@
 class ExpenseRule < ApplicationRecord
   include SoftDeletable
 
+  belongs_to :company, optional: true
   belongs_to :greater_than_amount, optional: true, class_name: "Amount", dependent: :destroy
   belongs_to :category, optional: true
 

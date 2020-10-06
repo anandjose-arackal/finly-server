@@ -15,6 +15,7 @@
 
 class ItzCashDmtSender < ApplicationRecord
 
+  belongs_to :company, optional: true
   belongs_to :user, optional: true
   belongs_to :status, optional: true, class_name: 'ItzCashDmtSenderStatus'
   has_many :beneficiaries, class_name: 'ItzCashDmtBeneficiary'

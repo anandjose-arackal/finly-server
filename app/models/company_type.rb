@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class CompanyType < ApplicationRecord
+class CompanyType < NonTenantedApplicationRecord
   include Seedable
 
   def self.values
