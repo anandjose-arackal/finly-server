@@ -6,6 +6,8 @@ if @result.selected_user.first_name.present?
 
   json.date_of_birth (@result.selected_user.date_of_birth&.strftime("%d-%m-%Y"))
   json.gender (@result.selected_user.gender_name)
+  json.gl_config @result.selected_user.gl_config&.map{|key,v| {key: key ,value: v}}
+  json.gl_config_str @result.selected_user.gl_config&.inspect
 else
   json.email @result.selected_user.email
   json.mobile_number @result.selected_user.mobile_number
