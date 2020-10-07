@@ -96,8 +96,9 @@ class BbpsBillerSubscription < ApplicationRecord
 
   delegate :draft?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :deactivated?, :reactivated?, to: :status
 
-
-  default_scope {order('bbps_biller_subscriptions.created_at DESC')}
+  def self.default_scope
+    unscoped.order('bbps_biller_subscriptions.created_at DESC')
+  end
 
   scope :filter_ids, -> (ids) {where(id: ids)}
 
