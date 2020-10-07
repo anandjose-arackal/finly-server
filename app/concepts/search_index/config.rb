@@ -139,7 +139,7 @@ class SearchIndex::Config < Transactions::API
           category: :masters,
           route: 'users/{{record_id}}/params={}',
           layout: {
-              fixed_left: [:name, :email],
+              fixed_left: [:user_name, :user_email],
               fixed_right: [:status_name]
           }
       }

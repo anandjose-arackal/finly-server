@@ -5,8 +5,8 @@ class UserIndex < SearchIndex::Model
 
     serialize do |record|
       {
-          name: record.name,
-          email: record.email,
+          user_name: record.name,
+          user_email: record.email,
           employee_id: record.profile&.employee_id,
           status_name: record.status&.titleize
       }

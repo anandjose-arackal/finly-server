@@ -42,6 +42,8 @@ class Indexes::VpRecords < SearchIndex::Api
   attribute :collaborators_emails, displayed: false
   attribute :collaborators_names, displayed: false
   attribute :unique_transaction_references
+  attribute :user_name
+  attribute :user_email
 
   class Indexes::VpRecords::Helpers
 
