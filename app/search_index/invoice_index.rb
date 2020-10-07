@@ -33,7 +33,7 @@ class InvoiceIndex < SearchIndex::Model
     end
 
     condition do |record|
-      record.deleted_at.nil? and record.company_id.present?
+      record.deleted_at.nil? and record.company_id.present? and record.procurement_id.present?
     end
 
   end
