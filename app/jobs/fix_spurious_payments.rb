@@ -1,8 +1,8 @@
 # this takes a list of spurious payments in the system - for example things like payments that are in progress
 # and such and handles them accordingly
-class FixSpuriousPayments
+class FixSpuriousPayments < BaseJob
 
-  def self.perform
+  def self.perform_job
     puts " ----------------------------- PERFORMING #{self.name} at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
 
     spurious_payments = Payment.where(payment_status_id: [PaymentStatus.id_for(:pending), PaymentStatus.id_for(:in_progress)]).where('updated_at <= ?', (DateTime.now - 1.day)).where(receiving_account_type: "BankAccount")

@@ -1,6 +1,6 @@
-class ReportsAwaitingApproval
+class ReportsAwaitingApproval < BaseJob
 
-  def self.perform
+  def self.perform_job
     company_list = Company.where(id: [144])
     company_list.each do |company|
       remind_document_reviewer(company)      

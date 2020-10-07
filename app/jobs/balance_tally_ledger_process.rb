@@ -1,8 +1,8 @@
-class BalanceTallyLedgerProcess
+class BalanceTallyLedgerProcess < BaseJob
 
   attr_accessor :company
 
-  def self.perform
+  def self.perform_job
     # this will update the balance for today's date on the two balances
     relevant_companies = Company.all.joins(:feature_subscription).where('feature_subscriptions.current_account_connected = ? OR feature_subscriptions.current_account_connected IS ?', false, nil)
     company_balance = YesBankCompanyAccount.with_company_id(relevant_companies.pluck(:id)).joins(:balance).sum(:value)
