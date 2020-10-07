@@ -165,7 +165,7 @@ class SearchIndex::Api
     options['attributesToCrop'] = self.class.attributes_to_crop if self.class.attributes_to_crop.present?
     options['matches'] = true
     options['offset'] = offset.to_i || 0
-    options['limit'] = limit.to_i || 20
+    options['limit'] = limit.to_i || 10
     SearchIndex::UpdateMonitor.with_tracking(self.class.full_index_name) do
       index.search(q, options)
     end
