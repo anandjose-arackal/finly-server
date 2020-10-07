@@ -87,7 +87,7 @@ class BbpsBillerSubscription < ApplicationRecord
 
   has_many :pocs, class_name: 'User', through: :subscription_pocs, source: :user
   has_many :bbps_bills, class_name: 'BbpsBill', foreign_key: :subscription_id
-  has_many :attachments, as: :resource, dependent: :destroy
+  has_many :attachments, as: :resource
 
   has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment'
   has_many :receiving_payments, foreign_key: 'receiving_user_id', class_name: 'Payment'

@@ -55,8 +55,8 @@ class Item < ApplicationRecord
   # LineItem and Branch Location Mapping
   has_many :branch_locations
   has_many :inventory_line_item_location_mappings, through: :branch_locations
-  has_many :artifacts, as: :resource, dependent: :destroy
-  has_many :custom_fields, as: :parent, dependent: :destroy
+  has_many :artifacts, as: :resource
+  has_many :custom_fields, as: :parent
   # validates :rate, presence: true
   validates :description, presence: true
   # validates :hsn_sac, format: {with: /\A(\d{6}|\d{8})\Z/}, allow_blank: true
