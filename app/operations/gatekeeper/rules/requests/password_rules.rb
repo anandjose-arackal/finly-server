@@ -123,8 +123,7 @@ Gatekeeper::Checker.new 'On New Request' do
             :plugins, :is_mobile
         ].each do |item|
           rule "#{item} property mismatch" do
-            next if RequestStoreUtil.x_finly_rp_attributes[item].to_s == RequestStoreUtil.current_session.user_device.client.send(item).to_s
-
+            next if RequestStoreUtil.x_finly_rp_attributes.present? and RequestStoreUtil.x_finly_rp_attributes[item].to_s == RequestStoreUtil.current_session.user_device.client.send(item).to_s
             session_status_id UserSessionStatus.id_for(:blocked)
             response_code 401
             fail
