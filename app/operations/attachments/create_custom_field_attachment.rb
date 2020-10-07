@@ -7,7 +7,7 @@ class Attachments::CreateCustomFieldAttachment < Attachments::Base
 
   def process
     self.attachment = CustomFieldAttachment.new
-    self.attachment.attachment = params[:attachment]
+    self.attachment.attachment = params[:file]
     # self.attachment.creator_id = user.id
     # self.attachment.company = user.company
     # self.attachment.resource_type = params[:resource_type] if params[:resource_type].present?

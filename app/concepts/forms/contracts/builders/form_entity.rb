@@ -58,9 +58,8 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
           )
         }
         required = result['required']
-
         # Required validation ( System Validation )
-        if required and send(entity.entity_key).nil?
+        if required and send(entity.entity_key).blank? and entity.entity_type != 'switch'
           errors.add entity.entity_key, 'cannot be blank'
         end
       end
@@ -119,6 +118,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
         entity: entity,
         contract: contract
     }
+
     entity.class.contract_evaluators.each do |name, evaluator|
       evaluator.call(context)
     end

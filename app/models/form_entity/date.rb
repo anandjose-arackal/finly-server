@@ -70,6 +70,7 @@ class FormEntity::Date < FormEntity
     if entity.options['restriction'].present?
       contract.validate do
         value = send(entity.entity_key)
+
         next unless value.present?
 
         case entity.options['restriction']

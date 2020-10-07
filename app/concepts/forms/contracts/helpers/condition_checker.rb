@@ -9,6 +9,7 @@ class Forms::Contracts::Helpers::ConditionChecker
       result[property] = entity.send(property)
     end
 
+
     conditions.each do |condition|
       # Applicable only if the required properties is impact by the condition.
       # This helps in running different conditions at deserialization stage (editable/visible) vs validation stage(required)

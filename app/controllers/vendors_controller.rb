@@ -116,9 +116,18 @@ class VendorsController < BaseControllers::WebBase
 
   # Support
 
+  # def penny_test
+  #   @result = Vendors::Support::PennyTest.(current_user, params)
+  #   respond
+  # end
+
   def penny_test
-    @result = Vendors::Support::PennyTest.(current_user, params)
-    respond
+    # todo - I2P - uncomment in production
+    # @result = Vendors::Support::PennyTest.(current_user, params)
+    data = {bank_account_master: BankAccountMaster.find_by(account_name: params[:bank_account][:name], account_number: params[:bank_account][:account_number], ifsc: params[:bank_account][:ifsc]).as_json, card_id: params[:card_id]}
+    respond_to do |format|
+      format.json {render json: data.as_json}
+    end
   end
 
   def validate_gstin
