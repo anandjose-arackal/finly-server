@@ -76,11 +76,11 @@ class TransferTimingUtils
   def self.daily_time_range(payment_mode)
     # todo check if the timezone is actually the current one
     start_time = DateTime.new(Date.today.year, Date.today.month, Date.today.day, 8, 0, 0, "IST")
-    case payment_mode
-      when "NEFT", "neft"
+    case payment_mode&.upcase
+      when "NEFT"
         start_time = DateTime.new(Date.today.year, Date.today.month, Date.today.day, 0, 0, 0, "IST")
         end_time = DateTime.new(Date.today.year, Date.today.month, Date.today.day, 23, 59, 59, "IST")
-      when "RTGS", "rtgs"
+      when "RTGS"
         end_time = DateTime.new(Date.today.year, Date.today.month, Date.today.day, 16, 10, 0, "IST")
       else
         # defaulting to RTGS times just to be sure
@@ -102,7 +102,7 @@ class TransferTimingUtils
     else
       date.change(hour: 8, min: 1, sec: 0)
     end
-    return date.to_date if ["IMPS", "NEFT"].include?( payment_mode )
+    return date.to_date if ["IMPS", "NEFT"].include?( payment_mode&.upcase )
     case payment_mode.upcase
       when "RTGS"
         date = date.to_date
