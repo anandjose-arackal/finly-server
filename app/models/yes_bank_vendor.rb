@@ -69,11 +69,11 @@ class YesBankVendor < ApplicationRecord
   belongs_to :currency, optional: true
   belongs_to :payment_term, optional: true
 
-  has_many :bank_accounts, as: :account_owner, dependent: :destroy
+  has_many :bank_accounts, as: :account_owner
   has_many :receiving_payments, as: :receiving_user, class_name: 'Payment'
   has_many :vendor_attachments
-  has_many :custom_fields, as: :parent, dependent: :destroy
-  has_many :vendor_tds_rates, dependent: :destroy, foreign_key: :vendor_id
+  has_many :custom_fields, as: :parent
+  has_many :vendor_tds_rates, foreign_key: :vendor_id
   has_many :tds_rates, through: :vendor_tds_rates
   has_many :beneficiary_payments, foreign_key: :vendor_id
   has_many :gstin_locations, foreign_key: :vendor_id
