@@ -17,6 +17,10 @@ class ApplicationToggle
     @record = record
   end
 
+  def feature_flag(feature, default)
+    user.feature_toggle.enabled?(feature, default)
+  end
+
   def feature_value(feature, default = nil)
     user.feature_toggle.value(feature, default)
   end

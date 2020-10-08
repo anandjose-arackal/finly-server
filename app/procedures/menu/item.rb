@@ -1,7 +1,7 @@
 class Menu::Item
   include ActionManager::DSL
 
-  attr_accessor :key, :id, :path, :icon, :label, :create, :features, :user_subscriptions, :permissions, :parent, :action_registry
+  attr_accessor :key, :id, :path, :icon, :label, :create, :features, :user_subscriptions, :permissions, :parent, :toggle, :action_registry
 
   def initialize(params = {}, &block)
     params.except(:scopes).each_pair do |attr, value|
@@ -114,6 +114,16 @@ class Menu::Item
     current_user = options[:current_user]
     return false unless current_user.present?
     return false unless current_user.has_permission?(permissions)
+    if toggle.present?
+      klass = toggle.first
+      method = toggle.second
+      raise "Invalid toggle for menu item #{key}" if klass.blank? or method.blank?
+
+      toggle = klass.new(current_user)
+      raise "Invalid toggle for menu item #{key}, method #{method} is not found in klass #{klass}" unless toggle.respond_to?(method)
+
+      return false unless toggle.send(method)
+    end
     return false unless company_subscribed?(current_user)
     return false unless user_subscribed?(current_user)
 

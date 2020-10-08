@@ -32,10 +32,10 @@ class Menu::API < Transactions::API
     @items ||= []
   end
 
-  def self.item(key, path: nil, icon: nil, label: nil, permissions: [], features: [], &block)
+  def self.item(key, path: nil, icon: nil, label: nil, permissions: [], features: [], toggle: [], &block)
     items << Menu::Item.new(
         key: key, path: path, icon: icon, label: label,
-        permissions: permissions, features: features, scopes: scopes, action_registry: self,
+        permissions: permissions, features: features, scopes: scopes, toggle: toggle, action_registry: self,
         &block
     )
   end
