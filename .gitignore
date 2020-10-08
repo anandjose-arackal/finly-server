@@ -33,7 +33,6 @@ config/meilisearch.yml
 config/posthog.yml
 data.ms/
 
-
 .rubocop.yml
 .vscode/
 reference_resource_migration.log

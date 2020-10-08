@@ -13,10 +13,25 @@ Rails.application.configure do
   config.consider_all_requests_local = true
 
   feature_flipper_config = Rails.application.config_for(:feature_flipper)
-  if feature_flipper_config.dig('api_key').present? and feature_flipper_config.dig('url').present?
-    config.bullet_train = BulletTrain.new(api_key: feature_flipper_config['api_key'], url: feature_flipper_config['url'])
+    if feature_flipper_config.present? and feature_flipper_config['enabled'] and
+        feature_flipper_config.dig('api_key').present? and feature_flipper_config.dig('url').present?
+      config.bullet_train = BulletTrain.new(api_key: feature_flipper_config['api_key'], url: feature_flipper_config['url'])
+    else
+      config.bullet_train = nil
+    end
+
+  posthog_config = Rails.application.config_for(:posthog)
+  if posthog_config.present? and posthog_config['enabled']
+    config.posthog = PostHog::Client.new(
+        {
+            api_key: posthog_config['api_key'],
+            api_host: posthog_config['api_host'],
+            # Todo log errors
+            on_error: Proc.new { |status, msg| print msg }
+        }
+    )
   else
-    config.bullet_train = nil
+    config.posthog = nil
   end
 
   redis_config = Rails.application.config_for(:redis_config)
