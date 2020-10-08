@@ -78,7 +78,7 @@ class Masters::Items::Index < IndexBuilder::API
   # Counter is not required for item master
   counter -> (user, collection) do
     collection = collection.non_deleted
-
+    
     counter = IndexBuilder::Counter.new :active_eq
     counts = collection.group(:active).count
     counter.add nil, "All", counts.values.reduce(0, :+)

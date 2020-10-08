@@ -19,7 +19,9 @@ class Admin::Users::Update < Admin::Users::Base
   end
 
   def pre_process
-
+    if params[:user][:gl_config].present?
+      params[:user][:gl_config] = eval(params[:user][:gl_config])
+    end
   end
 
   def process
@@ -43,7 +45,7 @@ class Admin::Users::Update < Admin::Users::Base
     params.require(:user).permit(:first_name, :last_name, :mothers_maiden_name, :point_of_contact, :mobile_number, :email,
                                  profile_attributes: [:date_of_birth, :gender, :address_1,
                                                       :address_2, :city, :state_id, :pin_code, :employee_id, :payroll_id],
-                                 user_panel_dubscription_attributes: [:expense_management, :disburse])
+                                 user_panel_dubscription_attributes: [:expense_management, :disburse],gl_config: {})
   end
 
 end

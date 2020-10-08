@@ -1,10 +1,13 @@
 if @result.selected_user.first_name.present?
   json.extract! @result.selected_user, :first_name, :last_name, :mobile_number, :email, :address_1, :address_2, :pin_code, :city, :state_name,
-                                     :company_name, :id, :mothers_maiden_name, :active, :employee_id, :payroll_id
+                                     :company_name, :id, :mothers_maiden_name, :active, :employee_id, :payroll_id, :gl_config
+
 
 
   json.date_of_birth (@result.selected_user.date_of_birth&.strftime("%d-%m-%Y"))
   json.gender (@result.selected_user.gender_name)
+  json.gl_config @result.selected_user.gl_config&.map{|key,v| {key: key ,value: v}}
+  json.gl_config_str @result.selected_user.gl_config&.inspect
 else
   json.email @result.selected_user.email
   json.mobile_number @result.selected_user.mobile_number

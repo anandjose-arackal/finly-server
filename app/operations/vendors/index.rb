@@ -102,7 +102,7 @@ class Vendors::Index < Vendors::Base
   end
 
   def success
-    params[:vendors] = self.vendors
+    params[:vendors] = self.vendors.non_deleted
     Vendors::Index::VendorsPresenter.new(user, params, messages)
   end
 end
