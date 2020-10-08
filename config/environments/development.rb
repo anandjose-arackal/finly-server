@@ -12,6 +12,13 @@ Rails.application.configure do
   # Show full error reports.
   config.consider_all_requests_local = true
 
+  feature_flipper_config = Rails.application.config_for(:feature_flipper)
+  if feature_flipper_config.dig('api_key').present? and feature_flipper_config.dig('url').present?
+    config.bullet_train = BulletTrain.new(api_key: feature_flipper_config['api_key'], url: feature_flipper_config['url'])
+  else
+    config.bullet_train = nil
+  end
+
   redis_config = Rails.application.config_for(:redis_config)
   config.redis = Redis.new(redis_config.slice('url', 'password'))
 

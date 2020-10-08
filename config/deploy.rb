@@ -90,6 +90,7 @@ linked_files = %w{
   config/finly_macros.yml
   config/finly_collect.yml
   config/meilisearch.yml
+  config/bullet_train.yml
 }
 case fetch(:stage)
 when :itzcash_production, :aws_production, :background_production, :foreground_production, :console_production, :api_production, :background_production_console,

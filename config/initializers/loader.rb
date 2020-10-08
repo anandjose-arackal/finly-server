@@ -14,7 +14,14 @@ Loader.watch! "Routes Loader" do
   Routers::Registry.routers.each do |router|
     router.clear_map
   end
-  Dir.glob(Rails.root.join("app/routes/**/*.rb")).each {|f| load f}
+  Dir.glob(Rails.root.join("app/routes/**/*.rb")).each { |f| load f }
+end
+
+Loader.watch! "Bullet Train" do
+  config = Rails.application.config_for(:feature_flipper)
+  if config.dig('api_key').present? and config.dig('url').present?
+    Rails.configuration.bullet_train = BulletTrain.new(api_key: config['api_key'], url: config['url'])
+  end
 end
 
 # Fixme: This is throwing a superclass mismatch error when IRB calls reload!. Added a temporary workaround in +SearchIndex::Concerns::Document+
