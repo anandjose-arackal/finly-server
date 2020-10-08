@@ -24,7 +24,7 @@ class Filters::API::Attribute
   end
 
   def simple_filter
-    Forms::API::Entity::Registry.types[field_type].simple_filter
+    Forms::Entity::Registry.types[field_type].simple_filter
   end
 
   def build(user)

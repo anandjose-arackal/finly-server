@@ -72,6 +72,20 @@ class FormEntity::AutoNumber < FormEntity
     end
   end
 
+  contract_eval "Set sequence" do |contract:, entity:, **|
+    contract.after_save do
+      if model.send(entity.entity_key).blank?
+        prefix = entity.config['prefix']
+        # min_length = entity.options['min_length'] || MasterEntity::Sequence::MIN_LENGTH_DEFAULT
+        prefix = LiquidHelper.interpolate(prefix, {'record' => model})
+        sequence = REDIS.incr("FormEntity::AutoNumber##{entity.id}##{prefix}")
+        sequence = sequence.to_s.rjust(min_length, "0")
+        model.send("#{entity.entity_key}=", "#{prefix}#{sequence}")
+        model.save
+      end
+    end
+  end
+
   def self.option_validation
     Proc.new do
       validation :options_config do
