@@ -126,6 +126,15 @@ set :rollbar_token, 'ca504254626b4bf69eb1a1ec0b3aea23'
 set :rollbar_env, Proc.new { fetch :stage }
 set :rollbar_role, Proc.new { :app }
 
+set :sentry_host, 'https://sentry.finly.io/' # https://sentry.io by default
+set :sentry_api_token, 'bed720c1d80849fcbc96fba0485460e6'
+set :sentry_organization, 'finly' # fetch(:application) by default
+set :sentry_project, 'finly-server'     # fetch(:application) by default
+set :sentry_repo, 'finlycore/finly-server' # computed from repo_url by default
+
+before 'deploy:starting', 'sentry:validate_config'
+after 'deploy:published', 'sentry:notice_deployment'
+
 set :puma_rackup, -> { File.join(current_path, 'config.ru') }
 set :puma_state, "#{shared_path}/tmp/pids/puma.state"
 set :puma_pid, "#{shared_path}/tmp/pids/puma.pid"

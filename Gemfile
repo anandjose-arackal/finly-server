@@ -21,7 +21,7 @@ gem 'cronex', '~> 0.10'
 gem 'daemons', '~> 1.3.1'
 # gem 'stomp', '~> 1.4.8'
 # gem 'activemessaging'
-
+gem "sentry-raven", '~> 2.13'
 # grm for mocking and stubbing in test cases
 
 # gem for crash reports
@@ -258,6 +258,7 @@ group :development, :test do
   gem 'capistrano-nvm', require: false
   gem 'capistrano-yarn'
   gem 'capistrano-sidekiq', '~> 1.0.2'
+  gem 'capistrano-sentry', require: false
   # gem 'capistrano-sneakers', github: 'inventionlabsSydney/capistrano-sneakers'
   gem 'capistrano-rails-console', '~> 2.3.0', require: false
   gem 'hirb', '~> 0.7.3'
