@@ -58,6 +58,7 @@ class BaseOperation
     return execute_failure if has_errors?
     execute_function :init
     return execute_failure if has_errors?
+    set_current_tenant
     execute_function :authorize
     return execute_failure if has_errors?
     execute_function :validate
@@ -105,6 +106,16 @@ class BaseOperation
   # Defined all the required features user should be subscribed to to run this operation
   def subscription
     nil
+  end
+
+  # Set current company in init method and use it as tenant.
+  def set_current_tenant
+    byebug
+    if self.respond_to? :company
+      if self.company.present?
+        ActsAsTenant.current_tenant = self.company
+      end
+    end
   end
 
   # Authorizes the user based on his feature subscription
