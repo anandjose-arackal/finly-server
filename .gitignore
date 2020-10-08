@@ -34,6 +34,8 @@ config/posthog.yml
 .vscode/
 reference_resource_migration.log
 config/web_client.yml
+config/meilisearch.yml
+data.ms/*
 
 # Ignore all logfiles and tempfiles.
 /log/*
