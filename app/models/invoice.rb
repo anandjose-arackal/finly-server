@@ -229,7 +229,7 @@ class Invoice < ApplicationRecord
   has_many :attachments, class_name: 'ProcurementAttachment', as: :procurement_document
   # Fixme: Migration of all invoice_attachment to attachments is still pending
   # Fixme: Need to check where the previous attachments was being used as this is overriding it
-  has_many :attachments, as: :resource
+  # has_many :attachments, as: :resource # todo - I2P
   has_many :custom_fields, as: :parent, dependent: :destroy
   has_many :form_custom_fields, class_name: 'FormCustomField', as: :document, dependent: :destroy
 
