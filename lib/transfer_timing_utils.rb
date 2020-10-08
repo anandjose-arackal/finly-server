@@ -16,7 +16,9 @@ class TransferTimingUtils
     case payment_mode&.upcase
       when "IMPS"
         return true
-      when "NEFT", "RTGS"
+      when "NEFT"
+        return true
+      when "RTGS"
         return false if (date.sunday?)
         return false if bank_holidays.include?(date.strftime("%d-%m-%Y"))
         return daily_time_range(payment_mode).cover?(DateUtils.local_date_time) # i.e. if the current time falls into the transferable window
@@ -78,7 +80,8 @@ class TransferTimingUtils
     start_time = DateTime.new(Date.today.year, Date.today.month, Date.today.day, 8, 0, 0, "IST")
     case payment_mode
       when "NEFT", "neft"
-        end_time = DateTime.new(Date.today.year, Date.today.month, Date.today.day, 18, 30, 0, "IST")
+        start_time = DateTime.new(Date.today.year, Date.today.month, Date.today.day, 0, 0, 0, "IST")
+        end_time = DateTime.new(Date.today.year, Date.today.month, Date.today.day, 23, 59, 59, "IST")
       when "RTGS", "rtgs"
         end_time = DateTime.new(Date.today.year, Date.today.month, Date.today.day, 16, 10, 0, "IST")
       else
@@ -101,9 +104,9 @@ class TransferTimingUtils
     else
       date.change(hour: 8, min: 1, sec: 0)
     end
-    return date.to_date if payment_mode == "IMPS"
+    return date.to_date if ["IMPS", "NEFT"].include?( payment_mode )
     case payment_mode.upcase
-      when "NEFT", "RTGS"
+      when "RTGS"
         date = date.to_date
         next_date = date + 1.day # i.e. the next day
         loop do
