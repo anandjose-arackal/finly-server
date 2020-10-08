@@ -14,9 +14,7 @@ class TransferTimingUtils
     end
     return true if date > DateUtils.local_date # because we are only checking for today's payments
     case payment_mode&.upcase
-      when "IMPS"
-        return true
-      when "NEFT"
+      when "IMPS", "NEFT"
         return true
       when "RTGS"
         return false if (date.sunday?)
