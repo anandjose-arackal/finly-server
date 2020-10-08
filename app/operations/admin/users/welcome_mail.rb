@@ -1,10 +1,11 @@
 class Admin::Users::WelcomeMail < Admin::Base
 
-  attr_accessor :selected_user, :raw_token
+  attr_accessor :selected_user, :raw_token, :company
 
   def init
     id = params[:id] || params[:user_id]
     self.selected_user = User.find_by(id: id)
+    self.company = self.selected_user.company
   end
 
   def validate

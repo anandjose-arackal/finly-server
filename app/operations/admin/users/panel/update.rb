@@ -1,6 +1,6 @@
 class Admin::Users::Panel::Update < Admin::Users::Base
 
-  attr_accessor :selected_user, :panel_subscription
+  attr_accessor :selected_user, :panel_subscription, :company
 
   def pre_validate
     if user.blank? || params.blank?
@@ -11,6 +11,7 @@ class Admin::Users::Panel::Update < Admin::Users::Base
   def init
     id = params[:id] || params[:user_id]
     self.selected_user = User.find_by(id: id)
+    self.company = self.selected_user.company
     self.panel_subscription = selected_user.user_panel_subscription
   end
 

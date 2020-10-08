@@ -1,10 +1,11 @@
 class Admin::Users::AgreementsMail < Admin::Base
 
-  attr_accessor :selected_user, :email_authorization_token, :email_authorizations, :agreements
+  attr_accessor :selected_user, :email_authorization_token, :email_authorizations, :agreements, :company
 
   def init
     id = params[:id] || params[:user_id]
     self.selected_user = User.find_by(id: id)
+    self.company = self.selected_user.company
 
     self.agreements = []
     agreement_types = []

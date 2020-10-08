@@ -2,7 +2,7 @@
 
 class Admin::Users::State::UpdateStatus < Admin::Users::Base
 
-  attr_accessor :selected_user, :update_params
+  attr_accessor :selected_user, :update_params, :company
 
   def pre_validate
     super()
@@ -14,6 +14,7 @@ class Admin::Users::State::UpdateStatus < Admin::Users::Base
   def init
     id = params[:id] || params[:user_id]
     self.selected_user = User.find_by(id: id)
+    self.company = self.selected_user.company
     self.update_params = user_status_params
   end
 

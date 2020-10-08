@@ -19,6 +19,7 @@ class Admin::Users::Team::Mappings::Destroy < User::Team::Mappings::Destroy
   def init
     id = params[:id] || params[:user_id]
     self.updating_user = User.find_by(id: id)
+    self.company = self.updating_user.company
     self.updating_mapping = updating_user.team_mapping.with_id(params[:mapping_id]).first rescue nil
   end
 

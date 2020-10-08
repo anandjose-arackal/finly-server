@@ -12,6 +12,7 @@ class Admin::Users::Update < Admin::Users::Base
   def init
     id = params[:id] || params[:user_id]
     self.selected_user = User.find_by(id: id)
+    self.company = self.selected_user.company
   end
 
   def authorize

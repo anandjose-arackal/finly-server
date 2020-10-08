@@ -17,6 +17,7 @@ class Admin::Cards::Create < Admin::Cards::Base
   def init
     if params[:user_id]
       self.selected_user = User.find_by(id: params[:user_id])
+      self.company = self.selected_user.company
     else
       self.company = Company.find_by(id: params[:company_id])
     end
