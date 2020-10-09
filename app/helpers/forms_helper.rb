@@ -1,6 +1,6 @@
 module FormsHelper
   def form_data(form, model = self)
-    form.entities.root.reduce({}) {|acc, entity| acc.merge(entity_data(model, entity))}
+    form.entities.root.reduce({}) {|acc, entity| acc.merge(entity_data(model, entity))}.with_indifferent_access
   end
 
   private
