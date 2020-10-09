@@ -13,7 +13,8 @@ namespace :load do
     set :status_index_monitor_env, -> {fetch(:rack_env, fetch(:rails_env, fetch(:stage)))}
     set :status_index_monitor_runner, -> {'SearchIndex::UpdateMonitor.run'}
     set :status_index_monitor_role, -> {:app}
-    set :status_index_monitor_env, fetch(:rack_env, fetch(:rails_env, 'production'))
+    set :status_index_monitor_env, -> {fetch(:rack_env, fetch(:rails_env, fetch(:stage)))}
+    set :status_index_monitor_env, -> {fetch(:rack_env, fetch(:rails_env, 'production'))}
   end
 end
 
