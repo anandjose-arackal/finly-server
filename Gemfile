@@ -34,7 +34,7 @@ gem "derailed_benchmarks", '~> 1.7.0'
 gem 'rack-attack', '5.4.2'
 # gem 'zxcvbn-ruby', '0.1.2', require: 'zxcvbn'
 gem 'devise_zxcvbn', '4.4.1'
-gem 'devise-security', '0.13.0'
+gem 'devise-security', '~> 0.14.3'
 # gem '-raven', '~> 2.8'
 
 gem 'dry-container', '~> 0.7'
@@ -60,7 +60,7 @@ gem 'multiverse', '~> 0.2'
 gem 'health-monitor-rails', '~> 8.4.0'
 
 # puma web server
-gem 'figaro', '~> 1.1.1'
+gem 'figaro', '~> 1.2'
 gem 'puma', '~> 4.1'
 
 gem 'resque', '~> 2.0.0'
@@ -94,17 +94,16 @@ gem 'roo-xls', '~> 1.2.0'
 gem 'write_xlsx', '~> 0.85.6'
 gem 'saxlsx', '~> 1.9'
 # Gem to show db schema in model file
-gem 'annotate', '~> 2.7'
+gem 'annotate', '~> 3.1', '>= 3.1.1'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 5.2.2'
+gem 'rails', '~> 6.0', '>= 6.0.3.2'
 # Use mysql as the database for Active Record
 gem 'mysql2', '~> 0.5'
-
+gem 'thor', '~> 0.19'
 #Bundles for pagination
 gem 'will_paginate', '~> 3.1.6'
 
-gem 'sneakers', '~> 2.12'
 gem 'hutch', '~> 1.0'
 
 gem 'jwt', '~> 2.2'
@@ -113,7 +112,8 @@ gem 'jwt', '~> 2.2'
 gem 'jquery-ui-rails', '~> 6.0.1'
 
 # Use SCSS for stylesheets
-gem 'sass-rails', '~> 5.0.7'
+gem 'sass-rails', '~> 6.0'
+
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '~> 4.1.20'
 # Use CoffeeScript for .coffee assets and views
@@ -194,9 +194,9 @@ gem 'require_all', '~> 2.0.0'
 gem 'haml', '~> 5.0.4'
 
 # gem for devise authentication
-gem 'devise', '~> 4.5.0'
+gem 'devise', '~> 4.7'
 
-gem 'devise_invitable', '~> 1.7.5'
+gem 'devise_invitable', '~> 2.0', '>= 2.0.2'
 gem 'doorkeeper', '~> 5.0.2'
 
 gem 'faraday', '~> 0.15.4'
@@ -255,6 +255,8 @@ group :development, :test do
   gem 'capistrano-rvm', '~> 0.1.2'
   gem 'capistrano-rbenv', '~> 2.1.4'
   gem 'capistrano-crono', '~> 0.1.2'
+  gem 'capistrano-nvm', require: false
+  gem 'capistrano-yarn'
   gem 'capistrano-sidekiq', '~> 1.0.2'
   gem 'capistrano-sentry', require: false
   # gem 'capistrano-sneakers', github: 'inventionlabsSydney/capistrano-sneakers'
@@ -289,22 +291,22 @@ group :development do
   gem 'faker', '~> 1.9.1'
   # Access an IRB console on exception pages or by using <%= console %> in views
   gem 'web-console', '~> 3.7.0'
-  gem 'foreman', '~> 0.85.0'
-  gem 'bullet', '~> 5.9.0'
+  gem 'foreman', '~> 0.87.2'
+  gem 'bullet', '~> 6.1'
   gem 'listen', '>= 3.0.5', '< 3.2'
   gem 'spring', '~> 2.1.0'
   gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'spring-commands-rspec', '~> 1.0.4'
   # gem "lol_dba"
 end
-
+gem 'sneakers', '~> 2.12'
 
 # gem 'backup'
 
 # gem 'animate-rails'
 
 gem 'amoeba', '~> 3.1.0'
-gem 'deep_cloneable', '~> 2.3.2'
+gem 'deep_cloneable', '~> 3.0'
 
 # gem 'nprogress-rails'
 
