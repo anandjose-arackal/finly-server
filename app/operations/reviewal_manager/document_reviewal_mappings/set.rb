@@ -57,7 +57,7 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
           end
 
           # Get max for all reviewers
-          max_thresholds = level_reviewers_data.map{|item| item['max']}
+          max_thresholds = level_reviewers_data.map{|item| item['max'].to_f}
           # min_thresholds = level_reviewers_data.map{|item| item['min']}
 
           # If level doesn't have reviewers
