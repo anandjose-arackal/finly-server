@@ -17,12 +17,11 @@ class SearchIndex::UpdateMonitor
       return
     end
 
-    logger = LogStashLogger.new(type: :file, path: 'log/meilisearch_error.log', sync: true)
+    logger = LogStashLogger.new(type: :file, path: 'log/meilisearch_logs.log', sync: true)
     puts 'Listening...'
     begin
       loop do
         while (update_data_json = Rails.configuration.redis.lpop(REDIS_QUEUE)).present?
-          puts "New Event: #{update_data_json}"
           update_data = JSON.parse(update_data_json)
           index_name = update_data['index']
           update_id = update_data['update_id']
