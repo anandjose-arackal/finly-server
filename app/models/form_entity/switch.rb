@@ -56,6 +56,8 @@ class FormEntity::Switch < FormEntity
 
   operators :eq_any, :blank, :present
 
+  TRUTHY_VALUES = ["true", true, 1, "1", "TRUE"]
+
   # def initialize(section, entity_key, parent_path, opts = {}, &block)
   #   super(section, entity_key, parent_path, opts.merge(choices_scope: Choices[:switch].()), &block)
   # end

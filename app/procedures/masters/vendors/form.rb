@@ -168,7 +168,7 @@ class Masters::Vendors::Form < Forms::API
       text :account_number, required: true
       text :ifsc, required: true
       switch :default_account
-      switch :disabled
+      switch :disabled, default_value: false
       attachment :cancelled_cheque, system_field: false
     end
   end

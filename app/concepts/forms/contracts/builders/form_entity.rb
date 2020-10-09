@@ -152,7 +152,12 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
         visible = result['visible']
         internal = result['internal']
         if editable and visible and input.has_key?(entity.entity_key)
-          value = input[entity.entity_key] # || entity.default_value
+          # todo - I2P - Get it verified by vivek
+          if entity.entity_type == 'switch'
+            value = FormEntity::Switch::TRUTHY_VALUES.include?(entity.default_value) ? true : false
+          else
+            value = input[entity.entity_key] # || entity.default_value
+          end
           entity.populate(represented, value)
           # represented.send("#{entity.entity_key}=", entity.format(value))
         end
