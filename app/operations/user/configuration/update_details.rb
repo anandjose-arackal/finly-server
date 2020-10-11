@@ -19,7 +19,16 @@ class User::Configuration::UpdateDetails < BaseOperation
         return messages[:error] << 'Gender not specified correctly'
       end
     end
-    
+
+
+    if params[:status].present?
+      if (['active', 'inactive'].include? (params[:status].downcase))
+        params[:status] = (params[:status].downcase == 'active') ? true.to_s : false.to_s
+      else
+        return messages[:error] << 'Sataus not specified correctly'
+      end
+    end
+
   end
 
   def init

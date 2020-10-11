@@ -147,9 +147,9 @@ class Invoice < ApplicationRecord
   include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport
   include LiquidDroppable
   include Exposures::Model::Exposable
-  include Exposures::Model::Exposable
   include Sequenced::ActsAsSequenced
   include FormsHelper
+  include ErpSyncable
 
   # include EventProducer
 
@@ -166,9 +166,9 @@ class Invoice < ApplicationRecord
   belongs_to :tds_amount, optional: true, class_name: "Amount"
   belongs_to :tax_amount, optional: true, class_name: "Amount"
   belongs_to :discount_amount, optional: true, class_name: "Amount"
-  belongs_to :freight_amount, optional: true, class_name: "Amount"
   belongs_to :original_amount, optional: true, class_name: "Amount"
   belongs_to :advance_amount, optional: true, class_name: "Amount"
+  belongs_to :freight_amount, optional: true, class_name: "Amount"
   belongs_to :balance_due, optional: true, class_name: "Amount"
   belongs_to :taxable_amount, optional: true, class_name: "Amount"
   belongs_to :paid_amount, optional: true, class_name: "Amount"
@@ -257,14 +257,20 @@ class Invoice < ApplicationRecord
   accepts_nested_attributes_for :gross_amount
   accepts_nested_attributes_for :net_amount
   accepts_nested_attributes_for :discount_amount
+  accepts_nested_attributes_for :tds_amount
   accepts_nested_attributes_for :tax_amount
   accepts_nested_attributes_for :original_amount
   accepts_nested_attributes_for :freight_amount
+  accepts_nested_attributes_for :custom_fields
   accepts_nested_attributes_for :advance_amount
   accepts_nested_attributes_for :balance_due
+  accepts_nested_attributes_for :invoice_items, allow_destroy: true
+  # accepts_nested_attributes_for :po_prev_adjusted_advance
   accepts_nested_attributes_for :po_adjusted_advance
   accepts_nested_attributes_for :proforma_advance
-  accepts_nested_attributes_for :po_prev_adjusted_advance
+  accepts_nested_attributes_for :notify_users, allow_destroy: true
+  accepts_nested_attributes_for :credit_note_adjustments, allow_destroy: true
+
   delegate :tax_amount_value, to: :tax_amount
   delegate :tds_amount_value, to: :tds_amount
   delegate :discount_amount_value, to: :discount_amount
@@ -620,9 +626,15 @@ class Invoice < ApplicationRecord
     where.not invoice_status_id: InwardInvoiceStatus.id_for(:voided)
   }
 
-  scope :scope_all_except_voided_rejected, -> {
+  scope :scope_all_except_voided_rejected_retracted, -> {
     where.not invoice_status_id: [InwardInvoiceStatus.id_for(:voided),
-                                  InwardInvoiceStatus.id_for(:rejected)]
+                                  InwardInvoiceStatus.id_for(:rejected),
+                                  InwardInvoiceStatus.id_for(:retracted)]
+  }
+
+  scope :pending_erp_sync, -> (*args) {
+    with_erp_sync_status_pending.
+        where(invoice_status_id: InwardInvoiceStatus.ids_for(:unpaid, :partially_paid, :paid, :approved, :auto_approved, :closed))
   }
 
   after_create :set_defaults
@@ -669,9 +681,7 @@ class Invoice < ApplicationRecord
     set :invoice_status_id => InwardInvoiceStatus.id_for(:open)
   end
 
-  def self.ransackable_scopes(auth_object = nil)
-    [:with_status_id]
-  end
+  ransack_scopes :with_status_id
 
   def policy
     return super if self.policy_id.present?
@@ -784,7 +794,7 @@ class Invoice < ApplicationRecord
   # this method updates the invoice status based on the associated
   # payments made against this particular invoice
   def update_invoice_status
-    balance_due = self.balance_due_amount
+    balance_due = self.balance_due&.value.to_f
     paid_amount = self.payments.successful.joins(:amount).sum(:value)
 
     if paid_amount == 0

@@ -12,6 +12,28 @@ Rails.application.configure do
   # Show full error reports.
   config.consider_all_requests_local = true
 
+  feature_flipper_config = Rails.application.config_for(:feature_flipper)
+  if feature_flipper_config.present? and feature_flipper_config['enabled'] and
+      feature_flipper_config.dig('api_key').present? and feature_flipper_config.dig('url').present?
+    config.bullet_train = BulletTrain.new(api_key: feature_flipper_config['api_key'], url: feature_flipper_config['url'])
+  else
+    config.bullet_train = nil
+  end
+
+  posthog_config = Rails.application.config_for(:posthog)
+  if posthog_config.present? and posthog_config['enabled']
+    config.posthog = PostHog::Client.new(
+        {
+            api_key: posthog_config['api_key'],
+            api_host: posthog_config['api_host'],
+            # Todo log errors
+            on_error: Proc.new {|status, msg| print msg}
+        }
+    )
+  else
+    config.posthog = nil
+  end
+
   # Enable/disable caching. By default caching is disabled.
   # Run rails dev:cache to toggle caching.
   if Rails.root.join('tmp', 'caching-dev.txt').exist?
@@ -19,7 +41,7 @@ Rails.application.configure do
 
     config.cache_store = :memory_store
     config.public_file_server.headers = {
-      'Cache-Control' => "public, max-age=#{2.days.to_i}"
+        'Cache-Control' => "public, max-age=#{2.days.to_i}"
     }
   else
     config.action_controller.perform_caching = false

@@ -12,6 +12,13 @@ Rails.application.configure do
   # Rake tasks automatically ignore this option for performance.
   config.eager_load = true
 
+  feature_flipper_config = Rails.application.config_for(:feature_flipper)
+  if feature_flipper_config.dig('api_key').present? and feature_flipper_config.dig('url').present?
+    config.bullet_train = BulletTrain.new(api_key: feature_flipper_config['api_key'], url: feature_flipper_config['url'])
+  else
+    config.bullet_train = nil
+  end
+
   # Full error reports are disabled and caching is turned on.
   config.consider_all_requests_local       = false
   config.action_controller.perform_caching = true
@@ -163,6 +170,14 @@ Rails.application.configure do
   #     }
   # }
   #########################################################################################
-  
+
+  #config.azure_config = config_for(:azure_config)
+  ###################### SETTINGS FOR AZURE BLOB STORAGE ##################################
+  #Paperclip::Attachment.default_options[:storage] = :azure
+  #Paperclip::Attachment.default_options[:azure_credentials] = {
+  #    storage_account_name: config.azure_config["storage_account_name"],
+  #    storage_access_key:   config.azure_config["storage_access_key"],
+  #    container: "finly-images-test"
+  #}
 
 end

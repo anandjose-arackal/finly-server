@@ -503,9 +503,7 @@ class PurchaseOrder < ApplicationRecord
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
 
-  def self.ransackable_scopes(auth_object = nil)
-    [:with_status_ids, :with_grn_status_id]
-  end
+  ransack_scopes :with_status_ids, :with_grn_status_id
 
   def status_tag_details
     return @tags_data if @tags_data.present?

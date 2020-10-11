@@ -1,5 +1,7 @@
 class IndexBuilder::StatusCount < Transactions::API
 
+  user_model [User, AdminUser]
+
   step :find_builder
   step :verify_counter
   pass :resolve

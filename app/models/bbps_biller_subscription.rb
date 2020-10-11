@@ -195,6 +195,8 @@ class BbpsBillerSubscription < ApplicationRecord
     joins(:biller).where("bbps_billers.biller_category_name = ?", "#{biller_type}")
   }
 
+  ransack_scopes :with_status_id
+
   def cleanup
     unless self.changes.keys.include?("auto_fetch_enabled")
       self.auto_fetch_enabled = true
@@ -394,10 +396,6 @@ class BbpsBillerSubscription < ApplicationRecord
 
   def review_in_progress?
     BbpsBillerSubscriptionStatus.ids_for(:awaiting_approval).include?(status_id)
-  end
-
-  def self.ransackable_scopes(auth_object = nil)
-    [:with_status_id]
   end
 
 end

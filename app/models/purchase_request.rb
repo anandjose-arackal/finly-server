@@ -213,10 +213,7 @@ class PurchaseRequest < ApplicationRecord
     end
   }
 
-  def self.ransackable_scopes(auth_object = nil)
-    [:with_status_ids]
-  end
-
+  ransack_scopes :with_status_ids
 
   # scope :sort_amount, -> (type){
   #   type = type&.strip&.upcase

@@ -156,7 +156,7 @@ class BudgetTrail < ApplicationRecord
   }
 
   scope :without_entity_status_id, -> (entity_status_id) {
-    where entity_status_id: entity_status_id
+    where.not entity_status_id: entity_status_id
   }
 
   private

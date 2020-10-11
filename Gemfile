@@ -4,7 +4,7 @@ ruby '~> 2.6'
 
 # gem for pdf export and its executable
 gem 'wicked_pdf', '~> 1.1.0'
-gem 'wkhtmltopdf-binary', '~> 0.12.4'
+gem 'wkhtmltopdf-binary', '0.12.5'
 
 gem 'nokogiri', '~> 1.10.0'
 gem 'autoprefixer-rails', '~> 9.4.4'
@@ -14,8 +14,8 @@ gem 'fiscali', '~> 2.4'
 gem 'parslet', '~> 1.8.2'
 gem 'rack', git: 'https://github.com/rack/rack', :ref => 'f690bb71425aa31d7b9b3113829af773950d8ab5'
 gem 'rufus-scheduler', '~> 3.6'
-gem 'clockwork', '~> 2.0'
-
+# gem 'clockwork', '~> 2.0'
+gem 'cronex', '~> 0.10'
 
 # adding gems for activeMQ
 gem 'daemons', '~> 1.3.1'
@@ -187,7 +187,7 @@ gem 'griddler-sendgrid', '~> 1.2'
 
 gem 'rmagick', '~> 2.16.0'
 gem 'imgkit', '~> 1.6.1'
-# gem 'wkhtmltoimage-binary'
+gem 'wkhtmltoimage-binary'
 # gem 'proselytism', git: 'git@bitbucket.org:finlycore/proselytism.git'
 
 gem 'require_all', '~> 2.0.0'
@@ -201,6 +201,8 @@ gem 'doorkeeper', '~> 5.0.2'
 
 gem 'faraday', '~> 0.15.4'
 gem 'faraday_middleware', '~> 0.12.2'
+
+gem 'posthog-ruby', '~> 1.0'
 # gem for xml parsing
 gem 'liquid', '~> 4.0.1'
 
@@ -225,6 +227,7 @@ gem 'aasm', '~> 5.0.1'
 gem 'activerecord-import', '~> 1.0', '>= 1.0.3'
 gem 'parallel', '~> 1.18'
 gem 'string_pattern', '~> 2.2', '>= 2.2.1'
+# gem 'bullet-train-client', '~> 1.1'
 # gem 'slackistrano'
 
 # adding aws-sdk gem for using their API enabled services
@@ -245,6 +248,7 @@ gem 'wit', '~> 6.0'
 
 # gem for all azure services
 gem 'azure'
+gem 'azure-storage-blob'
 
 group :development, :test do
   gem 'byebug'
@@ -258,6 +262,7 @@ group :development, :test do
   gem 'capistrano-rbenv', '~> 2.1.4'
   gem 'capistrano-crono', '~> 0.1.2'
   gem 'capistrano-sidekiq', '~> 1.0.2'
+  gem 'capistrano-hutch', '~> 0.1'
   # gem 'capistrano-sneakers', github: 'inventionlabsSydney/capistrano-sneakers'
   gem 'capistrano-rails-console', '~> 2.3.0', require: false
   gem 'hirb', '~> 0.7.3'
@@ -293,7 +298,7 @@ group :development do
   gem 'foreman', '~> 0.85.0'
   gem 'bullet', '~> 5.9.0'
   gem 'listen', '>= 3.0.5', '< 3.2'
-  gem 'spring', '~> 2.0.0'
+  gem 'spring', '~> 2.1.0'
   gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'spring-commands-rspec', '~> 1.0.4'
   # gem "lol_dba"

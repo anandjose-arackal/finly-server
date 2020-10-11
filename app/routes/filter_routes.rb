@@ -1,4 +1,10 @@
 Filters::Router.draw do
+
+  scope :admin do
+    route 'macros', Admin::Masters::Macros::FilterConfig
+    route 'macro_jobs', Admin::Masters::Macros::Jobs::FilterConfig
+  end
+
   # Master
   route 'vendors', Masters::Vendors::FilterConfig
   route 'items', Masters::Items::FilterConfig

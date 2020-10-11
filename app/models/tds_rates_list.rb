@@ -29,6 +29,15 @@ class TdsRatesList < ApplicationRecord
     end
   end
 
+  def as_json(options = {})
+    {
+        id: id,
+        name: name,
+        tds: tds,
+        gl_code: gl_code
+    }
+  end
+
   # For Olx
   # DEFAULTS = [
   #     {

@@ -87,6 +87,10 @@ linked_files = %w{
   config/hutch.yml
   config/web_client.yml
   config/azure_config.yml
+  config/finly_macros.yml
+  config/finly_collect.yml
+  config/bullet_train.yml
+  config/posthog.yml
 }
 case fetch(:stage)
 when :itzcash_production, :aws_production, :background_production, :foreground_production, :console_production, :api_production, :background_production_console,

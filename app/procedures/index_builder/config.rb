@@ -1,6 +1,7 @@
 class IndexBuilder::Config < Transactions::API
 
   pass :load_config
+  user_model [User, AdminUser]
 
   def load_config(context, params:, current_user:, **)
     routes = IndexBuilder::Router.map
@@ -13,7 +14,7 @@ class IndexBuilder::Config < Transactions::API
       klass = route_dispatchers.first.klass
       # mandatory to specify the system
       next if klass.system_subscription.blank?
-      next unless klass.system_subscription.map{|item| item.to_s}.include?(RequestStoreUtil.current_app.to_s)
+      next unless klass.system_subscription.map {|item| item.to_s}.include?(RequestStoreUtil.current_app.to_s)
       next if klass.feature_subscription and not current_user.company.feature_subscription.send(klass.feature_subscription)
       next if klass.user_subscription and not current_user.user_panel_subscription.send(klass.user_subscription)
       # Defining permissions is mandatory

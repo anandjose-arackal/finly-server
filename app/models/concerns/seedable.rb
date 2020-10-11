@@ -72,7 +72,7 @@ module Seedable
     def as_hash
       values = HashInsensitive.new
 
-      return values unless ApplicationRecord.connection.table_exists? self.table_name
+      return values unless self.connection.table_exists? self.table_name
       self.all.each do |item|
         values[item.name] = item.id
       end

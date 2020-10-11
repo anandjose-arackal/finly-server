@@ -1,4 +1,10 @@
 ActionManager::Router.draw do
+
+  scope 'admin' do
+    route 'macros', Admin::Masters::Macros::Action
+    route 'macro_jobs', Admin::Masters::Macros::Jobs::Action
+  end
+
   # NavBar
   route 'procurement', Menu::Masters::Procurement
 

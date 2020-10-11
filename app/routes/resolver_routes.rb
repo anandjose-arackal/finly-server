@@ -4,19 +4,30 @@ Resolver::Router.draw do
   #   route "submit", Masters::Departments::AutoComplete
   # end
   # with_options company_1: 1, env_1: :dev do
-  #   route "departments", Masters::Departments::AutoComplete, :department_2, options: {company: 156, env: :dev}
+  #   route "departments", Masters::Departments::AutoComplete, :department_2, company: 156, env: :dev
   #   route "departments", :department
   # end
 
+  # Admin
+  scope :admin do
+    scope :macros do
+      route 'default', Admin::Masters::Macros::Resolver
+    end
+
+    scope :macro_jobs do
+      route 'default', Admin::Masters::Macros::Jobs::Resolver
+    end
+  end
+
   # Masters
   scope :department do
-    route "default", Masters::Departments::Resolver
+    route 'default', Masters::Departments::Resolver
   end
   scope :location do
-    route "default", Masters::Locations::Resolver
+    route 'default', Masters::Locations::Resolver
   end
   scope :cost_center do
-    route "default", Masters::CostCenters::Resolver
+    route 'default', Masters::CostCenters::Resolver
   end
 
   scope :insight_dashboard do
@@ -129,5 +140,9 @@ Resolver::Router.draw do
 
   scope :upcoming_invoices do
     route 'default', Docs::P2P::Invoices::Agreement::UpcomingInvoices::Resolver
+  end
+
+  scope :reports do
+    route 'default', Docs::ExpenseManagement::Reports::Resolver
   end
 end

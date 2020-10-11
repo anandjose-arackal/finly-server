@@ -21,8 +21,6 @@ class Company < ApplicationRecord
   include Exposures::Model::Exposable
   include EventProducer
 
-  event_channel 'company'
-
   belongs_to :base_currency, optional: true, class_name: 'Currency'
   belongs_to :status, optional: true, class_name: 'CompanyStatus'
   belongs_to :group, optional: true, class_name: 'CompanyGroup'
@@ -81,6 +79,8 @@ class Company < ApplicationRecord
 
   has_many :budget_groups
   has_many :budget_group_criteria
+
+  has_many :macros
 
   has_one :collect_credit_account, class_name: "BankAccount", as: :account_owner
   has_one :collect_company_detail
@@ -230,6 +230,14 @@ class Company < ApplicationRecord
   }
 
   scope :with_subdomain, ->(subdomain) {find_by subdomain: subdomain}
+
+  def as_json(options = {})
+    {
+        id: id,
+        name: name,
+        active: active
+    }
+  end
 
   def vendor_payment_policies
     ids = self.policies.with_application("vp").pluck(:id)

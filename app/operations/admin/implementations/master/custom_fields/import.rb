@@ -29,9 +29,10 @@ class Admin::Implementations::Master::CustomFields::Import < Admin::Implementati
               }
           })
 
-  attr_accessor :field_configuration_params, :drop_down_items
+  attr_accessor :field_configuration_params, :drop_down_items, :multiselect_items
   def process
     self.drop_down_items = []
+    self.multiselect_items = []
     path = Rails.env.production? ? self.implementation_request.request_file&.url : self.implementation_request.request_file&.path
     self.input = Roo::Spreadsheet.open(path)
     output = {}
@@ -62,6 +63,9 @@ class Admin::Implementations::Master::CustomFields::Import < Admin::Implementati
     end
     unless drop_down_items.blank?
       set_drop_down_items
+    end
+    unless multiselect_items.blank?
+      set_multiselect_items
     end
     export headers, output
   end
@@ -108,15 +112,19 @@ class Admin::Implementations::Master::CustomFields::Import < Admin::Implementati
     unless custom_field.present?
       custom_field = FieldConfiguration.new (field_configuration_params)
       unless custom_field.save
-        result false, custom_fields.errors
+        result false, custom_field.errors
       else
         if custom_field.field_type_id == 5
           self.drop_down_items << {id: custom_field.id, field_name: custom_field.field_name}
+        elsif custom_field.field_type_id == 9
+          self.multiselect_itemss << {id: custom_field.id, field_name: custom_field.field_name}
         end
       end
     else
       if custom_field.field_type_id == 5
         self.drop_down_items << {id: custom_field.id, field_name: custom_field.field_name}
+      elsif custom_field.field_type_id == 9
+        self.multiselect_items << {id: custom_field.id, field_name: custom_field.field_name}
       end
     end
 
@@ -156,8 +164,10 @@ class Admin::Implementations::Master::CustomFields::Import < Admin::Implementati
         field_parent_mappings_attributes << {"field_parent_type_id"=> mapping_id.to_s}
       end
     end
-    if field_type != FieldType.id_for(:text)
+    if field_type == FieldType.id_for(:drop_down)
       drop_down_items_attributes =[{"name"=>"Test"}]
+    elsif field_type == FieldType.id_for(:multiselect)
+      multiselect_items_attributes = [{"name" => "Test"}]
     end
 
     params = {
@@ -171,8 +181,10 @@ class Admin::Implementations::Master::CustomFields::Import < Admin::Implementati
              root_field: root
         }
     params[:field_parent_mappings_attributes] = field_parent_mappings_attributes
-    if field_type != FieldType.id_for(:text)
+    if field_type == FieldType.id_for(:drop_down)
       params[:drop_down_items_attributes] = drop_down_items_attributes
+    elsif field_type == FieldType.id_for(:multiselect)
+      params[:multiselect_items_attributes] = multiselect_items_attributes
     end
     if policy_field_mappings_attributes.present?
       params[:policy_field_mappings_attributes] = policy_field_mappings_attributes
@@ -197,7 +209,7 @@ class Admin::Implementations::Master::CustomFields::Import < Admin::Implementati
   def set_drop_down_items
     sheet = input.sheet(1)
     drop_down_names = input.sheet(1).row(2)
-    (3..sheet.last_row).each do |i|
+    (2..sheet.last_row).each do |i|
       row = sheet.row(i)
       lower_limit = 0
       size= row.size
@@ -235,6 +247,34 @@ class Admin::Implementations::Master::CustomFields::Import < Admin::Implementati
         lower_limit += 2
       end
 
+    end
+  end
+
+  def set_multiselect_items
+    sheet = input.sheet(1)
+    (2..sheet.last_row).each do |i|
+      row = sheet.row(i)
+      lower_limit = 0
+      size = row.size
+      ddi = nil
+      previous_field = nil
+      muli_select_count = 0
+      while (lower_limit < size)
+        field_name = multiselect_items[muli_select_count][:field_name]
+        field_configuration = FieldConfiguration.non_deleted.find multiselect_items[muli_select_count][:id]
+
+        if field_configuration.present?
+          unless field_configuration.multiselect_items.pluck(:name).include?(row[lower_limit])
+            field_configuration.multiselect_items.create(name: row[lower_limit])
+          else
+          end
+          muli_select_count += 1
+          lower_limit += 2
+          next
+        end
+        muli_select_count += 1
+        lower_limit += 2
+      end
     end
   end
 

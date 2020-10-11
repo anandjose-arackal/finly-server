@@ -32,17 +32,35 @@ class Routers::Base
     map.keys
   end
 
-  def self.route(key, *args, options: {})
+  def self.route(key, *args, options: {}, &block)
     if not allow_multiple_associations? and map(key).present?
       return if args.count == 1 and map(key).first.klass == args.first
 
       raise "#{key} is already defined for the router #{self.name}"
     end
 
+    context_key(key)
     args.each do |klass|
-      map(key) << self.use_route.new(klass, merged_options.merge(options))
+      to klass, options
     end
+    instance_exec &block if block_given?
+
+    context_key(nil)
     map(key)
+  end
+
+  def self.to(klass, options = {})
+    raise "context_key is blank" if context_key.blank?
+
+    # Check if the route already exists, if it does update the options
+    map(context_key).each do |route|
+      if route.klass == klass
+        route.options = merged_options.merge(options)
+        return route
+      end
+    end
+
+    map(context_key) << self.use_route.new(klass, merged_options.merge(options))
   end
 
   def self.[](key)
@@ -73,6 +91,11 @@ class Routers::Base
 
   def self.global_options
     @global_options ||= []
+  end
+
+  def self.context_key(value = NoObject)
+    @context_key = value unless value == NoObject
+    @context_key
   end
 
   # Merges the options given across all with_options
