@@ -53,7 +53,7 @@ class Masters::Vendors::Action < ActionManager::API
     action :redirect,
            :create,
            permissions: [:vendor_creator, :vendor_manager],
-           authorize: [if: :vendor_forms_enabled?],
+           authorize: :vendor_forms_enabled?,
            format: 'primary',
            label: 'Add Vendor',
            icon: 'https://img.icons8.com/windows/17/708090/--checkmark-yes.png',
