@@ -94,8 +94,8 @@ class ActionManager::Action
 
   def permitted?(user)
     return false unless feature_enabled?(user)
-    return false unless feature_subscribed?(user)
-    return false unless user.has_permission?(permissions)
+    # return false unless feature_subscribed?(user)
+    # return false unless user.has_permission?(permissions)
 
     true
   end
@@ -105,15 +105,18 @@ class ActionManager::Action
 
     toggle = self.toggle
     toggle = {if: self.toggle} if self.toggle.is_a?(Array)
+
     if toggle[:if].present?
       klass, action = toggle[:if]
-      return klass.new(user).send(action)
+      return true if klass.new(user).send(action)
     elsif toggle[:unless].present?
       klass, action = toggle[:unless]
-      return klass.new(user).send(action)
+      return true unless klass.new(user).send(action)
+    else
+      raise "Invalid toggle #{self.toggle}"
     end
 
-    raise "Invalid toggle #{self.toggle}"
+    false
   end
 
   def feature_subscribed?(user)

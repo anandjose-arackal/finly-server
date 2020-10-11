@@ -44,7 +44,7 @@ class Masters::Vendors::Action < ActionManager::API
            route: "vendors.index"
 
     action :redirect,
-           :create,
+           :create_form,
            permissions: [:vendor_creator, :vendor_manager],
            toggle: {if: [VendorToggle, :forms_enabled?]},
            format: 'primary',
