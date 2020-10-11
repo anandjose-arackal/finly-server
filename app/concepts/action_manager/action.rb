@@ -6,7 +6,7 @@ class ActionManager::Action
 
   attr_accessor :type, :id, :path, :parent, :action_registry, :action_scopes,
                 :permissions, :label, :icon, :policy, :authorize, :features,
-                :model, :format, :action_condition
+                :model, :format, :action_condition, :toggle
 
   class_attribute :registered_type
 
@@ -93,10 +93,27 @@ class ActionManager::Action
   # end
 
   def permitted?(user)
+    return false unless feature_enabled?(user)
     return false unless feature_subscribed?(user)
     return false unless user.has_permission?(permissions)
 
     true
+  end
+
+  def feature_enabled?(user)
+    return true if toggle.blank?
+
+    toggle = self.toggle
+    toggle = {if: self.toggle} if self.toggle.is_a?(Array)
+    if toggle[:if].present?
+      klass, action = toggle[:if]
+      return klass.new(user).send(action)
+    elsif toggle[:unless].present?
+      klass, action = toggle[:unless]
+      return klass.new(user).send(action)
+    end
+
+    raise "Invalid toggle #{self.toggle}"
   end
 
   def feature_subscribed?(user)
@@ -116,16 +133,11 @@ class ActionManager::Action
     return true unless authorize.present?
     raise "Policy has not been defined for the action #{self.id}" unless policy.present?
 
-    authorize = {if: authorize} if authorize.is_a?(Symbol) or authorize.is_a?(String)
-    raise "Invalid authorization for the action #{self.id}" if authorize[:if].blank? and authorize[:unless].blank?
-
     policy = self.policy.new(context[:current_user], context[:record])
+    return true if policy.send(authorize)
+    return true if action_condition.present? and Transactions::Evaluator.eval(action_registry, action_condition, context)
 
-    return false if authorize[:if].present? and not policy.send(authorize)
-    return false if authorize[:unless].present? and policy.send(authorize)
-    return false if action_condition.present? and not Transactions::Evaluator.eval(action_registry, action_condition, context)
-
-    true
+    false
   end
 
   # def actions

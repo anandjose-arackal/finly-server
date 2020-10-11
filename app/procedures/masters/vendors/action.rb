@@ -1,6 +1,7 @@
 class Masters::Vendors::Action < ActionManager::API
 
   scope policy: Masters::Vendors::Policy, model: YesBankVendor do
+
     action :button_group,
            :actions,
            contextual: true,
@@ -42,18 +43,19 @@ class Masters::Vendors::Action < ActionManager::API
            icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
            route: "vendors.index"
 
-    # action :redirect,
-    #        :create,
-    #        permissions: [:vendor_creator, :vendor_manager],
-    #        format: 'primary',
-    #        label: 'Add Vendor',
-    #        icon: 'https://img.icons8.com/windows/17/708090/--checkmark-yes.png',
-    #        url: 'vendor/add'
+    action :redirect,
+           :create,
+           permissions: [:vendor_creator, :vendor_manager],
+           toggle: {if: [VendorToggle, :forms_enabled?]},
+           format: 'primary',
+           label: 'Add Vendor',
+           icon: 'https://img.icons8.com/windows/17/708090/--checkmark-yes.png',
+           url: 'vendors/add'
 
     action :redirect,
            :create,
            permissions: [:vendor_creator, :vendor_manager],
-           authorize: :vendor_forms_enabled?,
+           toggle: {unless: [VendorToggle, :forms_enabled?]},
            format: 'primary',
            label: 'Add Vendor',
            icon: 'https://img.icons8.com/windows/17/708090/--checkmark-yes.png',

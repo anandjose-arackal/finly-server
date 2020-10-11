@@ -1,6 +1,6 @@
-class FormsVendorToggle < ApplicationToggle
+class VendorToggle < ApplicationToggle
 
-  def enabled?
+  def forms_enabled?
     feature_flag 'release/forms_vendors#enabled', false
   end
 
