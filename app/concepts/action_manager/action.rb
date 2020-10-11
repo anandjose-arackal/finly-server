@@ -94,8 +94,8 @@ class ActionManager::Action
 
   def permitted?(user)
     return false unless feature_enabled?(user)
-    # return false unless feature_subscribed?(user)
-    # return false unless user.has_permission?(permissions)
+    return false unless feature_subscribed?(user)
+    return false unless user.has_permission?(permissions)
 
     true
   end
