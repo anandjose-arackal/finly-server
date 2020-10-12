@@ -168,6 +168,7 @@ class Masters::Vendors::Form < Forms::API
     data_map :bank_accounts, populate_if_empty: BankAccount, min_items: 1 do
       text :name, required: true
       text :account_number, required: true
+      text :confirm_account_number, required: true, system_field: false
       text :ifsc, label: "IFSC / Bank Code", required: true
       switch :default_account
       switch :disabled, default_value: false
@@ -320,6 +321,12 @@ class Masters::Vendors::Form < Forms::API
     action :visible, false
     action :active, false
     action :required, false
+  end
+
+  validation validation_id: :"confirm bank account" do
+    reference 'bank_accounts.confirm_account_number'
+    error_message "doesn't match with account number"
+    rule Rules::Builder['bank_accounts.account_number'].not_eq(entity: 'bank_accounts.confirm_account_number')
   end
 
 
