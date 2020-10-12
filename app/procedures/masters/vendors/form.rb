@@ -373,11 +373,11 @@ class Masters::Vendors::Form < Forms::API
     action :required, false
   end
 
-  validation validation_id: :"confirm bank account" do
-    reference 'bank_accounts.confirm_account_number'
-    error_message "doesn't match with account number"
-    rule Rules::Builder['bank_accounts.account_number'].not_eq(entity: 'bank_accounts.confirm_account_number')
-  end
+    # validation validation_id: :"confirm bank account" do
+    #   reference 'bank_accounts.confirm_account_number'
+    #   error_message "doesn't match with account number"
+    #   rule Rules::Builder['bank_accounts.account_number'].not_eq(entity: 'bank_accounts.confirm_account_number')
+    # end
 
 
   # condition condition_id: :department_id_editable do
