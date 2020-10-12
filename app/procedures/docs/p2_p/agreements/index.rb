@@ -74,6 +74,7 @@ class Docs::P2P::Agreements::Index < IndexBuilder::API
   end
 
   counter -> (user, collection) do
+    collection = collection.non_deleted
     # Use custom scope to support awaiting approval status
     counter = IndexBuilder::Counter.new :with_status_id
     counts = collection.group(:status_id).count

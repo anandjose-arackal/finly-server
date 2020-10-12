@@ -79,7 +79,7 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     collection = collection.joins(:payment_order)
     # Use custom scope to support awaiting approval status
     counter = IndexBuilder::Counter.new :with_status_id
-    counts = collection.group(:status_id).count
+    counts = collection.group('bank_payment_requests.status_id').count
     counter.add nil, "All", counts.values.reduce(0, :+)
     # Open / Retracted
     counter.add BankPaymentRequestStatus::GROUP_OPEN, 'Open', (

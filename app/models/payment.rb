@@ -800,7 +800,11 @@ class Payment < ApplicationRecord
 
   def utr
     return super() unless super().blank?
-    return (self.reference_resources.first&.utr || self.reference_resource&.utr) rescue nil
+    if self.reference_resources.first&.has_attribute?(:bank_reference_number)
+      return (self.reference_resources.first&.bank_reference_number || self.reference_resource&.bank_reference_number) rescue nil
+    else
+      return (self.reference_resources.first&.utr || self.reference_resource&.utr) rescue nil
+    end
   end
 
   private
@@ -927,6 +931,26 @@ class Payment < ApplicationRecord
         # marking the bill as approved so that they can retry the payment by creating another payment ticket
         parent&.update(status_id: BbpsBillStatus.id_for(:approved))
       end
+    end
+  end
+
+  def self.update_payment_status payment, user
+    if payment.failed?
+      payment.update(payment_status_id: PaymentStatus.id_for(:completed))
+      payment.system_messages.destroy_all
+      payment.system_messages.create(
+        system_message_type_id: SystemMessageType.id_for(:success), 
+        content: "Updated to completed via utr upload by #{user.name}."
+      )
+
+      payment_order = payment.payment_order
+      payments_status_ids = payment_order.payments.pluck(:payment_status_id).uniq
+      if payments_status_ids.include?(PaymentStatus.id_for(:failed)) && payments_status_ids.include?(PaymentStatus.id_for(:completed))
+        payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:partially_completed))
+      else payments_status_ids.length == 1  && payments_status_ids.include?(PaymentStatus.id_for(:completed) )
+        payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
+      end
+
     end
   end
 

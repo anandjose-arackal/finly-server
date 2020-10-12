@@ -1,4 +1,6 @@
 json.payments do
+  bank_transaction_class = current_user.company.feature_subscription.bank_transaction_class
+
   json.array!(@result.paginated_payments.include_for_index) do |payment|
     if payment.receiving_account&.is_a?(BbpsBiller)
       json.owner_name payment.receiving_account&.biller_name
@@ -34,8 +36,21 @@ json.payments do
     json.system_messages do
       json.array! (payment.system_messages)
     end
+
     json.bank_reference_number payment.utr
-    json.credited_at payment.reference_resources.first&.created_at&.strftime("%B %d, %Y - %H:%M:%S")
+    if payment.utr.blank?
+      bank_transaction = bank_transaction_class.find_by(reference_payment_id: payment.id)
+      json.bank_reference_number bank_transaction.bank_reference_number if bank_transaction.present?
+    end
+
+    credited_at = payment.reference_resources.first&.created_at&.strftime("%B %d, %Y - %H:%M:%S")
+
+    if credited_at.blank?
+      bank_transaction = bank_transaction_class.find_by(reference_payment_id: payment.id)
+      credited_at = bank_transaction&.created_at&.strftime("%B %d, %Y - %H:%M:%S") if bank_transaction.present?
+    end
+
+    json.credited_at credited_at
     json.payment_notification_users payment&.parent&.payment_notification_users rescue nil
     json.category_id payment.category_id
     json.category_name payment.category&.name

@@ -72,30 +72,30 @@ class InwardInvoiceStatus < ApplicationRecord
   # this will encapsulate all IDs of an invoice that come under the committed bucket of a budget
   def self.ids_for_committed_bucket
     [
-        InwardInvoiceStatus.id_for(:open),
-        InwardInvoiceStatus.id_for(:rejected),
-        InwardInvoiceStatus.id_for(:retracted),
-        InwardInvoiceStatus.id_for(:processing)
+        # InwardInvoiceStatus.id_for(:open),
+        # InwardInvoiceStatus.id_for(:rejected),
+        # InwardInvoiceStatus.id_for(:retracted),
+        InwardInvoiceStatus.id_for(:approved),
+        InwardInvoiceStatus.id_for(:auto_approved),
+        # InwardInvoiceStatus.id_for(:processing)
     ]
   end
 
   def self.ids_for_pending_payment_bucket
     [
-        InwardInvoiceStatus.id_for(:approved),
-        InwardInvoiceStatus.id_for(:auto_approved),
         InwardInvoiceStatus.id_for(:unpaid),
         InwardInvoiceStatus.id_for(:partially_paid),
         InwardInvoiceStatus.id_for(:initiated),
-        InwardInvoiceStatus.id_for(:paid)
+        # InwardInvoiceStatus.id_for(:paid)
     ]
   end
 
   # the below is the bucket from which paid amount will be considered
   def self.ids_for_paid_amount_consideration
     [
-        InwardInvoiceStatus.id_for(:open),
-        InwardInvoiceStatus.id_for(:retracted),
-        InwardInvoiceStatus.id_for(:processing),
+        # InwardInvoiceStatus.id_for(:open),
+        # InwardInvoiceStatus.id_for(:retracted),
+        # InwardInvoiceStatus.id_for(:processing),
         InwardInvoiceStatus.id_for(:approved),
         InwardInvoiceStatus.id_for(:auto_approved),
         InwardInvoiceStatus.id_for(:unpaid),
@@ -111,6 +111,15 @@ class InwardInvoiceStatus < ApplicationRecord
         InwardInvoiceStatus.id_for(:initiated),
         InwardInvoiceStatus.id_for(:partially_paid),
         InwardInvoiceStatus.id_for(:paid)
+    ]
+  end
+
+  # Status IDs for budget trails which are not calculated into budgets
+  def self.status_ids_for_unbudgetables
+    [
+        InwardInvoiceStatus.id_for(:open),
+        InwardInvoiceStatus.id_for(:rejected),
+        InwardInvoiceStatus.id_for(:retracted)
     ]
   end
 

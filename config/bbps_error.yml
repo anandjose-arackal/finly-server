@@ -2,6 +2,7 @@ BillPayErrorsResponses:
   "BillerResponse Mandatory": "Bank server unreachable"
   "Payment amount is unacceptable": "Wrong payment amount"
   "Successful Validation API is mandatory before executing Payment Request for this Biller": "Bank server unreachable"
+  "Successful Fetch Request is mandatory before executing Payment Request for this Biller": "Bank server unreachable"
 
 BillFetchNoDueResponses:
   - Payment received for the billing period - no bill due

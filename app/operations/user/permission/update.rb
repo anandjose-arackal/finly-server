@@ -4,7 +4,7 @@ class User::Permission::Update < User::Permission::Base
 
   def init
     id = params[:id] || params[:selected_user_id]
-    self.selected_user = User::Index.(user, params).team.find_by(id: id) rescue nil
+    self.selected_user = BankTransfer::Users::Index.(user, params).users.find_by(id: id) rescue nil
     self.permission = selected_user&.permission
   end
 

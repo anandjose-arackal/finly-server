@@ -5,9 +5,8 @@ class Oauth::TokenController < Doorkeeper::TokensController
   include AccessibilityCheckHelper
   include ApplicationHelper
   include Helpers::UserSessionsHelper
-  include Helpers::RequestImpressionHelper
 
-  around_action :save_request_impression
+  # around_action :save_request_impression
   before_action :load_global_variables
 
   def create
