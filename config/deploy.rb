@@ -103,9 +103,16 @@ when :yes_bank_balance_poller
   linked_files << 'config/bunny.yml'
 end
 set :linked_files, linked_files
-set :linked_dirs, %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/uploads}
+set :linked_dirs, %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/uploads node_modules client/node_modules}
 set :keep_releases, 5
+set :nvm_type, :user # or :system, depends on your nvm setup
+set :nvm_node, 'v12.18.3'
+set :nvm_map_bins, %w{node npm yarn}
 
+set :yarn_target_path, -> { release_path.join('client') } #
+set :yarn_flags, '--production --silent --no-progress'    # default
+set :yarn_roles, :all                                     # default
+set :yarn_env_variables, {}
 
 # set :rails_env, "staging"
 # set :rails_env, 'production'
@@ -158,6 +165,18 @@ set :slackistrano, {
     slack_via_slackbot: true
 }
 
+before "deploy:assets:precompile", "deploy:yarn_install"
+
+namespace :deploy do
+  desc 'Run rake yarn:install'
+  task :yarn_install do
+    on roles(:web) do
+      within release_path do
+        execute("cd #{release_path} && yarn install")
+      end
+    end
+  end
+end
 # before 'disable_secure_storage', 'runner:restart'
 #
 # # Restart runner

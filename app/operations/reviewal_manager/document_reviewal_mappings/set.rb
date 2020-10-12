@@ -57,7 +57,7 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
           end
 
           # Get max for all reviewers
-          max_thresholds = level_reviewers_data.map{|item| item['max']}
+          max_thresholds = level_reviewers_data.map{|item| item['max'].to_f}
           # min_thresholds = level_reviewers_data.map{|item| item['min']}
 
           # If level doesn't have reviewers
@@ -69,7 +69,7 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
           end
 
           # Check if selected reviewer is a valid reviewer
-          valid_threshold_reviewer_data = level_reviewers_data.filter{|item| item['min'] <= document_amount && (item['max'].blank? || item['max'] >= document_amount )}
+          valid_threshold_reviewer_data = level_reviewers_data.filter{|item| item['min'].to_f <= document_amount && (item['max'].blank? || item['max'].to_f >= document_amount )}
           valid_violation_reviewer_data = level_reviewers_data.filter do |item|
             if violations_present
               !!item['exception']
