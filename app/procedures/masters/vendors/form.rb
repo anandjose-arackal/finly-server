@@ -365,6 +365,14 @@ class Masters::Vendors::Form < Forms::API
     action :required, false
   end
 
+  condition condition_id: :attachment_lower_exemption_certificate_for_indian_vendors do
+    reference :entity, 'gstin_locations.gstin_certificate'
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    action :editable, false
+    action :visible, false
+    action :required, false
+  end
+
   validation validation_id: :"confirm bank account" do
     reference 'bank_accounts.confirm_account_number'
     error_message "doesn't match with account number"
