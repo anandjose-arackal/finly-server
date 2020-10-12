@@ -95,7 +95,7 @@ class Masters::Vendors::Form < Forms::API
   end
 
   section :business_details, associate_custom_fields: true do
-    auto_number :vendor_id, sequence: {prefix: "VNDR.", start_at: '000001'}
+    auto_number :vendor_id, sequence: {prefix: "VNDR-", start_at: '000001'}
     dropdown :vendor_country, choices_scope: Choices[:list].({id: 'India', name: "India"}, {id: 'International', name: "International"}),
              required: true, default_value: 'India'
     lookup :policy_id,
@@ -107,7 +107,7 @@ class Masters::Vendors::Form < Forms::API
     text :name, label: 'Trade Name', required: true
     switch :gst_registered, label: "GST Registered"
     large_text :address, label: "Full Address"
-    # lookup :vendor_type_id, choices_scope: Choices[:lookup].('vendor_types'), label: "Vendor Type"
+    lookup :vendor_type_id, choices_scope: Choices[:lookup].('vendor_types'), label: "Vendor Type"
     lookup :payment_term_id, choices_scope: Choices[:lookup].('payment_terms'), label: "Payment Term"
   end
 
@@ -120,8 +120,8 @@ class Masters::Vendors::Form < Forms::API
 
     # TDS
     dropdown :tds_rates_list_id, choices_scope: Choices[:lookup].('tds_slabs'), label: "TDS Percentage"
-    date :tds_effective_start_date, label: "TDS Effective Start Date"
-    date :tds_effective_end_date, label: "TDS Effective End Date"
+    date :tds_effective_start_date, label: "TDS Effective Start Date", editable: false
+    date :tds_effective_end_date, label: "TDS Effective End Date", editable: false
 
     # Sales Tax Codes
     lookup :tax_rate_id, choices_scope: Choices[:lookup].('tax_rates'), label: "Sales Tax Code", visible: false, editable: false
@@ -130,7 +130,7 @@ class Masters::Vendors::Form < Forms::API
   section :msme, associate_custom_fields: true do
     # MSME
     switch :msme_registered
-    text :msme_registration_number
+    text :msme_registration_number, editable: false
     attachment :msme_registration_certificate, system_field: false
   end
 
@@ -160,6 +160,8 @@ class Masters::Vendors::Form < Forms::API
       large_text :address
       lookup :gstin_id, visible: false
       text :gstin
+      dropdown :gst_status, choices_scope: Choices[:list].({id: 'Active', name: "Active"}, {id: 'Cancelled', name: "Cancelled"}, {id: 'Provisional', name: 'Provisional'}, {id: 'Inactive', name: 'Inactive'}),
+               required: false
       attachment :gstin_certificate, system_field: false
     end
   end
@@ -241,16 +243,32 @@ class Masters::Vendors::Form < Forms::API
     action :required, false
   end
 
+  condition condition_id: :tds_start_date_editable_when_tds_present do
+    reference :entity, :tds_effective_start_date
+    rule Rules::Builder[:tds_rates_list_id].present
+    action :editable, true
+  end
+
+  condition condition_id: :tds_end_date_editable_when_tds_present do
+    reference :entity, :tds_effective_end_date
+    rule Rules::Builder[:tds_rates_list_id].present
+    action :editable, true
+  end
+
   condition condition_id: :tds_start_date_for_indian_vendors do
     reference :entity, :tds_effective_start_date
-    rule Rules::Builder[:tds_rates_list_id].blank
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, false
+    action :visible, false
+    action :active, false
   end
 
   condition condition_id: :tds_end_date_for_indian_vendors do
     reference :entity, :tds_effective_end_date
-    rule Rules::Builder[:tds_rates_list_id].blank
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, false
+    action :visible, false
+    action :active, false
   end
 
 
@@ -265,8 +283,8 @@ class Masters::Vendors::Form < Forms::API
   end
   condition condition_id: :msme_number_when_msme_registered do
     reference :entity, :msme_registration_number
-    rule Rules::Builder[:msme_registered].blank
-    action :editable, false
+    rule Rules::Builder[:msme_registered].present
+    action :editable, true
   end
   condition condition_id: :msme_number_for_indian_vendors do
     reference :entity, :msme_registration_number
@@ -274,6 +292,14 @@ class Masters::Vendors::Form < Forms::API
     action :editable, false
     action :visible, false
     action :active, false
+    action :required, false
+  end
+
+  condition condition_id: :attachment_msme_for_indian_vendors do
+    reference :entity, :msme_registration_certificate
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    action :editable, false
+    action :visible, false
     action :required, false
   end
 
@@ -313,9 +339,25 @@ class Masters::Vendors::Form < Forms::API
     action :editable, false
   end
 
+  condition condition_id: :attachment_lower_exemption_certificate_for_indian_vendors do
+    reference :entity, :lower_exception_certificate
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    action :editable, false
+    action :visible, false
+    action :required, false
+  end
 
-  condition condition_id: :gst_for_indian_vendors do
-    reference :entity, :gst_registered
+  condition condition_id: :gstin_for_indian_vendors do
+    reference :entity, 'gstin_locations.gstin'
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    action :editable, false
+    action :visible, false
+    action :active, false
+    action :required, false
+  end
+
+  condition condition_id: :gst_status_for_indian_vendors do
+    reference :entity, 'gstin_locations.gst_status'
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, false
     action :visible, false

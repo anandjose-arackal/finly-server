@@ -43,11 +43,14 @@ Resolver::Router.draw do
     scope :bank_accounts do
       route 'default', Masters::Vendors::BankAccounts::Resolver
     end
+    scope :types do
+      route 'default', Masters::Vendors::Types::Resolver
+    end
   end
 
-  scope :vendor_types do
-    route 'default', Masters::Vendors::Types::Resolver
-  end
+  # scope :vendor_types do
+  #   route 'default', Masters::Vendors::Types::Resolver
+  # end
 
   scope :payment_terms do
     route 'default', Masters::PaymentTerms::Resolver
