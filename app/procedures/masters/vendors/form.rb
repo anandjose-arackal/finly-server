@@ -281,11 +281,8 @@ class Masters::Vendors::Form < Forms::API
     action :active, false
     action :required, false
   end
-  condition condition_id: :msme_number_when_msme_registered do
-    reference :entity, :msme_registration_number
-    rule Rules::Builder[:msme_registered].present
-    action :editable, true
-  end
+
+
   condition condition_id: :msme_number_for_indian_vendors do
     reference :entity, :msme_registration_number
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
@@ -293,6 +290,12 @@ class Masters::Vendors::Form < Forms::API
     action :visible, false
     action :active, false
     action :required, false
+  end
+
+  condition condition_id: :msme_number_when_msme_registered do
+    reference :entity, :msme_registration_number
+    rule Rules::Builder[:msme_registered].present
+    action :editable, true
   end
 
   condition condition_id: :attachment_msme_for_indian_vendors do
@@ -365,7 +368,7 @@ class Masters::Vendors::Form < Forms::API
     action :required, false
   end
 
-  condition condition_id: :attachment_lower_exemption_certificate_for_indian_vendors do
+  condition condition_id: :attachment_gstin_certificate_for_indian_vendors do
     reference :entity, 'gstin_locations.gstin_certificate'
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, false
