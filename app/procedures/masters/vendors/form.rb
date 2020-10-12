@@ -97,7 +97,7 @@ class Masters::Vendors::Form < Forms::API
   section :business_details, associate_custom_fields: true do
     auto_number :vendor_id, sequence: {prefix: "VNDR.", start_at: '000001'}
     dropdown :vendor_country, choices_scope: Choices[:list].({id: 'India', name: "India"}, {id: 'International', name: "International"}),
-             required: true
+             required: true, default_value: 'India'
     lookup :policy_id,
            choices_scope: Choices[:lookup].('policies', permissions: [:vendor_creator, :vendor_manager]),
            required: true
@@ -107,13 +107,14 @@ class Masters::Vendors::Form < Forms::API
     text :name, label: 'Trade Name', required: true
     switch :gst_registered, label: "GST Registered"
     large_text :address, label: "Full Address"
-      # dropdown :vendor_type_id, choices_scope: Choices[:lookup].('vendor_types'), label: "Vendor Type"
-      # dropdown :payment_term_id, choices_scope: Choices[:lookup].('payment_terms'), label: "Payment Term"
+    # lookup :vendor_type_id, choices_scope: Choices[:lookup].('vendor_types'), label: "Vendor Type"
+    lookup :payment_term_id, choices_scope: Choices[:lookup].('payment_terms'), label: "Payment Term"
   end
 
   section :tax_information, title: "Tax Information & Details", associate_custom_fields: true do
     # PAN
     text :pan
+    attachment :pan_card, system_field: false
     # RCM
     switch :rcm_enabled, label: "RCM Enabled"
 
@@ -122,7 +123,8 @@ class Masters::Vendors::Form < Forms::API
     date :tds_effective_start_date, label: "TDS Effective Start Date"
     date :tds_effective_end_date, label: "TDS Effective End Date"
 
-    attachment :pan_card, system_field: false
+    # Sales Tax Codes
+    lookup :tax_rate_id, choices_scope: Choices[:lookup].('tax_rates'), label: "Sales Tax Code", visible: false, editable: false
   end
 
   section :msme, associate_custom_fields: true do
@@ -166,7 +168,7 @@ class Masters::Vendors::Form < Forms::API
     data_map :bank_accounts, populate_if_empty: BankAccount, min_items: 1 do
       text :name, required: true
       text :account_number, required: true
-      text :ifsc, required: true
+      text :ifsc, label: "IFSC / Bank Code", required: true
       switch :default_account
       switch :disabled, default_value: false
       attachment :cancelled_cheque, system_field: false
@@ -176,6 +178,31 @@ class Masters::Vendors::Form < Forms::API
   section :attachments, associate_custom_fields: true do
     attachment :tax_exemption_certificate, system_field: false
     attachment :other_documents, system_field: false
+    attachment :tax_residency_certificate, label: 'Tax Residency Certificate', system_field: false, visible: false, editable: false
+    attachment :form_10f, label: 'Form 10 F', system_field: false, visible: false, editable: false
+    attachment :no_pe_declaration, label: 'No PE Declaration', system_field: false, visible: false, editable: false
+
+  end
+
+  condition condition_id: :attachment_tax_residency_for_international_vendors do
+    reference :entity, :tax_residency_certificate
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    action :editable, true
+    action :visible, true
+  end
+
+  condition condition_id: :attachment_form_10f_for_international_vendors do
+    reference :entity, :form_10f
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    action :editable, true
+    action :visible, true
+  end
+
+  condition condition_id: :attachment_no_pe_for_international_vendors do
+    reference :entity, :no_pe_declaration
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    action :editable, true
+    action :visible, true
   end
 
   condition condition_id: :pan_for_indian_vendors do
@@ -194,6 +221,14 @@ class Masters::Vendors::Form < Forms::API
     action :visible, false
     action :active, false
     action :required, false
+  end
+
+  condition condition_id: :tax_rate_international_vendors do
+    reference :entity, :tax_rate_id
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    action :editable, true
+    action :visible, true
+    action :active, true
   end
 
   condition condition_id: :tds_for_indian_vendors do

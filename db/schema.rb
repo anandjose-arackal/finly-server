@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_10_01_190741) do
+ActiveRecord::Schema.define(version: 2020_10_12_110003) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -183,6 +183,8 @@ ActiveRecord::Schema.define(version: 2020_10_01_190741) do
     t.string "authorized_ip"
     t.datetime "deleted_at"
     t.datetime "last_activity_at"
+    t.boolean "admin_panel_access", default: true
+    t.boolean "active", default: true
     t.index ["email"], name: "index_admin_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
   end
@@ -922,7 +924,7 @@ ActiveRecord::Schema.define(version: 2020_10_01_190741) do
     t.string "bill_month"
     t.string "pc"
     t.date "early_payment_date"
-    t.text "api_response"
+    t.text "api_response", limit: 16777215
     t.datetime "generated_at"
     t.text "biller_response"
     t.index ["amount_id"], name: "index_bbps_bills_on_amount_id"
@@ -3326,6 +3328,42 @@ ActiveRecord::Schema.define(version: 2020_10_01_190741) do
     t.index ["enforceable_type", "enforceable_id"], name: "index_enforce_policies_on_enforceable_type_and_enforceable_id"
   end
 
+  create_table "erp_sync_attempts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "record_id", null: false
+    t.string "record_type", null: false
+    t.integer "status_id", null: false
+    t.integer "company_id", null: false
+    t.integer "macro_id"
+    t.integer "macro_job_id"
+    t.string "message"
+    t.string "reference_id"
+    t.datetime "attempted_at", null: false
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_erp_sync_attempts_on_company_id"
+    t.index ["created_at"], name: "index_erp_sync_attempts_on_created_at"
+    t.index ["deleted_at"], name: "index_erp_sync_attempts_on_deleted_at"
+    t.index ["macro_id"], name: "index_erp_sync_attempts_on_macro_id"
+    t.index ["macro_job_id"], name: "index_erp_sync_attempts_on_macro_job_id"
+    t.index ["record_id", "record_type"], name: "index_erp_sync_attempts_on_record_id_and_record_type"
+    t.index ["record_id"], name: "index_erp_sync_attempts_on_record_id"
+    t.index ["record_type"], name: "index_erp_sync_attempts_on_record_type"
+    t.index ["status_id"], name: "index_erp_sync_attempts_on_status_id"
+    t.index ["updated_at"], name: "index_erp_sync_attempts_on_updated_at"
+  end
+
+  create_table "erp_sync_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_erp_sync_statuses_on_created_at"
+    t.index ["deleted_at"], name: "index_erp_sync_statuses_on_deleted_at"
+    t.index ["name"], name: "index_erp_sync_statuses_on_name"
+    t.index ["updated_at"], name: "index_erp_sync_statuses_on_updated_at"
+  end
+
   create_table "expense_data_extract_sources", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
@@ -4988,6 +5026,11 @@ ActiveRecord::Schema.define(version: 2020_10_01_190741) do
     t.decimal "invoice_advance_paid_amount_converted", precision: 20, scale: 5
     t.decimal "invoice_net_total_amount", precision: 20, scale: 5
     t.decimal "invoice_net_total_amount_converted", precision: 20, scale: 5
+    t.integer "erp_sync_status_id"
+    t.string "erp_sync_message"
+    t.string "erp_sync_reference_id"
+    t.integer "erp_sync_attempts_count", default: 0
+    t.datetime "erp_sync_attempted_at"
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["advance_amount_id"], name: "index_invoices_on_advance_amount_id"
     t.index ["amount_id"], name: "index_invoices_on_amount_id"
@@ -6287,6 +6330,11 @@ ActiveRecord::Schema.define(version: 2020_10_01_190741) do
     t.boolean "disabled"
     t.integer "transfer_mode_id"
     t.datetime "last_retried_at"
+    t.integer "erp_sync_status_id"
+    t.string "erp_sync_message"
+    t.string "erp_sync_reference_id"
+    t.integer "erp_sync_attempts_count", default: 0
+    t.datetime "erp_sync_attempted_at"
     t.index ["amount_id"], name: "index_payments_on_amount_id"
     t.index ["beneficiary_payment_id"], name: "index_payments_on_beneficiary_payment_id"
     t.index ["category_id"], name: "index_payments_on_category_id"
@@ -6527,6 +6575,7 @@ ActiveRecord::Schema.define(version: 2020_10_01_190741) do
     t.text "source_description"
     t.string "referrer"
     t.datetime "deleted_at"
+    t.text "url"
   end
 
   create_table "procurement_attachments", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
@@ -6807,6 +6856,7 @@ ActiveRecord::Schema.define(version: 2020_10_01_190741) do
     t.integer "vendor_poc_id"
     t.integer "vlpm_id"
     t.text "vendor_note"
+    t.integer "erp_sync_status_id"
     t.index ["advance_amount_id"], name: "index_purchase_orders_on_advance_amount_id"
     t.index ["advance_amount_status_id"], name: "index_purchase_orders_on_advance_amount_status_id"
     t.index ["advance_tds_amount_id"], name: "index_purchase_orders_on_advance_tds_amount_id"
@@ -7563,6 +7613,11 @@ ActiveRecord::Schema.define(version: 2020_10_01_190741) do
     t.integer "location_id"
     t.integer "cost_center_id"
     t.integer "company_id"
+    t.integer "erp_sync_status_id"
+    t.string "erp_sync_message"
+    t.string "erp_sync_reference_id"
+    t.integer "erp_sync_attempts_count", default: 0
+    t.datetime "erp_sync_attempted_at"
     t.index ["card_expenses_total_id"], name: "index_reports_on_card_expenses_total_id"
     t.index ["cash_in_hand_deduction_id"], name: "index_reports_on_cash_in_hand_deduction_id"
     t.index ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id"
@@ -9118,6 +9173,11 @@ ActiveRecord::Schema.define(version: 2020_10_01_190741) do
     t.string "finly_id", limit: 36
     t.datetime "deleted_at"
     t.boolean "pending_activation", default: false
+    t.integer "erp_sync_status_id"
+    t.string "erp_sync_message"
+    t.string "erp_sync_reference_id"
+    t.integer "erp_sync_attempts_count", default: 0
+    t.datetime "erp_sync_attempted_at"
     t.index ["company_id"], name: "index_users_on_company_id"
     t.index ["email"], name: "index_users_on_email"
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
@@ -9572,6 +9632,13 @@ ActiveRecord::Schema.define(version: 2020_10_01_190741) do
     t.date "ldc_effective_end_date"
     t.date "tds_effective_start_date"
     t.date "tds_effective_end_date"
+    t.integer "erp_sync_status_id"
+    t.string "erp_sync_message"
+    t.string "erp_sync_reference_id"
+    t.integer "erp_sync_attempts_count", default: 0
+    t.datetime "erp_sync_attempted_at"
+    t.string "bank_code"
+    t.integer "tax_rate_id"
     t.index ["authorized"], name: "index_yes_bank_vendors_on_authorized"
     t.index ["company_id"], name: "index_yes_bank_vendors_on_company_id"
     t.index ["controlling_level_id"], name: "index_yes_bank_vendors_on_controlling_level_id"

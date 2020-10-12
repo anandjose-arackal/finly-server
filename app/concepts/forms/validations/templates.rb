@@ -10,6 +10,28 @@ class Forms::Validations::Templates
     @validates
   end
 
+  validates :regex_match do |contract:, entity:, **|
+    format = entity.options['regex']&.dig('format')
+    message = entity.options['regex']&.dig('message')
+
+    if format.present?
+      contract.validate do
+        value = send(entity.entity_key)
+        next unless value.present?
+
+        match_data = value.match(Regexp.new(format))
+
+        unless match_data.present? && match_data[0] == value
+          if (message).present?
+            errors.add entity.entity_key, message
+          else
+            errors.add entity.entity_key, "did not match format : #{format}"
+          end
+        end
+      end
+    end
+  end
+
   validates :max_value do |contract:, entity:, **|
     if entity.options['max_value'].present?
       contract.validate do
