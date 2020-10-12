@@ -9,4 +9,5 @@
 #
 
 class KotakBankConfig < ApplicationRecord
+  belongs_to :company, optional: true
 end

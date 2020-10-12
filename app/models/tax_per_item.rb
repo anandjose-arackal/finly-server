@@ -16,6 +16,7 @@
 #
 
 class TaxPerItem < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :document
   belongs_to :tax_rate
 end

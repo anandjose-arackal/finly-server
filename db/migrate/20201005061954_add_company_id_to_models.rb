@@ -115,7 +115,6 @@ class AddCompanyIdToModels < ActiveRecord::Migration[5.2]
     add_column :document_message_receipts, :company_id, :integer, references: 'Company', foreign_key: true, index: true
     add_column :document_items, :company_id, :integer, references: 'Company', foreign_key: true, index: true
     add_column :email_authorizations, :company_id, :integer, references: 'Company', foreign_key: true, index: true
-    add_column :email_events, :company_id, :integer, references: 'Company', foreign_key: true, index: true
     add_column :receipt_emails, :company_id, :integer, references: 'Company', foreign_key: true, index: true
     add_column :expense_data_extracts, :company_id, :integer, references: 'Company', foreign_key: true, index: true
     add_column :expense_rules, :company_id, :integer, references: 'Company', foreign_key: true, index: true
@@ -165,5 +164,25 @@ class AddCompanyIdToModels < ActiveRecord::Migration[5.2]
     add_column :trip_routes, :company_id, :integer, references: 'Company', foreign_key: true, index: true
     add_column :trip_passengers, :company_id, :integer, references: 'Company', foreign_key: true, index: true
     add_column :user_session_events, :company_id, :integer, references: 'Company', foreign_key: true, index: true
+    add_column :user_delegate_mappings, :company_id, :integer, references: 'Company', foreign_key: true, index: true
+    add_column :account_reconciliation_balances, :company_id, :integer, references: 'Company', foreign_key: true, index: true
+    add_column :admin_summary_mail_configs, :company_id, :integer, references: 'Company', foreign_key: true, index: true
+    add_column :invoice_frequencies, :company_id, :integer, references: 'Company', foreign_key: true, index: true
+    add_column :kotak_bank_configs, :company_id, :integer, references: 'Company', foreign_key: true, index: true
+    add_column :payment_trails, :company_id, :integer, references: 'Company', foreign_key: true, index: true
+    add_column :procurement_charges, :company_id, :integer, references: 'Company', foreign_key: true, index: true
+    add_column :receipt_email_parse_failures, :company_id, :integer, references: 'Company', foreign_key: true, index: true
+    add_column :virtual_account_transactions, :company_id, :integer, references: 'Company', foreign_key: true, index: true
+    add_column :system_logs, :company_id, :integer, references: 'Company', foreign_key: true, index: true
+    add_column :task_schedules, :company_id, :integer, references: 'Company', foreign_key: true, index: true
+    add_column :task_file_manager_actions, :company_id, :integer, references: 'Company', foreign_key: true, index: true
+    add_column :tax_per_items, :company_id, :integer, references: 'Company', foreign_key: true, index: true
+    add_column :time_objects, :company_id, :integer, references: 'Company', foreign_key: true, index: true
+    add_column :travel_members, :company_id, :integer, references: 'Company', foreign_key: true, index: true
+    add_column :vendor_accounts, :company_id, :integer, references: 'Company', foreign_key: true, index: true
+    add_column :vendor_account_transactions, :company_id, :integer, references: 'Company', foreign_key: true, index: true
+    add_column :vendor_attachments, :company_id, :integer, references: 'Company', foreign_key: true, index: true
+    add_column :vendor_tds_rates, :company_id, :integer, references: 'Company', foreign_key: true, index: true
+    add_column :web_hook_event_mappings, :company_id, :integer, references: 'Company', foreign_key: true, index: true
   end
 end

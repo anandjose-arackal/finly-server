@@ -11,6 +11,7 @@
 #
 
 class TaskFileManagerAction < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :event_workflow
   belongs_to :export_template
 end

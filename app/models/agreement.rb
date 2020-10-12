@@ -16,7 +16,7 @@
 #  deleted_at        :datetime
 #
 
-class Agreement < ApplicationRecord
+class Agreement < NonTenantedApplicationRecord
   include Attachable
 
   belongs_to :agreement_type, optional: true

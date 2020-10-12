@@ -31,9 +31,10 @@
 #  note                    :text(65535)
 #
 
-class ExportJob < NonTenantedApplicationRecord
+class ExportJob < ApplicationRecord
   include SoftDeletable
 
+  belongs_to :company, optional: true
   belongs_to :status, class_name: 'ExportJobStatus'
   belongs_to :created_by, optional: true, class_name: 'User'
   belongs_to :record, polymorphic: true, optional: true

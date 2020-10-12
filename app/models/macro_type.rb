@@ -9,7 +9,7 @@
 #  updated_at :datetime         not null
 #
 
-class MacroType < FinlyMacrosRecord
+class MacroType < NonTenantedFinlyMacrosRecord
   include Seedable
 
   # set_values :integration#, :automation, :form_validation_rule, :button

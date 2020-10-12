@@ -14,6 +14,7 @@
 class WebHookEventMapping < ApplicationRecord
   include SoftDeletable
 
+  belongs_to :company, optional: true
   belongs_to :web_hook, optional: true
   belongs_to :web_hook_event, optional: true
 

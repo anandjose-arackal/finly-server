@@ -14,8 +14,7 @@
 #  deleted_at  :datetime
 #
 
-class EmailEvent < ApplicationRecord
-  belongs_to :company, optional: true
+class EmailEvent < NonTenantedApplicationRecord
   belongs_to :email
 
   # Events

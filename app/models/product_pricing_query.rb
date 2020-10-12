@@ -17,5 +17,5 @@
 #  deleted_at           :datetime
 #
 
-class ProductPricingQuery < ApplicationRecord
+class ProductPricingQuery < NonTenantedApplicationRecord
 end

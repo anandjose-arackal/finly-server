@@ -17,6 +17,7 @@
 
 class QuickbooksCategory < ApplicationRecord
 
+  belongs_to :company, optional: true
   belongs_to :category, optional: true
 
   accepts_nested_attributes_for :category

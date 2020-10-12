@@ -10,7 +10,7 @@
 #  deleted_at :datetime
 #
 
-class CityIdCityCodeMapping < ApplicationRecord
+class CityIdCityCodeMapping < NonTenantedApplicationRecord
 
   scope :with_city_id, -> (city_id) {where city_id: city_id}
   scope :with_city_code, -> (city_code) {where city_code: city_code}

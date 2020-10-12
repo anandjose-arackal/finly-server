@@ -21,6 +21,7 @@
 
 class PaymentTrail < ApplicationRecord
 
+  belongs_to :company, optional: true
   belongs_to :initiating_account, optional: true, polymorphic: true
   belongs_to :receiving_account, optional: true, polymorphic: true
 

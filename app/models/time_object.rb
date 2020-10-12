@@ -11,6 +11,7 @@
 #
 
 class TimeObject < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :physical_unit, optional: true
 
   validate :non_zero_value

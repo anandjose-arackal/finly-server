@@ -9,7 +9,7 @@
 #  updated_at :datetime         not null
 #
 
-class MacroJobStatus < FinlyMacrosRecord
+class MacroJobStatus < NonTentantedFinlyMacrosRecord
   include Seedable
 
   def self.values

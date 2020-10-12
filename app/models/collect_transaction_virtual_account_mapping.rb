@@ -10,6 +10,6 @@
 #  deleted_at             :datetime
 #
 
-class CollectTransactionVirtualAccountMapping < ApplicationRecord
+class CollectTransactionVirtualAccountMapping < NonTenantedApplicationRecord
 
 end

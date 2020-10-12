@@ -12,7 +12,7 @@
 #  deleted_at                :datetime
 #
 
-class BalanceTallyLedger < ActiveRecord::Base
+class BalanceTallyLedger < NonTenantedApplicationRecord
 
   belongs_to :api_balance, class_name: "Amount"
   belongs_to :finly_database_balance, class_name: "Amount"

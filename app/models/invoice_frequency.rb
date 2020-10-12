@@ -12,6 +12,7 @@
 
 class InvoiceFrequency < ApplicationRecord
 
+  belongs_to :company, optional: true
   belongs_to :period, optional: true
 
 end

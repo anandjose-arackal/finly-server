@@ -17,6 +17,7 @@ class TdsRatesList < ApplicationRecord
   include Exposures::Model::Exposable, SoftDeletable
   include EventProducer
 
+  belongs_to :company, optional: true
   event_channel 'tds_rate'
 
   def self.seed_data(company_id)
