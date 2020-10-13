@@ -66,7 +66,9 @@ class ActionsManager::Master::Procurements::InwardDocumentShow < ActionsManager:
         true
       end
     elsif self.procurement.documents&.first&.class&.name == "Invoice" &&  self.procurement.documents&.first&.voided?
-      true
+      unless self.inward_document.id != self.procurement.inward_documents.last.id
+        true
+      end
     end
   end
 
