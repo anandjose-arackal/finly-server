@@ -280,12 +280,15 @@ json.sub_departments do
 end
 json.tds_slabs do
   json.array!(current_company.tds_slabs) do |tds_slab|
-    json.id tds_slab.id
-    json.name "#{tds_slab.tds}% - #{tds_slab.name} "
-    json.tds tds_slab.tds
-    json.preferred @result.invoice.vendor.tds_rates.pluck(:id).include?(tds_slab.id) rescue false
+    if (tds_slab == invoice.tds_slab) || !tds_slab.deleted?
+      json.id tds_slab.id
+      json.name "#{tds_slab.tds}% - #{tds_slab.name} "
+      json.tds tds_slab.tds
+      json.preferred @result.invoice.vendor.tds_rates.pluck(:id).include?(tds_slab.id) rescue false
+    end
   end
 end
+
 
 json.attachments do
   json.array! invoice.attachments.reject {|attachment| attachment.file_file_size.nil?} do |attachment|

@@ -35,7 +35,9 @@ class TaxRate < ApplicationRecord
   scope :with_rate, -> (rate) {where rate: rate}
   scope :with_internal_id, -> (ids) {where internal_id: ids}
 
-  default_scope {order rate: :asc}
+  def self.default_scope
+    order( rate: :asc)
+  end
 
   after_create do
     self.update(igst: self.rate, cgst: (self.rate / 2), sgst: (self.rate / 2))
