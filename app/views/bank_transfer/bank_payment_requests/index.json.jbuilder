@@ -55,6 +55,7 @@ json.results do
     unless [168, 169, 174, 175].include?(current_user.company_id)
       # payments = payment_request.payment_order.payments.limit(5).includes(:payment_status, :receiving_account)
       # payments = payments.include_minimal_for_index
+      bank_transaction_class = current_user.company.feature_subscription.bank_transaction_class
 
       payments = @result.payments.select { |payment| payment if payment.payment_order_id == payment_request.payment_order_id }
       json.payments do
@@ -63,7 +64,13 @@ json.results do
           json.payment_mode payment.payment_mode&.upcase
           json.date payment.date.strftime('%d %b %Y')
           json.amount payment.amount_value
+
           json.utr payment.utr
+          if payment.utr.blank?
+            bank_transaction = bank_transaction_class.find_by(reference_payment_id: payment.id)
+            json.utr bank_transaction.bank_reference_number if bank_transaction.present?
+          end
+          
           json.payment_status payment.payment_status_name
           next if payment.receiving_account.is_a?(BbpsBiller)
           if payment&.receiving_account&.account_owner&.is_a?(YesBankVendor)

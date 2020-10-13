@@ -2919,6 +2919,12 @@ Rails.application.routes.draw do
       patch 'update_panel', to: 'users#update_panel', as: :update_panel
       patch 'reset_password', to: 'users#reset_password', as: :reset_password
     end
+
+    resources :payments do
+      get 'status_check', to: 'payments#status_check', as: :status_check
+      patch 'change_status', to: 'payments#change_status', as: :change_status
+    end
+
     post 'welcome', to: 'users#admin_welcome', as: :welcome
     post 'agreements_mail', to: 'users#agreements_mail', as: :agreements_mail
     post 'users/set_role', to: 'users#set_role', as: :set_role
@@ -4327,6 +4333,10 @@ Rails.application.routes.draw do
       get 'reports/count', to: 'reports#count'
       post 'reports/new_sync_attempt', to: 'reports#new_sync_attempt'
       resources :reports, only: [:index, :show, :update]
+
+      get 'purchase_orders/count', to: 'purchase_orders#count'
+      post 'purchase_orders/new_sync_attempt', to: 'purchase_orders#new_sync_attempt'
+      resources :purchase_orders, only: [:index]
     end
   end
 
