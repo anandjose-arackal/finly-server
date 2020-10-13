@@ -32,9 +32,23 @@ class Menu::API < Transactions::API
     @items ||= []
   end
 
-  def self.item(key, path: nil, icon: nil, label: nil, permissions: [], features: [], &block)
+  def self.item(key, path: nil, icon: nil, label: nil, permissions: [], features: [], options: {}, &block)
     items << Menu::Item.new(
         key: key, path: path, icon: icon, label: label,
+        options: options,
+        permissions: permissions, features: features, scopes: scopes, action_registry: self,
+        &block
+    )
+  end
+
+  def self.footer_items
+    @footer_items ||= []
+  end
+
+  def self.footer_item(key, path: nil, icon: nil, label: nil, permissions: [], features: [], options: {}, &block)
+    footer_items << Menu::Item.new(
+        key: key, path: path, icon: icon, label: label,
+        options: options,
         permissions: permissions, features: features, scopes: scopes, action_registry: self,
         &block
     )
@@ -52,6 +66,7 @@ class Menu::API < Transactions::API
 
   step :authorize!
   pass :build_menu
+  pass :build_footer
   pass :build_modules
   pass :set_current_module
 
@@ -67,6 +82,10 @@ class Menu::API < Transactions::API
 
   def build_menu(context, current_user:, **)
     context[:menu] = self.class.items.as_json(current_user: current_user).reject { |item| item.nil? }
+  end
+
+  def build_footer(context, current_user:, **)
+    context[:footer] = self.class.footer_items.as_json(current_user: current_user).reject { |item| item.nil? }
   end
 
   def build_modules(context, current_user:, **)
