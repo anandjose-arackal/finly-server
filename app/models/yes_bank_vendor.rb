@@ -233,6 +233,10 @@ class YesBankVendor < ApplicationRecord
     end
   end
 
+  scope :with_status_ids, -> (id){
+    with_status_id(id)
+  }
+
   scope :filter_approved_date, -> (from, to) {
     from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
     to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
@@ -259,6 +263,7 @@ class YesBankVendor < ApplicationRecord
   end
 
   ransack_scopes :with_status_id
+  ransack_scopes :with_status_ids
 
   def display_name
     self.business_name.blank? ? self.name : self.business_name
