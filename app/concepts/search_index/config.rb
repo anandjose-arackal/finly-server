@@ -26,7 +26,7 @@ class SearchIndex::Config < Transactions::API
           features: [:procurement],
           permissions: Docs::P2P::Invoices::Index.permissions,
           category: :transactions,
-          route: 'procure_purchase_order/{{record_id}}/params={"procurement_id":"{{parent_id}}","procurement_type":"{{parent_type}}"}',
+          route: 'procure_invoice/{{record_id}}/params={"procurement_id":"{{parent_id}}","procurement_type":"{{parent_type}}"}',
           layout: {
               fixed_left: [:vendor_name, :sequence_id],
               fixed_right: [:created_by_name, :created_by_email, :status_name]
