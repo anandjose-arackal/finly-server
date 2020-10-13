@@ -42,6 +42,7 @@ class Admin::Implementations::Master::Lrms::ImportTemplates < Admin::Implementat
              BankPaymentRequestProvider
              YesBankVendorProvider
              PaymentAgreementProvider
+             AgreementInvoiceProvider
              BbpsBillerSubscriptionProvider
              BbpsBillProvider
              CreditNoteProvider
