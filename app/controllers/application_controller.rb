@@ -7,7 +7,6 @@ class ApplicationController < ActionController::Base
   # include AbstractController::Callbacks
   # include ActionController::Head
   include Doorkeeper::Rails::Helpers
-  include Helpers::RequestImpressionHelper
   include Transactions::Endpoint::Controller
 
   # Prevent CSRF attacks by raising an exception.

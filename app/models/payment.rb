@@ -799,7 +799,11 @@ class Payment < ApplicationRecord
 
   def utr
     return super() unless super().blank?
-    return (self.reference_resources.first&.utr || self.reference_resource&.utr) rescue nil
+    if self.reference_resources.first&.has_attribute?(:bank_reference_number)
+      return (self.reference_resources.first&.bank_reference_number || self.reference_resource&.bank_reference_number) rescue nil
+    else
+      return (self.reference_resources.first&.utr || self.reference_resource&.utr) rescue nil
+    end
   end
 
   private
