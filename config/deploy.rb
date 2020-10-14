@@ -90,6 +90,7 @@ linked_files = %w{
   config/finly_macros.yml
   config/finly_collect.yml
   config/bullet_train.yml
+  config/feature_flipper.yml
   config/posthog.yml
 }
 case fetch(:stage)
