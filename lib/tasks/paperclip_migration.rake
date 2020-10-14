@@ -2,11 +2,14 @@
 namespace :paperclip do
   task migrate: :environment do
     arr = Array.new
-    ApplicationRecord.descendants.reject(&:abstract_class?).each { |klass| arr.push(klass) }
-
+    #incase we will need to migrate all attachment tables to activestorage
+    #ApplicationRecord.descendants.reject(&:abstract_class?).each { |klass| arr.push(klass) }
+    arr = [ProcurementAttachment]
     while model = arr.pop
       begin
-        attachments = model.column_names.filter { |column| column.match?(/(.+)_file_name$/) }.map { |column| column[/(?<name>\w*)_file_name/, :name] }
+        #incase we will need to migrate all attachment tables to activestorage
+        #attachments = model.column_names.filter { |column| column.match?(/(.+)_file_name$/) }.map { |column| column[/(?<name>\w*)_file_name/, :name] }
+        attachments = ['file']
         next if attachments.blank?
         attachments.each do |attachment|
           query = <<~SQL
