@@ -97,7 +97,7 @@ class Masters::Vendors::Form < Forms::API
   section :business_details, associate_custom_fields: true do
     auto_number :vendor_id, label: "Vendor ID", sequence: {prefix: "VNDR.", start_at: '000001'}
     dropdown :vendor_country, choices_scope: Choices[:list].({id: 'India', name: "India"}, {id: 'International', name: "International"}),
-             required: true
+             required: true, default_value: 'India'
     lookup :policy_id,
            choices_scope: Choices[:lookup].('policies', permissions: [:vendor_creator, :vendor_manager]),
            required: true
@@ -107,28 +107,30 @@ class Masters::Vendors::Form < Forms::API
     text :name, label: 'Trade Name', required: true
     switch :gst_registered, label: "GST Registered"
     large_text :address, label: "Full Address"
-      # dropdown :vendor_type_id, choices_scope: Choices[:lookup].('vendor_types'), label: "Vendor Type"
-      # dropdown :payment_term_id, choices_scope: Choices[:lookup].('payment_terms'), label: "Payment Term"
+    lookup :vendor_type_id, choices_scope: Choices[:lookup].('vendor_types'), label: "Vendor Type"
+    lookup :payment_term_id, choices_scope: Choices[:lookup].('payment_terms'), label: "Payment Term"
   end
 
   section :tax_information, title: "Tax Information & Details", associate_custom_fields: true do
     # PAN
     text :pan
+    attachment :pan_card, system_field: false
     # RCM
     switch :rcm_enabled, label: "RCM Enabled"
 
     # TDS
     dropdown :tds_rates_list_id, choices_scope: Choices[:lookup].('tds_slabs'), label: "TDS Percentage"
-    date :tds_effective_start_date, label: "TDS Effective Start Date"
-    date :tds_effective_end_date, label: "TDS Effective End Date"
+    date :tds_effective_start_date, label: "TDS Effective Start Date", editable: false
+    date :tds_effective_end_date, label: "TDS Effective End Date", editable: false
 
-    attachment :pan_card, system_field: false
+    # Sales Tax Codes
+    lookup :tax_rate_id, choices_scope: Choices[:lookup].('tax_rates'), label: "Sales Tax Code", visible: false, editable: false
   end
 
   section :msme, associate_custom_fields: true do
     # MSME
     switch :msme_registered
-    text :msme_registration_number
+    text :msme_registration_number, editable: false
     attachment :msme_registration_certificate, system_field: false
   end
 
@@ -158,6 +160,8 @@ class Masters::Vendors::Form < Forms::API
       large_text :address
       lookup :gstin_id, visible: false
       text :gstin
+      dropdown :gst_status, choices_scope: Choices[:list].({id: 'Active', name: "Active"}, {id: 'Cancelled', name: "Cancelled"}, {id: 'Provisional', name: 'Provisional'}, {id: 'Inactive', name: 'Inactive'}),
+               required: false
       attachment :gstin_certificate, system_field: false
     end
   end
@@ -166,7 +170,8 @@ class Masters::Vendors::Form < Forms::API
     data_map :bank_accounts, populate_if_empty: BankAccount, min_items: 1 do
       text :name, required: true
       text :account_number, required: true
-      text :ifsc, required: true
+      text :confirm_account_number, required: true, system_field: false
+      text :ifsc, label: "IFSC / Bank Code", required: true
       switch :default_account
       switch :disabled, default_value: false
       attachment :cancelled_cheque, system_field: false
@@ -176,6 +181,31 @@ class Masters::Vendors::Form < Forms::API
   section :attachments, associate_custom_fields: true do
     attachment :tax_exemption_certificate, system_field: false
     attachment :other_documents, system_field: false
+    attachment :tax_residency_certificate, label: 'Tax Residency Certificate', system_field: false, visible: false, editable: false
+    attachment :form_10f, label: 'Form 10 F', system_field: false, visible: false, editable: false
+    attachment :no_pe_declaration, label: 'No PE Declaration', system_field: false, visible: false, editable: false
+
+  end
+
+  condition condition_id: :attachment_tax_residency_for_international_vendors do
+    reference :entity, :tax_residency_certificate
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    action :editable, true
+    action :visible, true
+  end
+
+  condition condition_id: :attachment_form_10f_for_international_vendors do
+    reference :entity, :form_10f
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    action :editable, true
+    action :visible, true
+  end
+
+  condition condition_id: :attachment_no_pe_for_international_vendors do
+    reference :entity, :no_pe_declaration
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    action :editable, true
+    action :visible, true
   end
 
   condition condition_id: :pan_for_indian_vendors do
@@ -196,6 +226,14 @@ class Masters::Vendors::Form < Forms::API
     action :required, false
   end
 
+  condition condition_id: :tax_rate_international_vendors do
+    reference :entity, :tax_rate_id
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    action :editable, true
+    action :visible, true
+    action :active, true
+  end
+
   condition condition_id: :tds_for_indian_vendors do
     reference :entity, :tds_rates_list_id
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
@@ -205,16 +243,32 @@ class Masters::Vendors::Form < Forms::API
     action :required, false
   end
 
+  condition condition_id: :tds_start_date_editable_when_tds_present do
+    reference :entity, :tds_effective_start_date
+    rule Rules::Builder[:tds_rates_list_id].present
+    action :editable, true
+  end
+
+  condition condition_id: :tds_end_date_editable_when_tds_present do
+    reference :entity, :tds_effective_end_date
+    rule Rules::Builder[:tds_rates_list_id].present
+    action :editable, true
+  end
+
   condition condition_id: :tds_start_date_for_indian_vendors do
     reference :entity, :tds_effective_start_date
-    rule Rules::Builder[:tds_rates_list_id].blank
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, false
+    action :visible, false
+    action :active, false
   end
 
   condition condition_id: :tds_end_date_for_indian_vendors do
     reference :entity, :tds_effective_end_date
-    rule Rules::Builder[:tds_rates_list_id].blank
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, false
+    action :visible, false
+    action :active, false
   end
 
 
@@ -227,17 +281,28 @@ class Masters::Vendors::Form < Forms::API
     action :active, false
     action :required, false
   end
-  condition condition_id: :msme_number_when_msme_registered do
-    reference :entity, :msme_registration_number
-    rule Rules::Builder[:msme_registered].blank
-    action :editable, false
-  end
+
+
   condition condition_id: :msme_number_for_indian_vendors do
     reference :entity, :msme_registration_number
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, false
     action :visible, false
     action :active, false
+    action :required, false
+  end
+
+  condition condition_id: :msme_number_when_msme_registered do
+    reference :entity, :msme_registration_number
+    rule Rules::Builder[:msme_registered].present
+    action :editable, true
+  end
+
+  condition condition_id: :attachment_msme_for_indian_vendors do
+    reference :entity, :msme_registration_certificate
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    action :editable, false
+    action :visible, false
     action :required, false
   end
 
@@ -277,15 +342,45 @@ class Masters::Vendors::Form < Forms::API
     action :editable, false
   end
 
+  condition condition_id: :attachment_lower_exemption_certificate_for_indian_vendors do
+    reference :entity, :lower_exception_certificate
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    action :editable, false
+    action :visible, false
+    action :required, false
+  end
 
-  condition condition_id: :gst_for_indian_vendors do
-    reference :entity, :gst_registered
+  condition condition_id: :gstin_for_indian_vendors do
+    reference :entity, 'gstin_locations.gstin'
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, false
     action :visible, false
     action :active, false
     action :required, false
   end
+
+  condition condition_id: :gst_status_for_indian_vendors do
+    reference :entity, 'gstin_locations.gst_status'
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    action :editable, false
+    action :visible, false
+    action :active, false
+    action :required, false
+  end
+
+  condition condition_id: :attachment_gstin_certificate_for_indian_vendors do
+    reference :entity, 'gstin_locations.gstin_certificate'
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    action :editable, false
+    action :visible, false
+    action :required, false
+  end
+
+    # validation validation_id: :"confirm bank account" do
+    #   reference 'bank_accounts.confirm_account_number'
+    #   error_message "doesn't match with account number"
+    #   rule Rules::Builder['bank_accounts.account_number'].not_eq(entity: 'bank_accounts.confirm_account_number')
+    # end
 
 
   # condition condition_id: :department_id_editable do

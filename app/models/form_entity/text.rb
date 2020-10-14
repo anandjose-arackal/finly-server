@@ -68,6 +68,7 @@ class FormEntity::Text < FormEntity
 
   contract_eval 'Max Char Limit Check', &Forms::Validations::Templates[:maximum]
   contract_eval 'Min Char Limit Check', &Forms::Validations::Templates[:minimum]
+  contract_eval 'Regex Check', &Forms::Validations::Templates[:regex_match]
   # Todo regex
 
   schema_validation do

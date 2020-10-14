@@ -4170,6 +4170,17 @@ Rails.application.routes.draw do
     get 'procurements', to: "vendors#procurements"
     get 'transactions', to: "vendors#transactions"
   end
+
+  # ****************************************************
+  # NEW VENDOR FORMS
+
+  # Vendor Forms API
+  post 'vendor_forms/create_and_submit', to: "vendor_forms#create_and_submit"
+  resources :vendor_forms do
+    put 'submit', to: "vendor_forms#submit"
+  end
+
+
   ######### New Vendor Empanelment Ends ##
 
 
