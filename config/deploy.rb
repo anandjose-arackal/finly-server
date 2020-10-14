@@ -105,9 +105,16 @@ when :yes_bank_balance_poller
   linked_files << 'config/bunny.yml'
 end
 set :linked_files, linked_files
-set :linked_dirs, %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/uploads}
+set :linked_dirs, %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/uploads node_modules client/node_modules}
 set :keep_releases, 5
+set :nvm_type, :user # or :system, depends on your nvm setup
+set :nvm_node, 'v12.18.3'
+set :nvm_map_bins, %w{node npm yarn}
 
+set :yarn_target_path, -> { release_path.join('client') } #
+set :yarn_flags, '--production --silent --no-progress'    # default
+set :yarn_roles, :all                                     # default
+set :yarn_env_variables, {}
 
 # set :rails_env, "staging"
 # set :rails_env, 'production'
@@ -120,6 +127,15 @@ set :keep_releases, 5
 set :rollbar_token, 'ca504254626b4bf69eb1a1ec0b3aea23'
 set :rollbar_env, Proc.new { fetch :stage }
 set :rollbar_role, Proc.new { :app }
+
+set :sentry_host, 'https://sentry.finly.io/' # https://sentry.io by default
+set :sentry_api_token, 'bed720c1d80849fcbc96fba0485460e6'
+set :sentry_organization, 'finly' # fetch(:application) by default
+set :sentry_project, 'finly-server'     # fetch(:application) by default
+set :sentry_repo, 'finlycore/finly-server' # computed from repo_url by default
+
+before 'deploy:starting', 'sentry:validate_config'
+after 'deploy:published', 'sentry:notice_deployment'
 
 set :puma_rackup, -> { File.join(current_path, 'config.ru') }
 set :puma_state, "#{shared_path}/tmp/pids/puma.state"
@@ -151,6 +167,18 @@ set :slackistrano, {
     slack_via_slackbot: true
 }
 
+before "deploy:assets:precompile", "deploy:yarn_install"
+
+namespace :deploy do
+  desc 'Run rake yarn:install'
+  task :yarn_install do
+    on roles(:web) do
+      within release_path do
+        execute("cd #{release_path} && yarn install")
+      end
+    end
+  end
+end
 # before 'disable_secure_storage', 'runner:restart'
 #
 # # Restart runner

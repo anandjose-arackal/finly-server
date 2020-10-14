@@ -80,10 +80,11 @@ class YesBankVendor < ApplicationRecord
   has_many :bank_accounts, as: :account_owner, dependent: :destroy
   has_many :receiving_payments, as: :receiving_user, class_name: 'Payment'
   has_many :vendor_attachments
+  # todo - I2P - fix custom fields
   # has_many :custom_fields, as: :parent, dependent: :destroy
-  has_many :custom_fields, as: :document, class_name: "FormCustomField", dependent: :destroy
-  has_many :form_custom_fields, class_name: 'FormCustomField', as: :document, dependent: :destroy
-  has_many :vendor_tds_rates, dependent: :destroy, foreign_key: :vendor_id
+  has_many :custom_fields, as: :document, class_name: "FormCustomField"
+  has_many :form_custom_fields, class_name: 'FormCustomField', as: :document
+  has_many :vendor_tds_rates, foreign_key: :vendor_id
   has_many :tds_rates, through: :vendor_tds_rates
   has_many :beneficiary_payments, foreign_key: :vendor_id
   has_many :gstin_locations, foreign_key: :vendor_id
@@ -169,6 +170,7 @@ class YesBankVendor < ApplicationRecord
       where status_id: status_id
     end
   }
+
   scope :filter_policy_id, -> (policy_id) {where policy_id: policy_id}
   scope :filter_created_by_id, -> (user_id) {where created_by_id: user_id}
   scope :filter_business_name, -> (term) {where("business_name like ?", "%#{term}%")}
@@ -370,6 +372,13 @@ class YesBankVendor < ApplicationRecord
       end
     end
     return statuses.uniq
+  end
+
+  def self.awaiting_records user
+    user_id = user.id
+    if user_id.present?
+      self.awaiting_action_items(user_id).where.not(status_id: VendorStatus.id_for(:auto_approved))
+    end
   end
 
   def self.initiator_associated_items(user, role_id=nil)

@@ -24,7 +24,7 @@ class Policy::Mappings::DepartmentMapping::Index < Policy::Base
 
     def init
       self.policy = params[:policy]
-      self.department_mapping = policy.company.departments.arrange_serializable(order: :name) do |parent, children|
+      self.department_mapping = policy.company.departments.non_deleted.arrange_serializable(order: :name) do |parent, children|
         {
           id: parent.id,
           name: parent.name,

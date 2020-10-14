@@ -512,6 +512,15 @@ class BankPaymentRequest < ApplicationRecord
     self.owner
   end
 
+  def self.awaiting_records user
+    user_id = user.id
+    if user_id.present?
+      where("#{table_name}.status_id": BankPaymentRequestStatus.ids_for(:processing)).awaiting_action_items(user_id)
+    else
+      self.none
+    end
+  end
+
   def initiating_account
     self.payment_order.payments.first.initiating_account
   end

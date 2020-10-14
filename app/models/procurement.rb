@@ -34,7 +34,7 @@ class Procurement < ApplicationRecord
   belongs_to :vendor, optional: true, class_name: "YesBankVendor"
 
   has_one :purchase_order, -> { where.not purchase_order_status_id: PurchaseOrderStatus.id_for(:po_revised) }, dependent: :destroy
-  has_many :po_revisions, -> {where purchase_order_status_id: PurchaseOrderStatus.id_for(:po_revised)}, class_name: 'PurchaseOrder', dependent: :destroy
+  # has_many :po_revisions, -> { where purchase_order_status_id: PurchaseOrderStatus.id_for(:po_revised) }, class_name: 'PurchaseOrder', dependent: :destroy
   # has_many :po_revisions, class_name: 'PurchaseOrder', dependent: :destroy, foreign_key: :revised_po_id
   has_many :inward_documents, dependent: :destroy
   has_many :invoices, dependent: :destroy
@@ -608,6 +608,10 @@ class Procurement < ApplicationRecord
 
   def po_procurement?
     self.procurement_type == 'purchase_order'
+  end
+
+  def po_revisions
+    PurchaseOrder.where( purchase_order_status_id: PurchaseOrderStatus.id_for(:po_revised), procurement_id: id )
   end
 
   def as_json

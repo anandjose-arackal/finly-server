@@ -40,9 +40,9 @@ require 'capistrano/sidekiq/monit'
 # require 'capistrano/sneakers'
 require 'capistrano/rails/console'
 
-require 'capistrano/hutch'
 # adding rollbar capistrano for deploy tracking
 require 'rollbar/capistrano3'
+require 'capistrano/sentry'
 require 'finly/secure_storage/capistrano/connector'
 
 # require 'slackistrano/capistrano'

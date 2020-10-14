@@ -2,6 +2,7 @@ exposure = record.to_exposure
 json.id record.id
 json.invoice_id record.invoice_id
 json.invoice_number record.invoice_number
+json.narration record.narration
 json.created_by do
   json.first_name record.created_by&.first_name
   json.last_name record.created_by&.last_name
@@ -37,6 +38,7 @@ if record.vendor.present?
     json.vendor_id record.vendor.vendor_id
     json.business_name record.vendor.business_name
     json.trade_name record.vendor.trade_name
+    json.tax_id record.vendor.pan
   end
   # else
   # json.vendor nil

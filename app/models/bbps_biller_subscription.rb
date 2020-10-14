@@ -85,7 +85,7 @@ class BbpsBillerSubscription < ApplicationRecord
 
   has_many :pocs, class_name: 'User', through: :subscription_pocs, source: :user
   has_many :bbps_bills, class_name: 'BbpsBill', foreign_key: :subscription_id
-  has_many :attachments, as: :resource, dependent: :destroy
+  has_many :attachments, as: :resource
 
   has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment'
   has_many :receiving_payments, foreign_key: 'receiving_user_id', class_name: 'Payment'
@@ -94,8 +94,9 @@ class BbpsBillerSubscription < ApplicationRecord
 
   delegate :draft?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :deactivated?, :reactivated?, to: :status
 
-
-  default_scope {order('bbps_biller_subscriptions.created_at DESC')}
+  def self.default_scope
+    unscoped.order('bbps_biller_subscriptions.created_at DESC')
+  end
 
   scope :filter_ids, -> (ids) {where(id: ids)}
 
@@ -287,6 +288,11 @@ class BbpsBillerSubscription < ApplicationRecord
     end
     parameters.with_indifferent_access
   end
+
+  def self.awaiting_records user
+    where("#{table_name}.status_id": BbpsBillerSubscriptionStatus.id_for(:awaiting_approval)).awaiting_action_items(user&.id)
+  end
+
   # display_name  used  in  payment  file  creation method to  print the  beneficiary name
   def display_name
       self.biller&.biller_name

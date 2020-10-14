@@ -537,10 +537,13 @@ class BbpsBill < ApplicationRecord
     options[:plural] ? 'Utility Bills' : 'Utility Bill'
   end
 
+  def self.awaiting_records user
+    where("#{table_name}.status_id": BbpsBillStatus.id_for(:awaiting_approval)).awaiting_action_items( user&.id )
+  end
+
   def payable?
     BbpsBillStatus.ids_for(:approved, :auto_approved).include?(self.status_id)
   end
-
 
   # Used for tracking completion %
   def review_pending?

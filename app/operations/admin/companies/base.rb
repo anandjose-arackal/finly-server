@@ -29,7 +29,13 @@ class Admin::Companies::Base < Admin::Base
                                       :budgeting_system,
                                       :invoicing_system,
                                       :vendor_empanelment_workflow,
-                                      :purchase_requisition_system
+                                      :purchase_requisition_system,
+                                      :grn_enabled,
+                                      :srn_enabled,
+                                      :agreement_based_payment_system,
+                                      :gstin_verification_enabled,
+                                      :utility_bills_enabled,
+                                      :analytics_system
     ])
   end
 
