@@ -156,6 +156,7 @@ gem 'bootstrap-will_paginate', '~> 1.0'
 # gem for image manipulation
 gem 'paperclip', '~> 6.1.0'
 gem 'paperclip-azure', '~> 1.0'
+gem 'active_storage_validations'
 # Bundle for Bootstrap
 gem 'bootstrap-sass', '~> 3.4.0'
 
