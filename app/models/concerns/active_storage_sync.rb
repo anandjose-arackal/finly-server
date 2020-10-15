@@ -16,12 +16,13 @@ module ActiveStorageSync
                       nil
                     end
     return if picture_types.nil?
-    transfer_to_active_storage(picture_types)
+    transfer_to_active_storage(['file'])
   end
 
   private
 
   def transfer_to_active_storage(picture_types)
+    return true unless Rails.env.production?
     picture_types.each do |picture_type|
       next unless send("saved_change_to_#{picture_type}_updated_at?") ^ @is_migration
       next unless send(picture_type.to_s).exists?
@@ -30,9 +31,8 @@ module ActiveStorageSync
         remove_active_storage
         next
       end
-      storage_account_name = 'finlyimages'
-      container_name = 'finly-images'
-      tempfile = open(URI.parse(URI.escape("https://#{storage_account_name}.blob.core.windows.net/#{container_name}/" + key(picture_type.to_s))))
+      azure_config = Rails.application.config_for(:azure_config)&.with_indifferent_access
+      tempfile = open(URI.parse(URI.escape("https://#{azure_config["storage_account_name"]}.blob.core.windows.net/#{azure_config["container"]}/" + key(picture_type.to_s))))
       ActiveRecord::Base.transaction do
         blob = ActiveStorage::Blob.create_after_upload!(
             io: tempfile,
@@ -52,12 +52,10 @@ module ActiveStorageSync
 
   def key(attachment)
     filename = send("#{attachment}_file_name")
-    fingerprint = send("#{attachment}_fingerprint")
     klass = self.class.table_name
     id = self.id
     id_partition = ("%09d".freeze % id).scan(/\d{3}/).join("/".freeze)
-
-    "#{klass}/#{attachment.pluralize}/#{id_partition}/original/#{fingerprint}#{filename}"
+    "#{klass}/#{attachment.pluralize}/#{id_partition}/original/#{filename}"
   end
 
   def remove_active_storage
