@@ -15,7 +15,7 @@ class InvoiceIndex < SearchIndex::Model
           status_name: record.status&.name&.titleize,
           sequence_id: record.invoice_id,
           invoice_number: record.invoice_number,
-          narration: record.note,
+          narration: record.narration,
           cost_center_names: record.line_items.map { |line_item| line_item.cost_center&.name },
           cost_center_codes: record.line_items.map { |line_item| line_item.cost_center&.cost_center_code },
           department_names: record.line_items.map { |line_item| line_item.department&.name },

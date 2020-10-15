@@ -14,7 +14,7 @@ class PurchaseOrderIndex < SearchIndex::Model
           status_id: record.status&.id,
           status_name: record.status&.name&.titleize,
           sequence_id: record.purchase_order_number,
-          narration: record.note,
+          narration: record.vendor_note,
           cost_center_names: record.line_items.map { |line_item| line_item.cost_center&.name },
           cost_center_codes: record.line_items.map { |line_item| line_item.cost_center&.cost_center_code },
           department_names: record.line_items.map { |line_item| line_item.department&.name },
