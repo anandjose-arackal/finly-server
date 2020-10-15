@@ -45,6 +45,7 @@ module ActiveStorageSync
             record_type: self.class.name,
             record_id: id
         )
+        blob.update_columns(storage_url: blob.service_url)
       end
       clear_attribute_changes(["#{picture_type}_updated_at"])
     end
