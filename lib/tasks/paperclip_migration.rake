@@ -1,6 +1,6 @@
 
 namespace :paperclip do
-  task migrate_local_assets_to_azure do
+  task migrate_local_assets_to_azure: :environment do
     desc 'migrate local file to azure' do
       client = Azure::Storage::Blob::BlobService.create(storage_account_name: 'dummyblobstorage',
                                                         storage_access_key: 'LRbNMxGIRdWYy5mMg456LDDmKg+GhWDQYSdYXHZPIgOLPf/+iLOoEN8qY8d4fWxLGiueM5oozWhOpFfsKfpo/Q==' )
