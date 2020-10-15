@@ -11,7 +11,7 @@ class FeatureToggle
   end
 
   def enabled?(feature, default = false)
-    flag = flags&.dig(normalize_key(feature))
+    flag = flags[normalize_key(feature)]
     return default if flag.nil?
 
     flag[:enabled]
