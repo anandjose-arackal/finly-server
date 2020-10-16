@@ -27,7 +27,6 @@ class Docs::P2P::Vendors::Ops::CreateAndSubmit < Transactions::API
 
     unless op.success?
       add_message options, :error, :base, op.messages[:errors]
-      return
     end
 
     true

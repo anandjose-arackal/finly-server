@@ -11,7 +11,10 @@ class VendorFormsController < BaseControllers::WebBase
   end
 
   def create_and_submit
-    endpoint Docs::P2P::Vendors::Ops::CreateAndSubmit
+    @op = Docs::P2P::Vendors::Ops::CreateAndSubmit.({params: params.to_unsafe_h, current_user: current_user})
+    respond_to do |format|
+      format.json {}
+    end
   end
 
   def update

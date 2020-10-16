@@ -1,7 +1,5 @@
 class VendorsController < BaseControllers::WebBase
 
-  layout :resolve_layout
-
   def filter_config
     @result = Vendors::FilterConfig.(current_user, params)
     respond
