@@ -49,6 +49,20 @@ Rails.application.configure do
     }
   end
 
+  posthog_config = Rails.application.config_for(:posthog)&.with_indifferent_access
+  if posthog_config.present? and posthog_config['enabled']
+    config.posthog = PostHog::Client.new(
+        {
+            api_key: posthog_config['api_key'],
+            api_host: posthog_config['api_host'],
+            # Todo log errors
+            on_error: Proc.new { |status, msg| print msg }
+        }
+    )
+  else
+    config.posthog = nil
+  end
+
   config.lograge.custom_payload do |controller|
     user = controller.current_user
     params = RequestStore.store[:request_params]&.except(:password, :password_confirmation)
