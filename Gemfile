@@ -10,7 +10,7 @@ gem 'nokogiri', '~> 1.10.0'
 gem 'autoprefixer-rails', '~> 9.4.4'
 
 gem 'fiscali', '~> 2.4'
-
+gem 'redis', '~> 4.1'
 gem 'parslet', '~> 1.8.2'
 gem 'rack', github: 'rack/rack', :ref => 'f690bb71425aa31d7b9b3113829af773950d8ab5'
 gem 'rufus-scheduler', '~> 3.6'
@@ -198,8 +198,12 @@ gem 'devise', '~> 4.7'
 gem 'devise_invitable', '~> 2.0', '>= 2.0.2'
 gem 'doorkeeper', '~> 5.0.2'
 
+gem 'meilisearch', '~> 0.13'
+
 gem 'faraday', '~> 0.15.4'
 gem 'faraday_middleware', '~> 0.12.2'
+
+gem 'posthog-ruby', '~> 1.0'
 # gem for xml parsing
 gem 'liquid', '~> 4.0.1'
 
@@ -224,6 +228,7 @@ gem 'aasm', '~> 5.0.1'
 gem 'activerecord-import', '~> 1.0', '>= 1.0.3'
 gem 'parallel', '~> 1.18'
 gem 'string_pattern', '~> 2.2', '>= 2.2.1'
+# gem 'bullet-train-client', '~> 1.1'
 # gem 'slackistrano'
 
 # adding aws-sdk gem for using their API enabled services

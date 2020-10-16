@@ -2,7 +2,7 @@ class Docs::P2P::CreditNotes::Mailers::Reject < Docs::P2P::CreditNotes::Mailers:
 
   class Docs::P2P::CreditNotes::Mailers::Reject::RejectedBy < Docs::P2P::CreditNotes::Mailers::Reject
 
-    consumes_event! 'credit_note.reject'
+    consumes_event! 'credit_notes.reject'
 
     assign :to do |user, params|
       [user.email]
@@ -23,7 +23,7 @@ class Docs::P2P::CreditNotes::Mailers::Reject < Docs::P2P::CreditNotes::Mailers:
 
   class Docs::P2P::CreditNotes::Mailers::Reject::RejectedTo < Docs::P2P::CreditNotes::Mailers::Reject
 
-    consumes_event! 'credit_note.reject'
+    consumes_event! 'credit_notes.reject'
 
     assign :to do |user, params|
       [params[:record]&.user&.email]

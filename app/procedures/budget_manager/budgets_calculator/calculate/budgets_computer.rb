@@ -9,7 +9,7 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
 
   include Events::Consumer
 
-  consumes_event! 'budget.update'
+  consumes_event! 'budgets.update'
 
   def work(user, payload)
     self.class.(params: payload, current_user: user)

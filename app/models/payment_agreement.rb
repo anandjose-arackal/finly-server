@@ -37,6 +37,9 @@ class PaymentAgreement < ApplicationRecord
 
   include Transitionable, SoftDeletable
   include Sequenced::ActsAsSequenced
+  include SearchIndex::Concerns::Document
+
+  event_channel 'agreements'
 
   acts_as_sequenced column: :order_number, purpose: :payment_agreement, editable: false, prefix: 'PA'
 

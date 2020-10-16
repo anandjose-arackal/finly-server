@@ -46,6 +46,7 @@ class BankPaymentRequest < ApplicationRecord
           CustomFieldFilterSupport
   include LiquidDroppable
   include Exposures::Model::Exposable
+  include SearchIndex::Concerns::Document
 
 
   belongs_to :status, optional: true, class_name: "BankPaymentRequestStatus"
@@ -68,8 +69,6 @@ class BankPaymentRequest < ApplicationRecord
 
   accepts_nested_attributes_for :payment_order
   accepts_nested_attributes_for :requested_amount
-
-  event_channel 'bank_payment_request'
 
   # i.e. a payment request cannot exist without a payment order
   validates :payment_order, presence: true
@@ -529,7 +528,7 @@ class BankPaymentRequest < ApplicationRecord
     self.payment_order.payments.first.initiating_account_type_name
   end
 
-  def status_name(user_id)
+  def status_name(user_id=nil)
     if self.status_id == BankPaymentRequestStatus.id_for(:processing)
       if user_id == self.controlling_user_id
         return "awaiting_approval"

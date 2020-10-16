@@ -19,6 +19,25 @@ Rails.application.configure do
   #   config.dsn = YAML.load_file(Rails.root.join('config/sentry.yml'))['dsn']
   # end
 
+  feature_flipper_config = Rails.application.config_for(:feature_flipper)&.with_indifferent_access
+  if feature_flipper_config.dig('api_key').present? and feature_flipper_config.dig('url').present?
+    config.bullet_train = BulletTrain.new(api_key: feature_flipper_config['api_key'], url: feature_flipper_config['url'])
+  else
+    config.bullet_train = nil
+  end
+
+  redis_config = Rails.application.config_for(:redis_config)&.with_indifferent_access
+  config.redis = Redis.new(redis_config.slice('url', 'password'))
+
+  meilisearch_config = Rails.application.config_for(:meilisearch)&.with_indifferent_access
+  if meilisearch_config['enabled']
+    config.meilisearch = MeiliSearch::Client.new(meilisearch_config['url'], meilisearch_config['api_key'])
+    config.meilisearch_index_prefix = meilisearch_config['index_prefix']
+    config.meilisearch_monitor = true
+  else
+    config.meilisearch = nil
+  end
+
   config.lograge.enabled = true
   # config.lograge.keep_original_rails_log = true
   config.lograge.logger = ActiveSupport::Logger.new "#{Rails.root}/log/logstash_#{Rails.env}.log"
@@ -127,7 +146,7 @@ Rails.application.configure do
   config.action_mailer.raise_delivery_errors = true
 
   ################### SETTINGS FOR EMAIL ##########################
-  config.mailer_config = config_for(:mailer_config)
+  config.mailer_config = config_for(:mailer_config)&.with_indifferent_access
   config.action_mailer.default_url_options = {host: config.mailer_config['host']}
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {

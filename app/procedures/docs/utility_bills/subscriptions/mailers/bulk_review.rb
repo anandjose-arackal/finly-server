@@ -1,6 +1,6 @@
 class Docs::UtilityBills::Subscriptions::Mailers::BulkReview < Docs::UtilityBills::Subscriptions::Mailers::Base
 
-  # consumes_event! 'bbps_biller_subscription.approve'
+  # consumes_event! 'bbps_biller_subscriptions.approve'
 
   assign :tables do |user, params|
     tables = []
