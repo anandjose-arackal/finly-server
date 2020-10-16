@@ -11,7 +11,7 @@ class BbpsBillerSubscriptionIndex < SearchIndex::Model
     route 'utility_bill_master/{{record_id}}/params={}'
     layout(
         {
-            fixed_left: [:description, :sequence_id],
+            fixed_left: [:description, :sequence_id, :vendor_name],
             fixed_right: [:created_by_name, :created_by_email, :status_name]
         }
     )
