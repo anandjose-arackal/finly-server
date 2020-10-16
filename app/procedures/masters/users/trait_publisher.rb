@@ -24,7 +24,7 @@ module Masters
           end
         end
 
-        def work(current_user, payload)
+        def work(user, payload)
           company = payload[:record]
           return if IGNORE_LIST.include?(company.id)
           return if Rails.configuration.bullet_train.nil? and Rails.configuration.posthog.nil?
@@ -75,7 +75,7 @@ module Masters
           end
         end
 
-        def work(current_user, payload)
+        def work(user, payload)
           return if Rails.configuration.bullet_train.nil? and Rails.configuration.posthog.nil?
 
           user = payload[:record]
@@ -136,7 +136,7 @@ module Masters
           end
         end
 
-        def work(current_user, payload)
+        def work(user, payload)
           return if Rails.configuration.bullet_train.nil? and Rails.configuration.posthog.nil?
 
           role_mapping = payload[:record]
@@ -175,7 +175,7 @@ module Masters
           end
         end
 
-        def work(current_user, payload)
+        def work(user, payload)
           user_session = payload[:record]
           return if user_session.blank?
           return if Rails.configuration.bullet_train.nil? and Rails.configuration.posthog.nil?
