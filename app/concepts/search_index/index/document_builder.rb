@@ -76,7 +76,9 @@ class SearchIndex::Index::DocumentBuilder
   end
 
   def rebuild_documents(dry_run: false)
-    model.includes(include_associations).find_in_batches do |batch|
+    puts "Rebuilding Index"
+    records = 0
+    model.includes(include_associations).find_in_batches(batch_size: 200) do |batch|
       data = []
       batch.each do |record|
         next if condition.present? and not condition.call(record)
@@ -88,9 +90,12 @@ class SearchIndex::Index::DocumentBuilder
       index_api.index.add_documents data.compact
       break if dry_run
 
+      records += batch.size
+      puts "Completed Records: #{records}"
       # This is to avoid Net::ReadTimeout (Net::ReadTimeout)
-      sleep 1
+      sleep 1.seconds
     end
+    puts "Completed successfully"
   end
 
   def index_record(record)
