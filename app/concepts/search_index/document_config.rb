@@ -67,7 +67,6 @@ class SearchIndex::DocumentConfig
 
   def index_record(record)
     index = index_api.index
-    debugger
     if condition.blank? or condition.call(record)
       data = build_record_data(record)
       return if data.blank?
