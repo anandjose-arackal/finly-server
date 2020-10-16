@@ -29,6 +29,10 @@ config/icici_prepaid_card.yml
 config/finly_macros.yml
 public/system/import_job/*
 config/feature_flipper.yml
+config/meilisearch.yml
+config/posthog.yml
+data.ms/
+
 
 .rubocop.yml
 .vscode/
@@ -93,3 +97,9 @@ config/hutch.yml
 
 public/tmp
 config/integrations.yml
+/public/packs
+/public/packs-test
+/node_modules
+/yarn-error.log
+yarn-debug.log*
+.yarn-integrity

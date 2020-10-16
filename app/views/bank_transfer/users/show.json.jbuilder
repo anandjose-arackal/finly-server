@@ -23,6 +23,7 @@ json.actions @result.actions
 
 json.permissions do
   json.create_beneficiaries @result.selected_user.permission.create_beneficiaries
+  json.edit_terms_within_po @result.selected_user.permission.edit_terms_within_po
 end
 
 json.bank_accounts do

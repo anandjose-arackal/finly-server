@@ -46,10 +46,6 @@ class RequestStoreUtil
     RequestStore.store[:current_token] = token
   end
 
-  def self.set_request_impression(request_impression)
-    RequestStore.store[:request_impression] = request_impression
-  end
-
   def self.set_current_admin_user(admin_user)
     RequestStore.store[:current_admin_user] = admin_user
   end
@@ -78,7 +74,6 @@ class RequestStoreUtil
         current_session_event_id: RequestStore.store[:current_session_event]&.id,
         current_token_id: RequestStore.store[:current_token]&.id,
         authorized_scopes: RequestStore.store[:authorized_scopes],
-        request_impression_id: RequestStore.store[:request_impression]&.id,
         current_admin_user_id: RequestStore.store[:current_admin_user]&.id,
         x_finly_rp_attributes: RequestStore.store[:x_finly_rp_attributes],
         params: RequestStore.store[:params]
@@ -98,7 +93,6 @@ class RequestStoreUtil
       RequestStore.store[:current_session_event] = UserSessionEvent.find_by_id(request_store_data[:current_session_event_id])
     end
     RequestStore.store[:current_token] = Doorkeeper::AccessToken.find_by_id(request_store_data[:current_token_id])
-    RequestStore.store[:request_impression] = RequestImpression.find_by_id(request_store_data[:request_impression_id])
     RequestStore.store[:current_admin_user] = AdminUser.find_by_id(request_store_data[:current_admin_user_id])
     RequestStore.store[:x_finly_rp_attributes] = request_store_data[:x_finly_rp_attributes]
 
@@ -158,10 +152,6 @@ class RequestStoreUtil
 
   def self.current_token
     RequestStore.store[:current_token]
-  end
-
-  def self.request_impression
-    RequestStore.store[:request_impression]
   end
 
   def self.current_admin_user

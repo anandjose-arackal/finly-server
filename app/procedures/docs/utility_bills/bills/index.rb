@@ -212,21 +212,21 @@ class Docs::UtilityBills::Bills::Index < IndexBuilder::API
   end
 
   def self.customer_param_value_1(context)
-    return " " if context[:record].subscription.customer_param_value_1.blank?
+    return " " if context[:record]&.subscription&.customer_param_value_1&.blank?
 
-    "#{context[:record].subscription.customer_param_key_1}: #{context[:record].subscription.customer_param_value_1}"
+    "#{context[:record]&.subscription&.customer_param_value_1}: #{context[:record]&.subscription&.customer_param_value_1}"
   end
 
   def self.customer_param_value_2(context)
-    return " " if context[:record].subscription.customer_param_value_2.blank?
+    return " " if context[:record]&.subscription&.customer_param_value_2&.blank?
 
-    "#{context[:record].subscription.customer_param_key_2}: #{context[:record].subscription.customer_param_value_2}"
+    "#{ context[:record]&.subscription&.customer_param_value_2 }: #{ context[:record]&.subscription&.customer_param_value_2 }"
   end
 
   def self.customer_param_value_3(context)
-    return ' ' if context[:record].subscription.customer_param_value_3.blank?
+    return ' ' if context[:record]&.subscription&.customer_param_value_3&.blank?
 
-    "#{context[:record].subscription.customer_param_key_3}: #{context[:record].subscription.customer_param_value_3}"
+    "#{ context[:record]&.subscription&.customer_param_value_3 }: #{ context[:record]&.subscription&.customer_param_value_3 }"
   end
 
 end
