@@ -61,6 +61,9 @@ class FormEntity::LargeText < FormEntity
   operators :eq_any, :not_eq_all, :cont_any, :not_cont_all, :blank, :present
   simple_filter :cont_any
 
+  contract_eval 'Max Char Limit Check', &Forms::Validations::Templates[:maximum]
+  contract_eval 'Min Char Limit Check', &Forms::Validations::Templates[:minimum]
+
   schema_validation do
     required(:options) do
       hash do

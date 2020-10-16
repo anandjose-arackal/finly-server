@@ -1,7 +1,7 @@
 class Forms::Contracts::Builders::CustomField
 
-  def self.call(reform, custom_fields)
-    reform.collection :custom_fields, deserializer: Forms::Contracts::Builders::CustomField::Build(custom_fields) do
+  def self.call(reform, form_custom_fields)
+    reform.collection :form_custom_fields, deserializer: Forms::Contracts::Builders::CustomField::Build(form_custom_fields) do
       property :uuid
       property :form_entity_id
       property :field_key
@@ -24,13 +24,13 @@ class Forms::Contracts::Builders::CustomField
     end
   end
 
-  def self.Build(custom_fields)
+  def self.Build(form_custom_fields)
     -> (input, represented, **) do
       # represented.custom_fields = represented.model.present? ? represented.model.custom_fields : []
-      represented.custom_fields = []
-      custom_fields.each do |custom_field_entity|
+      represented.form_custom_fields = []
+      form_custom_fields.each do |custom_field_entity|
         # debugger
-        custom_field = represented.custom_fields.find_by(form_entity_id: custom_field_entity.uuid)
+        custom_field = represented.form_custom_fields.find_by(form_entity_id: custom_field_entity.uuid)
         if custom_field.nil?
           custom_field = build_custom_field custom_field_entity
         end
@@ -38,6 +38,7 @@ class Forms::Contracts::Builders::CustomField
         # Method 2
         case custom_field_entity.entity_type
         when 'dropdown'
+
           custom_field.value = nil
           if custom_field.selection.present?
             custom_field.selection.assign_attributes(form_entity_choice_id: input[custom_field_entity.entity_key])
@@ -45,12 +46,9 @@ class Forms::Contracts::Builders::CustomField
             custom_field.selection = CustomFieldSelection.new(form_entity_choice_id: input[custom_field_entity.entity_key]) if input[custom_field_entity.entity_key].present?
           end
         when 'attachment'
-          # debugger
           custom_field.value = ""
           input[custom_field_entity.entity_key].present? && input[custom_field_entity.entity_key].is_a?(Array) && input[custom_field_entity.entity_key].each do |attachment_obj|
             attachment = CustomFieldAttachment.find_by uuid: attachment_obj[:id]
-
-            # debugger
 
             if attachment.present?
               if attachment_obj[:_destroy].present?
@@ -85,7 +83,7 @@ class Forms::Contracts::Builders::CustomField
         else
           custom_field.value = input[custom_field_entity.entity_key]
         end
-        represented.custom_fields.append(custom_field)
+        represented.form_custom_fields.append(custom_field)
       end
     end
   end

@@ -24,6 +24,7 @@ class FormCustomField < ApplicationRecord
   has_one :selection, class_name: 'CustomFieldSelection'
   has_many :selections, class_name: 'CustomFieldSelection'
   has_many :attachments, class_name: 'CustomFieldAttachment'
+  # has_many :attachments, as: :resource
 
   def retrieve_value
     case self.form_entity&.entity_type

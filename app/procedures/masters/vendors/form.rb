@@ -95,7 +95,7 @@ class Masters::Vendors::Form < Forms::API
   end
 
   section :business_details, associate_custom_fields: true do
-    auto_number :vendor_id, label: "Vendor ID", sequence: {prefix: "VNDR.", start_at: '000001'}
+    auto_number :vendor_id, label: "Vendor ID", sequence: {prefix: "VNDR.", start_at: '000001'}, editable: false, placeholder: "System Generated Field", hint: "System Generated Field"
     dropdown :vendor_country, choices_scope: Choices[:list].({id: 'India', name: "India"}, {id: 'International', name: "International"}),
              required: true, default_value: 'India'
     lookup :policy_id,
@@ -149,7 +149,7 @@ class Masters::Vendors::Form < Forms::API
   # end
 
   section :location_details, associate_custom_fields: true do
-    data_map :gstin_locations, populate_if_empty: GstinLocation, min_items: 1 do
+    data_map :gstin_locations, populate_if_empty: GstinLocation, min_items: 1, associate_custom_fields: true do
       dropdown :state_id, required: true,
                choices_scope: Choices[:enum].(GstStateCode, name: :name)
       text :poc_name, label: "Point of Contact"
@@ -162,18 +162,22 @@ class Masters::Vendors::Form < Forms::API
       text :gstin
       dropdown :gst_status, choices_scope: Choices[:list].({id: 'Active', name: "Active"}, {id: 'Cancelled', name: "Cancelled"}, {id: 'Provisional', name: 'Provisional'}, {id: 'Inactive', name: 'Inactive'}),
                required: false
+      switch :verified, visible: false
+      large_text :gstin_fetch_details, visible: false
       attachment :gstin_certificate, system_field: false
+
     end
   end
 
   section :account_details, associate_custom_fields: true do
-    data_map :bank_accounts, populate_if_empty: BankAccount, min_items: 1 do
+    data_map :bank_accounts, populate_if_empty: BankAccount, min_items: 1, associate_custom_fields: true do
       text :name, required: true
       text :account_number, required: true
       text :confirm_account_number, required: true, system_field: false
       text :ifsc, label: "IFSC / Bank Code", required: true
       switch :default_account
       switch :disabled, default_value: false
+      switch :verified, visible: false
       attachment :cancelled_cheque, system_field: false
     end
   end
@@ -185,6 +189,32 @@ class Masters::Vendors::Form < Forms::API
     attachment :form_10f, label: 'Form 10 F', system_field: false, visible: false, editable: false
     attachment :no_pe_declaration, label: 'No PE Declaration', system_field: false, visible: false, editable: false
 
+  end
+
+  condition condition_id: "Hide Location for International Vendors" do
+    reference :entity, :gstin_locations
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    action :editable, false
+    action :visible, false
+    action :required, false
+    action :active, false
+  end
+
+  condition condition_id: 'Change Required to false for State ID for International Vendor' do
+    reference :entity, 'gstin_locations.state_id'
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    action :editable, false
+    action :visible, false
+    action :required, false
+    action :active, false
+  end
+
+  condition condition_id: "Hide gst_registered for International Vendors" do
+    reference :entity, :gst_registered
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    action :editable, false
+    action :visible, false
+    action :required, false
   end
 
   condition condition_id: :attachment_tax_residency_for_international_vendors do
@@ -214,6 +244,14 @@ class Masters::Vendors::Form < Forms::API
     action :editable, false
     action :visible, false
     action :active, false
+    action :required, false
+  end
+
+  condition condition_id: "Hide PAN Attachment for International Vendors" do
+    reference :entity, :pan_card
+    rule Rules::Builder[:vendor_country].not_eq(value: "India")
+    action :editable, false
+    action :visible, false
     action :required, false
   end
 

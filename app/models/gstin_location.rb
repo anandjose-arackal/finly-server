@@ -29,8 +29,10 @@ class GstinLocation < ApplicationRecord
   belongs_to :gstin_master, class_name: "Gstin", foreign_key: :gstin_id, optional: true
   belongs_to :state, class_name: "GstStateCode", optional: true
 
+  has_many :form_custom_fields, class_name: 'FormCustomField', as: :document
+
   # validates :location, presence: true
-  validates :state_id, presence: true, if: :check_vendor_gstin_registered?
+  # validates :state_id, presence: true, if: :check_vendor_gstin_registered? # todo - I2P : move logic to operations
   validates :gstin, format: Constants::VALID_GSTIN, length: {is: 15}, allow_blank: true
 
   def state_code

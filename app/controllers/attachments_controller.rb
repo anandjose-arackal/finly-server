@@ -13,6 +13,9 @@ class AttachmentsController < BaseControllers::WebBase
   def create_custom_field_attachment
     @result = Attachments::CreateCustomFieldAttachment.(current_user, params)
     respond
+
+      # @result = Attachments::Create.(current_user, params)
+      # respond
   end
 
   def destroy

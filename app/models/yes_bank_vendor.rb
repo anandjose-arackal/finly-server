@@ -81,8 +81,8 @@ class YesBankVendor < ApplicationRecord
   has_many :receiving_payments, as: :receiving_user, class_name: 'Payment'
   has_many :vendor_attachments
   # todo - I2P - fix custom fields
-  # has_many :custom_fields, as: :parent, dependent: :destroy
-  has_many :custom_fields, as: :document, class_name: "FormCustomField"
+  has_many :custom_fields, as: :parent, dependent: :destroy
+  # has_many :custom_fields, as: :document, class_name: "FormCustomField"
   has_many :form_custom_fields, class_name: 'FormCustomField', as: :document
   has_many :vendor_tds_rates, foreign_key: :vendor_id
   has_many :tds_rates, through: :vendor_tds_rates
@@ -426,6 +426,7 @@ class YesBankVendor < ApplicationRecord
     (awaiting_approval? rescue false) && user.vendor_payment_admin? && ( self.dlrms&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id rescue false)
   end
 
+  # todo - I2P : change tradename
   def name
     business_name
   end

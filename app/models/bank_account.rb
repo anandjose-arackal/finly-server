@@ -38,8 +38,7 @@ class BankAccount < ApplicationRecord
   has_many :receiving_payments, as: :receiving_account, class_name: "Payment"
   has_many :finly_transactions, as: :finly_account
 
-  has_many :custom_fields, as: :document, class_name: "FormCustomField", dependent: :destroy
-  has_many :form_custom_fields, class_name: 'FormCustomField', as: :document, dependent: :destroy
+  has_many :form_custom_fields, class_name: 'FormCustomField', as: :document
   # belongs_to :company_id
 
   attr_accessor :confirm_account_number
