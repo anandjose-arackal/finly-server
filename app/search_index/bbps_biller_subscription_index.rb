@@ -16,6 +16,10 @@ class BbpsBillerSubscriptionIndex < SearchIndex::Model
         }
     )
 
+    record_type do |record|
+      'utility_subscriptions'
+    end
+
     serialize do |record|
       {
           vendor_name: record.biller.biller_name,
