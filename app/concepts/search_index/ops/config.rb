@@ -23,7 +23,7 @@ class SearchIndex::Ops::Config < Transactions::API
           :credited, :pending_credit, :adjusted,
       ].map { |i| i.to_s.humanize }.uniq,
       danger: [
-          :rejected, :failed, :cancelled
+          :rejected, :failed, :cancelled, :expired
       ].map { |i| i.to_s.humanize }.uniq
   }.freeze
 
