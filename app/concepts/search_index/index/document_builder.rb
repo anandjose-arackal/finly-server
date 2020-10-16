@@ -37,14 +37,14 @@ class SearchIndex::Index::DocumentBuilder
   def document_id(&block)
     @document_id = block if block_given?
     @document_id ||= lambda { |record|
-      "#{record.class.table_name}_#{record.id}"
+      "#{(self.document_type || record.class.table_name)}_#{record.id}"
     }
   end
 
   def record_type(&block)
     @record_type = block if block_given?
     @record_type ||= lambda { |record|
-      record.class.table_name
+      self.document_type || record.class.table_name
     }
   end
 

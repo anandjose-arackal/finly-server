@@ -14,10 +14,6 @@ class YesBankVendorIndex < SearchIndex::Model
         }
     )
 
-    record_type do |record|
-      'vendors'
-    end
-
     serialize do |record|
       {
           vendor_name: record.business_name,

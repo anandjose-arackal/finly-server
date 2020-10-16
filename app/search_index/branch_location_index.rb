@@ -12,10 +12,6 @@ class BranchLocationIndex < SearchIndex::Model
         }
     )
 
-    record_type do |record|
-      'locations'
-    end
-
     serialize do |record|
       {
           description: record.name,

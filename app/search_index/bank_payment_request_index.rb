@@ -14,10 +14,6 @@ class BankPaymentRequestIndex < SearchIndex::Model
         }
     )
 
-    record_type do |record|
-      'payment_tickets'
-    end
-
     serialize do |record|
       {
           policy_id: record.policy_id,
