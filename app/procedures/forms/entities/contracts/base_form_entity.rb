@@ -121,7 +121,7 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
       property :company_id, deserializer: -> (input, represented, *args) {represented.company_id = represented.contract_root.current_user.company_id}
       property :form_id, deserializer: -> (input, represented, *args) {represented.form_id = represented.contract_root.form_id}
       property :property#, validates: {presence: true}
-      property :value#, validates: {presence: true, inclusion: {in: [true, false]}}
+      property :value, deserializer: -> (input, represented, *args) {represented.value = ['true', true, 1, 'TRUE'].include? input[:value] ? true : false}
 
       validation :condition_actions do
         params do
@@ -130,7 +130,7 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
         end
 
         rule(:value) do
-          key.failure("must be either TRUE or FALSE") unless [true, false].include?(value)
+          key.failure("must be either TRUE or FALSE") unless ['true', 'false', true, false, 1, 0, "TRUE", "FALSE"].include?(value)
         end
       end
     end
