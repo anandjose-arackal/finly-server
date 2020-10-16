@@ -1,7 +1,7 @@
 class BbpsBillIndex < SearchIndex::Model
 
   index Indexes::VpRecords do
-    include_associations(:policy, :status, {subscription: :biller}, {payments: :bbps_bank_transaction}, :created_by)
+    include_associations(:policy, :status, {subscription: :biller}, :payments, :created_by)
 
     serialize do |record|
       {
@@ -9,10 +9,10 @@ class BbpsBillIndex < SearchIndex::Model
           policy_name: record.policy&.name,
           status_id: record.status&.id,
           status_name: record.status&.name&.titleize,
-          sequence_id: record.bill_id,
+          sequence_id: record.sequence_id,
           narration: record.note,
           invoice_number: record.bill_number,
-          vendor_id: record.subscription.subscription_id,
+          vendor_id: record.subscription.sequence_id,
           vendor_name: record.subscription.biller.biller_name,
           category_name: record.subscription.biller.biller_category_name,
           description: record.subscription.name,

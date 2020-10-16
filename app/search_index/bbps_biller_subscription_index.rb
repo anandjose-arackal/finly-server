@@ -11,7 +11,7 @@ class BbpsBillerSubscriptionIndex < SearchIndex::Model
           policy_name: record.policy&.name,
           status_id: record.status_id,
           status_name: record.status&.name&.titleize,
-          sequence_id: record.subscription_id,
+          sequence_id: record.sequence_id,
           description: record.name,
           narration: record.note,
           category_name: record.biller.biller_category_name,
