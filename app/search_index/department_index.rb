@@ -4,10 +4,8 @@ class DepartmentIndex < SearchIndex::Model
 
     serialize do |record|
       {
-          description: record.name,
+          description: record.full_name,
           sequence_id: record.department_code,
-          department_names: [record.name],
-          department_codes: [record.department_code],
           gl_code: record.gl_code
       }
     end
