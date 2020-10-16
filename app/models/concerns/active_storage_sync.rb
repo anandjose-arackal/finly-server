@@ -16,13 +16,12 @@ module ActiveStorageSync
                       nil
                     end
     return if picture_types.nil?
-    transfer_to_active_storage(['file'])
+    transfer_to_active_storage(picture_types)
   end
 
   private
 
   def transfer_to_active_storage(picture_types)
-    return true unless Rails.env.production?
     picture_types.each do |picture_type|
       next unless send("saved_change_to_#{picture_type}_updated_at?") ^ @is_migration
       next unless send(picture_type.to_s).exists?
@@ -31,8 +30,13 @@ module ActiveStorageSync
         remove_active_storage
         next
       end
-      azure_config = Rails.application.config_for(:azure_config)&.with_indifferent_access
-      tempfile = open(URI.parse(URI.escape("https://#{azure_config["storage_account_name"]}.blob.core.windows.net/#{azure_config["container"]}/" + key(picture_type.to_s))))
+      if Rails.env.production?
+        tempfile = open(URI.parse(URI.escape(send("#{picture_type}").send('url'))))
+        #azure_config = Rails.application.config_for(:azure_config)&.with_indifferent_access
+        #tempfile = open(URI.parse(URI.escape("https://#{azure_config["storage_account_name"]}.blob.core.windows.net/#{azure_config["container"]}/" + key(picture_type.to_s))))
+      else
+        tempfile = open(send("#{picture_type}").send('path'))
+      end
       ActiveRecord::Base.transaction do
         blob = ActiveStorage::Blob.create_after_upload!(
             io: tempfile,
@@ -45,7 +49,6 @@ module ActiveStorageSync
             record_type: self.class.name,
             record_id: id
         )
-        blob.update_columns(storage_url: blob.service_url)
       end
       clear_attribute_changes(["#{picture_type}_updated_at"])
     end
