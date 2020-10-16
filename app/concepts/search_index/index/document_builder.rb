@@ -76,7 +76,7 @@ class SearchIndex::Index::DocumentBuilder
   end
 
   def rebuild_documents(dry_run: false)
-    model.includes(include_associations).find_in_batches(batch_size: 200) do |batch|
+    model.includes(include_associations).find_in_batches(batch_size: 1000) do |batch|
       data = []
       batch.each do |record|
         next if condition.present? and not condition.call(record)
@@ -89,7 +89,7 @@ class SearchIndex::Index::DocumentBuilder
       break if dry_run
 
       # This is to avoid Net::ReadTimeout (Net::ReadTimeout)
-      sleep 1
+      sleep 1000
     end
   end
 
