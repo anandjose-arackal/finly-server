@@ -162,7 +162,7 @@ class Masters::Vendors::Form < Forms::API
       text :gstin
       dropdown :gst_status, choices_scope: Choices[:list].({id: 'Active', name: "Active"}, {id: 'Cancelled', name: "Cancelled"}, {id: 'Provisional', name: 'Provisional'}, {id: 'Inactive', name: 'Inactive'}),
                required: false
-      switch :verified, visible: false
+      switch :verified, visible: false, default_value: false
       large_text :gstin_fetch_details, visible: false
       attachment :gstin_certificate, system_field: false
 
@@ -177,7 +177,7 @@ class Masters::Vendors::Form < Forms::API
       text :ifsc, label: "IFSC / Bank Code", required: true
       switch :default_account
       switch :disabled, default_value: false
-      switch :verified, visible: false
+      switch :verified, visible: false, default_value: false
       attachment :cancelled_cheque, system_field: false
     end
   end
