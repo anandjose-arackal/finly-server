@@ -32,6 +32,15 @@ class SearchIndex::Config < Transactions::API
               fixed_right: [:created_by_name, :created_by_email, :status_name]
           }
       },
+      payment_tickets: {
+          permissions: Docs::PaymentTickets::Index.permissions,
+          category: :transactions,
+          route: 'orders/{{record_id}}/params={}',
+          layout: {
+              fixed_left: [:description, :sequence_id],
+              fixed_right: [:created_by_name, :created_by_email, :status_name]
+          }
+      },
       payments: {
           permissions: Docs::PaymentTickets::Payments::Index.permissions,
           category: :transactions,
