@@ -15,7 +15,7 @@ class Events::Publisher::Record < Events::Publisher
   def self.Destroy(record, user, options = {})
     broadcast "#{record.class.event_channel}.destroy",
               Events::Payload::Record.(record, user, :destroy, options),
-              current_user: user, wait: 3.seconds
+              current_user: user, wait: 10.seconds
   end
 
   def self.Transition(record, user, action, from_status, options = {})
