@@ -32,8 +32,10 @@ class ActionsManager::Master::Procurements::InwardDocumentShow < ActionsManager:
     # edit button only appears after we have updated it with some items 
     # do not show edit button while the doc has just been created
     # after doc has been updated with some delivered items, show the edit button
+    # button will show if latest invoices in voided and met the above conditions
 
-    if (self.inward_document.id == self.procurement.inward_documents.last.id) && (self.procurement.documents&.first&.class&.name != "Invoice")
+    if (self.inward_document.id == self.procurement.inward_documents.last.id) && (self.procurement.documents&.first&.class&.name != "Invoice") ||
+        (self.procurement.documents&.first&.class&.name == "Invoice" &&  self.procurement.documents&.first&.voided?)
       unless all_accepted?
         if user.company.feature_subscription.grn_enabled
           e = inward_document.items.map {|i| i.delivered == 0}
@@ -60,8 +62,14 @@ class ActionsManager::Master::Procurements::InwardDocumentShow < ActionsManager:
   end
 
   def delete
+    #delete button will show if document is latest one
+    #delete button will show if document is latest one and latest invoice voided
     return false unless user.company.feature_subscription.grn_enabled || user.company.feature_subscription.srn_enabled
     if self.procurement.documents&.first&.class&.name != "Invoice"
+      unless self.inward_document.id != self.procurement.inward_documents.last.id
+        true
+      end
+    elsif self.procurement.documents&.first&.class&.name == "Invoice" &&  self.procurement.documents&.first&.voided?
       unless self.inward_document.id != self.procurement.inward_documents.last.id
         true
       end
