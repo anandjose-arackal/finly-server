@@ -11,7 +11,7 @@ namespace :load do
     set :status_index_monitor_pid, -> {File.join(shared_path, 'tmp', 'pids', 'status_index_monitor_queue.pid')}
     set :status_index_monitor_log, -> {File.join(shared_path, 'log', 'status_index_monitor.log')}
     set :status_index_monitor_env, -> {fetch(:rack_env, fetch(:rails_env, fetch(:stage)))}
-    set :status_index_monitor_runner, -> {'SearchIndex::UpdateMonitor.run'}
+    set :status_index_monitor_runner, -> {'SearchIndex::Services::UpdateMonitor.run'}
     set :status_index_monitor_role, -> {:app}
     set :status_index_monitor_env, -> {fetch(:rack_env, fetch(:rails_env, fetch(:stage)))}
     set :status_index_monitor_env, -> {fetch(:rack_env, fetch(:rails_env, 'production'))}

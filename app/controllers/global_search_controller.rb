@@ -5,7 +5,7 @@ class GlobalSearchController < BaseControllers::WebBase
   end
 
   def create
-    endpoint SearchIndex::Config
+    endpoint SearchIndex::Ops::Config
     # Going with direct rendering as it is faster than jbuilder
     if @op.success?
       render json: {
@@ -19,7 +19,7 @@ class GlobalSearchController < BaseControllers::WebBase
 
   def index
     RequestStoreUtil.set_current_request(request)
-    endpoint SearchIndex::Query
+    endpoint SearchIndex::Ops::Query
     # Going with direct rendering as it is faster than jbuilder
     if @op.success?
       render json: {

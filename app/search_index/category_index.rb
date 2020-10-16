@@ -1,5 +1,16 @@
 class CategoryIndex < SearchIndex::Model
-  index Indexes::VpRecords do
+  index Indexes::Vp do
+
+    document_type :categories
+    permissions [:admin]
+    category :masters
+    route 'organization_account/params={"id":"settings"}'
+    layout(
+        {
+            fixed_left: [:description, :sequence_id],
+            fixed_right: []
+        }
+    )
 
     serialize do |record|
       {

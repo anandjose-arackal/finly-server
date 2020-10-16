@@ -1,4 +1,4 @@
-class SearchIndex::Attribute
+class SearchIndex::Index::Attribute
 
   attr_accessor :name, :searchable, :displayed, :primary_key, :faceted, :crop_length
 

@@ -26,6 +26,6 @@ end
 
 # Fixme: This is throwing a superclass mismatch error when IRB calls reload!. Added a temporary workaround in +SearchIndex::Concerns::Document+
 # Loader.watch! "SearchIndex Loader" do
-#   Indexes::VpRecords.model_index_managers.clear
+#   Indexes::Vp.model_index_managers.clear
 #   Dir.glob(Rails.root.join("app/search_index/**/*.rb")).each {|f| load f }
 # end

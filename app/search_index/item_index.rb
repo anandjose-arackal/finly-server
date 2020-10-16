@@ -1,7 +1,18 @@
 class ItemIndex < SearchIndex::Model
 
-  index Indexes::VpRecords do
+  index Indexes::Vp do
     include_associations :item_expense_type, :product_type, :supply_item_type, :category
+
+    document_type :items
+    permissions Masters::Items::Index.permissions
+    category :masters
+    route 'inventory/{{record_id}}/params={}'
+    layout(
+        {
+            fixed_left: [:description, :sequence_id],
+            fixed_right: [:category_name, :status_name]
+        }
+    )
 
     serialize do |record|
       {

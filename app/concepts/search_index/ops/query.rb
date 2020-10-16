@@ -1,4 +1,4 @@
-class SearchIndex::Query < Transactions::API
+class SearchIndex::Ops::Query < Transactions::API
 
   skip_user_authorization!
 
@@ -25,7 +25,7 @@ class SearchIndex::Query < Transactions::API
     filters = config[:filters]
     facets = config[:facets]
     facets += JSON.parse(params[:facets]) if params[:facets].present?
-    context[:response] = Indexes::VpRecords.index.search(params[:q], {filters: filters, facets: facets, facets_distribution: ['record_type'], offset: (params[:offset] || 0), limit: (params[:limit] || 20)})
+    context[:response] = Indexes::Vp.index.search(params[:q], {filters: filters, facets: facets, facets_distribution: ['record_type'], offset: (params[:offset] || 0), limit: (params[:limit] || 20)})
   end
 
 end

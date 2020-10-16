@@ -1,8 +1,20 @@
 class BbpsBillerSubscriptionIndex < SearchIndex::Model
 
-  index Indexes::VpRecords do
-    include_associations :policy, :status, Indexes::VpRecords::Helpers::INCLUDE_COLLABORATORS,
+  index Indexes::Vp do
+    include_associations :policy, :status, Indexes::Vp::Helpers::INCLUDE_COLLABORATORS,
                          :created_by, :location, :department, :cost_center, :biller
+
+    document_type :utility_subscriptions
+    features :utility_bills_enabled
+    permissions Docs::UtilityBills::Subscriptions::Index.permissions
+    category :masters
+    route 'utility_bill_master/{{record_id}}/params={}'
+    layout(
+        {
+            fixed_left: [:description, :sequence_id],
+            fixed_right: [:created_by_name, :created_by_email, :status_name]
+        }
+    )
 
     serialize do |record|
       {
@@ -21,7 +33,7 @@ class BbpsBillerSubscriptionIndex < SearchIndex::Model
           department_codes: [record.department&.department_code],
           cost_center_names: [record.cost_center&.name],
           cost_center_codes: [record.cost_center&.cost_center_code]
-      }.merge(Indexes::VpRecords::Helpers::Collaborators(record))
+      }.merge(Indexes::Vp::Helpers::Collaborators(record))
     end
 
   end

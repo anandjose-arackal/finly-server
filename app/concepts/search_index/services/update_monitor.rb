@@ -1,4 +1,4 @@
-class SearchIndex::UpdateMonitor
+class SearchIndex::Services::UpdateMonitor
 
   REDIS_QUEUE = 'meilisearch_update_queue'
 
@@ -30,7 +30,8 @@ class SearchIndex::UpdateMonitor
             update_status = index.get_update_status(update_id)
             if update_status['status'] == 'enqueued'
               Rails.configuration.redis.lpush(REDIS_QUEUE, update_data_json)
-            else
+            elsif not update_status['status'] == 'processed'
+              # Log only failures
               logger.info({message_type: 'job'}.merge(update_status))
             end
             sleep 0.5.seconds

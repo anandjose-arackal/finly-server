@@ -1,7 +1,19 @@
 class BbpsBillIndex < SearchIndex::Model
 
-  index Indexes::VpRecords do
+  index Indexes::Vp do
     include_associations(:policy, :status, {subscription: :biller}, :payments, :created_by)
+
+    document_type :utility_bills
+    features [:procurement]
+    permissions Docs::UtilityBills::Subscriptions::Index.permissions
+    category :transactions
+    route 'utility_bill/{{record_id}}/params={}'
+    layout(
+        {
+            fixed_left: [:vendor_name, :sequence_id],
+            fixed_right: [:created_by_name, :created_by_email, :status_name]
+        }
+    )
 
     serialize do |record|
       {
@@ -23,7 +35,7 @@ class BbpsBillIndex < SearchIndex::Model
           location_names: [record.location&.name],
           location_codes: [record.location&.location_code],
           unique_transaction_references: [record.payments&.first&.bbps_bank_transaction&.bbps_ref_id]
-      }.merge(Indexes::VpRecords::Helpers::Collaborators(record))
+      }.merge(Indexes::Vp::Helpers::Collaborators(record))
     end
 
   end

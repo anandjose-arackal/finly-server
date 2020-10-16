@@ -1,7 +1,18 @@
 class YesBankVendorIndex < SearchIndex::Model
 
-  index Indexes::VpRecords do
-    include_associations :policy, :status, Indexes::VpRecords::Helpers::INCLUDE_COLLABORATORS, :gstin_locations, :created_by
+  index Indexes::Vp do
+    include_associations :policy, :status, Indexes::Vp::Helpers::INCLUDE_COLLABORATORS, :gstin_locations, :created_by
+
+    document_type :vendors
+    permissions Masters::Vendors::Index.permissions
+    category :masters
+    route 'vendor/{{record_id}}/params={}'
+    layout(
+        {
+            fixed_left: [:vendor_name, :sequence_id],
+            fixed_right: [:created_by_name, :created_by_email, :status_name]
+        }
+    )
 
     record_type do |record|
       'vendors'
@@ -19,7 +30,7 @@ class YesBankVendorIndex < SearchIndex::Model
           description: record.description,
           tax_id: record.pan,
           tax_registration_number: record.gstin_locations.pluck(:gstin).join(", "),
-      }.merge(Indexes::VpRecords::Helpers::Collaborators(record))
+      }.merge(Indexes::Vp::Helpers::Collaborators(record))
     end
 
   end

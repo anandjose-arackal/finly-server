@@ -1,9 +1,21 @@
 class PurchaseOrderIndex < SearchIndex::Model
 
-  index Indexes::VpRecords do
-    include_associations :policy, :status, Indexes::VpRecords::Helpers::INCLUDE_COLLABORATORS, :created_by,
+  index Indexes::Vp do
+    include_associations :policy, :status, Indexes::Vp::Helpers::INCLUDE_COLLABORATORS, :created_by,
                          :location, :delivery_location, :vendor,
                          {line_items: [:cost_center, :department, :inventory_line_item]}
+
+    document_type :purchase_orders
+    features [:procurement]
+    permissions Docs::P2P::PurchaseOrders::Index.permissions
+    category :transactions
+    route 'procure_purchase_order/{{record_id}}/params={"procurement_id":"{{parent_id}}","procurement_type":"{{parent_type}}"}'
+    layout(
+        {
+            fixed_left: [:vendor_name, :sequence_id],
+            fixed_right: [:created_by_name, :created_by_email, :status_name]
+        }
+    )
 
     serialize do |record|
       {
@@ -28,7 +40,7 @@ class PurchaseOrderIndex < SearchIndex::Model
           vendor_name: record.vendor&.business_name,
           vendor_trade_name: record.vendor&.trade_name,
           vendor_sequence_id: record.vendor&.vendor_id,
-      }.merge(Indexes::VpRecords::Helpers::Collaborators(record))
+      }.merge(Indexes::Vp::Helpers::Collaborators(record))
     end
 
   end

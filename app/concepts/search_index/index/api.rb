@@ -1,27 +1,28 @@
-class SearchIndex::Api
+class SearchIndex::Index::Api
   include DynamicAttributes
 
   class_attr :index_name
   class_attr :primary_key
+  class_attr :document_builder, default: SearchIndex::Index::DocumentBuilder
 
   def self.attribute(name, faceted: false, searchable: true, displayed: true, primary_key: false, crop_length: nil)
-    attribute = SearchIndex::Attribute.new(name, faceted: faceted, searchable: searchable, displayed: displayed, primary_key: primary_key, crop_length: crop_length)
+    attribute = SearchIndex::Index::Attribute.new(name, faceted: faceted, searchable: searchable, displayed: displayed, primary_key: primary_key, crop_length: crop_length)
     attributes << attribute
     primary_key(attribute) if primary_key
     attribute
   end
 
-  # Uses +SearchIndex::DocumentConfig+
-  def self.register(document_config)
-    document_configs << document_config
+  # Uses +SearchIndex::Index::DocumentBuilder+
+  def self.register(document_builder)
+    document_builders << document_builder
   end
 
   def self.attributes
     @attributes ||= []
   end
 
-  def self.document_configs
-    @document_configs ||= []
+  def self.document_builders
+    @document_builders ||= []
   end
 
   def self.index
@@ -61,8 +62,8 @@ class SearchIndex::Api
   end
 
   def self.seed_index(dry_run: false)
-    document_configs.each do |document_config|
-      document_config.rebuild_documents(dry_run: dry_run)
+    document_builders.each do |document_builder|
+      document_builder.rebuild_documents(dry_run: dry_run)
     end
 
     true
@@ -129,13 +130,13 @@ class SearchIndex::Api
 
   def add_documents(documents)
     documents = [documents] unless documents.respond_to?(:each)
-    SearchIndex::UpdateMonitor.with_tracking(self.class.full_index_name) do
+    SearchIndex::Services::UpdateMonitor.with_tracking(self.class.full_index_name) do
       index.add_documents documents, self.class.primary_key.name
     end
   end
 
   def delete_document(id)
-    SearchIndex::UpdateMonitor.with_tracking(self.class.full_index_name) do
+    SearchIndex::Services::UpdateMonitor.with_tracking(self.class.full_index_name) do
       index.delete_documents(id)
     end
   end
@@ -143,7 +144,7 @@ class SearchIndex::Api
   def delete_documents(ids)
     ids = [ids] unless ids.respond_to?(:each)
 
-    SearchIndex::UpdateMonitor.with_tracking(self.class.full_index_name) do
+    SearchIndex::Services::UpdateMonitor.with_tracking(self.class.full_index_name) do
       index.delete_documents(ids)
     end
   end
@@ -166,7 +167,7 @@ class SearchIndex::Api
     options['matches'] = true
     options['offset'] = offset.to_i || 0
     options['limit'] = limit.to_i || 10
-    SearchIndex::UpdateMonitor.with_tracking(self.class.full_index_name) do
+    SearchIndex::Services::UpdateMonitor.with_tracking(self.class.full_index_name) do
       index.search(q, options)
     end
   end

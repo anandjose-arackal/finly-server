@@ -1,4 +1,4 @@
-class Indexes::VpRecords < SearchIndex::Api
+class Indexes::Vp < SearchIndex::Index::Api
 
   index_name 'vp_records'
 
@@ -45,7 +45,7 @@ class Indexes::VpRecords < SearchIndex::Api
   attribute :user_name
   attribute :user_email
 
-  class Indexes::VpRecords::Helpers
+  class Indexes::Vp::Helpers
 
     INCLUDE_COLLABORATORS = {dlrms: [:taken_control_by, :action_taken_by, :forwarded_to, :forwarded_by, :rejected_by, :reviewer]}
 

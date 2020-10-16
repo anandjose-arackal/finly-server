@@ -1,6 +1,14 @@
-class SearchIndex::DocumentConfig
+class SearchIndex::Index::DocumentBuilder
+  include DynamicAttributes
 
   attr_accessor :model, :index_api, :block
+
+  instance_attr :document_type
+  instance_attr :features
+  instance_attr :permissions
+  instance_attr :category
+  instance_attr :route
+  instance_attr :layout
 
   def initialize(model, index_api, block)
     self.model = model
@@ -45,6 +53,26 @@ class SearchIndex::DocumentConfig
     @company_id ||= lambda { |record|
       record.company_id.to_s
     }
+  end
+
+  def authorized?(current_user)
+    return false unless current_user.present?
+    return false unless permissions.blank? or current_user.has_permission?(permissions)
+    return false unless company_subscribed?(current_user)
+
+    true
+  end
+
+  def company_subscribed?(current_user)
+    return true if self.features.blank?
+
+    features([features]) unless features.respond_to?(:each)
+
+    features.each do |feature|
+      return false unless !!current_user.company.feature_subscription.send(feature)
+    end
+
+    true
   end
 
   def rebuild_documents(dry_run: false)

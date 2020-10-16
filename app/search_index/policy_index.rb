@@ -1,5 +1,16 @@
 class PolicyIndex < SearchIndex::Model
-  index Indexes::VpRecords do
+  index Indexes::Vp do
+
+    document_type :policies
+    permissions [:admin]
+    category :masters
+    route 'policies/{{record_id}}/params={}'
+    layout(
+        {
+            fixed_left: [:policy_name],
+            fixed_right: []
+        }
+    )
 
     serialize do |record|
       {
