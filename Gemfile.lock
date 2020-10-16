@@ -559,8 +559,6 @@ GEM
       nokogiri (>= 1.6)
     rails-html-sanitizer (1.3.0)
       loofah (~> 2.3)
-    rails-observers (0.1.5)
-      activemodel (>= 4.0)
     rails-perftest (0.0.7)
     railties (6.0.3.2)
       actionpack (= 6.0.3.2)
@@ -902,7 +900,6 @@ DEPENDENCIES
   rack-attack (= 5.4.2)
   rack-mini-profiler (~> 1.0.1)
   rails (~> 6.0, >= 6.0.3.2)
-  rails-observers
   rails-perftest (~> 0.0.7)
   rake (~> 12.3.2)
   ransack (~> 2.3)

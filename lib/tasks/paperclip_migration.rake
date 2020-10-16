@@ -1,5 +1,5 @@
 
-namespace :paperclip do
+namespace :paperclip_migration do
   task migrate_local_assets_to_azure: :environment do
     desc 'migrate local file to azure' do
       client = Azure::Storage::Blob::BlobService.create(storage_account_name: 'dummyblobstorage',
@@ -31,6 +31,25 @@ namespace :paperclip do
             end
             end
           end
+      end
+    end
+  end
+  task migrate_procurement: :environment do
+    query = <<~SQL
+            NOT EXISTS(
+               SELECT * FROM active_storage_blobs AS blobs
+               INNER JOIN active_storage_attachments AS attachments ON attachments.blob_id = blobs.id
+               WHERE record_type = 'ProcurementAttachment'
+            )
+    SQL
+    ProcurementAttachment.where.not("file_file_name" => nil).where(query).find_each do |instance|
+      begin
+        instance.instance_variable_set(:@is_migration, true)
+        instance.duplicate_active_storage if instance.respond_to?(:duplicate_active_storage)
+      rescue => e
+        Rails.logger.error("Error during ActiveStorage migration: #{e} \n ")
+        Raven.capture_exception("Error during ActiveStorage migration: #{e} \n ")
+        next
       end
     end
   end
