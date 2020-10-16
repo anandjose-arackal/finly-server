@@ -95,7 +95,7 @@ class Masters::Vendors::Form < Forms::API
   end
 
   section :business_details, associate_custom_fields: true do
-    auto_number :vendor_id, label: "Vendor ID", sequence: {prefix: "VNDR.", start_at: '000001'}, editable: false, placeholder: "System Generated Field", hint: "System Generated Field"
+    auto_number :vendor_id, label: "Vendor ID", sequence: {prefix: "VNDR.", start_at: '000001'}, placeholder: "System Generated Field", hint: "System Generated Field"
     dropdown :vendor_country, choices_scope: Choices[:list].({id: 'India', name: "India"}, {id: 'International', name: "International"}),
              required: true, default_value: 'India'
     lookup :policy_id,

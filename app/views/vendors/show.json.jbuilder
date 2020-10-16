@@ -1,196 +1,186 @@
-json.form_data do
-  json.id @op['model'].id
-  json.merge! @op['model'].form_data(@op['form'])
+json.id @result.vendor.id
+json.vendor_approval_workflow @result.vendor_approval_workflow
+json.created_by @result.vendor.created_by&.json_for_trail({vendor_show: true})
+json.vendor do
+  json.extract! @result.vendor, :id, :name, :email, :mobile_number, :msme_registered, :msme_registration_number, :rcm_enabled
+  if @result.vendor.is_a?(YesBankVendor)
+    json.payment_term @result&.vendor&.payment_term&.as_json
+    json.currency @result.vendor.currency
+    json.business_name @result.vendor.business_name
+    json.trade_name @result.vendor.trade_name
+    json.address @result.vendor.address
+    json.authorized @result.vendor.authorized
+    json.description @result.vendor.description
+    json.editable_details (@result.user.permission.create_beneficiaries || @result.user.vendor_payments_admin?)
+    json.pan @result.vendor.pan
+    json.gst @result.vendor.gst
+    json.tin @result.vendor.tin
+    json.state_code_id @result.vendor.state_code_id
+    json.state_code_name @result.vendor.state_code&.full_name
+    json.created_by @result.vendor.created_by&.name
+    json.gst_registered @result.vendor.gst_registered
+    json.vendor_id @result.vendor.vendor_id
+    json.rejection_note @result.vendor&.reject_note
+    json.tds_rates do
+      json.array! @result.vendor.vendor_tds_rates do |vtr|
+        next if vtr.tds_rates.nil?
+        json.id vtr.id
+        json.tds_rates_list_id vtr.tds_rates.id
+        json.extract! vtr.tds_rates, :name, :tds
+      end
+    end
+  else
+    json.editable_details false
+  end
+  json.created_at @result.vendor.created_at.strftime "%b %d %y"
 end
 
+json.reviewal_chain @result.vendor.get_reviewal_chain
+json.status do
+  json.merge! @result.vendor.status&.as_json
+end
+json.bank_accounts do
+  json.array!(@result.bank_accounts) do |bank_account|
+    json.account_number bank_account.account_number
+    json.confirm_account_number bank_account.account_number
+    json.ifsc bank_account.ifsc
+    json.id bank_account.id
+    json.card_id bank_account.id
+    json.name bank_account.name
+    json.default_account bank_account.default_account
+    json.disabled bank_account.disabled
+  end
+end
 
-json.reviewal_chain @op['model'].get_reviewal_chain
+json.gstin_locations do
+  json.array!(@result.vendor.gstin_locations) do |gstin_location|
+    json.extract! gstin_location, :id, :gstin, :poc_name, :poc_mobile_number, :poc_email, :poc_fax, :poc_designation, :state_id, :location, :address
+    json.card_id gstin_location.id
+    if gstin_location.gstin_master.present?
+      json.result do
+        json.extract! gstin_location.gstin_master, :id, :gstin, :legal_name_of_business, :state, :date_of_registration,
+                      :constitution_of_business, :taxpayer_type, :status, :api_response, :address
+      end
+    end
+    gstin_master = Gstin.with_gstin(gstin_location.gstin).first
+    if gstin_master.present?
+      json.verified_details do
+        json.address gstin_master&.address
+        json.constitution_of_business gstin_master&.constitution_of_business
+        json.date_of_registration gstin_master&.date_of_registration
+        json.gstin gstin_master&.gstin
+        json.legal_name_of_business gstin_master&.legal_name_of_business
+        json.match_percentile StringUtils.fuzzy_string_match(StringUtils.clear_generic_keywords(@result.vendor.business_name), StringUtils.clear_generic_keywords(gstin_master&.legal_name_of_business))
+        json.state gstin_master&.state
+        json.status gstin_master&.status
+        json.trade_name gstin_master&.trade_name
+        json.valid_response 'true'
+      end
+    end
+  end
+end
+
+if @result.vendor.is_a?(YesBankVendor)
+  json.attachments do
+    json.array! @result.vendor.vendor_attachments do |attachment|
+      json.id attachment.id
+      json.uid attachment.id
+      json.url attachment.attached_file&.url
+      json.thumb attachment.attached_file&.url(:thumb)
+      json.file_type attachment.attached_file_content_type
+      json.attachment_type attachment.attachment_type
+      json.name attachment.attached_file_file_name
+    end
+  end
+
+  json.vendor_type do
+    json.id @result.vendor.vendor_type&.id
+    json.name @result.vendor.vendor_type&.name
+  end
+end
+
+json.actions @result.actions
+
+json.custom_fields do
+  json.array! @result.custom_fields
+end
+
+if @result.vendor.policy.present?
+  json.policy do
+    json.extract! @result.vendor&.policy, :id, :name
+  end
+end
+
+json.edit_config do
+  json.vendor_approval_workflow @result.edit_config&.vendor_approval_workflow
+  json.codes do
+    json.array! @result.edit_config.states, :id, :name
+  end
+  json.vendor_types do
+    json.array! @result.edit_config.vendor_types, :id, :name
+  end
+
+  json.payment_terms do
+    json.array! @result.edit_config.payment_terms, :id, :name, :description
+  end
+
+  json.currencies do
+    json.array! @result.edit_config.currencies do |currency|
+      json.merge! currency.as_json
+    end
+  end
+
+  # json.tds_rates do
+  #   json.array! @result.edit_config.vendor_tds_rates do |vtr|
+  #     json.vendor_tds_rate_id vtr.id
+  #     json.extract! vtr.tds_rate, :id, :name, :tds
+  #   end
+  # end
+
+  json.tds_rates do
+    json.array! @result.edit_config.tds_rates do |tds_rate|
+      # json. vtr.id
+      json.extract! tds_rate, :id, :name, :tds
+    end
+  end
+
+  json.custom_fields_config @result.edit_config.field_configurations
+
+  json.policies do
+    json.array! @result.edit_config.policies do |policy|
+      json.extract! policy, :id, :name
+    end
+  end
+
+  json.locations do
+    json.array! @result.edit_config.locations do |location|
+      json.extract! location, :id, :name
+    end
+  end
 
 
-# json.id @result.vendor.id
-# json.vendor_approval_workflow @result.vendor_approval_workflow
-# json.created_by @result.vendor.created_by&.json_for_trail({vendor_show: true})
-# json.vendor do
-#   json.extract! @result.vendor, :id, :name, :email, :mobile_number, :msme_registered, :msme_registration_number, :rcm_enabled
-#   if @result.vendor.is_a?(YesBankVendor)
-#     json.payment_term @result&.vendor&.payment_term&.as_json
-#     json.currency @result.vendor.currency
-#     json.business_name @result.vendor.business_name
-#     json.trade_name @result.vendor.trade_name
-#     json.address @result.vendor.address
-#     json.authorized @result.vendor.authorized
-#     json.description @result.vendor.description
-#     json.editable_details (@result.user.permission.create_beneficiaries || @result.user.vendor_payments_admin?)
-#     json.pan @result.vendor.pan
-#     json.gst @result.vendor.gst
-#     json.tin @result.vendor.tin
-#     json.state_code_id @result.vendor.state_code_id
-#     json.state_code_name @result.vendor.state_code&.full_name
-#     json.created_by @result.vendor.created_by&.name
-#     json.gst_registered @result.vendor.gst_registered
-#     json.vendor_id @result.vendor.vendor_id
-#     json.rejection_note @result.vendor&.reject_note
-#     json.tds_rates do
-#       json.array! @result.vendor.vendor_tds_rates do |vtr|
-#         next if vtr.tds_rates.nil?
-#         json.id vtr.id
-#         json.tds_rates_list_id vtr.tds_rates.id
-#         json.extract! vtr.tds_rates, :name, :tds
-#       end
-#     end
-#   else
-#     json.editable_details false
-#   end
-#   json.created_at @result.vendor.created_at.strftime "%b %d %y"
-# end
-#
-# json.reviewal_chain @result.vendor.get_reviewal_chain
-# json.status do
-#   json.merge! @result.vendor.status&.as_json
-# end
-# json.bank_accounts do
-#   json.array!(@result.bank_accounts) do |bank_account|
-#     json.account_number bank_account.account_number
-#     json.confirm_account_number bank_account.account_number
-#     json.ifsc bank_account.ifsc
-#     json.id bank_account.id
-#     json.card_id bank_account.id
-#     json.name bank_account.name
-#     json.default_account bank_account.default_account
-#     json.disabled bank_account.disabled
-#   end
-# end
-#
-# json.gstin_locations do
-#   json.array!(@result.vendor.gstin_locations) do |gstin_location|
-#     json.extract! gstin_location, :id, :gstin, :poc_name, :poc_mobile_number, :poc_email, :poc_fax, :poc_designation, :state_id, :location, :address
-#     json.card_id gstin_location.id
-#     if gstin_location.gstin_master.present?
-#       json.result do
-#         json.extract! gstin_location.gstin_master, :id, :gstin, :legal_name_of_business, :state, :date_of_registration,
-#         :constitution_of_business, :taxpayer_type, :status, :api_response, :address
-#       end
-#     end
-#     gstin_master = Gstin.with_gstin(gstin_location.gstin).first
-#     if gstin_master.present?
-#       json.verified_details do
-#         json.address gstin_master&.address
-#         json.constitution_of_business gstin_master&.constitution_of_business
-#         json.date_of_registration gstin_master&.date_of_registration
-#         json.gstin gstin_master&.gstin
-#         json.legal_name_of_business gstin_master&.legal_name_of_business
-#         json.match_percentile StringUtils.fuzzy_string_match(StringUtils.clear_generic_keywords(@result.vendor.business_name), StringUtils.clear_generic_keywords(gstin_master&.legal_name_of_business))
-#         json.state gstin_master&.state
-#         json.status gstin_master&.status
-#         json.trade_name gstin_master&.trade_name
-#         json.valid_response 'true'
-#       end
-#     end
-#   end
-# end
-#
-# if @result.vendor.is_a?(YesBankVendor)
-#   json.attachments do
-#     json.array! @result.vendor.vendor_attachments do |attachment|
-#       json.id attachment.id
-#       json.uid attachment.id
-#       json.url attachment.attached_file&.url
-#       json.thumb attachment.attached_file&.url(:thumb)
-#       json.file_type attachment.attached_file_content_type
-#       json.attachment_type attachment.attachment_type
-#       json.name attachment.attached_file_file_name
-#     end
-#   end
-#
-#   json.vendor_type do
-#     json.id @result.vendor.vendor_type&.id
-#     json.name @result.vendor.vendor_type&.name
-#   end
-# end
-#
-# json.actions @result.actions
-#
-# json.custom_fields do
-#   json.array! @result.custom_fields
-# end
-#
-# if @result.vendor.policy.present?
-#   json.policy do
-#     json.extract! @result.vendor&.policy, :id, :name
-#   end
-# end
-#
-# json.edit_config do
-#   json.vendor_approval_workflow @result.edit_config&.vendor_approval_workflow
-#   json.codes do
-#     json.array! @result.edit_config.states, :id, :name
-#   end
-#   json.vendor_types do
-#     json.array! @result.edit_config.vendor_types, :id, :name
-#   end
-#
-#   json.payment_terms do
-#     json.array! @result.edit_config.payment_terms, :id, :name, :description
-#   end
-#
-#   json.currencies do
-#     json.array! @result.edit_config.currencies do |currency|
-#       json.merge! currency.as_json
-#     end
-#   end
-#
-#   # json.tds_rates do
-#   #   json.array! @result.edit_config.vendor_tds_rates do |vtr|
-#   #     json.vendor_tds_rate_id vtr.id
-#   #     json.extract! vtr.tds_rate, :id, :name, :tds
-#   #   end
-#   # end
-#
-#   json.tds_rates do
-#     json.array! @result.edit_config.tds_rates do |tds_rate|
-#       # json. vtr.id
-#       json.extract! tds_rate, :id, :name, :tds
-#     end
-#   end
-#
-#   # json.custom_fields_config @result.edit_config.field_configurations
-#
-#   json.policies do
-#     json.array! @result.edit_config.policies do |policy|
-#       json.extract! policy, :id, :name
-#     end
-#   end
-#
-#   json.locations do
-#     json.array! @result.edit_config.locations do |location|
-#       json.extract! location, :id, :name
-#     end
-#   end
-#
-#
-#   json.reviewal_chains do
-#     json.array! @result.edit_config.reviewal_chains do |chain|
-#       json.policy_id chain[:policy_id]
-#       json.reviewal_chain do
-#         json.array! chain[:reviewal_chain] do |item|
-#           json.level_number item[:level_number]
-#           json.level_name item[:level_name]
-#           json.level_id item[:level_id]
-#           if item[:selected_reviewer].present?
-#             json.selected_reviewer do
-#               json.reviewer_details item[:selected_reviewer].as_json
-#               json.threshold item[:selected_reviewer_threshold]
-#             end
-#           end
-#           json.reviewers do
-#             json.array! item[:reviewers] do |reviewer|
-#               json.extract! reviewer, :id, :exception, :threshold, :min, :max
-#               json.reviewer_details reviewer.reviewer.as_json
-#             end
-#           end
-#         end
-#       end
-#     end
-#   end
-# end
-
+  json.reviewal_chains do
+    json.array! @result.edit_config.reviewal_chains do |chain|
+      json.policy_id chain[:policy_id]
+      json.reviewal_chain do
+        json.array! chain[:reviewal_chain] do |item|
+          json.level_number item[:level_number]
+          json.level_name item[:level_name]
+          json.level_id item[:level_id]
+          if item[:selected_reviewer].present?
+            json.selected_reviewer do
+              json.reviewer_details item[:selected_reviewer].as_json
+              json.threshold item[:selected_reviewer_threshold]
+            end
+          end
+          json.reviewers do
+            json.array! item[:reviewers] do |reviewer|
+              json.extract! reviewer, :id, :exception, :threshold, :min, :max
+              json.reviewer_details reviewer.reviewer.as_json
+            end
+          end
+        end
+      end
+    end
+  end
+end
