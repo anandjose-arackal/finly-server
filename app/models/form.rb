@@ -17,7 +17,7 @@ class Form < ApplicationRecord
   # include Forms::Generators::Contracts::ModelHelpers::Form
   # include Forms::Generators::Filters::ModelHelpers::Form
 
-  belongs_to :company
+  belongs_to :company, optional: true
   has_many :sections, class_name: 'FormSection', dependent: :destroy
   has_many :entities, class_name: "FormEntity"
   has_many :choice_dependencies, class_name: 'FormChoiceDependency'
