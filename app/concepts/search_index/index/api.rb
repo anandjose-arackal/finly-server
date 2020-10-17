@@ -70,10 +70,13 @@ class SearchIndex::Index::Api
   end
 
   def self.rebuild_index(dry_run: false)
+    t1 = Time.now
+    puts "Rebuilding Index"
     delete_index
     create_index
     seed_index(dry_run: dry_run)
     set_index_properties
+    puts "Rebuild Completed: Time: #{Time.now - t1}"
   end
 
   def self.set_index_properties
