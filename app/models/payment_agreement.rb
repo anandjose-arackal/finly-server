@@ -98,6 +98,7 @@ class PaymentAgreement < ApplicationRecord
 
   AGREEMENT_TYPES = [{id: 'general_invoice', name: 'Invoice - General Invoice'}, {id: 'rental_invoice', name: 'Invoice - Rental Invoice'}, {id: 'beneficiary_payment', name: 'Payment - Beneficiary Payment'}, {id: 'security_deposit', name: 'Payment - Security Deposit'}]
 
+  scope :with_company_id, -> (company_id) { where company_id: company_id }
   scope :filter_title, -> (title) {
     if title.present?
       where('payment_agreements.title LIKE ?', "%#{title}%")

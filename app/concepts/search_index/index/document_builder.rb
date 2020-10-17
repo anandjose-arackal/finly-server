@@ -75,13 +75,16 @@ class SearchIndex::Index::DocumentBuilder
     true
   end
 
-  def rebuild_documents(dry_run: false)
-    index_api.rebuild_logger.info({event: "Rebuilding Document", model: model.name, action: "Starting Rebuild"})
+  def rebuild_documents(company_id, dry_run: false)
     indexed_records = 0
     total_records = model.count
-    index = index_api.index
+    index = index_api.index(company_id)
+    index_api.rebuild_logger.info({event: "Rebuilding Document", index: index.scoped_index_name, action: "Starting Rebuild"})
     start_time = Time.now
-    model.includes(include_associations).find_in_batches(batch_size: 1000) do |batch|
+    unless model.respond_to?(:with_company_id)
+      raise "with_company_id not defined for #{model.name}"
+    end
+    model.with_company_id(company_id).includes(include_associations).find_in_batches(batch_size: 1000) do |batch|
       data = []
       batch.each do |record|
         next if condition.present? and not condition.call(record)
@@ -94,15 +97,15 @@ class SearchIndex::Index::DocumentBuilder
       index.add_documents data
 
       indexed_records += batch.size
-      index_api.rebuild_logger.info({event: "Rebuilding Document", model: model.name, action: "Batch Pushed", total_time: Time.at(Time.now - t1).utc.strftime("%H:%M:%S"), indexed_records: indexed_records, total_records: total_records})
+      index_api.rebuild_logger.info({event: "Rebuilding Document", index: index.scoped_index_name, action: "Batch Pushed", total_time: Time.at(Time.now - t1).utc.strftime("%H:%M:%S"), indexed_records: indexed_records, total_records: total_records})
       break if dry_run
       # Wait till the enqueued list reduces to less than 10 before sending more requests
       while (enqueued = index.total_enqueued) > 10
-        index_api.rebuild_logger.info({event: "Rebuilding Document", model: model.name, action: "Sleeping as enqueued is exceeding 10", total_enqueued: enqueued, total_processed: index.total_enqueued['processed']})
+        index_api.rebuild_logger.info({event: "Rebuilding Document", index: index.scoped_index_name, action: "Sleeping as enqueued is exceeding 10", total_enqueued: enqueued, total_processed: index.total_enqueued['processed']})
         sleep 10
       end
     end
-    index_api.rebuild_logger.info({event: "Rebuilding Document", model: model.name, action: "Document Index Completed", total_time: Time.at(Time.now - start_time).utc.strftime("%H:%M:%S"), indexed_records: indexed_records, total_records: total_records})
+    index_api.rebuild_logger.info({event: "Rebuilding Document", index: index.scoped_index_name, action: "Document Index Completed", total_time: Time.at(Time.now - start_time).utc.strftime("%H:%M:%S"), indexed_records: indexed_records, total_records: total_records})
     indexed_records
   end
 

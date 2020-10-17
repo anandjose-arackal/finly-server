@@ -89,6 +89,7 @@ class BankPaymentRequest < ApplicationRecord
       utility_bill: 'utility_bill'
   }
 
+  scope :with_company_id, -> (company_id) { where company_id: company_id }
   scope :non_owner, -> (user_id) { where.not owner_id: user_id }
   scope :with_controlling_user, -> (user_id) { where controlling_user_id: user_id }
   scope :with_controlling_user_role, -> (role_id) { where controlling_user_role_id: role_id }

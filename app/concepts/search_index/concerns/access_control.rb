@@ -106,7 +106,7 @@ module SearchIndex::Concerns::AccessControl
       end
     end
 
-    config = {filters: filters.join(" OR "), facets: ["company_id:#{company_id}"]}.to_json
+    config = {filters: filters.join(" OR "), company_id: company_id}.to_json
 
     token = SecureRandom.hex(32)
     redis = Rails.configuration.redis
