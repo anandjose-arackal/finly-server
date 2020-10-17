@@ -84,17 +84,18 @@ class SearchIndex::Index::DocumentBuilder
     unless model.respond_to?(:with_company_id)
       raise "with_company_id not defined for #{model.name}"
     end
-    model.with_company_id(company_id).includes(include_associations).find_in_batches(batch_size: 1000) do |batch|
-      data = []
+    model.with_company_id(company_id).includes(include_associations).find_in_batches(batch_size: 100) do |batch|
+      # data = []
       batch.each do |record|
         next if condition.present? and not condition.call(record)
         record_data = build_record_data(record)
         next if record_data.blank?
 
-        data << record_data
+        index.add_documents record_data
+        # data << record_data
       end
       t1 = Time.now
-      index.add_documents data
+      # index.add_documents data
 
       indexed_records += batch.size
       index_api.rebuild_logger.info({event: "Rebuilding Document", company_id: company_id, index: index.scoped_index_name, model: model.name, action: "Batch Pushed", total_time: Time.at(Time.now - t1).utc.strftime("%H:%M:%S.%L"), indexed_records: indexed_records, total_records: total_records})
