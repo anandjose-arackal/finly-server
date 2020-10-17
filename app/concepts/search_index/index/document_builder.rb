@@ -76,7 +76,7 @@ class SearchIndex::Index::DocumentBuilder
   end
 
   def rebuild_documents(dry_run: false)
-    puts "Rebuilding Index : #{model.name}"
+    puts "Rebuilding Document : #{model.name}"
     records = 0
     total_records = model.count
     index = index_api.index
