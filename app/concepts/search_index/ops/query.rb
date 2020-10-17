@@ -16,7 +16,7 @@ class SearchIndex::Ops::Query < Transactions::API
   def fetch_filters(context, token:, **)
     context[:config] = Rails.configuration.redis.get(token)
     context[:config] = JSON.parse(context[:config]).with_indifferent_access if context[:config]
-    return unauthorized!(context) if context[:config].blank? or context[:config][:filters].blank? or context[:config][:facets].blank?
+    return unauthorized!(context) if context[:config].blank? or context[:config][:filters].blank?
 
     true
   end
