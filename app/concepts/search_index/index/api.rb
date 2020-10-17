@@ -157,6 +157,15 @@ class SearchIndex::Index::Api
     index.get_update_status(update_id)
   end
 
+  def total_enqueued
+    status_counts&.dig('enqueued') || 0
+  end
+
+  # Provides a status wise summary of the update_status
+  def status_counts
+    index.get_all_update_status.map {|i| i['status']}.inject(Hash.new(0)) { |h, e| h[e] += 1 ; h }
+  end
+
   def search(q, filters: nil, facets: nil, facets_distribution: nil, offset: 0, limit: 20)
     options = {}
     options['filters'] = filters if filters.present?
