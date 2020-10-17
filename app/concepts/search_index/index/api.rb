@@ -131,16 +131,7 @@ class SearchIndex::Index::Api
   def add_documents(documents)
     documents = [documents] unless documents.respond_to?(:each)
     SearchIndex::Services::UpdateMonitor.with_tracking(self.class.full_index_name) do
-      attempt = 0
-      while attempt <= 2
-        begin
-          index.add_documents documents, self.class.primary_key.name
-        rescue Net::ReadTimeout
-          # Retry after a 20 second wait
-          sleep 20.seconds
-          attempt += 1
-        end
-      end
+      index.add_documents documents, self.class.primary_key.name
     end
   end
 

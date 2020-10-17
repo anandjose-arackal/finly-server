@@ -78,7 +78,7 @@ class SearchIndex::Index::DocumentBuilder
   def rebuild_documents(dry_run: false)
     puts "Rebuilding Index"
     records = 0
-    model.includes(include_associations).find_in_batches(batch_size: 200) do |batch|
+    model.includes(include_associations).find_in_batches(batch_size: 1000) do |batch|
       data = []
       batch.each do |record|
         next if condition.present? and not condition.call(record)
@@ -87,7 +87,9 @@ class SearchIndex::Index::DocumentBuilder
 
         data << record_data
       end
-      index_api.index.add_documents data.compact
+      puts "Adding data"
+      index_api.index.add_documents data
+      puts "Added data"
       break if dry_run
 
       records += batch.size
