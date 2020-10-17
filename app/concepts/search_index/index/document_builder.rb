@@ -85,24 +85,23 @@ class SearchIndex::Index::DocumentBuilder
       raise "with_company_id not defined for #{model.name}"
     end
     model.with_company_id(company_id).includes(include_associations).find_in_batches(batch_size: 100) do |batch|
-      # data = []
+      data = []
       batch.each do |record|
         next if condition.present? and not condition.call(record)
         record_data = build_record_data(record)
         next if record_data.blank?
 
-        index.add_documents record_data
-        # data << record_data
+        data << record_data
       end
       t1 = Time.now
-      # index.add_documents data
+      index.add_documents data
 
       indexed_records += batch.size
       index_api.rebuild_logger.info({event: "Rebuilding Document", company_id: company_id, index: index.scoped_index_name, model: model.name, action: "Batch Pushed", total_time: Time.at(Time.now - t1).utc.strftime("%H:%M:%S.%L"), indexed_records: indexed_records, total_records: total_records})
       break if dry_run
       # Wait till the enqueued list reduces to less than 10 before sending more requests
-      while (enqueued = index.total_enqueued) > 10
-        index_api.rebuild_logger.info({event: "Rebuilding Document", company_id: company_id, index: index.scoped_index_name, model: model.name, action: "Sleeping as enqueued is exceeding 10", total_enqueued: enqueued, total_processed: index.status_counts['processed']})
+      while (enqueued = index.total_enqueued) > 5
+        index_api.rebuild_logger.info({event: "Rebuilding Document", company_id: company_id, index: index.scoped_index_name, model: model.name, action: "Sleeping as enqueued is exceeding 5", total_enqueued: enqueued, total_processed: index.status_counts['processed']})
         sleep 10
       end
     end
