@@ -101,7 +101,7 @@ class SearchIndex::Index::DocumentBuilder
       break if dry_run
       # Wait till the enqueued list reduces to less than 10 before sending more requests
       while (enqueued = index.total_enqueued) > 10
-        index_api.rebuild_logger.info({event: "Rebuilding Document", company_id: company_id, index: index.scoped_index_name, model: model.name, action: "Sleeping as enqueued is exceeding 10", total_enqueued: enqueued, total_processed: index.total_enqueued['processed']})
+        index_api.rebuild_logger.info({event: "Rebuilding Document", company_id: company_id, index: index.scoped_index_name, model: model.name, action: "Sleeping as enqueued is exceeding 10", total_enqueued: enqueued, total_processed: index.status_counts['processed']})
         sleep 10
       end
     end
