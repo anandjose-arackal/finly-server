@@ -77,22 +77,30 @@ class SearchIndex::Index::Api
     dt1 = DateTime.now
     t1 = Time.now
     rebuild_logger.info({event: "Rebuilding Index", action: "Starting Rebuild"})
-    indexed_records = 0
+    total_indexed_records = 0
     companies = Company.all.reorder(id: :asc)
     companies = companies.where(id: company_id) if company_id.present?
     companies = companies.limit(2) if dry_run
 
     companies.pluck(:id).each do |company_id|
+      company_started_at = Time.now
       delete_index(company_id)
       create_index(company_id)
-      indexed_records += seed_index(company_id, dry_run: dry_run)
+      company_indexed_records = seed_index(company_id, dry_run: dry_run)
+      total_indexed_records += company_indexed_records
+
+      company_rebuild_attributes = {
+          total_time: Time.at(Time.now - company_started_at).utc.strftime("%H:%M:%S.%L"),
+          total_indexed_records: company_indexed_records
+      }
+      rebuild_logger.info({event: "Rebuilding Index", action: "Rebuild Completed For Company", company_id: company_id}.merge(company_rebuild_attributes))
     end
 
     rebuild_attributes = {
         started_at: dt1,
         ended_at: DateTime.now,
         total_time: Time.at(Time.now - t1).utc.strftime("%H:%M:%S.%L"),
-        total_indexed_records: indexed_records
+        total_indexed_records: total_indexed_records
     }
     SearchIndex::Services::UpdateMonitor.logger.info({message_type: 'index_rebuild'}.merge(rebuild_attributes))
 
