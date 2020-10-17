@@ -62,21 +62,38 @@ class SearchIndex::Index::Api
   end
 
   def self.seed_index(dry_run: false)
+    indexed_records = 0
     document_builders.each do |document_builder|
-      document_builder.rebuild_documents(dry_run: dry_run)
+      indexed_records += document_builder.rebuild_documents(dry_run: dry_run)
     end
 
-    true
+    indexed_records
+  end
+
+  def self.rebuild_logger
+    @rebuild_logger ||= LogStashLogger.new(type: :file, path: 'log/meilisearch_rebuild_tracker.log', sync: true)
   end
 
   def self.rebuild_index(dry_run: false)
+    dt1 = DateTime.now
     t1 = Time.now
-    puts "Rebuilding Index"
+    rebuild_logger.info({event: "Rebuilding Index", action: "Starting Rebuild"})
     delete_index
     create_index
-    seed_index(dry_run: dry_run)
+    indexed_records = seed_index(dry_run: dry_run)
     set_index_properties
-    puts "Rebuild Completed: Time: #{Time.now - t1}"
+
+    rebuild_attributes = {
+        started_at: dt1,
+        ended_at: DateTime.now,
+        total_time: Time.at(Time.now - t1).utc.strftime("%H:%M:%S"),
+        total_indexed_records: indexed_records
+    }
+    SearchIndex::Services::UpdateMonitor.logger.info({message_type: 'index_rebuild'}.merge(rebuild_attributes))
+
+    rebuild_logger.info({event: "Rebuilding Index",action: "Rebuild Completed"}.merge(rebuild_attributes))
+
+    true
   end
 
   def self.set_index_properties
