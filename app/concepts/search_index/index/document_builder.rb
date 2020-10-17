@@ -76,8 +76,10 @@ class SearchIndex::Index::DocumentBuilder
   end
 
   def rebuild_documents(dry_run: false)
-    puts "Rebuilding Index"
+    puts "Rebuilding Index : #{model.name}"
     records = 0
+    total_records = model.count
+    index = index_api.index
     model.includes(include_associations).find_in_batches(batch_size: 1000) do |batch|
       data = []
       batch.each do |record|
@@ -87,16 +89,20 @@ class SearchIndex::Index::DocumentBuilder
 
         data << record_data
       end
-      puts "Adding data"
+      puts "Adding data model: #{model.name}"
       t1 = Time.now
-      index_api.index.add_documents data
+      index.add_documents data
       puts "Added data: Time: #{Time.now - t1}"
       break if dry_run
 
       records += batch.size
-      puts "Completed Records: #{records}"
-      # This is to avoid Net::ReadTimeout (Net::ReadTimeout)
-      sleep 1.seconds
+      puts "Completed Records: #{records} / #{total_records}"
+
+      # Wait till the enqueued list reduces to less than 10 before sending more requests
+      while (enqueued = index.total_enqueued) > 10
+        puts "Sleeping as enqueued is exceeding 10 : Total enqueued: #{enqueued}"
+        sleep 10
+      end
     end
     puts "Completed successfully"
   end

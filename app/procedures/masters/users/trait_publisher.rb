@@ -29,32 +29,35 @@ module Masters
           return if IGNORE_LIST.include?(company.id)
           return if Rails.configuration.bullet_train.nil? and Rails.configuration.posthog.nil?
 
-          company.users.where.not(company_id: Masters::Users::TraitPublisher::IGNORE_LIST).find_each do |user|
-            properties = {
-                'company_id' => company.id,
-                "company_name" => company.name,
-                "company_active" => !!company.active,
-                "company_subdomain" => company.subdomain,
-                "company_test_account" => !!company.test_account,
-                "company_group_name" => company.group&.name,
-                "company_status" => company.status&.name,
-                'company_deleted_at' => company.deleted_at,
-            }.compact
+          company.users.where.not(company_id: Masters::Users::TraitPublisher::IGNORE_LIST).find_in_batches(batch_size: 1000) do |batch|
+            batch.each do |user|
+              properties = {
+                  'company_id' => company.id,
+                  "company_name" => company.name,
+                  "company_active" => !!company.active,
+                  "company_subdomain" => company.subdomain,
+                  "company_test_account" => !!company.test_account,
+                  "company_group_name" => company.group&.name,
+                  "company_status" => company.status&.name,
+                  'company_deleted_at' => company.deleted_at,
+              }.compact
 
-            if Rails.configuration.bullet_train.present?
-              properties.each_pair do |key, value|
-                Rails.configuration.bullet_train.set_trait user.analytics_id, key, value
+              if Rails.configuration.bullet_train.present?
+                properties.each_pair do |key, value|
+                  Rails.configuration.bullet_train.set_trait user.analytics_id, key, value
+                end
               end
-            end
-            if Rails.configuration.posthog.present?
-              Rails.configuration.posthog.identify(
-                  distinct_id: user.analytics_id,
-                  properties: properties
-              )
-            end
+              if Rails.configuration.posthog.present?
+                Rails.configuration.posthog.identify(
+                    distinct_id: user.analytics_id,
+                    properties: properties
+                )
+              end
 
-            true
+              true
+            end
           end
+          sleep 10
         end
       end
 
@@ -70,8 +73,11 @@ module Masters
 
           User.where('updated_at > ?', changed_since)
               .where.not(company_id: Masters::Users::TraitPublisher::IGNORE_LIST)
-              .find_each do |user|
-            self.new.work(nil, record: user)
+              .find_in_batches(batch_size: 1000) do |batch|
+            batch.each do |user|
+              self.new.work(nil, record: user)
+            end
+            sleep 10
           end
         end
 
@@ -123,16 +129,22 @@ module Masters
               .includes(:user, :user_role)
               .joins(:user)
               .where.not(users: {company_id: Masters::Users::TraitPublisher::IGNORE_LIST})
-              .find_each do |role_mapping|
-            self.new.work(nil, record: role_mapping)
+              .find_in_batches(batch_size: 1000) do |batch|
+            batch.each do |role_mapping|
+              self.new.work(nil, record: role_mapping)
+            end
+            sleep 10
           end
 
           PolicyUserRole.unscoped.where('policy_user_roles.updated_at > ?', changed_since)
               .includes(:user, :user_role)
               .joins(:user)
               .where.not(users: {company_id: Masters::Users::TraitPublisher::IGNORE_LIST})
-              .find_each do |role_mapping|
-            self.new.work(nil, record: role_mapping)
+              .find_in_batches(batch_size: 1000) do |batch|
+            batch.each do |role_mapping|
+              self.new.work(nil, record: role_mapping)
+            end
+            sleep 10
           end
         end
 
@@ -172,6 +184,7 @@ module Masters
             UserSession.where(user_id: batch.pluck(:id)).group(:user_id).count.each do |user_id, count|
               Rails.configuration.bullet_train&.set_trait "user:#{user_id}", 'user_sessions', count
             end
+            sleep 10
           end
         end
 
