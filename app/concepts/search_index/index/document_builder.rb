@@ -89,14 +89,12 @@ class SearchIndex::Index::DocumentBuilder
 
         data << record_data
       end
-      puts "Adding data model: #{model.name}"
       t1 = Time.now
       index.add_documents data
-      puts "Added data: Time: #{Time.now - t1}"
+      puts "Pushed Batch: Model: #{model.name}, Time: #{Time.now - t1}, Completed: #{records} / #{total_records}"
       break if dry_run
 
       records += batch.size
-      puts "Completed Records: #{records} / #{total_records}"
 
       # Wait till the enqueued list reduces to less than 10 before sending more requests
       while (enqueued = index.total_enqueued) > 10
