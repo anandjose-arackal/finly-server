@@ -76,8 +76,7 @@ class SearchIndex::Index::DocumentBuilder
   end
 
   def rebuild_documents(dry_run: false)
-    logger = LogStashLogger.new(type: :file, path: 'log/meilisearch_rebuild_tracker.log', sync: true)
-    logger.info({event: "Rebuilding Document", model: model.name, action: "Starting Rebuild"})
+    index_api.rebuild_log({event: "Rebuilding Document", model: model.name, action: "Starting Rebuild"})
     indexed_records = 0
     total_records = model.count
     index = index_api.index
@@ -95,15 +94,15 @@ class SearchIndex::Index::DocumentBuilder
       index.add_documents data
 
       indexed_records += batch.size
-      logger.info({event: "Rebuilding Document", model: model.name, action: "Batch Pushed", total_time: Time.at(Time.now - t1).utc.strftime("%H:%M:%S"), indexed_records: indexed_records, total_records: total_records})
+      index_api.rebuild_log({event: "Rebuilding Document", model: model.name, action: "Batch Pushed", total_time: Time.at(Time.now - t1).utc.strftime("%H:%M:%S"), indexed_records: indexed_records, total_records: total_records})
       break if dry_run
       # Wait till the enqueued list reduces to less than 10 before sending more requests
       while (enqueued = index.total_enqueued) > 10
-        logger.info({event: "Rebuilding Document", model: model.name, action: "Sleeping as enqueued is exceeding 10", total_enqueued: enqueued, total_processed: index.total_enqueued['processed']})
+        index_api.rebuild_log({event: "Rebuilding Document", model: model.name, action: "Sleeping as enqueued is exceeding 10", total_enqueued: enqueued, total_processed: index.total_enqueued['processed']})
         sleep 10
       end
     end
-    logger.info({event: "Rebuilding Document", model: model.name, action: "Document Index Completed", total_time: Time.at(Time.now - start_time).utc.strftime("%H:%M:%S"), indexed_records: indexed_records, total_records: total_records})
+    index_api.rebuild_log({event: "Rebuilding Document", model: model.name, action: "Document Index Completed", total_time: Time.at(Time.now - start_time).utc.strftime("%H:%M:%S"), indexed_records: indexed_records, total_records: total_records})
     indexed_records
   end
 
