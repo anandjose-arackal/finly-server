@@ -99,7 +99,7 @@ class SearchIndex::Index::DocumentBuilder
       # Wait till the enqueued list reduces to less than 10 before sending more requests
       while (enqueued = index.total_enqueued) > 10
         puts "Sleeping as enqueued is exceeding 10 : Total enqueued: #{enqueued}"
-        sleep 3
+        sleep 10
       end
     end
     puts "Completed successfully"
