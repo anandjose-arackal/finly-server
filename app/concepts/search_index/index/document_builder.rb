@@ -88,8 +88,9 @@ class SearchIndex::Index::DocumentBuilder
         data << record_data
       end
       puts "Adding data"
+      t1 = Time.now
       index_api.index.add_documents data
-      puts "Added data"
+      puts "Added data: Time: #{Time.now - t1}"
       break if dry_run
 
       records += batch.size
