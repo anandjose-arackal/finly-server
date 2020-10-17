@@ -15,6 +15,42 @@ class ExportResource < ApplicationRecord
     {
       name: 'Invoice Line Items',
       value: 'invoice_line_items'
+    },
+    {
+      name: 'Invoices',
+      value: 'invoices'
+    },
+    {
+      name: 'Payments',
+      value: 'payments'
+    },
+    {
+      name: 'Purchase Requests',
+      value: 'purchase_requests'
+    },
+    {
+      name: 'Purchase Orders',
+      value: 'purchase_orders'
+    },
+    {
+      name: 'Purchase Order Items',
+      value: 'purchase_order_items'
+    },
+    {
+      name: 'Users',
+      value: 'users'
+    },
+    {
+      name: 'Item Master',
+      value: 'items'
+    },
+    {
+      name: 'Vendors',
+      value: 'vendors'
+    },
+    {
+      name: 'Utility Bills',
+      value: 'utility_bills'
     }
   ]
 
