@@ -31,7 +31,7 @@ Events::Router.draw do
     end
 
     route 'create' do
-
+      to SearchIndex::EventListeners::CreateCompanyIndex
     end
   end
 
