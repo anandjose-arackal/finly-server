@@ -1,7 +1,7 @@
 module UpdatedTimeout
 
   def self.timeout
-    30
+    60
   end
 
   def self.max_retries
