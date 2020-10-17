@@ -90,7 +90,7 @@ class SearchIndex::Index::Api
     rebuild_attributes = {
         started_at: dt1,
         ended_at: DateTime.now,
-        total_time: Time.at(Time.now - t1).utc.strftime("%H:%M:%S"),
+        total_time: Time.at(Time.now - t1).utc.strftime("%H:%M:%S.%L"),
         total_indexed_records: indexed_records
     }
     SearchIndex::Services::UpdateMonitor.logger.info({message_type: 'index_rebuild'}.merge(rebuild_attributes))
