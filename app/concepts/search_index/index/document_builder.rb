@@ -77,7 +77,7 @@ class SearchIndex::Index::DocumentBuilder
 
   def rebuild_documents(dry_run: false)
     puts "Rebuilding Document : #{model.name}"
-    records = 0
+    indexed_records = 0
     total_records = model.count
     index = index_api.index
     model.includes(include_associations).find_in_batches(batch_size: 1000) do |batch|
@@ -91,11 +91,10 @@ class SearchIndex::Index::DocumentBuilder
       end
       t1 = Time.now
       index.add_documents data
-      puts "Pushed Batch: Model: #{model.name}, Time: #{Time.now - t1}, Completed: #{records} / #{total_records}"
-      break if dry_run
 
-      records += batch.size
-
+      indexed_records += batch.size
+      puts "Pushed Batch: Model: #{model.name}, Time: #{Time.now - t1}, Completed: #{indexed_records} / #{total_records}"
+      break  if dry_run
       # Wait till the enqueued list reduces to less than 10 before sending more requests
       while (enqueued = index.total_enqueued) > 10
         puts "Sleeping as enqueued is exceeding 10 : Total enqueued: #{enqueued}"
@@ -103,6 +102,7 @@ class SearchIndex::Index::DocumentBuilder
       end
     end
     puts "Completed successfully"
+    indexed_records
   end
 
   def index_record(record)
