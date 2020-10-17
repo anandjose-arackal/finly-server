@@ -1,7 +1,7 @@
 class PaymentIndex < SearchIndex::Model
 
   index Indexes::Vp do
-    include_associations({payment_order: {bank_payment_request: [:policy, :created_by]}}, :status, :receiving_user_vendor)
+    include_associations({payment_order: {bank_payment_request: [:policy, :created_by]}}, :status, :reference_resource, :receiving_user_vendor)
 
     document_type :payments
     permissions Docs::PaymentTickets::Payments::Index.permissions
