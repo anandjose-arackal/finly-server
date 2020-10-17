@@ -11,13 +11,16 @@ class SearchIndex::Services::UpdateMonitor
     response
   end
 
+  def self.logger
+    @logger ||= LogStashLogger.new(type: :file, path: 'log/meilisearch_logs.log', sync: true)
+  end
+
   def self.run
     unless Rails.configuration.meilisearch_monitor
       puts 'Not listening as meilisearch_monitor is set to false'
       return
     end
 
-    logger = LogStashLogger.new(type: :file, path: 'log/meilisearch_logs.log', sync: true)
     puts 'Listening...'
     begin
       loop do
