@@ -73,12 +73,13 @@ class SearchIndex::Index::Api
     @rebuild_logger ||= LogStashLogger.new(type: :file, path: 'log/meilisearch_rebuild_tracker.log', sync: true)
   end
 
-  def self.rebuild_index(dry_run: false)
+  def self.rebuild_index(company_id: nil, dry_run: false)
     dt1 = DateTime.now
     t1 = Time.now
     rebuild_logger.info({event: "Rebuilding Index", action: "Starting Rebuild"})
     indexed_records = 0
     companies = Company.all.reorder(id: :asc)
+    companies = companies.where(id: company_id) if company_id.present?
     companies = companies.limit(2) if dry_run
 
     companies.pluck(:id).each do |company_id|
