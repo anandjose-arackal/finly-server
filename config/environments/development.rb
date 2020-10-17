@@ -39,7 +39,7 @@ Rails.application.configure do
 
   meilisearch_config = Rails.application.config_for(:meilisearch)&.with_indifferent_access
   if meilisearch_config['enabled']
-    config.meilisearch = MeiliSearch::Client.new(meilisearch_config['url'], meilisearch_config['api_key'])
+    config.meilisearch = MeiliSearch::Client.new(meilisearch_config['url'], meilisearch_config['api_key'], timeout: 30.seconds, read_timeout: 30.seconds, max_retries: 2)
     config.meilisearch_index_prefix = meilisearch_config['index_prefix']
     config.meilisearch_monitor = false
   else
