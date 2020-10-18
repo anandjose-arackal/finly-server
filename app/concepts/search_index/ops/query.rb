@@ -16,16 +16,16 @@ class SearchIndex::Ops::Query < Transactions::API
   def fetch_filters(context, token:, **)
     context[:config] = Rails.configuration.redis.get(token)
     context[:config] = JSON.parse(context[:config]).with_indifferent_access if context[:config]
-    return unauthorized!(context) if context[:config].blank? or context[:config][:filters].blank? or context[:config][:facets].blank?
+    return unauthorized!(context) if context[:config].blank? or context[:config][:filters].blank?
 
     true
   end
 
   def query(context, config:, params:, **)
     filters = config[:filters]
-    facets = config[:facets]
-    facets += JSON.parse(params[:facets]) if params[:facets].present?
-    context[:response] = Indexes::Vp.index.search(params[:q], {filters: filters, facets: facets, facets_distribution: ['record_type'], offset: (params[:offset] || 0), limit: (params[:limit] || 20)})
+    # facets = config[:facets]
+    facets = params[:facets].present? ? JSON.parse(params[:facets]) : []
+    context[:response] = Indexes::Vp.index(config[:company_id]).search(params[:q], {filters: filters, facets: facets, facets_distribution: ['record_type'], offset: (params[:offset] || 0), limit: (params[:limit] || 20)})
   end
 
 end
