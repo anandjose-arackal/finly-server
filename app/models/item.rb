@@ -35,9 +35,7 @@ class Item < ApplicationRecord
   include Sequenced::ActsAsSequenced
   include MathUtil
   include EventProducer
-
-
-  event_channel 'item'
+  include SearchIndex::Concerns::Document
 
   acts_as_sequenced column: :item_number, purpose: :item_master, min_length: 8, editable: false, prefix: -> (record) { record.goods? ? "G" : "S" }
 
@@ -46,7 +44,7 @@ class Item < ApplicationRecord
   belongs_to :category, optional: true
   belongs_to :tax_rate, optional: true
   belongs_to :supply_item_type, optional: true
-  belongs_to :product_type, optional: true#, class_name: "ProductType", foreign_key: :product_type_id
+  belongs_to :product_type, optional: true #, class_name: "ProductType", foreign_key: :product_type_id
   belongs_to :user, optional: true
   belongs_to :created_by, optional: true, class_name: 'User', foreign_key: :user_id
   belongs_to :item_expense_type, optional: true
@@ -97,7 +95,7 @@ class Item < ApplicationRecord
     where id: ids
   }
 
-  scope :includes_for_export, -> {includes(:category,:item_expense_type,:product_type, :supply_item_type, :tax_rate)}
+  scope :includes_for_export, -> { includes(:category, :item_expense_type, :product_type, :supply_item_type, :tax_rate) }
 
   delegate :po_item?, :non_po_item?, to: :supply_item_type
 
@@ -109,12 +107,12 @@ class Item < ApplicationRecord
     self.product_type_id == ProductType.id_for(:service)
   end
 
-
   after_save :budget_trail_entry
 
   def as_json
     {
         id: id,
+        company_id: company_id,
         item_number: item_number,
         unit_of_measurement: unit_of_measurement,
         hsn_sac: hsn_sac,
@@ -175,7 +173,7 @@ class Item < ApplicationRecord
   end
 
   def rate_contract_vendors
-    rate_contract_line_items.joins(:rate_contract).map{|line_item| { vendor_id: line_item.rate_contract.vendor.id, vendor_name: line_item.rate_contract.vendor.display_name, rate:  precision_value(line_item&.amount&.value), rate_contract_item_id: line_item.id}}
+    rate_contract_line_items.joins(:rate_contract).map { |line_item| {vendor_id: line_item.rate_contract.vendor.id, vendor_name: line_item.rate_contract.vendor.display_name, rate: precision_value(line_item&.amount&.value), rate_contract_item_id: line_item.id} }
   end
 
   def get_custom_description

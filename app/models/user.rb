@@ -69,8 +69,12 @@ class User < ApplicationRecord
   include Exposures::Model::Exposable
   include EventProducer
   include ErpSyncable
+  include SearchIndex::Concerns::AccessControl
+  include SearchIndex::Concerns::Document
 
-  event_channel 'user'
+  ACTIVE = 1
+  PENDING = 2
+  INACTIVE = 3
 
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
@@ -938,6 +942,10 @@ class User < ApplicationRecord
     end
   end
 
+  def analytics_id
+    "user:#{id}"
+  end
+
   # def min_password_score
   #   level_3_req = UserRole.ids_for(
   #       :admin,
@@ -1770,6 +1778,10 @@ class User < ApplicationRecord
     return true if has_roles?(permissions)
 
     false
+  end
+
+  def feature_toggle
+    @feature_toggle ||= FeatureToggle.new(self)
   end
 
   def active?

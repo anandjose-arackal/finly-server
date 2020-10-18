@@ -23,7 +23,6 @@ class TaskWorkflow < ApplicationRecord
   include EventProducer
   include UUIDHelper
 
-  event_channel 'task_workflow'
   serialize :conditions, JSON
 
   has_many :file_manager_actions, class_name: 'TaskFileManagerAction'

@@ -52,10 +52,13 @@ class YesBankVendor < ApplicationRecord
   include LiquidDroppable
   include Exposures::Model::Exposable
   include ErpSyncable
+  include SearchIndex::Concerns::Document
 
   validates :business_name, presence: true
 
   include SoftDeletable
+
+  event_channel 'vendors'
 
   acts_as_sequenced column: :vendor_id, purpose: :vendor, editable: false, prefix: 'VNDR-'
 
