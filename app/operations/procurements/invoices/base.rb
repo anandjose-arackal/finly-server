@@ -95,4 +95,14 @@ class Procurements::Invoices::Base < BaseOperation
       item_amount_excluding_tax&.flatten&.compact&.sum
     end
   end
+
+  def budget_limit_validation invoice
+    if user.company.feature_subscription.enforce_budget_limit
+      op = BudgetManager::BudgetLimitValidator::ValidateInvoice.(user,{ invoice: self.invoice })
+      if op.messages[:error].present?
+        return add_message :error, op.messages[:error]
+      end
+    end
+  end
+
 end

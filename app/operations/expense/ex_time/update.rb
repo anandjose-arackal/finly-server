@@ -124,6 +124,7 @@ class Expense::ExTime::Update < Expense::ExTime::Base
 
     # ensuring that a particular expense cannot be both from cash on hand and reimbursable at the same time
     check_coh_reimbursable_exclusivity_update(updated_expense_params)
+    budget_limit_validation( expense )
   end
 
   def pre_process

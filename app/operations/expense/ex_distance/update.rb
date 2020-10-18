@@ -173,6 +173,7 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
     check_coh_availability_update(self.cash_pocket, updated_expense_params)
 
     check_coh_reimbursable_exclusivity_update(updated_expense_params)
+    budget_limit_validation( expense )
   end
 
   def pre_process

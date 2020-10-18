@@ -42,6 +42,7 @@ class BankTransfer::PaymentRequest::Review::Approve < BankTransfer::PaymentReque
     end
 
     invoice_check
+    budget_limit_validation( payment )
   end
 
   def process

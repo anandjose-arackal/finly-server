@@ -134,6 +134,8 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
         return
       end
     end
+
+    budget_limit_validation payment
   end
 
   def pre_process

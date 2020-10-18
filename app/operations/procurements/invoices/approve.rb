@@ -27,6 +27,7 @@ class Procurements::Invoices::Approve < Procurements::Invoices::Base
     end
 
     validate_agreement_limit
+    budget_limit_validation( invoice )
   end
 
   def process

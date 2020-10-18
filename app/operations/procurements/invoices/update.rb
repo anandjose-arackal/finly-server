@@ -40,6 +40,7 @@ class Procurements::Invoices::Update < Procurements::Invoices::Base
     if self.invoice.blank?
       add_message :error, 'Inward Invoice not found'
     end
+    budget_limit_validation( invoice )
   end
 
   def process

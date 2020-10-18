@@ -60,6 +60,7 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
       add_message :error, dlrm_validation_op.messages[:error]
     end
     validate_agreement_limit
+    budget_limit_validation( invoice )
   end
 
   def process

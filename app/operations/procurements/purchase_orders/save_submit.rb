@@ -14,7 +14,7 @@ class Procurements::PurchaseOrders::SaveSubmit < Procurements::PurchaseOrders::B
     unless self.purchase_order.present?
       add_message :error, 'Purchase Order not found'
     end
-
+    budget_limit_validation( purchase_order )
   end
 
   def process

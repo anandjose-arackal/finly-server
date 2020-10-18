@@ -82,6 +82,7 @@ class Expense::ExPerDiem::Update < Expense::ExPerDiem::Base
         self.updated_expense_params[:spent_from_id] = self.cash_pocket&.id
       end
     end
+    budget_limit_validation( expense )
   end
 
   def authorize

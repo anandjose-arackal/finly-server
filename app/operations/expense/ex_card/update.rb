@@ -56,6 +56,8 @@ class Expense::ExCard::Update < Expense::ExCard::Base
       add_message :error, "Card expenses are non-reimbursable by default"
       return
     end
+
+    budget_limit_validation( expense )
   end
 
   def authorize

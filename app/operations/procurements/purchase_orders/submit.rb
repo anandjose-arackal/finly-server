@@ -48,6 +48,7 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
     unless dlrm_validation_op.success?
       add_message :error, dlrm_validation_op.messages[:error]
     end
+    budget_limit_validation( purchase_order )
   end
 
   def process

@@ -15,6 +15,7 @@ class Procurements::Invoices::SaveSubmit < Procurements::Invoices::Base
       add_message :error, 'Inward Invoice not found'
     end
 
+    budget_limit_validation( invoice )
   end
 
   def process

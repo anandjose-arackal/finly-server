@@ -196,6 +196,8 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
         end
       end
     end
+
+    budget_limit_validation( purchase_order )
   end
 
   def pre_process

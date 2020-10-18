@@ -98,6 +98,7 @@ class Expense::ExDistance::Odometer::ExUpdate < Expense::ExDistance::Update
       add_message :error, 'End Reading Receipt not found'
       return
     end
+    budget_limit_validation( expense )
   end
 
   def process

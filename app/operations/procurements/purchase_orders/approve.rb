@@ -28,6 +28,8 @@ class Procurements::PurchaseOrders::Approve < Procurements::PurchaseOrders::Base
     # unless awaiting_action_from?
     #   add_message :error, 'You cannot approve this Purchase Order at this state'
     # end
+
+    budget_limit_validation( purchase_order )
   end
 
   def process
