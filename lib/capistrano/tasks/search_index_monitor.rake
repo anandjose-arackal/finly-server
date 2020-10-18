@@ -12,7 +12,7 @@ namespace :load do
     set :status_index_monitor_log, -> {File.join(shared_path, 'log', 'status_index_monitor.log')}
     set :status_index_monitor_env, -> {fetch(:rack_env, fetch(:rails_env, fetch(:stage)))}
     set :status_index_monitor_runner, -> {'SearchIndex::Services::UpdateMonitor.run'}
-    set :status_index_monitor_role, -> {:app}
+    set :status_index_monitor_role, -> {:status_index_monitor_role}
     set :status_index_monitor_env, -> {fetch(:rack_env, fetch(:rails_env, fetch(:stage)))}
     set :status_index_monitor_env, -> {fetch(:rack_env, fetch(:rails_env, 'production'))}
   end
