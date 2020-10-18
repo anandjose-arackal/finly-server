@@ -240,10 +240,11 @@ gem 'awesome_print', '~> 1.8.0'
 
 # Fuzzy String Match
 gem 'fuzzy-string-match', '1.0.1'
-
 # gem that schedules cron jobs for us
-gem 'whenever'
+gem 'whenever', '~> 1.0'
 
+# Elasticsearch
+gem 'searchkick', '~> 4.4'
 # gem for all azure services
 gem 'azure'
 gem 'azure-storage-blob'

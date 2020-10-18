@@ -332,6 +332,14 @@ GEM
     elastic-apm (2.8.1)
       concurrent-ruby (~> 1.0)
       http (>= 3.0)
+    elasticsearch (7.5.0)
+      elasticsearch-api (= 7.5.0)
+      elasticsearch-transport (= 7.5.0)
+    elasticsearch-api (7.5.0)
+      multi_json
+    elasticsearch-transport (7.5.0)
+      faraday (>= 0.14, < 1)
+      multi_json
     enumerable-statistics (2.0.1)
     erubi (1.9.0)
     et-orbi (1.2.4)
@@ -659,6 +667,10 @@ GEM
     saxlsx (1.9.0)
       ox (~> 2.1)
       rubyzip (~> 1.0)
+    searchkick (4.4.1)
+      activemodel (>= 5)
+      elasticsearch (>= 6)
+      hashie
     sendgrid-ruby (6.3.6)
       ruby_http_client (~> 3.4)
     sentry-raven (2.13.0)
@@ -919,6 +931,7 @@ DEPENDENCIES
   rufus-scheduler (~> 3.6)
   sass-rails (~> 6.0)
   saxlsx (~> 1.9)
+  searchkick (~> 4.4)
   sendgrid-ruby (~> 6.0)
   sentry-raven (~> 2.13)
   sidekiq (~> 5.2.3)
@@ -947,7 +960,7 @@ DEPENDENCIES
   uglifier (~> 4.1.20)
   uuidtools (~> 2.1)
   web-console (~> 3.7.0)
-  whenever
+  whenever (~> 1.0)
   wicked_pdf (~> 1.1.0)
   will_paginate (~> 3.1.6)
   wkhtmltopdf-binary (= 0.12.5)
