@@ -107,6 +107,8 @@ class BbpsBillerSubscription < ApplicationRecord
     where(id: ids)
   }
 
+  scope :with_company_id, -> (company_id) { where company_id: company_id }
+
   scope :filter_status, -> (status, user = nil) {
     case status
     when 'approved', :approved

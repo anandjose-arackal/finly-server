@@ -10,6 +10,10 @@ module Masters
           54 # Jotun India
       ]
 
+      def self.logger
+        LogStashLogger.new(type: :file, path: 'log/trait_publisher.log', sync: true)
+      end
+
       # Responsible for publishing company properties
       class CompanyHandler
         # include Events::Consumer

@@ -70,6 +70,7 @@ class Item < ApplicationRecord
     where("description like ? OR sku like ? OR note like ? OR hsn_sac like ? OR item_number like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
   }
   scope :filter_category_id, -> (category_id) { where category_id: category_id }
+  scope :with_company_id, -> (company_id) { where company_id: company_id }
 
   # Filter though supply item type
   scope :filter_item_type, -> (type_id) do

@@ -25,10 +25,10 @@ class SearchIndex::Index::Api
     @document_builders ||= []
   end
 
-  def self.index
+  def self.index(company_id)
     validate
 
-    self.new
+    self.new(company_id)
   end
 
   def self.validate
@@ -39,20 +39,19 @@ class SearchIndex::Index::Api
   # Adds an env prefix to the index name if available.
   # This is used for generating a separate index per env within the same instance
   # Ex: dev1, dev2 can have separate index prefix to separate out the searches
-  def self.full_index_name
-    if Rails.configuration.meilisearch_index_prefix.present?
-      return "#{Rails.configuration.meilisearch_index_prefix}_#{self.index_name}"
-    end
+  def self.scoped_index_name(company_id)
+    scoped_index_name = "#{self.index_name}_#{company_id}"
+    return scoped_index_name unless Rails.configuration.meilisearch_index_prefix.present?
 
-    self.index_name
+    "#{Rails.configuration.meilisearch_index_prefix}_#{scoped_index_name}"
   end
 
-  def self.create_index
+  def self.create_index(company_id)
     validate
 
     begin
-      Rails.configuration.meilisearch.create_index(self.full_index_name, primaryKey: self.primary_key.name)
-
+      Rails.configuration.meilisearch.create_index(scoped_index_name(company_id), primaryKey: self.primary_key.name)
+      set_index_properties(company_id)
       true
     rescue MeiliSearch::ApiError => e
       # Index already exists
@@ -61,10 +60,10 @@ class SearchIndex::Index::Api
     end
   end
 
-  def self.seed_index(dry_run: false)
+  def self.seed_index(company_id, dry_run: false)
     indexed_records = 0
     document_builders.each do |document_builder|
-      indexed_records += document_builder.rebuild_documents(dry_run: dry_run)
+      indexed_records += document_builder.rebuild_documents(company_id, dry_run: dry_run)
     end
 
     indexed_records
@@ -74,30 +73,44 @@ class SearchIndex::Index::Api
     @rebuild_logger ||= LogStashLogger.new(type: :file, path: 'log/meilisearch_rebuild_tracker.log', sync: true)
   end
 
-  def self.rebuild_index(dry_run: false)
+  def self.rebuild_index(company_id: nil, dry_run: false)
     dt1 = DateTime.now
     t1 = Time.now
     rebuild_logger.info({event: "Rebuilding Index", action: "Starting Rebuild"})
-    delete_index
-    create_index
-    indexed_records = seed_index(dry_run: dry_run)
-    set_index_properties
+    total_indexed_records = 0
+    companies = Company.all.reorder(id: :asc)
+    companies = companies.where(id: company_id) if company_id.present?
+    companies = companies.limit(2) if dry_run
+
+    companies.pluck(:id).each do |company_id|
+      company_started_at = Time.now
+      delete_index(company_id)
+      create_index(company_id)
+      company_indexed_records = seed_index(company_id, dry_run: dry_run)
+      total_indexed_records += company_indexed_records
+
+      company_rebuild_attributes = {
+          total_time: Time.at(Time.now - company_started_at).utc.strftime("%H:%M:%S.%L"),
+          total_indexed_records: company_indexed_records
+      }
+      rebuild_logger.info({event: "Rebuilding Index", action: "Rebuild Completed For Company", company_id: company_id}.merge(company_rebuild_attributes))
+    end
 
     rebuild_attributes = {
         started_at: dt1,
         ended_at: DateTime.now,
-        total_time: Time.at(Time.now - t1).utc.strftime("%H:%M:%S"),
-        total_indexed_records: indexed_records
+        total_time: Time.at(Time.now - t1).utc.strftime("%H:%M:%S.%L"),
+        total_indexed_records: total_indexed_records
     }
     SearchIndex::Services::UpdateMonitor.logger.info({message_type: 'index_rebuild'}.merge(rebuild_attributes))
 
-    rebuild_logger.info({event: "Rebuilding Index",action: "Rebuild Completed"}.merge(rebuild_attributes))
+    rebuild_logger.info({event: "Rebuilding Index", action: "Rebuild Completed"}.merge(rebuild_attributes))
 
     true
   end
 
-  def self.set_index_properties
-    index = Rails.configuration.meilisearch.index(self.full_index_name)
+  def self.set_index_properties(company_id)
+    index = Rails.configuration.meilisearch.index(scoped_index_name(company_id))
     index.update_searchable_attributes(searchable_attributes)
     index.update_displayed_attributes(displayed_attributes)
     index.update_attributes_for_faceting(attributes_for_faceting)
@@ -115,9 +128,9 @@ class SearchIndex::Index::Api
     attributes.map { |attr| attr.name if attr.faceted }.compact
   end
 
-  def self.delete_index
+  def self.delete_index(company_id)
     begin
-      Rails.configuration.meilisearch.delete_index(self.full_index_name)
+      Rails.configuration.meilisearch.delete_index(scoped_index_name(company_id))
       return true
     rescue MeiliSearch::ApiError => e
       # Index already exists
@@ -138,25 +151,27 @@ class SearchIndex::Index::Api
     @attributes_to_crop
   end
 
-  attr_accessor :index
+  attr_accessor :index, :company_id
 
-  def initialize
-    self.index = Rails.configuration.meilisearch.index(self.class.full_index_name)
+  def initialize(company_id)
+    self.company_id = company_id
+    self.index = Rails.configuration.meilisearch.index(scoped_index_name)
   end
 
-  def add_document(document)
-    add_documents document
+  def scoped_index_name
+    self.class.scoped_index_name(company_id)
   end
 
   def add_documents(documents)
     documents = [documents] unless documents.respond_to?(:each)
-    SearchIndex::Services::UpdateMonitor.with_tracking(self.class.full_index_name) do
+    SearchIndex::Services::UpdateMonitor.with_tracking(scoped_index_name) do
       index.add_documents documents, self.class.primary_key.name
     end
   end
+  alias_method :add_document, :add_documents
 
   def delete_document(id)
-    SearchIndex::Services::UpdateMonitor.with_tracking(self.class.full_index_name) do
+    SearchIndex::Services::UpdateMonitor.with_tracking(scoped_index_name) do
       index.delete_documents(id)
     end
   end
@@ -164,7 +179,7 @@ class SearchIndex::Index::Api
   def delete_documents(ids)
     ids = [ids] unless ids.respond_to?(:each)
 
-    SearchIndex::Services::UpdateMonitor.with_tracking(self.class.full_index_name) do
+    SearchIndex::Services::UpdateMonitor.with_tracking(scoped_index_name) do
       index.delete_documents(ids)
     end
   end
@@ -183,7 +198,7 @@ class SearchIndex::Index::Api
 
   # Provides a status wise summary of the update_status
   def status_counts
-    index.get_all_update_status.map {|i| i['status']}.inject(Hash.new(0)) { |h, e| h[e] += 1 ; h }
+    index.get_all_update_status.map { |i| i['status'] }.inject(Hash.new(0)) { |h, e| h[e] += 1; h }
   end
 
   def search(q, filters: nil, facets: nil, facets_distribution: nil, offset: 0, limit: 20)
@@ -196,8 +211,15 @@ class SearchIndex::Index::Api
     options['matches'] = true
     options['offset'] = offset.to_i || 0
     options['limit'] = limit.to_i || 10
-    SearchIndex::Services::UpdateMonitor.with_tracking(self.class.full_index_name) do
-      index.search(q, options)
+    SearchIndex::Services::UpdateMonitor.with_tracking(scoped_index_name) do
+      begin
+        index.search(q, options)
+      rescue MeiliSearch::ApiError => e
+        # In case the index is not created
+        {
+            'hits' => []
+        }
+      end
     end
   end
 

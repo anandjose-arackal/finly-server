@@ -114,6 +114,7 @@ class YesBankVendor < ApplicationRecord
 
   scope :with_ids, -> (ids) {where id: ids}
   scope :with_id, -> (ids) {where id: ids}
+  scope :with_company_id, -> (company_id) { where company_id: company_id }
 
   scope :including_bank_accounts, -> {joins(:bank_accounts)}
   scope :non_deleted, -> {where deleted_at: nil }

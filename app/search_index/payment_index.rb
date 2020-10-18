@@ -1,7 +1,7 @@
 class PaymentIndex < SearchIndex::Model
 
   index Indexes::Vp do
-    include_associations({payment_order: {bank_payment_request: [:policy, :created_by]}}, :status, :receiving_user_vendor)
+    include_associations({payment_order: {bank_payment_request: [:policy, :created_by]}}, :status, :reference_resource, :receiving_user_vendor)
 
     document_type :payments
     permissions Docs::PaymentTickets::Payments::Index.permissions
@@ -26,7 +26,7 @@ class PaymentIndex < SearchIndex::Model
             sequence_id: record.id,
             description: record.payment_order&.bank_payment_request&.description,
             narration: record.note,
-            unique_transaction_references: ([record.to_exposure.utr] if record.to_exposure.utr.present?),
+            unique_transaction_references: [record.to_exposure.utr].compact,
             vendor_name: vendor&.business_name,
             vendor_trade_name: vendor&.trade_name,
             vendor_sequence_id: vendor&.vendor_id,

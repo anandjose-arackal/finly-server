@@ -102,6 +102,8 @@ class BbpsBill < ApplicationRecord
 
   default_scope {order('bbps_bills.created_at DESC')}
 
+  scope :with_company_id, -> (company_id) { where company_id: company_id }
+
   scope :with_ids, -> (ids) {
     where(id: ids)
   }
