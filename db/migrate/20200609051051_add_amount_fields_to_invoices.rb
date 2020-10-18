@@ -1,6 +1,6 @@
 class AddAmountFieldsToInvoices < ActiveRecord::Migration[5.2]
   def change
-    add_column :invoices, :gross_amount, :decimal, precision: 20, scale: 10, index: true
+    # add_column :invoices, :gross_amount, :decimal, precision: 20, scale: 10, index: true
     add_column :invoices, :discount_amount, :decimal, precision: 20, scale: 10, index: true
     add_column :invoices, :freight_amount, :decimal, precision: 20, scale: 10, index: true
     add_column :invoices, :taxable_amount, :decimal, precision: 20, scale: 10, index: true
