@@ -9,7 +9,7 @@ json.results do
     json.query record.query
     json.active record.active
     json.personal record.personal
-    json.created_by record.created_by.name
+    json.created_by record.created_by&.name
     json.created_at record.created_at
     json.updated_at record.updated_at
     json.user_roles do

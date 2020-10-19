@@ -27,9 +27,10 @@ class ExportManager::Builders::Template
           attr.build
         end
       }),
-      query: JSON.generate(query),
+      query: query,
       default: default,
       master: master,
+      personal: false
     }
   end
 
