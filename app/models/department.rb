@@ -22,24 +22,10 @@ class Department < ApplicationRecord
   include LiquidDroppable
   include Exposures::Model::Exposable
   include EventProducer
-  include SearchIndex::Concerns::Document
+  include Searchkick::DSL
+  # include SearchIndex::Concerns::Document
 
   acts_as_sequenced column: :department_code, purpose: :department, editable: false, prefix: 'DPT'
-
-  searchkick index_name: -> {
-    raise 'Current company should be set to identify the required index' unless RequestStoreUtil.current_company.present?
-
-    [Rails.env, RequestStoreUtil.current_company&.id, 'search', table_name].join('_')
-  }
-
-  scope :search_import, -> { where company_id: RequestStoreUtil.current_company&.id }
-
-  def search_data
-    {
-        name: full_name,
-        department_code: department_code
-    }
-  end
 
   has_ancestry
 

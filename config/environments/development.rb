@@ -34,6 +34,8 @@ Rails.application.configure do
     config.posthog = nil
   end
 
+
+
   redis_config = Rails.application.config_for(:redis_config)&.with_indifferent_access
   config.redis = Redis.new(redis_config.slice('url', 'password'))
 
