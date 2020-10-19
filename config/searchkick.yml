@@ -1,0 +1,3 @@
+development:
+  elasticsearch_url: 'https://search.finly.io:443'
+  prefix: 'vivek_local'
