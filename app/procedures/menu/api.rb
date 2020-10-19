@@ -45,7 +45,7 @@ class Menu::API < Transactions::API
     @footer_items ||= []
   end
 
-  def self.footer_item(key, path: nil, icon: nil, label: nil, permissions: [], features: [], options: {}, &block)
+  def self.footer_item(key, path: nil, icon: nil, label: nil, permissions: [], features: [], toggle: [], options: {}, &block)
     footer_items << Menu::Item.new(
         key: key, path: path, icon: icon, label: label,
         options: options,
