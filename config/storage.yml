@@ -8,9 +8,9 @@ local:
 
 microsoft:
   service: AzureStorage
-  storage_account_name: 'dummyblobstorage'
-  storage_access_key: 'LRbNMxGIRdWYy5mMg456LDDmKg+GhWDQYSdYXHZPIgOLPf/+iLOoEN8qY8d4fWxLGiueM5oozWhOpFfsKfpo/Q=='
-  container: 'activestorage-dev'
+  storage_account_name: <%= Rails.application.credentials.dig(:azure_config, :storage_account_name) %>
+  storage_access_key: <%= Rails.application.credentials.dig(:azure_config, :storage_access_key) %>
+  container: <%= Rails.application.credentials.dig(:azure_config, :active_storage_container) %>
 # Use rails credentials:edit to set the AWS secrets (as aws:access_key_id|secret_access_key)
 # amazon:
 #   service: S3
