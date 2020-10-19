@@ -6,6 +6,8 @@ class ExportManager::Master::Invoices::GstExport < ExportManager::Builders::Temp
   resource 'invoice_line_items'
   subscribe 'invoice_line_items'
 
+  roles [:admin, :finance_manager]
+
   attribute :invoice_number, template: '{{ record.invoice.invoice_number }}'
   attribute :finly_ref_no, template: '{{ record.invoice.invoice_id }}'
   attribute :finance_approved_date, template: "{{ record.invoice.approved_at | date: '%d-%b-%Y' }}"

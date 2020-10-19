@@ -641,7 +641,10 @@ class ExportTemplateNew < ApplicationRecord
         list.each do |master|
           existing_template = ExportTemplateNew.where(master: master.to_s, company_id: company.id).first
           unless existing_template.present?
-            ExportTemplateNew.create!(**master.build, company_id: company.id)
+            data = master.build
+            user_roles = data.delete(:user_roles)
+            export_template = ExportTemplateNew.create!(**data, company_id: company.id)
+            export_template.role_mappings.create!(user_roles)
           end
         end
       end

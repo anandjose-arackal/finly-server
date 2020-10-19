@@ -13,6 +13,8 @@ class ExportManager::Master::Invoices::TdsExport < ExportManager::Builders::Temp
     }
   })
 
+  roles [:admin, :finance_manager]
+
   attribute :invoice_number, template: '{{ record.invoice_number }}'
   attribute :finly_ref_no, template: '{{ record.invoice_id }}'
   attribute :invoice_date, template: "{{ record.date | date: '%d-%b-%y' }}"
