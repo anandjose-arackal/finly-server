@@ -10,7 +10,7 @@ class ActionManager::Actions::Export < ActionManager::Action
 
     new_exports = Masters::ExportTemplates::Ops::Index.({ current_user: user, params: {route: route} })['model.records'].map do |record|
       {
-        version: 2,
+        template_export: true,
         name: record.name,
         id: record.id,
         export_format: record.export_format,
