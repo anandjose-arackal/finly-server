@@ -69,6 +69,8 @@ class User < ApplicationRecord
   include Exposures::Model::Exposable
   include EventProducer
   include ErpSyncable
+  include SearchIndex::Concerns::AccessControl
+  include SearchIndex::Concerns::Document
 
   ACTIVE = 1
   PENDING = 2

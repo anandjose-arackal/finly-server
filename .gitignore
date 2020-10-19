@@ -32,7 +32,7 @@ config/feature_flipper.yml
 config/meilisearch.yml
 config/posthog.yml
 data.ms/
-
+config/searchkick.yml
 
 .rubocop.yml
 .vscode/

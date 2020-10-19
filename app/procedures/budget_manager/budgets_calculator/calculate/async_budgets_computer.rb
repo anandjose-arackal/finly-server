@@ -4,11 +4,11 @@ class BudgetManager::BudgetsCalculator::Calculate::AsyncBudgetsComputer < Transa
 
   include Events::Consumer
 
-  consumes_event! 'purchase_order.update', 'purchase_order.create', 'purchase_order.destroy'
-  consumes_event! 'invoice.update', 'invoice.create', 'invoice.destroy'
-  consumes_event! 'report.update', 'report.create', 'report.destroy', 'expense.update', 'expense.create', 'expense.destroy'
-  consumes_event! 'bank_payment_request.update', 'bank_payment_request.create', 'bank_payment_request.destroy'
-  consumes_event! 'purchase_request.create', 'purchase_request.update', 'purchase_request.destroy'
+  consumes_event! 'purchase_orders.update', 'purchase_orders.create', 'purchase_orders.destroy'
+  consumes_event! 'invoices.update', 'invoices.create', 'invoices.destroy'
+  consumes_event! 'reports.update', 'reports.create', 'reports.destroy', 'expenses.update', 'expenses.create', 'expenses.destroy'
+  consumes_event! 'bank_payment_requests.update', 'bank_payment_requests.create', 'bank_payment_requests.destroy'
+  consumes_event! 'purchase_requests.create', 'purchase_requests.update', 'purchase_requests.destroy'
 
   def work(user, payload)
     self.class.(params: payload, current_user: user)

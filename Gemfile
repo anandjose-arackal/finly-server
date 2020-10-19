@@ -10,7 +10,7 @@ gem 'nokogiri', '~> 1.10.0'
 gem 'autoprefixer-rails', '~> 9.4.4'
 
 gem 'fiscali', '~> 2.4'
-
+gem 'redis', '~> 4.1'
 gem 'parslet', '~> 1.8.2'
 gem 'rack', github: 'rack/rack', :ref => 'f690bb71425aa31d7b9b3113829af773950d8ab5'
 gem 'rufus-scheduler', '~> 3.6'
@@ -197,6 +197,8 @@ gem 'devise', '~> 4.7'
 
 gem 'devise_invitable', '~> 2.0', '>= 2.0.2'
 gem 'doorkeeper', '~> 5.0.2'
+
+gem 'meilisearch', '~> 0.13'
 
 gem 'faraday', '~> 0.15.4'
 gem 'faraday_middleware', '~> 0.12.2'

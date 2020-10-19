@@ -2,7 +2,7 @@ class Docs::UtilityBills::Bills::Mailers::ReturnControl < Docs::UtilityBills::Bi
 
   class Docs::UtilityBills::Bills::Mailers::ReturnControl::ReturnedControlBy < Docs::UtilityBills::Bills::Mailers::ReturnControl
 
-    consumes_event! 'bbps_bill.return_control'
+    consumes_event! 'bbps_bills.return_control'
 
     assign :to do |user, params|
       [user.email]
@@ -23,7 +23,7 @@ class Docs::UtilityBills::Bills::Mailers::ReturnControl < Docs::UtilityBills::Bi
 
   class Docs::UtilityBills::Bills::Mailers::ReturnControl::ReturnedControlFrom < Docs::UtilityBills::Bills::Mailers::ReturnControl
 
-    consumes_event! 'bbps_bill.return_control'
+    consumes_event! 'bbps_bills.return_control'
 
     assign :to do |user, params|
       record = params[:record]

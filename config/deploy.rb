@@ -89,6 +89,7 @@ linked_files = %w{
   config/azure_config.yml
   config/finly_macros.yml
   config/finly_collect.yml
+  config/meilisearch.yml
   config/feature_flipper.yml
   config/posthog.yml
 }

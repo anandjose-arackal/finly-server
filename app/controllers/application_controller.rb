@@ -17,6 +17,7 @@ class ApplicationController < ActionController::Base
 
   before_action :set_cache_buster
 
+  # around_action :save_request_impression
   before_action :finly_authorize!
 
   # before_action :load_global_variables

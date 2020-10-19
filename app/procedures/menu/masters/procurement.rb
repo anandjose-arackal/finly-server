@@ -6,6 +6,8 @@ class Menu::Masters::Procurement < Menu::API
 
   app :vp
 
+  # item :global_search, label: "Search (Alt+/)", icon: 'https://img.icons8.com/windows/20/ffffff/search.png',
+  #      toggle: [GlobalSearchToggle, :enabled?]
   item :create, icon: 'https://img.icons8.com/windows/20/ffffff/plus-math.png' do
     action :redirect,
            :new_purchase_request,

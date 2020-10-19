@@ -12,7 +12,7 @@ Rails.application.configure do
   # Show full error reports.
   config.consider_all_requests_local = true
 
-  feature_flipper_config = Rails.application.config_for(:feature_flipper)
+  feature_flipper_config = Rails.application.config_for(:feature_flipper)&.with_indifferent_access
     if feature_flipper_config.present? and feature_flipper_config['enabled'] and
         feature_flipper_config.dig('api_key').present? and feature_flipper_config.dig('url').present?
       config.bullet_train = BulletTrain.new(api_key: feature_flipper_config['api_key'], url: feature_flipper_config['url'])
@@ -20,7 +20,7 @@ Rails.application.configure do
       config.bullet_train = nil
     end
 
-  posthog_config = Rails.application.config_for(:posthog)
+  posthog_config = Rails.application.config_for(:posthog)&.with_indifferent_access
   if posthog_config.present? and posthog_config['enabled']
     config.posthog = PostHog::Client.new(
         {
@@ -32,6 +32,18 @@ Rails.application.configure do
     )
   else
     config.posthog = nil
+  end
+
+  redis_config = Rails.application.config_for(:redis_config)&.with_indifferent_access
+  config.redis = Redis.new(redis_config.slice('url', 'password'))
+
+  meilisearch_config = Rails.application.config_for(:meilisearch)&.with_indifferent_access
+  if meilisearch_config['enabled']
+    config.meilisearch = MeiliSearch::Client.new(meilisearch_config['url'], meilisearch_config['api_key'], timeout: 30.seconds, read_timeout: 30.seconds, max_retries: 2)
+    config.meilisearch_index_prefix = meilisearch_config['index_prefix']
+    config.meilisearch_monitor = false
+  else
+    config.meilisearch = nil
   end
 
   # Enable/disable caching. By default caching is disabled.
