@@ -21,8 +21,7 @@ class CostCenter < ApplicationRecord
   include LiquidDroppable
   include Exposures::Model::Exposable
   include EventProducer
-
-  event_channel 'cost_center'
+  include SearchIndex::Concerns::Document
 
   acts_as_sequenced column: :cost_center_code, purpose: :cost_center, editable: false, prefix: 'CC'
 
@@ -51,6 +50,8 @@ class CostCenter < ApplicationRecord
   scope :vendor_payments_only, -> {
     where application: "vp"
   }
+
+  scope :with_company_id, -> (company_id) { where company_id: company_id }
 
   def as_json(options={})
     {

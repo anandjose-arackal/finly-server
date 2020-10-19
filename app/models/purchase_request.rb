@@ -27,11 +27,10 @@
 class PurchaseRequest < ApplicationRecord
   include Transitionable, CustomFieldFilterSupport
   include Sequenced::ActsAsSequenced
+  include SearchIndex::Concerns::Document
 
 
   acts_as_sequenced column: :order_number, purpose: :purchase_request, editable: false, prefix: 'PR'
-
-  event_channel 'purchase_request'
 
   # belongs_to :purchase_request_status, optional: true
   belongs_to :status, optional: true, class_name: 'PurchaseRequestStatus', foreign_key: :purchase_request_status_id
@@ -40,6 +39,7 @@ class PurchaseRequest < ApplicationRecord
   belongs_to :policy, optional: true
   belongs_to :company, optional: true
   belongs_to :creator, optional: true, class_name: 'User'
+  belongs_to :created_by, optional: true, class_name: 'User', foreign_key: 'creator_id'
   belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
   belongs_to :purchase_order, optional: true
   belongs_to :cost_center, optional: true
@@ -49,6 +49,7 @@ class PurchaseRequest < ApplicationRecord
   # has_many :line_items, class_name: "PurchaseRequestItem", dependent: :destroy
   has_many :purchase_request_items, dependent: :destroy
   has_many :items, class_name: "PurchaseRequestItem", dependent: :destroy
+  has_many :line_items, class_name: "PurchaseRequestItem", dependent: :destroy
   has_many :custom_fields, as: :parent, dependent: :destroy
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
 
@@ -75,6 +76,7 @@ class PurchaseRequest < ApplicationRecord
 
   scope :with_ids, -> (ids) { where id: ids }
 
+  scope :with_company_id, -> (company_id) { where company_id: company_id }
   scope :filter_by_status_id, -> (status_id) {
     if status_id == 'awaiting_approval'
       user_id = RequestStore.store[:current_user]&.id

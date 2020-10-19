@@ -45,9 +45,6 @@ class CreditNote < ApplicationRecord
   include Sequenced::ActsAsSequenced
   include EventProducer
 
-
-  event_channel 'credit_note'
-
   acts_as_sequenced column: :sequence_id, purpose: :credit_note, editable: false, prefix: 'CN'
 
   attr_accessor :skip_callback

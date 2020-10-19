@@ -17,6 +17,7 @@ class ApplicationController < ActionController::Base
 
   before_action :set_cache_buster
 
+  # around_action :save_request_impression
   before_action :finly_authorize!
 
   # before_action :load_global_variables
@@ -57,12 +58,12 @@ class ApplicationController < ActionController::Base
     # store last url - this is needed for post-login redirect to whatever the user last visited.
     return unless request.get?
     if request.path != "/users/sign_in" &&
-       request.path != "/users/sign_up" &&
-       request.path != "/users/password/new" &&
-       request.path != "/users/password/edit" &&
-       request.path != "/users/confirmation" &&
-       request.path != "/users/sign_out" &&
-       !request.xhr? # don't store ajax calls
+        request.path != "/users/sign_up" &&
+        request.path != "/users/password/new" &&
+        request.path != "/users/password/edit" &&
+        request.path != "/users/confirmation" &&
+        request.path != "/users/sign_out" &&
+        !request.xhr? # don't store ajax calls
       session[:previous_url] = request.fullpath
     end
   end
@@ -72,7 +73,7 @@ class ApplicationController < ActionController::Base
     respond_to do |format|
       format.html { redirect_to redirect_path }
       format.js { redirect_to redirect_path, turbolinks: true }
-      format.json { }
+      format.json {}
     end
   end
 
@@ -88,7 +89,7 @@ class ApplicationController < ActionController::Base
       format.js do
         render partial: "shared/flash_message"
       end
-      format.json { }
+      format.json {}
     end
   end
 
@@ -212,7 +213,7 @@ class ApplicationController < ActionController::Base
         end
         respond_to do |format|
           format.json { render "shared/success" }
-          format.html { }
+          format.html {}
         end
         return
       elsif type[:response] == :failure
@@ -223,19 +224,19 @@ class ApplicationController < ActionController::Base
         end
         respond_to do |format|
           format.json { render "layouts/application" }
-          format.html { }
+          format.html {}
         end
         return
       elsif type[:render].present?
         respond_to do |format|
           format.json { render type[:render] }
-          format.html { }
+          format.html {}
         end
         return
       elsif type[:view].present? and type[:view] == false
         respond_to do |format|
           format.json { render "layouts/application" }
-          format.html { }
+          format.html {}
         end
         return
       end
@@ -246,26 +247,26 @@ class ApplicationController < ActionController::Base
           @result.render(self)
         else
           respond_to do |format|
-            format.js { }
-            format.json { }
-            format.html { }
-            format.xls { }
+            format.js {}
+            format.json {}
+            format.html {}
+            format.xls {}
           end
         end
       else
         respond_to do |format|
           format.js { render "layouts/application" }
           format.json { render "layouts/application" }
-          format.html { }
-          format.xls { }
-          format.csv { }
+          format.html {}
+          format.xls {}
+          format.csv {}
         end
       end
     else
       respond_to do |format|
-        format.js { }
+        format.js {}
         format.json { render "layouts/application" }
-        format.html { }
+        format.html {}
       end
     end
   end
@@ -281,7 +282,7 @@ class ApplicationController < ActionController::Base
   def respond_failure(message = nil)
     messages = nil
     messages = [message] unless message.blank? or message.is_a?(Array)
-    @result = BaseOperation::BasePresenter::FailurePresenter.new(current_user, params, { error: messages })
+    @result = BaseOperation::BasePresenter::FailurePresenter.new(current_user, params, {error: messages})
     respond_to do |format|
       format.json { render "layouts/application" }
     end
@@ -341,7 +342,9 @@ class ApplicationController < ActionController::Base
     end
 
     verify_user_session(doorkeeper_token)
-    current_user&.update(last_activity_at: DateTime.now)
+
+    # Using an update all function to avoid the +users.update+ event. This event is avoided as it would fire too many times
+    User.where(id: current_user.id).update_all(last_activity_at: DateTime.now) if current_user.present?
   end
 
   def set_raven_context
@@ -402,7 +405,7 @@ class ApplicationController < ActionController::Base
 
     result = Gatekeeper::Event.(:on_authenticated_request, user: current_user)
     unless result.success?
-      session_status = result.session_status_id || UserSessionStatus.id_for(:blocked) 
+      session_status = result.session_status_id || UserSessionStatus.id_for(:blocked)
       invalidate_session session_status, (result.message || result.full_description)
       return false
     end

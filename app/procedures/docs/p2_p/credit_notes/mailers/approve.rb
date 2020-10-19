@@ -4,7 +4,7 @@ class Docs::P2P::CreditNotes::Mailers::Approve < Docs::P2P::CreditNotes::Mailers
 
   class Docs::P2P::CreditNotes::Mailers::Approve::ApprovedBy < Docs::P2P::CreditNotes::Mailers::Approve
 
-    consumes_event! 'credit_note.approve'
+    consumes_event! 'credit_notes.approve'
 
     assign :to do |user, params|
       [user.email]
@@ -25,7 +25,7 @@ class Docs::P2P::CreditNotes::Mailers::Approve < Docs::P2P::CreditNotes::Mailers
 
   class Docs::P2P::CreditNotes::Mailers::Approve::ApprovedTo < Docs::P2P::CreditNotes::Mailers::Approve
 
-    consumes_event! 'credit_note.approve'
+    consumes_event! 'credit_notes.approve'
 
     def validate(options, params:, **)
       return if params[:record].approved?
@@ -51,7 +51,7 @@ class Docs::P2P::CreditNotes::Mailers::Approve < Docs::P2P::CreditNotes::Mailers
 
   class Docs::P2P::CreditNotes::Mailers::Approve::ApprovedFor < Docs::P2P::CreditNotes::Mailers::Approve
 
-    consumes_event! 'credit_note.approve'
+    consumes_event! 'credit_notes.approve'
 
     def validate(options, params:, **)
       return unless params[:record].approved?

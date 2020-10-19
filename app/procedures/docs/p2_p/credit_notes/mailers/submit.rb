@@ -2,7 +2,7 @@ class Docs::P2P::CreditNotes::Mailers::Submit < Docs::P2P::CreditNotes::Mailers:
 
   class Docs::P2P::CreditNotes::Mailers::Submit::SubmittedFrom < Docs::P2P::CreditNotes::Mailers::Submit
 
-    consumes_event! 'credit_note.submit'
+    consumes_event! 'credit_notes.submit'
 
     assign :to do |user, params|
       [user.email]
@@ -23,7 +23,7 @@ class Docs::P2P::CreditNotes::Mailers::Submit < Docs::P2P::CreditNotes::Mailers:
 
   class Docs::P2P::CreditNotes::Mailers::Submit::SubmittedTo < Docs::P2P::CreditNotes::Mailers::Submit
 
-    consumes_event! 'credit_note.submit'
+    consumes_event! 'credit_notes.submit'
 
     assign :to do |user, params|
       params[:record].get_reviewers.pluck(:email)

@@ -62,10 +62,8 @@
 class BbpsBillerSubscription < ApplicationRecord
   include Sequenced::ActsAsSequenced
   include SoftDeletable, Transitionable
-
   include EventProducer
-
-  event_channel 'bbps_biller_subscription'
+  include SearchIndex::Concerns::Document
 
   acts_as_sequenced column: :sequence_id, purpose: :bbps_biller_subscription, editable: false, prefix: 'UBM'
 
@@ -108,6 +106,8 @@ class BbpsBillerSubscription < ApplicationRecord
   scope :with_id, -> (ids) {
     where(id: ids)
   }
+
+  scope :with_company_id, -> (company_id) { where company_id: company_id }
 
   scope :filter_status, -> (status, user = nil) {
     case status
