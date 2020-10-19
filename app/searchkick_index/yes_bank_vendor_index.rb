@@ -5,6 +5,8 @@ module YesBankVendorIndex
     scope :searchkick_import, -> {
       includes(:policy, :status, :gstin_locations, :created_by)
     }
+
+    searchkick_record_type :vendors
   end
 
   def searchkick_data
@@ -15,7 +17,7 @@ module YesBankVendorIndex
         policy_name: policy&.name,
         status_id: status_id,
         status_name: status&.name&.titleize,
-        sequence_id: vendor_id,
+        vendor_id: vendor_id,
         description: description,
         tax_id: pan,
         tax_registration_number: gstin_locations.pluck(:gstin).join(", "),

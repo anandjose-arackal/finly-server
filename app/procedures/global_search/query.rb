@@ -1,10 +1,11 @@
-class SearchIndex::Ops::Query < Transactions::API
+class GlobalSearch::Query < Transactions::API
 
   skip_user_authorization!
 
   step :fetch_token
   step :fetch_filters
   step :query
+  step :build_response
 
   def fetch_token(context, **)
     context[:token] = RequestStoreUtil.current_request.headers['Authorization']
@@ -14,18 +15,37 @@ class SearchIndex::Ops::Query < Transactions::API
   end
 
   def fetch_filters(context, token:, **)
-    context[:config] = Rails.configuration.redis.get(token)
-    context[:config] = JSON.parse(context[:config]).with_indifferent_access if context[:config]
-    return unauthorized!(context) if context[:config].blank? or context[:config][:filters].blank?
+    filters = Rails.configuration.redis.get(token)
+    return unauthorized!(context) if filters.blank?
 
+    context[:filters] = JSON.parse(filters).deep_symbolize_keys
     true
   end
 
-  def query(context, config:, params:, **)
-    filters = config[:filters]
-    # facets = config[:facets]
-    facets = params[:facets].present? ? JSON.parse(params[:facets]) : []
-    context[:response] = Indexes::Vp.index(config[:company_id]).search(params[:q], {filters: filters, facets: facets, facets_distribution: ['record_type'], offset: (params[:offset] || 0), limit: (params[:limit] || 20)})
+  def query(context, filters:, params:, **)
+    context[:result] = Searchkick.search(params[:q], where: filters, offset: (params[:offset] || 0).to_i, limit: (params[:limit] || 20).to_i, load: false, highlight: true)
+  end
+
+  def build_response(context, result:, **)
+    json_response = result.response.dig('hits', 'hits').map do |item|
+      json = {}
+      item['_source'].each do |k, v|
+        if v.respond_to?(:each)
+          json[k] = v.join(", ")
+        else
+          json[k] = v
+        end
+      end
+
+      json['record_id'] = item['_id']
+      formatted = {}.merge(json)
+      item['highlight'].each do |key, value|
+        formatted[key.gsub(".analyzed", "")] = value
+      end
+      json['_formatted'] = formatted
+      json
+    end
+    context[:response] = json_response.group_by { |hit| hit['record_type'] }
   end
 
 end

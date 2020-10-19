@@ -19,7 +19,7 @@ module PurchaseOrderIndex
         policy_name: policy&.name,
         status_id: status&.id,
         status_name: status&.name&.titleize,
-        sequence_id: purchase_order_number,
+        po_number: purchase_order_number,
         cost_center_names: line_items.map { |line_item| line_item.cost_center&.name },
         cost_center_codes: line_items.map { |line_item| line_item.cost_center&.cost_center_code },
         department_names: line_items.map { |line_item| line_item.department&.name },

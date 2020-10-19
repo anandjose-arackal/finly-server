@@ -40,7 +40,7 @@ class GlobalSearch::Config::Vp
           }
       },
       purchase_orders: {
-          index: PurchaseRequest,
+          index: PurchaseOrder,
           features: [:procurement],
           permissions: Docs::P2P::PurchaseOrders::Index.permissions,
           category: :transactions,
@@ -51,7 +51,7 @@ class GlobalSearch::Config::Vp
           }
       },
       invoices: {
-          index: PurchaseRequest,
+          index: Invoice,
           features: [:procurement],
           permissions: Docs::P2P::Invoices::Index.permissions,
           category: :transactions,
@@ -62,7 +62,7 @@ class GlobalSearch::Config::Vp
           }
       },
       payment_tickets: {
-          index: PurchaseRequest,
+          index: BankPaymentRequest,
           permissions: Docs::PaymentTickets::Index.permissions,
           category: :transactions,
           route: 'orders/{{record_id}}/params={}',
@@ -72,7 +72,7 @@ class GlobalSearch::Config::Vp
           }
       },
       payments: {
-          index: PurchaseRequest,
+          index: Payment,
           permissions: Docs::PaymentTickets::Payments::Index.permissions,
           category: :transactions,
           route: 'orders/{{parent_id}}/params={}',
@@ -82,7 +82,7 @@ class GlobalSearch::Config::Vp
           }
       },
       utility_bills: {
-          index: PurchaseRequest,
+          index: BbpsBill,
           features: [:procurement],
           permissions: Docs::UtilityBills::Subscriptions::Index.permissions,
           category: :transactions,
@@ -93,7 +93,7 @@ class GlobalSearch::Config::Vp
           }
       },
       vendors: {
-          index: PurchaseRequest,
+          index: YesBankVendor,
           permissions: Masters::Vendors::Index.permissions,
           category: :masters,
           route: 'vendor/{{record_id}}/params={}',
@@ -103,7 +103,7 @@ class GlobalSearch::Config::Vp
           }
       },
       items: {
-          index: PurchaseRequest,
+          index: Item,
           permissions: Masters::Items::Index.permissions,
           category: :masters,
           route: 'inventory/{{record_id}}/params={}',
@@ -113,7 +113,7 @@ class GlobalSearch::Config::Vp
           }
       },
       categories: {
-          index: PurchaseRequest,
+          index: Category,
           permissions: [:admin],
           category: :masters,
           route: 'organization_account/params={"id":"settings"}',
@@ -123,7 +123,7 @@ class GlobalSearch::Config::Vp
           }
       },
       policies: {
-          index: PurchaseRequest,
+          index: Policy,
           permissions: [:admin],
           category: :masters,
           route: 'policies/{{record_id}}/params={}',
@@ -133,7 +133,7 @@ class GlobalSearch::Config::Vp
           }
       },
       departments: {
-          index: PurchaseRequest,
+          index: Department,
           permissions: [:admin],
           category: :masters,
           route: 'organization_account/params={"id":"settings"}',
@@ -143,7 +143,7 @@ class GlobalSearch::Config::Vp
           }
       },
       locations: {
-          index: PurchaseRequest,
+          index: BranchLocation,
           permissions: [:admin],
           category: :masters,
           route: 'organization_account/params={"id":"settings"}',
@@ -153,7 +153,7 @@ class GlobalSearch::Config::Vp
           }
       },
       cost_centers: {
-          index: PurchaseRequest,
+          index: CostCenter,
           permissions: [:admin],
           category: :masters,
           route: 'organization_account/params={"id":"settings"}',
@@ -163,7 +163,7 @@ class GlobalSearch::Config::Vp
           }
       },
       payment_agreements: {
-          index: PurchaseRequest,
+          index: PaymentAgreement,
           features: :agreement_based_payment_system,
           permissions: Docs::P2P::Agreements::Index.permissions,
           category: :masters,
@@ -174,7 +174,7 @@ class GlobalSearch::Config::Vp
           }
       },
       utility_subscriptions: {
-          index: PurchaseRequest,
+          index: BbpsBillerSubscription,
           features: :utility_bills_enabled,
           permissions: Docs::UtilityBills::Subscriptions::Index.permissions,
           category: :masters,
@@ -185,7 +185,7 @@ class GlobalSearch::Config::Vp
           }
       },
       users: {
-          index: PurchaseRequest,
+          index: User,
           permissions: [:admin],
           category: :masters,
           route: 'users/{{record_id}}/params={}',

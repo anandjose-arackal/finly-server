@@ -19,12 +19,13 @@ class GlobalSearchController < BaseControllers::WebBase
 
   def index
     RequestStoreUtil.set_current_request(request)
-    endpoint SearchIndex::Ops::Query
-    # Going with direct rendering as it is faster than jbuilder
+    endpoint GlobalSearch::Query
     if @op.success?
+    # Going with direct rendering as it is faster than jbuilder
       render json: {
           data: {
-              records: @op[:response]&.dig('hits').group_by {|hit| hit['record_type']},
+              records: @op[:response],
+              # records: @op[:response]&.dig('hits').group_by {|hit| hit['record_type']},
           }
       }
     end
