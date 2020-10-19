@@ -20,7 +20,7 @@ module PaymentIndex
         unique_transaction_references: [to_exposure.utr].compact,
         vendor_name: receiving_user_vendor&.business_name,
         vendor_trade_name: receiving_user_vendor&.trade_name,
-        vendor_sequence_id: receiving_user_vendor&.vendor_id,
+        vendor_id: receiving_user_vendor&.vendor_id,
         created_by_name: payment_order&.bank_payment_request&.created_by&.name,
         created_by_email: payment_order&.bank_payment_request&.created_by&.email,
     }

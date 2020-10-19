@@ -32,7 +32,7 @@ module PurchaseOrderIndex
         shipping_location_code: delivery_location&.location_code,
         vendor_name: vendor&.business_name,
         vendor_trade_name: vendor&.trade_name,
-        vendor_sequence_id: vendor&.vendor_id,
+        vendor_id: vendor&.vendor_id,
     }
   end
 
