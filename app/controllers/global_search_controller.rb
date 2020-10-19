@@ -5,7 +5,7 @@ class GlobalSearchController < BaseControllers::WebBase
   end
 
   def create
-    endpoint SearchIndex::Ops::Config
+    endpoint GlobalSearch::Config
     # Going with direct rendering as it is faster than jbuilder
     if @op.success?
       render json: {
