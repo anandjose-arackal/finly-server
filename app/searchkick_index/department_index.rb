@@ -1,13 +1,8 @@
 module DepartmentIndex
   extend ActiveSupport::Concern
 
-  included do
-    include Searchkick::Api
-  end
-
-  def search_data
+  def searchkick_data
     {
-        record_type: 'departments',
         name: full_name,
         department_code: department_code,
     }

@@ -11,22 +11,23 @@ module Searchkick::Api
 
   included do
     searchkick index_name: -> {
-      raise 'Current company should be set to identify the required index' unless RequestStoreUtil.current_company.present?
+      # raise 'Current company should be set to identify the required index' unless RequestStoreUtil.current_company.present?
 
-      [Rails.configuration.searchkick_prefix, RequestStoreUtil.current_company&.id, 'search', table_name].join('_')
+      # [Rails.configuration.searchkick_prefix, RequestStoreUtil.current_company&.id, 'search', table_name].join('_')
+      [Rails.configuration.searchkick_prefix, table_name].join('_')
     }
 
-    scope :search_import_base, -> {
-      raise 'Current company should be set to identify the required index' unless RequestStoreUtil.current_company.present?
+    scope :search_import, -> {
+      # raise 'Current company should be set to identify the required index' unless RequestStoreUtil.current_company.present?
 
-      scope = unscoped.where(company_id: RequestStoreUtil.current_company.id)
+      scope = unscoped #.where(company_id: RequestStoreUtil.current_company.id)
       if klass.reflect_on_association(:dlrms)
         scope = scope.includes({dlrms: [:taken_control_by, :action_taken_by, :forwarded_to, :forwarded_by, :rejected_by, :reviewer]})
       end
-      scope
+      scope.searchkick_import#.limit(100)
     }
 
-    scope :search_import, -> { search_import_base }
+    scope :searchkick_import, -> {}
   end
 
   def should_index?
@@ -34,11 +35,21 @@ module Searchkick::Api
   end
 
   def search_data
+    data = {
+        company_id: self.company_id,
+        record_type: self.class.searchkick_record_type
+    }.merge(searchkick_data).merge(search_collaborators_data)
+    raise "Company ID should is not set for indexing for #{self.class.name}" if data[:company_id].nil?
+
+    data
+  end
+
+  def searchkick_data
     # Defaults to the models as_json for building search_data
     as_json
   end
 
-  def collaborators
+  def search_collaborators_data
     document = {}
     if respond_to?(:dlrms)
       document[:collaborator_ids] = []
@@ -85,6 +96,13 @@ module Searchkick::Api
       end
     end
     document
+  end
+
+  class_methods do
+    def searchkick_record_type(value = NoObject)
+      @searchkick_record_type = value unless value == NoObject
+      @searchkick_record_type&.to_s || self.table_name
+    end
   end
 
 end

@@ -2,6 +2,7 @@ module Searchkick::DSL
   extend ActiveSupport::Concern
 
   included do
+    include Searchkick::Api
     include searchkick_api
   end
 

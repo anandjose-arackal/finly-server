@@ -1,3 +1,11 @@
+Loader.watch! "Searchkick clear loaded models" do
+  # Searchkick appends the models everytime it is reloaded. This creates a lot of duplicate models being captured.
+  # This is prevent that behavior
+  Searchkick.models.clear
+  ApplicationRecord.descendants.each do |model|
+    Searchkick.models << model if model.respond_to?(:searchkick_api)
+  end
+end
 Loader.watch! "Actions Manager Actions", dir: "app/concepts/action_manager/actions/**/*.rb"
 Loader.watch! "Forms Types", dir: 'app/concepts/forms/api/entity/types/**/*.rb'
 Loader.watch! "Choices", dir: 'app/concepts/choices/builders/**/*.rb'

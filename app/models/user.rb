@@ -70,7 +70,8 @@ class User < ApplicationRecord
   include EventProducer
   include ErpSyncable
   include SearchIndex::Concerns::AccessControl
-  include SearchIndex::Concerns::Document
+  # include SearchIndex::Concerns::Document
+include Searchkick::DSL
 
   ACTIVE = 1
   PENDING = 2

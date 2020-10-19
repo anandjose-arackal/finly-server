@@ -1,27 +1,36 @@
-class BbpsBillIndex < SearchIndex::Model
+module BbpsBillIndex
+  extend ActiveSupport::Concern
+
+  included do
+    scope :searchkick_import, -> {
+      includes(:policy, :status, {subscription: :biller}, :payments, :created_by)
+    }
+
+    searchkick_record_type :utility_bills
+  end
   
-  # def search_data
-  #   {
-  #       policy_id: policy_id,
-  #       policy_name: policy&.name,
-  #       status_id: status&.id,
-  #       status_name: status&.name&.titleize,
-  #       sequence_id: sequence_id,
-  #       narration: note,
-  #       invoice_number: bill_number,
-  #       vendor_id: subscription.sequence_id,
-  #       vendor_name: subscription.biller.biller_name,
-  #       category_name: subscription.biller.biller_category_name,
-  #       description: subscription.name,
-  #       cost_center_names: [cost_center&.name],
-  #       cost_center_codes: [cost_center&.cost_center_code],
-  #       department_names: [department&.name],
-  #       department_codes: [department&.department_code],
-  #       location_names: [location&.name],
-  #       location_codes: [location&.location_code],
-  #       unique_transaction_references: [payments&.first&.bbps_bank_transaction&.bbps_ref_id]
-  #   }.merge(collaborators)
-  # end
+  def searchkick_data
+    {
+        policy_id: policy_id,
+        policy_name: policy&.name,
+        status_id: status&.id,
+        status_name: status&.name&.titleize,
+        sequence_id: sequence_id,
+        narration: note,
+        invoice_number: bill_number,
+        vendor_id: subscription.sequence_id,
+        vendor_name: subscription.biller.biller_name,
+        category_name: subscription.biller.biller_category_name,
+        description: subscription.name,
+        cost_center_names: [cost_center&.name],
+        cost_center_codes: [cost_center&.cost_center_code],
+        department_names: [department&.name],
+        department_codes: [department&.department_code],
+        location_names: [location&.name],
+        location_codes: [location&.location_code],
+        unique_transaction_references: [payments&.first&.bbps_bank_transaction&.bbps_ref_id]
+    }
+  end
 
   # index Indexes::Vp do
   #   include_associations(:policy, :status, {subscription: :biller}, :payments, :created_by)

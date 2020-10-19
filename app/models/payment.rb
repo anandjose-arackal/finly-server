@@ -66,7 +66,8 @@ class Payment < ApplicationRecord
   include LiquidDroppable
   include Exposures::Model::Exposable
   include ErpSyncable
-  include SearchIndex::Concerns::Document
+  # include SearchIndex::Concerns::Document
+include Searchkick::DSL
 
   class Payment::AccountType
     VIRTUAL_ACCOUNT = 'Company'
@@ -675,6 +676,10 @@ class Payment < ApplicationRecord
   def invoice_amount
     return self.amount.value unless self.invoice.present?
     self.invoice.amount&.value # in this case return the actual invoice amount
+  end
+
+  def company_id
+    super || payment_order&.bank_payment_request&.company_id
   end
 
   # def company_id

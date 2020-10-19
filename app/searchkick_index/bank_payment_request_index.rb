@@ -2,25 +2,25 @@ module BankPaymentRequestIndex
   extend ActiveSupport::Concern
 
   included do
-    include Searchkick::Api
-    scope :search_import, -> {
-      search_import_base.includes(:policy, :status, :created_by, {payment_order: :payment_order_status})
+    scope :searchkick_import, -> {
+      includes(:policy, :status, :created_by, {payment_order: :payment_order_status})
     }
+
+    searchkick_record_type :payment_tickets
   end
 
-  def search_data
+  def searchkick_data
     {
-        record_type: 'payment_tickets',
         policy_id: policy_id,
         policy_name: policy&.name,
         status_id: status&.id,
         status_name: status_name&.titleize,
-        sequence_id: id,
+        payment_ticket_id: id,
         narration: description,
         description: name,
         created_by_name: created_by&.name,
         created_by_email: created_by&.email,
-    }.merge(collaborators)
+    }
   end
 
   # index Indexes::Vp do

@@ -35,7 +35,8 @@ class Item < ApplicationRecord
   include Sequenced::ActsAsSequenced
   include MathUtil
   include EventProducer
-  include SearchIndex::Concerns::Document
+  # include SearchIndex::Concerns::Document
+include Searchkick::DSL
 
   acts_as_sequenced column: :item_number, purpose: :item_master, min_length: 8, editable: false, prefix: -> (record) { record.goods? ? "G" : "S" }
 

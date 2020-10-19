@@ -21,7 +21,8 @@ class CostCenter < ApplicationRecord
   include LiquidDroppable
   include Exposures::Model::Exposable
   include EventProducer
-  include SearchIndex::Concerns::Document
+  # include SearchIndex::Concerns::Document
+include Searchkick::DSL
 
   acts_as_sequenced column: :cost_center_code, purpose: :cost_center, editable: false, prefix: 'CC'
 
