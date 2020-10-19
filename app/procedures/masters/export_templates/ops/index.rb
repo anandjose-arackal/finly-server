@@ -3,6 +3,7 @@ class Masters::ExportTemplates::Ops::Index < Transactions::API
 
   has_scope :filter_resource, as: :resource
   has_scope :filter_default, type: :boolean, as: :default
+  has_scope :filter_route, as: :route
 
   # allow users with following roles
   # step Transactions::Authorization::Roles(:export_manager, :admin)

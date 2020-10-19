@@ -6,7 +6,19 @@ class ActionManager::Actions::Export < ActionManager::Action
 
   def build_config(options)
     user = options[:current_user]
-    ExportManager::Master.fetch(user, {screen: route})
+    old_exports = ExportManager::Master.fetch(user, {screen: route})
+
+    new_exports = Masters::ExportTemplates::Ops::Index.({ current_user: user, params: {route: route} })['model.records'].map do |record|
+      {
+        version: 2,
+        name: record.name,
+        id: record.id,
+        export_format: record.export_format,
+        description: record.description,
+        resource: record.resource,
+      }
+    end
+    old_exports + new_exports
   end
 
 end

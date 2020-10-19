@@ -3631,6 +3631,7 @@ ActiveRecord::Schema.define(version: 2020_10_19_065204) do
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "route"
     t.index ["deleted_at"], name: "index_export_resources_on_deleted_at"
   end
 

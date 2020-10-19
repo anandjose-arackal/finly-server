@@ -14,43 +14,53 @@ class ExportResource < ApplicationRecord
   RESOURCES = [
     {
       name: 'Invoice Line Items',
-      value: 'invoice_line_items'
+      value: 'invoice_line_items',
+      route: 'invoices.index'
     },
     {
       name: 'Invoices',
-      value: 'invoices'
+      value: 'invoices',
+      route: 'invoices.index'
     },
     {
       name: 'Payments',
-      value: 'payments'
+      value: 'payments',
+      route: 'payment_tickets.index'
     },
     {
       name: 'Purchase Requests',
-      value: 'purchase_requests'
+      value: 'purchase_requests',
+      route: 'purchase_requests.index'
     },
     {
       name: 'Purchase Orders',
-      value: 'purchase_orders'
+      value: 'purchase_orders',
+      route: 'purchase_orders.index'
     },
     {
       name: 'Purchase Order Items',
-      value: 'purchase_order_items'
+      value: 'purchase_order_items',
+      route: 'purchase_orders.index'
     },
     {
       name: 'Users',
-      value: 'users'
+      value: 'users',
+      route: 'user.index'
     },
     {
       name: 'Item Master',
-      value: 'items'
+      value: 'items',
+      route: 'items.index'
     },
     {
       name: 'Vendors',
-      value: 'vendors'
+      value: 'vendors',
+      route: 'vendors.index'
     },
     {
       name: 'Utility Bills',
-      value: 'utility_bills'
+      value: 'utility_bills',
+      route: 'utility_bills.index'
     }
   ]
 
@@ -58,7 +68,7 @@ class ExportResource < ApplicationRecord
     RESOURCES.each do |resource|
       next if ExportResource.find_by(value: resource[:value]).present?
 
-      ExportResource.create(name: resource[:name], value: resource[:value])
+      ExportResource.create(name: resource[:name], value: resource[:value], route: resource[:route])
     end
   end
 end

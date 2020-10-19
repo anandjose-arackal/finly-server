@@ -29,6 +29,7 @@ class ExportTemplateNew < ApplicationRecord
 
   scope :filter_resource, -> (resource) { where resource: resource }
   scope :filter_default, -> { where default: true }
+  scope :filter_route, -> (route) { where resource: ExportResource.where(route: route).pluck(:value) }
 
   # TODO: update seeding to add roles
   DEFAULT_TEMPLATES = [
