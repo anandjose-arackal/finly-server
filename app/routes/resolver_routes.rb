@@ -20,21 +20,21 @@ Resolver::Router.draw do
   end
 
   # Masters
-  scope :department do
+  scope :departments do
     route 'default', Masters::Departments::Resolver
   end
-  scope :location do
+  scope :locations do
     route 'default', Masters::Locations::Resolver
   end
-  scope :cost_center do
+  scope :cost_centers do
     route 'default', Masters::CostCenters::Resolver
   end
 
-  scope :insight_dashboard do
+  scope :insight_dashboards do
     route 'default', Insights::Resolver
   end
 
-  scope :category do
+  scope :categories do
     route 'default', Masters::Categories::Resolver
   end
 
