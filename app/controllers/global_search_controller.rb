@@ -23,10 +23,7 @@ class GlobalSearchController < BaseControllers::WebBase
     if @op.success?
     # Going with direct rendering as it is faster than jbuilder
       render json: {
-          data: {
-              records: @op[:response],
-              # records: @op[:response]&.dig('hits').group_by {|hit| hit['record_type']},
-          }
+          data: @op[:response]
       }
     end
   end

@@ -23,11 +23,11 @@ class GlobalSearch::Query < Transactions::API
   end
 
   def query(context, filters:, params:, **)
-    context[:result] = Searchkick.search(params[:q], where: filters, offset: (params[:offset] || 0).to_i, limit: (params[:limit] || 20).to_i, load: false, highlight: true)
+    context[:result] = Searchkick.search(params[:q], where: filters, offset: (params[:offset] || 0).to_i, limit: (params[:limit] || 20).to_i, load: false, highlight: true, aggs: ['record_type'])
   end
 
   def build_response(context, result:, **)
-    json_response = result.response.dig('hits', 'hits').map do |item|
+    hits = result.response.dig('hits', 'hits').map do |item|
       json = {}
       item['_source'].each do |k, v|
         if v.respond_to?(:each)
@@ -40,12 +40,24 @@ class GlobalSearch::Query < Transactions::API
       json['record_id'] = item['_id']
       formatted = {}.merge(json)
       item['highlight'].each do |key, value|
-        formatted[key.gsub(".analyzed", "")] = value
+        if value.respond_to?(:each)
+          formatted[key.gsub(".analyzed", "")] = value.join(", ")
+        else
+          formatted[key.gsub(".analyzed", "")] = value
+        end
       end
       json['_formatted'] = formatted
       json
     end
-    context[:response] = json_response.group_by { |hit| hit['record_type'] }
+    aggregations = {}
+    result.response&.dig("aggregations", 'record_type', 'record_type', 'buckets').each do |aggr|
+      aggregations[aggr['key']] = aggr['doc_count']
+    end
+    context[:response] = {
+        count: result.response.dig('aggregations', 'record_type', 'doc_count'),
+        aggregations: aggregations,
+        records: hits.group_by { |hit| hit['record_type'] },
+    }
   end
 
 end
