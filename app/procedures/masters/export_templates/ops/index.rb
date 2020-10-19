@@ -5,7 +5,7 @@ class Masters::ExportTemplates::Ops::Index < Transactions::API
   has_scope :filter_default, type: :boolean, as: :default
 
   # allow users with following roles
-  step Transactions::Authorization::Roles(:export_manager, :admin)
+  # step Transactions::Authorization::Roles(:export_manager, :admin)
   step :index!
   # step Resolver::Transactions::Load(model: ExportTemplateNew)
 
