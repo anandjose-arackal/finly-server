@@ -14,7 +14,7 @@ module ItemIndex
         description: description,
         category_name: category&.name,
         category_code: category&.category_code,
-        item_number: item_number,
+        sequence_id: item_number,
         gl_code: category&.gl_code,
         status_name: 'Active'
     }

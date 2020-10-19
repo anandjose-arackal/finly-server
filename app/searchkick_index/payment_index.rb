@@ -14,7 +14,7 @@ module PaymentIndex
         policy_name: payment_order&.bank_payment_request&.policy&.name,
         status_id: status&.id,
         status_name: status&.name&.titleize,
-        payment_id: id,
+        sequence_id: id,
         description: payment_order&.bank_payment_request&.description,
         narration: note,
         unique_transaction_references: [to_exposure.utr].compact,

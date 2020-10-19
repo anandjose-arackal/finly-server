@@ -15,7 +15,7 @@ module PaymentAgreementIndex
         policy_name: policy&.name,
         status_id: status&.id,
         status_name: status&.name&.titleize,
-        agreement_number: order_number,
+        sequence_id: order_number,
         description: title,
         narration: note,
     }

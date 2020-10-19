@@ -15,7 +15,7 @@ module BankPaymentRequestIndex
         policy_name: policy&.name,
         status_id: status&.id,
         status_name: status_name&.titleize,
-        payment_ticket_id: id,
+        sequence_id: id,
         narration: description,
         description: name,
         created_by_name: created_by&.name,

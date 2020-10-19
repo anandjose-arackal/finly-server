@@ -4,7 +4,7 @@ module CostCenterIndex
   def searchkick_data
     {
         name: full_name,
-        cost_center_code: cost_center_code
+        sequence_id: cost_center_code
     }
   end
 

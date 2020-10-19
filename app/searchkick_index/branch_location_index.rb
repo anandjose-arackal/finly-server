@@ -8,7 +8,7 @@ module BranchLocationIndex
   def searchkick_data
     {
         name: name,
-        location_code: location_code
+        sequence_id: location_code
     }
   end
 

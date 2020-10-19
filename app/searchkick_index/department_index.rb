@@ -4,7 +4,7 @@ module DepartmentIndex
   def searchkick_data
     {
         name: full_name,
-        department_code: department_code,
+        sequence_id: department_code,
     }
   end
 

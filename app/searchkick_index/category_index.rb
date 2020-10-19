@@ -4,7 +4,7 @@ module CategoryIndex
   def searchkick_data
     {
         name: name,
-        category_code: category_code,
+        sequence_id: category_code,
     }
   end
 

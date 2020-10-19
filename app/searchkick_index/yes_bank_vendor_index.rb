@@ -17,7 +17,7 @@ module YesBankVendorIndex
         policy_name: policy&.name,
         status_id: status_id,
         status_name: status&.name&.titleize,
-        vendor_id: vendor_id,
+        sequence_id: vendor_id,
         description: description,
         tax_id: pan,
         tax_registration_number: gstin_locations.pluck(:gstin).join(", "),
