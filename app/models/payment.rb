@@ -100,6 +100,7 @@ include Searchkick::DSL
   belongs_to :reference_payment, class_name: "Payment", optional: true
 
   has_one :payment, as: :reference_resource
+  has_many :payments, -> { reorder created_at: :desc }, as: :reference_resource
 
   # because there needs to be a reference against which an invoice payment was made
   belongs_to :invoice, optional: true

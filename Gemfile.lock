@@ -82,6 +82,7 @@ GEM
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.1, >= 1.2.0)
+    active_record_query_trace (1.5.4)
     activejob (6.0.3.4)
       activesupport (= 6.0.3.4)
       globalid (>= 0.3.6)
@@ -803,6 +804,7 @@ PLATFORMS
 
 DEPENDENCIES
   aasm (~> 5.0.1)
+  active_record_query_trace (~> 1.5.4)
   activerecord-import (~> 1.0, >= 1.0.3)
   amoeba (~> 3.1.0)
   ancestry (~> 3.0.5)

@@ -26,6 +26,10 @@ module PaymentIndex
     }
   end
 
+  def should_index?
+    deleted_at.nil? and company_id.present?
+  end
+
   # index Indexes::Vp do
   #   include_associations({payment_order: {bank_payment_request: [:policy, :created_by]}}, :status, :reference_resource, :receiving_user_vendor)
   #
