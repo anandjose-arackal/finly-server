@@ -1,7 +1,7 @@
 class InvoiceIndex < Searchkick::Api::DSL
 
   scope do
-    where.not(company_id: nil, deleted_at: nil, procurement_id: nil).
+    where.not(company_id: nil, deleted_at: nil).
         includes(
             :policy, :status,
             :created_by, :location, :delivery_location, :invoice_type,
@@ -36,7 +36,7 @@ class InvoiceIndex < Searchkick::Api::DSL
   field :vendor_id, value: -> (record) { record.vendor&.vendor_id }
 
   def self.should_index?(record)
-    record.deleted_at.nil? and record.company_id.present? and record.procurement_id.present?
+    record.deleted_at.nil? and record.company_id.present?# and record.procurement_id.present?
   end
 
   # included do
