@@ -1,7 +1,7 @@
 class BbpsBillIndex < Searchkick::Api::DSL
 
   scope do
-    includes(:policy, :status, {subscription: :biller}, :payments, :created_by)
+    includes(:policy, :status, {subscription: :biller}, :payments, :created_by, :cost_center, :location, :department)
   end
 
   record_type 'utility_bills'
