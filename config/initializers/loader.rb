@@ -31,9 +31,3 @@ Loader.watch! "Bullet Train" do
     Rails.configuration.bullet_train = BulletTrain.new(api_key: config['api_key'], url: config['url'])
   end
 end
-
-# Fixme: This is throwing a superclass mismatch error when IRB calls reload!. Added a temporary workaround in +SearchIndex::Concerns::Document+
-# Loader.watch! "SearchIndex Loader" do
-#   Indexes::Vp.model_index_managers.clear
-#   Dir.glob(Rails.root.join("app/search_index/**/*.rb")).each {|f| load f }
-# end

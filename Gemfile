@@ -198,8 +198,6 @@ gem 'devise', '~> 4.7'
 gem 'devise_invitable', '~> 2.0', '>= 2.0.2'
 gem 'doorkeeper', '~> 5.0.2'
 
-gem 'meilisearch', '~> 0.13'
-
 gem 'faraday', '~> 0.15.4'
 gem 'faraday_middleware', '~> 0.12.2'
 
