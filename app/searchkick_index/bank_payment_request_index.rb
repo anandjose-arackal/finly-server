@@ -7,13 +7,13 @@ class BankPaymentRequestIndex < Searchkick::Api::DSL
   record_type 'payment_tickets'
 
   field :policy_id, displayable: false, searchable: false
-  field :policy_name, value: 'record.policy.name'
-  field :status_name, value: 'record.status_name'
-  field :sequence_id, value: 'record.id'
-  field :narration, value: 'record.description'
-  field :description, value: 'record.name'
-  field :created_by_name, value: 'record.created_by.name'
-  field :created_by_email, value: 'record.created_by.name'
+  field :policy_name, value: '{{record.policy.name}}'
+  field :status_name, value: '{{record.status_name}}'
+  field :sequence_id, value: '{{record.id}}'
+  field :narration, value: '{{record.description}}'
+  field :description, value: '{{record.name}}'
+  field :created_by_name, value: '{{record.created_by.name}}'
+  field :created_by_email, value: '{{record.created_by.name}}'
 
   # index Indexes::Vp do
   #   include_associations :policy, :status, Indexes::Vp::Helpers::INCLUDE_COLLABORATORS, :created_by, {payment_order: :payment_order_status}
