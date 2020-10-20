@@ -27,7 +27,7 @@ GIT
 
 GIT
   remote: https://github.com/sinatra/sinatra.git
-  revision: 578c1a68f8a724893d42234bf6c5f7fedfae1a57
+  revision: 177392f44bb84ff69799a98d5d006bdb7286c12e
   branch: master
   specs:
     rack-protection (2.1.0)
@@ -91,7 +91,7 @@ GEM
     activerecord (6.0.3.4)
       activemodel (= 6.0.3.4)
       activesupport (= 6.0.3.4)
-    activerecord-import (1.0.6)
+    activerecord-import (1.0.7)
       activerecord (>= 3.2)
     activestorage (6.0.3.4)
       actionpack (= 6.0.3.4)
@@ -120,7 +120,7 @@ GEM
       execjs
     awesome_print (1.8.0)
     aws-eventstream (1.1.0)
-    aws-partitions (1.381.0)
+    aws-partitions (1.383.0)
     aws-sdk-core (3.109.1)
       aws-eventstream (~> 1, >= 1.0.2)
       aws-partitions (~> 1, >= 1.239.0)
