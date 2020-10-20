@@ -14,11 +14,12 @@ class GlobalSearch::Query < Transactions::API
     true
   end
 
-  def fetch_filters(context, token:, **)
+  def fetch_filters(context, token:, params:, **)
     filters = Rails.configuration.redis.get(token)
     return unauthorized!(context) if filters.blank?
 
     context[:filters] = JSON.parse(filters).deep_symbolize_keys
+    context[:filters][:_and] << params[:filters] if params[:filters].present?
     true
   end
 
