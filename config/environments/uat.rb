@@ -17,6 +17,7 @@ Rails.application.configure do
     config.bullet_train = nil
   end
 
+  config.active_storage.service = :microsoft
   # Full error reports are disabled and caching is turned on.
   config.consider_all_requests_local       = false
   config.action_controller.perform_caching = true
