@@ -94,6 +94,11 @@ module Searchkick::Api
       }.merge(searchkick_data(record)).merge(search_collaborators_data(record))
       return nil if data[:company_id].nil?
 
+      # If the value is an array, ensure it is unique
+      data.each do |k, v|
+        v.uniq! if v.is_a?(Array)
+      end
+
       data
     end
 
