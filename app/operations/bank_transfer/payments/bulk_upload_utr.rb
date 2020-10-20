@@ -116,16 +116,7 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
                                                        reference_payment_id: payment.id,
                                                        amount_id: amount.id,
                                                        created_at: credited_at)
-        else
-          new_transactions << bank_transaction_class.new(transfer_type: payment.payment_mode,
-                                                         utr: utr,
-                                                         company_id: user.company_id,
-                                                         transfer_status_id: BankTransferStatus.id_for(:completed),
-                                                         receiving_account_id: payment.receiving_account&.id,
-                                                         reference_payment_id: payment.id,
-                                                         amount_id: amount.id,
-                                                         created_at: credited_at)
-        end
+          end
 
         payment.utr  = utr
         payments << payment
