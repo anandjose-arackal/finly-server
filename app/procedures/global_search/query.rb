@@ -63,6 +63,7 @@ class GlobalSearch::Query < Transactions::API
         end
       end
       json['_formatted'] = formatted
+      json['_matchesInfo'] = formatted
       json
     end
     aggregations = {}
