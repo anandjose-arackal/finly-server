@@ -42,6 +42,7 @@ module ExportManager::DSL::Job
   end
 
   def progress_update(completed, force_update: true)
+    return if export_job.total_records.zero?
     return unless (completed % 100).zero? || force_update
 
     export_job.update(completed_records: completed, completion_percentage: (completed * 100 / export_job.total_records))
