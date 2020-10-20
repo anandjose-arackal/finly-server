@@ -1,5 +1,8 @@
 class GlobalSearch::Query < Transactions::API
 
+  DEFAULT_PAGE_SIZE = 10
+  DEFAULT_OFFSET = 0
+
   skip_user_authorization!
 
   step :fetch_token
@@ -28,8 +31,8 @@ class GlobalSearch::Query < Transactions::API
         params[:q],
         models: Searchkick.models,
         where: filters,
-        offset: (params[:offset] || 0).to_i,
-        limit: (params[:limit] || 10).to_i,
+        offset: (params[:offset] || DEFAULT_OFFSET).to_i,
+        limit: (params[:limit] || DEFAULT_PAGE_SIZE).to_i,
         load: false,
         highlight: true,
         aggs: ['record_type'],
