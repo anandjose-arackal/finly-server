@@ -2,7 +2,7 @@ class Docs::UtilityBills::Bills::Mailers::TakeControl < Docs::UtilityBills::Bill
 
   class Docs::UtilityBills::Bills::Mailers::TakeControl::TakenControlBy < Docs::UtilityBills::Bills::Mailers::TakeControl
 
-    consumes_event! 'bbps_bill.take_control'
+    consumes_event! 'bbps_bills.take_control'
 
     assign :to do |user, params|
       [user.email]
@@ -23,7 +23,7 @@ class Docs::UtilityBills::Bills::Mailers::TakeControl < Docs::UtilityBills::Bill
 
   class Docs::UtilityBills::Bills::Mailers::TakeControl::TakenControlFrom < Docs::UtilityBills::Bills::Mailers::TakeControl
 
-    consumes_event! 'bbps_bill.take_control'
+    consumes_event! 'bbps_bills.take_control'
 
     assign :to do |user, params|
       record = params[:record]

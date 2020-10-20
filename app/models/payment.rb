@@ -66,14 +66,13 @@ class Payment < ApplicationRecord
   include LiquidDroppable
   include Exposures::Model::Exposable
   include ErpSyncable
+  include SearchIndex::Concerns::Document
 
   class Payment::AccountType
     VIRTUAL_ACCOUNT = 'Company'
     WALLET = 'UserWallet'
     CARD = 'Card'
   end
-
-  event_channel 'payment'
 
   belongs_to :amount, optional: true
   belongs_to :payment_type, optional: true

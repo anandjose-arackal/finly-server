@@ -64,10 +64,9 @@ class BbpsBill < ApplicationRecord
   include SoftDeletable, Transitionable
   include Sequenced::ActsAsSequenced
   include EventProducer
+  include SearchIndex::Concerns::Document
 
   acts_as_sequenced column: :sequence_id, purpose: :bbps_bill, editable: false, prefix: 'UB'
-
-  event_channel 'bbps_bill'
 
   serialize :api_response, JSON
 
@@ -102,6 +101,8 @@ class BbpsBill < ApplicationRecord
   delegate :amount_value, to: :total_amount
 
   default_scope {order('bbps_bills.created_at DESC')}
+
+  scope :with_company_id, -> (company_id) { where company_id: company_id }
 
   scope :with_ids, -> (ids) {
     where(id: ids)
@@ -279,8 +280,13 @@ class BbpsBill < ApplicationRecord
       where status_id: status_id
     end
   end
+  
+  scope :with_status_id, -> (status_id){
+    with_status_id(status_id)
+  }
 
   ransack_scopes :with_status_id
+  ransack_scopes :with_status_ids
 
   def as_json(options = {})
     if options[:index]
