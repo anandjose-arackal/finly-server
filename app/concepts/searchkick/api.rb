@@ -10,12 +10,7 @@ module Searchkick::Api
   # end
 
   included do
-    searchkick index_name: -> {
-      # raise 'Current company should be set to identify the required index' unless RequestStoreUtil.current_company.present?
-
-      # [Rails.configuration.searchkick_prefix, RequestStoreUtil.current_company&.id, 'search', table_name].join('_')
-      [Rails.configuration.searchkick_prefix, table_name].join('_')
-    }
+    searchkick
 
     scope :search_import, -> {
       # raise 'Current company should be set to identify the required index' unless RequestStoreUtil.current_company.present?
