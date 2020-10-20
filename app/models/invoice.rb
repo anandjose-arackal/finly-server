@@ -122,7 +122,7 @@ class Invoice < ApplicationRecord
   include Sequenced::ActsAsSequenced
   include ErpSyncable
   # include SearchIndex::Concerns::Document
-include Searchkick::DSL
+include Searchkick::Api
 
   # include EventProducer
 

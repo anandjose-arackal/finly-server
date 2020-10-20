@@ -22,7 +22,7 @@ class Department < ApplicationRecord
   include LiquidDroppable
   include Exposures::Model::Exposable
   include EventProducer
-  include Searchkick::DSL
+  include Searchkick::Api
   # include SearchIndex::Concerns::Document
 
   acts_as_sequenced column: :department_code, purpose: :department, editable: false, prefix: 'DPT'

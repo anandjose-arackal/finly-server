@@ -67,7 +67,7 @@ class Payment < ApplicationRecord
   include Exposures::Model::Exposable
   include ErpSyncable
   # include SearchIndex::Concerns::Document
-include Searchkick::DSL
+include Searchkick::Api
 
   class Payment::AccountType
     VIRTUAL_ACCOUNT = 'Company'

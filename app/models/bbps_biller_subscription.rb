@@ -64,7 +64,7 @@ class BbpsBillerSubscription < ApplicationRecord
   include SoftDeletable, Transitionable
   include EventProducer
   # include SearchIndex::Concerns::Document
-include Searchkick::DSL
+include Searchkick::Api
 
   acts_as_sequenced column: :sequence_id, purpose: :bbps_biller_subscription, editable: false, prefix: 'UBM'
 

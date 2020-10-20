@@ -1,12 +1,15 @@
-module DepartmentIndex
-  extend ActiveSupport::Concern
+class DepartmentIndex <  Searchkick::Api::DSL
 
-  def searchkick_data
-    {
-        name: full_name,
-        sequence_id: department_code,
-    }
-  end
+  record_type 'departments'
+  field :department_name, value: -> (record) { record.full_name }
+  field :department_code, value: -> (record) { record.department_code }
+
+  # def searchkick_data
+  #   {
+  #       department_name: full_name,
+  #       department_code: department_code,
+  #   }
+  # end
 
   # index Indexes::Vp do
   #   document_type :departments

@@ -1,20 +1,30 @@
-module UserIndex
-  extend ActiveSupport::Concern
+class UserIndex < Searchkick::Api::DSL
 
-  included do
-    scope :searchkick_import, -> {
-      includes(:profile)
-    }
+  scope do
+    includes(:profile)
   end
 
-  def searchkick_data
-    {
-        user_name: name,
-        user_email: email,
-        employee_id: profile&.employee_id,
-        status_name: status&.titleize
-    }
-  end
+  record_type 'users'
+
+  field :user_name, value: -> (record) { record.name }
+  field :user_email, value: -> (record) { record.email }
+  field :employee_id, value: -> (record) { record.profile&.employee_id }
+  field :status_name, value: -> (record) { record.status&.titleize }
+
+  # included do
+  #   scope :searchkick_import, -> {
+  #     includes(:profile)
+  #   }
+  # end
+  #
+  # def searchkick_data
+  #   {
+  #       user_name: name,
+  #       user_email: email,
+  #       employee_id: profile&.employee_id,
+  #       status_name: status&.titleize
+  #   }
+  # end
 
   # index Indexes::Vp do
   #   include_associations(:profile)

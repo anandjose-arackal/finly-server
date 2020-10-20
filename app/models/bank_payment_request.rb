@@ -46,7 +46,7 @@ class BankPaymentRequest < ApplicationRecord
           CustomFieldFilterSupport
   include LiquidDroppable
   include Exposures::Model::Exposable
-  include Searchkick::DSL
+  include Searchkick::Api
   # include SearchIndex::Concerns::Document
 
 

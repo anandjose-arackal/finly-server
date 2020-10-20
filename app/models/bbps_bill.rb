@@ -65,7 +65,7 @@ class BbpsBill < ApplicationRecord
   include Sequenced::ActsAsSequenced
   include EventProducer
   # include SearchIndex::Concerns::Document
-  include Searchkick::DSL
+  include Searchkick::Api
 
   acts_as_sequenced column: :sequence_id, purpose: :bbps_bill, editable: false, prefix: 'UB'
 

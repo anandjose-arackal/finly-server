@@ -69,9 +69,8 @@ class User < ApplicationRecord
   include Exposures::Model::Exposable
   include EventProducer
   include ErpSyncable
-  include SearchIndex::Concerns::AccessControl
   # include SearchIndex::Concerns::Document
-include Searchkick::DSL
+  include Searchkick::Api
 
   ACTIVE = 1
   PENDING = 2
@@ -117,17 +116,17 @@ include Searchkick::DSL
   has_many :receipts, dependent: :destroy
   has_many :receipt_emails, dependent: :destroy
   has_many :policy_user_mappings, dependent: :destroy
-  has_many :policies, -> {where(:'policy_user_mappings.deleted_at' => nil)}, through: :policy_user_mappings, dependent: :destroy
-  has_many :admin_policy_user_mappings, -> {admin}, class_name: 'PolicyUserMapping', foreign_key: :user_id, dependent: :destroy
+  has_many :policies, -> { where(:'policy_user_mappings.deleted_at' => nil) }, through: :policy_user_mappings, dependent: :destroy
+  has_many :admin_policy_user_mappings, -> { admin }, class_name: 'PolicyUserMapping', foreign_key: :user_id, dependent: :destroy
   has_many :admin_policies, source: :policy, class_name: 'Policy', through: :admin_policy_user_mappings
   has_many :reports, inverse_of: :user, dependent: :destroy
   has_many :controlling_reports, class_name: 'Report', foreign_key: :controlling_user_id
   has_many :report_tracks, class_name: 'ReportTrack', foreign_key: :action_user_id
-  has_many :interacted_reports, -> {distinct}, source: :report, through: :report_tracks
-  has_many :manager_report_tracks, -> {manager_role}, class_name: 'ReportTrack', foreign_key: :modified_user_id
-  has_many :manager_reports, -> {distinct}, source: :report, through: :manager_report_tracks
-  has_many :finance_report_tracks, -> {finance_manager_role}, class_name: 'ReportTrack', foreign_key: :modified_user_id
-  has_many :finance_reports, -> {distinct}, source: :report, through: :finance_report_tracks
+  has_many :interacted_reports, -> { distinct }, source: :report, through: :report_tracks
+  has_many :manager_report_tracks, -> { manager_role }, class_name: 'ReportTrack', foreign_key: :modified_user_id
+  has_many :manager_reports, -> { distinct }, source: :report, through: :manager_report_tracks
+  has_many :finance_report_tracks, -> { finance_manager_role }, class_name: 'ReportTrack', foreign_key: :modified_user_id
+  has_many :finance_reports, -> { distinct }, source: :report, through: :finance_report_tracks
   has_many :policy_user_roles
   # Fixme: Replace this with policies as policies should ideally be deprecated
   has_many :policy_user_roles_policies, -> { where(:'policy_user_roles.deleted_at' => nil) }, through: :policy_user_roles
@@ -160,12 +159,12 @@ include Searchkick::DSL
   has_one :default_bank_account, -> { where default_account: true }, class_name: "BankAccount", as: :account_owner
   has_many :authentications
   has_many :cards, dependent: :destroy
-  has_many :payroll_cards, -> {where(card_program_id: CardProgram.id_for(:payroll))}, class_name: 'Card'
-  has_many :reimbursement_cards, -> {where(card_program_id: CardProgram.id_for(:reimbursement))}, class_name: 'Card'
-  has_many :reimbursement_payroll_cards, -> {where(card_program_id: [CardProgram.id_for(:reimbursement), CardProgram.id_for(:payroll)])}, class_name: 'Card'
-  has_many :meal_cards, -> {where(card_program_id: CardProgram.id_for(:meal))}, class_name: 'Card'
-  has_many :medical_cards, -> {where(card_program_id: CardProgram.id_for(:medical))}, class_name: 'Card'
-  has_many :expense_cards, -> {where(card_program_id: CardProgram.id_for(:expense))}, class_name: 'Card'
+  has_many :payroll_cards, -> { where(card_program_id: CardProgram.id_for(:payroll)) }, class_name: 'Card'
+  has_many :reimbursement_cards, -> { where(card_program_id: CardProgram.id_for(:reimbursement)) }, class_name: 'Card'
+  has_many :reimbursement_payroll_cards, -> { where(card_program_id: [CardProgram.id_for(:reimbursement), CardProgram.id_for(:payroll)]) }, class_name: 'Card'
+  has_many :meal_cards, -> { where(card_program_id: CardProgram.id_for(:meal)) }, class_name: 'Card'
+  has_many :medical_cards, -> { where(card_program_id: CardProgram.id_for(:medical)) }, class_name: 'Card'
+  has_many :expense_cards, -> { where(card_program_id: CardProgram.id_for(:expense)) }, class_name: 'Card'
   has_many :card_transactions, dependent: :destroy
   has_many :money_requests, inverse_of: :user
 
@@ -175,11 +174,11 @@ include Searchkick::DSL
 
   has_many :controlling_money_requests, class_name: 'MoneyRequest', foreign_key: :controlling_user_id
   has_many :money_request_tracks, class_name: 'MoneyRequestTrack', foreign_key: :action_user_id
-  has_many :interacted_money_requests, -> {distinct}, source: :money_request, through: :money_request_tracks
-  has_many :manager_money_request_tracks, -> {manager_role}, class_name: 'MoneyRequestTrack', foreign_key: :modified_user_id
-  has_many :manager_money_requests, -> {distinct}, source: :money_request, through: :manager_money_request_tracks
-  has_many :finance_money_request_tracks, -> {finance_manager_role}, class_name: 'MoneyRequestTrack', foreign_key: :modified_user_id
-  has_many :finance_money_requests, -> {distinct}, source: :money_request, through: :finance_money_request_tracks
+  has_many :interacted_money_requests, -> { distinct }, source: :money_request, through: :money_request_tracks
+  has_many :manager_money_request_tracks, -> { manager_role }, class_name: 'MoneyRequestTrack', foreign_key: :modified_user_id
+  has_many :manager_money_requests, -> { distinct }, source: :money_request, through: :manager_money_request_tracks
+  has_many :finance_money_request_tracks, -> { finance_manager_role }, class_name: 'MoneyRequestTrack', foreign_key: :modified_user_id
+  has_many :finance_money_requests, -> { distinct }, source: :money_request, through: :finance_money_request_tracks
   has_many :notifications, dependent: :destroy
   has_many :notifier_type_configurations
   has_many :user_balance_histories, dependent: :destroy
@@ -203,21 +202,21 @@ include Searchkick::DSL
   has_many :bank_payment_requests, foreign_key: :owner_id
   has_many :bank_payment_request_trails, class_name: "BankPaymentRequestTrail", foreign_key: :action_user_id
   has_many :controlling_payment_requests, class_name: "BankPaymentRequest", foreign_key: :controlling_user_id
-  has_many :interacted_payment_requests, -> {distinct}, source: :bank_payment_request, through: :bank_payment_request_trails
-  has_many :manager_payment_request_trails, -> {manager_role}, class_name: 'BankPaymentRequestTrail', foreign_key: :modified_user_id
-  has_many :manager_payment_requests, -> {distinct}, source: :bank_payment_request, through: :manager_payment_request_trails
-  has_many :finance_payment_request_trails, -> {finance_manager_role}, class_name: 'BankPaymentRequestTrail', foreign_key: :modified_user_id
-  has_many :finance_payment_requests, -> {distinct}, source: :bank_payment_request, through: :finance_payment_request_trails
+  has_many :interacted_payment_requests, -> { distinct }, source: :bank_payment_request, through: :bank_payment_request_trails
+  has_many :manager_payment_request_trails, -> { manager_role }, class_name: 'BankPaymentRequestTrail', foreign_key: :modified_user_id
+  has_many :manager_payment_requests, -> { distinct }, source: :bank_payment_request, through: :manager_payment_request_trails
+  has_many :finance_payment_request_trails, -> { finance_manager_role }, class_name: 'BankPaymentRequestTrail', foreign_key: :modified_user_id
+  has_many :finance_payment_requests, -> { distinct }, source: :bank_payment_request, through: :finance_payment_request_trails
 
   # adding associations for the user manager mapping of travel requests
   has_many :travel_requests
   has_many :travel_request_trails, class_name: "TravelRequestTrail", foreign_key: :action_user_id
   has_many :controlling_travel_requests, class_name: "TravelRequest", foreign_key: :controlling_user_id
-  has_many :interacted_travel_requests, -> {distinct}, source: :travel_requests, through: :travel_request_trails
-  has_many :manager_travel_request_trails, -> {manager_role}, class_name: 'TravelRequestTrail', foreign_key: :modified_user_id
-  has_many :manager_travel_requests, -> {distinct}, source: :travel_request, through: :manager_travel_request_trails
-  has_many :travel_manager_travel_request_trails, -> {travel_manager_role}, class_name: 'TravelRequestTrail', foreign_key: :modified_user_id
-  has_many :travel_manager_travel_requests, -> {distinct}, source: :travel_request, through: :travel_manager_travel_request_trails
+  has_many :interacted_travel_requests, -> { distinct }, source: :travel_requests, through: :travel_request_trails
+  has_many :manager_travel_request_trails, -> { manager_role }, class_name: 'TravelRequestTrail', foreign_key: :modified_user_id
+  has_many :manager_travel_requests, -> { distinct }, source: :travel_request, through: :manager_travel_request_trails
+  has_many :travel_manager_travel_request_trails, -> { travel_manager_role }, class_name: 'TravelRequestTrail', foreign_key: :modified_user_id
+  has_many :travel_manager_travel_requests, -> { distinct }, source: :travel_request, through: :travel_manager_travel_request_trails
 
   # Trips - New
   has_many :trips, foreign_key: :created_by_id
@@ -226,8 +225,8 @@ include Searchkick::DSL
   has_many :outward_invoices
   has_many :outward_invoice_attachments
   has_many :resource_templates
-  has_many :purchase_order_templates, -> {filter_resource_type(:purchase_orders)}, class_name: 'ResourceTemplate', foreign_key: :user_id
-  has_many :invoice_templates, -> {filter_resource_type(:invoices)}, class_name: 'ResourceTemplate', foreign_key: :user_id
+  has_many :purchase_order_templates, -> { filter_resource_type(:purchase_orders) }, class_name: 'ResourceTemplate', foreign_key: :user_id
+  has_many :invoice_templates, -> { filter_resource_type(:invoices) }, class_name: 'ResourceTemplate', foreign_key: :user_id
 
   # Inward Invoices
   has_many :inward_invoices, class_name: "Invoice", foreign_key: :created_by_user_id
@@ -320,28 +319,28 @@ include Searchkick::DSL
   validates :user_panel_subscription, presence: true
   validate :password_complexity
 
-  scope :with_id, ->(user_id) {where id: user_id}
-  scope :with_ids, -> (user_ids) {where id: user_ids}
+  scope :with_id, ->(user_id) { where id: user_id }
+  scope :with_ids, -> (user_ids) { where id: user_ids }
   scope :with_id_or_email_or_mobile_number, -> (string) {
     ids = where('users.id = ? OR users.email = ? OR users.mobile_number = ?', string, string, string).pluck('users.id')
     where id: ids
   }
-  scope :with_company_id, ->(company_id) {where company_id: company_id}
+  scope :with_company_id, ->(company_id) { where company_id: company_id }
   scope :without_company_id, -> (company_id) { where.not(company_id: company_id) }
-  scope :without_id, ->(user_id) {where.not id: user_id}
+  scope :without_id, ->(user_id) { where.not id: user_id }
   scope :filter_name, -> (name) do
     where 'first_name like ? or last_name like ? or concat(first_name, ' ', last_name) like ? or concat(first_name, ' ', last_name) like ?',
           "%#{name}%", "%#{name}%", "%#{name}%", "%#{name}%"
   end
-  scope :filter_email, -> (email) {where('email like ?', "%#{email}%")}
-  scope :filter_user_id, ->(user_id) {where id: user_id}
-  scope :with_roles, -> {joins :role_mapping}
-  scope :only_managers, -> {with_roles.where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:expense_management))}
+  scope :filter_email, -> (email) { where('email like ?', "%#{email}%") }
+  scope :filter_user_id, ->(user_id) { where id: user_id }
+  scope :with_roles, -> { joins :role_mapping }
+  scope :only_managers, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:expense_management)) }
   # scope :only_vendor_payment_reviewers, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments))}
   scope :only_vendor_payment_reviewers, -> { with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments)) }
 
-  scope :filter_vendor_payments_reviewers, -> (flag) {# passed argument is only for has scope, no effect here
-    with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments))}
+  scope :filter_vendor_payments_reviewers, -> (flag) { # passed argument is only for has scope, no effect here
+  with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments)) }
 
   # Use only for has_scope filter, scope to policy_user_roles
   scope :policy_id, -> (policy_id) {
@@ -374,22 +373,22 @@ include Searchkick::DSL
   scope :filter_em_reviewers, -> (flag) {
     with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.expense_management = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:expense_management))
   }
-  scope :only_finance_managers, -> {with_roles.where('user_role_mappings.user_role_id = ?', UserRole.finance_manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:expense_management))}
-  scope :only_vendor_payment_creditors, -> {with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.finance_manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments))}
+  scope :only_finance_managers, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.finance_manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:expense_management)) }
+  scope :only_vendor_payment_creditors, -> { with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.finance_manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments)) }
   # scope :only_vendor_payment_creditors, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.finance_manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments)) }
-  scope :only_admins, -> {with_roles.where('user_role_mappings.user_role_id = ?', UserRole.admin_id).where('user_role_mappings.user_role_id = ?', Purpose.id_for(:expense_management))}
-  scope :only_vendor_payment_admins, -> {with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.admin_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments))}
-  scope :only_auditors, -> {with_roles.where('user_role_mappings.user_role_id = ?', UserRole.id_for(:auditor))}
-  scope :sort_by_name, -> {order(first_name: :asc, last_name: :asc)}
-  scope :active, -> {where active: true}
-  scope :inactive, -> {filter_state(3)}
-  scope :pending, -> {filter_state(2)}
-  scope :invited_by, ->(id) {where invited_by_id: id}
-  scope :with_vendor_payments_enabled, -> {joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true)}
-  scope :with_expense_management_enabled, -> {joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true)}
-  scope :include_all_accounts_with_balance, -> {includes(cards: [:card_balance], wallet: [:balance], cash_on_hand: [:balance], bank_wallet: [:balance])}
-  scope :include_reimbursable_accounts, -> {includes :bank_accounts, :reimbursement_cards}
-  scope :with_email, ->(email) {where email: email}
+  scope :only_admins, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.admin_id).where('user_role_mappings.user_role_id = ?', Purpose.id_for(:expense_management)) }
+  scope :only_vendor_payment_admins, -> { with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.admin_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments)) }
+  scope :only_auditors, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.id_for(:auditor)) }
+  scope :sort_by_name, -> { order(first_name: :asc, last_name: :asc) }
+  scope :active, -> { where active: true }
+  scope :inactive, -> { filter_state(3) }
+  scope :pending, -> { filter_state(2) }
+  scope :invited_by, ->(id) { where invited_by_id: id }
+  scope :with_vendor_payments_enabled, -> { joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true) }
+  scope :with_expense_management_enabled, -> { joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true) }
+  scope :include_all_accounts_with_balance, -> { includes(cards: [:card_balance], wallet: [:balance], cash_on_hand: [:balance], bank_wallet: [:balance]) }
+  scope :include_reimbursable_accounts, -> { includes :bank_accounts, :reimbursement_cards }
+  scope :with_email, ->(email) { where email: email }
   scope :with_email_or_mobile_number, -> (email, mobile_number) {
     if email.present? && mobile_number.present?
       where('email = ? OR mobile_number = ?', email, mobile_number)
@@ -418,7 +417,7 @@ include Searchkick::DSL
     end
     if app.present?
       if app == 'finly_insights'
-         relevant_user_ids = ids #all users in em and vp
+        relevant_user_ids = ids #all users in em and vp
       else
         relevant_user_ids = UserPanelSubscription.where(user_id: ids).where(app.to_sym => true).pluck(:user_id)
       end
@@ -427,7 +426,7 @@ include Searchkick::DSL
   }
 
   # Simplified version of the above query
-  scope :with_application, -> (application=nil) {
+  scope :with_application, -> (application = nil) {
     case application
     when 'vp', :vp
       app = 'yes_bank_account_transfer'
@@ -585,8 +584,8 @@ include Searchkick::DSL
 
   end
 
-  scope :filter_company_id, -> (company_id) {where company_id: company_id}
-  scope :company_id, -> (company_id) {where company_id: company_id}
+  scope :filter_company_id, -> (company_id) { where company_id: company_id }
+  scope :company_id, -> (company_id) { where company_id: company_id }
 
   scope :created_between, -> (date_from, date_to) {
     unless date_from.blank? && date_to.blank?
@@ -610,12 +609,12 @@ include Searchkick::DSL
     where('created_at <= ?', end_date)
   }
 
-  scope :signed_up, -> {where(invitation_token: nil).where.not(first_name: [nil, ""])}
-  scope :pending, -> {where('first_name = ? OR default_password IS FALSE', "")}
-  scope :only_employees, -> {where('user_role_mappings.user_role_id = ?', UserRole.employee_id).uniq}
-  scope :sort_by_name, -> {order(first_name: :asc, last_name: :asc)}
-  scope :with_balance_sheet, -> {includes(:balance_sheet => [:cash_in_hand, :approved_reports_total])}
-  scope :with_bank_accounts, -> {joins(:bank_accounts)}
+  scope :signed_up, -> { where(invitation_token: nil).where.not(first_name: [nil, ""]) }
+  scope :pending, -> { where('first_name = ? OR default_password IS FALSE', "") }
+  scope :only_employees, -> { where('user_role_mappings.user_role_id = ?', UserRole.employee_id).uniq }
+  scope :sort_by_name, -> { order(first_name: :asc, last_name: :asc) }
+  scope :with_balance_sheet, -> { includes(:balance_sheet => [:cash_in_hand, :approved_reports_total]) }
+  scope :with_bank_accounts, -> { joins(:bank_accounts) }
 
   scope :filter_disburse, -> (enabled) {
     if StringUtils.to_bool(enabled)
@@ -1280,22 +1279,22 @@ include Searchkick::DSL
       return data
     elsif options[:streamsets]
       {
-        id: id,
-        name: name,
-        email: email,
-        employee_id: self.profile&.employee_id,
-        mobile_number: self.mobile_number,
-        location_name: self.location&.name,
-        department_name: self.department&.full_name,
-        status: self.active,
-        full_address: self.profile&.full_address,
-        address_1: self.profile&.address_1,
-        address_2: self.profile&.address_2,
-        pin_code: self.profile&.pin_code,
-        city: self.profile&.city,
-        state_id: self.profile&.state_id,
-        state_name: self.profile&.state_name,
-        pan: self.profile&.pan
+          id: id,
+          name: name,
+          email: email,
+          employee_id: self.profile&.employee_id,
+          mobile_number: self.mobile_number,
+          location_name: self.location&.name,
+          department_name: self.department&.full_name,
+          status: self.active,
+          full_address: self.profile&.full_address,
+          address_1: self.profile&.address_1,
+          address_2: self.profile&.address_2,
+          pin_code: self.profile&.pin_code,
+          city: self.profile&.city,
+          state_id: self.profile&.state_id,
+          state_name: self.profile&.state_name,
+          pan: self.profile&.pan
       }
     else
       {
@@ -1315,7 +1314,7 @@ include Searchkick::DSL
     if company_id.present?
       user = find_by(mobile_number: username, company_id: company_id) || find_by(email: username, company_id: company_id)
     else
-      user = find_by(mobile_number: username,active: true) || find_by(email: username,active:true)
+      user = find_by(mobile_number: username, active: true) || find_by(email: username, active: true)
       users = User.where(active: true).with_email_or_mobile_number(user&.email, user&.mobile_number)
       default_company_id = users.pluck(:default_company_id).uniq.first
       # if the default_company_id is present then replace the user object returned with the one from the default company
@@ -1404,7 +1403,7 @@ include Searchkick::DSL
     per_diems = self.company.per_diems.includes(:rate).active
     policies = self.policies.includes(per_diems: [:rate])
     policies.each do |policy|
-      per_diems += policy.per_diems.map {|pd| pd if pd.is_deleted == false}.reject(&:nil?)
+      per_diems += policy.per_diems.map { |pd| pd if pd.is_deleted == false }.reject(&:nil?)
     end
     per_diems
   end
@@ -1723,9 +1722,10 @@ include Searchkick::DSL
   # ************ User Role for vendor payments ******************
 
   # ************ User Role for expense management ************
-    def is_travel_manager?(document=nil)
-      self.has_policy_role?(UserRole.id_for(:travel_manager), document)
-    end
+  def is_travel_manager?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:travel_manager), document)
+  end
+
   # ************ User Role for expense management ************
 
   def relevant

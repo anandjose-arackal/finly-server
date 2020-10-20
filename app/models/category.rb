@@ -30,7 +30,7 @@ class Category < ApplicationRecord
   include Exposures::Model::Exposable
   include EventProducer
   # include SearchIndex::Concerns::Document
-include Searchkick::DSL
+include Searchkick::Api
 
   acts_as_sequenced column: :category_code, purpose: :category, editable: false, prefix: 'CAT'
   has_ancestry

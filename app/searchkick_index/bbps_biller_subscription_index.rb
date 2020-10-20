@@ -1,33 +1,54 @@
-module BbpsBillerSubscriptionIndex
-  extend ActiveSupport::Concern
+class BbpsBillerSubscriptionIndex < Searchkick::Api::DSL
 
-  included do
-    scope :searchkick_import, -> {
-      includes(:policy, :status, :created_by, :location, :department, :cost_center, :biller)
-    }
-
-    searchkick_record_type :utility_subscriptions
+  scope do
+    includes(:policy, :status, :created_by, :location, :department, :cost_center, :biller)
   end
 
-  def searchkick_data
-    {
-        vendor_name: biller.biller_name,
-        policy_id: policy_id,
-        policy_name: policy&.name,
-        status_id: status_id,
-        status_name: status&.name&.titleize,
-        sequence_id: sequence_id,
-        description: name,
-        narration: note,
-        category_name: biller.biller_category_name,
-        location_names: [location&.name],
-        location_codes: [location&.location_code],
-        department_names: [department&.name],
-        department_codes: [department&.department_code],
-        cost_center_names: [cost_center&.name],
-        cost_center_codes: [cost_center&.cost_center_code]
-    }
-  end
+  record_type 'utility_subscriptions'
+
+  field :vendor_name, value: -> (record) { record.biller.biller_name }
+  field :policy_id, value: -> (record) { record.policy_id }, searchable: false
+  field :policy_name, value: -> (record) { record.policy&.name }
+  field :status_id, value: -> (record) { record.status_id }, searchable: false
+  field :status_name, value: -> (record) { record.status&.name&.titleize }
+  field :sequence_id, value: -> (record) { record.sequence_id }
+  field :description, value: -> (record) { record.name }
+  field :narration, value: -> (record) { record.note }
+  field :category_name, value: -> (record) { record.biller.biller_category_name }
+  field :location_names, value: -> (record) { [record.location&.name] }
+  field :location_codes, value: -> (record) { [record.location&.location_code] }
+  field :department_names, value: -> (record) { [record.department&.name] }
+  field :department_codes, value: -> (record) { [record.department&.department_code] }
+  field :cost_center_names, value: -> (record) { [record.cost_center&.name] }
+  field :cost_center_codes, value: -> (record) { [record.cost_center&.cost_center_code] }
+
+  # included do
+  #   scope :searchkick_import, -> {
+  #     includes(:policy, :status, :created_by, :location, :department, :cost_center, :biller)
+  #   }
+  #
+  #   searchkick_record_type :utility_subscriptions
+  # end
+  #
+  # def searchkick_data
+  #   {
+  #       vendor_name: biller.biller_name,
+  #       policy_id: policy_id,
+  #       policy_name: policy&.name,
+  #       status_id: status_id,
+  #       status_name: status&.name&.titleize,
+  #       sequence_id: sequence_id,
+  #       description: name,
+  #       narration: note,
+  #       category_name: biller.biller_category_name,
+  #       location_names: [location&.name],
+  #       location_codes: [location&.location_code],
+  #       department_names: [department&.name],
+  #       department_codes: [department&.department_code],
+  #       cost_center_names: [cost_center&.name],
+  #       cost_center_codes: [cost_center&.cost_center_code]
+  #   }
+  # end
 
   # index Indexes::Vp do
   #   include_associations :policy, :status, Indexes::Vp::Helpers::INCLUDE_COLLABORATORS,

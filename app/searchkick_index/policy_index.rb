@@ -1,11 +1,13 @@
-module PolicyIndex
-  extend ActiveSupport::Concern
+class PolicyIndex < Searchkick::Api::DSL
 
-  def searchkick_data
-    {
-        name: name
-    }
-  end
+  record_type 'policies'
+  field :name, value: -> (record) { record.name }
+
+  # def searchkick_data
+  #   {
+  #       name: name
+  #   }
+  # end
 
   # index Indexes::Vp do
   #

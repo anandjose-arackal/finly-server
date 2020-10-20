@@ -14,7 +14,7 @@ class GlobalSearch::Config < Transactions::API
     GlobalSearch::Config::Vp::DOCUMENT_PERMISSIONS.each do |document, config|
       if authorized?(current_user, config)
         context[:documents][config[:category]] << {
-            document_type: config[:index].searchkick_record_type,
+            document_type: config[:index].searchkick_api.record_type,
             route: config[:route],
             layout: config[:layout]
         }

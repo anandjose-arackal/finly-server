@@ -53,7 +53,7 @@ class YesBankVendor < ApplicationRecord
   include Exposures::Model::Exposable
   include ErpSyncable
   # include SearchIndex::Concerns::Document
-include Searchkick::DSL
+include Searchkick::Api
 
   validates :business_name, presence: true
 

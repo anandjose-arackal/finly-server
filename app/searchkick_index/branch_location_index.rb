@@ -1,16 +1,19 @@
-module BranchLocationIndex
-  extend ActiveSupport::Concern
+class BranchLocationIndex <  Searchkick::Api::DSL
 
-  included do
-    searchkick_record_type :locations
-  end
+  record_type 'locations'
+  field :location_name, value: -> (record) { record.name }
+  field :location_code, value: -> (record) { record.location_code }
 
-  def searchkick_data
-    {
-        name: name,
-        sequence_id: location_code
-    }
-  end
+  # included do
+  #   searchkick_record_type :locations
+  # end
+  #
+  # def searchkick_data
+  #   {
+  #       location_name: name,
+  #       location_code: location_code
+  #   }
+  # end
 
   # index Indexes::Vp do
   #

@@ -1,12 +1,15 @@
-module CostCenterIndex
-  extend ActiveSupport::Concern
+class CostCenterIndex < Searchkick::Api::DSL
 
-  def searchkick_data
-    {
-        name: full_name,
-        sequence_id: cost_center_code
-    }
-  end
+  record_type 'cost_centers'
+  field :cost_center_name, value: -> (record) { record.full_name }
+  field :cost_center_code, value: -> (record) { record.cost_center_code }
+
+  # def searchkick_data
+  #   {
+  #       cost_center_name: full_name,
+  #       cost_center_code: cost_center_code
+  #   }
+  # end
 
   # index Indexes::Vp do
   #

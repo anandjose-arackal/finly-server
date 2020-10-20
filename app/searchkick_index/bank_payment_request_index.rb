@@ -1,29 +1,19 @@
-module BankPaymentRequestIndex
-  extend ActiveSupport::Concern
+class BankPaymentRequestIndex < Searchkick::Api::DSL
 
-  included do
-    # searchkick callbacks: :queue
-
-    scope :searchkick_import, -> {
-      includes(:policy, :status, :created_by, {payment_order: :payment_order_status})
-    }
-
-    searchkick_record_type :payment_tickets
+  scope do
+    includes(:policy, :status, :created_by, {payment_order: :payment_order_status})
   end
 
-  def searchkick_data
-    {
-        policy_id: policy_id,
-        policy_name: policy&.name,
-        status_id: status&.id,
-        status_name: status_name&.titleize,
-        sequence_id: id,
-        narration: description,
-        description: name,
-        created_by_name: created_by&.name,
-        created_by_email: created_by&.email,
-    }
-  end
+  record_type 'payment_tickets'
+
+  field :policy_id, displayable: false, searchable: false
+  field :policy_name, value: 'record.policy.name'
+  field :status_name, value: 'record.status_name'
+  field :sequence_id, value: 'record.id'
+  field :narration, value: 'record.description'
+  field :description, value: 'record.name'
+  field :created_by_name, value: 'record.created_by.name'
+  field :created_by_email, value: 'record.created_by.name'
 
   # index Indexes::Vp do
   #   include_associations :policy, :status, Indexes::Vp::Helpers::INCLUDE_COLLABORATORS, :created_by, {payment_order: :payment_order_status}

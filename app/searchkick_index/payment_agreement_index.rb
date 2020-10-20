@@ -1,25 +1,38 @@
-module PaymentAgreementIndex
-  extend ActiveSupport::Concern
+class PaymentAgreementIndex < Searchkick::Api::DSL
 
-  included do
-    scope :searchkick_import, -> {
-      includes(:policy, :status, :created_by)
-    }
-
-    searchkick_record_type :payment_agreements
+  scope do
+    includes(:policy, :status, :created_by)
   end
 
-  def searchkick_data
-    {
-        policy_id: policy_id,
-        policy_name: policy&.name,
-        status_id: status&.id,
-        status_name: status&.name&.titleize,
-        sequence_id: order_number,
-        description: title,
-        narration: note,
-    }
-  end
+  record_type 'payment_agreements'
+
+  field :policy_id, value: ->(record) { record.policy_id }, searchable: false, displayable: false
+  field :policy_name, value: ->(record) { record.policy&.name }
+  field :status_id, value: ->(record) { record.status&.id }, searchable: false, displayable: false
+  field :status_name, value: ->(record) { record.status&.name&.titleize }
+  field :sequence_id, value: ->(record) { record.order_number }
+  field :description, value: ->(record) { record.title }
+  field :narration, value: ->(record) { record.note }
+
+  # included do
+  #   scope :searchkick_import, -> {
+  #     includes(:policy, :status, :created_by)
+  #   }
+  #
+  #   searchkick_record_type :payment_agreements
+  # end
+  #
+  # def searchkick_data
+  #   {
+  #       policy_id: policy_id,
+  #       policy_name: policy&.name,
+  #       status_id: status&.id,
+  #       status_name: status&.name&.titleize,
+  #       sequence_id: order_number,
+  #       description: title,
+  #       narration: note,
+  #   }
+  # end
 
   # index Indexes::Vp do
   #   include_associations :policy, :status, :created_by, Indexes::Vp::Helpers::INCLUDE_COLLABORATORS

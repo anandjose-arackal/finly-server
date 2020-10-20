@@ -80,7 +80,7 @@ class PurchaseOrder < ApplicationRecord
   include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport
   include Sequenced::ActsAsSequenced
   # include SearchIndex::Concerns::Document
-include Searchkick::DSL
+include Searchkick::Api
   include Concerns::ErpSyncConcern
 
 

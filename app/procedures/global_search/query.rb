@@ -25,20 +25,23 @@ class GlobalSearch::Query < Transactions::API
   def query(context, filters:, params:, **)
     context[:result] = Searchkick.search(
         params[:q],
+        models: Searchkick.models,
         where: filters,
         offset: (params[:offset] || 0).to_i,
         limit: (params[:limit] || 20).to_i,
         load: false,
         highlight: true,
         aggs: ['record_type'],
-        # body_options: {track_total_hits: true}
     )
   end
 
   def build_response(context, result:, **)
     hits = result.response.dig('hits', 'hits').map do |item|
       json = {}
-      item['_source'].each do |k, v|
+      model = model_from_index(item['_index'])
+      searchkick_api = model.searchkick_api
+
+      item['_source'].slice(*searchkick_api.displayable_fields).each do |k, v|
         if v.respond_to?(:each)
           json[k] = v.join(", ")
         else
@@ -48,7 +51,7 @@ class GlobalSearch::Query < Transactions::API
 
       json['record_id'] = item['_id']
       formatted = {}.merge(json)
-      item['highlight'].each do |key, value|
+      item['highlight'].slice(*searchkick_api.displayable_fields).each do |key, value|
         if value.respond_to?(:each)
           formatted[key.gsub(".analyzed", "")] = value.join(", ")
         else
@@ -67,6 +70,24 @@ class GlobalSearch::Query < Transactions::API
         aggregations: aggregations,
         records: hits.group_by { |hit| hit['record_type'] },
     }
+  end
+
+  def model_from_index(index)
+    index_model_map.each do |ind, model|
+      return model if index.start_with?(ind)
+    end
+
+    nil
+  end
+
+  def index_model_map
+    return @index_model_map if @index_model_map.present?
+
+    @index_model_map = {}
+    Searchkick.models.each do |model|
+      @index_model_map[model.searchkick_index.name] = model
+    end
+    @index_model_map
   end
 
 end

@@ -1,12 +1,15 @@
-module CategoryIndex
-  extend ActiveSupport::Concern
+class CategoryIndex <  Searchkick::Api::DSL
 
-  def searchkick_data
-    {
-        name: name,
-        sequence_id: category_code,
-    }
-  end
+  record_type 'categories'
+  field :category_name, value: -> (record) { record.name }
+  field :category_code, value: -> (record) { record.category_code }
+
+  # def searchkick_data
+  #   {
+  #       category_name: name,
+  #       category_code: category_code,
+  #   }
+  # end
 
   # index Indexes::Vp do
   #

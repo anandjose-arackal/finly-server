@@ -34,7 +34,7 @@ class BranchLocation < ApplicationRecord
   include Exposures::Model::Exposable
   include EventProducer
   # include SearchIndex::Concerns::Document
-include Searchkick::DSL
+include Searchkick::Api
 
   event_channel 'locations'
 
