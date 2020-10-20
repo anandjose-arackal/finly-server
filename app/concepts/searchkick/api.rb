@@ -10,7 +10,7 @@ module Searchkick::Api
   # end
 
   included do
-    searchkick
+    searchkick callbacks: :queue
 
     scope :search_import, -> {
       # raise 'Current company should be set to identify the required index' unless RequestStoreUtil.current_company.present?
@@ -34,7 +34,7 @@ module Searchkick::Api
         company_id: self.company_id,
         record_type: self.class.searchkick_record_type
     }.merge(searchkick_data).merge(search_collaborators_data)
-    raise "Company ID should is not set for indexing for #{self.class.name}" if data[:company_id].nil?
+    return nil if data[:company_id].nil?
 
     data
   end
