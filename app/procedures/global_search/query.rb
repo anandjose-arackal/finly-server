@@ -29,7 +29,7 @@ class GlobalSearch::Query < Transactions::API
         models: Searchkick.models,
         where: filters,
         offset: (params[:offset] || 0).to_i,
-        limit: (params[:limit] || 20).to_i,
+        limit: (params[:limit] || 10).to_i,
         load: false,
         highlight: true,
         aggs: ['record_type'],
