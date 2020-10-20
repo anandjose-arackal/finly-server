@@ -2,6 +2,8 @@ module BankPaymentRequestIndex
   extend ActiveSupport::Concern
 
   included do
+    # searchkick callbacks: :queue
+
     scope :searchkick_import, -> {
       includes(:policy, :status, :created_by, {payment_order: :payment_order_status})
     }

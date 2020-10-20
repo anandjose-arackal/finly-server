@@ -93,3 +93,7 @@ end
 every 1.day, at: "12:10 am", roles: [:whenever_cron] do
   runner "BbpsBillerSync.perform", output: "#{path}/log/whenever/bbps_biller_sync.log"
 end
+
+every 30.seconds, roles: [:whenever_cron] do
+  runner 'SearchkickUpdateIndexJob.new.perform'
+end
