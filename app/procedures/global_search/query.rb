@@ -41,8 +41,8 @@ class GlobalSearch::Query < Transactions::API
       json = {}
       model = model_from_index(item['_index'])
       searchkick_api = model.searchkick_api
-
-      item['_source'].slice(*searchkick_api.displayable_fields).each do |k, v|
+      displayable_fields = searchkick_api.displayable_fields
+      item['_source'].slice(*displayable_fields).each do |k, v|
         if v.respond_to?(:each)
           json[k] = v.join(", ")
         else
@@ -51,12 +51,15 @@ class GlobalSearch::Query < Transactions::API
       end
 
       json['record_id'] = item['_id']
-      formatted = {}.merge(json)
-      item['highlight'].slice(*searchkick_api.displayable_fields).each do |key, value|
+      formatted = {}#.merge(json)
+      item['highlight'].each do |key, value|
+        formatted_key = key.gsub('.analyzed', '')
+        next unless displayable_fields.include?(formatted_key)
+
         if value.respond_to?(:each)
-          formatted[key.gsub(".analyzed", "")] = value.join(", ")
+          formatted[formatted_key] = value.join(", ")
         else
-          formatted[key.gsub(".analyzed", "")] = value
+          formatted[formatted_key] = value
         end
       end
       json['_formatted'] = formatted
