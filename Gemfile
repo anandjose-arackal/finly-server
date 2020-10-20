@@ -245,6 +245,8 @@ gem 'whenever', '~> 1.0'
 
 # Elasticsearch
 gem 'searchkick', '~> 4.4'
+gem 'typhoeus', '~> 1.4'
+
 # gem for all azure services
 gem 'azure'
 gem 'azure-storage-blob'

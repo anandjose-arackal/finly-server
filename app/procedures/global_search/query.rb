@@ -23,7 +23,16 @@ class GlobalSearch::Query < Transactions::API
   end
 
   def query(context, filters:, params:, **)
-    context[:result] = Searchkick.search(params[:q], where: filters, offset: (params[:offset] || 0).to_i, limit: (params[:limit] || 20).to_i, load: false, highlight: true, aggs: ['record_type'])
+    context[:result] = Searchkick.search(
+        params[:q],
+        where: filters,
+        offset: (params[:offset] || 0).to_i,
+        limit: (params[:limit] || 20).to_i,
+        load: false,
+        highlight: true,
+        aggs: ['record_type'],
+        # body_options: {track_total_hits: true}
+    )
   end
 
   def build_response(context, result:, **)
