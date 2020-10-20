@@ -52,10 +52,13 @@ class YesBankVendor < ApplicationRecord
   include LiquidDroppable
   include Exposures::Model::Exposable
   include ErpSyncable
+  include SearchIndex::Concerns::Document
 
   validates :business_name, presence: true
 
   include SoftDeletable
+
+  event_channel 'vendors'
 
   acts_as_sequenced column: :vendor_id, purpose: :vendor, editable: false, prefix: 'VNDR-'
 
@@ -111,6 +114,7 @@ class YesBankVendor < ApplicationRecord
 
   scope :with_ids, -> (ids) {where id: ids}
   scope :with_id, -> (ids) {where id: ids}
+  scope :with_company_id, -> (company_id) { where company_id: company_id }
 
   scope :including_bank_accounts, -> {joins(:bank_accounts)}
   scope :non_deleted, -> {where deleted_at: nil }

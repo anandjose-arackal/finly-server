@@ -4,7 +4,7 @@ class Docs::P2P::CreditNotes::Mailers::TakeControl < Docs::P2P::CreditNotes::Mai
 
   class Docs::P2P::CreditNotes::Mailers::TakeControl::TakenControlBy < Docs::P2P::CreditNotes::Mailers::TakeControl
 
-    consumes_event! 'credit_note.take_control'
+    consumes_event! 'credit_notes.take_control'
 
     assign :to do |user, params|
       [user.email]
@@ -25,7 +25,7 @@ class Docs::P2P::CreditNotes::Mailers::TakeControl < Docs::P2P::CreditNotes::Mai
 
   class Docs::P2P::CreditNotes::Mailers::TakeControl::TakenControlFrom < Docs::P2P::CreditNotes::Mailers::TakeControl
 
-    consumes_event! 'credit_note.take_control'
+    consumes_event! 'credit_notes.take_control'
 
     assign :to do |user, params|
       record = params[:record]

@@ -15,10 +15,13 @@ class Events::Publisher::Record < Events::Publisher
   end
 
   def self.Destroy(record, user, company, options = {})
+    # Since destroy is handled in +before_destroy+ callback, there are scenarios where the job is being executed
+    # before the record is actually destroyed. Adding a 10 seconds delay to avoid this scenario
     broadcast "#{record.class.event_channel}.destroy",
               Events::Payload::Record.(record, user, :destroy, options),
               current_user: user,
-              current_company: company
+              current_company: company,
+              wait: 10.seconds
   end
 
   def self.Transition(record, user, company, action, from_status, options = {})

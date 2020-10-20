@@ -52,8 +52,6 @@ class Report < ApplicationRecord
           FindByOrderedIds, Transitionable
   include ErpSyncable
 
-  event_channel 'report'
-
   has_many :email_authorizations, as: :authorizable
   belongs_to :user, optional: true, inverse_of: :reports
   belongs_to :company

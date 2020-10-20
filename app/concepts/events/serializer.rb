@@ -53,9 +53,9 @@ class Events::Serializer
     end
     ActsAsTenant.without_tenant do
       if relation
-        record.where id: record_id
+        record.unscoped.where id: record_id
       else
-        record.find_by id: record_id
+        record.unscoped.find_by id: record_id
       end
     end
   end
