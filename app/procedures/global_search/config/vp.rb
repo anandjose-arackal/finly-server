@@ -75,7 +75,7 @@ class GlobalSearch::Config::Vp
           index: Payment,
           permissions: Docs::PaymentTickets::Payments::Index.permissions,
           category: :transactions,
-          route: 'orders/{{parent_id}}/params={}',
+          route: 'orders/{{payment_ticket_id}}/params={}',
           layout: {
               fixed_left: [:vendor_name, :sequence_id],
               fixed_right: [:created_by_name, :created_by_email, :status_name]
