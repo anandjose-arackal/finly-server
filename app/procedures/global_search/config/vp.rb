@@ -118,7 +118,7 @@ class GlobalSearch::Config::Vp
           category: :masters,
           route: 'organization_account/params={"id":"settings"}',
           layout: {
-              fixed_left: [:description, :sequence_id],
+              fixed_left: [:category_name, :category_code],
               fixed_right: []
           }
       },
@@ -138,7 +138,7 @@ class GlobalSearch::Config::Vp
           category: :masters,
           route: 'organization_account/params={"id":"settings"}',
           layout: {
-              fixed_left: [:description, :sequence_id],
+              fixed_left: [:department_name, :department_code],
               fixed_right: []
           }
       },
@@ -148,7 +148,7 @@ class GlobalSearch::Config::Vp
           category: :masters,
           route: 'organization_account/params={"id":"settings"}',
           layout: {
-              fixed_left: [:description, :sequence_id],
+              fixed_left: [:location_name, :location_code],
               fixed_right: []
           }
       },
@@ -158,7 +158,7 @@ class GlobalSearch::Config::Vp
           category: :masters,
           route: 'organization_account/params={"id":"settings"}',
           layout: {
-              fixed_left: [:description, :sequence_id],
+              fixed_left: [:cost_center_name, :cost_center_code],
               fixed_right: []
           }
       },
@@ -180,7 +180,7 @@ class GlobalSearch::Config::Vp
           category: :masters,
           route: 'utility_bill_master/{{record_id}}/params={}',
           layout: {
-              fixed_left: [:description, :sequence_id],
+              fixed_left: [:description, :sequence_id, :vendor_name],
               fixed_right: [:created_by_name, :created_by_email, :status_name]
           }
       },
