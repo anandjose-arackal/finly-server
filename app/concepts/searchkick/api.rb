@@ -4,8 +4,8 @@ module Searchkick::Api
   class Searchkick::Api::EnqueueReindex
     include Sidekiq::Worker
 
-    def perform(klass, record_id)
-      klass.searchkick_index(name: nil).reindex_queue.push(record_id)
+    def perform(klass_name, record_id)
+      Object.const_get(klass_name).searchkick_index(name: nil).reindex_queue.push(record_id)
     end
 
   end
@@ -30,8 +30,9 @@ module Searchkick::Api
       end
     }
 
+    # Since paranoid is not triggering after_commit callback when a record is destroy, manually setting a job to publish to queue in 15seconds
     after_destroy do
-      Searchkick::Api::EnqueueReindex.perform_in(5, self.id)
+      Searchkick::Api::EnqueueReindex.perform_in(15, self.class.name, self.id)
     end
   end
 
