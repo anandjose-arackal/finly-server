@@ -10,7 +10,7 @@ class PurchaseOrderIndex < Searchkick::Api::DSL
 
   record_type 'purchase_orders'
 
-  field :parent_id, value: -> (record) { record.procurement_id }, searchable: false, displayable: false
+  field :parent_id, value: -> (record) { record.procurement_id }, searchable: false
   field :parent_type, value: 'po'
   field :policy_id, value: -> (record) { record.policy_id }, searchable: false, displayable: false
   field :policy_name, value: -> (record) { record.policy&.name }
