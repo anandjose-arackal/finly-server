@@ -51,7 +51,7 @@ class GlobalSearch::Query < Transactions::API
       end
 
       json['record_id'] = item['_id']
-      formatted = {}#.merge(json)
+      formatted = {}.merge(json)
       item['highlight'].each do |key, value|
         formatted_key = key.gsub('.analyzed', '')
         next unless displayable_fields.include?(formatted_key)
