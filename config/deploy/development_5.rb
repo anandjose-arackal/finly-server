@@ -8,13 +8,13 @@
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
 # server 'dev2.finly.io', user: 'centos', roles: %w{web app db}, port: 22
-server 'dev.finly.io', user: 'centos', roles: %w{web app db}, port: 22
+server 'dev.finly.io', user: 'centos', roles: %w{web app db whenever_cron}, port: 22
 # server 'demo2.finly.io', user: 'centos', roles: %w{web app db}, port: 22
 set :stage, 'development'
 set :use_sudo, false
 set :rbenv_type, :user
 set :rbenv_ruby, '2.6.1' # Edit this if you are using MRI Ruby
-
+set :whenever_cron, :whenever_cron
 # role-based syntax
 # ==================
 
