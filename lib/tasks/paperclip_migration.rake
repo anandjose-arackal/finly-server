@@ -39,7 +39,7 @@ namespace :paperclip_migration do
             NOT EXISTS(
                SELECT * FROM active_storage_blobs AS blobs
                INNER JOIN active_storage_attachments AS attachments ON attachments.blob_id = blobs.id
-               WHERE record_type = 'ProcurementAttachment'
+               WHERE record_type = 'ProcurementAttachment' AND record_id = procurement_attachments.id
             )
     SQL
     ProcurementAttachment.where.not("file_file_name" => nil).where(query).find_each do |instance|
