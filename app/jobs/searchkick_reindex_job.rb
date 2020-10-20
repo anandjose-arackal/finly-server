@@ -4,8 +4,10 @@ class SearchkickReindexJob
       if reindex
         model.reindex
       else
-        Searchkick::ProcessQueueJob.new.perform(class_name: model, inline: true)
+        Searchkick::ProcessQueueJob.new.perform(class_name: model.name, inline: true)
       end
     end
+
+    true
   end
 end

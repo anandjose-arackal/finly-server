@@ -1,15 +1,24 @@
 module Searchkick::Api
   extend ActiveSupport::Concern
 
+  class Searchkick::Api::EnqueueReindex
+    include Sidekiq::Worker
+
+    def perform(klass, record_id)
+      klass.searchkick_index(name: nil).reindex_queue.push(record_id)
+    end
+
+  end
+
   included do
     scope :search_import, -> {
       # raise 'Current company should be set to identify the required index' unless RequestStoreUtil.current_company.present?
 
-      scope = unscoped #.where(company_id: RequestStoreUtil.current_company.id)
+      scope = include_soft_deleted #.where(company_id: RequestStoreUtil.current_company.id)
       if klass.reflect_on_association(:dlrms)
         scope = scope.includes({dlrms: [:taken_control_by, :action_taken_by, :forwarded_to, :forwarded_by, :rejected_by, :reviewer]})
       end
-      scope.searchkick_import.limit(1000)
+      scope.searchkick_import#.limit(1000)
     }
 
     searchkick callbacks: :queue,
@@ -20,6 +29,10 @@ module Searchkick::Api
         instance_eval &searchkick_api.scope
       end
     }
+
+    after_destroy do
+      Searchkick::Api::EnqueueReindex.perform_in(5, self.id)
+    end
   end
 
   class_methods do
