@@ -53,11 +53,11 @@ Events::Router.draw do
     end
   end
 
-  scope :user_sessions do
-    route :create do
-      # to Masters::Users::TraitPublisher::UserSessionTracker
-    end
-  end
+  # scope :user_sessions do
+  #   route :create do
+  #     # to Masters::Users::TraitPublisher::UserSessionTracker
+  #   end
+  # end
 
   scope :items do
     route '*' do
