@@ -8,7 +8,7 @@
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
 # server 'bgp_azure.finly.io', user: 'centos', roles: %w{sidekiq_app crono_role poller_role hutch}
-server 'bgp.finly.io', user: 'ubuntu', roles: %w{sidekiq_app crono_role poller_role hutch}
+server 'bgp.finly.io', user: 'ubuntu', roles: %w{sidekiq_app poller_role hutch}
 
 set :stage, 'production'
 set :use_sudo, false
