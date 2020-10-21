@@ -31,13 +31,16 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
 
           # For each level find the reviewer selection data
           mapping_params = get_mapping_data(level)
+          puts "*******************"
           puts level
           puts document
           puts mapping_params
+          puts "*******************"
           reviewer_id = mapping_params[:reviewer_id] if mapping_params.present?
-
+          
+          puts "*******************"
           puts reviewer_id
-
+          puts "*******************"
           # If no reviewer is selected skip to next level
           # next if mapping_params.blank? || mapping_params[:reviewer_id].blank?
 
@@ -45,7 +48,9 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
           # level_reviewers = level.lurms.with_user_id(user.id).with_reviewer.with_threshold(document_amount).with_exception(violations_present)
           # Picking LURMs with reviewers because if reviewer is blank its gonna be skipped anyways and default level will be set
           level_reviewers_data = level.level_user_reviewer_mappings.with_user_id(user.id).with_reviewer.as_json
+          puts "*******************"
           puts level_reviewers_data
+          puts "*******************"
           # Get possible reviewers for the level | fall back to company level
           unless level_reviewers_data.present?
             # level_reviewers = level.level_reviewer_mappings.with_threshold(document_amount).with_exception(violations_present)
@@ -63,14 +68,16 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
           # Get max for all reviewers
           max_thresholds = level_reviewers_data.map{|item| item['max']}
           # min_thresholds = level_reviewers_data.map{|item| item['min']}
+          puts "*******************"
           puts max_thresholds
           puts document_amount
+          puts "*******************"
 
           # If level doesn't have reviewers
           if max_thresholds.compact.present?
             if !max_thresholds.include?(nil) && document_amount > max_thresholds.compact.max.to_f
               document_class_name = document.class.human_name rescue document.model_name.human.titleize
-              puts  "#{document_class_name}'s amount is greater than maximum limit set in Level - #{level.level_number} (#{level.name})"
+              add_message :error, "#{document_class_name}'s amount is greater than maximum limit set in Level - #{level.level_number} (#{level.name})"
             end
           end
 
