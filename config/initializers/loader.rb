@@ -18,7 +18,7 @@ Loader.watch! "Routes Loader" do
 end
 
 Loader.watch! "Bullet Train" do
-  config = Rails.application.config_for(:feature_flipper)
+  config = Rails.application.config_for(:feature_flipper)&.with_indifferent_access
   if config.dig('api_key').present? and config.dig('url').present?
     Rails.configuration.bullet_train = BulletTrain.new(api_key: config['api_key'], url: config['url'])
   end

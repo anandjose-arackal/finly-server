@@ -145,6 +145,10 @@ class BbpsBillerSubscription < ApplicationRecord
       where status_id: status_id
     end
   }
+  
+  scope :with_status_ids, -> (status_id) {
+    with_status_id(status_id)
+  }
 
   scope :filter_creation_date, -> (from, to) {
     from = Date.parse(from) rescue Date.parse('01-01-1990') unless from.is_a?(Date)
@@ -199,6 +203,7 @@ class BbpsBillerSubscription < ApplicationRecord
   }
 
   ransack_scopes :with_status_id
+  ransack_scopes :with_status_ids
 
   def cleanup
     unless self.changes.keys.include?("auto_fetch_enabled")

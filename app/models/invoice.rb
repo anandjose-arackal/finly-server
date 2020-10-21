@@ -311,6 +311,10 @@ class Invoice < ApplicationRecord
     end
   }
 
+  scope :with_status_ids, -> (status_id) {
+    with_status_id(status_id)
+  }
+
   scope :filter_payable_invoices, -> (enabled) {
     if StringUtils.to_bool(enabled)
       ids = self.joins(:balance_due).non_beneficiary.where(invoice_status_id: InwardInvoiceStatus.ids_for([:unpaid, :partially_paid, :approved, :auto_approved, :initiated]), payable: true).where.not(amounts: {value: 0}).pluck(:id)
@@ -637,6 +641,7 @@ class Invoice < ApplicationRecord
   end
 
   ransack_scopes :with_status_id
+  ransack_scopes :with_status_ids
 
   def policy
     return super if self.policy_id.present?
