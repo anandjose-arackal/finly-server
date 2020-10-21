@@ -31,19 +31,8 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
 
           # For each level find the reviewer selection data
           mapping_params = get_mapping_data(level)
-          Rails.logger.fatal "**************************************************************************************************"
-
-          Rails.logger.fatal "level -- #{level}"
-          Rails.logger.fatal "document -- #{document}"
-          Rails.logger.fatal "mapping_params -- #{mapping_params}"
-          
 
           reviewer_id = mapping_params[:reviewer_id] if mapping_params.present?
-          
-          Rails.logger.fatal "**************************************************************************************************"
-
-          Rails.logger.fatal "reviewer_id -- #{reviewer_id}"
-          
 
           # If no reviewer is selected skip to next level
           # next if mapping_params.blank? || mapping_params[:reviewer_id].blank?
@@ -52,10 +41,6 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
           # level_reviewers = level.lurms.with_user_id(user.id).with_reviewer.with_threshold(document_amount).with_exception(violations_present)
           # Picking LURMs with reviewers because if reviewer is blank its gonna be skipped anyways and default level will be set
           level_reviewers_data = level.level_user_reviewer_mappings.with_user_id(user.id).with_reviewer.as_json
-          
-
-          Rails.logger.fatal "level_reviewers_data -- #{level_reviewers_data}"
-          
 
           # Get possible reviewers for the level | fall back to company level
           unless level_reviewers_data.present?
@@ -74,13 +59,6 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
           # Get max for all reviewers
           max_thresholds = level_reviewers_data.map{|item| item['max']}
           # min_thresholds = level_reviewers_data.map{|item| item['min']}
-          
-
-          Rails.logger.fatal "max_thresholds -- #{max_thresholds}"
-          Rails.logger.fatal "document_amount -- #{document_amount}"
-          Rails.logger.fatal "max_thresholds.compact.max.to_f -- #{max_thresholds.compact.max.to_f}"
-          Rails.logger.fatal "condition -- #{!max_thresholds.include?(nil) && document_amount > max_thresholds.compact.max.to_f}"
-          Rails.logger.fatal "**************************************************************************************************"
 
 
           # If level doesn't have reviewers
