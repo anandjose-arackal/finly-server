@@ -1,0 +1,13 @@
+default:
+  image: ruby:2.6
+  before_script:
+    - apt-get update
+    - apt-get install -y sqlite3 libsqlite3-dev nodejs
+    - ruby -v
+    - which ruby
+    - gem install bundler --no-document
+    - bundle install --jobs $(nproc) "${FLAGS[@]}"
+
+rubocop:
+  script:
+    - bundle exec rubocop --require rubocop-rails
