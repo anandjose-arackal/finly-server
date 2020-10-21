@@ -23,8 +23,8 @@ class BudgetManager::BudgetLimitValidator::ValidateInvoice < BaseOperation
       budget_exceeded = false
       self.budgets.each do |budget|
         budget_criteria = budget.budget_group_criterium
-        budget_amount = budget.budget_consumption&.budget_amount&.value
-        budget_spent_amount = budget.budget_consumption&.total_consumed_amount&.value
+        budget_amount = budget.budget_consumption&.budget_amount&.value.to_f
+        budget_spent_amount = budget.budget_consumption&.total_consumed_amount&.value.to_f
 
         spent_amount = budget_spent_amount
 
@@ -38,10 +38,16 @@ class BudgetManager::BudgetLimitValidator::ValidateInvoice < BaseOperation
           end
         end
 
+        Rails.logger.fatal "**************************************************************************************************"
+        Rails.logger.fatal "spent_amount --- #{spent_amount}"
+        Rails.logger.fatal "budget_amount --- #{budget_amount}"
+        Rails.logger.fatal "spent_amount > budget_amount or budget_amount == 0 --- #{spent_amount > budget_amount or budget_amount == 0}"
+         
         if spent_amount > budget_amount or budget_amount == 0
           budget_exceeded = false
           add_message :error,  "Invoice Amount exceeding Budget - #{budget_criteria.name}"
         end
+        Rails.logger.fatal "**************************************************************************************************"
       end
 
       # adding overall message to the user
