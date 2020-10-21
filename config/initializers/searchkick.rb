@@ -4,5 +4,5 @@ Searchkick.redis = ConnectionPool.new { Redis.new(redis_config.slice('url', 'pas
 searchkick_config = Rails.application.config_for(:searchkick)
 if searchkick_config.present?
   ENV['ELASTICSEARCH_URL'] = searchkick_config[:elasticsearch_url]
-  Searchkick.index_prefix = searchkick_config[:prefix]
+  Searchkick.index_prefix = searchkick_config[:prefix] if searchkick_config[:prefix].present?
 end
