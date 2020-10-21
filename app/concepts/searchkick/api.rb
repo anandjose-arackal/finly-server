@@ -18,7 +18,7 @@ module Searchkick::Api
       if klass.reflect_on_association(:dlrms)
         scope = scope.includes({dlrms: [:taken_control_by, :action_taken_by, :forwarded_to, :forwarded_by, :rejected_by, :reviewer]})
       end
-      scope.searchkick_import#.limit(1000)
+      scope.searchkick_import#.limit(10)
     }
 
     searchkick callbacks: :queue,

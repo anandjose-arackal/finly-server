@@ -29,7 +29,7 @@ class BulletTrain
   def request(method, path, *args)
     start_time = Time.now
     res = @bt_api.send(method, path, *args)
-    time = Time.now - start_time
+    time = (Time.now - start_time).to_f
     response_body = res.status != 200 ? res.body : nil
     # Todo log only if the response is slower than 2s
     self.class.logger.info({duration: time, status: res.status, method: method, response_body: response_body, path: path, request_args: args})
