@@ -7,12 +7,16 @@ require 'faraday_middleware'
 class BulletTrain
   attr_reader :bt_api
 
-  TIMEOUT = 15
+  TIMEOUT = 30
+
+  def self.logger
+    @logger ||= LogStashLogger.new(type: :file, path: 'log/bullet_train_api.log', sync: true)
+  end
 
   def initialize(opts = {})
     @opts = determine_opts(opts)
 
-    @bt_api = Faraday.new(url: @opts[:url], request: { timeout: TIMEOUT }) do |faraday|
+    @bt_api = Faraday.new(url: @opts[:url], request: {timeout: TIMEOUT}) do |faraday|
       faraday.headers['Accept'] = 'application/json'
       faraday.headers['Content-Type'] = 'application/json'
       faraday.headers['x-environment-key'] = @opts[:api_key]
@@ -22,13 +26,23 @@ class BulletTrain
     end
   end
 
+  def request(method, path, *args)
+    start_time = Time.now
+    res = @bt_api.send(method, path, *args)
+    time = Time.now - start_time
+    response_body = res.status != 200 ? res.body : nil
+    # Todo log only if the response is slower than 2s
+    self.class.logger.info({duration: time, status: res.status, method: method, response_body: response_body, path: path, request_args: args})
+    res
+  end
+
   def get_flags(user_id = nil)
     if user_id.nil?
-      res = @bt_api.get('flags/')
+      res = request(:get, 'flags/')
       flags = transform_flags(res.body).select { |flag| flag[:segment].nil? }
       flags_to_hash(flags)
     else
-      res = @bt_api.get("identities/?identifier=#{user_id}")
+      res = request(:get, "identities/?identifier=#{user_id}")
       flags_to_hash(transform_flags(res.body['flags']))
     end
   end
@@ -55,14 +69,14 @@ class BulletTrain
         trait_key: normalize_key(trait),
         trait_value: value
     }
-    res = @bt_api.post('traits/', trait.to_json)
+    res = request(:post, 'traits/', trait.to_json)
     res.body
   end
 
   def get_traits(user_id)
     return {} if user_id.nil?
 
-    res = @bt_api.get("identities/?identifier=#{user_id}")
+    res = request(:get, "identities/?identifier=#{user_id}")
     traits_to_hash(res.body)
   end
 
@@ -74,7 +88,7 @@ class BulletTrain
         trait_key: normalize_key(trait),
         increment_by: incr_by
     }
-    res = @bt_api.post('traits/increment-value/', trait.to_json)
+    res = request(:post, 'traits/increment-value/', trait.to_json)
     res.body
   end
 
