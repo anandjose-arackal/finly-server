@@ -6,8 +6,9 @@ default:
     - ruby -v
     - which ruby
     - gem install bundler --no-document
-    - bundle install --jobs $(nproc) "${FLAGS[@]}"
+    - gem install rubocop-rails
+    # - bundle install --jobs $(nproc) "${FLAGS[@]}"
 
 rubocop:
   script:
-    - bundle exec rubocop --require rubocop-rails
+    - rubocop --require rubocop-rails

@@ -36,7 +36,7 @@ data.ms/
 config/searchkick.yml
 config/cubejs.yml
 
-.rubocop.yml
+# .rubocop.yml
 .vscode/
 reference_resource_migration.log
 config/web_client.yml
