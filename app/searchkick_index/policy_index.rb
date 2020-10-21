@@ -1,7 +1,7 @@
 class PolicyIndex < Searchkick::Api::DSL
 
   record_type 'policies'
-  field :name, value: -> (record) { record.name }
+  field :policy_name, value: -> (record) { record.name }
 
   # def searchkick_data
   #   {

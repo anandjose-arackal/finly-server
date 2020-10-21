@@ -1,7 +1,7 @@
 class PaymentIndex < Searchkick::Api::DSL
 
   scope do
-    includes({payment_order: {bank_payment_request: [:policy, :created_by]}}, :status, :reference_resource, :receiving_user_vendor)
+    where.not(payment_order_id: nil).includes({payment_order: {bank_payment_request: [:policy, :created_by]}}, :status, :reference_resource, :receiving_user_vendor)
   end
 
   record_type 'payments'
@@ -22,7 +22,7 @@ class PaymentIndex < Searchkick::Api::DSL
   field :created_by_email, value: -> (record) { record.payment_order&.bank_payment_request&.created_by&.email }
 
   def self.should_index?(record)
-    record.deleted_at.nil? and record.company_id.present?
+    record.deleted_at.nil? and record.company_id.present? and record.payment_order.present? and record.payment_order.bank_payment_request.present?
   end
 
   # included do
