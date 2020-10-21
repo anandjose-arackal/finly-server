@@ -20,7 +20,8 @@
 class Policy < ApplicationRecord
   include SoftDeletable
   include EventProducer
-  include SearchIndex::Concerns::Document
+  # include SearchIndex::Concerns::Document
+include Searchkick::Api
 
   belongs_to :company, optional: true
   belongs_to :base_currency, optional: true, class_name: 'Currency'

@@ -35,7 +35,6 @@ config/searchkick.yml
 data.ms/
 config/searchkick.yml
 
-
 .rubocop.yml
 .vscode/
 reference_resource_migration.log

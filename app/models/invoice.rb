@@ -121,7 +121,8 @@ class Invoice < ApplicationRecord
   include Exposures::Model::Exposable
   include Sequenced::ActsAsSequenced
   include ErpSyncable
-  include SearchIndex::Concerns::Document
+  # include SearchIndex::Concerns::Document
+include Searchkick::Api
 
   # include EventProducer
 

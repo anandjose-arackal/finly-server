@@ -60,7 +60,7 @@ module Masters
           end
           Masters::Users::TraitPublisher.logger.info(
               {handler: self.name, action: 'Refresh Completed', changed_since: changed_since, started_at: start_time,
-               ended_at: Time.now, total_time: (Time.now - start_time).to_i,
+               ended_at: Time.now, total_time: (Time.now - start_time).to_f,
                records_updated: companies.count, total_records: companies.count}
           )
         end
@@ -112,7 +112,7 @@ module Masters
             Masters::Users::TraitPublisher.logger.info(
                 {
                     handler: self.class.name, action: 'Batch Updated', started_at: batch_start,
-                    ended_at: Time.now, total_time: (Time.now - batch_start).to_i, records_updated: batch.size,
+                    ended_at: Time.now, total_time: (Time.now - batch_start).to_f, records_updated: batch.size,
                     total_records: total_users, company_name: company.name, company_id: company.id,
                 }
             )
@@ -123,7 +123,7 @@ module Masters
           Masters::Users::TraitPublisher.logger.info(
               {
                   handler: self.class.name, action: 'Job Completed', started_at: start_time,
-                  ended_at: Time.now, total_time: (Time.now - start_time).to_i, records_updated: total_users,
+                  ended_at: Time.now, total_time: (Time.now - start_time).to_f, records_updated: total_users,
                   total_records: total_users, company_name: company.name, company_id: company.id,
               }
           )
@@ -155,7 +155,7 @@ module Masters
             Masters::Users::TraitPublisher.logger.info(
                 {
                     handler: self.name, action: 'Batch Updated', started_at: batch_start_time,
-                    ended_at: Time.now, total_time: (Time.now - batch_start_time).to_i, records_updated: completed_users,
+                    ended_at: Time.now, total_time: (Time.now - batch_start_time).to_f, records_updated: completed_users,
                     total_records: total_users, batch_size: batch.size
                 }
             )
@@ -165,7 +165,7 @@ module Masters
           Masters::Users::TraitPublisher.logger.info(
               {
                   handler: self.name, action: 'Refresh Completed', started_at: start_time,
-                  ended_at: Time.now, total_time: (Time.now - start_time).to_i, records_updated: completed_users,
+                  ended_at: Time.now, total_time: (Time.now - start_time).to_f, records_updated: completed_users,
                   total_records: total_users
               }
           )
@@ -238,7 +238,7 @@ module Masters
             Masters::Users::TraitPublisher.logger.info(
                 {
                     handler: "#{self.name}#UserRoleMappings", action: 'Batch Updated', started_at: batch_start_time,
-                    ended_at: Time.now, total_time: (Time.now - batch_start_time).to_i, records_updated: completed_records,
+                    ended_at: Time.now, total_time: (Time.now - batch_start_time).to_f, records_updated: completed_records,
                     total_records: total_records, batch_size: batch.size
                 }
             )
@@ -248,7 +248,7 @@ module Masters
           Masters::Users::TraitPublisher.logger.info(
               {
                   handler: "#{self.name}#UserRoleMappings", action: 'Refresh Completed', started_at: start_time,
-                  ended_at: Time.now, total_time: (Time.now - start_time).to_i, records_updated: completed_records,
+                  ended_at: Time.now, total_time: (Time.now - start_time).to_f, records_updated: completed_records,
                   total_records: total_records
               }
           )
@@ -271,7 +271,7 @@ module Masters
             Masters::Users::TraitPublisher.logger.info(
                 {
                     handler: "#{self.name}#PolicyUserRoleMappings", action: 'Batch Updated', started_at: batch_start_time,
-                    ended_at: Time.now, total_time: (Time.now - batch_start_time).to_i, records_updated: completed_records,
+                    ended_at: Time.now, total_time: (Time.now - batch_start_time).to_f, records_updated: completed_records,
                     total_records: total_records, batch_size: batch.size
                 }
             )
@@ -281,7 +281,7 @@ module Masters
           Masters::Users::TraitPublisher.logger.info(
               {
                   handler: "#{self.name}#PolicyUserRoleMappings", action: 'Refresh Completed', started_at: start_time,
-                  ended_at: Time.now, total_time: (Time.now - start_time).to_i, records_updated: completed_records,
+                  ended_at: Time.now, total_time: (Time.now - start_time).to_f, records_updated: completed_records,
                   total_records: total_records
               }
           )

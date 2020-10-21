@@ -66,7 +66,8 @@ class Payment < ApplicationRecord
   include LiquidDroppable
   include Exposures::Model::Exposable
   include ErpSyncable
-  include SearchIndex::Concerns::Document
+  # include SearchIndex::Concerns::Document
+include Searchkick::Api
 
   class Payment::AccountType
     VIRTUAL_ACCOUNT = 'Company'
@@ -99,6 +100,7 @@ class Payment < ApplicationRecord
   belongs_to :reference_payment, class_name: "Payment", optional: true
 
   has_one :payment, as: :reference_resource
+  has_many :payments, -> { reorder created_at: :desc }, as: :reference_resource
 
   # because there needs to be a reference against which an invoice payment was made
   belongs_to :invoice, optional: true
@@ -675,6 +677,10 @@ class Payment < ApplicationRecord
   def invoice_amount
     return self.amount.value unless self.invoice.present?
     self.invoice.amount&.value # in this case return the actual invoice amount
+  end
+
+  def company_id
+    super || payment_order&.bank_payment_request&.company_id
   end
 
   # def company_id
