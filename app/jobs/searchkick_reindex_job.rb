@@ -6,26 +6,25 @@ class SearchkickReindexJob
     @logger ||= LogStashLogger.new(type: :file, path: 'log/searchkick.log', sync: true)
   end
 
-  # Reindex queued items
-  def self.perform
-    Searchkick.models.each do |model|
-      Searchkick::ProcessQueueJob.new.perform(class_name: model.name, inline: true)
-    end
+  # Reindex all models
+  def self.run(async: true)
+    run_async and return true if async
+
+    run_sync
 
     true
   end
 
-  # Reindex all models
-  def self.reindex(async: true)
+  def self.run_async
     Searchkick.models.each do |model|
-      if async
-        perform_async(model.name)
-      else
-        new.perform(model.name)
-      end
+      perform_async(model.name)
     end
+  end
 
-    true
+  def self.run_sync
+    Searchkick.models.each do |model|
+      new.perform(model.name)
+    end
   end
 
   def perform(model_name)

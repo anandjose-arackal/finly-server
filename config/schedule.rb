@@ -95,5 +95,5 @@ every 1.day, at: "12:10 am", roles: [:whenever_cron] do
 end
 
 every 1.minute, roles: [:whenever_cron] do
-  runner 'SearchkickReindexJob.delay.perform'
+  runner 'SearchkickProcessQueueJob.delay.perform'
 end
