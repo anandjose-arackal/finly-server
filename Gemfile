@@ -156,6 +156,7 @@ gem 'bootstrap-will_paginate', '~> 1.0'
 # gem for image manipulation
 gem 'paperclip', '~> 6.1.0'
 gem 'paperclip-azure', '~> 1.0'
+gem 'active_storage_validations', '~> 0.9.0'
 # Bundle for Bootstrap
 gem 'bootstrap-sass', '~> 3.4.0'
 
@@ -226,6 +227,7 @@ gem 'aasm', '~> 5.0.1'
 gem 'activerecord-import', '~> 1.0', '>= 1.0.3'
 gem 'parallel', '~> 1.18'
 gem 'string_pattern', '~> 2.2', '>= 2.2.1'
+gem 'image_processing', '~> 1.2'
 # gem 'bullet-train-client', '~> 1.1'
 # gem 'slackistrano'
 

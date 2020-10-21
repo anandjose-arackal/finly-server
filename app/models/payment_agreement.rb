@@ -305,8 +305,12 @@ include Searchkick::Api
       where(status_id: status_id)
     end
   }
+  scope :with_status_ids, -> (status_id) {
+    with_status_id(status_id)
+  }
 
   ransack_scopes :with_status_id
+  ransack_scopes :with_status_ids
 
   def as_json(options={})
     {
