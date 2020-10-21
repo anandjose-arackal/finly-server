@@ -51,6 +51,8 @@ class CostCenter < ApplicationRecord
     where application: "vp"
   }
 
+  scope :with_company_id, -> (company_id) { where company_id: company_id }
+
   def as_json(options={})
     {
         id: id,

@@ -160,6 +160,7 @@ class PurchaseOrder < ApplicationRecord
   validates :purchase_order_status_id, presence: true
   # validates :policy_id, presence: true
   # validates :items, presence: true
+  scope :with_company_id, -> (company_id) { where company_id: company_id }
   scope :document_number_generated_in_finly, -> { where override_po_number: [false, nil] }
   scope :not_open, -> { where.not purchase_order_status_id: PurchaseOrderStatus.id_for(:open) }
   scope :with_id, -> (id) { where id: id }

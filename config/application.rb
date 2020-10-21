@@ -17,6 +17,7 @@ module Finly
     config.active_record.default_timezone = :local
     config.middleware.use Rack::Attack
 
+
     # config.autoload_paths += %W(#{config.root}/lib)
 
     config.eager_load_paths << Rails.root.join('lib')

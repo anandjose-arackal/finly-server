@@ -89,6 +89,7 @@ class BankPaymentRequest < ApplicationRecord
       utility_bill: 'utility_bill'
   }
 
+  scope :with_company_id, -> (company_id) { where company_id: company_id }
   scope :non_owner, -> (user_id) { where.not owner_id: user_id }
   scope :with_controlling_user, -> (user_id) { where controlling_user_id: user_id }
   scope :with_controlling_user_role, -> (role_id) { where controlling_user_role_id: role_id }
@@ -416,6 +417,10 @@ class BankPaymentRequest < ApplicationRecord
     end
   }
 
+  scope :with_status_ids, -> (status_id) {
+    with_status_id(status_id)
+  }
+
   attr_accessor :cache_users
 
   before_save do
@@ -427,6 +432,7 @@ class BankPaymentRequest < ApplicationRecord
   before_save :add_company
 
   ransack_scopes :with_status_id
+  ransack_scopes :with_status_ids
 
   def can_submit?
     open? || retracted? || rejected?

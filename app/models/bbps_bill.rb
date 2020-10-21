@@ -102,6 +102,8 @@ class BbpsBill < ApplicationRecord
 
   default_scope {order('bbps_bills.created_at DESC')}
 
+  scope :with_company_id, -> (company_id) { where company_id: company_id }
+
   scope :with_ids, -> (ids) {
     where(id: ids)
   }
@@ -278,8 +280,13 @@ class BbpsBill < ApplicationRecord
       where status_id: status_id
     end
   end
+  
+  scope :with_status_id, -> (status_id){
+    with_status_id(status_id)
+  }
 
   ransack_scopes :with_status_id
+  ransack_scopes :with_status_ids
 
   def as_json(options = {})
     if options[:index]

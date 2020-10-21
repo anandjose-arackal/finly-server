@@ -107,6 +107,8 @@ class BbpsBillerSubscription < ApplicationRecord
     where(id: ids)
   }
 
+  scope :with_company_id, -> (company_id) { where company_id: company_id }
+
   scope :filter_status, -> (status, user = nil) {
     case status
     when 'approved', :approved
@@ -142,6 +144,10 @@ class BbpsBillerSubscription < ApplicationRecord
     else
       where status_id: status_id
     end
+  }
+  
+  scope :with_status_ids, -> (status_id) {
+    with_status_id(status_id)
   }
 
   scope :filter_creation_date, -> (from, to) {
@@ -197,6 +203,7 @@ class BbpsBillerSubscription < ApplicationRecord
   }
 
   ransack_scopes :with_status_id
+  ransack_scopes :with_status_ids
 
   def cleanup
     unless self.changes.keys.include?("auto_fetch_enabled")
