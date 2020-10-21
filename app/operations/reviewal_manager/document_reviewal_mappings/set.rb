@@ -31,16 +31,20 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
 
           # For each level find the reviewer selection data
           mapping_params = get_mapping_data(level)
-          puts "*******************"
-          puts level
-          puts document
-          puts mapping_params
-          puts "*******************"
+          Rails.logger.fatal "**************************************************************************************************"
+
+          Rails.logger.fatal level
+          Rails.logger.fatal document
+          Rails.logger.fatal mapping_params
+          Rails.logger.fatal "**************************************************************************************************"
+
           reviewer_id = mapping_params[:reviewer_id] if mapping_params.present?
           
-          puts "*******************"
-          puts reviewer_id
-          puts "*******************"
+          Rails.logger.fatal "**************************************************************************************************"
+
+          Rails.logger.fatal reviewer_id
+          Rails.logger.fatal "**************************************************************************************************"
+
           # If no reviewer is selected skip to next level
           # next if mapping_params.blank? || mapping_params[:reviewer_id].blank?
 
@@ -48,9 +52,11 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
           # level_reviewers = level.lurms.with_user_id(user.id).with_reviewer.with_threshold(document_amount).with_exception(violations_present)
           # Picking LURMs with reviewers because if reviewer is blank its gonna be skipped anyways and default level will be set
           level_reviewers_data = level.level_user_reviewer_mappings.with_user_id(user.id).with_reviewer.as_json
-          puts "*******************"
-          puts level_reviewers_data
-          puts "*******************"
+          Rails.logger.fatal "**************************************************************************************************"
+
+          Rails.logger.fatal level_reviewers_data
+          Rails.logger.fatal "**************************************************************************************************"
+
           # Get possible reviewers for the level | fall back to company level
           unless level_reviewers_data.present?
             # level_reviewers = level.level_reviewer_mappings.with_threshold(document_amount).with_exception(violations_present)
@@ -68,10 +74,12 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
           # Get max for all reviewers
           max_thresholds = level_reviewers_data.map{|item| item['max']}
           # min_thresholds = level_reviewers_data.map{|item| item['min']}
-          puts "*******************"
-          puts max_thresholds
-          puts document_amount
-          puts "*******************"
+          Rails.logger.fatal "**************************************************************************************************"
+
+          Rails.logger.fatal max_thresholds
+          Rails.logger.fatal document_amount
+          Rails.logger.fatal "**************************************************************************************************"
+
 
           # If level doesn't have reviewers
           if max_thresholds.compact.present?
