@@ -36,7 +36,7 @@ class Menu::API < Transactions::API
     items << Menu::Item.new(
         key: key, path: path, icon: icon, label: label,
         options: options,
-        permissions: permissions, features: features, scopes: scopes, action_registry: self,
+        permissions: permissions, features: features, scopes: scopes, toggle: toggle, action_registry: self,
         &block
     )
   end

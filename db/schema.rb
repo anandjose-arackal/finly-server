@@ -2,15 +2,15 @@
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
 #
-# Note that this schema.rb definition is the authoritative source for your
-# database schema. If you need to create the application database on another
-# system, you should be using db:schema:load, not running all the migrations
-# from scratch. The latter is a flawed and unsustainable approach (the more migrations
-# you'll amass, the slower it'll run and the greater likelihood for issues).
+# This file is the source Rails uses to define your schema when running `rails
+# db:schema:load`. When creating a new database, `rails db:schema:load` tends to
+# be faster and is potentially less error prone than running all of your
+# migrations from scratch. Old migrations may fail to apply correctly if those
+# migrations use external dependencies or application code.
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_25_094010) do
+ActiveRecord::Schema.define(version: 2020_10_13_070017) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -49,6 +49,27 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
     t.index ["resource_type", "resource_id"], name: "index_active_admin_comments_on_resource_type_and_resource_id"
   end
 
+  create_table "active_storage_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "record_type", null: false
+    t.bigint "record_id", null: false
+    t.bigint "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "key", null: false
+    t.string "filename", null: false
+    t.string "content_type"
+    t.text "metadata"
+    t.bigint "byte_size", null: false
+    t.string "checksum", null: false
+    t.datetime "created_at", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
   create_table "addresses", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.text "line_1"
     t.text "line_2"
@@ -72,7 +93,7 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
     t.integer "company_id", null: false
     t.integer "admin_user_id", null: false
     t.string "request_key", null: false
-    t.text "request_params", limit: 4294967295
+    t.text "request_params", size: :long
     t.string "master"
     t.string "name"
     t.integer "status", null: false
@@ -850,13 +871,13 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
     t.date "biller_effctv_to"
     t.date "biller_temp_deactivation_start"
     t.date "biller_temp_deactivation_end"
-    t.text "biller_payment_modes", limit: 4294967295
-    t.text "biller_payment_channels", limit: 4294967295
-    t.text "biller_customer_params", limit: 4294967295
-    t.text "biller_response_params", limit: 4294967295
-    t.text "biller_additional_info", limit: 4294967295
-    t.text "interchange_fee_conf", limit: 4294967295
-    t.text "interchange_fee", limit: 4294967295
+    t.text "biller_payment_modes", size: :long
+    t.text "biller_payment_channels", size: :long
+    t.text "biller_customer_params", size: :long
+    t.text "biller_response_params", size: :long
+    t.text "biller_additional_info", size: :long
+    t.text "interchange_fee_conf", size: :long
+    t.text "interchange_fee", size: :long
     t.string "status"
     t.text "biller_description"
     t.string "support_deemed"
@@ -923,7 +944,7 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
     t.string "bill_month"
     t.string "pc"
     t.date "early_payment_date"
-    t.text "api_response", limit: 16777215
+    t.text "api_response", size: :medium
     t.datetime "generated_at"
     t.text "biller_response"
     t.index ["amount_id"], name: "index_bbps_bills_on_amount_id"
@@ -1706,7 +1727,7 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
   create_table "callback_tracks", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id"
     t.text "request"
-    t.text "response", limit: 16777215
+    t.text "response", size: :medium
     t.integer "entity_id"
     t.string "entity_type"
     t.datetime "created_at", null: false
@@ -2585,7 +2606,7 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
 
   create_table "crono_jobs", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "job_id", null: false
-    t.text "log", limit: 16777215
+    t.text "log", size: :medium
     t.datetime "last_performed_at"
     t.boolean "healthy"
     t.datetime "created_at", null: false
@@ -3269,7 +3290,7 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
     t.string "link"
     t.datetime "received_at"
     t.string "event_id"
-    t.text "payload", limit: 4294967295
+    t.text "payload", size: :long
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
@@ -3291,7 +3312,7 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
     t.string "bcc"
     t.string "cc"
     t.string "subject"
-    t.text "body", limit: 4294967295
+    t.text "body", size: :long
     t.string "mailer_klass"
     t.string "mailer_action"
     t.string "configuration_set"
@@ -3599,7 +3620,7 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
     t.datetime "updated_at", null: false
     t.integer "status_id", null: false
     t.bigint "company_id", null: false
-    t.text "request_params", limit: 4294967295
+    t.text "request_params", size: :long
     t.datetime "deleted_at"
     t.string "master"
     t.string "description"
@@ -3662,7 +3683,7 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
     t.string "name", null: false
     t.text "description"
     t.string "template_type", null: false
-    t.text "configuration", limit: 4294967295
+    t.text "configuration", size: :long
     t.string "model_class", null: false
     t.boolean "active", default: true
     t.boolean "personal"
@@ -4045,8 +4066,8 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
     t.boolean "is_updated"
     t.boolean "can_be_updated"
     t.text "rule"
-    t.string "referencable_id", null: false
-    t.string "referencable_type", null: false
+    t.string "referencable_id"
+    t.string "referencable_type"
     t.index ["company_id"], name: "index_form_conditions_on_company_id"
     t.index ["created_at"], name: "index_form_conditions_on_created_at"
     t.index ["created_by_id"], name: "index_form_conditions_on_created_by_id"
@@ -4121,7 +4142,7 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
     t.boolean "compute"
     t.boolean "compute_enabled"
     t.integer "compute_type_id"
-    t.string "compute_formula"
+    t.text "compute_formula"
     t.string "compute_lookup_entity_id"
     t.text "filters"
     t.string "config_path"
@@ -4187,7 +4208,7 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
     t.boolean "is_updated"
     t.boolean "can_be_updated"
     t.text "rule"
-    t.string "form_entity_id", null: false
+    t.string "form_entity_id"
     t.index ["company_id"], name: "index_form_entity_validations_on_company_id"
     t.index ["created_at"], name: "index_form_entity_validations_on_created_at"
     t.index ["created_by_id"], name: "index_form_entity_validations_on_created_by_id"
@@ -4276,7 +4297,7 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
   create_table "gatekeeper_blocks", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "user_id"
     t.integer "company_id"
-    t.text "params", limit: 16777215, collation: "utf8_bin"
+    t.text "params", size: :medium, collation: "utf8_bin"
     t.text "headers"
     t.string "act"
     t.string "premise"
@@ -4434,6 +4455,8 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
     t.text "address"
     t.string "gl_code"
     t.datetime "deleted_at"
+    t.string "gst_status"
+    t.date "gst_expiry_date"
     t.index ["gstin_id"], name: "index_gstin_locations_on_gstin_id"
     t.index ["state_id"], name: "index_gstin_locations_on_state_id"
     t.index ["vendor_id"], name: "index_gstin_locations_on_vendor_id"
@@ -4447,7 +4470,7 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
     t.string "constitution_of_business"
     t.string "taxpayer_type"
     t.string "status"
-    t.text "api_response", limit: 16777215
+    t.text "api_response", size: :medium
     t.string "api_provider"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -4501,7 +4524,7 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
     t.string "request_id"
     t.integer "transfer_mode_id"
     t.datetime "deleted_at"
-    t.text "bank_error_message", limit: 16777215
+    t.text "bank_error_message", size: :medium
     t.index ["transfer_mode_id"], name: "index_icici_bank_transactions_on_transfer_mode_id"
   end
 
@@ -4555,7 +4578,7 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
     t.string "type"
     t.integer "created_by_id"
     t.bigint "company_id", null: false
-    t.text "request_params", limit: 4294967295
+    t.text "request_params", size: :long
     t.datetime "completed_at"
     t.integer "total_records"
     t.integer "created_records"
@@ -4569,9 +4592,9 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
     t.bigint "attachment_file_size"
     t.datetime "attachment_updated_at"
     t.datetime "deleted_at"
-    t.text "options", limit: 4294967295
+    t.text "options", size: :long
     t.string "description"
-    t.text "crash_stacktrace", limit: 4294967295
+    t.text "crash_stacktrace", size: :long
     t.integer "status_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -4865,6 +4888,20 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
     t.decimal "net_amount", precision: 20, scale: 10
     t.decimal "taxable_amount", precision: 20, scale: 10
     t.string "currency_code"
+    t.decimal "item_tds_amount", precision: 20, scale: 5
+    t.decimal "item_net_amount", precision: 20, scale: 5
+    t.decimal "item_tax_amount", precision: 20, scale: 5
+    t.decimal "item_taxable_amount", precision: 20, scale: 5
+    t.decimal "item_discount_amount", precision: 20, scale: 5
+    t.decimal "item_gross_amount", precision: 20, scale: 5
+    t.decimal "item_gross_amount_converted", precision: 20, scale: 5
+    t.decimal "item_discount_amount_converted", precision: 20, scale: 5
+    t.decimal "item_taxable_amount_converted", precision: 20, scale: 5
+    t.decimal "item_tax_amount_converted", precision: 20, scale: 5
+    t.decimal "item_tds_amount_converted", precision: 20, scale: 5
+    t.decimal "item_net_amount_converted", precision: 20, scale: 5
+    t.decimal "item_billable_amount", precision: 20, scale: 5
+    t.decimal "item_billable_amount_converted", precision: 20, scale: 5
     t.index ["amount_id"], name: "index_invoice_line_items_on_amount_id"
     t.index ["category_id"], name: "index_invoice_line_items_on_category_id"
     t.index ["cost_center_id"], name: "index_invoice_line_items_on_cost_center_id"
@@ -5038,6 +5075,41 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
     t.string "erp_sync_reference_id"
     t.integer "erp_sync_attempts_count"
     t.datetime "erp_sync_attempted_at"
+    t.string "vendor_sequence_id"
+    t.string "vendor_gstin"
+    t.string "vendor_bank_account_number"
+    t.string "vendor_bank_account_ifsc"
+    t.decimal "invoice_gross_amount", precision: 20, scale: 5
+    t.decimal "invoice_discount_amount", precision: 20, scale: 5
+    t.decimal "invoice_tax_amount", precision: 20, scale: 5
+    t.decimal "invoice_tds_amount", precision: 20, scale: 5
+    t.decimal "invoice_freight_amount", precision: 20, scale: 5
+    t.decimal "invoice_paid_outside_amount", precision: 20, scale: 5
+    t.decimal "invoice_sub_total_amount", precision: 20, scale: 5
+    t.decimal "invoice_total_amount", precision: 20, scale: 5
+    t.string "base_currency"
+    t.string "reporting_currency"
+    t.date "conversion_date"
+    t.decimal "conversion_rate", precision: 10, scale: 5
+    t.boolean "retrieve_conversion_rate", default: true
+    t.decimal "invoice_taxable_amount", precision: 20, scale: 5
+    t.decimal "invoice_roundoff_amount", precision: 20, scale: 5
+    t.decimal "invoice_balance_due", precision: 20, scale: 5
+    t.decimal "invoice_gross_amount_converted", precision: 20, scale: 5
+    t.decimal "invoice_discount_amount_converted", precision: 20, scale: 5
+    t.decimal "invoice_taxable_amount_converted", precision: 20, scale: 5
+    t.decimal "invoice_tax_amount_converted", precision: 20, scale: 5
+    t.decimal "invoice_tds_amount_converted", precision: 20, scale: 5
+    t.decimal "invoice_freight_amount_converted", precision: 20, scale: 5
+    t.decimal "invoice_sub_total_amount_converted", precision: 20, scale: 5
+    t.decimal "invoice_roundoff_amount_converted", precision: 20, scale: 5
+    t.decimal "invoice_advance_paid_amount", precision: 20, scale: 5
+    t.decimal "invoice_advance_paid_amount_converted", precision: 20, scale: 5
+    t.decimal "invoice_total_amount_converted", precision: 20, scale: 5
+    t.decimal "invoice_net_total_amount", precision: 20, scale: 5
+    t.decimal "invoice_net_total_amount_converted", precision: 20, scale: 5
+    t.decimal "invoice_paid_outside_amount_converted", precision: 20, scale: 5
+    t.decimal "invoice_balance_due_converted", precision: 20, scale: 5
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["advance_amount_id"], name: "index_invoices_on_advance_amount_id"
     t.index ["amount_id"], name: "index_invoices_on_amount_id"
@@ -5326,7 +5398,7 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
     t.text "reversal_response"
     t.integer "reversal_api_counter", default: 0
     t.datetime "deleted_at"
-    t.text "bank_error_message", limit: 16777215
+    t.text "bank_error_message", size: :medium
     t.index ["amount_id"], name: "index_kotak_bank_transactions_on_amount_id"
     t.index ["beneficiary_account_id"], name: "index_kotak_bank_transactions_on_beneficiary_account_id"
     t.index ["company_id"], name: "index_kotak_bank_transactions_on_company_id"
@@ -5399,7 +5471,7 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
     t.decimal "latitude", precision: 30, scale: 15
     t.decimal "longitude", precision: 30, scale: 15
     t.string "name", collation: "utf8_bin"
-    t.text "address", limit: 16777215, collation: "utf8_bin"
+    t.text "address", size: :medium, collation: "utf8_bin"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "order"
@@ -5496,8 +5568,8 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
     t.string "name"
     t.string "place_id"
     t.string "url"
-    t.text "address", limit: 4294967295
-    t.text "result", limit: 4294967295
+    t.text "address", size: :long
+    t.text "result", size: :long
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -5512,7 +5584,7 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
   create_table "map_location_searches", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "uuid", limit: 36, null: false
     t.string "input"
-    t.text "result", limit: 4294967295
+    t.text "result", size: :long
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -6813,7 +6885,7 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
     t.datetime "updated_at", null: false
     t.integer "user_id"
     t.integer "company_id"
-    t.text "note", limit: 16777215, collation: "utf8_bin"
+    t.text "note", size: :medium, collation: "utf8_bin"
     t.boolean "is_deleted", default: false, null: false
     t.string "procurement_type"
     t.string "transaction_id"
@@ -6864,7 +6936,7 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
     t.integer "purchase_order_id"
     t.integer "inventory_line_item_id"
     t.string "product_id"
-    t.text "description", limit: 16777215, collation: "utf8_bin"
+    t.text "description", size: :medium, collation: "utf8_bin"
     t.string "hsn_sac"
     t.decimal "quantity", precision: 20, scale: 5
     t.decimal "rate", precision: 20, scale: 5
@@ -6948,7 +7020,7 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "user_id"
-    t.text "procurement_term_text", limit: 16777215
+    t.text "procurement_term_text", size: :medium
     t.integer "controlling_user_id"
     t.integer "controlling_user_role_id"
     t.integer "controlling_for_user_id"
@@ -6959,8 +7031,8 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
     t.boolean "is_deleted", default: false, null: false
     t.integer "cost_center_id"
     t.integer "sub_department_id"
-    t.text "billing_address", limit: 16777215, collation: "utf8_bin"
-    t.text "shipping_address", limit: 16777215, collation: "utf8_bin"
+    t.text "billing_address", size: :medium, collation: "utf8_bin"
+    t.text "shipping_address", size: :medium, collation: "utf8_bin"
     t.boolean "is_template", default: false
     t.string "template_name"
     t.integer "resource_template_id"
@@ -7133,7 +7205,7 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
     t.string "quickbooks_id"
     t.string "quickbooks_integration_type"
     t.datetime "quickbooks_updated_at"
-    t.text "quickbooks_additional_information", limit: 16777215
+    t.text "quickbooks_additional_information", size: :medium
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "company_id"
@@ -7145,7 +7217,7 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
     t.string "quickbooks_tag_type"
     t.string "quickbooks_integration_type"
     t.string "quickbooks_id"
-    t.text "quickbooks_external_information", limit: 16777215
+    t.text "quickbooks_external_information", size: :medium
     t.datetime "quickbooks_updated_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -8135,9 +8207,9 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
     t.boolean "custom_voucher", default: false
     t.boolean "excel_export", default: false
     t.boolean "invoice_voucher_enabled"
-    t.text "invoice_voucher_configuration", limit: 4294967295
+    t.text "invoice_voucher_configuration", size: :long
     t.boolean "bpr_voucher_enabled"
-    t.text "bpr_voucher_configuration", limit: 4294967295
+    t.text "bpr_voucher_configuration", size: :long
     t.datetime "deleted_at"
     t.index ["company_id"], name: "index_tally_configurations_on_company_id"
   end
@@ -8326,7 +8398,7 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
     t.string "transaction_reference_id"
     t.string "payment_purpose"
     t.string "merchant", collation: "utf8_bin"
-    t.text "note", limit: 16777215, collation: "utf8_bin"
+    t.text "note", size: :medium, collation: "utf8_bin"
     t.string "transaction_type"
     t.string "status"
     t.integer "amount_id"
@@ -9590,7 +9662,7 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
     t.integer "item_id", null: false
     t.string "event", null: false
     t.string "whodunnit"
-    t.text "object", limit: 4294967295
+    t.text "object", size: :long
     t.datetime "created_at", precision: 6
     t.integer "transaction_id"
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
@@ -9725,7 +9797,7 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
     t.text "request_body"
     t.text "request_header"
     t.decimal "response_time", precision: 10
-    t.text "response_body", limit: 16777215
+    t.text "response_body", size: :medium
     t.integer "response_status"
     t.integer "attempt"
     t.datetime "last_attempted_at"
@@ -9814,7 +9886,7 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
     t.string "beneficiary_full_name"
     t.integer "transfer_mode_id"
     t.datetime "deleted_at"
-    t.text "bank_error_message", limit: 16777215
+    t.text "bank_error_message", size: :medium
     t.integer "reference_transaction_id"
     t.integer "reference_payment_id"
     t.index ["amount_id"], name: "index_yes_bank_transactions_on_amount_id"
@@ -9867,6 +9939,12 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
     t.string "erp_sync_reference_id"
     t.integer "erp_sync_attempts_count", default: 0
     t.datetime "erp_sync_attempted_at"
+    t.string "vendor_country"
+    t.integer "ldc_upper_limit_id"
+    t.date "ldc_effective_start_date"
+    t.date "ldc_effective_end_date"
+    t.date "tds_effective_start_date"
+    t.date "tds_effective_end_date"
     t.index ["authorized"], name: "index_yes_bank_vendors_on_authorized"
     t.index ["company_id"], name: "index_yes_bank_vendors_on_company_id"
     t.index ["controlling_level_id"], name: "index_yes_bank_vendors_on_controlling_level_id"
@@ -9884,6 +9962,7 @@ ActiveRecord::Schema.define(version: 2020_09_25_094010) do
   end
 
   add_foreign_key "accounting_system_configurations", "companies"
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "addresses", "states"
   add_foreign_key "admin_review_workflow_levels", "admin_review_workflows"
   add_foreign_key "admin_summary_mail_configs", "periods"

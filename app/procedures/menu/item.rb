@@ -19,10 +19,10 @@ class Menu::Item
     @items ||= []
   end
 
-  def item(key, path: nil, icon: nil, label: nil, permissions: [], features: [], options: {}, &block)
+  def item(key, path: nil, icon: nil, label: nil, permissions: [], features: [], toggle: [], options: {}, &block)
     items << Menu::Item.new(
         key: key, path: path, icon: icon, label: label,
-        action_registry: action_registry,
+        action_registry: action_registry, toggle: toggle,
         permissions: permissions, features: features, scopes: scopes, options: options, &block
     )
   end
