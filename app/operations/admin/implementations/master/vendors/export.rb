@@ -14,6 +14,7 @@ class Admin::Implementations::Master::Vendors::Export < Admin::Implementations::
       :pan => "PAN",
       :description => "Description",
       :address => "Address",
+      :payment_term => "Payment Term Name",
       :gstin => "GSTIN",
       :gst_location => "GST Location",
       :state => "GST State",
@@ -94,6 +95,10 @@ class Admin::Implementations::Master::Vendors::Export < Admin::Implementations::
 
   def vendor_bank_account_name(vendor)
     vendor.bank_accounts&.first&.name rescue ''
+  end
+
+  def payment_term(vendor)
+    vendor.payment_term&.name
   end
 
   def destroy(vendor)

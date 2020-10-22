@@ -13,6 +13,7 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
       :pan => "PAN",
       :description => "Description",
       :address => "Address",
+      :payment_term => "Payment Term Name",
       :gstin => "GSTIN",
       :gst_location => "GST Location",
       :state => "GST State",
@@ -136,6 +137,11 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
         vendor_type_id = vendor_type.id
       end
     end
+    payment_term_id = nil
+    if data[:payment_term].present?
+      payment_term_id = company.payment_terms(name: data[:payment_term]).first&.id
+        messages << "Payment Term not found" if payment_term_id.nil?
+    end
 
     gstin_state_id = nil
     if gstin.present?
@@ -164,7 +170,8 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
                            "created_by_id" => created_by_id,
                            "vendor_id" => vendor_id,
                            "vendor_type_id" => vendor_type_id,
-                           "gst_registered" => gst_registered
+                           "gst_registered" => gst_registered,
+                           "payment_term_id" => payment_term_id
     }}
 
     bank_params={"bank_accounts_attributes" =>[{"name"=>account_name,
