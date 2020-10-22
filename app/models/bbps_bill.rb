@@ -282,7 +282,7 @@ class BbpsBill < ApplicationRecord
     end
   end
   
-  scope :with_status_id, -> (status_id){
+  scope :with_status_ids, -> (status_id){
     with_status_id(status_id)
   }
 
