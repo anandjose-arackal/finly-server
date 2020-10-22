@@ -56,8 +56,6 @@ class Expense::ExCard::Update < Expense::ExCard::Base
       add_message :error, "Card expenses are non-reimbursable by default"
       return
     end
-
-    budget_limit_validation( expense )
   end
 
   def authorize
@@ -106,6 +104,7 @@ class Expense::ExCard::Update < Expense::ExCard::Base
   end
 
   def post_process
+    budget_limit_validation( expense )
     # add report comment
     Reports::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
 

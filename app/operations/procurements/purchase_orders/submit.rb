@@ -48,7 +48,6 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
     unless dlrm_validation_op.success?
       add_message :error, dlrm_validation_op.messages[:error]
     end
-    budget_limit_validation( purchase_order )
   end
 
   def process
@@ -81,6 +80,7 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
   end
 
   def post_process
+    budget_limit_validation( purchase_order )
     add_message :success, 'Successfully submitted purchase order'
     # role_id = self.workflow_output[:role_id]
     Event::EPurchaseOrder::Submit.(user, {purchase_order: purchase_order, workflow_output: workflow_output})

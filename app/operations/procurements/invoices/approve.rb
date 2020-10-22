@@ -27,7 +27,6 @@ class Procurements::Invoices::Approve < Procurements::Invoices::Base
     end
 
     validate_agreement_limit
-    budget_limit_validation( invoice )
   end
 
   def process
@@ -68,6 +67,7 @@ class Procurements::Invoices::Approve < Procurements::Invoices::Base
   end
 
   def post_process
+    budget_limit_validation( invoice )
     update_agreement_available_limit
     Event::EInvoice::Approve.(user, invoice: invoice, workflow_output: workflow_output)
     # Email to vendor that invoice is generated when the invoice is approved

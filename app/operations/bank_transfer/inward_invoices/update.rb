@@ -390,8 +390,6 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     #   end
     # end
 
-    budget_limit_validation( inward_invoice )
-
   end
 
   def process
@@ -446,9 +444,11 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     else
       add_message :error, self.inward_invoice.errors.full_messages
     end
+
   end
 
   def post_process
+    budget_limit_validation( inward_invoice )
     # update_agreement_available_limit
     add_message :success, "Invoice updated"
   end

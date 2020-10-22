@@ -134,8 +134,6 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
         return
       end
     end
-
-    budget_limit_validation payment
   end
 
   def pre_process
@@ -189,6 +187,7 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
   end
 
   def post_process
+    budget_limit_validation payment
     bank_payment_request.comments.create user_id: user.id,
                                          action_id: BankPaymentRequestCommentAction.id_for(:credit)
 

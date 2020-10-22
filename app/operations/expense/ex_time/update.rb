@@ -124,7 +124,6 @@ class Expense::ExTime::Update < Expense::ExTime::Base
 
     # ensuring that a particular expense cannot be both from cash on hand and reimbursable at the same time
     check_coh_reimbursable_exclusivity_update(updated_expense_params)
-    budget_limit_validation( expense )
   end
 
   def pre_process
@@ -175,6 +174,7 @@ class Expense::ExTime::Update < Expense::ExTime::Base
   end
 
   def post_process
+    budget_limit_validation( expense )
     # add comment in report if expense is added within report
     Reports::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
 

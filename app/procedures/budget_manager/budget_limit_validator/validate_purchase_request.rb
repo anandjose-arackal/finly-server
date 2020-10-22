@@ -23,16 +23,15 @@ class BudgetManager::BudgetLimitValidator::ValidatePurchaseRequest < BaseOperati
 
       spent_amount = budget_spent_amount
 
-      # if budget.purchase_request
-      #   op = BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer.({budget: budget, current_user: User.first, calculate_buckets: false, calculate_trail_items: true})
+      if budget.purchase_request
+        op = BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer.({budget: budget, current_user: User.first, calculate_buckets: false, calculate_trail_items: true})
 
-      #   if budget.calculated_before_tax_amount
-
-      #     spent_amount += op['result'][:budget_trails].where(entity: invoice.items).sum('billed_amount_before_tax_value')
-      #   else
-      #     spent_amount += op['result'][:budget_trails].where(entity: invoice.items).sum('billed_amount_after_tax_value')
-      #   end
-      # end
+        if budget.calculated_before_tax_amount
+          spent_amount += op['result'][:budget_trails].where(entity: purchase_request).map(&:amount_before_tax).map(&:value).sum
+        else
+          spent_amount += op['result'][:budget_trails].where(entity: purchase_request).map(&:amount_after_tax).map(&:value).sum
+        end
+      end
 
       if spent_amount > budget_amount or budget_amount == 0
         budget_exceeded = false
