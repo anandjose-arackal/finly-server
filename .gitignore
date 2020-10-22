@@ -33,7 +33,7 @@ config/meilisearch.yml
 config/posthog.yml
 config/searchkick.yml
 data.ms/
-config/searchkick.yml
+# config/searchkick.yml
 
 .rubocop.yml
 .vscode/
