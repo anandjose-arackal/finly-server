@@ -65,6 +65,7 @@ class Admin::Implementations::Master::Users::Import < Admin::Implementations::Pr
       unless user.update(user_params.except(:password, :password_confirmation))
         return result false, user.errors.full_messages
       end
+      user.confirm
     rescue Exception => e
       return result false, e.message
     end
