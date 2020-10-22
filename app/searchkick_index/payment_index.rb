@@ -1,7 +1,9 @@
 class PaymentIndex < Searchkick::Api::DSL
 
   scope do
-    where.not(payment_order_id: nil).includes({payment_order: {bank_payment_request: [:policy, :created_by]}}, :status, :reference_resource, :receiving_user_vendor)
+    where.not(payment_order_id: nil)
+        .where(receiving_user_type: 'YesBankVendor') #Sync only Vendor Payments
+        .includes({payment_order: {bank_payment_request: [:policy, :created_by]}}, :status, :reference_resource, :receiving_user)
   end
 
   record_type 'payments'
@@ -15,14 +17,18 @@ class PaymentIndex < Searchkick::Api::DSL
   field :description, value: -> (record) { record.payment_order&.bank_payment_request&.description }
   field :narration, value: -> (record) { record.note }
   field :unique_transaction_references, value: -> (record) { [record.to_exposure.utr].compact }
-  field :vendor_name, value: -> (record) { record.receiving_user_vendor&.business_name }
-  field :vendor_trade_name, value: -> (record) { record.receiving_user_vendor&.trade_name }
-  field :vendor_id, value: -> (record) { record.receiving_user_vendor&.vendor_id }
+  field :vendor_name, value: -> (record) { record.receiving_user&.business_name }
+  field :vendor_trade_name, value: -> (record) { record.receiving_user&.trade_name }
+  field :vendor_id, value: -> (record) { record.receiving_user&.vendor_id }
   field :created_by_name, value: -> (record) { record.payment_order&.bank_payment_request&.created_by&.name }
   field :created_by_email, value: -> (record) { record.payment_order&.bank_payment_request&.created_by&.email }
 
   def self.should_index?(record)
-    record.deleted_at.nil? and record.company_id.present? and record.payment_order.present? and record.payment_order.bank_payment_request.present?
+    record.deleted_at.nil? and
+        record.company_id.present? and
+        record.payment_order.present? and
+        record.payment_order.bank_payment_request.present? and
+        record.receiving_user_type == 'YesBankVendor' #Sync only Vendor Payments
   end
 
   # included do
