@@ -90,6 +90,7 @@ class BankTransfer::PaymentRequest::Review::Approve < BankTransfer::PaymentReque
   end
 
   def post_process
+    budget_limit_validation( payment )
     if self.auto_approve
       action_id = BankPaymentRequestCommentAction.id_for(:auto_approve)
     else

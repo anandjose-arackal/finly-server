@@ -14,7 +14,6 @@ class Procurements::Invoices::SaveSubmit < Procurements::Invoices::Base
     unless self.invoice.present?
       add_message :error, 'Inward Invoice not found'
     end
-
   end
 
   def process

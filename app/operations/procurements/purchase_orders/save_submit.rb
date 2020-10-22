@@ -14,7 +14,6 @@ class Procurements::PurchaseOrders::SaveSubmit < Procurements::PurchaseOrders::B
     unless self.purchase_order.present?
       add_message :error, 'Purchase Order not found'
     end
-
   end
 
   def process

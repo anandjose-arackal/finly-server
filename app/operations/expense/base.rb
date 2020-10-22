@@ -169,6 +169,14 @@ class Expense::Base < BaseOperation
     false
   end
 
+  def budget_limit_validation expense
+    if user.company.feature_subscription.enforce_budget_limit
+      op = BudgetManager::BudgetLimitValidator::ValidateExpense.(user,{ expense: self.expense })
+      if op.messages[:error].present?
+        return add_message :error, op.messages[:error]
+      end
+    end
+  end
 
   def success
     Expense::Base::Presenter.new(user, {expense: self.expense, view: params[:view]}, self.messages)
