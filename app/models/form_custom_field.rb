@@ -31,7 +31,8 @@ class FormCustomField < ApplicationRecord
     when 'text'
       value || value_text
     when 'dropdown'
-      selection&.form_entity_choice&.name
+      selection&.form_entity_choice&.id
+      # selection&.form_entity_choice&.name
     when 'multiselect'
       selections.map(&:form_entity_choice).map(&:name)
     when 'attachment'

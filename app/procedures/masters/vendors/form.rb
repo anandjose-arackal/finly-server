@@ -92,6 +92,10 @@ class Masters::Vendors::Form < Forms::API
     dropdown :status_id, choices_scope: Choices[:enum].(VendorStatus),
              required: false, editable: true, default_value: VendorStatus.id_for(:draft),
              can_editable_be_changed: false
+
+    switch :authorized, default_value: true,
+           visible: false, editable: false, required: true,
+           can_visible_be_changed: false, can_editable_be_changed: false, can_required_be_changed: false
   end
 
   section :business_details, associate_custom_fields: true do
@@ -104,7 +108,7 @@ class Masters::Vendors::Form < Forms::API
     # text :name, computed: Forms::Compute::Lookup('policy_id', '{{record.name}}'), editable: false
 
     text :business_name, label: 'Legal Name', required: true
-    text :name, label: 'Trade Name', required: true
+    text :trade_name, label: 'Trade Name', required: true
     switch :gst_registered, label: "GST Registered"
     large_text :address, label: "Full Address"
     lookup :vendor_type_id, choices_scope: Choices[:lookup].('vendor_types'), label: "Vendor Type"
@@ -174,7 +178,8 @@ class Masters::Vendors::Form < Forms::API
       text :name, required: true
       text :account_number, required: true
       text :confirm_account_number, required: true, system_field: false
-      text :ifsc, label: "IFSC / Bank Code", required: true
+      text :ifsc, label: "IFSC", required: true
+      text :swift_code, label: "Swift / Bank Code", required: false, visible: false, editable: false
       switch :default_account
       switch :disabled, default_value: false
       switch :verified, visible: false, default_value: false
@@ -408,6 +413,22 @@ class Masters::Vendors::Form < Forms::API
 
   condition condition_id: :attachment_gstin_certificate_for_indian_vendors do
     reference :entity, 'gstin_locations.gstin_certificate'
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    action :editable, false
+    action :visible, false
+    action :required, false
+  end
+
+  condition condition_id: :swift_code_for_foreign_vendors do
+    reference :entity, 'bank_accounts.swift_code'
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    action :editable, true
+    action :visible, true
+    action :required, true
+  end
+
+  condition condition_id: :no_ifsc_for_foreign_vendors do
+    reference :entity, 'bank_accounts.ifsc'
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, false
     action :visible, false
