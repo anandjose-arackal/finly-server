@@ -7,7 +7,7 @@ require 'faraday_middleware'
 class BulletTrain
   attr_reader :bt_api
 
-  TIMEOUT = 30
+  TIMEOUT = 15
 
   def self.logger
     @logger ||= LogStashLogger.new(type: :file, path: 'log/bullet_train_api.log', sync: true)
@@ -28,7 +28,15 @@ class BulletTrain
 
   def request(method, path, *args)
     start_time = Time.now
-    res = @bt_api.send(method, path, *args)
+    begin
+      res = @bt_api.send(method, path, *args)
+    rescue Exception => e
+      time = (Time.now - start_time).to_f
+      stack_trace = "#{e.message}\n#{e.backtrace&.join("\n")}"
+      self.class.logger.info({duration: time, status: 0, method: method, path: path, request_args: args, exception: e.message, stack_trace: stack_trace})
+      return nil
+    end
+
     time = (Time.now - start_time).to_f
     response_body = res.status != 200 ? res.body : nil
     # Todo log only if the response is slower than 2s
@@ -39,10 +47,14 @@ class BulletTrain
   def get_flags(user_id = nil)
     if user_id.nil?
       res = request(:get, 'flags/')
+      return {} if res.blank?
+
       flags = transform_flags(res.body).select { |flag| flag[:segment].nil? }
       flags_to_hash(flags)
     else
       res = request(:get, "identities/?identifier=#{user_id}")
+      return {} if res.blank?
+
       flags_to_hash(transform_flags(res.body['flags']))
     end
   end
