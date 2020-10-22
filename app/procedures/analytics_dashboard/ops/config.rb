@@ -1,0 +1,71 @@
+class AnalyticsDashboard::Ops::Config < Transactions::API
+
+  CUBES = [
+      {
+          label: 'Invoice',
+          cube: "invoices",
+          root: true,
+          associations: [:invoice_line_items, :billing_locations, :shipping_locations]
+      },
+      {
+          label: 'Invoice Line Items',
+          cube: "invoices_line_items",
+          root: true
+      },
+      {
+          label: 'Billing Location',
+          cube: "billing_locations",
+          root: false
+      },
+      {
+          label: 'Shipping Location',
+          cube: "shipping_locations",
+          root: false
+      }
+  ].freeze
+
+  pass :generate_token
+  pass :build_config
+
+  def generate_token(context, current_user:, **)
+    context[:token] = JWT.encode(
+        {u:
+             {id: current_user.id, company_id: current_user.company_id},
+         exp: 3.hour.from_now.to_i},
+        Rails.configuration.cube_js_api_key
+    )
+  end
+
+  def build_config(context, current_user:, **)
+    context[:config] = []
+    CUBES.each do |cube|
+      next unless authorized?(current_user, cube)
+
+      context[:config] << cube
+    end
+  end
+
+  private
+
+  def authorized?(current_user, config)
+    return false unless current_user.present?
+    return false unless config[:permissions].blank? or current_user.has_permission?(config[:permissions])
+    return false unless company_subscribed?(current_user, config)
+
+    true
+  end
+
+  def company_subscribed?(current_user, config)
+    return true if config[:features].blank?
+
+    features = config[:features]
+    features = [config[:features]] unless features.respond_to?(:each)
+
+    features.each do |feature|
+      return false unless !!current_user.company.feature_subscription.send(feature)
+    end
+
+    true
+  end
+
+end

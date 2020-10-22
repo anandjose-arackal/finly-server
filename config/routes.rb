@@ -3444,7 +3444,7 @@ Rails.application.routes.draw do
   get 'external/settlements/:id' => 'external_url#payment', as: :external_url_settlement
   get 'external/transaction/:id' => 'external_url#transaction', as: :external_url_transaction
 
-  get 'analytics' => 'analytics#show'
+  # get 'analytics' => 'analytics#show'
 
   get 'companies/notify' => 'companies#notify'
 
@@ -4345,6 +4345,8 @@ Rails.application.routes.draw do
 
   post 'search', to: 'global_search#create'
   get 'search', to: 'global_search#index'
+
+  post 'analytics/token', to: 'analytics#token'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
