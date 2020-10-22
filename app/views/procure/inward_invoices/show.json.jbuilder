@@ -51,6 +51,7 @@ if invoice.vendor.present?
   json.vendor invoice.vendor.as_json
 end
 
+tax_ids = []
 json.invoice do
   # conditionally set the original amount as invoice amount is there are line items
   json.extract! invoice, :id, :invoice_number, :payment_term_id, :location_id, :delivery_location_id, :department_id, :sub_department_id, :policy_id, :procurement_id,
@@ -177,7 +178,7 @@ json.invoice do
       json.extract! item, :id, :comment, :rate, :quantity, :tax, :discount,
                     :unit_of_measurement, :description, :hsn_sac, :inventory_line_item_id, :tax_rate_id, :department_id, :cost_center_id, :sgst, :cgst, :igst,
                     :purchase_order_item_id
-
+      tax_ids.push(tax_rate_id)
       json.category_id item&.category_id rescue nil
       json.item_number item&.inventory_line_item&.item_number rescue nil
       json.gl_code item&.category.gl_code rescue nil
@@ -383,7 +384,9 @@ end
 
 json.tax_rates do
   json.array! @result.tax_rates do |tax_rate|
-    json.merge! tax_rate.as_json
+    if tax_ids.include?(tax_rate.id) || !tax_rate.deleted?
+      json.merge! tax_rate.as_json
+    end
   end
 end
 

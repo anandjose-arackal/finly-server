@@ -29,6 +29,8 @@ class TaxRate < ApplicationRecord
 
   validates :rate, presence: true
 
+  default_scope {unscope(:where)}
+  
   scope :with_name, -> (name) {where name: name}
   scope :with_rate, -> (rate) {where rate: rate}
   scope :with_internal_id, -> (ids) {where internal_id: ids}
