@@ -4,7 +4,7 @@ Resolver::Router.draw do
   #   route "submit", Masters::Departments::AutoComplete
   # end
   # with_options company_1: 1, env_1: :dev do
-  #   route "departments", Masters::Departments::AutoComplete, :department_2, options: {company: 156, env: :dev}
+  #   route "departments", Masters::Departments::AutoComplete, :department_2, company: 156, env: :dev
   #   route "departments", :department
   # end
 
@@ -20,21 +20,21 @@ Resolver::Router.draw do
   end
 
   # Masters
-  scope :department do
+  scope :departments do
     route 'default', Masters::Departments::Resolver
   end
-  scope :location do
+  scope :locations do
     route 'default', Masters::Locations::Resolver
   end
-  scope :cost_center do
+  scope :cost_centers do
     route 'default', Masters::CostCenters::Resolver
   end
 
-  scope :insight_dashboard do
+  scope :insight_dashboards do
     route 'default', Insights::Resolver
   end
 
-  scope :category do
+  scope :categories do
     route 'default', Masters::Categories::Resolver
   end
 

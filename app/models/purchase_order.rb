@@ -79,12 +79,12 @@
 class PurchaseOrder < ApplicationRecord
   include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport
   include Sequenced::ActsAsSequenced
+  # include SearchIndex::Concerns::Document
+include Searchkick::Api
   include Concerns::ErpSyncConcern
 
 
   acts_as_sequenced column: :po_number, purpose: :purchase_order, editable: false, prefix: 'PO/{fiscal_year_start}-{fiscal_year_end}/', min_length: 4
-
-  event_channel 'purchase_order'
 
   belongs_to :company, optional: true
   belongs_to :user, optional: true
@@ -133,6 +133,7 @@ class PurchaseOrder < ApplicationRecord
   has_many :attachments, class_name: "ProcurementAttachment", as: :procurement_document
 
   has_many :items, class_name: "PurchaseOrderItem", dependent: :destroy
+  has_many :line_items, class_name: "PurchaseOrderItem", dependent: :destroy
   has_many :extra_charges, class_name: "ProcurementCharge", as: "Chargable"
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
   # has_many :custom_fields, as: :parent
@@ -160,6 +161,7 @@ class PurchaseOrder < ApplicationRecord
   validates :purchase_order_status_id, presence: true
   # validates :policy_id, presence: true
   # validates :items, presence: true
+  scope :with_company_id, -> (company_id) { where company_id: company_id }
   scope :document_number_generated_in_finly, -> { where override_po_number: [false, nil] }
   scope :not_open, -> { where.not purchase_order_status_id: PurchaseOrderStatus.id_for(:open) }
   scope :with_id, -> (id) { where id: id }

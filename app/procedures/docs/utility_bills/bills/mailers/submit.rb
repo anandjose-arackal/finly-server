@@ -2,7 +2,7 @@ class Docs::UtilityBills::Bills::Mailers::Submit < Docs::UtilityBills::Bills::Ma
 
   class Docs::UtilityBills::Bills::Mailers::Submit::SubmittedFrom < Docs::UtilityBills::Bills::Mailers::Submit
 
-    consumes_event! 'bbps_bill.submit'
+    consumes_event! 'bbps_bills.submit'
 
     assign :to do |user, params|
       [user.email]
@@ -23,7 +23,7 @@ class Docs::UtilityBills::Bills::Mailers::Submit < Docs::UtilityBills::Bills::Ma
 
   class Docs::UtilityBills::Bills::Mailers::Submit::SubmittedTo < Docs::UtilityBills::Bills::Mailers::Submit
 
-    consumes_event! 'bbps_bill.submit'
+    consumes_event! 'bbps_bills.submit'
 
     assign :to do |user, params|
       params[:record].get_reviewers.pluck(:email)

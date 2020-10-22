@@ -2,7 +2,7 @@ class Docs::UtilityBills::Subscriptions::Mailers::Approve < Docs::UtilityBills::
 
   class Docs::UtilityBills::Subscriptions::Mailers::Approve::ApprovedBy < Docs::UtilityBills::Subscriptions::Mailers::Approve
 
-    consumes_event! 'bbps_biller_subscription.approve'
+    consumes_event! 'bbps_biller_subscriptions.approve'
 
     assign :to do |user, params|
       [user.email]
@@ -23,7 +23,7 @@ class Docs::UtilityBills::Subscriptions::Mailers::Approve < Docs::UtilityBills::
 
   class Docs::UtilityBills::Subscriptions::Mailers::Approve::ApprovedTo < Docs::UtilityBills::Subscriptions::Mailers::Approve
 
-    consumes_event! 'bbps_biller_subscription.approve'
+    consumes_event! 'bbps_biller_subscriptions.approve'
 
     def validate(options, params:, **)
       return if params[:record].approved?
@@ -51,7 +51,7 @@ class Docs::UtilityBills::Subscriptions::Mailers::Approve < Docs::UtilityBills::
 
   class Docs::UtilityBills::Subscriptions::Mailers::Approve::ApprovedFor < Docs::UtilityBills::Subscriptions::Mailers::Approve
 
-    consumes_event! 'bbps_biller_subscription.approve'
+    consumes_event! 'bbps_biller_subscriptions.approve'
 
     def validate(options, params:, **)
       return unless params[:record].approved?

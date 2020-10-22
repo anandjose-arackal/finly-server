@@ -16,13 +16,13 @@ class Bbps::Api < ServiceApi
   class_attr :request_fields, default: []
   class_attr :response_fields, default: []
   class_attr :success_object
-  class_attr :encryption_key, default: Rails.application.config_for(:bbps_config)&.dig('encryption_key')
+  class_attr :encryption_key, default: Rails.application.config_for(:bbps_config)&.with_indifferent_access&.dig('encryption_key')
   skip_user_authorization!
   http_method :post
   mime_type "application/json"
-  url Rails.application.config_for(:bbps_config)&.dig('base_url')
-  header 'X-IBM-Client-Id', Rails.application.config_for(:bbps_config)&.dig('client_id')
-  header 'X-IBM-Client-Secret', Rails.application.config_for(:bbps_config)&.dig('client_secret')
+  url Rails.application.config_for(:bbps_config)&.with_indifferent_access&.dig('base_url')
+  header 'X-IBM-Client-Id', Rails.application.config_for(:bbps_config)&.with_indifferent_access&.dig('client_id')
+  header 'X-IBM-Client-Secret', Rails.application.config_for(:bbps_config)&.with_indifferent_access&.dig('client_secret')
   body -> (user, params) { body }
   client -> (user, params) { client }
   parse -> (user, params, response) { parse_response(user, params, response) }
@@ -166,15 +166,15 @@ class Bbps::Api < ServiceApi
   end
 
   def agent_institution_id
-    Rails.application.config_for(:bbps_config)&.dig('agent_institution_id')
+    Rails.application.config_for(:bbps_config)&.with_indifferent_access&.dig('agent_institution_id')
   end
 
   def channel_id
-    Rails.application.config_for(:bbps_config)&.dig('channel_id')
+    Rails.application.config_for(:bbps_config)&.with_indifferent_access&.dig('channel_id')
   end
 
   def agent_id
-    Rails.application.config_for(:bbps_config)&.dig('agent_id')
+    Rails.application.config_for(:bbps_config)&.with_indifferent_access&.dig('agent_id')
   end
 
   def customer_param_for(param)

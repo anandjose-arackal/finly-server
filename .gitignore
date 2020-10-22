@@ -31,8 +31,9 @@ public/system/import_job/*
 config/feature_flipper.yml
 config/meilisearch.yml
 config/posthog.yml
+config/searchkick.yml
 data.ms/
-
+config/searchkick.yml
 
 .rubocop.yml
 .vscode/

@@ -25,8 +25,6 @@ class TaxRate < ApplicationRecord
   include Exposures::Model::Exposable
   include EventProducer
 
-  event_channel 'tax_rate'
-
   belongs_to :company, optional: true
 
   validates :rate, presence: true

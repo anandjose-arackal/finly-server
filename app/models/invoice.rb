@@ -121,12 +121,12 @@ class Invoice < ApplicationRecord
   include Exposures::Model::Exposable
   include Sequenced::ActsAsSequenced
   include ErpSyncable
+  # include SearchIndex::Concerns::Document
+include Searchkick::Api
 
   # include EventProducer
 
   acts_as_sequenced column: :invoice_id, purpose: :invoice, editable: false, prefix: 'INV'
-
-  event_channel 'invoice'
 
   belongs_to :address, optional: true
   belongs_to :amount, optional: true
@@ -190,6 +190,7 @@ class Invoice < ApplicationRecord
 
   has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
   has_many :items, class_name: "InvoiceLineItem", as: :parent
+  has_many :line_items, class_name: "InvoiceLineItem", as: :parent
   has_many :invoice_attachments
 
   # Attachments created for procurement
@@ -247,6 +248,7 @@ class Invoice < ApplicationRecord
 
   before_destroy :rollback_agreement_invoice
 
+  scope :with_company_id, -> (company_id) { where company_id: company_id }
   scope :with_id, -> (id) { where id: id }
   scope :without_id, -> (id) { where.not(id: id) }
   scope :with_cost_center_id, -> (id) { where cost_center_id: id }
@@ -308,6 +310,10 @@ class Invoice < ApplicationRecord
     else
       where(invoice_status_id: status_id)
     end
+  }
+
+  scope :with_status_ids, -> (status_id) {
+    with_status_id(status_id)
   }
 
   scope :filter_payable_invoices, -> (enabled) {
@@ -636,6 +642,7 @@ class Invoice < ApplicationRecord
   end
 
   ransack_scopes :with_status_id
+  ransack_scopes :with_status_ids
 
   def policy
     return super if self.policy_id.present?
