@@ -43,17 +43,23 @@ module ActiveStorageSync
         next
       end
       ActiveRecord::Base.transaction do
-        blob = ActiveStorage::Blob.create_after_upload!(
+        begin
+          blob = ActiveStorage::Blob.create_after_upload!(
             io: tempfile,
             filename: send("#{picture_type}_file_name"),
             content_type: send("#{picture_type}_content_type")
-        )
+          )
 
-        blob.attachments.create(
+          blob.attachments.create(
             name: picture_type.to_s,
             record_type: self.class.name,
             record_id: id
-        )
+          )
+        rescue => e
+          Rails.logger.error("Azure blob failed to create for id: #{self.id}  due to #{e}")
+          Raven.capture_exception("Azure blob failed to create for id: #{self.id}  due to #{e}")
+          next
+        end
       end
       clear_attribute_changes(["#{picture_type}_updated_at"])
     end
