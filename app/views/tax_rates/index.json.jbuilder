@@ -1,1 +1,1 @@
-json.array!(@result.tax_rates)
+json.array!( @result.tax_rates.non_deleted )

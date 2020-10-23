@@ -137,9 +137,11 @@ json.cost_centers do
 end
 json.tds_slabs do
   json.array!(current_company.tds_slabs) do |tds_slab|
-    json.id tds_slab.id
-    json.name "#{tds_slab.tds}% - #{tds_slab.name} "
-    json.tds tds_slab.tds
+    if (tds_slab == invoice.tds_slab) || !tds_slab.deleted?
+      json.id tds_slab.id
+      json.name "#{tds_slab.tds}% - #{tds_slab.name} "
+      json.tds tds_slab.tds
+    end
   end
 end
 
