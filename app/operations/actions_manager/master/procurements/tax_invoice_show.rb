@@ -135,7 +135,7 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
   end
 
   def delete
-    document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?)
+    (document_owner? || user.vendor_payments_admin?)   && (invoice.open? || invoice.retracted? || invoice.rejected?)
   end
 
   def more_actions
