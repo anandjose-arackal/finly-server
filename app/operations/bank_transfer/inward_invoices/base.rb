@@ -98,7 +98,7 @@ class BankTransfer::InwardInvoices::Base < BankTransfer::Base
 
   def budget_limit_validation inward_invoice
     if user.company.feature_subscription.enforce_budget_limit
-      op = BudgetManager::BudgetLimitValidator::ValidateInvoice.(user,{ invoice: self.inward_invoice })
+      op = BudgetManager::BudgetLimitValidator::ValidateInvoice.(user,{ invoice: inward_invoice })
       if op.messages[:error].present?
         return add_message :error, op.messages[:error]
       end

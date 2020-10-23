@@ -197,7 +197,6 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     payments = self.bank_payment_request.payments
     payments.each do |payment|
       # notify vendor that they got the money they deserved
-      budget_limit_validation payment
       Event::EBankPaymentRequest::NotifyVendor.(user, payment: payment)
 
       case payment.parent_type
