@@ -1,19 +1,38 @@
-default:
+default: &default
   image: ruby:2.6
   before_script:
     - apt-get update
-    - apt-get install -y sqlite3 libsqlite3-dev nodejs
-    - ruby -v
-    - which ruby
     - gem install bundler --no-document
-    # - gem install rubocop-rails
-    - bundle config gitlab.com "$GITLAB_USERNAME:$GITLAB_TOKEN"
-    - bundle install --jobs $(nproc) "${FLAGS[@]}"
+    - gem install rubocop-rails
 
-# rubocop:
-#   script:
-#     - rubocop --require rubocop-rails -F
+rubocop:
+  <<: *default
+  script:
+    - rubocop --require rubocop-rails -F
 
 rspec:
+  <<: *default
+  services:
+    - mysql:5.7
+  variables:
+    # Configure mysql service (https://hub.docker.com/_/mysql/)
+    MYSQL_DATABASE: finly_test
+    MYSQL_ROOT_PASSWORD: admin123
+  # cache:
+  #   key: one-key-to-rule-them-all
+  before_script:
+    - apt-get update
+    - gem install bundler --no-document
+    - apt-get install -y nodejs default-mysql-client
+    - cp config/database.test.yml config/database.yml
+    - cp config/finly_macros.test.yml config/finly_macros.yml
+    - touch config/aws_config.yml config/azure_config.yml config/bbps_config.yml config/hutch.yml config/insights_config.yml config/integrations.yml config/mailer_config.yml config/redis_config.yml config/sidekiq.yml config/web_client.yml config/yes_bank_config.yml config/feature_flipper.yml config/meilisearch.yml config/posthog.yml
+    - sed -i 's/utf8mb4/utf8/g' db/schema.rb
+    - sed -i 's/utf8_0900_ai_ci/utf8_unicode_ci/g' db/schema.rb
+    - mysql --version
+    - ruby -v
+    - which ruby
+    - bundle config gitlab.com "$GITLAB_USERNAME:$GITLAB_TOKEN"
+    - bundle install --jobs $(nproc) "${FLAGS[@]}"
   script:
-    - bundle exec rspec
+    - RAILS_ENV=test bundle exec rspec
