@@ -145,6 +145,12 @@ class Vendors::Update < Vendors::Base
           add_message :error, "Account number: #{bank_account[:account_number]} does not match with confirmation account number: #{bank_account[:confirm_account_number]}"
           return
         end
+
+        if bank_account[:ifsc].present? && Constants::VALID_IFSC.match(bank_account[:ifsc]).present?
+          bank_account[:ifsc] = Constants::VALID_IFSC.match(bank_account[:ifsc]).to_s
+        else
+          add_message :error, "Please provide a valid IFSC code for Account number: #{bank_account[:account_number]}"
+        end
       end
     end
 
