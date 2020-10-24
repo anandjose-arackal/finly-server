@@ -367,6 +367,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
   end
 
   def post_process
+    budget_limit_validation( purchase_order )
     add_message :success, 'Successfully updated purchase order'
   end
 

@@ -34,6 +34,7 @@ json.agreement_based_payment_system @result.company.agreement_based_payment_syst
 json.gstin_verification_enabled @result.company.gstin_verification_enabled?
 json.utility_bills_enabled @result.company.utility_bills_enabled?
 json.analytics_system  @result.company.analytics_system_enabled?
+json.enforce_budget_limit  @result.company.feature_subscription.enforce_budget_limit?
 
 if Rails.env.production?
   json.url "https://www.itzcash.com/finly/servlet/AccountReloadServlet"

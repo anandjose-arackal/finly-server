@@ -714,7 +714,8 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
     return if bank_payment_request.validate_if_reviewer(user)
     return if bank_payment_request.validate_if_creditor(user)
     return if bank_payment_request.validate_if_auditor(user)
-    raise_unauthorized_exception
+    add_message :error, "You are not authorized to view the payment ticket"
+    return false
   end
 
   # def validate_ownership

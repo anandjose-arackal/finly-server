@@ -13,6 +13,7 @@ class Admin::Implementations::Master::Vendors::ImportTemplates < Admin::Implemen
       :pan => "PAN",
       :description => "Description",
       :address => "Address",
+      :payment_term => "Payment Term Name",
       :gstin => "GSTIN",
       :gst_location => "GST Location",
       :state => "GST State",
