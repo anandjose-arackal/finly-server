@@ -1,6 +1,6 @@
 class Masters::Categories::Lookup < Lookup::API
 
-  resolver 'category.default'
+  resolver 'categories.default'
   search_key :name_or_category_code_cont
 
   attribute :id, visible: false

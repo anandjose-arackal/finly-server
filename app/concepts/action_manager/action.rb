@@ -133,14 +133,18 @@ class ActionManager::Action
 
   def authorized?(context)
     return false unless permitted?(context[:current_user])
-    return true unless authorize.present?
-    raise "Policy has not been defined for the action #{self.id}" unless policy.present?
+    return true unless @authorize.present?
+    raise "Policy has not been defined for the action #{self.id}" unless @policy.present?
+
+    @authorize = {if: @authorize} if @authorize.is_a?(Symbol) or @authorize.is_a?(String)
+    raise "Invalid authorization for the action #{self.id}" if @authorize[:if].blank? and @authorize[:unless].blank?
 
     policy = self.policy.new(context[:current_user], context[:record])
-    return true if policy.send(authorize)
-    return true if action_condition.present? and Transactions::Evaluator.eval(action_registry, action_condition, context)
+    return false if @authorize[:if].present? and not policy.send(@authorize[:if])
+    return false if @authorize[:unless].present? and policy.send(@authorize[:unless])
+    return false if action_condition.present? and not Transactions::Evaluator.eval(action_registry, action_condition, context)
 
-    false
+    true
   end
 
   # def actions

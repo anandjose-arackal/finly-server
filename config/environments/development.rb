@@ -20,7 +20,7 @@ Rails.application.configure do
     config.bullet_train = nil
   end
 
-  posthog_config = Rails.application.config_for(:posthog)
+  posthog_config = Rails.application.config_for(:posthog)&.with_indifferent_access
   if posthog_config.present? and posthog_config['enabled']
     config.posthog = PostHog::Client.new(
         {
@@ -33,6 +33,11 @@ Rails.application.configure do
   else
     config.posthog = nil
   end
+
+
+
+  redis_config = Rails.application.config_for(:redis_config)&.with_indifferent_access
+  config.redis = Redis.new(redis_config.slice('url', 'password'))
 
   # Enable/disable caching. By default caching is disabled.
   # Run rails dev:cache to toggle caching.
@@ -86,7 +91,7 @@ Rails.application.configure do
 
   # Store uploaded files on the local file system (see config/storage.yml for options)
   config.active_storage.service = :local
-
+  ActiveStorage::Current.host = 'http://localhost:3001'
   # Don't care if the mailer can't send.
   config.action_mailer.raise_delivery_errors = true
 

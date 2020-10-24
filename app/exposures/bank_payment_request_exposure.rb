@@ -12,7 +12,7 @@ class BankPaymentRequestExposure < Exposures::API
   attribute :policy, record_attribute: true, exposure: true, includes: [:policy]
   attribute :status, record_attribute: true, exposure: true, includes: [:status]
   attribute :status_name do
-    record.status_name(user)
+    record.status_name(RequestStoreUtil.current_user&.id)
   end
   attribute :review_progress, record_attribute: true, includes: [:dlrms]
   attribute :controlling_level, record_attribute: true, exposure: true, includes: [:controlling_level]

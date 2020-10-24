@@ -1,7 +1,7 @@
 class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
 
   attr_accessor :payments_data, :file, :result_array, :headers, :all_payments, :update_payments, :new_transactions, :existing_transactions,
-                :all_transactions, :bank_transaction_class
+                :all_transactions, :bank_transaction_class, :payments
 
   def pre_validate
     if user.blank? || params.blank?
@@ -42,6 +42,7 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
   def process
     self.new_transactions = []
     self.existing_transactions = []
+    self.payments = []
     file_payments = []
 
     self.payments_data.each_with_index do |payment_data, index|
@@ -84,6 +85,8 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
         else
           reference_resource.utr = utr
         end
+        payment.utr  = utr
+        payments << payment
         
         existing_transactions << reference_resource
       else
@@ -113,16 +116,10 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
                                                        reference_payment_id: payment.id,
                                                        amount_id: amount.id,
                                                        created_at: credited_at)
-        else
-          new_transactions << bank_transaction_class.new(transfer_type: payment.payment_mode,
-                                                         utr: utr,
-                                                         company_id: user.company_id,
-                                                         transfer_status_id: BankTransferStatus.id_for(:completed),
-                                                         receiving_account_id: payment.receiving_account&.id,
-                                                         reference_payment_id: payment.id,
-                                                         amount_id: amount.id,
-                                                         created_at: credited_at)
-        end
+          end
+
+        payment.utr  = utr
+        payments << payment
       end
       # add a success message to the result array
       file_payments.push(payment)
@@ -162,6 +159,7 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
     end
     # will insert new records into bank transactions
     exec_statement self.new_transactions
+    exec_statement self.payments, true, [:utr]
     # payments_without_transactions = payment_details
     # updating_transactions = payment_details
     # exec_statement updating_transactions, true, [:reference_payment_id]

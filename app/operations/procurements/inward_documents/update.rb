@@ -75,9 +75,9 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
       end
     end
 
-    # todo take care of this
-    if self.procurement.invoices.present?
-      inv_items = self.procurement.invoices.includes(:items)
+    # validation for check the item already marked as delivered and generated invoice against it
+    if self.procurement.invoices.scope_all_except_voided.present?
+      inv_items = self.procurement.invoices.scope_all_except_voided.includes(:items)
       self.inward_document.items.each do |item|
 
         item_q = inv_items.map { |iv| iv.items.where(purchase_order_item_id: item.purchase_order_item_id) }.flatten

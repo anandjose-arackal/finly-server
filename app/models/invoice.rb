@@ -150,12 +150,12 @@ class Invoice < ApplicationRecord
   include Sequenced::ActsAsSequenced
   include FormsHelper
   include ErpSyncable
+  # include SearchIndex::Concerns::Document
+include Searchkick::Api
 
   # include EventProducer
 
   acts_as_sequenced column: :invoice_id, purpose: :invoice, editable: false, prefix: 'INV'
-
-  event_channel 'invoice'
 
   belongs_to :address, optional: true
   # #### Fixme: These associations are deprecated to support amount number fields with the same name.
@@ -222,6 +222,7 @@ class Invoice < ApplicationRecord
 
   has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
   has_many :items, class_name: "InvoiceLineItem", as: :parent
+  has_many :line_items, class_name: "InvoiceLineItem", as: :parent
   # Standardizing where all attachments are stored
   has_many :invoice_attachments
 
@@ -245,14 +246,6 @@ class Invoice < ApplicationRecord
 
   accepts_nested_attributes_for :address
   accepts_nested_attributes_for :invoice_attachments, allow_destroy: true
-  accepts_nested_attributes_for :custom_fields
-  accepts_nested_attributes_for :invoice_items, allow_destroy: true
-  accepts_nested_attributes_for :notify_users, allow_destroy: true
-  accepts_nested_attributes_for :credit_note_adjustments, allow_destroy: true
-
-  # #### Fixme: These associations are deprecated to support amount number fields with the same name.
-  # #### Fixme: This can be cleared once this has been deployed to production
-  accepts_nested_attributes_for :tds_amount
   accepts_nested_attributes_for :amount
   accepts_nested_attributes_for :gross_amount
   accepts_nested_attributes_for :net_amount
@@ -277,7 +270,6 @@ class Invoice < ApplicationRecord
   delegate :net_amount_value, to: :net_amount
   delegate :gross_amount_value, to: :gross_amount
   delegate :paid_amount_value, to: :paid_amount
-  # # ####
 
   delegate :unpaid?, :partially_paid?, :paid?, :open?, :processing?, :rejected?,
            :approved?, :retracted?, :auto_approved?, :initiated?, :closed?, :voided?, to: :invoice_status, allow_nil: true
@@ -293,6 +285,7 @@ class Invoice < ApplicationRecord
 
   before_destroy :rollback_agreement_invoice
 
+  scope :with_company_id, -> (company_id) { where company_id: company_id }
   scope :with_id, -> (id) { where id: id }
   scope :without_id, -> (id) { where.not(id: id) }
   scope :with_cost_center_id, -> (id) { where cost_center_id: id }
@@ -354,6 +347,10 @@ class Invoice < ApplicationRecord
     else
       where(invoice_status_id: status_id)
     end
+  }
+
+  scope :with_status_ids, -> (status_id) {
+    with_status_id(status_id)
   }
 
   scope :filter_payable_invoices, -> (enabled) {
@@ -682,6 +679,7 @@ class Invoice < ApplicationRecord
   end
 
   ransack_scopes :with_status_id
+  ransack_scopes :with_status_ids
 
   def policy
     return super if self.policy_id.present?

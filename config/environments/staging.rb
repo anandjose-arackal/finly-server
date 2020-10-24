@@ -23,6 +23,9 @@ Rails.application.configure do
   config.consider_all_requests_local       = false
   config.action_controller.perform_caching = true
 
+  redis_config = Rails.application.config_for(:redis_config)&.with_indifferent_access
+  config.redis = Redis.new(redis_config.slice('url', 'password'))
+
   # Enable Rack::Cache to put a simple HTTP cache in front of your application
   # Add `rack-cache` to your Gemfile before enabling this.
   # For large-scale production use, consider using a caching reverse proxy like
@@ -107,7 +110,7 @@ Rails.application.configure do
   # config.action_mailer.raise_delivery_errors = false
   # config.mailer_config = config_for(:mailer_config)
   ################## SETTINGS FOR SENDGRID ##########################
-  config.mailer_config = config_for(:mailer_config)
+  config.mailer_config = config_for(:mailer_config)&.with_indifferent_access
   config.action_mailer.delivery_method = :smtp
   if config.mailer_config["mailcatcher"].present?
     config.action_mailer.smtp_settings = {
@@ -142,6 +145,7 @@ Rails.application.configure do
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).
   config.i18n.fallbacks = true
+  config.active_storage.service = :microsoft
 
   # Send deprecation notices to registered listeners.
   config.active_support.deprecation = :notify

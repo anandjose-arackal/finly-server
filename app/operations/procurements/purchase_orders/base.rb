@@ -66,4 +66,14 @@ class Procurements::PurchaseOrders::Base < BaseOperation
       end
     end
   end
+
+  def budget_limit_validation purchase_order
+    if user.company.feature_subscription.enforce_budget_limit
+      op = BudgetManager::BudgetLimitValidator::ValidatePurchaseOrder.(user, { purchase_order: purchase_order })
+      if op.messages[:error].present?
+        return add_message :error, op.messages[:error]
+      end
+    end    
+  end
 end
+

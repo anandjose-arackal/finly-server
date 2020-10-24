@@ -10,9 +10,9 @@ gem 'nokogiri', '~> 1.10.0'
 gem 'autoprefixer-rails', '~> 9.4.4'
 
 gem 'fiscali', '~> 2.4'
-
+gem 'redis', '~> 4.1'
 gem 'parslet', '~> 1.8.2'
-gem 'rack', git: 'https://github.com/rack/rack', :ref => 'f690bb71425aa31d7b9b3113829af773950d8ab5'
+gem 'rack', github: 'rack/rack', :ref => 'f690bb71425aa31d7b9b3113829af773950d8ab5'
 gem 'rufus-scheduler', '~> 3.6'
 # gem 'clockwork', '~> 2.0'
 gem 'cronex', '~> 0.10'
@@ -67,7 +67,7 @@ gem 'resque', '~> 2.0.0'
 gem 'ransack', '~> 2.3'
 gem 'crono', '~> 1.1.2'
 # gem 'haml', '~> 5.0.4'
-gem 'sinatra', '~> 2.1.0', require: nil, git: 'https://github.com/sinatra/sinatra', branch: 'master'
+gem 'sinatra', '~> 2.1.0', require: nil, github: 'sinatra/sinatra', branch: 'master'
 gem 'gyoku', '~> 1.3'
 gem 'request_store', '~> 1.4.1'
 gem 'simpleconfig', '~> 2.0.1'
@@ -156,6 +156,7 @@ gem 'bootstrap-will_paginate', '~> 1.0'
 # gem for image manipulation
 gem 'paperclip', '~> 6.1.0'
 gem 'paperclip-azure', '~> 1.0'
+gem 'active_storage_validations', '~> 0.9.0'
 # Bundle for Bootstrap
 gem 'bootstrap-sass', '~> 3.4.0'
 
@@ -226,6 +227,7 @@ gem 'aasm', '~> 5.0.1'
 gem 'activerecord-import', '~> 1.0', '>= 1.0.3'
 gem 'parallel', '~> 1.18'
 gem 'string_pattern', '~> 2.2', '>= 2.2.1'
+gem 'image_processing', '~> 1.2'
 # gem 'bullet-train-client', '~> 1.1'
 # gem 'slackistrano'
 
@@ -238,9 +240,13 @@ gem 'awesome_print', '~> 1.8.0'
 
 # Fuzzy String Match
 gem 'fuzzy-string-match', '1.0.1'
-
 # gem that schedules cron jobs for us
-gem 'whenever'
+gem 'whenever', '~> 1.0'
+
+# Elasticsearch
+gem 'searchkick', '~> 4.4'
+gem 'typhoeus', '~> 1.4'
+
 gem 'json_logic', '~> 0.4'
 gem 'kalc'
 gem 'wit', '~> 6.0'
@@ -251,8 +257,8 @@ gem 'azure-storage-blob'
 
 group :development, :test do
   gem 'byebug'
-  gem 'pry', '~> 0.13'
-  # gem 'rb-readline', '~> 0.5'
+  gem 'pry', '~> 0.12.2'  
+  gem 'rb-readline', '~> 0.5'
   gem 'capistrano', '~> 3.11.0'
   gem 'capistrano3-puma', '~> 4.0'
   gem 'capistrano-rails', '~> 1.4.0', require: false
@@ -273,7 +279,7 @@ group :development, :test do
   gem 'stackprof', '~> 0.2.12' # ruby 2.1+ only
   # gem 'memory_profiler', '~> 0.9.12'
   gem 'brakeman'
-  # gem 'active_record_query_trace', '~> 1.5.4'
+  gem 'active_record_query_trace', '~> 1.5.4'
   # gem 'better_errors'
   # gem 'binding_of_caller'
 

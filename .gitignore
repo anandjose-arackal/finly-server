@@ -32,14 +32,15 @@ public/system/import_job/*
 config/feature_flipper.yml
 config/meilisearch.yml
 config/posthog.yml
+config/searchkick.yml
 data.ms/
+config/searchkick.yml
+config/cubejs.yml
 
 .rubocop.yml
 .vscode/
 reference_resource_migration.log
 config/web_client.yml
-config/meilisearch.yml
-data.ms/*
 
 # Ignore all logfiles and tempfiles.
 /log/*

@@ -52,8 +52,6 @@ class Expense < ApplicationRecord
           FieldCustomizer::CustomizableValidation,
           MathUtil
 
-  event_channel 'expense'
-
   belongs_to :amount, optional: true
   belongs_to :expense_status, optional: true
   belongs_to :user, optional: true, inverse_of: :expenses
@@ -662,9 +660,9 @@ class Expense < ApplicationRecord
     else
       if self.distance_expense?
         rate = ''
-        if distance_expense.vehicle_rate.present?
+        if self.distance_expense&.vehicle_rate&.present?
           rate = simple ? " @ " : " at "
-          rate += "#{distance_expense.vehicle_rate&.rate&.currency&.symbol}#{distance_expense.vehicle_rate&.rate&.value} #{distance_expense.vehicle_rate&.rate&.currency&.country_code} per KM"
+          rate += "#{self.distance_expense&.vehicle_rate&.rate&.currency&.symbol}#{self.distance_expense&.vehicle_rate&.rate&.value} #{self.distance_expense&.vehicle_rate&.rate&.currency&.country_code} per KM"
         end
         return "#{self.distance_expense.distance_value} KM#{rate}"
       elsif self.time_expense?

@@ -2933,7 +2933,7 @@ Rails.application.routes.draw do
     get 'temp_import', to: 'users#temp_import'
     resources :expenses
     resources :cards do
-      patch 'block', to: 'cards#block', as: :block
+      patch 'block', to: 'cards#block', as: :block 
     end
     post 'cards/new_card_activate', to: 'cards#new_card_activate', as: :new_card_activate
     post 'import_cards', to: 'cards#import', as: :import_cards
@@ -2996,8 +2996,7 @@ Rails.application.routes.draw do
   post 'virtual_accounts', to: 'api/fc/invoices/virtual_bank_accounts#create'
   patch 'virtual_accounts/:account_number', to: 'api/fc/invoices/virtual_bank_accounts#update'
   delete 'virtual_accounts/:account_number', to: 'api/fc/invoices/virtual_bank_accounts#deactivate'
-  # Deprecated in leu of the new invoices APIs
-  # post 'invoices', to: 'api/fc/invoices/outward_invoices#create_valid'
+  post 'invoices', to: 'api/fc/invoices/outward_invoices#create_valid'
   post 'invoices/customers', to: 'api/fc/invoices/customers#create'
   patch 'invoices/customers/:id', to: 'api/fc/invoices/customers#update'
   get 'invoices/customers/:id', to: 'api/fc/invoices/customers#show'
@@ -3436,7 +3435,9 @@ Rails.application.routes.draw do
 
   get 'autocomplete/customers', to: 'invoicing/autocomplete#customer'
   get 'autocomplete/vendors', to: 'autocomplete#vendors'
-  # get 'autocomplete/:entity', to: 'autocomplete#route' # Fixme Deprecated
+
+  # Fixme : Keeping it since its available in current version of master
+  get 'autocomplete/:entity', to: 'autocomplete#route' # Fixme Deprecated
 
   get 'lookup/:route', to: 'lookup#route'
 
@@ -4371,11 +4372,13 @@ Rails.application.routes.draw do
 
   get 'lookup/:route', to: 'lookup#route'
 
+  post 'search', to: 'global_search#create'
+  get 'search', to: 'global_search#index'
 
 
-  resources :invoices, only: [:create, :update, :show]
-
-  resources :approval_matrix, only: [:index]
+  # todo : I2P : For invoices
+  # resources :invoices, only: [:create, :update, :show]
+  # resources :approval_matrix, only: [:index]
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

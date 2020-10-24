@@ -17,8 +17,6 @@ class TdsRatesList < ApplicationRecord
   include Exposures::Model::Exposable, SoftDeletable
   include EventProducer
 
-  event_channel 'tds_rate'
-
   def self.seed_data(company_id)
     DEFAULTS.each do |rate|
       if TdsRatesList.find_by(name: rate[:name], company_id: company_id).present?
@@ -28,6 +26,8 @@ class TdsRatesList < ApplicationRecord
       end
     end
   end
+  
+  default_scope {unscope(:where)}
 
   def as_json(options = {})
     {

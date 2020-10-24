@@ -31,7 +31,7 @@ Events::Router.draw do
     end
 
     route 'create' do
-
+      # to SearchIndex::EventListeners::CreateCompanyIndex
     end
   end
 
@@ -53,9 +53,99 @@ Events::Router.draw do
     end
   end
 
-  scope :user_sessions do
-    route :create do
-      to Masters::Users::TraitPublisher::UserSessionTracker
+  scope :items do
+    route '*' do
+      # to SearchIndex::EventListeners::RecordChange
+    end
+  end
+
+  scope :purchase_requests do
+    route '*' do
+      # to SearchIndex::EventListeners::RecordChange
+    end
+  end
+
+  scope :purchase_orders do
+    route '*' do
+      # to SearchIndex::EventListeners::RecordChange
+    end
+  end
+
+  scope :invoices do
+    route '*' do
+      # to SearchIndex::EventListeners::RecordChange
+    end
+  end
+
+  scope :payments do
+    route '*' do
+      # to SearchIndex::EventListeners::RecordChange
+    end
+  end
+
+  scope :bbps_bills do
+    route '*' do
+      # to SearchIndex::EventListeners::RecordChange
+    end
+  end
+
+  scope :vendors do
+    route '*' do
+      # to SearchIndex::EventListeners::RecordChange
+    end
+  end
+
+  scope :items do
+    route '*' do
+      # to SearchIndex::EventListeners::RecordChange
+    end
+  end
+
+  scope :categories do
+    route '*' do
+      # to SearchIndex::EventListeners::RecordChange
+    end
+  end
+
+  scope :policies do
+    route '*' do
+      # to SearchIndex::EventListeners::RecordChange
+    end
+  end
+
+  scope :departments do
+    route '*' do
+      # to SearchIndex::EventListeners::RecordChange
+    end
+  end
+
+  scope :locations do
+    route '*' do
+      # to SearchIndex::EventListeners::RecordChange
+    end
+  end
+
+  scope :cost_centers do
+    route '*' do
+      # to SearchIndex::EventListeners::RecordChange
+    end
+  end
+
+  scope :agreements do
+    route '*' do
+      # to SearchIndex::EventListeners::RecordChange
+    end
+  end
+
+  scope :bbps_biller_subscriptions do
+    route '*' do
+      # to SearchIndex::EventListeners::RecordChange
+    end
+  end
+
+  scope :users do
+    route '*' do
+      # to SearchIndex::EventListeners::RecordChange
     end
   end
 end

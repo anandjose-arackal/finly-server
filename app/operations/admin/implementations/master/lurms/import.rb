@@ -268,6 +268,7 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
         "BankPaymentRequestProvider" =>"bank_payment_request_reviewer",
         "YesBankVendorProvider" =>"vendor_reviewer",
         "PaymentAgreementProvider" => "payment_agreement_reviewer",
+        "AgreementInvoiceProvider" => "agreement_invoice_reviewer",
         "BbpsBillerSubscriptionProvider" => "utility_bill_master_reviewer",
         "BbpsBillProvider" => "utility_bill_reviewer",
         "CreditNoteProvider" => "credit_note_reviewer"}
@@ -340,6 +341,7 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
         "BankPaymentRequestProvider" =>"bank_payment_request_initiator",
         "YesBankVendorProvider" =>"vendor_creator",
         "PaymentAgreementProvider" => "payment_agreement_initiator",
+        "AgreementInvoiceProvider"=> "agreement_invoice_initiator",
         "BbpsBillerSubscriptionProvider" => "utility_bill_master_initiator",
         "BbpsBillProvider" => "utility_bill_initiator",
         "CreditNoteProvider" => "credit_note_initiator"}

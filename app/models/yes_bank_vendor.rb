@@ -58,12 +58,16 @@ class YesBankVendor < ApplicationRecord
   include LiquidDroppable
   include Exposures::Model::Exposable
   include ErpSyncable
+  # include SearchIndex::Concerns::Document
+  include Searchkick::Api
   include FormsHelper
 
 
   validates :business_name, presence: true
 
   include SoftDeletable
+
+  event_channel 'vendors'
 
   acts_as_sequenced column: :vendor_id, purpose: :vendor, editable: false, prefix: 'VNDR-'
 
@@ -77,12 +81,10 @@ class YesBankVendor < ApplicationRecord
   belongs_to :currency, optional: true
   belongs_to :payment_term, optional: true
 
-  has_many :bank_accounts, as: :account_owner, dependent: :destroy
+  has_many :bank_accounts, as: :account_owner
   has_many :receiving_payments, as: :receiving_user, class_name: 'Payment'
   has_many :vendor_attachments
-  # todo - I2P - fix custom fields
   has_many :custom_fields, as: :parent, dependent: :destroy
-  # has_many :custom_fields, as: :document, class_name: "FormCustomField"
   has_many :form_custom_fields, class_name: 'FormCustomField', as: :document
   has_many :vendor_tds_rates, foreign_key: :vendor_id
   has_many :tds_rates, through: :vendor_tds_rates
@@ -122,6 +124,7 @@ class YesBankVendor < ApplicationRecord
 
   scope :with_ids, -> (ids) {where id: ids}
   scope :with_id, -> (ids) {where id: ids}
+  scope :with_company_id, -> (company_id) { where company_id: company_id }
 
   scope :including_bank_accounts, -> {joins(:bank_accounts)}
   scope :non_deleted, -> {where deleted_at: nil }
@@ -244,6 +247,10 @@ class YesBankVendor < ApplicationRecord
     end
   end
 
+  scope :with_status_ids, -> (id){
+    with_status_id(id)
+  }
+
   scope :filter_approved_date, -> (from, to) {
     from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
     to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
@@ -270,6 +277,7 @@ class YesBankVendor < ApplicationRecord
   end
 
   ransack_scopes :with_status_id
+  ransack_scopes :with_status_ids
 
   def display_name
     self.business_name.blank? ? self.name : self.business_name
@@ -426,7 +434,6 @@ class YesBankVendor < ApplicationRecord
     (awaiting_approval? rescue false) && user.vendor_payment_admin? && ( self.dlrms&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id rescue false)
   end
 
-  # todo - I2P : change tradename
   def name
     business_name
   end
