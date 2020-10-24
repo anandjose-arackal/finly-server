@@ -118,7 +118,7 @@ class Masters::Vendors::Form < Forms::API
   section :tax_information, title: "Tax Information & Details", associate_custom_fields: true do
     # PAN
     text :pan
-    attachment :pan_card, system_field: false
+    attachment :pan_attachment, system_field: false
     # RCM
     switch :rcm_enabled, label: "RCM Enabled"
 
@@ -253,7 +253,7 @@ class Masters::Vendors::Form < Forms::API
   end
 
   condition condition_id: "Hide PAN Attachment for International Vendors" do
-    reference :entity, :pan_card
+    reference :entity, :pan_attachment
     rule Rules::Builder[:vendor_country].not_eq(value: "India")
     action :editable, false
     action :visible, false

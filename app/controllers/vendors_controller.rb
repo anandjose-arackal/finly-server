@@ -117,8 +117,8 @@ class VendorsController < BaseControllers::WebBase
     respond
   end
 
+  # For testing in dev env
   # def penny_test
-  #   # todo - I2P - uncomment in production
   #   # @result = Vendors::Support::PennyTest.(current_user, params)
   #   bank_account_master = BankAccountMaster.find_by(account_number: params[:bank_account][:account_number], ifsc: params[:bank_account][:ifsc])
   #   data = {

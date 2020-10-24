@@ -4376,9 +4376,9 @@ Rails.application.routes.draw do
   get 'search', to: 'global_search#index'
 
 
-  # todo : I2P : For invoices
-  # resources :invoices, only: [:create, :update, :show]
-  # resources :approval_matrix, only: [:index]
+    # todo - I2P : For invoices
+    # resources :invoices, only: [:create, :update, :show]
+    # resources :approval_matrix, only: [:index]
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

@@ -154,7 +154,6 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
         visible = result['visible']
         internal = result['internal']
         if editable and visible and input.has_key?(entity.entity_key)
-          # todo - I2P - Get it verified by vivek
           if entity.entity_type == 'switch' and (input[entity.entity_key] == "" or input[entity.entity_key].nil?)
             value = FormEntity::Switch::TRUTHY_VALUES.include?(entity.default_value)
           else
