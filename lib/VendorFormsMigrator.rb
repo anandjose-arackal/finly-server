@@ -10,6 +10,8 @@
 class VendorFormsMigrator
   def self.perform
 
+    result = []
+
     # Company ID
     company_id = 2
 
@@ -90,8 +92,14 @@ class VendorFormsMigrator
           new_attachment = relevant_custom_field.attachments.new
 
           if Rails.env.production?
-            new_attachment.attachment = old_attachment.attached_file
-            new_attachment.save
+            begin
+              new_attachment.attachment = old_attachment.attached_file
+              new_attachment.save
+            rescue Paperclip::AdapterRegistry::NoHandlerError => e
+              attachment_error = "Company #{company.id} \n Document Type: #{document.class.name} \n Document ID: #{document.id} \n Attachment ID : #{old_attachment.id} \n Attachment Type: #{old_attachment.attachment_type} \n\n"
+              puts attachment_error
+              result.push(attachment_error)
+            end
           else
             file_path = Rails.root.to_s + "/public" + old_attachment.attached_file.url(:original, false)
             file = File.open(file_path) rescue nil
@@ -104,5 +112,6 @@ class VendorFormsMigrator
         end
       end
     end
+    File.open('/home/ubuntu/vendor_migration.log', 'w+') {|f| a.each {|line| f.puts(line)}}
   end
 end
