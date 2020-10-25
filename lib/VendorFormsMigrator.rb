@@ -1,5 +1,5 @@
 # RAILS_ENV=production nohup rails runner 'VendorFormsMigrator.run' --trace > vendor_forms_migration_[company_id].log 2>&1 &
-# RAILS_ENV=production nohup rails runner 'VendorFormsMigrator.run' --trace > vendor_forms_migration_2.log 2>&1 &
+# RAILS_ENV=production nohup rails runner 'VendorFormsMigrator.perform' --trace > ~/vendor_forms_migration_2.log 2>&1 &
 
 
 # Checklist:
@@ -112,6 +112,6 @@ class VendorFormsMigrator
         end
       end
     end
-    File.open('/home/ubuntu/vendor_migration.log', 'w+') {|f| a.each {|line| f.puts(line)}}
+    File.open('/home/ubuntu/vendor_migration.log', 'w+') {|f| result.each {|line| f.puts(line)}}
   end
 end
