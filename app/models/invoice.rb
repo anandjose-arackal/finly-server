@@ -151,7 +151,7 @@ class Invoice < ApplicationRecord
   include FormsHelper
   include ErpSyncable
   # include SearchIndex::Concerns::Document
-include Searchkick::Api
+  include Searchkick::Api
 
   # include EventProducer
 

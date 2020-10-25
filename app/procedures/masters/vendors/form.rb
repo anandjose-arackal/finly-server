@@ -154,6 +154,7 @@ class Masters::Vendors::Form < Forms::API
 
   section :location_details, associate_custom_fields: true do
     data_map :gstin_locations, populate_if_empty: GstinLocation, min_items: 1, associate_custom_fields: true do
+      text :location
       dropdown :state_id, required: true,
                choices_scope: Choices[:enum].(GstStateCode, name: :name)
       text :poc_name, label: "Point of Contact"
@@ -387,6 +388,14 @@ class Masters::Vendors::Form < Forms::API
 
   condition condition_id: :attachment_lower_exemption_certificate_for_indian_vendors do
     reference :entity, :lower_exception_certificate
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    action :editable, false
+    action :visible, false
+    action :required, false
+  end
+
+  condition condition_id: :tax_exemption_certificate_for_indian_vendors do
+    reference :entity, :tax_exemption_certificate
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, false
     action :visible, false
