@@ -3,6 +3,7 @@
 
 
 # Checklist:
+# [] Change Company ID Below & Deploy
 # [] Vendor Form is seeded for the company
 # [] Custom Fields are added for Vendor
 
@@ -10,7 +11,7 @@ class VendorFormsMigrator
   def self.perform
 
     # Company ID
-    company_id = 2
+    company_id = 1
 
     company = Company.find company_id
     documents = YesBankVendor.where(company_id: company.id).authorized
