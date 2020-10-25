@@ -6,8 +6,17 @@ Loader.watch! "Searchkick clear loaded models" do
     Searchkick.models << model if model.respond_to?(:searchkick_api)
   end
 end
+Loader.watch! "Create RequestStore" do
+  RequestStore.clear!
+end
+Loader.watch! "Setup Rules Predicates" do
+  Rules::Predicates.setup
+end
+Loader.watch! "Setup Transaction Contract" do
+  Reform::Form.include Transactions::Contract
+end
 Loader.watch! "Actions Manager Actions", dir: "app/concepts/action_manager/actions/**/*.rb"
-Loader.watch! "Forms Types", dir: 'app/concepts/forms/api/entity/types/**/*.rb'
+Loader.watch! "Forms Types", dir: 'app/models/form_entity/**/*.rb'
 Loader.watch! "Choices", dir: 'app/concepts/choices/builders/**/*.rb'
 
 Loader.watch! "Form Contract Transformers", dir: "app/concepts/forms/generators/contracts/entity_builder/validations/**/*.rb"
@@ -22,7 +31,7 @@ Loader.watch! "Routes Loader" do
   Routers::Registry.routers.each do |router|
     router.clear_map
   end
-  Dir.glob(Rails.root.join("app/routes/**/*.rb")).each { |f| load f }
+  Dir.glob(Rails.root.join("app/routes/**/*.rb")).each {|f| load f}
 end
 
 Loader.watch! "Bullet Train" do

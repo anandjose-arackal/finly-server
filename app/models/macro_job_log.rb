@@ -18,7 +18,7 @@ class MacroJobLog < FinlyMacrosRecord
 
   default_scope {order(created_at: :desc)}
 
-  def as_json(options={})
+  def as_json(options = {})
     {
         log_type: log_type.titleize,
         message: message,

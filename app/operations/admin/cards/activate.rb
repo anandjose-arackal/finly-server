@@ -7,7 +7,7 @@
 
 class Admin::Cards::Activate < Admin::Cards::Base
 
-  attr_accessor :old_card,:new_card
+  attr_accessor :old_card, :new_card
 
   def pre_validate
     super()
@@ -15,7 +15,7 @@ class Admin::Cards::Activate < Admin::Cards::Base
       add_message :error, "Invalid parameters"
       return
     end
-    
+
     if params.dig(:card, :old_card_id).blank? || params.dig(:card, :new_card_id).blank?
       add_message :error, "Invalid parameters"
     end
@@ -27,14 +27,14 @@ class Admin::Cards::Activate < Admin::Cards::Base
     self.new_card = card_user.cards.unscoped.find_by(id: active_params[:new_card_id])
   end
 
-  def validate 
+  def validate
   end
 
   def process
     self.old_card.update_attributes(hotlisted: true)
     self.new_card.update_attributes(
-      card_status_id: CardStatus.id_for(:assigned),
-      replaced_card_id: old_card.id
+        card_status_id: CardStatus.id_for(:assigned),
+        replaced_card_id: old_card.id
     )
   end
 
@@ -46,8 +46,9 @@ class Admin::Cards::Activate < Admin::Cards::Base
     Admin::Cards::Base::CardsPresenter.new(user, {card: self.new_card}, messages)
   end
 
-private
+  private
+
   def active_params
-    params.require(:card).permit( :old_card_id, :new_card_id )
+    params.require(:card).permit(:old_card_id, :new_card_id)
   end
 end

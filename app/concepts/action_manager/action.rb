@@ -6,7 +6,7 @@ class ActionManager::Action
 
   attr_accessor :type, :id, :path, :parent, :action_registry, :action_scopes,
                 :permissions, :label, :icon, :policy, :authorize, :features,
-                :model, :format, :action_condition
+                :model, :format, :action_condition, :toggle
 
   class_attribute :registered_type
 
@@ -93,10 +93,30 @@ class ActionManager::Action
   # end
 
   def permitted?(user)
+    return false unless feature_enabled?(user)
     return false unless feature_subscribed?(user)
     return false unless user.has_permission?(permissions)
 
     true
+  end
+
+  def feature_enabled?(user)
+    return true if toggle.blank?
+
+    toggle = self.toggle
+    toggle = {if: self.toggle} if self.toggle.is_a?(Array)
+
+    if toggle[:if].present?
+      klass, action = toggle[:if]
+      return true if klass.new(user).send(action)
+    elsif toggle[:unless].present?
+      klass, action = toggle[:unless]
+      return true unless klass.new(user).send(action)
+    else
+      raise "Invalid toggle #{self.toggle}"
+    end
+
+    false
   end
 
   def feature_subscribed?(user)

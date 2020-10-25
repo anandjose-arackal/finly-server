@@ -16,8 +16,9 @@
 #  poc_designation   :string(255)
 #  location          :string(255)
 #  address           :text(65535)
-#  gl_code           :string(255)
 #  deleted_at        :datetime
+#  gst_status        :string(255)
+#  gst_expiry_date   :date
 #
 
 require 'rails_helper'

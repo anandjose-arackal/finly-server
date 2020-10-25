@@ -75,6 +75,8 @@ class Company < ApplicationRecord
   has_many :icici_statements
   has_many :insight_dashboards
 
+  has_many :forms
+
   has_many :budget_groups
   has_many :budget_group_criteria
 
@@ -229,7 +231,7 @@ class Company < ApplicationRecord
 
   scope :with_subdomain, ->(subdomain) {find_by subdomain: subdomain}
 
-  def as_json(options={})
+  def as_json(options = {})
     {
         id: id,
         name: name,

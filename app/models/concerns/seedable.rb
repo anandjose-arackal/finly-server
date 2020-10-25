@@ -2,16 +2,27 @@ module Seedable
   extend ActiveSupport::Concern
 
   included do
-    scope :with_id, -> (id) {where id: id}
-    scope :with_name, -> (name) {where name: name}
+    scope :with_id, -> (id) { where id: id }
+    scope :with_name, -> (name) { where name: name }
 
     refresh_cache
   end
 
   class_methods do
 
+    def set_values(*values)
+      if values.present?
+        @values = values
+        @values.each do |value|
+          define_method "#{value}?" do
+            self.id == self.class.id_for(value)
+          end
+        end
+      end
+    end
+
     def values
-      []
+      @values
     end
 
     def ids_for(*keys)
@@ -22,7 +33,7 @@ module Seedable
       keys.each do |key|
         ids << id_for(key)
       end
-      ids.reject {|item| item.blank?}
+      ids.reject { |item| item.blank? }
     end
 
     def id_for(key)
@@ -82,7 +93,7 @@ module Seedable
   def self.refresh_all_caches
     Rails.application.eager_load! if Rails.env.development?
 
-    seedable_classes = ObjectSpace.each_object(Class).select {|c| c.included_modules.include?(Seedable)}
+    seedable_classes = ObjectSpace.each_object(Class).select { |c| c.included_modules.include?(Seedable) }
     values = {}
     seedable_classes.each do |seedable_class|
       seedable_class.refresh_cache

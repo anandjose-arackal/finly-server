@@ -32,7 +32,7 @@ class Admin::Implementations::Master::CustomFields::Import < Admin::Implementati
   attr_accessor :field_configuration_params, :drop_down_items, :multiselect_items
   def process
     self.drop_down_items = []
-    self.multiselect_items =[]
+    self.multiselect_items = []
     path = Rails.env.production? ? self.implementation_request.request_file&.url : self.implementation_request.request_file&.path
     self.input = Roo::Spreadsheet.open(path)
     output = {}
@@ -167,7 +167,7 @@ class Admin::Implementations::Master::CustomFields::Import < Admin::Implementati
     if field_type == FieldType.id_for(:drop_down)
       drop_down_items_attributes =[{"name"=>"Test"}]
     elsif field_type == FieldType.id_for(:multiselect)
-      multiselect_items_attributes = [{"name"=>"Test"}]
+      multiselect_items_attributes = [{"name" => "Test"}]
     end
 
     params = {
@@ -255,11 +255,11 @@ class Admin::Implementations::Master::CustomFields::Import < Admin::Implementati
     (2..sheet.last_row).each do |i|
       row = sheet.row(i)
       lower_limit = 0
-      size= row.size
+      size = row.size
       ddi = nil
       previous_field = nil
       muli_select_count = 0
-      while(lower_limit < size)
+      while (lower_limit < size)
         field_name = multiselect_items[muli_select_count][:field_name]
         field_configuration = FieldConfiguration.non_deleted.find multiselect_items[muli_select_count][:id]
 

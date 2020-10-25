@@ -1,4 +1,4 @@
-class Admin::FiltersController  < BaseControllers::AdminBase
+class Admin::FiltersController < BaseControllers::AdminBase
   layout 'trailblazers'
 
   def index
