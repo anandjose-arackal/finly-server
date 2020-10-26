@@ -93,7 +93,7 @@ class Routers::Base
     @global_options ||= []
   end
 
-  def self.context_key(value=NoObject)
+  def self.context_key(value = NoObject)
     @context_key = value unless value == NoObject
     @context_key
   end

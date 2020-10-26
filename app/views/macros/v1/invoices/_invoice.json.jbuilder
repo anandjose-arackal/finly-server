@@ -33,7 +33,7 @@ json.line_items do
   end
 end
 json.attachments do
-  json.array! record.attachments.reject { |attachment| attachment.file_file_size.nil? } do |attachment|
+  json.array! record.attachments.reject {|attachment| attachment.file_file_size.nil?} do |attachment|
     json.extract! attachment, :description
     json.file_name attachment.file_file_name
     json.file_size attachment.file_file_size

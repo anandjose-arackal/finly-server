@@ -15,8 +15,8 @@ class Admin::Masters::Macros::Jobs::Create < Admin::Transactions::API
   def run!(context, model:, params:, **)
     params[:macro_id] = params[:id]
     MacrosConnector::Run.(params: params.except(:controller, :action, :format), current_user: model.user) do |m|
-      m.success { |result| return true }
-      m.failure { |result| return on_error(context, :base, result.errors[:base]) }
+      m.success {|result| return true}
+      m.failure {|result| return on_error(context, :base, result.errors[:base])}
     end
 
     true

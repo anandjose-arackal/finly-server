@@ -156,7 +156,7 @@ class User < ApplicationRecord
 
 
   has_many :bank_accounts, as: :account_owner, dependent: :destroy
-  has_one :default_bank_account, -> { where default_account: true }, class_name: "BankAccount", as: :account_owner
+  has_one :default_bank_account, -> {where default_account: true}, class_name: "BankAccount", as: :account_owner
   has_many :authentications
   has_many :cards, dependent: :destroy
   has_many :payroll_cards, -> { where(card_program_id: CardProgram.id_for(:payroll)) }, class_name: 'Card'

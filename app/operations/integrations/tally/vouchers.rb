@@ -75,22 +75,22 @@ class Integrations::Tally::Vouchers < Integrations::Tally::Base
 
 
   def save_file(data)
-    url =""
+    url = ""
     azure_config = Rails.application.config_for(:azure_config)&.with_indifferent_access
     blob_client = Azure::Storage::Blob::BlobService.create(
         storage_account_name: azure_config["storage_account_name"],
         storage_access_key: azure_config["storage_access_key"],
     )
     container_name = azure_config["container"]
-    options = { content_type: 'application/xml', content_disposition: 'attachment;' }
+    options = {content_type: 'application/xml', content_disposition: 'attachment;'}
 
     unique_file_name = create_uniq_file_name
     full_file_path = "/tmp/#{unique_file_name}.xml"
-    file = File.open(full_file_path,'w+')
+    file = File.open(full_file_path, 'w+')
     file.write data
     file.close
 
-    options = { content_type: 'application/xml', content_disposition: "attachment; filename=#{File.basename(file)}"}
+    options = {content_type: 'application/xml', content_disposition: "attachment; filename=#{File.basename(file)}"}
 
     file = File.open(full_file_path, 'r+')
     if file

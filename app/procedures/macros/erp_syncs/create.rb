@@ -3,7 +3,7 @@ class Macros::ErpSyncs::Create < Transactions::API
   schema do
     params do
       required(:id).filled
-      required(:status).filled(inclusion?: ErpSyncStatus.values.map { |i| i.to_s })
+      required(:status).filled(inclusion?: ErpSyncStatus.values.map {|i| i.to_s})
       optional(:reference_id)
       optional(:message)
       optional(:attempted_at)

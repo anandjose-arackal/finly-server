@@ -3435,7 +3435,11 @@ Rails.application.routes.draw do
 
   get 'autocomplete/customers', to: 'invoicing/autocomplete#customer'
   get 'autocomplete/vendors', to: 'autocomplete#vendors'
-  get 'autocomplete/:entity', to: 'autocomplete#route'
+
+  # Fixme : Keeping it since its available in current version of master
+  get 'autocomplete/:entity', to: 'autocomplete#route' # Fixme Deprecated
+
+  get 'lookup/:route', to: 'lookup#route'
 
   # get 'features', to: 'static_pages#features'
 
@@ -4167,6 +4171,17 @@ Rails.application.routes.draw do
     get 'procurements', to: "vendors#procurements"
     get 'transactions', to: "vendors#transactions"
   end
+
+  # ****************************************************
+  # NEW VENDOR FORMS
+
+  # Vendor Forms API
+  post 'vendor_forms/create_and_submit', to: "vendor_forms#create_and_submit"
+  resources :vendor_forms do
+    put 'submit', to: "vendor_forms#submit"
+  end
+
+
   ######### New Vendor Empanelment Ends ##
 
 
@@ -4211,13 +4226,27 @@ Rails.application.routes.draw do
     end
   end
 
-
   # get 'form_entities', to: 'form_entities#index'
   # resources :form_entities
-  get 'forms/config/:name', to: 'forms#form_config'
-  get 'forms/config/:name/dependency', to: 'forms#form_dependency_config'
-  post 'forms/:form_name/entities/:entity_field_key/choices', to: 'forms#form_entity_choices'
+  get 'forms', to: 'forms#index'
+  get 'forms/entities/:entity_id', to: 'forms#entity_config'
+  get 'forms/:route/config', to: 'forms#form_config'
+
+  get 'forms/:route/dependencies', to: 'forms#form_dependencies'
+  post 'forms/choices', to: 'forms#form_entity_choices'
+  post 'forms/lookup_details', to: 'forms#form_lookup_details'
+  patch 'forms/:id/sync_positions', to: 'forms#sync_positions'
   resources :forms
+
+  get 'form_entities/entity_types', to: "form_entities#entity_types"
+  resources :form_entities
+
+  patch 'form_choice_dependencies/:id/enable', to: 'form_choice_dependencies#enable'
+  patch 'form_choice_dependencies/:id/disable', to: 'form_choice_dependencies#disable'
+  resources :form_choice_dependencies
+
+
+  post 'attachments/custom_field_attachment', to: 'attachments#create_custom_field_attachment'
 
   resources :insights
 
@@ -4345,6 +4374,12 @@ Rails.application.routes.draw do
 
   post 'search', to: 'global_search#create'
   get 'search', to: 'global_search#index'
+
+
+  # todo - I2P : For invoices
+  # resources :invoices, only: [:create, :update, :show]
+
+  resources :approval_matrix, only: [:index]
 
   post 'analytics/token', to: 'analytics#token'
 
