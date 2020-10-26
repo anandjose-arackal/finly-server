@@ -128,7 +128,7 @@ class AdminUser < NonTenantedApplicationRecord
     (hashed_password == password)
   end
 
-  def as_json(options={})
+  def as_json(options = {})
     {
         name: name,
         email: email

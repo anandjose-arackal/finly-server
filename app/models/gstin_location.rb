@@ -16,8 +16,9 @@
 #  poc_designation   :string(255)
 #  location          :string(255)
 #  address           :text(65535)
-#  gl_code           :string(255)
 #  deleted_at        :datetime
+#  gst_status        :string(255)
+#  gst_expiry_date   :date
 #
 
 class GstinLocation < ApplicationRecord
@@ -29,9 +30,13 @@ class GstinLocation < ApplicationRecord
   belongs_to :gstin_master, class_name: "Gstin", foreign_key: :gstin_id, optional: true
   belongs_to :state, class_name: "GstStateCode", optional: true
 
+  has_many :form_custom_fields, class_name: 'FormCustomField', as: :document
+
   # validates :location, presence: true
-  validates :state_id, presence: true, if: :check_vendor_gstin_registered?
+  # validates :state_id, presence: true, if: :check_vendor_gstin_registered? # todo - I2P : move logic to operations
   validates :gstin, format: Constants::VALID_GSTIN, length: {is: 15}, allow_blank: true
+
+  serialize :gstin_fetch_details, JSON
 
   def state_code
     self.state&.state_code
@@ -39,18 +44,18 @@ class GstinLocation < ApplicationRecord
 
   # belongs_to :location, class_name: "BranchLocation", optional: true
 
-  def as_json(options={})
+  def as_json(options = {})
     {
-      id: self.id,
-      location: self.location,
-      gstin: self.gstin,
-      address: self.address,
-      state: self.state,
-      poc: {
-          name: poc_name,
-          email: poc_email,
-          mobile_number: poc_mobile_number
-      }
+        id: self.id,
+        location: self.location,
+        gstin: self.gstin,
+        address: self.address,
+        state: self.state,
+        poc: {
+            name: poc_name,
+            email: poc_email,
+            mobile_number: poc_mobile_number
+        }
     }
   end
 

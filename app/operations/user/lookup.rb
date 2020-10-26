@@ -36,7 +36,7 @@ class User::Lookup < User::Base
         self.default_password = true
       end
       if selected_user[:active]
-           self.registered = true
+        self.registered = true
       else
         add_message :error, 'Your account has been deactivated'
         self.registered = false

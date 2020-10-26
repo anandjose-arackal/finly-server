@@ -37,7 +37,7 @@ class Rules::Adapters::JSONLogic
       if func[:value].present?
         return func[:value].to_s.strip
       else
-        var = (func[:formula] || func[:entity]).to_s
+        var = (func[:formula] || func[:entity] || func[:name]).to_s
         var = "form.#{var}".strip unless var.start_with?('form.') or var.start_with?('row.')
         return {var: var}.as_json
       end

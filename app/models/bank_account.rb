@@ -38,13 +38,15 @@ class BankAccount < ApplicationRecord
 
   has_many :receiving_payments, as: :receiving_account, class_name: "Payment"
   has_many :finly_transactions, as: :finly_account
+
+  has_many :form_custom_fields, class_name: 'FormCustomField', as: :document
   # belongs_to :company_id
 
   attr_accessor :confirm_account_number
 
 
   validates :account_number, presence: true, format: Constants::VALID_BANK_ACCOUNT
-  validates :ifsc, presence: true, format: Constants::VALID_IFSC
+  validates :ifsc, format: Constants::VALID_IFSC, allow_blank: true
   validates :name, presence: true
   # validates :company_id, presence: true
   validate :valid_bank_account
@@ -112,7 +114,7 @@ class BankAccount < ApplicationRecord
   }
 
   before_save do
-    self.ifsc = self.ifsc.match(Constants::VALID_IFSC).to_s
+    self.ifsc = self.ifsc.match(Constants::VALID_IFSC).to_s if self.ifsc.present?
     self.account_number = self.account_number&.strip
   end
 

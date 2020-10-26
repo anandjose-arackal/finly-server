@@ -1,5 +1,16 @@
 class Forms::TestInvoiceForm < Forms::API
 
+  model Invoice
+  section :header do
+
+  end
+
+  section :line_items do
+    table :line_items do
+
+    end
+  end
+
   # model Invoice
   # section :header do
   #   auto_number :invoice_id, prefix: "INV/{{\"now\" | date: \"%y-%m\" }}/", start_at: '000001', required: true
@@ -19,7 +30,7 @@ class Forms::TestInvoiceForm < Forms::API
   #
   # section :line_items do
   #   collection :line_items do
-  #     text :item_description, hint: "Please enter the name of the field", char_limit: 255
+  #     text :item_description, hint: "Please enter the name of the field", maximum: 255
   #     dropdown :status_id, scope: Choicess::List({value: 1, name: 'Approved'}, {value: 2, name: 'Pending'})
   #     dropdown :department_id, scope: Choicess::AutoComplete('departments', filters: {})
   #     dropdown :location_id, scope: Choicess::AutoComplete('locations', filters: {})

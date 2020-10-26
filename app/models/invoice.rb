@@ -2,117 +2,145 @@
 #
 # Table name: invoices
 #
-#  id                              :integer          not null, primary key
-#  address_id                      :integer
-#  date                            :date
-#  due_date                        :date
-#  invoice_number                  :text(65535)
-#  tax_type_id                     :integer
-#  discount                        :decimal(64, 12)
-#  discount_type_id                :integer
-#  created_at                      :datetime         not null
-#  updated_at                      :datetime         not null
-#  gross_amount_id                 :integer
-#  net_amount_id                   :integer
-#  inclusive_of_taxes              :boolean
-#  amount_id                       :integer
-#  tds                             :decimal(64, 12)
-#  tds_type_id                     :integer
-#  gst_type_id                     :integer
-#  payment_id                      :integer
-#  discount_amount_id              :integer
-#  tds_amount_id                   :integer
-#  tax_amount_id                   :integer
-#  tax                             :decimal(64, 12)
-#  category_id                     :integer
-#  original_amount_id              :integer
-#  advance_amount_id               :integer
-#  advance_type_id                 :integer
-#  advance                         :decimal(20, 10)
-#  freight_amount_id               :integer
-#  freight_type_id                 :integer
-#  freight                         :decimal(20, 10)
-#  roundoff_amount                 :decimal(20, 10)
-#  balance_due_id                  :integer
-#  taxable_amount_id               :integer
-#  cost_center_id                  :integer
-#  tds_slab_id                     :integer
-#  invoice_status_id               :integer
-#  company_id                      :integer
-#  created_by_user_id              :integer
-#  paid_amount_id                  :integer
-#  vendor_id                       :integer
-#  receiving_account_id            :integer
-#  receiving_account_type          :string(255)
-#  note                            :text(65535)
-#  procurement_id                  :integer
-#  remaining_amount_id             :integer
-#  invoice_type_id                 :integer
-#  location_id                     :integer
-#  delivery_location_id            :integer
-#  payment_term_id                 :integer
-#  department_id                   :integer
-#  sub_department_id               :integer
-#  policy_id                       :integer
-#  controlling_level_id            :integer
-#  controlling_user_id             :integer
-#  controlling_user_role_id        :integer
-#  controlling_for_user_id         :integer
-#  controlling_for_user_role_id    :integer
-#  billing_address                 :text(65535)
-#  shipping_address                :text(65535)
-#  is_template                     :boolean          default(FALSE)
-#  template_name                   :string(255)
-#  is_deleted                      :boolean          default(FALSE)
-#  resource_template_id            :integer
-#  invoice_id                      :string(255)
-#  deleted_at                      :datetime
-#  submitted_at                    :datetime
-#  approved_at                     :datetime
-#  po_adjusted_advance             :integer
-#  po_advance                      :decimal(20, 2)
-#  po_prev_adjusted_advance        :decimal(20, 2)
-#  advance_amount_required         :boolean          default(FALSE)
-#  gstin_location_id               :bigint
-#  transaction_service_period_from :date
-#  transaction_service_period_to   :date
-#  proforma_invoice_id             :integer
-#  proforma_advance                :integer
-#  total_proforma_advance          :decimal(20, 2)
-#  cost_allocation_items           :boolean          default(FALSE)
-#  narration                       :text(65535)
-#  po_number                       :string(255)
-#  bank_account_id                 :integer
-#  rejection_note                  :text(65535)
-#  payment_agreement_id            :integer
-#  vendor_location_id              :integer
-#  billing_type_id                 :integer
-#  agreement_item_type             :string(255)
-#  agreement_item_id               :integer
-#  vendor_poc_id                   :integer
-#  vlpm_id                         :integer
-#  client_note                     :text(65535)
-#  payable                         :boolean          default(FALSE)
-#  cn_adjusted_amount_id           :integer
-#  rcm_enabled                     :boolean          default(FALSE)
-#  tds_percentage                  :decimal(20, 5)
-#  gross_amount                    :decimal(20, 10)
-#  discount_amount                 :decimal(20, 10)
-#  freight_amount                  :decimal(20, 10)
-#  tax_amount                      :decimal(20, 10)
-#  tds_amount                      :decimal(20, 10)
-#  net_amount                      :decimal(20, 10)
-#  po_advance_amount               :decimal(20, 10)
-#  advance_paid_amount             :decimal(20, 10)
-#  total_paid_amount               :decimal(20, 10)
-#  balance_due_amount              :decimal(20, 10)
-#  currency_code                   :string(255)
-#  taxable_amount                  :decimal(20, 10)
-#  erp_sync_status_id              :integer
-#  erp_sync_message                :string(255)
-#  erp_sync_reference_id           :string(255)
-#  erp_sync_attempts_count         :integer
-#  erp_sync_attempted_at           :datetime
+#  id                                    :integer          not null, primary key
+#  address_id                            :integer
+#  date                                  :date
+#  due_date                              :date
+#  invoice_number                        :text(65535)
+#  tax_type_id                           :integer
+#  discount                              :decimal(64, 12)
+#  discount_type_id                      :integer
+#  created_at                            :datetime         not null
+#  updated_at                            :datetime         not null
+#  gross_amount_id                       :integer
+#  net_amount_id                         :integer
+#  inclusive_of_taxes                    :boolean
+#  amount_id                             :integer
+#  tds                                   :decimal(64, 12)
+#  tds_type_id                           :integer
+#  gst_type_id                           :integer
+#  payment_id                            :integer
+#  discount_amount_id                    :integer
+#  tds_amount_id                         :integer
+#  tax_amount_id                         :integer
+#  tax                                   :decimal(64, 12)
+#  category_id                           :integer
+#  original_amount_id                    :integer
+#  advance_amount_id                     :integer
+#  advance_type_id                       :integer
+#  advance                               :decimal(20, 10)
+#  freight_amount_id                     :integer
+#  freight_type_id                       :integer
+#  freight                               :decimal(20, 10)
+#  roundoff_amount                       :decimal(20, 10)
+#  balance_due_id                        :integer
+#  taxable_amount_id                     :integer
+#  cost_center_id                        :integer
+#  tds_slab_id                           :integer
+#  invoice_status_id                     :integer
+#  company_id                            :integer
+#  created_by_user_id                    :integer
+#  paid_amount_id                        :integer
+#  vendor_id                             :integer
+#  receiving_account_id                  :integer
+#  receiving_account_type                :string(255)
+#  note                                  :text(65535)
+#  procurement_id                        :integer
+#  remaining_amount_id                   :integer
+#  invoice_type_id                       :integer
+#  location_id                           :integer
+#  delivery_location_id                  :integer
+#  payment_term_id                       :integer
+#  department_id                         :integer
+#  sub_department_id                     :integer
+#  policy_id                             :integer
+#  controlling_level_id                  :integer
+#  controlling_user_id                   :integer
+#  controlling_user_role_id              :integer
+#  controlling_for_user_id               :integer
+#  controlling_for_user_role_id          :integer
+#  billing_address                       :text(65535)
+#  shipping_address                      :text(65535)
+#  is_template                           :boolean          default(FALSE)
+#  template_name                         :string(255)
+#  is_deleted                            :boolean          default(FALSE)
+#  resource_template_id                  :integer
+#  invoice_id                            :string(255)
+#  deleted_at                            :datetime
+#  submitted_at                          :datetime
+#  approved_at                           :datetime
+#  po_adjusted_advance                   :integer
+#  po_advance                            :decimal(20, 2)
+#  po_prev_adjusted_advance              :decimal(20, 2)
+#  advance_amount_required               :boolean          default(FALSE)
+#  gstin_location_id                     :bigint
+#  transaction_service_period_from       :date
+#  transaction_service_period_to         :date
+#  proforma_invoice_id                   :integer
+#  proforma_advance                      :integer
+#  total_proforma_advance                :decimal(20, 2)
+#  cost_allocation_items                 :boolean          default(FALSE)
+#  po_number                             :string(255)
+#  narration                             :text(65535)
+#  bank_account_id                       :integer
+#  rejection_note                        :text(65535)
+#  payment_agreement_id                  :integer
+#  vendor_location_id                    :integer
+#  billing_type_id                       :integer
+#  agreement_item_type                   :string(255)
+#  agreement_item_id                     :integer
+#  vendor_poc_id                         :integer
+#  vlpm_id                               :integer
+#  client_note                           :text(65535)
+#  payable                               :boolean          default(FALSE)
+#  cn_adjusted_amount_id                 :integer
+#  rcm_enabled                           :boolean          default(FALSE)
+#  tds_percentage                        :decimal(20, 5)
+#  gross_amount                          :decimal(20, 10)
+#  discount_amount                       :decimal(20, 10)
+#  freight_amount                        :decimal(20, 10)
+#  taxable_amount                        :decimal(20, 10)
+#  tax_amount                            :decimal(20, 10)
+#  tds_amount                            :decimal(20, 10)
+#  net_amount                            :decimal(20, 10)
+#  po_advance_amount                     :decimal(20, 10)
+#  advance_paid_amount                   :decimal(20, 10)
+#  total_paid_amount                     :decimal(20, 10)
+#  balance_due_amount                    :decimal(20, 10)
+#  currency_code                         :string(255)
+#  vendor_sequence_id                    :string(255)
+#  vendor_trade_name                     :string(255)
+#  vendor_gstin                          :string(255)
+#  vendor_pan                            :string(255)
+#  vendor_bank_account_number            :string(255)
+#  vendor_bank_account_ifsc              :string(255)
+#  invoice_gross_amount                  :decimal(20, 5)
+#  invoice_discount_amount               :decimal(20, 5)
+#  invoice_tax_amount                    :decimal(20, 5)
+#  invoice_tds_amount                    :decimal(20, 5)
+#  invoice_paid_outside_amount           :decimal(20, 5)
+#  invoice_sub_total_amount              :decimal(20, 5)
+#  invoice_total_amount                  :decimal(20, 5)
+#  base_currency                         :string(255)
+#  reporting_currency                    :string(255)
+#  invoice_taxable_amount                :decimal(20, 5)
+#  invoice_freight_amount                :decimal(20, 5)
+#  invoice_roundoff_amount               :decimal(20, 5)
+#  invoice_balance_due                   :decimal(20, 5)
+#  invoice_gross_amount_converted        :decimal(20, 5)
+#  invoice_discount_amount_converted     :decimal(20, 5)
+#  invoice_taxable_amount_converted      :decimal(20, 5)
+#  invoice_tax_amount_converted          :decimal(20, 5)
+#  invoice_tds_amount_converted          :decimal(20, 5)
+#  invoice_freight_amount_converted      :decimal(20, 5)
+#  invoice_sub_total_amount_converted    :decimal(20, 5)
+#  invoice_roundoff_amount_converted     :decimal(20, 5)
+#  invoice_total_amount_converted        :decimal(20, 5)
+#  invoice_paid_outside_amount_converted :decimal(20, 5)
+#  invoice_balance_due_converted         :decimal(20, 5)
+#  conversion_date                       :date
+#  conversion_rate                       :decimal(10, 5)
+#  retrieve_conversion_rate              :boolean          default(TRUE)
 #
 
 class Invoice < ApplicationRecord
@@ -120,14 +148,18 @@ class Invoice < ApplicationRecord
   include LiquidDroppable
   include Exposures::Model::Exposable
   include Sequenced::ActsAsSequenced
+  include FormsHelper
   include ErpSyncable
-  include SearchIndex::Concerns::Document
+  # include SearchIndex::Concerns::Document
+  include Searchkick::Api
 
   # include EventProducer
 
   acts_as_sequenced column: :invoice_id, purpose: :invoice, editable: false, prefix: 'INV'
 
   belongs_to :address, optional: true
+  # #### Fixme: These associations are deprecated to support amount number fields with the same name.
+  # #### Fixme: This can be cleared once this has been deployed to production
   belongs_to :amount, optional: true
   belongs_to :gross_amount, optional: true, class_name: "Amount"
   belongs_to :net_amount, optional: true, class_name: "Amount"
@@ -140,11 +172,12 @@ class Invoice < ApplicationRecord
   belongs_to :balance_due, optional: true, class_name: "Amount"
   belongs_to :taxable_amount, optional: true, class_name: "Amount"
   belongs_to :paid_amount, optional: true, class_name: "Amount"
-
+  #
   # Captures PO advance if any and how much is adjusted in the tax invoice
   # belongs_to :po_prev_adjusted_advance, optional: true, class_name: "Amount", foreign_key: :po_prev_adjusted_advance
   belongs_to :po_adjusted_advance, optional: true, class_name: "Amount", foreign_key: :po_adjusted_advance
   belongs_to :proforma_advance, optional: true, class_name: "Amount", foreign_key: :proforma_advance
+  # #### Fixme: END
 
   belongs_to :category, optional: true
   belongs_to :cost_center, optional: true
@@ -190,11 +223,16 @@ class Invoice < ApplicationRecord
   has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
   has_many :items, class_name: "InvoiceLineItem", as: :parent
   has_many :line_items, class_name: "InvoiceLineItem", as: :parent
+  # Standardizing where all attachments are stored
   has_many :invoice_attachments
 
   # Attachments created for procurement
   has_many :attachments, class_name: 'ProcurementAttachment', as: :procurement_document
+  # Fixme: Migration of all invoice_attachment to attachments is still pending
+  # Fixme: Need to check where the previous attachments was being used as this is overriding it
+  # has_many :attachments, as: :resource # todo - I2P
   has_many :custom_fields, as: :parent, dependent: :destroy
+  has_many :form_custom_fields, class_name: 'FormCustomField', as: :document, dependent: :destroy
 
   # From Procurement workflow
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
@@ -309,6 +347,10 @@ class Invoice < ApplicationRecord
     else
       where(invoice_status_id: status_id)
     end
+  }
+
+  scope :with_status_ids, -> (status_id) {
+    with_status_id(status_id)
   }
 
   scope :filter_payable_invoices, -> (enabled) {
@@ -637,6 +679,7 @@ class Invoice < ApplicationRecord
   end
 
   ransack_scopes :with_status_id
+  ransack_scopes :with_status_ids
 
   def policy
     return super if self.policy_id.present?

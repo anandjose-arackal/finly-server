@@ -35,7 +35,8 @@ class Admin::Companies::Base < Admin::Base
                                       :agreement_based_payment_system,
                                       :gstin_verification_enabled,
                                       :utility_bills_enabled,
-                                      :analytics_system
+                                      :analytics_system,
+                                      :enforce_budget_limit
     ])
   end
 

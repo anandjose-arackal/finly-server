@@ -28,8 +28,11 @@ class Currency < NonTenantedApplicationRecord
   end
 
   def as_json(options = {})
+      name = self.country_code
+      name = "#{name} (#{symbol})" unless symbol.blank?
     {
         id: self.id,
+        name: name,
         country: self.country,
         country_code: self.country_code,
         symbol: self.symbol

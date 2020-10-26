@@ -6,8 +6,8 @@ class Menu::Masters::Procurement < Menu::API
 
   app :vp
 
-  # item :global_search, label: "Search (Alt+/)", icon: 'https://img.icons8.com/windows/20/ffffff/search.png',
-  #      toggle: [GlobalSearchToggle, :enabled?]
+  item :global_search, label: "Search (Alt+/)", icon: 'https://img.icons8.com/windows/20/ffffff/search.png',
+       toggle: [GlobalSearchToggle, :enabled?]
   item :create, icon: 'https://img.icons8.com/windows/20/ffffff/plus-math.png' do
     action :redirect,
            :new_purchase_request,
@@ -54,10 +54,19 @@ class Menu::Masters::Procurement < Menu::API
     action :redirect,
            :new_vendor,
            permissions: [:vendor_creator, :vendor_manager],
+           toggle: {unless: [VendorToggle, :forms_enabled?]},
            policy: ::Masters::Vendors::Policy,
            model: ::YesBankVendor,
            label: 'New Vendor',
            url: 'vendor/add'
+
+    action :redirect,
+           :new_vendor_form,
+           permissions: [:vendor_creator, :vendor_manager],
+           toggle: {if: [VendorToggle, :forms_enabled?]},
+           model: ::YesBankVendor,
+           label: 'New Vendor',
+           url: 'vendors/add'
   end
 
   item :dashboard, icon: 'https://img.icons8.com/windows/20/ffffff/speed.png'

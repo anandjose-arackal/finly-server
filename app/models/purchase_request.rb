@@ -27,7 +27,8 @@
 class PurchaseRequest < ApplicationRecord
   include Transitionable, CustomFieldFilterSupport
   include Sequenced::ActsAsSequenced
-  include SearchIndex::Concerns::Document
+  # include SearchIndex::Concerns::Document
+include Searchkick::Api
 
 
   acts_as_sequenced column: :order_number, purpose: :purchase_request, editable: false, prefix: 'PR'

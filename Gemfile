@@ -156,6 +156,7 @@ gem 'bootstrap-will_paginate', '~> 1.0'
 # gem for image manipulation
 gem 'paperclip', '~> 6.1.0'
 gem 'paperclip-azure', '~> 1.0'
+gem 'active_storage_validations', '~> 0.9.0'
 # Bundle for Bootstrap
 gem 'bootstrap-sass', '~> 3.4.0'
 
@@ -198,8 +199,6 @@ gem 'devise', '~> 4.7'
 gem 'devise_invitable', '~> 2.0', '>= 2.0.2'
 gem 'doorkeeper', '~> 5.0.2'
 
-gem 'meilisearch', '~> 0.13'
-
 gem 'faraday', '~> 0.15.4'
 gem 'faraday_middleware', '~> 0.12.2'
 
@@ -228,6 +227,7 @@ gem 'aasm', '~> 5.0.1'
 gem 'activerecord-import', '~> 1.0', '>= 1.0.3'
 gem 'parallel', '~> 1.18'
 gem 'string_pattern', '~> 2.2', '>= 2.2.1'
+gem 'image_processing', '~> 1.2'
 # gem 'bullet-train-client', '~> 1.1'
 # gem 'slackistrano'
 
@@ -240,9 +240,16 @@ gem 'awesome_print', '~> 1.8.0'
 
 # Fuzzy String Match
 gem 'fuzzy-string-match', '1.0.1'
-
 # gem that schedules cron jobs for us
-gem 'whenever'
+gem 'whenever', '~> 1.0'
+
+# Elasticsearch
+gem 'searchkick', '~> 4.4'
+gem 'typhoeus', '~> 1.4'
+
+gem 'json_logic', '~> 0.4'
+gem 'kalc'
+gem 'wit', '~> 6.0'
 
 # gem for all azure services
 gem 'azure'
@@ -274,7 +281,7 @@ group :development, :test do
   gem 'stackprof', '~> 0.2.12' # ruby 2.1+ only
   # gem 'memory_profiler', '~> 0.9.12'
   gem 'brakeman'
-  # gem 'active_record_query_trace', '~> 1.5.4'
+  gem 'active_record_query_trace', '~> 1.5.4'
   # gem 'better_errors'
   # gem 'binding_of_caller'
 

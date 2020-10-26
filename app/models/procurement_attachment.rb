@@ -21,7 +21,7 @@
 
 class ProcurementAttachment < ApplicationRecord
   include Attachable
-
+  include ActiveStorageSync
   belongs_to :procurement_document, optional: true, polymorphic: true
   belongs_to :company, optional: true
   belongs_to :user, optional: true

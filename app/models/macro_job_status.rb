@@ -16,7 +16,7 @@ class MacroJobStatus < NonTentantedFinlyMacrosRecord
     [:in_progress, :completed, :failed]
   end
 
-  def as_json(options={})
+  def as_json(options = {})
     {
         id: id,
         name: name.titleize

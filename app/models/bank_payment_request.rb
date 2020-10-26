@@ -46,7 +46,8 @@ class BankPaymentRequest < ApplicationRecord
           CustomFieldFilterSupport
   include LiquidDroppable
   include Exposures::Model::Exposable
-  include SearchIndex::Concerns::Document
+  include Searchkick::Api
+  # include SearchIndex::Concerns::Document
 
 
   belongs_to :status, optional: true, class_name: "BankPaymentRequestStatus"
@@ -417,6 +418,10 @@ class BankPaymentRequest < ApplicationRecord
     end
   }
 
+  scope :with_status_ids, -> (status_id) {
+    with_status_id(status_id)
+  }
+
   attr_accessor :cache_users
 
   before_save do
@@ -428,6 +433,7 @@ class BankPaymentRequest < ApplicationRecord
   before_save :add_company
 
   ransack_scopes :with_status_id
+  ransack_scopes :with_status_ids
 
   def can_submit?
     open? || retracted? || rejected?

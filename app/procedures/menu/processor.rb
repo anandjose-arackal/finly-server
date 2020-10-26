@@ -27,7 +27,7 @@ class Menu::Processor < Transactions::API
       return true
     end
 
-    Messages::AddSchema(context, context.errors)
+    Messages::AddSchema(context, result.errors)
     false
   end
 

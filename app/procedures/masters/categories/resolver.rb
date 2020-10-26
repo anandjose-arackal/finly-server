@@ -4,9 +4,9 @@ class Masters::Categories::Resolver < Resolver::API
 
   def load(params)
     categories = user.company.categories
-    if app == :em
+    if app.to_s == 'em'
       return categories.expense_management_only
-    elsif app == :vp
+    elsif app.to_s == 'vp'
       return categories.vendor_payments_only
     end
     Category.none

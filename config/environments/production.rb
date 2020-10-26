@@ -29,15 +29,6 @@ Rails.application.configure do
   redis_config = Rails.application.config_for(:redis_config)&.with_indifferent_access
   config.redis = Redis.new(redis_config.slice('url', 'password'))
 
-  meilisearch_config = Rails.application.config_for(:meilisearch)&.with_indifferent_access
-  if meilisearch_config['enabled']
-    config.meilisearch = MeiliSearch::Client.new(meilisearch_config['url'], meilisearch_config['api_key'])
-    config.meilisearch_index_prefix = meilisearch_config['index_prefix']
-    config.meilisearch_monitor = true
-  else
-    config.meilisearch = nil
-  end
-
   config.lograge.enabled = true
   # config.lograge.keep_original_rails_log = true
   config.lograge.logger = ActiveSupport::Logger.new "#{Rails.root}/log/logstash_#{Rails.env}.log"
@@ -116,7 +107,7 @@ Rails.application.configure do
   # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for NGINX
 
   # Store uploaded files on the local file system (see config/storage.yml for options)
-  config.active_storage.service = :local
+  config.active_storage.service = :microsoft
 
   # Mount Action Cable outside main process or domain
   # config.action_cable.mount_path = nil

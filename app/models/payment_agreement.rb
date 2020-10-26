@@ -37,7 +37,8 @@ class PaymentAgreement < ApplicationRecord
 
   include Transitionable, SoftDeletable
   include Sequenced::ActsAsSequenced
-  include SearchIndex::Concerns::Document
+  # include SearchIndex::Concerns::Document
+include Searchkick::Api
 
   event_channel 'agreements'
 
@@ -304,8 +305,12 @@ class PaymentAgreement < ApplicationRecord
       where(status_id: status_id)
     end
   }
+  scope :with_status_ids, -> (status_id) {
+    with_status_id(status_id)
+  }
 
   ransack_scopes :with_status_id
+  ransack_scopes :with_status_ids
 
   def as_json(options={})
     {
