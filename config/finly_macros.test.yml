@@ -1,3 +1,5 @@
+# This file will be copied to finly_macros.yml while running test in gitlab-ci
+
 development:
   inbound:
     ip_address: "0.0.0.0"

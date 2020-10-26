@@ -18,20 +18,44 @@ rspec:
     # Configure mysql service (https://hub.docker.com/_/mysql/)
     MYSQL_DATABASE: finly_test
     MYSQL_ROOT_PASSWORD: admin123
-  # cache:
-  #   key: one-key-to-rule-them-all
   before_script:
     - apt-get update
-    - gem install bundler --no-document
     - apt-get install -y nodejs default-mysql-client
-    - cp config/database.test.yml config/database.yml
-    - cp config/finly_macros.test.yml config/finly_macros.yml
-    - touch config/aws_config.yml config/azure_config.yml config/bbps_config.yml config/hutch.yml config/insights_config.yml config/integrations.yml config/mailer_config.yml config/redis_config.yml config/sidekiq.yml config/web_client.yml config/yes_bank_config.yml config/feature_flipper.yml config/meilisearch.yml config/posthog.yml
-    - sed -i 's/utf8mb4/utf8/g' db/schema.rb
-    - sed -i 's/utf8_0900_ai_ci/utf8_unicode_ci/g' db/schema.rb
+    - gem install bundler --no-document
     - mysql --version
     - ruby -v
     - which ruby
+
+    # Copy config files for test
+    - cp config/database.test.yml config/database.yml
+    - cp config/finly_macros.test.yml config/finly_macros.yml
+
+    # Create empty config files
+    - touch config/aws_config.yml
+    - touch config/azure_config.yml
+    - touch config/bbps_config.yml
+    - touch config/feature_flipper.yml
+    - touch config/hutch.yml
+    - touch config/insights_config.yml
+    - touch config/integrations.ym
+    - touch config/mailer_config.yml
+    - touch config/meilisearch.yml
+    - touch config/posthog.yml
+    - touch config/redis_config.yml
+    - touch config/searchkick.yml
+    - touch config/sidekiq.yml
+    - touch config/web_client.yml
+    - touch config/yes_bank_config.yml
+
+    # Fix utf8 - mysql - schema confilicts
+    - sed -i 's/utf8mb4/utf8/g' db/schema.rb
+    - sed -i 's/utf8_0900_ai_ci/utf8_unicode_ci/g' db/schema.rb
+
+    # Change git protocol to https to fetch private repo
+    - sed -i 's/git@gitlab.com:finlycore/https:\/\/gitlab.com\/finlycore/g' Gemfile
+    - sed -i 's/git@gitlab.com:finlycore/https:\/\/gitlab.com\/finlycore/g' Gemfile.lock
+
+    # Change gitlab token to fetch private repo
     - bundle config gitlab.com "$GITLAB_USERNAME:$GITLAB_TOKEN"
     - bundle install --jobs $(nproc) "${FLAGS[@]}"
   script:
