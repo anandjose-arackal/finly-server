@@ -20,9 +20,9 @@
 class FormEntityChoice < ApplicationRecord
   include SoftDeletable, UUIDHelper
 
-  belongs_to :company
-  belongs_to :form
-  belongs_to :form_section
+  belongs_to :company, optional: true
+  belongs_to :form, optional: true
+  belongs_to :form_section, optional: true
   belongs_to :form_entity
   belongs_to :created_by_user, class_name: 'User', optional: true
 
@@ -30,7 +30,7 @@ class FormEntityChoice < ApplicationRecord
     {
         id: uuid,
         name: name,
-        # position: position,
+        position: position,
         # active: active,
     }
   end

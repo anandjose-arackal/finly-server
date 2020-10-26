@@ -31,24 +31,35 @@ module ActiveStorageSync
         next
       end
       if Rails.env.production?
-        tempfile = open(URI.parse(URI.escape(send("#{picture_type}").send('url'))))
+        tempfile = open(URI.parse(URI.escape(send("#{picture_type}").send('url')))) rescue nil
         #azure_config = Rails.application.config_for(:azure_config)&.with_indifferent_access
         #tempfile = open(URI.parse(URI.escape("https://#{azure_config["storage_account_name"]}.blob.core.windows.net/#{azure_config["container"]}/" + key(picture_type.to_s))))
       else
-        tempfile = open(send("#{picture_type}").send('path'))
+        tempfile = open(send("#{picture_type}").send('path')) rescue nil
+      end
+      if tempfile.nil?
+        Rails.logger.error("Paperclip Url is invalid for attachment id: #{self.id}")
+        Raven.capture_exception("Paperclip Url is invalid for attachment id: #{self.id}")
+        next
       end
       ActiveRecord::Base.transaction do
-        blob = ActiveStorage::Blob.create_after_upload!(
+        begin
+          blob = ActiveStorage::Blob.create_after_upload!(
             io: tempfile,
             filename: send("#{picture_type}_file_name"),
             content_type: send("#{picture_type}_content_type")
-        )
+          )
 
-        blob.attachments.create(
+          blob.attachments.create(
             name: picture_type.to_s,
             record_type: self.class.name,
             record_id: id
-        )
+          )
+        rescue => e
+          Rails.logger.error("Azure blob failed to create for id: #{self.id}  due to #{e}")
+          Raven.capture_exception("Azure blob failed to create for id: #{self.id}  due to #{e}")
+          next
+        end
       end
       clear_attribute_changes(["#{picture_type}_updated_at"])
     end

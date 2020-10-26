@@ -49,7 +49,7 @@ class Rules::Adapters::Ransack
         values_hash[index.to_s] = {value: value}
         raw_value << value
       }
-      json = {logic_type: 'condition', a: {'0': {name: rule.attribute[:entity], ransacker_args: {filter_id: rule.attribute[:entity]}}}, p: operator, v: values_hash, raw_value: raw_value}
+      json = {logic_type: 'condition', a: {'0': {name: rule.attribute[:name], ransacker_args: {filter_id: rule.attribute[:name]}}}, p: operator, v: values_hash, raw_value: raw_value}
 
       # Fixme: FE is currently build to parse auto_complete keyword, hence maintaining it here
       if rule.meta.present?

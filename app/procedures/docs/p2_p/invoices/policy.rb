@@ -1,5 +1,17 @@
 class Docs::P2P::Invoices::Policy < ApplicationPolicy
 
+  def create?
+    user.present?
+  end
+
+  def show?
+    user.present?
+  end
+
+  def update?
+    user.present?
+  end
+
   def review?
     return false if user.blank?
 

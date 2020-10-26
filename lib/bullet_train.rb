@@ -161,6 +161,6 @@ class BulletTrain
   end
 
   def self.api_url
-    ENV.fetch('BULLETTRAIN_URL') { 'https://api.bullet-train.io/api/v1/' }
+    ENV.fetch('BULLETTRAIN_URL') {'https://api.bullet-train.io/api/v1/'}
   end
 end

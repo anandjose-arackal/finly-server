@@ -18,6 +18,7 @@ class VendorsController < BaseControllers::WebBase
     respond
   end
 
+
   def procurements
     @result = Vendors::Support::Procurements.(current_user, params)
     respond
@@ -42,6 +43,7 @@ class VendorsController < BaseControllers::WebBase
     @result = Vendors::CreateAndSubmit.(current_user, params)
     respond
   end
+
 
   def update
     @result = Vendors::Update.(current_user, params)
@@ -115,6 +117,20 @@ class VendorsController < BaseControllers::WebBase
     respond
   end
 
+  # For testing in dev env
+  # def penny_test
+  #   # @result = Vendors::Support::PennyTest.(current_user, params)
+  #   bank_account_master = BankAccountMaster.find_by(account_number: params[:bank_account][:account_number], ifsc: params[:bank_account][:ifsc])
+  #   data = {
+  #       bank_account_master: bank_account_master.as_json,
+  #       card_id: params[:card_id],
+  #       success: bank_account_master.present? ? true : false
+  #   }
+  #   respond_to do |format|
+  #     format.json {render json: data.as_json}
+  #   end
+  # end
+
   def validate_gstin
     @result = Vendors::Support::ValidateGstin.(current_user, params)
     respond
@@ -134,4 +150,12 @@ class VendorsController < BaseControllers::WebBase
     @result = Vendors::Exports::Generate.(current_user, params)
     respond
   end
+
+    # def resolve_layout
+    #   if ["create", "update"].include?(action_name)
+    #     'trailblazers'
+    #   else
+    #     'application'
+    #   end
+    # end
 end

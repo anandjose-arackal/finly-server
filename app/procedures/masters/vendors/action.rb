@@ -44,8 +44,18 @@ class Masters::Vendors::Action < ActionManager::API
            route: "vendors.index"
 
     action :redirect,
+           :create_form,
+           permissions: [:vendor_creator, :vendor_manager],
+           toggle: {if: [VendorToggle, :forms_enabled?]},
+           format: 'primary',
+           label: 'Add Vendor',
+           icon: 'https://img.icons8.com/windows/17/708090/--checkmark-yes.png',
+           url: 'vendors/add'
+
+    action :redirect,
            :create,
            permissions: [:vendor_creator, :vendor_manager],
+           toggle: {unless: [VendorToggle, :forms_enabled?]},
            format: 'primary',
            label: 'Add Vendor',
            icon: 'https://img.icons8.com/windows/17/708090/--checkmark-yes.png',
