@@ -5,10 +5,10 @@ default: &default
     - gem install bundler --no-document
     - gem install rubocop-rails
 
-rubocop:
-  <<: *default
-  script:
-    - rubocop --require rubocop-rails -F
+# rubocop:
+#   <<: *default
+#   script:
+#     - rubocop --require rubocop-rails -F
 
 rspec:
   <<: *default
