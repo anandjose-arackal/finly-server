@@ -292,6 +292,10 @@ class Masters::Users::TraitPublisher
     false
   end
 
+  def logger
+    self.class.logger
+  end
+
   def enabled?(company_id = nil)
     self.class.enabled?(company_id)
   end
