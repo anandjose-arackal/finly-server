@@ -29,6 +29,7 @@
 class VirtualAccountTransaction < ApplicationRecord
   include SystemLoggable
 
+  belongs_to :company, optional: true
   belongs_to :reference_payment, class_name: "Payment", optional: true
 
   has_one :payment, as: :reference_resource

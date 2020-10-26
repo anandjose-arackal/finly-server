@@ -4062,6 +4062,7 @@ ActiveRecord::Schema.define(version: 2020_10_23_182636) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "controlling_choice_id"
+    t.integer "company_id"
     t.index ["created_at"], name: "index_form_choice_dependency_mappings_on_created_at"
     t.index ["deleted_at"], name: "index_form_choice_dependency_mappings_on_deleted_at"
     t.index ["dependency_id"], name: "index_form_choice_dependency_mappings_on_dependency_id"

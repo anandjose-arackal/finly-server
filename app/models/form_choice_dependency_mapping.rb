@@ -14,6 +14,7 @@
 class FormChoiceDependencyMapping < ApplicationRecord
   include TemplateClonable
 
+  belongs_to :company, optional: true
   belongs_to :dependency, class_name: "FormChoiceDependency", optional: true
 
   def reference(controlling_choice, dependent_choice)

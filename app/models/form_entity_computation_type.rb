@@ -9,7 +9,7 @@
 #  updated_at :datetime         not null
 #
 
-class FormEntityComputationType < ApplicationRecord
+class FormEntityComputationType < NonTenantedApplicationRecord
   include Seedable
 
   set_values :form, :lookup
