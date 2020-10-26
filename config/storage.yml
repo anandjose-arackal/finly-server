@@ -6,6 +6,11 @@ local:
   service: Disk
   root: <%= Rails.root.join("storage") %>
 
+microsoft:
+  service: AzureStorage
+  storage_account_name: <%= Rails.application.config_for(:azure_config)&.with_indifferent_access["storage_account_name"] %>
+  storage_access_key: <%= Rails.application.config_for(:azure_config)&.with_indifferent_access["storage_access_key"] %>
+  container: <%= Rails.application.config_for(:azure_config)&.with_indifferent_access["active_storage_container"] %>
 # Use rails credentials:edit to set the AWS secrets (as aws:access_key_id|secret_access_key)
 # amazon:
 #   service: S3
@@ -22,11 +27,7 @@ local:
 #   bucket: your_own_bucket
 
 # Use rails credentials:edit to set the Azure Storage secret (as azure_storage:storage_access_key)
-# microsoft:
-#   service: AzureStorage
-#   storage_account_name: your_account_name
-#   storage_access_key: <%= Rails.application.credentials.dig(:azure_storage, :storage_access_key) %>
-#   container: your_container_name
+
 
 # mirror:
 #   service: Mirror

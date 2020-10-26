@@ -1,0 +1,4 @@
+en:
+  errors:
+    options:
+      maximum: "passwords not equal"

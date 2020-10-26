@@ -1,6 +1,6 @@
 class Masters::Locations::Lookup < Lookup::API
 
-  resolver 'location.default'
+  resolver 'locations.default'
   search_key :name_or_location_code_cont
 
   attribute :id, visible: false

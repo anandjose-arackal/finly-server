@@ -21,8 +21,6 @@ class Company < ApplicationRecord
   include Exposures::Model::Exposable
   include EventProducer
 
-  event_channel 'company'
-
   belongs_to :base_currency, optional: true, class_name: 'Currency'
   belongs_to :status, optional: true, class_name: 'CompanyStatus'
   belongs_to :group, optional: true, class_name: 'CompanyGroup'
@@ -76,6 +74,8 @@ class Company < ApplicationRecord
   has_many :security_deposits
   has_many :icici_statements
   has_many :insight_dashboards
+
+  has_many :forms
 
   has_many :budget_groups
   has_many :budget_group_criteria
@@ -232,7 +232,7 @@ class Company < ApplicationRecord
 
   scope :with_subdomain, ->(subdomain) {find_by subdomain: subdomain}
 
-  def as_json(options={})
+  def as_json(options = {})
     {
         id: id,
         name: name,
@@ -432,6 +432,18 @@ class Company < ApplicationRecord
 
   def normal_login_blocked?
     self.feature_subscription.sso_login_enforced
+  end
+
+  def srn_enabled?
+    self.feature_subscription.srn_enabled
+  end
+
+  def grn_enabled?
+    self.feature_subscription.grn_enabled
+  end
+
+  def analytics_system_enabled?
+    self.feature_subscription.analytics_system_enabled
   end
 
   def more_than_one_subscription?

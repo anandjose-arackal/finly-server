@@ -46,7 +46,7 @@ class VendorAttachment < ApplicationRecord
   scope :cancelled_cheque_attachment, -> { where attachment_type: 'cancelled_cheque' }
   scope :no_type_attachments, -> {where attachment_type: nil}
 
-  def as_json(options={})
+  def as_json(options = {})
     {
         file_url: attached_file.url,
         attachment_type: attachment_type

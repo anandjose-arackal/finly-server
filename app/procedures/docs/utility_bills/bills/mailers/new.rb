@@ -2,7 +2,7 @@ class Docs::UtilityBills::Bills::Mailers::New < Notifier::Mailer
 
   class Docs::UtilityBills::Bills::Mailers::New::Autofetched < Docs::UtilityBills::Bills::Mailers::New
 
-    consumes_event! 'bbps_bill.new_bill'
+    consumes_event! 'bbps_bills.new_bill'
 
     assign :to do |user, params|
       bill = params[:record]
@@ -36,7 +36,7 @@ class Docs::UtilityBills::Bills::Mailers::New < Notifier::Mailer
 
   class Docs::UtilityBills::Bills::Mailers::New::Manual < Docs::UtilityBills::Bills::Mailers::New
 
-    consumes_event! 'bbps_bill.new_bill'
+    consumes_event! 'bbps_bills.new_bill'
 
     assign :to do |user, params|
       bill = params[:record]

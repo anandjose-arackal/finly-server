@@ -389,6 +389,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     #     cna[:amount_attributes][:value] = precision_value(cna[:amount_attributes][:value])
     #   end
     # end
+
   end
 
   def process
@@ -443,9 +444,11 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     else
       add_message :error, self.inward_invoice.errors.full_messages
     end
+
   end
 
   def post_process
+    budget_limit_validation( inward_invoice )
     # update_agreement_available_limit
     add_message :success, "Invoice updated"
   end

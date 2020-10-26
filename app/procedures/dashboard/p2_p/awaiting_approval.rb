@@ -140,7 +140,7 @@ class Dashboard::P2P::AwaitingApproval < Dashboard::IndexCard
       rule = build_rule(context, tile, filter_created_by: false)
       query = rule.as_ransack if rule.present?
 
-      count = tile[:model].ransack(query).result.awaiting_action_items(context[:current_user]).count
+      count = tile[:model].ransack(query).result.awaiting_records(context[:current_user]).count
       tiles << build_tile(count: count, rule: rule, title: tile[:title], path: tile[:path], status_id: PurchaseRequestStatus::GROUP_AWAITING_APPROVAL)
     end
     tiles
@@ -189,7 +189,7 @@ class Dashboard::P2P::AwaitingApproval < Dashboard::IndexCard
 
   def build_path(rule, label, path, status_id)
     params = {
-        filter_status: {_id: status_id&.to_s, identifier: 'with_status_id'},
+        filter_status: {_id: status_id&.to_s, identifier: 'with_status_ids'},
         id: self.class.path
     }
     if rule.present?

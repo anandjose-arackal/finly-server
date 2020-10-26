@@ -45,10 +45,10 @@ class InvoiceExposure < Exposures::API
     record.discount_amount&.value || 0
   end
   attribute :tax_amount, record_attribute: true, exposure: true, includes: [:tax_amount]
-  attribute :tax_type, record_attribute: true, exposure: true
-  attribute :tax_type_id, record_attribute: true
+  attribute :tax_type, record_attribute: :gst_type, exposure: true
+  attribute :tax_type_id, record_attribute: :gst_type_id
   attribute :tax_type_name do
-    case record.tax_type_id
+    case record.gst_type_id
     when 1
       'CGST + IGST'
     when 2

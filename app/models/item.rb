@@ -35,18 +35,17 @@ class Item < ApplicationRecord
   include Sequenced::ActsAsSequenced
   include MathUtil
   include EventProducer
-
-
-  event_channel 'item'
+  # include SearchIndex::Concerns::Document
+include Searchkick::Api
 
   acts_as_sequenced column: :item_number, purpose: :item_master, min_length: 8, editable: false, prefix: -> (record) { record.goods? ? "G" : "S" }
 
-  default_scope {unscope(where: :deleted_at)}
+  default_scope {unscope(:where)}
   belongs_to :company, optional: true
   belongs_to :category, optional: true
   belongs_to :tax_rate, optional: true
   belongs_to :supply_item_type, optional: true
-  belongs_to :product_type, optional: true#, class_name: "ProductType", foreign_key: :product_type_id
+  belongs_to :product_type, optional: true #, class_name: "ProductType", foreign_key: :product_type_id
   belongs_to :user, optional: true
   belongs_to :created_by, optional: true, class_name: 'User', foreign_key: :user_id
   belongs_to :item_expense_type, optional: true
@@ -55,8 +54,8 @@ class Item < ApplicationRecord
   # LineItem and Branch Location Mapping
   has_many :branch_locations
   has_many :inventory_line_item_location_mappings, through: :branch_locations
-  has_many :artifacts, as: :resource, dependent: :destroy
-  has_many :custom_fields, as: :parent, dependent: :destroy
+  has_many :artifacts, as: :resource
+  has_many :custom_fields, as: :parent
   # validates :rate, presence: true
   validates :description, presence: true
   # validates :hsn_sac, format: {with: /\A(\d{6}|\d{8})\Z/}, allow_blank: true
@@ -72,6 +71,7 @@ class Item < ApplicationRecord
     where("description like ? OR sku like ? OR note like ? OR hsn_sac like ? OR item_number like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
   }
   scope :filter_category_id, -> (category_id) { where category_id: category_id }
+  scope :with_company_id, -> (company_id) { where company_id: company_id }
 
   # Filter though supply item type
   scope :filter_item_type, -> (type_id) do
@@ -97,7 +97,7 @@ class Item < ApplicationRecord
     where id: ids
   }
 
-  scope :includes_for_export, -> {includes(:category,:item_expense_type,:product_type, :supply_item_type, :tax_rate)}
+  scope :includes_for_export, -> { includes(:category, :item_expense_type, :product_type, :supply_item_type, :tax_rate) }
 
   delegate :po_item?, :non_po_item?, to: :supply_item_type
 
@@ -109,12 +109,12 @@ class Item < ApplicationRecord
     self.product_type_id == ProductType.id_for(:service)
   end
 
-
   after_save :budget_trail_entry
 
   def as_json
     {
         id: id,
+        company_id: company_id,
         item_number: item_number,
         unit_of_measurement: unit_of_measurement,
         hsn_sac: hsn_sac,
@@ -175,7 +175,7 @@ class Item < ApplicationRecord
   end
 
   def rate_contract_vendors
-    rate_contract_line_items.joins(:rate_contract).map{|line_item| { vendor_id: line_item.rate_contract.vendor.id, vendor_name: line_item.rate_contract.vendor.display_name, rate:  precision_value(line_item&.amount&.value), rate_contract_item_id: line_item.id}}
+    rate_contract_line_items.joins(:rate_contract).map { |line_item| {vendor_id: line_item.rate_contract.vendor.id, vendor_name: line_item.rate_contract.vendor.display_name, rate: precision_value(line_item&.amount&.value), rate_contract_item_id: line_item.id} }
   end
 
   def get_custom_description

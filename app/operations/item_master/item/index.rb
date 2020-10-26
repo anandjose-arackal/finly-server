@@ -39,7 +39,7 @@ class ItemMaster::Item::Index < ItemMaster::Item::Base
   end
 
   def success
-    params[:inventory_line_items] = self.inventory_line_items
+    params[:inventory_line_items] = self.inventory_line_items.non_deleted
     ItemMaster::Item::Index::InventoryLineItemsPresenter.new(user, params, messages)
   end
 

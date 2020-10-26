@@ -16,4 +16,12 @@ class Forms::Policy < ApplicationPolicy
     true
   end
 
+  def index?
+    @user.admin?
+  end
+
+  def entity_config?
+    @user.admin?
+  end
+
 end

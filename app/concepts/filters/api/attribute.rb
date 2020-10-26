@@ -15,7 +15,7 @@ class Filters::API::Attribute
   end
 
   def operators
-    op = Forms::API::Entity::Registry.types[field_type].operators
+    op = Forms::Entity::Registry.types[field_type].operators
 
     # as the ransacker :custom_fields_value_search has issues with not query, remove all not conditions
     return op.reject { |o| o.to_s.start_with?("not_") } if custom_field_id.present?
@@ -24,7 +24,7 @@ class Filters::API::Attribute
   end
 
   def simple_filter
-    Forms::API::Entity::Registry.types[field_type].simple_filter
+    Forms::Entity::Registry.types[field_type].simple_filter
   end
 
   def build(user)

@@ -21,6 +21,10 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
 
   def init!(options, document:, **)
     self.document = document
+
+    # Reverting to nil to resolve https://sentry.finly.io/organizations/finly/issues/17
+    return if self.document.nil?
+
     self.company = document.company
     case document.class.name
     when "PurchaseOrder", "Invoice"
@@ -52,19 +56,23 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
       end
       self.departments = Department.with_id(document.payments.pluck(:department_id).compact)
       self.cost_centers = CostCenter.with_id(document.payments.pluck(:cost_center_id).compact)
-      self.vendors = YesBankVendor.with_id(document.payments.map {|payment| payment.receiving_user_id if payment.receiving_user.is_a?(YesBankVendor)})
+      self.vendors = YesBankVendor.with_id(document.payments.map { |payment| payment.receiving_user_id if payment.receiving_user.is_a?(YesBankVendor) })
       self.locations = BranchLocation.with_id(document.payments.pluck(:location_id).compact)
       self.categories += Category.with_id(document.payments.pluck(:category_id).compact)
       self.users = []
     when "Report", "Expense"
-      self.departments = [document.department].compact
-      self.cost_centers = [document.cost_center].compact
+      self.departments = [document.user.department].compact
+      self.cost_centers = [document.user.cost_center].compact
       # here vendors doesn't make sense because expenses don't have a vendor per se
       self.vendors = []
-      self.categories = Category.with_id(document.expenses.pluck(:category_id).compact)
+      if document.class.name == 'Report'
+        self.categories = Category.with_id(document.expenses.pluck(:category_id).compact)
+      elsif document.class.name == 'Expense'
+        self.categories = [document.category]
+      end
       # here users will be the owner of the report as all expenses are incurred by them
       self.users = [document.user].compact
-      self.locations = []
+      self.locations = [document.user.location].compact
     else
       raise "Invalid Document Type passed to ApplicableBudgets Class"
     end

@@ -3,7 +3,7 @@ class TaskManager::Documents::Configuration < Transactions::API
 
   schema do
     params do
-      required(:document).filled#(inclusion?: Documents::Master.list)
+      required(:document).filled#(included_in?: Documents::Master.list)
     end
   end
 

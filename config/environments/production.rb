@@ -1,6 +1,5 @@
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
-
   # Code is not reloaded between requests.
   config.cache_classes = true
 
@@ -20,6 +19,16 @@ Rails.application.configure do
   #   config.dsn = YAML.load_file(Rails.root.join('config/sentry.yml'))['dsn']
   # end
 
+  feature_flipper_config = Rails.application.config_for(:feature_flipper)&.with_indifferent_access
+  if feature_flipper_config.dig('api_key').present? and feature_flipper_config.dig('url').present?
+    config.bullet_train = BulletTrain.new(api_key: feature_flipper_config['api_key'], url: feature_flipper_config['url'])
+  else
+    config.bullet_train = nil
+  end
+
+  redis_config = Rails.application.config_for(:redis_config)&.with_indifferent_access
+  config.redis = Redis.new(redis_config.slice('url', 'password'))
+
   config.lograge.enabled = true
   # config.lograge.keep_original_rails_log = true
   config.lograge.logger = ActiveSupport::Logger.new "#{Rails.root}/log/logstash_#{Rails.env}.log"
@@ -29,6 +38,20 @@ Rails.application.configure do
         exception: event.payload[:exception], # ["ExceptionClass", "the message"]
         exception_object: event.payload[:exception_object] # the exception instance
     }
+  end
+
+  posthog_config = Rails.application.config_for(:posthog)&.with_indifferent_access
+  if posthog_config.present? and posthog_config['enabled']
+    config.posthog = PostHog::Client.new(
+        {
+            api_key: posthog_config['api_key'],
+            api_host: posthog_config['api_host'],
+            # Todo log errors
+            on_error: Proc.new { |status, msg| print msg }
+        }
+    )
+  else
+    config.posthog = nil
   end
 
   config.lograge.custom_payload do |controller|
@@ -84,7 +107,7 @@ Rails.application.configure do
   # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for NGINX
 
   # Store uploaded files on the local file system (see config/storage.yml for options)
-  config.active_storage.service = :local
+  config.active_storage.service = :microsoft
 
   # Mount Action Cable outside main process or domain
   # config.action_cable.mount_path = nil
@@ -128,7 +151,7 @@ Rails.application.configure do
   config.action_mailer.raise_delivery_errors = true
 
   ################### SETTINGS FOR EMAIL ##########################
-  config.mailer_config = config_for(:mailer_config)
+  config.mailer_config = config_for(:mailer_config)&.with_indifferent_access
   config.action_mailer.default_url_options = {host: config.mailer_config['host']}
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
@@ -195,4 +218,25 @@ Rails.application.configure do
       container:            config.azure_config["container"]
   }
   ####################### SETTINGS FOR AZURE BLOB STORAGE #################################
+
+   # Inserts middleware to perform automatic connection switching.
+  # The `database_selector` hash is used to pass options to the DatabaseSelector
+  # middleware. The `delay` is used to determine how long to wait after a write
+  # to send a subsequent read to the primary.
+  #
+  # The `database_resolver` class is used by the middleware to determine which
+  # database is appropriate to use based on the time delay.
+  #
+  # The `database_resolver_context` class is used by the middleware to set
+  # timestamps for the last write to the primary. The resolver uses the context
+  # class timestamps to determine how long to wait before reading from the
+  # replica.
+  #
+  # By default Rails will store a last write timestamp in the session. The
+  # DatabaseSelector middleware is designed as such you can define your own
+  # strategy for connection switching and pass that into the middleware through
+  # these configuration options.
+  # config.active_record.database_selector = { delay: 2.seconds }
+  # config.active_record.database_resolver = ActiveRecord::Middleware::DatabaseSelector::Resolver
+  # config.active_record.database_resolver_context = ActiveRecord::Middleware::DatabaseSelector::Resolver::Session
 end

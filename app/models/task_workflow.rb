@@ -3,17 +3,17 @@
 # Table name: task_workflows
 #
 #  id               :bigint           not null
+#  name             :string(255)      not null
+#  description      :text(65535)      not null
+#  trigger_type     :integer          not null
+#  conditions       :text(65535)
 #  model_class      :string(255)      not null
-#  trigger_type     :string(255)      not null
 #  event_key        :string(255)
 #  personal         :boolean          default(TRUE)
 #  user_id          :integer          not null
 #  company_id       :integer          not null
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
-#  name             :string(255)      not null
-#  description      :text(65535)      not null
-#  conditions       :text(65535)
 #  task_schedule_id :integer
 #  uuid             :string(36)       not null, primary key
 #  deleted_at       :datetime
@@ -23,7 +23,6 @@ class TaskWorkflow < ApplicationRecord
   include EventProducer
   include UUIDHelper
 
-  event_channel 'task_workflow'
   serialize :conditions, JSON
 
   has_many :file_manager_actions, class_name: 'TaskFileManagerAction'

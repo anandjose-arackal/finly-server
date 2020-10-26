@@ -34,7 +34,7 @@ module Forms::Generators::Filters::ApiEntityHelper
         label: label,
         hint: hint,
         type: registered_type,
-        filter_key: field_path,
+        filter_key: entity_path,
         operators: operators,
         multiple: multiple
     }

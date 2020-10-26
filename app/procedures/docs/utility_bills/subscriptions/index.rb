@@ -91,6 +91,8 @@ class Docs::UtilityBills::Subscriptions::Index < IndexBuilder::API
   # end
 
   counter -> (user, collection) do
+    collection = collection.non_deleted
+    
     counter = IndexBuilder::Counter.new :with_status_id
     counts = collection.group(:status_id).count
     counter.add nil, "All", counts.values.reduce(0, :+)

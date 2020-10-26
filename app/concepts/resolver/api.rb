@@ -1,6 +1,10 @@
 class Resolver::API
   include DynamicAttributes
 
+  # Todo
+  # Search Key
+  # Search Table
+
   attr_reader :user
   class_attr :entity
 

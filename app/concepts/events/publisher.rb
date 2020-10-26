@@ -5,12 +5,12 @@ class Events::Publisher
 
   protected
 
-  def self.broadcast(routing_key, message, current_user: nil, ignore_failure: false)
+  def self.broadcast(routing_key, message, current_user: nil, ignore_failure: false, wait: nil)
 
     payload = {message: message, current_user: (current_user || RequestStoreUtil.current_user)}
-    payload.reject! {|k, v| v.nil?} # Remove all nil values
+    payload.reject! { |k, v| v.nil? } # Remove all nil values
 
-    Async.(routing_key, payload, current_user: current_user)
+    Async.(routing_key, payload, current_user: current_user, wait: wait)
     Sync.(routing_key, payload, current_user: current_user, ignore_failure: ignore_failure)
   end
 
@@ -47,20 +47,31 @@ class Events::Publisher
 
   # Broadcasting the payload asynchronously to all listeners
   class Async
-    def self.call(routing_key, payload, current_user: nil)
-      begin
-        Hutch.connect # unless Hutch.connected?
-      rescue Hutch::ConnectionError => e
-        raise e if Rails.env.production?
+    def self.call(routing_key, payload, current_user: nil, wait: nil)
+      json_payload = Events::Serializer.encode(payload).as_json
+      if wait.present?
+        PublishJob.perform_in(wait, routing_key, json_payload)
+      else
+        # Publish to all consumers
+        PublishJob.new.perform(routing_key, json_payload)
+      end
+    end
 
-        return
+    class PublishJob
+      include Sidekiq::Worker
+
+      def perform(routing_key, payload)
+        begin
+          Hutch.connect # unless Hutch.connected?
+        rescue Hutch::ConnectionError => e
+          raise e if Rails.env.production?
+
+          return
+        end
+
+        Hutch.publish(routing_key, payload)
       end
 
-      # Publish to all consumers
-      Hutch.publish(
-          routing_key,
-          Events::Serializer.encode(payload).as_json
-      )
     end
   end
 

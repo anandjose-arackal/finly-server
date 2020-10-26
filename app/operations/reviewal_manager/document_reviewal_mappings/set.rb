@@ -60,16 +60,17 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
           max_thresholds = level_reviewers_data.map{|item| item['max']}
           # min_thresholds = level_reviewers_data.map{|item| item['min']}
 
+
           # If level doesn't have reviewers
           if max_thresholds.compact.present?
-            if !max_thresholds.include?(nil) && document_amount > max_thresholds.compact.max
+            if !max_thresholds.include?(nil) && document_amount > max_thresholds.compact.map(&:to_f).max
               document_class_name = document.class.human_name rescue document.model_name.human.titleize
               add_message :error, "#{document_class_name}'s amount is greater than maximum limit set in Level - #{level.level_number} (#{level.name})"
             end
           end
 
           # Check if selected reviewer is a valid reviewer
-          valid_threshold_reviewer_data = level_reviewers_data.filter{|item| item['min'] <= document_amount && (item['max'].blank? || item['max'] >= document_amount )}
+          valid_threshold_reviewer_data = level_reviewers_data.filter{|item| item['min'].to_f <= document_amount && (item['max'].blank? || item['max'].to_f >= document_amount )}
           valid_violation_reviewer_data = level_reviewers_data.filter do |item|
             if violations_present
               !!item['exception']
