@@ -1,4 +1,12 @@
 GIT
+  remote: git@gitlab.com:finlycore/finly-secure_storage-sdk.git
+  revision: 42054e97c6207cd5240f7b50840467ef42655bf2
+  specs:
+    finly-secure_storage-sdk (0.1.45)
+      aws-sdk-ec2 (>= 1.24.0)
+      rails (>= 4.2)
+
+GIT
   remote: https://github.com/rack/rack.git
   revision: f690bb71425aa31d7b9b3113829af773950d8ab5
   ref: f690bb71425aa31d7b9b3113829af773950d8ab5
@@ -29,14 +37,6 @@ GIT
       rack (~> 2.2)
       rack-protection (= 2.1.0)
       tilt (~> 2.0)
-
-GIT
-  remote: https://gitlab.com/finlycore/finly-secure_storage-sdk.git
-  revision: 42054e97c6207cd5240f7b50840467ef42655bf2
-  specs:
-    finly-secure_storage-sdk (0.1.45)
-      aws-sdk-ec2 (>= 1.24.0)
-      rails (>= 4.2)
 
 GEM
   remote: https://rubygems.org/
