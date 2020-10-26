@@ -12,26 +12,27 @@ module Mailtrain
     end
 
     # Add subscription
-    def subscribe(list_id, email, first_name = nil, last_name = nil, timezone = nil, force_subscribe = true)
-      response = connection.post "/api/subscribe/#{list_id}?access_token=#{@access_token}" do |req|
-        params = {email: email, first_name: first_name, last_name: last_name, timezone: timezone, force_subscribe: force_subscribe}.select { |_, value| !value.nil? }
-        req.body = params
+    def subscribe(list_id, email: , timezone: nil, force_subscribe: true, merge_attributes: {})
+      request_body = {email: email, timezone: timezone, force_subscribe: force_subscribe}.select { |_, value| !value.nil? }
+      merge_attributes.each do |key, value|
+        request_body["merge_#{key}"] = value
       end
+      response = request :post, "/api/subscribe/#{list_id}", request_body
 
       @response = Response.new response.body
       success?
     end
 
     def unsubscribe(list_id, email)
-      response = connection.post "/api/unsubscribe/#{list_id}?access_token=#{@access_token}", {list: list_id, email: email}
+      response = request :post, "/api/unsubscribe/#{list_id}", {list: list_id, email: email}
 
       @response = Response.new response.body
       success?
     end
 
     # Get list of blacklisted emails
-    def blacklist(start=0, limit=10000, search='')
-      response = connection.get "/api/blacklist/get?access_token=#{@access_token}&start=#{start}&limit=#{limit}&search=#{search}"
+    def blacklist(start = 0, limit = 10000, search = '')
+      response = request :get, "/api/blacklist/get&start=#{start}&limit=#{limit}&search=#{search}"
 
       @response = Response.new response.body
       data
@@ -39,7 +40,7 @@ module Mailtrain
 
     # Add email to blacklist
     def block(email)
-      response = connection.post "/api/blacklist/add?access_token=#{@access_token}", {email: email}
+      response = request :post, "/api/blacklist/add", {email: email}
 
       @response = Response.new response.body
       success?
@@ -47,7 +48,7 @@ module Mailtrain
 
     # delete email to blacklist
     def unblock(email)
-      response = connection.post "/api/blacklist/delete?access_token=#{@access_token}", {email: email}
+      response = request :post, "/api/blacklist/delete", {email: email}
 
       @response = Response.new response.body
       success?
@@ -67,10 +68,19 @@ module Mailtrain
 
     protected
 
+    def request(method, path, body = {})
+      connection.send method, path do |request|
+        request.headers['Content-Type'] = 'application/json'
+        request.params = {access_token: @access_token}
+        request.body = body.to_json if body.present?
+      end
+    end
+
     def connection
       @connection ||= Faraday.new(:url => @url) do |faraday|
-        faraday.request  :url_encoded
-        faraday.adapter  :excon
+        faraday.request :url_encoded
+        faraday.adapter Faraday.default_adapter
+        # faraday.adapter  :excon
       end
     end
 
