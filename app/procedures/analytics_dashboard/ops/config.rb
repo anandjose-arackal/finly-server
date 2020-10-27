@@ -32,11 +32,12 @@ class AnalyticsDashboard::Ops::Config < Transactions::API
         {u:
              {id: current_user.id, company_id: current_user.company_id},
          exp: 3.hour.from_now.to_i},
-        Rails.configuration.cube_js_api_key
+        Rails.configuration.cube_js.api_key
     )
   end
 
   def build_config(context, current_user:, **)
+    context[:url] = Rails.configuration.cube_js.url
     context[:config] = []
     CUBES.each do |cube|
       next unless authorized?(current_user, cube)
