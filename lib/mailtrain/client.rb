@@ -17,6 +17,7 @@ module Mailtrain
       merge_attributes.each do |key, value|
         request_body["merge_#{key}"] = value
       end
+      puts "Request Body: #{request_body}"
       response = request :post, "/api/subscribe/#{list_id}", request_body
 
       @response = Response.new response.body

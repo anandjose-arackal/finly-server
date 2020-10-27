@@ -35,7 +35,7 @@ class Masters::Users::TraitPublishers::FeatureSubscriptionHandler < Masters::Use
       next unless user_subscribed?(user, config[:user_subscriptions]) if config[:user_subscriptions].present?
       next unless user.has_permission?(config[:permissions]) if config[:permissions].present?
 
-      json[access] = true
+      json[access.to_s] = true
     end
     json
   end

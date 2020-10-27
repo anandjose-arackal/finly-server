@@ -38,6 +38,7 @@ class Masters::Users::TraitPublishers::UserHandler < Masters::Users::TraitPublis
 
   def self.properties(user)
     {
+        'user_id' => user.id,
         'email' => user.email,
         'mobile_number' => user.mobile_number,
         'first_name' => user.first_name,

@@ -11,8 +11,9 @@ class Masters::Users::TraitPublisher
   BATCH_SLEEP_DURATION = 2.seconds
 
   MAILTRAIN_ATTRIBUTES = %w(
-    first_name last_name point_of_contact status
+    user_id first_name last_name point_of_contact status
     company_id company_name company_group_name company_test_account company_status
+    product_em product_vp role_em_admin role_vp_admin module_i2p module_p2p module_abp module_budgets module_payments
   )
 
   def self.logger
