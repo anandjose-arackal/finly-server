@@ -43,10 +43,7 @@ class Masters::Users::TraitPublishers::UserHandler < Masters::Users::TraitPublis
         'first_name' => user.first_name,
         'last_name' => user.last_name,
         'deleted_at' => user.deleted_at,
-        'verified' => !!user.verified,
-        'has_set_password' => !!user.default_password,
         'point_of_contact' => !!user.point_of_contact,
-        'otp_verified' => !!user.otp_verified,
         'status' => user.status
     }.compact
   end
