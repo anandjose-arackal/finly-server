@@ -90,6 +90,7 @@ class Masters::Users::TraitPublishers::FeatureSubscriptionHandler < Masters::Use
   end
 
   def self.user_subscribed?(user, user_subscriptions)
+    return false unless user&.user_panel_subscription.present?
     return true unless user_subscriptions.present?
 
     user_subscriptions.each do |subscription|
