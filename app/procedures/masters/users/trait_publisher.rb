@@ -11,8 +11,8 @@ class Masters::Users::TraitPublisher
   BATCH_SLEEP_DURATION = 2.seconds
 
   MAILTRAIN_ATTRIBUTES = %w(
-    first_name last_name
-    company_id company_name company_active company_subdomain company_test_account company_status
+    first_name last_name point_of_contact status
+    company_id company_name company_group_name company_test_account company_status
   )
 
   # Responsible for publishing company properties
