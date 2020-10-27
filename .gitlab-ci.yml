@@ -39,6 +39,7 @@ rspec:
     - touch config/insights_config.yml
     - touch config/integrations.ym
     - touch config/mailer_config.yml
+    - touch config/mailtrain.yml
     - touch config/meilisearch.yml
     - touch config/posthog.yml
     - touch config/redis_config.yml
