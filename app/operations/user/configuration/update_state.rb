@@ -30,7 +30,7 @@ class User::Configuration::UpdateState < BaseOperation
     end
 
     # If the user is being activated, then check the maximum users that can be active as per the companies plan
-    if params[:active]
+    if StringUtils.to_bool params[:active]
       maximum_users = UserToggle.new(user).maximum_users
       if maximum_users.present? and maximum_users > 0
         existing_users_count = current_company.users.filter_state([User::ACTIVE, User::PENDING]).count
