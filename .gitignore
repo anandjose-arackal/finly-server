@@ -36,6 +36,7 @@ config/searchkick.yml
 data.ms/
 config/searchkick.yml
 config/cubejs.yml
+config/mailtrain.yml
 
 # .rubocop.yml
 .vscode/
