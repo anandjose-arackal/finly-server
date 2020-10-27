@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_10_23_182636) do
+ActiveRecord::Schema.define(version: 2020_10_27_063249) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3684,7 +3684,6 @@ ActiveRecord::Schema.define(version: 2020_10_23_182636) do
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "include_custom_fields", default: false
     t.boolean "default", default: false
     t.boolean "modified", default: false
     t.string "master"
@@ -3699,7 +3698,7 @@ ActiveRecord::Schema.define(version: 2020_10_23_182636) do
   end
 
   create_table "export_template_user_role_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "template_id", null: false
+    t.integer "template_id"
     t.integer "user_role_id", null: false
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
