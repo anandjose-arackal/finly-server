@@ -27,7 +27,7 @@ Events::Router.draw do
 
   scope :companies do
     route '*' do
-      to Masters::Users::TraitPublisher::CompanyHandler
+      to Masters::Users::TraitPublishers::CompanyHandler
     end
 
     route 'create' do
@@ -37,19 +37,31 @@ Events::Router.draw do
 
   scope :users do
     route '*' do
-      to Masters::Users::TraitPublisher::UserHandler
+      to Masters::Users::TraitPublishers::UserHandler
     end
   end
 
   scope :user_role_mappings do
     route '*' do
-      to Masters::Users::TraitPublisher::UserRoleHandler
+      to Masters::Users::TraitPublishers::UserRoleHandler
     end
   end
 
   scope :policy_user_roles do
     route '*' do
-      to Masters::Users::TraitPublisher::UserRoleHandler
+      to Masters::Users::TraitPublishers::UserRoleHandler
+    end
+  end
+
+  scope :feature_subscriptions do
+    route '*' do
+      to Masters::Users::TraitPublishers::FeatureSubscriptionHandler
+    end
+  end
+
+  scope :user_panel_subscriptions do
+    route '*' do
+      to Masters::Users::TraitPublishers::UserSubscriptionHandler
     end
   end
 

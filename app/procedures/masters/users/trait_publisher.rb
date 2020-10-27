@@ -15,242 +15,6 @@ class Masters::Users::TraitPublisher
     company_id company_name company_group_name company_test_account company_status
   )
 
-  # Responsible for publishing company properties
-  class Masters::Users::TraitPublisher::CompanyHandler < Masters::Users::TraitPublisher
-
-    def self.refresh(changed_since, dry_run: false, options: {})
-      return unless enabled?
-
-      companies = Company.where('updated_at > ?', changed_since)
-      companies = companies.limit(2) if dry_run
-      start_time = Time.now
-      companies.includes(:status, :group).all.each do |c|
-        new.work(nil, {record: c, dry_run: dry_run, options: options})
-      end
-      logger.info(
-          {handler: self.name, action: 'Refresh Completed', changed_since: changed_since, started_at: start_time,
-           ended_at: Time.now, total_time: (Time.now - start_time).to_f,
-           records_updated: companies.count, total_records: companies.count}
-      )
-    end
-
-    def work(u, payload)
-      company = payload[:record]
-      return false unless enabled?(company.id)
-
-      users = company.users.where.not(company_id: IGNORE_LIST)
-      users = users.limit(100) if payload[:dry_run]
-      total_users = company.users.count
-      completed_users = 0
-      start_time = Time.now
-
-      users.find_in_batches(batch_size: 1000) do |batch|
-        batch_start = Time.now
-        batch.each do |user|
-          properties = {
-              'company_id' => company.id,
-              'company_name' => company.name,
-              'company_active' => !!company.active,
-              'company_subdomain' => company.subdomain,
-              'company_test_account' => !!company.test_account,
-              'company_group_name' => company.group&.name,
-              'company_status' => company.status&.name,
-              'company_deleted_at' => company.deleted_at,
-          }.compact
-
-          publish(self.class, user, properties, options: payload[:options])
-        end
-        completed_users += batch.size
-        logger.info(
-            {
-                handler: self.class.name, action: 'Batch Updated', started_at: batch_start,
-                ended_at: Time.now, total_time: (Time.now - batch_start).to_f, records_updated: batch.size,
-                total_records: total_users, company_name: company.name, company_id: company.id,
-            }
-        )
-
-        sleep BATCH_SLEEP_DURATION
-      end
-
-      logger.info(
-          {
-              handler: self.class.name, action: 'Job Completed', started_at: start_time,
-              ended_at: Time.now, total_time: (Time.now - start_time).to_f, records_updated: total_users,
-              total_records: total_users, company_name: company.name, company_id: company.id,
-          }
-      )
-    end
-  end
-
-  # Updates the user and user profile attributes by using the +users.create+ and +users.update+ hooks.
-  class Masters::Users::TraitPublisher::UserHandler < Masters::Users::TraitPublisher
-
-    def self.refresh(changed_since, dry_run: false, options: {})
-      return if changed_since.nil?
-      return unless enabled?
-
-      users = User.where('updated_at > ?', changed_since)
-                  .where.not(company_id: IGNORE_LIST)
-      users = users.limit(100) if dry_run
-      total_users = users.count
-      start_time = Time.now
-      completed_users = 0
-      users.find_in_batches(batch_size: 1000) do |batch|
-        batch_start_time = Time.now
-        batch.each do |user|
-          self.new.work(nil, record: user)
-        end
-        completed_users += batch.size
-        logger.info(
-            {
-                handler: self.name, action: 'Batch Updated', started_at: batch_start_time,
-                ended_at: Time.now, total_time: (Time.now - batch_start_time).to_f, records_updated: completed_users,
-                total_records: total_users, batch_size: batch.size
-            }
-        )
-        sleep BATCH_SLEEP_DURATION
-      end
-
-      logger.info(
-          {
-              handler: self.name, action: 'Refresh Completed', started_at: start_time,
-              ended_at: Time.now, total_time: (Time.now - start_time).to_f, records_updated: completed_users,
-              total_records: total_users
-          }
-      )
-    end
-
-    def work(user, payload)
-      user = payload[:record]
-      return unless enabled?(user.company_id)
-
-      properties = {
-          'email' => user.email,
-          'mobile_number' => user.mobile_number,
-          'first_name' => user.first_name,
-          'last_name' => user.last_name,
-          'deleted_at' => user.deleted_at,
-          'verified' => !!user.verified,
-          'has_set_password' => !!user.default_password,
-          'point_of_contact' => !!user.point_of_contact,
-          'otp_verified' => !!user.otp_verified,
-          'status' => user.status
-      }.compact
-
-      publish(self.class, user, properties, options: payload[:options])
-      true
-    end
-  end
-
-  # For capturing user permissions and roles
-  class Masters::Users::TraitPublisher::UserRoleHandler < Masters::Users::TraitPublisher
-    # include Events::Consumer
-
-    # consumes_event! 'user_role_mappings.*', 'policy_user_roles.*'
-
-    def self.refresh(changed_since, dry_run: false, options: {})
-      return if changed_since.nil?
-      return unless enabled?
-
-      role_mappings = UserRoleMapping.unscoped.where('user_role_mappings.updated_at > ?', changed_since)
-                          .joins(:user)
-                          .where.not(users: {company_id: IGNORE_LIST})
-      role_mappings = role_mappings.limit(100) if dry_run
-
-      total_records = role_mappings.count
-      start_time = Time.now
-      completed_records = 0
-      role_mappings.includes(:user, :user_role)
-          .joins(:user)
-          .find_in_batches(batch_size: 1000) do |batch|
-        batch_start_time = Time.now
-        batch.each do |role_mapping|
-          self.new.work(nil, record: role_mapping)
-        end
-        completed_records += batch.size
-        logger.info(
-            {
-                handler: "#{self.name}#UserRoleMappings", action: 'Batch Updated', started_at: batch_start_time,
-                ended_at: Time.now, total_time: (Time.now - batch_start_time).to_f, records_updated: completed_records,
-                total_records: total_records, batch_size: batch.size
-            }
-        )
-        sleep BATCH_SLEEP_DURATION
-      end
-
-      logger.info(
-          {
-              handler: "#{self.name}#UserRoleMappings", action: 'Refresh Completed', started_at: start_time,
-              ended_at: Time.now, total_time: (Time.now - start_time).to_f, records_updated: completed_records,
-              total_records: total_records
-          }
-      )
-
-      role_mappings = PolicyUserRole.unscoped.where('policy_user_roles.updated_at > ?', changed_since)
-                          .joins(:user)
-                          .where.not(users: {company_id: IGNORE_LIST})
-      role_mappings = role_mappings.limit(100) if dry_run
-      total_records = role_mappings.count
-      start_time = Time.now
-      completed_records = 0
-      role_mappings.includes(:user, :user_role)
-          .joins(:user)
-          .find_in_batches(batch_size: 1000) do |batch|
-        batch_start_time = Time.now
-        batch.each do |role_mapping|
-          self.new.work(nil, record: role_mapping)
-        end
-        completed_records += batch.size
-        logger.info(
-            {
-                handler: "#{self.name}#PolicyUserRoleMappings", action: 'Batch Updated', started_at: batch_start_time,
-                ended_at: Time.now, total_time: (Time.now - batch_start_time).to_f, records_updated: completed_records,
-                total_records: total_records, batch_size: batch.size
-            }
-        )
-        sleep BATCH_SLEEP_DURATION
-      end
-
-      logger.info(
-          {
-              handler: "#{self.name}#PolicyUserRoleMappings", action: 'Refresh Completed', started_at: start_time,
-              ended_at: Time.now, total_time: (Time.now - start_time).to_f, records_updated: completed_records,
-              total_records: total_records
-          }
-      )
-    end
-
-    def work(user, payload)
-
-      role_mapping = payload[:record]
-      return if role_mapping.user_role&.name.blank?
-      return unless enabled?(role_mapping.user.company_id)
-
-      # Role is assigned to the user if the deleted_at flag is not set
-      assigned = role_mapping.deleted_at.nil?
-      properties = {:"permission_#{role_mapping.user_role.name}" => assigned}
-      publish(self.class, role_mapping.user, properties, options: payload[:options])
-    end
-  end
-
-  # Responsible for refreshing all user traits
-  class Masters::Users::TraitPublisher::RefreshUserTraits < Masters::Users::TraitPublisher
-
-    def self.call(timeframe = 10.years.ago, dry_run: false, options: {})
-      return unless enabled?
-
-      # Set company specific traits for all users
-      Masters::Users::TraitPublisher::CompanyHandler.refresh(timeframe, dry_run: dry_run, options: options)
-
-      # Set user traits for all users
-      Masters::Users::TraitPublisher::UserHandler.refresh(timeframe, dry_run: dry_run, options: options)
-
-      # Set role traits for all users
-      Masters::Users::TraitPublisher::UserRoleHandler.refresh(timeframe, dry_run: dry_run, options: options)
-    end
-
-  end
-
   def self.logger
     LogStashLogger.new(type: :file, path: 'log/trait_publisher.log', sync: true)
   end
@@ -332,5 +96,67 @@ class Masters::Users::TraitPublisher
         end
       end
     end
+  end
+
+  # Responsible for refreshing all user traits
+  class Masters::Users::TraitPublisher::RefreshUserTraits < Masters::Users::TraitPublisher
+
+    def self.call(timeframe = 10.years.ago, dry_run: false, options: {})
+      return unless enabled?
+
+      # Set company specific traits for all users
+      # Masters::Users::TraitPublisher::CompanyHandler.refresh(timeframe, dry_run: dry_run, options: options)
+      #
+      # # Set user traits for all users
+      # Masters::Users::TraitPublisher::UserHandler.refresh(timeframe, dry_run: dry_run, options: options)
+      companies = Company.where('updated_at > ?', timeframe).select(:id).to_sql
+      feature_subscriptions = FeatureSubscription.where('updated_at > ?', timeframe).select(:subscribable_id).to_sql
+      user_subscriptions = UserPanelSubscription.where('updated_at > ?', timeframe).select(:user_id).to_sql
+      users = User.all.where('updated_at > ?', timeframe)
+                  .or(User.where("company_id in (#{companies})"))
+                  .or(User.where("company_id in (#{feature_subscriptions})"))
+                  .or(User.where("id in (#{user_subscriptions})"))
+      users = users.where.not(company_id: IGNORE_LIST)
+      users = users.limit(10) if dry_run
+      total_users = users.count
+      completed_users = 0
+      users = users.includes(
+          :company, {company: [:feature_subscription, :status, :group]},
+          :user_panel_subscription, :policy_user_roles, :role_mapping,
+      )
+      instance = self.new
+      start_time = Time.now
+      users.find_in_batches(batch_size: 1000) do |batch|
+        batch_start_time = Time.now
+        batch.each do |user|
+          next unless enabled?(user.company_id)
+          properties = Masters::Users::TraitPublishers::CompanyHandler.properties(user.company)
+                           .merge(Masters::Users::TraitPublishers::FeatureSubscriptionHandler.properties(user))
+                           .merge(Masters::Users::TraitPublishers::UserHandler.properties(user))
+          instance.publish(self.class, user, properties, options: options)
+        end
+        completed_users += batch.size
+        logger.info(
+            {
+                handler: self.name, action: 'Batch Updated', started_at: batch_start_time,
+                ended_at: Time.now, total_time: (Time.now - batch_start_time).to_f, records_updated: completed_users,
+                total_records: total_users, batch_size: batch.size
+            }
+        )
+        sleep BATCH_SLEEP_DURATION
+      end
+
+      logger.info(
+          {
+              handler: self.name, action: 'Refresh Completed', started_at: start_time,
+              ended_at: Time.now, total_time: (Time.now - start_time).to_f, records_updated: completed_users,
+              total_records: total_users
+          }
+      )
+
+      # Set role traits for all users
+      Masters::Users::TraitPublisher::UserRoleHandler.refresh(timeframe, dry_run: dry_run, options: options)
+    end
+
   end
 end
