@@ -39,7 +39,9 @@ class FormEntityValidation < ApplicationRecord
     params[:internal] ||= false
     params[:is_updated] = false
     params[:can_be_updated] ||= false
-    validation = self.new(params)
+    validation = ActsAsTenant.without_tenant do
+      self.new(params)
+    end
     validation.instance_eval &block if block_given?
     if validation.validation_id.blank?
       raise "Condition ID cannot be blank for #{validation.entity_path}"

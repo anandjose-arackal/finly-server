@@ -1143,6 +1143,12 @@ class UpdateTenants
           record.update_column(:company_id, record.web_hook.company_id)
         end
       end
+
+      FormChoiceDependencyMapping.includes(:dependency).find_each do |record|
+        if record.dependency.present?
+          record.update_column(:company_id, record.dependency.company_id)
+        end
+      end
     end
   end
 end

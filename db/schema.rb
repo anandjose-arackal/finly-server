@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_10_23_182636) do
+ActiveRecord::Schema.define(version: 2020_10_26_123100) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -981,6 +981,7 @@ ActiveRecord::Schema.define(version: 2020_10_23_182636) do
     t.datetime "updated_at", null: false
     t.integer "biller_id"
     t.datetime "deleted_at"
+    t.integer "company_id"
     t.index ["label"], name: "index_bbps_subscription_fields_on_label"
     t.index ["subscription_id"], name: "index_bbps_subscription_fields_on_subscription_id"
     t.index ["value"], name: "index_bbps_subscription_fields_on_value"
@@ -992,6 +993,7 @@ ActiveRecord::Schema.define(version: 2020_10_23_182636) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
+    t.integer "company_id"
     t.index ["subscription_id"], name: "index_bbps_subscription_pocs_on_subscription_id"
     t.index ["user_id"], name: "index_bbps_subscription_pocs_on_user_id"
   end
@@ -2521,6 +2523,7 @@ ActiveRecord::Schema.define(version: 2020_10_23_182636) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
+    t.integer "company_id"
     t.index ["amount_id"], name: "index_credit_note_adjustments_on_amount_id"
     t.index ["credit_note_id"], name: "index_credit_note_adjustments_on_credit_note_id"
     t.index ["invoice_id"], name: "index_credit_note_adjustments_on_invoice_id"
@@ -3408,6 +3411,7 @@ ActiveRecord::Schema.define(version: 2020_10_23_182636) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
+    t.integer "company_id"
     t.index ["enforceable_type", "enforceable_id"], name: "index_enforce_policies_on_enforceable_type_and_enforceable_id"
   end
 
@@ -5558,6 +5562,7 @@ ActiveRecord::Schema.define(version: 2020_10_23_182636) do
     t.datetime "updated_at", null: false
     t.boolean "is_deleted", default: false
     t.datetime "deleted_at"
+    t.integer "company_id"
     t.index ["expense_id"], name: "index_manual_expenses_on_expense_id"
   end
 
@@ -7367,6 +7372,7 @@ ActiveRecord::Schema.define(version: 2020_10_23_182636) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
+    t.integer "company_id"
     t.index ["parsed_category_id"], name: "index_receipt_email_parse_failures_on_parsed_category_id"
     t.index ["parsed_currency_id"], name: "index_receipt_email_parse_failures_on_parsed_currency_id"
     t.index ["user_id"], name: "index_receipt_email_parse_failures_on_user_id"

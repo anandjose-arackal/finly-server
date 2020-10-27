@@ -40,7 +40,9 @@ class FormCondition < ApplicationRecord
     params[:internal] ||= false
     params[:is_updated] = false
     params[:can_be_updated] ||= false
-    condition = self.new(params)
+    condition = ActsAsTenant.without_tenant do
+      self.new(params)
+    end
     condition.instance_eval &block if block_given?
     if condition.condition_id.blank?
       raise "Condition ID cannot be blank for #{condition.entity_path}"
@@ -56,7 +58,9 @@ class FormCondition < ApplicationRecord
   end
 
   def action(property, value)
-    actions.new property: property, value: value
+    ActsAsTenant.without_tenant do
+      actions.new property: property, value: value
+    end
   end
 
   def rule(rule = NoObject)
