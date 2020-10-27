@@ -156,7 +156,7 @@ class Masters::Users::TraitPublisher
       )
 
       # Set role traits for all users
-      Masters::Users::TraitPublisher::UserRoleHandler.refresh(timeframe, dry_run: dry_run, options: options)
+      Masters::Users::TraitPublishers::UserRoleHandler.refresh(timeframe, dry_run: dry_run, options: options)
     end
 
   end
