@@ -37,7 +37,7 @@ class AnalyticsDashboard::Ops::Config < Transactions::API
   end
 
   def build_config(context, current_user:, **)
-    context[:url] = Rails.configuration.cube_js.url
+    context[:base_url] = Rails.configuration.cube_js.base_url
     context[:config] = []
     CUBES.each do |cube|
       next unless authorized?(current_user, cube)
