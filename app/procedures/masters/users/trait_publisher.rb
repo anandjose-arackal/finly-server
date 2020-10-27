@@ -105,10 +105,54 @@ class Masters::Users::TraitPublisher
       return unless enabled?
 
       # Set company specific traits for all users
-      Masters::Users::TraitPublisher::CompanyHandler.refresh(timeframe, dry_run: dry_run, options: options)
+      # Masters::Users::TraitPublisher::CompanyHandler.refresh(timeframe, dry_run: dry_run, options: options)
+      #
+      # # Set user traits for all users
+      # Masters::Users::TraitPublisher::UserHandler.refresh(timeframe, dry_run: dry_run, options: options)
+      companies = Company.where('updated_at > ?', timeframe).select(:id).to_sql
+      feature_subscriptions = FeatureSubscription.where('updated_at > ?', timeframe).select(:subscribable_id).to_sql
+      user_subscriptions = UserPanelSubscription.where('updated_at > ?', timeframe).select(:user_id).to_sql
+      users = User.all.where('updated_at > ?', timeframe)
+                  .or(User.where("company_id in (#{companies})"))
+                  .or(User.where("company_id in (#{feature_subscriptions})"))
+                  .or(User.where("id in (#{user_subscriptions})"))
+      users = users.where.not(company_id: IGNORE_LIST)
+      users = users.limit(10) if dry_run
+      total_users = users.count
+      completed_users = 0
+      users = users.includes(
+          :company, {company: [:feature_subscription, :status, :group]},
+          :user_panel_subscription, :policy_user_roles, :role_mapping,
+      )
+      instance = self.new
+      start_time = Time.now
+      users.find_in_batches(batch_size: 1000) do |batch|
+        batch_start_time = Time.now
+        batch.each do |user|
+          next unless enabled?(user.company_id)
+          properties = Masters::Users::TraitPublishers::CompanyHandler.properties(user.company)
+                           .merge(Masters::Users::TraitPublishers::FeatureSubscriptionHandler.properties(user))
+                           .merge(Masters::Users::TraitPublishers::UserHandler.properties(user))
+          instance.publish(self.class, user, properties, options: options)
+        end
+        completed_users += batch.size
+        logger.info(
+            {
+                handler: self.name, action: 'Batch Updated', started_at: batch_start_time,
+                ended_at: Time.now, total_time: (Time.now - batch_start_time).to_f, records_updated: completed_users,
+                total_records: total_users, batch_size: batch.size
+            }
+        )
+        sleep BATCH_SLEEP_DURATION
+      end
 
-      # Set user traits for all users
-      Masters::Users::TraitPublisher::UserHandler.refresh(timeframe, dry_run: dry_run, options: options)
+      logger.info(
+          {
+              handler: self.name, action: 'Refresh Completed', started_at: start_time,
+              ended_at: Time.now, total_time: (Time.now - start_time).to_f, records_updated: completed_users,
+              total_records: total_users
+          }
+      )
 
       # Set role traits for all users
       Masters::Users::TraitPublisher::UserRoleHandler.refresh(timeframe, dry_run: dry_run, options: options)
