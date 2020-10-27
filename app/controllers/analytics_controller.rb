@@ -6,23 +6,23 @@ class AnalyticsController < BaseControllers::WebBase
   end
 
   def create
-    # endpoint AnalyticsDashboard::Ops::Create
-  enˆd
+    endpoint AnalyticsDashboard::Ops::Create
+  end
 
   def update
-    # endpoint AnalyticsDashboard::Ops::Update
-  enˆd
+    endpoint AnalyticsDashboard::Ops::Update
+  end
 
   def show
-    # endpoint AnalyticsDashboard::Ops::Show
-  enˆd
+    endpoint AnalyticsDashboard::Ops::Show
+  end
 
   def index
-    # endpoint AnalyticsDashboard::Ops::Index
-  enˆd
+    endpoint AnalyticsDashboard::Ops::Index
+  end
 
   def destroy
-    # endpoint AnalyticsDashboard::Ops::Destroy
-  enˆd
+    endpoint AnalyticsDashboard::Ops::Destroy
+  end
 
 end

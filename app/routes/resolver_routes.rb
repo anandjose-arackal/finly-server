@@ -34,6 +34,10 @@ Resolver::Router.draw do
     route 'default', Insights::Resolver
   end
 
+  scope :analytics_dashboards do
+    route 'default', AnalyticsDashboard::Resolver
+  end
+
   scope :categories do
     route 'default', Masters::Categories::Resolver
   end
