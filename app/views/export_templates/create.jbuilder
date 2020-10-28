@@ -8,7 +8,7 @@ json.result do
   json.query @op['model'].query
   json.active @op['model'].active
   json.personal @op['model'].personal
-  json.created_by @op['model'].created_by.name
+  json.created_by @op['model'].created_by&.name
   json.created_at @op['model'].created_at
   json.updated_at @op['model'].updated_at
   json.user_roles do
