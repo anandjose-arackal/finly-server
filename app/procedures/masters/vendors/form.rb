@@ -177,10 +177,10 @@ class Masters::Vendors::Form < Forms::API
   section :account_details, associate_custom_fields: true do
     data_map :bank_accounts, populate_if_empty: BankAccount, min_items: 1, associate_custom_fields: true do
       text :name, required: true
-      text :account_number, required: true
+      text :account_number, required: true, regex: {format: "\\A[A-Za-z0-9]{3,32}\\z", message: "Enter a valid bank account"}
       text :confirm_account_number, required: true, system_field: false
-      text :ifsc, label: "IFSC", required: true
-      text :swift_code, label: "Swift / Bank Code", required: false, visible: false, editable: false
+      text :ifsc, label: "IFSC", required: true, regex: {format: "\\A[A-Za-z]{4}[a-zA-Z0-9]{7}\\z", message: "Enter a valid IFSC"}
+      text :swift_code, label: "Swift / Bank Code", required: false, visible: false, editable: false, regex: {format: "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$", message: "Enter a Swift / BIC Code"}
       switch :default_account
       switch :disabled, default_value: false
       switch :verified, visible: false, default_value: false

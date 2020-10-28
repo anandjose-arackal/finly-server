@@ -117,7 +117,7 @@ class FormEntity::Date < FormEntity
         end
         rule(:options) do
           restriction = value[:restriction]
-          key.failure("> restriction must be one of #{FormEntity::Date::RESTRICTIONS.join(", ")}") if FormEntity::Date::RESTRICTIONS.exclude?(restriction)
+          key.failure("> restriction must be one of #{FormEntity::Date::RESTRICTIONS.join(", ")}") if FormEntity::Date::RESTRICTIONS.exclude?(restriction) && restriction.present?
         end
       end
     end

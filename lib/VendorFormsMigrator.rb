@@ -88,7 +88,7 @@ class VendorFormsMigrator
           relevant_custom_field = document.form_custom_fields.where(field_key: 'other_documents').first
         end
 
-        if relevant_custom_field.present? && relevant_custom_field.attachments.blank?
+        if relevant_custom_field.present?
           new_attachment = relevant_custom_field.attachments.new
 
           if Rails.env.production?
