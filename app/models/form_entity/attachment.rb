@@ -30,6 +30,7 @@
 #  can_choices_be_changed       :boolean
 #  allow_clearing_default_value :boolean
 #  options                      :text(65535)
+#  data_provider                :text(65535)
 #  deleted_at                   :datetime
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
@@ -42,11 +43,10 @@
 #  type                         :string(255)
 #  config                       :text(65535)
 #  associate_custom_fields      :boolean
-#  compute                      :boolean
 #  compute_enabled              :boolean
 #  compute_type_id              :integer
-#  compute_formula              :string(255)
 #  compute_lookup_entity_id     :string(255)
+#  compute_formula              :text(65535)
 #  filters                      :text(65535)
 #  config_path                  :string(255)
 #
@@ -56,7 +56,7 @@ class FormEntity::Attachment < FormEntity
   FORMAT ||= %w(txt pdf doc docx xls xlsx).freeze
 
   register :attachment
-  collection!
+  # collection!
 
   option :maximum, default: 255
   option :minimum, default: 0
@@ -64,8 +64,8 @@ class FormEntity::Attachment < FormEntity
 
   # operators :eq_any, :not_eq_all, :cont_any, :not_cont_all, :blank, :present
 
-  contract_eval 'Max Items Check', &Forms::Validations::Templates[:maximum]
-  contract_eval 'Min Items Check', &Forms::Validations::Templates[:minimum]
+  # contract_eval 'Max Items Check', &Forms::Validations::Templates[:maximum]
+  # contract_eval 'Min Items Check', &Forms::Validations::Templates[:minimum]
 
   schema_validation do
     required(:options) do
@@ -77,20 +77,19 @@ class FormEntity::Attachment < FormEntity
     end
   end
 
-  def populator
-    -> (model: nil, collection:, fragment: nil, index: nil, options:, **) do
-      id = (fragment["id"] || fragment[:id] || fragment["uuid"] || fragment[:uuid]).to_s
-      item = collection.find { |item| id == item.id.to_s }
-
-      if fragment["_destroy"]
-        collection.destroy(item) if item
-        return skip!
-      end
-
-      # Fixme: Scope based on company
-      item ? item : collection.append(::Attachment.find(id))
-    end
-  end
+  # def populator
+  #   -> (model: nil, collection:, fragment: nil, index: nil, options:, **) do
+  #     id = (fragment["id"] || fragment[:id] || fragment["uuid"] || fragment[:uuid]).to_s
+  #     item = collection.find { |item| id == item.id.to_s }
+  #
+  #     if fragment["_destroy"]
+  #       collection.destroy(item) if item
+  #       return skip!
+  #     end
+  #
+  #     item ? item : collection.append(::Attachment.find(id))
+  #   end
+  # end
 
   def self.option_validation
     Proc.new do
@@ -98,14 +97,36 @@ class FormEntity::Attachment < FormEntity
         params do
           required(:options) do
             hash do
-              required(:maximum).value(:int?, lteq?: 255)
-              required(:minimum).value(:int?, gteq?: 0)
-              optional(:format).each(included_in?: FORMAT)
+              optional(:maximum)
+              optional(:minimum)
+              optional(:format)
+            end
+          end
+        end
+
+        rule(:options) do
+          max = value[:maximum]
+          min = value[:minimum]
+          format = value[:format]
+
+          if format.present?
+            if format.is_a?(Array)
+              key.failure("> formats must be one of #{FormEntity::Attachment::FORMAT.join(", ")}") if (format - FormEntity::Attachment::FORMAT).present?
+            else
+              key.failure('> formats must be sent as an array')
+            end
+          end
+
+          key.failure("> minimum can't be less than 0") if min.to_i < 0
+          key.failure("> maximum can't be greater than 10") if max.to_i > 10
+
+          if min.present? && max.present?
+            if min > max
+              key.failure('> maximum cannot be less than minimum')
             end
           end
         end
       end
     end
   end
-
 end

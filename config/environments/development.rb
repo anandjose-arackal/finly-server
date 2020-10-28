@@ -12,6 +12,33 @@ Rails.application.configure do
   # Show full error reports.
   config.consider_all_requests_local = true
 
+  feature_flipper_config = Rails.application.config_for(:feature_flipper)
+  if feature_flipper_config.present? and feature_flipper_config['enabled'] and
+      feature_flipper_config['api_key'].present? and feature_flipper_config['url'].present?
+    config.bullet_train = BulletTrain.new(api_key: feature_flipper_config['api_key'], url: feature_flipper_config['url'])
+  else
+    config.bullet_train = nil
+  end
+
+  posthog_config = Rails.application.config_for(:posthog)&.with_indifferent_access
+  if posthog_config.present? and posthog_config['enabled']
+    config.posthog = PostHog::Client.new(
+        {
+            api_key: posthog_config['api_key'],
+            api_host: posthog_config['api_host'],
+            # Todo log errors
+            on_error: Proc.new {|status, msg| print msg}
+        }
+    )
+  else
+    config.posthog = nil
+  end
+
+
+
+  redis_config = Rails.application.config_for(:redis_config)&.with_indifferent_access
+  config.redis = Redis.new(redis_config.slice('url', 'password'))
+
   # Enable/disable caching. By default caching is disabled.
   # Run rails dev:cache to toggle caching.
   if Rails.root.join('tmp', 'caching-dev.txt').exist?
@@ -20,7 +47,7 @@ Rails.application.configure do
 
     config.cache_store = :memory_store
     config.public_file_server.headers = {
-      'Cache-Control' => "public, max-age=#{2.days.to_i}"
+        'Cache-Control' => "public, max-age=#{2.days.to_i}"
     }
   else
     config.action_controller.perform_caching = false
@@ -64,7 +91,7 @@ Rails.application.configure do
 
   # Store uploaded files on the local file system (see config/storage.yml for options)
   config.active_storage.service = :local
-
+  ActiveStorage::Current.host = 'http://localhost:3001'
   # Don't care if the mailer can't send.
   config.action_mailer.raise_delivery_errors = true
 

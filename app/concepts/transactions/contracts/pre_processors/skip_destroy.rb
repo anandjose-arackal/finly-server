@@ -24,5 +24,4 @@ class Transactions::Contracts::PreProcessors::SkipDestroy < Transactions::Contra
     end
     true
   end
-
 end

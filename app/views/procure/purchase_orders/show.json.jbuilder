@@ -1,3 +1,4 @@
+purchase_order = @result.purchase_order
 json.extract! @result.purchase_order, :id, :po_number, :delivery_date, :gst_type_id,
               :inclusive_of_taxes, :roundoff_total_enabled, :roundoff_amount, :location_id, :delivery_location_id,
               :payment_term_id, :procurement_term_id, :procurement_term_text, :policy_id, :department_id, :sub_department_id, :cost_center_id,
@@ -5,6 +6,7 @@ json.extract! @result.purchase_order, :id, :po_number, :delivery_date, :gst_type
 
 json.vendor @result.purchase_order.vendor.as_json
 json.purchase_request_present @result.purchase_order.items.pluck('purchase_order_items.purchase_request_item_id').compact.present? rescue false
+tax_ids = []
 json.vendor do
   json.extract! @result.purchase_order&.vendor
 
@@ -128,7 +130,7 @@ json.items do
                   :unit_of_measurement,
                   :rate, :tax, :tds, :discount, :delivery_date, :comment, :tax_rate_id, :department_id, :cost_center_id,
                   :sgst, :cgst, :igst
-    
+    tax_ids.push(item.tax_rate_id)
     json.item_number item&.inventory_line_item&.item_number
     json.gl_code item&.category&.gl_code
     json.category_name item&.category&.name
@@ -298,7 +300,9 @@ end
 
 json.tax_rates do
   json.array! @result.tax_rates do |tax_rate|
-    json.merge! tax_rate.as_json
+    if tax_ids.include?(tax_rate.id) || !tax_rate.deleted?
+      json.merge! tax_rate.as_json
+    end
   end
 end
 
@@ -322,11 +326,13 @@ json.gstin_locations do
 end
 
 json.tds_slabs do
-    json.array!(@result.tds_slabs.tds_slabs) do |tds_slab|
+  json.array!(@result.tds_slabs.tds_slabs) do |tds_slab|
+    if (tds_slab.id == purchase_order.advance_tds_slab_id) || !tds_slab.deleted?
       json.id tds_slab.id
-      json.name tds_slab.name
+      json.name "#{tds_slab.tds}% - #{tds_slab.name} "
       json.tds tds_slab.tds
     end
+  end
 end
 
 json.transfer_modes current_company.transfer_modes.as_json

@@ -1,5 +1,5 @@
 <% content_for :body do %>
-    <h3><%= "#{@preview_registration.email}" %> has requested for a demo of our product. The details are as follows: </h3>
+  <h3><%= "#{@preview_registration.email}" %> has requested for a demo of our product. The details are as follows: </h3>
 
     <h4>Requester Name: <%= @preview_registration.name %></h4>
     <br/>
@@ -9,9 +9,9 @@
     <br/>
     <h4>Company: <%= @preview_registration.company %></h4>
     <br/>
-    <% if @sales_person %>
+  <% if @sales_person %>
     <h3>URL (page from which user sign up): <%= @preview_registration.url %></h3>
-    <% end %>
+  <% end %>
 <% end %>
 
 <%= render 'application_mailer/template' %>

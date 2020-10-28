@@ -1,3 +1,11 @@
+Loader.watch! "Searchkick clear loaded models" do
+  # Searchkick appends the models everytime it is reloaded. This creates a lot of duplicate models being captured.
+  # This is prevent that behavior
+  Searchkick.models.clear
+  ApplicationRecord.descendants.each do |model|
+    Searchkick.models << model if model.respond_to?(:searchkick_api)
+  end
+end
 Loader.watch! "Create RequestStore" do
   RequestStore.clear!
 end
@@ -25,4 +33,11 @@ Loader.watch! "Routes Loader" do
     router.clear_map
   end
   Dir.glob(Rails.root.join("app/routes/**/*.rb")).each {|f| load f}
+end
+
+Loader.watch! "Bullet Train" do
+  config = Rails.application.config_for(:feature_flipper)&.with_indifferent_access
+  if config.dig('api_key').present? and config.dig('url').present?
+    Rails.configuration.bullet_train = BulletTrain.new(api_key: config['api_key'], url: config['url'])
+  end
 end

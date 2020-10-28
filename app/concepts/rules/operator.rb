@@ -14,7 +14,12 @@ class Rules::Operator
             }
         ]
       else
-        values = values.map {|val| val.slice(:value, :entity, :formula)}
+        values = values.map { |val|
+          # if values is a hash, val will be an array of [key, value]
+          val = val[1] if val.is_a?(Array)
+
+          val.slice(:value, :entity, :formula)
+        }
       end
       Rules::Rule.new(
           predicate,

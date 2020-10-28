@@ -21,8 +21,6 @@ class Company < ApplicationRecord
   include Exposures::Model::Exposable
   include EventProducer
 
-  event_channel 'company'
-
   belongs_to :base_currency, optional: true, class_name: 'Currency'
   belongs_to :status, optional: true, class_name: 'CompanyStatus'
   belongs_to :group, optional: true, class_name: 'CompanyGroup'
@@ -234,7 +232,7 @@ class Company < ApplicationRecord
 
   scope :with_subdomain, ->(subdomain) {find_by subdomain: subdomain}
 
-  def as_json(options={})
+  def as_json(options = {})
     {
         id: id,
         name: name,

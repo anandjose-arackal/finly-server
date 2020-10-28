@@ -30,6 +30,7 @@
 #  can_choices_be_changed       :boolean
 #  allow_clearing_default_value :boolean
 #  options                      :text(65535)
+#  data_provider                :text(65535)
 #  deleted_at                   :datetime
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
@@ -42,11 +43,10 @@
 #  type                         :string(255)
 #  config                       :text(65535)
 #  associate_custom_fields      :boolean
-#  compute                      :boolean
 #  compute_enabled              :boolean
 #  compute_type_id              :integer
-#  compute_formula              :string(255)
 #  compute_lookup_entity_id     :string(255)
+#  compute_formula              :text(65535)
 #  filters                      :text(65535)
 #  config_path                  :string(255)
 #
@@ -80,6 +80,8 @@ class FormEntity < ApplicationRecord
 
   has_many :choice_dependencies, class_name: "FormChoiceDependency", foreign_key: :dependent_entity_id
   has_many :choice_controlling_entities, through: :choice_dependencies, class_name: 'FormEntity', source: :controlling_entity
+
+  before_save :sanitize
 
   # Fixme: Delete this as it is available in Forms::Entity::Registry. Kept it commented for testing purpose
   # def find_entity(entity_path)
@@ -179,6 +181,12 @@ class FormEntity < ApplicationRecord
 
   def form_builder_json(opts = {})
     params = opts[:params] || {}
+    if choices_scope.present?
+      choices_data = choices_scope.build(params: params, user: opts[:current_user])
+    else
+      choices_data = {choices: choices.as_json}
+    end
+
     data = {
         id: id,
         uuid: uuid,
@@ -192,7 +200,7 @@ class FormEntity < ApplicationRecord
         hint: hint,
         entity_type: entity_type,
         default_value: default_value,
-        behaviour: {
+        behavior: {
             editable: editable,
             required: required,
             active: active,
@@ -227,9 +235,10 @@ class FormEntity < ApplicationRecord
         compute_lookup_entity_id: compute_lookup_entity_id,
         filters: filters,
         config_path: config_path,
-        validations: validations.as_json(options),
-        conditions: conditions.as_json(options),
-        choices: choices_scope.present? ? choices_scope.build(params: params, user: opts[:current_user]) : nil
+        validations: validations.as_json(opts),
+        conditions: conditions.as_json(opts),
+        # choices: choices_scope(params: options[:params], user: options[:current_user]),
+        choices: choices_data
     }
   end
 
@@ -251,6 +260,8 @@ class FormEntity < ApplicationRecord
     data = {
         id: uuid,
         entity_key: entity_key,
+        parent_id: parent_id,
+        system_field: system_field,
         entity_path: entity_path,
         config_path: config_path,
         label: label,
@@ -328,16 +339,48 @@ class FormEntity < ApplicationRecord
   end
 
 
-  def meta_attributes
-    [
-        {:can_visible_be_changed => :visible},
-        {:can_editable_be_changed => :editable},
-        {:can_required_be_changed => :required},
-        {:can_uniqueness_be_changed => :unique},
-        {:can_be_disabled => :active},
-        {:can_label_be_renamed => :label},
-        {:can_choices_be_changed => :choices},
-        {:allow_clearing_default_value => :default_value}
-    ]
+  def generate_config_path(path = [], obj = self)
+    return path if obj.blank?
+    if obj.class.ancestors.map(&:name).include?('FormEntity')
+      # Obj is an entity
+      if obj.parent.present?
+        path.unshift("entities", obj.entity_key)
+        return generate_config_path(path, obj.parent)
+      else
+        path.unshift(obj.entity_key)
+        return generate_config_path(path, obj.section)
+      end
+
+    elsif obj.class.ancestors.map(&:name).include?('FormSection')
+      path.unshift(obj&.section&.section_id, "entities")
+      return generate_config_path(path, obj.form)
+    else
+      path
+    end
+  end
+
+  def generate_entity_path(path = [], obj = self)
+    return path if obj.blank?
+
+    if obj.class.ancestors.map(&:name).include?('FormEntity')
+      # Obj is an entity
+      if obj.parent.present?
+        path.unshift(obj.entity_key)
+        generate_entity_path(path, obj.parent)
+      else
+        path.unshift(obj.entity_key)
+        generate_entity_path(path, obj.section)
+      end
+    else
+      path
+    end
+  end
+
+
+  private
+  def sanitize
+    # Set entity path & config path
+    self.entity_path = generate_entity_path.join(".")
+    self.config_path = generate_config_path.join(".")
   end
 end

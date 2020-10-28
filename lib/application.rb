@@ -4,6 +4,11 @@ class Application < NonPersistentModel
     ['em', 'vp', 'ft', 'ap']
   end
 
+  def eager_load! #:nodoc:
+    railties.all(&:eager_load!)
+    super
+  end
+
   def self.id_for(app)
     case app
       when :expense_management, :em

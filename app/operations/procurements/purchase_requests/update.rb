@@ -63,6 +63,7 @@ class Procurements::PurchaseRequests::Update < Procurements::PurchaseRequests::B
   end
 
   def post_process
+    budget_limit_validation( purchase_request )
     add_message :success, 'Successfully updated purchase request'
   end
 

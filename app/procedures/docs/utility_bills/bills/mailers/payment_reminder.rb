@@ -4,7 +4,7 @@ class Docs::UtilityBills::Bills::Mailers::PaymentReminder < Notifier::Mailer
 
   class Docs::UtilityBills::Bills::Mailers::PaymentReminder::Autofetched < Docs::UtilityBills::Bills::Mailers::PaymentReminder
 
-    consumes_event! 'bbps_bill.remind_payment'
+    consumes_event! 'bbps_bills.remind_payment'
 
     assign :to do |user, params|
       bill = params[:record]

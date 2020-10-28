@@ -30,6 +30,7 @@
 #  can_choices_be_changed       :boolean
 #  allow_clearing_default_value :boolean
 #  options                      :text(65535)
+#  data_provider                :text(65535)
 #  deleted_at                   :datetime
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
@@ -42,11 +43,10 @@
 #  type                         :string(255)
 #  config                       :text(65535)
 #  associate_custom_fields      :boolean
-#  compute                      :boolean
 #  compute_enabled              :boolean
 #  compute_type_id              :integer
-#  compute_formula              :string(255)
 #  compute_lookup_entity_id     :string(255)
+#  compute_formula              :text(65535)
 #  filters                      :text(65535)
 #  config_path                  :string(255)
 #
@@ -68,16 +68,17 @@ class FormEntity::Text < FormEntity
 
   contract_eval 'Max Char Limit Check', &Forms::Validations::Templates[:maximum]
   contract_eval 'Min Char Limit Check', &Forms::Validations::Templates[:minimum]
+  contract_eval 'Regex Check', &Forms::Validations::Templates[:regex_match]
   # Todo regex
 
   schema_validation do
     required(:options) do
       hash do
-        required(:maximum).value(:int?, lteq?: 255)
-        required(:minimum).value(:int?, gteq?: 0)
+        required(:maximum).filled
+        required(:minimum).filled
         optional(:regex).hash do
           required(:format).filled
-          required(:message).filled
+          optional(:message)
         end
         optional(:format).value(included_in?: FORMAT)
       end
@@ -90,13 +91,25 @@ class FormEntity::Text < FormEntity
         params do
           required(:options) do
             hash do
-              required(:maximum).value(:int?, lteq?: 255)
-              required(:minimum).value(:int?, gteq?: 0)
-              optional(:regex).hash do
-                required(:format).filled
-                required(:message).filled
-              end
+              optional(:maximum).filled
+              optional(:minimum).filled
               optional(:format).value(included_in?: FORMAT)
+              optional(:regex).hash do
+                optional(:format).filled
+                optional(:message)
+              end
+            end
+          end
+        end
+        rule(:options) do
+          min = value[:minimum]
+          max = value[:maximum]
+          key.failure("> minimum can't be less than 0") if min.to_i < 0
+          key.failure("> maximum can't be greater than 255") if max.to_i > 255
+
+          if min.present? && max.present?
+            if min > max
+              key.failure('> maximum cannot be less than minimum')
             end
           end
         end

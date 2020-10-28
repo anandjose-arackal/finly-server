@@ -100,15 +100,15 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
 
   def post_process
     case self.response&.status
-      when 404
+    when 404
         self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:possible_failure))
         add_message :error, "Service temporarily unavailable"
         self.transfer_request.bank_error_message = "Service temporarily unavailable"
-      when 500
+    when 500
         self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:possible_failure))
         add_message :error, "Service temporarily unavailable"
         self.transfer_request.bank_error_message = "Service temporarily unavailable"
-      when 200
+    when 200
         # mark the transaction as processing.
         # log the parsed params so that we can get visibility on the transaction
 
@@ -143,11 +143,11 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
           add_message :error, error_message
           self.transfer_request.bank_error_message = error_message
         end
-      else
-        # this will be the catch-all in case the response is not one we expect
-        self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:possible_failure))
-        add_message :error, "Service temporarily unavailable"
-        self.transfer_request.bank_error_message = "Service temporarily unavailable"
+    else
+      # this will be the catch-all in case the response is not one we expect
+      self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:possible_failure))
+      add_message :error, "Service temporarily unavailable"
+      self.transfer_request.bank_error_message = "Service temporarily unavailable"
     end
   end
 

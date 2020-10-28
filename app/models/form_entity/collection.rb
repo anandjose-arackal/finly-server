@@ -30,6 +30,7 @@
 #  can_choices_be_changed       :boolean
 #  allow_clearing_default_value :boolean
 #  options                      :text(65535)
+#  data_provider                :text(65535)
 #  deleted_at                   :datetime
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
@@ -42,11 +43,10 @@
 #  type                         :string(255)
 #  config                       :text(65535)
 #  associate_custom_fields      :boolean
-#  compute                      :boolean
 #  compute_enabled              :boolean
 #  compute_type_id              :integer
-#  compute_formula              :string(255)
 #  compute_lookup_entity_id     :string(255)
+#  compute_formula              :text(65535)
 #  filters                      :text(65535)
 #  config_path                  :string(255)
 #
@@ -71,9 +71,14 @@ class FormEntity::Collection < FormEntity
         params do
           required(:options) do
             hash do
-              optional(:min_items).value(:int?)
+              optional(:min_items)
             end
           end
+        end
+
+        rule(:options) do
+          max = value[:min_items]
+          key.failure("> min items can't be less than 0") if min.to_i < 0
         end
       end
     end

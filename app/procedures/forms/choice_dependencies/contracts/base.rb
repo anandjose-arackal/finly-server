@@ -22,14 +22,14 @@ class Forms::ChoiceDependencies::Contracts::Base < Reform::Form
     property :controlling_choice_id
   end
 
-  property :internal, deserializer: -> (input, represented, *args) {debugger}
+  # property :internal, deserializer: -> (input, represented, *args) {debugger}
 
   def mappings!(collection:, fragment:, index:, options:, **)
     mapping = mappings.find {|mapping| mapping.id.to_s == fragment["id"].to_s}
 
     if fragment["_destroy"]
-      mappings.destroy(mapping)
-      return skip!
+      mapping.destroy
+      skip!
     end
 
     mapping || mappings.append(FormChoiceDependencyMapping.new)

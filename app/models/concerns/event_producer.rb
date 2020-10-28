@@ -3,9 +3,6 @@ module EventProducer
 
   included do
     include DynamicAttributes
-    class_attr :record_events, default: []
-    class_attr :collection_events, default: []
-
     setup_event_producers
   end
 
@@ -16,22 +13,8 @@ module EventProducer
       @event_channel || self.table_name
     end
 
-    def record_event?(event)
-      return false if event.blank?
-      record_events.include?(event) or record_events.include?(event.gsub("#{event_channel}.", ""))
-    end
-
-    def collection_event?(event)
-      return false if event.blank?
-      collection_events.include?(event) or collection_events.include?(event.gsub("#{event_channel}.", ""))
-    end
-
-    def all_events
-      record_events + collection_events
-    end
-
     def setup_event_producers
-      after_save :after_save_callbacks
+      after_commit :after_save_callbacks
       before_destroy :before_destroy_callbacks
     end
   end

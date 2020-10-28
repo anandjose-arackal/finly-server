@@ -16,7 +16,7 @@ class Admin::Masters::Macros::Contracts::Schedule < Reform::Form
       return
     end
 
-    valid_minutes = (0..11).to_a.map { |i| i * 5 }
+    valid_minutes = (0..11).to_a.map {|i| i * 5}
     unless valid_minutes.include?(self.minute.to_i)
       errors.add :minute, 'is invalid'
     end
@@ -44,7 +44,7 @@ class Admin::Masters::Macros::Contracts::Schedule < Reform::Form
   end
 
   def day_of_the_week_format
-    required =%w(
+    required = %w(
         weekly
     ).include?(frequency.to_s)
 

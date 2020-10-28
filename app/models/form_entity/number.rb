@@ -30,6 +30,7 @@
 #  can_choices_be_changed       :boolean
 #  allow_clearing_default_value :boolean
 #  options                      :text(65535)
+#  data_provider                :text(65535)
 #  deleted_at                   :datetime
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
@@ -42,11 +43,10 @@
 #  type                         :string(255)
 #  config                       :text(65535)
 #  associate_custom_fields      :boolean
-#  compute                      :boolean
 #  compute_enabled              :boolean
 #  compute_type_id              :integer
-#  compute_formula              :string(255)
 #  compute_lookup_entity_id     :string(255)
+#  compute_formula              :text(65535)
 #  filters                      :text(65535)
 #  config_path                  :string(255)
 #
@@ -63,6 +63,9 @@ class FormEntity::Number < FormEntity
   option :format
 
   operators :gteq, :lteq, :in, :not_in, :not_null, :null
+
+  contract_eval 'Max Value Limit Check', &Forms::Validations::Templates[:max_value]
+  contract_eval 'Min Value Limit Check', &Forms::Validations::Templates[:min_value]
 
   schema_validation do
     required(:options) do
@@ -83,6 +86,21 @@ class FormEntity::Number < FormEntity
               optional(:min_value).value(:int?)
               optional(:max_value).value(:int?)
               optional(:format).value(included_in?: FORMAT)
+            end
+          end
+        end
+        rule(:options) do
+          max = value[:max_value]
+          min = value[:min_value]
+          format = value[:format]
+
+          if format.present?
+            key.failure("> formats must be one of #{FormEntity::Number::FORMAT.join(", ")}") if FormEntity::Number::FORMAT.exclude?(format)
+          end
+
+          if min.present? && max.present?
+            if min.to_f > max.to_f
+              key.failure('> max value cannot be less than min value')
             end
           end
         end

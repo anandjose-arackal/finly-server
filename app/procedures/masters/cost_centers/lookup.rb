@@ -1,6 +1,6 @@
 class Masters::CostCenters::Lookup < Lookup::API
 
-  resolver 'cost_center.default'
+  resolver 'cost_centers.default'
   search_key :name_or_cost_center_code_cont
 
   attribute :id, visible: false

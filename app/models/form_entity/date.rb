@@ -30,6 +30,7 @@
 #  can_choices_be_changed       :boolean
 #  allow_clearing_default_value :boolean
 #  options                      :text(65535)
+#  data_provider                :text(65535)
 #  deleted_at                   :datetime
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
@@ -42,11 +43,10 @@
 #  type                         :string(255)
 #  config                       :text(65535)
 #  associate_custom_fields      :boolean
-#  compute                      :boolean
 #  compute_enabled              :boolean
 #  compute_type_id              :integer
-#  compute_formula              :string(255)
 #  compute_lookup_entity_id     :string(255)
+#  compute_formula              :text(65535)
 #  filters                      :text(65535)
 #  config_path                  :string(255)
 #
@@ -70,6 +70,7 @@ class FormEntity::Date < FormEntity
     if entity.options['restriction'].present?
       contract.validate do
         value = send(entity.entity_key)
+
         next unless value.present?
 
         case entity.options['restriction']
@@ -113,6 +114,10 @@ class FormEntity::Date < FormEntity
               optional(:restriction).value(included_in?: RESTRICTIONS)
             end
           end
+        end
+        rule(:options) do
+          restriction = value[:restriction]
+          key.failure("> restriction must be one of #{FormEntity::Date::RESTRICTIONS.join(", ")}") if FormEntity::Date::RESTRICTIONS.exclude?(restriction)
         end
       end
     end

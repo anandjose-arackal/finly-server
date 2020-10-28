@@ -23,10 +23,10 @@
 class FormChoiceDependency < ApplicationRecord
   include UUIDHelper, TemplateClonable
 
-  belongs_to :company
-  belongs_to :form
-  belongs_to :controlling_entity, class_name: "FormEntity"
-  belongs_to :dependent_entity, class_name: 'FormEntity'
+  belongs_to :company, optional: true
+  belongs_to :form, optional: true
+  belongs_to :controlling_entity, class_name: "FormEntity", optional: true
+  belongs_to :dependent_entity, class_name: 'FormEntity', optional: true
   belongs_to :created_by, class_name: 'User', optional: true
   belongs_to :updated_by, class_name: 'User', optional: true
 

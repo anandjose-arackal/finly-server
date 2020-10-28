@@ -37,6 +37,10 @@ class PaymentAgreement < ApplicationRecord
 
   include Transitionable, SoftDeletable
   include Sequenced::ActsAsSequenced
+  # include SearchIndex::Concerns::Document
+include Searchkick::Api
+
+  event_channel 'agreements'
 
   acts_as_sequenced column: :order_number, purpose: :payment_agreement, editable: false, prefix: 'PA'
 
@@ -95,6 +99,7 @@ class PaymentAgreement < ApplicationRecord
 
   AGREEMENT_TYPES = [{id: 'general_invoice', name: 'Invoice - General Invoice'}, {id: 'rental_invoice', name: 'Invoice - Rental Invoice'}, {id: 'beneficiary_payment', name: 'Payment - Beneficiary Payment'}, {id: 'security_deposit', name: 'Payment - Security Deposit'}]
 
+  scope :with_company_id, -> (company_id) { where company_id: company_id }
   scope :filter_title, -> (title) {
     if title.present?
       where('payment_agreements.title LIKE ?', "%#{title}%")
@@ -300,8 +305,12 @@ class PaymentAgreement < ApplicationRecord
       where(status_id: status_id)
     end
   }
+  scope :with_status_ids, -> (status_id) {
+    with_status_id(status_id)
+  }
 
   ransack_scopes :with_status_id
+  ransack_scopes :with_status_ids
 
   def as_json(options={})
     {

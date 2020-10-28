@@ -2,7 +2,7 @@ class Docs::UtilityBills::Subscriptions::Mailers::Reject < Docs::UtilityBills::S
 
   class Docs::UtilityBills::Subscriptions::Mailers::Reject::RejectedBy < Docs::UtilityBills::Subscriptions::Mailers::Reject
 
-    consumes_event! 'bbps_biller_subscription.reject'
+    consumes_event! 'bbps_biller_subscriptions.reject'
 
     assign :to do |user, params|
       [user.email]
@@ -23,7 +23,7 @@ class Docs::UtilityBills::Subscriptions::Mailers::Reject < Docs::UtilityBills::S
 
   class Docs::UtilityBills::Subscriptions::Mailers::Reject::RejectedTo < Docs::UtilityBills::Subscriptions::Mailers::Reject
 
-    consumes_event! 'bbps_biller_subscription.reject'
+    consumes_event! 'bbps_biller_subscriptions.reject'
 
     assign :to do |user, params|
       [params[:record]&.user&.email]

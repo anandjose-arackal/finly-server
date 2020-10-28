@@ -11,7 +11,7 @@ json.invoice_items_categories do
 end
 
 json.tds_slabs do
-  json.array!(current_company.tds_slabs) do |tds_slab|
+  json.array!(current_company.tds_slabs.non_deleted) do |tds_slab|
     json.extract! tds_slab, :name, :id, :tds
   end
 end

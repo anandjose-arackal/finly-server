@@ -30,6 +30,7 @@
 #  can_choices_be_changed       :boolean
 #  allow_clearing_default_value :boolean
 #  options                      :text(65535)
+#  data_provider                :text(65535)
 #  deleted_at                   :datetime
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
@@ -42,11 +43,10 @@
 #  type                         :string(255)
 #  config                       :text(65535)
 #  associate_custom_fields      :boolean
-#  compute                      :boolean
 #  compute_enabled              :boolean
 #  compute_type_id              :integer
-#  compute_formula              :string(255)
 #  compute_lookup_entity_id     :string(255)
+#  compute_formula              :text(65535)
 #  filters                      :text(65535)
 #  config_path                  :string(255)
 #
@@ -58,6 +58,9 @@ class FormEntity::Amount < FormEntity
   option :min_value
 
   operators :gteq, :lteq, :in, :not_in, :not_null, :null
+
+  contract_eval 'Max Value Limit Check', &Forms::Validations::Templates[:max_value]
+  contract_eval 'Min Value Limit Check', &Forms::Validations::Templates[:min_value]
 
   schema_validation do
     required(:options) do
@@ -74,8 +77,21 @@ class FormEntity::Amount < FormEntity
         params do
           required(:options) do
             hash do
-              optional(:min_value).value(:int?)
-              optional(:max_value).value(:int?)
+              optional(:min_value)
+              optional(:max_value)
+            end
+          end
+        end
+
+        rule(:options) do
+          max = value[:max_value]
+          min = value[:min_value]
+
+          key.failure("> min value can't be less than 0") if min.to_i < 0
+
+          if min.present? && max.present?
+            if min > max
+              key.failure('> max value cannot be less than minimum')
             end
           end
         end

@@ -87,9 +87,11 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
 
     self.invoice.update(rejection_note: "")
     self.workflow_output = op.workflow_output
+    
   end
 
   def post_process
+    budget_limit_validation( invoice )
     update_agreement_available_limit
     role_id = self.workflow_output[:role_id]
     Event::EInvoice::Submit.(user, {invoice: invoice, workflow_output: workflow_output, role_id: role_id})

@@ -36,10 +36,6 @@ class FormEntitiesController < BaseControllers::WebBase
     # endpoint Forms::Ops::EntityUpdate
   end
 
-  def sync_order
-    # endpoint Forms::Ops::EntitySyncOrder
-  end
-
   private
 
   def resolve_layout

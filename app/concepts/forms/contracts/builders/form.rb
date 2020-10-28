@@ -14,9 +14,9 @@ class Forms::Contracts::Builders::Form
         represented.form_data = {}
       end
 
-      if form.model.has_attribute?(:created_by)
-        property :created_by, deserializer: -> (input, represented, **) do
-          represented.created_by = RequestStoreUtil.current_user if represented.created_by.blank?
+      if form.model.has_attribute?(:created_by_id)
+        property :created_by_id, deserializer: -> (input, represented, **) do
+          represented.created_by_id = RequestStoreUtil.current_user.id if represented.created_by_id.blank?
         end
       end
 

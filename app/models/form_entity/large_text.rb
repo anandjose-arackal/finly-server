@@ -30,6 +30,7 @@
 #  can_choices_be_changed       :boolean
 #  allow_clearing_default_value :boolean
 #  options                      :text(65535)
+#  data_provider                :text(65535)
 #  deleted_at                   :datetime
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
@@ -42,11 +43,10 @@
 #  type                         :string(255)
 #  config                       :text(65535)
 #  associate_custom_fields      :boolean
-#  compute                      :boolean
 #  compute_enabled              :boolean
 #  compute_type_id              :integer
-#  compute_formula              :string(255)
 #  compute_lookup_entity_id     :string(255)
+#  compute_formula              :text(65535)
 #  filters                      :text(65535)
 #  config_path                  :string(255)
 #
@@ -60,6 +60,9 @@ class FormEntity::LargeText < FormEntity
 
   operators :eq_any, :not_eq_all, :cont_any, :not_cont_all, :blank, :present
   simple_filter :cont_any
+
+  contract_eval 'Max Char Limit Check', &Forms::Validations::Templates[:maximum]
+  contract_eval 'Min Char Limit Check', &Forms::Validations::Templates[:minimum]
 
   schema_validation do
     required(:options) do
@@ -76,8 +79,21 @@ class FormEntity::LargeText < FormEntity
         params do
           required(:options) do
             hash do
-              required(:maximum).value(:int?, lteq?: 65535)
-              required(:minimum).value(:int?, gteq?: 0)
+              optional(:maximum)
+              optional(:minimum)
+            end
+          end
+        end
+        rule(:options) do
+          max = value[:maximum]
+          min = value[:minimum]
+
+          key.failure("> minimum can't be less than 0") if min.to_i < 0
+          key.failure("> maximum can't be greater than 65535") if max.to_i > 65535
+
+          if min.present? && max.present?
+            if min > max
+              key.failure('> maximum cannot be less than minimum')
             end
           end
         end

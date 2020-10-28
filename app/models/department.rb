@@ -24,8 +24,8 @@ class Department < ApplicationRecord
   include LiquidDroppable
   include Exposures::Model::Exposable
   include EventProducer
-
-  event_channel 'department'
+  include Searchkick::Api
+  # include SearchIndex::Concerns::Document
 
   acts_as_sequenced column: :department_code, purpose: :department, editable: false, prefix: 'DPT'
 
@@ -54,6 +54,7 @@ class Department < ApplicationRecord
 
   scope :with_ids, -> (id) { where id: id }
   scope :with_id, -> (id) { where id: id }
+  scope :with_company_id, -> (company_id) { where company_id: company_id }
 
   scope :with_name, -> (name) { where name: name }
   # scope :only_sub_departments, -> {

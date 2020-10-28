@@ -2996,8 +2996,7 @@ Rails.application.routes.draw do
   post 'virtual_accounts', to: 'api/fc/invoices/virtual_bank_accounts#create'
   patch 'virtual_accounts/:account_number', to: 'api/fc/invoices/virtual_bank_accounts#update'
   delete 'virtual_accounts/:account_number', to: 'api/fc/invoices/virtual_bank_accounts#deactivate'
-  # Deprecated in leu of the new invoices APIs
-  # post 'invoices', to: 'api/fc/invoices/outward_invoices#create_valid'
+  post 'invoices', to: 'api/fc/invoices/outward_invoices#create_valid'
   post 'invoices/customers', to: 'api/fc/invoices/customers#create'
   patch 'invoices/customers/:id', to: 'api/fc/invoices/customers#update'
   get 'invoices/customers/:id', to: 'api/fc/invoices/customers#show'
@@ -3436,7 +3435,9 @@ Rails.application.routes.draw do
 
   get 'autocomplete/customers', to: 'invoicing/autocomplete#customer'
   get 'autocomplete/vendors', to: 'autocomplete#vendors'
-  # get 'autocomplete/:entity', to: 'autocomplete#route' # Fixme Deprecated
+
+  # Fixme : Keeping it since its available in current version of master
+  get 'autocomplete/:entity', to: 'autocomplete#route' # Fixme Deprecated
 
   get 'lookup/route', to: 'lookup#route'
   get 'lookup/:route', to: 'lookup#route'
@@ -4171,6 +4172,17 @@ Rails.application.routes.draw do
     get 'procurements', to: "vendors#procurements"
     get 'transactions', to: "vendors#transactions"
   end
+
+  # ****************************************************
+  # NEW VENDOR FORMS
+
+  # Vendor Forms API
+  post 'vendor_forms/create_and_submit', to: "vendor_forms#create_and_submit"
+  resources :vendor_forms do
+    put 'submit', to: "vendor_forms#submit"
+  end
+
+
   ######### New Vendor Empanelment Ends ##
 
 
@@ -4224,6 +4236,7 @@ Rails.application.routes.draw do
   get 'forms/:route/dependencies', to: 'forms#form_dependencies'
   post 'forms/choices', to: 'forms#form_entity_choices'
   post 'forms/lookup_details', to: 'forms#form_lookup_details'
+  patch 'forms/:id/sync_positions', to: 'forms#sync_positions'
   resources :forms
 
   get 'form_entities/entity_types', to: "form_entities#entity_types"
@@ -4232,6 +4245,9 @@ Rails.application.routes.draw do
   patch 'form_choice_dependencies/:id/enable', to: 'form_choice_dependencies#enable'
   patch 'form_choice_dependencies/:id/disable', to: 'form_choice_dependencies#disable'
   resources :form_choice_dependencies
+
+
+  post 'attachments/custom_field_attachment', to: 'attachments#create_custom_field_attachment'
 
   resources :insights
 
@@ -4358,7 +4374,14 @@ Rails.application.routes.draw do
 
   get 'lookup/:route', to: 'lookup#route'
 
-  resources :invoices, only: [:create, :update, :show]
+ post 'search', to: 'global_search#create'
+  get 'search', to: 'global_search#index'
+
+
+  # todo - I2P : For invoices
+  # resources :invoices, only: [:create, :update, :show]
+
+  resources :approval_matrix, only: [:index]
 
   namespace :masters do
     scope ":master_key/records" do

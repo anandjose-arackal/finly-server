@@ -21,9 +21,9 @@ class Forms::Entities::Ops::Create < Transactions::API
 
   step Contract::Build(builder: :retrieve_contract!)
 
-  step :check_success
-
   step Contract::Validate(key: :form_entity)
+
+  step :check_success
 
   step Contract::Persist()
 

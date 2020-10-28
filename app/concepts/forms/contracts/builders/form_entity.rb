@@ -24,6 +24,11 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
   # Contract evaluators help in checking entity specific validations such as max_items, min_items. Todo : Rename maybe?
   pass :execute_contract_evaluators
 
+  def check_success(ctx, options)
+    # debugger
+    true
+  end
+
   def init(context, params:, **)
     context[:contract] = params[:contract]
     context[:entity] = params[:entity]
@@ -53,9 +58,8 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
           )
         }
         required = result['required']
-
         # Required validation ( System Validation )
-        if required and send(entity.entity_key).nil?
+        if required and send(entity.entity_key).blank? and entity.entity_type != 'switch'
           errors.add entity.entity_key, 'cannot be blank'
         end
       end
@@ -66,6 +70,8 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
     contract.validate -> do
       contract_root.profiler.step 'custom_validate_entity', entity.entity_path do
         entity.validations.each do |validation|
+          puts "Validation ID => #{validation.id}"
+          puts "Data => #{{form: contract_root.form_data, row: self.form_data}.with_indifferent_access}"
           next unless validation.rule.apply?({form: contract_root.form_data, row: self.form_data}.with_indifferent_access)
 
           errors.add entity.entity_key, validation.error_message
@@ -85,6 +91,8 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
         row_data = self.form_data
         entity_value = Forms::RequestParser.new(form: form_data, row: row_data).fetch(entity.entity_path)
         next if entity_value.blank?
+
+        # debugger if entity.entity_key == 'vendor_location'
 
         if entity.filters.blank? and entity.choice_dependencies.size == 0
           contract_root.bulk_validate_choice entity, entity_value
@@ -112,6 +120,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
         entity: entity,
         contract: contract
     }
+
     entity.class.contract_evaluators.each do |name, evaluator|
       evaluator.call(context)
     end
@@ -126,6 +135,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
     properties[:deserializer] = deserializer(entity) unless entity.class.layout?
     populator = entity.populator
     properties[:populator] = populator if populator.present?
+    properties[:default] = entity.default_value if entity.default_value.present?
     properties
   end
 
@@ -144,7 +154,11 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
         visible = result['visible']
         internal = result['internal']
         if editable and visible and input.has_key?(entity.entity_key)
-          value = input[entity.entity_key] # || entity.default_value
+          if entity.entity_type == 'switch' and (input[entity.entity_key] == "" or input[entity.entity_key].nil?)
+            value = FormEntity::Switch::TRUTHY_VALUES.include?(entity.default_value)
+          else
+            value = input[entity.entity_key] # || entity.default_value
+          end
           entity.populate(represented, value)
           # represented.send("#{entity.entity_key}=", entity.format(value))
         end
