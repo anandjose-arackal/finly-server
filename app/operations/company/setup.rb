@@ -2,6 +2,8 @@ class Company::Setup < Transactions::API
 
   attr_accessor :company
 
+  skip_user_authorization!
+
   step :initialize!
 
   step :add_export_templates!

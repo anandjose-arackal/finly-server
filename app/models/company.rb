@@ -598,6 +598,6 @@ class Company < ApplicationRecord
   end
 
   def company_setup
-    Company::Setup.({company: self, current_user: User.first})
+    Company::Setup.({company: self})
   end
 end
