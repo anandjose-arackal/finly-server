@@ -170,7 +170,8 @@ class Oauth::TokenController < Doorkeeper::TokensController
       @user.otp_verified = false if @user.otp_verified and @user.associated_group_users.where.not(otp_verified: true).present?
 
       unless @user.expired?
-        @user.update(last_activity_at: DateTime.now)
+        User.where(id: @user.id).update_all(last_activity_at: DateTime.now)
+        # @user.update(last_activity_at: DateTime.now)
       end
 
       return {success: true}
