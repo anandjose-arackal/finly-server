@@ -19,6 +19,8 @@ class SeedHelper
 
     Currency.seed_data
     AdminReviewWorkflow.seed_data
+    ExportResource.seed_data
+    ExportFormat.seed_data
   end
 
 end
