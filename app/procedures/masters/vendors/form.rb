@@ -204,6 +204,12 @@ class Masters::Vendors::Form < Forms::API
     action :required, false
   end
 
+  condition condition_id: "Policy should not be mandatory for auto_approved vendors" do
+    reference :entity, :policy_id
+    rule Rules::Builder[:status_id].eq_any(value: VendorStatus.id_for(:auto_approved))
+    action :required, false
+  end
+
   condition condition_id: "Disable Locations(GSTIN) for International Vendors" do
     reference :entity, :gstin_locations
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
