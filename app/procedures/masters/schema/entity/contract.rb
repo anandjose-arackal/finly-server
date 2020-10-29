@@ -20,6 +20,9 @@ class Masters::Schema::Entity::Contract < Reform::Form
     else
       represented.type = type
     end
+    if represented.type.blank?
+      debugger
+    end
   }
   property :hint, deserializer: -> (input, represented, **) {
     represented.hint = input[:hint] || represented.type&.schema&.dig(:hint)
@@ -28,13 +31,18 @@ class Masters::Schema::Entity::Contract < Reform::Form
   property :unique, default: false
   property :primary_key, default: false
   property :position
-  property :entity_key
   property :label, deserializer: -> (input, represented, **) {
     represented.label = input[:label] if input[:label].present?
     represented.label ||= represented.entity_key.to_s.titleize
   }
   property :system_entity, deserializer: -> (input, represented, **) {
     represented.system_entity ||= false
+  }
+  property :entity_key, deserializer: -> (input, represented, **) {
+    if input[:entity_key].present? and not represented.system_entity
+      # entity_key cannot be modified once set
+      represented.entity_key ||= input[:entity_key]
+    end
   }
   property :active, default: true
   property :show_in_lookup, default: false
@@ -53,8 +61,8 @@ class Masters::Schema::Entity::Contract < Reform::Form
     property :company, deserializer: -> (input, represented) {
       represented.company ||= contract_root.model.company
     }
-    property :created_by, deserializer: -> (input, represented) { ``
-    represented.created_by ||= contract_root.model.created_by
+    property :created_by, deserializer: -> (input, represented) {
+      represented.created_by ||= contract_root.model.created_by
     }
     property :name
   end
@@ -75,6 +83,7 @@ class Masters::Schema::Entity::Contract < Reform::Form
     represented.can_be_destroyed = true unless represented.system_entity
   }
 
+
   validates :type, presence: true
   validates :hint, presence: true
   # validates :master_schema, presence: true
@@ -84,10 +93,20 @@ class Masters::Schema::Entity::Contract < Reform::Form
   validates :type, presence: true
 
   validate :primary_key_should_be_unique
+  validate :non_system_entity_keys
 
   def primary_key_should_be_unique
     if primary_key and not unique
       errors.add :primary_key, 'should be unique'
+    end
+  end
+
+  def non_system_entity_keys
+    return if system_entity
+
+    fields = contract_root.system_master ? MasterEntity::SYSTEM_MASTER_CUSTOM_FIELDS : MasterEntity::CUSTOM_MASTER_CUSTOM_FIELDS
+    unless fields.include?(entity_key)
+      errors.add :entity_key, 'is not valid'
     end
   end
 

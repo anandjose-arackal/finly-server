@@ -40,11 +40,17 @@ class MasterSchema < ApplicationRecord
   default_scope { order(created_at: :asc) }
 
   def model
-    klass_name&.model
+    if system_master
+      klass_name.model
+    else
+      # For custom masters
+      MasterRecord
+    end
   end
 
   def table_name
-    system_master ? master_key : "schema_#{company_id}_#{master_key}"
+    model.table_name
+    # system_master ? master_key : "schema_#{company_id}_#{master_key}"
   end
 
   def klass_name

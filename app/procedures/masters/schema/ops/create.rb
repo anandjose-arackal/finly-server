@@ -8,7 +8,7 @@ class Masters::Schema::Ops::Create < Transactions::API
   step Contract::Build(constant: Masters::Schema::Contract)
   step Contract::Validate()
   step Contract::Persist()
-  step Masters::Schema::Ops::MigrationRunner::Build()
+  # step Masters::Schema::Ops::MigrationRunner::Build()
   step Transactions::Messages::SuccessMessage('Saved')
 
 end
