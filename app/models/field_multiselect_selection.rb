@@ -19,7 +19,7 @@ class FieldMultiselectSelection < ApplicationRecord
   after_save :update_value_in_custom_field
 
   def update_value_in_custom_field
-    joined_values = self.field_multiselect_selection_items.map{|items| items&.value&.name
+    joined_values = self.field_multiselect_selection_items.map {|items| items&.value&.name
     }&.join(',')
     self&.custom_field&.update_column('configured_field_value', joined_values)
   end

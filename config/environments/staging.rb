@@ -12,8 +12,8 @@ Rails.application.configure do
   # Rake tasks automatically ignore this option for performance.
   config.eager_load = true
 
-  feature_flipper_config = Rails.application.config_for(:feature_flipper)&.with_indifferent_access
-  if feature_flipper_config.dig('api_key').present? and feature_flipper_config.dig('url').present?
+  feature_flipper_config = Rails.application.config_for(:feature_flipper)
+  if feature_flipper_config['api_key'].present? and feature_flipper_config['url'].present?
     config.bullet_train = BulletTrain.new(api_key: feature_flipper_config['api_key'], url: feature_flipper_config['url'])
   else
     config.bullet_train = nil
@@ -25,15 +25,6 @@ Rails.application.configure do
 
   redis_config = Rails.application.config_for(:redis_config)&.with_indifferent_access
   config.redis = Redis.new(redis_config.slice('url', 'password'))
-
-  meilisearch_config = Rails.application.config_for(:meilisearch)&.with_indifferent_access
-  if meilisearch_config['enabled']
-    config.meilisearch = MeiliSearch::Client.new(meilisearch_config['url'], meilisearch_config['api_key'])
-    config.meilisearch_index_prefix = meilisearch_config['index_prefix']
-    config.meilisearch_monitor = true
-  else
-    config.meilisearch = nil
-  end
 
   # Enable Rack::Cache to put a simple HTTP cache in front of your application
   # Add `rack-cache` to your Gemfile before enabling this.

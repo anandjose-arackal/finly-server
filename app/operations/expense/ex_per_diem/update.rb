@@ -188,6 +188,7 @@ class Expense::ExPerDiem::Update < Expense::ExPerDiem::Base
   end
 
   def post_process
+    budget_limit_validation( expense )
     # add comment in report if expense is added within report
     Reports::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
 

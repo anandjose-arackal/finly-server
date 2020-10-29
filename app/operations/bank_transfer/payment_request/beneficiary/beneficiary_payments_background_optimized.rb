@@ -419,11 +419,11 @@ def build_text_custom_fields
   custom_fields = []
   init_text_field.each do |text|
     custom_fields << CustomField.new(value_id: text[:value_id],
-                                    field_configuration_id: text[:field_configuration_id],
-                                    parent_id: text[:parent_id],
-                                    parent_type: text[:parent_type],
-                                    value_type: text[:value_type],
-                                    configured_field_value: text[:value][:value])
+                                     field_configuration_id: text[:field_configuration_id],
+                                     parent_id: text[:parent_id],
+                                     parent_type: text[:parent_type],
+                                     value_type: text[:value_type],
+                                     configured_field_value: text[:value][:value])
   end
 
   # bulk upsert field text with the new values and bulk insert the custom fields in one atomic op
@@ -467,11 +467,11 @@ def build_drop_down_custom_fields
   custom_fields = []
   init_drop_down_field.each do |drop_down|
     custom_fields << CustomField.new(value_id: drop_down[:value_id],
-                                    field_configuration_id: drop_down[:field_configuration_id],
-                                    parent_id: drop_down[:parent_id],
-                                    parent_type: drop_down[:parent_type],
-                                    value_type: drop_down[:value_type],
-                                    configured_field_value: drop_down[:value_name])
+                                     field_configuration_id: drop_down[:field_configuration_id],
+                                     parent_id: drop_down[:parent_id],
+                                     parent_type: drop_down[:parent_type],
+                                     value_type: drop_down[:value_type],
+                                     configured_field_value: drop_down[:value_name])
   end
 
   # bulk upsert field drop_down with the new values and bulk insert the custom fields in one atomic op

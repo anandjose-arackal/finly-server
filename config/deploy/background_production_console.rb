@@ -7,7 +7,7 @@
 # server 'example.com', user: 'deploy', roles: %w{app web}, other_property: :other_value
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
-server 'bgp_azure.finly.io', user: 'ubuntu', roles: %w{ app }
+server 'bgp.finly.io', user: 'ubuntu', roles: %w{ app }
 set :stage, 'production'
 set :use_sudo, false
 set :rbenv_type, :user

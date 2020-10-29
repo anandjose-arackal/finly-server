@@ -39,6 +39,12 @@
 #  trade_name               :string(255)
 #  reject_note              :text(65535)
 #  rcm_enabled              :boolean          default(FALSE)
+#  vendor_country           :string(255)
+#  ldc_upper_limit_id       :integer
+#  ldc_effective_start_date :date
+#  ldc_effective_end_date   :date
+#  tds_effective_start_date :date
+#  tds_effective_end_date   :date
 #  erp_sync_status_id       :integer
 #  erp_sync_message         :string(255)
 #  erp_sync_reference_id    :string(255)
@@ -52,7 +58,10 @@ class YesBankVendor < ApplicationRecord
   include LiquidDroppable
   include Exposures::Model::Exposable
   include ErpSyncable
-  include SearchIndex::Concerns::Document
+  # include SearchIndex::Concerns::Document
+  include Searchkick::Api
+  include FormsHelper
+
 
   validates :business_name, presence: true
 
@@ -75,7 +84,8 @@ class YesBankVendor < ApplicationRecord
   has_many :bank_accounts, as: :account_owner
   has_many :receiving_payments, as: :receiving_user, class_name: 'Payment'
   has_many :vendor_attachments
-  has_many :custom_fields, as: :parent
+  has_many :custom_fields, as: :parent, dependent: :destroy
+  has_many :form_custom_fields, class_name: 'FormCustomField', as: :document
   has_many :vendor_tds_rates, foreign_key: :vendor_id
   has_many :tds_rates, through: :vendor_tds_rates
   has_many :beneficiary_payments, foreign_key: :vendor_id

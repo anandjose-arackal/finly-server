@@ -135,7 +135,7 @@ class InwardInvoiceStatus < ApplicationRecord
     ]
   end
 
-  def as_json(options={})
+  def as_json(options = {})
     {
         id: id,
         name: name

@@ -37,7 +37,8 @@ class PaymentAgreement < ApplicationRecord
 
   include Transitionable, SoftDeletable
   include Sequenced::ActsAsSequenced
-  include SearchIndex::Concerns::Document
+  # include SearchIndex::Concerns::Document
+include Searchkick::Api
 
   event_channel 'agreements'
 

@@ -7,9 +7,9 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
 
   def personalizer
     {
-        validate: {
-            after: Personalizer::Process.new([:procurements, :invoices], :validate, self)
-        }
+      validate: {
+        after: Personalizer::Process.new([:procurements, :invoices], :validate, self)
+      }
     }
   end
 

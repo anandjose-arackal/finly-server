@@ -63,7 +63,7 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
 
           # If level doesn't have reviewers
           if max_thresholds.compact.present?
-            if !max_thresholds.include?(nil) && document_amount > max_thresholds.compact.max.to_f
+            if !max_thresholds.include?(nil) && document_amount > max_thresholds.compact.map(&:to_f).max
               document_class_name = document.class.human_name rescue document.model_name.human.titleize
               add_message :error, "#{document_class_name}'s amount is greater than maximum limit set in Level - #{level.level_number} (#{level.name})"
             end

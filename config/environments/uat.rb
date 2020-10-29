@@ -25,15 +25,6 @@ Rails.application.configure do
   redis_config = Rails.application.config_for(:redis_config)&.with_indifferent_access
   config.redis = Redis.new(redis_config.slice('url', 'password'))
 
-  meilisearch_config = Rails.application.config_for(:meilisearch)
-  if meilisearch_config['enabled']
-    config.meilisearch = MeiliSearch::Client.new(meilisearch_config['url'], meilisearch_config['api_key'])
-    config.meilisearch_index_prefix = meilisearch_config['index_prefix']
-    config.meilisearch_monitor = false
-  else
-    config.meilisearch = nil
-  end
-
   # Enable Rack::Cache to put a simple HTTP cache in front of your application
   # Add `rack-cache` to your Gemfile before enabling this.
   # For large-scale production use, consider using a caching reverse proxy like

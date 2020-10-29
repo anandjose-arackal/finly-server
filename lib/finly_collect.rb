@@ -9,7 +9,7 @@ class FinlyCollect
 
   def self.config
     if File.exists?("#{Rails.root}/config/finly_collect.yml")
-      return Rails.application.config_for(:finly_collect)
+      return Rails.application.config_for(:finly_collect).with_indifferent_access
     end
 
     nil
