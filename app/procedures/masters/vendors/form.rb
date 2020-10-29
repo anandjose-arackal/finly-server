@@ -197,6 +197,14 @@ class Masters::Vendors::Form < Forms::API
 
   end
 
+  condition condition_id: "Policy should not be editable once approved" do
+    reference :entity, :policy_id
+    rule Rules::Builder[:status_id].not_eq_all(*VendorStatus.ids_for(:draft, :retracted, :rejected).map {|item| {value: item}})
+    action :editable, false
+    action :required, false
+    action
+  end
+
   condition condition_id: "Hide Location for International Vendors" do
     reference :entity, :gstin_locations
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
