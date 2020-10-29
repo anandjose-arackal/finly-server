@@ -37,7 +37,6 @@ data.ms/
 config/searchkick.yml
 config/cubejs.yml
 config/mailtrain.yml
-
 .rubocop.yml
 .vscode/
 reference_resource_migration.log
