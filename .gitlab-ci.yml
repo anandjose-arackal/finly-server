@@ -21,7 +21,7 @@ rspec:
     MYSQL_ROOT_PASSWORD: admin123
   before_script:
     - apt-get update
-    - apt-get install -y nodejs default-mysql-client
+    - apt-get install -y nodejs default-mysql-client unzip
     - gem install bundler --no-document
     - mysql --version
     - ruby -v
@@ -60,5 +60,11 @@ rspec:
     # Change gitlab token to fetch private repo
     - bundle config gitlab.com "$GITLAB_USERNAME:$GITLAB_TOKEN"
     - bundle install --jobs $(nproc) "${FLAGS[@]}"
+
+    # Load test schema
+    - unzip -p spec/schema.sql.zip | mysql -h mysql -u root --password="$MYSQL_ROOT_PASSWORD" $MYSQL_DATABASE
+
+    # load empty macros db
+    - echo "create database finly_macros_test;" | mysql -h mysql -u root --password="$MYSQL_ROOT_PASSWORD" $MYSQL_DATABASE
   script:
     - RAILS_ENV=test bundle exec rspec

@@ -15,3 +15,9 @@ test:
   username: root
   password: admin123
   database: finly_test
+
+finly_macros_test:
+  <<: *default
+  username: root
+  password: admin123
+  database: finly_macros_test
