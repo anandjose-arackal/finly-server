@@ -15,7 +15,7 @@
 #
 
 class FormCustomField < ApplicationRecord
-  include UUIDHelper
+  include UUIDHelper, SoftDeletable
 
   belongs_to :form
   belongs_to :form_entity
