@@ -140,7 +140,7 @@ class Masters::Vendors::Form < Forms::API
 
   section :ldc, associate_custom_fields: true do
     # LDC
-    amount :ldc_upper_limit_id, label: "LDC Upper Limit"
+    amount :ldc_upper_limit_amount, label: "LDC Upper Limit"
     date :ldc_effective_start_date, label: "LDC Effect Start Date"
     date :ldc_effective_end_date, label: "LDC Effect End Date"
     attachment :lower_exception_certificate, system_field: false
@@ -359,7 +359,7 @@ class Masters::Vendors::Form < Forms::API
 
   # LDC Conditions
   condition condition_id: "Disable LDC for International Vendors" do
-    reference :entity, :ldc_upper_limit_id
+    reference :entity, :ldc_upper_limit_amount
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, false
     action :visible, false
@@ -384,12 +384,12 @@ class Masters::Vendors::Form < Forms::API
   end
   condition condition_id: "Make LDC Start Date Non Editable when LDC Upperlimit is Not Provided" do
     reference :entity, :ldc_effective_start_date
-    rule Rules::Builder[:ldc_upper_limit_id].blank
+    rule Rules::Builder[:ldc_upper_limit_amount].blank
     action :editable, false
   end
   condition condition_id: "Make LDC End Date Non Editable when LDC Upperlimit is Not Provided" do
     reference :entity, :ldc_effective_end_date
-    rule Rules::Builder[:ldc_upper_limit_id].blank
+    rule Rules::Builder[:ldc_upper_limit_amount].blank
     action :editable, false
   end
 

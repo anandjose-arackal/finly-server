@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_10_23_182636) do
+ActiveRecord::Schema.define(version: 2020_10_29_113208) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -9653,7 +9653,6 @@ ActiveRecord::Schema.define(version: 2020_10_23_182636) do
     t.text "reject_note"
     t.boolean "rcm_enabled", default: false
     t.string "vendor_country"
-    t.integer "ldc_upper_limit_id"
     t.date "ldc_effective_start_date"
     t.date "ldc_effective_end_date"
     t.date "tds_effective_start_date"
@@ -9665,6 +9664,7 @@ ActiveRecord::Schema.define(version: 2020_10_23_182636) do
     t.datetime "erp_sync_attempted_at"
     t.string "bank_code"
     t.integer "tax_rate_id"
+    t.decimal "ldc_upper_limit_amount", precision: 20, scale: 5
     t.index ["authorized"], name: "index_yes_bank_vendors_on_authorized"
     t.index ["company_id"], name: "index_yes_bank_vendors_on_company_id"
     t.index ["controlling_level_id"], name: "index_yes_bank_vendors_on_controlling_level_id"
