@@ -4,7 +4,7 @@ class Masters::ExportTemplates::Contract < Reform::Form
   property :export_format, validates: { presence: true, inclusion: { in: Masters::ExportTemplates::Helpers::Config.export_formats } }
   property :resource, validates: { presence: true, inclusion: { in: Masters::ExportTemplates::Helpers::Config.resources } }
   property :template, validates: { presence: true }
-  property :query
+  property :query, default: {}
   property :active, default: true
   property :personal, default: true
   property :created_by_id, validates: { presence: true }
