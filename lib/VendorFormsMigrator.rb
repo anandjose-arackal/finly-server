@@ -8,7 +8,7 @@
 # [] Custom Fields are added for Vendor
 
 class VendorFormsMigrator
-  def self.perform(comapny_id)
+  def self.perform(company_id)
 
     result = []
 
