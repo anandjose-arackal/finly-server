@@ -5,7 +5,7 @@ module Searchkick::Api
     include Sidekiq::Worker
 
     def perform(klass_name, record_id)
-      Object.const_get(klass_name).searchkick_index(name: nil).reindex_queue.push(record_id)
+      Object.const_get(klass_name).searchkick_refresh(record_id) #searchkick_index(name: nil).reindex_queue.push(record_id)
     end
 
   end
@@ -40,6 +40,18 @@ module Searchkick::Api
     def searchkick_api
       Object.const_get("#{self.name}Index")
     end
+
+    # This will queue the record to be refreshed
+    def searchkick_refresh(*ids)
+      ids.each do |id|
+        search_index.reindex_queue.push id if id&.to_i > 0
+      end
+    end
+  end
+
+  # This will queue the record to be refreshed
+  def searchkick_refresh
+    self.class.searchkick_refresh(self.id)
   end
 
   def searchkick_api
