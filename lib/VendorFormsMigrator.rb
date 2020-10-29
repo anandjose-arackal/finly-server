@@ -13,7 +13,7 @@ class VendorFormsMigrator
     result = []
 
     # Company ID
-    company_id = 2
+    company_id = 137
 
     company = Company.find company_id
     documents = YesBankVendor.where(company_id: company.id).authorized
