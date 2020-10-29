@@ -14,7 +14,7 @@ class SeedHelper
       seedable_classes = ObjectSpace.each_object(Class).select { |c| c.included_modules.include?(Seedable) }
     end
     seedable_classes.each do |klass|
-      klass.seed_data #rescue nil
+      klass.seed_data rescue nil
     end
 
     Currency.seed_data
