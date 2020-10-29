@@ -60,7 +60,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
         required = result['required']
         # Required validation ( System Validation )
         if required and send(entity.entity_key).blank? and entity.entity_type != 'switch'
-          errors.add entity.entity_key, 'cannot be blank'
+          errors.add entity.label, 'cannot be blank'
         end
       end
     end
@@ -74,7 +74,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
           puts "Data => #{{form: contract_root.form_data, row: self.form_data}.with_indifferent_access}"
           next unless validation.rule.apply?({form: contract_root.form_data, row: self.form_data}.with_indifferent_access)
 
-          errors.add entity.entity_key, validation.error_message
+          errors.add entity.label, validation.error_message
         end
       end
     end
