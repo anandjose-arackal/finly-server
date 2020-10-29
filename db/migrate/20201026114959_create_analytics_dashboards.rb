@@ -7,7 +7,7 @@ class CreateAnalyticsDashboards < ActiveRecord::Migration[6.0]
       t.string :name, index: true, null: false
       t.text :description
       t.boolean :default, index: true, default: false
-      t.text :reports, null: false
+      t.text :reports
       t.boolean :is_system_dashboard, index: true
       t.string :system_dashboard_id, index: true, references: 'analytics_dashboards', foreign_key: true
       t.text :feature_subscriptions
