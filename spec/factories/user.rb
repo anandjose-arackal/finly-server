@@ -42,10 +42,10 @@ FactoryBot.define do
   factory :user do
     first_name {"User"}
     last_name {"Doe"}
-    email {generate(:finly_user_email)}
+    # email {generate(:finly_user_email)}
     password {'FW1g$18j0t!k2'}
     mothers_maiden_name {"XX"}
-    mobile_number {generate(:user_mobile_number)}
+    # mobile_number {generate(:user_mobile_number)}
     last_activity_at {DateTime.now}
     password_changed_at {DateTime.now}
     otp_verified {true}
