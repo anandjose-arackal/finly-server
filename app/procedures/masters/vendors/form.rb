@@ -197,14 +197,14 @@ class Masters::Vendors::Form < Forms::API
 
   end
 
-  condition condition_id: "Policy should not be editable once approved" do
+  condition condition_id: "Policy should not be editable once unless in editable status" do
     reference :entity, :policy_id
     rule Rules::Builder[:status_id].not_eq_any(*VendorStatus.ids_for(:draft, :retracted, :rejected).map {|item| {value: item}})
     action :editable, false
     action :required, false
   end
 
-  condition condition_id: "Hide Location for International Vendors" do
+  condition condition_id: "Disable Locations(GSTIN) for International Vendors" do
     reference :entity, :gstin_locations
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, false
@@ -213,7 +213,7 @@ class Masters::Vendors::Form < Forms::API
     action :active, false
   end
 
-  condition condition_id: 'Change Required to false for State ID for International Vendor' do
+  condition condition_id: 'Disabled State ID for International Vendor' do
     reference :entity, 'gstin_locations.state_id'
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, false
@@ -222,7 +222,7 @@ class Masters::Vendors::Form < Forms::API
     action :active, false
   end
 
-  condition condition_id: "Hide gst_registered for International Vendors" do
+  condition condition_id: "Disable GST Registerd for International Vendors" do
     reference :entity, :gst_registered
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, false
@@ -230,28 +230,28 @@ class Masters::Vendors::Form < Forms::API
     action :required, false
   end
 
-  condition condition_id: :attachment_tax_residency_for_international_vendors do
+  condition condition_id: "Enable Tax Residency Certificate Attachment for International Vendors" do
     reference :entity, :tax_residency_certificate
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, true
     action :visible, true
   end
 
-  condition condition_id: :attachment_form_10f_for_international_vendors do
+  condition condition_id: "Enable Form 10F Attachment for International Vendors" do
     reference :entity, :form_10f
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, true
     action :visible, true
   end
 
-  condition condition_id: :attachment_no_pe_for_international_vendors do
+  condition condition_id: "Enable No PE Attachment for International Vendors" do
     reference :entity, :no_pe_declaration
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, true
     action :visible, true
   end
 
-  condition condition_id: :pan_for_indian_vendors do
+  condition condition_id: "Disable PAN for International Vendors" do
     reference :entity, :pan
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, false
@@ -268,7 +268,7 @@ class Masters::Vendors::Form < Forms::API
     action :required, false
   end
 
-  condition condition_id: :rcm_for_indian_vendors do
+  condition condition_id: "Disable RCM Enabled for International Vendors" do
     reference :entity, :rcm_enabled
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, false
@@ -277,7 +277,7 @@ class Masters::Vendors::Form < Forms::API
     action :required, false
   end
 
-  condition condition_id: :tax_rate_international_vendors do
+  condition condition_id: "Enable Tax Rates for International Vendors" do
     reference :entity, :tax_rate_id
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, true
@@ -285,7 +285,7 @@ class Masters::Vendors::Form < Forms::API
     action :active, true
   end
 
-  condition condition_id: :tds_for_indian_vendors do
+  condition condition_id: "Disable TDS Rate for International Vendors" do
     reference :entity, :tds_rates_list_id
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, false
@@ -294,19 +294,19 @@ class Masters::Vendors::Form < Forms::API
     action :required, false
   end
 
-  condition condition_id: :tds_start_date_editable_when_tds_present do
+  condition condition_id: "Make TDS Effective Start Date Editable when TDS Rate value present" do
     reference :entity, :tds_effective_start_date
     rule Rules::Builder[:tds_rates_list_id].present
     action :editable, true
   end
 
-  condition condition_id: :tds_end_date_editable_when_tds_present do
+  condition condition_id: "Make TDS Effective End Date Editable when TDS Rate value present" do
     reference :entity, :tds_effective_end_date
     rule Rules::Builder[:tds_rates_list_id].present
     action :editable, true
   end
 
-  condition condition_id: :tds_start_date_for_indian_vendors do
+  condition condition_id: "Disable TDS Effective Start Date for International Vendors" do
     reference :entity, :tds_effective_start_date
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, false
@@ -314,7 +314,7 @@ class Masters::Vendors::Form < Forms::API
     action :active, false
   end
 
-  condition condition_id: :tds_end_date_for_indian_vendors do
+  condition condition_id: "Disable TDS Effective End Date for International Vendors" do
     reference :entity, :tds_effective_end_date
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, false
@@ -324,7 +324,7 @@ class Masters::Vendors::Form < Forms::API
 
 
   # MSME Conditions
-  condition condition_id: :msme_for_indian_vendors do
+  condition condition_id: "Disable MSME Registered for International Vendors" do
     reference :entity, :msme_registered
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, false
@@ -334,7 +334,7 @@ class Masters::Vendors::Form < Forms::API
   end
 
 
-  condition condition_id: :msme_number_for_indian_vendors do
+  condition condition_id: "Disable MSME Registration Number for International Vendors" do
     reference :entity, :msme_registration_number
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, false
@@ -343,13 +343,13 @@ class Masters::Vendors::Form < Forms::API
     action :required, false
   end
 
-  condition condition_id: :msme_number_when_msme_registered do
+  condition condition_id: "Enable MSME Registration Number when MSME Registered is checked" do
     reference :entity, :msme_registration_number
     rule Rules::Builder[:msme_registered].present
     action :editable, true
   end
 
-  condition condition_id: :attachment_msme_for_indian_vendors do
+  condition condition_id: "Disable MSME Attachment for International Vendors" do
     reference :entity, :msme_registration_certificate
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, false
@@ -358,7 +358,7 @@ class Masters::Vendors::Form < Forms::API
   end
 
   # LDC Conditions
-  condition condition_id: :ldc_for_indian_vendors do
+  condition condition_id: "Disable LDC for International Vendors" do
     reference :entity, :ldc_upper_limit_id
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, false
@@ -366,7 +366,7 @@ class Masters::Vendors::Form < Forms::API
     action :active, false
     action :required, false
   end
-  condition condition_id: :ldc_start_date_indian_vendors do
+  condition condition_id: "Disable LDC Start Date for International Vendors" do
     reference :entity, :ldc_effective_start_date
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, false
@@ -374,7 +374,7 @@ class Masters::Vendors::Form < Forms::API
     action :active, false
     action :required, false
   end
-  condition condition_id: :ldc_end_date_indian_vendors do
+  condition condition_id: "Disable LDC End Date for International Vendors" do
     reference :entity, :ldc_effective_end_date
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, false
@@ -382,18 +382,18 @@ class Masters::Vendors::Form < Forms::API
     action :active, false
     action :required, false
   end
-  condition condition_id: :ldc_start_date_for_amount do
+  condition condition_id: "Make LDC Start Date Non Editable when LDC Upperlimit is Not Provided" do
     reference :entity, :ldc_effective_start_date
     rule Rules::Builder[:ldc_upper_limit_id].blank
     action :editable, false
   end
-  condition condition_id: :ldc_end_date_for_amount do
+  condition condition_id: "Make LDC End Date Non Editable when LDC Upperlimit is Not Provided" do
     reference :entity, :ldc_effective_end_date
     rule Rules::Builder[:ldc_upper_limit_id].blank
     action :editable, false
   end
 
-  condition condition_id: :attachment_lower_exemption_certificate_for_indian_vendors do
+  condition condition_id: "Disable Lower Exemption Certificate Attachment for International Vendors" do
     reference :entity, :lower_exception_certificate
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, false
@@ -401,7 +401,7 @@ class Masters::Vendors::Form < Forms::API
     action :required, false
   end
 
-  condition condition_id: :tax_exemption_certificate_for_indian_vendors do
+  condition condition_id: "Disable Tax Exemption Certificate for International Vendors" do
     reference :entity, :tax_exemption_certificate
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, false
@@ -409,7 +409,7 @@ class Masters::Vendors::Form < Forms::API
     action :required, false
   end
 
-  condition condition_id: :gstin_for_indian_vendors do
+  condition condition_id: "Disable Locations > GSTIN for International Vendors" do
     reference :entity, 'gstin_locations.gstin'
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, false
@@ -418,7 +418,7 @@ class Masters::Vendors::Form < Forms::API
     action :required, false
   end
 
-  condition condition_id: :gst_status_for_indian_vendors do
+  condition condition_id: "Disable Locations > GST Status for International Vendors" do
     reference :entity, 'gstin_locations.gst_status'
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, false
@@ -427,7 +427,7 @@ class Masters::Vendors::Form < Forms::API
     action :required, false
   end
 
-  condition condition_id: :attachment_gstin_certificate_for_indian_vendors do
+  condition condition_id: "Disable Locations > GSTIN Certificate for International Vendors" do
     reference :entity, 'gstin_locations.gstin_certificate'
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, false
@@ -435,7 +435,7 @@ class Masters::Vendors::Form < Forms::API
     action :required, false
   end
 
-  condition condition_id: :swift_code_for_foreign_vendors do
+  condition condition_id: "Enable Bank Accounts > Swift / BIC Code for International Vendors" do
     reference :entity, 'bank_accounts.swift_code'
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, true
@@ -443,7 +443,7 @@ class Masters::Vendors::Form < Forms::API
     action :required, true
   end
 
-  condition condition_id: :no_ifsc_for_foreign_vendors do
+  condition condition_id: "Disable Bank Accounts > IFS Code for International Vendors" do
     reference :entity, 'bank_accounts.ifsc'
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, false
