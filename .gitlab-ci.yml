@@ -14,6 +14,7 @@ rspec:
   <<: *default
   services:
     - mysql:5.7
+    - redis:latest
   variables:
     # Configure mysql service (https://hub.docker.com/_/mysql/)
     MYSQL_DATABASE: finly_test
