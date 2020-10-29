@@ -30,6 +30,7 @@ rspec:
     # Copy config files for test
     - cp config/database.test.yml config/database.yml
     - cp config/finly_macros.test.yml config/finly_macros.yml
+    - cp config/redis_config.test.yml config/redis_config.yml
 
     # Create empty config files
     - touch config/aws_config.yml
@@ -43,7 +44,6 @@ rspec:
     - touch config/mailtrain.yml
     - touch config/meilisearch.yml
     - touch config/posthog.yml
-    - touch config/redis_config.yml
     - touch config/searchkick.yml
     - touch config/sidekiq.yml
     - touch config/web_client.yml
