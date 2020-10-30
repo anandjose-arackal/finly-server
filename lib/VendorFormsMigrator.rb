@@ -8,12 +8,12 @@
 # [] Custom Fields are added for Vendor
 
 class VendorFormsMigrator
-  def self.perform
+  def self.perform(company_id)
 
     result = []
 
     # Company ID
-    company_id = 2
+    # company_id = 137
 
     company = Company.find company_id
     documents = YesBankVendor.where(company_id: company.id).authorized
@@ -88,7 +88,7 @@ class VendorFormsMigrator
           relevant_custom_field = document.form_custom_fields.where(field_key: 'other_documents').first
         end
 
-        if relevant_custom_field.present? && relevant_custom_field.attachments.blank?
+        if relevant_custom_field.present?
           new_attachment = relevant_custom_field.attachments.new
 
           if Rails.env.production?
