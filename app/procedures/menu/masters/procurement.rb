@@ -119,4 +119,12 @@ class Menu::Masters::Procurement < Menu::API
   item :download_manager, icon: "https://img.icons8.com/windows/20/ffffff/software-installer.png"
   item :settings, path: 'organization_account', permissions: [:admin], icon: "https://img.icons8.com/windows/20/ffffff/settings.png"
 
+  footer_item :switch_version, icon: 'https://img.icons8.com/windows/20/ffffff/versions.png', options: {do_not_build_path: true}
+  footer_item :notifications, icon: 'https://img.icons8.com/windows/20/ffffff/appointment-reminders.png', options: {do_not_build_path: true}
+  footer_item :hide_menu, icon: 'https://img.icons8.com/windows/20/ffffff/double-left.png', options: {do_not_build_path: true}
+  footer_item :account_settings, label: "My Account", icon: 'https://img.icons8.com/windows/20/ffffff/user.png'
+  footer_item :support, label: "Help Center", icon: 'https://img.icons8.com/windows/20/ffffff/software-installer.png', options: {do_not_build_path: true} do
+    item :new_releases, label: "What's New", icon: 'https://img.icons8.com/ios-glyphs/25/D298E4/commercial.png', options: {do_not_build_path: true}, toggle: [AnnouncementToggle, :product_stash]
+  end
+
 end
