@@ -17,7 +17,7 @@ module ExportManager::DSL::Generator
 
   class_methods do
     def sync!
-      sync(true)
+      @sync = true
     end
 
     def sync?
