@@ -28,6 +28,15 @@ class BankTransfer::PaymentRequest::Review::Base < BaseOperation
     BankTransfer::PaymentRequest::Review::Base::RequestPresenter.new(user, params, messages)
   end
 
+  def budget_limit_validation payment
+    if user.company.feature_subscription.enforce_budget_limit
+      op = BudgetManager::BudgetLimitValidator::ValidatePayment.(user,{ payment: payment })
+      if op.messages[:error].present?
+        return add_message :error, op.messages[:error]
+      end
+    end
+  end
+
   class BankTransfer::PaymentRequest::Review::Base::RequestPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :bank_payment_request
