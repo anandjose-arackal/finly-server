@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_10_26_114959) do
+ActiveRecord::Schema.define(version: 2020_10_13_070017) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -419,30 +419,6 @@ ActiveRecord::Schema.define(version: 2020_10_26_114959) do
     t.index ["deleted_at"], name: "index_amounts_on_deleted_at"
   end
 
-  create_table "analytics_dashboards", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.string "app", null: false
-    t.integer "company_id", null: false
-    t.integer "user_id", null: false
-    t.string "name", null: false
-    t.text "description"
-    t.boolean "default", default: false
-    t.text "reports", null: false
-    t.boolean "is_system_dashboard"
-    t.string "system_dashboard_id"
-    t.text "feature_subscriptions"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["app"], name: "index_analytics_dashboards_on_app"
-    t.index ["company_id"], name: "index_analytics_dashboards_on_company_id"
-    t.index ["created_at"], name: "index_analytics_dashboards_on_created_at"
-    t.index ["default"], name: "index_analytics_dashboards_on_default"
-    t.index ["is_system_dashboard"], name: "index_analytics_dashboards_on_is_system_dashboard"
-    t.index ["name"], name: "index_analytics_dashboards_on_name"
-    t.index ["system_dashboard_id"], name: "index_analytics_dashboards_on_system_dashboard_id"
-    t.index ["updated_at"], name: "index_analytics_dashboards_on_updated_at"
-    t.index ["user_id"], name: "index_analytics_dashboards_on_user_id"
-  end
-
   create_table "api_tokens", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "base_url"
     t.string "name"
@@ -659,8 +635,6 @@ ActiveRecord::Schema.define(version: 2020_10_26_114959) do
     t.datetime "deleted_at"
     t.boolean "on_hold", default: false
     t.integer "bank_account_master_id"
-    t.boolean "verified"
-    t.string "swift_code"
     t.index ["account_number"], name: "index_bank_accounts_on_account_number"
     t.index ["account_owner_type", "account_owner_id"], name: "index_bank_accounts_on_account_owner_type_and_account_owner_id"
     t.index ["company_id"], name: "index_bank_accounts_on_company_id"
@@ -3768,7 +3742,6 @@ ActiveRecord::Schema.define(version: 2020_10_26_114959) do
     t.boolean "analytics_system"
     t.datetime "deleted_at"
     t.boolean "sso_login_enforced", default: false
-    t.boolean "enforce_budget_limit", default: false
     t.index ["grn_enabled"], name: "index_feature_subscriptions_on_grn_enabled"
     t.index ["srn_enabled"], name: "index_feature_subscriptions_on_srn_enabled"
     t.index ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id"
@@ -4484,8 +4457,6 @@ ActiveRecord::Schema.define(version: 2020_10_26_114959) do
     t.datetime "deleted_at"
     t.string "gst_status"
     t.date "gst_expiry_date"
-    t.boolean "verified"
-    t.text "gstin_fetch_details"
     t.index ["gstin_id"], name: "index_gstin_locations_on_gstin_id"
     t.index ["state_id"], name: "index_gstin_locations_on_state_id"
     t.index ["vendor_id"], name: "index_gstin_locations_on_vendor_id"
@@ -5613,7 +5584,7 @@ ActiveRecord::Schema.define(version: 2020_10_26_114959) do
   create_table "map_location_searches", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "uuid", limit: 36, null: false
     t.string "input"
-    t.text "result", size: :medium, collation: "utf8_bin"
+    t.text "result", size: :long
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -9974,8 +9945,6 @@ ActiveRecord::Schema.define(version: 2020_10_26_114959) do
     t.date "ldc_effective_end_date"
     t.date "tds_effective_start_date"
     t.date "tds_effective_end_date"
-    t.string "bank_code"
-    t.integer "tax_rate_id"
     t.index ["authorized"], name: "index_yes_bank_vendors_on_authorized"
     t.index ["company_id"], name: "index_yes_bank_vendors_on_company_id"
     t.index ["controlling_level_id"], name: "index_yes_bank_vendors_on_controlling_level_id"

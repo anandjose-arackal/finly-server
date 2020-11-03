@@ -88,6 +88,7 @@ class FormEntity::AutoNumber < FormEntity
 
   def self.option_validation
     Proc.new do
+      property :config
       validation :options_config do
         params do
           required(:config) do
