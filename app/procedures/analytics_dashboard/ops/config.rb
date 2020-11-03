@@ -3,23 +3,29 @@ class AnalyticsDashboard::Ops::Config < Transactions::API
   CUBES = [
       {
           label: 'Invoice',
-          cube: "invoices",
+          cube: "Invoices",
           root: true,
-          associations: [:invoice_line_items, :billing_locations, :shipping_locations]
+          associations: %w(InvoicesLineItems BillingLocations ShippingLocations Vendors CostCenters Departments)
       },
       {
           label: 'Invoice Line Items',
-          cube: "invoices_line_items",
+          cube: "InvoicesLineItems",
+          root: true,
+          associations: %w(Invoices BillingLocations ShippingLocations Vendors CostCenters Departments)
+      },
+      {
+          label: 'Vendor',
+          cube: 'Vendors',
           root: true
       },
       {
           label: 'Billing Location',
-          cube: "billing_locations",
+          cube: "BillingLocations",
           root: false
       },
       {
           label: 'Shipping Location',
-          cube: "shipping_locations",
+          cube: "ShippingLocations",
           root: false
       }
   ].freeze
