@@ -23,6 +23,7 @@ class AnalyticsDashboard::Scheduler
     reports = self.analytics_dashboard.reports
     reports.each do |report|
       data = build_data(analytics_dashboard.created_by, report)
+
       report[:data] = data['data'] if data.present?
     end
 

@@ -98,6 +98,6 @@ every 1.minute, roles: [:whenever_cron] do
   runner 'SearchkickProcessQueueJob.delay.perform'
 end
 
-every '0,15,30,45 * * * *', roles: [:whenever_cron] do
-  runner 'AnalyticsDashboard::Scheduler.perform'
-end
+# every '0,15,30,45 * * * *', roles: [:whenever_cron] do
+#   runner 'AnalyticsDashboard::Scheduler.perform'
+# end
