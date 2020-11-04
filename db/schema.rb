@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_10_13_070017) do
+ActiveRecord::Schema.define(version: 2020_11_04_065841) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -419,6 +419,75 @@ ActiveRecord::Schema.define(version: 2020_10_13_070017) do
     t.index ["deleted_at"], name: "index_amounts_on_deleted_at"
   end
 
+  create_table "analytics_dashboard_schedule_user_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "company_id", null: false
+    t.integer "analytics_dashboard_id", null: false
+    t.integer "user_id", null: false
+    t.datetime "deleted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["analytics_dashboard_id"], name: "index_analytics_dashboard_schedule_user_mappings_on_dashboard_id"
+    t.index ["company_id"], name: "index_analytics_dashboard_schedule_user_mappings_on_company_id"
+    t.index ["created_at"], name: "index_analytics_dashboard_schedule_user_mappings_on_created_at"
+    t.index ["deleted_at"], name: "index_analytics_dashboard_schedule_user_mappings_on_deleted_at"
+    t.index ["updated_at"], name: "index_analytics_dashboard_schedule_user_mappings_on_updated_at"
+    t.index ["user_id"], name: "index_analytics_dashboard_schedule_user_mappings_on_user_id"
+  end
+
+  create_table "analytics_dashboard_schedules", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "company_id", null: false
+    t.integer "analytics_dashboard_id", null: false
+    t.integer "created_by_id", null: false
+    t.datetime "start_date"
+    t.datetime "end_date"
+    t.integer "frequency"
+    t.integer "hour"
+    t.integer "minute"
+    t.integer "day_of_the_week"
+    t.integer "day_of_the_month"
+    t.datetime "deleted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["analytics_dashboard_id"], name: "index_analytics_dashboard_schedules_on_analytics_dashboard_id"
+    t.index ["company_id"], name: "index_analytics_dashboard_schedules_on_company_id"
+    t.index ["created_at"], name: "index_analytics_dashboard_schedules_on_created_at"
+    t.index ["created_by_id"], name: "index_analytics_dashboard_schedules_on_created_by_id"
+    t.index ["day_of_the_month"], name: "index_analytics_dashboard_schedules_on_day_of_the_month"
+    t.index ["day_of_the_week"], name: "index_analytics_dashboard_schedules_on_day_of_the_week"
+    t.index ["deleted_at"], name: "index_analytics_dashboard_schedules_on_deleted_at"
+    t.index ["end_date"], name: "index_analytics_dashboard_schedules_on_end_date"
+    t.index ["frequency"], name: "index_analytics_dashboard_schedules_on_frequency"
+    t.index ["hour"], name: "index_analytics_dashboard_schedules_on_hour"
+    t.index ["minute"], name: "index_analytics_dashboard_schedules_on_minute"
+    t.index ["start_date"], name: "index_analytics_dashboard_schedules_on_start_date"
+    t.index ["updated_at"], name: "index_analytics_dashboard_schedules_on_updated_at"
+  end
+
+  create_table "analytics_dashboards", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "app", null: false
+    t.integer "company_id", null: false
+    t.integer "created_by_id", null: false
+    t.string "name", null: false
+    t.text "description"
+    t.boolean "default", default: false
+    t.text "reports", null: false
+    t.boolean "is_system_dashboard"
+    t.string "system_dashboard_id"
+    t.text "feature_subscriptions"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "deleted_at"
+    t.index ["app"], name: "index_analytics_dashboards_on_app"
+    t.index ["company_id"], name: "index_analytics_dashboards_on_company_id"
+    t.index ["created_at"], name: "index_analytics_dashboards_on_created_at"
+    t.index ["created_by_id"], name: "index_analytics_dashboards_on_created_by_id"
+    t.index ["default"], name: "index_analytics_dashboards_on_default"
+    t.index ["is_system_dashboard"], name: "index_analytics_dashboards_on_is_system_dashboard"
+    t.index ["name"], name: "index_analytics_dashboards_on_name"
+    t.index ["system_dashboard_id"], name: "index_analytics_dashboards_on_system_dashboard_id"
+    t.index ["updated_at"], name: "index_analytics_dashboards_on_updated_at"
+  end
+
   create_table "api_tokens", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "base_url"
     t.string "name"
@@ -635,6 +704,8 @@ ActiveRecord::Schema.define(version: 2020_10_13_070017) do
     t.datetime "deleted_at"
     t.boolean "on_hold", default: false
     t.integer "bank_account_master_id"
+    t.boolean "verified"
+    t.string "swift_code"
     t.index ["account_number"], name: "index_bank_accounts_on_account_number"
     t.index ["account_owner_type", "account_owner_id"], name: "index_bank_accounts_on_account_owner_type_and_account_owner_id"
     t.index ["company_id"], name: "index_bank_accounts_on_company_id"
@@ -2820,6 +2891,8 @@ ActiveRecord::Schema.define(version: 2020_10_13_070017) do
     t.bigint "attachment_file_size"
     t.datetime "attachment_updated_at"
     t.datetime "deleted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
     t.index ["deleted_at"], name: "index_custom_field_attachments_on_deleted_at"
     t.index ["form_custom_field_id"], name: "index_custom_field_attachments_on_form_custom_field_id"
     t.index ["uuid"], name: "index_custom_field_attachments_on_uuid"
@@ -2830,6 +2903,8 @@ ActiveRecord::Schema.define(version: 2020_10_13_070017) do
     t.string "form_entity_choice_id"
     t.string "form_custom_field_id"
     t.datetime "deleted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
     t.index ["deleted_at"], name: "index_custom_field_selections_on_deleted_at"
     t.index ["form_custom_field_id"], name: "index_custom_field_selections_on_form_custom_field_id"
     t.index ["form_entity_choice_id"], name: "index_custom_field_selections_on_form_entity_choice_id"
@@ -3742,6 +3817,7 @@ ActiveRecord::Schema.define(version: 2020_10_13_070017) do
     t.boolean "analytics_system"
     t.datetime "deleted_at"
     t.boolean "sso_login_enforced", default: false
+    t.boolean "enforce_budget_limit", default: false
     t.index ["grn_enabled"], name: "index_feature_subscriptions_on_grn_enabled"
     t.index ["srn_enabled"], name: "index_feature_subscriptions_on_srn_enabled"
     t.index ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id"
@@ -4089,6 +4165,8 @@ ActiveRecord::Schema.define(version: 2020_10_13_070017) do
     t.string "value_text"
     t.string "form_id", null: false
     t.datetime "deleted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
     t.index ["document_id"], name: "index_form_custom_fields_on_document_id"
     t.index ["document_type", "document_id"], name: "index_form_custom_fields_on_document_type_and_document_id"
     t.index ["document_type"], name: "index_form_custom_fields_on_document_type"
@@ -4457,6 +4535,8 @@ ActiveRecord::Schema.define(version: 2020_10_13_070017) do
     t.datetime "deleted_at"
     t.string "gst_status"
     t.date "gst_expiry_date"
+    t.boolean "verified"
+    t.text "gstin_fetch_details"
     t.index ["gstin_id"], name: "index_gstin_locations_on_gstin_id"
     t.index ["state_id"], name: "index_gstin_locations_on_state_id"
     t.index ["vendor_id"], name: "index_gstin_locations_on_vendor_id"
@@ -5584,7 +5664,7 @@ ActiveRecord::Schema.define(version: 2020_10_13_070017) do
   create_table "map_location_searches", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "uuid", limit: 36, null: false
     t.string "input"
-    t.text "result", size: :long
+    t.text "result", size: :medium, collation: "utf8_bin"
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -5664,6 +5744,45 @@ ActiveRecord::Schema.define(version: 2020_10_13_070017) do
     t.index ["name"], name: "index_master_entity_choices_on_name"
     t.index ["position"], name: "index_master_entity_choices_on_position"
     t.index ["updated_at"], name: "index_master_entity_choices_on_updated_at"
+  end
+
+  create_table "master_records", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "master_schema_id", null: false
+    t.integer "parent_id"
+    t.datetime "start_date"
+    t.datetime "end_date"
+    t.string "field_1"
+    t.string "field_2"
+    t.string "field_3"
+    t.string "field_4"
+    t.string "field_5"
+    t.string "field_6"
+    t.string "field_7"
+    t.string "field_8"
+    t.string "field_9"
+    t.string "field_10"
+    t.datetime "deleted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.integer "created_by_id"
+    t.integer "company_id"
+    t.index ["created_at"], name: "index_master_records_on_created_at"
+    t.index ["deleted_at"], name: "index_master_records_on_deleted_at"
+    t.index ["end_date"], name: "index_master_records_on_end_date"
+    t.index ["field_1"], name: "index_master_records_on_field_1"
+    t.index ["field_10"], name: "index_master_records_on_field_10"
+    t.index ["field_2"], name: "index_master_records_on_field_2"
+    t.index ["field_3"], name: "index_master_records_on_field_3"
+    t.index ["field_4"], name: "index_master_records_on_field_4"
+    t.index ["field_5"], name: "index_master_records_on_field_5"
+    t.index ["field_6"], name: "index_master_records_on_field_6"
+    t.index ["field_7"], name: "index_master_records_on_field_7"
+    t.index ["field_8"], name: "index_master_records_on_field_8"
+    t.index ["field_9"], name: "index_master_records_on_field_9"
+    t.index ["master_schema_id"], name: "index_master_records_on_master_schema_id"
+    t.index ["parent_id"], name: "index_master_records_on_parent_id"
+    t.index ["start_date"], name: "index_master_records_on_start_date"
+    t.index ["updated_at"], name: "index_master_records_on_updated_at"
   end
 
   create_table "master_schemas", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -9940,11 +10059,13 @@ ActiveRecord::Schema.define(version: 2020_10_13_070017) do
     t.integer "erp_sync_attempts_count", default: 0
     t.datetime "erp_sync_attempted_at"
     t.string "vendor_country"
-    t.integer "ldc_upper_limit_id"
     t.date "ldc_effective_start_date"
     t.date "ldc_effective_end_date"
     t.date "tds_effective_start_date"
     t.date "tds_effective_end_date"
+    t.string "bank_code"
+    t.integer "tax_rate_id"
+    t.decimal "ldc_upper_limit_amount", precision: 20, scale: 5
     t.index ["authorized"], name: "index_yes_bank_vendors_on_authorized"
     t.index ["company_id"], name: "index_yes_bank_vendors_on_company_id"
     t.index ["controlling_level_id"], name: "index_yes_bank_vendors_on_controlling_level_id"

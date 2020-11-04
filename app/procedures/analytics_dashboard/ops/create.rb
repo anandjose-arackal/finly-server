@@ -4,7 +4,7 @@ class AnalyticsDashboard::Ops::Create < Transactions::API
   step Policy::Pundit(AnalyticsDashboard::Policy, :create?)
   step AssignModelUser(key: :created_by)
   step :assign_app
-  step Contract::Build(constant: AnalyticsDashboard::Contract)
+  step Contract::Build(constant: AnalyticsDashboard::Contracts::Record)
   step Contract::Validate()
   step Contract::Persist()
   step Transactions::Messages::SuccessMessage('Dashboard saved')

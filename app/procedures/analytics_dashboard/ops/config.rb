@@ -34,16 +34,11 @@ class AnalyticsDashboard::Ops::Config < Transactions::API
   pass :build_config
 
   def generate_token(context, current_user:, **)
-    context[:token] = JWT.encode(
-        {u:
-             {id: current_user.id, company_id: current_user.company_id},
-         exp: 3.hour.from_now.to_i},
-        Rails.configuration.cube_js.api_key
-    )
+    context[:token] = CubeJs.generate_token(current_user)
   end
 
   def build_config(context, current_user:, **)
-    context[:base_url] = Rails.configuration.cube_js.base_url
+    context[:base_url] = CubeJs.base_url
     context[:config] = []
     CUBES.each do |cube|
       next unless authorized?(current_user, cube)
