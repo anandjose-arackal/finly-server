@@ -15,6 +15,6 @@ class Docs::P2P::PurchaseRequests::FilterConfig < Filters::API
   attribute :items_department_id, label: 'Department', type: :dropdown, choices: Choices[:lookup].('departments')
   attribute :creator_id, label: "Created By", type: :dropdown, choices: Choices[:lookup].("users")
   attribute :controlling_level_level_number, label: "Controlling Level", type: :number, simple: true
-  attribute :controlling_user, label: "Controlling User", type: :text, simple: true
+  attribute :get_reviewers_first_name, label: "Controlling User", type: :dropdown, simple: true, choices: Choices[:lookup].("users")
 
 end
