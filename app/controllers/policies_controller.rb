@@ -28,6 +28,7 @@ class PoliciesController < BaseControllers::WebBase
 
   def show
     @result = Policy::Show.(current_user, params)
+    respond
   end
 
   def update

@@ -5,7 +5,7 @@ record.custom_fields.each do |custom_field|
 end
 json.custom_fields custom_fields
 json.approval_workflow record.dlrms do |dlrm|
-  json.partial! 'approval_workflow', dlrm: dlrm
+  json.partial! 'macros/v1/shared/approval_workflow', dlrm: dlrm
 end
 json.line_items do
   json.array! record.items do |item|
@@ -33,7 +33,7 @@ json.line_items do
   end
 end
 json.attachments do
-  json.array! record.attachments.reject { |attachment| attachment.file_file_size.nil? } do |attachment|
+  json.array! record.attachments.reject {|attachment| attachment.file_file_size.nil?} do |attachment|
     json.extract! attachment, :description
     json.file_name attachment.file_file_name
     json.file_size attachment.file_file_size

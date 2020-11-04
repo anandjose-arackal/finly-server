@@ -6,7 +6,7 @@ class MacrosConnector::Run < ServiceApi
     end
   end
 
-  url -> (user, params) { Rails.application.config_for(:finly_macros)["outbound"]["base_url"] }
+  url -> (user, params) {Rails.application.config_for(:finly_macros)["outbound"]["base_url"]}
   path 'jobs'
   http_method 'post'
   client -> (user, params) do
@@ -32,12 +32,12 @@ class MacrosConnector::Run < ServiceApi
   def self.build_matcher(options, result)
     Dry::Matcher.new(
         success: Dry::Matcher::Case.new(
-            match: -> (result) { result['response.parsed']&.dig('success') },
-            resolve: -> (result) { result }
+            match: -> (result) {result['response.parsed']&.dig('success')},
+            resolve: -> (result) {result}
         ),
         failure: Dry::Matcher::Case.new(
-            match: -> (result) { true },
-            resolve: -> (result) { result }
+            match: -> (result) {true},
+            resolve: -> (result) {result}
         )
     )
   end

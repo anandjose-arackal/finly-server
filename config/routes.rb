@@ -2919,6 +2919,12 @@ Rails.application.routes.draw do
       patch 'update_panel', to: 'users#update_panel', as: :update_panel
       patch 'reset_password', to: 'users#reset_password', as: :reset_password
     end
+
+    resources :payments do
+      get 'status_check', to: 'payments#status_check', as: :status_check
+      patch 'change_status', to: 'payments#change_status', as: :change_status
+    end
+
     post 'welcome', to: 'users#admin_welcome', as: :welcome
     post 'agreements_mail', to: 'users#agreements_mail', as: :agreements_mail
     post 'users/set_role', to: 'users#set_role', as: :set_role
@@ -2927,8 +2933,9 @@ Rails.application.routes.draw do
     get 'temp_import', to: 'users#temp_import'
     resources :expenses
     resources :cards do
-      patch 'block', to: 'cards#block', as: :block
+      patch 'block', to: 'cards#block', as: :block 
     end
+    post 'cards/new_card_activate', to: 'cards#new_card_activate', as: :new_card_activate
     post 'import_cards', to: 'cards#import', as: :import_cards
     namespace :kyc do
       resources :companies do
@@ -3428,7 +3435,11 @@ Rails.application.routes.draw do
 
   get 'autocomplete/customers', to: 'invoicing/autocomplete#customer'
   get 'autocomplete/vendors', to: 'autocomplete#vendors'
-  get 'autocomplete/:entity', to: 'autocomplete#route'
+
+  # Fixme : Keeping it since its available in current version of master
+  get 'autocomplete/:entity', to: 'autocomplete#route' # Fixme Deprecated
+
+  get 'lookup/:route', to: 'lookup#route'
 
   # get 'features', to: 'static_pages#features'
 
@@ -4160,6 +4171,17 @@ Rails.application.routes.draw do
     get 'procurements', to: "vendors#procurements"
     get 'transactions', to: "vendors#transactions"
   end
+
+  # ****************************************************
+  # NEW VENDOR FORMS
+
+  # Vendor Forms API
+  post 'vendor_forms/create_and_submit', to: "vendor_forms#create_and_submit"
+  resources :vendor_forms do
+    put 'submit', to: "vendor_forms#submit"
+  end
+
+
   ######### New Vendor Empanelment Ends ##
 
 
@@ -4204,13 +4226,27 @@ Rails.application.routes.draw do
     end
   end
 
-
   # get 'form_entities', to: 'form_entities#index'
   # resources :form_entities
-  get 'forms/config/:name', to: 'forms#form_config'
-  get 'forms/config/:name/dependency', to: 'forms#form_dependency_config'
-  post 'forms/:form_name/entities/:entity_field_key/choices', to: 'forms#form_entity_choices'
+  get 'forms', to: 'forms#index'
+  get 'forms/entities/:entity_id', to: 'forms#entity_config'
+  get 'forms/:route/config', to: 'forms#form_config'
+
+  get 'forms/:route/dependencies', to: 'forms#form_dependencies'
+  post 'forms/choices', to: 'forms#form_entity_choices'
+  post 'forms/lookup_details', to: 'forms#form_lookup_details'
+  patch 'forms/:id/sync_positions', to: 'forms#sync_positions'
   resources :forms
+
+  get 'form_entities/entity_types', to: "form_entities#entity_types"
+  resources :form_entities
+
+  patch 'form_choice_dependencies/:id/enable', to: 'form_choice_dependencies#enable'
+  patch 'form_choice_dependencies/:id/disable', to: 'form_choice_dependencies#disable'
+  resources :form_choice_dependencies
+
+
+  post 'attachments/custom_field_attachment', to: 'attachments#create_custom_field_attachment'
 
   resources :insights
 
@@ -4326,11 +4362,24 @@ Rails.application.routes.draw do
       get 'reports/count', to: 'reports#count'
       post 'reports/new_sync_attempt', to: 'reports#new_sync_attempt'
       resources :reports, only: [:index, :show, :update]
+
+      get 'purchase_orders/count', to: 'purchase_orders#count'
+      post 'purchase_orders/new_sync_attempt', to: 'purchase_orders#new_sync_attempt'
+      resources :purchase_orders, only: [:index]
     end
   end
 
 
   get 'lookup/:route', to: 'lookup#route'
+
+  post 'search', to: 'global_search#create'
+  get 'search', to: 'global_search#index'
+
+
+  # todo - I2P : For invoices
+  # resources :invoices, only: [:create, :update, :show]
+
+  resources :approval_matrix, only: [:index]
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

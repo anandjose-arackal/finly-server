@@ -64,10 +64,10 @@ class BbpsBill < ApplicationRecord
   include SoftDeletable, Transitionable
   include Sequenced::ActsAsSequenced
   include EventProducer
+  # include SearchIndex::Concerns::Document
+  include Searchkick::Api
 
   acts_as_sequenced column: :sequence_id, purpose: :bbps_bill, editable: false, prefix: 'UB'
-
-  event_channel 'bbps_bill'
 
   serialize :api_response, JSON
 
@@ -98,10 +98,12 @@ class BbpsBill < ApplicationRecord
 
   accepts_nested_attributes_for :amount
 
-  delegate :open?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :payment_ticket_created?, :payment_initiated?, :failed, :paid?, :voided?, :payment_ticket_deleted?, :expired?, to: :status
+  delegate :open?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :payment_ticket_created?, :payment_initiated?, :paid?, :voided?, :payment_ticket_deleted?, :expired?, to: :status
   delegate :amount_value, to: :total_amount
 
-  default_scope {order('bbps_bills.created_at DESC')}
+  default_scope { order('bbps_bills.created_at DESC') }
+
+  scope :with_company_id, -> (company_id) { where company_id: company_id }
 
   scope :with_ids, -> (ids) {
     where(id: ids)
@@ -132,8 +134,6 @@ class BbpsBill < ApplicationRecord
       where(status_id: BbpsBillStatus.id_for(:voided))
     when 'paid', :paid
       where(status_id: BbpsBillStatus.id_for(:paid))
-    when 'failed', :failed
-      where(status_id: BbpsBillStatus.id_for(:failed))
     when 'payment_ticket_created', :payment_ticket_created
       where(status_id: BbpsBillStatus.id_for(:payment_ticket_created))
     when 'payment_initiated', :payment_initiated
@@ -164,7 +164,7 @@ class BbpsBill < ApplicationRecord
     where id: id
   }
 
-  scope :filter_ids, -> (ids) {where(id: ids)}
+  scope :filter_ids, -> (ids) { where(id: ids) }
 
   scope :sort_for_index, -> {
     reorder('bbps_bills.created_at DESC')
@@ -256,11 +256,11 @@ class BbpsBill < ApplicationRecord
     where(id: ids)
   }
 
-  scope :filter_bill_date, -> (start_date, end_date) {where('bbps_bills.bill_date >= ? AND bbps_bills.bill_date <= ? ', Date.parse(start_date), Date.parse(end_date))}
-  scope :filter_due_date, -> (start_date, end_date) {where('bbps_bills.due_date >= ? AND bbps_bills.due_date <= ? ', Date.parse(start_date), Date.parse(end_date))}
-  scope :filter_paid_on_date, -> (start_date, end_date) {where('bbps_bills.paid_on_date >= ? AND bbps_bills.paid_on_date <= ? ', Date.parse(start_date), Date.parse(end_date))}
-  scope :filter_created_on_date, -> (start_date, end_date) {where("bbps_bills.created_at >= ? AND bbps_bills.created_at <= ?", Date.parse(start_date).beginning_of_day, Date.parse(end_date).end_of_day)}
-  scope :filter_approved_on_date, -> (start_date, end_date) {where("bbps_bills.approved_at >= ? AND bbps_bills.approved_at <= ?", Date.parse(start_date).beginning_of_day, Date.parse(end_date).end_of_day)}
+  scope :filter_bill_date, -> (start_date, end_date) { where('bbps_bills.bill_date >= ? AND bbps_bills.bill_date <= ? ', Date.parse(start_date), Date.parse(end_date)) }
+  scope :filter_due_date, -> (start_date, end_date) { where('bbps_bills.due_date >= ? AND bbps_bills.due_date <= ? ', Date.parse(start_date), Date.parse(end_date)) }
+  scope :filter_paid_on_date, -> (start_date, end_date) { where('bbps_bills.paid_on_date >= ? AND bbps_bills.paid_on_date <= ? ', Date.parse(start_date), Date.parse(end_date)) }
+  scope :filter_created_on_date, -> (start_date, end_date) { where("bbps_bills.created_at >= ? AND bbps_bills.created_at <= ?", Date.parse(start_date).beginning_of_day, Date.parse(end_date).end_of_day) }
+  scope :filter_approved_on_date, -> (start_date, end_date) { where("bbps_bills.approved_at >= ? AND bbps_bills.approved_at <= ?", Date.parse(start_date).beginning_of_day, Date.parse(end_date).end_of_day) }
 
   scope :filter_amount, -> (gteq, lteq) do
     gteq = gteq.to_f
@@ -281,8 +281,13 @@ class BbpsBill < ApplicationRecord
       where status_id: status_id
     end
   end
+  
+  scope :with_status_ids, -> (status_id){
+    with_status_id(status_id)
+  }
 
   ransack_scopes :with_status_id
+  ransack_scopes :with_status_ids
 
   def as_json(options = {})
     if options[:index]
@@ -486,7 +491,7 @@ class BbpsBill < ApplicationRecord
       subscription_ids = BbpsBillerSubscription.role_based_reviewer_associated_items(user, role_id).pluck(:id)
       ids = self.joins(:subscription).
           where("bbps_biller_subscriptions.id in (?)", subscription_ids).where("bbps_bills.autofetched = ?", true).or(
-                  self.joins(:subscription).where("bbps_biller_subscriptions.id in (?)", subscription_ids).where("bbps_bills.autofetched = ?" , false).where.not("bbps_bills.status_id = ?", BbpsBillStatus.id_for(:open))
+          self.joins(:subscription).where("bbps_biller_subscriptions.id in (?)", subscription_ids).where("bbps_bills.autofetched = ?", false).where.not("bbps_bills.status_id = ?", BbpsBillStatus.id_for(:open))
       ).pluck("bbps_bills.id")
       where(id: ids)
     elsif UserRole.id_for(:bank_payment_request_reviewer)
@@ -508,11 +513,11 @@ class BbpsBill < ApplicationRecord
     if user.policy_user_roles.pluck(:user_role_id).uniq.present?
       user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
         if UserRole.ids_for(:bank_payment_request_initiator, :bank_payment_request_reviewer, :bank_payment_request_auditor, :bank_payment_request_creditor).include?(role_id.to_i)
-          statuses += [:approved, :auto_approved, :payment_ticket_created, :payment_initiated, :failed, :paid, :voided, :payment_ticket_deleted, :expired]
+          statuses += [:approved, :auto_approved, :payment_ticket_created, :payment_initiated, :paid, :voided, :payment_ticket_deleted, :expired]
         elsif UserRole.ids_for(:utility_bill_master_initiator, :utility_bill_master_reviewer, :utility_bill_initiator, :utility_bill_reviewer).include?(role_id.to_i)
-          statuses += [:open, :awaiting_approval, :retracted, :rejected, :approved, :auto_approved, :payment_ticket_created, :payment_initiated, :failed, :paid, :voided, :payment_ticket_deleted, :expired]
+          statuses += [:open, :awaiting_approval, :retracted, :rejected, :approved, :auto_approved, :payment_ticket_created, :payment_initiated, :paid, :voided, :payment_ticket_deleted, :expired]
         elsif UserRole.id_for(:admin) == role_id.to_i
-          statuses += [:open, :awaiting_approval, :retracted, :rejected, :approved, :auto_approved, :payment_ticket_created, :payment_initiated, :failed, :paid, :voided, :payment_ticket_deleted, :expired]
+          statuses += [:open, :awaiting_approval, :retracted, :rejected, :approved, :auto_approved, :payment_ticket_created, :payment_initiated, :paid, :voided, :payment_ticket_deleted, :expired]
         end
       end
     end
@@ -520,11 +525,11 @@ class BbpsBill < ApplicationRecord
   end
 
   def self.finance_associated_status_ids
-    BbpsBill.status_ids(:approved, :auto_approved, :payment_ticket_created, :payment_initiated, :failed, :paid, :voided, :payment_ticket_deleted )
+    BbpsBill.status_ids(:approved, :auto_approved, :payment_ticket_created, :payment_initiated, :paid, :voided, :payment_ticket_deleted)
   end
 
   def self.auditor_associated_status_ids
-    self.status_ids(:open, :rejected, :retracted, :awaiting_approval, :approved, :auto_approved, :payment_ticket_created, :payment_initiated, :failed, :paid, :voided, :payment_ticket_deleted)
+    self.status_ids(:open, :rejected, :retracted, :awaiting_approval, :approved, :auto_approved, :payment_ticket_created, :payment_initiated, :paid, :voided, :payment_ticket_deleted)
   end
 
   def self.status_ids(*statuses)
@@ -539,10 +544,13 @@ class BbpsBill < ApplicationRecord
     options[:plural] ? 'Utility Bills' : 'Utility Bill'
   end
 
+  def self.awaiting_records user
+    where("#{table_name}.status_id": BbpsBillStatus.id_for(:awaiting_approval)).awaiting_action_items(user&.id)
+  end
+
   def payable?
     BbpsBillStatus.ids_for(:approved, :auto_approved).include?(self.status_id)
   end
-
 
   # Used for tracking completion %
   def review_pending?
@@ -550,7 +558,7 @@ class BbpsBill < ApplicationRecord
   end
 
   def review_completed?
-    BbpsBillStatus.ids_for(:approved, :auto_approved, :payment_ticket_created, :payment_initiated, :failed, :paid, :voided, :payment_ticket_deleted).include?(status_id)
+    BbpsBillStatus.ids_for(:approved, :auto_approved, :payment_ticket_created, :payment_initiated, :paid, :voided, :payment_ticket_deleted).include?(status_id)
   end
 
   def review_in_progress?

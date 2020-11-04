@@ -42,6 +42,10 @@ class AdminUser < ApplicationRecord
 
   scope :with_id, ->(id) { where id: id }
   scope :with_email, ->(email) { where email: email }
+  scope :active, -> {where active: true}
+  scope :admin_panel_accessable, -> {where admin_panel_access: true}
+  # the scope will return user those are admin (pointing to sales persons)
+  scope :admin_panel_not_accessable, -> {where admin_panel_access: false}
 
   def finly_admin?
     # todo temporary, will change once roles has been estabilished
@@ -82,7 +86,7 @@ class AdminUser < ApplicationRecord
   end
 
   def active?
-    true
+    self.active
   end
 
   # Todo implement permission logic
@@ -124,7 +128,7 @@ class AdminUser < ApplicationRecord
     (hashed_password == password)
   end
 
-  def as_json(options={})
+  def as_json(options = {})
     {
         name: name,
         email: email

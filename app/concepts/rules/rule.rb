@@ -30,7 +30,11 @@ class Rules::Rule
   end
 
   def as_store(options = {})
-    as_json(mode: 'store')
+    json = as_json(mode: 'store')
+    unless json[:m].present?
+      json ={logic_type: "group", m: 'and', c: [json]}
+    end
+    json
   end
 
   def as_json_logic(options = {})

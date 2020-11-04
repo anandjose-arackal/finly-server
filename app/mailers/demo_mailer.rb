@@ -4,8 +4,9 @@ class DemoMailer < ApplicationMailer
     mail to: preview_registration.email, subject: 'Finly: Accounts Payable at your service'
   end
 
-  def notify_preview(preview_registration, recipient)
+  def notify_preview(preview_registration, recipient, sales_person = false)
     @preview_registration = preview_registration
+    @sales_person = sales_person
     mail to: recipient, subject: 'New demo request'
   end
 

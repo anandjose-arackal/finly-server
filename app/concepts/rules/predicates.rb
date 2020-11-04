@@ -11,6 +11,16 @@ module Rules::Predicates
     end
   end
 
+  def self.is_number?(value)
+    value = [value] unless value.respond_to?(:each)
+    value.each do |val|
+      is_number = Float(val) rescue false
+      return false unless is_number
+    end
+
+    true
+  end
+
   def self.to_number(arr)
     arr.map {|val|
       if val.respond_to?(:strftime)
@@ -39,6 +49,7 @@ module Rules::Predicates
         JSONLogic.add_operation "#{name}_any", ->(v, d) do
           input = v[0]
           rule_value = v[1]
+          rule_value = [rule_value] unless rule_value.respond_to?(:each)
           rule_value.each do |val|
             return true if block.call([input, val], d)
           end
@@ -49,6 +60,7 @@ module Rules::Predicates
         JSONLogic.add_operation "#{name}_all", ->(v, d) do
           input = v[0]
           rule_value = v[1]
+          rule_value = [rule_value] unless rule_value.respond_to?(:each)
           rule_value.each do |val|
             return false unless block.call([input, val], d)
           end
@@ -59,7 +71,12 @@ module Rules::Predicates
   end
 
   predicate :eq, any: true, all: true do |v, d|
-    v[0]&.to_s&.downcase == v[1].to_s.downcase
+    if Rules::Predicates.is_number?(v)
+      v[0]&.to_f == v[1]&.to_f
+    else
+      v[0]&.to_s&.downcase == v[1]&.to_s&.downcase
+    end
+    # v[0]&.to_s&.downcase == v[1].to_s.downcase
   end
 
   predicate :not_eq, any: true, all: true do |v, d|

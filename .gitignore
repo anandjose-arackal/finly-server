@@ -27,8 +27,16 @@ config/bbps_config.yml
 config/web_client.yml
 config/icici_prepaid_card.yml
 config/finly_macros.yml
+public/*
 public/system/import_job/*
-
+config/feature_flipper.yml
+config/meilisearch.yml
+config/posthog.yml
+config/searchkick.yml
+data.ms/
+config/searchkick.yml
+config/cubejs.yml
+config/mailtrain.yml
 .rubocop.yml
 .vscode/
 reference_resource_migration.log
@@ -47,6 +55,7 @@ erd.pdf
 /public/system/company_kycs/*
 /public/system/individual_kycs/*
 /public/system/attachments/*
+/public/system/custom_field_attachments/*
 /public/system/payment_order_attachments/*
 /public/system/agreements/*
 /public/system/invoice_attachments/*
@@ -92,3 +101,9 @@ config/hutch.yml
 
 public/tmp
 config/integrations.yml
+/public/packs
+/public/packs-test
+/node_modules
+/yarn-error.log
+yarn-debug.log*
+.yarn-integrity

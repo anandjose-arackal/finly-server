@@ -100,15 +100,15 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
 
   def post_process
     case self.response&.status
-      when 404
+    when 404
         self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:possible_failure))
         add_message :error, "Service temporarily unavailable"
         self.transfer_request.bank_error_message = "Service temporarily unavailable"
-      when 500
+    when 500
         self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:possible_failure))
         add_message :error, "Service temporarily unavailable"
         self.transfer_request.bank_error_message = "Service temporarily unavailable"
-      when 200
+    when 200
         # mark the transaction as processing.
         # log the parsed params so that we can get visibility on the transaction
 
@@ -143,11 +143,11 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
           add_message :error, error_message
           self.transfer_request.bank_error_message = error_message
         end
-      else
-        # this will be the catch-all in case the response is not one we expect
-        self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:possible_failure))
-        add_message :error, "Service temporarily unavailable"
-        self.transfer_request.bank_error_message = "Service temporarily unavailable"
+    else
+      # this will be the catch-all in case the response is not one we expect
+      self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:possible_failure))
+      add_message :error, "Service temporarily unavailable"
+      self.transfer_request.bank_error_message = "Service temporarily unavailable"
     end
   end
 
@@ -195,17 +195,25 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
 
   private
 
+  def icici_virtual_account?(ifsc)
+    ['ICIC0000103', 'ICIC0000104', 'ICIC0000106'].include?(ifsc)
+  end
+
   def retrieve_ifsc
-    if self.icici_bank_transaction.receiving_account&.ifsc.to_s.include?("ICIC")
-      return "ICIC0000011"
-    end
-    return self.icici_bank_transaction.receiving_account&.ifsc
+    ifsc = self.icici_bank_transaction.receiving_account&.ifsc.to_s
+    return ifsc if icici_virtual_account?(ifsc)
+
+    return "ICIC0000011" if ifsc.include?("ICIC")
+
+    return ifsc
   end
 
   def retrieve_transaction_type
-    if self.icici_bank_transaction.receiving_account&.ifsc.to_s.include?("ICIC")
-      return "TPA"
-    end
+    ifsc = self.icici_bank_transaction.receiving_account&.ifsc.to_s
+    return 'VAP' if icici_virtual_account?(ifsc)
+
+    return "TPA" if ifsc.include?("ICIC")
+
     return self.icici_bank_transaction.transfer_type
   end
 

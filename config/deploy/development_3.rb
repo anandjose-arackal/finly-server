@@ -9,11 +9,15 @@
 
 # server '13.127.234.0', user: 'centos', roles: %w{web app db}, port: 22
 # server 'demo2.finly.io', user: 'centos', roles: %w{web app db}, port: 22
-server 'dev.finly.io', user: 'centos', roles: %w{web app db}, port: 22
+server 'dev.finly.io', user: 'centos', roles: %w{web app db hutch whenever_cron sidekiq_app}, port: 22
 set :stage, 'development'
 set :use_sudo, false
 set :rbenv_type, :user
 set :rbenv_ruby, '2.6.1' # Edit this if you are using MRI Ruby
+set :whenever_cron, :whenever_cron
+
+set :sidekiq_config => File.join(shared_path, 'config', 'sidekiq.yml')
+set :sidekiq_roles, :sidekiq_app
 
 # role-based syntax
 # ==================

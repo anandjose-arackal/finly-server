@@ -108,6 +108,7 @@ class Admin::Implementations::Master::Lrms::Export < Admin::Implementations::Pro
              BankPaymentRequestProvider
              YesBankVendorProvider
              PaymentAgreementProvider
+             AgreementInvoiceProvider
              BbpsBillerSubscriptionProvider
              BbpsBillProvider
              CreditNoteProvider

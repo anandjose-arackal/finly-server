@@ -17,9 +17,18 @@ module Finly
     config.active_record.default_timezone = :local
     config.middleware.use Rack::Attack
 
+
     # config.autoload_paths += %W(#{config.root}/lib)
 
     config.eager_load_paths << Rails.root.join('lib')
+
+    Raven.configure do |config|
+      if Rails.env.production?
+        config.dsn = 'https://bed720c1d80849fcbc96fba0485460e6@sentry.finly.io/2'
+      end
+    end
+
+    config.filter_parameters << :password
 
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration can go into files in config/initializers

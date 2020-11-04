@@ -8,17 +8,18 @@
 #  user_id                :integer
 #  policy_id              :integer
 #  user_role_id           :integer
-#  application            :string(255)
+#  application            :string(255)      not null
 #  dashboard              :integer          not null
 #  name                   :string(255)
+#  description            :text(65535)
+#  app                    :string(255)
 #  admin_user_id          :integer
+#  priority               :integer          default(1)
 #  deleted_at             :datetime
 #  active                 :boolean          default(TRUE)
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
-#  can_filter_date        :boolean          default(TRUE)
-#  description            :text(65535)
-#  priority               :integer          default(1), not null
+#  can_filter_date        :boolean
 #  can_filter_policy      :boolean          default(FALSE)
 #  can_filter_department  :boolean          default(FALSE)
 #  can_filter_location    :boolean          default(FALSE)
@@ -29,8 +30,6 @@
 class InsightDashboard < ApplicationRecord
   include UUIDHelper, SoftDeletable
   include EventProducer
-
-  event_channel 'insight_dashboard'
 
   belongs_to :company, optional: true
   belongs_to :user, optional: true

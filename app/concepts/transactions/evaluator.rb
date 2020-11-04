@@ -15,7 +15,7 @@ class Transactions::Evaluator
 
   def self.eval_proc(exec_context, function, *args)
     if function.is_a?(Proc)
-      exec_context.instance_eval(*args, &function)
+      exec_context.instance_exec(*args, &function)
     else
       function
     end

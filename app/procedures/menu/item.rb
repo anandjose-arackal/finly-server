@@ -1,7 +1,7 @@
 class Menu::Item
   include ActionManager::DSL
 
-  attr_accessor :key, :id, :path, :icon, :label, :create, :features, :user_subscriptions, :permissions, :parent, :action_registry
+  attr_accessor :key, :id, :path, :icon, :label, :create, :features, :user_subscriptions, :permissions, :parent, :toggle, :action_registry, :options
 
   def initialize(params = {}, &block)
     params.except(:scopes).each_pair do |attr, value|
@@ -19,11 +19,11 @@ class Menu::Item
     @items ||= []
   end
 
-  def item(key, path: nil, icon: nil, label: nil, permissions: [], features: [], &block)
+  def item(key, path: nil, icon: nil, label: nil, permissions: [], features: [], toggle: [], options: {}, &block)
     items << Menu::Item.new(
         key: key, path: path, icon: icon, label: label,
-        action_registry: action_registry,
-        permissions: permissions, features: features, scopes: scopes, &block
+        action_registry: action_registry, toggle: toggle,
+        permissions: permissions, features: features, scopes: scopes, options: options, &block
     )
   end
 
@@ -39,7 +39,7 @@ class Menu::Item
 
   def init
     self.id = key
-    self.path ||= key
+    self.path ||= key unless do_not_build_path?
     self.label ||= key.to_s.titleize
 
     if self.permissions and not self.permissions.respond_to?(:each)
@@ -54,7 +54,7 @@ class Menu::Item
     end
 
     init_parent
-    add_id_to_path
+    add_id_to_path unless do_not_build_path?
     # self.icon ||= "" todo add default icon
   end
 
@@ -64,9 +64,13 @@ class Menu::Item
     self.id = "#{parent&.id}_#{key}"
   end
 
+  def do_not_build_path?
+    self.options[:do_not_build_path]
+  end
+
   def init_scopes(scopes)
     scopes.each do |scope|
-      self.path ||= scope[:path]
+      self.path ||= scope[:path] unless do_not_build_path?
 
       if scope[:permissions].present?
         scope[:permissions] = [scope[:permissions]] unless scope[:permissions].respond_to?(:each)
@@ -92,10 +96,11 @@ class Menu::Item
 
     json = {
         id: id,
-        path: path,
         icon: icon,
         label: label,
     }
+    # Since path is not used by all items
+    json[:path] = path if path.present?
 
     # Rejecting nil items as it would indicate that the tab should not be shown
     if items.present?
@@ -114,6 +119,16 @@ class Menu::Item
     current_user = options[:current_user]
     return false unless current_user.present?
     return false unless current_user.has_permission?(permissions)
+    if toggle.present?
+      klass = toggle.first
+      method = toggle.second
+      raise "Invalid toggle for menu item #{key}" if klass.blank? or method.blank?
+
+      toggle = klass.new(current_user)
+      raise "Invalid toggle for menu item #{key}, method #{method} is not found in klass #{klass}" unless toggle.respond_to?(method)
+
+      return false unless toggle.send(method)
+    end
     return false unless company_subscribed?(current_user)
     return false unless user_subscribed?(current_user)
 

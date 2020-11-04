@@ -18,9 +18,9 @@ class Admin::Implementations::Master::Users::Import < Admin::Implementations::Pr
       :city => "City",
       :gender => "Gender",
       :company_id => "Company ID (mandatory)",
-      :department_code => "Department Name",
-      :location_code => "Location Name",
-      :cost_center_code => "Cost Center Name",
+      :department_code => "Department Name / Departrment Code",
+      :location_code => "Location Name / Loaction Code",
+      :cost_center_code => "Cost Center Name / Cost Code",
       :mothers_maiden_name => "Mothers Maiden Name (mandatory)",
       :expense_management => "Expense Management Y for enable",
       :disburse  => "Disburse Y for enable",
@@ -65,6 +65,7 @@ class Admin::Implementations::Master::Users::Import < Admin::Implementations::Pr
       unless user.update(user_params.except(:password, :password_confirmation))
         return result false, user.errors.full_messages
       end
+      user.confirm
     rescue Exception => e
       return result false, e.message
     end
@@ -148,9 +149,10 @@ class Admin::Implementations::Master::Users::Import < Admin::Implementations::Pr
       generated_password = ''
     end
     company = Company.find_by(id: data[:company_id])
-    department_id = company&.departments&.find_by(name: data[:department_code])&.id
-    location_id = company&.locations&.find_by(name: data[:location_code])&.id
-    cost_center_id =  company&.cost_centers&.find_by(name: data[:cost_center_code])&.id
+    department_id = cost_center_id = location_id=  nil
+    department_id = company&.departments&.non_deleted&.where('name = ? OR department_code = ?', data[:department_code],data[:department_code])&.first&.id if data[:department_code].present?
+    location_id = company&.locations&.non_deleted&.where('name = ? OR location_code = ?', data[:location_code], data[:location_code])&.first&.id if data[:location_code].present?
+    cost_center_id =  company&.cost_centers&.non_deleted&.where('name = ? OR cost_center_code = ?', data[:cost_center_code],data[:cost_center_code])&.first&.id if data[:cost_center_code].present?
     enforce_policy_enabled = data[:enforce_policy]&.to_s&.upcase == 'Y' ? true : false
     if company.nil?
       messages << "Company with this ID not found"

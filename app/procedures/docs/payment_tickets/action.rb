@@ -46,6 +46,14 @@ class Docs::PaymentTickets::Action < ActionManager::API
       end
     end
 
+    action :template,
+           :upload_utr,
+           contextual: false,
+           format: 'standard',
+           label: "Upload UTR",
+           icon: "https://img.icons8.com/windows/17/708090/upload.png",
+           function: 'upload_utr'
+
     action :export,
            :export,
            label: "Export",

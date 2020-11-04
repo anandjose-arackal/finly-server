@@ -35,19 +35,22 @@
 #  grn_enabled                    :boolean          default(TRUE)
 #  srn_enabled                    :boolean          default(FALSE)
 #  agreement_based_payment_system :boolean          default(FALSE)
-#  vendor_portal                  :boolean          default(FALSE)
 #  gstin_verification_enabled     :boolean          default(FALSE)
+#  vendor_portal                  :boolean          default(FALSE)
 #  utility_bills_enabled          :boolean          default(FALSE)
+#  analytics_system               :boolean
 #  request_encryption_enabled     :boolean          default(FALSE)
 #  user_level_custom_fields       :boolean          default(FALSE)
-#  analytics_system               :boolean
 #  deleted_at                     :datetime
 #  sso_login_enforced             :boolean          default(FALSE)
+#  card_service_provider_id       :integer
 #
 
 class FeatureSubscription < ApplicationRecord
   belongs_to :subscribable, optional: true, polymorphic: true
 
+  after_commit :create_company_utiity_bank_account
+  
   def cards_enabled
     (gift_card_enabled or gift_voucher_enabled or meal_card_enabled or fuel_card_enabled or medical_card_enabled or expense_card_enabled or reimbursement_card_enabled or payroll_card_enabled)
   end
@@ -61,6 +64,7 @@ class FeatureSubscription < ApplicationRecord
     false
   end
 
+
   # this is only for when we are using the workaround
   # for multi bank support
   def bank_transaction_class
@@ -73,6 +77,17 @@ class FeatureSubscription < ApplicationRecord
       return KotakBankTransaction
     else
       return YesBankTransaction
+    end
+  end
+
+  def create_company_utiity_bank_account
+    if utility_bills_enabled?
+      if subscribable_type == "Company"
+        company = subscribable
+        if company.utility_bills_account.virtual_bank_accounts.blank?
+          company.utility_bills_account.va_generate
+        end
+      end
     end
   end
 

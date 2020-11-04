@@ -38,11 +38,11 @@
 #  modified_by_id                     :integer
 #  deleted_at                         :datetime
 #  controlling_level_id               :integer
-#  company_id                         :integer
 #  bank_reference_number              :string(255)
 #  source_account                     :string(255)
 #  location_id                        :integer
 #  cost_center_id                     :integer
+#  company_id                         :integer
 #
 
 class Report < ApplicationRecord
@@ -51,8 +51,6 @@ class Report < ApplicationRecord
           FieldCustomizer::CustomizableValidation,
           FindByOrderedIds, Transitionable
   include ErpSyncable
-
-  event_channel 'report'
 
   has_many :email_authorizations, as: :authorizable
   belongs_to :user, optional: true, inverse_of: :reports

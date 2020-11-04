@@ -11,7 +11,7 @@ class Vendors::NewVendorConfig < Vendors::Base
     self.locations = user.company.locations
 
     if user.company.vendor_empanelment_workflow_enabled?
-      self.policies = Policy::VendorPayments::Index.(user, {filter_role_id: [UserRole.id_for(:vendor_creator)]}).policies
+      self.policies = Policy::VendorPayments::Index.(user, {filter_role_id: [UserRole.id_for(:vendor_creator)]}).policies || Policy.none
     end
   end
 

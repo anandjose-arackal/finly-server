@@ -1,6 +1,6 @@
 class Masters::Departments::Lookup < Lookup::API
 
-  resolver 'department.default'
+  resolver 'departments.default'
   search_key :name_or_department_code_cont
 
   attribute :id, visible: false

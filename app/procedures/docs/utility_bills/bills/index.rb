@@ -136,7 +136,7 @@ class Docs::UtilityBills::Bills::Index < IndexBuilder::API
     )
 
     if user.has_permission?(awaiting_approval_roles)
-      counter.add 91, 'Awaiting Approval', collection.awaiting_action_items(user.id).count
+      counter.add 91, 'Awaiting Approval', collection.with_status_id(91).awaiting_action_items(user.id).count
     end
 
     # Processing
@@ -151,7 +151,7 @@ class Docs::UtilityBills::Bills::Index < IndexBuilder::API
         counts[BbpsBillStatus.id_for(:payment_ticket_deleted)].to_i
     )
 
-    [:rejected, :failed, :paid, :voided, :expired].each do |status|
+    [:rejected, :paid, :voided, :expired].each do |status|
       counter.add BbpsBillStatus.id_for(status), status.to_s.titleize, counts[BbpsBillStatus.id_for(status)].to_i
     end
 
@@ -170,7 +170,7 @@ class Docs::UtilityBills::Bills::Index < IndexBuilder::API
 
   def self.format_status(context)
     case context[:record].status&.name&.to_s&.to_sym
-    when :rejected, :failed
+    when :rejected
       format = 'danger'
     when :paid, :approved, :auto_approved, :payment_ticket_created, :payment_initiated, :payment_ticket_deleted
       format = 'success'
@@ -212,21 +212,21 @@ class Docs::UtilityBills::Bills::Index < IndexBuilder::API
   end
 
   def self.customer_param_value_1(context)
-    return " " if context[:record].subscription.customer_param_value_1.blank?
+    return " " if context[:record]&.subscription&.customer_param_value_1&.blank?
 
-    "#{context[:record].subscription.customer_param_key_1}: #{context[:record].subscription.customer_param_value_1}"
+    "#{context[:record]&.subscription&.customer_param_value_1}: #{context[:record]&.subscription&.customer_param_value_1}"
   end
 
   def self.customer_param_value_2(context)
-    return " " if context[:record].subscription.customer_param_value_2.blank?
+    return " " if context[:record]&.subscription&.customer_param_value_2&.blank?
 
-    "#{context[:record].subscription.customer_param_key_2}: #{context[:record].subscription.customer_param_value_2}"
+    "#{ context[:record]&.subscription&.customer_param_value_2 }: #{ context[:record]&.subscription&.customer_param_value_2 }"
   end
 
   def self.customer_param_value_3(context)
-    return ' ' if context[:record].subscription.customer_param_value_3.blank?
+    return ' ' if context[:record]&.subscription&.customer_param_value_3&.blank?
 
-    "#{context[:record].subscription.customer_param_key_3}: #{context[:record].subscription.customer_param_value_3}"
+    "#{ context[:record]&.subscription&.customer_param_value_3 }: #{ context[:record]&.subscription&.customer_param_value_3 }"
   end
 
 end

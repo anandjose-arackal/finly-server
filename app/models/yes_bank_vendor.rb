@@ -39,6 +39,12 @@
 #  trade_name               :string(255)
 #  reject_note              :text(65535)
 #  rcm_enabled              :boolean          default(FALSE)
+#  vendor_country           :string(255)
+#  ldc_upper_limit_id       :integer
+#  ldc_effective_start_date :date
+#  ldc_effective_end_date   :date
+#  tds_effective_start_date :date
+#  tds_effective_end_date   :date
 #  erp_sync_status_id       :integer
 #  erp_sync_message         :string(255)
 #  erp_sync_reference_id    :string(255)
@@ -52,10 +58,16 @@ class YesBankVendor < ApplicationRecord
   include LiquidDroppable
   include Exposures::Model::Exposable
   include ErpSyncable
+  # include SearchIndex::Concerns::Document
+  include Searchkick::Api
+  include FormsHelper
+
 
   validates :business_name, presence: true
 
   include SoftDeletable
+
+  event_channel 'vendors'
 
   acts_as_sequenced column: :vendor_id, purpose: :vendor, editable: false, prefix: 'VNDR-'
 
@@ -69,11 +81,12 @@ class YesBankVendor < ApplicationRecord
   belongs_to :currency, optional: true
   belongs_to :payment_term, optional: true
 
-  has_many :bank_accounts, as: :account_owner, dependent: :destroy
+  has_many :bank_accounts, as: :account_owner
   has_many :receiving_payments, as: :receiving_user, class_name: 'Payment'
   has_many :vendor_attachments
   has_many :custom_fields, as: :parent, dependent: :destroy
-  has_many :vendor_tds_rates, dependent: :destroy, foreign_key: :vendor_id
+  has_many :form_custom_fields, class_name: 'FormCustomField', as: :document
+  has_many :vendor_tds_rates, foreign_key: :vendor_id
   has_many :tds_rates, through: :vendor_tds_rates
   has_many :beneficiary_payments, foreign_key: :vendor_id
   has_many :gstin_locations, foreign_key: :vendor_id
@@ -111,6 +124,7 @@ class YesBankVendor < ApplicationRecord
 
   scope :with_ids, -> (ids) {where id: ids}
   scope :with_id, -> (ids) {where id: ids}
+  scope :with_company_id, -> (company_id) { where company_id: company_id }
 
   scope :including_bank_accounts, -> {joins(:bank_accounts)}
   scope :non_deleted, -> {where deleted_at: nil }
@@ -159,6 +173,7 @@ class YesBankVendor < ApplicationRecord
       where status_id: status_id
     end
   }
+
   scope :filter_policy_id, -> (policy_id) {where policy_id: policy_id}
   scope :filter_created_by_id, -> (user_id) {where created_by_id: user_id}
   scope :filter_business_name, -> (term) {where("business_name like ?", "%#{term}%")}
@@ -232,6 +247,10 @@ class YesBankVendor < ApplicationRecord
     end
   end
 
+  scope :with_status_ids, -> (id){
+    with_status_id(id)
+  }
+
   scope :filter_approved_date, -> (from, to) {
     from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
     to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
@@ -258,6 +277,7 @@ class YesBankVendor < ApplicationRecord
   end
 
   ransack_scopes :with_status_id
+  ransack_scopes :with_status_ids
 
   def display_name
     self.business_name.blank? ? self.name : self.business_name
@@ -360,6 +380,13 @@ class YesBankVendor < ApplicationRecord
       end
     end
     return statuses.uniq
+  end
+
+  def self.awaiting_records user
+    user_id = user.id
+    if user_id.present?
+      self.awaiting_action_items(user_id).where.not(status_id: VendorStatus.id_for(:auto_approved))
+    end
   end
 
   def self.initiator_associated_items(user, role_id=nil)

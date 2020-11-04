@@ -11,8 +11,6 @@
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
 #  deleted_at       :datetime
-#  schedulable_id   :string(255)
-#  schedulable_type :string(255)
 #
 
 class TaskSchedule < ApplicationRecord
