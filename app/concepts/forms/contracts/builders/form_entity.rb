@@ -62,6 +62,25 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
         if required and send(entity.entity_key).blank? and entity.entity_type != 'switch'
           errors.add entity.label, 'cannot be blank'
         end
+
+        # Check uniqueness of value
+        # Assumptions for checking uniqueness;
+        # 1. Entity's immediate parent must have association to company & vice versa
+        unique = result['unique']
+        if unique
+          id = send("id")
+          association_name = entity.parent&.entity_key || entity.form.model.table_name
+
+          records = contract_root.current_user.company.
+              send(association_name).
+              where("#{entity.entity_key} = ?", send(entity.entity_key))
+
+          records = records.where.not("id = ?", id) if id.present?
+
+          if records.present?
+            errors.add entity.label, "must be unique"
+          end
+        end
       end
     end
   end

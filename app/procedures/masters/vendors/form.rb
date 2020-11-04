@@ -117,7 +117,7 @@ class Masters::Vendors::Form < Forms::API
 
   section :tax_information, title: "Tax Information & Details", associate_custom_fields: true do
     # PAN
-    text :pan
+    text :pan, unique: true
     attachment :pan_attachment, system_field: false
     # RCM
     switch :rcm_enabled, label: "RCM Enabled"
@@ -177,7 +177,7 @@ class Masters::Vendors::Form < Forms::API
   section :account_details, associate_custom_fields: true do
     data_map :bank_accounts, populate_if_empty: BankAccount, min_items: 1, associate_custom_fields: true do
       text :name, required: true
-      text :account_number, required: true, regex: {format: "\\A[A-Za-z0-9]{3,32}\\z", message: "is not in valid format"}
+      text :account_number, required: true, unique: true, regex: {format: "\\A[A-Za-z0-9]{3,32}\\z", message: "is not in valid format"}
       text :confirm_account_number, required: true, system_field: false
       text :ifsc, label: "IFSC", required: true, regex: {format: "\\A[A-Za-z]{4}[a-zA-Z0-9]{7}\\z", message: "is not valid"}
       text :swift_code, label: "Swift / Bank Code", required: false, visible: false, editable: false, regex: {format: "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$", message: "is not valid"}
