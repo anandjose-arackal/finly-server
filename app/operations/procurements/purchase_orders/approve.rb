@@ -31,7 +31,7 @@ class Procurements::PurchaseOrders::Approve < Procurements::PurchaseOrders::Base
   end
 
   def process
-    self.purchase_order.paper_trail_event = "Submit"
+    self.purchase_order.paper_trail_event = "Approve"
     params[:document] = self.purchase_order
     params[:aasm_event] = 'approve'
     params[:violation_present] = false #todo Check violations

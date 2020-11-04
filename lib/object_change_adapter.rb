@@ -6,7 +6,6 @@ class ObjectChangeAdapter
 
 
   def diff(changes={})
-    binding.pry
     changes
   end
 
