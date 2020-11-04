@@ -14,5 +14,7 @@ class Docs::P2P::PurchaseRequests::FilterConfig < Filters::API
   attribute :items_cost_center_id, label: 'Cost Center', type: :dropdown, choices: Choices[:lookup].('cost_centers')
   attribute :items_department_id, label: 'Department', type: :dropdown, choices: Choices[:lookup].('departments')
   attribute :creator_id, label: "Created By", type: :dropdown, choices: Choices[:lookup].("users")
+  attribute :controlling_level, label: "Controlling Level", type: :text, simple: true
+  attribute :controlling_user, label: "Controlling User", type: :text, simple: true
 
 end

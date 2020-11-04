@@ -13,5 +13,7 @@ class Docs::P2P::Agreements::FilterConfig < Filters::API
   attribute :approved_at, type: :datetime
   attribute :policy_id, type: :dropdown, simple: false, choices: Choices[:lookup].('policies')
   attribute :creator_id, label: "Created By", type: :dropdown, choices: Choices[:lookup].("users")
+  attribute :controlling_level, label: "Controlling Level", type: :text, simple: true
+  attribute :controlling_user, label: "Controlling User", type: :text, simple: true
 
 end

@@ -61,10 +61,6 @@ class Docs::P2P::Agreements::Index < IndexBuilder::API
     user value: :created_by
   end
 
-  column :status, default: true, sort: :status_id, includes: [:status] do
-    indicator value: :agreement_status, format: :agreement_status_format
-  end
-
   IndexBuilder::API::ColumnTemplate::ControllingUser(self)
   IndexBuilder::API::ColumnTemplate::ControllingLevel(self)
   IndexBuilder::API::ColumnTemplate::ReviewProgress(self)
