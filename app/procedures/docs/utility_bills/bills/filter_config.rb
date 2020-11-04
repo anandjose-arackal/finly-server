@@ -22,7 +22,7 @@ class Docs::UtilityBills::Bills::FilterConfig < Filters::API
   attribute :cost_center_id, label: "Cost Center", type: :dropdown, choices: Choices[:lookup].("cost_centers")
   attribute :department_id, label: "Department", type: :dropdown, choices: Choices[:lookup].("departments")
   attribute :user_id, label: "Created By", type: :dropdown, choices: Choices[:lookup].("users")
-  attribute :controlling_level, label: "Controlling Level", type: :text, simple: true
+  attribute :controlling_level_level_number, label: "Controlling Level", type: :number, simple: true
   attribute :controlling_user, label: "Controlling User", type: :text, simple: true
 
 end

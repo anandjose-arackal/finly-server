@@ -15,8 +15,8 @@ class Docs::P2P::PurchaseOrders::FilterConfig < Filters::API
   attribute :items_department_id, label: "Department", type: :dropdown, choices: Choices[:lookup].("departments")
   attribute :user_id, label: "Created By", type: :dropdown, choices: Choices[:lookup].("users")
   attribute :items_purchase_request_item_purchase_request_order_number, label: "Purchase Request ID", type: :text
-  attribute :controlling_level, label: "Controlling Level", type: :text, simple: true
-  attribute :controlling_user, label: "Controlling User", type: :text, simple: true
+  attribute :controlling_level_level_number, label: "Controlling Level", type: :number, simple: true
+  attribute :controlling_user_id, label: "Controlling User", type: :dropdown, simple: true, choices: Choices[:lookup].("users")
   custom_fields :purchase_order
 
 end
