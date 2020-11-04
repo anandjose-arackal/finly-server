@@ -99,5 +99,5 @@ every 1.minute, roles: [:whenever_cron] do
 end
 
 every '0,15,30,45 * * * *', roles: [:whenever_cron] do
-  runner 'AnalyticsDashboards::Scheduler.perform'
+  runner 'AnalyticsDashboard::Scheduler.perform'
 end

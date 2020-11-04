@@ -1,5 +1,5 @@
 # Responsible for sending scheduled reports via email to the customer
-class AnalyticsDashboards::Scheduler
+class AnalyticsDashboard::Scheduler
   include Sidekiq::Worker
 
   def self.call
@@ -18,27 +18,40 @@ class AnalyticsDashboards::Scheduler
 
   attr_accessor :analytics_dashboard
 
-  def perform(id, options={})
+  def perform(id, options = {})
     self.analytics_dashboard = AnalyticsDashboard.find(id)
     reports = self.analytics_dashboard.reports
     reports.each do |report|
-      report[:data] = build_data(report)
+      data = build_data(analytics_dashboard.created_by, report)
+      report[:data] = data['data'] if data.present?
     end
 
+    reports
   end
 
-  def build_data(report)
+  def build_data(user, report)
     query = report.dig('vizState', 'query')
-    result = CubeJs.load(token, query)
-    if result.success?
-      result.message
+    attempt = 0
+    loop do
+      CubeJs::Load.(params: {q: query}, current_user: user) do |m|
+        m.success do |result|
+          return result
+        end
+
+        m.failure do |result|
+          return nil
+        end
+
+        m.wait do |result|
+          attempt += 1
+          if attempt > 3
+            return nil
+          else
+            # Sleep for 15 seconds and check again
+            sleep 15
+          end
+        end
+      end
     end
-
-    nil
   end
-
-  def token
-    @token ||= CubeJs.generate_token(analytics_dashboard.created_by, expiry: 30.minutes.from_now.to_i)
-  end
-
 end
