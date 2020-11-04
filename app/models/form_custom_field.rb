@@ -15,9 +15,36 @@
 #
 
 class FormCustomField < ApplicationRecord
-  include UUIDHelper
+  include UUIDHelper, SoftDeletable
 
   belongs_to :form
   belongs_to :form_entity
   belongs_to :document, polymorphic: true
+
+  has_one :selection, class_name: 'CustomFieldSelection'
+  has_many :selections, class_name: 'CustomFieldSelection'
+  has_many :attachments, class_name: 'CustomFieldAttachment'
+  # has_many :attachments, as: :resource
+
+  def retrieve_value
+    case self.form_entity&.entity_type
+    when 'text'
+      value || value_text
+    when 'dropdown'
+      selection&.form_entity_choice&.id
+      # selection&.form_entity_choice&.name
+    when 'multiselect'
+      selections.map(&:form_entity_choice).map(&:name)
+    when 'attachment'
+      attachments.as_json if self.persisted?
+    else
+      value
+    end
+  end
+
 end
+
+
+# value
+# attachments
+# values

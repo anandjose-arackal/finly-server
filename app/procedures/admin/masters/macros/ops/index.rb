@@ -51,7 +51,7 @@ class Admin::Masters::Macros::Ops::Index < IndexBuilder::API
   end
 
   column :permissions, default: true do
-    text value: -> (context) { context[:record].permissions&.map {|perm| perm.humanize}&.join(", ") }
+    text value: -> (context) {context[:record].permissions&.map {|perm| perm.humanize}&.join(", ")}
   end
 
   counter -> (user, collection) do

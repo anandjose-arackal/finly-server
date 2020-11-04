@@ -94,7 +94,6 @@ json.cancellable record.cancellable?
 json.cancelled record.cancelled?
 
 
-
 custom_fields = {}
 record.custom_fields.each do |cf|
   custom_fields[cf.field_configuration.field_name] = cf.configured_field_value

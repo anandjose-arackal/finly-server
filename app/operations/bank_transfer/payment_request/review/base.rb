@@ -21,20 +21,20 @@ class BankTransfer::PaymentRequest::Review::Base < BaseOperation
       add_message :error, "Payment order not found"
       return
     end
-
-    def budget_limit_validation payment
-      if user.company.feature_subscription.enforce_budget_limit
-        op = BudgetManager::BudgetLimitValidator::ValidatePayment.(user,{ payment: self.payment })
-        if op.messages[:error].present?
-          return add_message :error, op.messages[:error]
-        end
-      end
-    end
   end
 
   def success
     params[:bank_payment_request] = self.bank_payment_request
     BankTransfer::PaymentRequest::Review::Base::RequestPresenter.new(user, params, messages)
+  end
+
+  def budget_limit_validation payment
+    if user.company.feature_subscription.enforce_budget_limit
+      op = BudgetManager::BudgetLimitValidator::ValidatePayment.(user,{ payment: payment })
+      if op.messages[:error].present?
+        return add_message :error, op.messages[:error]
+      end
+    end
   end
 
   class BankTransfer::PaymentRequest::Review::Base::RequestPresenter < BaseOperation::BasePresenter::SuccessPresenter

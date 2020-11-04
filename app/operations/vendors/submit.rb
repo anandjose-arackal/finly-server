@@ -15,8 +15,23 @@ class Vendors::Submit < Vendors::Base
     self.vendor = Vendors::Show.(user, params).vendor rescue nil
   end
 
-  def process
+  def pre_process
+    if user.company.vendor_empanelment_workflow_enabled?
+      # Create Document Level Reviewer Mapping
+      # For setting level specific reviewers from reviewal chain for a document
+      params[:reviewal_document] = self.vendor
+      document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+      unless document_reviewer_mappings_op.success?
+        add_message :error, document_reviewer_mappings_op.messages[:error]
+        return
+      end
+    else
+      add_message :error, "Vendor Auto Approved"
+      self.vendor.update(status_id: VendorStatus.id_for(:auto_approved))
+    end
+  end
 
+  def process
     params[:reviewal_document] = self.vendor
     document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
     unless document_reviewer_mappings_op.success?

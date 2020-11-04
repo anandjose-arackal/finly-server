@@ -29,7 +29,7 @@ class TdsRatesList < ApplicationRecord
   
   default_scope {unscope(:where)}
 
-  def as_json(options={})
+  def as_json(options = {})
     {
         id: id,
         name: name,

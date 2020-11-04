@@ -22,12 +22,13 @@ class Menu::Processor < Transactions::API
     result = master.(params: params, current_user: current_user)
     if result.success?
       context[:menu] = result[:menu]
+      context[:footer] = result[:footer]
       context[:entities] = result[:entities]
       context[:current_module] = result[:current_module]
       return true
     end
 
-    Messages::AddSchema(context, context.errors)
+    Messages::AddSchema(context, result.errors)
     false
   end
 

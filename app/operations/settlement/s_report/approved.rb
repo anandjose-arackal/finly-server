@@ -104,7 +104,7 @@ class Settlement::SReport::Approved < Reports::Base
       return
     end
 
-    
+
     ########### Cash Pocket Deductions ###############
 
     user_pocket_ids = report.expenses.pluck(:spent_from_id).uniq

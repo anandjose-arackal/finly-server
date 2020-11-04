@@ -52,21 +52,21 @@ json.bank_accounts do
   end
 end
 
-json.gstin_locations do 
+json.gstin_locations do
   json.array!(@result.vendor.gstin_locations) do |gstin_location|
     json.extract! gstin_location, :id, :gstin, :poc_name, :poc_mobile_number, :poc_email, :poc_fax, :poc_designation, :state_id, :location, :address
     json.card_id gstin_location.id
     if gstin_location.gstin_master.present?
       json.result do
         json.extract! gstin_location.gstin_master, :id, :gstin, :legal_name_of_business, :state, :date_of_registration,
-        :constitution_of_business, :taxpayer_type, :status, :api_response, :address
+                      :constitution_of_business, :taxpayer_type, :status, :api_response, :address
       end
     end
     gstin_master = Gstin.with_gstin(gstin_location.gstin).first
     if gstin_master.present?
       json.verified_details do
         json.address gstin_master&.address
-        json.constitution_of_business gstin_master&.constitution_of_business 
+        json.constitution_of_business gstin_master&.constitution_of_business
         json.date_of_registration gstin_master&.date_of_registration
         json.gstin gstin_master&.gstin
         json.legal_name_of_business gstin_master&.legal_name_of_business
@@ -106,8 +106,8 @@ json.custom_fields do
 end
 
 if @result.vendor.policy.present?
-  json.policy do 
-    json.extract! @result.vendor&.policy, :id, :name  
+  json.policy do
+    json.extract! @result.vendor&.policy, :id, :name
   end
 end
 
@@ -184,4 +184,3 @@ json.edit_config do
     end
   end
 end
-

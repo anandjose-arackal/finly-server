@@ -11,11 +11,11 @@ class Admin::Masters::Macros::Jobs::Index < IndexBuilder::API
   end
 
   column :started_at, default: true, sort: true do
-    text value: -> (context) { context[:record].started_at&.strftime("%I:%M:%S %p, %d %b %Y") }
+    text value: -> (context) {context[:record].started_at&.strftime("%I:%M:%S %p, %d %b %Y")}
   end
 
   column :ended_at, default: true do
-    text value: -> (context) { context[:record].ended_at&.strftime("%I:%M:%S %p, %d %b %Y") }
+    text value: -> (context) {context[:record].ended_at&.strftime("%I:%M:%S %p, %d %b %Y")}
   end
 
   column :execution_time, default: true do

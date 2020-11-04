@@ -49,11 +49,11 @@ class Macro < FinlyMacrosRecord
       where('active = FALSE OR active IS NULL OR start_date > ? OR end_date < ?', Date.today, Date.today)
     end
   }
-  scope :with_route, -> (route) { joins(:routes).where(macro_routes: {route: route}) }
+  scope :with_route, -> (route) {joins(:routes).where(macro_routes: {route: route})}
 
   serialize :permissions, JSON
 
-  default_scope { order(created_at: :desc) }
+  default_scope {order(created_at: :desc)}
 
   ransack_scopes :filter_active
 

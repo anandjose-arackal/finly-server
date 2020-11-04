@@ -1,6 +1,7 @@
 class Transactions::API < Trailblazer::Operation
   include Contract::DSL
   include Trailblazer::Macro
+  include Forms::Transactions::Macro
   include Transactions::Messages
   include Transactions::Schema::DSL
   include Transactions::Authorization::DSL

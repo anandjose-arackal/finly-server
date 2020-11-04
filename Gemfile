@@ -247,6 +247,10 @@ gem 'whenever', '~> 1.0'
 gem 'searchkick', '~> 4.4'
 gem 'typhoeus', '~> 1.4'
 
+gem 'json_logic', '~> 0.4'
+gem 'kalc'
+gem 'wit', '~> 6.0'
+
 # gem for all azure services
 gem 'azure'
 gem 'azure-storage-blob'

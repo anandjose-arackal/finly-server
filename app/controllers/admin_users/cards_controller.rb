@@ -101,5 +101,5 @@ class AdminUsers::CardsController < BaseControllers::AdminBase
       respond response: :failure, message: @result.messages[:error]
     end
   end
-  
+
 end

@@ -26,7 +26,7 @@ class Rules::Adapters::Grammar
         if left_attr.class.name == Rules::Rule.name
           values << left_attr
         elsif left_attr[:entity].present?
-          attribute = left_attr
+          attribute = [{name: left_attr[:entity]}]
         else
           values << left_attr
         end

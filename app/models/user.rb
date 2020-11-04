@@ -156,7 +156,7 @@ class User < ApplicationRecord
 
 
   has_many :bank_accounts, as: :account_owner, dependent: :destroy
-  has_one :default_bank_account, -> { where default_account: true }, class_name: "BankAccount", as: :account_owner
+  has_one :default_bank_account, -> {where default_account: true}, class_name: "BankAccount", as: :account_owner
   has_many :authentications
   has_many :cards, dependent: :destroy
   has_many :payroll_cards, -> { where(card_program_id: CardProgram.id_for(:payroll)) }, class_name: 'Card'
@@ -1776,6 +1776,8 @@ class User < ApplicationRecord
     permissions = [permissions] unless permissions.is_a?(Array)
     permissions = UserRole.ids_for(permissions) unless permissions.first.is_a?(Integer)
     return true if permissions.include?(UserRole.id_for(:admin)) and admin?(RequestStoreUtil.current_app)
+    return true if permissions.include?(UserRole.id_for(:vp_admin)) and admin?('vp')
+    return true if permissions.include?(UserRole.id_for(:em_admin)) and admin?('em')
     return true if has_roles?(permissions)
 
     false

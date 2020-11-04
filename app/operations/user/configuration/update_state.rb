@@ -30,12 +30,14 @@ class User::Configuration::UpdateState < BaseOperation
     end
 
     # If the user is being activated, then check the maximum users that can be active as per the companies plan
-    if params[:active]
+    if StringUtils.to_bool params[:active]
       maximum_users = UserToggle.new(user).maximum_users
-      existing_users_count = current_company.users.filter_state([User::ACTIVE, User::PENDING]).count
-      if existing_users_count >= maximum_users
-        add_message :error, 'Error activating the user. You have reached the maximum users you can invite in your plan'
-        return
+      if maximum_users.present? and maximum_users > 0
+        existing_users_count = current_company.users.filter_state([User::ACTIVE, User::PENDING]).count
+        if existing_users_count >= maximum_users
+          add_message :error, 'Error activating the user. You have reached the maximum users you can invite in your plan'
+          return
+        end
       end
     end
   end

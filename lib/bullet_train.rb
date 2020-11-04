@@ -16,7 +16,7 @@ class BulletTrain
   def initialize(opts = {})
     @opts = determine_opts(opts)
 
-    @bt_api = Faraday.new(url: @opts[:url], request: {timeout: TIMEOUT}) do |faraday|
+    @bt_api = Faraday.new(url: @opts[:url], request: {timeout: TIMEOUT, open_timeout: TIMEOUT}) do |faraday|
       faraday.headers['Accept'] = 'application/json'
       faraday.headers['Content-Type'] = 'application/json'
       faraday.headers['x-environment-key'] = @opts[:api_key]
@@ -161,6 +161,6 @@ class BulletTrain
   end
 
   def self.api_url
-    ENV.fetch('BULLETTRAIN_URL') { 'https://api.bullet-train.io/api/v1/' }
+    ENV.fetch('BULLETTRAIN_URL') {'https://api.bullet-train.io/api/v1/'}
   end
 end

@@ -12,7 +12,7 @@ class Procurements::Bbps::Subscription::Form < Forms::API
   #   dropdown :policy_id, label: 'Policy', required: true,
   #            enum: {provider: PolicyProvider, filters: {role: UserRole.id_for(:bbps_subscription_initiator)}}
   #   date :start_date
-  #   text :note, attributes: {char_limit: 1000}
+  #   text :note, attributes: {maximum: 1000}
   # end
   #
   # section :general do

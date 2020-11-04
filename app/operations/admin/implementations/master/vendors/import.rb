@@ -139,7 +139,7 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
     end
     payment_term_id = nil
     if data[:payment_term].present?
-      payment_term_id = company.payment_terms(name: data[:payment_term]).first&.id
+      payment_term_id = company.payment_terms.non_deleted.where(name: data[:payment_term]).first&.id
         messages << "Payment Term not found" if payment_term_id.nil?
     end
 

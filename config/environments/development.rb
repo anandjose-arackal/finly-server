@@ -12,13 +12,13 @@ Rails.application.configure do
   # Show full error reports.
   config.consider_all_requests_local = true
 
-  feature_flipper_config = Rails.application.config_for(:feature_flipper)&.with_indifferent_access
-    if feature_flipper_config.present? and feature_flipper_config['enabled'] and
-        feature_flipper_config.dig('api_key').present? and feature_flipper_config.dig('url').present?
-      config.bullet_train = BulletTrain.new(api_key: feature_flipper_config['api_key'], url: feature_flipper_config['url'])
-    else
-      config.bullet_train = nil
-    end
+  feature_flipper_config = Rails.application.config_for(:feature_flipper)
+  if feature_flipper_config.present? and feature_flipper_config['enabled'] and
+      feature_flipper_config['api_key'].present? and feature_flipper_config['url'].present?
+    config.bullet_train = BulletTrain.new(api_key: feature_flipper_config['api_key'], url: feature_flipper_config['url'])
+  else
+    config.bullet_train = nil
+  end
 
   posthog_config = Rails.application.config_for(:posthog)&.with_indifferent_access
   if posthog_config.present? and posthog_config['enabled']
@@ -27,7 +27,7 @@ Rails.application.configure do
             api_key: posthog_config['api_key'],
             api_host: posthog_config['api_host'],
             # Todo log errors
-            on_error: Proc.new { |status, msg| print msg }
+            on_error: Proc.new {|status, msg| print msg}
         }
     )
   else

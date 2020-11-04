@@ -3,8 +3,14 @@ class Masters::Vendors::Index < IndexBuilder::API
   system_subscription :vp
   permissions :vendor_creator, :vendor_reviewer, :vendor_manager, :vendor_auditor, :auditor, :admin
   resolver 'vendors.default'
-  reference '{{record.id}}'
+  # reference '{{record.id}}'
   custom_fields :yes_bank_vendor
+
+  # Overriding reference to pass forms_enabled as metadata
+  def self.reference(id = nil, args = {})
+    forms_enabled = VendorToggle.new(RequestStoreUtil.current_user).forms_enabled?
+    {id: '{{record.id}}', args: {forms_enabled: forms_enabled}}
+  end
 
   # Fixed column is always default true
   column :vendor, label: 'Name', fixed: true, sort: :business_name do
