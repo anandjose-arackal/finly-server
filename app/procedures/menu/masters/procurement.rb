@@ -101,7 +101,7 @@ class Menu::Masters::Procurement < Menu::API
 
   item :manage, icon: 'https://img.icons8.com/windows/20/ffffff/commercial-development-management.png' do
     item :analytics, permissions: [:admin], features: :analytics_system
-    item :analytics_dashboard, permissions: [:admin]
+    item :analytics_dashboards, permissions: [:admin]
     item :vendors, permissions: Masters::Vendors::Index.permissions
     item :items, permissions: Masters::Items::Index.permissions
     item :rate_contracts, permissions: Masters::RateContracts::Index.permissions, features: :procurement
