@@ -42,3 +42,39 @@ Devise.setup do |config|
   # Time period for account expiry from last_activity_at
   config.expire_after = 90.days
 end
+
+
+# Note: Overwriting some methods in devise-security as OldPassword model inherits ApplicationRecord in the library
+# and having issues with multi-tenancy
+
+module Devise
+  module Models
+    module PasswordArchivable
+      alias_method :original_password_archive_included?, :password_archive_included?
+      alias_method :original_archive_password, :archive_password
+
+      def password_archive_included?
+        ActsAsTenant.without_tenant do
+          original_password_archive_included?
+        end
+      end
+
+      private
+
+      def archive_password
+        ActsAsTenant.without_tenant do
+          if max_old_passwords.positive?
+            return true if 
+            old_passwords.where(encrypted_password: encrypted_password_was).exists?
+            if encrypted_password_was.present?
+              old_passwords.new(encrypted_password: encrypted_password_was).save(validate: false)
+            end
+            old_passwords.order(created_at: :desc).offset(max_old_passwords).destroy_all
+          else
+            old_passwords.destroy_all
+          end
+        end
+      end
+    end
+  end
+end
