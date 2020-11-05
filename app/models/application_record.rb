@@ -9,6 +9,8 @@ class ApplicationRecord < ActiveRecord::Base
 
   include SoftDeletable
 
-  acts_as_tenant(:company)
+  acts_as_tenant(:company, options = {
+    has_global_records: true,
+  })
 
 end
