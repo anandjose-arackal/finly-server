@@ -20,7 +20,7 @@ class Authenticator::Providers::MultiEntityLogin < Authenticator::Providers::Bas
 
     # now find the logged in user
     token = Doorkeeper::AccessToken.find_by(token: auth_token)
-    self.logged_in_user = ActsAsTenant.without_tenant do
+    self.logged_in_user = ActsAsTenant.without_tenant_if_not_set do
       model.find_by(id: token&.resource_owner_id)
     end
 
@@ -35,7 +35,7 @@ class Authenticator::Providers::MultiEntityLogin < Authenticator::Providers::Bas
   def for_user
     email = self.logged_in_user.email
     mobile_number = self.logged_in_user.mobile_number
-    ActsAsTenant.without_tenant do
+    ActsAsTenant.without_tenant_if_not_set do
       User.with_company_id(self.company_id).with_email_or_mobile_number(email, mobile_number).first
     end
   end

@@ -41,6 +41,8 @@ class CompaniesController < BaseControllers::WebBase
       @sso_configs = []
       return
     end
+
+    ActsAsTenant.current_tenant = company
     @sso_configs = company.single_sign_on_configurations
   end
 

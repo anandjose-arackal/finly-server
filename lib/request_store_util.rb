@@ -98,7 +98,7 @@ class RequestStoreUtil
 
     case request_store_data[:current_user_type]
       when User.name
-        RequestStore.store[:current_user] = ActsAsTenant.without_tenant do
+        RequestStore.store[:current_user] = ActsAsTenant.with_tenant RequestStore.store[:current_company] do
           User.with_id(request_store_data[:current_user_id])&.first
         end
       when AdminUser.name
