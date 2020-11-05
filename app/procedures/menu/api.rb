@@ -86,6 +86,7 @@ class Menu::API < Transactions::API
 
       conf = {
           company_id: company.id,
+          subdomain: company.subdomain,
           name: company.name,
           logo: company.configuration.logo.url,
           selected: (current_user == user),

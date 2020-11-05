@@ -17,6 +17,8 @@ class ApplicationController < ActionController::Base
 
   before_action :set_cache_buster
 
+  before_action :set_tenant_from_subdomain
+
   # around_action :save_request_impression
   before_action :finly_authorize!
 
@@ -35,6 +37,22 @@ class ApplicationController < ActionController::Base
   # rescue_from ActiveRecord::RecordNotFound, with: :not_found
   # rescue_from StandardError, with: :error
   # rescue_from ActionController::RoutingError, with: :not_found
+
+  def set_tenant_from_subdomain
+    host = request.host.split('.')
+    return if host.count < 2
+
+    subdomain = host[0]
+    return if ['admin', 'www'].include?(subdomain)
+
+    company = Company.find_by_subdomain(subdomain)
+    unless company.present?
+      head 401
+      return
+    end
+
+    ActsAsTenant.current_tenant = company
+  end
 
   # handles 404 errors
   def not_found
@@ -163,7 +181,7 @@ class ApplicationController < ActionController::Base
     if doorkeeper_token.present? and doorkeeper_token&.resource_owner_id&.present?
       scopes = doorkeeper_token[:scopes]
       if scopes.include?("web") or scopes.include?("mobile") or scopes.include?("chrome") or scopes.include?("api") or scopes.include?("streamsets")
-        @curr_user ||= ActsAsTenant.without_tenant do
+        @curr_user ||= ActsAsTenant.without_tenant_if_not_set do
           User.find_by(id: doorkeeper_token[:resource_owner_id])
         end
         ActsAsTenant.current_tenant = @curr_user&.company

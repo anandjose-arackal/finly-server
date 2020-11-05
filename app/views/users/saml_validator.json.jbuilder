@@ -2,6 +2,7 @@ json.email @result.email
 json.companies do
   json.array!(@result.companies) do |company|
     json.name company.name
+    json.subdomain company.subdomain
     json.logo company.configuration.logo.url
     json.company_id company.id
     json.expense_management company.expense_management_enabled?
