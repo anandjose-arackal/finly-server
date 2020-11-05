@@ -31,6 +31,8 @@ class ApplicationController < ActionController::Base
   before_action :store_location
   before_action :set_raven_context
 
+  around_action :set_not_tenant_skip_authorize
+
   # after_action :track_request
 
   # handling exceptions and other errors through redirects to 404s and 500s
@@ -366,6 +368,16 @@ class ApplicationController < ActionController::Base
 
     # Using an update all function to avoid the +users.update+ event. This event is avoided as it would fire too many times
     User.where(id: current_user.id).update_all(last_activity_at: DateTime.now) if current_user.present?
+  end
+
+  def set_not_tenant_skip_authorize
+    if skip_finly_authorize?
+      ActsAsTenant.without_tenant_if_not_set do
+        yield
+      end
+    else
+      yield
+    end
   end
 
   def set_raven_context
