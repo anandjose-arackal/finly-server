@@ -5,7 +5,7 @@ class AnalyticsDashboard::Ops::Config < Transactions::API
           label: 'Invoice',
           cube: "Invoices",
           root: true,
-          associations: %w(InvoiceLineItems BillingLocations ShippingLocations Vendors CostCenters Departments Items)
+          associations: %w(InvoiceLineItems BillingLocations ShippingLocations Vendors CostCenters Departments)
       },
       {
           label: 'Vendor',
