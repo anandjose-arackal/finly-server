@@ -71,6 +71,17 @@ include Searchkick::Api
       where creator_id: user.company.users.find_by_email(email)&.id
     end
   }
+
+  ransacker :reviewer_id ,
+  args: [:parent, :ransacker_args] do |parent, args|
+    query = <<-SQL
+    SELECT * FROM purchase_requests
+    INNER JOIN document_level_reviewer_mappings ON document_level_reviewer_mappings.document_reviewer_mappable_id = purchase_requests.id  AND purchase_requests.controlling_level_id = document_level_reviewer_mappings.level_id 
+    SQL
+
+    Arel.sql(query)
+  end
+
   scope :not_draft, -> { where.not purchase_request_status_id: PurchaseRequestStatus.id_for(:draft) }
 
   scope :deleteable, -> { where purchase_request_status_id: [PurchaseRequestStatus.id_for(:draft), PurchaseRequestStatus.id_for(:retracted), PurchaseRequestStatus.id_for(:rejected)] }
