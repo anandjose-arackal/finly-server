@@ -110,7 +110,6 @@ class BaseOperation
 
   # Set current company in init method and use it as tenant.
   def set_current_tenant
-    byebug
     if self.respond_to? :company
       if self.company.present?
         ActsAsTenant.current_tenant = self.company
