@@ -13,4 +13,10 @@ class ApplicationRecord < ActiveRecord::Base
     has_global_records: true,
   })
 
+  before_validation Proc.new {|m|
+    if ActsAsTenant.current_tenant && m.company_id.nil?
+      m.company_id = ActsAsTenant.current_tenant.id
+    end
+  }, :on => :update
+
 end
