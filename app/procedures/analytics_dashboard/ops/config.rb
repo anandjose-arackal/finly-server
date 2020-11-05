@@ -5,7 +5,7 @@ class AnalyticsDashboard::Ops::Config < Transactions::API
           label: 'Invoice',
           cube: "Invoices",
           root: true,
-          associations: %w(InvoiceLineItems BillingLocations ShippingLocations Vendors CostCenters Departments)
+          associations: %w(InvoiceLineItems BillingLocations ShippingLocations Vendors Initiator)
       },
       {
           label: 'Vendor',
@@ -25,6 +25,11 @@ class AnalyticsDashboard::Ops::Config < Transactions::API
       {
           label: 'Shipping Location',
           cube: "ShippingLocations",
+          root: false
+      },
+      {
+          label: 'Initiator',
+          cube: "Initiator",
           root: false
       }
   ].freeze
