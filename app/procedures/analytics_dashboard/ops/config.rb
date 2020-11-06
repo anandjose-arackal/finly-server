@@ -1,22 +1,43 @@
 class AnalyticsDashboard::Ops::Config < Transactions::API
 
   CUBES = [
-      # {
-      #     label: 'Purchase Orders',
-      #     cube: "PurchaseOrders",
-      #     root: true,
-      #     associations: %w(PurchaseOrderItems BillingLocations ShippingLocations Vendors Initiator)
-      # },
+      {
+          label: 'Purchase Requests',
+          cube: "PurchaseRequests",
+          root: true,
+          associations: %w(PurchaseRequestLineItems CostCenters Departments ShippingLocations Initiator)
+      },
+      {
+          label: 'Purchase Orders',
+          cube: "PurchaseOrders",
+          root: true,
+          associations: %w(PurchaseOrderLineItems CostCenters Departments BillingLocations ShippingLocations Vendors Initiator)
+      },
       {
           label: 'Invoices',
           cube: "Invoices",
           root: true,
-          associations: %w(InvoiceLineItems BillingLocations ShippingLocations Vendors Initiator)
+          associations: %w(InvoiceLineItems CostCenters Departments BillingLocations ShippingLocations Vendors Initiator)
       },
       {
           label: 'Vendors',
           cube: 'Vendors',
           root: true
+      },
+      {
+          label: 'Users',
+          cube: "Users",
+          root: true
+      },
+      {
+          label: 'Purchase Request Line Items',
+          cube: 'PurchaseRequestLineItems',
+          root: false
+      },
+      {
+          label: 'Purchase Order Line Items',
+          cube: 'PurchaseOrderLineItems',
+          root: false
       },
       {
           label: 'Invoice Line Items',
