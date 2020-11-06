@@ -26,7 +26,7 @@ class AnalyticsDashboard::Ops::Config < Transactions::API
       },
       {
           label: 'Users',
-          cube: "Users",
+          cube: "VpUsers",
           root: true
       },
       {
