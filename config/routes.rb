@@ -4382,6 +4382,7 @@ Rails.application.routes.draw do
   resources :approval_matrix, only: [:index]
 
   post 'analytics/token', to: 'analytics#token'
+  post 'analytics/:id/export', to: 'analytics#export'
   resources :analytics, only: [:create, :update, :index, :show, :destroy]
 
   # The priority is based upon order of creation: first created -> highest priority.

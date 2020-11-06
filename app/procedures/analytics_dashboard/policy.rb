@@ -16,4 +16,8 @@ class AnalyticsDashboard::Policy < ApplicationPolicy
     show?
   end
 
+  def export?
+    show?
+  end
+
 end

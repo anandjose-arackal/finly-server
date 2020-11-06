@@ -25,4 +25,8 @@ class AnalyticsController < BaseControllers::WebBase
     endpoint AnalyticsDashboard::Ops::Destroy
   end
 
+  def export
+    endpoint AnalyticsDashboard::Ops::Export
+  end
+
 end
