@@ -2,13 +2,19 @@ class AnalyticsDashboard::Ops::Config < Transactions::API
 
   CUBES = [
       {
-          label: 'Invoice',
+          label: 'Purchase Orders',
+          cube: "PurchaseOrders",
+          root: true,
+          associations: %w(PurchaseOrderItems BillingLocations ShippingLocations Vendors Initiator)
+      },
+      {
+          label: 'Invoices',
           cube: "Invoices",
           root: true,
           associations: %w(InvoiceLineItems BillingLocations ShippingLocations Vendors Initiator)
       },
       {
-          label: 'Vendor',
+          label: 'Vendors',
           cube: 'Vendors',
           root: true
       },
@@ -39,6 +45,7 @@ class AnalyticsDashboard::Ops::Config < Transactions::API
 
   def generate_token(context, current_user:, **)
     context[:token] = CubeJs.generate_token(current_user)
+    context[:expires_in] = CubeJs::DEFAULT_EXPIRES_IN.to_i
   end
 
   def build_config(context, current_user:, **)
