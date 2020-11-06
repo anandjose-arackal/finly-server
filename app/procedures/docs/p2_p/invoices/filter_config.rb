@@ -27,6 +27,6 @@ class Docs::P2P::Invoices::FilterConfig < Filters::API
   attribute :items_department_id, label: "Department", type: :dropdown, choices: Choices[:lookup].("departments")
   attribute :created_by_user_id, label: "Created By", type: :dropdown, choices: Choices[:lookup].("users")
   attribute :controlling_level_level_number, label: "Controlling Level", type: :number, simple: true
-  attribute :controlling_user_id, label: "Controlling User", type: :dropdown, simple: true, choices: Choices[:lookup].("users")
+  attribute :controlling_user, label: "Controlling User", type: :dropdown, simple: true, choices: Choices[:lookup].("users")
 
 end
