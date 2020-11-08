@@ -62,4 +62,24 @@ class GstinLocation < ApplicationRecord
     return false if self.vendor_id.nil?
     self.vendor.gst_registered
   end
+
+  def forms_extra_data
+    data = {}
+    gstin_master = Gstin.with_gstin(self.gstin).first
+    if gstin_master.present?
+      data.merge!({gstin_fetch_details: {
+          address: gstin_master&.address,
+          constitution_of_business: gstin_master&.constitution_of_business,
+          date_of_registration: gstin_master&.date_of_registration,
+          gstin: gstin_master&.gstin,
+          legal_name_of_business: gstin_master&.legal_name_of_business,
+          match_percentile: StringUtils.fuzzy_string_match(StringUtils.clear_generic_keywords(vendor.business_name), StringUtils.clear_generic_keywords(gstin_master&.legal_name_of_business)),
+          state: gstin_master&.state,
+          status: gstin_master&.status,
+          trade_name: gstin_master&.trade_name,
+          valid_response: 'true'
+      }})
+    end
+    data
+  end
 end

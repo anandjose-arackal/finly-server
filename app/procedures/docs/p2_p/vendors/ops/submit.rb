@@ -2,8 +2,8 @@
 
 class Docs::P2P::Vendors::Ops::Submit < Transactions::API
 
-
   step :init
+  step :update_policy
   step :set_approval_matrix
   step :submit
   step :post_process
@@ -20,6 +20,11 @@ class Docs::P2P::Vendors::Ops::Submit < Transactions::API
       params[:reviewal_document] = op['model']
       options[:reviewal_document] = op['model']
     end
+    true
+  end
+
+  def update_policy(options, reviewal_document:, current_user:, params:, **)
+    reviewal_document.update(policy_id: params[:policy_id])
     true
   end
 
