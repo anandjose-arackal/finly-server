@@ -15,6 +15,7 @@ class AnalyticsDashboard::Contracts::Record < Reform::Form
     property :user_id, validates: {presence: true}
   end
 
+  # Ensure there is only one dashboard which has the default flag
   after_save do
     if default and model.id.present?
       model.created_by.analytics_dashboards
