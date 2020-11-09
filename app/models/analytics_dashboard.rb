@@ -8,6 +8,8 @@ class AnalyticsDashboard < ApplicationRecord
 
   serialize :reports, JSON
 
+  default_scope {order(name: :asc)}
+
   def as_json(options={})
     {
         id: id,

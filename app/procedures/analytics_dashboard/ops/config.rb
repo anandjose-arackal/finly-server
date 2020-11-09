@@ -11,13 +11,24 @@ class AnalyticsDashboard::Ops::Config < Transactions::API
           label: 'Purchase Orders',
           cube: "PurchaseOrders",
           root: true,
-          associations: %w(PurchaseOrderLineItems CostCenters Departments BillingLocations ShippingLocations Vendors Initiator)
+          associations: %w(PurchaseOrderLineItems CostCenters Departments BillingLocations ShippingLocations PaymentTerms Vendors Initiator)
       },
       {
           label: 'Invoices',
           cube: "Invoices",
           root: true,
-          associations: %w(InvoiceLineItems CostCenters Departments BillingLocations ShippingLocations Vendors Initiator)
+          associations: %w(InvoiceLineItems CostCenters Departments BillingLocations ShippingLocations PaymentTerms Vendors Initiator)
+      },
+      {
+          label: 'Payments',
+          cube: "Payments",
+          root: true,
+          associations: %w(PaymentTickets)
+      },
+      {
+          label: 'Payment Tickets',
+          cube: "PaymentTickets",
+          root: false
       },
       {
           label: 'Vendors',
@@ -57,6 +68,11 @@ class AnalyticsDashboard::Ops::Config < Transactions::API
       {
           label: 'Initiator',
           cube: "Initiator",
+          root: false
+      },
+      {
+          label: 'Payment Terms',
+          cube: "PaymentTerms",
           root: false
       }
   ].freeze
