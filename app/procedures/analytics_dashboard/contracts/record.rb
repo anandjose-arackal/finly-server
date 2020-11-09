@@ -15,4 +15,13 @@ class AnalyticsDashboard::Contracts::Record < Reform::Form
     property :user_id, validates: {presence: true}
   end
 
+  after_save do
+    if default and model.id.present?
+      model.created_by.analytics_dashboards
+          .where(app: model.app)
+          .where.not(id: model.id)
+          .update_all(default: false)
+    end
+  end
+
 end
