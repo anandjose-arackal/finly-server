@@ -89,8 +89,6 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
     contract.validate -> do
       contract_root.profiler.step 'custom_validate_entity', entity.entity_path do
         entity.validations.each do |validation|
-          puts "Validation ID => #{validation.id}"
-          puts "Data => #{{form: contract_root.form_data, row: self.form_data}.with_indifferent_access}"
           next unless validation.rule.apply?({form: contract_root.form_data, row: self.form_data}.with_indifferent_access)
 
           errors.add entity.label, validation.error_message

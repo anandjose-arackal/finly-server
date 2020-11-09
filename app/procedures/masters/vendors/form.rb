@@ -457,6 +457,12 @@ class Masters::Vendors::Form < Forms::API
     rule Rules::Builder['row.account_number'].not_eq(entity: 'row.confirm_account_number')
   end
 
+  validation validation_id: "PAN should match with GSTIN" do
+    reference 'gstin_locations.gstin'
+    error_message "doesn't match with PAN"
+    rule Rules::Builder['row.gstin'].not_cont_any(entity: :pan)
+  end
+
 
   # condition condition_id: :department_id_editable do
   #   reference :entity, :department_id

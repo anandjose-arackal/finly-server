@@ -24,7 +24,7 @@ class Docs::P2P::Vendors::Ops::Submit < Transactions::API
   end
 
   def update_policy(options, reviewal_document:, current_user:, params:, **)
-    reviewal_document.update(policy_id: params[:policy_id])
+    reviewal_document.update(policy_id: params[:policy_id]) if params[:policy_id].present?
     true
   end
 
