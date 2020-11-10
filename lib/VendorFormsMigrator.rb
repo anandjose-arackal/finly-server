@@ -22,7 +22,7 @@ class VendorFormsMigrator
       form.entities.root.custom_fields.each do |entity|
         form_custom_field = FormCustomField.where(field_key: entity.entity_key, document_type: document.class.name, document_id: document.id)
         unless form_custom_field.present?
-          FormCustomField.new({form_entity_id: entity.id, field_key: entity.entity_key, document_type: document.class.name, document_id: document.id, form_id: form.id}).save
+          FormCustomField.new({form_entity_id: entity.id, field_key: entity.entity_key, entity_type: entity.entity_type, document_type: document.class.name, document_id: document.id, form_id: form.id}).save
         end
       end
 
@@ -34,9 +34,9 @@ class VendorFormsMigrator
             form_custom_field.update(value: bank_account.account_number)
           else
             if entity.entity_key == 'confirm_account_number'
-              FormCustomField.new({form_entity_id: entity.id, field_key: entity.entity_key, document_type: bank_account.class.name, document_id: bank_account.id, form_id: form.id, value: bank_account.account_number}).save
+              FormCustomField.new({form_entity_id: entity.id, field_key: entity.entity_key, entity_type: entity.entity_type, document_type: bank_account.class.name, document_id: bank_account.id, form_id: form.id, value: bank_account.account_number}).save
             else
-              FormCustomField.new({form_entity_id: entity.id, field_key: entity.entity_key, document_type: bank_account.class.name, document_id: bank_account.id, form_id: form.id}).save
+              FormCustomField.new({form_entity_id: entity.id, field_key: entity.entity_key, entity_type: entity.entity_type, document_type: bank_account.class.name, document_id: bank_account.id, form_id: form.id}).save
             end
           end
         end
@@ -47,7 +47,7 @@ class VendorFormsMigrator
         form.entities.where(entity_key: :gstin_locations).first.entities.custom_fields.each do |entity|
           form_custom_field = FormCustomField.where(field_key: entity.entity_key, document_type: gstin_location.class.name, document_id: gstin_location.id)
           unless form_custom_field.present?
-            FormCustomField.new({form_entity_id: entity.id, field_key: entity.entity_key, document_type: gstin_location.class.name, document_id: gstin_location.id, form_id: form.id}).save
+            FormCustomField.new({form_entity_id: entity.id, field_key: entity.entity_key, entity_type: entity.entity_type, document_type: gstin_location.class.name, document_id: gstin_location.id, form_id: form.id}).save
           end
         end
       end
