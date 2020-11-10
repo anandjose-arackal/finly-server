@@ -460,7 +460,8 @@ class Masters::Vendors::Form < Forms::API
   validation validation_id: "PAN should match with GSTIN" do
     reference 'gstin_locations.gstin'
     error_message "doesn't match with PAN"
-    rule Rules::Builder['row.gstin'].not_cont_any(entity: :pan)
+    rule Rules::Builder["row.gstin"].present.and(Rules::Builder[:pan].present.and(Rules::Builder["row.gstin"].not_cont_any(entity: :pan)))
+      # rule Rules::Builder['row.gstin'].not_cont_any(entity: :pan)
   end
 
 
