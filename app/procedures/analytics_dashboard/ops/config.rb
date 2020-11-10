@@ -21,7 +21,7 @@ class AnalyticsDashboard::Ops::Config < Transactions::API
       },
       {
           label: 'Payments',
-          cube: "Payments",
+          cube: "VendorPayments",
           root: true,
           associations: %w(PaymentTickets)
       },

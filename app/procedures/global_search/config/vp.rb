@@ -33,7 +33,7 @@ class GlobalSearch::Config::Vp
           features: [:procurement, :purchase_requisition_system],
           permissions: Docs::P2P::PurchaseRequests::Index.permissions,
           category: :transactions,
-          route: 'purchase_request/{{record_id}}/params={}',
+          route: UrlBuilder.(:purchase_requests, :show),
           layout: {
               fixed_left: [:description, :sequence_id],
               fixed_right: [:created_by_name, :created_by_email, :status_name]
@@ -44,7 +44,7 @@ class GlobalSearch::Config::Vp
           features: [:procurement],
           permissions: Docs::P2P::PurchaseOrders::Index.permissions,
           category: :transactions,
-          route: 'procure_purchase_order/{{record_id}}/params={"procurement_id":"{{parent_id}}","procurement_type":"{{parent_type}}"}',
+          route: UrlBuilder.(:purchase_orders, :show, variables: {procurement_id: '{{parent_id}}', procurement_type: 'po'}),
           layout: {
               fixed_left: [:vendor_name, :sequence_id],
               fixed_right: [:created_by_name, :created_by_email, :status_name]
@@ -55,7 +55,7 @@ class GlobalSearch::Config::Vp
           features: [:procurement],
           permissions: Docs::P2P::Invoices::Index.permissions,
           category: :transactions,
-          route: 'procure_invoice/{{record_id}}/params={"procurement_id":"{{parent_id}}","procurement_type":"{{parent_type}}"}',
+          route: UrlBuilder.(:invoices, :show, variables: {procurement_id: '{{parent_id}}', procurement_type: "{{parent_type}}"}),
           layout: {
               fixed_left: [:vendor_name, :sequence_id],
               fixed_right: [:created_by_name, :created_by_email, :status_name]
@@ -65,7 +65,7 @@ class GlobalSearch::Config::Vp
           index: BankPaymentRequest,
           permissions: Docs::PaymentTickets::Index.permissions,
           category: :transactions,
-          route: 'orders/{{record_id}}/params={}',
+          route: UrlBuilder.(:payment_tickets, :show),
           layout: {
               fixed_left: [:description, :sequence_id],
               fixed_right: [:created_by_name, :created_by_email, :status_name]
@@ -75,7 +75,7 @@ class GlobalSearch::Config::Vp
           index: Payment,
           permissions: Docs::PaymentTickets::Payments::Index.permissions,
           category: :transactions,
-          route: 'orders/{{payment_ticket_id}}/params={}',
+          route: UrlBuilder.(:payments, :show),
           layout: {
               fixed_left: [:vendor_name, :sequence_id],
               fixed_right: [:created_by_name, :created_by_email, :status_name]
@@ -86,7 +86,7 @@ class GlobalSearch::Config::Vp
           features: [:procurement],
           permissions: Docs::UtilityBills::Subscriptions::Index.permissions,
           category: :transactions,
-          route: 'utility_bill/{{record_id}}/params={}',
+          route: UrlBuilder.(:utility_bills, :show),
           layout: {
               fixed_left: [:vendor_name, :sequence_id],
               fixed_right: [:created_by_name, :created_by_email, :status_name]
@@ -96,7 +96,7 @@ class GlobalSearch::Config::Vp
           index: YesBankVendor,
           permissions: Masters::Vendors::Index.permissions,
           category: :masters,
-          route: 'vendor/{{record_id}}/params={}',
+          route: UrlBuilder.(:vendors, :show),
           layout: {
               fixed_left: [:vendor_name, :sequence_id],
               fixed_right: [:created_by_name, :created_by_email, :status_name]
@@ -106,7 +106,7 @@ class GlobalSearch::Config::Vp
           index: Item,
           permissions: Masters::Items::Index.permissions,
           category: :masters,
-          route: 'inventory/{{record_id}}/params={}',
+          route: UrlBuilder.(:items, :show),
           layout: {
               fixed_left: [:description, :sequence_id],
               fixed_right: [:category_name, :status_name]
@@ -116,7 +116,7 @@ class GlobalSearch::Config::Vp
           index: Category,
           permissions: [:admin],
           category: :masters,
-          route: 'organization_account/params={"id":"settings"}',
+          route: UrlBuilder.(:organisation_account, :home),
           layout: {
               fixed_left: [:category_name, :category_code],
               fixed_right: []
@@ -126,7 +126,7 @@ class GlobalSearch::Config::Vp
           index: Policy,
           permissions: [:admin],
           category: :masters,
-          route: 'policies/{{record_id}}/params={}',
+          route: UrlBuilder.(:policies, :show),
           layout: {
               fixed_left: [:policy_name],
               fixed_right: []
@@ -136,7 +136,7 @@ class GlobalSearch::Config::Vp
           index: Department,
           permissions: [:admin],
           category: :masters,
-          route: 'organization_account/params={"id":"settings"}',
+          route: UrlBuilder.(:organisation_account, :home),
           layout: {
               fixed_left: [:department_name, :department_code],
               fixed_right: []
@@ -146,7 +146,7 @@ class GlobalSearch::Config::Vp
           index: BranchLocation,
           permissions: [:admin],
           category: :masters,
-          route: 'organization_account/params={"id":"settings"}',
+          route: UrlBuilder.(:organisation_account, :home),
           layout: {
               fixed_left: [:location_name, :location_code],
               fixed_right: []
@@ -156,7 +156,7 @@ class GlobalSearch::Config::Vp
           index: CostCenter,
           permissions: [:admin],
           category: :masters,
-          route: 'organization_account/params={"id":"settings"}',
+          route: UrlBuilder.(:organisation_account, :home),
           layout: {
               fixed_left: [:cost_center_name, :cost_center_code],
               fixed_right: []
@@ -167,7 +167,7 @@ class GlobalSearch::Config::Vp
           features: :agreement_based_payment_system,
           permissions: Docs::P2P::Agreements::Index.permissions,
           category: :masters,
-          route: 'agreements/{{record_id}}/params={}',
+          route: UrlBuilder.(:agreements, :show),
           layout: {
               fixed_left: [:description, :sequence_id],
               fixed_right: [:created_by_name, :created_by_email, :status_name]
@@ -178,7 +178,7 @@ class GlobalSearch::Config::Vp
           features: :utility_bills_enabled,
           permissions: Docs::UtilityBills::Subscriptions::Index.permissions,
           category: :masters,
-          route: 'utility_bill_master/{{record_id}}/params={}',
+          route: UrlBuilder.(:utility_subscriptions, :show),
           layout: {
               fixed_left: [:description, :sequence_id, :vendor_name],
               fixed_right: [:created_by_name, :created_by_email, :status_name]
@@ -188,7 +188,7 @@ class GlobalSearch::Config::Vp
           index: User,
           permissions: [:admin],
           category: :masters,
-          route: 'users/{{record_id}}/params={}',
+          route: UrlBuilder.(:users, :show),
           layout: {
               fixed_left: [:user_name, :user_email],
               fixed_right: [:status_name]
