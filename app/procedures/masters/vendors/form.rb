@@ -80,7 +80,6 @@
 #   reference controller: :policy_id, dependent: :department_id
 #   dependency "Company (Default)", ["test1"]
 # end
-
 # end
 
 
@@ -123,7 +122,7 @@ class Masters::Vendors::Form < Forms::API
     switch :rcm_enabled, label: "RCM Enabled"
 
     # TDS
-    dropdown :tds_rates_list_id, choices_scope: Choices[:lookup].('tds_slabs'), label: "TDS Percentage"
+    lookup :tds_rates_list_id, choices_scope: Choices[:lookup].('tds_slabs'), label: "TDS Percentage"
     date :tds_effective_start_date, label: "TDS Effective Start Date", editable: false
     date :tds_effective_end_date, label: "TDS Effective End Date", editable: false
 
@@ -457,13 +456,13 @@ class Masters::Vendors::Form < Forms::API
     rule Rules::Builder['row.account_number'].not_eq(entity: 'row.confirm_account_number')
   end
 
-    # validation validation_id: "PAN should match with GSTIN" do
-    #   reference 'gstin_locations.gstin'
-    #   error_message "doesn't match with PAN"
-    #   # rule Rules::Builder["row.gstin"].present.and(Rules::Builder[:pan].present.and(Rules::Builder["row.gstin"].not_cont_any(entity: :pan)))
-    #   rule Rules::Builder['row.gstin'].not_cont_any(entity: :pan)
-    # end
-
+  validation validation_id: "PAN should match with GSTIN" do
+    reference 'gstin_locations.gstin'
+    error_message "doesn't match with PAN"
+    # rule Rules::Builder["row.gstin"].present.and(Rules::Builder[:pan].present.and(Rules::Builder["row.gstin"].not_cont_any(entity: :pan)))
+    # rule Rules::Builder['row.gstin'].not_cont_any(entity: :pan)
+    rule Rules::Builder[:vendor_country].eq_any({value: "India"}).and(Rules::Builder["row.gstin"].not_cont_any(entity: :pan))
+  end
 
   # condition condition_id: :department_id_editable do
   #   reference :entity, :department_id
