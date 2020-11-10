@@ -67,7 +67,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
         # Assumptions for checking uniqueness;
         # 1. Entity's immediate parent must have association to company & vice versa
         unique = result['unique']
-        if unique
+        if unique and send(entity.entity_key).present?
           id = send("id")
           association_name = entity.parent&.entity_key || entity.form.model.table_name
 

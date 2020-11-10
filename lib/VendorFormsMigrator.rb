@@ -12,9 +12,6 @@ class VendorFormsMigrator
 
     result = []
 
-    # Company ID
-    # company_id = 137
-
     company = Company.find company_id
     documents = YesBankVendor.where(company_id: company.id).authorized
     form = Form.where(klass_name: 'Masters::Vendors::Form', company_id: company_id).first
@@ -23,7 +20,7 @@ class VendorFormsMigrator
 
       # Create custom fields
       form.entities.root.custom_fields.each do |entity|
-        form_custom_field = FormCustomField.where(form_entity_id: entity.id, field_key: entity.entity_key, document_type: document.class.name, document_id: document.id, form_id: form.id)
+        form_custom_field = FormCustomField.where(field_key: entity.entity_key, document_type: document.class.name, document_id: document.id)
         unless form_custom_field.present?
           FormCustomField.new({form_entity_id: entity.id, field_key: entity.entity_key, document_type: document.class.name, document_id: document.id, form_id: form.id}).save
         end
@@ -32,7 +29,7 @@ class VendorFormsMigrator
       # Create custom fields for
       document.bank_accounts.each do |bank_account|
         form.entities.where(entity_key: :bank_accounts).first.entities.custom_fields.each do |entity|
-          form_custom_field = FormCustomField.where(form_entity_id: entity.id, field_key: entity.entity_key, document_type: bank_account.class.name, document_id: bank_account.id, form_id: form.id)
+          form_custom_field = FormCustomField.where(field_key: entity.entity_key, document_type: bank_account.class.name, document_id: bank_account.id)
           if form_custom_field.present?
             form_custom_field.update(value: bank_account.account_number)
           else
@@ -48,7 +45,7 @@ class VendorFormsMigrator
       # Create for GSTIN Locations
       document.gstin_locations.each do |gstin_location|
         form.entities.where(entity_key: :gstin_locations).first.entities.custom_fields.each do |entity|
-          form_custom_field = FormCustomField.where(form_entity_id: entity.id, field_key: entity.entity_key, document_type: gstin_location.class.name, document_id: gstin_location.id, form_id: form.id)
+          form_custom_field = FormCustomField.where(field_key: entity.entity_key, document_type: gstin_location.class.name, document_id: gstin_location.id)
           unless form_custom_field.present?
             FormCustomField.new({form_entity_id: entity.id, field_key: entity.entity_key, document_type: gstin_location.class.name, document_id: gstin_location.id, form_id: form.id}).save
           end
@@ -75,20 +72,22 @@ class VendorFormsMigrator
         when 'pan'
           relevant_custom_field = document.form_custom_fields.where(field_key: 'pan_attachment').first
         when 'gstin'
-          relevant_custom_field = document.gstin_locations.first.form_custom_fields.where(field_key: 'gstin_certificate').first rescue nil
+          relevant_custom_field = document.gstin_locations.first.form_custom_fields.where(field_key: 'gstin_certificate').order(created_at: :asc).last rescue nil
         when 'cancelled_cheque'
-          relevant_custom_field = document.bank_accounts.first.form_custom_fields.where(field_key: 'cancelled_cheque').first rescue nil
+          relevant_custom_field = document.bank_accounts.first.form_custom_fields.where(field_key: 'cancelled_cheque').order(created_at: :asc).last rescue nil
         when 'tax_exemption'
-          relevant_custom_field = document.form_custom_fields.where(field_key: 'tax_exemption_certificate').first
+          relevant_custom_field = document.form_custom_fields.where(field_key: 'tax_exemption_certificate').order(created_at: :asc).last
         when 'msme_certificate'
-          relevant_custom_field = document.form_custom_fields.where(field_key: 'msme_registration_certificate').first
+          relevant_custom_field = document.form_custom_fields.where(field_key: 'msme_registration_certificate').order(created_at: :asc).last
         when 'lower_exemption'
-          relevant_custom_field = document.form_custom_fields.where(field_key: 'lower_exception_certificate').first
+          relevant_custom_field = document.form_custom_fields.where(field_key: 'lower_exception_certificate').order(created_at: :asc).last
         else
-          relevant_custom_field = document.form_custom_fields.where(field_key: 'other_documents').first
+          relevant_custom_field = document.form_custom_fields.where(field_key: 'other_documents').order(created_at: :asc).last
         end
 
         if relevant_custom_field.present?
+          # va.yes_bank_vendor.form_custom_fields.where(field_key: :pan_attachment).order(created_at: :asc).last.attachments.where(attachment_file_name: va.attached_file_file_name)
+          next if relevant_custom_field.attachments.where(attachment_file_name: old_attachment.attached_file_file_name).present?
           new_attachment = relevant_custom_field.attachments.new
 
           if Rails.env.production?
@@ -112,6 +111,13 @@ class VendorFormsMigrator
         end
       end
     end
-    File.open('/home/ubuntu/vendor_migration.log', 'w+') {|f| result.each {|line| f.puts(line)}}
+
+    if Rails.env.production?
+      File.open('/home/ubuntu/vendor_migration.log', 'w+') {|f| result.each {|line| f.puts(line)}}
+    elsif Rails.env.staging?
+      File.open('/home/centos/vendor_migration.log', 'w+') {|f| result.each {|line| f.puts(line)}}
+    else
+      File.open('/Users/kumar/Documents/vendor_migration.log', 'w+') {|f| result.each {|line| f.puts(line)}}
+    end
   end
 end
