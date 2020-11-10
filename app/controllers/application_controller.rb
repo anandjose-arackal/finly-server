@@ -27,6 +27,7 @@ class ApplicationController < ActionController::Base
   before_action :init_elastic_apm
 
   before_action :store_location
+  before_action :set_paper_trail_whodunnit
   before_action :set_raven_context
 
   # after_action :track_request
@@ -36,6 +37,11 @@ class ApplicationController < ActionController::Base
   # rescue_from StandardError, with: :error
   # rescue_from ActionController::RoutingError, with: :not_found
 
+  ####################
+  def info_for_paper_trail
+      { user_ip: request.remote_ip, user_agent: request.user_agent }
+  end
+  ####################
   # handles 404 errors
   def not_found
     respond_to do |format|
