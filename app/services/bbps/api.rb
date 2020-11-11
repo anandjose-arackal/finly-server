@@ -149,7 +149,7 @@ class Bbps::Api < ServiceApi
       # builder.use Faraday::Request::UrlEncoded
       faraday.request :url_encoded # form-encode POST params
       faraday.response :logger, logger # log requests to STDOUT
-      faraday.options[:timeout] = 60 # time out is 60 seconds
+      faraday.options[:timeout] = 180 # time out is 180 seconds
       faraday.use FaradayMiddleware::FollowRedirects, limit: 5
       faraday.adapter Faraday.default_adapter # make requests with Net::HTTP
     end

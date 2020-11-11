@@ -23,7 +23,7 @@ set :usage_tracker_role, :poller_role
 set :email_tracker_role, :email_tracker_role
 
 before 'deploy:updating',  'sidekiq:monit:unmonitor'
-after  'deploy:published', 'sidekiq:monit:monitor'
+before  'deploy:cleanup', 'sidekiq:monit:monitor'
 
 # set :sidekiq_config => File.join(shared_path, 'config', 'sidekiq.yml')
 # set :sidekiq_roles, :sidekiq_app

@@ -1807,6 +1807,11 @@ class User < ApplicationRecord
     first_name.present? and not active
   end
 
+  def deactivated_users_open_invoices
+    deactivated_users_ids = company.users.where(active: false).pluck(:id)
+    company.inward_invoices.where(invoice_status_id: InwardInvoiceStatus.id_for(:open), created_by: deactivated_users_ids, invoice_type_id: InwardInvoiceType.id_for(:tax_invoice) )
+  end
+
   protected
 
   # Checks whether a password is needed or not. For validations only.

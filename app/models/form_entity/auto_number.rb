@@ -88,13 +88,14 @@ class FormEntity::AutoNumber < FormEntity
 
   def self.option_validation
     Proc.new do
+      property :config
       validation :options_config do
         params do
           required(:config) do
             hash do
               required(:sequence) do
                 hash do
-                  required(:prefix).filled
+                  required(:prefix)
                   required(:start_at).filled
                 end
               end
@@ -105,7 +106,7 @@ class FormEntity::AutoNumber < FormEntity
           sequence = value[:sequence]
           prefix = sequence&.dig(:prefix)
           start_at = sequence&.dig(:start_at)
-          key.failure("prefix must be present") if prefix.blank?
+          # key.failure("prefix must be present") if prefix.blank?
           key.failure("start_at must be present") if start_at.blank?
         end
       end
