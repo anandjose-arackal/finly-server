@@ -1,5 +1,6 @@
 # RAILS_ENV=production nohup rails runner 'VendorFormsMigrator.run' --trace > vendor_forms_migration_[company_id].log 2>&1 &
 # RAILS_ENV=production nohup rails runner 'VendorFormsMigrator.perform' --trace > ~/vendor_forms_migration_2.log 2>&1 &
+# RAILS_ENV=production nohup rails runner 'VendorFormsMigrator.perform(248)' --trace > ~/vendor_forms_migration_248.log 2>&1 &
 
 
 # Checklist:
@@ -20,8 +21,10 @@ class VendorFormsMigrator
 
       # Create custom fields
       form.entities.root.custom_fields.each do |entity|
-        form_custom_field = FormCustomField.where(field_key: entity.entity_key, document_type: document.class.name, document_id: document.id)
-        unless form_custom_field.present?
+        form_custom_field = FormCustomField.where(field_key: entity.entity_key, document_type: document.class.name, document_id: document.id).order(created_at: :asc).last
+        if form_custom_field.present?
+          form_custom_field.update(form_entity_id: entity.id, entity_type: entity.entity_type)
+        else
           FormCustomField.new({form_entity_id: entity.id, field_key: entity.entity_key, entity_type: entity.entity_type, document_type: document.class.name, document_id: document.id, form_id: form.id}).save
         end
       end
@@ -29,14 +32,29 @@ class VendorFormsMigrator
       # Create custom fields for
       document.bank_accounts.each do |bank_account|
         form.entities.where(entity_key: :bank_accounts).first.entities.custom_fields.each do |entity|
-          form_custom_field = FormCustomField.where(field_key: entity.entity_key, document_type: bank_account.class.name, document_id: bank_account.id)
+          form_custom_field = FormCustomField.where(field_key: entity.entity_key, document_type: bank_account.class.name, document_id: bank_account.id).order(created_at: :asc).last
           if form_custom_field.present?
-            form_custom_field.update(value: bank_account.account_number)
+            form_custom_field.update(value: bank_account.account_number, form_entity_id: entity.id, entity_type: entity.entity_type)
           else
             if entity.entity_key == 'confirm_account_number'
-              FormCustomField.new({form_entity_id: entity.id, field_key: entity.entity_key, entity_type: entity.entity_type, document_type: bank_account.class.name, document_id: bank_account.id, form_id: form.id, value: bank_account.account_number}).save
+              FormCustomField.new({
+                                      form_entity_id: entity.id,
+                                      field_key: entity.entity_key,
+                                      entity_type: entity.entity_type,
+                                      document_type: bank_account.class.name,
+                                      document_id: bank_account.id,
+                                      form_id: form.id,
+                                      value: bank_account.account_number
+                                  }).save
             else
-              FormCustomField.new({form_entity_id: entity.id, field_key: entity.entity_key, entity_type: entity.entity_type, document_type: bank_account.class.name, document_id: bank_account.id, form_id: form.id}).save
+              FormCustomField.new({
+                                      form_entity_id: entity.id,
+                                      field_key: entity.entity_key,
+                                      entity_type: entity.entity_type,
+                                      document_type: bank_account.class.name,
+                                      document_id: bank_account.id,
+                                      form_id: form.id
+                                  }).save
             end
           end
         end
@@ -45,8 +63,10 @@ class VendorFormsMigrator
       # Create for GSTIN Locations
       document.gstin_locations.each do |gstin_location|
         form.entities.where(entity_key: :gstin_locations).first.entities.custom_fields.each do |entity|
-          form_custom_field = FormCustomField.where(field_key: entity.entity_key, document_type: gstin_location.class.name, document_id: gstin_location.id)
-          unless form_custom_field.present?
+          form_custom_field = FormCustomField.where(field_key: entity.entity_key, document_type: gstin_location.class.name, document_id: gstin_location.id).order(created_at: :asc).last
+          if form_custom_field.present?
+            form_custom_field.update(form_entity_id: entity.id, entity_type: entity.entity_type)
+          else
             FormCustomField.new({form_entity_id: entity.id, field_key: entity.entity_key, entity_type: entity.entity_type, document_type: gstin_location.class.name, document_id: gstin_location.id, form_id: form.id}).save
           end
         end
@@ -55,10 +75,26 @@ class VendorFormsMigrator
       document.custom_fields.each do |custom_field|
         field_name = custom_field.field_configuration.field_name
 
-        form_custom_field = document.form_custom_fields.where(field_key: field_name).first
+        form_custom_field = document.form_custom_fields.where(field_key: field_name).order(created_at: :asc).last
         if form_custom_field.present?
-          form_custom_field.value = custom_field.value&.value
-          form_custom_field.save
+          if form_custom_field&.form_entity&.entity_type == "text"
+            form_custom_field.value = custom_field.value&.value
+            form_custom_field.save
+          elsif form_custom_field&.form_entity&.entity_type == "dropdown"
+            custom_field_value = custom_field.value&.value&.name
+            selection = form_custom_field&.form_entity&.choices&.where(name: custom_field_value)
+
+            # A selection with the same name as of custom field selection is found
+            if selection.present?
+              if form_custom_field&.selection.present?
+                # If form custom field selection is already there, then update it
+                form_custom_field.selection.update(form_entity_choice_id: selection.uuid)
+              else
+                # If form custom field doesn't have a selection then create a new selection
+                CustomFieldSelection.create(form_entity_choice_id: selection.uuid, form_custom_field_id: form_custom_field.uuid)
+              end
+            end
+          end
         end
       end
 
@@ -70,7 +106,7 @@ class VendorFormsMigrator
         # [nil, "others", "pan", "gstin", "cancelled_cheque", "", "pan_card", "tax_exemption", "msme_certificate", "lower_exemption"]
         case old_attachment.attachment_type
         when 'pan'
-          relevant_custom_field = document.form_custom_fields.where(field_key: 'pan_attachment').first
+          relevant_custom_field = document.form_custom_fields.where(field_key: 'pan_attachment').order(created_at: :asc).last
         when 'gstin'
           relevant_custom_field = document.gstin_locations.first.form_custom_fields.where(field_key: 'gstin_certificate').order(created_at: :asc).last rescue nil
         when 'cancelled_cheque'
