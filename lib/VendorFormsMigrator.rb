@@ -23,7 +23,7 @@ class VendorFormsMigrator
       form.entities.root.custom_fields.each do |entity|
         form_custom_field = FormCustomField.where(field_key: entity.entity_key, document_type: document.class.name, document_id: document.id).order(created_at: :asc).last
         if form_custom_field.present?
-          form_custom_field.update(form_entity_id: entity.id, entity_type: entity.entity_type)
+          form_custom_field.update(form_entity_id: entity.id, entity_type: entity.entity_type, form_id: form.id)
         else
           FormCustomField.new({form_entity_id: entity.id, field_key: entity.entity_key, entity_type: entity.entity_type, document_type: document.class.name, document_id: document.id, form_id: form.id}).save
         end
@@ -34,7 +34,7 @@ class VendorFormsMigrator
         form.entities.where(entity_key: :bank_accounts).first.entities.custom_fields.each do |entity|
           form_custom_field = FormCustomField.where(field_key: entity.entity_key, document_type: bank_account.class.name, document_id: bank_account.id).order(created_at: :asc).last
           if form_custom_field.present?
-            form_custom_field.update(value: bank_account.account_number, form_entity_id: entity.id, entity_type: entity.entity_type)
+            form_custom_field.update(value: bank_account.account_number, form_entity_id: entity.id, entity_type: entity.entity_type, form_id: form.id)
           else
             if entity.entity_key == 'confirm_account_number'
               FormCustomField.new({
@@ -65,7 +65,7 @@ class VendorFormsMigrator
         form.entities.where(entity_key: :gstin_locations).first.entities.custom_fields.each do |entity|
           form_custom_field = FormCustomField.where(field_key: entity.entity_key, document_type: gstin_location.class.name, document_id: gstin_location.id).order(created_at: :asc).last
           if form_custom_field.present?
-            form_custom_field.update(form_entity_id: entity.id, entity_type: entity.entity_type)
+            form_custom_field.update(form_entity_id: entity.id, entity_type: entity.entity_type, form_id: form.id)
           else
             FormCustomField.new({form_entity_id: entity.id, field_key: entity.entity_key, entity_type: entity.entity_type, document_type: gstin_location.class.name, document_id: gstin_location.id, form_id: form.id}).save
           end
@@ -75,7 +75,7 @@ class VendorFormsMigrator
       document.custom_fields.each do |custom_field|
         field_name = custom_field.field_configuration.field_name
 
-        form_custom_field = document.form_custom_fields.where(field_key: field_name).order(created_at: :asc).last
+        form_custom_field = document.form_custom_fields.where(field_key: field_name).order(updated_at: :asc).last
         if form_custom_field.present?
           if form_custom_field&.form_entity&.entity_type == "text"
             form_custom_field.value = custom_field.value&.value
