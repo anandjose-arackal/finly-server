@@ -82,7 +82,7 @@ class VendorFormsMigrator
             form_custom_field.save
           elsif form_custom_field&.form_entity&.entity_type == "dropdown"
             custom_field_value = custom_field.value&.value&.name
-            selection = form_custom_field&.form_entity&.choices&.where(name: custom_field_value)
+            selection = form_custom_field&.form_entity&.choices&.where(name: custom_field_value).first
 
             # A selection with the same name as of custom field selection is found
             if selection.present?
