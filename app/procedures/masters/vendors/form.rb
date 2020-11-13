@@ -461,7 +461,8 @@ class Masters::Vendors::Form < Forms::API
     error_message "doesn't match with PAN"
     # rule Rules::Builder["row.gstin"].present.and(Rules::Builder[:pan].present.and(Rules::Builder["row.gstin"].not_cont_any(entity: :pan)))
     # rule Rules::Builder['row.gstin'].not_cont_any(entity: :pan)
-    rule Rules::Builder[:vendor_country].eq_any({value: "India"}).and(Rules::Builder["row.gstin"].not_cont_any(entity: :pan))
+    # rule Rules::Builder[:vendor_country].eq_any({value: "India"}).and(Rules::Builder["row.gstin"].not_cont_any(entity: :pan))
+    rule Rules::Builder["form.pan"].present.and(Rules::Builder["row.gstin"].present.and(Rules::Builder["row.gstin"].not_cont_any(entity: :pan)))
   end
 
   # condition condition_id: :department_id_editable do
