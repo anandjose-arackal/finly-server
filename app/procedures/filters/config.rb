@@ -22,7 +22,7 @@ class Filters::Config < Transactions::API
       next if klass.feature_subscription.present? and not current_user.company.feature_subscription.send(klass.feature_subscription)
       next if klass.user_subscription.present? and not current_user.user_panel_subscription.send(klass.user_subscription)
       # Defining permissions is mandatory
-      next if klass.permissions.blank? or not current_user.has_permission?(klass.permissions)
+      next if klass.permissions.present? and not current_user.has_permission?(klass.permissions)
 
       context[:config][route] = klass.build(current_user)
     end

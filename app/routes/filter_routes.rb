@@ -13,6 +13,9 @@ Filters::Router.draw do
   route 'utility_subscriptions', Docs::UtilityBills::Subscriptions::FilterConfig
   route 'agreements', Docs::P2P::Agreements::FilterConfig
 
+  # Simple Masters
+  route 'policies', Masters::Policies::FilterConfig
+
   # Docs
   route 'invoices', Docs::P2P::Invoices::FilterConfig
   route 'purchase_requests', Docs::P2P::PurchaseRequests::FilterConfig
