@@ -73,7 +73,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
 
     params.merge!(customer_params(bill.subscription))
 
-    Bbps::BillPay.call_async({params: params, current_user: payment.initiating_user}, {wait: true}) do |op|
+    Bbps::BillPay.call_async({params: params, current_user: payment.initiating_user}, {wait: true}, { wait_timeout: 180 }) do |op|
       op.success do |result|
         puts "Success:Result: #{result}"
         # here we are assuming that the bill gets paid through the BillPay API
@@ -118,7 +118,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
           payment.system_messages.build(content: error,
                                         system_message_type_id: SystemMessageType.id_for(:error)).save
         end
-        return false
+        return true
         # 200
       end
     end
