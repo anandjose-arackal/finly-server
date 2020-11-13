@@ -9,15 +9,16 @@ class Filters::Config < Transactions::API
     context[:config] = {}
     params[:route] = [params[:route]] unless params[:route].blank? or params[:route].respond_to?(:each)
 
+    @debug = true
     routes.each do |route, route_dispatchers|
-      next if params[:route].present? and not params[:route].include?(route.to_s)
+      next unless params[:route].blank? or params[:route].include?(route.to_s)
 
       klass = route_dispatchers.first.klass
       next if klass.blank?
 
       # mandatory to specify the system
       next if klass.system_subscription.blank?
-      next unless klass.system_subscription.map{|item| item.to_s}.include?(RequestStoreUtil.current_app.to_s)
+      next unless klass.system_subscription.map { |item| item.to_s }.include?(RequestStoreUtil.current_app.to_s)
       next if klass.feature_subscription.present? and not current_user.company.feature_subscription.send(klass.feature_subscription)
       next if klass.user_subscription.present? and not current_user.user_panel_subscription.send(klass.user_subscription)
       # Defining permissions is mandatory
