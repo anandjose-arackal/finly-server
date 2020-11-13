@@ -48,6 +48,7 @@ class Rules::Rule
     else
       json = {g: {'0': {logic_type: "group", m: 'and', c: {'0' => json}}}}
     end
+    return json if options[:do_not_interpolate]
     return json unless options.has_key?(:data)
 
     data = options[:data] || {}

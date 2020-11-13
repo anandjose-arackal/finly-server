@@ -59,6 +59,8 @@ class FormEntity::Lookup < FormEntity
 
   def self.option_validation
     Proc.new do
+      property :filters
+
       validation :options_config do
         params do
 
