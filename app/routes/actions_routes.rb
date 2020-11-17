@@ -28,4 +28,5 @@ ActionManager::Router.draw do
   route 'receive', Docs::P2P::Inwards::Pending::Action
   route 'receive_history', Docs::P2P::Inwards::Received::Action
   route 'credit_notes', Docs::P2P::CreditNotes::Action
+  route 'audit_trails', Docs::AuditTrail::Action
 end
