@@ -38,7 +38,7 @@ class ApplicationController < ActionController::Base
 
   ####################
   def info_for_paper_trail
-      { user_ip: request.remote_ip, user_agent: request.user_agent , company_id: current_user&.company_id}
+      { user_ip: request.remote_ip, user_agent: request.user_agent , company_id: current_user&.company_id, created_by_id: current_user&.id }
   end
   ####################
   # handles 404 errors

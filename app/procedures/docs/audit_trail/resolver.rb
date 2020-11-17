@@ -1,9 +1,9 @@
 class Docs::AuditTrail::Resolver < Resolver::API
 
-  entity PaperTrail::Version
+  entity ::AuditTrail
 
   def load(params)
-    PaperTrail::Version.where(company_id: user.company_id)
+    ::AuditTrail.non_deleted.where(company_id: user.company_id)
   end
 
 end

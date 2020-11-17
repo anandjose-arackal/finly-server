@@ -36,4 +36,11 @@ class Docs::AuditTrail::Index < IndexBuilder::API
     text value: :item_type, format: "primary"
   end
 
+  counter -> (user, collection) do
+    # Use custom scope to support awaiting approval status
+    counter = IndexBuilder::Counter.new
+    counter.add nil, "All", collection.count
+    counter
   end
+
+end
