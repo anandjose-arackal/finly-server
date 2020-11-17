@@ -59,7 +59,7 @@ class FormEntity::Lookup < FormEntity
 
   def self.option_validation
     Proc.new do
-      property :filters
+      property :filters, deserializer: -> (input, represented, *args) {represented.filters = Rules::Adapters::Store.load(input[:filters])}
 
       validation :options_config do
         params do
