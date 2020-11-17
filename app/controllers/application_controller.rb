@@ -13,7 +13,6 @@ class ApplicationController < ActionController::Base
   # For APIs, you may want to use :null_session instead.
 
   protect_from_forgery with: :null_session
-  # before_action :set_paper_trail_whodunnit
 
   before_action :set_cache_buster
 
@@ -39,7 +38,7 @@ class ApplicationController < ActionController::Base
 
   ####################
   def info_for_paper_trail
-      { user_ip: request.remote_ip, user_agent: request.user_agent }
+      { user_ip: request.remote_ip, user_agent: request.user_agent , company_id: current_user&.company_id}
   end
   ####################
   # handles 404 errors

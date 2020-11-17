@@ -109,6 +109,7 @@ class Menu::Masters::Procurement < Menu::API
     item :credit_notes, permissions: Docs::P2P::CreditNotes::Index.permissions, features: :procurement
     item :utility_subscriptions, permissions: Docs::UtilityBills::Subscriptions::Index.permissions, features: :utility_bills_enabled
     item :users, permissions: [:admin]
+    item :audit_trails, permissions: Docs::AuditTrail::Index.permissions
   end
 
   item :accounts, icon: 'https://img.icons8.com/windows/20/ffffff/wallet.png' do

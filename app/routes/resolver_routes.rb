@@ -148,4 +148,8 @@ Resolver::Router.draw do
   scope :reports do
     route 'default', Docs::ExpenseManagement::Reports::Resolver
   end
+
+  scope :audit_trails do
+    route 'default', Docs::AuditTrail::Resolver
+  end
 end
