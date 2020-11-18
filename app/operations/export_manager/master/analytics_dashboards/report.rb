@@ -7,7 +7,9 @@ class ExportManager::Master::AnalyticsDashboards::Report < ExportManager::API
   end
 
   def load_data
-    CubeJs::Load.(params: params.to_unsafe_h.with_indifferent_access, current_user: user) do |m|
+    params = params.to_unsafe_h if params.respond_to?(:to_unsafe_h)
+    params = params.with_indifferent_access
+    CubeJs::Load.(params: params, current_user: user) do |m|
       m.success do |result|
         return result
       end
