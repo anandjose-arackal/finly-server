@@ -9,7 +9,7 @@ class Docs::AuditTrails::Index < IndexBuilder::API
   # Fixed column is always default true
 
   column :description,  label: "Record Description", fixed: true, default: true do
-    text value: "{{record.created_by.name}} {{record.event}}ed {{record.item_type}}" , format: "primary"
+    text value: "{{record.created_by.name}} {{record.event}}d {{record.item_type}}" , format: "primary"
   end
 
   column :created_at, label: "DATE & TIME", sort: :created_at do
