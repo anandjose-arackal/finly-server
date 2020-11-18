@@ -93,6 +93,14 @@ class AnalyticsDashboard::Ops::Config < Transactions::API
 
       context[:config] << cube
     end
+    toggle = AnalyticsToggle.new(current_user)
+    context[:toggles] = {
+        maximum_reports: toggle.maximum_reports,
+        custom_reports_enabled: toggle.custom_reports_enabled?,
+        maximum_dashboards: toggle.maximum_dashboards,
+        drilldowns_enabled: toggle.drilldowns_enabled?,
+        custom_dashboards_enabled: toggle.custom_dashboards_enabled?,
+    }
   end
 
   private
