@@ -17,11 +17,11 @@ class Docs::AuditTrail::Index < IndexBuilder::API
   end
 
   column :change_set, label: "Changes", default: true do
-    text value: :changes , format: "primary"
+    text value: :changes , format: "standard"
   end
 
   column :item_type,  label: "Resources", default: true do
-    text value: :item_type, format: "primary"
+    text value: :item_type, format: "standard"
   end
 
   column :created_by, default: true, label: "User", includes: [:created_by] do
@@ -29,11 +29,11 @@ class Docs::AuditTrail::Index < IndexBuilder::API
   end
 
   column :event,  label: "Action", default: true do
-    text value: :event, format: "primary"
+    text value: :event, format: "standard"
   end
 
   column :user_ip, label: "User IP" do
-    text value: :item_type, format: "primary"
+    text value: :item_type, format: "standard"
   end
 
   counter -> (user, collection) do
@@ -42,7 +42,5 @@ class Docs::AuditTrail::Index < IndexBuilder::API
     counter.add nil, "All", collection.count
     counter
   end
-
-
 
 end
