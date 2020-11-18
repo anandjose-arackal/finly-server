@@ -25,5 +25,5 @@ Filters::Router.draw do
   route 'receive', Docs::P2P::Inwards::Pending::FilterConfig
   route 'receive_history', Docs::P2P::Inwards::Received::FilterConfig
   route 'credit_notes', Docs::P2P::CreditNotes::FilterConfig
-  route 'audit_trail',Docs::AuditTrail::FilterConfig
+  route 'audit_trails',Docs::AuditTrails::FilterConfig
 end

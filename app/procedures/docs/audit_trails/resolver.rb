@@ -1,4 +1,4 @@
-class Docs::AuditTrail::Resolver < Resolver::API
+class Docs::AuditTrails::Resolver < Resolver::API
 
   entity ::AuditTrail
 

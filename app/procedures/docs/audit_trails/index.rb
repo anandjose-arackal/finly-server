@@ -1,4 +1,4 @@
-class Docs::AuditTrail::Index < IndexBuilder::API
+class Docs::AuditTrails::Index < IndexBuilder::API
   include DynamicAttributes
 
   system_subscription :vp
@@ -8,7 +8,7 @@ class Docs::AuditTrail::Index < IndexBuilder::API
   reference '{{record.transaction_id}}'
   # Fixed column is always default true
 
-  column :description,  label: "Record Description", default: true do
+  column :description,  label: "Record Description", fixed: true, default: true do
     text value: "{{record.created_by.name}} {{record.event}}ed {{record.item_type}}" , format: "primary"
   end
 
@@ -24,8 +24,13 @@ class Docs::AuditTrail::Index < IndexBuilder::API
     text value: :item_type, format: "standard"
   end
 
+  column :item_id,  label: "Record Id", default: true do
+    text value: :item_id, format: "standard"
+  end
+
   column :created_by, default: true, label: "User", includes: [:created_by] do
-    user value: :created_by
+    text value: "{{record.created_by.name}}", format: 'primary'
+    text value: "{{record.created_by.email}}"
   end
 
   column :event,  label: "Action", default: true do
@@ -33,6 +38,10 @@ class Docs::AuditTrail::Index < IndexBuilder::API
   end
 
   column :user_ip, label: "User IP" do
+    text value: :item_type, format: "standard"
+  end
+
+  column :user_agent, label: "User Agent" do
     text value: :item_type, format: "standard"
   end
 

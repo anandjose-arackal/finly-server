@@ -150,6 +150,6 @@ Resolver::Router.draw do
   end
 
   scope :audit_trails do
-    route 'default', Docs::AuditTrail::Resolver
+    route 'default', Docs::AuditTrails::Resolver
   end
 end

@@ -1,6 +1,6 @@
-class Docs::AuditTrail::FilterConfig < Filters::API
+class Docs::AuditTrails::FilterConfig < Filters::API
 
-  index_builder Docs::AuditTrail::Index
+  index_builder Docs::AuditTrails::Index
 
   attribute :item_type, label: "Resources", type: :text, simple: true
   attribute :item_id, label: "Resource ID", type: :text, simple: true
