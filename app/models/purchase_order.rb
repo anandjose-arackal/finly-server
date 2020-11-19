@@ -78,10 +78,10 @@
 #
 
 class PurchaseOrder < ApplicationRecord
-  include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport
+  include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport, ControllingUser
   include Sequenced::ActsAsSequenced
   # include SearchIndex::Concerns::Document
-include Searchkick::Api
+  include Searchkick::Api
   include Concerns::ErpSyncConcern
 
 
@@ -512,7 +512,7 @@ include Searchkick::Api
   after_destroy :budget_trail_destroy
 
   ransack_scopes :with_status_ids, :with_grn_status_id
-
+  
   def status_tag_details
     return @tags_data if @tags_data.present?
 
