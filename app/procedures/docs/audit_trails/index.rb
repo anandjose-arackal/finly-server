@@ -16,8 +16,8 @@ class Docs::AuditTrails::Index < IndexBuilder::API
     date value: :created_at
   end
 
-  column :change_set, label: "Changes", default: true do
-    text value: :changes , format: "standard"
+  column :changes_less, label: "Changes", default: true do
+    text value: :changes_less , format: "standard"
   end
 
   column :item_type,  label: "Resources", default: true do

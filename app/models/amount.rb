@@ -185,8 +185,6 @@ class Amount < ApplicationRecord
   include SoftDeletable
 
   belongs_to :currency, optional: true
-  has_paper_trail only: [:value]
-
   accepts_nested_attributes_for :currency
 
   validate :no_negative_amount

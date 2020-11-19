@@ -12,4 +12,8 @@ class AuditTrailExposure < Exposures::API
   attribute :changes do
     record.changeset.to_s
   end
+
+  attribute :changes_less do
+    record.changes_less
+  end
 end
