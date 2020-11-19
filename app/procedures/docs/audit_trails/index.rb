@@ -12,7 +12,7 @@ class Docs::AuditTrails::Index < IndexBuilder::API
     text value: "{{record.created_by.name}} {{record.event}}d {{record.item_type}}" , format: "primary"
   end
 
-  column :created_at, label: "DATE & TIME", sort: :created_at do
+  column :created_at, label: "DATE & TIME", sort: :created_at, default: true do
     date value: :created_at
   end
 
@@ -37,7 +37,7 @@ class Docs::AuditTrails::Index < IndexBuilder::API
     text value: :event, format: "standard"
   end
 
-  column :user_ip, label: "User IP" do
+  column :user_ip, label: "User IP", default: true do
     text value: :item_type, format: "standard"
   end
 
