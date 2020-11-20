@@ -161,11 +161,11 @@ module Rules::Predicates
   end
 
   predicate :null do |v, d|
-    v[0].null?
+    v[0].nil?
   end
 
   predicate :not_null do |v, d|
-    !v[0].null?
+    !v[0].nil?
   end
 
 end
