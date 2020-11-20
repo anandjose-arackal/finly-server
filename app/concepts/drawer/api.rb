@@ -10,6 +10,7 @@ class Drawer::API
   class_attr :policy
   class_attr :policy_action
   class_attr :update_path
+  class_attr :find_by_key
 
 
   def self.call(options)

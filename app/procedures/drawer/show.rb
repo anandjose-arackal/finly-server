@@ -5,6 +5,7 @@ class Drawer::Show < Transactions::API
   class_attr :model
   class_attr :policy
   class_attr :json_builder
+  class_attr :find_by_key
 
   schema do
     params do
@@ -26,7 +27,8 @@ class Drawer::Show < Transactions::API
   end
 
   def find_model(context, params:, current_user:, **)
-    context['model'] = context['result.model'] = context[:builder].model.find_by(id: params[:id])
+    find_key = context[builder].find_by_key
+    context['model'] = context['result.model'] = context[:builder].model.where(id: params[:id])
     context['model'].present?
   end
 

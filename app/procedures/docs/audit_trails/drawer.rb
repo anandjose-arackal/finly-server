@@ -1,6 +1,7 @@
 class Docs::AuditTrails::Drawer < Drawer::API
 
   model AuditTrail
+  find_by_key :transaction_id
   policy true
   policy_action :index
 
