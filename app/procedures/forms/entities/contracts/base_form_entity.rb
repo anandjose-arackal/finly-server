@@ -121,7 +121,7 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
       property :company_id, deserializer: -> (input, represented, *args) {represented.company_id = represented.contract_root.current_user.company_id}
       property :form_id, deserializer: -> (input, represented, *args) {represented.form_id = represented.contract_root.form_id}
       property :property#, validates: {presence: true}
-      property :value, deserializer: -> (input, represented, *args) {represented.value = ['true', true, 1, '1', 'TRUE'].include?(input[:value]) ? '1' : '0'}
+      property :value, deserializer: -> (input, represented, *args) {represented.value = ['true', true, 1, '1', 'TRUE', 'True'].include?(input[:value]) ? '1' : '0'}
 
       validation :condition_actions do
         params do
