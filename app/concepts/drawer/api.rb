@@ -22,7 +22,7 @@ class Drawer::API
   end
 
   def self.build(user, record)
-    record_exposure = record.to_exposure
+    record_exposure = record.first.to_exposure
     map = []
     self.blocks.each do |block_key, block|
       #next if required_columns.present? and not (required_columns.include?(column_key.to_s) or required_columns.include?(column_key.to_sym))

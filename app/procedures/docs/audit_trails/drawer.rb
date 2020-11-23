@@ -6,8 +6,8 @@ class Docs::AuditTrails::Drawer < Drawer::API
   policy_action :index
 
   block block_key: :beneficiary, label: "Event", icon: "icon_url" do
-    text value: :document_type, format: 'standard', label: "Document Type"
-    text value: :document_id, format: 'standard', label: "Document ID"
+    text value: :item_type, format: 'standard', label: "Document Type"
+    text value: :item_id, format: 'standard', label: "Document ID"
     text value: "{{record.created_by.name}}", format: 'standard', label: "Actor"
     text value: :user_ip, format: 'standard', label: "IP Address"
     text value: :created_at, format: 'standard', label: "Date Time"

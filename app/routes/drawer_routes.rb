@@ -1,5 +1,5 @@
 Drawer::Router.draw do
 
-  route 'audit_trail', Docs::AuditTrails::Drawer
+  route 'audit_trails', Docs::AuditTrails::Drawer
 
 end
