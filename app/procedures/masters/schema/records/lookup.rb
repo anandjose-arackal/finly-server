@@ -1,6 +1,6 @@
 class Masters::Schema::Records::Lookup < Lookup::API
 
-  step :init_record_model_class, after: :define_search
+  step :init_record_model_class, before: :define_search
   step Resolver::Transactions::Load(klass: Masters::Schema::Records::Resolver, paginate: true), replace: "transactions.resolver.model"
 
   def init_record_model_class(context, params:, current_user:, **)
@@ -21,7 +21,7 @@ class Masters::Schema::Records::Lookup < Lookup::API
 
   # Todo dynamic search_key
   def search_key(context)
-    "id"
+    "#{context['model'].primary_entity_key}_cont"
   end
 
   # Todo

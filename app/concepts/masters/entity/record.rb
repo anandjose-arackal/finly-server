@@ -23,21 +23,28 @@ module Masters::Entity::Record
       # Clearing it from descendants of superclass as well as ApplicationRecord
       superclass.direct_descendants.delete(self)
       ApplicationRecord.descendants.delete(self)
-
+      unless master_schema.system_master
+        default_scope { where(master_schema_id: master_schema.id) }
+      end
       # For entities of lookup type, add a belongs_to association
       master_schema.entities.each do |entity|
         if entity.type?(:lookup) or entity.type?(:parent_lookup)
           attr = entity.entity_key
-          anonymous_class = entity.type?(:lookup) ? entity.lookup_master_schema.record_model_class : self
+          anonymous_class = entity.type?(:lookup) ? entity.lookup_master_schema&.record_model_class : self
           if attr.end_with?('_id')
             attr = attr[0..(attr.length - 4)]
             belongs_to attr.to_sym, -> { where company_id: entity.company_id }, anonymous_class: anonymous_class
           end
         end
+        if entity.type?(:multi_lookup)
+          has_many "#{entity.entity_key}_mappings".to_sym, -> { where company_id: entity.company_id, master_entity_id: entity.id }, class_name: 'MasterMapping', foreign_key: 'from_record_id'
+          anonymous_class = entity.lookup_master_schema&.record_model_class
+          has_many entity.entity_key.to_sym, through: "#{entity.entity_key}_mappings".to_sym, source: 'to_record', anonymous_class: anonymous_class, source_type: entity.lookup_master_schema.model.name
+        end
       end
 
       def self.name
-        "Master#{table_name}"
+        "MasterRecord"
       end
 
       define_method :to_exposure do

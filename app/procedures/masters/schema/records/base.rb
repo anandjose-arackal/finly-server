@@ -13,7 +13,7 @@ class Masters::Schema::Records::Base < Transactions::API
         next on_error context, :base, 'master not found'
       end
 
-      context[:model_class] = context[:params][:model_class] = context[:master_schema].model
+      context[:model_class] = context[:params][:model_class] = context[:master_schema].record_model_class
 
       unless context[:model_class].present?
         next on_error context, :base, 'master not found'
@@ -37,7 +37,7 @@ class Masters::Schema::Records::Base < Transactions::API
       end
 
       id = params[:id]
-      context[:model_class] = scoped_model = context[:master_schema].model
+      context[:model_class] = scoped_model = context[:master_schema].record_model_class
 
       if scoped_model == MasterRecord
         scoped_model = scoped_model.where(master_schema_id: context[:master_schema].id)

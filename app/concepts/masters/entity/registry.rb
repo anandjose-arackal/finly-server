@@ -32,7 +32,7 @@ module Masters::Entity::Registry
     unless contract.validate(params.deep_merge(opts))
       raise "Invalid MasterEntity: #{self}##{entity_key} (#{klass}) Failure: #{contract.errors.full_messages}"
     end
-    unless model.columns.find {|col| col.name.to_s == entity_key.to_s}.present?
+    unless type == :multi_lookup || model.columns.find {|col| col.name.to_s == entity_key.to_s}.present?
       raise "Invalid MasterEntity: #{self}##{entity_key} (#{klass}) Failure: column #{entity_key} is not defined for #{model}"
     end
 

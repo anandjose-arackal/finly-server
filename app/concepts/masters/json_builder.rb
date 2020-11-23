@@ -82,6 +82,8 @@ class Masters::JsonBuilder
     master_schema.entities.each do |entity|
       if entity.type?(:lookup) or entity.type?(:parent_lookup)
         json[entity.association_name] = build_lookup(record, entity)
+      elsif entity.type?(:multi_lookup)
+        json[entity.entity_key] = build_multi_lookup(record, entity)
       else
         json[entity.entity_key] = record.send(entity.entity_key)
       end
@@ -97,6 +99,12 @@ class Masters::JsonBuilder
 
     # Compact will only render the id and name attributes
     record.as_json(compact: true)
+  end
+
+  def build_multi_lookup(record, entity)
+    record.send(entity.entity_key).map do |child_record|
+      child_record.as_json(compact: true)
+    end
   end
 
 end
