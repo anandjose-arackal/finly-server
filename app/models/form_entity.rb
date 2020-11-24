@@ -237,7 +237,7 @@ class FormEntity < ApplicationRecord
         compute_type_id: compute_type_id,
         compute_formula: compute_formula,
         compute_lookup_entity_id: compute_lookup_entity_id,
-        filters: filters,
+        filters: filters.as_store,
         config_path: config_path,
         validations: validations.as_json(opts),
         conditions: conditions.as_json(opts),
@@ -275,6 +275,7 @@ class FormEntity < ApplicationRecord
         entity_type: entity_type,
         default_value: default_value,
         position: position,
+        filters: filters&.as_ransack(do_not_interpolate: true),
         behavior: {
             editable: editable,
             required: required,
