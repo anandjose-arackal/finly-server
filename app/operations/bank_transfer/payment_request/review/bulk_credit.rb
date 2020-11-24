@@ -193,7 +193,7 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
   end
 
   def retrieve_initiating_account_adapter
-    case params[:initiating_account_type] || 1 || 1
+    case params[:initiating_account_type] || 1
     when 1, '1'
       if params[:initiating_company_account_type].present?
         case params[:initiating_company_account_type]
