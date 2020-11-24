@@ -95,7 +95,7 @@ class FormEntity::Text < FormEntity
               optional(:minimum).filled
               optional(:format).value(included_in?: FORMAT)
               optional(:regex).hash do
-                optional(:format).filled
+                optional(:format)
                 optional(:message)
               end
             end

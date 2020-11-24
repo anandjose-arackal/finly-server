@@ -121,27 +121,27 @@ module Rules::Predicates
   # end
 
   predicate :cont, any: true, all: true do |v, d|
-    v[0]&.include?(v[1])
+    v[0].to_s.include?(v[1].to_s)
   end
 
   predicate :not_cont, any: true, all: true do |v, d|
-    !v[0]&.include?(v[1])
+    !v[0].to_s.include?(v[1].to_s)
   end
 
   predicate :start do |v, d|
-    v[0]&.start_with?(v[1])
+    v[0].to_s.start_with?(v[1])
   end
 
   predicate :not_start do |v, d|
-    !v[0]&.start_with?(v[1])
+    !v[0].to_s.start_with?(v[1])
   end
 
   predicate :end do |v, d|
-    v[0]&.end_with?(v[1])
+    v[0].to_s.end_with?(v[1].to_s)
   end
 
   predicate :not_end do |v, d|
-    !v[0]&.end_with?(v[1])
+    !v[0].to_s.end_with?(v[1].to_s)
   end
 
   predicate :true do |v, d|
@@ -153,19 +153,19 @@ module Rules::Predicates
   end
 
   predicate :present do |v, d|
-    v[0]&.present?
+    v[0].present?
   end
 
   predicate :blank do |v, d|
-    v[0]&.blank?
+    v[0].blank?
   end
 
   predicate :null do |v, d|
-    v[0]&.null?
+    v[0].null?
   end
 
   predicate :not_null do |v, d|
-    !v[0]&.null?
+    !v[0].null?
   end
 
 end

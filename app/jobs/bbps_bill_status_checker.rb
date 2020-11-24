@@ -49,6 +49,7 @@ class BbpsBillStatusChecker
           end
           op.failure do |result|
             puts "Failure: #{result}"
+            Event::EAlert::Create.(nil, title: 'BBpsBills Status check failure', description: "#{result}", subject: 'BBpsBills Status check failure')
             # log this response somewhere and see what the issue is:
             # TODO - add mailer here to send to sreeram.nr@finly.io kumar.abinash@finly.io
             # not updating the bill status here because it will depend on the final

@@ -450,4 +450,6 @@ class YesBankVendor < ApplicationRecord
   def review_in_progress?
     VendorStatus.ids_for(:awaiting_approval).include?(status_id)
   end
+
+
 end

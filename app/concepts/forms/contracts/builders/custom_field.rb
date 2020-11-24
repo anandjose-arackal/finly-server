@@ -5,6 +5,7 @@ class Forms::Contracts::Builders::CustomField
       property :uuid
       property :form_entity_id
       property :field_key
+      property :entity_type
       property :value
       property :value_text
       # collection :attachments, populator: :attachments! do
@@ -93,7 +94,8 @@ class Forms::Contracts::Builders::CustomField
         {
             form_entity: custom_field_entity,
             form_id: custom_field_entity.form_id,
-            field_key: custom_field_entity.entity_key
+            field_key: custom_field_entity.entity_key,
+            entity_type: custom_field_entity.entity_type
         }
     )
   end
