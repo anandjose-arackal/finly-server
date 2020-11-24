@@ -275,6 +275,7 @@ class FormEntity < ApplicationRecord
         entity_type: entity_type,
         default_value: default_value,
         position: position,
+        filters: filters&.as_ransack(do_not_interpolate: true),
         behavior: {
             editable: editable,
             required: required,
