@@ -52,10 +52,11 @@ if invoice.vendor.present?
 end
 
 tax_ids = []
+
 json.invoice do
   # conditionally set the original amount as invoice amount is there are line items
-  json.extract! invoice, :id, :invoice_number, :payment_term_id, :location_id, :delivery_location_id, :department_id, :sub_department_id, :policy_id, :procurement_id,
-                :billing_address, :shipping_address, :invoice_id, :gstin_location_id,
+  json.extract! invoice, :id, :invoice_number, :payment_term_id, :delivery_location_id, :department_id, :sub_department_id, :policy_id, :procurement_id,
+                :billing_address, :shipping_address, :invoice_id,
                 :cost_allocation_items, :narration, :discount_type_id, :rcm_enabled
 
   json.invoice_type invoice.invoice_type&.name
@@ -63,6 +64,13 @@ json.invoice do
   json.transaction_service_period_to invoice.transaction_service_period_to&.strftime('%d/%b/%Y')
   # json.po_number invoice.procurement&.purchase_order&.po_number
   json.po_number invoice.po_number
+
+  location_id = invoice.location_id
+  json.location_id location_id
+
+  gstin_location_id = invoice.gstin_location_id
+  json.gstin_location_id gstin_location_id
+
   json.created_from_payment_agreement invoice.payment_agreement_id.present?
   json.agreement_number invoice&.payment_agreement&.get_agreement_number
   json.payment_agreement_id invoice.payment_agreement_id
@@ -85,7 +93,21 @@ json.invoice do
   json.tds_amount precision_value invoice.tds_amount&.value
   json.tax precision_value invoice.tax
   json.tds precision_value invoice.tds
-  json.gst_type_id invoice.gst_type_id
+
+  if invoice.gst_type_id.present?
+    json.gst_type_id invoice.gst_type_id 
+  else
+    location_state_code = @result.locations.find_by(id: location_id)&.state_code
+    vendor_state_code = @result.gstin_locations.find_by(id: gstin_location_id)&.state_code
+
+    if location_state_code == vendor_state_code
+      gst_type_id = 2
+    else
+      gst_type_id = 1
+    end
+    json.gst_type_id gst_type_id 
+  end
+
   json.discount_amount precision_value invoice.discount_amount&.value
   json.discount precision_value invoice.discount
   json.advance invoice.advance
