@@ -90,7 +90,7 @@ class ExportManager::Master::Vendors::DetailsIndex < ExportManager::Builders::Sp
   def default_account_number(vendor)
     account = vendor.bank_accounts.default_accounts.first
     account = vendor.bank_accounts.first if account.blank?
-    account&.account_number
+    "\t" + (account&.account_number).to_s
   end
 
   def default_account_ifsc(vendor)

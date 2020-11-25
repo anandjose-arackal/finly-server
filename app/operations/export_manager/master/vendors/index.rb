@@ -128,7 +128,7 @@ class ExportManager::Master::Vendors::Index < ExportManager::Builders::Spreadshe
 
     account = self.vendor_ba.map {|ba| ba if ba.default_account}.compact.first
     account = self.vendor_ba.first if account.blank?
-    account&.account_number
+    "\t" + (account&.account_number).to_s
   end
 
   def default_account_name(vendor)
@@ -146,7 +146,7 @@ class ExportManager::Master::Vendors::Index < ExportManager::Builders::Spreadshe
   def second_account_number(vendor)
     account = self.vendor_ba.map {|ba| ba if ba.default_account}.compact.second
     account = self.vendor_ba.second if account.blank?
-    account&.account_number
+    "\t" + (account&.account_number).to_s
   end
 
   def second_account_name(vendor)
@@ -164,7 +164,7 @@ class ExportManager::Master::Vendors::Index < ExportManager::Builders::Spreadshe
   def third_account_number(vendor)
     account = self.vendor_ba.map {|ba| ba if ba.default_account}.compact.third
     account = self.vendor_ba.third if account.blank?
-    account&.account_number
+    "\t" + (account&.account_number).to_s
   end
 
   def third_account_name(vendor)
@@ -182,7 +182,7 @@ class ExportManager::Master::Vendors::Index < ExportManager::Builders::Spreadshe
   def fourth_account_number(vendor)
     account = self.vendor_ba.map {|ba| ba if ba.default_account}.compact.fourth
     account = self.vendor_ba.fourth if account.blank?
-    account&.account_number
+    "\t" + (account&.account_number).to_s
   end
 
   def fourth_account_name(vendor)
