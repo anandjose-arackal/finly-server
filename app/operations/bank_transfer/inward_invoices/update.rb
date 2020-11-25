@@ -454,7 +454,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
   def post_process
     # Budget check
     budget_validation_op = budget_limit_validation(inward_invoice)
-    if budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+    if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
       add_message :error, budget_validation_op.messages[:errors]
       return
     end

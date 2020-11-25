@@ -205,7 +205,7 @@ class Expense::ExTime::Create < Expense::ExTime::Base
 
     # Budget check
     budget_validation_op = budget_limit_validation(expense)
-    if budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+    if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
       add_message :error, budget_validation_op.messages[:errors]
       return
     end
