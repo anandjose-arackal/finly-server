@@ -6,7 +6,7 @@ class Docs::AuditTrails::Index < IndexBuilder::API
 
   resolver 'audit_trails.default'
   reference '{{record.transaction_id}}'
-  # Fixed column is always default true
+  status_filters false
 
   column :description,  label: "Record Description", fixed: true, default: true do
     text value: "{{record.created_by.name}} {{record.event}}d {{record.item_type}}" , format: "primary"

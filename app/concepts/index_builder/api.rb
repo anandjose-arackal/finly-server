@@ -39,7 +39,7 @@ class IndexBuilder::API
   end
 
   def self.config(user)
-    config = {selectable: self.selectable, fixed: [], dynamic: []}
+    config = {selectable: self.selectable, status_filters: self.status_filters, fixed: [], dynamic: []}
     columns.each do |column_key, column|
       if column.fixed
         config[:fixed] << column.config(user)
