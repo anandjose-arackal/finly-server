@@ -2,6 +2,10 @@ class Procurements::Invoices::Update < Procurements::Invoices::Base
 
   attr_accessor :procurement, :purchase_order, :invoice_params, :invoice, :po_revision
 
+  def rollback_process_if_error?
+    true
+  end
+
   def init
     id = params[:procurement_id]
     self.procurement = user.company.procurements.find_by(id: id)
@@ -20,6 +24,8 @@ class Procurements::Invoices::Update < Procurements::Invoices::Base
     # end
 
     self.custom_fields = params&.dig(:custom_fields) || params&.dig(:invoice, :custom_fields)
+
+    fetch_budget_contributions(invoice)
   end
 
   def validate
@@ -60,7 +66,13 @@ class Procurements::Invoices::Update < Procurements::Invoices::Base
   end
 
   def post_process
-    budget_limit_validation( invoice )
+    # Budget check
+    budget_validation_op = budget_limit_validation(invoice)
+    if budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+      add_message :error, budget_validation_op.messages[:errors]
+      return
+    end
+
     add_message :success, "Invoice updated successfully"
   end
 

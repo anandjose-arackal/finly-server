@@ -24,6 +24,10 @@ class Expense::ExDistance::Odometer::ExCreate < Expense::ExDistance::Create
     }
   end
 
+  def rollback_process_if_error?
+    true
+  end
+
   def pre_validate
     if user.blank? || params.blank?
       add_message :error, 'Invalid parameters passed'
@@ -93,6 +97,17 @@ class Expense::ExDistance::Odometer::ExCreate < Expense::ExDistance::Create
     end
     if self.receipt_end.present?
       self.receipt_end.update(parent: self.expense)
+    end
+  end
+
+  def post_process
+    super
+
+    # Budget check
+    budget_validation_op = budget_limit_validation(expense)
+    if budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+      add_message :error, budget_validation_op.messages[:errors]
+      return
     end
   end
 

@@ -9,6 +9,10 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
     }
   end
 
+  def rollback_process_if_error?
+    true
+  end
+
   def init
     invoice_id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
     self.invoice = user.company.inward_invoices.scope_all_except_voided.find_by id: invoice_id
@@ -91,7 +95,13 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
   end
 
   def post_process
-    budget_limit_validation( invoice )
+    # Budget check
+    budget_validation_op = budget_limit_validation(invoice)
+    if budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+      add_message :error, budget_validation_op.messages[:errors]
+      return
+    end
+
     update_agreement_available_limit
     role_id = self.workflow_output[:role_id]
     Event::EInvoice::Submit.(user, {invoice: invoice, workflow_output: workflow_output, role_id: role_id})

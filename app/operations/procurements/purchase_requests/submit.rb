@@ -13,6 +13,10 @@ class Procurements::PurchaseRequests::Submit < Procurements::PurchaseRequests::B
   #   self.purchase_request = Procurements::PurchaseRequests::Show.(user, params).purchase_request.with_id(id).first rescue nil
   # end
 
+  def rollback_process_if_error?
+    true
+  end
+
   def process
     begin
       ActiveRecord::Base.transaction do
@@ -50,7 +54,13 @@ class Procurements::PurchaseRequests::Submit < Procurements::PurchaseRequests::B
   end
 
   def post_process
-    budget_limit_validation( purchase_request )
+    # Budget check
+    budget_validation_op = budget_limit_validation(purchase_request)
+    if budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+      add_message :error, budget_validation_op.messages[:errors]
+      return
+    end
+
     Event::EPurchaseRequest::Submit.(user, purchase_request: purchase_request, workflow_output: workflow_output)
     if purchase_request.purchase_request_status_id == PurchaseRequestStatus.id_for(:auto_approved)
       add_message :success, "Purchase Request Auto Approved"

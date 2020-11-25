@@ -13,6 +13,9 @@ class Expense::ExCard::Update < Expense::ExCard::Base
     end
   end
 
+  def rollback_process_if_error?
+    true
+  end
 
   def init
     super
@@ -41,6 +44,8 @@ class Expense::ExCard::Update < Expense::ExCard::Base
       # adding the associated card expense id for the card expense
       self.updated_expense_params[:card_expense_attributes][:id] = expense.card_expense.id if self.updated_expense_params[:card_expense_attributes].present?
     end
+
+    fetch_budget_contributions(expense)
   end
 
 
@@ -104,7 +109,13 @@ class Expense::ExCard::Update < Expense::ExCard::Base
   end
 
   def post_process
-    budget_limit_validation( expense )
+    # Budget check
+    budget_validation_op = budget_limit_validation(expense)
+    if budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+      add_message :error, budget_validation_op.messages[:errors]
+      return
+    end
+
     # add report comment
     Reports::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
 

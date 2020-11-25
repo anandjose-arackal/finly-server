@@ -10,6 +10,10 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
     }
   end
 
+  def rollback_process_if_error?
+    true
+  end
+
   def init
     purchase_order_id = params[:id] || params[:purchase_order_id]
     self.purchase_order = user.company.purchase_orders.find_by id: purchase_order_id
@@ -80,7 +84,13 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
   end
 
   def post_process
-    budget_limit_validation( purchase_order )
+    # Budget check
+    budget_validation_op = budget_limit_validation(purchase_order)
+    if budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+      add_message :error, budget_validation_op.messages[:errors]
+      return
+    end
+
     add_message :success, 'Successfully submitted purchase order'
     # role_id = self.workflow_output[:role_id]
     Event::EPurchaseOrder::Submit.(user, {purchase_order: purchase_order, workflow_output: workflow_output})

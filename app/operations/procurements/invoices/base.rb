@@ -1,5 +1,5 @@
 class Procurements::Invoices::Base < BaseOperation
-  attr_accessor :workflow_output
+  attr_accessor :workflow_output, :budget_contributions_before_update
 
 
   class Procurements::Invoices::InwardInvoicePresenter < BaseOperation::BasePresenter::SuccessPresenter
@@ -96,13 +96,16 @@ class Procurements::Invoices::Base < BaseOperation
     end
   end
 
-  def budget_limit_validation invoice
+  def fetch_budget_contributions(invoice)
     if user.company.feature_subscription.enforce_budget_limit
-      op = BudgetManager::BudgetLimitValidator::ValidateInvoice.(user,{ invoice: invoice })
-      if op.messages[:error].present?
-        return add_message :error, op.messages[:error]
-      end
+      op = BudgetManager::BudgetLimitValidator::Invoice.({ invoice: invoice, current_user: user })
+      self.budget_contributions_before_update = op['result'][:budget_contributions] rescue {}
     end
   end
 
+  def budget_limit_validation(invoice)
+    if user.company.feature_subscription.enforce_budget_limit
+      return BudgetManager::BudgetLimitValidator::Invoice.({ invoice: invoice, previous_budget_contributions: self.budget_contributions_before_update, current_user: user })
+    end
+  end
 end

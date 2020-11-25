@@ -9,6 +9,10 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
                 :vendor, :procurement, :bank_account, :original_purchase_order, :department, :skip_adv_calculation,
                 :gstin_location, :cost_allocation_items, :policy
 
+  def rollback_process_if_error?
+    true
+  end
+
   def init
     self.purchase_order_params = purchase_order_parameters
     # self.procurement = user.company.procurements.find_by params[:procurement_id]
@@ -40,6 +44,8 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     self.cost_allocation_items = StringUtils.to_bool(self.purchase_order_params[:cost_allocation_items])
 
     self.policy = Policy::VendorPayments::Index.(current_user, params).policies.find_by(id: purchase_order_params[:policy_id])
+
+    fetch_budget_contributions(purchase_order)
   end
 
   def validate
@@ -367,7 +373,13 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
   end
 
   def post_process
-    budget_limit_validation( purchase_order )
+    # Budget check
+    budget_validation_op = budget_limit_validation(purchase_order)
+    if budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+      add_message :error, budget_validation_op.messages[:errors]
+      return
+    end
+
     add_message :success, 'Successfully updated purchase order'
   end
 

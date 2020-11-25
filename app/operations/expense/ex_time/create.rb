@@ -27,6 +27,10 @@ class Expense::ExTime::Create < Expense::ExTime::Base
     }
   end
 
+  def rollback_process_if_error?
+    true
+  end
+
 
   def authorized_user_types
     [:employee]
@@ -197,6 +201,13 @@ class Expense::ExTime::Create < Expense::ExTime::Base
     # checking if the expense has any receipts, and marking them all as no need to be transcribed
     if expense.receipts.present?
       expense.receipts.update_all(to_be_transcribed: false)
+    end
+
+    # Budget check
+    budget_validation_op = budget_limit_validation(expense)
+    if budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+      add_message :error, budget_validation_op.messages[:errors]
+      return
     end
 
     add_message :success, 'Expense created'

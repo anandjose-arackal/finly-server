@@ -14,6 +14,10 @@ class Expense::ExTime::Update < Expense::ExTime::Base
     }
   end
 
+  def rollback_process_if_error?
+    true
+  end
+
   def pre_validate
     if params.blank? or user.blank?
       messages[:error] << "Parameters or user not found"
@@ -84,6 +88,8 @@ class Expense::ExTime::Update < Expense::ExTime::Base
         self.updated_expense_params[:spent_from_id] = self.cash_pocket&.id
       end
     end
+
+    fetch_budget_contributions(expense)
   end
 
   def authorize
@@ -174,7 +180,13 @@ class Expense::ExTime::Update < Expense::ExTime::Base
   end
 
   def post_process
-    budget_limit_validation( expense )
+    # Budget check
+    budget_validation_op = budget_limit_validation(expense)
+    if budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+      add_message :error, budget_validation_op.messages[:errors]
+      return
+    end
+
     # add comment in report if expense is added within report
     Reports::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
 
