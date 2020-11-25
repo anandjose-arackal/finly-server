@@ -66,13 +66,18 @@ json.invoice do
   json.po_number invoice.po_number
 
   location_id = invoice.location_id
-  json.location_id location_id
-
   gstin_location_id = invoice.gstin_location_id
+
+  if invoice&.payment_agreement.present? && gstin_location_id.blank?
+    gstin_location_id = invoice&.payment_agreement&.rental_invoices.map(&:vendor_location_id).first
+  end
+
+  json.location_id location_id
   json.gstin_location_id gstin_location_id
 
   json.created_from_payment_agreement invoice.payment_agreement_id.present?
   json.agreement_number invoice&.payment_agreement&.get_agreement_number
+
   json.payment_agreement_id invoice.payment_agreement_id
   json.po_advance invoice.po_advance
   json.po_prev_adjusted_advance invoice.po_prev_adjusted_advance
