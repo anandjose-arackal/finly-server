@@ -77,7 +77,7 @@ class InwardInvoiceStatus < ApplicationRecord
         # InwardInvoiceStatus.id_for(:retracted),
         InwardInvoiceStatus.id_for(:approved),
         InwardInvoiceStatus.id_for(:auto_approved),
-        # InwardInvoiceStatus.id_for(:processing)
+        InwardInvoiceStatus.id_for(:processing)
     ]
   end
 
@@ -122,9 +122,8 @@ class InwardInvoiceStatus < ApplicationRecord
         InwardInvoiceStatus.id_for(:retracted),
         InwardInvoiceStatus.id_for(:voided),
 
-        # InwardInvoiceStatus.id_for(:processing),
-        # InwardInvoiceStatus.id_for(:closed),
-        # InwardInvoiceStatus.id_for(:pending),
+        InwardInvoiceStatus.id_for(:closed),
+        InwardInvoiceStatus.id_for(:pending),
     ]
   end
 
