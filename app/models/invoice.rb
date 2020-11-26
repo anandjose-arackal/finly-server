@@ -144,7 +144,7 @@
 #
 
 class Invoice < ApplicationRecord
-  include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport
+  include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport, ControllingUser
   include LiquidDroppable
   include Exposures::Model::Exposable
   include Sequenced::ActsAsSequenced
