@@ -1,12 +1,10 @@
 class ObjectChangeAdapter
   def init
-    #binding.pry
-    {}
   end
 
 
   def diff(changes={})
-    changes
+    changes.except!(:created_at, :updated_at, :id)
   end
 
 end
