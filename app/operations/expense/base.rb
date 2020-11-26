@@ -171,7 +171,7 @@ class Expense::Base < BaseOperation
 
   def fetch_budget_contributions(expense)
     if user.company.enforce_budget_configuration.enforce_expense_budget?
-      op = BudgetManager::BudgetLimitValidator::Expense.({ expense: expense, current_user: user })
+      op = BudgetManager::BudgetLimitValidator::Expense.({ expense: expense, ignore_unbudgetables: true, current_user: user })
       self.budget_contributions_before_update = op['result'][:budget_contributions] rescue {}
     end
   end

@@ -8,6 +8,8 @@ class BudgetManager::BudgetLimitValidator::PurchaseRequest < BudgetManager::Budg
     self.previous_budget_contributions = options[:previous_budget_contributions] || {}
     self.budget_contributions = {}
 
+    self.ignore_unbudgetables = options[:ignore_unbudgetables] || false
+
     unless purchase_request.present?
       add_message(options, :error, :base, 'Purchase Request not found')
       return false
@@ -39,10 +41,16 @@ class BudgetManager::BudgetLimitValidator::PurchaseRequest < BudgetManager::Budg
       if budget.purchase_request
         op = BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer.({budget: budget, current_user: User.first, calculate_buckets: false, calculate_trail_items: true})
 
+        trails = op['result'][:budget_trails].where(entity: purchase_request)
+
+        if self.ignore_unbudgetables
+          trails = trails.without_entity_status_id(PurchaseRequestStatus.status_ids_for_unbudgetables)
+        end
+
         if budget.calculated_before_tax_amount
-          trails_amount = op['result'][:budget_trails].where(entity: purchase_request).map(&:amount_before_tax).map(&:value).sum
+          trails_amount = trails.map(&:amount_before_tax).map(&:value).sum
         else
-          trails_amount = op['result'][:budget_trails].where(entity: purchase_request).map(&:amount_after_tax).map(&:value).sum
+          trails_amount = trails.map(&:amount_after_tax).map(&:value).sum
         end
         budget_contributions[budget.id] = trails_amount
         spent_amount += trails_amount

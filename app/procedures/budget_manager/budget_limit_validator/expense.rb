@@ -7,6 +7,8 @@ class BudgetManager::BudgetLimitValidator::Expense < BudgetManager::BudgetLimitV
     self.previous_budget_contributions = options[:previous_budget_contributions] || {}
     self.budget_contributions = {}
 
+    self.ignore_unbudgetables = options[:ignore_unbudgetables] || false
+
     unless expense.present?
       add_message(options, :error, :base, 'Expense not found')
       return false
@@ -38,10 +40,16 @@ class BudgetManager::BudgetLimitValidator::Expense < BudgetManager::BudgetLimitV
       if budget.expense
         op = BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer.({budget: budget, current_user: User.first, calculate_buckets: false, calculate_trail_items: true})
 
+        trails = op['result'][:budget_trails].where(entity: expense)
+
+        if self.ignore_unbudgetables
+          trails = trails.without_entity_status_id(ReportStatus.status_ids_for_unbudgetables)
+        end
+
         if budget.calculated_before_tax_amount
-          trails_amount = op['result'][:budget_trails].where(entity: expense).map(&:amount_before_tax).map(&:value).sum
+          trails_amount = trails.map(&:amount_before_tax).map(&:value).sum
         else
-          trails_amount = op['result'][:budget_trails].where(entity: expense).map(&:amount_after_tax).map(&:value).sum
+          trails_amount = trails.map(&:amount_after_tax).map(&:value).sum
         end
 
         budget_contributions[budget.id] = trails_amount

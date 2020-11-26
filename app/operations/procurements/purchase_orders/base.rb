@@ -70,7 +70,7 @@ class Procurements::PurchaseOrders::Base < BaseOperation
 
   def fetch_budget_contributions(purchase_order)
     if user.company.enforce_budget_configuration.enforce_purchase_order_budget?
-      op = BudgetManager::BudgetLimitValidator::PurchaseOrder.({ purchase_order: purchase_order, current_user: user })
+      op = BudgetManager::BudgetLimitValidator::PurchaseOrder.({ purchase_order: purchase_order, ignore_unbudgetables: true, current_user: user })
       self.budget_contributions_before_update = op['result'][:budget_contributions] rescue {}
     end
   end

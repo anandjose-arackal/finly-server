@@ -98,7 +98,7 @@ class Procurements::Invoices::Base < BaseOperation
 
   def fetch_budget_contributions(invoice)
     if user.company.enforce_budget_configuration.enforce_invoice_budget?
-      op = BudgetManager::BudgetLimitValidator::Invoice.({ invoice: invoice, current_user: user })
+      op = BudgetManager::BudgetLimitValidator::Invoice.({ invoice: invoice, ignore_unbudgetables: true, current_user: user })
       self.budget_contributions_before_update = op['result'][:budget_contributions] rescue {}
     end
   end

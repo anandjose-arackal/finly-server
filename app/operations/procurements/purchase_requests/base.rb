@@ -62,7 +62,7 @@ class Procurements::PurchaseRequests::Base < BaseOperation
 
   def fetch_budget_contributions(purchase_request)
     if user.company.enforce_budget_configuration.enforce_purchase_order_budget?
-      op = BudgetManager::BudgetLimitValidator::PurchaseRequest.({ purchase_request: purchase_request, current_user: user })
+      op = BudgetManager::BudgetLimitValidator::PurchaseRequest.({ purchase_request: purchase_request, ignore_unbudgetables: true, current_user: user })
       self.budget_contributions_before_update = op['result'][:budget_contributions] rescue {}
     end
   end

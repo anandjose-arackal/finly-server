@@ -8,6 +8,8 @@ class BudgetManager::BudgetLimitValidator::Invoice < BudgetManager::BudgetLimitV
     self.previous_budget_contributions = options[:previous_budget_contributions] || {}
     self.budget_contributions = {}
 
+    self.ignore_unbudgetables = options[:ignore_unbudgetables] || false
+
     unless self.invoice.present?
       add_message(options, :error, :base, 'Invoice not found')
       return false
@@ -49,10 +51,16 @@ class BudgetManager::BudgetLimitValidator::Invoice < BudgetManager::BudgetLimitV
         if budget.purchase_order || budget.invoice
           op = BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer.({budget: budget, current_user: User.first, calculate_buckets: false, calculate_trail_items: true})
 
+          trails = op['result'][:budget_trails].where(entity: invoice.items)
+
+          if self.ignore_unbudgetables
+            trails = trails.without_entity_status_id(InwardInvoiceStatus.status_ids_for_unbudgetables)
+          end
+
           if budget.calculated_before_tax_amount
-            trails_amount = op['result'][:budget_trails].where(entity: invoice.items).sum('billed_amount_before_tax_value - cn_adjusted_amount_after_tax_value')
+            trails_amount = trails.sum('billed_amount_before_tax_value - cn_adjusted_amount_after_tax_value')
           else
-            trails_amount = op['result'][:budget_trails].where(entity: invoice.items).sum('billed_amount_after_tax_value - cn_adjusted_amount_before_tax_value')
+            trails_amount = trails.sum('billed_amount_after_tax_value - cn_adjusted_amount_before_tax_value')
           end
 
           budget_contributions[budget.id] = trails_amount
