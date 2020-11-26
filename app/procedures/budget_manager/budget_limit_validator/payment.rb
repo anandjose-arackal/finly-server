@@ -1,6 +1,6 @@
 class BudgetManager::BudgetLimitValidator::Payment < BudgetManager::BudgetLimitValidator::Base
 
-  attr_accessor :payment
+  attr_accessor :payment, :document
   
   def initialize!(options, **)
     self.payment = options[:payment]

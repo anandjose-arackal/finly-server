@@ -1,6 +1,6 @@
 class BudgetManager::BudgetLimitValidator::Invoice < BudgetManager::BudgetLimitValidator::Base
 
-  attr_accessor :invoice
+  attr_accessor :invoice, :procurement, :purchase_order
   
   def initialize!(options, **)
     self.invoice = options[:invoice]
