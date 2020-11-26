@@ -3,8 +3,12 @@ class BudgetManager::BudgetLimitValidator::ValidatePayment < BaseOperation
   
   def init
     self.payment = params[:payment]
-
-    op = BudgetManager::BudgetsCalculator::ApplicableBudgets.({document: self.payment, current_user: User.first})
+    self.document = payment.bank_payment_request || payment.payment_order
+    if document.blank?
+      add_message :error,  "Document not found"
+      return
+    end
+    op = BudgetManager::BudgetsCalculator::ApplicableBudgets.({document: self.document, current_user: User.first})
     if op.success?
       self.budgets = op["result"][:budgets] rescue []
     end

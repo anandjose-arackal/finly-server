@@ -61,7 +61,7 @@ class BbpsBill < ApplicationRecord
 
   AMOUNT_TYPES = %w(base_amount early_payment_amount late_payment_amount)
 
-  include SoftDeletable, Transitionable
+  include SoftDeletable, Transitionable, ControllingUser
   include Sequenced::ActsAsSequenced
   include EventProducer
   # include SearchIndex::Concerns::Document

@@ -25,7 +25,7 @@
 #
 
 class PurchaseRequest < ApplicationRecord
-  include Transitionable, CustomFieldFilterSupport
+  include Transitionable, CustomFieldFilterSupport, ControllingUser
   include Sequenced::ActsAsSequenced
   # include SearchIndex::Concerns::Document
 include Searchkick::Api
@@ -71,6 +71,7 @@ include Searchkick::Api
       where creator_id: user.company.users.find_by_email(email)&.id
     end
   }
+
   scope :not_draft, -> { where.not purchase_request_status_id: PurchaseRequestStatus.id_for(:draft) }
 
   scope :deleteable, -> { where purchase_request_status_id: [PurchaseRequestStatus.id_for(:draft), PurchaseRequestStatus.id_for(:retracted), PurchaseRequestStatus.id_for(:rejected)] }

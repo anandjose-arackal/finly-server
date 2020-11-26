@@ -26,7 +26,7 @@ class ExportManager::Master::Vendors::Index < ExportManager::Builders::Template
   attribute :state_code, template: '{{ record.state_code.name }} - {{ record.state_code.code }}'
   attribute :description, template: '{{ record.description }}'
   attribute :vendor_type, template: '{{ record.vendor_type.name }}'
-  attribute :default_account_number, template: '{{ record.bank_accounts[0].account_number }}'
+  attribute :default_account_number, template: '\t{{ record.bank_accounts[0].account_number }}'
   attribute :default_account_name, template: '{{ record.bank_accounts[0].name }}'
   attribute :default_account_ifsc, template: '{{ record.bank_accounts[0].ifsc }}'
   attribute :second_account_number, template: '{{ record.bank_accounts[1].account_number }}'

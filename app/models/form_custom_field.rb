@@ -27,7 +27,14 @@ class FormCustomField < ApplicationRecord
   # has_many :attachments, as: :resource
 
   def retrieve_value
-    case self.form_entity&.entity_type
+    if entity_type.present?
+      field_type = entity_type
+    else
+      field_type = FormEntity.unscoped.where(uuid: self.form_entity_id)&.first.entity_type
+    end
+    # FormEntity.where(uuid: self.form_entity_id)
+
+    case field_type
     when 'text'
       value || value_text
     when 'dropdown'
