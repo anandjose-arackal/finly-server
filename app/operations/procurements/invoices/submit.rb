@@ -9,10 +9,16 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
     }
   end
 
+  def rollback_process_if_error?
+    true
+  end
+
   def init
     invoice_id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
     self.invoice = user.company.inward_invoices.scope_all_except_voided.find_by id: invoice_id
     self.procurement = self.invoice&.procurement
+
+    fetch_budget_contributions(invoice)
   end
 
   def validate
@@ -32,22 +38,6 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
     if receiving_account&.disabled
       add_message :error, "This invoice has a bank account which is disabled. Payment can only be processed to active bank accounts."
       return
-    end
-
-    # checking for configuration on whether this particular company
-    # has budgeting enforced or not
-    # this will apply only if this invoice is part of a non-PO
-    if self.invoice.procurement&.non_po_procurement?
-      if user.company.enforce_budget_configuration.enforce_invoice_budget? && self.invoice.items.present?
-        op = BudgetManager::BudgetsCalculator::ApplicableBudgets.({document: self.invoice, current_user: User.first})
-        if op.success?
-          self.budgets = op["result"][:budgets]
-        end
-      end
-      if user.company.enforce_budget_configuration.enforce_invoice_budget? && self.budgets.blank?
-        add_message :error, "You cannot submit this Invoice because there are no budgets associated with it"
-        return
-      end
     end
 
     # Set validation of DLRMs
@@ -91,7 +81,13 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
   end
 
   def post_process
-    budget_limit_validation( invoice )
+    # Budget check
+    budget_validation_op = budget_limit_validation(invoice)
+    if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+      add_message :error, budget_validation_op.messages[:errors]
+      return
+    end
+
     update_agreement_available_limit
     role_id = self.workflow_output[:role_id]
     Event::EInvoice::Submit.(user, {invoice: invoice, workflow_output: workflow_output, role_id: role_id})

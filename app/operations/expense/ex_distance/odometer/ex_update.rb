@@ -30,6 +30,10 @@ class Expense::ExDistance::Odometer::ExUpdate < Expense::ExDistance::Update
     end
   end
 
+  def rollback_process_if_error?
+    true
+  end
+
   def init
     id = (params[:expense_id] or params[:id])
     self.expense = Expense::Index.(user, params)&.expenses&.find_by(id: id)
@@ -83,6 +87,8 @@ class Expense::ExDistance::Odometer::ExUpdate < Expense::ExDistance::Update
       self.cash_pocket = user.user_pockets.cash_pockets_only.first
     end
     self.updated_expense_params[:spent_from_id] = self.cash_pocket&.id
+
+    fetch_budget_contributions(expense)
   end
 
   def validate
@@ -121,7 +127,13 @@ class Expense::ExDistance::Odometer::ExUpdate < Expense::ExDistance::Update
   end
 
   def post_process
-    budget_limit_validation( expense )
+    # Budget check
+    budget_validation_op = budget_limit_validation(expense)
+    if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+      add_message :error, budget_validation_op.messages[:errors]
+      return
+    end
+
     # add comment in report if expense is added within report
     Reports::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
 

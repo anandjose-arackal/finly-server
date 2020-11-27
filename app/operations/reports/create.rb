@@ -85,7 +85,7 @@ class Reports::Create < Reports::Base
                                          company_id: user.company_id,
                                          created_by: delegated_action_user
     report.skip_customizable_validation = true # As validation breaks the creation and loading of report, prevent it during creation
-    ActiveRecord::Base.transaction do
+    ActiveRecord::Base.transaction(requires_new: true) do
     if report.save
       # report.tracks.create action_user: for_user,
       #                      action_user_role_id: role_id,

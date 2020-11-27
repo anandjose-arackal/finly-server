@@ -1,5 +1,5 @@
 class Expense::Base < BaseOperation
-  attr_accessor :expense, :per_diem, :cash_pocket, :violations
+  attr_accessor :expense, :per_diem, :cash_pocket, :violations, :budget_contributions_before_update
 
   def authorized_user_types
     [:employee, :manager, :admin, :finance_manager]
@@ -169,12 +169,16 @@ class Expense::Base < BaseOperation
     false
   end
 
-  def budget_limit_validation expense
-    if user.company.feature_subscription.enforce_budget_limit
-      op = BudgetManager::BudgetLimitValidator::ValidateExpense.(user,{ expense: expense })
-      if op.messages[:error].present?
-        return add_message :error, op.messages[:error]
-      end
+  def fetch_budget_contributions(expense)
+    if user.company.enforce_budget_configuration.enforce_expense_budget?
+      op = BudgetManager::BudgetLimitValidator::Expense.({ expense: expense, ignore_unbudgetables: true, current_user: user })
+      self.budget_contributions_before_update = op['result'][:budget_contributions] rescue {}
+    end
+  end
+
+  def budget_limit_validation(expense)
+    if user.company.enforce_budget_configuration.enforce_expense_budget?
+      return BudgetManager::BudgetLimitValidator::Expense.({ expense: expense, previous_budget_contributions: self.budget_contributions_before_update, current_user: user })
     end
   end
 

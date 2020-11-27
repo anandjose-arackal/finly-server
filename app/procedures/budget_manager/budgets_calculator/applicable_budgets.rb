@@ -177,6 +177,15 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
       else
         dates << document.created_at.to_date
       end
+    when "Expense"
+      case date_type_id
+      when BudgetDateType.id_for(:entity_date)
+        dates += document.date
+      when BudgetDateType.id_for(:entity_submitted_at)
+        dates << (document.report&.submitted_at&.to_date || document.created_at.to_date)
+      else
+        dates << document.created_at.to_date
+      end
     when "Invoice"
       case date_type_id
       when BudgetDateType.id_for(:entity_date)
