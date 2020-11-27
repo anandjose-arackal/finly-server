@@ -40,22 +40,6 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
       return
     end
 
-    # checking for configuration on whether this particular company
-    # has budgeting enforced or not
-    # this will apply only if this invoice is part of a non-PO
-    if self.invoice.procurement&.non_po_procurement?
-      if user.company.enforce_budget_configuration.enforce_invoice_budget? && self.invoice.items.present?
-        op = BudgetManager::BudgetsCalculator::ApplicableBudgets.({document: self.invoice, current_user: User.first})
-        if op.success?
-          self.budgets = op["result"][:budgets]
-        end
-      end
-      if user.company.enforce_budget_configuration.enforce_invoice_budget? && self.budgets.blank?
-        add_message :error, "You cannot submit this Invoice because there are no budgets associated with it"
-        return
-      end
-    end
-
     # Set validation of DLRMs
     dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::Validate.(user, {
         reviewal_document: self.invoice,

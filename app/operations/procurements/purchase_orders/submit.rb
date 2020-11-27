@@ -32,19 +32,6 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
       return
     end
 
-    # checking for configuration on whether this particular company
-    # has budgeting enforced or not
-    if current_company.enforce_budget_configuration.enforce_purchase_order_budget? && self.purchase_order.items.present?
-      op = BudgetManager::BudgetsCalculator::ApplicableBudgets.({document: self.purchase_order, current_user: User.first})
-      if op.success?
-        self.budgets = op["result"][:budgets] rescue []
-      end
-    end
-    if current_company.enforce_budget_configuration.enforce_purchase_order_budget? && self.budgets.blank?
-      add_message :error, "You cannot submit this PO because there are no budgets associated with it"
-      return
-    end
-
 
     # Set validation of DLRMs
     dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::Validate.(user, {
