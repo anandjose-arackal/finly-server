@@ -18,6 +18,8 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
     purchase_order_id = params[:id] || params[:purchase_order_id]
     self.purchase_order = user.company.purchase_orders.find_by id: purchase_order_id
     self.procurement = self.purchase_order&.procurement
+
+    fetch_budget_contributions(purchase_order)
   end
 
   def validate

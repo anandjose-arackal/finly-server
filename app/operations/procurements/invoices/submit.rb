@@ -17,6 +17,8 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
     invoice_id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
     self.invoice = user.company.inward_invoices.scope_all_except_voided.find_by id: invoice_id
     self.procurement = self.invoice&.procurement
+
+    fetch_budget_contributions(invoice)
   end
 
   def validate
