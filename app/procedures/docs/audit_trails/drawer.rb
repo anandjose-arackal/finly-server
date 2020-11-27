@@ -29,7 +29,7 @@ class Docs::AuditTrails::Drawer < Drawer::API
         item_exposure.changes.each do |key,value|
         change value: value, label: key.to_s;
         end }
-      dynamic_block = block(block_key: "change_block_#{k}".to_sym , label: record_exposure.item_type_label, icon: "icon_url", &proc)
+      dynamic_block = block(block_key: "change_block_#{k}".to_sym , label: item_exposure.item_type_label, icon: "icon_url", &proc)
       data_provider = data_provider(user, item, item_exposure)
       map << dynamic_block.build(data_provider, user, item, item_exposure)
     end
