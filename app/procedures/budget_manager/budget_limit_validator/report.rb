@@ -1,7 +1,7 @@
 class BudgetManager::BudgetLimitValidator::Report < BudgetManager::BudgetLimitValidator::Base
 
   attr_accessor :report
-  
+
   def initialize!(options, **)
     self.report = options[:report]
 
