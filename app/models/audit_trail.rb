@@ -51,6 +51,8 @@ class AuditTrail < PaperTrail::Version
     case klass.to_s
     when "Amount"
       value = klass.find_by_id(identifier)&.value
+    when  "ReviewalLevel"
+      value = klass.find_by_id(identifier)&.level_number
     else
       value = klass.find_by_id(identifier)&.try(:name)
     end
