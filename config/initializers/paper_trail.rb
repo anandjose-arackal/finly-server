@@ -1,4 +1,4 @@
-PaperTrail.config.track_associations = true
+#PaperTrail.config.track_associations = true
 PaperTrail.config.enabled = true
 #PaperTrail.config.object_changes_adapter = {
 #                                                "delivery_location_id" => [2, 1],

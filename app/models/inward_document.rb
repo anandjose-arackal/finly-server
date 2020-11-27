@@ -41,6 +41,8 @@ class InwardDocument < ApplicationRecord
 
   has_many :trails, as: :parent
 
+  has_paper_trail
+
   accepts_nested_attributes_for :items
 
 

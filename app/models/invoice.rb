@@ -243,6 +243,8 @@ class Invoice < ApplicationRecord
   has_many :credit_note_adjustments, dependent: :destroy
   has_many :credit_notes, through: :credit_note_adjustments
 
+  has_paper_trail
+
 
   accepts_nested_attributes_for :address
   accepts_nested_attributes_for :invoice_attachments, allow_destroy: true

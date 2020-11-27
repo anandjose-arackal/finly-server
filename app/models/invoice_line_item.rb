@@ -91,6 +91,8 @@ class InvoiceLineItem < ApplicationRecord
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 
+  has_paper_trail
+
   delegate :goods?, :service?, to: :inventory_line_item, allow_nil: true
 
   # #### Fixme: These associations are deprecated to support amount number fields with the same name.
