@@ -57,10 +57,10 @@ class BudgetManager::BudgetLimitValidator::Payment < BudgetManager::BudgetLimitV
         budget_contributions[budget.id] = trails_amount
         spent_amount += trails_amount
         spent_amount -= previous_budget_contributions[budget.id] || 0
-      end
 
-      if spent_amount > budget_amount or budget_amount == 0
-        add_message(options, :error, :base, "Payment Amount exceeding Budget - #{budget_criteria.name}")
+        if spent_amount > budget_amount or budget_amount == 0
+          add_message(options, :error, :base, "Payment Amount exceeding Budget - #{budget_criteria.name}")
+        end
       end
     end
 
