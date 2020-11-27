@@ -48,7 +48,7 @@ class Docs::AuditTrails::Index < IndexBuilder::API
   counter -> (user, collection) do
     # Use custom scope to support awaiting approval status
     counter = IndexBuilder::Counter.new
-    counter.add nil, "All", collection.count
+    counter.add nil, "All", collection.count&.count
     counter
   end
 
