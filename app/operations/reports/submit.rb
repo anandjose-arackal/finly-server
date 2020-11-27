@@ -12,6 +12,10 @@ class Reports::Submit < Reports::Base
     [:employee]
   end
 
+  def rollback_process_if_error?
+    true
+  end
+
   def pre_validate
     if params.blank?
       add_message :error, 'Error loading configuration'
@@ -25,7 +29,8 @@ class Reports::Submit < Reports::Base
   def init
     id = (params[:report_id] or params[:id])
     self.report = user.reports.find_by(id: id)
-    self.budgets = []
+
+    fetch_budget_contributions(report)
   end
 
   def validate
@@ -148,6 +153,13 @@ class Reports::Submit < Reports::Base
   end
 
   def post_process
+    # Budget check
+    budget_validation_op = budget_limit_validation(report)
+    # byebug
+    if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+      add_message :error, budget_validation_op.messages[:errors]
+      return
+    end
 
     # Creating Email Authorization
 
