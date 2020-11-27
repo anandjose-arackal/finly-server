@@ -215,7 +215,7 @@ class PurchaseRequestItem < ApplicationRecord
     # else
     #   BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(self)
     # end
-    if self.purchase_request.draft? || self.purchase_request.rejected? || self.purchase_request.retracted? || self.purchase_request.cancelled?
+    if self.purchase_request.rejected? || self.purchase_request.cancelled?
       BudgetManager::BudgetsCalculator::Calculate::PurchaseRequestItemsBudgetsProcessor.new.destroy_trail(self)
     else
       BudgetManager::BudgetsCalculator::Calculate::PurchaseRequestItemsBudgetsProcessor.new.save_trail(self)

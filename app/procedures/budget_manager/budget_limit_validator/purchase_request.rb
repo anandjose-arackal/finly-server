@@ -41,7 +41,7 @@ class BudgetManager::BudgetLimitValidator::PurchaseRequest < BudgetManager::Budg
       if budget.purchase_request
         op = BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer.({budget: budget, current_user: User.first, calculate_buckets: false, calculate_trail_items: true})
 
-        trails = op['result'][:budget_trails].where(entity: purchase_request)
+        trails = op['result'][:budget_trails].where(entity: purchase_request.items)
 
         if self.ignore_unbudgetables
           trails = trails.without_entity_status_id(PurchaseRequestStatus.status_ids_for_unbudgetables)

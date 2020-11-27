@@ -475,7 +475,7 @@ include Searchkick::Api
   end
 
   def budget_trail_entry
-    if self.draft? || self.rejected? || self.retracted? || self.cancelled?
+    if self.rejected? || self.cancelled?
       # this will delete the trails of all the items within this particular purchase order
       self.items.each do |item|
         BudgetManager::BudgetsCalculator::Calculate::PurchaseRequestItemsBudgetsProcessor.new.destroy_trail(item)
