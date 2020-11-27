@@ -11,10 +11,14 @@ class AuditTrailExposure < Exposures::API
   attribute :created_at, record_attribute: true
   attribute :transaction_id, record_attribute: true
   attribute :changes do
-    record.changeset.to_s
+    record.get_change_statement
   end
 
   attribute :changes_less do
     record.changes_less
+  end
+
+  attribute :item_type_label do
+    "#{record.item_type} Changes"
   end
 end
