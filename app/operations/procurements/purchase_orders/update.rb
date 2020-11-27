@@ -246,7 +246,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
   def process
     # begin
-      ActiveRecord::Base.transaction do
+      ActiveRecord::Base.transaction(requires_new: true) do
         purchase_order.assign_attributes(purchase_order_params)
         if purchase_order.valid?
           update_purchase_request_item_status
