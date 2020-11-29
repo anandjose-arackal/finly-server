@@ -7,7 +7,7 @@ module FormsHelper
 
   def entity_data(model, form_entity)
     form_data = {}
-    if form_entity.entities.present?
+    if form_entity.class.collection?
       collection_models = (model.respond_to?(form_entity.entity_key) && model.send(form_entity.entity_key)) || []
       collection_data = collection_models.map do |collection_model|
         if collection_model.respond_to?(:forms_extra_data)
@@ -19,6 +19,17 @@ module FormsHelper
         end
       end
       form_data.merge!(form_entity.entity_key => collection_data)
+    elsif form_entity.entities.present?
+      form_entity.entities.each do |entity|
+        if entity.system_field && model.respond_to?(entity.entity_key)
+          form_data.merge!({entity.entity_key => model.send(entity.entity_key)})
+        else
+          if model.respond_to?(:form_custom_fields)
+            value = model.form_custom_fields.joins(:form_entity).where("form_entities.entity_key = ?", entity.entity_key).first&.retrieve_value
+            form_data.merge!({entity.entity_key => value})
+          end
+        end
+      end
     else
       if form_entity.system_field && model.respond_to?(form_entity.entity_key)
         form_data.merge!({form_entity.entity_key => model.send(form_entity.entity_key)})

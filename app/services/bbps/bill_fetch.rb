@@ -161,6 +161,7 @@ class Bbps::BillFetch < Bbps::Api
     customer_param_for(:customer_param_5)
   end
 
+
   def self.handle_success(result)
     # customer_bbps_name, :amount, :bill_date, :due_date, :bill_number, :bill_period, :convenience_fee,
     # :convenience_fee_desc, :late_payment_fee, :early_payment_fee

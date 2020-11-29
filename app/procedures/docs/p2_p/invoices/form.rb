@@ -9,92 +9,83 @@ class Docs::P2P::Invoices::Form < Forms::API
           item_discount_amount: "{{ row.item_gross_amount | times: row.discount | divided_by: 100 }}",
           item_taxable_amount: "{{ row.item_gross_amount | minus: row.item_discount_amount }}",
           item_tax_amount: "{{ row.item_taxable_amount | times: row.tax_percentage | divided_by: 100 }}",
-          item_tds_amount: %Q(
-          {% if row.tds_applicable == true %}
-            {{ row.item_taxable_amount | times: form.tds_percentage | divided_by: 100 }}
-          {% else %}
-            {{ 0 }}
-          {% endif %}
-        ),
+          item_tds_amount: "\
+          {% if row.tds_applicable == true %}\
+            {{ row.item_taxable_amount | times: form.tds_percentage | divided_by: 100 }}\
+          {% else %}\
+            {{ 0 }}\
+          {% endif %}\
+          ",
           item_net_amount: "{{ row.item_taxable_amount | plus: row.item_tax_amount | minus: row.item_tds_amount }}",
           item_billable_amount: %Q()
       },
       # INVOICE SUMMARY
       summary: {
-          invoice_gross_amount: %Q(
-        {% assign gross_amount = 0 %}
-        {% for item in form.items %}
-          {% assign gross_amount = gross_amount | plus: item.item_gross_amount %}
-        {% endfor %}
-        {{ gross_amount }}
-      ),
-
-          invoice_discount_amount: %Q(
-        {% assign discount_amount = 0 %}
-        {% for item in form.items %}
-          {% assign discount_amount = discount_amount | plus: item.item_discount_amount %}
-        {% endfor %}
-        {{ discount_amount }}
-      ),
-
+          invoice_gross_amount: "{% assign gross_amount = 0 %}{% for item in form.items %}{% assign gross_amount = gross_amount | plus: item.item_gross_amount %}{% endfor %}{{ gross_amount }}",
+          # invoice_gross_amount: "\
+          #   {% assign gross_amount = 0 %}\
+          #   {% for item in form.items %}\
+          #     {% assign gross_amount = gross_amount | plus: item.item_gross_amount %}\
+          #   {% endfor %}\
+          #   {{ gross_amount }}\
+          # ",
+          invoice_discount_amount: "\
+            {% assign discount_amount = 0 %}\
+            {% for item in form.items %}\
+              {% assign discount_amount = discount_amount | plus: item.item_discount_amount %}\
+            {% endfor %}\
+            {{ discount_amount }}\
+          ",
           invoice_taxable_amount: "{{ form.invoice_gross_amount | minus: form.invoice_discount_amount }}",
+          invoice_tax_amount: "\
+            {% assign tax_amount = 0 %}\
+            {% for item in form.items %}\
+              {% assign tax_amount = tax_amount | plus: item.item_tax_amount %}\
+            {% endfor %}\
+            {{ tax_amount }}\
+          ",
+          invoice_tds_amount: "\
+            {% assign tds_amount = 0 %}\
+            {% for item in form.items %}\
+              {% assign tds_amount = tax_amount | plus: item.item_tds_amount %}\
+            {% endfor %}\
+            {{ tds_amount }}\
+          ",
 
-          invoice_tax_amount: %Q(
-        {% assign tax_amount = 0 %}
-        {% for item in form.items %}
-          {% assign tax_amount = tax_amount | plus: item.item_tax_amount %}
-        {% endfor %}
-        {{ tax_amount }}
-      ),
-
-          invoice_tds_amount: %Q(
-        {% assign tds_amount = 0 %}
-        {% for item in form.items %}
-          {% assign tds_amount = tax_amount | plus: item.item_tds_amount %}
-        {% endfor %}
-        {{ tds_amount }}
-      ),
-
-          invoice_sub_total_amount: %Q(
-        {{ form.invoice_gross_amount |
-            minus: form.invoice_discount_amount |
-            plus: form.invoice_tax_amount |
-            minus: form.invoice_tds_amount |
-            plus: form.invoice_freight_amount
-        }}
-      ),
+          invoice_sub_total_amount: "\
+            {{ form.invoice_gross_amount |\
+                minus: form.invoice_discount_amount |\
+                plus: form.invoice_tax_amount |\
+                minus: form.invoice_tds_amount |\
+                plus: form.invoice_freight_amount\
+            }}\
+          ",
 
           # todo - Issue : Roundoff should be automatically calulated everytime user inputs something, even if its the round off itself
-          invoice_roundoff_amount: %Q(
-        {% assign amount = form.invoice_sub_total_amount | round %}
-        {{amount | minus: form.invoice_sub_total_amount}}
-      ),
+          invoice_roundoff_amount: "\
+            {% assign amount = form.invoice_sub_total_amount | round %}\
+            {{amount | minus: form.invoice_sub_total_amount}}\
+          ",
 
-          invoice_total_amount: %Q(
-        {{ form.invoice_sub_total_amount | plus: form.invoice_roundoff_amount }}
-      ),
+          invoice_total_amount: "{{ form.invoice_sub_total_amount | plus: form.invoice_roundoff_amount }}",
 
-          invoice_net_total_amount: %Q(
-        {{ form.invoice_total_amount |
-          minus: form.invoice_paid_outside_amount |
-          minus: invoice_advance_paid_amount
-        }}
-      ),
+
+          invoice_net_total_amount: "{{ form.invoice_total_amount | minus: form.invoice_paid_outside_amount | minus: invoice_advance_paid_amount}}",
+
 
           # todo - will be shown on top of invoice and needs separate calculation
-          invoice_balance_due_amount: %Q(
-        {{ form.total_amount | minus: form.advance_paid_amount }}
-      )
-    }
+          invoice_balance_due: "{{ form.total_amount | minus: form.advance_paid_amount }}"
+
+      }
   }
 
   # INVOICE STATUS
   section :status do
-    dropdown :invoice_status_id,
-             choices_scope: Choices[:enum].(InwardInvoiceStatus),
-             required: false, editable: false,
-             default_value: InwardInvoiceStatus.id_for(:open),
-             can_editable_be_changed: false
+    lookup :invoice_status_id,
+           choices_scope: Choices[:enum].(InwardInvoiceStatus),
+           required: false, editable: false,
+           default_value: InwardInvoiceStatus.id_for(:open),
+           can_editable_be_changed: false
   end
 
   # INVOICE DETAILS
@@ -113,11 +104,12 @@ class Docs::P2P::Invoices::Form < Forms::API
          required: true,
          restriction: 'not_in_the_future'
 
-    dropdown :payment_term_id,
-             label: "Payment Term",
-             visible: false, required: false,
-             choices_scope: Choices[:lookup].('payment_terms'),
-             can_choices_be_changed: false, default_value: false
+    lookup :payment_term_id,
+           choices_scope: Choices[:lookup].('payment_terms'),
+           label: "Payment Term",
+           visible: false, required: false
+
+    # can_choices_be_changed: false, default_value: false
     date :due_date
 
     dropdown :cost_allocation_items, choices_scope: Choices[:list].({id: false, name: "Header"}, {id: true, name: "Line Item"}),
@@ -134,7 +126,7 @@ class Docs::P2P::Invoices::Form < Forms::API
     lookup :department_id, label: "Department", choices_scope: Choices[:lookup].('departments') #, editable: false, visible: false
     lookup :cost_center_id, label: "Cost Center", choices_scope: Choices[:lookup].('cost_centers')
     date :conversion_date, label: "Conversion Date",
-         required: true,
+         # required: true,
          computed: Forms::Compute::Form('{{form.date}}')
     currency :reporting_currency, label: "Reporting Currency"
     currency :base_currency, label: "Base Currency", visible: false, editable: false, can_editable_be_changed: false # todo populate with system base currency
@@ -147,7 +139,8 @@ class Docs::P2P::Invoices::Form < Forms::API
 
   # VENDOR DETAILS
   section :vendor_details, title: "Vendor Details" do
-    lookup :vendor_id, label: "Vendor", choices_scope: Choices[:lookup].('vendors'), required: true
+    lookup :vendor_id, label: "Vendor", choices_scope: Choices[:lookup].('vendors'), required: true, editable: false,
+           can_editable_be_changed: false, can_be_disabled: false, can_required_be_changed: false, can_visible_be_changed: false
     text :vendor_sequence_id, "Vendor ID", editable: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.vendor_id}}')
 
     #  text :pan, editable: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.pan}}')
@@ -179,7 +172,7 @@ class Docs::P2P::Invoices::Form < Forms::API
 
   # INVOICE ITEMS
   section :items do
-    table :items, populate_if_empty: InvoiceLineItem do
+    table :items, min_items: 1, populate_if_empty: InvoiceLineItem do
       number :id, visible: false, editable: false, internal: true, can_visible_be_changed: false, can_editable_be_changed: false
 
       lookup :inventory_line_item_id, label: "Item",
@@ -195,10 +188,10 @@ class Docs::P2P::Invoices::Form < Forms::API
       text :comment, label: "Narration"
       text :item_number, label: "Item Code", editable: false, computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.item_code}}')
 
-      dropdown :product_type_id, label: "Product Type", choices_scope: Choices[:enum].(ProductType), editable: false, computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.product_type_id}}')
-      dropdown :department_id, label: "Department", editable: false, visible: false, choices_scope: Choices[:lookup].('departments'), computed: Forms::Compute::Form('{{form.department_id}}')
-      dropdown :cost_center_id, label: "Const Center", editable: false, visible: false, choices_scope: Choices[:lookup].('cost_centers'), computed: Forms::Compute::Form('{{form.cost_center_id}}')
-      dropdown :category_id, label: "Category", visible: false, editable: false, choices_scope: Choices[:lookup].('categories'), required: true, computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.category_id}}')
+      lookup :product_type_id, label: "Product Type", choices_scope: Choices[:enum].(ProductType), editable: false, computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.product_type_id}}')
+      lookup :department_id, label: "Department", editable: false, visible: false, choices_scope: Choices[:lookup].('departments'), computed: Forms::Compute::Form('{{form.department_id}}')
+      lookup :cost_center_id, label: "Const Center", editable: false, visible: false, choices_scope: Choices[:lookup].('cost_centers'), computed: Forms::Compute::Form('{{form.cost_center_id}}')
+      lookup :category_id, label: "Category", visible: false, editable: false, choices_scope: Choices[:lookup].('categories'), required: false, computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.category_id}}')
 
       text :gl_code, label: "GL Code", editable: false, visible: false, computed: Forms::Compute::Lookup('items.category_id', '{{record.gl_code}}')
       text :hsn_sac, label: "SAC/HSN", editable: false, visible: false, computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.hsn_sac}}')
@@ -245,7 +238,7 @@ class Docs::P2P::Invoices::Form < Forms::API
              can_visible_be_changed: false,
              can_editable_be_changed: false
 
-      dropdown :tax_rate_id, label: "Tax Rate", choices_scope: Choices[:lookup].('tax_rates'), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.tax_rate_id}}')
+      lookup :tax_rate_id, label: "Tax Rate", choices_scope: Choices[:lookup].('tax_rates'), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.tax_rate_id}}')
 
       # tax # tax percentage
       number :tax_percentage, editable: false, visible: false, computed: Forms::Compute::Lookup('items.tax_rate_id', '{{record.rate}}')
@@ -320,7 +313,7 @@ class Docs::P2P::Invoices::Form < Forms::API
              can_editable_be_changed: false
 
 
-      dropdown :tds_slab_id, choices_scope: Choices[:lookup].('tds_slabs') # todo - condition when reporting currency is in INR
+      lookup :tds_slab_id, choices_scope: Choices[:lookup].('tds_slabs') # todo - condition when reporting currency is in INR
       number :tds_percentage, internal: true, editable: false, # todo - condition when reporting currency is in INR
              can_editable_be_changed: false,
              computed: Forms::Compute::Lookup('items_summary.tds_slab_id', '{{record.rate}}')
@@ -351,7 +344,7 @@ class Docs::P2P::Invoices::Form < Forms::API
              can_visible_be_changed: false,
              can_editable_be_changed: false
 
-      amount :total_amount, editable: false, visible: true,
+      amount :invoice_total_amount, editable: false, visible: true,
              can_editable_be_changed: false,
              can_visible_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_total_amount])
@@ -377,9 +370,9 @@ class Docs::P2P::Invoices::Form < Forms::API
       amount :invoice_net_total_amount_converted, editable: false,
              can_editable_be_changed: false
 
-      amount :invoice_balance_due_amount, label: "Balance Payable", editable: false,
+      amount :invoice_balance_due, label: "Balance Payable", editable: false,
              can_editable_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_balance_due_amount])
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_balance_due])
       amount :invoice_advance_paid_amount_converted, editable: false, visible: false,
              can_visible_be_changed: false,
              can_editable_be_changed: false
@@ -394,11 +387,11 @@ class Docs::P2P::Invoices::Form < Forms::API
   # If reporting currency & base currency are same, then hide conversion_rate
 
   # VALIDATIONS
-  # validation validation_id: "Invoice Date Cannot be Later than Due Date" do
-  #   reference 'due_date'
-  #   error_message "Invoice Due Date must be After Invoice Date"
-  #   rule Rules::Builder['due_date'].lt(entity: "date")
-  # end
+  validation validation_id: "Invoice Date Cannot be Later than Due Date" do
+    reference 'due_date'
+    error_message "Invoice Due Date must be After Invoice Date"
+    rule Rules::Builder['due_date'].lt(entity: "date")
+  end
 
   # validation validation_id: "Advance Amount cannot be greater than total amount" do
   #   reference 'advance_paid_amount'

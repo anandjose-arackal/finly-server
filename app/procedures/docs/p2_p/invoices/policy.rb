@@ -5,7 +5,10 @@ class Docs::P2P::Invoices::Policy < ApplicationPolicy
   end
 
   def show?
-    user.present?
+    user.present? &&
+        user.company.id == record.company_id
+
+    # todo - I2P check invoice permissions `app/operations/procurements/invoices/show.rb`
   end
 
   def update?
