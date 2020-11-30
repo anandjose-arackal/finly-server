@@ -18,7 +18,15 @@ class ActionManager::Actions::Export < ActionManager::Action
         resource: record.resource,
       }
     end
-    old_exports + new_exports
+
+    if ExportManagerToggle.new(User.first).templates_enabled?
+      old_exports = old_exports.filter do |record|
+        !record[:has_template]
+      end
+      new_exports + old_exports
+    else
+      old_exports
+    end
   end
 
 end
