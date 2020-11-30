@@ -10,9 +10,9 @@ class Masters::ExportTemplates::Contract < Reform::Form
   property :created_by_id, validates: { presence: true }
   property :company_id, validates: { presence: true }
 
-  collection :role_mappings, populate_if_empty: ExportTemplateUserRoleMapping do
-    property :user_role_id, validates: {presence: true}
-  end
+  # collection :role_mappings, populate_if_empty: ExportTemplateUserRoleMapping do
+  #   property :user_role_id, validates: {presence: true}
+  # end
 
   validate :validate_template
 
