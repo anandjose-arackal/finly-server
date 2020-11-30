@@ -8,7 +8,11 @@ class Masters::ExportTemplates::Policy < ApplicationPolicy
   end
 
   def update?
-    @record.created_by == @user
+    if @record.created_by.present?
+      @record.created_by == @user
+    else
+      @user.admin?
+    end
   end
 
   def default?
