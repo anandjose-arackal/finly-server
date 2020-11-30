@@ -7,9 +7,9 @@ class ExportManager::Template::TemplateExport < ExportManager::API
   end
 
   # TODO: remove this function
-  def self.sync
-    true
-  end
+  # def self.sync
+  #   true
+  # end
 
   def build_name
     export_template.name
