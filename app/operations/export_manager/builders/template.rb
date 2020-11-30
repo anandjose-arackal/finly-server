@@ -40,15 +40,25 @@ class ExportManager::Builders::Template
     }
   end
 
-  def self.update_template!
-    Company.find_each do |company|
-      ExportTemplateNew.where(company_id: company.id, master: master, modified: false).find_each do |export_template|
-        export_template.role_mappings.destroy_all
-        data = build
-        user_roles = data.delete(:user_roles)
-        export_template.update(**data)
-        export_template.role_mappings.create!(user_roles)
+  def self.create_or_update_template!(company)
+    existing_template = ExportTemplateNew.where(master: master, company_id: company.id).first
+    data = build
+    user_roles = data.delete(:user_roles)
+    if existing_template.present?
+      unless existing_template.modified
+        existing_template.role_mappings.destroy_all
+        existing_template.update!(**data)
+        existing_template.role_mappings.create!(user_roles)
       end
+    else
+      export_template = ExportTemplateNew.create!(**data, company_id: company.id)
+      export_template.role_mappings.create!(user_roles)
+    end
+  end
+
+  def self.update_template_for_all!
+    Company.find_each do |company|
+      create_or_update_template!(company)
     end
   end
 end
