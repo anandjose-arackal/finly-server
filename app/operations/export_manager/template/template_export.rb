@@ -11,6 +11,10 @@ class ExportManager::Template::TemplateExport < ExportManager::API
     true
   end
 
+  def build_name
+    export_template.name
+  end
+
   def input
     if self.export_template.query.present?
       params[:additional_filters] = [self.export_template.query]
