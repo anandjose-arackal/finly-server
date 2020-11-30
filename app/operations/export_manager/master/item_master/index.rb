@@ -1,97 +1,99 @@
 require 'ostruct'
-class ExportManager::Master::ItemMaster::Index < ExportManager::Builders::Template
+class ExportManager::Master::ItemMaster::Index < ExportManager::Builders::Spreadsheet
 
   label 'Export'
   description 'Item Master Export'
-  export_format 'csv'
-  resource 'items'
-  subscribe 'items'
-  default true
+  configurable true
+  system :vp
+  screen 'item_master.index'
+  handle :inventory_items
 
-  attribute :item_number, template: '{{ record.item_number }}'
-  attribute :gl_code, template: '{{ record.item_code }}'
-  attribute :description, template: '{{ record.description }}'
-  attribute :product_type, template: '{{ record.product_type }}'
-  attribute :active, template: '{{ record.active }}'
-  attribute :category, template: '{{ record.category.name }}'
-  attribute :hsn_sac, template: '{{ record.hsn_sac }}'
-  attribute :sku, template: '{{ record.sku }}'
-  attribute :expense_type, template: '{{ record.expense_type }}'
-  attribute :tds_applicable, template: '{{ record.tds_applicable }}'
-  attribute :tax_rate, template: '{{ record.tax_rate.name }} - {{ record.tax_rate.rate }}'
-  attribute :item_rate, template: '{{ record.rate }}'
-  attribute :supply_item_type, template: '{{ record.scope }}'
-  attribute :unit_of_measurement, template: '{{ record.unit_of_measurement }}'
-  attribute :created_user, template: '{{ record.created_by.first_name }} {{ record.created_by.last_name }}'
-  attribute :created_at, template: "{{ record.created_at | date: '%d-%b-%Y' }}"
+  has_template true
 
-  # def input
-  #   resolve('items.default').includes_for_export
-  # end
+  attribute :item_number
+  attribute :gl_code
+  attribute :description
+  attribute :product_type
+  attribute :active
+  attribute :category
+  attribute :hsn_sac
+  attribute :sku
+  attribute :expense_type
+  attribute :tds_applicable
+  attribute :tax_rate
+  attribute :item_rate
+  attribute :supply_item_type
+  attribute :unit_of_measurement
+  attribute :created_user
+  attribute :created_at
 
-  # def item_number(item)
-  #   item.item_number
-  # end
+  def input
+    resolve('items.default').includes_for_export
+  end
 
-  # def gl_code(item)
-  #   item.item_code
-  # end
+  def item_number(item)
+    item.item_number
+  end
 
-  # def description(item)
-  #   item.description
-  # end
+  def gl_code(item)
+    item.item_code
+  end
 
-  # def product_type(item)
-  #   item.product_type&.name&.humanize
-  # end
+  def description(item)
+    item.description
+  end
 
-  # def active(item)
-  #   item.active
-  # end
+  def product_type(item)
+    item.product_type&.name&.humanize
+  end
 
-  # def category(item)
-  #   item.category&.name
-  # end
+  def active(item)
+    item.active
+  end
 
-  # def hsn_sac(item)
-  #   item.hsn_sac
-  # end
+  def category(item)
+    item.category&.name
+  end
 
-  # def sku(item)
-  #   item.sku
-  # end
+  def hsn_sac(item)
+    item.hsn_sac
+  end
 
-  # def unit_of_measurement(item)
-  #   item.unit_of_measurement
-  # end
+  def sku(item)
+    item.sku
+  end
 
-  # def expense_type(item)
-  #   item.item_expense_type&.name&.humanize
-  # end
+  def unit_of_measurement(item)
+    item.unit_of_measurement
+  end
 
-  # def tds_applicable(item)
-  #   item.tds_applicable
-  # end
+  def expense_type(item)
+    item.item_expense_type&.name&.humanize
+  end
 
-  # def tax_rate(item)
-  #   "#{item.tax_rate&.name} - #{item.tax_rate&.rate}"
-  # end
+  def tds_applicable(item)
+    item.tds_applicable
+  end
 
-  # def item_rate(item)
-  #   item.rate
-  # end
+  def tax_rate(item)
+    "#{item.tax_rate&.name} - #{item.tax_rate&.rate}"
+  end
 
-  # def supply_item_type(item)
-  #   item.supply_item_type&.name&.humanize
-  # end
+  def item_rate(item)
+    item.rate
+  end
 
-  # def created_user(item)
-  #   "#{item.user&.first_name} #{item.user&.last_name}"
-  # end
+  def supply_item_type(item)
+    item.supply_item_type&.name&.humanize
+  end
 
-  # def created_at(item)
-  #   item.created_at&.strftime('%d-%b-%Y')
-  # end
+  def created_user(item)
+    "#{item.user&.first_name} #{item.user&.last_name}"
+  end
+
+  def created_at(item)
+    item.created_at&.strftime('%d-%b-%Y')
+  end
 
 
 end
