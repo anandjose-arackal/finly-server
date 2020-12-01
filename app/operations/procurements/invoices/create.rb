@@ -1,10 +1,6 @@
 class Procurements::Invoices::Create < Procurements::Invoices::Base
   attr_accessor :invoice, :procurement, :invoice_params, :vendor, :template, :inward_invoice_type
 
-  def rollback_process_if_error?
-    true
-  end
-
   def init
     # self.invoice_params = invoice_parameters
     self.procurement = user.company.procurements.find_by id: params[:procurement_id]
