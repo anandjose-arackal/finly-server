@@ -5,6 +5,10 @@
 class Expense::ExCard::Create < Expense::ExCard::Base
   attr_accessor :expense_params
 
+  def rollback_process_if_error?
+    true
+  end
+
   # overriding initialize because the only info available will be the transaction and card
   def initialize(transaction, card, params = {})
     self.messages = []
@@ -42,7 +46,12 @@ class Expense::ExCard::Create < Expense::ExCard::Base
   end
 
   def post_process
-    # mailer to user notifying usage of the card - probably can be merged with transaction mailer
+    # Budget check
+    budget_validation_op = budget_limit_validation(expense)
+    if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+      add_message :error, budget_validation_op.messages[:errors]
+      return
+    end
   end
 
   def success

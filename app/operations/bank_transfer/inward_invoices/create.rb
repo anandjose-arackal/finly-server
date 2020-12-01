@@ -2,6 +2,10 @@ class BankTransfer::InwardInvoices::Create < BankTransfer::InwardInvoices::Base
 
   attr_accessor :inward_invoice, :inward_invoice_parameters, :custom_fields
 
+  def rollback_process_if_error?
+    true
+  end
+
   def init
     self.inward_invoice_parameters = invoice_attributes
     self.custom_fields = params&.dig(:invoice, :custom_fields)
@@ -45,6 +49,13 @@ class BankTransfer::InwardInvoices::Create < BankTransfer::InwardInvoices::Base
   end
 
   def post_process
+    # Budget check
+    budget_validation_op = budget_limit_validation(inward_invoice)
+    if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+      add_message :error, budget_validation_op.messages[:errors]
+      return
+    end
+
     add_message :success, "Invoice successfully created"
   end
 

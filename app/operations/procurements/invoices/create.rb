@@ -1,6 +1,10 @@
 class Procurements::Invoices::Create < Procurements::Invoices::Base
   attr_accessor :invoice, :procurement, :invoice_params, :vendor, :template, :inward_invoice_type
 
+  def rollback_process_if_error?
+    true
+  end
+
   def init
     # self.invoice_params = invoice_parameters
     self.procurement = user.company.procurements.find_by id: params[:procurement_id]
@@ -85,6 +89,13 @@ class Procurements::Invoices::Create < Procurements::Invoices::Base
   end
 
   def post_process
+    # Budget check
+    budget_validation_op = budget_limit_validation(invoice)
+    if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+      add_message :error, budget_validation_op.messages[:errors]
+      return
+    end
+
     add_message :success, 'Successfully added invoice'
   end
 

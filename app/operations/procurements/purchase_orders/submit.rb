@@ -10,10 +10,16 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
     }
   end
 
+  def rollback_process_if_error?
+    true
+  end
+
   def init
     purchase_order_id = params[:id] || params[:purchase_order_id]
     self.purchase_order = user.company.purchase_orders.find_by id: purchase_order_id
     self.procurement = self.purchase_order&.procurement
+
+    fetch_budget_contributions(purchase_order)
   end
 
   def validate
@@ -23,19 +29,6 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
 
     if self.purchase_order.bank_account.disabled
       add_message :error, "This purchase order has a bank account which is disabled. Payment can only be processed to active bank accounts"
-      return
-    end
-
-    # checking for configuration on whether this particular company
-    # has budgeting enforced or not
-    if current_company.enforce_budget_configuration.enforce_purchase_order_budget? && self.purchase_order.items.present?
-      op = BudgetManager::BudgetsCalculator::ApplicableBudgets.({document: self.purchase_order, current_user: User.first})
-      if op.success?
-        self.budgets = op["result"][:budgets] rescue []
-      end
-    end
-    if current_company.enforce_budget_configuration.enforce_purchase_order_budget? && self.budgets.blank?
-      add_message :error, "You cannot submit this PO because there are no budgets associated with it"
       return
     end
 
@@ -81,7 +74,13 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
   end
 
   def post_process
-    budget_limit_validation( purchase_order )
+    # Budget check
+    budget_validation_op = budget_limit_validation(purchase_order)
+    if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+      add_message :error, budget_validation_op.messages[:errors]
+      return
+    end
+
     add_message :success, 'Successfully submitted purchase order'
     # role_id = self.workflow_output[:role_id]
     Event::EPurchaseOrder::Submit.(user, {purchase_order: purchase_order, workflow_output: workflow_output})

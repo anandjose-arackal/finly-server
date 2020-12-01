@@ -68,7 +68,7 @@ class TravelRequests::Update < TravelRequests::Base
       add_message :error, valid.messages[:error]
       return false
     end
-    ActiveRecord::Base.transaction do
+    ActiveRecord::Base.transaction(requires_new: true) do
     if travel_request.save
       # Update money_request DLRMs only when the owner does it
       if travel_request.user_id == user.id && params[:view] == 'personal'

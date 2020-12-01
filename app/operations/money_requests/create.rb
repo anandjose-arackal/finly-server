@@ -86,7 +86,7 @@ class MoneyRequests::Create < MoneyRequests::Base
       money_request.skip_customizable_validation = true # As validation breaks the creation and loading money request, prevent it during creation
     end
     delegated_action_user_id = actual_current_user.present? ? actual_current_user.id : nil
-    ActiveRecord::Base.transaction do
+    ActiveRecord::Base.transaction(requires_new: true) do
     if money_request.save
       money_request.trails.create action_user: user,
                            action_id: TrailAction.id_for(:create),

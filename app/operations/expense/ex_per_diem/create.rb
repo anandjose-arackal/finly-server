@@ -13,6 +13,10 @@ class Expense::ExPerDiem::Create < Expense::ExPerDiem::Base
     }
   end
 
+  def rollback_process_if_error?
+    true
+  end
+
   def authorized_user_types
     [:employee]
   end
@@ -145,6 +149,12 @@ class Expense::ExPerDiem::Create < Expense::ExPerDiem::Base
   end
 
   def post_process
+    # Budget check
+    budget_validation_op = budget_limit_validation(expense)
+    if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+      add_message :error, budget_validation_op.messages[:errors]
+      return
+    end
 
     # calculate amount of the expense
     amount = expense.amount

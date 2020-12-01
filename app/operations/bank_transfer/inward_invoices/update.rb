@@ -12,6 +12,9 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     }
   end
 
+  def rollback_process_if_error?
+    true
+  end
 
   def init
     id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
@@ -52,6 +55,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
     self.policy = Policy::VendorPayments::Index.(current_user, params).policies.find_by(id: self.inward_invoice_params[:policy_id])
 
+    fetch_budget_contributions(inward_invoice)
   end
 
   def validate
@@ -448,7 +452,13 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
   end
 
   def post_process
-    budget_limit_validation( inward_invoice )
+    # Budget check
+    budget_validation_op = budget_limit_validation(inward_invoice)
+    if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+      add_message :error, budget_validation_op.messages[:errors]
+      return
+    end
+
     # update_agreement_available_limit
     add_message :success, "Invoice updated"
   end

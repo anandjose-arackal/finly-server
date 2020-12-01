@@ -12,6 +12,10 @@ class Reports::Submit < Reports::Base
     [:employee]
   end
 
+  def rollback_process_if_error?
+    true
+  end
+
   def pre_validate
     if params.blank?
       add_message :error, 'Error loading configuration'
@@ -25,7 +29,8 @@ class Reports::Submit < Reports::Base
   def init
     id = (params[:report_id] or params[:id])
     self.report = user.reports.find_by(id: id)
-    self.budgets = []
+
+    fetch_budget_contributions(report)
   end
 
   def validate
@@ -65,32 +70,6 @@ class Reports::Submit < Reports::Base
     unless custom_field_validations.success?
       add_message :error, custom_field_validations.messages[:error]
       return
-    end
-
-    # checking for configuration on whether this particular company
-    # has budgeting enforced or not
-    if self.report.expenses.present?
-      # op = BudgetsCalculator::RelevantBudgets.(user, object: self.report)
-      # if op.success?
-      #   self.budgets = op.budget_data
-      # end
-    end
-    if user.company.enforce_budget_configuration.enforce_expense_budget? && self.budgets.empty?
-      add_message :error, "You cannot submit this report because there are no budgets associated with it"
-      return
-    end
-
-    # also checking if the budgets are being exceeded here
-    self.budgets.each do |budget|
-      budget_amount = budget[:budget].budget_amount.value
-      budget_spent_amount = budget[:spent_amount]
-
-      spent_amount = budget_spent_amount
-
-      if spent_amount > budget_amount
-        add_message :error, "Report Amount exceeding Budget - #{budget[:budget].name}"
-        return
-      end
     end
 
     # Set validation of DLRMs
@@ -174,6 +153,13 @@ class Reports::Submit < Reports::Base
   end
 
   def post_process
+    # Budget check
+    budget_validation_op = budget_limit_validation(report)
+    # byebug
+    if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+      add_message :error, budget_validation_op.messages[:errors]
+      return
+    end
 
     # Creating Email Authorization
 
