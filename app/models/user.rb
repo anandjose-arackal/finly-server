@@ -81,7 +81,7 @@ class User < ApplicationRecord
 
   devise :invitable, :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :confirmable, :lockable,
-         :database_authenticatable
+         :database_authenticatable, :pwned_password
 
   # devise :database_authenticatable, :validatable, password_length: 8..128
   # devise :database_authenticatable
