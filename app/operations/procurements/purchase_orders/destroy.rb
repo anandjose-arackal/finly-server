@@ -71,7 +71,6 @@ class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
         end
       else
         po = self.previously_active_po
-        logger.info po
         po.purchase_order_status_id = self.po_previous_status
         if po.save
           update_purchase_request_item
@@ -90,7 +89,7 @@ class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
       self.previously_active_po = self.procurement.reload.purchase_order.revision_of
       ps = self.previously_active_po&.trails.where(action_id: [TrailAction.id_for(:approve), TrailAction.id_for(:auto_approve), TrailAction.id_for(:send_to_vendor), TrailAction.id_for(:vendor_confirmed)])
     end
-    logger.info previously_active_po
+    self.previously_active_po.present?
     ps.last.action_id
   end
 

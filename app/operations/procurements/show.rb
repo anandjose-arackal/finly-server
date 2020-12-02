@@ -40,7 +40,7 @@ class Procurements::Show < Procurements::Base
       self.delivery_challans = self.procurement.delivery_challans
       self.e_way_bills = self.procurement.e_way_bills
       self.po_revisions = self.procurement.po_revisions.where.not(id: purchase_order.id)
-      self.initial_purchase_order = po_revisions.last.revision_of
+      self.initial_purchase_order = po_revisions.last&.revision_of
       self.credit_notes = self.procurement.credit_notes
 
       self.procurement_trail = get_procurement_trail
@@ -126,6 +126,7 @@ class Procurements::Show < Procurements::Base
       documents += self.delivery_challans
       documents += self.e_way_bills
       documents += self.po_revisions
+      documents += self.initial_purchase_order
       documents += self.proforma_invoices
       documents += self.credit_notes
 
