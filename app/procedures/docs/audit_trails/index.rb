@@ -3,6 +3,7 @@ class Docs::AuditTrails::Index < IndexBuilder::API
 
   system_subscription :vp
   permissions :purchase_order_auditor, :po_invoice_auditor, :bank_payment_request_auditor,:admin
+  class_attr :record_count
 
   resolver 'audit_trails.default'
   reference '{{record.transaction_id}}'
@@ -50,6 +51,10 @@ class Docs::AuditTrails::Index < IndexBuilder::API
     counter = IndexBuilder::Counter.new
     counter.add nil, "All", collection.count&.count
     counter
+  end
+
+  record_count -> (collection) do
+    collection.count&.count
   end
 
 end
