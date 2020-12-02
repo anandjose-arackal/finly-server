@@ -126,7 +126,7 @@ class Procurements::Show < Procurements::Base
       documents += self.delivery_challans
       documents += self.e_way_bills
       documents += self.po_revisions
-      documents += self.initial_purchase_order self.initial_purchase_order.present?
+      #   documents += self.initial_purchase_order self.initial_purchase_order.present?
       documents += self.proforma_invoices
       documents += self.credit_notes
 
