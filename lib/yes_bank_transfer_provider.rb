@@ -23,7 +23,7 @@ class YesBankTransferProvider
 
     self.account_number = indifferent_params[:account_number]
     self.ifsc = indifferent_params[:ifsc]
-    company = Company.find_by(id: indifferent_params[:company_id])
+    company = bank_transaction.company
     self.company_id = company&.id
     transfer_request = create_transfer_request("IMPS", bank_transaction.unique_request_number)
     queue = Struct.new(:queue).new(response_handle)
