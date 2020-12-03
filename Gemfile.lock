@@ -824,7 +824,7 @@ DEPENDENCIES
   active_record_query_trace (~> 1.5.4)
   active_storage_validations (~> 0.9.0)
   activerecord-import (~> 1.0, >= 1.0.3)
-  activerecord-mysql-reconnect
+  activerecord-mysql-reconnect (~> 0.5)
   amoeba (~> 3.1.0)
   ancestry (~> 3.0.5)
   annotate (~> 3.1, >= 3.1.1)
