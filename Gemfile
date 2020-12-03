@@ -221,7 +221,7 @@ gem 'sidekiq-logstash', '~> 1.0.1'
 gem 'logstash-logger', '~> 0.26.1'
 
 gem 'ancestry', '~> 3.0.5'
-
+gem 'activerecord-mysql-reconnect', '~> 0.5'
 gem 'aasm', '~> 5.0.1'
 
 gem 'activerecord-import', '~> 1.0', '>= 1.0.3'
