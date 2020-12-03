@@ -91,7 +91,12 @@ class InvoiceLineItem < ApplicationRecord
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 
-  has_paper_trail
+  has_paper_trail(
+      meta: {
+          document_number: :'invoice.invoice_id',
+          parent_document_type: "Invoice"
+      }
+  )
 
   delegate :goods?, :service?, to: :inventory_line_item, allow_nil: true
 

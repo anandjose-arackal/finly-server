@@ -30,6 +30,12 @@ class GstinLocation < ApplicationRecord
   belongs_to :state, class_name: "GstStateCode", optional: true
 
   has_many :form_custom_fields, class_name: 'FormCustomField', as: :document
+  has_paper_trail(
+      meta: {
+          document_number: :'vendor.vendor_id',
+          parent_document_type: "YesBankVendor"
+      }
+  )
 
   # validates :location, presence: true
   # validates :state_id, presence: true, if: :check_vendor_gstin_registered? # todo - I2P : move logic to operations

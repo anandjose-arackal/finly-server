@@ -3,35 +3,11 @@ class AuditTrail < PaperTrail::Version
   include Resolver::ActiveRecordHelper
   include Ransacker
   include SoftDeletable
+  self.abstract_class = true
 
   default_scope {order(created_at: :desc)}
-  before_save :set_document_details
   belongs_to :created_by, optional: true, class_name: "User"
 
-  def set_document_details
-    klass = self.item_type.constantize
-    object = klass.find self.item_id
-    case self.item_type
-    when "PurchaseOrder"
-      self.document_number = object.po_number
-    when "PurchaseOrderItem"
-      oself.document_number = bject.purchase_order.po_number
-    when  "Invoice"
-      self.document_number = object.invoice_id
-    when  "InvoiceLineItem"
-      self.document_number = object.invoice.invoice_id
-    when "PurchaseRequest"
-      self.document_number = object.order_number
-    when "PurchaseRequestItem"
-      self.document_number = object.purchase_request.order_number
-    when "YesBankVendor"
-      self.document_number = object.vendor_id
-    when  "BankAccount"
-      self.document_number = object.account_owner.try(:vendor_id)
-    when "GstinLocation"
-      self.document_number = object.vendor.try(:vendor_id)
-    end
-  end
 
   def changes_less
     self.get_change_statement(less: true).map{|change| "#{change&.first&.to_s&.titlecase} Changed #{(change&.last)&.join(' -> ')}"}&.join(' , ')
@@ -77,6 +53,12 @@ class AuditTrail < PaperTrail::Version
       value = klass.find_by_id(identifier)&.value
     when  "ReviewalLevel"
       value = klass.find_by_id(identifier)&.level_number
+    when  "GstinLocation"
+      value = klass.find_by_id(identifier)&.location
+    when  "YesBanVendor"
+      value = klass.find_by_id(identifier)&.business_name
+    when "BankAccount"
+      value = klass.find_by_id(identifier)&.name
     else
       value = klass.find_by_id(identifier)&.try(:name)&.titlecase
     end
