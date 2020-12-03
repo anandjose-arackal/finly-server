@@ -10,6 +10,8 @@ class AuditTrailExposure < Exposures::API
   attribute :company_id, record_attribute: true
   attribute :created_at, record_attribute: true
   attribute :transaction_id, record_attribute: true
+  attribute :document_number, record_attribute: true
+  attribute :parent_document_type, record_attribute: true
   attribute :changes do
     record.get_change_statement
   end

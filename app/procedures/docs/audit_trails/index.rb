@@ -21,12 +21,16 @@ class Docs::AuditTrails::Index < IndexBuilder::API
     text value: :changes_less , format: "standard"
   end
 
-  column :item_type,  label: "Resources", default: true do
+  column :item_type,  label: "Document Type", default: true do
     text value: :item_type, format: "standard"
   end
 
-  column :item_id,  label: "Record Id", default: true do
-    text value: :item_id, format: "standard"
+  column :document_number,  label: "Document Number", default: true do
+    text value: :document_number, format: "standard"
+  end
+
+  column :parent_document_type,  label: "Parent Document Type", default: true do
+    text value: :parent_document_type, format: "standard"
   end
 
   column :created_by, default: true, label: "User", includes: [:created_by] do
