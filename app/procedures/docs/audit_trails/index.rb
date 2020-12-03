@@ -39,15 +39,15 @@ class Docs::AuditTrails::Index < IndexBuilder::API
   end
 
   column :event,  label: "Action", default: true do
-    text value: :event, format: "standard"
+    text value: "{{record.event.capitalize}}", format: "standard"
   end
 
   column :user_ip, label: "User IP", default: true do
-    text value: :item_type, format: "standard"
+    text value: :user_ip, format: "standard"
   end
 
   column :user_agent, label: "User Agent" do
-    text value: :item_type, format: "standard"
+    text value: :user_agent, format: "standard"
   end
 
   counter -> (user, collection) do

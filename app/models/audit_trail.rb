@@ -3,7 +3,6 @@ class AuditTrail < PaperTrail::Version
   include Resolver::ActiveRecordHelper
   include Ransacker
   include SoftDeletable
-  self.abstract_class = true
 
   default_scope {order(created_at: :desc)}
   belongs_to :created_by, optional: true, class_name: "User"
@@ -20,11 +19,20 @@ class AuditTrail < PaperTrail::Version
     else
       changes = self.changeset rescue {}
     end
+    convert_object_changes_to_hash(changes)
+  end
+
+  private
+  def convert_object_changes_to_hash(changes)
     all_reflections = get_all_reflections
+    klass = self.item_type.constantize
     hash ={}
     changes.each do |k,v|
-       if all_reflections.has_key? k
+      if all_reflections.has_key? k
         hash.merge!(get_value_change(all_reflections[k], v))
+      elsif [:datetime,:date].include? klass.columns_hash[k.to_s].type
+        date_change = v.map{ |date_string| Date.parse(date_string)&.strftime("%d/%m/%Y %H:%M:%S") rescue ""}
+        hash.merge!({k.to_s&.titlecase => date_change})
       else
         hash.merge!({k.to_s&.titlecase => v})
       end
@@ -32,7 +40,6 @@ class AuditTrail < PaperTrail::Version
     hash
   end
 
-  private
   def get_all_reflections
     klass = self.item_type.constantize
     hash = {}
@@ -63,6 +70,14 @@ class AuditTrail < PaperTrail::Version
       value = klass.find_by_id(identifier)&.try(:name)&.titlecase
     end
     value
+  end
+
+  def self.parent_document_types
+    %w( PurchaseRequest
+        PurchaseOrder
+        Invoice
+        YesBankVendor
+      )
   end
 
 end
