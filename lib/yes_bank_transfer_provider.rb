@@ -10,10 +10,20 @@ class YesBankTransferProvider
     queue = Struct.new(:queue).new(response_handle)
 
     indifferent_params = params.with_indifferent_access
-    bank_transaction = YesBankTransaction.find_by(id: indifferent_params[:bank_transaction_id])
+    
+    max_retries = 5
+    bank_transaction = nil
+    
+    while bank_transaction.blank? && max_retries > 0
+      bank_transaction = YesBankTransaction.find_by(id: indifferent_params[:bank_transaction_id])
+      sleep 5.second
+      max_retries -= 1
+    end
+    Rails.logger.fatal bank_transaction
+
     self.account_number = indifferent_params[:account_number]
     self.ifsc = indifferent_params[:ifsc]
-    company = bank_transaction.company
+    company = Company.find_by(id: indifferent_params[:company_id])
     self.company_id = company&.id
     transfer_request = create_transfer_request("IMPS", bank_transaction.unique_request_number)
     queue = Struct.new(:queue).new(response_handle)
