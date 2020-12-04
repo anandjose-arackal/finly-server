@@ -10,7 +10,13 @@ class YesBankTransferProvider
     queue = Struct.new(:queue).new(response_handle)
 
     indifferent_params = params.with_indifferent_access
-    bank_transaction = YesBankTransaction.find_by(id: indifferent_params[:bank_transaction_id])
+    
+    max_retries = 3
+    while (bank_transaction = YesBankTransaction.find_by(id: indifferent_params[:bank_transaction_id])).blank? && max_retries > 0
+      sleep 5.second
+      max_retries -= 1
+    end
+
     self.account_number = indifferent_params[:account_number]
     self.ifsc = indifferent_params[:ifsc]
     company = bank_transaction.company
