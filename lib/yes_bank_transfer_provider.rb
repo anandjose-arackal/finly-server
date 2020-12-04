@@ -22,7 +22,7 @@ class YesBankTransferProvider
 
     if bank_transaction.blank? and indifferent_params[:attempts] <= 5
       indifferent_params[:attempts] += 1
-      YesBankTransferProvider.perform_in(1.minute, response_handle, params)
+      YesBankTransferProvider.perform_in(1.minute, response_handle, indifferent_params)
 
       return
     end
