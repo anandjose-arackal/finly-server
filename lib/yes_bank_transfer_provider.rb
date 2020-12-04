@@ -18,7 +18,7 @@ class YesBankTransferProvider
 
     max_retries = 10
     while (bank_transaction = YesBankTransaction.find_by(id: indifferent_params[:bank_transaction_id])).blank? && max_retries > 0
-      sleep 5.second
+      sleep 1.minute
       max_retries -= 1
     end
 
