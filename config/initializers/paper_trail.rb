@@ -6,7 +6,6 @@ PaperTrail::Version.class_eval do
 
   def set_document_number
     klass = self.item_type.constantize
-    binding.pry
     object = klass.find self.item_id
     case self.item_type
     when "PurchaseOrder"
