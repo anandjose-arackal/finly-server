@@ -16,7 +16,9 @@ class YesBankTransferProvider
     
     while bank_transaction.blank? && max_retries > 0
       bank_transaction = YesBankTransaction.find_by(id: indifferent_params[:bank_transaction_id])
-      sleep 5.second
+      if bank_transaction.blank?
+        sleep 5.second
+      end
       max_retries -= 1
     end
     Rails.logger.fatal bank_transaction
