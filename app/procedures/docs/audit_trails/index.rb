@@ -28,10 +28,7 @@ class Docs::AuditTrails::Index < IndexBuilder::API
   column :document_number,  label: "Document Number", default: true do
     text value: :document_number, format: "standard"
   end
-
-  column :parent_document_type,  label: "Parent Document Type", default: true do
-  end
-
+  
   column :created_by, default: true, label: "User", includes: [:created_by] do
     text value: "{{record.created_by.name}}", format: 'primary'
     text value: "{{record.created_by.email}}"
