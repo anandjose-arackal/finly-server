@@ -44,7 +44,7 @@ class TravelRequests::Create < TravelRequests::Base
   end
 
   def process
-    ActiveRecord::Base.transaction do
+    ActiveRecord::Base.transaction(requires_new: true) do
     if travel_request.save
       # add the custom fields associated with this travel request
       CustomField::SetFields.(self.travel_request, FieldParentType.id_for(:travel_request), reset_fields: true, save: true)

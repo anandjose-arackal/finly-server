@@ -1,6 +1,10 @@
 class Procurements::PurchaseRequests::Create < Procurements::PurchaseRequests::Base
   attr_accessor :purchase_request, :purchase_request_params, :custom_fields
 
+  def rollback_process_if_error?
+    true
+  end
+
   def init
     self.purchase_request_params = purchase_request_parameters
     self.custom_fields = params&.dig(:custom_fields) || params&.dig(:purchase_request, :custom_fields)
@@ -77,6 +81,13 @@ class Procurements::PurchaseRequests::Create < Procurements::PurchaseRequests::B
   end
 
   def post_process
+    # Budget check
+    budget_validation_op = budget_limit_validation(purchase_request)
+    if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+      add_message :error, budget_validation_op.messages[:errors]
+      return
+    end
+
     unless has_errors?
       add_message :success, 'Successfully created purchase request'
     end

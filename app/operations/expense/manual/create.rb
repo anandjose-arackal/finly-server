@@ -18,6 +18,10 @@ class Expense::Manual::Create < Expense::Manual::Base
     }
   end
 
+  def rollback_process_if_error?
+    true
+  end
+
   # only employees can create expenses
   def authorized_user_types
     [:employee]
@@ -150,6 +154,13 @@ class Expense::Manual::Create < Expense::Manual::Base
   end
 
   def post_process
+    # Budget check
+    budget_validation_op = budget_limit_validation(expense)
+    if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+      add_message :error, budget_validation_op.messages[:errors]
+      return
+    end
+
     if expense&.receipt_email.present? and not params[:prevent_email_process]
       Receipt::ReceiptEmails::ProcessEmail.call_async(user, receipt_email_id: self.expense.receipt_email.id)
     end

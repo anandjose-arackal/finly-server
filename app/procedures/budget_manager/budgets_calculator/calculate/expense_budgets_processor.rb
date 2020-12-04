@@ -19,7 +19,7 @@ class BudgetManager::BudgetsCalculator::Calculate::ExpenseBudgetsProcessor < Bud
         location_id: expense.report.location_id,
         date: expense.date,
         entity_created_at: expense.created_at,
-        entity_submitted_at: expense.report.submitted_at,
+        entity_submitted_at: (expense.report.submitted_at || expense.created_at),
         entity_status_id: expense.report.report_status_id,
         reimbursable: expense.reimbursable,
         billed_amount_before_tax_value: expense.amount_before_tax,

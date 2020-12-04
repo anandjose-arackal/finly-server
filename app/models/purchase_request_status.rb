@@ -76,4 +76,18 @@ class PurchaseRequestStatus < ApplicationRecord
   def partially_closed?
     self.id == PurchaseRequestStatus.id_for(:partially_closed)
   end
+
+  # Status IDs for budget trails which are not calculated into budgets
+  def self.status_ids_for_unbudgetables
+    [
+        PurchaseRequestStatus.id_for(:draft),
+        PurchaseRequestStatus.id_for(:retracted),
+        PurchaseRequestStatus.id_for(:rejected),
+        PurchaseRequestStatus.id_for(:closed),
+        PurchaseRequestStatus.id_for(:order_initiated),
+        PurchaseRequestStatus.id_for(:cancelled),
+        PurchaseRequestStatus.id_for(:po_created),
+        PurchaseRequestStatus.id_for(:partially_closed),
+    ]
+  end
 end

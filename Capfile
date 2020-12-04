@@ -26,6 +26,7 @@ require 'capistrano/puma'
 require "whenever/capistrano"
 install_plugin Capistrano::Puma # Default puma tasks
 install_plugin Capistrano::Puma::Workers
+install_plugin Capistrano::Puma::Systemd
 # require 'capistrano/passenger'
 
 # require 'capistrano/crono'

@@ -10,7 +10,27 @@ class YesBankTransferProvider
     queue = Struct.new(:queue).new(response_handle)
 
     indifferent_params = params.with_indifferent_access
+
+    # This is a temporary patch for issue https://sentry.finly.io/organizations/finly/issues/642
+    # Basically, the return value of +YesBankTransaction.find_by+ was nil. When we were checking this in console a few minutes later, it was available
+    # Our best guess is that the job was being executed before the transaction could be persisted to the database
+    # leading to the above issue.
+
     bank_transaction = YesBankTransaction.find_by(id: indifferent_params[:bank_transaction_id])
+
+    indifferent_params[:attempts] ||= 0
+
+    if bank_transaction.blank? and indifferent_params[:attempts] <= 5
+      indifferent_params[:attempts] += 1
+      YesBankTransferProvider.perform_in(1.minute, response_handle, indifferent_params)
+
+      return
+    end
+
+    Raven.extra_context transaction_id: indifferent_params[:bank_transaction_id],
+                        params: indifferent_params,
+                        record: YesBankTransaction.find_by(id: indifferent_params[:bank_transaction_id])
+
     self.account_number = indifferent_params[:account_number]
     self.ifsc = indifferent_params[:ifsc]
     company = bank_transaction.company

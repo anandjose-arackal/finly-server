@@ -3,6 +3,7 @@
 # Table name: enforce_budget_configurations
 #
 #  id                            :integer          not null, primary key
+#  enforce_purchase_request_budget :boolean
 #  enforce_purchase_order_budget :boolean
 #  enforce_payment_budget        :boolean
 #  enforce_expense_budget        :boolean
