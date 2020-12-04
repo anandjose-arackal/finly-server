@@ -16,10 +16,15 @@ class YesBankTransferProvider
     # Our best guess is that the job was being executed before the transaction could be persisted to the database
     # leading to the above issue.
 
-    max_retries = 10
-    while (bank_transaction = YesBankTransaction.find_by(id: indifferent_params[:bank_transaction_id])).blank? && max_retries > 0
-      sleep 1.minute
-      max_retries -= 1
+    bank_transaction = YesBankTransaction.find_by(id: indifferent_params[:bank_transaction_id])
+
+    indifferent_params[:attempts] ||= 0
+
+    if bank_transaction.blank? and indifferent_params[:attempts] <= 5
+      indifferent_params[:attempts] += 1
+      YesBankTransferProvider.perform_in(1.minute, response_handle, indifferent_params)
+
+      return
     end
 
     Raven.extra_context transaction_id: indifferent_params[:bank_transaction_id],
