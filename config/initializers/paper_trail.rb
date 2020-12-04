@@ -1,17 +1,33 @@
-#PaperTrail.config.track_associations = true
 PaperTrail.config.enabled = true
-#PaperTrail.config.object_changes_adapter = {
-#                                                "delivery_location_id" => [2, 1],
-#                                            "cost_center_id" => [8, 7],
-#    "shipping_address" => [nil, "L-157, PSR Luxury PG For MEN, 14th A Cross, 3rd B main,\nHSR Layout, Bengaluru, Karnataka,\nBangalore, Jammu and Kashmir,\n560111"],
-#    "roundoff_amount" => [-0.43, 0.45],
-#    "tax_amount_id" => [
-# 51820, 51824],
-#    "advance_tds_amount_id" => [
-#51823,
-#51825],
-#    "updated_at" => [
-#        "Fri, 04 Sep 2020 12:56:30 IST +05:30",
-#        "Fri, 04 Sep 2020 13:59:26 IST +05:30",]
-#}
-PaperTrail.config.object_changes_adapter =  ObjectChangeAdapter.new()
+PaperTrail.config.object_changes_adapter =  AuditTrail::ObjectChangeAdapter.new()
+
+PaperTrail::Version.class_eval do
+  after_create :set_document_number
+
+  def set_document_number
+    klass = self.item_type.constantize
+    binding.pry
+    object = klass.find self.item_id
+    case self.item_type
+    when "PurchaseOrder"
+      self.document_number = object.po_number
+    when "PurchaseOrderItem"
+      self.document_number = object.purchase_order.po_number
+    when  "Invoice"
+      self.document_number = object.invoice_id
+    when  "InvoiceLineItem"
+      self.document_number = object.invoice.invoice_id
+    when "PurchaseRequest"
+      self.document_number = object.order_number
+    when "PurchaseRequestItem"
+      self.document_number = object.purchase_request.order_number
+    when "YesBankVendor"
+      self.document_number = object.vendor_id
+    when  "BankAccount"
+      self.document_number = object.account_owner.try(:vendor_id)
+    when "GstinLocation"
+      self.document_number = object.vendor.try(:vendor_id)
+    end
+    self.save
+  end
+end

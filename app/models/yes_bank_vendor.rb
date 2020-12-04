@@ -97,7 +97,6 @@ class YesBankVendor < ApplicationRecord
 
   has_paper_trail(
       meta: {
-          document_number: :vendor_id,
           parent_document_type: "YesBankVendor"
       }
   )

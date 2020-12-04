@@ -152,7 +152,6 @@ class PurchaseOrder < ApplicationRecord
 
   has_paper_trail(
       meta: {
-          document_number:  Proc.new { |po| po.purchase_order_number },
           parent_document_type: "PurchaseOrder"
       }
   )

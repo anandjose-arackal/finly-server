@@ -93,7 +93,6 @@ class InvoiceLineItem < ApplicationRecord
 
   has_paper_trail(
       meta: {
-          document_number: :'invoice.invoice_id',
           parent_document_type: "Invoice"
       }
   )

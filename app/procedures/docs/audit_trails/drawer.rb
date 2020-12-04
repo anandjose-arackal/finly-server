@@ -6,8 +6,8 @@ class Docs::AuditTrails::Drawer < Drawer::API
   policy_action :index
 
   block block_key: :beneficiary, label: "Event", icon: "icon_url" do
-    label_value value: :item_type, format: 'standard', label: "Document Type"
-    label_value value: :item_id, format: 'standard', label: "Document ID"
+    label_value value: :parent_document_type, format: 'standard', label: "Document Type"
+    label_value value: :document_number, format: 'standard', label: "Document ID"
     label_value value: "{{record.created_by.name}}", format: 'standard', label: "Actor"
     label_value value: :user_ip, format: 'standard', label: "IP Address"
     label_value value: :created_at, format: 'standard', label: "Date Time"
@@ -22,18 +22,25 @@ class Docs::AuditTrails::Drawer < Drawer::API
       data_provider = data_provider(user, record, record_exposure)
       map << block.build(data_provider, user, record, record_exposure)
     end
-
-    record.each_with_index do |item, k|
-      item_exposure = item.to_exposure
-      proc = Proc.new{
+    record.group_by(&:item_id).each do | k,item_group|
+      dup_exposure =item_group.first.to_exposure
+      hash ={}
+      item_group.each do |item|
+        item_exposure = item.to_exposure
         item_exposure.changes.each do |key,value|
-        change value: value, label: key.to_s;
+          hash[key] ={item: item, value: value}
+        end
+      end
+
+      proc = Proc.new{
+        hash.each do |key,value_hash|
+        change value: value_hash[:value], label: key.to_s;
         end }
-      dynamic_block = block(block_key: "change_block_#{k}".to_sym , label: item_exposure.item_type_label, icon: "icon_url", &proc)
-      data_provider = data_provider(user, item, item_exposure)
-      map << dynamic_block.build(data_provider, user, item, item_exposure)
+      dynamic_block = block(block_key: "change_block_#{k}".to_sym , label: dup_exposure.item_type_label, icon: "icon_url", &proc)
+      data_provider = data_provider(user, item_group.first, dup_exposure)
+      map << dynamic_block.build(data_provider, user, item_group.first, dup_exposure)
     end
-    {blocks: map,update_path:self.update_path}
+    {blocks: map, update_path:self.update_path}
   end
 
 end

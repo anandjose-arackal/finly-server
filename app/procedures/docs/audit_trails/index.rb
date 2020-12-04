@@ -22,7 +22,7 @@ class Docs::AuditTrails::Index < IndexBuilder::API
   end
 
   column :item_type,  label: "Document Type", default: true do
-    text value: :item_type, format: "standard"
+    text value: :parent_document_type, format: "standard"
   end
 
   column :document_number,  label: "Document Number", default: true do
@@ -30,7 +30,6 @@ class Docs::AuditTrails::Index < IndexBuilder::API
   end
 
   column :parent_document_type,  label: "Parent Document Type", default: true do
-    text value: :parent_document_type, format: "standard"
   end
 
   column :created_by, default: true, label: "User", includes: [:created_by] do

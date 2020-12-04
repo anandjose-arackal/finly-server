@@ -32,7 +32,6 @@ class GstinLocation < ApplicationRecord
   has_many :form_custom_fields, class_name: 'FormCustomField', as: :document
   has_paper_trail(
       meta: {
-          document_number: :'vendor.vendor_id',
           parent_document_type: "YesBankVendor"
       }
   )

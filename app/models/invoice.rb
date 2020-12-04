@@ -245,7 +245,6 @@ class Invoice < ApplicationRecord
 
   has_paper_trail(
       meta: {
-          document_number: :invoice_id,
           parent_document_type: "Invoice"
       }
   )

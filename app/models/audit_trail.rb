@@ -6,10 +6,35 @@ class AuditTrail < PaperTrail::Version
 
   default_scope {order(created_at: :desc)}
   belongs_to :created_by, optional: true, class_name: "User"
-
+  after_commit :set_document_details
 
   def changes_less
     self.get_change_statement(less: true).map{|change| "#{change&.first&.to_s&.titlecase} Changed #{(change&.last)&.join(' -> ')}"}&.join(' , ')
+  end
+
+  def set_document_details
+    klass = self.item_type.constantize
+    object = klass.find self.item_id
+    case self.item_type
+    when "PurchaseOrder"
+      self.document_number = object.po_number
+    when "PurchaseOrderItem"
+      self.document_number = object.purchase_order.po_number
+    when  "Invoice"
+      self.document_number = object.invoice_id
+    when  "InvoiceLineItem"
+      self.document_number = object.invoice.invoice_id
+    when "PurchaseRequest"
+      self.document_number = object.order_number
+    when "PurchaseRequestItem"
+      self.document_number = object.purchase_request.order_number
+    when "YesBankVendor"
+      self.document_number = object.vendor_id
+    when  "BankAccount"
+      self.document_number = object.account_owner.try(:vendor_id)
+    when "GstinLocation"
+      self.document_number = object.vendor.try(:vendor_id)
+    end
   end
 
   def get_change_statement(less=false)
