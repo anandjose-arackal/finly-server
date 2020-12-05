@@ -25,7 +25,7 @@ class Procurements::Show < Procurements::Base
     attr_accessor :procurement, :purchase_order, :invoices, :inward_documents, :procurement_trail, :locations,
                   :payment_terms, :bill_of_supplies, :delivery_challans, :vendor,
                   :procurement_terms, :policies, :e_way_bills, :status_tags, :actions, :po_revisions, :proforma_invoices,
-                  :credit_notes
+                  :credit_notes, :initial_purchase_order
 
     def init
       self.procurement = params[:procurement]
@@ -39,7 +39,8 @@ class Procurements::Show < Procurements::Base
       self.bill_of_supplies = self.procurement.bill_of_supplies
       self.delivery_challans = self.procurement.delivery_challans
       self.e_way_bills = self.procurement.e_way_bills
-      self.po_revisions = self.procurement.po_revisions
+      self.po_revisions = self.procurement.po_revisions.where.not(id: purchase_order.id)
+      self.initial_purchase_order = self.po_revisions.last&.revision_of || self.purchase_order.revision_of
       self.credit_notes = self.procurement.credit_notes
 
       self.procurement_trail = get_procurement_trail
@@ -125,6 +126,7 @@ class Procurements::Show < Procurements::Base
       documents += self.delivery_challans
       documents += self.e_way_bills
       documents += self.po_revisions
+      documents += [self.initial_purchase_order] if self.initial_purchase_order.present?
       documents += self.proforma_invoices
       documents += self.credit_notes
 
