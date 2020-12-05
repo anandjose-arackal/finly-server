@@ -13,10 +13,6 @@ class Expense::ExCard::Update < Expense::ExCard::Base
     end
   end
 
-  def rollback_process_if_error?
-    true
-  end
-
   def init
     super
     define_editable_attributes if expense
@@ -77,45 +73,49 @@ class Expense::ExCard::Update < Expense::ExCard::Base
   end
 
   def process
-    custom_fields = {custom_fields: params&.dig(:custom_fields)}
-    custom_fields[:save] = false
-    set_fields = CustomField::SetFields.(self.expense.card_expense, FieldParentType.id_for(:card_expense), custom_fields)
-    unless set_fields.success?
-      add_message :error, set_fields.messages[:error]
-      return
-    end
+    ActiveRecord::Base.transaction(requires_new: true) do
+      custom_fields = {custom_fields: params&.dig(:custom_fields)}
+      custom_fields[:save] = false
+      set_fields = CustomField::SetFields.(self.expense.card_expense, FieldParentType.id_for(:card_expense), custom_fields)
+      unless set_fields.success?
+        add_message :error, set_fields.messages[:error]
+        return
+      end
 
-    if expense.update(updated_expense_params)
-      if self.destroy_receipts
-        expense.receipts.each do |receipt|
-          if receipt
-            receipt.parent = nil
-            receipt.save
+      if expense.update(updated_expense_params)
+        if self.destroy_receipts
+          expense.receipts.each do |receipt|
+            if receipt
+              receipt.parent = nil
+              receipt.save
+            end
           end
         end
-      end
-      if receipt
-        receipt.parent = expense
-        if receipt.save
-          if old_receipt.present?
-            old_receipt.parent = nil
-            old_receipt.save
+        if receipt
+          receipt.parent = expense
+          if receipt.save
+            if old_receipt.present?
+              old_receipt.parent = nil
+              old_receipt.save
+            end
           end
         end
+      else
+        messages[:error] = self.expense.errors.full_messages
       end
-    else
-      messages[:error] = self.expense.errors.full_messages
+
+      return if has_errors?
+      # Budget check
+      budget_validation_op = budget_limit_validation(expense)
+      if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+        add_message :error, budget_validation_op.messages[:errors]
+        raise ActiveRecord::Rollback
+        return
+      end
     end
   end
 
   def post_process
-    # Budget check
-    budget_validation_op = budget_limit_validation(expense)
-    if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
-      add_message :error, budget_validation_op.messages[:errors]
-      return
-    end
-
     # add report comment
     Reports::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
 
