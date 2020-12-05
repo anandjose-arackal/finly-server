@@ -74,25 +74,14 @@ class BaseOperation
       execute_function :configure_vendor_payment
       return execute_failure if has_errors?
     end
-    ActiveRecord::Base.transaction(requires_new: true) do
-      execute_function :pre_process
-      raise ActiveRecord::Rollback if rollback_process_if_error? && has_errors?
-
-      execute_function :process
-      raise ActiveRecord::Rollback if rollback_process_if_error? && has_errors?
-
-      self.process_complete = true
-      execute_function :post_process
-      raise ActiveRecord::Rollback if rollback_process_if_error? && has_errors?
-    end
-
+    execute_function :pre_process
     return execute_failure if has_errors?
-
+    execute_function :process
+    return execute_failure if has_errors?
+    self.process_complete = true
+    execute_function :post_process
+    return execute_failure if has_errors?
     execute_function :retrieve
-  end
-
-  def rollback_process_if_error?
-    false
   end
 
   def user_model
