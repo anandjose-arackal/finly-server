@@ -26,12 +26,12 @@ class Docs::P2P::Invoices::Form < Forms::API
           invoice_discount_amount: "{% assign discount_amount = 0 %}{% for item in form.items %}{% assign discount_amount = discount_amount | plus: item.item_discount_amount %}{% endfor %}{{ discount_amount }}",
           invoice_taxable_amount: "{{ form.invoice_gross_amount | minus: form.invoice_discount_amount }}",
           invoice_tax_amount: "{% assign tax_amount = 0 %}{% for item in form.items %}{% assign tax_amount = tax_amount | plus: item.item_tax_amount %}{% endfor %}{{ tax_amount }}",
-          invoice_tds_amount: "{% assign tds_amount = 0 %}{% for item in form.items %}{% assign tds_amount = tax_amount | plus: item.item_tds_amount %}{% endfor %}{{ tds_amount }}",
-          invoice_sub_total_amount: "{{ form.invoice_gross_amount | minus: form.invoice_discount_amount | plus: form.invoice_tax_amount | minus: form.invoice_tds_amount | plus: form.invoice_freight_amount}}",
+          invoice_tds_amount: "{% assign tds_amount = 0 %}{% for item in form.items %}{% assign tds_amount = tds_amount | plus: item.item_tds_amount %}{% endfor %}{{ tds_amount }}",
+          invoice_sub_total_amount: "{{ form.invoice_gross_amount | minus: form.invoice_discount_amount | plus: form.invoice_tax_amount | minus: form.invoice_tds_amount }}",
           # todo - Issue : Roundoff should be automatically calulated everytime user inputs something, even if its the round off itself
           invoice_roundoff_amount: "{% assign amount = form.invoice_sub_total_amount | round %}{{amount | minus: form.invoice_sub_total_amount}}",
           invoice_total_amount: "{{ form.invoice_sub_total_amount | plus: form.invoice_roundoff_amount }}",
-          invoice_net_total_amount: "{{ form.invoice_total_amount | minus: form.invoice_paid_outside_amount | minus: invoice_advance_paid_amount}}",
+          invoice_net_total_amount: "{{ form.invoice_total_amount | minus: form.invoice_paid_outside_amount | minus: form.invoice_advance_paid_amount}}",
           # todo - will be shown on top of invoice and needs separate calculation
           invoice_balance_due: "{{ form.total_amount | minus: form.advance_paid_amount }}"
       }
@@ -340,7 +340,7 @@ class Docs::P2P::Invoices::Form < Forms::API
 
   # ATTACHMENTS
   section :attachments do
-    attachment :attachments # todo - run migration for attachment
+    attachment :attachments, system_field: false
   end
   # If reporting currency & base currency are same, then hide conversion_rate
 

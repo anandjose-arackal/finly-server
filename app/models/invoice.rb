@@ -144,6 +144,7 @@
 #
 
 class Invoice < ApplicationRecord
+  attr_accessor :skip_callback
   include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport, ControllingUser
   include LiquidDroppable
   include Exposures::Model::Exposable
@@ -152,6 +153,55 @@ class Invoice < ApplicationRecord
   include ErpSyncable
   # include SearchIndex::Concerns::Document
   include Searchkick::Api
+
+  # Multicurrency Support
+  include Monetizable
+  money :invoice_gross_amount, :get_reporting_currency
+  money :invoice_discount_amount, :get_reporting_currency
+  money :invoice_tax_amount, :get_reporting_currency
+  money :invoice_tds_amount, :get_reporting_currency
+  money :invoice_paid_outside_amount, :get_reporting_currency
+  money :invoice_sub_total_amount, :get_reporting_currency
+  money :invoice_total_amount, :get_reporting_currency
+  money :invoice_taxable_amount, :get_reporting_currency
+  money :invoice_freight_amount, :get_reporting_currency
+  money :invoice_roundoff_amount, :get_reporting_currency
+  money :invoice_balance_due, :get_reporting_currency
+  # money :invoice_gross_amount_converted, :get_reporting_currency
+  # money :invoice_discount_amount_converted, :get_reporting_currency
+  # money :invoice_taxable_amount_converted, :get_reporting_currency
+  # money :invoice_tax_amount_converted, :get_reporting_currency
+  # money :invoice_tds_amount_converted, :get_reporting_currency
+  # money :invoice_freight_amount_converted, :get_reporting_currency
+  # money :invoice_sub_total_amount_converted, :get_reporting_currency
+  # money :invoice_roundoff_amount_converted, :get_reporting_currency
+  # money :invoice_total_amount_converted, :get_reporting_currency
+  # money :invoice_paid_outside_amount_converted, :get_reporting_currency
+  # money :invoice_balance_due_converted, :get_reporting_currency
+
+  def get_reporting_currency
+    Currency.currency_for(self.reporting_currency || "INR")
+  end
+
+  def get_base_currency
+    Currency.currency_for(self.base_currency || "INR")
+  end
+
+  exchange_bank :get_reporting_currency, :get_base_currency, :exchange_rate
+
+  # exchange_rate as method
+  def exchange_rate
+    ExchangeRate.get_rate(
+        self.conversion_date,
+        self.reporting_currency,
+        self.base_currency
+    # self.conversion_date,
+    # Currency.currency_for(self.reporting_currency),
+    # Currency.currency_for(self.base_currency)
+    )
+  end
+
+  # Multicurrency Attributes
 
   # include EventProducer
 
@@ -635,6 +685,7 @@ class Invoice < ApplicationRecord
   }
 
   after_create :set_defaults
+  after_save :sync_amounts, unless: :skip_callback
   after_save :budget_trail_entry
   # the below callback deals with cases where the PO advance has been paid, and then an invoice is being raised
   # after_save :handle_po_advance_budget_trails
@@ -1234,6 +1285,42 @@ class Invoice < ApplicationRecord
     InwardInvoiceStatus.ids_for(:processing).include?(invoice_status_id)
   end
 
+  def forms_extra_data(type = nil, entity_key = nil)
+    if type.nil? || entity_key.nil?
+      return {
+
+      }
+    end
+
+    case entity_key
+    when :vendor_id, 'vendor_id'
+      data = {
+          "id": vendor_id,
+          "vendor_id": vendor&.id,
+          "name": vendor&.display_name,
+          "trade_name": vendor&.trade_name
+      }
+    when :gstin_location_id, 'gstin_location_id'
+      data = {
+          "id": gstin_location_id,
+          "gstin": gstin_location&.gstin,
+          "name": gstin_location&.location,
+          "address": gstin_location&.address
+      }
+    when :receiving_account_id, 'receiving_account_id'
+      data = {
+          "id": receiving_account_id,
+          "name": receiving_account&.name,
+          "account_number": receiving_account&.account_number,
+          "ifsc": receiving_account&.ifsc
+      }
+    else
+      data = {}
+    end
+
+    {"#{entity_key}_lookup_data": data}
+  end
+
   private
 
   # def payment_agreement_updations
@@ -1533,5 +1620,69 @@ class Invoice < ApplicationRecord
   #     # end
   #   end
   # end
+
+  # Syncs amounts from new forms structure to legacy amounts table
+  def sync_amounts
+    # Multi currency implementation
+    # self.invoice_gross_amount_converted = invoice_gross_amount_money.exchange_to(get_base_currency).amount
+    # self.invoice_discount_amount_converted = invoice_discount_amount_money.exchange_to(get_base_currency).amount
+    # self.invoice_tax_amount_converted = invoice_tax_amount_money.exchange_to(get_base_currency).amount
+    # self.invoice_tds_amount_converted = invoice_tds_amount_money.exchange_to(get_base_currency).amount
+    # self.invoice_paid_outside_amount_converted = invoice_paid_outside_amount_money.exchange_to(get_base_currency).amount
+    # self.invoice_sub_total_amount_converted = invoice_sub_total_amount_money.exchange_to(get_base_currency).amount
+    # self.invoice_total_amount_converted = invoice_total_amount_money.exchange_to(get_base_currency).amount
+    # self.invoice_taxable_amount_converted = invoice_taxable_amount_money.exchange_to(get_base_currency).amount
+    # self.invoice_freight_amount_converted = invoice_freight_amount_money.exchange_to(get_base_currency).amount
+    # self.invoice_roundoff_amount_converted = invoice_roundoff_amount_money.exchange_to(get_base_currency).amount
+    # self.invoice_balance_due_converted = invoice_balance_due_money.exchange_to(get_base_currency).amount
+
+
+    if invoice_gross_amount.present?
+      self.skip_callback = true
+      amounts_attributes_map.each do |key, value|
+        # amount_value = self.send("#{key}_converted")
+        amount_value = self.send(key)
+        amount_attr = self.send(value)
+        base_currency_id = get_base_currency&.id || Currency.id_for("INR")
+        if amount_attr.present?
+          Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: base_currency_id) # todo - I2P : Update value from base currency
+        else
+          self.assign_attributes(
+              {
+                  "#{value}": Amount.create(value: amount_value, currency_id: base_currency_id).id
+              }
+          )
+        end
+      end
+      self.save
+    end
+  end
+
+  def amounts_attributes_map
+    # todo - I2P change it to converted values post multicurrency setup
+    {
+        invoice_gross_amount: 'amount_id',
+        invoice_discount_amount: 'discount_amount_id',
+        invoice_taxable_amount: 'gross_amount_id',
+        invoice_tax_amount: 'tax_amount_id',
+        invoice_tds_amount: 'tds_amount_id',
+        invoice_advance_paid_amount: 'advance_amount_id',
+        invoice_sub_total_amount: 'net_amount_id',
+        invoice_balance_due: 'balance_due_id'
+    }
+
+    # Invoice amount meanings. Picked from Invoice Calculation Utils
+    # amount => raw amount, rate * qty
+    # discount_amount => discount total of items
+    # gross_amount => discounts included or taxable amount or after_discount_amount
+    # tax_amount => tax total of items
+    # tds_amount => tds total of tds_applicable items' tds
+    # net_amount => gross_amount + tax_amount - tds_amount
+    # advance_amount => advance paid
+
+    # New Structure
+    # invoice_sub_total_amount => old structure net_amount
+    # invoice_net_total_amount: invoice_total_amount - invoice_paid_outside_amount - invoice_advance_paid_amount
+  end
 
 end

@@ -97,6 +97,7 @@ class Forms::Ops::Choices < Transactions::API
       intersecting_choices = intersecting_choices & arr
     end
 
+
     context[:intersecting_choices] = intersecting_choices
     context[:filter_query] = {id_in: intersecting_choices}
     true

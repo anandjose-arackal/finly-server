@@ -3391,6 +3391,14 @@ ActiveRecord::Schema.define(version: 2020_11_25_180408) do
     t.index ["updated_at"], name: "index_erp_sync_statuses_on_updated_at"
   end
 
+  create_table "exchange_rates", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "from"
+    t.string "to"
+    t.float "rate"
+    t.date "date"
+    t.datetime "deleted_at"
+  end
+
   create_table "expense_data_extract_sources", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false

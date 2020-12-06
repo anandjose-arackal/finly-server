@@ -451,5 +451,4 @@ class YesBankVendor < ApplicationRecord
     VendorStatus.ids_for(:awaiting_approval).include?(status_id)
   end
 
-
 end

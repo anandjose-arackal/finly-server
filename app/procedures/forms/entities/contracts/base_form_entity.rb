@@ -139,7 +139,9 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
     end
 
     def actions!(collection:, fragment:, index:, options:, **)
+
       action = actions.find {|action| action.id.present? and action.id.to_s == fragment["id"].to_s}
+
       if fragment["_destroy"]
         actions.destroy(action)
         return skip!

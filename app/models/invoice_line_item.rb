@@ -64,6 +64,9 @@
 #
 
 class InvoiceLineItem < ApplicationRecord
+
+  attr_accessor :skip_callback
+
   include LiquidDroppable
   include Exposures::Model::Exposable
   include MathUtil
@@ -112,6 +115,7 @@ class InvoiceLineItem < ApplicationRecord
   # validates_presence_of :department, if: :check_outward_invoice?
   before_save :set_tds_applicable
   after_save :budget_trail_entry
+  after_save :sync_amounts, unless: :skip_callback
   after_destroy :budget_trail_destroy
 
   TEMPLATE_COLUMNS = %w{ description quantity rate tax discount category_id gst_type_id hsn_sac parent_type parent_id inventory_line_item_id item_info comment account tax_rate_id cost_center_id unit_of_measurement department_id sgst cgst igst }
@@ -247,23 +251,45 @@ class InvoiceLineItem < ApplicationRecord
     # applied_credit_notes = self.parent.credit_notes
     # adjusted_amount = (applied_credit_notes.joins(:gross_receivable_amount).sum(:value) + applied_credit_notes.joins(:tax_amount).sum(:value)) * ((self.after_tax_amount) / (self.parent.amount_after_tax)) rescue 0
     adjusted_amount = self.parent.credit_note_adjustments.joins(:amount).sum(:value) * ((self.after_tax_amount) / (self.parent.amount_after_tax)) rescue 0
-    adjusted_amount
+    adjusted_amount.nan? ? 0 : adjusted_amount
   end
 
   def cn_adjusted_amount_without_tax
     applied_credit_notes = self.parent.credit_notes
     adjusted_amount = [(self.parent.credit_note_adjustments.joins(:amount).sum(:value) - applied_credit_notes.joins(:tax_amount).sum(:value)), 0].max * ((self.before_tax_amount) / (self.parent.amount_before_tax)) rescue 0
-    adjusted_amount
+    adjusted_amount.nan? ? 0 : adjusted_amount
   end
 
   def cn_tax_amount
     applied_credit_notes = self.parent.credit_notes
     tax_amount = applied_credit_notes.joins(:tax_amount).sum(:value) * ((self.before_tax_amount) / (self.parent.amount_before_tax)) rescue 0
-    tax_amount
+    tax_amount.nan? ? 0 : tax_amount
   end
 
   def set_tds_applicable
     self.tds_applicable = self&.inventory_line_item&.tds_applicable
+  end
+
+  def forms_extra_data(type = nil, entity_key = nil)
+    if type.nil? || entity_key.nil?
+      return {
+
+      }
+    end
+
+    case entity_key
+    when :vendor_id, 'vendor_id'
+      data = {
+          "id": vendor_id,
+          "vendor_id": vendor&.id,
+          "name": vendor&.display_name,
+          "trade_name": vendor&.trade_name
+      }
+    else
+      data = {}
+    end
+
+    {"#{entity_key}_lookup_data": data}
   end
 
   private
@@ -295,4 +321,37 @@ class InvoiceLineItem < ApplicationRecord
     tds_amount.ceil
   end
 
+  # Syncs amounts from new forms structure to legacy amounts table
+  def sync_amounts
+    if item_gross_amount.present?
+      self.skip_callback = true
+      amounts_attributes_map.each do |key, value|
+        amount_value = self.send(key)
+        amount_attr = self.send("#{value}_id")
+        if amount_attr.present?
+          Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: 1) # todo - I2P : Update value from base currency
+        else
+          self.assign_attributes(
+              {
+                  "#{value}_id": Amount.create(value: amount_value, currency_id: 1).id
+              }
+          )
+        end
+      end
+      self.save
+    end
+  end
+
+  def amounts_attributes_map
+    # todo - I2P change it to converted values post multicurrency setup
+    {
+        item_gross_amount: 'amount',
+        item_discount_amount: 'discount_amount',
+        item_taxable_amount: 'taxable_amount',
+        item_tax_amount: 'tax_amount',
+        # item_tds_amount: '',
+        item_net_amount: 'net_amount',
+        item_billable_amount: 'billable_amount'
+    }
+  end
 end
