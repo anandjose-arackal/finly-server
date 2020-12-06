@@ -4370,6 +4370,9 @@ Rails.application.routes.draw do
     end
   end
 
+  get 'exchange_rate', to: 'exchange_rates#get_rate'
+
+
 
   get 'lookup/:route', to: 'lookup#route'
 
