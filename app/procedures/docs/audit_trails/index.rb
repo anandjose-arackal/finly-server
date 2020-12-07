@@ -6,7 +6,7 @@ class Docs::AuditTrails::Index < IndexBuilder::API
   class_attr :record_count
 
   resolver 'audit_trails.default'
-  reference '{{record.transaction_id}}'
+  reference '{{record.user_transaction_id}}'
   status_filters false
 
   column :description,  label: "Record Description", fixed: true, default: true do
