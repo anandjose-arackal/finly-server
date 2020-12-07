@@ -147,7 +147,7 @@ class PurchaseOrder < ApplicationRecord
   has_many :purchase_request_items
 
   has_many :quotations, dependent: :destroy
-  has_many :audit_trails, as: :item, dependent: :destroy
+
 
   belongs_to :bank_account, optional: true
 
