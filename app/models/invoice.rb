@@ -1312,7 +1312,8 @@ class Invoice < ApplicationRecord
     when :vendor_id, 'vendor_id'
       data = {
           "id": vendor_id,
-          "vendor_id": vendor&.id,
+          "vendor_id": vendor&.vendor_id,
+          "vendor_sequence_id": vendor&.vendor_id,
           "name": vendor&.display_name,
           "trade_name": vendor&.trade_name
       }
