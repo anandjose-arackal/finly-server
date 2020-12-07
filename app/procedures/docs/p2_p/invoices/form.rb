@@ -226,7 +226,7 @@ class Docs::P2P::Invoices::Form < Forms::API
              can_visible_be_changed: false,
              can_editable_be_changed: false
 
-      amount :item_billable_amount, label: "Net Amount", editable: false, visible: true,
+      amount :item_billable_amount, label: "Billable Amount", editable: false, visible: false,
              can_editable_be_changed: false,
              can_visible_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_billable_amount])
@@ -274,7 +274,7 @@ class Docs::P2P::Invoices::Form < Forms::API
       lookup :tds_slab_id, choices_scope: Choices[:lookup].('tds_slabs') # todo - condition when reporting currency is in INR
       number :tds_percentage, internal: true, editable: false, # todo - condition when reporting currency is in INR
              can_editable_be_changed: false,
-             computed: Forms::Compute::Lookup('items_summary.tds_slab_id', '{{record.rate}}')
+             computed: Forms::Compute::Lookup('items_summary.tds_slab_id', '{{record.tds}}')
 
       amount :invoice_tds_amount, editable: false, # todo - condition when reporting currency is in INR
              can_editable_be_changed: false,
