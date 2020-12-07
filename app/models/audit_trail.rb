@@ -6,35 +6,36 @@ class AuditTrail < PaperTrail::Version
 
   default_scope {order(created_at: :desc)}
   belongs_to :created_by, optional: true, class_name: "User"
-  after_commit :set_document_details
+  belongs_to :item, optional: true, polymorphic: true
+
+  scope :with_user_transaction_id, -> (ref_id) { where user_transaction_id: ref_id }
 
   def changes_less
     self.get_change_statement(less: true).map{|change| "#{change&.first&.to_s&.titlecase} Changed #{(change&.last)&.join(' -> ')}"}&.join(' , ')
   end
 
-  def set_document_details
-    klass = self.item_type.constantize
-    object = klass.find self.item_id
+  def get_document_number
     case self.item_type
     when "PurchaseOrder"
-      self.document_number = object.po_number
+      self.document_number = self.item.po_number
     when "PurchaseOrderItem"
-      self.document_number = object.purchase_order.po_number
+      self.document_number = self.item.purchase_order.po_number
     when  "Invoice"
-      self.document_number = object.invoice_id
+      self.document_number = R.invoice_id
     when  "InvoiceLineItem"
-      self.document_number = object.invoice.invoice_id
+      self.document_number = self.item.invoice.invoice_id
     when "PurchaseRequest"
-      self.document_number = object.order_number
+      self.document_number = self.item.order_number
     when "PurchaseRequestItem"
-      self.document_number = object.purchase_request.order_number
+      self.document_number = self.item.purchase_request.order_number
     when "YesBankVendor"
-      self.document_number = object.vendor_id
+      self.document_number = self.item.vendor_id
     when  "BankAccount"
-      self.document_number = object.account_owner.try(:vendor_id)
+      self.document_number = self.item.account_owner.try(:vendor_id)
     when "GstinLocation"
-      self.document_number = object.vendor.try(:vendor_id)
+      self.document_number = self.item.vendor.try(:vendor_id)
     end
+    self.document_number
   end
 
   def get_change_statement(less=false)
@@ -68,7 +69,7 @@ class AuditTrail < PaperTrail::Version
   def get_all_reflections
     klass = self.item_type.constantize
     hash = {}
-    klass.reflect_on_all_associations(:belongs_to).map{|reflect| hash[reflect.foreign_key] ={name:reflect.name ,klass:reflect.klass}}
+    klass.reflect_on_all_associations(:belongs_to).map{|reflect| hash[reflect.foreign_key] ={name: reflect.name ,klass: reflect.klass}}
     hash.with_indifferent_access
   end
 
@@ -82,17 +83,17 @@ class AuditTrail < PaperTrail::Version
     return "" if identifier.nil?
     case klass.to_s
     when "Amount"
-      value = klass.find_by_id(identifier)&.value
+      value = klass.unscoped.find_by_id(identifier)&.value
     when  "ReviewalLevel"
-      value = klass.find_by_id(identifier)&.level_number
+      value = klass.unscoped.find_by_id(identifier)&.level_number
     when  "GstinLocation"
-      value = klass.find_by_id(identifier)&.location
+      value = klass.unscoped.find_by_id(identifier)&.location
     when  "YesBanVendor"
-      value = klass.find_by_id(identifier)&.business_name
+      value = klass.unscoped.find_by_id(identifier)&.business_name
     when "BankAccount"
-      value = klass.find_by_id(identifier)&.name
+      value = klass.unscoped.find_by_id(identifier)&.name
     else
-      value = klass.find_by_id(identifier)&.try(:name)&.titlecase
+      value = klass.unscoped.find_by_id(identifier)&.try(:name)&.titlecase
     end
     value
   end
@@ -103,6 +104,20 @@ class AuditTrail < PaperTrail::Version
         Invoice
         YesBankVendor
       )
+  end
+
+  def self.generate_transaction_id
+    date = DateTime.now
+    prefix = DateTime.now.to_i
+    ref_id = Generator.random_number(8)
+    while !self.validate_transaction_id("#{prefix}#{ref_id}")
+      ref_id = Generator.random_number(8)
+    end
+    "#{prefix}#{ref_id}"
+  end
+
+  def self.validate_transaction_id(reference_id)
+    (not AuditTrail.with_user_transaction_id(reference_id).present?)
   end
 
 end

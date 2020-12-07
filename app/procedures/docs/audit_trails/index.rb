@@ -35,7 +35,7 @@ class Docs::AuditTrails::Index < IndexBuilder::API
   end
 
   column :event,  label: "Action", default: true do
-    text value: "{{record.event.capitalize}}", format: "standard"
+    text value: :event, format: "standard"
   end
 
   column :user_ip, label: "User IP", default: true do
