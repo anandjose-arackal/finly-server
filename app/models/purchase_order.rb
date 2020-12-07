@@ -122,6 +122,7 @@ class PurchaseOrder < ApplicationRecord
   belongs_to :advance_amount, optional: true, class_name: "Amount"
   belongs_to :advance_tds_amount, optional: true, class_name: "Amount"
   belongs_to :advance_tds_slab, optional: true, class_name: 'TdsRatesList'
+  belongs_to :revision_of, optional: true, class_name: 'PurchaseOrder'
 
   belongs_to :policy, optional: true
   belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
