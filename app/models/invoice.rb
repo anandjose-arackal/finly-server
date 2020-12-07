@@ -194,7 +194,7 @@ class Invoice < ApplicationRecord
     ExchangeRate.get_rate(
         self.conversion_date,
         self.reporting_currency,
-        self.base_currency
+        get_base_currency&.country_code || "INR"
     # self.conversion_date,
     # Currency.currency_for(self.reporting_currency),
     # Currency.currency_for(self.base_currency)
@@ -1318,7 +1318,10 @@ class Invoice < ApplicationRecord
       data = {}
     end
 
-    {"#{entity_key}_lookup_data": data}
+    {
+        "#{entity_key}_lookup_data": data,
+        "#{entity_key}_choice_data": [data]
+    }
   end
 
   private
@@ -1623,18 +1626,19 @@ class Invoice < ApplicationRecord
 
   # Syncs amounts from new forms structure to legacy amounts table
   def sync_amounts
+    exchange_base_currency = get_base_currency&.country_code || "INR"
     # Multi currency implementation
-    # self.invoice_gross_amount_converted = invoice_gross_amount_money.exchange_to(get_base_currency).amount
-    # self.invoice_discount_amount_converted = invoice_discount_amount_money.exchange_to(get_base_currency).amount
-    # self.invoice_tax_amount_converted = invoice_tax_amount_money.exchange_to(get_base_currency).amount
-    # self.invoice_tds_amount_converted = invoice_tds_amount_money.exchange_to(get_base_currency).amount
-    # self.invoice_paid_outside_amount_converted = invoice_paid_outside_amount_money.exchange_to(get_base_currency).amount
-    # self.invoice_sub_total_amount_converted = invoice_sub_total_amount_money.exchange_to(get_base_currency).amount
-    # self.invoice_total_amount_converted = invoice_total_amount_money.exchange_to(get_base_currency).amount
-    # self.invoice_taxable_amount_converted = invoice_taxable_amount_money.exchange_to(get_base_currency).amount
-    # self.invoice_freight_amount_converted = invoice_freight_amount_money.exchange_to(get_base_currency).amount
-    # self.invoice_roundoff_amount_converted = invoice_roundoff_amount_money.exchange_to(get_base_currency).amount
-    # self.invoice_balance_due_converted = invoice_balance_due_money.exchange_to(get_base_currency).amount
+    self.invoice_gross_amount_converted = invoice_gross_amount_money.exchange_to(exchange_base_currency).amount
+    self.invoice_discount_amount_converted = invoice_discount_amount_money.exchange_to(exchange_base_currency).amount
+    self.invoice_tax_amount_converted = invoice_tax_amount_money.exchange_to(exchange_base_currency).amount
+    self.invoice_tds_amount_converted = invoice_tds_amount_money.exchange_to(exchange_base_currency).amount
+    # self.invoice_paid_outside_amount_converted = invoice_paid_outside_amount_money.exchange_to(exchange_base_currency).amount
+    self.invoice_sub_total_amount_converted = invoice_sub_total_amount_money.exchange_to(exchange_base_currency).amount
+    self.invoice_total_amount_converted = invoice_total_amount_money.exchange_to(exchange_base_currency).amount
+    self.invoice_taxable_amount_converted = invoice_taxable_amount_money.exchange_to(exchange_base_currency).amount
+    # self.invoice_freight_amount_converted = invoice_freight_amount_money.exchange_to(exchange_base_currency).amount
+    self.invoice_roundoff_amount_converted = invoice_roundoff_amount_money.exchange_to(exchange_base_currency).amount
+    self.invoice_balance_due_converted = invoice_balance_due_money.exchange_to(exchange_base_currency).amount
 
 
     if invoice_gross_amount.present?
@@ -1661,14 +1665,14 @@ class Invoice < ApplicationRecord
   def amounts_attributes_map
     # todo - I2P change it to converted values post multicurrency setup
     {
-        invoice_gross_amount: 'amount_id',
-        invoice_discount_amount: 'discount_amount_id',
-        invoice_taxable_amount: 'gross_amount_id',
-        invoice_tax_amount: 'tax_amount_id',
-        invoice_tds_amount: 'tds_amount_id',
-        invoice_advance_paid_amount: 'advance_amount_id',
-        invoice_sub_total_amount: 'net_amount_id',
-        invoice_balance_due: 'balance_due_id'
+        invoice_gross_amount_converted: 'amount_id',
+        invoice_discount_amount_converted: 'discount_amount_id',
+        invoice_taxable_amount_converted: 'gross_amount_id',
+        invoice_tax_amount_converted: 'tax_amount_id',
+        invoice_tds_amount_converted: 'tds_amount_id',
+        invoice_advance_paid_amount_converted: 'advance_amount_id',
+        invoice_sub_total_amount_converted: 'net_amount_id',
+        invoice_balance_due_converted: 'balance_due_id'
     }
 
     # Invoice amount meanings. Picked from Invoice Calculation Utils
