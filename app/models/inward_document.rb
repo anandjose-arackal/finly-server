@@ -40,9 +40,7 @@ class InwardDocument < ApplicationRecord
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
 
   has_many :trails, as: :parent
-
-  has_paper_trail
-
+  
   accepts_nested_attributes_for :items
 
 
