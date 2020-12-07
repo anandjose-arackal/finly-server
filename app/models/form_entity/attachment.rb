@@ -53,7 +53,7 @@
 
 class FormEntity::Attachment < FormEntity
 
-  FORMAT = %w(txt pdf doc docx xls xlsx).freeze
+  FORMAT = %w(txt pdf doc docx xls xlsx png jpeg jpg gif).freeze
 
   register :attachment
   # collection!
