@@ -278,6 +278,12 @@ class InvoiceLineItem < ApplicationRecord
     end
 
     case entity_key
+    when :inventory_line_item_id, 'inventory_line_item_id'
+      data = {
+          "id": inventory_line_item_id,
+          "name": inventory_line_item&.description,
+          "item_number": inventory_line_item&.item_number
+      }
     when :vendor_id, 'vendor_id'
       data = {
           "id": vendor_id,
@@ -285,11 +291,37 @@ class InvoiceLineItem < ApplicationRecord
           "name": vendor&.display_name,
           "trade_name": vendor&.trade_name
       }
+    when :department_id, 'department_id'
+      data = {
+          "id": department_id,
+          "department_code": department&.department_code,
+          "name": department&.name,
+      }
+    when :cost_center_id, 'cost_center_id'
+      data = {
+          "id": cost_center_id,
+          "name": cost_center&.name,
+      }
+    when :category_id, 'category_id'
+      data = {
+          "id": category_id,
+          "name": category&.name,
+          "category_code": category&.category_code
+      }
+    when :tax_rate_id, 'tax_rate_id'
+      data = {
+          "id": tax_rate_id,
+          "name": tax_rate&.name,
+          "rate": tax_rate&.rate
+      }
     else
       data = {}
     end
 
-    {"#{entity_key}_lookup_data": data}
+    {
+        "#{entity_key}_lookup_data": data,
+        "#{entity_key}_choice_data": [data]
+    }
   end
 
   private

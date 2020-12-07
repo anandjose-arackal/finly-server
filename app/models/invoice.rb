@@ -1293,6 +1293,22 @@ class Invoice < ApplicationRecord
     end
 
     case entity_key
+    when :policy_id, 'policy_id'
+      data = {
+          "id": policy_id,
+          "name": policy&.name,
+      }
+    when :department_id, 'department_id'
+      data = {
+          "id": department_id,
+          "department_code": department&.department_code,
+          "name": department&.name,
+      }
+    when :cost_center_id, 'cost_center_id'
+      data = {
+          "id": cost_center_id,
+          "name": cost_center&.name,
+      }
     when :vendor_id, 'vendor_id'
       data = {
           "id": vendor_id,
@@ -1313,6 +1329,32 @@ class Invoice < ApplicationRecord
           "name": receiving_account&.name,
           "account_number": receiving_account&.account_number,
           "ifsc": receiving_account&.ifsc
+      }
+    when :location_id, 'location_id'
+      data = {
+          "id": location_id,
+          "name": location&.name,
+          "location_code": location&.location_code
+      }
+    when :delivery_location_id, 'delivery_location_id'
+      data = {
+          "id": delivery_location_id,
+          "name": delivery_location&.name,
+          "location_code": delivery_location&.location_code
+      }
+
+    when :tds_slab_id, 'tds_slab_id'
+      data = {
+          "id": tds_slab_id,
+          "name": "#{tds_slab&.tds}% - #{tds_slab&.name}",
+          "tds": tds_slab&.tds
+      }
+    when :payment_term_id, 'payment_term_id'
+      data = {
+          "id": payment_term_id,
+          "name": payment_term&.name,
+          "description": payment_term&.description,
+          "default": payment_term&.default
       }
     else
       data = {}
@@ -1646,6 +1688,7 @@ class Invoice < ApplicationRecord
       amounts_attributes_map.each do |key, value|
         # amount_value = self.send("#{key}_converted")
         amount_value = self.send(key)
+        puts "*************** Invoice #{key} value : #{amount_value}"
         amount_attr = self.send(value)
         base_currency_id = get_base_currency&.id || Currency.id_for("INR")
         if amount_attr.present?
