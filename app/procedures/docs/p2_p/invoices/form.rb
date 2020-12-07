@@ -340,7 +340,7 @@ class Docs::P2P::Invoices::Form < Forms::API
 
   # ATTACHMENTS
   section :attachments do
-    attachment :attachments, system_field: false
+    attachment :invoice_attachments, system_field: false
   end
   # If reporting currency & base currency are same, then hide conversion_rate
 
