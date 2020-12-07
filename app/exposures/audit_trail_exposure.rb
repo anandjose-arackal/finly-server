@@ -12,6 +12,7 @@ class AuditTrailExposure < Exposures::API
   attribute :company_id, record_attribute: true
   attribute :created_at, record_attribute: true
   attribute :transaction_id, record_attribute: true
+  attribute :user_transaction_id, record_attribute: true
   attribute :document_number do
     record.get_document_number
   end
