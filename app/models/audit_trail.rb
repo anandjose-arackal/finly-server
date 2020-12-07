@@ -56,7 +56,7 @@ class AuditTrail < PaperTrail::Version
     changes.each do |k,v|
       if all_reflections.has_key? k
         hash.merge!(get_value_change(all_reflections[k], v))
-      elsif [:datetime,:date].include? klass.columns_hash[k.to_s].type
+      elsif [:datetime,:date].include? klass.columns_hash[k.to_s]&.type
         date_change = v.map{ |date_string| Date.parse(date_string)&.strftime("%d/%m/%Y %H:%M:%S") rescue ""}
         hash.merge!({k.to_s&.titlecase => date_change})
       else
