@@ -33,7 +33,7 @@ class Docs::P2P::Invoices::Form < Forms::API
           invoice_total_amount: "{{ form.invoice_sub_total_amount | plus: form.invoice_roundoff_amount }}",
           invoice_net_total_amount: "{{ form.invoice_total_amount | minus: form.invoice_paid_outside_amount | minus: form.invoice_advance_paid_amount}}",
           # todo - will be shown on top of invoice and needs separate calculation
-          invoice_balance_due: "{{ form.total_amount | minus: form.advance_paid_amount }}"
+          invoice_balance_due: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount }}"
       }
   }
 
@@ -88,8 +88,8 @@ class Docs::P2P::Invoices::Form < Forms::API
          computed: Forms::Compute::Form('{{form.date}}')
     currency :reporting_currency, label: "Reporting Currency"
     currency :base_currency, label: "Base Currency", visible: false, editable: false, can_editable_be_changed: false # todo populate with system base currency
-    switch :retrieve_conversion_rate, label: "Auto Populate Conversion Rate", default_value: true
-    number :conversion_rate, visible: true, editable: false, format: 'decimal', default_value: 1
+    switch :retrieve_conversion_rate, label: "Auto Populate Conversion Rate", default_value: true, visible: false
+    number :conversion_rate, editable: false, format: 'decimal', default_value: 1, visible: false
     # date :transaction_service_period_from, label: 'Transaction Period From'
     # date :transaction_service_period_to, label: 'Transaction Period To'
     large_text :narration, label: "Narration"
@@ -105,9 +105,12 @@ class Docs::P2P::Invoices::Form < Forms::API
     lookup :gstin_location_id, label: 'Vendor LocationLocation', choices_scope: Choices[:lookup].('vendor_locations'), # todo - condition to hide for international
            filters: Rules::Builder[:vendor_id].eq(entity: :vendor_id)
     text :vendor_gstin, "Vendor GSTIN", editable: false, computed: Forms::Compute::Lookup('gstin_location_id', '{{record.gstin}}') # todo - condition
+    text :vendor_pan, "Vendor PAN", editable: false, computed: Forms::Compute::Lookup('gstin_location_id', '{{record.pan}}') # todo - condition
     lookup :receiving_account_id, label: "Vendor Account", choices_scope: Choices[:lookup].('vendor_bank_accounts'),
            filters: Rules::Builder[:account_owner_id].eq(entity: 'vendor_id').and(Rules::Builder[:account_owner_type].eq(value: 'YesBankVendor'))
     text :receiving_account_type, visible: false, internal: true, editable: false, computed: Forms::Compute::Form('BankAccount')
+    text :vendor_bank_account_number, editable: false, can_editable_be_changed: false, computed: Forms::Compute::Lookup('receiving_account_id', '{{record.account_number}}')
+    text :vendor_bank_account_ifsc, editable: false, can_editable_be_changed: false, computed: Forms::Compute::Lookup('receiving_account_id', '{{record.ifsc}}')
   end
 
   # BILLING ADDRESS
@@ -233,8 +236,6 @@ class Docs::P2P::Invoices::Form < Forms::API
       amount :item_billable_amount_converted, editable: false, visible: false,
              can_visible_be_changed: false,
              can_editable_be_changed: false
-
-
     end
   end
 
@@ -284,7 +285,7 @@ class Docs::P2P::Invoices::Form < Forms::API
              can_editable_be_changed: false
 
       amount :invoice_freight_amount, "Freight",
-             default_value: 0
+             default_value: 0, visible: false
       amount :invoice_freight_amount_converted, editable: false, visible: false,
              can_visible_be_changed: false,
              can_editable_be_changed: false
@@ -297,7 +298,8 @@ class Docs::P2P::Invoices::Form < Forms::API
              can_visible_be_changed: false,
              can_editable_be_changed: false
 
-      amount :invoice_roundoff_amount, computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_roundoff_amount]) # todo - changd name
+      amount :invoice_roundoff_amount, visible: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_roundoff_amount]) # todo - changd name
       amount :invoice_roundoff_amount_converted, editable: false, visible: false,
              can_visible_be_changed: false,
              can_editable_be_changed: false
@@ -311,13 +313,13 @@ class Docs::P2P::Invoices::Form < Forms::API
              can_editable_be_changed: false
 
       amount :invoice_paid_outside_amount, "Payment Outside Finly",
-             default_value: 0
+             default_value: 0, visible: false
       amount :invoice_paid_outside_amount_converted, editable: false, visible: false,
              can_visible_be_changed: false,
              can_editable_be_changed: false
 
       amount :invoice_advance_paid_amount, "Advance Paid",
-             default_value: 0
+             default_value: 0, visible: false
       amount :invoice_advance_paid_amount_converted, editable: false, visible: false,
              can_visible_be_changed: false,
              can_editable_be_changed: false
@@ -325,13 +327,13 @@ class Docs::P2P::Invoices::Form < Forms::API
       amount :invoice_net_total_amount, label: "Net Total", editable: false,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_net_total_amount])
-      amount :invoice_net_total_amount_converted, editable: false,
+      amount :invoice_net_total_amount_converted, editable: false, visible: false,
              can_editable_be_changed: false
 
       amount :invoice_balance_due, label: "Balance Payable", editable: false,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_balance_due])
-      amount :invoice_advance_paid_amount_converted, editable: false, visible: false,
+      amount :invoice_balance_due_converted, editable: false,
              can_visible_be_changed: false,
              can_editable_be_changed: false
       # amount :net_amount, editable: false, computed: Forms::Compute::Form('{{ form.gross_amount | minus: form.discount_amount | plus: form.tax_amount }}')
