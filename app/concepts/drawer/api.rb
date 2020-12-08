@@ -25,14 +25,11 @@ class Drawer::API
     record_exposure = record.first.to_exposure
     map = []
     self.blocks.each do |block_key, block|
-      #next if required_columns.present? and not (required_columns.include?(column_key.to_s) or required_columns.include?(column_key.to_sym))
-      #next if required_columns.blank? and not column.default
       data_provider = data_provider(user, record, record_exposure)
-
       map << block.build(data_provider, user, record, record_exposure)
-
     end
-    {blocks: map,update_path:self.update_path}
+    { blocks: map,
+      update_path: self.update_path }
   end
 
   # Data provider is used for reusing classes for fetching data
