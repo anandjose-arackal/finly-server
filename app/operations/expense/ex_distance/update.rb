@@ -30,10 +30,6 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
     }
   end
 
-  def rollback_process_if_error?
-    true
-  end
-
   def pre_validate
     if params.blank? or user.blank?
       messages[:error] << 'Parameters or user not found'
@@ -195,69 +191,75 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
   end
 
   def process
-    # Set custom fields
-    custom_fields = {custom_fields: params[:custom_fields]}
-    custom_fields[:save] = false
-    set_fields = CustomField::SetFields.(self.expense.distance_expense, FieldParentType.id_for(:distance_expense), custom_fields)
-    unless set_fields.success?
-      add_message :error, set_fields.messages[:error]
-      return
-    end
-    # valid = CustomField::Validate.(self.expense.distance_expense)
-    # unless valid.success?
-    #   add_message :error, valid.messages[:error]
-    #   return
-    # end
+    ActiveRecord::Base.transaction(requires_new: true) do
+      # Set custom fields
+      custom_fields = {custom_fields: params[:custom_fields]}
+      custom_fields[:save] = false
+      set_fields = CustomField::SetFields.(self.expense.distance_expense, FieldParentType.id_for(:distance_expense), custom_fields)
+      unless set_fields.success?
+        add_message :error, set_fields.messages[:error]
+        return
+      end
+      # valid = CustomField::Validate.(self.expense.distance_expense)
+      # unless valid.success?
+      #   add_message :error, valid.messages[:error]
+      #   return
+      # end
 
-    distance_expense = expense.distance_expense
-    expense.assign_attributes(updated_expense_params)
-    if expense.distance_expense.blank?
-      expense.distance_expense = distance_expense
-    end
+      distance_expense = expense.distance_expense
+      expense.assign_attributes(updated_expense_params)
+      if expense.distance_expense.blank?
+        expense.distance_expense = distance_expense
+      end
 
-    if self.expense.distance_expense&.vehicle_rate&.policy&.distance_expense_config&.enforce_category
-      enforced_category = self.expense.distance_expense&.vehicle_rate&.policy&.distance_expense_config&.default_category
-      sent_category_id = updated_expense_params[:category_id].to_i
-      sent_category = user.company.categories.find_by(id: sent_category_id)
-      # i.e. checking of the selected category is a sub category of the one enforced inside the policy
-      if enforced_category.children.pluck(:id).include?(sent_category_id)
-        self.expense.category = sent_category
+      if self.expense.distance_expense&.vehicle_rate&.policy&.distance_expense_config&.enforce_category
+        enforced_category = self.expense.distance_expense&.vehicle_rate&.policy&.distance_expense_config&.default_category
+        sent_category_id = updated_expense_params[:category_id].to_i
+        sent_category = user.company.categories.find_by(id: sent_category_id)
+        # i.e. checking of the selected category is a sub category of the one enforced inside the policy
+        if enforced_category.children.pluck(:id).include?(sent_category_id)
+          self.expense.category = sent_category
+        else
+          self.expense.category = enforced_category
+        end
+      end
+
+      if expense.save
+        expense.distance_expense.locations.with_id(locations_marked_for_destruction).destroy_all if self.locations_marked_for_destruction.present?
+        if self.destroy_receipts
+          expense.receipts.each do |receipt|
+            if receipt
+              receipt.parent = nil
+              receipt.save
+            end
+          end
+        end
+        if receipt
+          receipt.parent = expense
+          if receipt.save
+            if old_receipt.present?
+              old_receipt.parent = nil
+              old_receipt.save
+            end
+          end
+        end
       else
-        self.expense.category = enforced_category
+        add_message :error, self.expense.errors.full_messages
       end
-    end
 
-    if expense.save
-      expense.distance_expense.locations.with_id(locations_marked_for_destruction).destroy_all if self.locations_marked_for_destruction.present?
-      if self.destroy_receipts
-        expense.receipts.each do |receipt|
-          if receipt
-            receipt.parent = nil
-            receipt.save
-          end
-        end
+      return if has_errors?
+
+      # Budget check
+      budget_validation_op = budget_limit_validation(expense)
+      if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+        add_message :error, budget_validation_op.messages[:errors]
+        raise ActiveRecord::Rollback
+        return
       end
-      if receipt
-        receipt.parent = expense
-        if receipt.save
-          if old_receipt.present?
-            old_receipt.parent = nil
-            old_receipt.save
-          end
-        end
-      end
-    else
-      add_message :error, self.expense.errors.full_messages
     end
   end
 
   def post_process
-    # Budget check
-    budget_validation_op = budget_limit_validation(expense)
-    if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
-      add_message :error, budget_validation_op.messages[:errors]
-      return
-    end
 
     # add comment in report if expense is added within report
     Reports::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)

@@ -1,10 +1,6 @@
 class Procurements::PurchaseRequests::Create < Procurements::PurchaseRequests::Base
   attr_accessor :purchase_request, :purchase_request_params, :custom_fields
 
-  def rollback_process_if_error?
-    true
-  end
-
   def init
     self.purchase_request_params = purchase_request_parameters
     self.custom_fields = params&.dig(:custom_fields) || params&.dig(:purchase_request, :custom_fields)
@@ -31,63 +27,66 @@ class Procurements::PurchaseRequests::Create < Procurements::PurchaseRequests::B
   end
 
   def process
-    self.purchase_request = PurchaseRequest.new(purchase_request_params)
-    self.purchase_request.creator_id = user.id
-    self.purchase_request.purchase_request_status_id = PurchaseRequestStatus.id_for(:draft)
+    ActiveRecord::Base.transaction(requires_new: true) do
+      self.purchase_request = PurchaseRequest.new(purchase_request_params)
+      self.purchase_request.creator_id = user.id
+      self.purchase_request.purchase_request_status_id = PurchaseRequestStatus.id_for(:draft)
 
-    # Save Custom Fields
-    validate_custom_fields_pr
-    return if has_errors?
+      # Save Custom Fields
+      validate_custom_fields_pr
+      return if has_errors?
 
-    #Update purchase request line items state to :draft
-    begin
-      ActiveRecord::Base.transaction do
-        if self.purchase_request.save && self.purchase_request.purchase_request_items.update_all(status_id: PurchaseRequestItemStatus.id_for(:draft))
-          unless self.purchase_request.cost_allocation_items
-            self.purchase_request.purchase_request_items.update_all(cost_center_id: self.purchase_request&.cost_center_id, department_id: self.purchase_request&.department_id)
+      #Update purchase request line items state to :draft
+      begin
+        ActiveRecord::Base.transaction(requires_new: true) do
+          if self.purchase_request.save && self.purchase_request.purchase_request_items.update_all(status_id: PurchaseRequestItemStatus.id_for(:draft))
+            unless self.purchase_request.cost_allocation_items
+              self.purchase_request.purchase_request_items.update_all(cost_center_id: self.purchase_request&.cost_center_id, department_id: self.purchase_request&.department_id)
+            end
+            pr_attachment_ids = get_attachment_ids(params)
+            # line_item_attachment_ids = get_line_item_attachment_ids(params)
+
+            Attachment.update_resource({ids: pr_attachment_ids, resource_id: self.purchase_request.id, user: user}) if pr_attachment_ids.present?
+            # Update for line item attachment
+            # Attachment.update_resource({ids: line_item_attachment_ids, resource_id: self.purchase_request.id, user: user}) if attachment_ids.present?
+            # Update all estimated amount in the line item
+            purchase_request.reload.purchase_request_items.map(&:update_estimated_amount)
+
+            # Save Custom Fields
+            # if params[:custom_fields].present?
+            #   CustomField::SetFields.(purchase_request, FieldParentType.id_for(:purchase_request), custom_fields: params[:custom_fields], save: true, reset_fields: true)
+            # end
+
+            # Create document level reviewer mapping
+            # For setting level specific reviewers from reviewal chain for a document
+            params[:reviewal_document] = self.purchase_request
+            document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+            unless document_reviewer_mappings_op.success?
+              add_message :error, document_reviewer_mappings_op.messages[:error]
+              raise
+            end
+            return
+          else
+            add_message :error, purchase_request.errors.full_messages
+            return
           end
-          pr_attachment_ids = get_attachment_ids(params)
-          # line_item_attachment_ids = get_line_item_attachment_ids(params)
-
-          Attachment.update_resource({ids: pr_attachment_ids, resource_id: self.purchase_request.id, user: user}) if pr_attachment_ids.present?
-          # Update for line item attachment
-          # Attachment.update_resource({ids: line_item_attachment_ids, resource_id: self.purchase_request.id, user: user}) if attachment_ids.present?
-          # Update all estimated amount in the line item
-          purchase_request.reload.purchase_request_items.map(&:update_estimated_amount)
-
-          # Save Custom Fields
-          # if params[:custom_fields].present?
-          #   CustomField::SetFields.(purchase_request, FieldParentType.id_for(:purchase_request), custom_fields: params[:custom_fields], save: true, reset_fields: true)
-          # end
-
-          # Create document level reviewer mapping
-          # For setting level specific reviewers from reviewal chain for a document
-          params[:reviewal_document] = self.purchase_request
-          document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
-          unless document_reviewer_mappings_op.success?
-            add_message :error, document_reviewer_mappings_op.messages[:error]
-            raise
-          end
-          return
-        else
-          add_message :error, purchase_request.errors.full_messages
-          return
         end
+      rescue => error
+        add_message :error, 'Unable to create!'
       end
-    rescue => error
-      add_message :error, 'Unable to create!'
-    end
 
+      return if has_errors?
+      # Budget check
+      budget_validation_op = budget_limit_validation(purchase_request)
+      if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+        add_message :error, budget_validation_op.messages[:errors]
+        raise ActiveRecord::Rollback
+        return
+      end
+    end
   end
 
   def post_process
-    # Budget check
-    budget_validation_op = budget_limit_validation(purchase_request)
-    if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
-      add_message :error, budget_validation_op.messages[:errors]
-      return
-    end
-
     unless has_errors?
       add_message :success, 'Successfully created purchase request'
     end
