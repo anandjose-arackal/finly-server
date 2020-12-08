@@ -40,6 +40,11 @@ class BankAccount < ApplicationRecord
 
   has_many :form_custom_fields, class_name: 'FormCustomField', as: :document
   # belongs_to :company_id
+  has_paper_trail(
+      meta: {
+          parent_document_type: "Vendor"
+      }
+  )
 
   attr_accessor :confirm_account_number
 

@@ -61,7 +61,7 @@ class PurchaseOrderItem < ApplicationRecord
   has_many :budget_trails, as: :entity
   has_paper_trail(
       meta: {
-          parent_document_type: "PurchaseOrder"
+          parent_document_type: "Purchase Order"
       }
   )
 

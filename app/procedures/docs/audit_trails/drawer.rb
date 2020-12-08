@@ -10,7 +10,7 @@ class Docs::AuditTrails::Drawer < Drawer::API
     label_value value: :document_number, format: 'standard', label: "Document ID"
     label_value value: "{{record.created_by.name}}", format: 'standard', label: "Actor"
     label_value value: :user_ip, format: 'standard', label: "IP Address"
-    label_value value: :created_at, format: 'standard', label: "Date Time"
+    label_value value: "{{record.created_at | date: '%d/%m/%Y %H:%M:%S' }}", format: 'standard', label: "Date Time"
   end
 
 

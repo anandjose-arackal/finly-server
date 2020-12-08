@@ -4,9 +4,7 @@ class AuditTrailExposure < Exposures::API
   attribute :item_type, record_attribute: true
   attribute :item_id, record_attribute: true
   attribute :created_by, record_attribute: true, exposure: true
-  attribute :event do
-    record.event&.capitalize
-  end
+  attribute :event, record_attribute: true
   attribute :user_ip, record_attribute: true
   attribute :user_agent, record_attribute: true
   attribute :company_id, record_attribute: true

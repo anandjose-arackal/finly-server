@@ -83,7 +83,7 @@ class AuditTrail < PaperTrail::Version
     return "" if identifier.nil?
     case klass.to_s
     when "Amount"
-      value = klass.unscoped.find_by_id(identifier)&.value
+      value = klass.unscoped.find_by_id(identifier)&.value&.round(2)
     when  "ReviewalLevel"
       value = klass.unscoped.find_by_id(identifier)&.level_number
     when  "GstinLocation"
@@ -94,6 +94,9 @@ class AuditTrail < PaperTrail::Version
       value = klass.unscoped.find_by_id(identifier)&.name
     else
       value = klass.unscoped.find_by_id(identifier)&.try(:name)&.titlecase
+      if value.nil?
+        value = klass.unscoped.find_by_id(identifier)&.try(:description)
+      end
     end
     value
   end
