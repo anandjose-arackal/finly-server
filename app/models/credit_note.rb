@@ -293,6 +293,11 @@ class CreditNote < ApplicationRecord
     with_status_id(status_id)
   }
 
+  scope :pending_erp_sync, -> (*args) {
+    with_erp_sync_status_pending.
+        where(status_id: CreditNoteStatus.ids_for(:approved, :auto_approved, :partially_adjusted, :unadjusted))
+  }
+
   ransack_scopes :with_status_id
   ransack_scopes :with_status_ids
 
