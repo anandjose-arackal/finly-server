@@ -44,6 +44,7 @@ class CreditNote < ApplicationRecord
   include SoftDeletable, Templatable, Transitionable, MathUtil, CustomFieldFilterSupport
   include Sequenced::ActsAsSequenced
   include EventProducer
+  include Concerns::ErpSyncConcern
 
   acts_as_sequenced column: :sequence_id, purpose: :credit_note, editable: false, prefix: 'CN'
 
@@ -126,10 +127,7 @@ class CreditNote < ApplicationRecord
           updated_at: updated_at.strftime('%d %b %Y'),
           invoice_number: invoice&.invoice_number,
           rcm_enabled: invoice&.rcm_enabled,
-          # roundoff_amount: roundoff_amount,
-
           attachments: attachments.as_json,
-          # custom_fields: self.custom_fields,
           vendor: vendor.as_json,
           shipping_location: shipping_location.as_json,
           billing_location: billing_location.as_json,
