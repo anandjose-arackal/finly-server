@@ -25,7 +25,8 @@ class Reports::Submit < Reports::Base
   def init
     id = (params[:report_id] or params[:id])
     self.report = user.reports.find_by(id: id)
-    self.budgets = []
+
+    fetch_budget_contributions(report)
   end
 
   def validate
@@ -67,32 +68,6 @@ class Reports::Submit < Reports::Base
       return
     end
 
-    # checking for configuration on whether this particular company
-    # has budgeting enforced or not
-    if self.report.expenses.present?
-      # op = BudgetsCalculator::RelevantBudgets.(user, object: self.report)
-      # if op.success?
-      #   self.budgets = op.budget_data
-      # end
-    end
-    if user.company.enforce_budget_configuration.enforce_expense_budget? && self.budgets.empty?
-      add_message :error, "You cannot submit this report because there are no budgets associated with it"
-      return
-    end
-
-    # also checking if the budgets are being exceeded here
-    self.budgets.each do |budget|
-      budget_amount = budget[:budget].budget_amount.value
-      budget_spent_amount = budget[:spent_amount]
-
-      spent_amount = budget_spent_amount
-
-      if spent_amount > budget_amount
-        add_message :error, "Report Amount exceeding Budget - #{budget[:budget].name}"
-        return
-      end
-    end
-
     # Set validation of DLRMs
     dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::Validate.(user, {
         reviewal_document: self.report,
@@ -117,6 +92,7 @@ class Reports::Submit < Reports::Base
   end
 
   def process
+    ActiveRecord::Base.transaction(requires_new: true) do
     # presenter = User::Team::Review::NextReviewer.(report, has_violations: self.has_violations)
     # manager = presenter.user
     # manager_role_id = presenter.role_id
@@ -161,20 +137,32 @@ class Reports::Submit < Reports::Base
     #   return true
     # end
     # add_message :error, report.errors.full_messages
-    params[:document] = self.report
-    params[:aasm_event] = 'submit'
-    params[:violation_present] = false
-    op = WorkflowManager::Base.(user, params)
-    unless op.success?
-      add_message :error, op.messages[:error]
-      return
-    end
 
-    self.workflow_output = op.workflow_output
+      params[:document] = self.report
+      params[:aasm_event] = 'submit'
+      params[:violation_present] = false
+      op = WorkflowManager::Base.(user, params)
+      unless op.success?
+        add_message :error, op.messages[:error]
+        return
+      end
+
+      self.workflow_output = op.workflow_output
+
+      return if has_errors?
+
+      # Budget check
+      budget_validation_op = budget_limit_validation(report)
+      # byebug
+      if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+        add_message :error, budget_validation_op.messages[:errors]
+        raise ActiveRecord::Rollback
+        return
+      end
+    end
   end
 
   def post_process
-
     # Creating Email Authorization
 
     # If report is processing

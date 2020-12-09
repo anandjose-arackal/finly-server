@@ -1,6 +1,5 @@
 class Procurements::PurchaseRequests::Base < BaseOperation
-  attr_accessor :workflow_output, :company, :purchase_request, :purchase_request_item
-
+  attr_accessor :workflow_output, :company, :purchase_request, :purchase_request_item, :budget_contributions_before_update
 
   def pre_validate
     if user.blank? || params.blank?
@@ -61,13 +60,16 @@ class Procurements::PurchaseRequests::Base < BaseOperation
     CustomField::SetFields.(purchase_request, FieldParentType.id_for(:purchase_request), custom_fields)
   end
 
-  def budget_limit_validation purchase_request
-    if user.company.feature_subscription.enforce_budget_limit
-      op = BudgetManager::BudgetLimitValidator::ValidatePurchaseOrder.(user, { purchase_request: purchase_request })
-      if op.messages[:error].present?
-        return add_message :error, op.messages[:error]
-      end
-    end    
+  def fetch_budget_contributions(purchase_request)
+    if user.company.enforce_budget_configuration.enforce_purchase_request_budget?
+      op = BudgetManager::BudgetLimitValidator::PurchaseRequest.({purchase_request: purchase_request, ignore_unbudgetables: true, current_user: user})
+      self.budget_contributions_before_update = op['result'][:budget_contributions] rescue {}
+    end
   end
 
+  def budget_limit_validation(purchase_request)
+    if user.company.enforce_budget_configuration.enforce_purchase_request_budget?
+      return BudgetManager::BudgetLimitValidator::PurchaseRequest.({purchase_request: purchase_request, previous_budget_contributions: self.budget_contributions_before_update, current_user: user})
+    end
+  end
 end

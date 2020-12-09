@@ -135,4 +135,11 @@ class ReportStatus < ApplicationRecord
     ]
   end
 
+  # Status IDs for budget trails which are not calculated into budgets
+  def self.status_ids_for_unbudgetables
+    [
+        ReportStatus.id_for(:rejected),
+    ]
+  end
+
 end

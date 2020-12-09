@@ -59,7 +59,6 @@ class Procurements::Create < Procurements::Base
       else
         add_message :error, 'Invalid document type provided'
         return
-
     end
     if op.success?
       add_message :success, "Successfully created new #{params[:document_type].titleize}"

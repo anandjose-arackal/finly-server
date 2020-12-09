@@ -84,6 +84,8 @@ class Expense::ExTime::Update < Expense::ExTime::Base
         self.updated_expense_params[:spent_from_id] = self.cash_pocket&.id
       end
     end
+
+    fetch_budget_contributions(expense)
   end
 
   def authorize
@@ -140,41 +142,51 @@ class Expense::ExTime::Update < Expense::ExTime::Base
   end
 
   def process
+    ActiveRecord::Base.transaction(requires_new: true) do
+      # Set custom fields
+      custom_fields = {custom_fields: params[:custom_fields]}
+      custom_fields[:save] = false
+      set_fields = CustomField::SetFields.(self.expense.time_expense, FieldParentType.id_for(:time_expense), custom_fields)
+      unless set_fields.success?
+        add_message :error, set_fields.messages[:error]
+        return
+      end
 
-    # Set custom fields
-    custom_fields = {custom_fields: params[:custom_fields]}
-    custom_fields[:save] = false
-    set_fields = CustomField::SetFields.(self.expense.time_expense, FieldParentType.id_for(:time_expense), custom_fields)
-    unless set_fields.success?
-      add_message :error, set_fields.messages[:error]
-      return
-    end
-
-    if expense.update(updated_expense_params)
-      if self.destroy_receipts
-        expense.receipts.each do |receipt|
-          if receipt
-            receipt.parent = nil
-            receipt.save
+      if expense.update(updated_expense_params)
+        if self.destroy_receipts
+          expense.receipts.each do |receipt|
+            if receipt
+              receipt.parent = nil
+              receipt.save
+            end
           end
         end
-      end
-      if receipt
-        receipt.parent = expense
-        if receipt.save
-          if old_receipt.present?
-            old_receipt.parent = nil
-            old_receipt.save
+        if receipt
+          receipt.parent = expense
+          if receipt.save
+            if old_receipt.present?
+              old_receipt.parent = nil
+              old_receipt.save
+            end
           end
         end
+      else
+        add_message :error, self.expense.errors.full_messages
       end
-    else
-      add_message :error, self.expense.errors.full_messages
+
+      return if has_errors?
+
+      # Budget check
+      budget_validation_op = budget_limit_validation(expense)
+      if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+        add_message :error, budget_validation_op.messages[:errors]
+        raise ActiveRecord::Rollback
+        return
+      end
     end
   end
 
   def post_process
-    budget_limit_validation( expense )
     # add comment in report if expense is added within report
     Reports::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
 

@@ -1,6 +1,6 @@
 class BankTransfer::InwardInvoices::Base < BankTransfer::Base
 
-  attr_accessor :inward_invoice
+  attr_accessor :inward_invoice, :budget_contributions_before_update
 
   class BankTransfer::InwardInvoices::Show::InvoicePresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -96,13 +96,16 @@ class BankTransfer::InwardInvoices::Base < BankTransfer::Base
     CustomField::SetFields.(invoice, FieldParentType.id_for(:invoice), custom_fields)
   end
 
-  def budget_limit_validation inward_invoice
-    if user.company.feature_subscription.enforce_budget_limit
-      op = BudgetManager::BudgetLimitValidator::ValidateInvoice.(user,{ invoice: inward_invoice })
-      if op.messages[:error].present?
-        return add_message :error, op.messages[:error]
-      end
+  def fetch_budget_contributions(inward_invoice)
+    if user.company.enforce_budget_configuration.enforce_invoice_budget?
+      op = BudgetManager::BudgetLimitValidator::Invoice.({invoice: inward_invoice, ignore_unbudgetables: true, current_user: user})
+      self.budget_contributions_before_update = op['result'][:budget_contributions] rescue {}
     end
   end
 
+  def budget_limit_validation(inward_invoice)
+    if user.company.enforce_budget_configuration.enforce_invoice_budget?
+      return BudgetManager::BudgetLimitValidator::Invoice.({invoice: inward_invoice, previous_budget_contributions: self.budget_contributions_before_update, current_user: user})
+    end
+  end
 end

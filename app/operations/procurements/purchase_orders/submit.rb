@@ -14,6 +14,8 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
     purchase_order_id = params[:id] || params[:purchase_order_id]
     self.purchase_order = user.company.purchase_orders.find_by id: purchase_order_id
     self.procurement = self.purchase_order&.procurement
+
+    fetch_budget_contributions(purchase_order)
   end
 
   def validate
@@ -23,19 +25,6 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
 
     if self.purchase_order.bank_account.disabled
       add_message :error, "This purchase order has a bank account which is disabled. Payment can only be processed to active bank accounts"
-      return
-    end
-
-    # checking for configuration on whether this particular company
-    # has budgeting enforced or not
-    if current_company.enforce_budget_configuration.enforce_purchase_order_budget? && self.purchase_order.items.present?
-      op = BudgetManager::BudgetsCalculator::ApplicableBudgets.({document: self.purchase_order, current_user: User.first})
-      if op.success?
-        self.budgets = op["result"][:budgets] rescue []
-      end
-    end
-    if current_company.enforce_budget_configuration.enforce_purchase_order_budget? && self.budgets.blank?
-      add_message :error, "You cannot submit this PO because there are no budgets associated with it"
       return
     end
 
@@ -51,36 +40,48 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
   end
 
   def process
-    params[:document] = self.purchase_order
-    params[:aasm_event] = 'submit'
-    params[:violation_present] = false
-    op = WorkflowManager::Base.(user, params)
-    unless op.success?
-      add_message :error, op.messages[:error]
-      return
-    end
+    ActiveRecord::Base.transaction(requires_new: true) do
+      params[:document] = self.purchase_order
+      params[:aasm_event] = 'submit'
+      params[:violation_present] = false
+      op = WorkflowManager::Base.(user, params)
+      unless op.success?
+        add_message :error, op.messages[:error]
+        return
+      end
 
-    if purchase_order.auto_approved?
-      old_status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_processing))
-      status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_approved))
-      self.procurement.status_tags.delete(old_status_tag)
-      self.procurement.status_tags << status_tag
-    end
+      if purchase_order.auto_approved?
+        old_status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_processing))
+        status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_approved))
+        self.procurement.status_tags.delete(old_status_tag)
+        self.procurement.status_tags << status_tag
+      end
 
-    # if procurements already has advance payments, disallow changes in advance amount even if po revised.
-    if purchase_order.advance_amount&.present? and purchase_order.advance_payments.blank?
-      if purchase_order.advance_amount.value > 0
-        purchase_order.advance_amount_status_id = (purchase_order.auto_approved? ? AdvanceAmountStatus.id_for(:to_be_processed) : AdvanceAmountStatus.id_for(:po_processing))
-        purchase_order.save
+      # if procurements already has advance payments, disallow changes in advance amount even if po revised.
+      if purchase_order.advance_amount&.present? and purchase_order.advance_payments.blank?
+        if purchase_order.advance_amount.value > 0
+          purchase_order.advance_amount_status_id = (purchase_order.auto_approved? ? AdvanceAmountStatus.id_for(:to_be_processed) : AdvanceAmountStatus.id_for(:po_processing))
+          purchase_order.save
+        end
+      end
+
+      self.purchase_order.update(rejection_note: "")
+      self.workflow_output = op.workflow_output
+
+      return if has_errors?
+
+      # Budget check
+      budget_validation_op = budget_limit_validation(purchase_order)
+      if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+        add_message :error, budget_validation_op.messages[:errors]
+        raise ActiveRecord::Rollback
+        return
       end
     end
-
-    self.purchase_order.update(rejection_note: "")
-    self.workflow_output = op.workflow_output
   end
 
   def post_process
-    budget_limit_validation( purchase_order )
+
     add_message :success, 'Successfully submitted purchase order'
     # role_id = self.workflow_output[:role_id]
     Event::EPurchaseOrder::Submit.(user, {purchase_order: purchase_order, workflow_output: workflow_output})

@@ -77,7 +77,7 @@
         if finly_transaction.associated_transaction&.virtual_account&.name.present?
           merchant += "#{finly_transaction.associated_transaction&.virtual_account&.name} - "
         end
-        merchant += finly_transaction.associated_transaction&.virtual_account&.account_number
+        merchant += "#{finly_transaction.associated_transaction&.virtual_account&.account_number}"
       when PaymentPurpose.id_for(:utility_bill_payment)
         bill = finly_transaction.payment&.parent
         if finly_transaction.credit?

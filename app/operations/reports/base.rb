@@ -3,7 +3,7 @@
 
 require "#{Rails.root}/lib/formatter.rb"
 class Reports::Base < BaseOperation
-  attr_accessor :report, :report_id, :workflow_output, :violations
+  attr_accessor :report, :report_id, :workflow_output, :violations, :budget_contributions_before_update
 
   def pre_validate
     if user.blank?
@@ -71,6 +71,19 @@ class Reports::Base < BaseOperation
 
   def present_report
     Reports::Base::Presenter.new(self.user, {report: self.report, view: params[:view]}, messages)
+  end
+
+  def fetch_budget_contributions(report)
+    if user.company.enforce_budget_configuration.enforce_expense_budget?
+      op = BudgetManager::BudgetLimitValidator::Report.({report: report, ignore_unbudgetables: true, current_user: user})
+      self.budget_contributions_before_update = op['result'][:budget_contributions] rescue {}
+    end
+  end
+
+  def budget_limit_validation(report)
+    if user.company.enforce_budget_configuration.enforce_expense_budget?
+      return BudgetManager::BudgetLimitValidator::Report.({report: report, previous_budget_contributions: self.budget_contributions_before_update, current_user: user})
+    end
   end
 
   class Reports::Base::Presenter < BaseOperation::BasePresenter::SuccessPresenter
