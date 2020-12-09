@@ -101,7 +101,7 @@ class ExportManager::Master::Invoices::TdsExport < ExportManager::Builders::Spre
   end
 
   def invoice_number(invoice)
-    "\t" + (invoice.invoice_number.to_s)
+    "\t" + "#{invoice.invoice_number}"
   end
 
   def invoice_date(invoice)

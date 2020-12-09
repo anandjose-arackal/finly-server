@@ -45,7 +45,7 @@ class ExportManager::Master::Invoices::GstExport < ExportManager::Builders::Spre
   end
 
   def invoice_number(invoice_line_item)
-    "\t" + (invoice_line_item.parent.invoice_number.to_s)
+    "\t" + "#{invoice_line_item.parent.invoice_number}"
   end
 
   def finly_ref_no(invoice_line_item)
