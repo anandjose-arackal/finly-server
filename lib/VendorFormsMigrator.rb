@@ -1,3 +1,4 @@
+# Forms::Synchronizer.(master: 'Masters::Vendors::Form', company_id: 214)
 # RAILS_ENV=production nohup rails runner 'VendorFormsMigrator.run' --trace > vendor_forms_migration_[company_id].log 2>&1 &
 # RAILS_ENV=production nohup rails runner 'VendorFormsMigrator.perform' --trace > ~/vendor_forms_migration_2.log 2>&1 &
 # RAILS_ENV=production nohup rails runner 'VendorFormsMigrator.perform(248)' --trace > ~/vendor_forms_migration_248.log 2>&1 &

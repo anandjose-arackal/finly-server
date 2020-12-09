@@ -47,7 +47,7 @@ class Docs::P2P::Invoices::Form < Forms::API
   end
 
   # INVOICE DETAILS
-  section :invoice_details, title: "Invoice Details" do
+  section :invoice_details, title: "Invoice Details", associate_custom_fields: true do
     auto_number :invoice_id,
                label: "Sequence Number",
                editable: false,
@@ -76,7 +76,7 @@ class Docs::P2P::Invoices::Form < Forms::API
   end
 
   # ACCOUNTING DETAILS
-  section :accounting_details, title: "Accounting Details" do
+  section :accounting_details, title: "Accounting Details", associate_custom_fields: true do
     lookup :policy_id,
          choices_scope: Choices[:lookup].('policies'),
          #permissions: [:non_po_invoice_initiator]),
@@ -96,7 +96,7 @@ class Docs::P2P::Invoices::Form < Forms::API
   end
 
   # VENDOR DETAILS
-  section :vendor_details, title: "Vendor Details" do
+  section :vendor_details, title: "Vendor Details", associate_custom_fields: true do
     lookup :vendor_id, label: "Vendor", choices_scope: Choices[:lookup].('vendors'), required: true, editable: false,
            can_editable_be_changed: false, can_be_disabled: false, can_required_be_changed: false, can_visible_be_changed: false
     text :vendor_sequence_id, "Vendor ID", editable: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.vendor_id}}')
