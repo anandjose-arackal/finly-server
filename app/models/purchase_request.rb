@@ -66,6 +66,12 @@ include Searchkick::Api
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
 
+  has_paper_trail(
+      meta: {
+          parent_document_type: "Purchase Request"
+      }
+  )
+
 
   scope :search_by_email, -> (email) {
     user = RequestStore.store[:current_user]
