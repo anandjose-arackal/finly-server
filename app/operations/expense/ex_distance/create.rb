@@ -28,10 +28,6 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
     }
   end
 
-  def rollback_process_if_error?
-    true
-  end
-
   def authorized_user_types
     [:employee]
   end
@@ -166,33 +162,45 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
   end
 
   def process
-    self.expense = user.expenses.build(expense_params)
+    ActiveRecord::Base.transaction(requires_new: true) do
+      self.expense = user.expenses.build(expense_params)
 
-    if self.expense.distance_expense&.vehicle_rate&.policy&.distance_expense_config&.enforce_category
-      enforced_category = self.expense.distance_expense&.vehicle_rate&.policy&.distance_expense_config&.default_category
-      sent_category_id = expense_params[:category_id].to_i
-      sent_category = user.company.categories.find_by(id: sent_category_id)
-      # i.e. checking of the selected category is a sub category of the one enforced inside the policy
-      if enforced_category.children.pluck(:id).include?(sent_category_id)
-        self.expense.category = sent_category
+      if self.expense.distance_expense&.vehicle_rate&.policy&.distance_expense_config&.enforce_category
+        enforced_category = self.expense.distance_expense&.vehicle_rate&.policy&.distance_expense_config&.default_category
+        sent_category_id = expense_params[:category_id].to_i
+        sent_category = user.company.categories.find_by(id: sent_category_id)
+        # i.e. checking of the selected category is a sub category of the one enforced inside the policy
+        if enforced_category.children.pluck(:id).include?(sent_category_id)
+          self.expense.category = sent_category
+        else
+          self.expense.category = enforced_category
+        end
+      end
+
+      # Create custom fields only for validations. Fields will be saved later
+      validate_custom_fields
+      return if has_errors?
+
+
+      if self.expense.save
+        # Attach an existing receipt to the expense
+        if self.receipt.present?
+          self.receipt.parent = expense
+          self.receipt.save
+        end
       else
-        self.expense.category = enforced_category
+        messages[:error] = self.expense.errors.full_messages
       end
-    end
 
-    # Create custom fields only for validations. Fields will be saved later
-    validate_custom_fields
-    return if has_errors?
+      return if has_errors?
 
-
-    if self.expense.save
-      # Attach an existing receipt to the expense
-      if self.receipt.present?
-        self.receipt.parent = expense
-        self.receipt.save
+      # Budget check
+      budget_validation_op = budget_limit_validation(expense)
+      if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+        add_message :error, budget_validation_op.messages[:errors]
+        raise ActiveRecord::Rollback
+        return
       end
-    else
-      messages[:error] = self.expense.errors.full_messages
     end
   end
 
@@ -248,13 +256,6 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
     # checking if the expense has any receipts, and marking them all as no need to be transcribed
     if expense.receipts.present?
       expense.receipts.update_all(to_be_transcribed: false)
-    end
-
-    # Budget check
-    budget_validation_op = budget_limit_validation(expense)
-    if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
-      add_message :error, budget_validation_op.messages[:errors]
-      return
     end
 
     messages[:success] << 'Expense created'
