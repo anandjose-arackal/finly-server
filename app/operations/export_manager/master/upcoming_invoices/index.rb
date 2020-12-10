@@ -42,7 +42,6 @@ class ExportManager::Master::UpcomingInvoices::Index < ExportManager::Builders::
     # attribute :custom_fields, dynamic: true
   end
 
-
   def input
     invoices = resolve 'upcoming_invoices.default'
   end
