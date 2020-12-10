@@ -15,9 +15,34 @@ class ExportManager::Template::TemplateExport < ExportManager::API
     export_template.name
   end
 
+  def format_query(query)
+    conditions = []
+    groups = []
+    query["c"] ||= []
+    query["g"] ||= []
+
+    query["c"].each do |sub_query|
+      unless sub_query["_destroy"]
+        if sub_query["logic_type"] == "group"
+          groups << format_query(sub_query)
+        else
+          conditions << sub_query
+        end
+      end
+    end
+
+    query["c"] = conditions
+    query["g"] = groups
+    query
+  end
+
   def input
     if self.export_template.query.present?
-      params[:additional_filters] = [self.export_template.query.with_indifferent_access]
+      query = self.export_template.query
+      if query["q"].present?
+        query["q"] = format_query({"c" => query["q"]})
+      end
+      params[:additional_filters] = [query.with_indifferent_access]
     end
     results = Resolver::Router.dispatch("#{resource_type}.default", { current_user: user, params: params })
 
