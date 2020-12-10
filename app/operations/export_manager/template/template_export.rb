@@ -17,7 +17,7 @@ class ExportManager::Template::TemplateExport < ExportManager::API
 
   def input
     if self.export_template.query.present?
-      params[:additional_filters] = [self.export_template.query]
+      params[:additional_filters] = [self.export_template.query.with_indifferent_access]
     end
     results = Resolver::Router.dispatch("#{resource_type}.default", { current_user: user, params: params })
 
