@@ -14,7 +14,6 @@ class ExportManager::Master::UpcomingInvoices::Index < ExportManager::Builders::
   attribute :start_date
   attribute :end_date
   attribute :due_date
-  attribute :due_in_days
   attribute :agreement_number
   attribute :agreement_date
   attribute :agreement_execution_date
@@ -73,10 +72,6 @@ class ExportManager::Master::UpcomingInvoices::Index < ExportManager::Builders::
 
   def due_date invoice
     invoice&.due_date&.strftime("%d-%m-%Y")
-  end
-
-  def due_in_days invoice
-    invoice&.due_in_days
   end
 
   def agreement_number invoice
