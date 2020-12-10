@@ -116,7 +116,7 @@ class ExportManager::Master::UpcomingInvoices::Index < ExportManager::Builders::
   end
 
   def tds_rate invoice
-    invoice&.tds_slab&.rate.to_f
+    invoice&.tds_slab&.tds.to_f
   end
 
   def tds_amount invoice
