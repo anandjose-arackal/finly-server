@@ -52,7 +52,8 @@ class AuditTrail < PaperTrail::Version
   private
 
   def sanitize_data(changes)
-    changes = changes.reject{|k,v| v.first == v.last}
+    return changes if changes.count < 3
+    changes = changes.reject{|k,v| v.first&.to_s == v.last&.to_s}
   end
 
   def convert_object_changes_to_hash(changes)
