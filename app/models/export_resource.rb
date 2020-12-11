@@ -25,7 +25,7 @@ class ExportResource < ApplicationRecord
     {
       name: 'Payments',
       value: 'payments',
-      route: 'payment_tickets.index'
+      route: 'payment_ticket.index'
     },
     {
       name: 'Purchase Requests',
@@ -45,12 +45,12 @@ class ExportResource < ApplicationRecord
     {
       name: 'Users',
       value: 'users',
-      route: 'user.index'
+      route: 'users.vp.index'
     },
     {
       name: 'Item Master',
       value: 'items',
-      route: 'items.index'
+      route: 'item_master.index'
     },
     {
       name: 'Vendors',
