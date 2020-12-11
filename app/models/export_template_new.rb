@@ -31,6 +31,10 @@ class ExportTemplateNew < ApplicationRecord
   scope :filter_default, -> { where default: true }
   scope :filter_route, -> (route) { where resource: ExportResource.where(route: route).pluck(:value) }
 
+  def system_template?
+    return self.master.present?
+  end
+
   def self.seed_data
     Company.find_each do |company|
       ExportManager::TemplateMaster.subscribers.each do |_, list|

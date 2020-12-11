@@ -15,6 +15,7 @@ json.results do
     json.user_roles do
       json.array! record.user_roles
     end
+    json.system_template record.system_template?
   end
 end
 json.count @op['model.records'].count

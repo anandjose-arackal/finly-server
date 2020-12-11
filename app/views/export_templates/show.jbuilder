@@ -14,4 +14,5 @@ json.result do
   json.user_roles do
     json.array! @op['model'].user_roles
   end
+  json.system_template @op['model'].system_template?
 end
