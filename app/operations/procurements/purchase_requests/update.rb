@@ -38,7 +38,6 @@ class Procurements::PurchaseRequests::Update < Procurements::PurchaseRequests::B
 
   def process
     self.purchase_request.assign_attributes(purchase_request_parameters)
-
     # Save Custom Fields
     validate_custom_fields_pr
     return if has_errors?

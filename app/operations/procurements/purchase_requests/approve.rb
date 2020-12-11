@@ -22,6 +22,7 @@ class Procurements::PurchaseRequests::Approve < Procurements::PurchaseRequests::
 
     begin
       ActiveRecord::Base.transaction do
+        self.purchase_request.paper_trail_event = "Approve"
         params[:document] = self.purchase_request
         params[:aasm_event] = 'approve'
         op = WorkflowManager::Base.(user, params)

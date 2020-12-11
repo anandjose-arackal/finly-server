@@ -1,6 +1,7 @@
 class Procurements::PurchaseRequests::Retract < Procurements::PurchaseRequests::Base
 
   def process
+    self.purchase_request.paper_trail_event = "Retract"
     params[:document] = self.purchase_request
     params[:aasm_event] = 'retract'
 

@@ -20,6 +20,7 @@ class Procurements::PurchaseRequests::Submit < Procurements::PurchaseRequests::B
 
   def process
     begin
+      self.purchase_request.paper_trail_event = "Submit"
       ActiveRecord::Base.transaction do
         params[:document] = self.purchase_request
         params[:aasm_event] = 'submit'

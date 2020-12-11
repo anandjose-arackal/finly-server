@@ -11,6 +11,16 @@ class AuditTrailExposure < Exposures::API
   attribute :created_at, record_attribute: true
   attribute :transaction_id, record_attribute: true
   attribute :user_transaction_id, record_attribute: true
+  attribute :event_name do
+    case record.event.downcase
+    when 'update', 'approve', 'un approve', 'create'
+      "#{record.event}d"
+    when  'reject','retract', 'submit'
+      "#{record.event}ed"
+    else
+      record.event
+    end
+  end
   attribute :document_number do
     record.get_document_number
   end

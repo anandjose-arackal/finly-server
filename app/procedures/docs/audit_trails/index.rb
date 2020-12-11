@@ -10,7 +10,7 @@ class Docs::AuditTrails::Index < IndexBuilder::API
   status_filters false
 
   column :description,  label: "Record Description", fixed: true, default: true do
-    text value: "{{record.created_by.name}} {{record.event}}d {{record.item_type}}" , format: "primary"
+    text value: "{{record.created_by.name}} {{record.event_name}} {{record.item_type}}" , format: "primary"
   end
 
   column :created_at, label: "DATE & TIME", sort: :created_at, default: true do
