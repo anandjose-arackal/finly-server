@@ -41,11 +41,11 @@ class AuditTrail < PaperTrail::Version
   def get_change_statement(less=false)
     return {} if self.object_changes.nil?
     if less
-     changes = self.changeset&.first(2) rescue {}
+     changes = self.changeset&.last(2) rescue {}
     else
       changes = self.changeset rescue {}
     end
-    convert_object_changes_to_hash(changes)
+    change = convert_object_changes_to_hash(changes)
   end
 
   private
@@ -59,6 +59,9 @@ class AuditTrail < PaperTrail::Version
       elsif [:datetime,:date].include? klass.columns_hash[k.to_s]&.type
         date_change = v.map{ |date_string| date_string&.strftime("%d/%m/%Y %H:%M:%S") rescue ""}
         hash.merge!({k.to_s&.titlecase => date_change})
+      elsif [:boolean].include? klass.columns_hash[k.to_s]&.type
+        boolean_change = v.map{ |boolean_value|  boolean_value == "true" ? 'Yes' : 'No' rescue ""}
+        hash.merge!({k.to_s&.titlecase => boolean_change})
       else
         hash.merge!({k.to_s&.titlecase => v})
       end

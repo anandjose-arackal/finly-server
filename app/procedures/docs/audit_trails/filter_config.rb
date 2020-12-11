@@ -1,9 +1,9 @@
 class Docs::AuditTrails::FilterConfig < Filters::API
 
   DOCUMENT_TYPES = [
-      {id: "PuchaseOrder", name: "Purchase Order"},
+      {id: "Purchase Request", name: "Purchase Request"},
+      {id: "Purchase Order", name: "Purchase Order"},
       {id: "Invoice", name: "Invoice"},
-      {id: "PuchaseRequest", name: "Purchase Request"},
       {id: "YesBankVendor", name: "Vendor"}
   ]
 
