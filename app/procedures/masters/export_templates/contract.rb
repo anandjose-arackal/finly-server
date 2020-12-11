@@ -34,6 +34,15 @@ class Masters::ExportTemplates::Contract < Reform::Form
         errors.add :base, 'Invalid template'
         return
       end
+
+      parsed_template["columns"].each do |column|
+        unless column["label"].present?
+          errors.add :base, "Label cannot be empty"
+          return
+        end
+      end
+
+      true
     end
   end
 end
