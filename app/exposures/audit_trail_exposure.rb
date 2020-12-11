@@ -15,8 +15,10 @@ class AuditTrailExposure < Exposures::API
     case record.event.downcase
     when 'update', 'approve', 'un approve', 'create'
       "#{record.event}d"
-    when  'reject','retract', 'submit'
+    when  'reject','retract'
       "#{record.event}ed"
+    when 'submit'
+      "Submitted"
     else
       record.event
     end
