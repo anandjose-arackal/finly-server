@@ -4366,6 +4366,10 @@ Rails.application.routes.draw do
       get 'purchase_orders/count', to: 'purchase_orders#count'
       post 'purchase_orders/new_sync_attempt', to: 'purchase_orders#new_sync_attempt'
       resources :purchase_orders, only: [:index]
+
+      get 'credit_notes/count', to: 'credit_notes#count'
+      post 'credit_notes/new_sync_attempt', to: 'credit_notes#new_sync_attempt'
+      resources :credit_notes, only: [:index]
     end
   end
 

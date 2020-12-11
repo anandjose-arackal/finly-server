@@ -14,54 +14,55 @@ class Procurements::PurchaseRequests::Submit < Procurements::PurchaseRequests::B
     fetch_budget_contributions(purchase_request)
   end
 
-  def rollback_process_if_error?
-    true
-  end
-
   def process
-    begin
-      ActiveRecord::Base.transaction do
-        params[:document] = self.purchase_request
-        params[:aasm_event] = 'submit'
-        op = WorkflowManager::Base.(user, params)
-        if op.success?
-          # Submit the line items too
-          purchase_request_status = purchase_request&.status&.name
-          if purchase_request_status.present?
-            # if purchase_request.purchase_request_items.update_all(status_id: PurchaseRequestItemStatus.id_for(purchase_request&.status&.name&.to_sym), rejected: false)
-            if purchase_request_status == 'auto_approved'
-              trail_action = 'auto_approve'
-            elsif purchase_request_status == 'awaiting_approval'
-              trail_action = 'submit'
-            end
-            purchase_request.purchase_request_items.each do |item|
-              item.status_id = PurchaseRequestItemStatus.id_for(purchase_request&.status&.name&.to_sym)
-              item.rejected = false
-              if item.save
-                trail = item.trails.create(action_user: user, action_id: TrailAction.id_for(trail_action))
+    ActiveRecord::Base.transaction(requires_new: true) do
+      begin
+        ActiveRecord::Base.transaction(requires_new: true) do
+          params[:document] = self.purchase_request
+          params[:aasm_event] = 'submit'
+          op = WorkflowManager::Base.(user, params)
+          if op.success?
+            # Submit the line items too
+            purchase_request_status = purchase_request&.status&.name
+            if purchase_request_status.present?
+              # if purchase_request.purchase_request_items.update_all(status_id: PurchaseRequestItemStatus.id_for(purchase_request&.status&.name&.to_sym), rejected: false)
+              if purchase_request_status == 'auto_approved'
+                trail_action = 'auto_approve'
+              elsif purchase_request_status == 'awaiting_approval'
+                trail_action = 'submit'
               end
+              purchase_request.purchase_request_items.each do |item|
+                item.status_id = PurchaseRequestItemStatus.id_for(purchase_request&.status&.name&.to_sym)
+                item.rejected = false
+                if item.save
+                  trail = item.trails.create(action_user: user, action_id: TrailAction.id_for(trail_action))
+                end
+              end
+            else
+              raise
             end
           else
             raise
           end
-        else
-          raise
+          self.workflow_output = op.workflow_output
         end
-        self.workflow_output = op.workflow_output
+      rescue
+        add_message :error, 'Unable to proceed'
       end
-    rescue
-      add_message :error, 'Unable to proceed'
+
+      return if has_errors?
+
+      # Budget check
+      budget_validation_op = budget_limit_validation(purchase_request)
+      if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+        add_message :error, budget_validation_op.messages[:errors]
+        raise ActiveRecord::Rollback
+        return
+      end
     end
   end
 
   def post_process
-    # Budget check
-    budget_validation_op = budget_limit_validation(purchase_request)
-    if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
-      add_message :error, budget_validation_op.messages[:errors]
-      return
-    end
-
     Event::EPurchaseRequest::Submit.(user, purchase_request: purchase_request, workflow_output: workflow_output)
     if purchase_request.purchase_request_status_id == PurchaseRequestStatus.id_for(:auto_approved)
       add_message :success, "Purchase Request Auto Approved"

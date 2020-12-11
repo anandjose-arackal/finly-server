@@ -12,10 +12,6 @@ class Reports::Submit < Reports::Base
     [:employee]
   end
 
-  def rollback_process_if_error?
-    true
-  end
-
   def pre_validate
     if params.blank?
       add_message :error, 'Error loading configuration'
@@ -96,6 +92,7 @@ class Reports::Submit < Reports::Base
   end
 
   def process
+    ActiveRecord::Base.transaction(requires_new: true) do
     # presenter = User::Team::Review::NextReviewer.(report, has_violations: self.has_violations)
     # manager = presenter.user
     # manager_role_id = presenter.role_id
@@ -140,27 +137,32 @@ class Reports::Submit < Reports::Base
     #   return true
     # end
     # add_message :error, report.errors.full_messages
-    params[:document] = self.report
-    params[:aasm_event] = 'submit'
-    params[:violation_present] = false
-    op = WorkflowManager::Base.(user, params)
-    unless op.success?
-      add_message :error, op.messages[:error]
-      return
-    end
 
-    self.workflow_output = op.workflow_output
+      params[:document] = self.report
+      params[:aasm_event] = 'submit'
+      params[:violation_present] = false
+      op = WorkflowManager::Base.(user, params)
+      unless op.success?
+        add_message :error, op.messages[:error]
+        return
+      end
+
+      self.workflow_output = op.workflow_output
+
+      return if has_errors?
+
+      # Budget check
+      budget_validation_op = budget_limit_validation(report)
+      # byebug
+      if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+        add_message :error, budget_validation_op.messages[:errors]
+        raise ActiveRecord::Rollback
+        return
+      end
+    end
   end
 
   def post_process
-    # Budget check
-    budget_validation_op = budget_limit_validation(report)
-    # byebug
-    if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
-      add_message :error, budget_validation_op.messages[:errors]
-      return
-    end
-
     # Creating Email Authorization
 
     # If report is processing

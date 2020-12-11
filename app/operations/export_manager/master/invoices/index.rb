@@ -139,7 +139,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
   end
 
   def invoice_no(invoice_line_item)
-    invoice_line_item.parent&.invoice_number
+    "\t#{invoice_line_item.parent&.invoice_number}"
   end
 
   def vendor_name(invoice_line_item)
