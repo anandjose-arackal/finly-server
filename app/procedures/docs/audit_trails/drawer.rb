@@ -18,10 +18,10 @@ class Docs::AuditTrails::Drawer < Drawer::API
   def self.build(user, record)
     record_exposure = record.first.to_exposure
     map = []
-    self.blocks.each do |block_key, block|
-      data_provider = data_provider(user, record, record_exposure)
-      map << block.build(data_provider, user, record, record_exposure)
-    end
+    block = self.blocks.each
+    data_provider = data_provider(user, record, record_exposure)
+    map << block.build(data_provider, user, record, record_exposure)
+
     record.group_by(&:item_id).each do | k,item_group|
       dup_exposure =item_group.first.to_exposure
       hash ={}
