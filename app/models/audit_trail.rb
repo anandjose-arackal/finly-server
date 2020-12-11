@@ -45,10 +45,16 @@ class AuditTrail < PaperTrail::Version
     else
       changes = self.changeset rescue {}
     end
-    change = convert_object_changes_to_hash(changes)
+    changes = convert_object_changes_to_hash(changes)
+    sanitize_data(changes)
   end
 
   private
+
+  def sanitize_data(changes)
+    changes = changes.reject{|k,v| v.first == v.last}
+  end
+
   def convert_object_changes_to_hash(changes)
     all_reflections = get_all_reflections
     klass = self.item_type.constantize
