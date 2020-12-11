@@ -7,7 +7,7 @@ class Masters::ExportTemplates::Contract < Reform::Form
   property :query, default: {}
   property :active, default: true
   property :personal, default: true
-  property :created_by_id, validates: { presence: true }
+  property :created_by_id
   property :company_id, validates: { presence: true }
 
   # collection :role_mappings, populate_if_empty: ExportTemplateUserRoleMapping do
