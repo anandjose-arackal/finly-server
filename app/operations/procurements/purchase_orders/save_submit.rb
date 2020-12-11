@@ -19,7 +19,8 @@ class Procurements::PurchaseOrders::SaveSubmit < Procurements::PurchaseOrders::B
   def process
 
     call_save(params)
-    return unless self.flag_save    
+    return unless self.flag_save
+    self.purchase_order.paper_trail_event = "Submit"
     call_submit(params)
 
   end
