@@ -41,7 +41,7 @@ class AuditTrail < PaperTrail::Version
   def get_change_statement(less=false)
     return {} if self.object_changes.nil?
     if less
-     changes = self.changeset&.last(2) rescue {}
+     changes = self.changeset&.first(2) rescue {}
     else
       changes = self.changeset rescue {}
     end
