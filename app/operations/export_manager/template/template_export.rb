@@ -22,7 +22,7 @@ class ExportManager::Template::TemplateExport < ExportManager::API
     query["g"] ||= []
 
     query["c"].each do |sub_query|
-      unless sub_query["_destroy"]
+      unless sub_query["_destroy"].present?
         if sub_query["logic_type"] == "group"
           groups << format_query(sub_query)
         else
