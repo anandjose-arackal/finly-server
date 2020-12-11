@@ -37,6 +37,7 @@ class Procurements::Invoices::Void < Procurements::Invoices::Base
 
   def process
     # if purchase order's payment's been processed then should block voiding it
+    self.invoice.paper_trail_event = "Void"
     params[:document] = self.invoice
     params[:aasm_event] = 'void'
     params[:provider_name] = self.invoice.get_invoice_provider_name

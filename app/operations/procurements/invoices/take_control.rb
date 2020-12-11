@@ -24,6 +24,7 @@ class Procurements::Invoices::TakeControl < Procurements::Invoices::Base
 
 
   def process
+    self.invoice.paper_trail_event = "Took Control"
     params[:document] = self.invoice
     params[:aasm_event] = 'take_control'
     params[:violation_present] = false # Will be used in future

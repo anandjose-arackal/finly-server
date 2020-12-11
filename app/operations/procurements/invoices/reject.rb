@@ -30,6 +30,7 @@ class Procurements::Invoices::Reject < Procurements::Invoices::Base
   end
 
   def process
+    self.invoice.paper_trail_event = "Reject"
     params[:document] = self.invoice
     params[:aasm_event] = 'reject'
     params[:violation_present] = false #todo Check violations

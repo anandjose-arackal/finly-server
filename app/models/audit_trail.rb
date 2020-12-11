@@ -21,7 +21,7 @@ class AuditTrail < PaperTrail::Version
     when "PurchaseOrderItem"
       self.document_number = self.item.purchase_order.po_number
     when  "Invoice"
-      self.document_number = self.invoice_id
+      self.document_number = self.item.invoice_id
     when  "InvoiceLineItem"
       self.document_number = self.item.invoice.invoice_id
     when "PurchaseRequest"
@@ -79,7 +79,7 @@ class AuditTrail < PaperTrail::Version
   def get_all_reflections
     klass = self.item_type.constantize
     hash = {}
-    klass.reflect_on_all_associations(:belongs_to).map{|reflect| hash[reflect.foreign_key] ={name: reflect.name ,klass: reflect.klass}}
+    klass.reflect_on_all_associations(:belongs_to).map{|reflect| hash[reflect.foreign_key] ={name: reflect.name ,klass: reflect.klass} unless reflect.options[:polymorphic]}
     hash.with_indifferent_access
   end
 

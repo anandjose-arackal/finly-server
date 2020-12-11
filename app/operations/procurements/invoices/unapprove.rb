@@ -26,6 +26,7 @@ class Procurements::Invoices::Unapprove < Procurements::Invoices::Base
   end
 
   def process
+    self.invoice.paper_trail_event = "Un Approve"
     params[:document] = self.invoice
     params[:aasm_event] = 'unapprove'
     params[:violation_present] = false #todo Check violations

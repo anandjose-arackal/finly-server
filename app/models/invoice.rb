@@ -243,11 +243,11 @@ class Invoice < ApplicationRecord
   has_many :credit_note_adjustments, dependent: :destroy
   has_many :credit_notes, through: :credit_note_adjustments
 
-  #has_paper_trail(
-  #    meta: {
-  #        parent_document_type: "Invoice"
-  #    }
-  #)
+  has_paper_trail(
+      meta: {
+          parent_document_type: "Invoice"
+      }
+  ) if Proc.new { |inv | inv.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice) || inv.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)}
 
 
   accepts_nested_attributes_for :address

@@ -53,6 +53,7 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
   end
 
   def process
+    self.invoice.paper_trail_event = "Submit"
     params[:document] = self.invoice
     params[:aasm_event] = 'submit'
     params[:violation_present] = false

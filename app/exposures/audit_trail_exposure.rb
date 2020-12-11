@@ -14,9 +14,13 @@ class AuditTrailExposure < Exposures::API
   attribute :event_name do
     case record.event.downcase
     when 'update', 'approve', 'un approve', 'create'
-      "#{record.event}d"
+      "#{record.event.capitalize}d"
     when  'reject','retract'
       "#{record.event}ed"
+    when  'return control'
+      "Returned Control of"
+    when 'took control'
+      "Took Control of"
     when 'submit'
       "Submitted"
     else
@@ -38,4 +42,31 @@ class AuditTrailExposure < Exposures::API
   attribute :item_type_label do
     "#{record.item_type} Changes"
   end
+
+  attribute :description do
+    case record.event.downcase
+    when 'update', 'approve', 'un approve', 'create'
+      event_name = "#{record.event.capitalize}d"
+    when  'reject','retract'
+      event_name ="#{record.event}ed"
+    when  'return control'
+      event_name ="Returned Control of"
+    when 'took control'
+      event_name ="Took Control of"
+    when 'submit'
+      event_name ="Submitted"
+    else
+      event_name =record.event
+    end
+
+    case record.event.downcase
+    when 'vendor confirmed'
+      "#{record.created_by.name} the Purchase Order as Vendor Confirmed"
+    when 'send to vendor'
+      "#{record.created_by.name} Sent Purchase Order to Vendor"
+    else
+      "#{record.created_by.name} #{event_name} #{record.item_type}"
+    end
+  end
+
 end

@@ -17,6 +17,7 @@ class Procurements::PurchaseOrders::MarkSendToVendor < Procurements::PurchaseOrd
   def process
     # todo-abi
     # if purchase order's payment's been processed then should block voiding it
+    self.purchase_order.paper_trail_event = "Send To Vendor"
     params[:document] = self.purchase_order
     params[:aasm_event] = 'send_to_vendor'
     params[:violation_present] = false #todo Check violations
