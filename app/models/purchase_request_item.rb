@@ -69,6 +69,12 @@ class PurchaseRequestItem < ApplicationRecord
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 
+  has_paper_trail(
+      meta: {
+          parent_document_type: "Purchase Request"
+      }
+  )
+
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
 
