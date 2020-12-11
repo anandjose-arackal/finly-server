@@ -30,6 +30,7 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
     unless messages.blank?
       return result false, messages.join(', ')
     end
+    binding.pry
     #support for multiple gstin locations in import
     vendor = check_existing_vendor(vendor_params["vendor"])
     if vendor && vendor_params["vendor"]["gstin_locations_attributes"]
@@ -111,6 +112,7 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
   end
   
   def set_params(data)
+    binding.pry
     messages =[]
     business_name = data[:business_name].to_s
     messages << "Legal Name can't Blank" if business_name.blank?
@@ -130,6 +132,7 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
     code = data[:vendor_id].to_s
     vendor_id = (code.blank? ? nil : code)
     vendor_type_id = nil
+    policy_id = company&.default_policy&.id
     if data[:vendor_type].present?
       vendor_type_id = company.vendor_types.where(name: data[:vendor_type]).first
       if vendor_type_id.blank?
@@ -171,7 +174,8 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
                            "vendor_id" => vendor_id,
                            "vendor_type_id" => vendor_type_id,
                            "gst_registered" => gst_registered,
-                           "payment_term_id" => payment_term_id
+                           "payment_term_id" => payment_term_id,
+                           "policy_id" => policy_id
     }}
 
     bank_params={"bank_accounts_attributes" =>[{"name"=>account_name,
