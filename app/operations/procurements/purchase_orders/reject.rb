@@ -34,6 +34,7 @@ class Procurements::PurchaseOrders::Reject < Procurements::PurchaseOrders::Base
   end
 
   def process
+    self.purchase_order.paper_trail_event = "Reject"
     params[:document] = self.purchase_order
     params[:aasm_event] = 'reject'
     params[:violation_present] = false #todo Check violations

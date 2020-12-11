@@ -13,6 +13,7 @@ class Procurements::PurchaseOrders::Retract < Procurements::PurchaseOrders::Base
   end
 
   def process
+    self.purchase_order.paper_trail_event = "Retract"
     params[:document] = self.purchase_order
     params[:aasm_event] = 'retract'
     params[:violation_present] = false #todo Check violations
