@@ -16,6 +16,7 @@ class ActionManager::Actions::Export < ActionManager::Action
         export_format: record.export_format,
         description: record.description,
         resource: record.resource,
+        system_template: record.system_template?,
       }
     end
 
