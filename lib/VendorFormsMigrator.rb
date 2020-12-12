@@ -23,10 +23,9 @@ class VendorFormsMigrator
     documents_without_attachments = documents.where(status_id: VendorStatus.id_for(:auto_approved)).where.not(id: vendor_attachments.select(:yes_bank_vendor_id))
     # Update Vendor Country
 
-    documents_without_attachments.update_all({
+    YesBankVendor.where(id: documents_without_attachments.select(:id)).update_all({
                                                  vendor_country: "India"
                                              })
-
 
     documents_with_attachments = documents.where.not(id: documents_without_attachments.select(:id))
 
