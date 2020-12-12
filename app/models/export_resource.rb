@@ -61,6 +61,11 @@ class ExportResource < ApplicationRecord
       name: 'Utility Bills',
       value: 'utility_bills',
       route: 'utility_bills.index'
+    },
+    {
+      name: 'Utility Subscriptions',
+      value: 'utility_subscriptions',
+      route: 'utility_subscriptions.index'
     }
   ]
 
