@@ -72,6 +72,50 @@ class InvoiceLineItem < ApplicationRecord
   include MathUtil
   include FormsHelper
 
+  # Multicurrency Support
+  include Monetizable
+  money :invoice_gross_amount, :get_reporting_currency
+  money :gross_amount, :get_reporting_currency
+  money :discount_amount, :get_reporting_currency
+  money :taxable_amount, :get_reporting_currency
+  money :tax_amount, :get_reporting_currency
+  money :net_amount, :get_reporting_currency
+  money :item_tds_amount, :get_reporting_currency
+  money :item_net_amount, :get_reporting_currency
+  money :item_tax_amount, :get_reporting_currency
+  money :item_taxable_amount, :get_reporting_currency
+  money :item_discount_amount, :get_reporting_currency
+  money :item_gross_amount, :get_reporting_currency
+  money :item_billable_amount, :get_reporting_currency
+  #  item_gross_amount_converted    :decimal(20, 5)
+  #  item_discount_amount_converted :decimal(20, 5)
+  #  item_taxable_amount_converted  :decimal(20, 5)
+  #  item_tax_amount_converted      :decimal(20, 5)
+  #  item_tds_amount_converted      :decimal(20, 5)
+  #  item_net_amount_converted      :decimal(20, 5)
+  #  item_billable_amount           :decimal(20, 5)
+  #  item_billable_amount_converted :decimal(20, 5)
+
+  def get_reporting_currency
+    self.invoice.get_reporting_currency
+  end
+
+  def get_base_currency
+    self.parent.get_base_currency
+  end
+
+  exchange_bank :get_reporting_currency, :get_base_currency, :exchange_rate
+
+  # exchange_rate as method
+  def exchange_rate
+    ExchangeRate.get_rate(
+        self.invoice.conversion_date,
+        self.invoice.reporting_currency,
+        self.invoice.get_base_currency&.country_code || "INR"
+    )
+  end
+
+
   belongs_to :invoice, optional: true
   belongs_to :category, optional: true
   belongs_to :parent, optional: true, polymorphic: true
@@ -356,6 +400,26 @@ class InvoiceLineItem < ApplicationRecord
   # Syncs amounts from new forms structure to legacy amounts table
   def sync_amounts
     if item_gross_amount.present?
+      exchange_base_currency = get_base_currency&.country_code || "INR"
+
+      self.item_tds_amount_converted = item_tds_amount_money.exchange_to(exchange_base_currency).amount
+      self.item_net_amount_converted = item_net_amount_money.exchange_to(exchange_base_currency).amount
+      self.item_tax_amount_converted = item_tax_amount_money.exchange_to(exchange_base_currency).amount
+      self.item_taxable_amount_converted = item_taxable_amount_money.exchange_to(exchange_base_currency).amount
+      self.item_discount_amount_converted = item_discount_amount_money.exchange_to(exchange_base_currency).amount
+      self.item_gross_amount_converted = item_gross_amount_money.exchange_to(exchange_base_currency).amount
+      self.item_billable_amount_converted = item_billable_amount_money.exchange_to(exchange_base_currency).amount
+
+      #  item_gross_amount_converted    :decimal(20, 5)
+      #  item_discount_amount_converted :decimal(20, 5)
+      #  item_taxable_amount_converted  :decimal(20, 5)
+      #  item_tax_amount_converted      :decimal(20, 5)
+      #  item_tds_amount_converted      :decimal(20, 5)
+      #  item_net_amount_converted      :decimal(20, 5)
+      #  item_billable_amount           :decimal(20, 5)
+      #  item_billable_amount_converted :decimal(20, 5)
+
+
       self.skip_callback = true
       amounts_attributes_map.each do |key, value|
         amount_value = self.send(key)

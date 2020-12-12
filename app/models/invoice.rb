@@ -1688,7 +1688,7 @@ class Invoice < ApplicationRecord
       amounts_attributes_map.each do |key, value|
         # amount_value = self.send("#{key}_converted")
         amount_value = self.send(key)
-        puts "*************** Invoice #{key} value : #{amount_value}"
+        # puts "*************** Invoice #{key} value : #{amount_value}"
         amount_attr = self.send(value)
         base_currency_id = get_base_currency&.id || Currency.id_for("INR")
         if amount_attr.present?

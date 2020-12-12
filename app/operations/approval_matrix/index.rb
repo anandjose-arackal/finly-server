@@ -1,9 +1,36 @@
 class ApprovalMatrix::Index < BaseOperation
-  attr_accessor :policies, :document_type
+  attr_accessor :policies, :document_type, :provider_name
 
   def init
     self.document_type = params[:document_type]
-    self.policies = Policy::VendorPayments::Index.(user, {filter_role_id: [UserRole.id_for(:vendor_creator)]}).policies
+    role = nil
+    # self.provider_name = params[:provider_name]
+
+    case document_type
+    when 'vendors'
+      role = :vendor_creator
+      self.provider_name = 'YesBankVendorProvider'
+    when 'invoices'
+      document = current_user.company.invoices.find_by(params[:document_id])
+
+      self.provider_name = document.get_invoice_provider_name
+
+      if self.provider_name == 'PoInvoiceProvider'
+        role = :po_invoice_initiator
+      elsif self.provider_name == 'NonPoInvoiceProvider'
+        role = :non_po_invoice_initiator
+      elsif self.provider_name == 'AgreementInvoiceProvider'
+        role = :agreement_invoice_initiator
+      else
+        # do nothing
+      end
+    end
+
+    if role.present?
+      self.policies = Policy::VendorPayments::Index.(user, {filter_role_id: [UserRole.id_for(:role)]}).policies
+    else
+      add_message :error, "Not able to retrieve approval matrix"
+    end
   end
 
   def validate
@@ -13,6 +40,7 @@ class ApprovalMatrix::Index < BaseOperation
   def success
     if user.company.vendor_empanelment_workflow_enabled?
       params[:policies] = self.policies
+      params[:provider_name] = self.provider_name
     end
     ApprovalMatrix::Index::IndexPresenter.new(user, params, messages)
   end
@@ -21,21 +49,15 @@ class ApprovalMatrix::Index < BaseOperation
     attr_accessor :policies, :approval_workflow, :reviewal_chains
 
     def init
-      if user.company.vendor_empanelment_workflow_enabled?
-        self.reviewal_chains = []
-        self.policies = params[:policies]
-
-        params[:provider_name] = "YesBankVendorProvider"
-        policies.each do |policy|
-          params[:policy_id] = policy.id
-          chain = {
-              policy_id: policy.id,
-              reviewal_chain: get_reviewal_chain
-          }
-          self.reviewal_chains.push(chain)
-        end
-      else
-        self.vendor_approval_workflow = false
+      self.reviewal_chains = []
+      self.policies = params[:policies]
+      policies.each do |policy|
+        params[:policy_id] = policy.id
+        chain = {
+            policy_id: policy.id,
+            reviewal_chain: get_reviewal_chain
+        }
+        self.reviewal_chains.push(chain)
       end
     end
 

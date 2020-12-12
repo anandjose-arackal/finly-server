@@ -56,10 +56,12 @@ class Procurements::Invoices::Create < Procurements::Invoices::Base
     self.invoice.created_by = user
     self.invoice.company = user.company
     self.invoice.invoice_type_id = self.inward_invoice_type
+
     # self.invoice.receiving_account = receiving_account # let the user select bank accounts
     self.invoice.controlling_user = user
     self.invoice.vendor = vendor
-    self.invoice.vendor_id = vendor&.vendor_id
+    self.invoice.vendor_id = vendor.id
+    self.invoice.vendor_sequence_id = vendor&.vendor_id
     self.invoice.rcm_enabled = vendor.rcm_enabled
     if self.vendor.payment_term_id.present?
       self.invoice.payment_term_id = self.vendor.payment_term_id
