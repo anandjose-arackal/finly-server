@@ -159,7 +159,7 @@ class Company < ApplicationRecord
   delegate :bank_type, to: :configuration
 
   after_create :init_config_present
-  after_create :company_setup
+  # after_create :company_setup
 
   validates :name, presence: true
 
