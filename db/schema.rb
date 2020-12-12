@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_11_25_180408) do
+ActiveRecord::Schema.define(version: 2020_12_04_041503) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3342,6 +3342,7 @@ ActiveRecord::Schema.define(version: 2020_11_25_180408) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
+    t.boolean "enforce_purchase_request_budget", default: false, null: false
     t.index ["company_id"], name: "index_enforce_budget_configurations_on_company_id"
   end
 
@@ -3362,8 +3363,8 @@ ActiveRecord::Schema.define(version: 2020_11_25_180408) do
     t.integer "company_id", null: false
     t.integer "macro_id"
     t.integer "macro_job_id"
-    t.string "message"
-    t.string "reference_id"
+    t.text "message"
+    t.text "reference_id"
     t.datetime "attempted_at", null: false
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
@@ -5068,8 +5069,8 @@ ActiveRecord::Schema.define(version: 2020_11_25_180408) do
     t.decimal "invoice_net_total_amount", precision: 20, scale: 5
     t.decimal "invoice_net_total_amount_converted", precision: 20, scale: 5
     t.integer "erp_sync_status_id"
-    t.string "erp_sync_message"
-    t.string "erp_sync_reference_id"
+    t.text "erp_sync_message"
+    t.text "erp_sync_reference_id"
     t.integer "erp_sync_attempts_count", default: 0
     t.datetime "erp_sync_attempted_at"
     t.index ["address_id"], name: "index_invoices_on_address_id"
@@ -6372,8 +6373,8 @@ ActiveRecord::Schema.define(version: 2020_11_25_180408) do
     t.integer "transfer_mode_id"
     t.datetime "last_retried_at"
     t.integer "erp_sync_status_id"
-    t.string "erp_sync_message"
-    t.string "erp_sync_reference_id"
+    t.text "erp_sync_message"
+    t.text "erp_sync_reference_id"
     t.integer "erp_sync_attempts_count", default: 0
     t.datetime "erp_sync_attempted_at"
     t.index ["amount_id"], name: "index_payments_on_amount_id"
@@ -7655,8 +7656,8 @@ ActiveRecord::Schema.define(version: 2020_11_25_180408) do
     t.integer "cost_center_id"
     t.integer "company_id"
     t.integer "erp_sync_status_id"
-    t.string "erp_sync_message"
-    t.string "erp_sync_reference_id"
+    t.text "erp_sync_message"
+    t.text "erp_sync_reference_id"
     t.integer "erp_sync_attempts_count", default: 0
     t.datetime "erp_sync_attempted_at"
     t.index ["card_expenses_total_id"], name: "index_reports_on_card_expenses_total_id"
@@ -9215,8 +9216,8 @@ ActiveRecord::Schema.define(version: 2020_11_25_180408) do
     t.datetime "deleted_at"
     t.boolean "pending_activation", default: false
     t.integer "erp_sync_status_id"
-    t.string "erp_sync_message"
-    t.string "erp_sync_reference_id"
+    t.text "erp_sync_message"
+    t.text "erp_sync_reference_id"
     t.integer "erp_sync_attempts_count", default: 0
     t.datetime "erp_sync_attempted_at"
     t.index ["company_id"], name: "index_users_on_company_id"
@@ -9673,8 +9674,8 @@ ActiveRecord::Schema.define(version: 2020_11_25_180408) do
     t.date "tds_effective_start_date"
     t.date "tds_effective_end_date"
     t.integer "erp_sync_status_id"
-    t.string "erp_sync_message"
-    t.string "erp_sync_reference_id"
+    t.text "erp_sync_message"
+    t.text "erp_sync_reference_id"
     t.integer "erp_sync_attempts_count", default: 0
     t.datetime "erp_sync_attempted_at"
     t.string "bank_code"

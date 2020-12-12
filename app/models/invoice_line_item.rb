@@ -97,7 +97,8 @@ class InvoiceLineItem < ApplicationRecord
   #  item_billable_amount_converted :decimal(20, 5)
 
   def get_reporting_currency
-    self.invoice.get_reporting_currency
+    # debugger
+    self.parent.get_reporting_currency
   end
 
   def get_base_currency
@@ -109,9 +110,9 @@ class InvoiceLineItem < ApplicationRecord
   # exchange_rate as method
   def exchange_rate
     ExchangeRate.get_rate(
-        self.invoice.conversion_date,
-        self.invoice.reporting_currency,
-        self.invoice.get_base_currency&.country_code || "INR"
+        self.parent.conversion_date,
+        self.parent.reporting_currency,
+        self.parent.get_base_currency&.country_code || "INR"
     )
   end
 
@@ -408,7 +409,7 @@ class InvoiceLineItem < ApplicationRecord
       self.item_taxable_amount_converted = item_taxable_amount_money.exchange_to(exchange_base_currency).amount
       self.item_discount_amount_converted = item_discount_amount_money.exchange_to(exchange_base_currency).amount
       self.item_gross_amount_converted = item_gross_amount_money.exchange_to(exchange_base_currency).amount
-      self.item_billable_amount_converted = item_billable_amount_money.exchange_to(exchange_base_currency).amount
+      self.item_billable_amount_converted = item_billable_amount_money.exchange_to(exchange_base_currency).amount rescue 0
 
       #  item_gross_amount_converted    :decimal(20, 5)
       #  item_discount_amount_converted :decimal(20, 5)

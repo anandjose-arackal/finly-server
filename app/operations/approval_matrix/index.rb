@@ -11,7 +11,7 @@ class ApprovalMatrix::Index < BaseOperation
       role = :vendor_creator
       self.provider_name = 'YesBankVendorProvider'
     when 'invoices'
-      document = current_user.company.invoices.find_by(params[:document_id])
+      document = current_user.company.inward_invoices.find_by(params[:document_id])
 
       self.provider_name = document.get_invoice_provider_name
 
