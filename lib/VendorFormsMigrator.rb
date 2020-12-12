@@ -23,11 +23,9 @@ class VendorFormsMigrator
     documents_without_attachments = documents.where(status_id: VendorStatus.id_for(:auto_approved)).where.not(id: vendor_attachments.select(:yes_bank_vendor_id))
     # Update Vendor Country
 
-    YesBankVendor.where(id: documents_without_attachments.select(:id)).update_all({
-                                                 vendor_country: "India"
-                                             })
+    YesBankVendor.where("id IN (?)", documents_without_attachments.pluck(:id)).update_all({vendor_country: "India"})
 
-    documents_with_attachments = documents.where.not(id: documents_without_attachments.select(:id))
+    documents_with_attachments = YesBankVendor.where("id IN (?)", documents.where.not(id: documents_without_attachments.select(:id)).pluck(:id))
 
     documents_with_attachments.find_in_batches(batch_size: 500) do |batch|
       batch.each do |document|
