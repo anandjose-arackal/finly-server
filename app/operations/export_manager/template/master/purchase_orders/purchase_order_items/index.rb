@@ -2,7 +2,7 @@ class ExportManager::Template::Master::PurchaseOrders::PurchaseOrderItems::Index
 
   label 'Spreadsheet (Line Items)'
   description 'Purchase Orders Export (Line Items)'
-  export_format 'csv'
+  export_format 'xls'
   resource 'purchase_order_items'
   subscribe 'purchase_order_items'
   default true

@@ -2,7 +2,7 @@ class ExportManager::Template::Master::Invoices::TdsExport < ExportManager::Buil
 
   label 'Tds Export'
   description 'Tds Export'
-  export_format 'csv'
+  export_format 'xls'
   resource 'invoices'
   subscribe 'invoices'
   default true

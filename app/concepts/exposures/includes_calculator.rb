@@ -67,6 +67,8 @@ class Exposures::IncludesCalculator
                       [association.class_name]
                     end
       class_names.each do |class_name|
+        next unless class_name.present?
+
         klass = Object.const_get(class_name)
         nested_model_klasses << klass
         includes << all_includes[index][name]
