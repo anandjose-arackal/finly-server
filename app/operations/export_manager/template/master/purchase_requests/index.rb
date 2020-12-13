@@ -3,7 +3,7 @@ class ExportManager::Template::Master::PurchaseRequests::Index < ExportManager::
 
   label 'Spreadsheet'
   description 'Purchase Requests Export'
-  export_format 'csv'
+  export_format 'xls'
   resource 'purchase_requests'
   subscribe 'purchase_requests'
   default true

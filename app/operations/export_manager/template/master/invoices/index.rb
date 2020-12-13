@@ -2,7 +2,7 @@ class ExportManager::Template::Master::Invoices::Index < ExportManager::Builders
 
   label 'Spreadsheet'
   description 'Invoices Export'
-  export_format 'csv'
+  export_format 'xls'
   resource 'invoice_line_items'
   subscribe 'invoice_line_items'
   default true

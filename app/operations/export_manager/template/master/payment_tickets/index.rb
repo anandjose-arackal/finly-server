@@ -3,7 +3,7 @@ class ExportManager::Template::Master::PaymentTickets::Index < ExportManager::Bu
 
   label 'Export'
   description 'Payment Ticket Export'
-  export_format 'csv'
+  export_format 'xls'
   resource 'payments'
   subscribe 'payments'
   default true

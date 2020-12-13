@@ -2,7 +2,7 @@ class ExportManager::Template::Master::Users::VendorPayments::Index < ExportMana
 
   label 'Export'
   description 'Users Export'
-  export_format 'csv'
+  export_format 'xls'
   resource 'users'
   subscribe 'users'
   default true

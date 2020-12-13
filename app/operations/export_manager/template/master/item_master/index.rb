@@ -3,7 +3,7 @@ class ExportManager::Template::Master::ItemMaster::Index < ExportManager::Builde
 
   label 'Export'
   description 'Item Master Export'
-  export_format 'csv'
+  export_format 'xls'
   resource 'items'
   subscribe 'items'
   default true

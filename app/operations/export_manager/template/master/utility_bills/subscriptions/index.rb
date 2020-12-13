@@ -2,7 +2,7 @@ class ExportManager::Template::Master::UtilityBills::Subscriptions::Index < Expo
 
   label 'Spreadsheet'
   description 'Utility Bill Masters'
-  export_format 'csv'
+  export_format 'xls'
   resource 'utility_subscriptions'
   subscribe 'utility_subscriptions'
   default true

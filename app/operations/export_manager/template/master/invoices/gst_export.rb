@@ -2,7 +2,7 @@ class ExportManager::Template::Master::Invoices::GstExport < ExportManager::Buil
 
   label 'Gst Export'
   description 'Gst Export'
-  export_format 'csv'
+  export_format 'xls'
   resource 'invoice_line_items'
   subscribe 'invoice_line_items'
 

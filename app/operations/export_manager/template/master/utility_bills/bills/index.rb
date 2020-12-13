@@ -2,7 +2,7 @@ class ExportManager::Template::Master::UtilityBills::Bills::Index < ExportManage
 
   label 'Spreadsheet'
   description 'Utility Bills'
-  export_format 'csv'
+  export_format 'xls'
   resource 'utility_bills'
   subscribe 'utility_bills'
   default true

@@ -3,7 +3,7 @@ class ExportManager::Template::Master::Vendors::Index < ExportManager::Builders:
 
   label 'Export'
   description 'Vendor Export'
-  export_format 'csv'
+  export_format 'xls'
   resource 'vendors'
   subscribe 'vendors'
   default true
