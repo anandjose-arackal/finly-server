@@ -9,6 +9,8 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
   handle :purchase_order_items
   validate :input
 
+  has_template true
+
   section :item_details do
     attribute :description
     attribute :comment

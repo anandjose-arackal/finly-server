@@ -4376,6 +4376,16 @@ Rails.application.routes.draw do
 
   get 'lookup/:route', to: 'lookup#route'
 
+  resources :export_templates do
+  end
+  get 'export_templates/default/:resource', to: 'export_templates#default'
+
+  resources :export_formats do
+  end
+
+  resources :export_resources do
+  end
+
   post 'search', to: 'global_search#create'
   get 'search', to: 'global_search#index'
 

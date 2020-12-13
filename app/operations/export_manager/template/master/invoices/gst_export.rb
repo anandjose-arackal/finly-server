@@ -1,0 +1,41 @@
+class ExportManager::Template::Master::Invoices::GstExport < ExportManager::Builders::Template
+
+  label 'Gst Export'
+  description 'Gst Export'
+  export_format 'csv'
+  resource 'invoice_line_items'
+  subscribe 'invoice_line_items'
+
+  roles [:admin, :finance_manager]
+
+  attribute :invoice_number, template: '{{ record.invoice.invoice_number }}'
+  attribute :finly_ref_no, template: '{{ record.invoice.invoice_id }}'
+  attribute :finance_approved_date, template: "{{ record.invoice.approved_at | date: '%d-%b-%Y' }}"
+  attribute :vendor_gstin, template: '{{ record.invoice.gstin_location.gstin }}'
+  attribute :billing_location, template: '{{ record.invoice.billing_location.name }}'
+  attribute :shipping_location, template: '{{ record.invoice.shipping_location.name }}'
+  attribute :gl_code, template: '{{ record.category.gl_code }}'
+  attribute :description, template: '{{ record.description }}'
+  attribute :invoice_net_payable_amount, template: '{{ record.invoice.balance_due_value }}'
+  attribute :invoice_base_amount, template: '{{ record.invoice.base_amount }}'
+  attribute :total_tax, template: '{{ record.tax_amount.value }}'
+  attribute :item_rate, template: '{{ record.rate }}'
+  attribute :item_igst_amount, template: '{{ record.igst_amount }}'
+  attribute :item_cgst_amount, template: '{{ record.cgst_amount }}'
+  attribute :item_sgst_amount, template: '{{ record.sgst_amount }}'
+  attribute :item_igst, template: '{{ record.igst }}'
+  attribute :item_cgst, template: '{{ record.cgst }}'
+  attribute :item_sgst, template: '{{ record.sgst }}'
+  attribute :igst_account_number, template: '{{ record.tax_rate.igst_account_number }}'
+  attribute :cgst_account_number, template: '{{ record.tax_rate.cgst_account_number }}'
+  attribute :sgst_account_number, template: '{{ record.tax_rate.sgst_account_number }}'
+  attribute :hsn_sac, template: '{{ record.hsn_sac }}'
+  attribute :reverse_charge, template: '0'
+  attribute :reverse_charge_tax_gl_account, template: 'N'
+  attribute :calculate_tax_for_rct, template: 'N'
+  attribute :invoice_status, template: '{{ record.invoice.status.name }}'
+  attribute :itc_qualified, template: '{{ record.itc_qualified }}'
+  attribute :country, template: '{{ record.country }}'
+  attribute :vendor_name, template: '{{ record.invoice.vendor.business_name }}'
+  attribute :department_code, template: '{{ record.department.department_code }}'
+end

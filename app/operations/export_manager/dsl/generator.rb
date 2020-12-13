@@ -17,7 +17,7 @@ module ExportManager::DSL::Generator
 
   class_methods do
     def sync!
-      sync(true)
+      @sync = true
     end
 
     def sync?
@@ -47,6 +47,7 @@ module ExportManager::DSL::Generator
       generate
       post_process!
     rescue Exception => e
+      update_current_record
       stack_trace = "#{e.message}\n#{e.backtrace.join("\n")}"
       update crash_stacktrace: stack_trace, status_id: ExportJobStatus.id_for(:failed), message: "Exception: #{e.message}"
       raise e
@@ -55,6 +56,10 @@ module ExportManager::DSL::Generator
 
   def generate
 
+  end
+
+  def update_current_record
+  
   end
 
 end

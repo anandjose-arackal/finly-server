@@ -3595,6 +3595,15 @@ ActiveRecord::Schema.define(version: 2020_12_04_041503) do
     t.datetime "deleted_at"
   end
 
+  create_table "export_formats", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.string "value"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_export_formats_on_deleted_at"
+  end
+
   create_table "export_job_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -3676,6 +3685,54 @@ ActiveRecord::Schema.define(version: 2020_12_04_041503) do
     t.index ["model_class"], name: "index_export_requests_on_model_class"
     t.index ["scheduled_on"], name: "index_export_requests_on_scheduled_on"
     t.index ["user_id"], name: "index_export_requests_on_user_id"
+  end
+
+  create_table "export_resources", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.string "value"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "route"
+    t.index ["deleted_at"], name: "index_export_resources_on_deleted_at"
+  end
+
+  create_table "export_template_news", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.string "export_format", null: false
+    t.string "resource", null: false
+    t.text "template", limit: 4294967295
+    t.text "query", limit: 4294967295
+    t.boolean "active", default: true
+    t.boolean "personal"
+    t.integer "company_id"
+    t.integer "created_by_id"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "default", default: false
+    t.boolean "modified", default: false
+    t.string "master"
+    t.index ["active"], name: "index_export_template_news_on_active"
+    t.index ["company_id"], name: "index_export_template_news_on_company_id"
+    t.index ["created_by_id"], name: "index_export_template_news_on_created_by_id"
+    t.index ["deleted_at"], name: "index_export_template_news_on_deleted_at"
+    t.index ["export_format"], name: "index_export_template_news_on_export_format"
+    t.index ["name"], name: "index_export_template_news_on_name"
+    t.index ["personal"], name: "index_export_template_news_on_personal"
+    t.index ["resource"], name: "index_export_template_news_on_resource"
+  end
+
+  create_table "export_template_user_role_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "template_id"
+    t.integer "user_role_id", null: false
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_export_template_user_role_mappings_on_deleted_at"
+    t.index ["template_id"], name: "index_export_template_user_role_mappings_on_template_id"
+    t.index ["user_role_id"], name: "index_export_template_user_role_mappings_on_user_role_id"
   end
 
   create_table "export_templates", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|

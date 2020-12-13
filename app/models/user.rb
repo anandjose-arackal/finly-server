@@ -1637,6 +1637,10 @@ class User < ApplicationRecord
     self.has_policy_role?(UserRole.id_for(:inventory_manager), document)
   end
 
+  def is_export_manager?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:export_manager), document)
+  end
+
 
   ########### Agreement Based Payments Role End #############
   def is_payment_agreement_initiator?(document = nil)

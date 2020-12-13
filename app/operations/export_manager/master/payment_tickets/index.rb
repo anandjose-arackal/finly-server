@@ -8,6 +8,8 @@ class ExportManager::Master::PaymentTickets::Index < ExportManager::Builders::Sp
   screen 'payment_ticket.index'
   handle :bank_payment_requests
 
+  has_template true
+
   attribute :payment_order_id
   attribute :payment_order_name
   attribute :payment_id
