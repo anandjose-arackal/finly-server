@@ -9,6 +9,8 @@ class ExportManager::Master::Users::VendorPayments::Index < ExportManager::Build
   handle :vp_users
   # validate :input
 
+  has_template true
+
   attribute :employee_id
   attribute :name
   attribute :email

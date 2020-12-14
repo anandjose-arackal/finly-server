@@ -6,7 +6,28 @@ class ActionManager::Actions::Export < ActionManager::Action
 
   def build_config(options)
     user = options[:current_user]
-    ExportManager::Master.fetch(user, {screen: route})
+    old_exports = ExportManager::Master.fetch(user, {screen: route})
+
+    new_exports = Masters::ExportTemplates::Ops::Index.({ current_user: user, params: {route: route} })['model.records'].map do |record|
+      {
+        template_export: true,
+        name: record.name,
+        id: record.id,
+        export_format: record.export_format,
+        description: record.description,
+        resource: record.resource,
+        system_template: record.system_template?,
+      }
+    end
+
+    if ExportManagerToggle.new(user).templates_enabled?
+      old_exports = old_exports.filter do |record|
+        !record[:has_template]
+      end
+      new_exports + old_exports
+    else
+      old_exports
+    end
   end
 
 end

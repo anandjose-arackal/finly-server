@@ -11,6 +11,7 @@ module ExportManager::DSL::Config
     class_attr :resolver # Automatically generates the input using resolver if this is defined
     class_attr :description
     class_attr :company_scope, default: {}.with_indifferent_access
+    class_attr :has_template, default: false
   end
 
   class_methods do
@@ -21,6 +22,7 @@ module ExportManager::DSL::Config
           description: description,
           handle: handle_name,
           configurable: configurable,
+          has_template: has_template,
       }
     end
 

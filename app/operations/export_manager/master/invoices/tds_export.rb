@@ -7,6 +7,8 @@ class ExportManager::Master::Invoices::TdsExport < ExportManager::Builders::Spre
   screen 'invoices.index'
   system :vp
 
+  has_template true
+
   attribute :invoice_number
   attribute :finly_ref_no
   attribute :invoice_date
