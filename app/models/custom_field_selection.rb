@@ -7,6 +7,8 @@
 #  form_entity_choice_id :string(255)
 #  form_custom_field_id  :string(255)
 #  deleted_at            :datetime
+#  created_at            :datetime         not null
+#  updated_at            :datetime         not null
 #
 
 class CustomFieldSelection < ApplicationRecord

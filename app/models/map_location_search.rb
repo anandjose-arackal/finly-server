@@ -5,7 +5,7 @@
 #  id         :bigint           not null
 #  uuid       :string(36)       not null, primary key
 #  input      :string(255)
-#  result     :text(4294967295)
+#  result     :text(16777215)
 #  deleted_at :datetime
 #  created_at :datetime         not null
 #  updated_at :datetime         not null

@@ -38,6 +38,7 @@
 #  credit_note_number            :string(255)
 #  last_adjusted_at              :datetime
 #  review_note                   :text(65535)
+#  erp_sync_status_id            :integer
 #
 
 class CreditNote < ApplicationRecord
