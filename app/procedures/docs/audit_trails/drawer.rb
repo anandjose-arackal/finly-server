@@ -5,7 +5,7 @@ class Docs::AuditTrails::Drawer < Drawer::API
   policy true
   policy_action :index
 
-  block block_key: :beneficiary, label: "Event", icon: "icon_url" do
+  block block_key: :beneficiary, label: "Event", icon: "https://img.icons8.com/windows/20/000000/property-time.png" do
     label_value value: :parent_document_type, format: 'standard', label: "Document Type"
     label_value value: :document_number, format: 'standard', label: "Document ID"
     label_value value: "{{record.created_by.name}}", format: 'standard', label: "Actor"
@@ -37,7 +37,7 @@ class Docs::AuditTrails::Drawer < Drawer::API
         hash.each do |key,value_hash|
         change value: value_hash[:value], label: key.to_s;
         end }
-      dynamic_block = block(block_key: "change_block_#{k}".to_sym , label: dup_exposure.item_type_label, icon: "icon_url", &proc)
+      dynamic_block = block(block_key: "change_block_#{k}".to_sym , label: dup_exposure.item_type_label, icon: "https://img.icons8.com/windows/20/000000/data-in-both-directions.png", &proc)
       data_provider = data_provider(user, item_group.first, dup_exposure)
       map << dynamic_block.build(data_provider, user, item_group.first, dup_exposure)
     end
