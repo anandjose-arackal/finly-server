@@ -52,7 +52,7 @@
 #  bill_month                 :string(255)
 #  pc                         :string(255)
 #  early_payment_date         :date
-#  api_response               :text(65535)
+#  api_response               :text(16777215)
 #  generated_at               :datetime
 #  biller_response            :text(65535)
 #

@@ -3,14 +3,14 @@
 # Table name: admin_summary_mail_configs
 #
 #  id                     :integer          not null, primary key
-#  user_id                :integer          not null
-#  period_id              :integer          not null
+#  user_id                :integer
+#  period_id              :integer
 #  starting_day_of_month  :integer
 #  scheduled_day_of_month :integer
 #  starting_day_of_week   :string(255)
 #  scheduled_day_of_week  :string(255)
-#  scheduled_time         :string(255)      not null
-#  application            :string(255)      not null
+#  scheduled_time         :string(255)
+#  application            :string(255)
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  deleted_at             :datetime
