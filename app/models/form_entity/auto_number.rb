@@ -74,14 +74,27 @@ class FormEntity::AutoNumber < FormEntity
 
   contract_eval "Set sequence" do |contract:, entity:, **|
     contract.after_save do
-      if model.send(entity.entity_key).blank?
-        prefix = entity.config['sequence']['prefix']
-        min_length = entity.config['sequence']['start_at'].length
-        prefix = LiquidHelper.interpolate(prefix, {'record' => model})
-        sequence = REDIS.incr("FormEntity::AutoNumber##{entity.id}##{prefix}")
-        sequence = sequence.to_s.rjust(min_length, "0")
-        model.send("#{entity.entity_key}=", "#{prefix}#{sequence}")
-        model.save
+      if model.respond_to?(entity.entity_key)
+        if model.send(entity.entity_key).blank?
+          prefix = entity.config['sequence']['prefix']
+          min_length = entity.config['sequence']['start_at'].length
+          prefix = LiquidHelper.interpolate(prefix, {'record' => model})
+          sequence = REDIS.incr("FormEntity::AutoNumber##{entity.id}##{prefix}")
+          sequence = sequence.to_s.rjust(min_length, "0")
+          model.send("#{entity.entity_key}=", "#{prefix}#{sequence}")
+          model.save
+        end
+      else
+        form_custom_field = model.form_custom_fields.where(field_key: entity.entity_key, form_entity_id: entity.uuid).first
+        if form_custom_field.retrieve_value.blank?
+          prefix = entity.config['sequence']['prefix']
+          min_length = entity.config['sequence']['start_at'].length
+          prefix = LiquidHelper.interpolate(prefix, {'record' => model})
+          sequence = REDIS.incr("FormEntity::AutoNumber##{entity.id}##{prefix}")
+          sequence = sequence.to_s.rjust(min_length, "0")
+          form_custom_field.value = "#{prefix}#{sequence}"
+          form_custom_field.save
+        end
       end
     end
   end
