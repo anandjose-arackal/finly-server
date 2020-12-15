@@ -7,7 +7,7 @@
 # Processor -> Email, Direct Download, FTP etc
 Dir["#{Rails.root}/app/operations/export_manager/master/**/*.rb"].each {|file| require file}
 class ExportManager::RequestHandler < BaseOperation
-  attr_accessor :master, :type, :export_job
+  attr_accessor :master, :type, :export_job, :template_id
 
   class ExportManager::RequestHandler::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :export_job
@@ -29,6 +29,7 @@ class ExportManager::RequestHandler < BaseOperation
 
   def init
     self.type = params[:type]
+    self.template_id = params[:template_id]
     self.master = init_master
   end
 
@@ -61,8 +62,12 @@ class ExportManager::RequestHandler < BaseOperation
   protected
 
   def init_master
-    # Todo fix this to find the valid handler instead of picking the first one. This creates an issue if the user defines 2 exports with the same handler
-    ExportManager::Master.subscribers(self.type)&.first
+    if template_id
+      ExportManager::Template::TemplateExport
+    else
+      # Todo fix this to find the valid handler instead of picking the first one. This creates an issue if the user defines 2 exports with the same handler
+      ExportManager::Master.subscribers(self.type)&.first
+    end
   end
 
 

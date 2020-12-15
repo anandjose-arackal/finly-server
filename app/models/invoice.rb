@@ -83,15 +83,15 @@
 #  po_number                             :string(255)
 #  narration                             :text(65535)
 #  bank_account_id                       :integer
-#  rejection_note                        :text(65535)
 #  payment_agreement_id                  :integer
 #  vendor_location_id                    :integer
+#  rejection_note                        :text(65535)
 #  billing_type_id                       :integer
-#  agreement_item_type                   :string(255)
-#  agreement_item_id                     :integer
 #  vendor_poc_id                         :integer
 #  vlpm_id                               :integer
 #  client_note                           :text(65535)
+#  agreement_item_type                   :string(255)
+#  agreement_item_id                     :integer
 #  payable                               :boolean          default(FALSE)
 #  cn_adjusted_amount_id                 :integer
 #  rcm_enabled                           :boolean          default(FALSE)
@@ -108,23 +108,24 @@
 #  total_paid_amount                     :decimal(20, 10)
 #  balance_due_amount                    :decimal(20, 10)
 #  currency_code                         :string(255)
-#  vendor_sequence_id                    :string(255)
-#  vendor_trade_name                     :string(255)
-#  vendor_gstin                          :string(255)
-#  vendor_pan                            :string(255)
 #  vendor_bank_account_number            :string(255)
 #  vendor_bank_account_ifsc              :string(255)
 #  invoice_gross_amount                  :decimal(20, 5)
 #  invoice_discount_amount               :decimal(20, 5)
 #  invoice_tax_amount                    :decimal(20, 5)
 #  invoice_tds_amount                    :decimal(20, 5)
-#  invoice_paid_outside_amount           :decimal(20, 5)
-#  invoice_sub_total_amount              :decimal(20, 5)
-#  invoice_total_amount                  :decimal(20, 5)
+#  payment_outside_finly_amount          :decimal(20, 5)
+#  sub_total_amount                      :decimal(20, 5)
+#  total_amount                          :decimal(20, 5)
 #  base_currency                         :string(255)
-#  reporting_currency                    :string(255)
-#  invoice_taxable_amount                :decimal(20, 5)
+#  vendor_sequence_id                    :text(65535)
+#  vendor_gstin                          :string(255)
 #  invoice_freight_amount                :decimal(20, 5)
+#  reporting_currency                    :string(255)
+#  conversion_date                       :date
+#  conversion_rate                       :decimal(10, 5)
+#  retrieve_conversion_rate              :boolean          default(TRUE)
+#  invoice_taxable_amount                :decimal(20, 5)
 #  invoice_roundoff_amount               :decimal(20, 5)
 #  invoice_balance_due                   :decimal(20, 5)
 #  invoice_gross_amount_converted        :decimal(20, 5)
@@ -135,12 +136,18 @@
 #  invoice_freight_amount_converted      :decimal(20, 5)
 #  invoice_sub_total_amount_converted    :decimal(20, 5)
 #  invoice_roundoff_amount_converted     :decimal(20, 5)
+#  invoice_advance_paid_amount           :decimal(20, 5)
+#  invoice_advance_paid_amount_converted :decimal(20, 5)
 #  invoice_total_amount_converted        :decimal(20, 5)
+#  invoice_net_total_amount              :decimal(20, 5)
+#  invoice_net_total_amount_converted    :decimal(20, 5)
 #  invoice_paid_outside_amount_converted :decimal(20, 5)
 #  invoice_balance_due_converted         :decimal(20, 5)
-#  conversion_date                       :date
-#  conversion_rate                       :decimal(10, 5)
-#  retrieve_conversion_rate              :boolean          default(TRUE)
+#  erp_sync_status_id                    :integer
+#  erp_sync_message                      :text(65535)
+#  erp_sync_reference_id                 :text(65535)
+#  erp_sync_attempts_count               :integer          default(0)
+#  erp_sync_attempted_at                 :datetime
 #
 
 class Invoice < ApplicationRecord

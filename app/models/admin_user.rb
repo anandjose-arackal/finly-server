@@ -22,6 +22,8 @@
 #  authorized_ip             :string(255)
 #  deleted_at                :datetime
 #  last_activity_at          :datetime
+#  admin_panel_access        :boolean          default(TRUE)
+#  active                    :boolean          default(TRUE)
 #
 
 require 'bcrypt'

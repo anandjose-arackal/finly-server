@@ -37,42 +37,47 @@ class Procurements::PurchaseRequests::Update < Procurements::PurchaseRequests::B
   end
 
   def process
-    self.purchase_request.assign_attributes(purchase_request_parameters)
-    # Save Custom Fields
-    validate_custom_fields_pr
-    return if has_errors?
+    ActiveRecord::Base.transaction(requires_new: true) do
+      self.purchase_request.assign_attributes(purchase_request_parameters)
 
-    if self.purchase_request.save
-      self.purchase_request.reload.purchase_request_items.map(&:update_estimated_amount)
+      # Save Custom Fields
+      validate_custom_fields_pr
+      return if has_errors?
 
-      unless self.purchase_request.cost_allocation_items
-        self.purchase_request.purchase_request_items.update_all(cost_center_id: self.purchase_request&.cost_center_id, department_id: self.purchase_request&.department_id)
-      end
-      # Copy department id to purchase request item
-      # self.purchase_request.purchase_request_items.update_all(department_id: self.purchase_request.department_id)
-      # Create document level reviewer mapping
-      # For setting level  specific reviewers from reviewal chain for a document
-      if PurchaseRequest.status_ids(:draft, :retracted, :rejected).include?(purchase_request.purchase_request_status_id) && purchase_request.creator_id == user.id
-        params[:reviewal_document] = self.purchase_request
-        document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
-        unless document_reviewer_mappings_op.success?
-          add_message :error, document_reviewer_mappings_op.messages[:error]
+      if self.purchase_request.save
+        self.purchase_request.reload.purchase_request_items.map(&:update_estimated_amount)
+
+        unless self.purchase_request.cost_allocation_items
+          self.purchase_request.purchase_request_items.update_all(cost_center_id: self.purchase_request&.cost_center_id, department_id: self.purchase_request&.department_id)
         end
+        # Copy department id to purchase request item
+        # self.purchase_request.purchase_request_items.update_all(department_id: self.purchase_request.department_id)
+        # Create document level reviewer mapping
+        # For setting level  specific reviewers from reviewal chain for a document
+        if PurchaseRequest.status_ids(:draft, :retracted, :rejected).include?(purchase_request.purchase_request_status_id) && purchase_request.creator_id == user.id
+          params[:reviewal_document] = self.purchase_request
+          document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+          unless document_reviewer_mappings_op.success?
+            add_message :error, document_reviewer_mappings_op.messages[:error]
+          end
+          return
+        end
+      else
+        add_message :error, purchase_request.errors.full_messages
         return
       end
-    else
-      add_message :error, purchase_request.errors.full_messages
-      return
+
+      return if has_errors?
+
+      # Budget check
+      budget_validation_op = budget_limit_validation(purchase_request)
+      if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+        add_message :error, budget_validation_op.messages[:errors]
+        raise ActiveRecord::Rollback
+        return
+      end
     end
   end
-
-  def post_process
-    # Budget check
-    budget_validation_op = budget_limit_validation(purchase_request)
-    if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
-      add_message :error, budget_validation_op.messages[:errors]
-      return
-    end
 
     add_message :success, 'Successfully updated purchase request'
   end

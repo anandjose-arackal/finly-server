@@ -40,7 +40,7 @@ class ExportManager::Master::Invoices::InvoiceLineItems::Index < ExportManager::
   end
 
   def invoice_number(item)
-    invoice(item)&.invoice_number
+    "\t#{invoice(item)&.invoice_number}"
   end
 
   def invoice_date(item)

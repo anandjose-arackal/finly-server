@@ -54,41 +54,45 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
 
   def process
     self.invoice.paper_trail_event = "Submit"
-    params[:document] = self.invoice
-    params[:aasm_event] = 'submit'
-    params[:violation_present] = false
-    params[:provider_name] = self.invoice.get_invoice_provider_name
-    op = WorkflowManager::Base.(user, params)
-    unless op.success?
-      add_message :error, op.messages[:error]
-      return
-    end
+    ActiveRecord::Base.transaction(requires_new: true) do
+      params[:document] = self.invoice
+      params[:aasm_event] = 'submit'
+      params[:violation_present] = false
+      params[:provider_name] = self.invoice.get_invoice_provider_name
+      op = WorkflowManager::Base.(user, params)
+      unless op.success?
+        add_message :error, op.messages[:error]
+        return
+      end
 
-    if invoice.auto_approved?
-      old_status_tag = StatusTag.find_by(id: StatusTag.id_for(:invoice_processing))
-      status_tag = StatusTag.find_by(id: StatusTag.id_for(:invoice_approved))
-      self.procurement.status_tags.delete(old_status_tag)
-      self.procurement.status_tags << status_tag
-    else
-      status_tag = StatusTag.find_by(id: StatusTag.id_for(:invoice_processing))
-      unless self.procurement.status_tags.include? status_tag
+      if invoice.auto_approved?
+        old_status_tag = StatusTag.find_by(id: StatusTag.id_for(:invoice_processing))
+        status_tag = StatusTag.find_by(id: StatusTag.id_for(:invoice_approved))
+        self.procurement.status_tags.delete(old_status_tag)
         self.procurement.status_tags << status_tag
+      else
+        status_tag = StatusTag.find_by(id: StatusTag.id_for(:invoice_processing))
+        unless self.procurement.status_tags.include? status_tag
+          self.procurement.status_tags << status_tag
+        end
+      end
+
+      self.invoice.update(rejection_note: "")
+      self.workflow_output = op.workflow_output
+
+      return if has_errors?
+
+      # Budget check
+      budget_validation_op = budget_limit_validation(invoice)
+      if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+        add_message :error, budget_validation_op.messages[:errors]
+        raise ActiveRecord::Rollback
+        return
       end
     end
-
-    self.invoice.update(rejection_note: "")
-    self.workflow_output = op.workflow_output
-    
   end
 
   def post_process
-    # Budget check
-    budget_validation_op = budget_limit_validation(invoice)
-    if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
-      add_message :error, budget_validation_op.messages[:errors]
-      return
-    end
-
     update_agreement_available_limit
     role_id = self.workflow_output[:role_id]
     Event::EInvoice::Submit.(user, {invoice: invoice, workflow_output: workflow_output, role_id: role_id})

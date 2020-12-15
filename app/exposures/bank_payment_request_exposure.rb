@@ -37,4 +37,8 @@ class BankPaymentRequestExposure < Exposures::API
     end
   end
 
+  attribute :get_reviewers_names do
+    record.get_reviewers&.map(&:name)&.join(", ")
+  end
+
 end

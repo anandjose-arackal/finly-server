@@ -286,7 +286,7 @@ group :development, :test do
   gem 'active_record_query_trace', '~> 1.5.4'
   # gem 'better_errors'
   # gem 'binding_of_caller'
-
+  gem 'rubocop-rails', require: false
 end
 
 group :test do

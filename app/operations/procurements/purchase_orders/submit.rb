@@ -45,41 +45,47 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
 
   def process
     self.purchase_order.paper_trail_event = "Submit"
-    params[:document] = self.purchase_order
-    params[:aasm_event] = 'submit'
-    params[:violation_present] = false
-    op = WorkflowManager::Base.(user, params)
-    unless op.success?
-      add_message :error, op.messages[:error]
-      return
-    end
+    ActiveRecord::Base.transaction(requires_new: true) do
+      params[:document] = self.purchase_order
+      params[:aasm_event] = 'submit'
+      params[:violation_present] = false
+      op = WorkflowManager::Base.(user, params)
+      unless op.success?
+        add_message :error, op.messages[:error]
+        return
+      end
 
-    if purchase_order.auto_approved?
-      old_status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_processing))
-      status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_approved))
-      self.procurement.status_tags.delete(old_status_tag)
-      self.procurement.status_tags << status_tag
-    end
+      if purchase_order.auto_approved?
+        old_status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_processing))
+        status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_approved))
+        self.procurement.status_tags.delete(old_status_tag)
+        self.procurement.status_tags << status_tag
+      end
 
-    # if procurements already has advance payments, disallow changes in advance amount even if po revised.
-    if purchase_order.advance_amount&.present? and purchase_order.advance_payments.blank?
-      if purchase_order.advance_amount.value > 0
-        purchase_order.advance_amount_status_id = (purchase_order.auto_approved? ? AdvanceAmountStatus.id_for(:to_be_processed) : AdvanceAmountStatus.id_for(:po_processing))
-        purchase_order.save
+      # if procurements already has advance payments, disallow changes in advance amount even if po revised.
+      if purchase_order.advance_amount&.present? and purchase_order.advance_payments.blank?
+        if purchase_order.advance_amount.value > 0
+          purchase_order.advance_amount_status_id = (purchase_order.auto_approved? ? AdvanceAmountStatus.id_for(:to_be_processed) : AdvanceAmountStatus.id_for(:po_processing))
+          purchase_order.save
+        end
+      end
+
+      self.purchase_order.update(rejection_note: "")
+      self.workflow_output = op.workflow_output
+
+      return if has_errors?
+
+      # Budget check
+      budget_validation_op = budget_limit_validation(purchase_order)
+      if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+        add_message :error, budget_validation_op.messages[:errors]
+        raise ActiveRecord::Rollback
+        return
       end
     end
-
-    self.purchase_order.update(rejection_note: "")
-    self.workflow_output = op.workflow_output
   end
 
   def post_process
-    # Budget check
-    budget_validation_op = budget_limit_validation(purchase_order)
-    if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
-      add_message :error, budget_validation_op.messages[:errors]
-      return
-    end
 
     add_message :success, 'Successfully submitted purchase order'
     # role_id = self.workflow_output[:role_id]

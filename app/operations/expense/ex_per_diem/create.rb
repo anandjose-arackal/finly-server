@@ -13,10 +13,6 @@ class Expense::ExPerDiem::Create < Expense::ExPerDiem::Base
     }
   end
 
-  def rollback_process_if_error?
-    true
-  end
-
   def authorized_user_types
     [:employee]
   end
@@ -131,31 +127,36 @@ class Expense::ExPerDiem::Create < Expense::ExPerDiem::Base
   end
 
   def process
-    self.expense = user.expenses.build(expense_params)
+    ActiveRecord::Base.transaction(requires_new: true) do
+      self.expense = user.expenses.build(expense_params)
 
-    # Create custom fields only for validations. Fields will be saved later
-    validate_custom_fields
-    return if has_errors?
+      # Create custom fields only for validations. Fields will be saved later
+      validate_custom_fields
+      return if has_errors?
 
-    if self.expense.save
-      # Attach an existing receipt to the expense
-      if self.receipt.present?
-        self.receipt.parent = expense
-        self.receipt.save
+      if self.expense.save
+        # Attach an existing receipt to the expense
+        if self.receipt.present?
+          self.receipt.parent = expense
+          self.receipt.save
+        end
+      else
+        messages[:error] = self.expense.errors.full_messages
       end
-    else
-      messages[:error] = self.expense.errors.full_messages
+
+      return if has_errors?
+
+      # Budget check
+      budget_validation_op = budget_limit_validation(expense)
+      if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+        add_message :error, budget_validation_op.messages[:errors]
+        raise ActiveRecord::Rollback
+        return
+      end
     end
   end
 
   def post_process
-    # Budget check
-    budget_validation_op = budget_limit_validation(expense)
-    if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
-      add_message :error, budget_validation_op.messages[:errors]
-      return
-    end
-
     # calculate amount of the expense
     amount = expense.amount
     if amount.blank?
