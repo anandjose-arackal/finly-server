@@ -159,6 +159,7 @@ class Company < ApplicationRecord
   delegate :bank_type, to: :configuration
 
   after_create :init_config_present
+  # after_create :company_setup
 
   validates :name, presence: true
 
@@ -596,4 +597,7 @@ class Company < ApplicationRecord
     TdsRatesList.seed_data(self.id)
   end
 
+  def company_setup
+    Company::Setup.({company: self})
+  end
 end

@@ -8,6 +8,8 @@ class ExportManager::Master::Invoices::GstExport < ExportManager::Builders::Spre
   system :vp
   # validate :fetch_invoices
 
+  has_template true
+
   attribute :invoice_number
   attribute :finly_ref_no
   attribute :finance_approved_date
@@ -45,7 +47,7 @@ class ExportManager::Master::Invoices::GstExport < ExportManager::Builders::Spre
   end
 
   def invoice_number(invoice_line_item)
-    invoice_line_item.parent.invoice_number
+    "\t#{invoice_line_item.parent.invoice_number}"
   end
 
   def finly_ref_no(invoice_line_item)

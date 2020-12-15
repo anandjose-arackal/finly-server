@@ -17,6 +17,8 @@
 #  entity_date                                :date
 #  sub_department_id                          :integer
 #  procurement_id                             :integer
+#  spent_amount_id                            :integer
+#  committed_amount_id                        :integer
 #  deleted_at                                 :datetime
 #  payment_processing_amount_before_tax_value :decimal(20, 10)  default(0.0)
 #  payment_processing_amount_after_tax_value  :decimal(20, 10)  default(0.0)
@@ -51,7 +53,7 @@
 #  cn_adjusted_amount_before_tax_value        :decimal(20, 10)  default(0.0)
 #  cn_adjusted_amount_after_tax_value         :decimal(20, 10)  default(0.0)
 #  credit_note_tax_amount_value               :decimal(20, 10)  default(0.0)
-#  date                                       :date
+#  date                                       :datetime
 #
 
 class BudgetTrail < ApplicationRecord

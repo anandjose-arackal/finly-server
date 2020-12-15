@@ -10,18 +10,14 @@ class PurchaseRequestExposure < Exposures::API
   attribute :location, exposure: true, record_attribute: true
   attribute :cost_center, exposure: true, record_attribute: true
   attribute :total_amount, exposure: true, record_attribute: true
-  attribute :created_by do
-    record.creator.to_exposure
-  end
+  attribute :created_by, exposure: true, record_attribute: :creator
   attribute :policy, exposure: true, record_attribute: true
   attribute :created_at, record_attribute: true
   attribute :updated_at, record_attribute: true
   attribute :submitted_at, record_attribute: true
   attribute :approved_at, record_attribute: true
   attribute :cost_allocation_items, record_attribute: true
-  attribute :items do
-    record.items.map(&:to_exposure)
-  end
+  attribute :items, record_attribute: true, exposure: true
   attribute :controlling_level, record_attribute: true, exposure: true
 
 end

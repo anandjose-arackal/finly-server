@@ -1,7 +1,7 @@
 class BeneficiaryPaymentExposure < Exposures::API
 
   attribute :tax_amount, record_attribute: true, exposure: true
-  attribute :cgst_amount do
+  attribute :cgst_amount, includes: [:tax_amount] do
     case record.gst_type_id
     when GstType.id_for(:cgst_sgst)
       (record.tax_amount&.value || 0) / 2

@@ -27,5 +27,4 @@ module Exposures::PreLoader
       Exposures::PreLoader.preload!(self, associations, *fields)
     end
   end
-
 end
