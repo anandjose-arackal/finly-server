@@ -11,18 +11,11 @@ class Docs::P2P::Invoices::Form < Forms::API
           item_tax_amount: "{{ row.item_taxable_amount | times: row.tax_percentage | divided_by: 100 }}",
           item_tds_amount: "{% if row.tds_applicable == true %}{{ row.item_taxable_amount | times: form.tds_percentage | divided_by: 100 }}{% else %}{{ 0 }}{% endif %}",
           item_net_amount: "{{ row.item_taxable_amount | plus: row.item_tax_amount | minus: row.item_tds_amount }}",
-          item_billable_amount: %Q()
+          item_billable_amount: "{{ row.item_taxable_amount | plus: row.item_tax_amount | minus: row.item_tds_amount }}" # todo - I2P will be different for PO invoice
       },
       # INVOICE SUMMARY
       summary: {
           invoice_gross_amount: "{% assign gross_amount = 0 %}{% for item in form.items %}{% assign gross_amount = gross_amount | plus: item.item_gross_amount %}{% endfor %}{{ gross_amount }}",
-          # invoice_gross_amount: "\
-          #   {% assign gross_amount = 0 %}\
-          #   {% for item in form.items %}\
-          #     {% assign gross_amount = gross_amount | plus: item.item_gross_amount %}\
-          #   {% endfor %}\
-          #   {{ gross_amount }}\
-          # ",
           invoice_discount_amount: "{% assign discount_amount = 0 %}{% for item in form.items %}{% assign discount_amount = discount_amount | plus: item.item_discount_amount %}{% endfor %}{{ discount_amount }}",
           invoice_taxable_amount: "{{ form.invoice_gross_amount | minus: form.invoice_discount_amount }}",
           invoice_tax_amount: "{% assign tax_amount = 0 %}{% for item in form.items %}{% assign tax_amount = tax_amount | plus: item.item_tax_amount %}{% endfor %}{{ tax_amount }}",
@@ -259,7 +252,7 @@ class Docs::P2P::Invoices::Form < Forms::API
 
       amount :invoice_taxable_amount, editable: false, visible: false,
              can_editable_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_taxable_amount]) # todo taxable amount
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_taxable_amount])
       amount :invoice_taxable_amount_converted, editable: false, visible: false,
              can_editable_be_changed: false,
              can_visible_be_changed: false

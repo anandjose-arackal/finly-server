@@ -167,17 +167,6 @@ class Invoice < ApplicationRecord
   money :invoice_freight_amount, :get_reporting_currency
   money :invoice_roundoff_amount, :get_reporting_currency
   money :invoice_balance_due, :get_reporting_currency
-  # money :invoice_gross_amount_converted, :get_reporting_currency
-  # money :invoice_discount_amount_converted, :get_reporting_currency
-  # money :invoice_taxable_amount_converted, :get_reporting_currency
-  # money :invoice_tax_amount_converted, :get_reporting_currency
-  # money :invoice_tds_amount_converted, :get_reporting_currency
-  # money :invoice_freight_amount_converted, :get_reporting_currency
-  # money :invoice_sub_total_amount_converted, :get_reporting_currency
-  # money :invoice_roundoff_amount_converted, :get_reporting_currency
-  # money :invoice_total_amount_converted, :get_reporting_currency
-  # money :invoice_paid_outside_amount_converted, :get_reporting_currency
-  # money :invoice_balance_due_converted, :get_reporting_currency
 
   def get_reporting_currency
     Currency.currency_for(self.reporting_currency || "INR")
@@ -195,9 +184,6 @@ class Invoice < ApplicationRecord
         self.conversion_date,
         self.reporting_currency,
         get_base_currency&.country_code || "INR"
-    # self.conversion_date,
-    # Currency.currency_for(self.reporting_currency),
-    # Currency.currency_for(self.base_currency)
     )
   end
 
@@ -1686,9 +1672,7 @@ class Invoice < ApplicationRecord
 
       self.skip_callback = true
       amounts_attributes_map.each do |key, value|
-        # amount_value = self.send("#{key}_converted")
         amount_value = self.send(key)
-        # puts "*************** Invoice #{key} value : #{amount_value}"
         amount_attr = self.send(value)
         base_currency_id = get_base_currency&.id || Currency.id_for("INR")
         if amount_attr.present?
