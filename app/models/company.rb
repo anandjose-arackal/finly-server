@@ -159,6 +159,7 @@ class Company < ApplicationRecord
   delegate :bank_type, to: :configuration
 
   after_create :init_config_present
+  # after_create :company_setup
 
   validates :name, presence: true
 
@@ -579,7 +580,7 @@ class Company < ApplicationRecord
     end
 
     # creating budget configurations
-    self.build_enforce_budget_configuration(enforce_purchase_order_budget: false, enforce_payment_budget: false,
+    self.build_enforce_budget_configuration(enforce_purchase_request_budget: false, enforce_purchase_order_budget: false, enforce_payment_budget: false,
                                             enforce_expense_budget: false, enforce_invoice_budget: false).save
 
     # creating custom export configurations for a company
@@ -596,4 +597,7 @@ class Company < ApplicationRecord
     TdsRatesList.seed_data(self.id)
   end
 
+  def company_setup
+    Company::Setup.({company: self})
+  end
 end

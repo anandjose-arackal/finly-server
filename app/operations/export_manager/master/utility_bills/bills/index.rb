@@ -8,6 +8,8 @@ class ExportManager::Master::UtilityBills::Bills::Index < ExportManager::Builder
   resolver 'utility_bills.default'
   handle :utility_bills
 
+  has_template true
+
   attribute :id
   attribute :bill_sequence_id
   attribute :subscription_id
@@ -227,7 +229,7 @@ class ExportManager::Master::UtilityBills::Bills::Index < ExportManager::Builder
   end
 
   def submitted_at(record)
-    record.open? ? "NA" : record.submitted_at.strftime("%I:%M %p, %d %b %Y")
+    record.open? ? "NA" : record.submitted_at&.strftime("%I:%M %p, %d %b %Y")
   end
 
   def approved_at(record)

@@ -106,6 +106,9 @@ class Settlement::SMoneyRequests::Processing::Update < Settlement::SMoneyRequest
     else
       params[:redirect] = false
     end
+
+    #adding  money user pocket: if user individually marking as completed
+    add_source_pocket(mapping) if request_params[:marked_as_completed]
   end
 
   def post_process
@@ -190,6 +193,24 @@ class Settlement::SMoneyRequests::Processing::Update < Settlement::SMoneyRequest
     if data.compact.present? and (data.compact.count == self.mapping.money_requests.count)
       status = MoneyRequestProcessorStatus.id_for(:completed)
       self.mapping.update status_id: status
+    end
+  end
+
+  def add_source_pocket(mapping)
+    if money_request_processor.bank_transfer?
+      purpose = :advance
+    else
+      purpose = :advance_outside_finly
+    end
+    user = mapping.user
+    amount = mapping.amount.value
+    destination_pocket = mapping.money_requests.first.destination_pocket
+    payment_request = PaymentRequest.(user, nil, UserPocket.name, :credit, purpose)
+    payment_request.add_payment_item(PaymentRequest::PaymentItem.(user, destination_pocket, amount, reference_resource: mapping.payment))
+    op = AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
+    if op.success?
+      coh_payment = op.payments.first
+      mapping.payment.update(reference_payment_id: coh_payment.id) if mapping.payment.present?
     end
   end
 

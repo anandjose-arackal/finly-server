@@ -20,14 +20,14 @@ class ItemExposure < Exposures::API
   end
   attribute :deleted_at, record_attribute: true
   attribute :product_type_id, record_attribute: true
-  attribute :product_type do
+  attribute :product_type, includes: [:product_type] do
     record.product_type&.name&.titleize
   end
   attribute :item_number, record_attribute: true
   attribute :unit_of_measurement, record_attribute: true
   attribute :created_by, record_attribute: true, exposure: true
   attribute :active, record_attribute: true
-  attribute :expense_type do
+  attribute :expense_type, includes: [:item_expense_type] do
     record.item_expense_type&.name
   end
   attribute :tds_applicable, record_attribute: true

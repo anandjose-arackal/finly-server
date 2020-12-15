@@ -12,7 +12,6 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     }
   end
 
-
   def init
     id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
     self.inward_invoice = user.company.inward_invoices.scope_all_except_voided.find_by(id: id)
@@ -52,6 +51,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
     self.policy = Policy::VendorPayments::Index.(current_user, params).policies.find_by(id: self.inward_invoice_params[:policy_id])
 
+    fetch_budget_contributions(inward_invoice)
   end
 
   def validate
@@ -393,62 +393,73 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
   end
 
   def process
-    self.inward_invoice.assign_attributes(self.inward_invoice_params)
-    calculate_tax_and_discounts(self.inward_invoice, self.inward_invoice_params)
+    ActiveRecord::Base.transaction(requires_new: true) do
+      self.inward_invoice.assign_attributes(self.inward_invoice_params)
+      calculate_tax_and_discounts(self.inward_invoice, self.inward_invoice_params)
 
 
-    # Calculate the new balance_due based on credit notes
-    # calculate_cn_adjustment
-
-
-    # fail
-
-    validate_custom_fields_invoice
-    return if has_errors?
-
-    if inward_invoice.valid?
-      if Invoice.status_ids(:open, :retracted, :rejected).include?(inward_invoice.invoice_status_id) && inward_invoice.created_by_user_id == user.id
-
-        params[:reviewal_document] = self.inward_invoice
-        params[:document_reviewer_mappings] = document_reviewer_mappings_params
-        params[:provider_name] = self.inward_invoice.get_invoice_provider_name
-        document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
-        unless document_reviewer_mappings_op.success?
-          add_message :error, document_reviewer_mappings_op.messages[:error]
-          return
-        end
-      end
-    end
-
-    # # Validate Credit Notes After Balance Due has been calculated
-    # return unless validate_credit_notes
-
-    if self.inward_invoice.save
-      recalculate_totals(self.inward_invoice, self.inward_invoice_params)
-
-
+      # Calculate the new balance_due based on credit notes
       # calculate_cn_adjustment
-      inward_invoice.save
 
-      self.invoice_old_attachments.update_all(procurement_document_id: nil, procurement_document_type: nil)
-      self.invoice_current_attachments.update_all(procurement_document_id: inward_invoice.id, procurement_document_type: inward_invoice.class.name)
 
-      # Create trail for procurement
-      if self.inward_invoice.procurement_id.present?
-        unless inward_invoice.created_by == user
-          inward_invoice.trails.create action_user: user,
-                                action_id: TrailAction.id_for(:update),
-                                action_level: inward_invoice.trails.last.action_level
+      # fail
+
+      validate_custom_fields_invoice
+      return if has_errors?
+
+      if inward_invoice.valid?
+        if Invoice.status_ids(:open, :retracted, :rejected).include?(inward_invoice.invoice_status_id) && inward_invoice.created_by_user_id == user.id
+
+          params[:reviewal_document] = self.inward_invoice
+          params[:document_reviewer_mappings] = document_reviewer_mappings_params
+          params[:provider_name] = self.inward_invoice.get_invoice_provider_name
+          document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+          unless document_reviewer_mappings_op.success?
+            add_message :error, document_reviewer_mappings_op.messages[:error]
+            return
+          end
         end
       end
-    else
-      add_message :error, self.inward_invoice.errors.full_messages
-    end
 
+      # # Validate Credit Notes After Balance Due has been calculated
+      # return unless validate_credit_notes
+
+      if self.inward_invoice.save
+        recalculate_totals(self.inward_invoice, self.inward_invoice_params)
+
+
+        # calculate_cn_adjustment
+        inward_invoice.save
+
+        self.invoice_old_attachments.update_all(procurement_document_id: nil, procurement_document_type: nil)
+        self.invoice_current_attachments.update_all(procurement_document_id: inward_invoice.id, procurement_document_type: inward_invoice.class.name)
+
+        # Create trail for procurement
+        if self.inward_invoice.procurement_id.present?
+          unless inward_invoice.created_by == user
+            inward_invoice.trails.create action_user: user,
+                                  action_id: TrailAction.id_for(:update),
+                                  action_level: inward_invoice.trails.last.action_level
+          end
+        end
+      else
+        add_message :error, self.inward_invoice.errors.full_messages
+        return
+      end
+
+      return if has_errors?
+
+      # Budget check
+      budget_validation_op = budget_limit_validation(inward_invoice)
+      if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+        add_message :error, budget_validation_op.messages[:errors]
+        raise ActiveRecord::Rollback
+        return
+      end
+    end
   end
 
   def post_process
-    budget_limit_validation( inward_invoice )
     # update_agreement_available_limit
     add_message :success, "Invoice updated"
   end

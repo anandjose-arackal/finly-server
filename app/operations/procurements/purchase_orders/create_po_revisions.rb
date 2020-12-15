@@ -68,6 +68,8 @@ class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOr
 
     self.klass.each_with_index do |k, kid| 
       obj = self.purchase_order.__send__(k)
+      next if k == :line_items
+
 
       if obj.present?
         # self.duplicate_po.__send__("#{k}=", self.purchase_order.__send__(k))

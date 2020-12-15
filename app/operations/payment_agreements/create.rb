@@ -26,7 +26,7 @@ class PaymentAgreements::Create < PaymentAgreements::Base
       end
     end
     validate_item_quantity
-    ActiveRecord::Base.transaction do
+    ActiveRecord::Base.transaction(requires_new: true) do
       if self.payment_agreement.save
         # checks to see if items are there or not
         # checks to see if general_invoice or rental_invoice have same items

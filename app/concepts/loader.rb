@@ -1,7 +1,7 @@
 class Loader
 
   def self.watch!(name, dir: nil, path: nil, &block)
-    return unless Rails.env.development?
+    return unless Rails.env.development? || Rails.env.test?
 
     ActiveSupport::Reloader.to_prepare do
       block.call if block_given?

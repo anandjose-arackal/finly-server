@@ -1,5 +1,5 @@
 class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
-  attr_accessor :purchase_order, :procurement, :purchase_order_params, :po_available, :po_previous_status
+  attr_accessor :purchase_order, :procurement, :purchase_order_params, :po_available, :po_previous_status,:previously_active_po
 
   def init
     purchase_order_id = params[:id] || params[:purchase_order_id]
@@ -64,17 +64,14 @@ class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
     if po_available
       if self.procurement.po_revisions.reload.present?
         po = self.procurement.reload.po_revisions.last
-        # po.purchase_order_status_id = PurchaseOrderStatus.id_for(:sent_to_vendor)
         po.purchase_order_status_id = self.po_previous_status
         update_status(po)
         if po.save
           update_purchase_request_item
         end
       else
-        po = self.procurement.reload.purchase_order
-        # po.purchase_order_status_id = PurchaseOrderStatus.id_for(:sent_to_vendor)
+        po = self.previously_active_po
         po.purchase_order_status_id = self.po_previous_status
-        update_status(po)
         if po.save
           update_purchase_request_item
         end
@@ -84,28 +81,15 @@ class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
 
   private
 
-  def update_status(po)
-    # will get back to this later
-    # po.purchase_order_status_id = PurchaseOrderStatus.id_for(:sent_to_vendor)
-    # Update procurement po approved status tags
-    # old_status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_approved))
-    # status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_processing))
-    # self.procurement.status_tags.delete(old_status_tag)
-    # self.procurement.status_tags << status_tag
-
-    # Update procurement send status
-    # status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_sent))
-    # if self.procurement.status_tags.include? status_tag
-      # self.procurement.status_tags.delete(status_tag)
-    # end
-  end
-
   def previous_state
     if self.procurement.po_revisions.present? && (self.procurement.po_revisions.count > 1)
-      ps = self.procurement.reload.po_revisions[-2].trails.where(action_id: [TrailAction.id_for(:approve), TrailAction.id_for(:auto_approve), TrailAction.id_for(:send_to_vendor), TrailAction.id_for(:vendor_confirmed)])
+      self.previously_active_po = self.procurement.reload.po_revisions[-2]
+      ps = self.previously_active_po&.trails.where(action_id: [TrailAction.id_for(:approve), TrailAction.id_for(:auto_approve), TrailAction.id_for(:send_to_vendor), TrailAction.id_for(:vendor_confirmed)])
     else
-      ps = self.procurement.reload.po_revisions.last.trails.where(action_id: [TrailAction.id_for(:approve), TrailAction.id_for(:auto_approve), TrailAction.id_for(:send_to_vendor), TrailAction.id_for(:vendor_confirmed)])
+      self.previously_active_po = self.procurement.reload.purchase_order.revision_of
+      ps = self.previously_active_po&.trails.where(action_id: [TrailAction.id_for(:approve), TrailAction.id_for(:auto_approve), TrailAction.id_for(:send_to_vendor), TrailAction.id_for(:vendor_confirmed)])
     end
+    self.previously_active_po.present?
     ps.last.action_id
   end
 
@@ -154,7 +138,7 @@ class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
 
   def update_purchase_request_item
     if self.purchase_order.present? && self.purchase_order.purchase_request_items.present?
-      po = self.procurement.po_revisions.present? ? self.procurement.po_revisions.last : self.procurement.purchase_order
+      po = self.procurement.po_revisions.present? ? self.procurement.po_revisions.last : self.procurement.reload.purchase_order
       self.purchase_order.purchase_request_items.each do |item|
         if po.present?
           item_status = po.approved? || po.auto_approved? ? 'po_approved' : 'po_created'

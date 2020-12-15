@@ -40,6 +40,8 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     self.cost_allocation_items = StringUtils.to_bool(self.purchase_order_params[:cost_allocation_items])
 
     self.policy = Policy::VendorPayments::Index.(current_user, params).policies.find_by(id: purchase_order_params[:policy_id])
+
+    fetch_budget_contributions(purchase_order)
   end
 
   def validate
@@ -240,134 +242,143 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
   def process
     # begin
-      ActiveRecord::Base.transaction do
-        purchase_order.assign_attributes(purchase_order_params)
-        if purchase_order.valid?
-          update_purchase_request_item_status
-          # Set validation of DLRMs
-          if PurchaseOrder.status_ids(:open, :retracted, :rejected).include?(purchase_order.purchase_order_status_id) && purchase_order.user_id == user.id
+    ActiveRecord::Base.transaction(requires_new: true) do
+      purchase_order.assign_attributes(purchase_order_params)
+      if purchase_order.valid?
+        update_purchase_request_item_status
+        # Set validation of DLRMs
+        if PurchaseOrder.status_ids(:open, :retracted, :rejected).include?(purchase_order.purchase_order_status_id) && purchase_order.user_id == user.id
 
-            dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::ValidationUpdate.(user, {
-              reviewal_document: self.purchase_order,
-              document_reviewer_mappings_params: document_reviewer_mappings_params
-            })
-            unless dlrm_validation_op.success?
-              add_message :error, dlrm_validation_op.messages[:error]
-              raise ActiveRecord::Rollback, dlrm_validation_op.messages[:error]
-              return
-            end
+          dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::ValidationUpdate.(user, {
+            reviewal_document: self.purchase_order,
+            document_reviewer_mappings_params: document_reviewer_mappings_params
+          })
+          unless dlrm_validation_op.success?
+            add_message :error, dlrm_validation_op.messages[:error]
+            raise ActiveRecord::Rollback, dlrm_validation_op.messages[:error]
+            return
           end
-
-          # if PurchaseOrder.status_ids(:open, :retracted, :rejected).include?(purchase_order.purchase_order_status_id) && purchase_order.user_id == user.id
-          #   # For setting level specific reviewers from reviewal chain for a document
-          #   params[:reviewal_document] = self.purchase_order
-          #   params[:document_reviewer_mappings] = document_reviewer_mappings_params
-
-          #   document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
-          #   unless document_reviewer_mappings_op.success?
-          #     add_message :error, document_reviewer_mappings_op.messages[:error]
-          #     return
-          #   end
-          # end
-
-          unless purchase_order.save
-            raise ActiveRecord::Rollback, 'Unable to save'
-          end
-          purchase_order.process_line_item_calculation(self.skip_adv_calculation)
-          unless purchase_order.save
-            raise ActiveRecord::Rollback, 'Unable to save'
-          end
-
-          # Directly update the columns because we have callbacks,
-          # and those callbacks are validating data which were not previously formatted, like ifsc, (we have some gibberrish ifsc values which  were allowed to be saved before)
-          # so at this moment it is better to simply call the database,
-          # later when we have proper formatted data, we will call update
-          # if params[:bank_account_id]
-          #   self.bank_account.update_columns(purchase_order_id: purchase_order.id)
-          # end
-
-          if PurchaseOrder.status_ids(:open, :retracted, :rejected).include?(purchase_order.purchase_order_status_id) && purchase_order.user_id == user.id
-            # For setting level specific reviewers from reviewal chain for a document
-            params[:reviewal_document] = self.purchase_order
-            params[:document_reviewer_mappings] = document_reviewer_mappings_params
-
-            document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
-            unless document_reviewer_mappings_op.success?
-              add_message :error, document_reviewer_mappings_op.messages[:error]
-              raise ActiveRecord::Rollback, document_reviewer_mappings_op.messages[:error]
-              return
-            end
-          end
-
-          # purchase_order.save
-          # purchase_order.save
-
-          # Save Custom Fields
-          if params[:custom_fields].present?
-            CustomField::SetFields.(purchase_order, FieldParentType.id_for(:purchase_order), custom_fields: params[:custom_fields], save: true, reset_fields: true)
-          end
-
-          unless purchase_order.user == user
-            # If updated by anyone other document owner
-            purchase_order.trails.create action_user: user,
-                                         action_id: TrailAction.id_for(:update),
-                                         action_level: purchase_order.trails.last.action_level
-
-
-            # if self.procurement.po_revisions
-            #   self.original_purchase_order.trails.create action_user: user,
-            #                              action_id: TrailAction.id_for(:update),
-            #                              action_level: purchase_order.trails.last.action_level,
-            #                              note: "Revised PO # #{purchase_order.po_number} updated"
-            # end
-          end
-
-          # Create track
-
-          # if self.purchase_order.purchase_order_status_id == PurchaseOrderStatus.id_for(:open)
-          #   document_number_op = Procurements::DocumentNumbers::Generate.(user, {document: self.purchase_order})
-          #
-          #   if document_number_op.success?
-          #     self.purchase_order.update(po_number: document_number_op.document_number)
-          #   end
-          # end
-
-          # AS OF NOW MULTIPLE ADVANCE PAYMENT CREATION CANCELLED
-          # TO BE TAKEN UP LATER
-
-          # params[:purchase_order_id] = self.purchase_order.id
-          # params[:receiving_user_type] = self.vendor.class&.name
-          # params[:receiving_user_id] = self.vendor.bank_accounts.first.account_owner_id # MODIFY TO ADD ANY BANK ACCOUNT
-          # params[:receiving_account_id] = self.vendor.id
-
-          # params[:advance_payments_attributes] = [ { scheduled_at: "2019-02-06", amount_attributes: { id: 292688, value: 200} }, { amount_attributes: { id: 292689, value: 300} } ]
-          # params[:advance_payments_attributes] = [ { scheduled_at: "2019-02-06", amount_attributes: { value: 200} }, { amount_attributes: { value: 300} } ]
-
-          # unless params[:advance_payments_attributes].blank?
-          #   op = Procurements::Payments::AddAdvance.(user, params)
-          #   if op.success?
-          #     add_message :success, 'Successfully added advance payment to this purchase order'
-          #   else
-          #     add_message :error, op.messages[:error]
-          #   end
-          # end
-
-        else
-          add_message :error, purchase_order.errors.full_messages
-          return
         end
+
+        # if PurchaseOrder.status_ids(:open, :retracted, :rejected).include?(purchase_order.purchase_order_status_id) && purchase_order.user_id == user.id
+        #   # For setting level specific reviewers from reviewal chain for a document
+        #   params[:reviewal_document] = self.purchase_order
+        #   params[:document_reviewer_mappings] = document_reviewer_mappings_params
+
+        #   document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+        #   unless document_reviewer_mappings_op.success?
+        #     add_message :error, document_reviewer_mappings_op.messages[:error]
+        #     return
+        #   end
+        # end
+
+        unless purchase_order.save
+          raise ActiveRecord::Rollback, 'Unable to save'
+        end
+        purchase_order.process_line_item_calculation(self.skip_adv_calculation)
+        unless purchase_order.save
+          raise ActiveRecord::Rollback, 'Unable to save'
+        end
+
+        # Directly update the columns because we have callbacks,
+        # and those callbacks are validating data which were not previously formatted, like ifsc, (we have some gibberrish ifsc values which  were allowed to be saved before)
+        # so at this moment it is better to simply call the database,
+        # later when we have proper formatted data, we will call update
+        # if params[:bank_account_id]
+        #   self.bank_account.update_columns(purchase_order_id: purchase_order.id)
+        # end
+
+        if PurchaseOrder.status_ids(:open, :retracted, :rejected).include?(purchase_order.purchase_order_status_id) && purchase_order.user_id == user.id
+          # For setting level specific reviewers from reviewal chain for a document
+          params[:reviewal_document] = self.purchase_order
+          params[:document_reviewer_mappings] = document_reviewer_mappings_params
+
+          document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+          unless document_reviewer_mappings_op.success?
+            add_message :error, document_reviewer_mappings_op.messages[:error]
+            raise ActiveRecord::Rollback, document_reviewer_mappings_op.messages[:error]
+            return
+          end
+        end
+
+        # purchase_order.save
+        # purchase_order.save
+
+        # Save Custom Fields
+        if params[:custom_fields].present?
+          CustomField::SetFields.(purchase_order, FieldParentType.id_for(:purchase_order), custom_fields: params[:custom_fields], save: true, reset_fields: true)
+        end
+
+        unless purchase_order.user == user
+          # If updated by anyone other document owner
+          purchase_order.trails.create action_user: user,
+                                        action_id: TrailAction.id_for(:update),
+                                        action_level: purchase_order.trails.last.action_level
+
+
+          # if self.procurement.po_revisions
+          #   self.original_purchase_order.trails.create action_user: user,
+          #                              action_id: TrailAction.id_for(:update),
+          #                              action_level: purchase_order.trails.last.action_level,
+          #                              note: "Revised PO # #{purchase_order.po_number} updated"
+          # end
+        end
+
+        # Create track
+
+        # if self.purchase_order.purchase_order_status_id == PurchaseOrderStatus.id_for(:open)
+        #   document_number_op = Procurements::DocumentNumbers::Generate.(user, {document: self.purchase_order})
+        #
+        #   if document_number_op.success?
+        #     self.purchase_order.update(po_number: document_number_op.document_number)
+        #   end
+        # end
+
+        # AS OF NOW MULTIPLE ADVANCE PAYMENT CREATION CANCELLED
+        # TO BE TAKEN UP LATER
+
+        # params[:purchase_order_id] = self.purchase_order.id
+        # params[:receiving_user_type] = self.vendor.class&.name
+        # params[:receiving_user_id] = self.vendor.bank_accounts.first.account_owner_id # MODIFY TO ADD ANY BANK ACCOUNT
+        # params[:receiving_account_id] = self.vendor.id
+
+        # params[:advance_payments_attributes] = [ { scheduled_at: "2019-02-06", amount_attributes: { id: 292688, value: 200} }, { amount_attributes: { id: 292689, value: 300} } ]
+        # params[:advance_payments_attributes] = [ { scheduled_at: "2019-02-06", amount_attributes: { value: 200} }, { amount_attributes: { value: 300} } ]
+
+        # unless params[:advance_payments_attributes].blank?
+        #   op = Procurements::Payments::AddAdvance.(user, params)
+        #   if op.success?
+        #     add_message :success, 'Successfully added advance payment to this purchase order'
+        #   else
+        #     add_message :error, op.messages[:error]
+        #   end
+        # end
+
+      else
+        add_message :error, purchase_order.errors.full_messages
+        return
       end
-      # rescue => e
-      #   add_message :error, messages
-      # end
+    # rescue => e
+    #   add_message :error, messages
+    # end
 
-    self.po_old_attachments.update_all(procurement_document_id: nil, procurement_document_type: nil)
+      self.po_old_attachments.update_all(procurement_document_id: nil, procurement_document_type: nil)
 
-    self.po_current_attachments.update_all(procurement_document_id: purchase_order.id, procurement_document_type: purchase_order.class.name)
+      self.po_current_attachments.update_all(procurement_document_id: purchase_order.id, procurement_document_type: purchase_order.class.name)
+
+      return if has_errors?
+
+      # Budget check
+      budget_validation_op = budget_limit_validation(purchase_order)
+      if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+        add_message :error, budget_validation_op.messages[:errors]
+        raise ActiveRecord::Rollback
+        return
+      end
+    end
   end
 
   def post_process
-    budget_limit_validation( purchase_order )
     add_message :success, 'Successfully updated purchase order'
   end
 

@@ -61,7 +61,7 @@ class InvoiceDrop < Drop
   end
 
   def tds_amount
-    @object.tds_amount.value || 0
+    @object.tds_amount&.value || 0
   end
 
   def tds_slab
