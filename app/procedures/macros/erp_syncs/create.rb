@@ -43,10 +43,12 @@ class Macros::ErpSyncs::Create < Transactions::API
       end
       ErpSyncAttempt.import erp_sync_params
     end
-    records.update_all(
-      "erp_sync_status_id=?, erp_sync_message=?,erp_sync_reference_id=?,erp_sync_attempted_at=?,erp_sync_attempts_count=Coalesce(erp_sync_attempts_count, 0) + 1",
-      status_id, params[:message], params[:reference_id], attempted_at
-    )
+    records.update_all(erp_sync_status_id:status_id, erp_sync_message: params[:message],erp_sync_reference_id: params[:reference_id] ,erp_sync_attempted_at: attempted_at)
+    records.update_all("`erp_sync_attempts_count`=Coalesce(`erp_sync_attempts_count`, 0) + 1")
+    # records.update_all(
+    #   "erp_sync_status_id=?, erp_sync_message=?,erp_sync_reference_id=?,erp_sync_attempted_at=?,erp_sync_attempts_count=Coalesce(erp_sync_attempts_count, 0) + 1",
+    #   status_id, params[:message], params[:reference_id], attempted_at
+    # )
 
     true
   end
