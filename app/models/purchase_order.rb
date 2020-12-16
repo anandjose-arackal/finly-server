@@ -1147,11 +1147,11 @@ class PurchaseOrder < ApplicationRecord
     if user.policy_user_roles.pluck(:user_role_id).uniq.present?
       user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
         if (UserRole.id_for(:purchase_order_initiator) == role_id.to_i)
-          statuses += [:open, :retracted, :processing, :approved, :rejected, :auto_approved, :sent_to_vendor, :vendor_confirmed, :closed]
+          statuses += [:open, :retracted, :processing, :approved, :rejected, :auto_approved, :po_revised,:sent_to_vendor, :vendor_confirmed, :closed]
         elsif (UserRole.id_for(:purchase_order_reviewer) == role_id.to_i)
-          statuses += [:processing, :approved, :auto_approved, :sent_to_vendor, :vendor_confirmed, :closed, :voided]
+          statuses += [:processing, :approved, :auto_approved, :po_revised,:sent_to_vendor, :vendor_confirmed, :closed, :voided]
         elsif UserRole.id_for(:admin) == role_id.to_i
-          statuses += [:processing, :approved, :rejected, :auto_approved, :sent_to_vendor, :vendor_confirmed, :closed, :voided]
+          statuses += [:processing, :approved, :rejected, :auto_approved, :po_revised,:sent_to_vendor, :vendor_confirmed, :closed, :voided]
         end
       end
     end
