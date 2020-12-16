@@ -1116,6 +1116,10 @@ class PurchaseOrder < ApplicationRecord
     PurchaseOrderStatus.ids_for(:approved, :auto_approved, :sent_to_vendor, :vendor_confirmed, :closed, :voided)
   end
 
+  def self.initiator_associated_status_ids
+    PurchaseOrderStatus.ids_for(:approved, :auto_approved, :sent_to_vendor, :vendor_confirmed, :closed, :voided, :po_revised)
+  end
+
   def self.auditor_associated_status_ids
     self.status_ids(:retracted, :rejected, :processing, :approved, :auto_approved, :sent_to_vendor, :vendor_confirmed, :closed, :voided, :po_revised)
   end
@@ -1236,7 +1240,7 @@ class PurchaseOrder < ApplicationRecord
   def self.role_based_initiator_associated_items(user, role_id, options = {})
     if UserRole.ids_for([:bank_payment_request_initiator, :po_invoice_initiator]).include? role_id
       policy_ids = PolicyUserRole.select(:policy_id).where(user_id: user.id, user_role_id: role_id)
-      return user.company.purchase_orders.where(policy_id: policy_ids).where(purchase_order_status_id: finance_associated_status_ids)
+      return user.company.purchase_orders.where(policy_id: policy_ids).where(purchase_order_status_id: initiator_associated_status_ids)
     end
     user.send("#{self.table_name}")
   end
