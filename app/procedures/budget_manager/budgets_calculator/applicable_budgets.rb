@@ -63,7 +63,7 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
       self.vendors = YesBankVendor.with_id(document.payments.map { |payment| payment.receiving_user_id if payment.receiving_user.is_a?(YesBankVendor) })
       self.locations = BranchLocation.with_id(document.payments.pluck(:location_id).compact)
       self.categories += Category.with_id(document.payments.pluck(:category_id).compact)
-      self.users = User.where(id: documents.payments.pluck(:initiating_user_id).uniq)
+      self.users = User.where(id: document.payments.pluck(:initiating_user_id).uniq)
     when "Report", "Expense"
       self.departments = [document.user.department].compact
       self.cost_centers = [document.user.cost_center].compact
