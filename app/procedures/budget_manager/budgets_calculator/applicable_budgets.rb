@@ -35,14 +35,18 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
       self.vendors = [document.vendor].compact
       self.locations = [document.location].compact
       self.categories = Category.with_id(document.items.pluck(:category_id).compact)
-      self.users = []
+      if document.class.name == 'Invoice'
+        self.users = User.where(id: document.created_by_user_id)
+      else
+        self.users = [document.user].compact
+      end
     when "PurchaseRequest"
       self.departments = Department.with_id(document.items.pluck(:department_id).compact)
       self.cost_centers = CostCenter.with_id(document.items.pluck(:cost_center_id).compact)
       self.vendors = []
       self.locations = [document.location].compact
       self.categories = Category.with_id(document.items.pluck(:category_id).compact)
-      self.users = []
+      self.users = [document.creator].compact
     when "BankPaymentRequest", "PaymentOrder"
       # here we'll extract the categories as well from the invoice / purchase order
       # that is linked to each respective payment in the payment order
@@ -59,7 +63,7 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
       self.vendors = YesBankVendor.with_id(document.payments.map { |payment| payment.receiving_user_id if payment.receiving_user.is_a?(YesBankVendor) })
       self.locations = BranchLocation.with_id(document.payments.pluck(:location_id).compact)
       self.categories += Category.with_id(document.payments.pluck(:category_id).compact)
-      self.users = []
+      self.users = User.where(id: document.payments.pluck(:initiating_user_id).uniq)
     when "Report", "Expense"
       self.departments = [document.user.department].compact
       self.cost_centers = [document.user.cost_center].compact
