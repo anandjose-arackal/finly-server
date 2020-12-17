@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_13_092440) do
+ActiveRecord::Schema.define(version: 2020_12_09_042455) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3245,147 +3245,6 @@ ActiveRecord::Schema.define(version: 2020_12_13_092440) do
     t.datetime "deleted_at"
   end
 
-  create_table "document_workflow_blocks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "company_id", null: false
-    t.integer "created_by_id", null: false
-    t.string "type", null: false
-    t.integer "document_workflow_id"
-    t.integer "parent_id"
-    t.integer "position"
-    t.text "criteria"
-    t.text "config"
-    t.datetime "deleted_at"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["company_id"], name: "index_document_workflow_blocks_on_company_id"
-    t.index ["created_at"], name: "index_document_workflow_blocks_on_created_at"
-    t.index ["created_by_id"], name: "index_document_workflow_blocks_on_created_by_id"
-    t.index ["deleted_at"], name: "index_document_workflow_blocks_on_deleted_at"
-    t.index ["document_workflow_id"], name: "index_document_workflow_blocks_on_document_workflow_id"
-    t.index ["parent_id"], name: "index_document_workflow_blocks_on_parent_id"
-    t.index ["position"], name: "index_document_workflow_blocks_on_position"
-    t.index ["type"], name: "index_document_workflow_blocks_on_type"
-    t.index ["updated_at"], name: "index_document_workflow_blocks_on_updated_at"
-  end
-
-  create_table "document_workflow_item_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.string "name", null: false
-    t.datetime "deleted_at"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["created_at"], name: "index_document_workflow_item_statuses_on_created_at"
-    t.index ["deleted_at"], name: "index_document_workflow_item_statuses_on_deleted_at"
-    t.index ["name"], name: "index_document_workflow_item_statuses_on_name"
-    t.index ["updated_at"], name: "index_document_workflow_item_statuses_on_updated_at"
-  end
-
-  create_table "document_workflow_items", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "company_id", null: false
-    t.string "action_resource_type", null: false
-    t.bigint "action_resource_id", null: false
-    t.string "action"
-    t.integer "document_workflow_id", null: false
-    t.integer "block_id", null: false
-    t.integer "parent_id"
-    t.boolean "visible", default: true
-    t.integer "sequence"
-    t.integer "tat"
-    t.integer "tat_in_working_hours"
-    t.datetime "received_at"
-    t.datetime "processed_at"
-    t.datetime "estimated_completion_at"
-    t.datetime "deleted_at"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.integer "status_id", null: false
-    t.integer "document_workflow_record_mapping_id"
-    t.index ["action_resource_type", "action_resource_id"], name: "index_document_workflow_items_on_action_resource"
-    t.index ["block_id"], name: "index_document_workflow_items_on_block_id"
-    t.index ["company_id"], name: "index_document_workflow_items_on_company_id"
-    t.index ["created_at"], name: "index_document_workflow_items_on_created_at"
-    t.index ["deleted_at"], name: "index_document_workflow_items_on_deleted_at"
-    t.index ["document_workflow_id"], name: "index_document_workflow_items_on_document_workflow_id"
-    t.index ["estimated_completion_at"], name: "index_document_workflow_items_on_estimated_completion_at"
-    t.index ["parent_id"], name: "index_document_workflow_items_on_parent_id"
-    t.index ["processed_at"], name: "index_document_workflow_items_on_processed_at"
-    t.index ["received_at"], name: "index_document_workflow_items_on_received_at"
-    t.index ["sequence"], name: "index_document_workflow_items_on_sequence"
-    t.index ["tat"], name: "index_document_workflow_items_on_tat"
-    t.index ["tat_in_working_hours"], name: "index_document_workflow_items_on_tat_in_working_hours"
-    t.index ["updated_at"], name: "index_document_workflow_items_on_updated_at"
-    t.index ["visible"], name: "index_document_workflow_items_on_visible"
-  end
-
-  create_table "document_workflow_record_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "company_id", null: false
-    t.integer "created_by_id", null: false
-    t.string "record_type", null: false
-    t.bigint "record_id", null: false
-    t.integer "document_workflow_id", null: false
-    t.boolean "active", default: false
-    t.datetime "deleted_at"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["active"], name: "index_document_workflow_record_mappings_on_active"
-    t.index ["company_id"], name: "index_document_workflow_record_mappings_on_company_id"
-    t.index ["created_at"], name: "index_document_workflow_record_mappings_on_created_at"
-    t.index ["created_by_id"], name: "index_document_workflow_record_mappings_on_created_by_id"
-    t.index ["deleted_at"], name: "index_document_workflow_record_mappings_on_deleted_at"
-    t.index ["document_workflow_id"], name: "index_document_workflow_record_mappings_on_document_workflow_id"
-    t.index ["record_type", "record_id"], name: "index_document_workflow_on_record"
-    t.index ["updated_at"], name: "index_document_workflow_record_mappings_on_updated_at"
-  end
-
-  create_table "document_workflow_user_mapping_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.string "name", null: false
-    t.datetime "deleted_at"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["created_at"], name: "index_document_workflow_user_mapping_types_on_created_at"
-    t.index ["deleted_at"], name: "index_document_workflow_user_mapping_types_on_deleted_at"
-    t.index ["name"], name: "index_document_workflow_user_mapping_types_on_name"
-    t.index ["updated_at"], name: "index_document_workflow_user_mapping_types_on_updated_at"
-  end
-
-  create_table "document_workflow_user_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "company_id", null: false
-    t.integer "created_by_id", null: false
-    t.integer "mapping_type_id", null: false
-    t.integer "block_id", null: false
-    t.text "criteria"
-    t.string "user_resource_type"
-    t.bigint "user_resource_id"
-    t.datetime "deleted_at"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["block_id"], name: "index_document_workflow_user_mappings_on_block_id"
-    t.index ["company_id"], name: "index_document_workflow_user_mappings_on_company_id"
-    t.index ["created_at"], name: "index_document_workflow_user_mappings_on_created_at"
-    t.index ["created_by_id"], name: "index_document_workflow_user_mappings_on_created_by_id"
-    t.index ["deleted_at"], name: "index_document_workflow_user_mappings_on_deleted_at"
-    t.index ["mapping_type_id"], name: "index_document_workflow_user_mappings_on_mapping_type_id"
-    t.index ["updated_at"], name: "index_document_workflow_user_mappings_on_updated_at"
-    t.index ["user_resource_type", "user_resource_id"], name: "index_document_workflow_user_mappings_on_user_resource"
-  end
-
-  create_table "document_workflows", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "company_id", null: false
-    t.integer "created_by_id", null: false
-    t.string "document"
-    t.string "trigger"
-    t.text "criteria"
-    t.datetime "deleted_at"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["company_id"], name: "index_document_workflows_on_company_id"
-    t.index ["created_at"], name: "index_document_workflows_on_created_at"
-    t.index ["created_by_id"], name: "index_document_workflows_on_created_by_id"
-    t.index ["deleted_at"], name: "index_document_workflows_on_deleted_at"
-    t.index ["document"], name: "index_document_workflows_on_document"
-    t.index ["trigger"], name: "index_document_workflows_on_trigger"
-    t.index ["updated_at"], name: "index_document_workflows_on_updated_at"
-  end
-
   create_table "duplicate_expense_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.integer "expense_id", null: false
     t.integer "duplicate_expense_id", null: false
@@ -3737,7 +3596,7 @@ ActiveRecord::Schema.define(version: 2020_12_13_092440) do
     t.datetime "deleted_at"
   end
 
-  create_table "export_formats", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "export_formats", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name"
     t.string "value"
     t.datetime "deleted_at"
@@ -3829,7 +3688,7 @@ ActiveRecord::Schema.define(version: 2020_12_13_092440) do
     t.index ["user_id"], name: "index_export_requests_on_user_id"
   end
 
-  create_table "export_resources", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "export_resources", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name"
     t.string "value"
     t.datetime "deleted_at"
@@ -3839,7 +3698,7 @@ ActiveRecord::Schema.define(version: 2020_12_13_092440) do
     t.index ["deleted_at"], name: "index_export_resources_on_deleted_at"
   end
 
-  create_table "export_template_news", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "export_template_news", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.text "description"
     t.string "export_format", null: false
@@ -3866,7 +3725,7 @@ ActiveRecord::Schema.define(version: 2020_12_13_092440) do
     t.index ["resource"], name: "index_export_template_news_on_resource"
   end
 
-  create_table "export_template_user_role_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "export_template_user_role_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.integer "template_id"
     t.integer "user_role_id", null: false
     t.datetime "deleted_at"
@@ -4308,6 +4167,67 @@ ActiveRecord::Schema.define(version: 2020_12_13_092440) do
     t.index ["uuid"], name: "index_form_custom_fields_on_uuid"
     t.index ["value"], name: "index_form_custom_fields_on_value"
     t.index ["value_text"], name: "index_form_custom_fields_on_value_text"
+  end
+
+  create_table "form_dependencies", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "company_id", null: false
+    t.string "controlling_entity_id", null: false
+    t.string "dependent_entity_id", null: false
+    t.integer "created_by_id", null: false
+    t.integer "updated_by_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.string "form_id", null: false
+    t.string "controlling_entity_key"
+    t.string "dependent_entity_key"
+    t.index ["company_id"], name: "index_form_dependencies_on_company_id"
+    t.index ["controlling_entity_id"], name: "index_form_dependencies_on_controlling_entity_id"
+    t.index ["created_by_id"], name: "index_form_dependencies_on_created_by_id"
+    t.index ["dependent_entity_id"], name: "index_form_dependencies_on_dependent_entity_id"
+    t.index ["updated_by_id"], name: "index_form_dependencies_on_updated_by_id"
+  end
+
+  create_table "form_dependency_choice_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "company_id", null: false
+    t.string "form_dependency_mapping_id", null: false
+    t.string "dependent_choice_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.string "form_id", null: false
+    t.string "dependent_choice_type"
+    t.string "controlling_entity_id"
+    t.string "controlling_choice_id"
+    t.string "controlling_choice_type"
+    t.string "controlling_entity_key"
+    t.string "dependent_entity_key"
+    t.index ["company_id"], name: "index_form_dependency_choice_mappings_on_company_id"
+    t.index ["dependent_choice_id"], name: "index_form_dependency_choice_mappings_on_dependent_choice_id"
+    t.index ["form_dependency_mapping_id"], name: "index_form_dependency_choice_mappings_form_dependency_choice_id"
+  end
+
+  create_table "form_dependency_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "company_id", null: false
+    t.string "form_dependency_id", null: false
+    t.string "controlling_choice_id", null: false
+    t.boolean "dependent_required"
+    t.boolean "dependent_visible"
+    t.boolean "dependent_editable"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.string "form_id", null: false
+    t.string "controlling_choice_type"
+    t.boolean "has_dependent_choices"
+    t.boolean "lazy_load_dependent_choices"
+    t.integer "controlling_entity_id"
+    t.string "controlling_entity_key"
+    t.integer "dependent_entity_id"
+    t.string "dependent_entity_key"
+    t.index ["company_id"], name: "index_form_dependency_mappings_on_company_id"
+    t.index ["controlling_choice_id"], name: "index_form_dependency_mappings_on_controlling_choice_id"
+    t.index ["form_dependency_id"], name: "index_form_dependency_mappings_on_form_dependency_id"
   end
 
   create_table "form_entities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
