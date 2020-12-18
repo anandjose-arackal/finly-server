@@ -73,8 +73,8 @@ class WorkflowManager::Aasm::BaseProvider
   end
 
   def update_paper_trail_event
-    if self.document.try(:paper_trail_event)
-      self.document.paper_trail_event = aasm.current_event.split.map(&:capitalize)&.join(' ')
+    if self.document.respond_to?(:paper_trail_event)
+      self.document.paper_trail_event = aasm.current_event.to_s.humanize.split.map(&:capitalize)&.join(' ')
     end
   end
 

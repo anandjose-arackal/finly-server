@@ -91,10 +91,6 @@ class WorkflowManager::Base < BaseOperation
 
   def process
     # Run event
-    if self.aasm_document.document.try(:paper_trail_event)
-      self.aasm_document.document.paper_trail_event = self.paper_trail_event.split.map(&:capitalize)&.join(' ')
-    end
-
     action = self.aasm_document.send(self.aasm_event)
 
     if action
