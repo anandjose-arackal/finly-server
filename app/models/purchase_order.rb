@@ -155,7 +155,8 @@ class PurchaseOrder < ApplicationRecord
 
   has_paper_trail(
       meta: {
-          parent_document_type: "Purchase Order"
+          parent_document_type: "Purchase Order",
+          document_number: Proc.new { |document| document.po_number }
       }
   )
   delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :vendor_confirmed?, :closed?, :voided?, :po_revised?, to: :status

@@ -68,7 +68,8 @@ include Searchkick::Api
 
   has_paper_trail(
       meta: {
-          parent_document_type: "Purchase Request"
+          parent_document_type: "Purchase Request",
+          document_number: Proc.new { |document| document.order_number }
       }
   )
 

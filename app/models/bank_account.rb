@@ -44,7 +44,8 @@ class BankAccount < ApplicationRecord
   # belongs_to :company_id
   has_paper_trail(
       meta: {
-          parent_document_type: "Vendor"
+          parent_document_type: "Vendor",
+          document_number: Proc.new { |document| document.account_owner.try(:vendor_id) }
       }
   )if Proc.new { |bank_account| bank_account.account_owner_type == 'YesBankVendor'}
 
