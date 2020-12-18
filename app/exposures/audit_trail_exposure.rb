@@ -51,7 +51,7 @@ class AuditTrailExposure < Exposures::API
       event_name ="#{record.event}ed"
     when  'return control'
       event_name ="Returned Control of"
-    when 'took control'
+    when 'take control'
       event_name ="Took Control of"
     when 'submit'
       event_name ="Submitted"
