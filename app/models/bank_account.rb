@@ -46,7 +46,7 @@ class BankAccount < ApplicationRecord
       meta: {
           parent_document_type: "Vendor"
       }
-  )
+  )if Proc.new { |bank_account| bank_account.account_owner_type == 'YesBankVendor'}
 
   attr_accessor :confirm_account_number
 

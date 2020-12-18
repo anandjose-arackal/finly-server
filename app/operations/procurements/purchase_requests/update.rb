@@ -77,8 +77,6 @@ class Procurements::PurchaseRequests::Update < Procurements::PurchaseRequests::B
         return
       end
     end
-  end
-
     add_message :success, 'Successfully updated purchase request'
   end
 
