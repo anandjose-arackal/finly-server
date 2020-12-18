@@ -1,7 +1,7 @@
 class ExportManager::Master::UpcomingInvoices::Index < ExportManager::Builders::Spreadsheet
 
   label 'Export'
-  description 'UpcomingInvoices Export'
+  description 'Upcoming Invoices Export'
   configurable true
   handle :upcoming_invoices
   screen 'upcoming_invoices.index'
