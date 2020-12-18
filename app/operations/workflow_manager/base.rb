@@ -1,7 +1,7 @@
 class WorkflowManager::Base < BaseOperation
   attr_accessor :document, :aasm_document, :violations_present, :forwarded_to_user,
                 :aasm_event, :document_types, :note, :role_id, :provider_name, :trail, :document_class_name,
-                :reject_to_user, :reject_to_level
+                :reject_to_user, :reject_to_level,:paper_trail_event
   def init
     self.document = params[:document]
     self.violations_present = params[:violations_present]
@@ -9,6 +9,7 @@ class WorkflowManager::Base < BaseOperation
     self.note = params[:note]
     self.forwarded_to_user = params[:forwarded_to_user]
     self.provider_name = params[:provider_name] || self.document.get_default_provider
+    self.paper_trail_event = params[:aasm_event].capitalize
 
     # used for knowing if the document would be rejected to a specific level in the approval chain
     self.reject_to_user = params[:reject_to_user]
@@ -90,8 +91,11 @@ class WorkflowManager::Base < BaseOperation
 
   def process
     # Run event
-    action = self.aasm_document.send(self.aasm_event)
+    if self.aasm_document.document.try(:paper_trail_event)
+      self.aasm_document.document.paper_trail_event = self.paper_trail_event.split.map(&:capitalize)&.join(' ')
+    end
 
+    action = self.aasm_document.send(self.aasm_event)
 
     if action
       add_message :success, self.aasm_document.messages[:success]
