@@ -24,6 +24,8 @@
 #  deleted_at             :datetime
 #  on_hold                :boolean          default(FALSE)
 #  bank_account_master_id :integer
+#  verified               :boolean
+#  swift_code             :string(255)
 #
 
 class BankAccount < ApplicationRecord

@@ -26,6 +26,12 @@ class BudgetManager::BudgetsCalculator::Calculate::PaymentBudgetsProcessor < Bud
       paid_amount = 0
     end
 
+    if payment.parent_type == "PurchaseOrder"
+      parent_trail = BudgetTrail.find_by(entity_type: "PurchaseOrderItem", entity_id: payment.parent.items.first.id)
+    elsif payment.parent_type == "Invoice"
+      parent_trail = BudgetTrail.find_by(entity_type: "InvoiceLineItem", entity_id: payment.parent.items.first.id)
+    end
+
     self.trail_hash = {
         id: trail_id,
         entity: payment,
@@ -35,10 +41,10 @@ class BudgetManager::BudgetsCalculator::Calculate::PaymentBudgetsProcessor < Bud
         department_id: payment.department_id,
         location_id: payment.location_id,
         user_id: payment.initiating_user_id,
-        date: payment.date,
+        date: (parent_trail&.date || payment.date),
         entity_status_id: payment.payment_status_id,
-        entity_created_at: payment.created_at,
-        entity_submitted_at: (payment.bank_payment_request&.submitted_at || DateUtils.local_date_time),
+        entity_created_at: (parent_trail&.entity_created_at || payment.created_at),
+        entity_submitted_at: (parent_trail&.entity_submitted_at || payment.bank_payment_request&.submitted_at || DateUtils.local_date_time),
         payment_purpose_id: payment.payment_purpose_id,
         purchase_order_id: purchase_order_id,
         invoice_id: invoice_id,

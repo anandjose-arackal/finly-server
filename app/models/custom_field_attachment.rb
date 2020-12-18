@@ -10,6 +10,8 @@
 #  attachment_file_size    :bigint
 #  attachment_updated_at   :datetime
 #  deleted_at              :datetime
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
 #
 
 class CustomFieldAttachment < ApplicationRecord

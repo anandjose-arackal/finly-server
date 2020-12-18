@@ -33,15 +33,15 @@ module RequestHelper
       is_mobile: true,
   }
 
-  def random_ip
+  def self.random_ip
     IPAddr.new(rand(2 ** 32), Socket::AF_INET).to_s
   end
 
-  def random_fingerprint
+  def self.random_fingerprint
     rand(10 ** 10).to_s.rjust(10, '0')
   end
 
-  def authentication_headers_for(type, properties = {})
+  def self.authentication_headers_for(type, properties = {})
     headers = {}
     case type
     when :web
@@ -50,7 +50,7 @@ module RequestHelper
     headers
   end
 
-  def x_finly_rp_web(params)
+  def self.x_finly_rp_web(params)
     args = {}
     id = params[:id] || '13'
     args[id] = {}

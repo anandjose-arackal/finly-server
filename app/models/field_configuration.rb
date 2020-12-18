@@ -18,6 +18,7 @@
 #  global                  :boolean          default(TRUE)
 #  external_reference_type :string(255)
 #  external_reference_id   :integer
+#  field_parent_type_id    :integer
 #  parent_id               :integer
 #  parent_type             :string(255)
 #  root_field              :boolean          default(TRUE)

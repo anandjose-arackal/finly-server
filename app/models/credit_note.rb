@@ -38,6 +38,7 @@
 #  credit_note_number            :string(255)
 #  last_adjusted_at              :datetime
 #  review_note                   :text(65535)
+#  erp_sync_status_id            :integer
 #
 
 class CreditNote < ApplicationRecord
@@ -134,6 +135,7 @@ class CreditNote < ApplicationRecord
           billing_address: billing_address,
           narration: narration,
           shipping_address: shipping_address,
+          vendor_location: invoice&.gstin_location&.as_json,
           cost_center: cost_center.as_json,
           department: department.as_json,
           policy: policy.as_json,
@@ -142,12 +144,15 @@ class CreditNote < ApplicationRecord
           after_tax_amount: after_tax_amount,
           tax_amount: tax_amount.as_json,
           tds_rate_id: tds_rate_id,
+          tds_code: tds_rate&.name,
           tds_amount: tds_amount.as_json,
           net_receivable_amount: net_receivable_amount.as_json,
           freight_amount: freight_amount.as_json,
           previously_adjusted_amount: previously_adjusted_amount.as_json,
           net_adjustable_amount: net_adjustable_amount.as_json,
-          user: user.as_json
+          user: user.as_json,
+          invoice_gst_type: tax_type_name,
+          approved_at: approved_at&.strftime('%d %b %Y')
       }
     end
 
@@ -311,6 +316,17 @@ class CreditNote < ApplicationRecord
     policy = Policy.find_by id: self.policy_id
     if policy.present? && policy.policy_user_roles.present?
       policy.policy_user_roles.where(user_role_id: UserRole.id_for(:credit_note_auditor), user_id: user.id).present? rescue false
+    end
+  end
+
+  def  tax_type_name
+    case self.invoice&.gst_type_id
+    when 1
+      'CGST + IGST'
+    when 2
+      'IGST'
+    else
+      nil
     end
   end
 

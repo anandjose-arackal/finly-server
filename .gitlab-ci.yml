@@ -1,0 +1,76 @@
+workflow:
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+default: &default
+  image: ruby:2.6
+  before_script:
+    - apt-get update
+    - gem install bundler --no-document
+    - gem install rubocop-rails
+
+# rubocop:
+#   <<: *default
+#   script:
+#     - rubocop --require rubocop-rails -F
+
+rspec:
+  <<: *default
+  services:
+    - mysql:5.7
+    - redis:latest
+  variables:
+    # Configure mysql service (https://hub.docker.com/_/mysql/)
+    MYSQL_DATABASE: finly_test
+    MYSQL_ROOT_PASSWORD: admin123
+  before_script:
+    - apt-get update
+    - apt-get install -y nodejs default-mysql-client unzip
+    - gem install bundler --no-document
+    - mysql --version
+    - ruby -v
+    - which ruby
+
+    # Copy config files for test
+    - cp config/database.test.yml config/database.yml
+    - cp config/finly_macros.test.yml config/finly_macros.yml
+    - cp config/redis_config.test.yml config/redis_config.yml
+
+    # Create empty config files
+    - touch config/aws_config.yml
+    - touch config/azure_config.yml
+    - touch config/bbps_config.yml
+    - touch config/feature_flipper.yml
+    - touch config/hutch.yml
+    - touch config/insights_config.yml
+    - touch config/integrations.ym
+    - touch config/mailer_config.yml
+    - touch config/mailtrain.yml
+    - touch config/meilisearch.yml
+    - touch config/posthog.yml
+    - touch config/searchkick.yml
+    - touch config/sidekiq.yml
+    - touch config/web_client.yml
+    - touch config/yes_bank_config.yml
+
+    # Fix utf8 - mysql - schema confilicts
+    - sed -i 's/utf8mb4/utf8/g' db/schema.rb
+    - sed -i 's/utf8_0900_ai_ci/utf8_unicode_ci/g' db/schema.rb
+
+    # Change git protocol to https to fetch private repo
+    - sed -i 's/git@gitlab.com:finlycore/https:\/\/gitlab.com\/finlycore/g' Gemfile
+    - sed -i 's/git@gitlab.com:finlycore/https:\/\/gitlab.com\/finlycore/g' Gemfile.lock
+
+    # Change gitlab token to fetch private repo
+    - bundle config gitlab.com "$GITLAB_USERNAME:$GITLAB_TOKEN"
+    - bundle install --jobs $(nproc) "${FLAGS[@]}"
+
+    # Load test schema
+    - unzip -p spec/schema.sql.zip | mysql -h mysql -u root --password="$MYSQL_ROOT_PASSWORD" $MYSQL_DATABASE
+
+    # load empty macros db
+    - echo "create database finly_macros_test;" | mysql -h mysql -u root --password="$MYSQL_ROOT_PASSWORD" $MYSQL_DATABASE
+  script:
+    - RAILS_ENV=test bundle exec rspec

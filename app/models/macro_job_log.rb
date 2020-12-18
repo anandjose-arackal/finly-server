@@ -6,7 +6,7 @@
 #  macro_id     :integer          not null
 #  macro_job_id :integer          not null
 #  log_type     :string(255)
-#  message      :text(65535)
+#  message      :text(4294967295)
 #  deleted_at   :datetime
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null
