@@ -1,6 +1,7 @@
 class Vendors::Retract < Vendors::Base
 
   def process
+    self.vendor.paper_trail_event = "Retract"
     params[:document] = self.vendor
     params[:aasm_event] = 'retract'
 

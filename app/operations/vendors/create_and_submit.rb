@@ -28,6 +28,7 @@ class Vendors::CreateAndSubmit < Vendors::Base
 
   def process
     if self.vendor.policy_id.present?
+      self.vendor.paper_trail_event = "Submit"
       params[:document] = self.vendor
       params[:aasm_event] = 'submit'
 

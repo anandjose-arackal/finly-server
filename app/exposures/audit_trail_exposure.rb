@@ -13,7 +13,7 @@ class AuditTrailExposure < Exposures::API
   attribute :user_transaction_id, record_attribute: true
   attribute :event_name do
     case record.event.downcase
-    when 'update', 'approve', 'un approve', 'create'
+    when 'update', 'approve', 'un approve', 'create', 'deactivate', 'reactivate'
       "#{record.event.capitalize}d"
     when  'reject','retract'
       "#{record.event}ed"
@@ -65,7 +65,7 @@ class AuditTrailExposure < Exposures::API
     when 'send to vendor'
       "#{record.created_by.name} Sent Purchase Order to Vendor"
     else
-      "#{record.created_by.name} #{event_name} #{record.item_type}"
+      "#{record.created_by.name} #{event_name} #{record.parent_document_type}"
     end
   end
 

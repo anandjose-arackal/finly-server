@@ -11,6 +11,7 @@ class Vendors::TakeControl < Vendors::Base
   end
 
   def process
+    self.vendor.paper_trail_event = "Took Control"
     params[:document] = self.vendor
     params[:aasm_event] = 'take_control'
 
