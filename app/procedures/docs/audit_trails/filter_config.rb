@@ -4,7 +4,7 @@ class Docs::AuditTrails::FilterConfig < Filters::API
       {id: "Purchase Request", name: "Purchase Request"},
       {id: "Purchase Order", name: "Purchase Order"},
       {id: "Invoice", name: "Invoice"},
-      {id: "YesBankVendor", name: "Vendor"}
+      {id: "Vendor", name: "Vendor"}
   ]
 
   index_builder Docs::AuditTrails::Index
