@@ -54,8 +54,9 @@ class WorkflowManager::Aasm::BaseProvider
     ### :change_state has been broken down into three different methods
     ### so it can be overridden in any of the providers
 
-    # Uodate PaperTrail Event
+    # Update PaperTrail Event
     update_paper_trail_event
+
     # Update DLRMs for the document
     update_dlrms
 
@@ -70,12 +71,9 @@ class WorkflowManager::Aasm::BaseProvider
 
     # Broadcast event
     broadcast_event
-  end
 
-  def update_paper_trail_event
-    if self.document.respond_to?(:paper_trail_event)
-      self.document.paper_trail_event = aasm.current_event.to_s.humanize.split.map(&:capitalize)&.join(' ')
-    end
+    # Create new PaperTrail version
+    create_paper_trail_version
   end
 
   def update_dlrms
@@ -299,6 +297,23 @@ class WorkflowManager::Aasm::BaseProvider
   def broadcast_event
     Events::Publisher::Record::Transition(document, user, aasm.current_event, aasm.current_state)
   end
+
+  def update_paper_trail_event
+    if self.document.respond_to?(:paper_trail_event)
+      self.document.paper_trail_event = aasm.current_event.to_s.humanize.split.map(&:capitalize)&.join(' ')
+    end
+  end
+
+  def create_paper_trail_version
+    #below action not chnage any value in document
+    #DLRM are updating with updat_all without callback soe we manually saving a version
+    if self.document.respond_to?(:paper_trail_event)
+      if [:forward, :take_control, :return_control].include?(aasm.current_event)
+        self.document.paper_trail.save_with_version
+      end
+    end
+  end
+
 
   def reviewers_not_present?
     self.reviewers.blank?
