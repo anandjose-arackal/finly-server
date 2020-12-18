@@ -38,7 +38,6 @@ class Vendors::Submit < Vendors::Base
       add_message :error, document_reviewer_mappings_op.messages[:error]
       return
     end
-    self.vendor.paper_trail_event = "Submit"
     params[:document] = self.vendor
     params[:aasm_event] = 'submit'
     op = WorkflowManager::Base.(user, params)

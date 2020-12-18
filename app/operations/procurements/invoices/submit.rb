@@ -53,7 +53,6 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
   end
 
   def process
-    self.invoice.paper_trail_event = "Submit"
     ActiveRecord::Base.transaction(requires_new: true) do
       params[:document] = self.invoice
       params[:aasm_event] = 'submit'

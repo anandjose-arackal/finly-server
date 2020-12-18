@@ -17,7 +17,6 @@ class Procurements::PurchaseOrders::MarkVendorConfirmed < Procurements::Purchase
   def process
     # todo-abi
     # if purchase order's payment's been processed then should block voiding it
-    self.purchase_order.paper_trail_event = "Vendor Confirmed"
     params[:document] = self.purchase_order
     params[:aasm_event] = 'vendor_confirmed'
     params[:violation_present] = false #todo Check violations

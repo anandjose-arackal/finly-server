@@ -1,7 +1,6 @@
 class Vendors::ReturnControl < Vendors::Base
 
   def process
-    self.vendor.paper_trail_event = "Return Control"
     params[:document] = self.vendor
     params[:aasm_event] = 'return_control'
 

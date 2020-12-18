@@ -13,7 +13,6 @@ class Procurements::PurchaseRequests::Unapprove < Procurements::PurchaseRequests
     # self.workflow_output = op.workflow_output
 
     begin
-      self.purchase_request.paper_trail_event = "Un Approve"
       ActiveRecord::Base.transaction do
         params[:document] = self.purchase_request
         params[:aasm_event] = 'unapprove'

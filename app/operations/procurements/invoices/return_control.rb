@@ -30,7 +30,6 @@ class Procurements::Invoices::ReturnControl < Procurements::Invoices::Base
 
 
   def process
-    self.invoice.paper_trail_event = "Return Control"
     params[:document] = self.invoice
     params[:aasm_event] = 'return_control'
     params[:violation_present] = false # Will be used in future

@@ -44,7 +44,6 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
   end
 
   def process
-    self.purchase_order.paper_trail_event = "Submit"
     ActiveRecord::Base.transaction(requires_new: true) do
       params[:document] = self.purchase_order
       params[:aasm_event] = 'submit'

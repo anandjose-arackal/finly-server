@@ -23,7 +23,6 @@ class Procurements::PurchaseRequests::Reject < Procurements::PurchaseRequests::B
   def process
     # Transactions are tied to one database connection. Hence process only required operations
     begin
-      self.purchase_request.paper_trail_event = "Reject"
       ActiveRecord::Base.transaction(requires_new: true) do
         params[:document] = self.purchase_request
         params[:aasm_event] = 'reject'

@@ -24,7 +24,6 @@ class Procurements::Invoices::Retract < Procurements::Invoices::Base
   end
 
   def process
-    self.invoice.paper_trail_event = "Retract"
     params[:document] = self.invoice
     params[:aasm_event] = 'retract'
     params[:violation_present] = false #todo Check violations

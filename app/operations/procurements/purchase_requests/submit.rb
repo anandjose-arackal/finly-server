@@ -19,7 +19,6 @@ class Procurements::PurchaseRequests::Submit < Procurements::PurchaseRequests::B
   end
 
   def process
-    self.purchase_request.paper_trail_event = "Submit"
     ActiveRecord::Base.transaction(requires_new: true) do
       begin
         ActiveRecord::Base.transaction(requires_new: true) do

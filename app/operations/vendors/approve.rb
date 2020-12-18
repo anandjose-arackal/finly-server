@@ -1,6 +1,5 @@
 class Vendors::Approve < Vendors::Base
   def process
-    self.vendor.paper_trail_event = "Approve"
     params[:document] = self.vendor
     params[:aasm_event] = 'approve'
 

@@ -26,7 +26,6 @@ class Procurements::PurchaseOrders::TakeControl < Procurements::PurchaseOrders::
   end
 
   def process
-    self.purchase_order.paper_trail_event = "Took Control"
     params[:document] = self.purchase_order
     params[:aasm_event] = 'take_control'
     params[:violation_present] = false #todo Check violations

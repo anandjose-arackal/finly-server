@@ -1,7 +1,6 @@
 class Procurements::PurchaseRequests::TakeControl < Procurements::PurchaseRequests::Base
 
   def process
-    self.purchase_request.paper_trail_event = "Took Control"
     params[:document] = self.purchase_request
     params[:aasm_event] = 'take_control'
 

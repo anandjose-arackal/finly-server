@@ -26,7 +26,6 @@ class Procurements::PurchaseOrders::Unapprove < Procurements::PurchaseOrders::Ba
   end
 
   def process
-    self.purchase_order.paper_trail_event = "Un Approve"
     params[:document] = self.purchase_order
     params[:aasm_event] = 'unapprove'
     params[:violation_present] = false #todo Check violations

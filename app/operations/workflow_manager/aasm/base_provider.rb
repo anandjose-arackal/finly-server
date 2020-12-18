@@ -54,6 +54,8 @@ class WorkflowManager::Aasm::BaseProvider
     ### :change_state has been broken down into three different methods
     ### so it can be overridden in any of the providers
 
+    # Uodate PaperTrail Event
+    update_paper_trail_event
     # Update DLRMs for the document
     update_dlrms
 
@@ -68,6 +70,12 @@ class WorkflowManager::Aasm::BaseProvider
 
     # Broadcast event
     broadcast_event
+  end
+
+  def update_paper_trail_event
+    if self.document.try(:paper_trail_event)
+      self.document.paper_trail_event = aasm.current_event.humanize
+    end
   end
 
   def update_dlrms

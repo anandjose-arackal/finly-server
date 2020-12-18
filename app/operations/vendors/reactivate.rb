@@ -14,7 +14,6 @@ class Vendors::Reactivate < Vendors::Base
   end
 
   def process
-    self.vendor.paper_trail_event = "Reactivate"
     params[:document] = self.vendor
     params[:aasm_event] = 'reactivate'
 

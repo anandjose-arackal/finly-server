@@ -14,7 +14,6 @@ class Vendors::Reject < Vendors::Base
   end
 
   def process
-    self.vendor.paper_trail_event = "Reject"
     params[:document] = self.vendor
     params[:aasm_event] = 'reject'
 
