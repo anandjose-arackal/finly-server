@@ -15,7 +15,7 @@ class Procurements::PurchaseOrders::Approve < Procurements::PurchaseOrders::Base
       return
     end
 
-    if self.purchase_order.bank_account.disabled
+    if self.purchase_order.bank_account&.disabled
       add_message :error, "This purchase order has a bank account which is disabled. Payment can only be processed to active bank accounts"
       return
     end
