@@ -47,7 +47,7 @@ class AuditTrailExposure < Exposures::API
     case record.event.downcase
     when 'update', 'approve', 'un approve', 'create'
       event_name = "#{record.event.capitalize}d"
-    when  'reject','retract'
+    when  'reject','retract', 'void'
       event_name ="#{record.event}ed"
     when  'return control'
       event_name ="Returned Control of"
