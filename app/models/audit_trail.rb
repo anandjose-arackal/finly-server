@@ -116,6 +116,8 @@ class AuditTrail < PaperTrail::Version
         PurchaseOrder
         Invoice
         YesBankVendor
+        BankAccount
+        GstinLocation
       )
   end
 
