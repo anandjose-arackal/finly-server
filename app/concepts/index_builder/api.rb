@@ -9,6 +9,7 @@ class IndexBuilder::API
 
   class_attr :feature_subscription
   class_attr :user_subscription
+  class_attr :record_count
 
   def self.resolver(route = nil, params: {})
     @resolver = {route: route, params: params} if route

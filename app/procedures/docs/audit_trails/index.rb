@@ -3,7 +3,6 @@ class Docs::AuditTrails::Index < IndexBuilder::API
 
   system_subscription :vp
   permissions :purchase_order_auditor, :po_invoice_auditor, :bank_payment_request_auditor,:admin
-  class_attr :record_count
 
   resolver 'audit_trails.default'
   reference '{{record.user_transaction_id}}'
