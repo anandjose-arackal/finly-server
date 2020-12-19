@@ -4,10 +4,10 @@ class Docs::P2P::Invoices::Agreement::UpcomingInvoices::Resolver < Resolver::API
   # entity GeneralInvoice
 
   def load(params)
-    case params&.dig(:qs, :invoice_type).to_s
-    when 'general'
+    case params&.dig(:qs, :invoice_type_id).to_s
+    when  "1"
       load_general_invoices params
-    when 'rental'
+    when  "2"
       load_rental_invoices params
     else
       load_rental_invoices params
