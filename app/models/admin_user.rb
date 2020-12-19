@@ -120,7 +120,7 @@ class AdminUser < ApplicationRecord
   end
 
   def company_id
-    1
+    0
   end
 
   def set_master_password(password)
