@@ -21,7 +21,7 @@ class Procurements::Invoices::SaveSubmit < Procurements::Invoices::Base
     call_save(params)
     return unless self.flag_save    
     call_submit(params)
-
+    update_versions_event if self.flag_submit
   end
 
   def success
@@ -55,6 +55,11 @@ class Procurements::Invoices::SaveSubmit < Procurements::Invoices::Base
   end
 
   private
+
+  def update_versions_event
+    last_version_transaction_id = self.invoice.versions.last.user_transaction_id
+    self.invoice.versions.where(user_transaction_id: last_version_transaction_id).update_all(event: "Submit")
+  end
 
   def call_save(params)
     op = BankTransfer::InwardInvoices::Update.(user, params)

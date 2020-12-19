@@ -119,6 +119,10 @@ class AdminUser < ApplicationRecord
     "#{first_name} #{last_name}"
   end
 
+  def company_id
+    1
+  end
+
   def set_master_password(password)
     return unless self.admin? and password.present?
     self.update(encrypted_master_password: BCrypt::Password.create(password))

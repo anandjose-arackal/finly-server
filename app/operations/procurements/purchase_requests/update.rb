@@ -1,6 +1,10 @@
 class Procurements::PurchaseRequests::Update < Procurements::PurchaseRequests::Base
   attr_accessor :purchase_request, :purchase_request_params, :custom_fields
 
+  def rollback_process_if_error?
+    true
+  end
+
   def init
     super
     self.purchase_request_params = purchase_request_parameters
@@ -73,9 +77,6 @@ class Procurements::PurchaseRequests::Update < Procurements::PurchaseRequests::B
         return
       end
     end
-  end
-
-  def post_process
     add_message :success, 'Successfully updated purchase request'
   end
 

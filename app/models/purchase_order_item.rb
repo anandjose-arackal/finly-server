@@ -61,6 +61,11 @@ class PurchaseOrderItem < ApplicationRecord
 
   # link to budget trails table
   has_many :budget_trails, as: :entity
+  has_paper_trail(
+      meta: {
+          parent_document_type: "Purchase Order"
+      }
+  )
 
   # removing for now
   # validates_presence_of :unit_of_measurement

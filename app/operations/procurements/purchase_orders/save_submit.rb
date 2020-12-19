@@ -17,12 +17,13 @@ class Procurements::PurchaseOrders::SaveSubmit < Procurements::PurchaseOrders::B
   end
 
   def process
-
     call_save(params)
-    return unless self.flag_save    
+    return unless self.flag_save
     call_submit(params)
-
+    update_versions_event if self.flag_submit
   end
+
+
 
   def success
     params[:flag_save] = self.flag_save
@@ -55,6 +56,10 @@ class Procurements::PurchaseOrders::SaveSubmit < Procurements::PurchaseOrders::B
   end
 
   private
+  def update_versions_event
+    last_version_transaction_id = self.purchase_order.versions.last.user_transaction_id
+    self.purchase_order.versions.where(user_transaction_id: last_version_transaction_id).update_all(event: "Submit")
+  end
 
   def call_save(params)
     op = Procurements::PurchaseOrders::Update.(user, params)

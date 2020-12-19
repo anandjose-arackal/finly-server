@@ -10,6 +10,10 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
     }
   end
 
+  def rollback_process_if_error?
+    true
+  end
+
   def init
     purchase_order_id = params[:id] || params[:purchase_order_id]
     self.purchase_order = user.company.purchase_orders.find_by id: purchase_order_id

@@ -184,7 +184,6 @@ class Amount < ApplicationRecord
   include SoftDeletable
 
   belongs_to :currency, optional: true
-
   accepts_nested_attributes_for :currency
 
   validate :no_negative_amount

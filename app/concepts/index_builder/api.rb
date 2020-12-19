@@ -9,6 +9,7 @@ class IndexBuilder::API
 
   class_attr :feature_subscription
   class_attr :user_subscription
+  class_attr :record_count
 
   def self.resolver(route = nil, params: {})
     @resolver = {route: route, params: params} if route
@@ -39,7 +40,7 @@ class IndexBuilder::API
   end
 
   def self.config(user)
-    config = {selectable: self.selectable, fixed: [], dynamic: []}
+    config = {selectable: self.selectable, status_filters: self.status_filters, fixed: [], dynamic: []}
     columns.each do |column_key, column|
       if column.fixed
         config[:fixed] << column.config(user)

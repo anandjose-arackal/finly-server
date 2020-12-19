@@ -13,7 +13,6 @@ class ApplicationController < ActionController::Base
   # For APIs, you may want to use :null_session instead.
 
   protect_from_forgery with: :null_session
-  # before_action :set_paper_trail_whodunnit
 
   before_action :set_cache_buster
 
@@ -27,6 +26,7 @@ class ApplicationController < ActionController::Base
   before_action :init_elastic_apm
 
   before_action :store_location
+  before_action :set_paper_trail_whodunnit
   before_action :set_raven_context
 
   # after_action :track_request
@@ -36,6 +36,12 @@ class ApplicationController < ActionController::Base
   # rescue_from StandardError, with: :error
   # rescue_from ActionController::RoutingError, with: :not_found
 
+  ####################
+  def info_for_paper_trail
+
+    hash = { user_ip: request.remote_ip, user_agent: request.user_agent , company_id: current_user&.company_id, created_by_id: current_user&.id , user_transaction_id: AuditTrail.generate_transaction_id}
+  end
+  ####################
   # handles 404 errors
   def not_found
     respond_to do |format|

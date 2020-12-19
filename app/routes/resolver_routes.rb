@@ -157,6 +157,10 @@ Resolver::Router.draw do
     route 'default', Docs::ExpenseManagement::Reports::Resolver
   end
 
+  scope :audit_trails do
+    route 'default', Docs::AuditTrails::Resolver
+  end
+
   scope :export_templates do
     route 'default', Masters::ExportTemplates::Resolver
   end

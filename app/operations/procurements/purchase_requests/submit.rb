@@ -14,6 +14,10 @@ class Procurements::PurchaseRequests::Submit < Procurements::PurchaseRequests::B
     fetch_budget_contributions(purchase_request)
   end
 
+  def rollback_process_if_error?
+    true
+  end
+
   def process
     ActiveRecord::Base.transaction(requires_new: true) do
       begin
