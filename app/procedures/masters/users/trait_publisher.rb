@@ -99,6 +99,11 @@ class Masters::Users::TraitPublisher
 
   # Responsible for refreshing all user traits
   class Masters::Users::TraitPublisher::RefreshUserTraits < Masters::Users::TraitPublisher
+    include Sidekiq::Worker
+
+    def perform(timeframe = 10.years.ago, dry_run: false, options: {})
+      Masters::Users::TraitPublisher::RefreshUserTraits.call(timeframe, dry_run: dry_run, options: options.with_indifferent_access)
+    end
 
     def self.call(timeframe = 10.years.ago, dry_run: false, options: {})
       return unless enabled?
