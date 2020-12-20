@@ -1,3 +1,21 @@
+# == Schema Information
+#
+# Table name: analytics_dashboard_schedules
+#
+#  id                     :bigint           not null, primary key
+#  company_id             :integer          not null
+#  analytics_dashboard_id :integer          not null
+#  start_date             :datetime
+#  end_date               :datetime
+#  frequency              :integer
+#  hour                   :integer
+#  minute                 :integer
+#  day_of_the_week        :integer
+#  day_of_the_month       :integer
+#  deleted_at             :datetime
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#
 class AnalyticsDashboardSchedule < ApplicationRecord
   FREQUENCY = %w(
       monthly weekly daily hourly last_day_of_month
