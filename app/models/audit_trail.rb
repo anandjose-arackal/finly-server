@@ -1,3 +1,16 @@
+# == Schema Information
+#
+# Table name: versions
+#
+#  id             :integer          not null, primary key
+#  item_type      :string(191)      not null
+#  item_id        :integer          not null
+#  event          :string(255)      not null
+#  whodunnit      :string(255)
+#  object         :text(4294967295)
+#  created_at     :datetime
+#  transaction_id :integer
+#
 class AuditTrail < PaperTrail::Version
   include Exposures::Model::Exposable
   include Resolver::ActiveRecordHelper
