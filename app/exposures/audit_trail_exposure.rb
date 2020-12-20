@@ -64,6 +64,8 @@ class AuditTrailExposure < Exposures::API
       "#{record.created_by.name} the Purchase Order as Vendor Confirmed"
     when 'send to vendor'
       "#{record.created_by.name} Sent Purchase Order to Vendor"
+    when 'po revised'
+      "#{record.created_by.name} Revised Purchase Order"
     else
       "#{record.created_by.name} #{event_name} #{record.parent_document_type}"
     end

@@ -15,19 +15,20 @@ class AuditTrail < PaperTrail::Version
   end
 
   def get_document_number
+    return self.document_number if self.document_number.present?
     case self.item_type
     when "PurchaseOrder"
       self.document_number = self.item.po_number
     when "PurchaseOrderItem"
-      self.document_number = self.item.purchase_order.po_number
+      self.document_number = self.item.purchase_order&.po_number
     when  "Invoice"
       self.document_number = self.item.invoice_id
     when  "InvoiceLineItem"
-      self.document_number = self.item.invoice.invoice_id
+      self.document_number = self.item.parent&.invoice_id
     when "PurchaseRequest"
       self.document_number = self.item.order_number
     when "PurchaseRequestItem"
-      self.document_number = self.item.purchase_request.order_number
+      self.document_number = self.item.purchase_request&.order_number
     when "YesBankVendor"
       self.document_number = self.item.vendor_id
     when  "BankAccount"
