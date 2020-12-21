@@ -150,8 +150,15 @@ class PurchaseOrder < ApplicationRecord
 
   has_many :quotations, dependent: :destroy
 
+
   belongs_to :bank_account, optional: true
 
+  has_paper_trail(
+      meta: {
+          parent_document_type: "Purchase Order",
+          document_number: Proc.new { |document| document.po_number }
+      }
+  )
   delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :vendor_confirmed?, :closed?, :voided?, :po_revised?, to: :status
 
   accepts_nested_attributes_for :items, :purchase_request_items, allow_destroy: true

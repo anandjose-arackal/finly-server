@@ -39,6 +39,13 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
       self.location_ids = [ document.location.id ].compact
       self.category_ids = items.pluck(:category_id).compact
       self.user_ids = []
+
+      if document.class.name == 'Invoice'
+        self.user_ids = [ document&.created_by_user_id ].compact
+      else
+        self.user_ids = [ document&.user&.id ].compact
+      end
+
     when "PurchaseRequest"
       items = document.items
 
@@ -47,8 +54,7 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
       self.vendor_ids = []
       self.location_ids = [document.location.id].compact
       self.category_ids = items.pluck(:category_id).compact
-      self.user_ids = []
-
+      self.user_ids = [document&.creator&.id].compact
     when "BankPaymentRequest", "PaymentOrder"
       # here we'll extract the categories as well from the invoice / purchase order
       # that is linked to each respective payment in the payment order
@@ -64,14 +70,12 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
       else
         self.category_ids = []
       end
-
       self.department_ids = payments.pluck(:department_id).compact
       self.cost_center_ids = payments.pluck(:cost_center_id).compact
       self.vendor_ids = payments.map { |payment| payment.receiving_user_id if payment.receiving_user.is_a?(YesBankVendor) }
       self.location_ids = payments.pluck(:location_id).compact
       self.category_ids += payments.pluck(:category_id).compact
-      self.user_ids = []
-
+      self.user_ids = document.payments.pluck(:initiating_user_id).uniq
 
     when "Report", "Expense"
       self.department_ids = [document.user&.department&.id].compact
@@ -153,7 +157,7 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
     budget_ids = []
     # we have to cycle through each budget group criteria that has been selected,
     # and based on the budget_date_type need to decide on which budgets to include
-    budgets = Budget.with_budget_criteria_id(self.applicable_budget_group_criteria.pluck(:id))
+    budgets = company.budgets.with_budget_criteria_id(self.applicable_budget_group_criteria.pluck(:id))
     budgets.each do |budget|
       date_type_id = budget.budget_date_type_id
       dates = get_dates_from_document(document, date_type_id)

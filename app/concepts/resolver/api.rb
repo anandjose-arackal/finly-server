@@ -10,7 +10,7 @@ class Resolver::API
 
   def self.call(options)
     params = options[:params]
-    filter = params[:filter] || true
+    filter = (params[:filter] || true) && !self.is_items_resolver?
     paginate = params[:paginate] || false
     includes = params[:includes] || []
     self.new(options[:current_user])
@@ -71,5 +71,12 @@ class Resolver::API
   def include(collection, includes)
     collection.includes(*includes) if includes.present?
     collection
+  end
+
+  # Adding this to check whether to skip filtering in case filtering is done on parent objects and child items are returned through resolver.
+  # Example: In case of invoice line items, we filter invoices using its own resolver and return the corresponding line items.
+  # Set this to true to skip filtering for child items.
+  def self.is_items_resolver?
+    false
   end
 end

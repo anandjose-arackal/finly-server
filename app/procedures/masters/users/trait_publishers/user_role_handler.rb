@@ -4,7 +4,7 @@ class Masters::Users::TraitPublishers::UserRoleHandler < Masters::Users::TraitPu
 
   # consumes_event! 'user_role_mappings.*', 'policy_user_roles.*'
 
-  def self.refresh(changed_since, dry_run: false, options: {})
+  def self.refresh(changed_since=10.years.ago, dry_run: false, options: {})
     return if changed_since.nil?
     return unless enabled?
 
