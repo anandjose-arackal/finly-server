@@ -19,6 +19,7 @@ class Docs::AuditTrails::FilterConfig < Filters::API
       {id: "Return Control", name: "Return Control"},
       {id: "Forward", name: "Forward"},
       {id: "Void", name: "Void"},
+      {id: "PO Revised",name: "PO Revised"},
       {id: "Send To Vendor", name: "Send To Vendor"},
       {id: "Vendor Confirmed", name: "Vendor Confirmed"},
       {id: "Deactivate", name: "Deactivate"},
