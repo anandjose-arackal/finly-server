@@ -1,7 +1,7 @@
 # Responsible for publishing company properties
 class Masters::Users::TraitPublishers::UserSubscriptionHandler < Masters::Users::TraitPublishers::FeatureSubscriptionHandler
 
-  def self.refresh(changed_since, dry_run: false, options: {})
+  def self.refresh(changed_since=10.years.ago, dry_run: false, options: {})
     return unless enabled?
 
     start_time = Time.now

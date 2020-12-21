@@ -4320,6 +4320,7 @@ Rails.application.routes.draw do
   post 'index/:route/status_counts', to: 'index#status_counts'
   get 'index/:route', to: "index#show"
   post 'index/:route', to: "index#show"
+  get 'drawer/:route', to:"drawer#show"
 
   get 'menu', to: 'menu#show'
 

@@ -86,7 +86,7 @@ class Bbps::Api < ServiceApi
 
     splits = json["responseMsg"].split("|")
     # Request failed
-    return Failure((splits[3] || "Unable to fetch response")) if splits[1] == "N"
+    return Failure("Error connecting with BBPS") if splits[1].blank?
 
     map = {}.with_indifferent_access
     fetch(:response_fields).each_with_index { |field, index| map[field] = splits[index] }
@@ -101,7 +101,7 @@ class Bbps::Api < ServiceApi
 
     splits = json["responseMsg"].split("|")
     # Request failed
-    return Failure((splits[3] || "Unable to fetch response")) if splits[1] == "N"
+    return Failure("Error connecting with BBPS") if splits[1].blank?
 
     map = {}.with_indifferent_access
 

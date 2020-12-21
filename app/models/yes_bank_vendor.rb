@@ -97,6 +97,13 @@ class YesBankVendor < ApplicationRecord
   has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment'
   has_many :receiving_payments, foreign_key: 'receiving_user_id', class_name: 'Payment'
 
+  has_paper_trail(
+      meta: {
+          parent_document_type: "Vendor",
+          document_number: Proc.new { |document| document.vendor_id }
+      }
+  )
+
   default_scope { unscope(:where) }
 
   # Requirement first shared by olx
