@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_17_082957) do
+ActiveRecord::Schema.define(version: 2020_12_18_222920) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -9544,6 +9544,7 @@ ActiveRecord::Schema.define(version: 2020_12_17_082957) do
     t.integer "version_id"
     t.string "foreign_key_name", null: false
     t.integer "foreign_key_id"
+    t.string "foreign_type"
     t.index ["foreign_key_name", "foreign_key_id"], name: "index_version_associations_on_foreign_key"
     t.index ["version_id"], name: "index_version_associations_on_version_id"
   end
@@ -9556,6 +9557,19 @@ ActiveRecord::Schema.define(version: 2020_12_17_082957) do
     t.text "object", size: :long
     t.datetime "created_at", precision: 6
     t.integer "transaction_id"
+    t.string "user_ip"
+    t.string "user_agent"
+    t.text "object_changes"
+    t.string "item_subtype"
+    t.integer "company_id"
+    t.timestamp "deleted_at"
+    t.integer "created_by_id"
+    t.string "document_number"
+    t.string "parent_document_type"
+    t.string "user_transaction_id"
+    t.index ["company_id", "event", "parent_document_type"], name: "versions_event_company_id"
+    t.index ["company_id", "user_transaction_id", "item_type", "parent_document_type"], name: "versions_index_company_item_type"
+    t.index ["company_id"], name: "index_versions_on_company_id"
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
     t.index ["transaction_id"], name: "index_versions_on_transaction_id"
   end
