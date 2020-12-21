@@ -9,6 +9,8 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
   # scope "development", 156, 'Bundl Technologies Pvt Ltd'
   # validate :fetch_invoices
 
+  has_template true
+
   section :header do
     attribute :finly_ref_no
     attribute :po_number

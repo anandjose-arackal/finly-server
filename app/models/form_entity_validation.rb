@@ -18,7 +18,7 @@
 #  is_updated        :boolean
 #  can_be_updated    :boolean
 #  rule              :text(65535)
-#  form_entity_id    :string(255)      not null
+#  form_entity_id    :string(255)
 #
 
 class FormEntityValidation < ApplicationRecord

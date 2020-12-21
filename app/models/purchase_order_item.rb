@@ -30,6 +30,8 @@
 #  account                  :string(255)
 #  tax_rate_id              :integer
 #  deleted_at               :datetime
+#  submitted_at             :datetime
+#  approved_at              :datetime
 #  unit_of_measurement      :string(255)
 #  purchase_request_item_id :integer
 #  department_id            :integer
@@ -59,6 +61,11 @@ class PurchaseOrderItem < ApplicationRecord
 
   # link to budget trails table
   has_many :budget_trails, as: :entity
+  has_paper_trail(
+      meta: {
+          parent_document_type: "Purchase Order"
+      }
+  )
 
   # removing for now
   # validates_presence_of :unit_of_measurement

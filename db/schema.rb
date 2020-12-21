@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_09_042455) do
+ActiveRecord::Schema.define(version: 2020_12_18_222920) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3596,6 +3596,15 @@ ActiveRecord::Schema.define(version: 2020_12_09_042455) do
     t.datetime "deleted_at"
   end
 
+  create_table "export_formats", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "name"
+    t.string "value"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_export_formats_on_deleted_at"
+  end
+
   create_table "export_job_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -3677,6 +3686,54 @@ ActiveRecord::Schema.define(version: 2020_12_09_042455) do
     t.index ["model_class"], name: "index_export_requests_on_model_class"
     t.index ["scheduled_on"], name: "index_export_requests_on_scheduled_on"
     t.index ["user_id"], name: "index_export_requests_on_user_id"
+  end
+
+  create_table "export_resources", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "name"
+    t.string "value"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "route"
+    t.index ["deleted_at"], name: "index_export_resources_on_deleted_at"
+  end
+
+  create_table "export_template_news", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.string "export_format", null: false
+    t.string "resource", null: false
+    t.text "template", size: :long
+    t.text "query", size: :long
+    t.boolean "active", default: true
+    t.boolean "personal"
+    t.integer "company_id"
+    t.integer "created_by_id"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "default", default: false
+    t.boolean "modified", default: false
+    t.string "master"
+    t.index ["active"], name: "index_export_template_news_on_active"
+    t.index ["company_id"], name: "index_export_template_news_on_company_id"
+    t.index ["created_by_id"], name: "index_export_template_news_on_created_by_id"
+    t.index ["deleted_at"], name: "index_export_template_news_on_deleted_at"
+    t.index ["export_format"], name: "index_export_template_news_on_export_format"
+    t.index ["name"], name: "index_export_template_news_on_name"
+    t.index ["personal"], name: "index_export_template_news_on_personal"
+    t.index ["resource"], name: "index_export_template_news_on_resource"
+  end
+
+  create_table "export_template_user_role_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.integer "template_id"
+    t.integer "user_role_id", null: false
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_export_template_user_role_mappings_on_deleted_at"
+    t.index ["template_id"], name: "index_export_template_user_role_mappings_on_template_id"
+    t.index ["user_role_id"], name: "index_export_template_user_role_mappings_on_user_role_id"
   end
 
   create_table "export_templates", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -9341,6 +9398,7 @@ ActiveRecord::Schema.define(version: 2020_12_09_042455) do
     t.integer "version_id"
     t.string "foreign_key_name", null: false
     t.integer "foreign_key_id"
+    t.string "foreign_type"
     t.index ["foreign_key_name", "foreign_key_id"], name: "index_version_associations_on_foreign_key"
     t.index ["version_id"], name: "index_version_associations_on_version_id"
   end
@@ -9353,6 +9411,19 @@ ActiveRecord::Schema.define(version: 2020_12_09_042455) do
     t.text "object", size: :long
     t.datetime "created_at", precision: 6
     t.integer "transaction_id"
+    t.string "user_ip"
+    t.string "user_agent"
+    t.text "object_changes"
+    t.string "item_subtype"
+    t.integer "company_id"
+    t.timestamp "deleted_at"
+    t.integer "created_by_id"
+    t.string "document_number"
+    t.string "parent_document_type"
+    t.string "user_transaction_id"
+    t.index ["company_id", "event", "parent_document_type"], name: "versions_event_company_id"
+    t.index ["company_id", "user_transaction_id", "item_type", "parent_document_type"], name: "versions_index_company_item_type"
+    t.index ["company_id"], name: "index_versions_on_company_id"
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
     t.index ["transaction_id"], name: "index_versions_on_transaction_id"
   end

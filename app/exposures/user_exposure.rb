@@ -13,5 +13,5 @@ class UserExposure < Exposures::API
   attribute :updated_at, record_attribute: true
   attribute :last_activity_at, record_attribute: true
   attribute :profile, record_attribute: true, exposure: true
-
+  attribute :active, record_attribute: true
 end

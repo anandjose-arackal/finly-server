@@ -1,5 +1,6 @@
 class InvoiceExposure < Exposures::API
   include Concerns::ErpSyncConcern
+  include MathUtil
 
   attribute :id, record_attribute: true
   attribute :procurement_id, record_attribute: true
@@ -56,7 +57,7 @@ class InvoiceExposure < Exposures::API
       nil
     end
   end
-  attribute :cgst_amount do
+  attribute :cgst_amount, includes: [:tax_amount] do
     case record.gst_type_id
     when GstType.id_for(:cgst_sgst)
       (record.tax_amount&.value || 0)/2
@@ -66,7 +67,7 @@ class InvoiceExposure < Exposures::API
       0
     end
   end
-  attribute :sgst_amount do
+  attribute :sgst_amount, includes: [:tax_amount] do
     case record.gst_type_id
     when GstType.id_for(:cgst_sgst)
       (record.tax_amount&.value || 0)/2
@@ -74,7 +75,7 @@ class InvoiceExposure < Exposures::API
       0
     end
   end
-  attribute :igst_amount do
+  attribute :igst_amount, includes: [:tax_amount] do
     case record.gst_type_id
     when GstType.id_for(:cgst_sgst)
       0
@@ -100,7 +101,7 @@ class InvoiceExposure < Exposures::API
   attribute :advance_amount, record_attribute: true, exposure: true
   attribute :balance_due, includes: [:balance_due], record_attribute: true, exposure: true
   attribute :balance_due_value, includes: [:balance_due] do
-    record.balance_payable&.value || 0
+    record.balance_due&.value || 0
   end
   attribute :paid_amount_value, includes: [:balance_due, {successful_payments: :amount}] do
     record.paid_amount_value || 0
@@ -110,7 +111,7 @@ class InvoiceExposure < Exposures::API
   end
 
   # Fixme: Performance incase the number of line items it high
-  attribute :line_items, record_attribute: :invoice_items, exposure: true, includes: [:line_items]
+  attribute :line_items, record_attribute: :invoice_items, exposure: true, includes: [:invoice_items]
 
   attribute :po_number, includes: [{procurement: :purchase_order}] do
     record&.procurement&.purchase_order&.po_number
@@ -124,6 +125,72 @@ class InvoiceExposure < Exposures::API
     end
   end
   attribute :status, record_attribute: true, exposure: true, includes: [:status]
+  attribute :base_amount, includes: [:invoice_items, :amount, :original_amount] do
+    record.include_original_amount
+  end
+
+  attribute :total_invoice_amount, includes: [:gross_amount, :tax_amount] do
+    record.gross_amount&.value.to_f + record.tax_amount&.value.to_f
+  end
+
+  attribute :payment_amounts_total, record_attribute: true, includes: [{ payments: :amount }]
+
+  attribute :legal_status, includes: [{ vender_location: :gstin_master }] do
+    record.vendor_location&.gstin_master&.constitution_of_business
+  end
+
+  attribute :transaction_service_period_from, record_attribute: true
+  attribute :transaction_service_period_to, record_attribute: true
+
+  attribute :invoice_amount, includes: [:balance_due, :po_adjusted_advance] do
+    (record.balance_due&.value || 0) + (record.po_adjusted_advance&.value || 0)
+  end
+
+  attribute :is_approved do
+    InwardInvoiceStatus.ids_for(:unpaid, :partially_paid, :paid, :approved, :auto_approved, :closed, :pending, :initiated).include?(record.invoice_status_id)
+  end
+
+  attribute :invoice_advance_amount, includes: [:advance_amount, {procurement: {purchase_order: :advance_amount}}] do
+    if record.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)
+      value = record.advance_amount&.value || 0
+    else
+      value = record.procurement&.purchase_order&.advance_amount&.value || 0
+    end
+    precision_value(value)
+  end
+
+  attribute :approvers, includes: [{dlrms: [:taken_control_by, :forwarded_to, :reviewer]}] do
+    approvers = record.dlrms.map do |dlrm|
+      taken_control_by = forwarded_to = reviewer = nil
+      taken_control_by = dlrm.taken_control_by
+      forwarded_to = dlrm.forwarded_to
+      reviewer = dlrm.reviewer
+      approved = [TrailAction.id_for(:approve), TrailAction.id_for(:approve_and_forward)].include?(dlrm.action_id)
+      action_taken = (dlrm.action_taken_at.present? ? dlrm.action_taken_at.strftime("%I:%M %p, %d %b %Y") : dlrm.updated_at.strftime("%I:%M %p, %d %b %Y"))
+      if forwarded_to.present?
+        (approved ? "#{forwarded_to.name} - #{action_taken}" : forwarded_to.name)
+      elsif taken_control_by.present?
+        (approved ? "#{taken_control_by.name} - #{action_taken}" : taken_control_by.name)
+      elsif reviewer.present?
+        (approved ? "#{reviewer.name} - #{action_taken}" : reviewer.name)
+      end
+    end
+    approvers.reject { |e| e.to_s.empty? }.join(", ")
+  end
+
+  attribute :attachments, includes: [:attachments] do
+    record.attachments.map {|a| a.file.url(:original, timestamp: false)}.compact.join(", ")
+  end
+
+  attribute :approval_pending_reviewers, includes: [:level, :document_level_reviewer_mappings] do
+    record.get_reviewers&.map(&:name)&.join(", ")
+  end
+
+  attribute :rcm_enabled, record_attribute: true
+
+  attribute :custom_fields, record_attribute: true, includes: [{ custom_fields: [:field_configuration, :value] }]
+
+  attribute :item_amounts_total, record_attribute: true, includes: [{invoice_items: [:inventory_line_item, :amount, :billable_amount]}]
 
 
   # def vendor_ref_num(invoice_line_item)

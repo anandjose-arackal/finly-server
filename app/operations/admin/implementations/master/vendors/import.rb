@@ -30,7 +30,6 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
     unless messages.blank?
       return result false, messages.join(', ')
     end
-    binding.pry
     #support for multiple gstin locations in import
     vendor = check_existing_vendor(vendor_params["vendor"])
     if vendor && vendor_params["vendor"]["gstin_locations_attributes"]
@@ -112,7 +111,6 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
   end
   
   def set_params(data)
-    binding.pry
     messages =[]
     business_name = data[:business_name].to_s
     messages << "Legal Name can't Blank" if business_name.blank?

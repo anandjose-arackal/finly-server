@@ -33,6 +33,7 @@ class Exposures::API::Attribute
         return value unless exposure
         return value if value.class <= Exposures::API
         return value if value.nil?
+        return value.to_exposures if value.class <= ActiveRecord::Associations::CollectionProxy
         raise "#{value.class.name} does not have an exposure defined" unless value.respond_to?(:to_exposure)
         return value.to_exposure
       end

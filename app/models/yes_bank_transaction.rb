@@ -22,6 +22,7 @@
 #  transfer_mode_id            :integer
 #  deleted_at                  :datetime
 #  bank_error_message          :text(16777215)
+#  reference_payment_id        :integer
 #
 
 class YesBankTransaction < ApplicationRecord

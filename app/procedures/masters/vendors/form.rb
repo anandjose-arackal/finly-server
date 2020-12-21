@@ -198,7 +198,7 @@ class Masters::Vendors::Form < Forms::API
 
   condition condition_id: "Policy should not be editable once unless in editable status" do
     reference :entity, :policy_id
-    rule Rules::Builder[:status_id].eq_any(*VendorStatus.ids_for(:awaiting_approval, :approved, :auto_approved, :deactivated).map {|item| {value: item}})
+    rule Rules::Builder[:status_id].eq_any(*VendorStatus.ids_for(:awaiting_approval, :approved, :deactivated).map {|item| {value: item}})
     action :editable, false
     action :required, false
   end

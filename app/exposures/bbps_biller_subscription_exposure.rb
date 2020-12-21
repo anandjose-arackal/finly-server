@@ -30,5 +30,27 @@ class BbpsBillerSubscriptionExposure < Exposures::API
   attribute :updated_at, record_attribute: true
   attribute :submitted_at, record_attribute: true
   attribute :approved_at, record_attribute: true
+  attribute :pocs, record_attribute: true, exposure: true
+  attribute :mobile_number, record_attribute: true
+  attribute :support_bill_validation, record_attribute: true
+  attribute :customer_name, record_attribute: true
+  attribute :customer_email, record_attribute: true
+  attribute :customer_aadhar_number, record_attribute: true
+  attribute :customer_pan, record_attribute: true
+  attribute :active, record_attribute: true
+  attribute :note, record_attribute: true
+  attribute :expected_bill_day, record_attribute: true
+  attribute :reminder_before_days, record_attribute: true
+  attribute :biller_category_name, record_attribute: true
+  attribute :number_of_bills_present, includes: [:bbps_bills] do
+    record.bbps_bills.count
+  end
+  attribute :number_of_bills_paid, includes: [:bbps_bills] do
+    record.bbps_bills.filter_status('paid').count
+  end
+  attribute :reviewers, includes: [:level, :document_level_reviewer_mappings] do
+    record.get_reviewers&.to_exposures
+  end
+  attribute :fetch_requirement, record_attribute: true
 
 end

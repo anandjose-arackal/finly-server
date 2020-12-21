@@ -255,6 +255,10 @@ gem 'wit', '~> 6.0'
 gem 'azure'
 gem 'azure-storage-blob'
 
+# gem for all paper trail
+gem 'paper_trail'
+gem 'paper_trail-association_tracking'
+gem 'paper_trail-globalid'
 group :development, :test do
   gem 'byebug'
   gem 'pry', '~> 0.12.2'  
@@ -282,7 +286,7 @@ group :development, :test do
   gem 'active_record_query_trace', '~> 1.5.4'
   # gem 'better_errors'
   # gem 'binding_of_caller'
-
+  gem 'rubocop-rails', require: false
 end
 
 group :test do

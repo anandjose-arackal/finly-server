@@ -65,16 +65,17 @@
 #  gstin_location_id            :bigint
 #  cost_allocation_items        :boolean          default(FALSE)
 #  internal_note                :text(65535)
+#  taxable_amount_id            :integer
 #  vendor_address               :text(65535)
 #  discount_type_id             :integer
 #  vendor_poc_name              :string(255)
 #  vendor_poc_email             :string(255)
 #  vendor_poc_mobile_number     :string(255)
 #  rejection_note               :text(65535)
-#  taxable_amount_id            :integer
 #  vendor_poc_id                :integer
 #  vlpm_id                      :integer
 #  vendor_note                  :text(65535)
+#  erp_sync_status_id           :integer
 #
 
 class PurchaseOrder < ApplicationRecord
@@ -149,8 +150,15 @@ class PurchaseOrder < ApplicationRecord
 
   has_many :quotations, dependent: :destroy
 
+
   belongs_to :bank_account, optional: true
 
+  has_paper_trail(
+      meta: {
+          parent_document_type: "Purchase Order",
+          document_number: Proc.new { |document| document.po_number }
+      }
+  )
   delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :vendor_confirmed?, :closed?, :voided?, :po_revised?, to: :status
 
   accepts_nested_attributes_for :items, :purchase_request_items, allow_destroy: true

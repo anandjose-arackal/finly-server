@@ -12,6 +12,9 @@
 #  value          :string(255)
 #  value_text     :string(255)
 #  deleted_at     :datetime
+#  created_at     :datetime         not null
+#  updated_at     :datetime         not null
+#  entity_type    :string(255)
 #
 
 class FormCustomField < ApplicationRecord

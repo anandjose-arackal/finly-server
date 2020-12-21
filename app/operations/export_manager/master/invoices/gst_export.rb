@@ -8,6 +8,8 @@ class ExportManager::Master::Invoices::GstExport < ExportManager::Builders::Spre
   system :vp
   # validate :fetch_invoices
 
+  has_template true
+
   attribute :invoice_number
   attribute :finly_ref_no
   attribute :finance_approved_date
