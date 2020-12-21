@@ -134,9 +134,8 @@ class Masters::Users::TraitPublisher
         batch_start_time = Time.now
         batch.each do |user|
           next unless enabled?(user.company_id)
-          properties = Masters::Users::TraitPublishers::CompanyHandler.properties(user.company)
-                                                                      .merge(Masters::Users::TraitPublishers::FeatureSubscriptionHandler.properties(user))
-                                                                      .merge(Masters::Users::TraitPublishers::UserHandler.properties(user))
+          properties = Masters::Users::TraitPublishers::UserHandler.properties(user)
+                                                                   .merge(Masters::Users::TraitPublishers::FeatureSubscriptionHandler.properties(user))
           instance.publish(self.class, user, properties, options: options)
         end
         completed_users += batch.size
