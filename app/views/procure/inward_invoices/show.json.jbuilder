@@ -101,7 +101,7 @@ json.invoice do
 
   if invoice.gst_type_id.present?
     json.gst_type_id invoice.gst_type_id 
-  else
+  elsif @result.locations.present? && @result.gstin_locations.present?
     location_state_code = @result.locations.find_by(id: location_id)&.state_code
     vendor_state_code = @result.gstin_locations.find_by(id: gstin_location_id)&.state_code
 
