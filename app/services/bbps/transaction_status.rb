@@ -159,7 +159,12 @@ class Bbps::TransactionStatus < Bbps::Api
   end
 
   def self.handle_error(data)
-    data
+    error_response = {}
+    if ['success', 'must be filled'].include? data['response.parsed']['error_desc'].downcase
+      error_response['message'] = "Transaction failed, please try again"
+    else
+      error_response['message'] = data['response.parsed']['error_desc']
+    end
   end
 
 end
