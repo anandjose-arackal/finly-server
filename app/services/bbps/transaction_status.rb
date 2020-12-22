@@ -159,9 +159,10 @@ class Bbps::TransactionStatus < Bbps::Api
   end
 
   def self.handle_error(data)
-    if ['success', 'must be filled'].include? data['response.parsed']['error_desc'].downcase
-      data['response.parsed']['error_desc'] = "The payment was not accepted by the biller."
-    end
+    Rails.logger("#{ data}")
+    # if ['success', 'must be filled'].include? data['response.parsed']['error_desc'].downcase
+    #   data['response.parsed']['error_desc'] = "The payment was not accepted by the biller."
+    # end
     data
   end
 
