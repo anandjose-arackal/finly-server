@@ -53,9 +53,6 @@ class BbpsBillStatusChecker
             credit_transactions = FinlyTransaction.where(payment_id: payment.id, transaction_type_id: TransactionType.id_for(:credit)).count
 
             if debit_transactions_count - credit_transactions_count == 1
-              
-              adapter = AccountManager::Base.new()
-              debit_adapter =  adapter.send(:retrieve_adapter , payment.receiving_account, payment )
 
               payment.system_messages.destroy_all
               # add error message to the ticket
