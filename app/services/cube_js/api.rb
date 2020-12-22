@@ -10,7 +10,8 @@ class CubeJs::Api < ServiceApi
   end
 
   query_params -> (user, params) do
-    params[:q]  || {}
+    query = params[:q]  || {}
+    {query: query}
   end
 
   parse -> (user, params, response) { JSON.parse(response.body) }
