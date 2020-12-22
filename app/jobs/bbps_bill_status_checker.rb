@@ -53,15 +53,17 @@ class BbpsBillStatusChecker
             credit_transactions_count = FinlyTransaction.where(payment_id: payment.id, transaction_type_id: TransactionType.id_for(:credit)).count
 
             if debit_transactions_count - credit_transactions_count == 1
+              adapter = AccountManager::Base.new()
+              credit_adapter = adapter.send(:retrieve_adapter , payment.initiating_account, payment )
 
               payment.system_messages.destroy_all
               # add error message to the ticket
               error_message = result['error_desc']
               payment.system_messages.create(
-                system_message_type_id: SystemMessageType.id_for(:failure),
+                system_message_type_id: SystemMessageType.id_for(:error),
                 content: "#{error_message}."
               )
-              credit_for_failed_payment(payment)
+              credit_adapter.credit(payment, {})
             end
 
           end
