@@ -125,8 +125,9 @@ class Docs::UtilityBills::Bills::Ops::SyncBillPrePayment < Transactions::API
                                    api_response: api_response,
                                    biller_response: bill.generate_changelog_message("Bill updated at BBPS. Updated ")
                                })
+    else 
+      bill_update_params = {order_number: result['data'].order_number}
     end
-
 
     bill.assign_attributes(bill_update_params)
 
