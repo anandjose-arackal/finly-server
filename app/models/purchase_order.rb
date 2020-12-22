@@ -515,6 +515,10 @@ class PurchaseOrder < ApplicationRecord
         where(purchase_order_status_id: PurchaseOrderStatus.ids_for([ :released, :invoice_created, :received, :change_order, :approved, :auto_approved, :sent_to_vendor, :vendor_confirmed, :vendor_rejected ]))
   }
 
+  scope :non_voided, ->{
+    where.not(purchase_order_status_id: PurchaseOrderStatus.id_for(:voided))
+  }
+
   before_save :calculate_line_items
   after_create :purchase_request_tasks
   after_save :budget_trail_entry
