@@ -49,8 +49,8 @@ class BbpsBillStatusChecker
             # credit the amount back to the accout if already not credited.
 
             # get all the finly transaction_details, ( debit - credit == 1 )
-            debit_transactions = FinlyTransaction.where(payment_id: payment.id, transaction_type_id: TransactionType.id_for(:debit)).count
-            credit_transactions = FinlyTransaction.where(payment_id: payment.id, transaction_type_id: TransactionType.id_for(:credit)).count
+            debit_transactions_count = FinlyTransaction.where(payment_id: payment.id, transaction_type_id: TransactionType.id_for(:debit)).count
+            credit_transactions_count = FinlyTransaction.where(payment_id: payment.id, transaction_type_id: TransactionType.id_for(:credit)).count
 
             if debit_transactions_count - credit_transactions_count == 1
 
