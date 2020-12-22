@@ -78,40 +78,5 @@ class BbpsBillStatusChecker
         end
       end
     end
-
-
-    def credit_for_failed_payment payment
-      company = payment&.company
-      account = company.utility_bills_account
-      return if company.blank?
-      return if account.blank?
-
-      success = false
-      opening_balance = account.balance_value
-      balance_amount = account.balance
-      balance_amount.with_lock do
-      balance_amount.value += payment.amount_value
-      success = balance_amount.save
-      end
-      closing_balance = account.balance_value
-
-      type_id = TransactionType.id_for(:credit)
-      status_id = TransactionStatus.id_for(:success)
-      currency_id = Currency.id_for(:INR)
-      params = { 
-      transaction_type_id: type_id,
-      status_id: status_id,
-      amount_attributes: { value: payment.amount_value, currency_id: currency_id },
-      payment_purpose_id: payment.payment_purpose_id, 
-      opening_balance_attributes: { value: opening_balance, currency_id: currency_id },
-      closing_balance_attributes: { value: closing_balance, currency_id: currency_id },
-      associated_transaction: payment.reference_resources.first,
-      payment: payment,
-      company_id: company.id, 
-      date: DateTime.now 
-      }
-      transaction = account.finly_transactions.create params
-    end
-
   end
 end
