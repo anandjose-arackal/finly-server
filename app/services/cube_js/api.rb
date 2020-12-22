@@ -11,7 +11,7 @@ class CubeJs::Api < ServiceApi
 
   query_params -> (user, params) do
     query = params[:q][:query] || {}
-    { query: query.reject { |k, v| v.blank? } }
+    { query: query.to_json }
   end
 
   parse -> (user, params, response) { JSON.parse(response.body) }
