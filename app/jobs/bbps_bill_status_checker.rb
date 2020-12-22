@@ -46,10 +46,31 @@ class BbpsBillStatusChecker
             payment.update(payment_status_id: PaymentStatus.id_for(:failed))
             bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
             bill.update(status_id: BbpsBillStatus.id_for(:approved))
+            # credit the amount back to the accout if already not credited.
+
+            # get all the finly transaction_details, ( debit - credit == 1 )
+            debit_transactions = FinlyTransaction.where(payment_id: payment.id, transaction_type_id: TransactionType.id_for(:debit)).count
+            credit_transactions = FinlyTransaction.where(payment_id: payment.id, transaction_type_id: TransactionType.id_for(:credit)).count
+
+            if debit_transactions_count - credit_transactions_count == 1
+              
+              adapter = AccountManager::Base.new()
+              debit_adapter =  adapter.send(:retrieve_adapter , payment.receiving_account, payment )
+
+              payment.system_messages.destroy_all
+              # add error message to the ticket
+              error_message = result['error_desc']
+              payment.system_messages.create(
+                system_message_type_id: SystemMessageType.id_for(:failure),
+                content: "#{error_message}."
+              )
+              debit_adapter.on_failure(payment: payment)
+            end
+
           end
           op.failure do |result|
             puts "Failure: #{result}"
-            Event::EAlert::Create.(nil, title: 'BBpsBills Status check failure', description: "#{result}", subject: 'BBpsBills Status check failure')
+            Event::EAlert::Create.(nil, title: 'BbpsBills Status check failure', description: "#{result}", subject: 'BbpsBills Status check failure')
             # log this response somewhere and see what the issue is:
             # TODO - add mailer here to send to sreeram.nr@finly.io kumar.abinash@finly.io
             # not updating the bill status here because it will depend on the final
