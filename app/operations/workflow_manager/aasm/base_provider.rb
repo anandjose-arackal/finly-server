@@ -178,7 +178,7 @@ class WorkflowManager::Aasm::BaseProvider
           .where(level_id: current_level.id, policy_id: document.policy_id)
 
       if dlrm.present?
-        dlrm.update_all(taken_control_by_id: user.id, taken_control: true, active: false, action_taken_at: DateTime.now)
+        dlrm.update_all(taken_control_by_id: user.id, taken_control: true, active: false, action_taken_at: DateTime.now, forwarded: false, forwarded_by_id: nil, forwarded_to_id: nil)
       end
     end
 
