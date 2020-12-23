@@ -47,6 +47,8 @@ class FormCustomField < ApplicationRecord
       selections.map(&:form_entity_choice).map(&:name)
     when 'attachment'
       attachments.as_json if self.persisted?
+    when 'switch'
+      FormEntity::Switch::TRUTHY_VALUES.include? value
     else
       value
     end
