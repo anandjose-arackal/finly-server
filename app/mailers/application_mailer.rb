@@ -8,7 +8,7 @@ class ApplicationMailer < ActionMailer::Base
   layout 'mailer'
 
   def add_headers
-    headers['X-SES-CONFIGURATION-SET'] = 'email_tracker_core'
+    # headers['X-SES-CONFIGURATION-SET'] = 'email_tracker_core'
   end
 
   def company
