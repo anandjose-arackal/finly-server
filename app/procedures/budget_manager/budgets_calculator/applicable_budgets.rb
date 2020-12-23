@@ -165,7 +165,7 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
         budget_ids << budget.id if budget.within_timeframe?(date)
       end
     end
-    budgets = Budget.with_id(budget_ids).active
+    budgets = company.budgets.with_id(budget_ids).active
     result = {
         budgets: budgets
     }
