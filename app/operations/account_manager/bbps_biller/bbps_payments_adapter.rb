@@ -102,9 +102,9 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failure))
         payment.update(payment_status_id: PaymentStatus.id_for(:failure))
         result["errors"]&.values&.flatten&.each do |error|
-          # add_error_message( payment, error )
-          payment.system_messages.build(content: error,
-                                        system_message_type_id: SystemMessageType.id_for(:error)).save
+          add_error_message( payment, error )
+          # payment.system_messages.build(content: error,
+                                        # system_message_type_id: SystemMessageType.id_for(:error)).save
         end
         return false
         # any error code
@@ -114,9 +114,9 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:possible_failure))
         payment.update(payment_status_id: PaymentStatus.id_for(:possible_failure))
         result["errors"]&.values&.flatten&.each do |error|
-          # add_error_message( payment, error )
-          payment.system_messages.build(content: error,
-                                        system_message_type_id: SystemMessageType.id_for(:error)).save
+          add_error_message( payment, error )
+          # payment.system_messages.build(content: error,
+                                        # system_message_type_id: SystemMessageType.id_for(:error)).save
         end
         return true
         # 200
@@ -233,16 +233,15 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
   end
 
   def add_error_message payment, error
-
     if BBPS_ERROR_MESSAGES['BillPayErrorsResponses'][error.to_s].present?
       payment.system_messages.create({
-                                         content: BBPS_ERROR_MESSAGES['BillPayErrorsResponses'][error.to_s],
-                                         system_message_type_id: SystemMessageType.id_for(:error)
+                                        content: BBPS_ERROR_MESSAGES['BillPayErrorsResponses'][error.to_s],
+                                        system_message_type_id: SystemMessageType.id_for(:error)
                                      })
     else
       payment.system_messages.create({
-                                         content: "Unknown Error Occurred",
-                                         system_message_type_id: SystemMessageType.id_for(:error)
+                                        content: "Unknown Error Occurred",
+                                        system_message_type_id: SystemMessageType.id_for(:error)
                                      })
 
       message = YAML.load_file("#{Rails.root}/config/new_bbps_errors.yml")
