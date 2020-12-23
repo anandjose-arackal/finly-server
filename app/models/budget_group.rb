@@ -125,7 +125,9 @@ class BudgetGroup < ApplicationRecord
 
   def check_for_valid_start_end_date
     more = less  = false
-    date_difference =(( end_date - start_date ) / 1.days ).round(0)
+    self.start_date = self.start_date&.beginning_of_day
+    self.end_date = self.end_date&.end_of_day
+    date_difference =(( self.end_date - self.start_date ) / 1.days ).round(0)
     case self.period_id
     when Period.id_for(:day)
       if date_difference  < 1.day
@@ -179,7 +181,7 @@ class BudgetGroup < ApplicationRecord
 
   def set_start_and_end_date
     # setting start and end date appropriately to adjust for timezone
-    self.start_date = self.start_date&.end_of_day
-    self.end_date = self.end_date&.beginning_of_day
+    self.start_date = self.start_date&.beginning_of_day
+    self.end_date = self.end_date&.end_of_day
   end
 end
