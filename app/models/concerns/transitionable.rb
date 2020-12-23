@@ -240,7 +240,7 @@ module Transitionable
       case type
       when 'approve', :approve
         if level.present?
-          user_ids += self.document_level_reviewer_mappings.with_level_id(level.id).with_provider_name(provider_name).where(taken_control: false, fowarded: false).pluck(:reviewer_id)
+          user_ids += self.document_level_reviewer_mappings.with_level_id(level.id).with_provider_name(provider_name).where(taken_control: false, forwarded: false).pluck(:reviewer_id)
           user_ids += self.document_level_reviewer_mappings.with_level_id(level.id).with_provider_name(provider_name).where(taken_control: true).pluck(:taken_control_by_id)
           user_ids += self.document_level_reviewer_mappings.with_level_id(level.id).with_provider_name(provider_name).where(forwarded: true).pluck(:forwarded_to_id)
         end
