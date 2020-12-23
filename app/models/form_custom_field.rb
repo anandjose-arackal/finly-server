@@ -48,7 +48,7 @@ class FormCustomField < ApplicationRecord
     when 'attachment'
       attachments.as_json if self.persisted?
     when 'switch'
-      !!value
+      FormEntity::Switch::TRUTHY_VALUES.include? value
     else
       value
     end
