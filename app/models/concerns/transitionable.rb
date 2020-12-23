@@ -728,17 +728,17 @@ module Transitionable
       admin = user.admin? || user.vendor_payment_admin?
 
       # Find all level ids where user is a reviewer & is NOT forwarded
-      all_level_ids = DocumentLevelReviewerMapping.with_document_type(self.name).with_reviewer_id(user.id).with_action_taken_nil.where(forwarded: false).pluck(:level_id)
+      all_level_ids = DocumentLevelReviewerMapping.with_document_type(self.name).with_reviewer_id(user.id).where(forwarded: false).pluck(:level_id)
 
-      document_ids_from_dlrms = DocumentLevelReviewerMapping.with_document_type(self.name).with_action_taken_nil.with_reviewer_id(user.id).where(forwarded: false)
+      document_ids_from_dlrms = DocumentLevelReviewerMapping.with_document_type(self.name).with_reviewer_id(user.id).where(forwarded: false)
 
       if admin
-        taken_control_level_ids = DocumentLevelReviewerMapping.with_document_type(self.name).with_action_taken_nil.where(taken_control_by_id: user.id).pluck(:level_id)
-        taken_control_document_ids_from_dlrms = DocumentLevelReviewerMapping.with_document_type(self.name).with_action_taken_nil.where(taken_control_by_id: user.id)
+        taken_control_level_ids = DocumentLevelReviewerMapping.with_document_type(self.name).where(taken_control_by_id: user.id).pluck(:level_id)
+        taken_control_document_ids_from_dlrms = DocumentLevelReviewerMapping.with_document_type(self.name).where(taken_control_by_id: user.id)
       end
 
-      forwarded_level_ids = DocumentLevelReviewerMapping.with_document_type(self.name).with_action_taken_nil.where(forwarded: true, forwarded_to_id: user.id).pluck(:level_id)
-      forwarded_document_ids_from_dlrms = DocumentLevelReviewerMapping.with_document_type(self.name).with_action_taken_nil.where(forwarded: true, forwarded_to_id: user.id)
+      forwarded_level_ids = DocumentLevelReviewerMapping.with_document_type(self.name).where(forwarded: true, forwarded_to_id: user.id).pluck(:level_id)
+      forwarded_document_ids_from_dlrms = DocumentLevelReviewerMapping.with_document_type(self.name).where(forwarded: true, forwarded_to_id: user.id)
 
       if self.column_names.include? 'company_id'
         document_ids = self.where("#{table_name}.id in (#{document_ids_from_dlrms.select("document_reviewer_mappable_id").to_sql})").where(company_id: user.company_id).with_controlling_level_id(all_level_ids.uniq).pluck(:id)
