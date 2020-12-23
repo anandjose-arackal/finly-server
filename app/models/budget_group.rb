@@ -124,27 +124,49 @@ class BudgetGroup < ApplicationRecord
   private
 
   def check_for_valid_start_end_date
+    more = less  = false
     case self.period_id
     when Period.id_for(:day)
       if end_date - start_date < 1.day
-        errors.add(:period, "cannot be less than the difference between start and end dates")
+        less = true
+      end
+      if end_date - start_date > 1.day
+        more = true
       end
     when Period.id_for(:month)
       if end_date - start_date < 28.days
-        errors.add(:period, "cannot be less than the difference between start and end dates")
+        less = true
+      end
+      if end_date - start_date > 31.days
+        more = true
       end
     when Period.id_for(:week)
       if end_date - start_date < 7.days
-        errors.add(:period, "cannot be less than the difference between start and end dates")
+        less = true
+      end
+      if end_date - start_date > 7.days
+        more = true
       end
     when Period.id_for(:quarter)
       if end_date - start_date < (3.months - 1.day)/1.day
-        errors.add(:period, "cannot be less than the difference between start and end dates")
+        less = true
+      end
+      if end_date - start_date > (3.months + 2.day)/1.day
+        more = true
       end
     when Period.id_for(:year)
       if end_date - start_date < 365.days
-        errors.add(:period, "cannot be less than the difference between start and end dates")
+        less = true
       end
+      if end_date - start_date > 365.days
+        more = true
+      end
+    end
+    if more
+      errors.add(:period, "cannot be more than the difference between start and end dates")
+    end
+    if less
+      errors.add(:period, "cannot be less than the difference between start and end dates")
     end
   end
 
