@@ -260,7 +260,7 @@ class Vendors::Update < Vendors::Base
     end
 
     if self.vendor_changes[:bank_account_changed].present?
-      Event::EVendors::Update.(user, {document: self.vendor, vendor_changes: self.vendor_changes})
+      Event::EVendors::Update.(user, {document: self.vendor, vendor_changes: self.vendor_changes, action_user: user})
     end
   end
 
