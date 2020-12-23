@@ -138,7 +138,7 @@ class BudgetGroup < ApplicationRecord
         errors.add(:period, "cannot be less than the difference between start and end dates")
       end
     when Period.id_for(:quarter)
-      if end_date - start_date < (3.months - 1.day)
+      if end_date - start_date < (3.months - 1.day)/1.day
         errors.add(:period, "cannot be less than the difference between start and end dates")
       end
     when Period.id_for(:year)
