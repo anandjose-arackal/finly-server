@@ -125,40 +125,41 @@ class BudgetGroup < ApplicationRecord
 
   def check_for_valid_start_end_date
     more = less  = false
+    date_difference =(( end_date - start_date ) / 1.days ).round(0)
     case self.period_id
     when Period.id_for(:day)
-      if end_date - start_date < 1.day
+      if date_difference  < 1.day
         less = true
       end
-      if end_date - start_date > 1.day
+      if date_difference  > 1.day
         more = true
       end
     when Period.id_for(:month)
-      if end_date - start_date < 28.days
+      if date_difference  < 28.days
         less = true
       end
-      if end_date - start_date > 31.days
+      if date_difference  > 31.days
         more = true
       end
     when Period.id_for(:week)
-      if end_date - start_date < 7.days
+      if date_difference  < 7.days
         less = true
       end
-      if end_date - start_date > 7.days
+      if date_difference  > 7.days
         more = true
       end
     when Period.id_for(:quarter)
-      if end_date - start_date < (3.months - 1.day)/1.day
+      if date_difference  < (3.months - 1.day)/1.day
         less = true
       end
-      if end_date - start_date > (3.months + 2.day)/1.day
+      if date_difference  > (3.months)/1.day
         more = true
       end
     when Period.id_for(:year)
-      if end_date - start_date < 365.days
+      if date_difference  < 365.days
         less = true
       end
-      if end_date - start_date > 365.days
+      if date_difference  > 365.days
         more = true
       end
     end
