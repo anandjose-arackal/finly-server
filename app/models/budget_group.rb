@@ -153,11 +153,8 @@ class BudgetGroup < ApplicationRecord
     when Period.id_for(:quarter)
       if  start_date.end_of_quarter.to_i != end_date.to_i || end_date.beginning_of_quarter.to_i != start_date.to_i
         errors.add(:period, "start and end dates should be a quarter")
-        return
       end
-      if date_difference  > (3.months)/1.day
-        more = true
-      end
+      return
     when Period.id_for(:year)
       if date_difference  < 365.days
         less = true
