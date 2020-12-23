@@ -43,8 +43,8 @@ PaymentProcessorRules::Checker.new 'PaymentChecker' do
         if payment.parent_type == "BbpsBill"
           bill = payment.parent
           non_failed_payments = bill.payments.without_id(payment.id).all_except_failed
-          non_failed_payment_ids = non_failed_payments.pluck(:id)
           if non_failed_payments.present?
+            non_failed_payment_ids = non_failed_payments.pluck(:id)
             add_system_message :error, payment, "This payment cannot be processed as there are payments already pending against this bill, with id: #{non_failed_payment_ids}"
             message "This payment cannot be processed as there are payments already pending against this bill, with id: #{non_failed_payment_ids}"
             # also marking the payment as failed here

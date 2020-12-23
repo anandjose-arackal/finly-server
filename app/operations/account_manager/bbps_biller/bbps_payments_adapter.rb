@@ -102,9 +102,9 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failure))
         payment.update(payment_status_id: PaymentStatus.id_for(:failure))
         result["errors"]&.values&.flatten&.each do |error|
-          add_error_message( payment, error )
-          # payment.system_messages.build(content: error,
-                                        # system_message_type_id: SystemMessageType.id_for(:error)).save
+          # add_error_message( payment, error )
+          payment.system_messages.build(content: error,
+                                        system_message_type_id: SystemMessageType.id_for(:error)).save
         end
         return false
         # any error code
@@ -114,9 +114,9 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:possible_failure))
         payment.update(payment_status_id: PaymentStatus.id_for(:possible_failure))
         result["errors"]&.values&.flatten&.each do |error|
-          add_error_message( payment, error )
-          # payment.system_messages.build(content: error,
-                                        # system_message_type_id: SystemMessageType.id_for(:error)).save
+          # add_error_message( payment, error )
+          payment.system_messages.build(content: error,
+                                        system_message_type_id: SystemMessageType.id_for(:error)).save
         end
         return true
         # 200
