@@ -52,12 +52,16 @@ class Docs::UtilityBills::Bills::Ops::SyncBillPrePayment < Transactions::API
 
   def bill_fetch(options, subscription)
     options['result'] = {}
+    options['success'] = false
     Bbps::BillFetch.call_async({params: subscription.generate_billfetch_params, current_user: User.first}, {wait: true, wait_timeout: 180.seconds}) do |op|
-      op.success {|result| options['result']['data'] = result}
+      op.success do |result|
+        options['success'] = true
+        options['result']['data'] = result
+      end
 
       op.error do |result|
+        options['success'] = false
         options['result']['data'] = result
-        false
       end
 
       op.failure do |result|
