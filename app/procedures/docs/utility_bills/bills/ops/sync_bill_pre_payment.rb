@@ -55,7 +55,10 @@ class Docs::UtilityBills::Bills::Ops::SyncBillPrePayment < Transactions::API
     Bbps::BillFetch.call_async({params: subscription.generate_billfetch_params, current_user: User.first}, {wait: true, wait_timeout: 180.seconds}) do |op|
       op.success {|result| options['result']['data'] = result}
 
-      op.error {|result| options['result']['data'] = result}
+      op.error do |result|
+        options['result']['data'] = result
+        return false
+      end
 
       op.failure do |result|
         error_message = result&.dig("result.operation.errors")&.dig("base")&.first
