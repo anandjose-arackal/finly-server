@@ -57,7 +57,7 @@ class Docs::UtilityBills::Bills::Ops::SyncBillPrePayment < Transactions::API
 
       op.error do |result|
         options['result']['data'] = result
-        return false
+        false
       end
 
       op.failure do |result|
