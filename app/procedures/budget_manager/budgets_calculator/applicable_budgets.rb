@@ -27,7 +27,6 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
 
     self.company = document.company
     case document.class.name
-
     when "PurchaseOrder", "Invoice"
       # in this case users will not be there because there's no such thing as
       # a user consuming a PO, it is always with respect to the other criteria
@@ -35,8 +34,8 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
 
       self.department_ids = items.pluck(:department_id).compact
       self.cost_center_ids = items.pluck(:cost_center_id).compact
-      self.vendor_ids = [ document.vendor.id ].compact
-      self.location_ids = [ document.location.id ].compact
+      self.vendor_ids = [ document&.vendor&.id ].compact
+      self.location_ids = [ document&.location&.id ].compact
       self.category_ids = items.pluck(:category_id).compact
       self.user_ids = []
 
@@ -52,9 +51,9 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
       self.department_ids = items.pluck(:department_id).compact
       self.cost_center_ids = items.pluck(:cost_center_id).compact
       self.vendor_ids = []
-      self.location_ids = [document.location.id].compact
+      self.location_ids = [ document&.location&.id ].compact
       self.category_ids = items.pluck(:category_id).compact
-      self.user_ids = [document&.creator&.id].compact
+      self.user_ids = [ document&.creator&.id ].compact
     when "BankPaymentRequest", "PaymentOrder"
       # here we'll extract the categories as well from the invoice / purchase order
       # that is linked to each respective payment in the payment order
@@ -159,27 +158,34 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
     # and based on the budget_date_type need to decide on which budgets to include
     budgets = company.budgets.with_budget_criteria_id(self.applicable_budget_group_criteria.pluck(:id))
 
-    case self.document.class.name
-    when "PurchaseOrder", "PurchaseRequest", "Invoice", "Expense"
-      budget_ids = budgets.where( " ( budget_date_type_id = ? AND DATE(start_date) >= ? AND DATE(end_date) <= ? )
-        OR (budget_date_type_id = ? AND DATE(start_date) >= ? AND DATE(end_date) <= ?)
-        OR (budget_date_type_id = ? AND DATE(start_date) >= ? AND DATE(end_date) <= ? )
-        OR (budget_date_type_id = ? AND DATE(start_date) >= ? AND DATE(end_date) <= ? )",
-        BudgetDateType.id_for(:entity_date), document.entity_date, document.entity_date,
-        BudgetDateType.id_for(:entity_submitted_at), document.entity_submitted_at, document.entity_submitted_at,
-        BudgetDateType.id_for(:entity_created_at), document.created_at, document.created_at,
-        nil, document.created_at, document.created_at
-      ).pluck(:id)
-
-    when "Report", "BankPaymentRequest"
-      budgets.each do |budget|
-        date_type_id = budget.budget_date_type_id
-        dates = get_dates_from_document(document, date_type_id)
-        dates.each do |date|
-          budget_ids << budget.id if budget.within_timeframe?(date)
-        end
+    budgets.each do |budget|
+      date_type_id = budget.budget_date_type_id
+      dates = get_dates_from_document(document, date_type_id)
+      dates.each do |date|
+        budget_ids << budget.id if budget.within_timeframe?(date)
       end
     end
+    # case self.document.class.name
+    # when "PurchaseOrder", "PurchaseRequest", "Invoice", "Expense"
+    #   budget_ids = budgets.where( " ( budget_date_type_id = ? AND DATE(start_date) >= ? AND DATE(end_date) <= ? )
+    #     OR (budget_date_type_id = ? AND DATE(start_date) >= ? AND DATE(end_date) <= ?)
+    #     OR (budget_date_type_id = ? AND DATE(start_date) >= ? AND DATE(end_date) <= ? )
+    #     OR (budget_date_type_id = ? AND DATE(start_date) >= ? AND DATE(end_date) <= ? )",
+    #     BudgetDateType.id_for(:entity_date), document.entity_date, document.entity_date,
+    #     BudgetDateType.id_for(:entity_submitted_at), document.entity_submitted_at, document.entity_submitted_at,
+    #     BudgetDateType.id_for(:entity_created_at), document.created_at, document.created_at,
+    #     nil, document.created_at, document.created_at
+    #   ).pluck(:id)
+
+    # when "Report", "BankPaymentRequest"
+    #   budgets.each do |budget|
+    #     date_type_id = budget.budget_date_type_id
+    #     dates = get_dates_from_document(document, date_type_id)
+    #     dates.each do |date|
+    #       budget_ids << budget.id if budget.within_timeframe?(date)
+    #     end
+    #   end
+    # end
     
     budgets = company.budgets.with_id(budget_ids).active
 
@@ -192,24 +198,24 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
   def get_dates_from_document(document, date_type_id)
     dates = []
     case self.document.class.name
-    # when "PurchaseOrder"
-    #   case date_type_id
-    #   when BudgetDateType.id_for(:entity_date), BudgetDateType.id_for(:entity_created_at)
-    #     dates << document.created_at.to_date
-    #   when BudgetDateType.id_for(:entity_submitted_at)
-    #     dates << (document.submitted_at&.to_date || document.created_at.to_date)
-    #   else
-    #     dates << document.created_at.to_date
-    #   end
-    # when "PurchaseRequest"
-    #   case date_type_id
-    #   when BudgetDateType.id_for(:entity_date), BudgetDateType.id_for(:entity_created_at)
-    #     dates << document.created_at.to_date
-    #   when BudgetDateType.id_for(:entity_submitted_at)
-    #     dates << (document.submitted_at&.to_date || document.created_at.to_date)
-    #   else
-    #     dates << document.created_at.to_date
-    #   end
+    when "PurchaseOrder"
+      case date_type_id
+      when BudgetDateType.id_for(:entity_date), BudgetDateType.id_for(:entity_created_at)
+        dates << document.created_at.to_date
+      when BudgetDateType.id_for(:entity_submitted_at)
+        dates << (document.submitted_at&.to_date || document.created_at.to_date)
+      else
+        dates << document.created_at.to_date
+      end
+    when "PurchaseRequest"
+      case date_type_id
+      when BudgetDateType.id_for(:entity_date), BudgetDateType.id_for(:entity_created_at)
+        dates << document.created_at.to_date
+      when BudgetDateType.id_for(:entity_submitted_at)
+        dates << (document.submitted_at&.to_date || document.created_at.to_date)
+      else
+        dates << document.created_at.to_date
+      end
     when "Report"
       case date_type_id
       when BudgetDateType.id_for(:entity_date)
@@ -221,26 +227,26 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
       else
         dates << document.created_at.to_date
       end
-    # when "Expense"
-    #   case date_type_id
-    #   when BudgetDateType.id_for(:entity_date)
-    #     dates += document.date
-    #   when BudgetDateType.id_for(:entity_submitted_at)
-    #     dates << (document.report&.submitted_at&.to_date || document.created_at.to_date)
-    #   else
-    #     dates << document.created_at.to_date
-    #   end
-    # when "Invoice"
-    #   case date_type_id
-    #   when BudgetDateType.id_for(:entity_date)
-    #     dates << document.date
-    #   when BudgetDateType.id_for(:entity_created_at)
-    #     dates << document.created_at.to_date
-    #   when BudgetDateType.id_for(:entity_submitted_at)
-    #     dates << (document.submitted_at&.to_date || document.created_at.to_date)
-    #   else
-    #     dates << document.created_at.to_date
-    #   end
+    when "Expense"
+      case date_type_id
+      when BudgetDateType.id_for(:entity_date)
+        dates += document.date
+      when BudgetDateType.id_for(:entity_submitted_at)
+        dates << (document.report&.submitted_at&.to_date || document.created_at.to_date)
+      else
+        dates << document.created_at.to_date
+      end
+    when "Invoice"
+      case date_type_id
+      when BudgetDateType.id_for(:entity_date)
+        dates << document.date
+      when BudgetDateType.id_for(:entity_created_at)
+        dates << document.created_at.to_date
+      when BudgetDateType.id_for(:entity_submitted_at)
+        dates << (document.submitted_at&.to_date || document.created_at.to_date)
+      else
+        dates << document.created_at.to_date
+      end
     when "BankPaymentRequest"
       case date_type_id
       when BudgetDateType.id_for(:entity_date)
