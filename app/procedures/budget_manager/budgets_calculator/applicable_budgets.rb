@@ -161,8 +161,7 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
 
     case self.document.class.name
     when "PurchaseOrder", "PurchaseRequest", "Invoice", "Expense"
-
-      budgets = budgets.where( " (budget_date_type_id = ? AND DATE(start_date) >= ? AND DATE(end_date) <= ? )
+      budget_ids = budgets.where( " ( budget_date_type_id = ? AND DATE(start_date) >= ? AND DATE(end_date) <= ? )
         OR (budget_date_type_id = ? AND DATE(start_date) >= ? AND DATE(end_date) <= ?)
         OR (budget_date_type_id = ? AND DATE(start_date) >= ? AND DATE(end_date) <= ? )
         OR (budget_date_type_id = ? AND DATE(start_date) >= ? AND DATE(end_date) <= ? )",
@@ -170,7 +169,7 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
         BudgetDateType.id_for(:entity_submitted_at), document.entity_submitted_at, document.entity_submitted_at,
         BudgetDateType.id_for(:entity_created_at), document.created_at, document.created_at,
         nil, document.created_at, document.created_at
-      ).active
+      ).pluck(:id)
 
     when "Report", "BankPaymentRequest"
       budgets.each do |budget|
@@ -180,8 +179,9 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
           budget_ids << budget.id if budget.within_timeframe?(date)
         end
       end
-      budgets = company.budgets.with_id(budget_ids).active
     end
+    
+    budgets = company.budgets.with_id(budget_ids).active
 
     result = {
         budgets: budgets
@@ -256,5 +256,4 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
 
     return dates.compact
   end
-
 end
