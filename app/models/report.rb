@@ -642,6 +642,18 @@ class Report < ApplicationRecord
     rpg&.payment_type == 'bank_transfer' ? 'Bank Transfer' : super
   end
 
+  def entity_date
+    expenses.pluck(:entity_date).uniq.compact
+  end
+
+  def entity_created_at
+    expenses.pluck(:created_at).map(&:to_date)
+  end
+
+  def entity_submitted_at
+    submitted_at&.to_date || created_at.to_date
+  end
+
   private
 
   def controller_has_role
