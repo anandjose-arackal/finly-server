@@ -109,7 +109,7 @@ end
 
 json.actions @result.actions
 
-json.budgets @result.budgets
+# json.budgets @result.budgets
 # json.budgets do
 #   json.array! @result.budgets do |budget|
 #     json.extract! budget[:budget], :budgetable_id, :budgetable_type, :start_date, :id, :name, :start_date, :end_date
