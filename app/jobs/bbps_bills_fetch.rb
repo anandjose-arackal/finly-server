@@ -5,7 +5,7 @@ class BbpsBillsFetch
 
     # Fetch bills where automatic fetching is enabled
     status_ids = BbpsBillerSubscription.status_ids(:approved, :auto_approved, :reactivated)
-    bbps_subscriptions = BbpsBillerSubscription.where(status_id: status_ids, auto_generate_bill: true, auto_fetch_enabled: true).where(expected_bill_day: nil)
+    bbps_subscriptions = BbpsBillerSubscription.where(status_id: status_ids, auto_generate_bill: true, auto_fetch_enabled: true).where(expected_bill_day: nil, deleted_at: nil)
     autofetched = true
 
     bbps_subscriptions.each do |subscription|

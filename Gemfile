@@ -24,6 +24,8 @@ gem 'daemons', '~> 1.3.1'
 gem "sentry-raven", '~> 2.13'
 # grm for mocking and stubbing in test cases
 
+gem 'devise-pwned_password', '~> 0.1'
+
 # gem for crash reports
 gem 'rollbar'#, '~> 2.18.2'
 gem 'oj', '~> 3.7.6'
