@@ -226,7 +226,7 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
   end
 
   def po_status(item)
-    purchase_order(item).procurement.purchase_order&.status&.name&.humanize
+    purchase_order(item).status&.name&.humanize
   end
 
   def po_payment_term(item)

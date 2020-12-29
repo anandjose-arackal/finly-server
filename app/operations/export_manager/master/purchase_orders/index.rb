@@ -191,7 +191,7 @@ class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Sp
   end
 
   def po_status(purchase_order)
-    purchase_order.procurement.purchase_order&.status&.name&.humanize
+    purchase_order&.status&.name&.humanize
   end
 
   def po_number(purchase_order)
