@@ -45,7 +45,7 @@ class PurchaseOrderExposure < Exposures::API
   attribute :tax_type_name do
     case record.gst_type_id
     when GstType.id_for(:cgst_sgst)
-      'CGST + IGST'
+      'CGST + SGST'
     when GstType.id_for(:igst)
       'IGST'
     else

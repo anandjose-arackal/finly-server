@@ -1,7 +1,7 @@
 # Responsible for publishing company properties
 class Masters::Users::TraitPublishers::CompanyHandler < Masters::Users::TraitPublisher
 
-  def self.refresh(changed_since, dry_run: false, options: {})
+  def self.refresh(changed_since=10.years.ago, dry_run: false, options: {})
     return unless enabled?
 
     companies = Company.where('updated_at > ?', changed_since)
@@ -17,18 +17,18 @@ class Masters::Users::TraitPublishers::CompanyHandler < Masters::Users::TraitPub
     )
   end
 
-  def self.properties(company)
-    {
-        'company_id' => company.id,
-        'company_name' => company.name,
-        'company_active' => !!company.active,
-        'company_subdomain' => company.subdomain,
-        'company_test_account' => !!company.test_account,
-        'company_group_name' => company.group&.name,
-        'company_status' => company.status&.name,
-        'company_deleted_at' => company.deleted_at,
-    }.compact
-  end
+  # def self.properties(company)
+  #   {
+  #       'company_id' => company.id,
+  #       'company_name' => company.name,
+  #       'company_active' => !!company.active,
+  #       'company_subdomain' => company.subdomain,
+  #       'company_test_account' => !!company.test_account,
+  #       'company_group_name' => company.group&.name,
+  #       'company_status' => company.status&.name,
+  #       'company_deleted_at' => company.deleted_at,
+  #   }.compact
+  # end
 
   def work(u, payload)
     company = payload[:record]
@@ -40,12 +40,13 @@ class Masters::Users::TraitPublishers::CompanyHandler < Masters::Users::TraitPub
     completed_users = 0
     start_time = Time.now
 
-    properties = self.class.properties(company)
+    # properties = self.class.properties(company)
 
     users.find_in_batches(batch_size: 1000) do |batch|
       batch_start = Time.now
       batch.each do |user|
-        publish(self.class, user, properties, options: payload[:options])
+        Masters::Users::TraitPublishers::UserHandler.new.work(u, {record: user, options: payload[:options]})
+        # publish(self.class, user, properties, options: payload[:options])
       end
       completed_users += batch.size
       logger.info(

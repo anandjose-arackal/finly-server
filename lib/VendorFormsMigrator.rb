@@ -70,6 +70,14 @@ class VendorFormsMigrator
           end
         end
 
+        #migrate tds rate lists
+        if document.tds_rates.present?
+          tds_rate = document.tds_rates.order(:updated_at).last
+          unless document.tds_rates_list.present?
+            document.tds_rates_list_id = tds_rate.id
+            document.save
+          end
+        end
         # Create for GSTIN Locations
         document.gstin_locations.each do |gstin_location|
           form.entities.where(entity_key: :gstin_locations).first.entities.custom_fields.each do |entity|

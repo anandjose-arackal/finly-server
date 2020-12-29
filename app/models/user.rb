@@ -89,7 +89,7 @@ class User < ApplicationRecord
 
   devise :invitable, :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :confirmable, :lockable,
-         :database_authenticatable
+         :database_authenticatable, :pwned_password
 
   # devise :database_authenticatable, :validatable, password_length: 8..128
   # devise :database_authenticatable
@@ -156,6 +156,8 @@ class User < ApplicationRecord
   has_many :manager_summary_mail_configs, dependent: :destroy
   has_many :payment_receivables, foreign_key: :initiating_user_id
   has_many :user_pockets
+
+  has_many :analytics_dashboards, foreign_key: :created_by_id
 
   has_many :export_jobs, foreign_key: :created_by_id
 

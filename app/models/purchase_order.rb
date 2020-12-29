@@ -150,8 +150,15 @@ class PurchaseOrder < ApplicationRecord
 
   has_many :quotations, dependent: :destroy
 
+
   belongs_to :bank_account, optional: true
 
+  has_paper_trail(
+      meta: {
+          parent_document_type: "Purchase Order",
+          document_number: Proc.new { |document| document.po_number }
+      }
+  )
   delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :vendor_confirmed?, :closed?, :voided?, :po_revised?, to: :status
 
   accepts_nested_attributes_for :items, :purchase_request_items, allow_destroy: true
@@ -506,6 +513,10 @@ class PurchaseOrder < ApplicationRecord
   scope :pending_erp_sync, -> (*args) {
     with_erp_sync_status_pending.
         where(purchase_order_status_id: PurchaseOrderStatus.ids_for([ :released, :invoice_created, :received, :change_order, :approved, :auto_approved, :sent_to_vendor, :vendor_confirmed, :vendor_rejected ]))
+  }
+
+  scope :non_voided, ->{
+    where.not(purchase_order_status_id: PurchaseOrderStatus.id_for(:voided))
   }
 
   before_save :calculate_line_items
