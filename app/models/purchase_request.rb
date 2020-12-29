@@ -240,6 +240,17 @@ include Searchkick::Api
     self.company_id = self.creator.company_id
   end
 
+  def entity_date
+    created_at.to_date
+  end
+
+  def entity_created_at
+    created_at.to_date
+  end
+
+  def entity_submitted_at
+    submitted_at&.to_date || created_at&.to_date
+  end
 
   def as_json
     {

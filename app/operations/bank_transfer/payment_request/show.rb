@@ -95,8 +95,10 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
       self.invoice_line_items_categories = self.user.company.categories.inward_invoice_items_only.active
 
       # calling applicable budgets so that the relevant budgets are shown
-      op = BudgetManager::BudgetsCalculator::ApplicableBudgets.({document: self.bank_payment_request, current_user: User.first})
-      self.budgets = op["result"][:budgets]
+      
+      # Removing as budget are not required to show 
+      # op = BudgetManager::BudgetsCalculator::ApplicableBudgets.({document: self.bank_payment_request, current_user: User.first})
+      # self.budgets = op["result"][:budgets]
     end
 
     def invoice_custom_field_configurations

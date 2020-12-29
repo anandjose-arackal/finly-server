@@ -795,6 +795,18 @@ class PurchaseOrder < ApplicationRecord
     (self.advance_amount&.value + self.advance_tds_amount&.value) rescue nil
   end
 
+  def entity_date
+    created_at.to_date
+  end
+
+  def entity_created_at
+    created_at.to_date
+  end
+
+  def entity_submitted_at
+    submitted_at&.to_date || created_at&.to_date
+  end
+
   # because somewhere we got 'as_json' for PO already. running on deadline. dont have time to remodify.
   def as_json2
     {
