@@ -2,10 +2,6 @@ class BankTransfer::InwardInvoices::Create < BankTransfer::InwardInvoices::Base
 
   attr_accessor :inward_invoice, :inward_invoice_parameters, :custom_fields
 
-  def rollback_process_if_error?
-    true
-  end
-
   def init
     self.inward_invoice_parameters = invoice_attributes
     self.custom_fields = params&.dig(:invoice, :custom_fields)
@@ -33,29 +29,36 @@ class BankTransfer::InwardInvoices::Create < BankTransfer::InwardInvoices::Base
   end
 
   def process
-    if params[:template_id].present?
-      load_invoice_from_template
-    else
-      self.inward_invoice = user.company.inward_invoices.build(self.inward_invoice_parameters)
-    end
-    # assign the attributes to the invoice and calculate the various amounts
-    calculate_tax_and_discounts(self.inward_invoice, self.inward_invoice_parameters)
+    ActiveRecord::Base.transaction(requires_new: true) do
+      if params[:template_id].present?
+        load_invoice_from_template
+      else
+        self.inward_invoice = user.company.inward_invoices.build(self.inward_invoice_parameters)
+      end
+      # assign the attributes to the invoice and calculate the various amounts
+      calculate_tax_and_discounts(self.inward_invoice, self.inward_invoice_parameters)
 
-    validate_custom_fields_invoice
-    return if has_errors?
-    unless self.inward_invoice.save
-      add_message :error, self.inward_invoice.errors.full_messages
+      validate_custom_fields_invoice
+      return if has_errors?
+
+      unless self.inward_invoice.save
+        add_message :error, self.inward_invoice.errors.full_messages
+        return
+      end
+
+      return if has_errors?
+
+      # Budget check
+      budget_validation_op = budget_limit_validation(inward_invoice)
+      if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+        add_message :error, budget_validation_op.messages[:errors]
+        raise ActiveRecord::Rollback
+        return
+      end
     end
   end
 
   def post_process
-    # Budget check
-    budget_validation_op = budget_limit_validation(inward_invoice)
-    if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
-      add_message :error, budget_validation_op.messages[:errors]
-      return
-    end
-
     add_message :success, "Invoice successfully created"
   end
 

@@ -30,10 +30,6 @@ class Expense::ExDistance::Odometer::ExUpdate < Expense::ExDistance::Update
     end
   end
 
-  def rollback_process_if_error?
-    true
-  end
-
   def init
     id = (params[:expense_id] or params[:id])
     self.expense = Expense::Index.(user, params)&.expenses&.find_by(id: id)
@@ -107,33 +103,38 @@ class Expense::ExDistance::Odometer::ExUpdate < Expense::ExDistance::Update
   end
 
   def process
-    super
-    return if has_errors?
-    if remove_receipt_start
-      self.old_receipt_start&.update(parent: nil)
-    end
-    if self.receipt_start.present? and self.receipt_start != self.old_receipt_start
-      self.receipt_start.update(parent: self.expense)
-    end
-    if remove_receipt_end
-      self.old_receipt_end&.update(parent: nil)
-    end
-    if self.receipt_end.present? and self.receipt_end != self.old_receipt_end
-      self.receipt_end.update(parent: self.expense)
-    end
-    if self.remove_distance
-      self.expense&.distance_expense&.distance&.destroy and self.expense&.distance_expense&.update(distance_id: nil)
+    ActiveRecord::Base.transaction(requires_new: true) do
+      super
+      return if has_errors?
+      if remove_receipt_start
+        self.old_receipt_start&.update(parent: nil)
+      end
+      if self.receipt_start.present? and self.receipt_start != self.old_receipt_start
+        self.receipt_start.update(parent: self.expense)
+      end
+      if remove_receipt_end
+        self.old_receipt_end&.update(parent: nil)
+      end
+      if self.receipt_end.present? and self.receipt_end != self.old_receipt_end
+        self.receipt_end.update(parent: self.expense)
+      end
+      if self.remove_distance
+        self.expense&.distance_expense&.distance&.destroy and self.expense&.distance_expense&.update(distance_id: nil)
+      end
+
+      return if has_errors?
+
+      # Budget check
+      budget_validation_op = budget_limit_validation(expense)
+      if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+        add_message :error, budget_validation_op.messages[:errors]
+        raise ActiveRecord::Rollback
+        return
+      end
     end
   end
 
   def post_process
-    # Budget check
-    budget_validation_op = budget_limit_validation(expense)
-    if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
-      add_message :error, budget_validation_op.messages[:errors]
-      return
-    end
-
     # add comment in report if expense is added within report
     Reports::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
 

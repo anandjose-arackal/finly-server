@@ -24,10 +24,6 @@ class Expense::ExDistance::Odometer::ExCreate < Expense::ExDistance::Create
     }
   end
 
-  def rollback_process_if_error?
-    true
-  end
-
   def pre_validate
     if user.blank? || params.blank?
       add_message :error, 'Invalid parameters passed'
@@ -90,24 +86,25 @@ class Expense::ExDistance::Odometer::ExCreate < Expense::ExDistance::Create
   end
 
   def process
-    super
-    return if has_errors?
-    if self.receipt_start.present?
-      self.receipt_start.update(parent: self.expense)
-    end
-    if self.receipt_end.present?
-      self.receipt_end.update(parent: self.expense)
-    end
-  end
+    ActiveRecord::Base.transaction(requires_new: true) do
+      super
+      return if has_errors?
+      if self.receipt_start.present?
+        self.receipt_start.update(parent: self.expense)
+      end
+      if self.receipt_end.present?
+        self.receipt_end.update(parent: self.expense)
+      end
 
-  def post_process
-    super
+      return if has_errors?
 
-    # Budget check
-    budget_validation_op = budget_limit_validation(expense)
-    if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
-      add_message :error, budget_validation_op.messages[:errors]
-      return
+      # Budget check
+      budget_validation_op = budget_limit_validation(expense)
+      if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+        add_message :error, budget_validation_op.messages[:errors]
+        raise ActiveRecord::Rollback
+        return
+      end
     end
   end
 

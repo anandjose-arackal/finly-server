@@ -3448,7 +3448,7 @@ Rails.application.routes.draw do
   get 'external/settlements/:id' => 'external_url#payment', as: :external_url_settlement
   get 'external/transaction/:id' => 'external_url#transaction', as: :external_url_transaction
 
-  get 'analytics' => 'analytics#show'
+  # get 'analytics' => 'analytics#show'
 
   get 'companies/notify' => 'companies#notify'
 
@@ -4320,6 +4320,7 @@ Rails.application.routes.draw do
   post 'index/:route/status_counts', to: 'index#status_counts'
   get 'index/:route', to: "index#show"
   post 'index/:route', to: "index#show"
+  get 'drawer/:route', to:"drawer#show"
 
   get 'menu', to: 'menu#show'
 
@@ -4366,11 +4367,25 @@ Rails.application.routes.draw do
       get 'purchase_orders/count', to: 'purchase_orders#count'
       post 'purchase_orders/new_sync_attempt', to: 'purchase_orders#new_sync_attempt'
       resources :purchase_orders, only: [:index]
+
+      get 'credit_notes/count', to: 'credit_notes#count'
+      post 'credit_notes/new_sync_attempt', to: 'credit_notes#new_sync_attempt'
+      resources :credit_notes, only: [:index]
     end
   end
 
 
   get 'lookup/:route', to: 'lookup#route'
+
+  resources :export_templates do
+  end
+  get 'export_templates/default/:resource', to: 'export_templates#default'
+
+  resources :export_formats do
+  end
+
+  resources :export_resources do
+  end
 
   post 'search', to: 'global_search#create'
   get 'search', to: 'global_search#index'
@@ -4380,6 +4395,10 @@ Rails.application.routes.draw do
   # resources :invoices, only: [:create, :update, :show]
 
   resources :approval_matrix, only: [:index]
+
+  post 'analytics/token', to: 'analytics#token'
+  post 'analytics/:id/export', to: 'analytics#export'
+  resources :analytics, only: [:create, :update, :index, :show, :destroy]
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

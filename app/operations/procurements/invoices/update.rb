@@ -2,10 +2,6 @@ class Procurements::Invoices::Update < Procurements::Invoices::Base
 
   attr_accessor :procurement, :purchase_order, :invoice_params, :invoice, :po_revision
 
-  def rollback_process_if_error?
-    true
-  end
-
   def init
     id = params[:procurement_id]
     self.procurement = user.company.procurements.find_by(id: id)
@@ -50,29 +46,33 @@ class Procurements::Invoices::Update < Procurements::Invoices::Base
   end
 
   def process
-    self.invoice.assign_attributes(invoice_params)
-    validate_custom_fields_invoice
-    return if has_errors?
+    ActiveRecord::Base.transaction(requires_new: true) do
+      self.invoice.assign_attributes(invoice_params)
+      validate_custom_fields_invoice
+      return if has_errors?
 
-    if invoice.valid?
-      invoice.save
-      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.invoice_params, nil, self.invoice)
-      self.invoice.vendor_id = self.procurement.vendor_id
-      self.invoice.save
-    else
-      add_message :error, self.invoice.errors.full_messages
+      if invoice.valid?
+        invoice.save
+        InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.invoice_params, nil, self.invoice)
+        self.invoice.vendor_id = self.procurement.vendor_id
+        self.invoice.save
+      else
+        add_message :error, self.invoice.errors.full_messages
+      end
+
+      return if has_errors?
+
+      # Budget check
+      budget_validation_op = budget_limit_validation(invoice)
+      if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+        add_message :error, budget_validation_op.messages[:errors]
+        raise ActiveRecord::Rollback
+        return
+      end
     end
-    
   end
 
   def post_process
-    # Budget check
-    budget_validation_op = budget_limit_validation(invoice)
-    if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
-      add_message :error, budget_validation_op.messages[:errors]
-      return
-    end
-
     add_message :success, "Invoice updated successfully"
   end
 

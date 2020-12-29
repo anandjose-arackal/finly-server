@@ -9,6 +9,8 @@ class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Sp
   handle :purchase_orders
   # validate :input
 
+  has_template true
+
   attribute :procurement_name
   attribute :vendor_name
   attribute :vendor_business_name

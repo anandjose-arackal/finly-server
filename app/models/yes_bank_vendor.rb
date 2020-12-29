@@ -40,16 +40,18 @@
 #  reject_note              :text(65535)
 #  rcm_enabled              :boolean          default(FALSE)
 #  vendor_country           :string(255)
-#  ldc_upper_limit_id       :integer
 #  ldc_effective_start_date :date
 #  ldc_effective_end_date   :date
 #  tds_effective_start_date :date
 #  tds_effective_end_date   :date
+#  bank_code                :string(255)
+#  tax_rate_id              :integer
 #  erp_sync_status_id       :integer
-#  erp_sync_message         :string(255)
-#  erp_sync_reference_id    :string(255)
+#  erp_sync_message         :text(65535)
+#  erp_sync_reference_id    :text(65535)
 #  erp_sync_attempts_count  :integer          default(0)
 #  erp_sync_attempted_at    :datetime
+#  ldc_upper_limit_amount   :decimal(20, 5)
 #
 
 class YesBankVendor < ApplicationRecord
@@ -94,6 +96,13 @@ class YesBankVendor < ApplicationRecord
 
   has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment'
   has_many :receiving_payments, foreign_key: 'receiving_user_id', class_name: 'Payment'
+
+  has_paper_trail(
+      meta: {
+          parent_document_type: "Vendor",
+          document_number: Proc.new { |document| document.vendor_id }
+      }
+  )
 
   default_scope { unscope(:where) }
 

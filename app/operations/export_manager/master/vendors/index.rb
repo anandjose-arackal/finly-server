@@ -9,6 +9,8 @@ class ExportManager::Master::Vendors::Index < ExportManager::Builders::Spreadshe
   resolver 'vendors.default'
   handle :vendors
 
+  has_template true
+
   attribute :vendor_business_name
   attribute :vendor_trade_name
   attribute :vendor_id

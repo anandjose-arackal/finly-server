@@ -27,11 +27,6 @@ class Expense::ExTime::Create < Expense::ExTime::Base
     }
   end
 
-  def rollback_process_if_error?
-    true
-  end
-
-
   def authorized_user_types
     [:employee]
   end
@@ -137,18 +132,30 @@ class Expense::ExTime::Create < Expense::ExTime::Base
   end
 
   def process
-    self.expense = user.expenses.build(expense_params)
+    ActiveRecord::Base.transaction(requires_new: true) do
+      self.expense = user.expenses.build(expense_params)
 
-    validate_custom_fields
-    return if has_errors?
+      validate_custom_fields
+      return if has_errors?
 
-    if self.expense.save
-      if self.receipt.present?
-        self.receipt.parent = expense
-        self.receipt.save
+      if self.expense.save
+        if self.receipt.present?
+          self.receipt.parent = expense
+          self.receipt.save
+        end
+      else
+        add_message :error, self.expense.errors.full_messages
       end
-    else
-      add_message :error, self.expense.errors.full_messages
+
+      return if has_errors?
+
+      # Budget check
+      budget_validation_op = budget_limit_validation(expense)
+      if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+        add_message :error, budget_validation_op.messages[:errors]
+        raise ActiveRecord::Rollback
+        return
+      end
     end
   end
 
@@ -201,13 +208,6 @@ class Expense::ExTime::Create < Expense::ExTime::Base
     # checking if the expense has any receipts, and marking them all as no need to be transcribed
     if expense.receipts.present?
       expense.receipts.update_all(to_be_transcribed: false)
-    end
-
-    # Budget check
-    budget_validation_op = budget_limit_validation(expense)
-    if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
-      add_message :error, budget_validation_op.messages[:errors]
-      return
     end
 
     add_message :success, 'Expense created'

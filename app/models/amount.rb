@@ -176,7 +176,6 @@
 #  ZMW         :decimal(20, 5)
 #  ZWL         :decimal(20, 5)
 #  is_deleted  :boolean          default(FALSE)
-#  MYR         :decimal(20, 5)
 #  deleted_at  :datetime
 #
 
@@ -185,7 +184,6 @@ class Amount < ApplicationRecord
   include SoftDeletable
 
   belongs_to :currency, optional: true
-
   accepts_nested_attributes_for :currency
 
   validate :no_negative_amount

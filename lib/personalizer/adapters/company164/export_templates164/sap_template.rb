@@ -89,7 +89,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SapTemplate < Pers
             '',
             {value: retrieve_account(expense), type: "string"},
             {value: retrieve_sub_account(expense), type: "string"},
-            {value: (report.user.gl_config&.dig(:location_code).present? ? sprintf("%05d", report.user.gl_config&.dig(:location_code)) : ''), type: "string"},
+            {value: (report.user.gl_config&.dig(:location_code).present? ? sprintf("%05d", report.user.gl_config&.dig(:location_code)&.to_i) : ''), type: "string"},
             report.user.gl_config&.dig(:cost_center),
             '',
             '',

@@ -2,7 +2,7 @@ class PurchaseOrderExposure < Exposures::API
 
   attribute :id, record_attribute: true
   attribute :procurement_id, record_attribute: true
-  attribute :name do
+  attribute :name, includes: [:procurement] do
     record.procurement&.name
   end
   attribute :po_number, record_attribute: true
@@ -26,6 +26,7 @@ class PurchaseOrderExposure < Exposures::API
   attribute :controlling_level, record_attribute: true, exposure: true, includes: [:controlling_level]
   attribute :cost_center, record_attribute: true, exposure: true, includes: [:cost_center]
   attribute :department, record_attribute: true, exposure: true, includes: [:department]
+  attribute :sub_department, record_attribute: true, exposure: true, includes: [:sub_department]
   attribute :billing_location, record_attribute: :location, exposure: true, includes: [:location]
   attribute :shipping_location, record_attribute: :delivery_location, exposure: true, includes: [:delivery_location]
   attribute :note, record_attribute: true
@@ -51,7 +52,7 @@ class PurchaseOrderExposure < Exposures::API
       nil
     end
   end
-  attribute :cgst_amount do
+  attribute :cgst_amount, includes: [:tax_amount] do
     case record.gst_type_id
     when GstType.id_for(:cgst_sgst)
       (tax_amount&.value || 0) / 2
@@ -61,10 +62,10 @@ class PurchaseOrderExposure < Exposures::API
       0
     end
   end
-  attribute :sgst_amount do
+  attribute :sgst_amount, includes: [:tax_amount] do
     cgst_amount
   end
-  attribute :igst_amount do
+  attribute :igst_amount, includes: [:tax_amount] do
     case record.gst_type_id
     when GstType.id_for(:cgst_sgst)
       0
@@ -92,4 +93,44 @@ class PurchaseOrderExposure < Exposures::API
   attribute :cost_allocation_items, record_attribute: true
   attribute :status, record_attribute: true, exposure: true, includes: [:status]
 
+  attribute :get_reviewers_names do 
+    # TODO: having includes for attribute is not useful since we are doing additional query in the following. Update the following to not make addition query
+    record.get_reviewers&.map(&:name)&.join(", ")
+  end
+
+  attribute :approved_reviewers_names, includes: [{ dlrms: :reviewer }] do
+    # TODO: having includes for attribute is not useful since we are doing where query in the following. Update the following to not make addition query
+    record.dlrms&.where(action_id: TrailAction.id_for(:approve))&.includes(:reviewer)&.map {|dlr| dlr.reviewer.name}&.join(" ,")
+  end
+
+  attribute :purchase_request, exposure: true, includes: [{purchase_request_items: :purchase_request}] do
+    record.purchase_request_items.first&.purchase_request
+  end
+
+  attribute :payment_term, exposure: true, record_attribute: true
+
+  attribute :closed_at, includes: [:trails] do
+    # TODO: having includes for attribute is not useful since we are doing find_by query in the following. Update the following to not make addition query
+    record.trails&.find_by(action_id: TrailAction.id_for(:close))&.created_at
+  end
+
+  # attribute :submitted_at do
+  #   record.trails&.where(action_id: TrailAction.id_for(:submit))&.last&.created_at
+  # end
+
+  attribute :delivery_date, record_attribute: true
+
+  attribute :is_approved do
+    PurchaseOrderStatus.ids_for(:approved, :auto_approved, :closed, :sent_to_vendor, :vendor_confirmed).include?(record&.purchase_order_status_id)
+  end
+
+  attribute :total_before_tax, record_attribute: true, exposure: true
+
+  attribute :invoice, exposure: true, includes: [{procurement: {invoices: [:tax_amount, :net_amount, :discount_amount, :tds_amount, :tds_slab]}}] do
+    record.procurement.invoices&.first
+  end
+
+  attribute :user, exposure: true, record_attribute: true
+  attribute :billing_address, record_attribute: true
+  attribute :shipping_address, record_attribute: true
 end

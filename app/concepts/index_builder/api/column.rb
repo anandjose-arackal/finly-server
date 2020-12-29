@@ -60,6 +60,7 @@ class IndexBuilder::API::Column
       class_attr :columns, default: {}
       class_attr :fixed_column
       class_attr :selectable, default: true
+      class_attr :status_filters, default: true
     end
 
     class_methods do

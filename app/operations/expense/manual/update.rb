@@ -22,10 +22,6 @@ class Expense::Manual::Update < Expense::Manual::Base
     }
   end
 
-  def rollback_process_if_error?
-    true
-  end
-
   def pre_validate
     if params.blank? or user.blank?
       messages[:error] << 'Parameters or user not found'
@@ -153,57 +149,62 @@ class Expense::Manual::Update < Expense::Manual::Base
   end
 
   def process
-    # Set custom fields
-    custom_fields = {custom_fields: params[:custom_fields]}
-    custom_fields[:save] = false
-    # custom_fields[:reset_fields] = true
-    set_fields = CustomField::SetFields.(self.expense.manual_expense, FieldParentType.id_for(:manual_expense), custom_fields)
-    unless set_fields.success?
-      add_message :error, set_fields.messages[:error]
-      return
-    end
-    # validating the custom fields here
-    # todo - in android workflow the dependent custom fields is breaking, so need to prevent validation in the app
-    unless RequestStore.store[:request]&.path&.include?('/mobile/v0')
-      valid = CustomField::Validate.(self.expense.manual_expense)
-      unless valid.success?
-        add_message :error, valid.messages[:error]
-        return false
+    ActiveRecord::Base.transaction(requires_new: true) do
+      # Set custom fields
+      custom_fields = {custom_fields: params[:custom_fields]}
+      custom_fields[:save] = false
+      # custom_fields[:reset_fields] = true
+      set_fields = CustomField::SetFields.(self.expense.manual_expense, FieldParentType.id_for(:manual_expense), custom_fields)
+      unless set_fields.success?
+        add_message :error, set_fields.messages[:error]
+        return
       end
-    end
+      # validating the custom fields here
+      # todo - in android workflow the dependent custom fields is breaking, so need to prevent validation in the app
+      unless RequestStore.store[:request]&.path&.include?('/mobile/v0')
+        valid = CustomField::Validate.(self.expense.manual_expense)
+        unless valid.success?
+          add_message :error, valid.messages[:error]
+          return false
+        end
+      end
 
-    if expense.update(updated_expense_params)
-      if self.destroy_receipts
-        expense.receipts.each do |receipt|
-          if receipt
-            receipt.parent = nil
-            receipt.save
+      if expense.update(updated_expense_params)
+        if self.destroy_receipts
+          expense.receipts.each do |receipt|
+            if receipt
+              receipt.parent = nil
+              receipt.save
+            end
           end
         end
-      end
-      if receipt
-        receipt.parent = expense
-        if receipt.save
-          if old_receipt.present?
-            old_receipt.parent = nil
-            old_receipt.save
+        if receipt
+          receipt.parent = expense
+          if receipt.save
+            if old_receipt.present?
+              old_receipt.parent = nil
+              old_receipt.save
+            end
           end
         end
+        expense.save # extra just to do the gst amount updation part
+      else
+        add_message :error, self.expense.errors.full_messages
       end
-      expense.save # extra just to do the gst amount updation part
-    else
-      add_message :error, self.expense.errors.full_messages
+
+      return if has_errors?
+
+      # Budget check
+      budget_validation_op = budget_limit_validation(expense)
+      if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+        add_message :error, budget_validation_op.messages[:errors]
+        raise ActiveRecord::Rollback
+        return
+      end
     end
   end
 
   def post_process
-    # Budget check
-    budget_validation_op = budget_limit_validation(expense)
-    if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
-      add_message :error, budget_validation_op.messages[:errors]
-      return
-    end
-
     # add comment in report if expense is added within report
     Reports::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
 

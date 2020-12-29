@@ -38,12 +38,14 @@
 #  credit_note_number            :string(255)
 #  last_adjusted_at              :datetime
 #  review_note                   :text(65535)
+#  erp_sync_status_id            :integer
 #
 
 class CreditNote < ApplicationRecord
   include SoftDeletable, Templatable, Transitionable, MathUtil, CustomFieldFilterSupport
   include Sequenced::ActsAsSequenced
   include EventProducer
+  include Concerns::ErpSyncConcern
 
   acts_as_sequenced column: :sequence_id, purpose: :credit_note, editable: false, prefix: 'CN'
 
@@ -126,16 +128,14 @@ class CreditNote < ApplicationRecord
           updated_at: updated_at.strftime('%d %b %Y'),
           invoice_number: invoice&.invoice_number,
           rcm_enabled: invoice&.rcm_enabled,
-          # roundoff_amount: roundoff_amount,
-
           attachments: attachments.as_json,
-          # custom_fields: self.custom_fields,
           vendor: vendor.as_json,
           shipping_location: shipping_location.as_json,
           billing_location: billing_location.as_json,
           billing_address: billing_address,
           narration: narration,
           shipping_address: shipping_address,
+          vendor_location: invoice&.gstin_location&.as_json,
           cost_center: cost_center.as_json,
           department: department.as_json,
           policy: policy.as_json,
@@ -144,12 +144,15 @@ class CreditNote < ApplicationRecord
           after_tax_amount: after_tax_amount,
           tax_amount: tax_amount.as_json,
           tds_rate_id: tds_rate_id,
+          tds_code: tds_rate&.name,
           tds_amount: tds_amount.as_json,
           net_receivable_amount: net_receivable_amount.as_json,
           freight_amount: freight_amount.as_json,
           previously_adjusted_amount: previously_adjusted_amount.as_json,
           net_adjustable_amount: net_adjustable_amount.as_json,
-          user: user.as_json
+          user: user.as_json,
+          invoice_gst_type: tax_type_name,
+          approved_at: approved_at&.strftime('%d %b %Y')
       }
     end
 
@@ -293,6 +296,11 @@ class CreditNote < ApplicationRecord
     with_status_id(status_id)
   }
 
+  scope :pending_erp_sync, -> (*args) {
+    with_erp_sync_status_pending.
+        where(status_id: CreditNoteStatus.ids_for(:approved, :auto_approved, :partially_adjusted, :unadjusted))
+  }
+
   ransack_scopes :with_status_id
   ransack_scopes :with_status_ids
 
@@ -308,6 +316,17 @@ class CreditNote < ApplicationRecord
     policy = Policy.find_by id: self.policy_id
     if policy.present? && policy.policy_user_roles.present?
       policy.policy_user_roles.where(user_role_id: UserRole.id_for(:credit_note_auditor), user_id: user.id).present? rescue false
+    end
+  end
+
+  def  tax_type_name
+    case self.invoice&.gst_type_id
+    when 1
+      'CGST + IGST'
+    when 2
+      'IGST'
+    else
+      nil
     end
   end
 

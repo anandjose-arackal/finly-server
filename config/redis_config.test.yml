@@ -1,0 +1,11 @@
+default: &default
+  url: 'redis://redis:6379'
+
+development:
+  <<: *default
+
+staging:
+  <<: *default
+
+test:
+  <<: *default

@@ -9,6 +9,11 @@ Rails.application.configure do
   # Rake tasks automatically ignore this option for performance.
   config.eager_load = true
 
+  # Documentation: https://github.com/winebarrel/activerecord-mysql-reconnect
+  config.active_record.enable_retry = true
+  config.active_record.execution_tries = 5 # times
+  config.active_record.execution_retry_wait = 1.5 # sec
+
   # config.logstasher.enabled = true
   # config.logstasher.field_renaming = {
   #     error: :exception,

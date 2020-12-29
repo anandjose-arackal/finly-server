@@ -5,10 +5,6 @@
 class Expense::ExCard::Create < Expense::ExCard::Base
   attr_accessor :expense_params
 
-  def rollback_process_if_error?
-    true
-  end
-
   # overriding initialize because the only info available will be the transaction and card
   def initialize(transaction, card, params = {})
     self.messages = []
@@ -37,21 +33,26 @@ class Expense::ExCard::Create < Expense::ExCard::Base
   end
 
   def process
-    self.expense = user.expenses.build(expense_params)
-    set_custom_fields false
-    unless self.expense.save
-      add_message :error, self.expense.errors.full_messages
-      return false
+    ActiveRecord::Base.transaction(requires_new: true) do
+      self.expense = user.expenses.build(expense_params)
+      set_custom_fields false
+      unless self.expense.save
+        add_message :error, self.expense.errors.full_messages
+        return false
+      end
+
+      return if has_errors?
+      # Budget check
+      budget_validation_op = budget_limit_validation(expense)
+      if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
+        add_message :error, budget_validation_op.messages[:errors]
+        raise ActiveRecord::Rollback
+        return
+      end
     end
   end
 
   def post_process
-    # Budget check
-    budget_validation_op = budget_limit_validation(expense)
-    if budget_validation_op.present? && budget_validation_op.failure? && budget_validation_op.messages[:errors].present?
-      add_message :error, budget_validation_op.messages[:errors]
-      return
-    end
   end
 
   def success

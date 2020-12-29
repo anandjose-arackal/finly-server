@@ -65,16 +65,17 @@
 #  gstin_location_id            :bigint
 #  cost_allocation_items        :boolean          default(FALSE)
 #  internal_note                :text(65535)
+#  taxable_amount_id            :integer
 #  vendor_address               :text(65535)
 #  discount_type_id             :integer
 #  vendor_poc_name              :string(255)
 #  vendor_poc_email             :string(255)
 #  vendor_poc_mobile_number     :string(255)
 #  rejection_note               :text(65535)
-#  taxable_amount_id            :integer
 #  vendor_poc_id                :integer
 #  vlpm_id                      :integer
 #  vendor_note                  :text(65535)
+#  erp_sync_status_id           :integer
 #
 
 class PurchaseOrder < ApplicationRecord
@@ -122,6 +123,7 @@ class PurchaseOrder < ApplicationRecord
   belongs_to :advance_amount, optional: true, class_name: "Amount"
   belongs_to :advance_tds_amount, optional: true, class_name: "Amount"
   belongs_to :advance_tds_slab, optional: true, class_name: 'TdsRatesList'
+  belongs_to :revision_of, optional: true, class_name: 'PurchaseOrder'
 
   belongs_to :policy, optional: true
   belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
@@ -148,8 +150,15 @@ class PurchaseOrder < ApplicationRecord
 
   has_many :quotations, dependent: :destroy
 
+
   belongs_to :bank_account, optional: true
 
+  has_paper_trail(
+      meta: {
+          parent_document_type: "Purchase Order",
+          document_number: Proc.new { |document| document.po_number }
+      }
+  )
   delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :vendor_confirmed?, :closed?, :voided?, :po_revised?, to: :status
 
   accepts_nested_attributes_for :items, :purchase_request_items, allow_destroy: true
@@ -504,6 +513,10 @@ class PurchaseOrder < ApplicationRecord
   scope :pending_erp_sync, -> (*args) {
     with_erp_sync_status_pending.
         where(purchase_order_status_id: PurchaseOrderStatus.ids_for([ :released, :invoice_created, :received, :change_order, :approved, :auto_approved, :sent_to_vendor, :vendor_confirmed, :vendor_rejected ]))
+  }
+
+  scope :non_voided, ->{
+    where.not(purchase_order_status_id: PurchaseOrderStatus.id_for(:voided))
   }
 
   before_save :calculate_line_items
