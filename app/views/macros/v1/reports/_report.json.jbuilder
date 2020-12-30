@@ -17,7 +17,7 @@ json.total_amount do
   json.partial! 'shared/amount', amount: Amount.new(value: record&.total_amount, currency_id: record.policy&.base_currency_id)
 end
 json.approval_workflow record.dlrms do |dlrm|
-  json.partial! 'shared/approval_workflow', dlrm: dlrm
+  json.partial! 'macros/v1/shared/approval_workflow', dlrm: dlrm
 end
 json.erp_sync_status record.erp_sync_status&.name
 json.erp_sync_message record.erp_sync_message
