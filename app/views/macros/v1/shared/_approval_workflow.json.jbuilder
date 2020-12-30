@@ -10,6 +10,7 @@ if dlrm.action_taken_by.present?
     json.id dlrm.action_taken_by&.id
     json.email dlrm.action_taken_by&.email
     json.mobile_number dlrm.action_taken_by&.mobile_number
+    json.name dlrm.action_taken_by&.name
   end
 else
   json.action_taken_by(nil)
