@@ -250,6 +250,13 @@ class Invoice < ApplicationRecord
   has_many :credit_note_adjustments, dependent: :destroy
   has_many :credit_notes, through: :credit_note_adjustments
 
+  has_paper_trail(
+      meta: {
+          parent_document_type: "Invoice",
+          document_number: Proc.new { |document| document.invoice_id }
+      }
+  ) if Proc.new { |inv | inv.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice) || inv.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)}
+
 
   accepts_nested_attributes_for :address
   accepts_nested_attributes_for :invoice_attachments, allow_destroy: true
@@ -1239,6 +1246,18 @@ class Invoice < ApplicationRecord
 
   def review_in_progress?
     InwardInvoiceStatus.ids_for(:processing).include?(invoice_status_id)
+  end
+
+  def entity_date
+    date
+  end
+
+  def entity_created_at
+    created_at.to_date
+  end
+
+  def entity_submitted_at
+    submitted_at&.to_date || created_at.to_date
   end
 
   private

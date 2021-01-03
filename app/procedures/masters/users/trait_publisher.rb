@@ -3,9 +3,9 @@ class Masters::Users::TraitPublisher
 
   # Production having very large number of users but not active at the moment
   IGNORE_LIST = [
-      1, # Demo Account
-      50, # Pro-align
-      54 # Jotun India
+    1, # Demo Account
+    50, # Pro-align
+    54 # Jotun India
   ]
 
   BATCH_SLEEP_DURATION = 2.seconds
@@ -36,16 +36,16 @@ class Masters::Users::TraitPublisher
 
         if attempts > 0
           logger.info(
-              {handler: handler, destination: destination, action: 'Succeeded after exception'}
+            { handler: handler, destination: destination, action: 'Succeeded after exception' }
           )
         end
 
         return true
       rescue Exception => e
         logger.info(
-            {
-                handler: handler, destination: destination, action: 'Exception', exception: ([e.message] + e.backtrace).join("\n")
-            }
+          {
+            handler: handler, destination: destination, action: 'Exception', exception: ([e.message] + e.backtrace).join("\n")
+          }
         )
         sleep sleep
         # Log exception
@@ -71,26 +71,24 @@ class Masters::Users::TraitPublisher
 
   def publish(publisher, user, properties, options: {})
     if Rails.configuration.bullet_train.present? and (options&.dig(:destinations).blank? or options&.dig(:destinations)&.include?('bullet_train'))
-      properties.each_pair do |key, value|
-        with_retries(publisher, 'bullet_train') do
-          Rails.configuration.bullet_train.set_trait user.analytics_id, key, value
-        end
+      with_retries(publisher, 'bullet_train') do
+        Rails.configuration.bullet_train.set_traits user.analytics_id, properties
       end
     end
 
     if Rails.configuration.posthog.present? and (options&.dig(:destinations).blank? or options&.dig(:destinations).include?('posthog'))
       with_retries(publisher, 'posthog') do
         Rails.configuration.posthog.identify(
-            distinct_id: user.analytics_id,
-            properties: properties
+          distinct_id: user.analytics_id,
+          properties: properties
         )
       end
     end
 
     if Rails.configuration.mailtrain.present? and user.email.present? and
-        (options&.dig(:destinations).blank? or options&.dig(:destinations).include?('mailtrain'))
+      (options&.dig(:destinations).blank? or options&.dig(:destinations).include?('mailtrain'))
       with_retries(publisher, 'mailtrain') do
-        request = {email: user.email, timezone: 'Asia/Kolkata', merge_attributes: {}}
+        request = { email: user.email, timezone: 'Asia/Kolkata', merge_attributes: {} }
         request[:merge_attributes] = properties.slice(*MAILTRAIN_ATTRIBUTES)
         if request[:merge_attributes].present?
           Rails.configuration.mailtrain.client.subscribe(Rails.configuration.mailtrain.customers_list, request)
@@ -101,6 +99,11 @@ class Masters::Users::TraitPublisher
 
   # Responsible for refreshing all user traits
   class Masters::Users::TraitPublisher::RefreshUserTraits < Masters::Users::TraitPublisher
+    include Sidekiq::Worker
+
+    def perform(timeframe = 10.years.ago, dry_run: false, options: {})
+      Masters::Users::TraitPublisher::RefreshUserTraits.call(timeframe, dry_run: dry_run, options: options.with_indifferent_access)
+    end
 
     def self.call(timeframe = 10.years.ago, dry_run: false, options: {})
       return unless enabled?
@@ -122,8 +125,8 @@ class Masters::Users::TraitPublisher
       total_users = users.count
       completed_users = 0
       users = users.includes(
-          :company, {company: [:feature_subscription, :status, :group]},
-          :user_panel_subscription, :policy_user_roles, :role_mapping,
+        :company, { company: [:feature_subscription, :status, :group] },
+        :user_panel_subscription, :policy_user_roles, :role_mapping,
       )
       instance = self.new
       start_time = Time.now
@@ -131,28 +134,27 @@ class Masters::Users::TraitPublisher
         batch_start_time = Time.now
         batch.each do |user|
           next unless enabled?(user.company_id)
-          properties = Masters::Users::TraitPublishers::CompanyHandler.properties(user.company)
-                           .merge(Masters::Users::TraitPublishers::FeatureSubscriptionHandler.properties(user))
-                           .merge(Masters::Users::TraitPublishers::UserHandler.properties(user))
+          properties = Masters::Users::TraitPublishers::UserHandler.properties(user)
+                                                                   .merge(Masters::Users::TraitPublishers::FeatureSubscriptionHandler.properties(user))
           instance.publish(self.class, user, properties, options: options)
         end
         completed_users += batch.size
         logger.info(
-            {
-                handler: self.name, action: 'Batch Updated', started_at: batch_start_time,
-                ended_at: Time.now, total_time: (Time.now - batch_start_time).to_f, records_updated: completed_users,
-                total_records: total_users, batch_size: batch.size
-            }
+          {
+            handler: self.name, action: 'Batch Updated', started_at: batch_start_time,
+            ended_at: Time.now, total_time: (Time.now - batch_start_time).to_f, records_updated: completed_users,
+            total_records: total_users, batch_size: batch.size
+          }
         )
         sleep BATCH_SLEEP_DURATION
       end
 
       logger.info(
-          {
-              handler: self.name, action: 'Refresh Completed', started_at: start_time,
-              ended_at: Time.now, total_time: (Time.now - start_time).to_f, records_updated: completed_users,
-              total_records: total_users
-          }
+        {
+          handler: self.name, action: 'Refresh Completed', started_at: start_time,
+          ended_at: Time.now, total_time: (Time.now - start_time).to_f, records_updated: completed_users,
+          total_records: total_users
+        }
       )
 
       # Set role traits for all users

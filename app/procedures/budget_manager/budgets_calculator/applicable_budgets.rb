@@ -3,7 +3,7 @@
 # budgets that apply to this document along with the consumption data for each of them
 class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::BudgetsCalculator::Base
 
-  attr_accessor :departments, :cost_centers, :categories, :locations, :vendors, :users,
+  attr_accessor :department_ids, :cost_center_ids, :category_ids, :location_ids, :vendor_ids, :user_ids,
                 :company, :applicable_budget_group_criteria, :document
 
   # this step just finds the documents and intitializes the various parameters
@@ -30,53 +30,65 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
     when "PurchaseOrder", "Invoice"
       # in this case users will not be there because there's no such thing as
       # a user consuming a PO, it is always with respect to the other criteria
-      self.departments = Department.with_id(document.items.pluck(:department_id).compact)
-      self.cost_centers = CostCenter.with_id(document.items.pluck(:cost_center_id).compact)
-      self.vendors = [document.vendor].compact
-      self.locations = [document.location].compact
-      self.categories = Category.with_id(document.items.pluck(:category_id).compact)
+      items = document.items
+
+      self.department_ids = items.pluck(:department_id).compact
+      self.cost_center_ids = items.pluck(:cost_center_id).compact
+      self.vendor_ids = [ document&.vendor&.id ].compact
+      self.location_ids = [ document&.location&.id ].compact
+      self.category_ids = items.pluck(:category_id).compact
+      self.user_ids = []
+
       if document.class.name == 'Invoice'
-        self.users = User.where(id: document.created_by_user_id)
+        self.user_ids = [ document&.created_by_user_id ].compact
       else
-        self.users = [document.user].compact
+        self.user_ids = [ document&.user&.id ].compact
       end
+
     when "PurchaseRequest"
-      self.departments = Department.with_id(document.items.pluck(:department_id).compact)
-      self.cost_centers = CostCenter.with_id(document.items.pluck(:cost_center_id).compact)
-      self.vendors = []
-      self.locations = [document.location].compact
-      self.categories = Category.with_id(document.items.pluck(:category_id).compact)
-      self.users = [document.creator].compact
+      items = document.items
+
+      self.department_ids = items.pluck(:department_id).compact
+      self.cost_center_ids = items.pluck(:cost_center_id).compact
+      self.vendor_ids = []
+      self.location_ids = [ document&.location&.id ].compact
+      self.category_ids = items.pluck(:category_id).compact
+      self.user_ids = [ document&.creator&.id ].compact
     when "BankPaymentRequest", "PaymentOrder"
       # here we'll extract the categories as well from the invoice / purchase order
       # that is linked to each respective payment in the payment order
-      case document.payments.first&.parent_type
+      payments = document.payments
+
+      case payments.first&.parent_type
       when "PurchaseOrder"
-        self.categories = Category.with_id(PurchaseOrderItem.with_purchase_order_id(document.payments.pluck(:parent_id)).pluck(:category_id))
+        # self.category_ids = Category.with_id(PurchaseOrderItem.with_purchase_order_id(document.payments.pluck(:parent_id)).pluck(:category_id))
+        self.category_ids = payments.map(&:parent).flatten.compact.map(&:items).flatten.pluck(:category_id).compact
       when "Invoice"
-        self.categories = Category.with_id(InvoiceLineItem.with_parent_id(document.payments.pluck(:parent_id)).pluck(:category_id))
+        # self.category_ids = Category.with_id(InvoiceLineItem.with_parent_id(document.payments.pluck(:parent_id)).pluck(:category_id))
+        self.category_ids = payments.map(&:parent).flatten.compact.map(&:items).flatten.pluck(:category_id).compact
       else
-        self.categories = []
+        self.category_ids = []
       end
-      self.departments = Department.with_id(document.payments.pluck(:department_id).compact)
-      self.cost_centers = CostCenter.with_id(document.payments.pluck(:cost_center_id).compact)
-      self.vendors = YesBankVendor.with_id(document.payments.map { |payment| payment.receiving_user_id if payment.receiving_user.is_a?(YesBankVendor) })
-      self.locations = BranchLocation.with_id(document.payments.pluck(:location_id).compact)
-      self.categories += Category.with_id(document.payments.pluck(:category_id).compact)
-      self.users = User.where(id: document.payments.pluck(:initiating_user_id).uniq)
+      self.department_ids = payments.pluck(:department_id).compact
+      self.cost_center_ids = payments.pluck(:cost_center_id).compact
+      self.vendor_ids = payments.map { |payment| payment.receiving_user_id if payment.receiving_user.is_a?(YesBankVendor) }
+      self.location_ids = payments.pluck(:location_id).compact
+      self.category_ids += payments.pluck(:category_id).compact
+      self.user_ids = document.payments.pluck(:initiating_user_id).uniq
+
     when "Report", "Expense"
-      self.departments = [document.user.department].compact
-      self.cost_centers = [document.user.cost_center].compact
+      self.department_ids = [document.user&.department&.id].compact
+      self.cost_center_ids = [document.user&.cost_center&.id].compact
       # here vendors doesn't make sense because expenses don't have a vendor per se
-      self.vendors = []
+      self.vendor_ids = []
       if document.class.name == 'Report'
-        self.categories = Category.with_id(document.expenses.pluck(:category_id).compact)
+        self.category_ids = document.expenses.pluck(:category_id).compact
       elsif document.class.name == 'Expense'
-        self.categories = [document.category]
+        self.category_ids = [document&.category&.id].compact
       end
       # here users will be the owner of the report as all expenses are incurred by them
-      self.users = [document.user].compact
-      self.locations = [document.user.location].compact
+      self.user_ids = [document&.user&.id].compact
+      self.location_ids = [document&.user&.location&.id].compact
     else
       raise "Invalid Document Type passed to ApplicableBudgets Class"
     end
@@ -96,12 +108,12 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
                                                               OR (budgetable_type = ? AND budgetable_id IN (?))
                                                               OR (budgetable_type = ? AND budgetable_id IN (?))
                                                               OR (budgetable_type = ? AND budgetable_id IN (?))",
-                                                           "Department", self.departments.pluck(:id),
-                                                           "BranchLocation", self.locations.pluck(:id),
-                                                           "CostCenter", self.cost_centers.pluck(:id),
-                                                           "YesBankVendor", self.vendors.pluck(:id),
-                                                           "User", self.users.pluck(:id),
-                                                           "Category", self.categories.pluck(:id))
+                                                           "Department", self.department_ids,
+                                                           "BranchLocation", self.location_ids,
+                                                           "CostCenter", self.cost_center_ids,
+                                                           "YesBankVendor", self.vendor_ids,
+                                                           "User", self.user_ids,
+                                                           "Category", self.category_ids)
 
 
     # applicable_criteria_mapping_ids = criteria_mappings.with_budgetable_type("Department").with_budgetable_id(self.departments.pluck(:id)).pluck(:id)
@@ -111,7 +123,9 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
     # applicable_criteria_mapping_ids += criteria_mappings.with_budgetable_type("YesBankVendor").with_budgetable_id(self.vendors.pluck(:id)).pluck(:id)
     # applicable_criteria_mapping_ids += criteria_mappings.with_budgetable_type("User").with_budgetable_id(self.users.pluck(:id)).pluck(:id)
 
-    self.applicable_budget_group_criteria = BudgetGroupCriterium.with_id(applicable_criteria_mappings.pluck(:budget_group_criterium_id))
+    self.applicable_budget_group_criteria = BudgetGroupCriterium.with_id(applicable_criteria_mappings.pluck(:budget_group_criterium_id)).includes(
+      :budgetable_departments, :budgetable_locations, :budgetable_cost_centers, :budgetable_vendors, :budgetable_users, :budgetable_categories )
+
 
     # now since the above criteria will have some extra items we have to filter them out individually,
     # the idea is that for each dimension of criteria, either they need to be empty, or include the respective dimension of the document
@@ -121,12 +135,12 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
     # 3. The above conditions needs to be satisfied for ALL dimensions, which is why they're ANDed
     valid_criteria_mapping_ids = []
     self.applicable_budget_group_criteria.each do |criteria|
-      if (criteria.budgetable_departments.blank? || (self.departments.pluck(:id) & criteria.budgetable_departments.pluck(:id)).present?) and
-          (criteria.budgetable_locations.blank? || (self.locations.pluck(:id) & criteria.budgetable_locations.pluck(:id)).present?) and
-          (criteria.budgetable_cost_centers.blank? || (self.cost_centers.pluck(:id) & criteria.budgetable_cost_centers.pluck(:id)).present?) and
-          (criteria.budgetable_vendors.blank? || (self.vendors.pluck(:id) & criteria.budgetable_vendors.pluck(:id)).present?) and
-          (criteria.budgetable_users.blank? || (self.users.pluck(:id) & criteria.budgetable_users.pluck(:id)).present?) and
-          (criteria.budgetable_categories.blank? || (self.categories.pluck(:id) & criteria.budgetable_categories.pluck(:id)).present?)
+      if (criteria.budgetable_departments.blank? || (self.department_ids & criteria.budgetable_departments.pluck(:id)).present?) and
+          (criteria.budgetable_locations.blank? || (self.location_ids & criteria.budgetable_locations.pluck(:id)).present?) and
+          (criteria.budgetable_cost_centers.blank? || (self.cost_center_ids & criteria.budgetable_cost_centers.pluck(:id)).present?) and
+          (criteria.budgetable_vendors.blank? || (self.vendor_ids & criteria.budgetable_vendors.pluck(:id)).present?) and
+          (criteria.budgetable_users.blank? || (self.user_ids & criteria.budgetable_users.pluck(:id)).present?) and
+          (criteria.budgetable_categories.blank? || (self.category_ids & criteria.budgetable_categories.pluck(:id)).present?)
 
         valid_criteria_mapping_ids << criteria.id
       end
@@ -142,26 +156,51 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
     budget_ids = []
     # we have to cycle through each budget group criteria that has been selected,
     # and based on the budget_date_type need to decide on which budgets to include
-    budgets = Budget.with_budget_criteria_id(self.applicable_budget_group_criteria.pluck(:id))
-    budgets.each do |budget|
-      date_type_id = budget.budget_date_type_id
-      dates = get_dates_from_document(document, date_type_id)
-      dates.each do |date|
-        budget_ids << budget.id if budget.within_timeframe?(date)
+    budgets = company.budgets.with_budget_criteria_id(self.applicable_budget_group_criteria.pluck(:id))
+
+    case self.document.class.name
+    when "PurchaseOrder", "PurchaseRequest", "Invoice", "Expense"
+      budget_ids = budgets.where( " (budget_date_type_id = ? AND  DATE(start_date) <= ? AND DATE(end_date) >= ?)
+        OR (budget_date_type_id = ? AND  DATE(start_date) <= ? AND DATE(end_date) >= ?)
+        OR (budget_date_type_id = ? AND  DATE(start_date) <= ? AND DATE(end_date) >= ?)
+        OR (budget_date_type_id = ? AND  DATE(start_date) <= ? AND DATE(end_date) >= ?)",
+        BudgetDateType.id_for(:entity_date), document.entity_date, document.entity_date,
+        BudgetDateType.id_for(:entity_submitted_at), document.entity_submitted_at, document.entity_submitted_at,
+        BudgetDateType.id_for(:entity_created_at), document.entity_created_at, document.entity_created_at,
+        nil, document.entity_created_at, document.entity_created_at
+      ).pluck(:id)
+
+    when "Report", "BankPaymentRequest"
+      budgets.each do |budget|
+        date_type_id = budget.budget_date_type_id
+        dates = get_dates_from_document(document, date_type_id)
+        dates.each do |date|
+          budget_ids << budget.id if budget.within_timeframe?(date)
+        end
       end
     end
-    budgets = Budget.with_id(budget_ids).active
+    
+    budgets = company.budgets.with_id(budget_ids).active
+
     result = {
         budgets: budgets
     }
     options["result"] = result
   end
 
-
   def get_dates_from_document(document, date_type_id)
     dates = []
-    case self.document.class.name
-    when "PurchaseOrder", "PurchaseRequest"
+    case document.class.name
+    when "PurchaseOrder"
+      case date_type_id
+      when BudgetDateType.id_for(:entity_date), BudgetDateType.id_for(:entity_created_at)
+        dates << document.created_at.to_date
+      when BudgetDateType.id_for(:entity_submitted_at)
+        dates << (document.submitted_at&.to_date || document.created_at.to_date)
+      else
+        dates << document.created_at.to_date
+      end
+    when "PurchaseRequest"
       case date_type_id
       when BudgetDateType.id_for(:entity_date), BudgetDateType.id_for(:entity_created_at)
         dates << document.created_at.to_date
@@ -216,5 +255,4 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
 
     return dates.compact
   end
-
 end

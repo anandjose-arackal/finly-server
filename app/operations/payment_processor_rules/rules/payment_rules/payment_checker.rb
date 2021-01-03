@@ -44,8 +44,9 @@ PaymentProcessorRules::Checker.new 'PaymentChecker' do
           bill = payment.parent
           non_failed_payments = bill.payments.without_id(payment.id).all_except_failed
           if non_failed_payments.present?
-            add_system_message :error, payment, "This payment cannot be processed as there is a payment already pending against this bill"
-            message "This payment cannot be processed as there is a payment already pending against this bill"
+            non_failed_payment_ids = non_failed_payments.pluck(:id)
+            add_system_message :error, payment, "This payment cannot be processed as there are payments already pending against this bill, with id: #{non_failed_payment_ids}"
+            message "This payment cannot be processed as there are payments already pending against this bill, with id: #{non_failed_payment_ids}"
             # also marking the payment as failed here
             payment.update(payment_status_id: PaymentStatus.id_for(:failed))
             fail

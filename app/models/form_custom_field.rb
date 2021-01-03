@@ -47,6 +47,34 @@ class FormCustomField < ApplicationRecord
       selections.map(&:form_entity_choice).map(&:name)
     when 'attachment'
       attachments.as_json if self.persisted?
+    when 'switch'
+      FormEntity::Switch::TRUTHY_VALUES.include? value
+    else
+      value
+    end
+  end
+
+  # temporarily  added to get text value against custom field
+  # to support in macro
+  def retrieve_text_value
+    if entity_type.present?
+      field_type = entity_type
+    else
+      field_type = FormEntity.unscoped.where(uuid: self.form_entity_id)&.first.entity_type
+    end
+    # FormEntity.where(uuid: self.form_entity_id)
+
+    case field_type
+    when 'text'
+      value || value_text
+    when 'dropdown'
+      selection&.form_entity_choice&.name
+    when 'multiselect'
+      selections.map(&:form_entity_choice).map(&:name)
+    when 'attachment'
+      attachments.as_json if self.persisted?
+    when 'switch'
+      FormEntity::Switch::TRUTHY_VALUES.include? value
     else
       value
     end

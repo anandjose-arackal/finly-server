@@ -9,6 +9,10 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
     }
   end
 
+  def rollback_process_if_error?
+    true
+  end
+
   def init
     invoice_id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
     self.invoice = user.company.inward_invoices.scope_all_except_voided.find_by id: invoice_id

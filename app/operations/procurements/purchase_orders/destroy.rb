@@ -30,6 +30,7 @@ class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
   end
 
   def process
+    self.purchase_order.paper_trail_event = "Destroy"
     self.po_available = true
     if self.procurement.po_revisions.present?
       if self.purchase_order.destroy

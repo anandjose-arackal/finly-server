@@ -34,6 +34,10 @@ Resolver::Router.draw do
     route 'default', Insights::Resolver
   end
 
+  scope :analytics_dashboards do
+    route 'default', AnalyticsDashboard::Resolver
+  end
+
   scope :categories do
     route 'default', Masters::Categories::Resolver
   end
@@ -155,6 +159,10 @@ Resolver::Router.draw do
 
   scope :reports do
     route 'default', Docs::ExpenseManagement::Reports::Resolver
+  end
+
+  scope :audit_trails do
+    route 'default', Docs::AuditTrails::Resolver
   end
 
   scope :export_templates do
