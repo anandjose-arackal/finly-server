@@ -321,9 +321,9 @@ class CreditNote < ApplicationRecord
 
   def  tax_type_name
     case self.invoice&.gst_type_id
-    when 1
-      'CGST + IGST'
-    when 2
+    when GstType.id_for(:cgst_sgst)
+      'CGST + SGST'
+    when GstType.id_for(:igst)
       'IGST'
     else
       nil

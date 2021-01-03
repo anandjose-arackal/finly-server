@@ -100,7 +100,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
       op.error do |result|
         puts "Error:Result: #{result}"
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failure))
-        payment.update(payment_status_id: PaymentStatus.id_for(:failure))
+        payment.update(payment_status_id: PaymentStatus.id_for(:failed))
         result["errors"]&.values&.flatten&.each do |error|
           # add_error_message( payment, error )
           payment.system_messages.build(content: error,
@@ -233,16 +233,15 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
   end
 
   def add_error_message payment, error
-
     if BBPS_ERROR_MESSAGES['BillPayErrorsResponses'][error.to_s].present?
       payment.system_messages.create({
-                                         content: BBPS_ERROR_MESSAGES['BillPayErrorsResponses'][error.to_s],
-                                         system_message_type_id: SystemMessageType.id_for(:error)
+                                        content: BBPS_ERROR_MESSAGES['BillPayErrorsResponses'][error.to_s],
+                                        system_message_type_id: SystemMessageType.id_for(:error)
                                      })
     else
       payment.system_messages.create({
-                                         content: "Unknown Error Occurred",
-                                         system_message_type_id: SystemMessageType.id_for(:error)
+                                        content: "Unknown Error Occurred",
+                                        system_message_type_id: SystemMessageType.id_for(:error)
                                      })
 
       message = YAML.load_file("#{Rails.root}/config/new_bbps_errors.yml")

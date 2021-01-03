@@ -638,7 +638,18 @@ class BankPaymentRequest < ApplicationRecord
   def review_in_progress?
     BankPaymentRequestStatus.ids_for(:processing, :submitted, :unapprove, :pending).include?(status_id)
   end
+  
+  def entity_date
+    payments.pluck(:date)
+  end
 
+  def entity_created_at
+    created_at&.to_date
+  end
+
+  def entity_submitted_at
+    submitted_at&.to_date || created_at.to_date
+  end
 
   private
 

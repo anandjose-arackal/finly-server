@@ -70,7 +70,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
           'Description': get_description(invoice),
           'Account': retrieve_account(item),
           'Sub Account': {value: retrieve_sub_account(item), type: 'string'},
-          'Department': {value: (invoice.created_by.gl_config&.dig(:location_code).present? ? sprintf("%05d", invoice.created_by.gl_config&.dig(:location_code)) : ''), type: 'string'},
+          'Department': {value: (invoice.created_by.gl_config&.dig(:location_code).present? ? sprintf("%05d", invoice.created_by.gl_config&.dig(:location_code)&.to_i) : ''), type: 'string'},
           'Cost Center': invoice.created_by.gl_config&.dig(:cost_center),
           'Debit': item.taxable_amount&.value,
       }.each do |k, v|
@@ -141,7 +141,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
           'Description': get_description(invoice),
           'Account': retrieve_account(item),
           'Sub Account': {value: retrieve_sub_account(item), type: 'string'},
-          'Department': {value: (invoice.created_by.gl_config&.dig(:location_code).present? ? sprintf("%05d", invoice.created_by.gl_config&.dig(:location_code)) : ''), type: 'string'},
+          'Department': {value: (invoice.created_by.gl_config&.dig(:location_code).present? ? sprintf("%05d", invoice.created_by.gl_config&.dig(:location_code)&.to_i) : ''), type: 'string'},
           'Cost Center': invoice.created_by.gl_config&.dig(:cost_center),
           'Debit': item.net_amount&.value,
           'Comments': 'Finly'

@@ -1248,6 +1248,18 @@ class Invoice < ApplicationRecord
     InwardInvoiceStatus.ids_for(:processing).include?(invoice_status_id)
   end
 
+  def entity_date
+    date
+  end
+
+  def entity_created_at
+    created_at.to_date
+  end
+
+  def entity_submitted_at
+    submitted_at&.to_date || created_at.to_date
+  end
+
   private
 
   # def payment_agreement_updations

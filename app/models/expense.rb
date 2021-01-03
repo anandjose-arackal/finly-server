@@ -1165,6 +1165,18 @@ class Expense < ApplicationRecord
     }
   end
 
+  def entity_date
+    date
+  end
+
+  def entity_created_at
+    created_at.to_date
+  end
+
+  def entity_submitted_at
+    report&.submitted_at&.to_date || created_at.to_date
+  end
+
   private
 
   # cannot add an expense with future date

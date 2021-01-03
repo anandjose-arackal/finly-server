@@ -49,9 +49,9 @@ class InvoiceExposure < Exposures::API
   attribute :tax_type_id, record_attribute: :gst_type_id
   attribute :tax_type_name do
     case record.gst_type_id
-    when 1
-      'CGST + IGST'
-    when 2
+    when GstType.id_for(:cgst_sgst)
+      'CGST + SGST'
+    when GstType.id_for(:igst)
       'IGST'
     else
       nil
