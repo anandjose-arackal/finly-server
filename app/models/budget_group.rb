@@ -156,6 +156,7 @@ class BudgetGroup < ApplicationRecord
       end
       return
     when Period.id_for(:year)
+      date_difference -= 1 if Date.leap?(start_date.year) or Date.leap?(end_date.year)
       if date_difference  < 365
         less = true
       end
