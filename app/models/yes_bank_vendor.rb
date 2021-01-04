@@ -83,7 +83,7 @@ class YesBankVendor < ApplicationRecord
   belongs_to :currency, optional: true
   belongs_to :payment_term, optional: true
 
-  has_many :bank_accounts, as: :account_owner
+  has_many :bank_accounts, as: :account_owner, dependent: :destroy
   has_many :receiving_payments, as: :receiving_user, class_name: 'Payment'
   has_many :vendor_attachments
   has_many :custom_fields, as: :parent, dependent: :destroy
