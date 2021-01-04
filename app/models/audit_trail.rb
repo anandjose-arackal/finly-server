@@ -37,7 +37,7 @@ class AuditTrail < PaperTrail::Version
     when  "Invoice"
       self.document_number = self.item&.invoice_id
     when  "InvoiceLineItem"
-      self.document_number = self.item.parent&.invoice_id
+      self.document_number = self.item&.parent&.invoice_id
     when "PurchaseRequest"
       self.document_number = self.item&.order_number
     when "PurchaseRequestItem"
