@@ -101,7 +101,8 @@ class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Sp
   # end
 
   def procurement_name(purchase_order)
-    purchase_order&.procurement&.name
+    purchase_order&.procurement&.name.to_s if purchase_order&.procurement.present?
+      
   end
 
   def vendor_name(purchase_order)
