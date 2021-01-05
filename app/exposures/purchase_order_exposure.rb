@@ -100,7 +100,7 @@ class PurchaseOrderExposure < Exposures::API
 
   attribute :approved_reviewers_names, includes: [{ dlrms: :reviewer }] do
     # TODO: having includes for attribute is not useful since we are doing where query in the following. Update the following to not make addition query
-    record.dlrms&.where(action_id: TrailAction.id_for(:approve))&.includes(:reviewer)&.map {|dlr| dlr.reviewer.name}&.join(" ,")
+    record.dlrms&.where(action_id: TrailAction.id_for(:approve))&.includes(:reviewer)&.map {|dlr| dlr&.reviewer&.name}&.join(" ,")
   end
 
   attribute :purchase_request, exposure: true, includes: [{purchase_request_items: :purchase_request}] do
