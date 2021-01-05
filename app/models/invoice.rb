@@ -1249,7 +1249,10 @@ class Invoice < ApplicationRecord
   end
 
   def po_trail_item
-    BudgetTrail.find_by(entity_type: "PurchaseOrderItem", entity_id: invoice_items.map(&:purchase_order_item_id).compact.first )
+    if procurement&.purchase_order.present?
+      purchase_order_item_id = procurement.purchase_order.items.first.id
+      BudgetTrail.find_by(entity_type: "PurchaseOrderItem", entity_id: purchase_order_item_id )
+    end
   end
 
   def entity_date
