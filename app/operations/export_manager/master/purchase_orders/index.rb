@@ -101,8 +101,7 @@ class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Sp
   # end
 
   def procurement_name(purchase_order)
-    purchase_order&.procurement&.name.to_s if purchase_order&.procurement.present?
-      
+    purchase_order&.procurement&.name.to_s
   end
 
   def vendor_name(purchase_order)
@@ -142,7 +141,7 @@ class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Sp
   end
 
   def approved_reviewers(purchase_order)
-    purchase_order&.dlrms&.where(action_id: TrailAction.id_for(:approve))&.includes(:reviewer)&.map {|dlr| dlr.reviewer.name}&.join(" ,")
+    purchase_order&.dlrms&.where(action_id: TrailAction.id_for(:approve))&.includes(:reviewer)&.map {|dlr| dlr&.reviewer&.name}&.join(" ,")
   end
 
   def vendor_tds_rate(purchase_order)
