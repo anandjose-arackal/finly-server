@@ -948,9 +948,9 @@ DEPENDENCIES
   omniauth-multi-provider (~> 0.2)
   omniauth-quickbooks (~> 0.0.2)
   omniauth-saml (~> 1.10)
-  paper_trail
-  paper_trail-association_tracking
-  paper_trail-globalid
+  paper_trail (~> 11.0.0)
+  paper_trail-association_tracking (~> 2.1.1)
+  paper_trail-globalid (~> 0.2.0)
   paperclip (~> 6.1.0)
   paperclip-azure (~> 1.0)
   parallel (~> 1.18)
