@@ -130,24 +130,24 @@ class BudgetGroup < ApplicationRecord
     date_difference =(( self.end_date - self.start_date ) / 1.days ).round(0)
     case self.period_id
     when Period.id_for(:day)
-      if date_difference  < 1.day
+      if date_difference  < 1
         less = true
       end
-      if date_difference  > 1.day
+      if date_difference  > 1
         more = true
       end
     when Period.id_for(:month)
-      if date_difference  < 28.days
+      if date_difference  < 28
         less = true
       end
-      if date_difference  > 31.days
+      if date_difference  > 31
         more = true
       end
     when Period.id_for(:week)
-      if date_difference  < 7.days
+      if date_difference  < 7
         less = true
       end
-      if date_difference  > 7.days
+      if date_difference  > 7
         more = true
       end
     when Period.id_for(:quarter)
@@ -156,10 +156,11 @@ class BudgetGroup < ApplicationRecord
       end
       return
     when Period.id_for(:year)
-      if date_difference  < 365.days
+      date_difference -= 1 if Date.leap?(start_date.year) or Date.leap?(end_date.year)
+      if date_difference  < 365
         less = true
       end
-      if date_difference  > 365.days
+      if date_difference  > 365
         more = true
       end
     end
