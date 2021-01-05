@@ -87,7 +87,7 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
   end
 
   def po_closed_date(item)
-    purchase_order(item).trails&.find_by(action_id: TrailAction.id_for(:close))&.created_at&.strftime("%d-%b-%Y")
+    purchase_order(item)&.trails&.find_by(action_id: TrailAction.id_for(:close))&.created_at&.strftime("%d-%b-%Y")
   end
 
   def created_by(item)
@@ -95,11 +95,11 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
   end
 
   def description(item)
-    item.description
+    item&.description&.to_s
   end
 
   def comment(item)
-    item.comment
+    item&.comment&.to_s
   end
 
   def category(item)
@@ -111,19 +111,19 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
   end
 
   def hsn_sac(item)
-    item.hsn_sac
+    item&.hsn_sac
   end
 
   def quantity(item)
-    item.quantity
+    item&.quantity
   end
 
   def rate(item)
-    item.rate
+    item&.rate
   end
 
   def tax(item)
-    item.tax_rate&.rate || 0
+    item&.tax_rate&.rate || 0
   end
 
   def tax_amount(item)
@@ -153,24 +153,24 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
   # 
 
   def vendor_name(item)
-    purchase_order(item)&.procurement.vendor&.display_name
+    purchase_order(item)&.procurement&.vendor&.display_name
   end
 
   def vendor_business_name(item)
-    purchase_order(item)&.procurement.vendor&.business_name
+    purchase_order(item)&.procurement&.vendor&.business_name
   end
 
   def vendor_mobile_number(item)
-    purchase_order(item)&.procurement.vendor&.mobile_number
+    purchase_order(item)&.procurement&.vendor&.mobile_number
   end
 
   def vendor_state_code(item)
-    sc = purchase_order(item)&.procurement.vendor&.state_code&.state_code
+    sc = purchase_order(item)&.procurement&.vendor&.state_code&.state_code
     (sc.present?) ? (sprintf '%02d', sc) : ''
   end
 
   def vendor_pan(item)
-    purchase_order(item)&.procurement.vendor&.pan
+    purchase_order(item)&.procurement&.vendor&.pan
   end
 
   def vendor_gstin(item)
@@ -186,15 +186,15 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
   end
 
   def vendor_type(item)
-    purchase_order(item)&.procurement.vendor&.vendor_type&.name
+    purchase_order(item)&.procurement&.vendor&.vendor_type&.name
   end
 
   def vendor_description(item)
-    purchase_order(item)&.procurement.vendor&.description
+    purchase_order(item)&.procurement&.vendor&.description
   end
 
   def vendor_address(item)
-    purchase_order(item)&.procurement.vendor&.address
+    purchase_order(item)&.procurement&.vendor&.address
   end
 
   def approval_pending_level_number(item)
@@ -210,19 +210,19 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
   end
 
   def approved_reviewers(item)
-    purchase_order(item)&.dlrms&.where(action_id: TrailAction.id_for(:approve))&.includes(:reviewer)&.map { |dlr| dlr.reviewer.name }&.join(" ,")
+    purchase_order(item)&.dlrms&.where(action_id: TrailAction.id_for(:approve))&.includes(:reviewer)&.map { |dlr| dlr&.reviewer&.name }&.join(" ,")
   end
 
   def department(item)
-    purchase_order(item).procurement.type_entity&.department&.name
+    purchase_order(item).procurement&.type_entity&.department&.name
   end
 
   def sub_department(item)
-    purchase_order(item).procurement.type_entity&.sub_department&.name
+    purchase_order(item).procurement&.type_entity&.sub_department&.name
   end
 
   def cost_center(item)
-    purchase_order(item).procurement.type_entity&.cost_center&.name
+    purchase_order(item).procurement&.type_entity&.cost_center&.name
   end
 
   def po_status(item)
