@@ -258,9 +258,9 @@ gem 'azure'
 gem 'azure-storage-blob'
 
 # gem for all paper trail
-gem 'paper_trail'
-gem 'paper_trail-association_tracking'
-gem 'paper_trail-globalid'
+gem 'paper_trail', '~> 11.0.0'
+gem 'paper_trail-association_tracking', '~> 2.1.1'
+gem 'paper_trail-globalid', '~> 0.2.0'
 group :development, :test do
   gem 'byebug'
   gem 'pry', '~> 0.12.2'  
