@@ -1248,16 +1248,23 @@ class Invoice < ApplicationRecord
     InwardInvoiceStatus.ids_for(:processing).include?(invoice_status_id)
   end
 
+  def po_trail_item
+    if procurement&.purchase_order.present?
+      purchase_order_item_id = procurement.purchase_order.items.first.id
+      BudgetTrail.find_by(entity_type: "PurchaseOrderItem", entity_id: purchase_order_item_id )
+    end
+  end
+
   def entity_date
-    date
+    po_trail_item&.date || date
   end
 
   def entity_created_at
-    created_at.to_date
+    po_trail_item&.entity_created_at&.to_date || created_at&.to_date
   end
 
   def entity_submitted_at
-    submitted_at&.to_date || created_at.to_date
+    po_trail_item&.entity_submitted_at || submitted_at&.to_date || created_at&.to_date
   end
 
   private
