@@ -247,9 +247,9 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
       parent_trails = []
 
       if parent_type == "PurchaseOrder"
-        parent_trails = BudgetTrail.where(entity_type: "PurchaseOrderItem", entity_id: payments.map(&:parent).flatten.compact.map(&:items).compact.map(&:id))
+        parent_trails = BudgetTrail.where(entity_type: "PurchaseOrderItem", entity_id: payments.map(&:parent).flatten.compact.map(&:items).flatten.compact.map(&:id)) 
       elsif parent_type == "Invoice"
-        parent_trails = BudgetTrail.where(entity_type: "InvoiceLineItem", entity_id: payments.map(&:parent).flatten.compact.map(&:items).compact.map(&:id))
+        parent_trails = BudgetTrail.where(entity_type: "InvoiceLineItem", entity_id: payments.map(&:parent).flatten.compact.map(&:items).flatten.compact.map(&:id)) 
       end
 
       parent_dates = parent_trails.map(&:date).compact
