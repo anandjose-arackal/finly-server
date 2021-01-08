@@ -1,4 +1,4 @@
-class ExportManager::Master::Invoices::InvoiceLineItems::Index < ExportManager::Builders::Spreadsheet
+class ExportManager::Master::AuditTrails::Index < ExportManager::Builders::Spreadsheet
 
   label 'Export'
   description 'Audit Trail Export'
