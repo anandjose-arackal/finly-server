@@ -3,8 +3,8 @@ class ExportManager::Master::Invoices::InvoiceLineItems::Index < ExportManager::
   label 'Export'
   description 'Audit Trail Export'
   configurable true
-
   system :vp
+  screen 'audit_trails.index'
   handle :audit_trails
   validate :input
 
