@@ -164,10 +164,10 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
         OR (budget_date_type_id = ? AND  DATE(start_date) <= ? AND DATE(end_date) >= ?)
         OR (budget_date_type_id = ? AND  DATE(start_date) <= ? AND DATE(end_date) >= ?)
         OR (budget_date_type_id = ? AND  DATE(start_date) <= ? AND DATE(end_date) >= ?)",
-        BudgetDateType.id_for(:entity_date), document.entity_date, document.entity_date,
-        BudgetDateType.id_for(:entity_submitted_at), document.entity_submitted_at, document.entity_submitted_at,
-        BudgetDateType.id_for(:entity_created_at), document.entity_created_at, document.entity_created_at,
-        nil, document.entity_created_at, document.entity_created_at
+        BudgetDateType.id_for(:entity_date), document&.entity_date&.to_date, document&.entity_date&.to_date,
+        BudgetDateType.id_for(:entity_submitted_at), document&.entity_submitted_at&.to_date, document&.entity_submitted_at&.to_date,
+        BudgetDateType.id_for(:entity_created_at), document&.entity_created_at&.to_date, document&.entity_created_at&.to_date,
+        nil, document&.entity_created_at&.to_date, document&.entity_created_at&.to_date
       ).pluck(:id)
 
     when "Report", "BankPaymentRequest"

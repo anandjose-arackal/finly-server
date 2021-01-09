@@ -1264,7 +1264,7 @@ class Invoice < ApplicationRecord
   end
 
   def entity_submitted_at
-    po_trail_item&.entity_submitted_at || submitted_at&.to_date || created_at&.to_date
+    po_trail_item&.entity_submitted_at&.to_date || submitted_at&.to_date || created_at&.to_date
   end
 
   private
