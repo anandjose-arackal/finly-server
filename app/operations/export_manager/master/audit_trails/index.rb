@@ -59,7 +59,12 @@ class ExportManager::Master::AuditTrails::Index < ExportManager::Builders::Sprea
   end
 
   def document_change_affected(item)
-    item.to_exposure.changes_all
+    case item
+    when "YesBankVendor"
+      "Vendor"
+    else
+      item&.underscore&.split("_")&.map(&:humanize)&.join(' ')
+    end
   end
 
   def user_name(item)
