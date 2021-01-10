@@ -39,6 +39,10 @@ class AuditTrailExposure < Exposures::API
     record.changes_less
   end
 
+  attribute :changes_all do
+    record.changes_all
+  end
+
   attribute :item_type_label do
     "#{record.item_type} Changes"
   end

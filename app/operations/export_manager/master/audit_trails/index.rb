@@ -8,26 +8,30 @@ class ExportManager::Master::AuditTrails::Index < ExportManager::Builders::Sprea
   handle :audit_trails
   validate :input
 
+  attr_accessor :loaded_data
+
   attribute :description
   attribute :document_type
   attribute :document_number
   attribute :date_time
+  attribute :document_change_affected
   attribute :changes
   attribute :user_name
   attribute :user_email
   attribute :action
   attribute :user_ip
-  #attribute :user_agent
+
 
   def data
     @data = input
+    self.loaded_data = AuditTrail.where(company_id: user.company_id)
     update total_records: @data.count.count
     @data
   end
 
   def input
     audit_trails = Resolver::Router.dispatch('audit_trails.default', params: params.merge(filter: true, paginate: false), current_user: user)
-      #AuditTrail.where(company_id: user.company_id).where("versions.user_transaction_id IN (#{audit_trails.select('user_transaction_id').to_sql})").order(created_at: :desc)
+    AuditTrail.where(company_id: user.company_id).where("versions.user_transaction_id IN (#{audit_trails.select('user_transaction_id').to_sql})").order(created_at: :desc).group(:item_id)
   end
 
   def description(item)
@@ -39,7 +43,11 @@ class ExportManager::Master::AuditTrails::Index < ExportManager::Builders::Sprea
   end
 
   def changes(item)
-    item.to_exposure.changes_less
+    change_statement = []
+    self.loaded_data.where("versions.user_transaction_id = ? and item_id = ?", item.user_transaction_id, item.item_id).each do |related_trails|
+      change_statement << related_trails.changes_all
+    end
+    change_statement.join(', ')
   end
 
   def document_type(item)
@@ -48,6 +56,10 @@ class ExportManager::Master::AuditTrails::Index < ExportManager::Builders::Sprea
 
   def document_number(item)
     item.to_exposure.document_number
+  end
+
+  def document_change_affected(item)
+    item.to_exposure.changes_all
   end
 
   def user_name(item)
