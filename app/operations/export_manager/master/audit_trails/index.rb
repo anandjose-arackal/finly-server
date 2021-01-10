@@ -31,7 +31,7 @@ class ExportManager::Master::AuditTrails::Index < ExportManager::Builders::Sprea
 
   def input
     audit_trails = Resolver::Router.dispatch('audit_trails.default', params: params.merge(filter: true, paginate: false), current_user: user)
-    AuditTrail.where(company_id: user.company_id).where("versions.user_transaction_id IN (#{audit_trails.select('user_transaction_id').to_sql})").order(created_at: :desc).group(:item_id)
+    AuditTrail.where(company_id: user.company_id).where("versions.user_transaction_id IN (#{audit_trails.select('user_transaction_id').to_sql})").order(created_at: :desc).group(:user_transaction_id,:item_id)
   end
 
   def description(item)
