@@ -4403,14 +4403,31 @@ Rails.application.routes.draw do
   resources :analytics, only: [:create, :update, :index, :show, :destroy]
 
   namespace :masters do
-    scope ":master_key/records" do
-      get 'import/template', to: 'records#import_template'
-      post 'import', to: 'records#import'
-      post '/', to: 'records#create'
-      get '/', to: 'records#index'
-      get '/:id', to: 'records#show'
-      patch '/:id', to: 'records#update'
-      delete '/:id', to: 'records#destroy'
+    scope ":master_key" do
+      scope "records" do
+        post '/', to: 'records#create'
+        get '/', to: 'records#index'
+        get '/:id', to: 'records#show'
+        patch '/:id', to: 'records#update'
+        delete '/:id', to: 'records#destroy'
+      end
+
+      scope "filters" do
+        get '', to: "record_filters#show"
+        post '', to: "record_filters#show"
+        get 'choices/:field_key', to: "record_filters#choices"
+        post 'choices/:field_key', to: "record_filters#choices"
+      end
+
+      scope "lookup" do
+        get '', to: "record_lookup#route"
+        post '', to: "record_lookup#route"
+      end
+
+      scope "import" do
+        post '', to: "records#import"
+        get 'template', to: "records#import_template"
+      end
     end
 
 
