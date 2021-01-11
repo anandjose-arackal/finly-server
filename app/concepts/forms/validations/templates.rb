@@ -73,30 +73,42 @@ class Forms::Validations::Templates
   end
 
   validates :minimum do |contract:, entity:, **|
-    if entity.options['minimum'].present? and entity.options['minimum'] > 0
+    if entity.options['minimum'].present? and entity.options['minimum'].to_i > 0
       contract.validate do
         value = send(entity.entity_key)
         next unless value.present?
-
-        if value.length < entity.options['minimum']
-          errors.add entity.entity_key, "is too short (minimum is #{entity.options[:maximum]} characters)"
+        if entity.entity_type == 'attachment'
+          valid_attachments = value.filter {|item| !item[:_destroy]}
+          next if valid_attachments.length.zero? && !entity.required
+          if valid_attachments.length < entity.options['minimum'].to_i
+            errors.add entity.entity_key, "is less than the minimum (minimum is #{entity.options['minimum']} attachments)"
+          end
+        else
+          if value.length < entity.options['minimum'].to_i
+            errors.add entity.entity_key, "is too short (minimum is #{entity.options['minimum']} characters)"
+          end
         end
       end
-      # contract.validates entity.entity_key.to_sym, length: {minimum: entity.options['minimum']}
     end
   end
 
   validates :maximum do |contract:, entity:, **|
-    if entity.options['maximum'].present? and entity.options['maximum'] > 0
+    if entity.options['maximum'].present? and entity.options['maximum'].to_i > 0
       contract.validate do
         value = send(entity.entity_key)
         next unless value.present?
-
-        if value.length > entity.options['maximum']
-          errors.add entity.entity_key, "is too long (maximum is #{entity.options[:maximum]} characters)"
+        if entity.entity_type == 'attachment'
+          valid_attachments = value.filter {|item| !item[:_destroy]}
+          next if valid_attachments.length.zero? && !entity.required
+          if valid_attachments.length > entity.options['maximum'].to_i
+            errors.add entity.entity_key, "is more than the maximum (maximum is #{entity.options['maximum']} attachments)"
+          end
+        else
+          if value.length > entity.options['maximum'].to_i
+            errors.add entity.entity_key, "is too long (maximum is #{entity.options['maximum']} characters)"
+          end
         end
       end
-      # contract.validates entity.entity_key.to_sym, length: {maximum: entity.options['maximum']}
     end
   end
 

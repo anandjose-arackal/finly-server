@@ -21,10 +21,10 @@ module Rules::Predicates
     true
   end
 
-  def self.to_number(arr)
+  def self.to_valid_format(arr)
     arr.map {|val|
-      if val.respond_to?(:strftime)
-        val.strftime("%s").to_f
+      if val =~ Constants::VALID_DATE_FORMAT
+        val.to_datetime.to_f
       else
         val.to_f
       end
@@ -93,20 +93,20 @@ module Rules::Predicates
   # end
 
   predicate :lt do |v, d|
-    Rules::Predicates.to_number(v).each_cons(2).all? { |i, j| i < j }
+    Rules::Predicates.to_valid_format(v).each_cons(2).all? { |i, j| i < j }
     # v.map(&:to_f).each_cons(2).all? { |i, j| i < j }
   end
 
   predicate :lteq do |v, d|
-    Rules::Predicates.to_number(v).each_cons(2).all? { |i, j| i <= j }
+    Rules::Predicates.to_valid_format(v).each_cons(2).all? { |i, j| i <= j }
   end
 
   predicate :gt do |v, d|
-    Rules::Predicates.to_number(v).each_cons(2).all? { |i, j| i > j }
+    Rules::Predicates.to_valid_format(v).each_cons(2).all? { |i, j| i > j }
   end
 
   predicate :gteq do |v, d|
-    Rules::Predicates.to_number(v).each_cons(2).all? { |i, j| i >= j }
+    Rules::Predicates.to_valid_format(v).each_cons(2).all? { |i, j| i >= j }
   end
 
   # Fixme: check if in is really required as it is is covered by eq_any case in the context of form rules
@@ -161,11 +161,11 @@ module Rules::Predicates
   end
 
   predicate :null do |v, d|
-    v[0].null?
+    v[0].nil?
   end
 
   predicate :not_null do |v, d|
-    !v[0].null?
+    !v[0].nil?
   end
 
 end
