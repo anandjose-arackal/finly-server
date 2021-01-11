@@ -274,6 +274,33 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
       add_message :error, "Invoice status is \"Void\". No further actions can be taken."
       return
     end
+
+
+    if self.purchase_order.present?
+      if self.inward_invoice.status.processing?
+        
+        rate_flag = false
+        quantity_flag = false
+
+        items_attributes = self.inward_invoice_params[:invoice_items_attributes]
+
+        items_attributes.each do |line_item|
+
+          invoice_item = InvoiceLineItem.find_by(id: line_item[:id] )
+          unless line_item[:quantity].to_i == invoice_item.quantity.to_i
+            quantity_flag = true
+          end
+
+          unless line_item[:rate].to_f == invoice_item.rate.to_f
+            rate_flag = true
+          end 
+          break if rate_flag || quantity_flag  
+        end
+        add_message :error, "Reviewer can not updated invoice item's quantity" if quantity_flag
+        add_message :error, "Reviewer can not updated invoice item's rate" if rate_flag
+        return if rate_flag || quantity_flag
+      end
+    end
   end
 
   def pre_process

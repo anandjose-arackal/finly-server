@@ -169,6 +169,9 @@ class PurchaseOrder < ApplicationRecord
 
 
   validates :purchase_order_status_id, presence: true
+
+  validate :item_quantity_validation
+
   # validates :policy_id, presence: true
   # validates :items, presence: true
   scope :with_company_id, -> (company_id) { where company_id: company_id }
@@ -1270,5 +1273,16 @@ class PurchaseOrder < ApplicationRecord
 
   def update_po_cost_allocation_items
     self.update_column('cost_allocation_items', true)
+  end
+
+  def item_quantity_validation
+    flag = false
+    quantities = items.map(&:quantity).map(&:to_i)
+    quantities.each do |quantity|
+      flag = true if quantity <= 0
+      break
+    end
+    
+    errors.add(:items, "qunatity must be greater than 0") if flag
   end
 end
