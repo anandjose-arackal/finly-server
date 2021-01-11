@@ -186,4 +186,6 @@ Resolver::Router.draw do
   scope :import_jobs do
     route 'default', ImportJobs::Resolver
   end
+
+  route 'masters.*', Masters::Schema::Records::Resolver
 end

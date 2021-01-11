@@ -21,7 +21,7 @@ class Masters::Schema::Entity::Contract < Reform::Form
       represented.type = type
     end
     if represented.type.blank?
-      debugger
+      raise "Invalid Entity Type"
     end
   }
   property :hint, deserializer: -> (input, represented, **) {

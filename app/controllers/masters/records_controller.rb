@@ -1,4 +1,5 @@
 class Masters::RecordsController < BaseControllers::WebBase
+  layout 'trailblazers'
 
   def import
     endpoint Masters::Schema::Records::Import::Create
