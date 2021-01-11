@@ -113,11 +113,29 @@ describe 'Rules::Adapters::JsonLogic' do
 
     context 'when controlling field is not provided' do
       context 'when source field and value field are not in line items' do
+        it 'should be true if values are matching the criteria' do
+          rule = Rules::Builder['note'].eq_any(value: 'apple')
+          json_logic = Rules::Adapters::JSONLogic.as_json(rule, model_klass: Invoice)
 
+          data = { form: { note: 'apple' } }
+          expect(JSONLogic.apply(json_logic.with_indifferent_access, data.with_indifferent_access)).to be_truthy
+
+          data = { form: { note: 'orange' } }
+          expect(JSONLogic.apply(json_logic.with_indifferent_access, data.with_indifferent_access)).to be_falsey
+        end
       end
 
       context 'when source field and value field are in the same line item' do
+        it 'should be true if any line items values of source field and value fields are matching the criteria' do
+          rule = Rules::Builder['line_items.description'].eq_any(value: 'apple')
+          json_logic = Rules::Adapters::JSONLogic.as_json(rule, model_klass: Invoice)
 
+          data = { form: { line_items: [{ description: 'orange' }, { description: 'apple' }] } }
+          expect(JSONLogic.apply(json_logic.with_indifferent_access, data.with_indifferent_access)).to be_truthy
+
+          data = { form: { line_items: [{ description: 'orange' }] } }
+          expect(JSONLogic.apply(json_logic.with_indifferent_access, data.with_indifferent_access)).to be_falsey
+        end
       end
     end
 
