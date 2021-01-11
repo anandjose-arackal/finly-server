@@ -181,8 +181,12 @@ class FormEntity < ApplicationRecord
 
   def form_builder_json(opts = {})
     params = opts[:params] || {}
+    choices_scope_config = {}
     if choices_scope.present?
       choices_data = choices_scope.build(params: params, user: opts[:current_user])
+      if choices_scope.respond_to?(:route)
+        choices_scope_config[:route] = choices_scope.route
+      end
     else
       choices_data = {choices: choices.as_json}
     end
@@ -226,19 +230,20 @@ class FormEntity < ApplicationRecord
         entity_path: entity_path,
         parent_id: parent_id,
         populate_if_empty: populate_if_empty,
-        type: type,
+        # type: type,
         config: config,
         associate_custom_fields: associate_custom_fields,
         compute_enabled: compute_enabled,
         compute_type_id: compute_type_id,
         compute_formula: compute_formula,
         compute_lookup_entity_id: compute_lookup_entity_id,
-        filters: filters,
+        filters: filters&.as_store,
         config_path: config_path,
         validations: validations.as_json(opts),
         conditions: conditions.as_json(opts),
         # choices: choices_scope(params: options[:params], user: options[:current_user]),
-        choices: choices_data
+        choices: choices_data,
+        choices_scope: choices_scope_config
     }
   end
 
@@ -270,6 +275,7 @@ class FormEntity < ApplicationRecord
         entity_type: entity_type,
         default_value: default_value,
         position: position,
+        filters: filters&.as_ransack(do_not_interpolate: true),
         behavior: {
             editable: editable,
             required: required,

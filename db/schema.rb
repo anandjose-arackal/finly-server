@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_18_222920) do
+ActiveRecord::Schema.define(version: 2020_12_22_144554) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -416,6 +416,74 @@ ActiveRecord::Schema.define(version: 2020_12_18_222920) do
     t.index ["currency_id"], name: "index_amounts_on_currency_id"
   end
 
+  create_table "analytics_dashboard_schedule_user_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.integer "company_id", null: false
+    t.integer "analytics_dashboard_id", null: false
+    t.integer "user_id", null: false
+    t.datetime "deleted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["analytics_dashboard_id"], name: "index_analytics_dashboard_schedule_user_mappings_on_dashboard_id"
+    t.index ["company_id"], name: "index_analytics_dashboard_schedule_user_mappings_on_company_id"
+    t.index ["created_at"], name: "index_analytics_dashboard_schedule_user_mappings_on_created_at"
+    t.index ["deleted_at"], name: "index_analytics_dashboard_schedule_user_mappings_on_deleted_at"
+    t.index ["updated_at"], name: "index_analytics_dashboard_schedule_user_mappings_on_updated_at"
+    t.index ["user_id"], name: "index_analytics_dashboard_schedule_user_mappings_on_user_id"
+  end
+
+  create_table "analytics_dashboard_schedules", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.integer "company_id", null: false
+    t.integer "analytics_dashboard_id", null: false
+    t.datetime "start_date"
+    t.datetime "end_date"
+    t.integer "frequency"
+    t.integer "hour"
+    t.integer "minute"
+    t.integer "day_of_the_week"
+    t.integer "day_of_the_month"
+    t.datetime "deleted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["analytics_dashboard_id"], name: "index_analytics_dashboard_schedules_on_analytics_dashboard_id"
+    t.index ["company_id"], name: "index_analytics_dashboard_schedules_on_company_id"
+    t.index ["created_at"], name: "index_analytics_dashboard_schedules_on_created_at"
+    t.index ["day_of_the_month"], name: "index_analytics_dashboard_schedules_on_day_of_the_month"
+    t.index ["day_of_the_week"], name: "index_analytics_dashboard_schedules_on_day_of_the_week"
+    t.index ["deleted_at"], name: "index_analytics_dashboard_schedules_on_deleted_at"
+    t.index ["end_date"], name: "index_analytics_dashboard_schedules_on_end_date"
+    t.index ["frequency"], name: "index_analytics_dashboard_schedules_on_frequency"
+    t.index ["hour"], name: "index_analytics_dashboard_schedules_on_hour"
+    t.index ["minute"], name: "index_analytics_dashboard_schedules_on_minute"
+    t.index ["start_date"], name: "index_analytics_dashboard_schedules_on_start_date"
+    t.index ["updated_at"], name: "index_analytics_dashboard_schedules_on_updated_at"
+  end
+
+  create_table "analytics_dashboards", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "app", null: false
+    t.integer "company_id", null: false
+    t.integer "created_by_id", null: false
+    t.string "name", null: false
+    t.text "description"
+    t.boolean "default", default: false
+    t.text "reports"
+    t.boolean "is_system_dashboard"
+    t.string "system_dashboard_id"
+    t.text "feature_subscriptions"
+    t.datetime "deleted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["app"], name: "index_analytics_dashboards_on_app"
+    t.index ["company_id"], name: "index_analytics_dashboards_on_company_id"
+    t.index ["created_at"], name: "index_analytics_dashboards_on_created_at"
+    t.index ["created_by_id"], name: "index_analytics_dashboards_on_created_by_id"
+    t.index ["default"], name: "index_analytics_dashboards_on_default"
+    t.index ["deleted_at"], name: "index_analytics_dashboards_on_deleted_at"
+    t.index ["is_system_dashboard"], name: "index_analytics_dashboards_on_is_system_dashboard"
+    t.index ["name"], name: "index_analytics_dashboards_on_name"
+    t.index ["system_dashboard_id"], name: "index_analytics_dashboards_on_system_dashboard_id"
+    t.index ["updated_at"], name: "index_analytics_dashboards_on_updated_at"
+  end
+
   create_table "api_tokens", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "base_url"
     t.string "name"
@@ -746,6 +814,7 @@ ActiveRecord::Schema.define(version: 2020_12_18_222920) do
     t.integer "expected_payments", default: 0
     t.string "ticket_type"
     t.integer "transfer_mode_id"
+    t.index ["company_id", "controlling_level_id", "deleted_at"], name: "index_bpr_ct_lvl_cmpny_id"
     t.index ["company_id"], name: "index_bank_payment_requests_on_company_id"
     t.index ["controlling_level_id"], name: "index_bank_payment_requests_on_controlling_level_id"
     t.index ["controlling_user_id"], name: "index_bank_payment_requests_on_controlling_user_id"
@@ -5191,6 +5260,7 @@ ActiveRecord::Schema.define(version: 2020_12_18_222920) do
     t.integer "erp_sync_attempts_count", default: 0
     t.datetime "erp_sync_attempted_at"
     t.index ["address_id"], name: "index_invoices_on_address_id"
+    t.index ["company_id", "controlling_level_id", "deleted_at"], name: "index_invoice_ct_lvl_cmpny_id"
     t.index ["controlling_level_id"], name: "index_invoices_on_controlling_level_id"
     t.index ["discount_type_id"], name: "index_invoices_on_discount_type_id"
     t.index ["gstin_location_id"], name: "index_invoices_on_gstin_location_id"
@@ -6956,6 +7026,7 @@ ActiveRecord::Schema.define(version: 2020_12_18_222920) do
     t.index ["advance_amount_status_id"], name: "index_purchase_orders_on_advance_amount_status_id"
     t.index ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id"
     t.index ["bank_account_id"], name: "index_purchase_orders_on_bank_account_id"
+    t.index ["company_id", "controlling_level_id", "deleted_at"], name: "index_po_ct_lvl_cmpny_id"
     t.index ["company_id"], name: "index_purchase_orders_on_company_id"
     t.index ["delivery_location_id"], name: "index_purchase_orders_on_delivery_location_id"
     t.index ["discount_amount_id"], name: "index_purchase_orders_on_discount_amount_id"
@@ -7053,6 +7124,7 @@ ActiveRecord::Schema.define(version: 2020_12_18_222920) do
     t.integer "total_amount_id"
     t.boolean "cost_allocation_items", null: false
     t.datetime "deleted_at"
+    t.index ["company_id", "controlling_level_id", "deleted_at"], name: "index_po_ct_lvl_cmpny_id"
     t.index ["order_number"], name: "index_purchase_requests_on_order_number"
     t.index ["purchase_request_status_id"], name: "index_purchase_requests_on_purchase_request_status_id"
     t.index ["total_amount_id"], name: "index_purchase_requests_on_total_amount_id"
@@ -9686,6 +9758,7 @@ ActiveRecord::Schema.define(version: 2020_12_18_222920) do
     t.integer "erp_sync_attempts_count", default: 0
     t.datetime "erp_sync_attempted_at"
     t.decimal "ldc_upper_limit_amount", precision: 20, scale: 5
+    t.index ["company_id", "controlling_level_id", "deleted_at"], name: "index_vendors_ct_lvl_cmpny_id"
     t.index ["company_id"], name: "index_yes_bank_vendors_on_company_id"
     t.index ["name"], name: "index_yes_bank_vendors_on_name"
     t.index ["tds_rates_list_id"], name: "index_yes_bank_vendors_on_tds_rates_list_id"

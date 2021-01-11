@@ -218,7 +218,7 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
         'TRANSFER_TYPE' => transfer_request.transfer_type&.strip&.upcase,
         'TRANSFER_CURRENCY_CODE' => transfer_request.transfer_currency_code,
         'TRANSFER_AMOUNT' => transfer_request.transfer_amount,
-        'BENEFICIARY_EMAIL' => (self.beneficiary_email.present? ? (self.beneficiary_email) : ("noreply@finly.io")),
+        'BENEFICIARY_EMAIL' => (self.beneficiary_email.present? ? (self.beneficiary_email) : ("noreply@finlyhq.com")),
         'BENEFICIARY_MOBILE_NUMBER' => (self.beneficiary_mobile_number.present? ? (self.beneficiary_mobile_number) : ("7975520468"))
     )
   end
