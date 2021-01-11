@@ -87,14 +87,14 @@ class Forms::Ops::Choices < Transactions::API
 
     # debugger
 
-    intersecting_choices = [Forms::RequestParser.new(form: params[:form_data], row: params[:row_data]).fetch(entity.entity_path)].compact
+    intersecting_choices = [Forms::RequestParser.new(form: params[:form_data], row: params[:row_data]).fetch(entity.entity_path)].compact.map(&:to_s)
     return if intersecting_choices.blank?
 
     # intersecting_choices = choices.values.first
     # return if intersecting_choices.blank?
 
     choices.values.each do |arr|
-      intersecting_choices = intersecting_choices & arr
+      intersecting_choices = intersecting_choices & arr.map(&:to_s)
     end
 
     context[:intersecting_choices] = intersecting_choices

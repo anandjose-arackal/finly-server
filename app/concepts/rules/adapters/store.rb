@@ -6,13 +6,13 @@ class Rules::Adapters::Store
     data = JSON.load(data) if data.is_a?(String)
     data = data.with_indifferent_access unless data.is_a?(ActiveSupport::HashWithIndifferentAccess)
 
-    if Rules::Constants::LOGICAL_OPERATORS.include?(data[:m].to_s)
+    if Rules::Constants::LOGICAL_OPERATORS.include?(data[:m].to_s) && data[:c].present?
       rule = nil
       data[:c].each do |d|
         if rule.nil?
           rule = Rules::Adapters::Store.load(d)
         else
-          rule = rule.send(data[:m], Rules::Adapters::Store.load(d))
+          rule = rule.send(data[:m],  Rules::Adapters::Store.load(d))
         end
       end
       rule

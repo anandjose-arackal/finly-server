@@ -49,7 +49,7 @@ class Forms::Ops::SyncPositions < Transactions::API
   #   model.save
   # end
 
-  step Transactions::Messages::SuccessMessage('Saved Form Fields with Positions')
+  step Transactions::Messages::SuccessMessage('Form fields saved successfully')
 
   fail :check_failure
 
