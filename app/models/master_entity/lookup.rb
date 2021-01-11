@@ -31,20 +31,21 @@
 class MasterEntity::Lookup < MasterEntity
   register :lookup
   database_type :string
+  filter_type :lookup
   set :hint, 'Select value'
   operators :eq_any #, :blank, :present
 
   option :route
 
-  schema_contract do
-    validate :entity_key_format
+  # schema_contract do
+  #   validate :entity_key_format
 
-    def entity_key_format
-      unless self.entity_key&.end_with?('_id')
-        errors.add :entity_key, 'has to end with _id'
-      end
-    end
-  end
+  #   def entity_key_format
+  #     unless self.entity_key&.end_with?('_id')
+  #       errors.add :entity_key, 'has to end with _id'
+  #     end
+  #   end
+  # end
 
   def route
     choices_scope&.route
