@@ -63,7 +63,7 @@ class ExportManager::Master::AuditTrails::Index < ExportManager::Builders::Sprea
     when "YesBankVendor"
       "Vendor"
     else
-      item&.underscore&.split("_")&.map(&:humanize)&.join(' ')
+      item.item_type&.underscore&.split("_")&.map(&:humanize)&.join(' ')
     end
   end
 
