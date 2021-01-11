@@ -13,6 +13,7 @@ module Masters::Entity::Schema
     include DynamicAttributes
 
     class_attr :database_type
+    class_attr :filter_type
 
     def self.inherited(sub_class)
       super
@@ -63,6 +64,10 @@ module Masters::Entity::Schema
 
   def database_type
     self.class.database_type
+  end
+
+  def filter_type
+    self.class.filter_type
   end
 
   def schema_contract

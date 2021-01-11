@@ -31,6 +31,7 @@
 class MasterEntity::ParentLookup < MasterEntity::Lookup
   register :parent_lookup
   database_type :parent_lookup
+  filter_type :lookup
   set :hint, 'Select Parent'
 
   ATTRIBUTES = {

@@ -31,6 +31,7 @@
 class MasterEntity::Decimal < MasterEntity
   register :decimal
   database_type :decimal
+  filter_type :number
   set :hint, 'Enter value'
   operators :gteq, :lteq, :in, :not_in, :not_null, :null
 end

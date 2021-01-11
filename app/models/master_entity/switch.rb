@@ -31,5 +31,6 @@
 class MasterEntity::Switch < MasterEntity
   register :switch
   database_type :boolean
+  filter_type :switch
   operators :eq_any, :blank, :present
 end

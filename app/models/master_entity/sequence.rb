@@ -31,6 +31,7 @@
 class MasterEntity::Sequence < MasterEntity
   register :sequence
   database_type :string
+  filter_type :auto_number
   simple_filter :cont_any
   set :hint, 'Auto-Generated'
   operators :eq_any, :not_eq_all, :cont_any, :not_cont_all, :blank, :present

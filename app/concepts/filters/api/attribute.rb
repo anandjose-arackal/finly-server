@@ -62,9 +62,10 @@ class Filters::API::Attribute
     end
 
     class_methods do
+
       # Check if the attribute is defined
       def exists?(filter_key)
-        attributes[filter_key].present?
+        self.attributes[filter_key].present?
       end
 
       def attribute(field_key, label: nil, type: :text, hint: "Select Value", choices: nil, simple: false)
@@ -72,7 +73,7 @@ class Filters::API::Attribute
 
         label ||= field_key.to_s.humanize
 
-        attributes[field_key] = Filters::API::Attribute.new(
+        self.attributes[field_key] = Filters::API::Attribute.new(
             {
                 field_key: field_key,
                 label: label,
@@ -89,10 +90,11 @@ class Filters::API::Attribute
         @custom_fields << {parent_type: parent_type, prefix: prefix} if parent_type.present?
         @custom_fields
       end
+    end
 
-      def build(user)
+      def build(context, user)
         filters = []
-        attributes.each do |field_key, attribute|
+        attributes(context).each do |field_key, attribute|
           filters << attribute.build(user)
         end
         if custom_fields.present?
@@ -152,6 +154,5 @@ class Filters::API::Attribute
         end
       end
     end
-  end
 
 end

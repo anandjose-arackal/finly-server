@@ -31,4 +31,6 @@ Filters::Router.draw do
   route 'receive_history', Docs::P2P::Inwards::Received::FilterConfig
   route 'credit_notes', Docs::P2P::CreditNotes::FilterConfig
   route 'audit_trails',Docs::AuditTrails::FilterConfig
+
+  route 'masters.*', Masters::Schema::Records::FilterConfig
 end

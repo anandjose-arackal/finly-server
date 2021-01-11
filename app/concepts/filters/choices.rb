@@ -10,23 +10,30 @@ class Filters::Choices < Transactions::API
   step :verify_route
   pass :init_klass
   step :find_attribute
-  step :verify_choices
+  # step :verify_choices
   pass :build_choices
 
   def verify_route(context, params:, **)
-    unless Filters::Router.routes.include?(params[:route])
+    unless Filters::Router[params[:route]]
       return on_error context, :base, 'Route not found'
     end
 
     true
   end
 
-  def init_klass(context, params:, **)
+  def init_klass(context, params:, current_user:, **)
     context[:filter_config] = Filters::Router[params[:route]]&.first&.klass
-  end
+    op = Filters::Router.dispatch(params[:route], { params: { route: params[:route]}, current_user: current_user})
+    context[:filters] = op[:filters]
 
+    true
+  end
+  
   def find_attribute(context, params:, filter_config:, **)
-    context[:attribute] = filter_config.attributes[params[:field_key]]
+    context[:attribute] = (context[:filters].filter do |filter|
+      filter[:field_key] == params[:field_key].to_sym
+    end).first
+
     unless context[:attribute].present?
       return on_error context, :base, 'Invalid Request'
     end
@@ -34,16 +41,18 @@ class Filters::Choices < Transactions::API
     true
   end
 
-  def verify_choices(context,  attribute:, **)
-    unless attribute.choices.present?
-      return on_error(context, :base, 'Invalid Request')
-    end
+  # def verify_choices(context,  attribute:, **)
+  #   unless attribute.choices.present?
+  #     return on_error(context, :base, 'Invalid Request')
+  #   end
 
-    true
-  end
+  #   true
+  # end
 
   def build_choices(context, params:, current_user:, attribute:, **)
-    context[:data] = attribute.choices.build(params: params, user: current_user)
+    context[:data] = attribute[:data]
+
+    true
   end
 
 end

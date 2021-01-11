@@ -31,6 +31,7 @@
 class MasterEntity::LargeText < MasterEntity
   register :large_text
   database_type :text
+  filter_type :large_text
   set :hint, "Enter value"
   operators :eq_any, :not_eq_all, :cont_any, :not_cont_all, :blank, :present
   simple_filter :cont_any

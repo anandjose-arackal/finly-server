@@ -24,7 +24,7 @@ class Filters::Config < Transactions::API
       # Defining permissions is mandatory
       next if klass.permissions.present? and not current_user.has_permission?(klass.permissions)
 
-      context[:config][route] = klass.build(current_user)
+      context[:config][route] = Filters::Router.dispatch(route, { params: { route: route}, current_user: current_user})
     end
 
     true

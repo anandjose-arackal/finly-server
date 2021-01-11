@@ -31,6 +31,7 @@
 class MasterEntity::Integer < MasterEntity
   register :integer
   database_type :integer
+  filter_type :number
   set :hint, 'Enter value'
   operators :gteq, :lteq, :in, :not_in, :not_null, :null
 end

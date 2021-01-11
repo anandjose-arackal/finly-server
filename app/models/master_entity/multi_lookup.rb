@@ -1,6 +1,7 @@
 class MasterEntity::MultiLookup < MasterEntity
   register :multi_lookup
   database_type :multi_lookup
+  filter_type :lookup
   set :hint, 'Select values'
   operators :eq_any #, :blank, :present
 
