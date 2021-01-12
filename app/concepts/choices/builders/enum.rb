@@ -19,7 +19,17 @@ class Choices::Builders::Enum < Choices::Builders::Base
   end
 
   def choices(params: {}, user: nil)
-    klass.all
+    list = []
+    filtered_list = params.dig(:q, :id_in)&.map(&:to_i)
+    records = klass.all
+    records = records.where(id: filtered_list) unless filtered_list.nil?
+    records.each do |item|
+      list << {
+          id: item.send(id),
+          name: item.send(name).titleize,
+      }
+    end
+    list
   end
 
   # def choices_json(params: {}, user: nil)
@@ -43,7 +53,7 @@ class Choices::Builders::Enum < Choices::Builders::Base
       }
     end
 
-    Choices::Provider.new(provider: self, partial: false, data: list)
+    Choices::Provider.new(provider: self, partial: false, data: choices(params: params, user: user))
   end
 
 end

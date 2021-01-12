@@ -52,7 +52,7 @@ class Forms::Contracts::Builders::CustomField
             attachment = CustomFieldAttachment.find_by uuid: attachment_obj[:id]
 
             if attachment.present?
-              if attachment_obj[:_destroy].present?
+              if attachment_obj[:_destroy]
                 attachment.destroy
               else
                 custom_field.attachments << attachment
