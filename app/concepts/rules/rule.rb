@@ -56,6 +56,7 @@ class Rules::Rule
   end
 
   def apply?(data, options = {})
+    data = data.with_indifferent_access unless data.is_a?(HashWithIndifferentAccess)
     JSONLogic.apply(as_json_logic(options), data)
   end
 
