@@ -60,6 +60,6 @@ class Rules::Rule
   end
 
   def valid?(options = {})
-    Rules::Adapters::Ransack.valid?(self, options)
+    Rules::Adapters::JSONLogic.valid?(self, options)
   end
 end
