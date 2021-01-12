@@ -33,7 +33,6 @@ module Accountable
 
     # As company balance load's do not have opening or closing balance, this is to handle cases which do not have opening or closing balance
     # In case opening balance is required where company balance load was the first transaction performed, then fetch the previous day's last transactions closing balance as the day's closing balance
-    binding.pry
     transaction = finly_transactions.on_or_after_date(date)&.order(:sequence_number)&.limit_to_one&.first
     if transaction&.opening_balance_id.present?
       balance = transaction&.opening_balance&.value
