@@ -129,7 +129,7 @@ ActiveRecord::Schema.define(version: 2021_01_06_172214) do
     t.datetime "updated_at", null: false
     t.boolean "trigger_email", default: false, null: false
     t.boolean "reviewer", default: false, null: false
-    t.integer "admin_user_id", null: false
+    t.integer "admin_user_id"
     t.datetime "email_triggered_at"
     t.datetime "deleted_at"
     t.index ["admin_review_workflow_id"], name: "index_admin_review_workflow_levels_on_admin_review_workflow_id"
@@ -9847,8 +9847,6 @@ ActiveRecord::Schema.define(version: 2021_01_06_172214) do
     t.index ["vendor_type_id"], name: "index_yes_bank_vendors_on_vendor_type_id"
   end
 
-  add_foreign_key "accounting_system_configurations", "companies"
-  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "addresses", "states"
   add_foreign_key "admin_review_workflow_levels", "admin_review_workflows"
   add_foreign_key "admin_summary_mail_configs", "periods"

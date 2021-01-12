@@ -2,6 +2,22 @@ require 'rails_helper'
 
 describe 'Rules::Adapters::JsonLogic' do
 
+  context '#valid?' do
+    it 'should return false for invalid rules' do
+      rule = Rules::Builder['line_items.description'].eq_any(entity: 'note')
+      valid = Rules::Adapters::JSONLogic.valid?(rule, model_klass: Invoice, controlling_field: 'credit_notes.name')
+
+      expect(valid).to be_falsey
+    end
+
+    it 'should return true for valid rules' do
+      rule = Rules::Builder['line_items.description'].eq_any(entity: 'line_items.name')
+      valid = Rules::Adapters::JSONLogic.valid?(rule, model_klass: Invoice, controlling_field: 'credit_notes.name')
+
+      expect(valid).to be_truthy
+    end
+  end
+
   context '#as_json' do
     before do
       # Do nothing

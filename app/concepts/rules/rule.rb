@@ -58,4 +58,8 @@ class Rules::Rule
   def apply?(data, options = {})
     JSONLogic.apply(as_json_logic(options), data)
   end
+
+  def valid?(options = {})
+    Rules::Adapters::Ransack.valid?(self, options)
+  end
 end

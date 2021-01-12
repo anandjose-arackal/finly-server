@@ -37,6 +37,22 @@ class Rules::Adapters::JSONLogic
     json
   end
 
+  # This is responsible for validating the rule with json_logic standards
+  def self.valid?(rule, options = {})
+    return true unless rule.is_a?(Rules::Rule)
+
+    json_logic_type = self.json_logic_type(rule, options)
+    return false if json_logic_type == :invalid
+
+    return false unless valid?(rule.attribute, options)
+
+    rule.values.each do |value|
+      return false unless valid?(value, options)
+    end
+
+    true
+  end
+
   protected
 
   def self.build_var(func, json_logic_type, options = {})
