@@ -3,6 +3,7 @@ IndexBuilder::Router.draw do
   scope 'admin' do
     route 'macros', Admin::Masters::Macros::Ops::Index
     route 'macro_jobs', Admin::Masters::Macros::Jobs::Index
+    route 'company_groups', Admin::CompanyGroups::Ops::Index
   end
 
   # Masters

@@ -17,6 +17,10 @@ Resolver::Router.draw do
     scope :macro_jobs do
       route 'default', Admin::Masters::Macros::Jobs::Resolver
     end
+
+    scope :company_groups do
+      route 'default', Admin::CompanyGroups::Resolver
+    end
   end
 
   # Masters

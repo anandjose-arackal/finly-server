@@ -3905,6 +3905,8 @@ Rails.application.routes.draw do
 
     get 'filters', to: "filters#index"
     get 'views', to: "index_view_segments#index"
+
+    resources :company_groups, only: [:create, :update, :index, :show]
   end
 
   post 'macros/:id/jobs', to: 'macro_jobs#create'
