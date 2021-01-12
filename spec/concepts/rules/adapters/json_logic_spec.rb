@@ -9,6 +9,13 @@ describe 'Rules::Adapters::JsonLogic' do
 
     context 'when rule is invalid' do
 
+      it 'should return empty hash' do
+        rule = Rules::Builder['line_items.description'].eq_any(entity: 'note')
+        json_logic = Rules::Adapters::JSONLogic.as_json(rule, model_klass: Invoice, controlling_field: 'credit_notes.name')
+
+        expect(json_logic.blank?).to be_truthy
+      end
+
     end
 
     context 'when controlling field is provided' do
