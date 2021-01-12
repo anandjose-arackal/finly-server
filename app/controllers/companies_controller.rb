@@ -1,4 +1,21 @@
 class CompaniesController < BaseControllers::WebBase
+  layout 'trailblazers', only: [:index, :show, :create, :update]
+
+  def index
+    endpoint Companies::Ops::Index
+  end
+
+  def create
+    endpoint Companies::Ops::Create
+  end
+
+  def update
+    endpoint Companies::Ops::Update
+  end
+
+  def show
+    endpoint Companies::Ops::Show
+  end
 
   def notify
     # todo

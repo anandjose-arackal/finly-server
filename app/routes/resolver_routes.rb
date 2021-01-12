@@ -23,6 +23,10 @@ Resolver::Router.draw do
     end
   end
 
+  scope :companies do
+    route 'default', Companies::Resolver
+  end
+
   # Masters
   scope :master_schemas do
     route 'default', Masters::Schema::Resolver

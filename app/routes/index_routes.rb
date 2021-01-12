@@ -5,6 +5,7 @@ IndexBuilder::Router.draw do
     route 'macro_jobs', Admin::Masters::Macros::Jobs::Index
     route 'company_groups', Admin::CompanyGroups::Ops::Index
   end
+  route 'companies', Companies::Ops::Index
 
   # Masters
   route "vendors", Masters::Vendors::Index

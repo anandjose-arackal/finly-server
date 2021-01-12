@@ -3911,6 +3911,7 @@ Rails.application.routes.draw do
 
   post 'macros/:id/jobs', to: 'macro_jobs#create'
 
+  resources :companies, only: [:create, :update, :index, :show]
 
   namespace :summary do
     get 'configurations', to: 'configuration#index'
