@@ -81,7 +81,7 @@ class Docs::UtilityBills::Bills::Ops::SyncBillPrePayment < Transactions::API
   def bill_validate(options, subscription)
     options['result'] = {}
     options['success'] = false
-    Bbps::BillValidation.call_async({params: subscription.generate_billfetch_params, current_user: User.first}, {wait: true}) do |op|
+    Bbps::BillValidation.call_async({params: subscription.generate_billfetch_params, current_user: User.first}, {wait: true, wait_timeout: 180.seconds}) do |op|
       op.success do |result|
         options['success'] = true
         options['result']['data'] = result
