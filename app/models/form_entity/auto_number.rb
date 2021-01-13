@@ -102,7 +102,7 @@ class FormEntity::AutoNumber < FormEntity
               required(:sequence) do
                 hash do
                   required(:prefix)
-                  required(:start_at).filled
+                  required(:start_at)
                 end
               end
             end
@@ -112,7 +112,7 @@ class FormEntity::AutoNumber < FormEntity
           sequence = value[:sequence]
           prefix = sequence&.dig(:prefix)
           start_at = sequence&.dig(:start_at)
-          # key.failure("prefix must be present") if prefix.blank?
+          key.failure("prefix must be present") if prefix.blank?
           key.failure("start_at must be present") if start_at.blank?
         end
       end
