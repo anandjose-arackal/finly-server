@@ -87,7 +87,7 @@ class Settlement::SMoneyRequests::Processing::Update < Settlement::SMoneyRequest
       request_params[:status_id] = MoneyRequestProcessorStatus.id_for(:completed)
       request_params[:completed_at] = DateTime.now
     end
-    request_params[:add_source_pocket] = false
+    params[:add_source_pocket] = false
   end
 
   def process
@@ -109,7 +109,7 @@ class Settlement::SMoneyRequests::Processing::Update < Settlement::SMoneyRequest
     end
 
     #adding  money user pocket: if user individually marking as completed
-    add_source_pocket(mapping) if request_params[:marked_as_completed] || request_params[:add_source_pocket] 
+    add_source_pocket(mapping) if request_params[:marked_as_completed] || params[:add_source_pocket] 
   end
 
   def post_process
@@ -195,7 +195,7 @@ class Settlement::SMoneyRequests::Processing::Update < Settlement::SMoneyRequest
       status = MoneyRequestProcessorStatus.id_for(:completed)
       self.mapping.update status_id: status
       mark_credited(mapping)
-      request_params[:add_source_pocket] = true
+      params[:add_source_pocket] = true
     end
   end
 
