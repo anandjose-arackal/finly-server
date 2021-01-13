@@ -200,6 +200,9 @@ class Settlement::SMoneyRequests::Processing::Update < Settlement::SMoneyRequest
   end
 
   def mark_credited(mapping)
+    request_status = MoneyRequestStatus.id_for(:credited)
+    request_tracking_status = MoneyRequestTrackingAction.id_for(:credited)
+
     money_request_ids = []
       mapping.money_requests.where.not(status_id: MoneyRequestStatus.id_for(:credited)).each do |money_request|
         # explicitly settle money request when called from batch level
