@@ -21,7 +21,7 @@ gem 'cronex', '~> 0.10'
 gem 'daemons', '~> 1.3.1'
 # gem 'stomp', '~> 1.4.8'
 # gem 'activemessaging'
-gem "sentry-raven", '~> 3.1.1'
+gem "sentry-raven", '~> 2.13'
 # grm for mocking and stubbing in test cases
 
 gem 'devise-pwned_password', '~> 0.1'
@@ -157,8 +157,8 @@ gem 'gcm', '~> 0.1.1'
 gem 'bootstrap-will_paginate', '~> 1.0'
 # gem for image manipulation
 gem 'paperclip', '~> 6.1.0'
-gem 'paperclip-azure', '~> 0.3.0'
-gem 'active_storage_validations', '~> 0.9.2'
+gem 'paperclip-azure', '~> 1.0'
+gem 'active_storage_validations', '~> 0.9.0'
 # Bundle for Bootstrap
 gem 'bootstrap-sass', '~> 3.4.0'
 
@@ -201,8 +201,8 @@ gem 'devise', '~> 4.7'
 gem 'devise_invitable', '~> 2.0', '>= 2.0.2'
 gem 'doorkeeper', '~> 5.0.2'
 
-gem 'faraday', '~> 1.3.0'
-gem 'faraday_middleware', '~> 1.0.0'
+gem 'faraday', '~> 0.17.3'
+gem 'faraday_middleware', '~> 0.14.0'
 
 gem 'posthog-ruby', '~> 1.0'
 # gem for xml parsing
@@ -263,7 +263,7 @@ gem 'paper_trail-association_tracking', '~> 2.1.1'
 gem 'paper_trail-globalid', '~> 0.2.0'
 group :development, :test do
   gem 'byebug'
-  gem 'pry', '~> 0.12.2'  
+  gem 'pry', '~> 0.12.2'
   gem 'rb-readline', '~> 0.5'
   gem 'capistrano', '~> 3.11.0'
   gem 'capistrano3-puma', '~> 5.0'

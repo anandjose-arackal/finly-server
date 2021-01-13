@@ -2,14 +2,24 @@
 #
 # Table name: versions
 #
-#  id             :integer          not null, primary key
-#  item_type      :string(191)      not null
-#  item_id        :integer          not null
-#  event          :string(255)      not null
-#  whodunnit      :string(255)
-#  object         :text(4294967295)
-#  created_at     :datetime
-#  transaction_id :integer
+#  id                   :integer          not null, primary key
+#  item_type            :string(191)      not null
+#  item_id              :integer          not null
+#  event                :string(255)      not null
+#  whodunnit            :string(255)
+#  object               :text(4294967295)
+#  created_at           :datetime
+#  transaction_id       :integer
+#  user_ip              :string(255)
+#  user_agent           :string(255)
+#  object_changes       :text(65535)
+#  item_subtype         :string(255)
+#  company_id           :integer
+#  deleted_at           :datetime
+#  created_by_id        :integer
+#  document_number      :string(255)
+#  parent_document_type :string(255)
+#  user_transaction_id  :string(255)
 #
 class AuditTrail < PaperTrail::Version
   include Exposures::Model::Exposable
