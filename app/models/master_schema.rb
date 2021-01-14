@@ -66,9 +66,14 @@ class MasterSchema < ApplicationRecord
 
   def as_json(options = {})
     {
-        name: name,
-        master_key: master_key,
-        entities: entities
+      id: id,
+      name: name,
+      master_key: master_key,
+      entities: entities,
+      created_at: created_at,
+      updated_at: updated_at,
+      active: active,
+      system_master: system_master,
     }
   end
 

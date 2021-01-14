@@ -1,4 +1,5 @@
 class Masters::SchemasController < BaseControllers::WebBase
+  layout 'trailblazers'
 
   def create
     endpoint Masters::Schema::Ops::Create
@@ -8,9 +9,9 @@ class Masters::SchemasController < BaseControllers::WebBase
     endpoint Masters::Schema::Ops::Update
   end
 
-  def index
-    endpoint Masters::Schema::Ops::Index
-  end
+  # def index
+  #   endpoint Masters::Schema::Ops::Index
+  # end
 
   def show
     endpoint Masters::Schema::Ops::Show

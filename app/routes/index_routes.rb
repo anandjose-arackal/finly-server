@@ -31,4 +31,6 @@ IndexBuilder::Router.draw do
 
   # Others
   route 'import_jobs', ImportJobs::Index
+
+  route 'master_schemas', Masters::Schema::Ops::Index
 end

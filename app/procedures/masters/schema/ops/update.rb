@@ -7,7 +7,7 @@ class Masters::Schema::Ops::Update < Masters::Schema::Ops::Base
   step Contract::Validate()
   step Contract::Persist()
   # step Masters::Schema::Ops::MigrationRunner::Build()
-  step Transactions::Messages::SuccessMessage('Saved')
+  step Transactions::Messages::SuccessMessage('Master Schema Updated')
 
 
 end

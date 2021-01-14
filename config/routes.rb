@@ -4435,7 +4435,7 @@ Rails.application.routes.draw do
 
 
     post '/', to: 'schemas#create'
-    patch '/:id', to: 'schemas#update'
+    put '/:id', to: 'schemas#update'
     get '/', to: "schemas#index"
     get '/:id', to: 'schemas#show'
   end
