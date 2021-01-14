@@ -85,7 +85,7 @@ class FormEntity::Number < FormEntity
             hash do
               optional(:min_value).value(:int?)
               optional(:max_value).value(:int?)
-              optional(:format).value(included_in?: FORMAT)
+              optional(:format)
             end
           end
         end

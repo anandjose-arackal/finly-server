@@ -111,13 +111,13 @@ class FormEntity::Date < FormEntity
         params do
           required(:options) do
             hash do
-              optional(:restriction).value(included_in?: RESTRICTIONS)
+              optional(:restriction)
             end
           end
         end
         rule(:options) do
-          restriction = value[:restriction]
-          key.failure("> restriction must be one of #{FormEntity::Date::RESTRICTIONS.join(", ")}") if FormEntity::Date::RESTRICTIONS.exclude?(restriction) && restriction.present?
+          restriction = value[:restriction].to_s
+          key.failure("> restriction must be one of #{FormEntity::Date::RESTRICTIONS.join(", ")}") if restriction.present? && FormEntity::Date::RESTRICTIONS.exclude?(restriction)
         end
       end
     end
