@@ -9,9 +9,9 @@ class Admin::CompanyGroupsController < BaseControllers::AdminBase
     endpoint Admin::CompanyGroups::Ops::Update
   end
 
-  def index
-    endpoint Admin::CompanyGroups::Ops::Index
-  end
+  # def index
+  #   endpoint Admin::CompanyGroups::Ops::Index
+  # end
 
   def show
     endpoint Admin::CompanyGroups::Ops::Show
