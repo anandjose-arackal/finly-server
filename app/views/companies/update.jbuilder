@@ -7,4 +7,7 @@ json.data do
     json.start_date @op['model'].configuration&.start_date
     json.end_date @op['model'].configuration&.end_date
   end
+  json.created_at @op['model'].created_at
+  json.updated_at @op['model'].updated_at
+  json.active @op['model'].active
 end
