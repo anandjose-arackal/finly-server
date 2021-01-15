@@ -15,6 +15,11 @@ module Masters::Entity::Exposure
     master_schema = self
     @record_exposure_class = Class.new(Exposures::API) do
       attribute :id, record_attribute: true
+      attribute :created_at, record_attribute: true
+      attribute :updated_at, record_attribute: true
+      attribute :start_date, record_attribute: true
+      attribute :end_date, record_attribute: true
+      attribute :created_by, record_attribute: true, exposure: true
 
       master_schema.entities.each do |entity|
         if entity.type?(:lookup) or entity.type?(:parent_lookup)
