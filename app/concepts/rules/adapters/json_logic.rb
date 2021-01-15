@@ -57,9 +57,10 @@ class Rules::Adapters::JSONLogic
 
   def self.build_var(func, json_logic_type, options = {})
     prefix_map = { form: 'form.', row: 'row.', some: nil }.with_indifferent_access
-    prefix = prefix_map[json_logic_type]
 
     if func.class <= Hash
+      prefix = prefix_map[json_logic_type]
+
       if func[:value].present? or func[:formula].present?
         return func[:value]&.to_s&.strip || func[:formula]&.to_s&.strip
       else
@@ -91,6 +92,8 @@ class Rules::Adapters::JSONLogic
   #     - Some
   #         - Source/Value: Line Item
   def self.json_logic_type(rule, options = {})
+    return :none if rule.attribute.is_a?(Rules::Rule)
+
     model_klass = options[:model_klass]
     controller = options[:controlling_field]
     controller_collection_parent = collection_association_name(model_klass, controller)
