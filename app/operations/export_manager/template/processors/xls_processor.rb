@@ -19,7 +19,19 @@ class ExportManager::Template::Processors::XlsProcessor < ExportManager::Templat
       end
 
       row.build.each_with_index do |item, column|
-        worksheet.write(index, column, item)
+        # #TO DO START
+        #  WriteXLSX have different method to write date, string, number, curreny and blank
+        #  using these method will help to xls file processing more fastly
+        #  need to introdue column format type in export template to indtroduece these methods
+
+        #  eg:write_string
+        #     write_number
+        #     workbook.add_format({:num_format => 'dd-mm-yyyy'})
+        #     write_date_time
+        # #TO DO END
+
+        worksheet.write_string(index, column, item)
+        #worksheet.write(index, column, item)
       end
 
       progress_update(index, force_update: false)
