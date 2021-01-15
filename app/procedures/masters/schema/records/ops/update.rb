@@ -13,6 +13,6 @@ class Masters::Schema::Records::Ops::Update < Masters::Schema::Records::Base
   step Contract::Build()
   step Contract::Validate()
   step Contract::Persist()
-  step Transactions::Messages::SuccessMessage('Saved')
+  step Transactions::Messages::SuccessMessage('Record Updated')
 
 end

@@ -74,7 +74,11 @@ class Masters::JsonBuilder
   def build_record(record)
     return nil if record.blank?
 
-    json = {id: record.id}
+    json = {
+      id: record.id,
+      created_at: record.created_at,
+      updated_at: record.updated_at,
+    }
     if master_schema.primary_entity_key.present?
       json[:display_name] = record.send(master_schema.primary_entity_key)
     end

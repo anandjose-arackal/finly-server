@@ -4411,7 +4411,7 @@ Rails.application.routes.draw do
         post '/', to: 'records#create'
         get '/', to: 'records#index'
         get '/:id', to: 'records#show'
-        patch '/:id', to: 'records#update'
+        put '/:id', to: 'records#update'
         delete '/:id', to: 'records#destroy'
       end
 

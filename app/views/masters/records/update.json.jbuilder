@@ -1,1 +1,0 @@
-json.data @op[:model]

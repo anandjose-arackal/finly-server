@@ -10,7 +10,7 @@ class Masters::Schema::Records::Ops::Destroy < Masters::Schema::Records::Base
   step RecordModel(:find)
   step Policy::Pundit(Masters::Schema::Records::Policy, :destroy?)
   step :destroy
-  step Transactions::Messages::SuccessMessage('Deleted')
+  step Transactions::Messages::SuccessMessage('Record Deleted')
 
   def destroy(context, model:, **)
     model.destroy
