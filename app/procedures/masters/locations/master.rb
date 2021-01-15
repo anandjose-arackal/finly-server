@@ -12,7 +12,7 @@ class Masters::Locations::Master < Masters::API
     text :city
     # text :state # Todo
     text :country
-    text :pin_code
+    text :pin
     switch :billable_location
     switch :shippable_location
     text :tax_registration_number
