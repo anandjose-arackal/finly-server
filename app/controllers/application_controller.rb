@@ -479,7 +479,7 @@ class ApplicationController < ActionController::Base
   FILE_LOGGER = LogStashLogger.new(type: :file, path: "log/logstash_query_details.log", sync: true)
 
   def set_cache_buster
-    response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate"
+    response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate, proxy-revalidate"
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "Fri, 01 Jan 1990 00:00:00 GMT"
   end
