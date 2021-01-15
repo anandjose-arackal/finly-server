@@ -18,8 +18,8 @@ class BudgetManager::BudgetsCalculator::Calculate::PurchaseRequestItemsBudgetsPr
         department_id: purchase_request_item.purchase_request.department_id,
         date: purchase_request_item.purchase_request.created_at,
         entity_created_at: purchase_request_item.purchase_request.created_at,
-        entity_submitted_at: purchase_request_item.purchase_request.submitted_at,
-        entity_status_id: purchase_request_item.status_id,
+        entity_submitted_at: (purchase_request_item.purchase_request.submitted_at || purchase_request_item.purchase_request.created_at),
+        entity_status_id: purchase_request_item.purchase_request.purchase_request_status_id,
         amount_attributes: {
             id: trail&.amount&.id,
             value: purchase_request_item.estimated_amount&.value,

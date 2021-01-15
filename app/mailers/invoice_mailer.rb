@@ -24,7 +24,7 @@ class InvoiceMailer < ApplicationMailer
     # }
     # ###########################################
 
-    mail from: "#{@invoice.company.name} <noreply@finly.io>", :reply_to => "#{@invoice.user.email}", to: options[:email_to], bcc: options[:email_bcc], subject: options[:email_subject], template_name: 'send_to_customer'
+    mail from: "#{@invoice.company.name} <noreply@finlyhq.com>", :reply_to => "#{@invoice.user.email}", to: options[:email_to], bcc: options[:email_bcc], subject: options[:email_subject], template_name: 'send_to_customer'
   end
 
   def auto_remind_customer(invoice)
@@ -41,7 +41,7 @@ class InvoiceMailer < ApplicationMailer
                  footer: { html: { template: 'invoice_mailer/invoice_footer.html.erb' }})
     )
     ###########################################
-    mail from: "#{@invoice.company.name} <noreply@finly.io>", :reply_to => "#{@invoice.user.email}", to: @invoice.email, subject: @options[:email_subject], template_name: 'send_to_customer'
+    mail from: "#{@invoice.company.name} <noreply@finlyhq.com>", :reply_to => "#{@invoice.user.email}", to: @invoice.email, subject: @options[:email_subject], template_name: 'send_to_customer'
   end
 
   def payment_notify(presenter)
@@ -54,7 +54,7 @@ class InvoiceMailer < ApplicationMailer
                  footer: { html: { template: 'invoice_mailer/invoice_footer.html.erb' }})
     )
     ###########################################
-    mail from: "#{@invoice.company.name} <noreply@finly.io>", :reply_to => "#{@invoice.user.email}", to: @options.email_to, subject: @options.email_subject, template_name: 'send_to_customer'
+    mail from: "#{@invoice.company.name} <noreply@finlyhq.com>", :reply_to => "#{@invoice.user.email}", to: @options.email_to, subject: @options.email_subject, template_name: 'send_to_customer'
   end
 
 end

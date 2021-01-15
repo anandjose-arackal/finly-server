@@ -83,7 +83,10 @@ class UserRole < ApplicationRecord
       # Payment Agreement Invoice
       agreement_invoice_initiator: 49,
       agreement_invoice_reviewer: 50,
-      agreement_invoice_auditor: 51
+      agreement_invoice_auditor: 51,
+
+      # Export Manager
+      export_manager: 52,
   }
   ### ENSURE SECURITY POLICY IS CONFIGURED FOR THE USER ROLE in SecurityPolicy::Config ###
 

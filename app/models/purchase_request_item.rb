@@ -69,6 +69,12 @@ class PurchaseRequestItem < ApplicationRecord
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 
+  has_paper_trail(
+      meta: {
+          parent_document_type: "Purchase Request"
+      }
+  )
+
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
 
@@ -215,7 +221,7 @@ class PurchaseRequestItem < ApplicationRecord
     # else
     #   BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(self)
     # end
-    if self.purchase_request.draft? || self.purchase_request.rejected? || self.purchase_request.retracted? || self.purchase_request.cancelled?
+    if self.purchase_request.rejected? || self.purchase_request.cancelled?
       BudgetManager::BudgetsCalculator::Calculate::PurchaseRequestItemsBudgetsProcessor.new.destroy_trail(self)
     else
       BudgetManager::BudgetsCalculator::Calculate::PurchaseRequestItemsBudgetsProcessor.new.save_trail(self)

@@ -8,6 +8,8 @@ class ExportManager::Master::UtilityBills::Subscriptions::Index < ExportManager:
   resolver 'utility_subscriptions.default'
   handle :utility_bill_masters
 
+  has_template true
+
   attribute :id
   attribute :bbps_biller_id
   attribute :name

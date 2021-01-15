@@ -29,6 +29,14 @@ json.custom_fields do
     json.set! custom_field.field_configuration&.field_name, custom_field.configured_field_value
   end
 end
+
+json.form_custom_fields do
+  json.array! record.form_custom_fields.each do |form_custom_field|
+    json.name form_custom_field.form_entity.label
+    json.field_key form_custom_field.field_key
+    json.field_value form_custom_field.retrieve_text_value
+  end
+end
 json.approval_workflow record.dlrms do |dlrm|
   json.partial! 'macros/v1/shared/approval_workflow', dlrm: dlrm
 end

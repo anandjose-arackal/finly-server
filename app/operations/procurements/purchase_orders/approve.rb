@@ -15,7 +15,7 @@ class Procurements::PurchaseOrders::Approve < Procurements::PurchaseOrders::Base
       return
     end
 
-    if self.purchase_order.bank_account.disabled
+    if self.purchase_order.bank_account&.disabled
       add_message :error, "This purchase order has a bank account which is disabled. Payment can only be processed to active bank accounts"
       return
     end
@@ -60,7 +60,6 @@ class Procurements::PurchaseOrders::Approve < Procurements::PurchaseOrders::Base
   end
 
   def post_process
-    budget_limit_validation( purchase_order )
     # role_id = self.workflow_output[:role_id]
     Event::EPurchaseOrder::Approve.(user, purchase_order: purchase_order, workflow_output: workflow_output)
     add_message :success, 'Successfully Approved Purchase Order'

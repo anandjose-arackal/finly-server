@@ -21,10 +21,10 @@ module Rules::Predicates
     true
   end
 
-  def self.to_number(arr)
+  def self.to_valid_format(arr)
     arr.map {|val|
-      if val.respond_to?(:strftime)
-        val.strftime("%s").to_f
+      if val =~ Constants::VALID_DATE_FORMAT
+        val.to_datetime.to_f
       else
         val.to_f
       end
@@ -93,20 +93,20 @@ module Rules::Predicates
   # end
 
   predicate :lt do |v, d|
-    Rules::Predicates.to_number(v).each_cons(2).all? { |i, j| i < j }
+    Rules::Predicates.to_valid_format(v).each_cons(2).all? { |i, j| i < j }
     # v.map(&:to_f).each_cons(2).all? { |i, j| i < j }
   end
 
   predicate :lteq do |v, d|
-    Rules::Predicates.to_number(v).each_cons(2).all? { |i, j| i <= j }
+    Rules::Predicates.to_valid_format(v).each_cons(2).all? { |i, j| i <= j }
   end
 
   predicate :gt do |v, d|
-    Rules::Predicates.to_number(v).each_cons(2).all? { |i, j| i > j }
+    Rules::Predicates.to_valid_format(v).each_cons(2).all? { |i, j| i > j }
   end
 
   predicate :gteq do |v, d|
-    Rules::Predicates.to_number(v).each_cons(2).all? { |i, j| i >= j }
+    Rules::Predicates.to_valid_format(v).each_cons(2).all? { |i, j| i >= j }
   end
 
   # Fixme: check if in is really required as it is is covered by eq_any case in the context of form rules
@@ -121,27 +121,27 @@ module Rules::Predicates
   # end
 
   predicate :cont, any: true, all: true do |v, d|
-    v[0]&.include?(v[1])
+    v[0].to_s.include?(v[1].to_s)
   end
 
   predicate :not_cont, any: true, all: true do |v, d|
-    !v[0]&.include?(v[1])
+    !v[0].to_s.include?(v[1].to_s)
   end
 
   predicate :start do |v, d|
-    v[0]&.start_with?(v[1])
+    v[0].to_s.start_with?(v[1])
   end
 
   predicate :not_start do |v, d|
-    !v[0]&.start_with?(v[1])
+    !v[0].to_s.start_with?(v[1])
   end
 
   predicate :end do |v, d|
-    v[0]&.end_with?(v[1])
+    v[0].to_s.end_with?(v[1].to_s)
   end
 
   predicate :not_end do |v, d|
-    !v[0]&.end_with?(v[1])
+    !v[0].to_s.end_with?(v[1].to_s)
   end
 
   predicate :true do |v, d|
@@ -153,19 +153,19 @@ module Rules::Predicates
   end
 
   predicate :present do |v, d|
-    v[0]&.present?
+    v[0].present?
   end
 
   predicate :blank do |v, d|
-    v[0]&.blank?
+    v[0].blank?
   end
 
   predicate :null do |v, d|
-    v[0]&.null?
+    v[0].nil?
   end
 
   predicate :not_null do |v, d|
-    !v[0]&.null?
+    !v[0].nil?
   end
 
 end

@@ -1,5 +1,6 @@
 class Procurements::PurchaseOrders::Base < BaseOperation
-  attr_accessor :workflow_output
+  attr_accessor :workflow_output, :budget_contributions_before_update
+
   def pre_validate
     if user.blank? || params.blank?
       add_message :error, "Invalid parameters, try again"
@@ -67,13 +68,16 @@ class Procurements::PurchaseOrders::Base < BaseOperation
     end
   end
 
-  def budget_limit_validation purchase_order
-    if user.company.feature_subscription.enforce_budget_limit
-      op = BudgetManager::BudgetLimitValidator::ValidatePurchaseOrder.(user, { purchase_order: purchase_order })
-      if op.messages[:error].present?
-        return add_message :error, op.messages[:error]
-      end
-    end    
+  def fetch_budget_contributions(purchase_order)
+    if user.company.enforce_budget_configuration.enforce_purchase_order_budget?
+      op = BudgetManager::BudgetLimitValidator::PurchaseOrder.({ purchase_order: purchase_order, ignore_unbudgetables: true, current_user: user })
+      self.budget_contributions_before_update = op['result'][:budget_contributions] rescue {}
+    end
+  end
+
+  def budget_limit_validation(purchase_order)
+    if user.company.enforce_budget_configuration.enforce_purchase_order_budget?
+      return BudgetManager::BudgetLimitValidator::PurchaseOrder.({ purchase_order: purchase_order, previous_budget_contributions: self.budget_contributions_before_update, current_user: user })
+    end
   end
 end
-

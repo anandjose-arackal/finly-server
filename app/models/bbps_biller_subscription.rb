@@ -59,7 +59,7 @@
 
 class BbpsBillerSubscription < ApplicationRecord
   include Sequenced::ActsAsSequenced
-  include SoftDeletable, Transitionable
+  include SoftDeletable, Transitionable, ControllingUser
   include EventProducer
   # include SearchIndex::Concerns::Document
 include Searchkick::Api

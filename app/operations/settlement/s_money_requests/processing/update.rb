@@ -87,13 +87,14 @@ class Settlement::SMoneyRequests::Processing::Update < Settlement::SMoneyRequest
       request_params[:status_id] = MoneyRequestProcessorStatus.id_for(:completed)
       request_params[:completed_at] = DateTime.now
     end
+    params[:add_source_pocket] = false
   end
 
   def process
     self.mapping.assign_attributes(request_params)
 
     if self.mapping.valid?
-      self.mapping.save      
+      self.mapping.save
       update_status
       update_mapping_data if request_params[:marked_as_completed] # only update mr and its tracks if mapping is not completed
     else
@@ -106,6 +107,9 @@ class Settlement::SMoneyRequests::Processing::Update < Settlement::SMoneyRequest
     else
       params[:redirect] = false
     end
+
+    #adding  money user pocket: if user individually marking as completed
+    add_source_pocket(mapping) if request_params[:marked_as_completed] || params[:add_source_pocket] 
   end
 
   def post_process
@@ -190,6 +194,46 @@ class Settlement::SMoneyRequests::Processing::Update < Settlement::SMoneyRequest
     if data.compact.present? and (data.compact.count == self.mapping.money_requests.count)
       status = MoneyRequestProcessorStatus.id_for(:completed)
       self.mapping.update status_id: status
+      mark_credited(mapping)
+      params[:add_source_pocket] = true
+    end
+  end
+
+  def mark_credited(mapping)
+    request_status = MoneyRequestStatus.id_for(:credited)
+    request_tracking_status = MoneyRequestTrackingAction.id_for(:credited)
+
+    money_request_ids = []
+      mapping.money_requests.where.not(status_id: MoneyRequestStatus.id_for(:credited)).each do |money_request|
+        # explicitly settle money request when called from batch level
+        money_request_ids << money_request.id
+        money_request.tracks.create action_user_id: self.money_request_processor.created_by_user_id,
+                                    action_user_role_id: self.money_request_processor.created_by_user_role_id,
+                                    money_request_tracking_action_id: request_tracking_status,
+                                    status_id: request_status,
+                                    payment: mapping.payment
+      end
+
+      mapping.money_requests.where(id: money_request_ids).update_all(controlling_user_id: nil, controlling_user_role_id: nil,
+                                                                     controlling_for_user_id: nil, controlling_for_user_role_id: nil,
+                                                                     status_id: request_status, payment_id: mapping.payment&.id)
+  end
+
+  def add_source_pocket(mapping)
+    if money_request_processor.bank_transfer?
+      purpose = :advance
+    else
+      purpose = :advance_outside_finly
+    end
+    user = mapping.user
+    amount = mapping.amount.value
+    destination_pocket = mapping.money_requests.first.destination_pocket
+    payment_request = PaymentRequest.(user, nil, UserPocket.name, :credit, purpose)
+    payment_request.add_payment_item(PaymentRequest::PaymentItem.(user, destination_pocket, amount, reference_resource: mapping.payment))
+    op = AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
+    if op.success?
+      coh_payment = op.payments.first
+      mapping.payment.update(reference_payment_id: coh_payment.id) if mapping.payment.present?
     end
   end
 

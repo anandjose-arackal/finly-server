@@ -142,6 +142,14 @@ class PaymentStatus < ApplicationRecord
     ]
   end
 
+  # Status IDs for budget trails which are not calculated into budgets
+  def self.status_ids_for_unbudgetables
+    [
+      PaymentStatus.id_for(:cancelled),
+      PaymentStatus.id_for(:pending_retry),
+    ]
+  end
+
   def as_json(options = nil)
     {
         id: id,

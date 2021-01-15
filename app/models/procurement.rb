@@ -24,7 +24,6 @@ class Procurement < ApplicationRecord
   include SoftDeletable, FindByOrderedIds, Sequenced::ActsAsSequenced
 
   acts_as_sequenced column: :transaction_id, purpose: :procurement, editable: false
-
   # procurement_type ['purchase_order', 'invoice', 'non_po_invoice'] # will be moved to model
 
   belongs_to :user, optional: true
@@ -35,7 +34,7 @@ class Procurement < ApplicationRecord
 
   has_one :purchase_order, -> { where.not purchase_order_status_id: PurchaseOrderStatus.id_for(:po_revised) }, dependent: :destroy
   # has_many :po_revisions, -> { where purchase_order_status_id: PurchaseOrderStatus.id_for(:po_revised) }, class_name: 'PurchaseOrder', dependent: :destroy
-  # has_many :po_revisions, class_name: 'PurchaseOrder', dependent: :destroy, foreign_key: :revised_po_id
+  has_many :po_revisions, class_name: 'PurchaseOrder', dependent: :destroy, foreign_key: :revised_po_id
   has_many :inward_documents, dependent: :destroy
   has_many :invoices, dependent: :destroy
   has_many :proforma_invoices, class_name: 'Invoice', dependent: :destroy, foreign_key: :proforma_invoice_id
@@ -608,10 +607,6 @@ class Procurement < ApplicationRecord
 
   def po_procurement?
     self.procurement_type == 'purchase_order'
-  end
-
-  def po_revisions
-    PurchaseOrder.where( purchase_order_status_id: PurchaseOrderStatus.id_for(:po_revised), procurement_id: id )
   end
 
   def as_json

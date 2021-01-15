@@ -1,9 +1,8 @@
 class Menu::Masters::Procurement < Menu::API
 
   def self.accept?(user)
-    user.user_panel_subscription.yes_bank_account_transfer
+    user.user_panel_subscription&.yes_bank_account_transfer
   end
-
   app :vp
 
   item :global_search, label: "Search (Alt+/)", icon: 'https://img.icons8.com/windows/20/ffffff/search.png',
@@ -101,6 +100,7 @@ class Menu::Masters::Procurement < Menu::API
 
   item :manage, icon: 'https://img.icons8.com/windows/20/ffffff/commercial-development-management.png' do
     item :analytics, permissions: [:admin], features: :analytics_system
+    item :analytics_dashboards, label: 'Insights', permissions: [:admin], toggle: [AnalyticsToggle, :enabled?]
     item :vendors, permissions: Masters::Vendors::Index.permissions
     item :items, permissions: Masters::Items::Index.permissions
     item :rate_contracts, permissions: Masters::RateContracts::Index.permissions, features: :procurement
@@ -109,6 +109,8 @@ class Menu::Masters::Procurement < Menu::API
     item :credit_notes, permissions: Docs::P2P::CreditNotes::Index.permissions, features: :procurement
     item :utility_subscriptions, permissions: Docs::UtilityBills::Subscriptions::Index.permissions, features: :utility_bills_enabled
     item :users, permissions: [:admin]
+    item :audit_trails, permissions: Docs::AuditTrails::Index.permissions, toggle: [AuditTrailsToggle, :enabled?]
+
   end
 
   item :accounts, icon: 'https://img.icons8.com/windows/20/ffffff/wallet.png' do

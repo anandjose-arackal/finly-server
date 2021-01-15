@@ -79,17 +79,17 @@ class FormEntity::Currency < FormEntity
     Proc.new do
       validation :options_config do
         params do
-          required(:options) do
-            hash do
-              required(:currencies).array do
-                hash do
-                  required(:currency)
-                  # required(:currency_code).filled(included_in?: CURRENCIES.map {|item| item[:currency_code]})
-                  # optional(:symbol).value(included_in?: CURRENCIES.map {|item| item[:symbol]})
-                end
-              end
-            end
-          end
+          # required(:options) do
+          #   # hash do
+          #   #   required(:currencies).array do
+          #   #     # hash do
+          #   #     #   required(:currency)
+          #   #     #   # required(:currency_code).filled(included_in?: CURRENCIES.map {|item| item[:currency_code]})
+          #   #     #   # optional(:symbol).value(included_in?: CURRENCIES.map {|item| item[:symbol]})
+          #   #     # end
+          #   #   end
+          #   # end
+          # end
         end
 
           # rule(:options) do

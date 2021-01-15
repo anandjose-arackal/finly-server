@@ -40,6 +40,10 @@ Resolver::Router.draw do
     route 'default', Insights::Resolver
   end
 
+  scope :analytics_dashboards do
+    route 'default', AnalyticsDashboard::Resolver
+  end
+
   scope :categories do
     route 'default', Masters::Categories::Resolver
   end
@@ -117,6 +121,10 @@ Resolver::Router.draw do
     route "agreement", Docs::P2P::Invoices::Agreement::Resolver
   end
 
+  scope :invoice_line_items do
+    route "default", Docs::P2P::Invoices::InvoiceLineItems::Resolver
+  end
+
   scope :purchase_requests do
     route 'default', Docs::P2P::PurchaseRequests::Resolver
   end
@@ -124,6 +132,10 @@ Resolver::Router.draw do
   scope :purchase_orders do
     route 'default', Docs::P2P::PurchaseOrders::Resolver
     route 'advances', Docs::P2P::PurchaseOrders::Advances::Resolver
+  end
+
+  scope :purchase_order_items do
+    route 'default', Docs::P2P::PurchaseOrders::PurchaseOrderItems::Resolver
   end
 
   scope :inward_documents do
@@ -153,6 +165,22 @@ Resolver::Router.draw do
 
   scope :reports do
     route 'default', Docs::ExpenseManagement::Reports::Resolver
+  end
+
+  scope :audit_trails do
+    route 'default', Docs::AuditTrails::Resolver
+  end
+
+  scope :export_templates do
+    route 'default', Masters::ExportTemplates::Resolver
+  end
+
+  scope :export_formats do
+    route 'default', Masters::ExportFormats::Resolver
+  end
+
+  scope :export_resources do
+    route 'default', Masters::ExportResources::Resolver
   end
 
   scope :import_jobs do

@@ -23,7 +23,7 @@ class PaymentAgreements::Update < PaymentAgreements::Base
       end
     end
     validate_item_quantity
-    ActiveRecord::Base.transaction do
+    ActiveRecord::Base.transaction(requires_new: true) do
       if self.payment_agreement.save
         validate_invoice_line_items unless has_errors?
         validate_prepaid_consistency unless has_errors? 
@@ -45,7 +45,7 @@ class PaymentAgreements::Update < PaymentAgreements::Base
 
   def process
     clear_expiration_date_on_no_expiration
-    ActiveRecord::Base.transaction do
+    ActiveRecord::Base.transaction(requires_new: true) do
       return if has_errors?
       if self.payment_agreement.general_invoices.present?
         self.payment_agreement.general_invoices.each do |general_invoice|

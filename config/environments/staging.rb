@@ -6,6 +6,10 @@ Rails.application.configure do
   # Code is not reloaded between requests.
   config.cache_classes = true
 
+  config.active_record.enable_retry = true
+  config.active_record.execution_tries = 5 # times
+  config.active_record.execution_retry_wait = 1.5 # sec
+
   # Eager load code on boot. This eager loads most of Rails and
   # your application in memory, allowing both threaded web servers
   # and those relying on copy on write to perform better.

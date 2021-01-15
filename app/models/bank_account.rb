@@ -24,6 +24,8 @@
 #  deleted_at             :datetime
 #  on_hold                :boolean          default(FALSE)
 #  bank_account_master_id :integer
+#  verified               :boolean
+#  swift_code             :string(255)
 #
 
 class BankAccount < ApplicationRecord
@@ -40,6 +42,12 @@ class BankAccount < ApplicationRecord
 
   has_many :form_custom_fields, class_name: 'FormCustomField', as: :document
   # belongs_to :company_id
+  has_paper_trail(
+      meta: {
+          parent_document_type: "Vendor",
+          document_number: Proc.new { |document| document.account_owner.try(:vendor_id) }
+      }
+  )if Proc.new { |bank_account| bank_account.account_owner_type == 'YesBankVendor'}
 
   attr_accessor :confirm_account_number
 
@@ -63,6 +71,7 @@ class BankAccount < ApplicationRecord
   scope :default_accounts, -> { where(default_account: true).non_deleted}
   scope :non_deleted, -> {where deleted_at: nil}
   scope :enabled, -> {where disabled: false}
+  singleton_class.send(:alias_method, :filter_active, :enabled)
   scope :with_owner_id, -> (owner_id) {
     where account_owner_id: owner_id
   }

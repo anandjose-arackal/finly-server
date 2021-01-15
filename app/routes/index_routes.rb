@@ -25,6 +25,7 @@ IndexBuilder::Router.draw do
   route 'receive', Docs::P2P::Inwards::Pending::Index
   route 'receive_history', Docs::P2P::Inwards::Received::Index
   route 'credit_notes', Docs::P2P::CreditNotes::Index
+  route 'audit_trails', Docs::AuditTrails::Index
 
   # Others
   route 'import_jobs', ImportJobs::Index
