@@ -8,7 +8,7 @@ class User::Password::SendResetPasswordOtp < BaseOperation
 
   def validate
     if selected_user.blank?
-      messages[:error] << "User not found. Please enter your registered mobile number"
+      messages[:error] << "Invalid Credentials"
       return
     end
     if selected_user.otp.present? and selected_user.otp_sent_at > OTP_RESEND_TIMER.seconds.ago
