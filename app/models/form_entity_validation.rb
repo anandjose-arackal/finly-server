@@ -56,8 +56,7 @@ class FormEntityValidation < ApplicationRecord
 
   def valid_rule?
     return if rule.blank?
-
-    unless rule.valid?(controlling_field: referencable)
+    unless rule.valid?(controlling_field: form_entity)
       errors.add :rule, 'is not valid'
     end
   end
