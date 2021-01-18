@@ -30,6 +30,7 @@ class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
   end
 
   def process
+    self.purchase_order.paper_trail_event = "Destroy"
     self.po_available = true
     if self.procurement.po_revisions.present?
       if self.purchase_order.destroy
@@ -61,7 +62,7 @@ class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
   end
 
   def post_process
-    if po_available
+    if po_available & self.po_previous_status.present?
       if self.procurement.po_revisions.reload.present?
         po = self.procurement.reload.po_revisions.last
         po.purchase_order_status_id = self.po_previous_status
@@ -90,7 +91,7 @@ class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
       ps = self.previously_active_po&.trails.where(action_id: [TrailAction.id_for(:approve), TrailAction.id_for(:auto_approve), TrailAction.id_for(:send_to_vendor), TrailAction.id_for(:vendor_confirmed)])
     end
     self.previously_active_po.present?
-    ps.last.action_id
+    ps.last&.action_id
   end
 
   def is_approve?(state=false)

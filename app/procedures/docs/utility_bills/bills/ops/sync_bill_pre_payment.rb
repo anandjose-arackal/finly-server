@@ -52,10 +52,17 @@ class Docs::UtilityBills::Bills::Ops::SyncBillPrePayment < Transactions::API
 
   def bill_fetch(options, subscription)
     options['result'] = {}
+    options['success'] = false
     Bbps::BillFetch.call_async({params: subscription.generate_billfetch_params, current_user: User.first}, {wait: true, wait_timeout: 180.seconds}) do |op|
-      op.success {|result| options['result']['data'] = result}
+      op.success do |result|
+        options['success'] = true
+        options['result']['data'] = result
+      end
 
-      op.error {|result| options['result']['data'] = result}
+      op.error do |result|
+        options['success'] = false
+        options['result']['data'] = result
+      end
 
       op.failure do |result|
         error_message = result&.dig("result.operation.errors")&.dig("base")&.first
@@ -73,10 +80,17 @@ class Docs::UtilityBills::Bills::Ops::SyncBillPrePayment < Transactions::API
 
   def bill_validate(options, subscription)
     options['result'] = {}
-    Bbps::BillValidation.call_async({params: subscription.generate_billfetch_params, current_user: User.first}, {wait: true}) do |op|
-      op.success {|result| options['result']['data'] = result}
+    options['success'] = false
+    Bbps::BillValidation.call_async({params: subscription.generate_billfetch_params, current_user: User.first}, {wait: true, wait_timeout: 180.seconds}) do |op|
+      op.success do |result|
+        options['success'] = true
+        options['result']['data'] = result
+     end
 
-      op.error {|result| options['result']['data'] = result}
+      op.error do |result|
+        options['success'] = false
+        options['result']['data'] = result
+      end
 
       op.failure do |result|
         error_message = result&.dig("result.operation.errors")&.dig("base")&.first
@@ -93,6 +107,8 @@ class Docs::UtilityBills::Bills::Ops::SyncBillPrePayment < Transactions::API
   end
 
   def validate_bill(options, subscription:, bill:, result:, **)
+    return false unless options['success']
+    
     data = result['data']
     amount = (data.amount.to_f / 100).round(2)
 
@@ -125,8 +141,9 @@ class Docs::UtilityBills::Bills::Ops::SyncBillPrePayment < Transactions::API
                                    api_response: api_response,
                                    biller_response: bill.generate_changelog_message("Bill updated at BBPS. Updated ")
                                })
+    else 
+      bill_update_params = {order_number: result['data'].order_number}
     end
-
 
     bill.assign_attributes(bill_update_params)
 

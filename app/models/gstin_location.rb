@@ -2,23 +2,25 @@
 #
 # Table name: gstin_locations
 #
-#  id                :bigint           not null, primary key
-#  vendor_id         :integer
-#  created_at        :datetime         not null
-#  updated_at        :datetime         not null
-#  gstin_id          :integer
-#  gstin             :string(255)
-#  state_id          :integer
-#  poc_name          :string(255)
-#  poc_mobile_number :string(255)
-#  poc_email         :string(255)
-#  poc_fax           :string(255)
-#  poc_designation   :string(255)
-#  location          :string(255)
-#  address           :text(65535)
-#  deleted_at        :datetime
-#  gst_status        :string(255)
-#  gst_expiry_date   :date
+#  id                  :bigint           not null, primary key
+#  vendor_id           :integer
+#  created_at          :datetime         not null
+#  updated_at          :datetime         not null
+#  gstin_id            :integer
+#  gstin               :string(255)
+#  state_id            :integer
+#  poc_name            :string(255)
+#  poc_mobile_number   :string(255)
+#  poc_email           :string(255)
+#  poc_fax             :string(255)
+#  poc_designation     :string(255)
+#  location            :string(255)
+#  address             :text(65535)
+#  deleted_at          :datetime
+#  gst_status          :string(255)
+#  gst_expiry_date     :date
+#  verified            :boolean
+#  gstin_fetch_details :text(65535)
 #
 
 class GstinLocation < ApplicationRecord
@@ -30,6 +32,11 @@ class GstinLocation < ApplicationRecord
   belongs_to :state, class_name: "GstStateCode", optional: true
 
   has_many :form_custom_fields, class_name: 'FormCustomField', as: :document
+  has_paper_trail(
+      meta: {
+          parent_document_type: "Vendor"
+      }
+  )
 
   # validates :location, presence: true
   # validates :state_id, presence: true, if: :check_vendor_gstin_registered? # todo - I2P : move logic to operations

@@ -66,6 +66,13 @@ include Searchkick::Api
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
 
+  has_paper_trail(
+      meta: {
+          parent_document_type: "Purchase Request",
+          document_number: Proc.new { |document| document.order_number }
+      }
+  )
+
 
   scope :search_by_email, -> (email) {
     user = RequestStore.store[:current_user]
@@ -233,6 +240,17 @@ include Searchkick::Api
     self.company_id = self.creator.company_id
   end
 
+  def entity_date
+    created_at.to_date
+  end
+
+  def entity_created_at
+    created_at.to_date
+  end
+
+  def entity_submitted_at
+    submitted_at&.to_date || created_at&.to_date
+  end
 
   def as_json
     {

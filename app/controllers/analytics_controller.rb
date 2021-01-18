@@ -1,12 +1,32 @@
 class AnalyticsController < BaseControllers::WebBase
+  layout 'trailblazers'
+
+  def token
+    endpoint AnalyticsDashboard::Ops::Config
+  end
+
+  def create
+    endpoint AnalyticsDashboard::Ops::Create
+  end
+
+  def update
+    endpoint AnalyticsDashboard::Ops::Update
+  end
 
   def show
-    # params[:page] = 1
-    @result = Analytics::Charts.(current_user, params)
-    unless @result.success?
-      @result.charts = {}
-    end
-    respond
+    endpoint AnalyticsDashboard::Ops::Show
+  end
+
+  def index
+    endpoint AnalyticsDashboard::Ops::Index
+  end
+
+  def destroy
+    endpoint AnalyticsDashboard::Ops::Destroy
+  end
+
+  def export
+    endpoint AnalyticsDashboard::Ops::Export
   end
 
 end

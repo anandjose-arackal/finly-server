@@ -47,6 +47,9 @@
 #  default_password          :boolean          default(FALSE)
 #  point_of_contact          :boolean          default(FALSE)
 #  otp_attempts              :integer          default(0)
+#  user_group_location_id    :integer
+#  user_group_department_id  :integer
+#  user_group_designation_id :integer
 #  user_delegate_id          :integer
 #  delegation_enabled        :boolean
 #  gl_config                 :text(65535)
@@ -61,6 +64,11 @@
 #  finly_id                  :string(36)
 #  deleted_at                :datetime
 #  pending_activation        :boolean          default(FALSE)
+#  erp_sync_status_id        :integer
+#  erp_sync_message          :text(65535)
+#  erp_sync_reference_id     :text(65535)
+#  erp_sync_attempts_count   :integer          default(0)
+#  erp_sync_attempted_at     :datetime
 #
 
 class User < ApplicationRecord
@@ -81,7 +89,7 @@ class User < ApplicationRecord
 
   devise :invitable, :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :confirmable, :lockable,
-         :database_authenticatable
+         :database_authenticatable, :pwned_password
 
   # devise :database_authenticatable, :validatable, password_length: 8..128
   # devise :database_authenticatable
@@ -148,6 +156,8 @@ class User < ApplicationRecord
   has_many :manager_summary_mail_configs, dependent: :destroy
   has_many :payment_receivables, foreign_key: :initiating_user_id
   has_many :user_pockets
+
+  has_many :analytics_dashboards, foreign_key: :created_by_id
 
   has_many :export_jobs, foreign_key: :created_by_id
 
@@ -1635,6 +1645,10 @@ class User < ApplicationRecord
 
   def is_inventory_manager?(document = nil)
     self.has_policy_role?(UserRole.id_for(:inventory_manager), document)
+  end
+
+  def is_export_manager?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:export_manager), document)
   end
 
 

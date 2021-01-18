@@ -1,7 +1,7 @@
 # Updates the user and user profile attributes by using the +users.create+ and +users.update+ hooks.
 class Masters::Users::TraitPublishers::UserHandler < Masters::Users::TraitPublisher
 
-  def self.refresh(changed_since, dry_run: false, options: {})
+  def self.refresh(changed_since=10.years.ago, dry_run: false, options: {})
     return if changed_since.nil?
     return unless enabled?
 
@@ -18,34 +18,43 @@ class Masters::Users::TraitPublishers::UserHandler < Masters::Users::TraitPublis
       end
       completed_users += batch.size
       logger.info(
-          {
-              handler: self.name, action: 'Batch Updated', started_at: batch_start_time,
-              ended_at: Time.now, total_time: (Time.now - batch_start_time).to_f, records_updated: completed_users,
-              total_records: total_users, batch_size: batch.size
-          }
+        {
+          handler: self.name, action: 'Batch Updated', started_at: batch_start_time,
+          ended_at: Time.now, total_time: (Time.now - batch_start_time).to_f, records_updated: completed_users,
+          total_records: total_users, batch_size: batch.size
+        }
       )
       sleep BATCH_SLEEP_DURATION
     end
 
     logger.info(
-        {
-            handler: self.name, action: 'Refresh Completed', started_at: start_time,
-            ended_at: Time.now, total_time: (Time.now - start_time).to_f, records_updated: completed_users,
-            total_records: total_users
-        }
+      {
+        handler: self.name, action: 'Refresh Completed', started_at: start_time,
+        ended_at: Time.now, total_time: (Time.now - start_time).to_f, records_updated: completed_users,
+        total_records: total_users
+      }
     )
   end
 
   def self.properties(user)
+    company = user.company
     {
-        'user_id' => user.id,
-        'email' => user.email,
-        'mobile_number' => user.mobile_number,
-        'first_name' => user.first_name,
-        'last_name' => user.last_name,
-        'deleted_at' => user.deleted_at,
-        'point_of_contact' => !!user.point_of_contact,
-        'status' => user.status
+      'company_id' => company.id,
+      'company_name' => company.name,
+      'company_active' => !!company.active,
+      'company_subdomain' => company.subdomain,
+      'company_test_account' => !!company.test_account,
+      'company_group_name' => company.group&.name,
+      'company_status' => company.status&.name,
+      'company_deleted_at' => company.deleted_at,
+      'user_id' => user.id,
+      'email' => user.email,
+      'mobile_number' => user.mobile_number,
+      'first_name' => user.first_name,
+      'last_name' => user.last_name,
+      'deleted_at' => user.deleted_at,
+      'point_of_contact' => !!user.point_of_contact,
+      'status' => user.status
     }.compact
   end
 

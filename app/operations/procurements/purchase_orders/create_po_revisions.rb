@@ -49,7 +49,8 @@ class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOr
     # if op.success?
     #   self.duplicate_po.po_number = op.document_number
     # end
-
+    self.purchase_order.paper_trail_event = "PO Revised"
+    self.duplicate_po.paper_trail_event = "PO Revised"
     self.purchase_order.update(purchase_order_status_id: PurchaseOrderStatus.id_for(:po_revised))
 
     self.purchase_order.trails.create action_user: user, action_id: TrailAction.id_for(:revision), note: "Revised PO generated, ##{self.duplicate_po.po_number}"
@@ -68,6 +69,8 @@ class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOr
 
     self.klass.each_with_index do |k, kid| 
       obj = self.purchase_order.__send__(k)
+      next if k == :line_items
+
 
       if obj.present?
         # self.duplicate_po.__send__("#{k}=", self.purchase_order.__send__(k))

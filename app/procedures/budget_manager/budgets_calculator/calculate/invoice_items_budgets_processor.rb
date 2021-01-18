@@ -24,7 +24,7 @@ class BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor 
         billed_quantity = invoice_item.quantity
         billed_ratio = (billed_quantity / po_item&.quantity.to_f) rescue 1
       else
-        billed_ratio = (invoice_item.taxable_amount&.value.to_f / po_item.taxable_amount&.value.to_f) rescue 1
+        billed_ratio = (invoice_item.billable_amount&.value.to_f / po_item.taxable_amount&.value.to_f) rescue 1
       end
 
       billed_amount_after_tax = po_item.after_tax_amount * billed_ratio
@@ -73,10 +73,10 @@ class BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor 
         user_id: invoice_item.parent.created_by_user_id,
         location_id: invoice_item.parent.location_id,
         department_id: invoice_item.department_id,
-        date: invoice_item.parent.date,
+        date: (po_trail_item&.date || invoice_item.parent.date),
         entity_status_id: invoice_item.parent.invoice_status_id,
-        entity_created_at: invoice_item.parent.created_at,
-        entity_submitted_at: (invoice_item.parent.submitted_at || invoice_item.parent.created_at),
+        entity_created_at: (po_trail_item&.entity_created_at || invoice_item.parent.created_at),
+        entity_submitted_at: (po_trail_item&.entity_submitted_at || invoice_item.parent.submitted_at || invoice_item.parent.created_at),
         vendor_id: invoice_item.parent.vendor_id,
         billed: billed,
         po_trail_item_id: po_trail_item&.id,

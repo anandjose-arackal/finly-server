@@ -74,28 +74,21 @@ class FormEntity::AutoNumber < FormEntity
 
   contract_eval "Set sequence" do |contract:, entity:, **|
     contract.after_save do
-      if model.respond_to?(entity.entity_key)
+      if entity.system_field?
         if model.send(entity.entity_key).blank?
-          prefix = entity.config['sequence']['prefix']
-          min_length = entity.config['sequence']['start_at'].length
-          prefix = LiquidHelper.interpolate(prefix, {'record' => model})
-          sequence = REDIS.incr("FormEntity::AutoNumber##{entity.id}##{prefix}")
-          sequence = sequence.to_s.rjust(min_length, "0")
+          prefix, sequence = FormEntity::AutoNumber.fetch_autonumber(entity, model)
           model.send("#{entity.entity_key}=", "#{prefix}#{sequence}")
           model.save
         end
       else
-        form_custom_field = model.form_custom_fields.where(field_key: entity.entity_key, form_entity_id: entity.uuid).first
-        if form_custom_field.retrieve_value.blank?
-          prefix = entity.config['sequence']['prefix']
-          min_length = entity.config['sequence']['start_at'].length
-          prefix = LiquidHelper.interpolate(prefix, {'record' => model})
-          sequence = REDIS.incr("FormEntity::AutoNumber##{entity.id}##{prefix}")
-          sequence = sequence.to_s.rjust(min_length, "0")
-          form_custom_field.value = "#{prefix}#{sequence}"
-          form_custom_field.save
+        custom_field = model.form_custom_fields.find_by(field_key: entity.entity_key)
+        unless custom_field&.value
+          prefix, sequence = FormEntity::AutoNumber.fetch_autonumber(entity, model)
+          custom_field.value =  "#{prefix}#{sequence}"
+          custom_field.save
         end
       end
+
     end
   end
 
@@ -124,5 +117,14 @@ class FormEntity::AutoNumber < FormEntity
         end
       end
     end
+  end
+
+  def self.fetch_autonumber(entity, model)
+    prefix = entity.config['sequence']['prefix']
+    min_length = entity.config['sequence']['start_at'].length
+    prefix = LiquidHelper.interpolate(prefix, {'record' => model})
+    sequence = REDIS.incr("FormEntity::AutoNumber##{entity.id}##{prefix}")
+    sequence = sequence.to_s.rjust(min_length, "0")
+    [prefix, sequence]
   end
 end

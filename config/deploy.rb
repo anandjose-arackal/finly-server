@@ -92,6 +92,7 @@ linked_files = %w{
   config/feature_flipper.yml
   config/posthog.yml
   config/searchkick.yml
+  config/cubejs.yml
   config/mailtrain.yml
   config/open_exchange_rates.yml
 

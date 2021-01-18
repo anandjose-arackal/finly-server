@@ -65,16 +65,17 @@
 #  gstin_location_id            :bigint
 #  cost_allocation_items        :boolean          default(FALSE)
 #  internal_note                :text(65535)
+#  taxable_amount_id            :integer
 #  vendor_address               :text(65535)
 #  discount_type_id             :integer
 #  vendor_poc_name              :string(255)
 #  vendor_poc_email             :string(255)
 #  vendor_poc_mobile_number     :string(255)
 #  rejection_note               :text(65535)
-#  taxable_amount_id            :integer
 #  vendor_poc_id                :integer
 #  vlpm_id                      :integer
 #  vendor_note                  :text(65535)
+#  erp_sync_status_id           :integer
 #
 
 class PurchaseOrder < ApplicationRecord
@@ -149,8 +150,15 @@ class PurchaseOrder < ApplicationRecord
 
   has_many :quotations, dependent: :destroy
 
+
   belongs_to :bank_account, optional: true
 
+  has_paper_trail(
+      meta: {
+          parent_document_type: "Purchase Order",
+          document_number: Proc.new { |document| document.po_number }
+      }
+  )
   delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :vendor_confirmed?, :closed?, :voided?, :po_revised?, to: :status
 
   accepts_nested_attributes_for :items, :purchase_request_items, allow_destroy: true
@@ -507,6 +515,10 @@ class PurchaseOrder < ApplicationRecord
         where(purchase_order_status_id: PurchaseOrderStatus.ids_for([ :released, :invoice_created, :received, :change_order, :approved, :auto_approved, :sent_to_vendor, :vendor_confirmed, :vendor_rejected ]))
   }
 
+  scope :non_voided, ->{
+    where.not(purchase_order_status_id: PurchaseOrderStatus.id_for(:voided))
+  }
+
   before_save :calculate_line_items
   after_create :purchase_request_tasks
   after_save :budget_trail_entry
@@ -781,6 +793,18 @@ class PurchaseOrder < ApplicationRecord
 
   def total_adv_amount
     (self.advance_amount&.value + self.advance_tds_amount&.value) rescue nil
+  end
+
+  def entity_date
+    created_at.to_date
+  end
+
+  def entity_created_at
+    created_at.to_date
+  end
+
+  def entity_submitted_at
+    submitted_at&.to_date || created_at&.to_date
   end
 
   # because somewhere we got 'as_json' for PO already. running on deadline. dont have time to remodify.
@@ -1115,6 +1139,10 @@ class PurchaseOrder < ApplicationRecord
     PurchaseOrderStatus.ids_for(:approved, :auto_approved, :sent_to_vendor, :vendor_confirmed, :closed, :voided)
   end
 
+  def self.initiator_associated_status_ids
+    PurchaseOrderStatus.ids_for(:approved, :auto_approved, :sent_to_vendor, :vendor_confirmed, :closed, :voided, :po_revised)
+  end
+
   def self.auditor_associated_status_ids
     self.status_ids(:retracted, :rejected, :processing, :approved, :auto_approved, :sent_to_vendor, :vendor_confirmed, :closed, :voided, :po_revised)
   end
@@ -1146,11 +1174,11 @@ class PurchaseOrder < ApplicationRecord
     if user.policy_user_roles.pluck(:user_role_id).uniq.present?
       user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
         if (UserRole.id_for(:purchase_order_initiator) == role_id.to_i)
-          statuses += [:open, :retracted, :processing, :approved, :rejected, :auto_approved, :sent_to_vendor, :vendor_confirmed, :closed]
+          statuses += [:open, :retracted, :processing, :approved, :rejected, :auto_approved, :po_revised,:sent_to_vendor, :vendor_confirmed, :closed]
         elsif (UserRole.id_for(:purchase_order_reviewer) == role_id.to_i)
-          statuses += [:processing, :approved, :auto_approved, :sent_to_vendor, :vendor_confirmed, :closed, :voided]
+          statuses += [:processing, :approved, :auto_approved, :po_revised,:sent_to_vendor, :vendor_confirmed, :closed, :voided]
         elsif UserRole.id_for(:admin) == role_id.to_i
-          statuses += [:processing, :approved, :rejected, :auto_approved, :sent_to_vendor, :vendor_confirmed, :closed, :voided]
+          statuses += [:processing, :approved, :rejected, :auto_approved, :po_revised,:sent_to_vendor, :vendor_confirmed, :closed, :voided]
         end
       end
     end
@@ -1235,7 +1263,7 @@ class PurchaseOrder < ApplicationRecord
   def self.role_based_initiator_associated_items(user, role_id, options = {})
     if UserRole.ids_for([:bank_payment_request_initiator, :po_invoice_initiator]).include? role_id
       policy_ids = PolicyUserRole.select(:policy_id).where(user_id: user.id, user_role_id: role_id)
-      return user.company.purchase_orders.where(policy_id: policy_ids).where(purchase_order_status_id: finance_associated_status_ids)
+      return user.company.purchase_orders.where(policy_id: policy_ids).where(purchase_order_status_id: initiator_associated_status_ids)
     end
     user.send("#{self.table_name}")
   end

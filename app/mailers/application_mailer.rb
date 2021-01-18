@@ -1,5 +1,5 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: 'noreply@finly.io',
+  default from: 'noreply@finlyhq.com',
           "Message-ID" => ->(v) {"<#{SecureRandom.hex(32)}#{DateTime.now.strftime('%H%M%S%L')}@finly.io>"}
 
   before_action :add_headers
@@ -8,7 +8,7 @@ class ApplicationMailer < ActionMailer::Base
   layout 'mailer'
 
   def add_headers
-    headers['X-SES-CONFIGURATION-SET'] = 'email_tracker_core'
+    # headers['X-SES-CONFIGURATION-SET'] = 'email_tracker_core'
   end
 
   def company

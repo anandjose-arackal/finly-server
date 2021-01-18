@@ -11,6 +11,8 @@ class FeatureToggle
   end
 
   def enabled?(feature, default = false)
+    return default if flags.nil?
+
     flag = flags[normalize_key(feature)]
     return default if flag.nil?
 
@@ -30,6 +32,10 @@ class FeatureToggle
 
   def set_trait(trait, value)
     Rails.configuration.bullet_train&.set_trait user.analytics_id, trait, value
+  end
+
+  def set_traits(properties)
+    Rails.configuration.bullet_train&.set_traits user.analytics_id, properties
   end
 
   def normalize_key(key)

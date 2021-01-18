@@ -83,15 +83,15 @@
 #  po_number                             :string(255)
 #  narration                             :text(65535)
 #  bank_account_id                       :integer
-#  rejection_note                        :text(65535)
 #  payment_agreement_id                  :integer
 #  vendor_location_id                    :integer
+#  rejection_note                        :text(65535)
 #  billing_type_id                       :integer
-#  agreement_item_type                   :string(255)
-#  agreement_item_id                     :integer
 #  vendor_poc_id                         :integer
 #  vlpm_id                               :integer
 #  client_note                           :text(65535)
+#  agreement_item_type                   :string(255)
+#  agreement_item_id                     :integer
 #  payable                               :boolean          default(FALSE)
 #  cn_adjusted_amount_id                 :integer
 #  rcm_enabled                           :boolean          default(FALSE)
@@ -108,23 +108,24 @@
 #  total_paid_amount                     :decimal(20, 10)
 #  balance_due_amount                    :decimal(20, 10)
 #  currency_code                         :string(255)
-#  vendor_sequence_id                    :string(255)
-#  vendor_trade_name                     :string(255)
-#  vendor_gstin                          :string(255)
-#  vendor_pan                            :string(255)
 #  vendor_bank_account_number            :string(255)
 #  vendor_bank_account_ifsc              :string(255)
 #  invoice_gross_amount                  :decimal(20, 5)
 #  invoice_discount_amount               :decimal(20, 5)
 #  invoice_tax_amount                    :decimal(20, 5)
 #  invoice_tds_amount                    :decimal(20, 5)
-#  invoice_paid_outside_amount           :decimal(20, 5)
-#  invoice_sub_total_amount              :decimal(20, 5)
-#  invoice_total_amount                  :decimal(20, 5)
+#  payment_outside_finly_amount          :decimal(20, 5)
+#  sub_total_amount                      :decimal(20, 5)
+#  total_amount                          :decimal(20, 5)
 #  base_currency                         :string(255)
-#  reporting_currency                    :string(255)
-#  invoice_taxable_amount                :decimal(20, 5)
+#  vendor_sequence_id                    :text(65535)
+#  vendor_gstin                          :string(255)
 #  invoice_freight_amount                :decimal(20, 5)
+#  reporting_currency                    :string(255)
+#  conversion_date                       :date
+#  conversion_rate                       :decimal(10, 5)
+#  retrieve_conversion_rate              :boolean          default(TRUE)
+#  invoice_taxable_amount                :decimal(20, 5)
 #  invoice_roundoff_amount               :decimal(20, 5)
 #  invoice_balance_due                   :decimal(20, 5)
 #  invoice_gross_amount_converted        :decimal(20, 5)
@@ -135,12 +136,18 @@
 #  invoice_freight_amount_converted      :decimal(20, 5)
 #  invoice_sub_total_amount_converted    :decimal(20, 5)
 #  invoice_roundoff_amount_converted     :decimal(20, 5)
+#  invoice_advance_paid_amount           :decimal(20, 5)
+#  invoice_advance_paid_amount_converted :decimal(20, 5)
 #  invoice_total_amount_converted        :decimal(20, 5)
+#  invoice_net_total_amount              :decimal(20, 5)
+#  invoice_net_total_amount_converted    :decimal(20, 5)
 #  invoice_paid_outside_amount_converted :decimal(20, 5)
 #  invoice_balance_due_converted         :decimal(20, 5)
-#  conversion_date                       :date
-#  conversion_rate                       :decimal(10, 5)
-#  retrieve_conversion_rate              :boolean          default(TRUE)
+#  erp_sync_status_id                    :integer
+#  erp_sync_message                      :text(65535)
+#  erp_sync_reference_id                 :text(65535)
+#  erp_sync_attempts_count               :integer          default(0)
+#  erp_sync_attempted_at                 :datetime
 #
 
 class Invoice < ApplicationRecord
@@ -278,6 +285,13 @@ class Invoice < ApplicationRecord
   has_many :notify_users, as: :document
   has_many :credit_note_adjustments, dependent: :destroy
   has_many :credit_notes, through: :credit_note_adjustments
+
+  has_paper_trail(
+      meta: {
+          parent_document_type: "Invoice",
+          document_number: Proc.new { |document| document.invoice_id }
+      }
+  ) if Proc.new { |inv | inv.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice) || inv.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)}
 
 
   accepts_nested_attributes_for :address
@@ -1351,6 +1365,25 @@ class Invoice < ApplicationRecord
         "#{entity_key}_lookup_data": data,
         "#{entity_key}_choice_data": [data]
     }
+  end
+
+  def po_trail_item
+    if procurement&.purchase_order.present?
+      purchase_order_item_id = procurement.purchase_order.items.first.id
+      BudgetTrail.find_by(entity_type: "PurchaseOrderItem", entity_id: purchase_order_item_id )
+    end
+  end
+
+  def entity_date
+    po_trail_item&.date || date
+  end
+
+  def entity_created_at
+    po_trail_item&.entity_created_at&.to_date || created_at&.to_date
+  end
+
+  def entity_submitted_at
+    po_trail_item&.entity_submitted_at&.to_date || submitted_at&.to_date || created_at&.to_date
   end
 
   private

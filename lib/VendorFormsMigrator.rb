@@ -1,4 +1,3 @@
-# Forms::Synchronizer.(master: 'Masters::Vendors::Form', company_id: 214)
 # RAILS_ENV=production nohup rails runner 'VendorFormsMigrator.run' --trace > vendor_forms_migration_[company_id].log 2>&1 &
 # RAILS_ENV=production nohup rails runner 'VendorFormsMigrator.perform' --trace > ~/vendor_forms_migration_2.log 2>&1 &
 # RAILS_ENV=production nohup rails runner 'VendorFormsMigrator.perform(248)' --trace > ~/vendor_forms_migration_248.log 2>&1 &
@@ -18,7 +17,17 @@ class VendorFormsMigrator
     documents = YesBankVendor.where(company_id: company.id).authorized
     form = Form.where(klass_name: 'Masters::Vendors::Form', company_id: company_id).first
 
-    documents.find_in_batches(batch_size: 1000) do |batch|
+
+    vendor_attachments = VendorAttachment.where(yes_bank_vendor_id: documents.select(:id))
+
+    documents_without_attachments = documents.where(status_id: VendorStatus.id_for(:auto_approved)).where.not(id: vendor_attachments.select(:yes_bank_vendor_id))
+    # Update Vendor Country
+
+    YesBankVendor.where("id IN (?)", documents_without_attachments.pluck(:id)).update_all({vendor_country: "India"})
+
+    documents_with_attachments = YesBankVendor.where("id IN (?)", documents.where.not(id: documents_without_attachments.select(:id)).pluck(:id))
+
+    documents_with_attachments.find_in_batches(batch_size: 500) do |batch|
       batch.each do |document|
         # Create custom fields
         form.entities.root.custom_fields.each do |entity|
@@ -61,6 +70,14 @@ class VendorFormsMigrator
           end
         end
 
+        #migrate tds rate lists
+        if document.tds_rates.present?
+          tds_rate = document.tds_rates.order(:updated_at).last
+          unless document.tds_rates_list.present?
+            document.tds_rates_list_id = tds_rate.id
+            document.save
+          end
+        end
         # Create for GSTIN Locations
         document.gstin_locations.each do |gstin_location|
           form.entities.where(entity_key: :gstin_locations).first.entities.custom_fields.each do |entity|

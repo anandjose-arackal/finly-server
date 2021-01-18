@@ -8,6 +8,8 @@ class ExportManager::Master::PurchaseRequests::Index < ExportManager::Builders::
   screen 'purchase_requests.index'
   handle :purchase_request
 
+  has_template true
+
   attribute :request_id
   attribute :description
   attribute :department
