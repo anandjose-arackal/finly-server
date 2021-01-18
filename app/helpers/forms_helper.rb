@@ -36,11 +36,11 @@ module FormsHelper
     else
       if form_entity.system_field && model.respond_to?(form_entity.entity_key)
         form_data.merge!({form_entity.entity_key => model.send(form_entity.entity_key)})
-
+        Rails.logger.fatal "#{form_entity.entity_key}"
         if [:lookup, 'lookup'].include?(form_entity.entity_type)
-          puts "****************************************"
-          puts model.send(:forms_extra_data, form_entity.entity_type, form_entity.entity_key)
-          puts "****************************************"
+          Rails.logger.fatal "****************************************"
+          Rails.logger.fatal model.send(:forms_extra_data, form_entity.entity_type, form_entity.entity_key)
+          Rails.logger.fatal "****************************************"
           form_data.merge!(model.send(:forms_extra_data, form_entity.entity_type, form_entity.entity_key))
         end
 
