@@ -23,7 +23,7 @@ class User::Login::SendVerificationOtp < BaseOperation
 
   def validate
     unless selected_user
-      add_message :error, "User not found"
+      add_message :error, "OTP sent successfully"
       return
     end
 
