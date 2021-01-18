@@ -460,4 +460,27 @@ class YesBankVendor < ApplicationRecord
     VendorStatus.ids_for(:awaiting_approval).include?(status_id)
   end
 
+
+  def forms_extra_data(type = nil, entity_key = nil)
+    if type.nil? || entity_key.nil?
+      return {
+
+      }
+    end
+
+    case entity_key
+    when :policy_id, 'policy_id'
+      data = {
+          "id": category_id,
+          "name": policy&.name,
+      }
+    else
+      data = {}
+    end
+    {
+      "#{entity_key}_lookup_data": data,
+      "#{entity_key}_choice_data": [data]
+    }
+  end
+
 end
