@@ -72,7 +72,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
           association_name = entity.parent&.entity_key || entity.form.model.table_name
 
           records = contract_root.current_user.company.
-              send(association_name).non_deleted.
+              send(association_name).non_deleted.filter_active.
               where("#{entity.entity_key} = ?", send(entity.entity_key))
 
           records = records.where.not("id = ?", id) if id.present?

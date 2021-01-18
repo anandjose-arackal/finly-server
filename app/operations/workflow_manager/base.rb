@@ -95,6 +95,9 @@ class WorkflowManager::Base < BaseOperation
 
     if action
       add_message :success, self.aasm_document.messages[:success]
+    elsif self.aasm_document.messages[:error].present?
+      add_message :error, self.aasm_document.messages[:error]&.first
+      return
     else
       add_message :error, "Couldn't perform action"
       return
