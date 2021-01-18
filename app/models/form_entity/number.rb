@@ -70,8 +70,8 @@ class FormEntity::Number < FormEntity
   schema_validation do
     required(:options) do
       hash do
-        optional(:min_value).value(:int?)
-        optional(:max_value).value(:int?)
+        optional(:min_value)
+        optional(:max_value)
         optional(:format).value(included_in?: FORMAT)
       end
     end
@@ -83,8 +83,8 @@ class FormEntity::Number < FormEntity
         params do
           required(:options) do
             hash do
-              optional(:min_value).value(:int?)
-              optional(:max_value).value(:int?)
+              optional(:min_value)
+              optional(:max_value)
               optional(:format)
             end
           end
@@ -96,6 +96,7 @@ class FormEntity::Number < FormEntity
 
           if format.present?
             key.failure("> formats must be one of #{FormEntity::Number::FORMAT.join(", ")}") if FormEntity::Number::FORMAT.exclude?(format)
+            key.failure("Min and Max values needs to be integers under number format") if (!min.is_a?(Fixnum) || !max.is_a?(Fixnum)) && (format == 'number')
           end
 
           if min.present? && max.present?
