@@ -106,7 +106,7 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
       end
 
       # calculating pending amount - PurchaseRequests that are approved or auto approved and POs that are everything below approved will come under pending
-      pending_amount = self.budget_trails.with_entity_type("PurchaseRequestItem").with_entity_status_id(PurchaseRequestStatus.ids_for(:awaiting_approval, :approved, :auto_approved))
+      pending_amount = self.budget_trails.with_entity_type("PurchaseRequestItem").with_entity_status_id(PurchaseRequestItemStatus.ids_for(:awaiting_approval, :approved, :auto_approved))
                            .joins(self.amount_to_be_considered).sum(:value)
 
       pending_amount += self.budget_trails.with_entity_type("PurchaseOrderItem").with_entity_status_id(PurchaseOrderStatus.status_ids_for_pending_bucket).sum("#{po_item_amount_to_be_considered} - #{paid_amount_to_be_considered} - #{payment_processing_amount_to_be_considered}")
