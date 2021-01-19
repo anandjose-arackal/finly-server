@@ -75,19 +75,19 @@ class FormEntity::Date < FormEntity
 
         case entity.options['restriction']
         when 'in_the_future'
-          if value <= DateTime.now.end_of_day
+          if value.to_date <= DateTime.now.to_date
             errors.add entity.entity_key, "can only be in the future"
           end
         when 'in_the_past'
-          if value >= DateTime.now.end_of_day
+          if value.to_date >= DateTime.now.to_date
             errors.add entity.entity_key, "can only be in the past"
           end
         when 'not_in_the_future'
-          if value > DateTime.now.end_of_day
+          if value.to_date > DateTime.now.to_date
             errors.add entity.entity_key, "cannot be in the future"
           end
         when 'not_in_the_past'
-          if value < DateTime.now.end_of_day
+          if value.to_date < DateTime.now.to_date
             errors.add entity.entity_key, "cannot be in the past"
           end
         else
