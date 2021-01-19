@@ -2,6 +2,7 @@ class Rules::Adapters::Store
 
   def self.load(data)
     return data if data.nil? or data.is_a?(Rules::Rule)
+    return nil if data["_destroy"]
 
     data = JSON.load(data) if data.is_a?(String)
     data = data.with_indifferent_access unless data.is_a?(ActiveSupport::HashWithIndifferentAccess)
