@@ -171,9 +171,7 @@ end
 
 json.locations do
   json.array! @result.locations do |location|
-    # json.extract! location, :id, :name, :gstin, :pan
-    json.extract! location, :id, :name, :pan
-    json.gstin ( location&.gstin || location&.tax_registration_number )
+    json.extract! location, :id, :name, :gstin, :pan
     json.address location.address
   end
 end
