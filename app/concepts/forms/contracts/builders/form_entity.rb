@@ -125,7 +125,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
           )
           # Fixme: This is working only for lookup
           unless result[:choices].data.present?
-            errors.add entity.entity_key, 'has an invalid choice'
+            errors.add entity.label, 'has an invalid choice'
           end
         end
       end
