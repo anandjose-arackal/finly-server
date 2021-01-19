@@ -229,10 +229,10 @@ class Bbps::BillFetch < Bbps::Api
   def self.handle_error(result)
     OpenStruct.new(
       {
-        status: result['response.parsed']['status'],
-        error_code: result['response.parsed']['error_code'],
-        error_desc: result['response.parsed']['error_desc'],
-        ref_no: result['response.parsed']['ref_no']
+        status: result['status'],
+        error_code: result['error_code'],
+        error_desc: result['error_desc'],
+        ref_no: result['ref_no']
       }
     )
   end
