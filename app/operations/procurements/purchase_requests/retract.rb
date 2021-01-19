@@ -5,7 +5,11 @@ class Procurements::PurchaseRequests::Retract < Procurements::PurchaseRequests::
     params[:aasm_event] = 'retract'
 
     op = WorkflowManager::Base.(user, params)
-    unless op.success?
+
+    if op.success?
+      # Retract the line items too
+      purchase_request.purchase_request_items.update_all(status_id: PurchaseRequestItemStatus.id_for(purchase_request.status.name.to_sym))
+    else
       add_message :error, op.messages[:error]
       return
     end
