@@ -300,14 +300,7 @@ class Bbps::BillPay < Bbps::Api
   end
 
   def self.handle_error(data)
-    OpenStruct.new(
-      {
-        status: result['status'],
-        error_code: result['error_code'],
-        error_desc: result['error_desc'],
-        ref_no: result['ref_no']
-      }
-    )
+    data
   end
 
 end
