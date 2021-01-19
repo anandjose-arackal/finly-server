@@ -62,9 +62,7 @@ class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOr
       # moving the advance payments along with the revised PO update
       # changed the update_all to an update because callbacks need to be triggered for the
       # payment object that will update the paid amount in the new, revised PO
-      if self.purchase_order.advance_payments.present?
-        self.purchase_order.advance_payments.update(parent_id: self.duplicate_po.id, purchase_order_id: self.duplicate_po.id)
-      end
+
     end
 
     self.klass.each_with_index do |k, kid| 
@@ -119,6 +117,10 @@ class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOr
   def post_process
     # here we are also taking the advance payments and explcitily triggering the callbacks because
     # it seems to not be happening when we update the parents to the new PO
+    if self.purchase_order.advance_payments.present?
+        self.purchase_order.advance_payments.update(parent_id: self.duplicate_po.id, purchase_order_id: self.duplicate_po.id)
+    end
+
     self.duplicate_po.advance_payments.each do |payment|
       payment.save
     end

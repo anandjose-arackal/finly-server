@@ -47,8 +47,8 @@ class WorkflowManager::Aasm::YesBankVendorProvider < WorkflowManager::Aasm::Base
     end
 
     event :reactivate do
-      transitions from: :deactivated, to: :approved, guard: :reviewal_chain_present?
-      transitions from: :deactivated, to: :auto_approved
+      transitions from: :deactivated, to: :approved, guard: [:reviewal_chain_present?, :validate_vendor]
+      transitions from: :deactivated, to: :auto_approved, guard: [:validate_vendor]
     end
 
     after_all_events :change_state
@@ -71,6 +71,25 @@ class WorkflowManager::Aasm::YesBankVendorProvider < WorkflowManager::Aasm::Base
 
   def user_is_admin?
     user.vendor_payment_admin?
+  end
+
+  def validate_vendor
+    similar_pan_vendors = YesBankVendor.where(pan: document.pan, company_id: user.company_id).filter_active
+    if similar_pan_vendors.present?
+      self.messages[:error].push "Vendor with pan: \"#{similar_pan_vendors.first.pan}\" already exists in the system. See vendor - #{similar_pan_vendors.first.display_name}"
+      return false
+    end
+    similar_bank_accounts = BankAccount.where(account_number: document.bank_accounts.pluck(:account_number), company_id: user.company_id).filter_active
+    if similar_bank_accounts.present?
+      self.messages[:error].push "Active Bank Account with account number \"#{similar_bank_accounts.first.account_number}\" already exists in the system. Please disable it. See vendor - #{similar_bank_accounts.first.account_owner.display_name}"
+      return false
+    end
+    similar_gstins = GstinLocation.where(vendor_id: user.company.yes_bank_vendors.non_deleted.filter_active).where(gstin: document.gstin_locations.pluck(:gstin))
+    if similar_gstins.present?
+      self.messages[:error].push "GSTIN details for \"#{similar_gstins.first.gstin}\" already exists in the system. See vendor - #{similar_gstins.first.vendor.display_name}"
+      return false
+    end
+    true
   end
 
   def reviewal_chain_present?
