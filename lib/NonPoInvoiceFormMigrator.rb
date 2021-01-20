@@ -6,7 +6,7 @@ class NonPoInvoiceMigrator
     company = Company.find company_id
     documents = Invoice.where(invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)).where(company_id: company.id)
 
-    form = Form.where(klass_name: 'P2P::Docs::Invoices::Form', company_id: company_id).first
+    form = Form.where(klass_name: 'Docs::P2P::Invoices::Form', company_id: company_id).first
 
     documents.find_in_batches(batch_size: 1000) do |batch|
       batch.each do |document|
@@ -49,18 +49,18 @@ class NonPoInvoiceMigrator
         end
 
         # First migrate invoice line items
-        document.items each do |item|
+        document.items.each do |item|
           update_params = {
               item_gross_amount: item.amount.value,
               item_gross_amount_converted: item.amount.value,
-              item_discount_amount: item.discount.value,
-              item_discount_amount_converted: item.discount.value,
+              item_discount_amount: item.discount,
+              item_discount_amount_converted: item.discount,
               item_taxable_amount: item.taxable_amount.value,
               item_taxable_amount_converted: item.taxable_amount.value,
               item_net_amount: item.net_amount.value,
               item_net_amount_converted: item.net_amount.value,
-              item_billable_amount: item.billable_amount.value,
-              item_billable_amount_converted: item.billable_amount.value,
+              item_billable_amount: item&.billable_amount&.value,
+              item_billable_amount_converted: item&.billable_amount&.value,
 
               # tds amount
               item_tds_amount: 0,
@@ -77,36 +77,36 @@ class NonPoInvoiceMigrator
             reporting_currency: "INR",
 
             # Vendor Related Fields
-            vendor_sequence_id: document.vendor&.vendor_id,
-            vendor_trade_name: document.vendor&.display_name,
-            vendor_pan: document.vendor&.pan,
-            vendor_bank_account_number: document.receiving_account&.account_number,
-            vendor_bank_account_ifsc: document.receiving_account&.ifsc,
-            vendor_gstin: document.gstin_location&.gstin,
+            vendor_sequence_id: document&.vendor&.vendor_id,
+            vendor_trade_name: document&.vendor&.display_name,
+            vendor_pan: document&.vendor&.pan,
+            vendor_bank_account_number: document&.receiving_account&.account_number,
+            vendor_bank_account_ifsc: document&.receiving_account&.ifsc,
+            vendor_gstin: document&.gstin_location&.gstin,
 
             # Amount Related Fields # todo - I2P check if amounts are getting saved properly
-            invoice_gross_amount: document.amount.value,
-            invoice_gross_amount_converted: document.amount.value,
-            invoice_discount_amount: document.discount_amount.value,
-            invoice_discount_amount_converted: document.discount_amount.value,
-            invoice_taxable_amount: document.gross_amount.value,
-            invoice_taxable_amount_converted: document.gross_amount.value,
-            invoice_tax_amount: document.tax_amount.value,
-            invoice_tax_amount_converted: document.tax_amount.value,
-            invoice_tds_amount: document.tds_amount.value,
-            invoice_tds_amount_converted: document.tds_amount.value,
-            invoice_paid_outside_amount: document.advance_paid_amount.value,
-            invoice_paid_outside_amount_converted: document.advance_paid_amount.value,
-            invoice_sub_total_amount: document.net_amount.value,
-            invoice_sub_total_amount_converted: document.net_amount.value,
-            invoice_total_amount: document.net_amount.value,
-            invoice_total_amount_converted: document.net_amount.value,
-            invoice_freight_amount: document.freight_amount.value,
-            invoice_freight_amount_converted: document.freight_amount.value,
-            invoice_roundoff_amount: document.roundoff_amount,
-            invoice_roundoff_amount_converted: document.roundoff_amount,
-            invoice_balance_due: document.balance_due.value,
-            invoice_balance_due_converted: document.balance_due.value
+            invoice_gross_amount: document&.amount&.value,
+            invoice_gross_amount_converted: document&.amount&.value,
+            invoice_discount_amount: document&.discount_amount&.value,
+            invoice_discount_amount_converted: document&.discount_amount&.value,
+            invoice_taxable_amount: document&.gross_amount&.value,
+            invoice_taxable_amount_converted: document&.gross_amount&.value,
+            invoice_tax_amount: document&.tax_amount&.value,
+            invoice_tax_amount_converted: document&.tax_amount&.value,
+            invoice_tds_amount: document&.tds_amount&.value,
+            invoice_tds_amount_converted: document&.tds_amount&.value,
+            invoice_paid_outside_amount: 0,
+            invoice_paid_outside_amount_converted: 0,
+            invoice_sub_total_amount: document&.net_amount&.value,
+            invoice_sub_total_amount_converted: document&.net_amount&.value,
+            invoice_total_amount: document&.net_amount&.value,
+            invoice_total_amount_converted: document&.net_amount&.value,
+            invoice_freight_amount: document&.freight_amount&.value,
+            invoice_freight_amount_converted: document&.freight_amount&.value,
+            invoice_roundoff_amount: document&.roundoff_amount,
+            invoice_roundoff_amount_converted: document&.roundoff_amount,
+            invoice_balance_due: document&.balance_due&.value,
+            invoice_balance_due_converted: document&.balance_due&.value
         }
 
         document.update_columns(update_params)

@@ -100,4 +100,24 @@ class FormEntity::Currency < FormEntity
       end
     end
   end
+
+  def as_json(option = {})
+    result = super 
+    result_currencies = result.with_indifferent_access[:options][:currencies]
+    
+    # currencies = []
+    # CURRENCIES.each do |currency|
+    #   if result_currencies.include?(currency[:currency_code])
+    #     currency_hash = {}
+    #     currency_hash[:label] =  currency[:currency]
+    #     currency_hash[:id] =  currency[:currency_code]
+    #     currency_hash[:symbol] =  currency[:symbol]
+    #     currencies.push(currency_hash)
+    #   end
+    # end
+    # currencies
+    CURRENCIES.select{ |currency| result_currencies.include?(currency[:currency_code]) }
+
+  end
+
 end
