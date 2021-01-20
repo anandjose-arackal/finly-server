@@ -24,6 +24,7 @@ class Rules::Adapters::Store
       values = data&.dig('v').map do |pos, val|
         { type => val[:value] }
       end
+      return nil if predicate.nil?
       Rules::Operator.new(attribute).send(predicate, *values)
     end
   end
