@@ -2,7 +2,6 @@ class Rules::Adapters::Store
 
   def self.load(data)
     return data if data.nil? or data.is_a?(Rules::Rule)
-    return nil if data["_destroy"]
 
     data = JSON.load(data) if data.is_a?(String)
     data = data.with_indifferent_access unless data.is_a?(ActiveSupport::HashWithIndifferentAccess)
@@ -10,6 +9,7 @@ class Rules::Adapters::Store
     if Rules::Constants::LOGICAL_OPERATORS.include?(data[:m].to_s) && data[:c].present?
       rule = nil
       data[:c].each do |d|
+        next if d.dig('a', '0', 'name').nil?
         if rule.nil?
           rule = Rules::Adapters::Store.load(d)
         else
@@ -24,7 +24,6 @@ class Rules::Adapters::Store
       values = data&.dig('v').map do |pos, val|
         { type => val[:value] }
       end
-      return nil if predicate.nil?
       Rules::Operator.new(attribute).send(predicate, *values)
     end
   end

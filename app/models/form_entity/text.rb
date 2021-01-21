@@ -91,8 +91,8 @@ class FormEntity::Text < FormEntity
         params do
           required(:options) do
             hash do
-              optional(:maximum).filled
-              optional(:minimum).filled
+              optional(:maximum)
+              optional(:minimum)
               optional(:format)
               optional(:regex).hash do
                 optional(:format)
@@ -106,6 +106,8 @@ class FormEntity::Text < FormEntity
           max = value[:maximum]
           format = value[:format]
           key.failure("> restriction must be one of #{FormEntity::Text::FORMAT.join(", ")}") if (format.present? && FormEntity::Text::FORMAT.exclude?(format))
+          key.failure('minimum cannot be blank') if min.blank?
+          key.failure('maximum cannot be blank') if max.blank?
           key.failure("> minimum can't be less than 0") if min.to_i < 0
           key.failure("> maximum can't be greater than 255") if max.to_i > 255
 
