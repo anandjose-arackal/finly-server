@@ -73,6 +73,16 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
   property :compute_formula
   property :compute_lookup_entity_id
 
+  validation   do
+    params do
+      required(:compute_enabled)
+      required(:compute_formula)
+    end
+
+    rule(:compute_formula, :compute_enabled) do
+      key.failure("formula cannot be blank") if !!values[:compute_enabled] && values[:compute_formula].blank?
+    end
+  end
   # Validations
   collection :validations, populate_if_empty: FormEntityValidation do
     property :id
