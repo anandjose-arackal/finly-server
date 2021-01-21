@@ -101,8 +101,8 @@ class FormEntity::AutoNumber < FormEntity
             hash do
               required(:sequence) do
                 hash do
-                  required(:prefix)
-                  required(:start_at)
+                  optional(:prefix)
+                  optional(:start_at)
                 end
               end
             end
