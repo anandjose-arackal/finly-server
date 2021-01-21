@@ -16,7 +16,7 @@ module Rules::Predicates
     arr.each do |val|
       is_datetime = val.to_datetime rescue nil
       unless is_datetime.nil?
-        formatted_array.push(is_datetime.strftime('%a, %d %b %Y %H:%M:%S'))
+        formatted_array.push(is_datetime.strftime('%a, %d %b %Y %H:%M:%S').to_datetime)
         next
       end
       is_number = Float(val) rescue nil
@@ -73,12 +73,12 @@ module Rules::Predicates
   end
 
   predicate :eq, any: true, all: true do |v, d|
-    Rules::Predicates.to_valid_format(v).each_cons(2).all? { |i, j| i == j }
+    Rules::Predicates.to_valid_format(v).each_cons(2).all? { |i, j| i == j } rescue false
     # v[0]&.to_s&.downcase == v[1].to_s.downcase
   end
 
   predicate :not_eq, any: true, all: true do |v, d|
-    Rules::Predicates.to_valid_format(v).each_cons(2).all? { |i, j| i != j }
+    Rules::Predicates.to_valid_format(v).each_cons(2).all? { |i, j| i != j } rescue false
   end
 
   # Todo Matches is Regex search
@@ -91,20 +91,20 @@ module Rules::Predicates
   # end
 
   predicate :lt do |v, d|
-    Rules::Predicates.to_valid_format(v).each_cons(2).all? { |i, j| i < j }
+    Rules::Predicates.to_valid_format(v).each_cons(2).all? { |i, j| i < j } rescue false
     # v.map(&:to_f).each_cons(2).all? { |i, j| i < j }
   end
 
   predicate :lteq do |v, d|
-    Rules::Predicates.to_valid_format(v).each_cons(2).all? { |i, j| i <= j }
+    Rules::Predicates.to_valid_format(v).each_cons(2).all? { |i, j| i <= j } rescue false
   end
 
   predicate :gt do |v, d|
-    Rules::Predicates.to_valid_format(v).each_cons(2).all? { |i, j| i > j }
+    Rules::Predicates.to_valid_format(v).each_cons(2).all? { |i, j| i > j } rescue false
   end
 
   predicate :gteq do |v, d|
-    Rules::Predicates.to_valid_format(v).each_cons(2).all? { |i, j| i >= j }
+    Rules::Predicates.to_valid_format(v).each_cons(2).all? { |i, j| i >= j } rescue false
   end
 
   # Fixme: check if in is really required as it is is covered by eq_any case in the context of form rules
@@ -119,11 +119,11 @@ module Rules::Predicates
   # end
 
   predicate :cont, any: true, all: true do |v, d|
-    Rules::Predicates.to_valid_format(v).each_cons(2).all? { |i, j| i.to_s.include?(j.to_s) }
+    Rules::Predicates.to_valid_format(v).each_cons(2).all? { |i, j| i.to_s.include?(j.to_s) } rescue false
   end
 
   predicate :not_cont, any: true, all: true do |v, d|
-    Rules::Predicates.to_valid_format(v).each_cons(2).all? { |i, j| !i.to_s.include?(j.to_s) }
+    Rules::Predicates.to_valid_format(v).each_cons(2).all? { |i, j| !i.to_s.include?(j.to_s) } rescue false
   end
 
   predicate :start do |v, d|
