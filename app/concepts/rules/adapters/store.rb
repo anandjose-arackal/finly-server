@@ -9,7 +9,7 @@ class Rules::Adapters::Store
     if Rules::Constants::LOGICAL_OPERATORS.include?(data[:m].to_s) && data[:c].present?
       rule = nil
       data[:c].each do |d|
-        next if d.dig('a', '0', 'name').nil?
+        next if (d.dig('a', '0', 'name').nil? || d.dig("_destroy"))
         if rule.nil?
           rule = Rules::Adapters::Store.load(d)
         else
