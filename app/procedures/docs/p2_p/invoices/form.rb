@@ -26,7 +26,7 @@ class Docs::P2P::Invoices::Form < Forms::API
           invoice_total_amount: "{{ form.invoice_sub_total_amount | plus: form.invoice_roundoff_amount }}",
           invoice_net_total_amount: "{{ form.invoice_total_amount | minus: form.invoice_paid_outside_amount | minus: form.invoice_advance_paid_amount}}",
           # todo - will be shown on top of invoice and needs separate calculation
-          invoice_balance_due: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount }}"
+          invoice_balance_due: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | round }}"
       }
   }
 
@@ -58,10 +58,18 @@ class Docs::P2P::Invoices::Form < Forms::API
     lookup :payment_term_id,
            choices_scope: Choices[:lookup].('payment_terms'),
            label: "Payment Term",
-           visible: false, required: false
-
+           visible: true, required: false
+    
+    number :payment_term_days,
+         label: "Payment Term Days",
+         computed: Forms::Compute::Lookup('payment_term_id', '{{record.days_after}}'),
+         visible: false
+    
     # can_choices_be_changed: false, default_value: false
-    date :due_date
+    # '{% assign assigne_days = form.payment_term_days | times: 86400 %}{{ form.date | date: "%s" | plus: assigne_days | date: "%d-%m-%Y" }}'
+    date :due_date,
+      computed: Forms::Compute::Form('{% assign assigne_days = form.payment_term_days | times: 86400 %}{{ form.date | date: "%s" | plus: assigne_days | date: "%Y-%m-%d" }}')
+
 
     dropdown :cost_allocation_items, choices_scope: Choices[:list].({id: false, name: "Header"}, {id: true, name: "Line Item"}),
              required: true, can_choices_be_changed: false, default_value: false
@@ -144,7 +152,7 @@ class Docs::P2P::Invoices::Form < Forms::API
 
       lookup :product_type_id, label: "Product Type", choices_scope: Choices[:enum].(ProductType), editable: false, computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.product_type_id}}')
       lookup :department_id, label: "Department", editable: false, visible: false, choices_scope: Choices[:lookup].('departments'), computed: Forms::Compute::Form('{{form.department_id}}')
-      lookup :cost_center_id, label: "Cost Center", editable: false, visible: false, choices_scope: Choices[:lookup].('cost_centers'), computed: Forms::Compute::Form('{{form.cost_center_id}}')
+      lookup :cost_center_id, label: "Const Center", editable: false, visible: false, choices_scope: Choices[:lookup].('cost_centers'), computed: Forms::Compute::Form('{{form.cost_center_id}}')
       lookup :category_id, label: "Category", visible: false, editable: false, choices_scope: Choices[:lookup].('categories'), required: false, computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.category_id}}')
 
       text :gl_code, label: "GL Code", editable: false, visible: false, computed: Forms::Compute::Lookup('items.category_id', '{{record.gl_code}}')
