@@ -21,10 +21,11 @@
     <div style="text-align: right; padding-right: 20%;">
       <label style="font-size: 20px; font-weight: bold;">Purchase Order Total&nbsp;:&nbsp;&#8377;<%= @data.purchase_order.balance_amount.value%></label>
     </div>
+    <br>
     <% if @data.purchase_order.approved? %>
-      <br>
       <p style="font-size: 17px; margin-left: 3%;">A PDF copy of the purchase order has been attached.</p>
     <% end %>  
+
   </div>
   </body>
 <% end %>
