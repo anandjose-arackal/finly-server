@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_22_144554) do
+ActiveRecord::Schema.define(version: 2021_01_25_111815) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3764,6 +3764,7 @@ ActiveRecord::Schema.define(version: 2020_12_22_144554) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "route"
+    t.string "resolver"
     t.index ["deleted_at"], name: "index_export_resources_on_deleted_at"
   end
 
