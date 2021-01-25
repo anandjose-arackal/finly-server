@@ -92,7 +92,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
         override_data ||= {}
         entities.map{ |ent| override_data[ent.entity_key] = FormEntityChoice.find_by(uuid: contract_root.form_data[ent.entity_key])&.name}
         entity.validations.each do |validation|
-          next unless validation.rule.apply?({ form: contract_root.form_data.merge(override_data), row: self.form_data.merge(override_data) }.with_indifferent_access, controlling_field: entity.entity_path, interpolate_id: entity.interpolate_id)
+          next unless validation.rule.apply?({ form: contract_root.form_data.merge(override_data), row: self.form_data.merge(override_data) }.with_indifferent_access, controlling_field: entity.entity_path)
 
           errors.add entity.label, validation.error_message
         end
