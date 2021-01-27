@@ -112,8 +112,8 @@ class ImportUtil
       return raw_text
     end
     clean_text = raw_text
-    if clean_text.is_a?(Float) || clean_text.is_a?(Integer)
-      clean_text = clean_text&.to_i&.to_s if clean_text.is_a?(Integer)
+    if clean_text.is_a?(Float) || clean_text.is_a?(Integer) || clean_text.is_a?(BigDecimal)
+      clean_text = clean_text&.to_i&.to_s if clean_text.is_a?(Integer) || clean_text.is_a?(BigDecimal)
       clean_text = clean_text&.to_f&.to_s if clean_text.is_a?(Float)
     elsif clean_text.is_a?(Date)
       clean_text = clean_text.strftime("%d-%m-%Y")
