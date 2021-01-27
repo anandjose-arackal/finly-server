@@ -22,11 +22,13 @@ class Docs::P2P::Invoices::Form < Forms::API
           invoice_tds_amount: "{% assign tds_amount = 0 %}{% for item in form.items %}{% assign tds_amount = tds_amount | plus: item.item_tds_amount %}{% endfor %}{{ tds_amount }}",
           invoice_sub_total_amount: "{{ form.invoice_gross_amount | minus: form.invoice_discount_amount | plus: form.invoice_tax_amount | minus: form.invoice_tds_amount }}",
           # todo - Issue : Roundoff should be automatically calulated everytime user inputs something, even if its the round off itself
-          invoice_roundoff_amount: "{% assign amount = form.invoice_sub_total_amount | round %}{{amount | minus: form.invoice_sub_total_amount}}",
+          invoice_roundoff_amount: "{% assign amount = form.invoice_sub_total_amount | round %}{{amount | minus: form.invoice_sub_total_amount | round: 2 }}",
           invoice_total_amount: "{{ form.invoice_sub_total_amount | plus: form.invoice_roundoff_amount }}",
           invoice_net_total_amount: "{{ form.invoice_total_amount | minus: form.invoice_paid_outside_amount | minus: form.invoice_advance_paid_amount}}",
           # todo - will be shown on top of invoice and needs separate calculation
-          invoice_balance_due: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | round }}"
+          invoice_balance_due: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | round: 2 }}",
+          invoice_balance_due_converted: "{{ form.invoice_balance_due |times: form.conversion_rate | round: 2 }}"
+
       }
   }
 
@@ -81,7 +83,7 @@ class Docs::P2P::Invoices::Form < Forms::API
     lookup :policy_id,
          choices_scope: Choices[:lookup].('policies'),
          #permissions: [:non_po_invoice_initiator]),
-         required: true
+         required: true, editable: false
     lookup :department_id, label: "Department", choices_scope: Choices[:lookup].('departments') #, editable: false, visible: false
     lookup :cost_center_id, label: "Cost Center", choices_scope: Choices[:lookup].('cost_centers')
     date :conversion_date, label: "Conversion Date",
@@ -103,7 +105,7 @@ class Docs::P2P::Invoices::Form < Forms::API
     text :vendor_sequence_id, "Vendor ID", editable: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.vendor_id}}')
 
     #  text :pan, editable: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.pan}}')
-    lookup :gstin_location_id, label: 'Vendor LocationLocation', choices_scope: Choices[:lookup].('vendor_locations'), # todo - condition to hide for international
+    lookup :gstin_location_id, label: 'Vendor Location', choices_scope: Choices[:lookup].('vendor_locations'), # todo - condition to hide for international
            filters: Rules::Builder[:vendor_id].eq(entity: :vendor_id)
     text :vendor_gstin, "Vendor GSTIN", editable: false, computed: Forms::Compute::Lookup('gstin_location_id', '{{record.gstin}}') # todo - condition
     text :vendor_pan, "Vendor PAN", editable: false # todo - add condition
@@ -335,8 +337,9 @@ class Docs::P2P::Invoices::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_balance_due])
       amount :invoice_balance_due_converted, editable: false,
-             can_visible_be_changed: false,
-             can_editable_be_changed: false
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_balance_due_converted]),
+             can_visible_be_changed: false, can_editable_be_changed: false
+
       # amount :net_amount, editable: false, computed: Forms::Compute::Form('{{ form.gross_amount | minus: form.discount_amount | plus: form.tax_amount }}')
     end
   end
