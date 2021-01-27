@@ -117,6 +117,8 @@ class ImportUtil
       clean_text = clean_text&.to_f&.to_s if clean_text.is_a?(Float)
     elsif clean_text.is_a?(Date)
       clean_text = clean_text.strftime("%d-%m-%Y")
+    elsif clean_text.is_a?(Rational)
+      clean_text = clean_text&.to_s&.split('/').first
     end
     character_array.each do |character|
       clean_text = clean_text.sub(character, '')
