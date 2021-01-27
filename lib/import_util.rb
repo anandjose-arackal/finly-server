@@ -86,7 +86,7 @@ class ImportUtil
       sheet.rows.each_with_index do |row, index|
         next if index == 0
         new_hash = header.zip(row).to_h
-        new_hash.update(new_hash) { |key, value| val = cleanup_account_number_quickly(key, value); cleanup_email(val)}
+        new_hash.update(new_hash) { |key, value| val = cleanup_account_number(key, value); cleanup_email(val)}
         list << new_hash
       end
     end
