@@ -102,6 +102,9 @@ class Docs::P2P::Invoices::Form < Forms::API
   section :vendor_details, title: "Vendor Details", associate_custom_fields: true do
     lookup :vendor_id, label: "Vendor", choices_scope: Choices[:lookup].('vendors'), required: true, editable: false,
            can_editable_be_changed: false, can_be_disabled: false, can_required_be_changed: false, can_visible_be_changed: false
+    
+    text :vendor_country, editable: false, visible: false
+    
     text :vendor_sequence_id, "Vendor ID", editable: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.vendor_id}}')
 
     #  text :pan, editable: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.pan}}')
@@ -114,6 +117,7 @@ class Docs::P2P::Invoices::Form < Forms::API
     text :receiving_account_type, visible: false, internal: true, editable: false, computed: Forms::Compute::Form('BankAccount')
     text :vendor_bank_account_number, editable: false, can_editable_be_changed: false, computed: Forms::Compute::Lookup('receiving_account_id', '{{record.account_number}}')
     text :vendor_bank_account_ifsc, editable: false, can_editable_be_changed: false, computed: Forms::Compute::Lookup('receiving_account_id', '{{record.ifsc}}')
+    text :vendor_bank_account_swift_code, editable: false, visible: false, required: false, can_editable_be_changed: false, computed: Forms::Compute::Lookup('receiving_account_id', '{{record.swift_code}}')
   end
 
   # BILLING ADDRESS
@@ -357,6 +361,20 @@ class Docs::P2P::Invoices::Form < Forms::API
     rule Rules::Builder['due_date'].lt(entity: "date")
   end
 
+  condition condition_id: "Enable Bank Accounts > Swift / BIC Code for International Vendors" do
+    reference :entity, 'vendor_bank_account_swift_code'
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    action :visible, true
+    action :required, true
+  end
+
+  condition condition_id: "Disable Bank Accounts > IFS Code for International Vendors" do
+    reference :entity, 'vendor_bank_account_ifsc'
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    action :visible, false
+    action :required, false
+  end
+
   # validation validation_id: "Advance Amount cannot be greater than total amount" do
   #   reference 'advance_paid_amount'
   #   error_message "Advance Amount Cannot be Greater Than Invoice Total"
@@ -442,3 +460,5 @@ class Docs::P2P::Invoices::Form < Forms::API
 
 
 end
+
+

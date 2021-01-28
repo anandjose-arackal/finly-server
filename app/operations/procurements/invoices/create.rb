@@ -63,6 +63,7 @@ class Procurements::Invoices::Create < Procurements::Invoices::Base
     self.invoice.vendor_id = vendor.id
     self.invoice.vendor_pan = vendor&.pan
     self.invoice.vendor_sequence_id = vendor&.vendor_id
+    self.invoice.vendor_country = vendor&.vendor_country
     self.invoice.rcm_enabled = vendor.rcm_enabled
     if self.vendor.payment_term_id.present?
       self.invoice.payment_term_id = self.vendor.payment_term_id

@@ -79,6 +79,7 @@ class NonPoInvoiceMigrator
             # Vendor Related Fields
             vendor_sequence_id: document&.vendor&.vendor_id,
             vendor_trade_name: document&.vendor&.display_name,
+            vendor_country: document&.vendor&.vendor_country,
             vendor_pan: document&.vendor&.pan,
             vendor_bank_account_number: document&.receiving_account&.account_number,
             vendor_bank_account_ifsc: document&.receiving_account&.ifsc,
