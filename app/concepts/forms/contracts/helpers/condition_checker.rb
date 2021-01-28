@@ -20,7 +20,6 @@ class Forms::Contracts::Helpers::ConditionChecker
         break
       end
       next unless applicable
-
       next unless contract.contract_root.profiler.step("condition.apply") { condition.rule.apply?({ form: form, row: row }.with_indifferent_access, controlling_field: entity.entity_path) }
       # match = true
       # condition.rules.each do |rule|

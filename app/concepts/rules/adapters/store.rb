@@ -7,16 +7,13 @@ class Rules::Adapters::Store
     data = data.with_indifferent_access unless data.is_a?(ActiveSupport::HashWithIndifferentAccess)
 
     if Rules::Constants::LOGICAL_OPERATORS.include?(data[:m].to_s) && data[:c].present?
-      rule = nil
-      data[:c].each do |d|
-        next if d.dig('a', '0', 'name').nil?
-        if rule.nil?
-          rule = Rules::Adapters::Store.load(d)
-        else
-          rule = rule.send(data[:m],  Rules::Adapters::Store.load(d))
-        end
+      rule = Rules::Adapters::Store.load(data[:c].first)
+      rules = []
+      data[:c][1..]&.each do |d|
+        next if ((d.dig('a', '0', 'name').nil? && d.dig('c').nil?) || d.dig("_destroy"))
+        rules << Rules::Adapters::Store.load(d)
       end
-      rule
+      rule.send(data[:m], *rules)
     else
       attribute = data&.dig('a', '0', 'name')
       predicate = data&.dig('p')
@@ -27,6 +24,7 @@ class Rules::Adapters::Store
       Rules::Operator.new(attribute).send(predicate, *values)
     end
   end
+
 
   def self.dump(rule)
     JSON.dump(as_json(rule))

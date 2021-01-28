@@ -122,8 +122,9 @@ class FormEntity::AutoNumber < FormEntity
   def self.fetch_autonumber(entity, model)
     prefix = entity.config['sequence']['prefix']
     min_length = entity.config['sequence']['start_at'].length
+    start_at = entity.config['sequence']['start_at'].to_i - 1
     prefix = LiquidHelper.interpolate(prefix, {'record' => model})
-    sequence = REDIS.incr("FormEntity::AutoNumber##{entity.id}##{prefix}")
+    sequence = REDIS.incr("FormEntity::AutoNumber##{entity.id}##{prefix}") + start_at
     sequence = sequence.to_s.rjust(min_length, "0")
     [prefix, sequence]
   end
