@@ -49,6 +49,8 @@ class FormCustomField < ApplicationRecord
       attachments.as_json if self.persisted?
     when 'switch'
       FormEntity::Switch::TRUTHY_VALUES.include? value
+    when 'number'
+      form_entity.options['format'] == 'number' ? value.to_i.to_s :  sprintf( "%0.02f", value.to_f)
     else
       value
     end
