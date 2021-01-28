@@ -368,6 +368,27 @@ class Docs::P2P::Invoices::Form < Forms::API
     action :required, true
   end
 
+  condition condition_id: "Disable Vendor Location > No Location for International Vendors" do
+    reference :entity, 'gstin_location_id'
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    action :visible, false
+    action :required, false
+  end
+
+  condition condition_id: "Disable Vendor Gstin > No Gstin for International Vendors" do
+    reference :entity, 'vendor_gstin'
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    action :visible, false
+    action :required, false
+  end
+
+  condition condition_id: "Disable Vendor Pan > No Pan for International Vendors" do
+    reference :entity, 'vendor_pan'
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    action :visible, false
+    action :required, false
+  end
+
   condition condition_id: "Disable Bank Accounts > IFS Code for International Vendors" do
     reference :entity, 'vendor_bank_account_ifsc'
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
@@ -460,5 +481,3 @@ class Docs::P2P::Invoices::Form < Forms::API
 
 
 end
-
-
