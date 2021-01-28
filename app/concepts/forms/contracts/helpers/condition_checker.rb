@@ -20,10 +20,7 @@ class Forms::Contracts::Helpers::ConditionChecker
         break
       end
       next unless applicable
-      entities = FormEntity.where(entity_key: form.keys, system_field: false, entity_type: 'dropdown')
-      override_data ||= {}
-      entities.map{ |ent| override_data[ent.entity_key] = FormEntityChoice.find_by(uuid: form[ent.entity_key])&.name}
-      next unless contract.contract_root.profiler.step("condition.apply") { condition.rule.apply?({ form: form.merge(override_data), row: row.merge(override_data) }.with_indifferent_access, controlling_field: entity.entity_path) }
+      next unless contract.contract_root.profiler.step("condition.apply") { condition.rule.apply?({ form: form, row: row }.with_indifferent_access, controlling_field: entity.entity_path) }
       # match = true
       # condition.rules.each do |rule|
       #   match = false unless rule.match?({form: form, row: row}.with_indifferent_access)
