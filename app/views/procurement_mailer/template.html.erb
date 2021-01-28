@@ -11,27 +11,21 @@
     <p style="font-size: 17px; margin-left: 3%;text-align: left"><%=@data.body_val.html_safe%></p>
     <br>
 
-    <% if @data.action_url %>
-      <div style="text-align: center;">
-        <a href="https://www.finly.io/" style="height: 33px; width: 200px; background-color: #3adb76; color: white; border: none; font-size: 16px;padding: 10px 20px;
-          border-radius: 2px;
-          text-decoration: none;">Go to Finly</a>
-      </div>
-    <% else %>
-      <div style="text-align: center;">
-        <a href="https://www.finly.io/" style="height: 33px; width: 200px; background-color: #3adb76; color: white; border: none; font-size: 16px;padding: 10px 20px;
-          border-radius: 2px;
-          text-decoration: none;">Go to Finly</a>
-      </div>
-    <% end %>
+    <div style="text-align: center;">
+      <a href="https://www.finly.io/payments" style="height: 33px; width: 200px; background-color: #3adb76; color: white; border: none; font-size: 16px;padding: 10px 20px;
+        border-radius: 2px;
+        text-decoration: none;">Go to Finly</a>
+    </div>
 
     <br>
-    <div style="text-align: right; padding-right: 3%;">
+    <div style="text-align: right; padding-right: 20%;">
       <label style="font-size: 20px; font-weight: bold;">Purchase Order Total&nbsp;:&nbsp;&#8377;<%= @data.purchase_order.balance_amount.value%></label>
     </div>
     <br>
+    <% if @data.purchase_order.approved? %>
+      <p style="font-size: 17px; margin-left: 3%;">A PDF copy of the purchase order has been attached.</p>
+    <% end %>  
 
-    <p style="font-size: 17px; margin-left: 3%;">A PDF copy of the purchase order has been attached.</p>
   </div>
   </body>
 <% end %>

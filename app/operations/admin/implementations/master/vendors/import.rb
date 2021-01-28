@@ -35,6 +35,11 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
     if vendor && vendor_params["vendor"]["gstin_locations_attributes"]
       if check_existing_location(vendor, vendor_params["vendor"]["gstin_locations_attributes"].first)
         vendor.gstin_locations.build(vendor_params["vendor"]["gstin_locations_attributes"])
+        messages = validate_vendor(vendor,true)
+        unless messages.blank?
+          return result false, messages.join(', ')
+        end
+
         unless vendor.save
           return result false, vendor.errors.full_messages
         end
@@ -45,6 +50,11 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
     end
 
     vendor = self.company.yes_bank_vendors.build(vendor_params["vendor"])
+    messages = validate_vendor(vendor,false)
+    unless messages.blank?
+      return result false, messages.join(', ')
+    end
+
     unless vendor.validate
       return result false, vendor.errors.full_messages
     end
@@ -206,6 +216,39 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
     else
       text&.strip
     end
+  end
+
+  def validate_vendor(vendor, only_gstin = false)
+    messages = []
+
+    if vendor.gstin_locations.last.present?
+      gstins = vendor.gstin_locations.pluck(:gstin)
+      gstins << vendor.gstin_locations.last.gstin
+      similar_gstins = GstinLocation.where(vendor_id: company.yes_bank_vendors.non_deleted.filter_active).where(gstin: gstins)
+      if similar_gstins.present?
+        messages.push "GSTIN details for \"#{similar_gstins.first.gstin}\" already exists in the system. See vendor - #{similar_gstins.first.vendor.display_name}"
+      end
+    end
+
+    return messages if only_gstin
+
+    if vendor.pan.present?
+      similar_pan_vendors = YesBankVendor.where(pan: vendor.pan, company_id: company.id).filter_active
+      if similar_pan_vendors.present?
+        messages.push "Vendor with pan: \"#{similar_pan_vendors.first.pan}\" already exists in the system. See vendor - #{similar_pan_vendors.first.display_name}"
+      end
+    end
+
+    if vendor.bank_accounts.last.present?
+      account_numbers = vendor.bank_accounts.pluck(:account_number)
+      account_numbers << vendor.bank_accounts.last.account_number
+      similar_bank_accounts = BankAccount.where(account_number: account_numbers, company_id: company.id).filter_active
+      if similar_bank_accounts.present?
+        messages.push "Active Bank Account with account number \"#{similar_bank_accounts.first.account_number}\" already exists in the system. Please disable it. See vendor - #{similar_bank_accounts.first.account_owner.display_name}"
+      end
+    end
+
+    messages
   end
 
   def check_existing_vendor(vendor_params)

@@ -99,7 +99,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
       end
       op.error do |result|
         puts "Error:Result: #{result}"
-        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failure))
+        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
         payment.update(payment_status_id: PaymentStatus.id_for(:failed))
         result["errors"]&.values&.flatten&.each do |error|
           # add_error_message( payment, error )
