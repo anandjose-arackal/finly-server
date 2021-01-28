@@ -62,7 +62,7 @@ class FormEntity::Number < FormEntity
   # option :decimal, default: false
   option :format
 
-  operators :gteq, :lteq, :in, :not_in, :not_null, :null
+  operators :gteq, :lteq, :not_null, :null
 
   contract_eval 'Max Value Limit Check', &Forms::Validations::Templates[:max_value]
   contract_eval 'Min Value Limit Check', &Forms::Validations::Templates[:min_value]
