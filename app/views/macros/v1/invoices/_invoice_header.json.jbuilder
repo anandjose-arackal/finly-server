@@ -47,3 +47,9 @@ json.vendor_location record.gstin_location
 json.billing_location record.location
 json.shipping_location record.delivery_location
 json.beneficiary_account record.bank_account
+json.po_advance_adjusted record.advance_amount_required
+if record.advance_amount_required
+  json.po_adjusted_advance_amount exposure.po_adjusted_advance_value
+  json.po_advance record.po_advance
+  json.po_prev_adjusted_advance record.po_prev_adjusted_advance
+end

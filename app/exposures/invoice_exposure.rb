@@ -192,6 +192,10 @@ class InvoiceExposure < Exposures::API
 
   attribute :item_amounts_total, record_attribute: true, includes: [{invoice_items: [:inventory_line_item, :amount, :billable_amount]}]
 
+  attribute :po_adjusted_advance_value, includes: [:po_adjusted_advance] do
+    record.po_adjusted_advance&.value || 0
+  end
+
 
   # def vendor_ref_num(invoice_line_item)
   #   invoice_line_item.parent&.vendor_id
