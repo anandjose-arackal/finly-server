@@ -11,9 +11,7 @@ class Docs::P2P::Invoices::Form < Forms::API
           item_tax_amount: "{{ row.item_taxable_amount | times: row.tax_percentage | divided_by: 100 }}",
           item_tds_amount: "{% if row.tds_applicable == true %}{{ row.item_taxable_amount | times: form.tds_percentage | divided_by: 100 }}{% else %}{{ 0 }}{% endif %}",
           item_net_amount: "{{ row.item_taxable_amount | plus: row.item_tax_amount }}",
-          item_billable_amount: "{{ row.item_taxable_amount | plus: row.item_tax_amount | minus: row.item_tds_amount }}", # todo - I2P will be different for PO invoice
-          # tax_type_choice: "{% if form.vendor_country == 'India' %}{% assign value = [{id: IGST, name: IGST}, {id: CGST+SGST, name: CGST+SGST}] %}{% endif %}{% if form.vendor_country == 'International' %}{% assign value =  [{id: VAT, name: VAT} %}{% endif %}{{value}}"
-          # {id: 'IGST', name: 'IGST'}, {id: 'CGST+SGST', name: 'CGST+SGST'}, {id: 'VAT', name: 'VAT'}
+          item_billable_amount: "{{ row.item_taxable_amount | plus: row.item_tax_amount | minus: row.item_tds_amount }}", # todo - I2P will be different for PO invoice          
       },
       # INVOICE SUMMARY
       summary: {
@@ -96,8 +94,8 @@ class Docs::P2P::Invoices::Form < Forms::API
     lookup :department_id, label: "Department", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('departments') #, editable: false, visible: false
     lookup :cost_center_id, label: "Cost Center", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('cost_centers')
     date :conversion_date, label: "Conversion Date",
-         # required: true,
          computed: Forms::Compute::Form('{{form.date}}')
+
     currency :reporting_currency, label: "Reporting Currency"
     currency :base_currency, label: "Base Currency", visible: false, editable: false, can_editable_be_changed: false # todo populate with system base currency
     switch :retrieve_conversion_rate, label: "Auto Populate Conversion Rate", default_value: true, visible: false
@@ -117,9 +115,8 @@ class Docs::P2P::Invoices::Form < Forms::API
     
     text :vendor_sequence_id, "Vendor ID", editable: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.vendor_id}}')
 
-    #  text :pan, editable: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.pan}}')
     lookup :gstin_location_id, label: 'Vendor Location', choices_scope: Choices[:lookup].('vendor_locations'), # todo - condition to hide for international
-           filters: Rules::Builder[:vendor_id].eq(entity: :vendor_id)
+            filters: Rules::Builder[:vendor_id].eq(entity: :vendor_id)
     text :vendor_gstin, "Vendor GSTIN", editable: false, computed: Forms::Compute::Lookup('gstin_location_id', '{{record.gstin}}') # todo - condition
     text :vendor_pan, "Vendor PAN", editable: false # todo - add condition
     lookup :receiving_account_id, label: "Vendor Account", choices_scope: Choices[:lookup].('vendor_bank_accounts'),
@@ -226,7 +223,10 @@ class Docs::P2P::Invoices::Form < Forms::API
              can_editable_be_changed: false
 
       # dropdown :tax_type, label: "Tax Type", choices_scope: Choices[:list].({id: 'IGST', name: "IGST"}, {id: 'CGST+SGST', name: "CGST+SGST"}, {id: 'VAT', name: 'VAT'}), required: false
-      # dropdown :tax_type, label: "Tax Type", choices_scope: Choices[:list].(Forms::Compute::Form(LIQUID_FORMULAE[:items][:tax_type_choice])), required: true
+      
+      dropdown :tax_type, label: "Tax Type",
+                choices_scope: Choices[:list].(*TaxType.where(country_name: "{{ form.vendor_country }}".downcase ).map{ |t| {id: t.id, name: t.name }}),
+                required: true, editable: true, visible: true
       lookup :tax_rate_id, label: "Tax Rate", editable: true, visible: true, choices_scope: Choices[:lookup].('tax_rates'), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.tax_rate_id}}')
 
       # tax # tax percentage

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_29_103532) do
+ActiveRecord::Schema.define(version: 2021_01_29_171051) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -8173,6 +8173,16 @@ ActiveRecord::Schema.define(version: 2021_01_29_103532) do
     t.string "cgst_internal_id"
     t.string "sgst_internal_id"
     t.index ["company_id"], name: "index_tax_rates_on_company_id"
+  end
+
+  create_table "tax_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "country_name", default: ""
+    t.string "name", default: ""
+    t.string "tax_name", default: ""
+    t.datetime "deleted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["deleted_at"], name: "index_tax_types_on_deleted_at"
   end
 
   create_table "tds_rates_lists", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
