@@ -9,7 +9,6 @@ class Forms::Contracts::Helpers::ConditionChecker
       result[property] = entity.send(property)
     end
 
-
     conditions.each do |condition|
       # Applicable only if the required properties is impact by the condition.
       # This helps in running different conditions at deserialization stage (editable/visible) vs validation stage(required)
@@ -21,8 +20,7 @@ class Forms::Contracts::Helpers::ConditionChecker
         break
       end
       next unless applicable
-
-      next unless contract.contract_root.profiler.step("condition.apply") { condition.rule.apply?({form: form, row: row}.with_indifferent_access) }
+      next unless contract.contract_root.profiler.step("condition.apply") { condition.rule.apply?({ form: form, row: row }.with_indifferent_access, controlling_field: entity.entity_path) }
       # match = true
       # condition.rules.each do |rule|
       #   match = false unless rule.match?({form: form, row: row}.with_indifferent_access)
