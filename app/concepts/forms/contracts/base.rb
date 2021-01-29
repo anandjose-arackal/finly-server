@@ -50,13 +50,13 @@ class Forms::Contracts::Base < Reform::Form
       )
       if [Choices::Builders::Lookup.name, Choices::Builders::Resolver.name].include?(result[:choices].provider.class.name)
         if result[:choices].data.size != values.size
-          errors.add entity.entity_key, 'has an invalid choice'
+          errors.add entity.label, 'has an invalid choice'
         end
       else
         ids = result[:choices].data.map {|item| item[:id]&.to_s || item['id']&.to_s}.uniq
         values.each do |value|
           unless ids.include?(value.to_s)
-            errors.add entity.entity_key, 'has an invalid choice'
+            errors.add entity.label, 'has an invalid choice'
             break
           end
         end
