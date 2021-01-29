@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_28_095104) do
+ActiveRecord::Schema.define(version: 2021_01_29_103532) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -5323,6 +5323,9 @@ ActiveRecord::Schema.define(version: 2021_01_28_095104) do
     t.integer "payment_term_days", default: 0
     t.string "vendor_bank_account_swift_code", default: ""
     t.string "vendor_country", default: ""
+    t.string "tax_type", default: ""
+    t.string "transactions_service_period_form", default: ""
+    t.string "transactions_service_period_to", default: ""
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["company_id", "controlling_level_id", "deleted_at"], name: "index_invoice_ct_lvl_cmpny_id"
     t.index ["controlling_level_id"], name: "index_invoices_on_controlling_level_id"
@@ -8644,6 +8647,15 @@ ActiveRecord::Schema.define(version: 2021_01_28_095104) do
     t.datetime "deleted_at"
     t.index ["company_id"], name: "index_unique_identifiers_on_company_id"
     t.index ["purpose_id"], name: "index_unique_identifiers_on_purpose_id"
+  end
+
+  create_table "units", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "name", default: ""
+    t.string "value", default: ""
+    t.datetime "deleted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["deleted_at"], name: "index_units_on_deleted_at"
   end
 
   create_table "user_agent_client_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
