@@ -428,28 +428,28 @@ class Docs::P2P::Invoices::Form < Forms::API
   end
 
   condition condition_id: "Disable Item Tds Applicable > Tds Applicable for International Vendors" do
-    reference :entity, 'tds_applicable'
+    reference :entity, 'items.tds_applicable'
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :visible, false
     action :required, false
   end
 
   condition condition_id: "Disable Summary TDS Slab > Summary TDS Slab for International Vendors" do
-    reference :entity, 'tds_slab_id'
+    reference :entity, 'items_summary.tds_slab_id'
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :visible, false
     action :required, false
   end
 
   condition condition_id: "Disable Summary TDS Percentage > Summary TDS Percentage for International Vendors" do
-    reference :entity, 'tds_percentage'
+    reference :entity, 'items_summary.tds_percentage'
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :visible, false
     action :required, false
   end
 
   condition condition_id: "Disable Summary TDS Amount > TDS Amount for International Vendors" do
-    reference :entity, 'invoice_tds_amount'
+    reference :entity, 'items_summary.invoice_tds_amount'
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :visible, false
     action :required, false
