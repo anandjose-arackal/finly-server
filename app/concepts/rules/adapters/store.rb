@@ -13,6 +13,7 @@ class Rules::Adapters::Store
         next if ((d.dig('a', '0', 'name').nil? && d.dig('c').nil?) || d.dig("_destroy"))
         rules << Rules::Adapters::Store.load(d)
       end
+      return rule if rules.empty?
       rule.send(data[:m], *rules)
     else
       attribute = data&.dig('a', '0', 'name')
