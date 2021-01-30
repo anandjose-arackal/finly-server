@@ -187,7 +187,7 @@ class InvoiceExposure < Exposures::API
   end
 
   attribute :rcm_enabled, record_attribute: true
-
+  attribute :vendor_country, record_attribute: true
   attribute :custom_fields, record_attribute: true, includes: [{ custom_fields: [:field_configuration, :value] }]
 
   attribute :item_amounts_total, record_attribute: true, includes: [{invoice_items: [:inventory_line_item, :amount, :billable_amount]}]

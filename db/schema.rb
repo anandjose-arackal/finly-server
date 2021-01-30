@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_29_171051) do
+ActiveRecord::Schema.define(version: 2021_01_29_195003) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -5134,6 +5134,7 @@ ActiveRecord::Schema.define(version: 2021_01_29_171051) do
     t.decimal "item_net_amount_converted", precision: 20, scale: 5
     t.decimal "item_billable_amount", precision: 20, scale: 5
     t.decimal "item_billable_amount_converted", precision: 20, scale: 5
+    t.string "tax_type", default: ""
     t.index ["category_id"], name: "index_invoice_line_items_on_category_id"
     t.index ["department_id"], name: "index_invoice_line_items_on_department_id"
     t.index ["discount_amount_id"], name: "index_invoice_line_items_on_discount_amount_id"

@@ -5,31 +5,31 @@ class Docs::P2P::Invoices::Form < Forms::API
   # LIQUID FORMULAE
   LIQUID_FORMULAE = {
       items: {
-          item_gross_amount: "{{ row.rate | times: row.quantity }}",
-          item_discount_amount: "{{ row.item_gross_amount | times: row.discount | divided_by: 100 }}",
-          item_taxable_amount: "{{ row.item_gross_amount | minus: row.item_discount_amount }}",
-          item_tax_amount: "{{ row.item_taxable_amount | times: row.tax_percentage | divided_by: 100 }}",
-          item_tds_amount: "{% if row.tds_applicable == true %}{{ row.item_taxable_amount | times: form.tds_percentage | divided_by: 100 }}{% else %}{{ 0 }}{% endif %}",
-          item_net_amount: "{{ row.item_taxable_amount | plus: row.item_tax_amount }}",
-          item_billable_amount: "{{ row.item_taxable_amount | plus: row.item_tax_amount | minus: row.item_tds_amount }}", # todo - I2P will be different for PO invoice          
+          item_gross_amount: "{{ row.rate | times: row.quantity | round: 2 }}",
+          item_discount_amount: "{{ row.item_gross_amount | times: row.discount | divided_by: 100 | round: 2}}",
+          item_taxable_amount: "{{ row.item_gross_amount | minus: row.item_discount_amount | round: 2 }}",
+          item_tax_amount: "{{ row.item_taxable_amount | times: row.tax_percentage | divided_by: 100 | round: 2 }}",
+          item_tds_amount: "{% if row.tds_applicable == true %}{{ row.item_taxable_amount | times: form.tds_percentage | divided_by: 100 | round: 2}}{% else %}{{ 0 }}{% endif %}",
+          item_net_amount: "{{ row.item_taxable_amount | plus: row.item_tax_amount | round: 2 }}",
+          item_billable_amount: "{{ row.item_taxable_amount | plus: row.item_tax_amount | minus: row.item_tds_amount | round: 2 }}", # todo - I2P will be different for PO invoice          
       },
       # INVOICE SUMMARY
       summary: {
-          invoice_gross_amount: "{% assign gross_amount = 0 %}{% for item in form.items %}{% assign gross_amount = gross_amount | plus: item.item_gross_amount %}{% endfor %}{{ gross_amount }}",
-          invoice_discount_amount: "{% assign discount_amount = 0 %}{% for item in form.items %}{% assign discount_amount = discount_amount | plus: item.item_discount_amount %}{% endfor %}{{ discount_amount }}",
+          invoice_gross_amount: "{% assign gross_amount = 0 %}{% for item in form.items %}{% assign gross_amount = gross_amount | plus: item.item_gross_amount %}{% endfor %}{{ gross_amount | round: 2 }}",
+          invoice_discount_amount: "{% assign discount_amount = 0 %}{% for item in form.items %}{% assign discount_amount = discount_amount | plus: item.item_discount_amount %}{% endfor %}{{ discount_amount | round: 2 }}",
           invoice_taxable_amount: "{{ form.invoice_gross_amount | minus: form.invoice_discount_amount }}",
-          invoice_tax_amount: "{% assign tax_amount = 0 %}{% for item in form.items %}{% assign tax_amount = tax_amount | plus: item.item_tax_amount %}{% endfor %}{{ tax_amount }}",
-          invoice_tds_amount: "{% assign tds_amount = 0 %}{% for item in form.items %}{% assign tds_amount = tds_amount | plus: item.item_tds_amount %}{% endfor %}{{ tds_amount }}",
+          invoice_tax_amount: "{% assign tax_amount = 0 %}{% for item in form.items %}{% assign tax_amount = tax_amount | plus: item.item_tax_amount %}{% endfor %}{{ tax_amount | round: 2 }}",
+          invoice_tds_amount: "{% assign tds_amount = 0 %}{% for item in form.items %}{% assign tds_amount = tds_amount | plus: item.item_tds_amount %}{% endfor %}{{ tds_amount | round: 2 }}",
           # invoice_sub_total_amount: "{{ form.invoice_gross_amount | minus: form.invoice_discount_amount | plus: form.invoice_tax_amount | minus: form.invoice_tds_amount }}",
-          invoice_sub_total_amount: "{{ form.invoice_gross_amount | minus: form.invoice_discount_amount | plus: form.invoice_tax_amount | plus: form.invoice_freight_amount |minus: form.invoice_tds_amount}}",
+          invoice_sub_total_amount: "{{ form.invoice_gross_amount | minus: form.invoice_discount_amount | plus: form.invoice_tax_amount | plus: form.invoice_freight_amount | minus: form.invoice_tds_amount | round: 2 }}",
           # todo - Issue : Roundoff should be automatically calulated everytime user inputs something, even if its the round off itself
           invoice_roundoff_amount: "{% assign amount = form.invoice_sub_total_amount | round %}{{amount | minus: form.invoice_sub_total_amount | round: 2 }}",
-          invoice_total_amount: "{{ form.invoice_sub_total_amount | plus: form.invoice_roundoff_amount }}",
-          invoice_net_total_amount: "{{ form.invoice_total_amount | minus: form.invoice_paid_outside_amount | minus: form.invoice_advance_paid_amount}}",
+          invoice_total_amount: "{{ form.invoice_sub_total_amount | plus: form.invoice_roundoff_amount | round: 2 }}",
+          invoice_net_total_amount: "{{ form.invoice_total_amount | minus: form.invoice_paid_outside_amount | minus: form.invoice_advance_paid_amount | round: 2 }}",
           # todo - will be shown on top of invoice and needs separate calculation
           # invoice_balance_due: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | round: 2 }}",          
-          invoice_balance_due: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount |minus: form.invoice_paid_outside_amount | round: 2}}",
-          invoice_balance_due_converted: "{{ form.invoice_balance_due |times: form.conversion_rate | round: 2 }}"
+          invoice_balance_due: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | minus: form.invoice_paid_outside_amount | round: 2 }}",
+          invoice_balance_due_converted: "{{ form.invoice_balance_due | times: form.conversion_rate | round: 2 }}"
 
       }
   }
@@ -93,7 +93,7 @@ class Docs::P2P::Invoices::Form < Forms::API
          required: true, editable: false
     lookup :department_id, label: "Department", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('departments') #, editable: false, visible: false
     lookup :cost_center_id, label: "Cost Center", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('cost_centers')
-    date :conversion_date, label: "Conversion Date",
+    date :conversion_date, label: "Conversion Date", editable: false, visible: true,
          computed: Forms::Compute::Form('{{form.date}}')
 
     currency :reporting_currency, label: "Reporting Currency"
@@ -124,7 +124,7 @@ class Docs::P2P::Invoices::Form < Forms::API
            editable: true, visible: true, required: true
     text :receiving_account_type, visible: false, internal: true, editable: false, computed: Forms::Compute::Form('BankAccount')
     text :vendor_bank_account_number, editable: false, can_editable_be_changed: false, computed: Forms::Compute::Lookup('receiving_account_id', '{{record.account_number}}')
-    text :vendor_bank_account_ifsc, editable: false, can_editable_be_changed: false, computed: Forms::Compute::Lookup('receiving_account_id', '{{record.ifsc}}')
+    text :vendor_bank_account_ifsc, editable: false, required: true, can_editable_be_changed: false, computed: Forms::Compute::Lookup('receiving_account_id', '{{record.ifsc}}')
     text :vendor_bank_account_swift_code, editable: false, visible: false, required: false, can_editable_be_changed: false, computed: Forms::Compute::Lookup('receiving_account_id', '{{record.swift_code}}')
   end
 
@@ -177,7 +177,7 @@ class Docs::P2P::Invoices::Form < Forms::API
 
       lookup :tds_applicable, visible: true, editable: false,
               can_editable_be_changed: false,
-              can_visible_be_changed: false,              
+              can_visible_be_changed: false
               computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.tds_applicable }}')
 
       # currency :currency_code, editable: false, visible: false, computed: Forms::Compute::Form("{{ form.currency_code }}")
@@ -192,7 +192,8 @@ class Docs::P2P::Invoices::Form < Forms::API
       amount :rate, label: "Rate",
              can_editable_be_changed: false,
              can_visible_be_changed: false,
-             required: true
+             required: true,
+             computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.rate}')
 
       # gross_amount = rate x quantity
       amount :item_gross_amount, editable: false, visible: false,
@@ -421,6 +422,34 @@ class Docs::P2P::Invoices::Form < Forms::API
 
   condition condition_id: "Disable Bank Accounts > IFS Code for International Vendors" do
     reference :entity, 'vendor_bank_account_ifsc'
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    action :visible, false
+    action :required, false
+  end
+
+  condition condition_id: "Disable Item Tds Applicable > Tds Applicable for International Vendors" do
+    reference :entity, 'tds_applicable'
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    action :visible, false
+    action :required, false
+  end
+
+  condition condition_id: "Disable Summary TDS Slab > Summary TDS Slab for International Vendors" do
+    reference :entity, 'tds_slab_id'
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    action :visible, false
+    action :required, false
+  end
+
+  condition condition_id: "Disable Summary TDS Percentage > Summary TDS Percentage for International Vendors" do
+    reference :entity, 'tds_percentage'
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    action :visible, false
+    action :required, false
+  end
+
+  condition condition_id: "Disable Summary TDS Amount > TDS Amount for International Vendors" do
+    reference :entity, 'invoice_tds_amount'
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :visible, false
     action :required, false
