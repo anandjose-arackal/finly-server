@@ -17,4 +17,11 @@ class MasterEntityChoice < ApplicationRecord
   belongs_to :company
   belongs_to :master_entity
   belongs_to :created_by, class_name: 'User', optional: true
+
+  def as_json()
+    {
+      id: id,
+      name: name
+    }
+  end
 end
