@@ -6,7 +6,7 @@ class Docs::P2P::Invoices::Form < Forms::API
   LIQUID_FORMULAE = {
       items: {
           item_gross_amount: "{{ row.rate | times: row.quantity | round: 2 }}",
-          item_discount_amount: "{{ row.item_gross_amount | times: row.discount | divided_by: 100 | round: 2}}",
+          item_discount_amount: "{% if accounting_details.discount_type == percentage %}{{ row.item_gross_amount | times: row.discount | divided_by: 100 | round: 2}}{% eleif accounting_details.discount_type == amount %}{{ row.discount }}{% else %}{{ 0 }}{% endif %}",
           item_taxable_amount: "{{ row.item_gross_amount | minus: row.item_discount_amount | round: 2 }}",
           item_tax_amount: "{{ row.item_taxable_amount | times: row.tax_percentage | divided_by: 100 | round: 2 }}",
           item_tds_amount: "{% if row.tds_applicable == true %}{{ row.item_taxable_amount | times: form.tds_percentage | divided_by: 100 | round: 2}}{% else %}{{ 0 }}{% endif %}",
@@ -16,11 +16,11 @@ class Docs::P2P::Invoices::Form < Forms::API
       # INVOICE SUMMARY
       summary: {
           invoice_gross_amount: "{% assign gross_amount = 0 %}{% for item in form.items %}{% assign gross_amount = gross_amount | plus: item.item_gross_amount %}{% endfor %}{{ gross_amount | round: 2 }}",
+          
           invoice_discount_amount: "{% assign discount_amount = 0 %}{% for item in form.items %}{% assign discount_amount = discount_amount | plus: item.item_discount_amount %}{% endfor %}{{ discount_amount | round: 2 }}",
           invoice_taxable_amount: "{{ form.invoice_gross_amount | minus: form.invoice_discount_amount }}",
           invoice_tax_amount: "{% assign tax_amount = 0 %}{% for item in form.items %}{% assign tax_amount = tax_amount | plus: item.item_tax_amount %}{% endfor %}{{ tax_amount | round: 2 }}",
           invoice_tds_amount: "{% assign tds_amount = 0 %}{% for item in form.items %}{% assign tds_amount = tds_amount | plus: item.item_tds_amount %}{% endfor %}{{ tds_amount | round: 2 }}",
-          # invoice_sub_total_amount: "{{ form.invoice_gross_amount | minus: form.invoice_discount_amount | plus: form.invoice_tax_amount | minus: form.invoice_tds_amount }}",
           invoice_sub_total_amount: "{{ form.invoice_gross_amount | minus: form.invoice_discount_amount | plus: form.invoice_tax_amount | plus: form.invoice_freight_amount | minus: form.invoice_tds_amount | round: 2 }}",
           # todo - Issue : Roundoff should be automatically calulated everytime user inputs something, even if its the round off itself
           invoice_roundoff_amount: "{% assign amount = form.invoice_sub_total_amount | round %}{{amount | minus: form.invoice_sub_total_amount | round: 2 }}",
@@ -93,6 +93,7 @@ class Docs::P2P::Invoices::Form < Forms::API
          required: true, editable: false
     lookup :department_id, label: "Department", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('departments') #, editable: false, visible: false
     lookup :cost_center_id, label: "Cost Center", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('cost_centers')
+    dropdown :discount_type, label: "Discount Type", editable: true, visible: true, required: true, choices_scope: Choices[:list].({id: '', name: 'None'} , {id: 'percentage', name: 'percentage'}, {id: 'amount', name: 'Amount'} ), default_value: ""
     date :conversion_date, label: "Conversion Date", editable: false, visible: true,
          computed: Forms::Compute::Form('{{form.date}}')
 
@@ -186,14 +187,14 @@ class Docs::P2P::Invoices::Form < Forms::API
       lookup :unit_of_measurement, label: "Unit of Measurement",
               choices_scope: Choices[:list].(*Unit.all.map{ |v| {id: v.value, name: v.name }}),
               required: true, editable: true, visible: true,
-              computed: Forms::Compute::Lookup('items', '{{record.unit_of_measurement}')
+              computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.unit_of_measurement}}')
       
       # dropdown :unit_of_measurement, visible: false, choices_scope: Choices[:list].({id: "KG", value: "KG"})
       amount :rate, label: "Rate",
              can_editable_be_changed: false,
              can_visible_be_changed: false,
              required: true,
-             computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.rate}')
+             computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.rate}}')
 
       # gross_amount = rate x quantity
       amount :item_gross_amount, editable: false, visible: false,
@@ -205,7 +206,7 @@ class Docs::P2P::Invoices::Form < Forms::API
              can_editable_be_changed: false
 
       # discount # discount percentage
-      number :discount, max_value: 100, min_value: 0, visible: false, format: 'percentage', default_value: 0
+      number :discount, visible: true, editable: true, default_value: 0
 
       # discount_amount = gross_amount x discount / 100
       amount :item_discount_amount, editable: false, visible: false,
@@ -454,6 +455,13 @@ class Docs::P2P::Invoices::Form < Forms::API
     action :visible, false
     action :required, false
   end
+
+  # condition condition_id: "Set Min and Max for discount > Discount Min Max" do
+  #   reference :entity, 'accounting_details.discount_type'
+  #   rule Rules::Builder[:vendor_country].eq(value: 'percentage')
+  #   action min_value: 0
+  #   action max_value: 100
+  # end
 
   # condition condition_id: "Disable item department > Item department not for Header Cost Allocation Items" do
   #   reference :entity, 'items.department_id'
