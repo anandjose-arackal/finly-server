@@ -35,4 +35,32 @@ class MasterEntity::LargeText < MasterEntity
   set :hint, "Enter value"
   operators :eq_any, :not_eq_all, :cont_any, :not_cont_all, :blank, :present
   simple_filter :cont_any
+
+  MINIMUM_DEFAULT ||= 0
+  MAXIMUM_DEFAULT ||= 65535
+
+  option :minimum, default: MINIMUM_DEFAULT
+  option :maximum, default: MAXIMUM_DEFAULT
+
+  contract_eval 'Max Char Limit Check', &Masters::Schema::Validations::Templates[:maximum]
+  contract_eval 'Min Char Limit Check', &Masters::Schema::Validations::Templates[:minimum]
+
+  schema_contract do
+    validates :options, presence: true
+    validate :options_structure
+
+    def options_structure
+      if options['minimum'].blank?
+        errors.add :minimum,  "cannot be blank"
+      elsif options['maximum'].blank?
+        errors.add :maximum, "cannot be blank"
+      elsif options['minimum'].to_f < MINIMUM_DEFAULT
+        errors.add :minimum, "has to be greater than or equal to #{MINIMUM_DEFAULT}"
+      elsif options['maximum'].to_f > MAXIMUM_DEFAULT
+        errors.add :maximum, "has to be less than or equal to #{MAXIMUM_DEFAULT}"
+      elsif options['minimum'].to_f > options['maximum'].to_f
+        errors.add :minimum, "has to be less than or equal to maximum"
+      end
+    end
+  end
 end

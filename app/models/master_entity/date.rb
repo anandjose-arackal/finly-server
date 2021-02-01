@@ -34,4 +34,44 @@ class MasterEntity::Date < MasterEntity
   filter_type :date
   set :hint, "Select date"
   operators :gteq_days, :lteq_days, :eq_days, :in_days, :eq_any, :gteq, :lteq, :blank
+
+  RESTRICTIONS ||= %w(
+    in_the_future
+    in_the_past
+    not_in_the_future
+    not_in_the_past
+  ).freeze
+
+  option :restriction
+
+  contract_eval 'Restriction' do |contract:, entity:, **|
+    if entity.options['restriction'].present?
+      contract.validate do
+        value = send(entity.entity_key)
+
+        next unless value.present?
+
+        case entity.options['restriction']
+        when 'in_the_future'
+          if value <= DateTime.now.end_of_day
+            errors.add entity.entity_key, "can only be in the future"
+          end
+        when 'in_the_past'
+          if value >= DateTime.now.end_of_day
+            errors.add entity.entity_key, "can only be in the past"
+          end
+        when 'not_in_the_future'
+          if value > DateTime.now.end_of_day
+            errors.add entity.entity_key, "cannot be in the future"
+          end
+        when 'not_in_the_past'
+          if value < DateTime.now.end_of_day
+            errors.add entity.entity_key, "cannot be in the past"
+          end
+        else
+          # Do nothing
+        end
+      end
+    end
+  end
 end

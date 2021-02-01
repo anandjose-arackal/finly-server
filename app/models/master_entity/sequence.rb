@@ -37,6 +37,7 @@ class MasterEntity::Sequence < MasterEntity
   operators :eq_any, :not_eq_all, :cont_any, :not_cont_all, :blank, :present
 
   MIN_LENGTH_DEFAULT ||= 5
+  MAX_MIN_LENGTH_DEFAULT ||= 10
 
   option :prefix
   option :min_length, default: MIN_LENGTH_DEFAULT
@@ -50,10 +51,10 @@ class MasterEntity::Sequence < MasterEntity
         errors.add :prefix,  "cannot be blank"
       elsif options['min_length'].blank?
         errors.add :min_length, "cannot be blank"
-      elsif options['min_length'] < 0
-        errors.add :min_length, "has to be greater than 0"
-      elsif options['min_length'] > 10
-        errors.add :min_length, "has to be less than 10"
+      elsif options['min_length'].to_f < 0
+        errors.add :min_length, "has to be greater than or equal to 0"
+      elsif options['min_length'].to_f > MAX_MIN_LENGTH_DEFAULT
+        errors.add :min_length, "has to be less than or equal to #{MAX_MIN_LENGTH_DEFAULT}"
       end
     end
   end
