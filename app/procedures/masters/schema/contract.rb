@@ -4,6 +4,7 @@ class Masters::Schema::Contract < Reform::Form
   property :name
   property :master_key
   property :company_id, deserializer: -> (input, represented, **) {}
+  property :created_by, deserializer: -> (input, represented, **) {}
   property :klass_name, deserializer: -> (input, represented, **) {}
 
   property :has_nesting, default: false

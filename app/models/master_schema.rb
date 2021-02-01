@@ -29,6 +29,7 @@ class MasterSchema < ApplicationRecord
   include Masters::Entity::Exposure # Define the generation of anonymous exposures
 
   belongs_to :company
+  belongs_to :created_by, class_name: 'User', optional: true
   belongs_to :owner, optional: true
 
   has_many :entities, class_name: 'MasterEntity'
