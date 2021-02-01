@@ -4,4 +4,5 @@ Masters::Router.draw do
   route 'locations', Masters::Locations::Master
   route 'departments', Masters::Departments::Master
   route 'cost_centers', Masters::CostCenters::Master
+  route 'payment_terms', Masters::PaymentTerms::Master
 end
