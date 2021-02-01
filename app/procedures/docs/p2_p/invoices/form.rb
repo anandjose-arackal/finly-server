@@ -290,12 +290,12 @@ class Docs::P2P::Invoices::Form < Forms::API
       amount :overall_discount_amount, editable: false,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:overall_discount_amount])
-             
-      amount :invoice_discount_amount, editable: false,
-             can_editable_be_changed: false,
+
+      amount :invoice_discount_amount, label: "Net Discount Amount",
+              editable: false, can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_discount_amount])
       amount :invoice_discount_amount_converted, editable: false, visible: false,
-             can_visible_be_changed: false,
+             can_visible_be_changed: false, label: "Net Discount Amount Converted",
              can_editable_be_changed: false
 
       amount :invoice_taxable_amount, editable: false, visible: false,
@@ -325,7 +325,7 @@ class Docs::P2P::Invoices::Form < Forms::API
              can_visible_be_changed: false,
              can_editable_be_changed: false
 
-      amount :invoice_freight_amount, "Freight",
+      amount :invoice_freight_amount, label: "Freight",
              default_value: 0, visible: true, editable: true
       amount :invoice_freight_amount_converted, editable: false, visible: false,
              can_visible_be_changed: false,
