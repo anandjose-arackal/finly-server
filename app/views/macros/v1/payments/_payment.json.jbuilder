@@ -41,6 +41,11 @@ json.document do
     # Todo For BBPS Payments
   end
 end
+json.parent_details do
+  unless record.parent.nil?
+    json.merge! record.parent_details
+  end
+end
 json.beneficiary do
   json.user do
     # Todo - For Prepaid Card payments
