@@ -6,7 +6,7 @@ module Lookup::DSL
 
     class_attr :model
     class_attr :resolver
-    class_attr :max_per_page, default: 100
+    class_attr :max_per_page, default: 10
     class_attr :search_key
     class_attr :attributes, default: {}
   end
