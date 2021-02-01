@@ -33,7 +33,14 @@ class Masters::Schema::Contract < Reform::Form
   # by overriding build_twin to return the correct contract instance  depending on the entity type.
   #
   # Reference: #build_twin
-  collection :entities, populate_if_empty: MasterEntity do #, form: ProxyContract
+  collection :entities, populate_if_empty: :get_entity_model! do #, form: ProxyContract
+  end
+
+  def get_entity_model!(fragment:, **)
+    kls = Masters::Entity::Registry.types[fragment['entity_type']]
+    return MasterEntity if kls.blank?
+
+    return kls
   end
 
   # Identifies the entity for which primary_key flag is set. This validates that exactly one entity has primary_key set.
