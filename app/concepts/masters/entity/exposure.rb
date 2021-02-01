@@ -21,9 +21,13 @@ module Masters::Entity::Exposure
       attribute :end_date, record_attribute: true
       attribute :created_by, record_attribute: true, exposure: true
 
+      if master_schema.has_nesting
+        attribute :parent, record_attribute: true, exposure: true
+      end
+
       master_schema.entities.each do |entity|
-        if entity.type?(:lookup) or entity.type?(:parent_lookup)
-          attribute entity.association_name, record_attribute: true, exposure: true, includes: [entity.association_name]
+        if entity.type?(:lookup) or entity.type?(:multi_lookup)
+          attribute entity.entity_key, record_attribute: true, exposure: true, includes: [entity.association_name]
         else
           attribute entity.entity_key, record_attribute: true
         end

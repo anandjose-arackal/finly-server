@@ -6,6 +6,8 @@ class Masters::Schema::Contract < Reform::Form
   property :company_id, deserializer: -> (input, represented, **) {}
   property :klass_name, deserializer: -> (input, represented, **) {}
 
+  property :has_nesting, default: false
+
   # This property cannot be set from the contract. It can only be set directly in the model, which is done by the DSL
   property :system_master, deserializer: -> (input, represented, **) {
     represented.system_master ||= false

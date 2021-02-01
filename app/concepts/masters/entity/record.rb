@@ -23,17 +23,26 @@ module Masters::Entity::Record
       # Clearing it from descendants of superclass as well as ApplicationRecord
       superclass.direct_descendants.delete(self)
       ApplicationRecord.descendants.delete(self)
+
+      # set ancestry if nesting enabled
+      if master_schema.has_nesting
+        belongs_to :parent, anonymous_class: self, optional: true
+      end
+
       unless master_schema.system_master
         default_scope { where(master_schema_id: master_schema.id) }
       end
+
       # For entities of lookup type, add a belongs_to association
       master_schema.entities.each do |entity|
-        if entity.type?(:lookup) or entity.type?(:parent_lookup)
+        if entity.type?(:lookup)
           attr = entity.entity_key
-          anonymous_class = entity.type?(:lookup) ? entity.lookup_master_schema&.record_model_class : self
+          anonymous_class = entity.lookup_master_schema&.record_model_class
           if attr.end_with?('_id')
             attr = attr[0..(attr.length - 4)]
             belongs_to attr.to_sym, -> { where company_id: entity.company_id }, anonymous_class: anonymous_class
+          else
+            belongs_to "#{attr}_obj".to_sym, -> { where company_id: entity.company_id }, anonymous_class: anonymous_class, foreign_key: attr
           end
         end
         if entity.type?(:multi_lookup)

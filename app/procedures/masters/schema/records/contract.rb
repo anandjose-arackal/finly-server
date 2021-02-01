@@ -16,6 +16,10 @@ class Masters::Schema::Records::Contract
       property :created_by, deserializer: -> (input, represented, **) {}
       property :company, deserializer: -> (input, represented, **) {}
 
+      if master_schema.has_nesting
+        property :parent_id, default: nil
+      end
+
       master_schema.entities.each do |entity|
         next unless entity.active
         

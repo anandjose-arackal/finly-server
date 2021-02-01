@@ -70,6 +70,7 @@ class MasterSchema < ApplicationRecord
       name: name,
       master_key: master_key,
       entities: entities,
+      has_nesting: has_nesting,
       created_at: created_at,
       updated_at: updated_at,
       active: active,
