@@ -17,7 +17,10 @@ class Docs::P2P::Invoices::Form < Forms::API
       summary: {
           invoice_gross_amount: "{% assign gross_amount = 0 %}{% for item in form.items %}{% assign gross_amount = gross_amount | plus: item.item_gross_amount %}{% endfor %}{{ gross_amount | round: 2 }}",
           
-          invoice_discount_amount: "{% assign discount_amount = 0 %}{% for item in form.items %}{% assign discount_amount = discount_amount | plus: item.item_discount_amount %}{% endfor %}{{ discount_amount | round: 2 }}",
+          total_line_item_discount_amount: "{% assign discount_amount = 0 %}{% for item in form.items %}{% assign discount_amount = discount_amount | plus: item.item_discount_amount %}{% endfor %}{{ discount_amount | round: 2 }}",
+          overall_discount_amount: "{{ row.overall_discount_amount | round: 2  }}",
+          invoice_discount_amount: "{{ total_line_item_discount_amount | plus: overall_discount_amount | round: 2 }}",
+          
           invoice_taxable_amount: "{{ form.invoice_gross_amount | minus: form.invoice_discount_amount }}",
           invoice_tax_amount: "{% assign tax_amount = 0 %}{% for item in form.items %}{% assign tax_amount = tax_amount | plus: item.item_tax_amount %}{% endfor %}{{ tax_amount | round: 2 }}",
           invoice_tds_amount: "{% assign tds_amount = 0 %}{% for item in form.items %}{% assign tds_amount = tds_amount | plus: item.item_tds_amount %}{% endfor %}{{ tds_amount | round: 2 }}",
@@ -280,6 +283,14 @@ class Docs::P2P::Invoices::Form < Forms::API
              can_visible_be_changed: false,
              can_editable_be_changed: false
 
+      amount :total_line_item_discount_amount, editable: false,
+             can_editable_be_changed: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:total_line_item_discount_amount])
+
+      amount :overall_discount_amount, editable: false,
+             can_editable_be_changed: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:overall_discount_amount])
+             
       amount :invoice_discount_amount, editable: false,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_discount_amount])
