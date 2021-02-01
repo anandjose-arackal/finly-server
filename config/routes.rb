@@ -3441,6 +3441,7 @@ Rails.application.routes.draw do
 
   get 'lookup/route', to: 'lookup#route'
   get 'lookup/:route', to: 'lookup#route'
+  get 'lookup/masters/:master_key', to: 'lookup#masters_route'
 
   # get 'features', to: 'static_pages#features'
 
