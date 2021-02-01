@@ -52,5 +52,5 @@ if record.advance_amount_required
   json.po_adjusted_advance_amount exposure.po_adjusted_advance_value
   json.po_advance record.po_advance
   json.po_prev_adjusted_advance record.po_prev_adjusted_advance
-  json.po_advance_paid_at record.parent&.procurement&.purchase_order&.payments&.last&.date&.strftime("%d-%b-%y")
+  json.po_advance_paid_at record.procurement&.purchase_order&.payments&.last&.date&.strftime("%d-%b-%y")
 end
