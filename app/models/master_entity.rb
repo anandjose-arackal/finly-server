@@ -104,12 +104,16 @@ class MasterEntity < ApplicationRecord
     self.class.registered_type.to_s == name.to_s
   end
 
-  def as_json(options = {})
+  def entity_type
+    self.class.registered_type.to_s
+  end
+
+  def as_json(opts = {})
     registered_type = self.class.registered_type
     if registered_type.nil? and type.present?
       registered_type = Object.const_get(type).registered_type
     end
-    {
+    data = {
         id: id,
         label: label,
         hint: hint,
@@ -118,8 +122,21 @@ class MasterEntity < ApplicationRecord
         required: required,
         unique: unique,
         primary_key: primary_key,
-        entity_key: entity_key
+        entity_key: entity_key,
+        options: options,
     }
+
+    if type == 'MasterEntity::DropDown'
+      data[:choices] = choices.map do |choice|
+        choice.as_json
+      end
+    end
+
+    if type == "MasterEntity::Lookup"
+      data[:choices_scope] = choices_scope
+    end
+
+    data
   end
 
 end
