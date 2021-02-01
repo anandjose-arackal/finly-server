@@ -48,7 +48,7 @@ class Masters::Schema::Entity::Contract < Reform::Form
   property :show_in_lookup, default: false
   property :options, deserializer: -> (input, represented, **) {
     represented.options ||= {}
-    represented.model.class.options.each do |key, value|
+    represented.type.options.each do |key, value|
       if input[key].present?
         represented.options[key] = input[key]
       elsif represented.options[key].blank? and value[:default].present? and not value[:default] == NoObject
@@ -58,11 +58,11 @@ class Masters::Schema::Entity::Contract < Reform::Form
   }
   property :choices_scope
   collection :choices, populate_if_empty: MasterEntityChoice do
-    property :company, deserializer: -> (input, represented) {
-      represented.company ||= contract_root.model.company
+    property :company, deserializer: -> (input, represented, **) {
+      represented.company ||= represented.contract_root.model.company
     }
-    property :created_by, deserializer: -> (input, represented) {
-      represented.created_by ||= contract_root.model.created_by
+    property :created_by, deserializer: -> (input, represented, **) {
+      represented.created_by ||= represented.contract_root.model.created_by
     }
     property :name
   end
@@ -90,7 +90,6 @@ class Masters::Schema::Entity::Contract < Reform::Form
   validates :entity_key, presence: true
   # validates_uniqueness_of :entity_key, scope: [:master_schema]
   validates :label, presence: true
-  validates :type, presence: true
 
   validate :primary_key_should_be_unique
   validate :non_system_entity_keys
