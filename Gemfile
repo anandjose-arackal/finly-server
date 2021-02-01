@@ -295,7 +295,7 @@ group :test do
   gem 'rspec-rails', '~> 3.8'
   gem 'spring-commands-rspec', '~> 1.0.4'
   gem 'capybara', '~> 3.29'
-
+  gem 'simplecov'
 end
 
 group :test do

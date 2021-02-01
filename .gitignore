@@ -110,3 +110,5 @@ config/integrations.yml
 /yarn-error.log
 yarn-debug.log*
 .yarn-integrity
+
+coverage
