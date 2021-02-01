@@ -6,7 +6,7 @@ class Docs::P2P::Invoices::Form < Forms::API
   LIQUID_FORMULAE = {
       items: {
           item_gross_amount: "{{ row.rate | times: row.quantity | round: 2 }}",
-          item_discount_amount: "{% if accounting_details.discount_type == percentage %}{{ row.item_gross_amount | times: row.discount | divided_by: 100 | round: 2}}{% eleif accounting_details.discount_type == amount %}{{ row.discount }}{% else %}{{ 0 }}{% endif %}",
+          item_discount_amount: "{% if accounting_details.discount_type == percentage %}{{ row.item_gross_amount | times: row.discount | divided_by: 100 | round: 2}}{% elsif accounting_details.discount_type == amount %}{{ row.discount }}{% else %}{{ 0 }}{% endif %}",
           item_taxable_amount: "{{ row.item_gross_amount | minus: row.item_discount_amount | round: 2 }}",
           item_tax_amount: "{{ row.item_taxable_amount | times: row.tax_percentage | divided_by: 100 | round: 2 }}",
           item_tds_amount: "{% if row.tds_applicable == true %}{{ row.item_taxable_amount | times: form.tds_percentage | divided_by: 100 | round: 2}}{% else %}{{ 0 }}{% endif %}",
@@ -212,10 +212,10 @@ class Docs::P2P::Invoices::Form < Forms::API
       number :discount, visible: true, editable: true, default_value: 0
 
       # discount_amount = gross_amount x discount / 100
-      amount :item_discount_amount, editable: false, visible: false,
+      amount :item_discount_amount, editable: false, visible: true,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_discount_amount])
-      amount :item_discount_amount_converted, editable: false, visible: false,
+      amount :item_discount_amount_converted, editable: false, visible: true,
              can_visible_be_changed: false,
              can_editable_be_changed: false
 
@@ -223,7 +223,7 @@ class Docs::P2P::Invoices::Form < Forms::API
       amount :item_taxable_amount, editable: false, visible: true,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_taxable_amount])
-      amount :item_taxable_amount_converted, editable: false, visible: false,
+      amount :item_taxable_amount_converted, editable: false, visible: true,
              can_visible_be_changed: false,
              can_editable_be_changed: false
 
