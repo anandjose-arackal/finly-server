@@ -38,7 +38,7 @@ json.cards do
     json.available_eligibility card_hash[:eligibility]&.to_f
 
     card = card_hash[:card]
-    if CardStatus.ids_for([:unassigned, :assign_requested, :assigned]).include?(card.card_status_id)
+    if CardStatus.ids_for([:unassigned, :assign_requested, :assigned, :upgraded]).include?(card.card_status_id)
       json.activation_request true 
       json.current_card_id card.id 
     end
