@@ -6,7 +6,7 @@ class Docs::P2P::Invoices::Form < Forms::API
   LIQUID_FORMULAE = {
       items: {
           item_gross_amount: "{{ row.rate | times: row.quantity | round: 2 }}",
-          item_discount_amount: "{% if accounting_details.discount_type == percentage %}{{ row.item_gross_amount | times: row.discount | divided_by: 100 | round: 2}}{% elsif accounting_details.discount_type == amount %}{{ row.discount }}{% else %}{{ 0 }}{% endif %}",
+          item_discount_amount: "{% if accounting_details.discount_type == 'percentage' %}{{ row.item_gross_amount | times: row.discount | divided_by: 100 | round: 2}}{% elsif accounting_details.discount_type == 'amount' %}{{ row.discount }}{% else %}{{ 0 }}{% endif %}",
           item_taxable_amount: "{{ row.item_gross_amount | minus: row.item_discount_amount | round: 2 }}",
           item_tax_amount: "{{ row.item_taxable_amount | times: row.tax_percentage | divided_by: 100 | round: 2 }}",
           item_tds_amount: "{% if row.tds_applicable == true %}{{ row.item_taxable_amount | times: form.tds_percentage | divided_by: 100 | round: 2}}{% else %}{{ 0 }}{% endif %}",
@@ -18,7 +18,7 @@ class Docs::P2P::Invoices::Form < Forms::API
           invoice_gross_amount: "{% assign gross_amount = 0 %}{% for item in form.items %}{% assign gross_amount = gross_amount | plus: item.item_gross_amount %}{% endfor %}{{ gross_amount | round: 2 }}",
           
           total_line_item_discount_amount: "{% assign discount_amount = 0 %}{% for item in form.items %}{% assign discount_amount = discount_amount | plus: item.item_discount_amount %}{% endfor %}{{ discount_amount | round: 2 }}",
-          overall_discount_amount: "{{ row.overall_discount_amount | round: 2  }}",
+          overall_discount_amount: "{{ form.overall_discount_amount | round: 2  }}",
           invoice_discount_amount: "{{ total_line_item_discount_amount | plus: overall_discount_amount | round: 2 }}",
           
           invoice_taxable_amount: "{{ form.invoice_gross_amount | minus: form.invoice_discount_amount }}",
@@ -76,7 +76,7 @@ class Docs::P2P::Invoices::Form < Forms::API
     # can_choices_be_changed: false, default_value: false
     # '{% assign assigne_days = form.payment_term_days | times: 86400 %}{{ form.date | date: "%s" | plus: assigne_days | date: "%d-%m-%Y" }}'
     date :due_date,
-      computed: Forms::Compute::Form('{% assign assigne_days = form.payment_term_days | times: 86400 %}{{ form.date | date: "%s" | plus: assigne_days | date: "%Y-%m-%d" }}'),
+      computed: Forms::Compute::Form("{% assign assigne_days = form.payment_term_days | times: 86400 %}{{ form.date | date: '%s' | plus: assigne_days | date: '%Y-%m-%d' }}"),
       visible: true, required: true, editable: true
 
 
@@ -96,7 +96,7 @@ class Docs::P2P::Invoices::Form < Forms::API
          required: true, editable: false
     lookup :department_id, label: "Department", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('departments') #, editable: false, visible: false
     lookup :cost_center_id, label: "Cost Center", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('cost_centers')
-    dropdown :discount_type, label: "Discount Type", editable: true, visible: true, required: true, choices_scope: Choices[:list].({id: '', name: 'None'} , {id: 'percentage', name: 'percentage'}, {id: 'amount', name: 'Amount'} ), default_value: ""
+    dropdown :discount_type, label: "Discount Type", editable: true, visible: true, required: true, choices_scope: Choices[:list].({id: 'none', name: 'None'} , {id: 'percentage', name: 'Percentage'}, {id: 'amount', name: 'Amount'} ), default_value: 'none'
     date :conversion_date, label: "Conversion Date", editable: false, visible: true,
          computed: Forms::Compute::Form('{{form.date}}')
 
