@@ -128,7 +128,7 @@ class Docs::P2P::Invoices::Form < Forms::API
            editable: true, visible: true, required: true
     text :receiving_account_type, visible: false, internal: true, editable: false, computed: Forms::Compute::Form('BankAccount')
     
-    switch :rcm_enabled, label: "Rcm Enabled", editable: true, visible: true, computed: Forms::Compute::Form('vendor_id', '{{record.rcm_enabled}}')
+    switch :rcm_enabled, label: "Rcm Enabled", editable: true, visible: true, computed: Forms::Compute::Lookup('vendor_id', '{{record.rcm_enabled}}')
 
     text :vendor_bank_account_number, editable: false, can_editable_be_changed: false, computed: Forms::Compute::Lookup('receiving_account_id', '{{record.account_number}}')
     text :vendor_bank_account_ifsc, editable: false, required: true, can_editable_be_changed: false, computed: Forms::Compute::Lookup('receiving_account_id', '{{record.ifsc}}')
