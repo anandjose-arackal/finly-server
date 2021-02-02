@@ -126,7 +126,7 @@ class InvoiceExposure < Exposures::API
       :header
     end
   end
-  attribute :discount_type, record_attribute: true
+  attribute :discount_type_id, record_attribute: true
   attribute :status, record_attribute: true, exposure: true, includes: [:status]
   attribute :base_amount, includes: [:invoice_items, :amount, :original_amount] do
     record.include_original_amount
