@@ -39,7 +39,7 @@ class YesBankVendorExposure < Exposures::API
   end
 
   attribute :gstin_location, includes: [:gstin_locations] do
-    record.gstin_locations&.first
+    record.gstin_locations&.first&.to_exposure
   end
 
   attribute :deactivated, record_attribute: :deactivated?
