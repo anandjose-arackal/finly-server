@@ -35,6 +35,7 @@ class InvoiceExposure < Exposures::API
   attribute :created_at, record_attribute: true
   attribute :submitted_at, record_attribute: true
   attribute :overall_discount_amount, record_attribute: true
+  attribute :total_line_item_discount_amount, record_attribute: true
   attribute :created_by, record_attribute: true, exposure: true
   attribute :policy, exposure: true, record_attribute: true, includes: [:policy]
   attribute :gross_amount, record_attribute: true, exposure: true, includes: [:gross_amount]

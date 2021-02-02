@@ -24,7 +24,7 @@ class Docs::P2P::Invoices::Form < Forms::API
           invoice_taxable_amount: "{{ form.invoice_gross_amount | minus: form.invoice_discount_amount }}",
           invoice_tax_amount: "{% assign tax_amount = 0 %}{% for item in form.items %}{% assign tax_amount = tax_amount | plus: item.item_tax_amount %}{% endfor %}{{ tax_amount | round: 2 }}",
           invoice_tds_amount: "{% assign tds_amount = 0 %}{% for item in form.items %}{% assign tds_amount = tds_amount | plus: item.item_tds_amount %}{% endfor %}{{ tds_amount | round: 2 }}",
-          invoice_sub_total_amount: "{% assign inv_sub_total_amount = form.invoice_gross_amount | minus: form.invoice_discount_amount | plus: form.invoice_tax_amount | plus: form.invoice_freight_amount | minus: form.invoice_tds_amount | round: 2 %}{% if form.rcm_enabled == true  %}{{ inv_sub_total_amount | minus: form.invoice_tax_amount }}{% else %}{{ inv_sub_total_amount }}",
+          invoice_sub_total_amount: "{% assign inv_sub_total_amount = form.invoice_gross_amount | minus: form.invoice_discount_amount | plus: form.invoice_tax_amount | plus: form.invoice_freight_amount | minus: form.invoice_tds_amount | round: 2 %}{% if form.rcm_enabled == true  %}{{ inv_sub_total_amount | minus: form.invoice_tax_amount }}{% else %}{{ inv_sub_total_amount }}{% endif %}",
           # todo - Issue : Roundoff should be automatically calulated everytime user inputs something, even if its the round off itself
           invoice_roundoff_amount: "{% assign amount = form.invoice_sub_total_amount | round %}{{amount | minus: form.invoice_sub_total_amount | round: 2 }}",
           invoice_total_amount: "{{ form.invoice_sub_total_amount | plus: form.invoice_roundoff_amount | round: 2 }}",
@@ -76,7 +76,7 @@ class Docs::P2P::Invoices::Form < Forms::API
     # can_choices_be_changed: false, default_value: false
     # '{% assign assigne_days = form.payment_term_days | times: 86400 %}{{ form.date | date: "%s" | plus: assigne_days | date: "%d-%m-%Y" }}'
     date :due_date,
-      computed: Forms::Compute::Form("{% assign assigne_days = form.payment_term_days | times: 86400 %}{{ form.date | date: '%s' | plus: assigne_days | date: '%Y-%m-%d' }}"),
+      computed: Forms::Compute::Form('{% assign assigne_days = form.payment_term_days | times: 86400 %}{{ form.date | date: "%s" | plus: assigne_days | date: "%Y-%m-%d" }}'),
       visible: true, required: true, editable: true
 
 
@@ -96,7 +96,7 @@ class Docs::P2P::Invoices::Form < Forms::API
          required: true, editable: false
     lookup :department_id, label: "Department", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('departments') #, editable: false, visible: false
     lookup :cost_center_id, label: "Cost Center", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('cost_centers')
-    dropdown :discount_type, label: "Discount Type", editable: true, visible: true, required: true, choices_scope: Choices[:list].({id: 'percentage', name: 'Percentage'}, {id: 'amount', name: 'Amount'} ), default_value: 'none'
+    dropdown :discount_type, label: "Discount Type", editable: true, visible: true, required: true, choices_scope: Choices[:list].({id: 'percentage', name: 'Percentage'}, {id: 'amount', name: 'Amount'} ), default_value: 'percentage'
     date :conversion_date, label: "Conversion Date", editable: false, visible: true,
          computed: Forms::Compute::Form('{{form.date}}')
 
@@ -118,17 +118,17 @@ class Docs::P2P::Invoices::Form < Forms::API
     text :vendor_country, editable: false, visible: true
     
     text :vendor_sequence_id, "Vendor ID", editable: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.vendor_id}}')
-
+    
     lookup :gstin_location_id, label: 'Vendor Location', choices_scope: Choices[:lookup].('vendor_locations'), # todo - condition to hide for international
-            filters: Rules::Builder[:vendor_id].eq(entity: :vendor_id)
+          filters: Rules::Builder[:vendor_id].eq(entity: :vendor_id)
     text :vendor_gstin, "Vendor GSTIN", editable: false, computed: Forms::Compute::Lookup('gstin_location_id', '{{record.gstin}}') # todo - condition
     text :vendor_pan, "Vendor PAN", editable: false # todo - add condition
     lookup :receiving_account_id, label: "Vendor Account", choices_scope: Choices[:lookup].('vendor_bank_accounts'),
-           filters: Rules::Builder[:account_owner_id].eq(entity: 'vendor_id').and(Rules::Builder[:account_owner_type].eq(value: 'YesBankVendor')),
-           editable: true, visible: true, required: true
-    text :receiving_account_type, visible: false, internal: true, editable: false, computed: Forms::Compute::Form('BankAccount')
+          filters: Rules::Builder[:account_owner_id].eq(entity: 'vendor_id').and(Rules::Builder[:account_owner_type].eq(value: 'YesBankVendor')),
+          editable: true, visible: true, required: true
     
-    switch :rcm_enabled, label: "Rcm Enabled", editable: true, visible: true, computed: Forms::Compute::Lookup('vendor_id', '{{record.rcm_enabled}}')
+    text :receiving_account_type, visible: false, internal: true, editable: false, computed: Forms::Compute::Form('BankAccount')
+    switch :rcm_enabled, label: "RCM Enabled", editable: true, visible: true, computed: Forms::Compute::Lookup('vendor_id', '{{record.rcm_enabled}}')
 
     text :vendor_bank_account_number, editable: false, can_editable_be_changed: false, computed: Forms::Compute::Lookup('receiving_account_id', '{{record.account_number}}')
     text :vendor_bank_account_ifsc, editable: false, required: true, can_editable_be_changed: false, computed: Forms::Compute::Lookup('receiving_account_id', '{{record.ifsc}}')
