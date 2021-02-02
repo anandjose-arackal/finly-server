@@ -96,7 +96,7 @@ class Docs::P2P::Invoices::Form < Forms::API
          required: true, editable: false
     lookup :department_id, label: "Department", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('departments') #, editable: false, visible: false
     lookup :cost_center_id, label: "Cost Center", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('cost_centers')
-    dropdown :discount_type, label: "Discount Type", editable: true, visible: true, required: true, choices_scope: Choices[:list].({id: 'none', name: 'None'} , {id: 'percentage', name: 'Percentage'}, {id: 'amount', name: 'Amount'} ), default_value: 'none'
+    dropdown :discount_type, label: "Discount Type", editable: true, visible: true, required: true, choices_scope: Choices[:list].({id: 'percentage', name: 'Percentage'}, {id: 'amount', name: 'Amount'} ), default_value: 'none'
     date :conversion_date, label: "Conversion Date", editable: false, visible: true,
          computed: Forms::Compute::Form('{{form.date}}')
 
@@ -115,7 +115,7 @@ class Docs::P2P::Invoices::Form < Forms::API
            can_editable_be_changed: false, can_be_disabled: false, can_required_be_changed: false, can_visible_be_changed: false
     
     text :vendor_trade_name, label: 'Vendor Trade Name', editable: false, visible: true, computed: Forms::Compute::Lookup('vendor_id', '{{record.business_name}}')
-    text :vendor_country, editable: false, visible: false
+    text :vendor_country, editable: false, visible: true
     
     text :vendor_sequence_id, "Vendor ID", editable: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.vendor_id}}')
 
@@ -287,7 +287,7 @@ class Docs::P2P::Invoices::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:total_line_item_discount_amount])
 
-      amount :overall_discount_amount, editable: false,
+      amount :overall_discount_amount, editable: true,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:overall_discount_amount])
 
