@@ -273,4 +273,10 @@ class FieldConfiguration < ApplicationRecord
     end
   end
 
+  def set_field_key
+    if field_key.blank?
+      self.update_columns(field_key: self.field_name.gsub('-', ' ').parameterize(separator: "_"))
+    end
+  end
+
 end
