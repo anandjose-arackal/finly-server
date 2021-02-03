@@ -41,9 +41,7 @@ class YesBankVendorExposure < Exposures::API
   attribute :gstin_location, includes: [:gstin_locations], exposure: true do
     record.gstin_locations&.first
   end
-  attribute :gstin_locations, includes: [:gstin_locations], exposure: true do
-    record.gstin_locations
-  end
+  attribute :gstin_locations, includes: [:gstin_locations], exposure: true, record_attribute: true
 
   attribute :deactivated, record_attribute: :deactivated?
 
