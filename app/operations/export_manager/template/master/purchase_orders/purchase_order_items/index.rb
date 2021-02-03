@@ -7,6 +7,8 @@ class ExportManager::Template::Master::PurchaseOrders::PurchaseOrderItems::Index
   subscribe 'purchase_order_items'
   default true
 
+  custom_fields :purchase_order, template_prefix: 'record.purchase_order'
+
   attribute :description, template: '{{ record.description }}'
   attribute :comment, template: '{{ record.comment }}'
   attribute :category, template: '{{ record.inventory_line_item.category.name }}'
