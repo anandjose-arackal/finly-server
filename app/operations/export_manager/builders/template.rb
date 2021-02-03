@@ -17,14 +17,49 @@ class ExportManager::Builders::Template
     self.to_s
   end
 
-  def self.build
+  def self.build_custom_columns(company)
+    cols = []
+    custom_fields_config.each do |config|
+      if config[:form]
+        form = Form.where.not(klass_name: nil).find_by(klass_name: Forms::Router.klass(config[:key])&.name, company_id: company.id)
+        if form.present?
+          custom_entities = form.where(system_field: false)
+          custom_entities.each do |entity|
+            cols << ExportManager::Builders::Template::Attribute.new(
+              {
+                name: entity.entity_key.to_sym,
+                template: "{{ #{config[:template_prefix]}.#{entity.entity_key} }}",
+                column_name: entity.label
+              }
+            )
+          end
+        end
+      else
+        fields = FieldConfiguration.where(company_id: company.id).joins(:field_parent_mappings).where('field_parent_mappings.field_parent_type_id = ?', FieldParentType.id_for(config[:key]))
+        fields.each do |field|
+          cols << ExportManager::Builders::Template::Attribute.new(
+            {
+              name: field.field_key&.to_sym,
+              template: "{{ #{config[:template_prefix]}.#{field.field_key} }}",
+              column_name: field.field_name
+            }
+          )
+        end
+      end
+    end
+
+    cols
+  end
+
+  def self.build(company)
+    cols = columns + build_custom_columns(company)
     {
       name: label,
       description: description,
       resource: resource,
       export_format: export_format,
       template: JSON.generate({
-        columns: columns.map do |attr|
+        columns: cols.map do |attr|
           attr.build
         end
       }),
@@ -42,7 +77,7 @@ class ExportManager::Builders::Template
 
   def self.create_or_update_template!(company)
     existing_template = ExportTemplateNew.where(master: master, company_id: company.id).first
-    data = build
+    data = build(company)
     user_roles = data.delete(:user_roles)
     if existing_template.present?
       unless existing_template.modified
