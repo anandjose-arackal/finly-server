@@ -26,7 +26,26 @@ json.document do
   json.purchase_order do
     # PO Advance, Invoice Payments
     if record.parent_type == "PurchaseOrder"
-      json.po_number record.purchase_order_parent&.po_number
+      purchase_order = record.purchase_order_parent
+      if purchase_order.present?
+        json.po_number purchase_order&.po_number
+        json.original_amount precision_value(purchase_order.total_after_tax&.value)
+        json.total_advance_amount total_adv_amount
+        json.payable_advance_amount precision_value(purchase_order.advance_amount&.value)
+        json.balance_due precision_value(purchase_order.balance_amount&.value)
+        json.tds_amount purchase_order.advance_tds_amount&.value
+        json.tds purchase_order.advance_tds_slab&.tds
+        json.tds_slab_id purchase_order.advance_tds_slab_id
+        json.tds_slab_name purchase_order.advance_tds_slab&.name
+        json.delivery_location purchase_order.delivery_location.as_json
+        json.requested_advance_amount purchase_order.requested_advance_amount&.value
+        json.vendor do
+          # Invoice Payments/PO Advance/Beneficiary Payment/Security Deposit
+          if purchase_order.vendor.present?
+            json.partial! 'macros/v1/vendors/vendor', record:  purchase_order.vendor
+          end
+        end
+      end
     elsif record.parent_type == "Invoice"
       json.po_number record.invoice_parent&.po_number
     end
@@ -39,11 +58,6 @@ json.document do
   end
   json.bbps_bill do
     # Todo For BBPS Payments
-  end
-end
-json.parent_details do
-  unless record.parent.nil?
-    json.merge! record.parent_details
   end
 end
 json.beneficiary do
