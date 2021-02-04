@@ -239,7 +239,7 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
     end
 
     if vendor.bank_accounts.last.present?
-      account_number << vendor.bank_accounts.last.account_number
+      account_number = vendor.bank_accounts.last&.account_number
       similar_bank_accounts = BankAccount.where(account_number: account_number, company_id: company.id).filter_active
       if similar_bank_accounts.present?
         messages.push "Active Bank Account with account number \"#{similar_bank_accounts.first.account_number}\" already exists in the system. Please disable it. See vendor - #{similar_bank_accounts.first.account_owner.display_name}"
