@@ -39,7 +39,7 @@ class Event::EVendors::Update < Event::EVendors::Base
   end
 
   def mailer_body(user)
-    message = "Vendor details for #{self.document.business_name} were updated by #{user.name} <br><br>"
+    message = "Vendor details for #{self.document.business_name} were updated by #{params[:action_user]&.name} <br><br>"
 
     if params[:vendor_changes].present?
 

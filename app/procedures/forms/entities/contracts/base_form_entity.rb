@@ -73,8 +73,18 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
   property :compute_formula
   property :compute_lookup_entity_id
 
+  validation   do
+    params do
+      required(:compute_enabled)
+      required(:compute_formula)
+    end
+
+    rule(:compute_formula, :compute_enabled) do
+      key.failure("formula cannot be blank") if !!values[:compute_enabled] && values[:compute_formula].blank?
+    end
+  end
   # Validations
-  collection :validations, populator: :validations! do
+  collection :validations, populate_if_empty: FormEntityValidation do
     property :id
     property :company_id, deserializer: -> (input, represented, *args) {represented.company_id ||= represented.contract_root.current_user.company_id}
     property :form_id, deserializer: -> (input, represented, *args) {represented.form_id ||= represented.contract_root.form_id}
@@ -100,7 +110,7 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
   end
 
   # Conditions
-  collection :conditions, populator: :conditions! do
+  collection :conditions, populate_if_empty: FormCondition do
     property :id
     property :company_id, deserializer: -> (input, represented, *args) {represented.company_id ||= represented.contract_root.current_user.company_id}
     property :form_id, deserializer: -> (input, represented, *args) {represented.form_id ||= represented.contract_root.form_id}
@@ -150,26 +160,6 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
   end
 
   # validates :compute_type_id, :inclusion => {in: FormEntityComputationType.pluck(:id) }
-  def validations!(collection:, fragment:, index:, options:, **)
-    validation = validations.find {|validation| validation.id.to_s == fragment["id"].to_s}
 
-    if fragment["_destroy"]
-      validations.destroy(validation)
-      return skip!
-    end
-
-    validation || validations.append(FormEntityValidation.new)
-  end
-
-  def conditions!(collection:, fragment:, index:, options:, **)
-    condition = conditions.find {|condition| condition.id.to_s == fragment["id"].to_s}
-
-    if fragment["_destroy"]
-      conditions.destroy(condition)
-      return skip!
-    end
-
-    condition || conditions.append(FormCondition.new)
-  end
 
 end
