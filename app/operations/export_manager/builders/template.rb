@@ -23,7 +23,7 @@ class ExportManager::Builders::Template
       if config[:form]
         form = Form.where.not(klass_name: nil).find_by(klass_name: Forms::Router.klass(config[:key])&.name, company_id: company.id)
         if form.present?
-          custom_entities = form.where(system_field: false)
+          custom_entities = form.entities.where(system_field: false)
           custom_entities.each do |entity|
             cols << ExportManager::Builders::Template::Attribute.new(
               {
