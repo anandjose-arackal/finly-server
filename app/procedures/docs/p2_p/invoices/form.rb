@@ -104,7 +104,7 @@ class Docs::P2P::Invoices::Form < Forms::API
 
     currency :base_currency, label: "Base Currency", visible: true, editable: false, required: true, can_editable_be_changed: false,
               default_value: 'INR' # todo populate with system base currency
-    currency :reporting_currency, label: "Reporting Currency", required: true, default_value: Forms::Compute::Form('{{base_currency}}')
+    currency :reporting_currency, label: "Reporting Currency", required: true, computed: Forms::Compute::Form('{{form.base_currency}}')
     switch :retrieve_conversion_rate, label: "Auto Populate Conversion Rate", default_value: true, visible: false
     number :conversion_rate, editable: false, format: 'decimal', default_value: 1, visible: false
     # date :transaction_service_period_from, label: 'Transaction Period From'
