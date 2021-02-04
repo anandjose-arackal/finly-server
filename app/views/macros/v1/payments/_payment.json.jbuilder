@@ -28,7 +28,7 @@ json.document do
     if record.parent_type == "PurchaseOrder"
       json.po_number record.purchase_order_parent&.po_number
     elsif record.parent_type == "Invoice"
-      json.po_number record.invoice_parent.po_number
+      json.po_number record.invoice_parent&.po_number
     end
   end
   json.invoice do
