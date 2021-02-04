@@ -76,7 +76,8 @@ class Docs::P2P::Invoices::Form < Forms::API
     # can_choices_be_changed: false, default_value: false
     # '{% assign assigne_days = form.payment_term_days | times: 86400 %}{{ form.date | date: "%s" | plus: assigne_days | date: "%d-%m-%Y" }}'
     date :due_date,
-      computed: Forms::Compute::Form('{% assign assigne_days = form.payment_term_days | times: 86400 %}{{ form.date | date: "%s" | plus: assigne_days | date: "%Y-%m-%d" }}'),
+      # computed: Forms::Compute::Form('{% assign assigne_days = form.payment_term_days | times: 86400 %}{{ form.date | date: "%s" | plus: assigne_days | date: "%Y-%m-%d" }}'),
+      computed: Forms::Compute::Form('{% assign assigne_days = form.payment_term_days | times: 86400 %}{% assign calculated_date = form.date | date: "%s" | plus: assigne_days %}{% assign default_due_date = "now" |date: "%s" | plus: 84600 %}{% if calculated_date < default_due_date %}{{ default_due_date  | date: "%Y-%m-%d" }}{% else %}{{ calculated_date  | date: "%Y-%m-%d" }}{% endif %}'),
       visible: true, required: true, editable: true
 
 
@@ -97,6 +98,7 @@ class Docs::P2P::Invoices::Form < Forms::API
     lookup :department_id, label: "Department", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('departments') #, editable: false, visible: false
     lookup :cost_center_id, label: "Cost Center", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('cost_centers')
     dropdown :discount_type_id, label: "Discount Type", editable: true, visible: true, required: true, choices_scope: Choices[:list].({id: 1, name: 'Percentage'}, {id: 2, name: 'Amount'} ), default_value: 1
+    
     date :conversion_date, label: "Conversion Date", editable: false, visible: true,
          computed: Forms::Compute::Form('{{form.date}}')
 
@@ -128,7 +130,7 @@ class Docs::P2P::Invoices::Form < Forms::API
           editable: true, visible: true, required: true
     
     text :receiving_account_type, visible: false, internal: true, editable: false, computed: Forms::Compute::Form('BankAccount')
-    switch :rcm_enabled, label: "RCM Enabled", editable: true, visible: true, computed: Forms::Compute::Lookup('vendor_id', '{{record.rcm_enabled}}')
+    switch :rcm_enabled, label: "RCM Enabled", editable: true, visible: true, computed: Forms::Compute::Lookup('vendor_id', '{{record.rcm_enabled}}'), default_value: true
 
     text :vendor_bank_account_number, editable: false, can_editable_be_changed: false, computed: Forms::Compute::Lookup('receiving_account_id', '{{record.account_number}}')
     text :vendor_bank_account_ifsc, editable: false, required: true, can_editable_be_changed: false, computed: Forms::Compute::Lookup('receiving_account_id', '{{record.ifsc}}')
@@ -229,12 +231,7 @@ class Docs::P2P::Invoices::Form < Forms::API
       amount :item_taxable_amount_converted, editable: false, visible: true,
              can_visible_be_changed: false,
              can_editable_be_changed: false
-
-      # dropdown :tax_type, label: "Tax Type", choices_scope: Choices[:list].({id: 'IGST', name: "IGST"}, {id: 'CGST+SGST', name: "CGST+SGST"}, {id: 'VAT', name: 'VAT'}), required: false
       
-      dropdown :tax_type, label: "Tax Type",
-                choices_scope: Choices[:list].(*TaxType.where(country_name: "{{ form.vendor_country }}".downcase ).map{ |t| {id: t.id, name: t.name }}),
-                required: true, editable: true, visible: true
       lookup :tax_rate_id, label: "Tax Rate", editable: true, visible: true, choices_scope: Choices[:lookup].('tax_rates'), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.tax_rate_id}}')
 
       # tax # tax percentage
@@ -470,55 +467,43 @@ class Docs::P2P::Invoices::Form < Forms::API
     action :required, false
   end
 
-  # condition condition_id: "Set Min and Max for discount > Discount Min Max" do
-  #   reference :entity, 'accounting_details.discount_type'
-  #   rule Rules::Builder[:vendor_country].eq(value: 'percentage')
-  #   action min_value: 0
-  #   action max_value: 100
-  # end
+  condition condition_id: "Disable RCM for International > Rcm for International Vendors" do
+    reference :entity, 'rcm_enabled'
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    action :visible, false
+  end
 
-  # condition condition_id: "Disable item department > Item department not for Header Cost Allocation Items" do
-  #   reference :entity, 'items.department_id'
-  #   rule Rules::Builder[:cost_allocation_items].not_eq(value: 'Header')
-  #   action :visible, true
-  #   action :required, true
-  #   action :editable, true
-  # end
+  condition condition_id: "Disable item department > Item department not for Header Cost Allocation Items" do
+    reference :entity, 'items.department_id'
+    rule Rules::Builder[:cost_allocation_items].not_eq(value: 'Header')
+    action :visible, true
+    action :required, true
+    action :editable, true
+  end
 
-  # condition condition_id: "Enable item department > Item Cost Center for Header Cost Allocation Items" do
-  #   reference :entity, 'department_id'
-  #   rule Rules::Builder[:cost_allocation_items].not_eq(value: 'Header')
-  #   action :visible, false
-  #   action :required, false
-  #   action :editable, false
-  # end
+  condition condition_id: "Enable item department > Item Cost Center for Header Cost Allocation Items" do
+    reference :entity, 'department_id'
+    rule Rules::Builder[:cost_allocation_items].not_eq(value: 'Header')
+    action :visible, false
+    action :required, false
+    action :editable, false
+  end
 
-  # condition condition_id: "Disable item Cost Center > Item Cost Center not for Header Cost Allocation Items" do
-  #   reference :entity, 'items.cost_center_id'
-  #   rule Rules::Builder[:cost_allocation_items].not_eq(value: 'Header')
-  #   action :visible, true
-  #   action :required, true
-  #   action :editable, true
-  # end
+  condition condition_id: "Disable item Cost Center > Item Cost Center not for Header Cost Allocation Items" do
+    reference :entity, 'items.cost_center_id'
+    rule Rules::Builder[:cost_allocation_items].not_eq(value: 'Header')
+    action :visible, true
+    action :required, true
+    action :editable, true
+  end
 
-  # condition condition_id: "Enable item Cost Center > Item Cost Center for Header Cost Allocation Items" do
-  #   reference :entity, 'cost_center_id'
-  #   rule Rules::Builder[:cost_allocation_items].not_eq(value: 'Header')
-  #   action :visible, false
-  #   action :required, false
-  #   action :editable, false
-  # end
-
-
-
-
-
-
-  # validation validation_id: "Advance Amount cannot be greater than total amount" do
-  #   reference 'advance_paid_amount'
-  #   error_message "Advance Amount Cannot be Greater Than Invoice Total"
-  #   rule Rules::Builder['advance_paid_amount'].gt(entity: "total_amount")
-  # end
+  condition condition_id: "Enable item Cost Center > Item Cost Center for Header Cost Allocation Items" do
+    reference :entity, 'cost_center_id'
+    rule Rules::Builder[:cost_allocation_items].not_eq(value: 'Header')
+    action :visible, false
+    action :required, false
+    action :editable, false
+  end
 
   # CONDITIONS
 
