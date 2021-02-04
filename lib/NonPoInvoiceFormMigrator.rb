@@ -75,6 +75,7 @@ class NonPoInvoiceMigrator
             # For the existing customers the base currency & reporting currency shall be 'INR'
             base_currency: "INR",
             reporting_currency: "INR",
+            conversion_date: document.created_at.to_date,
 
             # Vendor Related Fields
             vendor_sequence_id: document&.vendor&.vendor_id,
