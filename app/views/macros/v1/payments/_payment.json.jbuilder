@@ -30,7 +30,7 @@ json.document do
       if purchase_order.present?
         json.po_number purchase_order&.po_number
         json.original_amount precision_value(purchase_order.total_after_tax&.value)
-        json.total_advance_amount total_adv_amount
+        json.total_advance_amount purchase_order.total_adv_amount
         json.payable_advance_amount precision_value(purchase_order.advance_amount&.value)
         json.balance_due precision_value(purchase_order.balance_amount&.value)
         json.tds_amount purchase_order.advance_tds_amount&.value
