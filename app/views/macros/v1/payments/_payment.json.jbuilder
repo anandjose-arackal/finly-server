@@ -33,7 +33,7 @@ json.document do
   end
   json.invoice do
     # Invoice Payments
-    if record.parent_type == 'Invoice'
+    if record.parent_type == 'Invoice' && record.invoice_parent.present?
       json.partial! 'macros/v1/invoices/invoice_header', record: record.invoice_parent
     end
   end
