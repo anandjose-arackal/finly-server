@@ -97,14 +97,14 @@ class Docs::P2P::Invoices::Form < Forms::API
          required: true, editable: false
     lookup :department_id, label: "Department", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('departments') #, editable: false, visible: false
     lookup :cost_center_id, label: "Cost Center", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('cost_centers')
-    dropdown :discount_type_id, label: "Discount Type", editable: true, visible: true, required: true, choices_scope: Choices[:list].({id: 1, name: 'Percentage'}, {id: 2, name: 'Amount'} ), default_value: 1
+    dropdown :discount_type_id, label: "Discount Type", editable: true, visible: true, required: true, choices_scope: Choices[:list].({id: 1, name: 'Percentage'}, {id: 2, name: 'Amount'} ), default_value: 'Percentage'
     
     date :conversion_date, label: "Conversion Date", editable: false, visible: true,
          computed: Forms::Compute::Form('{{form.date}}')
 
     currency :base_currency, label: "Base Currency", visible: true, editable: false, required: true, can_editable_be_changed: false,
               default_value: 'INR' # todo populate with system base currency
-    currency :reporting_currency, label: "Reporting Currency", required: true, computed: Forms::Compute::Form('{{form.base_currency}}')
+    currency :reporting_currency, label: "Reporting Currency", required: true
     switch :retrieve_conversion_rate, label: "Auto Populate Conversion Rate", default_value: true, visible: false
     number :conversion_rate, editable: false, format: 'decimal', default_value: 1, visible: false
     # date :transaction_service_period_from, label: 'Transaction Period From'
@@ -169,7 +169,7 @@ class Docs::P2P::Invoices::Form < Forms::API
 
       text :description, editable: false,
            can_editable_be_changed: false,
-           can_visible_be_changed: false,
+           can_visible_be_changed: false, visible: false,
            computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.description}}')
 
       text :comment, label: "Narration"
