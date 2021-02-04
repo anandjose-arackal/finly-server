@@ -807,7 +807,7 @@ include Searchkick::Api
   def utr
     return super() unless super().blank?
     if self.reference_resources.first&.has_attribute?(:bank_reference_number)
-      return (self.reference_resources.first&.bank_reference_number || (self.reference_resource&.has_attribute?(:bank_reference_number) ? self.reference_resource&.bank_reference_number : '' )) rescue nil
+      return (self.reference_resources.first&.bank_reference_number || self.reference_resource&.bank_reference_number) rescue nil
     else
       return (self.reference_resources.first&.utr || self.reference_resource&.utr) rescue nil
     end
