@@ -11,9 +11,9 @@ module ErpSyncable
 
     # Define pending_erp_sync in the model
     scope :pending_erp_sync_or_modified, -> (*args) {
-      synced_id = ErpSyncStatus.ids_for(:synced)
+      synced_ids = ErpSyncStatus.ids_for(:synced, :failed)
       pending_docs = pending_erp_sync
-      updated_docs = where('erp_sync_attempted_at < updated_at AND erp_sync_status_id = ?',  synced_id)
+      updated_docs = where('erp_sync_attempted_at < updated_at AND erp_sync_status_id IN (?)', synced_ids)
       pending_docs.or(updated_docs)
     }
 
