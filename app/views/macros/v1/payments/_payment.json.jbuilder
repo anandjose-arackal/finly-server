@@ -39,23 +39,23 @@ json.document do
         json.tds_slab_name purchase_order.advance_tds_slab&.name
         json.delivery_location purchase_order.delivery_location.as_json
         json.requested_advance_amount purchase_order.requested_advance_amount&.value
-        json.vendor do
-          # Invoice Payments/PO Advance/Beneficiary Payment/Security Deposit
-          if purchase_order.vendor.present?
-            json.partial! 'macros/v1/vendors/vendor', record:  purchase_order.vendor
-          end
-        end
+        #json.vendor do
+        #  # Invoice Payments/PO Advance/Beneficiary Payment/Security Deposit
+        #  if purchase_order.vendor.present?
+        #    json.partial! 'macros/v1/vendors/vendor', record:  purchase_order.vendor
+        #  end
+        #end
       end
     elsif record.parent_type == "Invoice"
       json.po_number record.invoice_parent&.po_number
     end
   end
-  json.invoice do
-    # Invoice Payments
-    if record.parent_type == 'Invoice' && record.invoice_parent.present?
-      json.partial! 'macros/v1/invoices/invoice_header', record: record.invoice_parent
-    end
-  end
+  #json.invoice do
+  #  # Invoice Payments
+  #  if record.parent_type == 'Invoice' && record.invoice_parent.present?
+  #    json.partial! 'macros/v1/invoices/invoice_header', record: record.invoice_parent
+  #  end
+  #end
   json.bbps_bill do
     # Todo For BBPS Payments
   end
@@ -64,12 +64,12 @@ json.beneficiary do
   json.user do
     # Todo - For Prepaid Card payments
   end
-  json.vendor do
-    # Invoice Payments/PO Advance/Beneficiary Payment/Security Deposit
-    if record.receiving_user_vendor.present?
-      json.partial! 'macros/v1/vendors/vendor', record: record.receiving_user_vendor
-    end
-  end
+  #json.vendor do
+  #  # Invoice Payments/PO Advance/Beneficiary Payment/Security Deposit
+  #  if record.receiving_user_vendor.present?
+  #    json.partial! 'macros/v1/vendors/vendor', record: record.receiving_user_vendor
+  #  end
+  #end
   json.utility_bill_subscription do
     # Todo - BBPS Bills
   end
