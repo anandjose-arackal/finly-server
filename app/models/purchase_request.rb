@@ -33,6 +33,8 @@ include Searchkick::Api
 
   acts_as_sequenced column: :order_number, purpose: :purchase_request, editable: false, prefix: 'PR'
 
+  default_scope { order(created_at: :desc) }
+
   # belongs_to :purchase_request_status, optional: true
   belongs_to :status, optional: true, class_name: 'PurchaseRequestStatus', foreign_key: :purchase_request_status_id
   belongs_to :department, optional: true
