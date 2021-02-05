@@ -107,8 +107,8 @@ class Docs::P2P::Invoices::Form < Forms::API
     dropdown :cost_allocation_items, choices_scope: Choices[:list].({id: false, name: "Header"}, {id: true, name: "Line Item"}),
              required: true, can_choices_be_changed: false, default_value: false
 
-    date :transactions_service_period_form, label: 'Transaction Service Period (From Date)', editable: true, visible: true
-    date :transactions_service_period_to, label: 'Transaction Service Period (To Date)', editable: true, visible: true
+    date :transaction_service_period_from, label: 'Transaction Service Period (From Date)', editable: true, visible: true
+    date :transaction_service_period_to, label: 'Transaction Service Period (To Date)', editable: true, visible: true
 
   end
 
