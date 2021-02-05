@@ -91,7 +91,7 @@ class NonPoInvoiceMigrator
             vendor_bank_account_number: document&.receiving_account&.account_number,
             vendor_bank_account_ifsc: document&.receiving_account&.ifsc,
             vendor_gstin: document&.gstin_location&.gstin,
-            vendor_bank_account_swift_code: invoice.receiving_account&.swift_code,
+            vendor_bank_account_swift_code: document.receiving_account&.swift_code,
 
 
             # Amount Related Fields # todo - I2P check if amounts are getting saved properly
