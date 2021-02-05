@@ -61,7 +61,7 @@ json.trail do
         end
         if item.payments.processed.first.present?
           payment = item.payments.processed.first
-          json.utr = payment.utr
+          json.utr  payment.utr
         end
         json.due_date item.due_date&.strftime("%b %d, %Y")
       end
