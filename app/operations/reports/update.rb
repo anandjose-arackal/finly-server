@@ -60,7 +60,7 @@ class Reports::Update < Reports::Base
 
   def process
     original_policy_id = report.policy_id
-    ActiveRecord::Base.transaction do
+    ActiveRecord::Base.transaction(requires_new: true) do
     if report.update_attributes(update_param)
       updated_policy_id = report.policy_id
       if params[:custom_fields].present? or original_policy_id != updated_policy_id

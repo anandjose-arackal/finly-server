@@ -23,9 +23,9 @@ class Forms::Validations::Templates
 
         unless match_data.present? && match_data[0] == value
           if (message).present?
-            errors.add entity.entity_key, message
+            errors.add entity.label, message
           else
-            errors.add entity.entity_key, "did not match format : #{format}"
+            errors.add entity.label, "did not match format : #{format}"
           end
         end
       end
@@ -41,10 +41,10 @@ class Forms::Validations::Templates
         value = Float(value) rescue nil
 
         if value.nil?
-          errors.add entity.entity_key, "must be numeric"
+          errors.add entity.label, "must be numeric"
         else
           if value > entity.options['max_value']
-            errors.add entity.entity_key, "must be less than or equal to #{entity.options['max_value']}"
+            errors.add entity.label, "must be less than or equal to #{entity.options['max_value']}"
           end
         end
       end
@@ -61,10 +61,10 @@ class Forms::Validations::Templates
         value = Float(value) rescue nil
 
         if value.nil?
-          errors.add entity.entity_key, "must be numeric"
+          errors.add entity.label, "must be numeric"
         else
           if value < entity.options['min_value']
-            errors.add entity.entity_key, "must be greater than or equal to #{entity.options['min_value']}"
+            errors.add entity.label, "must be greater than or equal to #{entity.options['min_value']}"
           end
         end
       end
@@ -73,30 +73,42 @@ class Forms::Validations::Templates
   end
 
   validates :minimum do |contract:, entity:, **|
-    if entity.options['minimum'].present? and entity.options['minimum'] > 0
+    if entity.options['minimum'].present? and entity.options['minimum'].to_i > 0
       contract.validate do
         value = send(entity.entity_key)
         next unless value.present?
-
-        if value.length < entity.options['minimum']
-          errors.add entity.entity_key, "is too short (minimum is #{entity.options[:maximum]} characters)"
+        if entity.entity_type == 'attachment'
+          valid_attachments = value.filter {|item| !item[:_destroy]}
+          next if valid_attachments.length.zero? && !entity.required
+          if valid_attachments.length < entity.options['minimum'].to_i
+            errors.add entity.label, "is less than the minimum (minimum is #{entity.options['minimum']} attachments)"
+          end
+        else
+          if value.length < entity.options['minimum'].to_i
+            errors.add entity.label, "is too short (minimum is #{entity.options['minimum']} characters)"
+          end
         end
       end
-      # contract.validates entity.entity_key.to_sym, length: {minimum: entity.options['minimum']}
     end
   end
 
   validates :maximum do |contract:, entity:, **|
-    if entity.options['maximum'].present? and entity.options['maximum'] > 0
+    if entity.options['maximum'].present? and entity.options['maximum'].to_i > 0
       contract.validate do
         value = send(entity.entity_key)
         next unless value.present?
-
-        if value.length > entity.options['maximum']
-          errors.add entity.entity_key, "is too long (maximum is #{entity.options[:maximum]} characters)"
+        if entity.entity_type == 'attachment'
+          valid_attachments = value.filter {|item| !item[:_destroy]}
+          next if valid_attachments.length.zero? && !entity.required
+          if valid_attachments.length > entity.options['maximum'].to_i
+            errors.add entity.label, "is more than the maximum (maximum is #{entity.options['maximum']} attachments)"
+          end
+        else
+          if value.length > entity.options['maximum'].to_i
+            errors.add entity.label, "is too long (maximum is #{entity.options['maximum']} characters)"
+          end
         end
       end
-      # contract.validates entity.entity_key.to_sym, length: {maximum: entity.options['maximum']}
     end
   end
 

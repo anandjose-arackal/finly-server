@@ -9,12 +9,12 @@
 #  company_id   :integer          not null
 #  macro_id     :integer
 #  macro_job_id :integer
-#  message      :string(255)
+#  message      :text(65535)
+#  reference_id :text(65535)
 #  attempted_at :datetime         not null
 #  deleted_at   :datetime
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null
-#  reference_id :string(255)
 #
 
 class ErpSyncAttempt < ApplicationRecord

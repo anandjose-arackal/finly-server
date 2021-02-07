@@ -23,13 +23,9 @@ class VendorFormsController < BaseControllers::WebBase
 
   def submit
     endpoint Docs::P2P::Vendors::Ops::Submit
+      # @op = Docs::P2P::Vendors::Ops::UpdateAndSubmit.({params: params.to_unsafe_h, current_user: current_user})
+      # respond_to do |format|
+      #   format.json {}
+      # end
   end
-
-    # def resolve_layout
-    #   if ["create", "update"].include?(action_name)
-    #     'trailblazers'
-    #   else
-    #     'application'
-    #   end
-    # end
 end

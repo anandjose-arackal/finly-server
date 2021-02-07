@@ -53,7 +53,7 @@
 
 class FormEntity::Attachment < FormEntity
 
-  FORMAT = %w(txt pdf doc docx xls xlsx).freeze
+  FORMAT = %w(txt pdf doc docx xls xlsx png jpeg jpg gif).freeze
 
   register :attachment
   # collection!
@@ -64,8 +64,8 @@ class FormEntity::Attachment < FormEntity
 
   # operators :eq_any, :not_eq_all, :cont_any, :not_cont_all, :blank, :present
 
-  # contract_eval 'Max Items Check', &Forms::Validations::Templates[:maximum]
-  # contract_eval 'Min Items Check', &Forms::Validations::Templates[:minimum]
+   contract_eval 'Max Items Check', &Forms::Validations::Templates[:maximum]
+   contract_eval 'Min Items Check', &Forms::Validations::Templates[:minimum]
 
   schema_validation do
     required(:options) do
@@ -109,6 +109,7 @@ class FormEntity::Attachment < FormEntity
           min = value[:minimum]
           format = value[:format]
 
+          key.failure("Format must be present") if format.blank?
           if format.present?
             if format.is_a?(Array)
               key.failure("> formats must be one of #{FormEntity::Attachment::FORMAT.join(", ")}") if (format - FormEntity::Attachment::FORMAT).present?

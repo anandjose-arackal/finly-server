@@ -45,7 +45,7 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchBill < Transactions::API
   def bill_fetch(options, model:, **)
     # op = Bbps::BillFetch.call_async({params: fetch_params, "current_user" => User.first}, {wait: true})
     options['result'] = {}
-    Bbps::BillFetch.call_async({params: model.generate_billfetch_params, "current_user" => User.first}, {wait: true}) do |op|
+    Bbps::BillFetch.call_async({params: model.generate_billfetch_params, "current_user" => User.first}, {wait: true, wait_timeout: 180.seconds}) do |op|
       op.success do |result|
         options['result']['data'] = result
       end
@@ -68,6 +68,7 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchBill < Transactions::API
   def check_bill_presence(options, model:, result:, **)
     data = result['data']
     unless data&.status == 'Y'
+      add_message(options, :error, :base, data.error_desc) if data.error_desc.present?
       add_message(options, :error, :base, "Could Not Fetch Bill")
       return
     end

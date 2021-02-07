@@ -240,7 +240,7 @@ module Transitionable
       case type
       when 'approve', :approve
         if level.present?
-          user_ids += self.document_level_reviewer_mappings.with_level_id(level.id).with_provider_name(provider_name).where(taken_control: false).pluck(:reviewer_id)
+          user_ids += self.document_level_reviewer_mappings.with_level_id(level.id).with_provider_name(provider_name).where(taken_control: false, forwarded: false).pluck(:reviewer_id)
           user_ids += self.document_level_reviewer_mappings.with_level_id(level.id).with_provider_name(provider_name).where(taken_control: true).pluck(:taken_control_by_id)
           user_ids += self.document_level_reviewer_mappings.with_level_id(level.id).with_provider_name(provider_name).where(forwarded: true).pluck(:forwarded_to_id)
         end
@@ -741,7 +741,7 @@ module Transitionable
       forwarded_document_ids_from_dlrms = DocumentLevelReviewerMapping.with_document_type(self.name).where(forwarded: true, forwarded_to_id: user.id)
 
       if self.column_names.include? 'company_id'
-        document_ids = self.where("#{table_name}.id in (#{document_ids_from_dlrms.select("document_reviewer_mappable_id").to_sql})").where(company_id: user.company_id).with_controlling_level_id(all_level_ids).pluck(:id)
+        document_ids = self.where("#{table_name}.id in (#{document_ids_from_dlrms.select("document_reviewer_mappable_id").to_sql})").where(company_id: user.company_id).with_controlling_level_id(all_level_ids.uniq).pluck(:id)
         # Find controlling level of all those documents
         controlling_level_ids = self.where(company_id: user.company_id).with_controlling_level_id(all_level_ids).pluck(:controlling_level_id)
 

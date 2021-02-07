@@ -16,7 +16,7 @@ class BulletTrain
   def initialize(opts = {})
     @opts = determine_opts(opts)
 
-    @bt_api = Faraday.new(url: @opts[:url], request: {timeout: TIMEOUT}) do |faraday|
+    @bt_api = Faraday.new(url: @opts[:url], request: { timeout: TIMEOUT, open_timeout: TIMEOUT }) do |faraday|
       faraday.headers['Accept'] = 'application/json'
       faraday.headers['Content-Type'] = 'application/json'
       faraday.headers['x-environment-key'] = @opts[:api_key]
@@ -29,18 +29,28 @@ class BulletTrain
   def request(method, path, *args)
     start_time = Time.now
     begin
+      retries ||= 0
       res = @bt_api.send(method, path, *args)
+    rescue Net::OpenTimeout => e
+      sleep 2.seconds
+      retry if (retries += 1) < 3
+    rescue Net::ReadTimeout => e
+      sleep 2.seconds
+      retry if (retries += 1) < 3
+    rescue Net::WriteTimeout => e
+      sleep 2.seconds
+      retry if (retries += 1) < 3
     rescue Exception => e
       time = (Time.now - start_time).to_f
       stack_trace = "#{e.message}\n#{e.backtrace&.join("\n")}"
-      self.class.logger.info({duration: time, status: 0, method: method, path: path, request_args: args, exception: e.message, stack_trace: stack_trace})
+      self.class.logger.info({ duration: time, status: 0, method: method, path: path, request_args: args, exception: e.message, stack_trace: stack_trace })
       return nil
     end
 
     time = (Time.now - start_time).to_f
     response_body = res.status != 200 ? res.body : nil
     # Todo log only if the response is slower than 2s
-    self.class.logger.info({duration: time, status: res.status, method: method, response_body: response_body, path: path, request_args: args})
+    self.class.logger.info({ duration: time, status: res.status, method: method, response_body: response_body, path: path, request_args: args })
     res
   end
 
@@ -77,11 +87,26 @@ class BulletTrain
     raise StandardError, 'user_id cannot be nil' if user_id.nil?
 
     trait = {
-        identity: {identifier: user_id},
-        trait_key: normalize_key(trait),
-        trait_value: value
+      identity: { identifier: user_id },
+      trait_key: normalize_key(trait),
+      trait_value: value
     }
     res = request(:post, 'traits/', trait.to_json)
+    res.body
+  end
+
+  def set_traits(user_id, properties)
+    raise StandardError, 'user_id cannot be nil' if user_id.nil?
+
+    traits = []
+    properties.each do |trait, value|
+      traits << {
+        identity: { identifier: user_id },
+        trait_key: normalize_key(trait),
+        trait_value: value
+      }
+    end
+    res = request(:put, 'traits/bulk/', traits.to_json)
     res.body
   end
 
@@ -96,9 +121,9 @@ class BulletTrain
     raise StandardError, 'user_id cannot be nil' if user_id.nil?
 
     trait = {
-        identifier: user_id,
-        trait_key: normalize_key(trait),
-        increment_by: incr_by
+      identifier: user_id,
+      trait_key: normalize_key(trait),
+      increment_by: incr_by
     }
     res = request(:post, 'traits/increment-value/', trait.to_json)
     res.body
@@ -112,10 +137,10 @@ class BulletTrain
   def transform_flags(flags)
     flags.map do |flag|
       {
-          name: flag['feature']['name'],
-          enabled: flag['enabled'],
-          value: flag['feature_state_value'],
-          segment: flag['feature_segment']
+        name: flag['feature']['name'],
+        enabled: flag['enabled'],
+        value: flag['feature_state_value'],
+        segment: flag['feature_segment']
       }
     end
   end
@@ -143,11 +168,11 @@ class BulletTrain
   end
 
   def determine_opts(opts)
-    opts = {api_key: opts} if opts.is_a? String
+    opts = { api_key: opts } if opts.is_a? String
 
     {
-        api_key: opts[:api_key] || self.class.api_key,
-        url: opts[:url] || self.class.api_url
+      api_key: opts[:api_key] || self.class.api_key,
+      url: opts[:url] || self.class.api_url
     }
   end
 
@@ -161,6 +186,6 @@ class BulletTrain
   end
 
   def self.api_url
-    ENV.fetch('BULLETTRAIN_URL') {'https://api.bullet-train.io/api/v1/'}
+    ENV.fetch('BULLETTRAIN_URL') { 'https://api.bullet-train.io/api/v1/' }
   end
 end

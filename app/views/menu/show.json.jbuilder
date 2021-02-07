@@ -17,5 +17,6 @@ json.data do
   end
   json.module @op[:current_module]
   json.menu @op[:menu]
+  json.footer @op[:footer]
   json.entities @op[:entities]
 end

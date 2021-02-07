@@ -92,6 +92,8 @@ linked_files = %w{
   config/feature_flipper.yml
   config/posthog.yml
   config/searchkick.yml
+  config/cubejs.yml
+  config/mailtrain.yml
 }
 case fetch(:stage)
 when :itzcash_production, :aws_production, :background_production, :foreground_production, :console_production, :api_production, :background_production_console,

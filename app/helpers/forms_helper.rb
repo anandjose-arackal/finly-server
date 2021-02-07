@@ -10,7 +10,13 @@ module FormsHelper
     if form_entity.entities.present?
       collection_models = (model.respond_to?(form_entity.entity_key) && model.send(form_entity.entity_key)) || []
       collection_data = collection_models.map do |collection_model|
-        form_entity.entities.reduce({}) {|acc, ent| acc.merge(entity_data(collection_model, ent))}.merge(id: collection_model.id, collection_id: collection_model.id)
+        if collection_model.respond_to?(:forms_extra_data)
+          collection_model_data = collection_model.send(:forms_extra_data)
+          entities_data = form_entity.entities.reduce({}) {|acc, ent| acc.merge(entity_data(collection_model, ent))}.merge(id: collection_model.id, collection_id: collection_model.id)
+          entities_data.merge(collection_model_data)
+        else
+          form_entity.entities.reduce({}) {|acc, ent| acc.merge(entity_data(collection_model, ent))}.merge(id: collection_model.id, collection_id: collection_model.id)
+        end
       end
       form_data.merge!(form_entity.entity_key => collection_data)
     else

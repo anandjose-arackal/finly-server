@@ -25,13 +25,15 @@
 #
 
 class PurchaseRequest < ApplicationRecord
-  include Transitionable, CustomFieldFilterSupport
+  include Transitionable, CustomFieldFilterSupport, ControllingUser
   include Sequenced::ActsAsSequenced
   # include SearchIndex::Concerns::Document
 include Searchkick::Api
 
 
   acts_as_sequenced column: :order_number, purpose: :purchase_request, editable: false, prefix: 'PR'
+
+  default_scope { order(created_at: :desc) }
 
   # belongs_to :purchase_request_status, optional: true
   belongs_to :status, optional: true, class_name: 'PurchaseRequestStatus', foreign_key: :purchase_request_status_id
@@ -63,6 +65,16 @@ include Searchkick::Api
 
   accepts_nested_attributes_for :purchase_request_items, :custom_fields, :attachments, allow_destroy: true
 
+  after_save :budget_trail_entry
+  after_destroy :budget_trail_destroy
+
+  has_paper_trail(
+      meta: {
+          parent_document_type: "Purchase Request",
+          document_number: Proc.new { |document| document.order_number }
+      }
+  )
+
 
   scope :search_by_email, -> (email) {
     user = RequestStore.store[:current_user]
@@ -71,6 +83,7 @@ include Searchkick::Api
       where creator_id: user.company.users.find_by_email(email)&.id
     end
   }
+
   scope :not_draft, -> { where.not purchase_request_status_id: PurchaseRequestStatus.id_for(:draft) }
 
   scope :deleteable, -> { where purchase_request_status_id: [PurchaseRequestStatus.id_for(:draft), PurchaseRequestStatus.id_for(:retracted), PurchaseRequestStatus.id_for(:rejected)] }
@@ -229,6 +242,17 @@ include Searchkick::Api
     self.company_id = self.creator.company_id
   end
 
+  def entity_date
+    created_at.to_date
+  end
+
+  def entity_created_at
+    created_at.to_date
+  end
+
+  def entity_submitted_at
+    submitted_at&.to_date || created_at&.to_date
+  end
 
   def as_json
     {
@@ -468,6 +492,25 @@ include Searchkick::Api
 
   def cost_allocation_items?
     self.cost_allocation_items
+  end
+
+  def budget_trail_entry
+    if self.rejected? || self.cancelled?
+      # this will delete the trails of all the items within this particular purchase order
+      self.items.each do |item|
+        BudgetManager::BudgetsCalculator::Calculate::PurchaseRequestItemsBudgetsProcessor.new.destroy_trail(item)
+      end
+    else
+      self.items.each do |item|
+        BudgetManager::BudgetsCalculator::Calculate::PurchaseRequestItemsBudgetsProcessor.new.save_trail(item)
+      end
+    end
+  end
+
+  def budget_trail_destroy
+    self.items.each do |item|
+      BudgetManager::BudgetsCalculator::Calculate::PurchaseRequestItemsBudgetsProcessor.new.destroy_trail(item)
+    end
   end
 
 end

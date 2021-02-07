@@ -41,7 +41,7 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchAndCreateBill < Transactions:
   def bill_fetch(options, fetch_params:, **)
     # op = Bbps::BillFetch.call_async({params: fetch_params, "current_user" => User.first}, {wait: true})
     options['result'] = {}
-    Bbps::BillFetch.call_async({params: fetch_params, "current_user" => User.first}, {wait: true}) do |op|
+    Bbps::BillFetch.call_async({params: fetch_params, "current_user" => User.first}, {wait: true, wait_timeout: 180.seconds}) do |op|
       op.success do |result|
         p "SUCCESS"
         options['result']['data'] = result

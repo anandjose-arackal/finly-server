@@ -133,6 +133,9 @@ class PurchaseOrderStatus < NonTenantedApplicationRecord
     [
         PurchaseOrderStatus.id_for(:open),
         PurchaseOrderStatus.id_for(:retracted),
+        PurchaseOrderStatus.id_for(:rejected),
+        PurchaseOrderStatus.id_for(:voided),
+        PurchaseOrderStatus.id_for(:po_revised) # ??
     ]
   end
 

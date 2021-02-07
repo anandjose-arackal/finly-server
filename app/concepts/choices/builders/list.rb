@@ -7,7 +7,7 @@ class Choices::Builders::List < Choices::Builders::Base
   end
 
   def choices(params: {}, user: nil, form_entity: nil)
-    if self.form_entity&.choices_scope&.config&.dig("choices").present?
+    if self.form_entity&.choices_scope&.config&.dig("choices").present? || config&.dig("choices").present? || config&.dig(:choices).present?
       config[:choices]
     else
       data = self.form_entity&.choices

@@ -8,6 +8,7 @@
 #  proxy                    :string(255)      not null
 #  card_type_id             :integer
 #  description              :text(65535)
+#  is_deleted               :boolean          default(FALSE)
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
 #  company_id               :integer          not null
@@ -21,12 +22,10 @@
 #  admin_unblockable        :boolean          default(TRUE)
 #  itz_cash_card_program_id :integer
 #  card_status_id           :integer          not null
-#  is_deleted               :boolean          default(FALSE)
 #  hotlisted                :boolean          default(FALSE)
 #  card_processor_status    :string(255)
 #  replaced_card_id         :integer
 #  deleted_at               :datetime
-#  card_number              :string(255)
 #
 
 class Card < ApplicationRecord

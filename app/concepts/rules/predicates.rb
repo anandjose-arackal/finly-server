@@ -11,24 +11,26 @@ module Rules::Predicates
     end
   end
 
-  def self.is_number?(value)
-    value = [value] unless value.respond_to?(:each)
-    value.each do |val|
-      is_number = Float(val) rescue false
-      return false unless is_number
-    end
-
-    true
-  end
-
-  def self.to_number(arr)
-    arr.map {|val|
-      if val.respond_to?(:strftime)
-        val.strftime("%s").to_f
-      else
-        val.to_f
+  def self.to_valid_format(arr)
+    formatted_array = []
+    arr.each do |val|
+      is_datetime = val.to_datetime rescue nil
+      unless is_datetime.nil?
+        formatted_array.push(is_datetime.strftime('%a, %d %b %Y %H:%M:%S').to_datetime)
+        next
       end
-    }
+      is_number = Float(val) rescue nil
+      unless is_number.nil?
+        formatted_array.push(is_number)
+        next
+      end
+      is_string = val.to_s.downcase rescue nil
+      unless is_string.nil?
+        formatted_array.push(is_string)
+        next
+      end
+    end
+    formatted_array
   end
 
   def self.predicates
@@ -71,16 +73,12 @@ module Rules::Predicates
   end
 
   predicate :eq, any: true, all: true do |v, d|
-    if Rules::Predicates.is_number?(v)
-      v[0]&.to_f == v[1]&.to_f
-    else
-      v[0]&.to_s&.downcase == v[1]&.to_s&.downcase
-    end
+    Rules::Predicates.to_valid_format(v).each_cons(2).all? { |i, j| i == j } rescue false
     # v[0]&.to_s&.downcase == v[1].to_s.downcase
   end
 
   predicate :not_eq, any: true, all: true do |v, d|
-    v[0]&.to_s&.downcase != v[1].to_s.downcase
+    Rules::Predicates.to_valid_format(v).each_cons(2).all? { |i, j| i != j } rescue false
   end
 
   # Todo Matches is Regex search
@@ -93,20 +91,20 @@ module Rules::Predicates
   # end
 
   predicate :lt do |v, d|
-    Rules::Predicates.to_number(v).each_cons(2).all? { |i, j| i < j }
+    Rules::Predicates.to_valid_format(v).each_cons(2).all? { |i, j| i < j } rescue false
     # v.map(&:to_f).each_cons(2).all? { |i, j| i < j }
   end
 
   predicate :lteq do |v, d|
-    Rules::Predicates.to_number(v).each_cons(2).all? { |i, j| i <= j }
+    Rules::Predicates.to_valid_format(v).each_cons(2).all? { |i, j| i <= j } rescue false
   end
 
   predicate :gt do |v, d|
-    Rules::Predicates.to_number(v).each_cons(2).all? { |i, j| i > j }
+    Rules::Predicates.to_valid_format(v).each_cons(2).all? { |i, j| i > j } rescue false
   end
 
   predicate :gteq do |v, d|
-    Rules::Predicates.to_number(v).each_cons(2).all? { |i, j| i >= j }
+    Rules::Predicates.to_valid_format(v).each_cons(2).all? { |i, j| i >= j } rescue false
   end
 
   # Fixme: check if in is really required as it is is covered by eq_any case in the context of form rules
@@ -121,27 +119,27 @@ module Rules::Predicates
   # end
 
   predicate :cont, any: true, all: true do |v, d|
-    v[0]&.include?(v[1])
+    v[0].to_s.include?(v[1].to_s)
   end
 
   predicate :not_cont, any: true, all: true do |v, d|
-    !v[0]&.include?(v[1])
+    !v[0].to_s.include?(v[1].to_s)
   end
 
   predicate :start do |v, d|
-    v[0]&.start_with?(v[1])
+    v[0].to_s.start_with?(v[1])
   end
 
   predicate :not_start do |v, d|
-    !v[0]&.start_with?(v[1])
+    !v[0].to_s.start_with?(v[1])
   end
 
   predicate :end do |v, d|
-    v[0]&.end_with?(v[1])
+    v[0].to_s.end_with?(v[1].to_s)
   end
 
   predicate :not_end do |v, d|
-    !v[0]&.end_with?(v[1])
+    !v[0].to_s.end_with?(v[1].to_s)
   end
 
   predicate :true do |v, d|
@@ -153,19 +151,19 @@ module Rules::Predicates
   end
 
   predicate :present do |v, d|
-    v[0]&.present?
+    v[0].present?
   end
 
   predicate :blank do |v, d|
-    v[0]&.blank?
+    v[0].blank?
   end
 
   predicate :null do |v, d|
-    v[0]&.null?
+    v[0].nil?
   end
 
   predicate :not_null do |v, d|
-    !v[0]&.null?
+    !v[0].nil?
   end
 
 end

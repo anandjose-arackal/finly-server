@@ -8,6 +8,8 @@ class ExportManager::Master::ItemMaster::Index < ExportManager::Builders::Spread
   screen 'item_master.index'
   handle :inventory_items
 
+  has_template true
+
   attribute :item_number
   attribute :gl_code
   attribute :description

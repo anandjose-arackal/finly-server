@@ -18,7 +18,7 @@
 #  is_updated        :boolean
 #  can_be_updated    :boolean
 #  rule              :text(65535)
-#  form_entity_id    :string(255)      not null
+#  form_entity_id    :string(255)
 #
 
 class FormEntityValidation < ApplicationRecord
@@ -31,6 +31,8 @@ class FormEntityValidation < ApplicationRecord
   belongs_to :updated_by, class_name: 'User', optional: true
 
   serialize :rule, Rules::Adapters::Store
+
+  validate :valid_rule?
 
   delegate :entity_path, to: :form_entity
 
@@ -52,6 +54,13 @@ class FormEntityValidation < ApplicationRecord
   def rule(rule=NoObject)
     self.rule = rule unless rule == NoObject
     super()
+  end
+
+  def valid_rule?
+    return if rule.blank?
+    unless rule.valid?(controlling_field: form_entity)
+      errors.add :rule, 'is not valid'
+    end
   end
 
   # def rule(entity_path, predicate, value: nil, formula: nil, match_entity_path: nil)

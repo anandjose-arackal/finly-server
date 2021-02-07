@@ -6,7 +6,7 @@
 #  uuid              :string(36)       not null, primary key
 #  company_id        :bigint           not null
 #  form_id           :string(255)      not null
-#  form_condition_id :string(255)      not null
+#  form_condition_id :string(255)
 #  property          :string(255)
 #  value             :string(255)
 #  created_at        :datetime         not null

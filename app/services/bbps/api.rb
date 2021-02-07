@@ -86,7 +86,7 @@ class Bbps::Api < ServiceApi
 
     splits = json["responseMsg"].split("|")
     # Request failed
-    return Failure((splits[3] || "Unable to fetch response")) if splits[1] == "N"
+    return Failure("Error connecting with BBPS") if splits[1].blank?
 
     map = {}.with_indifferent_access
     fetch(:response_fields).each_with_index { |field, index| map[field] = splits[index] }
@@ -101,7 +101,7 @@ class Bbps::Api < ServiceApi
 
     splits = json["responseMsg"].split("|")
     # Request failed
-    return Failure((splits[3] || "Unable to fetch response")) if splits[1] == "N"
+    return Failure("Error connecting with BBPS") if splits[1].blank?
 
     map = {}.with_indifferent_access
 
@@ -149,7 +149,8 @@ class Bbps::Api < ServiceApi
       # builder.use Faraday::Request::UrlEncoded
       faraday.request :url_encoded # form-encode POST params
       faraday.response :logger, logger # log requests to STDOUT
-      faraday.options[:timeout] = 60 # time out is 60 seconds
+      faraday.options[:timeout] = 180 # time out is 180 seconds
+      faraday.options[:open_timeout] = 180 # time out is 180 seconds
       faraday.use FaradayMiddleware::FollowRedirects, limit: 5
       faraday.adapter Faraday.default_adapter # make requests with Net::HTTP
     end

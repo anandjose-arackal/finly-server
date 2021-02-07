@@ -4,7 +4,7 @@ class Masters::TdsSlabs::Lookup < Lookup::API
   search_key :name_cont
 
   attribute :id, visible: false
-  attribute :name
+  attribute :name, value: '{{record.tds | append: "% - " | append: record.name}}'
   attribute :tds
 
 end

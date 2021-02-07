@@ -54,13 +54,32 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
           form_data = contract_root.form_data
           row_data = self.form_data
           Forms::Contracts::Helpers::ConditionChecker.(
-              self, entity.conditions, entity, VALIDATION_ACTIONS, form: form_data, row: row_data
+            self, entity.conditions, entity, VALIDATION_ACTIONS, form: form_data, row: row_data
           )
         }
         required = result['required']
         # Required validation ( System Validation )
         if required and send(entity.entity_key).blank? and entity.entity_type != 'switch'
-          errors.add entity.entity_key, 'cannot be blank'
+          errors.add entity.label, 'cannot be blank'
+        end
+
+        # Check uniqueness of value
+        # Assumptions for checking uniqueness;
+        # 1. Entity's immediate parent must have association to company & vice versa
+        unique = result['unique']
+        if unique and send(entity.entity_key).present?
+          id = send("id")
+          association_name = entity.parent&.entity_key || entity.form.model.table_name
+
+          records = contract_root.current_user.company.
+              send(association_name).non_deleted.filter_active.
+              where("#{entity.entity_key} = ?", send(entity.entity_key))
+
+          records = records.where.not("id = ?", id) if id.present?
+
+          if records.present?
+            errors.add entity.label, "must be unique"
+          end
         end
       end
     end
@@ -70,11 +89,9 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
     contract.validate -> do
       contract_root.profiler.step 'custom_validate_entity', entity.entity_path do
         entity.validations.each do |validation|
-          puts "Validation ID => #{validation.id}"
-          puts "Data => #{{form: contract_root.form_data, row: self.form_data}.with_indifferent_access}"
-          next unless validation.rule.apply?({form: contract_root.form_data, row: self.form_data}.with_indifferent_access)
+          next unless validation.rule.apply?({ form: contract_root.form_data, row: self.form_data }.with_indifferent_access, controlling_field: entity.entity_path)
 
-          errors.add entity.entity_key, validation.error_message
+          errors.add entity.label, validation.error_message
         end
       end
     end
@@ -98,17 +115,17 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
           contract_root.bulk_validate_choice entity, entity_value
         else
           result = Forms::Ops::Choices.(
-              params: {
-                  form_data: form_data,
-                  row_data: row_data,
-                  entity_path: entity.entity_path,
-                  form_record: entity.form,
-                  qs: {id_in: entity_value} # Pass the ID as a simple filter
-              }, current_user: current_user
+            params: {
+              form_data: form_data,
+              row_data: row_data,
+              entity_path: entity.entity_path,
+              form_record: entity.form,
+              qs: { id_in: entity_value } # Pass the ID as a simple filter
+            }, current_user: current_user
           )
           # Fixme: This is working only for lookup
           unless result[:choices].data.present?
-            errors.add entity.entity_key, 'has an invalid choice'
+            errors.add entity.label, 'has an invalid choice'
           end
         end
       end
@@ -117,8 +134,8 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
 
   def execute_contract_evaluators(context, contract:, entity:, **)
     context = {
-        entity: entity,
-        contract: contract
+      entity: entity,
+      contract: contract
     }
 
     entity.class.contract_evaluators.each do |name, evaluator|

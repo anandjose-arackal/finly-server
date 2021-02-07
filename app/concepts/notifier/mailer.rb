@@ -4,7 +4,7 @@
 class Notifier::Mailer < Notifier::API
   # require 'bunny'
 
-  assign :from, "noreply@finly.io"
+  assign :from, "noreply@finlyhq.com"
   assign :subject, "Finly Notification"
   # assign :body_header, "New Notification from Finly"
   assign :hero_bg_image, "bg_default"

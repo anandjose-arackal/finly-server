@@ -1,9 +1,8 @@
 class Menu::Masters::Procurement < Menu::API
 
   def self.accept?(user)
-    user.user_panel_subscription.yes_bank_account_transfer
+    user.user_panel_subscription&.yes_bank_account_transfer
   end
-
   app :vp
 
   item :global_search, label: "Search (Alt+/)", icon: 'https://img.icons8.com/windows/20/ffffff/search.png',
@@ -101,6 +100,7 @@ class Menu::Masters::Procurement < Menu::API
 
   item :manage, icon: 'https://img.icons8.com/windows/20/ffffff/commercial-development-management.png' do
     item :analytics, permissions: [:admin], features: :analytics_system
+    item :analytics_dashboards, label: 'Insights', permissions: [:admin], toggle: [AnalyticsToggle, :enabled?]
     item :vendors, permissions: Masters::Vendors::Index.permissions
     item :items, permissions: Masters::Items::Index.permissions
     item :rate_contracts, permissions: Masters::RateContracts::Index.permissions, features: :procurement
@@ -109,6 +109,8 @@ class Menu::Masters::Procurement < Menu::API
     item :credit_notes, permissions: Docs::P2P::CreditNotes::Index.permissions, features: :procurement
     item :utility_subscriptions, permissions: Docs::UtilityBills::Subscriptions::Index.permissions, features: :utility_bills_enabled
     item :users, permissions: [:admin]
+    item :audit_trails, permissions: Docs::AuditTrails::Index.permissions, toggle: [AuditTrailsToggle, :enabled?]
+
   end
 
   item :accounts, icon: 'https://img.icons8.com/windows/20/ffffff/wallet.png' do
@@ -118,5 +120,13 @@ class Menu::Masters::Procurement < Menu::API
 
   item :download_manager, icon: "https://img.icons8.com/windows/20/ffffff/software-installer.png"
   item :settings, path: 'organization_account', permissions: [:admin], icon: "https://img.icons8.com/windows/20/ffffff/settings.png"
+
+  footer_item :switch_version, icon: 'https://img.icons8.com/windows/20/ffffff/versions.png', options: {do_not_build_path: true}
+  footer_item :notifications, icon: 'https://img.icons8.com/windows/20/ffffff/appointment-reminders.png', options: {do_not_build_path: true}
+  footer_item :hide_menu, icon: 'https://img.icons8.com/windows/20/ffffff/double-left.png', options: {do_not_build_path: true}
+  footer_item :account_settings, label: "My Account", icon: 'https://img.icons8.com/windows/20/ffffff/user.png'
+  footer_item :support, label: "Help Center", icon: 'https://img.icons8.com/windows/20/ffffff/software-installer.png', options: {do_not_build_path: true} do
+    item :new_releases, label: "What's New", icon: 'https://img.icons8.com/ios-glyphs/25/D298E4/commercial.png', options: {do_not_build_path: true}, toggle: [AnnouncementToggle, :product_stash]
+  end
 
 end

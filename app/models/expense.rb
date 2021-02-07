@@ -1103,9 +1103,6 @@ class Expense < ApplicationRecord
   def usage_days
     return nil if usage_date_type.blank? or usage_date_type == 'none'
     days = (usage_date_start.to_date..usage_date_end.to_date).to_a
-    if (usage_date_type == 'hotel') and usage_date_end.to_date == usage_date_start.to_date
-      days.pop
-    end
     days
   end
 
@@ -1167,6 +1164,18 @@ class Expense < ApplicationRecord
         gst_percentage: gst_percentage,
         expense_tax_type: expense_tax_type
     }
+  end
+
+  def entity_date
+    date
+  end
+
+  def entity_created_at
+    created_at.to_date
+  end
+
+  def entity_submitted_at
+    report&.submitted_at&.to_date || created_at.to_date
   end
 
   private

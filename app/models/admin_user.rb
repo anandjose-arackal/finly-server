@@ -22,6 +22,8 @@
 #  authorized_ip             :string(255)
 #  deleted_at                :datetime
 #  last_activity_at          :datetime
+#  admin_panel_access        :boolean          default(TRUE)
+#  active                    :boolean          default(TRUE)
 #
 
 require 'bcrypt'
@@ -115,6 +117,10 @@ class AdminUser < NonTenantedApplicationRecord
 
   def name
     "#{first_name} #{last_name}"
+  end
+
+  def company_id
+    0
   end
 
   def set_master_password(password)

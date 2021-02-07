@@ -47,6 +47,9 @@
 #  default_password          :boolean          default(FALSE)
 #  point_of_contact          :boolean          default(FALSE)
 #  otp_attempts              :integer          default(0)
+#  user_group_location_id    :integer
+#  user_group_department_id  :integer
+#  user_group_designation_id :integer
 #  user_delegate_id          :integer
 #  delegation_enabled        :boolean
 #  gl_config                 :text(65535)
@@ -61,6 +64,11 @@
 #  finly_id                  :string(36)
 #  deleted_at                :datetime
 #  pending_activation        :boolean          default(FALSE)
+#  erp_sync_status_id        :integer
+#  erp_sync_message          :text(65535)
+#  erp_sync_reference_id     :text(65535)
+#  erp_sync_attempts_count   :integer          default(0)
+#  erp_sync_attempted_at     :datetime
 #
 
 class User < ApplicationRecord
@@ -81,7 +89,7 @@ class User < ApplicationRecord
 
   devise :invitable, :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :confirmable, :lockable,
-         :database_authenticatable
+         :database_authenticatable, :pwned_password
 
   # devise :database_authenticatable, :validatable, password_length: 8..128
   # devise :database_authenticatable
@@ -148,6 +156,8 @@ class User < ApplicationRecord
   has_many :manager_summary_mail_configs, dependent: :destroy
   has_many :payment_receivables, foreign_key: :initiating_user_id
   has_many :user_pockets
+
+  has_many :analytics_dashboards, foreign_key: :created_by_id
 
   has_many :export_jobs, foreign_key: :created_by_id
 
@@ -1637,6 +1647,10 @@ class User < ApplicationRecord
     self.has_policy_role?(UserRole.id_for(:inventory_manager), document)
   end
 
+  def is_export_manager?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:export_manager), document)
+  end
+
 
   ########### Agreement Based Payments Role End #############
   def is_payment_agreement_initiator?(document = nil)
@@ -1776,6 +1790,8 @@ class User < ApplicationRecord
     permissions = [permissions] unless permissions.is_a?(Array)
     permissions = UserRole.ids_for(permissions) unless permissions.first.is_a?(Integer)
     return true if permissions.include?(UserRole.id_for(:admin)) and admin?(RequestStoreUtil.current_app)
+    return true if permissions.include?(UserRole.id_for(:vp_admin)) and admin?('vp')
+    return true if permissions.include?(UserRole.id_for(:em_admin)) and admin?('em')
     return true if has_roles?(permissions)
 
     false
@@ -1795,6 +1811,11 @@ class User < ApplicationRecord
 
   def inactive?
     first_name.present? and not active
+  end
+
+  def deactivated_users_open_invoices
+    deactivated_users_ids = company.users.where(active: false).pluck(:id)
+    company.inward_invoices.where(invoice_status_id: InwardInvoiceStatus.id_for(:open), created_by: deactivated_users_ids, invoice_type_id: InwardInvoiceType.id_for(:tax_invoice) )
   end
 
   protected

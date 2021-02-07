@@ -12,10 +12,13 @@
 #  value          :string(255)
 #  value_text     :string(255)
 #  deleted_at     :datetime
+#  created_at     :datetime         not null
+#  updated_at     :datetime         not null
+#  entity_type    :string(255)
 #
 
 class FormCustomField < ApplicationRecord
-  include UUIDHelper
+  include UUIDHelper, SoftDeletable
 
   belongs_to :company, optional: true
   belongs_to :form
@@ -28,7 +31,14 @@ class FormCustomField < ApplicationRecord
   # has_many :attachments, as: :resource
 
   def retrieve_value
-    case self.form_entity&.entity_type
+    if entity_type.present?
+      field_type = entity_type
+    else
+      field_type = FormEntity.unscoped.where(uuid: self.form_entity_id)&.first.entity_type
+    end
+    # FormEntity.where(uuid: self.form_entity_id)
+
+    case field_type
     when 'text'
       value || value_text
     when 'dropdown'
@@ -38,6 +48,40 @@ class FormCustomField < ApplicationRecord
       selections.map(&:form_entity_choice).map(&:name)
     when 'attachment'
       attachments.as_json if self.persisted?
+    when 'switch'
+      FormEntity::Switch::TRUTHY_VALUES.include? value
+    when 'number'
+      form_entity.options['format'] == 'number' ? value.to_i.to_s :  sprintf( "%0.02f", value.to_f)
+    when 'date'
+      value.present? ? value.to_datetime.strftime('%Y-%m-%d') : value
+    when 'datetime'
+      value.present? ? value.to_datetime.strftime('%Y-%m-%d %H:%M:%S') : value
+    else
+      value
+    end
+  end
+
+  # temporarily  added to get text value against custom field
+  # to support in macro
+  def retrieve_text_value
+    if entity_type.present?
+      field_type = entity_type
+    else
+      field_type = FormEntity.unscoped.where(uuid: self.form_entity_id)&.first.entity_type
+    end
+    # FormEntity.where(uuid: self.form_entity_id)
+
+    case field_type
+    when 'text'
+      value || value_text
+    when 'dropdown'
+      selection&.form_entity_choice&.name
+    when 'multiselect'
+      selections.map(&:form_entity_choice).map(&:name)
+    when 'attachment'
+      attachments.as_json if self.persisted?
+    when 'switch'
+      FormEntity::Switch::TRUTHY_VALUES.include? value
     else
       value
     end

@@ -5,7 +5,7 @@ class BbpsBillsFetch < BaseJob
 
     # Fetch bills where automatic fetching is enabled
     status_ids = BbpsBillerSubscription.status_ids(:approved, :auto_approved, :reactivated)
-    bbps_subscriptions = BbpsBillerSubscription.where(status_id: status_ids, auto_generate_bill: true, auto_fetch_enabled: true).where(expected_bill_day: nil)
+    bbps_subscriptions = BbpsBillerSubscription.where(status_id: status_ids, auto_generate_bill: true, auto_fetch_enabled: true).where(expected_bill_day: nil, deleted_at: nil)
     autofetched = true
 
     bbps_subscriptions.each do |subscription|
@@ -43,7 +43,7 @@ class BbpsBillsFetch < BaseJob
 
       if will_create
         parameters = customer_params(subscription).with_indifferent_access
-        Bbps::BillFetch.call_async({params: parameters, "current_user" => User.first}, wait: true) do |op|
+        Bbps::BillFetch.call_async({params: parameters, "current_user" => User.first}, {wait: true, wait_timeout: 180.seconds}) do |op|
           op.success do |result|
             ap result
             create_bill(result, subscription, autofetched)

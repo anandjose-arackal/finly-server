@@ -52,7 +52,7 @@
 #  bill_month                 :string(255)
 #  pc                         :string(255)
 #  early_payment_date         :date
-#  api_response               :text(65535)
+#  api_response               :text(16777215)
 #  generated_at               :datetime
 #  biller_response            :text(65535)
 #
@@ -61,7 +61,7 @@ class BbpsBill < ApplicationRecord
 
   AMOUNT_TYPES = %w(base_amount early_payment_amount late_payment_amount)
 
-  include SoftDeletable, Transitionable
+  include SoftDeletable, Transitionable, ControllingUser
   include Sequenced::ActsAsSequenced
   include EventProducer
   # include SearchIndex::Concerns::Document

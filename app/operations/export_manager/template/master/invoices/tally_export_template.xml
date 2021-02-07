@@ -1,0 +1,184 @@
+<!-- TODO: Note: Temp file. To be removed -->
+<HEADER>
+  <TALLYREQUEST>Import Data</TALLYREQUEST>
+</HEADER>
+<BODY>
+  <IMPORTDATA>
+    <REQUESTDESC>
+      <REPORTNAME>Vouchers</REPORTNAME>
+      <STATICVARIABLES>
+        <SVCURRENTCOMPANY>{{ company_name }}</SVCURRENTCOMPANY>
+      </STATICVARIABLES>
+    </REQUESTDESC>
+    <REQUESTDATA>
+      <TALLYMESSAGE xmlns:UDF="TallyUDF">
+        {% for record in records %}
+        <VOUCHER remoteid="" vchkey="" vchtype="{{ voucher_type }}" action="Create">
+          <DATE>{{ record.date | date: '%Y%m%d' }}</DATE>
+          <REFERENCEDATE>{{ record.date | date: '%Y%m%d' }}</REFERENCEDATE>
+          <STATENAME>{{ record.billing_location.state.name }}</STATENAME>
+          <NARRATION>{{ record.narration }}</NARRATION>
+          <COUNTRYOFRESIDENCE>India</COUNTRYOFRESIDENCE>
+          <REFERENCE>{{ record.invoice_number }}</REFERENCE>
+          <VOUCHERNUMBER>{{ record.invoice_number }}</VOUCHERNUMBER>
+          <PARTYGSTIN>{{ record.vendor_location.gstin }}</PARTYGSTIN>
+          <PARTYNAME>{{ record.vendor.gl_name }}</PARTYNAME>
+          <VOUCHERTYPENAME>{{ voucher_type }}</VOUCHERTYPENAME>
+          <PARTYLEDGERNAME>{{ record.vendor.gl_name }}</PARTYLEDGERNAME>
+          <BASICBASEPARTYNAME>{{ record.vendor.gl_name }}</BASICBASEPARTYNAME>
+          <EFFECTIVEDATE>{{ record.date | date: '%Y%m%d' }}</EFFECTIVEDATE>
+
+          <!-- Vendor Ledger -->
+          <ALLLEDGERENTRIES.LIST>
+            {% assign amount = record.net_amount.value | default: 0.0 %}
+            <LEDGERNAME>{{ record.vendor.gl_name }}</LEDGERNAME>
+            <ISDEEMEDPOSITIVE>
+            {% if amount and amount < 0 %}
+              Yes
+            {% else %}
+              No
+            {% endif %}
+            </ISDEEMEDPOSITIVE>
+            <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
+            <AMOUNT>{{ amount }}</AMOUNT>
+            <BILLALLOCATION.LIST>
+              <NAME>{{ record.invoice_number }}</NAME>
+              <TYPE>New Ref</TYPE>
+              <AMOUNT>{{ record.net_amount.value | default: 0.0 | times: -1 }}</AMOUNT>
+            </BILLALLOCATION.LIST>
+          </ALLLEDGERENTRIES.LIST>
+
+          <!-- TDS Ledger -->
+          <ALLLEDGERENTRIES.LIST>
+            {% assign amount = record.tds_amount.value | default: 0.0 %}
+            <LEDGERNAME>{{ record.tds_slab.name }}</LEDGERNAME>
+            <ISDEEMEDPOSITIVE>
+            {% if amount and amount < 0 %}
+              Yes
+            {% else %}
+              No
+            {% endif %}
+            </ISDEEMEDPOSITIVE>
+            <ISPARTYLEDGER>No</ISPARTYLEDGER>
+            <AMOUNT>{{ amount }}</AMOUNT>
+          </ALLLEDGERENTRIES.LIST>
+
+          <!-- Roundoff Ledger -->
+          <ALLLEDGERENTRIES.LIST>
+            {% assign amount = record.roundoff_amount.value | default: 0.0 %}
+            <LEDGERNAME>{{ record.roundoff.gl_name }}</LEDGERNAME>
+            <ISDEEMEDPOSITIVE>
+            {% if amount and amount < 0 %}
+              Yes
+            {% else %}
+              No
+            {% endif %}
+            </ISDEEMEDPOSITIVE>
+            <ISPARTYLEDGER>No</ISPARTYLEDGER>
+            <AMOUNT>{{ amount }}</AMOUNT>
+          </ALLLEDGERENTRIES.LIST>
+
+          {% for item in record.line_items %}
+            <!-- Invoice Line Item Ledger -->
+            <ALLLEDGERENTRIES.LIST>
+
+              {% if item.billable_amount != 0 %}
+              {% assign amount = item.billable_amount | default: 0.0 | times: -1 %}
+              {% else %}
+              {% assign amount = item.taxable_amount | default: 0.0 | times: -1 %}
+              {% endif %}
+              <LEDGERNAME>{{ item.gl_code }}</LEDGERNAME>
+              <ISDEEMEDPOSITIVE>
+              {% if amount and amount < 0 %}
+                Yes
+              {% else %}
+                No
+              {% endif %}
+              </ISDEEMEDPOSITIVE>
+              <ISPARTYLEDGER>No</ISPARTYLEDGER>
+              <AMOUNT>{{amount}}</AMOUNT>
+
+              <CATEGORYALLOCATION.LIST>
+                {% assign amount = item.net_amount | default: 0.0 | times: -1 %}
+                <CATEGORY>Primary Cost Center</CATEGORY>
+                <ISDEEMEDPOSITIVE>
+                {% if amount and amount < 0 %}
+                  Yes
+                {% else %}
+                  No
+                {% endif %}
+                </CATEGORY>
+                <COSTCENTREALLOCATIONS.LIST>
+                  <NAME>{{ record.cost_center.name }}</NAME>
+                  <AMOUNT>{{ amount }}</AMOUNT>
+                </COSTCENTREALLOCATIONS.LIST>
+              </CATEGORYALLOCATION.LIST>
+
+              <CATEGORYALLOCATION.LIST>
+                {% assign amount = item.net_amount | default: 0.0 | times: -1 %}
+                <CATEGORY>State Cost Center</CATEGORY>
+                <ISDEEMEDPOSITIVE>
+                {% if amount and amount < 0 %}
+                  Yes
+                {% else %}
+                  No
+                {% endif %}
+                </CATEGORY>
+                <COSTCENTREALLOCATIONS.LIST>
+                  <NAME>{{ record.cost_center.name }}</NAME>
+                  <AMOUNT>{{ amount }}</AMOUNT>
+                </COSTCENTREALLOCATIONS.LIST>
+              </CATEGORYALLOCATION.LIST>
+            </ALLLEDGERENTRIES.LIST>
+
+            <!-- CGST Ledger -->
+            <ALLLEDGERENTRIES.LIST>
+              {% assign amount = item.cgst | default: 0.0 | times: -1 %}
+              <LEDGERNAME>Input CGST Mumbai</LEDGERNAME>
+              <ISDEEMEDPOSITIVE>
+              {% if amount and amount < 0 %}
+                Yes
+              {% else %}
+                No
+              {% endif %}
+              </ISDEEMEDPOSITIVE>
+              <ISPARTYLEDGER>No</ISPARTYLEDGER>
+              <AMOUNT>{{ amount }}</AMOUNT>
+            </ALLLEDGERENTRIES.LIST>
+
+            <!-- SGST Ledger -->
+            <ALLLEDGERENTRIES.LIST>
+              {% assign amount = item.sgst | default: 0.0 | times: -1 %}
+              <LEDGERNAME>Input SGST Mumbai</LEDGERNAME>
+              <ISDEEMEDPOSITIVE>
+              {% if amount and amount < 0 %}
+                Yes
+              {% else %}
+                No
+              {% endif %}
+              </ISDEEMEDPOSITIVE>
+              <ISPARTYLEDGER>No</ISPARTYLEDGER>
+              <AMOUNT>{{ amount }}</AMOUNT>
+            </ALLLEDGERENTRIES.LIST>
+
+            <!-- IGST Ledger -->
+            <ALLLEDGERENTRIES.LIST>
+              {% assign amount = item.igst | default: 0.0 | times: -1 %}
+              <LEDGERNAME>Input IGST Mumbai</LEDGERNAME>
+              <ISDEEMEDPOSITIVE>
+              {% if amount and amount < 0 %}
+                Yes
+              {% else %}
+                No
+              {% endif %}
+              </ISDEEMEDPOSITIVE>
+              <ISPARTYLEDGER>No</ISPARTYLEDGER>
+              <AMOUNT>{{ amount }}</AMOUNT>
+            </ALLLEDGERENTRIES.LIST>
+          {% endfor %}
+        </VOUCHER>
+        {% endfor %}
+      </TALLYMESSAGE>
+    </REQUESTDATA>
+  </IMPORTDATA>
+</BODY>

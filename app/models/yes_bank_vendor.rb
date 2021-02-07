@@ -40,16 +40,18 @@
 #  reject_note              :text(65535)
 #  rcm_enabled              :boolean          default(FALSE)
 #  vendor_country           :string(255)
-#  ldc_upper_limit_id       :integer
 #  ldc_effective_start_date :date
 #  ldc_effective_end_date   :date
 #  tds_effective_start_date :date
 #  tds_effective_end_date   :date
+#  bank_code                :string(255)
+#  tax_rate_id              :integer
 #  erp_sync_status_id       :integer
-#  erp_sync_message         :string(255)
-#  erp_sync_reference_id    :string(255)
+#  erp_sync_message         :text(65535)
+#  erp_sync_reference_id    :text(65535)
 #  erp_sync_attempts_count  :integer          default(0)
 #  erp_sync_attempted_at    :datetime
+#  ldc_upper_limit_amount   :decimal(20, 5)
 #
 
 class YesBankVendor < ApplicationRecord
@@ -81,7 +83,7 @@ class YesBankVendor < ApplicationRecord
   belongs_to :currency, optional: true
   belongs_to :payment_term, optional: true
 
-  has_many :bank_accounts, as: :account_owner
+  has_many :bank_accounts, as: :account_owner, dependent: :destroy
   has_many :receiving_payments, as: :receiving_user, class_name: 'Payment'
   has_many :vendor_attachments
   has_many :custom_fields, as: :parent, dependent: :destroy
@@ -94,6 +96,13 @@ class YesBankVendor < ApplicationRecord
 
   has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment'
   has_many :receiving_payments, foreign_key: 'receiving_user_id', class_name: 'Payment'
+
+  has_paper_trail(
+      meta: {
+          parent_document_type: "Vendor",
+          document_number: Proc.new { |document| document.vendor_id }
+      }
+  )
 
   default_scope { unscope(:where) }
 
@@ -450,4 +459,6 @@ class YesBankVendor < ApplicationRecord
   def review_in_progress?
     VendorStatus.ids_for(:awaiting_approval).include?(status_id)
   end
+
+
 end
