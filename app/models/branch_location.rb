@@ -124,7 +124,7 @@ include Searchkick::Api
     {
         id: self.id,
         name: display_name,
-        gstin: self.gstin,
+        gstin: self.tax_registration_number,
         pan: self.pan,
         address_1: self.address_1,
         address_2: self.address_2,
