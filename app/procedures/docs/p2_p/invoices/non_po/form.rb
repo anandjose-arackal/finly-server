@@ -1,4 +1,4 @@
-class Docs::P2P::Invoices::Form < Forms::API
+class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
   model Invoice
 

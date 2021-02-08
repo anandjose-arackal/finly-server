@@ -6,7 +6,7 @@ class NonPoInvoiceMigrator
     company = Company.find company_id
     documents = Invoice.where(invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)).where(company_id: company.id)
 
-    form = Form.where(klass_name: 'Docs::P2P::Invoices::Form', company_id: company_id).first
+    form = Form.where(klass_name: 'Docs::P2P::Invoices::NonPo::Form', company_id: company_id).first
 
     documents.find_in_batches(batch_size: 1000) do |batch|
       batch.each do |document|
