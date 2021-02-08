@@ -59,7 +59,8 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
         }
         required = result['required']
         # Required validation ( System Validation )
-        if required and send(entity.entity_key).blank? and entity.entity_type != 'switch'
+
+        if required and !([true, false].include?( send(entity.entity_key) )) and send(entity.entity_key).blank? and entity.entity_type != 'switch'
           errors.add entity.label, 'cannot be blank'
         end
 
