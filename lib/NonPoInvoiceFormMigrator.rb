@@ -73,17 +73,26 @@ class NonPoInvoiceMigrator
         # Migrate Invoice Data
         update_params = {
             # For the existing customers the base currency & reporting currency shall be 'INR'
+            # ACCOUNTING DETAILS
             base_currency: "INR",
             reporting_currency: "INR",
+            conversion_date: document.created_at.to_date,
+            retrieve_conversion_rate: true,
 
-            # Vendor Related Fields
+            # INVOICING DETAILS
+            payment_term_days: document&.payment_term&.days_after,
+            conversion_rate: 1,
+
+            # VENDOR DETAILS
             vendor_sequence_id: document&.vendor&.vendor_id,
-            vendor_trade_name: document&.vendor&.display_name,
+            vendor_trade_name: document&.vendor&.trade_name,
             vendor_country: document&.vendor&.vendor_country,
             vendor_pan: document&.vendor&.pan,
             vendor_bank_account_number: document&.receiving_account&.account_number,
             vendor_bank_account_ifsc: document&.receiving_account&.ifsc,
             vendor_gstin: document&.gstin_location&.gstin,
+            vendor_bank_account_swift_code: document.receiving_account&.swift_code,
+
 
             # Amount Related Fields # todo - I2P check if amounts are getting saved properly
             invoice_gross_amount: document&.amount&.value,
@@ -108,6 +117,7 @@ class NonPoInvoiceMigrator
             invoice_roundoff_amount_converted: document&.roundoff_amount,
             invoice_balance_due: document&.balance_due&.value,
             invoice_balance_due_converted: document&.balance_due&.value
+
         }
 
         document.update_columns(update_params)

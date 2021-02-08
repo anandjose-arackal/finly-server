@@ -64,6 +64,10 @@ class Procurements::Invoices::Create < Procurements::Invoices::Base
     self.invoice.vendor_pan = vendor&.pan
     self.invoice.vendor_sequence_id = vendor&.vendor_id
     self.invoice.vendor_country = vendor&.vendor_country
+    self.invoice.payment_term_days = vendor&.payment_term&.days_after.to_i
+    self.invoice.due_date = Date.today + vendor&.payment_term&.days_after.to_i.days
+    self.invoice.base_currency = 'INR'
+    self.invoice.reporting_currency = self.invoice.base_currency
     self.invoice.rcm_enabled = vendor.rcm_enabled
     if self.vendor.payment_term_id.present?
       self.invoice.payment_term_id = self.vendor.payment_term_id

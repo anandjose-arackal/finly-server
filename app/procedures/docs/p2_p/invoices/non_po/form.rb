@@ -12,15 +12,24 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
           item_tds_amount: "{% if row.tds_applicable == true %}{{ row.item_taxable_amount | times: form.tds_percentage | divided_by: 100 | round: 2}}{% else %}{{ 0 }}{% endif %}",
           item_net_amount: "{{ row.item_taxable_amount | plus: row.item_tax_amount | round: 2 }}",
           item_billable_amount: "{{ row.item_taxable_amount | plus: row.item_tax_amount | minus: row.item_tds_amount | round: 2 }}", # todo - I2P will be different for PO invoice          
+
+          # CONVERTED VALUES
+          item_gross_amount_converted:    "{{row.item_gross_amount | times: form.conversion_rate | round: 2 }}",
+          item_discount_amount_converted: "{{row.item_discount_amount | times: form.conversion_rate | round: 2 }}",
+          item_taxable_amount_converted:  "{{row.item_taxable_amount | times: form.conversion_rate | round: 2 }}",
+          item_tax_amount_converted:      "{{ row.item_tax_amount | times: form.conversion_rate | round: 2 }}",
+          item_tds_amount_converted:      "{{ row.item_tds_amount | times: form.conversion_rate | round: 2 }}",
+          item_net_amount_converted:      "{{ row.item_net_amount | times: form.conversion_rate | round: 2 }}",
+          item_billable_amount_converted: "{{ row.item_billable_amount | times: form.conversion_rate | round: 2 }}"
+
       },
       # INVOICE SUMMARY
       summary: {
-          invoice_gross_amount: "{% assign gross_amount = 0 %}{% for item in form.items %}{% assign gross_amount = gross_amount | plus: item.item_gross_amount %}{% endfor %}{{ gross_amount | round: 2 }}",
           
+          invoice_gross_amount: "{% assign gross_amount = 0 %}{% for item in form.items %}{% assign gross_amount = gross_amount | plus: item.item_gross_amount %}{% endfor %}{{ gross_amount | round: 2 }}",
           total_line_item_discount_amount: "{% assign discount_amount = 0 %}{% for item in form.items %}{% assign discount_amount = discount_amount | plus: item.item_discount_amount %}{% endfor %}{{ discount_amount | round: 2 }}",
           overall_discount_amount: "{{ form.overall_discount_amount | round: 2  }}",
           invoice_discount_amount: "{{ form.total_line_item_discount_amount | plus: form.overall_discount_amount | round: 2 }}",
-          
           invoice_taxable_amount: "{{ form.invoice_gross_amount | minus: form.invoice_discount_amount }}",
           invoice_tax_amount: "{% assign tax_amount = 0 %}{% for item in form.items %}{% assign tax_amount = tax_amount | plus: item.item_tax_amount %}{% endfor %}{{ tax_amount | round: 2 }}",
           invoice_tds_amount: "{% assign tds_amount = 0 %}{% for item in form.items %}{% assign tds_amount = tds_amount | plus: item.item_tds_amount %}{% endfor %}{{ tds_amount | round: 2 }}",
@@ -28,11 +37,25 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
           # todo - Issue : Roundoff should be automatically calulated everytime user inputs something, even if its the round off itself
           invoice_roundoff_amount: "{% assign amount = form.invoice_sub_total_amount | round %}{{amount | minus: form.invoice_sub_total_amount | round: 2 }}",
           invoice_total_amount: "{{ form.invoice_sub_total_amount | plus: form.invoice_roundoff_amount | round: 2 }}",
-          invoice_net_total_amount: "{{ form.invoice_total_amount | minus: form.invoice_paid_outside_amount | minus: form.invoice_advance_paid_amount | round: 2 }}",
+          invoice_net_total_amount: "{{ form.invoice_total_amount | minus: form.invoice_paid_outside_amount | round: 2 }}",
           # todo - will be shown on top of invoice and needs separate calculation
           # invoice_balance_due: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | round: 2 }}",          
           invoice_balance_due: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | minus: form.invoice_paid_outside_amount | round: 2 }}",
-          invoice_balance_due_converted: "{{ form.invoice_balance_due | times: form.conversion_rate | round: 2 }}"
+          
+          # CONVERTED VALUES
+          invoice_gross_amount_converted: "{{ form.invoice_gross_amount | times: form.conversion_rate | round: 2 }}",
+          invoice_discount_amount_converted: "{{ form.invoice_discount_amount | times: form.conversion_rate | round: 2 }}",
+          invoice_taxable_amount_converted: "{{ form.invoice_taxable_amount | times: form.conversion_rate | round: 2 }}",
+          invoice_tax_amount_converted: "{{ form.invoice_tax_amount | times: form.conversion_rate | round: 2 }}",
+          invoice_tds_amount_converted: "{{ form.invoice_tds_amount | times: form.conversion_rate | round: 2 }}",
+          invoice_paid_outside_amount_converted: "{{ form.invoice_paid_outside_amount | times: form.conversion_rate | round: 2 }}",
+          invoice_freight_amount_converted: "{{ form.invoice_freight_amount | times: form.conversion_rate | round: 2 }}",
+          invoice_sub_total_amount_converted: "{{ form.invoice_sub_total_amount | times: form.conversion_rate | round: 2 }}",
+          invoice_roundoff_amount_converted: "{% assign amount = form.invoice_sub_total_amount_converted | round %}{{ amount | minus: form.invoice_sub_total_amount | round: 2 }}",
+          invoice_total_amount_converted: "{{ form.invoice_sub_total_amount_converted | plus: form.invoice_roundoff_amount_converted | round: 2 }}",
+          invoice_balance_due_converted: "{{ form.invoice_balance_due | times: form.conversion_rate | round: 2 }}",
+          invoice_net_total_amount_converted: "{{ form.invoice_total_amount_converted | minus: form.invoice_paid_outside_amount_converted | round: 2 }}",
+          invoice_advance_paid_amount_converted: "{{ form.invoice_advance_paid_amount | times: form.conversion_rate | round: 2 }}"              
 
       }
   }
@@ -82,10 +105,10 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
 
     dropdown :cost_allocation_items, choices_scope: Choices[:list].({id: false, name: "Header"}, {id: true, name: "Line Item"}),
-             required: true, can_choices_be_changed: false, default_value: false
+             required: true, can_choices_be_changed: false, default_value: 'false'
 
-    date :transactions_service_period_form, label: 'Transaction Service Period (From Date)', editable: true, visible: true
-    date :transactions_service_period_to, label: 'Transaction Service Period (To Date)', editable: true, visible: true
+    date :transaction_service_period_from, label: 'Transaction Service Period (From Date)', editable: true, visible: true
+    date :transaction_service_period_to, label: 'Transaction Service Period (To Date)', editable: true, visible: true
 
   end
 
@@ -97,13 +120,14 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
          required: true, editable: false
     lookup :department_id, label: "Department", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('departments') #, editable: false, visible: false
     lookup :cost_center_id, label: "Cost Center", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('cost_centers')
-    dropdown :discount_type_id, label: "Discount Type", editable: true, visible: true, required: true, choices_scope: Choices[:list].({id: 1, name: 'Percentage'}, {id: 2, name: 'Amount'} ), default_value: 1
+    dropdown :discount_type_id, label: "Discount Type", editable: true, visible: true, required: true, choices_scope: Choices[:list].({id: 1, name: 'Percentage'}, {id: 2, name: 'Amount'} ), default_value: 'Percentage'
     
     date :conversion_date, label: "Conversion Date", editable: false, visible: true,
          computed: Forms::Compute::Form('{{form.date}}')
 
-    currency :reporting_currency, label: "Reporting Currency"
-    currency :base_currency, label: "Base Currency", visible: false, editable: false, can_editable_be_changed: false # todo populate with system base currency
+    currency :base_currency, label: "Base Currency", visible: true, editable: false, required: true, can_editable_be_changed: false,
+              default_value: 'INR' # todo populate with system base currency
+    currency :reporting_currency, label: "Reporting Currency", required: true
     switch :retrieve_conversion_rate, label: "Auto Populate Conversion Rate", default_value: true, visible: false
     number :conversion_rate, editable: false, format: 'decimal', default_value: 1, visible: false
     # date :transaction_service_period_from, label: 'Transaction Period From'
@@ -116,7 +140,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
     lookup :vendor_id, label: "Vendor", choices_scope: Choices[:lookup].('vendors'), required: true, editable: false,
            can_editable_be_changed: false, can_be_disabled: false, can_required_be_changed: false, can_visible_be_changed: false
     
-    text :vendor_trade_name, label: 'Vendor Trade Name', editable: false, visible: true, computed: Forms::Compute::Lookup('vendor_id', '{{record.business_name}}')
+    lookup :vendor_trade_name, label: 'Vendor Trade Name', editable: false, visible: true, computed: Forms::Compute::Lookup('vendor_id', '{{record.trade_name}}')
     text :vendor_country, editable: false, visible: true
     
     text :vendor_sequence_id, "Vendor ID", editable: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.vendor_id}}')
@@ -168,7 +192,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
       text :description, editable: false,
            can_editable_be_changed: false,
-           can_visible_be_changed: false,
+           can_visible_be_changed: false, visible: false,
            computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.description}}')
 
       text :comment, label: "Narration"
@@ -197,11 +221,10 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
               required: true, editable: true, visible: true,
               computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.unit_of_measurement}}')
       
-      # dropdown :unit_of_measurement, visible: false, choices_scope: Choices[:list].({id: "KG", value: "KG"})
       amount :rate, label: "Rate",
              can_editable_be_changed: false,
              can_visible_be_changed: false,
-             required: true,
+             required: true, visible: true, editable: true,
              computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.rate}}')
 
       # gross_amount = rate x quantity
@@ -209,9 +232,11 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_visible_be_changed: false,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_gross_amount])
+
       amount :item_gross_amount_converted, editable: false, visible: false,
              can_visible_be_changed: false,
-             can_editable_be_changed: false
+             can_editable_be_changed: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_gross_amount_converted])
 
       # discount # discount percentage
       number :discount, visible: true, editable: true, default_value: 0
@@ -220,17 +245,21 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       amount :item_discount_amount, editable: false, visible: true,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_discount_amount])
-      amount :item_discount_amount_converted, editable: false, visible: true,
+
+      amount :item_discount_amount_converted, editable: false, visible: false,
              can_visible_be_changed: false,
-             can_editable_be_changed: false
+             can_editable_be_changed: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_discount_amount_converted])
 
       # taxable_amount = gross_amount - discount_amount
       amount :item_taxable_amount, editable: false, visible: true,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_taxable_amount])
-      amount :item_taxable_amount_converted, editable: false, visible: true,
+
+      amount :item_taxable_amount_converted, editable: false, visible: false,
              can_visible_be_changed: false,
-             can_editable_be_changed: false
+             can_editable_be_changed: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_taxable_amount_converted])
       
       lookup :tax_rate_id, label: "Tax Rate", editable: true, visible: true, choices_scope: Choices[:lookup].('tax_rates'), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.tax_rate_id}}')
 
@@ -238,143 +267,176 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       number :tax_percentage, editable: false, visible: true, computed: Forms::Compute::Lookup('items.tax_rate_id', '{{record.rate}}')
 
       # tax_amount = taxable_amount x tax / 100
-      amount :item_tax_amount, editable: false, visible: false,
+      amount :item_tax_amount, editable: false, visible: true,
              can_editable_be_changed: false,
              can_visible_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_tax_amount])
+
       amount :item_tax_amount_converted, editable: false, visible: false,
              can_visible_be_changed: false,
-             can_editable_be_changed: false
+             can_editable_be_changed: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_tax_amount_converted])
 
-      amount :item_tds_amount, label: "TDS Amount", editable: false, visible: false,
+      amount :item_tds_amount, label: "TDS Amount", editable: false, visible: true,
              can_editable_be_changed: false,
              can_visible_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_tds_amount])
+
       amount :item_tds_amount_converted, editable: false, visible: false,
              can_visible_be_changed: false,
-             can_editable_be_changed: false
+             can_editable_be_changed: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_tds_amount_converted])
 
       amount :item_net_amount, label: "Net Amount", editable: false, visible: true,
              can_editable_be_changed: false,
              can_visible_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_net_amount])
+
       amount :item_net_amount_converted, editable: false, visible: false,
              can_visible_be_changed: false,
-             can_editable_be_changed: false
+             can_editable_be_changed: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_net_amount_converted])
 
       amount :item_billable_amount, label: "Billable Amount", editable: false, visible: false,
              can_editable_be_changed: false,
              can_visible_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_billable_amount])
+
       amount :item_billable_amount_converted, editable: false, visible: false,
              can_visible_be_changed: false,
-             can_editable_be_changed: false
+             can_editable_be_changed: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_billable_amount_converted])
     end
   end
 
   # INVOICE ITEMS SUMMARY
   section :summary do
     summary :items_summary do
-      amount :invoice_gross_amount, editable: false,
+      amount :invoice_gross_amount, editable: false, visible: true,
              can_editable_be_changed: false,
              can_visible_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_gross_amount])
+
       amount :invoice_gross_amount_converted, editable: false, visible: false,
              can_visible_be_changed: false,
-             can_editable_be_changed: false
+             can_editable_be_changed: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_gross_amount_converted])
 
-      amount :total_line_item_discount_amount, editable: false,
+      amount :total_line_item_discount_amount, editable: false, visible: true,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:total_line_item_discount_amount])
 
-      amount :overall_discount_amount, editable: true,
+      amount :overall_discount_amount, editable: true, visible: true,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:overall_discount_amount])
 
-      amount :invoice_discount_amount, label: "Net Discount Amount",
+      amount :invoice_discount_amount, label: "Net Discount Amount", visible: true,
               editable: false, can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_discount_amount])
+
       amount :invoice_discount_amount_converted, editable: false, visible: false,
              can_visible_be_changed: false, label: "Net Discount Amount Converted",
-             can_editable_be_changed: false
+             can_editable_be_changed: false, 
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_discount_amount_converted])
 
-      amount :invoice_taxable_amount, editable: false, visible: false,
+      amount :invoice_taxable_amount, editable: false, visible: true,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_taxable_amount])
+
       amount :invoice_taxable_amount_converted, editable: false, visible: false,
              can_editable_be_changed: false,
-             can_visible_be_changed: false
+             can_visible_be_changed: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_taxable_amount_converted])
 
-      amount :invoice_tax_amount, editable: false,
+      amount :invoice_tax_amount, editable: false, visible: true,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_tax_amount])
+
       amount :invoice_tax_amount_converted, editable: false, visible: false,
              can_visible_be_changed: false,
-             can_editable_be_changed: false
+             can_editable_be_changed: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_tax_amount_converted])
 
-
-      lookup :tds_slab_id, choices_scope: Choices[:lookup].('tds_slabs') # todo - condition when reporting currency is in INR
-      number :tds_percentage, internal: true, editable: false, # todo - condition when reporting currency is in INR
+      lookup :tds_slab_id, choices_scope: Choices[:lookup].('tds_slabs'), visible: true # todo - condition when reporting currency is in INR
+      
+      number :tds_percentage, internal: true, editable: false, visible: true, # todo - condition when reporting currency is in INR
              can_editable_be_changed: false,
              computed: Forms::Compute::Lookup('items_summary.tds_slab_id', '{{record.tds}}')
 
-      amount :invoice_tds_amount, editable: false, # todo - condition when reporting currency is in INR
+      amount :invoice_tds_amount, editable: false, visible: true, # todo - condition when reporting currency is in INR
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_tds_amount])
+      
       amount :invoice_tds_amount_converted, editable: false, visible: false,
              can_visible_be_changed: false,
-             can_editable_be_changed: false
+             can_editable_be_changed: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_tds_amount_converted])
 
       amount :invoice_freight_amount, label: "Freight",
-             default_value: 0, visible: true, editable: true
+             default_value: 0, visible: true, editable: true 
+
       amount :invoice_freight_amount_converted, editable: false, visible: false,
              can_visible_be_changed: false,
-             can_editable_be_changed: false
+             can_editable_be_changed: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_freight_amount_converted])
 
       amount :invoice_sub_total_amount, editable: false, visible: false,
              can_visible_be_changed: false,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_sub_total_amount]) # todo - changd name
+
       amount :invoice_sub_total_amount_converted, editable: false, visible: false,
              can_visible_be_changed: false,
-             can_editable_be_changed: false
+             can_editable_be_changed: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_sub_total_amount_converted]) # todo - changd name
 
       amount :invoice_roundoff_amount, visible: true, editable: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_roundoff_amount]) # todo - changd name
+
       amount :invoice_roundoff_amount_converted, editable: false, visible: false,
              can_visible_be_changed: false,
-             can_editable_be_changed: false
+             can_editable_be_changed: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_roundoff_amount_converted]) # todo - changd name
 
       amount :invoice_total_amount, editable: false, visible: true,
              can_editable_be_changed: false,
              can_visible_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_total_amount])
+
       amount :invoice_total_amount_converted, editable: false, visible: false,
              can_visible_be_changed: false,
-             can_editable_be_changed: false
+             can_editable_be_changed: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_total_amount_converted])
 
       amount :invoice_paid_outside_amount, "Payment Outside Finly",
              default_value: 0, visible: true, editable: true
+
       amount :invoice_paid_outside_amount_converted, editable: false, visible: false,
              can_visible_be_changed: false,
-             can_editable_be_changed: false
+             can_editable_be_changed: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_paid_outside_amount_converted])
 
       amount :invoice_advance_paid_amount, "Advance Paid",
              default_value: 0, editable: false, visible: true
+
       amount :invoice_advance_paid_amount_converted, editable: false, visible: false,
              can_visible_be_changed: false,
-             can_editable_be_changed: false
+             can_editable_be_changed: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_advance_paid_amount_converted])
 
-      amount :invoice_net_total_amount, label: "Net Total", editable: false,
+      amount :invoice_net_total_amount, label: "Net Total", editable: false, visible: true,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_net_total_amount])
-      amount :invoice_net_total_amount_converted, editable: false, visible: false,
-             can_editable_be_changed: false
+      
+      amount :invoice_net_total_amount_converted, label: "Net Total Converted", editable: false, visible: true,
+             can_editable_be_changed: false, 
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_net_total_amount_converted])
 
       amount :invoice_balance_due, label: "Balance Payable", editable: false,
              can_editable_be_changed: false, visible: true,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_balance_due])
-      amount :invoice_balance_due_converted, editable: false, visible: true,
+
+      amount :invoice_balance_due_converted, editable: false, visible: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_balance_due_converted]),
              can_visible_be_changed: false, can_editable_be_changed: false
 
