@@ -167,6 +167,15 @@ class Vendors::Base < BaseOperation
     true
   end
 
+  def validate_duplicate_pan
+    if vendor.present? && vendor.pan.present? && vendor.is_a?(YesBankVendor)
+      similar_pan_vendors = user.company.yes_bank_vendors.filter_active.where(pan: vendor.pan, company_id: company.id).where.not(id: vendor.id)
+      if similar_pan_vendors.present?
+        messages.push "Vendor with pan: \"#{similar_pan_vendors.first.pan}\" already exists in the system. See vendor - #{similar_pan_vendors.first.display_name}"
+      end
+    end
+  end
+
   def validate_duplicate_bank_account
     if vendor.present? && vendor.is_a?(YesBankVendor)
       if self.vendor.bank_accounts.present?
