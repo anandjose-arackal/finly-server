@@ -110,6 +110,8 @@ class FieldConfiguration < ApplicationRecord
 
   default_scope {unscope(:where).order(sequence_number: :asc, id: :asc)}
 
+  after_save :set_field_key
+
   def validate_config
     case field_type_id
     when FieldType.id_for(:drop_down)
