@@ -853,6 +853,7 @@ class Invoice < ApplicationRecord
     elsif paid_amount <= balance_due
       self.update(invoice_status_id: InwardInvoiceStatus.id_for(:partially_paid))
     end
+    self.update(invoice_advance_paid_amount: paid_amount)
   end
 
   def unpaid?
@@ -1384,6 +1385,10 @@ class Invoice < ApplicationRecord
 
   def entity_submitted_at
     po_trail_item&.entity_submitted_at&.to_date || submitted_at&.to_date || created_at&.to_date
+  end
+
+  def paid_amount 
+    payments.successful.joins(:amount).sum(:value).round(2)
   end
 
   private

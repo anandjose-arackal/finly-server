@@ -40,7 +40,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
           invoice_net_total_amount: "{{ form.invoice_total_amount | minus: form.invoice_paid_outside_amount | round: 2 }}",
           # todo - will be shown on top of invoice and needs separate calculation
           # invoice_balance_due: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | round: 2 }}",          
-          invoice_advance_paid_amount: "{{ form.paid_amount_value | round: 2 }}",
+          invoice_advance_paid_amount: "{{ form.invoice_advance_paid_amount | round: 2 }}",
           invoice_balance_due: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | minus: form.invoice_paid_outside_amount | round: 2 }}",
           
           # CONVERTED VALUES
@@ -419,7 +419,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
       amount :invoice_advance_paid_amount, label: "Amount Paid / Advance",
              default_value: 0, editable: false, visible: true,
-             computed: Forms::Compute::Form("{{form.paid_amount_value}}")
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_advance_paid_amount])
 
       amount :invoice_advance_paid_amount_converted, editable: false, visible: false,
              can_visible_be_changed: false,
