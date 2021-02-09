@@ -168,10 +168,10 @@ class Vendors::Base < BaseOperation
   end
 
   def validate_duplicate_pan
-    if vendor.present? && vendor.pan.present? && vendor.is_a?(YesBankVendor)
-      similar_pan_vendors = user.company.yes_bank_vendors.filter_active.where(pan: vendor.pan, company_id: company.id).where.not(id: vendor.id)
+    if vendor_parameters.present? && vendor_parameters[:pan].present?
+      similar_pan_vendors = user.company.yes_bank_vendors.filter_active.where(pan: vendor_parameters[:pan])
       if similar_pan_vendors.present?
-        messages.push "Vendor with pan: \"#{similar_pan_vendors.first.pan}\" already exists in the system. See vendor - #{similar_pan_vendors.first.display_name}"
+        add_message :error, "Vendor with pan: \"#{similar_pan_vendors.first.pan}\" already exists in the system. See vendor - #{similar_pan_vendors.first.display_name}"
       end
     end
   end
