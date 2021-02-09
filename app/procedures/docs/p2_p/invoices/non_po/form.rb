@@ -40,6 +40,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
           invoice_net_total_amount: "{{ form.invoice_total_amount | minus: form.invoice_paid_outside_amount | round: 2 }}",
           # todo - will be shown on top of invoice and needs separate calculation
           # invoice_balance_due: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | round: 2 }}",          
+          invoice_advance_paid_amount: "{{ form.paid_amount_value | round: 2 }}",
           invoice_balance_due: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | minus: form.invoice_paid_outside_amount | round: 2 }}",
           
           # CONVERTED VALUES
@@ -408,7 +409,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_total_amount_converted])
 
-      amount :invoice_paid_outside_amount, "Payment Outside Finly",
+      amount :invoice_paid_outside_amount, label: "Payment Outside Finly",
              default_value: 0, visible: true, editable: true
 
       amount :invoice_paid_outside_amount_converted, editable: false, visible: false,
@@ -416,8 +417,9 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_paid_outside_amount_converted])
 
-      amount :invoice_advance_paid_amount, "Advance Paid",
-             default_value: 0, editable: false, visible: true
+      amount :invoice_advance_paid_amount, label: "Amount Paid / Advance",
+             default_value: 0, editable: false, visible: true,
+             computed: Forms::Compute::Form("{{form.paid_amount_value}}")
 
       amount :invoice_advance_paid_amount_converted, editable: false, visible: false,
              can_visible_be_changed: false,
@@ -535,37 +537,37 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
     action :visible, false
   end
 
-  condition condition_id: "Disable item department > Item department not for Header Cost Allocation Items" do
-    reference :entity, 'items.department_id'
-    rule Rules::Builder[:cost_allocation_items].not_eq(value: 'Header')
-    action :visible, true
-    action :required, true
-    action :editable, true
-  end
+  # condition condition_id: "Disable item department > Item department not for Header Cost Allocation Items" do
+  #   reference :entity, 'items.department_id'
+  #   rule Rules::Builder[:cost_allocation_items].not_eq(value: 'Header')
+  #   action :visible, true
+  #   action :required, true
+  #   action :editable, true
+  # end
 
-  condition condition_id: "Enable item department > Item Cost Center for Header Cost Allocation Items" do
-    reference :entity, 'department_id'
-    rule Rules::Builder[:cost_allocation_items].not_eq(value: 'Header')
-    action :visible, false
-    action :required, false
-    action :editable, false
-  end
+  # condition condition_id: "Enable item department > Item Cost Center for Header Cost Allocation Items" do
+  #   reference :entity, 'department_id'
+  #   rule Rules::Builder[:cost_allocation_items].not_eq(value: 'Header')
+  #   action :visible, false
+  #   action :required, false
+  #   action :editable, false
+  # end
 
-  condition condition_id: "Disable item Cost Center > Item Cost Center not for Header Cost Allocation Items" do
-    reference :entity, 'items.cost_center_id'
-    rule Rules::Builder[:cost_allocation_items].not_eq(value: 'Header')
-    action :visible, true
-    action :required, true
-    action :editable, true
-  end
+  # condition condition_id: "Disable item Cost Center > Item Cost Center not for Header Cost Allocation Items" do
+  #   reference :entity, 'items.cost_center_id'
+  #   rule Rules::Builder[:cost_allocation_items].not_eq(value: 'Header')
+  #   action :visible, true
+  #   action :required, true
+  #   action :editable, true
+  # end
 
-  condition condition_id: "Enable item Cost Center > Item Cost Center for Header Cost Allocation Items" do
-    reference :entity, 'cost_center_id'
-    rule Rules::Builder[:cost_allocation_items].not_eq(value: 'Header')
-    action :visible, false
-    action :required, false
-    action :editable, false
-  end
+  # condition condition_id: "Enable item Cost Center > Item Cost Center for Header Cost Allocation Items" do
+  #   reference :entity, 'cost_center_id'
+  #   rule Rules::Builder[:cost_allocation_items].not_eq(value: 'Header')
+  #   action :visible, false
+  #   action :required, false
+  #   action :editable, false
+  # end
 
   # CONDITIONS
 
