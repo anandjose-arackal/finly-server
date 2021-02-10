@@ -1695,18 +1695,19 @@ class Invoice < ApplicationRecord
   def sync_amounts
     if invoice_gross_amount.present?
       exchange_base_currency = get_base_currency&.country_code || "INR"
+      binding.pry
       # Multi currency implementation
-      self.invoice_gross_amount_converted = invoice_gross_amount_money.exchange_to(exchange_base_currency).amount
-      self.invoice_discount_amount_converted = invoice_discount_amount_money.exchange_to(exchange_base_currency).amount
-      self.invoice_tax_amount_converted = invoice_tax_amount_money.exchange_to(exchange_base_currency).amount
-      self.invoice_tds_amount_converted = invoice_tds_amount_money.exchange_to(exchange_base_currency).amount
+      self.invoice_gross_amount_converted = invoice_gross_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.invoice_discount_amount_converted = invoice_discount_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.invoice_tax_amount_converted = invoice_tax_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.invoice_tds_amount_converted = invoice_tds_amount_money.exchange_to(exchange_base_currency).amount rescue 0
       # self.invoice_paid_outside_amount_converted = invoice_paid_outside_amount_money.exchange_to(exchange_base_currency).amount
-      self.invoice_sub_total_amount_converted = invoice_sub_total_amount_money.exchange_to(exchange_base_currency).amount
-      self.invoice_total_amount_converted = invoice_total_amount_money.exchange_to(exchange_base_currency).amount
-      self.invoice_taxable_amount_converted = invoice_taxable_amount_money.exchange_to(exchange_base_currency).amount
+      self.invoice_sub_total_amount_converted = invoice_sub_total_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.invoice_total_amount_converted = invoice_total_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.invoice_taxable_amount_converted = invoice_taxable_amount_money.exchange_to(exchange_base_currency).amount rescue 0
       # self.invoice_freight_amount_converted = invoice_freight_amount_money.exchange_to(exchange_base_currency).amount
-      self.invoice_roundoff_amount_converted = invoice_roundoff_amount_money.exchange_to(exchange_base_currency).amount
-      self.invoice_balance_due_converted = invoice_balance_due_money.exchange_to(exchange_base_currency).amount
+      self.invoice_roundoff_amount_converted = invoice_roundoff_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.invoice_balance_due_converted = invoice_balance_due_money.exchange_to(exchange_base_currency).amount rescue 0
 
       self.skip_callback = true
       amounts_attributes_map.each do |key, value|

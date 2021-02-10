@@ -416,13 +416,14 @@ class InvoiceLineItem < ApplicationRecord
   def sync_amounts
     if item_gross_amount.present?
       exchange_base_currency = get_base_currency&.country_code || "INR"
+      binding.pry
 
-      self.item_gross_amount_converted = item_gross_amount_money.exchange_to(exchange_base_currency).amount
-      self.item_discount_amount_converted = item_discount_amount_money.exchange_to(exchange_base_currency).amount
-      self.item_taxable_amount_converted = item_taxable_amount_money.exchange_to(exchange_base_currency).amount
-      self.item_tax_amount_converted = item_tax_amount_money.exchange_to(exchange_base_currency).amount
-      self.item_tds_amount_converted = item_tds_amount_money.exchange_to(exchange_base_currency).amount
-      self.item_net_amount_converted = item_net_amount_money.exchange_to(exchange_base_currency).amount
+      self.item_gross_amount_converted = item_gross_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.item_discount_amount_converted = item_discount_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.item_taxable_amount_converted = item_taxable_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.item_tax_amount_converted = item_tax_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.item_tds_amount_converted = item_tds_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.item_net_amount_converted = item_net_amount_money.exchange_to(exchange_base_currency).amount rescue 0
       self.item_billable_amount_converted = item_billable_amount_money.exchange_to(exchange_base_currency).amount rescue 0
 
       self.skip_callback = true
