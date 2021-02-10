@@ -52,7 +52,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
           invoice_paid_outside_amount_converted: "{{ form.invoice_paid_outside_amount | times: form.conversion_rate | round: 2 }}",
           invoice_freight_amount_converted: "{{ form.invoice_freight_amount | times: form.conversion_rate | round: 2 }}",
           invoice_sub_total_amount_converted: "{{ form.invoice_sub_total_amount | times: form.conversion_rate | round: 2 }}",
-          invoice_roundoff_amount_converted: "{% assign amount = form.invoice_sub_total_amount_converted | round %}{{ amount | minus: form.invoice_sub_total_amount | round: 2 }}",
+          invoice_roundoff_amount_converted: "{% assign amount = form.invoice_sub_total_amount_converted | round %}{{ amount | minus: form.invoice_sub_total_amount_converted | round: 2 }}",
           invoice_total_amount_converted: "{{ form.invoice_sub_total_amount_converted | plus: form.invoice_roundoff_amount_converted | round: 2 }}",
           invoice_balance_due_converted: "{{ form.invoice_balance_due | times: form.conversion_rate | round: 2 }}",
           invoice_net_total_amount_converted: "{{ form.invoice_total_amount_converted | minus: form.invoice_paid_outside_amount_converted | round: 2 }}",
@@ -417,6 +417,14 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_paid_outside_amount_converted])
 
+      amount :invoice_net_total_amount, label: "Net Total", editable: false, visible: true,
+             can_editable_be_changed: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_net_total_amount])
+      
+      amount :invoice_net_total_amount_converted, label: "Net Total Converted", editable: false, visible: true,
+             can_editable_be_changed: false, 
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_net_total_amount_converted])
+
       amount :invoice_advance_paid_amount, label: "Amount Paid / Advance",
              default_value: 0, editable: false, visible: true,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_advance_paid_amount])
@@ -425,14 +433,6 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_visible_be_changed: false,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_advance_paid_amount_converted])
-
-      amount :invoice_net_total_amount, label: "Net Total", editable: false, visible: true,
-             can_editable_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_net_total_amount])
-      
-      amount :invoice_net_total_amount_converted, label: "Net Total Converted", editable: false, visible: true,
-             can_editable_be_changed: false, 
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_net_total_amount_converted])
 
       amount :invoice_balance_due, label: "Balance Payable", editable: false,
              can_editable_be_changed: false, visible: true,
@@ -536,6 +536,15 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :visible, false
   end
+
+####################
+  condition condition_id: "Hide Conversion Rate > Conversion Rate for different currency" do
+    reference :entity, 'items_summary.invoice_net_total_amount_converted'
+    rule Rules::Builder[:base_currency].eq(entity: :reporting_currency)
+    action :visible, false
+  end
+
+
 
   # condition condition_id: "Disable item department > Item department not for Header Cost Allocation Items" do
   #   reference :entity, 'items.department_id'
