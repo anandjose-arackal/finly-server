@@ -416,7 +416,6 @@ class InvoiceLineItem < ApplicationRecord
   def sync_amounts
     if item_gross_amount.present?
       exchange_base_currency = get_base_currency&.country_code || "INR"
-      binding.pry
 
       self.item_gross_amount_converted = item_gross_amount_money.exchange_to(exchange_base_currency).amount rescue 0
       self.item_discount_amount_converted = item_discount_amount_money.exchange_to(exchange_base_currency).amount rescue 0

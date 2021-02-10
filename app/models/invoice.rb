@@ -1695,7 +1695,6 @@ class Invoice < ApplicationRecord
   def sync_amounts
     if invoice_gross_amount.present?
       exchange_base_currency = get_base_currency&.country_code || "INR"
-      binding.pry
       # Multi currency implementation
       self.invoice_gross_amount_converted = invoice_gross_amount_money.exchange_to(exchange_base_currency).amount rescue 0
       self.invoice_discount_amount_converted = invoice_discount_amount_money.exchange_to(exchange_base_currency).amount rescue 0
