@@ -38,6 +38,10 @@ class YesBankVendorExposure < Exposures::API
     bank_accounts.sort_by { |account| account.default_account ? 0 : 1 }
   end
 
+  attribute :default_bank_account, includes: [:bank_accounts], exposure: true do
+    record.bank_accounts.default_accounts&.first
+  end
+
   attribute :gstin_location, includes: [:gstin_locations], exposure: true do
     record.gstin_locations&.first
   end
