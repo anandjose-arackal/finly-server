@@ -89,13 +89,13 @@ class InvoiceLineItem < ApplicationRecord
 
   # Multicurrency Support
   include Monetizable
-  money :item_gross_amount, :get_reporting_currency
-  money :item_discount_amount, :get_reporting_currency
-  money :item_taxable_amount, :get_reporting_currency
-  money :item_tax_amount, :get_reporting_currency
-  money :item_tds_amount, :get_reporting_currency
-  money :item_net_amount, :get_reporting_currency
-  money :item_billable_amount, :get_reporting_currency
+  money :item_gross_amount, :get_base_currency
+  money :item_discount_amount, :get_base_currency
+  money :item_taxable_amount, :get_base_currency
+  money :item_tax_amount, :get_base_currency
+  money :item_tds_amount, :get_base_currency
+  money :item_net_amount, :get_base_currency
+  money :item_billable_amount, :get_base_currency
   #  item_gross_amount_converted    :decimal(20, 5)
   #  item_discount_amount_converted :decimal(20, 5)
   #  item_taxable_amount_converted  :decimal(20, 5)
@@ -113,14 +113,14 @@ class InvoiceLineItem < ApplicationRecord
     self.parent.get_base_currency
   end
 
-  exchange_bank :get_reporting_currency, :get_base_currency, :exchange_rate
+  exchange_bank :get_base_currency, :get_reporting_currency, :exchange_rate
 
   # exchange_rate as method
   def exchange_rate
     ExchangeRate.get_rate(
         self.parent.conversion_date,
-        self.parent.reporting_currency,
-        self.parent.get_base_currency&.country_code || "INR"
+        self.parent.get_base_currency&.country_code || "INR",
+        self.parent.reporting_currency
     )
   end
 

@@ -16,4 +16,11 @@ class TaxType < ApplicationRecord
       )
     end
   end
+
+  def as_json(options = {})
+    {
+        id: id,
+        name: self.name
+    }
+  end
 end

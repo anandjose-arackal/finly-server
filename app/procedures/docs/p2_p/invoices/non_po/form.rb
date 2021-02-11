@@ -122,15 +122,17 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
     lookup :department_id, label: "Department", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('departments') #, editable: false, visible: false
     lookup :cost_center_id, label: "Cost Center", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('cost_centers')
     dropdown :discount_type_id, label: "Discount Type", editable: true, visible: true, required: true, choices_scope: Choices[:list].({id: 1, name: 'Percentage'}, {id: 2, name: 'Amount'} ), default_value: 'Percentage'
+    # lookup :tax_type_id, label: "Tax Type", editable: true, visible: true, choices_scope: Choices[:lookup].('tax_types')
+    dropdown :tax_type_id, label: "Tax Type", editable: true, visible: true, choices_scope: Choices[:list].(*TaxType.all.map{ |v| {id: v.id, name: v.name }})
     
     date :conversion_date, label: "Conversion Date", editable: false, visible: true,
          computed: Forms::Compute::Form('{{form.date}}')
 
-    currency :base_currency, label: "Base Currency", visible: true, editable: false, required: true, can_editable_be_changed: false,
-              default_value: 'INR' # todo populate with system base currency
-    currency :reporting_currency, label: "Reporting Currency", required: true
+    currency :reporting_currency, label: "Reporting Currency", editable: false, required: true, visible: true,
+              can_editable_be_changed: false, default_value: 'INR' # todo populate with system base currency
+    currency :base_currency, label: "Base Currency", visible: true, editable: true
     switch :retrieve_conversion_rate, label: "Auto Populate Conversion Rate", default_value: true, visible: false
-    number :conversion_rate, editable: false, format: 'decimal', default_value: 1, visible: false
+    number :conversion_rate, editable: true, format: 'decimal', default_value: 1, visible: true
     # date :transaction_service_period_from, label: 'Transaction Period From'
     # date :transaction_service_period_to, label: 'Transaction Period To'
     large_text :narration, label: "Narration"
@@ -303,7 +305,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_visible_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_billable_amount])
 
-      amount :item_billable_amount_converted, editable: false, visible: false,
+      amount :item_billable_amount_converted, label: "Billable Amount(Base Currency)" , editable: false, visible: false,
              can_visible_be_changed: false,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_billable_amount_converted])
@@ -336,7 +338,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_discount_amount])
 
       amount :invoice_discount_amount_converted, editable: false, visible: false,
-             can_visible_be_changed: false, label: "Net Discount Amount Converted",
+             can_visible_be_changed: false, label: "Net Discount Amount( Base Currency )",
              can_editable_be_changed: false, 
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_discount_amount_converted])
 
@@ -376,7 +378,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       amount :invoice_freight_amount, label: "Freight",
              default_value: 0, visible: true, editable: true 
 
-      amount :invoice_freight_amount_converted, editable: false, visible: false,
+      amount :invoice_freight_amount_converted, label: "Freight(Base Currency)", editable: false, visible: false,
              can_visible_be_changed: false,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_freight_amount_converted])
@@ -412,16 +414,16 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       amount :invoice_paid_outside_amount, label: "Payment Outside Finly",
              default_value: 0, visible: true, editable: true
 
-      amount :invoice_paid_outside_amount_converted, editable: false, visible: false,
+      amount :invoice_paid_outside_amount_converted, label: "Payment Outside Finly(Base Currency)", editable: false, visible: false,
              can_visible_be_changed: false,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_paid_outside_amount_converted])
 
-      amount :invoice_net_total_amount, label: "Net Total", editable: false, visible: true,
+      amount :invoice_net_total_amount, label: "Net Total(Reporting Currency)", editable: false, visible: true,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_net_total_amount])
       
-      amount :invoice_net_total_amount_converted, label: "Net Total Converted", editable: false, visible: true,
+      amount :invoice_net_total_amount_converted, label: "Net Total(Base Currency)", editable: false, visible: true,
              can_editable_be_changed: false, 
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_net_total_amount_converted])
 
@@ -429,7 +431,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              default_value: 0, editable: false, visible: true,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_advance_paid_amount])
 
-      amount :invoice_advance_paid_amount_converted, editable: false, visible: false,
+      amount :invoice_advance_paid_amount_converted, label: "Amount Paid / Advance(Base Currency)", editable: false, visible: false,
              can_visible_be_changed: false,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_advance_paid_amount_converted])
@@ -537,10 +539,15 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
     action :visible, false
   end
 
-####################
-  condition condition_id: "Hide Conversion Rate > Conversion Rate for different currency" do
+  condition condition_id: "Hide Conversion Rate Conversion > Conversion Rate for different currency" do
     reference :entity, 'items_summary.invoice_net_total_amount_converted'
-    rule Rules::Builder[:base_currency].eq(entity: :reporting_currency)
+    rule Rules::Builder[:reporting_currency].eq(entity: :base_currency)
+    action :visible, false
+  end
+
+  condition condition_id: "Hide Conversion Rate > Conversion Rate for different currency" do
+    reference :entity, 'conversion_rate'
+    rule Rules::Builder[:reporting_currency].eq(entity: :base_currency)
     action :visible, false
   end
 
