@@ -142,6 +142,9 @@ class Vendors::Create < Vendors::Base
 
     # check for duplicate gstin in the system for the  current company
     gstins = []
+
+    validate_duplicate_pan
+
     if vendor_parameters[:gstin_locations_attributes].present?
       vendor_parameters[:gstin_locations_attributes].each do |gstin_location|
         poc_email = gstin_location[:poc_email]
