@@ -171,7 +171,7 @@ class Vendors::Base < BaseOperation
     if vendor_parameters.present? && vendor_parameters[:pan].present?
       similar_pan_vendors = user.company.yes_bank_vendors.filter_active.where(pan: vendor_parameters[:pan])
       if self.vendor.present?
-        similar_pan_vendors.where.not(id: self.vendor.id)
+        similar_pan_vendors = similar_pan_vendors.where.not(id: self.vendor.id)
       end
 
       if similar_pan_vendors.present?
