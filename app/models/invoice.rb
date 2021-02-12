@@ -900,19 +900,19 @@ class Invoice < ApplicationRecord
           invoice_type: self.invoice_type&.name,
           procurement_id: self.procurement_id,
           advance: self.advance,
-          advance_amount: self.advance_amount&.value,
+          advance_amount: self.advance_amount&.value.to_f,
           tax_amount: precision_value(self.tax_amount&.value.to_f),
           tds_amount: precision_value(self.tds_amount&.value.to_f),
-          tax: precision_value(self.tax),
-          tds: precision_value(self.tds),
-          gst_type_id: self.gst_type_id,
-          tax_type_id: self.tax_type_id,
-          tds_type_id: self.tds_type_id,
+          tax: precision_value(self.tax.to_f),
+          tds: precision_value(self.tds.to_f),
+          gst_type_id: self.gst_type_id.to_i,
+          tax_type_id: self.tax_type_id.to_i,
+          tds_type_id: self.tds_type_id.to_i,
           discount_amount: precision_value(self.discount_amount&.value.to_f),
           # discount: precision_value(self.discount),
           discount: invoice_discount_rate,
           date: self.date,
-          discount_type_id: self.discount_type_id,
+          discount_type_id: self.discount_type_id.to_i,
           due_date: self.due_date,
           invoice_number: self.invoice_number,
           invoice_id: self.invoice_id,
@@ -924,7 +924,7 @@ class Invoice < ApplicationRecord
           taxable_amount: precision_value(self.gross_amount&.value.to_f),
           editable: self.unpaid? || self.initiated? || self.partially_paid?,
           tax_rate: return_tax_rate,
-          tds_rate: precision_value(self.tds_rate),
+          tds_rate: precision_value(self.tds_rate.to_i),
           # discount_rate: precision_value(self.discount_rate),
           discount_rate: invoice_discount_rate,
           advance_rate: precision_value(self.advance_rate),
@@ -938,9 +938,9 @@ class Invoice < ApplicationRecord
               content_type: self.attachments.first&.file_content_type,
               file_name: self.attachments.first&.file_file_name
           },
-          net_amount: precision_value(self.net_amount&.value),
+          net_amount: precision_value(self.net_amount&.value.to_f),
           original_amount: self.include_original_amount,
-          gross_amount: precision_value(self.gross_amount&.value),
+          gross_amount: precision_value(self.gross_amount&.value.to_f),
           custom_fields: self.custom_fields,
           category_id: self.category_id,
           category_name: self.category&.name,
@@ -954,7 +954,7 @@ class Invoice < ApplicationRecord
           cost_center_id: self.cost_center_id,
           cost_center_name: self.cost_center&.name,
 
-          tds_slab_id: self.tds_slab_id,
+          tds_slab_id: self.tds_slab_id.to_i,
           tds_slab_name: self.tds_slab&.name,
           tds_rate: self.tds,
 
@@ -1738,7 +1738,8 @@ class Invoice < ApplicationRecord
         invoice_tds_amount_converted: 'tds_amount_id',
         invoice_advance_paid_amount_converted: 'advance_amount_id',
         invoice_sub_total_amount_converted: 'net_amount_id',
-        invoice_balance_due_converted: 'balance_due_id'
+        invoice_balance_due_converted: 'balance_due_id',
+        invoice_freight_amount_converted: 'freight_amount_id'
     }
 
     # Invoice amount meanings. Picked from Invoice Calculation Utils
@@ -1756,3 +1757,4 @@ class Invoice < ApplicationRecord
   end
 
 end
+
