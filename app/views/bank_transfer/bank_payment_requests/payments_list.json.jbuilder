@@ -157,7 +157,7 @@ json.payments do
           json.array!(invoice.invoice_items) do |item|
             json.rate item.rate
             json.quantity item.quantity
-            json.tax item.tax&.to_f
+            json.tax item&.tax.to_f
             json.discount item&.discount.to_f
             json.category_id item.category_id
             json.category_name item.category&.name
