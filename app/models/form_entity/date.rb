@@ -75,20 +75,20 @@ class FormEntity::Date < FormEntity
 
         case entity.options['restriction']
         when 'in_the_future'
-          if value <= DateTime.now.end_of_day
-            errors.add entity.entity_key, "can only be in the future"
+          if value.to_date <= DateTime.now.to_date
+            errors.add entity.label, "can only be in the future"
           end
         when 'in_the_past'
-          if value >= DateTime.now.end_of_day
-            errors.add entity.entity_key, "can only be in the past"
+          if value.to_date >= DateTime.now.to_date
+            errors.add entity.label, "can only be in the past"
           end
         when 'not_in_the_future'
-          if value > DateTime.now.end_of_day
-            errors.add entity.entity_key, "cannot be in the future"
+          if value.to_date > DateTime.now.to_date
+            errors.add entity.label, "cannot be in the future"
           end
         when 'not_in_the_past'
-          if value < DateTime.now.end_of_day
-            errors.add entity.entity_key, "cannot be in the past"
+          if value.to_date < DateTime.now.to_date
+            errors.add entity.label, "cannot be in the past"
           end
         else
           # Do nothing
@@ -111,13 +111,13 @@ class FormEntity::Date < FormEntity
         params do
           required(:options) do
             hash do
-              optional(:restriction).value(included_in?: RESTRICTIONS)
+              optional(:restriction)
             end
           end
         end
         rule(:options) do
-          restriction = value[:restriction]
-          key.failure("> restriction must be one of #{FormEntity::Date::RESTRICTIONS.join(", ")}") if FormEntity::Date::RESTRICTIONS.exclude?(restriction) && restriction.present?
+          restriction = value[:restriction].to_s
+          key.failure("> restriction must be one of #{FormEntity::Date::RESTRICTIONS.join(", ")}") if restriction.present? && FormEntity::Date::RESTRICTIONS.exclude?(restriction)
         end
       end
     end

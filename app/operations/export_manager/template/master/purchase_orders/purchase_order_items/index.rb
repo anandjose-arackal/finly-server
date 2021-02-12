@@ -9,7 +9,7 @@ class ExportManager::Template::Master::PurchaseOrders::PurchaseOrderItems::Index
 
   attribute :description, template: '{{ record.description }}'
   attribute :comment, template: '{{ record.comment }}'
-  attribute :category, template: '{{ record.inventory_line_item.category.name }}'
+  attribute :category, template: '{{ record.category.name }}'
   attribute :gl_code, template: '{{ record.category.gl_code }}'
   attribute :hsn_sac, template: '{{ record.hsn_sac }}'
   attribute :quantity, template: '{{ record.quantity }}'

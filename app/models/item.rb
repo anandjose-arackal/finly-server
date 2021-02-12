@@ -191,7 +191,9 @@ include Searchkick::Api
   def budget_trail_entry
     purchase_order_items = PurchaseOrderItem.with_inventory_line_item(self.id)
     purchase_order_items.each do |item|
-      BudgetManager::BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.save_trail(item)
+      if item.purchase_order.present?
+        BudgetManager::BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.save_trail(item)
+      end
     end
   end
 

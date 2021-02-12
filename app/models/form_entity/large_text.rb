@@ -87,7 +87,8 @@ class FormEntity::LargeText < FormEntity
         rule(:options) do
           max = value[:maximum]
           min = value[:minimum]
-
+          key.failure('minimum cannot be blank') if min.blank?
+          key.failure('maximum cannot be blank') if max.blank?
           key.failure("> minimum can't be less than 0") if min.to_i < 0
           key.failure("> maximum can't be greater than 65535") if max.to_i > 65535
 

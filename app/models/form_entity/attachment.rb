@@ -109,6 +109,7 @@ class FormEntity::Attachment < FormEntity
           min = value[:minimum]
           format = value[:format]
 
+          key.failure("Format must be present") if format.blank?
           if format.present?
             if format.is_a?(Array)
               key.failure("> formats must be one of #{FormEntity::Attachment::FORMAT.join(", ")}") if (format - FormEntity::Attachment::FORMAT).present?
