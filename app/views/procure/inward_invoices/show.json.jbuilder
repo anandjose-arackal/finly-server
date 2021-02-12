@@ -410,7 +410,7 @@ json.bank_payment_request_policies do
 end
 
 json.tax_rates do
-  json.array! @result.tax_rates do |tax_rate|
+  json.array! @result.tax_rates.non_deleted do |tax_rate|
     if tax_ids.include?(tax_rate.id) || !tax_rate.deleted?
       json.merge! tax_rate.as_json
     end

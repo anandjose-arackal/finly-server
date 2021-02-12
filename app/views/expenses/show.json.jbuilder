@@ -186,5 +186,5 @@ json.tax_details do
   json.gstin_location_id expense.gstin_location_id
 end
 
-json.tax_rates @result.tax_rates
+json.tax_rates @result.tax_rates.non_deleted
 json.state_codes @result.gst_state_codes

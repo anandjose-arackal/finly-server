@@ -95,22 +95,23 @@ json.payments do
         json.procurement_id invoice.procurement_id
         json.advance invoice.advance
         json.advance_amount precision_value invoice&.advance_amount&.value.to_f
-        json.tax_amount precision_value invoice&.tax_amount&.value.to_f
-        json.tds_amount precision_value invoice&.tds_amount&.value.to_f
+        json.tax_amount precision_value invoice&.invoice_tax_amount.to_f
+        json.tds_amount precision_value invoice&.invoice_tds_amount.to_f
         json.tax precision_value invoice.tax
         json.tds precision_value invoice.tds
-        json.gst_type_id invoice.gst_type_id
-        json.tax_type_id invoice.tax_type_id
-        json.tds_type_id invoice.tds_type_id
-        json.discount_amount precision_value invoice&.discount_amount&.value.to_f
+        json.gst_type_id invoice&.gst_type_id&.to_i
+        json.tax_type_id invoice&.tax_type_id&.to_i
+        json.tds_type_id invoice&.tds_type_id&.to_i
+        json.discount_amount precision_value invoice&.invoice_discount_amount&.to_f
         json.discount precision_value invoice.discount
         json.date invoice.date
-        json.discount_type_id invoice.discount_type_id
+        json.discount_type_id invoice&.discount_type_id&.to_i
         json.due_date invoice.due_date
         json.invoice_number invoice.invoice_number
         json.inclusive_of_taxes invoice.inclusive_of_taxes
-        json.freight_amount invoice&.freight_amount&.value.to_f
-        json.roundoff_amount invoice&.roundoff_amount.to_f
+        # json.freight_amount invoice&.freight_amount&.value.to_f
+        json.freight_amount invoice&.invoice_freight_amount.to_f
+        json.roundoff_amount invoice&.invoice_roundoff_amount.to_f
         json.net_payable_amount invoice&.balance_due&.value.to_f
         json.balance_due invoice&.balance_due&.value.to_f
         json.taxable_amount precision_value invoice&.gross_amount&.value.to_f
@@ -137,10 +138,10 @@ json.payments do
         json.category_id invoice.category_id
         json.category_name invoice.category&.name
 
-        json.cost_center_id invoice.cost_center_id
+        json.cost_center_id invoice.cost_center_id.to_i
         json.cost_center_name invoice.cost_center&.name
 
-        json.tds_slab_id invoice.tds_slab_id
+        json.tds_slab_id invoice.tds_slab_id.to_i
         json.tds_slab_name invoice.tds_slab&.name
         json.tds_rate invoice.tds
 
@@ -159,16 +160,16 @@ json.payments do
             json.quantity item.quantity
             json.tax item.tax
             json.discount item.discount
-            json.category_id item.category_id
+            json.category_id item.category_id.to_i
             json.category_name item.category&.name
-            json.tax_amount precision_value item.tax_amount&.value
-            json.discount_amount precision_value item.discount_amount&.value
-            json.amount precision_value item.amount&.value
+            json.tax_amount precision_value item&.tax_amount&.value.to_f
+            json.discount_amount precision_value item&.discount_amount&.value.to_f
+            json.amount precision_value item&.amount&.value&.to_f
             json.id item.id
             json.description item.description
-            json.total_amount precision_value item.net_amount&.value
+            json.total_amount precision_value item&.net_amount&.value.to_f
             json.hsn_sac item.hsn_sac
-            json.taxable_amount precision_value item.taxable_amount&.value
+            json.taxable_amount precision_value item&.taxable_amount&.value.to_f
           end
         end
       end
