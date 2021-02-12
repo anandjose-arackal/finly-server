@@ -163,17 +163,17 @@ class Invoice < ApplicationRecord
 
   # Multicurrency Support
   include Monetizable
-  money :invoice_gross_amount, :get_base_currency
-  money :invoice_discount_amount, :get_base_currency
-  money :invoice_tax_amount, :get_base_currency
-  money :invoice_tds_amount, :get_base_currency
-  money :invoice_paid_outside_amount, :get_base_currency
-  money :invoice_sub_total_amount, :get_base_currency
-  money :invoice_total_amount, :get_base_currency
-  money :invoice_taxable_amount, :get_base_currency
-  money :invoice_freight_amount, :get_base_currency
-  money :invoice_roundoff_amount, :get_base_currency
-  money :invoice_balance_due, :get_base_currency
+  money :invoice_gross_amount, :get_reporting_currency
+  money :invoice_discount_amount, :get_reporting_currency
+  money :invoice_tax_amount, :get_reporting_currency
+  money :invoice_tds_amount, :get_reporting_currency
+  money :invoice_paid_outside_amount, :get_reporting_currency
+  money :invoice_sub_total_amount, :get_reporting_currency
+  money :invoice_total_amount, :get_reporting_currency
+  money :invoice_taxable_amount, :get_reporting_currency
+  money :invoice_freight_amount, :get_reporting_currency
+  money :invoice_roundoff_amount, :get_reporting_currency
+  money :invoice_balance_due, :get_reporting_currency
 
   def get_reporting_currency
     Currency.currency_for(self.reporting_currency || "INR")
@@ -183,14 +183,14 @@ class Invoice < ApplicationRecord
     Currency.currency_for(self.base_currency || "INR")
   end
 
-  exchange_bank :get_base_currency, :get_reporting_currency, :exchange_rate
+  exchange_bank :get_reporting_currency, :get_base_currency, :exchange_rate
 
   # exchange_rate as method
   def exchange_rate
     ExchangeRate.get_rate(
         self.conversion_date,
-        get_base_currency&.country_code || "INR",
-        self.reporting_currency
+        self.reporting_currency,
+        get_base_currency&.country_code || "INR"
     )
   end
 
@@ -1694,25 +1694,26 @@ class Invoice < ApplicationRecord
   # Syncs amounts from new forms structure to legacy amounts table
   def sync_amounts
     if invoice_gross_amount.present?
-      exchange_reporting_currency = get_reporting_currency&.country_code || "INR"
+      
+      exchange_base_currency = get_base_currency&.country_code || "INR"
       # Multi currency implementation
-      self.invoice_gross_amount_converted = invoice_gross_amount_money.exchange_to(exchange_reporting_currency).amount rescue 0
-      self.invoice_discount_amount_converted = invoice_discount_amount_money.exchange_to(exchange_reporting_currency).amount rescue 0
-      self.invoice_tax_amount_converted = invoice_tax_amount_money.exchange_to(exchange_reporting_currency).amount rescue 0
-      self.invoice_tds_amount_converted = invoice_tds_amount_money.exchange_to(exchange_reporting_currency).amount rescue 0
-      # self.invoice_paid_outside_amount_converted = invoice_paid_outside_amount_money.exchange_to(exchange_reporting_currency).amount
-      self.invoice_sub_total_amount_converted = invoice_sub_total_amount_money.exchange_to(exchange_reporting_currency).amount rescue 0
-      self.invoice_total_amount_converted = invoice_total_amount_money.exchange_to(exchange_reporting_currency).amount rescue 0
-      self.invoice_taxable_amount_converted = invoice_taxable_amount_money.exchange_to(exchange_reporting_currency).amount rescue 0
-      # self.invoice_freight_amount_converted = invoice_freight_amount_money.exchange_to(exchange_reporting_currency).amount
-      self.invoice_roundoff_amount_converted = invoice_roundoff_amount_money.exchange_to(exchange_reporting_currency).amount rescue 0
-      self.invoice_balance_due_converted = invoice_balance_due_money.exchange_to(exchange_reporting_currency).amount rescue 0
+      self.invoice_gross_amount_converted = invoice_gross_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.invoice_discount_amount_converted = invoice_discount_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.invoice_tax_amount_converted = invoice_tax_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.invoice_tds_amount_converted = invoice_tds_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      # self.invoice_paid_outside_amount_converted = invoice_paid_outside_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.invoice_sub_total_amount_converted = invoice_sub_total_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.invoice_total_amount_converted = invoice_total_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.invoice_taxable_amount_converted = invoice_taxable_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      # self.invoice_freight_amount_converted = invoice_freight_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.invoice_roundoff_amount_converted = invoice_roundoff_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.invoice_balance_due_converted = invoice_balance_due_money.exchange_to(exchange_base_currency).amount rescue 0
 
       self.skip_callback = true
       amounts_attributes_map.each do |key, value|
         amount_value = self.send(key)
         amount_attr = self.send(value)
-        base_currency_id = get_reporting_currency&.id || Currency.id_for("INR")
+        base_currency_id = get_base_currency&.id || Currency.id_for("INR")
         if amount_attr.present?
           Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: base_currency_id) # todo - I2P : Update value from base currency
         else
