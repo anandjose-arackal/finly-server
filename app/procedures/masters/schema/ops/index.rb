@@ -3,7 +3,7 @@ class Masters::Schema::Ops::Index < IndexBuilder::API
   system_subscription :vp
   permissions :admin
   resolver 'master_schemas.default'
-  reference '{{record.id}}'
+  reference '{{record.master_key}}'
 
   column :name, fixed: true, sort: :name do
     text value: "{{record.name}}", format: 'primary'
