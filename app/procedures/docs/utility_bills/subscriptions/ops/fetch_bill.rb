@@ -120,7 +120,7 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchBill < Transactions::API
 
 
     if bill.present?
-      result['bill'] = bill
+      result['bill'] = bill.first
     end
 
     true

@@ -26,7 +26,7 @@ class User::AvailableExpenseTypes::Show < User::Base
       self.gst_state_codes = GstStateCode.all
       user.company.categories.active.pluck(:gst_applicable).uniq == [true] ? self.all_categories_gst_enabled = true : self.all_categories_gst_enabled = false
       self.gst_enabled = user.company.feature_subscription.em_tax_tracking
-      self.tax_rates = user.company.tax_rates
+      self.tax_rates = user.company.tax_rates.non_deleted
     end
 
   end
