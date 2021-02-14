@@ -1697,17 +1697,15 @@ class Invoice < ApplicationRecord
       
       exchange_base_currency = get_base_currency&.country_code || "INR"
       # Multi currency implementation
-      self.invoice_gross_amount_converted = invoice_gross_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      self.invoice_discount_amount_converted = invoice_discount_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      self.invoice_tax_amount_converted = invoice_tax_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      self.invoice_tds_amount_converted = invoice_tds_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      # self.invoice_paid_outside_amount_converted = invoice_paid_outside_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      self.invoice_sub_total_amount_converted = invoice_sub_total_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      self.invoice_total_amount_converted = invoice_total_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      self.invoice_taxable_amount_converted = invoice_taxable_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      # self.invoice_freight_amount_converted = invoice_freight_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      self.invoice_roundoff_amount_converted = invoice_roundoff_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      self.invoice_balance_due_converted = invoice_balance_due_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.reporting_invoice_gross_amount = invoice_gross_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.reporting_invoice_discount_amount = invoice_discount_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.reporting_invoice_tax_amount = invoice_tax_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.reporting_invoice_tds_amount = invoice_tds_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.reporting_invoice_sub_total_amount = invoice_sub_total_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.reporting_invoice_total_amount = invoice_total_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.reporting_invoice_taxable_amount = invoice_taxable_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.reporting_invoice_roundoff_amount = invoice_roundoff_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.reporting_invoice_balance_due = invoice_balance_due_money.exchange_to(exchange_base_currency).amount rescue 0
 
       self.skip_callback = true
       amounts_attributes_map.each do |key, value|
@@ -1731,15 +1729,15 @@ class Invoice < ApplicationRecord
   def amounts_attributes_map
     # todo - I2P change it to converted values post multicurrency setup
     {
-        invoice_gross_amount_converted: 'amount_id',
-        invoice_discount_amount_converted: 'discount_amount_id',
-        invoice_taxable_amount_converted: 'gross_amount_id',
-        invoice_tax_amount_converted: 'tax_amount_id',
-        invoice_tds_amount_converted: 'tds_amount_id',
-        invoice_advance_paid_amount_converted: 'advance_amount_id',
-        invoice_sub_total_amount_converted: 'net_amount_id',
-        invoice_balance_due_converted: 'balance_due_id',
-        invoice_freight_amount_converted: 'freight_amount_id'
+        reporting_invoice_gross_amount: 'amount_id',
+        reporting_invoice_discount_amount: 'discount_amount_id',
+        reporting_invoice_taxable_amount: 'gross_amount_id',
+        reporting_invoice_tax_amount: 'tax_amount_id',
+        reporting_invoice_tds_amount: 'tds_amount_id',
+        reporting_invoice_advance_paid_amount: 'advance_amount_id',
+        reporting_invoice_sub_total_amount: 'net_amount_id',
+        reporting_invoice_balance_due: 'balance_due_id',
+        reporting_invoice_freight_amount: 'freight_amount_id'
     }
 
     # Invoice amount meanings. Picked from Invoice Calculation Utils

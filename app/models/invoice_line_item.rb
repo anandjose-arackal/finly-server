@@ -418,13 +418,13 @@ class InvoiceLineItem < ApplicationRecord
     if item_gross_amount.present?
       exchange_base_currency = get_base_currency&.country_code || "INR"
 
-      self.item_gross_amount_converted = item_gross_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      self.item_discount_amount_converted = item_discount_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      self.item_taxable_amount_converted = item_taxable_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      self.item_tax_amount_converted = item_tax_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      self.item_tds_amount_converted = item_tds_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      self.item_net_amount_converted = item_net_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      self.item_billable_amount_converted = item_billable_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.reporting_item_gross_amount = item_gross_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.reporting_item_discount_amount = item_discount_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.reporting_item_taxable_amount = item_taxable_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.reporting_item_tax_amount = item_tax_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.reporting_item_tds_amount = item_tds_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.reporting_item_net_amount = item_net_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.reporting_item_billable_amount = item_billable_amount_money.exchange_to(exchange_base_currency).amount rescue 0
 
       self.skip_callback = true
       amounts_attributes_map.each do |key, value|

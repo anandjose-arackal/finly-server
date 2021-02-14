@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_11_152043) do
+ActiveRecord::Schema.define(version: 2021_02_14_124301) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -5126,14 +5126,14 @@ ActiveRecord::Schema.define(version: 2021_02_11_152043) do
     t.decimal "item_taxable_amount", precision: 20, scale: 5
     t.decimal "item_discount_amount", precision: 20, scale: 5
     t.decimal "item_gross_amount", precision: 20, scale: 5
-    t.decimal "item_gross_amount_converted", precision: 20, scale: 5
-    t.decimal "item_discount_amount_converted", precision: 20, scale: 5
-    t.decimal "item_taxable_amount_converted", precision: 20, scale: 5
-    t.decimal "item_tax_amount_converted", precision: 20, scale: 5
-    t.decimal "item_tds_amount_converted", precision: 20, scale: 5
-    t.decimal "item_net_amount_converted", precision: 20, scale: 5
+    t.decimal "reporting_item_gross_amount", precision: 20, scale: 5
+    t.decimal "reporting_item_discount_amount", precision: 20, scale: 5
+    t.decimal "reporting_item_taxable_amount", precision: 20, scale: 5
+    t.decimal "reporting_item_tax_amount", precision: 20, scale: 5
+    t.decimal "reporting_item_tds_amount", precision: 20, scale: 5
+    t.decimal "reporting_item_net_amount", precision: 20, scale: 5
     t.decimal "item_billable_amount", precision: 20, scale: 5
-    t.decimal "item_billable_amount_converted", precision: 20, scale: 5
+    t.decimal "reporting_item_billable_amount", precision: 20, scale: 5
     t.string "tax_type", default: ""
     t.index ["category_id"], name: "index_invoice_line_items_on_category_id"
     t.index ["department_id"], name: "index_invoice_line_items_on_department_id"
@@ -5296,21 +5296,21 @@ ActiveRecord::Schema.define(version: 2021_02_11_152043) do
     t.decimal "invoice_taxable_amount", precision: 20, scale: 5
     t.decimal "invoice_roundoff_amount", precision: 20, scale: 5
     t.decimal "invoice_balance_due", precision: 20, scale: 5
-    t.decimal "invoice_gross_amount_converted", precision: 20, scale: 5
-    t.decimal "invoice_discount_amount_converted", precision: 20, scale: 5
-    t.decimal "invoice_taxable_amount_converted", precision: 20, scale: 5
-    t.decimal "invoice_tax_amount_converted", precision: 20, scale: 5
-    t.decimal "invoice_tds_amount_converted", precision: 20, scale: 5
-    t.decimal "invoice_freight_amount_converted", precision: 20, scale: 5
-    t.decimal "invoice_sub_total_amount_converted", precision: 20, scale: 5
-    t.decimal "invoice_roundoff_amount_converted", precision: 20, scale: 5
+    t.decimal "reporting_invoice_gross_amount", precision: 20, scale: 5
+    t.decimal "reporting_invoice_discount_amount", precision: 20, scale: 5
+    t.decimal "reporting_invoice_taxable_amount", precision: 20, scale: 5
+    t.decimal "reporting_invoice_tax_amount", precision: 20, scale: 5
+    t.decimal "reporting_invoice_tds_amount", precision: 20, scale: 5
+    t.decimal "reporting_invoice_freight_amount", precision: 20, scale: 5
+    t.decimal "reporting_invoice_sub_total_amount", precision: 20, scale: 5
+    t.decimal "reporting_invoice_roundoff_amount", precision: 20, scale: 5
     t.decimal "invoice_advance_paid_amount", precision: 20, scale: 5
-    t.decimal "invoice_advance_paid_amount_converted", precision: 20, scale: 5
-    t.decimal "invoice_total_amount_converted", precision: 20, scale: 5
+    t.decimal "reporting_invoice_advance_paid_amount", precision: 20, scale: 5
+    t.decimal "reporting_invoice_total_amount", precision: 20, scale: 5
     t.decimal "invoice_net_total_amount", precision: 20, scale: 5
-    t.decimal "invoice_net_total_amount_converted", precision: 20, scale: 5
-    t.decimal "invoice_paid_outside_amount_converted", precision: 20, scale: 5
-    t.decimal "invoice_balance_due_converted", precision: 20, scale: 5
+    t.decimal "reporting_invoice_net_total_amount", precision: 20, scale: 5
+    t.decimal "reporting_invoice_paid_outside_amount", precision: 20, scale: 5
+    t.decimal "reporting_invoice_balance_due", precision: 20, scale: 5
     t.integer "erp_sync_status_id"
     t.text "erp_sync_message"
     t.text "erp_sync_reference_id"
@@ -5324,9 +5324,6 @@ ActiveRecord::Schema.define(version: 2021_02_11_152043) do
     t.integer "payment_term_days", default: 0
     t.string "vendor_bank_account_swift_code", default: ""
     t.string "vendor_country", default: ""
-    t.string "tax_type", default: ""
-    t.string "transactions_service_period_form", default: ""
-    t.string "transactions_service_period_to", default: ""
     t.string "discount_type", default: ""
     t.decimal "overall_discount_amount", precision: 10, default: "0"
     t.decimal "total_line_item_discount_amount", precision: 10, default: "0"

@@ -52,19 +52,19 @@ class NonPoInvoiceMigrator
         document.items.each do |item|
           update_params = {
               item_gross_amount: item.amount.value,
-              item_gross_amount_converted: item.amount.value,
+              reporting_item_gross_amount: item.amount.value,
               item_discount_amount: item.discount,
-              item_discount_amount_converted: item.discount,
+              reporting_item_discount_amount: item.discount,
               item_taxable_amount: item.taxable_amount.value,
-              item_taxable_amount_converted: item.taxable_amount.value,
+              reporting_item_taxable_amount: item.taxable_amount.value,
               item_net_amount: item.net_amount.value,
-              item_net_amount_converted: item.net_amount.value,
+              reporting_item_net_amount: item.net_amount.value,
               item_billable_amount: item&.billable_amount&.value,
-              item_billable_amount_converted: item&.billable_amount&.value,
+              reporting_item_billable_amount: item&.billable_amount&.value,
 
               # tds amount
               item_tds_amount: 0,
-              item_tds_amount_converted: 0
+              reporting_item_tds_amount: 0
           }
 
           item.update_columns(update_params)
@@ -96,27 +96,27 @@ class NonPoInvoiceMigrator
 
             # Amount Related Fields # todo - I2P check if amounts are getting saved properly
             invoice_gross_amount: document&.amount&.value,
-            invoice_gross_amount_converted: document&.amount&.value,
+            reporting_invoice_gross_amount: document&.amount&.value,
             invoice_discount_amount: document&.discount_amount&.value,
-            invoice_discount_amount_converted: document&.discount_amount&.value,
+            reporting_invoice_discount_amount: document&.discount_amount&.value,
             invoice_taxable_amount: document&.gross_amount&.value,
-            invoice_taxable_amount_converted: document&.gross_amount&.value,
+            reporting_invoice_taxable_amount: document&.gross_amount&.value,
             invoice_tax_amount: document&.tax_amount&.value,
-            invoice_tax_amount_converted: document&.tax_amount&.value,
+            reporting_invoice_tax_amount: document&.tax_amount&.value,
             invoice_tds_amount: document&.tds_amount&.value,
-            invoice_tds_amount_converted: document&.tds_amount&.value,
+            reporting_invoice_tds_amount: document&.tds_amount&.value,
             invoice_paid_outside_amount: 0,
-            invoice_paid_outside_amount_converted: 0,
+            reporting_invoice_paid_outside_amount: 0,
             invoice_sub_total_amount: document&.net_amount&.value,
-            invoice_sub_total_amount_converted: document&.net_amount&.value,
+            reporting_invoice_sub_total_amount: document&.net_amount&.value,
             invoice_total_amount: document&.net_amount&.value,
-            invoice_total_amount_converted: document&.net_amount&.value,
+            reporting_invoice_total_amount: document&.net_amount&.value,
             invoice_freight_amount: document&.freight_amount&.value,
-            invoice_freight_amount_converted: document&.freight_amount&.value,
+            reporting_invoice_freight_amount: document&.freight_amount&.value,
             invoice_roundoff_amount: document&.roundoff_amount,
-            invoice_roundoff_amount_converted: document&.roundoff_amount,
+            reporting_invoice_roundoff_amount: document&.roundoff_amount,
             invoice_balance_due: document&.balance_due&.value,
-            invoice_balance_due_converted: document&.balance_due&.value
+            reporting_invoice_balance_due: document&.balance_due&.value
 
         }
 
