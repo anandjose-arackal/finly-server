@@ -255,7 +255,7 @@ json.invoice do
 
     json.selected_bank_account do
       receiving_account = invoice.receiving_account
-      if receiving_account.nil?
+      if receiving_account.nil? &&  invoice.receiving_account_id.present?
         #BankAccaount was detroyable in old ui,
         # this condition for handle such vendor item
         receiving_account = BankAccount.find invoice.receiving_account_id

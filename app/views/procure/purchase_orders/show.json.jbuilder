@@ -12,7 +12,7 @@ json.vendor do
 
   json.selected_bank_account do
     selected_bank_account = @result.purchase_order.bank_account
-    if selected_bank_account.nil?
+    if selected_bank_account.nil? && @result.purchase_order.bank_account_id.present?
       #BankAccaount was detroyable in old ui,
       # this condition for handle such vendor item
       selected_bank_account  = BankAccount.find @result.purchase_order.bank_account_id
