@@ -11,11 +11,17 @@ json.vendor do
   json.extract! @result.purchase_order&.vendor
 
   json.selected_bank_account do
-    json.account_number @result.purchase_order.bank_account&.account_number
-    json.ifsc @result.purchase_order.bank_account&.ifsc
-    json.name @result.purchase_order.bank_account&.name
-    json.id @result.purchase_order.bank_account&.id
-    json.disabled @result.purchase_order.bank_account&.disabled
+    selected_bank_account = @result.purchase_order.bank_account
+    if selected_bank_account.nil?
+      #BankAccaount was detroyable in old ui,
+      # this condition for handle such vendor item
+      selected_bank_account  = BankAccount.find @result.purchase_order.bank_account_id
+    end
+    json.account_number selected_bank_account &.account_number
+    json.ifsc selected_bank_account&.ifsc
+    json.name selected_bank_account&.name
+    json.id selected_bank_account&.id
+    json.disabled selected_bank_account&.disabled
   end
 
   if @result.purchase_order.vendor&.bank_accounts.present?
