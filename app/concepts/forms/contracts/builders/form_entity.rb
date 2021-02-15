@@ -176,7 +176,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
           else
             value = input[entity.entity_key] # || entity.default_value
           end
-          entity.populate(represented, value)
+          entity.populate(represented, value, input)
           # represented.send("#{entity.entity_key}=", entity.format(value))
         end
 
