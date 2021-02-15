@@ -15,7 +15,7 @@ json.vendor do
     if selected_bank_account.nil? && @result.purchase_order.bank_account_id.present?
       #BankAccaount was detroyable in old ui,
       # this condition for handle such vendor item
-      selected_bank_account  = BankAccount.find @result.purchase_order.bank_account_id
+      selected_bank_account  = BankAccount.unscoped.find @result.purchase_order.bank_account_id
     end
     json.account_number selected_bank_account &.account_number
     json.ifsc selected_bank_account&.ifsc
