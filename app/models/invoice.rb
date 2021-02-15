@@ -900,7 +900,7 @@ class Invoice < ApplicationRecord
           invoice_type: self.invoice_type&.name,
           procurement_id: self.procurement_id,
           advance: self.advance,
-          advance_amount: self.advance_amount&.value.to_f,
+          advance_amount: self.advance_amount&.value.to_f + self&.reporting_invoice_paid_outside_amount.to_f,
           tax_amount: precision_value(self.tax_amount&.value.to_f),
           tds_amount: precision_value(self.tds_amount&.value.to_f),
           tax: precision_value(self.tax.to_f),
