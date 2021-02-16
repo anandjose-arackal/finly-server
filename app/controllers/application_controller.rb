@@ -66,8 +66,14 @@ class ApplicationController < ActionController::Base
 
   ####################
   def info_for_paper_trail
-
-    hash = { user_ip: request.remote_ip, user_agent: request.user_agent , company_id: current_user&.company_id, created_by_id: current_user&.id , user_transaction_id: AuditTrail.generate_transaction_id}
+    {
+      user_ip: request.remote_ip,
+      user_agent: request.user_agent,
+      # NOTE: We are getting user from RequestStore instead of using current_user as `info_for_paper_trail` is running immediately after controller is initialized, so calling current_user here will skip Authentication process and other actions declared and sets user directly.
+      company_id: RequestStore.store[:current_company]&.id,
+      created_by_id: RequestStore.store[:current_user]&.id,
+      user_transaction_id: AuditTrail.generate_transaction_id
+    }
   end
   ####################
   # handles 404 errors
