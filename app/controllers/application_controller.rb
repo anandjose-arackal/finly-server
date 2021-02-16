@@ -47,13 +47,21 @@ class ApplicationController < ActionController::Base
     subdomain = host[0]
     return if ['admin', 'www'].include?(subdomain)
 
-    company = Company.find_by_subdomain(subdomain)
-    unless company.present?
+    # company = Company.find_by_subdomain(subdomain)
+    # unless company.present?
+    #   head 401
+    #   return
+    # end
+
+    # ActsAsTenant.current_tenant = company
+
+    company_group = CompanyGroup.find_by_subdomain(subdomain)
+
+    unless company_group.present?
       head 401
       return
     end
-
-    ActsAsTenant.current_tenant = company
+    ActsAsTenant.current_tenant = company_group.companies
   end
 
   ####################

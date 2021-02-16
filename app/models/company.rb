@@ -240,6 +240,10 @@ class Company < NonTenantedApplicationRecord
     }
   end
 
+  def self.id
+    self.pluck(:id)
+  end
+
   def vendor_payment_policies
     ids = self.policies.with_application("vp").pluck(:id)
     ids << self.default_policy.id
