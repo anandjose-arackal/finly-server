@@ -12,7 +12,7 @@
 #  resolver   :string(255)
 #
 
-class ExportResource < ApplicationRecord
+class ExportResource < NonTenantedApplicationRecord
   RESOURCES = [
     {
       name: 'Invoice Line Items',
