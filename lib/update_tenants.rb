@@ -140,11 +140,18 @@ class UpdateTenants
         end
       end
 
-      CustomField.includes(:field_configuration).find_each do |record|
-        if record.field_configuration.present?
-          record.update_column(:company_id, record.field_configuration.company_id)
+      CustomField.includes(:field_configuration).find_in_batches(batch_size: 1000) do |custom_fields|
+        custom_fields.each do |custom_field|
+          custom_field.company_id = custom_field.field_configuration.company_id
         end
+        CustomField.import custom_fields, on_duplicate_key_update: [:company_id]
       end
+
+      # CustomField.includes(:field_configuration).find_each do |record|
+      #   if record.field_configuration.present?
+      #     record.update_column(:company_id, record.field_configuration.company_id)
+      #   end
+      # end
 
       BudgetTrail.includes(:entity).find_each do |record|
         if record.entity.present?
@@ -818,6 +825,18 @@ class UpdateTenants
         end
       end
 
+      CustomFieldAttachment.includes(:form_custom_field).find_each do |record|
+        if record.form_custom_field.present?
+          record.update_column(:company_id, record.form_custom_field.company_id)
+        end
+      end
+
+      CustomFieldSelection.includes(:form_custom_field).find_each do |record|
+        if record.form_custom_field.present?
+          record.update_column(:company_id, record.form_custom_field.company_id)
+        end
+      end
+
       GstinLocation.find_each do |record|
         if record.gstin_master.present?
           record.gstin_master.update_column(:company_id, record.company_id)
@@ -1149,6 +1168,13 @@ class UpdateTenants
           record.update_column(:company_id, record.dependency.company_id)
         end
       end
+
+      ExportTemplateUserRoleMapping.includes(:template).find_each do |record|
+        if record.template.present?
+          record.update_column(:company_id, record.template.company_id)
+        end
+      end
+
     end
   end
 end
