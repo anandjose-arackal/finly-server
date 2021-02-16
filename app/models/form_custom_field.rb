@@ -30,6 +30,14 @@ class FormCustomField < ApplicationRecord
   has_many :attachments, class_name: 'CustomFieldAttachment'
   # has_many :attachments, as: :resource
 
+
+  def selected_choice
+    if entity_type == 'dropdown'
+      return selection&.form_entity_choice&.name
+    end
+    value
+  end
+
   def retrieve_value
     if entity_type.present?
       field_type = entity_type

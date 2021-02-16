@@ -39,7 +39,7 @@ class AnalyticsDashboard::Ops::Config < Transactions::API
         label: 'Document Workflows Actions',
         cube: "DocumentWorkflowActions",
         root: true,
-        associations: %w(Users)
+        associations: %w(Users Policies)
       },
       {
           label: 'Users',
