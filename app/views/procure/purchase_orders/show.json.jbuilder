@@ -60,7 +60,14 @@ json.cost_center_attributes do
 end
 
 json.location_attributes @result.purchase_order.location&.as_json rescue nil
-json.gstin_location_attributes @result.purchase_order.gstin_location&.as_json rescue nil
+if @result.purchase_order.gstin_location_id.present?
+  gstin_location =  @result.purchase_order.gstin_location
+  if gstin_location.nil?
+    #this for handle deleted gstinlocation in old flow
+    gstin_location = GstinLocation.unscoped.find_by_id @result.purchase_order.gstin_location_id
+  end
+ json.gstin_location_attributes gstin_location&.as_json rescue nil
+end
 json.delivery_location_attributes @result.purchase_order.delivery_location&.as_json rescue nil
 
 json.actions @result.actions

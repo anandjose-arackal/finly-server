@@ -171,7 +171,15 @@ json.invoice do
   end
 
   json.delivery_location_attributes invoice.delivery_location&.as_json rescue nil
-  json.gstin_location_attributes invoice.gstin_location&.as_json rescue nil
+
+  if invoice.gstin_location_id.present?
+    gstin_location =  invoice.gstin_location
+    if gstin_location.nil?
+      #this for handle deleted gstinlocation in old flow
+      gstin_location = GstinLocation.unscoped.find_by_id invoice.gstin_location_id
+    end
+    json.gstin_location_attributes gstin_location&.as_json rescue nil
+  end
 
   json.tds_slab_id invoice.tds_slab_id
   json.tds_slab_name invoice.tds_slab&.name
