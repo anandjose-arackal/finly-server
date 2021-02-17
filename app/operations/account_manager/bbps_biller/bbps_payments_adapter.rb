@@ -100,25 +100,21 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
       op.error do |result|
         puts "Error:Result: #{result}"
         Rails.logger.error("Display error: #{result}")
-        
+        # Rails.logger.error("Display error: #{result['error_desc']}")
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
         payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+        payment.system_messages.destroy_all
         if result["error_desc"].present?
-          payment.system_messages.build(content: result["error_desc"], system_message_type_id: SystemMessageType.id_for(:error)).save
+          payment.system_messages.build(content: result['error_desc'], system_message_type_id: SystemMessageType.id_for(:error)).save
         else
           payment.system_messages.build(content: 'Unable to reach bbps. Please try again later', system_message_type_id: SystemMessageType.id_for(:error)).save
         end
-        # result["errors"]&.values&.flatten&.each do |error|
-        #   # add_error_message( payment, error )
-        # end
-        return false
-        # any error code
       end
       op.failure do |result|
         puts "Failure:Result: #{result}"
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:possible_failure))
         payment.update(payment_status_id: PaymentStatus.id_for(:possible_failure))
-        payment.system_messages.build(content: result["error_desc"], system_message_type_id: SystemMessageType.id_for(:error)).save
+        payment.system_messages.build(content: result[:error_desc], system_message_type_id: SystemMessageType.id_for(:error)).save
         
         # result["errors"]&.values&.flatten&.each do |error|
         #   # add_error_message( payment, error )
