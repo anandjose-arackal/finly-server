@@ -5,58 +5,58 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
   # LIQUID FORMULAE
   LIQUID_FORMULAE = {
       items: {
-          item_gross_amount: "{{ row.rate | times: row.quantity | round: 2 | default: 0 }}",
-          item_discount_amount: "{% if form.discount_type_id == '1' %}{{ row.item_gross_amount | times: row.discount | divided_by: 100 | round: 2 | default: 0 }}{% else %}{{ row.discount | default: 0 }}{% endif %}",
-          item_taxable_amount: "{{ row.item_gross_amount | minus: row.item_discount_amount | round: 2 | default: 0 }}",
-          item_tax_amount: "{{ row.item_taxable_amount | times: row.tax_percentage | divided_by: 100 | round: 2 | default: 0 }}",
-          item_tds_amount: "{% if row.tds_applicable == true %}{{ row.item_taxable_amount | times: form.tds_percentage | divided_by: 100 | round: 2 | default: 0 }}{% else %}{{ 0 }}{% endif %}",
-          item_net_amount: "{{ row.item_taxable_amount | plus: row.item_tax_amount | round: 2 | default: 0 }}",
-          item_billable_amount: "{{ row.item_taxable_amount | plus: row.item_tax_amount | minus: row.item_tds_amount | round: 2 | default: 0 }}", # todo - I2P will be different for PO invoice          
+          item_gross_amount: "{{ row.rate | times: row.quantity | default: 0 | round: 2  }}",
+          item_discount_amount: "{% if form.discount_type_id == '1' %}{{ row.item_gross_amount | times: row.discount | divided_by: 100 | default: 0 | round: 2  }}{% else %}{{ row.discount | default: 0 }}{% endif %}",
+          item_taxable_amount: "{{ row.item_gross_amount | minus: row.item_discount_amount | default: 0 | round: 2  }}",
+          item_tax_amount: "{{ row.item_taxable_amount | times: row.tax_percentage | divided_by: 100 | default: 0 | round: 2  }}",
+          item_tds_amount: "{% if row.tds_applicable == true %}{{ row.item_taxable_amount | times: form.tds_percentage | divided_by: 100 | default: 0 | round: 2  }}{% else %}{{ 0 }}{% endif %}",
+          item_net_amount: "{{ row.item_taxable_amount | plus: row.item_tax_amount | default: 0 | round: 2  }}",
+          item_billable_amount: "{{ row.item_taxable_amount | plus: row.item_tax_amount | minus: row.item_tds_amount | default: 0 | round: 2  }}", # todo - I2P will be different for PO invoice          
 
           # CONVERTED VALUES
-          reporting_item_gross_amount:    "{{ row.item_gross_amount | times: form.conversion_rate | round: 2 | default: 0 }}",
-          reporting_item_discount_amount: "{{ row.item_discount_amount | times: form.conversion_rate | round: 2 | default: 0 }}",
-          reporting_item_taxable_amount:  "{{ row.item_taxable_amount | times: form.conversion_rate | round: 2 | default: 0 }}",
-          reporting_item_tax_amount:      "{{ row.item_tax_amount | times: form.conversion_rate | round: 2 | default: 0 }}",
-          reporting_item_tds_amount:      "{{ row.item_tds_amount | times: form.conversion_rate | round: 2 | default: 0 }}",
-          reporting_item_net_amount:      "{{ row.item_net_amount | times: form.conversion_rate | round: 2 | default: 0 }}",
-          reporting_item_billable_amount: "{{ row.item_billable_amount | times: form.conversion_rate | round: 2 | default: 0 }}"
+          reporting_item_gross_amount:    "{{ row.item_gross_amount | times: form.conversion_rate | default: 0 | round: 2}}",
+          reporting_item_discount_amount: "{{ row.item_discount_amount | times: form.conversion_rate | default: 0 | round: 2}}",
+          reporting_item_taxable_amount:  "{{ row.item_taxable_amount | times: form.conversion_rate | default: 0 | round: 2}}",
+          reporting_item_tax_amount:      "{{ row.item_tax_amount | times: form.conversion_rate | default: 0 | round: 2  }}",
+          reporting_item_tds_amount:      "{{ row.item_tds_amount | times: form.conversion_rate | default: 0 | round: 2  }}",
+          reporting_item_net_amount:      "{{ row.item_net_amount | times: form.conversion_rate | default: 0 | round: 2  }}",
+          reporting_item_billable_amount: "{{ row.item_billable_amount | times: form.conversion_rate | default: 0 | round: 2  }}"
 
       },
       # INVOICE SUMMARY
       summary: {
           
-          invoice_gross_amount: "{% assign gross_amount = 0 %}{% for item in form.items %}{% assign gross_amount = gross_amount | plus: item.item_gross_amount %}{% endfor %}{{ gross_amount | round: 2  | default: 0 }}",
-          total_line_item_discount_amount: "{% assign discount_amount = 0 %}{% for item in form.items %}{% assign discount_amount = discount_amount | plus: item.item_discount_amount %}{% endfor %}{{ discount_amount | round: 2  | default: 0 }}",
-          overall_discount_amount: "{{ form.overall_discount_amount | round: 2 | default: 0  }}",
-          invoice_discount_amount: "{{ form.total_line_item_discount_amount | plus: form.overall_discount_amount | round: 2 | default: 0 }}",
-          invoice_taxable_amount: "{{ form.invoice_gross_amount | minus: form.invoice_discount_amount | default: 0 }}",
-          invoice_tax_amount: "{% assign tax_amount = 0 %}{% for item in form.items %}{% assign tax_amount = tax_amount | plus: item.item_tax_amount %}{% endfor %}{{ tax_amount | round: 2  | default: 0 }}",
-          invoice_tds_amount: "{% assign tds_amount = 0 %}{% for item in form.items %}{% assign tds_amount = tds_amount | plus: item.item_tds_amount %}{% endfor %}{{ tds_amount | round: 2  | default: 0 }}",
-          invoice_sub_total_amount: "{% assign inv_sub_total_amount = form.invoice_gross_amount | minus: form.invoice_discount_amount | plus: form.invoice_tax_amount | plus: form.invoice_freight_amount | minus: form.invoice_tds_amount | round: 2 %}{% if form.rcm_enabled == true  %}{{ inv_sub_total_amount | minus: form.invoice_tax_amount | default: 0 }}{% else %}{{ inv_sub_total_amount | default: 0 }}{% endif %}",
+          invoice_gross_amount: "{% assign gross_amount = 0 %}{% for item in form.items %}{% assign gross_amount = gross_amount | plus: item.item_gross_amount %}{% endfor %}{{ gross_amount | default: 0 | round: 2 }}",
+          total_line_item_discount_amount: "{% assign discount_amount = 0 %}{% for item in form.items %}{% assign discount_amount = discount_amount | plus: item.item_discount_amount %}{% endfor %}{{ discount_amount | default: 0 | round: 2 }}",
+          overall_discount_amount: "{{ form.overall_discount_amount | default: 0 | round: 2 }}",
+          invoice_discount_amount: "{{ form.total_line_item_discount_amount | plus: form.overall_discount_amount | default: 0 | round: 2}}",
+          invoice_taxable_amount: "{{ form.invoice_gross_amount | minus: form.invoice_discount_amount | default: 0 | round: 2}}",
+          invoice_tax_amount: "{% assign tax_amount = 0 %}{% for item in form.items %}{% assign tax_amount = tax_amount | plus: item.item_tax_amount %}{% endfor %}{{ tax_amount  | default: 0 | round: 2}}",
+          invoice_tds_amount: "{% assign tds_amount = 0 %}{% for item in form.items %}{% assign tds_amount = tds_amount | plus: item.item_tds_amount %}{% endfor %}{{ tds_amount  | default: 0 | round: 2}}",
+          invoice_sub_total_amount: "{% assign inv_sub_total_amount = form.invoice_gross_amount | minus: form.invoice_discount_amount | plus: form.invoice_tax_amount | plus: form.invoice_freight_amount | minus: form.invoice_tds_amount | round: 2 %}{% if form.rcm_enabled == true  %}{{ inv_sub_total_amount | minus: form.invoice_tax_amount | default: 0 | round: 2}}{% else %}{{ inv_sub_total_amount | default: 0 | round: 2}}{% endif %}",
           # todo - Issue : Roundoff should be automatically calulated everytime user inputs something, even if its the round off itself
-          invoice_roundoff_amount: "{% assign amount = form.invoice_sub_total_amount | round %}{{amount | minus: form.invoice_sub_total_amount | round: 2 | default: 0 }}",
-          invoice_total_amount: "{{ form.invoice_sub_total_amount | plus: form.invoice_roundoff_amount | round: 2 | default: 0 }}",
-          invoice_net_total_amount: "{{ form.invoice_total_amount | minus: form.invoice_paid_outside_amount | round: 2 | default: 0 }}",
+          invoice_roundoff_amount: "{% assign amount = form.invoice_sub_total_amount | round %}{{amount | minus: form.invoice_sub_total_amount | default: 0 | round: 2}}",
+          invoice_total_amount: "{{ form.invoice_sub_total_amount | plus: form.invoice_roundoff_amount | default: 0 | round: 2}}",
+          invoice_net_total_amount: "{{ form.invoice_total_amount | minus: form.invoice_paid_outside_amount | default: 0 | round: 2}}",
           # todo - will be shown on top of invoice and needs separate calculation
           # invoice_balance_due: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | round: 2 }}",          
-          invoice_advance_paid_amount: "{{ form.invoice_advance_paid_amount | round: 2 | default: 0 }}",
-          invoice_balance_due: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | minus: form.invoice_paid_outside_amount | round: 2 | default: 0 }}",
+          invoice_advance_paid_amount: "{{ form.invoice_advance_paid_amount | default: 0 | round: 2}}",
+          invoice_balance_due: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | minus: form.invoice_paid_outside_amount | default: 0 | round: 2}}",
           
           # CONVERTED VALUES
-          reporting_invoice_gross_amount: "{{ form.invoice_gross_amount | times: form.conversion_rate | round: 2 | default: 0 }}",
-          reporting_invoice_discount_amount: "{{ form.invoice_discount_amount | times: form.conversion_rate | round: 2 | default: 0 }}",
-          reporting_invoice_taxable_amount: "{{ form.invoice_taxable_amount | times: form.conversion_rate | round: 2 | default: 0 }}",
-          reporting_invoice_tax_amount: "{{ form.invoice_tax_amount | times: form.conversion_rate | round: 2 | default: 0 }}",
-          reporting_invoice_tds_amount: "{{ form.invoice_tds_amount | times: form.conversion_rate | round: 2 | default: 0 }}",
-          reporting_invoice_paid_outside_amount: "{{ form.invoice_paid_outside_amount | times: form.conversion_rate | round: 2 | default: 0 }}",
-          reporting_invoice_freight_amount: "{{ form.invoice_freight_amount | times: form.conversion_rate | round: 2 | default: 0 }}",
-          reporting_invoice_sub_total_amount: "{{ form.invoice_sub_total_amount | times: form.conversion_rate | round: 2 | default: 0 }}",
-          reporting_invoice_roundoff_amount: "{% assign amount = form.reporting_invoice_sub_total_amount | round %}{{ amount | minus: form.reporting_invoice_sub_total_amount | round: 2 | default: 0 }}",
-          reporting_invoice_total_amount: "{{ form.reporting_invoice_sub_total_amount | plus: form.reporting_invoice_roundoff_amount | round: 2 | default: 0 }}",
-          reporting_invoice_balance_due: "{{ form.invoice_balance_due | times: form.conversion_rate | round: 2 | default: 0 }}",
-          reporting_invoice_net_total_amount: "{{ form.reporting_invoice_total_amount | minus: form.reporting_invoice_paid_outside_amount | round: 2 | default: 0 }}",
-          reporting_invoice_advance_paid_amount: "{{ form.invoice_advance_paid_amount | times: form.conversion_rate | round: 2 | default: 0 }}"              
+          reporting_invoice_gross_amount: "{{ form.invoice_gross_amount | times: form.conversion_rate | default: 0 | round: 2}}",
+          reporting_invoice_discount_amount: "{{ form.invoice_discount_amount | times: form.conversion_rate | default: 0 | round: 2}}",
+          reporting_invoice_taxable_amount: "{{ form.invoice_taxable_amount | times: form.conversion_rate | default: 0 | round: 2}}",
+          reporting_invoice_tax_amount: "{{ form.invoice_tax_amount | times: form.conversion_rate | default: 0 | round: 2}}",
+          reporting_invoice_tds_amount: "{{ form.invoice_tds_amount | times: form.conversion_rate | default: 0 | round: 2}}",
+          reporting_invoice_paid_outside_amount: "{{ form.invoice_paid_outside_amount | times: form.conversion_rate | default: 0 | round: 2}}",
+          reporting_invoice_freight_amount: "{{ form.invoice_freight_amount | times: form.conversion_rate | default: 0 | round: 2}}",
+          reporting_invoice_sub_total_amount: "{{ form.invoice_sub_total_amount | times: form.conversion_rate | default: 0 | round: 2}}",
+          reporting_invoice_roundoff_amount: "{% assign amount = form.reporting_invoice_sub_total_amount | round %}{{ amount | minus: form.reporting_invoice_sub_total_amount | default: 0 | round: 2}}",
+          reporting_invoice_total_amount: "{{ form.reporting_invoice_sub_total_amount | plus: form.reporting_invoice_roundoff_amount | default: 0 | round: 2}}",
+          reporting_invoice_balance_due: "{{ form.invoice_balance_due | times: form.conversion_rate | default: 0 | round: 2}}",
+          reporting_invoice_net_total_amount: "{{ form.reporting_invoice_total_amount | minus: form.reporting_invoice_paid_outside_amount | default: 0 | round: 2}}",
+          reporting_invoice_advance_paid_amount: "{{ form.invoice_advance_paid_amount | times: form.conversion_rate | default: 0 | round: 2}}"
 
       }
   }
