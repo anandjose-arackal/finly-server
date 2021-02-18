@@ -1391,6 +1391,10 @@ class Invoice < ApplicationRecord
     payments.successful.joins(:amount).sum(:value).round(2)
   end
 
+  def retrieve_value(entity)
+    send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
+  end
+
   private
 
   # def payment_agreement_updations

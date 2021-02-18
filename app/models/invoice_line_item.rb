@@ -384,6 +384,10 @@ class InvoiceLineItem < ApplicationRecord
     }
   end
 
+  def retrieve_value(entity)
+    send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
+  end
+
   private
 
   def budget_trail_entry
