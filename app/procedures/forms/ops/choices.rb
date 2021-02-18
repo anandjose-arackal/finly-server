@@ -99,7 +99,7 @@ class Forms::Ops::Choices < Transactions::API
 
 
     context[:intersecting_choices] = intersecting_choices
-    context[:filter_query] = {id_in: intersecting_choices}
+    context[:filter_query]  = intersecting_choices.empty? ? {id_in: [-1]} : {id_in: intersecting_choices}    #FIXME: Bug in ransack where id_in: [] returns all the records hence overriding with -1
     true
   end
 

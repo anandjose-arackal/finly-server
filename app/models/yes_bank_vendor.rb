@@ -461,6 +461,9 @@ class YesBankVendor < ApplicationRecord
     VendorStatus.ids_for(:awaiting_approval).include?(status_id)
   end
 
+  def retrieve_value(entity)
+    send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
+  end
 
   def forms_extra_data(type = nil, entity_key = nil)
     if type.nil? || entity_key.nil?

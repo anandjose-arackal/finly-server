@@ -89,4 +89,8 @@ class GstinLocation < ApplicationRecord
     end
     data
   end
+
+  def retrieve_value(entity)
+    send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
+  end
 end

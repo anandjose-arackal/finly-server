@@ -16,6 +16,13 @@ class FormEntity::DropDown < FormEntity
     end
   end
 
+  def populate(represented, value, input)
+    super
+    value = input["#{entity_key}_value"]
+    represented.form_data["#{entity_key}_value"] = value
+    represented.contract_root.form_data["#{entity_key}_value"] = value
+  end
+
   def self.option_validation
     Proc.new do
 

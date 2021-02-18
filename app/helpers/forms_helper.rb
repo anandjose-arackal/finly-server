@@ -36,6 +36,9 @@ module FormsHelper
     else
       if form_entity.system_field && model.respond_to?(form_entity.entity_key)
         form_data.merge!({form_entity.entity_key => model.send(form_entity.entity_key)})
+        if form_entity.entity_type == 'dropdown' || form_entity.entity_type == 'lookup'
+          form_data.merge!({"#{form_entity.entity_key}_value" => model.retrieve_value(form_entity)})
+        end
 
         if [:lookup, 'lookup'].include?(form_entity.entity_type)
           Rails.logger.fatal "****************************************"
@@ -46,8 +49,12 @@ module FormsHelper
 
       else
         if model.respond_to?(:form_custom_fields)
-          value = model.form_custom_fields.joins(:form_entity).where("form_entities.entity_key = ?", form_entity.entity_key).first&.retrieve_value
+          custom_field = model.form_custom_fields.joins(:form_entity).where("form_entities.entity_key = ?", form_entity.entity_key).first
+          value = custom_field&.retrieve_value
           form_data.merge!({form_entity.entity_key => value})
+          if form_entity.entity_type == 'dropdown' || form_entity.entity_type == 'lookup'
+            form_data.merge!({"#{form_entity.entity_key}_value" => custom_field&.selected_choice})
+          end
         end
       end
     end

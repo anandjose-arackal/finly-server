@@ -56,6 +56,8 @@ class Vendors::Update < Vendors::Base
       add_message :notice, "GSTIN details can only be saved if a valid PAN is supplied."
     end
 
+    validate_duplicate_pan
+
     if vendor_parameters[:gstin_locations_attributes].present?
       vendor_parameters[:gstin_locations_attributes].each do |gstin_location|
         poc_email = gstin_location[:poc_email]
@@ -260,7 +262,7 @@ class Vendors::Update < Vendors::Base
     end
 
     if self.vendor_changes[:bank_account_changed].present?
-      Event::EVendors::Update.(user, {document: self.vendor, vendor_changes: self.vendor_changes})
+      Event::EVendors::Update.(user, {document: self.vendor, vendor_changes: self.vendor_changes, action_user: user})
     end
   end
 

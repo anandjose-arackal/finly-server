@@ -9,6 +9,7 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  route      :string(255)
+#  resolver   :string(255)
 #
 
 class ExportResource < ApplicationRecord

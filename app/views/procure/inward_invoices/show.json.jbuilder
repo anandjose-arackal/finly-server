@@ -171,7 +171,15 @@ json.invoice do
   end
 
   json.delivery_location_attributes invoice.delivery_location&.as_json rescue nil
-  json.gstin_location_attributes invoice.gstin_location&.as_json rescue nil
+
+  if invoice.gstin_location_id.present?
+    gstin_location =  invoice.gstin_location
+    if gstin_location.nil?
+      #this for handle deleted gstinlocation in old flow
+      gstin_location = GstinLocation.unscoped.find_by_id invoice.gstin_location_id
+    end
+    json.gstin_location_attributes gstin_location&.as_json rescue nil
+  end
 
   json.tds_slab_id invoice.tds_slab_id
   json.tds_slab_name invoice.tds_slab&.name
@@ -254,11 +262,17 @@ json.invoice do
     json.extract! invoice&.vendor
 
     json.selected_bank_account do
-      json.account_number invoice.receiving_account&.account_number
-      json.ifsc invoice.receiving_account&.ifsc
-      json.name invoice.receiving_account&.name
-      json.id invoice.receiving_account&.id
-      json.disabled invoice.receiving_account&.disabled
+      receiving_account = invoice.receiving_account
+      if receiving_account.nil? &&  invoice.receiving_account_id.present?
+        #BankAccaount was detroyable in old ui,
+        # this condition for handle such vendor item
+        receiving_account = BankAccount.unscoped.find invoice.receiving_account_id
+      end
+      json.account_number receiving_account&.account_number
+      json.ifsc receiving_account&.ifsc
+      json.name receiving_account&.name
+      json.id receiving_account&.id
+      json.disabled receiving_account&.disabled
     end
 
     if invoice.vendor&.bank_accounts.present?
