@@ -143,7 +143,7 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
   end
 
   def update_subscription_w_bill(options, params:, model:, **)
-    subscription = options[:subscription]
+    subscription = BbpsBillerSubscription.find_by id: params[:subscription_id]
     update_params = {
         refreshed_at: DateTime.now,
         biller_response: nil
@@ -156,7 +156,7 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
   end
 
   def update_subscription_wo_bill(options, params:, model:, **)
-    subscription = options[:subscription]
+    subscription = BbpsBillerSubscription.find_by id: params[:subscription_id]
     subscription.update(refreshed_at: DateTime.now, biller_response: nil)
   end
 
