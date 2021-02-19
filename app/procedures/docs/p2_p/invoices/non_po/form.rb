@@ -57,7 +57,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
           reporting_invoice_total_amount: "{{ form.reporting_invoice_sub_total_amount | plus: form.reporting_invoice_roundoff_amount | default: 0 | round: 2}}",
           reporting_invoice_net_total_amount: "{{ form.reporting_invoice_total_amount | minus: form.reporting_invoice_paid_outside_amount | default: 0 | round: 2}}",
           reporting_invoice_advance_paid_amount: "{{ form.invoice_advance_paid_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-          reporting_invoice_balance_due: "{{ form.reporting_invoice_total_amount | minus: form.reporting_invoice_advance_paid_amount | minus: form.reporting_invoice_paid_outside_amount | default: 0 | round: 2}}"
+          reporting_invoice_balance_due: "{{ form.invoice_balance_due | times: form.conversion_rate | default: 0 | round: 2}}"
   }
   }
 
