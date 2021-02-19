@@ -60,7 +60,7 @@ class Forms::Contracts::Helpers::ComputationQueue
         return if lookup_exposure.nil?
 
         value = lookup_exposure.template(entity.compute_formula)
-        entity.populate(represented, value)
+        entity.populate(represented, value, represented.contract_root.form_data)
       end
 
     end
@@ -79,7 +79,7 @@ class Forms::Contracts::Helpers::ComputationQueue
         puts "ENTITY: #{entity.entity_key}\nVALUE: #{value.inspect}\nFORMULA: #{entity.compute_formula}"
         puts "******************************* COMPUTATION END"
 
-        entity.populate(represented, value)
+        entity.populate(represented, value, form)
       end
     end
   end
