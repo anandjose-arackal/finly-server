@@ -5,6 +5,8 @@ ActionManager::Router.draw do
     route 'macro_jobs', Admin::Masters::Macros::Jobs::Action
   end
 
+  route 'companies', Companies::Action
+
   # NavBar
   route 'procurement', Menu::Masters::Procurement
 
