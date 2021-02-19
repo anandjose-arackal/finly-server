@@ -35,7 +35,7 @@ class ExportManager::Builders::Template
           end
         end
       else
-        fields = FieldConfiguration.where(company_id: company.id).joins(:field_parent_mappings).where('field_parent_mappings.field_parent_type_id = ?', FieldParentType.id_for(config[:key]))
+        fields = FieldConfiguration.non_deleted.where(company_id: company.id).joins(:field_parent_mappings).where('field_parent_mappings.field_parent_type_id = ?', FieldParentType.id_for(config[:key]))
         fields.each do |field|
           cols << ExportManager::Builders::Template::Attribute.new(
             {
