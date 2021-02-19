@@ -183,7 +183,7 @@ class Vendors::Base < BaseOperation
           similer_gstin_vendors = similar_pan_vendors.joins(:gstin_locations).where('gstin_locations.gstin IN (?)',  duplicated_gstins)
           add_message :error, "Vendor with pan: \"#{similar_pan_vendors.first.pan}\" and GSTIN Combination already exists in the system. See vendor - #{similer_gstin_vendors.first.display_name}"
         end
-      elsif similar_pan_vendors.present? && gstins.blank?
+      elsif similar_pan_vendors.present? && gstins.blank? && self.vendor&.gstin_locations.blank?
         add_message :error, "Vendor with pan: \"#{similar_pan_vendors.first.pan}\" already exists in the system. See vendor - #{similar_pan_vendors.first.display_name}"
       end
     end
