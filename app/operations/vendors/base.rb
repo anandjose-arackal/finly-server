@@ -174,7 +174,7 @@ class Vendors::Base < BaseOperation
         similar_pan_vendors = similar_pan_vendors.where.not(id: self.vendor.id)
       end
       gstins = []
-      vendor_parameters[:gstin_locations_attributes].map{|gstin_location| gstins << gstin_location[:gstin]}
+      vendor_parameters[:gstin_locations_attributes].each {|gstin_location| gstins << gstin_location[:gstin]}
       gstins =gstins.reject { |e| e.to_s.empty? }
       if similar_pan_vendors.present? && gstins.present?
         gstin_against_dup_pan = similar_pan_vendors.filter_active.joins(:gstin_locations).pluck(:'gstin_locations.gstin').uniq&.reject { |e| e.to_s.empty? }
