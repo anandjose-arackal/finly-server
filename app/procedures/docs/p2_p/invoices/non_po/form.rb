@@ -55,11 +55,10 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
           reporting_invoice_sub_total_amount: "{{ form.invoice_sub_total_amount | times: form.conversion_rate | default: 0 | round: 2}}",
           reporting_invoice_roundoff_amount: "{% assign amount = form.reporting_invoice_sub_total_amount | round %}{{ amount | minus: form.reporting_invoice_sub_total_amount | default: 0 | round: 2}}",
           reporting_invoice_total_amount: "{{ form.reporting_invoice_sub_total_amount | plus: form.reporting_invoice_roundoff_amount | default: 0 | round: 2}}",
-          reporting_invoice_balance_due: "{{ form.invoice_balance_due | times: form.conversion_rate | default: 0 | round: 2}}",
           reporting_invoice_net_total_amount: "{{ form.reporting_invoice_total_amount | minus: form.reporting_invoice_paid_outside_amount | default: 0 | round: 2}}",
-          reporting_invoice_advance_paid_amount: "{{ form.invoice_advance_paid_amount | times: form.conversion_rate | default: 0 | round: 2}}"
-
-      }
+          reporting_invoice_advance_paid_amount: "{{ form.invoice_advance_paid_amount | times: form.conversion_rate | default: 0 | round: 2}}",
+          reporting_invoice_balance_due: "{{ form.reporting_invoice_total_amount | minus: form.reporting_invoice_advance_paid_amount | minus: form.reporting_invoice_paid_outside_amount | default: 0 | round: 2}}"
+  }
   }
 
 
@@ -106,7 +105,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       visible: true, required: true, editable: true
 
 
-    dropdown :cost_allocation_items, choices_scope: Choices[:list].({id: false, name: "Header"}, {id: true, name: "Line Item"}),
+    dropdown :cost_allocation_items, choices_scope: Choices[:list].({id: "Header", name: "Header"}, {id: "Line Item", name: "Line Item"}),
              required: true, can_choices_be_changed: false, default_value: 'false'
 
     date :transaction_service_period_from, label: 'Transaction Service Period (From Date)', editable: true, visible: true
@@ -444,7 +443,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_editable_be_changed: false, visible: true,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_balance_due])
 
-      amount :reporting_invoice_balance_due, label: "Balance Payable(Reporting Currency)", editable: false, visible: false,
+      amount :reporting_invoice_balance_due, label: "Balance Payable(Reporting Currency)", editable: false, visible: true,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_balance_due]),
              can_visible_be_changed: false, can_editable_be_changed: false
 
@@ -555,37 +554,37 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
   #   action :visible, false
   # end
 
-  # condition condition_id: "Disable item department > Item department not for Header Cost Allocation Items" do
-  #   reference :entity, 'items.department_id'
-  #   rule Rules::Builder[:cost_allocation_items].not_eq_any(value: 'Header')
-  #   action :visible, true
-  #   action :required, true
-  #   action :editable, true
-  # end
+  condition condition_id: "Disable item department > Item department not for Header Cost Allocation Items" do
+    reference :entity, 'items.department_id'
+    rule Rules::Builder[:cost_allocation_items_value].not_eq(value: 'Header')
+    action :visible, true
+    action :required, true
+    action :editable, true
+  end
 
-  # condition condition_id: "Enable item department > Item Cost Center for Header Cost Allocation Items" do
-  #   reference :entity, 'department_id'
-  #   rule Rules::Builder[:cost_allocation_items].not_eq_any(value: 'Header')
-  #   action :visible, false
-  #   action :required, false
-  #   action :editable, false
-  # end
+  condition condition_id: "Enable item department > Item Cost Center for Header Cost Allocation Items" do
+    reference :entity, 'department_id'
+    rule Rules::Builder[:cost_allocation_items_value].not_eq(value: 'Header')
+    action :visible, false
+    action :required, false
+    action :editable, false
+  end
 
-  # condition condition_id: "Disable item Cost Center > Item Cost Center not for Header Cost Allocation Items" do
-  #   reference :entity, 'items.cost_center_id'
-  #   rule Rules::Builder[:cost_allocation_items].not_eq_any(value: 'Header')
-  #   action :visible, true
-  #   action :required, true
-  #   action :editable, true
-  # end
+  condition condition_id: "Disable item Cost Center > Item Cost Center not for Header Cost Allocation Items" do
+    reference :entity, 'items.cost_center_id'
+    rule Rules::Builder[:cost_allocation_items_value].not_eq(value: 'Header')
+    action :visible, true
+    action :required, true
+    action :editable, true
+  end
 
-  # condition condition_id: "Enable item Cost Center > Item Cost Center for Header Cost Allocation Items" do
-  #   reference :entity, 'cost_center_id'
-  #   rule Rules::Builder[:cost_allocation_items].not_eq_any(value: 'Header')
-  #   action :visible, false
-  #   action :required, false
-  #   action :editable, false
-  # end
+  condition condition_id: "Enable item Cost Center > Item Cost Center for Header Cost Allocation Items" do
+    reference :entity, 'cost_center_id'
+    rule Rules::Builder[:cost_allocation_items_value].not_eq(value: 'Header')
+    action :visible, false
+    action :required, false
+    action :editable, false
+  end
 
   # CONDITIONS
 
