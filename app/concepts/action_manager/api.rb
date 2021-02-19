@@ -28,11 +28,15 @@ class ActionManager::API < Transactions::API
 
   def build(context, options)
     context[:config] = []
+    context[:row_config] = []
     self.class.actions.each_pair do |id, action|
       hash = action.build(options)
       next if hash.nil?
-
-      context[:config] << hash
+      if action.row
+        context[:row_config] << hash
+      else
+        context[:config] << hash
+      end
     end
     context
   end
