@@ -111,6 +111,7 @@ class FieldConfiguration < ApplicationRecord
   default_scope {unscope(:where).order(sequence_number: :asc, id: :asc)}
 
   after_save :set_field_key
+  after_save :update_export_templates!
 
   def validate_config
     case field_type_id
@@ -278,6 +279,12 @@ class FieldConfiguration < ApplicationRecord
   def set_field_key
     if field_key.blank?
       self.update_columns(field_key: self.field_name.gsub('-', ' ').parameterize(separator: "_"))
+    end
+  end
+
+  def update_export_templates!
+    if company.present? and company.users.first.present? and ExportManagerToggle.new(company.users.first).templates_enabled?
+      Company::Setup.({ company: company })
     end
   end
 
