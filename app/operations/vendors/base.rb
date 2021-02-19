@@ -173,8 +173,17 @@ class Vendors::Base < BaseOperation
       if self.vendor.present?
         similar_pan_vendors = similar_pan_vendors.where.not(id: self.vendor.id)
       end
-
-      if similar_pan_vendors.present?
+      gstins = []
+      vendor_parameters[:gstin_locations_attributes].map{|gstin_location| gstins << gstin_location[:gstin]}
+      gstins =gstins.reject { |e| e.to_s.empty? }
+      if similar_pan_vendors.present? && gstins.present?
+        gstin_against_dup_pan = similar_pan_vendors.filter_active.joins(:gstin_locations).pluck(:'gstin_locations.gstin').uniq&.reject { |e| e.to_s.empty? }
+        duplicated_gstins = gstin_against_dup_pan & gstins
+        if gstin_against_dup_pan.present? && duplicated_gstins.present?
+          similer_gstin_vendors = similar_pan_vendors.joins(:gstin_locations).where('gstin_locations.gstin IN (?)',  duplicated_gstins)
+          add_message :error, "Vendor with pan: \"#{similar_pan_vendors.first.pan}\" and GSTIN Combination already exists in the system. See vendor - #{similer_gstin_vendors.first.display_name}"
+        end
+      elsif similar_pan_vendors.present? && gstins.blank?
         add_message :error, "Vendor with pan: \"#{similar_pan_vendors.first.pan}\" already exists in the system. See vendor - #{similar_pan_vendors.first.display_name}"
       end
     end

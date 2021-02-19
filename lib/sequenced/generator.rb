@@ -26,7 +26,8 @@ module Sequenced
       return if @sequenced_editable && record.send(:"#{column}").present?
 
       # record.with_lock do
-      record.send(:"#{column}=", next_id)
+      #record.send(:"#{column}=", next_id)
+      record.update_columns(:"#{column}" => next_id)
       # end
     end
 
