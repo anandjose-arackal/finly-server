@@ -1,13 +1,16 @@
 module FormsHelper
   def form_data(form, model = self)
-    form.entities.root.reduce({}) {|acc, entity| acc.merge(entity_data(model, entity))}.with_indifferent_access
+    form.entities.root.reduce({}) do |acc, entity|
+      acc.merge(entity_data(model, entity)).with_indifferent_access
+    end
   end
 
   private
 
   def entity_data(model, form_entity)
     form_data = {}
-    if form_entity.entities.present?
+
+    if form_entity.class.collection?
       collection_models = (model.respond_to?(form_entity.entity_key) && model.send(form_entity.entity_key)) || []
       collection_data = collection_models.map do |collection_model|
         if collection_model.respond_to?(:forms_extra_data)
@@ -19,12 +22,31 @@ module FormsHelper
         end
       end
       form_data.merge!(form_entity.entity_key => collection_data)
+    elsif form_entity.entities.present?
+      form_entity.entities.each do |entity|
+        if entity.system_field && model.respond_to?(entity.entity_key)
+          form_data.merge!({entity.entity_key => model.send(entity.entity_key)})
+        else
+          if model.respond_to?(:form_custom_fields)
+            value = model.form_custom_fields.joins(:form_entity).where("form_entities.entity_key = ?", entity.entity_key).first&.retrieve_value
+            form_data.merge!({entity.entity_key => value})
+          end
+        end
+      end
     else
       if form_entity.system_field && model.respond_to?(form_entity.entity_key)
         form_data.merge!({form_entity.entity_key => model.send(form_entity.entity_key)})
         if form_entity.entity_type == 'dropdown' || form_entity.entity_type == 'lookup'
           form_data.merge!({"#{form_entity.entity_key}_value" => model.retrieve_value(form_entity)})
         end
+
+        if [:lookup, 'lookup'].include?(form_entity.entity_type)
+          Rails.logger.fatal "****************************************"
+          Rails.logger.fatal model.send(:forms_extra_data, form_entity.entity_type, form_entity.entity_key)
+          Rails.logger.fatal "****************************************"
+          form_data.merge!(model.send(:forms_extra_data, form_entity.entity_type, form_entity.entity_key))
+        end
+
       else
         if model.respond_to?(:form_custom_fields)
           custom_field = model.form_custom_fields.joins(:form_entity).where("form_entities.entity_key = ?", form_entity.entity_key).first
@@ -36,6 +58,7 @@ module FormsHelper
         end
       end
     end
+
     form_data
   end
 end

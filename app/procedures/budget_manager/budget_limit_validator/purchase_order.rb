@@ -1,7 +1,7 @@
 class BudgetManager::BudgetLimitValidator::PurchaseOrder < BudgetManager::BudgetLimitValidator::Base
 
   attr_accessor :purchase_order
-  
+
   def initialize!(options, **)
     self.purchase_order = options[:purchase_order]
 
@@ -64,7 +64,7 @@ class BudgetManager::BudgetLimitValidator::PurchaseOrder < BudgetManager::Budget
     end
 
     options["result"] = {
-      budget_contributions: budget_contributions
+        budget_contributions: budget_contributions
     }
 
     if options['result.operation.errors'].present?

@@ -61,6 +61,8 @@ class Rules::Adapters::JSONLogic
     if func.class <= Hash
       prefix = prefix_map[json_logic_type]
 
+      # if func[:value].present? or func[:formula].present?
+      
       if func.keys.include?(:value) or func.keys.include?(:formula)
         return func[:value]&.to_s&.strip || func[:formula]&.to_s&.strip
       else

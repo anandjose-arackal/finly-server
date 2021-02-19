@@ -94,26 +94,26 @@ json.payments do
         json.invoice_type invoice.invoice_type&.name
         json.procurement_id invoice.procurement_id
         json.advance invoice.advance
-        json.advance_amount precision_value invoice.advance_amount&.value
-        json.tax_amount precision_value invoice.tax_amount&.value
-        json.tds_amount precision_value invoice.tds_amount&.value
+        json.advance_amount precision_value invoice&.advance_amount&.value.to_f
+        json.tax_amount precision_value invoice&.tax_amount&.value.to_f
+        json.tds_amount precision_value invoice&.tds_amount&.value.to_f
         json.tax precision_value invoice.tax
         json.tds precision_value invoice.tds
         json.gst_type_id invoice.gst_type_id
         json.tax_type_id invoice.tax_type_id
         json.tds_type_id invoice.tds_type_id
-        json.discount_amount precision_value invoice.discount_amount&.value
+        json.discount_amount precision_value invoice&.discount_amount&.value.to_f
         json.discount precision_value invoice.discount
         json.date invoice.date
         json.discount_type_id invoice.discount_type_id
         json.due_date invoice.due_date
         json.invoice_number invoice.invoice_number
         json.inclusive_of_taxes invoice.inclusive_of_taxes
-        json.freight_amount invoice.freight_amount&.value
-        json.roundoff_amount invoice.roundoff_amount
-        json.net_payable_amount invoice.balance_due&.value
-        json.balance_due invoice.balance_due&.value
-        json.taxable_amount precision_value invoice.gross_amount&.value
+        json.freight_amount invoice&.freight_amount&.value.to_f
+        json.roundoff_amount invoice&.roundoff_amount.to_f
+        json.net_payable_amount invoice&.balance_due&.value.to_f
+        json.balance_due invoice&.balance_due&.value.to_f
+        json.taxable_amount precision_value invoice&.gross_amount&.value.to_f
         json.editable invoice.unpaid? || invoice.initiated?
         # adding the respective rates
         json.tax_rate precision_value invoice.tax_rate
@@ -157,8 +157,8 @@ json.payments do
           json.array!(invoice.invoice_items) do |item|
             json.rate item.rate
             json.quantity item.quantity
-            json.tax item.tax
-            json.discount item.discount
+            json.tax item&.tax.to_f
+            json.discount item&.discount.to_f
             json.category_id item.category_id
             json.category_name item.category&.name
             json.tax_amount precision_value item.tax_amount&.value

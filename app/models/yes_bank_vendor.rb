@@ -82,6 +82,7 @@ class YesBankVendor < ApplicationRecord
 
   belongs_to :currency, optional: true
   belongs_to :payment_term, optional: true
+  belongs_to :tax_rate, optional: true
 
   has_many :bank_accounts, as: :account_owner, dependent: :destroy
   has_many :receiving_payments, as: :receiving_user, class_name: 'Payment'
@@ -463,4 +464,47 @@ class YesBankVendor < ApplicationRecord
   def retrieve_value(entity)
     send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
   end
+
+  def forms_extra_data(type = nil, entity_key = nil)
+    if type.nil? || entity_key.nil?
+      return {
+      }
+    end
+
+    case entity_key
+
+    when :policy_id, 'policy_id'
+      data = {
+          "id": policy_id,
+          "name": policy&.name,
+      }
+    when :payment_term_id, 'payment_term_id'
+      data = {
+          "id": payment_term_id,
+          "name": payment_term&.name,
+          "description": payment_term&.description,
+          "default": payment_term&.default
+      }
+    when :tax_rate_id, 'tax_rate_id'
+      data = {
+          "id": tax_rate_id,
+          "name": tax_rate&.name,
+          "rate": tax_rate&.rate
+      }
+    when :category_id, 'category_id'
+      data = {
+          "id": category_id,
+          "name": category&.name,
+          "category_code": category&.category_code
+      }
+    else
+      data = {}
+    end
+
+    {
+        "#{entity_key}_lookup_data": data,
+        "#{entity_key}_choice_data": [data]
+    }
+  end
+
 end

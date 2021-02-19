@@ -1,10 +1,10 @@
 class BudgetManager::BudgetLimitValidator::PurchaseRequest < BudgetManager::BudgetLimitValidator::Base
 
   attr_accessor :purchase_request
-  
+
   def initialize!(options, **)
     self.purchase_request = options[:purchase_request]
-    
+
     self.previous_budget_contributions = options[:previous_budget_contributions] || {}
     self.budget_contributions = {}
 
@@ -14,7 +14,7 @@ class BudgetManager::BudgetLimitValidator::PurchaseRequest < BudgetManager::Budg
       add_message(options, :error, :base, 'Purchase Request not found')
       return false
     end
-    
+
     op = BudgetManager::BudgetsCalculator::ApplicableBudgets.({document: self.purchase_request, current_user: User.first})
     if op.success?
       self.budgets = op["result"][:budgets] rescue []
@@ -63,7 +63,7 @@ class BudgetManager::BudgetLimitValidator::PurchaseRequest < BudgetManager::Budg
     end
 
     options["result"] = {
-      budget_contributions: budget_contributions
+        budget_contributions: budget_contributions
     }
 
     if options['result.operation.errors'].present?
