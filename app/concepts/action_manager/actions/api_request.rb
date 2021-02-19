@@ -4,6 +4,7 @@ class ActionManager::Actions::ApiRequest < ActionManager::Action
   config :contextual
   config :url
   config :method
+  config :body
   config :confirmation
   config :confirmation_message
   config :success_function
