@@ -1,9 +1,9 @@
 class CompaniesController < BaseControllers::WebBase
   layout 'trailblazers', only: [:index, :show, :create, :update]
 
-  def index
-    endpoint Companies::Ops::Index
-  end
+  # def index
+  #   endpoint Companies::Ops::Index
+  # end
 
   def create
     endpoint Companies::Ops::Create
