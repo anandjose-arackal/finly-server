@@ -56,6 +56,9 @@ class Vendors::Update < Vendors::Base
       add_message :notice, "GSTIN details can only be saved if a valid PAN is supplied."
     end
 
+    validate_duplicate_pan
+    validate_duplicate_gstin
+
     if vendor_parameters[:gstin_locations_attributes].present?
       vendor_parameters[:gstin_locations_attributes].each do |gstin_location|
         poc_email = gstin_location[:poc_email]

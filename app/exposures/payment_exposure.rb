@@ -51,8 +51,8 @@ class PaymentExposure < Exposures::API
       # (record.utr.present? ? record&.utr : record.reference_resource&.bank_reference_number)
       record.reference_resource&.bank_reference_number
     when 'IciciBankTransaction', 'KotakBankTransaction'
-      # (record.utr.present? ? record&.utr : record.reference_resource&.utr)
-      record.reference_resource&.utr
+      #record.reference_resource&.utr
+      record.utr
     when 'Payment', 'Report', 'BankTransaction'
       nil
     when 'VirtualAccountTransaction'
