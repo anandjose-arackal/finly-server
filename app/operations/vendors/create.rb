@@ -144,6 +144,7 @@ class Vendors::Create < Vendors::Base
     gstins = []
 
     validate_duplicate_pan
+    validate_duplicate_gstin
 
     if vendor_parameters[:gstin_locations_attributes].present?
       vendor_parameters[:gstin_locations_attributes].each do |gstin_location|

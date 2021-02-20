@@ -82,19 +82,6 @@ class Vendors::Base < BaseOperation
     business_name = vendor_params[:business_name]
     return if vendor_params[:gstin_locations_attributes].blank?
 
-    ### DETECTING duplicated gstin against vendor, existing ore newly adding set
-    gstins = []
-    vendor_parameters[:gstin_locations_attributes].each {|gstin_location| gstins << gstin_location[:gstin]}
-
-    if self.vendor.present?
-      gstins + self.vendor.gstin_locations.pluck(:gstin)
-    end
-
-    if gstins.detect{ |gstin| gstins.count(gstin) > 1 }.present?
-      add_message :error, "Duplicated GSTIN values entered"
-    end
-    ### DETECTING dupliated gstin ended
-
     vendor_params[:gstin_locations_attributes].each_with_index do |gstin_location, index|
       gstin = gstin_location[:gstin]
 
@@ -201,6 +188,23 @@ class Vendors::Base < BaseOperation
         add_message :error, "Vendor with pan: \"#{similar_pan_vendors.first.pan}\" already exists in the system. See vendor - #{similar_pan_vendors.first.display_name}"
       end
     end
+  end
+
+  def validate_duplicate_gstin
+    ### DETECTING duplicated gstin against vendor, existing ore newly adding set
+    gstins = []
+    vendor_parameters[:gstin_locations_attributes].each do |gstin_location|
+      gstins << gstin_location[:gstin]
+    end
+
+    if self.vendor.present?
+      gstins + self.vendor.gstin_locations.pluck(:gstin)
+    end
+
+    if gstins.detect{ |gstin| gstins.count(gstin) > 1 }.present?
+      add_message :error, "Duplicated GSTIN values entered"
+    end
+    ### DETECTING dupliated gstin ended
   end
 
   def validate_duplicate_bank_account
