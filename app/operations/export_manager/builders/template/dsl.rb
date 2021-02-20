@@ -17,19 +17,21 @@ module ExportManager::Builders::Template::DSL
       @columns ||= []
     end
 
-    def custom_fields(field_parent_type, template_prefix:)
+    def custom_fields(field_parent_type, template_prefix: , column_name_prefix: nil)
       custom_fields_config << {
         key: field_parent_type,
         form: false,
-        template_prefix: template_prefix
+        template_prefix: template_prefix,
+        column_name_prefix: column_name_prefix,
       }.with_indifferent_access
     end
 
-    def form_custom_fields(form_route, template_prefix:)
+    def form_custom_fields(form_route, template_prefix:, column_name_prefix: nil)
       custom_fields_config << {
         key: form_route,
         form: true,
-        template_prefix: template_prefix
+        template_prefix: template_prefix,
+        column_name_prefix: column_name_prefix,
       }.with_indifferent_access
     end
 

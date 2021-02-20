@@ -29,7 +29,7 @@ class ExportManager::Builders::Template
               {
                 name: entity.entity_key.to_sym,
                 template: "{{ #{config[:template_prefix]}.#{entity.entity_key} }}",
-                column_name: entity.label
+                column_name: config[:column_name_prefix].present? ? "#{config[:column_name_prefix]}: #{entity.label}" : entity.label
               }
             )
           end
@@ -41,7 +41,7 @@ class ExportManager::Builders::Template
             {
               name: field.field_key&.to_sym,
               template: "{{ #{config[:template_prefix]}.#{field.field_key} }}",
-              column_name: field.field_name
+              column_name: config[:column_name_prefix].present? ? "#{config[:column_name_prefix]}: #{field.field_name}" : field.field_name
             }
           )
         end

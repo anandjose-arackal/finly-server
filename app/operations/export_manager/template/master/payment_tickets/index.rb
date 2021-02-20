@@ -8,9 +8,9 @@ class ExportManager::Template::Master::PaymentTickets::Index < ExportManager::Bu
   subscribe 'payments'
   default true
 
-  custom_fields :invoice, template_prefix: 'record.invoice'
-  form_custom_fields :invoices, template_prefix: 'record.invoice'
-  custom_fields :purchase_order, template_prefix: 'record.purchase_order'
+  custom_fields :invoice, template_prefix: 'record.invoice', column_name_prefix: 'Invoice'
+  form_custom_fields :invoices, template_prefix: 'record.invoice', column_name_prefix: 'Invoice'
+  custom_fields :purchase_order, template_prefix: 'record.purchase_order', column_name_prefix: 'Purchase Order'
 
   attribute :payment_order_id, template: '{{ record.payment_order.bank_payment_request.id }}'
   attribute :payment_order_name, template: '{{ record.payment_order.bank_payment_request.name }}'
