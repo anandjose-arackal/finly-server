@@ -29,7 +29,9 @@ class PaymentExposure < Exposures::API
   attribute :last_retried_at, record_attribute: true
   attribute :note, record_attribute: true
   attribute :invoice, record_attribute: true, exposure: true
-  attribute :purchase_order, record_attribute: true, exposure: true
+  attribute :purchase_order, exposure: true, includes: [:parent] do
+    record.purchase_order_parent&.to_exposure
+  end
   attribute :initiating_account_number do
     account_name(record, :initiating_account)
   end
