@@ -50,6 +50,8 @@ class BbpsBillsFetch < BaseJob
           end
           op.error do |result|
             # Will never enter here
+            Docs::UtilityBills::Bills::Ops::HandleFetchErrors.(params: {result: result, subscription: subscription}, current_user: User.first)
+            
           end
           op.failure do |result|
             Docs::UtilityBills::Bills::Ops::HandleFetchErrors.(params: {result: result, subscription: subscription}, current_user: User.first)

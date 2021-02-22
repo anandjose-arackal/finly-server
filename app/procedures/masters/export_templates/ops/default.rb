@@ -4,6 +4,6 @@ class Masters::ExportTemplates::Ops::Default < Transactions::API
   step :default!
 
   def default!(options, current_user:, params:, **)
-    options['result'] = ExportManager::TemplateMaster.get_default_template(params[:resource])
+    options['result'] = ExportManager::TemplateMaster.get_default_template(params[:resource], current_user&.company)
   end
 end

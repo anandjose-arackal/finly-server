@@ -46,6 +46,14 @@ class BbpsBillStatusChecker < BaseJob
             payment.update(payment_status_id: PaymentStatus.id_for(:failed))
             bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
             bill.update(status_id: BbpsBillStatus.id_for(:approved))
+
+            payment.system_messages.destroy_all
+            # add error message to the ticket
+            error_message = result['error_desc']
+            payment.system_messages.create(
+              system_message_type_id: SystemMessageType.id_for(:error),
+              content: "#{error_message}."
+            )
             # credit the amount back to the accout if already not credited.
 
             # get all the finly transaction_details, ( debit - credit == 1 )
@@ -56,16 +64,9 @@ class BbpsBillStatusChecker < BaseJob
               adapter = AccountManager::Base.new()
               credit_adapter = adapter.send(:retrieve_adapter , payment.initiating_account, payment )
 
-              payment.system_messages.destroy_all
-              # add error message to the ticket
-              error_message = result['error_desc']
-              payment.system_messages.create(
-                system_message_type_id: SystemMessageType.id_for(:error),
-                content: "#{error_message}."
-              )
               credit_adapter.credit(payment, {})
             end
-
+            
           end
           op.failure do |result|
             puts "Failure: #{result}"
