@@ -201,8 +201,8 @@ gem 'devise', '~> 4.7'
 gem 'devise_invitable', '~> 2.0', '>= 2.0.2'
 gem 'doorkeeper', '~> 5.0.2'
 
-gem 'faraday', '~> 0.15.4'
-gem 'faraday_middleware', '~> 0.12.2'
+gem 'faraday', '~> 0.17.3'
+gem 'faraday_middleware', '~> 0.14.0'
 
 gem 'posthog-ruby', '~> 1.0'
 # gem for xml parsing
@@ -258,12 +258,12 @@ gem 'azure'
 gem 'azure-storage-blob'
 
 # gem for all paper trail
-gem 'paper_trail'
-gem 'paper_trail-association_tracking'
-gem 'paper_trail-globalid'
+gem 'paper_trail', '~> 11.0.0'
+gem 'paper_trail-association_tracking', '~> 2.1.1'
+gem 'paper_trail-globalid', '~> 0.2.0'
 group :development, :test do
   gem 'byebug'
-  gem 'pry', '~> 0.12.2'  
+  gem 'pry', '~> 0.12.2'
   gem 'rb-readline', '~> 0.5'
   gem 'capistrano', '~> 3.11.0'
   gem 'capistrano3-puma', '~> 5.0'

@@ -59,12 +59,21 @@ class FormEntity::Lookup < FormEntity
 
   def self.option_validation
     Proc.new do
+      property :filters, deserializer: -> (input, represented, *args) {represented.filters = Rules::Adapters::Store.load(input[:filters])}
+
       validation :options_config do
         params do
 
         end
       end
     end
+  end
+
+  def populate(represented, value, input)
+    super
+    value = input["#{entity_key}_value"]
+    represented.form_data["#{entity_key}_value"] = value
+    represented.contract_root.form_data["#{entity_key}_value"] = value
   end
 
 end

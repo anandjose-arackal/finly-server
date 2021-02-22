@@ -59,6 +59,10 @@ json.trail do
           json.id item.invoice_status&.id
           json.name item.invoice_status&.name
         end
+        if item.payments.processed.first.present?
+          payment = item.payments.processed.first
+          json.utr  payment.utr
+        end
         json.due_date item.due_date&.strftime("%b %d, %Y")
       end
 
@@ -69,6 +73,10 @@ json.trail do
         json.status do
           json.id item.invoice_status&.id
           json.name item.invoice_status&.name
+        end
+        if item.payments.processed.first.present?
+          payment = item.payments.processed.first
+          json.utr  payment.utr
         end
         json.due_date item.due_date&.strftime("%b %d, %Y")
       end

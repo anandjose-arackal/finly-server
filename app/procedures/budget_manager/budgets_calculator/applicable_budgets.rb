@@ -164,10 +164,10 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
         OR (budget_date_type_id = ? AND  DATE(start_date) <= ? AND DATE(end_date) >= ?)
         OR (budget_date_type_id = ? AND  DATE(start_date) <= ? AND DATE(end_date) >= ?)
         OR (budget_date_type_id = ? AND  DATE(start_date) <= ? AND DATE(end_date) >= ?)",
-        BudgetDateType.id_for(:entity_date), document.entity_date, document.entity_date,
-        BudgetDateType.id_for(:entity_submitted_at), document.entity_submitted_at, document.entity_submitted_at,
-        BudgetDateType.id_for(:entity_created_at), document.entity_created_at, document.entity_created_at,
-        nil, document.entity_created_at, document.entity_created_at
+        BudgetDateType.id_for(:entity_date), document&.entity_date&.to_date, document&.entity_date&.to_date,
+        BudgetDateType.id_for(:entity_submitted_at), document&.entity_submitted_at&.to_date, document&.entity_submitted_at&.to_date,
+        BudgetDateType.id_for(:entity_created_at), document&.entity_created_at&.to_date, document&.entity_created_at&.to_date,
+        nil, document&.entity_created_at&.to_date, document&.entity_created_at&.to_date
       ).pluck(:id)
 
     when "Report", "BankPaymentRequest"
@@ -241,18 +241,33 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
         dates << document.created_at.to_date
       end
     when "BankPaymentRequest"
+
+      payments = document.payments
+      parent_type = payments.first.parent_type
+      parent_trails = []
+
+      if parent_type == "PurchaseOrder"
+        parent_trails = BudgetTrail.where(entity_type: "PurchaseOrderItem", entity_id: payments.map(&:parent).flatten.compact.map(&:items).flatten.compact.map(&:id)) 
+      elsif parent_type == "Invoice"
+        parent_trails = BudgetTrail.where(entity_type: "InvoiceLineItem", entity_id: payments.map(&:parent).flatten.compact.map(&:items).flatten.compact.map(&:id)) 
+      end
+
+      parent_dates = parent_trails.map(&:date).compact
+      parent_entity_created_at_dates = parent_trails.map(&:entity_created_at).compact
+      parent_entity_submitted_at_dates = parent_trails.map(&:entity_submitted_at).compact
+
       case date_type_id
       when BudgetDateType.id_for(:entity_date)
-        dates += document.payments.pluck(:date)
+        dates += ( parent_dates || payments.pluck(:date) )
       when BudgetDateType.id_for(:entity_created_at)
-        dates << document.created_at&.to_date
+        dates << ( parent_entity_created_at_dates || document.created_at&.to_date )
       when BudgetDateType.id_for(:entity_submitted_at)
-        dates << (document.submitted_at&.to_date || document.created_at.to_date)
+        dates << ( parent_entity_submitted_at_dates || document.submitted_at&.to_date || document.created_at.to_date)
       else
         dates << document.created_at.to_date
       end
     end
 
-    return dates.compact
+    return dates.flatten.compact
   end
 end

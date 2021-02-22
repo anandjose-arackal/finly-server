@@ -101,31 +101,31 @@ class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Sp
   # end
 
   def procurement_name(purchase_order)
-    purchase_order.procurement.name
+    purchase_order&.procurement&.name.to_s
   end
 
   def vendor_name(purchase_order)
-    purchase_order.procurement.vendor&.display_name
+    purchase_order&.procurement&.vendor&.display_name
   end
 
   def vendor_business_name(purchase_order)
-    purchase_order.procurement.vendor&.business_name
+    purchase_order&.procurement&.vendor&.business_name
   end
 
   def vendor_mobile_number(purchase_order)
-    purchase_order.procurement.vendor&.mobile_number
+    purchase_order&.procurement&.vendor&.mobile_number
   end
 
   def vendor_state_code(purchase_order)
-    purchase_order.procurement.vendor&.state_code
+    purchase_order&.procurement&.vendor&.state_code
   end
 
   def vendor_pan(purchase_order)
-    purchase_order.procurement.vendor&.pan
+    purchase_order&.procurement&.vendor&.pan
   end
 
   def vendor_gstin(purchase_order)
-    purchase_order.gstin_location&.gstin
+    purchase_order&.gstin_location&.gstin
   end
 
   def approval_pending_level_number(purchase_order)
@@ -141,7 +141,7 @@ class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Sp
   end
 
   def approved_reviewers(purchase_order)
-    purchase_order&.dlrms&.where(action_id: TrailAction.id_for(:approve))&.includes(:reviewer)&.map {|dlr| dlr.reviewer.name}&.join(" ,")
+    purchase_order&.dlrms&.where(action_id: TrailAction.id_for(:approve))&.includes(:reviewer)&.map {|dlr| dlr&.reviewer&.name}&.join(" ,")
   end
 
   def vendor_tds_rate(purchase_order)
@@ -153,15 +153,15 @@ class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Sp
   end
 
   def vendor_type(purchase_order)
-    purchase_order.procurement.vendor&.vendor_type&.name
+    purchase_order&.procurement&.vendor&.vendor_type&.name
   end
 
   def vendor_description(purchase_order)
-    purchase_order.procurement.vendor&.description
+    purchase_order&.procurement&.vendor&.description
   end
 
   def vendor_address(purchase_order)
-    purchase_order.procurement.vendor&.address
+    purchase_order&.procurement&.vendor&.address
   end
 
   def vendor_custom_fields(purchase_order)
@@ -169,23 +169,23 @@ class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Sp
   end
 
   def policy(purchase_order)
-    purchase_order.procurement.type_entity&.policy&.name
+    purchase_order&.procurement&.type_entity&.policy&.name
   end
 
   def department(purchase_order)
-    purchase_order.procurement.type_entity&.department&.name
+    purchase_order&.procurement&.type_entity&.department&.name
   end
 
   def sub_department(purchase_order)
-    purchase_order.procurement.type_entity&.sub_department&.name
+    purchase_order&.procurement&.type_entity&.sub_department&.name
   end
 
   def cost_center(purchase_order)
-    purchase_order.procurement.type_entity&.cost_center&.name
+    purchase_order&.procurement&.type_entity&.cost_center&.name
   end
 
   def po_user(purchase_order)
-    if purchase_order.procurement.purchase_order.present?
+    if purchase_order&.procurement&.purchase_order&.present?
       purchase_order&.user&.name
     end
   end
@@ -211,12 +211,12 @@ class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Sp
   end
 
   def po_closed_date(purchase_order)
-    purchase_order.trails&.find_by(action_id: TrailAction.id_for(:close))&.created_at&.strftime("%d-%b-%Y")
+    purchase_order&.trails&.find_by(action_id: TrailAction.id_for(:close))&.created_at&.strftime("%d-%b-%Y")
   end
 
   def po_submitted_on(purchase_order)
     # todo
-    purchase_order.trails&.where(action_id: TrailAction.id_for(:submit))&.last&.created_at&.strftime("%d-%b-%Y")
+    purchase_order&.trails&.where(action_id: TrailAction.id_for(:submit))&.last&.created_at&.strftime("%d-%b-%Y")
   end
 
   def is_po_approved(purchase_order)
@@ -295,11 +295,11 @@ class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Sp
   end
 
   def invoice_number(purchase_order)
-    purchase_order.procurement.invoices&.first&.invoice_number
+    purchase_order&.procurement&.invoices&.first&.invoice_number
   end
 
   def invoice_id(purchase_order)
-    purchase_order.procurement.invoices.first&.invoice_id
+    purchase_order&.procurement&.invoices&.first&.invoice_id
   end
 
   def invoice_payment_term(purchase_order)
@@ -398,24 +398,24 @@ class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Sp
   end
 
   def pr_number purchase_order
-    request = purchase_order.purchase_request_items.first&.purchase_request
+    request = purchase_order&.purchase_request_items&.first&.purchase_request
     request.present? ? request&.order_number : ''
   end
 
   def pr_created_by purchase_order
-    request = purchase_order.purchase_request_items.first&.purchase_request
+    request = purchase_order&.purchase_request_items&.first&.purchase_request
     request.present? ? request&.creator&.name : ''
   end
 
   def pr_date purchase_order
-    request = purchase_order.purchase_request_items.first&.purchase_request
+    request = purchase_order&.purchase_request_items&.first&.purchase_request
     request.present? ? request&.created_at&.strftime("%d-%b-%Y") : ''
   end
 
   protected
 
   def invoice(purchase_order)
-    purchase_order.procurement&.invoices&.last
+    purchase_order&.procurement&.invoices&.last
   end
 
   # def purchase_order(purchase_order)

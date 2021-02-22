@@ -81,6 +81,7 @@ class Vendors::Base < BaseOperation
   def validate_gstin(vendor_params)
     business_name = vendor_params[:business_name]
     return if vendor_params[:gstin_locations_attributes].blank?
+
     vendor_params[:gstin_locations_attributes].each_with_index do |gstin_location, index|
       gstin = gstin_location[:gstin]
 
@@ -165,6 +166,45 @@ class Vendors::Base < BaseOperation
       end
     end
     true
+  end
+
+  def validate_duplicate_pan
+    if vendor_parameters.present? && vendor_parameters[:pan].present?
+      similar_pan_vendors = user.company.yes_bank_vendors.filter_active.where(pan: vendor_parameters[:pan])
+      if self.vendor.present?
+        similar_pan_vendors = similar_pan_vendors.where.not(id: self.vendor.id)
+      end
+      gstins = []
+      vendor_parameters[:gstin_locations_attributes].each {|gstin_location| gstins << gstin_location[:gstin]}
+      gstins =gstins.reject { |e| e.to_s.empty? }
+      if similar_pan_vendors.present? && gstins.present?
+        gstin_against_dup_pan = similar_pan_vendors.filter_active.joins(:gstin_locations).pluck(:'gstin_locations.gstin').uniq&.reject { |e| e.to_s.empty? }
+        duplicated_gstins = gstin_against_dup_pan & gstins
+        if gstin_against_dup_pan.present? && duplicated_gstins.present?
+          similer_gstin_vendors = similar_pan_vendors.joins(:gstin_locations).where('gstin_locations.gstin IN (?)',  duplicated_gstins)
+          add_message :error, "Vendor with pan: \"#{similar_pan_vendors.first.pan}\" and GSTIN Combination already exists in the system. See vendor - #{similer_gstin_vendors.first.display_name}"
+        end
+      elsif similar_pan_vendors.present? && gstins.blank? && self.vendor&.gstin_locations.blank?
+        add_message :error, "Vendor with pan: \"#{similar_pan_vendors.first.pan}\" already exists in the system. See vendor - #{similar_pan_vendors.first.display_name}"
+      end
+    end
+  end
+
+  def validate_duplicate_gstin
+    ### DETECTING duplicated gstin against vendor, existing ore newly adding set
+    gstins = []
+    vendor_parameters[:gstin_locations_attributes].each do |gstin_location|
+      gstins << gstin_location[:gstin]
+    end
+
+    if self.vendor.present?
+      gstins + self.vendor.gstin_locations.pluck(:gstin)
+    end
+
+    if gstins.detect{ |gstin| gstins.count(gstin) > 1 }.present?
+      add_message :error, "Duplicated GSTIN values entered"
+    end
+    ### DETECTING dupliated gstin ended
   end
 
   def validate_duplicate_bank_account

@@ -8,6 +8,10 @@ class ExportManager::Template::Master::PaymentTickets::Index < ExportManager::Bu
   subscribe 'payments'
   default true
 
+  custom_fields :invoice, template_prefix: 'record.invoice', column_name_prefix: 'Invoice'
+  form_custom_fields :invoices, template_prefix: 'record.invoice', column_name_prefix: 'Invoice'
+  custom_fields :purchase_order, template_prefix: 'record.purchase_order', column_name_prefix: 'Purchase Order'
+
   attribute :payment_order_id, template: '{{ record.payment_order.bank_payment_request.id }}'
   attribute :payment_order_name, template: '{{ record.payment_order.bank_payment_request.name }}'
   attribute :payment_id, template: '{{ record.id }}'
@@ -19,7 +23,7 @@ class ExportManager::Template::Master::PaymentTickets::Index < ExportManager::Bu
   attribute :payment_mode, template: '{{ record.payment_mode | upcase }}'
   attribute :initiated_by, template: '{{ record.initiating_user.name }}'
   attribute :initiator_email, template: '{{ record.initiating_user.email }}'
-  attribute :payment_order_status, template: '{{ record.payment_order.bank_payment_request.status.name }}'
+  attribute :payment_order_status, template: '{{ record.payment_order.bank_payment_request.status_name }}'
   attribute :payment_order_schedule_date, template: "{{ record.payment_order.scheduled_at | date: '%d-%b-%Y' }}"
   attribute :payment_order_submitted_date, template: "{{ record.payment_order.bank_payment_request.submitted_at | date: '%d-%b-%Y' }}"
   attribute :payment_order_processed_date, template: "{{ record.payment_order.processed_at | date: '%d-%b-%Y' }}"

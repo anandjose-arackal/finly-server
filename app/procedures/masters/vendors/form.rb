@@ -98,7 +98,7 @@ class Masters::Vendors::Form < Forms::API
   end
 
   section :business_details, associate_custom_fields: true do
-    auto_number :vendor_id, label: "Vendor ID", sequence: {prefix: "VNDR.", start_at: '000001'}, placeholder: "System Generated Field", hint: "System Generated Field"
+    auto_number :vendor_id,unique: true, label: "Vendor ID", sequence: {prefix: "VNDR.", start_at: '000001'}, placeholder: "System Generated Field", hint: "System Generated Field"
     dropdown :vendor_country, choices_scope: Choices[:list].({id: 'India', name: "India"}, {id: 'International', name: "International"}),
              required: true, default_value: 'India'
     lookup :policy_id,
@@ -126,24 +126,24 @@ class Masters::Vendors::Form < Forms::API
     date :tds_effective_start_date, label: "TDS Effective Start Date", editable: false
     date :tds_effective_end_date, label: "TDS Effective End Date", editable: false
 
+    # LDC
+    amount :ldc_upper_limit_amount, label: "LDC Upper Limit"
+    date :ldc_effective_start_date, label: "LDC Effect Start Date"
+    date :ldc_effective_end_date, label: "LDC Effect End Date"
+    attachment :lower_exception_certificate, system_field: false
+
     # Sales Tax Codes
     lookup :tax_rate_id, choices_scope: Choices[:lookup].('tax_rates'), label: "Sales Tax Code", visible: false, editable: false
   end
 
   section :msme, associate_custom_fields: true do
     # MSME
-    switch :msme_registered
-    text :msme_registration_number, editable: false
-    attachment :msme_registration_certificate, system_field: false
+    switch :msme_registered, visible: true
+    text :msme_registration_number, editable: false, visible: false
+    attachment :msme_registration_certificate, system_field: false, visible: false
   end
 
-  section :ldc, associate_custom_fields: true do
-    # LDC
-    amount :ldc_upper_limit_amount, label: "LDC Upper Limit"
-    date :ldc_effective_start_date, label: "LDC Effect Start Date"
-    date :ldc_effective_end_date, label: "LDC Effect End Date"
-    attachment :lower_exception_certificate, system_field: false
-  end
+
 
   # section :tds, associate_custom_fields: true do
   #   dropdown :tds_rates_list_id, Choices[:lookup].('tds_slabs')
@@ -342,18 +342,31 @@ class Masters::Vendors::Form < Forms::API
     action :required, false
   end
 
-  condition condition_id: "Enable MSME Registration Number when MSME Registered is checked" do
-    reference :entity, :msme_registration_number
-    rule Rules::Builder[:msme_registered].present
-    action :editable, true
-  end
-
   condition condition_id: "Disable MSME Attachment for International Vendors" do
     reference :entity, :msme_registration_certificate
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :editable, false
     action :visible, false
+    action :active, false
     action :required, false
+  end
+
+  condition condition_id: "Enable MSME Registration Number when MSME Registered is checked" do
+    reference :entity, :msme_registration_number
+    rule Rules::Builder[:msme_registered].eq_any(value: true)
+    action :editable, true
+    action :visible, true
+    action :active, true
+    action :required, true
+  end
+
+  condition condition_id: "Enable MSME Attachment when MSME Registered is checked" do
+    reference :entity, :msme_registration_certificate
+    rule Rules::Builder[:msme_registered].eq_any(value: true)
+    action :editable, true
+    action :visible, true
+    action :active, true
+    action :required, true
   end
 
   # LDC Conditions
@@ -433,7 +446,6 @@ class Masters::Vendors::Form < Forms::API
     action :visible, false
     action :required, false
   end
-
   condition condition_id: "Enable Bank Accounts > Swift / BIC Code for International Vendors" do
     reference :entity, 'bank_accounts.swift_code'
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')

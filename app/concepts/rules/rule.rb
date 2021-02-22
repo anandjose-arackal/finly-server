@@ -21,40 +21,46 @@ class Rules::Rule
   def as_json(options = {})
     case options[:mode].to_s
     when 'json_logic'
-      Rules::Adapters::JSONLogic.as_json(self)
+      Rules::Adapters::JSONLogic.as_json(self, options)
     when 'ransack'
-      Rules::Adapters::Ransack.as_json(self)
+      Rules::Adapters::Ransack.as_json(self, options)
     else
-      Rules::Adapters::Store.as_json(self)
+      Rules::Adapters::Store.as_json(self, options)
     end
   end
 
   def as_store(options = {})
-    json = as_json(mode: 'store')
+    json = as_json(options.merge(mode: 'store'))
     unless json[:m].present?
-      json ={logic_type: "group", m: 'and', c: [json]}
+      json = { logic_type: "group", m: 'and', c: [json] }
     end
     json
   end
 
   def as_json_logic(options = {})
-    as_json(mode: 'json_logic')
+    as_json(options.merge(mode: 'json_logic'))
   end
 
   def as_ransack(options = {})
-    json = as_json(mode: 'ransack')
+    json = as_json(options.merge(mode: 'ransack'))
     if json[:m].present?
-      json = {g: {'0': json}}
+      json = { g: { '0': json } }
     else
-      json = {g: {'0': {logic_type: "group", m: 'and', c: {'0' => json}}}}
+      json = { g: { '0': { logic_type: "group", m: 'and', c: { '0' => json } } } }
     end
+    return json if options[:do_not_interpolate]
     return json unless options.has_key?(:data)
 
     data = options[:data] || {}
     LiquidHelper.interpolate(json, data).as_json
   end
 
-  def apply?(data)
-    JSONLogic.apply(as_json_logic, data)
+  def apply?(data, options = {})
+    data = data.with_indifferent_access unless data.is_a?(HashWithIndifferentAccess)
+    JSONLogic.apply(as_json_logic(options), data)
+  end
+
+  def valid?(options = {})
+    Rules::Adapters::JSONLogic.valid?(self, options)
   end
 end

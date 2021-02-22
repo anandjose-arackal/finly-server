@@ -20,6 +20,7 @@ class Docs::UtilityBills::Bills::Ops::SyncBillPrePayment < Transactions::API
   def validate(options, subscription:, bill:, biller:, **)
     if bill.blank? or subscription.blank? or biller.blank?
       add_message(options, :error, :base, "Bill or Subscription not found")
+      return false
     end
 
     # unless ["MANDATORY", "OPTIONAL"].include?(biller.fetch_requirement)
@@ -29,7 +30,7 @@ class Docs::UtilityBills::Bills::Ops::SyncBillPrePayment < Transactions::API
 
     if bill.expired? # todo check for expired? method
       add_message(options, :error, :base, "Bill has expired")
-      return
+      return false
     end
 
     new_bills = subscription.bbps_bills.where("created_at > ?", bill.created_at)
@@ -62,6 +63,12 @@ class Docs::UtilityBills::Bills::Ops::SyncBillPrePayment < Transactions::API
       op.error do |result|
         options['success'] = false
         options['result']['data'] = result
+        error_message = result["error_desc"]
+        
+        if error_message.present?
+          add_message options, :error, :base, error_message
+        end
+        return false
       end
 
       op.failure do |result|
@@ -69,6 +76,8 @@ class Docs::UtilityBills::Bills::Ops::SyncBillPrePayment < Transactions::API
 
         if error_message.present?
           add_message options, :error, :base, error_message
+        elsif result["error_desc"].present?
+          add_message options, :error, :base, result["error_desc"]
         else
           add_message options, :error, :base, "Unable to Reach BBPS; Please Retry Later"
         end
@@ -81,7 +90,7 @@ class Docs::UtilityBills::Bills::Ops::SyncBillPrePayment < Transactions::API
   def bill_validate(options, subscription)
     options['result'] = {}
     options['success'] = false
-    Bbps::BillValidation.call_async({params: subscription.generate_billfetch_params, current_user: User.first}, {wait: true}) do |op|
+    Bbps::BillValidation.call_async({params: subscription.generate_billfetch_params, current_user: User.first}, {wait: true, wait_timeout: 180.seconds}) do |op|
       op.success do |result|
         options['success'] = true
         options['result']['data'] = result

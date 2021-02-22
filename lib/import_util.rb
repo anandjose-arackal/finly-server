@@ -86,7 +86,7 @@ class ImportUtil
       sheet.rows.each_with_index do |row, index|
         next if index == 0
         new_hash = header.zip(row).to_h
-        new_hash.update(new_hash) { |key, value| val = cleanup_account_number_quickly(key, value); cleanup_email(val)}
+        new_hash.update(new_hash) { |key, value| val = cleanup_account_number(key, value); cleanup_email(val)}
         list << new_hash
       end
     end
@@ -112,11 +112,13 @@ class ImportUtil
       return raw_text
     end
     clean_text = raw_text
-    if clean_text.is_a?(Float) || clean_text.is_a?(Integer)
-      clean_text = clean_text&.to_i&.to_s if clean_text.is_a?(Integer)
+    if clean_text.is_a?(Float) || clean_text.is_a?(Integer) || clean_text.is_a?(BigDecimal)
+      clean_text = clean_text&.to_i&.to_s if clean_text.is_a?(Integer) || clean_text.is_a?(BigDecimal)
       clean_text = clean_text&.to_f&.to_s if clean_text.is_a?(Float)
     elsif clean_text.is_a?(Date)
       clean_text = clean_text.strftime("%d-%m-%Y")
+    elsif clean_text.is_a?(Rational)
+      clean_text = clean_text&.to_s&.split('/').first
     end
     character_array.each do |character|
       clean_text = clean_text.sub(character, '')

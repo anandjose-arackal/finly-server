@@ -36,9 +36,20 @@ class AnalyticsDashboard::Ops::Config < Transactions::API
           root: true
       },
       {
+        label: 'Document Workflows Actions',
+        cube: "DocumentWorkflowActions",
+        root: true,
+        associations: %w(Users Policies)
+      },
+      {
           label: 'Users',
           cube: "VpUsers",
           root: true
+      },
+      {
+        label: 'Users',
+        cube: "Users",
+        root: false
       },
       {
           label: 'Purchase Request Line Items',

@@ -7,6 +7,9 @@ class ExportManager::Template::Master::Invoices::Index < ExportManager::Builders
   subscribe 'invoice_line_items'
   default true
 
+  custom_fields :invoice, template_prefix: 'record.invoice'
+  form_custom_fields :invoices, template_prefix: 'record.invoice'
+
   attribute :finly_ref_no, template: '{{ record.invoice.invoice_id }}'
   attribute :po_number, template: '{{ record.invoice.po_number }}'
   attribute :invoice_type, template: '{{ record.invoice.invoice_type.name }}'

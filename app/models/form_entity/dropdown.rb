@@ -16,13 +16,20 @@ class FormEntity::DropDown < FormEntity
     end
   end
 
+  def populate(represented, value, input)
+    super
+    value = input["#{entity_key}_value"]
+    represented.form_data["#{entity_key}_value"] = value
+    represented.contract_root.form_data["#{entity_key}_value"] = value
+  end
+
   def self.option_validation
     Proc.new do
 
       property :choices, virtual: true
       property :choices_scope, deserializer: -> (input, represented, *args) do
         choices = input[:choices].filter {|item| !item[:_destroy]}
-        represented.choices_scope = Choices['list'].() unless represented.system_field
+        represented.choices_scope = Choices['list'].()
       end
 
       collection :choices, populate_if_empty: FormEntityChoice, populator: :choices! do
@@ -52,7 +59,7 @@ class FormEntity::DropDown < FormEntity
 
       validation :options_config do
         params do
-          # required(:choices) do
+           required(:choices)
           #   hash do
           #     required(:type).value(included_in?: ["enum", "resolver", "switch", "lookup", "list"])
           #   end
@@ -64,9 +71,12 @@ class FormEntity::DropDown < FormEntity
             end
           end
         end
-        # rule(:choices) do
-        #   key.failure("must be an array") unless value.is_a?(Array)
-        # end
+        rule(:choices) do
+          key.failure("must contain atleast one dropdown item") if value.empty?
+          choices = value.map{|ch| ch[:contract_row_input]&.[](:name)}&.compact
+          key.failure("cannot have duplicate dropdown item") if (choices.uniq.length != choices.length)
+        end
+
         rule(:options) do
           min = value[:min_items]
           max = value[:max_items]

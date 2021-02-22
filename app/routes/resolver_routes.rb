@@ -151,6 +151,7 @@ Resolver::Router.draw do
 
   scope :payments do
     route 'default', Docs::PaymentTickets::Payments::Resolver
+    route 'export', Docs::PaymentTickets::Payments::Export::Resolver
   end
 
   scope :upcoming_invoices do
