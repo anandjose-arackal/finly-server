@@ -33,6 +33,7 @@ class ExportManager::Template::Master::Invoices::Index < ExportManager::Builders
   attribute :invoice_discount, template: '{{ record.invoice.discount_amount_value }}'
   attribute :attachments, template: '{{ record.invoice.attachments }}'
   attribute :approval_pending_reviewers, template: '{{ record.invoice.approval_pending_reviewers }}'
+  attribute :erp_sync_reference, template: '{{ record.invoice.erp_sync_reference_id }}'
 
   attribute :vendor_name, template: '{{ record.invoice.vendor.display_name }}'
   attribute :vendor_ref_no, template: '{{ record.invoice.vendor.vendor_id }}'

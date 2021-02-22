@@ -46,4 +46,5 @@ class ExportManager::Template::Master::PaymentTickets::Index < ExportManager::Bu
   attribute :note, template: '{{ record.note }}'
   attribute :payment_status, template: '{{ record.status.name }}'
   attribute :error_message, template: '{{ record.error_message }}'
+  attribute :erp_sync_reference, template: '{{ record.erp_sync_reference_id }}'
 end
