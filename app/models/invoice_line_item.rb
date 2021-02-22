@@ -434,12 +434,13 @@ class InvoiceLineItem < ApplicationRecord
       amounts_attributes_map.each do |key, value|
         amount_value = self.send(key)
         amount_attr = self.send("#{value}_id")
+        reporting_currency_id = get_reporting_currency&.id || Currency.id_for("INR")
         if amount_attr.present?
-          Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: 1) # todo - I2P : Update value from base currency
+          Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: reporting_currency_id) # todo - I2P : Update value from base currency
         else
           self.assign_attributes(
               {
-                  "#{value}_id": Amount.create(value: amount_value, currency_id: 1).id
+                  "#{value}_id": Amount.create(value: amount_value, currency_id: reporting_currency_id).id
               }
           )
         end
@@ -455,7 +456,6 @@ class InvoiceLineItem < ApplicationRecord
         item_discount_amount: 'discount_amount',
         item_taxable_amount: 'taxable_amount',
         item_tax_amount: 'tax_amount',
-        # item_tds_amount: '',
         item_net_amount: 'net_amount',
         item_billable_amount: 'billable_amount'
     }

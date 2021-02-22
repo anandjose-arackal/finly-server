@@ -909,7 +909,6 @@ class Invoice < ApplicationRecord
           tax_type_id: self.tax_type_id.to_i,
           tds_type_id: self.tds_type_id.to_i,
           discount_amount: precision_value(self.discount_amount&.value.to_f),
-          # discount: precision_value(self.discount),
           discount: invoice_discount_rate,
           date: self.date,
           discount_type_id: self.discount_type_id.to_i,
@@ -925,7 +924,6 @@ class Invoice < ApplicationRecord
           editable: self.unpaid? || self.initiated? || self.partially_paid?,
           tax_rate: return_tax_rate,
           tds_rate: precision_value(self.tds_rate.to_i),
-          # discount_rate: precision_value(self.discount_rate),
           discount_rate: invoice_discount_rate,
           advance_rate: precision_value(self.advance_rate),
           invoice_attachment: {
@@ -945,9 +943,7 @@ class Invoice < ApplicationRecord
           category_id: self.category_id,
           category_name: self.category&.name,
           rcm_enabled: self.rcm_enabled,
-
           available_credits: self.vendor.credit_notes.filter_adjustables.joins(:net_adjustable_amount).sum(:value),
-
           credit_note_adjustments: self.credit_note_adjustments.as_json,
           cost_center_id: self.cost_center_id,
           cost_center_name: self.cost_center&.name,
@@ -973,7 +969,38 @@ class Invoice < ApplicationRecord
           payment_agreement_id: self.payment_agreement_id,
           created_from_payment_agreement: self.payment_agreement_id.present?,
           agreement_number: self&.payment_agreement&.get_agreement_number,
-          payable: self.payable
+          payable: self.payable,
+
+          invoice_gross_amount: self.invoice_gross_amount,
+          reporting_invoice_gross_amount: self.reporting_invoice_gross_amount,
+          invoice_discount_amount: self.invoice_discount_amount,
+          reporting_invoice_discount_amount: self.reporting_invoice_discount_amount,
+          invoice_tax_amount: self.invoice_tax_amount,
+          reporting_invoice_tax_amount: self.reporting_invoice_tax_amount,
+          invoice_tds_amount: self.invoice_tds_amount,
+          reporting_invoice_tds_amount: self.reporting_invoice_tds_amount,
+          invoice_freight_amount: self.invoice_freight_amount,
+          reporting_invoice_freight_amount: self.reporting_invoice_freight_amount,
+          invoice_taxable_amount: self.invoice_taxable_amount,
+          reporting_invoice_taxable_amount: self.reporting_invoice_taxable_amount,
+          invoice_roundoff_amount: self.invoice_roundoff_amount,
+          reporting_invoice_roundoff_amount: self.reporting_invoice_roundoff_amount,
+          invoice_balance_due: self.invoice_balance_due,
+          reporting_invoice_balance_due: self.reporting_invoice_balance_due,
+          invoice_sub_total_amount: self.invoice_sub_total_amount,
+          reporting_invoice_sub_total_amount: self.reporting_invoice_sub_total_amount,
+          invoice_advance_paid_amount: self.invoice_advance_paid_amount,
+          reporting_invoice_advance_paid_amount: self.reporting_invoice_advance_paid_amount,
+          invoice_total_amount: self.invoice_total_amount,
+          reporting_invoice_total_amount: self.reporting_invoice_total_amount,
+          invoice_net_total_amount: self.invoice_net_total_amount,
+          reporting_invoice_net_total_amount: self.reporting_invoice_net_total_amount,
+          invoice_paid_outside_amount: self.invoice_paid_outside_amount,
+          reporting_invoice_paid_outside_amount: self.reporting_invoice_paid_outside_amount,
+          base_currency: self.base_currency,
+          reporting_currency: self.reporting_currency,
+          conversion_rate: self.conversion_rate,
+          is_domestic: self.is_domestic
       }
     end
   end
@@ -1715,16 +1742,23 @@ class Invoice < ApplicationRecord
       amounts_attributes_map.each do |key, value|
         amount_value = self.send(key)
         amount_attr = self.send(value)
-        base_currency_id = get_base_currency&.id || Currency.id_for("INR")
+        reporting_currency_id = get_reporting_currency&.id || Currency.id_for("INR")
         if amount_attr.present?
-          Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: base_currency_id) # todo - I2P : Update value from base currency
+          Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: reporting_currency_id) # todo - I2P : Update value from base currency
         else
           self.assign_attributes(
               {
-                  "#{value}": Amount.create(value: amount_value, currency_id: base_currency_id).id
+                  "#{value}": Amount.create(value: amount_value, currency_id: reporting_currency_id).id
               }
           )
         end
+      end
+
+      amount_direct_attribute_map.each do |key, value|
+        amount_value = self.send(key)
+        self.assign_attributes({
+          "#{value}": amount_value
+        })
       end
       self.save
     end
@@ -1742,7 +1776,12 @@ class Invoice < ApplicationRecord
         reporting_invoice_sub_total_amount: 'net_amount_id',
         reporting_invoice_balance_due: 'balance_due_id',
         reporting_invoice_freight_amount: 'freight_amount_id'
+
     }
+  end
+
+  def amount_direct_attribute_map
+    {reporting_invoice_roundoff_amount: 'roundoff_amount'}
 
     # Invoice amount meanings. Picked from Invoice Calculation Utils
     # amount => raw amount, rate * qty

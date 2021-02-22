@@ -121,6 +121,44 @@ json.payments do
         json.discount_rate precision_value invoice.discount_rate
         json.advance_rate precision_value invoice.advance_rate
         json.invoice_id invoice.invoice_id
+
+        # json.reporting_currency @result.parent&.reporting_currency
+        # json.base_currency @result.parent&.base_currency
+        # json.conversion_rate @result.parent&.conversion_rate
+
+
+
+        json.invoice_gross_amount precision_value invoice&.invoice_gross_amount.to_f
+        json.reporting_invoice_gross_amount precision_value invoice&.reporting_invoice_gross_amount.to_f
+        json.invoice_discount_amount precision_value invoice&.invoice_discount_amount.to_f
+        json.reporting_invoice_discount_amount precision_value invoice&.reporting_invoice_discount_amount.to_f
+        json.invoice_tax_amount precision_value invoice&.invoice_tax_amount.to_f
+        json.reporting_invoice_tax_amount precision_value invoice&.reporting_invoice_tax_amount.to_f
+        json.invoice_tds_amount precision_value invoice&.invoice_tds_amount.to_f
+        json.reporting_invoice_tds_amount precision_value invoice&.reporting_invoice_tds_amount.to_f
+        json.invoice_freight_amount precision_value invoice&.invoice_freight_amount.to_f
+        json.reporting_invoice_freight_amount precision_value invoice&.reporting_invoice_freight_amount.to_f
+        json.invoice_taxable_amount precision_value invoice&.invoice_taxable_amount.to_f
+        json.reporting_invoice_taxable_amount precision_value invoice&.reporting_invoice_taxable_amount.to_f
+        json.invoice_roundoff_amount precision_value invoice&.invoice_roundoff_amount.to_f
+        json.reporting_invoice_roundoff_amount precision_value invoice&.reporting_invoice_roundoff_amount.to_f
+        json.invoice_balance_due precision_value invoice&.invoice_balance_due.to_f
+        json.reporting_invoice_balance_due precision_value invoice&.reporting_invoice_balance_due.to_f
+        json.invoice_sub_total_amount precision_value invoice&.invoice_sub_total_amount.to_f
+        json.reporting_invoice_sub_total_amount precision_value invoice&.reporting_invoice_sub_total_amount.to_f
+        json.invoice_advance_paid_amount precision_value invoice&.invoice_advance_paid_amount.to_f
+        json.reporting_invoice_advance_paid_amount precision_value invoice&.reporting_invoice_advance_paid_amount.to_f
+        json.invoice_total_amount precision_value invoice&.invoice_total_amount.to_f
+        json.reporting_invoice_total_amount precision_value invoice&.reporting_invoice_total_amount.to_f
+        json.invoice_net_total_amount precision_value invoice&.invoice_net_total_amount.to_f
+        json.reporting_invoice_net_total_amount precision_value invoice&.reporting_invoice_net_total_amount.to_f
+        json.invoice_paid_outside_amount precision_value invoice&.invoice_paid_outside_amount.to_f
+        json.reporting_invoice_paid_outside_amount precision_value invoice&.reporting_invoice_paid_outside_amount.to_f
+        json.base_currency invoice&.base_currency
+        json.reporting_currency invoice&.reporting_currency
+        json.conversion_rate invoice&.conversion_rate
+        json.is_domestic invoice&.is_domestic
+
         #############################
         json.invoice_attachment do
           json.url invoice.invoice_attachments.first&.attached_file&.url
