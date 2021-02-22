@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_14_124301) do
+ActiveRecord::Schema.define(version: 2021_02_22_150141) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -825,6 +825,7 @@ ActiveRecord::Schema.define(version: 2021_02_14_124301) do
     t.integer "expected_payments", default: 0
     t.string "ticket_type"
     t.integer "transfer_mode_id"
+    t.boolean "is_domestic", default: true
     t.index ["company_id", "controlling_level_id", "deleted_at"], name: "index_bpr_ct_lvl_cmpny_id"
     t.index ["company_id"], name: "index_bank_payment_requests_on_company_id"
     t.index ["controlling_level_id"], name: "index_bank_payment_requests_on_controlling_level_id"
@@ -5135,6 +5136,7 @@ ActiveRecord::Schema.define(version: 2021_02_14_124301) do
     t.decimal "item_billable_amount", precision: 20, scale: 5
     t.decimal "reporting_item_billable_amount", precision: 20, scale: 5
     t.string "tax_type", default: ""
+    t.decimal "item_rate", precision: 10, default: "0"
     t.index ["category_id"], name: "index_invoice_line_items_on_category_id"
     t.index ["department_id"], name: "index_invoice_line_items_on_department_id"
     t.index ["discount_amount_id"], name: "index_invoice_line_items_on_discount_amount_id"

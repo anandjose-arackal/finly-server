@@ -1767,21 +1767,22 @@ class Invoice < ApplicationRecord
   def amounts_attributes_map
     # todo - I2P change it to converted values post multicurrency setup
     {
-        reporting_invoice_gross_amount: 'amount_id',
-        reporting_invoice_discount_amount: 'discount_amount_id',
-        reporting_invoice_taxable_amount: 'gross_amount_id',
-        reporting_invoice_tax_amount: 'tax_amount_id',
-        reporting_invoice_tds_amount: 'tds_amount_id',
-        reporting_invoice_advance_paid_amount: 'advance_amount_id',
-        reporting_invoice_sub_total_amount: 'net_amount_id',
-        reporting_invoice_balance_due: 'balance_due_id',
-        reporting_invoice_freight_amount: 'freight_amount_id'
-
+      invoice_gross_amount: 'amount_id',
+      invoice_discount_amount: 'discount_amount_id',
+      invoice_taxable_amount: 'gross_amount_id',
+      invoice_tax_amount: 'tax_amount_id',
+      invoice_tds_amount: 'tds_amount_id',
+      invoice_advance_paid_amount: 'advance_amount_id',
+      invoice_sub_total_amount: 'net_amount_id',
+      invoice_balance_due: 'balance_due_id',
+      invoice_freight_amount: 'freight_amount_id'
     }
   end
 
   def amount_direct_attribute_map
-    {reporting_invoice_roundoff_amount: 'roundoff_amount'}
+    {
+      invoice_roundoff_amount: 'roundoff_amount'
+    }
 
     # Invoice amount meanings. Picked from Invoice Calculation Utils
     # amount => raw amount, rate * qty

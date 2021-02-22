@@ -226,17 +226,17 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
               required: true, editable: true, visible: true,
               computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.unit_of_measurement}}')
       
-      # number :item_rate,
-      #      label: "Payment Term Days",
-      #      computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.rate | default: 0}}'),
-      #      visible: false
+      number :item_rate,
+           label: "Item Rate",
+           computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.rate | default: 0}}'),
+           visible: true
 
       amount :rate, label: "Rate",
              can_editable_be_changed: false,
              can_visible_be_changed: false,
              required: true, visible: true, editable: true,
-             computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.rate | default: 0}}')
-             # computed: Forms::Compute::Form('{{ form.item_rate | divided_by: conversion_rate | round: 2 }}')
+             computed: Forms::Compute::Form('{{ items.item_rate | divided_by: form.conversion_rate | round: 2 }}')
+             # computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.rate | default: 0}}')
 
       # gross_amount = rate x quantity
       amount :item_gross_amount, label: 'Item Gross Amount(Base Currency)', editable: false, visible: false,
