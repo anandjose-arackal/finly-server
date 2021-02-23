@@ -60,7 +60,7 @@ class BbpsBillStatusChecker
             debit_transactions_count = FinlyTransaction.where(payment_id: payment.id, transaction_type_id: TransactionType.id_for(:debit)).count
             credit_transactions_count = FinlyTransaction.where(payment_id: payment.id, transaction_type_id: TransactionType.id_for(:credit)).count
 
-            if debit_transactions_count - credit_transactions_count == 1
+            if debit_transactions_count - credit_transactions_count >= 1
               adapter = AccountManager::Base.new()
               credit_adapter = adapter.send(:retrieve_adapter , payment.initiating_account, payment )
 
