@@ -40,6 +40,13 @@ class BbpsBillStatusChecker
               payment&.parent&.update(paid_at: parsed_datetime)
               payment&.parent&.subscription&.update(last_paid_at: parsed_datetime)
             end
+
+            payment.system_messages.destroy_all
+            payment.system_messages.create(
+              system_message_type_id: SystemMessageType.id_for(:success),
+              content: "Payment Successfully Completed."
+            )
+
           end
           op.error do |result|
             puts "Error: #{result}"
