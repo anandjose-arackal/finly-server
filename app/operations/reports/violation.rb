@@ -325,7 +325,7 @@ class Reports::Violation < Reports::Base
             end_date = date.end_of_week
           elsif rule.period_id == Period.id_for(:year)
             start_date = date.beginning_of_year + 3.month #to get fiscal year start
-            end_date = date.end_of_year
+            end_date = date.end_of_year+ 3.month #to get fiscal year ending
           elsif rule.period_id == Period.id_for(:quarter)
             start_date = date.beginning_of_quarter
             end_date = date.end_of_quarter
