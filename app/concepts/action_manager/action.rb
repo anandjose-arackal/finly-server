@@ -6,7 +6,7 @@ class ActionManager::Action
 
   attr_accessor :type, :id, :path, :parent, :action_registry, :action_scopes,
                 :permissions, :label, :icon, :policy, :authorize, :features,
-                :model, :format, :action_condition, :toggle
+                :model, :format, :action_condition, :toggle, :row
 
   class_attribute :registered_type
 
