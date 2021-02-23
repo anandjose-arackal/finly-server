@@ -109,6 +109,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         else
           payment.system_messages.build(content: 'Unable to reach bbps. Please try again later', system_message_type_id: SystemMessageType.id_for(:error)).save
         end
+        return false
       end
       op.failure do |result|
         puts "Failure:Result: #{result}"
