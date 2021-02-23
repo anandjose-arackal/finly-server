@@ -40,5 +40,4 @@ class ExportManager::Template::Master::Vendors::Index < ExportManager::Builders:
   #attribute :fourth_account_ifsc, template: '{{ record.bank_accounts[3].ifsc }}'
   attribute :created_at, template: "{{ record.created_at | date: '%d-%b-%Y' }}"
   attribute :active, template: '{% if record.deactivated %}FALSE{% else %}TRUE{% endif %}'
-  attribute :erp_sync_reference, template: '{{ record.erp_sync_reference_id }}'
 end

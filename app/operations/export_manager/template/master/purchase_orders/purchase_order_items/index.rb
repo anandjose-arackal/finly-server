@@ -58,5 +58,4 @@ class ExportManager::Template::Master::PurchaseOrders::PurchaseOrderItems::Index
   attribute :po_igst, template: '{{ record.purchase_order.igst_amount }}'
   attribute :po_purchase_address, template: '{{ record.purchase_order.billing_address }}'
   attribute :po_delivery_address, template: '{{ record.purchase_order.shipping_address }}'
-  attribute :erp_sync_reference, template: '{{ record.purchase_order.erp_sync_reference_id }}'
 end
