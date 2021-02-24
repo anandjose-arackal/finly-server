@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file. Always add 
 
 Updating the bbps status checker credit checks.
 Addition of success message in bbps status checker for successful payment.
+
+Adding bbps error message on failure.
 ## 2020-02-22
 
 ### Added

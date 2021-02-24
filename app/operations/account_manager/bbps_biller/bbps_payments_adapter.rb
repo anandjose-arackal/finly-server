@@ -105,8 +105,10 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         payment.update(payment_status_id: PaymentStatus.id_for(:failed))
         payment.system_messages.destroy_all
         if result["error_desc"].present?
+          self.errors << result['error_desc']
           payment.system_messages.build(content: result['error_desc'], system_message_type_id: SystemMessageType.id_for(:error)).save
         else
+          self.errors << 'Unable to reach bbps. Please try again later'
           payment.system_messages.build(content: 'Unable to reach bbps. Please try again later', system_message_type_id: SystemMessageType.id_for(:error)).save
         end
         return false
