@@ -55,7 +55,7 @@ class FormEntity::Number < FormEntity
   register :number
   set :hint, 'Enter value'
 
-  FORMAT = %w(number decimal percentage)
+  FORMAT ||= %w[number decimal percentage].freeze
 
   option :max_value
   option :min_value

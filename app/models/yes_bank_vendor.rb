@@ -52,6 +52,7 @@
 #  erp_sync_attempts_count  :integer          default(0)
 #  erp_sync_attempted_at    :datetime
 #  ldc_upper_limit_amount   :decimal(20, 5)
+#  is_workflow_v2           :boolean          default(FALSE)
 #
 
 class YesBankVendor < ApplicationRecord
@@ -272,6 +273,7 @@ class YesBankVendor < ApplicationRecord
         where(status_id: VendorStatus.ids_for(%i(approved auto_approved)))
   }
 
+  scope :validation_associated_items, -> { non_deleted.where.not(status_id: VendorStatus.ids_for(:rejected, :deactivated))}
   # Scopes for ordering ends
 
   before_validation do

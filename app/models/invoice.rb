@@ -148,6 +148,8 @@
 #  erp_sync_reference_id                 :text(65535)
 #  erp_sync_attempts_count               :integer          default(0)
 #  erp_sync_attempted_at                 :datetime
+#  approval_workflow_version             :integer
+#  is_workflow_v2                        :boolean          default(FALSE)
 #
 
 class Invoice < ApplicationRecord
