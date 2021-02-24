@@ -55,7 +55,7 @@ class FormEntity::Date < FormEntity
   register :date
   set :hint, "Select date"
 
-  RESTRICTIONS = %w(
+  RESTRICTIONS ||= %w(
     in_the_future
     in_the_past
     not_in_the_future
