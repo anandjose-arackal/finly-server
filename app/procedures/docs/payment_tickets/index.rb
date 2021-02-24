@@ -11,6 +11,7 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     text value: "{{record.name}}", format: 'primary'
   end
 
+
   column :created_at, sort: :created_at do
     date value: :created_at
   end
@@ -33,6 +34,10 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
 
   column :ticket_type, label: "Ticket Type", default: true do
     text value: :ticket_type
+  end
+
+  column :transaction_type, label: "Transaction Type", default: true do
+    text value: :pt_type
   end
 
   column :status, default: true, includes: [:status] do
@@ -127,6 +132,14 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     return 'Awaiting Approval' if context[:record].status_id == BankPaymentRequestStatus.id_for(:processing) and context[:record].controlling_user?(context[:user])
 
     context[:record].status_name(context[:user])&.titleize
+  end
+
+  def self.pt_type( context )
+    if context[:record].is_domestic 
+      'Domestic'
+    else
+      'International'
+    end
   end
 
   def self.format_status(context)
