@@ -271,6 +271,7 @@ class YesBankVendor < ApplicationRecord
         where(status_id: VendorStatus.ids_for(%i(approved auto_approved)))
   }
 
+  scope :validation_associated_items, -> { non_deleted.where.not(status_id: VendorStatus.ids_for(:rejected, :deactivated))}
   # Scopes for ordering ends
 
   before_validation do
