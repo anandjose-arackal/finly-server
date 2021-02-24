@@ -52,6 +52,7 @@
 #  erp_sync_attempts_count  :integer          default(0)
 #  erp_sync_attempted_at    :datetime
 #  ldc_upper_limit_amount   :decimal(20, 5)
+#  is_workflow_v2           :boolean          default(FALSE)
 #
 
 class YesBankVendor < ApplicationRecord
