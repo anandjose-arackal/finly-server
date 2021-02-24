@@ -119,11 +119,11 @@ module Rules::Predicates
   # end
 
   predicate :cont, any: true, all: true do |v, d|
-    Rules::Predicates.to_valid_format(v).each_cons(2).all? { |i, j| i.to_s.include?(j.to_s) } rescue false
+    v[0].include?(v[1]) rescue false
   end
 
   predicate :not_cont, any: true, all: true do |v, d|
-    Rules::Predicates.to_valid_format(v).each_cons(2).all? { |i, j| !i.to_s.include?(j.to_s) } rescue false
+    !v[0].include?(v[1]) rescue false
   end
 
   predicate :start do |v, d|
