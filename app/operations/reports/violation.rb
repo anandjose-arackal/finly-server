@@ -324,8 +324,8 @@ class Reports::Violation < Reports::Base
             start_date = date.beginning_of_week
             end_date = date.end_of_week
           elsif rule.period_id == Period.id_for(:year)
-            start_date = date.beginning_of_year + 3.month #to get fiscal year start
-            end_date = date.end_of_year+ 3.month #to get fiscal year ending
+            start_date = get_fiscal_year_start(date) #to get fiscal year start
+            end_date = get_fiscal_year_end(date) #to get fiscal year ending
           elsif rule.period_id == Period.id_for(:quarter)
             start_date = date.beginning_of_quarter
             end_date = date.end_of_quarter
@@ -438,6 +438,16 @@ class Reports::Violation < Reports::Base
     if expense.from_cash_on_hand && !expense.cash_on_hand_blocked
       self.warning_messages[expense.id]['expense_blocking'] << {type: 'cash_on_hand', message: "You do not have enough cash on hand to mark this expense against it"}
     end
+  end
+
+  def get_fiscal_year_start(date)
+    date = date.change(year: date.year - 1) if date.month < 4
+    date.change(month: 4).beginning_of_month
+  end
+
+  def get_fiscal_year_end(date)
+    date = date.change(year: date.year + 1) if date.month > 3
+    date.change(month: 3).end_of_month
   end
 
 end
