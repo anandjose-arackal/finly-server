@@ -6,6 +6,7 @@ ActionManager::Router.draw do
   end
 
   route 'companies', Companies::Action
+  route 'companies_row', Companies::RowAction
 
   # NavBar
   route 'procurement', Menu::Masters::Procurement
