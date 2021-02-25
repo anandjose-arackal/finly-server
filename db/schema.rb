@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_24_050448) do
+ActiveRecord::Schema.define(version: 2021_02_25_042837) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -5879,7 +5879,6 @@ ActiveRecord::Schema.define(version: 2021_02_24_050448) do
     t.string "track_schedule"
     t.integer "build_duration"
     t.datetime "tracked_at"
-    t.text "pmml", size: :long
     t.string "algorithm"
     t.string "target_key", null: false
     t.string "target_key_type", null: false
@@ -5889,6 +5888,10 @@ ActiveRecord::Schema.define(version: 2021_02_24_050448) do
     t.datetime "deleted_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "pmml_file_name"
+    t.string "pmml_content_type"
+    t.bigint "pmml_file_size"
+    t.datetime "pmml_updated_at"
     t.index ["built_at"], name: "index_ml_models_on_built_at"
     t.index ["company_id"], name: "index_ml_models_on_company_id"
     t.index ["created_at"], name: "index_ml_models_on_created_at"
