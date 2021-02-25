@@ -211,6 +211,11 @@ class UsersController < BaseControllers::WebBase
     respond
   end
 
+  def user_traits
+    @result = User::Traits.(current_user, params)
+    respond
+  end
+
   private
 
   def update_handler(type = nil)
