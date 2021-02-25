@@ -1,7 +1,7 @@
 class ExportManager::Template::Master::Inwards::Received::ReceivedItems::Index < ExportManager::Builders::Template
 
-  label 'Spreadsheet (Line Items)'
-  description 'Receipt Note Export (Line Items)'
+  label 'Spreadsheet Receipt Note(Line Items)'
+  description 'Receipt Note  (Line Items)'
   export_format 'xls'
   resource 'receipt_note_items'
   subscribe 'receipt_note_items'
