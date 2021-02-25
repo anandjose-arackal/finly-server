@@ -27,8 +27,6 @@
 #  pmml_file_size    :bigint
 #  pmml_updated_at   :datetime
 #
-require 'open-uri'
-
 class MlModel < ApplicationRecord
   include DynamicAttributes
   include MlModels::Schema
@@ -43,9 +41,6 @@ class MlModel < ApplicationRecord
 
   FIELD_TYPES = { number: 'number', text: 'text', category: 'category', datetime: 'datetime' }
   SCHEDULES = %w[hourly daily weekly monthly].freeze
-
-  has_attached_file :pmml, :use_timestamp => false
-  do_not_validate_attachment_file_type :pmml
 
   validates :algorithm, presence: { in: %w[naive_bayes] }, allow_nil: true
   validates :build_schedule, presence: { in: SCHEDULES }
@@ -82,12 +77,8 @@ class MlModel < ApplicationRecord
   def model
     return nil unless pmml.present?
 
-    url = pmml.url
-    url = "#{Rails.root}/public#{url}" if url.start_with?('/')
-    pmml_data = open(url) { |f| f.read }
-
     # TODO cache permanently
-    @model ||= Eps::Model.load_pmml(pmml_data)
+    @model ||= Eps::Model.load_pmml(pmml)
   end
 
   def build_model
@@ -95,10 +86,7 @@ class MlModel < ApplicationRecord
     return false if data.blank?
 
     model = Eps::Model.new(data, target: target_key, algorithm: algorithm.to_sym)
-
-    file = Paperclip::Tempfile.new(["model_#{company_id}_#{target_key}", '.xml'])
-    open(file.path, 'wb') { |f| f.write model.to_pmml }
-    return false unless update(pmml: file, built_at: DateTime.now)
+    return false unless update(pmml: model.to_pmml, built_at: DateTime.now)
 
     # Clear the cache
     @model = model
