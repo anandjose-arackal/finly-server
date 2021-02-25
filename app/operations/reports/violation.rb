@@ -441,13 +441,13 @@ class Reports::Violation < Reports::Base
   end
 
   def get_fiscal_year_start(date)
-    date = date.change(year: date.year - 1) if date.month < 4
-    date.change(month: 4).beginning_of_month
+    year = (date.month < 4 ?  (date.year - 1) : date.year )
+    Date.parse("01-Apr-#{year}")
   end
 
   def get_fiscal_year_end(date)
-    date = date.change(year: date.year + 1) if date.month > 3
-    date.change(month: 3).end_of_month
+    year = (date.month > 3 ?  (date.year + 1) : date.year )
+    Date.parse("31-Mar-#{year}")
   end
 
 end
