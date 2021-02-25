@@ -47,7 +47,6 @@ class MlModel < ApplicationRecord
   has_attached_file :pmml, :use_timestamp => false
   do_not_validate_attachment_file_type :pmml
 
-
   validates :algorithm, presence: { in: %w[naive_bayes] }, allow_nil: true
   validates :build_schedule, presence: { in: SCHEDULES }
   validates :track_schedule, presence: { in: SCHEDULES }, allow_nil: true
@@ -62,7 +61,7 @@ class MlModel < ApplicationRecord
   validate :validate_schema
 
   def records
-    Object.const_get(model_klass).all
+    Object.const_get(model_klass).all.where(company_id: company_id)
   end
 
   def prepare_record(record)
@@ -97,7 +96,7 @@ class MlModel < ApplicationRecord
 
     model = Eps::Model.new(data, target: target_key, algorithm: algorithm.to_sym)
 
-    file = Paperclip::Tempfile.new(['export', '.xml'])
+    file = Paperclip::Tempfile.new(["model_#{company_id}_#{target_key}", '.xml'])
     open(file.path, 'wb') { |f| f.write model.to_pmml }
     return false unless update(pmml: file, built_at: DateTime.now)
 
