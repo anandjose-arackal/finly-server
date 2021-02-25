@@ -176,6 +176,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
         add_message :error, "Invoice has been credited."
         return
       end
+      payable_amount = payable_amount * invoice.conversion_rate
       self.requested_amount += payable_amount
     end
   end

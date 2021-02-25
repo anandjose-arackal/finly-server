@@ -65,7 +65,9 @@ class Procurements::Invoices::Create < Procurements::Invoices::Base
     self.invoice.vendor_sequence_id = vendor&.vendor_id
     self.invoice.vendor_country = vendor&.vendor_country
     self.invoice.vendor_trade_name = vendor&.trade_name
+
     self.invoice.is_domestic = false if vendor&.vendor_country != 'India'
+
     self.invoice.payment_term_days = vendor&.payment_term&.days_after.to_i
     self.invoice.due_date = Date.today + vendor&.payment_term&.days_after.to_i.days
     self.invoice.reporting_currency = 'INR'
