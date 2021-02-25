@@ -49,7 +49,7 @@ RSpec.describe MlModel::Monitor, type: :model do
   let(:valid_data) {
     {
       company_id: company.id,
-      config: { fields: [{ name: 'vendor_id', type: 'category' }, { name: 'created_by_id', type: 'category' }] },
+      config: { fields: [{ name: 'vendor_id', type: 'category' }, { name: 'created_by_id', type: 'category', value: '{{record.created_by_id}}' }] },
       model_klass: "Invoice",
       build_schedule: 'weekly',
       target_key: 'policy_id',
