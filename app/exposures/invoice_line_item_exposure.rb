@@ -134,6 +134,10 @@ class InvoiceLineItemExposure < Exposures::API
     record.inventory_line_item&.item_code
   end
 
+  attribute :item_number do
+    record.inventory_line_item&.item_number
+  end
+
   attribute :total_amount, includes: [:parent, :amount, :inventory_line_item, :billable_amount, :amount] do
     if record.parent&.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)
       record.amount&.value.to_f

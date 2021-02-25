@@ -8,6 +8,9 @@ class Docs::UtilityBills::Bills::Ops::HandleFetchErrors < Transactions::API
     if error_message.present?
       options[:error_message] = error_message
       options[:bbps_response_messages] = YAML.load_file("#{Rails.root}/config/bbps_error.yml")
+    elsif params[:result]&.dig("error_desc").present?
+      options[:error_message] = params[:result]&.dig("error_desc")
+      options[:bbps_response_messages] = YAML.load_file("#{Rails.root}/config/bbps_error.yml")
     end
   end
 

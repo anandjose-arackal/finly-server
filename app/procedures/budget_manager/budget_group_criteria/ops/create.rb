@@ -17,8 +17,25 @@ class BudgetManager::BudgetGroupCriteria::Ops::Create < Transactions::API
 
   step :set_parent_criterium!
 
+  step :set_budget_associations!
+
   # below step persists the model
   step Contract::Persist()
+
+  def set_budget_associations!(options, params:, model:, current_user:, **)
+    budget_group = BudgetGroup.find(params&.dig("budget_group_criterion", "budget_group_id"))
+    budget_association_data = params&.dig("budget_group_criterion", "budget_group")
+    if budget_group.present? and budget_association_data.present?
+      budget_group.update_columns(
+        invoice: budget_association_data["invoice"] || false,
+        purchase_order: budget_association_data["purchase_order"] || false,
+        purchase_request: budget_association_data["purchase_request"] || false,
+        payment: budget_association_data["payment"] || false,
+        expense: budget_association_data["expense"] || false,
+      )
+    end
+    true
+  end
 
   def set_parent_criterium!(options, params:, model:, current_user:, **)
     budget_criterium = model

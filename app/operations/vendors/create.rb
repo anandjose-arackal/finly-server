@@ -25,7 +25,7 @@ class Vendors::Create < Vendors::Base
     self.override_vendor_id = StringUtils.to_bool(vendor_parameters[:override_vendor_id])
     # setting account owner type as vendor
 
-    self.all_result = GstinLocation.where(vendor_id: user.company.yes_bank_vendors.non_deleted.filter_active)
+    self.all_result = GstinLocation.where(vendor_id: user.company.yes_bank_vendors.validation_associated_items)
 
   end
 
@@ -144,6 +144,7 @@ class Vendors::Create < Vendors::Base
     gstins = []
 
     validate_duplicate_pan
+    validate_duplicate_gstin
 
     if vendor_parameters[:gstin_locations_attributes].present?
       vendor_parameters[:gstin_locations_attributes].each do |gstin_location|
