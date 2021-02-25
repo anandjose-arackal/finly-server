@@ -13,7 +13,6 @@
 #  track_schedule  :string(255)
 #  build_duration  :integer
 #  tracked_at      :datetime
-#  pmml            :text(4294967295)
 #  algorithm       :string(255)
 #  target_key      :string(255)      not null
 #  target_key_type :string(255)      not null
@@ -23,6 +22,7 @@
 #  deleted_at      :datetime
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
+#  pmml            :text(65535)
 #
 class MlModel < ApplicationRecord
   include DynamicAttributes
@@ -53,7 +53,7 @@ class MlModel < ApplicationRecord
   validate :validate_schema
 
   def records
-    Object.const_get(model_klass).all
+    Object.const_get(model_klass).all.where(company_id: company_id)
   end
 
   def prepare_record(record)
