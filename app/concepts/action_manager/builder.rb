@@ -6,6 +6,10 @@ module ActionManager::Builder
     params = options[:params]
     return unless permitted?(user)
 
+    if options[:record].present?
+      return unless action_allowed_for_record?(options[:record])
+    end
+
     map = {
         path: self.path,
         label: self.label,
