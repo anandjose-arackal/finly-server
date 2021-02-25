@@ -177,10 +177,10 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
         return
       end
       payable_amount = payable_amount * invoice.conversion_rate.to_f
-      Rails.logger.fatal "****************************************"
-      Rails.logger.fatal "#{invoice.conversion_rate.to_f}"
+      # Rails.logger.fatal "****************************************"
+      # Rails.logger.fatal "#{invoice.conversion_rate.to_f}"
 
-      Rails.logger.fatal "****************************************"
+      # Rails.logger.fatal "****************************************"
       self.requested_amount += payable_amount
     end
   end

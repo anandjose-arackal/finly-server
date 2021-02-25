@@ -238,10 +238,20 @@ class PaymentOrder < ApplicationRecord
   def update_processed_amount
     new_amount = self.payments.completed.joins(:amount).sum(:value)
     self.amount_processed&.update(value: new_amount)
+
+    parent_type = self.payments.first.parent.parent_type.downcase
+    if parent_type == 'invoice'
+      new_amount =  self.payments.completed.map{ |payment| payment.amount.value * payment.parent.conversion_rate }
+    end
+    self.amount_processed&.update(value: new_amount)
   end
 
   def update_requested_amount
     new_amount = self.payments.joins(:amount).sum(:value)
+    parent_type = self.payments.first.parent.parent_type.downcase
+    if parent_type == 'invoice'
+      new_amount =  self.payments.map{ |payment| payment.amount.value * payment.parent.conversion_rate }
+    end
     self.amount_requested&.update(value: new_amount)
   end
 
