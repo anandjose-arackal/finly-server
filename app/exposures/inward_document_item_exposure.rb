@@ -15,5 +15,7 @@ class InwardDocumentItemExposure < Exposures::API
   attribute :billable_amount, record_attribute: true
   attribute :order_amount, record_attribute: true
   attribute :previously_billed_amount, record_attribute: true
-  attribute :product_type_id, record_attribute: true
+  attribute :product_type, includes: [:product_type] do
+    record.product_type&.name&.titleize
+  end
 end

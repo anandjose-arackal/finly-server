@@ -12,5 +12,6 @@ class InwardDocumentExposure < Exposures::API
   attribute :procurement, record_attribute: true, exposure: true
   attribute :procurement_id, record_attribute: true
   attribute :vendor, record_attribute: true, exposure: true
+  attribute :user, record_attribute: true, exposure: true
 
 end
