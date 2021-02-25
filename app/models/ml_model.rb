@@ -53,7 +53,10 @@ class MlModel < ApplicationRecord
   validate :validate_schema
 
   def records
-    Object.const_get(model_klass).all.where(company_id: company_id)
+    records = Object.const_get(model_klass).all.where(company_id: company_id)
+    # This will limit the records to just the last 12 months
+    # records = records.where("#{split_key} > #{1.year.ago}") if split_key.present?
+    records
   end
 
   def prepare_record(record)
