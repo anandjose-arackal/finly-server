@@ -11,6 +11,7 @@ class PurchaseRequestExposure < Exposures::API
   attribute :cost_center, exposure: true, record_attribute: true
   attribute :total_amount, exposure: true, record_attribute: true
   attribute :created_by, exposure: true, record_attribute: :creator
+  attribute :created_by_id, record_attribute: :creator_id
   attribute :policy, exposure: true, record_attribute: true
   attribute :created_at, record_attribute: true
   attribute :updated_at, record_attribute: true
