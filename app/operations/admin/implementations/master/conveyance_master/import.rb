@@ -55,7 +55,7 @@ class Admin::Implementations::Master::ConveyanceMaster::Import < Admin::Implemen
   end
 
   def destroy_records(data)
-    distance_expense_params messages = set_params(data)
+    distance_expense_params, messages = set_params(data)
     unless messages.blank?
       return result false, messages.join(', ')
     end
