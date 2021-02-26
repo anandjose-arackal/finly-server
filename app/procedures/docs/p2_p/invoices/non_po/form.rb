@@ -35,7 +35,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
           invoice_freight_amount: "{{ form.invoice_freight_amount | default: 0 | round: 2}}",
           invoice_sub_total_amount: "{% assign inv_sub_total_amount = form.invoice_gross_amount | minus: form.invoice_discount_amount | plus: form.invoice_tax_amount | plus: form.invoice_freight_amount | minus: form.invoice_tds_amount | round: 2 %}{% if form.rcm_enabled == true  %}{{ inv_sub_total_amount | minus: form.invoice_tax_amount | default: 0 | round: 2}}{% else %}{{ inv_sub_total_amount | default: 0 | round: 2}}{% endif %}",
           # todo - Issue : Roundoff should be automatically calulated everytime user inputs something, even if its the round off itself
-          invoice_roundoff_amount: "{% assign amount = form.invoice_sub_total_amount | round %}{ % assign amount = amount | minus: form.invoice_sub_total_amount %}{% if form.reporting_currency  != form.base_currency  %}{ % assign amount = 0 %}{% endif %}{{ amount | default: 0 | round: 2 }}",
+          invoice_roundoff_amount: "{% assign amount = form.invoice_sub_total_amount | round %}{% assign amount = amount | minus: form.invoice_sub_total_amount %}{% if form.reporting_currency  != form.base_currency  %}{% assign amount = 0 %}{% endif %}{{ amount | default: 0 | round: 2 }}",
           invoice_total_amount: "{{ form.invoice_sub_total_amount | plus: form.invoice_roundoff_amount | default: 0 | round: 2}}",
           invoice_net_total_amount: "{{ form.invoice_total_amount | minus: form.invoice_paid_outside_amount | default: 0 | round: 2}}",
           # todo - will be shown on top of invoice and needs separate calculation
@@ -52,8 +52,8 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
           reporting_invoice_paid_outside_amount: "{{ form.invoice_paid_outside_amount | times: form.conversion_rate | default: 0 | round: 2}}",
           reporting_invoice_freight_amount: "{{ form.invoice_freight_amount | times: form.conversion_rate | default: 0 | round: 2}}",
           reporting_invoice_sub_total_amount: "{{ form.invoice_sub_total_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-          reporting_invoice_roundoff_amount: "{% assign amount = form.reporting_invoice_sub_total_amount | round %}{% assign amount = amount | minus: form.reporting_invoice_sub_total_amount %}{ % if form.reporting_currency != form.base_currency %}{% assign amount = 0 %}{% endif %}{{ amount | default: 0 | round: 2}}",
-          reporting_invoice_total_amount: "{% assign amount = form.reporting_invoice_sub_total_amount | plus: form.reporting_invoice_roundoff_amount % }{% if form.reporting_currency != form.base_currency %}{% assign amount = 0 %}{% endif %}{{ amount | default: 0 | round: 2 }}",
+          reporting_invoice_roundoff_amount: "{% assign amount = form.reporting_invoice_sub_total_amount | round %}{% assign amount = amount | minus: form.reporting_invoice_sub_total_amount %}{% if form.reporting_currency != form.base_currency %}{% assign amount = 0 %}{% endif %}{{ amount | default: 0 | round: 2}}",
+          reporting_invoice_total_amount: "{% assign amount = form.reporting_invoice_sub_total_amount | plus: form.reporting_invoice_roundoff_amount %}{% if form.reporting_currency != form.base_currency %}{% assign amount = 0 %}{% endif %}{{ amount | default: 0 | round: 2 }}",
           reporting_invoice_net_total_amount: "{{ form.reporting_invoice_total_amount | minus: form.reporting_invoice_paid_outside_amount | default: 0 | round: 2}}",
           reporting_invoice_advance_paid_amount: "{{ form.invoice_advance_paid_amount | times: form.conversion_rate | default: 0 | round: 2}}",
           reporting_invoice_balance_due: "{{ form.invoice_balance_due | times: form.conversion_rate | default: 0 | round: 2}}"
