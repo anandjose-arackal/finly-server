@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_22_150141) do
+ActiveRecord::Schema.define(version: 2021_02_25_180040) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -870,7 +870,7 @@ ActiveRecord::Schema.define(version: 2021_02_22_150141) do
   create_table "bbps_biller_subscriptions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "bbps_biller_id", null: false
     t.string "name", null: false
-    t.string "sequence_id", null: false
+    t.string "sequence_id", default: "", null: false
     t.integer "department_id"
     t.integer "cost_center_id"
     t.integer "location_id"
@@ -6435,6 +6435,8 @@ ActiveRecord::Schema.define(version: 2021_02_22_150141) do
     t.integer "bank_account_provider_id"
     t.datetime "deleted_at"
     t.integer "transfer_mode_id"
+    t.decimal "reporting_amount_processed", precision: 10, default: "0"
+    t.decimal "reporting_amount_requested", precision: 10, default: "0"
     t.index ["amount_processed_id"], name: "index_payment_orders_on_amount_processed_id"
     t.index ["amount_requested_id"], name: "index_payment_orders_on_amount_requested_id"
     t.index ["company_id"], name: "index_payment_orders_on_company_id"

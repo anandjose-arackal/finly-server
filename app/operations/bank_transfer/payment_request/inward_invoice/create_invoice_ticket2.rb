@@ -14,7 +14,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
                 :description, :bank_payment_request, :payable_amount,
                 :payment_request_params, :policy, :bank_payment_request_params, :payable_amounts, :requested_amount, :inward_invoices,
                 :payments, :invoices_params, :invoices_status, :transfer_mode_id, :transfer_mode,
-                :update_payable_for_invoices
+                :update_payable_for_invoices, :reporting_amount_requested
 
   class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2::BankPaymentRequestPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -69,6 +69,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
     # params[:payment_mode] = 'neft'
     # params[:invoices_attributes] = [{invoice_id: 40343, payable_amount: '1' }]
     self.payable_amounts = {}
+    self.reporting_amount_requested = 0
     self.requested_amount = 0
     ids = []
     self.invoices_status = {}
@@ -176,12 +177,13 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
         add_message :error, "Invoice has been credited."
         return
       end
-      payable_amount = payable_amount * invoice.conversion_rate.to_f
-      # Rails.logger.fatal "****************************************"
-      # Rails.logger.fatal "#{invoice.conversion_rate.to_f}"
 
-      # Rails.logger.fatal "****************************************"
+      reporting_payable_amount = payable_amount
+      reporting_payable_amount = payable_amount * invoice.conversion_rate.to_f
+
       self.requested_amount += payable_amount
+      self.reporting_amount_requested += reporting_payable_amount
+
     end
   end
 
@@ -319,7 +321,8 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
         payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
         application: RequestStore.store[:current_app],
         currency_id: 1,
-        scheduled_at: self.scheduled_at
+        scheduled_at: self.scheduled_at,
+        reporting_amount_requested: self.reporting_amount_requested
     }
     bank_payment_request_params = {
         owner_id: user.id,
