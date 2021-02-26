@@ -10,7 +10,6 @@ class ExportManager::Template::Master::Inwards::Received::ReceivedItems::Index <
   attribute :reference_number, template: '{{ record.inward_document.receipt_note_number }}'
   attribute :grn_number, template: '{{ record.inward_document.grn_number}}'
   attribute :delivery_date, template: '{{ record.inward_document.delivery_date }}'
-  attribute :document_number, template: '{{ record.inward_document.doc_number }}'
   attribute :po_number, template: ' {{ record.inward_document.purchase_order.po_number }} '
   attribute :receipt_note_added_by, template: '{{ record.inward_document.user.name }}'
   attribute :vendor_name, template: '{{ record.inward_document.vendor.display_name }}'
