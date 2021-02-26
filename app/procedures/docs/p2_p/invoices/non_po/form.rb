@@ -25,7 +25,6 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       },
       # INVOICE SUMMARY
       summary: {
-          
           invoice_gross_amount: "{% assign gross_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign gross_amount = gross_amount | plus: item.item_gross_amount %}{% endif %}{% endfor %}{{ gross_amount | default: 0 | round: 2 }}",
           total_line_item_discount_amount: "{% assign discount_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign discount_amount = discount_amount | plus: item.item_discount_amount %}{% endif %}{% endfor %}{{ discount_amount | default: 0 | round: 2 }}",
           overall_discount_amount: "{{ form.overall_discount_amount | default: 0 | round: 2 }}",
@@ -36,7 +35,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
           invoice_freight_amount: "{{ form.invoice_freight_amount | default: 0 | round: 2}}",
           invoice_sub_total_amount: "{% assign inv_sub_total_amount = form.invoice_gross_amount | minus: form.invoice_discount_amount | plus: form.invoice_tax_amount | plus: form.invoice_freight_amount | minus: form.invoice_tds_amount | round: 2 %}{% if form.rcm_enabled == true  %}{{ inv_sub_total_amount | minus: form.invoice_tax_amount | default: 0 | round: 2}}{% else %}{{ inv_sub_total_amount | default: 0 | round: 2}}{% endif %}",
           # todo - Issue : Roundoff should be automatically calulated everytime user inputs something, even if its the round off itself
-          invoice_roundoff_amount: "{% assign amount = form.invoice_sub_total_amount | round %}{ %  amount = amount | minus: form.invoice_sub_total_amount %}{% if accounting_details.reporting_currency  != accounting_details.base_currency  %}{ % amount = 0 %}{% endif %}{{ amount | default: 0 | round: 2 }}",
+          invoice_roundoff_amount: "{% assign amount = form.invoice_sub_total_amount | round %}{ %  amount = amount | minus: form.invoice_sub_total_amount %}{% if form.reporting_currency  != form.base_currency  %}{ % amount = 0 %}{% endif %}{{ amount | default: 0 | round: 2 }}",
           invoice_total_amount: "{{ form.invoice_sub_total_amount | plus: form.invoice_roundoff_amount | default: 0 | round: 2}}",
           invoice_net_total_amount: "{{ form.invoice_total_amount | minus: form.invoice_paid_outside_amount | default: 0 | round: 2}}",
           # todo - will be shown on top of invoice and needs separate calculation
@@ -53,8 +52,8 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
           reporting_invoice_paid_outside_amount: "{{ form.invoice_paid_outside_amount | times: form.conversion_rate | default: 0 | round: 2}}",
           reporting_invoice_freight_amount: "{{ form.invoice_freight_amount | times: form.conversion_rate | default: 0 | round: 2}}",
           reporting_invoice_sub_total_amount: "{{ form.invoice_sub_total_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-          reporting_invoice_roundoff_amount: "{% assign amount = form.reporting_invoice_sub_total_amount | round %}{% amount = amount | minus: form.reporting_invoice_sub_total_amount %}{ % if accounting_details.reporting_currency != accounting_details.base_currency %}{% amount = 0 %}{% endif %}{{ amount | default: 0 | round: 2}}",
-          reporting_invoice_total_amount: "{% assign amount = form.reporting_invoice_sub_total_amount | plus: form.reporting_invoice_roundoff_amount | default: 0 | round: 2}{% if accounting_details.reporting_currency != accounting_details.base_currency %}{% amount = 0 %}{% endif %}{{ amount }}",
+          reporting_invoice_roundoff_amount: "{% assign amount = form.reporting_invoice_sub_total_amount | round %}{% amount = amount | minus: form.reporting_invoice_sub_total_amount %}{ % if form.reporting_currency != form.base_currency %}{% amount = 0 %}{% endif %}{{ amount | default: 0 | round: 2}}",
+          reporting_invoice_total_amount: "{% assign amount = form.reporting_invoice_sub_total_amount | plus: form.reporting_invoice_roundoff_amount % }{% if form.reporting_currency != form.base_currency %}{% amount = 0 %}{% endif %}{{ amount | default: 0 | round: 2 }}",
           reporting_invoice_net_total_amount: "{{ form.reporting_invoice_total_amount | minus: form.reporting_invoice_paid_outside_amount | default: 0 | round: 2}}",
           reporting_invoice_advance_paid_amount: "{{ form.invoice_advance_paid_amount | times: form.conversion_rate | default: 0 | round: 2}}",
           reporting_invoice_balance_due: "{{ form.invoice_balance_due | times: form.conversion_rate | default: 0 | round: 2}}"
@@ -313,7 +312,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_visible_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_billable_amount])
 
-      amount :reporting_item_billable_amount, label: "Billable Amount(Reporting Currency)" , editable: false, visible: false,
+      amount :reporting_item_billable_amount, label: "Billable Amount(Reporting Currency)", editable: false, visible: false,
              can_visible_be_changed: false,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_billable_amount])
