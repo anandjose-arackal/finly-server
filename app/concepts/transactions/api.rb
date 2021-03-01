@@ -15,12 +15,6 @@ class Transactions::API < Trailblazer::Operation
 
   # Step options: :before, :after, :replace, :delete, :override
 
-  def self.FindForm(model: :model)
-    Transactions::Task.build id: "load_form" do |context, **|
-      context[:form] = context[model].form
-    end
-  end
-
   def self.AssignModelUser(key: :user)
     Transactions::Task.build id: "assign_model_user" do |context, **|
       context[:model].send("#{key}=", context[:current_user])

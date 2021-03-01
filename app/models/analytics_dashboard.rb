@@ -4,8 +4,8 @@
 #
 #  id                    :bigint           not null, primary key
 #  app                   :string(255)      not null
-#  company_id            :integer          not null
-#  created_by_id         :integer          not null
+#  company_id            :integer
+#  created_by_id         :integer
 #  name                  :string(255)      not null
 #  description           :text(65535)
 #  default               :boolean          default(FALSE)
