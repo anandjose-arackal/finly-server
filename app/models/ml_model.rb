@@ -81,6 +81,10 @@ class MlModel < ApplicationRecord
     @model ||= Eps::Model.load_pmml(pmml)
   end
 
+  def clear_model_cache
+    @model = nil
+  end
+
   def build_model
     data = prepare_data
     return false if data.blank?

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_25_111430) do
+ActiveRecord::Schema.define(version: 2021_02_26_112046) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -819,6 +819,15 @@ ActiveRecord::Schema.define(version: 2021_02_25_111430) do
     t.index ["controlling_level_id"], name: "index_bank_payment_requests_on_controlling_level_id"
     t.index ["controlling_user_id"], name: "index_bank_payment_requests_on_controlling_user_id"
     t.index ["created_at"], name: "index_bank_payment_requests_on_created_at"
+    t.index ["deleted_at", "owner_id"], name: "index_bpr_fields_5"
+    t.index ["deleted_at", "payment_order_id", "policy_id", "controlling_level_id", "company_id", "owner_id"], name: "index_bpr_awaiting_approval_fields"
+    t.index ["deleted_at", "payment_order_id", "policy_id", "controlling_level_id", "company_id", "owner_id"], name: "index_bpr_awaiting_approval_fields_4"
+    t.index ["deleted_at", "payment_order_id", "policy_id", "controlling_level_id", "company_id"], name: "index_bpr_awaiting_approval_fields_2"
+    t.index ["deleted_at", "policy_id", "controlling_level_id", "company_id"], name: "index_bpr_awaiting_approval_fields_3"
+    t.index ["deleted_at", "policy_id", "payment_order_id", "status_id", "owner_id"], name: "index_bpr_fields_2"
+    t.index ["deleted_at", "policy_id", "payment_order_id", "status_id"], name: "index_bpr_fields"
+    t.index ["deleted_at", "policy_id", "payment_order_id"], name: "index_bpr_fields_3"
+    t.index ["deleted_at", "policy_id", "status_id"], name: "index_bpr_fields_4"
     t.index ["owner_id"], name: "index_bank_payment_requests_on_owner_id"
     t.index ["requested_amount_id"], name: "index_bank_payment_requests_on_requested_amount_id"
     t.index ["status_id"], name: "index_bank_payment_requests_on_status_id"
@@ -858,7 +867,7 @@ ActiveRecord::Schema.define(version: 2021_02_25_111430) do
   create_table "bbps_biller_subscriptions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "bbps_biller_id", null: false
     t.string "name", null: false
-    t.string "sequence_id", null: false
+    t.string "sequence_id"
     t.integer "department_id"
     t.integer "cost_center_id"
     t.integer "location_id"
@@ -5395,6 +5404,11 @@ ActiveRecord::Schema.define(version: 2021_02_25_111430) do
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["company_id", "controlling_level_id", "deleted_at"], name: "index_invoice_ct_lvl_cmpny_id"
     t.index ["controlling_level_id"], name: "index_invoices_on_controlling_level_id"
+    t.index ["deleted_at", "company_id", "created_by_user_id", "invoice_type_id"], name: "index_invoice_awaiting_approval_fields_4"
+    t.index ["deleted_at", "company_id", "policy_id"], name: "index_invoice_awaiting_approval_fields_5"
+    t.index ["deleted_at", "invoice_status_id", "policy_id", "controlling_level_id", "company_id", "created_by_user_id", "invoice_type_id"], name: "index_invoice_awaiting_approval_fields_3"
+    t.index ["deleted_at", "invoice_status_id", "policy_id", "controlling_level_id", "company_id", "invoice_type_id"], name: "index_invoice_awaiting_approval_fields_2"
+    t.index ["deleted_at", "invoice_status_id", "policy_id", "controlling_level_id", "company_id"], name: "index_invoice_awaiting_approval_fields"
     t.index ["discount_type_id"], name: "index_invoices_on_discount_type_id"
     t.index ["gstin_location_id"], name: "index_invoices_on_gstin_location_id"
     t.index ["invoice_status_id"], name: "index_invoices_on_invoice_status_id"
@@ -6555,6 +6569,9 @@ ActiveRecord::Schema.define(version: 2021_02_25_111430) do
     t.index ["amount_processed_id"], name: "index_payment_orders_on_amount_processed_id"
     t.index ["amount_requested_id"], name: "index_payment_orders_on_amount_requested_id"
     t.index ["company_id"], name: "index_payment_orders_on_company_id"
+    t.index ["deleted_at", "payment_order_status_id"], name: "index_bpr_order_fields_2"
+    t.index ["deleted_at", "payment_purpose_id", "payment_order_status_id"], name: "index_bpr_order_fields"
+    t.index ["deleted_at", "payment_purpose_id"], name: "index_bpr_order_fields_3"
     t.index ["initiating_user_id"], name: "index_payment_orders_on_initiating_user_id"
     t.index ["payment_order_status_id"], name: "index_payment_orders_on_payment_order_status_id"
     t.index ["payment_purpose_id"], name: "index_payment_orders_on_payment_purpose_id"

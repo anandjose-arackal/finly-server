@@ -5,7 +5,7 @@ class IndexBuilder::RecordCount < IndexBuilder::StatusCount
   # in the absence of custom lambda logic, aggregate method count will call against collection
   def count(context, builder:, **)
     unless builder.try(:record_count)
-     context['counter'] = context['model.records'].non_deleted.count
+     context['counter'] = context['model.records'].non_deleted.select(:id).count
     else
       context['counter'] = builder.instance_exec context['model.records'], &builder.record_count
     end
