@@ -33,8 +33,15 @@ class MlModel::FormEntity < MlModel
   validates :form, presence: true
   validates :parent, presence: true
 
-  def self.system_model(form_entity_key:, dependent_entity_keys: [])
-    model = self.new
+  def self.system_model(model_klass:, form_entity_key:, dependent_entity_keys: [])
+    model = self.new(
+      build_schedule: 'weekly',
+      target_key: form_entity_key,
+      target_key_type: 'category',
+      split_key: 'submitted_at',
+      split_key_type: 'datetime',
+      model_klass: model_klass
+    )
     model.template_reference[:form_entity_key] = form_entity_key
     dependent_entity_keys.each do |dependent_entity_key|
       dependent_entity_mapping = model.dependent_entity_mappings.new

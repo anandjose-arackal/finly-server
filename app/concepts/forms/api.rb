@@ -59,7 +59,7 @@ class Forms::API
   def self.predict(entity_key, with: [])
     with = [with] if with.present? and not with.respond_to?(:each)
 
-    prediction = MlModel::FormEntity.system_model(form_entity_key: entity_key, dependent_entity_keys: with)
+    prediction = MlModel::FormEntity.system_model(model_klass: form.model, form_entity_key: entity_key, dependent_entity_keys: with)
 
     raise "Prediction #{entity_key} is not unique" if predictions[entity_key].present?
 
