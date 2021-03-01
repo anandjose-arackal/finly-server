@@ -89,5 +89,31 @@ class Forms::Template < Templates::API
         set :form_entity, entity
       end
     end
+
+    association :prediction_models do
+      matcher do |template, record|
+        record.entity.entity_path == template.template_reference[:form_entity_key]
+      end
+
+      clone do |builder_context|
+        set :company_id, builder_context.params[:company_id]
+        set :form, builder_context.root_record
+
+        path = builder_context.template.template_reference[:form_entity_key]
+        entity = builder_context.root_record.find_entity(path)
+        raise "Entity with path : #{path} not found" if entity.nil?
+        set :parent, entity
+
+        association :dependent_entity_mappings do |dependent_entity_context|
+          clone do
+            set :company_id, dependent_entity_context.params[:company_id]
+            set :form, dependent_entity_context.root_record
+            path = builder_context.template.template_reference[:form_entity_key]
+            entity = builder_context.root_record.find_entity(path)
+            set :form_entity, entity
+          end
+        end
+      end
+    end
   end
 end

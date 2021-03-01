@@ -25,4 +25,30 @@
 #  pmml            :text(65535)
 #
 class MlModel::FormEntity < MlModel
+  include TemplateClonable
+
+  belongs_to :form
+  has_many :dependent_entity_mappings, class_name: 'MlModelDependentEntity', foreign_key: :ml_model_id
+
+  validates :form, presence: true
+  validates :parent, presence: true
+
+  def self.system_model(form_entity_key:, dependent_entity_keys: [])
+    model = self.new
+    model.template_reference[:form_entity_key] = form_entity_key
+    dependent_entity_keys.each do |dependent_entity_key|
+      dependent_entity_mapping = model.dependent_entity_mappings.new
+      dependent_entity_mapping.template_reference[:form_entity_key] = dependent_entity_key
+    end
+    model
+  end
+
+  def prepare_record(record)
+    # Todo
+  end
+
+  def prepare_prediction(data)
+    # Todo
+  end
+
 end

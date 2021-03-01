@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_01_104324) do
+ActiveRecord::Schema.define(version: 2021_03_01_145655) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -5863,6 +5863,23 @@ ActiveRecord::Schema.define(version: 2021_03_01_104324) do
     t.datetime "deleted_at"
   end
 
+  create_table "ml_model_dependent_entities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.integer "company_id", null: false
+    t.integer "ml_model_id", null: false
+    t.string "form_id", null: false
+    t.string "dependent_entity_id", null: false
+    t.datetime "deleted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["company_id"], name: "index_ml_model_dependent_entities_on_company_id"
+    t.index ["created_at"], name: "index_ml_model_dependent_entities_on_created_at"
+    t.index ["deleted_at"], name: "index_ml_model_dependent_entities_on_deleted_at"
+    t.index ["dependent_entity_id"], name: "index_ml_model_dependent_entities_on_dependent_entity_id"
+    t.index ["form_id"], name: "index_ml_model_dependent_entities_on_form_id"
+    t.index ["ml_model_id"], name: "index_ml_model_dependent_entities_on_ml_model_id"
+    t.index ["updated_at"], name: "index_ml_model_dependent_entities_on_updated_at"
+  end
+
   create_table "ml_model_predictions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.integer "company_id", null: false
     t.bigint "ml_model_id"
@@ -5903,6 +5920,7 @@ ActiveRecord::Schema.define(version: 2021_03_01_104324) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.text "pmml"
+    t.string "form_id"
     t.index ["built_at"], name: "index_ml_models_on_built_at"
     t.index ["company_id"], name: "index_ml_models_on_company_id"
     t.index ["created_at"], name: "index_ml_models_on_created_at"

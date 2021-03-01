@@ -1,4 +1,5 @@
-Dir.glob(Rails.root.join('app/models/form_entity**/*.rb')).each {|f| require(f)}
+Dir.glob(Rails.root.join('app/models/form_entity**/*.rb')).each { |f| require(f) }
+
 class Forms::API
   include DynamicAttributes
 
@@ -8,13 +9,14 @@ class Forms::API
   class_attr :validations, default: {}
   class_attr :dependencies, default: {}
   class_attr :model
+  class_attr :predictions, default: {}
 
   def self.form
     @form ||= Form.new(klass_name: self, model: self.model)
   end
 
   def self.section(section_id, options = {}, &block)
-    section = form.sections.new({section_id: section_id}.merge(options))
+    section = form.sections.new({ section_id: section_id }.merge(options))
     section.instance_eval &block
   end
 
@@ -39,6 +41,7 @@ class Forms::API
     validations[validation.validation_id] = validation
     form.validations << validation
   end
+
   singleton_class.send(:alias_method, :validate, :validation)
 
   def self.choice_dependency(params = {}, &block)
@@ -51,6 +54,17 @@ class Forms::API
     end
     dependencies[dependency.dependency_id] = dependency
     form.choice_dependencies << dependency
+  end
+
+  def self.predict(entity_key, with: [])
+    with = [with] if with.present? and not with.respond_to?(:each)
+
+    prediction = MlModel::FormEntity.system_model(form_entity_key: entity_key, dependent_entity_keys: with)
+
+    raise "Prediction #{entity_key} is not unique" if predictions[entity_key].present?
+
+    predictions[entity_key] = prediction
+    form.prediction_models << prediction
   end
 
   # def self.find_entity(entity_path)

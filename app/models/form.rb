@@ -23,6 +23,7 @@ class Form < ApplicationRecord
   has_many :choice_dependencies, class_name: 'FormChoiceDependency'
   has_many :conditions, class_name: 'FormCondition'
   has_many :validations, class_name: 'FormEntityValidation'
+  has_many :prediction_models, class_name: 'MlModel::FormEntity'
 
   def find_entity(entity_path)
     entity_path = entity_path.to_s

@@ -73,7 +73,7 @@ class FormEntity < ApplicationRecord
   delegate :compute_lookup?, :compute_form?, to: :compute_type, allow_nil: true
   belongs_to :compute_lookup_entity, class_name: 'FormEntity', optional: true
 
-  has_one :prediction_model, class_name: 'MlModel::FormEntity', primary_key: :uuid
+  has_one :prediction_model, class_name: 'MlModel::FormEntity', primary_key: :uuid, as: :parent
   has_many :entities, class_name: 'FormEntity', foreign_key: :parent_id, primary_key: :uuid
   has_many :choices, class_name: 'FormEntityChoice', dependent: :destroy
   has_many :validations, class_name: 'FormEntityValidation'
