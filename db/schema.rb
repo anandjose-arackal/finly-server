@@ -9702,10 +9702,20 @@ ActiveRecord::Schema.define(version: 2021_03_01_104324) do
     t.index ["company_id", "user_transaction_id", "item_type", "parent_document_type"], name: "versions_index_company_item_type"
     t.index ["company_id"], name: "index_versions_on_company_id"
     t.index ["created_at"], name: "index_versions_on_created_at"
+    t.index ["created_by_id"], name: "index_versions_on_created_by_id"
     t.index ["deleted_at"], name: "index_versions_on_deleted_at"
+    t.index ["document_number"], name: "index_versions_on_document_number"
+    t.index ["event"], name: "index_versions_on_event"
+    t.index ["item_id"], name: "index_versions_on_item_id"
+    t.index ["item_subtype"], name: "index_versions_on_item_subtype"
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
+    t.index ["item_type"], name: "index_versions_on_item_type"
+    t.index ["parent_document_type"], name: "index_versions_on_parent_document_type"
     t.index ["transaction_id"], name: "index_versions_on_transaction_id"
+    t.index ["user_agent"], name: "index_versions_on_user_agent"
+    t.index ["user_ip"], name: "index_versions_on_user_ip"
     t.index ["user_transaction_id"], name: "index_versions_on_user_transaction_id"
+    t.index ["whodunnit"], name: "index_versions_on_whodunnit"
   end
 
   create_table "virtual_account_collect_trails", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
