@@ -1,3 +1,4 @@
+# Controller & Routes for the same to be migrated to VendorsController after the rollout has been done for all customers
 class VendorFormsController < BaseControllers::WebBase
 
   layout 'trailblazers'

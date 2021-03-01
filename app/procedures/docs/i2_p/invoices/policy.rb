@@ -1,0 +1,36 @@
+class Docs::I2P::Invoices::Policy < ApplicationPolicy
+
+  def create?
+    user.present?
+  end
+
+  def show?
+    user.present? &&
+        user.company.id == record.company_id
+
+    # todo - I2P check invoice permissions `app/operations/procurements/invoices/show.rb`
+  end
+
+  def update?
+    user.present?
+  end
+
+  def review?
+    return false if user.blank?
+
+    record.processing? && record.controlling_user?(user)
+  end
+
+  def take_control?
+    return false if user.blank?
+    return false if record.action_users(:approve).include?(user)
+
+    record.processing? && user.vendor_payment_admin? && (record.dlrms&.find_by(level_id: record.level&.id)&.taken_control_by_id != user.id rescue false)
+  end
+
+  def erp_sync?
+    # Limiting it to admins only as this
+    user.admin?(:vp)
+  end
+
+end

@@ -98,14 +98,14 @@ class BankTransfer::InwardInvoices::Base < BankTransfer::Base
 
   def fetch_budget_contributions(inward_invoice)
     if user.company.enforce_budget_configuration.enforce_invoice_budget?
-      op = BudgetManager::BudgetLimitValidator::Invoice.({ invoice: inward_invoice, ignore_unbudgetables: true, current_user: user })
+      op = BudgetManager::BudgetLimitValidator::Invoice.({invoice: inward_invoice, ignore_unbudgetables: true, current_user: user})
       self.budget_contributions_before_update = op['result'][:budget_contributions] rescue {}
     end
   end
 
   def budget_limit_validation(inward_invoice)
     if user.company.enforce_budget_configuration.enforce_invoice_budget?
-      return BudgetManager::BudgetLimitValidator::Invoice.({ invoice: inward_invoice, previous_budget_contributions: self.budget_contributions_before_update, current_user: user })
+      return BudgetManager::BudgetLimitValidator::Invoice.({invoice: inward_invoice, previous_budget_contributions: self.budget_contributions_before_update, current_user: user})
     end
   end
 end

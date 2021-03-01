@@ -63,7 +63,7 @@ json.tds_slabs do
     end
 end
 
-json.tax_rates @result.tax_rates
+json.tax_rates @result.tax_rates.non_deleted
 
 json.tabs @result.tabs
 json.invoice_custom_fields_config @result.custom_fields_config[:invoice]

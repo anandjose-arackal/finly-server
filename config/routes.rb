@@ -4183,9 +4183,10 @@ Rails.application.routes.draw do
     put 'submit', to: "vendor_forms#submit"
   end
 
-
   ######### New Vendor Empanelment Ends ##
-
+  ######### NEW INVOICE FORMS ###################
+  post 'invoice_forms/save_and_submit', to: "invoice_forms#save_and_submit"
+  resources :invoice_forms, only: [:show, :update]
 
   ######### Rate Contract API start #############
   resources :rate_contracts do
@@ -4375,6 +4376,9 @@ Rails.application.routes.draw do
       resources :credit_notes, only: [:index]
     end
   end
+
+  get 'exchange_rate', to: 'exchange_rates#get_rate'
+
 
 
   get 'lookup/:route', to: 'lookup#route'
