@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_26_112046) do
+ActiveRecord::Schema.define(version: 2021_03_01_104324) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -460,8 +460,8 @@ ActiveRecord::Schema.define(version: 2021_02_26_112046) do
 
   create_table "analytics_dashboards", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "app", null: false
-    t.integer "company_id", null: false
-    t.integer "created_by_id", null: false
+    t.integer "company_id"
+    t.integer "created_by_id"
     t.string "name", null: false
     t.text "description"
     t.boolean "default", default: false
@@ -9701,8 +9701,11 @@ ActiveRecord::Schema.define(version: 2021_02_26_112046) do
     t.index ["company_id", "event", "parent_document_type"], name: "versions_event_company_id"
     t.index ["company_id", "user_transaction_id", "item_type", "parent_document_type"], name: "versions_index_company_item_type"
     t.index ["company_id"], name: "index_versions_on_company_id"
+    t.index ["created_at"], name: "index_versions_on_created_at"
+    t.index ["deleted_at"], name: "index_versions_on_deleted_at"
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
     t.index ["transaction_id"], name: "index_versions_on_transaction_id"
+    t.index ["user_transaction_id"], name: "index_versions_on_user_transaction_id"
   end
 
   create_table "virtual_account_collect_trails", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
