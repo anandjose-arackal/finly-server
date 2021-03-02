@@ -731,12 +731,9 @@ class Invoice < ApplicationRecord
   ransack_scopes :with_status_id
   ransack_scopes :with_status_ids
 
-  def form
+  def form_klass
     invoice_type = self.invoice_type.name.to_sym
-    Form.find_by(
-      klass_name: Forms::Router.klass(invoice_type)&.name,
-      company_id: self.company_id
-    )
+    Forms::Router.klass(invoice_type)&.name
   end
 
   def policy

@@ -7,10 +7,14 @@ module FormsHelper
     end
   end
 
-  def form
-    raise "Could not retrieve form" if self.company_id.blank?
+  def form_klass
+    self.class.name
+  end
 
-    Form.find_by(klass_name: self.class.name, company_id: self.company_id)
+  def form
+    raise 'Could not retrieve form' if self.company_id.blank?
+
+    Form.find_by(klass_name: form_klass, company_id: self.company_id)
   end
 
   private
