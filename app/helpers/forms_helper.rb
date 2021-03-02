@@ -12,7 +12,7 @@ module FormsHelper
   end
 
   def form
-    raise "Could not retrieve form" if self.company_id.blank?
+    raise 'Could not retrieve form' if self.company_id.blank?
 
     Form.find_by(klass_name: form_klass, company_id: self.company_id)
   end
