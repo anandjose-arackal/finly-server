@@ -731,6 +731,14 @@ class Invoice < ApplicationRecord
   ransack_scopes :with_status_id
   ransack_scopes :with_status_ids
 
+  def form
+    invoice_type = self.invoice_type.name.to_sym
+    Form.find_by(
+      klass_name: Forms::Router.klass(invoice_type)&.name,
+      company_id: self.company_id
+    )
+  end
+
   def policy
     return super if self.policy_id.present?
     # self.payments&.first&.payment_order&.bank_payment_request&.policy
