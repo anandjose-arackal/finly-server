@@ -5,9 +5,8 @@ class Companies::RowAction < ActionManager::API
            label: 'Disable',
            url: 'companies/{{record.id}',
            method: :patch,
-           authorize: :update?,
-           permissions: :admin,
-           record_condition: :is_active?
+           authorize: :disable?,
+           permissions: :admin
   end
 
   def self.is_active?(record)
