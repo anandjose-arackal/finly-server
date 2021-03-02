@@ -6,6 +6,10 @@ class Companies::Actions::Index::Row < ActionManager::API
            url: 'companies/{{record.id}',
            method: :patch,
            authorize: :disable?,
-           permissions: :admin
+           permissions: :admin,
+           body: {
+             active: false,
+           },
+           confirmation: "Are you sure you want to disable this entity?"
   end
 end
