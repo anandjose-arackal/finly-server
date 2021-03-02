@@ -1,4 +1,4 @@
-class Companies::RowAction < ActionManager::API
+class Companies::Actions::Index::Row < ActionManager::API
   scope policy: Companies::Policy, model: Company do
     action :api_request,
            :disable,
@@ -7,9 +7,5 @@ class Companies::RowAction < ActionManager::API
            method: :patch,
            authorize: :disable?,
            permissions: :admin
-  end
-
-  def self.is_active?(record)
-    return record.active?
   end
 end
