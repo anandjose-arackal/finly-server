@@ -82,6 +82,8 @@ class Routers::Base
 
       route_splits = route_key.split(".")
       required_key_splits = required_key.split(".")
+      next unless route_splits.count == required_key_splits.count
+
       route_splits.each_with_index do |val, index|
         match = false
         match = true if val == required_key_splits[index]
