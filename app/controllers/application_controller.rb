@@ -498,13 +498,13 @@ class ApplicationController < ActionController::Base
     return unless current_user
     return unless current_user.is_a?(User)
     ElasticAPM.set_user(current_user)
-    ElasticAPM.set_tag(:company_id, current_user.company_id)
-    ElasticAPM.set_tag(:company_name, current_user.company_name)
-    ElasticAPM.set_tag(:user_id, current_user.id)
-    ElasticAPM.set_tag(:user_name, current_user.name)
-    ElasticAPM.set_tag(:app, current_app)
-    ElasticAPM.set_tag(:device, current_device)
-    ElasticAPM.set_tag(:view, params&.dig(:view))
+    ElasticAPM.set_label(:company_id, current_user.company_id)
+    ElasticAPM.set_label(:company_name, current_user.company_name)
+    ElasticAPM.set_label(:user_id, current_user.id)
+    ElasticAPM.set_label(:user_name, current_user.name)
+    ElasticAPM.set_label(:app, current_app)
+    ElasticAPM.set_label(:device, current_device)
+    ElasticAPM.set_label(:view, params&.dig(:view))
   end
 
   def after_finly_authorize
