@@ -2,33 +2,35 @@
 #
 # Table name: payment_orders
 #
-#  id                        :integer          not null, primary key
-#  scheduled_at              :date
-#  processed_at              :datetime
-#  initiating_user_id        :integer          not null
-#  payment_order_status_id   :integer          not null
-#  payment_file_file_name    :string(255)
-#  payment_file_content_type :string(255)
-#  payment_file_file_size    :integer
-#  payment_file_updated_at   :datetime
-#  company_id                :integer          not null
-#  amount_requested_id       :integer
-#  amount_processed_id       :integer
-#  note                      :text(65535)
-#  created_at                :datetime         not null
-#  updated_at                :datetime         not null
-#  initiating_account_type   :string(255)
-#  receiving_account_type    :string(255)
-#  payment_purpose_id        :integer          not null
-#  currency_id               :integer          not null
-#  application               :string(255)
-#  payment_mode              :string(255)
-#  post_operation            :text(65535)
-#  post_operation_payload    :text(65535)
-#  api_initiated             :boolean          default(FALSE)
-#  bank_account_provider_id  :integer
-#  deleted_at                :datetime
-#  transfer_mode_id          :integer
+#  id                         :integer          not null, primary key
+#  scheduled_at               :date
+#  processed_at               :datetime
+#  initiating_user_id         :integer          not null
+#  payment_order_status_id    :integer          not null
+#  payment_file_file_name     :string(255)
+#  payment_file_content_type  :string(255)
+#  payment_file_file_size     :integer
+#  payment_file_updated_at    :datetime
+#  company_id                 :integer          not null
+#  amount_requested_id        :integer
+#  amount_processed_id        :integer
+#  note                       :text(65535)
+#  created_at                 :datetime         not null
+#  updated_at                 :datetime         not null
+#  initiating_account_type    :string(255)
+#  receiving_account_type     :string(255)
+#  payment_purpose_id         :integer          not null
+#  currency_id                :integer          not null
+#  application                :string(255)
+#  post_operation             :text(65535)
+#  post_operation_payload     :text(65535)
+#  payment_mode               :string(255)
+#  api_initiated              :boolean          default(FALSE)
+#  bank_account_provider_id   :integer
+#  deleted_at                 :datetime
+#  transfer_mode_id           :integer
+#  reporting_amount_processed :decimal(10, )    default(0)
+#  reporting_amount_requested :decimal(10, )    default(0)
 #
 
 class PaymentOrder < ApplicationRecord

@@ -1,3 +1,15 @@
+# == Schema Information
+#
+# Table name: tax_types
+#
+#  id           :bigint           not null, primary key
+#  country_name :string(255)      default("")
+#  name         :string(255)      default("")
+#  tax_name     :string(255)      default("")
+#  deleted_at   :datetime
+#  created_at   :datetime         not null
+#  updated_at   :datetime         not null
+#
 class TaxType < ApplicationRecord
   TAXTYPE = [
     {country_name:"india", name: 'IGST', tax_name: 'igst' },
