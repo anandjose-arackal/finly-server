@@ -1,3 +1,14 @@
+# == Schema Information
+#
+# Table name: units
+#
+#  id         :bigint           not null, primary key
+#  name       :string(255)      default("")
+#  value      :string(255)      default("")
+#  deleted_at :datetime
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
 class Unit < ApplicationRecord
   Units = [
     {value:"BOU", name: 'BOU'},
