@@ -6,7 +6,7 @@ class ActionManager::Action
 
   attr_accessor :type, :id, :path, :parent, :action_registry, :action_scopes,
                 :permissions, :label, :icon, :policy, :authorize, :features,
-                :model, :format, :action_condition, :toggle, :record_condition
+                :model, :format, :action_condition, :toggle
 
   class_attribute :registered_type
 
@@ -145,12 +145,6 @@ class ActionManager::Action
     return false if action_condition.present? and not Transactions::Evaluator.eval(action_registry, action_condition, context)
 
     true
-  end
-
-  def action_allowed_for_record?(record)
-    return true unless record_condition.present?
-
-    Transactions::Evaluator.eval(action_registry, record_condition, record)
   end
 
   # def actions

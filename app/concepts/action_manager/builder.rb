@@ -7,7 +7,7 @@ module ActionManager::Builder
     return unless permitted?(user)
 
     if options[:record].present?
-      return unless action_allowed_for_record?(options[:record])
+      return unless authorized?(options)
     end
 
     map = {
