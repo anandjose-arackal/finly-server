@@ -3,19 +3,23 @@ class Companies::Policy < ApplicationPolicy
   # TODO: update this to check for org admin role
 
   def create?
-    true 
+    user.admin?
   end
 
   def update?
-    true 
+    user.admin?
   end
 
   def index?
-    true 
+    user.admin?
   end
 
   def show?
-    true 
+    user.admin?
+  end
+
+  def disable?
+    update? && record&.active?
   end
 
 end
