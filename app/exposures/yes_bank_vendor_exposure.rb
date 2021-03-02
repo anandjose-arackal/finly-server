@@ -1,5 +1,6 @@
 class YesBankVendorExposure < Exposures::API
-
+  include Concerns::ErpSyncConcern
+  
   attribute :id, record_attribute: true
   attribute :name, record_attribute: true
   attribute :email, record_attribute: true

@@ -1,5 +1,6 @@
 class PaymentExposure < Exposures::API
-
+  include Concerns::ErpSyncConcern
+  
   attribute :id, record_attribute: true
   attribute :date, record_attribute: true
   attribute :narration, record_attribute: true

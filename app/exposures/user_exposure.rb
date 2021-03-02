@@ -1,5 +1,7 @@
 class UserExposure < Exposures::API
 
+  include Concerns::ErpSyncConcern
+  
   attribute :id, record_attribute: true
   attribute :name, record_attribute: true
   attribute :first_name, record_attribute: true
