@@ -10,6 +10,10 @@ class Admin::CompanyGroups::Ops::Index < IndexBuilder::API
     text value: "{{record.name}}"
   end
 
+  column :subdomain, default: true do
+    text value: :subdomain
+  end
+
   column :created_at, default: true do
     date value: :created_at
   end
