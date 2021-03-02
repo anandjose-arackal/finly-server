@@ -1,5 +1,9 @@
 json.id @result.company.id
 json.name @result.company.name
+json.company_group do
+  json.id @result.company.group.id
+  json.name @result.company.group.name
+end
 json.d_code @result.company.d_code
 json.logo @result.company.configuration.logo.url(:thumb)
 json.legal_entity_name @result.company.configuration.legal_entity_name
