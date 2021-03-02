@@ -341,6 +341,6 @@ group :test do
 end
 
 group :production do
-  gem 'elastic-apm', '~> 2.8.1'
+  gem 'elastic-apm', '~> 3.13.0'
   # gem 'scout_apm', '~> 2.4'
 end
