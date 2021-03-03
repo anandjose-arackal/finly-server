@@ -110,6 +110,9 @@ class FieldConfiguration < ApplicationRecord
 
   default_scope {unscope(:where).order(sequence_number: :asc, id: :asc)}
 
+  after_save :set_field_key
+  after_save :update_export_templates!
+
   def validate_config
     case field_type_id
     when FieldType.id_for(:drop_down)
@@ -270,6 +273,18 @@ class FieldConfiguration < ApplicationRecord
     end
     if self.configurable_type&.downcase == 'policy' and self.policy_field_mappings.blank?
       errors.add(:at_least, "one policy is required to create a custom field")
+    end
+  end
+
+  def set_field_key
+    if field_key.blank?
+      self.update_columns(field_key: self.field_name.gsub('-', ' ').parameterize(separator: "_"))
+    end
+  end
+
+  def update_export_templates!
+    if company.present? and company.users.first.present? and ExportManagerToggle.new(company.users.first).templates_enabled?
+      Company::Setup.({ company: company })
     end
   end
 

@@ -42,13 +42,20 @@ class Exposures::API < Liquid::Drop
 
   # Handle custom_fields keys as methods
   def method_missing(method)
-    if methods.include? :custom_fields
-      custom_fields.each do |cf|
-        if cf.field_key == method.to_s
-          return cf.string_value
-        end
+    if record.respond_to? :custom_fields
+      custom_field = record.custom_fields.joins(:field_configuration).where("field_configurations.field_key = ?", method.to_s).first
+      if custom_field.present?
+        return custom_field.string_value
       end
     end
+
+    if record.respond_to? :form_custom_fields
+      custom_field = record.form_custom_fields.joins(:form_entity).where("form_entities.entity_key = ?", method.to_s).first
+      if custom_field.present?
+        return custom_field.retrieve_text_value
+      end
+    end
+
     super
   end
 

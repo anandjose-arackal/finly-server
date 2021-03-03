@@ -26,6 +26,7 @@ set :crono_role, :crono_role
 set :balance_poller_role, :poller_role
 set :transaction_poller_role, :poller_role
 set :usage_tracker_role, :poller_role
+set :puma_service_unit_name, 'puma'
 # role-based syntax
 # ==================
 

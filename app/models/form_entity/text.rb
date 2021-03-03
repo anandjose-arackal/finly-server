@@ -53,7 +53,7 @@
 
 class FormEntity::Text < FormEntity
 
-  FORMAT ||= %w(text email).freeze
+  FORMAT ||= %w[text email].freeze
 
   register :text
   simple_filter :cont_any

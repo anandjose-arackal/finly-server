@@ -38,6 +38,7 @@ data.ms/
 config/searchkick.yml
 config/cubejs.yml
 config/mailtrain.yml
+config/open_exchange_rates.yml
 
 # .rubocop.yml
 .vscode/

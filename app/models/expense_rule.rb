@@ -60,7 +60,7 @@ class ExpenseRule < ApplicationRecord
   def rule_in_words
     rule_in_words = "Expenses"
 
-    if self.category_id
+    if self.category.present?
       rule_in_words += " belonging to category "
       if self.category.parent.present?
         rule_in_words += "#{self.category.parent.name} - "

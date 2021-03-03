@@ -9,6 +9,8 @@ gem 'wkhtmltopdf-binary', '0.12.5'
 gem 'nokogiri', '~> 1.10.0'
 gem 'autoprefixer-rails', '~> 9.4.4'
 
+gem 'eps', '~> 0.3'
+
 gem 'fiscali', '~> 2.4'
 gem 'redis', '~> 4.1'
 gem 'parslet', '~> 1.8.2'
@@ -343,6 +345,6 @@ group :test do
 end
 
 group :production do
-  gem 'elastic-apm', '~> 2.8.1'
+  gem 'elastic-apm', '~> 3.13.0'
   # gem 'scout_apm', '~> 2.4'
 end

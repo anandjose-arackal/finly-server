@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_25_111815) do
+ActiveRecord::Schema.define(version: 2021_03_01_104324) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -460,8 +460,8 @@ ActiveRecord::Schema.define(version: 2021_01_25_111815) do
 
   create_table "analytics_dashboards", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "app", null: false
-    t.integer "company_id", null: false
-    t.integer "created_by_id", null: false
+    t.integer "company_id"
+    t.integer "created_by_id"
     t.string "name", null: false
     t.text "description"
     t.boolean "default", default: false
@@ -844,6 +844,15 @@ ActiveRecord::Schema.define(version: 2021_01_25_111815) do
     t.index ["controlling_level_id"], name: "index_bank_payment_requests_on_controlling_level_id"
     t.index ["controlling_user_id"], name: "index_bank_payment_requests_on_controlling_user_id"
     t.index ["created_at"], name: "index_bank_payment_requests_on_created_at"
+    t.index ["deleted_at", "owner_id"], name: "index_bpr_fields_5"
+    t.index ["deleted_at", "payment_order_id", "policy_id", "controlling_level_id", "company_id", "owner_id"], name: "index_bpr_awaiting_approval_fields"
+    t.index ["deleted_at", "payment_order_id", "policy_id", "controlling_level_id", "company_id", "owner_id"], name: "index_bpr_awaiting_approval_fields_4"
+    t.index ["deleted_at", "payment_order_id", "policy_id", "controlling_level_id", "company_id"], name: "index_bpr_awaiting_approval_fields_2"
+    t.index ["deleted_at", "policy_id", "controlling_level_id", "company_id"], name: "index_bpr_awaiting_approval_fields_3"
+    t.index ["deleted_at", "policy_id", "payment_order_id", "status_id", "owner_id"], name: "index_bpr_fields_2"
+    t.index ["deleted_at", "policy_id", "payment_order_id", "status_id"], name: "index_bpr_fields"
+    t.index ["deleted_at", "policy_id", "payment_order_id"], name: "index_bpr_fields_3"
+    t.index ["deleted_at", "policy_id", "status_id"], name: "index_bpr_fields_4"
     t.index ["owner_id"], name: "index_bank_payment_requests_on_owner_id"
     t.index ["requested_amount_id"], name: "index_bank_payment_requests_on_requested_amount_id"
     t.index ["status_id"], name: "index_bank_payment_requests_on_status_id"
@@ -883,6 +892,7 @@ ActiveRecord::Schema.define(version: 2021_01_25_111815) do
   create_table "bbps_biller_subscriptions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "bbps_biller_id", null: false
     t.string "name", null: false
+    t.string "sequence_id"
     t.integer "department_id"
     t.integer "cost_center_id"
     t.integer "location_id"
@@ -3480,6 +3490,7 @@ ActiveRecord::Schema.define(version: 2021_01_25_111815) do
     t.datetime "status_changed_at"
     t.integer "document_workflow_version_id", null: false
     t.text "message"
+    t.integer "completion_percentage"
     t.index ["active"], name: "index_document_workflow_record_mappings_on_active"
     t.index ["company_id"], name: "index_document_workflow_record_mappings_on_company_id"
     t.index ["created_at"], name: "index_document_workflow_record_mappings_on_created_at"
@@ -3503,7 +3514,6 @@ ActiveRecord::Schema.define(version: 2021_01_25_111815) do
 
   create_table "document_workflow_user_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.integer "company_id", null: false
-    t.integer "created_by_id", null: false
     t.integer "mapping_type_id", null: false
     t.integer "block_id", null: false
     t.text "criteria"
@@ -3515,7 +3525,6 @@ ActiveRecord::Schema.define(version: 2021_01_25_111815) do
     t.index ["block_id"], name: "index_document_workflow_user_mappings_on_block_id"
     t.index ["company_id"], name: "index_document_workflow_user_mappings_on_company_id"
     t.index ["created_at"], name: "index_document_workflow_user_mappings_on_created_at"
-    t.index ["created_by_id"], name: "index_document_workflow_user_mappings_on_created_by_id"
     t.index ["deleted_at"], name: "index_document_workflow_user_mappings_on_deleted_at"
     t.index ["mapping_type_id"], name: "index_document_workflow_user_mappings_on_mapping_type_id"
     t.index ["updated_at"], name: "index_document_workflow_user_mappings_on_updated_at"
@@ -3530,7 +3539,7 @@ ActiveRecord::Schema.define(version: 2021_01_25_111815) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "created_by_id", null: false
-    t.string "version", null: false
+    t.string "version_id"
     t.index ["company_id"], name: "index_document_workflow_versions_on_company_id"
     t.index ["created_at"], name: "index_document_workflow_versions_on_created_at"
     t.index ["deleted_at"], name: "index_document_workflow_versions_on_deleted_at"
@@ -3548,6 +3557,10 @@ ActiveRecord::Schema.define(version: 2021_01_25_111815) do
     t.datetime "deleted_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "title", null: false
+    t.text "description"
+    t.integer "priority", default: 0
+    t.string "workflow_id"
     t.index ["company_id"], name: "index_document_workflows_on_company_id"
     t.index ["created_at"], name: "index_document_workflows_on_created_at"
     t.index ["created_by_id"], name: "index_document_workflows_on_created_by_id"
@@ -5513,9 +5526,16 @@ ActiveRecord::Schema.define(version: 2021_01_25_111815) do
     t.text "erp_sync_reference_id"
     t.integer "erp_sync_attempts_count", default: 0
     t.datetime "erp_sync_attempted_at"
+    t.integer "approval_workflow_version"
+    t.boolean "is_workflow_v2", default: false
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["company_id", "controlling_level_id", "deleted_at"], name: "index_invoice_ct_lvl_cmpny_id"
     t.index ["controlling_level_id"], name: "index_invoices_on_controlling_level_id"
+    t.index ["deleted_at", "company_id", "created_by_user_id", "invoice_type_id"], name: "index_invoice_awaiting_approval_fields_4"
+    t.index ["deleted_at", "company_id", "policy_id"], name: "index_invoice_awaiting_approval_fields_5"
+    t.index ["deleted_at", "invoice_status_id", "policy_id", "controlling_level_id", "company_id", "created_by_user_id", "invoice_type_id"], name: "index_invoice_awaiting_approval_fields_3"
+    t.index ["deleted_at", "invoice_status_id", "policy_id", "controlling_level_id", "company_id", "invoice_type_id"], name: "index_invoice_awaiting_approval_fields_2"
+    t.index ["deleted_at", "invoice_status_id", "policy_id", "controlling_level_id", "company_id"], name: "index_invoice_awaiting_approval_fields"
     t.index ["discount_type_id"], name: "index_invoices_on_discount_type_id"
     t.index ["gstin_location_id"], name: "index_invoices_on_gstin_location_id"
     t.index ["invoice_status_id"], name: "index_invoices_on_invoice_status_id"
@@ -6133,6 +6153,61 @@ ActiveRecord::Schema.define(version: 2021_01_25_111815) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
+  end
+
+  create_table "ml_model_predictions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.integer "company_id", null: false
+    t.bigint "ml_model_id"
+    t.string "record_type"
+    t.bigint "record_id"
+    t.string "actual_value"
+    t.string "predicted_value"
+    t.boolean "is_accurate_prediction"
+    t.datetime "deleted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["company_id"], name: "index_ml_model_predictions_on_company_id"
+    t.index ["created_at"], name: "index_ml_model_predictions_on_created_at"
+    t.index ["deleted_at"], name: "index_ml_model_predictions_on_deleted_at"
+    t.index ["ml_model_id"], name: "index_ml_model_predictions_on_ml_model_id"
+    t.index ["record_type", "record_id"], name: "index_ml_model_predictions_on_record_type_and_record_id"
+    t.index ["updated_at"], name: "index_ml_model_predictions_on_updated_at"
+  end
+
+  create_table "ml_models", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.integer "company_id", null: false
+    t.string "parent_type"
+    t.bigint "parent_id"
+    t.string "type", null: false
+    t.text "config", size: :long
+    t.datetime "built_at"
+    t.string "build_schedule"
+    t.string "track_schedule"
+    t.integer "build_duration"
+    t.datetime "tracked_at"
+    t.string "algorithm"
+    t.string "target_key", null: false
+    t.string "target_key_type", null: false
+    t.string "split_key"
+    t.string "split_key_type"
+    t.string "model_klass"
+    t.datetime "deleted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.text "pmml"
+    t.index ["built_at"], name: "index_ml_models_on_built_at"
+    t.index ["company_id"], name: "index_ml_models_on_company_id"
+    t.index ["created_at"], name: "index_ml_models_on_created_at"
+    t.index ["deleted_at"], name: "index_ml_models_on_deleted_at"
+    t.index ["model_klass"], name: "index_ml_models_on_model_klass"
+    t.index ["parent_type", "parent_id"], name: "index_ml_models_on_parent_type_and_parent_id"
+    t.index ["split_key"], name: "index_ml_models_on_split_key"
+    t.index ["split_key_type"], name: "index_ml_models_on_split_key_type"
+    t.index ["target_key"], name: "index_ml_models_on_target_key"
+    t.index ["target_key_type"], name: "index_ml_models_on_target_key_type"
+    t.index ["tracked_at"], name: "index_ml_models_on_tracked_at"
+    t.index ["type"], name: "index_ml_models_on_type"
+    t.index ["updated_at"], name: "index_ml_models_on_updated_at"
   end
 
   create_table "money_request_actions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -6798,6 +6873,9 @@ ActiveRecord::Schema.define(version: 2021_01_25_111815) do
     t.index ["amount_processed_id"], name: "index_payment_orders_on_amount_processed_id"
     t.index ["amount_requested_id"], name: "index_payment_orders_on_amount_requested_id"
     t.index ["company_id"], name: "index_payment_orders_on_company_id"
+    t.index ["deleted_at", "payment_order_status_id"], name: "index_bpr_order_fields_2"
+    t.index ["deleted_at", "payment_purpose_id", "payment_order_status_id"], name: "index_bpr_order_fields"
+    t.index ["deleted_at", "payment_purpose_id"], name: "index_bpr_order_fields_3"
     t.index ["initiating_user_id"], name: "index_payment_orders_on_initiating_user_id"
     t.index ["payment_order_status_id"], name: "index_payment_orders_on_payment_order_status_id"
     t.index ["payment_purpose_id"], name: "index_payment_orders_on_payment_purpose_id"
@@ -10056,8 +10134,21 @@ ActiveRecord::Schema.define(version: 2021_01_25_111815) do
     t.index ["company_id", "event", "parent_document_type"], name: "versions_event_company_id"
     t.index ["company_id", "user_transaction_id", "item_type", "parent_document_type"], name: "versions_index_company_item_type"
     t.index ["company_id"], name: "index_versions_on_company_id"
+    t.index ["created_at"], name: "index_versions_on_created_at"
+    t.index ["created_by_id"], name: "index_versions_on_created_by_id"
+    t.index ["deleted_at"], name: "index_versions_on_deleted_at"
+    t.index ["document_number"], name: "index_versions_on_document_number"
+    t.index ["event"], name: "index_versions_on_event"
+    t.index ["item_id"], name: "index_versions_on_item_id"
+    t.index ["item_subtype"], name: "index_versions_on_item_subtype"
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
+    t.index ["item_type"], name: "index_versions_on_item_type"
+    t.index ["parent_document_type"], name: "index_versions_on_parent_document_type"
     t.index ["transaction_id"], name: "index_versions_on_transaction_id"
+    t.index ["user_agent"], name: "index_versions_on_user_agent"
+    t.index ["user_ip"], name: "index_versions_on_user_ip"
+    t.index ["user_transaction_id"], name: "index_versions_on_user_transaction_id"
+    t.index ["whodunnit"], name: "index_versions_on_whodunnit"
   end
 
   create_table "virtual_account_collect_trails", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -10320,6 +10411,7 @@ ActiveRecord::Schema.define(version: 2021_01_25_111815) do
     t.integer "erp_sync_attempts_count", default: 0
     t.datetime "erp_sync_attempted_at"
     t.decimal "ldc_upper_limit_amount", precision: 20, scale: 5
+    t.boolean "is_workflow_v2", default: false
     t.index ["company_id", "controlling_level_id", "deleted_at"], name: "index_vendors_ct_lvl_cmpny_id"
     t.index ["company_id"], name: "index_yes_bank_vendors_on_company_id"
     t.index ["name"], name: "index_yes_bank_vendors_on_name"
@@ -10544,6 +10636,7 @@ ActiveRecord::Schema.define(version: 2021_01_25_111815) do
   add_foreign_key "manager_summary_mail_configs", "users"
   add_foreign_key "manual_expenses", "expenses"
   add_foreign_key "mcc_category_mappings", "categories"
+  add_foreign_key "ml_model_predictions", "ml_models"
   add_foreign_key "money_request_comments", "expenses"
   add_foreign_key "money_request_comments", "money_requests"
   add_foreign_key "money_request_comments", "payments"

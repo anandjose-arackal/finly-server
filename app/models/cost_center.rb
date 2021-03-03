@@ -58,6 +58,12 @@ include Searchkick::Api
 
   scope :with_company_id, -> (company_id) { where company_id: company_id }
 
+  scope :get_leaves, -> {
+    all_child_ids = self.pluck(:ancestry).compact
+    related_parents_ids  = all_child_ids.map{|p_id| p_id.split("/")}.flatten.uniq
+    self.select {|cost_center| related_parents_ids.exclude?(cost_center.id.to_s)}
+  }
+
   def as_json(options={})
     {
         id: id,
