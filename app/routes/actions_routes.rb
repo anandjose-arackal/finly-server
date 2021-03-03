@@ -3,6 +3,7 @@ ActionManager::Router.draw do
   scope 'admin' do
     route 'macros', Admin::Masters::Macros::Action
     route 'macro_jobs', Admin::Masters::Macros::Jobs::Action
+    route 'company_groups', Admin::CompanyGroups::Action
   end
 
   route 'companies', Companies::Actions::Index
