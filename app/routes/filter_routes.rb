@@ -3,6 +3,7 @@ Filters::Router.draw do
   scope :admin do
     route 'macros', Admin::Masters::Macros::FilterConfig
     route 'macro_jobs', Admin::Masters::Macros::Jobs::FilterConfig
+    route 'company_groups', Admin::CompanyGroups::FilterConfig
   end
 
   # Master
