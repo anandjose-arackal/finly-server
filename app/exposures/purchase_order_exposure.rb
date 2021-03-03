@@ -1,4 +1,5 @@
 class PurchaseOrderExposure < Exposures::API
+  include Concerns::ErpSyncConcern
 
   attribute :id, record_attribute: true
   attribute :procurement_id, record_attribute: true

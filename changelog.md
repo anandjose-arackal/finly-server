@@ -22,6 +22,8 @@ Adding bbps error message on failure.
  - Addition of success message in bbps status checker for successful payment.
 ## 2020-02-22
 
+## 2020-03-02
+ - Adding erp sync details for payment, user, and purchase_order exposure
 ### Added
 
 - `commit-msg` git hook to check branch name and commit message conventions.
