@@ -17,4 +17,8 @@ class Admin::CompanyGroupsController < BaseControllers::AdminBase
     endpoint Admin::CompanyGroups::Ops::Show
   end
 
+  def lookup
+    endpoint Admin::CompanyGroups::Ops::Lookup
+  end
+
 end

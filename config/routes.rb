@@ -3909,6 +3909,7 @@ Rails.application.routes.draw do
     get 'filters', to: "filters#index"
     get 'views', to: "index_view_segments#index"
 
+    get 'company_groups/lookup', to: "company_groups#lookup"
     resources :company_groups, only: [:create, :update, :index, :show]
   end
 
