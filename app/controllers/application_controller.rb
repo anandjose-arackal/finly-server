@@ -39,8 +39,9 @@ class ApplicationController < ActionController::Base
   ####################
   def info_for_paper_trail
 
-    hash = { user_ip: request.remote_ip, user_agent: request.user_agent , company_id: current_user&.company_id, created_by_id: current_user&.id , user_transaction_id: AuditTrail.generate_transaction_id}
+    hash = { user_ip: request.remote_ip, user_agent: request.user_agent, company_id: current_user&.company_id, created_by_id: current_user&.id, user_transaction_id: AuditTrail.generate_transaction_id }
   end
+
   ####################
   # handles 404 errors
   def not_found
@@ -64,12 +65,12 @@ class ApplicationController < ActionController::Base
     # store last url - this is needed for post-login redirect to whatever the user last visited.
     return unless request.get?
     if request.path != "/users/sign_in" &&
-        request.path != "/users/sign_up" &&
-        request.path != "/users/password/new" &&
-        request.path != "/users/password/edit" &&
-        request.path != "/users/confirmation" &&
-        request.path != "/users/sign_out" &&
-        !request.xhr? # don't store ajax calls
+      request.path != "/users/sign_up" &&
+      request.path != "/users/password/new" &&
+      request.path != "/users/password/edit" &&
+      request.path != "/users/confirmation" &&
+      request.path != "/users/sign_out" &&
+      !request.xhr? # don't store ajax calls
       session[:previous_url] = request.fullpath
     end
   end
@@ -288,7 +289,7 @@ class ApplicationController < ActionController::Base
   def respond_failure(message = nil)
     messages = nil
     messages = [message] unless message.blank? or message.is_a?(Array)
-    @result = BaseOperation::BasePresenter::FailurePresenter.new(current_user, params, {error: messages})
+    @result = BaseOperation::BasePresenter::FailurePresenter.new(current_user, params, { error: messages })
     respond_to do |format|
       format.json { render "layouts/application" }
     end
@@ -357,20 +358,20 @@ class ApplicationController < ActionController::Base
     return if current_user.nil?
 
     Raven.user_context(
-        id: current_user&.id,
-        name: current_user&.name,
-        email: current_user&.email,
-        company_id: current_company&.id,
-        company_name: current_company&.name,
-        session_id: RequestStoreUtil.current_session&.id
+      id: current_user&.id,
+      name: current_user&.name,
+      email: current_user&.email,
+      company_id: current_company&.id,
+      company_name: current_company&.name,
+      session_id: RequestStoreUtil.current_session&.id
     ) # or anything else in session
     Raven.extra_context(
-        params: params.to_unsafe_h,
-        url: request.url,
-        app: RequestStoreUtil.current_app,
-        device: RequestStoreUtil.current_device,
-        admin_user_id: RequestStoreUtil.current_admin_user&.id,
-        is_admin_login: RequestStoreUtil.current_admin_user.present?
+      params: params.to_unsafe_h,
+      url: request.url,
+      app: RequestStoreUtil.current_app,
+      device: RequestStoreUtil.current_device,
+      admin_user_id: RequestStoreUtil.current_admin_user&.id,
+      is_admin_login: RequestStoreUtil.current_admin_user.present?
     )
   end
 
@@ -427,6 +428,12 @@ class ApplicationController < ActionController::Base
 
     return false unless user_session.authorized?
     ["otp/resend", "otp/verify", "users/password", "notifications/unread"].each { |path| return false if request.path.include?(path) }
+
+    # Todo this is a temporary hack
+    # expired, otp verified and user session verified will be false for users who authenticate via SSO
+    # This will have to be handled when working on SSO
+    return true user_session.access_token&.authentication_type == 'sso'
+
     return false if current_user.expired?
     return false unless current_user.otp_verified
     return false unless user_session.verified?
