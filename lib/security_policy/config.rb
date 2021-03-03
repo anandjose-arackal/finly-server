@@ -5,7 +5,7 @@ class SecurityPolicy::Config
           client: {otp_verify: true},
           ip: {otp_verify: true},
           user_agent: {otp_verify: true},
-          inactivity_timeout: 30.minutes,
+          inactivity_timeout: 1.hours,
           concurrent_logins: 2
       },
       password: {
@@ -28,7 +28,7 @@ class SecurityPolicy::Config
           client: {otp_verify: false},
           ip: {otp_verify: false},
           user_agent: {otp_verify: false},
-          inactivity_timeout: 1.hours,
+          inactivity_timeout: 2.hours,
           concurrent_logins: 10
       },
       password: {
