@@ -51,7 +51,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
         self.sub_departments = purchase_order.user.company.departments.leaves
       end
 
-      self.cost_centers = user.company.cost_centers.non_deleted.leaves
+      self.cost_centers = user.company.cost_centers.non_deleted.get_leaves
       self.tax_rates = user.company.tax_rates
       self.tds_slabs = TdsSlabs::Index.(user, params)
 
