@@ -51,8 +51,7 @@ class PaymentExposure < Exposures::API
     when 'CardTransaction'
       record.reference_resource&.reference_id
     when  'YesBankTransaction'
-      # (record.utr.present? ? record&.utr : record.reference_resource&.bank_reference_number)
-      record.reference_resource&.bank_reference_number
+      record.utr
     when 'IciciBankTransaction', 'KotakBankTransaction'
       #record.reference_resource&.utr
       record.utr
