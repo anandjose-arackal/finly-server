@@ -37,6 +37,7 @@
 #  expected_payments            :integer          default(0)
 #  ticket_type                  :string(255)
 #  transfer_mode_id             :integer
+#  is_domestic                  :boolean          default(TRUE)
 #
 
 class BankPaymentRequest < ApplicationRecord

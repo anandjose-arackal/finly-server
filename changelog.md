@@ -20,10 +20,17 @@ Adding bbps error message on failure.
 ## 2020-02-23
  - Updating the bbps status checker credit checks.
  - Addition of success message in bbps status checker for successful payment.
+
 ## 2020-02-22
 
 ## 2020-03-02
  - Adding erp sync details for payment, user, and purchase_order exposure
+
+## 2020-03-04
+- Add index to statements finly_account
+- Reduce the number of columns in payments index as it was having a very slow response time
+- AutoComplete Vendors > Remove bank account search. It was slowing down the response
+
 ### Added
 
 - `commit-msg` git hook to check branch name and commit message conventions.

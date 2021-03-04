@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_01_104324) do
+ActiveRecord::Schema.define(version: 2021_03_04_024552) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -814,6 +814,7 @@ ActiveRecord::Schema.define(version: 2021_03_01_104324) do
     t.integer "expected_payments", default: 0
     t.string "ticket_type"
     t.integer "transfer_mode_id"
+    t.boolean "is_domestic", default: true
     t.index ["company_id", "controlling_level_id", "deleted_at"], name: "index_bpr_ct_lvl_cmpny_id"
     t.index ["company_id"], name: "index_bank_payment_requests_on_company_id"
     t.index ["controlling_level_id"], name: "index_bank_payment_requests_on_controlling_level_id"
@@ -2597,7 +2598,7 @@ ActiveRecord::Schema.define(version: 2021_03_01_104324) do
     t.boolean "is_deleted"
     t.datetime "deleted_at"
     t.string "cost_center_code"
-    t.string "ancestry"
+    t.string "ancestry", collation: "utf8_general_ci"
     t.string "gl_code"
     t.index ["ancestry"], name: "index_cost_centers_on_ancestry"
     t.index ["company_id"], name: "index_cost_centers_on_company_id"
@@ -3695,6 +3696,14 @@ ActiveRecord::Schema.define(version: 2021_03_01_104324) do
     t.index ["updated_at"], name: "index_erp_sync_statuses_on_updated_at"
   end
 
+  create_table "exchange_rates", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.string "from"
+    t.string "to"
+    t.float "rate"
+    t.date "date"
+    t.datetime "deleted_at"
+  end
+
   create_table "expense_data_extract_sources", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
@@ -4305,7 +4314,9 @@ ActiveRecord::Schema.define(version: 2021_03_01_104324) do
     t.index ["associated_transaction_type"], name: "index_finly_transactions_on_associated_transaction_type"
     t.index ["closing_balance_id"], name: "index_finly_transactions_on_closing_balance_id"
     t.index ["company_id"], name: "index_finly_transactions_on_company_id"
+    t.index ["deleted_at"], name: "index_finly_transactions_on_deleted_at"
     t.index ["finly_account_id"], name: "index_finly_transactions_on_finly_account_id"
+    t.index ["finly_account_type", "finly_account_id"], name: "index_transactions_on_account"
     t.index ["finly_account_type"], name: "index_finly_transactions_on_finly_account_type"
     t.index ["opening_balance_id"], name: "index_finly_transactions_on_opening_balance_id"
     t.index ["payment_id"], name: "index_finly_transactions_on_payment_id"
@@ -5183,26 +5194,22 @@ ActiveRecord::Schema.define(version: 2021_03_01_104324) do
     t.string "item_number"
     t.string "product_type_id"
     t.string "gl_code"
-    t.decimal "gross_amount", precision: 20, scale: 10
-    t.decimal "discount_amount", precision: 20, scale: 10
-    t.decimal "taxable_amount", precision: 20, scale: 10
-    t.decimal "tax_amount", precision: 20, scale: 10
-    t.decimal "net_amount", precision: 20, scale: 10
-    t.string "currency_code"
     t.decimal "item_tds_amount", precision: 20, scale: 5
     t.decimal "item_net_amount", precision: 20, scale: 5
     t.decimal "item_tax_amount", precision: 20, scale: 5
     t.decimal "item_taxable_amount", precision: 20, scale: 5
     t.decimal "item_discount_amount", precision: 20, scale: 5
     t.decimal "item_gross_amount", precision: 20, scale: 5
-    t.decimal "item_gross_amount_converted", precision: 20, scale: 5
-    t.decimal "item_discount_amount_converted", precision: 20, scale: 5
-    t.decimal "item_taxable_amount_converted", precision: 20, scale: 5
-    t.decimal "item_tax_amount_converted", precision: 20, scale: 5
-    t.decimal "item_tds_amount_converted", precision: 20, scale: 5
-    t.decimal "item_net_amount_converted", precision: 20, scale: 5
+    t.decimal "reporting_item_gross_amount", precision: 20, scale: 5
+    t.decimal "reporting_item_discount_amount", precision: 20, scale: 5
+    t.decimal "reporting_item_taxable_amount", precision: 20, scale: 5
+    t.decimal "reporting_item_tax_amount", precision: 20, scale: 5
+    t.decimal "reporting_item_tds_amount", precision: 20, scale: 5
+    t.decimal "reporting_item_net_amount", precision: 20, scale: 5
     t.decimal "item_billable_amount", precision: 20, scale: 5
-    t.decimal "item_billable_amount_converted", precision: 20, scale: 5
+    t.decimal "reporting_item_billable_amount", precision: 20, scale: 5
+    t.string "tax_type", default: ""
+    t.decimal "item_rate", precision: 10, default: "0"
     t.index ["category_id"], name: "index_invoice_line_items_on_category_id"
     t.index ["department_id"], name: "index_invoice_line_items_on_department_id"
     t.index ["discount_amount_id"], name: "index_invoice_line_items_on_discount_amount_id"
@@ -5347,27 +5354,12 @@ ActiveRecord::Schema.define(version: 2021_03_01_104324) do
     t.integer "cn_adjusted_amount_id"
     t.boolean "rcm_enabled", default: false
     t.decimal "tds_percentage", precision: 20, scale: 5
-    t.decimal "gross_amount", precision: 20, scale: 10
-    t.decimal "discount_amount", precision: 20, scale: 10
-    t.decimal "freight_amount", precision: 20, scale: 10
-    t.decimal "taxable_amount", precision: 20, scale: 10
-    t.decimal "tax_amount", precision: 20, scale: 10
-    t.decimal "tds_amount", precision: 20, scale: 10
-    t.decimal "net_amount", precision: 20, scale: 10
-    t.decimal "po_advance_amount", precision: 20, scale: 10
-    t.decimal "advance_paid_amount", precision: 20, scale: 10
-    t.decimal "total_paid_amount", precision: 20, scale: 10
-    t.decimal "balance_due_amount", precision: 20, scale: 10
-    t.string "currency_code"
     t.string "vendor_bank_account_number"
     t.string "vendor_bank_account_ifsc"
     t.decimal "invoice_gross_amount", precision: 20, scale: 5
     t.decimal "invoice_discount_amount", precision: 20, scale: 5
     t.decimal "invoice_tax_amount", precision: 20, scale: 5
     t.decimal "invoice_tds_amount", precision: 20, scale: 5
-    t.decimal "payment_outside_finly_amount", precision: 20, scale: 5
-    t.decimal "sub_total_amount", precision: 20, scale: 5
-    t.decimal "total_amount", precision: 20, scale: 5
     t.string "base_currency"
     t.text "vendor_sequence_id"
     t.string "vendor_gstin"
@@ -5379,21 +5371,21 @@ ActiveRecord::Schema.define(version: 2021_03_01_104324) do
     t.decimal "invoice_taxable_amount", precision: 20, scale: 5
     t.decimal "invoice_roundoff_amount", precision: 20, scale: 5
     t.decimal "invoice_balance_due", precision: 20, scale: 5
-    t.decimal "invoice_gross_amount_converted", precision: 20, scale: 5
-    t.decimal "invoice_discount_amount_converted", precision: 20, scale: 5
-    t.decimal "invoice_taxable_amount_converted", precision: 20, scale: 5
-    t.decimal "invoice_tax_amount_converted", precision: 20, scale: 5
-    t.decimal "invoice_tds_amount_converted", precision: 20, scale: 5
-    t.decimal "invoice_freight_amount_converted", precision: 20, scale: 5
-    t.decimal "invoice_sub_total_amount_converted", precision: 20, scale: 5
-    t.decimal "invoice_roundoff_amount_converted", precision: 20, scale: 5
+    t.decimal "reporting_invoice_gross_amount", precision: 20, scale: 5
+    t.decimal "reporting_invoice_discount_amount", precision: 20, scale: 5
+    t.decimal "reporting_invoice_taxable_amount", precision: 20, scale: 5
+    t.decimal "reporting_invoice_tax_amount", precision: 20, scale: 5
+    t.decimal "reporting_invoice_tds_amount", precision: 20, scale: 5
+    t.decimal "reporting_invoice_freight_amount", precision: 20, scale: 5
+    t.decimal "reporting_invoice_sub_total_amount", precision: 20, scale: 5
+    t.decimal "reporting_invoice_roundoff_amount", precision: 20, scale: 5
     t.decimal "invoice_advance_paid_amount", precision: 20, scale: 5
-    t.decimal "invoice_advance_paid_amount_converted", precision: 20, scale: 5
-    t.decimal "invoice_total_amount_converted", precision: 20, scale: 5
+    t.decimal "reporting_invoice_advance_paid_amount", precision: 20, scale: 5
+    t.decimal "reporting_invoice_total_amount", precision: 20, scale: 5
     t.decimal "invoice_net_total_amount", precision: 20, scale: 5
-    t.decimal "invoice_net_total_amount_converted", precision: 20, scale: 5
-    t.decimal "invoice_paid_outside_amount_converted", precision: 20, scale: 5
-    t.decimal "invoice_balance_due_converted", precision: 20, scale: 5
+    t.decimal "reporting_invoice_net_total_amount", precision: 20, scale: 5
+    t.decimal "reporting_invoice_paid_outside_amount", precision: 20, scale: 5
+    t.decimal "reporting_invoice_balance_due", precision: 20, scale: 5
     t.integer "erp_sync_status_id"
     t.text "erp_sync_message"
     t.text "erp_sync_reference_id"
@@ -5401,6 +5393,18 @@ ActiveRecord::Schema.define(version: 2021_03_01_104324) do
     t.datetime "erp_sync_attempted_at"
     t.integer "approval_workflow_version"
     t.boolean "is_workflow_v2", default: false
+    t.string "vendor_trade_name"
+    t.string "vendor_pan"
+    t.decimal "invoice_paid_outside_amount", precision: 20, scale: 5
+    t.decimal "invoice_sub_total_amount", precision: 20, scale: 5
+    t.decimal "invoice_total_amount", precision: 20, scale: 5
+    t.integer "payment_term_days", default: 0
+    t.string "vendor_bank_account_swift_code", default: ""
+    t.string "vendor_country", default: ""
+    t.string "discount_type", default: ""
+    t.decimal "overall_discount_amount", precision: 10, default: "0"
+    t.decimal "total_line_item_discount_amount", precision: 10, default: "0"
+    t.boolean "is_domestic", default: true
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["company_id", "controlling_level_id", "deleted_at"], name: "index_invoice_ct_lvl_cmpny_id"
     t.index ["controlling_level_id"], name: "index_invoices_on_controlling_level_id"
@@ -5863,6 +5867,23 @@ ActiveRecord::Schema.define(version: 2021_03_01_104324) do
     t.datetime "deleted_at"
   end
 
+  create_table "ml_model_dependent_entities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.integer "company_id", null: false
+    t.integer "ml_model_id", null: false
+    t.string "form_id", null: false
+    t.string "form_entity_id", null: false
+    t.datetime "deleted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["company_id"], name: "index_ml_model_dependent_entities_on_company_id"
+    t.index ["created_at"], name: "index_ml_model_dependent_entities_on_created_at"
+    t.index ["deleted_at"], name: "index_ml_model_dependent_entities_on_deleted_at"
+    t.index ["form_entity_id"], name: "index_ml_model_dependent_entities_on_form_entity_id"
+    t.index ["form_id"], name: "index_ml_model_dependent_entities_on_form_id"
+    t.index ["ml_model_id"], name: "index_ml_model_dependent_entities_on_ml_model_id"
+    t.index ["updated_at"], name: "index_ml_model_dependent_entities_on_updated_at"
+  end
+
   create_table "ml_model_predictions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.integer "company_id", null: false
     t.bigint "ml_model_id"
@@ -5884,8 +5905,6 @@ ActiveRecord::Schema.define(version: 2021_03_01_104324) do
 
   create_table "ml_models", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.integer "company_id", null: false
-    t.string "parent_type"
-    t.bigint "parent_id"
     t.string "type", null: false
     t.text "config", size: :long
     t.datetime "built_at"
@@ -5903,6 +5922,9 @@ ActiveRecord::Schema.define(version: 2021_03_01_104324) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.text "pmml"
+    t.string "form_id"
+    t.string "parent_id"
+    t.string "parent_type"
     t.index ["built_at"], name: "index_ml_models_on_built_at"
     t.index ["company_id"], name: "index_ml_models_on_company_id"
     t.index ["created_at"], name: "index_ml_models_on_created_at"
@@ -6566,6 +6588,8 @@ ActiveRecord::Schema.define(version: 2021_03_01_104324) do
     t.integer "bank_account_provider_id"
     t.datetime "deleted_at"
     t.integer "transfer_mode_id"
+    t.decimal "reporting_amount_processed", precision: 10, default: "0"
+    t.decimal "reporting_amount_requested", precision: 10, default: "0"
     t.index ["amount_processed_id"], name: "index_payment_orders_on_amount_processed_id"
     t.index ["amount_requested_id"], name: "index_payment_orders_on_amount_requested_id"
     t.index ["company_id"], name: "index_payment_orders_on_company_id"
@@ -8313,6 +8337,16 @@ ActiveRecord::Schema.define(version: 2021_03_01_104324) do
     t.index ["company_id"], name: "index_tax_rates_on_company_id"
   end
 
+  create_table "tax_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.string "country_name", default: ""
+    t.string "name", default: ""
+    t.string "tax_name", default: ""
+    t.datetime "deleted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["deleted_at"], name: "index_tax_types_on_deleted_at"
+  end
+
   create_table "tds_rates_lists", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "name"
     t.decimal "tds", precision: 10, scale: 5
@@ -8785,6 +8819,15 @@ ActiveRecord::Schema.define(version: 2021_03_01_104324) do
     t.datetime "deleted_at"
     t.index ["company_id"], name: "index_unique_identifiers_on_company_id"
     t.index ["purpose_id"], name: "index_unique_identifiers_on_purpose_id"
+  end
+
+  create_table "units", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.string "name", default: ""
+    t.string "value", default: ""
+    t.datetime "deleted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["deleted_at"], name: "index_units_on_deleted_at"
   end
 
   create_table "user_agent_client_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
