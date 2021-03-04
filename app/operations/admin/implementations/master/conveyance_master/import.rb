@@ -8,7 +8,8 @@ class Admin::Implementations::Master::ConveyanceMaster::Import < Admin::Implemen
       :distance_expense_enabled => "Distance Expense Enabled ( Y/ N )",
       :default_category => "Default Category",
       :vehicle_name => "Vehicle Name",
-      :rate => "Rate"
+      :rate => "Rate",
+      :destroy => "Destroy"
   })
 
   attr_accessor :distance_expense_params, :policy
@@ -29,6 +30,43 @@ class Admin::Implementations::Master::ConveyanceMaster::Import < Admin::Implemen
       return result false, distance_expense_config.errors.full_messages
     end
     result true, 'Created Successfully'
+  end
+
+  def update_record(data)
+    distance_expense_params, messages = set_params(data)
+    unless messages.blank?
+      return result false, messages.join(', ')
+    end
+
+    distance_expense_config = self.policy.distance_expense_config
+    distance_expense_config.enabled = distance_expense_params[:enabled]
+    distance_expense_config.default_category_id = distance_expense_params[:default_category]
+    distance_expense_config.enforce_category = true if distance_expense_params[:default_category].present?
+    vehicle_rate = self.policy.vehicle_rates.find_by id: data[:id]
+    unless vehicle_rate
+      return result false, "Distance expense configuration not found"
+    end
+    unless  vehicle_rate.update(vehicle_name: distance_expense_params[:name], distance_unit_id: PhysicalUnit.first.id, :rate_attributes=> { currency_id: 1, value: distance_expense_params[:rate]})
+
+      return result false, vehicle_rate.errors.full_messages
+    end
+    distance_expense_config.save
+    result true, 'Updated Successfully'
+  end
+
+  def destroy_records(data)
+    distance_expense_params, messages = set_params(data)
+    unless messages.blank?
+      return result false, messages.join(', ')
+    end
+    vehicle_rate = policy.vehicle_rates.find_by id: data[:id]
+    unless vehicle_rate
+      return result false, "Distance expense configuration  not found"
+    end
+    unless vehicle_rate.destroy
+      return result false, vehicle_rate.errors.full_messages
+    end
+    result true, "Destroyed Successfully"
   end
 
   def set_params(data)

@@ -5,7 +5,7 @@ class Docs::P2P::Inwards::Received::Index < IndexBuilder::API
   permissions :goods_receiver, :admin
   resolver 'inward_documents.received'
   reference '{{record.id}}', procurement_id: '{{record.procurement_id}}', document_type: "inward_document"
-  selectable false
+  selectable true
 
   # Fixed column is always default true
   column :vendor, label: 'Vendor Details', fixed: true, sort: :vendor_business_name, includes: [:vendor] do

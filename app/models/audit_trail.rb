@@ -153,9 +153,10 @@ class AuditTrail < PaperTrail::Version
     date = DateTime.now
     prefix = DateTime.now.to_i
     ref_id = Generator.random_number(8)
-    while !self.validate_transaction_id("#{prefix}#{ref_id}")
-      ref_id = Generator.random_number(8)
-    end
+    # Removed the validation as this is being used in every single request, slowing down requests
+    # while !self.validate_transaction_id("#{prefix}#{ref_id}")
+    #   ref_id = Generator.random_number(8)
+    # end
     "#{prefix}#{ref_id}"
   end
 
