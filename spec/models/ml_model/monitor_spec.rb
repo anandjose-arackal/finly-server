@@ -4,8 +4,6 @@
 #
 #  id              :bigint           not null, primary key
 #  company_id      :integer          not null
-#  parent_type     :string(255)
-#  parent_id       :bigint
 #  type            :string(255)      not null
 #  config          :text(4294967295)
 #  built_at        :datetime
@@ -23,6 +21,9 @@
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
 #  pmml            :text(65535)
+#  form_id         :string(255)
+#  parent_id       :string(255)
+#  parent_type     :string(255)
 #
 
 require 'rails_helper'

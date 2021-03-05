@@ -25,7 +25,6 @@ class Macros::ErpSyncs::Create < Transactions::API
   def import_erp_syncs(context, records:, record_class:, params:, current_user:, **)
     status_id = ErpSyncStatus.id_for(params[:status])
     attempted_at = params[:attempted_at].present? ? DateTime.parse(params[:attempted_at]) : DateTime.now
-    attempted_at = attempted_at.strftime("%Y-%m-%d")
     records.find_in_batches do |batch|
       erp_sync_params = []
       batch.each do |record|
