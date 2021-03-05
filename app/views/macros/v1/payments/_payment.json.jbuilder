@@ -26,15 +26,35 @@ json.document do
   json.purchase_order do
     # PO Advance, Invoice Payments
     if record.parent_type == "PurchaseOrder"
-      json.po_number record.purchase_order_parent.po_number
+      purchase_order = record.purchase_order_parent
+      if purchase_order.present?
+        json.po_number purchase_order&.po_number
+        json.original_amount precision_value(purchase_order.total_after_tax&.value)
+        json.total_advance_amount purchase_order.total_adv_amount
+        json.payable_advance_amount precision_value(purchase_order.advance_amount&.value)
+        json.balance_due precision_value(purchase_order.balance_amount&.value)
+        json.tds_amount purchase_order.advance_tds_amount&.value
+        json.tds purchase_order.advance_tds_slab&.tds
+        json.tds_slab_id purchase_order.advance_tds_slab_id
+        json.tds_slab_name purchase_order.advance_tds_slab&.name
+        json.delivery_location purchase_order.delivery_location.as_json
+        json.requested_advance_amount purchase_order.requested_advance_amount&.value
+        #json.vendor do
+        #  # Invoice Payments/PO Advance/Beneficiary Payment/Security Deposit
+        #  if purchase_order.vendor.present?
+        #    json.partial! 'macros/v1/vendors/vendor', record:  purchase_order.vendor
+        #  end
+        #end
+      end
     elsif record.parent_type == "Invoice"
-      json.po_number record.invoice_parent.po_number
+      json.po_number record.invoice_parent&.po_number
     end
   end
   json.invoice do
-    # Invoice Payments
-    if record.parent_type == 'Invoice'
-      json.partial! 'macros/v1/invoices/invoice_header', record: record.invoice_parent
+    if record.parent_type == 'Invoice' && record.invoice_parent.present?
+      invoice = record.invoice_parent
+      json.id invoice.id
+      json.invoice_id invoice.invoice_id
     end
   end
   json.bbps_bill do
@@ -45,12 +65,12 @@ json.beneficiary do
   json.user do
     # Todo - For Prepaid Card payments
   end
-  json.vendor do
-    # Invoice Payments/PO Advance/Beneficiary Payment/Security Deposit
-    if record.receiving_user_vendor.present?
-      json.partial! 'macros/v1/vendors/vendor', record: record.receiving_user_vendor
-    end
-  end
+  #json.vendor do
+  #  # Invoice Payments/PO Advance/Beneficiary Payment/Security Deposit
+  #  if record.receiving_user_vendor.present?
+  #    json.partial! 'macros/v1/vendors/vendor', record: record.receiving_user_vendor
+  #  end
+  #end
   json.utility_bill_subscription do
     # Todo - BBPS Bills
   end
