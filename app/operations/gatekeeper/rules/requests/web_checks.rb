@@ -80,6 +80,20 @@ Gatekeeper::Checker.new 'On New Request' do
       end
     end
 
+    section 'Unauthorised IP' do
+      rule 'cannot access the system from an unauthorised IP' do
+        policy = RequestStoreUtil.security_policy
+        restrictions = policy.browser_ip.restrictions
+        next if restrictions.blank?
+        next if restrictions.include?(RequestStoreUtil.current_session&.user_ip)
+
+        level 1
+        message 'Cannot access the system from an unauthorised IP'
+        response_code 401
+        fail
+      end
+    end
+
   end
 
 end

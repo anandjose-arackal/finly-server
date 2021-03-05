@@ -89,6 +89,16 @@ Gatekeeper::Checker.new 'On Web Authentication' do
 
         require_otp true
       end
+
+      rule 'Only authorised IPs can create the session' do
+        restrictions = policy.browser_ip.restrictions
+        next if restrictions.blank?
+        next if restrictions.include?(RequestStoreUtil.current_session&.user_ip)
+
+        level 1
+        response_code 403
+        fail
+      end
     end
 
     section 'UserAgentClient' do
