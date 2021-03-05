@@ -39,12 +39,6 @@ class IndexBuilder::API
     @system_subscription
   end
 
-  def self.action_route(action_route = nil)
-    @action_route = action_route if action_route.present?
-
-    @action_route
-  end
-
   def self.config(user)
     config = {selectable: self.selectable, status_filters: self.status_filters, fixed: [], dynamic: []}
     columns.each do |column_key, column|
@@ -122,10 +116,6 @@ class IndexBuilder::API
   def self.build(user, record, required_columns)
     record_exposure = record.to_exposure
     map = {}
-    actions = []
-    if action_route.present?
-      actions = ActionManager::Router.dispatch(action_route, params: {route: action_route}, current_user: user, record: record)[:config]
-    end
 
     self.columns.each do |column_key, column|
       next if required_columns.present? and not (required_columns.include?(column_key.to_s) or required_columns.include?(column_key.to_sym))
@@ -140,7 +130,6 @@ class IndexBuilder::API
     {
       reference: record_exposure.template(reference),
       columns: map,
-      actions: actions
     }
   end
 

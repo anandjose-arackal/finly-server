@@ -4,7 +4,6 @@ class Companies::Ops::Index < IndexBuilder::API
   permissions :admin
   resolver 'companies.default'
   reference '{{record.id}}'
-  action_route 'companies.index.row'
 
   column :name, fixed: true, sort: :name do
     text value: "{{record.name}}", format: 'primary'
