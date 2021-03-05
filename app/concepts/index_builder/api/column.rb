@@ -44,9 +44,10 @@ class IndexBuilder::API::Column
       values << field.build(context, user, record, record_exposure)
     end
     actions.each do |id, action|
-      next unless action.authorized?(current_user: user, record: record)
+      action_data = action.build(current_user: user, params: {}, record: record)
+      next unless action_data.present?
 
-      values << {content_type: 'action'}.merge(action.build(current_user: user, params: {}))
+      values << {content_type: 'action'}.merge(action_data)
     end
     values
   end
