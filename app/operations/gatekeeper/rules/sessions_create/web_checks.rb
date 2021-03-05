@@ -91,6 +91,7 @@ Gatekeeper::Checker.new 'On Web Authentication' do
       end
 
       rule 'Only authorised IPs can create the session' do
+        policy = RequestStoreUtil.security_policy
         restrictions = policy.browser_ip.restrictions
         next if restrictions.blank?
         next if restrictions.include?(RequestStoreUtil.current_session&.user_ip)
