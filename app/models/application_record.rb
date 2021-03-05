@@ -8,5 +8,5 @@ class ApplicationRecord < ActiveRecord::Base
   self.abstract_class = true
 
   include SoftDeletable
-
+  singleton_class.send(:alias_method, :filter_active, :exclude_deleted)
 end

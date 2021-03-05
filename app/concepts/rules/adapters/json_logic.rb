@@ -22,9 +22,24 @@ class Rules::Adapters::JSONLogic
   end
 
   def self.as_json(rule, options = {})
+    if rule.attribute.is_a?(Rules::Rule) #handle incase of nested rules (to support :some for nested rules)
+      json_logic_attribute = self.as_json(rule.attribute, options)
+      json_logic_value = rule.values.map { |value| self.as_json(value, options) }
+      json = {}
+      operator = Rules::Constants::MATH_PREDICATE_MAP[rule.operator.to_s] || rule.operator.to_s
+      json[operator] = []
+      json[operator] += [json_logic_attribute]
+      json[operator] += json_logic_value
+      json
+    else
+      json = self.as_json_data(rule, options) #incase of simple rule process as usual
+    end
+    json
+  end
+
+  def self.as_json_data(rule, options = {})
     json_logic_type = self.json_logic_type(rule, options)
     return {} if json_logic_type == :invalid
-
     json = {}
     operator = Rules::Constants::MATH_PREDICATE_MAP[rule.operator.to_s] || rule.operator.to_s
     json[operator] = []
@@ -36,7 +51,6 @@ class Rules::Adapters::JSONLogic
     end
     json
   end
-
   # This is responsible for validating the rule with json_logic standards
   def self.valid?(rule, options = {})
     return true unless rule.is_a?(Rules::Rule)
@@ -73,7 +87,6 @@ class Rules::Adapters::JSONLogic
         return { var: var }.as_json
       end
     end
-
     func.as_json(mode: 'json_logic')
   end
 
@@ -93,7 +106,6 @@ class Rules::Adapters::JSONLogic
   #         - Source/Value: Line Item
   def self.json_logic_type(rule, options = {})
     return :none if rule.attribute.is_a?(Rules::Rule)
-
     model_klass = options[:model_klass]
     controller = options[:controlling_field]
     controller_collection_parent = collection_association_name(model_klass, controller)
@@ -136,3 +148,5 @@ class Rules::Adapters::JSONLogic
   end
 
 end
+
+

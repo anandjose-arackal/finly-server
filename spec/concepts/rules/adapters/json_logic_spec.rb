@@ -64,6 +64,20 @@ describe 'Rules::Adapters::JsonLogic' do
             expect(JSONLogic.apply(json_logic.with_indifferent_access, data.with_indifferent_access)).to be_falsey
           end
 
+          it 'should be true if multiple condition checks are added where if source value is present amd value fields are empty' do
+            rule = Rules::Builder['line_items.description'].blank.and(Rules::Builder['header_item'].present)
+            json_logic = Rules::Adapters::JSONLogic.as_json(rule, model_klass: Invoice, controlling_field: 'narration')
+            data = { form: { line_items: [{ description: nil }, { description: nil }], header_item: 'mango' } }
+            expect(JSONLogic.apply(json_logic.with_indifferent_access, data.with_indifferent_access)).to be_truthy
+          end
+
+          it 'should be false if nested rules are added where if source value is present amd value fields are present' do
+            rule = Rules::Builder['line_items.description'].blank.and(Rules::Builder['header_item'].present)
+            json_logic = Rules::Adapters::JSONLogic.as_json(rule, model_klass: Invoice, controlling_field: 'narration')
+            data = { form: { line_items: [{ description: 'apple' }, { description: 'tomato' }], header_item: 'mango' } }
+            expect(JSONLogic.apply(json_logic.with_indifferent_access, data.with_indifferent_access)).to be_falsey
+          end
+
         end
       end
 
