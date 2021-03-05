@@ -25,6 +25,23 @@ class Companies::Ops::Index < IndexBuilder::API
     indicator value: :active, format: :active_status
   end
 
+  column :actions, default: true do
+    action :button_group, :actions, contextual: false, label: 'Actions' do
+      action :api_request,
+            :disable,
+            label: 'Disable',
+            url: 'companies/{{record.id}',
+            method: :patch,
+            policy: Companies::Policy,
+            authorize: :disable?,
+            permissions: :admin,
+            body: {
+              active: false,
+            },
+            confirmation: "Are you sure you want to disable this entity?"
+    end
+  end
+
   counter -> (user, collection) do
     counter = IndexBuilder::Counter.new :filter_state
     counter.add nil, "All", collection.count

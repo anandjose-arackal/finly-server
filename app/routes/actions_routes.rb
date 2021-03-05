@@ -6,8 +6,7 @@ ActionManager::Router.draw do
     route 'company_groups', Admin::CompanyGroups::Action
   end
 
-  route 'companies', Companies::Actions::Index
-  route 'companies.index.row', Companies::Actions::Index::Row
+  route 'companies', Companies::Action
 
   # NavBar
   route 'procurement', Menu::Masters::Procurement
