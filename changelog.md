@@ -34,6 +34,7 @@ Adding bbps error message on failure.
 ## 2020-03-05
 - Added support for overriding security policy on a company level via feature flipper
 - Added support for restricting IPs for a company
+- Added support for caching user flags
 
 ### Added
 
