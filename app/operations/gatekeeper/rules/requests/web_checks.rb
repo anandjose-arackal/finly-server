@@ -83,7 +83,7 @@ Gatekeeper::Checker.new 'On New Request' do
     section 'Unauthorised IP' do
       rule 'cannot access the system from an unauthorised IP' do
         policy = RequestStoreUtil.security_policy
-        restrictions = policy.browser_ip.restrictions
+        restrictions = policy.browser_ip.restriction
         next if restrictions.blank?
         next if restrictions.include?(RequestStoreUtil.current_session&.user_ip)
 
