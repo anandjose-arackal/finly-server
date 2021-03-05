@@ -23,7 +23,15 @@ Rails.application.configure do
   config.action_controller.perform_caching = true
 
   redis_config = Rails.application.config_for(:redis_config)&.with_indifferent_access
-  config.redis = Redis.new(redis_config.slice('url', 'password'))
+  redis_creds = redis_config&.slice('url', 'password')
+  config.redis = Redis.new(redis_creds)
+
+  if redis_config[:cache_enabled]
+    config.cache_store = :redis_cache_store, redis_creds
+  else
+    config.action_controller.perform_caching = false
+    config.cache_store = :null_store
+  end
 
   # Enable Rack::Cache to put a simple HTTP cache in front of your application
   # Add `rack-cache` to your Gemfile before enabling this.
