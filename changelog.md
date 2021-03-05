@@ -31,6 +31,10 @@ Adding bbps error message on failure.
 - Reduce the number of columns in payments index as it was having a very slow response time
 - AutoComplete Vendors > Remove bank account search. It was slowing down the response
 
+## 2020-03-05
+- Added support for overriding security policy on a company level via feature flipper
+- Added support for restricting IPs for a company
+
 ### Added
 
 - `commit-msg` git hook to check branch name and commit message conventions.
