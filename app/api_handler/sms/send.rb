@@ -64,7 +64,7 @@ class Sms::Send < BaseHandler
         authkey: authentication_key,
         mobiles: list,
         message: msg,
-        sender: 'FINLYX',
+        sender: 'IFINLY',
         route: 4,
         country: 91,
         response: 'json'
