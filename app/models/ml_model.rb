@@ -53,14 +53,28 @@ class MlModel < ApplicationRecord
   validates :model_klass, presence: true
   validate :validate_schema
 
+  def self.build(options = {})
+    self.all.find_each do |model|
+      model.build_model(options)
+      model.clear_model_cache
+    end
+
+    true
+  end
+
+  def includes(records)
+    records
+  end
+
   def records
     records = Object.const_get(model_klass).all.where(company_id: company_id)
+    records = includes(records)
     # This will limit the records to just the last 12 months
     # records = records.where("#{split_key} > #{1.year.ago}") if split_key.present?
     records
   end
 
-  def prepare_record(record)
+  def prepare_record(record, options = {})
     record_data = {}
     record_data[split_key] = split_value(record)
     record_data[target_key] = target_value(record)
@@ -86,19 +100,21 @@ class MlModel < ApplicationRecord
     @model = nil
   end
 
-  def build_model
+  def build_model(options = {})
+    start_time = Time.now
     data = prepare_data
     return false if data.blank?
 
     model = Eps::Model.new(data, target: target_key, algorithm: algorithm.to_sym)
-    return false unless update(pmml: model.to_pmml, built_at: DateTime.now)
+    return false unless update(pmml: model.to_pmml, built_at: DateTime.now, build_duration: (Time.now - start_time))
 
     # Clear the cache
     @model = model
+
     true
   end
 
-  def predict(data = {})
+  def predict(data = {}, options = {})
     return nil unless model.present?
 
     data ||= {}
@@ -106,7 +122,7 @@ class MlModel < ApplicationRecord
     model.predict(prepare_prediction(data))
   end
 
-  def track_predictions
+  def track_predictions(options = {})
     return false if model.blank?
 
     # Predictions will be tracked from the last build time
@@ -145,7 +161,7 @@ class MlModel < ApplicationRecord
     true
   end
 
-  def prepare_data(after: nil, records: nil)
+  def prepare_data(after: nil, records: nil, options: {})
     data = []
     records = self.records if records.nil?
 
@@ -160,12 +176,13 @@ class MlModel < ApplicationRecord
     end
 
     records.find_each do |record|
-      data << prepare_record(record)
+      record_data = prepare_record(record)
+      data << record_data if record_data.present?
     end
     data
   end
 
-  def prepare_prediction(data)
+  def prepare_prediction(data, options = {})
     data
   end
 
