@@ -122,13 +122,13 @@ class MlModel::FormEntityModel < MlModel
       # data << item
     else
       # Assumption is that target and dependent is not in line items
-      data[target_entity.entity_key] = form_data.dig(*target_paths).to_s
+      data[target_entity.entity_key] = format(form_data.dig(*target_paths), 'category')
       dependent_entity_mappings.each do |mapping|
         dependent_entity = mapping.form_entity
         dependent_paths = dependent_entity.entity_path.split('.')
         # Assumption is that the data points for all models are categorical, and not numerical.
         # Hence converting it to a string
-        data[dependent_entity.entity_key] = form_data.dig(*dependent_paths).to_s
+        data[dependent_entity.entity_key] = format(form_data.dig(*dependent_paths), 'category')
       end
     end
 
