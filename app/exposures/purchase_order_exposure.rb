@@ -1,4 +1,5 @@
 class PurchaseOrderExposure < Exposures::API
+  include Concerns::ErpSyncConcern
 
   attribute :id, record_attribute: true
   attribute :procurement_id, record_attribute: true
@@ -32,6 +33,7 @@ class PurchaseOrderExposure < Exposures::API
   attribute :note, record_attribute: true
   attribute :created_at, record_attribute: true
   attribute :created_by, record_attribute: true, exposure: true
+  attribute :created_by_id, record_attribute: :user_id
   attribute :gross_amount, record_attribute: true, exposure: true, includes: [:gross_amount]
   attribute :gross_amount_value, includes: [:gross_amount] do
     record.gross_amount&.value || 0

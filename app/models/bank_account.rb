@@ -32,7 +32,7 @@ class BankAccount < ApplicationRecord
   include Accountable
   include SoftDeletable
 
-  belongs_to :account_owner, optional: true, polymorphic: true
+  belongs_to :account_owner, optional: true, polymorphic: true, touch: true
 
   belongs_to :purchase_order, optional: true
   belongs_to :bank_account_master, optional: true
@@ -71,6 +71,7 @@ class BankAccount < ApplicationRecord
   scope :default_accounts, -> { where(default_account: true).non_deleted}
   scope :non_deleted, -> {where deleted_at: nil}
   scope :enabled, -> {where disabled: false}
+  singleton_class.send(:alias_method, :filter_active, :enabled)
   scope :with_owner_id, -> (owner_id) {
     where account_owner_id: owner_id
   }

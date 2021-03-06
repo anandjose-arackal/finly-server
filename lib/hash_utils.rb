@@ -28,6 +28,18 @@ class HashUtils
     value.nil? ? default : value # value can be false (Boolean)
   end
 
+  def self.flatten_hash(hash, delimiter: '.')
+    hash.each_with_object({}) do |(k, v), h|
+      if v.is_a? Hash
+        flatten_hash(v).map do |h_k, h_v|
+          h["#{k}#{delimiter}#{h_k}".to_sym] = h_v
+        end
+      else
+        h[k] = v
+      end
+    end
+  end
+
     # Array DeepFetch
     # def deep_fetch(data, path, delimiter: '/', default: nil)
     #   indexes = path.to_s.split(delimiter).map(&:to_i)

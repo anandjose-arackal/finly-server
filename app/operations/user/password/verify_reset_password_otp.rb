@@ -3,11 +3,11 @@ class User::Password::VerifyResetPasswordOtp < BaseOperation
 
   def validate
     unless selected_user
-      add_message :error, "User not found. Please enter your registered mobile number"
+      add_message :error, "Invalid Credentials"
       return
     end
     unless selected_user.mobile_number == params[:mobile_number]
-      add_message :error, "Mobile number does not match"
+      add_message :error, "Invalid Credentials"
       return
     end
 
@@ -19,7 +19,7 @@ class User::Password::VerifyResetPasswordOtp < BaseOperation
     end
 
     unless selected_user.otp == params[:otp]
-      add_message :error, "Wrong OTP"
+      add_message :error, "Wrong OTP entered. Please enter the OTP sent to your mobile number"
       selected_user.update_attribute(:otp_attempts, (selected_user.otp_attempts + 1))
       return
     end

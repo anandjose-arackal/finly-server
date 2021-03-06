@@ -5,7 +5,7 @@ FactoryBot.define do
   end
 
   factory :policy do
-    name { generate(:policy_name) }
+    name { FactoryBot.generate(:policy_name) }
     company_id {nil}
     default { false }
   end

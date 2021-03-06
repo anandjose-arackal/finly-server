@@ -82,7 +82,7 @@ class FormEntity::AutoNumber < FormEntity
         end
       else
         custom_field = model.form_custom_fields.find_by(field_key: entity.entity_key)
-        unless custom_field&.value
+        if custom_field&.value.blank?
           prefix, sequence = FormEntity::AutoNumber.fetch_autonumber(entity, model)
           custom_field.value =  "#{prefix}#{sequence}"
           custom_field.save
@@ -101,8 +101,8 @@ class FormEntity::AutoNumber < FormEntity
             hash do
               required(:sequence) do
                 hash do
-                  required(:prefix)
-                  required(:start_at).filled
+                  optional(:prefix)
+                  optional(:start_at)
                 end
               end
             end
@@ -112,7 +112,7 @@ class FormEntity::AutoNumber < FormEntity
           sequence = value[:sequence]
           prefix = sequence&.dig(:prefix)
           start_at = sequence&.dig(:start_at)
-          # key.failure("prefix must be present") if prefix.blank?
+          key.failure("prefix must be present") if prefix.blank?
           key.failure("start_at must be present") if start_at.blank?
         end
       end
@@ -122,8 +122,9 @@ class FormEntity::AutoNumber < FormEntity
   def self.fetch_autonumber(entity, model)
     prefix = entity.config['sequence']['prefix']
     min_length = entity.config['sequence']['start_at'].length
+    start_at = entity.config['sequence']['start_at'].to_i - 1
     prefix = LiquidHelper.interpolate(prefix, {'record' => model})
-    sequence = REDIS.incr("FormEntity::AutoNumber##{entity.id}##{prefix}")
+    sequence = REDIS.incr("FormEntity::AutoNumber##{entity.id}##{prefix}") + start_at
     sequence = sequence.to_s.rjust(min_length, "0")
     [prefix, sequence]
   end

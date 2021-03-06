@@ -67,7 +67,7 @@ module Transactions
       end
 
       def unauthorized(result)
-        controller.head 401
+        controller.head 403
       end
 
       def unauthenticated(result)

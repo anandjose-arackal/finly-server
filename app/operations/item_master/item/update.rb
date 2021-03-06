@@ -22,6 +22,11 @@ class ItemMaster::Item::Update < ItemMaster::Item::Base
       return
     end
 
+    if self.inventory_item_parameters['product_type_id'].to_i != inventory_item.product_type_id
+      add_message :error, "Item Type can't be updated"
+      return
+    end
+
     supply_item_type_id = inventory_item_params[:supply_item_type_id]
 
     if supply_item_type_id.present?

@@ -8,4 +8,8 @@ class SecurityPolicy::Enforcers::Base
     self.user_role_names = user_role_names
   end
 
+  def fetch(*keys)
+    SecurityPolicy::Config.config_for(user, user_role_names, *keys)
+  end
+
 end

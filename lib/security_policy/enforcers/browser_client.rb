@@ -4,16 +4,16 @@ class SecurityPolicy::Enforcers::BrowserClient < SecurityPolicy::Enforcers::Base
   subscribe :browser_client
 
   def inactivity_timeout(options = {})
-    inactivity_timeout = SecurityPolicy::Config.config_for(user_role_names, :browser, :inactivity_timeout).reject {|item| item.blank?}
+    inactivity_timeout = fetch(:browser, :inactivity_timeout).reject {|item| item.blank?}
     inactivity_timeout.min
   end
 
   def concurrent_logins(options = {})
-    SecurityPolicy::Config.config_for(user_role_names, :browser, :concurrent_logins).min
+    fetch(:browser, :concurrent_logins).min
   end
 
   def otp_verify?(options = {})
-    SecurityPolicy::Config.config_for(user_role_names, :browser, :client, :otp_verify).include?(true)
+    fetch(:browser, :client, :otp_verify).include?(true)
   end
 
 end

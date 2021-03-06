@@ -130,6 +130,11 @@ class Expense::Manual::Create < Expense::Manual::Base
       expense_params[:spent_from_id] = nil
     end
     expense_params[:created_by_id] = actual_current_user.id if actual_current_user.present?
+
+    ## method to set expense tax type for expense which are created from mobile api end
+    ## app not have tds gst selection logic
+    set_expense_tax_type(expense_params)
+    ##
   end
 
   def process
@@ -217,6 +222,14 @@ class Expense::Manual::Create < Expense::Manual::Base
         return
       end
       # self.expense.manual_expense.custom_fields.destroy_all
+    end
+  end
+
+  def set_expense_tax_type(expense_params)
+    return true unless expense_params.present?
+    return true  if expense_params[:expense_tax_type_id].present?
+    if expense_params.dig(:gstin_location_attributes,:gstin).present?
+      expense_params[:expense_tax_type_id] = ExpenseTaxType.id_for(:gst)
     end
   end
 

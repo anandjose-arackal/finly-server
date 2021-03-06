@@ -1,5 +1,6 @@
 class YesBankVendorExposure < Exposures::API
-
+  include Concerns::ErpSyncConcern
+  
   attribute :id, record_attribute: true
   attribute :name, record_attribute: true
   attribute :email, record_attribute: true
@@ -16,6 +17,7 @@ class YesBankVendorExposure < Exposures::API
   attribute :created_at, record_attribute: true
   attribute :updated_at, record_attribute: true
   attribute :created_by, record_attribute: true, exposure: true
+  attribute :created_by_id, record_attribute: true
   attribute :policy, record_attribute: true, exposure: true
   attribute :status, record_attribute: true, exposure: true
   attribute :gst_registered, record_attribute: true
@@ -30,17 +32,22 @@ class YesBankVendorExposure < Exposures::API
   attribute :description, record_attribute: true
   attribute :address, record_attribute: true
 
-  attribute :bank_accounts, includes: [:bank_accounts] do
+  attribute :bank_accounts, includes: [:bank_accounts], exposure: true do
     bank_accounts = []
     record.bank_accounts.each do |account|
-      bank_accounts << account.to_exposure
+      bank_accounts << account
     end
     bank_accounts.sort_by { |account| account.default_account ? 0 : 1 }
   end
 
-  attribute :gstin_location, includes: [:gstin_locations] do
+  attribute :default_bank_account, includes: [:bank_accounts], exposure: true do
+    record.bank_accounts.default_accounts&.first
+  end
+
+  attribute :gstin_location, includes: [:gstin_locations], exposure: true do
     record.gstin_locations&.first
   end
+  attribute :gstin_locations, includes: [:gstin_locations], exposure: true, record_attribute: true
 
   attribute :deactivated, record_attribute: :deactivated?
 

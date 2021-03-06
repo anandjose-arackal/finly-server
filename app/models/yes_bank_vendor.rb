@@ -52,6 +52,7 @@
 #  erp_sync_attempts_count  :integer          default(0)
 #  erp_sync_attempted_at    :datetime
 #  ldc_upper_limit_amount   :decimal(20, 5)
+#  is_workflow_v2           :boolean          default(FALSE)
 #
 
 class YesBankVendor < ApplicationRecord
@@ -147,8 +148,8 @@ class YesBankVendor < ApplicationRecord
     ids = self.pluck(:id)
     vendor_ids = where(id: ids).where("yes_bank_vendors.name like ? OR yes_bank_vendors.email like ? OR yes_bank_vendors.mobile_number like ? OR yes_bank_vendors.description like ? OR yes_bank_vendors.business_name like ? OR yes_bank_vendors.vendor_id like ? OR yes_bank_vendors.trade_name like ? OR yes_bank_vendors.pan like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
     vendor_ids += where(id: ids).joins(:gstin_locations).where('gstin_locations.gstin like ?', "%#{term}%").pluck(:id)
-    bank_account_ids = BankAccount.where("bank_accounts.account_number like ? OR bank_accounts.ifsc like ? OR bank_accounts.name like ?", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
-    vendor_ids += BankAccount.where(account_owner_type: "YesBankVendor").where(id: bank_account_ids).pluck(:account_owner_id)
+    # bank_account_ids = BankAccount.where("bank_accounts.account_number like ? OR bank_accounts.ifsc like ? OR bank_accounts.name like ?", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
+    # vendor_ids += BankAccount.where(account_owner_type: "YesBankVendor").where(id: bank_account_ids).pluck(:account_owner_id)
     where(id: vendor_ids)
   end
 
@@ -271,6 +272,7 @@ class YesBankVendor < ApplicationRecord
         where(status_id: VendorStatus.ids_for(%i(approved auto_approved)))
   }
 
+  scope :validation_associated_items, -> { non_deleted.where.not(status_id: VendorStatus.ids_for(:rejected, :deactivated))}
   # Scopes for ordering ends
 
   before_validation do
@@ -460,5 +462,7 @@ class YesBankVendor < ApplicationRecord
     VendorStatus.ids_for(:awaiting_approval).include?(status_id)
   end
 
-
+  def retrieve_value(entity)
+    send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
+  end
 end

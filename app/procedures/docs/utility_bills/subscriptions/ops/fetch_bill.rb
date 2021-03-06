@@ -45,18 +45,27 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchBill < Transactions::API
   def bill_fetch(options, model:, **)
     # op = Bbps::BillFetch.call_async({params: fetch_params, "current_user" => User.first}, {wait: true})
     options['result'] = {}
-    Bbps::BillFetch.call_async({params: model.generate_billfetch_params, "current_user" => User.first}, {wait: true}) do |op|
+    Bbps::BillFetch.call_async({params: model.generate_billfetch_params, "current_user" => User.first}, {wait: true, wait_timeout: 180.seconds}) do |op|
       op.success do |result|
         options['result']['data'] = result
       end
 
       op.error do |result|
         options['result']['data'] = result
+
+        error_message = result["error_desc"]
+        if error_message.present?
+          add_message options, :error, :base, error_message
+        end
+        return         
       end
 
       op.failure do |result|
         if result["errors"].present? && result["errors"].is_a?(Hash)
           messages = result["errors"].values.flatten
+          add_message options, :error, :base, messages
+        elsif result["error_desc"].present?
+          messages = result["error_desc"]
           add_message options, :error, :base, messages
         end
         return
@@ -68,6 +77,7 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchBill < Transactions::API
   def check_bill_presence(options, model:, result:, **)
     data = result['data']
     unless data&.status == 'Y'
+      add_message(options, :error, :base, data.error_desc) if data.error_desc.present?
       add_message(options, :error, :base, "Could Not Fetch Bill")
       return
     end
@@ -119,7 +129,7 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchBill < Transactions::API
 
 
     if bill.present?
-      result['bill'] = bill
+      result['bill'] = bill.first
     end
 
     true
