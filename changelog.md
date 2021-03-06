@@ -43,7 +43,6 @@ Adding bbps error message on failure.
 - reverse merging the master with bug/invoice_amount_rate_validation
 - Adding validation for line item rate greater than 0
 
-
 ### Added
 
 - `commit-msg` git hook to check branch name and commit message conventions.
