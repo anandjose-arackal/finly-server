@@ -137,6 +137,10 @@ Resolver::Router.draw do
     route 'received', Docs::P2P::Inwards::Received::Resolver
   end
 
+  scope :inward_documents_items do
+    route 'default', Docs::P2P::Inwards::Received::ReceivedItems::Resolver
+  end
+
   scope :credit_notes do
     route 'default', Docs::P2P::CreditNotes::Resolver
   end
@@ -151,6 +155,7 @@ Resolver::Router.draw do
 
   scope :payments do
     route 'default', Docs::PaymentTickets::Payments::Resolver
+    route 'export', Docs::PaymentTickets::Payments::Export::Resolver
   end
 
   scope :upcoming_invoices do

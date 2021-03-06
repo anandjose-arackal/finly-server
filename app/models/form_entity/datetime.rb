@@ -54,7 +54,7 @@ class FormEntity::Datetime < FormEntity
   register :datetime
   set :hint, "Select date and time"
 
-  RESTRICTIONS = %w(
+  RESTRICTIONS ||= %w(
     in_the_future
     in_the_past
     not_in_the_future
@@ -73,19 +73,19 @@ class FormEntity::Datetime < FormEntity
         case entity.options['restriction']
         when 'in_the_future'
           if value.in_time_zone <= DateTime.now
-            errors.add entity.entity_key, "can only be in the future"
+            errors.add entity.label, "can only be in the future"
           end
         when 'in_the_past'
           if value.in_time_zone >= DateTime.now
-            errors.add entity.entity_key, "can only be in the past"
+            errors.add entity.label, "can only be in the past"
           end
         when 'not_in_the_future'
           if value.in_time_zone > DateTime.now
-            errors.add entity.entity_key, "cannot be in the future"
+            errors.add entity.label, "cannot be in the future"
           end
         when 'not_in_the_past'
           if value.in_time_zone < DateTime.now
-            errors.add entity.entity_key, "cannot be in the past"
+            errors.add entity.label, "cannot be in the past"
           end
         else
           # Do nothing

@@ -43,13 +43,15 @@ class BbpsBillsFetch
 
       if will_create
         parameters = customer_params(subscription).with_indifferent_access
-        Bbps::BillFetch.call_async({params: parameters, "current_user" => User.first}, wait: true) do |op|
+        Bbps::BillFetch.call_async({params: parameters, "current_user" => User.first}, {wait: true, wait_timeout: 180.seconds}) do |op|
           op.success do |result|
             ap result
             create_bill(result, subscription, autofetched)
           end
           op.error do |result|
             # Will never enter here
+            Docs::UtilityBills::Bills::Ops::HandleFetchErrors.(params: {result: result, subscription: subscription}, current_user: User.first)
+            
           end
           op.failure do |result|
             Docs::UtilityBills::Bills::Ops::HandleFetchErrors.(params: {result: result, subscription: subscription}, current_user: User.first)

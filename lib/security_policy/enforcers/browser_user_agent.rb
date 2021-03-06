@@ -4,7 +4,7 @@ class SecurityPolicy::Enforcers::BrowserUserAgent < SecurityPolicy::Enforcers::B
   subscribe :browser_user_agent
 
   def otp_verify?(options = {})
-    SecurityPolicy::Config.config_for(user_role_names, :browser, :user_agent, :otp_verify).include?(true)
+    fetch(:browser, :user_agent, :otp_verify).include?(true)
   end
 
 end

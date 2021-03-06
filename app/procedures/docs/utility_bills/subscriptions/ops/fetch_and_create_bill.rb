@@ -41,7 +41,7 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchAndCreateBill < Transactions:
   def bill_fetch(options, fetch_params:, **)
     # op = Bbps::BillFetch.call_async({params: fetch_params, "current_user" => User.first}, {wait: true})
     options['result'] = {}
-    Bbps::BillFetch.call_async({params: fetch_params, "current_user" => User.first}, {wait: true}) do |op|
+    Bbps::BillFetch.call_async({params: fetch_params, "current_user" => User.first}, {wait: true, wait_timeout: 180.seconds}) do |op|
       op.success do |result|
         p "SUCCESS"
         options['result']['data'] = result
@@ -50,15 +50,26 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchAndCreateBill < Transactions:
       op.error do |result|
         p "ERROR"
         options['result']['data'] = result
+
+        error_message = result["error_desc"]
+        if error_message.present?
+          add_message options, :error, :base, error_message
+        end
+        
+        return
       end
 
       op.failure do |result|
         p "FAILURE"
 
-        if result["errors"].present? && result["errors"].is_a?(Hash)
+        if result["errors"].present? && result["errors"].is_a?(Hash) 
           messages = result["errors"].values.flatten
           add_message options, :error, :base, messages
+        elsif result["error_desc"].present?
+          messages = result["error_desc"]
+          add_message options, :error, :base, messages
         end
+
         return
       end
     end

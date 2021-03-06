@@ -33,18 +33,24 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
     #support for multiple gstin locations in import
     vendor = check_existing_vendor(vendor_params["vendor"])
     if vendor && vendor_params["vendor"]["gstin_locations_attributes"]
-      if check_existing_location(vendor, vendor_params["vendor"]["gstin_locations_attributes"].first)
         vendor.gstin_locations.build(vendor_params["vendor"]["gstin_locations_attributes"])
+        messages = validate_vendor(vendor,true)
+        unless messages.blank?
+          return result false, messages.join(', ')
+        end
+
         unless vendor.save
           return result false, vendor.errors.full_messages
         end
         return result true, 'Created Successfully'
-      else
-        return result false, 'Existing Vendor and Existing Gstin Location'
-      end
     end
 
     vendor = self.company.yes_bank_vendors.build(vendor_params["vendor"])
+    messages = validate_vendor(vendor,false)
+    unless messages.blank?
+      return result false, messages.join(', ')
+    end
+
     unless vendor.validate
       return result false, vendor.errors.full_messages
     end
@@ -130,6 +136,7 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
     code = data[:vendor_id].to_s
     vendor_id = (code.blank? ? nil : code)
     vendor_type_id = nil
+    policy_id = company&.default_policy&.id
     if data[:vendor_type].present?
       vendor_type_id = company.vendor_types.where(name: data[:vendor_type]).first
       if vendor_type_id.blank?
@@ -171,7 +178,8 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
                            "vendor_id" => vendor_id,
                            "vendor_type_id" => vendor_type_id,
                            "gst_registered" => gst_registered,
-                           "payment_term_id" => payment_term_id
+                           "payment_term_id" => payment_term_id,
+                           "policy_id" => policy_id
     }}
 
     bank_params={"bank_accounts_attributes" =>[{"name"=>account_name,
@@ -206,13 +214,52 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
     end
   end
 
+  def validate_vendor(vendor, only_gstin = false)
+    messages = []
+    if vendor.gstin_locations.last.present? && vendor.gstin_locations.last&.gstin.present?
+      gstin = vendor.gstin_locations.last.gstin
+      similar_gstins = GstinLocation.where(vendor_id: company.yes_bank_vendors.non_deleted.filter_active).where(gstin: gstin)
+      if similar_gstins.present?
+        messages.push "GSTIN details for \"#{similar_gstins.first.gstin}\" already exists in the system. See vendor - #{similar_gstins.first.vendor.display_name}"
+      end
+    end
+
+    return messages if only_gstin
+
+    if vendor.pan.present?
+      similar_pan_vendors = YesBankVendor.where(pan: vendor.pan, company_id: company.id).validation_associated_items
+      if similar_pan_vendors.present?
+        gstins=[]
+        gstins << vendor.gstin_locations.last.gstin if vendor.gstin_locations.last&.gstin.present?
+        vendor.gstin_locations.map{|gstin_location| gstins << gstin_location[:gstin]}
+        gstins =gstins.reject { |e| e.to_s.empty? }
+        if gstins.present?
+          gstin_against_dup_pan = similar_pan_vendors.validation_associated_items.joins(:gstin_locations).pluck(:'gstin_locations.gstin').uniq&.reject { |e| e.to_s.empty? }
+          duplicated_gstins = gstin_against_dup_pan & gstins
+          if gstin_against_dup_pan.present? && duplicated_gstins.present?
+            similer_gstin_vendors = similar_pan_vendors.joins(:gstin_locations).where('gstin_locations.gstin IN (?)',  duplicated_gstins)
+            messages.push"Vendor with pan: \"#{similar_pan_vendors.first.pan}\" and GSTIN Combination already exists in the system. See vendor - #{similer_gstin_vendors.first.display_name}"
+          end
+        else
+          messages.push"Vendor with pan: \"#{similar_pan_vendors.first.pan}\" already exists in the system. See vendor - #{similar_pan_vendors.first.display_name}"
+        end
+      end
+    end
+
+    if vendor.bank_accounts.last.present? && vendor.bank_accounts.last&.account_number.present?
+      account_number = vendor.bank_accounts.last&.account_number
+      similar_bank_accounts = BankAccount.where(account_number: account_number, company_id: company.id).filter_active
+      if similar_bank_accounts.present?
+        messages.push "Active Bank Account with account number \"#{similar_bank_accounts.first.account_number}\" already exists in the system. Please disable it. See vendor - #{similar_bank_accounts.first.account_owner.display_name}"
+      end
+    end
+
+    messages
+  end
+
   def check_existing_vendor(vendor_params)
     return false if vendor_params["vendor_id"].blank?
     existing_vendor = company.yes_bank_vendors.non_deleted.find_by_vendor_id vendor_params["vendor_id"]
   end
 
-  def check_existing_location(vendor, gstin_location_params)
-    return false if gstin_location_params["gstin"].blank?
-    vendor.gstin_locations.where(gstin: gstin_location_params["gstin"]).blank?
-  end
 end

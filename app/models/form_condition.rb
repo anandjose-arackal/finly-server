@@ -35,6 +35,8 @@ class FormCondition < ApplicationRecord
 
   serialize :rule, Rules::Adapters::Store
 
+  validate :valid_rule?
+
   def self.system_condition(params = {}, &block)
     params[:custom] = false
     params[:internal] ||= false
@@ -64,6 +66,14 @@ class FormCondition < ApplicationRecord
     super()
   end
 
+  def valid_rule?
+    return if rule.blank?
+
+    unless rule.valid?(controlling_field: referencable)
+      errors.add :rule, 'is not valid'
+    end
+  end
+
   def as_json(options = {})
     case options[:json_format]
     when 'form_builder'
@@ -74,11 +84,11 @@ class FormCondition < ApplicationRecord
       rule = self.rule.as_json_logic
     end
     referencable.as_json(json_format: "form_reference").merge(
-        {
-            id: id,
-            rule: rule,
-            actions: actions
-        }
+      {
+        id: id,
+        rule: rule,
+        actions: actions
+      }
     )
   end
 

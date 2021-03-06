@@ -35,6 +35,7 @@ class InvoiceExposure < Exposures::API
   attribute :created_at, record_attribute: true
   attribute :submitted_at, record_attribute: true
   attribute :created_by, record_attribute: true, exposure: true
+  attribute :created_by_id, record_attribute: :created_by_user_id
   attribute :policy, exposure: true, record_attribute: true, includes: [:policy]
   attribute :gross_amount, record_attribute: true, exposure: true, includes: [:gross_amount]
   attribute :gross_amount_value, includes: [:gross_amount] do
@@ -191,6 +192,10 @@ class InvoiceExposure < Exposures::API
   attribute :custom_fields, record_attribute: true, includes: [{ custom_fields: [:field_configuration, :value] }]
 
   attribute :item_amounts_total, record_attribute: true, includes: [{invoice_items: [:inventory_line_item, :amount, :billable_amount]}]
+
+  attribute :po_adjusted_advance_value, includes: [:po_adjusted_advance] do
+    record.po_adjusted_advance&.value || 0
+  end
 
 
   # def vendor_ref_num(invoice_line_item)

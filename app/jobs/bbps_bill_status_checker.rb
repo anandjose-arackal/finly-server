@@ -40,32 +40,40 @@ class BbpsBillStatusChecker
               payment&.parent&.update(paid_at: parsed_datetime)
               payment&.parent&.subscription&.update(last_paid_at: parsed_datetime)
             end
+
+            payment.system_messages.destroy_all
+            payment.system_messages.create(
+              system_message_type_id: SystemMessageType.id_for(:success),
+              content: "Payment Successfully Completed."
+            )
+
           end
           op.error do |result|
             puts "Error: #{result}"
             payment.update(payment_status_id: PaymentStatus.id_for(:failed))
             bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
             bill.update(status_id: BbpsBillStatus.id_for(:approved))
+
+            payment.system_messages.destroy_all
+            # add error message to the ticket
+            error_message = result['error_desc']
+            payment.system_messages.create(
+              system_message_type_id: SystemMessageType.id_for(:error),
+              content: "#{error_message}."
+            )
             # credit the amount back to the accout if already not credited.
 
             # get all the finly transaction_details, ( debit - credit == 1 )
             debit_transactions_count = FinlyTransaction.where(payment_id: payment.id, transaction_type_id: TransactionType.id_for(:debit)).count
             credit_transactions_count = FinlyTransaction.where(payment_id: payment.id, transaction_type_id: TransactionType.id_for(:credit)).count
 
-            if debit_transactions_count - credit_transactions_count == 1
+            if debit_transactions_count - credit_transactions_count >= 1
               adapter = AccountManager::Base.new()
               credit_adapter = adapter.send(:retrieve_adapter , payment.initiating_account, payment )
 
-              payment.system_messages.destroy_all
-              # add error message to the ticket
-              error_message = result['error_desc']
-              payment.system_messages.create(
-                system_message_type_id: SystemMessageType.id_for(:error),
-                content: "#{error_message}."
-              )
               credit_adapter.credit(payment, {})
             end
-
+            
           end
           op.failure do |result|
             puts "Failure: #{result}"

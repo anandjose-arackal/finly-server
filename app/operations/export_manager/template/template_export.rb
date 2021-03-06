@@ -44,7 +44,9 @@ class ExportManager::Template::TemplateExport < ExportManager::API
       end
       params[:additional_filters] = [query.with_indifferent_access]
     end
-    results = Resolver::Router.dispatch("#{resource_type}.default", { current_user: user, params: params })
+
+    export_resource = ExportResource.find_by(value: resource_type)
+    results = Resolver::Router.dispatch(export_resource.resolver, { current_user: user, params: params })
 
     case format
     when :csv, :xls

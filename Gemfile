@@ -9,6 +9,8 @@ gem 'wkhtmltopdf-binary', '0.12.5'
 gem 'nokogiri', '~> 1.10.0'
 gem 'autoprefixer-rails', '~> 9.4.4'
 
+gem 'eps', '~> 0.3'
+
 gem 'fiscali', '~> 2.4'
 gem 'redis', '~> 4.1'
 gem 'parslet', '~> 1.8.2'
@@ -201,8 +203,8 @@ gem 'devise', '~> 4.7'
 gem 'devise_invitable', '~> 2.0', '>= 2.0.2'
 gem 'doorkeeper', '~> 5.0.2'
 
-gem 'faraday', '~> 0.15.4'
-gem 'faraday_middleware', '~> 0.12.2'
+gem 'faraday', '~> 0.17.3'
+gem 'faraday_middleware', '~> 0.14.0'
 
 gem 'posthog-ruby', '~> 1.0'
 # gem for xml parsing
@@ -263,7 +265,7 @@ gem 'paper_trail-association_tracking', '~> 2.1.1'
 gem 'paper_trail-globalid', '~> 0.2.0'
 group :development, :test do
   gem 'byebug'
-  gem 'pry', '~> 0.12.2'  
+  gem 'pry', '~> 0.12.2'
   gem 'rb-readline', '~> 0.5'
   gem 'capistrano', '~> 3.11.0'
   gem 'capistrano3-puma', '~> 5.0'
@@ -339,6 +341,6 @@ group :test do
 end
 
 group :production do
-  gem 'elastic-apm', '~> 2.8.1'
+  gem 'elastic-apm', '~> 3.13.0'
   # gem 'scout_apm', '~> 2.4'
 end

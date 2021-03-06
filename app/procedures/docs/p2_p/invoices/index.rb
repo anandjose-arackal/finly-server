@@ -7,7 +7,7 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
               :credit_note_initiator, :credit_note_reviewer, :credit_note_auditor,
               :non_po_invoice_initiator, :non_po_invoice_reviewer, :non_po_invoice_auditor, :auditor, :admin
   resolver 'invoices.default'
-  reference '{{record.id}}', procurement_id: '{{record.procurement_id}}', procurement_type: "{{record.invoice_type.key}}"
+  reference '{{record.id}}', procurement_id: '{{record.procurement_id}}', procurement_type: "{{record.invoice_type.config_key}}"
   custom_fields :invoice
 
   # Fixed column is always default true
@@ -176,7 +176,7 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     # Awaiting Approval
     if user.has_permission?(awaiting_approval_roles)
       counter.add InwardInvoiceStatus::GROUP_AWAITING_APPROVAL, 'Awaiting Approval',
-                  collection.awaiting_action_items(user).count
+                  collection.awaiting_action_items(user).select(:id).count
     end
 
     # Processing

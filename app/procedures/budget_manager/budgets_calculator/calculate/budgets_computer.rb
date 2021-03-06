@@ -106,7 +106,7 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
       end
 
       # calculating pending amount - PurchaseRequests that are approved or auto approved and POs that are everything below approved will come under pending
-      pending_amount = self.budget_trails.with_entity_type("PurchaseRequestItem").with_entity_status_id(PurchaseRequestStatus.ids_for(:awaiting_approval, :approved, :auto_approved))
+      pending_amount = self.budget_trails.with_entity_type("PurchaseRequestItem").with_entity_status_id(PurchaseRequestItemStatus.ids_for(:awaiting_approval, :approved, :auto_approved))
                            .joins(self.amount_to_be_considered).sum(:value)
 
       pending_amount += self.budget_trails.with_entity_type("PurchaseOrderItem").with_entity_status_id(PurchaseOrderStatus.status_ids_for_pending_bucket).sum("#{po_item_amount_to_be_considered} - #{paid_amount_to_be_considered} - #{payment_processing_amount_to_be_considered}")
@@ -249,7 +249,7 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
     result = {}
     if calculate_trail_items
       expenses = Expense.with_id(self.budget_trails.with_entity_type("Expense").pluck(:entity_id))
-      purchase_request_items = PurchaseRequestItem.with_id(self.budget_trails.with_entity_type("PurchaseRequestItem").pluck(:entity_id))
+      purchase_request_items = PurchaseRequestItem.with_id(self.budget_trails.with_entity_type("PurchaseRequestItem").with_entity_status_id(PurchaseRequestStatus.ids_for(:awaiting_approval, :approved, :auto_approved)).pluck(:entity_id))
       purchase_order_items = PurchaseOrderItem.with_id(self.budget_trails.with_entity_type("PurchaseOrderItem").without_entity_status_id(PurchaseOrderStatus.status_ids_for_unbudgetables).pluck(:entity_id))
       invoice_items = InvoiceLineItem.with_id(self.budget_trails.with_entity_type("InvoiceLineItem").without_entity_status_id(InwardInvoiceStatus.status_ids_for_unbudgetables).pluck(:entity_id))
       payments = Payment.with_id(self.budget_trails.with_entity_type("Payment").pluck(:entity_id))

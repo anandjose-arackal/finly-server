@@ -63,6 +63,7 @@ class PaymentAgreements::Revise < PaymentAgreements::Base
     # self.revised_agreement.agreement_date = Date.today
     # self.revised_agreement.execution_date = Date.today
     self.revised_agreement.revision_of_pa_id = self.payment_agreement.id
+    self.revised_agreement.creator_id = user.id
     # self.revised_agreement.policy_id = nil
     self.revised_agreement.controlling_level_id = nil
     self.revised_agreement.status_id = PaymentAgreementStatus.id_for(:draft)
