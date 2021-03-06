@@ -61,7 +61,7 @@ module FormsHelper
 
       else
         if model.respond_to?(:form_custom_fields)
-          custom_field = model.form_custom_fields.joins(:form_entity).where("form_entities.entity_key = ?", form_entity.entity_key).first
+          custom_field = model.form_custom_fields.joins(:form_entity).where("form_entities.entity_key = ?", form_entity.entity_key).order(:created_at).last
           value = custom_field&.retrieve_value
           form_data.merge!({ form_entity.entity_key => value })
           if form_entity.entity_type == 'dropdown' || form_entity.entity_type == 'lookup'
