@@ -171,6 +171,7 @@ class PurchaseOrder < ApplicationRecord
   validates :purchase_order_status_id, presence: true
 
   validate :item_quantity_validation
+  validate :item_rate_validation
 
   # validates :policy_id, presence: true
   # validates :items, presence: true
@@ -1284,5 +1285,16 @@ class PurchaseOrder < ApplicationRecord
     end
     
     errors.add(:items, "qunatity must be greater than 0") if flag
+  end
+
+  def item_rate_validation
+    flag = false
+    rates = items.map(&:rate).map(&:to_i)
+    rates.each do |rate|
+      flag = true if rate <= 0
+      break
+    end
+    
+    errors.add(:items, "rate must be greater than 0") if flag
   end
 end
