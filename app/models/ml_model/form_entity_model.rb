@@ -141,6 +141,15 @@ class MlModel::FormEntityModel < MlModel
     data
   end
 
+  def prepare_prediction(data, options = {})
+    dependent_entity_mappings.includes(:form_entity).find_each do |dependent_entity_mapping|
+      dependent_entity_key = dependent_entity_mapping.form_entity.entity_key
+      data[dependent_entity_key] = format(data[dependent_entity_key], 'category')
+    end
+    data[split_key] = format(data[split_key], split_key_type) if split_key.present?
+    data
+  end
+
   protected
 
   def is_form_entities_valid?
