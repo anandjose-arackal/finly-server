@@ -55,7 +55,9 @@ class MlModel::FormEntityModel < MlModel
   end
 
   def includes(records)
-    records.includes(:created_by, :invoice_type, :form_custom_fields, :items)
+    return records.includes_for_contract if records.respond_to?(:includes_for_contract)
+
+    records
   end
 
   # def self.build(options = {})
