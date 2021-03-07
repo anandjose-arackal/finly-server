@@ -16,8 +16,16 @@ class Event::EBankPaymentRequest::CreditOtp < Event::EBankPaymentRequest::Base
     end
   end
 
+  def action_name
+    "Payment Order Credit OTP"
+  end
+
   def affected_users
     [crediting_user]
+  end
+
+  def event_id
+    NotifierType.id_for(:bank_payment_request_credit_confirm)
   end
 
 

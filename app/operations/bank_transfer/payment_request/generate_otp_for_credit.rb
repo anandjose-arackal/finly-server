@@ -69,7 +69,7 @@ class BankTransfer::PaymentRequest::GenerateOtpForCredit < BankTransfer::Payment
 
   def post_process
     add_message :success, "OTP sent to your mobile number"
-    Event::EBankPaymentRequest::CreditOtp.(user, {bank_payment_request: bank_payment_request, otp: otp})
+    Event::EBankPaymentRequest::CreditOtp.(user, {bank_payment_request: self.bank_payment_requests.first, otp: otp})
   end
 
   private
