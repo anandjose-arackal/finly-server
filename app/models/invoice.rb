@@ -1576,7 +1576,9 @@ class Invoice < ApplicationRecord
       break
     end
     
-    errors.add(:invoice_items, "qunatity must be greater than 0") if flag
+    errors.add(:invoice_items, "quantity must be greater than 0") if flag
+
+    Quantity
   end
 
   def item_rate_validation

@@ -1284,7 +1284,7 @@ class PurchaseOrder < ApplicationRecord
       break
     end
     
-    errors.add(:items, "qunatity must be greater than 0") if flag
+    errors.add(:items, "quantity must be greater than 0") if flag
   end
 
   def item_rate_validation
