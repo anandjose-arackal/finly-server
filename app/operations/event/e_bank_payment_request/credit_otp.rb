@@ -17,7 +17,7 @@ class Event::EBankPaymentRequest::CreditOtp < Event::EBankPaymentRequest::Base
   end
 
   def action_name
-    "Payment Order Credit OTP"
+    "Requested OTP for crediting payment"
   end
 
   def affected_users
@@ -30,7 +30,7 @@ class Event::EBankPaymentRequest::CreditOtp < Event::EBankPaymentRequest::Base
 
 
   def mailer_subject(user)
-    return "Credit OTP for your payment order"
+    return "Requested OTP for crediting payment"
   end
 
   def mailer_body(user)
