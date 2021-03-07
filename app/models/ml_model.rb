@@ -128,8 +128,11 @@ class MlModel < ApplicationRecord
     # Predictions will be tracked from the last build time
     return false if built_at.blank?
 
+    records = self.records
     # Scope records which have not been synced or have been updated after the last build
-    records = self.records.where.not("id in (#{predictions.select(:record_id).to_sql})")
+    records = records.where.not(
+      "id in (#{predictions.where(record_type: records.model).select(:record_id).to_sql})"
+    )
     records = records.or(records.where('updated_at > ?', tracked_at))
 
     # Scope records with split_key timestamp after the model was built.
@@ -139,24 +142,40 @@ class MlModel < ApplicationRecord
       records = records.where.not(:"#{split_key}" => nil).where("#{split_key} > ?", built_at)
     end
 
-    records.find_each do |record|
-      record_data = prepare_record(record)
+    records.find_in_batches do |batch|
+      predicted_records = []
+      import_data = []
+      batch.each do |record|
+        record_data = prepare_record(record)
+        next if record_data.blank?
 
-      actual = record_data[target_key]
-      prediction = model.predict(record_data.except(target_key))
+        actual = record_data[target_key]
+        prediction = model.predict(record_data.except(target_key))
 
-      # Update existing record if available
-      prediction_model = predictions.find_or_initialize_by(
-        record: record,
-        ml_model: self,
-        company_id: self.company_id
-      )
-      prediction_model.update(
-        actual_value: actual,
-        predicted_value: prediction
-      )
+        # Update existing record if available
+        # prediction_model = predictions.find_or_initialize_by(
+        #   record: record,
+        #   ml_model: self,
+        #   company_id: self.company_id
+        # )
+        # prediction_model.update(
+        #   actual_value: actual,
+        #   predicted_value: prediction
+        # )
+        import_data << {
+          record_id: record.id,
+          record_type: record.class.name,
+          ml_model_id: self.id,
+          company_id: self.company_id,
+          actual_value: actual,
+          predicted_value: prediction,
+          is_accurate_prediction: (actual.to_s == prediction.to_s)
+        }
+        predicted_records << record.id
+      end
+      update(tracked_at: DateTime.now)
+      MlModelPrediction.import import_data, on_duplicate_key_update: [:record_id, :record_type]
     end
-    update(tracked_at: DateTime.now)
 
     true
   end
