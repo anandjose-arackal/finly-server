@@ -296,8 +296,9 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
           end 
           break if rate_flag || quantity_flag  
         end
-        add_message :error, "Reviewer can not updated invoice item's quantity" if quantity_flag
-        add_message :error, "Reviewer can not updated invoice item's rate" if rate_flag
+
+        add_message :error, "Cannot update item quantity at this stage" if quantity_flag
+        add_message :error, "Cannot update item rate at this stage" if rate_flag
         return if rate_flag || quantity_flag
       end
     end

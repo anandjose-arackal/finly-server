@@ -42,6 +42,8 @@ Adding bbps error message on failure.
 ## 2021-03-06
 - reverse merging the master with bug/invoice_amount_rate_validation
 - Adding validation for line item rate greater than 0
+
+## 2021-03-07
 - Updating error message
 
 ### Added
