@@ -37,7 +37,7 @@ class MlModel::FormEntityModel < MlModel
 
   alias_attribute :target_entity, :parent
 
-  def self.system_model(model_klass:, form_entity_key:, dependent_entity_keys: [])
+  def self.system_model(model_klass:, form_entity_key:, dependent_entity_keys: [], attributes: {})
     model = self.new(
       build_schedule: 'weekly',
       target_key: form_entity_key,
@@ -46,6 +46,7 @@ class MlModel::FormEntityModel < MlModel
       split_key_type: 'datetime',
       model_klass: model_klass
     )
+    model.assign_attributes(attributes) if attributes.present?
     model.template_reference[:form_entity_key] = form_entity_key
     dependent_entity_keys.each do |dependent_entity_key|
       dependent_entity_mapping = model.dependent_entity_mappings.new
@@ -132,6 +133,9 @@ class MlModel::FormEntityModel < MlModel
         # Hence converting it to a string
         data[dependent_entity.entity_key] = format(form_data.dig(*dependent_paths), 'category')
       end
+
+      # Add the split key
+      data[split_key] = format(record.send(split_key), split_key_type) if split_key.present?
     end
 
     data

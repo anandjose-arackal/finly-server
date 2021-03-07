@@ -56,10 +56,24 @@ class Forms::API
     form.choice_dependencies << dependency
   end
 
-  def self.predict(entity_key, with: [])
+  def self.predict(entity_key, with: [], split_key: NoObject)
     with = [with] if with.present? and not with.respond_to?(:each)
 
-    prediction = MlModel::FormEntityModel.system_model(model_klass: form.model, form_entity_key: entity_key, dependent_entity_keys: with)
+    if split_key == NoObject
+      split_key = form.model.has_attribute?(:submitted_at) ? :submitted_at : :created_at
+    end
+
+    split_key_type = split_key.present? ? 'datetime' : nil
+
+    prediction = MlModel::FormEntityModel.system_model(
+      model_klass: form.model,
+      form_entity_key: entity_key,
+      dependent_entity_keys: with,
+      attributes: {
+        split_key: split_key,
+        split_key_type: split_key_type
+      }
+    )
 
     raise "Prediction #{entity_key} is not unique" if predictions[entity_key].present?
 
