@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file. Always add new logs to beginning of this file.
 
+2021-03-07
+ - OTP mailer for bank payment request credit action introduced.
+
 Updating the bbps status checker credit checks.
 Addition of success message in bbps status checker for successful payment.
 
