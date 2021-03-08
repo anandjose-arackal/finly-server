@@ -4,7 +4,7 @@ class Event::EBankPaymentRequest::CreditOtp < Event::EBankPaymentRequest::Base
 
   def init
     super
-    self.crediting_user = self.bank_payment_request.trails.last.action_user
+    self.crediting_user = user
     self.otp =params[:otp]
   end
 
@@ -21,7 +21,7 @@ class Event::EBankPaymentRequest::CreditOtp < Event::EBankPaymentRequest::Base
   end
 
   def affected_users
-    [user]
+    [crediting_user]
   end
 
   def event_id
