@@ -48,7 +48,13 @@ class Forms::Ops::Predict < Transactions::API
   end
 
   def predict(context, ml_model:, params:, **)
-    context[:prediction] = ml_model.predict(params[:data])
+    result = MlModels::Predict.call_async({ params: { id: ml_model.id, data: params[:data] } }, wait: true, wait_timeout: 40.seconds)
+    if result['success']
+      context[:prediction] = result['prediction']
+    else
+      on_error context, :base, 'error in prediction'
+    end
+    # context[:prediction] = ml_model.predict(params[:data])
   end
 
   def authorize_prediction(context, entity:, prediction:, created_by:, **)
