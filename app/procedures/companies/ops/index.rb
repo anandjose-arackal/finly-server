@@ -22,7 +22,7 @@ class Companies::Ops::Index < IndexBuilder::API
   end
 
   column :active, default: true do
-    indicator value: :active, format: :active_status
+    indicator value: :active, format: :format_active
   end
 
   column :actions, default: true do
@@ -48,11 +48,19 @@ class Companies::Ops::Index < IndexBuilder::API
     counter
   end
 
-  def self.active_status(context)
+  def self.active(context)
     if context[:record].active?
       'Active'
     else
       'Inactive'
+    end
+  end
+
+  def self.format_active(context)
+    if context[:record].active?
+      'info'
+    else
+      'danger'
     end
   end
 end
