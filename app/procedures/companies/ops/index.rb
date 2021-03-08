@@ -30,7 +30,7 @@ class Companies::Ops::Index < IndexBuilder::API
       action :api_request,
             :disable,
             label: 'Disable',
-            url: 'companies/{{record.id}',
+            url: 'companies/{{record.id}}',
             method: :patch,
             policy: Companies::Policy,
             authorize: :disable?,
