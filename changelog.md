@@ -1,6 +1,9 @@
 # Changelog
 
 All notable changes to this project will be documented in this file. Always add new logs to beginning of this file.
+2021-03-08
+ - SMP service api updated, by adding template id as one of the parameter
+ - Each msg template have unique template id in service provider, this template id stored in message_template yml
 
 2021-03-07
  - OTP mailer for bank payment request credit action introduced.
