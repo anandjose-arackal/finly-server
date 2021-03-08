@@ -73,7 +73,9 @@ class Forms::Ops::Dependencies < Transactions::API
     end
   end
 
-  def init_predictions(context, model:, dependencies:, **)
+  def init_predictions(context, model:, dependencies:, current_user:, **)
+    return unless FormsToggle.new(current_user).enabled?
+
     dependencies[:predictions] = []
     model.entities
          .includes(prediction_model: { dependent_entity_mappings: [:form_entity] })
