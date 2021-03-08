@@ -23,7 +23,7 @@ class BankPaymentRequestMailer < ApplicationMailer
   def notify_payment_otp(presenter)
     return if presenter.failure?
     @data = presenter
-    mail to: @data.to, subject: @data.subject, template_name: 'notify_payment_otp_template'
+    mail to: @data.recipient, subject: @data.subject, template_name: 'notify_payment_otp_template'
   end
 
 end
