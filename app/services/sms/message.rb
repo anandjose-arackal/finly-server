@@ -21,7 +21,7 @@ class Sms::Message < ServiceApi
         authkey: authorization_key,
         mobiles: params[:mobile_number],
         message: params[:message],
-        sender: 'FINLYX',
+        sender: 'IFINLY',
         route: 4,
         country: 91,
         response: 'json'
