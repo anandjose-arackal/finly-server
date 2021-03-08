@@ -105,7 +105,12 @@ class MlModel < ApplicationRecord
     data = prepare_data
     return false if data.blank?
 
-    model = Eps::Model.new(data, target: target_key, algorithm: algorithm.to_sym)
+    begin
+      model = Eps::Model.new(data, target: target_key, algorithm: algorithm.to_sym)
+    rescue StandardError => e
+      debugger
+      raise e
+    end
     return false unless update(pmml: model.to_pmml, built_at: DateTime.now, build_duration: (Time.now - start_time))
 
     # Clear the cache
@@ -146,32 +151,36 @@ class MlModel < ApplicationRecord
       predicted_records = []
       import_data = []
       batch.each do |record|
-        record_data = prepare_record(record)
-        next if record_data.blank?
+        record_dataset = prepare_record(record)
+        next if record_dataset.blank?
 
-        actual = record_data[target_key]
-        prediction = model.predict(record_data.except(target_key))
+        record_dataset = [record_dataset] unless record_dataset.is_a?(Array)
+        record_dataset.each do |record_data|
 
-        # Update existing record if available
-        # prediction_model = predictions.find_or_initialize_by(
-        #   record: record,
-        #   ml_model: self,
-        #   company_id: self.company_id
-        # )
-        # prediction_model.update(
-        #   actual_value: actual,
-        #   predicted_value: prediction
-        # )
-        import_data << {
-          record_id: record.id,
-          record_type: record.class.name,
-          ml_model_id: self.id,
-          company_id: self.company_id,
-          actual_value: actual,
-          predicted_value: prediction,
-          is_accurate_prediction: (actual.to_s == prediction.to_s)
-        }
-        predicted_records << record.id
+          actual = record_data[target_key]
+          prediction = model.predict(record_data.except(target_key))
+
+          # Update existing record if available
+          # prediction_model = predictions.find_or_initialize_by(
+          #   record: record,
+          #   ml_model: self,
+          #   company_id: self.company_id
+          # )
+          # prediction_model.update(
+          #   actual_value: actual,
+          #   predicted_value: prediction
+          # )
+          import_data << {
+            record_id: record.id,
+            record_type: record.class.name,
+            ml_model_id: self.id,
+            company_id: self.company_id,
+            actual_value: actual,
+            predicted_value: prediction,
+            is_accurate_prediction: (actual.to_s == prediction.to_s)
+          }
+          predicted_records << record.id
+        end
       end
       update(tracked_at: DateTime.now)
       MlModelPrediction.import import_data, on_duplicate_key_update: [:record_id, :record_type]
@@ -195,8 +204,13 @@ class MlModel < ApplicationRecord
     end
 
     records.find_each do |record|
-      record_data = prepare_record(record)
-      data << record_data if record_data.present?
+      record_dataset = prepare_record(record)
+      next if record_dataset.blank?
+
+      record_dataset = [record_dataset] unless record_dataset.is_a?(Array)
+      record_dataset.each do |record_data|
+        data << record_data if record_data.present?
+      end
     end
     data
   end

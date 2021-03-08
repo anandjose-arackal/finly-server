@@ -61,16 +61,6 @@ class MlModel::FormEntityModel < MlModel
     records
   end
 
-  # def self.build(options = {})
-  #   form_ids = self.all.distinct(:parent_id).pluck(:parent_id).uniq
-  #   form_ids.each do |form_id|
-  #     self.where(parent_id: form_id).find_each do |model|
-  #       model.build_model
-  #       model.clear_model_cache
-  #     end
-  #   end
-  # end
-
   def form_cache!(value)
     @form_cache = value
   end
@@ -97,44 +87,14 @@ class MlModel::FormEntityModel < MlModel
     contract = form.contract(record.created_by).new(record)
     form_data = contract.to_form
 
-    data = {}
-    target_paths = target_entity.entity_path.split('.')
+    dependent_entity_paths = dependent_entity_mappings.map { |ent| ent.form_entity.entity_path }
+    data = extract(form_data, form_data, target_entity.entity_path, target_entity.entity_path, dependent_entity_paths)
 
-    # Todo - target entity is in line item, this is working only if target entity is not within a collection
-    # target_row_data = form_data
-    # ent_path = ''
-    # target_paths.each do |ent_key|
-    #   break if ent_key == target_entity.entity_key
-    #
-    #   ent_path += '.' unless ent_path.blank?
-    #   ent_path += ent_key
-    #
-    #   target_row_data = form_data.dig(ent_key)
-    # end
-
-    if target_entity.is_in_collection?(form: form)
-
-      # Todo - target entity is in line item, this is working only if target entity is not within a collection
-      return nil
-      # data = []
-      # target_parent_paths = target_paths.pop
-      #
-      # item = {}
-      # dependent_entity_mappings.each do |mapping|
-      # end
-      # data << item
-    else
-      # Assumption is that target and dependent is not in line items
-      data[target_entity.entity_key] = format(form_data.dig(*target_paths), 'category')
-      dependent_entity_mappings.each do |mapping|
-        dependent_entity = mapping.form_entity
-        dependent_paths = dependent_entity.entity_path.split('.')
-        # Assumption is that the data points for all models are categorical, and not numerical.
-        # Hence converting it to a string
-        data[dependent_entity.entity_key] = format(form_data.dig(*dependent_paths), 'category')
+    if split_key.present? and data.is_a?(Array)
+      data.each do |item|
+        item[split_key] = format(record.send(split_key), split_key_type) if split_key.present?
       end
-
-      # Add the split key
+    else
       data[split_key] = format(record.send(split_key), split_key_type) if split_key.present?
     end
 
@@ -151,6 +111,32 @@ class MlModel::FormEntityModel < MlModel
   end
 
   protected
+
+  def extract(row_data, form_data, target_entity_path, target_entity_paths, dependent_entity_paths)
+    target_entity_paths = target_entity_paths.split('.') unless target_entity_paths.is_a?(Array)
+    ent_key = target_entity_paths.shift
+    value = row_data[ent_key]
+    if value.is_a?(Hash)
+      return extract(row_data[ent_key], form_data, target_entity_path, target_entity_paths, dependent_entity_paths)
+    elsif value.is_a?(Array)
+      data = []
+      value.each do |row|
+        data << extract(row, form_data, target_entity_path, target_entity_paths, dependent_entity_paths)
+      end
+      return data
+    else
+      data = {}
+      data[target_entity_path] = format(value, 'category')
+      dependent_entity_paths.each do |dep_ent_path|
+        # Assumption is that dependent_entity should either be in the same row as the target or in the form header
+        dep_ent_paths = dep_ent_path.split('.')
+        dep_ent_key = dep_ent_paths.last
+        dep_ent_value = row_data[dep_ent_key] || form_data.dig(*dep_ent_paths)
+        data[dep_ent_path] = format(dep_ent_value, 'category')
+      end
+      return data
+    end
+  end
 
   def is_form_entities_valid?
     return true if dependent_entity_mappings.blank?
