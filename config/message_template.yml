@@ -1,0 +1,17 @@
+default: &default
+  user_invite: ''
+  user_password_change: ''
+  user_otp: ''
+  creditconfirm: ''
+
+development:
+  <<: *default
+
+staging:
+  <<: *default
+
+production:
+  <<: *default
+
+
+
