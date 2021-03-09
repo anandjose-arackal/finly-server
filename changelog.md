@@ -46,7 +46,11 @@ All notable changes to this project will be documented in this file. Always add 
 - Added support for caching user flags
 - Added DSL support for swiggy release
 - fix: Header vs line item rule logic
--  
+
+
+## 2021-03-05
+- Initial changes for omni_auth
+
 ### Added
 
 - `commit-msg` git hook to check branch name and commit message conventions.

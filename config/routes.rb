@@ -2657,6 +2657,10 @@ Rails.application.routes.draw do
   devise_for :users, controllers: {passwords: 'passwords', sessions: 'sessions'}
   # devise_for :users, skip: [:session, :password]
 
+  get '/auth/:provider/callback', to: 'google_oauth2#create'
+  # get '/auth/:provider/callback', to: 'single_sign_on#create'
+  # get '/auth/:provider/callback' => 'sessions#create'
+
   post 'users/saml/validate', to: 'users#saml_validator'
   get 'users/saml/sign_in', to: 'single_sign_on#saml'
   post 'users/saml/auth', to: 'single_sign_on#create'
@@ -3580,7 +3584,8 @@ Rails.application.routes.draw do
 
   # All APIs for Quickbooks integration and syncing
 
-  get '/auth/:provider/callback', controller: 'third_party_auth', action: 'quickbooks'
+  get '/auth/quickbooks/callback', controller: 'third_party_auth', action: 'quickbooks'
+  # single_sign_on#create
   get 'testing_quickbooks', to: 'third_party_auth#testing'
 
 

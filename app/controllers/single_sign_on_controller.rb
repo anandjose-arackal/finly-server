@@ -40,6 +40,7 @@ class SingleSignOnController < Oauth::TokenController
     # yet to be implemented. When though?
   end
 
+
   protected
 
   def on_session_create

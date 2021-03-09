@@ -11,7 +11,7 @@ class Oauth::TokenController < Doorkeeper::TokensController
 
   def create
     return unless pre_process
-
+    binding.pry
     response = authorize_response
     headers.merge! response.headers
     self.status = response.status
