@@ -75,4 +75,13 @@ class AuditTrailExposure < Exposures::API
     end
   end
 
+  attribute :document_change_affected do
+    case record.item_typr
+    when "YesBankVendor"
+      "Vendor"
+    else
+      item.item_type&.underscore&.split("_")&.map(&:humanize)&.join(' ')
+    end
+  end
+
 end
