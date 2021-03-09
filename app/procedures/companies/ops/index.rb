@@ -26,19 +26,31 @@ class Companies::Ops::Index < IndexBuilder::API
   end
 
   column :actions, default: true do
-    action :button_group, :actions, contextual: false, label: 'Actions' do
+    action :button_group, :actions, contextual: false, label: 'Actions', vertical_ellipsis: true do
       action :api_request,
-            :disable,
-            label: 'Disable',
-            url: 'companies/{{record.id}}',
-            method: :patch,
-            policy: Companies::Policy,
-            authorize: :disable?,
-            permissions: :admin,
-            body: {
-              active: false,
-            },
-            confirmation: "Are you sure you want to disable this entity?"
+             :disable,
+             label: 'Disable',
+             url: 'companies/{{record.id}}',
+             method: :patch,
+             policy: Companies::Policy,
+             authorize: :disable?,
+             permissions: :admin,
+             body: {
+               active: false,
+             },
+             confirmation: "Are you sure you want to disable this entity?"
+      action :api_request,
+             :enable,
+             label: 'Enable',
+             url: 'companies/{{record.id}}',
+             method: :patch,
+             policy: Companies::Policy,
+             authorize: :enable?,
+             permissions: :admin,
+             body: {
+               active: true,
+             },
+             confirmation: "Are you sure you want to enable this entity?"
     end
   end
 

@@ -22,4 +22,8 @@ class Companies::Policy < ApplicationPolicy
     update? && record&.active?
   end
 
+  def enable?
+    update? && !record&.active?
+  end
+
 end
