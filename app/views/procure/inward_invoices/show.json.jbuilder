@@ -320,13 +320,15 @@ json.sub_departments do
     json.parent_id dept.ancestry&.to_i
   end
 end
+
+preferred_tds_rate_ids = (@result.invoice.vendor.tds_rates.pluck(:id) rescue [])
 json.tds_slabs do
   json.array!(current_company.tds_slabs) do |tds_slab|
     if (tds_slab == invoice.tds_slab) || !tds_slab.deleted?
       json.id tds_slab.id
       json.name "#{tds_slab.tds}% - #{tds_slab.name} "
       json.tds tds_slab.tds
-      json.preferred @result.invoice.vendor.tds_rates.pluck(:id).include?(tds_slab.id) rescue false
+      json.preferred preferred_tds_rate_ids.include?(tds_slab.id) rescue false
     end
   end
 end
@@ -343,7 +345,7 @@ json.attachments do
 end
 
 json.gstin_locations do
-  json.array! @result.gstin_locations do |gstin_location|
+  json.array! @result.gstin_locations.includes(:state) do |gstin_location|
     json.extract! gstin_location, :id, :gstin, :poc_name, :poc_email, :poc_mobile_number, :location, :address, :state_code
     json.location "#{gstin_location&.location.to_s} - #{gstin_location.state&.name&.to_s}"
   end

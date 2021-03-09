@@ -94,6 +94,7 @@ linked_files = %w{
   config/searchkick.yml
   config/cubejs.yml
   config/mailtrain.yml
+  config/message_template.yml
   config/open_exchange_rates.yml
 
 }
