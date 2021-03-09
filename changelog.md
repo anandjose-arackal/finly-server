@@ -54,6 +54,7 @@ All notable changes to this project will be documented in this file. Always add 
 
 ## 2021-03-07
 - Updating error message
+- Removing reviewer change validation 
 
 ### Added
 
