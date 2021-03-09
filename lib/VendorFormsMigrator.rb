@@ -91,7 +91,7 @@ class VendorFormsMigrator
         end
 
         document.custom_fields.each do |custom_field|
-          field_name = custom_field.field_configuration.field_name
+          field_name = custom_field.field_key
 
           form_custom_field = document.form_custom_fields.where(field_key: field_name).order(updated_at: :asc).last
           if form_custom_field.present?
@@ -171,8 +171,6 @@ class VendorFormsMigrator
       File.open('/home/ubuntu/vendor_migration.log', 'w+') {|f| result.each {|line| f.puts(line)}}
     elsif Rails.env.staging?
       File.open('/home/centos/vendor_migration.log', 'w+') {|f| result.each {|line| f.puts(line)}}
-    else
-      File.open('/Users/kumar/Documents/vendor_migration.log', 'w+') {|f| result.each {|line| f.puts(line)}}
     end
   end
 end

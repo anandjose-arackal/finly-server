@@ -36,7 +36,7 @@ json.inward_documents do
   json.array! record&.procurement&.inward_documents do |inward_document|    
     json.company inward_document.company&.name
     json.procurement_id inward_document.procurement_id
-    json.vendor inward_document.vendor.&name
+    json.vendor inward_document.vendor&.business_name
     json.doc_number inward_document.doc_number
     json.delivery_date inward_document.delivery_date&.strftime("%d-%m-%Y")
     json.transported_name inward_document&.transported_name

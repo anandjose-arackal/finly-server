@@ -76,7 +76,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
               send(association_name).non_deleted.filter_active.
               where("#{entity.entity_key} = ?", send(entity.entity_key))
 
-          records = records.where.not("id = ?", id) if id.present?
+          records = records.where.not("#{association_name}.id = ?", id) if id.present?
 
           if records.present?
             errors.add entity.label, "must be unique"
@@ -90,7 +90,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
     contract.validate -> do
       contract_root.profiler.step 'custom_validate_entity', entity.entity_path do
         entity.validations.each do |validation|
-          next unless validation.rule.apply?({ form: contract_root.form_data, row: self.form_data }.with_indifferent_access, controlling_field: entity.entity_path)
+          next unless validation.rule.apply?({ form: contract_root.form_data, row: self.form_data }.with_indifferent_access, model_klass: entity.form.model, controlling_field: entity.entity_path)
 
           errors.add entity.label, validation.error_message
         end
