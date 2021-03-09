@@ -41,7 +41,7 @@ class MlModel::Monitor < MlModel
     end
   end
 
-  def prepare_record(record)
+  def prepare_record(record, options = {})
     data = super(record)
     config['fields']&.each do |field|
       value = format(get_value(record, field), field['type'])
@@ -50,7 +50,7 @@ class MlModel::Monitor < MlModel
     data
   end
 
-  def prepare_prediction(data)
+  def prepare_prediction(data, options = {})
     config['fields']&.each do |field|
       data[field['name']] = format(data[field['name']], field['type'])
     end

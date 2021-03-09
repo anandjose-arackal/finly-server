@@ -40,6 +40,12 @@ class FormsController < BaseControllers::WebBase
     end
   end
 
+  def form_prediction
+    endpoint Forms::Ops::Predict do |m|
+      m.success { |result| render json: {prediction: result[:prediction]}, status: 200 }
+    end
+  end
+
   def sync_positions
     endpoint Forms::Ops::SyncPositions
   end
