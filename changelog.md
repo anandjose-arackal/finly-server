@@ -52,9 +52,10 @@ All notable changes to this project will be documented in this file. Always add 
 - reverse merging the master with bug/invoice_amount_rate_validation
 - Adding validation for line item rate greater than 0
 
-## 2021-03-07
+## 2021-03-09
 - Updating error message
 - Removing reviewer change validation 
+- fixing invoice item 500 issue
 
 ### Added
 
