@@ -610,10 +610,10 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
   end
 
 
-  predict 'policy_id', with: :vendor_id
-  predict 'department_id', with: [:vendor_id, :policy_id]
-  predict 'location_id', with: [:vendor_id, :policy_id]
-  predict 'cost_center_id', with: [:vendor_id, :policy_id]
+  # predict 'policy_id', with: :vendor_id
+  # predict 'department_id', with: [:vendor_id, :policy_id]
+  # predict 'location_id', with: [:vendor_id, :policy_id]
+  # predict 'cost_center_id', with: [:vendor_id, :policy_id]
   # predict 'items.inventory_line_item_id', with: [:vendor_id, :policy_id]
 
   # CONDITIONS
