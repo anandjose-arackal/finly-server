@@ -75,7 +75,7 @@ class Forms::API
       }
     )
 
-    raise "Prediction #{entity_key} is not unique" if predictions[entity_path].present?
+    raise "Prediction #{entity_path} is not unique" if predictions[entity_path].present?
 
     predictions[entity_path] = prediction
     form.prediction_models << prediction
