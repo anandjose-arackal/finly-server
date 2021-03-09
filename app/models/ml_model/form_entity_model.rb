@@ -69,6 +69,17 @@ class MlModel::FormEntityModel < MlModel
     @form_cache ||= {}
   end
 
+  # Builds the record hash for training from the form contract.
+  # If the target_key is within a line item, it will generate one entry per line item for training
+  # The generated hash will have entity_path as the keys
+  #
+  # Valid combinations
+  #   1. target_key -> header, dependent_keys -> header
+  #   2. target_key -> line_items, dependent_keys -> header
+  #   3. target_key -> line_items, dependent_keys -> line_items (same as target_key)
+  #
+  # Invalid Combinations
+  #   1. target_key -> header, dependent_keys -> line_items
   def prepare_record(record, options = {})
     form_klass = record.form_klass
     return if form_klass.blank?
@@ -112,6 +123,8 @@ class MlModel::FormEntityModel < MlModel
 
   protected
 
+  # extract works by splitting the target_entity_path and navigating through each of the paths.
+  # It will generate one record per item in array if the path has an array.
   def extract(row_data, form_data, target_entity_path, target_entity_paths, dependent_entity_paths)
     target_entity_paths = target_entity_paths.split('.') unless target_entity_paths.is_a?(Array)
     ent_key = target_entity_paths.shift

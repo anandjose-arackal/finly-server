@@ -127,7 +127,7 @@ class FormEntity < ApplicationRecord
     Forms::Contracts::Builders::FormEntity.({ params: { entity: self, contract: contract }, current_user: user })
   end
 
-  # Class method `contract` is used in Form Builder
+  # Class method +contract+ is used in Form Builder
   def self.contract(model, current_user)
     base_class = model.system_field ? Forms::Entities::Contracts::SystemFormEntity : Forms::Entities::Contracts::CustomFormEntity
 
