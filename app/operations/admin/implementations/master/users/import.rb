@@ -184,7 +184,7 @@ class Admin::Implementations::Master::Users::Import < Admin::Implementations::Pr
                     password: generated_password,
                     password_confirmation: generated_password,
                     role_mapping_attributes: role_mapping_attributes,
-                    profile_attributes: {address_1: data[:address_1],
+                    profile_attributes: {address_1: (data[:address_1].present? ? data[:address_1] : "To be filled"),
                                          address_2: data[:address_2],
                                          pin_code: pin_code,
                                          date_of_birth: data[:dob],
