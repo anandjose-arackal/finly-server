@@ -1,8 +1,7 @@
 class AnalyticsToggle < ApplicationToggle
 
   def enabled?
-    # Todo change default to false
-    feature_flag 'permissions/analytics#enabled', true
+    feature_flag 'permissions/analytics#enabled', false
   end
 
   def maximum_reports
@@ -10,8 +9,7 @@ class AnalyticsToggle < ApplicationToggle
   end
 
   def custom_reports_enabled?
-    # Todo change default to false
-    feature_flag 'permissions/analytics#custom_reports_enabled', true
+    feature_flag 'permissions/analytics#custom_reports_enabled', false
   end
 
   def maximum_dashboards
@@ -19,13 +17,11 @@ class AnalyticsToggle < ApplicationToggle
   end
 
   def drilldowns_enabled?
-    # Todo change default to false
-    feature_flag 'permissions/analytics#drilldowns_enabled', true
+    feature_flag 'permissions/analytics#drilldowns_enabled', false
   end
 
   def custom_dashboards_enabled?
-    # Todo change default to false
-    feature_flag 'permissions/analytics#custom_dashboards_enabled', true
+    feature_flag 'permissions/analytics#custom_dashboards_enabled', false
   end
 
 end
