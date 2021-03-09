@@ -31,7 +31,7 @@ class CustomMessage::Create < BaseHandler
           authkey: authentication_key,
           mobiles: mobile_numbers,
           message: message,
-          sender: 'FINLYX',
+          sender: 'IFINLY',
           route: 4,
           country: 91,
           response: 'json'
