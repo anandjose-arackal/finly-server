@@ -56,6 +56,15 @@ class Forms::API
     form.choice_dependencies << dependency
   end
 
+  # This is used to define predictions for form entities
+  #
+  # @param entity_path Entity path of the target entity for which the prediction has to be made
+  # @param with is used to define the dependent entities which is used for predicting the target entity
+  # @param split_key represents the datetime object which is used for adding datetime parameter to the prediction. This defaults to submitted_at
+  #
+  # @example
+  #   predict 'policy_id', with: ['vendor_id']
+  #   predict 'items.inventory_item_id', with: ['vendor_id', 'policy_id'], split_key: "created_at"
   def self.predict(entity_path, with: [], split_key: NoObject)
     with = [with] if with.present? and not with.respond_to?(:each)
 
