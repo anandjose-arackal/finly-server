@@ -19,9 +19,9 @@ class MlModelDependentEntity < ApplicationRecord
   belongs_to :form
   belongs_to :form_entity
 
-  def self.system_model(form_entity_key)
+  def self.system_model(form_entity_path)
     model = self.new
-    model.template_reference[:form_entity_key] = entity_key
+    model.template_reference[:form_entity_path] = entity_key
     model
   end
 

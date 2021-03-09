@@ -37,20 +37,20 @@ class MlModel::FormEntityModel < MlModel
 
   alias_attribute :target_entity, :parent
 
-  def self.system_model(model_klass:, form_entity_key:, dependent_entity_keys: [], attributes: {})
+  def self.system_model(model_klass:, form_entity_path:, dependent_entity_paths: [], attributes: {})
     model = self.new(
       build_schedule: 'weekly',
-      target_key: form_entity_key,
+      target_key: form_entity_path,
       target_key_type: 'category',
       split_key: 'submitted_at',
       split_key_type: 'datetime',
       model_klass: model_klass
     )
     model.assign_attributes(attributes) if attributes.present?
-    model.template_reference[:form_entity_key] = form_entity_key
-    dependent_entity_keys.each do |dependent_entity_key|
+    model.template_reference[:form_entity_path] = form_entity_path
+    dependent_entity_paths.each do |dependent_entity_key|
       dependent_entity_mapping = model.dependent_entity_mappings.new
-      dependent_entity_mapping.template_reference[:form_entity_key] = dependent_entity_key
+      dependent_entity_mapping.template_reference[:form_entity_path] = dependent_entity_key
     end
     model
   end

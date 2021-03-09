@@ -56,7 +56,7 @@ class Forms::API
     form.choice_dependencies << dependency
   end
 
-  def self.predict(entity_key, with: [], split_key: NoObject)
+  def self.predict(entity_path, with: [], split_key: NoObject)
     with = [with] if with.present? and not with.respond_to?(:each)
 
     if split_key == NoObject
@@ -67,17 +67,17 @@ class Forms::API
 
     prediction = MlModel::FormEntityModel.system_model(
       model_klass: form.model,
-      form_entity_key: entity_key,
-      dependent_entity_keys: with,
+      form_entity_path: entity_path,
+      dependent_entity_paths: with,
       attributes: {
         split_key: split_key,
         split_key_type: split_key_type
       }
     )
 
-    raise "Prediction #{entity_key} is not unique" if predictions[entity_key].present?
+    raise "Prediction #{entity_key} is not unique" if predictions[entity_path].present?
 
-    predictions[entity_key] = prediction
+    predictions[entity_path] = prediction
     form.prediction_models << prediction
   end
 

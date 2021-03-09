@@ -92,14 +92,14 @@ class Forms::Template < Templates::API
 
     association :prediction_models do
       matcher do |template, record|
-        record.parent.entity_path == template.template_reference[:form_entity_key]
+        record.parent.entity_path == template.template_reference[:form_entity_path]
       end
 
       clone do |builder_context|
         set :company_id, builder_context.params[:company_id]
         set :form, builder_context.root_record
 
-        path = builder_context.template.template_reference[:form_entity_key]
+        path = builder_context.template.template_reference[:form_entity_path]
         entity = builder_context.root_record.find_entity(path)
         raise "Entity with path : #{path} not found" if entity.nil?
         set :parent, entity
@@ -109,7 +109,7 @@ class Forms::Template < Templates::API
         clone do |builder_context|
           set :company_id, dependent_entity_context.params[:company_id]
           set :form, dependent_entity_context.root_record
-          path = builder_context.template.template_reference[:form_entity_key]
+          path = builder_context.template.template_reference[:form_entity_path]
           entity = builder_context.root_record.find_entity(path)
           set :form_entity, entity
           set :ml_model, builder_context.parent
