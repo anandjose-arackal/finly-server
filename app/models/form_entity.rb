@@ -381,7 +381,13 @@ class FormEntity < ApplicationRecord
     end
   end
 
-  # True if the entity exists within a collection. Ex: Invoice Line Items > Total Amount
+  # True if the entity exists within a collection.
+  #
+  # @return [Boolean]
+  #
+  # @example
+  #   returns true for items.total_amount since it is in az collection
+  #   returns false for policy_id since it is not in any collection
   def is_in_collection?(options = {})
     return false if parent_id.blank?
 

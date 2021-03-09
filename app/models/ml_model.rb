@@ -53,6 +53,7 @@ class MlModel < ApplicationRecord
   validates :model_klass, presence: true
   validate :validate_schema
 
+  # Rebuilds all models
   def self.build(options = {})
     self.all.find_each do |model|
       model.build_model(options)
@@ -62,10 +63,12 @@ class MlModel < ApplicationRecord
     true
   end
 
+  # Used by +records+ function to eager load the records to prevent N+1 query problem
   def includes(records)
     records
   end
 
+  # Provides all the records which will be used for training models and for tracking predictions
   def records
     records = Object.const_get(model_klass).all.where(company_id: company_id)
     records = includes(records)
@@ -127,6 +130,8 @@ class MlModel < ApplicationRecord
     model.predict(prepare_prediction(data))
   end
 
+  # Runs through all records which were created since the last time the model was built to measure the prediction
+  # Captures the accuracy and prediction in models/MlModelPrediction
   def track_predictions(options = {})
     return false if model.blank?
 
@@ -160,16 +165,7 @@ class MlModel < ApplicationRecord
           actual = record_data[target_key]
           prediction = model.predict(record_data.except(target_key))
 
-          # Update existing record if available
-          # prediction_model = predictions.find_or_initialize_by(
-          #   record: record,
-          #   ml_model: self,
-          #   company_id: self.company_id
-          # )
-          # prediction_model.update(
-          #   actual_value: actual,
-          #   predicted_value: prediction
-          # )
+          # Bulk import to improve performance
           import_data << {
             record_id: record.id,
             record_type: record.class.name,
