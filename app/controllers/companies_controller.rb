@@ -38,7 +38,14 @@ class CompaniesController < BaseControllers::WebBase
     # company = Company.second
     if company.blank?
       # redirect to the login page, because they don't have any configurations
-      @sso_configs = []
+      @sso_configs = [
+        {
+          label: 'Google Oauth',
+          finly_sso_path: 'auth/google_oauth2',
+          issuer: 'Finly',
+          company_id: 2
+        }
+      ]
       return
     end
     @sso_configs = company.single_sign_on_configurations

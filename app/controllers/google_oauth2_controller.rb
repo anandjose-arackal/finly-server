@@ -6,21 +6,13 @@ class GoogleOauth2Controller < Oauth::TokenController
 
   skip_before_action :verify_authenticity_token, raise: false
 
-  def saml
-    # sign_on_type = SingleSignOnType.id_for(action_name.to_sym)
-    # config = company&.single_sign_on_configurations&.with_single_sign_on_type(sign_on_type)&.with_id(sso_config_id)&.first
-    # ################## only for development sakes ###################
-    # # company = Company.second
-    # # config = company.single_sign_on_configurations.second
-    # #################################################################
-    # if company.present? and config.present?
-    #   settings = saml_settings(config)
-    #   @redirect_url = saml_request.create(settings)
-    # else
-    #   @redirect_url = "/login"
-    # end
-    # render json: {redirect_url: @redirect_url}, status: 200
-  end
+  # def google_auth2
+  #     @redirect_url = '/auth/google_auth2'
+  #   else
+  #     @redirect_url = "/login"
+  #   end
+  #   render json: {redirect_url: @redirect_url}, status: 200
+  # end
 
   # this will be the catch-all controller for SAML as well as Ouath strategies
   # The logic for choosing between the strategies will be held in the Authenticator::Processor operation
@@ -59,18 +51,6 @@ class GoogleOauth2Controller < Oauth::TokenController
 
   def set_grant_type
     params[:grant_type] = "password"
-  end
-
-  # the below will be generalized based on the company that is using it
-  # which will be determined based on the subdomain
-  # TODO - remove the placeholder configurations from below before moving to production
-  def saml_settings(sso_config = SingleSignOnConfiguration.first)
-    if Rails.env.production?
-      base = "https://www.finly.io"
-    else
-      # base = "https://www.dev.finly.io"
-      base = "http://localhost:3001"
-    end
   end
 end
 

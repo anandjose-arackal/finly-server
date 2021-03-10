@@ -60,6 +60,9 @@ All notable changes to this project will be documented in this file. Always add 
 - Removing reviewer change validation 
 - fixing invoice item 500 issue
 
+
+## 2021-03-10
+- Updating sso path
 ### Added
 
 - `commit-msg` git hook to check branch name and commit message conventions.
