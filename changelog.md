@@ -1,12 +1,15 @@
 # Changelog
 
 All notable changes to this project will be documented in this file. Always add new logs to beginning of this file.
-2021-03-08
+##2021-03-10
+ - Fix: Deleted user's policy user roles was trying render and leads to nil issue, 
+        Policy User Role index only render existing user roles
+
+##2021-03-08
  - SMP service api updated, by adding template id as one of the parameter
  - Each msg template have unique template id in service provider, this template id stored in message_template yml
 
-2021-03-07
- - OTP mailer for bank payment request credit action introduced.
+## - OTP mailer for bank payment request credit action introduced.
 
 - Updating the bbps status checker credit checks.
 - Addition of success message in bbps status checker for successful payment.
