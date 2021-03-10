@@ -47,9 +47,18 @@ All notable changes to this project will be documented in this file. Always add 
 - Added DSL support for swiggy release
 - fix: Header vs line item rule logic
 
-
 ## 2021-03-05
 - Initial changes for omni_auth
+-  
+
+## 2021-03-06
+- reverse merging the master with bug/invoice_amount_rate_validation
+- Adding validation for line item rate greater than 0
+
+## 2021-03-09
+- Updating error message
+- Removing reviewer change validation 
+- fixing invoice item 500 issue
 
 ### Added
 
