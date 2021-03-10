@@ -295,6 +295,8 @@ class Invoice < ApplicationRecord
   # validates :amount, presence: true
 
   validates :invoice_number, :format => {with: /\A[a-zA-Z0-9 \\\/\-\#\&]*\Z/, :message => ' can only have letters, numbers, dashes and forward slash and no other special characters'}, :length => {minimum: 0, maximum: 30}, :allow_blank => true
+  validate :item_quantity_validation
+  validate :item_rate_validation
 
   before_destroy :rollback_agreement_invoice
 
@@ -1565,5 +1567,27 @@ class Invoice < ApplicationRecord
   #     # end
   #   end
   # end
+
+  def item_quantity_validation
+    flag = false
+    quantities = invoice_items.map(&:quantity).map(&:to_i)
+    quantities.each do |quantity|
+      flag = true if quantity <= 0
+      break
+    end
+    
+    errors.add(:invoice_items, "quantity must be greater than 0") if flag
+  end
+
+  def item_rate_validation
+    flag = false
+    rates = invoice_items.map(&:rate).map(&:to_i)
+    rates.each do |rate|
+      flag = true if rate <= 0
+      break
+    end
+    
+    errors.add(:invoice_items, "rate must be greater than 0") if flag
+  end
 
 end
