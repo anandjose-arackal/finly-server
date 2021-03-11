@@ -44,8 +44,8 @@ class CompaniesController < BaseControllers::WebBase
     @sso_configs << {
       authentication_uri: "accounts.google.com/o/oauth2/auth?response_type=code&state=&client_id=307602140088-5aotklsei00379ioe94ebua3ge9nlv3s.apps.googleusercontent.com&scope=email&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Fgoogle_oauth2%2Fcallback",
       issuer: "Finly",
-      redirect_uri: "/auth/sso/provider/callback",
-      finly_sso_path: "/auth/sso/provider/callback",
+      redirect_uri: "/auth/sso/google_oauth/callback",
+      finly_sso_path: "/auth/sso/google_oauth/callback",
       label: "Sign in With Google",
       client_id:     Rails.application.credentials[:omniauth][:google][:client_id],
       client_secret: Rails.application.credentials[:omniauth][:google][:secret_id],
