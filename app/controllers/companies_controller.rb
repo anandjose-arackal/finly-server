@@ -36,11 +36,11 @@ class CompaniesController < BaseControllers::WebBase
     #   company = Company.first
     # end
     # company = Company.second
-
-      # redirect to the login page, because they don't have any configurations
-
     @sso_configs = []
-    @sso_configs = company.single_sign_on_configurations
+    if company.present?
+      # redirect to the login page, because they don't have any configurations
+      @sso_configs = company.single_sign_on_configurations
+    end
     @sso_configs << {
       authentication_uri: "accounts.google.com/o/oauth2/auth?response_type=code&state=&client_id=307602140088-5aotklsei00379ioe94ebua3ge9nlv3s.apps.googleusercontent.com&scope=email&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Fgoogle_oauth2%2Fcallback",
       issuer: "Finly",
