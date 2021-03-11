@@ -50,13 +50,12 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
     elsif is_vendor_confirmed?
       self.po_previous_status = PurchaseOrderStatus.id_for(:vendor_confirmed)
     end
-  end
 
-  if self.purchase_order.advance_amount&.present? and self.purchase_order.advance_payments.blank?
-    and self.purchase_order.advance_amount&.value > 0 and self.purchase_order.advance_closed?
-     self.po_advance_previous_status = AdvanceAmountStatus.id_for(:to_be_processed)
-  else
-     self.po_advance_previous_status = self.purchase_order.advance_amount_status_id
+    if self.purchase_order.advance_amount&.present? and self.purchase_order.advance_payments.blank?and self.purchase_order.advance_amount&.value > 0 and self.purchase_order.advance_closed?
+       self.po_advance_previous_status = AdvanceAmountStatus.id_for(:to_be_processed)
+    else
+       self.po_advance_previous_status = self.purchase_order.advance_amount_status_id
+    end
   end
 
   def process
