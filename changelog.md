@@ -66,6 +66,8 @@ All notable changes to this project will be documented in this file. Always add 
 
 ## 2021-03-11
 - Updating sso config api
+- Updating the redirect path
+- Updating the sso based on the token recieved from fe.
 
 ### Added
 

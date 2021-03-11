@@ -17,20 +17,6 @@ class GoogleOauth2Controller < Oauth::TokenController
   # this will be the catch-all controller for SAML as well as Ouath strategies
   # The logic for choosing between the strategies will be held in the Authenticator::Processor operation
   def create
-
-    
-    auth = request.env['omniauth.auth']
-
-    params[:info] =  auth.info
-    params[:credentials] =  auth.credentials
-
-    email = params[:info][:email]
-    user = User.find_by(email: email)
-
-    params[:email] = email
-    params[:user] = user
-    params[:company_id] = user.company_id
-
     RequestStore.store[:google_oauth2] = true
     set_grant_type
     set_scope

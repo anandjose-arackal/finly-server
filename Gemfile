@@ -81,6 +81,10 @@ gem 'slack-notifier', '~> 2.3'
 gem 'omniauth', '~> 1.9.0'
 gem 'omniauth-quickbooks', '~> 0.0.2'
 gem 'omniauth-google-oauth2'
+# gem 'google-api-client'
+gem 'google-id-token'
+
+
 
 gem 'quickbooks-ruby', git: 'https://github.com/ruckus/quickbooks-ruby.git', ref: '22c8df58bbed441207f3d0d8ac5a786cdb4821a5'
 
