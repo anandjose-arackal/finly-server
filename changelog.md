@@ -63,6 +63,10 @@ All notable changes to this project will be documented in this file. Always add 
 
 ## 2021-03-10
 - Updating sso path
+
+## 2021-03-11
+- Updating sso config api
+
 ### Added
 
 - `commit-msg` git hook to check branch name and commit message conventions.
