@@ -94,6 +94,7 @@ linked_files = %w{
   config/searchkick.yml
   config/cubejs.yml
   config/mailtrain.yml
+  config/message_template.yml
 }
 case fetch(:stage)
 when :itzcash_production, :aws_production, :background_production, :foreground_production, :console_production, :api_production, :background_production_console,
@@ -154,6 +155,7 @@ set :puma_workers, 0
 set :puma_worker_timeout, nil
 set :puma_init_active_record, true
 set :puma_preload_app, false
+set :puma_systemctl_user, :system
 set :ssh_options, :keepalive => true
 set :puma_user, fetch(:user)
 set :sidekiq_user, fetch(:user)

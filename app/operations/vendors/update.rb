@@ -56,6 +56,9 @@ class Vendors::Update < Vendors::Base
       add_message :notice, "GSTIN details can only be saved if a valid PAN is supplied."
     end
 
+    validate_duplicate_pan
+    validate_duplicate_gstin
+
     if vendor_parameters[:gstin_locations_attributes].present?
       vendor_parameters[:gstin_locations_attributes].each do |gstin_location|
         poc_email = gstin_location[:poc_email]
@@ -155,7 +158,7 @@ class Vendors::Update < Vendors::Base
     end
 
     # checking for duplicates within this particular company
-    current_company_vendors = user.company.yes_bank_vendors.non_deleted.filter_active
+    current_company_vendors = user.company.yes_bank_vendors.validation_associated_items
     if self.vendor_parameters[:vendor_id].blank?
       self.vendor_parameters[:vendor_id] = self.vendor.vendor_id
     end

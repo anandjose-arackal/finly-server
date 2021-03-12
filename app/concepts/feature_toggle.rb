@@ -6,8 +6,23 @@ class FeatureToggle
     self.user = user
   end
 
+  def cache_expires_in
+    1.hour
+  end
+
+  def cache_key
+    "feature_flag/user##{user.id}"
+  end
+
+  # This caches the flag for a period of 1 hour
   def flags
-    @flags ||= Rails.configuration.bullet_train&.get_flags(user.analytics_id)
+    @flags ||= Rails.cache.fetch(cache_key, expires_in: cache_expires_in) do
+      Rails.configuration.bullet_train&.get_flags(user.analytics_id)&.with_indifferent_access
+    end
+  end
+
+  def clear_cache
+    Rails.cache.delete(cache_key)
   end
 
   def enabled?(feature, default = false)

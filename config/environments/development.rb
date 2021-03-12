@@ -14,7 +14,7 @@ Rails.application.configure do
 
   feature_flipper_config = Rails.application.config_for(:feature_flipper)
   if feature_flipper_config.present? and feature_flipper_config['enabled'] and
-      feature_flipper_config['api_key'].present? and feature_flipper_config['url'].present?
+    feature_flipper_config['api_key'].present? and feature_flipper_config['url'].present?
     config.bullet_train = BulletTrain.new(api_key: feature_flipper_config['api_key'], url: feature_flipper_config['url'])
   else
     config.bullet_train = nil
@@ -23,37 +23,44 @@ Rails.application.configure do
   posthog_config = Rails.application.config_for(:posthog)&.with_indifferent_access
   if posthog_config.present? and posthog_config['enabled']
     config.posthog = PostHog::Client.new(
-        {
-            api_key: posthog_config['api_key'],
-            api_host: posthog_config['api_host'],
-            # Todo log errors
-            on_error: Proc.new {|status, msg| print msg}
-        }
+      {
+        api_key: posthog_config['api_key'],
+        api_host: posthog_config['api_host'],
+        # Todo log errors
+        on_error: Proc.new { |status, msg| print msg }
+      }
     )
   else
     config.posthog = nil
   end
 
-
-
   redis_config = Rails.application.config_for(:redis_config)&.with_indifferent_access
-  config.redis = Redis.new(redis_config.slice('url', 'password'))
+  redis_creds = redis_config&.slice('url', 'password')
+  config.redis = Redis.new(redis_creds)
+
+  if redis_config[:cache_enabled]
+    config.cache_store = :redis_cache_store, redis_creds
+  else
+    config.action_controller.perform_caching = false
+    config.cache_store = :null_store
+  end
 
   # Enable/disable caching. By default caching is disabled.
   # Run rails dev:cache to toggle caching.
-  if Rails.root.join('tmp', 'caching-dev.txt').exist?
-    config.action_controller.perform_caching = true
-    config.action_controller.enable_fragment_cache_logging = true
-
-    config.cache_store = :memory_store
-    config.public_file_server.headers = {
-        'Cache-Control' => "public, max-age=#{2.days.to_i}"
-    }
-  else
-    config.action_controller.perform_caching = false
-
-    config.cache_store = :null_store
-  end
+  # if Rails.root.join('tmp', 'caching-dev.txt').exist?
+  #   # config.action_controller.perform_caching = true
+  #   # config.action_controller.enable_fragment_cache_logging = true
+  #   #
+  #   # config.cache_store = :memory_store
+  #   # config.public_file_server.headers = {
+  #   #     'Cache-Control' => "public, max-age=#{2.days.to_i}"
+  #   # }
+  #   config.cache_store = :redis_cache_store, redis_config
+  # else
+  #   config.action_controller.perform_caching = false
+  #
+  #   config.cache_store = :null_store
+  # end
 
   # config.lograge.enabled = true
   # # config.lograge.keep_original_rails_log = true
@@ -136,9 +143,9 @@ Rails.application.configure do
 
   config.mailer_config = config_for(:mailer_config)
   config.action_mailer.deliver_later_queue_name = 'mailer_queue'
-  config.action_mailer.default_url_options = {host: config.mailer_config['host']}
+  config.action_mailer.default_url_options = { host: config.mailer_config['host'] }
   config.action_mailer.delivery_method = :smtp
-  config.action_mailer.smtp_settings = {address: "localhost", port: 1025}
+  config.action_mailer.smtp_settings = { address: "localhost", port: 1025 }
   # config.action_mailer.smtp_settings = {
   #     address: config.mailer_config['address'],
   #     port: config.mailer_config['port'],

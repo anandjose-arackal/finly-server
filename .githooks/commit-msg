@@ -1,0 +1,58 @@
+#!/usr/bin/env ruby
+#
+# An example hook script to check the commit log message.
+# Called by "git commit" with one argument, the name of the file
+# that has the commit message.  The hook should exit with non-zero
+# status after issuing an appropriate message if it wants to stop the
+# commit.  The hook is allowed to edit the commit message file.
+#
+# To enable this hook, rename this file to "commit-msg".
+
+# Uncomment the below to add a Signed-off-by line to the message.
+# Doing this in a hook is a bad idea in general, but the prepare-commit-msg
+# hook is more suited to it.
+#
+# SOB=$(git var GIT_AUTHOR_IDENT | sed -n 's/^\(.*>\).*$/Signed-off-by: \1/p')
+# grep -qs "^$SOB" "$1" || echo "$SOB" >> "$1"
+
+# This example catches duplicate Signed-off-by lines.
+
+# test "" = "$(grep '^Signed-off-by: ' "$1" |
+# 	 sort | uniq -c | sed -e '/^[ 	]*1[ 	]/d')" || {
+# 	echo >&2 Duplicate Signed-off-by lines.
+# 	exit 1
+# }
+
+# msg=$(cat $1)
+
+# echo $msg
+# echo 1
+
+# messagecheck= `echo $msg | grep -w "feat\|fix\|docs\|breaking"`
+# echo $messagecheck 
+# echo 2
+
+# if [ -z "$messagecheck" ]
+# then 
+# 			echo "Your commit message must begin with one of the following"
+# 			echo "  feat(feature-name)"
+# 			echo "  fix(fix-name)"
+# 			echo "  docs(docs-change)"
+# 			echo " "
+# fi
+
+branch_name = `git branch --no-color 2> /dev/null`[/^\* (.+)/, 1]
+
+message_file = ARGV[0]
+message = File.read(message_file)
+
+unless branch_name.scan(/^(master|develop)/).any? or branch_name.scan(/^(feature|hotfix|release)\//).any?
+	puts "Invalid branch name format. #{branch_name}"
+	exit 1
+end
+
+unless message.scan(/^(fix|feat|docs|testcases|test|docs|merge)(\((.+)\))*:\s/).any? or message.scan(/^(Merge)/).any?
+	puts "Invalid commit message format. #{message}"
+	exit 1
+end
+

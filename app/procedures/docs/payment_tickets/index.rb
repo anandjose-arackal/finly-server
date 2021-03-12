@@ -91,7 +91,7 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     # Awaiting Approval
     if user.has_permission?(awaiting_approval_roles)
       counter.add BankPaymentRequestStatus::GROUP_AWAITING_APPROVAL, 'Awaiting Approval',
-                  collection.with_status_id(BankPaymentRequestStatus::GROUP_AWAITING_APPROVAL).count
+                  collection.with_status_id(BankPaymentRequestStatus::GROUP_AWAITING_APPROVAL).select(:id).count
     end
 
     counter.add BankPaymentRequestStatus::GROUP_PROCESSING, "Processing", (
@@ -107,10 +107,10 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
         counts[BankPaymentRequestStatus.id_for(:pending)].to_i
     )
 
-    counter.add BankPaymentRequestStatus::GROUP_SCHEDULED, 'Scheduled', collection.with_status_id(BankPaymentRequestStatus::GROUP_SCHEDULED).count
-    counter.add BankPaymentRequestStatus::GROUP_PARTIALLY_COMPLETED, "Partially Completed", collection.with_status_id(BankPaymentRequestStatus::GROUP_PARTIALLY_COMPLETED).count
-    counter.add BankPaymentRequestStatus::GROUP_FAILED, 'Failed', collection.with_status_id(BankPaymentRequestStatus::GROUP_FAILED).count
-    counter.add BankPaymentRequestStatus::GROUP_COMPLETED, 'Completed', collection.with_status_id(BankPaymentRequestStatus::GROUP_COMPLETED).count
+    counter.add BankPaymentRequestStatus::GROUP_SCHEDULED, 'Scheduled', collection.with_status_id(BankPaymentRequestStatus::GROUP_SCHEDULED).select(:id).count
+    counter.add BankPaymentRequestStatus::GROUP_PARTIALLY_COMPLETED, "Partially Completed", collection.with_status_id(BankPaymentRequestStatus::GROUP_PARTIALLY_COMPLETED).select(:id).count
+    counter.add BankPaymentRequestStatus::GROUP_FAILED, 'Failed', collection.with_status_id(BankPaymentRequestStatus::GROUP_FAILED).select(:id).count
+    counter.add BankPaymentRequestStatus::GROUP_COMPLETED, 'Completed', collection.with_status_id(BankPaymentRequestStatus::GROUP_COMPLETED).select(:id).count
 
     [:rejected].each do |status|
       counter.add BankPaymentRequestStatus.id_for(status), status.to_s.titleize, counts[BankPaymentRequestStatus.id_for(status)].to_i

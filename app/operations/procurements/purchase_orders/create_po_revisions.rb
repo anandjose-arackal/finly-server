@@ -68,6 +68,7 @@ class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOr
     self.klass.each_with_index do |k, kid| 
       obj = self.purchase_order.__send__(k)
       next if k == :line_items
+      next if k == :attachments
 
 
       if obj.present?
@@ -95,6 +96,8 @@ class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOr
     if self.duplicate_po.save
       # self.original_purchase_order.trails.create action_user: user, action_id: TrailAction.id_for(:revision), note: "Revised PO generated, ##{self.duplicate_po.po_number}"
       self.duplicate_po.trails.create action_user: user, action_id: TrailAction.id_for(:create), note: "Revised PO created from, ##{self.purchase_order.po_number}"
+      #re-use the same blobs
+      self.purchase_order.attachments.update_all(procurement_document_id: duplicate_po.id)
 
       # Update procurement po approved status tags
       old_status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_approved))

@@ -171,7 +171,15 @@ json.invoice do
   end
 
   json.delivery_location_attributes invoice.delivery_location&.as_json rescue nil
-  json.gstin_location_attributes invoice.gstin_location&.as_json rescue nil
+
+  if invoice.gstin_location_id.present?
+    gstin_location =  invoice.gstin_location
+    if gstin_location.nil?
+      #this for handle deleted gstinlocation in old flow
+      gstin_location = GstinLocation.unscoped.find_by_id invoice.gstin_location_id
+    end
+    json.gstin_location_attributes gstin_location&.as_json rescue nil
+  end
 
   json.tds_slab_id invoice.tds_slab_id
   json.tds_slab_name invoice.tds_slab&.name
@@ -254,11 +262,17 @@ json.invoice do
     json.extract! invoice&.vendor
 
     json.selected_bank_account do
-      json.account_number invoice.receiving_account&.account_number
-      json.ifsc invoice.receiving_account&.ifsc
-      json.name invoice.receiving_account&.name
-      json.id invoice.receiving_account&.id
-      json.disabled invoice.receiving_account&.disabled
+      receiving_account = invoice.receiving_account
+      if receiving_account.nil? &&  invoice.receiving_account_id.present?
+        #BankAccaount was detroyable in old ui,
+        # this condition for handle such vendor item
+        receiving_account = BankAccount.unscoped.find invoice.receiving_account_id
+      end
+      json.account_number receiving_account&.account_number
+      json.ifsc receiving_account&.ifsc
+      json.name receiving_account&.name
+      json.id receiving_account&.id
+      json.disabled receiving_account&.disabled
     end
 
     if invoice.vendor&.bank_accounts.present?
@@ -306,13 +320,15 @@ json.sub_departments do
     json.parent_id dept.ancestry&.to_i
   end
 end
+
+preferred_tds_rate_ids = (@result.invoice.vendor.tds_rates.pluck(:id) rescue [])
 json.tds_slabs do
   json.array!(current_company.tds_slabs) do |tds_slab|
     if (tds_slab == invoice.tds_slab) || !tds_slab.deleted?
       json.id tds_slab.id
       json.name "#{tds_slab.tds}% - #{tds_slab.name} "
       json.tds tds_slab.tds
-      json.preferred @result.invoice.vendor.tds_rates.pluck(:id).include?(tds_slab.id) rescue false
+      json.preferred preferred_tds_rate_ids.include?(tds_slab.id) rescue false
     end
   end
 end
@@ -329,7 +345,7 @@ json.attachments do
 end
 
 json.gstin_locations do
-  json.array! @result.gstin_locations do |gstin_location|
+  json.array! @result.gstin_locations.includes(:state) do |gstin_location|
     json.extract! gstin_location, :id, :gstin, :poc_name, :poc_email, :poc_mobile_number, :location, :address, :state_code
     json.location "#{gstin_location&.location.to_s} - #{gstin_location.state&.name&.to_s}"
   end

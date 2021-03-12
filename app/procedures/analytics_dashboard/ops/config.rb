@@ -5,25 +5,25 @@ class AnalyticsDashboard::Ops::Config < Transactions::API
           label: 'Purchase Requests',
           cube: "PurchaseRequests",
           root: true,
-          associations: %w(PurchaseRequestLineItems CostCenters Departments ShippingLocations Initiator)
+          associations: %w(Policies PurchaseRequestLineItems CostCenters Departments ShippingLocations Initiator)
       },
       {
           label: 'Purchase Orders',
           cube: "PurchaseOrders",
           root: true,
-          associations: %w(PurchaseOrderLineItems CostCenters Departments BillingLocations ShippingLocations PaymentTerms Vendors Initiator)
+          associations: %w(Policies PurchaseOrderLineItems CostCenters Departments BillingLocations ShippingLocations PaymentTerms Vendors Initiator)
       },
       {
           label: 'Invoices',
           cube: "Invoices",
           root: true,
-          associations: %w(InvoiceLineItems CostCenters Departments BillingLocations ShippingLocations PaymentTerms Vendors Initiator)
+          associations: %w(Policies InvoiceLineItems CostCenters Departments BillingLocations ShippingLocations PaymentTerms Vendors Initiator)
       },
       {
           label: 'Payments',
           cube: "VendorPayments",
           root: true,
-          associations: %w(PaymentTickets)
+          associations: %w(PaymentTickets Policies)
       },
       {
           label: 'Payment Tickets',
@@ -33,17 +33,18 @@ class AnalyticsDashboard::Ops::Config < Transactions::API
       {
           label: 'Vendors',
           cube: 'Vendors',
-          root: true
+          root: true,
+          associations: %w(Policies)
       },
       {
         label: 'Document Workflows Actions',
         cube: "DocumentWorkflowActions",
         root: true,
-        associations: %w(Users)
+        associations: %w(Users Policies)
       },
       {
           label: 'Users',
-          cube: "VpUsers",
+          cube: "Users",
           root: true
       },
       {

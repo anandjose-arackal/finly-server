@@ -98,6 +98,14 @@ every 1.minute, roles: [:whenever_cron] do
   runner 'SearchkickProcessQueueJob.delay.perform'
 end
 
+every 1.day, at: '3:00 am', roles: [:whenever_cron] do
+  runner 'MlModels::Build.delay.perform'
+end
+
+every 1.day, at: '9:00 pm', roles: [:whenever_cron] do
+  runner 'MlModels::Track.delay.perform'
+end
+
 # every '0,15,30,45 * * * *', roles: [:whenever_cron] do
 #   runner 'AnalyticsDashboard::Scheduler.perform'
 # end
