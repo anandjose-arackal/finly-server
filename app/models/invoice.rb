@@ -96,27 +96,12 @@
 #  cn_adjusted_amount_id                 :integer
 #  rcm_enabled                           :boolean          default(FALSE)
 #  tds_percentage                        :decimal(20, 5)
-#  gross_amount                          :decimal(20, 10)
-#  discount_amount                       :decimal(20, 10)
-#  freight_amount                        :decimal(20, 10)
-#  taxable_amount                        :decimal(20, 10)
-#  tax_amount                            :decimal(20, 10)
-#  tds_amount                            :decimal(20, 10)
-#  net_amount                            :decimal(20, 10)
-#  po_advance_amount                     :decimal(20, 10)
-#  advance_paid_amount                   :decimal(20, 10)
-#  total_paid_amount                     :decimal(20, 10)
-#  balance_due_amount                    :decimal(20, 10)
-#  currency_code                         :string(255)
 #  vendor_bank_account_number            :string(255)
 #  vendor_bank_account_ifsc              :string(255)
 #  invoice_gross_amount                  :decimal(20, 5)
 #  invoice_discount_amount               :decimal(20, 5)
 #  invoice_tax_amount                    :decimal(20, 5)
 #  invoice_tds_amount                    :decimal(20, 5)
-#  payment_outside_finly_amount          :decimal(20, 5)
-#  sub_total_amount                      :decimal(20, 5)
-#  total_amount                          :decimal(20, 5)
 #  base_currency                         :string(255)
 #  vendor_sequence_id                    :text(65535)
 #  vendor_gstin                          :string(255)
@@ -128,26 +113,40 @@
 #  invoice_taxable_amount                :decimal(20, 5)
 #  invoice_roundoff_amount               :decimal(20, 5)
 #  invoice_balance_due                   :decimal(20, 5)
-#  invoice_gross_amount_converted        :decimal(20, 5)
-#  invoice_discount_amount_converted     :decimal(20, 5)
-#  invoice_taxable_amount_converted      :decimal(20, 5)
-#  invoice_tax_amount_converted          :decimal(20, 5)
-#  invoice_tds_amount_converted          :decimal(20, 5)
-#  invoice_freight_amount_converted      :decimal(20, 5)
-#  invoice_sub_total_amount_converted    :decimal(20, 5)
-#  invoice_roundoff_amount_converted     :decimal(20, 5)
+#  reporting_invoice_gross_amount        :decimal(20, 5)
+#  reporting_invoice_discount_amount     :decimal(20, 5)
+#  reporting_invoice_taxable_amount      :decimal(20, 5)
+#  reporting_invoice_tax_amount          :decimal(20, 5)
+#  reporting_invoice_tds_amount          :decimal(20, 5)
+#  reporting_invoice_freight_amount      :decimal(20, 5)
+#  reporting_invoice_sub_total_amount    :decimal(20, 5)
+#  reporting_invoice_roundoff_amount     :decimal(20, 5)
 #  invoice_advance_paid_amount           :decimal(20, 5)
-#  invoice_advance_paid_amount_converted :decimal(20, 5)
-#  invoice_total_amount_converted        :decimal(20, 5)
+#  reporting_invoice_advance_paid_amount :decimal(20, 5)
+#  reporting_invoice_total_amount        :decimal(20, 5)
 #  invoice_net_total_amount              :decimal(20, 5)
-#  invoice_net_total_amount_converted    :decimal(20, 5)
-#  invoice_paid_outside_amount_converted :decimal(20, 5)
-#  invoice_balance_due_converted         :decimal(20, 5)
+#  reporting_invoice_net_total_amount    :decimal(20, 5)
+#  reporting_invoice_paid_outside_amount :decimal(20, 5)
+#  reporting_invoice_balance_due         :decimal(20, 5)
 #  erp_sync_status_id                    :integer
 #  erp_sync_message                      :text(65535)
 #  erp_sync_reference_id                 :text(65535)
 #  erp_sync_attempts_count               :integer          default(0)
 #  erp_sync_attempted_at                 :datetime
+#  approval_workflow_version             :integer
+#  is_workflow_v2                        :boolean          default(FALSE)
+#  vendor_trade_name                     :string(255)
+#  vendor_pan                            :string(255)
+#  invoice_paid_outside_amount           :decimal(20, 5)
+#  invoice_sub_total_amount              :decimal(20, 5)
+#  invoice_total_amount                  :decimal(20, 5)
+#  payment_term_days                     :integer          default(0)
+#  vendor_bank_account_swift_code        :string(255)      default("")
+#  vendor_country                        :string(255)      default("")
+#  discount_type                         :string(255)      default("")
+#  overall_discount_amount               :decimal(10, )    default(0)
+#  total_line_item_discount_amount       :decimal(10, )    default(0)
+#  is_domestic                           :boolean          default(TRUE)
 #
 
 class Invoice < ApplicationRecord
@@ -296,6 +295,8 @@ class Invoice < ApplicationRecord
   # validates :amount, presence: true
 
   validates :invoice_number, :format => {with: /\A[a-zA-Z0-9 \\\/\-\#\&]*\Z/, :message => ' can only have letters, numbers, dashes and forward slash and no other special characters'}, :length => {minimum: 0, maximum: 30}, :allow_blank => true
+  validate :item_quantity_validation
+  validate :item_rate_validation
 
   before_destroy :rollback_agreement_invoice
 
@@ -1566,5 +1567,27 @@ class Invoice < ApplicationRecord
   #     # end
   #   end
   # end
+
+  def item_quantity_validation
+    flag = false
+    quantities = invoice_items.map(&:quantity).map(&:to_i)
+    quantities.each do |quantity|
+      flag = true if quantity <= 0
+      break
+    end
+    
+    errors.add(:invoice_items, "quantity must be greater than 0") if flag
+  end
+
+  def item_rate_validation
+    flag = false
+    rates = invoice_items.map(&:rate).map(&:to_i)
+    rates.each do |rate|
+      flag = true if rate <= 0
+      break
+    end
+    
+    errors.add(:invoice_items, "rate must be greater than 0") if flag
+  end
 
 end

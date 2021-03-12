@@ -19,4 +19,5 @@ class ApplicationRecord < ActiveRecord::Base
     end
   }, :on => :update
 
+  singleton_class.send(:alias_method, :filter_active, :exclude_deleted)
 end

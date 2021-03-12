@@ -51,6 +51,12 @@ class ExportResource < NonTenantedApplicationRecord
       route: 'purchase_orders.index'
     },
     {
+        name: 'Receipt Note Items',
+        value: 'receipt_note_items',
+        resolver: 'inward_documents_items.default',
+        route: 'received.index'
+    },
+    {
       name: 'Users',
       value: 'users',
       resolver: 'users.default',

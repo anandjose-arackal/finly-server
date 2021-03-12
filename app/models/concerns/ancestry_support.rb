@@ -2,14 +2,19 @@ module AncestrySupport
   extend ActiveSupport::Concern
 
   included do
-    scope :leaves, lambda { joins("LEFT JOIN #{table_name} AS c ON c.#{ancestry_column} = CAST(#{table_name}.id AS char(50)) OR c.#{ancestry_column} = concat(#{table_name}.#{ancestry_column}, '/', #{table_name}.id)").group("#{table_name}.id").having('COUNT(c.id) = 0') }
+    scope :leaves, lambda {
+      all_child_ids = self.pluck(ancestry_column).compact
+      related_parents_ids = all_child_ids.map { |p_id| p_id.split("/") }.flatten.uniq
+      where.not(id: related_parents_ids)
+      # joins("LEFT JOIN #{table_name} AS c ON c.#{ancestry_column} = CAST(#{table_name}.id AS char(50)) OR c.#{ancestry_column} = concat(#{table_name}.#{ancestry_column}, '/', #{table_name}.id)").group("#{table_name}.id").having('COUNT(c.id) = 0')
+    }
   end
 
   def full_name
     self.parent.blank? ? self.name : "#{self.ancestors&.pluck(:name)&.join(' / ')} / #{self.name}"
   end
 
-  def json_tree(options={})
+  def json_tree(options = {})
     json = as_json(options)
     json[:children] = children&.non_deleted&.map(&:json_tree)
     json

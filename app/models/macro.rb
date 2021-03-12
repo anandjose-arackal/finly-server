@@ -3,7 +3,7 @@
 # Table name: macros
 #
 #  id                  :bigint           not null, primary key
-#  macro_key           :string(255)      not null
+#  macro_key           :string(255)
 #  name                :string(255)      not null
 #  description         :text(65535)
 #  script              :text(65535)      not null

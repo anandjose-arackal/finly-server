@@ -73,6 +73,7 @@ class FormEntity < ApplicationRecord
   delegate :compute_lookup?, :compute_form?, to: :compute_type, allow_nil: true
   belongs_to :compute_lookup_entity, class_name: 'FormEntity', optional: true
 
+  has_one :prediction_model, class_name: 'MlModel::FormEntity', primary_key: :uuid
   has_many :entities, class_name: 'FormEntity', foreign_key: :parent_id, primary_key: :uuid
   has_many :choices, class_name: 'FormEntityChoice', dependent: :destroy
   has_many :validations, class_name: 'FormEntityValidation'
@@ -123,7 +124,7 @@ class FormEntity < ApplicationRecord
   end
 
   def contract(contract, user)
-    Forms::Contracts::Builders::FormEntity.({params: {entity: self, contract: contract}, current_user: user})
+    Forms::Contracts::Builders::FormEntity.({ params: { entity: self, contract: contract }, current_user: user })
   end
 
   # Class method `contract` is used in Form Builder
@@ -188,70 +189,70 @@ class FormEntity < ApplicationRecord
         choices_scope_config[:route] = choices_scope.route
       end
     else
-      choices_data = {choices: choices.as_json}
+      choices_data = { choices: choices.as_json }
     end
 
     data = {
-        id: id,
-        uuid: uuid,
-        company_id: company_id,
-        form_id: form_id,
-        form_section_id: form_section_id,
-        created_by_user_id: created_by_user_id,
-        entity_key: entity_key,
-        label: label,
-        placeholder: placeholder,
-        hint: hint,
-        entity_type: entity_type,
-        default_value: default_value,
-        behavior: {
-            editable: editable,
-            required: required,
-            active: active,
-            visible: visible,
-        },
-        unique: unique,
-        position: position,
-        custom_field: !system_field,
-        can_visible_be_changed: can_visible_be_changed,
-        can_editable_be_changed: can_editable_be_changed,
-        can_required_be_changed: can_required_be_changed,
-        can_uniqueness_be_changed: can_uniqueness_be_changed,
-        can_be_disabled: can_be_disabled,
-        can_label_be_renamed: can_label_be_renamed,
-        can_choices_be_changed: can_choices_be_changed,
-        allow_clearing_default_value: allow_clearing_default_value,
-        options: options,
-        deleted_at: deleted_at,
-        created_at: created_at,
-        updated_at: updated_at,
-        internal: internal,
-        is_modified: is_modified,
-        entity_path: entity_path,
-        parent_id: parent_id,
-        populate_if_empty: populate_if_empty,
-        # type: type,
-        config: config,
-        associate_custom_fields: associate_custom_fields,
-        compute_enabled: compute_enabled,
-        compute_type_id: compute_type_id,
-        compute_formula: compute_formula,
-        compute_lookup_entity_id: compute_lookup_entity_id,
-        filters: filters&.as_store,
-        config_path: config_path,
-        validations: validations.as_json(opts),
-        conditions: conditions.as_json(opts),
-        # choices: choices_scope(params: options[:params], user: options[:current_user]),
-        choices: choices_data,
-        choices_scope: choices_scope_config
+      id: id,
+      uuid: uuid,
+      company_id: company_id,
+      form_id: form_id,
+      form_section_id: form_section_id,
+      created_by_user_id: created_by_user_id,
+      entity_key: entity_key,
+      label: label,
+      placeholder: placeholder,
+      hint: hint,
+      entity_type: entity_type,
+      default_value: default_value,
+      behavior: {
+        editable: editable,
+        required: required,
+        active: active,
+        visible: visible,
+      },
+      unique: unique,
+      position: position,
+      custom_field: !system_field,
+      can_visible_be_changed: can_visible_be_changed,
+      can_editable_be_changed: can_editable_be_changed,
+      can_required_be_changed: can_required_be_changed,
+      can_uniqueness_be_changed: can_uniqueness_be_changed,
+      can_be_disabled: can_be_disabled,
+      can_label_be_renamed: can_label_be_renamed,
+      can_choices_be_changed: can_choices_be_changed,
+      allow_clearing_default_value: allow_clearing_default_value,
+      options: options,
+      deleted_at: deleted_at,
+      created_at: created_at,
+      updated_at: updated_at,
+      internal: internal,
+      is_modified: is_modified,
+      entity_path: entity_path,
+      parent_id: parent_id,
+      populate_if_empty: populate_if_empty,
+      # type: type,
+      config: config,
+      associate_custom_fields: associate_custom_fields,
+      compute_enabled: compute_enabled,
+      compute_type_id: compute_type_id,
+      compute_formula: compute_formula,
+      compute_lookup_entity_id: compute_lookup_entity_id,
+      filters: filters&.as_store,
+      config_path: config_path,
+      validations: validations.as_json(opts),
+      conditions: conditions.as_json(opts),
+      # choices: choices_scope(params: options[:params], user: options[:current_user]),
+      choices: choices_data,
+      choices_scope: choices_scope_config
     }
   end
 
   def form_reference_json(opts = {})
     json = {
-        entity_key: entity_key,
-        entity_path: entity_path,
-        config_path: config_path,
+      entity_key: entity_key,
+      entity_path: entity_path,
+      config_path: config_path,
     }
     if parent.present? and parent.class.collection?
       json[:collection_entity_key] = parent.entity_key
@@ -261,28 +262,28 @@ class FormEntity < ApplicationRecord
     json
   end
 
-  def form_json(opts={})
+  def form_json(opts = {})
     data = {
-        id: uuid,
-        entity_key: entity_key,
-        parent_id: parent_id,
-        system_field: system_field,
-        entity_path: entity_path,
-        config_path: config_path,
-        label: label,
-        placeholder: placeholder,
-        hint: hint,
-        entity_type: entity_type,
-        default_value: default_value,
-        position: position,
-        filters: filters&.as_ransack(do_not_interpolate: true),
-        behavior: {
-            editable: editable,
-            required: required,
-            active: active,
-            visible: visible,
-        },
-        options: options
+      id: uuid,
+      entity_key: entity_key,
+      parent_id: parent_id,
+      system_field: system_field,
+      entity_path: entity_path,
+      config_path: config_path,
+      label: label,
+      placeholder: placeholder,
+      hint: hint,
+      entity_type: entity_type,
+      default_value: default_value,
+      position: position,
+      filters: filters&.as_ransack(do_not_interpolate: true),
+      behavior: {
+        editable: editable,
+        required: required,
+        active: active,
+        visible: visible,
+      },
+      options: options
     }
     if choices_scope.present?
       data[:choices] = choices_scope.build(params: opts[:params], user: opts[:current_user])
@@ -295,7 +296,6 @@ class FormEntity < ApplicationRecord
     end
     data
   end
-
 
   def self.system_entity(section, entity_key, attributes)
     entity = ActsAsTenant.without_tenant do
@@ -346,7 +346,6 @@ class FormEntity < ApplicationRecord
     nil
   end
 
-
   def generate_config_path(path = [], obj = self)
     return path if obj.blank?
     if obj.class.ancestors.map(&:name).include?('FormEntity')
@@ -384,8 +383,8 @@ class FormEntity < ApplicationRecord
     end
   end
 
-
   private
+
   def sanitize
     # Set entity path & config path
     self.entity_path = generate_entity_path.join(".")

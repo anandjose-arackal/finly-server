@@ -33,7 +33,7 @@ class BankAccount < ApplicationRecord
   include SoftDeletable
 
   belongs_to :company, optional: true
-  belongs_to :account_owner, optional: true, polymorphic: true
+  belongs_to :account_owner, optional: true, polymorphic: true, touch: true
 
   belongs_to :purchase_order, optional: true
   belongs_to :bank_account_master, optional: true
