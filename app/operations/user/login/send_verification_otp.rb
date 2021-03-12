@@ -2,8 +2,7 @@ class User::Login::SendVerificationOtp < BaseOperation
 
   include MathUtil
 
-  attr_accessor :selected_user, :message, :otp, :otp_request_type_id
-
+  attr_accessor :selected_user, :message, :otp, :otp_request_type_id, :user_not_found
   OTP_RESEND_TIMER = Constants::OTP_RESEND_INTERVAL
 
   def self.call(params)
@@ -23,7 +22,7 @@ class User::Login::SendVerificationOtp < BaseOperation
 
   def validate
     unless selected_user
-      add_message :error, "OTP sent successfully"
+      self.user_not_found = true
       return
     end
 
@@ -38,25 +37,30 @@ class User::Login::SendVerificationOtp < BaseOperation
   def pre_process
     # generating the random 6 digit OTP for a particular user and storing it in the message
     # if the last OTP was sent less than 15 minutes ago, send the same OTP back
-    if selected_user.otp_request_type_id == otp_request_type_id && selected_user.otp_sent_at > 15.minutes.ago && selected_user.otp
-      self.otp = selected_user.otp
-      # else send the a new OTP after generating it
-    else
-      self.otp = MathUtil.generate_random_number(6)
+    unless self.user_not_found
+      if selected_user.otp_request_type_id == otp_request_type_id && selected_user.otp_sent_at > 15.minutes.ago && selected_user.otp
+        self.otp = selected_user.otp
+        # else send the a new OTP after generating it
+      else
+        self.otp = MathUtil.generate_random_number(6)
+      end
     end
   end
 
   def process
-    response = Sms::UserOtp.(selected_user, otp: self.otp)
-    if response.success?
-      # have to save it without validation because update_attributes considers validations
-      selected_user.update_columns(otp_count: (selected_user.otp_count+1), otp_attempts: 0)
-      if otp != selected_user.otp
-        selected_user.update_columns({otp: otp, otp_sent_at: DateTime.now, otp_request_type_id: otp_request_type_id, otp_attempts: 0})
+    unless self.user_not_found
+      response = Sms::UserOtp.(selected_user, otp: self.otp)
+      if response.success?
+        # have to save it without validation because update_attributes considers validations
+        selected_user.update_columns(otp_count: (selected_user.otp_count+1), otp_attempts: 0)
+        if otp != selected_user.otp
+          selected_user.update_columns({otp: otp, otp_sent_at: DateTime.now, otp_request_type_id: otp_request_type_id, otp_attempts: 0})
+        end
+      else
+        messages[:error] = response.messages[:error]
       end
-    else
-      messages[:error] = response.messages[:error]
     end
+    add_message :success, 'OTP sent successfully'
   end
 
   def failure
