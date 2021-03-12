@@ -5,6 +5,7 @@ beginning of this file.
 
 ## 2021-03-12
   - Adding master.key to git ignore
+  - Updating token based authentication
 
 ## 2021-03-11
   - Updating sso config api
