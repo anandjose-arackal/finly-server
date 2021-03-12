@@ -21,7 +21,7 @@ class GoogleOauth2Controller < Oauth::TokenController
     set_grant_type
     set_scope
     super()
-    @token.update_columns(authentication_type: "google_oauth2")
+    @token.update_columns(authentication_type: "sso")
   end
 
   def google_auth2_logout

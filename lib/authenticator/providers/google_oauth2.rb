@@ -29,9 +29,16 @@ class Authenticator::Providers::GoogleOauth2 < Authenticator::Providers::Base
     self.user_info[:exp] = data[:exp]
     params[:user] = user
     self.user_info[:email_verified] = data[:email_verified]
-    
+
+    toggel = AuthenticationToggle.new( user )
+    toggel.sso_google_enabled?
+
+    unless toggel.sso_google_enabled?    
+      fail_with_event :on_google_oauth, "SSo login not enabled, Please ask your team to enable it"
+    end
+
     fail_with_event :on_blank_username, "Invalid username"
-    fail_with_event :on_expired_token, "Invalid username"
+    fail_with_event :on_expired_token, "Token Expired"
 
     # create a session
     email_verified =  self.user_info[:email_verified]
@@ -56,10 +63,15 @@ class Authenticator::Providers::GoogleOauth2 < Authenticator::Providers::Base
   end
 
   def on_expired_token(message)
-    unless self.user_info[:exp] < Time.now.to_i
+    unless self.user_info[:exp] > Time.now.to_i
       params[:message] = "Token Expired"
       UserSessions::Create.(:failed, params)
     end
+  end
+
+  def on_google_oauth(message)    
+    params[:message] = message
+    UserSessions::Create.(:failed, params)
   end
 
   def username
@@ -73,7 +85,6 @@ class Authenticator::Providers::GoogleOauth2 < Authenticator::Providers::Base
     end
   end
 
-
   def on_success(message)
     result = Gatekeeper::Event.(:user_login_success, user: self.unauthenticated_user, username: username, ip: request.remote_ip)
     unless result.success?
@@ -84,25 +95,22 @@ class Authenticator::Providers::GoogleOauth2 < Authenticator::Providers::Base
     end
   end
 
-  # def sso_settings
-    #  {"iss"=>"accounts.google.com",
-    #  "azp"=>"307602140088-5aotklsei00379ioe94ebua3ge9nlv3s.apps.googleusercontent.com",
-    #  "aud"=>"307602140088-5aotklsei00379ioe94ebua3ge9nlv3s.apps.googleusercontent.com",
-    #  "sub"=>"109050515642264867674",
-    #  "hd"=>"finly.io",
-    #  "email"=>"prakash.thakur@finly.io",
-    #  "email_verified"=>true,
-    #  "at_hash"=>"lS1XKK1SThK3fsP8TGJZug",
-    #  "name"=>"Prakash Thakur",
-    #  "picture"=>
-    #   "https://lh4.googleusercontent.com/-OceF5KtWAls/AAAAAAAAAAI/AAAAAAAAAAA/AMZuuckId3mBT52mdG5nWY5-Zo7HVmU1OA/s96-c/photo.jpg",
-    #  "given_name"=>"Prakash ",
-    #  "family_name"=>"Thakur",
-    #  "locale"=>"en",
-    #  "iat"=>1615543580,
-    #  "exp"=>1615547180,
-    #  "jti"=>"1d456b46b3b964def7c7c2c782ed39d782faf90a"
-    # }
-  # end
-
+  #  {"iss"=>"accounts.google.com",
+  #  "azp"=>"307602140088-5aotklsei00379ioe94ebua3ge9nlv3s.apps.googleusercontent.com",
+  #  "aud"=>"307602140088-5aotklsei00379ioe94ebua3ge9nlv3s.apps.googleusercontent.com",
+  #  "sub"=>"109050515642264867674",
+  #  "hd"=>"finly.io",
+  #  "email"=>"prakash.thakur@finly.io",
+  #  "email_verified"=>true,
+  #  "at_hash"=>"lS1XKK1SThK3fsP8TGJZug",
+  #  "name"=>"Prakash Thakur",
+  #  "picture"=>
+  #   "https://lh4.googleusercontent.com/-OceF5KtWAls/AAAAAAAAAAI/AAAAAAAAAAA/AMZuuckId3mBT52mdG5nWY5-Zo7HVmU1OA/s96-c/photo.jpg",
+  #  "given_name"=>"Prakash ",
+  #  "family_name"=>"Thakur",
+  #  "locale"=>"en",
+  #  "iat"=>1615543580,
+  #  "exp"=>1615547180,
+  #  "jti"=>"1d456b46b3b964def7c7c2c782ed39d782faf90a"
+  # }
 end

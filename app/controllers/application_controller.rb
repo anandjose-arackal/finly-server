@@ -432,7 +432,12 @@ class ApplicationController < ActionController::Base
     # Todo this is a temporary hack
     # expired, otp verified and user session verified will be false for users who authenticate via SSO
     # This will have to be handled when working on SSO
-    return true if user_session.access_token&.authentication_type == 'sso'
+    
+    # return true if user_session.access_token&.authentication_type == 'sso'
+
+    return false if RequestStoreUtil.current_session.access_token.authentication_type == "password" && current_user.expired?
+    # if password then check for current_user session expired
+    
 
     return false if current_user.expired?
     return false unless current_user.otp_verified

@@ -7,6 +7,7 @@ beginning of this file.
   - Adding master.key to git ignore
   - Updating token based authentication
   - Correcting google auth name
+  - Adding featurefliper for google auth, adding user expiration
 
 ## 2021-03-11
   - Updating sso config api
