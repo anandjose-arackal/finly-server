@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file. Always add new logs to beginning of this file.
 
+##2021-03-12
+  - Updating the invoice and purchase_order validations
+
 ##2021-03-11
   - Fix: `Vendor Payment` Purchase Order advance Amount in upaid, the status will change to `close`  while closing a purchase order
     The re-opeing action in purchase order will revoke the Purchase advance amount status to previous status if it a non paid advance
