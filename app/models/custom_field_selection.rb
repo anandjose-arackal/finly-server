@@ -11,7 +11,7 @@
 #  updated_at            :datetime         not null
 #
 
-class CustomFieldSelection < ApplicationRecord
+class CustomFieldSelection < ApplicationRecordBackwardCompatibility
   include SoftDeletable, UUIDHelper
 
   belongs_to :company, optional: true
