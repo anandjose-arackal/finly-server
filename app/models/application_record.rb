@@ -10,7 +10,7 @@ class ApplicationRecord < ActiveRecord::Base
   include SoftDeletable
 
   acts_as_tenant(:company, options = {
-    has_global_records: true,
+    has_global_records: false,
   })
 
   before_validation Proc.new {|m|
