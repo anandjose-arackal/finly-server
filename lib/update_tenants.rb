@@ -8,7 +8,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        UserPanelSubscription.import records, on_duplicate_key_update: [:company_id]
+        UserPanelSubscription.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 534442
@@ -16,7 +16,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        UserRoleMapping.import records, on_duplicate_key_update: [:company_id]
+        UserRoleMapping.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 71291
@@ -24,7 +24,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        UserProfile.import records, on_duplicate_key_update: [:company_id]
+        UserProfile.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 328506
@@ -32,7 +32,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        PolicyUserRole.import records, on_duplicate_key_update: [:company_id]
+        PolicyUserRole.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 61863
@@ -40,7 +40,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        UserWallet.import records, on_duplicate_key_update: [:company_id]
+        UserWallet.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 61786
@@ -48,7 +48,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        VendorPaymentWallet.import records, on_duplicate_key_update: [:company_id]
+        VendorPaymentWallet.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 183410
@@ -56,7 +56,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        UserPocket.import records, on_duplicate_key_update: [:company_id]
+        UserPocket.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 30643
@@ -64,7 +64,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.policy&.company_id
         end
-        PolicyDepartmentMapping.import records, on_duplicate_key_update: [:company_id]
+        PolicyDepartmentMapping.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # Here
@@ -77,7 +77,7 @@ class UpdateTenants
             record.company_id = record.enforceable&.company_id
           end
         end
-        EnforcePolicy.import records, on_duplicate_key_update: [:company_id]
+        EnforcePolicy.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 115417
@@ -85,23 +85,23 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.policy&.company_id
         end
-        PolicyLocationMapping.import records, on_duplicate_key_update: [:company_id]
+        PolicyLocationMapping.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 3392475
-      DocumentLevelReviewerMapping.includes(:policy).find_in_batches(batch_size: 1000) do |records|
-        records.each do |record|
-          record.company_id = record.policy&.company_id
-        end
-        DocumentLevelReviewerMapping.import records, on_duplicate_key_update: [:company_id]
-      end
+      # DocumentLevelReviewerMapping.includes(:policy).find_in_batches(batch_size: 1000) do |records|
+      #   records.each do |record|
+      #     record.company_id = record.policy&.company_id
+      #   end
+      #   DocumentLevelReviewerMapping.import records, on_duplicate_key_update: [:company_id], validate: false
+      # end
 
       # 288950
       ProcurementStatusTaggable.includes(:procurement).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.procurement&.company_id
         end
-        ProcurementStatusTaggable.import records, on_duplicate_key_update: [:company_id]
+        ProcurementStatusTaggable.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 3640
@@ -109,7 +109,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.field_configuration&.company_id
         end
-        FieldParentMapping.import records, on_duplicate_key_update: [:company_id]
+        FieldParentMapping.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 38961
@@ -125,7 +125,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        CashOnHand.import records, on_duplicate_key_update: [:company_id]
+        CashOnHand.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 125150
@@ -133,7 +133,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.vendor&.company_id
         end
-        GstinLocation.import records, on_duplicate_key_update: [:company_id]
+        GstinLocation.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 274
@@ -141,7 +141,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user_group&.company_id
         end
-        UserGroupItem.import records, on_duplicate_key_update: [:company_id]
+        UserGroupItem.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 50
@@ -149,7 +149,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user_group&.company_id
         end
-        UserTeamGroupItemMapping.import records, on_duplicate_key_update: [:company_id]
+        UserTeamGroupItemMapping.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 324704
@@ -157,7 +157,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        UserIp.import records, on_duplicate_key_update: [:company_id]
+        UserIp.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 124744
@@ -165,7 +165,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        UserAgentClient.import records, on_duplicate_key_update: [:company_id]
+        UserAgentClient.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 18727
@@ -173,7 +173,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.budget_group_criterium&.company_id
         end
-        BudgetGroupCriteriaMapping.import records, on_duplicate_key_update: [:company_id]
+        BudgetGroupCriteriaMapping.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 26144
@@ -181,40 +181,31 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.budget&.company_id
         end
-        BudgetConsumption.import records, on_duplicate_key_update: [:company_id]
+        BudgetConsumption.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 14252657
-      CustomField.includes(:field_configuration).find_in_batches(batch_size: 1000) do |custom_fields|
-        custom_fields.each do |custom_field|
-          custom_field.company_id = custom_field.field_configuration.company_id
-        end
-        CustomField.import custom_fields, on_duplicate_key_update: [:company_id]
-      end
-
-      # Here
-      # 6127945
-      BudgetTrail.includes(:entity).find_in_batches(batch_size: 1000) do |records|
-        records.each do |record|
-          record.company_id = record.entity&.company_id
-        end
-        BudgetTrail.import records, on_duplicate_key_update: [:company_id]
-      end
+      # CustomField.includes(:field_configuration).find_in_batches(batch_size: 1000) do |custom_fields|
+      #   custom_fields.each do |custom_field|
+      #     custom_field.company_id = custom_field.field_configuration.company_id
+      #   end
+      #   CustomField.import custom_fields, on_duplicate_key_update: [:company_id], validate: false
+      # end
 
       # 1216912
-      Expense.includes(:user).find_in_batches(batch_size: 1000) do |records|
-        records.each do |record|
-          record.company_id = record.user&.company_id
-        end
-        Expense.import records, on_duplicate_key_update: [:company_id], validate: false
-      end
+      # Expense.includes(:user).find_in_batches(batch_size: 1000) do |records|
+      #   records.each do |record|
+      #     record.company_id = record.user&.company_id
+      #   end
+      #   Expense.import records, on_duplicate_key_update: [:company_id], validate: false
+      # end
 
       # 90449
       PurchaseOrderItem.includes(:purchase_order).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.purchase_order&.company_id
         end
-        PurchaseOrderItem.import records, on_duplicate_key_update: [:company_id]
+        PurchaseOrderItem.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 367776
@@ -222,7 +213,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.invoice&.company_id
         end
-        InvoiceLineItem.import records, on_duplicate_key_update: [:company_id]
+        InvoiceLineItem.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 668
@@ -246,7 +237,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        Receipt.import records, on_duplicate_key_update: [:company_id]
+        Receipt.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 799
@@ -254,7 +245,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.travel_request&.company_id
         end
-        TravelRequestDestination.import records, on_duplicate_key_update: [:company_id]
+        TravelRequestDestination.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 5232
@@ -262,31 +253,31 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.policy&.company_id
         end
-        PolicyFieldMapping.import records, on_duplicate_key_update: [:company_id]
+        PolicyFieldMapping.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 4421831
-      Trail.includes(:action_user).find_in_batches(batch_size: 1000) do |records|
-        records.each do |record|
-          record.company_id = record.action_user&.company_id
-        end
-        Trail.import records, on_duplicate_key_update: [:company_id]
-      end
+      # Trail.includes(:action_user).find_in_batches(batch_size: 1000) do |records|
+      #   records.each do |record|
+      #     record.company_id = record.action_user&.company_id
+      #   end
+      #   Trail.import records, on_duplicate_key_update: [:company_id], validate: false
+      # end
 
       # 2877951
-      FieldDropDownSelection.includes(:custom_field).find_in_batches(batch_size: 1000) do |records|
-        records.each do |record|
-          record.company_id = record.custom_field&.company_id
-        end
-        FieldDropDownSelection.import records, on_duplicate_key_update: [:company_id]
-      end
+      # FieldDropDownSelection.includes(:custom_field).find_in_batches(batch_size: 1000) do |records|
+      #   records.each do |record|
+      #     record.company_id = record.custom_field&.company_id
+      #   end
+      #   FieldDropDownSelection.import records, on_duplicate_key_update: [:company_id], validate: false
+      # end
 
       # 6986
       BudgetRule.includes(:policy).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.policy&.company_id
         end
-        BudgetRule.import records, on_duplicate_key_update: [:company_id]
+        BudgetRule.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 8162
@@ -294,7 +285,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.budget_rule&.company_id
         end
-        BudgetRuleCategoryMapping.import records, on_duplicate_key_update: [:company_id]
+        BudgetRuleCategoryMapping.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 10974
@@ -302,7 +293,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.budget_rule&.company_id
         end
-        BudgetRuleFieldMapping.import records, on_duplicate_key_update: [:company_id]
+        BudgetRuleFieldMapping.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 653527
@@ -310,7 +301,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.report&.company_id
         end
-        ReportComment.import records, on_duplicate_key_update: [:company_id]
+        ReportComment.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 613169
@@ -318,7 +309,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.money_request&.company_id
         end
-        MoneyRequestItem.import records, on_duplicate_key_update: [:company_id]
+        MoneyRequestItem.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 68838
@@ -326,7 +317,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.money_request&.company_id
         end
-        MoneyRequestComment.import records, on_duplicate_key_update: [:company_id]
+        MoneyRequestComment.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 2544
@@ -334,7 +325,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.policy&.company_id
         end
-        DistanceExpenseConfig.import records, on_duplicate_key_update: [:company_id]
+        DistanceExpenseConfig.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 2544
@@ -342,7 +333,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.policy&.company_id
         end
-        TimeExpenseConfig.import records, on_duplicate_key_update: [:company_id]
+        TimeExpenseConfig.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 1890
@@ -350,7 +341,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.policy&.company_id
         end
-        VehicleRate.import records, on_duplicate_key_update: [:company_id]
+        VehicleRate.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 2544
@@ -358,7 +349,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.policy&.company_id
         end
-        PerDiemExpenseConfig.import records, on_duplicate_key_update: [:company_id]
+        PerDiemExpenseConfig.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 189
@@ -366,7 +357,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.configurable&.company_id
         end
-        PerDiem.import records, on_duplicate_key_update: [:company_id]
+        PerDiem.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 921
@@ -374,7 +365,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.dependent_field_configuration&.company_id
         end
-        ParentDependentFieldConfigurationMapping.import records, on_duplicate_key_update: [:company_id]
+        ParentDependentFieldConfigurationMapping.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 368509
@@ -382,7 +373,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.messagable&.company_id
         end
-        SystemMessage.import records, on_duplicate_key_update: [:company_id]
+        SystemMessage.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 113523
@@ -398,7 +389,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.expense&.company_id
         end
-        ManualExpense.import records, on_duplicate_key_update: [:company_id]
+        ManualExpense.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 269045
@@ -406,7 +397,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.expense&.company_id
         end
-        CardExpense.import records, on_duplicate_key_update: [:company_id]
+        CardExpense.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 266055
@@ -422,7 +413,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.expense&.company_id
         end
-        TimeExpense.import records, on_duplicate_key_update: [:company_id]
+        TimeExpense.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 14427
@@ -430,7 +421,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.expense&.company_id
         end
-        PerDiemExpense.import records, on_duplicate_key_update: [:company_id]
+        PerDiemExpense.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 548
@@ -486,23 +477,23 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.rate_contract&.company_id
         end
-        RateContractLineItem.import records, on_duplicate_key_update: [:company_id]
+        RateContractLineItem.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 10736795
-      FieldText.includes(:custom_field).find_in_batches(batch_size: 1000) do |records|
-        records.each do |record|
-          record.company_id = record.custom_field&.company_id
-        end
-        FieldText.import records, on_duplicate_key_update: [:company_id]
-      end
+      # FieldText.includes(:custom_field).find_in_batches(batch_size: 1000) do |records|
+      #   records.each do |record|
+      #     record.company_id = record.custom_field&.company_id
+      #   end
+      #   FieldText.import records, on_duplicate_key_update: [:company_id], validate: false
+      # end
 
       # 630019
       CardTransaction.includes(:card).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.card&.company_id
         end
-        CardTransaction.import records, on_duplicate_key_update: [:company_id]
+        CardTransaction.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 61785
@@ -510,7 +501,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.submitable&.company_id
         end
-        AutoSubmitConfig.import records, on_duplicate_key_update: [:company_id]
+        AutoSubmitConfig.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 113
@@ -518,7 +509,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.company_kyc&.company_id
         end
-        KycDocument.import records, on_duplicate_key_update: [:company_id]
+        KycDocument.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 14
@@ -526,7 +517,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.scopable&.id
         end
-        FieldCustomization.import records, on_duplicate_key_update: [:company_id]
+        FieldCustomization.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 78870
@@ -534,7 +525,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.parent_commentable&.company_id
         end
-        ProcurementComment.import records, on_duplicate_key_update: [:company_id]
+        ProcurementComment.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 13515
@@ -542,7 +533,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.purchase_order&.company_id
         end
-        Quotation.import records, on_duplicate_key_update: [:company_id]
+        Quotation.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 1870
@@ -550,7 +541,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.department&.company_id
         end
-        UserDepartmentMapping.import records, on_duplicate_key_update: [:company_id]
+        UserDepartmentMapping.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 18
@@ -558,7 +549,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        UserDelegateMapping.import records, on_duplicate_key_update: [:company_id]
+        UserDelegateMapping.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 112232
@@ -566,7 +557,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        UserBalanceHistory.import records, on_duplicate_key_update: [:company_id]
+        UserBalanceHistory.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 0
@@ -574,7 +565,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        UserBranchLocationMapping.import records, on_duplicate_key_update: [:company_id]
+        UserBranchLocationMapping.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 0
@@ -582,7 +573,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        UserDropDownItemMapping.import records, on_duplicate_key_update: [:company_id]
+        UserDropDownItemMapping.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 0
@@ -590,7 +581,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        UserFieldMapping.import records, on_duplicate_key_update: [:company_id]
+        UserFieldMapping.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 564
@@ -598,7 +589,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        UserGroupItemMapping.import records, on_duplicate_key_update: [:company_id]
+        UserGroupItemMapping.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 509600
@@ -606,7 +597,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        UserLoginTrack.import records, on_duplicate_key_update: [:company_id]
+        UserLoginTrack.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 261045
@@ -614,7 +605,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        UserManagerMapping.import records, on_duplicate_key_update: [:company_id]
+        UserManagerMapping.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 0
@@ -622,7 +613,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        UserTag.import records, on_duplicate_key_update: [:company_id]
+        UserTag.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 0
@@ -630,7 +621,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user_wallet&.company_id
         end
-        UserWalletTrack.import records, on_duplicate_key_update: [:company_id]
+        UserWalletTrack.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 0 UserWalletTrackAction
@@ -645,7 +636,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.parent&.company_id
         end
-        Address.import records, on_duplicate_key_update: [:company_id]
+        Address.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 0
@@ -653,7 +644,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        ApprovalRoute.import records, on_duplicate_key_update: [:company_id]
+        ApprovalRoute.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 45
@@ -661,7 +652,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        Authentication.import records, on_duplicate_key_update: [:company_id]
+        Authentication.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 61785
@@ -669,7 +660,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.reloadable&.company_id
         end
-        AutoReloadConfig.import records, on_duplicate_key_update: [:company_id]
+        AutoReloadConfig.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 61785
@@ -677,7 +668,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        BalanceSheet.import records, on_duplicate_key_update: [:company_id]
+        BalanceSheet.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 14904 BankAccountMaster, 682004 BankAccount
@@ -690,27 +681,27 @@ class UpdateTenants
       end
 
       # 1333661
-      BankPaymentRequestComment.includes(:bank_payment_request).find_in_batches(batch_size: 1000) do |records|
-        records.each do |record|
-          record.company_id = record.bank_payment_request&.company_id
-        end
-        BankPaymentRequestComment.import records, on_duplicate_key_update: [:company_id]
-      end
+      # BankPaymentRequestComment.includes(:bank_payment_request).find_in_batches(batch_size: 1000) do |records|
+      #   records.each do |record|
+      #     record.company_id = record.bank_payment_request&.company_id
+      #   end
+      #   BankPaymentRequestComment.import records, on_duplicate_key_update: [:company_id], validate: false
+      # end
 
       # 3607952
-      BankPaymentRequestTrail.includes(:bank_payment_request).find_in_batches(batch_size: 1000) do |records|
-        records.each do |record|
-          record.company_id = record.bank_payment_request&.company_id
-        end
-        BankPaymentRequestTrail.import records, on_duplicate_key_update: [:company_id]
-      end
+      # BankPaymentRequestTrail.includes(:bank_payment_request).find_in_batches(batch_size: 1000) do |records|
+      #   records.each do |record|
+      #     record.company_id = record.bank_payment_request&.company_id
+      #   end
+      #   BankPaymentRequestTrail.import records, on_duplicate_key_update: [:company_id], validate: false
+      # end
 
       # 0
       BbpsSubscriptionField.includes(:subscription).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.subscription&.company_id
         end
-        BbpsSubscriptionField.import records, on_duplicate_key_update: [:company_id]
+        BbpsSubscriptionField.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 3580
@@ -722,7 +713,7 @@ class UpdateTenants
             record.company_id = record.user&.company_id
           end
         end
-        BbpsSubscriptionPoc.import records, on_duplicate_key_update: [:company_id]
+        BbpsSubscriptionPoc.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 57
@@ -746,7 +737,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.budget&.company_id
         end
-        BudgetCriteriaMapping.import records, on_duplicate_key_update: [:company_id]
+        BudgetCriteriaMapping.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 3289
@@ -754,7 +745,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.budget&.company_id
         end
-        BudgetModificationTrail.import records, on_duplicate_key_update: [:company_id]
+        BudgetModificationTrail.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 0
@@ -762,7 +753,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.budget_rule&.company_id
         end
-        BudgetRuleBranchLocationMapping.import records, on_duplicate_key_update: [:company_id]
+        BudgetRuleBranchLocationMapping.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 2536
@@ -770,7 +761,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.budget_rule&.company_id
         end
-        BudgetRuleDepartmentMapping.import records, on_duplicate_key_update: [:company_id]
+        BudgetRuleDepartmentMapping.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 10111
@@ -778,7 +769,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.budget_rule&.company_id
         end
-        BudgetRuleExpenseTypeMapping.import records, on_duplicate_key_update: [:company_id]
+        BudgetRuleExpenseTypeMapping.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 77
@@ -786,7 +777,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.card_assign_request&.company_id
         end
-        CardAssignRequestTrack.import records, on_duplicate_key_update: [:company_id]
+        CardAssignRequestTrack.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 51
@@ -794,7 +785,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.card&.company_id
         end
-        CardBalanceHistory.import records, on_duplicate_key_update: [:company_id]
+        CardBalanceHistory.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 0
@@ -802,7 +793,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.prepaid_card&.company_id
         end
-        CardConfiguration.import records, on_duplicate_key_update: [:company_id]
+        CardConfiguration.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 2523
@@ -810,7 +801,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.policy&.company_id
         end
-        CardExpenseConfig.import records, on_duplicate_key_update: [:company_id]
+        CardExpenseConfig.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 14193
@@ -818,7 +809,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.card&.company_id
         end
-        CardRestriction.import records, on_duplicate_key_update: [:company_id]
+        CardRestriction.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 85158
@@ -826,7 +817,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.card_restriction&.company_id
         end
-        CardLimit.import records, on_duplicate_key_update: [:company_id]
+        CardLimit.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 2523
@@ -834,7 +825,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.policy&.company_id
         end
-        CashExpenseConfig.import records, on_duplicate_key_update: [:company_id]
+        CashExpenseConfig.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 92
@@ -842,7 +833,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.company_kyc&.company_id
         end
-        CompanyKycTrail.import records, on_duplicate_key_update: [:company_id]
+        CompanyKycTrail.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 0
@@ -854,7 +845,7 @@ class UpdateTenants
             record.company_id = record.company_department&.company_id
           end
         end
-        CompanyLocationDepartment.import records, on_duplicate_key_update: [:company_id]
+        CompanyLocationDepartment.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 0
@@ -862,7 +853,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.contactable&.company_id
         end
-        Contact.import records, on_duplicate_key_update: [:company_id]
+        Contact.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 60
@@ -874,7 +865,7 @@ class UpdateTenants
             record.company_id = record.credit_note&.company_id
           end
         end
-        CreditNoteAdjustment.import records, on_duplicate_key_update: [:company_id]
+        CreditNoteAdjustment.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 153
@@ -882,7 +873,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.parent&.company_id
         end
-        CreditNoteItem.import records, on_duplicate_key_update: [:company_id]
+        CreditNoteItem.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 270
@@ -894,7 +885,7 @@ class UpdateTenants
             record.company_id = record.configurable&.company_id
           end
         end
-        CustomExportConfiguration.import records, on_duplicate_key_update: [:company_id]
+        CustomExportConfiguration.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 152
@@ -902,7 +893,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.customer&.company_id
         end
-        CustomerAttachment.import records, on_duplicate_key_update: [:company_id]
+        CustomerAttachment.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 239
@@ -910,7 +901,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.customer&.company_id
         end
-        CustomerAccount.import records, on_duplicate_key_update: [:company_id]
+        CustomerAccount.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 19
@@ -918,7 +909,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.customer_account&.company_id
         end
-        CustomerAccountTransaction.import records, on_duplicate_key_update: [:company_id]
+        CustomerAccountTransaction.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 225753
@@ -926,7 +917,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.receipt&.company_id
         end
-        DocumentSlice.import records, on_duplicate_key_update: [:company_id]
+        DocumentSlice.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 0
@@ -934,7 +925,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        DocumentMessage.import records, on_duplicate_key_update: [:company_id]
+        DocumentMessage.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 0
@@ -942,7 +933,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        DocumentMessageReceipt.import records, on_duplicate_key_update: [:company_id]
+        DocumentMessageReceipt.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 0
@@ -954,7 +945,7 @@ class UpdateTenants
             record.company_id = record.parent_document&.company_id
           end
         end
-        DocumentItem.import records, on_duplicate_key_update: [:company_id]
+        DocumentItem.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 512155
@@ -962,7 +953,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        EmailAuthorization.import records, on_duplicate_key_update: [:company_id]
+        EmailAuthorization.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 4909
@@ -970,7 +961,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.expense&.company_id
         end
-        ReceiptEmail.import records, on_duplicate_key_update: [:company_id]
+        ReceiptEmail.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 3957
@@ -978,7 +969,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.extractable&.company_id
         end
-        ExpenseDataExtract.import records, on_duplicate_key_update: [:company_id]
+        ExpenseDataExtract.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 32165
@@ -986,7 +977,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.policy&.company_id
         end
-        ExpenseRule.import records, on_duplicate_key_update: [:company_id]
+        ExpenseRule.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 270
@@ -994,7 +985,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.subscribable_id
         end
-        FeatureSubscription.import records, on_duplicate_key_update: [:company_id]
+        FeatureSubscription.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 44
@@ -1002,7 +993,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        Feedback.import records, on_duplicate_key_update: [:company_id]
+        Feedback.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 0
@@ -1010,7 +1001,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.custom_field&.company_id
         end
-        FieldAmount.import records, on_duplicate_key_update: [:company_id]
+        FieldAmount.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 0
@@ -1018,7 +1009,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.custom_field&.company_id
         end
-        FieldBoolean.import records, on_duplicate_key_update: [:company_id]
+        FieldBoolean.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 0
@@ -1026,7 +1017,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.custom_field&.company_id
         end
-        FieldDateTime.import records, on_duplicate_key_update: [:company_id]
+        FieldDateTime.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 0
@@ -1034,7 +1025,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.custom_field&.company_id
         end
-        FieldDate.import records, on_duplicate_key_update: [:company_id]
+        FieldDate.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 0
@@ -1042,7 +1033,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.custom_field&.company_id
         end
-        FieldDecimal.import records, on_duplicate_key_update: [:company_id]
+        FieldDecimal.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 13481
@@ -1050,7 +1041,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.field_configuration&.company_id
         end
-        FieldDropDownItem.import records, on_duplicate_key_update: [:company_id]
+        FieldDropDownItem.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 410
@@ -1058,7 +1049,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.field_configuration&.company_id
         end
-        FieldMultiselectItem.import records, on_duplicate_key_update: [:company_id]
+        FieldMultiselectItem.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 65943
@@ -1066,7 +1057,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.custom_field&.company_id
         end
-        FieldMultiselectSelection.import records, on_duplicate_key_update: [:company_id]
+        FieldMultiselectSelection.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 81593
@@ -1074,7 +1065,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.field_multiselect_selection&.company_id
         end
-        FieldMultiselectSelectionItem.import records, on_duplicate_key_update: [:company_id]
+        FieldMultiselectSelectionItem.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 0
@@ -1082,7 +1073,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.custom_field&.company_id
         end
-        FieldNumber.import records, on_duplicate_key_update: [:company_id]
+        FieldNumber.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 354003
@@ -1090,7 +1081,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.form&.company_id
         end
-        FormCustomField.import records, on_duplicate_key_update: [:company_id]
+        FormCustomField.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 52014
@@ -1098,7 +1089,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.form_custom_field&.company_id
         end
-        CustomFieldAttachment.import records, on_duplicate_key_update: [:company_id]
+        CustomFieldAttachment.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 1351
@@ -1106,7 +1097,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.form_custom_field&.company_id
         end
-        CustomFieldSelection.import records, on_duplicate_key_update: [:company_id]
+        CustomFieldSelection.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 10063 Gstin, 125150 GstinLocation
@@ -1123,7 +1114,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.individual_kyc&.company_id
         end
-        IndividualKycTrack.import records, on_duplicate_key_update: [:company_id]
+        IndividualKycTrack.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 205
@@ -1131,7 +1122,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.invoice&.company_id
         end
-        InvoiceTransactionMapping.import records, on_duplicate_key_update: [:company_id]
+        InvoiceTransactionMapping.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 100687
@@ -1139,7 +1130,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.inward_document&.company_id
         end
-        InwardDocumentItem.import records, on_duplicate_key_update: [:company_id]
+        InwardDocumentItem.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 0
@@ -1147,7 +1138,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        ItzCashDmtSender.import records, on_duplicate_key_update: [:company_id]
+        ItzCashDmtSender.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 0
@@ -1155,7 +1146,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.itz_cash_dmt_sender&.company_id
         end
-        ItzCashDmtBeneficiary.import records, on_duplicate_key_update: [:company_id]
+        ItzCashDmtBeneficiary.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 69010
@@ -1163,7 +1154,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.reviewer&.company_id
         end
-        LevelReviewerMapping.import records, on_duplicate_key_update: [:company_id]
+        LevelReviewerMapping.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 220824
@@ -1171,7 +1162,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        LevelUserReviewerMapping.import records, on_duplicate_key_update: [:company_id]
+        LevelUserReviewerMapping.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 0
@@ -1179,7 +1170,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        LoginAgreementMapping.import records, on_duplicate_key_update: [:company_id]
+        LoginAgreementMapping.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 376
@@ -1187,7 +1178,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        ManagerSummaryMailConfig.import records, on_duplicate_key_update: [:company_id]
+        ManagerSummaryMailConfig.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 96214
@@ -1195,7 +1186,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        MapLocationUserQuery.import records, on_duplicate_key_update: [:company_id]
+        MapLocationUserQuery.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 0
@@ -1203,7 +1194,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.category&.company_id
         end
-        MccCategoryMapping.import records, on_duplicate_key_update: [:company_id]
+        MccCategoryMapping.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 2203
@@ -1211,7 +1202,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        MoneyRequestProcessorMapping.import records, on_duplicate_key_update: [:company_id]
+        MoneyRequestProcessorMapping.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 30229
@@ -1219,23 +1210,23 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.money_request&.company_id
         end
-        MoneyRequestTrack.import records, on_duplicate_key_update: [:company_id]
+        MoneyRequestTrack.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 3148944
-      Notification.includes(:user).find_in_batches(batch_size: 1000) do |records|
-        records.each do |record|
-          record.company_id = record.user&.company_id
-        end
-        Notification.import records, on_duplicate_key_update: [:company_id]
-      end
+      # Notification.includes(:user).find_in_batches(batch_size: 1000) do |records|
+      #   records.each do |record|
+      #     record.company_id = record.user&.company_id
+      #   end
+      #   Notification.import records, on_duplicate_key_update: [:company_id], validate: false
+      # end
 
       # 0
       NotifierTypeConfiguration.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        NotifierTypeConfiguration.import records, on_duplicate_key_update: [:company_id]
+        NotifierTypeConfiguration.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 302
@@ -1243,7 +1234,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.invoice&.company_id
         end
-        OutwardInvoiceTrail.import records, on_duplicate_key_update: [:company_id]
+        OutwardInvoiceTrail.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 0
@@ -1251,7 +1242,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.payment_agreement&.company_id
         end
-        PaymentAgreementEscalation.import records, on_duplicate_key_update: [:company_id]
+        PaymentAgreementEscalation.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 77670
@@ -1259,7 +1250,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.payment_order&.company_id
         end
-        PaymentOrderAttachment.import records, on_duplicate_key_update: [:company_id]
+        PaymentOrderAttachment.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 2392
@@ -1267,7 +1258,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.policy&.company_id
         end
-        PolicyConfiguration.import records, on_duplicate_key_update: [:company_id]
+        PolicyConfiguration.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 132811
@@ -1275,7 +1266,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        PolicyUserMapping.import records, on_duplicate_key_update: [:company_id]
+        PolicyUserMapping.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 2016
@@ -1291,7 +1282,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.receipt_email&.company_id
         end
-        ReceiptEmailAttachment.import records, on_duplicate_key_update: [:company_id]
+        ReceiptEmailAttachment.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 39932
@@ -1299,7 +1290,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        ReportProcessorGroupMapping.import records, on_duplicate_key_update: [:company_id]
+        ReportProcessorGroupMapping.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 81475
@@ -1307,7 +1298,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.report&.company_id
         end
-        ReportTrack.import records, on_duplicate_key_update: [:company_id]
+        ReportTrack.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 42
@@ -1315,7 +1306,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        ResourceTemplate.import records, on_duplicate_key_update: [:company_id]
+        ResourceTemplate.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 24988
@@ -1323,7 +1314,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.policy&.company_id
         end
-        ReviewalLevel.import records, on_duplicate_key_update: [:company_id]
+        ReviewalLevel.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 0
@@ -1331,7 +1322,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.receipt&.company_id
         end
-        TranscribedExpense.import records, on_duplicate_key_update: [:company_id]
+        TranscribedExpense.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 774
@@ -1339,7 +1330,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.travel_request&.company_id
         end
-        TravelRequestComment.import records, on_duplicate_key_update: [:company_id]
+        TravelRequestComment.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 352
@@ -1347,7 +1338,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.travel_request&.company_id
         end
-        TravelRequestTrail.import records, on_duplicate_key_update: [:company_id]
+        TravelRequestTrail.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 0
@@ -1355,7 +1346,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.trip&.company_id
         end
-        TripRoute.import records, on_duplicate_key_update: [:company_id]
+        TripRoute.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 0
@@ -1363,23 +1354,23 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.trip&.company_id
         end
-        TripPassenger.import records, on_duplicate_key_update: [:company_id]
+        TripPassenger.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 38629220
-      UserSessionEvent.includes(:user_session).find_in_batches(batch_size: 1000) do |records|
-        records.each do |record|
-          record.company_id = record.user_session&.company_id
-        end
-        UserSessionEvent.import records, on_duplicate_key_update: [:company_id]
-      end
+      # UserSessionEvent.includes(:user_session).find_in_batches(batch_size: 1000) do |records|
+      #   records.each do |record|
+      #     record.company_id = record.user_session&.company_id
+      #   end
+      #   UserSessionEvent.import records, on_duplicate_key_update: [:company_id], validate: false
+      # end
 
       # 10
       AdminSummaryMailConfig.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        AdminSummaryMailConfig.import records, on_duplicate_key_update: [:company_id]
+        AdminSummaryMailConfig.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # Here
@@ -1430,7 +1421,7 @@ class UpdateTenants
             record.company_id = record.initiating_user&.company_id
           end
         end
-        PaymentTrail.import records, on_duplicate_key_update: [:company_id]
+        PaymentTrail.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 0
@@ -1438,7 +1429,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.chargable&.company_id
         end
-        ProcurementCharge.import records, on_duplicate_key_update: [:company_id]
+        ProcurementCharge.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 497
@@ -1446,7 +1437,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.user&.company_id
         end
-        ReceiptEmailParseFailure.import records, on_duplicate_key_update: [:company_id]
+        ReceiptEmailParseFailure.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 2137
@@ -1454,7 +1445,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.virtual_account&.company_id
         end
-        VirtualAccountTransaction.import records, on_duplicate_key_update: [:company_id]
+        VirtualAccountTransaction.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 6378
@@ -1462,7 +1453,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.log_resource&.company_id
         end
-        SystemLog.import records, on_duplicate_key_update: [:company_id]
+        SystemLog.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 0 TaskSchedule, 0 TaskWorkflow
@@ -1482,7 +1473,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.tax_rate&.company_id
         end
-        TaxPerItem.import records, on_duplicate_key_update: [:company_id]
+        TaxPerItem.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 57 TimeObject, 49 TimeExpense
@@ -1501,7 +1492,7 @@ class UpdateTenants
             record.company_id = record.booking_request&.company_id
           end
         end
-        TravelMember.import records, on_duplicate_key_update: [:company_id]
+        TravelMember.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 486751
@@ -1509,7 +1500,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.vendor&.company_id
         end
-        VendorAccount.import records, on_duplicate_key_update: [:company_id]
+        VendorAccount.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 0
@@ -1517,7 +1508,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.vendor_account&.company_id
         end
-        VendorAccountTransaction.import records, on_duplicate_key_update: [:company_id]
+        VendorAccountTransaction.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 66955
@@ -1525,7 +1516,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.yes_bank_vendor&.company_id
         end
-        VendorAttachment.import records, on_duplicate_key_update: [:company_id]
+        VendorAttachment.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 1701
@@ -1533,7 +1524,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.vendor&.company_id
         end
-        VendorTdsRate.import records, on_duplicate_key_update: [:company_id]
+        VendorTdsRate.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 1
@@ -1541,7 +1532,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.web_hook&.company_id
         end
-        WebHookEventMapping.import records, on_duplicate_key_update: [:company_id]
+        WebHookEventMapping.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 10
@@ -1549,7 +1540,7 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.dependency&.company_id
         end
-        FormChoiceDependencyMapping.import records, on_duplicate_key_update: [:company_id]
+        FormChoiceDependencyMapping.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 44
@@ -1557,8 +1548,18 @@ class UpdateTenants
         records.each do |record|
           record.company_id = record.template&.company_id
         end
-        ExportTemplateUserRoleMapping.import records, on_duplicate_key_update: [:company_id]
+        ExportTemplateUserRoleMapping.import records, on_duplicate_key_update: [:company_id], validate: false
       end
+
+      # Run this at the end
+      # 6127945
+      # BudgetTrail.includes(:entity).find_in_batches(batch_size: 1000) do |records|
+      #   records.each do |record|
+      #     record.company_id = record.entity&.company_id
+      #   end
+      #   BudgetTrail.import records, on_duplicate_key_update: [:company_id], validate: false
+      # end
+
     end
   end
 end
