@@ -193,12 +193,12 @@ class UpdateTenants
       # end
 
       # 1216912
-      # Expense.includes(:user).find_in_batches(batch_size: 1000) do |records|
-      #   records.each do |record|
-      #     record.company_id = record.user&.company_id
-      #   end
-      #   Expense.import records, on_duplicate_key_update: [:company_id], validate: false
-      # end
+      Expense.includes(:user).find_in_batches(batch_size: 1000) do |records|
+        records.each do |record|
+          record.company_id = record.user&.company_id
+        end
+        Expense.import records, on_duplicate_key_update: [:company_id], validate: false
+      end
 
       # 90449
       PurchaseOrderItem.includes(:purchase_order).find_in_batches(batch_size: 1000) do |records|
@@ -681,12 +681,12 @@ class UpdateTenants
       end
 
       # 1333661
-      # BankPaymentRequestComment.includes(:bank_payment_request).find_in_batches(batch_size: 1000) do |records|
-      #   records.each do |record|
-      #     record.company_id = record.bank_payment_request&.company_id
-      #   end
-      #   BankPaymentRequestComment.import records, on_duplicate_key_update: [:company_id], validate: false
-      # end
+      BankPaymentRequestComment.includes(:bank_payment_request).find_in_batches(batch_size: 1000) do |records|
+        records.each do |record|
+          record.company_id = record.bank_payment_request&.company_id
+        end
+        BankPaymentRequestComment.import records, on_duplicate_key_update: [:company_id], validate: false
+      end
 
       # 3607952
       # BankPaymentRequestTrail.includes(:bank_payment_request).find_in_batches(batch_size: 1000) do |records|
