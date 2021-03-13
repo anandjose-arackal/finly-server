@@ -6,16 +6,6 @@ class GoogleOauth2Controller < Oauth::TokenController
 
   skip_before_action :verify_authenticity_token, raise: false
 
-  # def google_auth2
-  #     @redirect_url = '/auth/google_auth2'
-  #   else
-  #     @redirect_url = "/login"
-  #   end
-  #   render json: {redirect_url: @redirect_url}, status: 200
-  # end
-
-  # this will be the catch-all controller for SAML as well as Ouath strategies
-  # The logic for choosing between the strategies will be held in the Authenticator::Processor operation
   def create
     RequestStore.store[:google_oauth2] = true
     set_grant_type
@@ -23,11 +13,6 @@ class GoogleOauth2Controller < Oauth::TokenController
     super()
     @token.update_columns(authentication_type: "sso")
   end
-
-  def google_auth2_logout
-    # yet to be implemented. When though?
-  end
-
 
   protected
 

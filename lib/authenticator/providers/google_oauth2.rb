@@ -34,7 +34,7 @@ class Authenticator::Providers::GoogleOauth2 < Authenticator::Providers::Base
     toggel.sso_google_enabled?
 
     unless toggel.sso_google_enabled?    
-      fail_with_event :on_google_oauth, "SSo login not enabled, Please ask your team to enable it"
+      fail_with_event :on_google_oauth, "Google SSO is not enabled for your account."
     end
 
     fail_with_event :on_blank_username, "Invalid username"

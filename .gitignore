@@ -112,4 +112,9 @@ yarn-debug.log*
 .yarn-integrity
 
 
-/config/master.key
+# /config/master.key
+/config/credentials/staging.key
+
+/config/credentials/production.key
+
+/config/credentials/development.key

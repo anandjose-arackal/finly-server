@@ -438,8 +438,6 @@ class ApplicationController < ActionController::Base
     return false if RequestStoreUtil.current_session.access_token.authentication_type == "password" && current_user.expired?
     # if password then check for current_user session expired
     
-
-    return false if current_user.expired?
     return false unless current_user.otp_verified
     return false unless user_session.verified?
 
