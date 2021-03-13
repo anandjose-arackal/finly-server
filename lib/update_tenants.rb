@@ -1077,28 +1077,31 @@ class UpdateTenants
       end
 
       # 354003
-      FormCustomField.includes(:form).find_in_batches(batch_size: 1000) do |records|
-        records.each do |record|
-          record.company_id = record.form&.company_id
-        end
-        FormCustomField.import records, on_duplicate_key_update: [:company_id], validate: false
-      end
+      # UUID
+      # FormCustomField.includes(:form).find_in_batches(batch_size: 1000) do |records|
+      #   records.each do |record|
+      #     record.company_id = record.form&.company_id
+      #   end
+      #   FormCustomField.import records, on_duplicate_key_update: [:company_id], validate: false
+      # end
 
       # 52014
-      CustomFieldAttachment.includes(:form_custom_field).find_in_batches(batch_size: 1000) do |records|
-        records.each do |record|
-          record.company_id = record.form_custom_field&.company_id
-        end
-        CustomFieldAttachment.import records, on_duplicate_key_update: [:company_id], validate: false
-      end
+      # UUID
+      # CustomFieldAttachment.includes(:form_custom_field).find_in_batches(batch_size: 1000) do |records|
+      #   records.each do |record|
+      #     record.company_id = record.form_custom_field&.company_id
+      #   end
+      #   CustomFieldAttachment.import records, on_duplicate_key_update: [:company_id], validate: false
+      # end
 
       # 1351
-      CustomFieldSelection.includes(:form_custom_field).find_in_batches(batch_size: 1000) do |records|
-        records.each do |record|
-          record.company_id = record.form_custom_field&.company_id
-        end
-        CustomFieldSelection.import records, on_duplicate_key_update: [:company_id], validate: false
-      end
+      # UUID
+      # CustomFieldSelection.includes(:form_custom_field).find_in_batches(batch_size: 1000) do |records|
+      #   records.each do |record|
+      #     record.company_id = record.form_custom_field&.company_id
+      #   end
+      #   CustomFieldSelection.import records, on_duplicate_key_update: [:company_id], validate: false
+      # end
 
       # 10063 Gstin, 125150 GstinLocation
       GstinLocation.where.not(gstin_id: nil).find_in_batches(batch_size: 1000) do |records|
@@ -1182,12 +1185,13 @@ class UpdateTenants
       end
 
       # 96214
-      MapLocationUserQuery.includes(:user).find_in_batches(batch_size: 1000) do |records|
-        records.each do |record|
-          record.company_id = record.user&.company_id
-        end
-        MapLocationUserQuery.import records, on_duplicate_key_update: [:company_id], validate: false
-      end
+      # UUID
+      # MapLocationUserQuery.includes(:user).find_in_batches(batch_size: 1000) do |records|
+      #   records.each do |record|
+      #     record.company_id = record.user&.company_id
+      #   end
+      #   MapLocationUserQuery.import records, on_duplicate_key_update: [:company_id], validate: false
+      # end
 
       # 0
       MccCategoryMapping.includes(:category).find_in_batches(batch_size: 1000) do |records|
@@ -1342,20 +1346,22 @@ class UpdateTenants
       end
 
       # 0
-      TripRoute.includes(:trip).find_in_batches(batch_size: 1000) do |records|
-        records.each do |record|
-          record.company_id = record.trip&.company_id
-        end
-        TripRoute.import records, on_duplicate_key_update: [:company_id], validate: false
-      end
+      # UUID
+      # TripRoute.includes(:trip).find_in_batches(batch_size: 1000) do |records|
+      #   records.each do |record|
+      #     record.company_id = record.trip&.company_id
+      #   end
+      #   TripRoute.import records, on_duplicate_key_update: [:company_id], validate: false
+      # end
 
       # 0
-      TripPassenger.includes(:trip).find_in_batches(batch_size: 1000) do |records|
-        records.each do |record|
-          record.company_id = record.trip&.company_id
-        end
-        TripPassenger.import records, on_duplicate_key_update: [:company_id], validate: false
-      end
+      # UUID
+      # TripPassenger.includes(:trip).find_in_batches(batch_size: 1000) do |records|
+      #   records.each do |record|
+      #     record.company_id = record.trip&.company_id
+      #   end
+      #   TripPassenger.import records, on_duplicate_key_update: [:company_id], validate: false
+      # end
 
       # 38629220
       # UserSessionEvent.includes(:user_session).find_in_batches(batch_size: 1000) do |records|
