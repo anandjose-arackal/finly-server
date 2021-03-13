@@ -1,9 +1,9 @@
 class UpdateTenants
-  # TODO: need to update script to fetch in batches and do bulk updates
   def self.run
     ActiveRecord::Base.logger = Logger.new(STDOUT)
 
     ActsAsTenant.without_tenant do
+      # 66741
       UserPanelSubscription.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -11,6 +11,7 @@ class UpdateTenants
         UserPanelSubscription.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 534442
       UserRoleMapping.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -18,6 +19,7 @@ class UpdateTenants
         UserRoleMapping.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 71291
       UserProfile.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -25,6 +27,7 @@ class UpdateTenants
         UserProfile.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 328506
       PolicyUserRole.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -32,6 +35,7 @@ class UpdateTenants
         PolicyUserRole.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 61863
       UserWallet.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -39,6 +43,7 @@ class UpdateTenants
         UserWallet.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 61786
       VendorPaymentWallet.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -46,6 +51,7 @@ class UpdateTenants
         VendorPaymentWallet.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 183410
       UserPocket.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -53,6 +59,7 @@ class UpdateTenants
         UserPocket.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 30643
       PolicyDepartmentMapping.includes(:policy).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.policy&.company_id
@@ -61,6 +68,7 @@ class UpdateTenants
       end
 
       # Here
+      # 61787
       EnforcePolicy.find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           if record.enforceable_type == 'Company'
@@ -72,6 +80,7 @@ class UpdateTenants
         EnforcePolicy.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 115417
       PolicyLocationMapping.includes(:policy).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.policy&.company_id
@@ -79,6 +88,7 @@ class UpdateTenants
         PolicyLocationMapping.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 3392475
       DocumentLevelReviewerMapping.includes(:policy).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.policy&.company_id
@@ -86,6 +96,7 @@ class UpdateTenants
         DocumentLevelReviewerMapping.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 288950
       ProcurementStatusTaggable.includes(:procurement).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.procurement&.company_id
@@ -93,6 +104,7 @@ class UpdateTenants
         ProcurementStatusTaggable.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 3640
       FieldParentMapping.includes(:field_configuration).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.field_configuration&.company_id
@@ -100,6 +112,7 @@ class UpdateTenants
         FieldParentMapping.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 38961
       PurchaseRequestItem.includes(:purchase_request).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.purchase_request&.company_id
@@ -107,6 +120,7 @@ class UpdateTenants
         PurchaseRequestItem.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
+      # 61785
       CashOnHand.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -114,6 +128,7 @@ class UpdateTenants
         CashOnHand.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 125150
       GstinLocation.includes(:vendor).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.vendor&.company_id
@@ -121,6 +136,7 @@ class UpdateTenants
         GstinLocation.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 274
       UserGroupItem.includes(:user_group).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user_group&.company_id
@@ -128,6 +144,7 @@ class UpdateTenants
         UserGroupItem.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 50
       UserTeamGroupItemMapping.includes(:user_group).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user_group&.company_id
@@ -135,6 +152,7 @@ class UpdateTenants
         UserTeamGroupItemMapping.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 324704
       UserIp.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -142,6 +160,7 @@ class UpdateTenants
         UserIp.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 124744
       UserAgentClient.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -149,6 +168,7 @@ class UpdateTenants
         UserAgentClient.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 18727
       BudgetGroupCriteriaMapping.includes(:budget_group_criterium).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.budget_group_criterium&.company_id
@@ -156,6 +176,7 @@ class UpdateTenants
         BudgetGroupCriteriaMapping.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 26144
       BudgetConsumption.includes(:budget).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.budget&.company_id
@@ -163,6 +184,7 @@ class UpdateTenants
         BudgetConsumption.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 14252657
       CustomField.includes(:field_configuration).find_in_batches(batch_size: 1000) do |custom_fields|
         custom_fields.each do |custom_field|
           custom_field.company_id = custom_field.field_configuration.company_id
@@ -171,6 +193,7 @@ class UpdateTenants
       end
 
       # Here
+      # 6127945
       BudgetTrail.includes(:entity).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.entity&.company_id
@@ -178,6 +201,7 @@ class UpdateTenants
         BudgetTrail.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 1216912
       Expense.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -185,6 +209,7 @@ class UpdateTenants
         Expense.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
+      # 90449
       PurchaseOrderItem.includes(:purchase_order).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.purchase_order&.company_id
@@ -192,6 +217,7 @@ class UpdateTenants
         PurchaseOrderItem.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 367776
       InvoiceLineItem.includes(:invoice).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.invoice&.company_id
@@ -199,6 +225,7 @@ class UpdateTenants
         InvoiceLineItem.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 668
       Booking.includes(:travel_request).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.travel_request&.company_id
@@ -206,6 +233,7 @@ class UpdateTenants
         Booking.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
+      # 23809
       MoneyRequest.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -213,6 +241,7 @@ class UpdateTenants
         MoneyRequest.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
+      # 601510
       Receipt.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -220,6 +249,7 @@ class UpdateTenants
         Receipt.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 799
       TravelRequestDestination.includes(:travel_request).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.travel_request&.company_id
@@ -227,6 +257,7 @@ class UpdateTenants
         TravelRequestDestination.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 5232
       PolicyFieldMapping.includes(:policy).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.policy&.company_id
@@ -234,6 +265,7 @@ class UpdateTenants
         PolicyFieldMapping.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 4421831
       Trail.includes(:action_user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.action_user&.company_id
@@ -241,6 +273,7 @@ class UpdateTenants
         Trail.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 2877951
       FieldDropDownSelection.includes(:custom_field).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.custom_field&.company_id
@@ -248,6 +281,7 @@ class UpdateTenants
         FieldDropDownSelection.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 6986
       BudgetRule.includes(:policy).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.policy&.company_id
@@ -255,6 +289,7 @@ class UpdateTenants
         BudgetRule.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 8162
       BudgetRuleCategoryMapping.includes(:budget_rule).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.budget_rule&.company_id
@@ -262,6 +297,7 @@ class UpdateTenants
         BudgetRuleCategoryMapping.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 10974
       BudgetRuleFieldMapping.includes(:budget_rule).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.budget_rule&.company_id
@@ -269,6 +305,7 @@ class UpdateTenants
         BudgetRuleFieldMapping.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 653527
       ReportComment.includes(:report).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.report&.company_id
@@ -276,6 +313,7 @@ class UpdateTenants
         ReportComment.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 613169
       MoneyRequestItem.includes(:money_request).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.money_request&.company_id
@@ -283,6 +321,7 @@ class UpdateTenants
         MoneyRequestItem.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 68838
       MoneyRequestComment.includes(:money_request).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.money_request&.company_id
@@ -290,6 +329,7 @@ class UpdateTenants
         MoneyRequestComment.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 2544
       DistanceExpenseConfig.includes(:policy).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.policy&.company_id
@@ -297,6 +337,7 @@ class UpdateTenants
         DistanceExpenseConfig.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 2544
       TimeExpenseConfig.includes(:policy).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.policy&.company_id
@@ -304,6 +345,7 @@ class UpdateTenants
         TimeExpenseConfig.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 1890
       VehicleRate.includes(:policy).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.policy&.company_id
@@ -311,6 +353,7 @@ class UpdateTenants
         VehicleRate.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 2544
       PerDiemExpenseConfig.includes(:policy).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.policy&.company_id
@@ -318,6 +361,7 @@ class UpdateTenants
         PerDiemExpenseConfig.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 189
       PerDiem.includes(:configurable).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.configurable&.company_id
@@ -325,6 +369,7 @@ class UpdateTenants
         PerDiem.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 921
       ParentDependentFieldConfigurationMapping.includes(:dependent_field_configuration).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.dependent_field_configuration&.company_id
@@ -332,6 +377,7 @@ class UpdateTenants
         ParentDependentFieldConfigurationMapping.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 368509
       SystemMessage.includes(:messagable).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.messagable&.company_id
@@ -339,6 +385,7 @@ class UpdateTenants
         SystemMessage.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 113523
       DuplicateExpenseMapping.includes(:expense).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.expense&.company_id
@@ -346,6 +393,7 @@ class UpdateTenants
         DuplicateExpenseMapping.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
+      # 668298
       ManualExpense.includes(:expense).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.expense&.company_id
@@ -353,6 +401,7 @@ class UpdateTenants
         ManualExpense.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 269045
       CardExpense.includes(:expense).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.expense&.company_id
@@ -360,6 +409,7 @@ class UpdateTenants
         CardExpense.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 266055
       DistanceExpense.includes(:expense).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.expense&.company_id
@@ -367,6 +417,7 @@ class UpdateTenants
         DistanceExpense.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
+      # 49
       TimeExpense.includes(:expense).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.expense&.company_id
@@ -374,6 +425,7 @@ class UpdateTenants
         TimeExpense.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 14427
       PerDiemExpense.includes(:expense).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.expense&.company_id
@@ -381,6 +433,7 @@ class UpdateTenants
         PerDiemExpense.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 548
       BookingFlight.includes(:booking).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.booking&.company_id
@@ -388,6 +441,7 @@ class UpdateTenants
         BookingFlight.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
+      # 32
       BookingTrain.includes(:booking).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.booking&.company_id
@@ -395,6 +449,7 @@ class UpdateTenants
         BookingTrain.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
+      # 31
       BookingBus.includes(:booking).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.booking&.company_id
@@ -402,6 +457,7 @@ class UpdateTenants
         BookingBus.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
+      # 55
       BookingCarRental.includes(:booking).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.booking&.company_id
@@ -409,6 +465,7 @@ class UpdateTenants
         BookingCarRental.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
+      # 51
       BookingHotel.includes(:booking).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.booking&.company_id
@@ -416,6 +473,7 @@ class UpdateTenants
         BookingHotel.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
+      # 0
       BookingOther.includes(:booking).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.booking&.company_id
@@ -423,6 +481,7 @@ class UpdateTenants
         BookingOther.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
+      # 161
       RateContractLineItem.includes(:rate_contract).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.rate_contract&.company_id
@@ -430,6 +489,7 @@ class UpdateTenants
         RateContractLineItem.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 10736795
       FieldText.includes(:custom_field).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.custom_field&.company_id
@@ -437,6 +497,7 @@ class UpdateTenants
         FieldText.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 630019
       CardTransaction.includes(:card).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.card&.company_id
@@ -444,6 +505,7 @@ class UpdateTenants
         CardTransaction.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 61785
       AutoSubmitConfig.includes(:submitable).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.submitable&.company_id
@@ -451,6 +513,7 @@ class UpdateTenants
         AutoSubmitConfig.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 113
       KycDocument.includes(:company_kyc).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.company_kyc&.company_id
@@ -458,6 +521,7 @@ class UpdateTenants
         KycDocument.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 14
       FieldCustomization.includes(:scopable).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.scopable&.id
@@ -465,6 +529,7 @@ class UpdateTenants
         FieldCustomization.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 78870
       ProcurementComment.includes(:parent_commentable).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.parent_commentable&.company_id
@@ -472,6 +537,7 @@ class UpdateTenants
         ProcurementComment.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 13515
       Quotation.includes(:purchase_order).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.purchase_order&.company_id
@@ -479,6 +545,7 @@ class UpdateTenants
         Quotation.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 1870
       UserDepartmentMapping.includes(:department).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.department&.company_id
@@ -486,6 +553,7 @@ class UpdateTenants
         UserDepartmentMapping.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 18
       UserDelegateMapping.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -493,6 +561,7 @@ class UpdateTenants
         UserDelegateMapping.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 112232
       UserBalanceHistory.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -500,6 +569,7 @@ class UpdateTenants
         UserBalanceHistory.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 0
       UserBranchLocationMapping.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -507,6 +577,7 @@ class UpdateTenants
         UserBranchLocationMapping.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 0
       UserDropDownItemMapping.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -514,6 +585,7 @@ class UpdateTenants
         UserDropDownItemMapping.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 0
       UserFieldMapping.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -521,6 +593,7 @@ class UpdateTenants
         UserFieldMapping.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 564
       UserGroupItemMapping.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -528,6 +601,7 @@ class UpdateTenants
         UserGroupItemMapping.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 509600
       UserLoginTrack.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -535,6 +609,7 @@ class UpdateTenants
         UserLoginTrack.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 261045
       UserManagerMapping.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -542,6 +617,7 @@ class UpdateTenants
         UserManagerMapping.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 0
       UserTag.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -549,6 +625,7 @@ class UpdateTenants
         UserTag.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 0
       UserWalletTrack.includes(:user_wallet).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user_wallet&.company_id
@@ -556,12 +633,14 @@ class UpdateTenants
         UserWalletTrack.import records, on_duplicate_key_update: [:company_id]
       end
 
-      # UserWalletTrack.includes(:record).find_each do |record|
-      #   if record.user_wallet.present?
-      #     record.user_wallet_track_action.update_column(:company_id, record.user_wallet.company_id)
-      #   end
-      # end
+      # 0 UserWalletTrackAction
+      UserWalletTrack.includes(:user_wallet).find_each do |record|
+        if record.user_wallet.present? and record.user_wallet_track_action.present?
+          record.user_wallet_track_action.update_column(:company_id, record.user_wallet.company_id)
+        end
+      end
 
+      # 431
       Address.includes(:parent).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.parent&.company_id
@@ -569,6 +648,7 @@ class UpdateTenants
         Address.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 0
       ApprovalRoute.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -576,6 +656,7 @@ class UpdateTenants
         ApprovalRoute.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 45
       Authentication.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -583,6 +664,7 @@ class UpdateTenants
         Authentication.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 61785
       AutoReloadConfig.includes(:reloadable).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.reloadable&.company_id
@@ -590,6 +672,7 @@ class UpdateTenants
         AutoReloadConfig.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 61785
       BalanceSheet.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -597,12 +680,16 @@ class UpdateTenants
         BalanceSheet.import records, on_duplicate_key_update: [:company_id]
       end
 
-      # BankAccount.where.not(bank_account_master_id: nil).includes(:company).find_each do |record|
-      #   if record.company.present?
-      #     record.bank_account_master.update_column(:company_id, record.company.company_id)
-      #   end
-      # end
+      # 14904 BankAccountMaster, 682004 BankAccount
+      BankAccount.where.not(bank_account_master_id: nil, company_id: nil).includes(:company).find_in_batches(batch_size: 1000) do |records|
+        records.each do |record|
+          if record.company.present? and record.bank_account_master.present?
+            record.bank_account_master.update_column(:company_id, record.company_id)
+          end
+        end
+      end
 
+      # 1333661
       BankPaymentRequestComment.includes(:bank_payment_request).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.bank_payment_request&.company_id
@@ -610,6 +697,7 @@ class UpdateTenants
         BankPaymentRequestComment.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 3607952
       BankPaymentRequestTrail.includes(:bank_payment_request).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.bank_payment_request&.company_id
@@ -617,6 +705,7 @@ class UpdateTenants
         BankPaymentRequestTrail.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 0
       BbpsSubscriptionField.includes(:subscription).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.subscription&.company_id
@@ -624,6 +713,7 @@ class UpdateTenants
         BbpsSubscriptionField.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 3580
       BbpsSubscriptionPoc.includes([:subscription, :user]).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           if record.subscription.present?
@@ -635,6 +725,7 @@ class UpdateTenants
         BbpsSubscriptionPoc.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 57
       BookingRequest.includes(:travel_request_destination).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.travel_request_destination&.company_id
@@ -642,6 +733,7 @@ class UpdateTenants
         BookingRequest.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
+      # 11
       BookingRestaurant.includes(:booking).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.booking&.company_id
@@ -649,6 +741,7 @@ class UpdateTenants
         BookingRestaurant.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
+      # 2257
       BudgetCriteriaMapping.includes(:budget).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.budget&.company_id
@@ -656,6 +749,7 @@ class UpdateTenants
         BudgetCriteriaMapping.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 3289
       BudgetModificationTrail.includes(:budget).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.budget&.company_id
@@ -663,6 +757,7 @@ class UpdateTenants
         BudgetModificationTrail.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 0
       BudgetRuleBranchLocationMapping.includes(:budget_rule).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.budget_rule&.company_id
@@ -670,6 +765,7 @@ class UpdateTenants
         BudgetRuleBranchLocationMapping.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 2536
       BudgetRuleDepartmentMapping.includes(:budget_rule).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.budget_rule&.company_id
@@ -677,6 +773,7 @@ class UpdateTenants
         BudgetRuleDepartmentMapping.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 10111
       BudgetRuleExpenseTypeMapping.includes(:budget_rule).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.budget_rule&.company_id
@@ -684,6 +781,7 @@ class UpdateTenants
         BudgetRuleExpenseTypeMapping.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 77
       CardAssignRequestTrack.includes(:card_assign_request).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.card_assign_request&.company_id
@@ -691,6 +789,7 @@ class UpdateTenants
         CardAssignRequestTrack.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 51
       CardBalanceHistory.includes(:card).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.card&.company_id
@@ -698,6 +797,7 @@ class UpdateTenants
         CardBalanceHistory.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 0
       CardConfiguration.includes(:prepaid_card).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.prepaid_card&.company_id
@@ -705,6 +805,7 @@ class UpdateTenants
         CardConfiguration.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 2523
       CardExpenseConfig.includes(:policy).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.policy&.company_id
@@ -712,6 +813,7 @@ class UpdateTenants
         CardExpenseConfig.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 14193
       CardRestriction.includes(:card).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.card&.company_id
@@ -719,6 +821,7 @@ class UpdateTenants
         CardRestriction.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 85158
       CardLimit.includes(:card_restriction).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.card_restriction&.company_id
@@ -726,6 +829,7 @@ class UpdateTenants
         CardLimit.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 2523
       CashExpenseConfig.includes(:policy).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.policy&.company_id
@@ -733,6 +837,7 @@ class UpdateTenants
         CashExpenseConfig.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 92
       CompanyKycTrail.includes(:company_kyc).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.company_kyc&.company_id
@@ -740,6 +845,7 @@ class UpdateTenants
         CompanyKycTrail.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 0
       CompanyLocationDepartment.includes([:branch_location, :company_department]).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           if record.branch_location.present?
@@ -751,6 +857,7 @@ class UpdateTenants
         CompanyLocationDepartment.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 0
       Contact.includes(:contactable).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.contactable&.company_id
@@ -758,6 +865,7 @@ class UpdateTenants
         Contact.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 60
       CreditNoteAdjustment.includes([:invoice, :credit_note]).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           if record.invoice.present?
@@ -769,6 +877,7 @@ class UpdateTenants
         CreditNoteAdjustment.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 153
       CreditNoteItem.includes(:parent).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.parent&.company_id
@@ -776,6 +885,7 @@ class UpdateTenants
         CreditNoteItem.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 270
       CustomExportConfiguration.find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           if record.configurable_type == 'Company'
@@ -787,6 +897,7 @@ class UpdateTenants
         CustomExportConfiguration.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 152
       CustomerAttachment.includes(:customer).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.customer&.company_id
@@ -794,6 +905,7 @@ class UpdateTenants
         CustomerAttachment.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 239
       CustomerAccount.includes(:customer).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.customer&.company_id
@@ -801,6 +913,7 @@ class UpdateTenants
         CustomerAccount.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 19
       CustomerAccountTransaction.includes(:customer_account).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.customer_account&.company_id
@@ -808,6 +921,7 @@ class UpdateTenants
         CustomerAccountTransaction.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 225753
       DocumentSlice.includes(:receipt).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.receipt&.company_id
@@ -815,6 +929,7 @@ class UpdateTenants
         DocumentSlice.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 0
       DocumentMessage.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -822,6 +937,7 @@ class UpdateTenants
         DocumentMessage.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 0
       DocumentMessageReceipt.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -829,6 +945,7 @@ class UpdateTenants
         DocumentMessageReceipt.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 0
       DocumentItem.includes(:inventory_line_item).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           if record.inventory_line_item.present?
@@ -840,6 +957,7 @@ class UpdateTenants
         DocumentItem.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 512155
       EmailAuthorization.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -847,6 +965,7 @@ class UpdateTenants
         EmailAuthorization.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 4909
       ReceiptEmail.includes(:expense).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.expense&.company_id
@@ -854,6 +973,7 @@ class UpdateTenants
         ReceiptEmail.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 3957
       ExpenseDataExtract.includes(:extractable).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.extractable&.company_id
@@ -861,6 +981,7 @@ class UpdateTenants
         ExpenseDataExtract.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 32165
       ExpenseRule.includes(:policy).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.policy&.company_id
@@ -868,6 +989,7 @@ class UpdateTenants
         ExpenseRule.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 270
       FeatureSubscription.find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.subscribable_id
@@ -875,6 +997,7 @@ class UpdateTenants
         FeatureSubscription.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 44
       Feedback.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -882,6 +1005,7 @@ class UpdateTenants
         Feedback.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 0
       FieldAmount.includes(:custom_field).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.custom_field&.company_id
@@ -889,6 +1013,7 @@ class UpdateTenants
         FieldAmount.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 0
       FieldBoolean.includes(:custom_field).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.custom_field&.company_id
@@ -896,6 +1021,7 @@ class UpdateTenants
         FieldBoolean.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 0
       FieldDateTime.includes(:custom_field).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.custom_field&.company_id
@@ -903,6 +1029,7 @@ class UpdateTenants
         FieldDateTime.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 0
       FieldDate.includes(:custom_field).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.custom_field&.company_id
@@ -910,6 +1037,7 @@ class UpdateTenants
         FieldDate.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 0
       FieldDecimal.includes(:custom_field).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.custom_field&.company_id
@@ -917,6 +1045,7 @@ class UpdateTenants
         FieldDecimal.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 13481
       FieldDropDownItem.includes(:field_configuration).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.field_configuration&.company_id
@@ -924,6 +1053,7 @@ class UpdateTenants
         FieldDropDownItem.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 410
       FieldMultiselectItem.includes(:field_configuration).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.field_configuration&.company_id
@@ -931,6 +1061,7 @@ class UpdateTenants
         FieldMultiselectItem.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 65943
       FieldMultiselectSelection.includes(:custom_field).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.custom_field&.company_id
@@ -938,6 +1069,7 @@ class UpdateTenants
         FieldMultiselectSelection.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 81593
       FieldMultiselectSelectionItem.includes(:field_multiselect_selection).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.field_multiselect_selection&.company_id
@@ -945,6 +1077,7 @@ class UpdateTenants
         FieldMultiselectSelectionItem.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 0
       FieldNumber.includes(:custom_field).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.custom_field&.company_id
@@ -952,6 +1085,7 @@ class UpdateTenants
         FieldNumber.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 354003
       FormCustomField.includes(:form).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.form&.company_id
@@ -959,6 +1093,7 @@ class UpdateTenants
         FormCustomField.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 52014
       CustomFieldAttachment.includes(:form_custom_field).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.form_custom_field&.company_id
@@ -966,6 +1101,7 @@ class UpdateTenants
         CustomFieldAttachment.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 1351
       CustomFieldSelection.includes(:form_custom_field).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.form_custom_field&.company_id
@@ -973,12 +1109,16 @@ class UpdateTenants
         CustomFieldSelection.import records, on_duplicate_key_update: [:company_id]
       end
 
-      GstinLocation.find_each do |record|
-        if record.gstin_master.present?
-          record.gstin_master.update_column(:company_id, record.company_id)
+      # 10063 Gstin, 125150 GstinLocation
+      GstinLocation.where.not(gstin_id: nil).find_in_batches(batch_size: 1000) do |records|
+        records.each do |record|
+          if record.gstin_master.present?
+            record.gstin_master.update_column(:company_id, record.company_id)
+          end
         end
       end
 
+      # 19237
       IndividualKycTrack.includes(:individual_kyc).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.individual_kyc&.company_id
@@ -986,6 +1126,7 @@ class UpdateTenants
         IndividualKycTrack.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 205
       InvoiceTransactionMapping.includes(:invoice).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.invoice&.company_id
@@ -993,6 +1134,7 @@ class UpdateTenants
         InvoiceTransactionMapping.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 100687
       InwardDocumentItem.includes(:inward_document).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.inward_document&.company_id
@@ -1000,6 +1142,7 @@ class UpdateTenants
         InwardDocumentItem.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 0
       ItzCashDmtSender.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -1007,6 +1150,7 @@ class UpdateTenants
         ItzCashDmtSender.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 0
       ItzCashDmtBeneficiary.includes(:itz_cash_dmt_sender).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.itz_cash_dmt_sender&.company_id
@@ -1014,6 +1158,7 @@ class UpdateTenants
         ItzCashDmtBeneficiary.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 69010
       LevelReviewerMapping.includes(:reviewer).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.reviewer&.company_id
@@ -1021,6 +1166,7 @@ class UpdateTenants
         LevelReviewerMapping.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 220824
       LevelUserReviewerMapping.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -1028,6 +1174,7 @@ class UpdateTenants
         LevelUserReviewerMapping.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 0
       LoginAgreementMapping.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -1035,6 +1182,7 @@ class UpdateTenants
         LoginAgreementMapping.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 376
       ManagerSummaryMailConfig.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -1042,6 +1190,7 @@ class UpdateTenants
         ManagerSummaryMailConfig.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 96214
       MapLocationUserQuery.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -1049,6 +1198,7 @@ class UpdateTenants
         MapLocationUserQuery.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 0
       MccCategoryMapping.includes(:category).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.category&.company_id
@@ -1056,6 +1206,7 @@ class UpdateTenants
         MccCategoryMapping.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 2203
       MoneyRequestProcessorMapping.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -1063,6 +1214,7 @@ class UpdateTenants
         MoneyRequestProcessorMapping.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 30229
       MoneyRequestTrack.includes(:money_request).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.money_request&.company_id
@@ -1070,6 +1222,7 @@ class UpdateTenants
         MoneyRequestTrack.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 3148944
       Notification.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -1077,6 +1230,7 @@ class UpdateTenants
         Notification.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 0
       NotifierTypeConfiguration.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -1084,6 +1238,7 @@ class UpdateTenants
         NotifierTypeConfiguration.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 302
       OutwardInvoiceTrail.includes(:invoice).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.invoice&.company_id
@@ -1091,6 +1246,7 @@ class UpdateTenants
         OutwardInvoiceTrail.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 0
       PaymentAgreementEscalation.includes(:payment_agreement).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.payment_agreement&.company_id
@@ -1098,6 +1254,7 @@ class UpdateTenants
         PaymentAgreementEscalation.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 77670
       PaymentOrderAttachment.includes(:payment_order).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.payment_order&.company_id
@@ -1105,6 +1262,7 @@ class UpdateTenants
         PaymentOrderAttachment.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 2392
       PolicyConfiguration.includes(:policy).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.policy&.company_id
@@ -1112,6 +1270,7 @@ class UpdateTenants
         PolicyConfiguration.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 132811
       PolicyUserMapping.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -1119,6 +1278,7 @@ class UpdateTenants
         PolicyUserMapping.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 2016
       PostOperationAction.includes(:post_operatable).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.post_operatable&.company_id
@@ -1126,6 +1286,7 @@ class UpdateTenants
         PostOperationAction.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
+      # 6983
       ReceiptEmailAttachment.includes(:receipt_email).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.receipt_email&.company_id
@@ -1133,6 +1294,7 @@ class UpdateTenants
         ReceiptEmailAttachment.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 39932
       ReportProcessorGroupMapping.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -1140,6 +1302,7 @@ class UpdateTenants
         ReportProcessorGroupMapping.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 81475
       ReportTrack.includes(:report).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.report&.company_id
@@ -1147,6 +1310,7 @@ class UpdateTenants
         ReportTrack.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 42
       ResourceTemplate.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -1154,6 +1318,7 @@ class UpdateTenants
         ResourceTemplate.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 24988
       ReviewalLevel.includes(:policy).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.policy&.company_id
@@ -1161,6 +1326,7 @@ class UpdateTenants
         ReviewalLevel.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 0
       TranscribedExpense.includes(:receipt).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.receipt&.company_id
@@ -1168,6 +1334,7 @@ class UpdateTenants
         TranscribedExpense.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 774
       TravelRequestComment.includes(:travel_request).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.travel_request&.company_id
@@ -1175,6 +1342,7 @@ class UpdateTenants
         TravelRequestComment.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 352
       TravelRequestTrail.includes(:travel_request).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.travel_request&.company_id
@@ -1182,6 +1350,7 @@ class UpdateTenants
         TravelRequestTrail.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 0
       TripRoute.includes(:trip).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.trip&.company_id
@@ -1189,6 +1358,7 @@ class UpdateTenants
         TripRoute.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 0
       TripPassenger.includes(:trip).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.trip&.company_id
@@ -1196,6 +1366,7 @@ class UpdateTenants
         TripPassenger.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 38629220
       UserSessionEvent.includes(:user_session).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user_session&.company_id
@@ -1203,6 +1374,7 @@ class UpdateTenants
         UserSessionEvent.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 10
       AdminSummaryMailConfig.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -1210,6 +1382,7 @@ class UpdateTenants
         AdminSummaryMailConfig.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # Here
       # MacroSchedule.includes(:macro).find_each do |record|
       #   if record.macro.present?
       #     record.update_column(:company_id, record.macro.company_id)
@@ -1234,14 +1407,21 @@ class UpdateTenants
       #   end
       # end
 
-      GeneralInvoice.where.not(invoice_frequency_id: nil).find_each do |record|
-        record.invoice_frequency.update_column(:company_id, record.company_id)
+      # 318 GeneralInvoice - Updating 22077 InvoiceFrequency
+      GeneralInvoice.where.not(invoice_frequency_id: nil).find_in_batches(batch_size: 1000) do |records|
+        records.each do |record|
+          record.invoice_frequency.update_column(:company_id, record.company_id)
+        end
       end
 
-      RentalInvoice.where.not(invoice_frequency_id: nil).find_each do |record|
-        record.invoice_frequency.update_column(:company_id, record.company_id)
+      # 16825 RentalInvoice - Updating 22077 InvoiceFrequency
+      RentalInvoice.where.not(invoice_frequency_id: nil).find_in_batches(batch_size: 1000) do |records|
+        records.each do |record|
+          record.invoice_frequency.update_column(:company_id, record.company_id)
+        end
       end
 
+      # 0
       PaymentTrail.includes(:macro).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           if record.initiating_account.present? && record.initiating_account.respond_to?(:company)
@@ -1253,6 +1433,7 @@ class UpdateTenants
         PaymentTrail.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 0
       ProcurementCharge.includes(:chargable).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.chargable&.company_id
@@ -1260,6 +1441,7 @@ class UpdateTenants
         ProcurementCharge.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 497
       ReceiptEmailParseFailure.includes(:user).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.user&.company_id
@@ -1267,6 +1449,7 @@ class UpdateTenants
         ReceiptEmailParseFailure.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 2137
       VirtualAccountTransaction.includes(:virtual_account).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.virtual_account&.company_id
@@ -1274,6 +1457,7 @@ class UpdateTenants
         VirtualAccountTransaction.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 6378
       SystemLog.includes(:log_resource).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.log_resource&.company_id
@@ -1281,16 +1465,19 @@ class UpdateTenants
         SystemLog.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 0 TaskSchedule, 0 TaskWorkflow
       TaskWorkflow.where.not(task_schedule_id: nil).find_each do |record|
         record.task_schedule.update_column(:company_id, record.company_id)
       end
 
+      # 0 TaskFileManagerAction, 0 TaskWorkflow
       TaskWorkflow.find_each do |tw|
         tw.file_manager_actions.each do |record|
           record.update_column(:company_id, tw.company_id)
         end
       end
 
+      # 0
       TaxPerItem.includes(:tax_rate).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.tax_rate&.company_id
@@ -1298,10 +1485,14 @@ class UpdateTenants
         TaxPerItem.import records, on_duplicate_key_update: [:company_id]
       end
 
-      TimeExpense.where.not(time_object_id: nil).find_each do |te|
-        te.time_object.update_column(:company_id, te.company_id)
+      # 57 TimeObject, 49 TimeExpense
+      TimeExpense.where.not(time_object_id: nil).find_in_batches(batch_size: 1000) do |records|
+        records.each do |record|
+          record.time_object.update_column(:company_id, record.company_id)
+        end
       end
 
+      # 740
       TravelMember.includes([:booking, :booking_request]).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           if record.booking.present?
@@ -1310,9 +1501,10 @@ class UpdateTenants
             record.company_id = record.booking_request&.company_id
           end
         end
-        TaxPerItem.import records, on_duplicate_key_update: [:company_id]
+        TravelMember.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 486751
       VendorAccount.includes(:vendor).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.vendor&.company_id
@@ -1320,6 +1512,7 @@ class UpdateTenants
         VendorAccount.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 0
       VendorAccountTransaction.includes(:vendor_account).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.vendor_account&.company_id
@@ -1327,6 +1520,7 @@ class UpdateTenants
         VendorAccountTransaction.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 66955
       VendorAttachment.includes(:yes_bank_vendor).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.yes_bank_vendor&.company_id
@@ -1334,6 +1528,7 @@ class UpdateTenants
         VendorAttachment.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 1701
       VendorTdsRate.includes(:vendor).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.vendor&.company_id
@@ -1341,6 +1536,7 @@ class UpdateTenants
         VendorTdsRate.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 1
       WebHookEventMapping.includes(:web_hook).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.web_hook&.company_id
@@ -1348,6 +1544,7 @@ class UpdateTenants
         WebHookEventMapping.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 10
       FormChoiceDependencyMapping.includes(:dependency).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.dependency&.company_id
@@ -1355,6 +1552,7 @@ class UpdateTenants
         FormChoiceDependencyMapping.import records, on_duplicate_key_update: [:company_id]
       end
 
+      # 44
       ExportTemplateUserRoleMapping.includes(:template).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
           record.company_id = record.template&.company_id
