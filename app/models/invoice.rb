@@ -1570,7 +1570,7 @@ class Invoice < ApplicationRecord
 
   def item_quantity_validation
     flag = false
-    quantities = invoice_items.map(&:quantity).map(&:to_i)
+    quantities = invoice_items.map(&:quantity).map(&:to_f)
     quantities.each do |quantity|
       flag = true if quantity <= 0
       break
@@ -1581,7 +1581,7 @@ class Invoice < ApplicationRecord
 
   def item_rate_validation
     flag = false
-    rates = invoice_items.map(&:rate).map(&:to_i)
+    rates = invoice_items.map(&:rate).map(&:to_f)
     rates.each do |rate|
       flag = true if rate <= 0
       break
