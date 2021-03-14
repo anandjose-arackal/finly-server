@@ -114,7 +114,5 @@ yarn-debug.log*
 
 /config/master.key
 /config/credentials/staging.key
-
 /config/credentials/production.key
-
 /config/credentials/development.key

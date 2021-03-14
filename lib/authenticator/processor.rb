@@ -6,7 +6,7 @@ class Authenticator::Processor
       Authenticator::Providers::Admin,
       Authenticator::Providers::AdminBypass,
       Authenticator::Providers::MultiEntityLogin,
-      Authenticator::Providers::Sso,
+      Authenticator::Providers::Saml,
       Authenticator::Providers::GoogleOauth2
 
   ]
