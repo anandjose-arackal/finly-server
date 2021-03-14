@@ -95,7 +95,6 @@ class Authenticator::Providers::GoogleOauth2 < Authenticator::Providers::Base
   end
 
   def on_success(message)
-    binding.pry
     result = Gatekeeper::Event.(:user_login_success, user: self.unauthenticated_user, username: username, ip: request.remote_ip)
     unless result.success?
       params[:user] = u
