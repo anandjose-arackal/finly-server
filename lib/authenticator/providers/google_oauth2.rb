@@ -18,7 +18,7 @@ class Authenticator::Providers::GoogleOauth2 < Authenticator::Providers::Base
 
 
     self.user_info = {}
-    
+
     id_token =  params[:id_token]
     data = JWT.decode(id_token, nil, false).first.with_indifferent_access
     
@@ -39,9 +39,8 @@ class Authenticator::Providers::GoogleOauth2 < Authenticator::Providers::Base
     self.user_info[:email_verified] = data[:email_verified]
 
     toggel = AuthenticationToggle.new( user )
-    toggel.sso_google_enabled?
 
-    unless toggel.sso_google_enabled?    
+    unless toggel.sso_google_enabled?
       fail_with_event :on_google_oauth, "Google SSO is not enabled for your account."
     end
     
