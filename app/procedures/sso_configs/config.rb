@@ -24,25 +24,31 @@ class SsoConfigs::Config < Transactions::API
 
   def get_google_oauth(options, params:, **)
     company = options[:company]
-    user = company.users.first
+    if company.present?
+      user = company.users.first
+      toggel = AuthenticationToggle.new( user )
     
-    toggel = AuthenticationToggle.new( user )
-    
-    if toggel.sso_google_enabled?
-      sso_configs = {
-        'issuer': "Finly",
-        'redirect_uri': "/auth/sso/google_oauth/callback",
-        'label': "Sign in With Google",
-        'client_id': Rails.application.config_for(:sso_provider_credentials)[:omniauth][:google][:client_id],
-        'type': "oauth2"
-      }
-      options[:sso_configs] << sso_configs
+      options[:sso_configs] << google_sso_config if toggel.sso_google_enabled?
+
+    else
+      options[:sso_configs] << google_sso_config
     end
+
     true
   end
 
   def set_results(options, params:, **)
     options['result'] = options[:sso_configs].compact
     true
+  end
+
+  def google_sso_config
+    sso_configs = {
+      'issuer': "Finly",
+      'redirect_uri': "/auth/sso/google_oauth/callback",
+      'label': "Sign in With Google",
+      'client_id': Rails.application.config_for(:sso_provider_credentials)[:omniauth][:google][:client_id],
+      'type': "oauth2"
+    }
   end
 end

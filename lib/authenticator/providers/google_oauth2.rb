@@ -18,7 +18,7 @@ class Authenticator::Providers::GoogleOauth2 < Authenticator::Providers::Base
 
 
     self.user_info = {}
-    id_token =  params['id_token']
+    id_token =  params[:id_token]
     data = JWT.decode(id_token, nil, false).first.with_indifferent_access
 
     self.user_info[:email] = data[:email]
