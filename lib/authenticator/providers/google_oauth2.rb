@@ -7,7 +7,7 @@ class Authenticator::Providers::GoogleOauth2 < Authenticator::Providers::Base
   def self.accept?(request)
     scopes = request.params[:scope]
     scopes = [scopes] unless scopes.respond_to?(:each)
-    scopes&.size == 1 and ["web", "mobile", "chrome", "api"].include?(scopes&.first) and RequestStore.store[:google_oauth2]
+    scopes&.size == 1 and ["web", "mobile", "chrome", "api"].include?(scopes&.first) and RequestStore.store[:sso] and RequestStore.store[:google_oauth2]
   end
 
   def model
@@ -24,6 +24,7 @@ class Authenticator::Providers::GoogleOauth2 < Authenticator::Providers::Base
     self.user_info[:email] = data[:email]
     user = User.find_by(email: user_info[:email])
 
+
     self.user_info[:user] = user
     self.user_info[:company_id] = user.company_id
     self.user_info[:exp] = data[:exp]
@@ -36,7 +37,8 @@ class Authenticator::Providers::GoogleOauth2 < Authenticator::Providers::Base
     unless toggel.sso_google_enabled?    
       fail_with_event :on_google_oauth, "Google SSO is not enabled for your account."
     end
-
+    
+    fail_with_event :on_inactive_user, "User Inactive"
     fail_with_event :on_blank_username, "Invalid username"
     fail_with_event :on_expired_token, "Token Expired"
 
@@ -85,7 +87,15 @@ class Authenticator::Providers::GoogleOauth2 < Authenticator::Providers::Base
     end
   end
 
+  def on_inactive_user(message)
+    unless self.user_info[:user].status == 'Active'
+      params[:message] = message || "User Inactive"
+      UserSessions::Create.(:failed, params)
+    end
+  end
+
   def on_success(message)
+    binding.pry
     result = Gatekeeper::Event.(:user_login_success, user: self.unauthenticated_user, username: username, ip: request.remote_ip)
     unless result.success?
       params[:user] = u

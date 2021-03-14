@@ -28,15 +28,8 @@ class CompaniesController < BaseControllers::WebBase
   end
 
   def single_sign_on_configs
-    subdomain = params[:subdomain] || self.request.subdomain
-    company = Company.find_by(subdomain: subdomain)
-    
-    @sso_configs = []
-    if company.present?
-      @sso_configs = company.single_sign_on_configurations
-    end
-
-    @sso_configs << GOOGLE_OAUTH
+    @op = SsoConfigs::Config.({ params: params.to_unsafe_h })
+    @sso_configs = @op['result']
   end
 
   protected

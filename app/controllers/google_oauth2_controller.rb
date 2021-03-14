@@ -7,6 +7,7 @@ class GoogleOauth2Controller < Oauth::TokenController
   skip_before_action :verify_authenticity_token, raise: false
 
   def create
+    RequestStore.store[:sso] = true
     RequestStore.store[:google_oauth2] = true
     set_grant_type
     set_scope

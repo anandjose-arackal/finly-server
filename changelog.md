@@ -3,6 +3,9 @@
 All notable changes to this project will be documented in this file. Always add new logs to 
 beginning of this file.
 
+## 2021-03-14
+  - Updating the sso from request_store adding error messages and sso config movied to procedure
+
 ## 2021-03-12
   - Adding master.key to git ignore
   - Updating token based authentication
