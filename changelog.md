@@ -1,10 +1,24 @@
 # Changelog
-
 All notable changes to this project will be documented in this file. Always add new logs to 
 beginning of this file.
 
 ## 2021-03-14
   - Updating the sso from request_store adding error messages and sso config movied to procedure
+
+##2021-03-12
+  - Updating the invoice and purchase_order validations
+
+##2021-03-11
+  - Fix: `Vendor Payment` Purchase Order advance Amount in upaid, the status will change to `close`  while closing a purchase order
+    The re-opeing action in purchase order will revoke the Purchase advance amount status to previous status if it a non paid advance
+
+##2021-03-08
+ - SMP service api updated, by adding template id as one of the parameter
+ - Each msg template have unique template id in service provider, this template id stored in message_template yml
+
+##2021-03-07
+ - OTP mailer for bank payment request credit action introduced.
+
 
 ## 2021-03-12
   - Adding master.key to git ignore

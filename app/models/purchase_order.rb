@@ -1278,7 +1278,7 @@ class PurchaseOrder < ApplicationRecord
 
   def item_quantity_validation
     flag = false
-    quantities = items.map(&:quantity).map(&:to_i)
+    quantities = items.map(&:quantity).map(&:to_f)
     quantities.each do |quantity|
       flag = true if quantity <= 0
       break
@@ -1289,7 +1289,7 @@ class PurchaseOrder < ApplicationRecord
 
   def item_rate_validation
     flag = false
-    rates = items.map(&:rate).map(&:to_i)
+    rates = items.map(&:rate).map(&:to_f)
     rates.each do |rate|
       flag = true if rate <= 0
       break
