@@ -80,9 +80,9 @@ gem 'slack-notifier', '~> 2.3'
 # gems for quickbooks integration
 gem 'omniauth', '~> 1.9.0'
 gem 'omniauth-quickbooks', '~> 0.0.2'
-gem 'omniauth-google-oauth2'
+gem 'omniauth-google-oauth2', '~> 0.8.1'
 # gem 'google-api-client'
-gem 'google-id-token'
+gem 'google-id-token', '~> 1.4.2'
 
 
 
@@ -117,7 +117,7 @@ gem 'will_paginate', '~> 3.1.6'
 gem 'hutch', '~> 1.0'
 
 gem 'jwt', '~> 2.2'
-
+  
 # gem for jquery ui in rails app
 gem 'jquery-ui-rails', '~> 6.0.1'
 
