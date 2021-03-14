@@ -18,15 +18,16 @@ class Authenticator::Providers::GoogleOauth2 < Authenticator::Providers::Base
 
 
     self.user_info = {}
-    id_token =  params[:id_token]
+    id_token =  params['id_token']
     data = JWT.decode(id_token, nil, false).first.with_indifferent_access
 
     self.user_info[:email] = data[:email]
     user = User.find_by(email: user_info[:email])
 
+    fail_with_event :on_blank_username, "Invalid username"
 
     self.user_info[:user] = user
-    self.user_info[:company_id] = user.company_id
+    self.user_info[:company_id] = user&.company_id
     self.user_info[:exp] = data[:exp]
     params[:user] = user
     self.user_info[:email_verified] = data[:email_verified]
@@ -39,7 +40,6 @@ class Authenticator::Providers::GoogleOauth2 < Authenticator::Providers::Base
     end
     
     fail_with_event :on_inactive_user, "User Inactive"
-    fail_with_event :on_blank_username, "Invalid username"
     fail_with_event :on_expired_token, "Token Expired"
 
     # create a session
