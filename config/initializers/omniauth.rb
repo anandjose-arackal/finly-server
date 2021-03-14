@@ -5,10 +5,12 @@ Rails.application.config.middleware.use OmniAuth::Builder do
     provider :quickbooks, 'qyprd0zDADfuZkLhAUxBfCWOZD9arh', 'UmdQJxfAd5Y7VZlCxF1gACyz60HWgI1hEXGkZImj'
   end
 
-  provider :google_oauth2, Rails.application.credentials[:omniauth][:google][:client_id],
-    Rails.application.credentials[:omniauth][:google][:secret_id], {
+    
+
+  provider :google_oauth2, Rails.application.config_for(:sso_provider_credentials)[:omniauth][:google][:client_id],
+    Rails.application.config_for(:sso_provider_credentials)[:omniauth][:google][:secret_id], {
       provider_ignores_state: true
-    }
+  }
 
   # adding multiple SAML configurations here for authentication
   OmniAuth::MultiProvider.register(self,

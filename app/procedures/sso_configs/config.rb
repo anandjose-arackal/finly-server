@@ -27,8 +27,7 @@ class SsoConfigs::Config < Transactions::API
       'issuer': "Finly",
       'redirect_uri': "/auth/sso/google_oauth/callback",
       'label': "Sign in With Google",
-      'client_id': Rails.application.credentials[:omniauth][:google][:client_id],
-      'client_secret': Rails.application.credentials[:omniauth][:google][:secret_id],
+      'client_id': Rails.application.config_for(:sso_provider_credentials)[:omniauth][:google][:client_id],
       'type': "oauth2"
     }
     options[:sso_configs] << sso_configs
