@@ -81,7 +81,7 @@ gem 'slack-notifier', '~> 2.3'
 gem 'omniauth', '~> 1.9.0'
 gem 'omniauth-quickbooks', '~> 0.0.2'
 gem 'omniauth-google-oauth2', '~> 0.8.1'
-# gem 'google-api-client'
+gem 'google-api-client', '~> 0.53.0'
 gem 'google-id-token', '~> 1.4.2'
 
 
