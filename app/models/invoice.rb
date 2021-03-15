@@ -1424,6 +1424,9 @@ class Invoice < ApplicationRecord
     send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
   end
 
+  def forms_enabled
+    NonPoInvoiceToggle.new(RequestStoreUtil.current_user).enabled?
+  end
   private
 
   # def payment_agreement_updations

@@ -26,8 +26,6 @@ class FeatureToggle
   end
 
   def enabled?(feature, default = false)
-    return false if feature == 'release/vp_old_ui#enabled'
-    return true
     return default if flags.nil?
 
     flag = flags[normalize_key(feature)]

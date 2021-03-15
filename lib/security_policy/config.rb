@@ -275,7 +275,7 @@ class SecurityPolicy::Config
         policy[key] = parse_hash(value, flags, "#{path}/#{key}")
       else
         full_path = "#{path}##{key}"
-        if !flags.has_key?(full_path)
+        if !flags&.has_key?(full_path)
           policy[key] = value
         elsif [true, false].include?(value)
           # Boolean, should fetch the flag

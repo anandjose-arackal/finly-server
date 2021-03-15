@@ -200,7 +200,9 @@ class InvoiceExposure < Exposures::API
     record.po_adjusted_advance&.value || 0
   end
 
-
+  attribute :forms_enabled do
+    record.forms_enabled
+  end
   # def vendor_ref_num(invoice_line_item)
   #   invoice_line_item.parent&.vendor_id
   # end
