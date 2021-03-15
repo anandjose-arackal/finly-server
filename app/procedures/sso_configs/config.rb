@@ -47,7 +47,7 @@ class SsoConfigs::Config < Transactions::API
       'issuer': "Finly",
       'logo': "https://img.icons8.com/windows/24/444444/google-logo.png",
       'auth_url': "https://accounts.google.com/o/oauth2/auth?response_type=code&state=&client_id=#{client_id}&scope=email&redirect_uri=#{redirect_uri}",
-      'label': "Sign in With Google",
+      'label': "Google",
       "provider": "google_oauth2",
       'type': "oauth2"
     }
