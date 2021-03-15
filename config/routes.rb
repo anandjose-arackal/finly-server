@@ -2658,6 +2658,7 @@ Rails.application.routes.draw do
   # devise_for :users, skip: [:session, :password]
   # get '/auth/google_oauth2/callback', to: 'google_oauth2#create'
   
+  get 'auth/:provider/callback', to: 'google_oauth2#token'
   post '/auth/sso/:provider/sign_in', to: 'google_oauth2#create'
   
 
