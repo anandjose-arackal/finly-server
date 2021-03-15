@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file. Always add new logs to 
 beginning of this file.
 
+## 2021-03-16
+  - Updating the authentication flow 
+
 ## 2021-03-14
   - Updating the sso from request_store adding error messages and sso config movied to procedure
 

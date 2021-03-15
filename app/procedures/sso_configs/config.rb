@@ -27,9 +27,7 @@ class SsoConfigs::Config < Transactions::API
     if company.present?
       user = company.users.first
       toggel = AuthenticationToggle.new( user )
-    
       options[:sso_configs] << google_sso_config if toggel.sso_google_enabled?
-
     else
       options[:sso_configs] << google_sso_config
     end
@@ -43,10 +41,12 @@ class SsoConfigs::Config < Transactions::API
   end
 
   def google_sso_config
+    redirect_uri = "#{Rails.application.config_for(:sso_provider_credentials)[:omniauth][:google][:base_url]}/auth/google_oauth2/callback"
+    client_id = Rails.application.config_for(:sso_provider_credentials)[:omniauth][:google][:client_id]
     sso_configs = {
       'issuer': "Finly",
-      'logo': "https://www.finly.io/api/common/images/playstore.png",
-      'auth_url': "https://accounts.google.com/o/oauth2/auth?response_type=code&state=&client_id=307602140088-5aotklsei00379ioe94ebua3ge9nlv3s.apps.googleusercontent.com&scope=email&redirect_uri=http%3A%2F%2Flocalhost%2Fauth%2Fgoogle_oauth2%2Fcallback",
+      'logo': "https://www.finly.io/api/common/images/google_sso.png",
+      'auth_url': "https://accounts.google.com/o/oauth2/auth?response_type=code&state=&client_id=#{client_id}&scope=email&redirect_uri=#{redirect_uri}",
       'label': "Sign in With Google",
       "provider": "google_oauth2",
       'type': "oauth2"
