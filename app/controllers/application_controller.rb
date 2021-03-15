@@ -388,7 +388,13 @@ class ApplicationController < ActionController::Base
     verify_user_session(doorkeeper_token)
 
     # Using an update all function to avoid the +users.update+ event. This event is avoided as it would fire too many times
-    User.where(id: current_user.id).update_all(last_activity_at: DateTime.now) if current_user.present?
+    if current_user.present?
+      if current_user.is_a?(User)
+        User.where(id: current_user.id).update_all(last_activity_at: DateTime.now)
+      else
+        AdminUser.where(id: current_user.id).update_all(last_activity_at: DateTime.now)
+      end
+    end
   end
 
   def set_not_tenant_skip_authorize
