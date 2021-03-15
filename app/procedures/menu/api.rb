@@ -107,7 +107,7 @@ class Menu::API < Transactions::API
           company_id: company.id,
           subdomain: company.subdomain,
           name: company.name,
-          logo: company.configuration.logo.url,
+          logo: company.configuration.logo&.url,
           selected: (current_user == user),
           modules: []
       }
