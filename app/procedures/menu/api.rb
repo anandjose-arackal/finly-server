@@ -101,32 +101,34 @@ class Menu::API < Transactions::API
 
     users.each do |user|
       company = user.company
-      next unless %w(partial_block active).include?(company.status.name.to_s)
+      ActsAsTenant.with_tenant company do
+        next unless %w(partial_block active).include?(company.status.name.to_s)
 
-      conf = {
-          company_id: company.id,
-          subdomain: company.subdomain,
-          name: company.name,
-          logo: company.configuration.logo&.url,
-          selected: (current_user == user),
-          modules: []
-      }
+        conf = {
+            company_id: company.id,
+            subdomain: company.subdomain,
+            name: company.name,
+            logo: company.configuration.logo&.url,
+            selected: (current_user == user),
+            modules: []
+        }
 
-      MODULES_CONFIG.each do |mod|
+        MODULES_CONFIG.each do |mod|
 
-        next if mod[:feature] and not user.company.feature_subscription.send(mod[:feature])
-        next if mod[:user_subscription] and not user.user_panel_subscription.send(mod[:user_subscription])
-        if mod[:permissions].present?
-          permissions = mod[:permissions]
-          permissions = [permissions] unless permissions.respond_to?(:each)
-          next if permissions.present? and not user.has_permission?(permissions)
+          next if mod[:feature] and not user.company.feature_subscription.send(mod[:feature])
+          next if mod[:user_subscription] and not user.user_panel_subscription.send(mod[:user_subscription])
+          if mod[:permissions].present?
+            permissions = mod[:permissions]
+            permissions = [permissions] unless permissions.respond_to?(:each)
+            next if permissions.present? and not user.has_permission?(permissions)
+          end
+
+          selected = (current_user == user and [mod[:app].to_s, mod[:app]].include?(RequestStoreUtil.current_app))
+          conf[:modules] << mod[:config].merge(selected: selected)
         end
 
-        selected = (current_user == user and [mod[:app].to_s, mod[:app]].include?(RequestStoreUtil.current_app))
-        conf[:modules] << mod[:config].merge(selected: selected)
+        context[:entities] << conf
       end
-
-      context[:entities] << conf
     end
   end
 
