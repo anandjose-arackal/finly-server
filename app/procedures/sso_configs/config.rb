@@ -46,8 +46,9 @@ class SsoConfigs::Config < Transactions::API
     sso_configs = {
       'issuer': "Finly",
       'logo': "https://www.finly.io/api/common/images/playstore.png",
-       'auth_url': "https://accounts.google.com/o/oauth2/auth?response_type=code&state=&client_id=307602140088-5aotklsei00379ioe94ebua3ge9nlv3s.apps.googleusercontent.com&scope=email&redirect_uri=http%3A%2F%2Flocalhost%2Fauth%2Fgoogle_oauth2%2Fcallback",
+      'auth_url': "https://accounts.google.com/o/oauth2/auth?response_type=code&state=&client_id=307602140088-5aotklsei00379ioe94ebua3ge9nlv3s.apps.googleusercontent.com&scope=email&redirect_uri=http%3A%2F%2Flocalhost%2Fauth%2Fgoogle_oauth2%2Fcallback",
       'label': "Sign in With Google",
+      "provider": "google_oauth2",
       'type': "oauth2"
     }
   end
