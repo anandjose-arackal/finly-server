@@ -58,7 +58,7 @@ class ApplicationController < ActionController::Base
     company_group = CompanyGroup.find_by_subdomain(subdomain)
 
     unless company_group.present?
-      head 401
+      # head 401
       return
     end
     ActsAsTenant.current_tenant = company_group.companies
