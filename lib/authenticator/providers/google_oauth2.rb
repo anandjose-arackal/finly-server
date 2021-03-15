@@ -56,7 +56,7 @@ class Authenticator::Providers::GoogleOauth2 < Authenticator::Providers::Base
     #   else
     #     fail_with_event :on_invalid_session, "Invalid login details given. Please contact your system administrator"
     #   end
-    end
+    # end
   end
 
   def unauthenticated_user
