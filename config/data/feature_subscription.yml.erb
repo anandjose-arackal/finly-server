@@ -24,8 +24,6 @@ user:
       vp: <%=  VpOldUiToggle.new(current_user).old_ui_enabled? %>
     export_manager:
       templates_enabled: <%=  ExportManagerToggle.new(current_user).templates_enabled? %>
-    non_po_invoice:
-      forms_enabled: <%= NonPoInvoiceToggle.new(current_user).enabled? %>
     theme:
       vp: <%= current_user.profile.vp_web_client_theme %>
       em: <%= current_user.profile.em_web_client_theme %>
