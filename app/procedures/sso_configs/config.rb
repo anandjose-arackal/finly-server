@@ -45,9 +45,9 @@ class SsoConfigs::Config < Transactions::API
   def google_sso_config
     sso_configs = {
       'issuer': "Finly",
-      'redirect_uri': "/auth/sso/google_oauth/callback",
+      'logo': "https://www.finly.io/api/common/images/playstore.png",
+       'auth_url': "https://accounts.google.com/o/oauth2/auth?response_type=code&state=&client_id=307602140088-5aotklsei00379ioe94ebua3ge9nlv3s.apps.googleusercontent.com&scope=email&redirect_uri=http%3A%2F%2Flocalhost%2Fauth%2Fgoogle_oauth2%2Fcallback",
       'label': "Sign in With Google",
-      'client_id': Rails.application.config_for(:sso_provider_credentials)[:omniauth][:google][:client_id],
       'type': "oauth2"
     }
   end
