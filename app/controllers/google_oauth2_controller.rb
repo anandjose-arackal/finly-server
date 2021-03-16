@@ -12,7 +12,7 @@ class GoogleOauth2Controller < Oauth::TokenController
     set_grant_type
     set_scope
     super()
-    @token.update_columns(authentication_type: "sso")
+    @token.update_columns(authentication_type: "sso") if @token.present?
   end
 
   protected

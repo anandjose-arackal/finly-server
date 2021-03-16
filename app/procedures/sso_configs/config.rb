@@ -45,7 +45,7 @@ class SsoConfigs::Config < Transactions::API
     client_id = Rails.application.config_for(:sso_provider_credentials)[:omniauth][:google][:client_id]
     sso_configs = {
       'issuer': "Finly",
-      'logo': "https://img.icons8.com/windows/24/444444/google-logo.png",
+      'logo': "https://img.icons8.com/color/24/000000/google-logo.png",
       'auth_url': "https://accounts.google.com/o/oauth2/auth?response_type=code&state=&client_id=#{client_id}&scope=email&redirect_uri=#{redirect_uri}",
       'label': "Google",
       "provider": "google_oauth2",
