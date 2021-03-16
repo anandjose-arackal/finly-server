@@ -17,8 +17,8 @@ class Authenticator::SsoConfig < Transactions::API
     options[:sso_configs] = []
     if options[:company].present?
       sso_configs = options[:company].single_sign_on_configurations
+      options[:sso_configs] << sso_configs
     end
-    options[:sso_configs] << sso_configs
     true
   end
 
