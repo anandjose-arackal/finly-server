@@ -30,6 +30,7 @@ class SingleSignOnController < Oauth::TokenController
   # The logic for choosing between the strategies will be held in the Authenticator::Processor operation
   def create
     RequestStore.store[:sso] = true
+    RequestStore.store[:saml] = true
     set_grant_type
     set_scope
     super()
@@ -39,6 +40,7 @@ class SingleSignOnController < Oauth::TokenController
   def saml_logout
     # yet to be implemented. When though?
   end
+
 
   protected
 

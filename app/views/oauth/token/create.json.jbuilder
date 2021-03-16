@@ -1,7 +1,13 @@
 json.success true
 json.otp_verified @user.otp_verified
 json.kyc_required @user.company.kyc_required?
-json.expired @user.expired?
+
+if  @token.authentication_type == 'password'
+  json.expired @user.expired?
+else
+  json.expired false
+end
+
 json.data do
   json.access_token @token.token
   # json.token_type 'bearer'
