@@ -18,7 +18,8 @@ class BackgroundOperation < BaseOperation
       user_id = user_id.id
     end
     request_store_hash = RequestStoreUtil.to_hash
-    puts request_store_hash
+    LOGGER = Logger.new(STDOUT)
+    LOGGER.info request_store_hash
     # this calls the super method of Sidekiq::Worker which calls the perfoem method
     super(user_id, params, request_store_hash)
   end
@@ -30,7 +31,10 @@ class BackgroundOperation < BaseOperation
   end
 
   def perform(user_id, params, request_store_hash = nil)
+    LOGGER = Logger.new(STDOUT)
+    LOGGER.info RequestStoreUtil.to_hash
     load_request_store request_store_hash
+    LOGGER.info RequestStoreUtil.to_hash
     if params.present? and params.is_a?(Hash)
       params = params.with_indifferent_access
     end
