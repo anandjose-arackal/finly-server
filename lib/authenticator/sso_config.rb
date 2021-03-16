@@ -49,7 +49,7 @@ class Authenticator::SsoConfig < Transactions::API
       'auth_url': "https://accounts.google.com/o/oauth2/auth?response_type=code&state=&client_id=#{client_id}&scope=email&redirect_uri=#{redirect_uri}",
       'label': "Google",
       "provider": "google_oauth2",
-      'type': "oauth2"
+      'sso_type': "oauth2"
     }
     sso_configs
   end

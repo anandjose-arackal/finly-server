@@ -8103,7 +8103,7 @@ ActiveRecord::Schema.define(version: 2021_03_16_184554) do
     t.string "finly_sso_path"
     t.string "label"
     t.datetime "deleted_at"
-    t.string "type", default: ""
+    t.string "sso_type", default: ""
     t.string "logo", default: ""
     t.index ["company_id"], name: "index_single_sign_on_configurations_on_company_id"
   end
