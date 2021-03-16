@@ -16,7 +16,7 @@ class Authenticator::SsoConfig < Transactions::API
   def get_saml(options, params:, **)
     options[:sso_configs] = []
     if options[:company].present?
-      sso_configs = company.single_sign_on_configurations
+      sso_configs = options[:company].single_sign_on_configurations
     end
     options[:sso_configs] << sso_configs
     true
