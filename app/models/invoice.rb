@@ -1425,7 +1425,9 @@ class Invoice < ApplicationRecord
   end
 
   def forms_enabled
-    NonPoInvoiceToggle.new(RequestStoreUtil.current_user).enabled?
+    feature_flag_enabled = NonPoInvoiceToggle.new(RequestStoreUtil.current_user).enabled?
+    is_non_po_invoice = self.invoice_type.non_po_invoice?
+    feature_flag_enabled && is_non_po_invoice
   end
   private
 
