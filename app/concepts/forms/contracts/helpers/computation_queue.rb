@@ -43,6 +43,7 @@ class Forms::Contracts::Helpers::ComputationQueue
         lookup_values[represented] = lookup_value
       end
 
+
       # Use the document owner or the current user for fetching the lookup choices
       user ||= contract.respond_to?(:created_by) ? contract.created_by : RequestStoreUtil.current_user
       return unless user.present?
@@ -59,8 +60,9 @@ class Forms::Contracts::Helpers::ComputationQueue
         return if lookup_exposure.nil?
 
         value = lookup_exposure.template(entity.compute_formula)
-        entity.populate(represented, value)
+        entity.populate(represented, value, represented.contract_root.form_data)
       end
+
     end
   end
 
@@ -71,7 +73,13 @@ class Forms::Contracts::Helpers::ComputationQueue
         form = contract.form_data
         row = represented.form_data
         value = transformer.render({row: row, form: form}.as_json)
-        entity.populate(represented, value)
+        puts "*********************************** COMPUTATION"
+        # puts "ENTITY: #{entity.entity_key}\nVALUE: #{value.inspect}\nFORMULA: #{entity.compute_formula}"
+        # puts "ENTITY: #{entity.entity_key}\nFORM : #{form.inspect}\n ROW: #{row.inspect}\n VALUE: #{value.inspect}\nFORMULA: #{entity.compute_formula}"
+        puts "ENTITY: #{entity.entity_key}\nVALUE: #{value.inspect}\nFORMULA: #{entity.compute_formula}"
+        puts "******************************* COMPUTATION END"
+
+        entity.populate(represented, value, form)
       end
     end
   end

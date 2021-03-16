@@ -5814,6 +5814,23 @@ ActiveRecord::Schema.define(version: 2021_03_04_024552) do
     t.datetime "deleted_at"
   end
 
+  create_table "ml_model_dependent_entities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.integer "company_id", null: false
+    t.integer "ml_model_id", null: false
+    t.string "form_id", null: false
+    t.string "form_entity_id", null: false
+    t.datetime "deleted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["company_id"], name: "index_ml_model_dependent_entities_on_company_id"
+    t.index ["created_at"], name: "index_ml_model_dependent_entities_on_created_at"
+    t.index ["deleted_at"], name: "index_ml_model_dependent_entities_on_deleted_at"
+    t.index ["form_entity_id"], name: "index_ml_model_dependent_entities_on_form_entity_id"
+    t.index ["form_id"], name: "index_ml_model_dependent_entities_on_form_id"
+    t.index ["ml_model_id"], name: "index_ml_model_dependent_entities_on_ml_model_id"
+    t.index ["updated_at"], name: "index_ml_model_dependent_entities_on_updated_at"
+  end
+
   create_table "ml_model_predictions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.integer "company_id", null: false
     t.bigint "ml_model_id"
@@ -5835,8 +5852,6 @@ ActiveRecord::Schema.define(version: 2021_03_04_024552) do
 
   create_table "ml_models", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.integer "company_id", null: false
-    t.string "parent_type"
-    t.bigint "parent_id"
     t.string "type", null: false
     t.text "config", size: :long
     t.datetime "built_at"
@@ -5854,6 +5869,9 @@ ActiveRecord::Schema.define(version: 2021_03_04_024552) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.text "pmml", size: :long
+    t.string "form_id"
+    t.string "parent_id"
+    t.string "parent_type"
     t.index ["built_at"], name: "index_ml_models_on_built_at"
     t.index ["company_id"], name: "index_ml_models_on_company_id"
     t.index ["created_at"], name: "index_ml_models_on_created_at"

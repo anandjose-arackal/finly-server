@@ -9,7 +9,7 @@ class Forms::Ops::LookupDetails < Transactions::API
   end
 
   step :find_model
-  step Policy::Pundit(Forms::Policy, :config?)
+  step Policy::Pundit(Forms::Policy, :config?) # Todo
   step :find_entity
   step :find_record
   pass :find_dependent_entities

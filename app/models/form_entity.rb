@@ -73,7 +73,7 @@ class FormEntity < ApplicationRecord
   delegate :compute_lookup?, :compute_form?, to: :compute_type, allow_nil: true
   belongs_to :compute_lookup_entity, class_name: 'FormEntity', optional: true
 
-  has_one :prediction_model, class_name: 'MlModel::FormEntity', primary_key: :uuid
+  has_one :prediction_model, class_name: 'MlModel::FormEntityModel', primary_key: :uuid, as: :parent
   has_many :entities, class_name: 'FormEntity', foreign_key: :parent_id, primary_key: :uuid
   has_many :choices, class_name: 'FormEntityChoice', dependent: :destroy
   has_many :validations, class_name: 'FormEntityValidation'
@@ -127,7 +127,7 @@ class FormEntity < ApplicationRecord
     Forms::Contracts::Builders::FormEntity.({ params: { entity: self, contract: contract }, current_user: user })
   end
 
-  # Class method `contract` is used in Form Builder
+  # Class method +contract+ is used in Form Builder
   def self.contract(model, current_user)
     base_class = model.system_field ? Forms::Entities::Contracts::SystemFormEntity : Forms::Entities::Contracts::CustomFormEntity
 
@@ -379,6 +379,35 @@ class FormEntity < ApplicationRecord
     else
       path
     end
+  end
+
+  # True if the entity exists within a collection.
+  #
+  # @return [Boolean]
+  #
+  # @example
+  #   returns true for items.total_amount since it is in az collection
+  #   returns false for policy_id since it is not in any collection
+  def is_in_collection?(options = {})
+    return false if parent_id.blank?
+
+    form = options[:form] || options['form'] || self.form
+
+    paths = entity_path.split('.')
+    ent_path = ''
+    paths.each do |ent_key|
+      ent_path += "." unless ent_path.blank?
+      ent_path += ent_key
+
+      next if ent_key == entity_key
+
+      ent = form.find_entity(ent_path)
+      next if ent.blank?
+
+      return true if ent.class.collection?
+    end
+
+    false
   end
 
   private
