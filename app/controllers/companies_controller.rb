@@ -28,7 +28,7 @@ class CompaniesController < BaseControllers::WebBase
   end
 
   def single_sign_on_configs
-    @op = SsoConfigs::Config.({ params: params.to_unsafe_h })
+    @op = Authenticator::SsoConfig.({ params: params.to_unsafe_h })
     @sso_configs = @op['result']
   end
 
