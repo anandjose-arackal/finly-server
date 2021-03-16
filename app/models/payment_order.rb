@@ -240,11 +240,27 @@ class PaymentOrder < ApplicationRecord
   def update_processed_amount
     new_amount = self.payments.completed.joins(:amount).sum(:value)
     self.amount_processed&.update(value: new_amount)
+
+    reporting_new_amount = new_amount
+    parent_type = self.payments.first.parent.parent_type.downcase
+    if parent_type == 'invoice'
+      reporting_new_amount =  self.payments.completed.map{ |payment| payment.amount.value * payment.parent.conversion_rate }
+    end
+    self.update(reporting_amount_processed: reporting_new_amount)
   end
 
   def update_requested_amount
     new_amount = self.payments.joins(:amount).sum(:value)
     self.amount_requested&.update(value: new_amount)
+    
+    reporting_amount_requested = new_amount
+
+    reporting_new_amount = new_amount
+    parent_type = self.payments.first.parent.parent_type.downcase
+    if parent_type == 'invoice'
+      reporting_new_amount =  self.payments.map{ |payment| payment.amount.value * payment.parent.conversion_rate }
+    end
+    self.update(reporting_amount_requested: reporting_new_amount)
   end
 
   # again, for convenience, and only applies to bank transfer poyments

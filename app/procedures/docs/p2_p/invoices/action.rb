@@ -54,9 +54,19 @@ class Docs::P2P::Invoices::Action < ActionManager::API
            :create,
            format: 'primary',
            permissions: :non_po_invoice_initiator,
+           toggle: {unless: [NonPoInvoiceToggle, :enabled?]},
            label: "Create Non PO Invoice",
            icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
            function: "non_po_invoice_create"
+
+    action :template,
+           :create_form,
+           format: 'primary',
+           permissions: :non_po_invoice_initiator,
+           toggle: {if: [NonPoInvoiceToggle, :enabled?]},
+           label: "Create Non PO Invoice",
+           icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
+           function: "non_po_invoice_forms_create"
 
   end
 
