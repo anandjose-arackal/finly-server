@@ -204,8 +204,8 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
       lookup :product_type_id, label: "Product Type", choices_scope: Choices[:enum].(ProductType), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.product_type_id}}'), editable: false, required: true, visible: true
       
-      lookup :department_id, label: "Department", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('departments'), computed: Forms::Compute::Form('{{form.department_id}}')
-      lookup :cost_center_id, label: "Cost Center", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('cost_centers'), computed: Forms::Compute::Form('{{form.cost_center_id}}')
+      lookup :items_department_id, label: "Department", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('departments'), computed: Forms::Compute::Form('{{form.department_id}}')
+      lookup :items_cost_center_id, label: "Cost Center", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('cost_centers'), computed: Forms::Compute::Form('{{form.cost_center_id}}')
       
       lookup :category_id, label: "Category", required: true, visible: true, editable: true, choices_scope: Choices[:lookup].('categories'), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.category_id}}')
 
@@ -560,7 +560,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
   # end
 
   condition condition_id: "Disable item department > Item department not for Header Cost Allocation Items" do
-    reference :entity, 'items.department_id'
+    reference :entity, 'items.items_department_id'
     rule Rules::Builder[:cost_allocation_items_value].not_eq(value: 'Header')
     action :visible, true
     action :required, true
@@ -576,7 +576,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
   end
 
   condition condition_id: "Disable item Cost Center > Item Cost Center not for Header Cost Allocation Items" do
-    reference :entity, 'items.cost_center_id'
+    reference :entity, 'items.items_cost_center_id'
     rule Rules::Builder[:cost_allocation_items_value].not_eq(value: 'Header')
     action :visible, true
     action :required, true
