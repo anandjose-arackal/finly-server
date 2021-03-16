@@ -17,6 +17,7 @@ Lookup::Router.draw do
   route 'bbps_billers', Docs::UtilityBills::Billers::Lookup
   route 'users', Masters::Users::Lookup
   route "payment_terms", Masters::PaymentTerms::Lookup
+  route "form_currencies", Masters::FormCurrencies::Lookup
 
   # Docs
   route 'purchase_requests', Docs::P2P::PurchaseRequests::Lookup
