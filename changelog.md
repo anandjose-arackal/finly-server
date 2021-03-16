@@ -4,6 +4,7 @@ beginning of this file.
 
 ## 2021-03-16
   - Updating the authentication flow 
+  - Updating sso config
 
 ## 2021-03-14
   - Updating the sso from request_store adding error messages and sso config movied to procedure
