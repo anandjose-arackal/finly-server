@@ -11,7 +11,9 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     {id: '{{record.id}}',
      args: {procurement_id: '{{record.procurement_id}}',
             procurement_type: "{{record.invoice_type.config_key}}",
-            forms_enabled: "{% if record.invoice_type.config_key == 'non_po_invoice' and record.forms_enabled == true %}{{true}}{% else %}{{ false }}{% endif %}"}
+            
+            # forms_enabled: "{% if record.invoice_type.config_key == 'non_po_invoice' and record.forms_enabled == true %}{{true}}{% else %}{{ false }}{% endif %}"}
+            forms_enabled: "{% if record.forms_enabled == true %}{{true}}{% else %}{{ false }}{% endif %}"}
     }
   end
   custom_fields :invoice

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_04_024552) do
+ActiveRecord::Schema.define(version: 2021_03_01_170315) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -2619,7 +2619,7 @@ ActiveRecord::Schema.define(version: 2021_03_04_024552) do
     t.boolean "is_deleted"
     t.datetime "deleted_at"
     t.string "cost_center_code"
-    t.string "ancestry", collation: "utf8_general_ci"
+    t.string "ancestry"
     t.string "gl_code"
     t.index ["ancestry"], name: "index_cost_centers_on_ancestry"
     t.index ["company_id"], name: "index_cost_centers_on_company_id"
@@ -4172,9 +4172,7 @@ ActiveRecord::Schema.define(version: 2021_03_04_024552) do
     t.index ["associated_transaction_type"], name: "index_finly_transactions_on_associated_transaction_type"
     t.index ["closing_balance_id"], name: "index_finly_transactions_on_closing_balance_id"
     t.index ["company_id"], name: "index_finly_transactions_on_company_id"
-    t.index ["deleted_at"], name: "index_finly_transactions_on_deleted_at"
     t.index ["finly_account_id"], name: "index_finly_transactions_on_finly_account_id"
-    t.index ["finly_account_type", "finly_account_id"], name: "index_transactions_on_account"
     t.index ["finly_account_type"], name: "index_finly_transactions_on_finly_account_type"
     t.index ["opening_balance_id"], name: "index_finly_transactions_on_opening_balance_id"
     t.index ["payment_id"], name: "index_finly_transactions_on_payment_id"

@@ -328,7 +328,6 @@ class Invoice < ApplicationRecord
   # validates :net_amount, presence: true
   # validates :amount, presence: true
 
-
   validates :invoice_number, :format => {with: /\A[a-zA-Z0-9 \\\/\-\#\&]*\Z/, :message => ' can only have letters, numbers, dashes and forward slash and no other special characters'}, :length => {minimum: 0, maximum: 30}, :allow_blank => true
   validate :item_quantity_validation
   validate :item_rate_validation
@@ -1428,7 +1427,9 @@ class Invoice < ApplicationRecord
   end
 
   def forms_enabled
-    NonPoInvoiceToggle.new(RequestStoreUtil.current_user).enabled?
+    feature_flag_enabled = NonPoInvoiceToggle.new(RequestStoreUtil.current_user).enabled?
+    is_non_po_invoice = self.invoice_type.non_po_invoice?
+    feature_flag_enabled && is_non_po_invoice
   end
   private
 
@@ -1750,6 +1751,7 @@ class Invoice < ApplicationRecord
     
     errors.add(:invoice_items, "rate must be greater than 0") if flag
   end
+
   # Syncs amounts from new forms structure to legacy amounts table
   def sync_amounts
     if invoice_gross_amount.present?
