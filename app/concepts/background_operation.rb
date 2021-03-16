@@ -18,6 +18,7 @@ class BackgroundOperation < BaseOperation
       user_id = user_id.id
     end
     request_store_hash = RequestStoreUtil.to_hash
+    puts request_store_hash
     # this calls the super method of Sidekiq::Worker which calls the perfoem method
     super(user_id, params, request_store_hash)
   end
