@@ -51,5 +51,6 @@ class Authenticator::SsoConfig < Transactions::API
       "provider": "google_oauth2",
       'type': "oauth2"
     }
+    sso_configs
   end
 end
