@@ -18,8 +18,6 @@ class BackgroundOperation < BaseOperation
       user_id = user_id.id
     end
     request_store_hash = RequestStoreUtil.to_hash
-    logger = Logger.new(STDOUT)
-    logger.error request_store_hash
     # this calls the super method of Sidekiq::Worker which calls the perfoem method
     super(user_id, params, request_store_hash)
   end
@@ -31,17 +29,23 @@ class BackgroundOperation < BaseOperation
   end
 
   def perform(user_id, params, request_store_hash = nil)
-    logger = Logger.new(STDOUT)
-    logger.error RequestStoreUtil.to_hash
     load_request_store request_store_hash
-    logger.error RequestStoreUtil.to_hash
     if params.present? and params.is_a?(Hash)
       params = params.with_indifferent_access
     end
-    ActsAsTenant.with_tenant RequestStore.store[:current_company] do
-      self.user = User.find_by_id(user_id)
-      self.params = params
-      self.run
+
+    self.params = params
+
+    if RequestStore.store[:current_user]&.class&.name == "AdminUser"
+      ActsAsTenant.without_tenant_if_not_set do
+        self.user = User.find_by_id(user_id)
+        self.run
+      end
+    else
+      ActsAsTenant.with_tenant RequestStore.store[:current_company] do
+        self.user = User.find_by_id(user_id)
+        self.run
+      end
     end
   end
 
