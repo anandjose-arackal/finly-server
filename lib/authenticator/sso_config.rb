@@ -36,7 +36,7 @@ class Authenticator::SsoConfig < Transactions::API
   end
 
   def set_results(options, params:, **)
-    options['result'] = options[:sso_configs].compact
+    options['result'] = options[:sso_configs].compact.flatten
     true
   end
 
