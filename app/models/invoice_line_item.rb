@@ -93,6 +93,8 @@ class InvoiceLineItem < ApplicationRecord
   money :item_net_amount, :get_reporting_currency
   money :item_billable_amount, :get_reporting_currency
 
+  alias_attribute :items_department_id, :department_id
+  alias_attribute :items_cost_center_id, :cost_center_id
   #  item_gross_amount_converted    :decimal(20, 5)
   #  item_discount_amount_converted :decimal(20, 5)
   #  item_taxable_amount_converted  :decimal(20, 5)
