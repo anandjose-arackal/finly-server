@@ -15,6 +15,11 @@ class Forms::API
     @form ||= Form.new(klass_name: self, model: self.model)
   end
 
+  def self.meta(form_meta = NoObject)
+    @meta ||= form_meta unless form_meta == NoObject
+    @meta
+  end
+
   def self.section(section_id, options = {}, &block)
     section = form.sections.new({ section_id: section_id }.merge(options))
     section.instance_eval &block
