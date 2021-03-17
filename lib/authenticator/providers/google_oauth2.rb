@@ -2,7 +2,6 @@ require 'net/http'
 # this class will handle the authentication that needs to be done for users who are logging in using SSO
 # For now this only supports SAML based authentication, but it can support others in the future
 class Authenticator::Providers::GoogleOauth2 < Authenticator::Providers::Base
-  
 
   attr_accessor :username, :user_info
 
@@ -18,11 +17,16 @@ class Authenticator::Providers::GoogleOauth2 < Authenticator::Providers::Base
 
   def authenticate
 
-    code = params[:auth_data].split('&').first.split('?code=').last
+    code = params[:auth_data].split('&').find { |item|
+      item.include?('code=')
+    }&.split('=')&.last
+
+    return false if code.blank?
+
     id_token = get_access_token(code)
+    return false if id_token.blank?
 
     data = JWT.decode(id_token, nil, false).first.with_indifferent_access
-    
 
     self.user_info = {}
     self.user_info[:email] = data[:email]
@@ -36,17 +40,17 @@ class Authenticator::Providers::GoogleOauth2 < Authenticator::Providers::Base
       params[:user] = user
       self.user_info[:email_verified] = data[:email_verified]
 
-      toggel = AuthenticationToggle.new( user )
+      toggel = AuthenticationToggle.new(user)
 
       unless toggel.sso_google_enabled?
         fail_with_event :on_google_oauth, "Google SSO is not enabled for your account."
       end
-      
+
       fail_with_event :on_inactive_user, "User Inactive"
       fail_with_event :on_expired_token, "Token Expired"
 
       # create a session
-      email_verified =  self.user_info[:email_verified]
+      email_verified = self.user_info[:email_verified]
       if email_verified
         self.authenticated_user = unauthenticated_user
       else
@@ -75,7 +79,7 @@ class Authenticator::Providers::GoogleOauth2 < Authenticator::Providers::Base
     end
   end
 
-  def on_google_oauth(message)    
+  def on_google_oauth(message)
     params[:message] = message
     UserSessions::Create.(:failed, params)
   end
@@ -145,6 +149,5 @@ class Authenticator::Providers::GoogleOauth2 < Authenticator::Providers::Base
     id_token = json_value['id_token']
     id_token
   end
-
 
 end
