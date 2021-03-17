@@ -104,8 +104,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       visible: true, required: true, editable: true
 
 
-    dropdown :cost_allocation_items, choices_scope: Choices[:list].({id: false, name: "Header"}, {id: true, name: "Line Item"}),
-             required: true, can_choices_be_changed: false, default_value: 'false'
+    switch :cost_allocation_items, label: 'Cost Allocation (Item Level)', required: true, default_value: false
 
     date :transaction_service_period_from, label: 'Transaction Service Period (From Date)', editable: true, visible: true
     date :transaction_service_period_to, label: 'Transaction Service Period (To Date)', editable: true, visible: true
@@ -562,7 +561,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
   condition condition_id: "Disable item department > Item department not for Header Cost Allocation Items" do
     reference :entity, 'items.items_department_id'
-    rule Rules::Builder[:cost_allocation_items_value].present
+    rule Rules::Builder[:cost_allocation_items].present
     action :visible, true
     action :required, true
     action :editable, true
@@ -570,7 +569,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
   condition condition_id: "Enable item department > Item Cost Center for Header Cost Allocation Items" do
     reference :entity, 'department_id'
-    rule Rules::Builder[:cost_allocation_items_value].present
+    rule Rules::Builder[:cost_allocation_items].present
     action :visible, false
     action :required, false
     action :editable, false
@@ -578,7 +577,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
   condition condition_id: "Disable item Cost Center > Item Cost Center not for Header Cost Allocation Items" do
     reference :entity, 'items.items_cost_center_id'
-    rule Rules::Builder[:cost_allocation_items_value].present
+    rule Rules::Builder[:cost_allocation_items].present
     action :visible, true
     action :required, true
     action :editable, true
@@ -586,7 +585,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
   condition condition_id: "Enable item Cost Center > Item Cost Center for Header Cost Allocation Items" do
     reference :entity, 'cost_center_id'
-    rule Rules::Builder[:cost_allocation_items_value].present
+    rule Rules::Builder[:cost_allocation_items].present
     action :visible, false
     action :required, false
     action :editable, false
