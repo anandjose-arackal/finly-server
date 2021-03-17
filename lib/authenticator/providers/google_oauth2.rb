@@ -21,10 +21,10 @@ class Authenticator::Providers::GoogleOauth2 < Authenticator::Providers::Base
       item.include?('code=')
     }&.split('=')&.last
 
-    return false if code.blank?
+    return if code.blank?
 
     id_token = get_access_token(code)
-    return false if id_token.blank?
+    return if id_token.blank?
 
     data = JWT.decode(id_token, nil, false).first.with_indifferent_access
 
