@@ -205,7 +205,6 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       
       lookup :items_department_id, label: "Department", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('departments')
       lookup :items_cost_center_id, label: "Cost Center", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('cost_centers')
-      text :department_id, editable: false, visible: false, computed: Forms::Compute::Form("{{ form.items_department_id }}")
 
       lookup :category_id, label: "Category", required: true, visible: true, editable: true, choices_scope: Choices[:lookup].('categories'), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.category_id}}')
 
