@@ -7,7 +7,7 @@ class Authenticator::SsoConfig < Transactions::API
   step :set_results
 
   def find_company(options, params:, **)
-    subdomain = params[:subdomain] || self.request.subdomain
+    subdomain = params[:subdomain] || options[:request]&.subdomain
     company = Company.find_by(subdomain: subdomain)
     # company = Company.find_by(id: 2)
     options[:company] = company
@@ -27,8 +27,8 @@ class Authenticator::SsoConfig < Transactions::API
     company = options[:company]
     if company.present?
       user = company.users.first
-      toggel = AuthenticationToggle.new( user )
-      options[:sso_configs] << google_sso_config if toggel.sso_google_enabled?
+      toggle = AuthenticationToggle.new( user )
+      options[:sso_configs] << google_sso_config if toggle.sso_google_enabled?
     else
       options[:sso_configs] << google_sso_config
     end
