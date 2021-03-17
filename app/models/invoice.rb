@@ -1701,6 +1701,7 @@ class Invoice < ApplicationRecord
     end
   end
 
+
   # # in case this invoice is paid or partially paid and the procurement it belongs to has a PO advance that has been initiated
   # # we need to mark that amount in the "paid_amount" attribute of each of the trail items of this invoice
   # # This will only apply in case it's an invoice raised as part of a PO

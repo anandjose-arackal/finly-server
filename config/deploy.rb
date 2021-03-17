@@ -96,7 +96,6 @@ linked_files = %w{
   config/mailtrain.yml
   config/message_template.yml
   config/open_exchange_rates.yml
-
   config/sso_provider_credentials.yml
 }
 case fetch(:stage)

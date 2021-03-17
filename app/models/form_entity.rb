@@ -49,6 +49,7 @@
 #  compute_formula              :text(65535)
 #  filters                      :text(65535)
 #  config_path                  :string(255)
+#  compute_lookup_assignments   :text(65535)
 #
 
 class FormEntity < ApplicationRecord
@@ -99,6 +100,7 @@ class FormEntity < ApplicationRecord
   serialize :choices_scope, JSON
   serialize :config, JSON
   serialize :compute_formula, JSON
+  serialize :compute_lookup_assignments, JSON
 
   scope :root, -> { where parent_id: nil }
   scope :system_fields, -> { where system_field: true }
@@ -150,6 +152,7 @@ class FormEntity < ApplicationRecord
     elsif data[:lookup].present?
       self.compute_type_id = FormEntityComputationType.id_for(:lookup)
       self.compute_formula = data&.dig(:lookup, :formula)
+      self.compute_lookup_assignments = data&.dig(:lookup, :assignments)
       template_reference[:compute_lookup_entity_path] = data&.dig(:lookup, :lookup_entity_path)
     end
   end
@@ -238,6 +241,7 @@ class FormEntity < ApplicationRecord
       compute_type_id: compute_type_id,
       compute_formula: compute_formula,
       compute_lookup_entity_id: compute_lookup_entity_id,
+      compute_lookup_assignments: compute_lookup_assignments,
       filters: filters&.as_store,
       config_path: config_path,
       validations: validations.as_json(opts),
