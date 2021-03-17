@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_01_170315) do
+ActiveRecord::Schema.define(version: 2021_03_16_184554) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -2206,6 +2206,7 @@ ActiveRecord::Schema.define(version: 2021_03_01_170315) do
     t.string "subdomain"
     t.integer "group_id"
     t.datetime "deleted_at"
+    t.string "reporting_currency_code", default: "INR"
   end
 
   create_table "company_account_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -2598,7 +2599,7 @@ ActiveRecord::Schema.define(version: 2021_03_01_170315) do
     t.boolean "is_deleted"
     t.datetime "deleted_at"
     t.string "cost_center_code"
-    t.string "ancestry"
+    t.string "ancestry", collation: "utf8_general_ci"
     t.string "gl_code"
     t.index ["ancestry"], name: "index_cost_centers_on_ancestry"
     t.index ["company_id"], name: "index_cost_centers_on_company_id"
@@ -4314,7 +4315,9 @@ ActiveRecord::Schema.define(version: 2021_03_01_170315) do
     t.index ["associated_transaction_type"], name: "index_finly_transactions_on_associated_transaction_type"
     t.index ["closing_balance_id"], name: "index_finly_transactions_on_closing_balance_id"
     t.index ["company_id"], name: "index_finly_transactions_on_company_id"
+    t.index ["deleted_at"], name: "index_finly_transactions_on_deleted_at"
     t.index ["finly_account_id"], name: "index_finly_transactions_on_finly_account_id"
+    t.index ["finly_account_type", "finly_account_id"], name: "index_transactions_on_account"
     t.index ["finly_account_type"], name: "index_finly_transactions_on_finly_account_type"
     t.index ["opening_balance_id"], name: "index_finly_transactions_on_opening_balance_id"
     t.index ["payment_id"], name: "index_finly_transactions_on_payment_id"
@@ -4424,6 +4427,19 @@ ActiveRecord::Schema.define(version: 2021_03_01_170315) do
     t.index ["uuid"], name: "index_form_conditions_on_uuid"
   end
 
+  create_table "form_currencies", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.string "currency"
+    t.string "currency_code"
+    t.string "symbol"
+    t.integer "company_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "deleted_at"
+    t.index ["company_id"], name: "index_form_currencies_on_company_id"
+    t.index ["created_at"], name: "index_form_currencies_on_created_at"
+    t.index ["updated_at"], name: "index_form_currencies_on_updated_at"
+  end
+
   create_table "form_custom_fields", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "uuid", limit: 36, null: false
     t.string "document_type"
@@ -4495,6 +4511,7 @@ ActiveRecord::Schema.define(version: 2021_03_01_170315) do
     t.text "compute_formula"
     t.text "filters"
     t.string "config_path"
+    t.text "compute_lookup_assignments"
     t.index ["company_id"], name: "index_form_entities_on_company_id"
     t.index ["created_at"], name: "index_form_entities_on_created_at"
     t.index ["created_by_user_id"], name: "index_form_entities_on_created_by_user_id"
@@ -5919,10 +5936,10 @@ ActiveRecord::Schema.define(version: 2021_03_01_170315) do
     t.datetime "deleted_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.text "pmml"
     t.string "form_id"
     t.string "parent_id"
     t.string "parent_type"
+    t.text "pmml", size: :long
     t.index ["built_at"], name: "index_ml_models_on_built_at"
     t.index ["company_id"], name: "index_ml_models_on_company_id"
     t.index ["created_at"], name: "index_ml_models_on_created_at"
@@ -8151,6 +8168,8 @@ ActiveRecord::Schema.define(version: 2021_03_01_170315) do
     t.string "finly_sso_path"
     t.string "label"
     t.datetime "deleted_at"
+    t.string "sso_type", default: ""
+    t.string "logo", default: ""
     t.index ["company_id"], name: "index_single_sign_on_configurations_on_company_id"
   end
 
