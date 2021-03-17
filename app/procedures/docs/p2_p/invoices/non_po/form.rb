@@ -104,8 +104,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       visible: true, required: true, editable: true
 
 
-    dropdown :cost_allocation_items, choices_scope: Choices[:list].({id: "Header", name: "Header"}, {id: "Line Item", name: "Line Item"}),
-             required: true, can_choices_be_changed: false, default_value: 'false'
+    switch :cost_allocation_items, label: 'Cost Allocation (Item Level)', required: true, default_value: false
 
     date :transaction_service_period_from, label: 'Transaction Service Period (From Date)', editable: true, visible: true
     date :transaction_service_period_to, label: 'Transaction Service Period (To Date)', editable: true, visible: true
@@ -127,13 +126,13 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
     date :conversion_date, label: "Conversion Date", editable: false, visible: true,
          computed: Forms::Compute::Form('{{form.date}}')
 
-    currency :reporting_currency, label: "Reporting Currency", editable: false, visible: true,
+    text :reporting_currency, label: "Reporting Currency", editable: false, visible: true,
             can_editable_be_changed: false # todo populate with system base currency
 
-    currency :base_currency, label: "Base Currency", visible: true, editable: true
+    lookup :base_currency, label: "Base Currency", choices_scope: Choices[:lookup].('form_currencies'), visible: true, editable: true
 
     switch :retrieve_conversion_rate, label: "Auto Populate Conversion Rate", default_value: true, visible: false
-    number :conversion_rate, editable: true, format: 'decimal', default_value: 1, visible: true
+    number :conversion_rate, editable: true, format: 'decimal', default_value: 1,computed: Forms::Compute::Lookup('base_currency', '{{ record.currency_conversion_rate }}'), visible: true
     # date :transaction_service_period_from, label: 'Transaction Period From'
     # date :transaction_service_period_to, label: 'Transaction Period To'
     large_text :narration, label: "Narration"
@@ -210,7 +209,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
       lookup :items_department_id, label: "Department", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('departments')
       lookup :items_cost_center_id, label: "Cost Center", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('cost_centers')
-      
+
       lookup :category_id, label: "Category", required: true, visible: true, editable: true, choices_scope: Choices[:lookup].('categories'), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.category_id}}')
 
       text :gl_code, label: "GL Code", editable: false, visible: false, computed: Forms::Compute::Lookup('items.category_id', '{{record.gl_code}}')
@@ -238,7 +237,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_editable_be_changed: false,
              can_visible_be_changed: false,
              required: true, visible: true, editable: true,
-             computed: Forms::Compute::Form('{{ items.item_rate | divided_by: form.conversion_rate | round: 2 }}')
+             computed: Forms::Compute::Form('{{ items.item_rate | divided_by: form.conversion_rate | default: 0 | round: 2 }}')
              # computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.rate | default: 0}}')
 
       # gross_amount = rate x quantity
@@ -565,7 +564,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
   condition condition_id: "Disable item department > Item department not for Header Cost Allocation Items" do
     reference :entity, 'items.items_department_id'
-    rule Rules::Builder[:cost_allocation_items_value].not_eq(value: 'Header')
+    rule Rules::Builder[:cost_allocation_items].eq_any(value: true)
     action :visible, true
     action :required, true
     action :editable, true
@@ -573,7 +572,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
   condition condition_id: "Enable item department > Item Cost Center for Header Cost Allocation Items" do
     reference :entity, 'department_id'
-    rule Rules::Builder[:cost_allocation_items_value].not_eq(value: 'Header')
+    rule Rules::Builder[:cost_allocation_items].eq_any(value: true)
     action :visible, false
     action :required, false
     action :editable, false
@@ -581,7 +580,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
   condition condition_id: "Disable item Cost Center > Item Cost Center not for Header Cost Allocation Items" do
     reference :entity, 'items.items_cost_center_id'
-    rule Rules::Builder[:cost_allocation_items_value].not_eq(value: 'Header')
+    rule Rules::Builder[:cost_allocation_items].eq_any(value: true)
     action :visible, true
     action :required, true
     action :editable, true
@@ -589,7 +588,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
   condition condition_id: "Enable item Cost Center > Item Cost Center for Header Cost Allocation Items" do
     reference :entity, 'cost_center_id'
-    rule Rules::Builder[:cost_allocation_items_value].not_eq(value: 'Header')
+    rule Rules::Builder[:cost_allocation_items].eq_any(value: true)
     action :visible, false
     action :required, false
     action :editable, false

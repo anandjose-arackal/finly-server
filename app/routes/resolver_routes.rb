@@ -20,6 +20,9 @@ Resolver::Router.draw do
   end
 
   # Masters
+  scope :form_currencies do
+    route 'default', Masters::FormCurrencies::Resolver
+  end
   scope :departments do
     route 'default', Masters::Departments::Resolver
   end

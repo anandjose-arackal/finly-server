@@ -70,9 +70,7 @@ class Procurements::Invoices::Create < Procurements::Invoices::Base
 
     self.invoice.payment_term_days = vendor&.payment_term&.days_after.to_i
     self.invoice.due_date = Date.today + vendor&.payment_term&.days_after.to_i.days
-    self.invoice.reporting_currency = 'INR'
-    self.invoice.base_currency = self.invoice.reporting_currency
-    self.invoice.conversion_rate = 1
+    self.invoice.reporting_currency = user.company.reporting_currency_code
     self.invoice.rcm_enabled = vendor.rcm_enabled
     if self.vendor.payment_term_id.present?
       self.invoice.payment_term_id = self.vendor.payment_term_id
