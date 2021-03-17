@@ -9,6 +9,7 @@ class Authenticator::SsoConfig < Transactions::API
   def find_company(options, params:, **)
     subdomain = params[:subdomain] || self.request.subdomain
     company = Company.find_by(subdomain: subdomain)
+    # company = Company.find_by(id: 2)
     options[:company] = company
     true
   end
@@ -17,8 +18,8 @@ class Authenticator::SsoConfig < Transactions::API
     options[:sso_configs] = []
     if options[:company].present?
       sso_configs = options[:company].single_sign_on_configurations
+      options[:sso_configs] << sso_configs
     end
-    options[:sso_configs] << sso_configs
     true
   end
 
@@ -36,7 +37,7 @@ class Authenticator::SsoConfig < Transactions::API
   end
 
   def set_results(options, params:, **)
-    options['result'] = options[:sso_configs].compact
+    options['result'] = options[:sso_configs].compact.flatten
     true
   end
 
@@ -49,7 +50,8 @@ class Authenticator::SsoConfig < Transactions::API
       'auth_url': "https://accounts.google.com/o/oauth2/auth?response_type=code&state=&client_id=#{client_id}&scope=email&redirect_uri=#{redirect_uri}",
       'label': "Google",
       "provider": "google_oauth2",
-      'type': "oauth2"
+      'sso_type': "oauth2"
     }
+    sso_configs
   end
 end

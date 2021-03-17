@@ -51,7 +51,7 @@ Gatekeeper::Checker.new 'On Web Authentication' do
         
           user = RequestStoreUtil.current_session.user
           toggel = AuthenticationToggle.new(user)
-          next if RequestStoreUtil.current_session.access_token.authentication_type == "sso" && toggel.sso_2fa_enabled?
+          next if RequestStoreUtil.current_session.access_token.authentication_type == "sso" && !toggel.sso_2fa_enabled?
 
           require_otp true
         end
@@ -94,7 +94,7 @@ Gatekeeper::Checker.new 'On Web Authentication' do
 
         user = RequestStoreUtil.current_session.user
         toggel = AuthenticationToggle.new(user)
-        next if RequestStoreUtil.current_session.access_token.authentication_type == "sso" && toggel.sso_2fa_enabled?
+        next if RequestStoreUtil.current_session.access_token.authentication_type == "sso" && !toggel.sso_2fa_enabled?
 
         require_otp true
       end
@@ -127,7 +127,7 @@ Gatekeeper::Checker.new 'On Web Authentication' do
         
         user = RequestStoreUtil.current_session.user
         toggel = AuthenticationToggle.new(user)
-        next if RequestStoreUtil.current_session.access_token.authentication_type == "sso" && toggel.sso_2fa_enabled?
+        next if RequestStoreUtil.current_session.access_token.authentication_type == "sso" && !toggel.sso_2fa_enabled?
 
         require_otp true
       end
