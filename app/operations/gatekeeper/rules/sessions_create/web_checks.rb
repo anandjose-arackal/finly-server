@@ -44,9 +44,14 @@ Gatekeeper::Checker.new 'On Web Authentication' do
         end
 
         rule 'Unverified devices need to be verified before proceeding' do
+
           next unless RequestStoreUtil.current_user_device.status_id == UserDeviceStatus.id_for(:unverified)
           policy = RequestStoreUtil.security_policy
           next unless policy.browser_client.otp_verify?
+        
+          user = RequestStoreUtil.current_session.user
+          toggel = AuthenticationToggle.new(user)
+          next if RequestStoreUtil.current_session.access_token.authentication_type == "sso" && !toggel.sso_2fa_enabled?
 
           require_otp true
         end
@@ -87,6 +92,10 @@ Gatekeeper::Checker.new 'On Web Authentication' do
         policy = RequestStoreUtil.security_policy
         next unless policy.browser_ip.otp_verify?
 
+        user = RequestStoreUtil.current_session.user
+        toggel = AuthenticationToggle.new(user)
+        next if RequestStoreUtil.current_session.access_token.authentication_type == "sso" && !toggel.sso_2fa_enabled?
+
         require_otp true
       end
 
@@ -115,6 +124,11 @@ Gatekeeper::Checker.new 'On Web Authentication' do
 
         policy = RequestStoreUtil.security_policy
         next unless policy.browser_user_agent.otp_verify?
+        
+        user = RequestStoreUtil.current_session.user
+        toggel = AuthenticationToggle.new(user)
+        next if RequestStoreUtil.current_session.access_token.authentication_type == "sso" && !toggel.sso_2fa_enabled?
+
         require_otp true
       end
     end

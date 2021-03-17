@@ -329,6 +329,8 @@ class Invoice < ApplicationRecord
   # validates :amount, presence: true
 
   validates :invoice_number, :format => { with: /\A[a-zA-Z0-9 \\\/\-\#\&]*\Z/, :message => ' can only have letters, numbers, dashes and forward slash and no other special characters' }, :length => { minimum: 0, maximum: 30 }, :allow_blank => true
+  validate :item_quantity_validation
+  validate :item_rate_validation
 
   before_destroy :rollback_agreement_invoice
 
@@ -1699,6 +1701,7 @@ class Invoice < ApplicationRecord
     end
   end
 
+
   # # in case this invoice is paid or partially paid and the procurement it belongs to has a PO advance that has been initiated
   # # we need to mark that amount in the "paid_amount" attribute of each of the trail items of this invoice
   # # This will only apply in case it's an invoice raised as part of a PO
@@ -1802,6 +1805,28 @@ class Invoice < ApplicationRecord
     # New Structure
     # invoice_sub_total_amount => old structure net_amount
     # invoice_net_total_amount: invoice_total_amount - invoice_paid_outside_amount - invoice_advance_paid_amount
+  end
+
+  def item_quantity_validation
+    flag = false
+    quantities = invoice_items.map(&:quantity).map(&:to_f)
+    quantities.each do |quantity|
+      flag = true if quantity <= 0
+      break
+    end
+
+    errors.add(:invoice_items, "quantity must be greater than 0") if flag
+  end
+
+  def item_rate_validation
+    flag = false
+    rates = invoice_items.map(&:rate).map(&:to_f)
+    rates.each do |rate|
+      flag = true if rate <= 0
+      break
+    end
+
+    errors.add(:invoice_items, "rate must be greater than 0") if flag
   end
 
 end

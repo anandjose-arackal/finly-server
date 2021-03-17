@@ -80,6 +80,12 @@ gem 'slack-notifier', '~> 2.3'
 # gems for quickbooks integration
 gem 'omniauth', '~> 1.9.0'
 gem 'omniauth-quickbooks', '~> 0.0.2'
+gem 'omniauth-google-oauth2', '~> 0.8.1'
+gem 'google-api-client', '~> 0.53.0'
+gem 'google-id-token', '~> 1.4.2'
+
+
+
 gem 'quickbooks-ruby', git: 'https://github.com/ruckus/quickbooks-ruby.git', ref: '22c8df58bbed441207f3d0d8ac5a786cdb4821a5'
 
 # gem 'finly-secure_storage-sdk', git: 'git@bitbucket.org:vivek_a17/finly-secure_storage-sdk.git'
@@ -111,7 +117,7 @@ gem 'will_paginate', '~> 3.1.6'
 gem 'hutch', '~> 1.0'
 
 gem 'jwt', '~> 2.2'
-
+  
 # gem for jquery ui in rails app
 gem 'jquery-ui-rails', '~> 6.0.1'
 

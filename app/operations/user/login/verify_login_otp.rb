@@ -24,7 +24,7 @@ class User::Login::VerifyLoginOtp < BaseOperation
       return
     end
     unless selected_user
-      add_message :error, 'User not found'
+      add_message :error, 'Invalid OTP'
       return
     end
     # adding validation to check if the OTP has been checked more than 3 times since being sent
@@ -34,7 +34,7 @@ class User::Login::VerifyLoginOtp < BaseOperation
       return
     end
     unless selected_user.otp == params[:otp]
-      add_message :error, 'Wrong OTP entered. Please enter the OTP sent to your mobile number'
+      add_message :error, 'Invalid OTP'
       selected_user.update_attribute(:otp_attempts, (selected_user.otp_attempts + 1))
       return
     end

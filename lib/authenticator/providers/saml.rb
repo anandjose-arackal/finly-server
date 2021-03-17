@@ -1,13 +1,13 @@
 # this class will handle the authentication that needs to be done for users who are logging in using SSO
 # For now this only supports SAML based authentication, but it can support others in the future
-class Authenticator::Providers::Sso < Authenticator::Providers::Base
+class Authenticator::Providers::Saml < Authenticator::Providers::Base
 
   attr_accessor :username, :sso_response, :sso_config_id, :company_id
 
   def self.accept?(request)
     scopes = request.params[:scope]
     scopes = [scopes] unless scopes.respond_to?(:each)
-    scopes&.size == 1 and ["web", "mobile", "chrome", "api"].include?(scopes&.first) and RequestStore.store[:sso]
+    scopes&.size == 1 and ["web", "mobile", "chrome", "api"].include?(scopes&.first) and RequestStore.store[:sso] and RequestStore.store[:saml]
   end
 
   def model
