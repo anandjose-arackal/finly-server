@@ -175,7 +175,7 @@ class Invoice < ApplicationRecord
   money :invoice_balance_due, :get_reporting_currency
 
   def get_reporting_currency
-    Currency.currency_for(self.reporting_currency || "INR")
+    Currency.currency_for(self.company.reporting_currency_code)
   end
 
   def get_base_currency
@@ -1735,18 +1735,6 @@ class Invoice < ApplicationRecord
   def sync_amounts
     if invoice_gross_amount.present?
 
-      exchange_base_currency = get_base_currency&.country_code || "INR"
-      # Multi currency implementation
-      self.reporting_invoice_gross_amount = invoice_gross_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      self.reporting_invoice_discount_amount = invoice_discount_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      self.reporting_invoice_tax_amount = invoice_tax_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      self.reporting_invoice_tds_amount = invoice_tds_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      self.reporting_invoice_sub_total_amount = invoice_sub_total_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      self.reporting_invoice_total_amount = invoice_total_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      self.reporting_invoice_taxable_amount = invoice_taxable_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      self.reporting_invoice_roundoff_amount = invoice_roundoff_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      self.reporting_invoice_balance_due = invoice_balance_due_money.exchange_to(exchange_base_currency).amount rescue 0
-
       self.skip_callback = true
       amounts_attributes_map.each do |key, value|
         amount_value = self.send(key)
@@ -1774,23 +1762,22 @@ class Invoice < ApplicationRecord
   end
 
   def amounts_attributes_map
-    # todo - I2P change it to converted values post multicurrency setup
     {
-      invoice_gross_amount: 'amount_id',
-      invoice_discount_amount: 'discount_amount_id',
-      invoice_taxable_amount: 'gross_amount_id',
-      invoice_tax_amount: 'tax_amount_id',
-      invoice_tds_amount: 'tds_amount_id',
-      invoice_advance_paid_amount: 'advance_amount_id',
-      invoice_sub_total_amount: 'net_amount_id',
-      invoice_balance_due: 'balance_due_id',
-      invoice_freight_amount: 'freight_amount_id'
+      reporting_invoice_gross_amount: 'amount_id',
+      reporting_invoice_discount_amount: 'discount_amount_id',
+      reporting_invoice_taxable_amount: 'gross_amount_id',
+      reporting_invoice_tax_amount: 'tax_amount_id',
+      reporting_invoice_tds_amount: 'tds_amount_id',
+      reporting_invoice_advance_paid_amount: 'advance_amount_id',
+      reporting_invoice_sub_total_amount: 'net_amount_id',
+      reporting_invoice_balance_due: 'balance_due_id',
+      reporting_invoice_freight_amount: 'freight_amount_id'
     }
   end
 
   def amount_direct_attribute_map
     {
-      invoice_roundoff_amount: 'roundoff_amount'
+      reporting_invoice_roundoff_amount: 'roundoff_amount'
     }
 
     # Invoice amount meanings. Picked from Invoice Calculation Utils
