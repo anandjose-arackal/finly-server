@@ -28,7 +28,6 @@ json.trail do
         json.id item&.created_by&.id
         json.name item&.created_by&.name
         json.email item&.created_by&.email
-        json.forms_enabled item&.forms_enabled
       elsif item.is_a?(Payment)
 
       else
@@ -56,6 +55,7 @@ json.trail do
         json.proforma_advance item.proforma_advance&.value
         json.amount item.balance_due&.value
         json.inv_number item.invoice_number
+        json.forms_enabled item.forms_enabled
         json.status do
           json.id item.invoice_status&.id
           json.name item.invoice_status&.name
@@ -71,6 +71,7 @@ json.trail do
       json.invoice_details do
         json.amount item.balance_due&.value
         json.inv_number item.invoice_number
+        json.forms_enabled item.forms_enabled
         json.status do
           json.id item.invoice_status&.id
           json.name item.invoice_status&.name
