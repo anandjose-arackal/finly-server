@@ -27,7 +27,6 @@ config/bbps_config.yml
 config/web_client.yml
 config/icici_prepaid_card.yml
 config/finly_macros.yml
-config/open_exchange_rates.yml
 public/*
 public/system/import_job/*
 config/feature_flipper.yml
@@ -111,4 +110,6 @@ config/integrations.yml
 /yarn-error.log
 yarn-debug.log*
 .yarn-integrity
+/config/sso_provider_credentials.yml
+
 storage/

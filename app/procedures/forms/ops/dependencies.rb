@@ -52,6 +52,7 @@ class Forms::Ops::Dependencies < Transactions::API
       lookup_json.each_pair do |key, value|
         json["lookup_#{key}"] = value
       end
+      json['assignments'] = entity.compute_lookup_assignments
       dependencies[:lookup_computations] << json
     end
   end

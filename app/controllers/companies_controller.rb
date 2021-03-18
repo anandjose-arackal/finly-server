@@ -28,20 +28,8 @@ class CompaniesController < BaseControllers::WebBase
   end
 
   def single_sign_on_configs
-    subdomain = params[:subdomain] || self.request.subdomain
-    company = Company.find_by(subdomain: subdomain)
-    # if Rails.env.production?
-    #   company = Company.find_by_sub_domain(subdomain)
-    # else
-    #   company = Company.first
-    # end
-    # company = Company.second
-    if company.blank?
-      # redirect to the login page, because they don't have any configurations
-      @sso_configs = []
-      return
-    end
-    @sso_configs = company.single_sign_on_configurations
+    @op = Authenticator::SsoConfig.({ params: params.to_unsafe_h, request: self.request })
+    @sso_configs = @op['result']
   end
 
   protected

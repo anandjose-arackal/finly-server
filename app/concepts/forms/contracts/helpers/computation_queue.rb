@@ -37,7 +37,7 @@ class Forms::Contracts::Helpers::ComputationQueue
       represented_list.each do |represented|
         form = represented.contract_root.form_data
         row = represented.form_data
-        lookup_value = Forms::RequestParser.new(form: form, row: row).fetch(entity.compute_lookup_entity.entity_path)
+        lookup_value = Forms::RequestParser.new(form: form, row: row, meta: represented.contract_root.model.form_metadata).fetch(entity.compute_lookup_entity.entity_path)
         return unless lookup_value.present?
 
         lookup_values[represented] = lookup_value
@@ -72,7 +72,7 @@ class Forms::Contracts::Helpers::ComputationQueue
       represented_list.each do |represented|
         form = contract.form_data
         row = represented.form_data
-        value = transformer.render({row: row, form: form}.as_json)
+        value = transformer.render({row: row, form: form, meta: contract.model.form_metadata}.as_json)
         puts "*********************************** COMPUTATION"
         # puts "ENTITY: #{entity.entity_key}\nVALUE: #{value.inspect}\nFORMULA: #{entity.compute_formula}"
         # puts "ENTITY: #{entity.entity_key}\nFORM : #{form.inspect}\n ROW: #{row.inspect}\n VALUE: #{value.inspect}\nFORMULA: #{entity.compute_formula}"
