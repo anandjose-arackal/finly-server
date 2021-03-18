@@ -28,6 +28,7 @@ json.trail do
         json.id item&.created_by&.id
         json.name item&.created_by&.name
         json.email item&.created_by&.email
+        json.forms_enabled item&.forms_enabled
       elsif item.is_a?(Payment)
 
       else
