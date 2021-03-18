@@ -209,9 +209,9 @@ class UpdateTenants
       end
 
       # 367776
-      InvoiceLineItem.includes(:invoice).find_in_batches(batch_size: 1000) do |records|
+      InvoiceLineItem.includes(:parent).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
-          record.company_id = record.invoice&.company_id
+          record.company_id = record.parent&.company_id
         end
         InvoiceLineItem.import records, on_duplicate_key_update: [:company_id], validate: false
       end
