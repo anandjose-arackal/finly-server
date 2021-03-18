@@ -2,12 +2,11 @@ class NonPoInvoiceMigrator
   def self.perform(company_id)
 
     result = []
-
     company = Company.find company_id
     documents = Invoice.where(invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)).where(company_id: company.id)
+    # documents = Invoice.where(id: 10651).where(company_id: company.id)
 
     form = Form.where(klass_name: 'Docs::P2P::Invoices::NonPo::Form', company_id: company_id).first
-
     documents.find_in_batches(batch_size: 1000) do |batch|
       batch.each do |document|
 
@@ -17,141 +16,241 @@ class NonPoInvoiceMigrator
           if form_custom_field.present?
             form_custom_field.update(form_entity_id: entity.id, entity_type: entity.entity_type, form_id: form.id)
           else
-            FormCustomField.new({form_entity_id: entity.id, field_key: entity.entity_key, entity_type: entity.entity_type, document_type: document.class.name, document_id: document.id, form_id: form.id}).save
+            FormCustomField.new({
+              form_entity_id: entity.id, field_key: entity.entity_key,
+              entity_type: entity.entity_type, document_type: document.class.name,
+              document_id: document.id, form_id: form.id}
+              ).save
           end
         end
 
         # Migrate Custom Fields
-        document.custom_fields.each do |custom_field|
-          field_name = custom_field.field_configuration.field_name
-
-          form_custom_field = document.form_custom_fields.where(field_key: field_name).order(updated_at: :asc).last
-          if form_custom_field.present?
-            if form_custom_field&.form_entity&.entity_type == "text"
-              form_custom_field.value = custom_field.value&.value
-              form_custom_field.save
-            elsif form_custom_field&.form_entity&.entity_type == "dropdown"
-              custom_field_value = custom_field.value&.value&.name
-              selection = form_custom_field&.form_entity&.choices&.where(name: custom_field_value).first
-
-              # A selection with the same name as of custom field selection is found
-              if selection.present?
-                if form_custom_field&.selection.present?
-                  # If form custom field selection is already there, then update it
-                  form_custom_field.selection.update(form_entity_choice_id: selection.uuid)
-                else
-                  # If form custom field doesn't have a selection then create a new selection
-                  CustomFieldSelection.create(form_entity_choice_id: selection.uuid, form_custom_field_id: form_custom_field.uuid)
-                end
-              end
-            end
-          end
-        end
-
+        update_custome_fields document
+        
         # First migrate invoice line items
-        document.items.each do |item|
-          update_params = {
-              item_gross_amount: item.amount.value,
-              reporting_item_gross_amount: item.amount.value,
-              item_discount_amount: item.discount,
-              reporting_item_discount_amount: item.discount,
-              item_taxable_amount: item.taxable_amount.value,
-              reporting_item_taxable_amount: item.taxable_amount.value,
-              item_net_amount: item.net_amount.value,
-              reporting_item_net_amount: item.net_amount.value,
-              item_billable_amount: item&.billable_amount&.value,
-              reporting_item_billable_amount: item&.billable_amount&.value,
-
-              # tds amount
-              item_tds_amount: 0,
-              reporting_item_tds_amount: 0
-          }
-
-          item.update_columns(update_params)
-        end
+        update_item document
 
         # Migrate Invoice Data
-        update_params = {
-            # For the existing customers the base currency & reporting currency shall be 'INR'
-            # ACCOUNTING DETAILS
-            base_currency: "INR",
-            reporting_currency: "INR",
-            conversion_date: document.created_at.to_date,
-            retrieve_conversion_rate: true,
-
-            # INVOICING DETAILS
-            payment_term_days: document&.payment_term&.days_after,
-            conversion_rate: 1,
-
-            # VENDOR DETAILS
-            vendor_sequence_id: document&.vendor&.vendor_id,
-            vendor_trade_name: document&.vendor&.trade_name,
-            vendor_country: document&.vendor&.vendor_country,
-            vendor_pan: document&.vendor&.pan,
-            vendor_bank_account_number: document&.receiving_account&.account_number,
-            vendor_bank_account_ifsc: document&.receiving_account&.ifsc,
-            vendor_gstin: document&.gstin_location&.gstin,
-            vendor_bank_account_swift_code: document.receiving_account&.swift_code,
-
-
-            # Amount Related Fields # todo - I2P check if amounts are getting saved properly
-            invoice_gross_amount: document&.amount&.value,
-            reporting_invoice_gross_amount: document&.amount&.value,
-            invoice_discount_amount: document&.discount_amount&.value,
-            reporting_invoice_discount_amount: document&.discount_amount&.value,
-            invoice_taxable_amount: document&.gross_amount&.value,
-            reporting_invoice_taxable_amount: document&.gross_amount&.value,
-            invoice_tax_amount: document&.tax_amount&.value,
-            reporting_invoice_tax_amount: document&.tax_amount&.value,
-            invoice_tds_amount: document&.tds_amount&.value,
-            reporting_invoice_tds_amount: document&.tds_amount&.value,
-            invoice_paid_outside_amount: 0,
-            reporting_invoice_paid_outside_amount: 0,
-            invoice_sub_total_amount: document&.net_amount&.value,
-            reporting_invoice_sub_total_amount: document&.net_amount&.value,
-            invoice_total_amount: document&.net_amount&.value,
-            reporting_invoice_total_amount: document&.net_amount&.value,
-            invoice_freight_amount: document&.freight_amount&.value,
-            reporting_invoice_freight_amount: document&.freight_amount&.value,
-            invoice_roundoff_amount: document&.roundoff_amount,
-            reporting_invoice_roundoff_amount: document&.roundoff_amount,
-            invoice_balance_due: document&.balance_due&.value,
-            reporting_invoice_balance_due: document&.balance_due&.value
-
-        }
-
-        document.update_columns(update_params)
-
+        update_invoice_details document
+        
         # Migrate Attachments
-        document.invoice_attachments.each do |old_attachment|
-          relevant_custom_field = document.form_custom_fields.where(field_key: 'invoice_attachments')
+        update_invoice_attachments document
 
-          if relevant_custom_field.present?
-            new_attachment = relevant_custom_field.attachments.new
+      end
+    end
+    # Todo - I2P:
+    # Log and output file for future reference; Will be useful in case data is not migrated properly
+  end
 
-            if Rails.env.production?
-              begin
-                new_attachment.attachment = old_attachment.attached_file
-                new_attachment.save
-              rescue Paperclip::AdapterRegistry::NoHandlerError => e
-                attachment_error = "Company #{company.id} \n Document Type: #{document.class.name} \n Document ID: #{document.id} \n Attachment ID : #{old_attachment.id} \n Attachment Type: #{old_attachment.attachment_type} \n\n"
-                puts attachment_error
-                result.push(attachment_error)
-              end
+  def self.update_custome_fields document
+    document.custom_fields.each do |custom_field|
+      field_name = custom_field.field_configuration.field_name
+
+      form_custom_field = document.form_custom_fields.where(field_key: field_name).order(updated_at: :asc).last
+
+      if form_custom_field.present?
+        if form_custom_field&.form_entity&.entity_type == "text"
+          form_custom_field.value = custom_field.value&.value
+          form_custom_field.save
+
+        elsif form_custom_field&.form_entity&.entity_type == "dropdown"
+          custom_field_value = custom_field.value&.value&.name
+          selection = form_custom_field&.form_entity&.choices&.where(name: custom_field_value).first
+          # A selection with the same name as of custom field selection is found
+          if selection.present?
+            if form_custom_field&.selection.present?
+              # If form custom field selection is already there, then update it
+              form_custom_field.selection.update(form_entity_choice_id: selection.uuid)
             else
-              file_path = Rails.root.to_s + "/public" + old_attachment.attached_file.url(:original, false)
-              file = File.open(file_path) rescue nil
-
-              if file.present?
-                new_attachment.attachment = old_attachment.attached_file
-                new_attachment.save
-              end
+              # If form custom field doesn't have a selection then create a new selection
+              CustomFieldSelection.create(form_entity_choice_id: selection.uuid, form_custom_field_id: form_custom_field.uuid)
             end
           end
         end
       end
     end
-    # Todo - I2P:
-    # Log and output file for future reference; Will be useful in case data is not migrated properly
+  end
+
+  def self.update_item document
+    #MAPPING
+    document.items.each do |item|
+      update_params = {
+
+        # quantity: item.quantity,
+        # inventory_line_item_id: item.inventory_line_item_id,
+        # category_id: item&.category_id,
+        # tds_applicable: item&.tds_applicable,
+        # description: item.description,
+        # comment: ,
+        # gl_code: item.gl_code,
+        # hsn_sac: item.hsn_sac,
+        # unit_of_measurement: item.unit_of_measurement,
+        # rate: item.rate,
+        # discount: item.discount,
+        # tax_rate_id: item.tax_rate_id,
+        # tax_percentage: item.tax_percentage,
+        # item_number: item.item_number,
+        
+        items_department_id: item&.department_id,
+        items_cost_center_id: item&.cost_center_id,
+        product_type_id: item&.inventory_line_item&.product_type_id,
+        item_rate: item&.rate,
+        item_tds_amount: 0,
+        reporting_item_tds_amount: 0,
+        item_gross_amount: item&.amount&.value.to_f,
+        reporting_item_gross_amount: item&.amount&.value.to_f,
+        item_discount_amount: item&.discount_amount&.value.to_f,
+        reporting_item_discount_amount: item&.discount_amount&.value.to_f,
+        item_taxable_amount: item&.taxable_amount&.value.to_f,
+        reporting_item_taxable_amount: item&.taxable_amount&.value.to_f,
+        item_tax_amount: item.tax_amount&.value.to_f,
+        reporting_item_tax_amount: item.tax_amount&.value.to_f,
+        item_net_amount: item&.net_amount&.value.to_f,
+        reporting_item_net_amount: item&.net_amount&.value.to_f,
+        item_billable_amount: item&.billable_amount&.value.to_f,
+        reporting_item_billable_amount: item&.billable_amount&.value.to_f
+      }
+
+      item.update_columns(update_params)
+    end
+  end
+
+  def self.update_invoice_details document
+    update_params = {
+
+      base_currency: 'INR',
+      reporting_currency: 'INR',
+      conversion_rate: 1,
+      retrieve_conversion_rate: true,
+
+      # invoice_status_id: document&.invoice_status_id,
+      # invoice_id: document&.invoice_id,
+      # invoice_number: document&.invoice_number,
+      # date: document&.date,
+      # payment_term_id: document&.payment_term_id ,
+      # due_date: document&.due_date,
+      # cost_allocation_items: document&.cost_allocation_items,
+      # transaction_service_period_from: document&.transaction_service_period_from,
+      # transaction_service_period_to: document&.transaction_service_period_to ,
+      # policy_id: document&.policy_id,
+      # department_id: document&.department_id,
+      # cost_center_id: document&.cost_center_id,
+      # discount_type_id: document&.discount_type_id,
+      # narration: document&.narration,
+      # vendor_id: document&.invoice_id,
+
+      payment_term_days: document&.payment_term&.days_after,
+      tax_type_id: document&.gst_type_id,
+      conversion_date: document&.created_at&.to_date,
+
+      # VENDOR DETAILS
+      vendor_country: document&.vendor&.vendor_country,
+      vendor_trade_name: document&.vendor&.business_name || document&.vendor&.name,
+      vendor_sequence_id: document&.vendor&.vendor_id,
+      vendor_gstin: document&.gstin_location&.gstin,
+      vendor_pan: document&.vendor&.pan,
+      
+      gstin_location_id: document&.gstin_location_id,
+      vendor_bank_account_number: document&.receiving_account&.account_number,
+      vendor_bank_account_ifsc: document&.receiving_account&.ifsc,
+      vendor_bank_account_swift_code: document&.receiving_account&.swift_code,
+
+      # receiving_account_id: document&.receiving_account_id,
+      # receiving_account_type: document&.receiving_account_type,
+      # rcm_enabled: document&.rcm_enabled,
+      # location_id: document&.location_id,
+      # delivery_location_id: document&.delivery_location_id,
+      # billing_address: document&.billing_address,
+      # shipping_address: document&.shipping_address,
+
+
+      # INVOICE SUMMARY
+      invoice_gross_amount: document&.amount&.value,
+      reporting_invoice_gross_amount: document&.amount&.value,
+      
+      invoice_discount_amount: document&.discount_amount&.value,
+      reporting_invoice_discount_amount: document&.discount_amount&.value,
+      
+      invoice_taxable_amount: document&.gross_amount&.value,
+      reporting_invoice_taxable_amount: document&.gross_amount&.value,
+      
+      invoice_tax_amount: document&.tax_amount&.value,
+      reporting_invoice_tax_amount: document&.tax_amount&.value,
+      
+      invoice_tds_amount: document&.tds_amount&.value,
+      reporting_invoice_tds_amount: document&.tds_amount&.value,
+      
+      invoice_freight_amount: document&.freight_amount&.value,
+      reporting_invoice_freight_amount: document&.freight_amount&.value,
+
+      invoice_sub_total_amount: document&.net_amount&.value,
+      reporting_invoice_sub_total_amount: document&.net_amount&.value,
+
+      invoice_roundoff_amount: document&.roundoff_amount,
+      reporting_invoice_roundoff_amount: document&.roundoff_amount,
+
+      invoice_total_amount: document&.net_amount&.value,
+      reporting_invoice_total_amount: document&.net_amount&.value,
+
+      invoice_paid_outside_amount: document&.payments&.successful&.joins(:amount)&.sum(:value),
+      reporting_invoice_paid_outside_amount: document&.payments&.successful&.joins(:amount)&.sum(:value),
+
+      invoice_balance_due: document&.balance_due&.value,
+      reporting_invoice_balance_due: document&.balance_due&.value,
+
+      # tds_slab_id:  document&.tds_slab_id ,
+      # tds_percentage: document&.tds_percentage,
+      
+      total_line_item_discount_amount: document&.discount_amount&.value,
+      overall_discount_amount: 0,
+      
+      invoice_net_total_amount: document&.net_amount&.value,
+      reporting_invoice_net_total_amount: document&.net_amount&.value,
+      
+      invoice_advance_paid_amount: document&.payments&.successful&.joins(:amount)&.sum(:value),
+      reporting_invoice_advance_paid_amount: document&.payments&.successful&.joins(:amount)&.sum(:value)
+    }
+    document.update_columns(update_params)
+  end
+
+  def self.update_invoice_attachments document
+    document.attachments.each do |old_attachment|
+      relevant_custom_field = document.form_custom_fields.where(field_key: 'invoice_attachments').first
+
+      if relevant_custom_field.present?
+        add_attachment_to_new_invoice( old_attachment, relevant_custom_field )
+      else
+        entity  = form.entities.where(entity_key: 'invoice_attachments').first
+        document.form_custom_fields.create({
+            document_type: 'Invoice', document_id: document.id, form_id: form.id, form_entity_id: entity.id,
+            field_key: 'invoice_attachments', value: "", value_text: nil, entity_type: 'attachments',
+         })
+        
+        relevant_custom_field = document.form_custom_fields.where(field_key: 'invoice_attachments').first
+        add_attachment_to_new_invoice( old_attachment, relevant_custom_field )
+      end
+    end    
+  end
+
+  def self.add_attachment_to_new_invoice( old_attachment, relevant_custom_field )
+    new_attachment = relevant_custom_field.attachments.new()
+    if Rails.env.production?
+      begin
+        new_attachment.attachment = old_attachment.file
+        new_attachment.save
+      rescue Paperclip::AdapterRegistry::NoHandlerError => e
+        attachment_error = "Company #{company.id} \n Document Type: #{document.class.name} \n Document ID: #{document.id} \n Attachment ID : #{old_attachment.id} \n Attachment Type: #{old_attachment.attachment_type} \n\n"
+        puts attachment_error
+        result.push(attachment_error)
+      end
+    else
+      file_path = Rails.root.to_s + "/public" + old_attachment.file.url(:original, false)
+      file = File.open(file_path) rescue nil
+
+      if file.present?
+        new_attachment.attachment = old_attachment.file
+        new_attachment.save
+      end
+    end
   end
 end

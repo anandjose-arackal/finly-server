@@ -152,7 +152,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
     lookup :vendor_id, label: "Vendor", choices_scope: Choices[:lookup].('vendors'), required: true, editable: false,
            can_editable_be_changed: false, can_be_disabled: false, can_required_be_changed: false, can_visible_be_changed: false
 
-    lookup :vendor_trade_name, label: 'Vendor Trade Name', editable: false, visible: true, computed: Forms::Compute::Lookup('vendor_id', '{{record.trade_name}}', assignments: { created_by_id: "{{meta.created_by_id}}" })
+    lookup :vendor_trade_name, label: 'Vendor Trade Name', editable: false, visible: true, computed: Forms::Compute::Lookup('vendor_id', '{{record.business_name}}', assignments: { created_by_id: "{{meta.created_by_id}}" })
     text :vendor_country, editable: false, visible: true
 
     text :vendor_sequence_id, "Vendor ID", editable: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.vendor_id}}')
@@ -218,7 +218,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       lookup :category_id, label: "Category", required: true, visible: true, editable: true, choices_scope: Choices[:lookup].('categories'), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.category_id}}')
 
       text :gl_code, label: "GL Code", editable: false, visible: false, computed: Forms::Compute::Lookup('items.category_id', '{{record.gl_code}}')
-      text :hsn_sac, label: "SAC/HSN", editable: true, visible: true, computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.hsn_sac}}')
+      text :hsn_sac, label: "HSN/SAC", editable: true, visible: true, computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.hsn_sac}}')
 
       lookup :tds_applicable, visible: true, editable: false,
              can_editable_be_changed: false,
