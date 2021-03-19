@@ -63,7 +63,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       reporting_invoice_freight_amount: "{{ form.invoice_freight_amount | times: form.conversion_rate | default: 0 | round: 2}}",
       reporting_invoice_sub_total_amount: "{{ form.invoice_sub_total_amount | times: form.conversion_rate | default: 0 | round: 2}}",
       reporting_invoice_roundoff_amount: "{% assign amount = form.reporting_invoice_sub_total_amount | round %}{% assign amount = amount | minus: form.reporting_invoice_sub_total_amount %}{% if form.reporting_currency != form.base_currency %}{% assign amount = 0 %}{% endif %}{{ amount | default: 0 | round: 2}}",
-      reporting_invoice_total_amount: "{% assign amount = form.reporting_invoice_sub_total_amount | plus: form.reporting_invoice_roundoff_amount %}{% if form.reporting_currency != form.base_currency %}{% assign amount = 0 %}{% endif %}{{ amount | default: 0 | round: 2 }}",
+      reporting_invoice_total_amount: "{% assign amount = form.reporting_invoice_sub_total_amount | plus: form.reporting_invoice_roundoff_amount %}{% if form.reporting_currency != form.base_currency %}{% assign amount = form.reporting_invoice_sub_total_amount %}{% endif %}{{ amount | default: 0 | round: 2 }}",
       reporting_invoice_net_total_amount: "{{ form.reporting_invoice_total_amount | minus: form.reporting_invoice_paid_outside_amount | default: 0 | round: 2}}",
       reporting_invoice_advance_paid_amount: "{{ form.invoice_advance_paid_amount | times: form.conversion_rate | default: 0 | round: 2}}",
       reporting_invoice_balance_due: "{{ form.invoice_balance_due | times: form.conversion_rate | default: 0 | round: 2}}"
@@ -242,7 +242,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_editable_be_changed: false,
              can_visible_be_changed: false,
              required: true, visible: true, editable: true,
-             computed: Forms::Compute::Form('{{ items.item_rate | divided_by: form.conversion_rate | default: 0 | round: 2 }}')
+             computed: Forms::Compute::Form('{{ row.item_rate | divided_by: form.conversion_rate | round: 2 }}')
       # computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.rate | default: 0}}')
 
       # gross_amount = rate x quantity

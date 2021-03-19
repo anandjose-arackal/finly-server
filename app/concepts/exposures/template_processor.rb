@@ -2,7 +2,7 @@ module Exposures::TemplateProcessor
   extend ActiveSupport::Concern
 
   def self.template(exposure, text, key: :record, registers: {})
-    LiquidHelper.interpolate(text, { "#{key}" => exposure }, { registers: registers.with_indifferent_access })
+    LiquidHelper.interpolate(text, { "#{key}" => exposure }, { registers: registers&.with_indifferent_access })
   end
 
   class_methods do
