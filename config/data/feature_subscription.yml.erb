@@ -30,3 +30,6 @@ user:
     client_version:
       vp: <%= current_user.profile.vp_web_client_version %>
       em: <%= current_user.profile.em_web_client_version %>
+  customer_specific:
+    invoice_minimal_ui: <%=   MinimalInvoiceUiToggle.new(current_user).minimal_invoice_ui_enabled? %>
+    dummy_bank_account: current_company.yes_bank_vendors&.first&.id
