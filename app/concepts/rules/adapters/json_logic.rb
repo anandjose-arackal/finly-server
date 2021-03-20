@@ -44,13 +44,19 @@ class Rules::Adapters::JSONLogic
     operator = Rules::Constants::MATH_PREDICATE_MAP[rule.operator.to_s] || rule.operator.to_s
     json[operator] = []
     json[operator] += [build_var(rule.attribute, json_logic_type, options)] if rule.attribute.present?
-    json[operator] += rule.values.map { |value| build_var(value, json_logic_type, options) }
+    values = rule.values.map { |value| build_var(value, json_logic_type, options) }
+    if values.size == 1
+      json[operator] += values
+    else
+      json[operator] << values
+    end
 
     if json_logic_type == :some
       json = { 'some' => [{ 'var' => "form.#{collection_association_name(options[:model_klass], rule.attribute[:name])}" }, json] }
     end
     json
   end
+
   # This is responsible for validating the rule with json_logic standards
   def self.valid?(rule, options = {})
     return true unless rule.is_a?(Rules::Rule)
@@ -76,7 +82,7 @@ class Rules::Adapters::JSONLogic
       prefix = prefix_map[json_logic_type]
 
       # if func[:value].present? or func[:formula].present?
-      
+
       if func.keys.include?(:value) or func.keys.include?(:formula)
         return func[:value]&.to_s&.strip || func[:formula]&.to_s&.strip
       else
