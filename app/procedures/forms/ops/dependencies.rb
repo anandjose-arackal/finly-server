@@ -23,16 +23,16 @@ class Forms::Ops::Dependencies < Transactions::API
   end
 
   def init_conditions(context, dependencies:, model:, **)
-    dependencies[:conditions] = model.conditions.includes(:referencable_entity).where(form_entities: { internal: false })
+    dependencies[:conditions] = model.conditions.includes({ referencable_entity: :parent }, :actions)
   end
 
   def init_validations(context, model:, dependencies:, **)
-    dependencies[:validations] = model.validations.includes(:form_entity).where(form_entities: { internal: false })
+    dependencies[:validations] = model.validations.includes(form_entity: :parent)
   end
 
   def init_form_computations(context, model:, dependencies:, **)
     dependencies[:form_computations] = []
-    model.entities.where(compute_enabled: true, compute_type_id: FormEntityComputationType.id_for(:form)).includes(:compute_lookup_entity, :parent).each do |entity|
+    model.entities.where(compute_enabled: true, compute_type_id: FormEntityComputationType.id_for(:form)).includes(:compute_type, :compute_lookup_entity, :parent).each do |entity|
       computation = entity.form_reference_json
       computation[:type] = entity.compute_type.name
       computation[:formula] = entity.compute_formula
