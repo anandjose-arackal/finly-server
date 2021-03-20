@@ -26,7 +26,15 @@ class Form < ApplicationRecord
   has_many :prediction_models, class_name: 'MlModel::FormEntityModel'
 
   scope :preload_for_contract, -> {
-    includes(:entities, { sections: { entities: [:compute_lookup_entity, :form, { conditions: :actions }, :validations, { choice_dependencies: :controlling_entity }, { entities: [:compute_lookup_entity, :form, { conditions: :actions }, :validations, { choice_dependencies: :controlling_entity }, { entities: [:compute_lookup_entity, :form, { conditions: :actions }, :validations, { choice_dependencies: :controlling_entity }, entities: [:compute_lookup_entity, :form, { conditions: :actions }, :validations, { choice_dependencies: :controlling_entity }, :entities]] }] }] } })
+    includes(:entities, {
+      sections: {
+        entities: [:compute_lookup_entity, :form, { conditions: :actions }, :validations, { choice_dependencies: :controlling_entity }, {
+          entities: [:compute_lookup_entity, :form, { conditions: :actions }, :validations, { choice_dependencies: :controlling_entity }, {
+            entities: [:compute_lookup_entity, :form, { conditions: :actions }, :validations, { choice_dependencies: :controlling_entity }, {
+              entities: [:compute_lookup_entity, :form, { conditions: :actions }, :validations, { choice_dependencies: :controlling_entity }, {
+                entities: [:compute_lookup_entity, :form, { conditions: :actions }, :validations, { choice_dependencies: :controlling_entity }, {
+                  entities: [:compute_lookup_entity, :form, { conditions: :actions }, :validations, { choice_dependencies: :controlling_entity },
+                             :entities] }] }] }] }] }] } })
   }
 
   attr_accessor :preloaded_for_contract
