@@ -5,6 +5,7 @@ beginning of this file.
 ## 2021-03-21
   - Updating the payment processed logic
   - Fixing conversion issue
+  - Removing transaction type from index
   
 ## 2021-03-16
   - Updating the authentication flow 
