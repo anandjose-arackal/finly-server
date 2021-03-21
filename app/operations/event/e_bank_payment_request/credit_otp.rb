@@ -41,7 +41,7 @@ class Event::EBankPaymentRequest::CreditOtp < Event::EBankPaymentRequest::Base
     return if user.blank?
     set_presenter_params(user)
     return unless params[:subject].present? && params[:body].present?
-    BankPaymentRequestMailer.delay.notify_payment_otp(Event::EBankPaymentRequest::Base::PaymentRequestMailerPresenter.new(user, params))
+    BankPaymentRequestMailer.delay(:queue => 'payments_creation').notify_payment_otp(Event::EBankPaymentRequest::Base::PaymentRequestMailerPresenter.new(user, params))
   end
 
 
