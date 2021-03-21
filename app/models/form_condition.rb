@@ -27,7 +27,7 @@ class FormCondition < ApplicationRecord
   belongs_to :company
   belongs_to :form
   belongs_to :referencable, polymorphic: true
-  belongs_to :referencable_entity, -> { includes(:conditions).where(internal: false) }, foreign_key: :referencable_id, class_name: 'FormEntity', optional: true
+  belongs_to :referencable_entity, -> { includes(:conditions) }, foreign_key: :referencable_id, class_name: 'FormEntity', optional: true
   belongs_to :created_by, class_name: 'User', optional: true
   belongs_to :updated_by, class_name: 'User', optional: true
 
@@ -69,7 +69,7 @@ class FormCondition < ApplicationRecord
   def valid_rule?
     return if rule.blank?
 
-    unless rule.valid?(controlling_field: referencable)
+    unless rule.valid?(controlling_field: referencable_entity)
       errors.add :rule, 'is not valid'
     end
   end
@@ -83,7 +83,7 @@ class FormCondition < ApplicationRecord
       # Todo temporary patch to unblock FE, this has to generate as_json_logic
       rule = self.rule.as_json_logic
     end
-    referencable.as_json(json_format: "form_reference").merge(
+    referencable_entity.as_json(json_format: "form_reference").merge(
       {
         id: id,
         rule: rule,

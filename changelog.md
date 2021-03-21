@@ -5,6 +5,9 @@ beginning of this file.
 ## 2021-03-19
   - Updating the non-po-form migration script
 
+## 2021-03-21
+  - Updating the payment processed logic
+  
 ## 2021-03-16
   - Updating the authentication flow 
   - Updating sso config
