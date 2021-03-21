@@ -36,7 +36,7 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     text value: :ticket_type
   end
 
-  column :transaction_type, label: "Transaction Type", default: true do
+  column :transaction_type, label: "Transaction Type" do
     text value: :pt_type
   end
 

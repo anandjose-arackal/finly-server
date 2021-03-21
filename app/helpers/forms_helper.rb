@@ -2,7 +2,7 @@ module FormsHelper
   include ActiveSupport::Concern
 
   def form_data(form, model = self)
-    form.entities.root.reduce({}) do |acc, entity|
+    form.entities.root.includes({entities: {entities: {entities: :entities}}}).reduce({}) do |acc, entity|
       acc.merge(entity_data(model, entity)).with_indifferent_access
     end
   end
