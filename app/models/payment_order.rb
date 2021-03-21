@@ -244,7 +244,7 @@ class PaymentOrder < ApplicationRecord
     reporting_new_amount = new_amount
     parent_type = self.payments.first.parent_type.downcase
     if parent_type == 'invoice'
-      reporting_new_amount =  self.payments.completed.map{ |payment| payment.amount.value * payment.parent.conversion_rate }
+      reporting_new_amount =  self.payments.completed.map{ |payment| payment&.amount&.value.to_f * payment&.parent&.conversion_rate }
     end
     self.update(reporting_amount_processed: reporting_new_amount)
   end
@@ -258,7 +258,7 @@ class PaymentOrder < ApplicationRecord
     reporting_new_amount = new_amount
     parent_type = self.payments.first.parent_type.downcase
     if parent_type == 'invoice'
-      reporting_new_amount =  self.payments.map{ |payment| payment.amount.value * payment.parent.conversion_rate }
+      reporting_new_amount =  self.payments.map{ |payment| payment&.amount&.value.to_f * payment&.parent&.conversion_rate }
     end
     self.update(reporting_amount_requested: reporting_new_amount)
   end
