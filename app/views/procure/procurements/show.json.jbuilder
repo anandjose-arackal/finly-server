@@ -180,7 +180,7 @@ json.trail do
 end
 
 json.locations do
-  json.array! @result.locations do |location|
+  json.array! @result.locations.includes(:state) do |location|
     json.extract! location, :id, :name, :gstin, :pan
     json.address location.address
   end
