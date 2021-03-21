@@ -12,7 +12,7 @@ module FormsHelper
 
     return {} if (form_klass = self.form_klass).nil?
     form_klass = Object.const_get(form_klass)
-    return {} unless (meta = form_klass.meta).present?
+    return {} unless (meta = form_klass&.meta).present?
 
     @form_metadata = LiquidHelper.interpolate(meta, { 'record' => self.to_exposure })
   end
