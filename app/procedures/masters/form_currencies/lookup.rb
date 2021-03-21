@@ -5,7 +5,7 @@ class Masters::FormCurrencies::Lookup < Lookup::API
 
   attribute :id, visible: false
   attribute :currency_code
-  attribute :name, value: '{{record.currency}}'
+  attribute :name, value: '{{record.currency_code}}'
   attribute :currency
   attribute :symbol
   attribute :currency_conversion_rate
