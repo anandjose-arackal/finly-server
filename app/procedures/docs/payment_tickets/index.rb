@@ -11,6 +11,12 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     text value: "{{record.name}}", format: 'primary'
   end
 
+  column :payment_ticket_id, sort: :id, label: "Payment Ticket ID", default: true, includes: [:policy, :created_by] do
+    text value: :payment_ticket_id, format: "primary"
+    text value: 'Policy: {{record.policy.name}}'
+    user value: :created_by
+  end
+
   column :created_at, sort: :created_at do
     date value: :created_at
   end
@@ -19,17 +25,9 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     date value: :updated_at
   end
 
-  column :created_by, default: true, includes: [:created_by] do
-    user value: :created_by
-  end
-
-  column :scheduled_date, sort: :payment_order_scheduled_at, default: true, includes: [:payment_order] do
-    date value: "{{record.payment_order.scheduled_at}}"
-  end
-
-  column :payment_ticket_id, sort: :id, label: "Payment Ticket ID", default: true do
-    text value: :payment_ticket_id, format: "primary"
-  end
+  # column :created_by, default: true, includes: [:created_by] do
+  #   user value: :created_by
+  # end
 
   column :ticket_type, label: "Ticket Type", default: true do
     text value: :ticket_type
@@ -39,16 +37,24 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     indicator value: :pt_status, format: :format_status
   end
 
-  column :policy, default: true, includes: [:policy] do
+  column :policy, default: false, includes: [:policy] do
     text value: "{{record.policy.name}}"
   end
 
-  column :requested, default: true, includes: [payment_order: {amount_requested: :currency}] do
+  IndexBuilder::API::ColumnTemplate::ReviewProgress(self)
+  IndexBuilder::API::ColumnTemplate::ControllingUser(self)
+  IndexBuilder::API::ColumnTemplate::ControllingLevel(self)
+
+  column :requested, default: true, includes: [payment_order: { amount_requested: :currency }] do
     amount value: -> (context) { context[:exposure].payment_order.amount_requested }
   end
 
-  column :processed, default: true, includes: [payment_order: {amount_processed: :currency}] do
+  column :processed, default: true, includes: [payment_order: { amount_processed: :currency }] do
     amount value: -> (context) { context[:exposure].payment_order.amount_processed }
+  end
+
+  column :scheduled_date, sort: :payment_order_scheduled_at, default: true, includes: [:payment_order] do
+    date value: "{{record.payment_order.scheduled_at}}"
   end
 
   column :submitted_at, sort: :submitted_at, default: true do
@@ -58,10 +64,6 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
   column :approved_at, sort: :approved_at, default: true do
     date value: :approved_at
   end
-
-  IndexBuilder::API::ColumnTemplate::ControllingUser(self)
-  IndexBuilder::API::ColumnTemplate::ControllingLevel(self)
-  IndexBuilder::API::ColumnTemplate::ReviewProgress(self)
 
   # Avoiding this as this fetches data from payments as well, which would result in N+1 query
   # column :payment_mode, includes: [:payment_order] do
@@ -83,9 +85,9 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     counter.add nil, "All", counts.values.reduce(0, :+)
     # Open / Retracted
     counter.add BankPaymentRequestStatus::GROUP_OPEN, 'Open', (
-        counts[BankPaymentRequestStatus.id_for(:open)].to_i +
+      counts[BankPaymentRequestStatus.id_for(:open)].to_i +
         counts[BankPaymentRequestStatus.id_for(:retracted)].to_i +
-            counts[BankPaymentRequestStatus.id_for(:creation_in_progress)].to_i
+        counts[BankPaymentRequestStatus.id_for(:creation_in_progress)].to_i
     )
 
     # Awaiting Approval
@@ -95,14 +97,14 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     end
 
     counter.add BankPaymentRequestStatus::GROUP_PROCESSING, "Processing", (
-    counts[BankPaymentRequestStatus.id_for(:processing)].to_i +
+      counts[BankPaymentRequestStatus.id_for(:processing)].to_i +
         counts[BankPaymentRequestStatus.id_for(:submitted)].to_i +
         counts[BankPaymentRequestStatus.id_for(:unapprove)].to_i
     )
 
     # Approved / Auto Approved
     counter.add BankPaymentRequestStatus::GROUP_PENDING_CREDIT, 'Pending Credit', (
-    counts[BankPaymentRequestStatus.id_for(:approved)].to_i +
+      counts[BankPaymentRequestStatus.id_for(:approved)].to_i +
         counts[BankPaymentRequestStatus.id_for(:auto_approved)].to_i +
         counts[BankPaymentRequestStatus.id_for(:pending)].to_i
     )
