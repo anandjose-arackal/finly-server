@@ -1,10 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file. Always add new logs to 
 beginning of this file.
-
 ## 2021-03-21
-  - Updating the payment processed logic
-  
+- Feat: Non Po Invoice Forms release
+## 2021-03-19
+- Fix: Moved OTP mailers from default redis queue to payment creation queue
+
 ## 2021-03-16
   - Updating the authentication flow 
   - Updating sso config

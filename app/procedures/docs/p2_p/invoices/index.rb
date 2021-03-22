@@ -62,7 +62,7 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     text value: :due_in_days
   end
 
-  column :transaction_type, label: "Transaction Type", default: true do
+  column :transaction_type, label: "Transaction Type" do
     text value: :pt_type
   end
 
