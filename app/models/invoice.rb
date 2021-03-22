@@ -175,7 +175,7 @@ class Invoice < ApplicationRecord
   money :invoice_balance_due, :get_reporting_currency
 
   def get_reporting_currency
-    Currency.currency_for(self.company.reporting_currency_code)
+    Currency.currency_for(self.reporting_currency || "INR")
   end
 
   def get_base_currency
@@ -1733,17 +1733,23 @@ class Invoice < ApplicationRecord
 
   # Syncs amounts from new forms structure to legacy amounts table
   def sync_amounts
-    self.skip_callback = true
-    if self.forms_enabled
-      sync_to_old_structure
-    else
-      sync_to_forms_structure
-    end
-  end
+    if invoice_gross_amount.present?
 
-  def sync_to_old_structure
+      exchange_base_currency = get_base_currency&.country_code || "INR"
+      # Multi currency implementation
+      self.reporting_invoice_gross_amount = invoice_gross_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.reporting_invoice_discount_amount = invoice_discount_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.reporting_invoice_tax_amount = invoice_tax_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.reporting_invoice_tds_amount = invoice_tds_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.reporting_invoice_sub_total_amount = invoice_sub_total_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.reporting_invoice_total_amount = invoice_total_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.reporting_invoice_taxable_amount = invoice_taxable_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.reporting_invoice_roundoff_amount = invoice_roundoff_amount_money.exchange_to(exchange_base_currency).amount rescue 0
+      self.reporting_invoice_balance_due = invoice_balance_due_money.exchange_to(exchange_base_currency).amount rescue 0
+
+      self.skip_callback = true
       amounts_attributes_map.each do |key, value|
-        amount_value = self.send("reporting_#{key}")
+        amount_value = self.send(key)
         amount_attr = self.send(value)
         reporting_currency_id = get_reporting_currency&.id || Currency.id_for("INR")
         if amount_attr.present?
@@ -1758,31 +1764,17 @@ class Invoice < ApplicationRecord
       end
 
       amount_direct_attribute_map.each do |key, value|
-        amount_value = self.send("reporting_#{key}")
+        amount_value = self.send(key)
         self.assign_attributes({
                                  "#{value}": amount_value
                                })
       end
       self.save
-  end
-
-  def sync_to_forms_structure
-    amounts_attributes_map.each do |key, value|
-      amount_value = self.send(value)
-      self.send("reporting_#{key}=", amount_value)
-      self.send("#{key}=", amount_value)
     end
-    amount_direct_attribute_map.each do |key, value|
-      amount_value = self.send(value)
-      self.assign_attributes({
-                               "reporting_#{key}": amount_value,
-                               "#{key}": amount_value
-                             })
-    end
-    self.save
   end
 
   def amounts_attributes_map
+    # todo - I2P change it to converted values post multicurrency setup
     {
       invoice_gross_amount: 'amount_id',
       invoice_discount_amount: 'discount_amount_id',

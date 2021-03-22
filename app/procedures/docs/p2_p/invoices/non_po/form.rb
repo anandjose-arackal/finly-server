@@ -117,7 +117,8 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
     date :transaction_service_period_from, label: 'Transaction Service Period (From Date)', editable: true, visible: true
     date :transaction_service_period_to, label: 'Transaction Service Period (To Date)', editable: true, visible: true
-
+    
+    large_text :narration, label: "Narration", visible: true
   end
 
   # ACCOUNTING DETAILS
@@ -128,7 +129,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
            required: true, editable: false
     lookup :department_id, label: "Department", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('departments') #, editable: false, visible: false
     lookup :cost_center_id, label: "Cost Center", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('cost_centers')
-    dropdown :discount_type_id, label: "Discount Type", editable: true, visible: true, required: true, choices_scope: Choices[:list].({ id: 1, name: 'Percentage' }, { id: 2, name: 'Amount' }), default_value: 'Percentage'
+    dropdown :discount_type_id, label: "Discount Type", editable: true, visible: true, required: true, choices_scope: Choices[:list].({ id: 1, name: 'Percentage' }, { id: 2, name: 'Amount' }), default_value: 1
     # lookup :tax_type_id, label: "Tax Type", editable: true, visible: true, choices_scope: Choices[:lookup].('tax_types')
     dropdown :tax_type_id, label: "Tax Type", editable: true, visible: true, choices_scope: Choices[:list].(*TaxType.all.map { |v| { id: v.id, name: v.name } })
 
@@ -144,7 +145,6 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
     number :conversion_rate, editable: true, format: 'decimal', default_value: 1, computed: Forms::Compute::Lookup('base_currency', '{{ record.currency_conversion_rate }}'), visible: true
     # date :transaction_service_period_from, label: 'Transaction Period From'
     # date :transaction_service_period_to, label: 'Transaction Period To'
-    large_text :narration, label: "Narration"
   end
 
   # VENDOR DETAILS
@@ -208,7 +208,8 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
            computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.description}}')
 
       text :comment, label: "Narration"
-      text :item_number, label: "Item Code", editable: false, computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.item_code}}')
+      text :item_number, label: "Item Code", editable: false
+      # , computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.item_code}}')
 
       lookup :product_type_id, label: "Product Type", choices_scope: Choices[:enum].(ProductType), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.product_type_id}}'), editable: false, required: true, visible: true
 
@@ -217,8 +218,10 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
       lookup :category_id, label: "Category", required: true, visible: true, editable: true, choices_scope: Choices[:lookup].('categories'), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.category_id}}')
 
-      text :gl_code, label: "GL Code", editable: false, visible: false, computed: Forms::Compute::Lookup('items.category_id', '{{record.gl_code}}')
-      text :hsn_sac, label: "HSN/SAC", editable: true, visible: true, computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.hsn_sac}}')
+      text :gl_code, label: "GL Code", editable: false, visible: false
+      # , computed: Forms::Compute::Lookup('items.category_id', '{{record.gl_code}}')
+      text :hsn_sac, label: "HSN/SAC", editable: true, visible: true
+      # , computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.hsn_sac}}')
 
       lookup :tds_applicable, visible: true, editable: false,
              can_editable_be_changed: false,

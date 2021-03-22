@@ -4,7 +4,7 @@ class NonPoInvoiceMigrator
     result = []
     company = Company.find company_id
     documents = Invoice.where(invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)).where(company_id: company.id)
-    # documents = Invoice.where(id: 10651).where(company_id: company.id)
+    # documents = Invoice.where(id: 10653).where(company_id: company.id)
 
     form = Form.where(klass_name: 'Docs::P2P::Invoices::NonPo::Form', company_id: company_id).first
     documents.find_in_batches(batch_size: 1000) do |batch|
@@ -25,7 +25,7 @@ class NonPoInvoiceMigrator
         end
 
         # Migrate Custom Fields
-        update_custome_fields document
+        update_custome_fields form, document, company
         
         # First migrate invoice line items
         update_item document
@@ -34,7 +34,7 @@ class NonPoInvoiceMigrator
         update_invoice_details document
         
         # Migrate Attachments
-        update_invoice_attachments document
+        update_invoice_attachments( form, document)
 
       end
     end
@@ -42,34 +42,126 @@ class NonPoInvoiceMigrator
     # Log and output file for future reference; Will be useful in case data is not migrated properly
   end
 
-  def self.update_custome_fields document
+  def self.update_custome_fields form, document, company
     document.custom_fields.each do |custom_field|
       field_name = custom_field.field_configuration.field_name
 
       form_custom_field = document.form_custom_fields.where(field_key: field_name).order(updated_at: :asc).last
 
       if form_custom_field.present?
-        if form_custom_field&.form_entity&.entity_type == "text"
-          form_custom_field.value = custom_field.value&.value
-          form_custom_field.save
+        update_each_custom_field( form_custom_field, custom_field)
+      else
 
-        elsif form_custom_field&.form_entity&.entity_type == "dropdown"
-          custom_field_value = custom_field.value&.value&.name
-          selection = form_custom_field&.form_entity&.choices&.where(name: custom_field_value).first
-          # A selection with the same name as of custom field selection is found
-          if selection.present?
-            if form_custom_field&.selection.present?
-              # If form custom field selection is already there, then update it
-              form_custom_field.selection.update(form_entity_choice_id: selection.uuid)
-            else
-              # If form custom field doesn't have a selection then create a new selection
-              CustomFieldSelection.create(form_entity_choice_id: selection.uuid, form_custom_field_id: form_custom_field.uuid)
-            end
+        entity_key = custom_field.field_configuration.field_key
+
+        form_entity = form.entities.where(entity_key: entity_key).first
+        if form_entity.blank?
+          if custom_field.value_type == 'FieldText'
+            form_entity = create_text_custom_field(form, custom_field, company)
+          elsif custom_field.value_type == 'FieldDropDownSelection'
+            form_entity = create_drop_down_custom_field(form, custom_field, company)
           end
+        end
+        
+        next if form_entity == nil
+        form_custom_field = FormCustomField.create({
+          form_entity_id: form_entity.id, field_key: form_entity.entity_key,
+          entity_type: form_entity.entity_type, document_type: document.class.name,
+          document_id: document.id, form_id: form.id }
+        )
+
+        update_each_custom_field( form_custom_field, custom_field)
+      end
+    end
+  end
+
+  def self.create_text_custom_field form, custom_field, company
+    form_id = form.uuid
+    section_id = FormSection.where(section_id: 'invoice_details', company_id: company.id, form_id: form_id).first.uuid
+    required = custom_field.field_configuration.mandatory
+    active = custom_field.field_configuration.enabled
+    lable = custom_field.field_configuration.field_name
+    entity_key = custom_field.field_configuration.field_key
+    position = form.entities.where(form_section_id: section_id).order(:position).last.position + 1
+
+    form_entity = FormEntity::Text.create({ company_id: company.id,
+     form_id: form_id, form_section_id: section_id,
+     created_by_user_id: company.users.only_admins.first,
+     entity_key: entity_key, label: lable,
+     placeholder: 'Enter value', hint: 'Please enter the hint',
+     entity_type: 'text', editable: true, required: required,
+     active: active, unique: false, visible: true, position: position,
+     system_field: false, options: "{'format':'text','minimum':1,'maximum':255}", 
+    })
+    form_entity
+  end
+
+  def self.create_drop_down_custom_field form, custom_field, company
+
+    form_id = form.uuid
+    section_id = FormSection.where(section_id: 'invoice_details', company_id: company.id, form_id: form_id).first.uuid
+    required = custom_field.field_configuration.mandatory
+    active = custom_field.field_configuration.enabled
+    lable = custom_field.field_configuration.field_name
+    entity_key = custom_field.field_configuration.field_key
+    position = form.entities.where(form_section_id: section_id).order(:position).last.position + 1
+
+    # create entity
+    form_entity = FormEntity::DropDown.create({ company_id: company.id,
+     form_id: form_id, form_section_id: section_id,
+     created_by_user_id: company.users.only_admins.first.id,
+     entity_key: entity_key, label: lable,
+     placeholder: 'Enter value', hint: 'Please enter the hint',
+     entity_type: 'dropdown', editable: true, required: required,
+     active: active, unique: false, visible: true, position: position,
+     system_field: false, choices_scope: nil,
+     options: {}
+    })
+
+    choices = Choices['list'].()
+    choices.form_entity = form_entity
+    form_entity.update(choices_scope: choices )
+    
+    # create options
+    custom_field.field_configuration.drop_down_items.each do |item|
+
+      form_entity.choices.create({
+        company_id: company.id,
+        form_id: form_id,
+        form_section_id: section_id,        
+        created_by_user_id: company.users.only_admins.first.id,
+        name: item.name,
+        position: 1, 
+        active: true
+      })
+    end
+
+    form_entity
+  end
+
+
+  def self.update_each_custom_field form_custom_field, custom_field
+      
+    if form_custom_field&.form_entity&.entity_type == "text"
+      form_custom_field.value = custom_field.value&.value
+      form_custom_field.save
+
+    elsif form_custom_field&.form_entity&.entity_type == "dropdown"
+      custom_field_value = custom_field.value&.value&.name
+      selection = form_custom_field&.form_entity&.choices&.where(name: custom_field_value).first
+      # A selection with the same name as of custom field selection is found
+      if selection.present?
+        if form_custom_field&.selection.present?
+          # If form custom field selection is already there, then update it
+          form_custom_field.selection.update(form_entity_choice_id: selection.uuid)
+        else
+          # If form custom field doesn't have a selection then create a new selection
+          CustomFieldSelection.create(form_entity_choice_id: selection.uuid, form_custom_field_id: form_custom_field.uuid)
         end
       end
     end
   end
+
 
   def self.update_item document
     #MAPPING
@@ -82,14 +174,17 @@ class NonPoInvoiceMigrator
         # tds_applicable: item&.tds_applicable,
         # description: item.description,
         # comment: ,
-        # gl_code: item.gl_code,
+        
+        
         # hsn_sac: item.hsn_sac,
         # unit_of_measurement: item.unit_of_measurement,
         # rate: item.rate,
         # discount: item.discount,
         # tax_rate_id: item.tax_rate_id,
-        # tax_percentage: item.tax_percentage,
-        # item_number: item.item_number,
+        tax_percentage: item.tax_percentage,
+        
+        gl_code: item&.category&.gl_code,
+        item_number: item&.inventory_line_item&.item_number,
         
         items_department_id: item&.department_id,
         items_cost_center_id: item&.cost_center_id,
@@ -192,14 +287,14 @@ class NonPoInvoiceMigrator
       invoice_total_amount: document&.net_amount&.value,
       reporting_invoice_total_amount: document&.net_amount&.value,
 
-      invoice_paid_outside_amount: document&.payments&.successful&.joins(:amount)&.sum(:value),
-      reporting_invoice_paid_outside_amount: document&.payments&.successful&.joins(:amount)&.sum(:value),
+      invoice_paid_outside_amount: document&.advance_amount&.value.to_f,
+      reporting_invoice_paid_outside_amount: document&.advance_amount&.value.to_f,
 
       invoice_balance_due: document&.balance_due&.value,
       reporting_invoice_balance_due: document&.balance_due&.value,
 
       # tds_slab_id:  document&.tds_slab_id ,
-      # tds_percentage: document&.tds_percentage,
+      tds_percentage: document&.tds_slab&.tds,
       
       total_line_item_discount_amount: document&.discount_amount&.value,
       overall_discount_amount: 0,
@@ -213,7 +308,7 @@ class NonPoInvoiceMigrator
     document.update_columns(update_params)
   end
 
-  def self.update_invoice_attachments document
+  def self.update_invoice_attachments( form, document)
     document.attachments.each do |old_attachment|
       relevant_custom_field = document.form_custom_fields.where(field_key: 'invoice_attachments').first
 
