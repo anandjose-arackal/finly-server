@@ -9,6 +9,7 @@ class Docs::UtilityBills::Bills::Configs::Edit < Transactions::API
     result['types'] = BbpsBiller.all.pluck(:biller_category_name).uniq.compact
     result['policies'] = ::Policy::VendorPayments::Index.(current_user, {filter_role_id: [UserRole.id_for(:utility_bill_initiator)]}).policies rescue Policy.none
     result['reviewal_chains'] = []
+    result['custom_fields'] = model.subscription.custom_fields
 
     if model.present? && model.user_id.present?
       parameters = {reviewal_document: model}
@@ -34,7 +35,6 @@ class Docs::UtilityBills::Bills::Configs::Edit < Transactions::API
         result['reviewal_chains'].push(chain)
       end
     end
-
     options['result'] = result
   end
 
