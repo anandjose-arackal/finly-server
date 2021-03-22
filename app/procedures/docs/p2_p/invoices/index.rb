@@ -11,36 +11,48 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
   custom_fields :invoice
 
   # Fixed column is always default true
-  column :vendor, label: 'Vendor Details', fixed: true, sort: :vendor_business_name, includes: [:vendor] do
+  column :vendor, label: 'Vendor Details', fixed: true, sort: :vendor_business_name, includes: [:vendor, :invoice_type] do
     text value: "{{record.vendor.business_name}}", format: 'primary'
     text value: "Vendor ID: {{record.vendor.vendor_id}}"
+    text value: "Type: {{record.invoice_type.name | upcase}}"
   end
 
-  column :invoice_id, default: true, sort: true do
+  column :invoice_id, label: "Invoice ID", default: true, sort: true, includes: [:policy, :created_by] do
     text value: :invoice_id, format: 'primary'
-  end
-
-  column :created_by, default: true, includes: [:created_by] do
+    text value: 'Policy: {{record.policy.name}}'
     user value: :created_by
   end
 
-  column :invoice_type, label: "Type", default: true, includes: [:invoice_type] do
-    text value: "{{record.invoice_type.name | upcase}}"
+  column :created_by, default: false, includes: [:created_by] do
+    user value: :created_by
   end
 
-  column :status, default: true, includes: [:status] do
-    indicator value: :invoice_status, format: :format_status
+  column :invoice_type, label: "Type", default: false, includes: [:invoice_type] do
+    text value: "{{record.invoice_type.name | upcase}}"
   end
 
   column :invoice_number, default: true do
     text value: :invoice_number, format: 'primary'
   end
 
-  column :submitted_on, default: true do
+  column :status, default: true, includes: [:status] do
+    indicator value: :invoice_status, format: :format_status
+  end
+
+  IndexBuilder::API::ColumnTemplate::ReviewProgress(self)
+
+  column :net_amount, includes: [net_amount: :currency], default: true do
+    amount value: :net_amount
+  end
+
+  IndexBuilder::API::ColumnTemplate::ControllingUser(self)
+  IndexBuilder::API::ColumnTemplate::ControllingLevel(self)
+
+  column :submitted_on, default: false do
     date value: :submitted_at
   end
 
-  column :approved_on, default: true do
+  column :approved_on, default: false do
     date value: :approved_at
   end
 
@@ -102,10 +114,6 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     amount value: :freight_amount
   end
 
-  column :net_amount, includes: [net_amount: :currency], default: true do
-    amount value: :net_amount
-  end
-
   # Todo: Data issue in invoice model. Gross amount is dynamically being calculated instead of pre-computation
   # column :advance_amount, includes: [advance_amount: :currency]  do
   #   amount value: :advance_amount
@@ -138,10 +146,6 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
   column :shipping_location, default: false, includes: [:delivery_location] do
     text value: "{{record.shipping_location.name}}"
   end
-
-  IndexBuilder::API::ColumnTemplate::ControllingUser(self)
-  IndexBuilder::API::ColumnTemplate::ControllingLevel(self)
-  IndexBuilder::API::ColumnTemplate::ReviewProgress(self)
 
   column :approved_at, default: true do
     date value: :approved_at
