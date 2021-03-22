@@ -88,6 +88,8 @@ class PurchaseOrder < ApplicationRecord
 
   acts_as_sequenced column: :po_number, purpose: :purchase_order, editable: false, prefix: 'PO/{fiscal_year_start}-{fiscal_year_end}/', min_length: 4
 
+  default_scope { order(created_at: :desc) }
+
   belongs_to :company, optional: true
   belongs_to :user, optional: true
   belongs_to :created_by, optional: true, foreign_key: 'user_id', class_name: 'User'
