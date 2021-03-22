@@ -14,6 +14,7 @@ class Docs::UtilityBills::Subscriptions::Configs::Edit < Transactions::API
     result['policies'] = ::Policy::VendorPayments::Index.(current_user, filter_params).policies rescue Policy.none
     result['categories'] = current_user.company.categories.inward_invoice_items_only
     result['tax_rates'] = current_user.company.tax_rates
+    result['custom_fields'] = model.custom_fields
 
     result['reviewal_chains'] = []
 

@@ -8,7 +8,9 @@ class Docs::UtilityBills::Subscriptions::Ops::Create < Transactions::API
 
   # Below method makes sure all necessary data is present for contract to work properly, it also sets default value for
   # number of attributes
-  step :set_default_params
+  step :set_default_params 
+
+  step :set_custom_fields
 
   # Instantiate contract
   step Contract::Build( constant: Docs::UtilityBills::Subscriptions::Contracts::Base )
@@ -55,7 +57,7 @@ class Docs::UtilityBills::Subscriptions::Ops::Create < Transactions::API
 
   def set_default_params(options, params:, current_user:, **)
     bbps_biller_id = params[:bbps_biller_id] || params[:subscription][:bbps_biller_id]
-    op = Docs::UtilityBills::Billers::Ops::Show.(params: {id: bbps_biller_id}, "current_user" => current_user)
+    op = Docs::UtilityBills::Billers::Ops::Show.(params: {id: bbps_biller_id}, current_user: current_user)
 
     biller = op['model'] if op.success?
 
@@ -69,7 +71,11 @@ class Docs::UtilityBills::Subscriptions::Ops::Create < Transactions::API
     params[:subscription][:company_id] = current_user.company_id
     params[:subscription][:support_bill_validation] = support_bill_validation
     params[:subscription][:auto_generate_bill] = params[:subscription][:auto_generate_bill] || resolve_auto_bill_generation(fetch_requirement)
-    true
+  end
+
+  def set_custom_fields(options, current_user:, params:, model:, **)
+    custom_fields = params[:custom_fields]
+    res = CustomField::SetFields.(options['model'], FieldParentType.id_for("BbpsBillerSubscription"), custom_fields: custom_fields)
   end
 
 
