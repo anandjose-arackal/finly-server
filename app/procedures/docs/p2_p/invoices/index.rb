@@ -14,7 +14,6 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
   column :vendor, label: 'Vendor Details', fixed: true, sort: :vendor_business_name, includes: [:vendor, :invoice_type] do
     text value: "{{record.vendor.business_name}}", format: 'primary'
     text value: "Vendor ID: {{record.vendor.vendor_id}}"
-    text value: "Type: {{record.invoice_type.name | upcase}}"
   end
 
   column :invoice_id, label: "Invoice ID", default: true, sort: true, includes: [:policy, :created_by] do
@@ -33,6 +32,7 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
 
   column :invoice_number, default: true do
     text value: :invoice_number, format: 'primary'
+    text value: "{{record.invoice_type.name | upcase}}"
   end
 
   column :status, default: true, includes: [:status] do
