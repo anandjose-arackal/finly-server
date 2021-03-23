@@ -73,6 +73,7 @@ class BudgetTrail < ApplicationRecord
   belongs_to :po_trail_item, class_name: "BudgetTrail", optional: true
 
   after_save :set_po_trail_attributes
+  after_save :recalculate_po_remaining_amount
 
   after_destroy :set_po_trail_attributes
 
@@ -161,8 +162,6 @@ class BudgetTrail < ApplicationRecord
     where.not entity_status_id: entity_status_id
   }
 
-  private
-
   # here we are reducing the amounts against each line item to match the amount that has been invoices
   # so that it doesn't consume the budget twice.
   # Additionally, we also have to prorporionally reduce the TDS (if any) in the invoice and proportionally subtract it from the remaining amount of the PO
@@ -176,4 +175,13 @@ class BudgetTrail < ApplicationRecord
     end
   end
 
+  # we need to recalculate remaining amount as updating po budget trail will set it wrongly if po invoice is present
+  def recalculate_po_remaining_amount
+    if self.entity_type == 'PurchaseOrderItem'
+      invoice_trail = BudgetTrail.where(entity_type: "InvoiceLineItem", po_trail_item_id: self.id).first
+      if invoice_trail.present?
+        invoice_trail.set_po_trail_attributes
+      end
+    end
+  end
 end

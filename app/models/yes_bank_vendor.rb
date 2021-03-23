@@ -106,7 +106,7 @@ class YesBankVendor < ApplicationRecord
       }
   )
 
-  default_scope { unscope(:where) }
+  default_scope { unscope(:where).reorder(created_at: :desc) }
 
   # Requirement first shared by olx
   # has_one :cancelled_cheque_attachment, class_name: "VendorAttachment", dependent: :destroy
