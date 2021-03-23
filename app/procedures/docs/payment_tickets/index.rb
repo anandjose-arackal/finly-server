@@ -26,17 +26,9 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     date value: :updated_at
   end
 
-  column :created_by, default: true, includes: [:created_by] do
-    user value: :created_by
-  end
-
-  column :scheduled_date, sort: :payment_order_scheduled_at, default: true, includes: [:payment_order] do
-    date value: "{{record.payment_order.scheduled_at}}"
-  end
-
-  column :payment_ticket_id, sort: :id, label: "Payment Ticket ID", default: true do
-    text value: :payment_ticket_id, format: "primary"
-  end
+  # column :created_by, default: true, includes: [:created_by] do
+  #   user value: :created_by
+  # end
 
   column :ticket_type, label: "Ticket Type", default: true do
     text value: :ticket_type
