@@ -199,6 +199,8 @@ class Invoice < ApplicationRecord
 
   acts_as_sequenced column: :invoice_id, purpose: :invoice, editable: false, prefix: 'INV'
 
+  default_scope { order(created_at: :desc) }
+
   belongs_to :address, optional: true
   # #### Fixme: These associations are deprecated to support amount number fields with the same name.
   # #### Fixme: This can be cleared once this has been deployed to production
