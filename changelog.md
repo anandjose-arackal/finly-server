@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file. Always add new logs to 
 beginning of this file.
 
+## 2021-03-23
+  - Updating the reporting values and payment ticket values.
+  - Adding support for multi currency export.
+
 ## 2021-03-22
   - Updating the invoice form migration script and fixing migration bugs
 

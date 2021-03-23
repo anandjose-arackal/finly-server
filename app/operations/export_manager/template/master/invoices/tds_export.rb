@@ -35,4 +35,11 @@ class ExportManager::Template::Master::Invoices::TdsExport < ExportManager::Buil
   attribute :cgst_sgst_amount, template: '{{ record.cgst_amount }}'
   attribute :igst_amount, template: '{{ record.igst_amount }}'
   attribute :amount_paid, template: '{{ record.payment_amounts_total }}'
+
+
+  attribute :reporting_net_total, template: '{{ record.reporting_invoice_net_total_amount }}'
+  attribute :reporting_payable_amount, template: '{{ record.reporting_invoice_balance_due }}'
+  attribute :conversion_rate, template: '{{ record.conversion_rate }}'
+  attribute :base_currency, template: '{{ record.base_currency_code }}'
+  attribute :reporting_currency, template: '{{ record.reporting_currency_code }}'
 end

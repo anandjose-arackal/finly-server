@@ -238,7 +238,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
       number :item_rate,
              label: "Item Rate",
-             computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.rate | default: 0}}'),
+             computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.rate | default: 0 }}'),
              visible: true
 
       amount :rate, label: "Rate",
@@ -246,10 +246,9 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_visible_be_changed: false,
              required: true, visible: true, editable: true,
              computed: Forms::Compute::Form('{{ row.item_rate | divided_by: form.conversion_rate | round: 2 }}')
-      # computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.rate | default: 0}}')
 
       # gross_amount = rate x quantity
-      amount :item_gross_amount, label: 'Item Gross Amount(Base Currency)', editable: false, visible: false,
+      amount :item_gross_amount, label: 'Item Gross Amount', editable: false, visible: false,
              can_visible_be_changed: false,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_gross_amount])
@@ -263,7 +262,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       number :discount, visible: true, editable: true, default_value: 0
 
       # discount_amount = gross_amount x discount / 100
-      amount :item_discount_amount, label: 'Item Discount Amount(Base Currency)', editable: false, visible: true,
+      amount :item_discount_amount, label: 'Item Discount Amount', editable: false, visible: true,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_discount_amount])
 
@@ -273,7 +272,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_discount_amount])
 
       # taxable_amount = gross_amount - discount_amount
-      amount :item_taxable_amount, label: 'Item Taxable Amount(Base Currency)', editable: false, visible: true,
+      amount :item_taxable_amount, label: 'Item Taxable Amount', editable: false, visible: true,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_taxable_amount])
 
@@ -288,7 +287,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       number :tax_percentage, editable: false, visible: true, computed: Forms::Compute::Lookup('items.tax_rate_id', '{{record.rate}}')
 
       # tax_amount = taxable_amount x tax / 100
-      amount :item_tax_amount, label: 'Item Tax Amount(Base Currency)', editable: false, visible: true,
+      amount :item_tax_amount, label: 'Item Tax Amount', editable: false, visible: true,
              can_editable_be_changed: false,
              can_visible_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_tax_amount])
@@ -298,7 +297,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_tax_amount])
 
-      amount :item_tds_amount, label: 'Tds Amount(Base Currency)', editable: false, visible: true,
+      amount :item_tds_amount, label: 'Tds Amount', editable: false, visible: true,
              can_editable_be_changed: false,
              can_visible_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_tds_amount])
@@ -308,7 +307,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_tds_amount])
 
-      amount :item_net_amount, label: "Net Amount(Base Currency)", editable: false, visible: true,
+      amount :item_net_amount, label: "Net Amount", editable: false, visible: true,
              can_editable_be_changed: false,
              can_visible_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_net_amount])
@@ -318,7 +317,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_net_amount])
 
-      amount :item_billable_amount, label: "Billable Amount(Base Currency)", editable: false, visible: false,
+      amount :item_billable_amount, label: "Billable Amount", editable: false, visible: false,
              can_editable_be_changed: false,
              can_visible_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_billable_amount])
@@ -333,7 +332,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
   # INVOICE ITEMS SUMMARY
   section :summary do
     summary :items_summary do
-      amount :invoice_gross_amount, label: 'Invoice Gross Amount(Base Currency)', editable: false, visible: true,
+      amount :invoice_gross_amount, label: 'Invoice Gross Amount', editable: false, visible: true,
              can_editable_be_changed: false,
              can_visible_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_gross_amount])
@@ -351,7 +350,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:overall_discount_amount])
 
-      amount :invoice_discount_amount, label: "Net Discount Amount( Base Currency )", visible: true,
+      amount :invoice_discount_amount, label: "Net Discount Amount", visible: true,
              editable: false, can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_discount_amount])
 
@@ -360,7 +359,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_discount_amount])
 
-      amount :invoice_taxable_amount, label: 'Invoice Taxable Amount(Base Currency)', editable: false, visible: true,
+      amount :invoice_taxable_amount, label: 'Invoice Taxable Amount', editable: false, visible: true,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_taxable_amount])
 
@@ -369,7 +368,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_visible_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_taxable_amount])
 
-      amount :invoice_tax_amount, label: 'Invoice Tax Amount(Base Currency)', editable: false, visible: true,
+      amount :invoice_tax_amount, label: 'Invoice Tax Amount', editable: false, visible: true,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_tax_amount])
 
@@ -384,7 +383,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Lookup('items_summary.tds_slab_id', '{{record.tds}}')
 
-      amount :invoice_tds_amount, label: 'Invoice Tds Amount(Base Currency)', editable: false, visible: true, # todo - condition when reporting currency is in INR
+      amount :invoice_tds_amount, label: 'Invoice Tds Amount', editable: false, visible: true, # todo - condition when reporting currency is in INR
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_tds_amount])
 
@@ -393,7 +392,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_tds_amount])
 
-      amount :invoice_freight_amount, label: "Freight(Base Currency)",
+      amount :invoice_freight_amount, label: "Freight",
              default_value: 0, visible: true, editable: true,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_freight_amount])
 
@@ -402,7 +401,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_freight_amount])
 
-      amount :invoice_sub_total_amount, label: 'Invoice SubTotal Amount(Base Currency)', editable: false, visible: false,
+      amount :invoice_sub_total_amount, label: 'Invoice SubTotal Amount', editable: false, visible: false,
              can_visible_be_changed: false,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_sub_total_amount]) # todo - changd name
@@ -412,7 +411,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_sub_total_amount]) # todo - changd name
 
-      amount :invoice_roundoff_amount, label: 'Invoice Roundoff Amount(Base Currency)', visible: true, editable: false,
+      amount :invoice_roundoff_amount, label: 'Invoice Roundoff Amount', visible: true, editable: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_roundoff_amount]) # todo - changd name
 
       amount :reporting_invoice_roundoff_amount, label: 'Invoice Roundoff Amount(Reporting Currency)', editable: false, visible: false,
@@ -420,7 +419,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_roundoff_amount]) # todo - changd name
 
-      amount :invoice_total_amount, label: 'Invoice Total Amount(Base Currency)', editable: false, visible: true,
+      amount :invoice_total_amount, label: 'Invoice Total Amount', editable: false, visible: true,
              can_editable_be_changed: false,
              can_visible_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_total_amount])
@@ -430,7 +429,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_total_amount])
 
-      amount :invoice_paid_outside_amount, label: "Payment Outside Finly(Base Currency)",
+      amount :invoice_paid_outside_amount, label: "Payment Outside Finly",
              default_value: 0, visible: true, editable: true
 
       amount :reporting_invoice_paid_outside_amount, label: "Payment Outside Finly(Reporting Currency)", editable: false, visible: false,
@@ -438,7 +437,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_paid_outside_amount])
 
-      amount :invoice_net_total_amount, label: "Net Total(Base Currency)", editable: false, visible: true,
+      amount :invoice_net_total_amount, label: "Net Total", editable: false, visible: true,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_net_total_amount])
 
@@ -446,7 +445,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_net_total_amount])
 
-      amount :invoice_advance_paid_amount, label: "Amount Paid / Advance(Base Currency)",
+      amount :invoice_advance_paid_amount, label: "Amount Paid / Advance",
              default_value: 0, editable: false, visible: true,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_advance_paid_amount])
 
@@ -455,7 +454,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_advance_paid_amount])
 
-      amount :invoice_balance_due, label: "Balance Payable(Base Currency)", editable: false,
+      amount :invoice_balance_due, label: "Balance Payable", editable: false,
              can_editable_be_changed: false, visible: true,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_balance_due])
 
