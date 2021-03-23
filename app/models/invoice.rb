@@ -1743,22 +1743,22 @@ class Invoice < ApplicationRecord
 
   def sync_to_old_structure
       amounts_attributes_map.each do |key, value|
-        amount_value = self.send("reporting_#{key}")
+        amount_value = self.send("#{key}")
         amount_attr = self.send(value)
-        reporting_currency_id = get_reporting_currency&.id || Currency.id_for("INR")
+        base_currency_id = get_base_currency&.id
         if amount_attr.present?
-          Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: reporting_currency_id) # todo - I2P : Update value from base currency
+          Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: base_currency_id)
         else
           self.assign_attributes(
             {
-              "#{value}": Amount.create(value: amount_value, currency_id: reporting_currency_id).id
+              "#{value}": Amount.create(value: amount_value, currency_id: base_currency_id).id
             }
           )
         end
       end
 
       amount_direct_attribute_map.each do |key, value|
-        amount_value = self.send("reporting_#{key}")
+        amount_value = self.send("#{key}")
         self.assign_attributes({
                                  "#{value}": amount_value
                                })
