@@ -16,15 +16,17 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
     text value: "Vendor ID: {{record.vendor.vendor_id}}"
   end
 
-  column :po_number, sort: :po_number, label: "PO Number", default: true do
+  column :po_number, sort: :po_number, label: "PO Number", includes: [:created_by, :policy], default: true do
     text value: :po_number, format: "primary"
+    text value: 'Policy: {{record.policy.name}}'
+    user value: :created_by
   end
 
   column :name, label: "Name", default: true do
     text value: "{{record.name}}", format: "success"
   end
 
-  column :created_by, default: true, includes: [:created_by] do
+  column :created_by, includes: [:created_by] do
     user value: :created_by
   end
 
@@ -44,7 +46,9 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
     indicator value: :po_status, format: :format_status
   end
 
-  column :policy, default: true, includes: [:policy] do
+  IndexBuilder::API::ColumnTemplate::ReviewProgress(self)
+
+  column :policy, includes: [:policy] do
     text value: "{{record.policy.name}}"
   end
 
@@ -52,15 +56,18 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
     amount value: :net_amount
   end
 
-  column :gross_amount, default: true, includes: [gross_amount: :currency] do
+  IndexBuilder::API::ColumnTemplate::ControllingUser(self)
+  IndexBuilder::API::ColumnTemplate::ControllingLevel(self)
+
+  column :gross_amount, includes: [gross_amount: :currency] do
     amount value: :gross_amount
   end
 
-  column :cost_center, default: true, includes: [:cost_center] do
+  column :cost_center, default: false, includes: [:cost_center] do
     text value: :cost_center_name
   end
 
-  column :department, default: true, includes: [:department] do
+  column :department, default: false, includes: [:department] do
     text value: :department_name
   end
 
@@ -75,10 +82,6 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
   column :shipping_location, sort: :shipping_location_name, default: false, includes: [:delivery_location] do
     text value: "{{record.shipping_location.name}}"
   end
-
-  IndexBuilder::API::ColumnTemplate::ControllingUser(self)
-  IndexBuilder::API::ColumnTemplate::ControllingLevel(self)
-  IndexBuilder::API::ColumnTemplate::ReviewProgress(self)
 
   column :advance_status, default: true, includes: [:status] do
     indicator value: :advance_amount_status, format: :format_advance_status

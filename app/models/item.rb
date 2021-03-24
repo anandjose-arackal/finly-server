@@ -37,11 +37,12 @@ class Item < ApplicationRecord
   include MathUtil
   include EventProducer
   # include SearchIndex::Concerns::Document
-include Searchkick::Api
+  include Searchkick::Api
 
   acts_as_sequenced column: :item_number, purpose: :item_master, min_length: 8, editable: false, prefix: -> (record) { record.goods? ? "G" : "S" }
 
-  default_scope {unscope(:where)}
+  default_scope { unscope(:where).order(created_at: :desc) }
+
   belongs_to :company, optional: true
   belongs_to :category, optional: true
   belongs_to :tax_rate, optional: true
@@ -60,7 +61,7 @@ include Searchkick::Api
   # validates :rate, presence: true
   validates :description, presence: true
   # validates :hsn_sac, format: {with: /\A(\d{6}|\d{8})\Z/}, allow_blank: true
-  validates :hsn_sac, numericality: {only_integer: true}, length: {minimum: 4, maximum: 8}, allow_blank: true
+  validates :hsn_sac, numericality: { only_integer: true }, length: { minimum: 4, maximum: 8 }, allow_blank: true
 
   accepts_nested_attributes_for :artifacts, allow_destroy: true
 
@@ -114,38 +115,38 @@ include Searchkick::Api
 
   def as_json
     {
-        id: id,
-        company_id: company_id,
-        item_number: item_number,
-        unit_of_measurement: unit_of_measurement,
-        hsn_sac: hsn_sac,
-        category_name: category&.name,
-        category_id: category_id,
-        category_gl_code: category&.gl_code,
-        rate: rate,
-        description: description,
-        discount: discount,
-        sku: sku,
-        tax_amount: self.tax_amount,
-        tax_rate_id: tax_rate_id,
-        tax: tax,
-        account: account,
-        item_code: item_code,
-        gl_code: self&.category&.gl_code,
-        supply_item_type_id: supply_item_type_id,
-        item_type: supply_item_type.as_json,
-        product_type: product_type_id,
-        product_type_label: product_type_label,
-        rate_contract_vendors: rate_contract_vendors,
-        preferred_vendors: rate_contract_vendors,
-        user: user,
-        active: active,
-        item_expense_type_id: item_expense_type_id,
-        item_expense_type_name: item_expense_type&.name,
-        tds_applicable: tds_applicable,
-        tds_applicable_label: (tds_applicable ? "yes" : "no"),
-        custom_description: get_custom_description,
-        custom_fields: self.custom_fields
+      id: id,
+      company_id: company_id,
+      item_number: item_number,
+      unit_of_measurement: unit_of_measurement,
+      hsn_sac: hsn_sac,
+      category_name: category&.name,
+      category_id: category_id,
+      category_gl_code: category&.gl_code,
+      rate: rate,
+      description: description,
+      discount: discount,
+      sku: sku,
+      tax_amount: self.tax_amount,
+      tax_rate_id: tax_rate_id,
+      tax: tax,
+      account: account,
+      item_code: item_code,
+      gl_code: self&.category&.gl_code,
+      supply_item_type_id: supply_item_type_id,
+      item_type: supply_item_type.as_json,
+      product_type: product_type_id,
+      product_type_label: product_type_label,
+      rate_contract_vendors: rate_contract_vendors,
+      preferred_vendors: rate_contract_vendors,
+      user: user,
+      active: active,
+      item_expense_type_id: item_expense_type_id,
+      item_expense_type_name: item_expense_type&.name,
+      tds_applicable: tds_applicable,
+      tds_applicable_label: (tds_applicable ? "yes" : "no"),
+      custom_description: get_custom_description,
+      custom_fields: self.custom_fields
 
     }
   end
@@ -176,7 +177,7 @@ include Searchkick::Api
   end
 
   def rate_contract_vendors
-    rate_contract_line_items.joins(:rate_contract).map { |line_item| {vendor_id: line_item.rate_contract.vendor.id, vendor_name: line_item.rate_contract.vendor.display_name, rate: precision_value(line_item&.amount&.value), rate_contract_item_id: line_item.id} }
+    rate_contract_line_items.joins(:rate_contract).map { |line_item| { vendor_id: line_item.rate_contract.vendor.id, vendor_name: line_item.rate_contract.vendor.display_name, rate: precision_value(line_item&.amount&.value), rate_contract_item_id: line_item.id } }
   end
 
   def get_custom_description
