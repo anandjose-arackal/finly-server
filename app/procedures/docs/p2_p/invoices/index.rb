@@ -15,6 +15,7 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     }
   end
   custom_fields :invoice
+  model 'Invoice'
 
   # Fixed column is always default true
   column :vendor, label: 'Vendor Details', fixed: true, sort: :vendor_business_name, includes: [:vendor] do
