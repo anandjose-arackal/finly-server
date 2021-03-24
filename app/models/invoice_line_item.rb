@@ -455,12 +455,12 @@ class InvoiceLineItem < ApplicationRecord
   def amounts_attributes_map
     # todo - I2P change it to converted values post multicurrency setup
     {
-      item_gross_amount: 'amount',
-      item_discount_amount: 'discount_amount',
-      item_taxable_amount: 'taxable_amount',
-      item_tax_amount: 'tax_amount',
-      item_net_amount: 'net_amount',
-      item_billable_amount: 'billable_amount'
+      item_gross_amount: 'amount_id',
+      item_discount_amount: 'discount_amount_id',
+      item_taxable_amount: 'taxable_amount_id',
+      item_tax_amount: 'tax_amount_id',
+      item_net_amount: 'net_amount_id',
+      item_billable_amount: 'billable_amount_id'
     }
   end
 end

@@ -179,7 +179,8 @@ class Invoice < ApplicationRecord
   end
 
   def get_base_currency
-    Currency.currency_for(self.base_currency || "INR")
+    currency_code = FormCurrency.find(self.base_currency)&.currency_code rescue nil
+    Currency.currency_for(currency_code || "INR")
   end
 
   exchange_bank :get_reporting_currency, :get_base_currency, :exchange_rate
@@ -1745,25 +1746,20 @@ class Invoice < ApplicationRecord
 
   def sync_to_old_structure
       amounts_attributes_map.each do |key, value|
-        amount_value = self.send("#{key}")
+        amount_value = self.send(key)
         amount_attr = self.send(value)
         base_currency_id = get_base_currency&.id
         if amount_attr.present?
           Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: base_currency_id)
         else
-          self.assign_attributes(
-            {
-              "#{value}": Amount.create(value: amount_value, currency_id: base_currency_id).id
-            }
-          )
+          amount_id = Amount.create(value: amount_value, currency_id: base_currency_id).id
+          self.send("#{value}=", amount_id)
         end
       end
 
       amount_direct_attribute_map.each do |key, value|
-        amount_value = self.send("#{key}")
-        self.assign_attributes({
-                                 "#{value}": amount_value
-                               })
+        amount_value = self.send(key)
+        self.send("#{value}=", amount_value)
       end
       self.save
   end
