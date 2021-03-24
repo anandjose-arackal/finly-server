@@ -1747,7 +1747,7 @@ class Invoice < ApplicationRecord
   def sync_to_old_structure
       amounts_attributes_map.each do |key, value|
         amount_value = self.send(key)
-        amount_attr = self.send(value)
+        amount_attr = self.send("#{value}_id")
         base_currency_id = get_base_currency&.id
         if amount_attr.present?
           Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: base_currency_id)
@@ -1766,7 +1766,7 @@ class Invoice < ApplicationRecord
 
   def sync_to_forms_structure
     amounts_attributes_map.each do |key, value|
-      amount_value = self.send(value)
+      amount_value = self.send(value)&.value
       self.send("reporting_#{key}=", amount_value)
       self.send("#{key}=", amount_value)
     end
@@ -1782,15 +1782,15 @@ class Invoice < ApplicationRecord
 
   def amounts_attributes_map
     {
-      invoice_gross_amount: 'amount_id',
-      invoice_discount_amount: 'discount_amount_id',
-      invoice_taxable_amount: 'gross_amount_id',
-      invoice_tax_amount: 'tax_amount_id',
-      invoice_tds_amount: 'tds_amount_id',
-      invoice_advance_paid_amount: 'advance_amount_id',
-      invoice_sub_total_amount: 'net_amount_id',
-      invoice_balance_due: 'balance_due_id',
-      invoice_freight_amount: 'freight_amount_id'
+      invoice_gross_amount: 'amount',
+      invoice_discount_amount: 'discount_amount',
+      invoice_taxable_amount: 'gross_amount',
+      invoice_tax_amount: 'tax_amount',
+      invoice_tds_amount: 'tds_amount',
+      invoice_advance_paid_amount: 'advance_amount',
+      invoice_sub_total_amount: 'net_amount',
+      invoice_balance_due: 'balance_due',
+      invoice_freight_amount: 'freight_amount'
     }
   end
 

@@ -428,7 +428,7 @@ class InvoiceLineItem < ApplicationRecord
   def sync_to_old_structure
     amounts_attributes_map.each do |key, value|
       amount_value = self.send("#{key}")
-      amount_attr = self.send(value)
+      amount_attr = self.send("#{value}_id")
       base_currency_id = get_base_currency&.id
       if amount_attr.present?
         Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: base_currency_id)
@@ -445,7 +445,7 @@ class InvoiceLineItem < ApplicationRecord
 
   def sync_to_forms_structure
     amounts_attributes_map.each do |key, value|
-      amount_value = self.send(value)
+      amount_value = self.send(value)&.value
       self.send("reporting_#{key}=", amount_value)
       self.send("#{key}=", amount_value)
     end
@@ -455,12 +455,12 @@ class InvoiceLineItem < ApplicationRecord
   def amounts_attributes_map
     # todo - I2P change it to converted values post multicurrency setup
     {
-      item_gross_amount: 'amount_id',
-      item_discount_amount: 'discount_amount_id',
-      item_taxable_amount: 'taxable_amount_id',
-      item_tax_amount: 'tax_amount_id',
-      item_net_amount: 'net_amount_id',
-      item_billable_amount: 'billable_amount_id'
+      item_gross_amount: 'amount',
+      item_discount_amount: 'discount_amount',
+      item_taxable_amount: 'taxable_amount',
+      item_tax_amount: 'tax_amount',
+      item_net_amount: 'net_amount',
+      item_billable_amount: 'billable_amount'
     }
   end
 end
