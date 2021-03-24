@@ -30,7 +30,7 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     text value: "{{record.invoice_type.name | upcase}}"
   end
 
-  column :invoice_number, default: true do
+  column :invoice_number, default: true, sort: true do
     text value: :invoice_number, format: 'primary'
     text value: "{{record.invoice_type.name | upcase}}"
   end
