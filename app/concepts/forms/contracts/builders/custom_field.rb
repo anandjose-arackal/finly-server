@@ -1,7 +1,8 @@
 class Forms::Contracts::Builders::CustomField
 
-  def self.call(reform, form_custom_fields)
-    reform.collection :form_custom_fields, deserializer: Forms::Contracts::Builders::CustomField::Build(form_custom_fields) do
+  def self.call(reform, form_custom_entities)
+    reform.collection :form_custom_fields, deserializer: Forms::Contracts::Builders::CustomField::Build(form_custom_entities) do
+      property :id
       property :uuid
       property :form_entity_id
       property :field_key
@@ -25,15 +26,19 @@ class Forms::Contracts::Builders::CustomField
     end
   end
 
-  def self.Build(form_custom_fields)
+  def self.Build(form_custom_entities)
     -> (input, represented, **) do
+      represented_custom_fields = represented.form_custom_fields
       # represented.custom_fields = represented.model.present? ? represented.model.custom_fields : []
-      represented.form_custom_fields = []
-      form_custom_fields.each do |custom_field_entity|
-        # debugger
-        custom_field = represented.form_custom_fields.find_by(form_entity_id: custom_field_entity.uuid)
+      # represented.form_custom_fields = []
+      form_custom_entities.each do |custom_field_entity|
+        custom_field = nil
+        represented_custom_fields.each do |represented_custom_field|
+          custom_field = represented_custom_field if represented_custom_field.form_entity_id == custom_field_entity.uuid
+        end
         if custom_field.nil?
           custom_field = build_custom_field custom_field_entity
+          represented.form_custom_fields.append(custom_field)
         end
 
         # Method 2
@@ -84,19 +89,19 @@ class Forms::Contracts::Builders::CustomField
         else
           custom_field.value = input[custom_field_entity.entity_key]
         end
-        represented.form_custom_fields.append(custom_field)
+        # represented.form_custom_fields.append(custom_field)
       end
     end
   end
 
   def self.build_custom_field(custom_field_entity)
     FormCustomField.new(
-        {
-            form_entity: custom_field_entity,
-            form_id: custom_field_entity.form_id,
-            field_key: custom_field_entity.entity_key,
-            entity_type: custom_field_entity.entity_type
-        }
+      {
+        form_entity: custom_field_entity,
+        form_id: custom_field_entity.form_id,
+        field_key: custom_field_entity.entity_key,
+        entity_type: custom_field_entity.entity_type
+      }
     )
   end
 end
