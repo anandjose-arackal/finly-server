@@ -92,7 +92,7 @@ class YesBankVendor < ApplicationRecord
   has_many :vendor_tds_rates, foreign_key: :vendor_id
   has_many :tds_rates, through: :vendor_tds_rates
   has_many :beneficiary_payments, foreign_key: :vendor_id
-  has_many :gstin_locations, foreign_key: :vendor_id
+  has_many :gstin_locations, foreign_key: :vendor_id, dependent: :destroy
   has_many :credit_notes, foreign_key: :vendor_id
 
   has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment'
