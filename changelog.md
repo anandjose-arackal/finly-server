@@ -2,8 +2,9 @@
 All notable changes to this project will be documented in this file. Always add new logs to 
 beginning of this file.
 
-## 2021-03-15
+## 2021-03-25
   - Security: Updating the authorization policy for invoice and vendors. 
+  - Removing changes for invoice policy authorization.
 
 ## 2021-03-19
 - Fix: Moved OTP mailers from default redis queue to payment creation queue

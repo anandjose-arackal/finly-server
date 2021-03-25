@@ -2,10 +2,10 @@ class Docs::P2P::Invoices::Show < Transactions::API
 
   # step Form(route: 'invoices')
   # step Model(Invoice, :find_by)
+  # step Policy::Pundit(Docs::P2P::Invoices::Policy, :show?)
   # step Forms::Contracts::Build()
 
   step Model(Invoice, :find_by)
-  step Policy::Pundit(Docs::P2P::Invoices::Policy, :show?)
   step :retrieve_form
 
   def retrieve_form(options, params:, current_user:, **)
