@@ -40,8 +40,6 @@ class WorkflowManager::Aasm::MoneyRequestProvider < WorkflowManager::Aasm::BaseP
 
     event :submit do
       transitions from: [:trip_open, :trip_retracted, :trip_rejected], to: :trip_approved, guard: [:reviewers_not_present?, :travel_request_present?]
-      transitions from: [:open, :retracted, :rejected], to: :auto_approved, guard: :reviewers_not_present?
-
       transitions from: [:trip_open, :trip_retracted, :trip_rejected], to: :trip_processing, guard: [:travel_request_present?]
       transitions from: [:open, :retracted, :rejected], to: :processing
     end
