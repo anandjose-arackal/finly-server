@@ -3,6 +3,7 @@
 class Docs::P2P::Vendors::Ops::Submit < Transactions::API
 
   step :init
+  step Policy::Pundit(Masters::Vendors::Policy, :submit?)
   step :update_policy
   step :set_approval_matrix
   step :submit
