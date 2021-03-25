@@ -74,7 +74,7 @@ class FormEntity < ApplicationRecord
   delegate :compute_lookup?, :compute_form?, to: :compute_type, allow_nil: true
   belongs_to :compute_lookup_entity, class_name: 'FormEntity', optional: true
 
-  has_one :prediction_model, class_name: 'MlModel::FormEntity', primary_key: :uuid
+  has_one :prediction_model, class_name: 'MlModel::FormEntityModel', primary_key: :uuid, as: :parent
   has_many :entities, class_name: 'FormEntity', foreign_key: :parent_id, primary_key: :uuid
   has_many :choices, class_name: 'FormEntityChoice', dependent: :destroy
   has_many :validations, class_name: 'FormEntityValidation'
@@ -100,6 +100,7 @@ class FormEntity < ApplicationRecord
   serialize :choices_scope, JSON
   serialize :config, JSON
   serialize :compute_formula, JSON
+  serialize :compute_lookup_assignments, JSON
 
   scope :root, -> { where parent_id: nil }
   scope :system_fields, -> { where system_field: true }
@@ -128,7 +129,7 @@ class FormEntity < ApplicationRecord
     Forms::Contracts::Builders::FormEntity.({ params: { entity: self, contract: contract }, current_user: user })
   end
 
-  # Class method `contract` is used in Form Builder
+  # Class method +contract+ is used in Form Builder
   def self.contract(model, current_user)
     base_class = model.system_field ? Forms::Entities::Contracts::SystemFormEntity : Forms::Entities::Contracts::CustomFormEntity
 
@@ -151,6 +152,7 @@ class FormEntity < ApplicationRecord
     elsif data[:lookup].present?
       self.compute_type_id = FormEntityComputationType.id_for(:lookup)
       self.compute_formula = data&.dig(:lookup, :formula)
+      self.compute_lookup_assignments = data&.dig(:lookup, :assignments)
       template_reference[:compute_lookup_entity_path] = data&.dig(:lookup, :lookup_entity_path)
     end
   end
@@ -239,6 +241,7 @@ class FormEntity < ApplicationRecord
       compute_type_id: compute_type_id,
       compute_formula: compute_formula,
       compute_lookup_entity_id: compute_lookup_entity_id,
+      compute_lookup_assignments: compute_lookup_assignments,
       filters: filters&.as_store,
       config_path: config_path,
       validations: validations.as_json(opts),
@@ -380,6 +383,35 @@ class FormEntity < ApplicationRecord
     else
       path
     end
+  end
+
+  # True if the entity exists within a collection.
+  #
+  # @return [Boolean]
+  #
+  # @example
+  #   returns true for items.total_amount since it is in az collection
+  #   returns false for policy_id since it is not in any collection
+  def is_in_collection?(options = {})
+    return false if parent_id.blank?
+
+    form = options[:form] || options['form'] || self.form
+
+    paths = entity_path.split('.')
+    ent_path = ''
+    paths.each do |ent_key|
+      ent_path += "." unless ent_path.blank?
+      ent_path += ent_key
+
+      next if ent_key == entity_key
+
+      ent = form.find_entity(ent_path)
+      next if ent.blank?
+
+      return true if ent.class.collection?
+    end
+
+    false
   end
 
   private

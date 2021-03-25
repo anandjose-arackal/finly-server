@@ -14,7 +14,7 @@ module Rules::Predicates
   def self.to_valid_format(arr)
     formatted_array = []
     arr.each do |val|
-      is_datetime = val.to_datetime rescue nil
+      is_datetime = Date.strptime(val, "%Y-%m-%d") rescue nil
       unless is_datetime.nil?
         formatted_array.push(is_datetime.strftime('%a, %d %b %Y %H:%M:%S').to_datetime)
         next
@@ -159,11 +159,11 @@ module Rules::Predicates
   end
 
   predicate :null do |v, d|
-    v[0].nil?
+    v[0].blank?
   end
 
   predicate :not_null do |v, d|
-    !v[0].nil?
+    v[0].present?
   end
 
 end

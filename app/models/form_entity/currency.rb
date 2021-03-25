@@ -101,4 +101,13 @@ class FormEntity::Currency < FormEntity
       end
     end
   end
+
+  def as_json(option = {})
+    result = super 
+    result_currencies = result[:options]['currencies'] || []
+    currencies = CURRENCIES.select{ |currency| result_currencies.include?(currency[:currency_code]) }
+    result[:options]['currencies'] = currencies
+    result
+  end
+
 end

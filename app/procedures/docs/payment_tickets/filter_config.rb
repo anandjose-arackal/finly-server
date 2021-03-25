@@ -8,12 +8,18 @@ class Docs::PaymentTickets::FilterConfig < Filters::API
       {id: "utility_bill", name: "Utility Bill"},
   ]
 
+  TRANSACTION_TYPE = [
+    {id: 'true', name: 'Domestic'},
+    {id: 'false', name: 'International'}
+  ]
+
   index_builder Docs::PaymentTickets::Index
 
   attribute :id, label: 'Payment Ticket ID', type: :text, simple: true
   attribute :payment_order_payments_id, label: "Payment ID", type: :text, simple: true
   attribute :status_id, type: :dropdown, choices: Choices[:enum].(BankPaymentRequestStatus)
   attribute :ticket_type, type: :dropdown, simple: true, choices: Choices[:list].(*TICKET_TYPES)
+  attribute :is_domestic, label: 'Transaction Type', type: :dropdown, choices: Choices[:list].(*TRANSACTION_TYPE)
   attribute :name, type: :text, simple: true
   attribute :created_at, type: :datetime
   attribute :updated_at, type: :datetime

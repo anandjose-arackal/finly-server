@@ -5,5 +5,7 @@ json.form_data do
   json.merge! @op['model'].form_data(@op['form'])
 end
 
+json.meta @op['model'].form_metadata
+
 
 json.reviewal_chain @op['model'].get_reviewal_chain
