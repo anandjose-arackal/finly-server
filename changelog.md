@@ -1,10 +1,15 @@
 # Changelog
 All notable changes to this project will be documented in this file. Always add new logs to 
 beginning of this file.
+
+## 2021-03-26
+  - FIX: Removing google_oauth2 gem
+
 ## 2021-03-21
-- Feat: Non Po Invoice Forms release
+  - Feat: Non Po Invoice Forms release
+
 ## 2021-03-19
-- Fix: Moved OTP mailers from default redis queue to payment creation queue
+  - Fix: Moved OTP mailers from default redis queue to payment creation queue
 
 ## 2021-03-16
   - Updating the authentication flow 
@@ -15,10 +20,10 @@ beginning of this file.
   - Updating the sso from request_store adding error messages and sso config movied to procedure
 
 ##2021-03-12
-- Updating the invoice and purchase_order validations
+  - Updating the invoice and purchase_order validations
 
 ##2021-03-11
-- Fix: `Vendor Payment` Purchase Order advance Amount in upaid, the status will change to `close`  while closing a purchase order
+  - Fix: `Vendor Payment` Purchase Order advance Amount in upaid, the status will change to `close`  while closing a purchase order
   The re-opeing action in purchase order will revoke the Purchase advance amount status to previous status if it a non paid advance
 
 ##2021-03-10
