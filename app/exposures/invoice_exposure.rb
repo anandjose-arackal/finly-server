@@ -34,6 +34,8 @@ class InvoiceExposure < Exposures::API
   attribute :invoice_number, record_attribute: true
   attribute :created_at, record_attribute: true
   attribute :submitted_at, record_attribute: true
+  attribute :overall_discount_amount, record_attribute: true
+  attribute :total_line_item_discount_amount, record_attribute: true
   attribute :created_by, record_attribute: true, exposure: true
   attribute :created_by_id, record_attribute: :created_by_user_id
   attribute :policy, exposure: true, record_attribute: true, includes: [:policy]
@@ -125,6 +127,7 @@ class InvoiceExposure < Exposures::API
       :header
     end
   end
+  attribute :discount_type_id, record_attribute: true
   attribute :status, record_attribute: true, exposure: true, includes: [:status]
   attribute :base_amount, includes: [:invoice_items, :amount, :original_amount] do
     record.include_original_amount
@@ -188,7 +191,7 @@ class InvoiceExposure < Exposures::API
   end
 
   attribute :rcm_enabled, record_attribute: true
-
+  attribute :vendor_country, record_attribute: true
   attribute :custom_fields, record_attribute: true, includes: [{ custom_fields: [:field_configuration, :value] }]
 
   attribute :item_amounts_total, record_attribute: true, includes: [{invoice_items: [:inventory_line_item, :amount, :billable_amount]}]
@@ -197,7 +200,9 @@ class InvoiceExposure < Exposures::API
     record.po_adjusted_advance&.value || 0
   end
 
-
+  attribute :forms_enabled do
+    record.forms_enabled
+  end
   # def vendor_ref_num(invoice_line_item)
   #   invoice_line_item.parent&.vendor_id
   # end

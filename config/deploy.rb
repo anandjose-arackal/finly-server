@@ -95,6 +95,7 @@ linked_files = %w{
   config/cubejs.yml
   config/mailtrain.yml
   config/message_template.yml
+  config/open_exchange_rates.yml
   config/sso_provider_credentials.yml
 }
 case fetch(:stage)

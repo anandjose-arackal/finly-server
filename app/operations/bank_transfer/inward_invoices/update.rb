@@ -466,8 +466,8 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
         if self.inward_invoice.procurement_id.present?
           unless inward_invoice.created_by == user
             inward_invoice.trails.create action_user: user,
-                                  action_id: TrailAction.id_for(:update),
-                                  action_level: inward_invoice.trails.last.action_level
+                                         action_id: TrailAction.id_for(:update),
+                                         action_level: inward_invoice.trails.last.action_level
           end
         end
       else

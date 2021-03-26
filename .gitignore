@@ -111,3 +111,5 @@ config/integrations.yml
 yarn-debug.log*
 .yarn-integrity
 /config/sso_provider_credentials.yml
+
+storage/

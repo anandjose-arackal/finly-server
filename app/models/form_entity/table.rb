@@ -59,6 +59,8 @@ class FormEntity::Table < FormEntity
 
   option :min_items
 
+  contract_eval 'Min Item Limit Check', &Forms::Validations::Templates[:min_items]
+
   schema_validation do
     required(:options) do
       hash do

@@ -1,6 +1,6 @@
 class BudgetManager::BudgetLimitValidator::Expense < BudgetManager::BudgetLimitValidator::Base
   attr_accessor :expense
-  
+
   def initialize!(options, **)
     self.expense = options[:expense]
 
@@ -36,7 +36,7 @@ class BudgetManager::BudgetLimitValidator::Expense < BudgetManager::BudgetLimitV
       budget_spent_amount = budget.budget_consumption&.total_consumed_amount&.value
 
       spent_amount = budget_spent_amount
-      
+
       if budget.expense
         op = BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer.({budget: budget, current_user: User.first, calculate_buckets: false, calculate_trail_items: true})
 
@@ -63,7 +63,7 @@ class BudgetManager::BudgetLimitValidator::Expense < BudgetManager::BudgetLimitV
     end
 
     options["result"] = {
-      budget_contributions: budget_contributions
+        budget_contributions: budget_contributions
     }
 
     if options['result.operation.errors'].present?

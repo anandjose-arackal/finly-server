@@ -7,8 +7,15 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
               :credit_note_initiator, :credit_note_reviewer, :credit_note_auditor,
               :non_po_invoice_initiator, :non_po_invoice_reviewer, :non_po_invoice_auditor, :auditor, :admin
   resolver 'invoices.default'
-  reference '{{record.id}}', procurement_id: '{{record.procurement_id}}', procurement_type: "{{record.invoice_type.config_key}}"
+  def self.reference(id = nil, args = {})
+    {id: '{{record.id}}',
+     args: {procurement_id: '{{record.procurement_id}}',
+            procurement_type: "{{record.invoice_type.config_key}}",
+            forms_enabled: "{% if record.forms_enabled == true %}{{true}}{% else %}{{ false }}{% endif %}"}
+    }
+  end
   custom_fields :invoice
+  model 'Invoice'
 
   # Fixed column is always default true
   column :vendor, label: 'Vendor Details', fixed: true, sort: :vendor_business_name, includes: [:vendor, :invoice_type] do
@@ -66,6 +73,10 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
 
   column :due_in_days, sort: :due_date, default: true do
     text value: :due_in_days
+  end
+
+  column :transaction_type, label: "Transaction Type" do
+    text value: :pt_type
   end
 
   # Todo
@@ -216,6 +227,14 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     return "Multiple" if context[:exposure].cost_allocation_items
 
     context[:exposure].cost_center&.name
+  end
+
+  def self.pt_type( context )
+    if context[:record].is_domestic 
+      'Domestic'
+    else
+      'International'
+    end
   end
 
   def self.department_name(context)

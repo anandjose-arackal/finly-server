@@ -1,5 +1,5 @@
 class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
-  attr_accessor :purchase_order, :procurement, :purchase_order_params, :po_available, :po_previous_status,:previously_active_po
+  attr_accessor :purchase_order, :procurement, :purchase_order_params, :po_available, :po_previous_status, :previously_active_po
 
   def init
     purchase_order_id = params[:id] || params[:purchase_order_id]
