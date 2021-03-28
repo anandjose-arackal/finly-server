@@ -11,8 +11,7 @@ class WorkflowManager::Aasm::ReportProvider < WorkflowManager::Aasm::BaseProvide
     state :closed
 
     event :submit do
-      transitions from: [:open, :retracted, :rejected], to: :auto_approved, guard: :reviewers_not_present?
-      transitions from: [:open, :retracted, :rejected], to: :processing
+      transitions from: [:open, :retracted, :rejected], to: :processing, guard: :reviewers_present?
     end
 
     event :approve do
