@@ -9,7 +9,7 @@ json.result do
   json.locations {json.array! @op['result']['locations']}
   json.categories {json.array! @op['result']['categories']}
   json.tax_rates {json.array! @op['result']['tax_rates']}
-  json.custom_fields {json.array! @op['result']['custom_fields']}
+  json.custom_fields_config {json.array! @op['result']['custom_fields_config']}
 
   json.reviewal_chains do
     json.array! @op['result']['reviewal_chains'] do |chain|
@@ -31,7 +31,7 @@ json.result do
               json.reviewer_details reviewer.reviewer.as_json
             end
           end
-        end
+        end 
       end
     end
   end

@@ -7,7 +7,7 @@ json.result do
 
   json.policies {json.array! @op['result']['policies']}
 
-  json.custom_fields {json.array! @op['result']['custom_fields']}
+  json.custom_fields_config {json.array! @op['result']['custom_fields_config']}
 
   json.reviewal_chains do
     json.array! @op['result']['reviewal_chains'] do |chain|
