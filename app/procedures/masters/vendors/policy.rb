@@ -9,7 +9,9 @@ class Masters::Vendors::Policy < ApplicationPolicy
   end
 
   def show?   
-    (user.is_vendor_initiator? && record.created_by_id == user.id ) || user.has_permission?([ :vendor_manager, :vendor_auditor ])|| user.vendor_payment_admin? || user.permission.create_beneficiaries || (record.get_reviewers.include?(user) )
+    ( user.company_id == record.company_id && YesBankVendor.status_ids(:approved, :auto_approved ).include?(record.status_id) ) ||
+    ( user.is_vendor_initiator? && record.created_by_id == user.id ) || user.has_permission?([ :vendor_manager, :vendor_auditor ])|| user.vendor_payment_admin? ||
+    ( record.document_level_reviewer_mappings.map(&:reviewer).include?(user) )
   end
 
   def update?
