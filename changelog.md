@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file. Always add 
 beginning of this file.
 
 
+## 2021-03-30
+  - Updating model for vendor form.
+
 ## 2021-03-25
   - Security: Updating the authorization policy for invoice and vendors. 
   - Removing changes for invoice policy authorization.

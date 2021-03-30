@@ -12,8 +12,7 @@ class Docs::P2P::Vendors::Ops::Submit < Transactions::API
   def init(options, current_user:, params:, **)
     if params[:reviewal_document].present?
       options[:reviewal_document] = params[:reviewal_document]
-      options[:model] = params[:reviewal_document]
-      params[:model] = params[:reviewal_document]
+
     else
       op = Docs::P2P::Vendors::Ops::Show.(params: {id: params[:vendor_form_id]}, current_user: current_user)
       unless op.success?
@@ -23,6 +22,8 @@ class Docs::P2P::Vendors::Ops::Submit < Transactions::API
       params[:reviewal_document] = op['model']
       options[:reviewal_document] = op['model']
     end
+    options[:model] = params[:reviewal_document]
+    params[:model] = params[:reviewal_document]
     true
   end
 
