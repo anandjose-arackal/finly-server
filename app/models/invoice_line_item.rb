@@ -417,34 +417,41 @@ class InvoiceLineItem < ApplicationRecord
 
   # Syncs amounts from new forms structure to legacy amounts table
   def sync_amounts
-    if item_gross_amount.present?
-      exchange_base_currency = get_base_currency&.country_code || "INR"
-
-      self.reporting_item_gross_amount = item_gross_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      self.reporting_item_discount_amount = item_discount_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      self.reporting_item_taxable_amount = item_taxable_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      self.reporting_item_tax_amount = item_tax_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      self.reporting_item_tds_amount = item_tds_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      self.reporting_item_net_amount = item_net_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      self.reporting_item_billable_amount = item_billable_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-
-      self.skip_callback = true
-      amounts_attributes_map.each do |key, value|
-        amount_value = self.send(key)
-        amount_attr = self.send("#{value}_id")
-        reporting_currency_id = get_reporting_currency&.id || Currency.id_for("INR")
-        if amount_attr.present?
-          Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: reporting_currency_id) # todo - I2P : Update value from base currency
-        else
-          self.assign_attributes(
-              {
-                  "#{value}_id": Amount.create(value: amount_value, currency_id: reporting_currency_id).id
-              }
-          )
-        end
+    self.skip_callback = true
+    if parent.respond_to?(:forms_enabled)
+      if parent.forms_enabled
+        sync_to_old_structure
+      else
+        sync_to_forms_structure
       end
-      self.save
     end
+  end
+
+  def sync_to_old_structure
+    amounts_attributes_map.each do |key, value|
+      amount_value = self.send("#{key}")
+      amount_attr = self.send("#{value}_id")
+      base_currency_id = get_base_currency&.id
+      if amount_attr.present?
+        Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: base_currency_id)
+      else
+        self.assign_attributes(
+          {
+            "#{value}": Amount.create(value: amount_value, currency_id: base_currency_id).id
+          }
+        )
+      end
+    end
+    self.save
+  end
+
+  def sync_to_forms_structure
+    amounts_attributes_map.each do |key, value|
+      amount_value = self.send(value)&.value
+      self.send("reporting_#{key}=", amount_value)
+      self.send("#{key}=", amount_value)
+    end
+    self.save
   end
 
   def amounts_attributes_map

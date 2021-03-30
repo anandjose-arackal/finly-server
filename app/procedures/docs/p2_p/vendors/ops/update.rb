@@ -4,7 +4,6 @@ class Docs::P2P::Vendors::Ops::Update < Transactions::API
   step Model(YesBankVendor, :find_by)
   # step Policy::Pundit(Docs::P2P::Invoices::Policy, :create?)
   step Forms::Contracts::Build()
-
   step Contract::Validate()
   step Contract::Persist()
   step Transactions::Messages::SuccessMessage('Updated')

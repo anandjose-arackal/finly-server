@@ -10,17 +10,18 @@ class IndexBuilder::API
   class_attr :feature_subscription
   class_attr :user_subscription
   class_attr :record_count
+  class_attr :model
 
   def self.resolver(route = nil, params: {})
-    @resolver = {route: route, params: params} if route
+    @resolver = { route: route, params: params } if route
 
     @resolver
   end
 
   def self.reference(id = nil, args = {})
-    @reference = {id: id, args: args} if id.present?
+    @reference = { id: id, args: args } if id.present?
 
-    @reference ||= {id: '{{record.id}}', args: {}}
+    @reference ||= { id: '{{record.id}}', args: {} }
   end
 
   def self.includes(args)
@@ -40,7 +41,7 @@ class IndexBuilder::API
   end
 
   def self.config(user)
-    config = {selectable: self.selectable, status_filters: self.status_filters, fixed: [], dynamic: []}
+    config = { selectable: self.selectable, status_filters: self.status_filters, fixed: [], dynamic: [] }
     columns.each do |column_key, column|
       if column.fixed
         config[:fixed] << column.config(user)
@@ -49,16 +50,17 @@ class IndexBuilder::API
       end
     end
 
-    self.config_custom_fields(user, config)
+    self.config_legacy_custom_fields(user, config)
+    self.config_form_custom_fields(user, config)
     config
   end
 
-  def self.config_custom_fields(user, config)
+  def self.config_legacy_custom_fields(user, config)
     return unless self.custom_fields
 
     field_configurations = user.company.field_configurations.joins(:field_parent_mappings)
                                .where(is_deleted: false, deleted_at: nil, enabled: true)
-                               .where(field_parent_mappings: {field_parent_type_id: FieldParentType.ids_for(*custom_fields[:type])})
+                               .where(field_parent_mappings: { field_parent_type_id: FieldParentType.ids_for(*custom_fields[:type]) })
     map = {}
     field_configurations&.each do |field_config|
       map[field_config.field_name] ||= []
@@ -66,10 +68,33 @@ class IndexBuilder::API
     end
     map.each_pair do |field_name, ids|
       config[:dynamic] << {
-          column_key: "cf_#{ids.join("_")}",
-          label: field_name,
-          sort: false,
-          default: false,
+        column_key: "cf_#{ids.join("_")}",
+        label: field_name,
+        sort: false,
+        default: false,
+      }
+    end
+  end
+
+  def self.config_form_custom_fields(user, config)
+    return unless self.model.present?
+    model_klass = Object.const_get(self.model)
+    return unless model_klass.reflect_on_association(:form_custom_fields).present?
+
+    form = Form.find_by(model: self.model, company_id: user.company_id)
+    return unless form.present?
+
+    entities = form.entities
+    entities.each do |form_entity|
+      next if form_entity.system_field
+      next if form_entity.is_in_collection?(form: form)
+      next if form_entity.is_a?(FormEntity::Attachment)
+
+      config[:dynamic] << {
+        column_key: "formcf_#{form_entity.uuid}",
+        label: form_entity.label,
+        sort: false,
+        default: false,
       }
     end
   end
@@ -110,6 +135,11 @@ class IndexBuilder::API
       includes += (@custom_fields&.dig(:includes) || [])
     end
 
+    # check if the model has form_custom_fields association and the column exists
+    if collection.model.reflect_on_association(:form_custom_fields).present? and required_columns&.select { |column| column.starts_with?("formcf_") }&.present?
+      includes << :form_custom_fields
+    end
+
     collection.includes(includes.uniq)
   end
 
@@ -124,19 +154,37 @@ class IndexBuilder::API
 
       map[column.column_key] = column.build(data_provider, user, record, record_exposure)
     end
-    build_custom_fields(map, user, record, record_exposure, required_columns)
-    {reference: record_exposure.template(reference), columns: map}
+    build_legacy_custom_fields(map, user, record, record_exposure, required_columns)
+    build_form_custom_fields(map, user, record, record_exposure, required_columns)
+    { reference: record_exposure.template(reference), columns: map }
   end
 
-  def self.build_custom_fields(map, user, record, record_exposure, required_columns)
+  def self.build_legacy_custom_fields(map, user, record, record_exposure, required_columns)
     return unless required_columns.present?
 
     required_columns.select { |column| column.starts_with?("cf_") }&.each do |custom_field_column|
       ids = custom_field_column.split("_")
       custom_fields = self.custom_fields[:path].call(record)
-      if custom_fields.present?
+      if custom_fields.size > 0
         required_cf = custom_fields.select { |cf| ids.include?(cf.field_configuration_id.to_s) }&.first
-        text_field = IndexBuilder::ContentTypes::Text.new({value: required_cf&.configured_field_value.to_s})
+        text_field = IndexBuilder::ContentTypes::Text.new({ value: required_cf&.configured_field_value.to_s })
+        map[custom_field_column] = [text_field.build(self, user, record, record_exposure)]
+      end
+    end
+  end
+
+  def self.build_form_custom_fields(map, user, record, record_exposure, required_columns)
+    return unless required_columns.present?
+    return unless record.respond_to?(:form_custom_fields)
+
+    required_columns.select { |column| column.starts_with?("formcf_") }&.each do |custom_field_column|
+      ids = custom_field_column.split("_")
+      custom_fields = record.form_custom_fields
+      if custom_fields.size > 0
+        required_cf = custom_fields.select { |cf| ids.include?(cf.form_entity_id.to_s) }&.first
+        value = required_cf&.retrieve_value.to_s
+        value = value.join(', ') if value.respond_to?(:each)
+        text_field = IndexBuilder::ContentTypes::Text.new({ value: value })
         map[custom_field_column] = [text_field.build(self, user, record, record_exposure)]
       end
     end

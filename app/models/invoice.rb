@@ -179,7 +179,9 @@ class Invoice < ApplicationRecord
   end
 
   def get_base_currency
-    Currency.find_by(id: self.base_currency) || Currency.find_by(country_code: "INR") 
+    # Currency.find_by(id: self.base_currency) || Currency.find_by(country_code: "INR") 
+    currency_code = FormCurrency.find(self.base_currency)&.currency_code rescue nil
+    Currency.currency_for(currency_code || "INR")
   end
 
   exchange_bank :get_reporting_currency, :get_base_currency, :exchange_rate
@@ -198,6 +200,8 @@ class Invoice < ApplicationRecord
   # include EventProducer
 
   acts_as_sequenced column: :invoice_id, purpose: :invoice, editable: false, prefix: 'INV'
+
+  default_scope { order(created_at: :desc) }
 
   belongs_to :address, optional: true
   # #### Fixme: These associations are deprecated to support amount number fields with the same name.
@@ -1428,7 +1432,7 @@ class Invoice < ApplicationRecord
 
   def forms_enabled
     feature_flag_enabled = NonPoInvoiceToggle.new(RequestStoreUtil.current_user).enabled?
-    is_non_po_invoice = self.invoice_type.non_po_invoice?
+    is_non_po_invoice = self&.invoice_type&.non_po_invoice? || false
     feature_flag_enabled && is_non_po_invoice
   end
   private
@@ -1754,41 +1758,51 @@ class Invoice < ApplicationRecord
       self.skip_callback = true
       amounts_attributes_map.each do |key, value|
         amount_value = self.send(key)
-        amount_attr = self.send(value)
-        base_currency_id = get_base_currency&.id || Currency.id_for("INR")
+        amount_attr = self.send("#{value}_id")
+        base_currency_id = get_base_currency&.id
         if amount_attr.present?
-          Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: base_currency_id) # todo - I2P : Update value from base currency
+          Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: base_currency_id)
         else
-          self.assign_attributes(
-            {
-              "#{value}": Amount.create(value: amount_value, currency_id: base_currency_id).id
-            }
-          )
+          amount_id = Amount.create(value: amount_value, currency_id: base_currency_id).id
+          self.send("#{value}=", amount_id)
         end
       end
 
       amount_direct_attribute_map.each do |key, value|
         amount_value = self.send(key)
-        self.assign_attributes({
-           "#{value}": amount_value
-         })
+        self.send("#{value}=", amount_value)
       end
       self.save
+    end
+  end
+
+  def sync_to_forms_structure
+    amounts_attributes_map.each do |key, value|
+      amount_value = self.send(value)&.value
+      self.send("reporting_#{key}=", amount_value)
+      self.send("#{key}=", amount_value)
+    end
+    amount_direct_attribute_map.each do |key, value|
+      amount_value = self.send(value)
+      self.assign_attributes({
+                               "reporting_#{key}": amount_value,
+                               "#{key}": amount_value
+                             })
     end
   end
 
   def amounts_attributes_map
     # todo - I2P change it to converted values post multicurrency setup
     {
-      invoice_gross_amount: 'amount_id',
-      invoice_discount_amount: 'discount_amount_id',
-      invoice_taxable_amount: 'gross_amount_id',
-      invoice_tax_amount: 'tax_amount_id',
-      invoice_tds_amount: 'tds_amount_id',
-      invoice_advance_paid_amount: 'advance_amount_id',
-      invoice_sub_total_amount: 'net_amount_id',
-      invoice_balance_due: 'balance_due_id',
-      invoice_freight_amount: 'freight_amount_id'
+      invoice_gross_amount: 'amount',
+      invoice_discount_amount: 'discount_amount',
+      invoice_taxable_amount: 'gross_amount',
+      invoice_tax_amount: 'tax_amount',
+      invoice_tds_amount: 'tds_amount',
+      invoice_advance_paid_amount: 'advance_amount',
+      invoice_sub_total_amount: 'net_amount',
+      invoice_balance_due: 'balance_due',
+      invoice_freight_amount: 'freight_amount'
     }
   end
 

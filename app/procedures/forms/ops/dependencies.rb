@@ -23,11 +23,11 @@ class Forms::Ops::Dependencies < Transactions::API
   end
 
   def init_conditions(context, dependencies:, model:, **)
-    dependencies[:conditions] = model.conditions.includes({ referencable_entity: :parent }, :actions)
+    dependencies[:conditions] = model.conditions.includes(:referencable_entity).where(form_entities: {internal: false})
   end
 
   def init_validations(context, model:, dependencies:, **)
-    dependencies[:validations] = model.validations.includes(form_entity: :parent)
+    dependencies[:validations] = model.validations.includes(:form_entity).where(form_entities: {internal: false})
   end
 
   def init_form_computations(context, model:, dependencies:, **)
