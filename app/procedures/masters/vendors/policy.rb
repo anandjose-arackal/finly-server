@@ -9,7 +9,7 @@ class Masters::Vendors::Policy < ApplicationPolicy
   end
 
   def show?   
-    (user.is_vendor_initiator? && record.created_by_id == user.id ) || user.has_permission?([ :vendor_manager, :vendor_auditor ])|| user.vendor_payment_admin? || user.permission.create_beneficiaries || (record.get_reviewers.include?(user) && record.awaiting_approval?)
+    (user.is_vendor_initiator? && record.created_by_id == user.id ) || user.has_permission?([ :vendor_manager, :vendor_auditor ])|| user.vendor_payment_admin? || user.permission.create_beneficiaries || (record.get_reviewers.include?(user) )
   end
 
   def update?
