@@ -23,7 +23,7 @@ class GlobalSearch::Config < Transactions::API
 
     context[:documents][:masters] = context[:documents][:masters].sort_by { |document| document[:document_type] }
     context[:documents][:transactions] = context[:documents][:transactions].sort_by { |document| document[:document_type] }
-    context[:indicator_map] = GlobalSearch::Config::Vp.status_indicators(user)
+    context[:indicator_map] = GlobalSearch::Config::Vp.status_indicators(current_user)
 
     true
   end
