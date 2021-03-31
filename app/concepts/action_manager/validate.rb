@@ -14,6 +14,7 @@ class ActionManager::Validate < Transactions::API
   step :init_action
   step :authorize_action
   step :authorize_record
+  step :perform_calculation
 
   def init_route(context, params:, **)
     unless ActionManager::Router.routes.include?(params[:route])
@@ -60,4 +61,13 @@ class ActionManager::Validate < Transactions::API
     true
   end
 
-end
+  def perform_calculation(context, route_klass:, action:, params:, current_user:, **)
+    if action.config[:record_scope].present?
+      records = action.model.where(company_id: current_user.company_id, id: params[:record_id])
+      context[:records][:processable_amount] = records.where(id: context[:records][:processable]).send(action.config[:record_scope])
+      context[:records][:non_processable_amount] = records.where(id: context[:records][:unprocessable]).send(action.config[:record_scope])
+    end
+    true
+  end
+
+  end
