@@ -413,6 +413,9 @@ class Invoice < ApplicationRecord
     end
   }
 
+
+  scope :filter_base_currency, -> (base_currency_id) { where base_currency: base_currency_id }
+
   # scope :filter_awaiting_approval, -> (enabled) {
   #   if StringUtils.to_bool(enabled)
   #     where(invoice_status_id: InwardInvoiceStatus.id_for(:processing))
@@ -1763,8 +1766,8 @@ class Invoice < ApplicationRecord
         if amount_attr.present?
           Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: base_currency_id)
         else
-          amount_id = Amount.create(value: amount_value, currency_id: base_currency_id).id
-          self.send("#{value}=", amount_id)
+          amount = Amount.create(value: amount_value, currency_id: base_currency_id)
+          self.send("#{value}=", amount)
         end
       end
 

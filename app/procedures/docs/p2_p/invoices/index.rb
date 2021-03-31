@@ -77,9 +77,9 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     text value: :due_in_days
   end
 
-  column :transaction_type, label: "Transaction Type" do
-    text value: :pt_type
-  end
+  # column :transaction_type, label: "Transaction Type" do
+  #   text value: :pt_type
+  # end
 
   # Todo
   # column :agreement_number do
@@ -231,13 +231,13 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     context[:exposure].cost_center&.name
   end
 
-  def self.pt_type( context )
-    if context[:record].is_domestic 
-      'Domestic'
-    else
-      'International'
-    end
-  end
+  # def self.pt_type( context )
+  #   if context[:record].is_domestic 
+  #     'Domestic'
+  #   else
+  #     'International'
+  #   end
+  # end
 
   def self.department_name(context)
     return "Multiple" if context[:exposure].cost_allocation_items

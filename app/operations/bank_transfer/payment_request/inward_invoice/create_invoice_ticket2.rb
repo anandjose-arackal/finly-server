@@ -14,7 +14,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
                 :description, :bank_payment_request, :payable_amount,
                 :payment_request_params, :policy, :bank_payment_request_params, :payable_amounts, :requested_amount, :inward_invoices,
                 :payments, :invoices_params, :invoices_status, :transfer_mode_id, :transfer_mode,
-                :update_payable_for_invoices, :reporting_amount_requested
+                :update_payable_for_invoices, :reporting_amount_requested, :base_currency_id
 
   class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2::BankPaymentRequestPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -86,6 +86,9 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
     # since previous state can be more than one type, this is a clean way to handle this
     self.inward_invoices.pluck(:id,:invoice_status_id).map { |id, st| self.invoices_status[id.to_i] = st }
 
+    base_currency_id = Currency.find_by(id: inward_invoices.first.base_currency).id rescue Currency.find_by(country_code: inward_invoices.first.base_currency).id
+    self.base_currency_id = base_currency_id
+
     Rails.logger.fatal "invoices_status,\n #{invoices_status.inspect}"
 
     self.scheduled_at = params[:scheduled_at]
@@ -124,6 +127,16 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
       add_message :error, "Payment mode cannot be blank"
       return
     end
+
+    # condition for same currency check
+
+    if self.inward_invoices.present?
+      if inward_invoices.pluck(:base_currency).uniq.length != 1
+        add_message :error, "Please add invoices with same base currency"
+        return
+      end
+    end
+
 
     self.payable_amounts.each do |invoice_id, payable_amount|
       invoice = self.inward_invoices.find_by(id: invoice_id)
@@ -338,7 +351,8 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
         payment_order_attributes: payment_order_params,
         expected_payments: self.inward_invoices.count,
         ticket_type: 'invoice',
-        transfer_mode_id: self.transfer_mode_id
+        transfer_mode_id: self.transfer_mode_id,
+        base_currency_id: self.base_currency_id
     }
     return bank_payment_request_params
   end

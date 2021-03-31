@@ -418,12 +418,10 @@ class InvoiceLineItem < ApplicationRecord
   # Syncs amounts from new forms structure to legacy amounts table
   def sync_amounts
     self.skip_callback = true
-    if parent.respond_to?(:forms_enabled)
-      if parent.forms_enabled
-        sync_to_old_structure
-      else
-        sync_to_forms_structure
-      end
+    if self.parent.forms_enabled
+      sync_to_old_structure
+    else
+      sync_to_forms_structure
     end
   end
 
@@ -437,7 +435,7 @@ class InvoiceLineItem < ApplicationRecord
       else
         self.assign_attributes(
           {
-            "#{value}": Amount.create(value: amount_value, currency_id: base_currency_id).id
+            "#{value}": Amount.create(value: amount_value, currency_id: base_currency_id)
           }
         )
       end

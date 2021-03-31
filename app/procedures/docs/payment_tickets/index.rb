@@ -34,8 +34,8 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     text value: :ticket_type
   end
 
-  column :transaction_type, label: "Transaction Type" do
-    text value: :pt_type
+  column :base_currency, label: "Base Currency" do
+    text value: :base_currency_code
   end
 
   column :status, default: true, includes: [:status] do
@@ -128,6 +128,10 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
 
   def self.awaiting_approval_roles
     [:bank_payment_request_reviewer, :admin]
+  end
+
+  def self.base_currency_code(context)
+    context[:record]&.base_currency&.country_code
   end
 
   def self.pt_status(context)

@@ -64,6 +64,7 @@ class BankPaymentRequest < ApplicationRecord
   belongs_to :company, optional: true
   belongs_to :transfer_mode, optional: true, class_name: "TransferModeCompanyMapping"
 
+  belongs_to :base_currency, class_name: 'Currency'
   has_many :comments, class_name: "BankPaymentRequestComment"
   has_many :bank_payment_request_trails
 

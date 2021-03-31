@@ -55,6 +55,7 @@ json.summary do
 
   json.verified_payments_count @result.payments_verified
   json.unverified_payments_count @result.payments_unverified
+  json.base_currency_code @result.bank_payment_request.base_currency.country_code
 end
 
 json.invoice_categories do

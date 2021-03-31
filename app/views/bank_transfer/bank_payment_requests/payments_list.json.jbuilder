@@ -228,6 +228,11 @@ json.payments do
         json.merge! payment.parent_details
         # json.payable_amount payment.get_payable_amount
         json.payable_amount precision_value payment.amount.value
+        
+        if payment.parent_type == 'Invoice'
+          conversion_rate = payment.parent_details['conversion_rate'] rescue 1
+          json.reporting_payable_amount precision_value payment.amount.value * conversion_rate
+        end
       end
     end
   end

@@ -342,11 +342,11 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_gross_amount])
 
-      amount :total_line_item_discount_amount, label: 'Total LineItem Discount Amount', editable: false, visible: true,
+      amount :total_line_item_discount_amount, label: 'Total LineItem Discount Amount', editable: false, visible: false,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:total_line_item_discount_amount])
 
-      amount :overall_discount_amount, label: 'Overall Discount Amount', editable: true, visible: true,
+      amount :overall_discount_amount, label: 'Overall Discount Amount', editable: true, visible: false,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:overall_discount_amount])
 
