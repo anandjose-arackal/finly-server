@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file. Always add 
 beginning of this file.
 
 
+## 2021-03-31
+  - Fix: use user roles instead policy user roles to properly filter export templates.
+
 ## 2021-03-30
   - Updating model for vendor form.
 
