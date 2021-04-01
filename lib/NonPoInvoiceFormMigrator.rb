@@ -52,7 +52,7 @@ class NonPoInvoiceMigrator
         update_each_custom_field( form_custom_field, custom_field)
       else
 
-        entity_key = custom_field.field_configuration.field_key
+        entity_key = custom_field.field_configuration.field_name.split(" ").join("_").underscore
 
         form_entity = form.entities.where(entity_key: entity_key).first
         if form_entity.blank?
@@ -81,7 +81,7 @@ class NonPoInvoiceMigrator
     required = custom_field.field_configuration.mandatory
     active = custom_field.field_configuration.enabled
     lable = custom_field.field_configuration.field_name
-    entity_key = custom_field.field_configuration.field_key
+    entity_key = custom_field.field_configuration.field_name.split(" ").join("_").underscore
     position = form.entities.where(form_section_id: section_id).order(:position).last.position + 1
 
     form_entity = FormEntity::Text.create({ company_id: company.id,
@@ -103,7 +103,7 @@ class NonPoInvoiceMigrator
     required = custom_field.field_configuration.mandatory
     active = custom_field.field_configuration.enabled
     lable = custom_field.field_configuration.field_name
-    entity_key = custom_field.field_configuration.field_key
+    entity_key = custom_field.field_configuration.field_name.split(" ").join("_").underscore
     position = form.entities.where(form_section_id: section_id).order(:position).last.position + 1
 
     # create entity
@@ -299,8 +299,8 @@ class NonPoInvoiceMigrator
       total_line_item_discount_amount: document&.discount_amount&.value,
       overall_discount_amount: 0,
       
-      invoice_net_total_amount: document&.net_amount&.value,
-      reporting_invoice_net_total_amount: document&.net_amount&.value,
+      invoice_net_total_amount: document&.balance_due&.value,
+      reporting_invoice_net_total_amount: document&.balance_due&.value,
       
       invoice_advance_paid_amount: document&.payments&.successful&.joins(:amount)&.sum(:value),
       reporting_invoice_advance_paid_amount: document&.payments&.successful&.joins(:amount)&.sum(:value)
