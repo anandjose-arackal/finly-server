@@ -4,25 +4,27 @@ class NonPoInvoiceMigrator
     result = []
     company = Company.find company_id
     documents = Invoice.where(invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)).where(company_id: company.id)
-    # documents = Invoice.where(id: 10653).where(company_id: company.id)
+    # documents = Invoice.where(id: 10668).where(company_id: company.id)
 
+    # FormCustomField.where(company_id: company_id).destroy_all
     form = Form.where(klass_name: 'Docs::P2P::Invoices::NonPo::Form', company_id: company_id).first
     documents.find_in_batches(batch_size: 1000) do |batch|
       batch.each do |document|
 
         # Populate Custom Fields
-        form.entities.root.custom_fields.each do |entity|
-          form_custom_field = FormCustomField.where(field_key: entity.entity_key, document_type: document.class.name, document_id: document.id).order(created_at: :asc).last
-          if form_custom_field.present?
-            form_custom_field.update(form_entity_id: entity.id, entity_type: entity.entity_type, form_id: form.id)
-          else
-            FormCustomField.new({
-              form_entity_id: entity.id, field_key: entity.entity_key,
-              entity_type: entity.entity_type, document_type: document.class.name,
-              document_id: document.id, form_id: form.id}
-              ).save
-          end
-        end
+
+        # form.entities.root.custom_fields.each do |entity|
+        #   form_custom_field = FormCustomField.where(field_key: entity.entity_key, document_type: document.class.name, document_id: document.id).order(created_at: :asc).last
+        #   if form_custom_field.present?
+        #     form_custom_field.update(form_entity_id: entity.id, entity_type: entity.entity_type, form_id: form.id)
+        #   else
+        #     FormCustomField.new({
+        #       form_entity_id: entity.id, field_key: entity.entity_key,
+        #       entity_type: entity.entity_type, document_type: document.class.name,
+        #       document_id: document.id, form_id: form.id}
+        #       ).save
+        #   end
+        # end
 
         # Migrate Custom Fields
         update_custome_fields form, document, company
@@ -181,7 +183,7 @@ class NonPoInvoiceMigrator
         # rate: item.rate,
         # discount: item.discount,
         # tax_rate_id: item.tax_rate_id,
-        tax_percentage: item.tax_percentage,
+        tax_percentage: item&.tax_rate&.rate,
         
         gl_code: item&.category&.gl_code,
         item_number: item&.inventory_line_item&.item_number,
@@ -260,8 +262,8 @@ class NonPoInvoiceMigrator
 
 
       # INVOICE SUMMARY
-      invoice_gross_amount: document&.amount&.value,
-      reporting_invoice_gross_amount: document&.amount&.value,
+      invoice_gross_amount: document&.item_amounts_total&.round,
+      reporting_invoice_gross_amount: document&.item_amounts_total&.round,
       
       invoice_discount_amount: document&.discount_amount&.value,
       reporting_invoice_discount_amount: document&.discount_amount&.value,

@@ -6,8 +6,7 @@ module FormsHelper
       acc.merge(entity_data(model, entity)).with_indifferent_access
     end
   end
-
-
+  
   def form_metadata
     return @form_metadata if @form_metadata.present?
 
@@ -33,7 +32,6 @@ module FormsHelper
 
   def entity_data(model, form_entity)
     form_data = {}
-
     if form_entity.class.collection?
       collection_models = (model.respond_to?(form_entity.entity_key) && model.send(form_entity.entity_key)) || []
       collection_data = collection_models.map do |collection_model|
@@ -62,6 +60,8 @@ module FormsHelper
         form_data.merge!({form_entity.entity_key => model.send(form_entity.entity_key)})
         if form_entity.entity_type == 'dropdown' || form_entity.entity_type == 'lookup'
           form_data.merge!({"#{form_entity.entity_key}_value" => model.retrieve_value(form_entity)})
+        elsif form_entity.entity_type == 'amount'
+          form_data.merge!({form_entity.entity_key => model.send(form_entity.entity_key).to_f.round(2)})
         end
       else
         if model.respond_to?(:form_custom_fields)
