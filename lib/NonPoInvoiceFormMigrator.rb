@@ -13,18 +13,18 @@ class NonPoInvoiceMigrator
 
         # Populate Custom Fields
 
-        # form.entities.root.custom_fields.each do |entity|
-        #   form_custom_field = FormCustomField.where(field_key: entity.entity_key, document_type: document.class.name, document_id: document.id).order(created_at: :asc).last
-        #   if form_custom_field.present?
-        #     form_custom_field.update(form_entity_id: entity.id, entity_type: entity.entity_type, form_id: form.id)
-        #   else
-        #     FormCustomField.new({
-        #       form_entity_id: entity.id, field_key: entity.entity_key,
-        #       entity_type: entity.entity_type, document_type: document.class.name,
-        #       document_id: document.id, form_id: form.id}
-        #       ).save
-        #   end
-        # end
+        form.entities.root.custom_fields.each do |entity|
+          form_custom_field = FormCustomField.where(field_key: entity.entity_key, document_type: document.class.name, document_id: document.id).order(created_at: :asc).last
+          if form_custom_field.present?
+            form_custom_field.update(form_entity_id: entity.id, entity_type: entity.entity_type, form_id: form.id)
+          else
+            FormCustomField.new({
+              form_entity_id: entity.id, field_key: entity.entity_key,
+              entity_type: entity.entity_type, document_type: document.class.name,
+              document_id: document.id, form_id: form.id}
+              ).save
+          end
+        end
 
         # Migrate Custom Fields
         update_custome_fields form, document, company
