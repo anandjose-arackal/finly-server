@@ -35,6 +35,12 @@ beginning of this file.
 ## 2021-03-19
   - Updating the non-po-form migration script
 
+## 2021-03-21
+  - Feat: Non Po Invoice Forms release
+
+## 2021-03-19
+  - Fix: Moved OTP mailers from default redis queue to payment creation queue
+
 ## 2021-03-16
   - Updating the authentication flow 
   - Updating sso config
@@ -58,6 +64,11 @@ beginning of this file.
   The re-opeing action in purchase order will revoke the Purchase advance amount status to previous status if it a non paid advance
 
 ##2021-03-10
+
+  The re-opeing action in purchase order will revoke the Purchase advance amount status to previous status if it a non paid advance
+
+##2021-03-10
+
   - Fix: Deleted user's policy user roles was trying render and leads to nil issue, 
         Policy User Role index only render existing user roles
    

@@ -437,7 +437,7 @@ class InvoiceLineItem < ApplicationRecord
       else
         self.assign_attributes(
           {
-            "#{value}": Amount.create(value: amount_value, currency_id: base_currency_id).id
+            "#{value}_id": Amount.create(value: amount_value, currency_id: base_currency_id).id
           }
         )
       end

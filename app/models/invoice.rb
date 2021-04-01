@@ -1764,7 +1764,7 @@ class Invoice < ApplicationRecord
           Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: base_currency_id)
         else
           amount_id = Amount.create(value: amount_value, currency_id: base_currency_id).id
-          self.send("#{value}=", amount_id)
+          self.send("#{value}_id=", amount_id)
         end
       end
 
