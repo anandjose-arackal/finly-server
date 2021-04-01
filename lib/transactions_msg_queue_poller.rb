@@ -161,7 +161,11 @@ class TransactionsMsgQueuePoller
       log_params[:request_id] = Security.generate_hmac_hex(self.object_id.to_s, DateTime.now.to_s)
 
       trans_params[:billing_amount_attributes] = billing_amount_attributes if billing_amount_attributes.present?
-      trans_params[:transaction_amount_attributes] = transaction_amount_attributes if transaction_amount_attributes
+      if billing_amount_attributes.present?
+        trans_params[:transaction_amount_attributes] = billing_amount_attributes
+      elsif transaction_amount_attributes.present?
+        trans_params[:transaction_amount_attributes] = transaction_amount_attributes
+      end
 
       rescued = false
       @result = nil
