@@ -99,6 +99,9 @@ module Searchkick::Api
     end
 
     def self.search_data(record)
+      record_data = searchkick_data(record)
+      return {} if record_data.blank?
+
       data = {
           company_id: record.company_id,
           record_type: record.class.searchkick_api.record_type,
