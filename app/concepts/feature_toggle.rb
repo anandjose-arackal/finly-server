@@ -26,7 +26,6 @@ class FeatureToggle
   end
 
   def enabled?(feature, default = false)
-    # return true if feature == 'release/non_po_invoice#forms_enabled'
 
     return default if flags.nil?
 
