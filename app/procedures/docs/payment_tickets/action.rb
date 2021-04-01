@@ -34,7 +34,6 @@ class Docs::PaymentTickets::Action < ActionManager::API
                icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
                url: "bank_transfer/mark_as_credited.json",
                password: true,
-               record_scope: :total_requested_amount,
                authorize: :mark_as_credited?
         action :transition,
                :credit,
@@ -43,6 +42,7 @@ class Docs::PaymentTickets::Action < ActionManager::API
                url: "bank_transfer/bulk_credit.json",
                otp: 'api/bank_transfer/generate_otp',
                password: true,
+               record_scope: :total_requested_amount,
                authorize: :credit?
       end
     end
