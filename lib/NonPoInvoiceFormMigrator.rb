@@ -170,7 +170,7 @@ class NonPoInvoiceMigrator
     document.items.each do |item| 
       item_tds = 0
       if item&.tds_applicable
-        item_tds = ( item&.taxable_amount&.value.to_f * document&.tds_slab&.tds ) / 100
+        item_tds = ( item&.taxable_amount&.value.to_f * document&.tds_slab&.tds.to_f ) / 100
         item_tds = item_tds.to_f.round(2)
       end
 
