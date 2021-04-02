@@ -42,6 +42,7 @@ class Docs::PaymentTickets::Action < ActionManager::API
                url: "bank_transfer/bulk_credit.json",
                otp: 'api/bank_transfer/generate_otp',
                password: true,
+               record_scope: :total_requested_amount,
                authorize: :credit?
       end
     end
