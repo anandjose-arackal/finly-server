@@ -6,7 +6,8 @@ module FormsHelper
       acc.merge(entity_data(model, entity)).with_indifferent_access
     end
   end
-  
+
+
   def form_metadata
     return @form_metadata if @form_metadata.present?
 
@@ -40,7 +41,9 @@ module FormsHelper
           entities_data = form_entity.entities.reduce({}) {|acc, ent| acc.merge(entity_data(collection_model, ent))}.merge(id: collection_model.id, collection_id: collection_model.id)
           entities_data.merge(collection_model_data)
         else
+          
           form_entity.entities.reduce({}) {|acc, ent| acc.merge(entity_data(collection_model, ent))}.merge(id: collection_model.id, collection_id: collection_model.id)
+
         end
       end
       form_data.merge!(form_entity.entity_key => collection_data)
@@ -48,6 +51,9 @@ module FormsHelper
       form_entity.entities.each do |entity|
         if entity.system_field && model.respond_to?(entity.entity_key)
           form_data.merge!({ entity.entity_key => model.send(entity.entity_key) })
+          if entity.entity_type == 'amount'
+            form_data.merge!({entity.entity_key => model.send(entity.entity_key).to_f.round(2)})
+          end
         else
           if model.respond_to?(:form_custom_fields)
             value = model.form_custom_fields.joins(:form_entity).where("form_entities.entity_key = ?", entity.entity_key).first&.retrieve_value

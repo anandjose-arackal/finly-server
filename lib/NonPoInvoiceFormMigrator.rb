@@ -4,7 +4,7 @@ class NonPoInvoiceMigrator
     result = []
     company = Company.find company_id
     documents = Invoice.where(invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)).where(company_id: company.id)
-    # documents = Invoice.where(id: 10668).where(company_id: company.id)
+    # documents = Invoice.where(id: 10670).where(company_id: company.id)
 
     # FormCustomField.where(company_id: company_id).destroy_all
     form = Form.where(klass_name: 'Docs::P2P::Invoices::NonPo::Form', company_id: company_id).first
@@ -167,7 +167,13 @@ class NonPoInvoiceMigrator
 
   def self.update_item document
     #MAPPING
-    document.items.each do |item|
+    document.items.each do |item| 
+      item_tds = 0
+      if item&.tds_applicable
+        item_tds = ( item&.taxable_amount&.value.to_f * document&.tds_slab&.tds ) / 100
+        item_tds = item_tds.to_f.round(2)
+      end
+
       update_params = {
 
         # quantity: item.quantity,
@@ -192,8 +198,8 @@ class NonPoInvoiceMigrator
         items_cost_center_id: item&.cost_center_id,
         product_type_id: item&.inventory_line_item&.product_type_id,
         item_rate: item&.rate,
-        item_tds_amount: 0,
-        reporting_item_tds_amount: 0,
+        item_tds_amount: item_tds,
+        reporting_item_tds_amount: item_tds,
         item_gross_amount: item&.amount&.value.to_f,
         reporting_item_gross_amount: item&.amount&.value.to_f,
         item_discount_amount: item&.discount_amount&.value.to_f,
@@ -215,7 +221,7 @@ class NonPoInvoiceMigrator
   def self.update_invoice_details document
     update_params = {
 
-      base_currency: 'INR',
+      base_currency: Currency.find_by(country_code: 'INR').id,
       reporting_currency: 'INR',
       conversion_rate: 1,
       retrieve_conversion_rate: true,
@@ -322,7 +328,7 @@ class NonPoInvoiceMigrator
             document_type: 'Invoice', document_id: document.id, form_id: form.id, form_entity_id: entity.id,
             field_key: 'invoice_attachments', value: "", value_text: nil, entity_type: 'attachments',
          })
-        
+
         relevant_custom_field = document.form_custom_fields.where(field_key: 'invoice_attachments').first
         add_attachment_to_new_invoice( old_attachment, relevant_custom_field )
       end
@@ -349,5 +355,6 @@ class NonPoInvoiceMigrator
         new_attachment.save
       end
     end
+    new_attachment.update(created_at: old_attachment.created_at )
   end
 end
