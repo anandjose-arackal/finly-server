@@ -34,7 +34,7 @@ class NotifierMailerPreview < ActionMailer::Preview
           others: 0
         },
         payments_processed: {
-          maximum: 100, # Highest spend in all the months
+          maximum: 100 * 1.2, # 20% more than the highest
           months: [
             {
               month: "October 2020",
@@ -60,7 +60,7 @@ class NotifierMailerPreview < ActionMailer::Preview
               label: "INR 4.1cr",
               week_1_percentage: 30,
               week_2_percentage: 41,
-              week_3_percentage:  11,
+              week_3_percentage: 11,
               week_4_percentage: 18
             },
             {
@@ -91,7 +91,7 @@ class NotifierMailerPreview < ActionMailer::Preview
           ]
         },
         top_payments: {
-          maximum: 100,
+          maximum: 100 * 1.2, # 20% more than the highest
           payments: [
             {
               vendor: "ABC Industries",
@@ -128,6 +128,74 @@ class NotifierMailerPreview < ActionMailer::Preview
               payment_type: "Agreement Invoice",
               color: "#3C4A3E"
             }
+          ]
+        },
+        overdue_invoices: {
+          days_0_to_30: {
+            amount: "INR 20cr",
+            count: '20'
+          },
+          days_30_to_60: {
+            amount: "INR 20cr",
+            count: '20'
+          },
+          days_60_to_90: {
+            amount: "INR 20cr",
+            count: '20'
+          }
+        },
+        upcoming_invoices: {
+          days_0_to_30: {
+            amount: "INR 30cr",
+            count: '40'
+          },
+          days_30_to_60: {
+            amount: "INR 20cr",
+            count: '30'
+          },
+          days_60_to_90: {
+            amount: "INR 10cr",
+            count: '20'
+          }
+        },
+        po_summary: {
+          enabled: true,
+          open_pos: {
+            amount: "INR 10cr",
+            count: '40'
+          },
+          open_pos_30_days: {
+            amount: "INR 50cr",
+            count: '50'
+          }
+        },
+        avg_approval: {
+          maximum: 100 * 1.2, # 20% more than the highest
+          items: [
+            {
+              label: "Purchase Requests",
+              days: 8,
+              percent_of_max: 80,
+              color: "#FF6633"
+            },
+            {
+              label: "Purchase Orders",
+              days: 3,
+              percent_of_max: 30,
+              color: "#FFCC33"
+            },
+            {
+              label: "Invoices",
+              days: 4,
+              percent_of_max: 40,
+              color: "#33CC66"
+            },
+            {
+              label: "Vendor Empanelment",
+              days: 10,
+              percent_of_max: 100,
+              color: "#008ce9"
+            },
           ]
         }
       }
