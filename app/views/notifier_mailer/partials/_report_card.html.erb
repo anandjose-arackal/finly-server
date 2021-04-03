@@ -1,3 +1,11 @@
+<% green = '#fff' %>
+<% green_2 = '#fff' %>
+<% green_3 = '#fff' %>
+<% blue = '#fff' %>
+<% yellow = '#fff' %>
+<% orange = '#fff' %>
+<% beige = '#fff' %>
+
 <table width="90%" height="0" id="i62b" class="container" style="box-sizing: border-box; font-family: Helvetica, serif; min-height: 150px; padding-top: 5px; padding-right: 5px; padding-bottom: 5px; padding-left: 5px; margin-top: auto; margin-right: auto; margin-bottom: auto; margin-left: auto; height: 0px; width: 90%; max-width: auto;">
   <tbody id="ilfz" bgcolor="#ffffff" style="box-sizing: border-box; background-color: #ffffff;">
   <tr id="isvf" style="box-sizing: border-box;">
@@ -60,30 +68,30 @@
         <tr id="ivzutw" style="box-sizing: border-box;">
           <td id="iaiung" align="right" class="m_-1079150786403824544legend" style="box-sizing: border-box; font-size: 14px; padding: 0; font-weight: 300; margin: 0; text-align: left;">
             <% if @payload.dig('report_card', 'payments_by_type', 'po_invoice').to_f > 0 %>
-              <span id="iafs2g" style="box-sizing: border-box; border-radius: 3px; font-weight: 300; vertical-align: bottom; color: #fff; width: 16px; height: 16px; margin: 10px 15px 0 15px; display: inline-block; background-color: #33CC66;"></span>PO
+              <span id="iafs2g" style="box-sizing: border-box; border-radius: 3px; font-weight: 300; vertical-align: bottom; color: #fff; width: 16px; height: 16px; margin: 10px 15px 0 15px; display: inline-block; background-color: <%= green %>;"></span>PO
               Invoice
             <% end %>
             <% if @payload.dig('report_card', 'payments_by_type', 'non_po_invoice').to_f > 0 %>
-              <span id="iafs2g" style="box-sizing: border-box; border-radius: 3px; font-weight: 300; vertical-align: bottom; color: #fff; width: 16px; height: 16px; margin: 10px 15px 0 15px; display: inline-block; background-color: #3C4A3E;"></span>Non
+              <span id="iafs2g" style="box-sizing: border-box; border-radius: 3px; font-weight: 300; vertical-align: bottom; color: #fff; width: 16px; height: 16px; margin: 10px 15px 0 15px; display: inline-block; background-color: <%= green_2 %>;"></span>Non
               PO Invoice
             <% end %>
             <% if @payload.dig('report_card', 'payments_by_type', 'agreement_invoice').to_f > 0 %>
-              <span id="iafs2g" style="box-sizing: border-box; border-radius: 3px; font-weight: 300; vertical-align: bottom; color: #fff; width: 16px; height: 16px; margin: 10px 15px 0 15px; display: inline-block; background-color: #598961;"></span>Agreement
+              <span id="iafs2g" style="box-sizing: border-box; border-radius: 3px; font-weight: 300; vertical-align: bottom; color: #fff; width: 16px; height: 16px; margin: 10px 15px 0 15px; display: inline-block; background-color: <%= green_3 %>;"></span>Agreement
               Invoice
             <% end %>
             <% if @payload.dig('report_card', 'payments_by_type', 'po').to_f > 0 %>
-              <span id="i24tp5" style="box-sizing: border-box; border-radius: 3px; font-weight: 300; vertical-align: bottom; color: #fff; width: 16px; height: 16px; margin: 10px 15px 0 15px; display: inline-block; background-color: #3399FF;"></span>Purchase
+              <span id="i24tp5" style="box-sizing: border-box; border-radius: 3px; font-weight: 300; vertical-align: bottom; color: #fff; width: 16px; height: 16px; margin: 10px 15px 0 15px; display: inline-block; background-color: <%= blue %>;"></span>Purchase
               Order
             <% end %>
             <% if @payload.dig('report_card', 'payments_by_type', 'utility_bill').to_f > 0 %>
-              <span id="izf94l" style="box-sizing: border-box; border-radius: 3px; font-weight: 300; vertical-align: bottom; color: #fff; width: 16px; height: 16px; margin: 10px 15px 0 15px; display: inline-block; background-color: #FFCC33;"></span>Beneficiary
+              <span id="izf94l" style="box-sizing: border-box; border-radius: 3px; font-weight: 300; vertical-align: bottom; color: #fff; width: 16px; height: 16px; margin: 10px 15px 0 15px; display: inline-block; background-color: <%= yellow %>;"></span>Beneficiary
             <% end %>
             <% if @payload.dig('report_card', 'payments_by_type', 'beneficiary_payment').to_f > 0 %>
-              <span id="iiqqha" style="box-sizing: border-box; border-radius: 3px; font-weight: 300; vertical-align: bottom; color: #fff; width: 16px; height: 16px; margin: 10px 15px 0 15px; display: inline-block; background-color: #FF6633;"></span>Utility
+              <span id="iiqqha" style="box-sizing: border-box; border-radius: 3px; font-weight: 300; vertical-align: bottom; color: #fff; width: 16px; height: 16px; margin: 10px 15px 0 15px; display: inline-block; background-color: <%= orange %>;"></span>Utility
               Bills
             <% end %>
             <% if @payload.dig('report_card', 'payments_by_type', 'others').to_f > 0 %>
-              <span id="iiqqha" style="box-sizing: border-box; border-radius: 3px; font-weight: 300; vertical-align: bottom; color: #fff; width: 16px; height: 16px; margin: 10px 15px 0 15px; display: inline-block; background-color: #CBA74E;"></span>Others
+              <span id="iiqqha" style="box-sizing: border-box; border-radius: 3px; font-weight: 300; vertical-align: bottom; color: #fff; width: 16px; height: 16px; margin: 10px 15px 0 15px; display: inline-block; background-color: <%= beige %>;"></span>Others
             <% end %>
           </td>
         </tr>
@@ -98,31 +106,31 @@
               <tbody id="in9ga4" style="box-sizing: border-box;">
               <tr id="irqwyl" style="box-sizing: border-box;">
                 <% if @payload.dig('report_card', 'payments_by_type', 'po_invoice').to_f > 0 %>
-                  <td width="<%= @payload.dig('report_card', 'payments_by_type', 'po_invoice') %>%" bgcolor="#33CC66" id="i4cu2h" style="box-sizing: border-box;"> 
+                  <td width="<%= @payload.dig('report_card', 'payments_by_type', 'po_invoice') %>%" bgcolor="<%= green %>" id="i4cu2h" style="box-sizing: border-box;"> 
                   </td>
                 <% end %>
                 <% if @payload.dig('report_card', 'payments_by_type', 'non_po_invoice').to_f > 0 %>
-                  <td width="<%= @payload.dig('report_card', 'payments_by_type', 'non_po_invoice') %>%" bgcolor="#3C4A3E" id="i4cu2h" style="box-sizing: border-box;"> 
+                  <td width="<%= @payload.dig('report_card', 'payments_by_type', 'non_po_invoice') %>%" bgcolor="<%= green_2 %>" id="i4cu2h" style="box-sizing: border-box;"> 
                   </td>
                 <% end %>
                 <% if @payload.dig('report_card', 'payments_by_type', 'agreement_invoice').to_f > 0 %>
-                  <td width="<%= @payload.dig('report_card', 'payments_by_type', 'agreement_invoice') %>%" bgcolor="#598961" id="i4cu2h" style="box-sizing: border-box;"> 
+                  <td width="<%= @payload.dig('report_card', 'payments_by_type', 'agreement_invoice') %>%" bgcolor="<%= green_3 %>" id="i4cu2h" style="box-sizing: border-box;"> 
                   </td>
                 <% end %>
                 <% if @payload.dig('report_card', 'payments_by_type', 'po').to_f > 0 %>
-                  <td width="<%= @payload.dig('report_card', 'payments_by_type', 'po') %>%" bgcolor="#3399FF" id="ifeqog" style="box-sizing: border-box;"> 
+                  <td width="<%= @payload.dig('report_card', 'payments_by_type', 'po') %>%" bgcolor="<%= blue %>" id="ifeqog" style="box-sizing: border-box;"> 
                   </td>
                 <% end %>
                 <% if @payload.dig('report_card', 'payments_by_type', 'utility_bill').to_f > 0 %>
-                  <td width="<%= @payload.dig('report_card', 'payments_by_type', 'utility_bill') %>%" bgcolor="#FFCC33" id="imurmg" style="box-sizing: border-box;"> 
+                  <td width="<%= @payload.dig('report_card', 'payments_by_type', 'utility_bill') %>%" bgcolor="<%= yellow %>" id="imurmg" style="box-sizing: border-box;"> 
                   </td>
                 <% end %>
                 <% if @payload.dig('report_card', 'payments_by_type', 'beneficiary_payment').to_f > 0 %>
-                  <td width="<%= @payload.dig('report_card', 'payments_by_type', 'beneficiary_payment') %>%" bgcolor="#FF6633" id="ik9fkp" style="box-sizing: border-box;"> 
+                  <td width="<%= @payload.dig('report_card', 'payments_by_type', 'beneficiary_payment') %>%" bgcolor="<%= orange %>" id="ik9fkp" style="box-sizing: border-box;"> 
                   </td>
                 <% end %>
                 <% if @payload.dig('report_card', 'payments_by_type', 'others').to_f > 0 %>
-                  <td width="<%= @payload.dig('report_card', 'payments_by_type', 'others') %>%" bgcolor="#CBA74E" id="ik9fkp" style="box-sizing: border-box;"> 
+                  <td width="<%= @payload.dig('report_card', 'payments_by_type', 'others') %>%" bgcolor="<%= beige %>" id="ik9fkp" style="box-sizing: border-box;"> 
                   </td>
                 <% end %>
               </tr>
@@ -146,13 +154,13 @@
         <tbody id="iu9ams" style="box-sizing: border-box;">
         <tr id="i9jqsf" style="box-sizing: border-box;">
           <td align="right" class="m_-1079150786403824544legend" id="ic63rt" style="box-sizing: border-box; font-size: 14px; padding: 0; font-weight: 300; margin: 0; text-align: left;">
-            <span id="in1y1l" style="box-sizing: border-box; border-radius: 3px; font-weight: 300; vertical-align: bottom; color: #fff; width: 16px; height: 16px; margin: 10px 15px 0 15px; display: inline-block; background-color: #33CC66;"></span>Week
+            <span id="in1y1l" style="box-sizing: border-box; border-radius: 3px; font-weight: 300; vertical-align: bottom; color: #fff; width: 16px; height: 16px; margin: 10px 15px 0 15px; display: inline-block; background-color: <%= green %>;"></span>Week
             1
-            <span id="iuiskp" style="box-sizing: border-box; border-radius: 3px; font-weight: 300; vertical-align: bottom; color: #fff; width: 16px; height: 16px; margin: 10px 15px 0 15px; display: inline-block; background-color: #3399FF;"></span>Week
+            <span id="iuiskp" style="box-sizing: border-box; border-radius: 3px; font-weight: 300; vertical-align: bottom; color: #fff; width: 16px; height: 16px; margin: 10px 15px 0 15px; display: inline-block; background-color: <%= blue %>;"></span>Week
             2
-            <span id="i8n2qr" style="box-sizing: border-box; border-radius: 3px; font-weight: 300; vertical-align: bottom; color: #fff; width: 16px; height: 16px; margin: 10px 15px 0 15px; display: inline-block; background-color: #FFCC33;"></span>Week
+            <span id="i8n2qr" style="box-sizing: border-box; border-radius: 3px; font-weight: 300; vertical-align: bottom; color: #fff; width: 16px; height: 16px; margin: 10px 15px 0 15px; display: inline-block; background-color: <%= yellow %>;"></span>Week
             3
-            <span id="i07ctk" style="box-sizing: border-box; border-radius: 3px; font-weight: 300; vertical-align: bottom; color: #fff; width: 16px; height: 16px; margin: 10px 15px 0 15px; display: inline-block; background-color: #FF6633;"></span>Week
+            <span id="i07ctk" style="box-sizing: border-box; border-radius: 3px; font-weight: 300; vertical-align: bottom; color: #fff; width: 16px; height: 16px; margin: 10px 15px 0 15px; display: inline-block; background-color: <%= orange %>;"></span>Week
             4
           </td>
         </tr>
@@ -176,19 +184,19 @@
                       <tbody id="ixfkq" style="box-sizing: border-box;">
                       <tr id="i32an" style="box-sizing: border-box;">
                         <% if data.dig('week_1_percentage').to_f > 0 %>
-                          <td width="<%= data.dig('week_1_percentage') %>%" bgcolor="#33CC66" id="ie51r" style="box-sizing: border-box; margin: 0 0 0 0; padding: 0 0 0 0;"> 
+                          <td width="<%= data.dig('week_1_percentage') %>%" bgcolor="<%= green %>" id="ie51r" style="box-sizing: border-box; margin: 0 0 0 0; padding: 0 0 0 0;"> 
                           </td>
                         <% end %>
                         <% if data.dig('week_2_percentage').to_f > 0 %>
-                          <td width="<%= data.dig('week_2_percentage') %>%" bgcolor="#3399FF" id="i3zlk" style="box-sizing: border-box;"> 
+                          <td width="<%= data.dig('week_2_percentage') %>%" bgcolor="<%= blue %>" id="i3zlk" style="box-sizing: border-box;"> 
                           </td>
                         <% end %>
                         <% if data.dig('week_3_percentage').to_f > 0 %>
-                          <td width="<%= data.dig('week_3_percentage') %>%" bgcolor="#FFCC33" id="ifdjh" style="box-sizing: border-box;"> 
+                          <td width="<%= data.dig('week_3_percentage') %>%" bgcolor="<%= yellow %>" id="ifdjh" style="box-sizing: border-box;"> 
                           </td>
                         <% end %>
                         <% if data.dig('week_4_percentage').to_f > 0 %>
-                          <td width="<%= data.dig('week_4_percentage') %>%" bgcolor="#FF6633" id="i2c7g" style="box-sizing: border-box;"> 
+                          <td width="<%= data.dig('week_4_percentage') %>%" bgcolor="<%= orange %>" id="i2c7g" style="box-sizing: border-box;"> 
                           </td>
                         <% end %>
                       </tr>
@@ -460,11 +468,11 @@
                     <table width="100%" cellpadding="0" cellspacing="0" border="0" id="iua1da" style="box-sizing: border-box;">
                       <tbody id="izajh6" style="box-sizing: border-box;">
                       <tr id="isei4t" style="box-sizing: border-box;">
-                        <!--                      <td width="35.1%" bgcolor="#33CC66" id="ie51r-2" style="box-sizing: border-box; margin: 0 0 0 0; padding: 0 0 0 0;"> -->
+                        <!--                      <td width="35.1%" bgcolor="<%= green %>" id="ie51r-2" style="box-sizing: border-box; margin: 0 0 0 0; padding: 0 0 0 0;"> -->
                         <!--                      </td>-->
-                        <!--                      <td width="9%" bgcolor="#3399FF" id="i3zlk-2" style="box-sizing: border-box;"> -->
+                        <!--                      <td width="9%" bgcolor="<%= blue %>" id="i3zlk-2" style="box-sizing: border-box;"> -->
                         <!--                      </td>-->
-                        <!--                      <td width="30.9%" bgcolor="#FFCC33" id="ifdjh-2" style="box-sizing: border-box;"> -->
+                        <!--                      <td width="30.9%" bgcolor="<%= yellow %>" id="ifdjh-2" style="box-sizing: border-box;"> -->
                         <!--                      </td>-->
                         <td width="auto" bgcolor="<%= item['color'] %>" id="i2c7g-2" style="box-sizing: border-box;"> 
                         </td>
