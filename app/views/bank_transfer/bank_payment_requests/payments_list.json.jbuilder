@@ -230,8 +230,8 @@ json.payments do
         json.payable_amount precision_value payment.amount.value
         
         if payment.parent_type == 'Invoice'
-          conversion_rate = payment.parent_details['conversion_rate'] rescue 1
-          json.reporting_payable_amount precision_value payment.amount.value * conversion_rate
+          conversion_rate = payment.parent_details.with_indifferent_access[:conversion_rate] rescue 1
+          json.reporting_payable_amount precision_value payment&.amount&.value * conversion_rate
         end
       end
     end

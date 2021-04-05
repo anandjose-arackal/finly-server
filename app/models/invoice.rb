@@ -175,7 +175,7 @@ class Invoice < ApplicationRecord
   money :invoice_balance_due, :get_reporting_currency
 
   def get_reporting_currency
-    Currency.currency_for(self.reporting_currency || "INR")
+    Currency.currency_for(self.company.reporting_currency_code || "INR")
   end
 
   def get_base_currency
@@ -1009,10 +1009,12 @@ class Invoice < ApplicationRecord
         reporting_invoice_net_total_amount: self.reporting_invoice_net_total_amount,
         invoice_paid_outside_amount: self.invoice_paid_outside_amount,
         reporting_invoice_paid_outside_amount: self.reporting_invoice_paid_outside_amount,
-        base_currency: self.base_currency,
-        reporting_currency: self.reporting_currency,
+        base_currency_id: self.get_base_currency.id,
+        base_currency_code: self.get_base_currency.country_code,
         conversion_rate: self.conversion_rate,
-        is_domestic: self.is_domestic
+        is_domestic: self.is_domestic,
+        reporting_currency_id: self.get_reporting_currency.id,
+        reporting_currency_code: self.get_reporting_currency.country_code
       }
     end
   end

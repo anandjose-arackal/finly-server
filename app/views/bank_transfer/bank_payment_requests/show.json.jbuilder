@@ -56,6 +56,10 @@ json.summary do
   json.verified_payments_count @result.payments_verified
   json.unverified_payments_count @result.payments_unverified
   json.base_currency_code @result.bank_payment_request.base_currency.country_code
+  json.base_currency_id @result.bank_payment_request.base_currency_id
+  json.is_domestic @result.bank_payment_request.is_domestic
+
+  json.reporting_currency_code @result.user.company.reporting_currency_code
 end
 
 json.invoice_categories do

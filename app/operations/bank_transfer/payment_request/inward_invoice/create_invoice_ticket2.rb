@@ -85,7 +85,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
     # which can be unpaid or partially paid
     # since previous state can be more than one type, this is a clean way to handle this
     self.inward_invoices.pluck(:id,:invoice_status_id).map { |id, st| self.invoices_status[id.to_i] = st }
-
+    self.is_domestic = inward_invoices.first.is_domestic
     base_currency_id = Currency.find_by(id: inward_invoices.first.base_currency).id rescue Currency.find_by(country_code: inward_invoices.first.base_currency).id
     self.base_currency_id = base_currency_id
 
@@ -352,7 +352,8 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
         expected_payments: self.inward_invoices.count,
         ticket_type: 'invoice',
         transfer_mode_id: self.transfer_mode_id,
-        base_currency_id: self.base_currency_id
+        base_currency_id: self.base_currency_id,
+        is_domestic: self.is_domestic
     }
     return bank_payment_request_params
   end
