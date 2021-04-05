@@ -112,7 +112,7 @@ class Notifications::Vp::WeeklyReport::Mailer < Notifier::Mailer
     po_count = payments_last_7_days.where(parent_type: 'PurchaseOrder').count
     utility_bill_count = payments_last_7_days.where(parent_type: 'BbpsBill').count
     beneficiary_payment_count = payments_last_7_days.where(parent_type: 'BeneficiaryPayment').count
-    others_count = payments_last_7_days.where.not(parent_type: %(BbpsBill BeneficiaryPayment Invoice PurchaseOrder)).count
+    others_count = payments_last_7_days.where.not(parent_type: %w(BbpsBill BeneficiaryPayment Invoice PurchaseOrder)).count
 
     total_count = po_invoice_count + non_po_invoice_count + agreement_invoice_count + po_count +
       utility_bill_count + beneficiary_payment_count + others_count
