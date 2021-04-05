@@ -112,7 +112,7 @@ class Notifications::Vp::WeeklyReport::Mailer < Notifier::Mailer
     po_count = payments_last_7_days.where(parent_type: 'PurchaseOrder').count
     utility_bill_count = payments_last_7_days.where(parent_type: 'BbpsBill').count
     beneficiary_payment_count = payments_last_7_days.where(parent_type: 'BeneficiaryPayment').count
-    others_count = payments_last_7_days.where.not(parent_type: %(BbpsBill BeneficiaryPayment Invoice PurchaseOrder)).count
+    others_count = payments_last_7_days.where.not(parent_type: %w(BbpsBill BeneficiaryPayment Invoice PurchaseOrder)).count
 
     total_count = po_invoice_count + non_po_invoice_count + agreement_invoice_count + po_count +
       utility_bill_count + beneficiary_payment_count + others_count
@@ -282,30 +282,30 @@ class Notifications::Vp::WeeklyReport::Mailer < Notifier::Mailer
     row = result[0]
     report[:overdue_invoices] = {
       days_60_plus: {
-        amount: format_currency(context, row[0]),
+        amount: format_currency(context, row[0].to_f),
         count: row[1].to_i
       },
       days_30_to_60: {
-        amount: format_currency(context, row[2]),
+        amount: format_currency(context, row[2].to_f),
         count: row[3].to_i
       },
       days_0_to_30: {
-        amount: format_currency(context, row[4]),
+        amount: format_currency(context, row[4].to_f),
         count: row[5].to_i
       }
     }
 
     report[:upcoming_invoices] = {
-      days_60_plus: {
-        amount: format_currency(context, row[6]),
+      days_0_to_30: {
+        amount: format_currency(context, row[6].to_f),
         count: row[7].to_i
       },
       days_30_to_60: {
-        amount: format_currency(context, row[8]),
+        amount: format_currency(context, row[8].to_f),
         count: row[9].to_i
       },
-      days_0_to_30: {
-        amount: format_currency(context, row[10]),
+      days_60_plus: {
+        amount: format_currency(context, row[10].to_f),
         count: row[11].to_i
       }
     }
