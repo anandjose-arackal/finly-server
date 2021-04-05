@@ -296,7 +296,7 @@ class Notifications::Vp::WeeklyReport::Mailer < Notifier::Mailer
     }
 
     report[:upcoming_invoices] = {
-      days_60_plus: {
+      days_0_to_30: {
         amount: format_currency(context, row[6].to_f),
         count: row[7].to_i
       },
@@ -304,7 +304,7 @@ class Notifications::Vp::WeeklyReport::Mailer < Notifier::Mailer
         amount: format_currency(context, row[8].to_f),
         count: row[9].to_i
       },
-      days_0_to_30: {
+      days_60_plus: {
         amount: format_currency(context, row[10].to_f),
         count: row[11].to_i
       }
