@@ -65,6 +65,7 @@ end
 
 json.tax_rates @result.tax_rates.non_deleted
 json.currencies @result.currencies
+json.default_currency @result.default_currency
 
 json.tabs @result.tabs
 json.invoice_custom_fields_config @result.custom_fields_config[:invoice]

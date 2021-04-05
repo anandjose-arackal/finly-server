@@ -11,6 +11,7 @@ class BankTransfer::PaymentRequest::ConfigurationData < BankTransfer::PaymentReq
     params[:tds_slabs] = TdsSlabs::Index.(user, params)
     params[:tax_rates] = user.company.tax_rates
     params[:currencies] =  Currency.all.map{ |currency| {id: currency.id, country_code: currency.country_code, symbol: currency.symbol }}
+    params[:default_currency] = user.company.reporting_currency
     load_custom_fields_config
     params[:custom_fields_config] = self.custom_fields_config
 
@@ -53,7 +54,7 @@ class BankTransfer::PaymentRequest::ConfigurationData < BankTransfer::PaymentReq
 
 
   class BankTransfer::PaymentRequest::ConfigurationDataPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :departments, :cost_centers, :categories, :policies, :tds_slabs, :custom_fields_config, :tabs, :transfer_modes, :tax_rates, :currencies
+    attr_accessor :departments, :cost_centers, :categories, :policies, :tds_slabs, :custom_fields_config, :tabs, :transfer_modes, :tax_rates, :currencies, :default_currency
     
     def init
       self.departments = params[:departments]
@@ -66,6 +67,7 @@ class BankTransfer::PaymentRequest::ConfigurationData < BankTransfer::PaymentReq
       self.transfer_modes = params[:transfer_modes]
       self.tax_rates = params[:tax_rates]
       self.currencies = params[:currencies]
+      self.default_currency = params[:default_currency]
     end
 
   end

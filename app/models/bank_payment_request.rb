@@ -430,6 +430,10 @@ class BankPaymentRequest < ApplicationRecord
     if self.name.blank?
       self.name = generate_name
     end
+
+    if self.base_currency_id.blank?
+      self.base_currency_id = Currency.find_by(currency_code: 'INR').id
+    end
   end
 
   before_save :add_company
