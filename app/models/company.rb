@@ -77,6 +77,9 @@ class Company < ApplicationRecord
   has_many :icici_statements
   has_many :insight_dashboards
 
+  has_many :payments
+  has_many :invoices
+
   has_many :forms
 
   has_many :budget_groups

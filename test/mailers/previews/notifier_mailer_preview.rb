@@ -8,6 +8,7 @@ class NotifierMailerPreview < ActionMailer::Preview
       company: {
         name: "Test Company"
       },
+      hero_bg_icon: 'icon_default',
       hero_bg_image: 'bg_invite',
       title: "Weekly Update for Quikr",
       sub_header: "November 1st, 2020 - November 7th, 2020",
@@ -15,12 +16,13 @@ class NotifierMailerPreview < ActionMailer::Preview
       report_card: {
         currency: "INR",
         payments_summary: {
-          this_week: {
-            amount: "INR 20cr",
+          last_7_days: {
+            amount: 'INR 20cr',
             count: '20'
           },
-          this_month: {
-            amount: "INR 100cr",
+          month: {
+            name: 'March 2021',
+            amount: 'INR 100cr',
             count: 200
           }
         },
@@ -139,7 +141,7 @@ class NotifierMailerPreview < ActionMailer::Preview
             amount: "INR 20cr",
             count: '20'
           },
-          days_60_to_90: {
+          days_60_plus: {
             amount: "INR 20cr",
             count: '20'
           }
@@ -153,7 +155,7 @@ class NotifierMailerPreview < ActionMailer::Preview
             amount: "INR 20cr",
             count: '30'
           },
-          days_60_to_90: {
+          days_60_plus: {
             amount: "INR 10cr",
             count: '20'
           }
@@ -200,6 +202,7 @@ class NotifierMailerPreview < ActionMailer::Preview
         }
       }
     }
+    payload[:report_card] = Notifications::Vp::WeeklyReport::Mailer.build_report(User.first, {from: 7.days.ago.beginning_of_day, to: Date.today.end_of_day})
     NotifierMailer.send_mail(payload.to_json.to_s)
   end
 

@@ -1,6 +1,6 @@
-class WeeklyReport
+class Notifications::Vp::WeeklyReport::Job
 
-  class WeeklyReport::Colors
+  class Notifications::Vp::WeeklyReport::Job::Colors
 
     GREEN ||= '#33CC66'
     GREEN_2 ||= '#3C4A3E'
