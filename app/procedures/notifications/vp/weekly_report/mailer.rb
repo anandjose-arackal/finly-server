@@ -1,19 +1,39 @@
 class Notifications::Vp::WeeklyReport::Mailer < Notifier::Mailer
 
+  def self.send_weekly_reports
+    from = 1.week.ago.beginning_of_week
+    to = 1.week.ago.end_of_week
+    UserPanelSubscription.where(weekly_summary_enabled: true).includes(user: :company).each do |subscription|
+      Notifications::Vp::WeeklyReport::Mailer.(current_user: subscription.user, params: {from: from, to: to})
+    end
+  end
+
+  schema do
+    params do
+      required(:from).filled
+      required(:to).filled
+    end
+  end
+
   assign :to do |user, params|
-    [user.email]
+    ['vivek.a@finly.io']
+    # [user.email]
+  end
+
+  assign :bcc do |user, params|
+    ['vivek.a@finly.io']
   end
 
   assign :subject do |user, params|
-    "Finly Weekly Report: #{params[:period][:from]} to #{params[:period][:to]}"
+    "Finly Weekly Report: #{params[:from].strftime("%B %d, %Y")} to #{params[:to].strftime("%B %d, %Y")}"
   end
 
   assign :title do |user, params|
-    "Weekly Update for #{user.company.name}"
+    "Weekly Insights(Beta) for #{user.company.name}"
   end
 
   assign :sub_header do |user, params|
-    "#{params[:period][:from]} to #{params[:period][:to]}"
+    "#{params[:from].strftime("%B %d, %Y")} to #{params[:to].strftime("%B %d, %Y")}"
   end
 
   assign :partial, 'notifier_mailer/partials/report_card'
@@ -61,7 +81,7 @@ class Notifications::Vp::WeeklyReport::Mailer < Notifier::Mailer
     context[:payments] = company.payments.non_deleted.completed.where(application: 'vp').joins(:amount)
     context[:payments_last_7_days] = payments_last_7_days = context[:payments].where('`payments`.`date` between ? and ?', context[:from], context[:to])
 
-    report[:payments_summary] = {last_7_days: {}, month: {}}
+    report[:payments_summary] = { last_7_days: {}, month: {} }
     report[:payments_summary][:last_7_days][:amount] = format_amount(context, payments_last_7_days)
     report[:payments_summary][:last_7_days][:count] = payments_last_7_days.count
 
@@ -86,17 +106,31 @@ class Notifications::Vp::WeeklyReport::Mailer < Notifier::Mailer
     payments_last_7_days_invoice = payments_last_7_days.where(parent_type: "Invoice")
 
     report[:payments_by_type] = {}
-    report[:payments_by_type][:po_invoice] = format_amount(context, payments_last_7_days_invoice.joins(:invoice).where({ invoices: { invoice_type_id: InwardInvoiceType.id_for(:tax_invoice) } }))
-    report[:payments_by_type][:non_po_invoice] = format_amount(context, payments_last_7_days_invoice.joins(:invoice).where({ invoices: { invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice) } }))
-    report[:payments_by_type][:agreement_invoice] = format_amount(context, payments_last_7_days_invoice.joins(:invoice, :amount).where({ invoices: { invoice_type_id: InwardInvoiceType.ids_for(:general_invoice, :rental_invoice, :recurring_invoice, :agreement_invoice) } }))
-    report[:payments_by_type][:po] = format_amount(context, payments_last_7_days.where(parent_type: 'PurchaseOrder'))
-    report[:payments_by_type][:utility_bill] = format_amount(context, payments_last_7_days.where(parent_type: 'BbpsBill'))
-    report[:payments_by_type][:beneficiary_payment] = format_amount(context, payments_last_7_days.where(parent_type: 'BeneficiaryPayment'))
-    report[:payments_by_type][:others] = format_amount(context, payments_last_7_days.where.not(parent_type: %(BbpsBill BeneficiaryPayment Invoice PurchaseOrder)))
+    po_invoice_count = payments_last_7_days_invoice.joins(:invoice).where({ invoices: { invoice_type_id: InwardInvoiceType.id_for(:tax_invoice) } }).count
+    non_po_invoice_count = payments_last_7_days_invoice.joins(:invoice).where({ invoices: { invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice) } }).count
+    agreement_invoice_count = payments_last_7_days_invoice.joins(:invoice, :amount).where({ invoices: { invoice_type_id: InwardInvoiceType.ids_for(:general_invoice, :rental_invoice, :recurring_invoice, :agreement_invoice) } }).count
+    po_count = payments_last_7_days.where(parent_type: 'PurchaseOrder').count
+    utility_bill_count = payments_last_7_days.where(parent_type: 'BbpsBill').count
+    beneficiary_payment_count = payments_last_7_days.where(parent_type: 'BeneficiaryPayment').count
+    others_count = payments_last_7_days.where.not(parent_type: %(BbpsBill BeneficiaryPayment Invoice PurchaseOrder)).count
+
+    total_count = po_invoice_count + non_po_invoice_count + agreement_invoice_count + po_count +
+      utility_bill_count + beneficiary_payment_count + others_count
+
+    total_count = 100 if total_count.blank? || total_count == 0
+
+    report[:payments_by_type][:po_invoice] = (po_invoice_count * 100 / total_count).round(2)
+    report[:payments_by_type][:non_po_invoice] = (non_po_invoice_count * 100 / total_count).round(2)
+    report[:payments_by_type][:agreement_invoice] = (agreement_invoice_count * 100 / total_count).round(2)
+    report[:payments_by_type][:po] = (po_count * 100 / total_count).round(2)
+    report[:payments_by_type][:utility_bill] = (utility_bill_count * 100 / total_count).round(2)
+    report[:payments_by_type][:beneficiary_payment] = (beneficiary_payment_count * 100 / total_count).round(2)
+    report[:payments_by_type][:others] = (others_count * 100 / total_count).round(2)
+
   end
 
   def self.build_payments_processed(context, report)
-    report[:payments_processed] = {months: []}
+    report[:payments_processed] = { months: [] }
     payments = context[:payments].joins(:amount)
                                  .select('sum(`amounts`.`value`) as amount, FLOOR((DayOfMonth(date)-1)/7)+1 as week, DATE_FORMAT(date, "%M %Y") as month')
                                  .where("`payments`.`created_at` > ?", 6.months.ago.beginning_of_month)
@@ -124,12 +158,12 @@ class Notifications::Vp::WeeklyReport::Mailer < Notifier::Mailer
       report[:payments_processed][:months] << {
         month: month,
         label: format_currency(context, data['total']),
-        percent_of_max: '%.2f' % (data['total'] * 100 / maximum), # Percentage of spend compared to the highest month
-        week_1_percentage: '%.2f' % (data["week_1"].to_i * 100 / data['total']), # Percentage of spend of the month,
-        week_2_percentage: '%.2f' % (data["week_2"].to_i * 100 / data['total']),
-        week_3_percentage: '%.2f' % (data["week_3"].to_i * 100 / data['total']),
-        week_4_percentage: '%.2f' % (data["week_4"].to_i * 100 / data['total']),
-        week_5_percentage: '%.2f' % (data["week_5"].to_i * 100 / data['total'])
+        percent_of_max: (data['total'] * 100 / maximum).round(2), # Percentage of spend compared to the highest month
+        week_1_percentage: (data["week_1"].to_i * 100 / data['total']).round(2), # Percentage of spend of the month,
+        week_2_percentage: (data["week_2"].to_i * 100 / data['total']).round(2),
+        week_3_percentage: (data["week_3"].to_i * 100 / data['total']).round(2),
+        week_4_percentage: (data["week_4"].to_i * 100 / data['total']).round(2),
+        week_5_percentage: (data["week_5"].to_i * 100 / data['total']).round(2)
       }
     end
 
@@ -159,8 +193,8 @@ class Notifications::Vp::WeeklyReport::Mailer < Notifier::Mailer
   #     }
   def self.build_top_payments(context, report)
     payments_last_7_days = context[:payments_last_7_days]
-    top_payments = payments_last_7_days.order(value: :desc).limit(5)
-    report[:top_payments] = {payments: [], maximum: 0}
+    top_payments = payments_last_7_days.reorder(value: :desc).limit(5)
+    report[:top_payments] = { payments: [], maximum: 0 }
 
     return if top_payments.size == 0
 
@@ -183,9 +217,11 @@ class Notifications::Vp::WeeklyReport::Mailer < Notifier::Mailer
         vendor_name = payment.receiving_user.business_name
       end
 
+      vendor_name = "#{vendor_name[0..18]}.." if vendor_name.to_s.length > 22
+
       report[:top_payments][:payments] << {
         vendor: vendor_name,
-        percent_of_max: '%.2f' % (payment.amount.value * 100 / maximum),
+        percent_of_max: (payment.amount.value * 100 / maximum).round(2),
         label: format_currency(context, payment.amount.value),
         payment_type: payment.parent_type_name,
         color: colors.shift
@@ -350,7 +386,7 @@ class Notifications::Vp::WeeklyReport::Mailer < Notifier::Mailer
                                .where('approved_at between ? and ?', context[:from].beginning_of_day, context[:to].end_of_day)
                                .select('AVG(DATEDIFF(`approved_at`, `submitted_at`)) as `Days (Avg)`')
                                .to_sql
-        pr_days = ActiveRecord::Base.connection.execute(pr_days_query).as_json[0][0].to_f
+        pr_days = ActiveRecord::Base.connection.execute(pr_days_query).as_json[0][0].to_f.round(2)
         report[:avg_approval][:items] << {
           label: 'Purchase Requests',
           color: Notifications::Vp::WeeklyReport::Job::Colors::ORANGE,
@@ -364,7 +400,7 @@ class Notifications::Vp::WeeklyReport::Mailer < Notifier::Mailer
                              .where('approved_at between ? and ?', context[:from].beginning_of_day, context[:to].end_of_day)
                              .select('AVG(DATEDIFF(`approved_at`, `submitted_at`)) as `Days (Avg)`')
                              .to_sql
-      po_days = ActiveRecord::Base.connection.execute(po_days_query).as_json[0][0].to_f
+      po_days = ActiveRecord::Base.connection.execute(po_days_query).as_json[0][0].to_f.round(2)
       report[:avg_approval][:items] << {
         label: 'Purchase Orders',
         color: Notifications::Vp::WeeklyReport::Job::Colors::YELLOW,
@@ -374,11 +410,11 @@ class Notifications::Vp::WeeklyReport::Mailer < Notifier::Mailer
     end
 
     inv_days_query = company.invoices.where(invoice_type_id: InwardInvoiceType.ids_for(:tax_invoice, :non_po_invoice))
-                           .non_deleted
-                           .where('approved_at between ? and ?', context[:from].beginning_of_day, context[:to].end_of_day)
-                           .select('AVG(DATEDIFF(`approved_at`, `submitted_at`)) as `Days (Avg)`')
-                           .to_sql
-    inv_days = ActiveRecord::Base.connection.execute(inv_days_query).as_json[0][0].to_f
+                            .non_deleted
+                            .where('approved_at between ? and ?', context[:from].beginning_of_day, context[:to].end_of_day)
+                            .select('AVG(DATEDIFF(`approved_at`, `submitted_at`)) as `Days (Avg)`')
+                            .to_sql
+    inv_days = ActiveRecord::Base.connection.execute(inv_days_query).as_json[0][0].to_f.round(2)
     report[:avg_approval][:items] << {
       label: 'Invoices',
       color: Notifications::Vp::WeeklyReport::Job::Colors::BEIGE,
@@ -387,11 +423,11 @@ class Notifications::Vp::WeeklyReport::Mailer < Notifier::Mailer
     maximum = inv_days if maximum < inv_days
 
     pt_days_query = company.bank_payment_requests
-                            .non_deleted
-                            .where('approved_at between ? and ?', context[:from].beginning_of_day, context[:to].end_of_day)
-                            .select('AVG(DATEDIFF(`approved_at`, `submitted_at`)) as `Days (Avg)`')
-                            .to_sql
-    pt_days = ActiveRecord::Base.connection.execute(pt_days_query).as_json[0][0].to_f
+                           .non_deleted
+                           .where('approved_at between ? and ?', context[:from].beginning_of_day, context[:to].end_of_day)
+                           .select('AVG(DATEDIFF(`approved_at`, `submitted_at`)) as `Days (Avg)`')
+                           .to_sql
+    pt_days = ActiveRecord::Base.connection.execute(pt_days_query).as_json[0][0].to_f.round(2)
     report[:avg_approval][:items] << {
       label: 'Payment Tickets',
       color: Notifications::Vp::WeeklyReport::Job::Colors::BLUE,
@@ -400,11 +436,11 @@ class Notifications::Vp::WeeklyReport::Mailer < Notifier::Mailer
     maximum = pt_days if maximum < pt_days
 
     vndr_days_query = company.yes_bank_vendors
-                           .non_deleted
-                           .where('approved_at between ? and ?', context[:from].beginning_of_day, context[:to].end_of_day)
-                           .select('AVG(DATEDIFF(`approved_at`, `submitted_at`)) as `Days (Avg)`')
-                           .to_sql
-    vndr_days = ActiveRecord::Base.connection.execute(vndr_days_query).as_json[0][0].to_f
+                             .non_deleted
+                             .where('approved_at between ? and ?', context[:from].beginning_of_day, context[:to].end_of_day)
+                             .select('AVG(DATEDIFF(`approved_at`, `submitted_at`)) as `Days (Avg)`')
+                             .to_sql
+    vndr_days = ActiveRecord::Base.connection.execute(vndr_days_query).as_json[0][0].to_f.round(2)
     report[:avg_approval][:items] << {
       label: 'Vendor Empanelment',
       color: Notifications::Vp::WeeklyReport::Job::Colors::GREEN,
@@ -415,7 +451,7 @@ class Notifications::Vp::WeeklyReport::Mailer < Notifier::Mailer
 
     return if maximum == 0
     report[:avg_approval][:items].each do |item|
-      item[:percent_of_max] = '%.2f' % (item[:days] * 100 / maximum)
+      item[:percent_of_max] = (item[:days] * 100 / maximum).round(2)
     end
   end
 
@@ -430,7 +466,7 @@ class Notifications::Vp::WeeklyReport::Mailer < Notifier::Mailer
   end
 
   def self.format_currency(context, value)
-    "#{context[:currency]} #{'%.2f' % (value / 100000)}L"
+    "#{context[:currency]} #{(value / 100000).round(2)}L"
   end
 
   # payload = {

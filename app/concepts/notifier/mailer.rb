@@ -11,11 +11,15 @@ class Notifier::Mailer < Notifier::API
   assign :hero_bg_icon, "icon_default"
 
   assign :company do |user, params|
-    company_id = params[:record].respond_to?(:company_id) ? params[:record].company_id : User.find(params[:record].send(params[:record].class.document_owner_attribute)).company_id
-    company = Company.find company_id
+    if user.present?
+      company = user.company
+    else
+      company_id = params[:record].respond_to?(:company_id) ? params[:record].company_id : User.find(params[:record].send(params[:record].class.document_owner_attribute)).company_id
+      company = Company.find company_id
+    end
     company = {
-        logo_url: company.configuration.logo.url(:thumb),
-        name: company.name
+      logo_url: company.configuration.logo.url(:thumb),
+      name: company.name
     }
   end
 

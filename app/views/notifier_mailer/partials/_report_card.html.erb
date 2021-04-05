@@ -55,7 +55,7 @@
         </tr>
         </tbody>
       </table>
-      <% if @payload.dig('report_card', 'payments_summary', 'last_7_days', 'amount').to_f > 0 %>
+      <% if @payload.dig('report_card', 'payments_summary', 'last_7_days', 'count').to_f > 0 %>
         <div id="ifftt" style="box-sizing: border-box; padding: 10px; color: #8578ff;">Payments By Type - Last 7 days
         </div>
         <table width="100%" id="ic2xh3" style="box-sizing: border-box; width: 100%; margin-top: 10px; margin-bottom: 10px; margin: 0 0 0 0;">
