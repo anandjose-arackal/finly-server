@@ -16,7 +16,8 @@ class Notifications::Vp::WeeklyReport::Mailer < Notifier::Mailer
   end
 
   assign :to do |user, params|
-    [user.email]
+    ['vivek.a@finly.io']
+    # [user.email]
   end
 
   assign :bcc do |user, params|
@@ -217,6 +218,7 @@ class Notifications::Vp::WeeklyReport::Mailer < Notifier::Mailer
       end
 
       vendor_name = "#{vendor_name[0..18]}.." if vendor_name.to_s.length > 22
+      vendor_name ||= "-"
 
       report[:top_payments][:payments] << {
         vendor: vendor_name,
@@ -276,34 +278,34 @@ class Notifications::Vp::WeeklyReport::Mailer < Notifier::Mailer
         sum(if(DATEDIFF(`invoices`.`due_date`, CURDATE()) >= 60, `amounts`.`value`, 0)) as `60+ days`,
         sum(if(DATEDIFF(`invoices`.`due_date`, CURDATE()) >= 60, 1, 0)) as `Count 60+ days`')
                     .to_sql
-    result = ActiveRecord::Base.connection.execute(query).to_json
+    result = ActiveRecord::Base.connection.execute(query).as_json
     row = result[0]
     report[:overdue_invoices] = {
       days_60_plus: {
-        amount: format_currency(context, row[0].to_f),
+        amount: format_currency(context, row[0]),
         count: row[1].to_i
       },
       days_30_to_60: {
-        amount: format_currency(context, row[2].to_f),
+        amount: format_currency(context, row[2]),
         count: row[3].to_i
       },
       days_0_to_30: {
-        amount: format_currency(context, row[4].to_f),
+        amount: format_currency(context, row[4]),
         count: row[5].to_i
       }
     }
 
     report[:upcoming_invoices] = {
       days_60_plus: {
-        amount: format_currency(context, row[6].to_f),
+        amount: format_currency(context, row[6]),
         count: row[7].to_i
       },
       days_30_to_60: {
-        amount: format_currency(context, row[8].to_f),
+        amount: format_currency(context, row[8]),
         count: row[9].to_i
       },
       days_0_to_30: {
-        amount: format_currency(context, row[10].to_f),
+        amount: format_currency(context, row[10]),
         count: row[11].to_i
       }
     }

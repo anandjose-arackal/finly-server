@@ -203,6 +203,10 @@
                           <td width="<%= data.dig('week_4_percentage') %>%" bgcolor="<%= orange %>" id="i2c7g" style="box-sizing: border-box;"> 
                           </td>
                         <% end %>
+                        <% if data.dig('week_5_percentage').to_f > 0 %>
+                          <td width="<%= data.dig('week_5_percentage') %>%" bgcolor="<%= beige %>" id="i2e7g" style="box-sizing: border-box;"> 
+                          </td>
+                        <% end %>
                       </tr>
                       </tbody>
                     </table>
