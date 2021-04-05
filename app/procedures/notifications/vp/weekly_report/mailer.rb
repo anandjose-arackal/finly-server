@@ -16,8 +16,7 @@ class Notifications::Vp::WeeklyReport::Mailer < Notifier::Mailer
   end
 
   assign :to do |user, params|
-    ['vivek.a@finly.io']
-    # [user.email]
+    [user.email]
   end
 
   assign :bcc do |user, params|
