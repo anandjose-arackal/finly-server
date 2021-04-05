@@ -14,7 +14,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
                 :description, :bank_payment_request, :payable_amount,
                 :payment_request_params, :policy, :bank_payment_request_params, :payable_amounts, :requested_amount, :inward_invoices,
                 :payments, :invoices_params, :invoices_status, :transfer_mode_id, :transfer_mode,
-                :update_payable_for_invoices, :reporting_amount_requested, :base_currency_id
+                :update_payable_for_invoices, :reporting_amount_requested, :base_currency_id, :is_domestic
 
   class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2::BankPaymentRequestPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
