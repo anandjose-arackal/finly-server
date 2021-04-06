@@ -23,9 +23,9 @@ class Notifications::Vp::WeeklyReport::Mailer < Notifier::Mailer
     [user.email]
   end
 
-  # assign :bcc do |user, params|
-  # ['vivek.a@finly.io', 'ruchit.shah@finly.io']
-  # end
+  assign :bcc do |user, params|
+    ['vivek.a@finly.io', 'ruchit.shah@finly.io']
+  end
 
   assign :subject do |user, params|
     "Finly Weekly Report: #{params[:from].strftime("%B %d, %Y")} to #{params[:to].strftime("%B %d, %Y")}"
