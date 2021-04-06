@@ -1389,29 +1389,29 @@ class UpdateTenants
       end
 
       # Here
-      # MacroSchedule.includes(:macro).find_each do |record|
-      #   if record.macro.present?
-      #     record.update_column(:company_id, record.macro.company_id)
-      #   end
-      # end
+      MacroSchedule.includes(:macro).find_each do |record|
+        if record.macro.present?
+          record.update_column(:company_id, record.macro.company_id)
+        end
+      end
 
-      # MacroRoute.includes(:macro).find_each do |record|
-      #   if record.macro.present?
-      #     record.update_column(:company_id, record.macro.company_id)
-      #   end
-      # end
+      MacroRoute.includes(:macro).find_each do |record|
+        if record.macro.present?
+          record.update_column(:company_id, record.macro.company_id)
+        end
+      end
 
-      # MacroJob.includes(:macro).find_each do |record|
-      #   if record.macro.present?
-      #     record.update_column(:company_id, record.macro.company_id)
-      #   end
-      # end
+      MacroJob.includes(:macro).find_each do |record|
+        if record.macro.present?
+          record.update_column(:company_id, record.macro.company_id)
+        end
+      end
 
-      # MacroJobLog.includes(:macro).find_each do |record|
-      #   if record.macro.present?
-      #     record.update_column(:company_id, record.macro.company_id)
-      #   end
-      # end
+      MacroJobLog.includes(:macro).find_each do |record|
+        if record.macro.present?
+          record.update_column(:company_id, record.macro.company_id)
+        end
+      end
 
       # 318 GeneralInvoice - Updating 22077 InvoiceFrequency
       GeneralInvoice.where.not(invoice_frequency_id: nil).find_in_batches(batch_size: 1000) do |records|
