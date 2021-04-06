@@ -223,11 +223,14 @@ class Notifications::Vp::WeeklyReport::Mailer < Notifier::Mailer
       vendor_name = "#{vendor_name[0..18]}.." if vendor_name.to_s.length > 22
       vendor_name ||= "-"
 
+      payment_type = payment.parent_type_name
+      payment_type = 'PO Advance' if payment_type == 'Purchase Order'
+
       report[:top_payments][:payments] << {
         vendor: vendor_name,
         percent_of_max: (payment.amount.value * 100 / maximum).round(2),
         label: format_currency(context, payment.amount.value),
-        payment_type: payment.parent_type_name,
+        payment_type: payment_type,
         color: colors.shift
       }
 
