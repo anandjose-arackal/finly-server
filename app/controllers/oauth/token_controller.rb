@@ -7,7 +7,14 @@ class Oauth::TokenController < Doorkeeper::TokensController
   include Helpers::UserSessionsHelper
 
   # around_action :save_request_impression
+  around_action :set_non_tenant
   before_action :load_global_variables
+
+  def set_non_tenant
+    ActsAsTenant.without_tenant_if_not_set do
+      yield
+    end
+  end
 
   def authorize_response
     ActsAsTenant.without_tenant_if_not_set do
