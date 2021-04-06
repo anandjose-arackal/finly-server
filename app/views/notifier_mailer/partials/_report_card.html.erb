@@ -83,8 +83,7 @@
                 Invoice
               <% end %>
               <% if @payload.dig('report_card', 'payments_by_type', 'po').to_f > 0 %>
-                <span id="i24tp5" style="box-sizing: border-box; border-radius: 3px; font-weight: 300; vertical-align: bottom; color: #fff; width: 16px; height: 16px; margin: 10px 15px 0 15px; display: inline-block; background-color: <%= blue %>;"></span>Purchase
-                Order
+                <span id="i24tp5" style="box-sizing: border-box; border-radius: 3px; font-weight: 300; vertical-align: bottom; color: #fff; width: 16px; height: 16px; margin: 10px 15px 0 15px; display: inline-block; background-color: <%= blue %>;"></span>PO Advance
               <% end %>
               <% if @payload.dig('report_card', 'payments_by_type', 'utility_bill').to_f > 0 %>
                 <span id="izf94l" style="box-sizing: border-box; border-radius: 3px; font-weight: 300; vertical-align: bottom; color: #fff; width: 16px; height: 16px; margin: 10px 15px 0 15px; display: inline-block; background-color: <%= yellow %>;"></span>Beneficiary
