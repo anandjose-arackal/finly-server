@@ -4,7 +4,10 @@ class Notifications::Vp::WeeklyReport::Mailer < Notifier::Mailer
     from = 1.week.ago.beginning_of_week
     to = 1.week.ago.end_of_week
     UserPanelSubscription.where(weekly_summary_enabled: true).includes(user: :company).each do |subscription|
-      Notifications::Vp::WeeklyReport::Mailer.(current_user: subscription.user, params: {from: from, to: to})
+      user = subscription.user
+      next unless user.active? && user.company.status_id == CompanyStatus.id_for(:active)
+
+      Notifications::Vp::WeeklyReport::Mailer.(current_user: user, params: { from: from, to: to })
     end
   end
 
@@ -21,7 +24,7 @@ class Notifications::Vp::WeeklyReport::Mailer < Notifier::Mailer
   end
 
   # assign :bcc do |user, params|
-    # ['vivek.a@finly.io', 'ruchit.shah@finly.io']
+  # ['vivek.a@finly.io', 'ruchit.shah@finly.io']
   # end
 
   assign :subject do |user, params|
