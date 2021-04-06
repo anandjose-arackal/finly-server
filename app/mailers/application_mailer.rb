@@ -1,6 +1,6 @@
 class ApplicationMailer < ActionMailer::Base
   default from: 'noreply@finlyhq.com',
-          "Message-ID" => ->(v) {"<#{SecureRandom.hex(32)}#{DateTime.now.strftime('%H%M%S%L')}@finly.io>"}
+          "Message-ID" => ->(v) {"<#{SecureRandom.hex(32)}#{DateTime.now.strftime('%H%M%S%L')}@finlyhq.com>"}
 
   before_action :add_headers
   after_action :log_mail
