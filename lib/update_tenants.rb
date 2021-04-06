@@ -480,6 +480,15 @@ class UpdateTenants
         RateContractLineItem.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
+      Artifact.includes(:resource).find_in_batches(batch_size: 1000) do |records|
+        records.each do |record|
+          unless record.company_id
+            record.company_id = record.resource&.company_id
+          end
+        end
+        Artifact.import records, on_duplicate_key_update: [:company_id], validate: false
+      end
+
       # 10736795
       # FieldText.includes(:custom_field).find_in_batches(batch_size: 1000) do |records|
       #   records.each do |record|
