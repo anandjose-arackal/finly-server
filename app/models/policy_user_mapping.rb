@@ -20,7 +20,7 @@ class PolicyUserMapping < ApplicationRecord
   belongs_to :user, optional: true
   belongs_to :policy, optional: true
 
-  default_scope { unscope(:where) }
+  default_scope { include_soft_deleted }
 
   scope :admin, -> { where admin: true }
   scope :with_policy, ->(policy_id) { where policy_id: policy_id }

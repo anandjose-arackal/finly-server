@@ -23,8 +23,8 @@ class Admin::Cards::Activate < Admin::Cards::Base
 
   def init
     card_user = User.find_by(id: params[:id])
-    self.old_card = card_user.cards.unscoped.find_by(id: active_params[:old_card_id])
-    self.new_card = card_user.cards.unscoped.find_by(id: active_params[:new_card_id])
+    self.old_card = card_user.cards.include_soft_deleted.find_by(id: active_params[:old_card_id])
+    self.new_card = card_user.cards.include_soft_deleted.find_by(id: active_params[:new_card_id])
   end
 
   def validate

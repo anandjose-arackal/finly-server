@@ -42,7 +42,7 @@ class FieldDropDownItem < ApplicationRecord
     joins(:user_drop_down_item_mappings).where('user_drop_down_item_mappings.user_id = ?', user_ids)
   }
 
-  default_scope { unscope(:where) }
+  default_scope { include_soft_deleted }
 
   def as_json(options={})
     dependent_field_ids = ParentDependentFieldConfigurationMapping.where(parent_type: "FieldDropDownItem", parent_id: self.id).pluck(:dependent_field_configuration_id)

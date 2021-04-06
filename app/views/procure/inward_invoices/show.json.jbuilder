@@ -176,7 +176,7 @@ json.invoice do
     gstin_location =  invoice.gstin_location
     if gstin_location.nil?
       #this for handle deleted gstinlocation in old flow
-      gstin_location = GstinLocation.unscoped.find_by_id invoice.gstin_location_id
+      gstin_location = GstinLocation.include_soft_deleted.find_by_id invoice.gstin_location_id
     end
     json.gstin_location_attributes gstin_location&.as_json rescue nil
   end
@@ -266,7 +266,7 @@ json.invoice do
       if receiving_account.nil? &&  invoice.receiving_account_id.present?
         #BankAccaount was detroyable in old ui,
         # this condition for handle such vendor item
-        receiving_account = BankAccount.unscoped.find invoice.receiving_account_id
+        receiving_account = BankAccount.include_soft_deleted.find invoice.receiving_account_id
       end
       json.account_number receiving_account&.account_number
       json.ifsc receiving_account&.ifsc

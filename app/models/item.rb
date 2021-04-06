@@ -41,7 +41,7 @@ include Searchkick::Api
 
   acts_as_sequenced column: :item_number, purpose: :item_master, min_length: 8, editable: false, prefix: -> (record) { record.goods? ? "G" : "S" }
 
-  default_scope {unscope(:where)}
+  default_scope { include_soft_deleted }
   belongs_to :company, optional: true
   belongs_to :category, optional: true
   belongs_to :tax_rate, optional: true
