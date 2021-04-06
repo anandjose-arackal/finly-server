@@ -279,7 +279,7 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
     FieldText.import field_texts
 
     # capture the newly created fields texts
-    newly_created_texts = FieldText.unscoped.where(value: self.import_id)
+    newly_created_texts = FieldText.include_soft_deleted.where(value: self.import_id)
 
     # update its value
     original_values = init_text_field.pluck :value # original list of values
@@ -326,7 +326,7 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
     FieldDropDownSelection.import field_drop_down
 
     # capture the newly created fields drop_downs
-    newly_created_drop_downs = FieldDropDownSelection.unscoped.where(created_at: dt)
+    newly_created_drop_downs = FieldDropDownSelection.include_soft_deleted.where(created_at: dt)
 
     # update its value
     original_values = init_drop_down_field.pluck :value # original list of values
@@ -375,7 +375,7 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
     FieldMultiselectSelection.import field_multi_selects
 
     # capture the newly created multi select selection item
-    newly_created_multi_selection = FieldMultiselectSelection.unscoped.where(created_at: dt)
+    newly_created_multi_selection = FieldMultiselectSelection.include_soft_deleted.where(created_at: dt)
 
     # update its value
     original_values = init_multi_select_field.pluck :value # original list of values

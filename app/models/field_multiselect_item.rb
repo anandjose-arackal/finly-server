@@ -17,6 +17,6 @@ class FieldMultiselectItem < ApplicationRecord
   belongs_to :company, optional: true
   belongs_to :field_configuration, optional: true
 
-  default_scope { unscope(:where) }
+  default_scope { include_soft_deleted }
   
 end

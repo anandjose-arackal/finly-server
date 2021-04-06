@@ -197,7 +197,7 @@ class Amount < NonTenantedApplicationRecord
     end
   end
 
-  default_scope {unscope(:where)}
+  default_scope { include_soft_deleted }
 
   # # method that returns the amount value
   # def amount_value

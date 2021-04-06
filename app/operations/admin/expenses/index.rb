@@ -31,7 +31,7 @@ class Admin::Expenses::Index < Admin::Expenses::Base
 
   def init
     if params[:show_deleted] == '1'
-      self.expenses = Expense.unscoped.all.paginate(page: params[:page])
+      self.expenses = Expense.include_soft_deleted.all.paginate(page: params[:page])
     else
       self.expenses = Expense.all.paginate(page: params[:page])
     end

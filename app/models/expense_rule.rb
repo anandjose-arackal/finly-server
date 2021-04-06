@@ -33,7 +33,7 @@ class ExpenseRule < ApplicationRecord
   delegate :type, to: :rule_type
   delegate :category_name, to: :category
 
-  default_scope { unscope(:where)}
+  default_scope { include_soft_deleted }
 
   validates :policy_id, presence: true
   validates :rule_type_id, presence: true

@@ -64,7 +64,7 @@ class BudgetRule < ApplicationRecord
   delegate :amount_value, to: :amount, allow_nil: true
   # delegate :category_name, to: :category
 
-  default_scope {unscope(:where)}
+  default_scope { include_soft_deleted }
 
   validates :period_id, presence: true
   validates :policy_id, presence: true

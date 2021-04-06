@@ -29,7 +29,7 @@ class TdsRatesList < ApplicationRecord
     end
   end
   
-  default_scope {unscope(:where)}
+  default_scope { include_soft_deleted }
 
   def as_json(options = {})
     {

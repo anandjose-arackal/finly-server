@@ -31,7 +31,7 @@ class ReviewalLevel < ApplicationRecord
   validates :associated_entity_type, presence: true
   validates :level_number, numericality: { greater_than: 0 }
 
-  default_scope { unscope(:where) }
+  default_scope { include_soft_deleted }
 
   scope :with_id, -> (ids) { where id: ids }
   scope :with_entity_type, -> (type) { where associated_entity_type: type }

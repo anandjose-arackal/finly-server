@@ -50,7 +50,7 @@ class ReportComment < ApplicationRecord
       current_user_name = self.user.name
       delegation_user_name = self.delegated_action_user_id == u.id ? "You" : self.delegated_action_user.name
     end
-    expense = Expense.unscoped.find_by(id: self.expense_id)
+    expense = Expense.include_soft_deleted.find_by(id: self.expense_id)
 
     type = "" # i.e. will form 'an expense...'
     merchant = ""
