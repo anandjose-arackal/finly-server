@@ -1,13 +1,5 @@
 class AdminUsers::Oauth::BypassTokenController < Oauth::TokenController
 
-  around_action :set_non_tenant
-
-  def set_non_tenant
-    ActsAsTenant.without_tenant do
-      yield
-    end
-  end
-
   def on_create_success(response)
     params[:request] = request
     params[:application] = 'web'
