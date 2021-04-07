@@ -41,8 +41,7 @@ class ApplicationMailer < ActionMailer::Base
       sent_at: mail.date
     )
 
-    email_body = email.create_body(company: self.company, body: body)
-    debugger
+    email.create_body(company: self.company, body: body)
 
     # Todo save attachments
 
