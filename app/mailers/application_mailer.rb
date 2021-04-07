@@ -1,6 +1,6 @@
 class ApplicationMailer < ActionMailer::Base
   default from: 'noreply@finlyhq.com',
-          "Message-ID" => ->(v) {"<#{SecureRandom.hex(32)}#{DateTime.now.strftime('%H%M%S%L')}@finlyhq.com>"}
+          "Message-ID" => ->(v) { "<#{SecureRandom.hex(32)}#{DateTime.now.strftime('%H%M%S%L')}@finlyhq.com>" }
 
   before_action :add_headers
   after_action :log_mail
@@ -12,7 +12,7 @@ class ApplicationMailer < ActionMailer::Base
   end
 
   def company
-    # Implement me
+    RequestStoreUtil.current_company
   end
 
   def log_mail
@@ -27,20 +27,22 @@ class ApplicationMailer < ActionMailer::Base
     end
 
     email = Email.create(
-        entity: params&.dig(:entity),
-        company: self.company,
-        message_id: mail.message_id,
-        sender: mail.from,
-        recipient: mail.to,
-        bcc: mail.bcc,
-        cc: mail.cc,
-        subject: mail.subject,
-        body: body,
-        configuration_set: headers['X-SES-CONFIGURATION-SET'],
-        mailer_klass: mailer_klass,
-        mailer_action: mailer_action,
-        sent_at: mail.date
+      entity: params&.dig(:entity),
+      company: self.company,
+      message_id: mail.message_id,
+      sender: mail.from,
+      recipient: mail.to,
+      bcc: mail.bcc,
+      cc: mail.cc,
+      subject: mail.subject,
+      configuration_set: headers['X-SES-CONFIGURATION-SET'],
+      mailer_klass: mailer_klass,
+      mailer_action: mailer_action,
+      sent_at: mail.date
     )
+
+    email_body = email.create_body(company: self.company, body: body)
+    debugger
 
     # Todo save attachments
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_04_05_134000) do
+ActiveRecord::Schema.define(version: 2021_04_07_055749) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3575,6 +3575,20 @@ ActiveRecord::Schema.define(version: 2021_04_05_134000) do
     t.index ["user_id"], name: "index_email_authorizations_on_user_id"
   end
 
+  create_table "email_bodies", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.integer "company_id", null: false
+    t.integer "email_id", null: false
+    t.text "body", size: :long
+    t.datetime "deleted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["company_id"], name: "index_email_bodies_on_company_id"
+    t.index ["created_at"], name: "index_email_bodies_on_created_at"
+    t.index ["deleted_at"], name: "index_email_bodies_on_deleted_at"
+    t.index ["email_id"], name: "index_email_bodies_on_email_id"
+    t.index ["updated_at"], name: "index_email_bodies_on_updated_at"
+  end
+
   create_table "email_events", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "email_id", null: false
     t.string "event", null: false
@@ -3605,7 +3619,6 @@ ActiveRecord::Schema.define(version: 2021_04_05_134000) do
     t.string "bcc"
     t.string "cc"
     t.string "subject"
-    t.text "body", size: :long
     t.string "mailer_klass"
     t.string "mailer_action"
     t.string "configuration_set"
