@@ -94,7 +94,7 @@ class MlModel < ApplicationRecord
   end
 
   def model
-    return nil unless model_pmml.present? and model_pmml.pmml
+    return nil unless model_pmml.present? and model_pmml.pmml.present?
 
     # TODO cache permanently
     @model ||= Eps::Model.load_pmml(model_pmml.pmml)
