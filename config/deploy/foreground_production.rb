@@ -27,6 +27,7 @@ set :balance_poller_role, :poller_role
 set :transaction_poller_role, :poller_role
 set :usage_tracker_role, :poller_role
 set :puma_service_unit_name, 'puma'
+set :email_tracker_role, :email_tracker_role
 # role-based syntax
 # ==================
 
