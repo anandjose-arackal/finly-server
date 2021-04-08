@@ -62,7 +62,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
 
         if required and entity.entity_type == 'attachment'
           attachments = send(entity.entity_key)
-          valid_attachments = attachments&.filter {|item| !item[:_destroy]}
+          valid_attachments = attachments&.filter {|item| !item[:_destroy]} if attachments.respond_to?(:each)
           errors.add(entity.label, 'cannot be blank') if valid_attachments.blank? or valid_attachments.length.zero?
         end
 
