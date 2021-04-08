@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file. Always add new logs to 
 beginning of this file.
 
+## 2021-04-07
+- Fix: Vendor policy check was not checking for company. Patched this security gap.
 
 ## 2021-03-31
   - Fix: use user roles instead of policy user roles to properly filter export templates.

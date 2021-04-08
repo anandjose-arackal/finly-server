@@ -34,6 +34,7 @@ class MlModel < ApplicationRecord
   belongs_to :company
 
   has_many :predictions, class_name: 'MlModelPrediction'
+  has_one :model_pmml, class_name: "MlModelPmml"
 
   serialize :config, JSON
 
@@ -93,10 +94,10 @@ class MlModel < ApplicationRecord
   end
 
   def model
-    return nil unless pmml.present?
+    return nil unless model_pmml.present? and model_pmml.pmml.present?
 
     # TODO cache permanently
-    @model ||= Eps::Model.load_pmml(pmml)
+    @model ||= Eps::Model.load_pmml(model_pmml.pmml)
   end
 
   def clear_model_cache
@@ -111,10 +112,14 @@ class MlModel < ApplicationRecord
     begin
       model = Eps::Model.new(data, target: target_key, algorithm: algorithm.to_sym)
     rescue StandardError => e
-      debugger
       raise e
     end
-    return false unless update(pmml: model.to_pmml, built_at: DateTime.now, build_duration: (Time.now - start_time))
+    if model_pmml.nil?
+      return false unless self.create_model_pmml(pmml: model.to_pmml, company_id: self.company_id)
+    else
+      return false unless self.model_pmml.update(pmml: model.to_pmml)
+    end
+    return false unless update(built_at: DateTime.now, build_duration: (Time.now - start_time))
 
     # Clear the cache
     @model = model
