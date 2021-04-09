@@ -169,7 +169,7 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
   end
 
   def self.format_amount_requested_tool_tip(context)
-    country_code = context[:record].base_currency.country_code
+    country_code = context[:record].base_currency&.country_code
     value = context[:record].payment_order&.amount_requested&.value.to_f
 
     "#{country_code} #{value}"
