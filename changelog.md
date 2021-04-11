@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file. Always add new logs to 
 beginning of this file.
 
+## 2021-04-08
+ - feat: Create export templates for new companies when created.
+
 ## 2021-04-07
 - Fix: Vendor policy check was not checking for company. Patched this security gap.
 
