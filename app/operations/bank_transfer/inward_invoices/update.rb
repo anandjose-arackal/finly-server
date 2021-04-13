@@ -134,7 +134,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
         invoiced_total_qty = 0
         invoiced_total_qty = invoiced_line_items_except_current_item.sum('invoice_line_items.quantity').to_f
 
-        if item_q < (invoiced_total_qty + item[:quantity].to_i)
+        if item_q < (invoiced_total_qty + item[:quantity].to_f)
           add_message :error, "Invoiced item quantity should be on par with the Purchase Order quantity."
           break
         end
