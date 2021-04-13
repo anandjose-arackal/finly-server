@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file. Always add new logs to 
 beginning of this file.
 
+## 2021-04-13
+ - Fix: Updating the user base dlrm for credit note.
+
 ## 2021-04-08
  - feat: Create export templates for new companies when created.
 
