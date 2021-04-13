@@ -121,7 +121,8 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
       # the below line is in the case of one PO having multiple line items of the same inventory item
       processed_item_ids = []
       self.inward_invoice_params[:invoice_items_attributes].each do |item|
-        po_item = self.purchase_order.items.without_id(processed_item_ids).find_by(id: item[:purchase_order_item_id])
+        invoice_line_item = self.inward_invoice.items.find_by(id: item[:id])
+        po_item = self.purchase_order.items.without_id(processed_item_ids).find_by(id: invoice_line_item.purchase_order_item_id)
         next if po_item.blank? # temp workaround
         item_q = (po_item&.inventory_line_item&.product_type_id == ProductType.id_for(:goods)) ? po_item.accepted : po_item.quantity
 
