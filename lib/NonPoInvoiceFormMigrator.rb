@@ -4,7 +4,7 @@ class NonPoInvoiceMigrator
     result = []
     company = Company.find company_id
     documents = Invoice.where(invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)).where(company_id: company.id)
-    # documents = Invoice.where(id: 10670).where(company_id: company.id)
+    # documents = Invoice.where(id: 10682).where(company_id: company.id)
 
     # FormCustomField.where(company_id: company_id).destroy_all
     form = Form.where(klass_name: 'Docs::P2P::Invoices::NonPo::Form', company_id: company_id).first
@@ -85,6 +85,8 @@ class NonPoInvoiceMigrator
     lable = custom_field.field_configuration.field_name
     entity_key = custom_field.field_configuration.field_name.split(" ").join("_").underscore
     position = form.entities.where(form_section_id: section_id).order(:position).last.position + 1
+    # is_active = !custom_field.field_configuration.deleted?
+
 
     form_entity = FormEntity::Text.create({ company_id: company.id,
      form_id: form_id, form_section_id: section_id,
@@ -93,7 +95,8 @@ class NonPoInvoiceMigrator
      placeholder: 'Enter value', hint: 'Please enter the hint',
      entity_type: 'text', editable: true, required: required,
      active: active, unique: false, visible: true, position: position,
-     system_field: false, options: "{'format':'text','minimum':1,'maximum':255}", 
+     system_field: false, options: "{'format':'text','minimum':1,'maximum':255}"
+     # , active: is_active
     })
     form_entity
   end
@@ -107,6 +110,7 @@ class NonPoInvoiceMigrator
     lable = custom_field.field_configuration.field_name
     entity_key = custom_field.field_configuration.field_name.split(" ").join("_").underscore
     position = form.entities.where(form_section_id: section_id).order(:position).last.position + 1
+    # is_active = !custom_field.field_configuration.deleted?
 
     # create entity
     form_entity = FormEntity::DropDown.create({ company_id: company.id,
@@ -118,6 +122,7 @@ class NonPoInvoiceMigrator
      active: active, unique: false, visible: true, position: position,
      system_field: false, choices_scope: nil,
      options: {}
+     # ,active: is_active
     })
 
     choices = Choices['list'].()
