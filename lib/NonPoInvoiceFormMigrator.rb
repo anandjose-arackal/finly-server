@@ -273,8 +273,8 @@ class NonPoInvoiceMigrator
 
 
       # INVOICE SUMMARY
-      invoice_gross_amount: document&.item_amounts_total&.round,
-      reporting_invoice_gross_amount: document&.item_amounts_total&.round,
+      invoice_gross_amount: document&.item_amounts_total.to_f,
+      reporting_invoice_gross_amount: document&.item_amounts_total.to_f,
       
       invoice_discount_amount: document&.discount_amount&.value,
       reporting_invoice_discount_amount: document&.discount_amount&.value,
