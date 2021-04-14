@@ -279,8 +279,8 @@ class NonPoInvoiceMigrator
       invoice_discount_amount: document&.discount_amount&.value,
       reporting_invoice_discount_amount: document&.discount_amount&.value,
       
-      invoice_taxable_amount: document&.gross_amount&.value,
-      reporting_invoice_taxable_amount: document&.gross_amount&.value,
+      invoice_taxable_amount: precision_value(document.gross_amount&.value.to_f),
+      reporting_invoice_taxable_amount: precision_value(document.gross_amount&.value.to_f),
 
       total_line_item_discount_amount: document&.discount_amount&.value,
       overall_discount_amount: 0,
