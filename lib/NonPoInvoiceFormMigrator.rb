@@ -4,7 +4,7 @@ class NonPoInvoiceMigrator
     result = []
     company = Company.find company_id
     documents = Invoice.where(invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)).where(company_id: company.id)
-    # documents = Invoice.where(id: 10682).where(company_id: company.id)
+    # documents = Invoice.where(id: 10686).where(company_id: company.id)
 
     # FormCustomField.where(company_id: company_id).destroy_all
     form = Form.where(klass_name: 'Docs::P2P::Invoices::NonPo::Form', company_id: company_id).first
@@ -281,42 +281,48 @@ class NonPoInvoiceMigrator
       
       invoice_taxable_amount: document&.gross_amount&.value,
       reporting_invoice_taxable_amount: document&.gross_amount&.value,
+
+      total_line_item_discount_amount: document&.discount_amount&.value,
+      overall_discount_amount: 0,
       
       invoice_tax_amount: document&.tax_amount&.value,
       reporting_invoice_tax_amount: document&.tax_amount&.value,
-      
+
+      # tds_slab_id:  document&.tds_slab_id ,
+      tds_percentage: document&.tds_slab&.tds,
       invoice_tds_amount: document&.tds_amount&.value,
       reporting_invoice_tds_amount: document&.tds_amount&.value,
       
       invoice_freight_amount: document&.freight_amount&.value,
       reporting_invoice_freight_amount: document&.freight_amount&.value,
-
-      invoice_sub_total_amount: document&.net_amount&.value,
-      reporting_invoice_sub_total_amount: document&.net_amount&.value,
+      
+      invoice_paid_outside_amount: document&.advance_amount&.value.to_f,
+      reporting_invoice_paid_outside_amount: document&.advance_amount&.value.to_f,
 
       invoice_roundoff_amount: document&.roundoff_amount,
       reporting_invoice_roundoff_amount: document&.roundoff_amount,
 
-      invoice_total_amount: document&.net_amount&.value,
-      reporting_invoice_total_amount: document&.net_amount&.value,
+      invoice_sub_total_amount: document&.balance_due&.value.to_f,
+      reporting_invoice_sub_total_amount: document&.balance_due&.value.to_f,
 
-      invoice_paid_outside_amount: document&.advance_amount&.value.to_f,
-      reporting_invoice_paid_outside_amount: document&.advance_amount&.value.to_f,
+
+      # invoice_total_amount: document&.net_amount&.value - document&.advance_amount&.value.to_f,
+      # reporting_invoice_total_amount: document&.net_amount&.value - document&.advance_amount&.value.to_f,
+      
+      # invoice_net_total_amount: document&.net_amount&.value - document&.advance_amount&.value.to_f ,
+      # reporting_invoice_net_total_amount: document&.net_amount&.value - document&.advance_amount&.value.to_f,
+
+      invoice_total_amount: document&.balance_due&.value.to_f,
+      reporting_invoice_total_amount: document&.balance_due&.value.to_f,
+
+      invoice_net_total_amount: document&.balance_due&.value.to_f,
+      reporting_invoice_net_total_amount: document&.balance_due&.value.to_f,
+            
+      invoice_advance_paid_amount: document&.payments&.successful&.joins(:amount)&.sum(:value),
+      reporting_invoice_advance_paid_amount: document&.payments&.successful&.joins(:amount)&.sum(:value),
 
       invoice_balance_due: document&.balance_due&.value,
-      reporting_invoice_balance_due: document&.balance_due&.value,
-
-      # tds_slab_id:  document&.tds_slab_id ,
-      tds_percentage: document&.tds_slab&.tds,
-      
-      total_line_item_discount_amount: document&.discount_amount&.value,
-      overall_discount_amount: 0,
-      
-      invoice_net_total_amount: document&.balance_due&.value,
-      reporting_invoice_net_total_amount: document&.balance_due&.value,
-      
-      invoice_advance_paid_amount: document&.payments&.successful&.joins(:amount)&.sum(:value),
-      reporting_invoice_advance_paid_amount: document&.payments&.successful&.joins(:amount)&.sum(:value)
+      reporting_invoice_balance_due: document&.balance_due&.value
     }
     document.update_columns(update_params)
   end
