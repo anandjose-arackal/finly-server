@@ -321,8 +321,8 @@ class NonPoInvoiceMigrator
       invoice_advance_paid_amount: document&.payments&.successful&.joins(:amount)&.sum(:value),
       reporting_invoice_advance_paid_amount: document&.payments&.successful&.joins(:amount)&.sum(:value),
 
-      invoice_balance_due: document&.balance_due&.value - document&.payments&.successful&.joins(:amount)&.sum(:value).to_f ,
-      reporting_invoice_balance_due: document&.balance_due&.value - document&.payments&.successful&.joins(:amount)&.sum(:value).to_f
+      invoice_balance_due: document&.balance_due&.value.to_f - document&.payments&.successful&.joins(:amount)&.sum(:value).to_f ,
+      reporting_invoice_balance_due: document&.balance_due&.value.to_f - document&.payments&.successful&.joins(:amount)&.sum(:value).to_f
     }
     document.update_columns(update_params)
   end
