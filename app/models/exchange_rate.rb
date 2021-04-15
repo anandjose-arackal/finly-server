@@ -10,7 +10,7 @@
 #  deleted_at :datetime
 #
 
-class ExchangeRate < ApplicationRecord
+class ExchangeRate < NonTenantedApplicationRecord
   def self.populate_rates(date)
     oxr = Money::Bank::OpenExchangeRatesBank.new
     oxr.app_id = OPEN_EXCHANGE_RATES['app_id']
