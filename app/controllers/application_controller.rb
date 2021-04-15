@@ -485,9 +485,12 @@ class ApplicationController < ActionController::Base
     # Todo this is a temporary hack
     # expired, otp verified and user session verified will be false for users who authenticate via SSO
     # This will have to be handled when working on SSO
-    return true if user_session.access_token&.authentication_type == 'sso'
+    
+    # return true if user_session.access_token&.authentication_type == 'sso'
 
-    return false if current_user.expired?
+    return false if RequestStoreUtil.current_session.access_token.authentication_type == "password" && current_user.expired?
+    # if password then check for current_user session expired
+    
     return false unless current_user.otp_verified
     return false unless user_session.verified?
 
@@ -539,7 +542,7 @@ class ApplicationController < ActionController::Base
   FILE_LOGGER = LogStashLogger.new(type: :file, path: "log/logstash_query_details.log", sync: true)
 
   def set_cache_buster
-    response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate"
+    response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate, proxy-revalidate"
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "Fri, 01 Jan 1990 00:00:00 GMT"
   end

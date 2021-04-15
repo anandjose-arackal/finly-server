@@ -8,12 +8,44 @@ class Docs::P2P::PurchaseRequests::Index < IndexBuilder::API
   custom_fields :purchase_request
 
   # Fixed column is always default true
-  column :request, label: 'Name', fixed: true do
+  column :request, label: 'Description', fixed: true do
     text value: :description, format: 'primary'
   end
 
-  column :request_id, sort: :order_number, label: "Request ID", default: true do
+  column :request_id, sort: :order_number, label: "Request ID", default: true, includes: [:policy, :created_by] do
     text value: :request_id, format: 'primary'
+    text value: 'Policy: {{record.policy.name}}'
+    user value: :created_by
+  end
+
+  column :status, sort: :status_name, default: true, includes: [:status] do
+    indicator value: :status, format: :format_status
+  end
+
+  column :amount, default: true, sort: :total_amount_value, includes: [total_amount: :currency] do
+    amount value: :total_amount
+  end
+
+  IndexBuilder::API::ColumnTemplate::ReviewProgress(self)
+
+  column :policy, includes: [:policy] do
+    text value: '{{record.policy.name}}'
+  end
+
+  IndexBuilder::API::ColumnTemplate::ControllingUser(self)
+
+  IndexBuilder::API::ColumnTemplate::ControllingLevel(self)
+
+  column :created_by, default: true, includes: [:created_by] do
+    user value: :created_by
+  end
+
+  column :cost_center, default: true, includes: [:cost_center] do
+    text value: :cost_center_name
+  end
+
+  column :department, default: true, includes: [:department] do
+    text value: :department_name
   end
 
   column :created_at, sort: true do
@@ -31,34 +63,6 @@ class Docs::P2P::PurchaseRequests::Index < IndexBuilder::API
   column :approved_at, sort: :approved_at do
     date value: :approved_at
   end
-
-  column :status, sort: :status_name, default: true, includes: [:status] do
-    indicator value: :status, format: :format_status
-  end
-
-  column :policy, default: true, includes: [:policy] do
-    text value: "{{record.policy.name}}"
-  end
-
-  column :amount, default: true, sort: :total_amount_value, includes: [total_amount: :currency] do
-    amount value: :total_amount
-  end
-
-  column :cost_center, default: true, includes: [:cost_center] do
-    text value: :cost_center_name
-  end
-
-  column :department, default: true, includes: [:department] do
-    text value: :department_name
-  end
-
-  column :created_by, default: true, includes: [:creator] do
-    user value: :created_by
-  end
-
-  IndexBuilder::API::ColumnTemplate::ControllingUser(self)
-  IndexBuilder::API::ColumnTemplate::ControllingLevel(self)
-  IndexBuilder::API::ColumnTemplate::ReviewProgress(self)
 
   counter -> (user, collection) do
     counter = IndexBuilder::Counter.new :with_status_ids
@@ -79,7 +83,7 @@ class Docs::P2P::PurchaseRequests::Index < IndexBuilder::API
 
     # :approved, :auto_approved, :po_created, :partially_closed, :order_initiated
     counter.add PurchaseRequestStatus::GROUP_APPROVED, 'Approved', (
-        counts[PurchaseRequestStatus.id_for(:approved)].to_i +
+      counts[PurchaseRequestStatus.id_for(:approved)].to_i +
         counts[PurchaseRequestStatus.id_for(:auto_approved)].to_i +
         counts[PurchaseRequestStatus.id_for(:po_created)].to_i +
         counts[PurchaseRequestStatus.id_for(:partially_closed)].to_i +
@@ -110,7 +114,7 @@ class Docs::P2P::PurchaseRequests::Index < IndexBuilder::API
       # if context[:record].controlling_user?(context[:user])
       #   format = 'warning'
       # else
-        format = 'info'
+      format = 'info'
       # end
     when :draft, :retracted
       format = 'info'

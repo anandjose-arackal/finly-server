@@ -3,6 +3,8 @@ json.form_data do
   json.merge! @op['model'].form_data(@op['form'])
 end
 
+json.meta @op['model'].form_metadata
+
 # Additional Data
 json.created_by @op['model']&.created_by.as_json
 

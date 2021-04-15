@@ -5,6 +5,8 @@ Rails.application.config.middleware.use OmniAuth::Builder do
     provider :quickbooks, 'qyprd0zDADfuZkLhAUxBfCWOZD9arh', 'UmdQJxfAd5Y7VZlCxF1gACyz60HWgI1hEXGkZImj'
   end
 
+  
+
   # adding multiple SAML configurations here for authentication
   OmniAuth::MultiProvider.register(self,
                                    provider_name: :saml,

@@ -22,4 +22,10 @@ class MlModelPrediction < ApplicationRecord
   before_save do
     self.is_accurate_prediction = (actual_value.to_s == predicted_value.to_s)
   end
+
+  def self.measure
+    total_measures = self.count
+    accurate_measures = self.where(is_accurate_prediction: true).count
+    puts "Accuracy: #{accurate_measures * 100 / total_measures}% (#{total_measures} samples)"
+  end
 end

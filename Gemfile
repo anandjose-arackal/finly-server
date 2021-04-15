@@ -80,6 +80,9 @@ gem 'slack-notifier', '~> 2.3'
 # gems for quickbooks integration
 gem 'omniauth', '~> 1.9.0'
 gem 'omniauth-quickbooks', '~> 0.0.2'
+
+
+
 gem 'quickbooks-ruby', git: 'https://github.com/ruckus/quickbooks-ruby.git', ref: '22c8df58bbed441207f3d0d8ac5a786cdb4821a5'
 
 # gem 'finly-secure_storage-sdk', git: 'git@bitbucket.org:vivek_a17/finly-secure_storage-sdk.git'
@@ -111,7 +114,7 @@ gem 'will_paginate', '~> 3.1.6'
 gem 'hutch', '~> 1.0'
 
 gem 'jwt', '~> 2.2'
-
+  
 # gem for jquery ui in rails app
 gem 'jquery-ui-rails', '~> 6.0.1'
 
@@ -238,7 +241,7 @@ gem 'image_processing', '~> 1.2'
 # adding aws-sdk gem for using their API enabled services
 # gem 'aws-sdk'
 # gem 'aws-sdk-s3', '~> 1.30.0'
-# gem 'aws-sdk-sqs', '~> 1.10.0'
+gem 'aws-sdk-sqs', '~> 1.38.0'
 
 gem 'awesome_print', '~> 1.8.0'
 
@@ -261,6 +264,8 @@ gem 'azure-storage-blob'
 
 gem 'acts_as_tenant'
 
+gem 'money'
+gem 'money-open-exchange-rates'
 # gem for all paper trail
 gem 'paper_trail', '~> 11.0.0'
 gem 'paper_trail-association_tracking', '~> 2.1.1'

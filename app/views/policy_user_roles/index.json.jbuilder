@@ -16,7 +16,7 @@
 json.array! @result.paginated_policy_user_roles do |pur|
   # json.id pur.id, 
   json.extract! pur, :id, :min_amount, :max_amount
-  json.name pur.user.name
-  json.email pur.user.email
-  json.mobile_number pur.user.mobile_number
+  json.name pur.user&.name
+  json.email pur.user&.email
+  json.mobile_number pur.user&.mobile_number
 end

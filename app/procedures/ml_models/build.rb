@@ -1,10 +1,8 @@
 class MlModels::Build
 
   def self.perform
-    MlModel.all.each do |model|
-      model.build_model
-      model.clear_model_cache
-    end
+    MlModel::Monitor.build
+    MlModel::FormEntityModel.build
   end
 
 end

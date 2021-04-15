@@ -40,4 +40,6 @@ class Agreement < NonTenantedApplicationRecord
   has_attached_file :file, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
   validates_attachment :file, content_type: CONTENT_TYPES
 
+  default_scope { order(created_at: :desc) }
+
 end

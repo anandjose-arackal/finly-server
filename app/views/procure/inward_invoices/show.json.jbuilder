@@ -110,7 +110,7 @@ json.invoice do
     else
       gst_type_id = 1
     end
-    json.gst_type_id gst_type_id 
+    json.gst_type_id gst_type_id
   end
 
   json.discount_amount precision_value invoice.discount_amount&.value
@@ -426,7 +426,7 @@ json.bank_payment_request_policies do
 end
 
 json.tax_rates do
-  json.array! @result.tax_rates do |tax_rate|
+  json.array! @result.tax_rates.non_deleted do |tax_rate|
     if tax_ids.include?(tax_rate.id) || !tax_rate.deleted?
       json.merge! tax_rate.as_json
     end
