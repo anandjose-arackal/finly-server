@@ -253,7 +253,7 @@ class NonPoInvoiceMigrator
 
       # VENDOR DETAILS
       vendor_country: document&.vendor&.vendor_country,
-      vendor_trade_name: document&.vendor&.business_name || document&.vendor&.name,
+      vendor_trade_name:  document&.vendor&.trade_name || document&.vendor&.business_name,
       vendor_sequence_id: document&.vendor&.vendor_id,
       vendor_gstin: document&.gstin_location&.gstin,
       vendor_pan: document&.vendor&.pan,
@@ -321,8 +321,8 @@ class NonPoInvoiceMigrator
       invoice_advance_paid_amount: document&.payments&.successful&.joins(:amount)&.sum(:value),
       reporting_invoice_advance_paid_amount: document&.payments&.successful&.joins(:amount)&.sum(:value),
 
-      invoice_balance_due: document&.balance_due&.value,
-      reporting_invoice_balance_due: document&.balance_due&.value
+      invoice_balance_due: document&.balance_due&.value - document&.payments&.successful&.joins(:amount)&.sum(:value) ,
+      reporting_invoice_balance_due: document&.balance_due&.value - document&.payments&.successful&.joins(:amount)&.sum(:value)
     }
     document.update_columns(update_params)
   end
