@@ -9,7 +9,7 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #
-class Unit < ApplicationRecord
+class Unit < NonTenantedApplicationRecord
   Units = [
     {value:"BOU", name: 'BOU'},
     {value:"BGS", name: 'Bags'},

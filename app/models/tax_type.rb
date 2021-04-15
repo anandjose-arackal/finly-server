@@ -10,7 +10,7 @@
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null
 #
-class TaxType < ApplicationRecord
+class TaxType < NonTenantedApplicationRecord
   TAXTYPE = [
     {country_name:"india", name: 'IGST', tax_name: 'igst' },
     {country_name:"india", name: 'CGST+SGST', tax_name: 'cgst_sgst' },

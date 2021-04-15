@@ -1,4 +1,4 @@
-class FormCurrency < ApplicationRecord
+class FormCurrency < NonTenantedApplicationRecord
 
   def currency_conversion_rate
     ExchangeRate.get_rate(
