@@ -249,7 +249,7 @@ class NonPoInvoiceMigrator
 
       payment_term_days: document&.payment_term&.days_after,
       tax_type_id: document&.gst_type_id,
-      conversion_date: document&.created_at&.to_date,
+      conversion_date: document&.date&.to_date,
 
       # VENDOR DETAILS
       vendor_country: document&.vendor&.vendor_country,
