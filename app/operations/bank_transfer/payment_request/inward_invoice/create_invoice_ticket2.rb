@@ -277,7 +277,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
           transfer_mode_id: self.transfer_mode_id,
           amount_attributes: {
               value: self.payable_amounts[invoice.id],
-              currency_id: Currency.first.id
+              currency_id: self.base_currency_id
           },
           note: invoice.narration,
           category_id: invoice.category_id,
@@ -325,7 +325,11 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
         company_id: user.company_id,
         amount_requested_attributes: {
             value: self.requested_amount,
-            currency_id: 1
+            currency_id: self.base_currency_id
+        },
+        amount_processed_attributes: {
+            value: 0,
+            currency_id: self.base_currency_id
         },
         payment_mode: self.payment_mode,
         transfer_mode_id: self.transfer_mode_id,
@@ -333,7 +337,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
         receiving_account_type: "BankAccount",
         payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
         application: RequestStore.store[:current_app],
-        currency_id: 1,
+        currency_id: self.base_currency_id,
         scheduled_at: self.scheduled_at,
         reporting_amount_requested: self.reporting_amount_requested
     }
@@ -342,8 +346,8 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
         status_id: BankPaymentRequestStatus.id_for(:creation_in_progress),
         controlling_user_id: user.id,
         requested_amount_attributes: {
-            value: self.requested_amount,
-            currency_id: 1
+          value: self.requested_amount,
+          currency_id: self.base_currency_id
         },
         description: self.description,
         beneficiary_type_id: 2, # this is because an invoice will always come from a vendor
