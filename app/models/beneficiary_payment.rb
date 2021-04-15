@@ -174,7 +174,7 @@ class BeneficiaryPayment < ApplicationRecord
         tds_slab_id: self.tds_slab_id,
         tds_slab_name: self.tds_slab&.name,
         # tds_rate: self.tds,
-        paid_amount: self.payments.successful.joins(:amount).sum(:value),
+        paid_amount: self.payments.successful.joins(:amount).sum(:value).to_f,
         remaining_amount: (self.balance_due&.value.to_f - self.payments.successful.joins(:amount).sum(:value)),
         original_amount: precision_value(self.original_amount&.value),
         advance_amount: precision_value(self.advance_amount&.value),

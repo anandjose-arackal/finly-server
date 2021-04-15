@@ -71,7 +71,7 @@ class GstinLocation < ApplicationRecord
     self.vendor.gst_registered
   end
 
-  def forms_extra_data
+  def forms_extra_data(type = nil, entity_key = nil)
     data = {}
     gstin_master = Gstin.with_gstin(self.gstin).first
     if gstin_master.present?

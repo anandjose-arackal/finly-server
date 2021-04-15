@@ -14,8 +14,26 @@ json.summary do
   json.scheduled_at @result.payment_order.scheduled_at&.strftime "%d %b %Y"
   json.processed_at @result.payment_order.processed_at&.strftime "%d %b %Y"
   json.submitted_at @result.bank_payment_request.submitted_at&.strftime("%d %b %Y")
+  
   json.amount_requested precision_value @result.payment_order.amount_requested&.value
+  json.amount_requested_currency precision_value @result.payment_order.amount_requested&.currency&.country_code
+  
   json.amount_processed precision_value @result.payment_order.amount_processed&.value
+  json.amount_processed_currency precision_value @result.payment_order.amount_processed&.currency&.country_code
+
+
+  # json.amount_requested do
+  #   amount = @result.payment_order.amount_requested
+  #   json.value precision_value amount&.value
+  #   json.currency_code amount&.currency&.country_code
+  # end
+
+  # json.amount_processed do
+  #   amount = @result.payment_order.amount_processed
+  #   json.value precision_value amount&.value
+  #   json.currency_code amount&.currency&.country_code
+  # end
+
   json.description @result.bank_payment_request.description
   json.note @result.payment_order.note
   json.initiating_user @result.bank_payment_request.owner.name

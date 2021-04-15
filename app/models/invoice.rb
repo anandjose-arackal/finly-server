@@ -150,6 +150,7 @@
 #
 
 class Invoice < ApplicationRecord
+  attr_accessor :skip_callback
   include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport, ControllingUser
   include LiquidDroppable
   include Exposures::Model::Exposable
@@ -159,9 +160,47 @@ class Invoice < ApplicationRecord
   # include SearchIndex::Concerns::Document
   include Searchkick::Api
 
+  # Multicurrency Support
+  include Monetizable
+  money :invoice_gross_amount, :get_reporting_currency
+  money :invoice_discount_amount, :get_reporting_currency
+  money :invoice_tax_amount, :get_reporting_currency
+  money :invoice_tds_amount, :get_reporting_currency
+  money :invoice_paid_outside_amount, :get_reporting_currency
+  money :invoice_sub_total_amount, :get_reporting_currency
+  money :invoice_total_amount, :get_reporting_currency
+  money :invoice_taxable_amount, :get_reporting_currency
+  money :invoice_freight_amount, :get_reporting_currency
+  money :invoice_roundoff_amount, :get_reporting_currency
+  money :invoice_balance_due, :get_reporting_currency
+
+  def get_reporting_currency
+    Currency.currency_for(self.company.reporting_currency_code)
+  end
+
+  def get_base_currency
+    currency_code = FormCurrency.find(self.base_currency)&.currency_code rescue nil
+    Currency.currency_for(currency_code || "INR")
+  end
+
+  exchange_bank :get_reporting_currency, :get_base_currency, :exchange_rate
+
+  # exchange_rate as method
+  def exchange_rate
+    ExchangeRate.get_rate(
+      self.conversion_date,
+      self.reporting_currency,
+      get_base_currency&.country_code || "INR"
+    )
+  end
+
+  # Multicurrency Attributes
+
   # include EventProducer
 
   acts_as_sequenced column: :invoice_id, purpose: :invoice, editable: false, prefix: 'INV'
+
+  default_scope { order(created_at: :desc) }
 
   belongs_to :address, optional: true
   # #### Fixme: These associations are deprecated to support amount number fields with the same name.
@@ -224,7 +263,7 @@ class Invoice < ApplicationRecord
 
   # because multiple payments can be made against one invoice
   has_many :payments
-  has_many :successful_payments, -> {successful}, class_name: 'Payment'
+  has_many :successful_payments, -> { successful }, class_name: 'Payment'
 
   has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
   has_many :items, class_name: "InvoiceLineItem", as: :parent
@@ -243,19 +282,17 @@ class Invoice < ApplicationRecord
   # From Procurement workflow
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
 
-
   has_many :trails, as: :parent
   has_many :notify_users, as: :document
   has_many :credit_note_adjustments, dependent: :destroy
   has_many :credit_notes, through: :credit_note_adjustments
 
   has_paper_trail(
-      meta: {
-          parent_document_type: "Invoice",
-          document_number: Proc.new { |document| document.invoice_id }
-      }
-  ) if Proc.new { |inv | inv.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice) || inv.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)}
-
+    meta: {
+      parent_document_type: "Invoice",
+      document_number: Proc.new { |document| document.invoice_id }
+    }
+  ) if Proc.new { |inv| inv.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice) || inv.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice) }
 
   accepts_nested_attributes_for :address
   accepts_nested_attributes_for :invoice_attachments, allow_destroy: true
@@ -370,7 +407,7 @@ class Invoice < ApplicationRecord
 
   scope :filter_payable_invoices, -> (enabled) {
     if StringUtils.to_bool(enabled)
-      ids = self.joins(:balance_due).non_beneficiary.where(invoice_status_id: InwardInvoiceStatus.ids_for([:unpaid, :partially_paid, :approved, :auto_approved, :initiated]), payable: true).where.not(amounts: {value: 0}).pluck(:id)
+      ids = self.joins(:balance_due).non_beneficiary.where(invoice_status_id: InwardInvoiceStatus.ids_for([:unpaid, :partially_paid, :approved, :auto_approved, :initiated]), payable: true).where.not(amounts: { value: 0 }).pluck(:id)
       where id: ids
     end
   }
@@ -560,7 +597,6 @@ class Invoice < ApplicationRecord
       user_id = RequestStore.store[:current_user]&.id
     end
 
-
     if user_id.present?
       with_created_by_user_id(user_id)
     end
@@ -602,6 +638,9 @@ class Invoice < ApplicationRecord
     where(rcm_enabled: true) if StringUtils.to_bool(enabled)
   }
 
+  scope :includes_for_contract, -> {
+    includes(:created_by, :invoice_type, :form_custom_fields, :items)
+  }
 
   # Sorting
   scope :sort_invoice_id, -> (type) {
@@ -646,15 +685,15 @@ class Invoice < ApplicationRecord
 
   scope :pending_erp_sync, -> (*args) {
     with_erp_sync_status_pending.
-        where(invoice_status_id: InwardInvoiceStatus.ids_for(:unpaid, :partially_paid, :paid, :approved, :auto_approved, :closed))
+      where(invoice_status_id: InwardInvoiceStatus.ids_for(:unpaid, :partially_paid, :paid, :approved, :auto_approved, :closed))
   }
 
   after_create :set_defaults
+  after_save :sync_amounts, unless: :skip_callback
   after_save :budget_trail_entry
   # the below callback deals with cases where the PO advance has been paid, and then an invoice is being raised
   # after_save :handle_po_advance_budget_trails
   after_destroy :budget_trail_destroy
-
 
   template_merge :procurement_id
   template_config do
@@ -695,6 +734,11 @@ class Invoice < ApplicationRecord
 
   ransack_scopes :with_status_id
   ransack_scopes :with_status_ids
+
+  def form_klass
+    invoice_type = self.invoice_type.name.to_sym
+    Forms::Router.klass(invoice_type)&.name
+  end
 
   def policy
     return super if self.policy_id.present?
@@ -776,8 +820,8 @@ class Invoice < ApplicationRecord
     result = []
     available_credit_data.keys.each do |currency_id|
       data = {
-          currency: Currency.find(currency_id).as_json,
-          amount: available_credit_data[currency_id]
+        currency: Currency.find(currency_id).as_json,
+        amount: available_credit_data[currency_id]
       }
 
       result.push(data)
@@ -801,7 +845,7 @@ class Invoice < ApplicationRecord
   end
 
   def paid_amount_value
-    successful_payments.map {|i| (i&.amount&.value || 0)}.inject(0, :+) || 0
+    successful_payments.map { |i| (i&.amount&.value || 0) }.inject(0, :+) || 0
   end
 
   # this method updates the invoice status based on the associated
@@ -817,6 +861,7 @@ class Invoice < ApplicationRecord
     elsif paid_amount <= balance_due
       self.update(invoice_status_id: InwardInvoiceStatus.id_for(:partially_paid))
     end
+    self.update(invoice_advance_paid_amount: paid_amount)
   end
 
   def unpaid?
@@ -841,12 +886,12 @@ class Invoice < ApplicationRecord
 
   def procurement_index_details
     {
-        id: id,
-        document_number: self.invoice_number,
-        amount: self.net_amount&.value,
-        document_status: self.invoice_status&.name,
-        document_owner: self.created_by&.name,
-        document_type: self.class.name
+      id: id,
+      document_number: self.invoice_number,
+      amount: self.net_amount&.value,
+      document_status: self.invoice_status&.name,
+      document_owner: self.created_by&.name,
+      document_type: self.class.name
     }
   end
 
@@ -859,84 +904,111 @@ class Invoice < ApplicationRecord
       return payment_history_json
     else
       {
-          id: self.id,
-          invoice_type: self.invoice_type&.name,
-          procurement_id: self.procurement_id,
-          advance: self.advance,
-          advance_amount: self.advance_amount&.value,
-          tax_amount: precision_value(self.tax_amount&.value),
-          tds_amount: precision_value(self.tds_amount&.value),
-          tax: precision_value(self.tax),
-          tds: precision_value(self.tds),
-          gst_type_id: self.gst_type_id,
-          tax_type_id: self.tax_type_id,
-          tds_type_id: self.tds_type_id,
-          discount_amount: precision_value(self.discount_amount&.value),
-          # discount: precision_value(self.discount),
-          discount: invoice_discount_rate,
-          date: self.date,
-          discount_type_id: self.discount_type_id,
-          due_date: self.due_date,
-          invoice_number: self.invoice_number,
-          invoice_id: self.invoice_id,
-          inclusive_of_taxes: self.inclusive_of_taxes,
-          freight_amount: self.freight_amount&.value,
-          roundoff_amount: self.roundoff_amount,
-          net_payable_amount: self.balance_due&.value,
-          balance_due: self.balance_due&.value,
-          taxable_amount: precision_value(self.gross_amount&.value),
-          editable: self.unpaid? || self.initiated? || self.partially_paid?,
-          tax_rate: return_tax_rate,
-          tds_rate: precision_value(self.tds_rate),
-          # discount_rate: precision_value(self.discount_rate),
-          discount_rate: invoice_discount_rate,
-          advance_rate: precision_value(self.advance_rate),
-          invoice_attachment: {
-              # url: self.invoice_attachments.first&.attached_file&.url,
-              # thumb: self.invoice_attachments.first&.attached_file&.url(:thumb),
-              # content_type: self.invoice_attachments.first&.attached_file&.content_type,
-              # file_name: self.invoice_attachments.first&.attached_file&.original_filename
-              url: self.attachments.first&.file&.url(:original, timestamp: false),
-              thumb: self.attachments.first&.file&.url(:thumb, timestamp: false),
-              content_type: self.attachments.first&.file_content_type,
-              file_name: self.attachments.first&.file_file_name
-          },
-          net_amount: precision_value(self.net_amount&.value),
-          original_amount: self.include_original_amount,
-          gross_amount: precision_value(self.gross_amount&.value),
-          custom_fields: self.custom_fields,
-          category_id: self.category_id,
-          category_name: self.category&.name,
-          rcm_enabled: self.rcm_enabled,
+        id: self.id,
+        invoice_type: self.invoice_type&.name,
+        procurement_id: self.procurement_id,
+        advance: self.advance,
+        advance_amount: self.advance_amount&.value.to_f + self&.reporting_invoice_paid_outside_amount.to_f,
+        tax_amount: precision_value(self.tax_amount&.value.to_f),
+        tds_amount: precision_value(self.tds_amount&.value.to_f),
+        tax: precision_value(self.tax.to_f),
+        tds: precision_value(self.tds.to_f),
+        gst_type_id: self.gst_type_id.to_i,
+        tax_type_id: self.tax_type_id.to_i,
+        tds_type_id: self.tds_type_id.to_i,
+        discount_amount: precision_value(self.discount_amount&.value.to_f),
+        discount: invoice_discount_rate,
+        date: self.date,
+        discount_type_id: self.discount_type_id.to_i,
+        due_date: self.due_date,
+        invoice_number: self.invoice_number,
+        invoice_id: self.invoice_id,
+        inclusive_of_taxes: self.inclusive_of_taxes,
+        freight_amount: self.freight_amount&.value.to_f,
+        roundoff_amount: self.roundoff_amount.to_f,
+        net_payable_amount: self.balance_due&.value.to_f,
+        balance_due: self.balance_due&.value.to_f,
+        taxable_amount: precision_value(self.gross_amount&.value.to_f),
+        editable: self.unpaid? || self.initiated? || self.partially_paid?,
+        tax_rate: return_tax_rate,
+        tds_rate: precision_value(self.tds_rate.to_i),
+        discount_rate: invoice_discount_rate,
+        advance_rate: precision_value(self.advance_rate),
+        invoice_attachment: {
+          # url: self.invoice_attachments.first&.attached_file&.url,
+          # thumb: self.invoice_attachments.first&.attached_file&.url(:thumb),
+          # content_type: self.invoice_attachments.first&.attached_file&.content_type,
+          # file_name: self.invoice_attachments.first&.attached_file&.original_filename
+          url: self.attachments.first&.file&.url(:original, timestamp: false),
+          thumb: self.attachments.first&.file&.url(:thumb, timestamp: false),
+          content_type: self.attachments.first&.file_content_type,
+          file_name: self.attachments.first&.file_file_name
+        },
+        net_amount: precision_value(self.net_amount&.value.to_f),
+        original_amount: self.include_original_amount,
+        gross_amount: precision_value(self.gross_amount&.value.to_f),
+        custom_fields: self.custom_fields,
+        category_id: self.category_id,
+        category_name: self.category&.name,
+        rcm_enabled: self.rcm_enabled,
+        available_credits: self.vendor.credit_notes.filter_adjustables.joins(:net_adjustable_amount).sum(:value),
+        credit_note_adjustments: self.credit_note_adjustments.as_json,
+        cost_center_id: self.cost_center_id,
+        cost_center_name: self.cost_center&.name,
+        cost_center_id: self.cost_center_id,
+        cost_center_name: self.cost_center&.name,
 
-          available_credits: self.vendor.credit_notes.filter_adjustables.joins(:net_adjustable_amount).sum(:value),
+        tds_slab_id: self.tds_slab_id.to_i,
+        tds_slab_name: self.tds_slab&.name,
+        tds_rate: self.tds,
 
-          credit_note_adjustments: self.credit_note_adjustments.as_json,
-          cost_center_id: self.cost_center_id,
-          cost_center_name: self.cost_center&.name,
-          cost_center_id: self.cost_center_id,
-          cost_center_name: self.cost_center&.name,
+        # invoice amounts total
+        item_amounts_total: self.item_amounts_total,
 
-          tds_slab_id: self.tds_slab_id,
-          tds_slab_name: self.tds_slab&.name,
-          tds_rate: self.tds,
+        # paid amount for this invoice
+        # paid_amount: self.payments.successful.joins(:amount).sum(:value),
+        # remaining_amount: (self.balance_due&.value.to_f - self.payments.successful.joins(:amount).sum(:value))
+        paid_amount: payment_amounts_total,
+        remaining_amount: (self.balance_due&.value.to_f - payment_amounts_total(false)),
+        po_adjusted_advance: precision_value(self.po_adjusted_advance&.value),
+        invoice_items: invoice_items.as_json,
+        note: self.note,
+        discount_amount_attributes: { id: self.discount_amount_id, value: precision_value(self.discount_amount&.value), currency_id: self.discount_amount&.currency_id },
+        payment_agreement_id: self.payment_agreement_id,
+        created_from_payment_agreement: self.payment_agreement_id.present?,
+        agreement_number: self&.payment_agreement&.get_agreement_number,
+        payable: self.payable,
 
-          # invoice amounts total
-          item_amounts_total: self.item_amounts_total,
-
-          # paid amount for this invoice
-          # paid_amount: self.payments.successful.joins(:amount).sum(:value),
-          # remaining_amount: (self.balance_due&.value.to_f - self.payments.successful.joins(:amount).sum(:value))
-          paid_amount: payment_amounts_total,
-          remaining_amount: (self.balance_due&.value.to_f - payment_amounts_total(false)),
-          po_adjusted_advance: precision_value(self.po_adjusted_advance&.value),
-          invoice_items: invoice_items.as_json,
-          note: self.note,
-          discount_amount_attributes: {id: self.discount_amount_id, value: precision_value(self.discount_amount&.value), currency_id: self.discount_amount&.currency_id},
-          payment_agreement_id: self.payment_agreement_id,
-          created_from_payment_agreement: self.payment_agreement_id.present?,
-          agreement_number: self&.payment_agreement&.get_agreement_number,
-          payable: self.payable
+        invoice_gross_amount: self.invoice_gross_amount,
+        reporting_invoice_gross_amount: self.reporting_invoice_gross_amount,
+        invoice_discount_amount: self.invoice_discount_amount,
+        reporting_invoice_discount_amount: self.reporting_invoice_discount_amount,
+        invoice_tax_amount: self.invoice_tax_amount,
+        reporting_invoice_tax_amount: self.reporting_invoice_tax_amount,
+        invoice_tds_amount: self.invoice_tds_amount,
+        reporting_invoice_tds_amount: self.reporting_invoice_tds_amount,
+        invoice_freight_amount: self.invoice_freight_amount,
+        reporting_invoice_freight_amount: self.reporting_invoice_freight_amount,
+        invoice_taxable_amount: self.invoice_taxable_amount,
+        reporting_invoice_taxable_amount: self.reporting_invoice_taxable_amount,
+        invoice_roundoff_amount: self.invoice_roundoff_amount,
+        reporting_invoice_roundoff_amount: self.reporting_invoice_roundoff_amount,
+        invoice_balance_due: self.invoice_balance_due,
+        reporting_invoice_balance_due: self.reporting_invoice_balance_due,
+        invoice_sub_total_amount: self.invoice_sub_total_amount,
+        reporting_invoice_sub_total_amount: self.reporting_invoice_sub_total_amount,
+        invoice_advance_paid_amount: self.invoice_advance_paid_amount,
+        reporting_invoice_advance_paid_amount: self.reporting_invoice_advance_paid_amount,
+        invoice_total_amount: self.invoice_total_amount,
+        reporting_invoice_total_amount: self.reporting_invoice_total_amount,
+        invoice_net_total_amount: self.invoice_net_total_amount,
+        reporting_invoice_net_total_amount: self.reporting_invoice_net_total_amount,
+        invoice_paid_outside_amount: self.invoice_paid_outside_amount,
+        reporting_invoice_paid_outside_amount: self.reporting_invoice_paid_outside_amount,
+        base_currency: self.base_currency,
+        reporting_currency: self.reporting_currency,
+        conversion_rate: self.conversion_rate,
+        is_domestic: self.is_domestic
       }
     end
   end
@@ -1223,7 +1295,6 @@ class Invoice < ApplicationRecord
     return custom_fields_config
   end
 
-
   def tds_per_item
     self.tds_amount&.value.to_f / self.items.count
   end
@@ -1249,10 +1320,92 @@ class Invoice < ApplicationRecord
     InwardInvoiceStatus.ids_for(:processing).include?(invoice_status_id)
   end
 
+  def forms_extra_data(type = nil, entity_key = nil)
+    if type.nil? || entity_key.nil?
+      return {
+
+      }
+    end
+
+    case entity_key
+    when :policy_id, 'policy_id'
+      data = {
+        "id": policy_id,
+        "name": policy&.name,
+      }
+    when :department_id, 'department_id'
+      data = {
+        "id": department_id,
+        "department_code": department&.department_code,
+        "name": department&.name,
+      }
+    when :cost_center_id, 'cost_center_id'
+      data = {
+        "id": cost_center_id,
+        "name": cost_center&.name,
+      }
+    when :vendor_id, 'vendor_id'
+      data = {
+        "id": vendor_id,
+        "vendor_id": vendor&.vendor_id,
+        "vendor_sequence_id": vendor&.vendor_id,
+        "name": vendor&.display_name,
+        "trade_name": vendor&.trade_name
+      }
+    when :gstin_location_id, 'gstin_location_id'
+      data = {
+        "id": gstin_location_id,
+        "gstin": gstin_location&.gstin,
+        "name": gstin_location&.location,
+        "address": gstin_location&.address
+      }
+    when :receiving_account_id, 'receiving_account_id'
+      data = {
+        "id": receiving_account_id,
+        "name": receiving_account&.name,
+        "account_number": receiving_account&.account_number,
+        "ifsc": receiving_account&.ifsc
+      }
+    when :location_id, 'location_id'
+      data = {
+        "id": location_id,
+        "name": location&.name,
+        "location_code": location&.location_code
+      }
+    when :delivery_location_id, 'delivery_location_id'
+      data = {
+        "id": delivery_location_id,
+        "name": delivery_location&.name,
+        "location_code": delivery_location&.location_code
+      }
+
+    when :tds_slab_id, 'tds_slab_id'
+      data = {
+        "id": tds_slab_id,
+        "name": "#{tds_slab&.tds}% - #{tds_slab&.name}",
+        "tds": tds_slab&.tds
+      }
+    when :payment_term_id, 'payment_term_id'
+      data = {
+        "id": payment_term_id,
+        "name": payment_term&.name,
+        "description": payment_term&.description,
+        "default": payment_term&.default
+      }
+    else
+      data = {}
+    end
+
+    {
+      "#{entity_key}_lookup_data": data,
+      "#{entity_key}_choice_data": [data]
+    }
+  end
+
   def po_trail_item
     if procurement&.purchase_order.present?
       purchase_order_item_id = procurement.purchase_order.items.first.id
-      BudgetTrail.find_by(entity_type: "PurchaseOrderItem", entity_id: purchase_order_item_id )
+      BudgetTrail.find_by(entity_type: "PurchaseOrderItem", entity_id: purchase_order_item_id)
     end
   end
 
@@ -1268,6 +1421,19 @@ class Invoice < ApplicationRecord
     po_trail_item&.entity_submitted_at&.to_date || submitted_at&.to_date || created_at&.to_date
   end
 
+  def paid_amount
+    payments.successful.joins(:amount).sum(:value).round(2)
+  end
+
+  def retrieve_value(entity)
+    send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
+  end
+
+  def forms_enabled
+    feature_flag_enabled = NonPoInvoiceToggle.new(RequestStoreUtil.current_user).enabled?
+    is_non_po_invoice = self&.invoice_type&.non_po_invoice? || false
+    feature_flag_enabled && is_non_po_invoice
+  end
   private
 
   # def payment_agreement_updations
@@ -1397,24 +1563,24 @@ class Invoice < ApplicationRecord
   def self.roles
     # [:admin, :purchase_order_initiator, :purchase_order_reviewer, :invoice_initiator, :invoice_reviewer, :goods_receiver]
     [
-        :invoice_initiator,
-        :invoice_reviewer,
-        :invoice_auditor,
-        :po_invoice_initiator,
-        :po_invoice_reviewer,
-        :po_invoice_auditor,
-        :non_po_invoice_initiator,
-        :non_po_invoice_reviewer,
-        :non_po_invoice_auditor,
-        :agreement_invoice_initiator,
-        :agreement_invoice_reviewer,
-        :agreement_invoice_auditor,
-        :bank_payment_request_initiator,
-        :bank_payment_request_reviewer,
-        :bank_payment_request_creditor,
-        :bank_payment_request_auditor,
-        :credit_note_initiator,
-        :credit_note_reviewer
+      :invoice_initiator,
+      :invoice_reviewer,
+      :invoice_auditor,
+      :po_invoice_initiator,
+      :po_invoice_reviewer,
+      :po_invoice_auditor,
+      :non_po_invoice_initiator,
+      :non_po_invoice_reviewer,
+      :non_po_invoice_auditor,
+      :agreement_invoice_initiator,
+      :agreement_invoice_reviewer,
+      :agreement_invoice_auditor,
+      :bank_payment_request_initiator,
+      :bank_payment_request_reviewer,
+      :bank_payment_request_creditor,
+      :bank_payment_request_auditor,
+      :credit_note_initiator,
+      :credit_note_reviewer
     ]
   end
 
@@ -1464,21 +1630,21 @@ class Invoice < ApplicationRecord
 
   def payment_history_json
     {
-        id: self.id,
-        invoice_number: self.invoice_number,
-        invoice_id: self.invoice_id,
-        vendor_name: self.vendor&.display_name,
-        due_date: self.due_date&.to_date,
-        net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
-        balance_due_attributes: {id: self.balance_due_id, value: precision_value(self.balance_due&.value), currency_id: self.amount&.currency_id},
-        status: self&.status&.name&.titleize,
-        creation_date: self.created_at.to_date,
-        tds_slab_attributes: {id: self.tds_slab_id, name: self.tds_slab&.name, tds: self.tds_slab&.tds},
-        agreement_type: self.class.name.underscore,
-        payment_agreement_id: self.payment_agreement_id,
-        vendor_id: self.vendor_id,
-        agreement_number: self.payment_agreement&.get_agreement_number,
-        procurement_id: self.procurement_id
+      id: self.id,
+      invoice_number: self.invoice_number,
+      invoice_id: self.invoice_id,
+      vendor_name: self.vendor&.display_name,
+      due_date: self.due_date&.to_date,
+      net_amount_attributes: { id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id },
+      balance_due_attributes: { id: self.balance_due_id, value: precision_value(self.balance_due&.value), currency_id: self.amount&.currency_id },
+      status: self&.status&.name&.titleize,
+      creation_date: self.created_at.to_date,
+      tds_slab_attributes: { id: self.tds_slab_id, name: self.tds_slab&.name, tds: self.tds_slab&.tds },
+      agreement_type: self.class.name.underscore,
+      payment_agreement_id: self.payment_agreement_id,
+      vendor_id: self.vendor_id,
+      agreement_number: self.payment_agreement&.get_agreement_number,
+      procurement_id: self.procurement_id
 
     }
   end
@@ -1568,6 +1734,85 @@ class Invoice < ApplicationRecord
   #   end
   # end
 
+  # Syncs amounts from new forms structure to legacy amounts table
+  def sync_amounts
+    self.skip_callback = true
+    if self.forms_enabled
+      sync_to_old_structure
+    else
+      sync_to_forms_structure
+    end
+  end
+
+  def sync_to_old_structure
+      amounts_attributes_map.each do |key, value|
+        amount_value = self.send(key)
+        amount_attr = self.send("#{value}_id")
+        base_currency_id = get_base_currency&.id
+        if amount_attr.present?
+          Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: base_currency_id)
+        else
+          amount_id = Amount.create(value: amount_value, currency_id: base_currency_id).id
+          self.send("#{value}=", amount_id)
+        end
+      end
+
+      amount_direct_attribute_map.each do |key, value|
+        amount_value = self.send(key)
+        self.send("#{value}=", amount_value)
+      end
+      self.save
+  end
+
+  def sync_to_forms_structure
+    amounts_attributes_map.each do |key, value|
+      amount_value = self.send(value)&.value
+      self.send("reporting_#{key}=", amount_value)
+      self.send("#{key}=", amount_value)
+    end
+    amount_direct_attribute_map.each do |key, value|
+      amount_value = self.send(value)
+      self.assign_attributes({
+                               "reporting_#{key}": amount_value,
+                               "#{key}": amount_value
+                             })
+    end
+    self.save
+  end
+
+  def amounts_attributes_map
+    {
+      invoice_gross_amount: 'amount',
+      invoice_discount_amount: 'discount_amount',
+      invoice_taxable_amount: 'gross_amount',
+      invoice_tax_amount: 'tax_amount',
+      invoice_tds_amount: 'tds_amount',
+      invoice_advance_paid_amount: 'advance_amount',
+      invoice_sub_total_amount: 'net_amount',
+      invoice_balance_due: 'balance_due',
+      invoice_freight_amount: 'freight_amount'
+    }
+  end
+
+  def amount_direct_attribute_map
+    {
+      invoice_roundoff_amount: 'roundoff_amount'
+    }
+
+    # Invoice amount meanings. Picked from Invoice Calculation Utils
+    # amount => raw amount, rate * qty
+    # discount_amount => discount total of items
+    # gross_amount => discounts included or taxable amount or after_discount_amount
+    # tax_amount => tax total of items
+    # tds_amount => tds total of tds_applicable items' tds
+    # net_amount => gross_amount + tax_amount - tds_amount
+    # advance_amount => advance paid
+
+    # New Structure
+    # invoice_sub_total_amount => old structure net_amount
+    # invoice_net_total_amount: invoice_total_amount - invoice_paid_outside_amount - invoice_advance_paid_amount
+  end
+
   def item_quantity_validation
     flag = false
     quantities = invoice_items.map(&:quantity).map(&:to_f)
@@ -1575,7 +1820,7 @@ class Invoice < ApplicationRecord
       flag = true if quantity <= 0
       break
     end
-    
+
     errors.add(:invoice_items, "quantity must be greater than 0") if flag
   end
 
@@ -1586,8 +1831,9 @@ class Invoice < ApplicationRecord
       flag = true if rate <= 0
       break
     end
-    
+
     errors.add(:invoice_items, "rate must be greater than 0") if flag
   end
 
 end
+

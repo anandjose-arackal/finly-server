@@ -36,6 +36,7 @@ class Email < NonTenantedApplicationRecord
   belongs_to :company, optional: true
 
   has_many :events, class_name: "EmailEvent"
+  has_one :body, class_name: 'EmailBody'
 
   scope :order_created_at, -> (type) {reorder created_at: (type.to_sym || :desc)}
 end

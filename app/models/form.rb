@@ -23,6 +23,37 @@ class Form < ApplicationRecord
   has_many :choice_dependencies, class_name: 'FormChoiceDependency'
   has_many :conditions, class_name: 'FormCondition'
   has_many :validations, class_name: 'FormEntityValidation'
+  has_many :prediction_models, class_name: 'MlModel::FormEntityModel'
+
+  scope :preload_for_contract, -> {
+    includes(:entities, {
+      sections: {
+        entities: [:compute_lookup_entity, :form, { conditions: :actions }, :validations, { choice_dependencies: :controlling_entity }, {
+          entities: [:compute_lookup_entity, :form, { conditions: :actions }, :validations, { choice_dependencies: :controlling_entity }, {
+            entities: [:compute_lookup_entity, :form, { conditions: :actions }, :validations, { choice_dependencies: :controlling_entity }, {
+              entities: [:compute_lookup_entity, :form, { conditions: :actions }, :validations, { choice_dependencies: :controlling_entity }, {
+                entities: [:compute_lookup_entity, :form, { conditions: :actions }, :validations, { choice_dependencies: :controlling_entity }, {
+                  entities: [:compute_lookup_entity, :form, { conditions: :actions }, :validations, { choice_dependencies: :controlling_entity },
+                             :entities] }] }] }] }] }] } })
+  }
+
+  attr_accessor :preloaded_for_contract
+
+  def preloaded_for_contract?
+    !!preloaded_for_contract
+  end
+
+  def preload_for_contract!
+    return self if preloaded_for_contract?
+
+    self.class.find_for_contract(uuid: self.id)
+  end
+
+  def self.find_for_contract(query)
+    form = Form.where(query).preload_for_contract.first
+    form.preloaded_for_contract = true
+    form
+  end
 
   def find_entity(entity_path)
     entity_path = entity_path.to_s
@@ -47,8 +78,8 @@ class Form < ApplicationRecord
 
   def as_json(options = {})
     {
-        id: id,
-        sections: sections
+      id: id,
+      sections: sections
     }
   end
 

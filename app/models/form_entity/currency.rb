@@ -49,6 +49,7 @@
 #  compute_formula              :text(65535)
 #  filters                      :text(65535)
 #  config_path                  :string(255)
+#  compute_lookup_assignments   :text(65535)
 #
 
 class FormEntity::Currency < FormEntity
@@ -100,4 +101,13 @@ class FormEntity::Currency < FormEntity
       end
     end
   end
+
+  def as_json(option = {})
+    result = super 
+    result_currencies = result[:options]['currencies'] || []
+    currencies = CURRENCIES.select{ |currency| result_currencies.include?(currency[:currency_code]) }
+    result[:options]['currencies'] = currencies
+    result
+  end
+
 end

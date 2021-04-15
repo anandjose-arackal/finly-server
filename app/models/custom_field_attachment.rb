@@ -36,7 +36,8 @@ class CustomFieldAttachment < ApplicationRecord
         form_custom_field_id: form_custom_field_id,
         name: self.attachment_file_name,
         url: self.attachment&.url,
-        file_name: self.attachment.original_filename
+        file_name: self.attachment.original_filename,
+        created_at: self.attachment_updated_at.strftime("%d-%m-%Y")
     }
   end
 end

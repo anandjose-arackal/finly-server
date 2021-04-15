@@ -24,7 +24,6 @@ class Oauth::TokenController < Doorkeeper::TokensController
 
   def create
     return unless pre_process
-
     response = authorize_response
     headers.merge! response.headers
     self.status = response.status
@@ -32,12 +31,14 @@ class Oauth::TokenController < Doorkeeper::TokensController
     if self.status == 200
       @auth_grant = response
       @token = response.token
+      @token.update_columns(authentication_type: "sso")
       @user = current_user(response&.token)
       params[:user] = @user
       params[:response] = response
 
-      response_message = nil
-      if create_user_sessions
+      response_message = {message: params[:message]}
+
+      if create_user_sessions && response_message[:message].blank?
         response_message = on_session_create
         if response_message == true or (response_message.is_a?(Hash) and response_message[:success])
           on_create_success(response)
@@ -45,7 +46,7 @@ class Oauth::TokenController < Doorkeeper::TokensController
         end
       end
 
-      error_message = "The email / mobile or password you entered is incorrect"
+      error_message = "Invalid request"
       error_message = response_message[:message] if response_message.is_a?(Hash) and response_message[:message].present?
       json_string = {
           error: "invalid_grant",
@@ -189,10 +190,9 @@ class Oauth::TokenController < Doorkeeper::TokensController
     if result.success?
       @user.otp_verified = !result.require_otp if @user.otp_verified
       @user.otp_verified = false if @user.otp_verified and @user.associated_group_users.where.not(otp_verified: true).present?
-
+      
       unless @user.expired?
         User.where(id: @user.id).update_all(last_activity_at: DateTime.now)
-        # @user.update(last_activity_at: DateTime.now)
       end
 
       return {success: true}

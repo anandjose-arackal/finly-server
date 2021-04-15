@@ -5,6 +5,7 @@ class Masters::Vendors::Index < IndexBuilder::API
   resolver 'vendors.default'
   # reference '{{record.id}}'
   custom_fields :yes_bank_vendor
+  model 'YesBankVendor'
 
   # Overriding reference to pass forms_enabled as metadata
   def self.reference(id = nil, args = {})
