@@ -196,7 +196,7 @@ class NonPoInvoiceMigrator
         # tax_rate_id: item.tax_rate_id,
         tax_percentage: item&.tax_rate&.rate,
         
-        gl_code: item&.category&.gl_code,
+        gl_code: item&.gl_code || item&.category&.gl_code,
         item_number: item&.inventory_line_item&.item_number,
         
         items_department_id: item&.department_id,
