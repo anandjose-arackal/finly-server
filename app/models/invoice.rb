@@ -685,7 +685,7 @@ class Invoice < ApplicationRecord
 
   scope :pending_erp_sync, -> (*args) {
     with_erp_sync_status_pending.
-      where(invoice_status_id: InwardInvoiceStatus.ids_for(:unpaid, :partially_paid, :paid, :approved, :auto_approved, :closed))
+      where(invoice_status_id: InwardInvoiceStatus.ids_for(:unpaid, :partially_paid, :paid, :approved, :auto_approved, :closed, :initiated))
   }
 
   after_create :set_defaults
