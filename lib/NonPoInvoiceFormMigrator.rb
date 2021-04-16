@@ -279,8 +279,8 @@ class NonPoInvoiceMigrator
       invoice_discount_amount: document&.discount_amount&.value,
       reporting_invoice_discount_amount: document&.discount_amount&.value,
       
-      invoice_taxable_amount: precision_value(document.gross_amount&.value.to_f),
-      reporting_invoice_taxable_amount: precision_value(document.gross_amount&.value.to_f),
+      invoice_taxable_amount: document.gross_amount&.value.to_f,
+      reporting_invoice_taxable_amount: document.gross_amount&.value.to_f,
 
       total_line_item_discount_amount: document&.discount_amount&.value,
       overall_discount_amount: 0,
@@ -332,7 +332,7 @@ class NonPoInvoiceMigrator
       relevant_custom_field = document.form_custom_fields.where(field_key: 'invoice_attachments').first
 
       if relevant_custom_field.present?
-        add_attachment_to_new_invoice( old_attachment, relevant_custom_field )
+        new_attachment = add_attachment_to_new_invoice( old_attachment, relevant_custom_field )
       else
         entity  = form.entities.where(entity_key: 'invoice_attachments').first
         document.form_custom_fields.create({
@@ -341,8 +341,9 @@ class NonPoInvoiceMigrator
          })
 
         relevant_custom_field = document.form_custom_fields.where(field_key: 'invoice_attachments').first
-        add_attachment_to_new_invoice( old_attachment, relevant_custom_field )
+        new_attachment = add_attachment_to_new_invoice( old_attachment, relevant_custom_field )
       end
+      new_attachment.update_attribute(:attachment_updated_at,  old_attachment.created_at )
     end    
   end
 
@@ -366,6 +367,6 @@ class NonPoInvoiceMigrator
         new_attachment.save
       end
     end
-    new_attachment.update(created_at: old_attachment.created_at )
+    new_attachment
   end
 end
