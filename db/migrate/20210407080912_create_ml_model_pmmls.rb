@@ -1,6 +1,8 @@
 class CreateMlModelPmmls < ActiveRecord::Migration[6.0]
   def change
-    MlModel.update_all(pmml: nil)
+    ActsAsTenant.without_tenant do
+      MlModel.update_all(pmml: nil)
+    end
     remove_column :ml_models, :pmml
     create_table :ml_model_pmmls do |t|
       t.integer :company_id, references: 'companies', null: false, index: true, foreign_key: true
