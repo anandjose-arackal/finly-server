@@ -95,6 +95,7 @@ class InvoiceLineItem < ApplicationRecord
 
   alias_attribute :items_department_id, :department_id
   alias_attribute :items_cost_center_id, :cost_center_id
+
   #  item_gross_amount_converted    :decimal(20, 5)
   #  item_discount_amount_converted :decimal(20, 5)
   #  item_taxable_amount_converted  :decimal(20, 5)
@@ -142,6 +143,12 @@ class InvoiceLineItem < ApplicationRecord
   belongs_to :tax_rate, optional: true
   belongs_to :cost_center, optional: true
   belongs_to :department, optional: true
+
+  alias_method :items_department, :department
+  alias_method :items_cost_center, :cost_center
+
+  # belongs_to :items_department, optional: true, class_name: 'Department'
+  # belongs_to :items_cost_center, optional: true, class_name: 'CostCenter'
   belongs_to :purchase_order_item, optional: true
 
   has_many :custom_fields, as: :parent, dependent: :destroy
