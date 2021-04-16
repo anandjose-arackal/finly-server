@@ -25,10 +25,7 @@ class FeatureToggle
     Rails.cache.delete(cache_key)
   end
 
-  def enabled?(feature, default = false)
-    return true if feature == 'release/non_po_invoice#forms_enabled'
-    
-
+  def enabled?(feature, default = false) 
     return default if flags.nil?
 
     flag = flags[normalize_key(feature)]
