@@ -4,6 +4,7 @@ beginning of this file.
 
 ## 2021-04-13
  - Fix: Updating the user base dlrm for credit note.
+ - fix: Updating invoice for vendor location.
 
 ## 2021-04-08
  - feat: Create export templates for new companies when created.
