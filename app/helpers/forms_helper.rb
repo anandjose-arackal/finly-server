@@ -50,8 +50,12 @@ module FormsHelper
     elsif form_entity.entities.present?
       form_entity.entities.each do |entity|
         if entity.system_field && model.respond_to?(entity.entity_key)
+
           form_data.merge!({ entity.entity_key => model.send(entity.entity_key) })
-          if entity.entity_type == 'amount'
+          if entity.entity_type == 'dropdown' || entity.entity_type == 'lookup'
+            form_data.merge!({entity.entity_key => model.send(entity.entity_key).to_s})
+            form_data.merge!({"#{entity.entity_key}_value" => model.retrieve_value(entity)})
+          elsif entity.entity_type == 'amount'
             form_data.merge!({entity.entity_key => model.send(entity.entity_key).to_f.round(2)})
           end
         else

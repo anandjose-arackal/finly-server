@@ -155,6 +155,11 @@ class Item < ApplicationRecord
     self.tax_rate&.rate
   end
 
+
+  def name
+    self.description
+  end
+
   # def validate_if_owner?(user)
   #   self.creator_id == user.id
   # end
