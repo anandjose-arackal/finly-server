@@ -3,6 +3,7 @@ All notable changes to this project will be documented in this file. Always add 
 beginning of this file.
 
 ## 2021-04-13
+ - Fix: Updating the user base dlrm for credit note.
  - fix: Updating invoice for vendor location.
 
 ## 2021-04-08
