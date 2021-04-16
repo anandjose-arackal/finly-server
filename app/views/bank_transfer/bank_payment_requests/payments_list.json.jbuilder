@@ -122,10 +122,6 @@ json.payments do
         json.advance_rate precision_value invoice.advance_rate
         json.invoice_id invoice.invoice_id
 
-        # json.reporting_currency @result.parent&.reporting_currency
-        # json.base_currency @result.parent&.base_currency
-        # json.conversion_rate @result.parent&.conversion_rate
-
         json.forms_enabled invoice.forms_enabled
 
         json.invoice_gross_amount precision_value invoice&.invoice_gross_amount.to_f

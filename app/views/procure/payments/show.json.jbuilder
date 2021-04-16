@@ -7,6 +7,8 @@ else
 end
 json.name payment.receiving_account&.name
 json.account_number payment.receiving_account.account_number
+json.base_currency payment.bank_payment_request.base_currency
+json.reporting_currency payment.company.reporting_currency
 json.disabled payment.receiving_account&.disabled
 json.ifsc payment.receiving_account.ifsc
 json.amount precision_value payment.amount_value
@@ -106,6 +108,14 @@ if payment.invoice.present?
     json.paid_amount invoice.payments.successful.joins(:amount).sum(:value)
     json.remaining_amount (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
 
+    json.conversion_rate invoice.conversion_rate.to_f rescue 1
+    json.reporting_invoice_net_total_amount invoice.reporting_invoice_net_total_amount
+
+    json.payable_amount precision_value payment.amount.value
+    if payment.parent_type == 'Invoice'
+      conversion_rate = invoice.conversion_rate.to_f rescue 1
+      json.reporting_payable_amount precision_value payment&.amount&.value * conversion_rate
+    end
     #
 
     json.invoice_items do
