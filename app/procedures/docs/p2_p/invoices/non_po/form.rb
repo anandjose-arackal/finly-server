@@ -19,7 +19,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       item_discount_amount: "{% if form.discount_type_id == 1 %}{{ row.item_gross_amount | times: row.discount | divided_by: 100 | default: 0 | round: 2  }}{% else %}{{ row.discount | default: 0 }}{% endif %}",
       item_taxable_amount: "{{ row.item_gross_amount | minus: row.item_discount_amount | default: 0 | round: 2  }}",
       item_tax_amount: "{{ row.item_taxable_amount | times: row.tax_percentage | divided_by: 100 | default: 0 | round: 2  }}",
-      item_tds_amount: "{% if row.tds_applicable == true %}{{ row.item_taxable_amount | times: form.tds_percentage | divided_by: 100 | default: 0 | round: 2  }}{% else %}{{ 0 }}{% endif %}",
+      item_tds_amount: "{% if row.tds_applicable == 'true' %}{{ row.item_taxable_amount | times: form.tds_percentage | divided_by: 100 | default: 0 | round: 2  }}{% else %}{{ 0 }}{% endif %}",
       item_net_amount: "{{ row.item_taxable_amount | plus: row.item_tax_amount | default: 0 | round: 2  }}",
       item_billable_amount: "{{ row.item_taxable_amount | plus: row.item_tax_amount | minus: row.item_tds_amount | default: 0 | round: 2  }}", # todo - I2P will be different for PO invoice
 
@@ -38,7 +38,10 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       invoice_gross_amount: "{% assign gross_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign gross_amount = gross_amount | plus: item.item_gross_amount %}{% endif %}{% endfor %}{{ gross_amount | default: 0 | round: 2 }}",
       total_line_item_discount_amount: "{% assign discount_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign discount_amount = discount_amount | plus: item.item_discount_amount %}{% endif %}{% endfor %}{{ discount_amount | default: 0 | round: 2 }}",
       overall_discount_amount: "{{ form.overall_discount_amount | default: 0 | round: 2 }}",
-      invoice_discount_amount: "{{ form.total_line_item_discount_amount | plus: form.overall_discount_amount | default: 0 | round: 2}}",
+
+      # invoice_discount_amount: "{{ form.total_line_item_discount_amount | plus: form.overall_discount_amount | default: 0 | round: 2}}",
+      invoice_discount_amount: "{% assign discount_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign discount_amount = discount_amount | plus: item.item_discount_amount %}{% endif %}{% endfor %}{{ discount_amount | default: 0 | round: 2 }}",
+
       invoice_taxable_amount: "{{ form.invoice_gross_amount | minus: form.invoice_discount_amount | default: 0 | round: 2}}",
       invoice_tax_amount: "{% assign tax_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign tax_amount = tax_amount | plus: item.item_tax_amount %}{% endif %}{% endfor %}{{ tax_amount  | default: 0 | round: 2}}",
       invoice_tds_amount: "{% assign tds_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign tds_amount = tds_amount | plus: item.item_tds_amount %}{% endif %}{% endfor %}{{ tds_amount  | default: 0 | round: 2}}",
@@ -344,12 +347,12 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_gross_amount])
 
-      amount :total_line_item_discount_amount, label: 'Total LineItem Discount Amount', editable: false, visible: true,
-             can_editable_be_changed: false,
+      amount :total_line_item_discount_amount, label: 'Total LineItem Discount Amount', editable: false, visible: false,
+             can_editable_be_changed: false, active: false, 
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:total_line_item_discount_amount])
 
-      amount :overall_discount_amount, label: 'Overall Discount Amount', editable: true, visible: true,
-             can_editable_be_changed: false,
+      amount :overall_discount_amount, label: 'Overall Discount Amount', editable: true, visible: true,  visible: false,
+             can_editable_be_changed: false, active: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:overall_discount_amount])
 
       amount :invoice_discount_amount, label: "Net Discount Amount", visible: true,
@@ -480,6 +483,12 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
     error_message "Invoice Due Date must be After Invoice Date"
     rule Rules::Builder['due_date'].lt(entity: "date")
   end
+
+  # validation validation_id: "Conversion Rate must be greater than 0" do
+  #   reference 'conversion_rate'
+  #   error_message "Conversion Rate must be greater than 0"
+  #   rule Rules::Builder['conversion_rate'].gteq(value: 0.0)
+  # end
 
   # CONDITIONS
   condition condition_id: "Policy should not be editable once unless in editable status" do
