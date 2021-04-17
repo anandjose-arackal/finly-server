@@ -92,7 +92,7 @@ class Menu::API < Transactions::API
     context[:entities] = []
 
     if current_user.company.group_entity_structure_enabled? and not RequestStore.store[:actual_current_user].present?
-      users = User.where(finly_id: current_user.finly_id).includes({company: [:configuration, :status]})
+      users = User.where(finly_id: current_user.finly_id, active: true).includes({company: [:configuration, :status]})
     else
       users = [current_user]
     end
