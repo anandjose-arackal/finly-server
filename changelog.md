@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file. Always add new logs to 
 beginning of this file.
 
+## 2021-04-17
+- Fix: Validation on total invoiced quantity against purchase order quantity removed for service items
+
 ## 2021-04-13
  - Fix: Updating the user base dlrm for credit note.
  - fix: Updating invoice for vendor location.
