@@ -109,7 +109,7 @@ if payment.invoice.present?
     json.remaining_amount (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
 
     json.conversion_rate invoice.conversion_rate.to_f rescue 1
-    json.reporting_invoice_net_total_amount invoice.reporting_invoice_net_total_amount
+    json.reporting_invoice_net_total_amount invoice.reporting_invoice_net_total_amount.to_f
 
     json.payable_amount precision_value payment.amount.value
     if payment.parent_type == 'Invoice'
