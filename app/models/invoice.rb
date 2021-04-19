@@ -1011,7 +1011,7 @@ class Invoice < ApplicationRecord
         reporting_invoice_paid_outside_amount: self.reporting_invoice_paid_outside_amount,
         base_currency_id: self.get_base_currency.id,
         base_currency_code: self.get_base_currency.country_code,
-        conversion_rate: self.conversion_rate,
+        conversion_rate: self.conversion_rate.to_f,
         is_domestic: self.is_domestic,
         reporting_currency_id: self.get_reporting_currency.id,
         reporting_currency_code: self.get_reporting_currency.country_code
