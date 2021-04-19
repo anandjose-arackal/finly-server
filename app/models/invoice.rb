@@ -871,17 +871,21 @@ class Invoice < ApplicationRecord
 
     invoice_advance_paid_amount = paid_amount.to_f
     reporting_invoice_advance_paid_amount = invoice_advance_paid_amount * conversion_rate.to_f
-
-    invoice_balance_due =  self.invoice_balance_due.to_f - paid_amount.to_f
-    reporting_invoice_balance_due =  invoice_balance_due.to_f * conversion_rate.to_f
     
     self.update({
       invoice_advance_paid_amount: invoice_advance_paid_amount,  
-      reporting_invoice_advance_paid_amount: reporting_invoice_advance_paid_amount,
-      invoice_balance_due: invoice_balance_due,
-      reporting_invoice_balance_due: reporting_invoice_balance_due
+      reporting_invoice_advance_paid_amount: reporting_invoice_advance_paid_amount
     })
   end
+
+  def invoice_balance_due
+    self[:invoice_balance_due].to_f - self.invoice_advance_paid_amount.to_f
+  end
+
+  def reporting_invoice_balance_due
+    self[:reporting_invoice_balance_due].to_f - self.reporting_invoice_advance_paid_amount.to_f 
+  end
+
 
   def unpaid?
     return nil if self.invoice_status.blank?
