@@ -78,6 +78,7 @@ class Procurements::Invoices::Create < Procurements::Invoices::Base
 
     self.invoice.rcm_enabled = vendor.rcm_enabled
     self.invoice.tds_slab_id = vendor&.tds_rates_list_id
+    self.invoice.tds_percentage = self.invoice&.tds_slab&.tds.to_f
     self.invoice.tds = vendor&.tds_rates_list&.tds
     if self.vendor.payment_term_id.present?
       self.invoice.payment_term_id = self.vendor.payment_term_id

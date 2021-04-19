@@ -20,8 +20,11 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       item_taxable_amount: "{{ row.item_gross_amount | minus: row.item_discount_amount | default: 0 | round: 2  }}",
       item_tax_amount: "{{ row.item_taxable_amount | times: row.tax_percentage | divided_by: 100 | default: 0 | round: 2  }}",
       item_tds_amount: "{% if row.tds_applicable == 'true' %}{{ row.item_taxable_amount | times: form.tds_percentage | divided_by: 100 | default: 0 | round: 2  }}{% else %}{{ 0 }}{% endif %}",
-      item_net_amount: "{{ row.item_taxable_amount | plus: row.item_tax_amount | default: 0 | round: 2  }}",
-      item_billable_amount: "{{ row.item_taxable_amount | plus: row.item_tax_amount | minus: row.item_tds_amount | default: 0 | round: 2  }}", # todo - I2P will be different for PO invoice
+      item_net_amount: "{% if form.rcm_enabled == true %}{{ row.item_taxable_amount | default: 0 | round: 2 }}{% else %}{{ row.item_taxable_amount | plus: row.item_tax_amount | default: 0 | round: 2 }}{% endif %}",
+      item_billable_amount: "{{ row.item_taxable_amount | plus: row.item_tax_amount | minus: row.item_tds_amount | default: 0 | round: 2 }}", # todo - I2P will be different for PO invoice
+      # item_net_amount: "{{ row.item_taxable_amount | plus: row.item_tax_amount | default: 0 | round: 2  }}",
+      
+
 
       # CONVERTED VALUES
       reporting_item_gross_amount: "{{ row.item_gross_amount | times: form.conversion_rate | default: 0 | round: 2}}",
@@ -33,14 +36,15 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       reporting_item_billable_amount: "{{ row.item_billable_amount | times: form.conversion_rate | default: 0 | round: 2  }}"
 
     },
+
     # INVOICE SUMMARY
     summary: {
       invoice_gross_amount: "{% assign gross_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign gross_amount = gross_amount | plus: item.item_gross_amount %}{% endif %}{% endfor %}{{ gross_amount | default: 0 | round: 2 }}",
       total_line_item_discount_amount: "{% assign discount_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign discount_amount = discount_amount | plus: item.item_discount_amount %}{% endif %}{% endfor %}{{ discount_amount | default: 0 | round: 2 }}",
       overall_discount_amount: "{{ form.overall_discount_amount | default: 0 | round: 2 }}",
+      invoice_discount_amount: "{% assign discount_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign discount_amount = discount_amount | plus: item.item_discount_amount %}{% endif %}{% endfor %}{{ discount_amount | default: 0 | round: 2 }}",
 
       # invoice_discount_amount: "{{ form.total_line_item_discount_amount | plus: form.overall_discount_amount | default: 0 | round: 2}}",
-      invoice_discount_amount: "{% assign discount_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign discount_amount = discount_amount | plus: item.item_discount_amount %}{% endif %}{% endfor %}{{ discount_amount | default: 0 | round: 2 }}",
 
       invoice_taxable_amount: "{{ form.invoice_gross_amount | minus: form.invoice_discount_amount | default: 0 | round: 2}}",
       invoice_tax_amount: "{% assign tax_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign tax_amount = tax_amount | plus: item.item_tax_amount %}{% endif %}{% endfor %}{{ tax_amount  | default: 0 | round: 2}}",
@@ -52,9 +56,8 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       # todo - Issue : Roundoff should be automatically calulated everytime user inputs something, even if its the round off itself
       invoice_roundoff_amount: "{% assign amount = form.invoice_sub_total_amount | round %}{% assign amount = amount | minus: form.invoice_sub_total_amount %}{% if form.base_currency != '1'  %}{% assign amount = 0 %}{% endif %}{{ amount | default: 0 | round: 2 }}",
       invoice_total_amount: "{{ form.invoice_sub_total_amount | plus: form.invoice_roundoff_amount | default: 0 | round: 2}}",
+      
       invoice_net_total_amount: "{{ form.invoice_total_amount | default: 0 | round: 2}}",
-      # todo - will be shown on top of invoice and needs separate calculation
-      # invoice_balance_due: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | round: 2 }}",
       invoice_advance_paid_amount: "{{ form.invoice_advance_paid_amount | default: 0 | round: 2}}",
       invoice_balance_due: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | default: 0 | round: 2}}",
 
@@ -66,11 +69,12 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       reporting_invoice_tds_amount: "{{ form.invoice_tds_amount | times: form.conversion_rate | default: 0 | round: 2}}",
       reporting_invoice_paid_outside_amount: "{{ form.invoice_paid_outside_amount | times: form.conversion_rate | default: 0 | round: 2}}",
       reporting_invoice_freight_amount: "{{ form.invoice_freight_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_invoice_advance_paid_amount: "{{ form.invoice_advance_paid_amount | times: form.conversion_rate | default: 0 | round: 2}}",
       reporting_invoice_sub_total_amount: "{{ form.invoice_sub_total_amount | times: form.conversion_rate | default: 0 | round: 2}}",
       reporting_invoice_roundoff_amount: "{% assign amount = form.reporting_invoice_sub_total_amount | round %}{% assign amount = amount | minus: form.reporting_invoice_sub_total_amount %}{% if form.base_currency != '1' %}{% assign amount = 0 %}{% endif %}{{ amount | default: 0 | round: 2}}",
       reporting_invoice_total_amount: "{% assign amount = form.reporting_invoice_sub_total_amount | plus: form.reporting_invoice_roundoff_amount %}{% if form.base_currency != '1' %}{% assign amount = form.reporting_invoice_sub_total_amount %}{% endif %}{{ amount | default: 0 | round: 2 }}",
-      reporting_invoice_net_total_amount: "{{ form.reporting_invoice_total_amount | minus: form.reporting_invoice_paid_outside_amount | default: 0 | round: 2}}",
+      reporting_invoice_net_total_amount: "{{ form.invoice_total_amount | times: form.conversion_rate | default: 0 | round: 2}}",
+      reporting_invoice_advance_paid_amount: "{{ form.invoice_advance_paid_amount | times: form.conversion_rate | default: 0 | round: 2}}",
+      
       reporting_invoice_balance_due: "{{ form.invoice_balance_due | times: form.conversion_rate | default: 0 | round: 2}}"
     }
   }
@@ -213,8 +217,8 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
            computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.description}}')
 
       text :comment, label: "Narration"
-      text :item_number, label: "Item Code", editable: false
-      # , computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.item_code}}')
+      text :item_number, label: "Item Code", editable: false, 
+        computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.item_code}}')
 
       lookup :product_type_id, label: "Product Type", choices_scope: Choices[:enum].(ProductType), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.product_type_id}}'), editable: false, required: true, visible: true
 
@@ -567,6 +571,12 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
     action :visible, false
   end
 
+  condition condition_id: "Base Currency non editable for Indian vendor" do
+    reference :entity, 'base_currency'
+    rule Rules::Builder[:vendor_country].eq(value: 'India')
+    action :editable, false
+  end
+
   condition condition_id: "Hide Conversion Rate Conversion > Conversion Rate for different currency" do
     reference :entity, 'items_summary.reporting_invoice_net_total_amount'
     rule Rules::Builder[:base_currency].eq(value: '1')
@@ -605,7 +615,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
   condition condition_id: "Enable item Cost Center > Item Cost Center for Header Cost Allocation Items" do
     reference :entity, 'cost_center_id'
-    rule Rules::Builder[:base_currency].not_eq(value: '1')
+    rule Rules::Builder[:cost_allocation_items].eq_any(value: true)
     action :visible, false
     action :required, false
     action :editable, false

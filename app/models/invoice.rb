@@ -862,7 +862,25 @@ class Invoice < ApplicationRecord
     elsif paid_amount <= balance_due
       self.update(invoice_status_id: InwardInvoiceStatus.id_for(:partially_paid))
     end
-    self.update(invoice_advance_paid_amount: paid_amount)
+
+    update_paid_and_balance_payable paid_amount
+  end
+
+  def update_paid_and_balance_payable paid_amount
+    conversion_rate = self.conversion_rate.to_f
+
+    invoice_advance_paid_amount = paid_amount.to_f
+    reporting_invoice_advance_paid_amount = invoice_advance_paid_amount * conversion_rate.to_f
+
+    invoice_balance_due =  self.invoice_balance_due.to_f - paid_amount.to_f
+    reporting_invoice_balance_due =  invoice_balance_due.to_f * conversion_rate.to_f
+    
+    self.update({
+      invoice_advance_paid_amount: invoice_advance_paid_amount,  
+      reporting_invoice_advance_paid_amount: reporting_invoice_advance_paid_amount,
+      invoice_balance_due: invoice_balance_due,
+      reporting_invoice_balance_due: reporting_invoice_balance_due
+    })
   end
 
   def unpaid?
@@ -1800,7 +1818,8 @@ class Invoice < ApplicationRecord
       invoice_tax_amount: 'tax_amount',
       invoice_tds_amount: 'tds_amount',
       invoice_advance_paid_amount: 'advance_amount',
-      invoice_sub_total_amount: 'net_amount',
+      # invoice_sub_total_amount: 'net_amount',
+      invoice_net_total_amount: 'net_amount',
       invoice_balance_due: 'balance_due',
       invoice_freight_amount: 'freight_amount'
     }
