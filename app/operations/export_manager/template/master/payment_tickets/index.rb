@@ -46,4 +46,7 @@ class ExportManager::Template::Master::PaymentTickets::Index < ExportManager::Bu
   attribute :note, template: '{{ record.note }}'
   attribute :payment_status, template: '{{ record.status.name }}'
   attribute :error_message, template: '{{ record.error_message }}'
+  attribute :attachment_url_1, template:  '{{  record.payment_order.attachment_urls  | first_item }}'
+  attribute :attachment_url_2, template:  '{{ record.payment_order.attachment_urls  | second_item }} '
+
 end
