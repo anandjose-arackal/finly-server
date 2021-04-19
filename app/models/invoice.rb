@@ -1779,6 +1779,9 @@ class Invoice < ApplicationRecord
 
       self.skip_callback = true
       amounts_attributes_map.each do |key, value|
+        # if an invoice has a payment associated with self, then do not update balance_payable, adding a workaround as balance payable do not get updated.
+        next if self.payments.present? && key == 'invoice_balance_due'
+
         amount_value = self.send(key)
         amount_attr = self.send("#{value}_id")
         base_currency_id = get_base_currency&.id
