@@ -27,6 +27,7 @@ class Reports::ExportHandler < Reports::Show
     end
 
     def receipts
+      return [] if params[:receipt] == false
       receipts = []
       self.report.expenses.each do |expense|
         expense.receipts.includes(:document_slices).each do |receipt|
@@ -34,7 +35,12 @@ class Reports::ExportHandler < Reports::Show
             # As ImageMagick was throwing an exception while trying to read the file from S3, resorted to this alternate.
             tempfile = Tempfile.new('temp_export')
             open(tempfile.path, 'wb') do |file|
-              file << open(receipt.image.url).read
+              if Rails.env.production?
+               file << open(receipt.image.url).read
+              else
+                path = "#{Rails.root.to_s}/public#{receipt.image.url.split('?').first}"
+                file << open(path).read
+              end
             end
 
             Magick::ImageList.new(tempfile.path) do

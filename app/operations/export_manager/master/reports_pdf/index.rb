@@ -8,6 +8,7 @@ class ExportManager::Master::ReportsPdf::Index < ExportManager::Builders::Pdf
   handle :reports_pdf
 
   def generate_pdf
+    update({total_records: 1})
     op = ::Reports::ExportHandler.(user, params)
     local_variables = op.local_variables
     template = op.template
