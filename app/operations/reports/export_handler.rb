@@ -31,10 +31,24 @@ class Reports::ExportHandler < Reports::Show
       self.report.expenses.each do |expense|
         expense.receipts.includes(:document_slices).each do |receipt|
           if receipt.is_pdf?
-            receipt.document_slices.each do |document_slice|
-              path = document_slice.image.url
-              receipts << {merchant: expense.merchant_name, amount: expense.amount_value, path: path}
-            end
+            ## As ImageMagick was throwing an exception while trying to read the file from S3, resorted to this alternate.
+            #tempfile = Tempfile.new('temp_export')
+            #open(tempfile.path, 'wb') do |file|
+            #  file << open(receipt.image.url).read
+            #end
+            #
+            #Magick::ImageList.new(tempfile.path) do
+            #  self.quality = 95
+            #  self.density = '300'
+            #  self.colorspace = Magick::RGBColorspace
+            #  self.interlace = Magick::NoInterlace
+            #end.each_with_index do |img, i|
+            #  #img.resize_to_fit!(800, 800)
+            #  path = "#{base_path}/#{receipt.id}_#{DateTime.now.strftime('%Q')}-#{i}.jpg"
+            #  img.write(path)
+            #  receipts << {merchant: expense.merchant_name, amount: expense.amount_value, path: path}
+            #end
+            #tempfile.delete
           else
             path = receipt.image.url
             receipts << {merchant: expense.merchant_name, amount: expense.amount_value, path: path}
