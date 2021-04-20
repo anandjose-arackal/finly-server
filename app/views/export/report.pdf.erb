@@ -248,7 +248,7 @@
           <% receipts.each do |receipt| %>
             <% next if receipt[:path].nil? %>
             <div class="img-responsive" style="text-align: center;">
-              <!--<img src="file:///<%= receipt[:path]  %>"/>-->
+                   <%= receipt[:path]  %>
               <%= wicked_pdf_image_tag(receipt[:path], :style=>"max-width:100%; height:auto;")%>
               <p class="text-center">Merchant: <%= receipt[:merchant] %> | Amount: <%= receipt[:amount] %></p>
             </div>

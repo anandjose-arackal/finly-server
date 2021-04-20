@@ -29,7 +29,7 @@ class Reports::ExportHandler < Reports::Show
     def receipts
       return [] if params[:receipt] == false
       receipts = []
-      base_path = "#{Rails.root}/public/tmp"
+      base_path = "#{Rails.root}/public/system"
       FileUtils::mkdir_p base_path
       self.report.expenses.each do |expense|
         expense.receipts.includes(:document_slices).each do |receipt|
@@ -53,7 +53,7 @@ class Reports::ExportHandler < Reports::Show
             end.each_with_index do |img, i|
               path = "#{base_path}/#{receipt.id}_#{DateTime.now.strftime('%Q')}-#{i}.jpg"
               img.write(path)
-              receipts << {merchant: expense.merchant_name, amount: expense.amount_value, path: path}
+              receipts << {merchant: expense.merchant_name, amount: expense.amount_value, path: path.split("public").last}
             end
             tempfile.delete
           else
