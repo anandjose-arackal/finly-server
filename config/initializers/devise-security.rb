@@ -50,6 +50,11 @@ end
 module Devise
   module Models
     module PasswordArchivable
+
+      included do
+        has_many :old_passwords, class_name: 'OldPassword', as: :password_archivable
+      end
+
       alias_method :original_password_archive_included?, :password_archive_included?
       alias_method :original_archive_password, :archive_password
 
