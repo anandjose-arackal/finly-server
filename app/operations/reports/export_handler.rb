@@ -29,6 +29,8 @@ class Reports::ExportHandler < Reports::Show
     def receipts
       return [] if params[:receipt] == false
       receipts = []
+      base_path = "#{Rails.root}/public/tmp"
+      FileUtils::mkdir_p base_path
       self.report.expenses.each do |expense|
         expense.receipts.includes(:document_slices).each do |receipt|
           if receipt.is_pdf?
@@ -38,8 +40,8 @@ class Reports::ExportHandler < Reports::Show
               if Rails.env.production?
                file << open(receipt.image.url).read
               else
-                path = "#{Rails.root.to_s}/public#{receipt.image.url.split('?').first}"
-                file << open(path).read
+                path_pdf = "#{Rails.root.to_s}/public#{receipt.image.url.split('?').first}"
+                file << open(path_pdf).read
               end
             end
 
