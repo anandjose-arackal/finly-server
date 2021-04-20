@@ -71,7 +71,7 @@ class Expense::ExDistance::Odometer::ExCreate < Expense::ExDistance::Create
       add_message :error, 'End Reading can\'t be blank' if end_reading.blank?
       return
     end
-    if start_reading >= end_reading
+    if start_reading.to_f >= end_reading.to_f
       add_message :error, 'Start Reading can\'t be greater than End Reading'
       return
     end
