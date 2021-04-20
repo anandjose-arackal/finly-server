@@ -51,7 +51,6 @@ class Reports::ExportHandler < Reports::Show
               self.colorspace = Magick::RGBColorspace
               self.interlace = Magick::NoInterlace
             end.each_with_index do |img, i|
-              img.resize_to_fit!(800, 800)
               path = "#{base_path}/#{receipt.id}_#{DateTime.now.strftime('%Q')}-#{i}.jpg"
               img.write(path)
               receipts << {merchant: expense.merchant_name, amount: expense.amount_value, path: path}
