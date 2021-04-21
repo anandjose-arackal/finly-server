@@ -46,6 +46,6 @@ class Docs::UtilityBills::Bills::Configs::Edit < Transactions::API
 
   def custom_fields_config(current_user)
     configurations = current_user.company.field_configurations.exclude_deleted.root_fields.order_created_at_desc
-    configurations.with_parent_type(FieldParentType.id_for(:purchase_request))
+    configurations.with_parent_type(FieldParentType.id_for(:BbpsBillerSubscription))
   end
 end
