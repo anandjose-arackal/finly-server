@@ -50,8 +50,8 @@ Gatekeeper::Checker.new 'On Web Authentication' do
           next unless policy.browser_client.otp_verify?
         
           user = RequestStoreUtil.current_session.user
-          toggel = AuthenticationToggle.new(user)
-          next if RequestStoreUtil.current_session.access_token.authentication_type == "sso" && !toggel.sso_2fa_enabled?
+          toggle = AuthenticationToggle.new(user)
+          next if RequestStoreUtil.current_session.access_token.authentication_type == "sso" && !toggle.sso_2fa_enabled?
 
           require_otp true
         end
@@ -93,8 +93,8 @@ Gatekeeper::Checker.new 'On Web Authentication' do
         next unless policy.browser_ip.otp_verify?
 
         user = RequestStoreUtil.current_session.user
-        toggel = AuthenticationToggle.new(user)
-        next if RequestStoreUtil.current_session.access_token.authentication_type == "sso" && !toggel.sso_2fa_enabled?
+        toggle = AuthenticationToggle.new(user)
+        next if RequestStoreUtil.current_session.access_token.authentication_type == "sso" && !toggle.sso_2fa_enabled?
 
         require_otp true
       end
@@ -126,8 +126,8 @@ Gatekeeper::Checker.new 'On Web Authentication' do
         next unless policy.browser_user_agent.otp_verify?
         
         user = RequestStoreUtil.current_session.user
-        toggel = AuthenticationToggle.new(user)
-        next if RequestStoreUtil.current_session.access_token.authentication_type == "sso" && !toggel.sso_2fa_enabled?
+        toggle = AuthenticationToggle.new(user)
+        next if RequestStoreUtil.current_session.access_token.authentication_type == "sso" && !toggle.sso_2fa_enabled?
 
         require_otp true
       end

@@ -18,8 +18,8 @@ class Docs::P2P::CreditNotes::Ops::Update < Transactions::API
   end
 
   def setup_dlrm(options, current_user:, params:, model:, **)
-
-    dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::Set.(current_user, {
+    user = model.user
+    dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::Set.(user, {
         reviewal_document: model,
         document_reviewer_mappings: params[:document_reviewer_mappings]
     })

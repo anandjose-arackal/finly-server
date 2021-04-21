@@ -7,7 +7,7 @@ class Masters::Locations::Resolver < Resolver::API
       user.company.locations
     else
       policies = user.policies
-      policies = policies.where(application: app) if app.present?
+      policies = policies.with_application(app) if app.present?
       policy_ids = policies.pluck(:id)
       location_ids = [user.location_id]
       location_ids += PolicyLocationMapping.where(policy_id: policy_ids).pluck(:location_id)

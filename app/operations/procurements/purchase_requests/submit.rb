@@ -19,6 +19,7 @@ class Procurements::PurchaseRequests::Submit < Procurements::PurchaseRequests::B
   end
 
   def process
+    ActiveRecord::Base.transaction(requires_new: true) do
       begin
         ActiveRecord::Base.transaction(requires_new: true) do
           params[:document] = self.purchase_request
@@ -62,6 +63,7 @@ class Procurements::PurchaseRequests::Submit < Procurements::PurchaseRequests::B
         raise ActiveRecord::Rollback
         return
       end
+    end
   end
 
   def post_process

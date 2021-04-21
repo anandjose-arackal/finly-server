@@ -27,14 +27,35 @@ class Reports::ExportHandler < Reports::Show
     end
 
     def receipts
+      return [] if params[:receipt] == false
       receipts = []
+      base_path = "#{Rails.root}/public/system"
+      FileUtils::mkdir_p base_path
       self.report.expenses.each do |expense|
         expense.receipts.includes(:document_slices).each do |receipt|
           if receipt.is_pdf?
-            receipt.document_slices.each do |document_slice|
-              path = document_slice.image.url
-              receipts << {merchant: expense.merchant_name, amount: expense.amount_value, path: path}
+            # As ImageMagick was throwing an exception while trying to read the file from S3, resorted to this alternate.
+            tempfile = Tempfile.new('temp_export')
+            open(tempfile.path, 'wb') do |file|
+              if Rails.env.production?
+               file << open(receipt.image.url).read
+              else
+                path_pdf = "#{Rails.root.to_s}/public#{receipt.image.url.split('?').first}"
+                file << open(path_pdf).read
+              end
             end
+
+            Magick::ImageList.new(tempfile.path) do
+              self.quality = 95
+              self.density = '300'
+              self.colorspace = Magick::RGBColorspace
+              self.interlace = Magick::NoInterlace
+            end.each_with_index do |img, i|
+              path = "#{base_path}/#{receipt.id}_#{DateTime.now.strftime('%Q')}-#{i}.jpg"
+              img.write(path)
+              receipts << {merchant: expense.merchant_name, amount: expense.amount_value, path: path.split("public").last}
+            end
+            tempfile.delete
           else
             path = receipt.image.url
             receipts << {merchant: expense.merchant_name, amount: expense.amount_value, path: path}
