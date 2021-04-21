@@ -64,16 +64,16 @@ class UserSession < ApplicationRecord
 
   accepts_nested_attributes_for :events
 
-  scope :with_user_id, ->(user_id) {where user_id: user_id}
-  scope :with_device, ->(device) {where device: device}
-  scope :with_ip, ->(ip) {where ip: ip}
-  scope :started_after, ->(datetime) {where 'started_at >= ?', datetime}
-  scope :authorized, -> {where status_id: UserSessionStatus.id_for(:authorized)}
-  scope :web, -> {where(scopes: 'web')}
-  scope :mobile, -> {where(scopes: 'mobile')}
-  scope :admin, -> {where(scopes: 'admin')}
-  scope :api, -> {where(scopes: 'api')}
-  scope :admin_bypass, -> {where(scopes: 'admin_bypass web')}
+  scope :with_user_id, ->(user_id) { where user_id: user_id }
+  scope :with_device, ->(device) { where device: device }
+  scope :with_ip, ->(ip) { where ip: ip }
+  scope :started_after, ->(datetime) { where 'started_at >= ?', datetime }
+  scope :authorized, -> { where status_id: UserSessionStatus.id_for(:authorized) }
+  scope :web, -> { where(scopes: 'web') }
+  scope :mobile, -> { where(scopes: 'mobile') }
+  scope :admin, -> { where(scopes: 'admin') }
+  scope :api, -> { where(scopes: 'api') }
+  scope :admin_bypass, -> { where(scopes: 'admin_bypass web') }
 
   validates :ip, presence: true
 
@@ -86,13 +86,16 @@ class UserSession < ApplicationRecord
   end
 
   def revoke
-    
+
   end
 
   def verified?
     # Todo temporary workaround as user device, ip, client verification is only implemented for the web
     return true unless web?
 
+    toggle = AuthenticationToggle.new(user)
+
+    return true if access_token.authentication_type == 'sso' && !toggle.sso_2fa_enabled?
     return false if user.security_policy.browser_client.otp_verify? and not user_device&.status_id == UserDeviceStatus.id_for(:verified)
     return false if user.security_policy.browser_ip.otp_verify? and not user_ip&.status_id == UserIpStatus.id_for(:verified)
     return false if user.security_policy.browser_user_agent.otp_verify? and not user_agent_client&.status_id == UserAgentClientStatus.id_for(:verified)

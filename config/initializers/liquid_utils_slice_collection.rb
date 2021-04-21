@@ -19,3 +19,5 @@ module Liquid
     end
   end
 end
+
+Liquid::Template.register_filter(LiquidFilters)

@@ -121,16 +121,22 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
       # the below line is in the case of one PO having multiple line items of the same inventory item
       processed_item_ids = []
       self.inward_invoice_params[:invoice_items_attributes].each do |item|
-        po_item = self.purchase_order.items.without_id(processed_item_ids).find_by(id: item[:purchase_order_item_id])
+        invoice_line_item = self.inward_invoice.items.find_by(id: item[:id])
+        po_item = self.purchase_order.items.without_id(processed_item_ids).find_by(id: invoice_line_item.purchase_order_item_id)
         next if po_item.blank? # temp workaround
-        item_q = (po_item&.inventory_line_item&.product_type_id == ProductType.id_for(:goods)) ? po_item.accepted : po_item.quantity
-
+        next if po_item.inventory_line_item&.product_type_id == ProductType.id_for(:service)
+        item_q =  po_item.accepted
         unless user.company.feature_subscription.grn_enabled
           item_q = po_item.quantity
         end
 
-        if item_q < item[:quantity].to_i
-          add_message :error, "Invoice item quantity should be on par with the Purchase Order quantity."
+        invoiced_line_items = self.procurement.invoices.joins(:items).where('invoice_line_items.purchase_order_item_id = ?', invoice_line_item.purchase_order_item_id)
+        invoiced_line_items_except_current_item = invoiced_line_items.where('invoice_line_items.id != ?', item[:id])
+        invoiced_total_qty = 0
+        invoiced_total_qty = invoiced_line_items_except_current_item.sum('invoice_line_items.quantity').to_f
+
+        if item_q < (invoiced_total_qty + item[:quantity].to_f)
+          add_message :error, "Invoiced item quantity should be on par with the Purchase Order quantity."
           break
         end
         processed_item_ids << po_item.id
