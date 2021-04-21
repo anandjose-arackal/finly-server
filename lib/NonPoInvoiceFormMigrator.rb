@@ -4,13 +4,15 @@ class NonPoInvoiceMigrator
     result = []
     company = Company.find company_id
     documents = Invoice.where(invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)).where(company_id: company.id)
-    # documents = Invoice.where(id: 10653).where(company_id: company.id)
+    # documents = Invoice.where(id: 10686).where(company_id: company.id)
 
+    # FormCustomField.where(company_id: company_id).destroy_all
     form = Form.where(klass_name: 'Docs::P2P::Invoices::NonPo::Form', company_id: company_id).first
     documents.find_in_batches(batch_size: 1000) do |batch|
       batch.each do |document|
 
         # Populate Custom Fields
+
         form.entities.root.custom_fields.each do |entity|
           form_custom_field = FormCustomField.where(field_key: entity.entity_key, document_type: document.class.name, document_id: document.id).order(created_at: :asc).last
           if form_custom_field.present?
@@ -52,7 +54,7 @@ class NonPoInvoiceMigrator
         update_each_custom_field( form_custom_field, custom_field)
       else
 
-        entity_key = custom_field.field_configuration.field_key
+        entity_key = custom_field.field_configuration.field_name.split(" ").join("_").underscore
 
         form_entity = form.entities.where(entity_key: entity_key).first
         if form_entity.blank?
@@ -81,8 +83,10 @@ class NonPoInvoiceMigrator
     required = custom_field.field_configuration.mandatory
     active = custom_field.field_configuration.enabled
     lable = custom_field.field_configuration.field_name
-    entity_key = custom_field.field_configuration.field_key
+    entity_key = custom_field.field_configuration.field_name.split(" ").join("_").underscore
     position = form.entities.where(form_section_id: section_id).order(:position).last.position + 1
+    # is_active = !custom_field.field_configuration.deleted?
+
 
     form_entity = FormEntity::Text.create({ company_id: company.id,
      form_id: form_id, form_section_id: section_id,
@@ -91,7 +95,8 @@ class NonPoInvoiceMigrator
      placeholder: 'Enter value', hint: 'Please enter the hint',
      entity_type: 'text', editable: true, required: required,
      active: active, unique: false, visible: true, position: position,
-     system_field: false, options: "{'format':'text','minimum':1,'maximum':255}", 
+     system_field: false, options: "{'format':'text','minimum':1,'maximum':255}"
+     # , active: is_active
     })
     form_entity
   end
@@ -103,8 +108,9 @@ class NonPoInvoiceMigrator
     required = custom_field.field_configuration.mandatory
     active = custom_field.field_configuration.enabled
     lable = custom_field.field_configuration.field_name
-    entity_key = custom_field.field_configuration.field_key
+    entity_key = custom_field.field_configuration.field_name.split(" ").join("_").underscore
     position = form.entities.where(form_section_id: section_id).order(:position).last.position + 1
+    # is_active = !custom_field.field_configuration.deleted?
 
     # create entity
     form_entity = FormEntity::DropDown.create({ company_id: company.id,
@@ -116,6 +122,7 @@ class NonPoInvoiceMigrator
      active: active, unique: false, visible: true, position: position,
      system_field: false, choices_scope: nil,
      options: {}
+     # ,active: is_active
     })
 
     choices = Choices['list'].()
@@ -165,7 +172,13 @@ class NonPoInvoiceMigrator
 
   def self.update_item document
     #MAPPING
-    document.items.each do |item|
+    document.items.each do |item| 
+      item_tds = 0
+      if item&.tds_applicable
+        item_tds = ( item&.taxable_amount&.value.to_f * document&.tds_slab&.tds.to_f ) / 100
+        item_tds = item_tds.to_f.round(2)
+      end
+
       update_params = {
 
         # quantity: item.quantity,
@@ -181,17 +194,17 @@ class NonPoInvoiceMigrator
         # rate: item.rate,
         # discount: item.discount,
         # tax_rate_id: item.tax_rate_id,
-        tax_percentage: item.tax_percentage,
+        tax_percentage: item&.tax_rate&.rate,
         
-        gl_code: item&.category&.gl_code,
+        gl_code: item&.gl_code.present? ? item&.gl_code :  ( item&.category&.gl_code.present? ? item&.category&.gl_code : item&.inventory_line_item&.item_number),
         item_number: item&.inventory_line_item&.item_number,
         
         items_department_id: item&.department_id,
         items_cost_center_id: item&.cost_center_id,
         product_type_id: item&.inventory_line_item&.product_type_id,
         item_rate: item&.rate,
-        item_tds_amount: 0,
-        reporting_item_tds_amount: 0,
+        item_tds_amount: item_tds,
+        reporting_item_tds_amount: item_tds,
         item_gross_amount: item&.amount&.value.to_f,
         reporting_item_gross_amount: item&.amount&.value.to_f,
         item_discount_amount: item&.discount_amount&.value.to_f,
@@ -213,7 +226,7 @@ class NonPoInvoiceMigrator
   def self.update_invoice_details document
     update_params = {
 
-      base_currency: 'INR',
+      base_currency: Currency.find_by(country_code: 'INR').id,
       reporting_currency: 'INR',
       conversion_rate: 1,
       retrieve_conversion_rate: true,
@@ -236,11 +249,11 @@ class NonPoInvoiceMigrator
 
       payment_term_days: document&.payment_term&.days_after,
       tax_type_id: document&.gst_type_id,
-      conversion_date: document&.created_at&.to_date,
+      conversion_date: document&.date&.to_date,
 
       # VENDOR DETAILS
       vendor_country: document&.vendor&.vendor_country,
-      vendor_trade_name: document&.vendor&.business_name || document&.vendor&.name,
+      vendor_trade_name:  document&.vendor&.trade_name || document&.vendor&.business_name,
       vendor_sequence_id: document&.vendor&.vendor_id,
       vendor_gstin: document&.gstin_location&.gstin,
       vendor_pan: document&.vendor&.pan,
@@ -260,50 +273,56 @@ class NonPoInvoiceMigrator
 
 
       # INVOICE SUMMARY
-      invoice_gross_amount: document&.amount&.value,
-      reporting_invoice_gross_amount: document&.amount&.value,
+      invoice_gross_amount: document&.item_amounts_total.to_f,
+      reporting_invoice_gross_amount: document&.item_amounts_total.to_f,
       
       invoice_discount_amount: document&.discount_amount&.value,
       reporting_invoice_discount_amount: document&.discount_amount&.value,
       
-      invoice_taxable_amount: document&.gross_amount&.value,
-      reporting_invoice_taxable_amount: document&.gross_amount&.value,
+      invoice_taxable_amount: document.gross_amount&.value.to_f,
+      reporting_invoice_taxable_amount: document.gross_amount&.value.to_f,
+
+      total_line_item_discount_amount: document&.discount_amount&.value,
+      overall_discount_amount: 0,
       
       invoice_tax_amount: document&.tax_amount&.value,
       reporting_invoice_tax_amount: document&.tax_amount&.value,
-      
+
+      # tds_slab_id:  document&.tds_slab_id ,
+      tds_percentage: document&.tds_slab&.tds,
       invoice_tds_amount: document&.tds_amount&.value,
       reporting_invoice_tds_amount: document&.tds_amount&.value,
       
       invoice_freight_amount: document&.freight_amount&.value,
       reporting_invoice_freight_amount: document&.freight_amount&.value,
-
-      invoice_sub_total_amount: document&.net_amount&.value,
-      reporting_invoice_sub_total_amount: document&.net_amount&.value,
+      
+      invoice_paid_outside_amount: document&.advance_amount&.value.to_f,
+      reporting_invoice_paid_outside_amount: document&.advance_amount&.value.to_f,
 
       invoice_roundoff_amount: document&.roundoff_amount,
       reporting_invoice_roundoff_amount: document&.roundoff_amount,
 
-      invoice_total_amount: document&.net_amount&.value,
-      reporting_invoice_total_amount: document&.net_amount&.value,
+      invoice_sub_total_amount: document&.balance_due&.value.to_f,
+      reporting_invoice_sub_total_amount: document&.balance_due&.value.to_f,
 
-      invoice_paid_outside_amount: document&.advance_amount&.value.to_f,
-      reporting_invoice_paid_outside_amount: document&.advance_amount&.value.to_f,
 
-      invoice_balance_due: document&.balance_due&.value,
-      reporting_invoice_balance_due: document&.balance_due&.value,
+      # invoice_total_amount: document&.net_amount&.value - document&.advance_amount&.value.to_f,
+      # reporting_invoice_total_amount: document&.net_amount&.value - document&.advance_amount&.value.to_f,
+      
+      # invoice_net_total_amount: document&.net_amount&.value - document&.advance_amount&.value.to_f ,
+      # reporting_invoice_net_total_amount: document&.net_amount&.value - document&.advance_amount&.value.to_f,
 
-      # tds_slab_id:  document&.tds_slab_id ,
-      tds_percentage: document&.tds_slab&.tds,
-      
-      total_line_item_discount_amount: document&.discount_amount&.value,
-      overall_discount_amount: 0,
-      
-      invoice_net_total_amount: document&.net_amount&.value,
-      reporting_invoice_net_total_amount: document&.net_amount&.value,
-      
+      invoice_total_amount: document&.balance_due&.value.to_f,
+      reporting_invoice_total_amount: document&.balance_due&.value.to_f,
+
+      invoice_net_total_amount: document&.balance_due&.value.to_f,
+      reporting_invoice_net_total_amount: document&.balance_due&.value.to_f,
+            
       invoice_advance_paid_amount: document&.payments&.successful&.joins(:amount)&.sum(:value),
-      reporting_invoice_advance_paid_amount: document&.payments&.successful&.joins(:amount)&.sum(:value)
+      reporting_invoice_advance_paid_amount: document&.payments&.successful&.joins(:amount)&.sum(:value),
+
+      invoice_balance_due: document&.balance_due&.value.to_f - document&.payments&.successful&.joins(:amount)&.sum(:value).to_f ,
+      reporting_invoice_balance_due: document&.balance_due&.value.to_f - document&.payments&.successful&.joins(:amount)&.sum(:value).to_f
     }
     document.update_columns(update_params)
   end
@@ -313,17 +332,18 @@ class NonPoInvoiceMigrator
       relevant_custom_field = document.form_custom_fields.where(field_key: 'invoice_attachments').first
 
       if relevant_custom_field.present?
-        add_attachment_to_new_invoice( old_attachment, relevant_custom_field )
+        new_attachment = add_attachment_to_new_invoice( old_attachment, relevant_custom_field )
       else
         entity  = form.entities.where(entity_key: 'invoice_attachments').first
         document.form_custom_fields.create({
             document_type: 'Invoice', document_id: document.id, form_id: form.id, form_entity_id: entity.id,
             field_key: 'invoice_attachments', value: "", value_text: nil, entity_type: 'attachments',
          })
-        
+
         relevant_custom_field = document.form_custom_fields.where(field_key: 'invoice_attachments').first
-        add_attachment_to_new_invoice( old_attachment, relevant_custom_field )
+        new_attachment = add_attachment_to_new_invoice( old_attachment, relevant_custom_field )
       end
+      new_attachment.update_attribute(:attachment_updated_at,  old_attachment.created_at )
     end    
   end
 
@@ -347,5 +367,6 @@ class NonPoInvoiceMigrator
         new_attachment.save
       end
     end
+    new_attachment
   end
 end

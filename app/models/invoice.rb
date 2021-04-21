@@ -865,8 +865,30 @@ class Invoice < ApplicationRecord
     elsif paid_amount <= balance_due
       self.update(invoice_status_id: InwardInvoiceStatus.id_for(:partially_paid))
     end
-    self.update(invoice_advance_paid_amount: paid_amount)
+
+    update_paid_and_balance_payable paid_amount
   end
+
+  def update_paid_and_balance_payable paid_amount
+    conversion_rate = self.conversion_rate.to_f
+
+    invoice_advance_paid_amount = paid_amount.to_f
+    reporting_invoice_advance_paid_amount = invoice_advance_paid_amount * conversion_rate.to_f
+    
+    self.update({
+      invoice_advance_paid_amount: invoice_advance_paid_amount,  
+      reporting_invoice_advance_paid_amount: reporting_invoice_advance_paid_amount
+    })
+  end
+
+  def invoice_balance_due
+    self[:invoice_balance_due].to_f - self.invoice_advance_paid_amount.to_f
+  end
+
+  def reporting_invoice_balance_due
+    self[:reporting_invoice_balance_due].to_f - self.reporting_invoice_advance_paid_amount.to_f 
+  end
+
 
   def unpaid?
     return nil if self.invoice_status.blank?
@@ -912,7 +934,8 @@ class Invoice < ApplicationRecord
         invoice_type: self.invoice_type&.name,
         procurement_id: self.procurement_id,
         advance: self.advance,
-        advance_amount: self.advance_amount&.value.to_f + self&.reporting_invoice_paid_outside_amount.to_f,
+        advance_amount: self.advance_amount&.value.to_f ,
+        # + self&.reporting_invoice_paid_outside_amount.to_f,
         tax_amount: precision_value(self.tax_amount&.value.to_f),
         tds_amount: precision_value(self.tds_amount&.value.to_f),
         tax: precision_value(self.tax.to_f),
@@ -1762,14 +1785,19 @@ class Invoice < ApplicationRecord
 
       self.skip_callback = true
       amounts_attributes_map.each do |key, value|
+        # if an invoice has a payment associated with self, then do not update balance_payable, adding a workaround as balance payable do not get updated.
+        next if self.payments.present? && key.to_s == 'invoice_balance_due'
+
         amount_value = self.send(key)
         amount_attr = self.send("#{value}_id")
         base_currency_id = get_base_currency&.id
         if amount_attr.present?
           Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: base_currency_id)
         else
-          amount = Amount.create(value: amount_value, currency_id: base_currency_id)
-          self.send("#{value}=", amount)
+#           amount = Amount.create(value: amount_value, currency_id: base_currency_id)
+#           self.send("#{value}=", amount)
+          amount_id = Amount.create(value: amount_value, currency_id: base_currency_id).id
+          self.send("#{value}_id=", amount_id)
         end
       end
 
@@ -1803,11 +1831,13 @@ class Invoice < ApplicationRecord
       invoice_discount_amount: 'discount_amount',
       invoice_taxable_amount: 'gross_amount',
       invoice_tax_amount: 'tax_amount',
-      invoice_tds_amount: 'tds_amount',
-      invoice_advance_paid_amount: 'advance_amount',
+      invoice_freight_amount: 'freight_amount',
       invoice_sub_total_amount: 'net_amount',
-      invoice_balance_due: 'balance_due',
-      invoice_freight_amount: 'freight_amount'
+
+      invoice_tds_amount: 'tds_amount',
+      invoice_paid_outside_amount: 'advance_amount',
+      # invoice_advance_paid_amount: 'advance_amount',
+      invoice_balance_due: 'balance_due'
     }
   end
 

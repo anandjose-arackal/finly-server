@@ -5,10 +5,18 @@ class ItemExposure < Exposures::API
   attribute :rate, record_attribute: true
   attribute :description, record_attribute: true
   attribute :category, record_attribute: true, exposure: true, includes: [:category]
+  attribute :category_id, record_attribute: true, includes: [:category]
+  attribute :category_value, includes: [:category] do
+    record.category&.name
+  end
   attribute :created_at, record_attribute: true
   attribute :updated_at, record_attribute: true
   attribute :note, record_attribute: true
   attribute :tax_rate, record_attribute: true, exposure: true
+  attribute :tax_rate_id, record_attribute: true, includes: [:tax_rate]
+  attribute :tax_rate_value, includes: [:tax_rate] do 
+    record&.tax_rate&.name
+  end
   attribute :item_code, record_attribute: true
   attribute :account, record_attribute: true
   attribute :scope, includes: [:supply_item_type] do

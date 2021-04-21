@@ -72,8 +72,13 @@ class Procurements::Invoices::Create < Procurements::Invoices::Base
     self.invoice.payment_term_days = vendor&.payment_term&.days_after.to_i
     self.invoice.due_date = Date.today + vendor&.payment_term&.days_after.to_i.days
     self.invoice.reporting_currency = user.company.reporting_currency_code
+
+    self.invoice.base_currency = user.company.reporting_currency.id
+    self.invoice.conversion_rate = 1
+
     self.invoice.rcm_enabled = vendor.rcm_enabled
     self.invoice.tds_slab_id = vendor&.tds_rates_list_id
+    self.invoice.tds_percentage = self.invoice&.tds_slab&.tds.to_f
     self.invoice.tds = vendor&.tds_rates_list&.tds
     if self.vendor.payment_term_id.present?
       self.invoice.payment_term_id = self.vendor.payment_term_id
