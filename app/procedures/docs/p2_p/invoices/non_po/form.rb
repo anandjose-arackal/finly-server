@@ -40,9 +40,10 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       invoice_taxable_amount: "{{ form.invoice_gross_amount | minus: form.invoice_discount_amount | default: 0 | round: 2}}",
       invoice_tax_amount: "{% assign tax_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign tax_amount = tax_amount | plus: item.item_tax_amount %}{% endif %}{% endfor %}{{ tax_amount  | default: 0 | round: 2}}",
       invoice_freight_amount: "{{ form.invoice_freight_amount | default: 0 | round: 2}}",
-      invoice_sub_total_amount: "{% assign inv_sub_total_amount = form.invoice_gross_amount | minus: form.invoice_discount_amount | plus: form.invoice_tax_amount | plus: form.invoice_freight_amount | round: 2 %}{% if form.rcm_enabled == true  %}{{ inv_sub_total_amount | minus: form.invoice_tax_amount | default: 0 | round: 2}}{% else %}{{ inv_sub_total_amount | default: 0 | round: 2}}{% endif %}",
+      invoice_sub_total_amount: "{% assign inv_sub_total_amount = form.invoice_gross_amount | minus: form.invoice_discount_amount | plus: form.invoice_tax_amount | plus: form.invoice_freight_amount | round: 2 %}{% if form.rcm_enabled == true  %}{{ inv_sub_total_amount | minus: form.invoice_tax_amount | default: 0 | round: 2}}{% else %}{{ inv_sub_total_amount | default: 0 | round }}{% endif %}",
+      
       invoice_paid_outside_amount: "{{ form.invoice_paid_outside_amount | default: 0 | round: 2}}",
-      invoice_tds_amount: "{% assign tds_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign tds_amount = tds_amount | plus: item.item_tds_amount %}{% endif %}{% endfor %}{{ tds_amount  | default: 0 | round: 2}}",
+      invoice_tds_amount: "{% assign tds_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign tds_amount = tds_amount | plus: item.item_tds_amount %}{% endif %}{% endfor %}{{ tds_amount  | default: 0 | ceil}}",
       
       invoice_roundoff_amount: "{% assign net_total_amount = form.invoice_sub_total_amount | minus: form.invoice_paid_outside_amount | minus: form.invoice_tds_amount %}{% assign round_amount = net_total_amount | round %}{% assign amount = round_amount | minus: net_total_amount %}{% if form.base_currency != '1' %}{% assign amount = 0 %}{% endif %}{{ amount | default: 0 | round: 2 }}",
       invoice_total_amount: "{{ form.invoice_sub_total_amount | plus: form.invoice_roundoff_amount | minus: form.invoice_tds_amount | minus: form.invoice_paid_outside_amount | default: 0 | round: 2}}",
@@ -393,16 +394,15 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_freight_amount])
 
-      amount :invoice_sub_total_amount, label: 'Net Amount', editable: false, visible: false,
+      amount :invoice_sub_total_amount, label: 'Net Amount', editable: false, visible: true,
              can_visible_be_changed: false,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_sub_total_amount]) # todo - changd name
 
-      amount :reporting_invoice_sub_total_amount, label: 'Net Amount(Reporting Currency)', editable: false, visible: false,
+      amount :reporting_invoice_sub_total_amount, label: 'Net Amount(Reporting Currency)', editable: false, visible: true,
              can_visible_be_changed: false,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_sub_total_amount]) # todo - changd name
-
 
       lookup :tds_slab_id, choices_scope: Choices[:lookup].('tds_slabs'), visible: true # todo - condition when reporting currency is in INR
 
@@ -410,7 +410,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Lookup('items_summary.tds_slab_id', '{{record.tds}}')
 
-      amount :invoice_tds_amount, label: 'Tds Amount', editable: false, visible: false, # todo - condition when reporting currency is in INR
+      amount :invoice_tds_amount, label: 'Tds Amount', editable: false, visible: true, # todo - condition when reporting currency is in INR
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_tds_amount])
 
@@ -419,6 +419,14 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_tds_amount])
 
+      amount :invoice_net_total_amount, label: "Net Payable", editable: false, visible: false,
+             can_editable_be_changed: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_net_total_amount])
+
+      amount :reporting_invoice_net_total_amount, label: "Net Payable (Reporting Currency)", editable: false, visible: false,
+             can_editable_be_changed: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_net_total_amount])
+
       amount :invoice_paid_outside_amount, label: "Advance Paid",
              default_value: 0, visible: true, editable: true
 
@@ -426,7 +434,6 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_visible_be_changed: false,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_paid_outside_amount])
-
 
       amount :invoice_roundoff_amount, label: 'Roundoff Amount', visible: true, editable: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_roundoff_amount]) # todo - changd name
@@ -447,11 +454,11 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_total_amount])
 
 
-      amount :invoice_net_total_amount, label: "Net Payable", editable: false, visible: true,
+      amount :invoice_net_total_amount, label: "Net Payable", editable: false, visible: false,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_net_total_amount])
 
-      amount :reporting_invoice_net_total_amount, label: "Net Payable (Reporting Currency)", editable: false, visible: true,
+      amount :reporting_invoice_net_total_amount, label: "Net Payable (Reporting Currency)", editable: false, visible: false,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_net_total_amount])
 
@@ -639,13 +646,18 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
   #   action :visible, false
   # end
 
-  condition condition_id: "Hide Net Payable (Reporting Currency)" do
-    reference :entity, 'items_summary.reporting_invoice_net_total_amount'
+  # condition condition_id: "Hide Net Payable (Reporting Currency)" do
+  #   reference :entity, 'items_summary.reporting_invoice_net_total_amount'
+  #   rule Rules::Builder[:base_currency].eq(value: '1')
+  #   action :visible, false
+  # end
+
+
+  condition condition_id: "Hide Net Amount (Reporting Currency)" do
+    reference :entity, 'items_summary.reporting_invoice_sub_total_amount'
     rule Rules::Builder[:base_currency].eq(value: '1')
     action :visible, false
   end
-
-
 
   condition condition_id: "Hide Reporting Balance Payable for indian currency" do
     reference :entity, 'items_summary.reporting_invoice_balance_due'
