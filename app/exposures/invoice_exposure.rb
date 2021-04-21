@@ -101,6 +101,9 @@ class InvoiceExposure < Exposures::API
     record.net_amount&.value || 0
   end
   attribute :roundoff_amount, record_attribute: true
+  attribute :roundoff_amount_value, includes: [:roundoff_amount] do
+    record.roundoff_amount&.value || 0
+  end
   attribute :advance_amount, record_attribute: true, exposure: true
   attribute :balance_due, includes: [:balance_due], record_attribute: true, exposure: true
   attribute :balance_due_value, includes: [:balance_due] do
