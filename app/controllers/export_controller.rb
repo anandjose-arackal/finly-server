@@ -46,30 +46,33 @@ class ExportController < BaseControllers::WebBase
 
   def report
     if request.format == :pdf
-      respond_to do |format|
-        format.pdf {
-          op = Reports::ExportHandler.(current_user, params)
-          local_variables = op.local_variables
-          template = op.template
-          local_variables[:op] = op
-          @result = Exporter::Pdf.new(current_user, {filename: "report-#{op.report.name}", layout: 'pdf.html.erb', template: template, local_variables: local_variables})
-          @result.render(self)
+      params[:export_format] = params[:download_type]
+      params[:type] = 'reports_pdf'
+      result = ExportManager::RequestHandler.(current_user, params)
+      if result.success?
+        @response = {
+            success: true,
+            job_id: result.export_job&.id,
+            messages: result.messages
         }
-      end and return
-    end
-
-    params[:export_format] = params[:download_type]
-    params[:type] = 'reports'
-    result = ExportManager::RequestHandler.(current_user, params)
-    if result.success?
-      @response = {
-          success: true,
-          job_id: result.export_job&.id,
-          messages: result.messages
-      }
-      render json: @response.as_json
+        render json: @response.as_json
+      else
+        respond response: :failure, message: result.messages[:error]
+      end
     else
-      respond response: :failure, message: result.messages[:error]
+      params[:export_format] = params[:download_type]
+      params[:type] = 'reports'
+      result = ExportManager::RequestHandler.(current_user, params)
+      if result.success?
+        @response = {
+            success: true,
+            job_id: result.export_job&.id,
+            messages: result.messages
+        }
+        render json: @response.as_json
+      else
+        respond response: :failure, message: result.messages[:error]
+      end
     end
   end
 
