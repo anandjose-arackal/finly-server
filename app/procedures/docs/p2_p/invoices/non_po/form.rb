@@ -217,7 +217,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
       text :comment, label: "Narration"
       text :item_number, label: "Item Code", editable: false, 
-        computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.item_code}}')
+        computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.item_number}}')
 
       lookup :product_type_id, label: "Product Type", choices_scope: Choices[:enum].(ProductType), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.product_type_id}}'), editable: false, required: true, visible: true
 
