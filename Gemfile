@@ -262,7 +262,7 @@ gem 'wit', '~> 6.0'
 gem 'azure'
 gem 'azure-storage-blob'
 
-gem 'acts_as_tenant'
+gem 'acts_as_tenant', '~> 0.4.4'
 
 gem 'money'
 gem 'money-open-exchange-rates'
