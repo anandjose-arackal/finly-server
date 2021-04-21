@@ -429,7 +429,8 @@ class InvoiceLineItem < ApplicationRecord
       if parent.forms_enabled
         sync_to_old_structure
       else
-        sync_to_forms_structure
+        puts " "
+        # sync_to_forms_structure
       end
     end
   end
