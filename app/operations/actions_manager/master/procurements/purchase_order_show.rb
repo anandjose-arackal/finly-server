@@ -80,10 +80,9 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
 
   def close
     unless purchase_order.procurement.invoices.blank? && purchase_order.procurement.inward_documents.blank?
-      (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor? || purchase_order.vendor_confirmed?) && (user_in_level? || document_owner?)
+      ((purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor? || purchase_order.vendor_confirmed?) && (user_in_level? || document_owner?)) ||  user.vendor_payments_admin?
     end
 
-    # if user.vendor_payments_admin? || purchase_order.is_initiating_user? || purchase_order.is_reviewing_user?
   end
 
   def approve
