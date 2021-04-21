@@ -46,7 +46,7 @@ class EmailNotificationPoller
       else
         event = message['eventType']
         event_id = data['MessageId']
-        message_id_hash = message['mail']['headers'].find {|m| m[:name] == 'Message-ID'}
+        message_id_hash = message['mail']['headers'].find {|m| m[:name]&.downcase == 'Message-ID'.downcase}
         # Strip < and > in Message ID
         message_id = message_id_hash&.dig(:value)[/#{"<"}(.*?)#{">"}/m, 1] || message_id_hash&.dig(:value) #data&.dig('mail', 'messageId')
         event_key = event&.parameterize&.underscore
