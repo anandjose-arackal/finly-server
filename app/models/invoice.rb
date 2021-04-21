@@ -1828,7 +1828,8 @@ class Invoice < ApplicationRecord
       invoice_sub_total_amount: 'net_amount',
 
       invoice_tds_amount: 'tds_amount',
-      invoice_advance_paid_amount: 'advance_amount',
+      invoice_paid_outside_amount: 'advance_amount',
+      # invoice_advance_paid_amount: 'advance_amount',
       invoice_balance_due: 'balance_due'
     }
   end
