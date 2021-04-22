@@ -1087,6 +1087,10 @@ class UpdateTenants
 
       # 354003
       # UUID
+      # FormCustomField
+      Form.unscoped.find_each do |record|
+        FormCustomField.unscoped.where(form_id: record.id).update_all(company_id: record.company_id)
+      end
       # FormCustomField.includes(:form).find_in_batches(batch_size: 1000) do |records|
       #   records.each do |record|
       #     record.company_id = record.form&.company_id
@@ -1096,6 +1100,11 @@ class UpdateTenants
 
       # 52014
       # UUID
+      CustomFieldAttachment.includes(:form_custom_field).find_in_batches(batch_size: 1000) do |records|
+        records.each do |record|
+          record.update_columns(company_id: record.form_custom_field&.company_id)
+        end
+      end
       # CustomFieldAttachment.includes(:form_custom_field).find_in_batches(batch_size: 1000) do |records|
       #   records.each do |record|
       #     record.company_id = record.form_custom_field&.company_id
@@ -1105,6 +1114,11 @@ class UpdateTenants
 
       # 1351
       # UUID
+      CustomFieldSelection.includes(:form_custom_field).find_in_batches(batch_size: 1000) do |records|
+        records.each do |record|
+          record.update_columns(company_id: record.form_custom_field&.company_id)
+        end
+      end
       # CustomFieldSelection.includes(:form_custom_field).find_in_batches(batch_size: 1000) do |records|
       #   records.each do |record|
       #     record.company_id = record.form_custom_field&.company_id
@@ -1195,6 +1209,11 @@ class UpdateTenants
 
       # 96214
       # UUID
+      # MapLocationUserQuery.includes(:user).find_in_batches(batch_size: 1000) do |records|
+      #   records.each do |record|
+      #     record.update_columns(company_id: record.user&.company_id)
+      #   end
+      # end
       # MapLocationUserQuery.includes(:user).find_in_batches(batch_size: 1000) do |records|
       #   records.each do |record|
       #     record.company_id = record.user&.company_id
