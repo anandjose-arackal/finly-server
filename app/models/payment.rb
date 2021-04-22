@@ -961,15 +961,17 @@ include Searchkick::Api
   end
 
   def payment_request_show_json(document_type)
-    {document_type: document_type,
-     document_details: get_document_details(document_type),
-     amount_details: get_amount_details(document_type),
-     custom_fields: get_custom_fields(document_type),
-     custom_field_config: get_custom_field_config(document_type),
-     payment_id: self.id,
-     attachment_details: get_attachment_details(document_type),
-     base_currency: self.bank_payment_request.base_currency,
-     reporting_currency: self.company.reporting_currency
+    {
+      document_type: document_type,
+      document_details: get_document_details(document_type),
+      amount_details: get_amount_details(document_type),
+      custom_fields: get_custom_fields(document_type),
+      custom_field_config: get_custom_field_config(document_type),
+      payment_id: self.id,
+      attachment_details: get_attachment_details(document_type),
+      base_currency: self.bank_payment_request.base_currency,
+      reporting_currency: self.company.reporting_currency,
+      is_domestic: self.bank_payment_request&.is_domestic
     }
   end
 
