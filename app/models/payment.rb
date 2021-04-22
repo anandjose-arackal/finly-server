@@ -1199,12 +1199,12 @@ include Searchkick::Api
       balance_due: {value: self.parent.balance_due&.value, editable: false}, # Invoice AMOUNT
       available_credits: available_credits_amount,
 
-      invoice_balance_due: {value: self.invoice_balance_due, editable: true}, 
-      reporting_invoice_balance_due: {value: self.reporting_invoice_balance_due, editable: false},     
-      invoice_sub_total_amount: {value: self.invoice_sub_total_amount, editable: false}, 
-      reporting_invoice_sub_total_amount: {value: self.reporting_invoice_sub_total_amount, editable: false},
-      invoice_net_total_amount: {value: self.invoice_net_total_amount, editable: false},
-      reporting_invoice_net_total_amount: {value: self.reporting_invoice_net_total_amount, editable: false} 
+      invoice_balance_due: {value: self.parent&.invoice_balance_due, editable: true}, 
+      reporting_invoice_balance_due: {value: self.parent&.reporting_invoice_balance_due, editable: false},     
+      invoice_sub_total_amount: {value: self.parent&.invoice_sub_total_amount, editable: false}, 
+      reporting_invoice_sub_total_amount: {value: self.parent&.reporting_invoice_sub_total_amount, editable: false},
+      invoice_net_total_amount: {value: self.parent&.invoice_net_total_amount, editable: false},
+      reporting_invoice_net_total_amount: {value: self.parent&.reporting_invoice_net_total_amount, editable: false} 
     }
   end
 
