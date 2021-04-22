@@ -5,6 +5,7 @@ if payment.receiving_account&.account_owner_type == "YesBankVendor"
 else
   json.owner_name payment.receiving_account&.account_owner&.name
 end
+
 json.name payment.receiving_account&.name
 json.account_number payment.receiving_account.account_number
 json.base_currency payment.bank_payment_request.base_currency
@@ -23,6 +24,8 @@ json.beneficiary_id payment.receiving_account.account_owner&.id
 json.beneficiary_type (payment.receiving_account.account_owner_type == "User" ? 1 : 2)
 json.created_at payment.created_at.strftime("%b %d, %Y")
 json.created_by payment.initiating_user.as_json
+json.is_domestic payment&.bank_payment_request&.is_domestic
+
 if payment.receiving_user.is_a?(User) || payment.receiving_user.authorized
   json.beneficiary_type "authorized"
 else
