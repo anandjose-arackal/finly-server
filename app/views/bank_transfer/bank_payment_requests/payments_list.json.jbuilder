@@ -84,6 +84,13 @@ json.payments do
       json.raw_amount precision_value invoice&.amount&.value
       # conditionally set the original amount as invoice amount is there are line items
       if payment.invoice&.invoice_items.present?
+        
+        toggel = NonPoInvoiceToggle.new(current_user)
+        original_amount = precision_value invoice.amount&.value
+        if toggle.enabled?
+          original_amount = invoice.invoice_gross_amount
+        end
+        
         json.original_amount precision_value invoice.amount&.value
       else
         json.original_amount precision_value invoice.original_amount&.value
