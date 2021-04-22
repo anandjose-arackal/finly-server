@@ -14,7 +14,7 @@
 #  updated_at              :datetime         not null
 #
 
-class CustomFieldAttachment < ApplicationRecordBackwardCompatibility
+class CustomFieldAttachment < ApplicationRecord
 
   include SoftDeletable, UUIDHelper
 

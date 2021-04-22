@@ -17,7 +17,7 @@
 #  entity_type    :string(255)
 #
 
-class FormCustomField < ApplicationRecordBackwardCompatibility
+class FormCustomField < ApplicationRecord
   include UUIDHelper, SoftDeletable
 
   belongs_to :company, optional: true
