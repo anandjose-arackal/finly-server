@@ -64,7 +64,7 @@ class BankPaymentRequest < ApplicationRecord
   belongs_to :company, optional: true
   belongs_to :transfer_mode, optional: true, class_name: "TransferModeCompanyMapping"
 
-  belongs_to :base_currency, class_name: 'Currency'
+  belongs_to :base_currency, optional: true, class_name: 'Currency'
   has_many :comments, class_name: "BankPaymentRequestComment"
   has_many :bank_payment_request_trails
 
@@ -431,12 +431,14 @@ class BankPaymentRequest < ApplicationRecord
       self.name = generate_name
     end
 
-    if self.base_currency_id.blank?
-      self.base_currency_id = Currency.find_by(currency_code: 'INR').id
-    end
+    # if self.base_currency_id.blank?
+    #   self.base_currency_id = Currency.find_by(currency_code: 'INR').id
+    # end
   end
 
   before_save :add_company
+  before_save :set_base_currency
+  
 
   ransack_scopes :with_status_id
   ransack_scopes :with_status_ids
@@ -655,6 +657,10 @@ class BankPaymentRequest < ApplicationRecord
 
   def entity_submitted_at
     submitted_at&.to_date || created_at.to_date
+  end
+
+  def set_base_currency
+    self.base_currency_id = self.company.reporting_currency.id if base_currency_id.blank?
   end
 
   private
