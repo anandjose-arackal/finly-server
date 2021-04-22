@@ -99,7 +99,7 @@ class User < ApplicationRecord
   devise :zxcvbnable
 
   # override has_many :old_passwords from devise security to remove company_id scope
-  has_many :old_passwords, -> { unscope(where: company_id) }, class_name: 'OldPassword', as: :password_archivable, dependent: :destroy
+  has_many :old_passwords, -> { unscope(where: company_id) }, class_name: 'OldPassword', as: :password_archivable
 
   attr_accessor :view, :invitation_note
   attr_reader :raw_invitation_token
