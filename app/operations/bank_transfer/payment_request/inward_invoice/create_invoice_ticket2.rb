@@ -86,7 +86,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
     # since previous state can be more than one type, this is a clean way to handle this
     self.inward_invoices.pluck(:id,:invoice_status_id).map { |id, st| self.invoices_status[id.to_i] = st }
     self.is_domestic = inward_invoices.first.is_domestic
-    base_currency_id = Currency.find_by(id: inward_invoices.first.base_currency).id rescue Currency.find_by(country_code: inward_invoices.first.base_currency).id
+    base_currency_id = Currency.find_by(id: inward_invoices.first.base_currency).id rescue Currency.find_by(country_code: 'INR').id
     self.base_currency_id = base_currency_id
 
     Rails.logger.fatal "invoices_status,\n #{invoices_status.inspect}"
