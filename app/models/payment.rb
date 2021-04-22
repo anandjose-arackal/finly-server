@@ -968,7 +968,8 @@ include Searchkick::Api
      custom_field_config: get_custom_field_config(document_type),
      payment_id: self.id,
      attachment_details: get_attachment_details(document_type),
-     base_currency: self.bank_payment_request.base_currency
+     base_currency: self.bank_payment_request.base_currency,
+     reporting_currency: self.company.reporting_currency
     }
   end
 
