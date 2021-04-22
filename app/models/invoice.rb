@@ -218,6 +218,7 @@ class Invoice < ApplicationRecord
   belongs_to :balance_due, optional: true, class_name: "Amount"
   belongs_to :taxable_amount, optional: true, class_name: "Amount"
   belongs_to :paid_amount, optional: true, class_name: "Amount"
+
   #
   # Captures PO advance if any and how much is adjusted in the tax invoice
   # belongs_to :po_prev_adjusted_advance, optional: true, class_name: "Amount", foreign_key: :po_prev_adjusted_advance
@@ -1096,7 +1097,8 @@ class Invoice < ApplicationRecord
 
   def include_original_amount
     if self.invoice_items.present?
-      precision_value(self.amount&.value)
+      # precision_value(self.amount&.value)
+      1234
     else
       precision_value(self.original_amount&.value)
     end
@@ -1806,24 +1808,9 @@ class Invoice < ApplicationRecord
 
   # Syncs amounts from new forms structure to legacy amounts table
   def sync_amounts
+    base_currency_id = get_base_currency&.id
+
     if invoice_gross_amount.present?
-      # REMOVING RECALCULATION OF DATA
-
-      # exchange_reporting_currency = get_reporting_currency&.country_code || "INR"
-      # exchange_base_currency = get_base_currency&.country_code || "INR"
-      
-
-      # Multi currency implementation
-      # self.reporting_invoice_gross_amount = invoice_gross_amount_money.exchange_to(exchange_reporting_currency).amount rescue 0
-      # self.reporting_invoice_discount_amount = invoice_discount_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      # self.reporting_invoice_tax_amount = invoice_tax_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      # self.reporting_invoice_tds_amount = invoice_tds_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      # self.reporting_invoice_sub_total_amount = invoice_sub_total_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      # self.reporting_invoice_total_amount = invoice_total_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      # self.reporting_invoice_taxable_amount = invoice_taxable_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      # self.reporting_invoice_roundoff_amount = invoice_roundoff_amount_money.exchange_to(exchange_base_currency).amount rescue 0
-      # self.reporting_invoice_balance_due = invoice_balance_due_money.exchange_to(exchange_base_currency).amount rescue 0
-
       self.skip_callback = true
       amounts_attributes_map.each do |key, value|
         # if an invoice has a payment associated with self, then do not update balance_payable, adding a workaround as balance payable do not get updated.
@@ -1831,12 +1818,9 @@ class Invoice < ApplicationRecord
 
         amount_value = self.send(key)
         amount_attr = self.send("#{value}_id")
-        base_currency_id = get_base_currency&.id
         if amount_attr.present?
           Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: base_currency_id)
         else
-#           amount = Amount.create(value: amount_value, currency_id: base_currency_id)
-#           self.send("#{value}=", amount)
           amount_id = Amount.create(value: amount_value, currency_id: base_currency_id).id
           self.send("#{value}_id=", amount_id)
         end
@@ -1848,6 +1832,33 @@ class Invoice < ApplicationRecord
       end
       self.save
     end
+
+    # FOR AMOUNT ATTRIBUTE
+    amount_attr = self.amount_id
+    # taxable + tax
+    amount_value = self.invoice_taxable_amount.to_f + self.invoice_tax_amount.to_f
+    self.skip_callback = true
+    if amount_attr.present?
+      Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: base_currency_id)
+    else
+      amount_id = Amount.create(value: amount_value, currency_id: base_currency_id).id
+      self.send("amount_id=", amount_id)
+    end
+
+
+
+    # FOR NET AMOUNT
+    net_amount_attr = self.net_amount_id
+    # invoice_net_total_amount - invoice_paid_outside_amount
+    net_amount_value = self.invoice_net_total_amount.to_f - self.invoice_paid_outside_amount.to_f
+    self.skip_callback = true
+    if net_amount_attr.present?
+      Amount.find_by(id: net_amount_attr).update(value: net_amount_value, currency_id: base_currency_id)
+    else
+      amount_id = Amount.create(value: net_amount_value, currency_id: base_currency_id).id
+      self.send("net_amount_id=", amount_id)
+    end
+
   end
 
   def sync_to_forms_structure
@@ -1867,18 +1878,27 @@ class Invoice < ApplicationRecord
 
   def amounts_attributes_map
     # todo - I2P change it to converted values post multicurrency setup
-    {
-      invoice_gross_amount: 'amount',
-      invoice_discount_amount: 'discount_amount',
+    {  
       invoice_taxable_amount: 'gross_amount',
-      invoice_tax_amount: 'tax_amount',
+      invoice_discount_amount: 'discount_amount',
       invoice_freight_amount: 'freight_amount',
-      invoice_sub_total_amount: 'net_amount',
-
+      invoice_tax_amount: 'tax_amount',
       invoice_tds_amount: 'tds_amount',
       invoice_paid_outside_amount: 'advance_amount',
-      # invoice_advance_paid_amount: 'advance_amount',
       invoice_balance_due: 'balance_due'
+
+
+      # invoice_gross_amount: 'amount',
+      # invoice_discount_amount: 'discount_amount',
+      # invoice_taxable_amount: 'gross_amount',
+      # invoice_tax_amount: 'tax_amount',
+      # invoice_freight_amount: 'freight_amount',
+      # invoice_sub_total_amount: 'net_amount',
+
+      # invoice_tds_amount: 'tds_amount',
+      # invoice_paid_outside_amount: 'advance_amount',
+      # # invoice_advance_paid_amount: 'advance_amount',
+      # invoice_balance_due: 'balance_due'
     }
   end
 
