@@ -1181,23 +1181,30 @@ include Searchkick::Api
     end
 
     {
-        tds_applicable_amount: calculate_tds_applicable_amount('Invoice'),
-        total_amount: {value: precision_value(self.parent&.item_amounts_total), editable: false}, # TOTAL
-        inclusive_of_taxes: {value: self.parent.inclusive_of_taxes, editable: false},
-        discount: {discount_type_id: self.parent.discount_type_id, rate: self.parent.discount, discount_amount: precision_value(self.parent.discount_amount&.value), editable: false},
-        tax: {tax_type_id: self.parent.tax_type_id, tax_amount: precision_value(self.parent.tax_amount&.value), value: precision_value(self.parent.tax), editable: false},
-        tds: {tds_slab_id: self.parent.tds_slab_id, tds_amount: precision_value(self.parent.tds_amount&.value), editable: true, tds_slab_rate: self.parent&.tds_slab&.tds},
-        advance_amount: {value: invoice_advance, editable: false}, # Advance
-        freight_amount: {value: self.parent.freight_amount&.value, editable: false},
-        net_payable_amount: {value: self.parent.balance_due&.value, editable: false},
-        net_total: {value: self.parent.net_amount&.value, editable: false}, #Net Total
-        roundoff_amount: {value: self.parent.roundoff_amount, editable: false},
-        tds_slabs: tds_slabs,
-        tax_rates: self.parent.company.tax_rates,
-        gst_type_id: {value: self.parent.gst_type_id, editable: false},
-        payment_amount: {value: self.amount_value, editable: true}, #Payable Amount
-        balance_due: {value: self.parent.balance_due&.value, editable: false}, # Invoice AMOUNT
-        available_credits: available_credits_amount
+      tds_applicable_amount: calculate_tds_applicable_amount('Invoice'),
+      total_amount: {value: precision_value(self.parent&.item_amounts_total), editable: false}, # TOTAL
+      inclusive_of_taxes: {value: self.parent.inclusive_of_taxes, editable: false},
+      discount: {discount_type_id: self.parent.discount_type_id, rate: self.parent.discount, discount_amount: precision_value(self.parent.discount_amount&.value), editable: false},
+      tax: {tax_type_id: self.parent.tax_type_id, tax_amount: precision_value(self.parent.tax_amount&.value), value: precision_value(self.parent.tax), editable: false},
+      tds: {tds_slab_id: self.parent.tds_slab_id, tds_amount: precision_value(self.parent.tds_amount&.value), editable: true, tds_slab_rate: self.parent&.tds_slab&.tds},
+      advance_amount: {value: invoice_advance, editable: false}, # Advance
+      freight_amount: {value: self.parent.freight_amount&.value, editable: false},
+      net_payable_amount: {value: self.parent.balance_due&.value, editable: false},
+      net_total: {value: self.parent.net_amount&.value, editable: false}, #Net Total
+      roundoff_amount: {value: self.parent.roundoff_amount, editable: false},
+      tds_slabs: tds_slabs,
+      tax_rates: self.parent.company.tax_rates,
+      gst_type_id: {value: self.parent.gst_type_id, editable: false},
+      payment_amount: {value: self.amount_value, editable: true}, #Payable Amount
+      balance_due: {value: self.parent.balance_due&.value, editable: false}, # Invoice AMOUNT
+      available_credits: available_credits_amount,
+
+      invoice_balance_due: {value: self.invoice_balance_due, editable: true}, 
+      reporting_invoice_balance_due: {value: self.reporting_invoice_balance_due, editable: false},     
+      invoice_sub_total_amount: {value: self.invoice_sub_total_amount, editable: false}, 
+      reporting_invoice_sub_total_amount: {value: self.reporting_invoice_sub_total_amount, editable: false},
+      invoice_net_total_amount: {value: self.invoice_net_total_amount, editable: false},
+      reporting_invoice_net_total_amount: {value: self.reporting_invoice_net_total_amount, editable: false} 
     }
   end
 
