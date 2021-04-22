@@ -7,7 +7,7 @@ class Authenticator::SsoConfig < Transactions::API
   step :set_results
 
   def find_company(options, params:, **)
-    subdomain = params[:subdomain] || options[:request]&.subdomain || 'test'
+    subdomain = params[:subdomain] || options[:request]&.subdomain
     company = Company.find_by(subdomain: subdomain)
     # company = Company.find_by(id: 2)
     options[:company] = company
