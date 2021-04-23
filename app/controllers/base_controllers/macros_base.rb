@@ -18,7 +18,10 @@ class BaseControllers::MacrosBase < ApplicationController
   end
 
   def current_user
-    user = current_macro&.user
+    user = nil
+    ActsAsTenant.without_tenant do
+      user = current_macro&.user
+    end
     ActsAsTenant.current_tenant = user&.company
     user
   end
