@@ -28,13 +28,7 @@ class SingleSignOnConfiguration < ApplicationRecord
   belongs_to :single_sign_on_type
 
   def self.as_json(options = {})
-    {
-      id: id,
-      label: label,
-      finly_sso_path: finly_sso_path,
-      logo: logo,
-      sso_type: sso_type
-    }
+    super(options)
   end
 
   scope :with_single_sign_on_type, -> (type_id) {
@@ -44,5 +38,15 @@ class SingleSignOnConfiguration < ApplicationRecord
   scope :with_id, -> (id) {
     where id: id
   }
+
+  def as_json(options={})
+    {
+      id: id,
+      label: label,
+      finly_sso_path: finly_sso_path,
+      logo: logo,
+      sso_type: sso_type
+    }
+  end
 
 end
