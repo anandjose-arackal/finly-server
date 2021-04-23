@@ -25,7 +25,7 @@
 #  deleted_at           :datetime
 #
 
-class Notification < ApplicationRecord
+class Notification < ApplicationRecordBackwardCompatibility
   belongs_to :company, optional: true
   belongs_to :notification_type, optional: true
   belongs_to :user, optional: true

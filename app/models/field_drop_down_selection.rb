@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class FieldDropDownSelection < ApplicationRecord
+class FieldDropDownSelection < ApplicationRecordBackwardCompatibility
   belongs_to :company, optional: true
   has_one :custom_field, as: :value
   has_one :field_configuration, as: :default_value

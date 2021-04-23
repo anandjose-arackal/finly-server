@@ -32,7 +32,7 @@
 #  tat_added_by_script             :boolean          default(FALSE)
 #
 
-class DocumentLevelReviewerMapping < ApplicationRecord
+class DocumentLevelReviewerMapping < ApplicationRecordBackwardCompatibility
 
   # When a single reviewer is selected from each level in the reviewal chain
   # a new mapping is created. If nothing is selected it falls back to reviewer(s) in the

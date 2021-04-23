@@ -56,7 +56,7 @@
 #  date                                       :datetime
 #
 
-class BudgetTrail < ApplicationRecord
+class BudgetTrail < ApplicationRecordBackwardCompatibility
 
   belongs_to :company, optional: true
   belongs_to :entity, optional: true, polymorphic: true

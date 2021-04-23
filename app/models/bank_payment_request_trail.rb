@@ -17,7 +17,7 @@
 #  deleted_at              :datetime
 #
 
-class BankPaymentRequestTrail < ApplicationRecord
+class BankPaymentRequestTrail < ApplicationRecordBackwardCompatibility
 
   attr_accessor :excluded_id_ranges
 

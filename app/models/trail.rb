@@ -22,7 +22,7 @@
 #  deleted_at                :datetime
 #
 
-class Trail < ApplicationRecord
+class Trail < ApplicationRecordBackwardCompatibility
   belongs_to :company, optional: true
   belongs_to :parent, optional: true, polymorphic: true
   belongs_to :action, optional: true, class_name: 'TrailAction'
