@@ -181,7 +181,7 @@ class InvoiceLineItem < ApplicationRecord
   
   # Updating this for forms, due to some unknown issue 
   # before_save :set_tds_applicable
-  after_commit :set_tds_applicable, on: [:create, :update]
+  # after_commit :set_tds_applicable, on: [:create, :update]
 
   after_save :budget_trail_entry
   after_save :sync_amounts, unless: :skip_callback
@@ -239,7 +239,7 @@ class InvoiceLineItem < ApplicationRecord
   end
 
   def tds_applicable?
-    self&.tds_applicable
+    self&.tds_applicable || self&.inventory_line_item&.tds_applicable
   end
 
   def as_json(options = {})
@@ -336,9 +336,7 @@ class InvoiceLineItem < ApplicationRecord
   end
 
   def set_tds_applicable
-    self.skip_callback = true
     self.tds_applicable = self&.inventory_line_item&.tds_applicable
-    self.save
   end
 
   def forms_extra_data(type = nil, entity_key = nil)
