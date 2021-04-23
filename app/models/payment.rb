@@ -993,6 +993,7 @@ include Searchkick::Api
         owner_name: {name: self.receiving_account&.account_owner&.display_name, label: 'Vendor'},
         account_number: {number: self.receiving_account&.account_number},
         ifsc: {code: self.receiving_account&.ifsc},
+        swift: {code: self.receiving_account&.swift_code},
         beneficiary_type: {type: get_beneficiary_type},
         field_details: get_field_details('Invoice')
     }

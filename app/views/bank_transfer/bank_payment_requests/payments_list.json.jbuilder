@@ -15,6 +15,7 @@ json.payments do
       json.name payment.receiving_account&.name
       json.account_number payment.receiving_account&.account_number
       json.ifsc payment.receiving_account&.ifsc
+      json.swift_code payment.receiving_account&.swift_code
     else
       json.owner_name payment.receiving_account&.account_owner&.name
       json.beneficiary_id payment.receiving_account&.account_owner&.id
