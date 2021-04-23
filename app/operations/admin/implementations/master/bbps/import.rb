@@ -68,7 +68,7 @@ class Admin::Implementations::Master::BBPS::Import < Admin::Implementations::Pro
 
     input = data.merge(format_data.success)
     unless subscription.validate(input) and subscription.save
-      return result false, subscription.errors.full_messages
+      return result false, subscription.errors.messages.to_s
     end
 
     unless subscription.model.persisted?
