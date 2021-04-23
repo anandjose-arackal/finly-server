@@ -10,7 +10,9 @@ class IciciBankStatusCheckerBackground
       begin
         pending_transactions = IciciBankTransaction.processing_transactions
         pending_transactions.each do |bank_transaction|
-          BankTransfer::Icici::Transactions::CheckStatus.(bank_transaction)
+          ActsAsTenant.with_tenant bank_transaction.company do
+            BankTransfer::Icici::Transactions::CheckStatus.(bank_transaction)
+          end
         end
       rescue Exception => error
         error.backtrace.each do |line|

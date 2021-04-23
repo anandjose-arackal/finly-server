@@ -14,13 +14,15 @@ class YesBankBalanceProvider
           Resque.enqueue(queue, {success: false, message: 'Company not found'})
           return
         end
-        op = YesBankApi::Balance::GetBalance.(company)
-        # return the balance given by the API
-        if op.success?
-          balance = op.balance&.to_d
-          Resque.enqueue(queue, {success: true, balance: balance})
-        else
-          Resque.enqueue(queue, {success: false, balance: 0, messages: op.messages[:error]})
+        ActsAsTenant.with_tenant company do
+          op = YesBankApi::Balance::GetBalance.(company)
+          # return the balance given by the API
+          if op.success?
+            balance = op.balance&.to_d
+            Resque.enqueue(queue, {success: true, balance: balance})
+          else
+            Resque.enqueue(queue, {success: false, balance: 0, messages: op.messages[:error]})
+          end
         end
       rescue Exception => e
         Resque.enqueue(queue, {success: false, balance: 0, messages: e.message})

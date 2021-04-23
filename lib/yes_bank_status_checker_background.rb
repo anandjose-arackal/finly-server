@@ -10,8 +10,10 @@ class YesBankStatusCheckerBackground
       begin
         pending_transactions = YesBankTransaction.processing_transactions.non_penny_test.all
         pending_transactions.find_each do |trans|
-          # where all the magic happens!
-          BankTransfer::YesBank::CheckStatus.(trans)
+          ActsAsTenant.with_tenant trans.company do
+            # where all the magic happens!
+            BankTransfer::YesBank::CheckStatus.(trans)
+          end
         end
       rescue Exception => error
         error.backtrace.each do |line|
