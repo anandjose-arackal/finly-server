@@ -54,6 +54,8 @@ json.results do
       json.advance_rate precision_value invoice.advance_rate
       json.base_currency_id invoice.get_base_currency.id
       json.base_currency_code invoice.get_base_currency.country_code
+      json.is_domestic invoice.is_domestic
+
       #############################
       json.invoice_attachment do
         json.url invoice.invoice_attachments.first&.attached_file&.url
