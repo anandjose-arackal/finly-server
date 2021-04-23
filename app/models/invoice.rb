@@ -1097,8 +1097,7 @@ class Invoice < ApplicationRecord
 
   def include_original_amount
     if self.invoice_items.present?
-      # precision_value(self.amount&.value)
-      1234
+      precision_value(self.amount&.value)
     else
       precision_value(self.original_amount&.value)
     end
@@ -1808,10 +1807,10 @@ class Invoice < ApplicationRecord
 
   # Syncs amounts from new forms structure to legacy amounts table
   def sync_amounts
+    self.skip_callback = true
     base_currency_id = get_base_currency&.id
 
     if invoice_gross_amount.present?
-      self.skip_callback = true
       amounts_attributes_map.each do |key, value|
         # if an invoice has a payment associated with self, then do not update balance_payable, adding a workaround as balance payable do not get updated.
         next if self.payments.present? && key.to_s == 'invoice_balance_due'
@@ -1874,6 +1873,7 @@ class Invoice < ApplicationRecord
                                "#{key}": amount_value
                              })
     end
+    self.save
   end
 
   def amounts_attributes_map
