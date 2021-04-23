@@ -18,11 +18,15 @@ class BaseControllers::MacrosBase < ApplicationController
   end
 
   def current_user
-    current_macro&.user
+    user = current_macro&.user
+    ActsAsTenant.current_tenant = user&.company
+    user
   end
 
   def current_macro
-    Macro.find_by id: params[:macro_id]
+    ActsAsTenant.without_tenant do
+      Macro.find_by id: params[:macro_id]
+    end
   end
 
   def skip_finly_authorize?
