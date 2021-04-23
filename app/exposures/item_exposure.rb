@@ -17,6 +17,10 @@ class ItemExposure < Exposures::API
   attribute :tax_rate_value, includes: [:tax_rate] do 
     record&.tax_rate&.name
   end
+
+  attribute :tax_percentage, includes: [:tax_rate] do 
+    record&.tax_rate&.rate
+  end
   attribute :item_code, record_attribute: true
   attribute :account, record_attribute: true
   attribute :scope, includes: [:supply_item_type] do
@@ -28,7 +32,7 @@ class ItemExposure < Exposures::API
   end
   attribute :deleted_at, record_attribute: true
   attribute :product_type_id, record_attribute: true
-  attribute :product_type, includes: [:product_type] do
+  attribute :product_type_value, includes: [:product_type] do
     record.product_type&.name&.titleize
   end
   attribute :item_number, record_attribute: true

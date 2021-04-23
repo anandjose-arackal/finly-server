@@ -293,7 +293,8 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       lookup :tax_rate_id, label: "Tax Rate", editable: true, visible: true, choices_scope: Choices[:lookup].('tax_rates'), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.tax_rate_id}}')
 
       # tax # tax percentage
-      number :tax_percentage, editable: false, visible: true, computed: Forms::Compute::Lookup('items.tax_rate_id', '{{record.rate}}')
+      # number :tax_percentage, editable: false, visible: true, computed: Forms::Compute::Lookup('items.tax_rate_id', '{{record.rate}}')
+      number :tax_percentage, editable: false, visible: true, computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.tax_percentage }}')
 
       # tax_amount = taxable_amount x tax / 100
       amount :item_tax_amount, label: 'Item Tax Amount', editable: false, visible: true,

@@ -40,15 +40,7 @@ class Forms::Ops::LookupDetails < Transactions::API
 
   def find_dependent_entities(context, model:, entity:, **)
     # need to update this from 2 level to a recurcive function where all level of entities could be fetched
-    all_dependent_entities = []
-
-    dependent_entities = model.entities.where(compute_lookup_entity: entity)
-    all_dependent_entities << dependent_entities
-
-    dependent_entities.each do |dep_ent|
-      all_dependent_entities << model.entities.where(compute_lookup_entity: dep_ent)
-    end
-    context[:dependent_entities] = all_dependent_entities.flatten
+    context[:dependent_entities] = model.entities.where(compute_lookup_entity: entity)
   end
 
   def compute(context, params:, entity_exposure:, dependent_entities:, **)
