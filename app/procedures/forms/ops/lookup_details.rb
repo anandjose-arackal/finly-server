@@ -43,7 +43,7 @@ class Forms::Ops::LookupDetails < Transactions::API
     all_dependent_entities = []
 
     dependent_entities = model.entities.where(compute_lookup_entity: entity)
-    all_dependent_entities << dependent_entities.flatten
+    all_dependent_entities << dependent_entities
 
     dependent_entities.each do |dep_ent|
       all_dependent_entities << model.entities.where(compute_lookup_entity: dep_ent)
