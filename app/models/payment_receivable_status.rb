@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class PaymentReceivableStatus < ApplicationRecord
+class PaymentReceivableStatus < NonTenantedApplicationRecord
   include Seedable
 
   def self.values

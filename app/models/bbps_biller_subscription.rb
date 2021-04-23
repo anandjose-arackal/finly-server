@@ -94,7 +94,7 @@ include Searchkick::Api
   delegate :draft?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :deactivated?, :reactivated?, to: :status
 
   def self.default_scope
-    unscoped.order('bbps_biller_subscriptions.created_at DESC')
+    include_soft_deleted.order('bbps_biller_subscriptions.created_at DESC')
   end
 
   scope :filter_ids, -> (ids) {where(id: ids)}

@@ -7,7 +7,7 @@
 #  deleted_at :datetime
 #
 
-class TrailAction < ApplicationRecord
+class TrailAction < NonTenantedApplicationRecord
   include Seedable
   def self.values
     [

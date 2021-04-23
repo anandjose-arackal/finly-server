@@ -26,6 +26,7 @@
 #
 
 class Notification < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :notification_type, optional: true
   belongs_to :user, optional: true
   belongs_to :action_type, optional: true, class_name: "NotificationActionType"
@@ -248,7 +249,7 @@ class Notification < ApplicationRecord
         content = "Syncing with Quickbooks was partially successful - refer to reports list to see what all were successful"
         return content
       when NotificationActionType.id_for(:notify_credit_confirmation)
-        bank_payment_request = BankPaymentRequest.unscoped.find_by(id: self.object_id)
+        bank_payment_request = BankPaymentRequest.include_soft_deleted.find_by(id: self.object_id)
         content = "Credit for one of your payments in Payment Order: #{bank_payment_request.name} was successful!"
         return content
       when NotificationActionType.id_for(:notify_credit_failure)
@@ -277,7 +278,7 @@ class Notification < ApplicationRecord
         else
           object = " report"
         end
-        r = Report.unscoped.find_by(id: self.object_id)
+        r = Report.include_soft_deleted.find_by(id: self.object_id)
         object_name = " : \"#{r.name}\""
         if action_type_id == NotificationActionType.id_for(:notify_auto_approve)
           object_name += " has been auto approved"
@@ -288,11 +289,11 @@ class Notification < ApplicationRecord
       when "Money Request"
         if action_type_id == NotificationActionType.id_for(:notify_credit_advance_request)
           object = " for a money request"
-          mr = MoneyRequest.unscoped.find_by(id: self.object_id)
+          mr = MoneyRequest.include_soft_deleted.find_by(id: self.object_id)
           object_name = " : \"#{mr.name}\""
         else
           object = " money request"
-          mr = MoneyRequest.unscoped.find_by(id: self.object_id)
+          mr = MoneyRequest.include_soft_deleted.find_by(id: self.object_id)
           object_name = " : \"#{mr.name}\""
         end
         if action_type_id == NotificationActionType.id_for(:notify_auto_approve)
@@ -307,7 +308,7 @@ class Notification < ApplicationRecord
         else
           object = " payment order"
         end
-        bpr = BankPaymentRequest.unscoped.find_by(id: self.object_id)
+        bpr = BankPaymentRequest.include_soft_deleted.find_by(id: self.object_id)
         object_name = " : \"#{bpr.name}\""
         if action_type_id == NotificationActionType.id_for(:notify_auto_approve)
           object_name += " has been auto approved"
@@ -320,7 +321,7 @@ class Notification < ApplicationRecord
          # todo - add logic to handle this
       when "Expense"
         object = " an expense"
-        e = Expense.unscoped.find_by(id: self.object_id)
+        e = Expense.include_soft_deleted.find_by(id: self.object_id)
         object_name = " at #{e.merchant_name}"
       when "Card"
         object = " to your card"
@@ -391,7 +392,7 @@ class Notification < ApplicationRecord
 
     case self.path_object_type
       when "Report"
-        path_object = Report.unscoped.find_by(id: self.path_object_id)
+        path_object = Report.include_soft_deleted.find_by(id: self.path_object_id)
         if path_object.is_deleted?
           path = "reports"
         else
@@ -401,7 +402,7 @@ class Notification < ApplicationRecord
         suffix = "/params={\"view\":" + view
         path = "reports"
       when "Money Request"
-        path_object = MoneyRequest.unscoped.find_by(id: self.path_object_id)
+        path_object = MoneyRequest.include_soft_deleted.find_by(id: self.path_object_id)
         if path_object.is_deleted?
           path = "requests"
         else
@@ -426,14 +427,14 @@ class Notification < ApplicationRecord
           path = "employees"
         end
       when "PaymentOrder", "Payment Order"
-        path_object = BankPaymentRequest.unscoped.find_by(id: self.path_object_id)
+        path_object = BankPaymentRequest.include_soft_deleted.find_by(id: self.path_object_id)
         if path_object.blank?
           path = "orders"
         else
           path = "orders/#{self.path_object_id}"
         end
       when "Purchase Order"
-        document = PurchaseOrder.unscoped.find_by(id: self.path_object_id)
+        document = PurchaseOrder.include_soft_deleted.find_by(id: self.path_object_id)
         if document.blank? || document&.procurement.blank?
           path = "purchase_orders"
           suffix = "/params={"
@@ -442,7 +443,7 @@ class Notification < ApplicationRecord
           suffix = "/params={\"procurement_id\":#{document.procurement_id}"
         end
       when 'Invoice'
-        document = Invoice.unscoped.find_by(id: self.path_object_id)
+        document = Invoice.include_soft_deleted.find_by(id: self.path_object_id)
         if document.blank? || document&.procurement.blank?
           path = "new_payment_invoices"
           suffix = "/params={"
@@ -476,13 +477,13 @@ class Notification < ApplicationRecord
   def retrieve_object_preposition
     case object_type
       when "Report"
-        object = Report.unscoped.find_by(id: object_id)
+        object = Report.include_soft_deleted.find_by(id: object_id)
       when "Money Request"
-        object = MoneyRequest.unscoped.find_by(id: object_id)
+        object = MoneyRequest.include_soft_deleted.find_by(id: object_id)
       when 'Purchase Order'
-        object = PurchaseOrder.unscoped.find_by(id: object_id)
+        object = PurchaseOrder.include_soft_deleted.find_by(id: object_id)
       when 'Invoice'
-        object = Invoice.unscoped.find_by(id: object_id)
+        object = Invoice.include_soft_deleted.find_by(id: object_id)
       else
         return ""
     end

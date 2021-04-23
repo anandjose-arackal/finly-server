@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class PaymentStatus < ApplicationRecord
+class PaymentStatus < NonTenantedApplicationRecord
   # Documentation at end of the file
   VALUES = {
       completed: 1,

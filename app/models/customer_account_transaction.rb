@@ -17,6 +17,7 @@
 # Transaction type: credit, debit
 
 class CustomerAccountTransaction < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :customer_account, optional: true
   belongs_to :virtual_account_transaction, optional: true
   belongs_to :associated_object, optional: true, polymorphic: true

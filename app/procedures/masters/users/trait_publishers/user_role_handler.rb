@@ -8,7 +8,7 @@ class Masters::Users::TraitPublishers::UserRoleHandler < Masters::Users::TraitPu
     return if changed_since.nil?
     return unless enabled?
 
-    role_mappings = UserRoleMapping.unscoped.where('user_role_mappings.updated_at > ?', changed_since)
+    role_mappings = UserRoleMapping.include_soft_deleted.where('user_role_mappings.updated_at > ?', changed_since)
                         .joins(:user)
                         .where.not(users: {company_id: IGNORE_LIST})
     role_mappings = role_mappings.limit(100) if dry_run
@@ -42,7 +42,7 @@ class Masters::Users::TraitPublishers::UserRoleHandler < Masters::Users::TraitPu
         }
     )
 
-    role_mappings = PolicyUserRole.unscoped.where('policy_user_roles.updated_at > ?', changed_since)
+    role_mappings = PolicyUserRole.include_soft_deleted.where('policy_user_roles.updated_at > ?', changed_since)
                         .joins(:user)
                         .where.not(users: {company_id: IGNORE_LIST})
     role_mappings = role_mappings.limit(100) if dry_run

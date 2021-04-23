@@ -13,6 +13,7 @@
 #
 
 class EmailAuthorization < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :authorizable, optional: true, polymorphic: true
   belongs_to :user, optional: true
 

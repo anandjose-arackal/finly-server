@@ -15,6 +15,7 @@
 class PerDiemExpense < ApplicationRecord
   include SoftDeletable
 
+  belongs_to :company, optional: true
   belongs_to :expense, optional: true
   belongs_to :per_diem, optional: true
 

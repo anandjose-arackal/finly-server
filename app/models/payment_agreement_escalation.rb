@@ -16,6 +16,7 @@
 #
 
 class PaymentAgreementEscalation < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :payment_agreement, optional: true
   belongs_to :period, optional: true
 

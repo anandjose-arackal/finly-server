@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class TransferMode < ApplicationRecord
+class TransferMode < NonTenantedApplicationRecord
 	include Seedable
 
   def self.values

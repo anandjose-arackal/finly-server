@@ -28,7 +28,7 @@
 #  deleted_at           :datetime
 #
 
-class Email < ApplicationRecord
+class Email < NonTenantedApplicationRecord
   serialize :recipient, JSON
 
   belongs_to :entity, polymorphic: true, optional: true

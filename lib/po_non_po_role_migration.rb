@@ -56,7 +56,7 @@ class PoNonPoRoleMigration
 
 
   def copy_to_po_invoice
-    reviewal_levels = ReviewalLevel.unscoped.where(associated_entity_type: 'InvoiceProvider')
+    reviewal_levels = ReviewalLevel.include_soft_deleted.where(associated_entity_type: 'InvoiceProvider')
     reviewal_levels.each do |reviewal_level|
       new_reviewal_level = reviewal_level.dup
       new_reviewal_level.associated_entity_type = "PoInvoiceProvider"
@@ -82,7 +82,7 @@ class PoNonPoRoleMigration
 
 
   def copy_to_non_po_invoice
-    reviewal_levels = ReviewalLevel.unscoped.where(associated_entity_type: 'InvoiceProvider')
+    reviewal_levels = ReviewalLevel.include_soft_deleted.where(associated_entity_type: 'InvoiceProvider')
     reviewal_levels.each do |reviewal_level|
       new_reviewal_level = reviewal_level.dup
       new_reviewal_level.associated_entity_type = "NonPoInvoiceProvider"

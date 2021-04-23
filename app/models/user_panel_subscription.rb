@@ -17,6 +17,8 @@
 class UserPanelSubscription < ApplicationRecord
   belongs_to :user, optional: true
 
+  belongs_to :company, optional: true
+
   validate :at_least_one_panel
 
   private

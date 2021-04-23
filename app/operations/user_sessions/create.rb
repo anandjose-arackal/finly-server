@@ -230,6 +230,7 @@ class UserSessions::Create < BaseOperation
     args[:events_attributes][0][:view] = current_view
     args[:events_attributes][0][:status_id] = UserSessionStatus.id_for(self.status)
     args[:events_attributes][0][:message] = params[:message]
+    args[:events_attributes][0][:company_id] = user&.company&.id
   end
 
 end

@@ -16,7 +16,7 @@
 #  reporting_currency_code :string(255)      default("INR")
 #
 
-class Company < ApplicationRecord
+class Company < NonTenantedApplicationRecord
   include Constants
   include LiquidDroppable
   include Exposures::Model::Exposable
@@ -243,6 +243,10 @@ class Company < ApplicationRecord
         name: name,
         active: active
     }
+  end
+
+  def self.id
+    self.pluck(:id)
   end
 
   def vendor_payment_policies

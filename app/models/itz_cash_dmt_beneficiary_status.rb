@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class ItzCashDmtBeneficiaryStatus < ApplicationRecord
+class ItzCashDmtBeneficiaryStatus < NonTenantedApplicationRecord
 
   validates :name, presence: true
 

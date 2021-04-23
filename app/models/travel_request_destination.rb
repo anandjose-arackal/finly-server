@@ -12,6 +12,7 @@
 
 class TravelRequestDestination < ApplicationRecord
 
+  belongs_to :company, optional: true
   belongs_to :location, optional: true, dependent: :destroy
   belongs_to :travel_request, optional: true
   # has_many :booking_requests, dependent: :destroy

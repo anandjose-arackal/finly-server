@@ -5,11 +5,12 @@ class Admin::Users::Base < Admin::Base
     attr_accessor :created_user, :selected_user, :cards, :policies, :mapping,
                   :managers, :finance_managers, :wallet, :user_panel_subscription,
                   :itz_cash_card_programs, :reviewers, :creditors,
-                  :mapping_em, :mapping_vp
+                  :mapping_em, :mapping_vp, :company
 
     def init
       self.created_user = params[:created_user]
       self.selected_user = params[:selected_user]
+      self.company = self.selected_user.company
       self.wallet = selected_user.wallet
       self.cards = retrieve_card_data
       self.policies = selected_user.policies

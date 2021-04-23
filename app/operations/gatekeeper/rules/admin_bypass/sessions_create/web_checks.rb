@@ -5,6 +5,15 @@ Gatekeeper::Checker.new 'AdminUserBypass > On Web Authentication' do
       rule 'Only admin.finly.io can be used for accessing admin panel' do
         domain = RequestStoreUtil.current_request.domain
         subdomain = RequestStoreUtil.current_request.subdomains(0)&.first
+
+        if Rails.env.staging?
+          next if domain == 'finly.io' and ['dev', 'dev2', 'dev3', 'dev4', 'dev5', 'qa1', 'qa2', 'qa3'].include?(subdomain)
+        end
+
+        if Rails.env.development?
+          next if domain == 'localhost'
+        end
+
         next if domain == 'finly.io' and ['admin'].include?(subdomain)
 
         message "Only admin.finly.io can be used for accessing admin panel. Attempted login with domain: #{domain} subdomain: #{subdomain}"
@@ -17,6 +26,9 @@ Gatekeeper::Checker.new 'AdminUserBypass > On Web Authentication' do
     section 'IP check' do
       rule 'Only authorized IP can be used for accessing admin panel' do
         admin_user = params[:admin_user]
+
+        next if (Rails.env.staging? || Rails.env.development?)
+
         next if RequestStoreUtil.current_request.remote_ip == admin_user&.authorized_ip
 
         message "Admin Panel > Unauthorized IP > Email: #{admin_user.email} Attempted IP: #{RequestStoreUtil.current_request.remote_ip}"

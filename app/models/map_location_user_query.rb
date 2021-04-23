@@ -19,6 +19,7 @@
 class MapLocationUserQuery < ApplicationRecord
   include UUIDHelper
 
+  belongs_to :company, optional: true
   belongs_to :user
   belongs_to :map_location_detail
 

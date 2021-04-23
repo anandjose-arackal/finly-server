@@ -14,7 +14,7 @@
 #
 
 class UserRoleMapping < ApplicationRecord
-
+  belongs_to :company, optional: true
   belongs_to :user, optional: true
   belongs_to :user_role, optional: true
   belongs_to :company_department, optional: true

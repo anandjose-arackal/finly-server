@@ -9,6 +9,6 @@
 #  deleted_at :datetime
 #
 
-class CardType < ApplicationRecord
+class CardType < NonTenantedApplicationRecord
 
 end

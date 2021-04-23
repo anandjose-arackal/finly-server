@@ -7,7 +7,7 @@
 #  deleted_at :datetime
 #
 
-class CompanyFundsLoadRequestType < ApplicationRecord
+class CompanyFundsLoadRequestType < NonTenantedApplicationRecord
   include Seedable
 
   def self.values

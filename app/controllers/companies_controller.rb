@@ -29,6 +29,9 @@ class CompaniesController < BaseControllers::WebBase
 
   def single_sign_on_configs
     @op = Authenticator::SsoConfig.({ params: params.to_unsafe_h, request: self.request })
+
+    ActsAsTenant.current_tenant = @op['company']
+
     @sso_configs = @op['result']
   end
 

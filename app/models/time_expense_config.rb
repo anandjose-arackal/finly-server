@@ -14,6 +14,7 @@
 #
 
 class TimeExpenseConfig < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :default_category, optional: true, class_name: "Category"
   belongs_to :rate, optional: true, class_name: "Amount"
   belongs_to :period, optional: true

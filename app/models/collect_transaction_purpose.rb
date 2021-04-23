@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class CollectTransactionPurpose < ApplicationRecord
+class CollectTransactionPurpose < NonTenantedApplicationRecord
   include Seedable
 
   def self.values

@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class PaymentOrderStatus < ApplicationRecord
+class PaymentOrderStatus < NonTenantedApplicationRecord
 
   VALUES = {
       cancelled: 1,
