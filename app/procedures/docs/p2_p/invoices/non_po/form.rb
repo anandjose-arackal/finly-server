@@ -51,7 +51,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       invoice_total_amount: "{{ form.invoice_sub_total_amount | plus: form.invoice_roundoff_amount | minus: form.invoice_tds_amount | minus: form.invoice_paid_outside_amount | default: 0 | round: 2}}",
       
       #### net payable amount has roundoff value added
-      invoice_net_total_amount: "{{ form.invoice_total_amount | default: 0 | round }}",
+      invoice_net_total_amount: "{% if form.base_currency != '1' %}{{ form.invoice_total_amount | default: 0 | round }}{% else %}{{ form.invoice_total_amount | default: 0 | round: 2 }}{% endif %}",
       invoice_advance_paid_amount: "{{ form.invoice_advance_paid_amount | default: 0 | round: 2}}",
       invoice_balance_due: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | default: 0 | round: 2}}",
       
