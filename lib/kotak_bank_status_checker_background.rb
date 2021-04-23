@@ -11,16 +11,18 @@ class KotakBankStatusCheckerBackground
         bank_transactions = KotakBankTransaction.without_utr.status_check_required
 
         bank_transactions.each do |bank_transaction|
-          parameters = {
-              unique_reference_number: bank_transaction.unique_reference_number,
-              company_id: bank_transaction.company_id,
-              bank_transaction: bank_transaction
-          }
-          op = KotakBankApi::TransactionStatus.(parameters)
-          unless op.success?
-            error_logger.error("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-            error_logger.error(op.messages)
-            error_logger.error("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+          ActsAsTenant.with_tenant bank_transaction.company do
+            parameters = {
+                unique_reference_number: bank_transaction.unique_reference_number,
+                company_id: bank_transaction.company_id,
+                bank_transaction: bank_transaction
+            }
+            op = KotakBankApi::TransactionStatus.(parameters)
+            unless op.success?
+              error_logger.error("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+              error_logger.error(op.messages)
+              error_logger.error("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+            end
           end
         end
       rescue Exception => error
