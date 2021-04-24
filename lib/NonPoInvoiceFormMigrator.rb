@@ -3,8 +3,8 @@ class NonPoInvoiceMigrator
 
     result = []
     company = Company.find company_id
-    documents = Invoice.where(invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)).where(company_id: company.id)
-    # documents = Invoice.where(id: 10686).where(company_id: company.id)
+    # documents = Invoice.where(invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)).where(company_id: company.id)
+    documents = Invoice.where(id: 10710).where(company_id: company.id)
 
     # FormCustomField.where(company_id: company_id).destroy_all
     form = Form.where(klass_name: 'Docs::P2P::Invoices::NonPo::Form', company_id: company_id).first
@@ -224,6 +224,14 @@ class NonPoInvoiceMigrator
   end
 
   def self.update_invoice_details document
+    
+
+    invoice_sub_total_amount = document&.item_amounts_total.to_f - document&.discount_amount&.value.to_f + document&.tax_amount&.value.to_f + document&.freight_amount&.value.to_f
+    if document&.rcm_enabled
+      invoice_sub_total_amount = invoice_sub_total_amount.to_f - document&.tax_amount&.value.to_f
+    end
+    invoice_total_amount = invoice_sub_total_amount + document&.roundoff_amount.to_f - document&.tds_amount&.value.to_f - document&.advance_amount&.value.to_f 
+
     update_params = {
 
       base_currency: Currency.find_by(country_code: 'INR').id,
@@ -271,11 +279,13 @@ class NonPoInvoiceMigrator
       # billing_address: document&.billing_address,
       # shipping_address: document&.shipping_address,
 
-
       # INVOICE SUMMARY
       invoice_gross_amount: document&.item_amounts_total.to_f,
       reporting_invoice_gross_amount: document&.item_amounts_total.to_f,
-      
+
+
+
+
       invoice_discount_amount: document&.discount_amount&.value,
       reporting_invoice_discount_amount: document&.discount_amount&.value,
       
@@ -302,21 +312,30 @@ class NonPoInvoiceMigrator
       invoice_roundoff_amount: document&.roundoff_amount,
       reporting_invoice_roundoff_amount: document&.roundoff_amount,
 
-      invoice_sub_total_amount: document&.balance_due&.value.to_f,
-      reporting_invoice_sub_total_amount: document&.balance_due&.value.to_f,
+
+      # if rcm == true
+      #   invoice_sub_total_amount = 
+            # invoice_gross_amount - invoice_discount_amount + invoice_freight_amount
+            # ============ document&.item_amounts_total.to_f - document&.discount_amount&.value + document&.freight_amount&.value
+      # else
+      #   invoice_sub_total_amount = 
+            # invoice_gross_amount - invoice_discount_amount + invoice_tax_amount + invoice_freight_amount
+            # ============ document&.item_amounts_total.to_f - document&.discount_amount&.value + document&.tax_amount&.value + document&.freight_amount&.value
+      # end
 
 
-      # invoice_total_amount: document&.net_amount&.value - document&.advance_amount&.value.to_f,
-      # reporting_invoice_total_amount: document&.net_amount&.value - document&.advance_amount&.value.to_f,
+      invoice_sub_total_amount: invoice_sub_total_amount,
+      reporting_invoice_sub_total_amount: invoice_sub_total_amount,
+
+
       
-      # invoice_net_total_amount: document&.net_amount&.value - document&.advance_amount&.value.to_f ,
-      # reporting_invoice_net_total_amount: document&.net_amount&.value - document&.advance_amount&.value.to_f,
+      # invoice_total_amount: invoice_sub_total_amount + invoice_roundoff_amount - invoice_tds_amount - invoice_paid_outside_amount 
 
-      invoice_total_amount: document&.balance_due&.value.to_f,
-      reporting_invoice_total_amount: document&.balance_due&.value.to_f,
+      invoice_total_amount: invoice_total_amount.to_f,
+      reporting_invoice_total_amount: invoice_total_amount.to_f,
 
-      invoice_net_total_amount: document&.balance_due&.value.to_f,
-      reporting_invoice_net_total_amount: document&.balance_due&.value.to_f,
+      invoice_net_total_amount: invoice_total_amount.to_f,
+      reporting_invoice_net_total_amount: invoice_total_amount.to_f,
             
       invoice_advance_paid_amount: document&.payments&.successful&.joins(:amount)&.sum(:value),
       reporting_invoice_advance_paid_amount: document&.payments&.successful&.joins(:amount)&.sum(:value),
