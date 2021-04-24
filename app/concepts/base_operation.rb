@@ -111,7 +111,7 @@ class BaseOperation
   # Set current company in init method and use it as tenant.
   def set_current_tenant
     if self.respond_to? :company
-      if self.company.present?
+      if self.company.present? and self.company.is_a?(Company)
         ActsAsTenant.current_tenant = self.company
       end
     end
