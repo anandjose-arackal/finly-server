@@ -3,9 +3,16 @@ class ApplicationMailer < ActionMailer::Base
           "Message-ID" => ->(v) { "<#{SecureRandom.hex(32)}#{DateTime.now.strftime('%H%M%S%L')}@finlyhq.com>" }
 
   before_action :add_headers
+  around_action :set_non_tenant
   after_action :log_mail
 
   layout 'mailer'
+
+  def set_non_tenant
+    ActsAsTenant.without_tenant_if_not_set do
+      yield
+    end
+  end
 
   def add_headers
     headers['X-SES-CONFIGURATION-SET'] = 'email_tracker_core'
