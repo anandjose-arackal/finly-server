@@ -1,6 +1,6 @@
-class MlModels::Build
+class MlModels::Build < BaseJob
 
-  def self.perform
+  def self.perform_job
     MlModel::Monitor.build
     MlModel::FormEntityModel.build
   end

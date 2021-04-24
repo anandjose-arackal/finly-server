@@ -26,6 +26,9 @@ class EmailProcessor
       #                                             raw_headers: @email.raw_headers,
       #                                             sent_at: DateTime.parse(@email.headers['Date'])
       ActsAsTenant.with_tenant user.company do
+        RequestStoreUtil.set_current_user user
+        RequestStoreUtil.set_current_company user.company
+
         receipt_email = user.receipt_emails.create subject: StringUtils.force_utf_8_encoding(@email.subject),
                                                   sent_at: DateTime.parse(@email.headers['Date'])
         id = receipt_email.id
