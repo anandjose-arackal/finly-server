@@ -9,7 +9,7 @@ class ApplicationMailer < ActionMailer::Base
   layout 'mailer'
 
   def set_non_tenant
-    ActsAsTenant.without_tenant_if_not_set do
+    ActsAsTenant.without_tenant do
       yield
     end
   end
