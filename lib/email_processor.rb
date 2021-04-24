@@ -7,7 +7,9 @@ class EmailProcessor
 
   def process
 
-    user = User.find_by_email(@email.from[:email])
+    user = ActsAsTenant.without_tenant do
+      User.find_by_email(@email.from[:email])
+    end
     special_response_email = @email.to.select {|e| e[:email] == Constants::SPECIAL_RESPONSE_EMAIL}
     if special_response_email.present? # && user.id == 651
         # pass the special response file to the respective operation
@@ -23,23 +25,24 @@ class EmailProcessor
       #                                             raw_html: @email.raw_html,
       #                                             raw_headers: @email.raw_headers,
       #                                             sent_at: DateTime.parse(@email.headers['Date'])
-
-      receipt_email = user.receipt_emails.create subject: StringUtils.force_utf_8_encoding(@email.subject),
-                                                 sent_at: DateTime.parse(@email.headers['Date'])
-      id = receipt_email.id
-      receipt_email.body = FakeFileIO.new("#{id}_body.txt", @email.body)
-      receipt_email.raw_text = FakeFileIO.new("#{id}_raw_body.txt", @email.raw_body)
-      receipt_email.raw_html = FakeFileIO.new("#{id}_raw_html.txt", @email.raw_html)
-      receipt_email.raw_header = FakeFileIO.new("#{id}_raw_headers.txt", @email.raw_headers)
-      receipt_email.receipt_email_status_id = ReceiptEmailStatus.id_for(:awaiting_processing)
-      receipt_email.save
-      if @email.attachments.any?
-        @email.attachments.each do |attachment|
-          receipt_email.receipt_email_attachments.create(original_attachment: attachment)
+      ActsAsTenant.with_tenant user.company do
+        receipt_email = user.receipt_emails.create subject: StringUtils.force_utf_8_encoding(@email.subject),
+                                                  sent_at: DateTime.parse(@email.headers['Date'])
+        id = receipt_email.id
+        receipt_email.body = FakeFileIO.new("#{id}_body.txt", @email.body)
+        receipt_email.raw_text = FakeFileIO.new("#{id}_raw_body.txt", @email.raw_body)
+        receipt_email.raw_html = FakeFileIO.new("#{id}_raw_html.txt", @email.raw_html)
+        receipt_email.raw_header = FakeFileIO.new("#{id}_raw_headers.txt", @email.raw_headers)
+        receipt_email.receipt_email_status_id = ReceiptEmailStatus.id_for(:awaiting_processing)
+        receipt_email.save
+        if @email.attachments.any?
+          @email.attachments.each do |attachment|
+            receipt_email.receipt_email_attachments.create(original_attachment: attachment)
+          end
         end
+        receipt_email.update_columns(receipt_email_status_id: ReceiptEmailStatus.id_for(:in_progress))
+        Receipt::ReceiptEmails::ProcessEmail.call_async(user.id, receipt_email_id: receipt_email.id)
       end
-      receipt_email.update_columns(receipt_email_status_id: ReceiptEmailStatus.id_for(:in_progress))
-      Receipt::ReceiptEmails::ProcessEmail.call_async(user.id, receipt_email_id: receipt_email.id)
     end
   end
 end
