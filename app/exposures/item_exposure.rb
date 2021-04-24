@@ -18,9 +18,10 @@ class ItemExposure < Exposures::API
     record&.tax_rate&.name
   end
 
-  attribute :tax_percentage, includes: [:tax_rate] do 
-    record&.tax_rate&.rate
-  end
+  # attribute :tax_percentage, includes: [:tax_rate] do 
+  #   record&.tax_rate&.rate
+  # end
+  
   attribute :item_code, record_attribute: true
   attribute :account, record_attribute: true
   attribute :scope, includes: [:supply_item_type] do
