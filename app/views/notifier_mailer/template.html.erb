@@ -18,7 +18,9 @@
         <%= render partial: 'notifier_mailer/partials/body_quote', locals: { payload: @payload } %>
 
         <!-- Custom partials -->
-        <%= render partial: @payload['partial'], locals: { payload: @payload } %>
+        <% if @payload['partial'].present? %>
+          <%= render partial: @payload['partial'], locals: { payload: @payload } %>
+        <% end %>
 
         <%= render partial: 'notifier_mailer/partials/tables', locals: { tables: @payload["tables"] } %>
 
