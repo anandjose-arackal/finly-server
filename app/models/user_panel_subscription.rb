@@ -12,6 +12,7 @@
 #  invoicing_system          :boolean          default(FALSE)
 #  travel_request            :boolean          default(FALSE)
 #  deleted_at                :datetime
+#  weekly_summary_enabled    :boolean          default(FALSE)
 #
 
 class UserPanelSubscription < ApplicationRecord
