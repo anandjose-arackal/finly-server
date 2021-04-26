@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class UserIpStatus < ApplicationRecord
+class UserIpStatus < NonTenantedApplicationRecord
   include Seedable
 
   def self.values

@@ -14,7 +14,7 @@
 #  deleted_at      :datetime
 #
 
-class StatusTag < ApplicationRecord
+class StatusTag < NonTenantedApplicationRecord
   include Seedable
   def self.values
     [

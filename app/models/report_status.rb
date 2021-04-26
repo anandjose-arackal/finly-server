@@ -13,7 +13,7 @@
 
 
 
-class ReportStatus < ApplicationRecord
+class ReportStatus < NonTenantedApplicationRecord
   include Seedable
 
   scope :open, -> { find_by(id: ReportStatus.open_id) }

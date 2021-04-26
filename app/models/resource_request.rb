@@ -12,7 +12,7 @@
 #  deleted_at         :datetime
 #
 
-class ResourceRequest < ApplicationRecord
+class ResourceRequest < NonTenantedApplicationRecord
 
   validates :email, presence: true, format: { allow_blank: true, with: Constants::VALID_EMAIL_FORMAT}
   validates :mobile_number, presence: true

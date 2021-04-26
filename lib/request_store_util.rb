@@ -88,15 +88,21 @@ class RequestStoreUtil
     RequestStore.store[:authorized_scopes] = request_store_data[:authorized_scopes]
     RequestStore.store[:params] = request_store_data[:params]
     RequestStore.store[:current_company] = Company.with_id(request_store_data[:current_company_id])&.first
-    RequestStore.store[:current_session] = UserSession.find_by_id(request_store_data[:current_session_id])
-    RequestStore.store[:current_session_event] = UserSessionEvent.find_by_id(request_store_data[:current_session_event_id])
+    if RequestStore.store[:current_company].present?
+      ActsAsTenant.with_tenant RequestStore.store[:current_company] do
+        RequestStore.store[:current_session] = UserSession.find_by_id(request_store_data[:current_session_id])
+        RequestStore.store[:current_session_event] = UserSessionEvent.find_by_id(request_store_data[:current_session_event_id])
+      end
+    end
     RequestStore.store[:current_token] = Doorkeeper::AccessToken.find_by_id(request_store_data[:current_token_id])
     RequestStore.store[:current_admin_user] = AdminUser.find_by_id(request_store_data[:current_admin_user_id])
     RequestStore.store[:x_finly_rp_attributes] = request_store_data[:x_finly_rp_attributes]
 
     case request_store_data[:current_user_type]
       when User.name
-        RequestStore.store[:current_user] = User.with_id(request_store_data[:current_user_id])&.first
+        RequestStore.store[:current_user] = ActsAsTenant.with_tenant RequestStore.store[:current_company] do
+          User.with_id(request_store_data[:current_user_id])&.first
+        end
       when AdminUser.name
         RequestStore.store[:current_user] = AdminUser.with_id(request_store_data[:current_user_id])&.first
     end

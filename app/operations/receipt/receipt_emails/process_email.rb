@@ -2,8 +2,8 @@
 class Receipt::ReceiptEmails::ProcessEmail < Receipt::ReceiptEmails::Base
 # NOTE: THIS IS A BACKGROUND_OPERATION
   def process
-    download_attachment_urls
     save_receipts
+    download_attachment_urls
     extract_data
     create_expense
   end

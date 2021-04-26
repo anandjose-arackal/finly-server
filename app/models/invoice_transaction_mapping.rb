@@ -12,6 +12,7 @@
 
 class InvoiceTransactionMapping < ApplicationRecord
 
+  belongs_to :company, optional: true
   belongs_to :invoice, optional: true, class_name: "OutwardInvoice"
   belongs_to :va_transaction, optional: true, class_name: "VirtualAccountTransaction"
 end

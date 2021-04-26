@@ -7,7 +7,7 @@
 #  deleted_at :datetime
 #
 
-class OutwardInvoiceType < ApplicationRecord
+class OutwardInvoiceType < NonTenantedApplicationRecord
 
   validates :name, presence: true
 

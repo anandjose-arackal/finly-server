@@ -23,7 +23,6 @@
 #  form_id         :string(255)
 #  parent_id       :string(255)
 #  parent_type     :string(255)
-#  pmml            :text(4294967295)
 #
 class MlModel::Monitor < MlModel
 
@@ -37,6 +36,24 @@ class MlModel::Monitor < MlModel
           required(:type).filled(included_in?: FIELD_TYPES.values)
           optional(:value).filled
         end
+      end
+    end
+  end
+
+  def self.seed_data
+    Company.all.find_each do |company|
+      [
+        { "config" => { "fields" => [{ "name" => "created_by_id", "type" => "category", "value" => "{{record.created_by_id}}" }, { "name" => "policy_id", "type" => "category" }, { "name" => "cost_center_id", "type" => "category" }] }, "build_schedule" => "weekly", "algorithm" => "naive_bayes", "target_key" => "cost_center_id", "target_key_type" => "category", "split_key" => "submitted_at", "split_key_type" => "datetime", "model_klass" => "Invoice" },
+        { "config" => { "fields" => [{ "name" => "created_by_id", "type" => "category", "value" => "{{record.created_by_id}}" }, { "name" => "policy_id", "type" => "category" }, { "name" => "department_id", "type" => "category" }, { "name" => "cost_center_id", "type" => "category" }] }, "build_schedule" => "weekly", "algorithm" => "naive_bayes", "target_key" => "location_id", "target_key_type" => "category", "split_key" => "submitted_at", "split_key_type" => "datetime", "model_klass" => "PurchaseRequest" },
+        { "config" => { "fields" => [{ "name" => "created_by_id", "type" => "category", "value" => "{{record.created_by_id}}" }, { "name" => "policy_id", "type" => "category" }, { "name" => "vendor_id", "type" => "category" }, { "name" => "department_id", "type" => "category" }, { "name" => "cost_center_id", "type" => "category" }] }, "build_schedule" => "weekly", "algorithm" => "naive_bayes", "target_key" => "location_id", "target_key_type" => "category", "split_key" => "submitted_at", "split_key_type" => "datetime", "model_klass" => "Invoice" },
+        { "config" => { "fields" => [{ "name" => "created_by_id", "type" => "category", "value" => "{{record.created_by_id}}" }, { "name" => "policy_id", "type" => "category" }, { "name" => "vendor_id", "type" => "category" }] }, "build_schedule" => "weekly", "algorithm" => "naive_bayes", "target_key" => "department_id", "target_key_type" => "category", "split_key" => "submitted_at", "split_key_type" => "datetime", "model_klass" => "Invoice" },
+        { "config" => { "fields" => [{ "name" => "created_by_id", "type" => "category", "value" => "{{record.created_by_id}}" }, { "name" => "policy_id", "type" => "category" }] }, "build_schedule" => "weekly", "algorithm" => "naive_bayes", "target_key" => "department_id", "target_key_type" => "category", "split_key" => "submitted_at", "split_key_type" => "datetime", "model_klass" => "PurchaseRequest" },
+        { "config" => { "fields" => [{ "name" => "created_by_id", "type" => "category", "value" => "{{record.created_by_id}}" }, { "name" => "vendor_id", "type" => "category" }] }, "build_schedule" => "weekly", "algorithm" => "naive_bayes", "target_key" => "policy_id", "target_key_type" => "category", "split_key" => "submitted_at", "split_key_type" => "datetime", "model_klass" => "Invoice" },
+        { "config" => { "fields" => [{ "name" => "created_by_id", "type" => "category", "value" => "{{record.created_by_id}}" }] }, "build_schedule" => "weekly", "algorithm" => "naive_bayes", "target_key" => "policy_id", "target_key_type" => "category", "split_key" => "submitted_at", "split_key_type" => "datetime", "model_klass" => "PurchaseRequest" }
+      ].each do |config|
+        next if MlModel::Monitor.where(company_id: company.id, model_klass: config['model_klass'], target_key: config['target_key']).count > 0
+
+        MlModel::Monitor.create(config.merge(company_id: company.id))
       end
     end
   end

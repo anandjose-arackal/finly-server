@@ -23,6 +23,7 @@
 #
 
 class UserBalanceHistory < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :user, optional: true
 
   belongs_to :card_balance, optional: true, class_name: "Amount"

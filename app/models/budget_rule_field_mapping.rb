@@ -12,6 +12,7 @@
 #
 
 class BudgetRuleFieldMapping < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :budget_rule, optional: true
   belongs_to :field_configuration, optional: true
   belongs_to :field_drop_down_item, optional: true

@@ -7,7 +7,20 @@ class Oauth::TokenController < Doorkeeper::TokensController
   include Helpers::UserSessionsHelper
 
   # around_action :save_request_impression
+  around_action :set_non_tenant
   before_action :load_global_variables
+
+  def set_non_tenant
+    ActsAsTenant.without_tenant_if_not_set do
+      yield
+    end
+  end
+
+  def authorize_response
+    ActsAsTenant.without_tenant_if_not_set do
+      super
+    end
+  end
 
   def create
     return unless pre_process
@@ -139,11 +152,19 @@ class Oauth::TokenController < Doorkeeper::TokensController
     if doorkeeper_token.present? && doorkeeper_token&.resource_owner_id&.present?
       scopes = doorkeeper_token[:scopes]
       if scopes.include?("web") || scopes.include?("mobile") || scopes.include?("chrome") || scopes.include?("api") || scopes.include?("admin_bypass") || scopes.include?("streamsets")
-        @curr_user ||= User.find_by(id: doorkeeper_token[:resource_owner_id])
+        @curr_user ||= ActsAsTenant.without_tenant_if_not_set do
+          User.find_by(id: doorkeeper_token[:resource_owner_id])
+        end
+        ActsAsTenant.current_tenant = @curr_user&.company
+        @curr_user
       elsif scopes.include?("admin")
         @curr_user ||= AdminUser.find_by(id: doorkeeper_token[:resource_owner_id])
       elsif scopes.include?("darwinbox")
-        @curr_user ||= User.find_by(id: doorkeeper_token[:resource_owner_id])
+        @curr_user ||= ActsAsTenant.without_tenant_if_not_set do
+          User.find_by(id: doorkeeper_token[:resource_owner_id])
+        end
+        ActsAsTenant.current_tenant = @curr_user&.company
+        @curr_user
       end
     end
   end

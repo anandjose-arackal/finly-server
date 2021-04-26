@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class CardAssignRequestTrackAction < ApplicationRecord
+class CardAssignRequestTrackAction < NonTenantedApplicationRecord
   include Seedable
 
   validates :name, presence: true

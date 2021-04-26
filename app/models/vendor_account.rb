@@ -12,6 +12,7 @@
 
 class VendorAccount < ApplicationRecord
 
+  belongs_to :company, optional: true
   belongs_to :balance, optional: true, class_name: "Amount"
   belongs_to :vendor, optional: true, class_name: "YesBankVendor"
 

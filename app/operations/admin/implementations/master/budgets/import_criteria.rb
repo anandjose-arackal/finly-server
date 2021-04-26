@@ -102,7 +102,7 @@ class Admin::Implementations::Master::Budgets::ImportCriteria < Admin::Implement
     budget_group_id = data[1]
     budget_group = company.budget_groups.find_by(id: budget_group_id)
     if budget_group.blank?
-      return result fail, "Could not find budget group criterium"
+      return result false, "Could not find budget group criterium"
     end
 
     # finding the budget criteria in case it's already there and is an update Op

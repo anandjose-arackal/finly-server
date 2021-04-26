@@ -302,13 +302,15 @@ class FormEntity < ApplicationRecord
   end
 
   def self.system_entity(section, entity_key, attributes)
-    entity = self.new(
-      section: section,
-      entity_key: entity_key,
-      parent: attributes[:parent],
-      options: {},
-      config: {}
-    )
+    entity = ActsAsTenant.without_tenant do
+      self.new(
+        section: section,
+        entity_key: entity_key,
+        parent: attributes[:parent],
+        options: {},
+        config: {}
+      )
+    end
     schema = DEFAULT_SYSTEM_SCHEMA.deep_dup
     schema.deep_merge!(self.schema.deep_dup)
     schema.deep_merge!(attributes)

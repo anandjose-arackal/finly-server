@@ -90,40 +90,45 @@ class Menu::API < Transactions::API
 
   def build_modules(context, current_user:, **)
     context[:entities] = []
-
-    if current_user.company.group_entity_structure_enabled? and not RequestStore.store[:actual_current_user].present?
-      users = User.where(finly_id: current_user.finly_id).includes({company: [:configuration, :status]})
-    else
-      users = [current_user]
-    end
-
-    users.each do |user|
-      company = user.company
-      next unless %w(partial_block active).include?(company.status.name.to_s)
-
-      conf = {
-          company_id: company.id,
-          name: company.name,
-          logo: company.configuration.logo.url,
-          selected: (current_user == user),
-          modules: []
-      }
-
-      MODULES_CONFIG.each do |mod|
-
-        next if mod[:feature] and not user.company.feature_subscription.send(mod[:feature])
-        next if mod[:user_subscription] and not user.user_panel_subscription.send(mod[:user_subscription])
-        if mod[:permissions].present?
-          permissions = mod[:permissions]
-          permissions = [permissions] unless permissions.respond_to?(:each)
-          next if permissions.present? and not user.has_permission?(permissions)
-        end
-
-        selected = (current_user == user and [mod[:app].to_s, mod[:app]].include?(RequestStoreUtil.current_app))
-        conf[:modules] << mod[:config].merge(selected: selected)
+    
+    ActsAsTenant.without_tenant do
+      if current_user.company.group_entity_structure_enabled? and not RequestStore.store[:actual_current_user].present?
+        users = User.where(finly_id: current_user.finly_id, active: true).includes({company: [:configuration, :status]})
+      else
+        users = [current_user]
       end
 
-      context[:entities] << conf
+      users.each do |user|
+        company = user.company
+        ActsAsTenant.with_tenant company do
+          next unless %w(partial_block active).include?(company.status.name.to_s)
+
+          conf = {
+              company_id: company.id,
+              subdomain: company.subdomain,
+              name: company.name,
+              logo: company.configuration.logo&.url,
+              selected: (current_user == user),
+              modules: []
+          }
+
+          MODULES_CONFIG.each do |mod|
+
+            next if mod[:feature] and not user.company.feature_subscription.send(mod[:feature])
+            next if mod[:user_subscription] and not user.user_panel_subscription.send(mod[:user_subscription])
+            if mod[:permissions].present?
+              permissions = mod[:permissions]
+              permissions = [permissions] unless permissions.respond_to?(:each)
+              next if permissions.present? and not user.has_permission?(permissions)
+            end
+
+            selected = (current_user == user and [mod[:app].to_s, mod[:app]].include?(RequestStoreUtil.current_app))
+            conf[:modules] << mod[:config].merge(selected: selected)
+          end
+
+          context[:entities] << conf
+        end
+      end
     end
   end
 

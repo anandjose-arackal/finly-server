@@ -563,7 +563,7 @@ include Searchkick::Api
     when "CashOnHand"
       name += "Cash on Hand"
     when "Card"
-      card_type = Card.unscoped.find_by(id: self.initiating_account_id)&.card_program&.name&.humanize
+      card_type = Card.include_soft_deleted.find_by(id: self.initiating_account_id)&.card_program&.name&.humanize
       name += "#{card_type} Card"
     when "UserWallet"
       name += "Finly Money"
@@ -592,7 +592,7 @@ include Searchkick::Api
     when "CashOnHand"
       name += "Cash on Hand"
     when "Card"
-      card_type = Card.unscoped.find_by(id: self.receiving_account_id)&.card_program&.name&.humanize
+      card_type = Card.include_soft_deleted.find_by(id: self.receiving_account_id)&.card_program&.name&.humanize
       name += "#{card_type} Card"
     when "UserWallet"
       name += "Finly Money"

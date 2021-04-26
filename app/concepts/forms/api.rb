@@ -12,7 +12,9 @@ class Forms::API
   class_attr :predictions, default: {}
 
   def self.form
-    @form ||= Form.new(klass_name: self, model: self.model)
+    @form ||= ActsAsTenant.without_tenant do
+      Form.new(klass_name: self, model: self.model)
+    end
   end
 
   def self.meta(form_meta = NoObject)
@@ -21,7 +23,9 @@ class Forms::API
   end
 
   def self.section(section_id, options = {}, &block)
-    section = form.sections.new({ section_id: section_id }.merge(options))
+    section = ActsAsTenant.without_tenant do
+      form.sections.new({ section_id: section_id }.merge(options))
+    end
     section.instance_eval &block
   end
 
@@ -33,7 +37,9 @@ class Forms::API
       raise "Validation #{condition.condition_id} is not unique"
     end
     conditions[condition.condition_id] = condition
-    form.conditions << condition
+    ActsAsTenant.without_tenant do
+      form.conditions << condition
+    end
   end
 
   def self.validation(params = {}, &block)
@@ -44,7 +50,9 @@ class Forms::API
       raise "Validation #{validation.validation_id} is not unique"
     end
     validations[validation.validation_id] = validation
-    form.validations << validation
+    ActsAsTenant.without_tenant do
+      form.validations << validation
+    end
   end
 
   singleton_class.send(:alias_method, :validate, :validation)
@@ -58,7 +66,9 @@ class Forms::API
       raise "Dependency #{dependency.dependency_id} is not unique"
     end
     dependencies[dependency.dependency_id] = dependency
-    form.choice_dependencies << dependency
+    ActsAsTenant.without_tenant do
+      form.choice_dependencies << dependency
+    end
   end
 
   # This is used to define predictions for form entities

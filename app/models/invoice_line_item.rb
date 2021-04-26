@@ -83,6 +83,8 @@ class InvoiceLineItem < ApplicationRecord
   include MathUtil
   include FormsHelper
 
+  belongs_to :company, optional: true
+
   # Multicurrency Support
   include Monetizable
   money :item_gross_amount, :get_reporting_currency

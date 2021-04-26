@@ -12,6 +12,7 @@
 #
 
 class BankAccountMaster < ApplicationRecord
+  belongs_to :company, optional: true
 
   validates :account_number, presence: true
   validates :ifsc, presence: true

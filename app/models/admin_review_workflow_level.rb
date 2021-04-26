@@ -14,7 +14,7 @@
 #  deleted_at               :datetime
 #
 
-class AdminReviewWorkflowLevel < ApplicationRecord
+class AdminReviewWorkflowLevel < NonTenantedApplicationRecord
   belongs_to :admin_review_workflow, optional: true
   belongs_to :admin_user, optional: true
 

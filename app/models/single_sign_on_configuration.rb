@@ -39,4 +39,14 @@ class SingleSignOnConfiguration < ApplicationRecord
     where id: id
   }
 
+  def as_json(options={})
+    {
+      id: id,
+      label: label,
+      finly_sso_path: finly_sso_path,
+      logo: logo,
+      sso_type: sso_type
+    }
+  end
+
 end

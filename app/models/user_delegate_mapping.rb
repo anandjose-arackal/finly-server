@@ -29,6 +29,7 @@
 
 class UserDelegateMapping < ActiveRecord::Base
 
+  belongs_to :company, optional: true
   belongs_to :user
   belongs_to :delegate_for_user, class_name: "User"
 

@@ -40,9 +40,9 @@ class Authenticator::Providers::GoogleOauth2 < Authenticator::Providers::Base
       params[:user] = user
       self.user_info[:email_verified] = data[:email_verified]
 
-      toggel = AuthenticationToggle.new(user)
+      toggle = AuthenticationToggle.new(user)
 
-      unless toggel.sso_google_enabled?
+      unless toggle.sso_google_enabled?
         fail_with_event :on_google_oauth, "Google SSO is not enabled for your account."
       end
 

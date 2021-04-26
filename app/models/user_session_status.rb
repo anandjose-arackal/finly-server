@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class UserSessionStatus < ApplicationRecord
+class UserSessionStatus < NonTenantedApplicationRecord
   include Seedable
 
   # Authorized -> Currently signed in

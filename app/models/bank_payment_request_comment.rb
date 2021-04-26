@@ -20,6 +20,7 @@
 
 class BankPaymentRequestComment < ApplicationRecord
 
+  belongs_to :company, optional: true
   belongs_to :action, optional: true, class_name: "BankPaymentRequestCommentAction"
   belongs_to :bank_payment_request, optional: true
   belongs_to :user, optional: true, class_name: "User"

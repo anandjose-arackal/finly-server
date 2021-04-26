@@ -27,6 +27,7 @@
 
 class InwardDocumentItem < ApplicationRecord
   include SoftDeletable
+  belongs_to :company, optional: true
   belongs_to :inward_document, optional: true
   belongs_to :inventory_line_item, optional: true, class_name: 'Item'
   belongs_to :product_type, optional: true

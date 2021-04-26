@@ -25,6 +25,8 @@
 class BudgetRule < ApplicationRecord
   include SoftDeletable
 
+  belongs_to :company, optional: true
+
   # belongs_to :category, optional: true
   has_many :budget_rule_category_mappings
   has_many :categories, through: :budget_rule_category_mappings
@@ -62,7 +64,7 @@ class BudgetRule < ApplicationRecord
   delegate :amount_value, to: :amount, allow_nil: true
   # delegate :category_name, to: :category
 
-  default_scope {unscope(:where)}
+  default_scope { include_soft_deleted }
 
   validates :period_id, presence: true
   validates :policy_id, presence: true

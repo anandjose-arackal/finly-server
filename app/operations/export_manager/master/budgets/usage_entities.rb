@@ -60,7 +60,7 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
       self.payment_processing_amount_to_be_considered = "payment_processing_amount_before_tax_value"
     end
 
-    calculator = ::BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer.({budget: budget, current_user: User.first, calculate_buckets: false, calculate_trail_items: true})
+    calculator = ::BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer.({budget: budget, current_user: user, calculate_buckets: false, calculate_trail_items: true})
     if calculator.success?
       self.budget_trails = calculator["result"][:budget_trails] rescue BudgetTrail.none
     else

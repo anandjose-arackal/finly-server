@@ -15,7 +15,7 @@ class BudgetManager::BudgetsCalculator::Calculate::PurchaseRequestItemsBudgetsPr
         cost_center_id: purchase_request_item.cost_center_id,
         user_id: purchase_request_item.purchase_request.creator_id,
         location_id: purchase_request_item.purchase_request.location_id,
-        department_id: purchase_request_item.purchase_request.department_id,
+        department_id: purchase_request_item.department_id,
         date: purchase_request_item.purchase_request.created_at,
         entity_created_at: purchase_request_item.purchase_request.created_at,
         entity_submitted_at: (purchase_request_item.purchase_request.submitted_at || purchase_request_item.purchase_request.created_at),

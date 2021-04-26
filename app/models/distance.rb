@@ -10,7 +10,7 @@
 #  deleted_at       :datetime
 #
 
-class Distance < ApplicationRecord
+class Distance < NonTenantedApplicationRecord
   belongs_to :physical_unit, optional: true
 
   validates :value, presence: true

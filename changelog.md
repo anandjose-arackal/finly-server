@@ -2,11 +2,25 @@
 All notable changes to this project will be documented in this file. Always add new logs to 
 beginning of this file.
 
+## 2021-04-17
+- Fix: Validation on total invoiced quantity against purchase order quantity removed for service items
+
+## 2021-04-13
+ - Fix: Updating the user base dlrm for credit note.
+ - fix: Updating invoice for vendor location.
+
+## 2021-04-08
+ - feat: Create export templates for new companies when created.
+
+## 2021-04-07
+- Fix: Vendor policy check was not checking for company. Patched this security gap.
+
 ## 2021-03-01
   - FormMigration: Updating migration to handle custom field migrations.
+  - Updating payment ticket changes for invoice.
 
 ## 2021-03-31
-  - Updating payment ticket changes for invoice.
+  - Fix: use user roles instead of policy user roles to properly filter export templates.
 
 ## 2021-03-30
   - Updating model for vendor form.

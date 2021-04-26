@@ -51,11 +51,12 @@ class Events::Serializer
     if record_id.blank?
       return (relation ? record.none : nil)
     end
-
-    if relation
-      record.unscoped.where id: record_id
-    else
-      record.unscoped.find_by id: record_id
+    ActsAsTenant.without_tenant do
+      if relation
+        record.include_soft_deleted.where id: record_id
+      else
+        record.include_soft_deleted.find_by id: record_id
+      end
     end
   end
 

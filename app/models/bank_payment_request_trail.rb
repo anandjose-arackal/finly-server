@@ -17,10 +17,11 @@
 #  deleted_at              :datetime
 #
 
-class BankPaymentRequestTrail < ApplicationRecord
+class BankPaymentRequestTrail < ApplicationRecordBackwardCompatibility
 
   attr_accessor :excluded_id_ranges
 
+  belongs_to :company, optional: true
   belongs_to :bank_payment_request, optional: true
   belongs_to :action_user, optional: true, class_name: "User"
   belongs_to :modified_user, optional: true, class_name: "User"

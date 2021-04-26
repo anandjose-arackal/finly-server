@@ -23,7 +23,7 @@ class Reports::Base < BaseOperation
     self.report = Reports::Index.(user, params).reports.with_id(id).first rescue nil
 
     # todo - temporary fix for notifications
-    # self.report = Reports::Index.(user, params).reports&.unscoped.with_id(id)&.first
+    # self.report = Reports::Index.(user, params).reports&.include_soft_deleted.with_id(id)&.first
     # self.report = Report.find_by(id: params[:report_id])
   end
 

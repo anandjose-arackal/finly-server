@@ -18,6 +18,7 @@
 #
 
 class MacroJob < FinlyMacrosRecord
+  belongs_to :company
   belongs_to :macro
   belongs_to :status, class_name: 'MacroJobStatus'
 

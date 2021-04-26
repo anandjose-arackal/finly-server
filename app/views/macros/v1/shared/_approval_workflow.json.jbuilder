@@ -3,6 +3,7 @@ json.level do
   json.name dlrm.level.name
 end
 json.action_taken dlrm.action_id.present?
+json.action_taken_at dlrm.action_taken_at
 json.action dlrm.action
 json.approved dlrm.action_id == TrailAction.id_for(:approve)
 if dlrm.action_taken_by.present?

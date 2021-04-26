@@ -424,6 +424,10 @@ class BankPaymentRequest < ApplicationRecord
     with_status_id(status_id)
   }
 
+  scope :total_requested_amount, -> {
+    joins(payment_order: {payments: :amount}).sum('amounts.value').to_f.round(2)
+  }
+
   attr_accessor :cache_users
 
   before_save do
