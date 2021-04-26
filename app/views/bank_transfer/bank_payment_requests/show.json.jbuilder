@@ -19,10 +19,10 @@ json.summary do
   json.submitted_at @result.bank_payment_request.submitted_at&.strftime("%d %b %Y")
   
   json.amount_requested precision_value @result.payment_order.amount_requested&.value
-  json.amount_requested_currency precision_value @result.payment_order.amount_requested&.currency&.country_code
+  json.amount_requested_currency @result.payment_order.amount_requested&.currency&.country_code rescue 'INR'
   
   json.amount_processed precision_value @result.payment_order.amount_processed&.value
-  json.amount_processed_currency precision_value @result.payment_order.amount_processed&.currency&.country_code
+  json.amount_processed_currency @result.payment_order.amount_processed&.currency&.country_code rescue 'INR'
 
 
   # json.amount_requested do
@@ -58,7 +58,7 @@ json.summary do
 
   json.verified_payments_count @result.payments_verified
   json.unverified_payments_count @result.payments_unverified
-  json.base_currency_code @result.bank_payment_request.base_currency.country_code
+  json.base_currency_code @result.bank_payment_request.base_currency.country_code rescue 'INR'
   json.base_currency_id @result.bank_payment_request.base_currency_id
   json.is_domestic @result.bank_payment_request.is_domestic
 
