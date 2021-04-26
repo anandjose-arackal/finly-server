@@ -1853,6 +1853,11 @@ class User < ApplicationRecord
     company.inward_invoices.where(invoice_status_id: InwardInvoiceStatus.id_for(:open), created_by: deactivated_users_ids, invoice_type_id: InwardInvoiceType.id_for(:tax_invoice) )
   end
 
+  def non_po_invoice_form_enabled
+    feature_flag_enabled = NonPoInvoiceToggle.new(self || RequestStoreUtil.current_user).enabled?
+    feature_flag_enabled
+  end
+
   protected
 
   # Checks whether a password is needed or not. For validations only.

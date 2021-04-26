@@ -155,4 +155,5 @@ json.results do
   end
 end
 
+json.non_po_invoice_form_enabled @result&.invoices&.first&.forms_enabled
 json.count @result.invoices.count

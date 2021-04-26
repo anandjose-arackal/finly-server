@@ -182,7 +182,7 @@ class InvoiceLineItem < ApplicationRecord
   # validates_presence_of :department, if: :check_outward_invoice?
   
   # Updating this for forms, due to some unknown issue 
-  # before_save :set_tds_applicable
+  before_save :set_tds_applicable
   # after_commit :set_tds_applicable, on: [:create, :update]
 
   after_save :budget_trail_entry

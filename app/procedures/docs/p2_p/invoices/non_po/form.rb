@@ -328,7 +328,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_net_amount])
 
       amount :item_billable_amount, label: "Billable Amount", editable: false, visible: false,
-             can_editable_be_changed: false,
+             can_editable_be_changed: false, active: false,
              can_visible_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_billable_amount])
 

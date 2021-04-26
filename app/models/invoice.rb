@@ -1079,7 +1079,8 @@ class Invoice < ApplicationRecord
         conversion_rate: self.conversion_rate.to_f,
         is_domestic: self.is_domestic,
         reporting_currency_id: self.get_reporting_currency.id,
-        reporting_currency_code: self.get_reporting_currency.country_code
+        reporting_currency_code: self.get_reporting_currency.country_code,
+        non_po_invoice_form_enabled: self.forms_enabled
       }
     end
   end

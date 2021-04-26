@@ -1,10 +1,12 @@
 payment = @result.payment
+
 parent = payment.parent rescue nil
 if payment.receiving_account&.account_owner_type == "YesBankVendor"
   json.owner_name payment.receiving_account&.account_owner&.business_name
 else
   json.owner_name payment.receiving_account&.account_owner&.name
 end
+
 
 json.name payment.receiving_account&.name
 json.account_number payment.receiving_account.account_number
@@ -26,6 +28,7 @@ json.beneficiary_type (payment.receiving_account.account_owner_type == "User" ? 
 json.created_at payment.created_at.strftime("%b %d, %Y")
 json.created_by payment.initiating_user.as_json
 json.is_domestic payment&.bank_payment_request&.is_domestic
+json.non_po_invoice_form_enabled payment&.parent&.forms_enabled 
 
 if payment.receiving_user.is_a?(User) || payment.receiving_user.authorized
   json.beneficiary_type "authorized"
