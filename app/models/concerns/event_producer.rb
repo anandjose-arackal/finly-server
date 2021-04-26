@@ -20,24 +20,24 @@ module EventProducer
   end
 
   def after_save_callbacks
-    company = nil
+    cmp = nil
     if self.respond_to?(:company) and self.company.present? and self.company.is_a?(Company)
-      company = self.company
+      cmp = self.company
     end
     if previous_changes['created_at'].present?
       # New record
-      Events::Publisher::Record::Create(self, RequestStoreUtil.current_user, (RequestStoreUtil.current_company || company))
+      Events::Publisher::Record::Create(self, RequestStoreUtil.current_user, (RequestStoreUtil.current_company || cmp))
     else
       # Old record
-      Events::Publisher::Record::Update(self, RequestStoreUtil.current_user, (RequestStoreUtil.current_company || company), previous_changes)
+      Events::Publisher::Record::Update(self, RequestStoreUtil.current_user, (RequestStoreUtil.current_company || cmp), previous_changes)
     end
   end
 
   def before_destroy_callbacks
-    company = nil
+    cmp = nil
     if self.respond_to?(:company) and self.company.present? and self.company.is_a?(Company)
-      company = self.company
+      cmp = self.company
     end
-    Events::Publisher::Record::Destroy(self, RequestStoreUtil.current_user, (RequestStoreUtil.current_company || company))
+    Events::Publisher::Record::Destroy(self, RequestStoreUtil.current_user, (RequestStoreUtil.current_company || cmp))
   end
 end
