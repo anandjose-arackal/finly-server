@@ -23,7 +23,6 @@
 #  form_id         :string(255)
 #  parent_id       :string(255)
 #  parent_type     :string(255)
-#  pmml            :text(4294967295)
 #
 class MlModel::Monitor < MlModel
 

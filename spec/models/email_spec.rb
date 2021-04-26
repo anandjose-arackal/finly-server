@@ -12,7 +12,6 @@
 #  bcc                  :string(255)
 #  cc                   :string(255)
 #  subject              :string(255)
-#  body                 :text(4294967295)
 #  mailer_klass         :string(255)
 #  mailer_action        :string(255)
 #  configuration_set    :string(255)
