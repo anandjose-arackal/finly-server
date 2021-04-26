@@ -1,10 +1,10 @@
 class Filters::API::Attribute
 
-  attr_accessor :field_key, :label, :field_type, :choices, :hint, :simple, :custom_field_id
+  attr_accessor :field_key, :label, :field_type, :choices, :hint, :simple, :custom_field_id, :active
 
   # Includes: Used for capturing the data points to be included to optimize the fetch for the current record
   # Simple is used to identify if the filter should be a part of the simple filter or not
-  def initialize(field_key:, label:, hint:, field_type:, choices: nil, simple: false, custom_field_id: nil)
+  def initialize(field_key:, label:, hint:, field_type:, choices: nil, simple: false, custom_field_id: nil, active: true)
     self.field_key = field_key
     self.label = label
     self.hint = hint
@@ -12,6 +12,7 @@ class Filters::API::Attribute
     self.choices = choices
     self.simple = simple
     self.custom_field_id = custom_field_id
+    self.active = active
   end
 
   def operators
@@ -35,7 +36,8 @@ class Filters::API::Attribute
         field_type: field_type,
         simple: (simple ? simple_filter : false),
         operators: operators,
-        args: {filter_id: field_key}
+        args: {filter_id: field_key},
+        active: active
     }
     if custom_field_id.present?
       # Generate unique ID for custom fields
@@ -67,7 +69,7 @@ class Filters::API::Attribute
         attributes[filter_key].present?
       end
 
-      def attribute(field_key, label: nil, type: :text, hint: "Select Value", choices: nil, simple: false)
+      def attribute(field_key, label: nil, type: :text, hint: "Select Value", choices: nil, simple: false, active: active)
         raise "#{field_key} is already defined for class #{self.name}" if exists?(field_key)
 
         label ||= field_key.to_s.humanize
@@ -79,7 +81,8 @@ class Filters::API::Attribute
                 field_type: type,
                 hint: hint,
                 choices: choices,
-                simple: simple
+                simple: simple,
+                active:active
             }
         )
       end
@@ -95,9 +98,18 @@ class Filters::API::Attribute
         attributes.each do |field_key, attribute|
           filters << attribute.build(user)
         end
+
         if custom_fields.present?
           build_custom_fields(user, filters)
         end
+
+        selected_filters = []
+        filters.each do |filter|
+          if filter[:active] == nil || (filter[:active].to_s == 'is_accessable' && self.send(filter[:active].to_s, user))
+            selected_filters << filter
+          end
+        end
+        filters = selected_filters
         filters
       end
 

@@ -34,7 +34,7 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     text value: :ticket_type
   end
 
-  column :base_currency, label: "Base Currency" do
+  column :base_currency, label: "Base Currency", active: :is_accessable do
     text value: :base_currency_code
   end
 
@@ -169,16 +169,27 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
   end
 
   def self.format_amount_requested_tool_tip(context)
-    country_code = context[:record].base_currency&.country_code
-    value = context[:record].payment_order&.amount_requested&.value.to_f
+    user = context[:user]
+    if user.present? && user.non_po_invoice_form_enabled 
+      country_code = context[:record].base_currency&.country_code
+      value = context[:record].payment_order&.amount_requested&.value.to_f
 
-    "#{country_code} #{value}"
+      "#{country_code} #{value}"
+    end
   end
 
   def self.format_amount_processed_tool_tip(context)
-    country_code = context[:record].base_currency&.country_code
-    value = context[:record].payment_order&.amount_processed&.value.to_f
+    user = context[:user]
+    if user.present? && user.non_po_invoice_form_enabled 
+      country_code = context[:record].base_currency&.country_code
+      value = context[:record].payment_order&.amount_processed&.value.to_f
 
-    "#{country_code} #{value}"
+      "#{country_code} #{value}"
+    end
   end
+
+  def self.is_accessable( user )
+    user.present? && user.non_po_invoice_form_enabled 
+  end
+
 end
