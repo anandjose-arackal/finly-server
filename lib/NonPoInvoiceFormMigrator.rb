@@ -3,41 +3,44 @@ class NonPoInvoiceMigrator
 
     result = []
     company = Company.find company_id
-    documents = Invoice.where(invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)).where(company_id: company.id)
-    # documents = Invoice.where(id: 10710).where(company_id: company.id)
+    
+    ActsAsTenant.with_tenant(company) do
+      documents = Invoice.where(invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)).where(company_id: company.id)
+      # documents = Invoice.where(id: 10710).where(company_id: company.id)
 
-    # FormCustomField.where(company_id: company_id).destroy_all
-    form = Form.where(klass_name: 'Docs::P2P::Invoices::NonPo::Form', company_id: company_id).first
-    documents.find_in_batches(batch_size: 1000) do |batch|
-      batch.each do |document|
+      # FormCustomField.where(company_id: company_id).destroy_all
+      form = Form.where(klass_name: 'Docs::P2P::Invoices::NonPo::Form', company_id: company_id).first
+      documents.find_in_batches(batch_size: 1000) do |batch|
+        batch.each do |document|
 
-        # Populate Custom Fields
+          # Populate Custom Fields
 
-        form.entities.root.custom_fields.each do |entity|
-          form_custom_field = FormCustomField.where(field_key: entity.entity_key, document_type: document.class.name, document_id: document.id).order(created_at: :asc).last
-          if form_custom_field.present?
-            form_custom_field.update(form_entity_id: entity.id, entity_type: entity.entity_type, form_id: form.id)
-          else
-            FormCustomField.new({
-              form_entity_id: entity.id, field_key: entity.entity_key,
-              entity_type: entity.entity_type, document_type: document.class.name,
-              document_id: document.id, form_id: form.id}
-              ).save
+          form.entities.root.custom_fields.each do |entity|
+            form_custom_field = FormCustomField.where(field_key: entity.entity_key, document_type: document.class.name, document_id: document.id).order(created_at: :asc).last
+            if form_custom_field.present?
+              form_custom_field.update(form_entity_id: entity.id, entity_type: entity.entity_type, form_id: form.id)
+            else
+              FormCustomField.new({
+                form_entity_id: entity.id, field_key: entity.entity_key,
+                entity_type: entity.entity_type, document_type: document.class.name,
+                document_id: document.id, form_id: form.id}
+                ).save
+            end
           end
+
+          # Migrate Custom Fields
+          update_custome_fields form, document, company
+          
+          # First migrate invoice line items
+          update_item document
+
+          # Migrate Invoice Data
+          update_invoice_details document
+          
+          # Migrate Attachments
+          update_invoice_attachments( form, document)
+
         end
-
-        # Migrate Custom Fields
-        update_custome_fields form, document, company
-        
-        # First migrate invoice line items
-        update_item document
-
-        # Migrate Invoice Data
-        update_invoice_details document
-        
-        # Migrate Attachments
-        update_invoice_attachments( form, document)
-
       end
     end
     # Todo - I2P:
