@@ -4,13 +4,13 @@ class Notifications::Vp::WeeklyReport::Mailer < Notifier::Mailer
     from = 1.week.ago.beginning_of_week
     to = 1.week.ago.end_of_week
 
-    ActsAsTenant.current_tenant = nil
+    ActsAsTenant.without_tenant do
+      UserPanelSubscription.where(weekly_summary_enabled: true).includes(user: :company).each do |subscription|
+        user = subscription.user
+        next unless user.active? && user.company.status_id == CompanyStatus.id_for(:active)
 
-    UserPanelSubscription.where(weekly_summary_enabled: true).includes(user: :company).each do |subscription|
-      user = subscription.user
-      next unless user.active? && user.company.status_id == CompanyStatus.id_for(:active)
-
-      Notifications::Vp::WeeklyReport::Mailer.(current_user: user, params: { from: from, to: to })
+        Notifications::Vp::WeeklyReport::Mailer.(current_user: user, params: { from: from, to: to })
+      end
     end
   end
 
