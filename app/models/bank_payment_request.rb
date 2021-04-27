@@ -667,6 +667,10 @@ class BankPaymentRequest < ApplicationRecord
     self.base_currency_id = self.company.reporting_currency.id if base_currency_id.blank?
   end
 
+  def non_po_form_enabled
+    user.present? && user.non_po_invoice_form_enabled 
+  end
+
   private
 
   def self.status_ids(*statuses)
