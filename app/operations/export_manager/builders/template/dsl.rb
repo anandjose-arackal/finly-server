@@ -3,12 +3,13 @@ module ExportManager::Builders::Template::DSL
 
   class_methods do
 
-    def attribute(name, template:, column_name: nil)
+    def attribute(name, template:, column_name: nil, toggle: nil)
       columns << ExportManager::Builders::Template::Attribute.new(
         {
           name: name,
           template: template,
-          column_name: column_name
+          column_name: column_name,
+          toggle: toggle,
         }
       )
     end
