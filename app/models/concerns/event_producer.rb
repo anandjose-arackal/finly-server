@@ -21,7 +21,7 @@ module EventProducer
 
   def after_save_callbacks
     cmp = nil
-    if self.respond_to?(:company) and self.company.present? and self.company.is_a?(Company)
+    if self.respond_to?(:company) and self.respond_to?(:company_id) and self.company.present? and self.company.is_a?(Company)
       cmp = self.company
     end
     if previous_changes['created_at'].present?
@@ -35,7 +35,7 @@ module EventProducer
 
   def before_destroy_callbacks
     cmp = nil
-    if self.respond_to?(:company) and self.company.present? and self.company.is_a?(Company)
+    if self.respond_to?(:company) and self.respond_to?(:company_id) and self.company.present? and self.company.is_a?(Company)
       cmp = self.company
     end
     Events::Publisher::Record::Destroy(self, RequestStoreUtil.current_user, (RequestStoreUtil.current_company || cmp))
