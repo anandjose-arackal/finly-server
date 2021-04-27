@@ -27,7 +27,7 @@
 #  can_filter_category    :boolean          default(FALSE)
 #
 
-class InsightDashboard < ApplicationRecord
+class InsightDashboard < ApplicationRecordBackwardCompatibility
   include UUIDHelper, SoftDeletable
   include EventProducer
 

@@ -13,6 +13,7 @@
 #
 
 class MacroJobLog < FinlyMacrosRecord
+  belongs_to :company
   belongs_to :macro
   belongs_to :macro_job
 

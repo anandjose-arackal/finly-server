@@ -1,6 +1,6 @@
-class UpdateCompanyBalances
+class UpdateCompanyBalances < BaseJob
 
-  def self.perform
+  def self.perform_job
     puts " ----------------------------- PERFORMING #{self.name}  at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
 
     Company.all.each do |company|

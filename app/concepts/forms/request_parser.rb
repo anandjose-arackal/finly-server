@@ -1,10 +1,11 @@
 class Forms::RequestParser
 
-  attr_accessor :form, :row
+  attr_accessor :form, :row, :meta
 
-  def initialize(form: {}, row: {})
+  def initialize(form: {}, row: {}, meta: {})
     self.form = form || {}
     self.row = row || {}
+    self.meta = meta || {}
   end
 
   def fetch(entity_path)

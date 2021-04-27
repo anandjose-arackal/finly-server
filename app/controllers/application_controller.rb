@@ -16,6 +16,8 @@ class ApplicationController < ActionController::Base
 
   before_action :set_cache_buster
 
+  before_action :set_tenant_from_subdomain
+
   # around_action :save_request_impression
   before_action :finly_authorize!
 
@@ -29,6 +31,8 @@ class ApplicationController < ActionController::Base
   before_action :set_paper_trail_whodunnit
   before_action :set_raven_context
 
+  around_action :set_not_tenant_skip_authorize
+
   # after_action :track_request
 
   # handling exceptions and other errors through redirects to 404s and 500s
@@ -36,10 +40,40 @@ class ApplicationController < ActionController::Base
   # rescue_from StandardError, with: :error
   # rescue_from ActionController::RoutingError, with: :not_found
 
+  def set_tenant_from_subdomain
+    host = request.host.split('.')
+    return if host.count < 2
+
+    subdomain = host[0]
+    return if ['admin', 'www'].include?(subdomain)
+
+    # company = Company.find_by_subdomain(subdomain)
+    # unless company.present?
+    #   head 401
+    #   return
+    # end
+
+    # ActsAsTenant.current_tenant = company
+
+    company_group = CompanyGroup.find_by_subdomain(subdomain)
+
+    unless company_group.present?
+      # head 401
+      return
+    end
+    ActsAsTenant.current_tenant = company_group.companies
+  end
+
   ####################
   def info_for_paper_trail
-
-    hash = { user_ip: request.remote_ip, user_agent: request.user_agent, company_id: current_user&.company_id, created_by_id: current_user&.id, user_transaction_id: AuditTrail.generate_transaction_id }
+    {
+      user_ip: request.remote_ip,
+      user_agent: request.user_agent,
+      # NOTE: We are getting user from RequestStore instead of using current_user as `info_for_paper_trail` is running immediately after controller is initialized, so calling current_user here will skip Authentication process and other actions declared and sets user directly.
+      company_id: RequestStore.store[:current_company]&.id,
+      created_by_id: RequestStore.store[:current_user]&.id,
+      user_transaction_id: AuditTrail.generate_transaction_id
+    }
   end
 
   ####################
@@ -170,7 +204,10 @@ class ApplicationController < ActionController::Base
     if doorkeeper_token.present? and doorkeeper_token&.resource_owner_id&.present?
       scopes = doorkeeper_token[:scopes]
       if scopes.include?("web") or scopes.include?("mobile") or scopes.include?("chrome") or scopes.include?("api") or scopes.include?("streamsets")
-        @curr_user ||= User.find_by(id: doorkeeper_token[:resource_owner_id])
+        @curr_user ||= ActsAsTenant.without_tenant_if_not_set do
+          User.find_by(id: doorkeeper_token[:resource_owner_id])
+        end
+        ActsAsTenant.current_tenant = @curr_user&.company
       elsif scopes.include?("admin")
         @curr_user ||= AdminUser.find_by(id: doorkeeper_token[:resource_owner_id])
       end
@@ -351,7 +388,23 @@ class ApplicationController < ActionController::Base
     verify_user_session(doorkeeper_token)
 
     # Using an update all function to avoid the +users.update+ event. This event is avoided as it would fire too many times
-    User.where(id: current_user.id).update_all(last_activity_at: DateTime.now) if current_user.present?
+    if current_user.present?
+      if current_user.is_a?(User)
+        User.where(id: current_user.id).update_all(last_activity_at: DateTime.now)
+      else
+        AdminUser.where(id: current_user.id).update_all(last_activity_at: DateTime.now)
+      end
+    end
+  end
+
+  def set_not_tenant_skip_authorize
+    if skip_finly_authorize?
+      ActsAsTenant.without_tenant_if_not_set do
+        yield
+      end
+    else
+      yield
+    end
   end
 
   def set_raven_context

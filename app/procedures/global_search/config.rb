@@ -11,7 +11,7 @@ class GlobalSearch::Config < Transactions::API
   def generate_filters(context, current_user:, **)
     context[:documents] = {transactions: [], masters: []}
 
-    GlobalSearch::Config::Vp::DOCUMENT_PERMISSIONS.each do |document, config|
+    GlobalSearch::Config::Vp.document_permissions(current_user).each do |document, config|
       if authorized?(current_user, config)
         context[:documents][config[:category]] << {
             document_type: config[:index].searchkick_api.record_type,
@@ -23,7 +23,7 @@ class GlobalSearch::Config < Transactions::API
 
     context[:documents][:masters] = context[:documents][:masters].sort_by { |document| document[:document_type] }
     context[:documents][:transactions] = context[:documents][:transactions].sort_by { |document| document[:document_type] }
-    context[:indicator_map] = GlobalSearch::Config::Vp::STATUS_INDICATORS
+    context[:indicator_map] = GlobalSearch::Config::Vp.status_indicators(current_user)
 
     true
   end

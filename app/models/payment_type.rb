@@ -11,7 +11,7 @@
 
 
 
-class PaymentType < ApplicationRecord
+class PaymentType < NonTenantedApplicationRecord
   include Seedable
 
   def self.values

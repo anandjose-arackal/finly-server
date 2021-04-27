@@ -16,6 +16,7 @@
 #
 
 class FieldCustomization < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :scopable, optional: true, polymorphic: true
 
   validates :scopable, presence: true

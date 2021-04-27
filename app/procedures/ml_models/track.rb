@@ -1,6 +1,6 @@
-class MlModels::Track
+class MlModels::Track < BaseJob
 
-  def self.perform
+  def self.perform_job
     MlModel.all.each do |model|
       model.track_predictions
       model.clear_model_cache

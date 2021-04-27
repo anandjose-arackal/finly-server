@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class FieldType < ApplicationRecord
+class FieldType < NonTenantedApplicationRecord
 
   TYPES = {text: 1, number: 2, decimal: 3, boolean: 4, drop_down: 5, date: 6, datetime: 7, amount: 8, multiselect: 9}
 

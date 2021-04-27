@@ -8,5 +8,16 @@ class ApplicationRecord < ActiveRecord::Base
   self.abstract_class = true
 
   include SoftDeletable
+
+  acts_as_tenant(:company, options = {
+    has_global_records: false,
+  })
+
+  before_validation Proc.new {|m|
+    if ActsAsTenant.current_tenant && m.company_id.nil?
+      m.company_id = ActsAsTenant.current_tenant.id
+    end
+  }, :on => :update
+
   singleton_class.send(:alias_method, :filter_active, :exclude_deleted)
 end

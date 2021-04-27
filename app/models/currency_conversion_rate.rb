@@ -178,7 +178,7 @@
 #  deleted_at :datetime
 #
 
-class CurrencyConversionRate < ApplicationRecord
+class CurrencyConversionRate < NonTenantedApplicationRecord
 
   validates :date, presence: true, uniqueness: true
 

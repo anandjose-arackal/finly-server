@@ -20,7 +20,6 @@
 #  deleted_at      :datetime
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
-#  pmml            :text(65535)
 #  form_id         :string(255)
 #  parent_id       :string(255)
 #  parent_type     :string(255)
@@ -41,7 +40,25 @@ class MlModel::Monitor < MlModel
     end
   end
 
-  def prepare_record(record)
+  def self.seed_data
+    Company.all.find_each do |company|
+      [
+        { "config" => { "fields" => [{ "name" => "created_by_id", "type" => "category", "value" => "{{record.created_by_id}}" }, { "name" => "policy_id", "type" => "category" }, { "name" => "cost_center_id", "type" => "category" }] }, "build_schedule" => "weekly", "algorithm" => "naive_bayes", "target_key" => "cost_center_id", "target_key_type" => "category", "split_key" => "submitted_at", "split_key_type" => "datetime", "model_klass" => "Invoice" },
+        { "config" => { "fields" => [{ "name" => "created_by_id", "type" => "category", "value" => "{{record.created_by_id}}" }, { "name" => "policy_id", "type" => "category" }, { "name" => "department_id", "type" => "category" }, { "name" => "cost_center_id", "type" => "category" }] }, "build_schedule" => "weekly", "algorithm" => "naive_bayes", "target_key" => "location_id", "target_key_type" => "category", "split_key" => "submitted_at", "split_key_type" => "datetime", "model_klass" => "PurchaseRequest" },
+        { "config" => { "fields" => [{ "name" => "created_by_id", "type" => "category", "value" => "{{record.created_by_id}}" }, { "name" => "policy_id", "type" => "category" }, { "name" => "vendor_id", "type" => "category" }, { "name" => "department_id", "type" => "category" }, { "name" => "cost_center_id", "type" => "category" }] }, "build_schedule" => "weekly", "algorithm" => "naive_bayes", "target_key" => "location_id", "target_key_type" => "category", "split_key" => "submitted_at", "split_key_type" => "datetime", "model_klass" => "Invoice" },
+        { "config" => { "fields" => [{ "name" => "created_by_id", "type" => "category", "value" => "{{record.created_by_id}}" }, { "name" => "policy_id", "type" => "category" }, { "name" => "vendor_id", "type" => "category" }] }, "build_schedule" => "weekly", "algorithm" => "naive_bayes", "target_key" => "department_id", "target_key_type" => "category", "split_key" => "submitted_at", "split_key_type" => "datetime", "model_klass" => "Invoice" },
+        { "config" => { "fields" => [{ "name" => "created_by_id", "type" => "category", "value" => "{{record.created_by_id}}" }, { "name" => "policy_id", "type" => "category" }] }, "build_schedule" => "weekly", "algorithm" => "naive_bayes", "target_key" => "department_id", "target_key_type" => "category", "split_key" => "submitted_at", "split_key_type" => "datetime", "model_klass" => "PurchaseRequest" },
+        { "config" => { "fields" => [{ "name" => "created_by_id", "type" => "category", "value" => "{{record.created_by_id}}" }, { "name" => "vendor_id", "type" => "category" }] }, "build_schedule" => "weekly", "algorithm" => "naive_bayes", "target_key" => "policy_id", "target_key_type" => "category", "split_key" => "submitted_at", "split_key_type" => "datetime", "model_klass" => "Invoice" },
+        { "config" => { "fields" => [{ "name" => "created_by_id", "type" => "category", "value" => "{{record.created_by_id}}" }] }, "build_schedule" => "weekly", "algorithm" => "naive_bayes", "target_key" => "policy_id", "target_key_type" => "category", "split_key" => "submitted_at", "split_key_type" => "datetime", "model_klass" => "PurchaseRequest" }
+      ].each do |config|
+        next if MlModel::Monitor.where(company_id: company.id, model_klass: config['model_klass'], target_key: config['target_key']).count > 0
+
+        MlModel::Monitor.create(config.merge(company_id: company.id))
+      end
+    end
+  end
+
+  def prepare_record(record, options = {})
     data = super(record)
     config['fields']&.each do |field|
       value = format(get_value(record, field), field['type'])
@@ -50,7 +67,7 @@ class MlModel::Monitor < MlModel
     data
   end
 
-  def prepare_prediction(data)
+  def prepare_prediction(data, options = {})
     config['fields']&.each do |field|
       data[field['name']] = format(data[field['name']], field['type'])
     end

@@ -13,6 +13,8 @@
 
 class BudgetGroupCriteriaMapping < ApplicationRecord
 
+  belongs_to :company, optional: true
+
   belongs_to :budget_group_criterium
   belongs_to :budgetable, polymorphic: true
 

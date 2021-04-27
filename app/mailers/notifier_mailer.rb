@@ -31,7 +31,8 @@ class NotifierMailer < ApplicationMailer
 
     @payload["to"].compact && @payload["to"].compact.each do |email|
       mail to: email,
-           # from: payload[:from],
+           cc: @payload['cc'],
+           bcc: @payload['bcc'],
            subject: @payload["subject"],
            template_name: 'template'
     end

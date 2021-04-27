@@ -10,7 +10,7 @@
 #
 
 
-class ExpenseRuleType < ApplicationRecord
+class ExpenseRuleType < NonTenantedApplicationRecord
 
   ACTIONS = {
     'Require Receipt': 1,

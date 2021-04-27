@@ -20,6 +20,7 @@ class Admin::Users::Role::SetRole < Admin::Users::Base
     id = (params[:id] or params[:user_id])
     self.being_updated_user = User.with_id(id).first rescue nil
     return unless being_updated_user.present?
+    self.company = self.being_updated_user.company
 
     ###### setting the expense management roles first ############
     self.em_purpose_id = Purpose.id_for(:expense_management)

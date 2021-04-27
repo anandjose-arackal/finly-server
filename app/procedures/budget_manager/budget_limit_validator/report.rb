@@ -64,7 +64,7 @@ class BudgetManager::BudgetLimitValidator::Report < BudgetManager::BudgetLimitVa
     end
 
     options["result"] = {
-      budget_contributions: budget_contributions
+        budget_contributions: budget_contributions
     }
 
     if options['result.operation.errors'].present?

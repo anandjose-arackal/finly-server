@@ -27,10 +27,11 @@ class GstinLocation < ApplicationRecord
   include LiquidDroppable
   include Exposures::Model::Exposable
 
+  belongs_to :company, optional: true
   belongs_to :vendor, class_name: "YesBankVendor", optional: true, touch: true
   belongs_to :gstin_master, class_name: "Gstin", foreign_key: :gstin_id, optional: true
   belongs_to :state, class_name: "GstStateCode", optional: true
-  has_one :company, through: :vendor
+  # has_one :company, through: :vendor
   has_many :form_custom_fields, class_name: 'FormCustomField', as: :document
   has_paper_trail(
       meta: {
@@ -70,7 +71,7 @@ class GstinLocation < ApplicationRecord
     self.vendor.gst_registered
   end
 
-  def forms_extra_data
+  def forms_extra_data(type = nil, entity_key = nil)
     data = {}
     gstin_master = Gstin.with_gstin(self.gstin).first
     if gstin_master.present?

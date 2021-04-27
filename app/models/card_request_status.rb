@@ -10,5 +10,5 @@
 #
 
 
-class CardRequestStatus < ApplicationRecord
+class CardRequestStatus < NonTenantedApplicationRecord
 end

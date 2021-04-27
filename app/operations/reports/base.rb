@@ -23,7 +23,7 @@ class Reports::Base < BaseOperation
     self.report = Reports::Index.(user, params).reports.with_id(id).first rescue nil
 
     # todo - temporary fix for notifications
-    # self.report = Reports::Index.(user, params).reports&.unscoped.with_id(id)&.first
+    # self.report = Reports::Index.(user, params).reports&.include_soft_deleted.with_id(id)&.first
     # self.report = Report.find_by(id: params[:report_id])
   end
 
@@ -75,14 +75,14 @@ class Reports::Base < BaseOperation
 
   def fetch_budget_contributions(report)
     if user.company.enforce_budget_configuration.enforce_expense_budget?
-      op = BudgetManager::BudgetLimitValidator::Report.({ report: report, ignore_unbudgetables: true, current_user: user })
+      op = BudgetManager::BudgetLimitValidator::Report.({report: report, ignore_unbudgetables: true, current_user: user})
       self.budget_contributions_before_update = op['result'][:budget_contributions] rescue {}
     end
   end
 
   def budget_limit_validation(report)
     if user.company.enforce_budget_configuration.enforce_expense_budget?
-      return BudgetManager::BudgetLimitValidator::Report.({ report: report, previous_budget_contributions: self.budget_contributions_before_update, current_user: user })
+      return BudgetManager::BudgetLimitValidator::Report.({report: report, previous_budget_contributions: self.budget_contributions_before_update, current_user: user})
     end
   end
 

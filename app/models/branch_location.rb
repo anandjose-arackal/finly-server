@@ -61,7 +61,7 @@ include Searchkick::Api
   scope :with_id, -> (id) {where id: id}
 
   scope :include_state, -> { includes :state }
-  default_scope {unscope(:where)}
+  default_scope { include_soft_deleted }
 
   def state_code
     self.state&.state_code

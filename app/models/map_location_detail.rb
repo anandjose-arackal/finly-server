@@ -17,7 +17,7 @@
 #  longitude  :decimal(20, 10)
 #
 
-class MapLocationDetail < ApplicationRecord
+class MapLocationDetail < NonTenantedApplicationRecord
   include UUIDHelper
 
   serialize :result, JSON

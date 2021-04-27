@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class QuickbooksReferenceType < ApplicationRecord
+class QuickbooksReferenceType < NonTenantedApplicationRecord
   include Seedable
 
   def self.values

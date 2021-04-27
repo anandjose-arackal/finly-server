@@ -13,7 +13,7 @@
 
 
 
-class ReportStatus < ApplicationRecord
+class ReportStatus < NonTenantedApplicationRecord
   include Seedable
 
   scope :open, -> { find_by(id: ReportStatus.open_id) }
@@ -138,7 +138,7 @@ class ReportStatus < ApplicationRecord
   # Status IDs for budget trails which are not calculated into budgets
   def self.status_ids_for_unbudgetables
     [
-      ReportStatus.id_for(:rejected),
+        ReportStatus.id_for(:rejected),
     ]
   end
 

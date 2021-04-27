@@ -16,7 +16,7 @@
 
 require 'bcrypt'
 
-class SignedupUser < ApplicationRecord
+class SignedupUser < NonTenantedApplicationRecord
   attr_accessor :password
   before_save :encrypt_password
   after_save :clear_password

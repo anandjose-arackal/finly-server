@@ -8,5 +8,5 @@ json.currencies do
   end
 end
 
-json.tax_rates @result.tax_rates
+json.tax_rates @result.tax_rates.non_deleted
 json.state_codes @result.gst_state_codes

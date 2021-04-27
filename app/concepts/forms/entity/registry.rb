@@ -25,7 +25,9 @@ module Forms::Entity::Registry
     klass, entity_key = klass_and_name_from args
     opts[:parent] = self if self.class <= FormEntity
     entity = klass.system_entity(section, entity_key, opts)
-    entities << entity
+    ActsAsTenant.without_tenant do
+      entities << entity
+    end
     result = entity.valid_schema?
     unless result.success?
       raise "Invalid Form Field: #{self.form}##{entity_key} (#{klass}) Failure: #{result.failure.to_json}"

@@ -80,9 +80,6 @@ gem 'slack-notifier', '~> 2.3'
 # gems for quickbooks integration
 gem 'omniauth', '~> 1.9.0'
 gem 'omniauth-quickbooks', '~> 0.0.2'
-gem 'omniauth-google-oauth2', '~> 0.8.1'
-gem 'google-api-client', '~> 0.53.0'
-gem 'google-id-token', '~> 1.4.2'
 
 
 
@@ -244,7 +241,7 @@ gem 'image_processing', '~> 1.2'
 # adding aws-sdk gem for using their API enabled services
 # gem 'aws-sdk'
 # gem 'aws-sdk-s3', '~> 1.30.0'
-# gem 'aws-sdk-sqs', '~> 1.10.0'
+gem 'aws-sdk-sqs', '~> 1.38.0'
 
 gem 'awesome_print', '~> 1.8.0'
 
@@ -265,10 +262,15 @@ gem 'wit', '~> 6.0'
 gem 'azure'
 gem 'azure-storage-blob'
 
+gem 'acts_as_tenant', '~> 0.4.4'
+
+gem 'money'
+gem 'money-open-exchange-rates'
 # gem for all paper trail
 gem 'paper_trail', '~> 11.0.0'
 gem 'paper_trail-association_tracking', '~> 2.1.1'
 gem 'paper_trail-globalid', '~> 0.2.0'
+
 group :development, :test do
   gem 'byebug'
   gem 'pry', '~> 0.12.2'

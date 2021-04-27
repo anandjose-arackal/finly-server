@@ -2,20 +2,21 @@
 #
 # Table name: companies
 #
-#  id               :integer          not null, primary key
-#  name             :string(255)
-#  created_at       :datetime         not null
-#  updated_at       :datetime         not null
-#  active           :boolean          default(TRUE), not null
-#  base_currency_id :integer          default(1)
-#  status_id        :integer          default(1), not null
-#  test_account     :boolean          default(FALSE)
-#  subdomain        :string(255)
-#  group_id         :integer
-#  deleted_at       :datetime
+#  id                      :integer          not null, primary key
+#  name                    :string(255)
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
+#  active                  :boolean          default(TRUE), not null
+#  base_currency_id        :integer          default(1)
+#  status_id               :integer          default(1), not null
+#  test_account            :boolean          default(FALSE)
+#  subdomain               :string(255)
+#  group_id                :integer
+#  deleted_at              :datetime
+#  reporting_currency_code :string(255)      default("INR")
 #
 
-class Company < ApplicationRecord
+class Company < NonTenantedApplicationRecord
   include Constants
   include LiquidDroppable
   include Exposures::Model::Exposable
@@ -25,6 +26,7 @@ class Company < ApplicationRecord
   belongs_to :status, optional: true, class_name: 'CompanyStatus'
   belongs_to :group, optional: true, class_name: 'CompanyGroup'
 
+  has_many :form_currencies
   has_many :rate_contracts
   has_many :trips
   has_many :users
@@ -74,6 +76,9 @@ class Company < ApplicationRecord
   has_many :security_deposits
   has_many :icici_statements
   has_many :insight_dashboards
+
+  has_many :payments
+  has_many :invoices
 
   has_many :forms
 
@@ -159,7 +164,7 @@ class Company < ApplicationRecord
   delegate :bank_type, to: :configuration
 
   after_create :init_config_present
-  # after_create :company_setup
+  after_create :company_setup
 
   validates :name, presence: true
 
@@ -238,6 +243,10 @@ class Company < ApplicationRecord
         name: name,
         active: active
     }
+  end
+
+  def self.id
+    self.pluck(:id)
   end
 
   def vendor_payment_policies

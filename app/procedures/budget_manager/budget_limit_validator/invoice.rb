@@ -1,7 +1,7 @@
 class BudgetManager::BudgetLimitValidator::Invoice < BudgetManager::BudgetLimitValidator::Base
 
   attr_accessor :invoice, :procurement, :purchase_order
-  
+
   def initialize!(options, **)
     self.invoice = options[:invoice]
 
@@ -74,12 +74,12 @@ class BudgetManager::BudgetLimitValidator::Invoice < BudgetManager::BudgetLimitV
       end
 
       options["result"] = {
-        budget_contributions: budget_contributions
+          budget_contributions: budget_contributions
       }
-  
+
       if options['result.operation.errors'].present?
         add_message options, :error, :base, 'Please contact finance to allocate more budget'
-  
+
         return false
       end
     end

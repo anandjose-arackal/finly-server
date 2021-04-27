@@ -75,10 +75,56 @@
 #
 
 class InvoiceLineItem < ApplicationRecord
+
+  attr_accessor :skip_callback
+
   include LiquidDroppable
   include Exposures::Model::Exposable
   include MathUtil
   include FormsHelper
+
+  belongs_to :company, optional: true
+
+  # Multicurrency Support
+  include Monetizable
+  money :item_gross_amount, :get_reporting_currency
+  money :item_discount_amount, :get_reporting_currency
+  money :item_taxable_amount, :get_reporting_currency
+  money :item_tax_amount, :get_reporting_currency
+  money :item_tds_amount, :get_reporting_currency
+  money :item_net_amount, :get_reporting_currency
+  money :item_billable_amount, :get_reporting_currency
+
+  alias_attribute :items_department_id, :department_id
+  alias_attribute :items_cost_center_id, :cost_center_id
+  #  item_gross_amount_converted    :decimal(20, 5)
+  #  item_discount_amount_converted :decimal(20, 5)
+  #  item_taxable_amount_converted  :decimal(20, 5)
+  #  item_tax_amount_converted      :decimal(20, 5)
+  #  item_tds_amount_converted      :decimal(20, 5)
+  #  item_net_amount_converted      :decimal(20, 5)
+  #  item_billable_amount           :decimal(20, 5)
+  #  item_billable_amount_converted :decimal(20, 5)
+
+  def get_reporting_currency
+    self.parent.get_reporting_currency
+  end
+
+  def get_base_currency
+    self.parent.get_base_currency
+  end
+
+  exchange_bank :get_reporting_currency, :get_base_currency, :exchange_rate
+
+  # exchange_rate as method
+  def exchange_rate
+    ExchangeRate.get_rate(
+        self.parent.conversion_date,
+        self.parent.reporting_currency,
+        self.parent.get_base_currency&.country_code || "INR"
+    )
+  end
+
 
   belongs_to :invoice, optional: true
   belongs_to :category, optional: true
@@ -129,6 +175,7 @@ class InvoiceLineItem < ApplicationRecord
   # validates_presence_of :department, if: :check_outward_invoice?
   before_save :set_tds_applicable
   after_save :budget_trail_entry
+  after_save :sync_amounts, unless: :skip_callback
   after_destroy :budget_trail_destroy
 
   TEMPLATE_COLUMNS = %w{ description quantity rate tax discount category_id gst_type_id hsn_sac parent_type parent_id inventory_line_item_id item_info comment account tax_rate_id cost_center_id unit_of_measurement department_id sgst cgst igst }
@@ -264,23 +311,81 @@ class InvoiceLineItem < ApplicationRecord
     # applied_credit_notes = self.parent.credit_notes
     # adjusted_amount = (applied_credit_notes.joins(:gross_receivable_amount).sum(:value) + applied_credit_notes.joins(:tax_amount).sum(:value)) * ((self.after_tax_amount) / (self.parent.amount_after_tax)) rescue 0
     adjusted_amount = self.parent.credit_note_adjustments.joins(:amount).sum(:value) * ((self.after_tax_amount) / (self.parent.amount_after_tax)) rescue 0
-    adjusted_amount
+    adjusted_amount.nan? ? 0 : adjusted_amount
   end
 
   def cn_adjusted_amount_without_tax
     applied_credit_notes = self.parent.credit_notes
     adjusted_amount = [(self.parent.credit_note_adjustments.joins(:amount).sum(:value) - applied_credit_notes.joins(:tax_amount).sum(:value)), 0].max * ((self.before_tax_amount) / (self.parent.amount_before_tax)) rescue 0
-    adjusted_amount
+    adjusted_amount.nan? ? 0 : adjusted_amount
   end
 
   def cn_tax_amount
     applied_credit_notes = self.parent.credit_notes
     tax_amount = applied_credit_notes.joins(:tax_amount).sum(:value) * ((self.before_tax_amount) / (self.parent.amount_before_tax)) rescue 0
-    tax_amount
+    tax_amount.nan? ? 0 : tax_amount
   end
 
   def set_tds_applicable
     self.tds_applicable = self&.inventory_line_item&.tds_applicable
+  end
+
+  def forms_extra_data(type = nil, entity_key = nil)
+    if type.nil? || entity_key.nil?
+      return {
+
+      }
+    end
+
+    case entity_key
+    when :inventory_line_item_id, 'inventory_line_item_id'
+      data = {
+          "id": inventory_line_item_id,
+          "name": inventory_line_item&.description,
+          "item_number": inventory_line_item&.item_number
+      }
+    when :vendor_id, 'vendor_id'
+      data = {
+          "id": vendor_id,
+          "vendor_id": vendor&.id,
+          "name": vendor&.display_name,
+          "trade_name": vendor&.trade_name
+      }
+    when :department_id, 'department_id'
+      data = {
+          "id": department_id,
+          "department_code": department&.department_code,
+          "name": department&.name,
+      }
+    when :cost_center_id, 'cost_center_id'
+      data = {
+          "id": cost_center_id,
+          "name": cost_center&.name,
+      }
+    when :category_id, 'category_id'
+      data = {
+          "id": category_id,
+          "name": category&.name,
+          "category_code": category&.category_code
+      }
+    when :tax_rate_id, 'tax_rate_id'
+      data = {
+          "id": tax_rate_id,
+          "name": tax_rate&.name,
+          "rate": tax_rate&.rate
+      }
+    else
+      data = {}
+    end
+
+    {
+        "#{entity_key}_lookup_data": data,
+        "#{entity_key}_choice_data": [data]
+    }
+  end
+
+  def retrieve_value(entity)
+    send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
   end
 
   private
@@ -312,4 +417,54 @@ class InvoiceLineItem < ApplicationRecord
     tds_amount.ceil
   end
 
+  # Syncs amounts from new forms structure to legacy amounts table
+  def sync_amounts
+    self.skip_callback = true
+    if parent.respond_to?(:forms_enabled)
+      if parent.forms_enabled
+        sync_to_old_structure
+      else
+        sync_to_forms_structure
+      end
+    end
+  end
+
+  def sync_to_old_structure
+    amounts_attributes_map.each do |key, value|
+      amount_value = self.send("#{key}")
+      amount_attr = self.send("#{value}_id")
+      base_currency_id = get_base_currency&.id
+      if amount_attr.present?
+        Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: base_currency_id)
+      else
+        self.assign_attributes(
+          {
+            "#{value}": Amount.create(value: amount_value, currency_id: base_currency_id).id
+          }
+        )
+      end
+    end
+    self.save
+  end
+
+  def sync_to_forms_structure
+    amounts_attributes_map.each do |key, value|
+      amount_value = self.send(value)&.value
+      self.send("reporting_#{key}=", amount_value)
+      self.send("#{key}=", amount_value)
+    end
+    self.save
+  end
+
+  def amounts_attributes_map
+    # todo - I2P change it to converted values post multicurrency setup
+    {
+      item_gross_amount: 'amount',
+      item_discount_amount: 'discount_amount',
+      item_taxable_amount: 'taxable_amount',
+      item_tax_amount: 'tax_amount',
+      item_net_amount: 'net_amount',
+      item_billable_amount: 'billable_amount'
+    }
+  end
 end

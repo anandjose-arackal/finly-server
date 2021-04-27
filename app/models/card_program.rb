@@ -21,7 +21,7 @@
 #  deleted_at                    :datetime
 #
 
-class CardProgram < ApplicationRecord
+class CardProgram < NonTenantedApplicationRecord
   has_many :cards
 
   scope :with_id, -> (id){ where id: id }

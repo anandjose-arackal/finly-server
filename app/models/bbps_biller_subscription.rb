@@ -97,7 +97,7 @@ include Searchkick::Api
   accepts_nested_attributes_for :custom_fields
 
   def self.default_scope
-    unscoped.order('bbps_biller_subscriptions.created_at DESC')
+    include_soft_deleted.order('bbps_biller_subscriptions.created_at DESC')
   end
 
   scope :filter_ids, -> (ids) {where(id: ids)}

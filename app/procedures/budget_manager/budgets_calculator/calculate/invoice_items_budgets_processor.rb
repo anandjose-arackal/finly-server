@@ -66,6 +66,7 @@ class BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor 
 
     self.trail_hash = {
         id: trail_id,
+        company_id: invoice_item.company_id,
         procurement_id: invoice_item.parent.procurement_id,
         entity: invoice_item,
         category_id: invoice_item.category_id,

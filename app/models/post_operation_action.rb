@@ -16,6 +16,7 @@ class PostOperationAction < ApplicationRecord
 
   serialize :payload
 
+  belongs_to :company, optional: true
   belongs_to :post_operatable, optional: true, polymorphic: true
 
   validates :post_operatable, presence: true

@@ -12,6 +12,7 @@ class Admin::Payments::ChangeStatus < Admin::Payments::Base
   def init
     payment_id = params[:id] || params[:payment_id]
     company_id = params[:company_id]
+    self.company = Company.find_by(id: company_id)
     self.payment = Payment.find_by(id: payment_id, company_id: company_id )
     self.initiating_user = payment.initiating_user
   end

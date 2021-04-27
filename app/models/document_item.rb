@@ -27,6 +27,7 @@
 #
 
 class DocumentItem < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :inventory_line_item, optional: true, class_name: 'Item'
   belongs_to :parent_document, optional: true, polymorphic: true
 

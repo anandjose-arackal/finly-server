@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class AdminUserRole < ApplicationRecord
+class AdminUserRole < NonTenantedApplicationRecord
   include Seedable
 
   validates :name, presence: true

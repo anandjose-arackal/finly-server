@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class InvoiceNumberConfigType < ApplicationRecord
+class InvoiceNumberConfigType < NonTenantedApplicationRecord
 
   include Seedable
 
