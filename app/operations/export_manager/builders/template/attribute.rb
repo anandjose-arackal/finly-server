@@ -1,11 +1,12 @@
 class ExportManager::Builders::Template::Attribute
-  attr_accessor :name, :template, :column_name, :toggle
+  attr_accessor :name, :template, :column_name, :toggle, :active
 
-  def initialize(name:, template:, column_name: nil, toggle: nil)
+  def initialize(name:, template:, column_name: nil, toggle: nil, active: true)
     self.name = name
     self.template = template
     self.column_name = column_name || name.to_s.humanize
     self.toggle = toggle
+    self.active = active
   end
 
   def feature_enabled?(company)

@@ -53,7 +53,12 @@ class ExportManager::Builders::Template
 
   def self.filter_columns(company)
     columns.filter do |col|
-      col.feature_enabled?(company)
+      next false unless col.feature_enabled?(company)
+      if col.active.is_a?(Symbol)
+        next self.send(col.active, company)
+      end
+
+      col.active.truthy?
     end
   end
 
