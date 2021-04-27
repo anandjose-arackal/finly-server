@@ -315,21 +315,8 @@ class NonPoInvoiceMigrator
       invoice_roundoff_amount: document&.roundoff_amount,
       reporting_invoice_roundoff_amount: document&.roundoff_amount,
 
-
-      # if rcm == true
-      #   invoice_sub_total_amount = 
-            # invoice_gross_amount - invoice_discount_amount + invoice_freight_amount
-            # ============ document&.item_amounts_total.to_f - document&.discount_amount&.value + document&.freight_amount&.value
-      # else
-      #   invoice_sub_total_amount = 
-            # invoice_gross_amount - invoice_discount_amount + invoice_tax_amount + invoice_freight_amount
-            # ============ document&.item_amounts_total.to_f - document&.discount_amount&.value + document&.tax_amount&.value + document&.freight_amount&.value
-      # end
-
-
       invoice_sub_total_amount: invoice_sub_total_amount,
       reporting_invoice_sub_total_amount: invoice_sub_total_amount,
-
 
       
       # invoice_total_amount: invoice_sub_total_amount + invoice_roundoff_amount - invoice_tds_amount - invoice_paid_outside_amount 

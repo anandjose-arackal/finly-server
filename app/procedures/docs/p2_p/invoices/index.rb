@@ -51,7 +51,7 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
   IndexBuilder::API::ColumnTemplate::ReviewProgress(self)
 
   column :net_amount, includes: [net_amount: :currency], default: true do
-    amount value: :net_amount
+    amount value: :set_net_amount_value
   end
 
   IndexBuilder::API::ColumnTemplate::ControllingUser(self)
@@ -265,6 +265,17 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
       format = 'danger'
     end
     format
+  end
+
+  def self.set_net_amount_value(context)
+    user = context[:user]
+    if user.present? && user.non_po_invoice_form_enabled 
+      # show sub_total amount
+      context[:record].invoice_sub_total_amount
+    else
+      # show new amount
+      context[:record].net_amount
+    end
   end
 
 end

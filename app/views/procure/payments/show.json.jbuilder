@@ -28,7 +28,7 @@ json.beneficiary_type (payment.receiving_account.account_owner_type == "User" ? 
 json.created_at payment.created_at.strftime("%b %d, %Y")
 json.created_by payment.initiating_user.as_json
 json.is_domestic payment&.bank_payment_request&.is_domestic
-json.non_po_invoice_form_enabled payment&.parent&.forms_enabled 
+json.non_po_invoice_form_enabled payment&.parent&.forms_enabled rescue false
 
 if payment.receiving_user.is_a?(User) || payment.receiving_user.authorized
   json.beneficiary_type "authorized"
