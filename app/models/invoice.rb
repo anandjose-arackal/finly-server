@@ -1808,57 +1808,58 @@ class Invoice < ApplicationRecord
 
   # Syncs amounts from new forms structure to legacy amounts table
   def sync_amounts
-    self.skip_callback = true
-    base_currency_id = get_base_currency&.id
+    if forms_enabled
+      self.skip_callback = true
+      base_currency_id = get_base_currency&.id
 
-    if invoice_gross_amount.present?
-      amounts_attributes_map.each do |key, value|
-        # if an invoice has a payment associated with self, then do not update balance_payable, adding a workaround as balance payable do not get updated.
-        next if self.payments.present? && key.to_s == 'invoice_balance_due'
+      if invoice_gross_amount.present?
+        amounts_attributes_map.each do |key, value|
+          # if an invoice has a payment associated with self, then do not update balance_payable, adding a workaround as balance payable do not get updated.
+          next if self.payments.present? && key.to_s == 'invoice_balance_due'
 
-        amount_value = self.send(key)
-        amount_attr = self.send("#{value}_id")
-        if amount_attr.present?
-          Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: base_currency_id)
-        else
-          amount_id = Amount.create(value: amount_value, currency_id: base_currency_id).id
-          self.send("#{value}_id=", amount_id)
+          amount_value = self.send(key)
+          amount_attr = self.send("#{value}_id")
+          if amount_attr.present?
+            Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: base_currency_id)
+          else
+            amount_id = Amount.create(value: amount_value, currency_id: base_currency_id).id
+            self.send("#{value}_id=", amount_id)
+          end
         end
+
+        amount_direct_attribute_map.each do |key, value|
+          amount_value = self.send(key)
+          self.send("#{value}=", amount_value)
+        end
+        self.save
       end
 
-      amount_direct_attribute_map.each do |key, value|
-        amount_value = self.send(key)
-        self.send("#{value}=", amount_value)
+      # FOR AMOUNT ATTRIBUTE
+      amount_attr = self.amount_id
+      # taxable + tax
+      amount_value = self.invoice_taxable_amount.to_f + self.invoice_tax_amount.to_f
+      self.skip_callback = true
+      if amount_attr.present?
+        Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: base_currency_id)
+      else
+        amount_id = Amount.create(value: amount_value, currency_id: base_currency_id).id
+        self.send("amount_id=", amount_id)
       end
-      self.save
+
+
+
+      # FOR NET AMOUNT
+      net_amount_attr = self.net_amount_id
+      # invoice_net_total_amount - invoice_paid_outside_amount
+      net_amount_value = self.invoice_net_total_amount.to_f - self.invoice_paid_outside_amount.to_f
+      self.skip_callback = true
+      if net_amount_attr.present?
+        Amount.find_by(id: net_amount_attr).update(value: net_amount_value, currency_id: base_currency_id)
+      else
+        amount_id = Amount.create(value: net_amount_value, currency_id: base_currency_id).id
+        self.send("net_amount_id=", amount_id)
+      end
     end
-
-    # FOR AMOUNT ATTRIBUTE
-    amount_attr = self.amount_id
-    # taxable + tax
-    amount_value = self.invoice_taxable_amount.to_f + self.invoice_tax_amount.to_f
-    self.skip_callback = true
-    if amount_attr.present?
-      Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: base_currency_id)
-    else
-      amount_id = Amount.create(value: amount_value, currency_id: base_currency_id).id
-      self.send("amount_id=", amount_id)
-    end
-
-
-
-    # FOR NET AMOUNT
-    net_amount_attr = self.net_amount_id
-    # invoice_net_total_amount - invoice_paid_outside_amount
-    net_amount_value = self.invoice_net_total_amount.to_f - self.invoice_paid_outside_amount.to_f
-    self.skip_callback = true
-    if net_amount_attr.present?
-      Amount.find_by(id: net_amount_attr).update(value: net_amount_value, currency_id: base_currency_id)
-    else
-      amount_id = Amount.create(value: net_amount_value, currency_id: base_currency_id).id
-      self.send("net_amount_id=", amount_id)
-    end
-
   end
 
   def sync_to_forms_structure
