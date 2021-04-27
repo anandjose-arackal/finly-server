@@ -972,7 +972,7 @@ include Searchkick::Api
       base_currency: self.bank_payment_request.base_currency,
       reporting_currency: self.company.reporting_currency,
       is_domestic: self.bank_payment_request&.is_domestic,
-      non_po_invoice_form_enabled: self.parent&.forms_enabled
+      non_po_invoice_form_enabled: (self.parent&.forms_enabled rescue false)
     }
   end
 
