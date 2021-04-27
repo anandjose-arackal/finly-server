@@ -9,7 +9,7 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
   def self.reference(id = nil, args = {})
     {id: '{{record.id}}',
      args: {
-            forms_enabled: "{% if record.non_po_form_enabled == true %}{{true}}{% else %}{{ false }}{% endif %}"}
+            non_po_forms_enabled: "{% if record.non_po_form_enabled == true %}{{true}}{% else %}{{ false }}{% endif %}"}
     }
   end
 
