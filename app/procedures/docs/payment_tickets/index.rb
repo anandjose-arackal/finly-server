@@ -170,21 +170,27 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
 
   def self.format_amount_requested_tool_tip(context)
     user = context[:user]
+    value = context[:record].payment_order&.amount_requested&.value.to_f
+    
     if user.present? && user.non_po_invoice_form_enabled 
       country_code = context[:record].base_currency&.country_code
-      value = context[:record].payment_order&.amount_requested&.value.to_f
-
       "#{country_code} #{value}"
+    else
+      country_sym = context[:record].base_currency&.symbol
+      "#{country_sym} #{value}"
     end
   end
 
   def self.format_amount_processed_tool_tip(context)
     user = context[:user]
+    value = context[:record].payment_order&.amount_processed&.value.to_f
+
     if user.present? && user.non_po_invoice_form_enabled 
       country_code = context[:record].base_currency&.country_code
-      value = context[:record].payment_order&.amount_processed&.value.to_f
-
       "#{country_code} #{value}"
+    else
+      country_sym = context[:record].base_currency&.symbol
+      "#{country_sym} #{value}"
     end
   end
 
