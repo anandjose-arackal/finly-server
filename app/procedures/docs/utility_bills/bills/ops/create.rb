@@ -106,6 +106,8 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
         )
     )
 
+    bill.merge("custom_fields" => subscription.custom_fields)
+
     # Add Amounts
     %i( amount late_payment_fee early_payment_fee ).each do |key|
       bill.merge!({"#{key.to_s}": {value: (params.dig(key) || 0), currency_id: 1}})
