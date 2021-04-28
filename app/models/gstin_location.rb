@@ -39,6 +39,7 @@ class GstinLocation < ApplicationRecord
       }
   )
   scope :filter_active, -> { joins(:vendor).where("yes_bank_vendors.status_id != ?", VendorStatus.id_for(:deactivated)) }
+  scope :filter_unique_check, -> { joins(:vendor).where("yes_bank_vendors.status_id != ?", VendorStatus.id_for(:deactivated)) }
   # validates :location, presence: true
   # validates :state_id, presence: true, if: :check_vendor_gstin_registered? # todo - I2P : move logic to operations
   validates :gstin, format: Constants::VALID_GSTIN, length: {is: 15}, allow_blank: true

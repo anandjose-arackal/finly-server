@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file. Always add new logs to 
 beginning of this file.
 
+## 2021-04-28
+- Fix: Added filter_unique_check method for models to use it for scoping records for uniqueness check. And updated forms unique validation to use the same
+
 ## 2021-04-17
 - Fix: Validation on total invoiced quantity against purchase order quantity removed for service items
 
