@@ -14,7 +14,7 @@ json.base_currency payment.bank_payment_request.base_currency
 json.reporting_currency payment.company.reporting_currency
 json.disabled payment.receiving_account&.disabled
 json.ifsc payment.receiving_account.ifsc
-json.ifsc payment.receiving_account.swift_code
+json.swift_code payment.receiving_account.swift_code
 json.amount precision_value payment.amount_value
 json.payment_amount payment.amount_value
 json.net_amount precision_value payment.amount_value
