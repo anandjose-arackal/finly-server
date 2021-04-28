@@ -92,7 +92,7 @@ json.payments do
           original_amount = invoice.invoice_gross_amount
         end
         
-        json.original_amount precision_value invoice.amount&.value
+        json.original_amount precision_value original_amount
       else
         json.original_amount precision_value invoice.original_amount&.value
       end

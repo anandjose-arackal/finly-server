@@ -1838,6 +1838,10 @@ class Invoice < ApplicationRecord
       amount_attr = self.amount_id
       # taxable + tax
       amount_value = self.invoice_taxable_amount.to_f + self.invoice_tax_amount.to_f
+      if self.rcm_enabled 
+        amount_value = amount_value - self.invoice_tax_amount.to_f
+      end
+      
       self.skip_callback = true
       if amount_attr.present?
         Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: base_currency_id)
