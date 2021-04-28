@@ -535,7 +535,7 @@ class PurchaseOrder < ApplicationRecord
   def status_tag_details
     return @tags_data if @tags_data.present?
 
-    tag_ids = self.procurement.status_tags.pluck(:id)
+    tag_ids = self.procurement&.status_tags&.pluck(:id) || []
 
     data = {
         grn: {},
