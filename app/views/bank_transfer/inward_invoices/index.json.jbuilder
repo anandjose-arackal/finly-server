@@ -52,8 +52,12 @@ json.results do
       json.tds_rate precision_value invoice.tds_rate
       json.discount_rate precision_value invoice.discount_rate
       json.advance_rate precision_value invoice.advance_rate
-      json.base_currency_id invoice.get_base_currency.id
-      json.base_currency_code invoice.get_base_currency.country_code
+      
+      if invoice.forms_enabled
+        json.base_currency_id invoice.get_base_currency.id
+        json.base_currency_code invoice.get_base_currency.country_code
+      end
+      
       json.is_domestic invoice.is_domestic
 
       #############################
