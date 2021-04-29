@@ -34,11 +34,11 @@ class ExportManager::Template::Master::Invoices::Index < ExportManager::Builders
   attribute :attachments, template: '{{ record.invoice.attachments }}'
   attribute :approval_pending_reviewers, template: '{{ record.invoice.approval_pending_reviewers }}'
   
-  attribute :reporting_net_amount, template: '{{ record.reporting_invoice_sub_total_amount }}'
-  attribute :reporting_balance_due, template: '{{ record.reporting_invoice_balance_due }}'
-  attribute :conversion_rate, template: '{{ record.conversion_rate }}'
-  attribute :reporting_currency, template: '{{ record.reporting_currency_code }}'
-  attribute :base_currency, template: '{{ record.base_currency_code }}'
+  # attribute :reporting_net_amount, template: '{{ record.reporting_invoice_sub_total_amount }}', toggle: {if: [ NonPoInvoiceToggle, :enabled?]}
+  # attribute :reporting_balance_due, template: '{{ record.reporting_invoice_balance_due }}', toggle: {if: [ NonPoInvoiceToggle, :enabled?]}
+  # attribute :conversion_rate, template: '{{ record.conversion_rate }}', toggle: {if: [ NonPoInvoiceToggle, :enabled?]}
+  # attribute :reporting_currency, template: '{{ record.reporting_currency_code }}', toggle: {if: [ NonPoInvoiceToggle, :enabled?]}
+  # attribute :base_currency, template: '{{ record.base_currency_code }}', toggle: {if: [ NonPoInvoiceToggle, :enabled?]}
 
   attribute :vendor_name, template: '{{ record.invoice.vendor.display_name }}'
   attribute :vendor_ref_no, template: '{{ record.invoice.vendor.vendor_id }}'
