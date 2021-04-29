@@ -11,6 +11,7 @@ class AccountManager::Collect::CollectRouter < AccountManager::Collect::Base
       self.virtual_account_transaction = VirtualAccountTransaction.new transaction_params
       self.virtual_account = ::VirtualBankAccount.find_by(account_number: virtual_account_transaction.beneficiary_account_no)
       self.virtual_account_transaction.virtual_account = self.virtual_account
+      self.virtual_account_transaction.company_id = self.virtual_account.company_id
     else
       self.virtual_account = self.virtual_account_transaction.virtual_account
     end
