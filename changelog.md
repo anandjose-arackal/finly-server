@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file. Always add new logs to 
 beginning of this file.
 
+## 2021-04-30
+- Feat: NonPoInvoice form migration, payment ticket and multi currency changes, with feature flag added to the old ui
+
 ## 2021-04-17
 - Fix: Validation on total invoiced quantity against purchase order quantity removed for service items
 
