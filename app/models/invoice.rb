@@ -338,6 +338,13 @@ class Invoice < ApplicationRecord
   validate :item_rate_validation
 
   before_destroy :rollback_agreement_invoice
+  # before_create :set_base_currency
+
+  # def set_base_currency  
+  #   self.reporting_currency = self.company.reporting_currency_code
+  #   self.base_currency = self.company.reporting_currency.id
+  #   self.conversion_rate = 1
+  # end
 
   scope :with_company_id, -> (company_id) { where company_id: company_id }
   scope :with_id, -> (id) { where id: id }
