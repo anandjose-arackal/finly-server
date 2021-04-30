@@ -228,7 +228,12 @@ json.payments do
         json.merge! payment.parent_details
         # json.payable_amount payment.get_payable_amount
         json.payable_amount precision_value payment.amount.value
-      end
+        if payment.parent&.is_a?(BbpsBill)
+          #to support one attachment preview in payment list
+          # TO DO want rewamp to suuport mutil attachment in UI
+          json.invoice_attachment payment.parent.attachments.to_json
+        end
+        end
     end
   end
 end
