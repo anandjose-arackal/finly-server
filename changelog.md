@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file. Always add new logs to 
 beginning of this file.
 
+## 2021-05-01
+- Fix: Fix for filter issue, filter not populating. 
+
 ## 2021-04-30
 - Feat: NonPoInvoice form migration, payment ticket and multi currency changes, with feature flag added to the old ui
 
