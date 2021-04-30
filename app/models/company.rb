@@ -536,6 +536,10 @@ class Company < NonTenantedApplicationRecord
     status_id == CompanyStatus.id_for(:partial_block)
   end
 
+  def reporting_currency
+    Currency.find_by(country_code: self.reporting_currency_code || 'INR')
+  end
+
   private
 
   def init_config_present
