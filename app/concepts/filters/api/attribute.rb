@@ -82,7 +82,7 @@ class Filters::API::Attribute
                 hint: hint,
                 choices: choices,
                 simple: simple,
-                active:active
+                active: active
             }
         )
       end
@@ -105,7 +105,7 @@ class Filters::API::Attribute
 
         selected_filters = []
         filters.each do |filter|
-          if filter[:active] == nil || (filter[:active].to_s == 'is_accessable' && self.send(filter[:active].to_s, user))
+          if filter[:active] == true || (filter[:active].to_s == 'is_accessable' && self.send(filter[:active].to_s, user))
             selected_filters << filter
           end
         end
