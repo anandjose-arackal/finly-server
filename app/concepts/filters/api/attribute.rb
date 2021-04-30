@@ -69,7 +69,7 @@ class Filters::API::Attribute
         attributes[filter_key].present?
       end
 
-      def attribute(field_key, label: nil, type: :text, hint: "Select Value", choices: nil, simple: false, active: active)
+      def attribute(field_key, label: nil, type: :text, hint: "Select Value", choices: nil, simple: false, active: true)
         raise "#{field_key} is already defined for class #{self.name}" if exists?(field_key)
 
         label ||= field_key.to_s.humanize
