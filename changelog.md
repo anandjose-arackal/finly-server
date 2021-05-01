@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file. Always add new logs to 
 beginning of this file.
 
+## 2021-05-01
+ - feat: Custom fields for Bbps utility subscriptions.
+
 ## 2021-04-17
 - Fix: Validation on total invoiced quantity against purchase order quantity removed for service items
 
