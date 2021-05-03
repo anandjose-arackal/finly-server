@@ -76,8 +76,8 @@ class Forms::Ops::LookupDetails < Transactions::API
       end
     end
 
-    data
     data.merge!(context[:all_data])
+    data
   end  
 
 end
