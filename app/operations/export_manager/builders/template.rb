@@ -51,8 +51,19 @@ class ExportManager::Builders::Template
     cols
   end
 
+  def self.filter_columns(company)
+    columns.filter do |col|
+      next false unless col.feature_enabled?(company)
+      if col.active.is_a?(Symbol)
+        next self.send(col.active, company)
+      end
+
+      col.active.truthy?
+    end
+  end
+
   def self.build(company)
-    cols = columns + build_custom_columns(company)
+    cols = filter_columns(company) + build_custom_columns(company)
     {
       name: label,
       description: description,

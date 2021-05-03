@@ -42,4 +42,8 @@ class BankPaymentRequestExposure < Exposures::API
     record.get_reviewers&.map(&:name)&.join(", ")
   end
 
+  attribute :non_po_form_enabled do
+    record.non_po_form_enabled
+  end
+
 end

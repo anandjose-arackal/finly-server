@@ -15,6 +15,7 @@ json.payments do
       json.name payment.receiving_account&.name
       json.account_number payment.receiving_account&.account_number
       json.ifsc payment.receiving_account&.ifsc
+      json.swift_code payment.receiving_account&.swift_code
     else
       json.owner_name payment.receiving_account&.account_owner&.name
       json.beneficiary_id payment.receiving_account&.account_owner&.id
@@ -84,7 +85,14 @@ json.payments do
       json.raw_amount precision_value invoice&.amount&.value
       # conditionally set the original amount as invoice amount is there are line items
       if payment.invoice&.invoice_items.present?
-        json.original_amount precision_value invoice.amount&.value
+
+        # toggle = NonPoInvoiceToggle.new(current_user)
+        original_amount = precision_value invoice.amount&.value
+        # if toggle.enabled?
+          # original_amount = invoice.invoice_gross_amount
+        # end
+
+        json.original_amount precision_value original_amount
       else
         json.original_amount precision_value invoice.original_amount&.value
       end
@@ -228,12 +236,17 @@ json.payments do
         json.merge! payment.parent_details
         # json.payable_amount payment.get_payable_amount
         json.payable_amount precision_value payment.amount.value
+
+        if payment.parent_type == 'Invoice'
+          conversion_rate = payment&.parent_details.with_indifferent_access[:conversion_rate].to_f rescue 1
+          json.reporting_payable_amount payment&.amount&.value.to_f * conversion_rate.to_f
+        end
         if payment.parent&.is_a?(BbpsBill)
           #to support one attachment preview in payment list
           # TO DO want rewamp to suuport mutil attachment in UI
           json.invoice_attachment payment.parent.attachments&.first
         end
-        end
+      end
     end
   end
 end

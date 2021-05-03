@@ -19,6 +19,12 @@ class PurchaseRequestExposure < Exposures::API
   attribute :approved_at, record_attribute: true
   attribute :cost_allocation_items, record_attribute: true
   attribute :items, record_attribute: true, exposure: true
-  attribute :controlling_level, record_attribute: true, exposure: true
+  attribute :controlling_level, record_attribute: true, exposure: true, includes: [:controlling_level]
+  attribute :get_reviewers_names do
+    record.get_reviewers&.map(&:name)&.join(", ")
+  end
+  attribute :approved_reviewers_names, includes: [{ dlrms: :reviewer }] do
+    record.dlrms&.where(action_id: TrailAction.id_for(:approve))&.includes(:reviewer)&.map {|dlr| dlr&.reviewer&.name}&.join(" ,")
+  end
 
 end
