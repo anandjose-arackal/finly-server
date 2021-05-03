@@ -231,7 +231,7 @@ json.payments do
         if payment.parent&.is_a?(BbpsBill)
           #to support one attachment preview in payment list
           # TO DO want rewamp to suuport mutil attachment in UI
-          json.invoice_attachment payment.parent.attachments
+          json.invoice_attachment payment.parent.attachments&.first
         end
         end
     end
