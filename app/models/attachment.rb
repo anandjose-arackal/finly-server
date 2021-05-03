@@ -60,7 +60,7 @@ class Attachment < ApplicationRecord
       file_name: self.file.original_filename,
       file_size: (self.file_file_size / 1024).round(2).to_s + " KB",
       status: 'done',
-      content_type: self.content_type
+      content_type: self.file_content_type
       # created_by: self.creator&.name,
       # description: self.description
     }
