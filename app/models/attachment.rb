@@ -54,7 +54,7 @@ class Attachment < ApplicationRecord
       id: self.id,
       name: self.file_file_name,
       url: self.file&.url,
-      thump: self.file(:thump),
+      thumb: self.file(:thumb),
       created_at: self.created_at.to_date,
       resource_type: self.resource_type,
       resource_id: self.resource_id,
