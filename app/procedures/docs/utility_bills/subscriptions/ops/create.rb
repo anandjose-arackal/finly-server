@@ -3,6 +3,7 @@ class Docs::UtilityBills::Subscriptions::Ops::Create < Transactions::API
   # Create an empty model
   step Model( BbpsBillerSubscription, :new )
 
+
   # Pass the model to the policy and check if user can perform the action
   step Policy::Pundit( Docs::UtilityBills::Subscriptions::Authorizer, :create? )
 
@@ -10,7 +11,7 @@ class Docs::UtilityBills::Subscriptions::Ops::Create < Transactions::API
   # number of attributes
   step :set_default_params 
 
-  step :set_custom_fields
+  step :set_and_validate_custom_fields
 
   # Instantiate contract
   step Contract::Build( constant: Docs::UtilityBills::Subscriptions::Contracts::Base )
@@ -35,6 +36,7 @@ class Docs::UtilityBills::Subscriptions::Ops::Create < Transactions::API
   step :update_attachments
 
   step Transactions::Messages::SuccessMessage('Utility Bill Master created successfully')
+
 
   def check(ctx, options, **)
     # ctx['result.contract.default'].errors.present?
@@ -73,9 +75,19 @@ class Docs::UtilityBills::Subscriptions::Ops::Create < Transactions::API
     params[:subscription][:auto_generate_bill] = params[:subscription][:auto_generate_bill] || resolve_auto_bill_generation(fetch_requirement)
   end
 
-  def set_custom_fields(options, current_user:, params:, model:, **)
+  def set_and_validate_custom_fields(options, current_user:, params:, model:, **)
     custom_fields = params[:custom_fields]
-    res = CustomField::SetFields.(options['model'], FieldParentType.id_for("BbpsBillerSubscription"), custom_fields: custom_fields)
+    set_fields = CustomField::SetFields.(options['model'], FieldParentType.id_for("BbpsBillerSubscription"), custom_fields: custom_fields)
+    unless set_fields.success?
+      add_message(options, :error, nil, set_fields.messages[:error])
+      return 
+    end
+    valid = CustomField::Validate.(options['model'])
+    unless valid.success?
+      add_message(options, :error, nil, valid.messages[:error])
+      return 
+    end
+    true
   end
 
 

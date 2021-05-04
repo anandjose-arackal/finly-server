@@ -54,6 +54,16 @@ class Docs::UtilityBills::Subscriptions::Ops::Update < Transactions::API
 
   def set_custom_fields(options, params:, current_user:,model:, **)
     custom_fields = params[:custom_fields]
-    res = CustomField::SetFields.(model, FieldParentType.id_for("BbpsBillerSubscription"), custom_fields: custom_fields)
+    set_fields = CustomField::SetFields.(options['model'], FieldParentType.id_for("BbpsBillerSubscription"), custom_fields: custom_fields)
+    unless set_fields.success?
+      add_message(options, :error, nil, set_fields.messages[:error])
+      return 
+    end
+    valid = CustomField::Validate.(options['model'])
+    unless valid.success?
+      add_message(options, :error, nil, valid.messages[:error])
+      return 
+    end
+    true
   end
 end

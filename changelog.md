@@ -4,6 +4,7 @@ beginning of this file.
 
 ## 2021-05-01
 - Fix: Fix for filter issue, filter not populating. 
+- feat: Custom fields for Bbps utility subscriptions.
 
 ## 2021-04-30
 - Feat: NonPoInvoice form migration, payment ticket and multi currency changes, with feature flag added to the old ui
