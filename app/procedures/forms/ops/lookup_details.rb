@@ -5,11 +5,12 @@ class Forms::Ops::LookupDetails < Transactions::API
       required(:route).filled #.value(included_in?: Forms::Router.map.keys)
       required(:entity_path).filled
       required(:value).filled
+      optional(:registers) # Registers is used for lookup
     end
   end
 
   step :find_model
-  step Policy::Pundit(Forms::Policy, :config?)
+  step Policy::Pundit(Forms::Policy, :config?) # Todo
   step :find_entity
   step :find_record
   pass :find_dependent_entities
@@ -38,13 +39,17 @@ class Forms::Ops::LookupDetails < Transactions::API
   end
 
   def find_dependent_entities(context, model:, entity:, **)
+    # need to update this from 2 level to a recurcive function where all level of entities could be fetched
     context[:dependent_entities] = model.entities.where(compute_lookup_entity: entity)
   end
 
-  def compute(context, entity_exposure:, dependent_entities:, **)
+  def compute(context, params:, entity_exposure:, dependent_entities:, **)
     context[:data] = data = {}
     dependent_entities.each do |dep_ent|
-      data[dep_ent.entity_path] = entity_exposure.template(dep_ent.compute_formula)
+      data[dep_ent.entity_path] = entity_exposure.template(dep_ent.compute_formula, registers: params[:registers])
+      if dep_ent.entity_path.split("_").include?("id")
+        data["#{dep_ent.entity_path}_value"] = entity_exposure.template(dep_ent.compute_formula.gsub('id', 'value'), registers: params[:registers])
+      end
     end
   end
 

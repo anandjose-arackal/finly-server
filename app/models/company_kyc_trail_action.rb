@@ -10,7 +10,7 @@
 #
 
 
-class CompanyKycTrailAction < ApplicationRecord
+class CompanyKycTrailAction < NonTenantedApplicationRecord
 
   include Seedable
 

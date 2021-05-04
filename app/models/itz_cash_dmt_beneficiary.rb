@@ -28,6 +28,7 @@
 #
 
 class ItzCashDmtBeneficiary < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :itz_cash_dmt_sender, optional: true
   belongs_to :status, optional: true, class_name: 'ItzCashDmtBeneficiaryStatus'
 

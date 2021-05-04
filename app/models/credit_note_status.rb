@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class CreditNoteStatus < ApplicationRecord
+class CreditNoteStatus < NonTenantedApplicationRecord
   include Seedable
 
   def as_json(options = {})

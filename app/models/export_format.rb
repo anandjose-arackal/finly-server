@@ -10,7 +10,7 @@
 #  updated_at :datetime         not null
 #
 
-class ExportFormat < ApplicationRecord
+class ExportFormat < NonTenantedApplicationRecord
   FORMATS = [
     {
       name: 'Excel',

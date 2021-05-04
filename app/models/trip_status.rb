@@ -7,7 +7,7 @@
 #  deleted_at :datetime
 #
 
-class TripStatus < ApplicationRecord
+class TripStatus < NonTenantedApplicationRecord
   include Seedable
 
   def self.values

@@ -83,6 +83,7 @@ class YesBankVendor < ApplicationRecord
 
   belongs_to :currency, optional: true
   belongs_to :payment_term, optional: true
+  belongs_to :tax_rate, optional: true
 
   has_many :bank_accounts, as: :account_owner, dependent: :destroy
   has_many :receiving_payments, as: :receiving_user, class_name: 'Payment'
@@ -92,7 +93,7 @@ class YesBankVendor < ApplicationRecord
   has_many :vendor_tds_rates, foreign_key: :vendor_id
   has_many :tds_rates, through: :vendor_tds_rates
   has_many :beneficiary_payments, foreign_key: :vendor_id
-  has_many :gstin_locations, foreign_key: :vendor_id
+  has_many :gstin_locations, foreign_key: :vendor_id, dependent: :destroy
   has_many :credit_notes, foreign_key: :vendor_id
 
   has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment'
@@ -105,7 +106,7 @@ class YesBankVendor < ApplicationRecord
       }
   )
 
-  default_scope { unscope(:where) }
+  default_scope { include_soft_deleted.order(created_at: :desc) }
 
   # Requirement first shared by olx
   # has_one :cancelled_cheque_attachment, class_name: "VendorAttachment", dependent: :destroy
@@ -465,4 +466,47 @@ class YesBankVendor < ApplicationRecord
   def retrieve_value(entity)
     send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
   end
+
+  def forms_extra_data(type = nil, entity_key = nil)
+    if type.nil? || entity_key.nil?
+      return {
+      }
+    end
+
+    case entity_key
+
+    when :policy_id, 'policy_id'
+      data = {
+          "id": policy_id,
+          "name": policy&.name,
+      }
+    when :payment_term_id, 'payment_term_id'
+      data = {
+          "id": payment_term_id,
+          "name": payment_term&.name,
+          "description": payment_term&.description,
+          "default": payment_term&.default
+      }
+    when :tax_rate_id, 'tax_rate_id'
+      data = {
+          "id": tax_rate_id,
+          "name": tax_rate&.name,
+          "rate": tax_rate&.rate
+      }
+    when :category_id, 'category_id'
+      data = {
+          "id": category_id,
+          "name": category&.name,
+          "category_code": category&.category_code
+      }
+    else
+      data = {}
+    end
+
+    {
+        "#{entity_key}_lookup_data": data,
+        "#{entity_key}_choice_data": [data]
+    }
+  end
+
 end

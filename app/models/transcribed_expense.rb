@@ -16,6 +16,7 @@
 #
 
 class TranscribedExpense < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :amount, optional: true
   belongs_to :receipt, optional: true
   belongs_to :expense, optional: true

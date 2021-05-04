@@ -17,10 +17,11 @@
 #  deleted_at             :datetime
 #
 
-class CustomField < ApplicationRecord
+class CustomField < ApplicationRecordBackwardCompatibility
 
   PARENT_TYPES = ['ManualExpense', 'CardExpense', 'TimeExpense', 'PerDiemExpense', 'DistanceExpense', 'Report', 'MoneyRequest', 'Invoice', 'InvoiceLineItem', 'PurchaseOrder', 'TravelRequest', 'Booking', 'YesBankVendor', 'PurchaseRequest', 'PurchaseRequestItem', 'GeneralInvoice', 'RentalInvoice', 'Item', 'PaymentAgreement', 'RateContract', 'BbpsBillerSubscription'].freeze
 
+  belongs_to :company, optional: true
   belongs_to :field_configuration, optional: true
   belongs_to :parent, optional: true, polymorphic: true
 

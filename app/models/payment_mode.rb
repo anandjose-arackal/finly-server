@@ -10,7 +10,7 @@
 #
 
 
-class PaymentMode < ApplicationRecord
+class PaymentMode < NonTenantedApplicationRecord
 
   MODES = {cash: 1, card: 2}
 

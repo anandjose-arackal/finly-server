@@ -47,6 +47,7 @@ class Quotation < ApplicationRecord
 
  #  	acts_as_sequenced column: :quotation_number, purpose: :quotation, editable: false, prefix: 'Q-'
 
+	belongs_to :company, optional: true
 	belongs_to :purchase_order, optional: true
 	has_many :attachments, class_name: "ProcurementAttachment", as: :procurement_document
 

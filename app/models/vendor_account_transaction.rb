@@ -13,6 +13,7 @@
 #
 
 class VendorAccountTransaction < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :vendor_account, optional: true
   belongs_to :amount, optional: true
   belongs_to :payment, optional: true

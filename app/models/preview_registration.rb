@@ -16,7 +16,7 @@
 #  url                :text(65535)
 #
 
-class PreviewRegistration < ApplicationRecord
+class PreviewRegistration < NonTenantedApplicationRecord
 
   validates :email, presence: true, format: { allow_blank: true, with: Constants::VALID_EMAIL_FORMAT}
   validates :phone_number, length: {allow_blank: true, is: 10}, format: {allow_blank: true, with: Constants::VALID_MOBILE_NUMBER}

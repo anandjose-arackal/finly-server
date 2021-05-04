@@ -22,7 +22,7 @@ class BudgetGroupCriterium < ApplicationRecord
   include AncestrySupport
 
   belongs_to :budget_group, optional: true
-  belongs_to :created_by_user, class_name: "User"
+  belongs_to :created_by_user, class_name: "User", optional: true
   belongs_to :company
 
   has_many :budget_group_criteria_mappings

@@ -84,6 +84,20 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
       end
       controller.render pdf: self.filename, layout: self.layout, template: self.template, print_media_type: true, locals: local_variables
     end
+
+    def render_pdf_file
+      ac = ActionController::Base.new()
+      local_variables[:current_user] = current_user || user
+      local_variables[:params] = params
+      pdf = WickedPdf.new.pdf_from_string(ac.render_to_string(self.template, layout: self.layout, locals: local_variables))
+      file = Paperclip::Tempfile.new(['export','.pdf'])
+      File.open(file.path, 'wb') do |file|
+        file << pdf
+      end
+      file.rewind
+      file
+    end
+
   end
 
   # NOTE: THIS CAN BE USED INDEPENDENTLY. I.E THIS CAN BE INSTANTIATED AND USED like in the example below

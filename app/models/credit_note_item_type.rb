@@ -7,7 +7,7 @@
 #  deleted_at :datetime
 #
 
-class CreditNoteItemType < ApplicationRecord
+class CreditNoteItemType < NonTenantedApplicationRecord
   include Seedable
 
   def self.values

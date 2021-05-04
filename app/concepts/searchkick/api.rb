@@ -99,12 +99,15 @@ module Searchkick::Api
     end
 
     def self.search_data(record)
+      record_data = searchkick_data(record)
+      return {} if record_data.blank?
+
       data = {
           company_id: record.company_id,
           record_type: record.class.searchkick_api.record_type,
           record_id: record.id
       }.merge(searchkick_data(record)).merge(search_collaborators_data(record))
-      return nil if data[:company_id].nil?
+      return {} if data[:company_id].nil?
 
       # If the value is an array, ensure it is unique
       data.each do |k, v|

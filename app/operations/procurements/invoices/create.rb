@@ -56,10 +56,30 @@ class Procurements::Invoices::Create < Procurements::Invoices::Base
     self.invoice.created_by = user
     self.invoice.company = user.company
     self.invoice.invoice_type_id = self.inward_invoice_type
+
     # self.invoice.receiving_account = receiving_account # let the user select bank accounts
     self.invoice.controlling_user = user
     self.invoice.vendor = vendor
+    self.invoice.vendor_id = vendor.id
+    self.invoice.vendor_pan = vendor&.pan
+    self.invoice.vendor_sequence_id = vendor&.vendor_id
+    self.invoice.vendor_country = vendor&.vendor_country
+    self.invoice.vendor_trade_name = vendor&.trade_name
+
+    self.invoice.discount_type_id = 1
+    self.invoice.is_domestic = false if vendor&.vendor_country != 'India'
+
+    self.invoice.payment_term_days = vendor&.payment_term&.days_after.to_i
+    self.invoice.due_date = Date.today + vendor&.payment_term&.days_after.to_i.days
+    self.invoice.reporting_currency = user.company.reporting_currency_code
+
+    self.invoice.base_currency = user.company.reporting_currency.id
+    self.invoice.conversion_rate = 1
+
     self.invoice.rcm_enabled = vendor.rcm_enabled
+    self.invoice.tds_slab_id = vendor&.tds_rates_list_id
+    self.invoice.tds_percentage = self.invoice&.tds_slab&.tds.to_f
+    self.invoice.tds = vendor&.tds_rates_list&.tds
     if self.vendor.payment_term_id.present?
       self.invoice.payment_term_id = self.vendor.payment_term_id
     end

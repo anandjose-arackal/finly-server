@@ -21,7 +21,7 @@ class Forms::Synchronizer
       dependency_template.sync(company_id: company.id, user: user)
     else
       # Form.delete_all; FormSection.delete_all; FormEntity.delete_all; FormChoiceDependency.delete_all; FormChoiceDependencyMapping.delete_all; FormRule.delete_all; FormCondition.delete_all; FormConditionAction.delete_all;FormEntityValidation.delete_all;
-      Company.limit(2).last(1).each do |company|
+      Company.limit(1).last(1).each do |company|
         user = company.users.first
         # Synchronize form
         template.sync(company_id: company.id, user: user)

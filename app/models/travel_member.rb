@@ -28,6 +28,7 @@ class TravelMember < ApplicationRecord
   # validates :age, presence: true
   # validates :mobile_number, presence: true
 
+  belongs_to :company, optional: true
   belongs_to :booking, optional: true
   belongs_to :booking_request, optional: true
 

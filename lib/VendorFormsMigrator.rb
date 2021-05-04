@@ -14,6 +14,9 @@ class VendorFormsMigrator
     result = []
 
     company = Company.find company_id
+
+    ActsAsTenant.current_tenant = company
+
     documents = YesBankVendor.where(company_id: company.id).authorized
     form = Form.where(klass_name: 'Masters::Vendors::Form', company_id: company_id).first
 

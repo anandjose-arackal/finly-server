@@ -38,6 +38,7 @@
 
 require 'fileutils'
 class ReceiptEmail < ApplicationRecord
+  belongs_to :company, optional: true
   has_many :receipts, as: :sourcable
   has_many :receipt_email_attachments, dependent: :destroy
   has_many :expense_data_extracts, as: :extractable

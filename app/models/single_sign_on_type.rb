@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class SingleSignOnType < ApplicationRecord
+class SingleSignOnType < NonTenantedApplicationRecord
   include Seedable
 
   def self.values

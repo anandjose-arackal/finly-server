@@ -33,9 +33,20 @@ class BackgroundOperation < BaseOperation
     if params.present? and params.is_a?(Hash)
       params = params.with_indifferent_access
     end
-    self.user = User.find_by_id(user_id)
+
     self.params = params
-    self.run
+
+    if RequestStore.store[:current_user]&.class&.name == "AdminUser"
+      ActsAsTenant.without_tenant_if_not_set do
+        self.user = User.find_by_id(user_id)
+        self.run
+      end
+    else
+      ActsAsTenant.with_tenant RequestStore.store[:current_company] do
+        self.user = User.find_by_id(user_id)
+        self.run
+      end
+    end
   end
 
   def load_request_store(request_store_hash)

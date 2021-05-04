@@ -37,6 +37,7 @@
 
 class UserProfile < ApplicationRecord
   include Attachable
+  belongs_to :company, optional: true
   belongs_to :user, optional: true
   belongs_to :default_currency, optional: true, class_name: 'Currency'
   belongs_to :state, optional: true

@@ -1,6 +1,6 @@
-class ReminderOutwardInvoices
+class ReminderOutwardInvoices < BaseJob
 
-  def self.perform
+  def self.perform_job
     puts " ----------------------------- PERFORMING #{self.name}  at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
 
     outward_invoices = OutwardInvoice.exclude_deleted.unpaid

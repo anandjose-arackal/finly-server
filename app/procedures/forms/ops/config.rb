@@ -21,7 +21,7 @@ class Forms::Ops::Config < Transactions::API
   end
 
   def find_model(context, params:, current_user:, **)
-    context[:model] = Form.where.not(klass_name: nil).find_by(klass_name: Forms::Router.klass(params[:route])&.name, company_id: current_user.company_id)
+    context[:model] = Form.where.not(klass_name: nil).where(klass_name: Forms::Router.klass(params[:route])&.name, company_id: current_user.company_id).preload_for_contract.first
   end
 
   def validate_model(context, model:, **)

@@ -16,9 +16,10 @@
 #  longitude              :decimal(20, 10)
 #
 
-class MapLocationUserQuery < ApplicationRecord
+class MapLocationUserQuery < ApplicationRecordBackwardCompatibility
   include UUIDHelper
 
+  belongs_to :company, optional: true
   belongs_to :user
   belongs_to :map_location_detail
 

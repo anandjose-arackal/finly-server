@@ -16,6 +16,10 @@ class Forms::Policy < ApplicationPolicy
     true
   end
 
+  def predict?
+    true
+  end
+
   def index?
     @user.admin?
   end

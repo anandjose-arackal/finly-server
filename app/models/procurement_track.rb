@@ -10,7 +10,7 @@
 #  deleted_at  :datetime
 #
 
-class ProcurementTrack < ApplicationRecord
+class ProcurementTrack < NonTenantedApplicationRecord
   include Seedable
 
   def self.values

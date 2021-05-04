@@ -7,7 +7,11 @@ class FeatureToggle
   end
 
   def cache_expires_in
-    1.hour
+    if Rails.env.production?
+      15.minutes
+    else
+      1.minute
+    end
   end
 
   def cache_key
@@ -25,7 +29,7 @@ class FeatureToggle
     Rails.cache.delete(cache_key)
   end
 
-  def enabled?(feature, default = false)
+  def enabled?(feature, default = false) 
     return default if flags.nil?
 
     flag = flags[normalize_key(feature)]

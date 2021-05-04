@@ -13,6 +13,8 @@
 
 class EnforcePolicy < ApplicationRecord
 
+  belongs_to :company, optional: true
+
   belongs_to :enforceable, optional: true, polymorphic: true
 
   validate :at_least_one_default_policy

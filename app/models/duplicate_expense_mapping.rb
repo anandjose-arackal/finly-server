@@ -11,6 +11,7 @@
 #
 
 class DuplicateExpenseMapping < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :expense, optional: true, class_name: 'Expense'
   belongs_to :duplicate_expense, optional: true, class_name: 'Expense'
 

@@ -20,6 +20,7 @@
 #
 
 class Gstin < ApplicationRecord
+  belongs_to :company, optional: true
   serialize :api_response, Hash
   scope :with_gstin, -> (gstin) {where gstin: gstin}
 

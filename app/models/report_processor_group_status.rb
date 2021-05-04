@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class ReportProcessorGroupStatus < ApplicationRecord
+class ReportProcessorGroupStatus < NonTenantedApplicationRecord
   include Seedable
 
   def self.values

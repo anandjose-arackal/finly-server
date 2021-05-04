@@ -14,6 +14,7 @@
 #
 
 class UserWalletTrack < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :user_wallet, optional: true
   belongs_to :user_wallet_track_action, optional: true
   belongs_to :amount, optional: true

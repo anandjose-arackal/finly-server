@@ -7,7 +7,7 @@
 #  deleted_at :datetime
 #
 
-class OutwardInvoiceTrailAction < ApplicationRecord
+class OutwardInvoiceTrailAction < NonTenantedApplicationRecord
   include Seedable
 
   def self.values

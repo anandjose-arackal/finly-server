@@ -110,7 +110,7 @@ json.invoice do
     else
       gst_type_id = 1
     end
-    json.gst_type_id gst_type_id 
+    json.gst_type_id gst_type_id
   end
 
   json.discount_amount precision_value invoice.discount_amount&.value
@@ -176,7 +176,7 @@ json.invoice do
     gstin_location =  invoice.gstin_location
     if gstin_location.nil?
       #this for handle deleted gstinlocation in old flow
-      gstin_location = GstinLocation.unscoped.find_by_id invoice.gstin_location_id
+      gstin_location = GstinLocation.include_soft_deleted.find_by_id invoice.gstin_location_id
     end
     json.gstin_location_attributes gstin_location&.as_json rescue nil
   end
@@ -266,7 +266,7 @@ json.invoice do
       if receiving_account.nil? &&  invoice.receiving_account_id.present?
         #BankAccaount was detroyable in old ui,
         # this condition for handle such vendor item
-        receiving_account = BankAccount.unscoped.find invoice.receiving_account_id
+        receiving_account = BankAccount.include_soft_deleted.find invoice.receiving_account_id
       end
       json.account_number receiving_account&.account_number
       json.ifsc receiving_account&.ifsc
@@ -426,7 +426,7 @@ json.bank_payment_request_policies do
 end
 
 json.tax_rates do
-  json.array! @result.tax_rates do |tax_rate|
+  json.array! @result.tax_rates.non_deleted do |tax_rate|
     if tax_ids.include?(tax_rate.id) || !tax_rate.deleted?
       json.merge! tax_rate.as_json
     end

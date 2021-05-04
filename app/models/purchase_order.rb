@@ -88,6 +88,8 @@ class PurchaseOrder < ApplicationRecord
 
   acts_as_sequenced column: :po_number, purpose: :purchase_order, editable: false, prefix: 'PO/{fiscal_year_start}-{fiscal_year_end}/', min_length: 4
 
+  default_scope { order(created_at: :desc) }
+
   belongs_to :company, optional: true
   belongs_to :user, optional: true
   belongs_to :created_by, optional: true, foreign_key: 'user_id', class_name: 'User'
@@ -533,7 +535,7 @@ class PurchaseOrder < ApplicationRecord
   def status_tag_details
     return @tags_data if @tags_data.present?
 
-    tag_ids = self.procurement.status_tags.pluck(:id)
+    tag_ids = self.procurement&.status_tags&.pluck(:id) || []
 
     data = {
         grn: {},
@@ -579,7 +581,7 @@ class PurchaseOrder < ApplicationRecord
       data[:procurement_status_text] = 'Invoice Processing'
     else
       data[:invoice][:status] = 'init'
-      if not self.procurement.invoices.nil?
+      if not self.procurement&.invoices.nil?
         data[:invoice][:status_text] = 'Invoice Processing'
         data[:procurement_status_text] = 'Invoice Processing'
       else

@@ -19,6 +19,8 @@
 #  finly_sso_path                     :string(255)
 #  label                              :string(255)
 #  deleted_at                         :datetime
+#  sso_type                           :string(255)      default("")
+#  logo                               :string(255)      default("")
 #
 
 class SingleSignOnConfiguration < ApplicationRecord
@@ -36,5 +38,15 @@ class SingleSignOnConfiguration < ApplicationRecord
   scope :with_id, -> (id) {
     where id: id
   }
+
+  def as_json(options={})
+    {
+      id: id,
+      label: label,
+      finly_sso_path: finly_sso_path,
+      logo: logo,
+      sso_type: sso_type
+    }
+  end
 
 end

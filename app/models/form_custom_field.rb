@@ -20,6 +20,7 @@
 class FormCustomField < ApplicationRecord
   include UUIDHelper, SoftDeletable
 
+  belongs_to :company, optional: true
   belongs_to :form
   belongs_to :form_entity
   belongs_to :document, polymorphic: true
@@ -41,7 +42,7 @@ class FormCustomField < ApplicationRecord
     if entity_type.present?
       field_type = entity_type
     else
-      field_type = FormEntity.unscoped.where(uuid: self.form_entity_id)&.first.entity_type
+      field_type = FormEntity.include_soft_deleted.where(uuid: self.form_entity_id)&.first.entity_type
     end
     # FormEntity.where(uuid: self.form_entity_id)
 
@@ -74,7 +75,7 @@ class FormCustomField < ApplicationRecord
     if entity_type.present?
       field_type = entity_type
     else
-      field_type = FormEntity.unscoped.where(uuid: self.form_entity_id)&.first.entity_type
+      field_type = FormEntity.include_soft_deleted.where(uuid: self.form_entity_id)&.first.entity_type
     end
     # FormEntity.where(uuid: self.form_entity_id)
 

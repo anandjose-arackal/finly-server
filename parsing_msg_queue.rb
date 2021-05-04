@@ -97,7 +97,12 @@ messages.each do |message|
       }
 
       trans_params[:billing_amount_attributes] = billing_amount_attributes if billing_amount_attributes.present?
-      trans_params[:transaction_amount_attributes] = transaction_amount_attributes if transaction_amount_attributes
+
+      if billing_amount_attributes.present?
+        trans_params[:transaction_amount_attributes] = billing_amount_attributes
+      elsif transaction_amount_attributes.present?
+        trans_params[:transaction_amount_attributes] = transaction_amount_attributes
+      end
 
       rescued = false
       @result = nil

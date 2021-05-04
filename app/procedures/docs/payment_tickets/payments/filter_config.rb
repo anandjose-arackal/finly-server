@@ -10,8 +10,10 @@ class Docs::PaymentTickets::Payments::FilterConfig < Filters::API
   attribute :payment_order_bank_payment_request_submitted_at, label: "Submitted At", type: :datetime
   attribute :payment_order_bank_payment_request_approved_at, label: "Approved At", type: :datetime
   attribute :payment_order_scheduled_at, label: "Scheduled On", type: :datetime, simple: true
+  
   # attribute :processed_at, label: "Processed On", type: :datetime
   # attribute :last_retried_at, label: "Last Retried On", type: :datetime
+  
   attribute :payment_order_bank_payment_request_policy_id, label: "Policy", type: :dropdown, simple: true, choices: Choices[:lookup].("policies")
   attribute :amount_value, type: :number, label: 'Amount'
   attribute :receiving_user_vendor_id, type: :dropdown, label: 'Vendor', choices: Choices[:lookup].("vendors"), simple: true

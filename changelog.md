@@ -2,8 +2,64 @@
 All notable changes to this project will be documented in this file. Always add new logs to 
 beginning of this file.
 
+## 2021-05-01
+- Fix: Fix for filter issue, filter not populating. 
+
+## 2021-04-30
+- Feat: NonPoInvoice form migration, payment ticket and multi currency changes, with feature flag added to the old ui
+
+## 2021-04-17
+- Fix: Validation on total invoiced quantity against purchase order quantity removed for service items
+
+## 2021-04-13
+ - Fix: Updating the user base dlrm for credit note.
+ - fix: Updating invoice for vendor location.
+
+## 2021-04-08
+ - feat: Create export templates for new companies when created.
+
+## 2021-04-07
+- Fix: Vendor policy check was not checking for company. Patched this security gap.
+
+## 2021-03-01
+  - FormMigration: Updating migration to handle custom field migrations.
+  - Updating payment ticket changes for invoice.
+
+## 2021-03-31
+  - Fix: use user roles instead of policy user roles to properly filter export templates.
+
+## 2021-03-30
+  - Updating model for vendor form.
+
+## 2021-03-26
+- FIX: Removing google_oauth2 gem
+
+## 2021-03-25
+  - Security: Updating the authorization policy for invoice and vendors. 
+  - Removing changes for invoice policy authorization.
+
+## 2021-03-23
+  - Updating the reporting values and payment ticket values.
+  - Adding support for multi currency export.
+
+## 2021-03-22
+  - Updating the invoice form migration script and fixing migration bugs
+
+## 2021-03-21
+  - Feat: Non Po Invoice Forms release
+  - Fix: Moved OTP mailers from default redis queue to payment creation queue
+
 ## 2021-03-19
-- Fix: Moved OTP mailers from default redis queue to payment creation queue
+  - Fix: Moved OTP mailers from default redis queue to payment creation queue
+
+## 2021-03-19
+  - Updating the non-po-form migration script
+
+## 2021-03-21
+  - Feat: Non Po Invoice Forms release
+
+## 2021-03-19
+  - Fix: Moved OTP mailers from default redis queue to payment creation queue
 
 ## 2021-03-16
   - Updating the authentication flow 
@@ -14,19 +70,31 @@ beginning of this file.
   - Updating the sso from request_store adding error messages and sso config movied to procedure
 
 ##2021-03-12
-- Updating the invoice and purchase_order validations
+  - Updating the invoice and purchase_order validations
 
 ##2021-03-11
-- Fix: `Vendor Payment` Purchase Order advance Amount in upaid, the status will change to `close`  while closing a purchase order
-  The re-opeing action in purchase order will revoke the Purchase advance amount status to previous status if it a non paid advance
+  - Fix: `Vendor Payment` Purchase Order advance Amount in upaid, the status will change to `close`  while closing a purchase order
+
+    The re-opeing action in purchase order will revoke the Purchase advance amount status to previous status if it a non paid advance
 
 ##2021-03-10
  - Fix: Deleted user's policy user roles was trying render and leads to nil issue, 
+    Policy User Role index only render existing user roles
+    
+  The re-opeing action in purchase order will revoke the Purchase advance amount status to previous status if it a non paid advance
+
+##2021-03-10
+
+  The re-opeing action in purchase order will revoke the Purchase advance amount status to previous status if it a non paid advance
+
+##2021-03-10
+
+  - Fix: Deleted user's policy user roles was trying render and leads to nil issue, 
         Policy User Role index only render existing user roles
    
 ##2021-03-08
- - SMP service api updated, by adding template id as one of the parameter
- - Each msg template have unique template id in service provider, this template id stored in message_template yml
+  - SMP service api updated, by adding template id as one of the parameter
+  - Each msg template have unique template id in service provider, this template id stored in   message_template yml
 
 ##2021-03-07
  - OTP mailer for bank payment request credit action introduced.

@@ -72,7 +72,7 @@ module Sequenced
     def base_relation
       raise 'Company ID cannot be null for generating sequence' if record.company_id.nil?
 
-      record.class.base_class.unscoped.where(company_id: record.company_id)
+      record.class.base_class.include_soft_deleted.where(company_id: record.company_id)
     end
 
     def process_prefix

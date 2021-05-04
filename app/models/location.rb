@@ -17,7 +17,7 @@
 #  deleted_at     :datetime
 #
 
-class Location < ApplicationRecord
+class Location < NonTenantedApplicationRecord
   include SoftDeletable
 
   belongs_to :locatable, optional: true, polymorphic: true

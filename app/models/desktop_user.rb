@@ -10,7 +10,7 @@
 #  deleted_at :datetime
 #
 
-class DesktopUser < ApplicationRecord
+class DesktopUser < NonTenantedApplicationRecord
 
   validates :email, presence: true, format: Constants::VALID_EMAIL_FORMAT
   validates :country, presence: true

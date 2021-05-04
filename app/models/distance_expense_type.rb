@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class DistanceExpenseType < ApplicationRecord
+class DistanceExpenseType < NonTenantedApplicationRecord
   include Seedable
 
   validates :name, presence: true

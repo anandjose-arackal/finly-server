@@ -15,7 +15,7 @@ json.vendor do
     if selected_bank_account.nil? && @result.purchase_order.bank_account_id.present?
       #BankAccaount was detroyable in old ui,
       # this condition for handle such vendor item
-      selected_bank_account  = BankAccount.unscoped.find @result.purchase_order.bank_account_id
+      selected_bank_account  = BankAccount.include_soft_deleted.find @result.purchase_order.bank_account_id
     end
     json.account_number selected_bank_account &.account_number
     json.ifsc selected_bank_account&.ifsc
@@ -64,7 +64,7 @@ if @result.purchase_order.gstin_location_id.present?
   gstin_location =  @result.purchase_order.gstin_location
   if gstin_location.nil?
     #this for handle deleted gstinlocation in old flow
-    gstin_location = GstinLocation.unscoped.find_by_id @result.purchase_order.gstin_location_id
+    gstin_location = GstinLocation.include_soft_deleted.find_by_id @result.purchase_order.gstin_location_id
   end
  json.gstin_location_attributes gstin_location&.as_json rescue nil
 end
