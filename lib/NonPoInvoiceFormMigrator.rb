@@ -354,7 +354,7 @@ class NonPoInvoiceMigrator
         relevant_custom_field = document.form_custom_fields.where(field_key: 'invoice_attachments').first
         new_attachment = add_attachment_to_new_invoice( old_attachment, relevant_custom_field )
       end
-      # new_attachment.skip_callback = true
+      
       new_attachment.update_attribute(:attachment_updated_at,  old_attachment.created_at )
     end    
   end

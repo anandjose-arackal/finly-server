@@ -1870,6 +1870,11 @@ class Invoice < ApplicationRecord
         amount_id = Amount.create(value: net_amount_value, currency_id: base_currency_id).id
         self.send("net_amount_id=", amount_id)
       end
+
+      # update attachments 
+      update_attachments
+
+      # update custom fields
     end
   end
 
@@ -1886,6 +1891,7 @@ class Invoice < ApplicationRecord
                                "#{key}": amount_value
                              })
     end
+    self.skip_callback = true
     self.save
   end
 
@@ -1955,6 +1961,95 @@ class Invoice < ApplicationRecord
     
     errors.add(:invoice_items, "rate must be greater than 0") if flag
   end
+
+
+  def update_attachments
+    form_attachments_field = self.form_custom_fields.where(field_key: 'invoice_attachments').first
+    form_attachments_field.attachments.each do |new_attachment|
+      old_attachment = self.attachments.find_or_initialize_by(file_file_name: new_attachment.attachment_file_name )
+
+      if old_attachment.new_record?
+        old_attachment.file_file_name = new_attachment.attachment_file_name
+        old_attachment.file_content_type = new_attachment.attachment_content_type
+        old_attachment.file_file_size = new_attachment.attachment_file_size
+        old_attachment.file_file_size = new_attachment.attachment_file_size
+        old_attachment.company_id = self.company_id
+        old_attachment.procurement_document_id = form_attachments_field.document_id
+        old_attachment.procurement_document_type = form_attachments_field.document_type
+        old_attachment.user_id = RequestStoreUtil.current_user
+        old_attachment.save
+      end
+    end    
+  end
+
+
+  #  We are keeping this aside for now.
+  
+  # def update_custom_fields
+  #   form_custom_fields = self.form_custom_fields.where.not(field_key: 'invoice_attachments')
+
+  #   form_custom_fields.each do |form_custom_field|
+  #     if form_custom_field.entity_type == 'text'
+  #       custom_field = self.custom_fields.find_or_initialize_by(field_key: form_custom_field.field_key)
+  #       if custom_field.new_record?
+  #         custom_field.parent_id = self.id
+  #         custom_field.parent_type = "Invoice"
+  #         custom_field.company_id = self.company_id
+
+  #         field_configuration = custom_field.field_configuration.new()
+  #         field_configuration.enabled           = true
+  #         field_configuration.field_type_id     = FieldType.find_by(name: 'text').id
+  #         field_configuration.mandatory         = form_custom_field.form_entity.required
+  #         field_configuration.company_id        = self.company_id
+  #         field_configuration.configurable_id   = self.company_id
+  #         field_configuration.configurable_type = "Company"
+  #         field_configuration.field_name        = form_custom_field.form_entity.label
+  #         field_configuration.field_key         = form_custom_field.form_entity.entity_key
+  #         field_configuration.save
+          
+  #       end
+  #       custom_field.value = FieldText.create({ value: form_custom_field.value, company_id: self.company_id })
+  #       custom_field.configured_field_value = form_custom_field.value
+  #       custom_field.value_type = 'FieldText'
+
+  #       custom_field.save
+
+  #     elsif form_custom_field.entity_type == 'drop_down'
+  #       custom_field = self.custom_fields.find_or_initialize_by(field_key: form_custom_field.field_key)
+
+  #       if custom_field.new_record?
+  #         custom_field.parent_id = self.id
+  #         custom_field.parent_type = "Invoice"
+  #         custom_field.company_id = self.company_id
+
+  #         field_configuration = custom_field.field_configuration.new()
+  #         field_configuration.enabled           = true
+  #         field_configuration.field_type_id     = FieldType.find_by(name: 'drop_down').id
+  #         field_configuration.mandatory         = form_custom_field.form_entity.required
+  #         field_configuration.company_id        = self.company_id
+  #         field_configuration.configurable_id   = self.company_id
+  #         field_configuration.configurable_type = "Company"
+  #         field_configuration.field_name        = form_custom_field.form_entity.label
+  #         field_configuration.field_key         = form_custom_field.form_entity.entity_key
+  #         field_configuration.save
+  #       end
+      
+
+  #       value = form_custom_field.selection.form_entity_choice.name
+
+  #       custom_field.value = FieldText.create({ value: form_custom_field.value, company_id: self.company_id })
+  #       custom_field.configured_field_value = value
+  #       custom_field.value_type = 'FieldDropDownSelection'
+      
+  #       custom_field.save
+  #       end
+
+
+  #     end
+  #   end
+  # end
+
+
 
 end
 
