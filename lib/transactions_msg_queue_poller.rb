@@ -160,6 +160,7 @@ class TransactionsMsgQueuePoller
         user = card&.user
       end
       ActsAsTenant.current_tenant = (user&.company || card&.company)
+      RequestStoreUtil.set_current_company((user&.company || card&.company))
 
       log_params[:card_id] = card&.id
       log_params[:user_id] = user&.id
