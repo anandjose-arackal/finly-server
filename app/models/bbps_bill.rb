@@ -66,6 +66,7 @@ class BbpsBill < ApplicationRecord
   include EventProducer
   # include SearchIndex::Concerns::Document
   include Searchkick::Api
+  include Concerns::ErpSyncConcern
 
   acts_as_sequenced column: :sequence_id, purpose: :bbps_bill, editable: false, prefix: 'UB'
 
@@ -284,6 +285,11 @@ class BbpsBill < ApplicationRecord
   
   scope :with_status_ids, -> (status_id){
     with_status_id(status_id)
+  }
+
+  scope :pending_erp_sync, -> (*args) {
+    with_erp_sync_status_pending.
+        where(invoice_status_id: BbpsBillStatus.ids_for(:approved, :auto_approved, :payment_ticket_created, :payment_initiated, :payment_ticket_deleted, :paid))
   }
 
   ransack_scopes :with_status_id
