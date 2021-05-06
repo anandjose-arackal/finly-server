@@ -2,7 +2,7 @@
 #
 #]
 json.data do
-  json.array! @op['model.records'].includes(includes) do |record|
+  json.array! @op['model.records'] do |record|
     json.partial! 'bbps_bill', record: record
   end
 end
