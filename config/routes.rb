@@ -4358,6 +4358,9 @@ Rails.application.routes.draw do
       get 'credit_notes/count', to: 'credit_notes#count'
       post 'credit_notes/new_sync_attempt', to: 'credit_notes#new_sync_attempt'
       resources :credit_notes, only: [:index]
+      get 'bills/count', to: 'bbps_bills#count'
+      post 'bills/new_sync_attempt', to: 'bbps_bills#new_sync_attempt'
+      get 'bills', to: 'bbps_bills#index'
     end
   end
 
