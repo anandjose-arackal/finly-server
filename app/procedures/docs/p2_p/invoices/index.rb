@@ -11,6 +11,8 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     {id: '{{record.id}}',
      args: {procurement_id: '{{record.procurement_id}}',
             procurement_type: "{{record.invoice_type.config_key}}",
+            
+            # forms_enabled: "{% if record.invoice_type.config_key == 'non_po_invoice' and record.forms_enabled == true %}{{true}}{% else %}{{ false }}{% endif %}"}
             forms_enabled: "{% if record.forms_enabled == true %}{{true}}{% else %}{{ false }}{% endif %}"}
     }
   end
@@ -49,7 +51,7 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
   IndexBuilder::API::ColumnTemplate::ReviewProgress(self)
 
   column :net_amount, includes: [net_amount: :currency], default: true do
-    amount value: :net_amount
+    amount value: :set_net_amount_value
   end
 
   IndexBuilder::API::ColumnTemplate::ControllingUser(self)
@@ -75,9 +77,9 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     text value: :due_in_days
   end
 
-  column :transaction_type, label: "Transaction Type" do
-    text value: :pt_type
-  end
+  # column :transaction_type, label: "Transaction Type" do
+  #   text value: :pt_type
+  # end
 
   # Todo
   # column :agreement_number do
@@ -229,13 +231,13 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     context[:exposure].cost_center&.name
   end
 
-  def self.pt_type( context )
-    if context[:record].is_domestic 
-      'Domestic'
-    else
-      'International'
-    end
-  end
+  # def self.pt_type( context )
+  #   if context[:record].is_domestic 
+  #     'Domestic'
+  #   else
+  #     'International'
+  #   end
+  # end
 
   def self.department_name(context)
     return "Multiple" if context[:exposure].cost_allocation_items
@@ -263,6 +265,17 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
       format = 'danger'
     end
     format
+  end
+
+  def self.set_net_amount_value(context)
+    user = context[:user]
+    if user.present? && user.non_po_invoice_form_enabled 
+      # show sub_total amount
+      context[:record].invoice_sub_total_amount
+    else
+      # show new amount
+      context[:record].net_amount
+    end
   end
 
 end

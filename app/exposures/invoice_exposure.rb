@@ -203,6 +203,27 @@ class InvoiceExposure < Exposures::API
   attribute :forms_enabled do
     record.forms_enabled
   end
+
+  attribute :base_currency_code do    
+    country_code = Currency.find_by(id: record.base_currency).country_code rescue 'INR'
+    country_code
+  end
+
+  attribute :reporting_currency_code do
+    record.reporting_currency
+  end
+
+  attribute :conversion_rate do
+    record.conversion_rate
+  end
+
+  attribute :reporting_invoice_net_total_amount do
+    record.reporting_invoice_net_total_amount
+  end
+  
+  attribute :reporting_invoice_balance_due do
+    record.reporting_invoice_balance_due
+  end
   # def vendor_ref_num(invoice_line_item)
   #   invoice_line_item.parent&.vendor_id
   # end

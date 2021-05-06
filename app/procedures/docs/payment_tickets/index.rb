@@ -6,6 +6,13 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
   resolver 'payment_tickets.default'
   reference '{{record.id}}'
 
+  def self.reference(id = nil, args = {})
+    {id: '{{record.id}}',
+     args: {
+            non_po_forms_enabled: "{% if record.non_po_form_enabled == true %}{{true}}{% else %}{{ false }}{% endif %}"}
+    }
+  end
+
   # Fixed column is always default true
   column :description, label: 'Description', fixed: true, sort: :name do
     text value: "{{record.name}}", format: 'primary'
@@ -34,8 +41,8 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     text value: :ticket_type
   end
 
-  column :transaction_type, label: "Transaction Type" do
-    text value: :pt_type
+  column :base_currency, label: "Base Currency", active: :is_accessable do
+    text value: :base_currency_code
   end
 
   column :status, default: true, includes: [:status] do
@@ -51,11 +58,11 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
   IndexBuilder::API::ColumnTemplate::ControllingLevel(self)
 
   column :requested, default: true, includes: [payment_order: { amount_requested: :currency }] do
-    amount value: -> (context) { context[:exposure].payment_order.amount_requested }
+    amount value: -> (context) { context[:exposure].payment_order.amount_requested }, tool_tip: :format_amount_requested_tool_tip
   end
 
   column :processed, default: true, includes: [payment_order: { amount_processed: :currency }] do
-    amount value: -> (context) { context[:exposure].payment_order.amount_processed }
+    amount value: -> (context) { context[:exposure].payment_order.amount_processed }, tool_tip: :format_amount_processed_tool_tip
   end
 
   column :scheduled_date, sort: :payment_order_scheduled_at, default: true, includes: [:payment_order] do
@@ -130,6 +137,10 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     [:bank_payment_request_reviewer, :admin]
   end
 
+  def self.base_currency_code(context)
+    context[:record]&.base_currency&.country_code
+  end
+
   def self.pt_status(context)
     return 'Awaiting Approval' if context[:record].status_id == BankPaymentRequestStatus.id_for(:processing) and context[:record].controlling_user?(context[:user])
 
@@ -163,4 +174,35 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     end
     format
   end
+
+  def self.format_amount_requested_tool_tip(context)
+    user = context[:user]
+    value = context[:record].payment_order&.amount_requested&.value.to_f
+    
+    if user.present? && user.non_po_invoice_form_enabled 
+      country_code = context[:record].base_currency&.country_code
+      "#{country_code} #{value}"
+    else
+      country_sym = context[:record].base_currency&.symbol
+      "#{country_sym} #{value}"
+    end
+  end
+
+  def self.format_amount_processed_tool_tip(context)
+    user = context[:user]
+    value = context[:record].payment_order&.amount_processed&.value.to_f
+
+    if user.present? && user.non_po_invoice_form_enabled 
+      country_code = context[:record].base_currency&.country_code
+      "#{country_code} #{value}"
+    else
+      country_sym = context[:record].base_currency&.symbol
+      "#{country_sym} #{value}"
+    end
+  end
+
+  def self.is_accessable( user )
+    user.present? && user.non_po_invoice_form_enabled 
+  end
+
 end

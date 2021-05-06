@@ -535,7 +535,7 @@ class PurchaseOrder < ApplicationRecord
   def status_tag_details
     return @tags_data if @tags_data.present?
 
-    tag_ids = self.procurement.status_tags.pluck(:id)
+    tag_ids = self.procurement&.status_tags&.pluck(:id) || []
 
     data = {
         grn: {},
@@ -581,7 +581,7 @@ class PurchaseOrder < ApplicationRecord
       data[:procurement_status_text] = 'Invoice Processing'
     else
       data[:invoice][:status] = 'init'
-      if not self.procurement.invoices.nil?
+      if not self.procurement&.invoices.nil?
         data[:invoice][:status_text] = 'Invoice Processing'
         data[:procurement_status_text] = 'Invoice Processing'
       else

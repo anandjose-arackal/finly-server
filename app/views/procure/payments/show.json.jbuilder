@@ -1,14 +1,20 @@
 payment = @result.payment
+
 parent = payment.parent rescue nil
 if payment.receiving_account&.account_owner_type == "YesBankVendor"
   json.owner_name payment.receiving_account&.account_owner&.business_name
 else
   json.owner_name payment.receiving_account&.account_owner&.name
 end
+
+
 json.name payment.receiving_account&.name
 json.account_number payment.receiving_account.account_number
+json.base_currency payment.bank_payment_request.base_currency
+json.reporting_currency payment.company.reporting_currency
 json.disabled payment.receiving_account&.disabled
 json.ifsc payment.receiving_account.ifsc
+json.swift_code payment.receiving_account.swift_code
 json.amount precision_value payment.amount_value
 json.payment_amount payment.amount_value
 json.net_amount precision_value payment.amount_value
@@ -21,6 +27,9 @@ json.beneficiary_id payment.receiving_account.account_owner&.id
 json.beneficiary_type (payment.receiving_account.account_owner_type == "User" ? 1 : 2)
 json.created_at payment.created_at.strftime("%b %d, %Y")
 json.created_by payment.initiating_user.as_json
+json.is_domestic payment&.bank_payment_request&.is_domestic
+json.non_po_invoice_form_enabled payment&.parent&.forms_enabled rescue false
+
 if payment.receiving_user.is_a?(User) || payment.receiving_user.authorized
   json.beneficiary_type "authorized"
 else
@@ -106,6 +115,22 @@ if payment.invoice.present?
     json.paid_amount invoice.payments.successful.joins(:amount).sum(:value)
     json.remaining_amount (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
 
+    json.conversion_rate invoice.conversion_rate.to_f rescue 1
+    
+    json.invoice_sub_total_amount invoice&.invoice_sub_total_amount.to_f
+    json.reporting_invoice_sub_total_amount invoice&.reporting_invoice_sub_total_amount.to_f
+
+    json.invoice_net_total_amount invoice&.invoice_net_total_amount.to_f
+    json.reporting_invoice_net_total_amount invoice&.reporting_invoice_net_total_amount.to_f
+
+    json.invoice_balance_due invoice&.invoice_balance_due.to_f
+    json.reporting_invoice_balance_due invoice&.reporting_invoice_balance_due.to_f
+    
+    json.payable_amount precision_value payment.amount.value
+    if payment.parent_type == 'Invoice'
+      conversion_rate = invoice.conversion_rate.to_f rescue 1
+      json.reporting_payable_amount precision_value payment&.amount&.value.to_f * conversion_rate
+    end
     #
 
     json.invoice_items do

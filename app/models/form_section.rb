@@ -42,7 +42,8 @@ class FormSection < ApplicationRecord
       active: active,
       config_path: section_id.to_s,
       entities: {},
-      associate_custom_fields: associate_custom_fields
+      associate_custom_fields: associate_custom_fields,
+      collection: entities.map{ |ent| ent.class.collection? }.include?( true )
     }
     entities.each do |ent|
       # Root entities only. N+1's if this is made into a query

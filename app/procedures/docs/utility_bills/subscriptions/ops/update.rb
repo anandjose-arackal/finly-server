@@ -2,7 +2,9 @@ class Docs::UtilityBills::Subscriptions::Ops::Update < Transactions::API
 
   step :set_default_params
 
-  step Model(BbpsBillerSubscription, :find_by)
+  step Model(BbpsBillerSubscription, :find_by) 
+
+  step :set_custom_fields
 
   step Policy::Pundit( Docs::UtilityBills::Subscriptions::Authorizer, :update? )
 
@@ -48,5 +50,20 @@ class Docs::UtilityBills::Subscriptions::Ops::Update < Transactions::API
     })
 
     dlrm_validation_op.success?
+  end
+
+  def set_custom_fields(options, params:, current_user:,model:, **)
+    custom_fields = params[:custom_fields]
+    set_fields = CustomField::SetFields.(options['model'], FieldParentType.id_for("BbpsBillerSubscription"), custom_fields: custom_fields)
+    unless set_fields.success?
+      add_message(options, :error, nil, set_fields.messages[:error])
+      return 
+    end
+    valid = CustomField::Validate.(options['model'])
+    unless valid.success?
+      add_message(options, :error, nil, valid.messages[:error])
+      return 
+    end
+    true
   end
 end

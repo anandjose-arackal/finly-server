@@ -48,8 +48,18 @@ class IndexBuilder::API
       else
         config[:dynamic] << column.config(user)
       end
-    end
 
+    end
+    selected_col = []
+
+    config[:dynamic].each do |value| 
+      if value[:active] == true || self.send("#{value[:active]}", user)
+        selected_col << value
+      end
+    end
+    
+    config[:dynamic] = selected_col
+    
     self.config_legacy_custom_fields(user, config)
     self.config_form_custom_fields(user, config)
     config
@@ -117,9 +127,18 @@ class IndexBuilder::API
     includes = [includes] unless includes.is_a?(Array)
 
     # include system fields
+    
+
     attrs = columns.select do |column_key, attr|
       (required_columns.blank? and attr.default) or (required_columns.present? and (required_columns.include?(column_key.to_s) or required_columns.include?(column_key.to_sym)))
     end
+    
+    # attrs.each do | key, value|
+    #   unless value.active
+    #     required_columns.delete(key.to_s)
+    #   end
+    # end
+    
 
     attrs.each do |column_key, column|
       if column.includes.is_a?(Hash)
@@ -154,6 +173,7 @@ class IndexBuilder::API
 
       map[column.column_key] = column.build(data_provider, user, record, record_exposure)
     end
+
     build_legacy_custom_fields(map, user, record, record_exposure, required_columns)
     build_form_custom_fields(map, user, record, record_exposure, required_columns)
     { reference: record_exposure.template(reference), columns: map }

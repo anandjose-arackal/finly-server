@@ -10,16 +10,19 @@ json.summary do
   # json.retriable @result.bank_payment_request.retriable?
   json.bank_transfer_type @result.payment_order.payment_mode&.upcase
   json.transfer_mode @result.bank_payment_request.mode
+  
+  json.non_po_invoice_form_enabled @result.bank_payment_request&.payments&.first&.parent&.forms_enabled rescue false
+  
   json.payment_type @result.payment_order.payment_type&.humanize
   json.scheduled_at @result.payment_order.scheduled_at&.strftime "%d %b %Y"
   json.processed_at @result.payment_order.processed_at&.strftime "%d %b %Y"
   json.submitted_at @result.bank_payment_request.submitted_at&.strftime("%d %b %Y")
   
   json.amount_requested precision_value @result.payment_order.amount_requested&.value
-  json.amount_requested_currency precision_value @result.payment_order.amount_requested&.currency&.country_code
+  json.amount_requested_currency @result.payment_order.amount_requested&.currency&.country_code rescue 'INR'
   
   json.amount_processed precision_value @result.payment_order.amount_processed&.value
-  json.amount_processed_currency precision_value @result.payment_order.amount_processed&.currency&.country_code
+  json.amount_processed_currency @result.payment_order.amount_processed&.currency&.country_code rescue 'INR'
 
 
   # json.amount_requested do
@@ -55,6 +58,11 @@ json.summary do
 
   json.verified_payments_count @result.payments_verified
   json.unverified_payments_count @result.payments_unverified
+  json.base_currency_code @result.bank_payment_request.base_currency.country_code rescue 'INR'
+  json.base_currency_id @result.bank_payment_request.base_currency_id
+  json.is_domestic @result.bank_payment_request.is_domestic
+
+  json.reporting_currency_code @result.user.company.reporting_currency_code
 end
 
 json.invoice_categories do

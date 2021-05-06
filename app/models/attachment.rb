@@ -54,12 +54,14 @@ class Attachment < ApplicationRecord
       id: self.id,
       name: self.file_file_name,
       url: self.file&.url,
+      thumb: self.file(:thumb),
       created_at: self.created_at.to_date,
       resource_type: self.resource_type,
       resource_id: self.resource_id,
       file_name: self.file.original_filename,
       file_size: (self.file_file_size / 1024).round(2).to_s + " KB",
-      status: 'done'
+      status: 'done',
+      content_type: self.file_content_type
       # created_by: self.creator&.name,
       # description: self.description
     }

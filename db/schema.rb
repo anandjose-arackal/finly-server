@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_04_08_065248) do
+ActiveRecord::Schema.define(version: 2021_04_15_143526) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -170,7 +170,6 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
     t.integer "company_id"
-    t.index ["application"], name: "index_admin_summary_mail_configs_on_application"
     t.index ["period_id"], name: "index_admin_summary_mail_configs_on_period_id"
     t.index ["scheduled_day_of_month"], name: "index_admin_summary_mail_configs_on_scheduled_day_of_month"
     t.index ["scheduled_day_of_week"], name: "index_admin_summary_mail_configs_on_scheduled_day_of_week"
@@ -525,6 +524,7 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
+    t.integer "company_id"
     t.index ["created_by_user_id"], name: "index_approval_routes_on_created_by_user_id"
     t.index ["level"], name: "index_approval_routes_on_level"
     t.index ["policy_id"], name: "index_approval_routes_on_policy_id"
@@ -1588,7 +1588,6 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.datetime "deleted_at"
     t.integer "company_id"
     t.index ["deleted_at"], name: "index_budget_group_criteria_mappings_on_deleted_at"
   end
@@ -1769,8 +1768,8 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.decimal "cn_adjusted_amount_before_tax_value", precision: 20, scale: 10, default: "0.0"
     t.decimal "cn_adjusted_amount_after_tax_value", precision: 20, scale: 10, default: "0.0"
     t.decimal "credit_note_tax_amount_value", precision: 20, scale: 10, default: "0.0"
-    t.integer "company_id"
     t.datetime "date"
+    t.integer "company_id"
     t.index ["amount_after_tax_id"], name: "index_budget_trails_on_amount_after_tax_id"
     t.index ["amount_before_tax_id"], name: "index_budget_trails_on_amount_before_tax_id"
     t.index ["amount_id"], name: "index_budget_trails_on_amount_id"
@@ -2465,6 +2464,7 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.datetime "updated_at", null: false
     t.integer "default_company_id"
     t.datetime "deleted_at"
+    t.string "subdomain"
   end
 
   create_table "company_kyc_document_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -2492,8 +2492,6 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
     t.integer "company_id"
-    t.index ["action_id"], name: "index_company_kyc_trails_on_action_id"
-    t.index ["action_resource_id", "action_resource_type"], name: "index_company_kyc_trails_on_action_resource"
     t.index ["company_kyc_id"], name: "index_company_kyc_trails_on_company_kyc_id"
   end
 
@@ -2631,7 +2629,6 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.string "designation"
     t.datetime "deleted_at"
     t.integer "company_id"
-    t.index ["contactable_id", "contactable_type"], name: "index_contacts_on_contactable_id_and_contactable_type"
   end
 
   create_table "cost_allocation_items", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -3011,7 +3008,6 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
     t.integer "company_id"
-    t.index ["configurable_id", "configurable_type"], name: "index_custom_export_configurations_on_configurable"
   end
 
   create_table "custom_field_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -3024,6 +3020,7 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.datetime "deleted_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "company_id"
     t.index ["deleted_at"], name: "index_custom_field_attachments_on_deleted_at"
     t.index ["form_custom_field_id"], name: "index_custom_field_attachments_on_form_custom_field_id"
     t.index ["uuid"], name: "index_custom_field_attachments_on_uuid"
@@ -3036,6 +3033,7 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.datetime "deleted_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "company_id"
     t.index ["deleted_at"], name: "index_custom_field_selections_on_deleted_at"
     t.index ["form_custom_field_id"], name: "index_custom_field_selections_on_form_custom_field_id"
     t.index ["form_entity_choice_id"], name: "index_custom_field_selections_on_form_entity_choice_id"
@@ -3199,9 +3197,6 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.boolean "enforce_category", default: false
     t.datetime "deleted_at"
     t.integer "company_id"
-    t.index ["default_category_id"], name: "index_distance_expense_configs_on_default_category_id"
-    t.index ["policy_id"], name: "index_distance_expense_configs_on_policy_id"
-    t.index ["rate_id"], name: "index_distance_expense_configs_on_rate_id"
   end
 
   create_table "distance_expense_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -3229,9 +3224,6 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.integer "distance_unit_id"
     t.datetime "deleted_at"
     t.integer "company_id"
-    t.index ["distance_id"], name: "index_distance_expenses_on_distance_id"
-    t.index ["distance_rate_id"], name: "index_distance_expenses_on_distance_rate_id"
-    t.index ["distance_unit_id"], name: "index_distance_expenses_on_distance_unit_id"
     t.index ["expense_id"], name: "index_distance_expenses_on_expense_id"
   end
 
@@ -3432,7 +3424,6 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
     t.integer "company_id"
-    t.index ["duplicate_expense_id"], name: "index_duplicate_expense_mappings_on_duplicate_expense_id"
     t.index ["expense_id"], name: "index_duplicate_expense_mappings_on_expense_id"
   end
 
@@ -3940,6 +3931,7 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "company_id"
     t.index ["deleted_at"], name: "index_export_template_user_role_mappings_on_deleted_at"
     t.index ["template_id"], name: "index_export_template_user_role_mappings_on_template_id"
     t.index ["user_role_id"], name: "index_export_template_user_role_mappings_on_user_role_id"
@@ -4008,8 +4000,8 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.boolean "user_level_custom_fields", default: false
     t.datetime "deleted_at"
     t.boolean "sso_login_enforced", default: false
-    t.integer "company_id"
     t.boolean "enforce_budget_limit", default: false
+    t.integer "company_id"
     t.index ["grn_enabled"], name: "index_feature_subscriptions_on_grn_enabled"
     t.index ["srn_enabled"], name: "index_feature_subscriptions_on_srn_enabled"
     t.index ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id"
@@ -4167,7 +4159,6 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.boolean "is_deleted"
     t.datetime "deleted_at"
     t.integer "company_id"
-    t.index ["field_configuration_id"], name: "index_field_multiselect_items_on_field_configuration_id"
   end
 
   create_table "field_multiselect_selection_items", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -4177,7 +4168,6 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.integer "field_multiselect_selection_id"
     t.datetime "deleted_at"
     t.integer "company_id"
-    t.index ["field_multiselect_selection_id"], name: "index_field_multiselect_selection_items_on_selection_id"
     t.index ["value_id"], name: "index_field_multiselect_selection_items_on_value_id"
   end
 
@@ -4420,10 +4410,10 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.string "value"
     t.string "value_text"
     t.datetime "deleted_at"
-    t.integer "company_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "entity_type"
+    t.integer "company_id"
     t.index ["document_id"], name: "index_form_custom_fields_on_document_id"
     t.index ["document_type", "document_id"], name: "index_form_custom_fields_on_document_type_and_document_id"
     t.index ["document_type"], name: "index_form_custom_fields_on_document_type"
@@ -4851,11 +4841,11 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.string "location"
     t.text "address"
     t.datetime "deleted_at"
-    t.integer "company_id"
     t.string "gst_status"
     t.date "gst_expiry_date"
     t.boolean "verified"
     t.text "gstin_fetch_details"
+    t.integer "company_id"
     t.index ["vendor_id"], name: "index_gstin_locations_on_vendor_id"
   end
 
@@ -4875,8 +4865,6 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.string "trade_name"
     t.datetime "deleted_at"
     t.integer "company_id"
-    t.index ["gstin"], name: "index_gstins_on_gstin"
-    t.index ["status"], name: "index_gstins_on_status"
   end
 
   create_table "icici_bank_company_accounts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -5270,7 +5258,6 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.integer "purchase_order_item_id"
     t.datetime "deleted_at"
     t.boolean "tds_applicable", default: false
-    t.integer "company_id"
     t.decimal "discount_rate", precision: 10
     t.decimal "tax_percentage", precision: 20, scale: 5
     t.string "item_number"
@@ -5292,6 +5279,7 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.decimal "reporting_item_billable_amount", precision: 20, scale: 5
     t.string "tax_type", default: ""
     t.decimal "item_rate", precision: 10, default: "0"
+    t.integer "company_id"
     t.index ["category_id"], name: "index_invoice_line_items_on_category_id"
     t.index ["department_id"], name: "index_invoice_line_items_on_department_id"
     t.index ["discount_amount_id"], name: "index_invoice_line_items_on_discount_amount_id"
@@ -5531,8 +5519,8 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.decimal "order_amount", precision: 20, scale: 5, default: "0.0"
     t.decimal "previously_billed_amount", precision: 20, scale: 5, default: "0.0"
     t.integer "product_type_id", default: 1
-    t.integer "company_id"
     t.integer "accepting_item_amount_id"
+    t.integer "company_id"
     t.index ["accepting_item_amount_id"], name: "index_inward_document_items_on_accepting_item_amount_id"
     t.index ["inventory_line_item_id"], name: "index_inward_document_items_on_inventory_line_item_id"
     t.index ["inward_document_id"], name: "index_inward_document_items_on_inward_document_id"
@@ -5695,7 +5683,6 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.boolean "otp_verified", default: false, null: false
     t.datetime "deleted_at"
     t.integer "company_id"
-    t.index ["status_id"], name: "index_itz_cash_dmt_senders_on_status_id"
     t.index ["user_id"], name: "index_itz_cash_dmt_senders_on_user_id"
   end
 
@@ -6573,8 +6560,6 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
     t.integer "company_id"
-    t.index ["dependent_field_configuration_id"], name: "index_parent_dependent_field_configuration_mappings_on_config_id"
-    t.index ["parent_id", "parent_type"], name: "index_parent_dependent_field_configuration_mappings_parent"
   end
 
   create_table "payment_agreement_escalations", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -6804,7 +6789,6 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.string "receiving_user_type"
     t.datetime "deleted_at"
     t.integer "company_id"
-    t.index ["initiating_account_id", "initiating_account_type"], name: "index_payment_trails_on_initiating_account"
     t.index ["initiating_account_id"], name: "index_payment_trails_on_initiating_account_id"
     t.index ["receiving_account_id"], name: "index_payment_trails_on_receiving_account_id"
   end
@@ -6901,7 +6885,6 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.integer "policy_id", null: false
     t.datetime "deleted_at"
     t.integer "company_id"
-    t.index ["policy_id"], name: "index_per_diem_expense_configs_on_policy_id"
   end
 
   create_table "per_diem_expenses", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -6927,7 +6910,6 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.boolean "is_deleted", default: false
     t.datetime "deleted_at"
     t.integer "company_id"
-    t.index ["configurable_id", "configurable_type"], name: "index_per_diems_on_configurable_id_and_configurable_type"
     t.index ["rate_id"], name: "index_per_diems_on_rate_id"
   end
 
@@ -7014,8 +6996,6 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
     t.integer "company_id"
-    t.index ["department_id"], name: "index_policy_department_mappings_on_department_id"
-    t.index ["policy_id"], name: "index_policy_department_mappings_on_policy_id"
   end
 
   create_table "policy_designation_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -7057,8 +7037,6 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
     t.integer "company_id"
-    t.index ["location_id"], name: "index_policy_location_mappings_on_location_id"
-    t.index ["policy_id"], name: "index_policy_location_mappings_on_policy_id"
   end
 
   create_table "policy_user_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -7307,9 +7285,6 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.decimal "previously_billed_amount", precision: 20, scale: 5, default: "0.0"
     t.boolean "tds_applicable", default: false
     t.integer "company_id"
-    t.index ["category_id"], name: "index_purchase_order_items_on_category_id"
-    t.index ["cost_center_id"], name: "index_purchase_order_items_on_cost_center_id"
-    t.index ["deleted_at"], name: "index_purchase_order_items_on_deleted_at"
     t.index ["department_id"], name: "index_purchase_order_items_on_department_id"
     t.index ["discount_amount_id"], name: "index_purchase_order_items_on_discount_amount_id"
     t.index ["inventory_line_item_id"], name: "index_purchase_order_items_on_inventory_line_item_id"
@@ -7652,10 +7627,6 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.integer "amount_id"
     t.datetime "deleted_at"
     t.integer "company_id"
-    t.index ["amount_id"], name: "index_rate_contract_line_items_on_amount_id"
-    t.index ["item_id"], name: "index_rate_contract_line_items_on_item_id"
-    t.index ["location_id"], name: "index_rate_contract_line_items_on_location_id"
-    t.index ["rate_contract_id"], name: "index_rate_contract_line_items_on_rate_contract_id"
   end
 
   create_table "rate_contracts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -7962,7 +7933,6 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.integer "delegated_action_user_id"
     t.datetime "deleted_at"
     t.integer "company_id"
-    t.index ["delegated_action_user_id"], name: "index_report_comments_on_delegated_action_user_id"
     t.index ["expense_id"], name: "index_report_comments_on_expense_id"
     t.index ["rejected_to_id"], name: "index_report_comments_on_rejected_to_id"
     t.index ["report_comment_action_id"], name: "index_report_comments_on_report_comment_action_id"
@@ -8555,10 +8525,6 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.integer "policy_id", null: false
     t.datetime "deleted_at"
     t.integer "company_id"
-    t.index ["default_category_id"], name: "index_time_expense_configs_on_default_category_id"
-    t.index ["period_id"], name: "index_time_expense_configs_on_period_id"
-    t.index ["policy_id"], name: "index_time_expense_configs_on_policy_id"
-    t.index ["rate_id"], name: "index_time_expense_configs_on_rate_id"
   end
 
   create_table "time_expenses", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -8733,10 +8699,6 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.integer "delegated_action_user_id"
     t.datetime "deleted_at"
     t.integer "company_id"
-    t.index ["action_id"], name: "index_travel_request_comments_on_action_id"
-    t.index ["booking_id"], name: "index_travel_request_comments_on_booking_id"
-    t.index ["booking_request_id"], name: "index_travel_request_comments_on_booking_request_id"
-    t.index ["delegated_action_user_id"], name: "index_travel_request_comments_on_delegated_action_user_id"
     t.index ["travel_request_id"], name: "index_travel_request_comments_on_travel_request_id"
     t.index ["user_id"], name: "index_travel_request_comments_on_user_id"
   end
@@ -8748,7 +8710,6 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.integer "location_id"
     t.datetime "deleted_at"
     t.integer "company_id"
-    t.index ["location_id"], name: "index_travel_request_destinations_on_location_id"
     t.index ["travel_request_id"], name: "index_travel_request_destinations_on_travel_request_id"
   end
 
@@ -8891,6 +8852,7 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "company_id"
     t.index ["deleted_at"], name: "index_trip_passengers_on_deleted_at"
     t.index ["trip_id"], name: "index_trip_passengers_on_trip_id"
     t.index ["uuid"], name: "index_trip_passengers_on_uuid"
@@ -9424,8 +9386,8 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.boolean "invoicing_system", default: false
     t.boolean "travel_request", default: false
     t.datetime "deleted_at"
-    t.integer "company_id"
     t.boolean "weekly_summary_enabled", default: false
+    t.integer "company_id"
     t.index ["user_id"], name: "index_user_panel_subscriptions_on_user_id"
   end
 
@@ -9516,9 +9478,6 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.integer "branch_location_id"
     t.datetime "deleted_at"
     t.integer "company_id"
-    t.index ["branch_location_id"], name: "index_user_role_mappings_on_branch_location_id"
-    t.index ["company_department_id"], name: "index_user_role_mappings_on_company_department_id"
-    t.index ["purpose_id"], name: "index_user_role_mappings_on_purpose_id"
     t.index ["user_id"], name: "index_user_role_mappings_on_user_id"
     t.index ["user_role_id"], name: "index_user_role_mappings_on_user_role_id"
   end
@@ -9926,7 +9885,6 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.integer "tds_rates_list_id"
     t.datetime "deleted_at"
     t.integer "company_id"
-    t.index ["tds_rates_list_id"], name: "index_vendor_tds_rates_on_tds_rates_list_id"
     t.index ["vendor_id"], name: "index_vendor_tds_rates_on_vendor_id"
   end
 
@@ -10025,7 +9983,6 @@ ActiveRecord::Schema.define(version: 2021_04_08_065248) do
     t.string "beneficiary_account_no"
     t.datetime "deleted_at"
     t.integer "company_id"
-    t.index ["virtual_account_id"], name: "index_virtual_account_transactions_on_virtual_account_id"
   end
 
   create_table "virtual_bank_accounts", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|

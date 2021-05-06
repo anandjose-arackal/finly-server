@@ -361,6 +361,7 @@ class BbpsBill < ApplicationRecord
         biller_category_name: subscription.biller_category_name,
         mobile_number: subscription.mobile_number,
         customer_fields: subscription.all_customer_fields,
+        custom_fields: subscription.custom_fields,
         subscription_pocs: subscription.subscription_pocs.as_json,
         fetch_requirement: subscription.fetch_requirement,
         support_bill_validation: subscription.support_bill_validation,
