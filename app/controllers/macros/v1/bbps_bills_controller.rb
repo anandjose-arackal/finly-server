@@ -1,4 +1,4 @@
-class Macros::V1::CreditNotesController < BaseControllers::MacrosBase
+class Macros::V1::BbpsBillsController < BaseControllers::MacrosBase
 
   def index
     params[:route] = 'utility_bills.default'
