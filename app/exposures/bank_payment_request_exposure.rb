@@ -2,6 +2,7 @@ class BankPaymentRequestExposure < Exposures::API
 
   attribute :id, record_attribute: true
   attribute :name, record_attribute: true
+  attribute :description, record_attribute: true
   attribute :payment_ticket_id, record_attribute: :id
   attribute :payment_order, record_attribute: true, exposure: true, includes: [:payment_order]
   attribute :created_by, record_attribute: true, exposure: true, includes: [:created_by]
