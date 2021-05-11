@@ -35,7 +35,7 @@ class User::Cards::AllCards < User::Cards::Base
   end
 
   def process
-    self.cards = Card.include_soft_deleted.with_card_program(self.card_program_id).with_user_id(self.selected_user.id)
+    self.cards = Card.include_hotlisted.with_card_program(self.card_program_id).with_user_id(self.selected_user.id)
   end
 
   def success
