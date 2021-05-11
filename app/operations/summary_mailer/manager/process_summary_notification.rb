@@ -1,48 +1,47 @@
 class SummaryMailer::Manager::ProcessSummaryNotification < BaseOperation
   attr_accessor :time_slot, :configurations
 
-  def self.call
-    self.new.run
-  end
-
-  def initialize
-    super(nil, nil)
+  def init
+    if self.user.present?
+      self.company = self.user.company
+    end
   end
 
   def validate
-    unless current_company.present?
+    unless company.present?
       add_message :error, 'Invalid Action'
+      return
     end
 
-    unless current_company.feature_subscription.expense_management
+    unless company.feature_subscription.expense_management_enabled
       add_message :error, 'Em not enabled'
     end
   end
 
   def process
-    current_company.users.only_managerseach do |user|
-      process_configuration(user)
+    company.users.active.only_managers.each do |user_manager|
+      process_configuration(user_manager)
     end
   end
 
   protected
 
-  def process_configuration(user)
-    manager = user.manager?
+  def process_configuration(user_manager)
+    manager = user_manager.manager?
     summary = {}
     return unless manager
     summary[:roles] = {manager: manager}
-    has_pending_reports = set_report_summary summary, user, manager
-    has_pending_requests = set_money_request_summary summary, user, manager
+    has_pending_reports = set_report_summary summary, user_manager, manager
+    has_pending_requests = set_money_request_summary summary, user_manager, manager
     if has_pending_requests or has_pending_reports
-      Event::ESummary::Manager.(user, user: user, summary: summary)
+      Event::ESummary::Manager.(user_manager, user: user_manager, summary: summary)
     end
   end
 
-  def set_report_summary(summary, user, manager)
+  def set_report_summary(summary, user_manager, manager)
     manager_request_count = 0
     if manager
-      manager_reports = Report.awaiting_action_items(user.id)
+      manager_reports = Report.awaiting_action_items(user_manager.id)
       manager_request_count = manager_reports.count
       summary[:manager_reports] = {count: manager_request_count, reports: manager_reports}
     end
@@ -51,10 +50,10 @@ class SummaryMailer::Manager::ProcessSummaryNotification < BaseOperation
     manager_request_count  > 0
   end
 
-  def set_money_request_summary(summary, user, manager)
+  def set_money_request_summary(summary, user_manager, manager)
     manager_request_count = 0
     if manager
-      manager_money_requests = user.manager_money_requests.awaiting_approval_of_user(user.id, UserRole.id_for(:manager))
+      manager_money_requests = MoneyRequest.awaiting_action_items(user_manager.id)
       manager_request_count = manager_money_requests.count
       summary[:manager_money_requests] = {count: manager_request_count, money_requests: manager_money_requests}
     end
