@@ -1,6 +1,6 @@
-class BankTransferProcessRetry
+class BankTransferProcessRetry < BaseJob
 
-  def self.perform
+  def self.perform_job
     puts " ----------------------------- PERFORMING #{self.name}  at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")}------------------------------"
 
     failed_payments_for_retry = Payment.where(payment_status_id: PaymentStatus.id_for(:pending_retry))

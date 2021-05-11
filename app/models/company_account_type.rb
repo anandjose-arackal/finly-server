@@ -9,5 +9,5 @@
 #  deleted_at :datetime
 #
 
-class CompanyAccountType < ApplicationRecord
+class CompanyAccountType < NonTenantedApplicationRecord
 end

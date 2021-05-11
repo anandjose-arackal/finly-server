@@ -12,10 +12,13 @@
 #  invoicing_system          :boolean          default(FALSE)
 #  travel_request            :boolean          default(FALSE)
 #  deleted_at                :datetime
+#  weekly_summary_enabled    :boolean          default(FALSE)
 #
 
 class UserPanelSubscription < ApplicationRecord
   belongs_to :user, optional: true
+
+  belongs_to :company, optional: true
 
   validate :at_least_one_panel
 

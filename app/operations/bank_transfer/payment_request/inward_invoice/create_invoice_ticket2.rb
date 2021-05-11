@@ -14,7 +14,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
                 :description, :bank_payment_request, :payable_amount,
                 :payment_request_params, :policy, :bank_payment_request_params, :payable_amounts, :requested_amount, :inward_invoices,
                 :payments, :invoices_params, :invoices_status, :transfer_mode_id, :transfer_mode,
-                :update_payable_for_invoices
+                :update_payable_for_invoices, :reporting_amount_requested, :base_currency_id, :is_domestic
 
   class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2::BankPaymentRequestPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -69,6 +69,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
     # params[:payment_mode] = 'neft'
     # params[:invoices_attributes] = [{invoice_id: 40343, payable_amount: '1' }]
     self.payable_amounts = {}
+    self.reporting_amount_requested = 0
     self.requested_amount = 0
     ids = []
     self.invoices_status = {}
@@ -84,6 +85,9 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
     # which can be unpaid or partially paid
     # since previous state can be more than one type, this is a clean way to handle this
     self.inward_invoices.pluck(:id,:invoice_status_id).map { |id, st| self.invoices_status[id.to_i] = st }
+    self.is_domestic = inward_invoices.first.is_domestic
+    base_currency_id = Currency.find_by(id: inward_invoices.first.base_currency).id rescue Currency.find_by(country_code: 'INR').id
+    self.base_currency_id = base_currency_id
 
     Rails.logger.fatal "invoices_status,\n #{invoices_status.inspect}"
 
@@ -123,6 +127,16 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
       add_message :error, "Payment mode cannot be blank"
       return
     end
+
+    # condition for same currency check
+
+    if self.inward_invoices.present?
+      if inward_invoices.pluck(:base_currency).uniq.length != 1
+        add_message :error, "Please add invoices with same base currency"
+        return
+      end
+    end
+
 
     self.payable_amounts.each do |invoice_id, payable_amount|
       invoice = self.inward_invoices.find_by(id: invoice_id)
@@ -176,7 +190,13 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
         add_message :error, "Invoice has been credited."
         return
       end
+
+      reporting_payable_amount = payable_amount
+      reporting_payable_amount = payable_amount * invoice.conversion_rate.to_f
+
       self.requested_amount += payable_amount
+      self.reporting_amount_requested += reporting_payable_amount
+
     end
   end
 
@@ -257,7 +277,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
           transfer_mode_id: self.transfer_mode_id,
           amount_attributes: {
               value: self.payable_amounts[invoice.id],
-              currency_id: Currency.first.id
+              currency_id: self.base_currency_id
           },
           note: invoice.narration,
           category_id: invoice.category_id,
@@ -305,7 +325,11 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
         company_id: user.company_id,
         amount_requested_attributes: {
             value: self.requested_amount,
-            currency_id: 1
+            currency_id: self.base_currency_id
+        },
+        amount_processed_attributes: {
+            value: 0,
+            currency_id: self.base_currency_id
         },
         payment_mode: self.payment_mode,
         transfer_mode_id: self.transfer_mode_id,
@@ -313,16 +337,17 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
         receiving_account_type: "BankAccount",
         payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
         application: RequestStore.store[:current_app],
-        currency_id: 1,
-        scheduled_at: self.scheduled_at
+        currency_id: self.base_currency_id,
+        scheduled_at: self.scheduled_at,
+        reporting_amount_requested: self.reporting_amount_requested
     }
     bank_payment_request_params = {
         owner_id: user.id,
         status_id: BankPaymentRequestStatus.id_for(:creation_in_progress),
         controlling_user_id: user.id,
         requested_amount_attributes: {
-            value: self.requested_amount,
-            currency_id: 1
+          value: self.requested_amount,
+          currency_id: self.base_currency_id
         },
         description: self.description,
         beneficiary_type_id: 2, # this is because an invoice will always come from a vendor
@@ -330,7 +355,9 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
         payment_order_attributes: payment_order_params,
         expected_payments: self.inward_invoices.count,
         ticket_type: 'invoice',
-        transfer_mode_id: self.transfer_mode_id
+        transfer_mode_id: self.transfer_mode_id,
+        base_currency_id: self.base_currency_id,
+        is_domestic: self.is_domestic
     }
     return bank_payment_request_params
   end

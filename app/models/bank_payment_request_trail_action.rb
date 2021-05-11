@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class BankPaymentRequestTrailAction < ApplicationRecord
+class BankPaymentRequestTrailAction < NonTenantedApplicationRecord
 
   include Seedable
 

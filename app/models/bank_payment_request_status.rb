@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class BankPaymentRequestStatus < ApplicationRecord
+class BankPaymentRequestStatus < NonTenantedApplicationRecord
   include Seedable
 
   GROUP_OPEN = 90

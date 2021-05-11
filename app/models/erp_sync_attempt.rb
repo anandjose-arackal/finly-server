@@ -28,11 +28,11 @@ class ErpSyncAttempt < ApplicationRecord
   default_scope {order(created_at: :desc)}
 
   def self.setup_migration(model)
-    ActiveRecord::Migration.add_column model.table_name, :erp_sync_status_id, :integer, references: 'erp_sync_statuses', index: true, foreign_key: true unless model.has_attribute?(:erp_sync_status_id)
-    ActiveRecord::Migration.add_column model.table_name, :erp_sync_message, :string unless model.has_attribute?(:erp_sync_message)
-    ActiveRecord::Migration.add_column model.table_name, :erp_sync_reference_id, :string, index: true unless model.has_attribute?(:erp_sync_reference_id)
-    ActiveRecord::Migration.add_column model.table_name, :erp_sync_attempts_count, :integer, index: true, default: 0 unless model.has_attribute?(:erp_sync_attempts_count)
-    ActiveRecord::Migration.add_column model.table_name, :erp_sync_attempted_at, :datetime, index: true unless model.has_attribute?(:erp_sync_attempted_at)
+    ActiveRecord::Migration.add_column model.table_name, :erp_sync_status_id, :integer, references: 'erp_sync_statuses', index: true, foreign_key: true unless model.column_names.include? "erp_sync_status_id"
+    ActiveRecord::Migration.add_column model.table_name, :erp_sync_message, :text unless model.column_names.include? "erp_sync_message"
+    ActiveRecord::Migration.add_column model.table_name, :erp_sync_reference_id, :string, index: true unless model.column_names.include? "erp_sync_reference_id"
+    ActiveRecord::Migration.add_column model.table_name, :erp_sync_attempts_count, :integer, index: true, default: 0 unless model.column_names.include? "erp_sync_attempts_count"
+    ActiveRecord::Migration.add_column model.table_name, :erp_sync_attempted_at, :datetime, index: true unless model.column_names.include? "erp_sync_attempted_at"
   end
 
 end

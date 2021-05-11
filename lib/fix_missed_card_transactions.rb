@@ -88,6 +88,14 @@ class FixMissedCardTransactions
 
       trans_params[:billing_amount_attributes] = billing_amount_attributes if billing_amount_attributes.present?
       trans_params[:transaction_amount_attributes] = transaction_amount_attributes if transaction_amount_attributes
+      card = nil
+      user = nil
+      ActsAsTenant.without_tenant do
+        card = Card.find_by_proxy(trans_params[:serial_id])
+        user = card&.user
+      end
+      ActsAsTenant.current_tenant = (user&.company || card&.company)
+      RequestStoreUtil.set_current_company((user&.company || card&.company))
 
       operation = Script::MissedCardTransactionCreate.(trans_params)
       puts "Operation Result: #{operation.success?}"

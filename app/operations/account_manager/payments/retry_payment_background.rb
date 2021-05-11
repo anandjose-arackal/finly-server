@@ -22,7 +22,7 @@ class AccountManager::Payments::RetryPaymentBackground < AccountManager::Base
     if options.present? and options.is_a?(Hash)
       options = options.with_indifferent_access
     end
-    self.payment = Payment.unscoped.find_by_id(payment_id)
+    self.payment = Payment.include_soft_deleted.find_by_id(payment_id)
     self.options = options
     self.run
   end

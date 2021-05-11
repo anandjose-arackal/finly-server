@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class VirtualAccountPurpose < ApplicationRecord
+class VirtualAccountPurpose < NonTenantedApplicationRecord
   include Seedable
 
   # cash_on_hand_return - when employees return their cash advance through a bank transfer

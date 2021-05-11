@@ -13,7 +13,7 @@
 #  deleted_at   :datetime
 #
 
-class ItzCashCardProgram < ApplicationRecord
+class ItzCashCardProgram < NonTenantedApplicationRecord
 
   scope :with_product_code, -> (product_code) { where product_code: product_code }
 

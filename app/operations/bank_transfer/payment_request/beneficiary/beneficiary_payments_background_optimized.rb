@@ -106,9 +106,9 @@ def build_new_vendors
 
 	if import_id_column.present? or import_number_column.present?
 		kolumn, kolumn_value = import_id_column.present? ? [import_id_column, import_id] : [import_number_column, import_number]
-		vendors = YesBankVendor.unscoped.where(kolumn => kolumn_value, :created_at => import_date)
+		vendors = YesBankVendor.include_soft_deleted.where(kolumn => kolumn_value, :created_at => import_date)
 	else
-		vendors = YesBankVendor.unscoped.where(created_at: import_date)
+		vendors = YesBankVendor.include_soft_deleted.where(created_at: import_date)
 	end
 
 
@@ -120,7 +120,7 @@ def build_new_vendors
 		vendors[index].business_name = account[:business_name]
 	end
 	exec_statement(vendors.to_a, false, false, true, true)
-	# self.new_vendors = YesBankVendor.unscoped.where('import_id like ?', import_id).to_a
+	# self.new_vendors = YesBankVendor.include_soft_deleted.where('import_id like ?', import_id).to_a
 	self.new_vendors = vendors
 	# 
 	build_new_bank_accounts
@@ -170,10 +170,10 @@ def setup_beneficiary_payment
 
 	BeneficiaryPayment.import beneficiary_details
 
-	# beneficiary_payments = BeneficiaryPayment.unscoped.where('import_id like ?', import_id).to_a
-	fetch_beneficiary_payments = BeneficiaryPayment.unscoped.where(created_at: import_date)
+	# beneficiary_payments = BeneficiaryPayment.include_soft_deleted.where('import_id like ?', import_id).to_a
+	fetch_beneficiary_payments = BeneficiaryPayment.include_soft_deleted.where(created_at: import_date)
 
-	self.beneficiary_payments = BeneficiaryPayment.unscoped.where(id: fetch_beneficiary_payments.pluck(:id))
+	self.beneficiary_payments = BeneficiaryPayment.include_soft_deleted.where(id: fetch_beneficiary_payments.pluck(:id))
 
 	self.payments_attributes.each_with_index do |vd, ix| 
 		vd[:advance_amount] = (vd[:advance_amount].blank?) ? 0 : vd[:advance_amount]
@@ -216,7 +216,7 @@ def build_amounts
 
 	Amount.import amounts
 
-	amounts = Amount.unscoped.where(created_at: import_date)
+	amounts = Amount.include_soft_deleted.where(created_at: import_date)
 
 	self.original_amounts, self.advance_amounts, self.payment_amounts = amounts.in_groups_of(((payments_attributes.size * 3) / 3), false)
 	# 
@@ -246,9 +246,9 @@ def build_invoices
 
 	if import_id_column.present? or import_number_column.present?
 		kolumn, kolumn_value = import_id_column.present? ? [import_id_column, import_id] : [import_number_column, import_number]
-		invoices = Invoice.unscoped.where(kolumn => kolumn_value, :created_at => import_date)
+		invoices = Invoice.include_soft_deleted.where(kolumn => kolumn_value, :created_at => import_date)
 	else
-		invoices = Invoice.unscoped.where(created_at: import_date)
+		invoices = Invoice.include_soft_deleted.where(created_at: import_date)
 	end
 
 	self.payments_attributes.each_with_index do |payment, index|
@@ -297,7 +297,7 @@ def build_payments
 	run_before_callbacks(self.payments)
 	Payment.import self.payments
 
-	self.payments = Payment.unscoped.where(created_at: import_date)
+	self.payments = Payment.include_soft_deleted.where(created_at: import_date)
 
 	# payment_params.each_with_index do |params, index|
 	# 	params[:amount_id] = payment_amounts[index].id
@@ -402,7 +402,7 @@ def build_text_custom_fields
   FieldText.import field_texts
 
   # capture the newly created fields texts
-  newly_created_texts = FieldText.unscoped.where(value: self.import_id)
+  newly_created_texts = FieldText.include_soft_deleted.where(value: self.import_id)
 
   # update its value
   original_values = init_text_field.pluck :value # original list of values
@@ -448,7 +448,7 @@ def build_drop_down_custom_fields
   FieldDropDownSelection.import field_drop_down
 
   # capture the newly created fields drop_downs
-  newly_created_drop_downs = FieldDropDownSelection.unscoped.where(created_at: dt)
+  newly_created_drop_downs = FieldDropDownSelection.include_soft_deleted.where(created_at: dt)
 
   # update its value
   original_values = init_drop_down_field.pluck :value # original list of values

@@ -4,8 +4,6 @@
 #
 #  id              :bigint           not null, primary key
 #  company_id      :integer          not null
-#  parent_type     :string(255)
-#  parent_id       :bigint
 #  type            :string(255)      not null
 #  config          :text(4294967295)
 #  built_at        :datetime
@@ -22,7 +20,9 @@
 #  deleted_at      :datetime
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
-#  pmml            :text(65535)
+#  form_id         :string(255)
+#  parent_id       :string(255)
+#  parent_type     :string(255)
 #
 class MlModel < ApplicationRecord
   include DynamicAttributes
@@ -33,6 +33,7 @@ class MlModel < ApplicationRecord
   belongs_to :company
 
   has_many :predictions, class_name: 'MlModelPrediction'
+  has_one :model_pmml, class_name: "MlModelPmml"
 
   serialize :config, JSON
 
@@ -52,14 +53,31 @@ class MlModel < ApplicationRecord
   validates :model_klass, presence: true
   validate :validate_schema
 
+  # Rebuilds all models
+  def self.build(options = {})
+    self.all.find_each do |model|
+      model.build_model(options)
+      model.clear_model_cache
+    end
+
+    true
+  end
+
+  # Used by +records+ function to eager load the records to prevent N+1 query problem
+  def includes(records)
+    records
+  end
+
+  # Provides all the records which will be used for training models and for tracking predictions
   def records
     records = Object.const_get(model_klass).all.where(company_id: company_id)
+    records = includes(records)
     # This will limit the records to just the last 12 months
     # records = records.where("#{split_key} > #{1.year.ago}") if split_key.present?
     records
   end
 
-  def prepare_record(record)
+  def prepare_record(record, options = {})
     record_data = {}
     record_data[split_key] = split_value(record)
     record_data[target_key] = target_value(record)
@@ -75,29 +93,40 @@ class MlModel < ApplicationRecord
   end
 
   def model
-    return nil unless pmml.present?
+    return nil unless model_pmml.present? and model_pmml.pmml.present?
 
     # TODO cache permanently
-    @model ||= Eps::Model.load_pmml(pmml)
+    @model ||= Eps::Model.load_pmml(model_pmml.pmml)
   end
 
   def clear_model_cache
     @model = nil
   end
 
-  def build_model
+  def build_model(options = {})
+    start_time = Time.now
     data = prepare_data
     return false if data.blank?
 
-    model = Eps::Model.new(data, target: target_key, algorithm: algorithm.to_sym)
-    return false unless update(pmml: model.to_pmml, built_at: DateTime.now)
+    begin
+      model = Eps::Model.new(data, target: target_key, algorithm: algorithm.to_sym)
+    rescue StandardError => e
+      raise e
+    end
+    if model_pmml.nil?
+      return false unless self.create_model_pmml(pmml: model.to_pmml, company_id: self.company_id)
+    else
+      return false unless self.model_pmml.update(pmml: model.to_pmml)
+    end
+    return false unless update(built_at: DateTime.now, build_duration: (Time.now - start_time))
 
     # Clear the cache
     @model = model
+
     true
   end
 
-  def predict(data = {})
+  def predict(data = {}, options = {})
     return nil unless model.present?
 
     data ||= {}
@@ -105,14 +134,19 @@ class MlModel < ApplicationRecord
     model.predict(prepare_prediction(data))
   end
 
-  def track_predictions
+  # Runs through all records which were created since the last time the model was built to measure the prediction
+  # Captures the accuracy and prediction in models/MlModelPrediction
+  def track_predictions(options = {})
     return false if model.blank?
 
     # Predictions will be tracked from the last build time
     return false if built_at.blank?
 
+    records = self.records
     # Scope records which have not been synced or have been updated after the last build
-    records = self.records.where.not("id in (#{predictions.select(:record_id).to_sql})")
+    records = records.where.not(
+      "id in (#{predictions.where(record_type: records.model).select(:record_id).to_sql})"
+    )
     records = records.or(records.where('updated_at > ?', tracked_at))
 
     # Scope records with split_key timestamp after the model was built.
@@ -122,29 +156,40 @@ class MlModel < ApplicationRecord
       records = records.where.not(:"#{split_key}" => nil).where("#{split_key} > ?", built_at)
     end
 
-    records.find_each do |record|
-      record_data = prepare_record(record)
+    records.find_in_batches do |batch|
+      predicted_records = []
+      import_data = []
+      batch.each do |record|
+        record_dataset = prepare_record(record)
+        next if record_dataset.blank?
 
-      actual = record_data[target_key]
-      prediction = model.predict(record_data.except(target_key))
+        record_dataset = [record_dataset] unless record_dataset.is_a?(Array)
+        record_dataset.each do |record_data|
 
-      # Update existing record if available
-      prediction_model = predictions.find_or_initialize_by(
-        record: record,
-        ml_model: self,
-        company_id: self.company_id
-      )
-      prediction_model.update(
-        actual_value: actual,
-        predicted_value: prediction
-      )
+          actual = record_data[target_key]
+          prediction = model.predict(record_data.except(target_key))
+
+          # Bulk import to improve performance
+          import_data << {
+            record_id: record.id,
+            record_type: record.class.name,
+            ml_model_id: self.id,
+            company_id: self.company_id,
+            actual_value: actual,
+            predicted_value: prediction,
+            is_accurate_prediction: (actual.to_s == prediction.to_s)
+          }
+          predicted_records << record.id
+        end
+      end
+      update(tracked_at: DateTime.now)
+      MlModelPrediction.import import_data, on_duplicate_key_update: [:record_id, :record_type]
     end
-    update(tracked_at: DateTime.now)
 
     true
   end
 
-  def prepare_data(after: nil, records: nil)
+  def prepare_data(after: nil, records: nil, options: {})
     data = []
     records = self.records if records.nil?
 
@@ -159,12 +204,18 @@ class MlModel < ApplicationRecord
     end
 
     records.find_each do |record|
-      data << prepare_record(record)
+      record_dataset = prepare_record(record)
+      next if record_dataset.blank?
+
+      record_dataset = [record_dataset] unless record_dataset.is_a?(Array)
+      record_dataset.each do |record_data|
+        data << record_data if record_data.present?
+      end
     end
     data
   end
 
-  def prepare_prediction(data)
+  def prepare_prediction(data, options = {})
     data
   end
 

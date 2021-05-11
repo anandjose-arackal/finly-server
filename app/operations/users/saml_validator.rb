@@ -33,8 +33,11 @@ class Users::SamlValidator < BaseOperation
       self.unauthenticated_user = User.find_by(email: self.email)
       if self.unauthenticated_user&.company&.group_entity_structure_enabled?
         RequestStore.store[:skip_password] = true
-        op = User::GroupEntitiesLogin.(nil, email_mobile: self.email)
-        if op.success?
+        op = nil
+        ActsAsTenant.without_tenant do
+          op = User::GroupEntitiesLogin.(nil, email_mobile: self.email)
+        end
+        if op and op.success?
           self.companies = op.companies
         else
           add_message :error, op.messages[:error]

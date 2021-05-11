@@ -14,6 +14,7 @@ class ExportManager::Template::Master::PaymentTickets::Index < ExportManager::Bu
 
   attribute :payment_order_id, template: '{{ record.payment_order.bank_payment_request.id }}'
   attribute :payment_order_name, template: '{{ record.payment_order.bank_payment_request.name }}'
+  attribute :payment_order_description, template: '{{ record.payment_order.bank_payment_request.description }}'
   attribute :payment_id, template: '{{ record.id }}'
   attribute :beneficiary_name, template: '{{ record.receiving_account.account_owner.name }}'
   attribute :beneficiary_code, template: '{{ record.vendor.vendor_id }}'
@@ -46,4 +47,7 @@ class ExportManager::Template::Master::PaymentTickets::Index < ExportManager::Bu
   attribute :note, template: '{{ record.note }}'
   attribute :payment_status, template: '{{ record.status.name }}'
   attribute :error_message, template: '{{ record.error_message }}'
+  attribute :attachment_url_1, template:  '{{  record.payment_order.attachment_urls  | first_item }}'
+  attribute :attachment_url_2, template:  '{{ record.payment_order.attachment_urls  | second_item }} '
+
 end

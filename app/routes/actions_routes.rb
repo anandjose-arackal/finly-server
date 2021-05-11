@@ -21,6 +21,7 @@ ActionManager::Router.draw do
 
   # Docs
   route 'invoices', Docs::P2P::Invoices::Action
+  route 'non_po_invoice', Docs::P2P::Invoices::Action
   route 'purchase_requests', Docs::P2P::PurchaseRequests::Action
   route 'purchase_orders', Docs::P2P::PurchaseOrders::Action
   route 'po_advances', Docs::P2P::PurchaseOrders::Advances::Action

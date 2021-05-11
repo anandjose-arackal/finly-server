@@ -10,5 +10,5 @@
 #  deleted_at  :datetime
 #
 
-class BankDetailsMaster < ApplicationRecord
+class BankDetailsMaster < NonTenantedApplicationRecord
 end

@@ -10,7 +10,7 @@
 #  deleted_at :datetime
 #
 
-class BillingType < ApplicationRecord
+class BillingType < NonTenantedApplicationRecord
   include Seedable
 
     belongs_to :company, optional: true

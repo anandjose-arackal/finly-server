@@ -16,6 +16,7 @@
 #
 
 class CardRestriction < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :card, optional: true
 
   belongs_to :mcc_group, optional: true

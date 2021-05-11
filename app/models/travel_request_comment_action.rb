@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class TravelRequestCommentAction < ApplicationRecord
+class TravelRequestCommentAction < NonTenantedApplicationRecord
 
   include Seedable
 

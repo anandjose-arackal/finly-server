@@ -50,7 +50,7 @@ class Department < ApplicationRecord
 
   accepts_nested_attributes_for :user_department_mappings
 
-  default_scope { unscope(:where) }
+  default_scope { include_soft_deleted }
 
   scope :with_ids, -> (id) { where id: id }
   scope :with_id, -> (id) { where id: id }

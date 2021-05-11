@@ -54,12 +54,19 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
           form_data = contract_root.form_data
           row_data = self.form_data
           Forms::Contracts::Helpers::ConditionChecker.(
-            self, entity.conditions, entity, VALIDATION_ACTIONS, form: form_data, row: row_data
+            self, entity.conditions, entity, VALIDATION_ACTIONS, form: form_data, row: row_data, meta: contract_root.model.form_metadata
           )
         }
         required = result['required']
         # Required validation ( System Validation )
-        if required and send(entity.entity_key).blank? and entity.entity_type != 'switch'
+
+        if required and entity.entity_type == 'attachment'
+          attachments = send(entity.entity_key)
+          valid_attachments = attachments&.filter {|item| !item[:_destroy]} if attachments.respond_to?(:each)
+          errors.add(entity.label, 'cannot be blank') if valid_attachments.blank? or valid_attachments.length.zero?
+        end
+
+        if required and !([true, false].include?( send(entity.entity_key) )) and send(entity.entity_key).blank? and entity.entity_type != 'switch' and entity.entity_type != 'attachment'
           errors.add entity.label, 'cannot be blank'
         end
 
@@ -75,7 +82,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
               send(association_name).non_deleted.filter_active.
               where("#{entity.entity_key} = ?", send(entity.entity_key))
 
-          records = records.where.not("id = ?", id) if id.present?
+          records = records.where.not("#{association_name}.id = ?", id) if id.present?
 
           if records.present?
             errors.add entity.label, "must be unique"
@@ -89,7 +96,10 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
     contract.validate -> do
       contract_root.profiler.step 'custom_validate_entity', entity.entity_path do
         entity.validations.each do |validation|
-          next unless validation.rule.apply?({ form: contract_root.form_data, row: self.form_data }.with_indifferent_access, controlling_field: entity.entity_path)
+          next unless validation.rule.apply?(
+            { form: contract_root.form_data, row: self.form_data, meta: contract_root.model.form_metadata }.with_indifferent_access,
+            model_klass: entity.form.model, controlling_field: entity.entity_path
+          )
 
           errors.add entity.label, validation.error_message
         end
@@ -106,7 +116,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
       contract_root.profiler.step 'validate_choices', entity.entity_path do
         form_data = contract_root.form_data
         row_data = self.form_data
-        entity_value = Forms::RequestParser.new(form: form_data, row: row_data).fetch(entity.entity_path)
+        entity_value = Forms::RequestParser.new(form: form_data, row: row_data, meta: contract_root.model.form_metadata).fetch(entity.entity_path)
         next if entity_value.blank?
 
         # debugger if entity.entity_key == 'vendor_location'
@@ -165,12 +175,15 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
         form_data = represented.contract_root.form_data
         row_data = represented.form_data
         result = represented.contract_root.profiler.step('condition_checker', ent.entity_path) {
-          Forms::Contracts::Helpers::ConditionChecker.(represented, entity.conditions, entity, SETTER_ACTIONS, form: form_data, row: row_data)
+          Forms::Contracts::Helpers::ConditionChecker.(
+            represented, entity.conditions, entity, SETTER_ACTIONS, form: form_data, row: row_data, meta: represented.contract_root.model.form_metadata
+          )
         }
         editable = result['editable']
         visible = result['visible']
         internal = result['internal']
-        if editable and visible and input.has_key?(entity.entity_key)
+        if visible and input.has_key?(entity.entity_key) # todo - I2P uncomment next line
+          # if editable and visible and input.has_key?(entity.entity_key)
           if entity.entity_type == 'switch' and (input[entity.entity_key] == "" or input[entity.entity_key].nil?)
             value = FormEntity::Switch::TRUTHY_VALUES.include?(entity.default_value)
           else

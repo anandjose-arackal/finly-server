@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class WebHookEvent < ApplicationRecord
+class WebHookEvent < NonTenantedApplicationRecord
   include Seedable
 
   def self.values

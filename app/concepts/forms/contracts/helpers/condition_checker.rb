@@ -1,7 +1,7 @@
 # Responsible for running conditions and returning the applicable actions in result
 class Forms::Contracts::Helpers::ConditionChecker
 
-  def self.call(contract, conditions, entity, properties, form: {}, row: {})
+  def self.call(contract, conditions, entity, properties, form: {}, row: {}, meta: {})
     result = {}.with_indifferent_access
 
     # Set the default values of properties
@@ -20,10 +20,10 @@ class Forms::Contracts::Helpers::ConditionChecker
         break
       end
       next unless applicable
-      next unless contract.contract_root.profiler.step("condition.apply") { condition.rule.apply?({ form: form, row: row }.with_indifferent_access, controlling_field: entity.entity_path) }
+      next unless contract.contract_root.profiler.step("condition.apply") { condition.rule.apply?({ form: form, row: row, meta: meta }.with_indifferent_access, model_klass: entity.form.model, controlling_field: entity.entity_path) }
       # match = true
       # condition.rules.each do |rule|
-      #   match = false unless rule.match?({form: form, row: row}.with_indifferent_access)
+      #   match = false unless rule.match?({form: form, row: row, meta: meta}.with_indifferent_access)
       # end
       # next unless match
 

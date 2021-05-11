@@ -94,6 +94,9 @@ linked_files = %w{
   config/searchkick.yml
   config/cubejs.yml
   config/mailtrain.yml
+  config/message_template.yml
+  config/open_exchange_rates.yml
+  config/sso_provider_credentials.yml
 }
 case fetch(:stage)
 when :itzcash_production, :aws_production, :background_production, :foreground_production, :console_production, :api_production, :background_production_console,
@@ -106,6 +109,8 @@ when :yes_bank_balance_poller
   linked_files << "config/sidekiq_yes_bank_balance_poller.yml"
   linked_files << "config/elastic_apm.yml"
   linked_files << 'config/bunny.yml'
+when :development_6
+  linked_files << 'config/master_users.yml'
 end
 set :linked_files, linked_files
 set :linked_dirs, %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/uploads node_modules client/node_modules}

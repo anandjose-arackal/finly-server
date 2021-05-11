@@ -11,6 +11,7 @@
 #
 
 class LoginAgreementMapping < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :user, optional: true
   belongs_to :agreement, optional: true
 end

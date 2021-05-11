@@ -72,6 +72,10 @@ class Exposures::API < Liquid::Drop
     @object
   end
 
+  def registers
+    @context&.registers || {}
+  end
+
   alias_method :record, :object
 
 end

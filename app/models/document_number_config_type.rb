@@ -10,7 +10,7 @@
 #  deleted_at  :datetime
 #
 
-class DocumentNumberConfigType < ApplicationRecord
+class DocumentNumberConfigType < NonTenantedApplicationRecord
   include Seedable
 
   # After adding more items here seed and also create DocumentNumberConfig for all existing companies like this:

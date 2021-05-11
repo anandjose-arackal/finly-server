@@ -3,7 +3,7 @@ class Masters::TaxRates::Resolver < Masters::Vendors::Resolver
   entity TaxRate
 
   def load(params)
-    user.company.tax_rates
+    user.company.tax_rates.non_deleted
   end
 
 end

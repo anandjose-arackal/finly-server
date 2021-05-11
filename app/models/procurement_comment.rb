@@ -15,6 +15,8 @@
 
 class ProcurementComment < ApplicationRecord
   include SoftDeletable
+  belongs_to :company, optional: true
+
   belongs_to :user, optional: true
 
   belongs_to :parent_commentable, optional: true, polymorphic: true

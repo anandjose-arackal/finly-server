@@ -49,11 +49,12 @@
 #  compute_formula              :text(65535)
 #  filters                      :text(65535)
 #  config_path                  :string(255)
+#  compute_lookup_assignments   :text(65535)
 #
 
 class FormEntity::Attachment < FormEntity
 
-  FORMAT ||= %w[txt pdf doc docx xls xlsx png jpeg jpg gif].freeze
+  FORMAT ||= %w[txt pdf doc docx xls xlsx png jpeg jpg gif rtf].freeze
 
   register :attachment
   # collection!

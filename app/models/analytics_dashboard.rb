@@ -17,7 +17,7 @@
 #  created_at            :datetime         not null
 #  updated_at            :datetime         not null
 #
-class AnalyticsDashboard < ApplicationRecord
+class AnalyticsDashboard < ApplicationRecordBackwardCompatibility
   belongs_to :created_by, class_name: 'User', optional: true
   belongs_to :company, optional: true
   belongs_to :system_dashboard, optional: true

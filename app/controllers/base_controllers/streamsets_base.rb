@@ -10,6 +10,9 @@ class BaseControllers::StreamsetsBase < ApplicationController
   end
 
   def current_user
+    company = Company.find(params[:company_id])
+    ActsAsTenant.current_tenant = company
+
   	User.find_by id: params[:user_id], company_id: params[:company_id]
   end
 

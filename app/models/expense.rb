@@ -57,6 +57,7 @@ class Expense < ApplicationRecord
           FieldCustomizer::CustomizableValidation,
           MathUtil
 
+  belongs_to :company, optional: true
   belongs_to :amount, optional: true
   belongs_to :expense_status, optional: true
   belongs_to :user, optional: true, inverse_of: :expenses
@@ -644,7 +645,7 @@ class Expense < ApplicationRecord
       # this will handle cases for deleted expenses as well.
       merchant = self.manual_expense.merchant rescue nil
       if merchant.nil?
-        merchant = ManualExpense.unscoped.find_by(expense_id: self.id).merchant rescue ""
+        merchant = ManualExpense.include_soft_deleted.find_by(expense_id: self.id).merchant rescue ""
       end
       return merchant
     when ExpenseType.id_for(:card)
@@ -655,11 +656,11 @@ class Expense < ApplicationRecord
       # un-scoping here for cases when the per diem gets destroyed
       policy_name = self.per_diem_expense&.per_diem&.configurable&.name
       if policy_name.nil?
-        policy_name = PerDiem.unscoped.find_by(id: self.per_diem_expense&.per_diem_id)&.configurable&.name rescue nil
+        policy_name = PerDiem.include_soft_deleted.find_by(id: self.per_diem_expense&.per_diem_id)&.configurable&.name rescue nil
       end
       per_diem_name = self.per_diem_expense&.per_diem_name rescue nil
       if per_diem_name.nil?
-        per_diem_name = PerDiem.unscoped.find_by(id: self.per_diem_expense&.per_diem_id)&.name rescue nil
+        per_diem_name = PerDiem.include_soft_deleted.find_by(id: self.per_diem_expense&.per_diem_id)&.name rescue nil
       end
       return "#{policy_name} - #{per_diem_name}"
     else
@@ -773,7 +774,7 @@ class Expense < ApplicationRecord
       # unscoping for cases when the per diem gets destroyed
       rate = self.per_diem_expense.per_diem&.rate_value rescue nil
       if rate.nil?
-        rate = PerDiem.unscoped.find_by(id: self.per_diem_expense.per_diem_id).rate_value
+        rate = PerDiem.include_soft_deleted.find_by(id: self.per_diem_expense.per_diem_id).rate_value
       end
       return rate
     else
@@ -786,11 +787,11 @@ class Expense < ApplicationRecord
       # unscoping for cases when the per diem gets destroyed
       policy_name = self.per_diem_expense.per_diem&.configurable&.name
       if policy_name.nil?
-        policy_name = PerDiem.unscoped.find_by(id: self.per_diem_expense.per_diem_id)&.configurable&.name
+        policy_name = PerDiem.include_soft_deleted.find_by(id: self.per_diem_expense.per_diem_id)&.configurable&.name
       end
       per_diem_name = self.per_diem_expense&.per_diem_name rescue nil
       if per_diem_name.nil?
-        per_diem_name = PerDiem.unscoped.find_by(id: self.per_diem_expense.per_diem_id)&.name
+        per_diem_name = PerDiem.include_soft_deleted.find_by(id: self.per_diem_expense.per_diem_id)&.name
       end
       return "#{policy_name} - #{per_diem_name}"
     else

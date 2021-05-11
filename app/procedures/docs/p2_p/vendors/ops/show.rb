@@ -1,6 +1,7 @@
 class Docs::P2P::Vendors::Ops::Show < Transactions::API
 
   step Model(YesBankVendor, :find_by)
+  step Policy::Pundit(Masters::Vendors::Policy, :show?)
   step :retrieve_form
 
 

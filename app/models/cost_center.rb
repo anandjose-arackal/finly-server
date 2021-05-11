@@ -42,7 +42,7 @@ include Searchkick::Api
 
   has_many :budget_trails
 
-  default_scope {unscope(:where).order(name: :asc)}
+  default_scope { include_soft_deleted.order(name: :asc) }
   scope :with_name, -> (name) {where name: name}
   scope :with_application, -> (app) {
     where application: app

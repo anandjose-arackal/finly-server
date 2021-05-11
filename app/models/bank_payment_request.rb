@@ -37,6 +37,7 @@
 #  expected_payments            :integer          default(0)
 #  ticket_type                  :string(255)
 #  transfer_mode_id             :integer
+#  is_domestic                  :boolean          default(TRUE)
 #
 
 class BankPaymentRequest < ApplicationRecord
@@ -63,6 +64,7 @@ class BankPaymentRequest < ApplicationRecord
   belongs_to :company, optional: true
   belongs_to :transfer_mode, optional: true, class_name: "TransferModeCompanyMapping"
 
+  belongs_to :base_currency, optional: true, class_name: 'Currency'
   has_many :comments, class_name: "BankPaymentRequestComment"
   has_many :bank_payment_request_trails
 
@@ -422,15 +424,25 @@ class BankPaymentRequest < ApplicationRecord
     with_status_id(status_id)
   }
 
+  scope :total_requested_amount, -> {
+    joins(payment_order: {payments: :amount}).sum('amounts.value').to_f.round(2)
+  }
+
   attr_accessor :cache_users
 
   before_save do
     if self.name.blank?
       self.name = generate_name
     end
+
+    # if self.base_currency_id.blank?
+    #   self.base_currency_id = Currency.find_by(currency_code: 'INR').id
+    # end
   end
 
   before_save :add_company
+  before_save :set_base_currency
+  
 
   ransack_scopes :with_status_id
   ransack_scopes :with_status_ids
@@ -649,6 +661,14 @@ class BankPaymentRequest < ApplicationRecord
 
   def entity_submitted_at
     submitted_at&.to_date || created_at.to_date
+  end
+
+  def set_base_currency
+    self.base_currency_id = self.company.reporting_currency.id if base_currency_id.blank?
+  end
+
+  def non_po_form_enabled
+    user.present? && user.non_po_invoice_form_enabled 
   end
 
   private

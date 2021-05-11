@@ -13,6 +13,7 @@
 #
 
 class SystemLog < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :log_resource, optional: true, polymorphic: true
   belongs_to :type, optional: true, class_name: 'SystemMessageType'
 

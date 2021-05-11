@@ -15,6 +15,7 @@ json.payments do
       json.name payment.receiving_account&.name
       json.account_number payment.receiving_account&.account_number
       json.ifsc payment.receiving_account&.ifsc
+      json.swift_code payment.receiving_account&.swift_code
     else
       json.owner_name payment.receiving_account&.account_owner&.name
       json.beneficiary_id payment.receiving_account&.account_owner&.id
@@ -84,7 +85,14 @@ json.payments do
       json.raw_amount precision_value invoice&.amount&.value
       # conditionally set the original amount as invoice amount is there are line items
       if payment.invoice&.invoice_items.present?
-        json.original_amount precision_value invoice.amount&.value
+
+        # toggle = NonPoInvoiceToggle.new(current_user)
+        original_amount = precision_value invoice.amount&.value
+        # if toggle.enabled?
+          # original_amount = invoice.invoice_gross_amount
+        # end
+
+        json.original_amount precision_value original_amount
       else
         json.original_amount precision_value invoice.original_amount&.value
       end
@@ -94,26 +102,26 @@ json.payments do
         json.invoice_type invoice.invoice_type&.name
         json.procurement_id invoice.procurement_id
         json.advance invoice.advance
-        json.advance_amount precision_value invoice.advance_amount&.value
-        json.tax_amount precision_value invoice.tax_amount&.value
-        json.tds_amount precision_value invoice.tds_amount&.value
+        json.advance_amount precision_value invoice&.advance_amount&.value.to_f
+        json.tax_amount precision_value invoice&.tax_amount&.value.to_f
+        json.tds_amount precision_value invoice&.tds_amount&.value.to_f
         json.tax precision_value invoice.tax
         json.tds precision_value invoice.tds
         json.gst_type_id invoice.gst_type_id
         json.tax_type_id invoice.tax_type_id
         json.tds_type_id invoice.tds_type_id
-        json.discount_amount precision_value invoice.discount_amount&.value
+        json.discount_amount precision_value invoice&.discount_amount&.value.to_f
         json.discount precision_value invoice.discount
         json.date invoice.date
         json.discount_type_id invoice.discount_type_id
         json.due_date invoice.due_date
         json.invoice_number invoice.invoice_number
         json.inclusive_of_taxes invoice.inclusive_of_taxes
-        json.freight_amount invoice.freight_amount&.value
-        json.roundoff_amount invoice.roundoff_amount
-        json.net_payable_amount invoice.balance_due&.value
-        json.balance_due invoice.balance_due&.value
-        json.taxable_amount precision_value invoice.gross_amount&.value
+        json.freight_amount invoice&.freight_amount&.value.to_f
+        json.roundoff_amount invoice&.roundoff_amount.to_f
+        json.net_payable_amount invoice&.balance_due&.value.to_f
+        json.balance_due invoice&.balance_due&.value.to_f
+        json.taxable_amount precision_value invoice&.gross_amount&.value.to_f
         json.editable invoice.unpaid? || invoice.initiated?
         # adding the respective rates
         json.tax_rate precision_value invoice.tax_rate
@@ -121,6 +129,44 @@ json.payments do
         json.discount_rate precision_value invoice.discount_rate
         json.advance_rate precision_value invoice.advance_rate
         json.invoice_id invoice.invoice_id
+
+        # json.reporting_currency @result.parent&.reporting_currency
+        # json.base_currency @result.parent&.base_currency
+        # json.conversion_rate @result.parent&.conversion_rate
+
+        json.forms_enabled invoice.forms_enabled
+
+        json.invoice_gross_amount precision_value invoice&.invoice_gross_amount.to_f
+        json.reporting_invoice_gross_amount precision_value invoice&.reporting_invoice_gross_amount.to_f
+        json.invoice_discount_amount precision_value invoice&.invoice_discount_amount.to_f
+        json.reporting_invoice_discount_amount precision_value invoice&.reporting_invoice_discount_amount.to_f
+        json.invoice_tax_amount precision_value invoice&.invoice_tax_amount.to_f
+        json.reporting_invoice_tax_amount precision_value invoice&.reporting_invoice_tax_amount.to_f
+        json.invoice_tds_amount precision_value invoice&.invoice_tds_amount.to_f
+        json.reporting_invoice_tds_amount precision_value invoice&.reporting_invoice_tds_amount.to_f
+        json.invoice_freight_amount precision_value invoice&.invoice_freight_amount.to_f
+        json.reporting_invoice_freight_amount precision_value invoice&.reporting_invoice_freight_amount.to_f
+        json.invoice_taxable_amount precision_value invoice&.invoice_taxable_amount.to_f
+        json.reporting_invoice_taxable_amount precision_value invoice&.reporting_invoice_taxable_amount.to_f
+        json.invoice_roundoff_amount precision_value invoice&.invoice_roundoff_amount.to_f
+        json.reporting_invoice_roundoff_amount precision_value invoice&.reporting_invoice_roundoff_amount.to_f
+        json.invoice_balance_due precision_value invoice&.invoice_balance_due.to_f
+        json.reporting_invoice_balance_due precision_value invoice&.reporting_invoice_balance_due.to_f
+        json.invoice_sub_total_amount precision_value invoice&.invoice_sub_total_amount.to_f
+        json.reporting_invoice_sub_total_amount precision_value invoice&.reporting_invoice_sub_total_amount.to_f
+        json.invoice_advance_paid_amount precision_value invoice&.invoice_advance_paid_amount.to_f
+        json.reporting_invoice_advance_paid_amount precision_value invoice&.reporting_invoice_advance_paid_amount.to_f
+        json.invoice_total_amount precision_value invoice&.invoice_total_amount.to_f
+        json.reporting_invoice_total_amount precision_value invoice&.reporting_invoice_total_amount.to_f
+        json.invoice_net_total_amount precision_value invoice&.invoice_net_total_amount.to_f
+        json.reporting_invoice_net_total_amount precision_value invoice&.reporting_invoice_net_total_amount.to_f
+        json.invoice_paid_outside_amount precision_value invoice&.invoice_paid_outside_amount.to_f
+        json.reporting_invoice_paid_outside_amount precision_value invoice&.reporting_invoice_paid_outside_amount.to_f
+        json.base_currency invoice&.base_currency
+        json.reporting_currency invoice&.reporting_currency
+        json.conversion_rate invoice&.conversion_rate
+        json.is_domestic invoice&.is_domestic
+
         #############################
         json.invoice_attachment do
           json.url invoice.invoice_attachments.first&.attached_file&.url
@@ -157,8 +203,8 @@ json.payments do
           json.array!(invoice.invoice_items) do |item|
             json.rate item.rate
             json.quantity item.quantity
-            json.tax item.tax
-            json.discount item.discount
+            json.tax item&.tax.to_f
+            json.discount item&.discount.to_f
             json.category_id item.category_id
             json.category_name item.category&.name
             json.tax_amount precision_value item.tax_amount&.value
@@ -190,6 +236,16 @@ json.payments do
         json.merge! payment.parent_details
         # json.payable_amount payment.get_payable_amount
         json.payable_amount precision_value payment.amount.value
+
+        if payment.parent_type == 'Invoice'
+          conversion_rate = payment&.parent_details.with_indifferent_access[:conversion_rate].to_f rescue 1
+          json.reporting_payable_amount payment&.amount&.value.to_f * conversion_rate.to_f
+        end
+        if payment.parent&.is_a?(BbpsBill)
+          #to support one attachment preview in payment list
+          # TO DO want rewamp to suuport mutil attachment in UI
+          json.invoice_attachment payment.parent.attachments&.first
+        end
       end
     end
   end

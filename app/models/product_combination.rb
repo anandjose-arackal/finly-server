@@ -10,7 +10,7 @@
 #
 
 
-class ProductCombination < ApplicationRecord
+class ProductCombination < NonTenantedApplicationRecord
 
   VALUES = {transportation: 1,
             ground_transportation: 2,

@@ -19,6 +19,7 @@ Filters::Router.draw do
 
   # Docs
   route 'invoices', Docs::P2P::Invoices::FilterConfig
+  route 'non_po_invoice', Docs::P2P::Invoices::FilterConfig
   route 'invoice_line_items', Docs::P2P::Invoices::InvoiceLineItems::FilterConfig
   route 'purchase_requests', Docs::P2P::PurchaseRequests::FilterConfig
   route 'purchase_orders', Docs::P2P::PurchaseOrders::FilterConfig

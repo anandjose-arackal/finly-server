@@ -32,6 +32,10 @@ Resolver::Router.draw do
     route 'default', Masters::Schema::Resolver
   end
 
+  scope :form_currencies do
+    route 'default', Masters::FormCurrencies::Resolver
+  end
+
   scope :departments do
     route 'default', Masters::Departments::Resolver
   end

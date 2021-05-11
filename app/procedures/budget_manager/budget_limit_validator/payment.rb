@@ -1,7 +1,7 @@
 class BudgetManager::BudgetLimitValidator::Payment < BudgetManager::BudgetLimitValidator::Base
 
   attr_accessor :payment, :document
-  
+
   def initialize!(options, **)
     self.payment = options[:payment]
 
@@ -65,7 +65,7 @@ class BudgetManager::BudgetLimitValidator::Payment < BudgetManager::BudgetLimitV
     end
 
     options["result"] = {
-      budget_contributions: budget_contributions
+        budget_contributions: budget_contributions
     }
 
     if options['result.operation.errors'].present?

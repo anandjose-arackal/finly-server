@@ -108,7 +108,7 @@ class FieldConfiguration < ApplicationRecord
   delegate :drop_down?, :multiselect?, to: :field_type
   delegate :text?, to: :field_type
 
-  default_scope {unscope(:where).order(sequence_number: :asc, id: :asc)}
+  default_scope {include_soft_deleted.order(sequence_number: :asc, id: :asc)}
 
   after_save :set_field_key
   after_save :update_export_templates!

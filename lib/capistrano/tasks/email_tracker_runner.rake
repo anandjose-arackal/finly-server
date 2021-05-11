@@ -12,7 +12,7 @@ namespace :load do
     set :email_tracker_log, -> {File.join(shared_path, 'log', 'email_tracker.log')}
     set :email_tracker_env, -> {fetch(:rack_env, fetch(:rails_env, fetch(:stage)))}
     set :email_tracker_runner, -> {'EmailNotificationPoller.run'}
-    set :email_tracker_role, -> {:app}
+    set :email_tracker_role, -> {:email_tracker_role}
     set :email_tracker_env, fetch(:rack_env, fetch(:rails_env, 'production'))
   end
 end

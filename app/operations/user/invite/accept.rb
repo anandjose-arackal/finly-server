@@ -24,18 +24,17 @@ class User::Invite::Accept < User::Invite::Base
   end
 
   def init
-    self.accept_params = user_params
+    self.accept_params = user_invite_params
     self.accept_params[:invitation_token] = params[:invitation_token] if accept_params[:invitation_token].blank?
   end
 
   def validate
-    param = accept_params
+    param = user_params
 
     if param.blank?
       add_message :error, 'User details cannot be blank'
       return
     end
-
     if param[:profile_attributes].blank?
       add_message :error, 'Please fill in all the required details to complete the registration'
       return
@@ -138,6 +137,8 @@ class User::Invite::Accept < User::Invite::Base
     self.invited_user = User.accept_invitation!(accept_params)
     unless invited_user.present? and invited_user.id.present? and invited_user.valid?
       add_message :error, invited_user.errors.full_messages
+    else
+      invited_user.profile.update_attributes(user_params[:profile_attributes])
     end
   end
 
@@ -156,6 +157,11 @@ class User::Invite::Accept < User::Invite::Base
                                  :last_name, :mothers_maiden_name, :default_password,
                                  profile_attributes: [:date_of_birth, :gender, :address_1,
                                                       :address_2, :city, :state_id, :pin_code, :employee_id, :payroll_id])
+  end
+
+  def user_invite_params
+    params.require(:user).permit(:password, :password_confirmation, :invitation_token, :mobile_number, :first_name,
+                                 :last_name, :mothers_maiden_name, :default_password)
   end
 
 end

@@ -23,6 +23,7 @@ class UserPocket < ApplicationRecord
 
   belongs_to :user_pocket_type, optional: true
   belongs_to :balance, optional: true, class_name: "Amount"
+  belongs_to :company, optional: true
   belongs_to :user, optional: true
   belongs_to :base_currency, optional: true, class_name: "Currency"
   belongs_to :company_pocket_template, optional: true

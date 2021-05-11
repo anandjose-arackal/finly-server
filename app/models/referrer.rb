@@ -9,5 +9,5 @@
 #  deleted_at :datetime
 #
 
-class Referrer < ApplicationRecord
+class Referrer < NonTenantedApplicationRecord
 end

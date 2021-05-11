@@ -161,12 +161,12 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
   end
 
   def vendor_mobile_number(item)
-    purchase_order(item)&.procurement&.vendor&.mobile_number
+    purchase_order(item)&.gstin_location&.poc_mobile_number
   end
 
   def vendor_state_code(item)
-    sc = purchase_order(item)&.procurement&.vendor&.state_code&.state_code
-    (sc.present?) ? (sprintf '%02d', sc) : ''
+    sc = purchase_order(item)&.gstin_location&.state&.state_code
+    (sc.present?) ? (sprintf '%02d', sc.to_i) : ''
   end
 
   def vendor_pan(item)

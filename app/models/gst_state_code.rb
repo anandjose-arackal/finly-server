@@ -10,7 +10,7 @@
 #  deleted_at :datetime
 #
 
-class GstStateCode < ApplicationRecord
+class GstStateCode < NonTenantedApplicationRecord
   include LiquidDroppable
   include Exposures::Model::Exposable
 

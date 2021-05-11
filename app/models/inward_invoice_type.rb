@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class InwardInvoiceType < ApplicationRecord
+class InwardInvoiceType < NonTenantedApplicationRecord
 
   include Seedable
 

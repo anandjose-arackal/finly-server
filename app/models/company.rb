@@ -2,20 +2,21 @@
 #
 # Table name: companies
 #
-#  id               :integer          not null, primary key
-#  name             :string(255)
-#  created_at       :datetime         not null
-#  updated_at       :datetime         not null
-#  active           :boolean          default(TRUE), not null
-#  base_currency_id :integer          default(1)
-#  status_id        :integer          default(1), not null
-#  test_account     :boolean          default(FALSE)
-#  subdomain        :string(255)
-#  group_id         :integer
-#  deleted_at       :datetime
+#  id                      :integer          not null, primary key
+#  name                    :string(255)
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
+#  active                  :boolean          default(TRUE), not null
+#  base_currency_id        :integer          default(1)
+#  status_id               :integer          default(1), not null
+#  test_account            :boolean          default(FALSE)
+#  subdomain               :string(255)
+#  group_id                :integer
+#  deleted_at              :datetime
+#  reporting_currency_code :string(255)      default("INR")
 #
 
-class Company < ApplicationRecord
+class Company < NonTenantedApplicationRecord
   include Constants
   include LiquidDroppable
   include Exposures::Model::Exposable
@@ -25,6 +26,7 @@ class Company < ApplicationRecord
   belongs_to :status, optional: true, class_name: 'CompanyStatus'
   belongs_to :group, optional: true, class_name: 'CompanyGroup'
 
+  has_many :form_currencies
   has_many :rate_contracts
   has_many :trips
   has_many :users
@@ -75,6 +77,9 @@ class Company < ApplicationRecord
   has_many :icici_statements
   has_many :insight_dashboards
   has_many :master_schemas
+
+  has_many :payments
+  has_many :invoices
 
   has_many :forms
 
@@ -127,7 +132,7 @@ class Company < ApplicationRecord
   has_many :inward_documents # purchase order inward documents
   has_many :field_customizations, as: :scopable
 
-  
+  has_many :gstin_locations, through: :yes_bank_vendors
   has_many :payment_agreements
   has_many :general_invoices
   has_many :rental_invoices
@@ -160,7 +165,7 @@ class Company < ApplicationRecord
   delegate :bank_type, to: :configuration
 
   after_create :init_config_present
-  # after_create :company_setup
+  after_create :company_setup
 
   validates :name, presence: true
 
@@ -239,6 +244,10 @@ class Company < ApplicationRecord
         name: name,
         active: active
     }
+  end
+
+  def self.id
+    self.pluck(:id)
   end
 
   def vendor_payment_policies
@@ -528,77 +537,84 @@ class Company < ApplicationRecord
     status_id == CompanyStatus.id_for(:partial_block)
   end
 
+  def reporting_currency
+    Currency.find_by(country_code: self.reporting_currency_code || 'INR')
+  end
+
   private
 
   def init_config_present
+    ActsAsTenant.with_tenant self do
+      self.policies.build(default: true, name: 'Company (Default)').save unless self.policies.default.present?
+      ExportPreference.build_default_preferences(self)
+      Constants::DEFAULT_CATEGORIES.each do |category|
+        self.categories.create(name: category, expense_management: true, vendor_payments: true)
+      end
 
-    self.policies.build(default: true, name: 'Company (Default)').save unless self.policies.default.present?
-    ExportPreference.build_default_preferences(self)
-    Constants::DEFAULT_CATEGORIES.each do |category|
-      self.categories.create(name: category, expense_management: true, vendor_payments: true)
+      Constants::DEFAULT_MONEY_REQUEST_CATEGORIES.each do |category|
+        self.money_request_item_categories.create(name: category, active: true)
+      end
+
+      self.build_configuration(bank_type: "HDFC").save if self.configuration.blank?
+      # also setting the default card transaction category here, so even if 'Other' is renamed later, it
+      # will not matter for the same
+      other_category = self.categories.find_by(name: "Other")
+      self.configuration.update(default_card_expense_category_id: other_category&.id)
+      self.configuration.update(legal_entity_name: self.name) if self.configuration.legal_entity_name.blank?
+
+      self.build_account.save if self.account.blank?
+
+      if self.feature_subscription.blank?
+        self.build_feature_subscription.save
+      end
+
+      # create the auto sync configurations for each new company
+      AutoSyncConfigType::VALUES.each do |type|
+        self.auto_sync_configs.build(enabled: false)
+      end
+
+      self.build_company_kyc(kyc_status_id: KycStatus.id_for(:incomplete)).save if self.company_kyc.blank?
+      self.build_itz_cash_company_account(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
+      self.build_yes_bank_company_account(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
+      self.build_icici_bank_company_account(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
+      self.build_utility_bills_account(enabled: true, balance_attributes: {value: 0, currency_id: Currency.first.id}).save
+
+      # creating the invoice numbering configuration for all companies with default values
+      # self.build_invoice_number_config(sequence_start: "0000").save
+      self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:collect), invoice_number_config_type_id: InvoiceNumberConfigType.id_for(:tax_invoice)}).save
+      self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:collect), invoice_number_config_type_id: InvoiceNumberConfigType.id_for(:advance)}).save
+      self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:collect), invoice_number_config_type_id: InvoiceNumberConfigType.id_for(:credit_note)}).save
+      self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:collect), invoice_number_config_type_id: InvoiceNumberConfigType.id_for(:debit_note)}).save
+      self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:vendor_payments), invoice_number_config_type_id: InvoiceNumberConfigType.id_for(:debit_note)}).save
+
+      # Seed Default list of vendor types
+      default_vendor_types = %w( Contractors Vendors )
+      default_vendor_types.each do |vendor_type|
+        self.vendor_types.build({name: vendor_type}).save
+      end
+
+      # creating budget configurations
+      self.build_enforce_budget_configuration(enforce_purchase_request_budget: false, enforce_purchase_order_budget: false, enforce_payment_budget: false,
+                                              enforce_expense_budget: false, enforce_invoice_budget: false).save
+
+      # creating custom export configurations for a company
+      self.build_custom_export_configuration(custom_report: false, custom_invoice: false, custom_purchase_order: false).save
+
+
+      # Create Invoicing System Auto transfer config (enabled: false)
+      self.build_collect_auto_transfer_config.save
+
+
+      self.build_collect_company_detail.save
+      # seeding the default payment terms for this company
+      PaymentTerm.seed_defaults(self.id)
+      TdsRatesList.seed_data(self.id)
     end
-
-    Constants::DEFAULT_MONEY_REQUEST_CATEGORIES.each do |category|
-      self.money_request_item_categories.create(name: category, active: true)
-    end
-
-    self.build_configuration(bank_type: "HDFC").save if self.configuration.blank?
-    # also setting the default card transaction category here, so even if 'Other' is renamed later, it
-    # will not matter for the same
-    other_category = self.categories.find_by(name: "Other")
-    self.configuration.update(default_card_expense_category_id: other_category&.id)
-    self.configuration.update(legal_entity_name: self.name) if self.configuration.legal_entity_name.blank?
-
-    self.build_account.save if self.account.blank?
-
-    if self.feature_subscription.blank?
-      self.build_feature_subscription.save
-    end
-
-    # create the auto sync configurations for each new company
-    AutoSyncConfigType::VALUES.each do |type|
-      self.auto_sync_configs.build(enabled: false)
-    end
-
-    self.build_company_kyc(kyc_status_id: KycStatus.id_for(:incomplete)).save if self.company_kyc.blank?
-    self.build_itz_cash_company_account(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
-    self.build_yes_bank_company_account(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
-    self.build_icici_bank_company_account(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
-    self.build_utility_bills_account(enabled: true, balance_attributes: {value: 0, currency_id: Currency.first.id}).save
-
-    # creating the invoice numbering configuration for all companies with default values
-    # self.build_invoice_number_config(sequence_start: "0000").save
-    self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:collect), invoice_number_config_type_id: InvoiceNumberConfigType.id_for(:tax_invoice)}).save
-    self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:collect), invoice_number_config_type_id: InvoiceNumberConfigType.id_for(:advance)}).save
-    self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:collect), invoice_number_config_type_id: InvoiceNumberConfigType.id_for(:credit_note)}).save
-    self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:collect), invoice_number_config_type_id: InvoiceNumberConfigType.id_for(:debit_note)}).save
-    self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:vendor_payments), invoice_number_config_type_id: InvoiceNumberConfigType.id_for(:debit_note)}).save
-
-    # Seed Default list of vendor types
-    default_vendor_types = %w( Contractors Vendors )
-    default_vendor_types.each do |vendor_type|
-      self.vendor_types.build({name: vendor_type}).save
-    end
-
-    # creating budget configurations
-    self.build_enforce_budget_configuration(enforce_purchase_request_budget: false, enforce_purchase_order_budget: false, enforce_payment_budget: false,
-                                            enforce_expense_budget: false, enforce_invoice_budget: false).save
-
-    # creating custom export configurations for a company
-    self.build_custom_export_configuration(custom_report: false, custom_invoice: false, custom_purchase_order: false).save
-
-
-    # Create Invoicing System Auto transfer config (enabled: false)
-    self.build_collect_auto_transfer_config.save
-
-
-    self.build_collect_company_detail.save
-    # seeding the default payment terms for this company
-    PaymentTerm.seed_defaults(self.id)
-    TdsRatesList.seed_data(self.id)
   end
 
   def company_setup
-    Company::Setup.({company: self})
+    ActsAsTenant.with_tenant self do
+      Company::Setup.({company: self})
+    end
   end
 end

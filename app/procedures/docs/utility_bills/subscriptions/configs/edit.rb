@@ -14,6 +14,7 @@ class Docs::UtilityBills::Subscriptions::Configs::Edit < Transactions::API
     result['policies'] = ::Policy::VendorPayments::Index.(current_user, filter_params).policies rescue Policy.none
     result['categories'] = current_user.company.categories.inward_invoice_items_only
     result['tax_rates'] = current_user.company.tax_rates
+    result['custom_fields_config'] = custom_fields_config(current_user)
 
     result['reviewal_chains'] = []
 
@@ -48,5 +49,10 @@ class Docs::UtilityBills::Subscriptions::Configs::Edit < Transactions::API
   def get_reviewal_chain(user, parameters)
     op = ::ReviewalManager::ReviewalChain.(user, parameters)
     op.chain
+  end
+
+  def custom_fields_config(current_user)
+    configurations = current_user.company.field_configurations.exclude_deleted.root_fields.order_created_at_desc
+    configurations.with_parent_type(FieldParentType.id_for(:BbpsBillerSubscription))
   end
 end

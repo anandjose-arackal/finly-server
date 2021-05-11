@@ -9,7 +9,7 @@
 #  updated_at :datetime         not null
 #
 
-class FormRuleType < ApplicationRecord
+class FormRuleType < NonTenantedApplicationRecord
   include Seedable
 
   set_values :value, :entity, :formula, :none

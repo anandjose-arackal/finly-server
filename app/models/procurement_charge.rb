@@ -18,6 +18,7 @@
 #
 
 class ProcurementCharge < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :amount, optional: true
   belongs_to :tax_amount, optional: true, class_name: "Amount"
   belongs_to :total_amount, optional: true, class_name: "Amount"

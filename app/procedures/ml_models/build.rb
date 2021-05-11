@@ -1,10 +1,8 @@
-class MlModels::Build
+class MlModels::Build < BaseJob
 
-  def self.perform
-    MlModel.all.each do |model|
-      model.build_model
-      model.clear_model_cache
-    end
+  def self.perform_job
+    MlModel::Monitor.build
+    MlModel::FormEntityModel.build
   end
 
 end

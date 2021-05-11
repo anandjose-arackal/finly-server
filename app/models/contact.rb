@@ -15,6 +15,7 @@
 #
 
 class Contact < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :contactable, optional: true, polymorphic: true
 
   # validates_numericality_of :number, allow_nil: true

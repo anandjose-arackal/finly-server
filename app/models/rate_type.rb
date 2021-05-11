@@ -9,5 +9,5 @@
 #  deleted_at :datetime
 #
 
-class RateType < ApplicationRecord
+class RateType < NonTenantedApplicationRecord
 end

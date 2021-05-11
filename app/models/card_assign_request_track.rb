@@ -14,6 +14,7 @@
 #
 
 class CardAssignRequestTrack < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :card_assign_request, optional: true
   belongs_to :action_resource, optional: true, polymorphic: true
   belongs_to :action, optional: true, class_name: 'CardAssignRequestTrackAction'

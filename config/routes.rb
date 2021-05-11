@@ -2621,7 +2621,7 @@ Rails.application.routes.draw do
   require 'sidekiq/web'
   mount Sidekiq::Web => '/sidekiq'
   mount Crono::Web, at: '/crono'
-  devise_for :admin_users, controllers: {sessions: 'admin_users/sessions'}
+  devise_for :admin_users, controllers: { sessions: 'admin_users/sessions' }
 
   namespace :api do
     namespace :v1 do
@@ -2654,8 +2654,12 @@ Rails.application.routes.draw do
   #     oauth_token: 'oauth/token'
   # }
   #
-  devise_for :users, controllers: {passwords: 'passwords', sessions: 'sessions'}
+  devise_for :users, controllers: { passwords: 'passwords', sessions: 'sessions' }
   # devise_for :users, skip: [:session, :password]
+  # get '/auth/google_oauth2/callback', to: 'google_oauth2#create'
+  
+  # get 'auth/:provider/callback', to: 'google_oauth2#create'
+  post '/auth/sso/:provider/sign_in', to: 'google_oauth2#create'
 
   post 'users/saml/validate', to: 'users#saml_validator'
   get 'users/saml/sign_in', to: 'single_sign_on#saml'
@@ -2933,7 +2937,7 @@ Rails.application.routes.draw do
     get 'temp_import', to: 'users#temp_import'
     resources :expenses
     resources :cards do
-      patch 'block', to: 'cards#block', as: :block 
+      patch 'block', to: 'cards#block', as: :block
     end
     post 'cards/new_card_activate', to: 'cards#new_card_activate', as: :new_card_activate
     post 'import_cards', to: 'cards#import', as: :import_cards
@@ -3042,8 +3046,8 @@ Rails.application.routes.draw do
   get 'nav_bar/config', to: 'nav_bar#show'
 
   # adding admin oauth token creation for admin login
-  post 'admin/oauth/token', to: 'admin_users/oauth/token#create', as: :admin_oauth_token_generate, defaults: {format: 'json'}
-  post 'admin/oauth/bypass_token', to: 'admin_users/oauth/bypass_token#create', defaults: {format: 'json'}
+  post 'admin/oauth/token', to: 'admin_users/oauth/token#create', as: :admin_oauth_token_generate, defaults: { format: 'json' }
+  post 'admin/oauth/bypass_token', to: 'admin_users/oauth/bypass_token#create', defaults: { format: 'json' }
 
   post '/welcome/preview', to: 'registrations#preview', as: :preview_registration
   post 'welcome/signup', to: 'registrations#signup', as: :welcome_signup
@@ -3111,7 +3115,6 @@ Rails.application.routes.draw do
   post 'organization_account/create_transfer_modes' => 'organization_account#create_transfer_modes'
   delete 'organization_account/destroy_transfer_modes' => 'organization_account#destroy_transfer_modes'
 
-
   get 'organization_account/export_preferences' => 'organization_account#export_preferences'
   get 'state_codes', to: 'organization_account#gst_state_codes', as: :state_codes
 
@@ -3165,7 +3168,6 @@ Rails.application.routes.draw do
   # get 'test_take_control' => 'reports#test_take_control', as: :test_take_control
   post 'reports/bulk_approve' => 'reports#bulk_approve', as: :reports_bulk_approve
 
-
   post 'money_requests/categories', to: 'money_request_category#create'
   get 'money_requests/categories', to: 'money_request_category#index'
   delete 'money_requests/categories/:id', to: 'money_request_category#destroy'
@@ -3176,7 +3178,6 @@ Rails.application.routes.draw do
   resources :money_request do
     post 'comment' => 'money_request#comment', as: :comment
   end
-
 
   ######################## SSO LOGIN START #############################
   post 'oauth/sso_login', to: 'sso/token#create', as: :create_sso
@@ -3248,7 +3249,6 @@ Rails.application.routes.draw do
 
   # get 'expenses/all_expense_types', to: 'expenses#all_expense_types'
   # get 'expenses/all_expense_types' => 'expenses#all_expense_types'
-
 
   scope :task_workflows do
     get 'documents', to: "task_workflows#documents"
@@ -3426,7 +3426,6 @@ Rails.application.routes.draw do
 
   get 'currencies', to: 'expenses#currencies'
 
-
   #Filters/Autocomplete
   get 'autocomplete/merchant'
   get 'autocomplete/employees'
@@ -3488,7 +3487,6 @@ Rails.application.routes.draw do
   delete 'cards/meal/orders/:id' => 'benefits/meal_cards#destroy'
 
   # Medical Cards
-
 
   post 'cards/medical/process_file' => 'benefits/medical_cards#process_file'
   post 'cards/medical/orders' => 'benefits/medical_cards#create'
@@ -3582,9 +3580,9 @@ Rails.application.routes.draw do
 
   # All APIs for Quickbooks integration and syncing
 
-  get '/auth/:provider/callback', controller: 'third_party_auth', action: 'quickbooks'
+  get '/auth/quickbooks/callback', controller: 'third_party_auth', action: 'quickbooks'
+  # single_sign_on#create
   get 'testing_quickbooks', to: 'third_party_auth#testing'
-
 
   post 'quickbooks/sync_report', to: 'quickbooks#sync_report', as: :quickbooks_sync_report
   post 'quickbooks/sync_reports', to: 'quickbooks#sync_reports', as: :quickbooks_sync_reports
@@ -3610,12 +3608,10 @@ Rails.application.routes.draw do
 
   end
 
-
   get 'tos', to: 'static_pages#tos'
   get 'privacy', to: 'static_pages#privacy'
   get 'prepaid_card_agreement', to: 'static_pages#prepaid_card_agreement'
   get 'bank_transfer_agreement', to: 'static_pages#bank_transfer_agreement'
-
 
   # Bank Accounts
   resources :bank_accounts
@@ -3624,7 +3620,6 @@ Rails.application.routes.draw do
   resources :cost_centers
   resources :tds_slabs
   resources :tax_rates
-
 
   scope :payments do
     resources :companies do
@@ -3711,7 +3706,6 @@ Rails.application.routes.draw do
       delete 'remove_attachment', to: 'bank_payment_requests#remove_attachment', as: :remove_attachment
     end
 
-
     get 'transfer_timings', to: 'bank_payment_requests#within_timeframe'
 
     get 'account_owners/search', to: 'account_owners#search', as: :search
@@ -3765,7 +3759,6 @@ Rails.application.routes.draw do
 
     get 'autocomplete/vendors/:id', to: 'autocomplete#vendors'
   end
-
 
   get 'account/:account_number', to: 'invoicing/public_links#virtual_bank_account_show', as: :public_bank_account
   get 'invoice/:invoice_id', to: 'invoicing/public_links#invoice_show', as: :public_invoice
@@ -3826,7 +3819,6 @@ Rails.application.routes.draw do
       get 'show_credit_account', to: 'company_configurations#show_credit_account'
 
       # resources :company_branches
-
 
     end
     get 'inventory_line_items/count', to: 'inventory_line_items#count', as: :inventory_line_items_count
@@ -3953,7 +3945,6 @@ Rails.application.routes.draw do
   resources :budget_group_criteria, except: [:index]
   ######## Budget apis end #########
 
-
   ## Procurement APIs start ##########################################
 
   get 'grn/pending', to: 'procure/procurements#index'
@@ -4014,7 +4005,6 @@ Rails.application.routes.draw do
     get 'po_with_advance', to: 'purchase_orders#po_with_advance', as: :po_with_advance
     get 'po_with_advance_count', to: 'purchase_orders#po_with_advance_count', as: :po_with_advance_count
 
-
     resources :inward_documents do
 
     end
@@ -4049,13 +4039,11 @@ Rails.application.routes.draw do
     post 'purchase_request/bulk_upload_items', to: 'purchase_requests#bulk_upload_items'
     get 'purchase_request/template_bulk_import_items', to: 'purchase_requests#template_bulk_import_items'
 
-
     post 'payments/create_bulk_advance', to: 'payments#bulk_create_advance', as: :bulk_create_advance
     resources :payments, only: [:show]
 
     resources :attachments
     post 'inward_invoices/create_from_po', to: 'inward_invoices#create_from_po', as: :create_from_po
-
 
     get 'inward_invoices/templates', to: 'inward_invoices#template_index'
     get 'inward_invoices/templates/:id', to: 'inward_invoices#template_show'
@@ -4119,7 +4107,6 @@ Rails.application.routes.draw do
   ### Audit Trails ##
   resources :audit_trails, only: [:index]
   ### Audit Trails End ##
-
 
   ######## Dashboards ##################
   # Fixme: old routes for supporting v1 of dashboards in dynamic index. This can deleted when the support is removed
@@ -4189,9 +4176,10 @@ Rails.application.routes.draw do
     put 'submit', to: "vendor_forms#submit"
   end
 
-
   ######### New Vendor Empanelment Ends ##
-
+  ######### NEW INVOICE FORMS ###################
+  post 'invoice_forms/save_and_submit', to: "invoice_forms#save_and_submit"
+  resources :invoice_forms, only: [:show, :update]
 
   ######### Rate Contract API start #############
   resources :rate_contracts do
@@ -4243,6 +4231,7 @@ Rails.application.routes.draw do
   get 'forms/:route/dependencies', to: 'forms#form_dependencies'
   post 'forms/choices', to: 'forms#form_entity_choices'
   post 'forms/lookup_details', to: 'forms#form_lookup_details'
+  post 'forms/:route/predict', to: 'forms#form_prediction'
   patch 'forms/:id/sync_positions', to: 'forms#sync_positions'
   resources :forms
 
@@ -4252,7 +4241,6 @@ Rails.application.routes.draw do
   patch 'form_choice_dependencies/:id/enable', to: 'form_choice_dependencies#enable'
   patch 'form_choice_dependencies/:id/disable', to: 'form_choice_dependencies#disable'
   resources :form_choice_dependencies
-
 
   post 'attachments/custom_field_attachment', to: 'attachments#create_custom_field_attachment'
 
@@ -4309,7 +4297,6 @@ Rails.application.routes.draw do
     put 'update_and_submit', to: 'credit_notes#update_and_submit'
   end
 
-
   get 'accounting_exports', to: 'accounting_exports#index'
 
   # Adding GET and POST support for all URL's as get does not support very large URL's
@@ -4328,7 +4315,7 @@ Rails.application.routes.draw do
   post 'index/:route/status_counts', to: 'index#status_counts'
   get 'index/:route', to: "index#show"
   post 'index/:route', to: "index#show"
-  get 'drawer/:route', to:"drawer#show"
+  get 'drawer/:route', to: "drawer#show"
 
   get 'menu', to: 'menu#show'
 
@@ -4349,7 +4336,6 @@ Rails.application.routes.draw do
   patch 'users/:id/profile', to: 'user_profiles#update'
 
   post 'clients/web', to: 'web_clients#create'
-
 
   namespace :macros do
     namespace :v1 do
@@ -4380,9 +4366,13 @@ Rails.application.routes.draw do
       get 'credit_notes/count', to: 'credit_notes#count'
       post 'credit_notes/new_sync_attempt', to: 'credit_notes#new_sync_attempt'
       resources :credit_notes, only: [:index]
+      get 'bills', to: 'bbps_bills#index'
+      get 'bills/count', to: 'bbps_bills#count'
+      post 'bills/new_sync_attempt', to: 'bbps_bills#new_sync_attempt'
     end
   end
 
+  get 'exchange_rate', to: 'exchange_rates#get_rate'
 
   get 'lookup/:route', to: 'lookup#route'
 
@@ -4398,7 +4388,6 @@ Rails.application.routes.draw do
 
   post 'search', to: 'global_search#create'
   get 'search', to: 'global_search#index'
-
 
   # todo - I2P : For invoices
   # resources :invoices, only: [:create, :update, :show]

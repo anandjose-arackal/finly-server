@@ -1,6 +1,6 @@
 class Admin::Implementations::RequestHandler < Admin::Base
 
-  attr_accessor :master, :request_key, :implementation_request, :processor
+  attr_accessor :master, :request_key, :implementation_request, :processor, :company
 
   def pre_validate
     user_present? and params_present?
@@ -13,9 +13,11 @@ class Admin::Implementations::RequestHandler < Admin::Base
       add_message :error, 'Company is not set'
       return
     end
+
   end
 
   def init
+    self.company = Company.find_by id: params[:company_id]
     self.request_key = params[:request_key]
     self.master = init_master
     return if self.master.blank?

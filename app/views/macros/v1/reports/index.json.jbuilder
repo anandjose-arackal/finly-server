@@ -1,5 +1,6 @@
 includes = [
     {policy: {time_expense_config: :rate}},
+    report_processor_group_mapping: :processor_group,
     user: [:profile, :default_bank_account],
     expenses: [
         {user: [:profile, :default_bank_account]}, :expense_type, :category, :spent_from,

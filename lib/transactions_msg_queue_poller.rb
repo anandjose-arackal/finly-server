@@ -54,6 +54,8 @@ class TransactionsMsgQueuePoller
 
     loop do
 
+      ActsAsTenant.current_tenant = nil
+
       begin
         puts "Listening...."
         message = azure_service_bus_service.receive_queue_message(queue_name, {peek_lock: false})
@@ -151,8 +153,15 @@ class TransactionsMsgQueuePoller
       log_params = trans_params.deep_dup
       log_params[:billing_amount] = billing_amount
       log_params[:transaction_amount] = transaction_amount
-      card = Card.find_by_proxy(serial_id)
-      user = card&.user
+      card = nil
+      user = nil
+      ActsAsTenant.without_tenant do
+        card = Card.find_by_proxy(serial_id)
+        user = card&.user
+      end
+      ActsAsTenant.current_tenant = (user&.company || card&.company)
+      RequestStoreUtil.set_current_company((user&.company || card&.company))
+
       log_params[:card_id] = card&.id
       log_params[:user_id] = user&.id
       log_params[:user_name] = user&.name
@@ -161,7 +170,11 @@ class TransactionsMsgQueuePoller
       log_params[:request_id] = Security.generate_hmac_hex(self.object_id.to_s, DateTime.now.to_s)
 
       trans_params[:billing_amount_attributes] = billing_amount_attributes if billing_amount_attributes.present?
-      trans_params[:transaction_amount_attributes] = transaction_amount_attributes if transaction_amount_attributes
+      if billing_amount_attributes.present?
+        trans_params[:transaction_amount_attributes] = billing_amount_attributes
+      elsif transaction_amount_attributes.present?
+        trans_params[:transaction_amount_attributes] = transaction_amount_attributes
+      end
 
       rescued = false
       @result = nil

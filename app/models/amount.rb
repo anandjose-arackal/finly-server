@@ -179,7 +179,7 @@
 #  deleted_at  :datetime
 #
 
-class Amount < ApplicationRecord
+class Amount < NonTenantedApplicationRecord
   include MathUtil
   include SoftDeletable
 
@@ -197,7 +197,7 @@ class Amount < ApplicationRecord
     end
   end
 
-  default_scope {unscope(:where)}
+  default_scope { include_soft_deleted }
 
   # # method that returns the amount value
   # def amount_value

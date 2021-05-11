@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class OtpRequestType < ApplicationRecord
+class OtpRequestType < NonTenantedApplicationRecord
 
   TYPES = {
       user_activation: 1,

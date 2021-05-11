@@ -23,6 +23,7 @@
 class TravelRequestComment < ApplicationRecord
   include SoftDeletable
 
+  belongs_to :company, optional: true
   belongs_to :travel_request, optional: true
   belongs_to :user, optional: true
   belongs_to :action, optional: true, class_name: "TravelRequestCommentAction"

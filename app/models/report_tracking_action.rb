@@ -14,7 +14,7 @@
 
 
 
-class ReportTrackingAction < ApplicationRecord
+class ReportTrackingAction < NonTenantedApplicationRecord
   include Seedable
 
   def self.values

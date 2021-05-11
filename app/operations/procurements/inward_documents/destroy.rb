@@ -1,6 +1,6 @@
 class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Base
   attr_accessor :inward_document, :procurement, :inward_document_params, :purchase_order, :id_old_attachments,
-                :id_current_attachments, :po_revision, :po_previous_status
+                :id_current_attachments, :po_revision, :po_previous_status, :po_advance_previous_status
   def init
     procurement_id = params[:procurement_id]
     inward_document_id = params[:id] || params[:inward_document_id]
@@ -50,6 +50,12 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
     elsif is_vendor_confirmed?
       self.po_previous_status = PurchaseOrderStatus.id_for(:vendor_confirmed)
     end
+
+    if self.purchase_order.advance_amount&.present? and self.purchase_order.advance_payments.blank?and self.purchase_order.advance_amount&.value > 0 and self.purchase_order.advance_closed?
+       self.po_advance_previous_status = AdvanceAmountStatus.id_for(:to_be_processed)
+    else
+       self.po_advance_previous_status = self.purchase_order.advance_amount_status_id
+    end
   end
 
   def process
@@ -62,7 +68,7 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
       add_message :error, inward_document.errors.full_messages
       return
     else
-      self.purchase_order.update(purchase_order_status_id: self.po_previous_status)
+      self.purchase_order.update(purchase_order_status_id: self.po_previous_status, advance_amount_status_id: self.po_advance_previous_status)
     end
 
     # self.id_old_attachments.update_all(procurement_document_id: nil, procurement_document_type: nil)
