@@ -36,7 +36,8 @@ class FieldParentType < NonTenantedApplicationRecord
       payment_agreement: 22,
       item: 23,
       rate_contract: 24,
-      yes_bank_vendor: 25
+      yes_bank_vendor: 25,
+      BbpsBillerSubscription: 26
   }.with_indifferent_access
 
   scope :with_name, -> (name) { where name: name }

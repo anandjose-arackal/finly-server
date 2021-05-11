@@ -85,13 +85,13 @@ json.payments do
       json.raw_amount precision_value invoice&.amount&.value
       # conditionally set the original amount as invoice amount is there are line items
       if payment.invoice&.invoice_items.present?
-        
+
         # toggle = NonPoInvoiceToggle.new(current_user)
         original_amount = precision_value invoice.amount&.value
         # if toggle.enabled?
           # original_amount = invoice.invoice_gross_amount
         # end
-        
+
         json.original_amount precision_value original_amount
       else
         json.original_amount precision_value invoice.original_amount&.value
@@ -129,6 +129,10 @@ json.payments do
         json.discount_rate precision_value invoice.discount_rate
         json.advance_rate precision_value invoice.advance_rate
         json.invoice_id invoice.invoice_id
+
+        # json.reporting_currency @result.parent&.reporting_currency
+        # json.base_currency @result.parent&.base_currency
+        # json.conversion_rate @result.parent&.conversion_rate
 
         json.forms_enabled invoice.forms_enabled
 
@@ -232,10 +236,15 @@ json.payments do
         json.merge! payment.parent_details
         # json.payable_amount payment.get_payable_amount
         json.payable_amount precision_value payment.amount.value
-        
+
         if payment.parent_type == 'Invoice'
           conversion_rate = payment&.parent_details.with_indifferent_access[:conversion_rate].to_f rescue 1
           json.reporting_payable_amount payment&.amount&.value.to_f * conversion_rate.to_f
+        end
+        if payment.parent&.is_a?(BbpsBill)
+          #to support one attachment preview in payment list
+          # TO DO want rewamp to suuport mutil attachment in UI
+          json.invoice_attachment payment.parent.attachments&.first
         end
       end
     end

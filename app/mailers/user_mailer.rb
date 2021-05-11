@@ -39,6 +39,7 @@ class UserMailer < ApplicationMailer
   def invite(user, token, note)
     @user = user
     @data = user
+    binding.pry
     @token = token
     @note = note
     mail to: user.email, subject: 'Invitation to use Finly!'
