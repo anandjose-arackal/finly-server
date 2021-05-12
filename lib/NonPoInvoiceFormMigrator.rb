@@ -206,7 +206,8 @@ class NonPoInvoiceMigrator
         items_department_id: item&.department_id,
         items_cost_center_id: item&.cost_center_id,
         product_type_id: item&.inventory_line_item&.product_type_id,
-        item_rate: item&.rate,
+        item_rate: item&.rate.to_f,
+        rate: item&.rate.to_f,
         item_tds_amount: item_tds,
         reporting_item_tds_amount: item_tds,
         item_gross_amount: item&.amount&.value.to_f,
@@ -331,8 +332,10 @@ class NonPoInvoiceMigrator
       invoice_advance_paid_amount: document&.payments&.successful&.joins(:amount)&.sum(:value),
       reporting_invoice_advance_paid_amount: document&.payments&.successful&.joins(:amount)&.sum(:value),
 
-      invoice_balance_due: document&.balance_due&.value.to_f - document&.payments&.successful&.joins(:amount)&.sum(:value).to_f ,
-      reporting_invoice_balance_due: document&.balance_due&.value.to_f - document&.payments&.successful&.joins(:amount)&.sum(:value).to_f
+      invoice_balance_due: document&.balance_due&.value.to_f,
+       # - document&.payments&.successful&.joins(:amount)&.sum(:value).to_f ,
+      reporting_invoice_balance_due: document&.balance_due&.value.to_f
+       # - document&.payments&.successful&.joins(:amount)&.sum(:value).to_f
     }
     document.skip_callback = true
     document.update_columns(update_params)

@@ -890,23 +890,23 @@ class Invoice < ApplicationRecord
   end
 
   def invoice_balance_due
-    if self[:invoice_balance_due].present?
-      self[:invoice_balance_due].to_f - self.invoice_advance_paid_amount.to_f
-    else
-      self.balance_due&.value.to_f
-    end
+    # if self.forms_enabled
+    self[:invoice_balance_due].to_f - self.invoice_advance_paid_amount.to_f
+    # else
+    #   self.balance_due&.value.to_f
+    # end
   end
 
   def reporting_invoice_balance_due
-    if self[:invoice_balance_due].present?
-      self[:reporting_invoice_balance_due].to_f - self.reporting_invoice_advance_paid_amount.to_f 
-    else
-      self.balance_due&.value.to_f
-    end
+    # if self.forms_enabled
+    self[:reporting_invoice_balance_due].to_f - self.reporting_invoice_advance_paid_amount.to_f 
+    # else
+    #   self.balance_due&.value.to_f
+    # end
   end
 
   def invoice_sub_total_amount
-    if self[:invoice_sub_total_amount].present?
+    if self.forms_enabled
       self[:invoice_sub_total_amount]
     else
       self.net_amount&.value.to_f
@@ -914,7 +914,7 @@ class Invoice < ApplicationRecord
   end
 
   def reporting_invoice_sub_total_amount
-    if self[:reporting_invoice_sub_total_amount].present?
+    if self.forms_enabled
       self[:reporting_invoice_sub_total_amount]
     else
       self.net_amount&.value.to_f
@@ -922,7 +922,7 @@ class Invoice < ApplicationRecord
   end
 
   def invoice_net_total_amount
-    if self[:invoice_sub_total_amount].present?
+    if self.forms_enabled
       self[:invoice_net_total_amount]
     else
       # self.net_amount - tds - paid_outside_amount + round
@@ -931,7 +931,7 @@ class Invoice < ApplicationRecord
   end
   
   def reporting_invoice_net_total_amount
-    if self[:reporting_invoice_net_total_amount].present?
+    if self.forms_enabled
       self[:reporting_invoice_net_total_amount]
     else
       self.invoice_net_total_amount.to_f
