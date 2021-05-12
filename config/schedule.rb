@@ -111,6 +111,14 @@ every '0 10 * * 1', :roles => [:whenever_cron] do
   runner 'Notifications::Vp::WeeklyReport::Mailer.delay.send_weekly_reports'
 end
 
+every 1.day, at: '12:00 pm', roles: [:whenever_cron] do
+  runner 'SummaryMailersProcessor.process_em_notification'
+end
+
+every 1.day, at: '3:00 pm', roles: [:whenever_cron] do
+  runner 'SummaryMailersProcessor.process_em_notification'
+end
+
 # every '0,15,30,45 * * * *', roles: [:whenever_cron] do
 #   runner 'AnalyticsDashboard::Scheduler.perform'
 # end
