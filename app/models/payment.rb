@@ -1204,7 +1204,7 @@ include Searchkick::Api
       balance_due: {value: (self.parent.balance_due&.value - self.parent&.paid_amount.to_f ), editable: false}, # Invoice AMOUNT
       available_credits: available_credits_amount,
 
-      invoice_balance_due: {value: self.parent&.invoice_balance_due, editable: true}, 
+      invoice_balance_due: {value: self.parent&.invoice_balance_due, editable: false}, 
       reporting_invoice_balance_due: {value: self.parent&.reporting_invoice_balance_due, editable: false},     
       invoice_sub_total_amount: {value: self.parent&.invoice_sub_total_amount, editable: false}, 
       reporting_invoice_sub_total_amount: {value: self.parent&.reporting_invoice_sub_total_amount, editable: false},
