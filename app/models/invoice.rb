@@ -1964,22 +1964,24 @@ class Invoice < ApplicationRecord
 
 
   def update_attachments
-    form_attachments_field = self.form_custom_fields.where(field_key: 'invoice_attachments').first
-    form_attachments_field.attachments.each do |new_attachment|
-      old_attachment = self.attachments.find_or_initialize_by(file_file_name: new_attachment.attachment_file_name )
+    form_attachments_field = self&.form_custom_fields&.where(field_key: 'invoice_attachments').first
+    if form_attachments_field.present?
+      form_attachments_field.attachments.each do |new_attachment|
+        old_attachment = self.attachments.find_or_initialize_by(file_file_name: new_attachment.attachment_file_name )
 
-      if old_attachment.new_record?
-        old_attachment.file_file_name = new_attachment.attachment_file_name
-        old_attachment.file_content_type = new_attachment.attachment_content_type
-        old_attachment.file_file_size = new_attachment.attachment_file_size
-        old_attachment.file_file_size = new_attachment.attachment_file_size
-        old_attachment.company_id = self.company_id
-        old_attachment.procurement_document_id = form_attachments_field.document_id
-        old_attachment.procurement_document_type = form_attachments_field.document_type
-        old_attachment.user_id = RequestStoreUtil.current_user
-        old_attachment.save
-      end
-    end    
+        if old_attachment.new_record?
+          old_attachment.file_file_name = new_attachment.attachment_file_name
+          old_attachment.file_content_type = new_attachment.attachment_content_type
+          old_attachment.file_file_size = new_attachment.attachment_file_size
+          old_attachment.file_file_size = new_attachment.attachment_file_size
+          old_attachment.company_id = self.company_id
+          old_attachment.procurement_document_id = form_attachments_field.document_id
+          old_attachment.procurement_document_type = form_attachments_field.document_type
+          old_attachment.user_id = RequestStoreUtil.current_user
+          old_attachment.save
+        end
+      end    
+    end
   end
 
 
