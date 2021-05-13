@@ -129,9 +129,8 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
     end
 
     # condition for same currency check
-
     if self.inward_invoices.present?
-      if inward_invoices.pluck(:base_currency).uniq.length != 1
+      if inward_invoices.pluck(:base_currency).compact.uniq.length != 1
         add_message :error, "Please add invoices with same base currency"
         return
       end

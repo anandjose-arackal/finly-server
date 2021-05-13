@@ -1195,7 +1195,7 @@ include Searchkick::Api
       advance_amount: {value: invoice_advance, editable: false}, # Advance
       freight_amount: {value: self.parent.freight_amount&.value, editable: false},
       net_payable_amount: {value: self.parent.balance_due&.value, editable: false},
-      net_total: {value: self.parent.net_amount&.value, editable: false}, #Net Total
+      net_total: {value: precision_value(self.parent.net_amount&.value), editable: false}, #Net Total
       roundoff_amount: {value: self.parent.roundoff_amount, editable: false},
       tds_slabs: tds_slabs,
       tax_rates: self.parent.company.tax_rates,
