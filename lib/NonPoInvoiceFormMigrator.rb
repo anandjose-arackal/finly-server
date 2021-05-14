@@ -90,17 +90,31 @@ class NonPoInvoiceMigrator
     position = form.entities.where(form_section_id: section_id).order(:position).last.position + 1
     # is_active = !custom_field.field_configuration.deleted?
 
+    field_max_data_length = custom_field.field_configuration.custom_fields.map(&:value).compact.map(&:value).compact.map(&:length).max
+    if field_max_data_length <= 30
+      form_entity = FormEntity::Text.create({ company_id: company.id,
+        form_id: form_id, form_section_id: section_id,
+        created_by_user_id: company.users.only_admins.first,
+        entity_key: entity_key, label: lable,
+        placeholder: 'Enter value', hint: 'Please enter the hint',
+        entity_type: 'text', editable: true, required: required,
+        active: active, unique: false, visible: true, position: position,
+        system_field: false, options: "{'format':'text','minimum':1,'maximum':255}"
+        # , active: is_active
+      })
+    else
+      form_entity = FormEntity::LargeText.create({ company_id: company.id,
+        form_id: form_id, form_section_id: section_id,
+        created_by_user_id: company.users.only_admins.first,
+        entity_key: entity_key, label: lable,
+        placeholder: 'Enter value', hint: 'Please enter the hint',
+        entity_type: 'large_text', editable: true, required: required,
+        active: active, unique: false, visible: true, position: position,
+        system_field: false,
+        options: "{ maximum: 65535, minimum: 0 }"
+      })
+    end
 
-    form_entity = FormEntity::Text.create({ company_id: company.id,
-     form_id: form_id, form_section_id: section_id,
-     created_by_user_id: company.users.only_admins.first,
-     entity_key: entity_key, label: lable,
-     placeholder: 'Enter value', hint: 'Please enter the hint',
-     entity_type: 'text', editable: true, required: required,
-     active: active, unique: false, visible: true, position: position,
-     system_field: false, options: "{'format':'text','minimum':1,'maximum':255}"
-     # , active: is_active
-    })
     form_entity
   end
 
