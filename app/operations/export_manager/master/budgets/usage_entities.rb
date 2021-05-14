@@ -1,6 +1,6 @@
 class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::Spreadsheet
 
-  attr_accessor :entities, :budget_trails, :amount_to_be_considered,
+  attr_accessor :entities, :budget_trails, :amount_to_be_considered, :budget,
                 :po_item_amount_to_be_considered, :invoice_item_amount_to_be_considered, :paid_amount_to_be_considered, :payment_processing_amount_to_be_considered
 
   description 'Budget Trails Export'
@@ -13,11 +13,16 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
 
   attribute :entity_name #, column_name: "Entity Name", optional: false
   attribute :entity_type
-  attribute :pr_number
-  attribute :po_number
-  attribute :invoice_number
-  attribute :payment_id
   attribute :expense_id
+  attribute :expense_amount
+  attribute :purchase_request_number
+  attribute :purchase_request_amount
+  attribute :purchase_order_number
+  attribute :purchase_order_amount
+  attribute :invoice_number
+  attribute :invoice_amount
+  attribute :payment_id
+  attribute :payment_amount
   attribute :category
   attribute :department
   attribute :cost_center
@@ -40,8 +45,8 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
       add_message :error, op.messages[:error]
       return
     end
-    budget = op["model"]
-    if budget.calculated_before_tax_amount
+    self.budget = op["model"]
+    if self.budget.calculated_before_tax_amount
       self.amount_to_be_considered = :amount_before_tax
     else
       self.amount_to_be_considered = :amount_after_tax
@@ -60,7 +65,7 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
       self.payment_processing_amount_to_be_considered = "payment_processing_amount_before_tax_value"
     end
 
-    calculator = ::BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer.({budget: budget, current_user: user, calculate_buckets: false, calculate_trail_items: true})
+    calculator = ::BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer.({budget: self.budget, current_user: user, calculate_buckets: false, calculate_trail_items: true})
     if calculator.success?
       self.budget_trails = calculator["result"][:budget_trails] rescue BudgetTrail.none
     else
@@ -89,7 +94,7 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
     item.entity_type.underscore.humanize
   end
 
-  def pr_number(item)
+  def purchase_request_number(item)
     if item.entity.is_a?(PurchaseRequestItem)
       return item.entity&.purchase_request&.order_number
     elsif item.entity.is_a?(PurchaseOrderItem)
@@ -97,13 +102,21 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
     end
   end
 
-  def po_number(item)
+  def purchase_request_amount(item)
+    get_trail_amount(item)
+  end
+
+  def purchase_order_number(item)
     if item.entity.is_a?(PurchaseOrderItem)
       return item.entity.purchase_order.po_number
     elsif item.entity.is_a?(InvoiceLineItem)
       return item.entity.purchase_order_item&.purchase_order&.po_number
     end
     ""
+  end
+
+  def purchase_order_amount(item)
+    get_trail_amount(item)
   end
 
   def invoice_number(item)
@@ -113,6 +126,10 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
     ""
   end
 
+  def invoice_amount(item)
+    get_trail_amount(item)
+  end
+
   def payment_id(item)
     if item.entity.is_a?(Payment)
       return item.entity&.id
@@ -120,11 +137,27 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
     ""
   end
 
+  def payment_amount(item)
+    get_trail_amount(item)
+  end
+
+  def get_trail_amount(item)
+    if self.budget.calculated_before_tax_amount
+      item.billed_amount_before_tax_value
+    else
+      item.billed_amount_after_tax_value
+    end
+  end
+
   def expense_id(item)
     if item.entity.is_a?(Expense)
       return item.entity&.report&.id
     end
     ""
+  end
+
+  def expense_amount(item)
+    get_trail_amount(item)
   end
 
   def department(item)
