@@ -14,23 +14,15 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
   attribute :entity_name #, column_name: "Entity Name", optional: false
   attribute :entity_type
   attribute :expense_id
-  attribute :expense_amount
   attribute :purchase_request_number
-  attribute :purchase_request_amount
   attribute :purchase_order_number
-  attribute :purchase_order_amount
   attribute :invoice_number
-  attribute :invoice_amount
   attribute :payment_id
-  attribute :payment_amount
+  attribute :amount
   attribute :category
   attribute :department
   attribute :cost_center
   attribute :location
-  # attribute :pending_amount
-  # attribute :committed_amount
-  # attribute :payment_processing_amount
-  # attribute :paid_amount
   attribute :vendor
   attribute :merchant
   attribute :created_at
@@ -104,11 +96,6 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
     end
   end
 
-  def purchase_request_amount(item)
-    return "" unless item.entity.is_a?(PurchaseRequestItem)
-    get_trail_amount(item)
-  end
-
   def purchase_order_number(item)
     if item.entity.is_a?(PurchaseOrderItem)
       return item.entity.purchase_order.po_number
@@ -118,21 +105,11 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
     ""
   end
 
-  def purchase_order_amount(item)
-    return "" unless item.entity.is_a?(PurchaseOrderItem)
-    get_trail_amount(item)
-  end
-
   def invoice_number(item)
     if item.entity.is_a?(InvoiceLineItem)
       return item.entity.parent.invoice_number
     end
     ""
-  end
-
-  def invoice_amount(item)
-    return "" unless item.entity.is_a?(InvoiceLineItem)
-    get_trail_amount(item)
   end
 
   def payment_id(item)
@@ -142,31 +119,13 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
     ""
   end
 
-  def payment_amount(item)
-    return "" unless item.entity.is_a?(Payment)
-    get_trail_amount(item)
-  end
-
-  def get_trail_amount(item)
-    if self.budget.calculated_before_tax_amount
-      item.billed_amount_before_tax_value
-    else
-      item.billed_amount_after_tax_value
-    end
-  end
-
   def expense_id(item)
     if item.entity.is_a?(Expense)
       return item.entity&.report&.id
     end
     ""
   end
-
-  def expense_amount(item)
-    return "" unless item.entity.is_a?(Expense)
-    get_trail_amount(item)
-  end
-
+  
   def department(item)
     if item.entity&.is_a?(PurchaseOrderItem)
       return item.entity.department&.name
