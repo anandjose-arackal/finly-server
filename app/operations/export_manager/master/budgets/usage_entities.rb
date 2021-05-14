@@ -74,7 +74,6 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
   end
 
   def fields
-
   end
 
   def entity_name(item)
@@ -106,6 +105,7 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
   end
 
   def purchase_request_amount(item)
+    return "" unless item.entity.is_a?(PurchaseRequestItem)
     get_trail_amount(item)
   end
 
@@ -119,6 +119,7 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
   end
 
   def purchase_order_amount(item)
+    return "" unless item.entity.is_a?(PurchaseOrderItem)
     get_trail_amount(item)
   end
 
@@ -130,6 +131,7 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
   end
 
   def invoice_amount(item)
+    return "" unless item.entity.is_a?(InvoiceLineItem)
     get_trail_amount(item)
   end
 
@@ -141,6 +143,7 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
   end
 
   def payment_amount(item)
+    return "" unless item.entity.is_a?(Payment)
     get_trail_amount(item)
   end
 
@@ -160,6 +163,7 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
   end
 
   def expense_amount(item)
+    return "" unless item.entity.is_a?(Expense)
     get_trail_amount(item)
   end
 
