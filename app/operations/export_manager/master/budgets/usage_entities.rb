@@ -27,7 +27,6 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
   attribute :department
   attribute :cost_center
   attribute :location
-  attribute :amount
   # attribute :pending_amount
   # attribute :committed_amount
   # attribute :payment_processing_amount
@@ -72,6 +71,10 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
       self.budget_trails = BudgetTrail.none
     end
     return self.budget_trails
+  end
+
+  def fields
+
   end
 
   def entity_name(item)
