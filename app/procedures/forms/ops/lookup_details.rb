@@ -56,8 +56,7 @@ class Forms::Ops::LookupDetails < Transactions::API
       if nested_dependent_entities.present?
         value = entity_exposure.template(entity.compute_formula, registers: params[:registers])
         entity_path = entity.entity_path
-
-        params_hash = params.merge!({value: value, entity_path: model.entities.find_by(entity_key: parent_key).entity_path})
+        params_hash = params.merge!({value: value, entity_path: entity&.entity_path})
 
         new_data = Forms::Ops::LookupDetails.(params: params_hash, current_user: current_user) || {}
         nested_data.merge!(new_data[:data] || {} )
