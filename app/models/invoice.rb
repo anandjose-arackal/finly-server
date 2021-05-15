@@ -1824,6 +1824,13 @@ class Invoice < ApplicationRecord
           # if an invoice has a payment associated with self, then do not update balance_payable, adding a workaround as balance payable do not get updated.
           next if self.payments.present? && key.to_s == 'invoice_balance_due'
 
+          # if the payment is present, user can update the tds only from payment screen, ie from old to new tds structure 
+          if self.payments.present? && key.to_s == 'invoice_tds_amount'
+            updated_tds_to_new_structure 
+            next
+          end
+
+
           amount_value = self.send(key)
           amount_attr = self.send("#{value}_id")
           if amount_attr.present?
@@ -1961,6 +1968,26 @@ class Invoice < ApplicationRecord
     
     errors.add(:invoice_items, "rate must be greater than 0") if flag
   end
+
+  def updated_tds_to_new_structure 
+    tds_amount = self.tds_amount&.value&.to_f
+    self.invoice_tds_amount = tds_amount
+    self.tds_percentage = self&.tds_slab&.tds.to_f
+    # update tds for each line item also
+
+    self.items.each do |item|
+      item_tds = 0
+      if item&.tds_applicable
+        item_tds = ( item&.taxable_amount&.value.to_f * self&.tds_slab&.tds.to_f ) / 100
+        item_tds = item_tds.to_f.round(2)
+      end
+      self.skip_callback = true
+      item.save
+    end
+    self.skip_callback = true
+    self.save
+  end
+
 
 
   def update_attachments
