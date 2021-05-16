@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_05_13_080348) do
+ActiveRecord::Schema.define(version: 2021_05_15_145615) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -486,6 +486,7 @@ ActiveRecord::Schema.define(version: 2021_05_13_080348) do
     t.datetime "deleted_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "feature_toggle"
     t.index ["app"], name: "index_analytics_dashboards_on_app"
     t.index ["company_id"], name: "index_analytics_dashboards_on_company_id"
     t.index ["created_at"], name: "index_analytics_dashboards_on_created_at"
@@ -4011,6 +4012,7 @@ ActiveRecord::Schema.define(version: 2021_05_13_080348) do
     t.boolean "sso_login_enforced", default: false
     t.boolean "enforce_budget_limit", default: false
     t.integer "company_id"
+    t.boolean "awaiting_approval_summary_enabled", default: false
     t.index ["grn_enabled"], name: "index_feature_subscriptions_on_grn_enabled"
     t.index ["srn_enabled"], name: "index_feature_subscriptions_on_srn_enabled"
     t.index ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id"
@@ -4416,7 +4418,7 @@ ActiveRecord::Schema.define(version: 2021_05_13_080348) do
     t.string "form_id", null: false
     t.string "form_entity_id", null: false
     t.string "field_key", null: false
-    t.string "value"
+    t.text "value"
     t.string "value_text"
     t.datetime "deleted_at"
     t.datetime "created_at", precision: 6, null: false
@@ -4430,7 +4432,6 @@ ActiveRecord::Schema.define(version: 2021_05_13_080348) do
     t.index ["form_entity_id"], name: "index_form_custom_fields_on_form_entity_id"
     t.index ["form_id"], name: "index_form_custom_fields_on_form_id"
     t.index ["uuid"], name: "index_form_custom_fields_on_uuid"
-    t.index ["value"], name: "index_form_custom_fields_on_value"
     t.index ["value_text"], name: "index_form_custom_fields_on_value_text"
   end
 

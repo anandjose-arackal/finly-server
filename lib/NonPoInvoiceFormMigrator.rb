@@ -111,7 +111,7 @@ class NonPoInvoiceMigrator
         entity_type: 'large_text', editable: true, required: required,
         active: active, unique: false, visible: true, position: position,
         system_field: false,
-        options: "{ maximum: 65535, minimum: 0 }"
+        options: "{ 'maximum': 65535, 'minimum': 0 }"
       })
     end
 
@@ -166,7 +166,7 @@ class NonPoInvoiceMigrator
 
   def self.update_each_custom_field form_custom_field, custom_field
       
-    if form_custom_field&.form_entity&.entity_type == "text"
+    if ["text", "large_text" ].include? form_custom_field&.form_entity&.entity_type 
       form_custom_field.value = custom_field.value&.value
       form_custom_field.save
 
