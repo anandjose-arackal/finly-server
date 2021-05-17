@@ -563,7 +563,7 @@ include Searchkick::Api
     when "CashOnHand"
       name += "Cash on Hand"
     when "Card"
-      card_type = Card.include_soft_deleted.find_by(id: self.initiating_account_id)&.card_program&.name&.humanize
+      card_type = Card.include_hotlisted.find_by(id: self.initiating_account_id)&.card_program&.name&.humanize
       name += "#{card_type} Card"
     when "UserWallet"
       name += "Finly Money"
@@ -592,7 +592,7 @@ include Searchkick::Api
     when "CashOnHand"
       name += "Cash on Hand"
     when "Card"
-      card_type = Card.include_soft_deleted.find_by(id: self.receiving_account_id)&.card_program&.name&.humanize
+      card_type = Card.include_hotlisted.find_by(id: self.receiving_account_id)&.card_program&.name&.humanize
       name += "#{card_type} Card"
     when "UserWallet"
       name += "Finly Money"
@@ -961,13 +961,18 @@ include Searchkick::Api
   end
 
   def payment_request_show_json(document_type)
-    {document_type: document_type,
-     document_details: get_document_details(document_type),
-     amount_details: get_amount_details(document_type),
-     custom_fields: get_custom_fields(document_type),
-     custom_field_config: get_custom_field_config(document_type),
-     payment_id: self.id,
-     attachment_details: get_attachment_details(document_type)
+    {
+      document_type: document_type,
+      document_details: get_document_details(document_type),
+      amount_details: get_amount_details(document_type),
+      custom_fields: get_custom_fields(document_type),
+      custom_field_config: get_custom_field_config(document_type),
+      payment_id: self.id,
+      attachment_details: get_attachment_details(document_type),
+      base_currency: self.bank_payment_request.base_currency,
+      reporting_currency: self.company.reporting_currency,
+      is_domestic: self.bank_payment_request&.is_domestic,
+      non_po_invoice_form_enabled: (self.parent&.forms_enabled rescue false)
     }
   end
 
@@ -989,6 +994,7 @@ include Searchkick::Api
         owner_name: {name: self.receiving_account&.account_owner&.display_name, label: 'Vendor'},
         account_number: {number: self.receiving_account&.account_number},
         ifsc: {code: self.receiving_account&.ifsc},
+        swift: {code: self.receiving_account&.swift_code},
         beneficiary_type: {type: get_beneficiary_type},
         field_details: get_field_details('Invoice')
     }
@@ -1180,23 +1186,30 @@ include Searchkick::Api
     end
 
     {
-        tds_applicable_amount: calculate_tds_applicable_amount('Invoice'),
-        total_amount: {value: precision_value(self.parent&.item_amounts_total), editable: false}, # TOTAL
-        inclusive_of_taxes: {value: self.parent.inclusive_of_taxes, editable: false},
-        discount: {discount_type_id: self.parent.discount_type_id, rate: self.parent.discount, discount_amount: precision_value(self.parent.discount_amount&.value), editable: false},
-        tax: {tax_type_id: self.parent.tax_type_id, tax_amount: precision_value(self.parent.tax_amount&.value), value: precision_value(self.parent.tax), editable: false},
-        tds: {tds_slab_id: self.parent.tds_slab_id, tds_amount: precision_value(self.parent.tds_amount&.value), editable: true, tds_slab_rate: self.parent&.tds_slab&.tds},
-        advance_amount: {value: invoice_advance, editable: false}, # Advance
-        freight_amount: {value: self.parent.freight_amount&.value, editable: false},
-        net_payable_amount: {value: self.parent.balance_due&.value, editable: false},
-        net_total: {value: self.parent.net_amount&.value, editable: false}, #Net Total
-        roundoff_amount: {value: self.parent.roundoff_amount, editable: false},
-        tds_slabs: tds_slabs,
-        tax_rates: self.parent.company.tax_rates,
-        gst_type_id: {value: self.parent.gst_type_id, editable: false},
-        payment_amount: {value: self.amount_value, editable: true}, #Payable Amount
-        balance_due: {value: self.parent.balance_due&.value, editable: false}, # Invoice AMOUNT
-        available_credits: available_credits_amount
+      tds_applicable_amount: calculate_tds_applicable_amount('Invoice'),
+      total_amount: {value: precision_value(self.parent&.item_amounts_total), editable: false}, # TOTAL
+      inclusive_of_taxes: {value: self.parent.inclusive_of_taxes, editable: false},
+      discount: {discount_type_id: self.parent.discount_type_id, rate: self.parent.discount, discount_amount: precision_value(self.parent.discount_amount&.value), editable: false},
+      tax: {tax_type_id: self.parent.tax_type_id, tax_amount: precision_value(self.parent.tax_amount&.value), value: precision_value(self.parent.tax), editable: false},
+      tds: {tds_slab_id: self.parent.tds_slab_id, tds_amount: precision_value(self.parent.tds_amount&.value), editable: true, tds_slab_rate: self.parent&.tds_slab&.tds},
+      advance_amount: {value: invoice_advance, editable: false}, # Advance
+      freight_amount: {value: self.parent.freight_amount&.value, editable: false},
+      net_payable_amount: {value: self.parent.balance_due&.value, editable: false},
+      net_total: {value: self.parent.net_amount&.value, editable: false}, #Net Total
+      roundoff_amount: {value: self.parent.roundoff_amount, editable: false},
+      tds_slabs: tds_slabs,
+      tax_rates: self.parent.company.tax_rates,
+      gst_type_id: {value: self.parent.gst_type_id, editable: false},
+      payment_amount: {value: self.amount_value, editable: true}, #Payable Amount
+      balance_due: {value: self.parent.balance_due&.value, editable: false}, # Invoice AMOUNT
+      available_credits: available_credits_amount,
+
+      invoice_balance_due: {value: self.parent&.invoice_balance_due, editable: true}, 
+      reporting_invoice_balance_due: {value: self.parent&.reporting_invoice_balance_due, editable: false},     
+      invoice_sub_total_amount: {value: self.parent&.invoice_sub_total_amount, editable: false}, 
+      reporting_invoice_sub_total_amount: {value: self.parent&.reporting_invoice_sub_total_amount, editable: false},
+      invoice_net_total_amount: {value: self.parent&.invoice_net_total_amount, editable: false},
+      reporting_invoice_net_total_amount: {value: self.parent&.reporting_invoice_net_total_amount, editable: false} 
     }
   end
 

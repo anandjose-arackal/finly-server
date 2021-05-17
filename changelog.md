@@ -1,9 +1,17 @@
 # Changelog
 All notable changes to this project will be documented in this file. Always add new logs to 
 beginning of this file.
-
-## 2021-04-28
+## 2021-05-17
 - Fix: Added filter_unique_check method for models to use it for scoping records for uniqueness check. And updated forms unique validation to use the same
+## 2021-05-03
+- Fix: Fix for base currency issue. 
+
+## 2021-05-01
+- Fix: Fix for filter issue, filter not populating. 
+- feat: Custom fields for Bbps utility subscriptions.
+
+## 2021-04-30
+- Feat: NonPoInvoice form migration, payment ticket and multi currency changes, with feature flag added to the old ui
 
 ## 2021-04-17
 - Fix: Validation on total invoiced quantity against purchase order quantity removed for service items
@@ -18,6 +26,10 @@ beginning of this file.
 ## 2021-04-07
 - Fix: Vendor policy check was not checking for company. Patched this security gap.
 
+## 2021-03-01
+  - FormMigration: Updating migration to handle custom field migrations.
+  - Updating payment ticket changes for invoice.
+
 ## 2021-03-31
   - Fix: use user roles instead of policy user roles to properly filter export templates.
 
@@ -30,6 +42,23 @@ beginning of this file.
 ## 2021-03-25
   - Security: Updating the authorization policy for invoice and vendors. 
   - Removing changes for invoice policy authorization.
+
+## 2021-03-23
+  - Updating the reporting values and payment ticket values.
+  - Adding support for multi currency export.
+
+## 2021-03-22
+  - Updating the invoice form migration script and fixing migration bugs
+
+## 2021-03-21
+  - Feat: Non Po Invoice Forms release
+  - Fix: Moved OTP mailers from default redis queue to payment creation queue
+
+## 2021-03-19
+  - Fix: Moved OTP mailers from default redis queue to payment creation queue
+
+## 2021-03-19
+  - Updating the non-po-form migration script
 
 ## 2021-03-21
   - Feat: Non Po Invoice Forms release
@@ -50,9 +79,21 @@ beginning of this file.
 
 ##2021-03-11
   - Fix: `Vendor Payment` Purchase Order advance Amount in upaid, the status will change to `close`  while closing a purchase order
+
+    The re-opeing action in purchase order will revoke the Purchase advance amount status to previous status if it a non paid advance
+
+##2021-03-10
+ - Fix: Deleted user's policy user roles was trying render and leads to nil issue, 
+    Policy User Role index only render existing user roles
+    
   The re-opeing action in purchase order will revoke the Purchase advance amount status to previous status if it a non paid advance
 
 ##2021-03-10
+
+  The re-opeing action in purchase order will revoke the Purchase advance amount status to previous status if it a non paid advance
+
+##2021-03-10
+
   - Fix: Deleted user's policy user roles was trying render and leads to nil issue, 
         Policy User Role index only render existing user roles
    

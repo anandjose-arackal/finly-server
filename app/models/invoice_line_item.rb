@@ -97,6 +97,7 @@ class InvoiceLineItem < ApplicationRecord
 
   alias_attribute :items_department_id, :department_id
   alias_attribute :items_cost_center_id, :cost_center_id
+
   #  item_gross_amount_converted    :decimal(20, 5)
   #  item_discount_amount_converted :decimal(20, 5)
   #  item_taxable_amount_converted  :decimal(20, 5)
@@ -144,6 +145,12 @@ class InvoiceLineItem < ApplicationRecord
   belongs_to :tax_rate, optional: true
   belongs_to :cost_center, optional: true
   belongs_to :department, optional: true
+
+  alias_method :items_department, :department
+  alias_method :items_cost_center, :cost_center
+
+  # belongs_to :items_department, optional: true, class_name: 'Department'
+  # belongs_to :items_cost_center, optional: true, class_name: 'CostCenter'
   belongs_to :purchase_order_item, optional: true
 
   has_many :custom_fields, as: :parent, dependent: :destroy
@@ -173,7 +180,11 @@ class InvoiceLineItem < ApplicationRecord
   # removing for now
   # validates_presence_of :unit_of_measurement
   # validates_presence_of :department, if: :check_outward_invoice?
+  
+  # Updating this for forms, due to some unknown issue 
   before_save :set_tds_applicable
+  # after_commit :set_tds_applicable, on: [:create, :update]
+
   after_save :budget_trail_entry
   after_save :sync_amounts, unless: :skip_callback
   after_destroy :budget_trail_destroy
@@ -230,7 +241,7 @@ class InvoiceLineItem < ApplicationRecord
   end
 
   def tds_applicable?
-    self&.tds_applicable
+    self&.tds_applicable || self&.inventory_line_item&.tds_applicable
   end
 
   def as_json(options = {})
@@ -439,7 +450,7 @@ class InvoiceLineItem < ApplicationRecord
       else
         self.assign_attributes(
           {
-            "#{value}": Amount.create(value: amount_value, currency_id: base_currency_id).id
+            "#{value}_id": Amount.create(value: amount_value, currency_id: base_currency_id).id
           }
         )
       end

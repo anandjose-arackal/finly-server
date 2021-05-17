@@ -467,7 +467,7 @@ class Procurement < ApplicationRecord
   end
 
   def status_tag_details
-    tag_ids = self.status_tags.pluck(:id)
+    tag_ids = self.status_tags.pluck(:id) || []
 
     data = {
         invoice: {},

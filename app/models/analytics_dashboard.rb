@@ -20,7 +20,7 @@
 class AnalyticsDashboard < ApplicationRecordBackwardCompatibility
   belongs_to :created_by, class_name: 'User', optional: true
   belongs_to :company, optional: true
-  belongs_to :system_dashboard, optional: true
+  belongs_to :system_dashboard, optional: true, class_name: 'AnalyticsDashboard'
 
   has_many :schedules, class_name: 'AnalyticsDashboardSchedule'
   has_many :schedule_user_mappings, class_name: 'AnalyticsDashboardScheduleUserMapping'

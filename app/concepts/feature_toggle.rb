@@ -29,7 +29,7 @@ class FeatureToggle
     Rails.cache.delete(cache_key)
   end
 
-  def enabled?(feature, default = false)
+  def enabled?(feature, default = false) 
     return default if flags.nil?
 
     flag = flags[normalize_key(feature)]

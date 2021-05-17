@@ -34,6 +34,7 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
     has_scope :filter_department_id
     has_scope :filter_location_id
     has_scope :filter_cost_center_id
+    has_scope :filter_base_currency
 
     has_scope :rcm_enabled
     has_scope :filter_rcm_enabled

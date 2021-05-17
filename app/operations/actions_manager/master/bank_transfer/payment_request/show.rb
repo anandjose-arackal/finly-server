@@ -169,6 +169,10 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     #   end
     # end
 
+    unless bank_payment_request.is_domestic
+      return false
+    end
+
     if user.vendor_payments_admin?
       if bank_payment_request.payment_order.partially_completed? && !bank_payment_request.open? && !bank_payment_request.rejected? && !bank_payment_request.retracted? 
         return true

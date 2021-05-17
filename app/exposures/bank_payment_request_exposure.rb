@@ -2,6 +2,7 @@ class BankPaymentRequestExposure < Exposures::API
 
   attribute :id, record_attribute: true
   attribute :name, record_attribute: true
+  attribute :description, record_attribute: true
   attribute :payment_ticket_id, record_attribute: :id
   attribute :payment_order, record_attribute: true, exposure: true, includes: [:payment_order]
   attribute :created_by, record_attribute: true, exposure: true, includes: [:created_by]
@@ -40,6 +41,10 @@ class BankPaymentRequestExposure < Exposures::API
 
   attribute :get_reviewers_names do
     record.get_reviewers&.map(&:name)&.join(", ")
+  end
+
+  attribute :non_po_form_enabled do
+    record.non_po_form_enabled
   end
 
 end

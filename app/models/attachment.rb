@@ -29,6 +29,13 @@ class Attachment < ApplicationRecord
   has_attached_file :file, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
   validates_attachment :file, content_type: CONTENT_TYPES
 
+  amoeba do
+    exclude_association :file
+    customize(lambda { |original_attachment,new_attachment|
+      new_attachment.file = original_attachment.file
+    })
+  end
+
   scope :orphans, -> {
     where(resource_id: nil)
   }
@@ -54,12 +61,14 @@ class Attachment < ApplicationRecord
       id: self.id,
       name: self.file_file_name,
       url: self.file&.url,
+      thumb: self.file(:thumb),
       created_at: self.created_at.to_date,
       resource_type: self.resource_type,
       resource_id: self.resource_id,
       file_name: self.file.original_filename,
       file_size: (self.file_file_size / 1024).round(2).to_s + " KB",
-      status: 'done'
+      status: 'done',
+      content_type: self.file_content_type
       # created_by: self.creator&.name,
       # description: self.description
     }
