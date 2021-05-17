@@ -227,14 +227,14 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
     return messages if only_gstin
 
     if vendor.pan.present?
-      similar_pan_vendors = YesBankVendor.where(pan: vendor.pan, company_id: company.id).validation_associated_items
+      similar_pan_vendors = YesBankVendor.where(pan: vendor.pan, company_id: company.id).filter_unique_check
       if similar_pan_vendors.present?
         gstins=[]
         gstins << vendor.gstin_locations.last.gstin if vendor.gstin_locations.last&.gstin.present?
         vendor.gstin_locations.map{|gstin_location| gstins << gstin_location[:gstin]}
         gstins =gstins.reject { |e| e.to_s.empty? }
         if gstins.present?
-          gstin_against_dup_pan = similar_pan_vendors.validation_associated_items.joins(:gstin_locations).pluck(:'gstin_locations.gstin').uniq&.reject { |e| e.to_s.empty? }
+          gstin_against_dup_pan = similar_pan_vendors.filter_unique_check.joins(:gstin_locations).pluck(:'gstin_locations.gstin').uniq&.reject { |e| e.to_s.empty? }
           duplicated_gstins = gstin_against_dup_pan & gstins
           if gstin_against_dup_pan.present? && duplicated_gstins.present?
             similer_gstin_vendors = similar_pan_vendors.joins(:gstin_locations).where('gstin_locations.gstin IN (?)',  duplicated_gstins)

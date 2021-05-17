@@ -73,6 +73,7 @@ class BankAccount < ApplicationRecord
   scope :non_deleted, -> {where deleted_at: nil}
   scope :enabled, -> {where disabled: false}
   singleton_class.send(:alias_method, :filter_active, :enabled)
+  singleton_class.send(:alias_method, :filter_unique_check, :enabled)
   scope :with_owner_id, -> (owner_id) {
     where account_owner_id: owner_id
   }

@@ -105,11 +105,12 @@ class UpdateTenants
       end
 
       # 3640
-      FieldParentMapping.includes(:field_configuration).find_in_batches(batch_size: 1000) do |records|
+      FieldParentMapping.unscoped.includes(:field_configuration).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
-          record.company_id = record.field_configuration&.company_id
+          if record.company_id != record.field_configuration&.company_id
+            record.update_columns(company_id: record.field_configuration&.company_id)
+          end
         end
-        FieldParentMapping.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 38961
@@ -1048,23 +1049,27 @@ class UpdateTenants
       # 13481
       FieldDropDownItem.includes(:field_configuration).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
-          record.company_id = record.field_configuration&.company_id
+          if record.company_id != record.field_configuration&.company_id
+            record.update_columns(company_id: record.field_configuration&.company_id)
+          end
         end
-        FieldDropDownItem.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 410
       FieldMultiselectItem.includes(:field_configuration).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
-          record.company_id = record.field_configuration&.company_id
+          if record.company_id != record.field_configuration&.company_id
+            record.update_columns(company_id: record.field_configuration&.company_id)
+          end
         end
-        FieldMultiselectItem.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       # 65943
-      FieldMultiselectSelection.includes(:custom_field).find_in_batches(batch_size: 1000) do |records|
+      FieldMultiselectSelection.includes({ custom_field: :field_configuration}).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
-          record.company_id = record.custom_field&.company_id
+          if record.company_id != record.custom_field&.field_configuration&.company_id
+            record.company_id = record.custom_field&.field_configuration&.company_id
+          end
         end
         FieldMultiselectSelection.import records, on_duplicate_key_update: [:company_id], validate: false
       end
@@ -1078,9 +1083,11 @@ class UpdateTenants
       end
 
       # 0
-      FieldNumber.includes(:custom_field).find_in_batches(batch_size: 1000) do |records|
+      FieldNumber.includes({ custom_field: :field_configuration}).find_in_batches(batch_size: 1000) do |records|
         records.each do |record|
-          record.company_id = record.custom_field&.company_id
+          if record.company_id != record.custom_field&.field_configuration&.company_id
+            record.company_id = record.custom_field&.field_configuration&.company_id
+          end
         end
         FieldNumber.import records, on_duplicate_key_update: [:company_id], validate: false
       end
@@ -1420,10 +1427,13 @@ class UpdateTenants
         end
       end
 
-      MacroJob.includes(:macro).find_each do |record|
-        if record.macro.present?
-          record.update_column(:company_id, record.macro.company_id)
+      MacroJob.includes(:macro).find_in_batches(batch_size: 1000) do |records|
+        records.each do |record|
+          if record.macro.present?
+            record.company_id = record.macro&.company_id
+          end
         end
+        MacroJob.import records, on_duplicate_key_update: [:company_id], validate: false
       end
 
       MacroJobLog.includes(:macro).find_each do |record|
