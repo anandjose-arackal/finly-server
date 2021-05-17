@@ -108,11 +108,11 @@ class InvoiceLineItem < ApplicationRecord
   #  item_billable_amount_converted :decimal(20, 5)
 
   def get_reporting_currency
-    self.parent.get_reporting_currency
+    self.parent.get_reporting_currency rescue self.company.reporting_currency
   end
 
   def get_base_currency
-    self.parent.get_base_currency
+    self.parent.get_base_currency rescue self.company.reporting_currency
   end
 
   exchange_bank :get_reporting_currency, :get_base_currency, :exchange_rate
