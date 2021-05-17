@@ -4,6 +4,9 @@ class Admin::Masters::Macros::Contracts::Schedule < Reform::Form
   property :minute
   property :day_of_the_week
   property :day_of_the_month
+  property :company_id, deserializer: -> (input, represented, **) do
+    represented.company_id = represented.contract_root.model.company_id
+  end
 
   validate :minute_format
   validate :hour_format

@@ -10,4 +10,5 @@ class NonTenantedApplicationRecord < ActiveRecord::Base
   include SoftDeletable
 
   singleton_class.send(:alias_method, :filter_active, :exclude_deleted)
+  singleton_class.send(:alias_method, :filter_unique_check, :exclude_deleted)
 end

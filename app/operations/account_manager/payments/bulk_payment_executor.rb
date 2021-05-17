@@ -15,7 +15,7 @@ class AccountManager::Payments::BulkPaymentExecutor < AccountManager::Base
     if options.present? and options.is_a?(Hash)
       options = options.with_indifferent_access
     end
-    self.payment_order = PaymentOrder.unscoped.find_by_id(payment_order_id)
+    self.payment_order = PaymentOrder.unscope(where: :payment_purpose_id).find_by_id(payment_order_id)
     self.crediting_payments = self.payment_order.payments.with_id(options[:crediting_payment_ids])
     self.options = options
     self.run

@@ -151,4 +151,5 @@ class InvoiceLineItemExposure < Exposures::API
   attribute :custom_fields, includes: [{ parent: { custom_fields: [:field_configuration, :value] } }] do
     record.parent.custom_fields
   end
+  attribute :comment, record_attribute: true
 end

@@ -110,14 +110,6 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     end
 
     if self.inward_invoice.procurement.present? && self.purchase_order.present?
-      # if params[:invoice][:balance_amount_attributes][:value].to_i < 0
-      #   add_message :error, "Balance due amount cannot be less than zero"
-      # end
-      if params[:invoice][:balance_amount_attributes][:value].to_i > (self.purchase_order.balance_amount&.value + 1) # adding a buffer to account for roundoff amount
-          add_message :error, "Payable amount for this invoice has exceeded the Purchase Order payable amount."
-        return
-      end
-
       # the below line is in the case of one PO having multiple line items of the same inventory item
       processed_item_ids = []
       self.inward_invoice_params[:invoice_items_attributes].each do |item|
@@ -126,17 +118,25 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
         next if po_item.blank? # temp workaround
         next if po_item.inventory_line_item&.product_type_id == ProductType.id_for(:service)
         item_q =  po_item.accepted
+        item_amount = po_item.taxable_amount.value
         unless user.company.feature_subscription.grn_enabled
           item_q = po_item.quantity
+          item_amount = po_item.taxable_amount.value
         end
 
         invoiced_line_items = self.procurement.invoices.joins(:items).where('invoice_line_items.purchase_order_item_id = ?', invoice_line_item.purchase_order_item_id)
         invoiced_line_items_except_current_item = invoiced_line_items.where('invoice_line_items.id != ?', item[:id])
         invoiced_total_qty = 0
         invoiced_total_qty = invoiced_line_items_except_current_item.sum('invoice_line_items.quantity').to_f
+        invoiced_total_amount = invoiced_line_items_except_current_item.joins(:taxable_amount).sum('amounts.value')
 
         if item_q < (invoiced_total_qty + item[:quantity].to_f)
           add_message :error, "Invoiced item quantity should be on par with the Purchase Order quantity."
+          break
+        end
+
+        if item_amount < (invoiced_total_amount + item.dig(:taxable_amount_attributes, :value)&.to_f)
+          add_message :error, "Invoiced Item Taxable Amount should be on par with the Purchase Order Item Taxable Amount"
           break
         end
         processed_item_ids << po_item.id

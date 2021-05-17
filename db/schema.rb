@@ -9566,7 +9566,7 @@ ActiveRecord::Schema.define(version: 2021_05_15_145615) do
     t.string "country_code"
     t.string "region_code"
     t.string "region_name"
-    t.string "city"
+    t.string "city", collation: "utf8_bin"
     t.string "zip"
     t.decimal "latitude", precision: 20, scale: 10
     t.decimal "longitude", precision: 20, scale: 10

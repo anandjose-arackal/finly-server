@@ -12,8 +12,14 @@ class Script::MissedCardTransactionCreate < BaseOperation
 
   def init
 
-    self.card = Card.find_by(proxy: params[:serial_id])
-    self.user = self.card.user rescue nil
+    ActsAsTenant.without_tenant do
+      self.card = Card.find_by_proxy(params[:serial_id])
+      self.user = card&.user  rescue nil
+    end
+    ActsAsTenant.current_tenant = (user&.company || card&.company)
+    RequestStoreUtil.set_current_company((user&.company || card&.company))
+
+
     self.type = params[:transaction_type].upcase rescue nil
     self.mode = params[:transaction_mode].upcase rescue nil
     self.transaction = CardTransaction.find_by(reference_id: params[:reference_id], type_of_details: params[:type_of_details])
@@ -161,7 +167,7 @@ class Script::MissedCardTransactionCreate < BaseOperation
       case mode
       when 'ATM'
         # handling the case of ATM reversals here, where the type of details will be 'R'
-        if self.transactrion && params[:type_of_details] == 'R'
+        if self.transaction && params[:type_of_details] == 'R'
 
           # check if the card is even an expense card at this point
           return true unless card.card_program.create_expense
@@ -184,7 +190,7 @@ class Script::MissedCardTransactionCreate < BaseOperation
               return false
             end
           end
-        elsif self.transcation && params[:type_of_details] == 'RF'
+        elsif self.transaction && params[:type_of_details] == 'RF'
           # handle the cancellation of the ATM surcharge fee expense that is created during the original card swipe at the ATM
           original_transaction = CardTransaction.find_by(reference_id: params[:reference_id], type_of_details: 'F')
           orig_sur_card_exp = CardExpense.find_by(card_transaction_id: original_transaction&.id)
