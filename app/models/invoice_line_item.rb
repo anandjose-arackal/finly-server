@@ -108,11 +108,11 @@ class InvoiceLineItem < ApplicationRecord
   #  item_billable_amount_converted :decimal(20, 5)
 
   def get_reporting_currency
-    self.parent.get_reporting_currency
+    self.parent.get_reporting_currency rescue self.company.reporting_currency
   end
 
   def get_base_currency
-    self.parent.get_base_currency
+    self.parent.get_base_currency rescue self.company.reporting_currency
   end
 
   exchange_bank :get_reporting_currency, :get_base_currency, :exchange_rate
@@ -431,13 +431,15 @@ class InvoiceLineItem < ApplicationRecord
   # Syncs amounts from new forms structure to legacy amounts table
   def sync_amounts
     self.skip_callback = true
-    if parent.respond_to?(:forms_enabled)
-      if parent.forms_enabled
-        sync_to_old_structure
-      else
-        sync_to_forms_structure
-      end
-    end
+    sync_to_old_structure
+    
+    # if parent.respond_to?(:forms_enabled)
+    #   if parent.forms_enabled
+    #     sync_to_old_structure
+    #   else
+    #     sync_to_forms_structure
+    #   end
+    # end
   end
 
   def sync_to_old_structure
@@ -455,6 +457,7 @@ class InvoiceLineItem < ApplicationRecord
         )
       end
     end
+    self.skip_callback = true
     self.save
   end
 

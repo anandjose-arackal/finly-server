@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file. Always add new logs to 
 beginning of this file.
+
+## 2021-05-17
+  - Feat: Updating migration, fixing lookup issue and stabilizing the invoice forms.
+
+
 ## 2021-05-17
 - Fix: Added filter_unique_check method for models to use it for scoping records for uniqueness check. And updated forms unique validation to use the same
 ## 2021-05-03

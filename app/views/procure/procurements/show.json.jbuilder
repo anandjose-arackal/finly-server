@@ -126,7 +126,7 @@ json.trail do
         json.payment_mode item.payment_mode
         json.bank_payment_order_id item&.payment_order&.bank_payment_request&.id
         json.base_currency item.bank_payment_request.base_currency
-
+        json.forms_enabled item&.parent&.forms_enabled if item.parent.is_a?(Invoice)
         json.status do
           json.id item.payment_status&.id
           json.name item.payment_status&.name

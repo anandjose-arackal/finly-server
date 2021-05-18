@@ -114,11 +114,17 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
            computed: Forms::Compute::Lookup('payment_term_id', '{{record.days_after | default: 0 }}'),
            visible: false
 
-    # can_choices_be_changed: false, default_value: false
-    # '{% assign assigne_days = form.payment_term_days | times: 86400 %}{{ form.date | date: "%s" | plus: assigne_days | date: "%d-%m-%Y" }}'
     date :due_date,
-         # computed: Forms::Compute::Form('{% assign assigne_days = form.payment_term_days | times: 86400 %}{{ form.date | date: "%s" | plus: assigne_days | date: "%Y-%m-%d" }}'),
-         computed: Forms::Compute::Form('{% assign assigne_days = form.payment_term_days | times: 86400 %}{% assign calculated_date = form.date | date: "%s" | plus: assigne_days %}{% assign default_due_date = "now" |date: "%s" | plus: 84600 %}{% if calculated_date < default_due_date %}{{ default_due_date  | date: "%Y-%m-%d" }}{% else %}{{ calculated_date  | date: "%Y-%m-%d" }}{% endif %}'),
+         computed: Forms::Compute::Form('{% assign assigne_days = form.payment_term_days | times: 86400 %}{% assign calculated_date = form.date | date: "%s" | plus: assigne_days %}{{ calculated_date  | date: "%Y-%m-%d" }}'),
+         # computed: Forms::Compute::Form('
+         #  {% assign assigne_days = form.payment_term_days | times: 86400 %}
+         #  {% assign calculated_date = form.date | date: "%s" | plus: assigne_days %}
+         #  {% assign default_due_date = "now" |date: "%s" | plus: 84600 %}
+         #  {% if calculated_date < default_due_date %}
+         #    {{ default_due_date  | date: "%Y-%m-%d" }}
+         #  {% else %}
+         #    {{ calculated_date  | date: "%Y-%m-%d" }}
+         #  {% endif %}'),
          visible: true, required: true, editable: true
 
 
@@ -246,9 +252,9 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
                required: true, editable: true, visible: true,
                computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.unit_of_measurement}}')
 
-      number :item_rate,
+      amount :item_rate,
              label: "Item Rate",
-             computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.rate | default: 0 }}'),
+             computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.rate | default: 0 | round: 2 }}'),
              visible: true
 
       amount :rate, label: "Rate",

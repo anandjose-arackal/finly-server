@@ -112,19 +112,19 @@ if payment.invoice.present?
     json.item_amounts_total invoice.item_amounts_total
 
     # paid amount for this invoice
-    json.paid_amount invoice.payments.successful.joins(:amount).sum(:value)
-    json.remaining_amount (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
+    json.paid_amount precision_value invoice.payments.successful.joins(:amount).sum(:value)
+    json.remaining_amount precision_value (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
 
     json.conversion_rate invoice.conversion_rate.to_f rescue 1
     
-    json.invoice_sub_total_amount invoice&.invoice_sub_total_amount.to_f
-    json.reporting_invoice_sub_total_amount invoice&.reporting_invoice_sub_total_amount.to_f
+    json.invoice_sub_total_amount precision_value invoice&.invoice_sub_total_amount.to_f
+    json.reporting_invoice_sub_total_amount precision_value invoice&.reporting_invoice_sub_total_amount.to_f
 
-    json.invoice_net_total_amount invoice&.invoice_net_total_amount.to_f
-    json.reporting_invoice_net_total_amount invoice&.reporting_invoice_net_total_amount.to_f
+    json.invoice_net_total_amount precision_value invoice&.invoice_net_total_amount.to_f
+    json.reporting_invoice_net_total_amount precision_value invoice&.reporting_invoice_net_total_amount.to_f
 
-    json.invoice_balance_due invoice&.invoice_balance_due.to_f
-    json.reporting_invoice_balance_due invoice&.reporting_invoice_balance_due.to_f
+    json.invoice_balance_due precision_value invoice&.invoice_balance_due.to_f 
+    json.reporting_invoice_balance_due precision_value invoice&.reporting_invoice_balance_due.to_f
     
     json.payable_amount precision_value payment.amount.value
     if payment.parent_type == 'Invoice'
