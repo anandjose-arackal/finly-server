@@ -31,7 +31,7 @@ class Docs::P2P::Vendors::Ops::Submit < Transactions::API
   def validate_gstin(options, reviewal_document:, current_user:, params:, **)
     gstin = GstinLocation.where(vendor_id: current_user.company.yes_bank_vendors.non_deleted.filter_unique_check).where(gstin: reviewal_document.gstin_locations.pluck(:gstin)).where.not(id: reviewal_document.gstin_locations.pluck(:id)).first
 
-    if gstin.present?
+    if gstin.present? and gstin.gstin.present?
       add_message options, :error, :base, "GSTIN details for \"#{gstin.gstin}\" already exists in the system. See vendor - #{gstin.vendor.display_name}"
       return
     end
