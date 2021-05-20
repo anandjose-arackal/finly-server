@@ -73,8 +73,13 @@ class MasterEntity < ApplicationRecord
   end
 
   contract_eval "Uniqueness check" do |contract:, entity:, **|
+    scopes = [:company_id]
+    unless entity.schema.system_master
+      scopes << :master_schema_id
+    end
+
     if entity.unique
-      contract.validates_uniqueness_of entity.entity_key, scope: [:company_id, :master_schema_id], conditions: -> { where deleted_at: nil }
+      contract.validates_uniqueness_of entity.entity_key, scope: scopes, conditions: -> { where deleted_at: nil }
     end
   end
 
