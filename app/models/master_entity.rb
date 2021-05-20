@@ -74,7 +74,7 @@ class MasterEntity < ApplicationRecord
 
   contract_eval "Uniqueness check" do |contract:, entity:, **|
     scopes = [:company_id]
-    unless entity.schema.system_master
+    unless entity.master_schema.system_master
       scopes << :master_schema_id
     end
 
