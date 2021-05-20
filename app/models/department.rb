@@ -35,6 +35,8 @@ class Department < ApplicationRecord
   alias_attribute :ancestry, :parent_id
 
   belongs_to :company, optional: true
+  belongs_to :created_by, class_name: 'User', optional: true
+
   belongs_to :cost_center, optional: true
 
   has_many :user_department_mappings

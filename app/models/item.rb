@@ -46,6 +46,8 @@ class Item < ApplicationRecord
 
   default_scope { include_soft_deleted.order(created_at: :desc) }
   belongs_to :company, optional: true
+  belongs_to :created_by, class_name: 'User', optional: true
+
   belongs_to :category, optional: true
   belongs_to :tax_rate, optional: true
   belongs_to :supply_item_type, optional: true

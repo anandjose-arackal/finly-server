@@ -33,6 +33,7 @@ include Searchkick::Api
   alias_attribute :parent_id, :ancestry
 
   belongs_to :company, optional: true
+  belongs_to :created_by, optional: true, class_name: 'User'
 
   has_many :budget_criteria_mappings, as: :budgetable
   has_many :budgets, through: :budget_criteria_mappings

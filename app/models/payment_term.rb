@@ -20,6 +20,7 @@ class PaymentTerm < ApplicationRecord
   include SoftDeletable
 
   belongs_to :company, optional: true
+  belongs_to :created_by, class_name: 'User', optional: true
 
 
   # contains the attributes of a few common payment terms
