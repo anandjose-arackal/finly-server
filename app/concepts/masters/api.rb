@@ -62,7 +62,9 @@ class Masters::API
     args[:model] = model
     args[:klass_name] = self
     args[:system_master] = true
-    @schema ||= MasterSchema.new(args)
+    @schema ||= ActsAsTenant.without_tenant do
+      MasterSchema.new(args)
+    end
     @schema.instance_eval &block if block_given?
     contract = Masters::Schema::Contract.new(@schema)
     raise "Invalid Master Schema: #{contract.errors}" unless contract.validate({})
