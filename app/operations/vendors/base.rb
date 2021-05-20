@@ -170,7 +170,7 @@ class Vendors::Base < BaseOperation
 
   def validate_duplicate_pan
     if vendor_parameters.present? && vendor_parameters[:pan].present?
-      similar_pan_vendors = user.company.yes_bank_vendors.validation_associated_items.where(pan: vendor_parameters[:pan])
+      similar_pan_vendors = user.company.yes_bank_vendors.filter_unique_check.where(pan: vendor_parameters[:pan])
       if self.vendor.present?
         similar_pan_vendors = similar_pan_vendors.where.not(id: self.vendor.id)
       end
@@ -178,7 +178,7 @@ class Vendors::Base < BaseOperation
       vendor_parameters[:gstin_locations_attributes].each {|gstin_location| gstins << gstin_location[:gstin]}
       gstins =gstins.reject { |e| e.to_s.empty? }
       if similar_pan_vendors.present? && gstins.present?
-        gstin_against_dup_pan = similar_pan_vendors.validation_associated_items.joins(:gstin_locations).pluck(:'gstin_locations.gstin').uniq&.reject { |e| e.to_s.empty? }
+        gstin_against_dup_pan = similar_pan_vendors.filter_unique_check.joins(:gstin_locations).pluck(:'gstin_locations.gstin').uniq&.reject { |e| e.to_s.empty? }
         duplicated_gstins = gstin_against_dup_pan & gstins
         if gstin_against_dup_pan.present? && duplicated_gstins.present?
           similer_gstin_vendors = similar_pan_vendors.joins(:gstin_locations).where('gstin_locations.gstin IN (?)',  duplicated_gstins)

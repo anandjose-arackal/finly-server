@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_04_15_143526) do
+ActiveRecord::Schema.define(version: 2021_05_15_145615) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -486,6 +486,7 @@ ActiveRecord::Schema.define(version: 2021_04_15_143526) do
     t.datetime "deleted_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "feature_toggle"
     t.index ["app"], name: "index_analytics_dashboards_on_app"
     t.index ["company_id"], name: "index_analytics_dashboards_on_company_id"
     t.index ["created_at"], name: "index_analytics_dashboards_on_created_at"
@@ -1075,6 +1076,11 @@ ActiveRecord::Schema.define(version: 2021_04_15_143526) do
     t.text "api_response", size: :medium
     t.datetime "generated_at"
     t.text "biller_response"
+    t.integer "erp_sync_status_id"
+    t.text "erp_sync_message"
+    t.string "erp_sync_reference_id"
+    t.integer "erp_sync_attempts_count", default: 0
+    t.datetime "erp_sync_attempted_at"
     t.index ["amount_id"], name: "index_bbps_bills_on_amount_id"
     t.index ["autofetched"], name: "index_bbps_bills_on_autofetched"
     t.index ["controlling_level_id"], name: "index_bbps_bills_on_controlling_level_id"
@@ -2826,6 +2832,10 @@ ActiveRecord::Schema.define(version: 2021_04_15_143526) do
     t.datetime "last_adjusted_at"
     t.text "review_note"
     t.integer "erp_sync_status_id"
+    t.text "erp_sync_message"
+    t.string "erp_sync_reference_id"
+    t.integer "erp_sync_attempts_count", default: 0
+    t.datetime "erp_sync_attempted_at"
     t.index ["billing_location_id"], name: "index_credit_notes_on_billing_location_id"
     t.index ["company_id"], name: "index_credit_notes_on_company_id"
     t.index ["controlling_level_id"], name: "index_credit_notes_on_controlling_level_id"
@@ -4074,6 +4084,7 @@ ActiveRecord::Schema.define(version: 2021_04_15_143526) do
     t.boolean "sso_login_enforced", default: false
     t.boolean "enforce_budget_limit", default: false
     t.integer "company_id"
+    t.boolean "awaiting_approval_summary_enabled", default: false
     t.index ["grn_enabled"], name: "index_feature_subscriptions_on_grn_enabled"
     t.index ["srn_enabled"], name: "index_feature_subscriptions_on_srn_enabled"
     t.index ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id"
@@ -4488,7 +4499,7 @@ ActiveRecord::Schema.define(version: 2021_04_15_143526) do
     t.string "document_id"
     t.string "form_entity_id", null: false
     t.string "field_key", null: false
-    t.string "value"
+    t.text "value"
     t.string "value_text"
     t.string "form_id", null: false
     t.datetime "deleted_at"
@@ -4502,7 +4513,6 @@ ActiveRecord::Schema.define(version: 2021_04_15_143526) do
     t.index ["field_key"], name: "index_form_custom_fields_on_field_key"
     t.index ["form_entity_id"], name: "index_form_custom_fields_on_form_entity_id"
     t.index ["uuid"], name: "index_form_custom_fields_on_uuid"
-    t.index ["value"], name: "index_form_custom_fields_on_value"
     t.index ["value_text"], name: "index_form_custom_fields_on_value_text"
   end
 
@@ -5407,7 +5417,7 @@ ActiveRecord::Schema.define(version: 2021_04_15_143526) do
     t.decimal "item_billable_amount", precision: 20, scale: 5
     t.decimal "reporting_item_billable_amount", precision: 20, scale: 5
     t.string "tax_type", default: ""
-    t.decimal "item_rate", precision: 10, default: "0"
+    t.decimal "item_rate", precision: 20, scale: 5, default: "0.0"
     t.integer "company_id"
     t.index ["category_id"], name: "index_invoice_line_items_on_category_id"
     t.index ["cost_center_id"], name: "index_invoice_line_items_on_cost_center_id"
@@ -9996,7 +10006,7 @@ ActiveRecord::Schema.define(version: 2021_04_15_143526) do
     t.string "country_code"
     t.string "region_code"
     t.string "region_name"
-    t.string "city"
+    t.string "city", collation: "utf8_bin"
     t.string "zip"
     t.decimal "latitude", precision: 20, scale: 10
     t.decimal "longitude", precision: 20, scale: 10

@@ -6,7 +6,7 @@ class NonPoInvoiceMigrator
     
     ActsAsTenant.with_tenant(company) do
       documents = Invoice.where(invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)).where(company_id: company.id)
-      # documents = Invoice.where(id: 10721).where(company_id: company.id)
+      # documents = Invoice.where(id: 490).where(company_id: company.id)
 
       # FormCustomField.where(company_id: company_id).destroy_all
       form = Form.where(klass_name: 'Docs::P2P::Invoices::NonPo::Form', company_id: company_id).first
@@ -90,17 +90,31 @@ class NonPoInvoiceMigrator
     position = form.entities.where(form_section_id: section_id).order(:position).last.position + 1
     # is_active = !custom_field.field_configuration.deleted?
 
+    field_max_data_length = custom_field.field_configuration.custom_fields.map(&:value).compact.map(&:value).compact.map(&:length).max
+    if field_max_data_length <= 30
+      form_entity = FormEntity::Text.create({ company_id: company.id,
+        form_id: form_id, form_section_id: section_id,
+        created_by_user_id: company.users.only_admins.first,
+        entity_key: entity_key, label: lable,
+        placeholder: 'Enter value', hint: 'Please enter the hint',
+        entity_type: 'text', editable: true, required: required,
+        active: active, unique: false, visible: true, position: position,
+        system_field: false, options: "{'format':'text','minimum':1,'maximum':255}"
+        # , active: is_active
+      })
+    else
+      form_entity = FormEntity::LargeText.create({ company_id: company.id,
+        form_id: form_id, form_section_id: section_id,
+        created_by_user_id: company.users.only_admins.first,
+        entity_key: entity_key, label: lable,
+        placeholder: 'Enter value', hint: 'Please enter the hint',
+        entity_type: 'large_text', editable: true, required: required,
+        active: active, unique: false, visible: true, position: position,
+        system_field: false,
+        options: "{ 'maximum': 65535, 'minimum': 0 }"
+      })
+    end
 
-    form_entity = FormEntity::Text.create({ company_id: company.id,
-     form_id: form_id, form_section_id: section_id,
-     created_by_user_id: company.users.only_admins.first,
-     entity_key: entity_key, label: lable,
-     placeholder: 'Enter value', hint: 'Please enter the hint',
-     entity_type: 'text', editable: true, required: required,
-     active: active, unique: false, visible: true, position: position,
-     system_field: false, options: "{'format':'text','minimum':1,'maximum':255}"
-     # , active: is_active
-    })
     form_entity
   end
 
@@ -130,7 +144,6 @@ class NonPoInvoiceMigrator
 
     choices = Choices['list'].()
     choices.form_entity = form_entity
-    form_entity.skip_callback = true
     form_entity.update(choices_scope: choices )
     
     # create options
@@ -153,7 +166,7 @@ class NonPoInvoiceMigrator
 
   def self.update_each_custom_field form_custom_field, custom_field
       
-    if form_custom_field&.form_entity&.entity_type == "text"
+    if ["text", "large_text" ].include? form_custom_field&.form_entity&.entity_type 
       form_custom_field.value = custom_field.value&.value
       form_custom_field.save
 
@@ -206,7 +219,8 @@ class NonPoInvoiceMigrator
         items_department_id: item&.department_id,
         items_cost_center_id: item&.cost_center_id,
         product_type_id: item&.inventory_line_item&.product_type_id,
-        item_rate: item&.rate,
+        item_rate: item&.rate.to_f,
+        rate: item&.rate.to_f,
         item_tds_amount: item_tds,
         reporting_item_tds_amount: item_tds,
         item_gross_amount: item&.amount&.value.to_f,
@@ -331,8 +345,10 @@ class NonPoInvoiceMigrator
       invoice_advance_paid_amount: document&.payments&.successful&.joins(:amount)&.sum(:value),
       reporting_invoice_advance_paid_amount: document&.payments&.successful&.joins(:amount)&.sum(:value),
 
-      invoice_balance_due: document&.balance_due&.value.to_f - document&.payments&.successful&.joins(:amount)&.sum(:value).to_f ,
-      reporting_invoice_balance_due: document&.balance_due&.value.to_f - document&.payments&.successful&.joins(:amount)&.sum(:value).to_f
+      invoice_balance_due: document&.balance_due&.value.to_f,
+       # - document&.payments&.successful&.joins(:amount)&.sum(:value).to_f ,
+      reporting_invoice_balance_due: document&.balance_due&.value.to_f
+       # - document&.payments&.successful&.joins(:amount)&.sum(:value).to_f
     }
     document.skip_callback = true
     document.update_columns(update_params)
@@ -354,7 +370,7 @@ class NonPoInvoiceMigrator
         relevant_custom_field = document.form_custom_fields.where(field_key: 'invoice_attachments').first
         new_attachment = add_attachment_to_new_invoice( old_attachment, relevant_custom_field )
       end
-      # new_attachment.skip_callback = true
+      
       new_attachment.update_attribute(:attachment_updated_at,  old_attachment.created_at )
     end    
   end

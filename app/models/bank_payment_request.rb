@@ -591,7 +591,7 @@ class BankPaymentRequest < ApplicationRecord
   end
 
   def credit_card?
-    self.payment_order.payment_mode.upcase == "CREDITCARD"
+    self&.payment_order&.payment_mode&.upcase == "CREDITCARD"
   end
 
   def payments

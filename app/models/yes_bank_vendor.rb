@@ -142,6 +142,7 @@ class YesBankVendor < ApplicationRecord
   scope :authorized, -> { where authorized: true }
   scope :approved, -> {where status_id: [VendorStatus.id_for(:approved), VendorStatus.id_for(:auto_approved)]}
   scope :filter_active, -> { where.not(status_id: VendorStatus.id_for(:deactivated))}
+  scope :filter_unique_check, -> { where.not(status_id: VendorStatus.ids_for(:draft, :open, :retracted, :rejected, :deactivated))}
 
   scope :non_draft, -> {where.not(status_id: VendorStatus.id_for(:draft))}
 
@@ -273,7 +274,6 @@ class YesBankVendor < ApplicationRecord
         where(status_id: VendorStatus.ids_for(%i(approved auto_approved)))
   }
 
-  scope :validation_associated_items, -> { non_deleted.where.not(status_id: VendorStatus.ids_for(:rejected, :deactivated))}
   # Scopes for ordering ends
 
   before_validation do

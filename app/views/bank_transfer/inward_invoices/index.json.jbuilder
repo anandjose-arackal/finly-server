@@ -53,10 +53,10 @@ json.results do
       json.discount_rate precision_value invoice.discount_rate
       json.advance_rate precision_value invoice.advance_rate
       
-      if invoice.forms_enabled
-        json.base_currency_id invoice.get_base_currency.id
-        json.base_currency_code invoice.get_base_currency.country_code
-      end
+      # if invoice.forms_enabled
+      json.base_currency_id invoice.get_base_currency.id rescue '1'
+      json.base_currency_code invoice.get_base_currency.country_code rescue 'INR'
+      # end
       
       json.is_domestic invoice.is_domestic
 
