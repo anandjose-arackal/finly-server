@@ -9,7 +9,7 @@
 #  updated_at :datetime         not null
 #
 
-class ImportJobStatus < ApplicationRecord
+class ImportJobStatus < NonTenantedApplicationRecord
   include Seedable
 
   set_values :pending, :in_progress, :completed, :failed
