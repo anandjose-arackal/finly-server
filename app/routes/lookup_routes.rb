@@ -18,6 +18,7 @@ Lookup::Router.draw do
   route 'users', Masters::Users::Lookup
   route "payment_terms", Masters::PaymentTerms::Lookup
   route "form_currencies", Masters::FormCurrencies::Lookup
+  route "currencies", Masters::Currencies::Lookup
 
   # Docs
   route 'purchase_requests', Docs::P2P::PurchaseRequests::Lookup

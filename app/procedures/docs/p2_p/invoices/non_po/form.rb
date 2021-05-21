@@ -154,7 +154,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
     text :reporting_currency, label: "Reporting Currency", editable: false, visible: true,
          can_editable_be_changed: false # todo populate with system base currency
 
-    lookup :base_currency, label: "Base Currency", choices_scope: Choices[:lookup].('form_currencies'), visible: true, editable: true
+    lookup :base_currency, label: "Base Currency", choices_scope: Choices[:lookup].('currencies'), visible: true, editable: true
 
     switch :retrieve_conversion_rate, label: "Auto Populate Conversion Rate", default_value: true, visible: false
     number :conversion_rate, editable: true, format: 'decimal', default_value: 1, computed: Forms::Compute::Lookup('base_currency', '{{ record.currency_conversion_rate }}'), visible: true
