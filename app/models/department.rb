@@ -33,6 +33,7 @@ class Department < ApplicationRecord
 
   # This is support for old attributes which we were renamed during the masters generalization
   alias_attribute :ancestry, :parent_id
+  belongs_to :parent, class_name: 'Department', optional: true
 
   belongs_to :company, optional: true
   belongs_to :created_by, class_name: 'User', optional: true

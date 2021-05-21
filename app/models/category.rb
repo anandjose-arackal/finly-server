@@ -40,7 +40,9 @@ include Searchkick::Api
   # acts_as_sequenced column: :category_code, purpose: :category, editable: false, prefix: 'CAT'
   has_ancestry ancestry_column: :parent_id
 
-  alias_attribute  :ancestry, :parent_id
+  # This is support for old attributes which we were renamed during the masters generalization
+  alias_attribute :ancestry, :parent_id
+  belongs_to :parent, class_name: 'Category', optional: true
 
   belongs_to :company, optional: true
   belongs_to :created_by, optional: true, class_name: 'User'
