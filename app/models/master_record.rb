@@ -1,4 +1,5 @@
 class MasterRecord < ApplicationRecord
+  include SoftDeletable
   include AncestrySupport
   belongs_to :created_by, class_name: 'User'
   belongs_to :company
