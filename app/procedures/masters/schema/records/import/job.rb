@@ -10,7 +10,8 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
   step :update_properties
   pass :build_headers
   pass :build_input
-  pass :cache_associations
+  pass :pre_process_input
+  # pass :cache_associations
   pass :import_data
   pass :build_result
 
@@ -37,6 +38,9 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
   def build_headers(context, params:, master_schema:, **)
     context[:headers] = {}.with_indifferent_access
     context[:identifier_key] = master_schema.sequence_entity&.entity_key
+    if master_schema.has_nesting
+      context[:headers][:parent_id] << "Parent Id"
+    end
     master_schema.entities.each do |entity|
       context[:headers][entity.entity_key] = entity.label
     end
@@ -54,33 +58,48 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
     true
   end
 
+  def pre_process_input(context, input:, master_schema:, **)
+    context[:input].each do |row|
+      master_schema.entities.each do |entity|
+        next unless entity.type?(:multi_lookup)
+        next unless row[entity.entity_key]
+
+        row[entity.entity_key] = row[entity.entity_key].split(',').map do |lookup_id|
+          {
+            "to_record_id": lookup_id
+          }
+        end
+      end
+  end
+
   # Associations cache is used for bulk fetching all the associations for lookup and parent entities
   # key is always the referring entity
   # value is an hash having inputs as keys and the association ID as the value
-  def cache_associations(context, input:, master_schema:, **)
-    context[:association_cache] = association_cache = {}
-    context[:input].each do |row|
-      master_schema.entities.each do |entity|
-        next unless entity.type?(:lookup) or entity.type?(:parent_lookup)
+  # def cache_associations(context, input:, master_schema:, **)
+  #   context[:association_cache] = association_cache = {}
+  #   context[:input].each do |row|
+  #     master_schema.entities.each do |entity|
+  #       next unless entity.type?(:lookup) or entity.type?(:multi_lookup)
 
-        association_cache[entity] ||= {}
-        next if row[entity.entity_key].blank?
-        association_cache[entity][row[entity.entity_key]] = nil
-      end
-    end
+  #       association_cache[entity] ||= {}
+  #       next if row[entity.entity_key].blank?
+  #       if entity.type?(:lookup)
+  #         association_cache[entity][row[entity.entity_key]] = nil
+  #       elsif entity.type?(:multi_lookup)
+  #         row[entity.entity_key].split(',').each do |lookup_id|
+  #           association_cache[entity][lookup_id] = nil
+  #         end
+  #     end
+  #   end
 
-    association_cache.each do |entity, inputs|
-      if entity.type?(:lookup)
-        entity.lookup_master_schema.record_model_class.where(company_id: entity.company_id, entity.lookup_master_schema.primary_entity_key => inputs.keys).each { |record|
-          inputs[record.send(entity.lookup_master_schema.primary_entity_key)] = record.id
-        }
-      elsif entity.type?(:parent_lookup)
-        master_schema.record_model_class.where(company_id: entity.company_id, master_schema.primary_entity_key => inputs.keys).each { |record|
-          inputs[record.send(master_schema.primary_entity_key)] = record.id
-        }
-      end
-    end
-  end
+  #   association_cache.each do |entity, inputs|
+  #     if entity.type?(:lookup)
+  #       entity.lookup_master_schema.record_model_class.where(company_id: entity.company_id, entity.lookup_master_schema.primary_entity_key => inputs.keys).each { |record|
+  #         inputs[record.send(entity.lookup_master_schema.primary_entity_key)] = record.id
+  #       }
+  #     end
+  #   end
+  # end
 
   def import_data(context, contract:, master_schema:, association_cache:, params:, model:, model_class:, **)
     context[:result] = []
@@ -90,13 +109,13 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
     skipped_records = 0
     context[:input].each do |row|
       data = row.values
-      pre_process_result = pre_process(context, row)
+      # pre_process_result = pre_process(context, row)
 
-      if pre_process_result.failure?
-        import_result = pre_process_result
-      else
+      # if pre_process_result.failure?
+      #   import_result = pre_process_result
+      # else
         import_result = import_row(context, master_schema, contract, model_class, row)
-      end
+      # end
 
       if import_result.success?
         data << 'Success'
@@ -174,7 +193,7 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
       return Failure(contract.model.errors.full_messages.join(','))
     end
 
-    update_association_cache(context, contract.model)
+    # update_association_cache(context, contract.model)
 
     Success({action: action})
   end
@@ -193,42 +212,42 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
     context[:identifier_key]
   end
 
-  def pre_process(context, row)
-    pre_process_associations(context, row)
-  end
+  # def pre_process(context, row)
+  #   pre_process_associations(context, row)
+  # end
 
-  def pre_process_associations(context, row)
-    association_cache = context[:association_cache]
-    errors = []
-    if association_cache.present?
-      association_cache.each do |entity, inputs|
-        value = row[entity.entity_key]
-        next if value.blank?
+  # def pre_process_associations(context, row)
+  #   association_cache = context[:association_cache]
+  #   errors = []
+  #   if association_cache.present?
+  #     association_cache.each do |entity, inputs|
+  #       value = row[entity.entity_key]
+  #       next if value.blank?
 
-        if inputs[value].blank?
-          errors << "#{value} not found for #{entity.label}"
-        else
-          row[entity.entity_key] = inputs[value]
-        end
-      end
-    end
+  #       if inputs[value].blank?
+  #         errors << "#{value} not found for #{entity.label}"
+  #       else
+  #         row[entity.entity_key] = inputs[value]
+  #       end
+  #     end
+  #   end
 
-    if errors.blank?
-      Success()
-    else
-      Failure(errors.join(", "))
-    end
-  end
+  #   if errors.blank?
+  #     Success()
+  #   else
+  #     Failure(errors.join(", "))
+  #   end
+  # end
 
   # Add newly created records to the association cache to allow associating it with subsequent records
-  def update_association_cache(context, model)
-    master_schema = context[:master_schema]
-    association_cache = context[:association_cache]
-    master_schema.entities.each do |entity|
-      next unless entity.type?(:parent_lookup)
+  # def update_association_cache(context, model)
+  #   master_schema = context[:master_schema]
+  #   association_cache = context[:association_cache]
+  #   master_schema.entities.each do |entity|
+  #     next unless entity.type?(:parent_lookup)
 
-      association_cache[entity][model.send(master_schema.primary_entity_key)] = model.id
-    end
-  end
+  #     association_cache[entity][model.send(master_schema.primary_entity_key)] = model.id
+  #   end
+  # end
 
 end
