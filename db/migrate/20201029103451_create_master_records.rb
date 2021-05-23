@@ -2,7 +2,7 @@ class CreateMasterRecords < ActiveRecord::Migration[6.0]
   def change
     create_table :master_records do |t|
       t.integer :master_schema_id, index: true, foreign_key: true, references: 'master_schemas', null: false
-      t.integer :parent_id, references: 'master_records', foreign_key: true, index: true
+      t.string :ancestry
       t.datetime :start_date, index: true
       t.datetime :end_date, index: true
       t.integer :company_id, index: true, references: 'companies', foreign_key: true
