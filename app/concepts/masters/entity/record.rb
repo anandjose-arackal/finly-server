@@ -26,7 +26,7 @@ module Masters::Entity::Record
 
       # set ancestry if nesting enabled
       if master_schema.has_nesting
-        belongs_to :parent, anonymous_class: self, optional: true
+        has_ancestry
       end
 
       unless master_schema.system_master

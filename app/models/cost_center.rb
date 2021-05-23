@@ -28,11 +28,7 @@ include Searchkick::Api
 
   acts_as_sequenced column: :cost_center_code, purpose: :cost_center, editable: false, prefix: 'CC'
 
-  has_ancestry ancestry_column: :parent_id
-
-  # This is support for old attributes which we were renamed during the masters generalization
-  alias_attribute :ancestry, :parent_id
-  belongs_to :parent, class_name: 'CostCenter', optional: true
+  has_ancestry
 
   belongs_to :company, optional: true
   belongs_to :created_by, optional: true, class_name: 'User'

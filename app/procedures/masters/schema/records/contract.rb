@@ -17,7 +17,9 @@ class Masters::Schema::Records::Contract
       property :company, deserializer: -> (input, represented, **) {}
 
       if master_schema.has_nesting
-        property :parent_id, default: nil
+        property :parent_id, virtual: true, default: nil, deserializer: -> (input, represented, *args) do
+          represented.ancestry = input["parent_id"]
+        end
       end
 
       master_schema.entities.each do |entity|
