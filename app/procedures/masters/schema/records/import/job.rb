@@ -70,6 +70,7 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
           }
         end
       end
+    end
   end
 
   # Associations cache is used for bulk fetching all the associations for lookup and parent entities
