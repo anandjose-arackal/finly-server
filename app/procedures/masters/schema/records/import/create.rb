@@ -1,7 +1,7 @@
 class Masters::Schema::Records::Import::Create < Masters::Schema::Records::Base
   include Transactions::BackgroundWorker
 
-  step RecordModelClass()
+  step Model(ImportJob, :new)
   step Policy::Pundit(Masters::Schema::Records::Policy, :import?)
   step Contract::Build(constant: Masters::Schema::Records::Import::Contract)
   step Contract::Validate()
