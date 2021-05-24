@@ -20,7 +20,11 @@ class ImportJobs::Index < IndexBuilder::API
   end
 
   column :attachment, default: true do
-    # Todo
+    action :button,
+      :attachment,
+      label: 'Download',
+      icon: 'https://img.icons8.com/windows/28/2e92f4/software-installer.png',
+      url: '{{record.attachment.url}}'
   end
 
   counter -> (user, collection) do
