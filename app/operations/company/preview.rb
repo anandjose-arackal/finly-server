@@ -9,6 +9,7 @@ class Company::Preview < BaseOperation
   end
 
   def init
+    params[:preview][:phone_number] = params[:mobile_number]
     self.preview_parameters = preview_params
     self.referrer = preview_parameters[:referrer]
   end
@@ -59,6 +60,6 @@ class Company::Preview < BaseOperation
   private
 
   def preview_params
-    params.require(:preview).permit(:name, :phone_number, :mobile_number, :email, :company, :source, :source_description, :referrer, :url)
+    params.require(:preview).permit(:name, :phone_number, :email, :company, :source, :source_description, :referrer, :url)
   end
 end
