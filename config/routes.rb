@@ -4208,6 +4208,7 @@ Rails.application.routes.draw do
   get 'exports/:type', to: 'export_jobs#create'
   post 'exports/:type', to: 'export_jobs#create'
   resources :export_jobs, only: [:index]
+  resources :import_jobs, only: [:index]
   get 'maps/config/:type', to: 'google_maps#maps_config'
 
   scope :streamsets do

@@ -32,6 +32,7 @@
 
 class ImportJob < ApplicationRecord
   include UUIDHelper
+  include Exposures::Model::Exposable
 
   belongs_to :created_by, class_name: 'User', optional: true
   belongs_to :company
@@ -50,8 +51,24 @@ class ImportJob < ApplicationRecord
   serialize :request_params, JSON
   serialize :options, JSON
 
-  def to_exposure
-    ImportJobExposure.new(self)
+  def as_json(options = {})
+    {
+      id: id,
+      name: name,
+      description: description,
+      type: type,
+      completed_at: completed_at&.strftime("%I:%M%p, %d-%m-%Y"),
+      total_records: (total_records || 0),
+      created_records: (created_records || 0),
+      updated_records: (updated_records || 0),
+      skipped_records: (skipped_records || 0),
+      failed_records: (failed_records || 0),
+      completed_records: (completed_records || 0),
+      completion_percentage: (completion_percentage || 0),
+      attachment: attachment&.url,
+      created_at: created_at&.strftime("%I:%M%p, %d-%m-%Y"),
+      status: status&.name
+    }
   end
 
 end

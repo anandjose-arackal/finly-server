@@ -1,8 +1,7 @@
 class ImportJobsController < BaseControllers::WebBase
+  layout 'trailblazers'
 
   def index
-    @result = ExportManager::Jobs::Index.(current_user, params)
-    respond
+    endpoint ImportJobs::Ops::Index
   end
-
 end
