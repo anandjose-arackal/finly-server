@@ -1,5 +1,7 @@
 class Masters::Schema::Records::Import::Contract < Reform::Form
 
+  property :created_by_id
+  property :company_id, validates: { presence: true }
   property :name, deserializer: -> (input, represented, **) {
     represented.name = input[:master_key]
   }

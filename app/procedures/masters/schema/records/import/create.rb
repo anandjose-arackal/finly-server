@@ -3,7 +3,7 @@ class Masters::Schema::Records::Import::Create < Masters::Schema::Records::Base
 
   step Model(ImportJob, :new)
   step Policy::Pundit(Masters::Schema::Records::Policy, :import?)
-  step AssignModelUser()
+  step Transactions::API::AssignModelUser(key: :created_by)
   step Contract::Build(constant: Masters::Schema::Records::Import::Contract)
   step Contract::Validate()
   step Contract::Persist()

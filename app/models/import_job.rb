@@ -33,7 +33,7 @@
 class ImportJob < ApplicationRecord
   include UUIDHelper
 
-  belongs_to :created_by, class_name: 'User'
+  belongs_to :created_by, class_name: 'User', optional: true
   belongs_to :company
   belongs_to :status, class_name: 'ImportJobStatus'
 
