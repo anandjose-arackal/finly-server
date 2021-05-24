@@ -1,11 +1,13 @@
 class Masters::Schema::Records::Import::Contract < Reform::Form
 
-  property :name, validates: {presence: true}
+  property :name, deserializer: -> (input, represented, **) {
+    represented.name = input[:master_key]
+  }
   property :request_params, deserializer: -> (input, represented, **) {represented.request_params = input}
   property :options, deserializer: -> (input, represented, **) {
     represented.options = {
         master_schema: input[:master_key],
-        mode: input[:mode]
+        mode: 'create'
     }
   }
   property :status_id, deserializer: -> (input, represented, **) {represented.status_id = ImportJobStatus.id_for(:pending)}
