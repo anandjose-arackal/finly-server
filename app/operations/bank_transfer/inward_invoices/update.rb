@@ -124,11 +124,12 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
           item_amount = po_item.taxable_amount.value
         end
 
-        invoiced_line_items = self.procurement.invoices.joins(:items).where('invoice_line_items.purchase_order_item_id = ?', invoice_line_item.purchase_order_item_id)
+        invoiced_line_items = procurement.invoices.joins(items: :taxable_amount).where('invoice_line_items.purchase_order_item_id = ?', invoice_line_item.purchase_order_item_id)
+        #invoiced_line_items holding joined active record query on line item
         invoiced_line_items_except_current_item = invoiced_line_items.where('invoice_line_items.id != ?', item[:id])
         invoiced_total_qty = 0
         invoiced_total_qty = invoiced_line_items_except_current_item.sum('invoice_line_items.quantity').to_f
-        invoiced_total_amount = invoiced_line_items_except_current_item.joins(:taxable_amount).sum('amounts.value')
+        invoiced_total_amount = invoiced_line_items_except_current_item.sum('amounts.value')
 
         if item_q < (invoiced_total_qty + item[:quantity].to_f)
           add_message :error, "Invoiced item quantity should be on par with the Purchase Order quantity."
