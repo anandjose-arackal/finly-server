@@ -32,7 +32,7 @@ module ActionManager::Builder
 
   def build_config(options)
     if options[:record].present?
-      record.to_exposure.template(config)
+      options[:record].to_exposure.template(config)
     else
       config
     end
