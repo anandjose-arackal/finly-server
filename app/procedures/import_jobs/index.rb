@@ -24,7 +24,7 @@ class ImportJobs::Index < IndexBuilder::API
       :attachment,
       label: 'Download',
       icon: 'https://img.icons8.com/windows/28/2e92f4/software-installer.png',
-      url: '{{record.attachment.url}}'
+      url: '{{record.attachment_url}}'
   end
 
   counter -> (user, collection) do

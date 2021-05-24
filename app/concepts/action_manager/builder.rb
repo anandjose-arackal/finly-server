@@ -31,7 +31,11 @@ module ActionManager::Builder
   end
 
   def build_config(options)
-    config
+    if options[:record].present?
+      record.to_exposure.template(config)
+    else
+      config
+    end
   end
 
   def as_json(options)
