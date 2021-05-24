@@ -4401,6 +4401,10 @@ Rails.application.routes.draw do
   namespace :masters do
     scope ":master_key" do
       scope "records" do
+        scope "import" do
+          post '', to: "records#import"
+          get 'template', to: "records#import_template"
+        end
         post '/', to: 'records#create'
         get '/', to: 'records#index'
         get '/:id', to: 'records#show'
@@ -4418,11 +4422,6 @@ Rails.application.routes.draw do
       scope "lookup" do
         get '', to: "record_lookup#route"
         post '', to: "record_lookup#route"
-      end
-
-      scope "import" do
-        post '', to: "records#import"
-        get 'template', to: "records#import_template"
       end
     end
 
