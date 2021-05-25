@@ -192,8 +192,8 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
   section :billing_address do
     lookup :location_id, label: 'Billing Address', choices_scope: Choices[:lookup].('locations'),
            filters: Rules::Builder['billable_location'].true, required: true
-    # text :name, editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.gstin}}')
-    # text :gstin, editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.name}}')
+    text :billing_address_name, label: 'Name', editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.gstin}}')
+    text :billing_address_gstin, label: 'Gstin', editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.name}}')
     large_text :billing_address, computed: Forms::Compute::Lookup('location_id', '{{record.address}}')
   end
 
@@ -201,8 +201,8 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
   section :shipping_address do
     lookup :delivery_location_id, label: 'Shipping Address', choices_scope: Choices[:lookup].('locations'),
            filters: Rules::Builder['shippable_location'].true, required: true
-    # text :name, editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.gstin}}')
-    # text :gstin, editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.name}}')
+    text :shipping_address_name, label: 'Name', editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.gstin}}')
+    text :shipping_address_gstin, label: 'Gstin', editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.name}}')
     large_text :shipping_address, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.address}}')
   end
 
@@ -435,7 +435,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_paid_outside_amount])
 
-      amount :invoice_roundoff_amount, label: 'Roundoff Amount', visible: true, editable: false,
+      number :invoice_roundoff_amount, label: 'Roundoff Amount', visible: true, editable: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_roundoff_amount]) # todo - changd name
 
       amount :reporting_invoice_roundoff_amount, label: 'Roundoff Amount(Reporting Currency)', editable: false, visible: false,
