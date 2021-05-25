@@ -1509,10 +1509,22 @@ class Invoice < ApplicationRecord
   end
 
   def forms_enabled
-    feature_flag_enabled = NonPoInvoiceToggle.new(RequestStoreUtil.current_user).enabled?
+    if RequestStoreUtil.current_user.blank?
+      feature_flag_enabled = true
+    else
+      feature_flag_enabled = NonPoInvoiceToggle.new(RequestStoreUtil.current_user).enabled?
+    end
     is_non_po_invoice = self&.invoice_type&.non_po_invoice? || false
     feature_flag_enabled && is_non_po_invoice
   end
+
+  def bank_payment_request_policies(user)
+    role_filter = {}
+    role_filter[:filter_role_id] = [UserRole.id_for(:bank_payment_request_initiator)]
+    bank_payment_request_policies = Policy::VendorPayments::Index.(user, role_filter).policies rescue Policy.none
+    bank_payment_request_policies.pluck(:id, :name)
+  end
+
   private
 
   # def payment_agreement_updations
@@ -2077,8 +2089,6 @@ class Invoice < ApplicationRecord
   #     end
   #   end
   # end
-
-
 
 end
 
