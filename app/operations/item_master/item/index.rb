@@ -36,7 +36,7 @@ class ItemMaster::Item::Index < ItemMaster::Item::Base
           item['tds_applicable'] = item_ref.tds_applicable
           item['category_id_value'] = item_ref.category&.name.to_s
           item['tax_rate_id_value'] = item_ref.tax_rate&.name.to_s
-          item['product_type_id_value'] = item_ref.goods? 'Goods' : 'Service'
+          item['product_type_id_value'] = item_ref.goods? ? 'Goods' : 'Service'
           item['tax_percentage'] = item_ref.tax_rate&.rate.to_f
           item['item_rate'] = item_ref.rate
           final_item << item
