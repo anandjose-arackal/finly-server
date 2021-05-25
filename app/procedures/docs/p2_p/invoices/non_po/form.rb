@@ -101,7 +101,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
     date :date,
          label: "Invoice Date",
-         required: true,
+         required: true, computed: Forms::Compute::Form('{{ form.date | default: "now" | date: "%Y-%m-%d" }}'),
          restriction: 'not_in_the_future'
 
     lookup :payment_term_id,
