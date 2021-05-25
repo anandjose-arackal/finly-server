@@ -1522,7 +1522,7 @@ class Invoice < ApplicationRecord
     role_filter = {}
     role_filter[:filter_role_id] = [UserRole.id_for(:bank_payment_request_initiator)]
     bank_payment_request_policies = Policy::VendorPayments::Index.(user, role_filter).policies rescue Policy.none
-    bank_payment_request_policies.pluck(:id, :name)
+    bank_payment_request_policies
   end
 
   private
