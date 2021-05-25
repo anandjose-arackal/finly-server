@@ -13,4 +13,13 @@ class PurchaseOrderItemExposure < Exposures::API
   attribute :total_amount, record_attribute: true, exposure: true
   attribute :discount, record_attribute: true
   attribute :discount_amount, record_attribute: true, exposure: true
+
+  attribute :department, includes: [:department], exposure: true do
+    (record.parent.cost_allocation_items ? record.department : record.parent.department)
+  end
+
+  attribute :cost_center, includes: [:cost_center], exposure: true do
+    (record.parent.cost_allocation_items ? record.cost_center : record.parent.cost_center)
+  end
+
 end
