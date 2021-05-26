@@ -60,6 +60,9 @@ class PurchaseOrderItem < ApplicationRecord
   belongs_to :department, optional: true
   belongs_to :purchase_request_item, optional: true
 
+  alias_attribute :items_department_id, :department_id
+  alias_attribute :items_cost_center_id, :cost_center_id
+  
   # link to budget trails table
   has_many :budget_trails, as: :entity
   has_paper_trail(

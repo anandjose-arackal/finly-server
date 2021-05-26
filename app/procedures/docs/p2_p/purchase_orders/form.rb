@@ -19,8 +19,8 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
       item_discount_amount:  "{% if form.discount_type_id == 1 %}{{ row.item_gross_amount | times: row.discount | divided_by: 100 | default: 0 | round: 2  }}{% else %}{{ row.discount | default: 0 }}{% endif %}",
       item_taxable_amount: "{{ row.item_gross_amount | minus: row.item_discount_amount | default: 0 | round: 2  }}",
       item_tax_amount: "{{ row.item_taxable_amount | times: row.tax_percentage | divided_by: 100 | default: 0 | round: 2  }}",
-      item_tds_amount: "{% if row.tds_applicable == 'true' %}{{ row.item_taxable_amount | times: form.tds_percentage | divided_by: 100 | default: 0 | round: 2  }}{% else %}{{ 0 }}{% endif %}",
-      item_net_amount: "{% if form.rcm_enabled == true %}{{ row.item_taxable_amount | default: 0 | round: 2 }}{% else %}{{ row.item_taxable_amount | plus: row.item_tax_amount | default: 0 | round: 2 }}{% endif %}",
+      # item_tds_amount: "{% if row.tds_applicable == 'true' %}{{ row.item_taxable_amount | times: form.tds_percentage | divided_by: 100 | default: 0 | round: 2  }}{% else %}{{ 0 }}{% endif %}",
+      item_net_amount: "{{ row.item_taxable_amount | plus: row.item_tax_amount | default: 0 | round: 2 }}",
       item_billable_amount:  "{{ row.item_taxable_amount| default: 0 | round: 2 }}",
         
         # CONVERTED VALUES
@@ -28,49 +28,51 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
       reporting_item_discount_amount: " {{ row.item_discount_amount | times: form.conversion_rate | default: 0 | round: 2}}",
       reporting_item_taxable_amount: "{{ row.item_taxable_amount | times: form.conversion_rate | default: 0 | round: 2}}",
       reporting_item_tax_amount: "{{ row.item_tax_amount | times: form.conversion_rate | default: 0 | round: 2  }}",
-      reporting_item_tds_amount: "{{ row.item_tds_amount | times: form.conversion_rate | default: 0 | round: 2  }}",
+      # reporting_item_tds_amount: "{{ row.item_tds_amount | times: form.conversion_rate | default: 0 | round: 2  }}",
       reporting_item_net_amount: "{{ row.item_net_amount | times: form.conversion_rate | default: 0 | round: 2  }}",
       reporting_item_billable_amount: " {{ row.item_billable_amount | times: form.conversion_rate | default: 0 | round: 2  }}"
     },
 
     # PURCHASE ORDER SUMMARY
     summary: {
-      gross_amount: "{% assign gross_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign gross_amount = gross_amount | plus: item.item_gross_amount %}{% endif %}{% endfor %}{{ gross_amount | default: 0 | round: 2 }}",
-      discount_amount: "{% assign discount_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign discount_amount = discount_amount | plus: item.item_discount_amount %}{% endif %}{% endfor %}{{ discount_amount | default: 0 | round: 2 }}",
-      taxable_amount: "{{ form.gross_amount | minus: form.discount_amount | default: 0 | round: 2}}",
-      tax_amount: "{% assign tax_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign tax_amount = tax_amount | plus: item.item_tax_amount %}{% endif %}{% endfor %}{{ tax_amount  | default: 0 | round: 2}}",
-      freight_amount: "{{ form.freight_amount | default: 0 | round: 2}}",
+      po_gross_amount: "{% assign gross_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign gross_amount = gross_amount | plus: item.item_gross_amount %}{% endif %}{% endfor %}{{ gross_amount | default: 0 | round: 2 }}",
+      po_discount_amount: "{% assign discount_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign discount_amount = discount_amount | plus: item.item_discount_amount %}{% endif %}{% endfor %}{{ discount_amount | default: 0 | round: 2 }}",
+      po_taxable_amount: "{{ form.po_gross_amount | minus: form.po_discount_amount | default: 0 | round: 2}}",
+      po_tax_amount: "{% assign tax_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign tax_amount = tax_amount | plus: item.item_tax_amount %}{% endif %}{% endfor %}{{ tax_amount  | default: 0 | round: 2}}",
+      
       # NET AMOUNT
-      sub_total_amount: "{% assign inv_sub_total_amount = form.gross_amount | minus: form.discount_amount | plus: form.tax_amount | plus: form.freight_amount | round: 2 %}{% if form.rcm_enabled == true  %}{{ inv_sub_total_amount | minus: form.tax_amount | default: 0 | round: 2}}{% else %}{{ inv_sub_total_amount | default: 0 | round: 2 }}{% endif %}",
+      po_sub_total_amount: "{% assign inv_sub_total_amount = form.po_gross_amount | minus: form.po_discount_amount | plus: form.po_tax_amount | round: 2 %}{{ inv_sub_total_amount | default: 0 | round: 2 }}",
       
-      paid_outside_amount: "{{ form.paid_outside_amount | default: 0 | round: 2}}",
-      tds_amount: "{% assign tds_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign tds_amount = tds_amount | plus: item.item_tds_amount %}{% endif %}{% endfor %}{{ tds_amount  | default: 0 | ceil}}",
-      
+      # po_paid_outside_amount: "{{ form.paid_outside_amount | default: 0 | round: 2}}",
+      # po_tds_amount: "{% assign tds_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign tds_amount = tds_amount | plus: item.item_tds_amount %}{% endif %}{% endfor %}{{ tds_amount  | default: 0 | ceil}}",
+
       #### net payable amount 
-      roundoff_amount: "{% assign net_total_amount = form.sub_total_amount | minus: form.paid_outside_amount | minus: form.tds_amount %}{% assign round_amount = net_total_amount | round %}{% assign amount = round_amount | minus: net_total_amount %}{% if form.base_currency != '1' %}{% assign amount = 0 %}{% endif %}{{ amount | default: 0 | round: 2 }}",
-      total_amount: "{{ form.sub_total_amount | plus: form.roundoff_amount | minus: form.tds_amount | minus: form.paid_outside_amount | default: 0 | round: 2}}",
-      
+      po_roundoff_amount: "{% assign net_total_amount = form.po_sub_total_amount %}{% assign round_amount = net_total_amount | round %}{% assign amount = round_amount | minus: net_total_amount %}{% if form.base_currency_id != '1' %}{% assign amount = 0 %}{% endif %}{{ amount | default: 0 | round: 2 }}",
+      po_total_amount: "{{ form.po_sub_total_amount | plus: form.po_roundoff_amount | default: 0 | round: 2}}",
+
       #### net payable amount has roundoff value added
-      net_total_amount: "{% if form.base_currency != '1' %}{{ form.total_amount | default: 0 | round: 2 }}{% else %}{{ form.total_amount | default: 0 | round }}{% endif %}",
-      advance_paid_amount: "{{ form.advance_paid_amount | default: 0 | round: 2}}",
-      balance_due: "{{ form.total_amount | minus: form.advance_paid_amount | default: 0 | round: 2}}",
+      # po_net_total_amount: "{% if form.base_currency != '1' %}{{ form.total_amount | default: 0 | round: 2 }}{% else %}{{ form.total_amount | default: 0 | round }}{% endif %}",
+      # po_advance_paid_amount: "{{ form.advance_paid_amount | default: 0 | round: 2}}",
+
+      po_balance_due: "{{ form.po_total_amount | default: 0 | round: 2}}",
+
+
 
       # CONVERTED VALUES
-      reporting_gross_amount: "{{ form.gross_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_discount_amount: "{{ form.discount_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_taxable_amount: "{{ form.taxable_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_tax_amount: "{{ form.tax_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_freight_amount: "{{ form.freight_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_sub_total_amount: "{{ form.sub_total_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_paid_outside_amount: "{{ form.paid_outside_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_tds_amount: "{{ form.tds_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_roundoff_amount: "{% assign amount = form.reporting_sub_total_amount | round %}{% assign amount = amount | minus: form.reporting_sub_total_amount %}{% if form.base_currency != '1' %}{% assign amount = 0 %}{% endif %}{{ amount | default: 0 | round: 2}}",
-      # reporting_total_amount: "{% assign amount = form.reporting_sub_total_amount | plus: form.reporting_roundoff_amount %}{% if form.base_currency != '1' %}{% assign amount = form.reporting_sub_total_amount %}{% endif %}{{ amount | default: 0 | round: 2 }}",
-      reporting_total_amount: "{{ form.total_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      
-      reporting_net_total_amount: "{{ form.net_total_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_advance_paid_amount: "{{ form.advance_paid_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_balance_due: "{{ form.balance_due | times: form.conversion_rate | default: 0 | round: 2}}"
+      reporting_po_gross_amount: "{{ form.po_gross_amount | times: form.conversion_rate | default: 0 | round: 2}}",
+      reporting_po_discount_amount: "{{ form.po_discount_amount | times: form.conversion_rate | default: 0 | round: 2}}",
+      reporting_po_taxable_amount: "{{ form.po_taxable_amount | times: form.conversion_rate | default: 0 | round: 2}}",
+      reporting_po_tax_amount: "{{ form.po_tax_amount | times: form.conversion_rate | default: 0 | round: 2}}",
+      reporting_po_sub_total_amount: "{{ form.po_sub_total_amount | times: form.conversion_rate | default: 0 | round: 2}}",
+
+      # reporting_po_paid_outside_amount: "{{ form.paid_outside_amount | times: form.conversion_rate | default: 0 | round: 2}}",
+      # reporting_po_tds_amount: "{{ form.tds_amount | times: form.conversion_rate | default: 0 | round: 2}}",
+      # reporting_po_roundoff_amount: "{% assign amount = form.reporting_sub_total_amount | round %}{% assign amount = amount | minus: form.reporting_sub_total_amount %}{% if form.base_currency != '1' %}{% assign amount = 0 %}{% endif %}{{ amount | default: 0 | round: 2}}",
+      reporting_po_roundoff_amount: "{{ form.po_roundoff_amount | times: form.conversion_rate | default: 0 | round: 2}}", # This is wrong calculation need to correct it later
+      reporting_po_total_amount: "{{ form.po_total_amount | times: form.conversion_rate | default: 0 | round: 2}}",
+      # reporting_po_net_total_amount: "{{ form.net_total_amount | times: form.conversion_rate | default: 0 | round: 2}}",
+      # reporting_po_advance_paid_amount: "{{ form.advance_paid_amount | times: form.conversion_rate | default: 0 | round: 2}}",
+      reporting_po_balance_due: "{{ form.po_balance_due | times: form.conversion_rate | default: 0 | round: 2}}"
     }
   }
 
@@ -115,19 +117,15 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
 
   # ACCOUNTING DETAILS
   section :accounting_details, title: "Accounting Details", associate_custom_fields: true do
-    lookup :policy_id,
-           choices_scope: Choices[:lookup].('policies'),
-           required: true, editable: false
-
+    lookup :policy_id, choices_scope: Choices[:lookup].('policies'), required: true, editable: false
     lookup :department_id, label: "Department", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('departments') #, editable: false, visible: false
     lookup :cost_center_id, label: "Cost Center", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('cost_centers')
     dropdown :discount_type_id, label: "Discount Type", editable: true, visible: true, required: true, choices_scope: Choices[:list].({ id: 1, name: 'Percentage' }, { id: 2, name: 'Amount' }), default_value: 1
     dropdown :gst_type_id, label: "Tax Type", editable: true, visible: true, choices_scope: Choices[:list].(*TaxType.all.map { |v| { id: v.id, name: v.name } })
-
     date :conversion_date, label: "Conversion Date", editable: false, visible: true, computed: Forms::Compute::Form('{{form.created_at}}')
     lookup :reporting_currency_id, label: "Reporting Currency", editable: false, visible: true, can_editable_be_changed: false
     lookup :base_currency_id, label: "Base Currency", choices_scope: Choices[:lookup].('form_currencies'), visible: true, editable: true
-    number :conversion_rate, editable: true, format: 'decimal', default_value: 1, computed: Forms::Compute::Lookup('base_currency', '{{ record.currency_conversion_rate }}'), visible: true
+    number :conversion_rate, editable: true, format: 'decimal', default_value: 1, computed: Forms::Compute::Lookup('base_currency_id', '{{ record.currency_conversion_rate }}'), visible: true
   end
 
   # VENDOR DETAILS
@@ -148,6 +146,9 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
            filters: Rules::Builder[:account_owner_id].eq(entity: 'vendor_id').and(Rules::Builder[:account_owner_type].eq(value: 'YesBankVendor')),
            editable: true, visible: true, required: true
 
+    text :vendor_poc_name, lable: 'Poc Name', visible: true
+    text :vendor_poc_email, lable: 'Poc Emal', visible: true
+    text :vendor_poc_mobile_number, lable: 'Poc Mobile Number', visible: true
 
     # need to add these fields as system fields
     text :vendor_bank_account_number, editable: false, can_editable_be_changed: false, computed: Forms::Compute::Lookup('bank_account_id', '{{record.account_number}}')
@@ -159,8 +160,8 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
   section :billing_address do
     lookup :location_id, label: 'Company Address', choices_scope: Choices[:lookup].('locations'),
            filters: Rules::Builder['billable_location'].true, required: true
-    # text :name, editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.gstin}}')
-    # text :gstin, editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.name}}')
+    text :billing_address_name, editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.gstin}}')
+    text :billing_address_gstin, editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.name}}')
     large_text :billing_address, computed: Forms::Compute::Lookup('location_id', '{{record.address}}')
   end
 
@@ -168,8 +169,8 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
   section :shipping_address do
     lookup :delivery_location_id, label: 'Delivery Address', choices_scope: Choices[:lookup].('locations'),
            filters: Rules::Builder['shippable_location'].true, required: true
-    # text :name, editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.gstin}}')
-    # text :gstin, editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.name}}')
+    text :shipping_address_name, editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.gstin}}')
+    text :shipping_address_gstin, editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.name}}')
     large_text :shipping_address, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.address}}')
   end
 
@@ -179,15 +180,12 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
       number :id, visible: false, editable: false, internal: true, can_visible_be_changed: false, can_editable_be_changed: false
 
       lookup :inventory_line_item_id, label: "Item",
-             can_visible_be_changed: false,
-             can_editable_be_changed: false,
+             can_visible_be_changed: false, can_editable_be_changed: false,
              choices_scope: Choices[:lookup].('items'),
              required: true, editable: true, visible: true
 
-      text :description, editable: false,
-           can_editable_be_changed: false,
-           can_visible_be_changed: false, visible: false,
-           computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.description}}')
+      text :description, editable: false, can_editable_be_changed: false, can_visible_be_changed: false,
+          visible: false, computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.description}}')
 
       text :comment, label: "Narration"
       text :item_number, label: "Item Code", editable: false, 
@@ -291,134 +289,105 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
   # PURCHASE ORDER ITEMS SUMMARY
   section :summary do
     summary :items_summary do
-      amount :gross_amount, label: 'Gross Amount', editable: false, visible: true,
-             can_editable_be_changed: false,
+      amount :po_gross_amount, label: 'Gross Amount', editable: false, visible: true,
+             can_editable_be_changed: false, can_visible_be_changed: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:po_gross_amount])
+
+      amount :reporting_po_gross_amount, label: 'Gross Amount(Reporting Currency)', editable: false, visible: false,
              can_visible_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:gross_amount])
-
-      amount :reporting_gross_amount, label: 'Gross Amount(Reporting Currency)', editable: false, visible: false,
-             can_visible_be_changed: false,
              can_editable_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_gross_amount])
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_gross_amount])
 
-      amount :total_line_item_discount_amount, label: 'Total LineItem Discount Amount', editable: false,
-             can_editable_be_changed: false, visible: false, active: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:total_line_item_discount_amount])
-
-      amount :overall_discount_amount, label: 'Overall Discount Amount', editable: true, visible: false,
-             can_editable_be_changed: false, active: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:overall_discount_amount])
-
-      amount :discount_amount, label: "Total Discount", visible: true,
+      amount :po_discount_amount, label: "Total Discount", visible: true,
              editable: false, can_editable_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:discount_amount])
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:po_discount_amount])
 
-      amount :reporting_discount_amount, editable: false, visible: false,
+      amount :reporting_po_discount_amount, editable: false, visible: false,
              can_visible_be_changed: false, label: "Total Discount ( Reporting Currency )",
              can_editable_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_discount_amount])
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_discount_amount])
 
-      amount :taxable_amount, label: 'Taxable Amount', editable: false, visible: false,
+      amount :po_taxable_amount, label: 'Taxable Amount', editable: false, visible: false,
              can_editable_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:taxable_amount])
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:po_taxable_amount])
 
-      amount :reporting_taxable_amount, label: 'Taxable Amount(Reporting Currency)', editable: false, visible: false,
+      amount :reporting_po_taxable_amount, label: 'Taxable Amount(Reporting Currency)', editable: false, visible: false,
+             can_editable_be_changed: false, can_visible_be_changed: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_taxable_amount])
+
+      amount :po_tax_amount, label: 'Tax Amount', editable: false, visible: true,
              can_editable_be_changed: false,
-             can_visible_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_taxable_amount])
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:po_tax_amount])
 
-      amount :tax_amount, label: 'Tax Amount', editable: false, visible: true,
+      amount :reporting_po_tax_amount, label: 'Tax Amount(Reporting Currency)', editable: false, visible: false,
+             can_visible_be_changed: false, can_editable_be_changed: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_tax_amount])
+
+      amount :po_sub_total_amount, label: 'Net Amount', editable: false, visible: true,
+             can_visible_be_changed: false, can_editable_be_changed: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:po_sub_total_amount]) # todo - changd name
+
+      amount :reporting_po_sub_total_amount, label: 'Net Amount(Reporting Currency)', editable: false, visible: true,
+             can_visible_be_changed: false, can_editable_be_changed: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_sub_total_amount]) # todo - changd name
+
+      # lookup :tds_slab_id, choices_scope: Choices[:lookup].('tds_slabs'), visible: true # todo - condition when reporting currency is in INR
+
+      # number :tds_percentage, internal: true, editable: false, visible: true, # todo - condition when reporting currency is in INR
+      #        can_editable_be_changed: false,
+      #        computed: Forms::Compute::Lookup('items_summary.tds_slab_id', '{{record.tds}}')
+
+      # amount :po_tds_amount, label: 'Tds Amount', editable: false, visible: true, # todo - condition when reporting currency is in INR
+      #        can_editable_be_changed: false,
+      #        computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:po_tds_amount])
+
+      # amount :po_reporting_tds_amount, label: 'Tds Amount(Reporting Currency)', editable: false, visible: false,
+      #        can_visible_be_changed: false, can_editable_be_changed: false,
+      #        computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_tds_amount])
+
+      # amount :po_paid_outside_amount, label: "Advance Paid", default_value: 0, visible: true, editable: true
+
+      # amount :reporting_po_paid_outside_amount, label: "Advance Paid(Reporting Currency)", editable: false, visible: false,
+      #        can_visible_be_changed: false, can_editable_be_changed: false,
+      #        computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_paid_outside_amount])
+
+      amount :po_roundoff_amount, label: 'Roundoff Amount', visible: true, editable: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:po_roundoff_amount]) # todo - changd name
+
+      amount :reporting_po_roundoff_amount, label: 'Roundoff Amount(Reporting Currency)', editable: false, visible: false,
+             can_visible_be_changed: false, can_editable_be_changed: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_roundoff_amount]) # todo - changd name
+
+      amount :po_total_amount, label: 'Total Amount', editable: false, visible: false,
+             can_editable_be_changed: false, can_visible_be_changed: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:po_total_amount])
+
+      amount :reporting_po_total_amount, label: 'Total Amount(Reporting Currency)', editable: false, visible: false,
+             can_visible_be_changed: false, can_editable_be_changed: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_total_amount])
+
+      # amount :po_net_total_amount, label: "Net Payable", editable: false, visible: false,
+      #        can_editable_be_changed: false,
+      #        computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:po_net_total_amount])
+
+      # amount :reporting_po_net_total_amount, label: "Net Payable (Reporting Currency)", editable: false, visible: false,
+      #        can_editable_be_changed: false,
+      #        computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_net_total_amount])
+
+      # amount :po_advance_paid_amount, label: "Total Partial-Payment",
+      #        default_value: 0, editable: false, visible: true,
+      #        computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:po_advance_paid_amount])
+
+      # amount :reporting_po_advance_paid_amount, label: "Total Partial-Payment(Reporting Currency)", editable: false, visible: false,
+      #        can_visible_be_changed: false, can_editable_be_changed: false,
+      #        computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_advance_paid_amount])
+
+      amount :po_balance_due, label: "Balance Payable", editable: false, visible: true,
              can_editable_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:tax_amount])
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:po_balance_due])
 
-      amount :reporting_tax_amount, label: 'Tax Amount(Reporting Currency)', editable: false, visible: false,
-             can_visible_be_changed: false,
-             can_editable_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_tax_amount])
-
-      amount :freight_amount, label: "Freight",
-             default_value: 0, visible: true, editable: true,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:freight_amount])
-
-      amount :reporting_freight_amount, label: "Freight(Reporting Currency)", editable: false, visible: false,
-             can_visible_be_changed: false,
-             can_editable_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_freight_amount])
-
-      amount :sub_total_amount, label: 'Net Amount', editable: false, visible: true,
-             can_visible_be_changed: false,
-             can_editable_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:sub_total_amount]) # todo - changd name
-
-      amount :reporting_sub_total_amount, label: 'Net Amount(Reporting Currency)', editable: false, visible: true,
-             can_visible_be_changed: false,
-             can_editable_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_sub_total_amount]) # todo - changd name
-
-      lookup :tds_slab_id, choices_scope: Choices[:lookup].('tds_slabs'), visible: true # todo - condition when reporting currency is in INR
-
-      number :tds_percentage, internal: true, editable: false, visible: true, # todo - condition when reporting currency is in INR
-             can_editable_be_changed: false,
-             computed: Forms::Compute::Lookup('items_summary.tds_slab_id', '{{record.tds}}')
-
-      amount :tds_amount, label: 'Tds Amount', editable: false, visible: true, # todo - condition when reporting currency is in INR
-             can_editable_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:tds_amount])
-
-      amount :reporting_tds_amount, label: 'Tds Amount(Reporting Currency)', editable: false, visible: false,
-             can_visible_be_changed: false,
-             can_editable_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_tds_amount])
-
-      amount :paid_outside_amount, label: "Advance Paid",
-             default_value: 0, visible: true, editable: true
-
-      amount :reporting_paid_outside_amount, label: "Advance Paid(Reporting Currency)", editable: false, visible: false,
-             can_visible_be_changed: false,
-             can_editable_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_paid_outside_amount])
-
-      amount :roundoff_amount, label: 'Roundoff Amount', visible: true, editable: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:roundoff_amount]) # todo - changd name
-
-      amount :reporting_roundoff_amount, label: 'Roundoff Amount(Reporting Currency)', editable: false, visible: false,
-             can_visible_be_changed: false,
-             can_editable_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_roundoff_amount]) # todo - changd name
-
-      amount :total_amount, label: 'Total Amount', editable: false, visible: false,
-             can_editable_be_changed: false,
-             can_visible_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:total_amount])
-
-      amount :reporting_total_amount, label: 'Total Amount(Reporting Currency)', editable: false, visible: false,
-             can_visible_be_changed: false,
-             can_editable_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_total_amount])
-
-      amount :net_total_amount, label: "Net Payable", editable: false, visible: false,
-             can_editable_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:net_total_amount])
-
-      amount :reporting_net_total_amount, label: "Net Payable (Reporting Currency)", editable: false, visible: false,
-             can_editable_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_net_total_amount])
-
-      amount :advance_paid_amount, label: "Total Partial-Payment",
-             default_value: 0, editable: false, visible: true,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:advance_paid_amount])
-
-      amount :reporting_advance_paid_amount, label: "Total Partial-Payment(Reporting Currency)", editable: false, visible: false,
-             can_visible_be_changed: false,
-             can_editable_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_advance_paid_amount])
-
-      amount :balance_due, label: "Balance Payable", editable: false,
-             can_editable_be_changed: false, visible: true,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:balance_due])
-
-      amount :reporting_balance_due, label: "Balance Payable(Reporting Currency)", editable: false, visible: true,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_balance_due]),
+      amount :reporting_po_balance_due, label: "Balance Payable(Reporting Currency)", editable: false, visible: true,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_balance_due]),
              can_visible_be_changed: false, can_editable_be_changed: false
     end
   end
@@ -431,9 +400,9 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
 
   # VALIDATIONS
   validation validation_id: "Order Date Cannot be Later than Delivery Date" do
-    reference 'due_date'
+    reference 'delivery_date'
     error_message "Order Date Cannot be Later than Delivery Date"
-    rule Rules::Builder['due_date'].lt(entity: "date")
+    rule Rules::Builder['delivery_date'].lt(entity: "created_at")
   end
 
   # validation validation_id: "Conversion Rate must be greater than 0" do
@@ -513,14 +482,14 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
   #   action :required, false
   # end
 
-  condition condition_id: "Disable RCM for International > Rcm for International Vendors" do
-    reference :entity, 'rcm_enabled'
-    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
-    action :visible, false
-  end
+  # condition condition_id: "Disable RCM for International > Rcm for International Vendors" do
+  #   reference :entity, 'rcm_enabled'
+  #   rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+  #   action :visible, false
+  # end
 
   condition condition_id: "Base Currency non editable for Indian vendor" do
-    reference :entity, 'base_currency'
+    reference :entity, 'base_currency_id'
     rule Rules::Builder[:vendor_country].eq(value: 'India')
     action :editable, false
   end
@@ -576,19 +545,19 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
   end
 
   condition condition_id: "Hide Roundoff for different currency" do
-    reference :entity, 'items_summary.roundoff_amount'
+    reference :entity, 'items_summary.po_roundoff_amount'
     rule Rules::Builder[:base_currency].not_eq(value: '1')
     action :visible, false
   end
 
   condition condition_id: "Hide Net Amount (Reporting Currency)" do
-    reference :entity, 'items_summary.reporting_sub_total_amount'
+    reference :entity, 'items_summary.reporting_po_sub_total_amount'
     rule Rules::Builder[:base_currency].eq(value: '1')
     action :visible, false
   end
 
   condition condition_id: "Hide Reporting Balance Payable for indian currency" do
-    reference :entity, 'items_summary.reporting_balance_due'
+    reference :entity, 'items_summary.reporting_po_balance_due'
     rule Rules::Builder[:base_currency].eq(value: '1')
     action :visible, false
   end
