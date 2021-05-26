@@ -18,6 +18,7 @@
 class CardExpense < ApplicationRecord
   include SoftDeletable
 
+  belongs_to :company, optional: true
   belongs_to :card_transaction, optional: true
   belongs_to :expense, optional: true # foreign key would be expense_id
   belongs_to :surcharge, optional: true, class_name: 'Amount'

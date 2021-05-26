@@ -12,7 +12,7 @@
 #
 
 
-class Currency < ApplicationRecord
+class Currency < NonTenantedApplicationRecord
 
   has_many :amounts
 

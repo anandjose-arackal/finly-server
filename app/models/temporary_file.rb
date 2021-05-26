@@ -15,7 +15,7 @@
 #  deleted_at        :datetime
 #
 
-class TemporaryFile < ApplicationRecord
+class TemporaryFile < NonTenantedApplicationRecord
   has_attached_file :file, :use_timestamp => false
   do_not_validate_attachment_file_type :file
 end

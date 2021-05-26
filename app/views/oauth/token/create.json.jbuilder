@@ -1,7 +1,13 @@
 json.success true
 json.otp_verified @user.otp_verified
 json.kyc_required @user.company.kyc_required?
-json.expired @user.expired?
+
+if  @token.authentication_type == 'password'
+  json.expired @user.expired?
+else
+  json.expired false
+end
+
 json.data do
   json.access_token @token.token
   # json.token_type 'bearer'
@@ -20,6 +26,7 @@ json.data do
     json.id @user.company.id
     json.name @user.company.name
     json.d_code_assigned @user.company.d_code_enabled?
+    json.subdomain @user.company.subdomain
   end
 
   views = YamlUtils.load_yaml_erb("#{Rails.root}/config/data/feature_subscription.yml.erb", {current_company: @user.company, current_user: @user})

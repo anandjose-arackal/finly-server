@@ -47,6 +47,7 @@
 #
 
 class FeatureSubscription < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :subscribable, optional: true, polymorphic: true
 
   after_commit :create_company_utiity_bank_account

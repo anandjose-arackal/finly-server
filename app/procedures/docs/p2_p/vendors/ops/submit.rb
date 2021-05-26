@@ -1,8 +1,10 @@
 # Vendor Submit will first create the vendor & Then submit it
-
 class Docs::P2P::Vendors::Ops::Submit < Transactions::API
 
   step :init
+  # step Model(YesBankVendor, :find_by)
+  step Policy::Pundit(Masters::Vendors::Policy, :submit?)
+  step :validate_gstin
   step :update_policy
   step :set_approval_matrix
   step :submit
@@ -11,6 +13,7 @@ class Docs::P2P::Vendors::Ops::Submit < Transactions::API
   def init(options, current_user:, params:, **)
     if params[:reviewal_document].present?
       options[:reviewal_document] = params[:reviewal_document]
+
     else
       op = Docs::P2P::Vendors::Ops::Show.(params: {id: params[:vendor_form_id]}, current_user: current_user)
       unless op.success?
@@ -20,8 +23,23 @@ class Docs::P2P::Vendors::Ops::Submit < Transactions::API
       params[:reviewal_document] = op['model']
       options[:reviewal_document] = op['model']
     end
+    options[:model] = params[:reviewal_document]
+    params[:model] = params[:reviewal_document]
     true
   end
+
+  def validate_gstin(options, reviewal_document:, current_user:, params:, **)
+    gstin = GstinLocation.where(vendor_id: current_user.company.yes_bank_vendors.non_deleted.filter_unique_check).where(gstin: reviewal_document.gstin_locations.pluck(:gstin)).where.not(id: reviewal_document.gstin_locations.pluck(:id)).first
+
+    if gstin.present? and gstin.gstin.present?
+      add_message options, :error, :base, "GSTIN details for \"#{gstin.gstin}\" already exists in the system. See vendor - #{gstin.vendor.display_name}"
+      return
+    end
+
+    return true
+  end
+
+
 
   def update_policy(options, reviewal_document:, current_user:, params:, **)
     reviewal_document.update(policy_id: params[:policy_id]) if params[:policy_id].present?

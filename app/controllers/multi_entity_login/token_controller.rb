@@ -8,7 +8,9 @@ class MultiEntityLogin::TokenController < Oauth::TokenController
   def create_user_sessions
     # Reuse previous session
     token = Doorkeeper::AccessToken.find_by(token: params[:auth_token])
-    session = UserSession.find_by(access_token_id: token&.id)
+    session = ActsAsTenant.without_tenant do
+      UserSession.find_by(access_token_id: token&.id)
+    end
 
     @token.update authentication_type: token.authentication_type
 

@@ -60,14 +60,19 @@ class Sms::Send < BaseHandler
     end
     mobile_numbers = mob_num.map{ |s| "91#{s}" }
     list = mobile_numbers.join(",")
+    template_key = self.class.name.demodulize.downcase
+    message_template_config = Rails.application.config_for(:message_template)&.with_indifferent_access
+    dlt_template_id = message_template_config[template_key]
+
     {
         authkey: authentication_key,
         mobiles: list,
         message: msg,
-        sender: 'FINLYX',
+        sender: 'IFINLY',
         route: 4,
         country: 91,
-        response: 'json'
+        response: 'json',
+        DLT_TE_ID: dlt_template_id
     }
   end
 

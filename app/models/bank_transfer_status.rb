@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class BankTransferStatus < ApplicationRecord
+class BankTransferStatus < NonTenantedApplicationRecord
 
   include Seedable
 

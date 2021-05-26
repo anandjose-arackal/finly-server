@@ -45,6 +45,7 @@ class MoneyRequest < ApplicationRecord
           FindByOrderedIds,
           Transitionable
 
+  belongs_to :company, optional: true
   has_many :email_authorizations, as: :authorizable
   belongs_to :status, optional: true, class_name: 'MoneyRequestStatus'
   belongs_to :user, optional: true, inverse_of: :money_requests

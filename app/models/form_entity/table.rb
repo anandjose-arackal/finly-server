@@ -49,6 +49,7 @@
 #  compute_formula              :text(65535)
 #  filters                      :text(65535)
 #  config_path                  :string(255)
+#  compute_lookup_assignments   :text(65535)
 #
 
 class FormEntity::Table < FormEntity
@@ -57,6 +58,8 @@ class FormEntity::Table < FormEntity
   collection!
 
   option :min_items
+
+  contract_eval 'Min Item Limit Check', &Forms::Validations::Templates[:min_items]
 
   schema_validation do
     required(:options) do

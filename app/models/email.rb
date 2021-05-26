@@ -12,7 +12,6 @@
 #  bcc                  :string(255)
 #  cc                   :string(255)
 #  subject              :string(255)
-#  body                 :text(4294967295)
 #  mailer_klass         :string(255)
 #  mailer_action        :string(255)
 #  configuration_set    :string(255)
@@ -28,7 +27,7 @@
 #  deleted_at           :datetime
 #
 
-class Email < ApplicationRecord
+class Email < NonTenantedApplicationRecord
   serialize :recipient, JSON
 
   belongs_to :entity, polymorphic: true, optional: true
@@ -36,6 +35,7 @@ class Email < ApplicationRecord
   belongs_to :company, optional: true
 
   has_many :events, class_name: "EmailEvent"
+  has_one :body, class_name: 'EmailBody'
 
   scope :order_created_at, -> (type) {reorder created_at: (type.to_sym || :desc)}
 end

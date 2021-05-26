@@ -22,6 +22,7 @@
 #
 
 class ExpenseDataExtract < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :extractable, optional: true, polymorphic: true
   belongs_to :amount, optional: true
   belongs_to :expense_data_extract_source, optional: true

@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class AgreementType < ApplicationRecord
+class AgreementType < NonTenantedApplicationRecord
   include Seedable
 
   validates :name, presence: true

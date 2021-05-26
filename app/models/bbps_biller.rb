@@ -38,7 +38,7 @@
 #  disabled                       :boolean          default(FALSE)
 #
 
-class BbpsBiller < ApplicationRecord
+class BbpsBiller < NonTenantedApplicationRecord
   serialize :biller_payment_modes, JSON
   serialize :biller_payment_channels, JSON
   serialize :biller_customer_params, JSON

@@ -88,13 +88,16 @@ include Searchkick::Api
 
   has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment'
   has_many :receiving_payments, foreign_key: 'receiving_user_id', class_name: 'Payment'
+  has_many :custom_fields, as: :parent, dependent: :destroy
 
   before_update :cleanup # Destroy Biller Subscription fields for other billers if any
 
   delegate :draft?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :deactivated?, :reactivated?, to: :status
 
+  accepts_nested_attributes_for :custom_fields
+
   def self.default_scope
-    unscoped.order('bbps_biller_subscriptions.created_at DESC')
+    include_soft_deleted.order('bbps_biller_subscriptions.created_at DESC')
   end
 
   scope :filter_ids, -> (ids) {where(id: ids)}
@@ -245,7 +248,8 @@ include Searchkick::Api
         customer_pan: customer_pan,
         attachments: attachments.as_json,
         auto_fetch_enabled: auto_fetch_enabled,
-        biller_response: biller_response
+        biller_response: biller_response,
+        custom_fields: custom_fields
     }
   end
 

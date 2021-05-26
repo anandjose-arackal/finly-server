@@ -10,7 +10,7 @@
 #  deleted_at :datetime
 #
 
-class GoogleMapsConfig < ApplicationRecord
+class GoogleMapsConfig < NonTenantedApplicationRecord
 
   DEV_VALUES = {
       android: "AIzaSyC0EcUaLSYoKwcR30X39hLzLpIeSUXXFcE",

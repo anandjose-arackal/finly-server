@@ -14,6 +14,7 @@
 
 
 class CardConfiguration < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :card_status, optional: true
   belongs_to :configured_by_user, optional: true, class_name: "User"
   belongs_to :prepaid_card, optional: true, class_name: "Card"

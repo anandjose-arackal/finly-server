@@ -12,6 +12,7 @@
 
 class VendorPaymentWallet < ApplicationRecord
   include Accountable
+  belongs_to :company, optional: true
   belongs_to :user, optional: true
   belongs_to :balance, optional: true, class_name: "Amount"
 

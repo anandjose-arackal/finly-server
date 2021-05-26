@@ -23,6 +23,7 @@
 class DistanceExpense < ApplicationRecord
   include SoftDeletable
 
+  belongs_to :company, optional: true
   belongs_to :expense, optional: true
   belongs_to :distance, optional: true
   belongs_to :maps_distance, optional: true, class_name: 'Distance'

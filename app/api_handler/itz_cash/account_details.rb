@@ -35,15 +35,17 @@ class ItzCash::AccountDetails < ItzCash::Base
     params[:description] = parsed_response[12]
     params[:card] = card
     # special condition because of ItzCash's drama about reissued cards
-    #if card.replaced_card_id.present?
-    #  replaced_card = Card.unscoped.find_by(id: card.replaced_card_id)
-    #  op = ItzCash::AccountDetails.(replaced_card.user, card: replaced_card)
-    #  if op.success?
-    #    params[:balance] = op.balance
-    #    params[:available_card_eligibility] = op.available_card_eligibility
-    #    params[:distributor_id] = op.distributor_id
-    #  end
-    #end
+    if card.replaced_card_id.present?
+      replaced_card = Card.include_hotlisted.find_by(id: card.replaced_card_id, itz_cash_card_program_id: card.itz_cash_card_program_id)
+      if replaced_card.present?
+        op = ItzCash::AccountDetails.(replaced_card.user, card: replaced_card)
+        if op.success?
+          params[:balance] = op.balance
+          params[:available_card_eligibility] = op.available_card_eligibility
+          params[:distributor_id] = op.distributor_id
+        end
+      end
+    end
     update_card
     ItzCash::AccountDetails::SuccessPresenter.new(self.user, self.params, self.messages)
   end

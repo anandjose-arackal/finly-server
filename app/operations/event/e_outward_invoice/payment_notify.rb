@@ -86,9 +86,9 @@ class Event::EOutwardInvoice::PaymentNotify < Event::SetNotifier
   end
 
   def sms_message(user)
-    message = "Payment for invoice #{outward_invoice.invoice_number}"
+    message = "Finly : Payment for invoice #{outward_invoice.invoice_number}"
     if user.is_a?(User)
-      message = "Received payment of #{amount_credited} for invoice #{outward_invoice.invoice_number}"
+      message = "Finly : Received payment of #{amount_credited} for invoice #{outward_invoice.invoice_number}"
     elsif user.is_a?(Event::EOutwardInvoice::PaymentNotify::Customer)
       message = "Payment of #{amount_credited} successful for invoice #{outward_invoice.invoice_number}"
     end

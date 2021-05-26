@@ -3,6 +3,12 @@ class AccountManager::Collect::VATransactionProcessor < BackgroundOperation
 
   attr_accessor :virtual_account_transaction, :virtual_account, :payment, :adapter
 
+  def perform(user_id, params, request_store_hash = nil)
+    ActsAsTenant.without_tenant_if_not_set do
+      super(user_id, params, request_store_hash)
+    end
+  end
+
   def pre_validate
     unless params[:virtual_account_transaction_id].present?
       add_message :error, 'Virtual Account Transaction not found'
@@ -67,27 +73,27 @@ class AccountManager::Collect::VATransactionProcessor < BackgroundOperation
     # trigger the api call for Webhooks
     # setting the body of the webhook
     body = {
-        "beneficiary_account_no": self.virtual_account.account_number,
-        "beneficiary_account_ifsc": self.virtual_account.ifsc,
-        "beneficiary_full_name": self.virtual_account.company.name,
-        "transfer_type": self.virtual_account_transaction.transfer_type,
-        "transfer_id": self.virtual_account_transaction.transfer_id,
-        "transfer_timestamp": self.virtual_account_transaction.transfer_timestamp,
-        "transfer_currency": self.virtual_account_transaction.transfer_currency,
-        "transfer_amount": self.virtual_account_transaction.transfer_amount,
-        "remitter_account_no": self.virtual_account_transaction.remitter_account_no,
-        "remitter_account_ifsc": self.virtual_account_transaction.remitter_account_ifsc,
-        "remitter_account_type": self.virtual_account_transaction.remitter_account_type,
-        "remitter_full_name": self.virtual_account_transaction.remitter_full_name,
-        "remitter_address": self.virtual_account_transaction.remitter_address,
-        "note": self.virtual_account_transaction.note,
-        "transfer_status": "CREDITED",
-        "credited_at": self.virtual_account_transaction.credited_at,
-        "returned_at": nil,
-        "attempt_no": 1,
-        "reject_reason": nil
+      "beneficiary_account_no": self.virtual_account.account_number,
+      "beneficiary_account_ifsc": self.virtual_account.ifsc,
+      "beneficiary_full_name": self.virtual_account.company.name,
+      "transfer_type": self.virtual_account_transaction.transfer_type,
+      "transfer_id": self.virtual_account_transaction.transfer_id,
+      "transfer_timestamp": self.virtual_account_transaction.transfer_timestamp,
+      "transfer_currency": self.virtual_account_transaction.transfer_currency,
+      "transfer_amount": self.virtual_account_transaction.transfer_amount,
+      "remitter_account_no": self.virtual_account_transaction.remitter_account_no,
+      "remitter_account_ifsc": self.virtual_account_transaction.remitter_account_ifsc,
+      "remitter_account_type": self.virtual_account_transaction.remitter_account_type,
+      "remitter_full_name": self.virtual_account_transaction.remitter_full_name,
+      "remitter_address": self.virtual_account_transaction.remitter_address,
+      "note": self.virtual_account_transaction.note,
+      "transfer_status": "CREDITED",
+      "credited_at": self.virtual_account_transaction.credited_at,
+      "returned_at": nil,
+      "attempt_no": 1,
+      "reject_reason": nil
     }
-    op = Webhook::Process.(nil, {company: self.virtual_account.company, body: body, web_hook_event_id: WebHookEvent.id_for('collect.transaction')})
+    op = Webhook::Process.(nil, { company: self.virtual_account.company, body: body, web_hook_event_id: WebHookEvent.id_for('collect.transaction') })
   end
 
   protected
@@ -111,20 +117,20 @@ class AccountManager::Collect::VATransactionProcessor < BackgroundOperation
 
   def build_payment
     self.payment = self.virtual_account_transaction.build_payment(
-        payment_type_id: PaymentType.id_for(:credit),
-        application: self.virtual_account&.application,
-        initiating_account: self.virtual_account,
-        receiving_account: self.adapter.account,
-        payment_status_id: PaymentStatus.id_for(:pending),
-        payment_purpose_id: self.virtual_account.purpose.payment_purpose_id,
-        payment_mode: self.virtual_account_transaction&.transfer_type,
-        amount_attributes: {
-            value: self.virtual_account_transaction&.transfer_amount,
-            currency_id: Currency.id_for(:INR)
-        },
-        date: self.virtual_account_transaction&.transfer_timestamp,
-        reference_resource: self.virtual_account_transaction, # this is legacy, although we are saving it to the reference_resource attribute
-        note: self.virtual_account_transaction&.note
+      payment_type_id: PaymentType.id_for(:credit),
+      application: self.virtual_account&.application,
+      initiating_account: self.virtual_account,
+      receiving_account: self.adapter.account,
+      payment_status_id: PaymentStatus.id_for(:pending),
+      payment_purpose_id: self.virtual_account.purpose.payment_purpose_id,
+      payment_mode: self.virtual_account_transaction&.transfer_type,
+      amount_attributes: {
+        value: self.virtual_account_transaction&.transfer_amount,
+        currency_id: Currency.id_for(:INR)
+      },
+      date: self.virtual_account_transaction&.transfer_timestamp,
+      reference_resource: self.virtual_account_transaction, # this is legacy, although we are saving it to the reference_resource attribute
+      note: self.virtual_account_transaction&.note
     )
     self.payment.save
   end

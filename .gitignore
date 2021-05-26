@@ -38,6 +38,7 @@ config/searchkick.yml
 config/cubejs.yml
 config/mailtrain.yml
 config/open_exchange_rates.yml
+config/message_template.yml
 
 # .rubocop.yml
 .vscode/
@@ -109,3 +110,6 @@ config/integrations.yml
 /yarn-error.log
 yarn-debug.log*
 .yarn-integrity
+/config/sso_provider_credentials.yml
+
+storage/

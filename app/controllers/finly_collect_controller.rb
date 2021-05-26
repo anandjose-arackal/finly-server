@@ -1,7 +1,9 @@
 class FinlyCollectController < BaseControllers::CollectBase
 
   def notify
-    AccountManager::Collect::CollectRouter.(current_user, params)
+    ActsAsTenant.without_tenant do
+      AccountManager::Collect::CollectRouter.(current_user, params)
+    end
     # if @result.success?
     respond response: :success
     # else

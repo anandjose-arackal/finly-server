@@ -37,6 +37,7 @@ class CreditNoteItem < ApplicationRecord
   before_save :set_tds_applicable
   before_save :calculate_total
 
+  belongs_to :company, optional: true
   belongs_to :item, class_name: 'Item', optional: true
   belongs_to :invoice_item, class_name: 'InvoiceLineItem', optional: true
   belongs_to :category, class_name: 'Category', optional: true

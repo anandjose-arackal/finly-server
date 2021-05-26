@@ -18,6 +18,7 @@
 #
 
 class DocumentMessageReceipt < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :user
   belongs_to :receiptable_document
   belongs_to :document_message

@@ -38,13 +38,17 @@ class FormSection < ApplicationRecord
 
   def as_json(options = {})
     data = {
-        title: title,
-        active: active,
-        config_path: section_id.to_s,
-        entities: {},
-        associate_custom_fields: associate_custom_fields
+      title: title,
+      active: active,
+      config_path: section_id.to_s,
+      entities: {},
+      associate_custom_fields: associate_custom_fields,
+      collection: entities.map{ |ent| ent.class.collection? }.include?( true )
     }
-    entities.exclude_internal.root.each do |ent|
+    entities.each do |ent|
+      # Root entities only. N+1's if this is made into a query
+      next if ent.parent_id.present?
+
       data[:entities][ent.entity_key] = ent.as_json(options.merge(config_path: "#{section_id}/entities"))
     end
     data

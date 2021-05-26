@@ -98,7 +98,8 @@ class Masters::Vendors::Form < Forms::API
   end
 
   section :business_details, associate_custom_fields: true do
-    auto_number :vendor_id,unique: true, label: "Vendor ID", sequence: {prefix: "VNDR.", start_at: '000001'}, placeholder: "System Generated Field", hint: "System Generated Field"
+    auto_number :vendor_id,unique: true,editable: false, label: "Vendor ID", sequence: {prefix: "VNDR.", start_at: '000001'}, placeholder: "System Generated Field", hint: "System Generated Field"
+    switch :autogenerate_vendor_id, default_value: true, label: "Auto-Generate Vendor ID", system_field: false
     dropdown :vendor_country, choices_scope: Choices[:list].({id: 'India', name: "India"}, {id: 'International', name: "International"}),
              required: true, default_value: 'India'
     lookup :policy_id,
@@ -116,7 +117,7 @@ class Masters::Vendors::Form < Forms::API
 
   section :tax_information, title: "Tax Information & Details", associate_custom_fields: true do
     # PAN
-    text :pan, unique: true
+    text :pan, regex: {format: Constants::VALID_PAN, message: "is not in valid format"}
     attachment :pan_attachment, system_field: false
     # RCM
     switch :rcm_enabled, label: "RCM Enabled"
@@ -163,7 +164,7 @@ class Masters::Vendors::Form < Forms::API
       text :poc_designation
       large_text :address
       lookup :gstin_id, visible: false
-      text :gstin
+      text :gstin, regex: {format: Constants::VALID_GSTIN, message: "is not in valid format"}
       dropdown :gst_status, choices_scope: Choices[:list].({id: 'Active', name: "Active"}, {id: 'Cancelled', name: "Cancelled"}, {id: 'Provisional', name: 'Provisional'}, {id: 'Inactive', name: 'Inactive'}),
                required: false
       switch :verified, visible: false, default_value: false
@@ -176,7 +177,7 @@ class Masters::Vendors::Form < Forms::API
   section :account_details, associate_custom_fields: true do
     data_map :bank_accounts, populate_if_empty: BankAccount, min_items: 1, associate_custom_fields: true do
       text :name, required: true
-      text :account_number, required: true, unique: true, regex: {format: "\\A[A-Za-z0-9]{3,32}\\z", message: "is not in valid format"}
+      text :account_number, required: true, unique: false, regex: {format: "\\A[A-Za-z0-9]{3,32}\\z", message: "is not in valid format"}
       text :confirm_account_number, required: true, system_field: false
       text :ifsc, label: "IFSC", required: true, regex: {format: "\\A[A-Za-z]{4}[a-zA-Z0-9]{7}\\z", message: "is not valid"}
       text :swift_code, label: "Swift / Bank Code", required: false, visible: false, editable: false, regex: {format: "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$", message: "is not valid"}
@@ -460,6 +461,31 @@ class Masters::Vendors::Form < Forms::API
     action :editable, false
     action :visible, false
     action :required, false
+  end
+
+  condition condition_id: "Business Details > Vendor ID Override" do
+    reference :entity, :vendor_id
+    rule Rules::Builder[:autogenerate_vendor_id].blank
+    action :editable, true
+    action :required, true
+  end
+
+  condition condition_id: "Uniqueness for GSTIN" do
+    reference :entity, 'gstin_locations.gstin'
+    rule Rules::Builder["row.gstin"].present
+    action :unique, true
+  end
+
+  condition condition_id: "Uniqueness for PAN" do
+    reference :entity, :pan
+    rule Rules::Builder['gstin_locations.gstin'].blank.and(Rules::Builder["pan"].present)
+    action :unique, true
+  end
+
+  condition condition_id: :"PAN attachment is compulsory for PAN" do
+    reference :entity, :pan_attachment
+    rule Rules::Builder["pan"].present
+    action :required, true
   end
 
   validation validation_id: :"confirm bank account" do

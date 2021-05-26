@@ -11,6 +11,7 @@
 #
 
 class CashExpenseConfig < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :policy, optional: true
 
   validates :policy_id, presence: true

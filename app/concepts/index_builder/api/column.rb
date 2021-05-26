@@ -2,7 +2,7 @@ class IndexBuilder::API::Column
   include IndexBuilder::ContentTypes::Registry
   include ActionManager::DSL
 
-  attr_accessor :column_key, :label, :default, :sort, :includes, :fixed, :block
+  attr_accessor :column_key, :label, :default, :sort, :includes, :fixed, :block, :active
 
   # Includes: Used for capturing the data points to be included to optimize the fetch for the current record
   def initialize(params)
@@ -35,6 +35,7 @@ class IndexBuilder::API::Column
         label: label,
         sort: sort,
         default: default,
+        active: active
     }
   end
 
@@ -69,7 +70,7 @@ class IndexBuilder::API::Column
         columns[column_key].present?
       end
 
-      def column(column_key, default: false, label: nil, sort: false, includes: [], fixed: false, fields: [], &block)
+      def column(column_key, default: false, label: nil, sort: false, includes: [], fixed: false, active: true, fields: [], &block)
         raise "#{column_key} is already defined for class #{self.name}" if exists?(column_key)
         raise "#{column_key} does not have associated fields" unless block_given? or fields.present?
 
@@ -91,7 +92,8 @@ class IndexBuilder::API::Column
                 includes: includes,
                 default: (default || fixed),
                 fixed: fixed,
-                block: block
+                block: block, 
+                active: active
             }
         )
 

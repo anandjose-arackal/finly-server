@@ -110,27 +110,34 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     end
 
     if self.inward_invoice.procurement.present? && self.purchase_order.present?
-      # if params[:invoice][:balance_amount_attributes][:value].to_i < 0
-      #   add_message :error, "Balance due amount cannot be less than zero"
-      # end
-      if params[:invoice][:balance_amount_attributes][:value].to_i > (self.purchase_order.balance_amount&.value + 1) # adding a buffer to account for roundoff amount
-          add_message :error, "Payable amount for this invoice has exceeded the Purchase Order payable amount."
-        return
-      end
-
       # the below line is in the case of one PO having multiple line items of the same inventory item
       processed_item_ids = []
       self.inward_invoice_params[:invoice_items_attributes].each do |item|
-        po_item = self.purchase_order.items.without_id(processed_item_ids).find_by(id: item[:purchase_order_item_id])
+        invoice_line_item = self.inward_invoice.items.find_by(id: item[:id])
+        po_item = self.purchase_order.items.without_id(processed_item_ids).find_by(id: invoice_line_item.purchase_order_item_id)
         next if po_item.blank? # temp workaround
-        item_q = (po_item&.inventory_line_item&.product_type_id == ProductType.id_for(:goods)) ? po_item.accepted : po_item.quantity
-
+        next if po_item.inventory_line_item&.product_type_id == ProductType.id_for(:service)
+        item_q =  po_item.accepted
+        item_amount = po_item.taxable_amount.value
         unless user.company.feature_subscription.grn_enabled
           item_q = po_item.quantity
+          item_amount = po_item.taxable_amount.value
         end
 
-        if item_q < item[:quantity].to_i
-          add_message :error, "Invoice item quantity should be on par with the Purchase Order quantity."
+        invoiced_line_items = procurement.invoices.joins(items: :taxable_amount).where('invoice_line_items.purchase_order_item_id = ?', invoice_line_item.purchase_order_item_id)
+        #invoiced_line_items holding joined active record query on line item
+        invoiced_line_items_except_current_item = invoiced_line_items.where('invoice_line_items.id != ?', item[:id])
+        invoiced_total_qty = 0
+        invoiced_total_qty = invoiced_line_items_except_current_item.sum('invoice_line_items.quantity').to_f
+        invoiced_total_amount = invoiced_line_items_except_current_item.sum('amounts.value')
+
+        if item_q < (invoiced_total_qty + item[:quantity].to_f)
+          add_message :error, "Invoiced item quantity should be on par with the Purchase Order quantity."
+          break
+        end
+
+        if item_amount < (invoiced_total_amount + item.dig(:taxable_amount_attributes, :value)&.to_f)
+          add_message :error, "Invoiced Item Taxable Amount should be on par with the Purchase Order Item Taxable Amount"
           break
         end
         processed_item_ids << po_item.id
@@ -274,6 +281,41 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
       add_message :error, "Invoice status is \"Void\". No further actions can be taken."
       return
     end
+
+
+    # if self.purchase_order.present?
+    #   if self.inward_invoice.status.processing?
+        
+    #     rate_flag = false
+    #     quantity_flag = false
+
+    #     items_attributes = self.inward_invoice_params[:invoice_items_attributes]
+
+    #     items_attributes.each do |line_item|
+
+    #       invoice_item = InvoiceLineItem.find_by(id: line_item[:id] )
+    #       unless line_item[:quantity].to_i == invoice_item.quantity.to_i
+    #         quantity_flag = true
+    #       end
+
+    #       unless line_item[:rate].to_f == invoice_item.rate.to_f
+    #         rate_flag = true
+    #       end 
+    #       break if rate_flag || quantity_flag  
+    #     end
+
+    #     add_message :error, "Cannot update item quantity at this stage" if quantity_flag
+    #     add_message :error, "Cannot update item rate at this stage" if rate_flag
+    #     return if rate_flag || quantity_flag
+    #   end
+    # end
+
+    # Adding default currency as per form structure.
+
+    self.inward_invoice.reporting_currency = user.company.reporting_currency_code
+    self.inward_invoice.base_currency = user.company.reporting_currency.id
+    self.inward_invoice.conversion_rate = 1
+
   end
 
   def pre_process
@@ -292,9 +334,10 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
         self.inward_invoice_params[:gst_type_id] = GstType.id_for(:igst)
       end
     end
-    if self.gstin_location.present?
-      self.inward_invoice_params[:gstin_location_id] = self.gstin_location&.id
-    end
+    
+    # if self.gstin_location.present?
+    #   self.inward_invoice_params[:gstin_location_id] = self.gstin_location&.id
+    # end
 
     # adding id for original_amount and freight_amount so that new copies aren't created every time
     if inward_invoice_params&.dig(:original_amount_attributes).present?
@@ -438,8 +481,8 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
         if self.inward_invoice.procurement_id.present?
           unless inward_invoice.created_by == user
             inward_invoice.trails.create action_user: user,
-                                  action_id: TrailAction.id_for(:update),
-                                  action_level: inward_invoice.trails.last.action_level
+                                         action_id: TrailAction.id_for(:update),
+                                         action_level: inward_invoice.trails.last.action_level
           end
         end
       else

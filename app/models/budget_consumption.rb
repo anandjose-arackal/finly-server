@@ -18,7 +18,7 @@
 #
 
 class BudgetConsumption < ApplicationRecord
-
+  belongs_to :company, optional: true
   belongs_to :budget
   belongs_to :budget_amount, class_name: "Amount"
   belongs_to :pending_amount, class_name: "Amount"

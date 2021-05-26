@@ -6,6 +6,7 @@ json.bank_reference_number record.bank_reference_number
 json.source_account record.source_account
 json.submitted_at record.submitted_at
 json.policy record.policy
+json.payment_type record.report_processor_group_mapping&.processor_group&.payment_type
 json.user do
   json.partial! 'macros/v1/users/user', record: record.user
   json.bank_account record.user.default_bank_account

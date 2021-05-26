@@ -5,6 +5,7 @@ class Masters::Vendors::Index < IndexBuilder::API
   resolver 'vendors.default'
   # reference '{{record.id}}'
   custom_fields :yes_bank_vendor
+  model 'YesBankVendor'
 
   # Overriding reference to pass forms_enabled as metadata
   def self.reference(id = nil, args = {})
@@ -89,7 +90,7 @@ class Masters::Vendors::Index < IndexBuilder::API
 
     if user.has_permission?(:vendor_reviewer)
       counter.add 91, 'Awaiting Approval',
-                  collection.awaiting_action_items(user.id).count
+                  collection.awaiting_action_items(user.id).where("yes_bank_vendors.status_id": VendorStatus.ids_for(:awaiting_approval)).count
     end
 
     # processing

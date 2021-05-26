@@ -21,6 +21,7 @@
 
 class MoneyRequestProcessorMapping < ApplicationRecord
 
+  belongs_to :company, optional: true
   belongs_to :user, optional: true
   belongs_to :amount, optional: true, dependent: :destroy
   belongs_to :processor, optional: true, class_name: 'MoneyRequestProcessor'

@@ -50,4 +50,21 @@ class ApplicationPolicy
     user.feature_toggle.enabled?(feature, default)
   end
 
+  def self.action(name, options = {}, &block)
+    define_method name do
+      next false unless pre_authorize(name, options)
+
+      instance_exec &block
+    end
+  end
+
+  def pre_authorize(action, options)
+    return true if options[:skip_record_authorization]
+    return false if record.blank?
+    return true unless record.persisted?
+    return false if record.respond_to?(:company_id) and not record.company_id == user.company_id
+
+    true
+  end
+
 end

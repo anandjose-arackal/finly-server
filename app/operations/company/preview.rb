@@ -9,6 +9,7 @@ class Company::Preview < BaseOperation
   end
 
   def init
+    params[:preview][:phone_number] = params[:mobile_number]
     self.preview_parameters = preview_params
     self.referrer = preview_parameters[:referrer]
   end

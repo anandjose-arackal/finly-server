@@ -8,7 +8,7 @@ class Sms::UserOtp < Sms::Send
   end
 
   def message
-    "#{params[:otp]} is your OTP verification code"
+    "Finly : #{params[:otp]} is your OTP verification code"
   end
 
  end

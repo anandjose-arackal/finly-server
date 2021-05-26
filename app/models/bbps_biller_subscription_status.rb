@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class BbpsBillerSubscriptionStatus < ApplicationRecord
+class BbpsBillerSubscriptionStatus < NonTenantedApplicationRecord
   include Seedable
 
   GROUP_AWAITING_APPROVAL = 91

@@ -121,19 +121,19 @@ class AuditTrail < PaperTrail::Version
     return "" if identifier.nil?
     case klass.to_s
     when "Amount"
-      value = klass.unscoped.find_by_id(identifier)&.value&.round(2)
+      value = klass.include_soft_deleted.find_by_id(identifier)&.value&.round(2)
     when  "ReviewalLevel"
-      value = klass.unscoped.find_by_id(identifier)&.level_number
+      value = klass.include_soft_deleted.find_by_id(identifier)&.level_number
     when  "GstinLocation"
-      value = klass.unscoped.find_by_id(identifier)&.location
+      value = klass.include_soft_deleted.find_by_id(identifier)&.location
     when  "YesBanVendor"
-      value = klass.unscoped.find_by_id(identifier)&.business_name
+      value = klass.include_soft_deleted.find_by_id(identifier)&.business_name
     when "BankAccount"
-      value = klass.unscoped.find_by_id(identifier)&.name
+      value = klass.include_soft_deleted.find_by_id(identifier)&.name
     else
-      value = klass.unscoped.find_by_id(identifier)&.try(:name)&.titlecase
+      value = klass.include_soft_deleted.find_by_id(identifier)&.try(:name)&.titlecase
       if value.nil?
-        value = klass.unscoped.find_by_id(identifier)&.try(:description)
+        value = klass.include_soft_deleted.find_by_id(identifier)&.try(:description)
       end
     end
     value

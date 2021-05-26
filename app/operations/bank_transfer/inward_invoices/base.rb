@@ -45,7 +45,7 @@ class BankTransfer::InwardInvoices::Base < BankTransfer::Base
                                         :cost_center_id, :rate, :tax, :tax_rate_id, :discount,
                                         :category_id, :description, :id, :remove_line_item,
                                         :hsn_sac, :comment, :_destroy, :inventory_line_item_id, :purchase_order_item_id,
-                                    # :billable_amount
+                                        taxable_amount_attributes: [:value, :currency_id]
                                     ], custom_fields: [],
                                     credit_note_adjustments_attributes: [:id, :_destroy, :credit_note_id, amount_attributes: [:value, :currency_id]]
     )
@@ -98,14 +98,14 @@ class BankTransfer::InwardInvoices::Base < BankTransfer::Base
 
   def fetch_budget_contributions(inward_invoice)
     if user.company.enforce_budget_configuration.enforce_invoice_budget?
-      op = BudgetManager::BudgetLimitValidator::Invoice.({ invoice: inward_invoice, ignore_unbudgetables: true, current_user: user })
+      op = BudgetManager::BudgetLimitValidator::Invoice.({invoice: inward_invoice, ignore_unbudgetables: true, current_user: user})
       self.budget_contributions_before_update = op['result'][:budget_contributions] rescue {}
     end
   end
 
   def budget_limit_validation(inward_invoice)
     if user.company.enforce_budget_configuration.enforce_invoice_budget?
-      return BudgetManager::BudgetLimitValidator::Invoice.({ invoice: inward_invoice, previous_budget_contributions: self.budget_contributions_before_update, current_user: user })
+      return BudgetManager::BudgetLimitValidator::Invoice.({invoice: inward_invoice, previous_budget_contributions: self.budget_contributions_before_update, current_user: user})
     end
   end
 end

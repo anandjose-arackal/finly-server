@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class InwardInvoiceStatus < ApplicationRecord
+class InwardInvoiceStatus < NonTenantedApplicationRecord
   include Seedable
 
   GROUP_OPEN = 90

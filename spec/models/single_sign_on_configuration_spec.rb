@@ -19,6 +19,8 @@
 #  finly_sso_path                     :string(255)
 #  label                              :string(255)
 #  deleted_at                         :datetime
+#  sso_type                           :string(255)      default("")
+#  logo                               :string(255)      default("")
 #
 
 require 'rails_helper'

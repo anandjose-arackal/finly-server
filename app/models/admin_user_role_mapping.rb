@@ -10,7 +10,7 @@
 #  deleted_at         :datetime
 #
 
-class AdminUserRoleMapping < ApplicationRecord
+class AdminUserRoleMapping < NonTenantedApplicationRecord
   belongs_to :admin_user, optional: true
   belongs_to :admin_user_role, optional: true
 

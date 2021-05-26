@@ -9,7 +9,7 @@
 #  deleted_at :datetime
 #
 
-class IndividualKycType < ApplicationRecord
+class IndividualKycType < NonTenantedApplicationRecord
   include Seedable
 
   def self.values

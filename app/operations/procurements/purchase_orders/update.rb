@@ -250,8 +250,8 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
         if PurchaseOrder.status_ids(:open, :retracted, :rejected).include?(purchase_order.purchase_order_status_id) && purchase_order.user_id == user.id
 
           dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::ValidationUpdate.(user, {
-            reviewal_document: self.purchase_order,
-            document_reviewer_mappings_params: document_reviewer_mappings_params
+              reviewal_document: self.purchase_order,
+              document_reviewer_mappings_params: document_reviewer_mappings_params
           })
           unless dlrm_validation_op.success?
             add_message :error, dlrm_validation_op.messages[:error]
@@ -312,8 +312,8 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
         unless purchase_order.user == user
           # If updated by anyone other document owner
           purchase_order.trails.create action_user: user,
-                                        action_id: TrailAction.id_for(:update),
-                                        action_level: purchase_order.trails.last.action_level
+                                       action_id: TrailAction.id_for(:update),
+                                       action_level: purchase_order.trails.last.action_level
 
 
           # if self.procurement.po_revisions
@@ -358,9 +358,9 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
         add_message :error, purchase_order.errors.full_messages
         return
       end
-    # rescue => e
-    #   add_message :error, messages
-    # end
+      # rescue => e
+      #   add_message :error, messages
+      # end
 
       self.po_old_attachments.update_all(procurement_document_id: nil, procurement_document_type: nil)
 

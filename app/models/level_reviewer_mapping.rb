@@ -25,7 +25,7 @@ class LevelReviewerMapping < ApplicationRecord
   validates :level_id, presence: true
   validates :reviewer_id, presence: true
 
-  default_scope { unscope(:where) }
+  default_scope { include_soft_deleted }
 
   scope :with_reviewer_id, -> (reviewer_id) {
     where reviewer_id: reviewer_id

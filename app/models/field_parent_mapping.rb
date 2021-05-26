@@ -11,6 +11,7 @@
 #
 
 class FieldParentMapping < ApplicationRecord
+  belongs_to :company, optional: true
   belongs_to :field_configuration, optional: true
   belongs_to :field_parent_type, optional: true
 

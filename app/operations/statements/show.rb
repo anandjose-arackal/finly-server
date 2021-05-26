@@ -51,7 +51,7 @@ class Statements::Show < Statements::Base
       when :expense_card, :reimbursement_card
         card_id = params[:card_id]
         if personal_view?
-          self.account = Card.unscoped.with_user(sel_user.id).with_id(card_id)&.first
+          self.account = Card.include_hotlisted.with_user(sel_user.id).with_id(card_id)&.first
         else
           user_presenter = User::Index.(user, params)
           unless user_presenter.success?
@@ -59,7 +59,7 @@ class Statements::Show < Statements::Base
             return
           end
           users = user_presenter.team
-          self.account = Card.unscoped.with_user(users.pluck(:id)).with_id(card_id)&.first
+          self.account = Card.include_hotlisted.with_user(users.pluck(:id)).with_id(card_id)&.first
         end
       when :finly_money_card_transfer
         self.account = sel_user.wallet

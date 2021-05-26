@@ -30,7 +30,9 @@ class SearchkickReindexJob
   def perform(model_name)
     model = Object.const_get(model_name)
     start_time = Time.now
-    model.reindex
+    ActsAsTenant.without_tenant do
+      model.reindex
+    end
     time = (Time.now - start_time).to_f
     self.class.logger.info({duration: time, reindexed_model: model.name})
   end

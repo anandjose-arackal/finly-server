@@ -1,6 +1,6 @@
-class IciciStatusChecker
+class IciciStatusChecker < BaseJob
 
-  def self.perform
+  def self.perform_job
     puts " ----------------------------- PERFORMING #{self.name}  at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
 
     # this operation will check for the payment status of all ICICI initiated payments

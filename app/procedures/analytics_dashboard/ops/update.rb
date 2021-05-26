@@ -16,6 +16,7 @@ class AnalyticsDashboard::Ops::Update < Transactions::API
       context[:model].company = current_user.company
       context[:model].created_by = current_user
       context[:model].system_dashboard_id = model.id
+      context[:model].is_system_dashboard = false
     end
   end
 
