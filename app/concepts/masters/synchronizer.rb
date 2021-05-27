@@ -7,18 +7,21 @@
 # run the Synchronizer in a migration by calling Masters::Synchronizer.()
 class Masters::Synchronizer
 
-  def self.call
-    Masters::Router.masters.each { |master| sync(master) }
-  end
-
-  def self.sync(master)
-    schema = master.schema
-    template = Masters::Template.new(schema)
-    Company.limit(2).last(1).each do |company|
-      user = company.users.first
-      # Synchronize master
-      template.sync(company_id: company.id, user: user)
+  def self.call(options)
+    if options[:master].present?
+      master = Masters::Router.masters.filter {|item| item.name == options[:master]}.first
+      sync(master, options[:company_id])
+    else
+      Masters::Router.masters.each { |master| sync(master, options[:company_id]) }
     end
   end
 
+  def self.sync(master, company_id)
+    schema = master.schema
+    template = Masters::Template.new(schema)
+    company = Company.find(company_id)
+    user = company.users.first
+    # Synchronize master
+    template.sync(company_id: company.id, user: user)
+  end
 end
