@@ -40,13 +40,13 @@ module Masters::Entity::Record
           anonymous_class = entity.lookup_master_schema&.record_model_class
           if attr.end_with?('_id')
             attr = attr[0..(attr.length - 4)]
-            belongs_to attr.to_sym, -> { where company_id: entity.company_id }, anonymous_class: anonymous_class
+            belongs_to attr.to_sym, anonymous_class: anonymous_class
           else
-            belongs_to "#{attr}_obj".to_sym, -> { where company_id: entity.company_id }, anonymous_class: anonymous_class, foreign_key: attr
+            belongs_to "#{attr}_obj".to_sym, anonymous_class: anonymous_class, foreign_key: attr
           end
         end
         if entity.type?(:multi_lookup)
-          has_many "#{entity.entity_key}_mappings".to_sym, -> { where company_id: entity.company_id, master_entity_id: entity.id }, class_name: 'MasterMapping', foreign_key: 'from_record_id'
+          has_many "#{entity.entity_key}_mappings".to_sym, -> { where master_entity_id: entity.id }, class_name: 'MasterMapping', foreign_key: 'from_record_id'
           anonymous_class = entity.lookup_master_schema&.record_model_class
           has_many entity.entity_key.to_sym, through: "#{entity.entity_key}_mappings".to_sym, source: 'to_record', anonymous_class: anonymous_class, source_type: entity.lookup_master_schema.model.name
         end
