@@ -392,6 +392,15 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
     end
   end
 
+  # Advance Payment
+  section :document_advance, title: "Document Advance" do
+    dropdown :advance_amount_required, label: "Adjust Amount ?", editable: true, visible: true, required: true, choices_scope: Choices[:list].({ id: 'true', name: 'Yes' }, { id: 'false', name: 'No' }), default_value: 'false'
+    number :po_advance, label: "Adjust Amount ?", editable: false, visible: true, required: true
+    
+    number :po_prev_adjusted_advance, label: "Po Prev Adjusted Advance", editable: false, visible: true, required: true
+    amount :po_invoice_adjusted_advance, label: "Current Adjustment", editable: false, visible: true, required: true
+  end
+
   # ATTACHMENTS
   section :attachments, associate_custom_fields: true do
     attachment :attachments, system_field: false
