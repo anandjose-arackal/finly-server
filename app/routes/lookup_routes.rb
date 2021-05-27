@@ -6,6 +6,7 @@ Lookup::Router.draw do
   route 'policies', Masters::Policies::Lookup
   route "departments", Masters::Departments::Lookup
   route "locations", Masters::Locations::Lookup
+  route "states", Masters::States::Lookup
   route "cost_centers", Masters::CostCenters::Lookup
   route "categories", Masters::Categories::Lookup
   route "vendors", Masters::Vendors::Lookup # Went with singular because plural was already being used by other areas of the app

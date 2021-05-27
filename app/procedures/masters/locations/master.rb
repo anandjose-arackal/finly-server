@@ -10,7 +10,7 @@ class Masters::Locations::Master < Masters::API
     large_text :address_1
     large_text :address_2
     text :city
-    lookup :state_id, choices_scope: Choices[:lookup].('masters.states')
+    lookup :state_id, choices_scope: Choices[:lookup].('states')
     text :country
     text :pin
     switch :billable_location

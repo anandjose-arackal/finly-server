@@ -44,6 +44,10 @@ Resolver::Router.draw do
     route 'default', Masters::Locations::Resolver
   end
 
+  scope :states do
+    route 'default', Masters::States::Resolver
+  end
+
   scope :cost_centers do
     route 'default', Masters::CostCenters::Resolver
   end
