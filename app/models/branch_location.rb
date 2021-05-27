@@ -51,7 +51,7 @@ include Searchkick::Api
   belongs_to :company, optional: true
   belongs_to :created_by, class_name: 'User', optional: true
 
-  # belongs_to :state, optional: true
+  belongs_to :state, optional: true
   has_many :company_location_departments
   has_many :company_departments, through: :company_location_departments
 
