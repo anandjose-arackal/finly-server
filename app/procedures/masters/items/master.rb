@@ -3,6 +3,7 @@ class Masters::Items::Master < Masters::API
   UNITS_OF_MEASUREMENT = ["BOU", "Bags", "Bale", "Bottles", "Boxes", "Buckles", "Bunches", "Bundles", "Cans", "Carat", "Cartons", "Centimeter", "Cubic Centimeter", "Cubic Meter", "Dozen", "Drums", "Grams", "Great Gross", "Gross", "Gross Yards", "Kilograms", "Kiloliter", "Kilometers", "Liters", "Lump Sum", "Meter", "Metric Ton", "Milliliters", "Month", "Numbers", "Others", "Packs", "Pairs", "Pieces", "Quintal", "Rolls", "Sets", "Square Feet", "Square Meter", "Square Yards", "Tablets", "Ten Grams", "Thousands", "Tonnes", "Tubes", "US Gallons", "Units", "Yards", "Years", "Quarter"]
 
   model Item
+  name "Items"
 
   schema do
     sequence :item_number, prefix: 'ITEM/', min_length: 6, show_in_lookup: true

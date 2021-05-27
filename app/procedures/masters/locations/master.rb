@@ -1,6 +1,7 @@
 class Masters::Locations::Master < Masters::API
 
   model BranchLocation
+  name "Branch Locations"
 
   schema has_nesting: true do
     sequence :location_code, prefix: 'LOC/', min_length: 6, show_in_lookup: true
