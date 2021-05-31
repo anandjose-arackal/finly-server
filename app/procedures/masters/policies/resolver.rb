@@ -3,8 +3,6 @@ class Masters::Policies::Resolver < Resolver::API
   entity Policy
 
   def load(params)
-
-    # if admin_view? || auditor_view?
     if user.company_admin? || user.auditor? || user.vendor_payments_admin?
       if user&.enforce_policy_enabled?
         ids = []
@@ -22,7 +20,18 @@ class Masters::Policies::Resolver < Resolver::API
       ids += user&.admin_policies.with_application(app).pluck(:id)
       policies = Policy.with_id(ids)
     end
+    
     policies
+
+    policy_mapping = user.policy_user_roles
+    if params[:permissions].present?
+      policy_mapping = policy_mapping.where(user_role_id: UserRole.ids_for(params[:permissions]))
+    end
+
+    policies.where(id: policy_mapping.pluck(:policy_id))
+
+
+    #   policy_mapping = policy_mapping.where(user_role_id: UserRole.ids_for(params[:permissions]))
 
     # # else
     #   if user&.enforce_policy_enabled?
@@ -37,12 +46,6 @@ class Masters::Policies::Resolver < Resolver::API
 
     # return user.company.policies if user.admin? and not params[:permissions]
 
-    # policy_mapping = user.policy_user_roles
-    # if params[:permissions].present?
-    #   policy_mapping = policy_mapping.where(user_role_id: UserRole.ids_for(params[:permissions]))
-    # end
-
-    # Policy.where(id: policy_mapping.pluck(:policy_id))
   end
 
 end

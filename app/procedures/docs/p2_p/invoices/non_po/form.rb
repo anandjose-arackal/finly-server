@@ -139,8 +139,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
   # ACCOUNTING DETAILS
   section :accounting_details, title: "Accounting Details", associate_custom_fields: true do
     lookup :policy_id,
-           choices_scope: Choices[:lookup].('policies'),
-           #permissions: [:non_po_invoice_initiator]),
+           choices_scope: Choices[:lookup].('policies', permissions: [:non_po_invoice_initiator]),
            required: true, editable: false
     lookup :department_id, label: "Department", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('departments') #, editable: false, visible: false
     lookup :cost_center_id, label: "Cost Center", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('cost_centers')
@@ -192,8 +191,8 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
   section :billing_address do
     lookup :location_id, label: 'Billing Address', choices_scope: Choices[:lookup].('locations'),
            filters: Rules::Builder['billable_location'].true, required: true
-    text :billing_address_name, label: 'Name', editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.gstin}}')
-    text :billing_address_gstin, label: 'Gstin', editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.name}}')
+    text :billing_address_name, label: 'Name', editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.name}}')
+    text :billing_address_gstin, label: 'Gstin', editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.gstin}}')
     large_text :billing_address, computed: Forms::Compute::Lookup('location_id', '{{record.address}}')
   end
 
@@ -201,8 +200,8 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
   section :shipping_address do
     lookup :delivery_location_id, label: 'Shipping Address', choices_scope: Choices[:lookup].('locations'),
            filters: Rules::Builder['shippable_location'].true, required: true
-    text :shipping_address_name, label: 'Name', editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.gstin}}')
-    text :shipping_address_gstin, label: 'Gstin', editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.name}}')
+    text :shipping_address_name, label: 'Name', editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.name}}')
+    text :shipping_address_gstin, label: 'Gstin', editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.gstin}}') 
     large_text :shipping_address, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.address}}')
   end
 
