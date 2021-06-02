@@ -28,7 +28,9 @@ class ApplicationController < ActionController::Base
   before_action :init_elastic_apm
 
   before_action :store_location
-  before_action :set_paper_trail_whodunnit
+
+  before_action :set_paper_trail_metadata
+
   before_action :set_raven_context
 
   around_action :set_not_tenant_skip_authorize
@@ -577,6 +579,17 @@ class ApplicationController < ActionController::Base
       invalidate_session UserSessionStatus.id_for(:revoked), result.message
       return
     end
+  end
+
+  def set_paper_trail_metadata
+    ::PaperTrail::Request.controller_info =  {
+        user_ip: request.remote_ip,
+        user_agent: request.user_agent,
+        company_id: RequestStore.store[:current_company]&.id,
+        created_by_id: RequestStore.store[:current_user]&.id,
+        whodunnit:  RequestStore.store[:current_user]&.id,
+        user_transaction_id: AuditTrail.generate_transaction_id
+    }
   end
 
   # Used by sentry
