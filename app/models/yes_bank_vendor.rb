@@ -291,6 +291,10 @@ class YesBankVendor < ApplicationRecord
   ransack_scopes :with_status_id
   ransack_scopes :with_status_ids
 
+  def form_klass
+    Forms::Router.klass(:vendors)&.name
+  end
+
   def display_name
     self.business_name.blank? ? self.name : self.business_name
   end

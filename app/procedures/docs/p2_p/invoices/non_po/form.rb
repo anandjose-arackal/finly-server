@@ -2,15 +2,15 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
   model Invoice
 
-  meta(
+  meta ->(record) {
     {
       created_by: {
-        id: "{{record.created_by.id}}",
-        name: "{{record.created_by.name}}",
-        email: "{{record.created_by.email}}"
+        id: record.created_by&.id,
+        name: record.created_by&.name,
+        email: record.created_by&.email,
       }
     }
-  )
+  }
 
   # LIQUID FORMULAE
   LIQUID_FORMULAE = {
@@ -342,6 +342,12 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_visible_be_changed: false,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_billable_amount])
+
+      meta ->(record) { # TODO: ID is only for testing. Update this with required meta data.
+        {
+          id: record.id
+        }
+      }
     end
   end
 
