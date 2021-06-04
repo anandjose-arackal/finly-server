@@ -12,7 +12,7 @@ class ExportManager::Template::Processors::CSVProcessor < ExportManager::Templat
 
         exposure = record.to_exposure
         csv << template['columns'].map do |column|
-          (column.blank? ? nil : exposure.template(column['value']))
+          (column['value'].blank? ? nil : exposure.template(column['value']))
         end
         progress_update(index, force_update: false)
 
