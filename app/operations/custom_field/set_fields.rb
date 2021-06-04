@@ -75,7 +75,7 @@ class CustomField::SetFields < CustomField::Base
       self.field_configurations = self.field_configurations.exclude_deleted.with_parent_type(parent_type_id)
     end
     # end
-    self.field_configurations = self.field_configurations.where('created_at >= ?', item.created_at)
+    self.field_configurations = self.field_configurations.where('field_configurations.created_at >= ?', (item.created_at || DateTime.now))
 
     self.save = !!params&.dig(:save)
   end
