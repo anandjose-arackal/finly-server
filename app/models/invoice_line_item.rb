@@ -430,7 +430,7 @@ class InvoiceLineItem < ApplicationRecord
 
   # Syncs amounts from new forms structure to legacy amounts table
   def sync_amounts
-    if parent.respond_to?(:forms_enabled)
+    if parent.forms_enabled
       self.skip_callback = true
       sync_to_old_structure
     end
@@ -462,14 +462,14 @@ class InvoiceLineItem < ApplicationRecord
     self.save
   end
 
-  # def sync_to_forms_structure
-  #   amounts_attributes_map.each do |key, value|
-  #     amount_value = self.send(value)&.value
-  #     self.send("reporting_#{key}=", amount_value)
-  #     self.send("#{key}=", amount_value)
-  #   end
-  #   self.save
-  # end
+  def sync_to_forms_structure
+    amounts_attributes_map.each do |key, value|
+      amount_value = self.send(value)&.value
+      self.send("reporting_#{key}=", amount_value)
+      self.send("#{key}=", amount_value)
+    end
+    self.save
+  end
 
   def amounts_attributes_map
     # todo - I2P change it to converted values post multicurrency setup
