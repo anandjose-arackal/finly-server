@@ -1881,7 +1881,8 @@ class Invoice < ApplicationRecord
       # FOR NET AMOUNT
       net_amount_attr = self.net_amount_id
       # invoice_net_total_amount - invoice_paid_outside_amount
-      net_amount_value = self.invoice_net_total_amount.to_f - self.invoice_paid_outside_amount.to_f
+      net_amount_value = self.invoice_net_total_amount.to_f 
+      # - self.invoice_paid_outside_amount.to_f
       self.skip_callback = true
       if net_amount_attr.present?
         Amount.find_by(id: net_amount_attr).update(value: net_amount_value, currency_id: base_currency_id)
@@ -2012,11 +2013,12 @@ class Invoice < ApplicationRecord
           old_attachment.file_file_name = new_attachment.attachment_file_name
           old_attachment.file_content_type = new_attachment.attachment_content_type
           old_attachment.file_file_size = new_attachment.attachment_file_size
-          old_attachment.file_file_size = new_attachment.attachment_file_size
+          # old_attachment.file_file_size = new_attachment.attachment_file_size
           old_attachment.company_id = self.company_id
           old_attachment.procurement_document_id = form_attachments_field.document_id
           old_attachment.procurement_document_type = form_attachments_field.document_type
           old_attachment.user_id = RequestStoreUtil.current_user
+          old_attachment.file = new_attachment.attachment
           old_attachment.save
         end
       end    
