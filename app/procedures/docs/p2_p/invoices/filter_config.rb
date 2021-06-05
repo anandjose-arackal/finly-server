@@ -23,6 +23,7 @@ class Docs::P2P::Invoices::FilterConfig < Filters::API
   attribute :date, label: "Invoice Date", type: :datetime, simple: true
   attribute :due_date, label: "Due Date", type: :datetime, simple: true
   attribute :invoice_type_id, label: "Type", type: :dropdown, simple: true, choices: Choices[:list].(*INVOICE_TYPES)
+  attribute :base_currency_id, label: 'Base Currency', type: :dropdown, choices: Choices[:lookup].("currencies"), active: :is_accessable
   # attribute :is_domestic, label: 'Transaction Type', type: :dropdown, choices: Choices[:list].(*TRANSACTION_TYPE)
   attribute :policy_id, type: :dropdown, simple: false, choices: Choices[:lookup].('policies')
   attribute :vendor_id, label: "Vendor", simple: true, type: :dropdown, choices: Choices[:lookup].("vendors")
@@ -34,5 +35,10 @@ class Docs::P2P::Invoices::FilterConfig < Filters::API
   attribute :created_by_user_id, label: "Created By", type: :dropdown, choices: Choices[:lookup].("users")
   attribute :controlling_level_level_number, label: "Controlling Level", type: :number, simple: true
   attribute :controlling_user, label: "Controlling User", type: :dropdown, simple: true, choices: Choices[:lookup].("users")
+
+
+  def self.is_accessable( user )
+    user.present? && user.non_po_invoice_form_enabled 
+  end
 
 end

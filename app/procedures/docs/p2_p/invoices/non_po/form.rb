@@ -130,35 +130,27 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
     switch :cost_allocation_items, label: 'Cost Allocation (Item Level)', required: true, default_value: false
 
-    date :transaction_service_period_from, label: 'Transaction Service Period (From Date)', editable: true, visible: true
-    date :transaction_service_period_to, label: 'Transaction Service Period (To Date)', editable: true, visible: true
+    date :transaction_service_period_from, label: 'Transaction Service Period (From Date)', editable: true, visible: true, computed: Forms::Compute::Form( '{{ form.transaction_service_period_from | default: "now" | date: "%Y-%m-%d" }}')
+    date :transaction_service_period_to, label: 'Transaction Service Period (To Date)', editable: true, visible: true, computed: Forms::Compute::Form('{{ form.transaction_service_period_to | default: "now" | date: "%Y-%m-%d" }}')
     
     large_text :narration, label: "Narration", visible: true
   end
 
   # ACCOUNTING DETAILS
   section :accounting_details, title: "Accounting Details", associate_custom_fields: true do
-    lookup :policy_id,
-           choices_scope: Choices[:lookup].('policies', permissions: [:non_po_invoice_initiator]),
-           required: true, editable: false
+    lookup :policy_id, choices_scope: Choices[:lookup].('policies', permissions: [:non_po_invoice_initiator]), required: true, editable: false
     lookup :department_id, label: "Department", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('departments') #, editable: false, visible: false
     lookup :cost_center_id, label: "Cost Center", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('cost_centers')
     dropdown :discount_type_id, label: "Discount Type", editable: true, visible: true, required: true, choices_scope: Choices[:list].({ id: 1, name: 'Percentage' }, { id: 2, name: 'Amount' }), default_value: 1
-    # lookup :tax_type_id, label: "Tax Type", editable: true, visible: true, choices_scope: Choices[:lookup].('tax_types')
+
     dropdown :tax_type_id, label: "Tax Type", editable: true, visible: true, choices_scope: Choices[:list].(*TaxType.all.map { |v| { id: v.id, name: v.name } })
+    date :conversion_date, label: "Conversion Date", editable: false, visible: true, computed: Forms::Compute::Form('{{form.date}}')
 
-    date :conversion_date, label: "Conversion Date", editable: false, visible: true,
-         computed: Forms::Compute::Form('{{form.date}}')
-
-    text :reporting_currency, label: "Reporting Currency", editable: false, visible: true,
-         can_editable_be_changed: false # todo populate with system base currency
-
+    text :reporting_currency, label: "Reporting Currency", editable: false, visible: true, can_editable_be_changed: false
     lookup :base_currency, label: "Base Currency", choices_scope: Choices[:lookup].('currencies'), visible: true, editable: true
 
     switch :retrieve_conversion_rate, label: "Auto Populate Conversion Rate", default_value: true, visible: false
     number :conversion_rate, editable: true, format: 'decimal', default_value: 1, computed: Forms::Compute::Lookup('base_currency', '{{ record.currency_conversion_rate }}'), visible: true
-    # date :transaction_service_period_from, label: 'Transaction Period From'
-    # date :transaction_service_period_to, label: 'Transaction Period To'
   end
 
   # VENDOR DETAILS
@@ -189,7 +181,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
   # BILLING ADDRESS
   section :billing_address do
-    lookup :location_id, label: 'Billing Address', choices_scope: Choices[:lookup].('locations'),
+    lookup :location_id, label: 'Billing Address', choices_scope: Choices[:lookup].('locations', assignments: { form: true }),
            filters: Rules::Builder['billable_location'].true, required: true
     text :billing_address_name, label: 'Name', editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.name}}')
     text :billing_address_gstin, label: 'Gstin', editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.gstin}}')
@@ -198,7 +190,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
   # SHIPPING ADDRESS
   section :shipping_address do
-    lookup :delivery_location_id, label: 'Shipping Address', choices_scope: Choices[:lookup].('locations'),
+    lookup :delivery_location_id, label: 'Shipping Address', choices_scope: Choices[:lookup].('locations', assignments: { form: true }),
            filters: Rules::Builder['shippable_location'].true, required: true
     text :shipping_address_name, label: 'Name', editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.name}}')
     text :shipping_address_gstin, label: 'Gstin', editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.gstin}}') 
