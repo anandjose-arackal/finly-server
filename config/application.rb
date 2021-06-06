@@ -23,7 +23,7 @@ module Finly
     config.eager_load_paths << Rails.root.join('lib')
 
     Raven.configure do |config|
-      if Rails.env.production?
+      if Rails.env.production? || Rails.env.staging? 
         config.dsn = 'https://bed720c1d80849fcbc96fba0485460e6@sentry.finly.io/2'
       end
     end
