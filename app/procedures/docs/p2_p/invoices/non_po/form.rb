@@ -234,7 +234,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       lookup :category_id, label: "Category", required: true, visible: true, editable: true, choices_scope: Choices[:lookup].('categories'), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.category_id}}')
 
       text :gl_code, label: "GL Code", editable: false, visible: false, 
-        computed: Forms::Compute::Lookup('items.category_id', '{{record.gl_code}}')
+        computed: Forms::Compute::Lookup('items.category_id', '{{record.gl_code_or_item_code}}', assignments: {item_code: "{{row.item_code}}"})
       
       text :hsn_sac, label: "HSN/SAC", editable: true, visible: true,
         computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.hsn_sac}}')
