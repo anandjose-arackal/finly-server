@@ -44,9 +44,9 @@ class ExportManager::Template::Master::PurchaseOrders::PurchaseOrderItems::Index
   attribute :approval_pending_reviewers, template: '{{ record.purchase_order.get_reviewers_names }}'
   attribute :approved_reviewers, template: '{{ record.purchase_order.approved_reviewers_names }}'
 
-  attribute :department, template: '{{ record.purchase_order.department.name }}'
+  attribute :department, template: '{{ record.department.name }}'
+  attribute :cost_center, template: '{{ record.cost_center.name }}'
   attribute :sub_department, template: '{{ record.purchase_order.sub_department.name }}'
-  attribute :cost_center, template: '{{ record.purchase_order.cost_center.name }}'
   attribute :po_status, template: '{{ record.purchase_order.status.name }}'
   attribute :po_payment_term, template: '{{ record.purchase_order.payment_term.name }}'
   attribute :po_delivery_date, template: "{{ record.purchase_order.delivery_date | date: '%d-%b-%Y' }}"
