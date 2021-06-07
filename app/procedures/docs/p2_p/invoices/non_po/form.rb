@@ -473,7 +473,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
   # ATTACHMENTS
   section :attachments, associate_custom_fields: true do
-    attachment :invoice_attachments, system_field: false
+    attachment :invoice_attachments, system_field: false, required: true
   end
   # If reporting currency & base currency are same, then hide conversion_rate
 
