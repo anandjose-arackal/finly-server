@@ -1881,8 +1881,7 @@ class Invoice < ApplicationRecord
       # FOR NET AMOUNT
       net_amount_attr = self.net_amount_id
       # invoice_net_total_amount - invoice_paid_outside_amount
-      net_amount_value = self.invoice_net_total_amount.to_f 
-      # - self.invoice_paid_outside_amount.to_f
+      net_amount_value = self.invoice_net_total_amount.to_f + self.invoice_paid_outside_amount.to_f
       self.skip_callback = true
       if net_amount_attr.present?
         Amount.find_by(id: net_amount_attr).update(value: net_amount_value, currency_id: base_currency_id)
