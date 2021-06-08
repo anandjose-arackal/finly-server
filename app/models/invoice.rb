@@ -752,6 +752,26 @@ class Invoice < ApplicationRecord
     Forms::Router.klass(invoice_type)&.name
   end
 
+  # This method is to get Invoice ID from Form Autonumber Entity
+  def get_form_based_next_sequence(seq_prefix)
+    forms_enabled = NonPoInvoiceToggle.new(RequestStoreUtil.current_user).enabled?
+    return nil unless forms_enabled
+
+    invoice_form_class_name = Forms::Router.klass(:invoices)&.name
+
+    invoice_form = Form.find_by(klass_name: invoice_form_class_name, company_id: self.company_id)
+    return nil unless invoice_form.present?
+
+    sequence_entity = (invoice_form.entities.where(type: 'FormEntity::AutoNumber').filter do |e|
+      e.config.dig("sequence", "prefix") == seq_prefix
+    end).first
+
+    return nil unless sequence_entity.present?
+
+    prefix, sequence = FormEntity::AutoNumber.fetch_autonumber(sequence_entity, self)
+    prefix + sequence
+  end
+
   def policy
     return super if self.policy_id.present?
     # self.payments&.first&.payment_order&.bank_payment_request&.policy

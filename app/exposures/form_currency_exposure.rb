@@ -6,7 +6,7 @@ class FormCurrencyExposure < Exposures::API
   attribute :symbol, record_attribute: true
 
   attribute :currency_conversion_rate do
-    record.currency_conversion_rate
+    record.currency_conversion_rate(Date.parse(registers["conversion_date"]), registers["to_currency"])
   end
 
 end
