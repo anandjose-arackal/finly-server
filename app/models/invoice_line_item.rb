@@ -430,10 +430,11 @@ class InvoiceLineItem < ApplicationRecord
 
   # Syncs amounts from new forms structure to legacy amounts table
   def sync_amounts
-    self.skip_callback = true
-    sync_to_old_structure
+    if parent.forms_enabled
+      self.skip_callback = true
+      sync_to_old_structure
+    end
     
-    # if parent.respond_to?(:forms_enabled)
     #   if parent.forms_enabled
     #     sync_to_old_structure
     #   else

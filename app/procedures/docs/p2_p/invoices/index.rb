@@ -168,6 +168,18 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
   column :policy, default: true, includes: [:policy] do
     text value: "{{record.policy.name}}"
   end
+  
+  column :base_currency, label: "Base Currency", active: :is_accessable do
+    text value: "{{record.base_currency_code}}"
+  end
+  
+  column :reporting_currency, label: "Reporting Currency", active: :is_accessable do
+    text value: "{{record.reporting_currency_code}}"
+  end
+
+  column :conversion_rate, label: "Conversion Rate", active: :is_accessable do
+    text value: "{{record.conversion_rate}}"
+  end
 
   IndexBuilder::API::ColumnTemplate::ErpSync(self)
 
@@ -278,5 +290,10 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
       context[:record].net_amount
     end
   end
+
+  def self.is_accessable( user )
+    user.present? && user.non_po_invoice_form_enabled 
+  end
+
 
 end

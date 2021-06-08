@@ -7,5 +7,6 @@ class Masters::Vendors::Lookup < Lookup::API
   attribute :vendor_id
   attribute :name, value: :business_name
   attribute :trade_name
+  attribute :vendor_country
 
 end
