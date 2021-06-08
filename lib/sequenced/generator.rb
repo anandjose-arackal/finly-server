@@ -40,6 +40,11 @@ module Sequenced
     end
 
     def next_id
+      if record.respond_to?(:get_form_based_next_sequence)
+        seq = record.get_form_based_next_sequence(prefix)
+        return seq if seq.present?
+      end
+
       seq = next_id_in_sequence
       seq += 1 until unique?(format_id(seq))
       format_id(seq)
