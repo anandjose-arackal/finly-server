@@ -82,7 +82,8 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
   # INVOICE STATUS
   section :status do
     lookup :invoice_status_id,
-           choices_scope: Choices[:enum].(InwardInvoiceStatus),
+           choices_scope: Choices[:lookup].('inward_invoice_statuses'),
+           # Choices[:enum].(InwardInvoiceStatus),
            required: false, editable: false,
            default_value: InwardInvoiceStatus.id_for(:open),
            can_editable_be_changed: false
@@ -159,7 +160,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
            can_editable_be_changed: false, can_be_disabled: false, can_required_be_changed: false, can_visible_be_changed: false
 
     lookup :vendor_trade_name, label: 'Vendor Trade Name', editable: false, visible: true, computed: Forms::Compute::Lookup('vendor_id', '{{record.trade_name}}', assignments: { created_by_id: "{{meta.created_by_id}}" })
-    text :vendor_country, editable: false, visible: true
+    text :vendor_country, editable: false, visible: true, computed: Forms::Compute::Lookup('vendor_id', '{{record.vendor_country}}')
 
     text :vendor_sequence_id, "Vendor ID", editable: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.vendor_id}}')
 
