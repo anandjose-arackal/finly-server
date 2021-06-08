@@ -5,11 +5,11 @@ class CategoryExposure < Exposures::API
   attribute :category_code, record_attribute: true
   attribute :gl_code, record_attribute: true
 
-  attribute :gl_code_or_item_code do
+  attribute :gl_code_or_item_number do
     if record.gl_code.present?
       record.gl_code
     else
-      registers["item_code"]
+      registers["item_number"]
     end
   end
 
