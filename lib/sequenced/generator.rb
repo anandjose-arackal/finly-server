@@ -41,7 +41,7 @@ module Sequenced
 
     def next_id
       if record.respond_to?(:get_form_based_next_sequence)
-        seq = record.get_form_based_next_sequence(prefix)
+        seq = record.get_form_based_next_sequence(@prefix)
         return seq if seq.present?
       end
 
