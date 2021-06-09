@@ -57,6 +57,8 @@ json.results do
       json.base_currency_id invoice.get_base_currency.id rescue '1'
       json.base_currency_code invoice.get_base_currency.country_code rescue 'INR'
       # end
+      json.base_currency invoice.get_base_currency
+      json.reporting_currency invoice.get_reporting_currency
       
       json.is_domestic invoice.is_domestic
 

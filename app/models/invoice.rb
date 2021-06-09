@@ -151,7 +151,7 @@
 
 class Invoice < ApplicationRecord
   attr_accessor :skip_callback
-  include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport, ControllingUser
+  include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport, ControllingUser, GetCurrency
   include LiquidDroppable
   include Exposures::Model::Exposable
   include Sequenced::ActsAsSequenced
@@ -173,16 +173,6 @@ class Invoice < ApplicationRecord
   money :invoice_freight_amount, :get_reporting_currency
   money :invoice_roundoff_amount, :get_reporting_currency
   money :invoice_balance_due, :get_reporting_currency
-
-  def get_reporting_currency
-    Currency.currency_for(self.company.reporting_currency_code || "INR")
-  end
-
-  def get_base_currency
-    # Currency.find_by(id: self.base_currency) || Currency.find_by(country_code: "INR") 
-    currency_code = FormCurrency.find(self.base_currency)&.currency_code rescue nil
-    Currency.currency_for(currency_code || "INR")
-  end
 
   exchange_bank :get_reporting_currency, :get_base_currency, :exchange_rate
 

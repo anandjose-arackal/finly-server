@@ -42,7 +42,7 @@
 #
 
 class CreditNote < ApplicationRecord
-  include SoftDeletable, Templatable, Transitionable, MathUtil, CustomFieldFilterSupport
+  include SoftDeletable, Templatable, Transitionable, MathUtil, CustomFieldFilterSupport, GetCurrency
   include Sequenced::ActsAsSequenced
   include EventProducer
   include Concerns::ErpSyncConcern
@@ -72,6 +72,8 @@ class CreditNote < ApplicationRecord
   belongs_to :freight_amount, class_name: 'Amount', optional: true
   belongs_to :previously_adjusted_amount, class_name: 'Amount', optional: true
   belongs_to :net_adjustable_amount, class_name: 'Amount', optional: true
+  belongs_to :base_currency, optional: true, class_name: 'Currency'
+  belongs_to :reporting_currency, optional: true, class_name: 'Currency'
 
   belongs_to :tds_rate, class_name: 'TdsRatesList', optional: true
 
@@ -84,8 +86,15 @@ class CreditNote < ApplicationRecord
   after_create :calculate_from_items_values, unless: :skip_callback
   before_save :calculate_from_item_methods
   after_touch :update_adjustments
+  before_create :set_currency
 
   delegate :draft?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :voided?, :adjusted?, :partially_adjusted?, :unadjusted?, to: :status
+
+  def set_currency
+    self.reporting_currency = self.company.reporting_currency_code if self.reporting_currency.blank? 
+    self.base_currency = self.company.reporting_currency.id if self.base_currency.blank? 
+  end
+
 
   def as_json(options = {})
     if options[:index]
@@ -113,7 +122,9 @@ class CreditNote < ApplicationRecord
           user_email: user&.email,
           user_employee_id: user.employee_id,
           previously_adjusted_amount: previously_adjusted_amount.as_json({rounded: true}),
-          net_adjustable_amount: net_adjustable_amount.as_json({rounded: true})
+          net_adjustable_amount: net_adjustable_amount.as_json({rounded: true}),
+          base_currency: get_base_currency,
+          reporting_currency: get_reporting_currency
       }
     else
       data = {
@@ -152,7 +163,9 @@ class CreditNote < ApplicationRecord
           net_adjustable_amount: net_adjustable_amount.as_json,
           user: user.as_json,
           invoice_gst_type: tax_type_name,
-          approved_at: approved_at&.strftime('%d %b %Y')
+          approved_at: approved_at&.strftime('%d %b %Y'),
+          base_currency: get_base_currency,
+          reporting_currency: get_reporting_currency
       }
     end
 

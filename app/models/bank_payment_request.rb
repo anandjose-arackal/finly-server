@@ -44,7 +44,7 @@ class BankPaymentRequest < ApplicationRecord
   include SoftDeletable,
           FindByOrderedIds,
           Transitionable,
-          CustomFieldFilterSupport, ControllingUser
+          CustomFieldFilterSupport, ControllingUser, GetCurrency
   include LiquidDroppable
   include Exposures::Model::Exposable
   include Searchkick::Api

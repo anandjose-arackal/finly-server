@@ -36,6 +36,8 @@ json.result do
     json.amount payment.amount.value
     json.date payment.date
     json.bank_payment_request_id payment.payment_order&.bank_payment_request&.id
+    json.base_currency payment.payment_order&.bank_payment_request&.get_base_currency
+    json.reporting_currency payment.payment_order&.bank_payment_request&.get_reporting_currency
     json.payment_mode payment.payment_mode&.upcase
     json.account_number payment.receiving_account&.account_number
     json.ifsc payment.receiving_account&.ifsc

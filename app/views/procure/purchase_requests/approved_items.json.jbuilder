@@ -55,5 +55,14 @@ json.results do
       end
     end
   end
+
+  json.currencies do
+    json.array!(Currency.all) do |currency|
+      json.id currency.id
+      # json.country currency.country
+      json.symbol currency.symbol
+      json.country_code currency.country_code
+    end
+  end
   json.count @result.count
 end

@@ -22,7 +22,7 @@
 #
 
 class InwardDocument < ApplicationRecord
-  include SoftDeletable, Transitionable
+  include SoftDeletable, Transitionable, GetCurrency
   include Sequenced::ActsAsSequenced
 
   acts_as_sequenced column: :grn_number, purpose: :grn, editable: false, prefix: 'GRN'
@@ -32,6 +32,8 @@ class InwardDocument < ApplicationRecord
   belongs_to :user, optional: true
   belongs_to :created_by, foreign_key: :user_id, class_name: 'User'
   belongs_to :company, optional: true
+  belongs_to :base_currency, optional: true, class_name: 'Currency'
+  belongs_to :reporting_currency, optional: true, class_name: 'Currency'
 
   belongs_to :vendor, optional: true, class_name: "YesBankVendor"
   has_many :items, class_name: "InwardDocumentItem", dependent: :destroy
@@ -40,6 +42,7 @@ class InwardDocument < ApplicationRecord
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
 
   has_many :trails, as: :parent
+  before_create :set_currency
   
   accepts_nested_attributes_for :items
 
@@ -70,7 +73,9 @@ class InwardDocument < ApplicationRecord
         document_owner: self.user&.name,
         document_type: self.class.name,
         delivery_date: self.delivery_date&.strftime("%d-%m-%Y"),
-        received_date: self.updated_at&.strftime("%d-%m-%Y")
+        received_date: self.updated_at&.strftime("%d-%m-%Y"),
+        base_currency: get_base_currency,
+        reporting_currency: get_reporting_currency
     }
   end
 
@@ -90,4 +95,8 @@ class InwardDocument < ApplicationRecord
     user.vp_admin_or_auditor?
   end
 
+  def set_currency
+    self.reporting_currency = self.company.reporting_currency_code if self.reporting_currency.blank? 
+    self.base_currency = self.company.reporting_currency.id if self.base_currency.blank? 
+  end
 end

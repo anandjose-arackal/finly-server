@@ -224,4 +224,15 @@ json.comments do
   end
 end
 
+json.currencies do
+  json.array!(Currency.all) do |currency|
+    json.country currency.country
+    json.symbol currency.symbol
+    json.country_code currency.country_code
+    json.id currency.id
+  end
+end
+
 json.actions @result.actions
+
+

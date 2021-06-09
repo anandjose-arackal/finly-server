@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_05_25_074953) do
+ActiveRecord::Schema.define(version: 2021_06_09_081537) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -1055,6 +1055,8 @@ ActiveRecord::Schema.define(version: 2021_05_25_074953) do
     t.string "erp_sync_reference_id"
     t.integer "erp_sync_attempts_count", default: 0
     t.datetime "erp_sync_attempted_at"
+    t.integer "base_currency_id"
+    t.integer "reporting_currency_id"
     t.index ["amount_id"], name: "index_bbps_bills_on_amount_id"
     t.index ["autofetched"], name: "index_bbps_bills_on_autofetched"
     t.index ["controlling_level_id"], name: "index_bbps_bills_on_controlling_level_id"
@@ -2789,6 +2791,8 @@ ActiveRecord::Schema.define(version: 2021_05_25_074953) do
     t.string "erp_sync_reference_id"
     t.integer "erp_sync_attempts_count", default: 0
     t.datetime "erp_sync_attempted_at"
+    t.integer "base_currency_id"
+    t.integer "reporting_currency_id"
     t.index ["billing_location_id"], name: "index_credit_notes_on_billing_location_id"
     t.index ["company_id"], name: "index_credit_notes_on_company_id"
     t.index ["controlling_level_id"], name: "index_credit_notes_on_controlling_level_id"
@@ -5560,6 +5564,8 @@ ActiveRecord::Schema.define(version: 2021_05_25_074953) do
     t.integer "user_id"
     t.datetime "deleted_at"
     t.string "grn_number"
+    t.integer "base_currency_id"
+    t.integer "reporting_currency_id"
     t.index ["company_id"], name: "index_inward_documents_on_company_id"
     t.index ["procurement_id"], name: "index_inward_documents_on_procurement_id"
     t.index ["user_id"], name: "index_inward_documents_on_user_id"
@@ -6635,6 +6641,8 @@ ActiveRecord::Schema.define(version: 2021_05_25_074953) do
     t.integer "revision_of_pa_id"
     t.text "revision_reason"
     t.integer "revised_by_id"
+    t.integer "base_currency_id"
+    t.integer "reporting_currency_id"
     t.index ["company_id", "status_id", "policy_id", "created_at"], name: "payment_agreement_joined_indeexes"
     t.index ["creator_id"], name: "index_payment_agreements_on_creator_id"
     t.index ["policy_id"], name: "index_payment_agreements_on_policy_id"
@@ -6872,6 +6880,8 @@ ActiveRecord::Schema.define(version: 2021_05_25_074953) do
     t.text "erp_sync_reference_id"
     t.integer "erp_sync_attempts_count", default: 0
     t.datetime "erp_sync_attempted_at"
+    t.integer "base_currency_id"
+    t.integer "reporting_currency_id"
     t.index ["amount_id"], name: "index_payments_on_amount_id"
     t.index ["beneficiary_payment_id"], name: "index_payments_on_beneficiary_payment_id"
     t.index ["category_id"], name: "index_payments_on_category_id"
@@ -7299,6 +7309,23 @@ ActiveRecord::Schema.define(version: 2021_05_25_074953) do
     t.decimal "previously_billed_amount", precision: 20, scale: 5, default: "0.0"
     t.boolean "tds_applicable", default: false
     t.integer "company_id"
+    t.string "item_number"
+    t.boolean "product_type_id"
+    t.string "gl_code"
+    t.decimal "item_rate", precision: 20, scale: 5
+    t.decimal "tax_percentage", precision: 20, scale: 5
+    t.decimal "item_gross_amount", precision: 20, scale: 5
+    t.decimal "reporting_item_gross_amount", precision: 20, scale: 5
+    t.decimal "item_discount_amount", precision: 20, scale: 5
+    t.decimal "reporting_item_discount_amount", precision: 20, scale: 5
+    t.decimal "item_taxable_amount", precision: 20, scale: 5
+    t.decimal "reporting_item_taxable_amount", precision: 20, scale: 5
+    t.decimal "item_tax_amount", precision: 20, scale: 5
+    t.decimal "reporting_item_tax_amount", precision: 20, scale: 5
+    t.decimal "item_net_amount", precision: 20, scale: 5
+    t.decimal "reporting_item_net_amount", precision: 20, scale: 5
+    t.decimal "item_billable_amount", precision: 20, scale: 5
+    t.decimal "reporting_item_billable_amount", precision: 20, scale: 5
     t.index ["department_id"], name: "index_purchase_order_items_on_department_id"
     t.index ["discount_amount_id"], name: "index_purchase_order_items_on_discount_amount_id"
     t.index ["inventory_line_item_id"], name: "index_purchase_order_items_on_inventory_line_item_id"
@@ -7390,6 +7417,39 @@ ActiveRecord::Schema.define(version: 2021_05_25_074953) do
     t.integer "vlpm_id"
     t.text "vendor_note"
     t.integer "erp_sync_status_id"
+    t.date "conversion_date"
+    t.integer "reporting_currency_id"
+    t.integer "base_currency_id"
+    t.decimal "conversion_rate", precision: 20, scale: 5
+    t.string "vendor_trade_name"
+    t.string "vendor_sequence_id"
+    t.string "vendor_country"
+    t.string "vendor_gstin"
+    t.string "vendor_pan"
+    t.string "vendor_bank_account_number"
+    t.string "vendor_bank_account_ifsc"
+    t.string "vendor_bank_account_swift_code"
+    t.string "billing_address_name"
+    t.string "billing_address_gstin"
+    t.string "shipping_address_name"
+    t.string "shipping_address_gstin"
+    t.decimal "po_gross_amount", precision: 20, scale: 5
+    t.decimal "reporting_po_gross_amount", precision: 20, scale: 5
+    t.decimal "po_discount_amount", precision: 20, scale: 5
+    t.decimal "reporting_po_discount_amount", precision: 20, scale: 5
+    t.decimal "po_taxable_amount", precision: 20, scale: 5
+    t.decimal "reporting_po_taxable_amount", precision: 20, scale: 5
+    t.decimal "po_tax_amount", precision: 20, scale: 5
+    t.decimal "reporting_po_tax_amount", precision: 20, scale: 5
+    t.decimal "po_sub_total_amount", precision: 20, scale: 5
+    t.decimal "reporting_po_sub_total_amount", precision: 20, scale: 5
+    t.decimal "po_roundoff_amount", precision: 20, scale: 5
+    t.decimal "reporting_po_roundoff_amount", precision: 20, scale: 5
+    t.decimal "po_balance_due", precision: 20, scale: 5
+    t.decimal "reporting_po_balance_due", precision: 20, scale: 5
+    t.decimal "po_total_amount", precision: 20, scale: 5
+    t.decimal "reporting_po_total_amount", precision: 20, scale: 5
+    t.integer "payment_term_days", default: 0
     t.index ["advance_amount_id"], name: "index_purchase_orders_on_advance_amount_id"
     t.index ["advance_amount_status_id"], name: "index_purchase_orders_on_advance_amount_status_id"
     t.index ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id"
@@ -7452,6 +7512,12 @@ ActiveRecord::Schema.define(version: 2021_05_25_074953) do
     t.integer "rate_contract_item_id"
     t.datetime "deleted_at"
     t.integer "company_id"
+    t.string "item_description"
+    t.string "item_number"
+    t.decimal "item_rate", precision: 20, scale: 5
+    t.decimal "rate", precision: 20, scale: 5
+    t.decimal "item_gross_amount", precision: 20, scale: 5
+    t.decimal "reporting_item_gross_amount", precision: 20, scale: 5
     t.index ["approved"], name: "index_purchase_request_items_on_approved"
     t.index ["category_id"], name: "index_purchase_request_items_on_category_id"
     t.index ["cost_center_id"], name: "index_purchase_request_items_on_cost_center_id"
@@ -7493,6 +7559,14 @@ ActiveRecord::Schema.define(version: 2021_05_25_074953) do
     t.integer "total_amount_id"
     t.boolean "cost_allocation_items", null: false
     t.datetime "deleted_at"
+    t.string "creator_name"
+    t.string "creator_email"
+    t.date "conversion_date"
+    t.integer "reporting_currency_id"
+    t.integer "base_currency_id"
+    t.decimal "conversion_rate", precision: 20, scale: 5
+    t.decimal "pr_gross_amount", precision: 20, scale: 5
+    t.decimal "reporting_pr_gross_amount", precision: 20, scale: 5
     t.index ["company_id", "controlling_level_id", "deleted_at"], name: "index_po_ct_lvl_cmpny_id"
     t.index ["order_number"], name: "index_purchase_requests_on_order_number"
     t.index ["purchase_request_status_id"], name: "index_purchase_requests_on_purchase_request_status_id"
