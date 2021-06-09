@@ -24,6 +24,7 @@ class Docs::P2P::Invoices::FilterConfig < Filters::API
   attribute :due_date, label: "Due Date", type: :datetime, simple: true
   attribute :invoice_type_id, label: "Type", type: :dropdown, simple: true, choices: Choices[:list].(*INVOICE_TYPES)
   attribute :base_currency, label: 'Base Currency', type: :dropdown, choices: Choices[:lookup].("currencies"), active: :is_accessable
+  attribute :invoice_status_id, label: 'Status', type: :dropdown, choices: Choices[:lookup].('inward_invoice_statuses')
   # attribute :is_domestic, label: 'Transaction Type', type: :dropdown, choices: Choices[:list].(*TRANSACTION_TYPE)
   attribute :policy_id, type: :dropdown, simple: false, choices: Choices[:lookup].('policies')
   attribute :vendor_id, label: "Vendor", simple: true, type: :dropdown, choices: Choices[:lookup].("vendors")
