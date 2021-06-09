@@ -13,7 +13,7 @@ class CurrencyExposure < Exposures::API
   end
   
   attribute :currency_conversion_rate do
-    record.currency_conversion_rate
+    record.currency_conversion_rate(Date.parse(registers["conversion_date"]), registers["to_currency"]) rescue 1
   end
 
 end

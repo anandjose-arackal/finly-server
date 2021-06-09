@@ -13,5 +13,5 @@ class Masters::Currencies::Lookup < Lookup::API
   attribute :currency, value: '{{record.country}}' 
 
   attribute :symbol
-  attribute :currency_conversion_rate
+  # attribute :currency_conversion_rate
 end
