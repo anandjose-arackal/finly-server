@@ -24,10 +24,10 @@ module Finly
 
     Raven.configure do |config|
       if Rails.env.production?
-        config.dsn = 'https://bed720c1d80849fcbc96fba0485460e6@sentry.finly.io/2'
+        config.dsn = YAML.load_file(Rails.root.join('config/sentry_dsn.yml'))['production']
       end
       if Rails.env.staging?
-        config.dsn =  'https://c69a2738d68b4e818814a56374e4ca4b@sentry.finly.io/5'
+        config.dsn = YAML.load_file(Rails.root.join('config/sentry_dsn.yml'))['staging']
       end
     end
 
