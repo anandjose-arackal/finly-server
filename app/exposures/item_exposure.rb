@@ -47,7 +47,7 @@ class ItemExposure < Exposures::API
   attribute :hsn_sac, record_attribute: true
 
   attribute :rate_in_base_currency do
-    record.rate / FormCurrency.find_by(currency_code: registers["reporting_currency"]).currency_conversion_rate(Date.parse(registers["conversion_date"]), FormCurrency.find(registers["base_currency_id"]).currency_code) rescue record.rate
+    record.rate * FormCurrency.find_by(currency_code: registers["reporting_currency"]).currency_conversion_rate(Date.parse(registers["conversion_date"]), FormCurrency.find(registers["base_currency_id"]).currency_code) rescue record.rate
   end
 
 end
