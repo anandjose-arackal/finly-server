@@ -1916,21 +1916,22 @@ class User < ApplicationRecord
   def generate_finly_id
     return if self.finly_id.present?
     return unless valid?
+    ActsAsTenant.without_tenant do
+      if self.company.group_entity_structure_enabled? && self.company.group_id.present?
+        group_companies = self.company.group.companies
+        users = User.with_company_id(group_companies.pluck(:id)).with_email_or_mobile_number(self.email, self.mobile_number).without_id(self.id)
+        previously_added_user = users.reorder(created_at: :asc).first #
+        self.finly_id = previously_added_user.finly_id if previously_added_user.present? and previously_added_user.finly_id.present?
+      end
 
-    if self.company.group_entity_structure_enabled? && self.company.group_id.present?
-      group_companies = self.company.group.companies
-      users = User.with_company_id(group_companies.pluck(:id)).with_email_or_mobile_number(self.email, self.mobile_number).without_id(self.id)
-      previously_added_user = users.reorder(created_at: :asc).first #
-      self.finly_id = previously_added_user.finly_id if previously_added_user.present? and previously_added_user.finly_id.present?
-    end
+      # while finly_id.blank? or User.find_by(finly_id: self.finly_id).present?
+      #   self.finly_id = UUIDTools::UUID.timestamp_create().to_s.upcase if finly_id.blank?
+      # end
 
-    # while finly_id.blank? or User.find_by(finly_id: self.finly_id).present?
-    #   self.finly_id = UUIDTools::UUID.timestamp_create().to_s.upcase if finly_id.blank?
-    # end
-
-    if finly_id.blank?
-      while User.find_by(finly_id: self.finly_id).present?
-        self.finly_id = UUIDTools::UUID.timestamp_create().to_s.upcase
+      if finly_id.blank?
+        while User.find_by(finly_id: self.finly_id).present?
+          self.finly_id = UUIDTools::UUID.timestamp_create().to_s.upcase
+        end
       end
     end
 
