@@ -25,26 +25,8 @@ class ItemMaster::Item::Index < ItemMaster::Item::Base
       per_page = params[:per_page] || 30
       self.paginated_line_items = self.inventory_line_items&.order(created_at: :desc)&.paginate(page: params[:page], per_page: per_page)
 
-
-      final_item = self.paginated_line_items
-      if user.non_po_invoice_form_enabled
-        # make data as per forms requirement
-        final_item = []
-        self.paginated_line_items.each do |item|
-          item_ref = item
-          item = item.attributes
-          item['tds_applicable'] = item_ref.tds_applicable
-          item['category_id_value'] = item_ref.category&.name.to_s
-          item['tax_rate_id_value'] = item_ref.tax_rate&.name.to_s
-          item['product_type_id'] = item_ref&.product_type_id rescue 1
-          item['product_type_id_value'] = item_ref.goods? ? 'Goods' : 'Service'
-          item['tax_percentage'] = item_ref.tax_rate&.rate.to_f
-          item['item_rate'] = item_ref.rate
-          final_item << item
-        end
-      end 
-      self.paginated_line_items = final_item
-      # self.paginated_line_items
+      # self.paginated_line_items.map(&:attributes)
+      self.paginated_line_items
     end
   end
 
