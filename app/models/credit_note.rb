@@ -91,10 +91,9 @@ class CreditNote < ApplicationRecord
   delegate :draft?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :voided?, :adjusted?, :partially_adjusted?, :unadjusted?, to: :status
 
   def set_currency
-    self.reporting_currency = self.company.reporting_currency_code if self.reporting_currency.blank? 
-    self.base_currency = self.company.reporting_currency.id if self.base_currency.blank? 
+    self.reporting_currency_id = self.company.reporting_currency.id if self.reporting_currency_id.blank? 
+    self.base_currency_id = self.company.reporting_currency.id if self.base_currency_id.blank? 
   end
-
 
   def as_json(options = {})
     if options[:index]

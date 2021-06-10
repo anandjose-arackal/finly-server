@@ -20,5 +20,14 @@ class AddCurrencyToDifferentDocuments < ActiveRecord::Migration[6.0]
 
     add_column :bbps_bills, :base_currency_id, :integer
     add_column :bbps_bills, :reporting_currency_id, :integer
+
+    add_column :rental_invoices, :base_currency_id, :integer
+    add_column :rental_invoices, :reporting_currency_id, :integer
+    
+    add_column :general_invoices, :base_currency_id, :integer
+    add_column :general_invoices, :reporting_currency_id, :integer
+    
+    add_column :rate_contracts, :base_currency_id, :integer
+    add_column :rate_contracts, :reporting_currency_id, :integer
   end
 end

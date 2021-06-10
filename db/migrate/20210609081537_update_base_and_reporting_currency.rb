@@ -27,6 +27,15 @@ class UpdateBaseAndReportingCurrency < ActiveRecord::Migration[6.0]
       
       BbpsBill.where(base_currency_id: nil).update_all(base_currency_id: Currency.find_by(country_code: 'INR').id )  
       BbpsBill.where(reporting_currency_id: nil).update_all(reporting_currency_id: Currency.find_by(country_code: 'INR').id )  
+
+      GeneralInvoice.where(base_currency_id: nil).update_all(base_currency_id: Currency.find_by(country_code: 'INR').id )  
+      GeneralInvoice.where(reporting_currency_id: nil).update_all(reporting_currency_id: Currency.find_by(country_code: 'INR').id )  
+
+      RentalInvoice.where(base_currency_id: nil).update_all(base_currency_id: Currency.find_by(country_code: 'INR').id )  
+      RentalInvoice.where(reporting_currency_id: nil).update_all(reporting_currency_id: Currency.find_by(country_code: 'INR').id )  
+
+      RateContract.where(base_currency_id: nil).update_all(base_currency_id: Currency.find_by(country_code: 'INR').id )  
+      RateContract.where(reporting_currency_id: nil).update_all(reporting_currency_id: Currency.find_by(country_code: 'INR').id )  
     end
   end
 end

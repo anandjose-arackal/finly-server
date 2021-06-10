@@ -101,6 +101,7 @@ json.trail do
         json.revision_for item.revised_po_id
         json.revision_of item.revision_of_id
         json.revision_number item.revision_number
+        json.base_currency item.get_base_currency
       end
 
     elsif item.is_a?(PurchaseOrder)
@@ -114,12 +115,14 @@ json.trail do
         json.delivery_date item.delivery_date&.strftime("%b %d, %Y")
         json.amount item&.balance_amount&.value
         json.items_count item.items.count
+        json.base_currency item.get_base_currency
       end
 
     elsif item.is_a?(InwardDocument)
       json.inward_document_details do
         json.items_count item.items.count
         json.doc_number item.doc_number
+        json.base_currency item.get_base_currency
       end
     elsif item.is_a?(Payment)
       json.payment_details do
@@ -144,6 +147,7 @@ json.trail do
         json.amount item.net_adjustable_amount&.value
         json.sequence_id item.sequence_id
         json.credit_note_number item.credit_note_number
+        json.base_currency item.get_base_currency
         json.status do
           json.id item.status&.id
           json.name item.status&.name
