@@ -76,12 +76,16 @@ class AuditTrailExposure < Exposures::API
   end
 
   attribute :document_change_affected do
-    case record.item_typr
+    case record.item_type
     when "YesBankVendor"
       "Vendor"
     else
-      item.item_type&.underscore&.split("_")&.map(&:humanize)&.join(' ')
+      record.item_type&.underscore&.split("_")&.map(&:humanize)&.join(' ')
     end
+  end
+
+  attribute :action_performed do
+    record.event.capitalize
   end
 
 end
