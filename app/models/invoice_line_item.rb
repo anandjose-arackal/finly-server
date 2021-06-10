@@ -458,6 +458,12 @@ class InvoiceLineItem < ApplicationRecord
         )
       end
     end
+
+    unless parent.cost_allocation_items
+      self.department_id = parent&.department_id
+      self.cost_center_id = parent&.cost_center_id
+    end
+
     self.skip_callback = true
     self.save
   end
@@ -468,6 +474,7 @@ class InvoiceLineItem < ApplicationRecord
       self.send("reporting_#{key}=", amount_value)
       self.send("#{key}=", amount_value)
     end
+
     self.save
   end
 
