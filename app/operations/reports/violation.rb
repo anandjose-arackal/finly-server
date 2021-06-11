@@ -127,6 +127,7 @@ class Reports::Violation < Reports::Base
 
   def check_expense_rule_violation(expense, rule, manager = nil)
     message = ''
+    return false if expense.amount.nil?
     if rule.greater_than_amount_value && rule.greater_than_amount_value != 0
       expense_amount = expense.amount.send(base_currency_code.to_sym)
       if expense_amount and expense_amount > rule.greater_than_amount_value
