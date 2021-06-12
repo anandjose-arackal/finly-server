@@ -575,7 +575,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
   end
 
   condition condition_id: "Disable HSN/SAC for International > HSN/SAC for International Vendors" do
-    reference :entity, 'hsn_sac'
+    reference :entity, 'items.hsn_sac'
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :visible, false
   end
