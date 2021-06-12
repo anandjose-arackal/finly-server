@@ -6,6 +6,7 @@ else
   json.base_currency Currency.first.as_json
   currency = Currency.first
 end
+
 json.account_name @result.account_name
 json.opening_balance AmountUtils.format(@result.opening_balance, placeholder: '-', currency: currency)
 json.closing_balance AmountUtils.format(@result.closing_balance, placeholder: '-', currency: currency)
