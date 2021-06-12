@@ -140,7 +140,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
   # ACCOUNTING DETAILS
   section :accounting_details, title: "Accounting Details", associate_custom_fields: true do
     lookup :policy_id, choices_scope: Choices[:lookup].('policies', permissions: [:non_po_invoice_initiator]), required: true, editable: false
-    lookup :department_id, label: "Department", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('departments') #, editable: false, visible: false
+    lookup :department_id, label: "Department", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('departments', assignments: { form: true }) #, editable: false, visible: false
     lookup :cost_center_id, label: "Cost Center", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('cost_centers')
     dropdown :discount_type_id, label: "Discount Type", editable: true, visible: true, required: true, choices_scope: Choices[:list].({ id: 1, name: 'Percentage' }, { id: 2, name: 'Amount' }), default_value: 1
 
@@ -220,7 +220,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
       lookup :product_type_id, label: "Product Type", choices_scope: Choices[:enum].(ProductType), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.product_type_id}}'), editable: false, required: true, visible: true
 
-      lookup :items_department_id, label: "Department", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('departments')
+      lookup :items_department_id, label: "Department", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('departments', assignments: { form: true })
       lookup :items_cost_center_id, label: "Cost Center", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('cost_centers')
 
       lookup :category_id, label: "Category", required: true, visible: true, editable: true, choices_scope: Choices[:lookup].('categories'), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.category_id}}')
@@ -570,6 +570,12 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
   condition condition_id: "Disable RCM for International > Rcm for International Vendors" do
     reference :entity, 'rcm_enabled'
+    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    action :visible, false
+  end
+
+  condition condition_id: "Disable HSN/SAC for International > HSN/SAC for International Vendors" do
+    reference :entity, 'hsn_sac'
     rule Rules::Builder[:vendor_country].not_eq(value: 'India')
     action :visible, false
   end
