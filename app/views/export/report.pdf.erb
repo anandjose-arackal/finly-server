@@ -224,7 +224,7 @@
             </div>
 
             <div class="col-sm-10" style="margin-left: 5%; width: 85%; font-size: 13px;">
-              <%#= comment.generate(current_user) %>
+              <%= comment.generate %>
             </div>
           </div>
 
@@ -248,7 +248,6 @@
           <% receipts.each do |receipt| %>
             <% next if receipt[:path].nil? %>
             <div class="img-responsive" style="text-align: center;">
-                   <%= receipt[:path]  %>
               <%= wicked_pdf_image_tag(receipt[:path], :style=>"max-width:100%; height:auto;")%>
               <p class="text-center">Merchant: <%= receipt[:merchant] %> | Amount: <%= receipt[:amount] %></p>
             </div>
