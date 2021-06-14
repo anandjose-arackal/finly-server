@@ -2,9 +2,10 @@ module FormsHelper
   include ActiveSupport::Concern
 
   def form_data(form, model = self)
-    form.entities.root.includes({entities: {entities: {entities: :entities}}}).reduce({}) do |acc, entity|
+    data = form.entities.root.includes({entities: {entities: {entities: :entities}}}).reduce({}) do |acc, entity|
       acc.merge(entity_data(model, entity)).with_indifferent_access
     end
+    data.merge({meta: form_metadata})
   end
 
 
@@ -16,7 +17,8 @@ module FormsHelper
     meta = form_klass.try(:meta)
     return {} unless meta.present?
 
-    @form_metadata = LiquidHelper.interpolate(meta, { 'record' => self.to_exposure })
+    # @form_metadata = LiquidHelper.interpolate(meta, { 'record' => self.to_exposure })
+    @form_metadata = meta.(self)
   end
 
   def form_klass
@@ -31,6 +33,16 @@ module FormsHelper
 
   private
 
+  def entity_meta_data(model, form_entity)
+    return {} if (form_klass = self.form_klass).nil?
+    return {} unless Object.const_get(form_klass).respond_to?(:form)
+
+    meta = Object.const_get(form_klass).form.find_entity(form_entity.entity_key).try(:meta)
+    return {} unless meta.present?
+
+    return meta.(model)
+  end
+
   def entity_data(model, form_entity)
     form_data = {}
     if form_entity.class.collection?
@@ -39,11 +51,11 @@ module FormsHelper
         if collection_model.respond_to?(:forms_extra_data)
           collection_model_data = collection_model.send(:forms_extra_data)
           entities_data = form_entity.entities.reduce({}) {|acc, ent| acc.merge(entity_data(collection_model, ent))}.merge(id: collection_model.id, collection_id: collection_model.id)
-          entities_data.merge(collection_model_data)
+          entities_data.merge!(collection_model_data)
+          entities_data.merge!({meta: entity_meta_data(collection_model, form_entity)})
         else
-          
-          form_entity.entities.reduce({}) {|acc, ent| acc.merge(entity_data(collection_model, ent))}.merge(id: collection_model.id, collection_id: collection_model.id)
-
+          entities_data = form_entity.entities.reduce({}) {|acc, ent| acc.merge(entity_data(collection_model, ent))}.merge(id: collection_model.id, collection_id: collection_model.id)
+          entities_data.merge!({meta: entity_meta_data(collection_model, form_entity)})
         end
       end
       form_data.merge!(form_entity.entity_key => collection_data)

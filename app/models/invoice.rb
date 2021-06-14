@@ -742,6 +742,26 @@ class Invoice < ApplicationRecord
     Forms::Router.klass(invoice_type)&.name
   end
 
+  # This method is to get Invoice ID from Form Autonumber Entity
+  def get_form_based_next_sequence(seq_prefix)
+    forms_enabled = NonPoInvoiceToggle.new(RequestStoreUtil.current_user).enabled?
+    return nil unless forms_enabled
+
+    invoice_form_class_name = Forms::Router.klass(:invoices)&.name
+
+    invoice_form = Form.find_by(klass_name: invoice_form_class_name, company_id: self.company_id)
+    return nil unless invoice_form.present?
+
+    sequence_entity = (invoice_form.entities.where(type: 'FormEntity::AutoNumber').filter do |e|
+      e.config.dig("sequence", "prefix") == seq_prefix
+    end).first
+
+    return nil unless sequence_entity.present?
+
+    prefix, sequence = FormEntity::AutoNumber.fetch_autonumber(sequence_entity, self)
+    prefix + sequence
+  end
+
   def policy
     return super if self.policy_id.present?
     # self.payments&.first&.payment_order&.bank_payment_request&.policy
@@ -1871,8 +1891,8 @@ class Invoice < ApplicationRecord
       # FOR NET AMOUNT
       net_amount_attr = self.net_amount_id
       # invoice_net_total_amount - invoice_paid_outside_amount
-      net_amount_value = self.invoice_net_total_amount.to_f 
-      # - self.invoice_paid_outside_amount.to_f
+      # cant use invoice_net_amount because net amount converts to round value in new ui for base currency == 1
+      net_amount_value = self.invoice_total_amount.to_f + self.invoice_paid_outside_amount.to_f - self.invoice_roundoff_amount.to_f
       self.skip_callback = true
       if net_amount_attr.present?
         Amount.find_by(id: net_amount_attr).update(value: net_amount_value, currency_id: base_currency_id)
