@@ -74,6 +74,7 @@ class Forms::Ops::LookupDetails < Transactions::API
       data[dep_ent.entity_path] = entity_exposure.template(dep_ent.compute_formula, registers: params.dig(:assignments, dep_ent.entity_path))
       if dep_ent.entity_path.split("_").include?("id")
         data["#{dep_ent.entity_path}_value"] = entity_exposure.template(dep_ent.compute_formula.gsub('id', 'value'), registers: params.dig(:assignments, dep_ent.entity_path))
+        data["name"] = entity_exposure.template(dep_ent.compute_formula.gsub('id', 'value'), registers: params.dig(:assignments, dep_ent.entity_path))
       end
     end
 
