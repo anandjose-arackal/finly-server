@@ -1,4 +1,0 @@
-{
-  'staging':'https://c69a2738d68b4e818814a56374e4ca4b@sentry.finly.io/5',
-  'production': 'https://bed720c1d80849fcbc96fba0485460e6@sentry.finly.io/2'
-}

@@ -23,11 +23,8 @@ module Finly
     config.eager_load_paths << Rails.root.join('lib')
 
     Raven.configure do |config|
-      if Rails.env.production?
-        config.dsn = YAML.load_file(Rails.root.join('config/sentry_dsn.yml'))['production']
-      end
-      if Rails.env.staging?
-        config.dsn = YAML.load_file(Rails.root.join('config/sentry_dsn.yml'))['staging']
+      if Rails.env.production? || Rails.env.staging?
+        config.dsn = Rails.application.config_for(:sentry)[:dsn]
       end
     end
 
