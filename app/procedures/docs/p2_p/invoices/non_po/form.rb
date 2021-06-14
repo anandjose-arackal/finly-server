@@ -145,7 +145,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
     dropdown :discount_type_id, label: "Discount Type", editable: true, visible: true, required: true, choices_scope: Choices[:list].({ id: 1, name: 'Percentage' }, { id: 2, name: 'Amount' }), default_value: 1
 
     dropdown :tax_type_id, label: "Tax Type", editable: true, visible: true, choices_scope: Choices[:list].(*TaxType.all.map { |v| { id: v.id, name: v.name } })
-    date :conversion_date, label: "Conversion Date", editable: false, visible: true, computed: Forms::Compute::Form('{{form.date}}')
+    date :conversion_date, label: "Conversion Date", editable: false, visible: true, computed: Forms::Compute::Form('{{form.date}}'), triggers: {on_compute: {lookup_details: [:reporting_currency]}}
 
     text :reporting_currency, label: "Reporting Currency", editable: false, visible: true, can_editable_be_changed: false
     lookup :base_currency, label: "Base Currency", choices_scope: Choices[:lookup].('currencies'), visible: true, editable: true
@@ -223,7 +223,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       lookup :items_department_id, label: "Department", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('departments', assignments: { form: true })
       lookup :items_cost_center_id, label: "Cost Center", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('cost_centers')
 
-      lookup :category_id, label: "Category", required: true, visible: true, editable: true, choices_scope: Choices[:lookup].('categories'), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.category_id}}')
+      lookup :category_id, label: "Category", required: true, visible: true, editable: true, choices_scope: Choices[:lookup].('categories'), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.category_id}}'), triggers: {on_compute: {lookup_details: [:category_id]}}
 
       text :gl_code, label: "GL Code", editable: false, visible: false, 
         computed: Forms::Compute::Lookup('items.category_id', '{{record.gl_code_or_item_number}}', assignments: {item_number: "{{row.item_number}}"})

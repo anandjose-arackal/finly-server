@@ -101,6 +101,7 @@ class FormEntity < ApplicationRecord
   serialize :config, JSON
   serialize :compute_formula, JSON
   serialize :compute_lookup_assignments, JSON
+  serialize :triggers, JSON
 
   scope :root, -> { where parent_id: nil }
   scope :system_fields, -> { where system_field: true }
