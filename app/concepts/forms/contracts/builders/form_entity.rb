@@ -25,7 +25,6 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
   pass :execute_contract_evaluators
 
   def check_success(ctx, options)
-    # debugger
     true
   end
 
