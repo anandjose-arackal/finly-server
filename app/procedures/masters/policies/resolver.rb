@@ -20,15 +20,13 @@ class Masters::Policies::Resolver < Resolver::API
       ids += user&.admin_policies.with_application(app).pluck(:id)
       policies = Policy.with_id(ids)
     end
-    
     policies
+    
 
-    policy_mapping = user.policy_user_roles
-    if params[:permissions].present?
-      policy_mapping = policy_mapping.where(user_role_id: UserRole.ids_for(params[:permissions]))
+    if params[:permissions].present?  
+      policies = Policy::VendorPayments::Index.(user, {filter_role_id: [UserRole.ids_for(params[:permissions])]}).policies
     end
-
-    policies.where(id: policy_mapping.pluck(:policy_id))
+    policies
 
 
     #   policy_mapping = policy_mapping.where(user_role_id: UserRole.ids_for(params[:permissions]))

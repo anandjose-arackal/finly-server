@@ -1,7 +1,7 @@
 class Forms::Contracts::Builders::FormEntity < Transactions::API
 
   SETTER_ACTIONS = %w(editable visible active internal).freeze
-  VALIDATION_ACTIONS = %w(required unique).freeze
+  VALIDATION_ACTIONS = %w(required unique active).freeze
 
   schema do
     params do
