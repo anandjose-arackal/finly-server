@@ -42,6 +42,7 @@
 #
 
 class CreditNote < ApplicationRecord
+  attr_accessor :skip_callback
   include SoftDeletable, Templatable, Transitionable, MathUtil, CustomFieldFilterSupport, GetCurrency
   include Sequenced::ActsAsSequenced
   include EventProducer
@@ -85,6 +86,7 @@ class CreditNote < ApplicationRecord
   # before_save :calculate_amount
   after_create :calculate_from_items_values, unless: :skip_callback
   before_save :calculate_from_item_methods
+  after_save :set_currency_for_amount, unless: :skip_callback
   after_touch :update_adjustments
   before_create :set_currency
 
@@ -637,6 +639,22 @@ class CreditNote < ApplicationRecord
       self.status_id = CreditNoteStatus.id_for(:unadjusted)
     end
     save(validation: false)
+  end
+
+  def set_currency_for_amount
+
+    amount_attr = [:gross_receivable_amount, :tax_amount, :discount_amount, :net_receivable_amount, :tds_amount, :freight_amount, :previously_adjusted_amount, :net_adjustable_amount]
+
+    amount_attr.each do |amount_attribute|
+      amount_attr_id = self.send("#{amount_attribute}_id")
+      if amount_attr_id.present?
+          Amount.find_by(id: amount_attr_id).update(currency_id: get_base_currency.id)
+      else
+        amount_id = Amount.create(value: 0, currency_id: get_base_currency.id)
+      end
+    end
+    self.skip_callback = true
+    self.save
   end
 
 end

@@ -58,7 +58,7 @@
 #
 
 class BbpsBill < ApplicationRecord
-
+  attr_accessor :skip_callback
   AMOUNT_TYPES = %w(base_amount early_payment_amount late_payment_amount)
 
   include SoftDeletable, Transitionable, ControllingUser, GetCurrency
@@ -74,6 +74,7 @@ class BbpsBill < ApplicationRecord
 
   before_save :resolve_bill_validation
   before_save :set_quick_pay
+  after_save :set_currency_for_amount, unless: :skip_callback
   before_save :update_total_amount
   before_create :set_currency
 
@@ -623,6 +624,21 @@ class BbpsBill < ApplicationRecord
     else
       self.total_amount = Amount.new(value: total_amount_value, currency_id: 1)
     end
+  end
+
+  def set_currency_for_amount
+    amount_attr = [:amount, :total_amount, :late_payment_fee, :early_payment_fee, :convenience_fee]
+
+    amount_attr.each do |amount_attribute|
+      amount_attr_id = self.send("#{amount_attribute}_id")
+      if amount_attr_id.present?
+          Amount.find_by(id: amount_attr_id).update(currency_id: get_base_currency.id)
+      else
+        amount_id = Amount.create(value: 0, currency_id: get_base_currency.id)
+      end
+    end
+    self.skip_callback = true
+    self.save
   end
 
 

@@ -282,7 +282,7 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
 
   def self.set_net_amount_value(context)
     user = context[:user]
-    if user.present? && user.non_po_invoice_form_enabled 
+    if user.present? && context[:record].forms_enabled
       # show sub_total amount
       context[:record].invoice_sub_total_amount
     else

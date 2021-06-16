@@ -71,6 +71,7 @@ class Procurements::Invoices::Create < Procurements::Invoices::Base
 
     self.invoice.payment_term_days = vendor&.payment_term&.days_after.to_i
     self.invoice.due_date = Date.today + vendor&.payment_term&.days_after.to_i.days
+    
     self.invoice.reporting_currency = user.company.reporting_currency_code
 
     self.invoice.base_currency = user.company.reporting_currency.id

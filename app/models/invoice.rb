@@ -151,7 +151,7 @@
 
 class Invoice < ApplicationRecord
   attr_accessor :skip_callback
-  include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport, ControllingUser, GetCurrency
+  include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport, ControllingUser
   include LiquidDroppable
   include Exposures::Model::Exposable
   include Sequenced::ActsAsSequenced
@@ -173,6 +173,16 @@ class Invoice < ApplicationRecord
   money :invoice_freight_amount, :get_reporting_currency
   money :invoice_roundoff_amount, :get_reporting_currency
   money :invoice_balance_due, :get_reporting_currency
+
+  def get_reporting_currency
+    Currency.currency_for(self.reporting_currency ) rescue self.company.reporting_currency.country_code
+  end
+
+  def get_base_currency
+    currency_code = Currency.find(self.base_currency)&.country_code rescue nil
+    Currency.currency_for(currency_code || "INR")
+  end
+
 
   exchange_bank :get_reporting_currency, :get_base_currency, :exchange_rate
 
@@ -692,6 +702,7 @@ class Invoice < ApplicationRecord
 
   after_create :set_defaults
   after_save :sync_amounts, unless: :skip_callback
+  after_save :set_currency_for_amount, unless: :skip_callback
   after_save :budget_trail_entry
   # the below callback deals with cases where the PO advance has been paid, and then an invoice is being raised
   # after_save :handle_po_advance_budget_trails
@@ -2034,6 +2045,23 @@ class Invoice < ApplicationRecord
       end    
     end
   end
+
+  def set_currency_for_amount
+    amount_attr = [:amount, :gross_amount, :net_amount, :tds_amount, :tax_amount, :discount_amount, :original_amount, :advance_amount, :freight_amount, :balance_due, :taxable_amount, :paid_amount, :remaining_amount]
+
+    amount_attr.each do |amount_attribute|
+      amount_attr_id = self.send("#{amount_attribute}_id")
+      if amount_attr_id.present?
+          Amount.find_by(id: amount_attr_id).update(currency_id: get_base_currency.id)
+      else
+        amount_id = Amount.create(value: 0, currency_id: get_base_currency.id)
+      end
+    end
+    self.skip_callback = true
+    self.save
+  end
+
+
 
 
   #  We are keeping this aside for now.

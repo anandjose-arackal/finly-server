@@ -34,7 +34,7 @@
 #
 
 class PaymentAgreement < ApplicationRecord
-
+  attr_accessor :skip_callback
   include Transitionable, SoftDeletable, ControllingUser, GetCurrency
   include Sequenced::ActsAsSequenced
   # include SearchIndex::Concerns::Document
@@ -74,6 +74,7 @@ include Searchkick::Api
   has_many :attachments, as: :resource, dependent: :destroy
 
   before_create :set_currency
+  after_save :set_currency_for_amount, unless: :skip_callback
 
   amoeba do
     clone [:custom_fields, :general_invoices, :rental_invoices, :beneficiary_payments, :security_deposits, :notify_users]
@@ -586,6 +587,21 @@ include Searchkick::Api
 
   def review_in_progress?
     PaymentAgreementStatus.ids_for(:awaiting_approval).include?(status_id)
+  end
+
+  def set_currency_for_amount
+    amount_attr = [:total_amount]
+
+    amount_attr.each do |amount_attribute|
+      amount_attr_id = self.send("#{amount_attribute}_id")
+      if amount_attr_id.present?
+          Amount.find_by(id: amount_attr_id).update(currency_id: get_base_currency.id)
+      else
+        amount_id = Amount.create(value: 0, currency_id: get_base_currency.id)
+      end
+    end
+    self.skip_callback = true
+    self.save
   end
 
 end

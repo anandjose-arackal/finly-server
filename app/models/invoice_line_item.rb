@@ -186,6 +186,7 @@ class InvoiceLineItem < ApplicationRecord
   # after_commit :set_tds_applicable, on: [:create, :update]
 
   after_save :budget_trail_entry
+  after_save :set_currency_for_amount, unless: :skip_callback
   after_save :sync_amounts, unless: :skip_callback
   after_destroy :budget_trail_destroy
 
@@ -488,5 +489,20 @@ class InvoiceLineItem < ApplicationRecord
       item_net_amount: 'net_amount',
       item_billable_amount: 'billable_amount'
     }
+  end
+
+  def set_currency_for_amount
+    amount_attr = [:discount_amount, :net_amount, :taxable_amount, :tax_amount, :billable_amount, :amount]
+
+    amount_attr.each do |amount_attribute|
+      amount_attr_id = self.send("#{amount_attribute}_id")
+      if amount_attr_id.present?
+          Amount.find_by(id: amount_attr_id).update(currency_id: self.parent.get_base_currency.id)
+      else
+        amount_id = Amount.create(value: 0, currency_id: self.parent.get_base_currency.id)
+      end
+    end
+    self.skip_callback = true
+    self.save
   end
 end

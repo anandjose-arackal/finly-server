@@ -79,6 +79,7 @@
 #
 
 class PurchaseOrder < ApplicationRecord
+  attr_accessor :skip_callback
   include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport, ControllingUser, GetCurrency
   include Sequenced::ActsAsSequenced
   # include SearchIndex::Concerns::Document
@@ -529,6 +530,7 @@ class PurchaseOrder < ApplicationRecord
 
   before_save :calculate_line_items
   after_create :purchase_request_tasks
+  after_save :set_currency_for_amount, unless: :skip_callback
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
 
@@ -1309,5 +1311,20 @@ class PurchaseOrder < ApplicationRecord
     end
     
     errors.add(:items, "rate must be greater than 0") if flag
+  end
+
+  def set_currency_for_amount
+    amount_attr = [:total_before_tax, :tax_amount, :total_after_tax, :discount_amount, :balance_amount, :requested_advance_amount, :advance_amount, :advance_tds_amount]
+
+    amount_attr.each do |amount_attribute|
+      amount_attr_id = self.send("#{amount_attribute}_id")
+      if amount_attr_id.present?
+          Amount.find_by(id: amount_attr_id).update(currency_id: get_base_currency.id)
+      else
+        amount_id = Amount.create(value: 0, currency_id: get_base_currency.id)
+      end
+    end
+    self.skip_callback = true
+    self.save
   end
 end

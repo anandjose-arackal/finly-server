@@ -3,8 +3,8 @@ if @result.account.is_a?(UserPocket)
   currency = @result.account.base_currency
 else
   # because any other account has INR as the base curency
-  json.base_currency Currency.first.as_json
-  currency = Currency.first
+  json.base_currency @result.account.company.reporting_currency
+  currency = @result.account.company.reporting_currency
 end
 
 json.account_name @result.account_name

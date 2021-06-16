@@ -32,6 +32,7 @@
 #
 
 class CreditNoteItem < ApplicationRecord
+  attr_accessor :skip_callback
   include MathUtil, SoftDeletable
 
   before_save :set_tds_applicable
@@ -51,6 +52,8 @@ class CreditNoteItem < ApplicationRecord
   belongs_to :tax_rate, class_name: 'TaxRate', optional: true
   belongs_to :tax_amount, class_name: 'Amount', optional: true
   belongs_to :total_amount, class_name: 'Amount', optional: true
+
+  after_save :set_currency_for_amount, unless: :skip_callback
 
   def as_json(options = {})
     {
@@ -191,5 +194,20 @@ class CreditNoteItem < ApplicationRecord
 
   def set_tds_applicable
     self.tds_applicable = self&.item&.tds_applicable
+  end
+
+  def set_currency_for_amount
+    amount_attr = [:able_amount, :taxable_amount, :tax_amount, :total_amount]
+
+    amount_attr.each do |amount_attribute|
+      amount_attr_id = self.send("#{amount_attribute}_id")
+      if amount_attr_id.present?
+        Amount.find_by(id: amount_attr_id).update(currency_id: self.credit_note.get_base_currency.id)
+      else
+        amount_id = Amount.create(value: 0, currency_id: self.credit_note.get_base_currency.id)
+      end
+    end
+    self.skip_callback = true
+    self.save
   end
 end

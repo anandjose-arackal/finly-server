@@ -109,6 +109,7 @@
 # Make columns consistent with that in 'Invoices' table as this model acts as a template to actual "Invoice"
 
 class GeneralInvoice < ApplicationRecord
+  attr_accessor :skip_callback
   include SoftDeletable, MathUtil, GetCurrency
   include Sequenced::ActsAsSequenced
 
@@ -254,6 +255,7 @@ class GeneralInvoice < ApplicationRecord
 
   # before_create :set_company, :set_creator
   before_create :set_currency
+  after_save :set_currency_for_amount, unless: :skip_callback
   
   def set_currency
     self.reporting_currency_id = self.company.reporting_currency.id if self.reporting_currency_id.blank? 
@@ -432,6 +434,21 @@ class GeneralInvoice < ApplicationRecord
     user = RequestStore.store[:current_user]
     agreement_invoice = user.company.inward_invoices.find_by_agreement_item_id self.id
     agreement_invoice.present?
+  end
+
+  def set_currency_for_amount
+    amount_attr = [:gross_amount, :net_amount, :tds_amount, :tax_amount, :discount_amount, :original_amount, :advance_amount, :freight_amount, :balance_due, :taxable_amount, :remaining_amount, :amount_id, :remaining_amount, :total_invoice_amount, :available_invoice_amount]
+
+    amount_attr.each do |amount_attribute|
+      amount_attr_id = self.send("#{amount_attribute}_id")
+      if amount_attr_id.present?
+          Amount.find_by(id: amount_attr_id).update(currency_id: get_base_currency.id)
+      else
+        amount_id = Amount.create(value: 0, currency_id: get_base_currency.id)
+      end
+    end
+    self.skip_callback = true
+    self.save
   end
 
 end
