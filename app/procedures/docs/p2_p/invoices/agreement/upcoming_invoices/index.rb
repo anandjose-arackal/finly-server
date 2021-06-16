@@ -67,23 +67,23 @@ class Docs::P2P::Invoices::Agreement::UpcomingInvoices::Index < IndexBuilder::AP
   end
 
   column :gross_amount, sort: :gross_amount_value, default: true, includes: [gross_amount: :currency] do
-    amount value: :gross_amount
+    amount value: :gross_amount, currency_code: :set_currency_code, currency_symbol: :set_currency_symbol
   end
 
   column :discount_amount, sort: :discount_amount_value, includes: [discount_amount: :currency] do
-    amount value: :discount_amount
+    amount value: :discount_amount, currency_code: :set_currency_code, currency_symbol: :set_currency_symbol
   end
 
   column :cgst_amount, sort: :tax_amount_value, label: 'CGST', default: true, includes: [tax_amount: :currency] do
-    amount value: :cgst_amount
+    amount value: :cgst_amount, currency_code: :set_currency_code, currency_symbol: :set_currency_symbol
   end
 
   column :sgst_amount, sort: :tax_amount_value, label: 'SGST', default: true, includes: [tax_amount: :currency] do
-    amount value: :sgst_amount
+    amount value: :sgst_amount, currency_code: :set_currency_code, currency_symbol: :set_currency_symbol
   end
 
   column :igst, sort: :tax_amount_value, label: 'IGST', default: true, includes: [tax_amount: :currency] do
-    amount value: :igst_amount
+    amount value: :igst_amount, currency_code: :set_currency_code, currency_symbol: :set_currency_symbol
   end
 
   column :tds_slab, sort: :tds_slab_name, includes: [:tds_slab] do
@@ -95,23 +95,23 @@ class Docs::P2P::Invoices::Agreement::UpcomingInvoices::Index < IndexBuilder::AP
   end
 
   column :tds_amount, sort: :tds_amount_value, includes: [tds_amount: :currency] do
-    amount value: :tds_amount
+    amount value: :tds_amount, currency_code: :set_currency_code, currency_symbol: :set_currency_symbol
   end
 
   column :freight_amount, sort: :freight_amount_value, includes: [freight_amount: :currency] do
-    amount value: :freight_amount
+    amount value: :freight_amount, currency_code: :set_currency_code, currency_symbol: :set_currency_symbol
   end
 
   column :net_amount, sort: :net_amount_value, default: true, includes: [net_amount: :currency] do
-    amount value: :net_amount
+    amount value: :net_amount, currency_code: :set_currency_code, currency_symbol: :set_currency_symbol
   end
 
   column :advance_amount, sort: :advance_amount_value, includes: [advance_amount: :currency] do
-    amount value: :advance_amount
+    amount value: :advance_amount, currency_code: :set_currency_code, currency_symbol: :set_currency_symbol
   end
 
   column :balance_due, includes: [balance_due: :currency] do
-    amount value: :balance_due
+    amount value: :balance_due, currency_code: :set_currency_code, currency_symbol: :set_currency_symbol
   end
 
   column :cost_center, default: true, includes: [:cost_center] do
@@ -208,6 +208,14 @@ class Docs::P2P::Invoices::Agreement::UpcomingInvoices::Index < IndexBuilder::AP
 
   def self.can_create?(context)
     false
+  end
+
+  def self.set_currency_code(context)
+    context[:record].get_base_currency.country_code
+  end
+
+  def self.set_currency_symbol(context)
+    context[:record].get_base_currency.symbol
   end
 
 end

@@ -12,12 +12,11 @@ class IndexBuilder::ContentTypes::Amount < IndexBuilder::ContentTypes::Base
     if [Amount.name, AmountExposure.name].include?(context&.dig(:data, :value).class.name)
       "#{context[:data][:value].currency&.country_code} #{context[:data][:value].value}"
     else
-      "#{(context&.dig(:data, :currency_code) || default_currency.country_code )} #{(context&.dig(:data, :value) || 0)}"
+      "#{(context&.dig(:data, :currency_code)|| default_currency.country_code )} #{(context&.dig(:data, :value) || 0)}"
     end
   end
 
   def format_value(context, user, record, exposure, data)
-    # return data unless data[:value].present?
     unless [Amount.name, AmountExposure.name].include?(data[:value].class.name)
       data[:value] = 0 if data[:value].blank?
       data[:currency_code] = user.company.reporting_currency.country_code if data[:currency_code].blank?
