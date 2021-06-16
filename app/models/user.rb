@@ -1309,6 +1309,10 @@ class User < ApplicationRecord
     }
   end
 
+  def previous_session
+    self.user_sessions.order(id: :desc).offset(1).first
+  end
+
   def json_for_trail(options = {})
     if options[:vendor_show]
       data = {

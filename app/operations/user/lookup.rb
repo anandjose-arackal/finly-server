@@ -11,7 +11,9 @@ class User::Lookup < User::Base
   end
 
   def pre_validate
-
+    if params[:email_mobile].length > 35
+      add_message :error, 'Invalid User'
+    end
   end
 
   def init
