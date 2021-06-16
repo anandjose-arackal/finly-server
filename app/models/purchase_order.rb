@@ -79,7 +79,7 @@
 #
 
 class PurchaseOrder < ApplicationRecord
-  include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport, ControllingUser
+  include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport, ControllingUser, GetCurrency
   include Sequenced::ActsAsSequenced
   # include SearchIndex::Concerns::Document
   include Searchkick::Api
@@ -106,6 +106,8 @@ class PurchaseOrder < ApplicationRecord
   belongs_to :sub_department, optional: true, class_name: "Department", foreign_key: :sub_department_id
   belongs_to :cost_center, optional: true
   belongs_to :gst_type, optional: true
+  belongs_to :base_currency, optional: true, class_name: 'Currency'
+  belongs_to :reporting_currency, optional: true, class_name: 'Currency'
 
   belongs_to :controlling_user, optional: true, class_name: 'User'
   belongs_to :controlling_for_user, optional: true, class_name: 'User'
@@ -530,7 +532,14 @@ class PurchaseOrder < ApplicationRecord
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
 
+  before_create :set_currency
+
   ransack_scopes :with_status_ids, :with_grn_status_id
+  
+  def set_currency
+    self.reporting_currency_id = self.company.reporting_currency.id if self.reporting_currency_id.blank? 
+    self.base_currency_id = self.company.reporting_currency.id if self.base_currency_id.blank? 
+  end
   
   def status_tag_details
     return @tags_data if @tags_data.present?
@@ -841,7 +850,9 @@ class PurchaseOrder < ApplicationRecord
             thumb: self.attachments.first&.file&.url(:thumb, timestamp: false),
             content_type: self.attachments.first&.file_content_type,
             file_name: self.attachments.first&.file_file_name
-        }
+        },
+        base_currency: get_base_currency,
+        reporting_currency: get_reporting_currency
         # balance_due: {
         #   value: precision_value(self.balance_amount&.value),
         #   id: self.balance_amount&.id,

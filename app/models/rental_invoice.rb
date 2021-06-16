@@ -105,7 +105,7 @@
 
 class RentalInvoice < ApplicationRecord
 
-  include SoftDeletable, MathUtil
+  include SoftDeletable, MathUtil, GetCurrency
   include Sequenced::ActsAsSequenced
 
   acts_as_sequenced column: :invoice_id, purpose: :rental_invoice, editable: false, prefix: 'RENINV'
@@ -144,7 +144,9 @@ class RentalInvoice < ApplicationRecord
   belongs_to :invoice_frequency, optional: true
   belongs_to :delivery_location, optional: true, class_name: 'BranchLocation'
   belongs_to :template_invoice, optional: true, class_name: 'RentalInvoice'
-
+  belongs_to :base_currency, optional: true, class_name: 'Currency'
+  belongs_to :reporting_currency, optional: true, class_name: 'Currency'
+  
   has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
   has_many :items, class_name: "InvoiceLineItem", as: :parent
   has_many :custom_fields, as: :parent, dependent: :destroy, autosave: true
@@ -154,6 +156,8 @@ class RentalInvoice < ApplicationRecord
 
   # Use include_association instead of exclude_association if data tree grows
   #https://github.com/amoeba-rb/amoeba#installation
+
+  before_create :set_currency
 
   amoeba do
     clone [:amount, :gross_amount, :net_amount, :tds_amount, :tax_amount, :discount_amount,
@@ -314,7 +318,9 @@ class RentalInvoice < ApplicationRecord
       already_exists: true,
       prepaid: self.prepaid,
       escalation_percentage: self.escalation_percentage,
-      invoice_number: self.get_invoice_number
+      invoice_number: self.get_invoice_number,
+      base_currency: get_base_currency,
+      reporting_currency: get_reporting_currency
     }
   end
 
@@ -336,7 +342,9 @@ class RentalInvoice < ApplicationRecord
         start_date: self.start_date,
         end_date: self.end_date,
         allow_add_invoice: allowed_to_add_invoice?,
-        invoice_created: agreement_invoice_created?
+        invoice_created: agreement_invoice_created?,
+        base_currency: get_base_currency,
+        reporting_currency: get_reporting_currency
 
     }
   end
@@ -364,5 +372,9 @@ class RentalInvoice < ApplicationRecord
     agreement_invoice.present?
   end
 
+  def set_currency
+    self.reporting_currency_id = self.company.reporting_currency.id if self.reporting_currency_id.blank? 
+    self.base_currency_id = self.company.reporting_currency.id if self.base_currency_id.blank? 
+  end
 
 end

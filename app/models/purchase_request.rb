@@ -25,10 +25,10 @@
 #
 
 class PurchaseRequest < ApplicationRecord
-  include Transitionable, CustomFieldFilterSupport, ControllingUser
+  include Transitionable, CustomFieldFilterSupport, ControllingUser, GetCurrency
   include Sequenced::ActsAsSequenced
   # include SearchIndex::Concerns::Document
-include Searchkick::Api
+  include Searchkick::Api
 
 
   acts_as_sequenced column: :order_number, purpose: :purchase_request, editable: false, prefix: 'PR'
@@ -48,6 +48,8 @@ include Searchkick::Api
   belongs_to :cost_center, optional: true
   belongs_to :total_amount, optional: true, class_name: "Amount", dependent: :destroy
   has_many :attachments, as: :resource, dependent: :destroy
+  belongs_to :base_currency, optional: true, class_name: 'Currency'
+  belongs_to :reporting_currency, optional: true, class_name: 'Currency'
 
   # has_many :line_items, class_name: "PurchaseRequestItem", dependent: :destroy
   has_many :purchase_request_items, dependent: :destroy
@@ -67,6 +69,7 @@ include Searchkick::Api
 
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
+  before_create :set_currency
 
   has_paper_trail(
       meta: {
@@ -269,7 +272,9 @@ include Searchkick::Api
         rejection_note: self.reject_note,
         department: self.department&.name,
         cost_center: self.cost_center&.name,
-        cost_allocation_items: cost_allocation_items
+        cost_allocation_items: cost_allocation_items,
+        base_currency: get_base_currency,
+        reporting_currency: get_reporting_currency
     }
   end
 
@@ -461,6 +466,11 @@ include Searchkick::Api
 
   def review_in_progress?
     PurchaseRequestStatus.ids_for(:awaiting_approval).include?(purchase_request_status_id)
+  end
+  
+  def set_currency
+    self.reporting_currency_id = self.company.reporting_currency.id if self.reporting_currency_id.blank? 
+    self.base_currency_id = self.company.reporting_currency.id if self.base_currency_id.blank? 
   end
 
   private

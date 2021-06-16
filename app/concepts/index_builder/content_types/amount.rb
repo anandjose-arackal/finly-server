@@ -7,10 +7,12 @@ class IndexBuilder::ContentTypes::Amount < IndexBuilder::ContentTypes::Base
   attribute :currency_symbol
   attribute :format, default: "default"
   attribute :tool_tip, default: -> (context) do
+    user = context[:user]
+    default_currency = user.company.reporting_currency
     if [Amount.name, AmountExposure.name].include?(context&.dig(:data, :value).class.name)
-      "#{context[:data][:value].currency&.symbol} #{context[:data][:value].value}"
+      "#{context[:data][:value].currency&.country_code} #{context[:data][:value].value}"
     else
-      "#{(context&.dig(:data, :currency_code) || "₹")} #{(context&.dig(:data, :value) || 0)}"
+      "#{(context&.dig(:data, :currency_code) || default_currency.country_code || 'INR' )} #{(context&.dig(:data, :value) || 0)}"
     end
   end
 
