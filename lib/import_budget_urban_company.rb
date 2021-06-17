@@ -123,7 +123,7 @@ class ImportBudgetUrbanCompany
                 purchase_request: budget_group.purchase_request,
                 budget_amount_attributes: {
                     value: amount,
-                    currency_id: company.reporting_currency.id rescue 1
+                    currency_id: (company.reporting_currency.id rescue 1)
                 }
             )
 
