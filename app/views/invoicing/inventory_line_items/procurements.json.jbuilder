@@ -40,4 +40,5 @@ json.documents do
   end
 end
 
+json.non_po_invoice_form_enabled @result.current_user.non_po_invoice_form_enabled
 json.count @result.documents.count

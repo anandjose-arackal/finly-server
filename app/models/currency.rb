@@ -44,7 +44,7 @@ class Currency < NonTenantedApplicationRecord
         date,
         self.country_code,
         to_iso_code
-    ).to_f
+    ).to_f.round(5)
   end
 
   CURRENCIES = [
