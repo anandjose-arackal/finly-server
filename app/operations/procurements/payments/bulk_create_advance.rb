@@ -151,14 +151,14 @@ class Procurements::Payments::BulkCreateAdvance < Procurements::Payments::Base
         company_id: user.company_id,
         amount_requested_attributes: {
             value: self.payable_amount,
-            currency_id: user.company.reporting_currency.id rescue Currency.first.id
+            currency_id: (user.company.reporting_currency.id rescue Currency.first.id)
         },
         payment_mode: self.payment_mode,
         initiating_account_type: user.company.yes_bank_company_account&.class&.name,
         receiving_account_type: "BankAccount",
         payment_purpose_id: PaymentPurpose.id_for(:advance_against_purchase_order),
         application: RequestStore.store[:current_app],
-        currency_id: user.company.reporting_currency.id rescue Currency.first.id,
+        currency_id: (user.company.reporting_currency.id rescue Currency.first.id),
         scheduled_at: self.scheduled_at
     }
     bank_payment_request_params = {
@@ -167,7 +167,7 @@ class Procurements::Payments::BulkCreateAdvance < Procurements::Payments::Base
         controlling_user_id: user.id,
         requested_amount_attributes: {
             value: self.payable_amount,
-            currency_id: user.company.reporting_currency.id rescue Currency.first.id
+            currency_id: (user.company.reporting_currency.id rescue Currency.first.id)
         },
         description: self.description,
         beneficiary_type_id: 2, # this is because a purchase order will always come from a vendor

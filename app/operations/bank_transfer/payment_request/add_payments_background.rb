@@ -54,7 +54,7 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
           payment_mode: self.payment_mode,
           amount_attributes: {
               value: payment[:original_amount],
-              currency_id: user.company.reporting_currency.id rescue Currency.first.id
+              currency_id: (user.company.reporting_currency.id rescue Currency.first.id)
           },
           note: payment[:note],
           date: DateUtils.local_date,
@@ -84,7 +84,7 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
               receiving_account_id: bank_account.id,
               original_amount_attributes: {
                   value: payment[:original_amount],
-                  currency_id: user.company.reporting_currency.id rescue Currency.first.id
+                  currency_id: (user.company.reporting_currency.id rescue Currency.first.id)
               }
           },
           custom_fields: payment[:custom_fields]

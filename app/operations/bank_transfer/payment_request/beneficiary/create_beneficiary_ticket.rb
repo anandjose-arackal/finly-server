@@ -204,7 +204,7 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 		    company_id: user.company_id,
 		    amount_requested_attributes: {
 		        value: 0,
-		        currency_id: user.company.reporting_currency.id rescue Currency.first.id
+		        currency_id: (user.company.reporting_currency.id rescue Currency.first.id)
 		    },
 		    payment_mode: self.payment_mode,
 		    transfer_mode_id: self.transfer_mode_id,
@@ -212,7 +212,7 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 		    receiving_account_type: BankAccount.name,
 		    payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
 		    application: "vp",
-		    currency_id: user.company.reporting_currency.id rescue Currency.first.id,
+		    currency_id: (user.company.reporting_currency.id rescue Currency.first.id),
 		    scheduled_at: self.scheduled_at,
 		    api_initiated: false
 		}
@@ -222,7 +222,7 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 		    controlling_user_id: user.id,
 		    requested_amount_attributes: {
 		        value: 0,
-		        currency_id: user.company.reporting_currency.id rescue Currency.first.id
+		        currency_id: (user.company.reporting_currency.id rescue Currency.first.id)
 		    },
 		    beneficiary_type_id: 2,
 		    policy_id: self.policy&.id,
