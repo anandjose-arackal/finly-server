@@ -41,10 +41,11 @@
 #
 
 class BankPaymentRequest < ApplicationRecord
+  attr_accessor :skip_callback
   include SoftDeletable,
           FindByOrderedIds,
           Transitionable,
-          CustomFieldFilterSupport, ControllingUser
+          CustomFieldFilterSupport, ControllingUser, GetCurrency
   include LiquidDroppable
   include Exposures::Model::Exposable
   include Searchkick::Api
@@ -442,6 +443,7 @@ class BankPaymentRequest < ApplicationRecord
 
   before_save :add_company
   before_save :set_base_currency
+  after_save :set_currency_for_amount, unless: :skip_callback
   
 
   ransack_scopes :with_status_id
@@ -790,6 +792,19 @@ class BankPaymentRequest < ApplicationRecord
         end
       end
     end
+  end
+
+  def set_currency_for_amount
+    amount_attr = [:requested_amount]
+
+    amount_attr.each do |amount_attribute|
+      amount_attr_id = self.send("#{amount_attribute}_id")
+      if amount_attr_id.present?
+        Amount.find_by(id: amount_attr_id).update(currency_id: get_base_currency.id)
+      end
+    end
+    self.skip_callback = true
+    self.save
   end
 
 end

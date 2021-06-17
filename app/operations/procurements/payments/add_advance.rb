@@ -141,7 +141,7 @@ class Procurements::Payments::AddAdvance < Procurements::Payments::Base
         amount_attributes: {
             # value: self.advance_amount,
             value: advance_payment[:amount_attributes][:value],
-            currency_id: Currency.first.id
+            currency_id: (user.company.reporting_currency.id rescue Currency.first.id)
         },
         date: DateUtils.local_date,
         purchase_order_id: self.purchase_order.id,
@@ -154,7 +154,7 @@ class Procurements::Payments::AddAdvance < Procurements::Payments::Base
     #     company_id: user.company_id,
     #     amount_requested_attributes: {
     #         value: self.advance_amount,
-    #         currency_id: 1
+    #         currency_id: (user.company.reporting_currency.id rescue Currency.first.id)
     #     },
     #     payment_mode: self.payment_mode,
     #     initiating_account_type: user.company.yes_bank_company_account&.class&.name,

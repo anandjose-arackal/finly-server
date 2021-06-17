@@ -39,7 +39,7 @@ class Event::EBankPaymentRequest::CreditConfirm < Event::EBankPaymentRequest::Ba
                                              timestamp: DateUtils.local_date_time,
                                              view_role_id: view_role_id,
                                              application: RequestStore.store[:current_app],
-                                             amount_attributes: {value: bank_payment_request&.payment_order&.amount_processed&.value, currency_id: 1}
+                                             amount_attributes: {value: bank_payment_request&.payment_order&.amount_processed&.value, currency_id: (user.company.reporting_currency.id rescue 1) }
     )
     notification.save
   end

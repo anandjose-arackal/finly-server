@@ -45,6 +45,7 @@
 
 
 class PurchaseRequestItem < ApplicationRecord
+  attr_accessor :skip_callback
   include FieldCustomizer::CustomizableValidation
   # include Transitionable
 
@@ -85,6 +86,7 @@ class PurchaseRequestItem < ApplicationRecord
   accepts_nested_attributes_for :per_unit_estimated_amount, :attachment, allow_destroy: true
 
   after_create :add_attachment
+  after_save :set_currency_for_amount, unless: :skip_callback
 
   scope :with_ids, -> (ids) { where id: ids }
   scope :with_id, -> (id) { where id: id }
@@ -232,5 +234,19 @@ class PurchaseRequestItem < ApplicationRecord
   def budget_trail_destroy
     BudgetManager::BudgetsCalculator::Calculate::PurchaseRequestItemsBudgetsProcessor.new.destroy_trail(self)
   end
+
+  def set_currency_for_amount
+    amount_attr = [:per_unit_estimated_amount, :estimated_amount]
+
+    amount_attr.each do |amount_attribute|
+      amount_attr_id = self.send("#{amount_attribute}_id")
+      if amount_attr_id.present?
+        Amount.find_by(id: amount_attr_id).update(currency_id: self.purchase_request.get_base_currency.id)
+      end
+    end
+    self.skip_callback = true
+    self.save
+  end
+
 
 end

@@ -108,14 +108,14 @@ class BankTransfer::Payments::ApiPayments::BulkInitiatePayment < BankTransfer::P
         company_id: user.company_id,
         amount_requested_attributes: {
             value: self.total_amount_requested,
-            currency_id: 1
+            currency_id: (user.company.reporting_currency.id rescue Currency.first.id)
         },
         payment_mode: self.payment_mode,
         initiating_account_type: initiating_account.class.name,
         receiving_account_type: BankAccount.name,
         payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
         application: "vp",
-        currency_id: Currency.first.id,
+        currency_id: (user.company.reporting_currency.id rescue Currency.first.id),
         api_initiated: true
     }
     bpr_attributes = {
@@ -124,7 +124,7 @@ class BankTransfer::Payments::ApiPayments::BulkInitiatePayment < BankTransfer::P
         controlling_user_id: user.id,
         requested_amount_attributes: {
             value: self.total_amount_requested,
-            currency_id: 1
+            currency_id: (user.company.reporting_currency.id rescue Currency.first.id)
         },
         beneficiary_type_id: 2,
         policy_id: user.company.policies.default.first.id,

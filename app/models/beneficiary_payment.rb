@@ -75,7 +75,8 @@
 
 
 class BeneficiaryPayment < ApplicationRecord
-  include MathUtil, Templatable
+  include MathUtil, Templatable, GetCurrency
+  attr_accessor :skip_callback
   
   belongs_to :vendor,  class_name: 'YesBankVendor'
   belongs_to :bank_account, optional: true
@@ -106,6 +107,9 @@ class BeneficiaryPayment < ApplicationRecord
   belongs_to :advance_amount, optional: true, class_name: "Amount"
   belongs_to :payment_agreement, optional: true
   belongs_to :tax_rate, optional: true
+  belongs_to :base_currency, optional: true, class_name: 'Currency'
+  belongs_to :reporting_currency, optional: true, class_name: 'Currency'
+
 
   has_many :payments, as: :parent
 
@@ -122,8 +126,10 @@ class BeneficiaryPayment < ApplicationRecord
   validate :payment_agreement_related_fields
   after_create :update_creator_id, :update_company_id, :update_status
   delegate :paid?, to: :status
-
+  
+  before_create :set_currency
   after_save :budget_trail_entry
+  after_save :set_currency_for_amount, unless: :skip_callback
 
   after_destroy :budget_trail_destroy
 
@@ -139,6 +145,11 @@ class BeneficiaryPayment < ApplicationRecord
   def unpaid?
     return nil if self.status.blank?
     return (self.status_id == BeneficiaryPaymentStatus.id_for(:unpaid))
+  end
+
+  def set_currency
+    self.reporting_currency_id = self.company.reporting_currency.id if self.reporting_currency_id.blank? 
+    self.base_currency_id = self.company.reporting_currency.id if self.base_currency_id.blank? 
   end
 
   def as_json(options={})
@@ -187,8 +198,9 @@ class BeneficiaryPayment < ApplicationRecord
         cost_center_attributes: { id: self.cost_center_id, name: self.cost_center&.name },
         note: self.note,
         already_exists: true,
-        payment_agreement_id: self.payment_agreement_id
-
+        payment_agreement_id: self.payment_agreement_id,
+        base_currency: get_base_currency,
+        reporting_currency: get_reporting_currency
     	}
     end
   end
@@ -247,7 +259,7 @@ class BeneficiaryPayment < ApplicationRecord
     # if self.amount.present?
     #   self.amount.value = self.invoice_amount
     # else
-    #   self.amount = Amount.new(value: self.invoice_amount, currency_id: 1)
+    #   self.amount = Amount.new(value: self.invoice_amount, currency_id: self.company.reporting_currency.id )
     # end
 
     # assign gross amount
@@ -255,7 +267,7 @@ class BeneficiaryPayment < ApplicationRecord
       # self.gross_amount.value = gross_amount
       self.gross_amount.update(value: gross_amount)
     else
-      self.gross_amount = Amount.new(value: gross_amount, currency_id: 1)
+      self.gross_amount = Amount.new(value: gross_amount, currency_id: self.company.reporting_currency.id )
     end
 
     # assign tax amount
@@ -263,7 +275,7 @@ class BeneficiaryPayment < ApplicationRecord
       # self.tax_amount.value = tax_amount
       self.tax_amount.update(value: tax_amount)
     else
-      self.tax_amount = Amount.new(value: tax_amount, currency_id: 1)
+      self.tax_amount = Amount.new(value: tax_amount, currency_id: self.company.reporting_currency.id )
     end
 
     # assign TDS amount
@@ -271,7 +283,7 @@ class BeneficiaryPayment < ApplicationRecord
       # self.tds_amount.value = tds_amount
       self.tds_amount.update(value: tds_amount)
     else
-      self.tds_amount = Amount.new(value: tds_amount, currency_id: 1)
+      self.tds_amount = Amount.new(value: tds_amount, currency_id: self.company.reporting_currency.id )
     end
 
     # assign net amount
@@ -279,7 +291,7 @@ class BeneficiaryPayment < ApplicationRecord
       # self.net_amount.value = net_amount
       self.net_amount.update(value: net_amount)
     else
-      self.net_amount = Amount.new(value: net_amount, currency_id: 1)
+      self.net_amount = Amount.new(value: net_amount, currency_id: self.company.reporting_currency.id )
     end
 
     # assign balance due
@@ -287,7 +299,7 @@ class BeneficiaryPayment < ApplicationRecord
       # self.balance_due.value = balance_due_amount
       self.balance_due.update(value: balance_due_amount)
     else
-      self.balance_due = Amount.new(value: balance_due_amount, currency_id: 1)
+      self.balance_due = Amount.new(value: balance_due_amount, currency_id: self.company.reporting_currency.id )
     end
 
     # quick fix for abp
@@ -295,7 +307,7 @@ class BeneficiaryPayment < ApplicationRecord
     if self.payable_amount.present?
       self.payable_amount.update(value: balance_due_amount)
     else
-      self.payable_amount = Amount.new(value: balance_due_amount, currency_id: 1)
+      self.payable_amount = Amount.new(value: balance_due_amount, currency_id: self.company.reporting_currency.id )
     end
 
     # # adding the payment amount to the params if  the object is present
@@ -305,7 +317,7 @@ class BeneficiaryPayment < ApplicationRecord
     #   if payment.amount.present?
     #     payment.amount.value = self.payment_amount
     #   else
-    #     payment.amount = Amount.new(value: self.payment_amount, currency_id: 1)
+    #     payment.amount = Amount.new(value: self.payment_amount, currency_id: self.company.reporting_currency.id )
     #   end
     # end
     # params
@@ -371,7 +383,9 @@ class BeneficiaryPayment < ApplicationRecord
       roundoff_amount: self.roundoff_amount,
       net_payable_amount: self.balance_due&.value,
       display_name: self.status&.name&.titleize, payment_agreement_status: self.payment_agreement&.status&.name},
-      bank_payment_request_id: (self.payments.first.payment_order.bank_payment_request.id rescue nil)
+      bank_payment_request_id: (self.payments.first.payment_order.bank_payment_request.id rescue nil),
+      base_currency: get_base_currency,
+      reporting_currency: get_reporting_currency
     }
   end
 
@@ -455,4 +469,17 @@ class BeneficiaryPayment < ApplicationRecord
       BudgetManager::BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.destroy_trail(payment)
     end
   end
+
+  def set_currency_for_amount
+    amount_attr = [:original_amount, :tax_amount, :payable_amount, :balance_due, :tds_amount, :net_amount, :gross_amount, :advance_amount ]
+    amount_attr.each do |amount_attribute|
+      amount_attr_id = self.send("#{amount_attribute}_id")
+      if amount_attr_id.present?
+        Amount.find_by(id: amount_attr_id).update(currency_id: self.company.reporting_currency.id)
+      end
+    end
+    self.skip_callback = true
+    self.save
+  end
+
 end

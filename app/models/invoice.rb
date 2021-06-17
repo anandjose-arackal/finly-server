@@ -175,14 +175,14 @@ class Invoice < ApplicationRecord
   money :invoice_balance_due, :get_reporting_currency
 
   def get_reporting_currency
-    Currency.currency_for(self.company.reporting_currency_code || "INR")
+    Currency.currency_for(self.reporting_currency ) rescue self.company.reporting_currency.country_code
   end
 
   def get_base_currency
-    # Currency.find_by(id: self.base_currency) || Currency.find_by(country_code: "INR") 
-    currency_code = FormCurrency.find(self.base_currency)&.currency_code rescue nil
+    currency_code = Currency.find(self.base_currency)&.country_code rescue nil
     Currency.currency_for(currency_code || "INR")
   end
+
 
   exchange_bank :get_reporting_currency, :get_base_currency, :exchange_rate
 
@@ -702,6 +702,7 @@ class Invoice < ApplicationRecord
 
   after_create :set_defaults
   after_save :sync_amounts, unless: :skip_callback
+  after_save :set_currency_for_amount, unless: :skip_callback
   after_save :budget_trail_entry
   # the below callback deals with cases where the PO advance has been paid, and then an invoice is being raised
   # after_save :handle_po_advance_budget_trails
@@ -750,6 +751,26 @@ class Invoice < ApplicationRecord
   def form_klass
     invoice_type = self.invoice_type.name.to_sym
     Forms::Router.klass(invoice_type)&.name
+  end
+
+  # This method is to get Invoice ID from Form Autonumber Entity
+  def get_form_based_next_sequence(seq_prefix)
+    forms_enabled = NonPoInvoiceToggle.new(RequestStoreUtil.current_user).enabled?
+    return nil unless forms_enabled
+
+    invoice_form_class_name = Forms::Router.klass(:invoices)&.name
+
+    invoice_form = Form.find_by(klass_name: invoice_form_class_name, company_id: self.company_id)
+    return nil unless invoice_form.present?
+
+    sequence_entity = (invoice_form.entities.where(type: 'FormEntity::AutoNumber').filter do |e|
+      e.config.dig("sequence", "prefix") == seq_prefix
+    end).first
+
+    return nil unless sequence_entity.present?
+
+    prefix, sequence = FormEntity::AutoNumber.fetch_autonumber(sequence_entity, self)
+    prefix + sequence
   end
 
   def policy
@@ -1505,14 +1526,28 @@ class Invoice < ApplicationRecord
   end
 
   def retrieve_value(entity)
+    return get_base_currency.country_code if entity.entity_key == 'base_currency'
+
     send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
   end
 
   def forms_enabled
-    feature_flag_enabled = NonPoInvoiceToggle.new(RequestStoreUtil.current_user).enabled?
+    if RequestStoreUtil.current_user.blank?
+      feature_flag_enabled = true
+    else
+      feature_flag_enabled = NonPoInvoiceToggle.new(RequestStoreUtil.current_user).enabled?
+    end
     is_non_po_invoice = self&.invoice_type&.non_po_invoice? || false
     feature_flag_enabled && is_non_po_invoice
   end
+
+  def bank_payment_request_policies(user)
+    role_filter = {}
+    role_filter[:filter_role_id] = [UserRole.id_for(:bank_payment_request_initiator)]
+    bank_payment_request_policies = Policy::VendorPayments::Index.(user, role_filter).policies rescue Policy.none
+    bank_payment_request_policies
+  end
+
   private
 
   # def payment_agreement_updations
@@ -1869,7 +1904,8 @@ class Invoice < ApplicationRecord
       # FOR NET AMOUNT
       net_amount_attr = self.net_amount_id
       # invoice_net_total_amount - invoice_paid_outside_amount
-      net_amount_value = self.invoice_net_total_amount.to_f - self.invoice_paid_outside_amount.to_f
+      # cant use invoice_net_amount because net amount converts to round value in new ui for base currency == 1
+      net_amount_value = self.invoice_total_amount.to_f + self.invoice_paid_outside_amount.to_f - self.invoice_roundoff_amount.to_f
       self.skip_callback = true
       if net_amount_attr.present?
         Amount.find_by(id: net_amount_attr).update(value: net_amount_value, currency_id: base_currency_id)
@@ -2000,16 +2036,32 @@ class Invoice < ApplicationRecord
           old_attachment.file_file_name = new_attachment.attachment_file_name
           old_attachment.file_content_type = new_attachment.attachment_content_type
           old_attachment.file_file_size = new_attachment.attachment_file_size
-          old_attachment.file_file_size = new_attachment.attachment_file_size
+          # old_attachment.file_file_size = new_attachment.attachment_file_size
           old_attachment.company_id = self.company_id
           old_attachment.procurement_document_id = form_attachments_field.document_id
           old_attachment.procurement_document_type = form_attachments_field.document_type
           old_attachment.user_id = RequestStoreUtil.current_user
+          old_attachment.file = new_attachment.attachment
           old_attachment.save
         end
       end    
     end
   end
+
+  def set_currency_for_amount
+    amount_attr = [:amount, :gross_amount, :net_amount, :tds_amount, :tax_amount, :discount_amount, :original_amount, :advance_amount, :freight_amount, :balance_due, :taxable_amount, :paid_amount, :remaining_amount]
+
+    amount_attr.each do |amount_attribute|
+      amount_attr_id = self.send("#{amount_attribute}_id")
+      if amount_attr_id.present?
+        Amount.find_by(id: amount_attr_id).update(currency_id: get_base_currency.id)
+      end
+    end
+    self.skip_callback = true
+    self.save
+  end
+
+
 
 
   #  We are keeping this aside for now.
@@ -2077,8 +2129,6 @@ class Invoice < ApplicationRecord
   #     end
   #   end
   # end
-
-
 
 end
 

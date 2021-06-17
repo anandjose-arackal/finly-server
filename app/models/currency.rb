@@ -39,6 +39,14 @@ class Currency < NonTenantedApplicationRecord
     }
   end
 
+  def currency_conversion_rate(date, to_iso_code)
+    ExchangeRate.get_rate(
+        date,
+        self.country_code,
+        to_iso_code
+    ).to_f.round(5)
+  end
+
   CURRENCIES = [
       {
           country: "India Rupee",

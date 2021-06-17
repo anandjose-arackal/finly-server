@@ -125,7 +125,7 @@ class BankTransfer::PaymentRequest::UnifiedPaymentTicket < BankTransfer::Payment
 		    company_id: user.company_id,
 		    amount_requested_attributes: {
 		        value: self.total_amount,
-		        currency_id: 1
+		        currency_id: (user.company.reporting_currency.id rescue Currency.first.id)
 		    },
 		    payment_mode: self.payment_mode,
 		    scheduled_at: params[:scheduled_at],
@@ -134,7 +134,7 @@ class BankTransfer::PaymentRequest::UnifiedPaymentTicket < BankTransfer::Payment
 		    receiving_account_type: BankAccount.name,
 		    payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
 		    application: "vp",
-		    currency_id: Currency.first.id,
+		    currency_id: (user.company.reporting_currency.id rescue Currency.first.id),
 		    api_initiated: false
 		}
 		bpr_attributes = {
@@ -143,7 +143,7 @@ class BankTransfer::PaymentRequest::UnifiedPaymentTicket < BankTransfer::Payment
 		    controlling_user_id: user.id,
 		    requested_amount_attributes: {
 		        value: self.total_amount,
-		        currency_id: 1
+		        currency_id: (user.company.reporting_currency.id rescue Currency.first.id)
 		    },
 		    beneficiary_type_id: 2,
 		    policy_id: policy&.id,
