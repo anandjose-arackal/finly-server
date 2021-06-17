@@ -383,7 +383,9 @@ class BeneficiaryPayment < ApplicationRecord
       roundoff_amount: self.roundoff_amount,
       net_payable_amount: self.balance_due&.value,
       display_name: self.status&.name&.titleize, payment_agreement_status: self.payment_agreement&.status&.name},
-      bank_payment_request_id: (self.payments.first.payment_order.bank_payment_request.id rescue nil)
+      bank_payment_request_id: (self.payments.first.payment_order.bank_payment_request.id rescue nil),
+      base_currency: get_base_currency,
+      reporting_currency: get_reporting_currency
     }
   end
 
