@@ -197,7 +197,7 @@ class CreditNoteItem < ApplicationRecord
   end
 
   def set_currency_for_amount
-    amount_attr = [:able_amount, :taxable_amount, :tax_amount, :total_amount]
+    amount_attr = [:original_taxable_amount, :taxable_amount, :tax_amount, :total_amount]
 
     amount_attr.each do |amount_attribute|
       amount_attr_id = self.send("#{amount_attribute}_id")
