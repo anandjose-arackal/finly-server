@@ -227,7 +227,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
     p[:controlling_user_id] = user.id
     p[:requested_amount_attributes] = {
         value: self.requested_amount,
-        currency_id: Currency.first.id
+        currency_id: user.company.reporting_currency.id rescue Currency.first.id
     }
     p[:description] = params[:description]
     p[:beneficiary_type_id] = retrieve_beneficiary_type
@@ -239,7 +239,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
     p[:payment_order_attributes][:company_id] = self.company_id
     p[:payment_order_attributes][:amount_requested_attributes] = {
         value: self.requested_amount,
-        currency_id: Currency.first.id
+        currency_id: user.company.reporting_currency.id rescue Currency.first.id
     }
     p[:payment_order_attributes][:payment_mode] = params[:bank_transfer_type]
     p[:payment_order_attributes][:initiating_account_type] = initiating_account.class.name
@@ -247,7 +247,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
     p[:payment_order_attributes][:payment_purpose_id] = PaymentPurpose.id_for(:vendor_payment)
     p[:payment_order_attributes][:payments_attributes] = []
     p[:payment_order_attributes][:application] = RequestStore.store[:current_app]
-    p[:payment_order_attributes][:currency_id] = Currency.first.id
+    p[:payment_order_attributes][:currency_id] = user.company.reporting_currency.id rescue Currency.first.id
     p[:payment_order_attributes][:scheduled_at] = self.scheduled_at
     processed_order_data.each do |order_details|
       # processing the line items of this particular invoice
@@ -287,7 +287,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
           payment_mode: params[:bank_transfer_type],
           amount_attributes: {
               value: order_details[:original_amount],
-              currency_id: Currency.first.id
+              currency_id: user.company.reporting_currency.id rescue Currency.first.id
           },
           api_initiated: params[:api_initiated],
           external_reference_id: order_details[:external_reference_id],
@@ -319,15 +319,15 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
               receiving_account_id: bank_account.id,
               original_amount_attributes: {
                   value: order_details[:original_amount],
-                  currency_id: 1
+                  currency_id: user.company.reporting_currency.id rescue Currency.first.id
               },
               freight_amount_attributes: {
                   value: order_details[:freight],
-                  currency_id: 1
+                  currency_id: user.company.reporting_currency.id rescue Currency.first.id
               },
               advance_amount_attributes: {
                   value: order_details[:advance_amount],
-                  currency_id: 1
+                  currency_id: user.company.reporting_currency.id rescue Currency.first.id
               },
               roundoff_amount: order_details[:roundoff_amount],
               invoice_status_id: InwardInvoiceStatus.id_for(:unpaid),
@@ -421,7 +421,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
         tax: payment[:tax],
         original_amount_attributes: {
             value: payment[:original_amount],
-            currency_id: Currency.first.id
+            currency_id: user.company.reporting_currency.id rescue Currency.first.id
         },
         invoice_number: payment[:invoice_number],
         invoice_date: payment[:date],

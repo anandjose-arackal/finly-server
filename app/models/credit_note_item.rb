@@ -203,9 +203,6 @@ class CreditNoteItem < ApplicationRecord
       amount_attr_id = self.send("#{amount_attribute}_id")
       if amount_attr_id.present?
         Amount.find_by(id: amount_attr_id).update(currency_id: self.credit_note.get_base_currency.id)
-      else
-        amount_id = Amount.create(value: 0, currency_id: self.credit_note.get_base_currency.id)
-        self.send("#{amount_attribute}_id=", amount_id)
       end
     end
     self.skip_callback = true

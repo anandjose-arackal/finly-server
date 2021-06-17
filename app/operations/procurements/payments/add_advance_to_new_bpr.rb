@@ -114,14 +114,14 @@ class Procurements::Payments::AddAdvanceToNewBpr < Procurements::Payments::Base
         company_id: user.company_id,
         amount_requested_attributes: {
             value: self.requested_amount,
-            currency_id: 1
+            currency_id: user.company.reporting_currency.id rescue Currency.first.id
         },
         payment_mode: self.payment_mode,
         initiating_account_type: YesBankCompanyAccount.name,
         receiving_account_type: BankAccount.name,
         payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
         application: "vp",
-        currency_id: Currency.first.id,
+        currency_id: user.company.reporting_currency.id rescue Currency.first.id,
         scheduled_at: self.scheduled_at,
         api_initiated: false
     }
@@ -131,7 +131,7 @@ class Procurements::Payments::AddAdvanceToNewBpr < Procurements::Payments::Base
         controlling_user_id: user.id,
         requested_amount_attributes: {
             value: self.requested_amount,
-            currency_id: 1
+            currency_id: user.company.reporting_currency.id rescue Currency.first.id
         },
         beneficiary_type_id: 2,
         # policy_id: policy&.id,

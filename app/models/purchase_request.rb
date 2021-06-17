@@ -533,10 +533,7 @@ class PurchaseRequest < ApplicationRecord
       amount_value = self.send(amount_attribute)
       amount_attr_id = self.send("#{amount_attribute}_id")
       if amount_attr_id.present?
-          Amount.find_by(id: amount_attr_id).update(value: amount_value, currency_id: get_base_currency.id)
-      else
-        amount_id = Amount.create(value: amount_value, currency_id: get_base_currency.id)
-        self.send("#{amount_attribute}_id=", amount_id)
+        Amount.find_by(id: amount_attr_id).update(value: amount_value, currency_id: get_base_currency.id)
       end
     end
     self.skip_callback = true

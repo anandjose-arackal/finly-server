@@ -146,7 +146,7 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
         transfer_mode_id: self.transfer_mode_id,
         amount_attributes: {
             value: self.payable_amount,
-            currency_id: Currency.first.id
+            currency_id: user.company.reporting_currency.id rescue Currency.first.id
         },
         note: self.inward_invoice.narration,
         category_id: self.inward_invoice.category_id,
@@ -163,7 +163,7 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
         company_id: user.company_id,
         amount_requested_attributes: {
             value: self.payable_amount,
-            currency_id: 1
+            currency_id: user.company.reporting_currency.id rescue Currency.first.id
         },
         payment_mode: self.payment_mode,
         transfer_mode_id: self.transfer_mode_id,
@@ -171,7 +171,7 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
         receiving_account_type: "BankAccount",
         payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
         application: RequestStore.store[:current_app],
-        currency_id: 1,
+        currency_id: user.company.reporting_currency.id rescue Currency.first.id,
         scheduled_at: self.scheduled_at,
         payments_attributes: payment_params
     }
@@ -181,7 +181,7 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
         controlling_user_id: user.id,
         requested_amount_attributes: {
             value: self.payable_amount,
-            currency_id: 1
+            currency_id: user.company.reporting_currency.id rescue Currency.first.id
         },
         description: self.description,
         beneficiary_type_id: 2, # this is because an invoice will always come from a vendor

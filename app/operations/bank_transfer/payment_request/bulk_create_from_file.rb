@@ -184,7 +184,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
         company_id: user.company_id,
         amount_requested_attributes: {
             value: self.requested_amount,
-            currency_id: 1
+            currency_id: user.company.reporting_currency.id rescue Currency.first.id
         },
         payment_mode: self.payment_mode,
         transfer_mode_id: self.transfer_mode_id,
@@ -193,7 +193,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
         receiving_account_type: BankAccount.name,
         payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
         application: "vp",
-        currency_id: Currency.first.id,
+        currency_id: user.company.reporting_currency.id rescue Currency.first.id,
         api_initiated: false
     }
     bpr_attributes = {
@@ -202,7 +202,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
         # controlling_user_id: user.id,
         requested_amount_attributes: {
             value: self.requested_amount,
-            currency_id: 1
+            currency_id: user.company.reporting_currency.id rescue Currency.first.id
         },
         description: params[:description],
         beneficiary_type_id: 2,
