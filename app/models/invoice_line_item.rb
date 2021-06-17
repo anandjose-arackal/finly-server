@@ -288,7 +288,7 @@ class InvoiceLineItem < ApplicationRecord
     if self.taxable_amount.present?
       self.taxable_amount.update_column('value', taxable_amt)
     else
-      self.create_taxable_amount(value: taxable_amt, currency_id: 1)
+      self.create_taxable_amount(value: taxable_amt, currency_id: self.get_base_currency.id)
     end
   end
 
@@ -299,7 +299,7 @@ class InvoiceLineItem < ApplicationRecord
     if self.net_amount.present?
       self.net_amount.update(value: net_value)
     else
-      self.create_net_amount(value: net_value, currency_id: 1)      
+      self.create_net_amount(value: net_value, currency_id: self.get_base_currency.id)
     end
   end
 
@@ -310,7 +310,7 @@ class InvoiceLineItem < ApplicationRecord
     if self.tax_amount.present?
       self.tax_amount.update(value: tax_value)
     else
-      self.create_tax_amount(value: tax_value, currency_id: 1)
+      self.create_tax_amount(value: tax_value, currency_id: self.get_base_currency.id)
     end
   end
 
@@ -500,6 +500,7 @@ class InvoiceLineItem < ApplicationRecord
           Amount.find_by(id: amount_attr_id).update(currency_id: self.parent.get_base_currency.id)
       else
         amount_id = Amount.create(value: 0, currency_id: self.parent.get_base_currency.id)
+        self.send("#{amount_attribute}_id=", amount_id)
       end
     end
     self.skip_callback = true

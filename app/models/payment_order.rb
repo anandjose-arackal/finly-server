@@ -308,6 +308,7 @@ class PaymentOrder < ApplicationRecord
           Amount.find_by(id: amount_attr_id).update(currency_id: self.bank_payment_request.get_base_currency.id)
       else
         amount_id = Amount.create(value: 0, currency_id: self.bank_payment_request.get_base_currency.id)
+        self.send("#{amount_attribute}_id=", amount_id)
       end
     end
 

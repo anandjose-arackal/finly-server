@@ -451,7 +451,7 @@ class PurchaseRequest < ApplicationRecord
       if self.total_amount.present?
         self.total_amount.update_attributes(value: updated_amount)
       else
-        if self.create_total_amount(currency_id: 1, value: updated_amount)
+        if self.create_total_amount(currency_id: get_base_currency.id, value: updated_amount)
           self.save
         end
       end
@@ -528,13 +528,15 @@ class PurchaseRequest < ApplicationRecord
 
   def set_currency_for_amount
     amount_attr = [:total_amount]
-
     amount_attr.each do |amount_attribute|
+      
+      amount_value = self.send(amount_attribute)
       amount_attr_id = self.send("#{amount_attribute}_id")
       if amount_attr_id.present?
-          Amount.find_by(id: amount_attr_id).update(currency_id: get_base_currency.id)
+          Amount.find_by(id: amount_attr_id).update(value: amount_value, currency_id: get_base_currency.id)
       else
-        amount_id = Amount.create(value: 0, currency_id: get_base_currency.id)
+        amount_id = Amount.create(value: amount_value, currency_id: get_base_currency.id)
+        self.send("#{amount_attribute}_id=", amount_id)
       end
     end
     self.skip_callback = true

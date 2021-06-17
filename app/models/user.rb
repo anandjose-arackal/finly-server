@@ -1285,7 +1285,7 @@ class User < ApplicationRecord
     return cash if date_obj.blank? or date_obj == DateUtils.local_date
     history = self.user_balance_histories.find_by(date: date_obj)
     if history.blank?
-      return Amount.new(value: 0, currency_id: 1)
+      return Amount.new(value: 0, currency_id: company.base_currency_id )
     else
       cash_on_hand = history.cash_on_hand_balance
       return cash_on_hand

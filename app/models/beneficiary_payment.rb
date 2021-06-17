@@ -247,7 +247,7 @@ class BeneficiaryPayment < ApplicationRecord
     # if self.amount.present?
     #   self.amount.value = self.invoice_amount
     # else
-    #   self.amount = Amount.new(value: self.invoice_amount, currency_id: 1)
+    #   self.amount = Amount.new(value: self.invoice_amount, currency_id: self.company.reporting_currency.id )
     # end
 
     # assign gross amount
@@ -255,7 +255,7 @@ class BeneficiaryPayment < ApplicationRecord
       # self.gross_amount.value = gross_amount
       self.gross_amount.update(value: gross_amount)
     else
-      self.gross_amount = Amount.new(value: gross_amount, currency_id: 1)
+      self.gross_amount = Amount.new(value: gross_amount, currency_id: self.company.reporting_currency.id )
     end
 
     # assign tax amount
@@ -263,7 +263,7 @@ class BeneficiaryPayment < ApplicationRecord
       # self.tax_amount.value = tax_amount
       self.tax_amount.update(value: tax_amount)
     else
-      self.tax_amount = Amount.new(value: tax_amount, currency_id: 1)
+      self.tax_amount = Amount.new(value: tax_amount, currency_id: self.company.reporting_currency.id )
     end
 
     # assign TDS amount
@@ -271,7 +271,7 @@ class BeneficiaryPayment < ApplicationRecord
       # self.tds_amount.value = tds_amount
       self.tds_amount.update(value: tds_amount)
     else
-      self.tds_amount = Amount.new(value: tds_amount, currency_id: 1)
+      self.tds_amount = Amount.new(value: tds_amount, currency_id: self.company.reporting_currency.id )
     end
 
     # assign net amount
@@ -279,7 +279,7 @@ class BeneficiaryPayment < ApplicationRecord
       # self.net_amount.value = net_amount
       self.net_amount.update(value: net_amount)
     else
-      self.net_amount = Amount.new(value: net_amount, currency_id: 1)
+      self.net_amount = Amount.new(value: net_amount, currency_id: self.company.reporting_currency.id )
     end
 
     # assign balance due
@@ -287,7 +287,7 @@ class BeneficiaryPayment < ApplicationRecord
       # self.balance_due.value = balance_due_amount
       self.balance_due.update(value: balance_due_amount)
     else
-      self.balance_due = Amount.new(value: balance_due_amount, currency_id: 1)
+      self.balance_due = Amount.new(value: balance_due_amount, currency_id: self.company.reporting_currency.id )
     end
 
     # quick fix for abp
@@ -295,7 +295,7 @@ class BeneficiaryPayment < ApplicationRecord
     if self.payable_amount.present?
       self.payable_amount.update(value: balance_due_amount)
     else
-      self.payable_amount = Amount.new(value: balance_due_amount, currency_id: 1)
+      self.payable_amount = Amount.new(value: balance_due_amount, currency_id: self.company.reporting_currency.id )
     end
 
     # # adding the payment amount to the params if  the object is present
@@ -305,7 +305,7 @@ class BeneficiaryPayment < ApplicationRecord
     #   if payment.amount.present?
     #     payment.amount.value = self.payment_amount
     #   else
-    #     payment.amount = Amount.new(value: self.payment_amount, currency_id: 1)
+    #     payment.amount = Amount.new(value: self.payment_amount, currency_id: self.company.reporting_currency.id )
     #   end
     # end
     # params

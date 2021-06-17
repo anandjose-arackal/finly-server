@@ -177,8 +177,8 @@ def setup_beneficiary_payment
 
 	self.payments_attributes.each_with_index do |vd, ix| 
 		vd[:advance_amount] = (vd[:advance_amount].blank?) ? 0 : vd[:advance_amount]
-		beneficiary_payments[ix].original_amount = Amount.new(value: vd[:original_amount], currency_id: 1)
-		beneficiary_payments[ix].advance_amount = Amount.new(value: vd[:advance_amount], currency_id: 1)
+		beneficiary_payments[ix].original_amount = Amount.new(value: vd[:original_amount], currency_id: company.base_currency_id)
+		beneficiary_payments[ix].advance_amount = Amount.new(value: vd[:advance_amount], currency_id: company.base_currency_id)
 		beneficiary_payments[ix].created_at = DateTime.now
 	end
 

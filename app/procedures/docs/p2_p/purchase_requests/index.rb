@@ -145,5 +145,4 @@ class Docs::P2P::PurchaseRequests::Index < IndexBuilder::API
     context[:record].get_base_currency.symbol
   end
 
-
 end
