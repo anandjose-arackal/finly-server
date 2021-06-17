@@ -1526,6 +1526,8 @@ class Invoice < ApplicationRecord
   end
 
   def retrieve_value(entity)
+    return get_base_currency.country_code if entity.entity_key == 'base_currency'
+
     send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
   end
 
