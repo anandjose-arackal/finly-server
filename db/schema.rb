@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_06_09_081537) do
+ActiveRecord::Schema.define(version: 2021_06_17_121138) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -1180,6 +1180,8 @@ ActiveRecord::Schema.define(version: 2021_06_09_081537) do
     t.integer "creator_id"
     t.date "payment_agreement_upcoming_date"
     t.datetime "deleted_at"
+    t.integer "base_currency_id"
+    t.integer "reporting_currency_id"
     t.index ["advance_amount_id"], name: "index_beneficiary_payments_on_advance_amount_id"
     t.index ["balance_due_id"], name: "index_beneficiary_payments_on_balance_due_id"
     t.index ["bank_account_id"], name: "index_beneficiary_payments_on_bank_account_id"
@@ -4813,6 +4815,8 @@ ActiveRecord::Schema.define(version: 2021_06_09_081537) do
     t.integer "available_invoice_amount_id"
     t.boolean "include_tax_and_tds", default: false
     t.boolean "rcm_enabled"
+    t.integer "base_currency_id"
+    t.integer "reporting_currency_id"
     t.index ["template_invoice_id"], name: "index_general_invoices_on_template_invoice_id"
   end
 
@@ -5446,11 +5450,9 @@ ActiveRecord::Schema.define(version: 2021_06_09_081537) do
     t.decimal "invoice_discount_amount", precision: 20, scale: 5
     t.decimal "invoice_tax_amount", precision: 20, scale: 5
     t.decimal "invoice_tds_amount", precision: 20, scale: 5
-    t.string "base_currency"
     t.text "vendor_sequence_id"
     t.string "vendor_gstin"
     t.decimal "invoice_freight_amount", precision: 20, scale: 5
-    t.string "reporting_currency"
     t.date "conversion_date"
     t.decimal "conversion_rate", precision: 10, scale: 5
     t.boolean "retrieve_conversion_rate", default: true
@@ -5493,6 +5495,8 @@ ActiveRecord::Schema.define(version: 2021_06_09_081537) do
     t.string "billing_address_gstin", default: ""
     t.string "shipping_address_name", default: ""
     t.string "shipping_address_gstin", default: ""
+    t.string "base_currency"
+    t.string "reporting_currency"
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["agreement_item_id"], name: "index_invoices_on_agreement_item_id"
     t.index ["company_id", "controlling_level_id", "deleted_at"], name: "index_invoice_ct_lvl_cmpny_id"
@@ -7732,6 +7736,8 @@ ActiveRecord::Schema.define(version: 2021_06_09_081537) do
     t.integer "company_id"
     t.string "rate_contract_number"
     t.datetime "deleted_at"
+    t.integer "base_currency_id"
+    t.integer "reporting_currency_id"
   end
 
   create_table "rate_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -7983,6 +7989,8 @@ ActiveRecord::Schema.define(version: 2021_06_09_081537) do
     t.float "escalation_percentage"
     t.string "override_invoice_id"
     t.boolean "rcm_enabled"
+    t.integer "base_currency_id"
+    t.integer "reporting_currency_id"
     t.index ["advance_amount_id"], name: "index_rental_invoices_on_advance_amount_id"
     t.index ["advance_type_id"], name: "index_rental_invoices_on_advance_type_id"
     t.index ["amount_id"], name: "index_rental_invoices_on_amount_id"
@@ -8344,6 +8352,8 @@ ActiveRecord::Schema.define(version: 2021_06_09_081537) do
     t.date "payment_agreement_upcoming_date"
     t.integer "status_id"
     t.datetime "deleted_at"
+    t.integer "base_currency_id"
+    t.integer "reporting_currency_id"
     t.index ["bank_account_id"], name: "index_security_deposits_on_bank_account_id"
     t.index ["company_id"], name: "index_security_deposits_on_company_id"
     t.index ["creator_id"], name: "index_security_deposits_on_creator_id"

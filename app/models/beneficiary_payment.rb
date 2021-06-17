@@ -75,7 +75,8 @@
 
 
 class BeneficiaryPayment < ApplicationRecord
-  include MathUtil, Templatable
+  include MathUtil, Templatable, GetCurrency
+  attr_accessor :skip_callback
   
   belongs_to :vendor,  class_name: 'YesBankVendor'
   belongs_to :bank_account, optional: true
@@ -106,6 +107,9 @@ class BeneficiaryPayment < ApplicationRecord
   belongs_to :advance_amount, optional: true, class_name: "Amount"
   belongs_to :payment_agreement, optional: true
   belongs_to :tax_rate, optional: true
+  belongs_to :base_currency, optional: true, class_name: 'Currency'
+  belongs_to :reporting_currency, optional: true, class_name: 'Currency'
+
 
   has_many :payments, as: :parent
 
@@ -122,8 +126,10 @@ class BeneficiaryPayment < ApplicationRecord
   validate :payment_agreement_related_fields
   after_create :update_creator_id, :update_company_id, :update_status
   delegate :paid?, to: :status
-
+  
+  before_create :set_currency
   after_save :budget_trail_entry
+  after_save :set_currency_for_amount, unless: :skip_callback
 
   after_destroy :budget_trail_destroy
 
@@ -139,6 +145,11 @@ class BeneficiaryPayment < ApplicationRecord
   def unpaid?
     return nil if self.status.blank?
     return (self.status_id == BeneficiaryPaymentStatus.id_for(:unpaid))
+  end
+
+  def set_currency
+    self.reporting_currency_id = self.company.reporting_currency.id if self.reporting_currency_id.blank? 
+    self.base_currency_id = self.company.reporting_currency.id if self.base_currency_id.blank? 
   end
 
   def as_json(options={})
@@ -187,8 +198,9 @@ class BeneficiaryPayment < ApplicationRecord
         cost_center_attributes: { id: self.cost_center_id, name: self.cost_center&.name },
         note: self.note,
         already_exists: true,
-        payment_agreement_id: self.payment_agreement_id
-
+        payment_agreement_id: self.payment_agreement_id,
+        base_currency: get_base_currency,
+        reporting_currency: get_reporting_currency
     	}
     end
   end
@@ -455,4 +467,17 @@ class BeneficiaryPayment < ApplicationRecord
       BudgetManager::BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.destroy_trail(payment)
     end
   end
+
+  def set_currency_for_amount
+    amount_attr = [:original_amount, :tax_amount, :payable_amount, :balance_due, :tds_amount, :net_amount, :gross_amount, :advance_amount ]
+    amount_attr.each do |amount_attribute|
+      amount_attr_id = self.send("#{amount_attribute}_id")
+      if amount_attr_id.present?
+        Amount.find_by(id: amount_attr_id).update(currency_id: self.company.reporting_currency.id)
+      end
+    end
+    self.skip_callback = true
+    self.save
+  end
+
 end
