@@ -437,7 +437,7 @@ class GeneralInvoice < ApplicationRecord
   end
 
   def set_currency_for_amount
-    amount_attr = [:gross_amount, :net_amount, :tds_amount, :tax_amount, :discount_amount, :original_amount, :advance_amount, :freight_amount, :balance_due, :taxable_amount, :remaining_amount, :amount_id, :remaining_amount, :total_invoice_amount, :available_invoice_amount]
+    amount_attr = [:gross_amount, :net_amount, :tds_amount, :tax_amount, :discount_amount, :original_amount, :advance_amount, :freight_amount, :balance_due, :taxable_amount, :remaining_amount, :amount, :remaining_amount, :total_invoice_amount, :available_invoice_amount]
 
     amount_attr.each do |amount_attribute|
       amount_attr_id = self.send("#{amount_attribute}_id")
