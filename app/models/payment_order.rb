@@ -305,11 +305,11 @@ class PaymentOrder < ApplicationRecord
     amount_attr.each do |amount_attribute|
       amount_attr_id = self.send("#{amount_attribute}_id")
       if amount_attr_id.present?
-        Amount.find_by(id: amount_attr_id).update(currency_id: self.company.reporting.currency.id)
+        Amount.find_by(id: amount_attr_id).update(currency_id: self.company.reporting_currency.id)
       end
     end
 
-    self.currency_id = self.company.reporting.currency.id
+    self.currency_id = self.company.reporting_currency.id
     self.skip_callback = true
     self.save
   end
