@@ -1436,7 +1436,7 @@ include Searchkick::Api
     amount_attr.each do |amount_attribute|
       amount_attr_id = self.send("#{amount_attribute}_id")
       if amount_attr_id.present?
-          Amount.find_by(id: amount_attr_id).update(currency_id: self.bank_payment_request.get_base_currency.id)
+          Amount.find_by(id: amount_attr_id).update(currency_id: (self.bank_payment_request&.get_base_currency&.id || self.company&.reporting_currency&.id || 1))
       end
     end
     self.skip_callback = true
