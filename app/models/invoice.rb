@@ -1914,9 +1914,14 @@ class Invoice < ApplicationRecord
         self.send("net_amount_id=", amount_id)
       end
 
+      if TaxType.where(tax_name: ['igst', 'cgst_sgst'] ).pluck(:id).include?(tax_type_id)
+        self.gst_type_id = self.tax_type_id
+      end
       # update attachments 
       update_attachments
+      set_currency_for_amount
 
+      self.save
       # update custom fields
     end
   end
@@ -1968,19 +1973,6 @@ class Invoice < ApplicationRecord
     {
       invoice_roundoff_amount: 'roundoff_amount'
     }
-
-    # Invoice amount meanings. Picked from Invoice Calculation Utils
-    # amount => raw amount, rate * qty
-    # discount_amount => discount total of items
-    # gross_amount => discounts included or taxable amount or after_discount_amount
-    # tax_amount => tax total of items
-    # tds_amount => tds total of tds_applicable items' tds
-    # net_amount => gross_amount + tax_amount - tds_amount
-    # advance_amount => advance paid
-
-    # New Structure
-    # invoice_sub_total_amount => old structure net_amount
-    # invoice_net_total_amount: invoice_total_amount - invoice_paid_outside_amount - invoice_advance_paid_amount
   end
 
   def item_quantity_validation

@@ -464,7 +464,8 @@ class InvoiceLineItem < ApplicationRecord
       self.department_id = parent&.department_id
       self.cost_center_id = parent&.cost_center_id
     end
-
+    set_currency_for_amount
+    
     self.skip_callback = true
     self.save
   end
