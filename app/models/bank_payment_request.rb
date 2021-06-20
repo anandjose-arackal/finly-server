@@ -66,6 +66,8 @@ class BankPaymentRequest < ApplicationRecord
   belongs_to :transfer_mode, optional: true, class_name: "TransferModeCompanyMapping"
 
   belongs_to :base_currency, optional: true, class_name: 'Currency'
+  belongs_to :reporting_currency, optional: true, class_name: 'Currency'
+
   has_many :comments, class_name: "BankPaymentRequestComment"
   has_many :bank_payment_request_trails
 
@@ -666,7 +668,8 @@ class BankPaymentRequest < ApplicationRecord
   end
 
   def set_base_currency
-    self.base_currency_id = self.company.reporting_currency.id if base_currency_id.blank?
+    self.reporting_currency_id = self.company.reporting_currency.id if self.reporting_currency_id.blank? 
+    self.base_currency_id = self.company.reporting_currency.id if self.base_currency_id.blank? 
   end
 
   def non_po_form_enabled

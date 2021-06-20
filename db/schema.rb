@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_06_17_121138) do
+ActiveRecord::Schema.define(version: 2021_06_18_081243) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -839,6 +839,7 @@ ActiveRecord::Schema.define(version: 2021_06_17_121138) do
     t.integer "transfer_mode_id"
     t.boolean "is_domestic", default: true
     t.integer "base_currency_id"
+    t.integer "reporting_currency_id"
     t.index ["company_id", "controlling_level_id", "deleted_at"], name: "index_bpr_ct_lvl_cmpny_id"
     t.index ["company_id"], name: "index_bank_payment_requests_on_company_id"
     t.index ["controlling_level_id"], name: "index_bank_payment_requests_on_controlling_level_id"
