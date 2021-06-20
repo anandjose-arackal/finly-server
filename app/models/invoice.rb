@@ -1919,8 +1919,6 @@ class Invoice < ApplicationRecord
       end
       # update attachments 
       update_attachments
-      set_currency_for_amount
-
       self.save
       # update custom fields
     end
