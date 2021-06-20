@@ -26,10 +26,10 @@ class Admin::KycProcesses::Users::Reject < Admin::KycProcesses::Users::Base
       track_params = {
           action_resource: user,
           action_id: IndividualKycTrackAction.id_for(:reject),
-          note: params[:admin_note]
+          note: params[:admin_note],
+          company_id: individual_kyc.company_id
       }
-      track = individual_kyc.tracks.create track_params
-      puts track.errors
+      individual_kyc.tracks.create track_params
     end
   end
 
