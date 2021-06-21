@@ -77,19 +77,19 @@ class Docs::P2P::CreditNotes::Index < IndexBuilder::API
   end
 
   column :gross_receivable_amount, default: true, sort: :gross_receivable_amount_value, includes: [gross_receivable_amount: :currency]  do
-    amount value: :gross_receivable_amount
+    amount value: :gross_receivable_amount, currency_code: :set_currency_code, currency_symbol: :set_currency_symbol
   end
 
   column :tax_amount, includes: [tax_amount: :currency]  do
-    amount value: :tax_amount
+    amount value: :tax_amount, currency_code: :set_currency_code, currency_symbol: :set_currency_symbol
   end
 
   column :discount_amount, includes: [discount_amount: :currency]  do
-    amount value: :discount_amount
+    amount value: :discount_amount, currency_code: :set_currency_code, currency_symbol: :set_currency_symbol
   end
 
   column :net_receivable_amount, default: true, sort: :net_receivable_amount_value, includes: [net_receivable_amount: :currency]  do
-    amount value: :net_receivable_amount
+    amount value: :net_receivable_amount, currency_code: :set_currency_code, currency_symbol: :set_currency_symbol
   end
 
   column :tds_rate, includes: [:tds_rate]  do
@@ -97,19 +97,19 @@ class Docs::P2P::CreditNotes::Index < IndexBuilder::API
   end
 
   column :tds_amount, includes: [tds_amount: :currency]  do
-    amount value: :tds_amount
+    amount value: :tds_amount, currency_code: :set_currency_code, currency_symbol: :set_currency_symbol
   end
 
   column :freight_amount, includes: [freight_amount: :currency]  do
-    amount value: :freight_amount
+    amount value: :freight_amount, currency_code: :set_currency_code, currency_symbol: :set_currency_symbol
   end
 
   column :previously_adjusted_amount, includes: [previously_adjusted_amount: :currency]  do
-    amount value: :previously_adjusted_amount
+    amount value: :previously_adjusted_amount, currency_code: :set_currency_code, currency_symbol: :set_currency_symbol
   end
 
   column :net_adjustable_amount, includes: [net_adjustable_amount: :currency]  do
-    amount value: :net_adjustable_amount
+    amount value: :net_adjustable_amount, currency_code: :set_currency_code, currency_symbol: :set_currency_symbol
   end
 
   # Todo invoice related attributes
@@ -191,6 +191,14 @@ class Docs::P2P::CreditNotes::Index < IndexBuilder::API
       format = 'danger'
     end
     format
+  end
+
+  def self.set_currency_code(context)
+    context[:record].get_base_currency.country_code
+  end
+
+  def self.set_currency_symbol(context)
+    context[:record].get_base_currency.symbol
   end
 
 end

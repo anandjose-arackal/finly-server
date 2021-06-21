@@ -33,7 +33,8 @@ class Admin::KycProcesses::Users::Approve < Admin::KycProcesses::Users::Base
 
         track_params = {
             action_resource: user,
-            action_id: IndividualKycTrackAction.id_for(:final_approve)
+            action_id: IndividualKycTrackAction.id_for(:final_approve),
+            company_id: individual_kyc.company_id
         }
         individual_kyc.tracks.create track_params
       else
@@ -42,7 +43,8 @@ class Admin::KycProcesses::Users::Approve < Admin::KycProcesses::Users::Base
 
         track_params = {
             action_resource: user,
-            action_id: IndividualKycTrackAction.id_for(:approve)
+            action_id: IndividualKycTrackAction.id_for(:approve),
+            company_id: individual_kyc.company_id
         }
         individual_kyc.tracks.create track_params
       end

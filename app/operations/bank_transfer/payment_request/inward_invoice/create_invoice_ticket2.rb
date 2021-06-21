@@ -324,11 +324,11 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
         company_id: user.company_id,
         amount_requested_attributes: {
             value: self.requested_amount,
-            currency_id: self.base_currency_id
+            currency_id: user.company.reporting_currency.id
         },
         amount_processed_attributes: {
             value: 0,
-            currency_id: self.base_currency_id
+            currency_id: user.company.reporting_currency.id
         },
         payment_mode: self.payment_mode,
         transfer_mode_id: self.transfer_mode_id,
@@ -346,7 +346,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
         controlling_user_id: user.id,
         requested_amount_attributes: {
           value: self.requested_amount,
-          currency_id: self.base_currency_id
+          currency_id: user.company.reporting_currency.id
         },
         description: self.description,
         beneficiary_type_id: 2, # this is because an invoice will always come from a vendor

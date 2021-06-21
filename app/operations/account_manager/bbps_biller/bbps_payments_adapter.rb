@@ -184,7 +184,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         customer_mobile: bill.subscription.mobile_number,
         amount_attributes: {
             value: payment.amount_value,
-            currency_id: Currency.first.id
+            currency_id: (payment&.company&.reportintg_currency&.id || Currency.first.id)
         })
     bank_transaction.save
 

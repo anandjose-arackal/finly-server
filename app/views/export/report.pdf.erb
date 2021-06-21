@@ -91,10 +91,10 @@
 
         <tr>
           <td width="25%"><label>Total Amount:</label></td>
-          <td width="25%"><i class="fa fa-inr">&nbsp;</i><%= report.total_amount %></td>
+          <td width="25%"><b><%= report.base_currency&.symbol%></b>&nbsp;<%= report.total_amount %></td>
 
           <td width="25%"><label>Reimbursable Amount:</label></td>
-          <td width="25%"><i class="fa fa-inr">&nbsp;</i><%= report.reimbursable_expenses %></td>
+          <td width="25%"><b><%= report.base_currency&.symbol %></b>&nbsp;<%= report.reimbursable_expenses %></td>
         </tr>
       </table>
     </div>
@@ -146,7 +146,7 @@
           <tr>
             <td colspan="3"><label width="100%"><%= section[:section_name] %></label></td>
             <td style="text-align: right;"><label width="100%">Category Total&nbsp;&nbsp;:</label></td>
-            <td><i class="fa fa-inr" aria-hidden="true"></i><%= section[:section_total] %></td>
+            <td><b><%= report.base_currency&.symbol %></b>&nbsp;<%= section[:section_total] %></td>
           </tr>
           </thead>
           <tbody>
@@ -185,7 +185,7 @@
                   <br>
                 <% end %>
               </td>
-              <td width="20%"><i class="fa fa-inr">&nbsp;</i><%= expense.amount_value %></td>
+              <td width="20%"><b><%= report.base_currency&.symbol%></b>&nbsp;<%= expense.amount_value %></td>
             </tr>
             <% @index += 1 %>
           <% end %>

@@ -148,4 +148,18 @@ class PurchaseOrderItem < ApplicationRecord
     BudgetManager::BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(self)
   end
 
+
+  def set_currency_for_amount
+    amount_attr = [:tax_amount ,:taxable_amount ,:discount_amount ,:total_amount]
+
+    amount_attr.each do |amount_attribute|
+      amount_attr_id = self.send("#{amount_attribute}_id")
+      if amount_attr_id.present?
+        Amount.find_by(id: amount_attr_id).update(currency_id: self.purchase_order.get_base_currency.id)
+      end
+    end
+    self.skip_callback = true
+    self.save
+  end
+
 end

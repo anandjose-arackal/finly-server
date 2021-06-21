@@ -104,8 +104,8 @@
 #
 
 class RentalInvoice < ApplicationRecord
-
-  include SoftDeletable, MathUtil
+  attr_accessor :skip_callback
+  include SoftDeletable, MathUtil, GetCurrency
   include Sequenced::ActsAsSequenced
 
   acts_as_sequenced column: :invoice_id, purpose: :rental_invoice, editable: false, prefix: 'RENINV'
@@ -144,7 +144,9 @@ class RentalInvoice < ApplicationRecord
   belongs_to :invoice_frequency, optional: true
   belongs_to :delivery_location, optional: true, class_name: 'BranchLocation'
   belongs_to :template_invoice, optional: true, class_name: 'RentalInvoice'
-
+  belongs_to :base_currency, optional: true, class_name: 'Currency'
+  belongs_to :reporting_currency, optional: true, class_name: 'Currency'
+  
   has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
   has_many :items, class_name: "InvoiceLineItem", as: :parent
   has_many :custom_fields, as: :parent, dependent: :destroy, autosave: true
@@ -155,10 +157,12 @@ class RentalInvoice < ApplicationRecord
   # Use include_association instead of exclude_association if data tree grows
   #https://github.com/amoeba-rb/amoeba#installation
 
+  before_create :set_currency
+  after_save :set_currency_for_amount, unless: :skip_callback
+
   amoeba do
     clone [:amount, :gross_amount, :net_amount, :tds_amount, :tax_amount, :discount_amount,
-           :original_amount, :taxable_amount,
-           :invoice_items, :custom_fields]#,
+           :original_amount, :taxable_amount, :invoice_items, :custom_fields]#,
            #:document_level_reviewer_mappings]
     
     exclude_association :trails
@@ -314,7 +318,9 @@ class RentalInvoice < ApplicationRecord
       already_exists: true,
       prepaid: self.prepaid,
       escalation_percentage: self.escalation_percentage,
-      invoice_number: self.get_invoice_number
+      invoice_number: self.get_invoice_number,
+      base_currency: get_base_currency,
+      reporting_currency: get_reporting_currency
     }
   end
 
@@ -336,7 +342,9 @@ class RentalInvoice < ApplicationRecord
         start_date: self.start_date,
         end_date: self.end_date,
         allow_add_invoice: allowed_to_add_invoice?,
-        invoice_created: agreement_invoice_created?
+        invoice_created: agreement_invoice_created?,
+        base_currency: get_base_currency,
+        reporting_currency: get_reporting_currency
 
     }
   end
@@ -364,5 +372,21 @@ class RentalInvoice < ApplicationRecord
     agreement_invoice.present?
   end
 
+  def set_currency
+    self.reporting_currency_id = self.company.reporting_currency.id if self.reporting_currency_id.blank? 
+    self.base_currency_id = self.company.reporting_currency.id if self.base_currency_id.blank? 
+  end
 
+  def set_currency_for_amount
+    amount_attr = [:amount, :gross_amount, :net_amount, :tds_amount, :tax_amount, :discount_amount, :original_amount, :advance_amount, :freight_amount, :balance_due, :taxable_amount, :remaining_amount]
+
+    amount_attr.each do |amount_attribute|
+      amount_attr_id = self.send("#{amount_attribute}_id")
+      if amount_attr_id.present?
+        Amount.find_by(id: amount_attr_id).update(currency_id: get_base_currency.id)
+      end
+    end
+    self.skip_callback = true
+    self.save
+  end
 end

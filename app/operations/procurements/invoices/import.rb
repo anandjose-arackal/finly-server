@@ -308,7 +308,7 @@ class Procurements::Invoices::Import < Procurements::Invoices::Base
               hsn_sac: inventory_line_item&.hsn_sac,
               amount_attributes: {
                   value: amount,
-                  currency_id: 1
+                  currency_id: user.company.reporting_currency.id
               },
               rate: rate,
               quantity: quantity,

@@ -44,20 +44,19 @@ class Policy::VendorPayments::Index < Policy::Base
       end
     end
     self.policy_user_roles = ::PolicyUserRole.with_policy_id(ids).with_user_id(user.id)
-  end
 
-  def post_process
     self.policy_user_roles = self.policy_user_roles.where(user_id: user.id)&.distinct
-    self.policies = Policy.where(id: policy_user_roles&.pluck(:policy_id)&.uniq)&.with_application('vp')&.exclude_deleted if policy_user_roles.present?
-    # d'uh, need to clean this operation
     if user.vp_admin_or_auditor?
       if user&.enforce_policy_enabled?
         self.policies = user.company&.policies.where.not(default: true).with_application('vp')&.exclude_deleted
       else
         self.policies = user.company&.policies.with_application('vp')&.exclude_deleted
       end
+    else
+      self.policies = Policy.where(id: policy_user_roles&.pluck(:policy_id)&.uniq)&.with_application('vp')&.exclude_deleted if policy_user_roles.present?
     end
   end
+
 
   def success
     params[:policy_user_roles] = self.policy_user_roles

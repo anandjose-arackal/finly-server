@@ -124,7 +124,7 @@ class Script::MissedCardTransactionCreate < BaseOperation
           # add to cash on hand only if it's an expense card
 
           return true unless card.card_program.create_expense
-          payment = Payment.where(reference_resource_id: transaction.id, reference_resource_type: 'CardTransaction', receiving_account_type: 'UserPocket', payment_type_id: 19).first
+          payment = Payment.where(reference_resource_id: transaction.id, reference_resource_type: 'CardTransaction', receiving_account_type: 'UserPocket', payment_type_id: PaymentType.id_for(:credit)).first
           if payment.blank?
             # add to cash on hand
             atm_pocket = user.user_pockets.atm_withdrawal_pockets.first

@@ -1,10 +1,17 @@
 company:
   name: <%= current_company.name %>
   id: <%= current_company.id %>
+  reporting_currency: 
+    id: <%= current_company.reporting_currency.id %>
+    country: <%= current_company.reporting_currency.country %>
+    country_code: <%= current_company.reporting_currency.country_code %>
+    symbol: <%= current_company.reporting_currency.symbol %>
+      
   logo:
   <% if current_company.configuration.logo.present? %>
     url: <%= current_company.configuration.logo.url(:thumb)%>
   <% end %>
+
   features:
     expense_card: <%= current_company.feature_subscription.expense_card_enabled %>
     meal_card: <%= current_company.feature_subscription.meal_card_enabled %>
