@@ -66,8 +66,8 @@ class IndexBuilder::API
   end
 
   def self.config_legacy_custom_fields(user, config)
-    return if user.non_po_invoice_form_enabled
     return unless self.custom_fields
+    return if user.non_po_invoice_form_enabled
 
     field_configurations = user.company.field_configurations.joins(:field_parent_mappings)
                                .where(is_deleted: false, deleted_at: nil, enabled: true)
@@ -88,8 +88,8 @@ class IndexBuilder::API
   end
 
   def self.config_form_custom_fields(user, config)
-    return unless user.non_po_invoice_form_enabled
     return unless self.model.present?
+    return unless user.non_po_invoice_form_enabled
     model_klass = Object.const_get(self.model)
     return unless model_klass.reflect_on_association(:form_custom_fields).present?
 
