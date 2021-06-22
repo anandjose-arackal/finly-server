@@ -27,15 +27,15 @@ class ActionsManager::Master::PolicyUserRoles::RoleConfig < ActionsManager::Mast
   end
 
   def goods_receiver
-    user.company.procurement_enabled?
+    user.company.procurement_enabled? || user.company.invoice_to_pay_system_enabled?
   end
 
   def invoice_initiator
-    user.company.procurement_enabled?
+    user.company.procurement_enabled? || user.company.invoice_to_pay_system_enabled?
   end
 
   def invoice_reviewer
-    user.company.procurement_enabled?
+    user.company.procurement_enabled? || user.company.invoice_to_pay_system_enabled?
   end
 
   def bank_payment_request_initiator
@@ -74,15 +74,12 @@ class ActionsManager::Master::PolicyUserRoles::RoleConfig < ActionsManager::Mast
     user.company.vendor_empanelment_workflow_enabled?
   end
 
-  def bank_payment_request_auditor
-  end
-
   def budget_manager
     user.company.budgeting_system_enabled?
   end
 
   def non_po_initiator
-    user.company.procurement_enabled?
+    user.company.invoice_to_pay_system_enabled?
   end
 
   def purchase_order_auditor
@@ -98,7 +95,7 @@ class ActionsManager::Master::PolicyUserRoles::RoleConfig < ActionsManager::Mast
   end
 
   def invoice_auditor
-    user.company.procurement_enabled?
+    user.company.procurement_enabled? || user.company.invoice_to_pay_system_enabled?
   end
 
   def vendor_auditor
@@ -106,31 +103,31 @@ class ActionsManager::Master::PolicyUserRoles::RoleConfig < ActionsManager::Mast
   end
 
   def payment_agreement_initiator
-    true
+    user.company.agreement_based_payment_system_enabled?
   end
 
   def payment_agreement_reviewer
-    true
+    user.company.agreement_based_payment_system_enabled?
   end
 
   def payment_agreement_auditor
-    true
+    user.company.agreement_based_payment_system_enabled?
   end
 
   def utility_bill_master_initiator
-    true
+    user.company.utility_bills_enabled?
   end
 
   def utility_bill_master_reviewer
-    true
+    user.company.utility_bills_enabled?
   end
 
   def utility_bill_initiator
-    true
+    user.company.utility_bills_enabled?
   end
 
   def utility_bill_reviewer
-    true
+    user.company.utility_bills_enabled?
   end
 
   def credit_note_initiator
@@ -146,14 +143,14 @@ class ActionsManager::Master::PolicyUserRoles::RoleConfig < ActionsManager::Mast
   end
 
   def agreement_invoice_initiator
-    true
+    user.company.agreement_based_payment_system_enabled
   end
 
   def agreement_invoice_reviewer
-    true
+    user.company.agreement_based_payment_system_enabled
   end
 
   def agreement_invoice_auditor
-    true
+    user.company.agreement_based_payment_system_enabled
   end
 end
