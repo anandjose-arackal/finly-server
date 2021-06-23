@@ -95,7 +95,7 @@ class Menu::Masters::Procurement < Menu::API
     item :receive_history, path: 'receive/history'
   end
 
-  item :payables, features: [:procurement,:invoice_to_pay_system], icon: "https://img.icons8.com/windows/20/ffffff/sales-performance.png" do
+  item :payables, features: [:yes_bank_account], icon: "https://img.icons8.com/windows/20/ffffff/sales-performance.png" do
     item :po_advances, label: 'PO Advances', permissions: Docs::P2P::PurchaseOrders::Advances::Index.permissions, features: :procurement
     item :invoices, permissions: Docs::P2P::Invoices::Index.permissions
     item :utility_bills, permissions: Docs::UtilityBills::Subscriptions::Index.permissions, features: :utility_bills_enabled
