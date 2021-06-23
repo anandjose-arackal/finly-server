@@ -27,15 +27,19 @@ class ActionsManager::Master::PolicyUserRoles::RoleConfig < ActionsManager::Mast
   end
 
   def goods_receiver
-    user.company.procurement_enabled? || user.company.invoice_to_pay_system_enabled?
+    user.company.procurement_enabled?
   end
 
-  def invoice_initiator
-    user.company.procurement_enabled? || user.company.invoice_to_pay_system_enabled?
+  def po_invoice_initiator
+    user.company.procurement_enabled?
   end
 
-  def invoice_reviewer
-    user.company.procurement_enabled? || user.company.invoice_to_pay_system_enabled?
+  def po_invoice_reviewer
+    user.company.procurement_enabled?
+  end
+
+  def po_invoice_auditor
+    user.company.procurement_enabled?
   end
 
   def bank_payment_request_initiator
@@ -100,10 +104,6 @@ class ActionsManager::Master::PolicyUserRoles::RoleConfig < ActionsManager::Mast
   
   def purchase_request_auditor
     user.company.purchase_requisition_enabled?
-  end
-
-  def invoice_auditor
-    user.company.procurement_enabled? || user.company.invoice_to_pay_system_enabled?
   end
 
   def vendor_auditor
