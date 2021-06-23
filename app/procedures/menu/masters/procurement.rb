@@ -31,6 +31,7 @@ class Menu::Masters::Procurement < Menu::API
            policy: ::Docs::P2P::Invoices::Policy,
            model: ::Invoice,
            label: 'New Non PO Invoice',
+           features: :invoice_to_pay_system,
            function: "non_po_invoice_create"
 
     action :template,
@@ -39,6 +40,7 @@ class Menu::Masters::Procurement < Menu::API
            toggle: {if: [NonPoInvoiceToggle, :enabled?]},
            model: ::Invoice,
            label: 'New Non PO Invoice',
+           features: :invoice_to_pay_system,
            function: "non_po_invoice_forms_create"
 
     action :redirect,
@@ -95,7 +97,7 @@ class Menu::Masters::Procurement < Menu::API
 
   item :payables, features: [:procurement,:invoice_to_pay_system], icon: "https://img.icons8.com/windows/20/ffffff/sales-performance.png" do
     item :po_advances, label: 'PO Advances', permissions: Docs::P2P::PurchaseOrders::Advances::Index.permissions, features: :procurement
-    item :invoices, permissions: Docs::P2P::Invoices::Index.permissions, features: [:procurement,:invoice_to_pay_system]
+    item :invoices, permissions: Docs::P2P::Invoices::Index.permissions
     item :utility_bills, permissions: Docs::UtilityBills::Subscriptions::Index.permissions, features: :utility_bills_enabled
     item :upcoming_invoices, permissions: Docs::P2P::Invoices::Agreement::UpcomingInvoices::Index.permissions, features: :agreement_based_payment_system
     # item :unbilled_items, permissions: [] # todo

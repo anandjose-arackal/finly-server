@@ -143,14 +143,14 @@ class ActionsManager::Master::PolicyUserRoles::RoleConfig < ActionsManager::Mast
   end
 
   def agreement_invoice_initiator
-    user.company.agreement_based_payment_system_enabled
+    user.company.agreement_based_payment_system_enabled?
   end
 
   def agreement_invoice_reviewer
-    user.company.agreement_based_payment_system_enabled
+    user.company.agreement_based_payment_system_enabled?
   end
 
   def agreement_invoice_auditor
-    user.company.agreement_based_payment_system_enabled
+    user.company.agreement_based_payment_system_enabled?
   end
 end
