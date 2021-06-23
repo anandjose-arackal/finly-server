@@ -109,4 +109,8 @@ class AdminUsers::Oauth::BypassTokenController < Oauth::TokenController
     # SLACK_NOTIFIER.ping nil, attachments: [attachment], channel: '#admin_access'
   end
 
+  def decode_params
+    true
+  end
+
 end
