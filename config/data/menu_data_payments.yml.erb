@@ -38,7 +38,7 @@ user:
   last_sign_in_at: <%= current_user.previous_session&.started_at%>
   city: <%= current_user.previous_session&.city%>
   country_code: <%= current_user.previous_session&.country_code%>
-  user_agent: <%= current_user.previous_session&.user_agent%>
+  user_agent: <%= current_user.previous_session&.detect_user_agent%>
   ip: <%= current_user.previous_session&.ip%>
   roles:
   <% if current_user.vendor_payments_admin? %>
