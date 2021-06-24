@@ -76,6 +76,7 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchBill < Transactions::API
 
   def check_bill_presence(options, model:, result:, **)
     data = result['data']
+    
     unless data&.status == 'Y'
       add_message(options, :error, :base, data.error_desc) if data.error_desc.present?
       add_message(options, :error, :base, "Could Not Fetch Bill")
