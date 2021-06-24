@@ -24,6 +24,7 @@ class Oauth::TokenController < Doorkeeper::TokensController
 
   def create
     return unless pre_process
+    decode_params
     response = authorize_response
     headers.merge! response.headers
     self.status = response.status
@@ -200,5 +201,10 @@ class Oauth::TokenController < Doorkeeper::TokensController
       invalidate_session UserSessionStatus.id_for(:failed), (result.message || result.rule.description)
       return {success: false, message: result.response_message}
     end
+  end
+
+  def decode_params
+    return if params[:password].blank?
+    params[:password] = Base64.decode64(params[:password])
   end
 end

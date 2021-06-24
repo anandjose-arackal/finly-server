@@ -231,7 +231,7 @@ class Script::MissedCardTransactionCreate < BaseOperation
   def post_process
     # Create Finly Transaction
     if self.transaction.present? and transaction.success? and not ['Branch TopUp', 'Balance Adjustment Debit'].include?(self.transaction.merchant_name)
-      if FinlyTransaction.where(associated_transaction_id: transaction.id, associated_transaction_type: 'CardTransaction').first.nil?
+      if FinlyTransaction.where(associated_transaction_id: transaction.id, associated_transaction_type: 'CardTransaction', finly_account_type: 'Card').first.nil?
         account = self.transaction.card
         if transaction.credit?
           transaction_type_id = TransactionType.id_for(:credit)
