@@ -15,7 +15,7 @@ includes = [
     },
     {dlrms: [:level, :action, :action_taken_by]},
     {custom_fields: :field_configuration},
-    :attachments
+    :attachments, {comments:  :user}
 ]
 json.data do
   json.array! @op['model.records'].includes(includes) do |record|
