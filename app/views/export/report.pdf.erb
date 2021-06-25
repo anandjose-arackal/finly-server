@@ -204,7 +204,7 @@
         <tr>
           <td width="80%" style="text-align: right; font-size: 16px"><label>Report&nbsp;Total&nbsp;:&nbsp;</label></td>
           <td width="20%" style="font-size: 16px;">
-            <label><i class="fa fa-rupee"></i>&nbsp<%= report.total_amount.to_f %></label></td>
+            <label><b><%= report.base_currency&.symbol%></b>&nbsp<%= report.total_amount.to_f %></label></td>
         </tr>
         </tbody>
       </table>
