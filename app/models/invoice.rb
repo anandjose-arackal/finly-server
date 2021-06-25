@@ -1396,11 +1396,19 @@ class Invoice < ApplicationRecord
   end
 
   def tds_per_item
-    self.tds_amount&.value.to_f / self.items.count
+    if forms_enabled
+      self.reporting_invoice_tds_amount / self.items.count
+    else
+      self.tds_amount&.value.to_f / self.items.count
+    end
   end
 
   def advance_per_item
-    self.advance_amount&.value.to_f / self.items.count
+    if forms_enabled
+      self.reporting_invoice_paid_outside_amount / self.items.count
+    else
+      self.advance_amount&.value.to_f / self.items.count
+    end
   end
 
   def cn_adjustment_per_item

@@ -228,12 +228,19 @@ class InvoiceLineItem < ApplicationRecord
   scope :with_invoice_id, -> (invoice_id) {where invoice_id: invoice_id}
 
   def before_tax_amount
-    self.taxable_amount&.value.to_f
+    if parent_forms_enabled
+      self.reporting_item_taxable_amount&.to_f
+    else
+      self.taxable_amount&.value.to_f
+    end
   end
 
   def after_tax_amount
-
-    self.net_amount&.value.to_f
+    if parent_forms_enabled
+      self.reporting_item_net_amount&.to_f
+    else
+      self.net_amount&.value.to_f
+    end
   end
 
 
@@ -399,6 +406,14 @@ class InvoiceLineItem < ApplicationRecord
   def retrieve_value(entity)
     send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
   end
+
+  def parent_forms_enabled
+    invoice_forms_enabled = false
+    if parent.respond_to?(:forms_enabled) && parent.forms_enabled
+      invoice_forms_enabled = true
+    end
+  end
+
 
   private
 
