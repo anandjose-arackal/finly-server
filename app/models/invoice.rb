@@ -2114,8 +2114,6 @@ class Invoice < ApplicationRecord
       
   #       custom_field.save
   #       end
-
-
   #     end
   #   end
   # end
