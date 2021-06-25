@@ -26,6 +26,8 @@ json.results do
     end
     
     json.po_status purchase_order.status&.name&.humanize || ""
+    json.base_currency purchase_order.get_base_currency
+    json.reporting_currency purchase_order.get_reporting_currency
    
    end
 end

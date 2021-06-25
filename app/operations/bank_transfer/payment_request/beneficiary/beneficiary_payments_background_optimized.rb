@@ -177,8 +177,8 @@ def setup_beneficiary_payment
 
 	self.payments_attributes.each_with_index do |vd, ix| 
 		vd[:advance_amount] = (vd[:advance_amount].blank?) ? 0 : vd[:advance_amount]
-		beneficiary_payments[ix].original_amount = Amount.new(value: vd[:original_amount], currency_id: 1)
-		beneficiary_payments[ix].advance_amount = Amount.new(value: vd[:advance_amount], currency_id: 1)
+		beneficiary_payments[ix].original_amount = Amount.new(value: vd[:original_amount], currency_id: (self.user&.company&.reporting_currency&.id || 1 ))
+		beneficiary_payments[ix].advance_amount = Amount.new(value: vd[:advance_amount], currency_id: (self.user&.company&.reporting_currency&.id || 1 ))
 		beneficiary_payments[ix].created_at = DateTime.now
 	end
 
@@ -211,7 +211,7 @@ end
 def build_amounts
 	amounts = []
 	(payments_attributes.size * 3).times do |i|
-		amounts << Amount.new(value: import_number, currency_id: 1, created_at: import_date)
+		amounts << Amount.new(value: import_number, currency_id: (self.user&.company&.reporting_currency&.id || 1 ), created_at: import_date)
 	end
 
 	Amount.import amounts

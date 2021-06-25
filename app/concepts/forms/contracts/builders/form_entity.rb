@@ -1,7 +1,7 @@
 class Forms::Contracts::Builders::FormEntity < Transactions::API
 
   SETTER_ACTIONS = %w(editable visible active internal).freeze
-  VALIDATION_ACTIONS = %w(required unique).freeze
+  VALIDATION_ACTIONS = %w(required unique active).freeze
 
   schema do
     params do
@@ -25,7 +25,6 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
   pass :execute_contract_evaluators
 
   def check_success(ctx, options)
-    # debugger
     true
   end
 
@@ -57,16 +56,18 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
             self, entity.conditions, entity, VALIDATION_ACTIONS, form: form_data, row: row_data, meta: contract_root.model.form_metadata
           )
         }
+
         required = result['required']
+        active = result['active']
         # Required validation ( System Validation )
 
-        if required and entity.entity_type == 'attachment'
+        if required and entity.entity_type == 'attachment' and active
           attachments = send(entity.entity_key)
           valid_attachments = attachments&.filter {|item| !item[:_destroy]} if attachments.respond_to?(:each)
           errors.add(entity.label, 'cannot be blank') if valid_attachments.blank? or valid_attachments.length.zero?
         end
 
-        if required and !([true, false].include?( send(entity.entity_key) )) and send(entity.entity_key).blank? and entity.entity_type != 'switch' and entity.entity_type != 'attachment'
+        if required and active and !([true, false].include?( send(entity.entity_key) )) and send(entity.entity_key).blank? and entity.entity_type != 'switch' and entity.entity_type != 'attachment'
           errors.add entity.label, 'cannot be blank'
         end
 
@@ -157,7 +158,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
 
   def properties(entity)
     properties = {}
-    properties[:virtual] = true unless entity.system_field
+    properties[:virtual] = true if (!entity.system_field || entity.virtual)
     properties[:populate_if_empty] = entity.populate_if_empty if entity.populate_if_empty.present?
     properties[:deserializer] = deserializer(entity) unless entity.class.layout?
     populator = entity.populator

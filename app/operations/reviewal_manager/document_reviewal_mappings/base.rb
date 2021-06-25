@@ -11,7 +11,7 @@ class ReviewalManager::DocumentReviewalMappings::Base < BaseOperation
     when 'MoneyRequest'
       amount = document&.total_amount
     when 'Invoice'
-      amount = document&.net_amount&.value rescue 0
+      amount = document.reporting_invoice_sub_total_amount rescue 0
     when 'Report'
       amount = document&.total_amount rescue 0
     when 'BankPaymentRequest'

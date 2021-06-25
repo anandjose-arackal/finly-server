@@ -58,10 +58,10 @@
 #
 
 class BbpsBill < ApplicationRecord
-
+  attr_accessor :skip_callback
   AMOUNT_TYPES = %w(base_amount early_payment_amount late_payment_amount)
 
-  include SoftDeletable, Transitionable, ControllingUser
+  include SoftDeletable, Transitionable, ControllingUser, GetCurrency
   include Sequenced::ActsAsSequenced
   include EventProducer
   # include SearchIndex::Concerns::Document
@@ -74,7 +74,9 @@ class BbpsBill < ApplicationRecord
 
   before_save :resolve_bill_validation
   before_save :set_quick_pay
+  after_save :set_currency_for_amount, unless: :skip_callback
   before_save :update_total_amount
+  before_create :set_currency
 
   belongs_to :subscription, class_name: 'BbpsBillerSubscription', foreign_key: :subscription_id, optional: true
   belongs_to :biller, class_name: 'BbpsBiller', foreign_key: :bbps_biller_id, optional: true
@@ -90,6 +92,8 @@ class BbpsBill < ApplicationRecord
   belongs_to :late_payment_fee, foreign_key: :late_payment_fee_id, class_name: 'Amount', optional: true
   belongs_to :early_payment_fee, foreign_key: :early_payment_fee_id, class_name: 'Amount', optional: true
   belongs_to :convenience_fee, foreign_key: :convenience_fee_id, class_name: 'Amount', optional: true
+  belongs_to :base_currency, optional: true, class_name: 'Currency'
+  belongs_to :reporting_currency, optional: true, class_name: 'Currency'
 
   belongs_to :tax_rate, class_name: 'TaxRate', optional: true
   belongs_to :category, class_name: 'Category', optional: true
@@ -317,6 +321,8 @@ class BbpsBill < ApplicationRecord
           amount: total_amount.as_json(rounded: true),
           customer_fields: subscription.all_customer_fields,
           paid_at: paid_at&.strftime("%I:%M %p, %d %b %Y"),
+          reporting_currency: get_reporting_currency,
+          base_currency: get_base_currency
       }
       return data
     end
@@ -373,7 +379,9 @@ class BbpsBill < ApplicationRecord
         customer_pan: subscription.customer_pan,
         show_payment_details: false,
         attachments: attachments.as_json,
-        selected_amount_type: selected_amount_type
+        selected_amount_type: selected_amount_type,
+        reporting_currency: get_reporting_currency,
+        base_currency: get_base_currency
     }
 
     if self.late_payment_fee&.value.to_f > 0
@@ -573,6 +581,11 @@ class BbpsBill < ApplicationRecord
   end
 
   ransack_scopes :with_status_id
+  
+  def set_currency
+    self.reporting_currency_id = self.company.reporting_currency.id if self.reporting_currency_id.blank? 
+    self.base_currency_id = self.company.reporting_currency.id if self.base_currency_id.blank? 
+  end
 
   private
 
@@ -609,8 +622,21 @@ class BbpsBill < ApplicationRecord
     if self.total_amount.present?
       self.total_amount.update(value: total_amount_value)
     else
-      self.total_amount = Amount.new(value: total_amount_value, currency_id: 1)
+      self.total_amount = Amount.new(value: total_amount_value, currency_id: get_base_currency.id)
     end
+  end
+
+  def set_currency_for_amount
+    amount_attr = [:amount, :total_amount, :late_payment_fee, :early_payment_fee, :convenience_fee]
+
+    amount_attr.each do |amount_attribute|
+      amount_attr_id = self.send("#{amount_attribute}_id")
+      if amount_attr_id.present?
+        Amount.find_by(id: amount_attr_id).update(currency_id: get_base_currency.id)
+      end
+    end
+    self.skip_callback = true
+    self.save
   end
 
 

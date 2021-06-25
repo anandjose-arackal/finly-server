@@ -72,6 +72,7 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
   property :compute_type_id
   property :compute_formula
   property :compute_lookup_entity_id
+  property :compute_lookup_assignments
 
   validation   do
     params do

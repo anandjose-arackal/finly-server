@@ -58,11 +58,13 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
   IndexBuilder::API::ColumnTemplate::ControllingLevel(self)
 
   column :requested, default: true, includes: [payment_order: { amount_requested: :currency }] do
-    amount value: -> (context) { context[:exposure].payment_order.amount_requested }, tool_tip: :format_amount_requested_tool_tip
+    amount value: -> (context) { context[:exposure].payment_order.amount_requested }
+      # , tool_tip: :format_amount_requested_tool_tip
   end
 
   column :processed, default: true, includes: [payment_order: { amount_processed: :currency }] do
-    amount value: -> (context) { context[:exposure].payment_order.amount_processed }, tool_tip: :format_amount_processed_tool_tip
+    amount value: -> (context) { context[:exposure].payment_order.amount_processed }
+      # , tool_tip: :format_amount_processed_tool_tip
   end
 
   column :scheduled_date, sort: :payment_order_scheduled_at, default: true, includes: [:payment_order] do

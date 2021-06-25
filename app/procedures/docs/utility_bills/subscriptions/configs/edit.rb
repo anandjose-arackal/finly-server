@@ -11,7 +11,7 @@ class Docs::UtilityBills::Subscriptions::Configs::Edit < Transactions::API
     result['departments'] = Company::Departments::Index.(current_user, filter_params).policy_department_filter_mapping&.leaves
     result['locations'] = Company::Locations::Index.(current_user, filter_params).policy_location_filter_mapping&.leaves
     result['cost_centers'] = current_user.company.cost_centers.non_deleted
-    result['policies'] = ::Policy::VendorPayments::Index.(current_user, filter_params).policies rescue Policy.none
+    result['policies'] = ::Policy::VendorPayments::Index.(current_user, (current_user.vendor_payments_admin? ? {current_app: :vp} : filter_params)).policies rescue Policy.none
     result['categories'] = current_user.company.categories.inward_invoice_items_only
     result['tax_rates'] = current_user.company.tax_rates
     result['custom_fields_config'] = custom_fields_config(current_user)
