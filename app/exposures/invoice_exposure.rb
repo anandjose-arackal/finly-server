@@ -224,6 +224,9 @@ class InvoiceExposure < Exposures::API
   attribute :reporting_invoice_balance_due do
     record.reporting_invoice_balance_due
   end
+
+  attribute :payment_term, record_attribute: true, exposure: true, includes: [:payment_term]
+
   # def vendor_ref_num(invoice_line_item)
   #   invoice_line_item.parent&.vendor_id
   # end

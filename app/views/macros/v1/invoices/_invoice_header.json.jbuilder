@@ -30,6 +30,7 @@ json.net_amount exposure.net_amount_value
 json.paid_amount exposure.paid_amount_value
 json.balance_payable exposure.balance_payable_value
 json.roundoff_amount exposure.roundoff_amount
+json.payment_term exposure.payment_term&.name
 # json.cost_allocation exposure.cost_allocation
 # json.cost_center record.cost_center
 # json.department record.department
