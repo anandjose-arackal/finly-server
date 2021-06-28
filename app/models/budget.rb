@@ -394,35 +394,35 @@ class Budget < ApplicationRecord
     budget_consumption = self.build_budget_consumption(
         budget_amount_attributes: {
             value: self.budget_amount.value,
-            currency: ( self.company&.reporting_currency&.id || Currency.first )
+            currency: ( self.company&.reporting_currency&.id || Currency.first.id )
         },
         pending_amount_attributes: {
             value: 0,
-            currency: ( self.company&.reporting_currency&.id || Currency.first )
+            currency: ( self.company&.reporting_currency&.id || Currency.first.id )
         },
         committed_amount_attributes: {
             value: 0,
-            currency: ( self.company&.reporting_currency&.id || Currency.first )
+            currency: ( self.company&.reporting_currency&.id || Currency.first.id )
         },
         pending_payment_amount_attributes: {
             value: 0,
-            currency: ( self.company&.reporting_currency&.id || Currency.first )
+            currency: ( self.company&.reporting_currency&.id || Currency.first.id )
         },
         payment_processing_amount_attributes: {
             value: 0,
-            currency: ( self.company&.reporting_currency&.id || Currency.first )
+            currency: ( self.company&.reporting_currency&.id || Currency.first.id )
         },
         paid_amount_attributes: {
             value: 0,
-            currency: ( self.company&.reporting_currency&.id || Currency.first )
+            currency: ( self.company&.reporting_currency&.id || Currency.first.id )
         },
         remaining_amount_attributes: {
             value: self.budget_amount.value,
-            currency: ( self.company&.reporting_currency&.id || Currency.first )
+            currency: ( self.company&.reporting_currency&.id || Currency.first.id )
         },
         total_consumed_amount_attributes: {
             value: 0,
-            currency: ( self.company&.reporting_currency&.id || Currency.first )
+            currency: ( self.company&.reporting_currency&.id || Currency.first.id )
         }
     )
     budget_consumption.save
