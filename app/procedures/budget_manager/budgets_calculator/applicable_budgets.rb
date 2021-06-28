@@ -188,11 +188,12 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
         budgets: budgets
     }
     options["result"] = result
+    true
   end
 
 
   def docuemnt_specific_budget(options, **)
-    budgets = options["result"]["budgets"]
+    budgets = options.dig(:result, :budgets)
 
     case self.document.class.name
     when "PurchaseOrder"
