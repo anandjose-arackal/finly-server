@@ -6,19 +6,19 @@ class ActionsManager::Master::ApprovalMatrices::WorkflowConfig < ActionsManager:
                     :bbps_bill_non_auto_fetched_provider]
 
   def purchase_request
-    true
+    user.company.purchase_requisition_enabled?
   end
 
   def purchase_order
-    true
+    user.company.procurement_enabled?
   end
 
   def non_po_invoice
-    true
+    user.company.invoice_to_pay_system_enabled?
   end
 
   def invoice
-    true
+    user.company.procurement_enabled?
   end
 
   def bank_payment_request
@@ -26,15 +26,15 @@ class ActionsManager::Master::ApprovalMatrices::WorkflowConfig < ActionsManager:
   end
 
   def vendor
-    true
+    user.company.vendor_empanelment_workflow_enabled?
   end
 
   def payment_agreement
-    true
+    user.company.agreement_based_payment_system_enabled?
   end
 
   def agreement_invoices
-    true
+    user.company.agreement_based_payment_system_enabled?
   end
 
   def credit_note
@@ -42,15 +42,15 @@ class ActionsManager::Master::ApprovalMatrices::WorkflowConfig < ActionsManager:
   end
 
   def bbps_bill_subscription
-    true
+    user.company.utility_bills_enabled?
   end
 
   def bbps_bill_auto_fetched_provider
-    true
+    user.company.utility_bills_enabled?
   end
 
   def bbps_bill_non_auto_fetched_provider
-    true
+    user.company.utility_bills_enabled?
   end
 
 end
