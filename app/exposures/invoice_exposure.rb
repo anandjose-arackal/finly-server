@@ -227,7 +227,7 @@ class InvoiceExposure < Exposures::API
 
   attribute :payment_term, record_attribute: true, exposure: true, includes: [:payment_term]
 
-  attribute :payments_utr, includes: [:payment] do
+  attribute :payments_utr, includes: [:payments] do
     utrs =[]
     record.payments.each do |payment|
       utrs << payment.utr
