@@ -1397,17 +1397,17 @@ class Invoice < ApplicationRecord
 
   def tds_per_item
     if forms_enabled
-      self.reporting_invoice_tds_amount / self.items.count
+      (self.reporting_invoice_tds_amount.to_f / self.items.count.to_f) rescue 0
     else
-      self.tds_amount&.value.to_f / self.items.count
+      (self.tds_amount&.value.to_f / self.items.count.to_f) rescue 0
     end
   end
 
   def advance_per_item
     if forms_enabled
-      self.reporting_invoice_paid_outside_amount / self.items.count
+      (self.reporting_invoice_paid_outside_amount.to_f / self.items.count.to_f) rescue 0
     else
-      self.advance_amount&.value.to_f / self.items.count
+      (self.advance_amount&.value.to_f / self.items.count.to_f) rescue 0
     end
   end
 
