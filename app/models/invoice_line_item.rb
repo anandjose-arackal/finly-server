@@ -186,8 +186,8 @@ class InvoiceLineItem < ApplicationRecord
   # after_commit :set_tds_applicable, on: [:create, :update]
 
   after_save :budget_trail_entry
-  after_save :set_currency_for_amount, unless: :skip_callback
   after_save :sync_amounts, unless: :skip_callback
+  after_save :set_currency_for_amount, unless: :skip_callback
   after_destroy :budget_trail_destroy
 
   TEMPLATE_COLUMNS = %w{ description quantity rate tax discount category_id gst_type_id hsn_sac parent_type parent_id inventory_line_item_id item_info comment account tax_rate_id cost_center_id unit_of_measurement department_id sgst cgst igst }
