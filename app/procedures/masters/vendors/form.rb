@@ -163,7 +163,7 @@ class Masters::Vendors::Form < Forms::API
   # end
 
   section :location_details, associate_custom_fields: true do
-    data_map :gstin_locations, populate_if_empty: GstinLocation, min_items: 1, associate_custom_fields: true do
+    data_map :gstin_locations, populate_if_empty: GstinLocation, min_items: 1, associate_custom_fields: true, primary_key_for_import: :gstin do
       text :location
       dropdown :state_id, required: true,
                choices_scope: Choices[:enum].(GstStateCode, name: :name)
@@ -185,7 +185,7 @@ class Masters::Vendors::Form < Forms::API
   end
 
   section :account_details, associate_custom_fields: true do
-    data_map :bank_accounts, populate_if_empty: BankAccount, min_items: 1, associate_custom_fields: true do
+    data_map :bank_accounts, populate_if_empty: BankAccount, min_items: 1, associate_custom_fields: true, primary_key_for_import: :account_number do
       text :name, required: true
       text :account_number, required: true, unique: false, regex: {format: "\\A[A-Za-z0-9]{3,32}\\z", message: "is not in valid format"}
       text :confirm_account_number, required: true, system_field: false
