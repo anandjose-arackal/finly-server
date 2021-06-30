@@ -227,6 +227,14 @@ class InvoiceExposure < Exposures::API
 
   attribute :payment_term, record_attribute: true, exposure: true, includes: [:payment_term]
 
+  attribute :payments_utr, includes: [:payments] do
+    utrs =[]
+    record.payments.each do |payment|
+      utrs << payment.utr
+    end
+    utrs.compact.join(', ')
+  end
+
   # def vendor_ref_num(invoice_line_item)
   #   invoice_line_item.parent&.vendor_id
   # end

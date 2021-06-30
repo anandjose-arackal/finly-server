@@ -127,4 +127,26 @@ class UserSession < ApplicationRecord
   #   scopes == 'admin'
   # end
 
+  def detect_user_agent
+    if self.scopes == 'web'
+      downcase_user_agent = self.user_agent.downcase
+      list_of_browsers = ['edg', 'firefox', 'chrome', 'safari']
+      list_of_systems = ['windows', 'mac', 'linux']
+      selected_browser = []
+      selected_system = []
+      list_of_browsers.any? do |browser|
+        if downcase_user_agent.include? browser
+          selected_browser.push(browser)
+        end
+      end
+      list_of_systems.any? do |browser_system|
+        if downcase_user_agent.include? browser_system
+          selected_system.push(browser_system)
+        end
+      end
+      "#{selected_browser[0].capitalize} on #{selected_system[0].capitalize}"
+    else
+      'Finly App'
+    end
+  end
 end
