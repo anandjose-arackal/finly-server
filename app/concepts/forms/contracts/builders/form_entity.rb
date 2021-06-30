@@ -68,7 +68,10 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
         end
 
         if required and active and !([true, false].include?( send(entity.entity_key) )) and send(entity.entity_key).blank? and entity.entity_type != 'switch' and entity.entity_type != 'attachment'
-          errors.add entity.label, 'cannot be blank'
+          # checking whether entity is system_field or data is changed to skip validation for old nested objects data
+          if entity.system_field || send(:changed?)
+            errors.add entity.label, 'cannot be blank'
+          end
         end
 
         # Check uniqueness of value
