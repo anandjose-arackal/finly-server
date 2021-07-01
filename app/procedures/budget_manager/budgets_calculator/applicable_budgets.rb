@@ -19,7 +19,7 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
   # budgets among which only some of them will apply
   step :date_based_budgets!
 
-  # step :docuemnt_specific_budget
+  step :docuemnt_specific_budget
 
   def init!(options, document:, **)
     self.document = document
@@ -188,27 +188,33 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
         budgets: budgets
     }
     options["result"] = result
+    true
   end
 
 
-  # def docuemnt_specific_budget(options, **)
-    # budgets = options["result"]
+  def docuemnt_specific_budget(options, **)
 
-    # case self.document.class.name
-    # when "PurchaseOrder"
-    #   budgets = budgets.where(purchase_order: true)
-    # when "PurchaseRequest"
-    #   budgets = budgets.where(purchase_request: true)
-    # when "Invoice"
-    #   budgets = budgets.where(invoice: true)
-    # when "Expense", "Report"
-    #   budgets = budgets.where(expense: true)
-    # when "BankPaymentRequest"
-    #   budgets = budgets.where(payment: true)
-    # end
+    budgets = options[:result][:budgets] || []
 
-    # options["result"] = budgets
-  # end
+    case self.document.class.name
+    when "PurchaseOrder"
+      budgets = budgets.where(purchase_order: true)
+    when "PurchaseRequest"
+      budgets = budgets.where(purchase_request: true)
+    when "Invoice"
+      budgets = budgets.where(invoice: true)
+    when "Expense", "Report"
+      budgets = budgets.where(expense: true)
+    when "BankPaymentRequest"
+      budgets = budgets.where(payment: true)
+    end
+
+    result = {
+      budgets: budgets
+    }
+    
+    options["result"] = result
+  end
 
   def get_dates_from_document(document, date_type_id)
     dates = []
