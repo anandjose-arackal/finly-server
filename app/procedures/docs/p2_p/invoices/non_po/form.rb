@@ -223,7 +223,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       lookup :items_department_id, label: "Department", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('departments', assignments: { form: true })
       lookup :items_cost_center_id, label: "Cost Center", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('cost_centers')
 
-      lookup :category_id, label: "Category", required: true, visible: true, editable: true, choices_scope: Choices[:lookup].('categories'), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.category_id}}'), triggers: {on_compute: {lookup_details: [:category_id]}}
+      lookup :category_id, label: "Category", required: true, visible: true, editable: true, choices_scope: Choices[:lookup].('categories', scope: :inward_invoice_line_items_only), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.category_id}}'), triggers: {on_compute: {lookup_details: [:category_id]}}
 
       text :gl_code, label: "GL Code", editable: false, visible: false, 
         computed: Forms::Compute::Lookup('items.category_id', '{{record.gl_code_or_item_number}}', assignments: {item_number: "{{row.item_number}}"})
