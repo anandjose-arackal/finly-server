@@ -34,11 +34,7 @@ class YesBankVendorExposure < Exposures::API
   attribute :address, record_attribute: true
 
   attribute :bank_accounts, includes: [:bank_accounts], exposure: true do
-    bank_accounts = []
-    record.bank_accounts.each do |account|
-      bank_accounts << account
-    end
-    bank_accounts.sort_by { |account| account.default_account ? 0 : 1 }
+    record.bank_accounts.unscope(:order).order(default_account: :desc, created_at: :desc)
   end
 
   attribute :default_bank_account, includes: [:bank_accounts], exposure: true do
