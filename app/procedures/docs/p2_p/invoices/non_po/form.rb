@@ -245,11 +245,12 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
                computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.unit_of_measurement}}')
 
       amount :item_rate,
-             label: "Item Rate",
+             label: "Item Rate (Reporting Currency)",
              computed: Forms::Compute::Form('{{ row.rate | times: form.conversion_rate | round: 2 }}'),
-             visible: true
+             visible: true,
+             editable: false
 
-      amount :rate, label: "Rate",
+      amount :rate, label: "Rate (Base Currency)",
              can_editable_be_changed: false,
              can_visible_be_changed: false,
              required: true, visible: true, editable: true,
