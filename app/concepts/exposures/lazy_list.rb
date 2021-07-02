@@ -33,6 +33,38 @@ class Exposures::LazyList < Exposures::API
     self
   end
 
+  def first
+    relation.first&.to_exposure
+  end
+
+  def second
+    relation.second&.to_exposure
+  end
+
+  def third
+    relation.third&.to_exposure
+  end
+
+  def fourth
+    relation.fourth&.to_exposure
+  end
+
+  def fifth
+    relation.fifth&.to_exposure
+  end
+
+  def last
+    relation.last&.to_exposure
+  end
+
+  def second_to_last
+    relation.second_to_last&.to_exposure
+  end
+
+  def third_to_last
+    relation.third_to_last&.to_exposure
+  end
+
   def each
     relation.find_in_batches(batch_size: batch_size) do |records|
       records.each do |record|
