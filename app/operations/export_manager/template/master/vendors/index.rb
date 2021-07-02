@@ -1,6 +1,4 @@
 class ExportManager::Template::Master::Vendors::Index < ExportManager::Builders::Template
-  attr_accessor :vendor_ba
-
   label 'Export'
   description 'Vendor Export'
   export_format 'xls'
