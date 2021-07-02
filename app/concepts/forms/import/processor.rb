@@ -53,7 +53,7 @@ class Forms::Import::Processor
     else
       entity.entities.each do |child_entity|
         next unless child_entity.visible
-        next unless entity.type != 'FormEntity::Attachment'
+        next unless child_entity.type != 'FormEntity::Attachment'
 
         build_headers_for_entity(child_entity, user).each do |hdr_key, hdr_value|
           headers[hdr_key] = "#{entity.entity_key.titleize(keep_id_suffix: true)} #{hdr_value}"
