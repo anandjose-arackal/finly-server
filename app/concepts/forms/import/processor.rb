@@ -95,7 +95,7 @@ class Forms::Import::Processor
       nested_data[data_headers[sheet_name]] = {}
 
       (2..sheet.last_row).each do |index|
-        row_data = {}
+        row_data = {}.with_indifferent_access
         row = sheet.row(index)
         row.each_with_index do |value, index|
           row_data[worksheet_headers[index]] = value
@@ -122,6 +122,10 @@ class Forms::Import::Processor
           else
             data[header_data[:entity_key]] = parse_value(row_data[header_data[:name]], header_data[:entity])
           end
+        end
+
+        unless data[:id].present?
+          data.delete(:id)
         end
 
         if data[:parent_id].present? || data[:primary_key_for_import].present?
@@ -178,9 +182,9 @@ class Forms::Import::Processor
 
           nested_data.keys.each do |key|
             if form_data[:id].present?
-              form_data[key] = nested_data[key][form_data[:id]] || nested_data[key][form_data[:primary_key_for_import]]
+              form_data[key] = nested_data[key][form_data[:id]] || nested_data[key][form_data[form.primary_key_for_import]]
             elsif form_data[form.primary_key_for_import].present?
-              form_data[key] = nested_data[key][form_data[:primary_key_for_import]]
+              form_data[key] = nested_data[key][form_data[form.primary_key_for_import]]
             end
           end
 

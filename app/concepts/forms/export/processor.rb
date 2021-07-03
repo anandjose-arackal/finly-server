@@ -84,8 +84,8 @@ class Forms::Export::Processor
           entity_type: 'text'
         },
         parent_primary_key: {
-          name: "#{parent_sheet_label.singularize} #{form.primary_key_for_import.titleize(keep_id_suffix: true)}",
-          entity_key: 'parent_primary_key',
+          name: "#{parent_sheet_label.singularize} #{form.entities.find_by(entity_key: form.primary_key_for_import).label}",
+          entity_key: 'primary_key_for_import',
           entity_type: 'text'
         },
         id: {
