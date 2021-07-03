@@ -9,11 +9,13 @@ class Forms::API
   class_attr :validations, default: {}
   class_attr :dependencies, default: {}
   class_attr :model
+  class_attr :label
+  class_attr :primary_key_for_import
   class_attr :predictions, default: {}
 
   def self.form
     @form ||= ActsAsTenant.without_tenant do
-      Form.new(klass_name: self, model: self.model)
+      Form.new(klass_name: self, model: self.model, label: (self.label || self.model.name), primary_key_for_import: self.primary_key_for_import)
     end
   end
 

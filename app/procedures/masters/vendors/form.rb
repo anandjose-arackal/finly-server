@@ -86,6 +86,8 @@
 class Masters::Vendors::Form < Forms::API
 
   model YesBankVendor
+  label 'Vendors'
+  primary_key_for_import :business_name
 
   meta ->(record) {
     {
