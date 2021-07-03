@@ -67,6 +67,9 @@ module FormsHelper
           if  entity.entity_type == 'lookup'
             form_data.merge!({entity.entity_key => model.send(entity.entity_key).to_s})
             form_data.merge!({"#{entity.entity_key}_value" => model.retrieve_value(entity)})
+          elsif entity.entity_type == 'dropdown'
+            form_data.merge!({entity.entity_key => model.send(entity.entity_key).to_s})
+            form_data.merge!({"#{entity.entity_key}_value" => entity.choices_scope.find_by_id(model.send(entity.entity_key))&.dig(:name)})
           elsif entity.entity_type == 'amount'
             form_data.merge!({entity.entity_key => model.send(entity.entity_key).to_f.round(2)})
           end
@@ -83,6 +86,9 @@ module FormsHelper
         if  form_entity.entity_type == 'lookup'
           form_data.merge!({form_entity.entity_key => model.send(form_entity.entity_key).to_s})
           form_data.merge!({"#{form_entity.entity_key}_value" => model.retrieve_value(form_entity)})
+        elsif form_entity.entity_type == 'dropdown'
+          form_data.merge!({form_entity.entity_key => model.send(form_entity.entity_key).to_s})
+          form_data.merge!({"#{form_entity.entity_key}_value" => form_entity.choices_scope.find_by_id(model.send(form_entity.entity_key))&.dig(:name)})
         elsif form_entity.entity_type == 'amount'
           form_data.merge!({form_entity.entity_key => model.send(form_entity.entity_key).to_f.round(2)})
         end

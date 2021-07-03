@@ -23,16 +23,15 @@ class Forms::Export::Processor
   end
 
   def build_headers
-    sheet_names = [form.model.name]
     sheets_headers = {}
-    sheets_headers[form.model.name] = { id: 'ID' }
+    sheets_headers[form.label] = { id: 'ID' }
 
     form_sections.each do |section|
       section.entities.each do |entity|
         next unless entity.parent_id.blank?
         next unless entity.visible
 
-        sheets_headers[form.model.name].merge!(build_headers_for_entity(sheets_headers, form.model.name, entity, user))
+        sheets_headers[form.label].merge!(build_headers_for_entity(sheets_headers, form.label, entity, user))
       end
     end
 
@@ -44,17 +43,20 @@ class Forms::Export::Processor
 
     if entity.entities.blank?
       if entity.visible
-        headers[entity.entity_key.to_s] = entity.entity_key.titleize(keep_id_suffix: true)
+        unless ['lookup', 'dropdown'].include?(entity.entity_type)
+          headers[entity.entity_key.to_s] = entity.entity_key.titleize(keep_id_suffix: true)
+        end
         if entity.type == 'FormEntity::Switch'
           headers[entity.entity_key.to_s] += ' (Y/N)'
         end
-        if ['lookup'].include?(entity.entity_type)
+        if ['lookup', 'dropdown'].include?(entity.entity_type)
           headers["#{entity.entity_key}_value"] = entity.label
         end
       end
     else
       child_sheet_headers = {
-        parent_id: "#{parent_sheet_name} ID"
+        parent_id: "#{parent_sheet_name.singularize} ID",
+        parent_primary_key: "#{parent_sheet_name.singularize} #{form.primary_key_for_import.titleize(keep_id_suffix: true)}",
       }
       entity.entities.each do |child_entity|
         next unless child_entity.visible
@@ -89,13 +91,13 @@ class Forms::Export::Processor
   end
 
   def build_export(input, request)
-    file = Tempfile.new([form.model.name, '.xlsx'])
+    file = Tempfile.new(["#{form.label}_", '.xlsx'])
     workbook = ::WriteXLSX.new(file)
 
     worksheets = {}
     worksheets_length = Hash.new(0)
     self.headers.keys.each do |sheet_name|
-      worksheets[sheet_name] = workbook.add_worksheet(sheet_name)
+      worksheets[sheet_name] = workbook.add_worksheet(sheet_name.titleize)
       worksheets_length[sheet_name] = 0
       self.headers[sheet_name].values.each_with_index do |header_name, header_index|
         worksheets[sheet_name].write(0, header_index, header_name)
@@ -107,7 +109,7 @@ class Forms::Export::Processor
       form_data['id'] = record.id
 
       self.headers.keys.each do |sheet_name|
-        if sheet_name == form.model.name
+        if sheet_name == form.label
           worksheets_length[sheet_name] += 1
           self.headers[sheet_name].keys.each_with_index do |key, header_index|
             column_data = form_data[key]
@@ -126,6 +128,8 @@ class Forms::Export::Processor
               column_data = child_data[key]
               if key.to_s == 'parent_id'
                 column_data = parent_data['id']
+              elsif key.to_s == 'parent_primary_key'
+                column_data = parent_data[form.primary_key_for_import]
               end
               # get urls if attachments
               if column_data.is_a?(Array) && column_data.present? && column_data[0].is_a?(Hash) && column_data[0].has_key?(:url)

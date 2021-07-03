@@ -205,6 +205,9 @@ class Forms::Import::Processor
     existing_record = nil
     if row_data[:id].present?
       existing_record = form.model.find(row_data[:id])
+    elsif form.primary_key_for_import.present?
+      existing_record = form.model.where("#{form.primary_key_for_import}": row_data[form.primary_key_for_import]).first
+      form_data[:id] = existing_record.id if existing_record.present?
     end
 
     form_sections.each do |section|
