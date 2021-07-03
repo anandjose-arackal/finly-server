@@ -503,13 +503,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
     error_message "Item Discount Amount Cannot be greater than Item Gross Amount"
     rule Rules::Builder['items.item_discount_amount'].gt(entity: "items.item_gross_amount")
   end
-
-  # validation validation_id: "Conversion Rate must be greater than 0" do
-  #   reference 'conversion_rate'
-  #   error_message "Conversion Rate must be greater than 0"
-  #   rule Rules::Builder['conversion_rate'].gteq(value: 0.0)
-  # end
-
+  
   # CONDITIONS
   condition condition_id: "Policy should not be editable once unless in editable status" do
     reference :entity, :policy_id
