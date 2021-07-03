@@ -17,11 +17,25 @@ class Choices::Builders::List < Choices::Builders::Base
   end
 
   def find_by_id(id, params: {}, user: nil)
-    choices(params: params, user: user).find_by(uuid: id)
+    list = choices(params: params, user: user)
+    if list.respond_to?(:find_by)
+      list.find_by(uuid: id)
+    elsif list.respond_to?(:filter)
+      (list.filter do |item|
+        item[:id] == id || item["id"] == id || item[:uuid] == id || item["uuid"] == id
+      end).first
+    end
   end
 
   def find_by_name(name, params: {}, user: nil)
-    choices(params: params, user: user).find_by(name: name)
+    list = choices(params: params, user: user)
+    if list.respond_to?(:find_by)
+      list.find_by(name: name)
+    elsif list.respond_to?(:filter)
+      (list.filter do |item|
+        item[:name] == name || item["name"] == name
+      end).first
+    end
   end
 
   def build(params: {}, user: nil)
