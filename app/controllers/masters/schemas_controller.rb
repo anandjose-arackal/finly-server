@@ -17,4 +17,7 @@ class Masters::SchemasController < BaseControllers::WebBase
     endpoint Masters::Schema::Ops::Show
   end
 
+  def choices
+    endpoint Masters::Schema::Ops::Choices
+  end
 end

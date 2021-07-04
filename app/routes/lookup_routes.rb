@@ -27,6 +27,7 @@ Lookup::Router.draw do
   # Docs
   route 'purchase_requests', Docs::P2P::PurchaseRequests::Lookup
 
+  route 'master_schemas', Masters::Schema::Lookup
   route 'masters.*', Masters::Schema::Records::Lookup
 
 end

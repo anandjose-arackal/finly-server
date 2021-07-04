@@ -4430,6 +4430,7 @@ Rails.application.routes.draw do
     post '/', to: 'schemas#create'
     put '/:id', to: 'schemas#update'
     get '/', to: "schemas#index"
+    get '/choices', to: 'schemas#choices'
     get '/:id', to: 'schemas#show'
   end
 
