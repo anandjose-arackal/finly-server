@@ -15,6 +15,7 @@ class Masters::Locations::Master < Masters::API
     text :pin
     switch :billable_location
     switch :shippable_location
+    text :pan
     text :tax_registration_number
     date :start_date
     date :end_date
