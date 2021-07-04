@@ -134,11 +134,11 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
   # end
 
   column :paid_amount, includes: {successful_payments: :amount}, default: true do
-    amount value: :paid_amount_value
+    amount value: :paid_amount_value, currency_code: :set_currency_code, currency_symbol: :set_currency_symbol
   end
 
   column :balance_due, includes: [:balance_due, {successful_payments: :amount}], default: true do
-    amount value: :balance_payable_value
+    amount value: :balance_payable_value, currency_code: :set_currency_code, currency_symbol: :set_currency_symbol
   end
 
   column :cost_center, default: true, includes: [:cost_center] do
@@ -167,6 +167,18 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
 
   column :policy, default: true, includes: [:policy] do
     text value: "{{record.policy.name}}"
+  end
+  
+  column :base_currency, label: "Base Currency", active: :is_accessable do
+    text value: "{{record.base_currency_code}}"
+  end
+  
+  column :reporting_currency, label: "Reporting Currency", active: :is_accessable do
+    text value: "{{record.reporting_currency_code}}"
+  end
+
+  column :conversion_rate, label: "Conversion Rate", active: :is_accessable do
+    text value: "{{record.conversion_rate}}"
   end
 
   IndexBuilder::API::ColumnTemplate::ErpSync(self)
@@ -270,13 +282,25 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
 
   def self.set_net_amount_value(context)
     user = context[:user]
-    if user.present? && user.non_po_invoice_form_enabled 
+    if user.present? && context[:record].forms_enabled
       # show sub_total amount
       context[:record].invoice_sub_total_amount
     else
       # show new amount
       context[:record].net_amount
     end
+  end
+
+  def self.is_accessable( user )
+    user.present? && user.non_po_invoice_form_enabled 
+  end
+
+  def self.set_currency_code(context)
+    context[:record].get_base_currency.country_code
+  end
+
+  def self.set_currency_symbol(context)
+    context[:record].get_base_currency.symbol
   end
 
 end

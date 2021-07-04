@@ -177,7 +177,7 @@ class BankTransfer::PaymentRequest::UtilityBills::CreateUtilityBillsTicket < Ban
         company_id: user.company_id,
         amount_requested_attributes: {
             value: self.requested_amount,
-            currency_id: 1
+            currency_id: (user&.company&.reporting_currency&.id || Currency.first.id)
         },
         payment_mode: self.payment_mode,
         transfer_mode_id: self.transfer_mode_id,
@@ -185,7 +185,7 @@ class BankTransfer::PaymentRequest::UtilityBills::CreateUtilityBillsTicket < Ban
         receiving_account_type: "BbpsBiller",
         payment_purpose_id: PaymentPurpose.id_for(:utility_bill_payment),
         application: RequestStore.store[:current_app],
-        currency_id: 1,
+        currency_id: (user&.company&.reporting_currency&.id || Currency.first.id),
         scheduled_at: self.scheduled_at
     }
     bank_payment_request_params = {
@@ -194,7 +194,7 @@ class BankTransfer::PaymentRequest::UtilityBills::CreateUtilityBillsTicket < Ban
         controlling_user_id: user.id,
         requested_amount_attributes: {
             value: self.requested_amount,
-            currency_id: 1
+            currency_id: (user&.company&.reporting_currency&.id || Currency.first.id)
         },
         transfer_mode_id: self.transfer_mode_id,
         description: self.description,

@@ -84,4 +84,9 @@ class FormEntity::Table < FormEntity
     end
   end
 
+  def meta(form_meta = NoObject)
+    @meta ||= form_meta unless form_meta == NoObject
+    @meta
+  end
+
 end

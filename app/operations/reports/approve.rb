@@ -74,18 +74,19 @@ class Reports::Approve < Reports::Base
     end
 
     self.workflow_output = op.workflow_output
+
+    if auto_approve
+      comment = report.comments.build report_comment_action_id: ReportCommentAction.id_for(:report_auto_approve)
+    else
+      comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.id_for(:report_approve)
+    end
+    comment.save
     # NEW CODE ENDS
     ####################
   end
 
   def post_process
     if success?
-      if auto_approve
-        comment = report.comments.build report_comment_action_id: ReportCommentAction.id_for(:report_auto_approve)
-      else
-        comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.id_for(:report_approve)
-      end
-      comment.save
 
       email_authorization = nil
 

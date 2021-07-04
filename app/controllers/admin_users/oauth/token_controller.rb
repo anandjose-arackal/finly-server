@@ -25,4 +25,7 @@ class AdminUsers::Oauth::TokenController < Oauth::TokenController
     true
   end
 
+  def decode_params
+    true
+  end
 end

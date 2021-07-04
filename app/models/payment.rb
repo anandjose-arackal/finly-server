@@ -63,6 +63,7 @@
 #
 
 class Payment < ApplicationRecord
+  attr_accessor :skip_callback
   include PostOperationExecution, SoftDeletable, MathUtil
   include LiquidDroppable
   include Exposures::Model::Exposable
@@ -519,6 +520,7 @@ include Searchkick::Api
   after_save :recalculate_order_summary
   after_save :add_company_id
   after_save :calculate_paid_amount_in_parent_trails
+  after_save :set_currency_for_amount, unless: :skip_callback
   after_commit :update_parent_status
 
   after_destroy :budget_trail_destroy
@@ -1426,5 +1428,20 @@ include Searchkick::Api
   def budget_trail_destroy
     BudgetManager::BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.destroy_trail(self)
   end
+
+
+  def set_currency_for_amount
+    amount_attr = [:amount]
+
+    amount_attr.each do |amount_attribute|
+      amount_attr_id = self.send("#{amount_attribute}_id")
+      if amount_attr_id.present?
+          Amount.find_by(id: amount_attr_id).update(currency_id: (self.bank_payment_request&.get_base_currency&.id || self.company&.reporting_currency&.id || 1))
+      end
+    end
+    self.skip_callback = true
+    self.save
+  end
+
 
 end

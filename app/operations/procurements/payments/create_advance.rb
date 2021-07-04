@@ -164,7 +164,7 @@ class Procurements::Payments::CreateAdvance < Procurements::Payments::Base
         transfer_mode_id: self.transfer_mode_id,
         amount_attributes: {
             value: self.advance_amount,
-            currency_id: Currency.first.id
+            currency_id: (user&.company&.reporting_currency&.id || Currency.first.id)
         },
         note: self.description,
         category_id: self.purchase_order.category_id,
@@ -180,7 +180,7 @@ class Procurements::Payments::CreateAdvance < Procurements::Payments::Base
         company_id: user.company_id,
         amount_requested_attributes: {
             value: self.advance_amount,
-            currency_id: 1
+            currency_id: (user&.company&.reporting_currency&.id || Currency.first.id)
         },
         payment_mode: self.payment_mode,
         transfer_mode_id: self.transfer_mode_id,
@@ -188,7 +188,7 @@ class Procurements::Payments::CreateAdvance < Procurements::Payments::Base
         receiving_account_type: "BankAccount",
         payment_purpose_id: PaymentPurpose.id_for(:advance_against_purchase_order),
         application: RequestStore.store[:current_app],
-        currency_id: 1,
+        currency_id: (user&.company&.reporting_currency&.id || Currency.first.id),
         scheduled_at: self.scheduled_at,
         payments_attributes: payment_params
     }
@@ -198,7 +198,7 @@ class Procurements::Payments::CreateAdvance < Procurements::Payments::Base
         controlling_user_id: user.id,
         requested_amount_attributes: {
             value: self.advance_amount,
-            currency_id: 1
+            currency_id: (user&.company&.reporting_currency&.id || Currency.first.id)
         },
         description: self.description,
         beneficiary_type_id: 2, # this is because a purchase order will always come from a vendor

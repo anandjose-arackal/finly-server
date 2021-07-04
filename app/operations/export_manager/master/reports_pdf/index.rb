@@ -11,6 +11,7 @@ class ExportManager::Master::ReportsPdf::Index < ExportManager::Builders::Pdf
     update({total_records: 1})
     op = ::Reports::ExportHandler.(user, params)
     local_variables = op.local_variables
+    local_variables[:current_user] = user
     template = op.template
     local_variables[:op] = op
     @result = Exporter::Pdf.new(user, {filename: "report-#{op.report.name}", layout: 'pdf.html.erb', template: template, local_variables: local_variables})

@@ -62,6 +62,8 @@ class FormEntity::Currency < FormEntity
 
   option :currencies, default: CURRENCIES
 
+  before_create :set_choices_scope
+
   schema_validation do
     required(:options) do
       hash do
@@ -108,6 +110,10 @@ class FormEntity::Currency < FormEntity
     currencies = CURRENCIES.select{ |currency| result_currencies.include?(currency[:currency_code]) }
     result[:options]['currencies'] = currencies
     result
+  end
+
+  def set_choices_scope
+    self.choices_scope = Choices[:lookup].('currencies')
   end
 
 end

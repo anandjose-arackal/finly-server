@@ -15,6 +15,9 @@ class ExportManager::Template::Master::Invoices::TdsExport < ExportManager::Buil
 
   roles [:admin, :finance_manager]
 
+  custom_fields :invoice, template_prefix: 'record'
+  form_custom_fields :invoices, template_prefix: 'record'
+
   attribute :invoice_number, template: '{{ record.invoice_number }}'
   attribute :finly_ref_no, template: '{{ record.invoice_id }}'
   attribute :invoice_date, template: "{{ record.date | date: '%d-%b-%y' }}"

@@ -13,11 +13,11 @@
 #
 class FormCurrency < NonTenantedApplicationRecord
 
-  def currency_conversion_rate
+  def currency_conversion_rate(date, to_iso_code)
     ExchangeRate.get_rate(
-        Date.yesterday,
+        date,
         self.currency_code,
-        RequestStoreUtil.current_user.company.reporting_currency_code
-    ).to_f rescue 1
+        to_iso_code
+    ).to_f
   end
 end

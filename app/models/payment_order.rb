@@ -34,6 +34,7 @@
 #
 
 class PaymentOrder < ApplicationRecord
+  attr_accessor :skip_callback
   include PostOperationExecution, SoftDeletable
   include LiquidDroppable
   include Exposures::Model::Exposable
@@ -93,6 +94,8 @@ class PaymentOrder < ApplicationRecord
   accepts_nested_attributes_for :amount_processed
   accepts_nested_attributes_for :payments
   accepts_nested_attributes_for :payment_order_attachments
+
+  after_save :set_currency_for_amount, unless: :skip_callback
 
   scope :with_purpose_id, -> (id) {where payment_purpose_id: id}
   scope :without_purpose_id, -> (id) {where.not payment_purpose_id: id}
@@ -294,6 +297,21 @@ class PaymentOrder < ApplicationRecord
         self.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
       end
     end
+  end
+
+  def set_currency_for_amount
+    amount_attr = [:amount_requested, :amount_processed]
+
+    amount_attr.each do |amount_attribute|
+      amount_attr_id = self.send("#{amount_attribute}_id")
+      if amount_attr_id.present?
+        Amount.find_by(id: amount_attr_id).update(currency_id: self.company.reporting_currency.id)
+      end
+    end
+
+    self.currency_id = self.company.reporting_currency.id
+    self.skip_callback = true
+    self.save
   end
 
 end

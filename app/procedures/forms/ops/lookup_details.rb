@@ -5,7 +5,7 @@ class Forms::Ops::LookupDetails < Transactions::API
       required(:route).filled #.value(included_in?: Forms::Router.map.keys)
       required(:entity_path).filled
       required(:value).filled
-      optional(:registers) # Registers is used for lookup
+      optional(:assignments) # Registers is used for lookup
     end
   end
 
@@ -54,11 +54,13 @@ class Forms::Ops::LookupDetails < Transactions::API
       parent_key = entity.entity_key.to_s
       
       if nested_dependent_entities.present?
-        value = entity_exposure.template(entity.compute_formula, registers: params[:registers])
+        value = entity_exposure.template(entity.compute_formula, registers: params.dig(:assignments, entity.entity_path))
         entity_path = entity.entity_path
         params_hash = params.merge!({value: value, entity_path: entity&.entity_path})
 
+        Rails.logger.error("#{params_hash}")
         new_data = Forms::Ops::LookupDetails.(params: params_hash, current_user: current_user) || {}
+        Rails.logger.error("#{new_data[:data]}")
         nested_data.merge!(new_data[:data] || {} )
       end
     end
@@ -69,9 +71,9 @@ class Forms::Ops::LookupDetails < Transactions::API
   def compute(context, params:, entity_exposure:, dependent_entities:, **)
     context[:data] = data = {}
     dependent_entities.each do |dep_ent|
-      data[dep_ent.entity_path] = entity_exposure.template(dep_ent.compute_formula, registers: params[:registers])
+      data[dep_ent.entity_path] = entity_exposure.template(dep_ent.compute_formula, registers: params.dig(:assignments, dep_ent.entity_path))
       if dep_ent.entity_path.split("_").include?("id")
-        data["#{dep_ent.entity_path}_value"] = entity_exposure.template(dep_ent.compute_formula.gsub('id', 'value'), registers: params[:registers])
+        data["#{dep_ent.entity_path}_value"] = entity_exposure.template(dep_ent.compute_formula.gsub('id', 'value'), registers: params.dig(:assignments, dep_ent.entity_path))
       end
     end
 

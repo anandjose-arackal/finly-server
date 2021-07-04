@@ -87,7 +87,7 @@ class Forms::Validations::Templates
             errors.add entity.label, "is less than the minimum (minimum is #{entity.options['minimum']} attachments)"
           end
         else
-          if value.length < entity.options['minimum'].to_i
+          if value.to_s.length < entity.options['minimum'].to_i
             errors.add entity.label, "is too short (minimum is #{entity.options['minimum']} characters)"
           end
         end
@@ -107,7 +107,7 @@ class Forms::Validations::Templates
             errors.add entity.label, "is more than the maximum (maximum is #{entity.options['maximum']} attachments)"
           end
         else
-          if value.length > entity.options['maximum'].to_i
+          if value.to_s.length > entity.options['maximum'].to_i
             errors.add entity.label, "is too long (maximum is #{entity.options['maximum']} characters)"
           end
         end
@@ -119,7 +119,7 @@ class Forms::Validations::Templates
     if entity.options['min_items'].present? and entity.options['min_items'].to_i > 0
       contract.validate do
         value = send(entity.entity_key)
-        if value.length < entity.options['min_items'].to_i
+        if value.to_s.length < entity.options['min_items'].to_i
           errors.add entity.label, "must have atleast #{entity.options['min_items'].to_i} record"
         end
       end

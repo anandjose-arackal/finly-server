@@ -41,6 +41,14 @@ json.attachments do
     json.content_type attachment&.file_content_type
   end
 end
+json.comments do
+  json.array! record.comments do |comment|
+    json.user comment.user&.as_json
+    json.user_name comment.user&.name
+    json.body comment.body
+    json.commented_at comment.created_at
+  end
+end
 json.erp_sync_status record.erp_sync_status&.name
 json.erp_sync_message record.erp_sync_message
 json.erp_sync_reference_id record.erp_sync_reference_id

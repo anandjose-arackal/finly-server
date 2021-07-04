@@ -1,6 +1,9 @@
 inward_document = @result.inward_document
 json.extract! @result.inward_document, :id, :doc_number, :delivery_date, :grn_number, :user
 
+json.base_currency @result.inward_document.get_base_currency
+json.reporting_currency @result.inward_document.get_reporting_currency
+
 if @result.inward_document.vendor.present?
   json.vendor do
     json.extract! inward_document.vendor, :id, :name, :email, :mobile_number, :authorized, :description, :pan, :gst, :state, :business_name, :vendor_id, :trade_name
@@ -163,5 +166,13 @@ end
 json.actions do
   if inward_document.items.length > 0
     json.show_comments true
+  end
+end
+json.currencies do
+  json.array!(Currency.all) do |currency|
+    json.country currency.country
+    json.symbol currency.symbol
+    json.country_code currency.country_code
+    json.id currency.id
   end
 end
