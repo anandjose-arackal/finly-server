@@ -68,11 +68,10 @@ class PurchaseRequest < ApplicationRecord
 
   accepts_nested_attributes_for :purchase_request_items, :custom_fields, :attachments, allow_destroy: true
 
+  before_create :set_currency
   after_save :budget_trail_entry
   after_save :set_currency_for_amount, unless: :skip_callback
-
   after_destroy :budget_trail_destroy
-  before_create :set_currency
 
   has_paper_trail(
       meta: {
@@ -529,11 +528,9 @@ class PurchaseRequest < ApplicationRecord
   def set_currency_for_amount
     amount_attr = [:total_amount]
     amount_attr.each do |amount_attribute|
-      
-      amount_value = self.send(amount_attribute)
       amount_attr_id = self.send("#{amount_attribute}_id")
       if amount_attr_id.present?
-        Amount.find_by(id: amount_attr_id).update(value: amount_value, currency_id: get_base_currency.id)
+        Amount.find_by(id: amount_attr_id).update(currency_id: get_base_currency.id)
       end
     end
     self.skip_callback = true

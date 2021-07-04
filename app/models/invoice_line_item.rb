@@ -464,6 +464,8 @@ class InvoiceLineItem < ApplicationRecord
       self.department_id = parent&.department_id
       self.cost_center_id = parent&.cost_center_id
     end
+
+    self.tax_percentage = self.tax_rate&.rate.to_f # workaround to update tax_percentage
     
     self.skip_callback = true
     self.save

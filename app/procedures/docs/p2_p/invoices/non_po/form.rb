@@ -492,12 +492,18 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
     rule Rules::Builder['due_date'].lt(entity: "date")
   end
 
-  # validation validation_id: "Conversion Rate must be greater than 0" do
-  #   reference 'conversion_rate'
-  #   error_message "Conversion Rate must be greater than 0"
-  #   rule Rules::Builder['conversion_rate'].gteq(value: 0.0)
-  # end
+  validation validation_id: "Invoice Discount Cannot be greater than Invoice Gross Amount" do
+    reference 'items_summary.invoice_discount_amount'
+    error_message "Invoice Discount Cannot be greater than Invoice Gross amount"
+    rule Rules::Builder['items_summary.invoice_discount_amount'].gt(entity: "items_summary.invoice_gross_amount")
+  end
 
+  validation validation_id: "Item Discount Cannot be greater than Item gross amount" do
+    reference 'items.item_discount_amount'
+    error_message "Item Discount Amount Cannot be greater than Item Gross Amount"
+    rule Rules::Builder['items.item_discount_amount'].gt(entity: "items.item_gross_amount")
+  end
+  
   # CONDITIONS
   condition condition_id: "Policy should not be editable once unless in editable status" do
     reference :entity, :policy_id
