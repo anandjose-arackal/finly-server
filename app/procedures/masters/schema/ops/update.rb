@@ -24,7 +24,7 @@ class Masters::Schema::Ops::Update < Masters::Schema::Ops::Base
 
     if params[:entities].present?
       params[:entities].each do |entity|
-        if entity[:entity_key].present? && !entity[:"_destroy"].present?
+        if entity[:entity_key].present? && entity[:active].present?
           all_fields[entity[:entity_key]] = false
         end
       end
@@ -37,7 +37,10 @@ class Masters::Schema::Ops::Update < Masters::Schema::Ops::Base
 
       index = 0
       params[:entities].each do |entity|
-        if !entity[:entity_key].present? and !entity[:"_destroy"].present?
+        if !entity[:entity_key].present? and !entity[:active].present?
+          if index >= available_fields.length
+            return on_error context, :entities, "Exceeds the maximum number of custom fields (#{model.system_master ? 5 : 10 })"
+          end
           entity[:entity_key] = available_fields[index]
           index += 1
         end
