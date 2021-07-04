@@ -4,7 +4,7 @@ class Masters::Schema::Records::Resolver < Resolver::API
     if params[:route].present?
       init_record_model_class(params, user)
     end
-    params[:model_class].where(company_id: user.company_id)
+    params[:model_class].where(company_id: user.company_id, ancestry: nil)
   end
 
   def init_record_model_class(params, user)

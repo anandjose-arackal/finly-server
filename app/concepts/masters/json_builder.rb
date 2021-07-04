@@ -86,6 +86,9 @@ class Masters::JsonBuilder
 
     if master_schema.has_nesting
       json[:parent] = record.parent.as_json(compact: true)
+      json[:children] = record.children.each do |child_record|
+        build_record(child_record)
+      end
     end
 
     master_schema.entities.each do |entity|
