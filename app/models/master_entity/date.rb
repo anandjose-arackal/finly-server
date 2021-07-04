@@ -53,20 +53,20 @@ class MasterEntity::Date < MasterEntity
 
         case entity.options['restriction']
         when 'in_the_future'
-          if value <= DateTime.now.end_of_day
-            errors.add entity.entity_key, "can only be in the future"
+          if value <= Date.today
+            errors.add entity.label, "can only be in the future"
           end
         when 'in_the_past'
-          if value >= DateTime.now.end_of_day
-            errors.add entity.entity_key, "can only be in the past"
+          if value >= Date.today
+            errors.add entity.label, "can only be in the past"
           end
         when 'not_in_the_future'
-          if value > DateTime.now.end_of_day
-            errors.add entity.entity_key, "cannot be in the future"
+          if value > Date.today
+            errors.add entity.label, "cannot be in the future"
           end
         when 'not_in_the_past'
-          if value < DateTime.now.end_of_day
-            errors.add entity.entity_key, "cannot be in the past"
+          if value < Date.today
+            errors.add entity.label, "cannot be in the past"
           end
         else
           # Do nothing
