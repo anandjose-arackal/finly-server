@@ -35,6 +35,7 @@ class Masters::Schema::Entity::Contract < Reform::Form
     represented.label = input[:label] if input[:label].present?
     represented.label ||= represented.entity_key.to_s.titleize
   }
+  property :default_value
   property :system_entity, deserializer: -> (input, represented, **) {
     represented.system_entity ||= false
   }

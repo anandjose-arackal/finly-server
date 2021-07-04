@@ -129,6 +129,7 @@ class MasterEntity < ApplicationRecord
         primary_key: primary_key,
         entity_key: entity_key,
         options: options,
+        default_value: default_value,
         active: (active.present? && active.truthy?) ? true : false,
     }
 
