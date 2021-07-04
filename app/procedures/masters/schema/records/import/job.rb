@@ -8,31 +8,37 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
   step RecordModelClass()
   step :build_contract
   step :update_properties
-  pass :build_headers
-  pass :build_input
-  pass :pre_process_input
-  # pass :cache_associations
-  pass :import_data
-  pass :build_result
+  step :build_headers
+  step :build_input
+  step :pre_process_input
+  # step :cache_associations
+  step :import_data
+  step :build_result
 
   def init_record_model(context, params:, model:, current_user:, **)
     params[:master_key] = model.options['master_key']
+
+    true
   end
 
   def build_contract(context, master_schema:, model_class:, **)
     context[:contract] = master_schema.contract
+
+    true
   end
 
   def update_properties(context, model:, **)
     context[:spreadsheet] = ImportUtil.open_spreadsheet(model.attachment)
     model.update(
-        total_records: (context[:spreadsheet].last_row - 1),
+        total_records: (context[:spreadsheet].last_row - 2),
         completed_records: 0,
         completion_percentage: 0,
         created_records: 0,
         updated_records: 0,
         failed_records: 0
     )
+
+    true
   end
 
   def build_headers(context, params:, master_schema:, **)
@@ -44,6 +50,8 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
     master_schema.entities.each do |entity|
       context[:headers][entity.entity_key] = entity.label
     end
+
+    true
   end
 
   def build_input(context, params:, master_schema:, **)
@@ -71,6 +79,8 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
         end
       end
     end
+
+    true
   end
 
   # Associations cache is used for bulk fetching all the associations for lookup and parent entities
@@ -102,7 +112,7 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
   #   end
   # end
 
-  def import_data(context, contract:, master_schema:, association_cache:, params:, model:, model_class:, **)
+  def import_data(context, contract:, master_schema:, params:, model:, model_class:, **)
     context[:result] = []
     created_records = 0
     updated_records = 0
@@ -115,7 +125,7 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
       # if pre_process_result.failure?
       #   import_result = pre_process_result
       # else
-        import_result = import_row(context, master_schema, contract, model_class, row)
+      import_result = import_row(context, master_schema, contract, model_class, row)
       # end
 
       if import_result.success?
@@ -138,6 +148,8 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
       progress_update(model, created_records, updated_records, skipped_records, failed_records)
       context[:result] << data
     end
+
+    true
   end
 
   def progress_update(model, created_records, updated_records, skipped_records, failed_records)
@@ -148,8 +160,10 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
         updated_records: updated_records,
         skipped_records: skipped_records,
         failed_records: failed_records,
-        completion_percentage: (completed * 100 / model.total_records)
+        completion_percentage: ((completed * 100 / model.total_records) rescue 0)
     )
+
+    true
   end
 
   def build_result(context, result:, model:, current_user:, **)
@@ -166,6 +180,8 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
       file = spreadsheet_builder.generate_xls_file
     end
     context[:'result.file'] = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 1.day)
+
+    true
   end
 
   protected

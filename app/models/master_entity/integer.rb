@@ -46,7 +46,7 @@ class MasterEntity::Integer < MasterEntity
     validate :options_structure
 
     def options_structure
-      if options.presnet? && options['min_value'].present? and options['max_value'].present?
+      if options.present? && options['min_value'].present? and options['max_value'].present?
         if options['min_value'].to_f > options['max_value'].to_f
           errors.add :min_value, "has to be less than or equal to max_value"
         end

@@ -79,7 +79,7 @@ class MasterEntity < ApplicationRecord
     end
 
     if entity.unique
-      contract.validates_uniqueness_of entity.entity_key, scope: scopes, conditions: -> { where deleted_at: nil }
+      contract.validates_uniqueness_of entity.entity_key, message: "should have unique value", scope: scopes, conditions: -> { where deleted_at: nil }
     end
   end
 
