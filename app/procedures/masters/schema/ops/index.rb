@@ -19,6 +19,14 @@ class Masters::Schema::Ops::Index < IndexBuilder::API
 
   def self.active_status(context)
     if context[:record].active?
+      'success'
+    else
+      'danger'
+    end
+  end
+
+  def self.active(context)
+    if context[:record].active?
       'Active'
     else
       'Inactive'
