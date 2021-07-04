@@ -42,11 +42,11 @@ class MasterEntity::Decimal < MasterEntity
   contract_eval 'Min Value Limit Check', &Masters::Schema::Validations::Templates[:min_value]
 
   schema_contract do
-    validates :options, presence: true
+    validates :options, presence: false
     validate :options_structure
 
     def options_structure
-      if options['min_value'].present? and options['max_value'].present?
+      if options.present? and options['min_value'].present? and options['max_value'].present?
         if options['min_value'] > options['max_value']
           errors.add :min_value, "has to be less than or equal to max_value"
         end
