@@ -73,14 +73,26 @@ class MasterEntity < ApplicationRecord
   end
 
   contract_eval "Uniqueness check" do |contract:, entity:, **|
-    scopes = [:company_id]
-    unless entity.master_schema.system_master
-      scopes << :master_schema_id
-    end
-
     if entity.unique
-      contract.validates_uniqueness_of entity.entity_key, message: "should have unique value", scope: scopes, conditions: -> { where deleted_at: nil }
+      contract.validate do
+        if send(entity.entity_key).present?
+          recs = contract_root.model.class.where("#{entity.entity_key} = ?", send(entity.entity_key))
+          id = send(:id)
+          recs = recs.where.not(id: id) if id.present?
+          if recs.present?
+            errors.add entity.label, "must be unique"
+          end
+        end
+      end
     end
+    # scopes = [:company_id]
+    # unless entity.master_schema.system_master
+    #   scopes << :master_schema_id
+    # end
+
+    # if entity.unique
+    #   contract.validates_uniqueness_of entity.entity_key, message: "should have unique value", scope: scopes, conditions: -> { where deleted_at: nil }, allow_nil: true, allow_blank: true
+    # end
   end
 
   contract_eval "Choices Scope" do |contract:, entity:, **|
