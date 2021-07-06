@@ -6,11 +6,11 @@ class Choices::Builders::List < Choices::Builders::Base
     self.new({choices: args&.map {|m| m.slice(:id, :name, :active)}})
   end
 
-  def choices(params: {}, user: nil, form_entity: nil)
-    if self.form_entity&.choices_scope&.config&.dig("choices").present? || config&.dig("choices").present? || config&.dig(:choices).present?
+  def choices(params: {}, user: nil, entity: nil)
+    if self.entity&.choices_scope&.config&.dig("choices").present? || config&.dig("choices").present? || config&.dig(:choices).present?
       config[:choices]
     else
-      data = self.form_entity&.choices
+      data = self.entity&.choices
       return data&.where(uuid: params.dig(:q)&.dig(:id_in)) if params.dig(:q)&.dig(:id_in).is_a?(Array)
       data
     end
