@@ -7,10 +7,10 @@ class Choices::Builders::List < Choices::Builders::Base
   end
 
   def choices(params: {}, user: nil, form_entity: nil)
-    if form_entity&.choices_scope&.config&.dig("choices").present? || config&.dig("choices").present? || config&.dig(:choices).present?
+    if self.form_entity&.choices_scope&.config&.dig("choices").present? || config&.dig("choices").present? || config&.dig(:choices).present?
       config[:choices]
     else
-      data = form_entity&.choices
+      data = self.form_entity&.choices
       return data&.where(uuid: params.dig(:q)&.dig(:id_in)) if params.dig(:q)&.dig(:id_in).is_a?(Array)
       data
     end
