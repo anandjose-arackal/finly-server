@@ -21,7 +21,7 @@ class Masters::Schema::Records::Import::Template < Transactions::API
     if master_schema.has_nesting
       context[:headers] << "Parent Id"
     end
-    master_schema.entities.each do |entity|
+    master_schema.entities.only_active.each do |entity|
       context[:headers] << entity.label
     end
   end

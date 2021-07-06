@@ -26,7 +26,7 @@ class Masters::Schema::Ops::Create < Transactions::API
 
     if params[:entities].present?
       params[:entities].each do |entity|
-        if entity[:entity_key].present? && !entity[:"_destroy"].present?
+        if entity[:entity_key].present?
           all_fields[entity[:entity_key]] = false
         end
       end
@@ -39,7 +39,7 @@ class Masters::Schema::Ops::Create < Transactions::API
 
       index = 0
       params[:entities].each do |entity|
-        if !entity[:entity_key].present? and !entity[:"_destroy"].present?
+        if !entity[:entity_key].present?
           entity[:entity_key] = available_fields[index]
           index += 1
         end

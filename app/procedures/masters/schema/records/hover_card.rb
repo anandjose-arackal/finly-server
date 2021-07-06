@@ -21,7 +21,7 @@ class Masters::Schema::Records::HoverCard < HoverCard::API
   policy_action :hover_card?
   json do |context, record|
     json = {}
-    context[:master_schema].entities.each do |entity|
+    context[:master_schema].entities.only_active.each do |entity|
       if entity.type?(:lookup) or entity.type?(:parent_lookup)
         json[entity.label] = record.send(entity.association_name)&.as_json(compact: true)&.dig(:name)
       else

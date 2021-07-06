@@ -47,7 +47,7 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
     if master_schema.has_nesting
       context[:headers][:parent_id] << "Parent Id"
     end
-    master_schema.entities.each do |entity|
+    master_schema.entities.only_active.each do |entity|
       context[:headers][entity.entity_key] = entity.label
     end
 
@@ -68,7 +68,7 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
 
   def pre_process_input(context, input:, master_schema:, **)
     context[:input].each do |row|
-      master_schema.entities.each do |entity|
+      master_schema.entities.only_active.each do |entity|
         next unless entity.type?(:multi_lookup)
         next unless row[entity.entity_key]
 

@@ -25,7 +25,7 @@ class Masters::Schema::Records::FilterConfig < Filters::API
     init_record_model_class(context)
 
     attributes_list = {}.with_indifferent_access
-    context[:model].entities.each do |entity|
+    context[:model].entities.only_active.each do |entity|
       choices = nil
       if entity.filter_type == :lookup
         choices = entity.choices_scope
