@@ -82,6 +82,7 @@ class Admin::Implementations::Master::Users::Import < Admin::Implementations::Pr
       unless user.update(active: false)
         return result false, user.errors.full_messages
       end
+      user.user_sessions.where(status_id: UserSessionStatus.id_for(:authorized)).update_all(status_id:  UserSessionStatus.id_for(:blocked))
       result true, "Deactivated Successfully"
     elsif data[:destroy]&.to_s&.downcase == 'activate'
       unless user.update(active: true)
