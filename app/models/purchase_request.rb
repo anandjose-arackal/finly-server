@@ -156,6 +156,8 @@ class PurchaseRequest < ApplicationRecord
       end
     when PurchaseRequestStatus::GROUP_APPROVED
       where purchase_request_status_id: PurchaseRequestStatus.ids_for(:approved, :auto_approved, :po_created, :partially_closed, :order_initiated)
+    when PurchaseRequestStatus::GROUP_APPROVED_ITEM
+      joins(:purchase_request_items).where('purchase_request_items.status_id IN (?)', [PurchaseRequestItemStatus.id_for(:approved)])
     else
       where purchase_request_status_id: status_ids
     end
