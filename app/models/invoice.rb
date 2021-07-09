@@ -2024,8 +2024,8 @@ class Invoice < ApplicationRecord
     self.reporting_invoice_net_total_amount = (self.reporting_invoice_net_total_amount.to_f + old_reporting_tds_amount.to_f - self.reporting_invoice_tds_amount.to_f).round(2)
 
     # update invoice_balance_due
-    self.invoice_balance_due = (self.invoice_balance_due.to_f + old_tds_amount.to_f - self.invoice_tds_amount.to_f).round(2)
-    self.reporting_invoice_balance_due = (self.reporting_invoice_balance_due.to_f + old_reporting_tds_amount.to_f - self.reporting_invoice_tds_amount.to_f).round(2)
+    self.invoice_balance_due = (self[:invoice_balance_due].to_f + old_tds_amount.to_f - self.invoice_tds_amount.to_f).round(2)
+    self.reporting_invoice_balance_due = (self[:reporting_invoice_balance_due].to_f + old_reporting_tds_amount.to_f - self.reporting_invoice_tds_amount.to_f).round(2)
     
     # update
 
