@@ -32,8 +32,10 @@ class Masters::Schema::Entity::Contract < Reform::Form
   property :primary_key, default: false
   property :position
   property :label, deserializer: -> (input, represented, **) {
-    represented.label = input[:label] if input[:label].present?
-    represented.label ||= represented.entity_key.to_s.titleize
+    represented.label = input[:label]
+    if represented.system_entity && !represented.id.present?
+      represented.label ||= represented.entity_key.to_s.titleize
+    end
   }
   property :default_value
   property :system_entity, deserializer: -> (input, represented, **) {
