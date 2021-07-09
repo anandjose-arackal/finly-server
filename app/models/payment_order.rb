@@ -95,7 +95,7 @@ class PaymentOrder < ApplicationRecord
   accepts_nested_attributes_for :payments
   accepts_nested_attributes_for :payment_order_attachments
 
-  # after_save :set_currency_for_amount, unless: :skip_callback
+  after_save :set_currency_for_amount, unless: :skip_callback
 
   scope :with_purpose_id, -> (id) {where payment_purpose_id: id}
   scope :without_purpose_id, -> (id) {where.not payment_purpose_id: id}
@@ -299,19 +299,19 @@ class PaymentOrder < ApplicationRecord
     end
   end
 
-  # def set_currency_for_amount
-  #   amount_attr = [:amount_requested, :amount_processed]
+  def set_currency_for_amount
+    amount_attr = [:amount_requested, :amount_processed]
 
-  #   amount_attr.each do |amount_attribute|
-  #     amount_attr_id = self.send("#{amount_attribute}_id")
-  #     if amount_attr_id.present?
-  #       Amount.find_by(id: amount_attr_id).update(currency_id: self.company.reporting_currency.id)
-  #     end
-  #   end
+    amount_attr.each do |amount_attribute|
+      amount_attr_id = self.send("#{amount_attribute}_id")
+      if amount_attr_id.present?
+        Amount.find_by(id: amount_attr_id).update(currency_id: self.bank_payment_request.base_currency_id)
+      end
+    end
 
-  #   self.currency_id = self.company.reporting_currency.id
-  #   self.skip_callback = true
-  #   self.save
-  # end
+    self.currency_id = self.bank_payment_request.base_currency_id
+    self.skip_callback = true
+    self.save
+  end
 
 end
