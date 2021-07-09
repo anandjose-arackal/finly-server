@@ -1,4 +1,4 @@
-class MasterEntity::Date < MasterEntity
+class MasterEntity::DateTime < MasterEntity
   register :datetime
   database_type :datetime
   filter_type :datetime
