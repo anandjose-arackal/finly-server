@@ -103,7 +103,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
     date :date,
          label: "Invoice Date",
          required: true, computed: Forms::Compute::Form('{{ form.date | default: "now" | date: "%Y-%m-%d" }}'),
-         restriction: 'not_in_the_future'
+         restriction: 'not_in_the_future', triggers: {on_change: {lookup_details: [:base_currency]}}
 
     lookup :payment_term_id,
            choices_scope: Choices[:lookup].('payment_terms'),

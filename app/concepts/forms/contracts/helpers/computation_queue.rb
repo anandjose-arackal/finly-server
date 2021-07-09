@@ -58,8 +58,11 @@ class Forms::Contracts::Helpers::ComputationQueue
 
         lookup_exposure = lookup_exposures[lookup_value.to_s]
         return if lookup_exposure.nil?
-
-        value = lookup_exposure.template(entity.compute_formula)
+        registers = {}
+        if entity.compute_lookup_assignments.present?
+          registers = JSON.parse(Liquid::Template.parse(JSON.dump(entity.compute_lookup_assignments)).render({row: represented.form_data, form: represented.contract_root.form_data, meta: represented.contract_root.model.form_metadata}.as_json))
+        end
+        value = lookup_exposure.template(entity.compute_formula, registers: registers)
         entity.populate(represented, value, represented.contract_root.form_data)
       end
 
