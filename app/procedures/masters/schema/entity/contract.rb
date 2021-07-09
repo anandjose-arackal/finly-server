@@ -45,7 +45,7 @@ class Masters::Schema::Entity::Contract < Reform::Form
       represented.entity_key ||= input[:entity_key]
     end
   }
-  property :active, default: true
+  property :active
   property :show_in_lookup, default: false
   property :options, deserializer: -> (input, represented, **) {
     represented.options ||= {}
