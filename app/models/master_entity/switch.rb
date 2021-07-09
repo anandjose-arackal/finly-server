@@ -33,4 +33,5 @@ class MasterEntity::Switch < MasterEntity
   database_type :boolean
   filter_type :switch
   operators :eq_any, :blank, :present
+  set :hint, 'Select value'
 end
