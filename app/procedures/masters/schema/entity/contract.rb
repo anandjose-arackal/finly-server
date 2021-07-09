@@ -25,7 +25,7 @@ class Masters::Schema::Entity::Contract < Reform::Form
     end
   }
   property :hint, deserializer: -> (input, represented, **) {
-    represented.hint = input[:hint] || represented.type&.schema&.dig(:hint)
+    represented.hint = input[:hint].present? ? input[:hint] : represented.type&.schema&.dig(:hint)
   }
   property :required, default: false
   property :unique, default: false
@@ -33,8 +33,8 @@ class Masters::Schema::Entity::Contract < Reform::Form
   property :position
   property :label, deserializer: -> (input, represented, **) {
     represented.label = input[:label]
-    if represented.system_entity && !represented.id.present?
-      represented.label ||= represented.entity_key.to_s.titleize
+    if represented.system_entity && !represented.label.present?
+      represented.label = represented.entity_key.to_s.titleize
     end
   }
   property :default_value
