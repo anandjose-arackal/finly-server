@@ -35,6 +35,8 @@ class MasterEntity < ApplicationRecord
   include Masters::Entity::Schema
   include Masters::Entity::Filters
 
+  TRUTHY_VALUES ||= ['true', true, 1, '1', 'TRUE'].freeze
+
   belongs_to :company
   belongs_to :master_schema
 
@@ -143,7 +145,7 @@ class MasterEntity < ApplicationRecord
         entity_key: entity_key,
         options: options,
         default_value: default_value,
-        active: (active.present? && active.truthy?) ? true : false,
+        active: TRUTHY_VALUES.include?(active) ? true : false,
     }
 
     if type == 'MasterEntity::DropDown'
