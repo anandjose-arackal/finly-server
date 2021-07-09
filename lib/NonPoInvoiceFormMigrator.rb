@@ -252,8 +252,8 @@ class NonPoInvoiceMigrator
 
     update_params = {
 
-      base_currency: Currency.find_by(country_code: 'INR').id,
-      reporting_currency: 'INR',
+      base_currency_id: Currency.find_by(country_code: 'INR').id,
+      reporting_currency_id: Currency.find_by(country_code: 'INR').id,
       conversion_rate: 1,
       retrieve_conversion_rate: true,
 

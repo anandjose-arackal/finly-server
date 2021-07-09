@@ -20,6 +20,7 @@ Lookup::Router.draw do
   route "form_currencies", Masters::FormCurrencies::Lookup
   route "inward_invoice_statuses", Masters::InwardInvoiceStatuses::Lookup
   route "currencies", Masters::Currencies::Lookup
+  route "countries", Masters::Countries::Lookup
 
   # Docs
   route 'purchase_requests', Docs::P2P::PurchaseRequests::Lookup

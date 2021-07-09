@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_06_18_081243) do
+ActiveRecord::Schema.define(version: 2021_07_08_085032) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -2684,6 +2684,11 @@ ActiveRecord::Schema.define(version: 2021_06_18_081243) do
     t.string "gl_code"
     t.index ["ancestry"], name: "index_cost_centers_on_ancestry"
     t.index ["company_id"], name: "index_cost_centers_on_company_id"
+  end
+
+  create_table "countries", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "name"
+    t.datetime "deleted_at"
   end
 
   create_table "credit_note_adjustments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -5497,8 +5502,8 @@ ActiveRecord::Schema.define(version: 2021_06_18_081243) do
     t.string "billing_address_gstin", default: ""
     t.string "shipping_address_name", default: ""
     t.string "shipping_address_gstin", default: ""
-    t.string "base_currency"
-    t.string "reporting_currency"
+    t.integer "base_currency_id"
+    t.integer "reporting_currency_id"
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["agreement_item_id"], name: "index_invoices_on_agreement_item_id"
     t.index ["company_id", "controlling_level_id", "deleted_at"], name: "index_invoice_ct_lvl_cmpny_id"
@@ -10293,7 +10298,6 @@ ActiveRecord::Schema.define(version: 2021_06_18_081243) do
     t.string "trade_name"
     t.text "reject_note"
     t.boolean "rcm_enabled", default: false
-    t.string "vendor_country"
     t.date "ldc_effective_start_date"
     t.date "ldc_effective_end_date"
     t.date "tds_effective_start_date"
@@ -10306,6 +10310,7 @@ ActiveRecord::Schema.define(version: 2021_06_18_081243) do
     t.integer "erp_sync_attempts_count", default: 0
     t.datetime "erp_sync_attempted_at"
     t.decimal "ldc_upper_limit_amount", precision: 20, scale: 5
+    t.integer "vendor_country_id"
     t.index ["company_id", "controlling_level_id", "deleted_at"], name: "index_vendors_ct_lvl_cmpny_id"
     t.index ["company_id"], name: "index_yes_bank_vendors_on_company_id"
     t.index ["name"], name: "index_yes_bank_vendors_on_name"

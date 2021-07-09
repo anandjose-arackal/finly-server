@@ -23,6 +23,9 @@ Resolver::Router.draw do
   scope :form_currencies do
     route 'default', Masters::FormCurrencies::Resolver
   end
+  scope :countries do
+    route 'default', Masters::Countries::Resolver
+  end
   scope :currencies do
     route 'default', Masters::Currencies::Resolver
   end

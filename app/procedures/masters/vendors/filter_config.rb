@@ -15,6 +15,7 @@ class Masters::Vendors::FilterConfig < Filters::API
   attribute :gstin_locations_gstin, label: 'GSTIN', type: :text, simple: true
   attribute :pan, label: 'PAN', type: :text
   attribute :bank_accounts_account_number, label: 'Bank Account No', type: :text
+  attribute :vendor_country_id, type: :dropdown, choices: Choices[:lookup].("countries")
 
   attribute :created_by_id, label: "Created By", type: :dropdown, choices: Choices[:lookup].("users")
 
