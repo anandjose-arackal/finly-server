@@ -25,7 +25,7 @@ class Admin::Users::State::UpdateStatus < Admin::Users::Base
   end
 
   def post_process
-    if user_status_params[:active] == false
+    if update_params[:active] == "0"
       selected_user.user_sessions.where(status_id: UserSessionStatus.id_for(:authorized)).update_all(status_id:  UserSessionStatus.id_for(:blocked))
     end
     add_message :success, "User status updated"
