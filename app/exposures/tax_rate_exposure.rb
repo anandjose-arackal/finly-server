@@ -1,9 +1,7 @@
 class TaxRateExposure < Exposures::API
 
   attribute :id, record_attribute: true
-  attribute :name do 
-    "#{rate}% - #{record.name}"
-  end
+  attribute :name, record_attribute: true
   attribute :rate, record_attribute: true
   attribute :cgst, record_attribute: true
   attribute :sgst, record_attribute: true

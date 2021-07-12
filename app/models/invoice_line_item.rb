@@ -396,8 +396,7 @@ class InvoiceLineItem < ApplicationRecord
     }
   end
 
-  def retrieve_value(entity)
-    return self&.tax_rate&.display_name if entity.entity_key == 'tax_rate_id'
+  def retrieve_value(entity)    
     send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
   end
 
