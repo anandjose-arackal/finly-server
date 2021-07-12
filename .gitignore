@@ -39,6 +39,7 @@ config/cubejs.yml
 config/mailtrain.yml
 config/open_exchange_rates.yml
 config/message_template.yml
+config/appsmith.yml
 
 # .rubocop.yml
 .vscode/
