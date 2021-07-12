@@ -56,6 +56,9 @@ class TaxRate < ApplicationRecord
     }
   end
 
+  def display_name
+    "#{self.rate}% - #{self[:name]}"
+  end
   # def name
   #   if RequestStoreUtil.current_user.non_po_invoice_form_enabled
   #     "#{self.rate}% - #{self[:name]}"
