@@ -55,4 +55,12 @@ class TaxRate < ApplicationRecord
         is_deleted: self.is_deleted
     }
   end
+
+  def name
+    if RequestStoreUtil.current_user.non_po_invoice_form_enabled
+      "#{self.rate}% - #{self[:name]}"
+    else
+      self[:name]
+    end
+  end
 end
