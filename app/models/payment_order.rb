@@ -240,41 +240,41 @@ class PaymentOrder < ApplicationRecord
     end
   end
 
-  # def update_processed_amount
-  #   new_amount = self.payments.completed.joins(:amount).sum(:value)
-  #   self.amount_processed&.update(value: new_amount)
-
-  #   reporting_new_amount = new_amount
-  #   parent_type = self.payments.first.parent_type.downcase
-  #   if parent_type == 'invoice'
-  #     reporting_new_amount =  self.payments.completed.map{ |payment| ( payment&.amount&.value || 0 ) * payment&.parent&.conversion_rate }
-  #   end
-  #   self.update(reporting_amount_processed: reporting_new_amount)
-  # end
-
-  # def update_requested_amount
-  #   new_amount = self.payments.joins(:amount).sum(:value)
-  #   self.amount_requested&.update(value: new_amount)
-    
-  #   reporting_amount_requested = new_amount
-
-  #   reporting_new_amount = new_amount
-  #   parent_type = self.payments.first.parent_type.downcase
-  #   if parent_type == 'invoice'
-  #     reporting_new_amount =  self.payments.map{ |payment| ( payment&.amount&.value || 0 ) * payment&.parent&.conversion_rate }
-  #   end
-  #   self.update(reporting_amount_requested: reporting_new_amount)
-  # end
-
   def update_processed_amount
     new_amount = self.payments.completed.joins(:amount).sum(:value)
     self.amount_processed&.update(value: new_amount)
+
+    reporting_new_amount = new_amount
+    parent_type = self.payments.first&.parent_type&.downcase
+    if parent_type == 'invoice'
+      reporting_new_amount = (self.payments.completed.map { |payment| (payment&.amount&.value || 0) * (payment&.parent&.conversion_rate || 1) }).sum
+    end
+    self.update(reporting_amount_processed: reporting_new_amount)
   end
 
   def update_requested_amount
     new_amount = self.payments.joins(:amount).sum(:value)
     self.amount_requested&.update(value: new_amount)
+
+    reporting_amount_requested = new_amount
+
+    reporting_new_amount = new_amount
+    parent_type = self.payments.first&.parent_type&.downcase
+    if parent_type == 'invoice'
+      reporting_new_amount = (self.payments.map { |payment| (payment&.amount&.value || 0) * (payment&.parent&.conversion_rate || 1) }).sum
+    end
+    self.update(reporting_amount_requested: reporting_new_amount)
   end
+
+  # def update_processed_amount
+  #   new_amount = self.payments.completed.joins(:amount).sum(:value)
+  #   self.amount_processed&.update(value: new_amount)
+  # end
+
+  # def update_requested_amount
+  #   new_amount = self.payments.joins(:amount).sum(:value)
+  #   self.amount_requested&.update(value: new_amount)
+  # end
 
   # again, for convenience, and only applies to bank transfer poyments
   def bank_transfer_type
@@ -305,11 +305,11 @@ class PaymentOrder < ApplicationRecord
     amount_attr.each do |amount_attribute|
       amount_attr_id = self.send("#{amount_attribute}_id")
       if amount_attr_id.present?
-        Amount.find_by(id: amount_attr_id).update(currency_id: self.company.reporting_currency.id)
+        Amount.find_by(id: amount_attr_id).update(currency_id: self.bank_payment_request.base_currency_id)
       end
     end
 
-    self.currency_id = self.company.reporting_currency.id
+    self.currency_id = self.bank_payment_request.base_currency_id
     self.skip_callback = true
     self.save
   end

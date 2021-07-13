@@ -874,7 +874,11 @@ class Invoice < ApplicationRecord
   end
 
   def balance_payable
-    balance_due&.value.to_f - paid_amount_value
+    if self.forms_enabled
+      self.invoice_balance_due
+    else
+      balance_due&.value.to_f - paid_amount_value
+    end
   end
 
   def paid_amount_value
@@ -911,19 +915,11 @@ class Invoice < ApplicationRecord
   end
 
   def invoice_balance_due
-    # if self.forms_enabled
     self[:invoice_balance_due].to_f - self.invoice_advance_paid_amount.to_f
-    # else
-    #   self.balance_due&.value.to_f
-    # end
   end
 
   def reporting_invoice_balance_due
-    # if self.forms_enabled
     self[:reporting_invoice_balance_due].to_f - self.reporting_invoice_advance_paid_amount.to_f 
-    # else
-    #   self.balance_due&.value.to_f
-    # end
   end
 
   def invoice_sub_total_amount
@@ -1861,7 +1857,7 @@ class Invoice < ApplicationRecord
 
           # if the payment is present, user can update the tds only from payment screen, ie from old to new tds structure 
           if self.payments.present? && key.to_s == 'invoice_tds_amount'
-            updated_tds_to_new_structure 
+            updated_values_to_new_structure 
             next
           end
 
@@ -1900,23 +1896,26 @@ class Invoice < ApplicationRecord
       end
 
 
-
-      # FOR NET AMOUNT
-      net_amount_attr = self.net_amount_id
-      # invoice_net_total_amount - invoice_paid_outside_amount
-      # cant use invoice_net_amount because net amount converts to round value in new ui for base currency == 1
-      net_amount_value = self.invoice_total_amount.to_f + self.invoice_paid_outside_amount.to_f - self.invoice_roundoff_amount.to_f
-      self.skip_callback = true
-      if net_amount_attr.present?
-        Amount.find_by(id: net_amount_attr).update(value: net_amount_value, currency_id: base_currency_id)
-      else
-        amount_id = Amount.create(value: net_amount_value, currency_id: base_currency_id).id
-        self.send("net_amount_id=", amount_id)
+      if self.payments.blank?
+        # FOR NET AMOUNT
+        net_amount_attr = self.net_amount_id
+        # invoice_net_total_amount - invoice_paid_outside_amount
+        # cant use invoice_net_amount because net amount converts to round value in new ui for base currency == 1
+        net_amount_value = self.invoice_total_amount.to_f + self.invoice_paid_outside_amount.to_f - self.invoice_roundoff_amount.to_f
+        self.skip_callback = true
+        if net_amount_attr.present?
+          Amount.find_by(id: net_amount_attr).update(value: net_amount_value, currency_id: base_currency_id)
+        else
+          amount_id = Amount.create(value: net_amount_value, currency_id: base_currency_id).id
+          self.send("net_amount_id=", amount_id)
+        end
       end
-
+      if TaxType.where(tax_name: ['igst', 'cgst_sgst'] ).pluck(:id).include?(tax_type_id)
+        self.gst_type_id = self.tax_type_id
+      end
       # update attachments 
       update_attachments
-
+      self.save
       # update custom fields
     end
   end
@@ -1968,19 +1967,6 @@ class Invoice < ApplicationRecord
     {
       invoice_roundoff_amount: 'roundoff_amount'
     }
-
-    # Invoice amount meanings. Picked from Invoice Calculation Utils
-    # amount => raw amount, rate * qty
-    # discount_amount => discount total of items
-    # gross_amount => discounts included or taxable amount or after_discount_amount
-    # tax_amount => tax total of items
-    # tds_amount => tds total of tds_applicable items' tds
-    # net_amount => gross_amount + tax_amount - tds_amount
-    # advance_amount => advance paid
-
-    # New Structure
-    # invoice_sub_total_amount => old structure net_amount
-    # invoice_net_total_amount: invoice_total_amount - invoice_paid_outside_amount - invoice_advance_paid_amount
   end
 
   def item_quantity_validation
@@ -2005,21 +1991,44 @@ class Invoice < ApplicationRecord
     errors.add(:invoice_items, "rate must be greater than 0") if flag
   end
 
-  def updated_tds_to_new_structure 
+  def updated_values_to_new_structure 
+
+    # update_tds
+    old_tds_amount = self.invoice_tds_amount
+    old_reporting_tds_amount = self.reporting_invoice_tds_amount
+
     tds_amount = self.tds_amount&.value&.to_f
     self.invoice_tds_amount = tds_amount
+    self.reporting_invoice_tds_amount = (tds_amount.to_f * self.conversion_rate.to_f).round(2)
     self.tds_percentage = self&.tds_slab&.tds.to_f
     # update tds for each line item also
 
     self.items.each do |item|
-      item_tds = 0
+      item_tds = item.item_tds_amount
       if item&.tds_applicable
         item_tds = ( item&.taxable_amount&.value.to_f * self&.tds_slab&.tds.to_f ) / 100
-        item_tds = item_tds.to_f.round(2)
+        item.item_tds_amount = item_tds.to_f.round(2)
+        item.reporting_item_tds_amount = (item_tds * self.conversion_rate.to_f).round(2)
       end
       self.skip_callback = true
       item.save
     end
+
+
+    # update invoice_total_amount
+    self.invoice_total_amount = (self.invoice_total_amount.to_f + old_tds_amount.to_f - self.invoice_tds_amount.to_f).round(2)
+    self.reporting_invoice_total_amount = (self.reporting_invoice_total_amount.to_f + old_reporting_tds_amount.to_f - self.reporting_invoice_tds_amount.to_f).round(2)
+    
+    # update invoice_net_total_amount
+    self.invoice_net_total_amount = (self.invoice_net_total_amount.to_f + old_tds_amount.to_f - self.invoice_tds_amount.to_f).round(2)
+    self.reporting_invoice_net_total_amount = (self.reporting_invoice_net_total_amount.to_f + old_reporting_tds_amount.to_f - self.reporting_invoice_tds_amount.to_f).round(2)
+
+    # update invoice_balance_due
+    self.invoice_balance_due = (self[:invoice_balance_due].to_f + old_tds_amount.to_f - self.invoice_tds_amount.to_f).round(2)
+    self.reporting_invoice_balance_due = (self[:reporting_invoice_balance_due].to_f + old_reporting_tds_amount.to_f - self.reporting_invoice_tds_amount.to_f).round(2)
+    
+    # update
+
     self.skip_callback = true
     self.save
   end
@@ -2124,8 +2133,6 @@ class Invoice < ApplicationRecord
       
   #       custom_field.save
   #       end
-
-
   #     end
   #   end
   # end
