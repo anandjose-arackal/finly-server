@@ -302,14 +302,19 @@ class PaymentOrder < ApplicationRecord
   def set_currency_for_amount
     amount_attr = [:amount_requested, :amount_processed]
 
+    base_currency_id = self.bank_payment_request&.get_base_currency&.id || self.company.reporting_currency.id || 1 
+    if base_currency_id.blank?
+      base_currency_id = 1
+    end
+    
     amount_attr.each do |amount_attribute|
       amount_attr_id = self.send("#{amount_attribute}_id")
       if amount_attr_id.present?
-        Amount.find_by(id: amount_attr_id).update(currency_id: self.bank_payment_request.base_currency_id)
+        Amount.find_by(id: amount_attr_id).update(currency_id: base_currency_id)
       end
     end
 
-    self.currency_id = self.bank_payment_request.base_currency_id
+    self.currency_id = base_currency_id
     self.skip_callback = true
     self.save
   end
