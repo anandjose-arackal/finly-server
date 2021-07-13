@@ -148,7 +148,7 @@ class Trail < ApplicationRecordBackwardCompatibility
     when TrailAction.id_for(:take_control)
         action = " took control of"
     when TrailAction.id_for(:return_control)
-      action = " return control of"
+      action = " returned control of"
     when TrailAction.id_for(:update)
         action = " updated"
     when TrailAction.id_for(:approve)
