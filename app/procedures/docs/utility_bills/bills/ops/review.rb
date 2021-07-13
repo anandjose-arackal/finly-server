@@ -27,11 +27,10 @@ class Docs::UtilityBills::Bills::Ops::Review < Transactions::API
   end
 
   def transition(options, params:, current_user:, model:, **)
-    parameters = {
-        document: model,
-        aasm_event: params[:aasm_event],
-    }
-    op = WorkflowManager::Base.(current_user, parameters)
+    params[:document] = model
+    params[:aasm_event] = 'reject'
+    params[:violation_present] = false
+    op = WorkflowManager::Base.(current_user, params)
     op.messages.slice(:error, :success, :info).each do |key, val|
       next if key == :errors_meta
       add_message options, key, :base, val
