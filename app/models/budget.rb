@@ -418,7 +418,7 @@ class Budget < ApplicationRecord
         },
         remaining_amount_attributes: {
             value: self.budget_amount.value,
-            currency: ( self.company&.reporting_currency|| Currency.first )
+            currency: ( self.company&.reporting_currency || Currency.first )
         },
         total_consumed_amount_attributes: {
             value: 0,

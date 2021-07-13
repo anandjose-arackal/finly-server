@@ -396,7 +396,7 @@ class InvoiceLineItem < ApplicationRecord
     }
   end
 
-  def retrieve_value(entity)
+  def retrieve_value(entity)    
     send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
   end
 

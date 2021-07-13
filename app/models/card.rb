@@ -90,6 +90,7 @@ class Card < ApplicationRecord
   scope :reimbursement_cards_only, -> {where card_program_id: CardProgram.id_for(:reimbursement)}
   scope :with_proxy, -> (proxy) {where proxy: proxy}
   scope :with_id_or_proxy, -> (id) {where 'id = ? OR proxy = ?', id, id}
+  scope :non_closed, -> { where.not(card_processor_status: "Closed") }
 
   scope :filter_search, -> (term) {
     if term.present?

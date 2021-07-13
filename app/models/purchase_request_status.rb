@@ -16,6 +16,7 @@ class PurchaseRequestStatus < NonTenantedApplicationRecord
   GROUP_OPEN = 90
   GROUP_AWAITING_APPROVAL = 91
   GROUP_APPROVED = 92
+  GROUP_APPROVED_ITEM = 93
 
   def self.values
     [
