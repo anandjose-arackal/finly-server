@@ -183,11 +183,9 @@ class InvoiceLineItem < ApplicationRecord
   
   # Updating this for forms, due to some unknown issue 
   before_save :set_tds_applicable
-  # after_commit :set_tds_applicable, on: [:create, :update]
-
+  after_save :budget_trail_entry
   after_save :sync_amounts, unless: :skip_callback
   after_save :set_currency_for_amount, unless: :skip_callback
-  after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
 
   TEMPLATE_COLUMNS = %w{ description quantity rate tax discount category_id gst_type_id hsn_sac parent_type parent_id inventory_line_item_id item_info comment account tax_rate_id cost_center_id unit_of_measurement department_id sgst cgst igst }
@@ -403,7 +401,7 @@ class InvoiceLineItem < ApplicationRecord
     }
   end
 
-  def retrieve_value(entity)
+  def retrieve_value(entity)    
     send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
   end
 
@@ -480,6 +478,8 @@ class InvoiceLineItem < ApplicationRecord
       self.cost_center_id = parent&.cost_center_id
     end
 
+    self.tax_percentage = self.tax_rate&.rate.to_f # workaround to update tax_percentage
+    
     self.skip_callback = true
     self.save
   end

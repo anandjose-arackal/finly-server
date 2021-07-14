@@ -264,8 +264,8 @@ gem 'azure-storage-blob'
 
 gem 'acts_as_tenant', '~> 0.4.4'
 
-gem 'money'
-gem 'money-open-exchange-rates'
+gem 'money', '~> 6.16.0'
+gem 'money-open-exchange-rates', '~> 1.4.0'
 # gem for all paper trail
 gem 'paper_trail', '~> 11.0.0'
 gem 'paper_trail-association_tracking', '~> 2.1.1'

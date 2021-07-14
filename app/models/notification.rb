@@ -452,6 +452,9 @@ class Notification < ApplicationRecordBackwardCompatibility
           if document.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice)
             suffix = "/params={\"procurement_id\":#{document.procurement_id }"
           elsif document.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)
+            if user.non_po_invoice_form_enabled
+              path = "procure_invoices/#{document.id}"
+            end
             suffix = "/params={\"procurement_id\":#{document.procurement_id },\"procurement_type\":\"non_po\""
           elsif document.invoice_type_id == InwardInvoiceType.id_for(:agreement_invoice)
             suffix = "/params={\"procurement_id\":#{document.procurement_id },\"procurement_type\":\"non_po\",\"invoice_type\":\"recurring_invoice\""

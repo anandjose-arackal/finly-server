@@ -41,7 +41,7 @@ class ExportManager::Template::Master::Invoices::TdsExport < ExportManager::Buil
 
 
   attribute :reporting_net_total, template: '{{ record.reporting_invoice_net_total_amount }}', toggle: { if: [ NonPoInvoiceToggle, :enabled?] }
-  attribute :reporting_payable_amount, template: '{{ record.reporting_invoice_balance_due }}', toggle: { if: [ NonPoInvoiceToggle, :enabled?] }
+  attribute :reporting_payable_amount, template: '{{ record.reporting_invoice_balance_due | round }}', toggle: { if: [ NonPoInvoiceToggle, :enabled?] }
   attribute :conversion_rate, template: '{{ record.conversion_rate }}', toggle: { if: [ NonPoInvoiceToggle, :enabled?] }
   attribute :base_currency, template: '{{ record.base_currency_code }}', toggle: { if: [ NonPoInvoiceToggle, :enabled?] }
   attribute :reporting_currency, template: '{{ record.reporting_currency_code }}', toggle: { if: [ NonPoInvoiceToggle, :enabled?] }

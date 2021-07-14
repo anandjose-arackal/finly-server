@@ -52,8 +52,8 @@ json.trail do
     if item.is_a?(Invoice) && (item.invoice_type_id == InwardInvoiceType.id_for(:proforma_invoice) rescue false )
       json.invoice_type item.invoice_type&.name
       json.invoice_details do
-        json.proforma_advance item.proforma_advance&.value
-        json.amount item.balance_due&.value
+        json.proforma_advance item.proforma_advance&.value.to_f.round(2)
+        json.amount item.balance_due&.value.to_f.round(2)
         json.inv_number item.invoice_number
         json.forms_enabled item.forms_enabled
         json.base_currency item.get_base_currency
@@ -70,7 +70,7 @@ json.trail do
 
     elsif item.is_a?(Invoice)
       json.invoice_details do
-        json.amount item.balance_due&.value
+        json.amount item.balance_due&.value.to_f.round(2)
         json.inv_number item.invoice_number
         json.forms_enabled item.forms_enabled
         json.base_currency item.get_base_currency
@@ -140,7 +140,7 @@ json.trail do
           json.email item.initiating_user.email
           json.mobile_number item.initiating_user.mobile_number
         end
-        json.amount item.amount&.value.round(2) rescue 0
+        json.amount item.amount&.value.to_f.round(2) rescue 0
       end
     elsif item.is_a?(CreditNote)
       json.document_details do
