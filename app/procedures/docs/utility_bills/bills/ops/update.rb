@@ -8,6 +8,7 @@ class Docs::UtilityBills::Bills::Ops::Update < Transactions::API
 
   step :setup_dlrm
   step :update_attachments
+  step :create_trail
 
   fail :check
   step Transactions::Messages::SuccessMessage('Successfully Updated Utility Bill')
@@ -39,6 +40,13 @@ class Docs::UtilityBills::Bills::Ops::Update < Transactions::API
 
     Attachment.where(id: attachment_ids).update(resource_id: model.id, resource_type: model.class.name)
     model.attachments.where.not(id: attachment_ids).destroy_all
+    true
+  end
+
+  def create_trail(options, params:, current_user:, model:, **)
+    model.trails.create(action_user: current_user,
+                        action_id: TrailAction.id_for(:update),
+                        action_level: model.trails.last&.action_level)
     true
   end
 end

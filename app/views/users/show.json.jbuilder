@@ -12,6 +12,14 @@ json.user do
   json.editable (@result.user.company_admin? and params[:view] == 'admin')
   json.active @result.user.active
   json.activateable @result.selected_user.manager_activateable?
+  json.address @result.selected_user&.profile&.full_address
+  json.address_1 @result.selected_user&.address_1
+  json.address_2 @result.selected_user&.address_2
+  json.city @result.selected_user.city
+  json.profile_id = @result.selected_user&.profile&.id
+  json.state_name @result.selected_user.state_name
+  json.state_id @result.selected_user.state_id
+  json.pin_code @result.selected_user.pin_code
   json.enforce_policy do
     json.enabled @result.selected_user.enforce_policy_enabled?
     approver = (@result.selected_user.manager? or @result.selected_user.finance_manager?)
