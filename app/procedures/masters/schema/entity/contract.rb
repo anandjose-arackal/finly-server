@@ -54,7 +54,7 @@ class Masters::Schema::Entity::Contract < Reform::Form
     represented.type.options.each do |key, value|
       if input[key].present?
         represented.options[key] = input[key]
-      elsif represented.options[key].blank? and value[:default].present? and not value[:default] == NoObject
+      elsif value[:default].present? and not value[:default] == NoObject
         represented.options[key] = value[:default]
       end
     end
