@@ -103,7 +103,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
     date :date,
          label: "Invoice Date",
          required: true, computed: Forms::Compute::Form('{{ form.date | default: "now" | date: "%Y-%m-%d" }}'),
-         restriction: 'not_in_the_future', triggers: {on_change: {lookup_details: [:base_currency]}}
+         restriction: 'not_in_the_future'
 
     lookup :payment_term_id,
            choices_scope: Choices[:lookup].('payment_terms'),
@@ -145,7 +145,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
     dropdown :discount_type_id, label: "Discount Type", editable: true, visible: true, required: true, choices_scope: Choices[:list].({ id: 1, name: 'Percentage' }, { id: 2, name: 'Amount' }), default_value: 1
 
     dropdown :tax_type_id, label: "Tax Type", editable: true, visible: true, choices_scope: Choices[:list].(*TaxType.all.map { |v| { id: v.id, name: v.name } })
-    date :conversion_date, label: "Conversion Date", editable: false, visible: true, computed: Forms::Compute::Form('{{form.date}}'), triggers: {on_change: {lookup_details: [:base_currency]}}
+    date :conversion_date, label: "Conversion Date", editable: false, visible: true, computed: Forms::Compute::Form('{{form.date}}'), triggers: {on_change: {lookup_details: [:base_currency]}, on_compute: {lookup_details: [:base_currency]}}
 
     text :reporting_currency, label: "Reporting Currency", editable: false, visible: true, can_editable_be_changed: false
     lookup :base_currency, label: "Base Currency", choices_scope: Choices[:lookup].('currencies'), visible: true, editable: true
