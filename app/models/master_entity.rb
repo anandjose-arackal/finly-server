@@ -71,7 +71,12 @@ class MasterEntity < ApplicationRecord
 
   contract_eval "Required check" do |contract:, entity:, **|
     if entity.required
-      contract.validates entity.entity_key, presence: true
+      contract.validate do
+        unless send(entity.entity_key).present?
+          errors.add entity.label, "must be present"
+        end
+      end
+      # contract.validates entity.entity_key, presence: true
     end
   end
 
