@@ -27,9 +27,6 @@ class ExchangeRate < NonTenantedApplicationRecord
     end
 
     if date == Date.today
-      unless ::LATEST_EXCHANGE_RATES.rates.present?
-        ::LATEST_EXCHANGE_RATES.update_rates
-      end
       return ::LATEST_EXCHANGE_RATES.get_rate(from_iso_code, to_iso_code)
     end
 

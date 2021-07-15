@@ -87,4 +87,24 @@ class Form < ApplicationRecord
     Object.const_get(super()) if super()
   end
 
+  def sync_sequence_numbers
+    return unless self.model.sequenced_options.present?
+
+    self.model.sequenced_options.each do |seq_options|
+      sequence_entity = (self.entities.where(type: 'FormEntity::AutoNumber').filter do |e|
+        e.config.dig("sequence", "prefix") == seq_options[:prefix]
+      end).first
+
+      next unless sequence_entity.present?
+
+      latest_record = self.model.where(company_id: self.company_id).order(:created_at).first
+      next unless latest_record.present?
+
+      sequence_number = Sequenced::Generator.new(latest_record, seq_options).next_id_in_sequence - 1
+
+      REDIS.set("FormEntity::AutoNumber##{sequence_entity.id}##{seq_options[:prefix]}", sequence_number)
+    end
+
+  end
+
 end

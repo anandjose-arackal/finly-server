@@ -103,7 +103,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
     date :date,
          label: "Invoice Date",
          required: true, computed: Forms::Compute::Form('{{ form.date | default: "now" | date: "%Y-%m-%d" }}'),
-         restriction: 'not_in_the_future'
+         restriction: 'not_in_the_future', triggers: {on_change: {lookup_details: [:base_currency]}}
 
     lookup :payment_term_id,
            choices_scope: Choices[:lookup].('payment_terms'),
@@ -145,13 +145,13 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
     dropdown :discount_type_id, label: "Discount Type", editable: true, visible: true, required: true, choices_scope: Choices[:list].({ id: 1, name: 'Percentage' }, { id: 2, name: 'Amount' }), default_value: 1
 
     dropdown :tax_type_id, label: "Tax Type", editable: true, visible: true, choices_scope: Choices[:list].(*TaxType.all.map { |v| { id: v.id, name: v.name } })
-    date :conversion_date, label: "Conversion Date", editable: false, visible: true, computed: Forms::Compute::Form('{{form.date}}')
+    date :conversion_date, label: "Conversion Date", editable: false, visible: true, computed: Forms::Compute::Form('{{form.date}}'), triggers: {on_change: {lookup_details: [:base_currency]}}
 
     text :reporting_currency, label: "Reporting Currency", editable: false, visible: true, can_editable_be_changed: false
     lookup :base_currency, label: "Base Currency", choices_scope: Choices[:lookup].('currencies'), visible: true, editable: true
 
     switch :retrieve_conversion_rate, label: "Auto Populate Conversion Rate", default_value: true, visible: false
-    number :conversion_rate, editable: true, format: 'decimal', default_value: 1, computed: Forms::Compute::Lookup('base_currency', '{{ record.currency_conversion_rate }}', assignments: {conversion_date: "{{form.conversion_date}}", to_currency: "{{form.reporting_currency}}"}), visible: true
+    number :conversion_rate, editable: true, format: 'decimal', max_decimal_places: 5, default_value: 1, computed: Forms::Compute::Lookup('base_currency', '{{ record.currency_conversion_rate }}', assignments: {conversion_date: "{{form.conversion_date}}", to_currency: "{{form.reporting_currency}}"}), visible: true
   end
 
   # VENDOR DETAILS
@@ -223,7 +223,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       lookup :items_department_id, label: "Department", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('departments', assignments: { form: true })
       lookup :items_cost_center_id, label: "Cost Center", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('cost_centers')
 
-      lookup :category_id, label: "Category", required: true, visible: true, editable: true, choices_scope: Choices[:lookup].('categories'), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.category_id}}')
+      lookup :category_id, label: "Category", required: true, visible: true, editable: true, choices_scope: Choices[:lookup].('categories', scope: :inward_invoice_line_items_only), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.category_id}}'), triggers: {on_compute: {lookup_details: [:category_id]}}
 
       text :gl_code, label: "GL Code", editable: false, visible: false, 
         computed: Forms::Compute::Lookup('items.category_id', '{{record.gl_code_or_item_number}}', assignments: {item_number: "{{row.item_number}}"})
@@ -245,15 +245,16 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
                computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.unit_of_measurement}}')
 
       amount :item_rate,
-             label: "Item Rate",
+             label: "Item Rate (Reporting Currency)",
              computed: Forms::Compute::Form('{{ row.rate | times: form.conversion_rate | round: 2 }}'),
-             visible: true
+             visible: true,
+             editable: false
 
-      amount :rate, label: "Rate",
+      amount :rate, label: "Rate (Base Currency)",
              can_editable_be_changed: false,
              can_visible_be_changed: false,
              required: true, visible: true, editable: true,
-             computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.rate_in_base_currency | default: 0 | round: 2 }}', assignments: {conversion_date: "{{form.conversion_date}}", base_currency_id: "{{form.base_currency}}", reporting_currency: "{{form.reporting_currency}}"})
+             computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.rate_in_base_currency | default: 0 | round: 2 }}', assignments: {conversion_date: "{{form.conversion_date}}", base_currency_id: "{{form.base_currency}}", reporting_currency: "{{form.reporting_currency}}", conversion_rate: "{{form.conversion_rate}}"})
 
       # gross_amount = rate x quantity
       amount :item_gross_amount, label: 'Item Gross Amount', editable: false, visible: false,
@@ -491,12 +492,18 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
     rule Rules::Builder['due_date'].lt(entity: "date")
   end
 
-  # validation validation_id: "Conversion Rate must be greater than 0" do
-  #   reference 'conversion_rate'
-  #   error_message "Conversion Rate must be greater than 0"
-  #   rule Rules::Builder['conversion_rate'].gteq(value: 0.0)
-  # end
+  validation validation_id: "Invoice Discount Cannot be greater than Invoice Gross Amount" do
+    reference 'items_summary.invoice_discount_amount'
+    error_message "Invoice Discount Cannot be greater than Invoice Gross amount"
+    rule Rules::Builder['items_summary.invoice_discount_amount'].gt(entity: "items_summary.invoice_gross_amount")
+  end
 
+  validation validation_id: "Item Discount Cannot be greater than Item gross amount" do
+    reference 'items.item_discount_amount'
+    error_message "Item Discount Amount Cannot be greater than Item Gross Amount"
+    rule Rules::Builder['items.item_discount_amount'].gt(entity: "items.item_gross_amount")
+  end
+  
   # CONDITIONS
   condition condition_id: "Policy should not be editable once unless in editable status" do
     reference :entity, :policy_id

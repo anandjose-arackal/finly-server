@@ -24,7 +24,7 @@ class YesBankTransferRequest < NonPersistentModel
                  beneficiary_account_number: beneficiary_account_number,
                  beneficiary_name: beneficiary_name,
                  ifsc: ifsc,
-                 transfer_type: get_transfer_type(transfer_type, ifsc),
+                 transfer_type: get_transfer_type(transfer_type, ifsc, transfer_amount),
                  transfer_amount: transfer_amount,
                  transfer_currency_code: transfer_currency,
                  unique_reference_number: set_unique_reference(unique_reference_number, transfer_type, beneficiary_account_number),
@@ -77,7 +77,8 @@ class YesBankTransferRequest < NonPersistentModel
     }
   end
 
-  def self.get_transfer_type(transfer_type = "IMPS", ifsc)
+  def self.get_transfer_type(transfer_type = "IMPS", ifsc, transfer_amount)
+    return "IMPS" if transfer_amount == 1 #Imps transaction for all penny transfer
     if ifsc.include?("YESB") && ifsc != "YESB0CMSNOC"
       return "FT"
     end

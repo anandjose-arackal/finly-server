@@ -30,6 +30,10 @@ class Docs::UtilityBills::Bills::Ops::Review < Transactions::API
     parameters = {
         document: model,
         aasm_event: params[:aasm_event],
+        note: params[:note],
+        forwarded_to_user: params[:forwarded_to_user],
+        reject_to_level: params[:reject_to_level],
+        reject_to_user: params[:reject_to_user],
     }
     op = WorkflowManager::Base.(current_user, parameters)
     op.messages.slice(:error, :success, :info).each do |key, val|

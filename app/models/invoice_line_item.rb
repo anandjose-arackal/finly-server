@@ -396,7 +396,7 @@ class InvoiceLineItem < ApplicationRecord
     }
   end
 
-  def retrieve_value(entity)
+  def retrieve_value(entity)    
     send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
   end
 
@@ -465,6 +465,8 @@ class InvoiceLineItem < ApplicationRecord
       self.cost_center_id = parent&.cost_center_id
     end
 
+    self.tax_percentage = self.tax_rate&.rate.to_f # workaround to update tax_percentage
+    
     self.skip_callback = true
     self.save
   end

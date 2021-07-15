@@ -4633,6 +4633,7 @@ ActiveRecord::Schema.define(version: 2021_06_18_081243) do
     t.string "config_path"
     t.text "compute_lookup_assignments"
     t.boolean "virtual", default: false
+    t.text "triggers"
     t.index ["company_id"], name: "index_form_entities_on_company_id"
     t.index ["compute_lookup_entity_id"], name: "index_form_entities_on_compute_lookup_entity_id"
     t.index ["created_at"], name: "index_form_entities_on_created_at"
