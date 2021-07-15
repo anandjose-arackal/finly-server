@@ -231,7 +231,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       text :hsn_sac, label: "HSN/SAC", editable: true, visible: true,
         computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.hsn_sac}}')
 
-      dropdown :tds_applicable, visible: true, editable: false,
+      lookup :tds_applicable, visible: true, editable: false,
              can_editable_be_changed: false,
              can_visible_be_changed: false, choices_scope:  Choices[:list].({ id: true, name: 'Yes' }, { id: false, name: 'No' }),
              computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.tds_applicable }}')
