@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_07_08_085032) do
+ActiveRecord::Schema.define(version: 2021_07_13_091527) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -2284,6 +2284,7 @@ ActiveRecord::Schema.define(version: 2021_07_08_085032) do
     t.integer "group_id"
     t.datetime "deleted_at"
     t.string "reporting_currency_code", default: "INR"
+    t.integer "country_id"
   end
 
   create_table "company_account_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|

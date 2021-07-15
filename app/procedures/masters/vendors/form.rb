@@ -89,11 +89,12 @@ class Masters::Vendors::Form < Forms::API
 
   meta ->(record) {
     {
-      created_by: {
-        id: record.created_by&.id,
-        name: record.created_by&.name,
-        email: record.created_by&.email,
-      }
+      # created_by: {
+      #   id: record.created_by&.id,
+      #   name: record.created_by&.name,
+      #   email: record.created_by&.email,
+      # },
+      company_country_id: RequestStoreUtil.current_user.company.country_id
     }
   }
 
@@ -465,15 +466,15 @@ class Masters::Vendors::Form < Forms::API
   end
   condition condition_id: "Enable Bank Accounts > Swift / BIC Code for International Vendors" do
     reference :entity, 'bank_accounts.swift_code'
-    rule Rules::Builder[:vendor_country_id].not_eq(*Country.ids_for('India').map {|item| {value: item}})
+    rule Rules::Builder[:vendor_country_id].not_eq(*Country.ids_for('India').map {|item| {value: item}}) # for now keeping it as india -- need to set as meta company
     action :editable, true
     action :visible, true
     action :required, true
   end
 
-  condition condition_id: "Disable Bank Accounts > IFS Code for International Vendors" do
+  condition condition_id: "Disable Bank Accounts > IFSC Code for International Vendors" do
     reference :entity, 'bank_accounts.ifsc'
-    rule Rules::Builder[:vendor_country_id].not_eq(*Country.ids_for('India').map {|item| {value: item}})
+    rule Rules::Builder[:vendor_country_id].not_eq(*Country.ids_for('India').map {|item| {value: item}}) # for now keeping it as india -- need to set as meta company
     action :editable, false
     action :visible, false
     action :required, false

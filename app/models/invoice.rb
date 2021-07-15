@@ -261,6 +261,7 @@ class Invoice < ApplicationRecord
   belongs_to :agreement_item, optional: true, polymorphic: true
   belongs_to :base_currency, optional: true, class_name: 'Currency'
   belongs_to :reporting_currency, optional: true, class_name: 'Currency'
+  belongs_to :vendor_country, optional: true, class_name: 'Country'
 
   has_one :credit_note
   has_many :document_level_reviewer_mappings, as: :document_reviewer_mappable

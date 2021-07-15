@@ -31,9 +31,6 @@ class Docs::PaymentTickets::FilterConfig < Filters::API
   custom_fields :purchase_order, prefix: :payment_order_payments_purchase_order_parent
   custom_fields :invoice, prefix: :payment_order_payments_invoice
 
-
-
-
   def self.is_accessable( user )
     user.present? && user.non_po_invoice_form_enabled 
   end

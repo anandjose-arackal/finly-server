@@ -7,6 +7,7 @@ class Country < NonTenantedApplicationRecord
   def self.ids_for(countries)
     where(name: countries).pluck(:id)
   end
+
 end
 
 
