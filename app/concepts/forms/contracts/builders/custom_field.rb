@@ -48,13 +48,18 @@ class Forms::Contracts::Builders::CustomField
           end
         when 'attachment'
           custom_field.value = ""
+          current_form_custom_field = represented.model.form_custom_fields.find_by(field_key: custom_field_entity.entity_key)
           input[custom_field_entity.entity_key].present? && input[custom_field_entity.entity_key].is_a?(Array) && input[custom_field_entity.entity_key].each do |attachment_obj|
             attachment = CustomFieldAttachment.find_by uuid: attachment_obj[:id]
 
+            Rails.logger.error("********************** #{custom_field_entity.entity_key} - #{attachment_obj[:name]}**********************")
+
             if attachment.present?
+              
               if attachment_obj[:_destroy]
                 attachment.destroy
               else
+                attachment.update(form_custom_field_id: current_form_custom_field&.id)
                 custom_field.attachments << attachment
               end
               # debugger
