@@ -3038,6 +3038,16 @@ Rails.application.routes.draw do
 
   ################### Vendor Payments APIs end ########################
 
+  ################### AppSmith APIs start ########################
+  scope :appsmith do
+    scope :companies do
+      post '', to: "appsmith/companies#create"
+    end
+  end
+
+  # ################### AppSmith APIs end ########################
+
+
   get 'junk/show', to: 'junk#show'
 
   get 'menu_data', to: 'users#menu_data'
