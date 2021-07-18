@@ -233,7 +233,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
       lookup :tds_applicable, visible: true, editable: false,
              can_editable_be_changed: false,
-             can_visible_be_changed: false, choices_scope:  Choices[:list].({ id: true, name: 'Yes' }, { id: false, name: 'No' }),
+             can_visible_be_changed: false, choices_scope: Choices[:list].({ id: true, name: 'true' }, { id: false, name: 'false' }),
              computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.tds_applicable }}')
 
       # currency :currency_code, editable: false, visible: false, computed: Forms::Compute::Form("{{ form.currency_code }}")
