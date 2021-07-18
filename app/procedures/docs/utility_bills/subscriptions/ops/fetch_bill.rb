@@ -76,6 +76,7 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchBill < Transactions::API
 
   def check_bill_presence(options, model:, result:, **)
     data = result['data']
+    
     unless data&.status == 'Y'
       add_message(options, :error, :base, data.error_desc) if data.error_desc.present?
       add_message(options, :error, :base, "Could Not Fetch Bill")
@@ -137,6 +138,13 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchBill < Transactions::API
 
   def update_bill(options, result:, **)
     return true if result['bill'].blank?
+    
+    data = result['data']
+    unless data&.status == 'Y'
+      add_message(options, :error, :base, data.error_desc) if data.error_desc.present?
+      add_message(options, :error, :base, "Could Not Fetch Bill")
+      return
+    end
 
     api_response = result['bill']&.api_response.is_a?(Array) ? result['bill']&.api_response : []
 

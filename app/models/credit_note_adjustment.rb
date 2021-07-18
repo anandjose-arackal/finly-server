@@ -12,6 +12,7 @@
 #
 
 class CreditNoteAdjustment < ApplicationRecord
+  attr_accessor :skip_callback
   include SoftDeletable, MathUtil
 
   belongs_to :company, optional: true
@@ -27,6 +28,7 @@ class CreditNoteAdjustment < ApplicationRecord
   # # before_update :calculate_adjustable_amount
   # after_destroy :calculate_adjustable_amount
 
+  after_save :set_currency_for_amount, unless: :skip_callback
 
   def as_json(options = {})
     {
@@ -39,6 +41,19 @@ class CreditNoteAdjustment < ApplicationRecord
   end
 
   private
+
+  def set_currency_for_amount
+    amount_attr = [:amount]
+
+    amount_attr.each do |amount_attribute|
+      amount_attr_id = self.send("#{amount_attribute}_id")
+      if amount_attr_id.present?
+        Amount.find_by(id: amount_attr_id).update(currency_id: self.credit_note.get_base_currency.id)
+      end
+    end
+    self.skip_callback = true
+    self.save
+  end
 
   # def calculate_credit_note_amounts
   #   credit_note.touch

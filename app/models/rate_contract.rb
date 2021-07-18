@@ -29,12 +29,16 @@ class RateContract < ApplicationRecord
   belongs_to :item, optional: true, class_name: 'Item'
   belongs_to :renewal_alert_period, optional: true, class_name: 'Period', foreign_key: :renewal_alert_period_id
   belongs_to :company, optional: true
+  belongs_to :base_currency, optional: true, class_name: 'Currency'
+  belongs_to :reporting_currency, optional: true, class_name: 'Currency'
+  
   has_many :rate_contract_line_items, dependent: :destroy
   has_many :artifacts, as: :resource, dependent: :destroy
   has_many :custom_fields, as: :parent, dependent: :destroy
 
   before_validation :add_company
-
+  before_create :set_currency
+  
   # validates :renewal_alert_period, :renewal_alert_number, presence: true
   validates :vendor, presence: true
 
@@ -66,7 +70,9 @@ class RateContract < ApplicationRecord
         note: note,
         default_location_name: (rate_contract_line_items.where.not(location_id: nil).first.location.name rescue nil),
         locations_count: (rate_contract_line_items.pluck(:location_id).count rescue 0),
-        custom_fields: self.custom_fields
+        custom_fields: self.custom_fields,
+        base_currency: get_base_currency,
+        reporting_currency: get_reporting_currency
     }
   end
 
@@ -92,5 +98,9 @@ class RateContract < ApplicationRecord
     self&.vendor&.business_name || self&.vendor&.name
   end
 
+  def set_currency
+    self.reporting_currency_id = self.company.reporting_currency.id if self.reporting_currency_id.blank? 
+    self.base_currency_id = self.company.reporting_currency.id if self.base_currency_id.blank? 
+  end
 
 end

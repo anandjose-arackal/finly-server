@@ -394,35 +394,35 @@ class Budget < ApplicationRecord
     budget_consumption = self.build_budget_consumption(
         budget_amount_attributes: {
             value: self.budget_amount.value,
-            currency: Currency.first
+            currency: ( self.company&.reporting_currency || Currency.first )
         },
         pending_amount_attributes: {
             value: 0,
-            currency: Currency.first
+            currency: ( self.company&.reporting_currency || Currency.first )
         },
         committed_amount_attributes: {
             value: 0,
-            currency: Currency.first
+            currency: ( self.company&.reporting_currency || Currency.first )
         },
         pending_payment_amount_attributes: {
             value: 0,
-            currency: Currency.first
+            currency: ( self.company&.reporting_currency || Currency.first )
         },
         payment_processing_amount_attributes: {
             value: 0,
-            currency: Currency.first
+            currency: ( self.company&.reporting_currency || Currency.first )
         },
         paid_amount_attributes: {
             value: 0,
-            currency: Currency.first
+            currency: ( self.company&.reporting_currency || Currency.first )
         },
         remaining_amount_attributes: {
             value: self.budget_amount.value,
-            currency: Currency.first
+            currency: ( self.company&.reporting_currency || Currency.first )
         },
         total_consumed_amount_attributes: {
             value: 0,
-            currency: Currency.first
+            currency: ( self.company&.reporting_currency || Currency.first )
         }
     )
     budget_consumption.save

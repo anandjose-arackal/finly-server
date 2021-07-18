@@ -45,7 +45,8 @@ class Admin::KycProcesses::Users::Export::KycsAsZip < Admin::KycProcesses::Users
     self.individual_kycs.each do |individual_kyc|
       track_params = {
           action_resource: user,
-          action_id: CardAssignRequestTrackAction.id_for(:download)
+          action_id: CardAssignRequestTrackAction.id_for(:download),
+          company_id: individual_kyc.company_id
       }
       individual_kyc.tracks.create track_params
     end

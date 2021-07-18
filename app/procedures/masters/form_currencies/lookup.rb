@@ -8,5 +8,5 @@ class Masters::FormCurrencies::Lookup < Lookup::API
   attribute :name, value: '{{record.currency_code}}'
   attribute :currency
   attribute :symbol
-  attribute :currency_conversion_rate
+  # attribute :currency_conversion_rate
 end

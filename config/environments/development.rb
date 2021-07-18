@@ -178,8 +178,6 @@ Rails.application.configure do
     Bullet.bullet_logger = true
   end
 
-  config.hosts << "900ab763466a.ngrok.io"
-
   ###################### S3 for local attachments ########################
   # config.aws_config = config_for(:aws_config)
   # config.paperclip_defaults = {

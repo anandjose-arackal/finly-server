@@ -289,6 +289,13 @@ class NonPoInvoiceMigrator
       vendor_bank_account_ifsc: document&.receiving_account&.ifsc,
       vendor_bank_account_swift_code: document&.receiving_account&.swift_code,
 
+
+      billing_address_name: document&.location&.name,
+      billing_address_gstin: document&.location&.gstin,
+
+      shipping_address_name: document&.delivery_location&.name,
+      shipping_address_gstin: document&.delivery_location&.gstin,
+
       # receiving_account_id: document&.receiving_account_id,
       # receiving_account_type: document&.receiving_account_type,
       # rcm_enabled: document&.rcm_enabled,

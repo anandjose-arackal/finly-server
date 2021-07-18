@@ -23,6 +23,12 @@ Resolver::Router.draw do
   scope :form_currencies do
     route 'default', Masters::FormCurrencies::Resolver
   end
+  scope :currencies do
+    route 'default', Masters::Currencies::Resolver
+  end
+  scope :inward_invoice_statuses do
+    route 'default', Masters::InwardInvoiceStatuses::Resolver
+  end
   scope :departments do
     route 'default', Masters::Departments::Resolver
   end

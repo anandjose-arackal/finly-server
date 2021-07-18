@@ -26,7 +26,8 @@
 # Security deposit is required to create rental invoice in payment agreements
 
 class SecurityDeposit < ApplicationRecord
-  include SoftDeletable
+  attr_accessor :skip_callback
+  include SoftDeletable, GetCurrency
 
   belongs_to :vendor,  class_name: 'YesBankVendor'
   belongs_to :cost_center, optional: true
@@ -40,14 +41,18 @@ class SecurityDeposit < ApplicationRecord
   belongs_to :creator, optional: true, class_name: "User"
   belongs_to :payment_agreement, optional: true
   belongs_to :status, optional: true, class_name: 'SecurityDepositStatus'
+  belongs_to :base_currency, optional: true, class_name: 'Currency'
+  belongs_to :reporting_currency, optional: true, class_name: 'Currency'
 
   has_many :payments, as: :parent
   has_many :trails, as: :parent
 
   validates :vendor, :vendor_location, :bank_account, :cost_center, :department, :location, :original_amount, presence: true
-
+  
+  before_create :set_currency
   after_create :update_creator_id, :update_company_id, :update_status
-
+  after_save :set_currency_for_amount, unless: :skip_callback
+  
   accepts_nested_attributes_for :payable_amount, :original_amount
 
 
@@ -95,8 +100,15 @@ class SecurityDeposit < ApplicationRecord
       tax: (self.tax rescue 0),
       tds: (self.tds_slab.tds rescue 0),
       bank_payment_request_id: (self.payments.first.payment_order.bank_payment_request.id rescue nil),
-      already_exists: true
+      already_exists: true,
+      base_currency: get_base_currency,
+      reporting_currency: get_reporting_currency
     }
+  end
+
+  def set_currency
+    self.reporting_currency_id = self.company.reporting_currency.id if self.reporting_currency_id.blank? 
+    self.base_currency_id = self.company.reporting_currency.id if self.base_currency_id.blank? 
   end
 
   def document_owner_attribute
@@ -128,5 +140,19 @@ class SecurityDeposit < ApplicationRecord
   def update_status
     self.update(status_id: SecurityDepositStatus.id_for(:unpaid))
   end
+
+  def set_currency_for_amount
+    amount_attr = [:payable_amount, :original_amount]
+
+    amount_attr.each do |amount_attribute|
+      amount_attr_id = self.send("#{amount_attribute}_id")
+      if amount_attr_id.present?
+        Amount.find_by(id: amount_attr_id).update(currency_id: self.company.reporting_currency.id)
+      end
+    end
+    self.skip_callback = true
+    self.save
+  end
+
 
 end

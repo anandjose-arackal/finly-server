@@ -1285,7 +1285,7 @@ class User < ApplicationRecord
     return cash if date_obj.blank? or date_obj == DateUtils.local_date
     history = self.user_balance_histories.find_by(date: date_obj)
     if history.blank?
-      return Amount.new(value: 0, currency_id: 1)
+      return Amount.new(value: 0, currency_id: company.base_currency_id )
     else
       cash_on_hand = history.cash_on_hand_balance
       return cash_on_hand
@@ -1307,6 +1307,10 @@ class User < ApplicationRecord
         email: email,
         mobile_number: mobile_number
     }
+  end
+
+  def previous_session
+    self.user_sessions.where(admin_user_id: nil).order(id: :desc).offset(1).first
   end
 
   def json_for_trail(options = {})
@@ -1916,21 +1920,22 @@ class User < ApplicationRecord
   def generate_finly_id
     return if self.finly_id.present?
     return unless valid?
+    ActsAsTenant.without_tenant do
+      if self.company.group_entity_structure_enabled? && self.company.group_id.present?
+        group_companies = self.company.group.companies
+        users = User.with_company_id(group_companies.pluck(:id)).with_email_or_mobile_number(self.email, self.mobile_number).without_id(self.id)
+        previously_added_user = users.reorder(created_at: :asc).first #
+        self.finly_id = previously_added_user.finly_id if previously_added_user.present? and previously_added_user.finly_id.present?
+      end
 
-    if self.company.group_entity_structure_enabled? && self.company.group_id.present?
-      group_companies = self.company.group.companies
-      users = User.with_company_id(group_companies.pluck(:id)).with_email_or_mobile_number(self.email, self.mobile_number).without_id(self.id)
-      previously_added_user = users.reorder(created_at: :asc).first #
-      self.finly_id = previously_added_user.finly_id if previously_added_user.present? and previously_added_user.finly_id.present?
-    end
+      # while finly_id.blank? or User.find_by(finly_id: self.finly_id).present?
+      #   self.finly_id = UUIDTools::UUID.timestamp_create().to_s.upcase if finly_id.blank?
+      # end
 
-    # while finly_id.blank? or User.find_by(finly_id: self.finly_id).present?
-    #   self.finly_id = UUIDTools::UUID.timestamp_create().to_s.upcase if finly_id.blank?
-    # end
-
-    if finly_id.blank?
-      while User.find_by(finly_id: self.finly_id).present?
-        self.finly_id = UUIDTools::UUID.timestamp_create().to_s.upcase
+      if finly_id.blank?
+        while User.find_by(finly_id: self.finly_id).present?
+          self.finly_id = UUIDTools::UUID.timestamp_create().to_s.upcase
+        end
       end
     end
 

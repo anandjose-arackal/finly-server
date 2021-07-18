@@ -53,14 +53,14 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
   end
 
   column :net_amount, default: true, includes: [net_amount: :currency] do
-    amount value: :net_amount
+    amount value: :net_amount, currency_code: :set_currency_code, currency_symbol: :set_currency_symbol
   end
 
   IndexBuilder::API::ColumnTemplate::ControllingUser(self)
   IndexBuilder::API::ColumnTemplate::ControllingLevel(self)
 
   column :gross_amount, includes: [gross_amount: :currency] do
-    amount value: :gross_amount
+    amount value: :gross_amount, currency_code: :set_currency_code, currency_symbol: :set_currency_symbol
   end
 
   column :cost_center, default: false, includes: [:cost_center] do
@@ -243,6 +243,14 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
       format = 'info'
     end
     format
+  end
+
+  def self.set_currency_code(context)
+    context[:record].get_base_currency.country_code
+  end
+
+  def self.set_currency_symbol(context)
+    context[:record].get_base_currency.symbol
   end
 
 end

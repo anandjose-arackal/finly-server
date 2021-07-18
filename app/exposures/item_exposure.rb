@@ -46,4 +46,12 @@ class ItemExposure < Exposures::API
   attribute :tds_applicable, record_attribute: true
   attribute :hsn_sac, record_attribute: true
 
+  attribute :rate_in_base_currency do
+    if registers["conversion_rate"].present? and registers["conversion_rate"].to_f > 0
+      (record.rate / registers["conversion_rate"].to_f).round(2) rescue record.rate
+    else
+      (record.rate / Currency.find(registers["base_currency_id"]).currency_conversion_rate(Date.parse(registers["conversion_date"]), registers["reporting_currency"])).round(2) rescue record.rate
+    end
+  end
+
 end

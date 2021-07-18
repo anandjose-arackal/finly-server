@@ -34,6 +34,7 @@
 #
 
 class PaymentOrder < ApplicationRecord
+  attr_accessor :skip_callback
   include PostOperationExecution, SoftDeletable
   include LiquidDroppable
   include Exposures::Model::Exposable
@@ -93,6 +94,8 @@ class PaymentOrder < ApplicationRecord
   accepts_nested_attributes_for :amount_processed
   accepts_nested_attributes_for :payments
   accepts_nested_attributes_for :payment_order_attachments
+
+  after_save :set_currency_for_amount, unless: :skip_callback
 
   scope :with_purpose_id, -> (id) {where payment_purpose_id: id}
   scope :without_purpose_id, -> (id) {where.not payment_purpose_id: id}
@@ -237,41 +240,41 @@ class PaymentOrder < ApplicationRecord
     end
   end
 
-  # def update_processed_amount
-  #   new_amount = self.payments.completed.joins(:amount).sum(:value)
-  #   self.amount_processed&.update(value: new_amount)
-
-  #   reporting_new_amount = new_amount
-  #   parent_type = self.payments.first.parent_type.downcase
-  #   if parent_type == 'invoice'
-  #     reporting_new_amount =  self.payments.completed.map{ |payment| ( payment&.amount&.value || 0 ) * payment&.parent&.conversion_rate }
-  #   end
-  #   self.update(reporting_amount_processed: reporting_new_amount)
-  # end
-
-  # def update_requested_amount
-  #   new_amount = self.payments.joins(:amount).sum(:value)
-  #   self.amount_requested&.update(value: new_amount)
-    
-  #   reporting_amount_requested = new_amount
-
-  #   reporting_new_amount = new_amount
-  #   parent_type = self.payments.first.parent_type.downcase
-  #   if parent_type == 'invoice'
-  #     reporting_new_amount =  self.payments.map{ |payment| ( payment&.amount&.value || 0 ) * payment&.parent&.conversion_rate }
-  #   end
-  #   self.update(reporting_amount_requested: reporting_new_amount)
-  # end
-
   def update_processed_amount
     new_amount = self.payments.completed.joins(:amount).sum(:value)
     self.amount_processed&.update(value: new_amount)
+
+    reporting_new_amount = new_amount
+    parent_type = self.payments.first&.parent_type&.downcase
+    if parent_type == 'invoice'
+      reporting_new_amount = (self.payments.completed.map { |payment| (payment&.amount&.value || 0) * (payment&.parent&.conversion_rate || 1) }).sum
+    end
+    self.update(reporting_amount_processed: reporting_new_amount)
   end
 
   def update_requested_amount
     new_amount = self.payments.joins(:amount).sum(:value)
     self.amount_requested&.update(value: new_amount)
+
+    reporting_amount_requested = new_amount
+
+    reporting_new_amount = new_amount
+    parent_type = self.payments.first&.parent_type&.downcase
+    if parent_type == 'invoice'
+      reporting_new_amount = (self.payments.map { |payment| (payment&.amount&.value || 0) * (payment&.parent&.conversion_rate || 1) }).sum
+    end
+    self.update(reporting_amount_requested: reporting_new_amount)
   end
+
+  # def update_processed_amount
+  #   new_amount = self.payments.completed.joins(:amount).sum(:value)
+  #   self.amount_processed&.update(value: new_amount)
+  # end
+
+  # def update_requested_amount
+  #   new_amount = self.payments.joins(:amount).sum(:value)
+  #   self.amount_requested&.update(value: new_amount)
+  # end
 
   # again, for convenience, and only applies to bank transfer poyments
   def bank_transfer_type
@@ -294,6 +297,26 @@ class PaymentOrder < ApplicationRecord
         self.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
       end
     end
+  end
+
+  def set_currency_for_amount
+    amount_attr = [:amount_requested, :amount_processed]
+
+    base_currency_id = self.bank_payment_request&.get_base_currency&.id || self.company.reporting_currency.id || 1 
+    if base_currency_id.blank?
+      base_currency_id = 1
+    end
+    
+    amount_attr.each do |amount_attribute|
+      amount_attr_id = self.send("#{amount_attribute}_id")
+      if amount_attr_id.present?
+        Amount.find_by(id: amount_attr_id).update(currency_id: base_currency_id)
+      end
+    end
+
+    self.currency_id = base_currency_id
+    self.skip_callback = true
+    self.save
   end
 
 end

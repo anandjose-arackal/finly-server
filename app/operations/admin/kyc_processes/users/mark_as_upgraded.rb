@@ -26,7 +26,8 @@ class Admin::KycProcesses::Users::MarkAsUpgraded < Admin::KycProcesses::Users::B
       individual_kyc.user.cards.update_all(card_status_id: CardStatus.id_for(:upgraded))
       track_params = {
           action_resource: user,
-          action_id: IndividualKycTrackAction.id_for(:upgraded)
+          action_id: IndividualKycTrackAction.id_for(:upgraded),
+          company_id: individual_kyc.company_id
       }
       individual_kyc.tracks.create track_params
       # individual_kyc.user.cards.update_all

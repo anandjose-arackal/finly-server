@@ -34,8 +34,8 @@
 #
 
 class PaymentAgreement < ApplicationRecord
-
-  include Transitionable, SoftDeletable, ControllingUser
+  attr_accessor :skip_callback
+  include Transitionable, SoftDeletable, ControllingUser, GetCurrency
   include Sequenced::ActsAsSequenced
   # include SearchIndex::Concerns::Document
 include Searchkick::Api
@@ -53,6 +53,8 @@ include Searchkick::Api
   belongs_to :total_amount, optional: true, class_name: 'Amount'
   belongs_to :terminated_by, optional: true, class_name: 'User'
   belongs_to :revision_of_pa, optional: true, class_name: 'PaymentAgreement'
+  belongs_to :base_currency, optional: true, class_name: 'Currency'
+  belongs_to :reporting_currency, optional: true, class_name: 'Currency'
 
   has_many :general_invoices, -> { where(fixed_periodic_template: [nil, false]) }, dependent: :destroy
   has_many :rental_invoices, -> { where(fixed_periodic_template: [nil, false]) }, dependent: :destroy
@@ -69,8 +71,10 @@ include Searchkick::Api
   has_many :security_deposits, dependent: :destroy
   has_many :custom_fields, as: :parent, dependent: :destroy
 
-
   has_many :attachments, as: :resource, dependent: :destroy
+
+  before_create :set_currency
+  after_save :set_currency_for_amount, unless: :skip_callback
 
   amoeba do
     clone [:custom_fields, :general_invoices, :rental_invoices, :beneficiary_payments, :security_deposits, :notify_users]
@@ -311,6 +315,11 @@ include Searchkick::Api
 
   ransack_scopes :with_status_id
   ransack_scopes :with_status_ids
+  
+  def set_currency
+    self.reporting_currency_id = self.company.reporting_currency.id if self.reporting_currency_id.blank? 
+    self.base_currency_id = self.company.reporting_currency.id if self.base_currency_id.blank? 
+  end
 
   def as_json(options={})
     {
@@ -339,7 +348,9 @@ include Searchkick::Api
         revision_of_pa_order_number: self&.revision_of_pa&.get_agreement_number,
         revision_reason: self.revision_reason,
         termination_reason: self.termination_reason,
-        reject_note: self.reject_note
+        reject_note: self.reject_note,
+        base_currency: get_base_currency,
+        reporting_currency: get_reporting_currency
     }
   end
 
@@ -576,6 +587,19 @@ include Searchkick::Api
 
   def review_in_progress?
     PaymentAgreementStatus.ids_for(:awaiting_approval).include?(status_id)
+  end
+
+  def set_currency_for_amount
+    amount_attr = [:total_amount]
+
+    amount_attr.each do |amount_attribute|
+      amount_attr_id = self.send("#{amount_attribute}_id")
+      if amount_attr_id.present?
+        Amount.find_by(id: amount_attr_id).update(currency_id: get_base_currency.id)
+      end
+    end
+    self.skip_callback = true
+    self.save
   end
 
 end
