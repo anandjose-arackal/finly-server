@@ -97,6 +97,7 @@ linked_files = %w{
   config/message_template.yml
   config/open_exchange_rates.yml
   config/sso_provider_credentials.yml
+  config/appsmith.yml
 }
 case fetch(:stage)
 when :itzcash_production, :aws_production, :background_production, :foreground_production, :console_production, :api_production, :background_production_console,
