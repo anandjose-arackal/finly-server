@@ -58,6 +58,7 @@ class Masters::Schema::Entity::Contract < Reform::Form
         represented.options[key] = value[:default]
       else
         represented.options.delete(key.to_sym)
+        represented.options.delete(key.to_s)
       end
     end
   }
