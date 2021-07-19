@@ -4,7 +4,12 @@ class Masters::Schema::Records::Resolver < Resolver::API
     if params[:route].present?
       init_record_model_class(params, user)
     end
-    params[:model_class].where(company_id: user.company_id, ancestry: nil)
+    data = params[:model_class].where(company_id: user.company_id)
+    if params[:model].has_nesting
+      data = data.where(ancestry: nil)
+    end
+
+    data
   end
 
   def init_record_model_class(params, user)
