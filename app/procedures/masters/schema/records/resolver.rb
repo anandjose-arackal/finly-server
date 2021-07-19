@@ -5,7 +5,7 @@ class Masters::Schema::Records::Resolver < Resolver::API
       init_record_model_class(params, user)
     end
     data = params[:model_class].where(company_id: user.company_id)
-    if params[:model].has_nesting
+    if params[:model_class].master_schema.has_nesting
       data = data.where(ancestry: nil)
     end
 

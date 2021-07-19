@@ -60,6 +60,10 @@ module Masters::Entity::Record
         master_schema.record_exposure_class.new(self)
       end
 
+      define_method :master_schema do
+        master_schema
+      end
+
       define_method :as_json do |options = {}|
         if options[:compact]
           # Compact will only render the id and display name attributes
