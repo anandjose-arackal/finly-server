@@ -9,7 +9,6 @@ module Masters::Entity::Record
   #
   # @return [Class]
   def record_model_class
-    clear_record_model_class
     return @record_model_class if @record_model_class.present?
 
     base_class = self.model.present? ? self.model : ApplicationRecord
@@ -61,7 +60,7 @@ module Masters::Entity::Record
         master_schema.record_exposure_class.new(self)
       end
 
-      define_method :master_schema do
+      define_method :schema do
         master_schema
       end
 
