@@ -60,7 +60,7 @@ module Masters::Entity::Record
         master_schema.record_exposure_class.new(self)
       end
 
-      define_method :schema do
+      define_method :master_schema do
         master_schema
       end
 
