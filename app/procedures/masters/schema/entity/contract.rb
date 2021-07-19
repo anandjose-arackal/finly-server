@@ -104,11 +104,11 @@ class Masters::Schema::Entity::Contract < Reform::Form
 
   def primary_key_should_be_unique
     if primary_key and not unique
-      errors.add :primary_key, 'should be unique'
+      errors.add :primary_key, 'should be unique field'
     end
   end
 
-  def primary_key_should_be_unique
+  def primary_key_should_be_required
     if primary_key and not required
       errors.add :primary_key, 'should be required field'
     end
