@@ -5,6 +5,7 @@ class Reports::ExportHandler < Reports::Show
 
   def success
     params[:report] = self.report
+    params[:receipt] = self.receipt
     Reports::ExportHandler::SuccessPresenter.new(self.user, params, messages)
   end
 
