@@ -22,7 +22,7 @@ class Masters::Schema::Records::Contract
         end
       end
 
-      master_schema.entities.each do |entity|
+      master_schema.entities.only_active.each do |entity|
         next unless entity.active
         
         unless entity.type?(:multi_lookup)
