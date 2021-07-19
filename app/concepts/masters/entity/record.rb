@@ -40,9 +40,9 @@ module Masters::Entity::Record
           anonymous_class = entity.lookup_master_schema&.record_model_class
           if attr.end_with?('_id')
             attr = attr[0..(attr.length - 4)]
-            belongs_to attr.to_sym, anonymous_class: anonymous_class
+            belongs_to attr.to_sym, anonymous_class: anonymous_class, optional: !entity.required
           else
-            belongs_to "#{attr}_obj".to_sym, anonymous_class: anonymous_class, foreign_key: attr
+            belongs_to "#{attr}_obj".to_sym, anonymous_class: anonymous_class, foreign_key: attr, optional: !entity.required
           end
         end
         if entity.type?(:multi_lookup)
