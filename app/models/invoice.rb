@@ -344,7 +344,7 @@ class Invoice < ApplicationRecord
   before_create :set_currency
 
   def set_currency
-    self.reporting_currency_id = self.company.reporting_currency_code if self.reporting_currency.blank? 
+    self.reporting_currency_id = self.company.reporting_currency.id if self.reporting_currency.blank? 
     self.base_currency_id = self.company.reporting_currency.id if self.base_currency.blank? 
     self.conversion_rate = 1
   end
