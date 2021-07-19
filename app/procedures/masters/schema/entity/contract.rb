@@ -56,6 +56,8 @@ class Masters::Schema::Entity::Contract < Reform::Form
         represented.options[key] = input[key]
       elsif value[:default].present? and not value[:default] == NoObject
         represented.options[key] = value[:default]
+      else
+        represented.options.delete(key.to_sym)
       end
     end
   }
