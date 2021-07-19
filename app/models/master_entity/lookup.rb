@@ -66,7 +66,7 @@ class MasterEntity::Lookup < MasterEntity
     if entity_key.end_with?('_id')
       entity_key[0..(entity_key.length - 4)]
     else
-      entity_key
+      entity_key + '_obj'
     end
   end
 end
