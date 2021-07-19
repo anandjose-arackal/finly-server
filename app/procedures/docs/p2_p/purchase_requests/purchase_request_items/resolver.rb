@@ -9,8 +9,8 @@ class Docs::P2P::PurchaseRequests::PurchaseRequestItems::Resolver < Resolver::AP
   def load(params)
     pr = Resolver::Router.dispatch('purchase_requests.default', { params: params, current_user: user })
     # PurchaseRequestStatus::GROUP_APPROVED_ITEM applying against item instead of pr, other filters against parent
-     if params.dig(:qs, :with_status_id) == PurchaseRequestStatus::GROUP_APPROVED_ITEM
-       PurchaseRequestItem.where "purchase_request_id  in (#{pr.select('id').to_sql}) and purchase_request_items.status_id = #{PurchaseRequestItemStatus.id_for(:approved)}"
+     if params.dig(:qs, :with_status_ids) == PurchaseRequestStatus::GROUP_APPROVED_ITEM
+       PurchaseRequestItem.where "purchase_request_id  in (#{pr.select('id').to_sql}) and purchase_request_items.status_id = #{PurchaseRequestItemStatus.id_for(:approved)} and purchase_request_items.rejected = false"
      else
        PurchaseRequestItem.where "purchase_request_id  in (#{pr.select('id').to_sql})"
      end
