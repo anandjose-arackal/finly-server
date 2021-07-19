@@ -469,11 +469,15 @@ class InvoiceLineItem < ApplicationRecord
     
     conversion_rate = self.parent.conversion_rate
 
-    item_tds = self.item_tds_amount
-    if self.tds_applicable?
-      item_tds = ( self.item_taxable_amount.to_f * self.parent&.tds_slab&.tds.to_f ) / 100
-      self.item_tds_amount = item_tds.to_f.round(2)
-      self.reporting_item_tds_amount = (item_tds * conversion_rate.to_f).round(2)
+    self.skip_callback = true
+    self.save
+
+    if parent.payments.present?
+      if self.tds_applicable?
+        item_tds = ( self.item_taxable_amount.to_f * self.parent&.tds_slab&.tds.to_f ) / 100
+        self.item_tds_amount = item_tds.to_f.round(2)
+        self.reporting_item_tds_amount = (item_tds * conversion_rate.to_f).round(2)
+      end
     end
 
     self.skip_callback = true
