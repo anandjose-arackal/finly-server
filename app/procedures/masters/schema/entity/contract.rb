@@ -98,11 +98,25 @@ class Masters::Schema::Entity::Contract < Reform::Form
   validates :label, presence: true
 
   validate :primary_key_should_be_unique
+  validate :primary_key_should_be_required
+  validate :cannot_deactivate_primary_key
   validate :non_system_entity_keys
 
   def primary_key_should_be_unique
     if primary_key and not unique
       errors.add :primary_key, 'should be unique'
+    end
+  end
+
+  def primary_key_should_be_unique
+    if primary_key and not required
+      errors.add :primary_key, 'should be required field'
+    end
+  end
+
+  def cannot_deactivate_primary_key
+    if primary_key and not active
+      errors.add :primary_key, 'cannot be deactivated'
     end
   end
 
