@@ -63,7 +63,7 @@ class MasterEntity::Sequence < MasterEntity
     contract.after_save do
       if model.send(entity.entity_key).blank?
         prefix = entity.options['prefix']
-        min_length = entity.options['min_length'] || MasterEntity::Sequence::MIN_LENGTH_DEFAULT
+        min_length = (entity.options['min_length'] || MasterEntity::Sequence::MIN_LENGTH_DEFAULT).to_i
         prefix = LiquidHelper.interpolate(prefix, {'record' => model})
         sequence = REDIS.incr("MasterEntity::Sequence##{entity.id}##{prefix}")
         sequence = sequence.to_s.rjust(min_length, "0")
