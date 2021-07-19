@@ -1,5 +1,5 @@
 class Docs::P2P::PurchaseRequests::PurchaseRequestItems::Resolver < Resolver::API
-  entity PurchaseOrderItem
+  entity PurchaseRequestItem
 
   # Adding this skip filtering for child items.
   def self.is_items_resolver?
@@ -7,7 +7,7 @@ class Docs::P2P::PurchaseRequests::PurchaseRequestItems::Resolver < Resolver::AP
   end
 
   def load(params)
-    po = Resolver::Router.dispatch('purchase_requests.default', { params: params, current_user: user })
-    PurchaseOrderItem.where "purchase_order_id in (#{po.select('id').to_sql})"
+    pr = Resolver::Router.dispatch('purchase_requests.default', { params: params, current_user: user })
+    PurchaseRequestItem.where "purchase_request_id  in (#{pr.select('id').to_sql})"
   end
 end
