@@ -278,7 +278,7 @@ class NonPoInvoiceMigrator
       conversion_date: document&.date&.to_date,
 
       # VENDOR DETAILS
-      vendor_country_id: document&.vendor&.vendor_country_id,
+      vendor_country_id: Country.id_for(document&.vendor&.vendor_country),
       vendor_trade_name:  document&.vendor&.trade_name || document&.vendor&.business_name,
       vendor_sequence_id: document&.vendor&.vendor_id,
       vendor_gstin: document&.gstin_location&.gstin,

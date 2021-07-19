@@ -63,11 +63,11 @@ class Procurements::Invoices::Create < Procurements::Invoices::Base
     self.invoice.vendor_id = vendor.id
     self.invoice.vendor_pan = vendor&.pan
     self.invoice.vendor_sequence_id = vendor&.vendor_id
-    self.invoice.vendor_country_id = vendor&.vendor_country_id
+    self.invoice.vendor_country_id = Country.id_for(vendor&.vendor_country)
     self.invoice.vendor_trade_name = vendor&.trade_name
 
     self.invoice.discount_type_id = 1
-    self.invoice.is_domestic = false if vendor&.vendor_country_id != user.company&.country_id
+    self.invoice.is_domestic = false if self.invoice.vendor_country_id != user.company&.country_id
 
     self.invoice.payment_term_days = vendor&.payment_term&.days_after.to_i
     self.invoice.due_date = Date.today + vendor&.payment_term&.days_after.to_i.days

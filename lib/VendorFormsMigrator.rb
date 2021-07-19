@@ -120,8 +120,8 @@ class VendorFormsMigrator
         end
 
         # Reload document
-        # document.vendor_country = "India"
-        document.vendor_country_id = Country.id_for("India")
+        document.vendor_country = "India"
+        # document.vendor_country_id = Country.id_for("India")
         document.save
 
         document.vendor_attachments.each do |old_attachment|
