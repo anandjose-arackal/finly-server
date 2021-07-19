@@ -9,6 +9,7 @@ module Masters::Entity::Record
   #
   # @return [Class]
   def record_model_class
+    clear_record_model_class
     return @record_model_class if @record_model_class.present?
 
     base_class = self.model.present? ? self.model : ApplicationRecord
