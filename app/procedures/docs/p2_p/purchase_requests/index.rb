@@ -80,7 +80,7 @@ class Docs::P2P::PurchaseRequests::Index < IndexBuilder::API
 
     if user.has_permission?(:purchase_request_reviewer)
       counter.add PurchaseRequestStatus::GROUP_APPROVED_ITEM, 'Awaiting PO',
-                  collection.joins(:purchase_request_items).where('purchase_request_items.status_id IN (?)', [PurchaseRequestItemStatus.id_for(:approved)]).count
+                  collection.joins(:purchase_request_items).where('purchase_request_items.status_id IN (?) and purchase_request_items.rejected = false', [PurchaseRequestItemStatus.id_for(:approved)]).count
     end
 
     # :processing
