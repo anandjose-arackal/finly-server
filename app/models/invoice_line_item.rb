@@ -467,6 +467,19 @@ class InvoiceLineItem < ApplicationRecord
 
     self.tax_percentage = self.tax_rate&.rate.to_f # workaround to update tax_percentage
     
+    conversion_rate = self.parent.conversion_rate
+
+    self.skip_callback = true
+    self.save
+
+    if parent.payments.present?
+      if self.tds_applicable?
+        item_tds = ( self.item_taxable_amount.to_f * self.parent&.tds_slab&.tds.to_f ) / 100
+        self.item_tds_amount = item_tds.to_f.round(2)
+        self.reporting_item_tds_amount = (item_tds * conversion_rate.to_f).round(2)
+      end
+    end
+
     self.skip_callback = true
     self.save
   end
@@ -495,11 +508,12 @@ class InvoiceLineItem < ApplicationRecord
 
   def set_currency_for_amount
     amount_attr = [:discount_amount, :net_amount, :taxable_amount, :tax_amount, :billable_amount, :amount]
+    base_currency_id =  self.parent.get_base_currency.id
 
     amount_attr.each do |amount_attribute|
       amount_attr_id = self.send("#{amount_attribute}_id")
       if amount_attr_id.present?
-        Amount.find_by(id: amount_attr_id).update(currency_id: self.parent.get_base_currency.id)
+        Amount.find_by(id: amount_attr_id).update(currency_id: base_currency_id)
       end
     end
     self.skip_callback = true
