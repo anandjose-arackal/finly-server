@@ -1857,7 +1857,7 @@ class Invoice < ApplicationRecord
 
           # if the payment is present, user can update the tds only from payment screen, ie from old to new tds structure 
           if self.payments.present? && key.to_s == 'invoice_tds_amount'
-            updated_values_to_new_structure 
+            updated_values_to_new_structure
             next
           end
 
@@ -1998,21 +1998,23 @@ class Invoice < ApplicationRecord
     old_reporting_tds_amount = self.reporting_invoice_tds_amount
 
     tds_amount = self.tds_amount&.value&.to_f
+
     self.invoice_tds_amount = tds_amount
     self.reporting_invoice_tds_amount = (tds_amount.to_f * self.conversion_rate.to_f).round(2)
-    self.tds_percentage = self&.tds_slab&.tds.to_f
+    self.tds_percentage = tds_slab&.tds.to_f
     # update tds for each line item also
-
-    self.items.each do |item|
-      item_tds = item.item_tds_amount
-      if item&.tds_applicable
-        item_tds = ( item&.taxable_amount&.value.to_f * self&.tds_slab&.tds.to_f ) / 100
-        item.item_tds_amount = item_tds.to_f.round(2)
-        item.reporting_item_tds_amount = (item_tds * self.conversion_rate.to_f).round(2)
-      end
-      self.skip_callback = true
-      item.save
-    end
+    
+    # self.items.each do |item|
+    #   item_tds = item.item_tds_amount
+    #   if item&.tds_applicable
+    #     item_tds = ( item&.taxable_amount&.value.to_f * tds_slab&.tds.to_f ) / 100
+    #     binding.pry
+    #     item.item_tds_amount = item_tds.to_f.round(2)
+    #     item.reporting_item_tds_amount = (item_tds * self.conversion_rate.to_f).round(2)
+    #   end
+    #   item.save
+    #   self.skip_callback = true
+    # end
 
 
     # update invoice_total_amount

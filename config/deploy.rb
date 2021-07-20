@@ -97,6 +97,7 @@ linked_files = %w{
   config/message_template.yml
   config/open_exchange_rates.yml
   config/sso_provider_credentials.yml
+  config/appsmith.yml
   config/sentry.yml
 }
 case fetch(:stage)
