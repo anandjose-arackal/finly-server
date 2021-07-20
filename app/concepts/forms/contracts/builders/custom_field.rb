@@ -50,7 +50,7 @@ class Forms::Contracts::Builders::CustomField
           input[custom_field_entity.entity_key].present? && input[custom_field_entity.entity_key].is_a?(Array) && input[custom_field_entity.entity_key].each do |attachment_obj|
             attachment = CustomFieldAttachment.find_by uuid: attachment_obj[:id]
 
-            Rails.logger.error("********************** #{custom_field_entity.entity_key} - #{attachment_obj[:name]}**********************")
+            # Rails.logger.error("********************** #{custom_field_entity.entity_key} - #{attachment_obj[:name]}**********************")
 
             if attachment.present?
               
