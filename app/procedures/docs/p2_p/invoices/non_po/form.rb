@@ -519,24 +519,24 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
   condition condition_id: "Enable Bank Accounts > Swift / BIC Code for International Vendors" do
     reference :entity, 'vendor_bank_account_swift_code'
-    rule Rules::Builder[:vendor_country_id].not_eq(formula: "{{ meta.company_country_id }}")
-    # rule Rules::Builder[:vendor_country_id].not_eq(*Country.ids_for('India').map {|item| {value: item}})
+    # rule Rules::Builder[:vendor_country_id].not_eq(formula: "{{ meta.company_country_id }}" )
+    rule Rules::Builder[:vendor_country_id].not_eq(*Country.ids_for('India').map {|item| {value: item}})
     action :visible, true
     action :required, true
   end
 
   condition condition_id: "Disable Bank Accounts > IFSC Code for International Vendors" do
     reference :entity, 'vendor_bank_account_ifsc'
-    rule Rules::Builder[:vendor_country_id].not_eq(formula: "{{ meta.company_country_id }}")
-    # rule Rules::Builder[:vendor_country_id].not_eq(*Country.ids_for('India').map {|item| {value: item}})
+    # rule Rules::Builder[:vendor_country_id].not_eq(formula: "{{ meta.company_country_id }}" )
+    rule Rules::Builder[:vendor_country_id].not_eq(*Country.ids_for('India').map {|item| {value: item}})
     action :visible, false
     action :required, false
   end
 
   condition condition_id: "Base Currency non editable for Local vendor" do
     reference :entity, 'base_currency_id'
-    rule Rules::Builder[:vendor_country_id].eq(formula: "{{ meta.company_country_id }}")
-    # rule Rules::Builder[:vendor_country_id].eq(*Country.ids_for('India').map {|item| {value: item}})
+    # rule Rules::Builder[:vendor_country_id].eq(formula: "{{ meta.company_country_id }}" )
+    rule Rules::Builder[:vendor_country_id].eq(*Country.ids_for('India').map {|item| {value: item}})
     action :editable, false
   end
 
