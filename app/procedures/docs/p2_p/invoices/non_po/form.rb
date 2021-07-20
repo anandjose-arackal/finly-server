@@ -9,7 +9,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
         name: record.created_by&.name,
         email: record.created_by&.email,
       },
-      company_country_id: record.company.country_id
+      company_country_id: record.company.country_id.to_s
     }
   }
 
@@ -103,7 +103,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
     date :date,
          label: "Invoice Date",
          required: true, computed: Forms::Compute::Form('{{ form.date | default: "now" | date: "%Y-%m-%d" }}'),
-         restriction: 'not_in_the_future', triggers: {on_change: {lookup_details: [:base_currency]}}
+         restriction: 'not_in_the_future'
 
     lookup :payment_term_id,
            choices_scope: Choices[:lookup].('payment_terms'),
@@ -147,7 +147,10 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
     dropdown :discount_type_id, label: "Discount Type", editable: true, visible: true, required: true, choices_scope: Choices[:list].({ id: 1, name: 'Percentage' }, { id: 2, name: 'Amount' }), default_value: 1
 
     dropdown :tax_type_id, label: "Tax Type", editable: true, visible: true, choices_scope: Choices[:list].(*TaxType.all.map { |v| { id: v.id, name: v.name } })
-    date :conversion_date, label: "Conversion Date", editable: false, visible: true, computed: Forms::Compute::Form('{{form.date}}'), triggers: {on_change: {lookup_details: [:base_currency_id]}}
+    
+    date :conversion_date, label: "Conversion Date", editable: false, visible: true, computed: Forms::Compute::Form('{{form.date}}'), triggers: {on_change: {lookup_details: [:base_currency_id]},on_compute: {lookup_details: [:base_currency_id]}}
+    
+    # date :conversion_date, label: "Conversion Date", editable: false, visible: true, computed: Forms::Compute::Form('{{form.date}}'), triggers: {on_change: {lookup_details: [:base_currency]}, on_compute: {lookup_details: [:base_currency]}}
 
     lookup :reporting_currency_id, label: "Reporting Currency", choices_scope: Choices[:lookup].('currencies'), visible: true, editable: false, can_editable_be_changed: false
     lookup :base_currency_id, label: "Base Currency", choices_scope: Choices[:lookup].('currencies'), visible: true, editable: true
@@ -235,7 +238,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
       lookup :tds_applicable, visible: true, editable: false,
              can_editable_be_changed: false,
-             can_visible_be_changed: false,
+             can_visible_be_changed: false, choices_scope: Choices[:list].({ id: true, name: 'true' }, { id: false, name: 'false' }),
              computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.tds_applicable }}')
 
       # currency :currency_code, editable: false, visible: false, computed: Forms::Compute::Form("{{ form.currency_code }}")
@@ -516,21 +519,24 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
   condition condition_id: "Enable Bank Accounts > Swift / BIC Code for International Vendors" do
     reference :entity, 'vendor_bank_account_swift_code'
-    rule Rules::Builder[:vendor_country_id].not_eq(formula: "{{meta.company_country_id}}")
+    rule Rules::Builder[:vendor_country_id].not_eq(formula: "{{ meta.company_country_id }}")
+    # rule Rules::Builder[:vendor_country_id].not_eq(*Country.ids_for('India').map {|item| {value: item}})
     action :visible, true
     action :required, true
   end
 
   condition condition_id: "Disable Bank Accounts > IFSC Code for International Vendors" do
     reference :entity, 'vendor_bank_account_ifsc'
-    rule Rules::Builder[:vendor_country_id].not_eq(formula: "{{meta.company_country_id}}")
+    rule Rules::Builder[:vendor_country_id].not_eq(formula: "{{ meta.company_country_id }}")
+    # rule Rules::Builder[:vendor_country_id].not_eq(*Country.ids_for('India').map {|item| {value: item}})
     action :visible, false
     action :required, false
   end
 
   condition condition_id: "Base Currency non editable for Local vendor" do
     reference :entity, 'base_currency_id'
-    rule Rules::Builder[:vendor_country_id].eq(formula: "{{meta.company_country_id}}" )
+    rule Rules::Builder[:vendor_country_id].eq(formula: "{{ meta.company_country_id }}")
+    # rule Rules::Builder[:vendor_country_id].eq(*Country.ids_for('India').map {|item| {value: item}})
     action :editable, false
   end
 
@@ -568,14 +574,14 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
   end
   
   condition condition_id: "Disable Shipping address gstin for International" do
-    reference :entity, 'form.shipping_address_gstin'
+    reference :entity, 'shipping_address_gstin'
     rule Rules::Builder[:vendor_country_id].not_eq(*Country.ids_for('India').map {|item| {value: item}} )
     action :visible, false
     action :required, false
   end
 
   condition condition_id: "Disable Billing address gstin for International" do
-    reference :entity, 'form.billing_address_gstin'
+    reference :entity, 'billing_address_gstin'
     rule Rules::Builder[:vendor_country_id].not_eq(*Country.ids_for('India').map {|item| {value: item}} )
     action :visible, false
     action :required, false

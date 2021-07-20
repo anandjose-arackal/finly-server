@@ -132,7 +132,7 @@ class Docs::UtilityBills::Subscriptions::Contracts::Update < Reform::Form
   private
 
   def check_alphanumeric(string)
-    string.match(/\A[a-zA-Z0-9]*\z/)
+    string.to_s.match(/\A[a-zA-Z0-9-_\/]*\z/)
   end
 
   def check_numeric(string)

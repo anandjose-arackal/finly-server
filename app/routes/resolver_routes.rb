@@ -135,6 +135,10 @@ Resolver::Router.draw do
     route 'default', Docs::P2P::PurchaseRequests::Resolver
   end
 
+  scope :purchase_request_items do
+    route 'default', Docs::P2P::PurchaseRequests::PurchaseRequestItems::Resolver
+  end
+
   scope :purchase_orders do
     route 'default', Docs::P2P::PurchaseOrders::Resolver
     route 'advances', Docs::P2P::PurchaseOrders::Advances::Resolver

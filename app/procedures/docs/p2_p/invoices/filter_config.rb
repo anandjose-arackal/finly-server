@@ -30,7 +30,7 @@ class Docs::P2P::Invoices::FilterConfig < Filters::API
   attribute :created_by_user_id, label: "Created By", type: :dropdown, choices: Choices[:lookup].("users")
   attribute :controlling_level_level_number, label: "Controlling Level", type: :number, simple: true
   attribute :controlling_user, label: "Controlling User", type: :dropdown, simple: true, choices: Choices[:lookup].("users")
-  attribute :vendor_country_id, type: :dropdown, choices: Choices[:lookup].("countries"), active: false
+  attribute :vendor_country_id, type: :dropdown, choices: Choices[:lookup].("countries")
 
 
   def self.is_accessable( user )

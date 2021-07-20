@@ -5494,7 +5494,6 @@ ActiveRecord::Schema.define(version: 2021_07_13_091527) do
     t.decimal "invoice_total_amount", precision: 20, scale: 5
     t.integer "payment_term_days", default: 0
     t.string "vendor_bank_account_swift_code", default: ""
-    t.string "vendor_country", default: ""
     t.string "discount_type", default: ""
     t.decimal "overall_discount_amount", precision: 10, default: "0"
     t.decimal "total_line_item_discount_amount", precision: 10, default: "0"
@@ -5505,6 +5504,7 @@ ActiveRecord::Schema.define(version: 2021_07_13_091527) do
     t.string "shipping_address_gstin", default: ""
     t.integer "base_currency_id"
     t.integer "reporting_currency_id"
+    t.integer "vendor_country_id"
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["agreement_item_id"], name: "index_invoices_on_agreement_item_id"
     t.index ["company_id", "controlling_level_id", "deleted_at"], name: "index_invoice_ct_lvl_cmpny_id"
@@ -10311,7 +10311,7 @@ ActiveRecord::Schema.define(version: 2021_07_13_091527) do
     t.integer "erp_sync_attempts_count", default: 0
     t.datetime "erp_sync_attempted_at"
     t.decimal "ldc_upper_limit_amount", precision: 20, scale: 5
-    t.integer "vendor_country_id"
+    t.string "vendor_country"
     t.index ["company_id", "controlling_level_id", "deleted_at"], name: "index_vendors_ct_lvl_cmpny_id"
     t.index ["company_id"], name: "index_yes_bank_vendors_on_company_id"
     t.index ["name"], name: "index_yes_bank_vendors_on_name"

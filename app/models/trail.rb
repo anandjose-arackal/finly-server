@@ -146,7 +146,9 @@ class Trail < ApplicationRecordBackwardCompatibility
     when TrailAction.id_for(:create)
         action = " created"
     when TrailAction.id_for(:take_control)
-        action = " took control"
+        action = " took control of"
+    when TrailAction.id_for(:return_control)
+      action = " returned control of"
     when TrailAction.id_for(:update)
         action = " updated"
     when TrailAction.id_for(:approve)
@@ -196,7 +198,10 @@ class Trail < ApplicationRecordBackwardCompatibility
     end
     if self.parent_type == 'YesBankVendor'
       doc = 'Vendor'
-      body += action + " the #{doc}."    
+      body += action + " the #{doc}."
+    elsif self.parent_type == 'BbpsBill'
+      doc = 'Bill'
+      body += action + " the #{doc}."
     else
       body += action + " the #{self.parent_type}."    
     end
