@@ -37,7 +37,7 @@ class Category < ApplicationRecord
   # include SearchIndex::Concerns::Document
 include Searchkick::Api
 
-  # acts_as_sequenced column: :category_code, purpose: :category, editable: false, prefix: 'CAT'
+  acts_as_sequenced column: :category_code, purpose: :category, editable: false, prefix: 'CAT'
   has_ancestry
 
   belongs_to :company, optional: true
