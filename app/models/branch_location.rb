@@ -45,7 +45,7 @@ include Searchkick::Api
   has_ancestry
 
   # This is support for old attributes which we were renamed during the masters generalization
-  alias_attribute :pin, :pin_code
+  # alias_attribute :pin, :pin_code
   alias_attribute :gstin, :tax_registration_number
 
   belongs_to :company, optional: true
