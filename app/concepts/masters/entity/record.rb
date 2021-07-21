@@ -30,7 +30,7 @@ module Masters::Entity::Record
       end
 
       unless master_schema.system_master
-        default_scope { where(master_schema_id: master_schema.id) }
+        default_scope { where(master_schema_id: master_schema.id).non_deleted }
       end
 
       # For entities of lookup type, add a belongs_to association
