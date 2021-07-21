@@ -23,7 +23,11 @@ class Policy::ApprovalWorkflows::LevelUserReviewers::Update < Policy::ApprovalWo
       add_message :error, "Max cannot be less than or equal to min"
     end
   end
-
+  def pre_process
+    if Policy::ApprovalWorkflows::LevelUserReviewers::Index.(user, params).lurms.where(reviewer_params).exists?
+      add_message :error, "Reviewer with same rules already existing"
+    end
+  end
   def process
     unless self.lurm.update(level_user_reviewer_params)
       add_message :error, self.lurm.errors.full_messages

@@ -35,7 +35,9 @@ class Policy::ApprovalWorkflows::LevelUserReviewers::Create < Policy::ApprovalWo
   end
 
   def pre_process
-
+    if LevelUserReviewerMapping.where(reviewer_params).exists?
+      add_message :error, "Reviewer with same rules already existing"
+    end
   end
 
   def process

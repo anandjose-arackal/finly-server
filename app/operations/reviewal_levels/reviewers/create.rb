@@ -41,6 +41,12 @@ class ReviewalLevels::Reviewers::Create < ReviewalLevels::Reviewers::Base
     end
   end
 
+  def pre_process
+    if reviewal_level.level_reviewer_mappings.where(reviewer_params).exists?
+      add_message :error, "Reviewer with same rules already existing"
+    end
+  end
+
   def process
     level_reviewer_mapping = reviewal_level.level_reviewer_mappings.new(reviewer_params)
 
