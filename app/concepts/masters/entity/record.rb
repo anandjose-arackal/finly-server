@@ -24,12 +24,12 @@ module Masters::Entity::Record
       superclass.direct_descendants.delete(self)
       ApplicationRecord.descendants.delete(self)
 
-      # set ancestry if nesting enabled
-      if master_schema.has_nesting
-        has_ancestry
-      end
-
       unless master_schema.system_master
+        # set ancestry if nesting enabled only for non-system masters, as it is already in their respective class
+        if master_schema.has_nesting
+          has_ancestry
+        end
+
         default_scope { where(master_schema_id: master_schema.id).non_deleted }
       end
 
