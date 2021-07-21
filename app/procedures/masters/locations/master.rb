@@ -12,7 +12,7 @@ class Masters::Locations::Master < Masters::API
     text :city
     lookup :state_id, choices_scope: Choices[:lookup].('states')
     text :country
-    text :pin
+    text :pin_code
     switch :billable_location
     switch :shippable_location
     text :pan
