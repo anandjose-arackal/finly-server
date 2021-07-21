@@ -1974,7 +1974,7 @@ class Invoice < ApplicationRecord
     quantities = invoice_items.map(&:quantity).map(&:to_f)
     quantities.each do |quantity|
       flag = true if quantity <= 0
-      break
+      break if flag
     end
     
     errors.add(:invoice_items, "quantity must be greater than 0") if flag
@@ -1985,7 +1985,7 @@ class Invoice < ApplicationRecord
     rates = invoice_items.map(&:rate).map(&:to_f)
     rates.each do |rate|
       flag = true if rate <= 0
-      break
+      break if flag
     end
     
     errors.add(:invoice_items, "rate must be greater than 0") if flag
