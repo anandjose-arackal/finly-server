@@ -100,9 +100,9 @@ include Searchkick::Api
 
   # end
 
-  def pin
+  # def pin
 
-  end
+  # end
 
   # def as_json
   #   {
