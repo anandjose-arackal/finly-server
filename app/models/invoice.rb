@@ -1523,7 +1523,8 @@ class Invoice < ApplicationRecord
 
   def retrieve_value(entity)
     return get_base_currency.country_code if entity.entity_key == 'base_currency'
-
+    return tds_slab&.dispaly_name if entity.entity_key == 'tds_slab_id'
+    
     send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
   end
 
