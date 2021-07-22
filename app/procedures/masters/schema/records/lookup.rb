@@ -28,10 +28,10 @@ class Masters::Schema::Records::Lookup < Lookup::API
   def attributes(context)
     return @attributes if @attributes.present?
 
-    @attributes = []
-    @attributes << Lookup::Attribute.new(id: :id, visible: false, primary: true)
+    @attributes = {}
+    @attributes[:id] = Lookup::Attribute.new(id: :id, visible: false, primary: true)
     context[:model].entities.only_active.show_in_lookup.each do |entity|
-      @attributes << Lookup::Attribute.new(id: entity.entity_key, label: entity.label)
+      @attributes[entity.entity_key] = Lookup::Attribute.new(id: entity.entity_key, label: entity.label)
     end
     @attributes
   end
