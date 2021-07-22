@@ -8,7 +8,7 @@ class Masters::Schema::Records::Base < Transactions::API
       master_key = params[key_path] || context[key_path]
 
       # master_key can be fetched from the route with the format masters.<master_key>
-      context[:master_schema] = MasterSchema.find_by(company_id: current_user.company_id, master_key: master_key)
+      context[:master_schema] = context[:params][:master_schema] = MasterSchema.find_by(company_id: current_user.company_id, master_key: master_key)
       unless context[:master_schema].present?
         next on_error context, :base, 'master not found'
       end
