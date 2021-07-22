@@ -24,8 +24,10 @@ class Policy::ApprovalWorkflows::LevelUserReviewers::Update < Policy::ApprovalWo
     end
   end
   def pre_process
-    if Policy::ApprovalWorkflows::LevelUserReviewers::Index.(user, params).lurms.where(reviewer_params).exists?
-      add_message :error, "Reviewer with same rules already existing"
+    dup_check_params = level_user_reviewer_params
+    dup_check_params[:max] = nil if dup_check_params[:max].blank?
+    if Policy::ApprovalWorkflows::LevelUserReviewers::Index.(user, params).lurms.where(level_user_reviewer_params).exists?
+      add_message :error, "User already exists in level (#{lurm.level&.name})"
     end
   end
   def process

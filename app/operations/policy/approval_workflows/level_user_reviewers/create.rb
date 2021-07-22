@@ -35,8 +35,10 @@ class Policy::ApprovalWorkflows::LevelUserReviewers::Create < Policy::ApprovalWo
   end
 
   def pre_process
-    if LevelUserReviewerMapping.where(reviewer_params).exists?
-      add_message :error, "Reviewer with same rules already existing"
+    dup_check_params = level_user_reviewer_params
+    dup_check_params[:max] = nil if dup_check_params[:max].blank?
+    if LevelUserReviewerMapping.where(evel_user_reviewer_params).exists?
+      add_message :error, "User already exists in level (#{lurm.level&.name})"
     end
   end
 
