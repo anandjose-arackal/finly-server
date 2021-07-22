@@ -8,15 +8,17 @@ class Masters::Items::Master < Masters::API
   schema do
     sequence :item_number, prefix: 'ITEM', min_length: 6, show_in_lookup: true
     text :description, required: true, show_in_lookup: true, unique: true, primary_key: true
+    dropdown :supply_item_type_id, choices_scope: Choices[:enum].(::SupplyItemType)
     text :sku
     lookup :category_id, choices_scope: Choices[:lookup].('masters.categories'), required: true
+    text :hsn_sac
+    decimal :rate
+    lookup :tax_rate_id, choices_scope: Choices[:lookup].('masters.tax_rates')
+    dropdown :unit_of_measurement, choices_scope: Choices[:list].(*UNITS_OF_MEASUREMENT.map { |unit| { id: unit, name: unit } })
+    dropdown :product_type_id, choices_scope: Choices[:enum].(::ProductType)
+    switch :tds_applicable
+    dropdown :item_expense_type_id, choices_scope: Choices[:enum].(::ItemExpenseType)
     large_text :note
-    # lookup :tax_rate_id, choices_scope: Choices[:lookup].('masters.tax_rates')
-    # text :account, label: 'Account Code'
-    # dropdown :item_scope_id, choices_scope: Choices[:list].({id: 'PO', name: "PO"}, {id: 'Non PO', name: "Non PO"}, {id: 'Any', name: "Any"})
-    # dropdown :item_type_id, choices_scope: Choices[:list].({id: 'Goods', name: 'Goods'}, {id: 'Service', name: 'Service'})
-    # dropdown :nature_of_expense_id, choices_scope: Choices[:list].({id: 'Capex', name: 'Capex'}, {id: 'Opex', name: 'Opex'})
-    # dropdown :unit_of_measurement_id, choices_scope: Choices[:list].(*UNITS_OF_MEASUREMENT)
   end
 
 end
