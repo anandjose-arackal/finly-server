@@ -1,7 +1,7 @@
 class Masters::Schema::Records::Lookup < Lookup::API
 
   step :init_record_model_class, before: :define_search
-  step Resolver::Transactions::Load(klass: Masters::Schema::Records::Resolver, paginate: true), replace: "transactions.resolver.model"
+  step Resolver::Transactions::Load(klass: Masters::Schema::Records::LookupResolver, paginate: true), replace: "transactions.resolver.model"
 
   def init_record_model_class(context, params:, current_user:, **)
     # master_key can be fetched from the route with the format masters.<master_key>
