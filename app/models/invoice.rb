@@ -1531,7 +1531,8 @@ class Invoice < ApplicationRecord
 
   def retrieve_value(entity)
     return get_base_currency.country_code if entity.entity_key == 'base_currency'
-
+    return tds_slab&.dispaly_name if entity.entity_key == 'tds_slab_id'
+    
     send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
   end
 
@@ -1865,7 +1866,7 @@ class Invoice < ApplicationRecord
 
           # if the payment is present, user can update the tds only from payment screen, ie from old to new tds structure 
           if self.payments.present? && key.to_s == 'invoice_tds_amount'
-            updated_values_to_new_structure 
+            updated_values_to_new_structure
             next
           end
 
@@ -1982,7 +1983,7 @@ class Invoice < ApplicationRecord
     quantities = invoice_items.map(&:quantity).map(&:to_f)
     quantities.each do |quantity|
       flag = true if quantity <= 0
-      break
+      break if flag
     end
     
     errors.add(:invoice_items, "quantity must be greater than 0") if flag
@@ -1993,7 +1994,7 @@ class Invoice < ApplicationRecord
     rates = invoice_items.map(&:rate).map(&:to_f)
     rates.each do |rate|
       flag = true if rate <= 0
-      break
+      break if flag
     end
     
     errors.add(:invoice_items, "rate must be greater than 0") if flag
@@ -2006,21 +2007,23 @@ class Invoice < ApplicationRecord
     old_reporting_tds_amount = self.reporting_invoice_tds_amount
 
     tds_amount = self.tds_amount&.value&.to_f
+
     self.invoice_tds_amount = tds_amount
     self.reporting_invoice_tds_amount = (tds_amount.to_f * self.conversion_rate.to_f).round(2)
-    self.tds_percentage = self&.tds_slab&.tds.to_f
+    self.tds_percentage = tds_slab&.tds.to_f
     # update tds for each line item also
-
-    self.items.each do |item|
-      item_tds = item.item_tds_amount
-      if item&.tds_applicable
-        item_tds = ( item&.taxable_amount&.value.to_f * self&.tds_slab&.tds.to_f ) / 100
-        item.item_tds_amount = item_tds.to_f.round(2)
-        item.reporting_item_tds_amount = (item_tds * self.conversion_rate.to_f).round(2)
-      end
-      self.skip_callback = true
-      item.save
-    end
+    
+    # self.items.each do |item|
+    #   item_tds = item.item_tds_amount
+    #   if item&.tds_applicable
+    #     item_tds = ( item&.taxable_amount&.value.to_f * tds_slab&.tds.to_f ) / 100
+    #     binding.pry
+    #     item.item_tds_amount = item_tds.to_f.round(2)
+    #     item.reporting_item_tds_amount = (item_tds * self.conversion_rate.to_f).round(2)
+    #   end
+    #   item.save
+    #   self.skip_callback = true
+    # end
 
 
     # update invoice_total_amount
