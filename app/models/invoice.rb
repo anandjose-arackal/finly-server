@@ -1553,6 +1553,12 @@ class Invoice < ApplicationRecord
     bank_payment_request_policies
   end
 
+  def invoice_budgets
+    op = BudgetManager::BudgetsCalculator::ApplicableBudgets.({document: self, current_user: User.first})
+    budgets = op["result"][:budgets]
+    budgets
+  end
+
   private
 
   # def payment_agreement_updations

@@ -410,6 +410,7 @@ class InvoiceLineItem < ApplicationRecord
     if parent.respond_to?(:forms_enabled) && parent.forms_enabled
       invoice_forms_enabled = true
     end
+    invoice_forms_enabled
   end
 
 
