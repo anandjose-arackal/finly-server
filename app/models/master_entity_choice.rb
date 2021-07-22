@@ -14,13 +14,23 @@
 #
 
 class MasterEntityChoice < ApplicationRecord
+
   belongs_to :company
   belongs_to :master_entity
   belongs_to :created_by, class_name: 'User', optional: true
 
+  after_save :set_key
+
+  def set_key
+    unless key.present?
+      self.key = self.id
+      self.save!
+    end
+  end
+
   def as_json()
     {
-      id: id,
+      id: key,
       name: name
     }
   end

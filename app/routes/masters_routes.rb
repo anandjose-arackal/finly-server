@@ -5,4 +5,5 @@ Masters::Router.draw do
   route 'departments', Masters::Departments::Master
   route 'cost_centers', Masters::CostCenters::Master
   route 'payment_terms', Masters::PaymentTerms::Master
+  route 'tax_rates', Masters::TaxRates::Master
 end

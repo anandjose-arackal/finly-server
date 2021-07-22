@@ -63,7 +63,7 @@ class Masters::Schema::Entity::Contract < Reform::Form
     end
   }
   property :choices_scope
-  collection :choices, populate_if_empty: MasterEntityChoice do
+  collection :choices, populator: :choices! do
     property :company, deserializer: -> (input, represented, **) {
       represented.company ||= represented.contract_root.model.company
     }
@@ -71,6 +71,10 @@ class Masters::Schema::Entity::Contract < Reform::Form
       represented.created_by ||= represented.contract_root.model.created_by
     }
     property :name
+    property :key, deserializer: -> (input, represented, **) {
+      represented.key = input[:id]
+    }
+    property :id, virtual: true
   end
 
   property :can_label_be_changed, deserializer: -> (input, represented, **) {
@@ -88,6 +92,17 @@ class Masters::Schema::Entity::Contract < Reform::Form
   property :can_be_destroyed, deserializer: -> (input, represented, **) {
     represented.can_be_destroyed = true unless represented.system_entity
   }
+
+  def choices!(collection:, fragment:, index:, options:, **)
+    choice = choices.find {|choice| choice.key.to_s == fragment["id"].to_s}
+
+    if fragment["_destroy"]
+      choices.destroy(choice)
+      return skip!
+    end
+
+    choice || choices.append(MasterEntityChoice.new)
+  end
 
 
   validates :type, presence: true

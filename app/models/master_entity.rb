@@ -122,6 +122,7 @@ class MasterEntity < ApplicationRecord
     val = super()&.with_indifferent_access
     return nil unless val.present?
     if entity_type == 'dropdown' and choices.present?
+      val[:type] = :list
       val[:config] = {
         choices: choices.map do |choice|
           choice.as_json
