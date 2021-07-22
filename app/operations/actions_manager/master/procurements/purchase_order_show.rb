@@ -38,7 +38,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   def po_revision
     # can only be done after the po status is set to "sent to vendor"
     # prevent revision if procurement has invoice or grn attached
-    if po_modifiable?
+    if po_modifiable? && user.is_purchase_order_initiator?
       unless procurement.po_revisions.pluck(:revision_of_id).include?(purchase_order.id)
         (purchase_order.sent_to_vendor? || purchase_order.approved? || purchase_order.auto_approved? || purchase_order.vendor_confirmed?) && (user_in_level? || document_owner? || user.vendor_payment_admin?)
       end
