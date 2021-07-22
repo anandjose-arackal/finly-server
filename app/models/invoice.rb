@@ -918,11 +918,19 @@ class Invoice < ApplicationRecord
   end
 
   def invoice_balance_due
-    self[:invoice_balance_due].to_f - self.invoice_advance_paid_amount.to_f
+    if self.forms_enabled
+      self[:invoice_balance_due].to_f - self.invoice_advance_paid_amount.to_f
+    else
+      balance_due&.value.to_f - paid_amount_value
+    end
   end
 
   def reporting_invoice_balance_due
-    self[:reporting_invoice_balance_due].to_f - self.reporting_invoice_advance_paid_amount.to_f 
+    if self.forms_enabled
+      self[:reporting_invoice_balance_due].to_f - self.reporting_invoice_advance_paid_amount.to_f 
+    else
+      balance_due&.value.to_f - paid_amount_value
+    end
   end
 
   def invoice_sub_total_amount
