@@ -167,7 +167,7 @@ class MasterEntity < ApplicationRecord
 
     if type == "MasterEntity::Lookup"
       data[:choices_scope] = choices_scope
-      data[:data] = choices_scope.build(user: RequestStoreUtil.current_user).as_json
+      data[:choices] = choices_scope.build(user: RequestStoreUtil.current_user).as_json
     end
 
     data
