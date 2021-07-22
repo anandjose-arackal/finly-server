@@ -104,7 +104,7 @@ class MasterEntity < ApplicationRecord
   end
 
   contract_eval "Choices Scope" do |contract:, entity:, **|
-    if entity.choices_scope.present?
+    if entity.choices_scope.present? and entity.entity_type == 'lookup'
       contract.validate do
         id = send(entity.entity_key)
         if id.present?
