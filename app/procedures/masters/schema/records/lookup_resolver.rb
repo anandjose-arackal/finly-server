@@ -1,4 +1,4 @@
-class Masters::Schema::Records::Resolver < Masters::Schema::Records::Resolver
+class Masters::Schema::Records::LookupResolver < Masters::Schema::Records::Resolver
 
   def load(params)
     if params[:route].present?
