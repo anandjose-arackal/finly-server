@@ -168,6 +168,7 @@ class MasterEntity < ApplicationRecord
     if type == "MasterEntity::Lookup"
       data[:choices_scope] = choices_scope
       data[:choices_data] = choices_scope.build(user: RequestStoreUtil.current_user)
+      data[:autocomplete_url] = 'lookup/' + choices_scope.route.gsub('.', '/')
     end
 
     data
