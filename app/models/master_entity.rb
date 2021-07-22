@@ -121,7 +121,7 @@ class MasterEntity < ApplicationRecord
   def choices_scope
     val = super()&.with_indifferent_access
     return nil unless val.present?
-    if entity_type == 'dropdown'
+    if entity_type == 'dropdown' and choices.present?
       val[:config] = {
         choices: choices.map do |choice|
           choice.as_json
