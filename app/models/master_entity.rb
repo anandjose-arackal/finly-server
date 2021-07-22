@@ -160,8 +160,12 @@ class MasterEntity < ApplicationRecord
     }
 
     if type == 'MasterEntity::DropDown'
-      data[:choices] = choices.map do |choice|
-        choice.as_json
+      if choices_scope.type == :enum
+        data[:choices] = choices_scope.choices
+      else
+        data[:choices] = choices.map do |choice|
+          choice.as_json
+        end
       end
     end
 
