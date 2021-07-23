@@ -31,6 +31,8 @@ user:
       vp: <%=  VpOldUiToggle.new(current_user).old_ui_enabled? %>
     export_manager:
       templates_enabled: <%=  ExportManagerToggle.new(current_user).templates_enabled? %>
+    simple_masters:
+      simple_masters_enabled: <%=  SimpleMastersToggle.new(current_user).simple_masters_enabled? %>
     theme:
       vp: <%= current_user.profile.vp_web_client_theme %>
       em: <%= current_user.profile.em_web_client_theme %>

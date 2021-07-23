@@ -1,16 +1,19 @@
 class Forms::Validations::Templates
 
+  include DynamicAttributes
+
+  class_attr :validates, default: {}
+
   def self.[](key)
     validates[key]
   end
 
-  def self.validates(key = NoObject, &block)
-    @validates ||= {}
-    @validates[key] = block if key != NoObject and block_given?
-    @validates
+  def self.validate(key = NoObject, &block)
+    validates[key] = block if key != NoObject and block_given?
+    validates
   end
 
-  validates :regex_match do |contract:, entity:, **|
+  validate :regex_match do |contract:, entity:, **|
     format = entity.options['regex']&.dig('format')
     message = entity.options['regex']&.dig('message')
 
@@ -32,7 +35,7 @@ class Forms::Validations::Templates
     end
   end
 
-  validates :max_value do |contract:, entity:, **|
+  validate :max_value do |contract:, entity:, **|
     if entity.options['max_value'].present?
       contract.validate do
         value = send(entity.entity_key)
@@ -52,7 +55,7 @@ class Forms::Validations::Templates
     end
   end
 
-  validates :min_value do |contract:, entity:, **|
+  validate :min_value do |contract:, entity:, **|
     if entity.options['min_value'].present?
       contract.validate do
         value = send(entity.entity_key)
@@ -113,7 +116,7 @@ class Forms::Validations::Templates
     end
   end
 
-  validates :maximum do |contract:, entity:, **|
+  validate :maximum do |contract:, entity:, **|
     if entity.options['maximum'].present? and entity.options['maximum'].to_i > 0
       contract.validate do
         value = send(entity.entity_key)
