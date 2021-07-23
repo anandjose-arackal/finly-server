@@ -166,25 +166,25 @@ production:
     base: 'http://172.33.74.252'
     path: 'receivables'
   icici_bank_registration:
-    base: 'https://apibankingone.icicibank.com/api/Corporate/CIB/v1'
+    base: 'https://api.icicibank.com:8443/api/Corporate/CIB/v1'
     path: 'Registration'
   icici_bank_transaction_otp:
-    base: 'https://apibankingone.icicibank.com/api/Corporate/CIB/v1'
+    base: 'https://api.icicibank.com:8443/api/Corporate/CIB/v1'
     path: 'TransactionOTP'
   icici_bank_transaction_initiate:
-    base: 'https://apibankingone.icicibank.com/api/Corporate/CIB/v1'
+    base: 'https://api.icicibank.com:8443/api/Corporate/CIB/v1'
     path: 'TransactionOTP'
   icici_bank_balance_inquiry:
-    base: 'https://apibankingone.icicibank.com/api/Corporate/CIB/v1'
+    base: 'https://api.icicibank.com:8443/api/Corporate/CIB/v1'
     path: 'BalanceInquiry'
   icici_bank_account_statement:
-    base: 'https://apibankingone.icicibank.com/api/Corporate/CIB/v1'
+    base: 'https://api.icicibank.com:8443/api/Corporate/CIB/v1'
     path: 'AccountStatement'
   icici_bank_validate_account:
-    base: 'https://apibankingone.icicibank.com/api/Corporate/CIB/v1'
+    base: 'https://api.icicibank.com:8443/api/Corporate/CIB/v1'
     path: 'ValidateLinkedAccount'
   icici_bank_transaction_status:
-    base: 'https://apibankingone.icicibank.com/api/Corporate/CIB/v1'
+    base: 'https://api.icicibank.com:8443/api/Corporate/CIB/v1'
     path: 'TransactionInquiry'
   kotak_bank:
     base: 'https://apigw.kotak.com:8443/cms_generic_service'
