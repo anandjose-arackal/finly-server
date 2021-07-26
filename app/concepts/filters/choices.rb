@@ -23,16 +23,14 @@ class Filters::Choices < Transactions::API
 
   def init_klass(context, params:, current_user:, **)
     context[:filter_config] = Filters::Router[params[:route]]&.first&.klass
-    op = Filters::Router.dispatch(params[:route], { params: { route: params[:route]}, current_user: current_user})
-    context[:filters] = op[:filters]
+    op = Filters::Router.dispatch(params[:route], { params: { route: params[:route]}, current_user: current_user, only_attributes: true})
+    context[:attributes] = op[:attributes]
 
     true
   end
   
   def find_attribute(context, params:, filter_config:, **)
-    context[:attribute] = (context[:filters].filter do |filter|
-      filter[:field_key] == params[:field_key].to_sym
-    end).first
+    context[:attribute] = context[:attributes][params[:field_key]]
 
     unless context[:attribute].present?
       return on_error context, :base, 'Invalid Request'
@@ -50,7 +48,7 @@ class Filters::Choices < Transactions::API
   # end
 
   def build_choices(context, params:, current_user:, attribute:, **)
-    context[:data] = attribute[:data]
+    context[:data] = attribute.choices.build(params: params, user: current_user).as_json
 
     true
   end
