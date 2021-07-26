@@ -6,19 +6,22 @@ class BankTransfer::PaymentRequest::InwardInvoice::InvoicePaymentsBackground < B
 
   attr_accessor :bank_payment_request, :payments_attributes, :payment_mode, :options,
                 :company_id, :execute, :payment_params, :invoices_status, :invoices,
-                :transfer_mode_id
+                :transfer_mode_id, :logger, :log_data
 
   def self.call(user, options = {})
     self.new.perform(user, options)
   end
 
   def perform(user, options, request_store_hash = nil)
+    self.logger = LogStashLogger.new(type: :file, path: 'log/logstash_payments_creation.log', sync: true)
+    self.log_data = {}
     load_request_store request_store_hash
     if options.present? and options.is_a?(Hash)
       options = options.with_indifferent_access
     end
     self.bank_payment_request = BankPaymentRequest.find_by(id: options[:bank_payment_request_id])
     self.payments_attributes = options[:payments_attributes]
+    self.log_data[:number_of_payments] = self.payments_attributes.count
     self.invoices_status = options[:invoices_status]
     self.options = options
     self.run
@@ -36,6 +39,8 @@ class BankTransfer::PaymentRequest::InwardInvoice::InvoicePaymentsBackground < B
 
   def init
     self.company_id = self.bank_payment_request.owner.company_id
+    self.log_data[:company] = self.bank_payment_request.owner.company.name
+    self.log_data[:company_id] = self.company_id
     self.user = self.bank_payment_request.owner
     self.payment_mode = self.bank_payment_request.payment_mode
     self.transfer_mode_id = self.bank_payment_request.transfer_mode_id
@@ -124,6 +129,9 @@ class BankTransfer::PaymentRequest::InwardInvoice::InvoicePaymentsBackground < B
 
       puts 'SUCCESSFUL!'
     # end
+
+    self.log_data[:end_time] = DateTime.now.utc
+    self.logger.info(self.log_data)
   end
 
   private
