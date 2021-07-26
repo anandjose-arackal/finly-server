@@ -281,7 +281,7 @@ class NonPoInvoiceMigrator
       vendor_country_id: Country.id_for(document&.vendor&.vendor_country),
       vendor_trade_name:  document&.vendor&.trade_name || document&.vendor&.business_name,
       vendor_sequence_id: document&.vendor&.vendor_id,
-      vendor_gstin: document&.gstin_location&.gstin,
+      vendor_gstin: document&.gstin_location&.tax_registration_number,
       vendor_pan: document&.vendor&.pan,
       
       gstin_location_id: document&.gstin_location_id,

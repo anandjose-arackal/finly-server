@@ -4,6 +4,7 @@ class BranchLocationExposure < Exposures::API
   attribute :name, record_attribute: true
   attribute :location_code, record_attribute: true
   attribute :gstin, record_attribute: true
+  attribute :tax_registration_number, record_attribute: true
   attribute :state, record_attribute: true
   attribute :gl_code, record_attribute: true
   attribute :address_1, record_attribute: true

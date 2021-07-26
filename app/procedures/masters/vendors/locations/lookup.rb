@@ -6,6 +6,6 @@ class Masters::Vendors::Locations::Lookup < Lookup::API
   attribute :id, visible: false
   attribute :name, value: :location
   attribute :address
-  attribute :gstin
+  attribute :tax_registration_number
 
 end
