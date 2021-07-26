@@ -97,7 +97,7 @@ class Filters::API::Attribute
 
       def build(context, user)
         filters = []
-        attributes(context).each do |field_key, attribute|
+        context[:attributes].each do |field_key, attribute|
           filters << attribute.build(user)
         end
 
