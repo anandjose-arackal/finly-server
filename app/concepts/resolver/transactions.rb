@@ -1,7 +1,7 @@
 class Resolver::Transactions
   include DynamicAttributes
 
-  def self.Load(klass: nil, route: :route, model: nil, scope: :default, builder: nil, paginate: false, filter: true, includes: [])
+  def self.Load(klass: nil, route: nil, model: nil, scope: :default, builder: nil, paginate: false, filter: true, includes: [])
     Transactions::Task.build id: "transactions.resolver.model" do |context, flow_options, circuit_options|
       route_path = nil
       if model
@@ -12,6 +12,8 @@ class Resolver::Transactions
         route_path = route
         # route = [route] unless route.respond_to?(:each)
         # route_path = context[:params]&.dig(*route)
+      elsif klass.blank?
+        route_path = context[:params]&.dig(:route)
       end
 
       # route = [route] unless route.respond_to?(:each)
