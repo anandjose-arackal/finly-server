@@ -2,6 +2,7 @@ class Filters::API < Transactions::API
   include DynamicAttributes
   include Attribute::Builder
 
+  step :build_attributes
   step :build_config
 
   class_attr :feature_subscription
@@ -27,8 +28,14 @@ class Filters::API < Transactions::API
     user_subscription index_builder.user_subscription
   end
 
+  def build_attributes(context, current_user:, **)
+    context[:attributes] = attributes(context)
+  end
+
   def build_config(context, current_user:, **)
-    context[:filters] = build(context, current_user)
+    unless context[:only_attributes]
+      context[:filters] = build(context, current_user)
+    end
   end
 
   # def build(context, current_user)
