@@ -69,6 +69,8 @@
 #  erp_sync_reference_id     :text(65535)
 #  erp_sync_attempts_count   :integer          default(0)
 #  erp_sync_attempted_at     :datetime
+#  start_date                :date
+#  end_date                  :date
 #
 
 require 'rails_helper'

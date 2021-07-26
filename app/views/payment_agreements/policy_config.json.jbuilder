@@ -1,6 +1,6 @@
 json.locations do
   if @result.locations.present?
-    json.array!(@result.locations.include_state) do |location|
+    json.array!(@result.locations) do |location|
       json.merge! location.as_json(tree: true)
     end
   end

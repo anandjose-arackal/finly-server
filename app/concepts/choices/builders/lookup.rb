@@ -40,12 +40,14 @@ class Choices::Builders::Lookup < Choices::Builders::Base
 
   def choices(params: {}, user: nil)
     params = params.with_indifferent_access.deep_merge(choice_params.with_indifferent_access)
+    params[:route] = route
     result = klass.(params: params, current_user: user)
     result['model.records']
   end
 
   def build(params: {}, user: {})
     params = params.with_indifferent_access.deep_merge(choice_params.with_indifferent_access)
+    params[:route] = route
     raise "Lookup with route #{route} not found" if klass.blank?
 
     result = klass.(params: params, current_user: user)

@@ -1,0 +1,75 @@
+# == Schema Information
+#
+# Table name: master_entities
+#
+#  id                        :bigint           not null, primary key
+#  master_schema_id          :string(255)      not null
+#  company_id                :integer
+#  type                      :string(255)      not null
+#  hint                      :string(255)
+#  required                  :boolean
+#  unique                    :boolean
+#  position                  :string(255)
+#  entity_key                :string(255)      not null
+#  system_entity             :boolean          default(FALSE)
+#  label                     :string(255)      not null
+#  active                    :string(255)
+#  options                   :text(65535)
+#  can_label_be_changed      :boolean
+#  can_uniqueness_be_changed :boolean
+#  can_required_be_changed   :boolean
+#  can_active_be_changed     :boolean
+#  can_be_destroyed          :boolean
+#  show_in_lookup            :boolean
+#  deleted_at                :datetime
+#  created_at                :datetime         not null
+#  updated_at                :datetime         not null
+#  choices_scope             :text(65535)
+#  primary_key               :boolean
+#
+
+class MasterEntity::Sequence < MasterEntity
+  register :sequence
+  database_type :string
+  filter_type :auto_number
+  simple_filter :cont_any
+  set :hint, 'Auto-Generated'
+  operators :eq_any, :not_eq_all, :cont_any, :not_cont_all, :blank, :present
+
+  MIN_LENGTH_DEFAULT ||= 5
+  MAX_MIN_LENGTH_DEFAULT ||= 10
+
+  option :prefix
+  option :min_length, default: MIN_LENGTH_DEFAULT
+
+  schema_contract do
+    validates :options, presence: true
+    validate :options_structure
+
+    def options_structure
+      if options['prefix'].blank?
+        errors.add :prefix,  "cannot be blank"
+      elsif options['min_length'].blank?
+        errors.add :min_length, "cannot be blank"
+      elsif options['min_length'].to_f < 0
+        errors.add :min_length, "has to be greater than or equal to 0"
+      elsif options['min_length'].to_f > MAX_MIN_LENGTH_DEFAULT
+        errors.add :min_length, "has to be less than or equal to #{MAX_MIN_LENGTH_DEFAULT}"
+      end
+    end
+  end
+
+  contract_eval "Set sequence" do |contract:, entity:, **|
+    contract.after_save do
+      if model.send(entity.entity_key).blank?
+        prefix = entity.options['prefix']
+        min_length = (entity.options['min_length'] || MasterEntity::Sequence::MIN_LENGTH_DEFAULT).to_i
+        prefix = LiquidHelper.interpolate(prefix, {'record' => model})
+        sequence = REDIS.incr("MasterEntity::Sequence##{entity.id}##{prefix}")
+        sequence = sequence.to_s.rjust(min_length, "0")
+        model.send("#{entity.entity_key}=", "#{prefix}#{sequence}")
+        model.save
+      end
+    end
+  end
+end
