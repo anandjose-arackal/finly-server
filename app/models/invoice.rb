@@ -795,7 +795,11 @@ class Invoice < ApplicationRecord
   end
 
   def tds_rate
-    self.tds
+    if forms_enabled
+      self.tds_percentage
+    else
+      self.tds
+    end
   end
 
   def discount_rate
