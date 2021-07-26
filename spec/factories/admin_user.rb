@@ -1,6 +1,11 @@
 # require './company'
 FactoryBot.define do
 
+  sequence :admin_user_email do |n|
+    "admin_user#{n}@example.com"
+  end
+
+
   factory :admin_user do
     first_name {Faker::Name.first_name}
     last_name {Faker::Name.last_name}

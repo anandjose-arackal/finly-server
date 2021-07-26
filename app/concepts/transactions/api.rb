@@ -17,8 +17,8 @@ class Transactions::API < Trailblazer::Operation
 
   def self.AssignModelUser(key: :user)
     Transactions::Task.build id: "assign_model_user" do |context, **|
-      context[:model].send("#{key}=", context[:current_user])
-      context[:model].company = context[:model].send(key)&.company
+      context[:model].send("#{key}=", context[:current_user]) if context[:model].respond_to?("#{key}=")
+      context[:model].company = context[:current_user]&.company if context[:model].respond_to?("company=")
       true
     end
   end

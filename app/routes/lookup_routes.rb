@@ -1,9 +1,12 @@
 Lookup::Router.draw do
 
+
+
   # Masters
   route 'policies', Masters::Policies::Lookup
   route "departments", Masters::Departments::Lookup
   route "locations", Masters::Locations::Lookup
+  route "states", Masters::States::Lookup
   route "cost_centers", Masters::CostCenters::Lookup
   route "categories", Masters::Categories::Lookup
   route "vendors", Masters::Vendors::Lookup # Went with singular because plural was already being used by other areas of the app
@@ -24,5 +27,8 @@ Lookup::Router.draw do
 
   # Docs
   route 'purchase_requests', Docs::P2P::PurchaseRequests::Lookup
+
+  route 'master_schemas', Masters::Schema::Lookup
+  route 'masters.*', Masters::Schema::Records::Lookup
 
 end

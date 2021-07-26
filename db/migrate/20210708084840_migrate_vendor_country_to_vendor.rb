@@ -3,6 +3,7 @@ class MigrateVendorCountryToVendor < ActiveRecord::Migration[6.0]
     ActsAsTenant.without_tenant do
       # YesBankVendor.where(vendor_country: 'India').update_all(vendor_country_id: Country.id_for('India') )
       Invoice.where(vendor_country: 'India').update_all(vendor_country_id: Country.id_for('India') )
+      Invoice.where(vendor_country: 'International').update_all(vendor_country_id: Country.id_for('International') )
 
       # international_vendor_ids = YesBankVendor.where.not(vendor_country: 'India').pluck(:id)
       # Rails.logger.fatal "#{international_vendor_ids}"

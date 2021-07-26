@@ -3,6 +3,7 @@ Filters::Router.draw do
   scope :admin do
     route 'macros', Admin::Masters::Macros::FilterConfig
     route 'macro_jobs', Admin::Masters::Macros::Jobs::FilterConfig
+    route 'company_groups', Admin::CompanyGroups::FilterConfig
   end
 
   # Master
@@ -32,4 +33,6 @@ Filters::Router.draw do
   route 'receive_history', Docs::P2P::Inwards::Received::FilterConfig
   route 'credit_notes', Docs::P2P::CreditNotes::FilterConfig
   route 'audit_trails',Docs::AuditTrails::FilterConfig
+
+  route 'masters.*', Masters::Schema::Records::FilterConfig
 end

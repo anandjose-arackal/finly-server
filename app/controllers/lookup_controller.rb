@@ -8,4 +8,9 @@ class LookupController < BaseControllers::WebBase
       respond response: :failure, message: "Invalid Request"
     end
   end
+
+  def masters_route
+    params[:route] = "masters.#{params[:master_key]}"
+    route
+  end
 end

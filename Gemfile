@@ -305,7 +305,7 @@ group :test do
   gem 'rspec-rails', '~> 3.8'
   gem 'spring-commands-rspec', '~> 1.0.4'
   gem 'capybara', '~> 3.29'
-
+  gem 'simplecov'
 end
 
 group :test do
@@ -326,7 +326,11 @@ group :development do
   gem 'spring-commands-rspec', '~> 1.0.4'
   # gem "lol_dba"
 end
-gem 'sneakers', '~> 2.12'
+
+gem 'yard', '~> 0.9'
+gem 'yard-activerecord'
+gem 'rdoc', '~> 6.2'
+
 
 # gem 'backup'
 

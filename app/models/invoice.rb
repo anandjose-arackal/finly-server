@@ -1534,7 +1534,8 @@ class Invoice < ApplicationRecord
 
   def retrieve_value(entity)
     # return get_base_currency.country_code if entity.entity_key == 'base_currency'
-
+    return tds_slab&.dispaly_name if entity.entity_key == 'tds_slab_id'
+  
     send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
   end
 
@@ -1985,7 +1986,7 @@ class Invoice < ApplicationRecord
     quantities = invoice_items.map(&:quantity).map(&:to_f)
     quantities.each do |quantity|
       flag = true if quantity <= 0
-      break
+      break if flag
     end
     
     errors.add(:invoice_items, "quantity must be greater than 0") if flag
@@ -1996,7 +1997,7 @@ class Invoice < ApplicationRecord
     rates = invoice_items.map(&:rate).map(&:to_f)
     rates.each do |rate|
       flag = true if rate <= 0
-      break
+      break if flag
     end
     
     errors.add(:invoice_items, "rate must be greater than 0") if flag

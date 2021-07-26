@@ -17,9 +17,21 @@ Resolver::Router.draw do
     scope :macro_jobs do
       route 'default', Admin::Masters::Macros::Jobs::Resolver
     end
+
+    scope :company_groups do
+      route 'default', Admin::CompanyGroups::Resolver
+    end
+  end
+
+  scope :companies do
+    route 'default', Companies::Resolver
   end
 
   # Masters
+  scope :master_schemas do
+    route 'default', Masters::Schema::Resolver
+  end
+
   scope :form_currencies do
     route 'default', Masters::FormCurrencies::Resolver
   end
@@ -35,9 +47,15 @@ Resolver::Router.draw do
   scope :departments do
     route 'default', Masters::Departments::Resolver
   end
+
   scope :locations do
     route 'default', Masters::Locations::Resolver
   end
+
+  scope :states do
+    route 'default', Masters::States::Resolver
+  end
+
   scope :cost_centers do
     route 'default', Masters::CostCenters::Resolver
   end
@@ -197,4 +215,10 @@ Resolver::Router.draw do
   scope :export_resources do
     route 'default', Masters::ExportResources::Resolver
   end
+
+  scope :import_jobs do
+    route 'default', ImportJobs::Resolver
+  end
+
+  route 'masters.*', Masters::Schema::Records::Resolver
 end

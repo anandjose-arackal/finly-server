@@ -120,7 +120,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::InvoicePaymentsBackground < B
       # now once the payment request has been created and the payments saved, we can mark it as open
       max_payment_amount = self.bank_payment_request.payment_order.payments.reload.joins(:amount).pluck(:value).max || 0
       self.bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:open), max_payment_amount: max_payment_amount)
-      self.bank_payment_request.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval))
+      self.bank_payment_request.payment_order.reload.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval))
 
       puts 'SUCCESSFUL!'
     # end

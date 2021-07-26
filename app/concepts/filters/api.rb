@@ -28,7 +28,18 @@ class Filters::API < Transactions::API
   end
 
   def build_config(context, current_user:, **)
-    context[:filters] = self.class.build(current_user)
+    context[:filters] = build(context, current_user)
   end
 
+  # def build(context, current_user)
+  #   self.class.build(context, current_user)
+  # end
+
+  def attributes(context)
+    self.class.attributes
+  end
+
+  def custom_fields
+    self.class.custom_fields
+  end
 end
