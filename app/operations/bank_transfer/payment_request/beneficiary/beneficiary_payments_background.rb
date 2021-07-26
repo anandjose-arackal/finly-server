@@ -16,12 +16,14 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
     self.logger = LogStashLogger.new(type: :file, path: 'log/logstash_payments_creation.log', sync: true)
     self.log_data = {}
     self.log_data[:start_time] = DateTime.now.utc
-    self.log_data[:job] = self.class.name
+    self.log_data[:klass_name] = self.class.name
+    self.log_data[:job] = "payments_creation"
     load_request_store request_store_hash
     if options.present? and options.is_a?(Hash)
       options = options.with_indifferent_access
     end
     self.bank_payment_request = BankPaymentRequest.find_by(id: options[:bank_payment_request_id])
+    self.log_data[:bank_payment_request_id] = self.bank_payment_request&.id
     self.payments_attributes = options[:payments_attributes]
     self.log_data[:number_of_payments] = self.payments_attributes.count
     self.from_payment_agreement = options[:created_from_payment_agreement]
@@ -53,7 +55,7 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
     self.import_date = DateTime.now + rand(2..11).years
 
     self.company_id = self.bank_payment_request.owner.company_id
-    self.log_data[:company] = self.bank_payment_request.owner.company.name
+    self.log_data[:company_name] = self.bank_payment_request.owner.company.name
     self.log_data[:company_id] = self.company_id
     self.user = self.bank_payment_request.owner
     self.payment_mode = self.bank_payment_request.payment_mode
