@@ -69,6 +69,8 @@
 #  erp_sync_reference_id     :text(65535)
 #  erp_sync_attempts_count   :integer          default(0)
 #  erp_sync_attempted_at     :datetime
+#  start_date                :date
+#  end_date                  :date
 #
 
 class User < ApplicationRecord
@@ -163,6 +165,7 @@ class User < ApplicationRecord
   has_many :analytics_dashboards, foreign_key: :created_by_id
 
   has_many :export_jobs, foreign_key: :created_by_id
+  has_many :import_jobs, foreign_key: :created_by_id
 
   # adding association to drop down items
   has_many :user_drop_down_item_mappings

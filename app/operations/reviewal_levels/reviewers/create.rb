@@ -41,6 +41,14 @@ class ReviewalLevels::Reviewers::Create < ReviewalLevels::Reviewers::Base
     end
   end
 
+  def pre_process
+    dup_check_params = reviewer_params
+    dup_check_params[:max] = nil if dup_check_params[:max].blank?
+    if reviewal_level.level_reviewer_mappings.where(dup_check_params).exists?
+      add_message :error, "User already exists in level (#{reviewal_level&.name})"
+    end
+  end
+
   def process
     level_reviewer_mapping = reviewal_level.level_reviewer_mappings.new(reviewer_params)
 

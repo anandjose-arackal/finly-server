@@ -17,8 +17,15 @@ class Transactions::Contracts::PreProcessors::SkipDestroy < Transactions::Contra
             collection.destroy(item) if item
             return skip!
           end
-
-          item ? item : collection.append(model_klass.new)
+          if item
+            item
+          elsif model_klass.is_a?(Proc)
+            collection.append(model_klass.(fragment: fragment).new)
+          elsif model_klass.is_a?(Symbol)
+            collection.append(send(model_klass, fragment: fragment).new)
+          else
+            collection.append(model_klass.new)
+          end
         else
           model || self.send("#{name}=", model_klass.new)
         end

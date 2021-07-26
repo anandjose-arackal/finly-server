@@ -167,6 +167,7 @@ class IndexBuilder::API
   def self.build(user, record, required_columns)
     record_exposure = record.to_exposure
     map = {}
+
     self.columns.each do |column_key, column|
       next if required_columns.present? and not (required_columns.include?(column_key.to_s) or required_columns.include?(column_key.to_sym))
       next if required_columns.blank? and not column.default

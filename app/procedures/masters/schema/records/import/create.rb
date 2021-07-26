@@ -1,0 +1,17 @@
+class Masters::Schema::Records::Import::Create < Masters::Schema::Records::Base
+  include Transactions::BackgroundWorker
+
+  step Model(ImportJob::Master, :new)
+  step Policy::Pundit(Masters::Schema::Records::Policy, :import?)
+  step Transactions::API::AssignModelUser(key: :created_by)
+  step Contract::Build(constant: Masters::Schema::Records::Import::Contract)
+  step Contract::Validate()
+  step Contract::Persist()
+  pass :run_background_job
+  step Transactions::Messages::SuccessMessage('Import in progress')
+
+  def run_background_job(context, model:, current_user:, **)
+    Masters::Schema::Records::Import::Job.call_async(params: {id: model.id, uuid: model.id}, current_user: current_user)
+  end
+
+end

@@ -3450,7 +3450,9 @@ Rails.application.routes.draw do
   # Fixme : Keeping it since its available in current version of master
   get 'autocomplete/:entity', to: 'autocomplete#route' # Fixme Deprecated
 
+  get 'lookup/route', to: 'lookup#route'
   get 'lookup/:route', to: 'lookup#route'
+  get 'lookup/masters/:master_key', to: 'lookup#masters_route'
 
   # get 'features', to: 'static_pages#features'
 
@@ -3908,9 +3910,14 @@ Rails.application.routes.draw do
 
     get 'filters', to: "filters#index"
     get 'views', to: "index_view_segments#index"
+
+    get 'company_groups/lookup', to: "company_groups#lookup"
+    resources :company_groups, only: [:create, :update, :index, :show]
   end
 
   post 'macros/:id/jobs', to: 'macro_jobs#create'
+
+  resources :companies, only: [:create, :update, :index, :show]
 
   namespace :summary do
     get 'configurations', to: 'configuration#index'
@@ -4211,6 +4218,7 @@ Rails.application.routes.draw do
   get 'exports/:type', to: 'export_jobs#create'
   post 'exports/:type', to: 'export_jobs#create'
   resources :export_jobs, only: [:index]
+  resources :import_jobs, only: [:index]
   get 'maps/config/:type', to: 'google_maps#maps_config'
 
   scope :streamsets do
@@ -4328,6 +4336,7 @@ Rails.application.routes.draw do
 
   resources :views, controller: 'index_view_segments', except: [:show]
 
+  get 'cards/:id', to: 'hover_card#route'
   get 'cards/:route/:id', to: 'hover_card#route'
 
   get 'maps/auto_complete', to: 'maps#auto_complete'
@@ -4399,6 +4408,41 @@ Rails.application.routes.draw do
   post 'analytics/token', to: 'analytics#token'
   post 'analytics/:id/export', to: 'analytics#export'
   resources :analytics, only: [:create, :update, :index, :show, :destroy]
+
+  namespace :masters do
+    scope ":master_key" do
+      scope "records" do
+        scope "import" do
+          post '', to: "records#import"
+          get 'template', to: "records#import_template"
+        end
+        post '/', to: 'records#create'
+        get '/', to: 'records#index'
+        get '/:id', to: 'records#show'
+        put '/:id', to: 'records#update'
+        delete '/:id', to: 'records#destroy'
+      end
+
+      scope "filters" do
+        get '', to: "record_filters#show"
+        post '', to: "record_filters#show"
+        get 'choices/:field_key', to: "record_filters#choices"
+        post 'choices/:field_key', to: "record_filters#choices"
+      end
+
+      scope "lookup" do
+        get '', to: "record_lookup#route"
+        post '', to: "record_lookup#route"
+      end
+    end
+
+
+    post '/', to: 'schemas#create'
+    get '/choices', to: 'schemas#choices'
+    put '/:id', to: 'schemas#update'
+    get '/', to: "schemas#index"
+    get '/:id', to: 'schemas#show'
+  end
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

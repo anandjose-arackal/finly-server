@@ -1,7 +1,8 @@
 class CompanyExposure < Exposures::API
 
-  def name
-    record.name
-  end
+  attribute :id, record_attribute: true
+  attribute :name, record_attribute: true
+  attribute :active, record_attribute: true
+  attribute :configuration, record_attribute: true, exposure: true
 
 end
