@@ -1559,6 +1559,23 @@ class Invoice < ApplicationRecord
     budgets
   end
 
+  def invoice_budget_contributions_before_update
+    if self.company.enforce_budget_configuration.enforce_invoice_budget?
+      op = BudgetManager::BudgetLimitValidator::Invoice.({invoice: self, ignore_unbudgetables: true, current_user: self.created_by })
+      
+      op['result'][:budget_contributions] rescue {}
+    end
+    {}
+  end
+
+  def invoice_budget_limit_validation
+    if self.company.enforce_budget_configuration.enforce_invoice_budget?
+      return BudgetManager::BudgetLimitValidator::Invoice.({invoice: self, previous_budget_contributions: self.invoice_budget_contributions_before_update, current_user: self.company.users.first })
+    end
+  end
+
+
+
   private
 
   # def payment_agreement_updations
