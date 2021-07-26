@@ -94,7 +94,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::InvoicePaymentsBackground < B
       payment_param.delete(:custom_fields)
       payment_param[:payment_order_id] = self.bank_payment_request.payment_order.id
       # payment = ::Payment.new(payment_param)
-      payment = self.bank_payment_request.payment_order.payments.build(payment_param)
+      payment = self.bank_payment_request.payment_order.reload.payments.build(payment_param)
       if payment.save
         puts "invoice SUCCESSFULS", payment.id
         # inv_id = payment.invoice.id

@@ -91,7 +91,7 @@ class Procurements::Payments::PoAdvancePaymentsBackground < BackgroundOperation
     self.payment_params.each do |payment_param|
       payment_param[:payment_order_id] = self.bank_payment_request.payment_order.id
       payment = ::Payment.new(payment_param)
-      payment = self.bank_payment_request.payment_order.payments.build(payment_param)
+      payment = self.bank_payment_request.payment_order.reload.payments.build(payment_param)
       if payment.save
         purchase_order = self.purchase_orders.find(payment_param[:purchase_order_id])
         purchase_order.update(advance_amount_status_id: AdvanceAmountStatus.id_for(:initiated))
