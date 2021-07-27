@@ -23,19 +23,19 @@ class MasterEntity::DateTime < MasterEntity
 
         case entity.options['restriction']
         when 'in_the_future'
-          if value.in_time_zone <= DateTime.now
+          if value.in_time_zone <= ::DateTime.now
             errors.add entity.label, "can only be in the future"
           end
         when 'in_the_past'
-          if value.in_time_zone >= DateTime.now
+          if value.in_time_zone >= ::DateTime.now
             errors.add entity.label, "can only be in the past"
           end
         when 'not_in_the_future'
-          if value.in_time_zone > DateTime.now
+          if value.in_time_zone > ::DateTime.now
             errors.add entity.label, "cannot be in the future"
           end
         when 'not_in_the_past'
-          if value.in_time_zone < DateTime.now
+          if value.in_time_zone < ::DateTime.now
             errors.add entity.label, "cannot be in the past"
           end
         else
