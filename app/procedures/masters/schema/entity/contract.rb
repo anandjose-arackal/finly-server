@@ -94,14 +94,14 @@ class Masters::Schema::Entity::Contract < Reform::Form
   }
 
   def choices!(collection:, fragment:, index:, options:, **)
-    choice = choices.find {|choice| choice.key.to_s == fragment["id"].to_s}
+    choice = collection.find {|choice| fragment["id"].present? and (choice.key.to_s == fragment["id"].to_s) }
 
     if fragment["_destroy"]
-      choices.destroy(choice)
+      collection.destroy(choice)
       return skip!
     end
 
-    choice || choices.append(MasterEntityChoice.new)
+    choice || collection.append(MasterEntityChoice.new)
   end
 
 
