@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_07_22_083728) do
+ActiveRecord::Schema.define(version: 2021_07_26_171846) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -4465,7 +4465,7 @@ ActiveRecord::Schema.define(version: 2021_07_22_083728) do
     t.string "form_id", null: false
     t.string "form_entity_id", null: false
     t.string "field_key", null: false
-    t.text "value"
+    t.text "value", collation: "utf8_bin"
     t.string "value_text"
     t.datetime "deleted_at"
     t.datetime "created_at", precision: 6, null: false
@@ -5585,9 +5585,9 @@ ActiveRecord::Schema.define(version: 2021_07_22_083728) do
     t.string "billing_address_gstin", default: ""
     t.string "shipping_address_name", default: ""
     t.string "shipping_address_gstin", default: ""
-    t.string "base_currency"
-    t.string "reporting_currency"
-    t.string "vendor_country"
+    t.integer "base_currency_id"
+    t.integer "reporting_currency_id"
+    t.integer "vendor_country_id"
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["agreement_item_id"], name: "index_invoices_on_agreement_item_id"
     t.index ["company_id", "controlling_level_id", "deleted_at"], name: "index_invoice_ct_lvl_cmpny_id"
