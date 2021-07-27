@@ -93,8 +93,9 @@ class Masters::JsonBuilder
 
     master_schema.entities.each do |entity|
       if entity.type?(:lookup) or entity.type?(:parent_lookup)
-        json[entity.association_name] = build_lookup(record, entity)
+        # json[entity.association_name] = build_lookup(record, entity)
         json[entity.entity_key] = record.send(entity.entity_key)
+        json["#{entity.entity_key}_value"] = record.send(entity.association_name)&.primary_entity_value
       elsif entity.type?(:multi_lookup)
         json[entity.entity_key] = build_multi_lookup(record, entity)
       else

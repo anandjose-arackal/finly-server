@@ -64,12 +64,16 @@ module Masters::Entity::Record
         master_schema
       end
 
+      define_method :primary_entity_value do
+        send(master_schema.primary_entity_key)
+      end
+
       define_method :as_json do |options = {}|
         if options[:compact]
           # Compact will only render the id and display name attributes
           {
               id: id,
-              name: send(master_schema.primary_entity_key)
+              name: primary_entity_value
           }
         else
           Masters::JsonBuilder.(master_schema, self)
