@@ -15,6 +15,10 @@ class BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor 
       return
     end
 
+    parent_forms_enabled = invoice_item.parent_forms_enabled
+
+    # invoice_forms_enabled to be used for new form invoice budget processing as for new form structure it should be calculated based on reporting values 
+
     # if this an invoice from a PO, a few things need to be sorted out first.
     # Firstly, the amount considered in the invoice item should reduce the proporionate amount consumed from the PO invoice item it is linked to
     # now based on whether it's a good ors service, we have to put the billed_amount_value attribute - which contains the amount we want to consider in the budget
@@ -51,13 +55,22 @@ class BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor 
     end
 
     if invoice.rcm_enabled
-      rcm_tax_value = invoice_item.tax_amount&.value.to_f
+      if parent_forms_enabled 
+        rcm_tax_value = invoice_item.reporting_item_tax_amount&.to_f
+      else
+        rcm_tax_value = invoice_item.tax_amount&.value.to_f
+      end
       tax_amount = 0
       # in case it's an RCM invoice we can always say that amount before and after tax is gonna be the same
       billed_amount_after_tax = billed_amount_before_tax
     else
       rcm_tax_value = 0
-      tax_amount = invoice_item.tax_amount&.value.to_f
+
+      if parent_forms_enabled 
+        tax_amount = invoice_item.reporting_item_tax_amount&.to_f
+      else
+        tax_amount = invoice_item.tax_amount&.value.to_f
+      end
     end
 
     # extracting the PO Item's BudgetTrail object here to store the reference, because we need to update

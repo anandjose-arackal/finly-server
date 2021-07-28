@@ -1392,11 +1392,19 @@ class Invoice < ApplicationRecord
   end
 
   def tds_per_item
-    self.tds_amount&.value.to_f / self.items.count
+    if forms_enabled
+      (self.reporting_invoice_tds_amount.to_f / self.items.count.to_f) rescue 0
+    else
+      (self.tds_amount&.value.to_f / self.items.count.to_f) rescue 0
+    end
   end
 
   def advance_per_item
-    self.advance_amount&.value.to_f / self.items.count
+    if forms_enabled
+      (self.reporting_invoice_paid_outside_amount.to_f / self.items.count.to_f) rescue 0
+    else
+      (self.advance_amount&.value.to_f / self.items.count.to_f) rescue 0
+    end
   end
 
   def cn_adjustment_per_item
@@ -1544,6 +1552,29 @@ class Invoice < ApplicationRecord
     bank_payment_request_policies = Policy::VendorPayments::Index.(user, role_filter).policies rescue Policy.none
     bank_payment_request_policies
   end
+
+  def invoice_budgets
+    op = BudgetManager::BudgetsCalculator::ApplicableBudgets.({document: self, current_user: User.first})
+    budgets = op["result"][:budgets]
+    budgets
+  end
+
+  def invoice_budget_contributions_before_update
+    if self.company.enforce_budget_configuration.enforce_invoice_budget?
+      op = BudgetManager::BudgetLimitValidator::Invoice.({invoice: self, ignore_unbudgetables: true, current_user: self.created_by })
+      
+      op['result'][:budget_contributions] rescue {}
+    end
+    {}
+  end
+
+  def invoice_budget_limit_validation
+    if self.company.enforce_budget_configuration.enforce_invoice_budget?
+      return BudgetManager::BudgetLimitValidator::Invoice.({invoice: self, previous_budget_contributions: self.invoice_budget_contributions_before_update, current_user: self.company.users.first })
+    end
+  end
+
+
 
   private
 

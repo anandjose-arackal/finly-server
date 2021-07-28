@@ -79,6 +79,9 @@ json.budget_trail_items do
         json.sub_department invoice_line_item.parent&.sub_department&.name
         json.invoice_number invoice_line_item.parent.invoice_number
         json.index index
+        json.get_base_currency invoice_line_item.get_base_currency
+        json.get_reporting_currency invoice_line_item.get_reporting_currency
+        json.reporting_item_net_amount invoice_line_item&.reporting_item_net_amount.to_f
         index += 1
       end
     end

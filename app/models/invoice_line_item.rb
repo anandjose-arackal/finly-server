@@ -183,8 +183,6 @@ class InvoiceLineItem < ApplicationRecord
   
   # Updating this for forms, due to some unknown issue 
   before_save :set_tds_applicable
-  # after_commit :set_tds_applicable, on: [:create, :update]
-
   after_save :budget_trail_entry
   after_save :sync_amounts, unless: :skip_callback
   after_save :set_currency_for_amount, unless: :skip_callback
@@ -228,12 +226,19 @@ class InvoiceLineItem < ApplicationRecord
   scope :with_invoice_id, -> (invoice_id) {where invoice_id: invoice_id}
 
   def before_tax_amount
-    self.taxable_amount&.value.to_f
+    if parent_forms_enabled
+      self.reporting_item_taxable_amount&.to_f
+    else
+      self.taxable_amount&.value.to_f
+    end
   end
 
   def after_tax_amount
-
-    self.net_amount&.value.to_f
+    if parent_forms_enabled
+      self.reporting_item_net_amount&.to_f
+    else
+      self.net_amount&.value.to_f
+    end
   end
 
 
@@ -399,6 +404,15 @@ class InvoiceLineItem < ApplicationRecord
   def retrieve_value(entity)    
     send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
   end
+
+  def parent_forms_enabled
+    invoice_forms_enabled = false
+    if parent.respond_to?(:forms_enabled) && parent.forms_enabled
+      invoice_forms_enabled = true
+    end
+    invoice_forms_enabled
+  end
+
 
   private
 
