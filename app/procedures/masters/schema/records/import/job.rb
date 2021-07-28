@@ -44,9 +44,9 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
   def build_headers(context, params:, master_schema:, **)
     context[:headers] = {}.with_indifferent_access
     context[:identifier_key] = master_schema.sequence_entity&.entity_key
-    if master_schema.has_nesting
-      context[:headers][:parent_id] << "Parent Id"
-    end
+    # if master_schema.has_nesting
+    #   context[:headers][:parent_id] = "Parent Id"
+    # end
     master_schema.entities.only_active.each do |entity|
       context[:headers][entity.entity_key] = entity.label
     end
