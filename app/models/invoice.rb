@@ -151,7 +151,7 @@
 
 class Invoice < ApplicationRecord
   attr_accessor :skip_callback
-  include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport, ControllingUser
+  include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport, ControllingUser, GetCurrency
   include LiquidDroppable
   include Exposures::Model::Exposable
   include Sequenced::ActsAsSequenced
@@ -174,14 +174,14 @@ class Invoice < ApplicationRecord
   money :invoice_roundoff_amount, :get_reporting_currency
   money :invoice_balance_due, :get_reporting_currency
 
-  def get_reporting_currency
-    Currency.currency_for(self.reporting_currency ) rescue self.company.reporting_currency.country_code
-  end
+  # def get_reporting_currency
+  #   Currency.currency_for(self.reporting_currency ) rescue self.company.reporting_currency.country_code
+  # end
 
-  def get_base_currency
-    currency_code = Currency.find(self.base_currency)&.country_code rescue nil
-    Currency.currency_for(currency_code || "INR")
-  end
+  # def get_base_currency
+  #   currency_code = Currency.find(self.base_currency)&.country_code rescue nil
+  #   Currency.currency_for(currency_code || "INR")
+  # end
 
 
   exchange_bank :get_reporting_currency, :get_base_currency, :exchange_rate
@@ -190,7 +190,7 @@ class Invoice < ApplicationRecord
   def exchange_rate
     ExchangeRate.get_rate(
       self.conversion_date,
-      self.reporting_currency,
+      self.get_reporting_currency.country_code,
       get_base_currency&.country_code || "INR"
     )
   end
@@ -259,6 +259,9 @@ class Invoice < ApplicationRecord
   belongs_to :vendor_location, class_name: "GstinLocation", optional: true
   belongs_to :payment_agreement, optional: true
   belongs_to :agreement_item, optional: true, polymorphic: true
+  belongs_to :base_currency, optional: true, class_name: 'Currency'
+  belongs_to :reporting_currency, optional: true, class_name: 'Currency'
+  belongs_to :vendor_country, optional: true, class_name: 'Country'
 
   has_one :credit_note
   has_many :document_level_reviewer_mappings, as: :document_reviewer_mappable
@@ -341,8 +344,8 @@ class Invoice < ApplicationRecord
   before_create :set_currency
 
   def set_currency
-    self.reporting_currency = self.company.reporting_currency_code if self.reporting_currency.blank? 
-    self.base_currency = self.company.reporting_currency.id if self.base_currency.blank? 
+    self.reporting_currency_id = self.company.reporting_currency.id if self.reporting_currency.blank? 
+    self.base_currency_id = self.company.reporting_currency.id if self.base_currency.blank? 
     self.conversion_rate = 1
   end
 
@@ -422,7 +425,7 @@ class Invoice < ApplicationRecord
   }
 
 
-  scope :filter_base_currency, -> (base_currency_id) { where base_currency: base_currency_id }
+  scope :filter_base_currency, -> (base_currency_id) { where base_currency_id: base_currency_id }
 
   # scope :filter_awaiting_approval, -> (enabled) {
   #   if StringUtils.to_bool(enabled)
@@ -792,7 +795,11 @@ class Invoice < ApplicationRecord
   end
 
   def tds_rate
-    self.tds
+    if forms_enabled
+      self.tds_percentage
+    else
+      self.tds
+    end
   end
 
   def discount_rate
@@ -915,11 +922,19 @@ class Invoice < ApplicationRecord
   end
 
   def invoice_balance_due
-    self[:invoice_balance_due].to_f - self.invoice_advance_paid_amount.to_f
+    if self.forms_enabled
+      self[:invoice_balance_due].to_f - self.invoice_advance_paid_amount.to_f
+    else
+      balance_due&.value.to_f - paid_amount_value
+    end
   end
 
   def reporting_invoice_balance_due
-    self[:reporting_invoice_balance_due].to_f - self.reporting_invoice_advance_paid_amount.to_f 
+    if self.forms_enabled
+      self[:reporting_invoice_balance_due].to_f - self.reporting_invoice_advance_paid_amount.to_f 
+    else
+      balance_due&.value.to_f - paid_amount_value
+    end
   end
 
   def invoice_sub_total_amount
@@ -1530,9 +1545,9 @@ class Invoice < ApplicationRecord
   end
 
   def retrieve_value(entity)
-    return get_base_currency.country_code if entity.entity_key == 'base_currency'
+    # return get_base_currency.country_code if entity.entity_key == 'base_currency'
     return tds_slab&.dispaly_name if entity.entity_key == 'tds_slab_id'
-    
+  
     send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
   end
 

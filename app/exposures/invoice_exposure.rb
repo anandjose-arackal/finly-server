@@ -205,12 +205,13 @@ class InvoiceExposure < Exposures::API
   end
 
   attribute :base_currency_code do    
-    country_code = Currency.find_by(id: record.base_currency).country_code rescue 'INR'
-    country_code
+    # country_code = Currency.find_by(id: record.get_base_currency.id).country_code rescue 'INR'
+    # country_code
+    record.get_base_currency.country_code
   end
 
   attribute :reporting_currency_code do
-    record.reporting_currency
+    record.get_reporting_currency.country_code
   end
 
   attribute :conversion_rate do

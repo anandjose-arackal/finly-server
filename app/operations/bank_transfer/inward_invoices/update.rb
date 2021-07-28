@@ -311,9 +311,9 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
     # Adding default currency as per form structure.
 
-    self.inward_invoice.reporting_currency = user.company.reporting_currency_code
-    self.inward_invoice.base_currency = user.company.reporting_currency.id
-    self.inward_invoice.conversion_rate = 1
+    # self.inward_invoice.reporting_currency = user.company.reporting_currency_code
+    # self.inward_invoice.base_currency = user.company.reporting_currency.id
+    # self.inward_invoice.conversion_rate = 1
 
   end
 
