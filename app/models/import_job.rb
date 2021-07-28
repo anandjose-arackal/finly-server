@@ -45,8 +45,7 @@ class ImportJob < ApplicationRecord
   ransack_scopes :with_status_id
 
   has_attached_file :attachment, :use_timestamp => false
-  validates_attachment_content_type :attachment,
-                                    content_type: %w(application/vnd.ms-excel application/vnd.openxmlformats-officedocument.spreadsheetml.sheet text/csv text/plain)
+  validates_attachment :attachment, content_type: {content_type: []}
 
   serialize :request_params, JSON
   serialize :options, JSON
