@@ -25,6 +25,7 @@ class Company < NonTenantedApplicationRecord
   belongs_to :base_currency, optional: true, class_name: 'Currency'
   belongs_to :status, optional: true, class_name: 'CompanyStatus'
   belongs_to :group, optional: true, class_name: 'CompanyGroup'
+  belongs_to :country, optional: true, class_name: 'Country'
 
   has_many :form_currencies
   has_many :rate_contracts

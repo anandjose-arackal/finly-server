@@ -47,6 +47,10 @@ class Currency < NonTenantedApplicationRecord
     ).to_f.round(5)
   end
 
+  def name
+    self&.country_code
+  end
+
   CURRENCIES = [
       {
           country: "India Rupee",

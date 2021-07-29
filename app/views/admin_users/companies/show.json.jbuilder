@@ -1,8 +1,8 @@
 json.id @result.company.id
 json.name @result.company.name
 json.company_group do
-  json.id @result.company.group.id
-  json.name @result.company.group.name
+  json.id @result.company.group&.id
+  json.name @result.company.group&.name
 end
 json.subdomain @result.company.subdomain
 json.d_code @result.company.d_code
@@ -19,7 +19,7 @@ json.medical_card_enabled @result.company.medical_card_enabled?
 json.expense_card_enabled @result.company.expense_card_enabled?
 json.reimbursement_card_enabled @result.company.reimbursement_card_enabled?
 json.em_tax_tracking @result.company.em_tax_tracking_enabled?
-json.itz_cash_company_balance 0
+json.itz_cash_company_balance @result.company.itz_cash_company_balance
 json.hard_copy_receipt @result.company.hard_copy_receipt_enabled?
 json.encrypted_params @result.company.configuration.encrypted_easy_login_params
 json.itz_cash_d_code_enabled @result.company.itz_cash_d_code_enabled?

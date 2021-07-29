@@ -168,8 +168,12 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     #     return true
     #   end
     # end
+    
+    unless user&.company&.country_id == Country.id_for('India')
+      return false
+    end
 
-    unless bank_payment_request.is_domestic
+    unless bank_payment_request.is_domestic 
       return false
     end
 
