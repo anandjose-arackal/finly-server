@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file. Always add new logs to 
 beginning of this file.
 
+## 2021-06-22
+  - Fix: two way sync, update and column issue fix.
+
 ## 2021-05-17
   - Feat: Updating migration, fixing lookup issue and stabilizing the invoice forms.
 

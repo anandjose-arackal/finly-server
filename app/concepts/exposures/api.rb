@@ -18,7 +18,7 @@ class Exposures::API < Liquid::Drop
   #       All record attributes that are data providers will be added to the include list by default
   #   - exposure: Flag if the result should be converted to a Exposure::API
   def self.attribute(name, includes: [], record_attribute: false, exposure: false, data_type: :text, &block)
-    raise "#{name} is already defined for class #{self.name}" if exists?(name)
+    # raise "#{name} is already defined for class #{self.name}" if exists?(name)
     raise "#{name} : Non-record attributes require a block for fetching the data" unless record_attribute or block_given?
 
     if record_attribute and exposure

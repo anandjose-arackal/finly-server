@@ -4,6 +4,11 @@ class Masters::Categories::Resolver < Resolver::API
 
   def load(params)
     categories = user.company.categories
+
+    if params[:scope].present?
+      return categories.send(params[:scope])
+    end
+
     if app.to_s == 'em'
       return categories.expense_management_only
     elsif app.to_s == 'vp'

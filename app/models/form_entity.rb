@@ -101,6 +101,7 @@ class FormEntity < ApplicationRecord
   serialize :config, JSON
   serialize :compute_formula, JSON
   serialize :compute_lookup_assignments, JSON
+  serialize :triggers, JSON
 
   scope :root, -> { where parent_id: nil }
   scope :system_fields, -> { where system_field: true }
@@ -122,7 +123,7 @@ class FormEntity < ApplicationRecord
     val = super()&.with_indifferent_access
     return nil unless val.present?
 
-    Choices[val[:type]].new(val[:config], form_entity: self)
+    Choices[val[:type]].new(val[:config], entity: self)
   end
 
   def contract(contract, user)

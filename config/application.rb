@@ -21,10 +21,9 @@ module Finly
     # config.autoload_paths += %W(#{config.root}/lib)
 
     config.eager_load_paths << Rails.root.join('lib')
-
     Raven.configure do |config|
-      if Rails.env.production?
-        config.dsn = 'https://bed720c1d80849fcbc96fba0485460e6@sentry.finly.io/2'
+      if File.exist?("#{Rails.root}/config/sentry.yml") &&  Rails.application.config_for(:sentry)[:dsn].present?
+        config.dsn = Rails.application.config_for(:sentry)[:dsn]
       end
     end
 

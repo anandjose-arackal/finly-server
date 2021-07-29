@@ -75,6 +75,7 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
   property :compute_formula
   property :compute_lookup_entity_id
   property :compute_lookup_assignments
+  property :triggers
 
   validation   do
     params do

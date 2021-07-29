@@ -638,6 +638,4 @@ class BbpsBill < ApplicationRecord
     self.skip_callback = true
     self.save
   end
-
-
 end

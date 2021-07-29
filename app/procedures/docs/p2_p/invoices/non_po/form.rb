@@ -8,7 +8,8 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
         id: record.created_by&.id,
         name: record.created_by&.name,
         email: record.created_by&.email,
-      }
+      },
+      company_country_id: record.company.country_id.to_s
     }
   }
 
@@ -42,16 +43,17 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       invoice_freight_amount: "{{ form.invoice_freight_amount | default: 0 | round: 2}}",
       # NET AMOUNT
       invoice_sub_total_amount: "{% assign inv_sub_total_amount = form.invoice_gross_amount | minus: form.invoice_discount_amount | plus: form.invoice_tax_amount | plus: form.invoice_freight_amount | round: 2 %}{% if form.rcm_enabled == true  %}{{ inv_sub_total_amount | minus: form.invoice_tax_amount | default: 0 | round: 2}}{% else %}{{ inv_sub_total_amount | default: 0 | round: 2 }}{% endif %}",
-      
       invoice_paid_outside_amount: "{{ form.invoice_paid_outside_amount | default: 0 | round: 2}}",
       invoice_tds_amount: "{% assign tds_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign tds_amount = tds_amount | plus: item.item_tds_amount %}{% endif %}{% endfor %}{{ tds_amount  | default: 0 | ceil}}",
       
       #### net payable amount 
-      invoice_roundoff_amount: "{% assign net_total_amount = form.invoice_sub_total_amount | minus: form.invoice_paid_outside_amount | minus: form.invoice_tds_amount %}{% assign round_amount = net_total_amount | round %}{% assign amount = round_amount | minus: net_total_amount %}{% if form.base_currency != '1' %}{% assign amount = 0 %}{% endif %}{{ amount | default: 0 | round: 2 }}",
+      # invoice_roundoff_amount: "{% assign net_total_amount = form.invoice_sub_total_amount | minus: form.invoice_paid_outside_amount | minus: form.invoice_tds_amount %}{% assign round_amount = net_total_amount | round %}{% assign amount = round_amount | minus: net_total_amount %}{% if form.base_currency_id != form.reporting_currency_id %}{% assign amount = 0 %}{% endif %}{{ amount | default: 0 | round: 2 }}",
+      invoice_roundoff_amount: "{% assign net_total_amount = form.invoice_sub_total_amount | minus: form.invoice_paid_outside_amount | minus: form.invoice_tds_amount %}{% assign round_amount = net_total_amount | round %}{% assign amount = round_amount | minus: net_total_amount %}{% if form.base_currency_id == '1' and form.reporting_currency_id == '1' %}{{ amount | default: 0 | round: 2 }}{% else %}{{ 0 }}{% endif %}",
       invoice_total_amount: "{{ form.invoice_sub_total_amount | plus: form.invoice_roundoff_amount | minus: form.invoice_tds_amount | minus: form.invoice_paid_outside_amount | default: 0 | round: 2}}",
       
       #### net payable amount has roundoff value added
-      invoice_net_total_amount: "{% if form.base_currency != '1' %}{{ form.invoice_total_amount | default: 0 | round: 2 }}{% else %}{{ form.invoice_total_amount | default: 0 | round }}{% endif %}",
+      # invoice_net_total_amount: "{% if form.base_currency_id != form.reporting_currency_id %}{{ form.invoice_total_amount | default: 0 | round: 2 }}{% else %}{{ form.invoice_total_amount | default: 0 | round }}{% endif %}",
+      invoice_net_total_amount: "{% if form.base_currency_id == '1' and form.reporting_currency_id == '1' %}{{ form.invoice_total_amount | default: 0 | round }}{% else %}{{ form.invoice_total_amount | default: 0 | round: 2 }}{% endif %}",
       invoice_advance_paid_amount: "{{ form.invoice_advance_paid_amount | default: 0 | round: 2}}",
       invoice_balance_due: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | default: 0 | round: 2}}",
       
@@ -69,7 +71,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       reporting_invoice_sub_total_amount: "{{ form.invoice_sub_total_amount | times: form.conversion_rate | default: 0 | round: 2}}",
       reporting_invoice_paid_outside_amount: "{{ form.invoice_paid_outside_amount | times: form.conversion_rate | default: 0 | round: 2}}",
       reporting_invoice_tds_amount: "{{ form.invoice_tds_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_invoice_roundoff_amount: "{% assign amount = form.reporting_invoice_sub_total_amount | round %}{% assign amount = amount | minus: form.reporting_invoice_sub_total_amount %}{% if form.base_currency != '1' %}{% assign amount = 0 %}{% endif %}{{ amount | default: 0 | round: 2}}",
+      reporting_invoice_roundoff_amount: "{% assign amount = form.reporting_invoice_sub_total_amount | round %}{% assign amount = amount | minus: form.reporting_invoice_sub_total_amount %}{% if form.base_currency_id == '1' and form.reporting_currency_id == '1' %}{{ amount | default: 0 | round: 2}}{% else %}{{ 0 }}{% endif %}",
       # reporting_invoice_total_amount: "{% assign amount = form.reporting_invoice_sub_total_amount | plus: form.reporting_invoice_roundoff_amount %}{% if form.base_currency != '1' %}{% assign amount = form.reporting_invoice_sub_total_amount %}{% endif %}{{ amount | default: 0 | round: 2 }}",
       reporting_invoice_total_amount: "{{ form.invoice_total_amount | times: form.conversion_rate | default: 0 | round: 2}}",
       
@@ -134,6 +136,8 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
     date :transaction_service_period_from, label: 'Transaction Service Period (From Date)', editable: true, visible: true, computed: Forms::Compute::Form( '{{ form.transaction_service_period_from | default: "now" | date: "%Y-%m-%d" }}')
     date :transaction_service_period_to, label: 'Transaction Service Period (To Date)', editable: true, visible: true, computed: Forms::Compute::Form('{{ form.transaction_service_period_to | default: "now" | date: "%Y-%m-%d" }}')
     
+    # lookup :company_country_id, label: 'Company Country', editable: false, visible: false, computed: Forms::Compute::Form('{{ form.company.country_id}}'), virtual: true
+    
     large_text :narration, label: "Narration", visible: true
   end
 
@@ -145,13 +149,16 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
     dropdown :discount_type_id, label: "Discount Type", editable: true, visible: true, required: true, choices_scope: Choices[:list].({ id: 1, name: 'Percentage' }, { id: 2, name: 'Amount' }), default_value: 1
 
     dropdown :tax_type_id, label: "Tax Type", editable: true, visible: true, choices_scope: Choices[:list].(*TaxType.all.map { |v| { id: v.id, name: v.name } })
-    date :conversion_date, label: "Conversion Date", editable: false, visible: true, computed: Forms::Compute::Form('{{form.date}}')
+    
+    date :conversion_date, label: "Conversion Date", editable: false, visible: true, computed: Forms::Compute::Form('{{form.date}}'), triggers: {on_change: {lookup_details: [:base_currency_id]},on_compute: {lookup_details: [:base_currency_id]}}
+    
+    # date :conversion_date, label: "Conversion Date", editable: false, visible: true, computed: Forms::Compute::Form('{{form.date}}'), triggers: {on_change: {lookup_details: [:base_currency]}, on_compute: {lookup_details: [:base_currency]}}
 
-    text :reporting_currency, label: "Reporting Currency", editable: false, visible: true, can_editable_be_changed: false
-    lookup :base_currency, label: "Base Currency", choices_scope: Choices[:lookup].('currencies'), visible: true, editable: true
+    lookup :reporting_currency_id, label: "Reporting Currency", choices_scope: Choices[:lookup].('currencies'), visible: true, editable: false, can_editable_be_changed: false
+    lookup :base_currency_id, label: "Base Currency", choices_scope: Choices[:lookup].('currencies'), visible: true, editable: true
 
     switch :retrieve_conversion_rate, label: "Auto Populate Conversion Rate", default_value: true, visible: false
-    number :conversion_rate, editable: true, format: 'decimal', default_value: 1, computed: Forms::Compute::Lookup('base_currency', '{{ record.currency_conversion_rate }}', assignments: {conversion_date: "{{form.conversion_date}}", to_currency: "{{form.reporting_currency}}"}), visible: true
+    number :conversion_rate, editable: true, format: 'decimal', max_decimal_places: 5, default_value: 1, computed: Forms::Compute::Lookup('base_currency_id', '{{ record.currency_conversion_rate }}', assignments: {conversion_date: "{{form.conversion_date}}", to_currency: "{{form.reporting_currency_id}}"}), visible: true
   end
 
   # VENDOR DETAILS
@@ -160,7 +167,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
            can_editable_be_changed: false, can_be_disabled: false, can_required_be_changed: false, can_visible_be_changed: false
 
     lookup :vendor_trade_name, label: 'Vendor Trade Name', editable: false, visible: true, computed: Forms::Compute::Lookup('vendor_id', '{{record.trade_name}}', assignments: { created_by_id: "{{meta.created_by_id}}" })
-    text :vendor_country, editable: false, visible: true, computed: Forms::Compute::Lookup('vendor_id', '{{record.vendor_country}}')
+    lookup :vendor_country_id, editable: false, visible: true, choices_scope: Choices[:lookup].('countries')
 
     text :vendor_sequence_id, "Vendor ID", editable: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.vendor_id}}')
 
@@ -223,7 +230,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       lookup :items_department_id, label: "Department", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('departments', assignments: { form: true })
       lookup :items_cost_center_id, label: "Cost Center", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('cost_centers')
 
-      lookup :category_id, label: "Category", required: true, visible: true, editable: true, choices_scope: Choices[:lookup].('categories'), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.category_id}}')
+      lookup :category_id, label: "Category", required: true, visible: true, editable: true, choices_scope: Choices[:lookup].('categories', scope: :inward_invoice_line_items_only), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.category_id}}'), triggers: {on_compute: {lookup_details: [:category_id]}}
 
       text :gl_code, label: "GL Code", editable: false, visible: false, 
         computed: Forms::Compute::Lookup('items.category_id', '{{record.gl_code_or_item_number}}', assignments: {item_number: "{{row.item_number}}"})
@@ -233,7 +240,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
       lookup :tds_applicable, visible: true, editable: false,
              can_editable_be_changed: false,
-             can_visible_be_changed: false,
+             can_visible_be_changed: false, choices_scope: Choices[:list].({ id: true, name: 'true' }, { id: false, name: 'false' }),
              computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.tds_applicable }}')
 
       # currency :currency_code, editable: false, visible: false, computed: Forms::Compute::Form("{{ form.currency_code }}")
@@ -245,15 +252,16 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
                computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.unit_of_measurement}}')
 
       amount :item_rate,
-             label: "Item Rate",
+             label: "Item Rate (Reporting Currency)",
              computed: Forms::Compute::Form('{{ row.rate | times: form.conversion_rate | round: 2 }}'),
-             visible: true
+             visible: true,
+             editable: false
 
-      amount :rate, label: "Rate",
+      amount :rate, label: "Rate (Base Currency)",
              can_editable_be_changed: false,
              can_visible_be_changed: false,
              required: true, visible: true, editable: true,
-             computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.rate_in_base_currency | default: 0 | round: 2 }}', assignments: {conversion_date: "{{form.conversion_date}}", base_currency_id: "{{form.base_currency}}", reporting_currency: "{{form.reporting_currency}}"})
+             computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.rate_in_base_currency | default: 0 | round: 2 }}', assignments: {conversion_date: "{{form.conversion_date}}", base_currency_id: "{{form.base_currency_id}}", reporting_currency_id: "{{form.reporting_currency_id}}", conversion_rate: "{{form.conversion_rate}}"})
 
       # gross_amount = rate x quantity
       amount :item_gross_amount, label: 'Item Gross Amount', editable: false, visible: false,
@@ -433,7 +441,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_paid_outside_amount])
 
-      number :invoice_roundoff_amount, label: 'Roundoff Amount', visible: true, editable: false,
+      number :invoice_roundoff_amount, label: 'Roundoff Amount', visible: false, editable: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_roundoff_amount]) # todo - changd name
 
       amount :reporting_invoice_roundoff_amount, label: 'Roundoff Amount(Reporting Currency)', editable: false, visible: false,
@@ -491,12 +499,18 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
     rule Rules::Builder['due_date'].lt(entity: "date")
   end
 
-  # validation validation_id: "Conversion Rate must be greater than 0" do
-  #   reference 'conversion_rate'
-  #   error_message "Conversion Rate must be greater than 0"
-  #   rule Rules::Builder['conversion_rate'].gteq(value: 0.0)
-  # end
+  validation validation_id: "Invoice Discount Cannot be greater than Invoice Gross Amount" do
+    reference 'items_summary.invoice_discount_amount'
+    error_message "Invoice Discount Cannot be greater than Invoice Gross amount"
+    rule Rules::Builder['items_summary.invoice_discount_amount'].gt(entity: "items_summary.invoice_gross_amount")
+  end
 
+  validation validation_id: "Item Discount Cannot be greater than Item gross amount" do
+    reference 'items.item_discount_amount'
+    error_message "Item Discount Amount Cannot be greater than Item Gross Amount"
+    rule Rules::Builder['items.item_discount_amount'].gt(entity: "items.item_gross_amount")
+  end
+  
   # CONDITIONS
   condition condition_id: "Policy should not be editable once unless in editable status" do
     reference :entity, :policy_id
@@ -507,90 +521,70 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
   condition condition_id: "Enable Bank Accounts > Swift / BIC Code for International Vendors" do
     reference :entity, 'vendor_bank_account_swift_code'
-    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    rule Rules::Builder[:vendor_country_id_value].not_eq(value: 'India')
     action :visible, true
     action :required, true
   end
 
+  condition condition_id: "Disable Bank Accounts > IFSC Code for International Vendors" do
+    reference :entity, 'vendor_bank_account_ifsc'
+    rule Rules::Builder[:vendor_country_id_value].not_eq(value: 'India')
+    action :visible, false
+    action :required, false
+  end
+
+  condition condition_id: "Base Currency non editable for Local vendor" do
+    reference :entity, 'base_currency_id'
+    rule Rules::Builder[:vendor_country_id_value].eq(value: 'India')
+    action :editable, false
+  end
+
   condition condition_id: "Disable Vendor Location > No Location for International Vendors" do
     reference :entity, 'gstin_location_id'
-    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    rule Rules::Builder[:vendor_country_id_value].not_eq(value: 'India')
     action :visible, false
     action :required, false
   end
 
   condition condition_id: "Disable Vendor Gstin > No Gstin for International Vendors" do
     reference :entity, 'vendor_gstin'
-    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    rule Rules::Builder[:vendor_country_id_value].not_eq(value: 'India')
     action :visible, false
     action :required, false
   end
 
   condition condition_id: "Disable Vendor Pan > No Pan for International Vendors" do
     reference :entity, 'vendor_pan'
-    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    rule Rules::Builder[:vendor_country_id_value].not_eq(value: 'India')
     action :visible, false
     action :required, false
   end
-
-  condition condition_id: "Disable Bank Accounts > IFS Code for International Vendors" do
-    reference :entity, 'vendor_bank_account_ifsc'
-    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
-    action :visible, false
-    action :required, false
-  end
-
-  # condition condition_id: "Disable Item Tds Applicable > Tds Applicable for International Vendors" do
-  #   reference :entity, 'items.tds_applicable'
-  #   rule Rules::Builder[:vendor_country].not_eq(value: 'India')
-  #   action :visible, false
-  #   action :required, false
-  # end
-
-  # condition condition_id: "Disable Summary TDS Slab > Summary TDS Slab for International Vendors" do
-  #   reference :entity, 'items_summary.tds_slab_id'
-  #   rule Rules::Builder[:vendor_country].not_eq(value: 'India')
-  #   action :visible, false
-  #   action :required, false
-  # end
-
-  # condition condition_id: "Disable Summary TDS Percentage > Summary TDS Percentage for International Vendors" do
-  #   reference :entity, 'items_summary.tds_percentage'
-  #   rule Rules::Builder[:vendor_country].not_eq(value: 'India')
-  #   action :visible, false
-  #   action :required, false
-  # end
-
-  # condition condition_id: "Disable Summary TDS Amount > TDS Amount for International Vendors" do
-  #   reference :entity, 'items_summary.invoice_tds_amount'
-  #   rule Rules::Builder[:vendor_country].not_eq(value: 'India')
-  #   action :visible, false
-  #   action :required, false
-  # end
 
   condition condition_id: "Disable RCM for International > Rcm for International Vendors" do
     reference :entity, 'rcm_enabled'
-    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    rule Rules::Builder[:vendor_country_id_value].not_eq(value: 'India')
     action :visible, false
   end
 
   condition condition_id: "Disable HSN/SAC for International > HSN/SAC for International Vendors" do
     reference :entity, 'items.hsn_sac'
-    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
+    rule Rules::Builder[:vendor_country_id_value].not_eq(value: 'India')
     action :visible, false
   end
-
-  condition condition_id: "Base Currency non editable for Indian vendor" do
-    reference :entity, 'base_currency'
-    rule Rules::Builder[:vendor_country].eq(value: 'India')
-    action :editable, false
+  
+  condition condition_id: "Disable Shipping address gstin for International" do
+    reference :entity, 'shipping_address_gstin'
+    rule Rules::Builder[:vendor_country_id_value].not_eq(value: 'India')
+    action :visible, false
+    action :required, false
   end
 
-  # condition condition_id: "Hide Conversion Rate for indian currency" do
-  #   reference :entity, 'conversion_rate'
-  #   rule Rules::Builder[:reporting_currency].eq(entity: :base_currency)
-  #   action :visible, false
-  # end
+  condition condition_id: "Disable Billing address gstin for International" do
+    reference :entity, 'billing_address_gstin'
+    rule Rules::Builder[:vendor_country_id_value].not_eq(value: 'India')
+    action :visible, false
+    action :required, false
+  end
 
   condition condition_id: "Disable item department > Item department not for Header Cost Allocation Items" do
     reference :entity, 'items.items_department_id'
@@ -624,127 +618,49 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
     action :editable, false
   end
 
-  # condition condition_id: "Hide Reporting Roundoff for different currency" do
-  #   reference :entity, 'items_summary.reporting_invoice_roundoff_amount'
-  #   rule Rules::Builder[:base_currency].eq(value: '1')
-  #   action :visible, false
-  # end
-
   condition condition_id: "Hide Conversion Rate for indian currency" do
     reference :entity, 'conversion_rate'
-    rule Rules::Builder[:base_currency].eq(value: '1')
+    rule Rules::Builder[:base_currency_id].eq(entity: "reporting_currency_id")
     action :visible, false
   end
 
   condition condition_id: "Hide Roundoff for different currency" do
     reference :entity, 'items_summary.invoice_roundoff_amount'
-    rule Rules::Builder[:base_currency].not_eq(value: '1')
-    action :visible, false
+    rule Rules::Builder[:base_currency_id].eq(value: '1').and(Rules::Builder[:reporting_currency_id].eq(value: '1'))
+    action :visible, true
   end
-
-
-  # condition condition_id: "Hide Reporting Invoice Total for indian currency for indian currency" do
-  #   reference :entity, 'items_summary.reporting_invoice_total_amount'
-  #   rule Rules::Builder[:base_currency].eq(value: '1')
-  #   action :visible, false
-  # end
-
-  # condition condition_id: "Hide Net Payable (Reporting Currency)" do
-  #   reference :entity, 'items_summary.reporting_invoice_net_total_amount'
-  #   rule Rules::Builder[:base_currency].eq(value: '1')
-  #   action :visible, false
-  # end
-
 
   condition condition_id: "Hide Net Amount (Reporting Currency)" do
     reference :entity, 'items_summary.reporting_invoice_sub_total_amount'
-    rule Rules::Builder[:base_currency].eq(value: '1')
+    rule Rules::Builder[:base_currency_id].eq(entity: "reporting_currency_id")
     action :visible, false
   end
 
   condition condition_id: "Hide Reporting Balance Payable for indian currency" do
     reference :entity, 'items_summary.reporting_invoice_balance_due'
-    rule Rules::Builder[:base_currency].eq(value: '1')
+    rule Rules::Builder[:base_currency_id].eq(entity: "reporting_currency_id")
     action :visible, false
   end
 
-  # predict 'policy_id', with: :vendor_id
-  # predict 'department_id', with: [:vendor_id, :policy_id]
-  # predict 'location_id', with: [:vendor_id, :policy_id]
-  # predict 'cost_center_id', with: [:vendor_id, :policy_id]
-  # predict 'items.inventory_line_item_id', with: [:vendor_id, :policy_id]
 
-  # CONDITIONS
-
-  # condition condition_id: "GSTIN Field to be visible when vendor is Indian" do
-  #   reference 'entity', 'gstin'
-  #   rule Rules::Builder['']
-  # end
-
-  # condition condition_id: "Receiving Account Type can only be active if Receiving Account ID is set" do
-  #   reference 'entity', 'receiving_account_type'
-  #   rule Rules::Builder['receiving_account_id'].present
-  #   action :active, true
-  # end
-  #
-  # condition condition_id: 'Disable line item department for header level cost allocation' do
-  #   reference 'entity', 'items.department_id'
-  #   rule Rules::Builder['cost_allocation_items'].false
+  # condition condition_id: "Hide Reporting Roundoff for different currency" do
+  #   reference :entity, 'items_summary.reporting_invoice_roundoff_amount'
+  #   rule Rules::Builder[:base_currency_id].eq(value: '1')
   #   action :visible, false
-  #   action :editable, false
   # end
-  # #
-  # condition condition_id: 'Disable line item cost center for header level cost allocation' do
-  #   reference 'entity', 'items.cost_center_id'
-  #   rule Rules::Builder['cost_allocation_items'].false
+
+  # condition condition_id: "Hide Reporting Invoice Total for indian currency for indian currency" do
+  #   reference :entity, 'items_summary.reporting_invoice_total_amount'
+  #   rule Rules::Builder[:base_currency_id].eq(value: '1')
   #   action :visible, false
-  #   action :editable, false
   # end
 
-  # condition condition_id: 'Enabled header department for header level cost allocation' do
-  #   reference 'entity', 'department_id'
-  #   rule Rules::Builder['cost_allocation_items'].false
-  #   action :visible, true
-  #   action :editable, true
-  # end
-
-  # condition condition_id: 'Enabled header cost_center for header level cost allocation' do
-  #   reference 'entity', 'cost_center_id'
-  #   rule Rules::Builder['cost_allocation_items'].false
-  #   action :visible, true
-  #   action :editable, true
-  # end
-
-  # condition condition_id: 'Enable line item department for item level cost allocation' do
-  #   reference 'entity', 'items.department_id'
-  #   rule Rules::Builder['cost_allocation_items'].true
-  #   action :visible, true
-  #   action :editable, true
-  # end
-
-  # condition condition_id: 'Enable line item cost center for item level cost allocation' do
-  #   reference 'entity', 'items.cost_center_id'
-  #   rule Rules::Builder['cost_allocation_items'].true
-  #   action :visible, true
-  #   action :editable, true
-  # end
-
-  # condition condition_id: 'Disable header department for item level cost allocation' do
-  #   reference 'entity', 'department_id'
-  #   rule Rules::Builder['cost_allocation_items'].true
+  # condition condition_id: "Hide Net Payable (Reporting Currency)" do
+  #   reference :entity, 'items_summary.reporting_invoice_net_total_amount'
+  #   rule Rules::Builder[:base_currency_id].eq(value: '1')
   #   action :visible, false
-  #   action :editable, false
   # end
 
-  # condition condition_id: 'Disable header cost_center for item level cost allocation' do
-  #   reference 'entity', 'cost_center_id'
-  #   rule Rules::Builder['cost_allocation_items'].true
-  #   action :visible, false
-  #   action :editable, false
-  # end
-  #
-
-  #
   # validation validation_id: :due_date_gteq_invoice_date do
   #   reference 'due_date'
   #   error_message "Due Date cannot be before the invoice date"

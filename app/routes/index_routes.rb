@@ -3,7 +3,9 @@ IndexBuilder::Router.draw do
   scope 'admin' do
     route 'macros', Admin::Masters::Macros::Ops::Index
     route 'macro_jobs', Admin::Masters::Macros::Jobs::Index
+    route 'company_groups', Admin::CompanyGroups::Ops::Index
   end
+  route 'companies', Companies::Ops::Index
 
   # Masters
   route "vendors", Masters::Vendors::Index
@@ -26,4 +28,9 @@ IndexBuilder::Router.draw do
   route 'receive_history', Docs::P2P::Inwards::Received::Index
   route 'credit_notes', Docs::P2P::CreditNotes::Index
   route 'audit_trails', Docs::AuditTrails::Index
+
+  # Others
+  route 'import_jobs', ImportJobs::Index
+
+  route 'master_schemas', Masters::Schema::Ops::Index
 end

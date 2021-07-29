@@ -12,12 +12,15 @@
 #  default     :boolean
 #  is_deleted  :boolean          default(FALSE), not null
 #  deleted_at  :datetime
+#  start_date  :date
+#  end_date    :date
 #
 
 class PaymentTerm < ApplicationRecord
   include SoftDeletable
 
   belongs_to :company, optional: true
+  belongs_to :created_by, class_name: 'User', optional: true
 
 
   # contains the attributes of a few common payment terms

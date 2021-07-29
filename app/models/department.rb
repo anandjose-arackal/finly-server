@@ -8,12 +8,14 @@
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
 #  is_deleted      :boolean          default(FALSE), not null
-#  ancestry        :string(255)
+#  parent_id       :string(255)
 #  cost_center_id  :integer
 #  deleted_at      :datetime
 #  department_code :string(255)
 #  code            :string(255)
 #  gl_code         :string(255)
+#  start_date      :date
+#  end_date        :date
 #
 
 class Department < ApplicationRecord
@@ -30,11 +32,13 @@ class Department < ApplicationRecord
   has_ancestry
 
   belongs_to :company, optional: true
+  belongs_to :created_by, class_name: 'User', optional: true
+
   belongs_to :cost_center, optional: true
 
   has_many :user_department_mappings
   has_many :users, through: :user_department_mappings
-  
+
   has_many :budget_rule_department_mappings
   has_many :budget_rules, through: :budget_rule_department_mappings
 
@@ -48,10 +52,10 @@ class Department < ApplicationRecord
   default_scope { include_soft_deleted }
 
   scope :with_ids, -> (id) { where id: id }
-  scope :with_id, -> (id) {where id: id}
+  scope :with_id, -> (id) { where id: id }
   scope :with_company_id, -> (company_id) { where company_id: company_id }
 
-  scope :with_name, -> (name) {where name: name}
+  scope :with_name, -> (name) { where name: name }
   # scope :only_sub_departments, -> {
   #   where(id: Department.pluck(:ancestry).compact.map { |e| e.split('/') }.flatten.uniq)
   # }
@@ -72,7 +76,7 @@ class Department < ApplicationRecord
   end
 
 
-  def as_json(options={})
+  def as_json(options = {})
     args = {id: self.id}
     args[:name] = options&.dig(:tree) ? full_name : name
     # args[:name] = name if ancestry.present?

@@ -51,4 +51,12 @@ class BbpsBillExposure < Exposures::API
   attribute :bbps_id, record_attribute: true
   attribute :bill_period, record_attribute: true
   attribute :category, record_attribute: true, exposure: true, includes: [:category]
+  attribute :payments_utr, includes: [:payments] do
+    utrs =[]
+    record.payments.each do |payment|
+      utrs << payment.utr
+    end
+    utrs.compact.join(', ')
+  end
+
 end

@@ -108,3 +108,6 @@ RSpec::Core::Formatters::DocumentationFormatter.prepend FormatterOverrides
 
 # Silence output from pending examples in progress formatter
 RSpec::Core::Formatters::ProgressFormatter.prepend FormatterOverrides
+
+require 'simplecov'
+SimpleCov.start 'rails'
