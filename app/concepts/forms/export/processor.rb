@@ -83,11 +83,6 @@ class Forms::Export::Processor
           entity_key: 'parent_id',
           entity_type: 'text'
         },
-        parent_primary_key: {
-          name: "#{parent_sheet_label.singularize} #{form.entities.find_by(entity_key: form.primary_key_for_import).label}",
-          entity_key: 'primary_key_for_import',
-          entity_type: 'text'
-        },
         id: {
           name: 'ID',
           entity_key: 'id',
@@ -173,8 +168,6 @@ class Forms::Export::Processor
               column_data = child_data[key]
               if key.to_s == 'parent_id'
                 column_data = parent_data['id']
-              elsif key.to_s == 'parent_primary_key'
-                column_data = parent_data[form.primary_key_for_import]
               end
               # get urls if attachments
               if column_data.is_a?(Array) && column_data.present? && column_data[0].is_a?(Hash) && column_data[0].has_key?(:url)

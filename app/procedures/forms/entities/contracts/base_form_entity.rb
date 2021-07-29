@@ -67,8 +67,6 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
   # property :options, deserializer: -> (input, represented, *args) {represented.options = {} if input[:options].blank?}
   property :options, deserializer: -> (input, represented, *args) {represented.options = input[:options].is_a?(Hash) ? input[:options] : {}}
 
-  property :primary_key_for_import
-
   # Computation
   property :compute_enabled
   property :compute_type_id

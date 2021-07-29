@@ -128,9 +128,8 @@ class Forms::Import::Processor
           data.delete(:id)
         end
 
-        if data[:parent_id].present? || data[:primary_key_for_import].present?
+        if data[:parent_id].present?
           key = data[:parent_id].to_s
-          key = data[:primary_key_for_import].to_s unless key.present?
           nested_data[data_headers[sheet_name]][key] = [] unless nested_data[data_headers[sheet_name]][key].present?
           nested_data[data_headers[sheet_name]][key] << data
         end
@@ -182,9 +181,7 @@ class Forms::Import::Processor
 
           nested_data.keys.each do |key|
             if form_data[:id].present?
-              form_data[key] = nested_data[key][form_data[:id]] || nested_data[key][form_data[form.primary_key_for_import]]
-            elsif form_data[form.primary_key_for_import].present?
-              form_data[key] = nested_data[key][form_data[form.primary_key_for_import]]
+              form_data[key] = nested_data[key][form_data[:id]]
             end
           end
 
@@ -279,9 +276,6 @@ class Forms::Import::Processor
     existing_record = nil
     if row_data[:id].present?
       existing_record = form.model.find(row_data[:id])
-    elsif form.primary_key_for_import.present?
-      existing_record = form.model.where("#{form.primary_key_for_import}": row_data[form.primary_key_for_import]).first
-      form_data[:id] = existing_record.id if existing_record.present?
     end
 
     form_sections.each do |section|
@@ -313,11 +307,6 @@ class Forms::Import::Processor
       record_finder_query = {}
       entity.entities.each do |child_entity|
         children_data.merge!(get_entity_value(row_data, child_entity, existing_record))
-      end
-
-      if existing_record.present? && entity.class.collection? && entity.primary_key_for_import.present? && children_data[entity.primary_key_for_import].present?
-        children_record = existing_record.send(entity.entity_key).where("#{entity.primary_key_for_import}": children_data[entity.primary_key_for_import]).first
-        children_data[:id] = children_record.id if children_record.present?
       end
       data[entity.entity_key.to_s] = [children_data]
     end
