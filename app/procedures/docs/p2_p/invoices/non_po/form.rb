@@ -17,7 +17,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
   LIQUID_FORMULAE = {
     items: {
       item_gross_amount: "{{ row.rate | times: row.quantity | default: 0 | round: 2  }}",
-      item_discount_amount:  "{% if form.discount_type_id == 1 %}{{ row.item_gross_amount | times: row.discount | divided_by: 100 | default: 0 | round: 2  }}{% else %}{{ row.discount | default: 0 }}{% endif %}",
+      item_discount_amount:  "{% if form.discount_type_id == '1' %}{{ row.item_gross_amount | times: row.discount | divided_by: 100 | default: 0 | round: 2  }}{% else %}{{ row.discount | default: 0 }}{% endif %}",
       item_taxable_amount: "{{ row.item_gross_amount | minus: row.item_discount_amount | default: 0 | round: 2  }}",
       item_tax_amount: "{{ row.item_taxable_amount | times: row.tax_percentage | divided_by: 100 | default: 0 | round: 2  }}",
       item_tds_amount: "{% if row.tds_applicable == 'true' %}{{ row.item_taxable_amount | times: form.tds_percentage | divided_by: 100 | default: 0 | round: 2  }}{% else %}{{ 0 }}{% endif %}",

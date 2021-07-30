@@ -241,6 +241,7 @@ class Invoice < ApplicationRecord
   belongs_to :remaining_amount, optional: true, class_name: "Amount"
   belongs_to :invoice_type, optional: true, class_name: "InwardInvoiceType"
   belongs_to :gst_type, optional: true
+  belongs_to :tax_type, optional: true
   belongs_to :tds_slab, optional: true, class_name: 'TdsRatesList'
   belongs_to :payment_term, optional: true
 
@@ -1545,10 +1546,18 @@ class Invoice < ApplicationRecord
   end
 
   def retrieve_value(entity)
-    # return get_base_currency.country_code if entity.entity_key == 'base_currency'
     return tds_slab&.dispaly_name if entity.entity_key == 'tds_slab_id'
+    return get_discount_type if entity.entity_key == 'discount_type_id'
   
     send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
+  end
+
+  def get_discount_type
+    if discount_type_id == 1
+      'Percentage' 
+    else
+      'Amount'
+    end
   end
 
   def forms_enabled
@@ -1588,8 +1597,6 @@ class Invoice < ApplicationRecord
       return BudgetManager::BudgetLimitValidator::Invoice.({invoice: self, previous_budget_contributions: self.invoice_budget_contributions_before_update, current_user: self.company.users.first })
     end
   end
-
-
 
   private
 
@@ -2187,4 +2194,3 @@ class Invoice < ApplicationRecord
   # end
 
 end
-
