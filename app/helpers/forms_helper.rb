@@ -86,7 +86,7 @@ module FormsHelper
         if form_entity.entity_type == 'lookup'
           form_data.merge!({form_entity.entity_key => model.send(form_entity.entity_key).to_s})
           form_data.merge!({"#{form_entity.entity_key}_value" => model.retrieve_value(form_entity)})
-        if form_entity.entity_type == 'dropdown'
+        elsif form_entity.entity_type == 'dropdown'
           form_data.merge!({"#{form_entity.entity_key}_value" => model.retrieve_value(form_entity)})
         elsif form_entity.entity_type == 'amount'
           form_data.merge!({form_entity.entity_key => model.send(form_entity.entity_key).to_f.round(2)})
