@@ -13,4 +13,8 @@ class Masters::Currencies::Lookup < Lookup::API
   attribute :currency, value: '{{record.country}}' 
 
   attribute :symbol
+
+  def self.max_per_page
+    200
+  end
 end
