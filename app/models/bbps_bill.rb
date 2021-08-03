@@ -293,7 +293,7 @@ class BbpsBill < ApplicationRecord
 
   scope :pending_erp_sync, -> (*args) {
     with_erp_sync_status_pending.
-        where(invoice_status_id: BbpsBillStatus.ids_for(:approved, :auto_approved, :payment_ticket_created, :payment_initiated, :payment_ticket_deleted, :paid))
+        where(status_id: BbpsBillStatus.ids_for(:approved, :auto_approved, :payment_ticket_created, :payment_initiated, :payment_ticket_deleted, :paid))
   }
 
   ransack_scopes :with_status_id
