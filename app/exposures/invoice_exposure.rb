@@ -236,6 +236,22 @@ class InvoiceExposure < Exposures::API
     utrs.compact.join(', ')
   end
 
+  attribute :invoice_comments, includes: [:comments] do
+    comment_texts =[]
+    record.comments.each do |comment|
+      comment_texts  << comment.generate_body
+    end
+    comment_texts.compact.join(', ')
+  end
+
+  attribute :invoice_rejection_comments, includes: [:trails] do
+    trail_texts =[]
+    record.trails.only_reject.each do |trail|
+      trail_texts  << trail.generate_trail_body(nil)
+    end
+    trail_texts.compact.join(', ')
+  end
+
   # def vendor_ref_num(invoice_line_item)
   #   invoice_line_item.parent&.vendor_id
   # end
