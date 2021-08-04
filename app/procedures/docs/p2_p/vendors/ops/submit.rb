@@ -29,6 +29,8 @@ class Docs::P2P::Vendors::Ops::Submit < Transactions::API
   end
 
   def validate_gstin(options, reviewal_document:, current_user:, params:, **)
+    return true if VendorToggle.new(current_user).forms_enabled?
+
     gstin = GstinLocation.where(vendor_id: current_user.company.yes_bank_vendors.non_deleted.filter_unique_check).where(gstin: reviewal_document.gstin_locations.pluck(:gstin)).where.not(id: reviewal_document.gstin_locations.pluck(:id)).first
 
     if gstin.present? and gstin.gstin.present?
