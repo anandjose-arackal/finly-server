@@ -67,6 +67,7 @@ class BbpsBill < ApplicationRecord
   # include SearchIndex::Concerns::Document
   include Searchkick::Api
   include Concerns::ErpSyncConcern
+  include ErpSyncable
 
   acts_as_sequenced column: :sequence_id, purpose: :bbps_bill, editable: false, prefix: 'UB'
 
