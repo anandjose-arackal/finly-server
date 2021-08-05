@@ -47,6 +47,7 @@ class CreditNote < ApplicationRecord
   include Sequenced::ActsAsSequenced
   include EventProducer
   include Concerns::ErpSyncConcern
+  include ErpSyncable
 
   acts_as_sequenced column: :sequence_id, purpose: :credit_note, editable: false, prefix: 'CN'
 
