@@ -88,12 +88,8 @@ module FormsHelper
           form_data.merge!({form_entity.entity_key => model.send(form_entity.entity_key).to_s})
           form_data.merge!({"#{form_entity.entity_key}_value" => model.retrieve_value(form_entity)})
         elsif form_entity.entity_type == 'dropdown'
-<<<<<<< HEAD
           form_data.merge!({form_entity.entity_key => model.send(form_entity.entity_key).to_s})
-          form_data.merge!({"#{form_entity.entity_key}_value" => form_entity.choices_scope.find_by_id(model.send(form_entity.entity_key))&.dig(:name)})
-=======
           form_data.merge!({"#{form_entity.entity_key}_value" => model.retrieve_value(form_entity)})
->>>>>>> 0229c5e804c39510da5c909c034d449cf78c2c23
         elsif form_entity.entity_type == 'amount'
           form_data.merge!({form_entity.entity_key => model.send(form_entity.entity_key).to_f.round(2)})
         end
