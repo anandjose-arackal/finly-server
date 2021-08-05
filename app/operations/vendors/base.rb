@@ -169,6 +169,8 @@ class Vendors::Base < BaseOperation
   end
 
   def validate_duplicate_pan
+    return true if VendorToggle.new(user).forms_enabled?
+
     if vendor_parameters.present? && vendor_parameters[:pan].present?
       similar_pan_vendors = user.company.yes_bank_vendors.filter_unique_check.where(pan: vendor_parameters[:pan])
       if self.vendor.present?
