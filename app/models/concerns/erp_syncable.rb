@@ -17,12 +17,22 @@ module ErpSyncable
       pending_docs.or(updated_docs)
     }
 
+    scope :with_erp_sync_status_id, -> (status_id) {
+        where(erp_sync_status_id: status_id)
+    }
+
+    scope :with_erp_sync_status_ids, -> (status_id) {
+      with_erp_sync_status_id(status_id)
+    }
+
 
     belongs_to :erp_sync_status, optional: true
     has_many :erp_sync_attempts, as: :record
 
     ransack_scopes :pending_erp_sync
     ransack_scopes :pending_erp_sync_or_modified
+    ransack_scopes :with_erp_sync_status_id
+    ransack_scopes :with_erp_sync_status_ids
   end
 
 end
