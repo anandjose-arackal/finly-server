@@ -247,7 +247,7 @@ class InvoiceExposure < Exposures::API
   attribute :invoice_rejection_comments, includes: [:trails] do
     trail_texts =[]
     record.trails.only_reject.each do |trail|
-      trail_texts  << trail.generate_trail_body(nil)
+      trail_texts  << trail.generate_trail_body_note(nil)
     end
     trail_texts.compact.join(', ')
   end
