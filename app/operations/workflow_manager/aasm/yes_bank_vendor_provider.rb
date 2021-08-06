@@ -74,6 +74,17 @@ class WorkflowManager::Aasm::YesBankVendorProvider < WorkflowManager::Aasm::Base
   end
 
   def validate_vendor
+    if VendorToggle.new(user).forms_enabled?
+      form = Form.where(model: 'YesBankVendor', company_id: user.company.id).first
+      if form.present?
+        entities = form.entities.where(entity_path: ['gstin_locations.gstin', 'pan'], active: true)
+        return true unless entities.present?
+
+        actions = FormConditionAction.where(form_condition: form.conditions.where(referencable: entities), property: 'unique', value: 1)
+        return true unless actions.present?
+      end
+    end
+
     similar_pan_vendors = YesBankVendor.where(pan: document.pan, company_id: user.company_id).filter_active
     if similar_pan_vendors.present?
       self.messages[:error].push "Vendor with pan: \"#{similar_pan_vendors.first.pan}\" already exists in the system. See vendor - #{similar_pan_vendors.first.display_name}"
