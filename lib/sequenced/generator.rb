@@ -72,6 +72,10 @@ module Sequenced
       end.count == 0
     end
 
+    def get_prefix
+      @prefix
+    end
+
     private
 
     def base_relation
