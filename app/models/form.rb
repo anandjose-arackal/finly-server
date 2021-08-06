@@ -91,22 +91,19 @@ class Form < ApplicationRecord
     return unless self.model.sequenced_options.present?
 
     self.model.sequenced_options.each do |seq_options|
+      record = self.model.new(company_id: self.company_id)
+      generator = Sequenced::Generator.new(record, seq_options)
+      sequence_number = generator.next_unique_id_in_sequence - 1
+      prefix = generator.get_prefix
+
       sequence_entity = (self.entities.where(type: 'FormEntity::AutoNumber').filter do |e|
-        e.config.dig("sequence", "prefix") == seq_options[:prefix]
+        e.config.dig("sequence", "prefix") == prefix
       end).first
 
       next unless sequence_entity.present?
 
-      latest_record = self.model.where(company_id: self.company_id).order(:created_at).first
-      next unless latest_record.present?
-
-      generator = Sequenced::Generator.new(latest_record, seq_options)
-      sequence_number = generator.next_unique_id_in_sequence - 1
-      prefix = generator.get_prefix
-
       REDIS.set("FormEntity::AutoNumber##{sequence_entity.id}##{prefix}", sequence_number)
     end
-
   end
 
 end
