@@ -74,32 +74,53 @@ class WorkflowManager::Aasm::YesBankVendorProvider < WorkflowManager::Aasm::Base
   end
 
   def validate_vendor
+    should_check_gstin = true
+    should_check_pan = true
+    should_check_bank_account = true
+
     if VendorToggle.new(user).forms_enabled?
       form = Form.where(model: 'YesBankVendor', company_id: user.company.id).first
       if form.present?
-        entities = form.entities.where(entity_path: ['gstin_locations.gstin', 'pan'], active: true)
-        return true unless entities.present?
-
-        actions = FormConditionAction.where(form_condition: form.conditions.where(referencable: entities), property: 'unique', value: 1)
-        return true unless actions.present?
+        entities = form.entities.where(entity_path: ['gstin_locations.gstin', 'pan', 'bank_accounts.account_number'], active: true).non_deleted
+        if entities.present?
+          actions = FormConditionAction.where(form_condition: form.conditions.where(referencable: entities).non_deleted, property: 'unique', value: 1).non_deleted
+          actions.each do |action|
+            case action.form_condition&.referencable&.entity_path
+            when 'gstin_locations.gstin'
+              should_check_gstin = false
+            when 'pan'
+              should_check_pan = false
+            when 'bank_accounts.account_number'
+              should_check_bank_account = false
+            end
+          end
+        end
       end
     end
 
-    similar_pan_vendors = YesBankVendor.where(pan: document.pan, company_id: user.company_id).filter_active
-    if similar_pan_vendors.present?
-      self.messages[:error].push "Vendor with pan: \"#{similar_pan_vendors.first.pan}\" already exists in the system. See vendor - #{similar_pan_vendors.first.display_name}"
-      return false
+    if should_check_pan
+      similar_pan_vendors = YesBankVendor.where(pan: document.pan, company_id: user.company_id).filter_active
+      if similar_pan_vendors.present?
+        self.messages[:error].push "Vendor with pan: \"#{similar_pan_vendors.first.pan}\" already exists in the system. See vendor - #{similar_pan_vendors.first.display_name}"
+        return false
+      end
     end
-    similar_bank_accounts = BankAccount.where(account_number: document.bank_accounts.pluck(:account_number), company_id: user.company_id).filter_active
-    if similar_bank_accounts.present?
-      self.messages[:error].push "Active Bank Account with account number \"#{similar_bank_accounts.first.account_number}\" already exists in the system. Please disable it. See vendor - #{similar_bank_accounts.first.account_owner.display_name}"
-      return false
+
+    if should_check_bank_account
+      similar_bank_accounts = BankAccount.where(account_number: document.bank_accounts.pluck(:account_number), company_id: user.company_id).filter_active
+      if similar_bank_accounts.present?
+        self.messages[:error].push "Active Bank Account with account number \"#{similar_bank_accounts.first.account_number}\" already exists in the system. Please disable it. See vendor - #{similar_bank_accounts.first.account_owner.display_name}"
+        return false
+      end
     end
-    document_gstins = document.gstin_locations.pluck(:gstin)&.reject { |c| c.empty? }
-    similar_gstins = GstinLocation.where(vendor_id: user.company.yes_bank_vendors.non_deleted.filter_unique_check).where(gstin: document_gstins)
-    if similar_gstins.present?
-      self.messages[:error].push "GSTIN details for \"#{similar_gstins.first.gstin}\" already exists in the system. See vendor - #{similar_gstins.first.vendor.display_name}"
-      return false
+
+    if should_check_gstin
+      document_gstins = document.gstin_locations.pluck(:gstin)&.reject { |c| c.empty? }
+      similar_gstins = GstinLocation.where(vendor_id: user.company.yes_bank_vendors.non_deleted.filter_unique_check).where(gstin: document_gstins)
+      if similar_gstins.present?
+        self.messages[:error].push "GSTIN details for \"#{similar_gstins.first.gstin}\" already exists in the system. See vendor - #{similar_gstins.first.vendor.display_name}"
+        return false
+      end
     end
     true
   end
