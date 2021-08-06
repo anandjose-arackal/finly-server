@@ -74,9 +74,9 @@ class WorkflowManager::Aasm::YesBankVendorProvider < WorkflowManager::Aasm::Base
   end
 
   def validate_vendor
-    should_check_gstin = true
-    should_check_pan = true
-    should_check_bank_account = true
+    should_check_gstin = false
+    should_check_pan = false
+    should_check_bank_account = false
 
     if VendorToggle.new(user).forms_enabled?
       form = Form.where(model: 'YesBankVendor', company_id: user.company.id).first
@@ -87,15 +87,19 @@ class WorkflowManager::Aasm::YesBankVendorProvider < WorkflowManager::Aasm::Base
           actions.each do |action|
             case action.form_condition&.referencable&.entity_path
             when 'gstin_locations.gstin'
-              should_check_gstin = false
+              should_check_gstin = true
             when 'pan'
-              should_check_pan = false
+              should_check_pan = true
             when 'bank_accounts.account_number'
-              should_check_bank_account = false
+              should_check_bank_account = true
             end
           end
         end
       end
+    else
+      should_check_gstin = true
+      should_check_pan = true
+      should_check_bank_account = true
     end
 
     if should_check_pan
