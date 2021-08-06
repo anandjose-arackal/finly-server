@@ -101,7 +101,7 @@ class Form < ApplicationRecord
       next unless latest_record.present?
 
       generator = Sequenced::Generator.new(latest_record, seq_options)
-      sequence_number = generator.next_id_in_sequence - 1
+      sequence_number = generator.next_unique_id_in_sequence - 1
       prefix = generator.get_prefix
 
       REDIS.set("FormEntity::AutoNumber##{sequence_entity.id}##{prefix}", sequence_number)

@@ -45,8 +45,7 @@ module Sequenced
         return seq if seq.present?
       end
 
-      seq = next_id_in_sequence
-      seq += 1 until unique?(format_id(seq))
+      seq = next_unique_id_in_sequence
       format_id(seq)
     end
 
@@ -74,6 +73,12 @@ module Sequenced
 
     def get_prefix
       @prefix
+    end
+
+    def next_unique_id_in_sequence
+      seq = next_id_in_sequence
+      seq += 1 until unique?(format_id(seq))
+      seq
     end
 
     private
