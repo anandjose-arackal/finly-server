@@ -169,6 +169,17 @@ class Vendors::Base < BaseOperation
   end
 
   def validate_duplicate_pan
+    if VendorToggle.new(user).forms_enabled?
+      form = Form.where(model: 'YesBankVendor', company_id: user.company.id).first
+      if form.present?
+        entities = form.entities.where(entity_path: ['gstin_locations.gstin', 'pan'], active: true)
+        return true unless entities.present?
+
+        actions = FormConditionAction.where(form_condition: form.conditions.where(referencable: entities), property: 'unique', value: 1)
+        return true unless actions.present?
+      end
+    end
+
     if vendor_parameters.present? && vendor_parameters[:pan].present?
       similar_pan_vendors = user.company.yes_bank_vendors.filter_unique_check.where(pan: vendor_parameters[:pan])
       if self.vendor.present?
