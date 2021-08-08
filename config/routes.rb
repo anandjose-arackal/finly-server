@@ -4289,6 +4289,7 @@ Rails.application.routes.draw do
       put 'update_and_submit', to: 'bills#update_and_submit'
       patch 'bill_validate', to: 'bills#bill_validate'
       get 'download_receipt', to: 'bills#download_receipt'
+      get 'expire_bill', to: 'bills#expire_bill'
     end
 
     resources :complaints
