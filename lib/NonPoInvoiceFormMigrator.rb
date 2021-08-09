@@ -143,7 +143,7 @@ class NonPoInvoiceMigrator
     })
 
     choices = Choices['list'].()
-    choices.form_entity = form_entity
+    choices.entity = form_entity
     form_entity.update(choices_scope: choices )
     
     # create options
