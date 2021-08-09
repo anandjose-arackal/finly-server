@@ -29,6 +29,8 @@
 #  active               :boolean          default(TRUE)
 #  item_expense_type_id :integer
 #  tds_applicable       :boolean          default(TRUE)
+#  start_date           :date
+#  end_date             :date
 #
 
 class Item < ApplicationRecord
@@ -36,6 +38,7 @@ class Item < ApplicationRecord
   include Sequenced::ActsAsSequenced
   include MathUtil
   include EventProducer
+
   # include SearchIndex::Concerns::Document
   include Searchkick::Api
 
@@ -43,6 +46,8 @@ class Item < ApplicationRecord
 
   default_scope { include_soft_deleted.order(created_at: :desc) }
   belongs_to :company, optional: true
+  belongs_to :created_by, class_name: 'User', optional: true
+
   belongs_to :category, optional: true
   belongs_to :tax_rate, optional: true
   belongs_to :supply_item_type, optional: true
@@ -112,7 +117,7 @@ class Item < ApplicationRecord
 
   after_save :budget_trail_entry
 
-  def as_json
+  def as_json(options={})
     {
       id: id,
       company_id: company_id,
@@ -145,8 +150,13 @@ class Item < ApplicationRecord
       tds_applicable: tds_applicable,
       tds_applicable_label: (tds_applicable ? "yes" : "no"),
       custom_description: get_custom_description,
-      custom_fields: self.custom_fields
-
+      custom_fields: self.custom_fields,
+      category_id_value: self.category&.name.to_s,
+      tax_rate_id_value: self.tax_rate&.name.to_s,
+      product_type_id: (self.product_type_id rescue 1),
+      product_type_id_value: (self.goods? ? 'Goods' : 'Service'),
+      tax_percentage: self.tax_rate&.rate.to_f,
+      item_rate: self.rate
     }
   end
 

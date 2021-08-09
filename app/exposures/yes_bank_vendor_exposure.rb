@@ -7,6 +7,7 @@ class YesBankVendorExposure < Exposures::API
   attribute :business_name, record_attribute: true
   attribute :trade_name, record_attribute: true
   attribute :vendor_id, record_attribute: true
+  attribute :vendor_country, record_attribute: true
   attribute :vendor_type, record_attribute: true, exposure: true
   attribute :rcm_enabled, record_attribute: true
   attribute :pan, record_attribute: true

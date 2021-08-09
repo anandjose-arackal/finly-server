@@ -73,7 +73,7 @@ class ExportManager::Master::Reports::Index < ExportManager::Builders::Spreadshe
 
   def reviewal_chain(row, expense)
     expense.report&.dlrms.group_by(&:level_number).map do |level_number, group|
-      reviewer_name = group.map(&:reviewer).map(&:name).join(", ")
+      reviewer_name = group.map(&:reviewer).compact.map(&:name).join(", ")
       dlrm = group.find {|d| d if d.action_taken_by_id.present?}
       action_taker = dlrm&.action_taken_by&.name
       action = dlrm&.action&.name&.humanize 

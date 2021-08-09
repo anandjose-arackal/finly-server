@@ -6,6 +6,10 @@ module ActionManager::Builder
     params = options[:params]
     return unless permitted?(user)
 
+    if options[:record].present?
+      return unless authorized?(options)
+    end
+
     map = {
         path: self.path,
         label: self.label,
@@ -27,7 +31,11 @@ module ActionManager::Builder
   end
 
   def build_config(options)
-    config
+    if options[:record].present?
+      options[:record].to_exposure.template(config)
+    else
+      config
+    end
   end
 
   def as_json(options)

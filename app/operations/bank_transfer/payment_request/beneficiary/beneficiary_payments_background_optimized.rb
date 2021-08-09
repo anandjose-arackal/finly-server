@@ -21,19 +21,26 @@ attr_accessor :bank_payment_request, :payments_attributes, :payment_mode, :optio
               :company_id, :execute, :payment_params, :beneficiary_payments, :from_payment_agreement, :agreement_type, :agreement_related_document_id, :ticket_type, :security_deposit, :beneficiary_payment, :security_deposits, :agreement_beneficiary_payment, :agreement_security_deposit, 
               :init_text_field, :init_drop_down_field, :import_id, :import_number, :import_date,
               :company, :new_accounts, :new_vendors, :bank_accounts, :beneficiary_payments, :original_amounts, :advance_amounts, :payment_amounts,
-              :initiating_account, :user, :invoices, :payments, :transfer_mode, :tax_rate_id
+              :initiating_account, :user, :invoices, :payments, :transfer_mode, :tax_rate_id, :logger, :log_data
 
 def self.call(user, options = {})
   self.new.perform(user, options)
 end
 
 def perform(user, options, request_store_hash = nil)
+	self.logger = LogStashLogger.new(type: :file, path: 'log/logstash_payments_creation.log', sync: true)
+	self.log_data = {}
+	self.log_data[:start_time] = DateTime.now.utc
+	self.log_data[:klass_name] = self.class.name
+	self.log_data[:job] = "payments_creation"
   load_request_store request_store_hash
   if options.present? and options.is_a?(Hash)
     options = options.with_indifferent_access
   end
   self.bank_payment_request = BankPaymentRequest.find_by(id: options[:bank_payment_request_id])
+  self.log_data[:bank_payment_request_id] = self.bank_payment_request&.id
   self.payments_attributes = options[:payments_attributes]
+	self.log_data[:number_of_payments] = self.payments_attributes.count
   self.from_payment_agreement = options[:created_from_payment_agreement]
   # Payment agreement type
   self.agreement_type = options[:agreement_type]
@@ -69,11 +76,16 @@ def process
 		setup_payments
 		build_custom_fields
 	end
+
+	self.log_data[:end_time] = DateTime.now.utc
+	self.logger.info(self.log_data)
 end
 
 def setup
 	self.company = self.bank_payment_request.owner.company.name.split.first.parameterize.to_s
 	self.company_id = self.bank_payment_request.owner.company_id
+	self.log_data[:company_name] = self.bank_payment_request.owner.company.name
+	self.log_data[:company_id] = self.company_id
 	date = DateTime.now.strftime('%b-%d-%a-%H-%M-%S').downcase
 	rnd = SecureRandom.hex(11)
 	self.import_id = (company + "-" + date + "-" + rnd).freeze
@@ -177,8 +189,8 @@ def setup_beneficiary_payment
 
 	self.payments_attributes.each_with_index do |vd, ix| 
 		vd[:advance_amount] = (vd[:advance_amount].blank?) ? 0 : vd[:advance_amount]
-		beneficiary_payments[ix].original_amount = Amount.new(value: vd[:original_amount], currency_id: 1)
-		beneficiary_payments[ix].advance_amount = Amount.new(value: vd[:advance_amount], currency_id: 1)
+		beneficiary_payments[ix].original_amount = Amount.new(value: vd[:original_amount], currency_id: (self.user&.company&.reporting_currency&.id || 1 ))
+		beneficiary_payments[ix].advance_amount = Amount.new(value: vd[:advance_amount], currency_id: (self.user&.company&.reporting_currency&.id || 1 ))
 		beneficiary_payments[ix].created_at = DateTime.now
 	end
 
@@ -211,7 +223,7 @@ end
 def build_amounts
 	amounts = []
 	(payments_attributes.size * 3).times do |i|
-		amounts << Amount.new(value: import_number, currency_id: 1, created_at: import_date)
+		amounts << Amount.new(value: import_number, currency_id: (self.user&.company&.reporting_currency&.id || 1 ), created_at: import_date)
 	end
 
 	Amount.import amounts
@@ -337,7 +349,7 @@ def post_process
 	# now once the payment request has been created and the payments saved, we can mark it as open
   max_payment_amount = self.bank_payment_request.payment_order.payments.reload.joins(:amount).pluck(:value).max || 0
   self.bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:open), max_payment_amount: max_payment_amount)
-  self.bank_payment_request.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval))
+  self.bank_payment_request.payment_order.reload.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval))
   # puts 'SUCCESSFUL!'
 
   # Trail.import build_trails if build_trails.present?

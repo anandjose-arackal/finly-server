@@ -13,6 +13,8 @@
 #  cost_center_code :string(255)
 #  ancestry         :string(255)
 #  gl_code          :string(255)
+#  start_date       :date
+#  end_date         :date
 #
 
 class CostCenter < ApplicationRecord
@@ -29,6 +31,7 @@ include Searchkick::Api
   has_ancestry
 
   belongs_to :company, optional: true
+  belongs_to :created_by, optional: true, class_name: 'User'
 
   has_many :budget_criteria_mappings, as: :budgetable
   has_many :budgets, through: :budget_criteria_mappings

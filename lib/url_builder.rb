@@ -48,6 +48,10 @@ class UrlBuilder
 
     if route.first.to_s == 'vendors' and route.second.to_s == 'show'
       path = 'vendors/{{record_id}}/params={}' if VendorToggle.new(user).forms_enabled?
+    elsif route.first.to_s == 'invoices' and route.second.to_s == 'show'
+      if user.non_po_invoice_form_enabled
+        path = 'procure_invoices/{{record_id}}/params={"procurement_id":"{{procurement_id}}","procurement_type":"{{procurement_type}}"}'
+      end
     end
 
     variables.each do |key, value|

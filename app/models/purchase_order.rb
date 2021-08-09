@@ -79,11 +79,13 @@
 #
 
 class PurchaseOrder < ApplicationRecord
-  include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport, ControllingUser
+  attr_accessor :skip_callback
+  include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport, ControllingUser, GetCurrency
   include Sequenced::ActsAsSequenced
   # include SearchIndex::Concerns::Document
   include Searchkick::Api
   include Concerns::ErpSyncConcern
+  include ErpSyncable
 
 
   acts_as_sequenced column: :po_number, purpose: :purchase_order, editable: false, prefix: 'PO/{fiscal_year_start}-{fiscal_year_end}/', min_length: 4
@@ -106,6 +108,8 @@ class PurchaseOrder < ApplicationRecord
   belongs_to :sub_department, optional: true, class_name: "Department", foreign_key: :sub_department_id
   belongs_to :cost_center, optional: true
   belongs_to :gst_type, optional: true
+  belongs_to :base_currency, optional: true, class_name: 'Currency'
+  belongs_to :reporting_currency, optional: true, class_name: 'Currency'
 
   belongs_to :controlling_user, optional: true, class_name: 'User'
   belongs_to :controlling_for_user, optional: true, class_name: 'User'
@@ -527,10 +531,18 @@ class PurchaseOrder < ApplicationRecord
 
   before_save :calculate_line_items
   after_create :purchase_request_tasks
+  after_save :set_currency_for_amount, unless: :skip_callback
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
 
+  before_create :set_currency
+
   ransack_scopes :with_status_ids, :with_grn_status_id
+  
+  def set_currency
+    self.reporting_currency_id = self.company.reporting_currency.id if self.reporting_currency_id.blank? 
+    self.base_currency_id = self.company.reporting_currency.id if self.base_currency_id.blank? 
+  end
   
   def status_tag_details
     return @tags_data if @tags_data.present?
@@ -841,7 +853,9 @@ class PurchaseOrder < ApplicationRecord
             thumb: self.attachments.first&.file&.url(:thumb, timestamp: false),
             content_type: self.attachments.first&.file_content_type,
             file_name: self.attachments.first&.file_file_name
-        }
+        },
+        base_currency: get_base_currency,
+        reporting_currency: get_reporting_currency
         # balance_due: {
         #   value: precision_value(self.balance_amount&.value),
         #   id: self.balance_amount&.id,
@@ -989,13 +1003,13 @@ class PurchaseOrder < ApplicationRecord
         if item.tax_amount.present?
           item.tax_amount.value = item_tax_amount
         else
-          item.tax_amount = Amount.new(value: item_tax_amount, currency_id: 1)
+          item.tax_amount = Amount.new(value: item_tax_amount, currency_id: get_base_currency.id)
         end
 
         if item.taxable_amount.present?
           item.taxable_amount.value = item_taxable_amount
         else
-          item.taxable_amount = Amount.new(value: item_taxable_amount, currency_id: 1)
+          item.taxable_amount = Amount.new(value: item_taxable_amount, currency_id: get_base_currency.id)
         end
 
         # also set the CGST, SGST, and IGST amounts in the PO Line item
@@ -1018,13 +1032,13 @@ class PurchaseOrder < ApplicationRecord
         if item.discount_amount.present?
           item.discount_amount.value = item_discount_amount
         else
-          item.discount_amount = Amount.new(value: item_discount_amount, currency_id: 1)
+          item.discount_amount = Amount.new(value: item_discount_amount, currency_id: get_base_currency.id)
         end
 
         if item.total_amount.present?
           item.total_amount.value = item_total_amount
         else
-          item.total_amount = Amount.new(value: item_total_amount, currency_id: 1)
+          item.total_amount = Amount.new(value: item_total_amount, currency_id: get_base_currency.id)
         end
 
 
@@ -1042,14 +1056,14 @@ class PurchaseOrder < ApplicationRecord
     if self.total_before_tax.present?
       self.total_before_tax.value = total_before_tax_amount
     else
-      self.total_before_tax = Amount.new(value: total_before_tax_amount, currency_id: 1)
+      self.total_before_tax = Amount.new(value: total_before_tax_amount, currency_id: get_base_currency.id)
     end
 
 
     if self.total_after_tax.present?
       self.total_after_tax.value = total_after_tax_amount
     else
-      self.total_after_tax = Amount.new(value: total_after_tax_amount, currency_id: 1)
+      self.total_after_tax = Amount.new(value: total_after_tax_amount, currency_id: get_base_currency.id)
     end
     # if self.total_amount.present?
     #   self.total_amount.value = total_amount
@@ -1059,19 +1073,19 @@ class PurchaseOrder < ApplicationRecord
     if self.discount_amount.present?
       self.discount_amount.value = discount_amount
     else
-      self.build_discount_amount(value: discount_amount, currency_id: 1)
+      self.build_discount_amount(value: discount_amount, currency_id: get_base_currency.id)
     end
 
     if self.tax_amount.present?
       self.tax_amount.value = tax_amount
     else
-      self.build_tax_amount(value: tax_amount, currency_id: 1)
+      self.build_tax_amount(value: tax_amount, currency_id: get_base_currency.id)
     end
 
     if self.balance_amount.present?
       self.balance_amount.value = total_amount&.round
     else
-      self.build_balance_amount(value: total_amount&.round, currency_id: 1)
+      self.build_balance_amount(value: total_amount&.round, currency_id: get_base_currency.id)
     end
 
     if self.requested_advance_amount.present? #&& self.advance_amount_status.id == AdvanceAmountStatus.id_for(:paid)
@@ -1084,18 +1098,18 @@ class PurchaseOrder < ApplicationRecord
         tds_amount = self.requested_advance_amount.value - new_advance_amount
         # tds_amount = tds_amount.round(-1) # round the tds to the nearest 10. This is as per income tax rules to calculate tds, section 288b
         tds_amount = tds_amount.ceil # round the tds to the nearest digit as of now
-        self.advance_tds_amount = Amount.create(value: tds_amount, currency_id: 1)
+        self.advance_tds_amount = Amount.create(value: tds_amount, currency_id: get_base_currency.id)
         final_advance_amount = self.requested_advance_amount.value - tds_amount
         if self.advance_amount.nil?
-          self.advance_amount = Amount.create(value: final_advance_amount, currency_id: 1)
+          self.advance_amount = Amount.create(value: final_advance_amount, currency_id: get_base_currency.id)
         else
           self.advance_amount.update(value: final_advance_amount)
         end
       end
 
     else
-      self.advance_amount = Amount.new(value: 0, currency_id: 1)
-      self.requested_advance_amount = Amount.new(value: 0, currency_id: 1)
+      self.advance_amount = Amount.new(value: 0, currency_id: get_base_currency.id)
+      self.requested_advance_amount = Amount.new(value: 0, currency_id: get_base_currency.id)
     end
 
     # self.save
@@ -1283,7 +1297,7 @@ class PurchaseOrder < ApplicationRecord
     quantities = items.map(&:quantity).map(&:to_f)
     quantities.each do |quantity|
       flag = true if quantity <= 0
-      break
+      break if flag
     end
     
     errors.add(:items, "quantity must be greater than 0") if flag
@@ -1294,9 +1308,22 @@ class PurchaseOrder < ApplicationRecord
     rates = items.map(&:rate).map(&:to_f)
     rates.each do |rate|
       flag = true if rate <= 0
-      break
+      break if flag
     end
     
     errors.add(:items, "rate must be greater than 0") if flag
+  end
+
+  def set_currency_for_amount
+    amount_attr = [:total_before_tax, :tax_amount, :total_after_tax, :discount_amount, :balance_amount, :requested_advance_amount, :advance_amount, :advance_tds_amount]
+
+    amount_attr.each do |amount_attribute|
+      amount_attr_id = self.send("#{amount_attribute}_id")
+      if amount_attr_id.present?
+        Amount.find_by(id: amount_attr_id).update(currency_id: get_base_currency.id)
+      end
+    end
+    self.skip_callback = true
+    self.save
   end
 end

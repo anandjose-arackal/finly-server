@@ -32,7 +32,7 @@ json.invoice do
   json.inclusive_of_taxes invoice.inclusive_of_taxes
   json.freight_amount invoice.freight_amount&.value
   json.roundoff_amount invoice.roundoff_amount
-  json.balance_due invoice.balance_due&.value
+  json.balance_due precision_value invoice.balance_due&.value.round(2)
   json.taxable_amount precision_value invoice.gross_amount&.value
   # adding the respective rates
   json.tax_rate precision_value invoice.tax_rate
@@ -66,13 +66,11 @@ json.invoice do
   json.invoice_status_id invoice.invoice_status_id
   json.invoice_status_name invoice.invoice_status&.name&.humanize
 
-  # invoice amounts total
   
-  json.item_amounts_total invoice.item_amounts_total&.round(2)
-
-  json.net_payable_amount invoice.balance_due&.value
-  json.paid_amount invoice.payments.successful.joins(:amount).sum(:value).round(2)
-  json.remaining_amount (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value)).round(2)
+  json.item_amounts_total precision_value invoice.item_amounts_total&.round(2)
+  json.net_payable_amount precision_value invoice.balance_due&.value&.round(2)
+  json.paid_amount precision_value invoice.payments.successful.joins(:amount).sum(:value).round(2)
+  json.remaining_amount precision_value (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value)).round(2)
 
   # invoice items
   json.invoice_items do

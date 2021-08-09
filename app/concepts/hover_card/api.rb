@@ -17,13 +17,23 @@ class HoverCard::API < Transactions::API
   step :authorize!
   step :render
 
+  def model(context)
+    return self.class.model.call(context) if self.class.model.is_a?(Proc)
+    self.class.model
+  end
+
+  def policy(context)
+    return self.class.policy.call(context) if self.class.policy.is_a?(Proc)
+    self.class.policy
+  end
+
   def find_model(context, params:, current_user:, **)
-    context['model'] = context['result.model'] = self.class.model.find_by(company_id: current_user.company_id, id: params[:id])
+    context['model'] = context['result.model'] = model(context).find_by(company_id: current_user.company_id, id: params[:id])
     context['model'].present?
   end
 
   def authorize!(context, model:, current_user:, **)
-    policy = self.class.policy&.new(current_user, model)
+    policy = policy(context)&.new(current_user, model)
     if policy.present? and not policy.send(self.class.policy_action)
       context[:'result.authorization'] = Failure(message: 'Breach')
       return false

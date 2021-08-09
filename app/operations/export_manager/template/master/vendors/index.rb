@@ -8,6 +8,8 @@ class ExportManager::Template::Master::Vendors::Index < ExportManager::Builders:
   subscribe 'vendors'
   default true
 
+  form_custom_fields :vendors, template_prefix: 'record'
+
   attribute :vendor_business_name, template: '{{ record.business_name }}'
   attribute :vendor_trade_name, template: '{{ record.trade_name }}'
   attribute :vendor_id, template: '{{ record.vendor_id }}'

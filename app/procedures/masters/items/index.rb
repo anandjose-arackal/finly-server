@@ -64,7 +64,7 @@ class Masters::Items::Index < IndexBuilder::API
   end
 
   column :rate, default: true, sort: :rate do
-    amount value: '{{record.rate}}', currency_code: 'INR', currency_symbol: '₹'
+    amount value: '{{record.rate}}', currency_code: :set_currency_code, currency_symbol: :set_currency_symbol
   end
 
   column :sku, default: true, sort: :sku do
@@ -88,5 +88,14 @@ class Masters::Items::Index < IndexBuilder::API
 
     counter
   end
+
+  def self.set_currency_code(context)
+    context[:user].company.reporting_currency.country_code
+  end
+
+  def self.set_currency_symbol(context)
+    context[:user].company.reporting_currency.symbol
+  end
+
 
 end

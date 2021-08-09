@@ -48,7 +48,9 @@ class PaymentExposure < Exposures::API
   attribute :utr, includes: [:reference_resource] do
     case record.reference_resource_type
     when 'BbpsYesBankTransaction'
-      record.reference_resource&.bbps_ref_id
+      bbps_ref_id = record.reference_resources&.first&.bbps_ref_id
+      bbps_ref_id = record.utr if bbps_ref_id.nil?
+      bbps_ref_id
     when 'CardTransaction'
       record.reference_resource&.reference_id
     when  'YesBankTransaction'

@@ -1,0 +1,31 @@
+class Masters::Schema::Records::Import::Contract < Reform::Form
+
+  property :created_by_id
+  property :company_id, validates: { presence: true }
+  property :name, deserializer: -> (input, represented, **) {
+    represented.name = input[:master_key]
+  }
+  property :request_params, deserializer: -> (input, represented, **) {represented.request_params = input}
+  property :options, deserializer: -> (input, represented, **) {
+    represented.options = {
+        master_key: input[:master_key],
+        mode: 'create'
+    }
+  }
+  property :status_id, deserializer: -> (input, represented, **) {represented.status_id = ImportJobStatus.id_for(:pending)}
+  property :attachment, validates: {presence: true}
+
+  validate :validate_options
+
+  def validate_options
+    if options[:master_key].blank?
+      errors.add :base, 'master not found'
+      return
+    end
+
+    unless ImportJob::Master::MODES.include?(options[:mode])
+      errors.add :base, 'invalid mode'
+    end
+  end
+
+end

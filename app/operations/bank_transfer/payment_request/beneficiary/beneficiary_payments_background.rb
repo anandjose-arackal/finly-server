@@ -6,19 +6,26 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
 
   attr_accessor :bank_payment_request, :payments_attributes, :payment_mode, :options,
                 :company_id, :execute, :payment_params, :beneficiary_payments, :from_payment_agreement, :agreement_type, :agreement_related_document_id, :ticket_type, :security_deposit, :beneficiary_payment, :security_deposits, :agreement_beneficiary_payment, :agreement_security_deposit, 
-                :init_text_field, :init_drop_down_field, :import_id, :import_number, :import_date, :init_multi_select_field, :init_multi_select_selction_items, :transfer_mode_id, :tax_rate_id
+                :init_text_field, :init_drop_down_field, :import_id, :import_number, :import_date, :init_multi_select_field, :init_multi_select_selction_items, :transfer_mode_id, :tax_rate_id, :logger, :log_data
 
   def self.call(user, options = {})
     self.new.perform(user, options)
   end
 
   def perform(user, options, request_store_hash = nil)
+    self.logger = LogStashLogger.new(type: :file, path: 'log/logstash_payments_creation.log', sync: true)
+    self.log_data = {}
+    self.log_data[:start_time] = DateTime.now.utc
+    self.log_data[:klass_name] = self.class.name
+    self.log_data[:job] = "payments_creation"
     load_request_store request_store_hash
     if options.present? and options.is_a?(Hash)
       options = options.with_indifferent_access
     end
     self.bank_payment_request = BankPaymentRequest.find_by(id: options[:bank_payment_request_id])
+    self.log_data[:bank_payment_request_id] = self.bank_payment_request&.id
     self.payments_attributes = options[:payments_attributes]
+    self.log_data[:number_of_payments] = self.payments_attributes.count
     self.from_payment_agreement = options[:created_from_payment_agreement]
     # Payment agreement type
     self.agreement_type = options[:agreement_type]
@@ -48,6 +55,8 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
     self.import_date = DateTime.now + rand(2..11).years
 
     self.company_id = self.bank_payment_request.owner.company_id
+    self.log_data[:company_name] = self.bank_payment_request.owner.company.name
+    self.log_data[:company_id] = self.company_id
     self.user = self.bank_payment_request.owner
     self.payment_mode = self.bank_payment_request.payment_mode
     self.transfer_mode_id = self.bank_payment_request.transfer_mode_id
@@ -260,10 +269,13 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
     # now once the payment request has been created and the payments saved, we can mark it as open
     max_payment_amount = self.bank_payment_request.payment_order.payments.reload.joins(:amount).pluck(:value).max || 0
     self.bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:open), max_payment_amount: max_payment_amount)
-    self.bank_payment_request.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval))
+    self.bank_payment_request.payment_order.reload.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval))
     # puts 'SUCCESSFUL!'
 
     Trail.import build_trails if build_trails.present?
+
+    self.log_data[:end_time] = DateTime.now.utc
+    self.logger.info(self.log_data)
   end
 
   private
@@ -425,15 +437,15 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
       ba = BankAccount.find_by(id: id)
       return ba
     else
-      ba = BankAccount.non_deleted.find_by(account_number: order_details[:bank_account_number]&.strip, ifsc: order_details[:ifsc]&.strip,
-                                           company_id: self.company_id, # name: order_details[:name]&.strip, because account number and IFSC are the only criteria against which we company
-                                           account_owner_type: YesBankVendor.name) # default for API initiations are 2, because they're always for vendors
+      account_name = order_details[:bank_account_name] || order_details[:name]
       business_name = order_details[:business_name] || order_details[:name]
+      ba = BankAccount.find_by(account_number: order_details[:bank_account_number]&.strip, ifsc: order_details[:ifsc]&.strip,
+                                           company_id: self.company_id, # name: order_details[:name]&.strip, because account number and IFSC are the only criteria against which we company
+                                           account_owner_type: YesBankVendor.name,
+                                           name: account_name) # default for API initiations are 2, because they're always for vendors
       vendor = ba&.account_owner || YesBankVendor.find_or_create_by(name: order_details[:name], company_id: self.company_id, business_name: business_name)
-      ba&.update(is_deleted: false) # i.e. if the bank account already exists, mark it as non deleted
       if ba.nil?
-        ba = BankAccount.create(name: order_details[:name], account_number: order_details[:bank_account_number]&.strip, ifsc: order_details[:ifsc]&.strip,account_owner: vendor, company_id: self.company_id, default_account: true)
-
+        ba = BankAccount.create(name: account_name, account_number: order_details[:bank_account_number]&.strip, ifsc: order_details[:ifsc]&.strip,account_owner: vendor, company_id: self.company_id, default_account: true)
       end
       return ba
     end

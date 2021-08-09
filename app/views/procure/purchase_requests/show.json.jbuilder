@@ -6,6 +6,8 @@ json.result do
     json.note @result.purchase_request&.note
     json.rejection_note @result.purchase_request&.reject_note
     json.cost_allocation_items @result&.purchase_request&.cost_allocation_items
+    json.base_currency @result&.purchase_request&.get_base_currency
+    json.reporting_currency @result&.purchase_request&.get_reporting_currency
     # json.total_amount @result.purchase_request.calculate_total_amount
     json.created_by do
       json.id @result.purchase_request.creator_id

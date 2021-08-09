@@ -1,0 +1,78 @@
+module Masters::Entity::Schema
+  extend ActiveSupport::Concern
+
+  SYSTEM_DEFAULTS = {
+      can_label_be_changed: true,
+      can_uniqueness_be_changed: false,
+      can_required_be_changed: false,
+      can_active_be_changed: false,
+      can_be_destroyed: false,
+  }
+
+  included do
+    include DynamicAttributes
+
+    class_attr :database_type
+    class_attr :filter_type
+
+    def self.inherited(sub_class)
+      super
+      sub_class.schema(schema.deep_dup)
+    end
+  end
+
+  class_methods do
+    def build_schema_contract
+      return @contract if @contract.present?
+
+      base_class = Masters::Schema::Entity::Contract
+
+      schema_contract = self.schema_contract
+      return base_class unless schema_contract.present?
+      @contract = Class.new(base_class) do
+        class_eval &schema_contract
+      end
+    end
+
+    def schema_contract(&block)
+      @schema_contract = block if block_given?
+      @schema_contract
+    end
+
+    def schema(value=nil)
+      @schema = value if value.present?
+      @schema ||= {options: {}}.with_indifferent_access
+    end
+
+    def options
+      @options ||= {}.with_indifferent_access
+    end
+
+    def option(key, default: NoObject)
+      options[key] = {key: key, default: default}
+      schema[:options][key] = default unless default == NoObject
+    end
+
+    def set(attribute, value)
+      if options[attribute].present?
+        schema[:options][attribute] = value
+      else
+        schema[attribute] = value
+      end
+    end
+  end
+
+  def database_type
+    self.class.database_type
+  end
+
+  def filter_type
+    self.class.filter_type
+  end
+
+  def schema_contract
+    # system_entity is a database attribute of master_entity
+    self.class.build_schema_contract
+  end
+
+end

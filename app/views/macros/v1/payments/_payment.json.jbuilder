@@ -56,9 +56,18 @@ json.document do
       json.id invoice.id
       json.invoice_id invoice.invoice_id
     end
+    if record.parent_type == 'BbpsBill'
+      bill = record.bbps_bill_parent
+      json.id bill.id
+      json.invoice_id bill.sequence_id
+    end
   end
   json.bbps_bill do
-    # Todo For BBPS Payments
+    if record.parent_type == 'BbpsBill'
+      bill = record.bbps_bill_parent
+      json.id bill.id
+      json.invoice_id bill.sequence_id
+    end
   end
 end
 json.beneficiary do

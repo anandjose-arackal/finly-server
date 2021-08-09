@@ -87,6 +87,16 @@ class Masters::Vendors::Form < Forms::API
 
   model YesBankVendor
 
+  meta ->(record) {
+    {
+      created_by: {
+        id: record.created_by&.id,
+        name: record.created_by&.name,
+        email: record.created_by&.email,
+      }
+    }
+  }
+
   section :status do
     dropdown :status_id, choices_scope: Choices[:enum].(VendorStatus),
              required: false, editable: true, default_value: VendorStatus.id_for(:draft),
@@ -185,6 +195,12 @@ class Masters::Vendors::Form < Forms::API
       switch :disabled, default_value: false
       switch :verified, visible: false, default_value: false
       attachment :cancelled_cheque, system_field: false
+
+      meta ->(record) { # TODO: ID is only for testing. Update this with required meta data.
+        {
+          id: record.id
+        }
+      }
     end
   end
 

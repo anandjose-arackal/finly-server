@@ -39,6 +39,12 @@ class ExportResource < NonTenantedApplicationRecord
       route: 'purchase_requests.index'
     },
     {
+        name: 'Purchase Request Items',
+        value: 'purchase_request_items',
+        resolver: 'purchase_request_items.default',
+        route: 'purchase_requests.index'
+    },
+    {
       name: 'Purchase Orders',
       value: 'purchase_orders',
       resolver: 'purchase_orders.default',

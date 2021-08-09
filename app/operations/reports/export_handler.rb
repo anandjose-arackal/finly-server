@@ -27,7 +27,7 @@ class Reports::ExportHandler < Reports::Show
     end
 
     def receipts
-      return [] if params[:receipt] == false
+      return [] if params[:receipt] == "false"
       receipts = []
       base_path = "#{Rails.root}/public/system"
       FileUtils::mkdir_p base_path
