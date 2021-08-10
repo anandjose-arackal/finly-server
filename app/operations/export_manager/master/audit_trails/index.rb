@@ -30,6 +30,9 @@ class ExportManager::Master::AuditTrails::Index < ExportManager::Builders::Sprea
   end
 
   def input
+    if params.dig(:qs,:id_eq_any).present?
+      params[:qs].delete(:id_eq_any)
+    end
     audit_trails = Resolver::Router.dispatch('audit_trails.default', params: params.merge(filter: true, paginate: false), current_user: user)
     AuditTrail.where(company_id: user.company_id).where("versions.user_transaction_id IN (#{audit_trails.select('user_transaction_id').to_sql})").order(created_at: :desc).group(:user_transaction_id,:item_id)
   end
