@@ -32,6 +32,7 @@ module ErpSyncable
     ransack_scopes :pending_erp_sync_or_modified
     ransack_scopes :with_erp_sync_status_ids
     ransack_scopes :except_erp_sync_status_id
+    ransack_scopes :with_erp_sync_status_pending
   end
 
 end
