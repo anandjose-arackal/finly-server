@@ -103,7 +103,7 @@ class WorkflowManager::Aasm::YesBankVendorProvider < WorkflowManager::Aasm::Base
     end
 
     if should_check_pan
-      similar_pan_vendors = YesBankVendor.where(pan: document.pan, company_id: user.company_id).filter_active
+      similar_pan_vendors = YesBankVendor.non_deleted.where(pan: document.pan, company_id: user.company_id).filter_unique_check
       if similar_pan_vendors.present?
         self.messages[:error].push "Vendor with pan: \"#{similar_pan_vendors.first.pan}\" already exists in the system. See vendor - #{similar_pan_vendors.first.display_name}"
         return false
