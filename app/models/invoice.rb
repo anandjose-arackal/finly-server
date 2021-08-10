@@ -2178,9 +2178,7 @@ class Invoice < ApplicationRecord
   #         field_configuration.field_name        = form_custom_field.form_entity.label
   #         field_configuration.field_key         = form_custom_field.form_entity.entity_key
   #         field_configuration.save
-  #       end
-      
-
+  #       end    
   #       value = form_custom_field.selection.form_entity_choice.name
 
   #       custom_field.value = FieldText.create({ value: form_custom_field.value, company_id: self.company_id })
