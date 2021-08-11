@@ -166,7 +166,7 @@ class Docs::UtilityBills::Subscriptions::Contracts::Update < Reform::Form
   end
 
   def validate_subscription_uniqueness
-    valid true
+    valid = true
     unique_subscription =  BbpsBillerSubscription.filter_unique_check.where.not(id: id).where(bbps_biller_id: bbps_biller_id,
                                                                             customer_param_key_1: customer_param_key_1,
                                                                             customer_param_value_1: customer_param_value_1,
