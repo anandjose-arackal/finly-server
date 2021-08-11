@@ -77,6 +77,7 @@ class WorkflowManager::Aasm::YesBankVendorProvider < WorkflowManager::Aasm::Base
     should_check_gstin = false
     should_check_pan = false
     should_check_bank_account = false
+    
 
     if VendorToggle.new(user).forms_enabled?
       form = Form.where(model: 'YesBankVendor', company_id: user.company.id).first
