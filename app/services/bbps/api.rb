@@ -48,7 +48,9 @@ class Bbps::Api < ServiceApi
 
   def body
     message = generate_message
+    Rails.logger.info "BBPS Message :: #{message}"
     encrypted_message = encrypt(message)
+
     body = {requestMsg: encrypted_message, agentInstitutionId: agent_institution_id}
     log_generator.merge({request_raw_message: message})
     puts "Message: #{message}"
