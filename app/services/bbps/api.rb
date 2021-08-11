@@ -20,9 +20,10 @@ class Bbps::Api < ServiceApi
   skip_user_authorization!
   http_method :post
   mime_type "application/json"
-  url Rails.application.config_for(:bbps_config)&.with_indifferent_access&.dig('base_url')
+  url 'http://180.179.170.6:1012/portal/service/npciservice'#Rails.application.config_for(:bbps_config)&.with_indifferent_access&.dig('base_url')
   header 'X-IBM-Client-Id', Rails.application.config_for(:bbps_config)&.with_indifferent_access&.dig('client_id')
   header 'X-IBM-Client-Secret', Rails.application.config_for(:bbps_config)&.with_indifferent_access&.dig('client_secret')
+  header "AUTH","7ljbVcKc1Ka5tpaGAyAvR/vNDcTzk1C+BRhUdM9zB3s="
   body -> (user, params) { body }
   client -> (user, params) { client }
   parse -> (user, params, response) { parse_response(user, params, response) }
@@ -47,11 +48,11 @@ class Bbps::Api < ServiceApi
   end
 
   def body
-    message = generate_message
+    message = "FCEtV3bbmRQqRPDe++Exq4c5eAcgD+xEE8313baqaxOzfvoqw/gQsG4LbOMABfRySPe3WTynow1NRJ6gNjnhWi9ujU4X4Jxl1YiMCB1fGXa1snS1acHr5h3981JB6KvahHOeGfp7zVd5w96Sc+bWwOi24fWGV+n8lGvMa+SDQPNqmhhDJbmAfPAdzxm/TPy9UNw5IWaOL7hXAxdKzQNO1qZIldpoXbdLn5GAvBJY9PdGkiXwVxtNwp9UIPemKQAfnvLYx5tV80WkZlp+c/EqWVrlaxQ1Dm7Gg7rXNdJiTx10tVRpjQ+LUEgdwWRd/ZeS7I3eVU0PavZ7kD5iY1rl+jpZhgv/auW+Va+OXIrdTyEZIOs06E6TVebDMMrcr8lCduwbFt7lDOiYXxQUUA0MR5Px9ij1A9Dfijy3Cyqks7jgwzaFErA0BDCF/ycOWdlOLuQE/zJNz63Fsq1M5wHwlUqZdhz5a3v4HMRUZMXYY8veBb1drVm92ESramUvoN9RvE/kevQDe2BkUPYm0+2Jll+Yf4CC0BBK7W6MwGxq5644hJXZwLC3bE0vNPf68pgTo0Cfy9xqpIM9eY/m2p7Jr7bYquULQ7sBmZkbuZVe4cOL1cI162UDBRGF26T2gNrzo4/faINt4HN+1EYEkHexwS4HM5UItbM8TEsEIxc7d5WR7HMyEcXlu1K0jKjGGCrt"#generate_message
     Rails.logger.info "BBPS Message :: #{message}"
-    encrypted_message = encrypt(message)
+    #encrypted_message = encrypt(message)
 
-    body = {requestMsg: encrypted_message, agentInstitutionId: agent_institution_id}
+    body = {requestMsg: message, agentInstitutionId: agent_institution_id}
     log_generator.merge({request_raw_message: message})
     puts "Message: #{message}"
     puts "Body: #{body}"
@@ -147,7 +148,7 @@ class Bbps::Api < ServiceApi
     # https://stackoverflow.com/questions/11059059/is-it-possible-to-enable-tls-v1-2-in-ruby-if-so-how
     logger = Logger.new $stderr
     logger.level = Logger::DEBUG
-    Faraday.new(:url => fetch(:url), ssl: ssl_options) do |faraday|
+    Faraday.new(:url => "http://180.179.170.6:1012/portal/service/npciservice/fetch", ssl: ssl_options) do |faraday|
       # builder.use Faraday::Request::UrlEncoded
       faraday.request :url_encoded # form-encode POST params
       faraday.response :logger, logger # log requests to STDOUT
