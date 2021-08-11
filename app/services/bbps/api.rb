@@ -83,6 +83,8 @@ class Bbps::Api < ServiceApi
 
   # Map the response splits with the respective headers provided by response_fields
   def parse_response(user, params, response)
+    Rails.logger.info "BBPS response :: #{response}"
+       Rails.logger.info "BBPS response :: #{response.inspect}"
     return Failure("Invalid response") unless response.status == 200
     json = JSON.parse response.body
     return Failure("Invalid response") unless json&.dig('responseMsg').present?
@@ -98,6 +100,9 @@ class Bbps::Api < ServiceApi
 
   # The JSON response has a pipe delimiter in the biller_details. Hence, handling it correctly
   def parse_json_response(json_key, user, params, response)
+    Rails.logger.info "BBPS json response :: #{response}"
+
+        Rails.logger.info "BBPS json response :: #{response.inspect}"
     return Failure("Invalid response") unless response.status == 200
     json = JSON.parse response.body
     return Failure("Invalid response") unless json&.dig('responseMsg').present?
