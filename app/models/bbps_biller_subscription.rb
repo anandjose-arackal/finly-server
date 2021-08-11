@@ -172,6 +172,9 @@ include Searchkick::Api
     where('extract(month from created_at) = ?', month)
   }
 
+  scope :filter_unique_check, -> { where.not(status_id: BbpsBillerSubscriptionStatus.ids_for(:draft, :open, :retracted, :rejected, :deactivated))}
+
+
   scope :includes_for_index, -> {
     includes(:pocs, :department, :cost_center, :policy, :location, :biller, :status, :category, :user, :attachments, :tax_rate)
   }
