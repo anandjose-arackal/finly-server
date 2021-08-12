@@ -3,7 +3,7 @@ module ErpSyncable
 
   included do
 
-    scope :with_erp_sync_status_pending, -> {
+    scope :with_erp_sync_status_pending, -> (*args) {
       pending_ids = ErpSyncStatus.ids_for(:pending)
       pending_ids << nil
       where erp_sync_status_id: pending_ids
@@ -17,12 +17,22 @@ module ErpSyncable
       pending_docs.or(updated_docs)
     }
 
+    scope :with_erp_sync_status_ids, -> (status_ids) {
+      where(erp_sync_status_id: status_ids)
+    }
+
+    scope :except_erp_sync_status_id, -> (status_ids) {
+      where.not(erp_sync_status_id: status_ids)
+    }
 
     belongs_to :erp_sync_status, optional: true
     has_many :erp_sync_attempts, as: :record
 
     ransack_scopes :pending_erp_sync
     ransack_scopes :pending_erp_sync_or_modified
+    ransack_scopes :with_erp_sync_status_ids
+    ransack_scopes :except_erp_sync_status_id
+    ransack_scopes :with_erp_sync_status_pending
   end
 
 end

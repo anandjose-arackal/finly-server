@@ -97,6 +97,12 @@ class ExportResource < NonTenantedApplicationRecord
       value: 'utility_subscriptions',
       resolver: 'utility_subscriptions.default',
       route: 'utility_subscriptions.index'
+    },
+    {
+        name: 'Audit Trails',
+        value: 'audit_trails',
+        resolver: 'audit_trails.default',
+        route: 'audit_trails.index'
     }
   ]
 

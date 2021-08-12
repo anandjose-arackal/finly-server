@@ -49,4 +49,22 @@ class YesBankVendorExposure < Exposures::API
   attribute :deactivated, record_attribute: :deactivated?
 
   # attribute :vendor_tds_rates, record_attribute: true, exposure: true
+  attribute :approved_timeline, includes: [{dlrms: [:taken_control_by, :forwarded_to, :reviewer]}] do
+    approvers = record.dlrms.map do |dlrm|
+      taken_control_by = forwarded_to = reviewer = nil
+      taken_control_by = dlrm.taken_control_by
+      forwarded_to = dlrm.forwarded_to
+      reviewer = dlrm.reviewer
+      approved = [TrailAction.id_for(:approve), TrailAction.id_for(:approve_and_forward)].include?(dlrm.action_id)
+      action_taken = (dlrm.action_taken_at.present? ? dlrm.action_taken_at.strftime("%I:%M %p, %d %b %Y") : dlrm.updated_at.strftime("%I:%M %p, %d %b %Y"))
+      if forwarded_to.present?
+        (approved ? "#{forwarded_to.name} - #{action_taken}" : forwarded_to.name)
+      elsif taken_control_by.present?
+        (approved ? "#{taken_control_by.name} - #{action_taken}" : taken_control_by.name)
+      elsif reviewer.present?
+        (approved ? "#{reviewer.name} - #{action_taken}" : reviewer.name)
+      end
+    end
+    approvers.reject { |e| e.to_s.empty? }.join(", ")
+  end
 end
