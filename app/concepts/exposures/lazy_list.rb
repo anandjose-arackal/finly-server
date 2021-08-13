@@ -33,26 +33,7 @@ class Exposures::LazyList < Exposures::API
     self
   end
 
-  def first
-    relation.first&.to_exposure
-  end
-
-  def second
-    relation.second&.to_exposure
-  end
-
-  def third
-    relation.third&.to_exposure
-  end
-
-  def fourth
-    relation.fourth&.to_exposure
-  end
-
-  def fifth
-    relation.fifth&.to_exposure
-  end
-
+  # Define first, second, third, etc. methods
   offset_methods = []
     first: 1,
     second: 2,
