@@ -81,12 +81,6 @@ class ExportResource < NonTenantedApplicationRecord
       route: 'vendors.index'
     },
     {
-      name: 'Vendor Locations',
-      value: 'vendor_locations',
-      resolver: 'vendors.locations.default',
-      route: 'vendors.index'
-    },
-    {
       name: 'Utility Bills',
       value: 'utility_bills',
       resolver: 'utility_bills.default',
