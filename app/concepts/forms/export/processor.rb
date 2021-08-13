@@ -181,10 +181,6 @@ class Forms::Export::Processor
       request.item_complete(true)
     end
 
-    # self.headers.values.each_with_index do |header_name, header_index|
-    #   worksheet.write(0, header_index, header_name)
-    # end
-
     lookup_content.each_with_index do |content, index|
       worksheet = workbook.add_worksheet(content[:name])
 

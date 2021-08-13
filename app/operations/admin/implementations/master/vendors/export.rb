@@ -48,7 +48,7 @@ class Admin::Implementations::Master::Vendors::Export < Admin::Implementations::
   end
 
   def input
-    company.yes_bank_vendors.non_deleted.authorized.includes(:vendor_type,:bank_accounts,:gstin_locations)
+    company.yes_bank_vendors.non_deleted.includes(:vendor_type,:bank_accounts,:gstin_locations)
   end
 
   def id(vendor)
