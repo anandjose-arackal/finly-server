@@ -34,7 +34,7 @@ class Exposures::LazyList < Exposures::API
   end
 
   # Define first, second, third, etc. methods
-  offset_methods = []
+  offset_methods = {
     first: 1,
     second: 2,
     third: 3,
