@@ -47,7 +47,7 @@ class Exposures::LazyList < Exposures::API
     tenth: 10,
   }
 
-  offsets.each do |name, offset|
+  offset_methods.each do |name, offset|
     define_method name do
       relation.offset(offset-1).first&.to_exposure
     end
