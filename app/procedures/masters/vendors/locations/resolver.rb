@@ -1,4 +1,4 @@
-class Masters::Vendors::Locations::Resolver < Masters::Vendors::Resolver
+class Masters::Vendors::Locations::Resolver < Resolver::API
 
   entity GstinLocation
 
@@ -8,7 +8,7 @@ class Masters::Vendors::Locations::Resolver < Masters::Vendors::Resolver
   end
 
   def load(params)
-    vendors = super(params)
+    vendors = Resolver::Router.dispatch('vendors.default', { params: params, current_user: user })
     GstinLocation.where("`gstin_locations`.`vendor_id` IN (#{vendors.select(:id).to_sql})")
   end
 
