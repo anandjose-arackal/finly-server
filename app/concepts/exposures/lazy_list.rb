@@ -53,6 +53,25 @@ class Exposures::LazyList < Exposures::API
     relation.fifth&.to_exposure
   end
 
+  offset_methods = []
+    first: 1,
+    second: 2,
+    third: 3,
+    fourth: 4,
+    fifth: 5,
+    sixth: 6,
+    seventh: 7,
+    eighth: 8,
+    ninth: 9,
+    tenth: 10,
+  }
+
+  offsets.each do |name, offset|
+    define_method name do
+      relation.offset(offset-1).first&.to_exposure
+    end
+  end
+
   def last
     relation.last&.to_exposure
   end
