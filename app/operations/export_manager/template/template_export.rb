@@ -86,6 +86,10 @@ class ExportManager::Template::TemplateExport < ExportManager::API
     end
   end
 
+  def iter_field
+    export_template.iter_field
+  end
+
   def processor_class
     case format
     when :xls
@@ -103,7 +107,7 @@ class ExportManager::Template::TemplateExport < ExportManager::API
 
   def generate
     self.processor = processor_class.new export_job
-    self.file = self.processor.generate template, data, file_name
+    self.file = self.processor.generate template, iter_field, data, file_name
     if self.file
       save_attachment self.file
       success!

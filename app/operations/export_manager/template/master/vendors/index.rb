@@ -6,6 +6,7 @@ class ExportManager::Template::Master::Vendors::Index < ExportManager::Builders:
   subscribe 'vendors'
   default true
 
+  iter_field field: :gstin_locations, template_prefix: 'gstin_location'
   form_custom_fields :vendors, template_prefix: 'record'
 
   attribute :vendor_business_name, template: '{{ record.business_name }}'
@@ -18,10 +19,10 @@ class ExportManager::Template::Master::Vendors::Index < ExportManager::Builders:
   attribute :email, template: '{{ record.email }}'
   attribute :created_by, template: '{{ record.created_by.name }}'
   attribute :pan, template: '{{ record.pan }}'
-  attribute :poc_name, template: '{{ record.gstin_locations.first.poc_name }}'
-  attribute :poc_email, template: '{{ record.gstin_locations.first.poc_email }}'
-  attribute :gstin_location_address, template: '{{ record.gstin_locations.first.address }}'
-  attribute :gstin, template: '{{ record.gstin_locations.first.gstin }}'
+  attribute :poc_name, template: '{{ gstin_location.poc_name }}'
+  attribute :poc_email, template: '{{ gstin_location.poc_email }}'
+  attribute :gstin_location_address, template: '{{ gstin_location.address }}'
+  attribute :gstin, template: '{{ gstin_location.gstin }}'
   attribute :tds_percentage, template: ''
   attribute :state_code, template: '{{ record.state_code.name }} - {{ record.state_code.code }}'
   attribute :description, template: '{{ record.description }}'
