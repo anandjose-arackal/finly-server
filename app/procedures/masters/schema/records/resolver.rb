@@ -9,7 +9,7 @@ class Masters::Schema::Records::Resolver < Resolver::API
       data = data.where(ancestry: nil)
     end
 
-    data
+    data.unscope(:order).order(created_at: :desc)
   end
 
   def init_record_model_class(params, user)
