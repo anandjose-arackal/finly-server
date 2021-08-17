@@ -2096,7 +2096,7 @@ class Invoice < ApplicationRecord
     if form_attachments_field.present?
       form_attachments_field.attachments.each do |new_attachment|
         old_attachment = self.attachments.find_or_initialize_by(file_file_name: new_attachment.attachment_file_name )
-
+        next
         if old_attachment.new_record?
           old_attachment.file_file_name = new_attachment.attachment_file_name
           old_attachment.file_content_type = new_attachment.attachment_content_type

@@ -50,7 +50,11 @@ class AuditTrail < PaperTrail::Version
   scope :with_user_transaction_id, -> (ref_id) { where user_transaction_id: ref_id }
 
   def changes_less
-    self.get_change_statement(less: true).map{|change| "#{change&.first&.to_s&.titlecase} Changed #{(change&.last)&.join(' -> ')}"}&.join(' , ')
+    self.get_change_statement(less: true).map{|change| "#{change&.first.to_s&.titlecase} Changed #{(change&.last)&.join(' -> ')}"}&.join(' , ')
+  end
+
+  def changes_all
+    self.get_change_statement(less: false).map{|change| "#{change&.first.to_s&.titlecase} Changed #{(change&.last)&.join(' -> ')}"}&.join(' , ')
   end
 
   def get_document_number
