@@ -174,12 +174,7 @@ class MasterEntity < ApplicationRecord
       data[:choices_scope] = choices_scope
       data[:choices_data] = choices_scope.build(user: RequestStoreUtil.current_user)
       data[:autocomplete_url] = 'lookup/' + choices_scope.route.gsub('.', '/')
-      master_key = choices_scope.route.split(".")[1]
-      lookup_schema = MasterSchema.find_by(master_key: master_key)
-      data[:resource] = {
-        name: lookup_schema.name,
-        master_key: lookup_schema.master_key,
-      }
+      data[:route] = choices_scope.route.split(".")[1]
     end
 
     data
