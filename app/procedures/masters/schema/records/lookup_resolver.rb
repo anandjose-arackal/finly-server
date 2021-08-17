@@ -4,7 +4,7 @@ class Masters::Schema::Records::LookupResolver < Masters::Schema::Records::Resol
     if params[:route].present?
       init_record_model_class(params, user)
     end
-    params[:model_class].where(company_id: user.company_id).order(created_at: :desc)
+    params[:model_class].where(company_id: user.company_id).unscope(:order).order(created_at: :desc)
   end
 
 end
