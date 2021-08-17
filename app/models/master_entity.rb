@@ -45,6 +45,8 @@ class MasterEntity < ApplicationRecord
   scope :system_fields, -> { where system_entity: true }
   scope :custom_fields, -> { where.not system_entity: true }
   scope :show_in_lookup, -> { where show_in_lookup: true }
+  scope :primary_fields, -> { where primary_key: true }
+  scope :entities_for_lookup, -> { show_in_lookup.or(primary_fields) }
   scope :only_active, -> { where active: true }
 
   set :hint, 'Enter Value'
