@@ -45,8 +45,7 @@ module Sequenced
         return seq if seq.present?
       end
 
-      seq = next_id_in_sequence
-      seq += 1 until unique?(format_id(seq))
+      seq = next_unique_id_in_sequence
       format_id(seq)
     end
 
@@ -70,6 +69,16 @@ module Sequenced
         rel = rel.where("NOT id = ?", record.id) if record.persisted?
         rel.where(column => id)
       end.count == 0
+    end
+
+    def get_prefix
+      @prefix
+    end
+
+    def next_unique_id_in_sequence
+      seq = next_id_in_sequence
+      seq += 1 until unique?(format_id(seq))
+      seq
     end
 
     private

@@ -437,15 +437,15 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
       ba = BankAccount.find_by(id: id)
       return ba
     else
-      ba = BankAccount.non_deleted.find_by(account_number: order_details[:bank_account_number]&.strip, ifsc: order_details[:ifsc]&.strip,
-                                           company_id: self.company_id, # name: order_details[:name]&.strip, because account number and IFSC are the only criteria against which we company
-                                           account_owner_type: YesBankVendor.name) # default for API initiations are 2, because they're always for vendors
+      account_name = order_details[:bank_account_name] || order_details[:name]
       business_name = order_details[:business_name] || order_details[:name]
+      ba = BankAccount.find_by(account_number: order_details[:bank_account_number]&.strip, ifsc: order_details[:ifsc]&.strip,
+                                           company_id: self.company_id, # name: order_details[:name]&.strip, because account number and IFSC are the only criteria against which we company
+                                           account_owner_type: YesBankVendor.name,
+                                           name: account_name) # default for API initiations are 2, because they're always for vendors
       vendor = ba&.account_owner || YesBankVendor.find_or_create_by(name: order_details[:name], company_id: self.company_id, business_name: business_name)
-      ba&.update(is_deleted: false) # i.e. if the bank account already exists, mark it as non deleted
       if ba.nil?
-        ba = BankAccount.create(name: order_details[:name], account_number: order_details[:bank_account_number]&.strip, ifsc: order_details[:ifsc]&.strip,account_owner: vendor, company_id: self.company_id, default_account: true)
-
+        ba = BankAccount.create(name: account_name, account_number: order_details[:bank_account_number]&.strip, ifsc: order_details[:ifsc]&.strip,account_owner: vendor, company_id: self.company_id, default_account: true)
       end
       return ba
     end

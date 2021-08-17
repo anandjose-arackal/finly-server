@@ -5,4 +5,9 @@ class Masters::Countries::Lookup < Lookup::API
 
   attribute :id, visible: false
   attribute :name
+
+  def self.max_per_page
+    200
+  end
+  
 end

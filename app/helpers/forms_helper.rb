@@ -45,6 +45,7 @@ module FormsHelper
 
   def entity_data(model, form_entity)
     form_data = {}
+    # binding.pry if form_entity.entity_key == 'vendorcountry'
     if form_entity.class.collection?
       collection_models = (model.respond_to?(form_entity.entity_key) && model.send(form_entity.entity_key)) || []
       collection_data = collection_models.map do |collection_model|
@@ -67,6 +68,8 @@ module FormsHelper
           if  entity.entity_type == 'lookup'
             form_data.merge!({entity.entity_key => model.send(entity.entity_key).to_s})
             form_data.merge!({"#{entity.entity_key}_value" => model.retrieve_value(entity)})
+          elsif form_entity.entity_type == 'dropdown'
+            form_data.merge!({"#{entity.entity_key}_value" => model.retrieve_value(entity)})
           elsif entity.entity_type == 'amount'
             form_data.merge!({entity.entity_key => model.send(entity.entity_key).to_f.round(2)})
           end
@@ -80,8 +83,10 @@ module FormsHelper
     else
       if form_entity.system_field && model.respond_to?(form_entity.entity_key)
         form_data.merge!({form_entity.entity_key => model.send(form_entity.entity_key)})
-        if  form_entity.entity_type == 'lookup'
+        if form_entity.entity_type == 'lookup'
           form_data.merge!({form_entity.entity_key => model.send(form_entity.entity_key).to_s})
+          form_data.merge!({"#{form_entity.entity_key}_value" => model.retrieve_value(form_entity)})
+        elsif form_entity.entity_type == 'dropdown'
           form_data.merge!({"#{form_entity.entity_key}_value" => model.retrieve_value(form_entity)})
         elsif form_entity.entity_type == 'amount'
           form_data.merge!({form_entity.entity_key => model.send(form_entity.entity_key).to_f.round(2)})

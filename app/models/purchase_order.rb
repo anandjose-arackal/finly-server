@@ -85,6 +85,7 @@ class PurchaseOrder < ApplicationRecord
   # include SearchIndex::Concerns::Document
   include Searchkick::Api
   include Concerns::ErpSyncConcern
+  include ErpSyncable
 
 
   acts_as_sequenced column: :po_number, purpose: :purchase_order, editable: false, prefix: 'PO/{fiscal_year_start}-{fiscal_year_end}/', min_length: 4

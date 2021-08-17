@@ -11,7 +11,18 @@ json.pan_number record.pan
 json.msme_registered record.msme_registered
 json.msme_registration_number record.msme_registration_number
 json.tds_rates record.tds_rates
-json.locations record.gstin_locations
+json.locations do
+  json.array! record.gstin_locations.each do |gstin_location|
+    json.merge! gstin_location.as_json
+    json.location_custom_fields do
+      json.array! gstin_location.form_custom_fields.each do |location_custom_field|
+        json.name location_custom_field.form_entity&.label
+        json.field_key location_custom_field.field_key
+        json.field_value location_custom_field.retrieve_text_value
+      end
+    end
+  end
+end
 json.bank_accounts record.bank_accounts
 json.created_at record.created_at
 json.updated_at record.updated_at

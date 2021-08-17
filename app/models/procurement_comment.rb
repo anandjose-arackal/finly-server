@@ -20,4 +20,9 @@ class ProcurementComment < ApplicationRecord
   belongs_to :user, optional: true
 
   belongs_to :parent_commentable, optional: true, polymorphic: true
+
+  def generate_body
+    name = self.user.name
+    "#{name} commented at #{self.created_at.strftime("%d-%b-%y")}: #{self.body}"
+  end
 end

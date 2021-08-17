@@ -15,6 +15,7 @@ json.line_items do
     json.product_type item.inventory_line_item&.product_type&.name
     json.item_code item.inventory_line_item&.item_number
     json.description item.description
+    json.comment item.comment
     json.category item.category
     json.department item.department
     json.cost_center item.cost_center
