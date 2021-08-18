@@ -16,7 +16,7 @@ class Bbps::Api < ServiceApi
   class_attr :request_fields, default: []
   class_attr :response_fields, default: []
   class_attr :success_object
-  class_attr :encryption_key, default: Rails.application.config_for(:bbps_config)&.with_indifferent_access&.dig('encryption_key')
+  class_attr :encryption_key, default: "2321bd46f297a35241efe1744df7898c"
   skip_user_authorization!
   http_method :post
   mime_type "application/json"
@@ -48,18 +48,18 @@ class Bbps::Api < ServiceApi
   end
 
   def body
-    message = "+VlF8N18OMDnNnG4dWh1j3amfWDzMm5aZjahCqH4+HXrbUcGuQgDPCapXevqBGvdAsoZ2yivBOB4v7mqWRoUw5yYOPekVP37w/4rmt0M0/V4OL/4Spc6UQC3QkZ/w/9EVROuXH/TsAipGBjK45sExQN5rCP159LDBS7sfy8UT6hbr0EbKAwKP5Hw7RI3zYEjw1lz9o7gc7PUl23AgQTRFTGWf5sDk7gzwWhGaHEo2BAGqZdk6VyiPsHxXtukN5t0EreTmN5GcNFhcxYne+0gvqimD2Iw+g125yhR8y4l4ywTU2xVJuhR5nlHH93pffJ9ylQ1Vf7JYnPzhtbMkarHxUnLen7p1XSI2nkNHmTxjdqowV5BywwI6DF6zlcmCn26QoxqulrxwAJTlqKqEdBuWXIs4ZX2QHgRv/3eZZV/99p5yED/e5o2koesPoMMVNfp7lVovHQX/uRxPxOCZ8g8UnyI6ALtb2AUwv/caVIhbadsUrVQUkwCohk2Teh8+pE0ndTuU8rhQT0utfGDuEhskVCaBkFdXladx82G9y183S70ISY00IXsvqa6kY3X1BSrEe0HgBc2F6xphSXHukQRL9XW8M0OZH8vgGW+iglcExfBOEfxV269ocsa+SvmxZhdFgASnEDVSmvWCg2GDDDEsTR1E3OK8cikDHy47YCMfAs="
-    Rails.logger.info "BBPS Message :: #{message}"
-    #encrypted_message = encrypt(message)
-
+    m1 = "{\"chId\":1,\"custDetails\":{\"mobileNo\":\"8879397255\",\"customerTags\":[{\"name\":\"EMAIL\",\"value\":\"mk.chekuri@gmail.com\"},{\"name\":\"AADHAAR\",\"value\":\"499118665246\"},{\"name\":\"PAN\",\"value\":\"BXXCG7754K\"}]},\"agentDetails\":{\"agentId\":\"YB31YB41MOB521611569\",\"deviceTags\":[{\"name\":\"IP\",\"value\":\"124.170.23.24\"},{\"name\":\"MAC\",\"value\":\"01-23-45-67-89-ab\"}]},\"billDetails\":{\"billerId\":\"ASCE00000NATGK\",\"customerParams\":[{\"name\":\"Loan number\",\"value\":\"17000036\"}]}}"
+    m2 = "sample"
+    message = "FCEtV3bbmRQqRPDe++Exq4c5eAcgD+xEE8313baqaxOzfvoqw/gQsG4LbOMABfRySPe3WTynow1NRJ6gNjnhWi9ujU4X4Jxl1YiMCB1fGXa1snS1acHr5h3981JB6KvahHOeGfp7zVd5w96Sc+bWwOi24fWGV+n8lGvMa+SDQPNqmhhDJbmAfPAdzxm/TPy9UNw5IWaOL7hXAxdKzQNO1qZIldpoXbdLn5GAvBJY9PdGkiXwVxtNwp9UIPemKQAfnvLYx5tV80WkZlp+c/EqWVrlaxQ1Dm7Gg7rXNdJiTx10tVRpjQ+LUEgdwWRd/ZeS7I3eVU0PavZ7kD5iY1rl+ouoriV5mWRcGceTwUeGRWMb1R6MqEd8xNeI/06B89ioRCfMjtRuoQpcvvql0RL3bvYxUdwSBz7OPcLxV1UAuj451kvEe9kmyRu3P6Vm0kDDYxvfGxo27ecH8xp0Rq7CyuVB37kL2X4CqW6eub7MUVknXbtuknj8wLzQvqrUFvATBWoX7rqus5WFH48pxntwy2aP0GZ+fpmHbBUFc1uTJXZo3aqbPt2B7Tgk0ZC1mLQx38pdfyijERo6emqD2/LS5A=="
+    encrypted_message = encrypt(m1)
+    Rails.logger.info("Encrypted message :: #{encrypted_message}")
     body = {request: message, agentInstitutionId: agent_institution_id}
     log_generator.merge({request_raw_message: message})
-    puts "Message: #{message}"
-    puts "Body: #{body}"
     body
   end
 
   def generate_message
+    
     req = []
     fetch(:request_fields).each do |field|
       val = (self.respond_to?(field) ? self.send(field) : nil)
@@ -75,7 +75,7 @@ class Bbps::Api < ServiceApi
 
   def encrypt(message)
     result = nil
-    Open3.popen3("java UPISecurity.java \"#{message}\" \"#{self.class.encryption_key}\"") do |stdin, stdout, strerr|
+    Open3.popen3("java BbpsEncryption.java \"#{message}\" \"2321bd46f297a35241efe1744df7898c\"") do |stdin, stdout, strerr|
       result = stdout.read
     end
     result
@@ -144,8 +144,8 @@ class Bbps::Api < ServiceApi
     verify = true #Rails.env.production? ? true : false
     # since we're using the default keystore, no need to import Yes Bank's certificates as they're signed
     ssl_options = {
-        client_cert: OpenSSL::X509::Certificate.new(File.read(ENV['HOME'] + '/certificates/finly.crt')),
-        client_key: OpenSSL::PKey::RSA.new(File.read(ENV['HOME'] + '/certificates/finly.key')),
+        client_cert: "",#OpenSSL::X509::Certificate.new(File.read(ENV['HOME'] + '/certificates/finly.crt')),
+        client_key: "",#OpenSSL::PKey::RSA.new(File.read(ENV['HOME'] + '/certificates/finly.key')),
         verify: verify,
         version: :SSLv23
     }
