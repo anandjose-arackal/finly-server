@@ -51,7 +51,9 @@ class Bbps::Api < ServiceApi
     m1 = "{\"chId\":1,\"custDetails\":{\"mobileNo\":\"8879397255\",\"customerTags\":[{\"name\":\"EMAIL\",\"value\":\"mk.chekuri@gmail.com\"},{\"name\":\"AADHAAR\",\"value\":\"499118665246\"},{\"name\":\"PAN\",\"value\":\"BXXCG7754K\"}]},\"agentDetails\":{\"agentId\":\"YB31YB41MOB521611569\",\"deviceTags\":[{\"name\":\"IP\",\"value\":\"124.170.23.24\"},{\"name\":\"MAC\",\"value\":\"01-23-45-67-89-ab\"}]},\"billDetails\":{\"billerId\":\"ASCE00000NATGK\",\"customerParams\":[{\"name\":\"Loan number\",\"value\":\"17000036\"}]}}"
     m2 = "sample"
     message = "FCEtV3bbmRQqRPDe++Exq4c5eAcgD+xEE8313baqaxOzfvoqw/gQsG4LbOMABfRySPe3WTynow1NRJ6gNjnhWi9ujU4X4Jxl1YiMCB1fGXa1snS1acHr5h3981JB6KvahHOeGfp7zVd5w96Sc+bWwOi24fWGV+n8lGvMa+SDQPNqmhhDJbmAfPAdzxm/TPy9UNw5IWaOL7hXAxdKzQNO1qZIldpoXbdLn5GAvBJY9PdGkiXwVxtNwp9UIPemKQAfnvLYx5tV80WkZlp+c/EqWVrlaxQ1Dm7Gg7rXNdJiTx10tVRpjQ+LUEgdwWRd/ZeS7I3eVU0PavZ7kD5iY1rl+ouoriV5mWRcGceTwUeGRWMb1R6MqEd8xNeI/06B89ioRCfMjtRuoQpcvvql0RL3bvYxUdwSBz7OPcLxV1UAuj451kvEe9kmyRu3P6Vm0kDDYxvfGxo27ecH8xp0Rq7CyuVB37kL2X4CqW6eub7MUVknXbtuknj8wLzQvqrUFvATBWoX7rqus5WFH48pxntwy2aP0GZ+fpmHbBUFc1uTJXZo3aqbPt2B7Tgk0ZC1mLQx38pdfyijERo6emqD2/LS5A=="
+    Rails.logger.info("Encryption key :: #{self.class.encryption_key}")
     encrypted_message = encrypt(m1)
+
     Rails.logger.info("Encrypted message :: #{encrypted_message}")
     body = {request: message, agentInstitutionId: agent_institution_id}
     log_generator.merge({request_raw_message: message})
