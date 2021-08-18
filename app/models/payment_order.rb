@@ -291,7 +291,7 @@ class PaymentOrder < ApplicationRecord
         self.update(payment_order_status_id: PaymentOrderStatus.id_for(:failed))
       end
     else
-      if status_ids.include?(PaymentStatus.id_for(:initiated)) || status_ids.include?(PaymentStatus.id_for(:processing))
+      if status_ids.include?(PaymentStatus.id_for(:initiated)) || status_ids.include?(PaymentStatus.id_for(:processing)) || status_ids.include?(PaymentStatus.id_for(:pending))
         self.update(payment_order_status_id: PaymentOrderStatus.id_for(:partially_completed))
       else
         self.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
