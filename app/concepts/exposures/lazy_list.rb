@@ -33,25 +33,65 @@ class Exposures::LazyList < Exposures::API
     self
   end
 
-  # Define first, second, third, etc. methods
-  offset_methods = {
-    first: 1,
-    second: 2,
-    third: 3,
-    fourth: 4,
-    fifth: 5,
-    sixth: 6,
-    seventh: 7,
-    eighth: 8,
-    ninth: 9,
-    tenth: 10,
-  }
+  ## Define first, second, third, etc. methods
+  #offset_methods = {
+  #  first: 1,
+  #  second: 2,
+  #  third: 3,
+  #  fourth: 4,
+  #  fifth: 5,
+  #  sixth: 6,
+  #  seventh: 7,
+  #  eighth: 8,
+  #  ninth: 9,
+  #  tenth: 10,
+  #}
+  #
+  #offsets.each do |name, offset|
+  #  define_method name do
+  #    relation.offset(offset-1).first&.to_exposure
+  #  end
+  #end
 
-  offsets.each do |name, offset|
-    define_method name do
-      relation.offset(offset-1).first&.to_exposure
-    end
+  def first
+    relation.first&.to_exposure
+
   end
+
+  def second
+    relation.second&.to_exposure
+  end
+
+  def third
+    relation.third&.to_exposure
+  end
+
+  def fourth
+    relation.fourth&.to_exposure
+  end
+
+  def fifth
+    relation.fifth&.to_exposure
+  end
+
+  def sixth
+    relation[6]&.to_exposure
+  end
+
+  def seventh
+    relation[7]&.to_exposure
+  end
+
+  def eighth
+    relation[8]&.to_exposure
+
+  end
+
+  def nineth
+    relation[9]&.to_exposure
+
+  end
+
 
   def last
     relation.last&.to_exposure
