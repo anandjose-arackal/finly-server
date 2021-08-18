@@ -143,5 +143,4 @@ class Masters::Schema::Entity::Contract < Reform::Form
       errors.add :entity_key, 'is not valid'
     end
   end
-
 end
