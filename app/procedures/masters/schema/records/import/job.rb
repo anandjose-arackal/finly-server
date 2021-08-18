@@ -118,7 +118,12 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
     updated_records = 0
     failed_records = 0
     skipped_records = 0
+    model.update(total_records: context[:input].count)
+
     context[:input].each do |row|
+      row.keys.each do |key|
+        row[key] = row[key].to_s
+      end
       data = row.values
       # pre_process_result = pre_process(context, row)
 
@@ -148,6 +153,8 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
       progress_update(model, created_records, updated_records, skipped_records, failed_records)
       context[:result] << data
     end
+
+    model.update(status_id: ImportJobStatus.id_for(:completed))
 
     true
   end
@@ -181,6 +188,8 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
     end
     context[:'result.file'] = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 1.day)
 
+    model.result_file = context[:'result.file'].file
+    model.save
     true
   end
 

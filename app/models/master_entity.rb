@@ -48,6 +48,7 @@ class MasterEntity < ApplicationRecord
   scope :primary_fields, -> { where primary_key: true }
   scope :entities_for_lookup, -> { show_in_lookup.or(primary_fields) }
   scope :only_active, -> { where active: true }
+  scope :only_lookup_entities, -> { where type: 'MasterEntity::Lookup' }
 
   set :hint, 'Enter Value'
 
@@ -163,12 +164,12 @@ class MasterEntity < ApplicationRecord
     }
 
     if type == 'MasterEntity::DropDown'
-      if choices_scope.type == :enum
-        data[:choices] = choices_scope.choices
-      else
+      if choices.present?
         data[:choices] = choices.map do |choice|
           choice.as_json
         end
+      else
+        data[:choices] = choices_scope.choices
       end
     end
 
