@@ -4416,6 +4416,7 @@ Rails.application.routes.draw do
           post '', to: "records#import"
           get 'template', to: "records#import_template"
         end
+        get '/count', to: 'records#count'
         post '/', to: 'records#create'
         get '/', to: 'records#index'
         get '/:id', to: 'records#show'
