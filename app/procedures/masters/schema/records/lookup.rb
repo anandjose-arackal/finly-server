@@ -37,7 +37,10 @@ class Masters::Schema::Records::Lookup < Lookup::API
   end
 
   def render_record(context, record:, model:, **)
-    json = {id: record.id}
+    json = {
+      id: record.id,
+      name: record.primary_entity_value,
+    }
     model.entities.only_active.entities_for_lookup.each do |entity|
       json[entity.entity_key] = record.send(entity.entity_key)
     end
