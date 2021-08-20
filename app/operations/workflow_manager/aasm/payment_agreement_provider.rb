@@ -49,7 +49,7 @@ class WorkflowManager::Aasm::PaymentAgreementProvider < WorkflowManager::Aasm::B
     end
 
     event :terminate do
-      transitions :from => [:approved], :to => [:terminated]
+      transitions :from => [:approved,:auto_approved], :to => [:terminated]
     end
 
     event :revise do
