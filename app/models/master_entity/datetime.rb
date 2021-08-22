@@ -22,8 +22,7 @@ class MasterEntity::DateTime < MasterEntity
       next unless value.present?
 
       begin
-        datetime_format = DATETIME_FORMAT
-        ::DateTime.strptime(value, datetime_format)
+        ::DateTime.strptime(value, DATETIME_FORMAT)
       rescue ArgumentError
         errors.add entity.label, 'invalid Datetime format'
       end
