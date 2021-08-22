@@ -20,7 +20,9 @@ class PurchaseRequestExposure < Exposures::API
   attribute :cost_allocation_items, record_attribute: true
   attribute :items, record_attribute: true, exposure: true
   attribute :controlling_level, record_attribute: true, exposure: true, includes: [:controlling_level]
-  attribute :dlrms, record_attribute: true, exposure: true, includes: [:dlrms]
+  attribute :approval_levels, record_attribute: true, exposure: true, includes: [:dlrms] do
+    record.dlrms
+  end
   attribute :get_reviewers_names do
     record.get_reviewers&.map(&:name)&.join(", ")
   end

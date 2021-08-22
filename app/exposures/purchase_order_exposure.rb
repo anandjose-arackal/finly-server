@@ -135,8 +135,9 @@ class PurchaseOrderExposure < Exposures::API
   attribute :user, exposure: true, record_attribute: true
   attribute :billing_address, record_attribute: true
   attribute :shipping_address, record_attribute: true
-  attribute :dlrms, record_attribute: true, exposure: true, includes: [:dlrms]
-
+  attribute :approval_levels, record_attribute: true, exposure: true, includes: [:dlrms] do
+    record.dlrms
+  end
 
   attribute :approved_timeline, includes: [{dlrms: [:taken_control_by, :forwarded_to, :reviewer]}] do
     approvers = record.dlrms.map do |dlrm|
