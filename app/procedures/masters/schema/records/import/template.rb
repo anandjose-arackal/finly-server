@@ -29,8 +29,8 @@ class Masters::Schema::Records::Import::Template < Transactions::API
     if master_schema.has_nesting
       context[:headers] << 'Parent ID'
     end
-    master_schema.entities.only_active.each do |entity|
-      context[:headers] << entity.label
+    master_schema.entities.only_active.only_import_entities.each do |entity|
+      context[:headers] << entity.import_label
     end
 
     context[:sheets] << {
@@ -55,7 +55,7 @@ class Masters::Schema::Records::Import::Template < Transactions::API
       next unless ['lookup', 'dropdown'].include?(entity.entity_type)
 
       sheet = {}
-      sheet[:name] = entity.label
+      sheet[:name] = entity.label.pluralize
       if entity.entity_type == 'lookup'
         sheet[:data] = entity.choices_scope.build(user: current_user, params: { paginate: false }).as_json
       end

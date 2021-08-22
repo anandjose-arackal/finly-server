@@ -14,6 +14,20 @@ class MasterEntity::DateTime < MasterEntity
 
   option :restriction
 
+  contract_eval 'DateTime validity' do |contract:, entity:, **|
+    contract.validate do
+      value = send(entity.entity_key)
+      next unless value.present?
+
+      begin
+        datetime_format = '%Y-%m-%d %H:%M:%S'
+        ::DateTime.strptime(value, datetime_format)
+      rescue ArgumentError
+        errors.add entity.label, 'invalid Datetime format'
+      end
+    end
+  end
+
   contract_eval 'Restriction' do |contract:, entity:, **|
     if entity.options['restriction'].present?
       contract.validate do

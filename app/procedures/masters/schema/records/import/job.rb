@@ -43,12 +43,14 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
 
   def build_headers(context, params:, master_schema:, **)
     context[:headers] = {}.with_indifferent_access
+    context[:entity_types] = {}.with_indifferent_access
     context[:identifier_key] = master_schema.sequence_entity&.entity_key
     # if master_schema.has_nesting
     #   context[:headers][:parent_id] = "Parent Id"
     # end
-    master_schema.entities.only_active.each do |entity|
-      context[:headers][entity.entity_key] = entity.label
+    master_schema.entities.only_active.only_import_entities.each do |entity|
+      context[:headers][entity.entity_key] = entity.import_label
+      context[:entity_types][entity.entity_key] = entity.entity_type
     end
 
     true
@@ -112,6 +114,27 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
   #   end
   # end
 
+  def format_cell_value(value, type)
+    return value unless value.present?
+    byebug
+    case type
+    when 'datetime'
+      if value.is_a?(::DateTime)
+        value.strftime('%Y-%m-%d %H:%M:%S')
+      else
+        value.to_s
+      end
+    when 'date'
+      if value.is_a?(::Date)
+        value.strftime('%Y-%m-%d')
+      else
+        value.to_s
+      end
+    else
+      value.to_s
+    end
+  end
+
   def import_data(context, contract:, master_schema:, params:, model:, model_class:, **)
     context[:result] = []
     created_records = 0
@@ -122,7 +145,7 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
 
     context[:input].each do |row|
       row.keys.each do |key|
-        row[key] = row[key].to_s
+        row[key] = format_cell_value(row[key], context[:entity_types][key])
       end
       data = row.values
       # pre_process_result = pre_process(context, row)

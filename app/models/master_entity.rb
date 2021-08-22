@@ -49,6 +49,7 @@ class MasterEntity < ApplicationRecord
   scope :entities_for_lookup, -> { show_in_lookup.or(primary_fields) }
   scope :only_active, -> { where active: true }
   scope :only_lookup_entities, -> { where type: 'MasterEntity::Lookup' }
+  scope :only_import_entities, -> { where.not type: 'MasterEntity::Sequence' }
 
   set :hint, 'Enter Value'
 
@@ -107,7 +108,7 @@ class MasterEntity < ApplicationRecord
   end
 
   contract_eval "Choices Scope" do |contract:, entity:, **|
-    if entity.choices_scope.present? and entity.entity_type == 'lookup'
+    if entity.choices_scope.present?
       contract.validate do
         id = send(entity.entity_key)
         if id.present?
@@ -183,4 +184,20 @@ class MasterEntity < ApplicationRecord
     data
   end
 
+  def import_label
+    case entity_type
+    when 'switch'
+      "#{label} (TRUE/FALSE)"
+    when 'sequence'
+      "#{label} (Auto-populated)"
+    when 'lookup', 'dropdown'
+      "#{label} ID"
+    when 'date'
+      "#{label} (YYYY-MM-DD)"
+    when 'datetime'
+      "#{label} (YYYY-MM-DD HH:MM:SS)"
+    else
+      label
+    end
+  end
 end
