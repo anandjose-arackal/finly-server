@@ -48,6 +48,10 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
     # if master_schema.has_nesting
     #   context[:headers][:parent_id] = "Parent Id"
     # end
+    if master_schema.has_nesting
+      context[:headers]['parent_id'] = 'Parent ID'
+      context[:entity_types]['parent_id'] = 'text'
+    end
     master_schema.entities.only_active.only_import_entities.each do |entity|
       context[:headers][entity.entity_key] = entity.import_label
       context[:entity_types][entity.entity_key] = entity.entity_type
@@ -116,7 +120,7 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
 
   def format_cell_value(value, type)
     return value unless value.present?
-    byebug
+
     case type
     when 'datetime'
       if value.is_a?(::DateTime)
