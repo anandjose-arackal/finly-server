@@ -124,13 +124,13 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
     case type
     when 'datetime'
       if value.is_a?(::DateTime)
-        value.strftime('%Y-%m-%d %H:%M:%S')
+        value.strftime(MasterEntity::DateTime::DATETIME_FORMAT)
       else
         value.to_s
       end
     when 'date'
       if value.is_a?(::Date)
-        value.strftime('%Y-%m-%d')
+        value.strftime(MasterEntity::Date::DATE_FORMAT)
       else
         value.to_s
       end

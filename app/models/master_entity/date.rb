@@ -42,6 +42,8 @@ class MasterEntity::Date < MasterEntity
     not_in_the_past
   ).freeze
 
+  DATE_FORMAT = '%Y-%m-%d'
+
   option :restriction
 
   contract_eval 'Date validity' do |contract:, entity:, **|
@@ -50,7 +52,7 @@ class MasterEntity::Date < MasterEntity
       next unless value.present?
 
       begin
-        date_format = '%Y-%m-%d'
+        date_format = DATE_FORMAT
         ::Date.strptime(value, date_format)
       rescue ArgumentError
         errors.add entity.label, 'invalid Date format'

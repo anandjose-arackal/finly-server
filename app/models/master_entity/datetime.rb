@@ -12,6 +12,8 @@ class MasterEntity::DateTime < MasterEntity
     not_in_the_past
   ).freeze
 
+  DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
+
   option :restriction
 
   contract_eval 'DateTime validity' do |contract:, entity:, **|
@@ -20,7 +22,7 @@ class MasterEntity::DateTime < MasterEntity
       next unless value.present?
 
       begin
-        datetime_format = '%Y-%m-%d %H:%M:%S'
+        datetime_format = DATETIME_FORMAT
         ::DateTime.strptime(value, datetime_format)
       rescue ArgumentError
         errors.add entity.label, 'invalid Datetime format'
