@@ -214,6 +214,7 @@ class FormEntity < ApplicationRecord
         required: required,
         active: active,
         visible: visible,
+        unique: unique
       },
       unique: unique,
       position: position,
@@ -287,6 +288,7 @@ class FormEntity < ApplicationRecord
         required: required,
         active: active,
         visible: visible,
+        unique: unique
       },
       options: options
     }

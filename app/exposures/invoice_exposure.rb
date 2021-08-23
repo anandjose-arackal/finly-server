@@ -252,6 +252,8 @@ class InvoiceExposure < Exposures::API
     trail_texts.compact.join(', ')
   end
 
+  attribute :approval_levels, record_attribute: :dlrms, exposure: true, includes: [:dlrms]
+
   # def vendor_ref_num(invoice_line_item)
   #   invoice_line_item.parent&.vendor_id
   # end
