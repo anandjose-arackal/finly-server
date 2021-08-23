@@ -54,4 +54,29 @@ class AdminImplementationRequest < NonTenantedApplicationRecord
   has_attached_file :result_file, :use_timestamp => false
   do_not_validate_attachment_file_type :result_file
   # validates_attachment_file_name :result_file, matches: [/\.xls?$/, /\. xlsx?$/, /\.csv?$/]
+
+  def item_complete(success)
+    self.completed_items = 0 if self.completed_items.nil?
+    self.success_items = 0 if self.success_items.nil?
+    self.failed_items = 0 if self.failed_items.nil?
+    self.completed_items += 1
+    self.success_items += 1 if success
+    self.failed_items += 1 unless success
+    self.save
+  end
+
+  def progress_update(status, message: nil)
+    self.status = status
+    self.message = message if message
+
+    case status
+    when :failed, :error
+      add_message :error, message || 'Unknown error occurred'
+      self.completed_at = DateTime.now
+    when :completed
+      self.completed_at = DateTime.now
+    end
+
+    self.save
+  end
 end

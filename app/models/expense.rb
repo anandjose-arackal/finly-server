@@ -176,7 +176,7 @@ class Expense < ApplicationRecord
 
   after_save :budget_trail_entry
 
-  default_scope {order('expenses.created_at DESC')}
+  default_scope { order(created_at: :desc) }
 
   scope :with_id, -> (ids) {where id: ids}
   scope :filter_id, ->(id) {with_id(id)}

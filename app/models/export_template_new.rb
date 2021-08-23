@@ -28,6 +28,7 @@ class ExportTemplateNew < ApplicationRecord
   has_many :role_mappings, class_name: 'ExportTemplateUserRoleMapping', foreign_key: 'template_id', dependent: :destroy
   has_many :user_roles, through: :role_mappings, dependent: :destroy
 
+  serialize :iter_field, JSON
   serialize :query, JSON
 
   scope :filter_resource, -> (resource) { where resource: resource }

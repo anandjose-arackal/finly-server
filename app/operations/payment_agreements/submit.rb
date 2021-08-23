@@ -31,7 +31,40 @@ class PaymentAgreements::Submit < PaymentAgreements::Base
   end
 
   def post_process
-    add_message :success, "You've submitted the agreement"
+    add_message :success, "You've approved the agreement"
+    if self.payment_agreement.status_id == PaymentAgreementStatus.id_for(:auto_approved)
+     agreement_related_operations
+    end
   end
-  
+
+  def agreement_related_operations
+    if self.payment_agreement.approved?
+      update_one_time_invoice
+      if self.payment_agreement.general_invoices.fixed_periodic_type.present? || self.payment_agreement.rental_invoices.fixed_periodic_type.present?
+        params[:payment_agreement_id] = self.payment_agreement.id
+        upcoming_invoice_op = ::PaymentAgreements::CreateUpcomingInvoiceBackground.call(user, {payment_agreement_id: self.payment_agreement.id})
+      end
+    end
+  end
+
+    def update_one_time_invoice
+      if self.payment_agreement.general_invoices.one_time_type.present?
+        update_upcoming_date('general_invoices')
+        self.payment_agreement.general_invoices.one_time_type.update_all(is_payment_agreement_upcoming_invoice: true)
+      end
+
+      if self.payment_agreement.rental_invoices.one_time_type.present?
+        update_upcoming_date('rental_invoices')
+        self.payment_agreement.rental_invoices.one_time_type.update_all(is_payment_agreement_upcoming_invoice: true)
+      end
+    end
+
+  def update_upcoming_date(invoice_type)
+    self.payment_agreement.send(invoice_type.pluralize.to_sym).one_time_type.each do |invoice_template|
+      date = invoice_template.prepaid ? invoice_template.start_date : invoice_template.end_date
+      invoice_template.update(payment_agreement_upcoming_date: date)
+    end
+  end
+
+
 end
