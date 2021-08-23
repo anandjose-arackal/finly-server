@@ -36,6 +36,13 @@ class MasterEntity::DateTime < MasterEntity
 
         next unless value.present?
 
+        # skip validation if datetime is invalid format as it is checked separately
+        begin
+          ::DateTime.strptime(value, DATETIME_FORMAT)
+        rescue ArgumentError
+          next
+        end
+
         case entity.options['restriction']
         when 'in_the_future'
           if value.in_time_zone <= ::DateTime.now

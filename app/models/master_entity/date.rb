@@ -66,6 +66,13 @@ class MasterEntity::Date < MasterEntity
 
         next unless value.present?
 
+        # skip validation if date is invalid format as it is checked separately
+        begin
+          ::Date.strptime(value, DATE_FORMAT)
+        rescue ArgumentError
+          next
+        end
+
         case entity.options['restriction']
         when 'in_the_future'
           if ::Date.parse(value) <= ::Date.today
