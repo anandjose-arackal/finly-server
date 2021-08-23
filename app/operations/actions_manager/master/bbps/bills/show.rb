@@ -76,7 +76,7 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
   end
 
   def expire_bill
-    !bbps_bill.expired?
+    !bbps_bill.expired? && !bbps_bill.paid?
   end
 
   private
