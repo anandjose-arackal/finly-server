@@ -1,5 +1,7 @@
 class Admin::Implementations::Master::Vendors::ImportTemplates < Admin::Implementations::Processor::ImportTemplate
 
+  # attr_accessor :form, :form_import
+
   bus Admin::Implementations::Master::BaseMaster
   subscribe 'vendors.import_template'
   headers ({
@@ -22,6 +24,26 @@ class Admin::Implementations::Master::Vendors::ImportTemplates < Admin::Implemen
       :ifsc => "IFSC",
       :destroy => "Destroy"
   })
+
+  # def init
+  #   super
+
+  #   self.form = Form.where(company_id: self.company.id, klass_name: "Masters::Vendors::Form").first
+  #   self.form_import = Forms::Import::Processor.(self.form, company.admins.first)
+  # end
+
+  # def headers
+  #   form_import.headers
+  # end
+
+  # def contents
+  #   form_import.lookup_content
+  # end
+
+  # def export(headers, content)
+  #   form_import.build_import_template.url
+  # end
+
   def valid_request
   end
 
