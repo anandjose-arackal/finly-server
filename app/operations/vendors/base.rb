@@ -181,7 +181,7 @@ class Vendors::Base < BaseOperation
     end
 
     if vendor_parameters.present? && vendor_parameters[:pan].present?
-      similar_pan_vendors = user.company.yes_bank_vendors.filter_unique_check.where(pan: vendor_parameters[:pan])
+      similar_pan_vendors = user.company.yes_bank_vendors.filter_unique_check.where(pan: vendor_parameters[:pan]).non_deleted
       if self.vendor.present?
         similar_pan_vendors = similar_pan_vendors.where.not(id: self.vendor.id)
       end
