@@ -61,17 +61,14 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
         active = result['active']
         # Required validation ( System Validation )
 
-        if required and entity.entity_type == 'attachment' and active and !contract_root.contract_input["is_import_process"].present?
+        if required and entity.entity_type == 'attachment' and active
           attachments = send(entity.entity_key)
           valid_attachments = attachments&.filter {|item| !item[:_destroy]} if attachments.respond_to?(:each)
           errors.add(entity.label, 'cannot be blank') if valid_attachments.blank? or valid_attachments.length.zero?
         end
 
         if required and active and !([true, false].include?( send(entity.entity_key) )) and send(entity.entity_key).blank? and entity.entity_type != 'switch' and entity.entity_type != 'attachment'
-          # checking whether entity is system_field or data is changed to skip validation for old nested objects data
-          if entity.system_field || send(:changed?)
-            errors.add entity.label, 'cannot be blank'
-          end
+          errors.add entity.label, 'cannot be blank'
         end
 
         # Check uniqueness of value
