@@ -10,7 +10,7 @@ class Docs::UtilityBills::Subscriptions::Ops::Review < Transactions::API
   step Model(BbpsBillerSubscription, :find_by)
   step :verify_policy
   # step :set_default_params
-  step :validate_uniquness
+  step :validate_subscription_uniqueness
   step :transition
   step :post_process
 
