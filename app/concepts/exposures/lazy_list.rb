@@ -33,7 +33,7 @@ class Exposures::LazyList < Exposures::API
     self
   end
 
-  ## Define first, second, third, etc. methods
+  # Define first, second, third, etc. methods
   offset_methods = {
     first: 1,
     second: 2,
@@ -52,7 +52,6 @@ class Exposures::LazyList < Exposures::API
       relation.offset(offset-1).first&.to_exposure
     end
   end
-  
 
   def last
     relation.last&.to_exposure

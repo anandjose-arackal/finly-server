@@ -9,11 +9,12 @@ class Forms::API
   class_attr :validations, default: {}
   class_attr :dependencies, default: {}
   class_attr :model
+  class_attr :label
   class_attr :predictions, default: {}
 
   def self.form
     @form ||= ActsAsTenant.without_tenant do
-      Form.new(klass_name: self, model: self.model)
+      Form.new(klass_name: self, model: self.model, label: (self.label || self.model&.name&.pluralize))
     end
   end
 
