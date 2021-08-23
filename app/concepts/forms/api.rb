@@ -14,7 +14,7 @@ class Forms::API
 
   def self.form
     @form ||= ActsAsTenant.without_tenant do
-      Form.new(klass_name: self, model: self.model, label: (self.label || self.model&.name))
+      Form.new(klass_name: self, model: self.model, label: (self.label || self.model&.name&.pluralize))
     end
   end
 
