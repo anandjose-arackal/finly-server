@@ -25,7 +25,7 @@ class Forms::Import::Processor
 
   def build_import_template
     file = Tempfile.new([form.model.name, '.xlsx'])
-    workbook  = ::WriteXLSX.new(file)
+    workbook  = ::WriteXLSX.new(file, strings_to_urls: false)
 
     worksheets = {}
     worksheets_length = Hash.new(0)
@@ -77,7 +77,7 @@ class Forms::Import::Processor
     imported_sheet = Roo::Spreadsheet.open(path)
 
     file = Tempfile.new([form.model.name, '.xlsx'])
-    workbook = ::WriteXLSX.new(file)
+    workbook = ::WriteXLSX.new(file, strings_to_urls: false)
 
     data_headers = {}
     self.headers.values.each do |sheet_data|
