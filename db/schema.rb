@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_08_23_093359) do
+ActiveRecord::Schema.define(version: 2021_08_24_062852) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -7716,6 +7716,13 @@ ActiveRecord::Schema.define(version: 2021_08_23_093359) do
     t.decimal "po_total_amount", precision: 20, scale: 5
     t.decimal "reporting_po_total_amount", precision: 20, scale: 5
     t.integer "payment_term_days", default: 0
+    t.decimal "po_requested_advance_amount", precision: 20, scale: 10, default: "0.0"
+    t.decimal "po_advance_tds_amount", precision: 20, scale: 10, default: "0.0"
+    t.decimal "po_advance_amount", precision: 20, scale: 10, default: "0.0"
+    t.decimal "reporting_po_requested_advance_amount", precision: 20, scale: 10, default: "0.0"
+    t.decimal "reporting_po_advance_tds_amount", precision: 20, scale: 10, default: "0.0"
+    t.decimal "reporting_po_advance_amount", precision: 20, scale: 10, default: "0.0"
+    t.decimal "po_advance_tds_percentage", precision: 20, scale: 10, default: "0.0"
     t.index ["advance_amount_id"], name: "index_purchase_orders_on_advance_amount_id"
     t.index ["advance_amount_status_id"], name: "index_purchase_orders_on_advance_amount_status_id"
     t.index ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id"

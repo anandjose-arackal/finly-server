@@ -7,7 +7,20 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
               :bank_payment_request_initiator, :bank_payment_request_reviewer, :bank_payment_request_creditor, :bank_payment_request_auditor
               :admin
   resolver 'purchase_orders.default'
-  reference '{{record.id}}', procurement_id: '{{record.procurement_id}}', procurement_type: 'po'
+
+  def self.reference(id = nil, args = {})
+    {id: '{{record.id}}',
+     args: {procurement_id: '{{record.procurement_id}}',
+            procurement_type: "{{record.invoice_type.config_key}}",
+            
+            # forms_enabled: "{% if record.invoice_type.config_key == 'non_po_invoice' and record.forms_enabled == true %}{{true}}{% else %}{{ false }}{% endif %}"}
+            # forms_enabled: "{% if record.forms_enabled == true %}{{true}}{% else %}{{ false }}{% endif %}"}
+            forms_enabled: "true"
+          }
+    }
+  end
+
+  # reference '{{record.id}}', procurement_id: '{{record.procurement_id}}', procurement_type: 'po'
   custom_fields :purchase_order
 
   # Fixed column is always default true

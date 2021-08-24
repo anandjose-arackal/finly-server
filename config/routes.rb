@@ -4192,8 +4192,8 @@ Rails.application.routes.draw do
   resources :invoice_forms, only: [:show, :update]
 
   ######### NEW PURCHASE ORDER ###################
-  post 'purchase_orders/save_and_submit', to: "purchase_orders#save_and_submit"
-  resources :purchase_orders, only: [:show, :update]
+  post 'purchase_order_forms/save_and_submit', to: "purchase_order_form#save_and_submit"
+  resources :purchase_order_forms, only: [:show, :update]
 
   ######### Rate Contract API start #############
   resources :rate_contracts do

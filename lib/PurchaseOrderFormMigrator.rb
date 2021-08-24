@@ -83,7 +83,7 @@ class PurchaseOrderMigrator
     section_id = FormSection.where(section_id: 'invoice_details', company_id: company.id, form_id: form_id).first.uuid
     required = custom_field.field_configuration.mandatory
     active = custom_field.field_configuration.enabled
-    lable = custom_field.field_configuration.field_name
+    label = custom_field.field_configuration.field_name
     entity_key = custom_field.field_configuration.field_name.split(" ").join("_").underscore
     position = form.entities.where(form_section_id: section_id).order(:position).last.position + 1
     # is_active = !custom_field.field_configuration.deleted?
@@ -93,7 +93,7 @@ class PurchaseOrderMigrator
       form_entity = FormEntity::Text.create({ company_id: company.id,
         form_id: form_id, form_section_id: section_id,
         created_by_user_id: company.users.only_admins.first,
-        entity_key: entity_key, label: lable,
+        entity_key: entity_key, label: label,
         placeholder: 'Enter value', hint: 'Please enter the hint',
         entity_type: 'text', editable: true, required: required,
         active: active, unique: false, visible: true, position: position,
@@ -104,7 +104,7 @@ class PurchaseOrderMigrator
       form_entity = FormEntity::LargeText.create({ company_id: company.id,
         form_id: form_id, form_section_id: section_id,
         created_by_user_id: company.users.only_admins.first,
-        entity_key: entity_key, label: lable,
+        entity_key: entity_key, label: label,
         placeholder: 'Enter value', hint: 'Please enter the hint',
         entity_type: 'large_text', editable: true, required: required,
         active: active, unique: false, visible: true, position: position,
@@ -122,7 +122,7 @@ class PurchaseOrderMigrator
     section_id = FormSection.where(section_id: 'invoice_details', company_id: company.id, form_id: form_id).first.uuid
     required = custom_field.field_configuration.mandatory
     active = custom_field.field_configuration.enabled
-    lable = custom_field.field_configuration.field_name
+    label = custom_field.field_configuration.field_name
     entity_key = custom_field.field_configuration.field_name.split(" ").join("_").underscore
     position = form.entities.where(form_section_id: section_id).order(:position).last.position + 1
     # is_active = !custom_field.field_configuration.deleted?
@@ -131,7 +131,7 @@ class PurchaseOrderMigrator
     form_entity = FormEntity::DropDown.create({ company_id: company.id,
      form_id: form_id, form_section_id: section_id,
      created_by_user_id: company.users.only_admins.first.id,
-     entity_key: entity_key, label: lable,
+     entity_key: entity_key, label: label,
      placeholder: 'Enter value', hint: 'Please enter the hint',
      entity_type: 'dropdown', editable: true, required: required,
      active: active, unique: false, visible: true, position: position,

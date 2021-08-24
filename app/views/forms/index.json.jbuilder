@@ -3,8 +3,14 @@ forms = @op["model.index"]
 json.result do
   json.array!(forms) do |form|
     # model_name = form.model.name == 'YesBankVendor' ? 'Vendor' : form.model.name
-    model_name = form.model.name == 'YesBankVendor' ? 'Vendor' : 'Invoice'
-    # form.model.name
+
+    model_name = form.model.name.titleize
+    if form.model.name == 'YesBankVendor'
+      model_name = 'Vendor' 
+    elsif form.model.name == 'Invoice'
+      model_name = 'Invoice'
+    end 
+      
 
     json.extract! form, :id, :updated_at
     json.document_name model_name

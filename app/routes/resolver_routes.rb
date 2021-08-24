@@ -44,6 +44,9 @@ Resolver::Router.draw do
   scope :inward_invoice_statuses do
     route 'default', Masters::InwardInvoiceStatuses::Resolver
   end
+  scope :purchase_order_statuses do
+    route 'default', Masters::PurchaseOrderStatuses::Resolver
+  end
   scope :departments do
     route 'default', Masters::Departments::Resolver
   end

@@ -37,6 +37,8 @@ class Forms::Ops::Config < Transactions::API
       klass = YesBankVendor
     when "Invoice"
       klass = Invoice
+    when "PurchaseOrder"
+      klass = PurchaseOrder
     else
       # no nothing
     end

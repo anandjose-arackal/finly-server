@@ -1,10 +1,10 @@
 # Controller & Routes for the same to be migrated to InvoicesController after the following
 #   -
 class PurchaseOrderFormsController < BaseControllers::WebBase
-
   layout 'trailblazers'
 
   def show
+    # binding.pry
     # endpoint Docs::I2P::Invoices::Ops::Show
     @result = Procurements::PurchaseOrders::Show.(current_user, params)
     respond
