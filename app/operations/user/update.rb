@@ -42,13 +42,11 @@ class User::Update < User::Base
     self.selected_user = result.selected_user
     self.user_params = parse_user_params
     self.user_params[:first_name], self.user_params[:last_name] = split_name params.dig(:user, :name)
-
   end
 
   def process
     if selected_user.update(user_params)
       selected_user.confirm
-      add_message :success, "User updated"
     else
       add_message :error, selected_user.errors.full_messages
       return

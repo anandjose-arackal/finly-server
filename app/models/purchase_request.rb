@@ -25,10 +25,11 @@
 #
 
 class PurchaseRequest < ApplicationRecord
-  include Transitionable, CustomFieldFilterSupport, ControllingUser
+  attr_accessor :skip_callback
+  include Transitionable, CustomFieldFilterSupport, ControllingUser, GetCurrency
   include Sequenced::ActsAsSequenced
   # include SearchIndex::Concerns::Document
-include Searchkick::Api
+  include Searchkick::Api
 
 
   acts_as_sequenced column: :order_number, purpose: :purchase_request, editable: false, prefix: 'PR'
@@ -48,6 +49,8 @@ include Searchkick::Api
   belongs_to :cost_center, optional: true
   belongs_to :total_amount, optional: true, class_name: "Amount", dependent: :destroy
   has_many :attachments, as: :resource, dependent: :destroy
+  belongs_to :base_currency, optional: true, class_name: 'Currency'
+  belongs_to :reporting_currency, optional: true, class_name: 'Currency'
 
   # has_many :line_items, class_name: "PurchaseRequestItem", dependent: :destroy
   has_many :purchase_request_items, dependent: :destroy
@@ -65,7 +68,9 @@ include Searchkick::Api
 
   accepts_nested_attributes_for :purchase_request_items, :custom_fields, :attachments, allow_destroy: true
 
+  before_create :set_currency
   after_save :budget_trail_entry
+  after_save :set_currency_for_amount, unless: :skip_callback
   after_destroy :budget_trail_destroy
 
   has_paper_trail(
@@ -150,6 +155,8 @@ include Searchkick::Api
       end
     when PurchaseRequestStatus::GROUP_APPROVED
       where purchase_request_status_id: PurchaseRequestStatus.ids_for(:approved, :auto_approved, :po_created, :partially_closed, :order_initiated)
+    when PurchaseRequestStatus::GROUP_APPROVED_ITEM
+      joins(:purchase_request_items).where('purchase_request_items.status_id IN (?)', [PurchaseRequestItemStatus.id_for(:approved)])
     else
       where purchase_request_status_id: status_ids
     end
@@ -269,7 +276,9 @@ include Searchkick::Api
         rejection_note: self.reject_note,
         department: self.department&.name,
         cost_center: self.cost_center&.name,
-        cost_allocation_items: cost_allocation_items
+        cost_allocation_items: cost_allocation_items,
+        base_currency: get_base_currency,
+        reporting_currency: get_reporting_currency
     }
   end
 
@@ -443,7 +452,7 @@ include Searchkick::Api
       if self.total_amount.present?
         self.total_amount.update_attributes(value: updated_amount)
       else
-        if self.create_total_amount(currency_id: 1, value: updated_amount)
+        if self.create_total_amount(currency_id: get_base_currency.id, value: updated_amount)
           self.save
         end
       end
@@ -461,6 +470,11 @@ include Searchkick::Api
 
   def review_in_progress?
     PurchaseRequestStatus.ids_for(:awaiting_approval).include?(purchase_request_status_id)
+  end
+  
+  def set_currency
+    self.reporting_currency_id = self.company.reporting_currency.id if self.reporting_currency_id.blank? 
+    self.base_currency_id = self.company.reporting_currency.id if self.base_currency_id.blank? 
   end
 
   private
@@ -511,6 +525,18 @@ include Searchkick::Api
     self.items.each do |item|
       BudgetManager::BudgetsCalculator::Calculate::PurchaseRequestItemsBudgetsProcessor.new.destroy_trail(item)
     end
+  end
+
+  def set_currency_for_amount
+    amount_attr = [:total_amount]
+    amount_attr.each do |amount_attribute|
+      amount_attr_id = self.send("#{amount_attribute}_id")
+      if amount_attr_id.present?
+        Amount.find_by(id: amount_attr_id).update(currency_id: get_base_currency.id)
+      end
+    end
+    self.skip_callback = true
+    self.save
   end
 
 end

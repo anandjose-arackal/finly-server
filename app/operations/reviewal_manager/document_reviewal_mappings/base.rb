@@ -11,11 +11,11 @@ class ReviewalManager::DocumentReviewalMappings::Base < BaseOperation
     when 'MoneyRequest'
       amount = document&.total_amount
     when 'Invoice'
-      amount = document&.net_amount&.value rescue 0
+      amount = document.reporting_invoice_sub_total_amount rescue 0
     when 'Report'
       amount = document&.total_amount rescue 0
     when 'BankPaymentRequest'
-      amount = document&.payment_order&.amount_requested&.value rescue 0
+      amount = (document&.payment_order&.reporting_amount_requested.truthy? ? document&.payment_order&.reporting_amount_requested : document&.payment_order&.amount_requested&.value) rescue 0
     # when 'TravelRequest'
     #   amount = 0
     when 'PurchaseRequest'

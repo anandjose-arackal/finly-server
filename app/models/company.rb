@@ -25,6 +25,7 @@ class Company < NonTenantedApplicationRecord
   belongs_to :base_currency, optional: true, class_name: 'Currency'
   belongs_to :status, optional: true, class_name: 'CompanyStatus'
   belongs_to :group, optional: true, class_name: 'CompanyGroup'
+  belongs_to :country, optional: true, class_name: 'Country'
 
   has_many :form_currencies
   has_many :rate_contracts
@@ -76,6 +77,7 @@ class Company < NonTenantedApplicationRecord
   has_many :security_deposits
   has_many :icici_statements
   has_many :insight_dashboards
+  has_many :master_schemas
 
   has_many :payments
   has_many :invoices
@@ -559,7 +561,7 @@ class Company < NonTenantedApplicationRecord
       # will not matter for the same
       other_category = self.categories.find_by(name: "Other")
       self.configuration.update(default_card_expense_category_id: other_category&.id)
-      self.configuration.update(legal_entity_name: self.name)
+      self.configuration.update(legal_entity_name: self.name) if self.configuration.legal_entity_name.blank?
 
       self.build_account.save if self.account.blank?
 

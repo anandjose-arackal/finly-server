@@ -16,6 +16,7 @@ json.documents do
         json.procurement_id document.procurement_id
         json.due_date document.due_date
       end
+      json.base_currency document.get_base_currency
     when 'PurchaseOrder'
       json.document_number document.po_number
       json.date document.delivery_date
@@ -25,6 +26,7 @@ json.documents do
       json.additional_information do
         json.procurement_id document.procurement_id
       end
+      json.base_currency document.get_base_currency
     when 'PurchaseRequest'
       json.document_number document.order_number
       json.date document.updated_at.strftime("%d-%b-%Y")
@@ -32,9 +34,11 @@ json.documents do
       json.created_at document.created_at&.strftime("%d-%b-%Y")
       json.amount document.total_amount&.value
       json.additional_information({})
+      json.base_currency document.get_base_currency
     end
 
   end
 end
 
+json.non_po_invoice_form_enabled @result.current_user.non_po_invoice_form_enabled
 json.count @result.documents.count

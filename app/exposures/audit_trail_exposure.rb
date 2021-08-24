@@ -39,6 +39,10 @@ class AuditTrailExposure < Exposures::API
     record.changes_less
   end
 
+  attribute :changes_all do
+    record.changes_all
+  end
+
   attribute :item_type_label do
     "#{record.item_type} Changes"
   end
@@ -69,6 +73,19 @@ class AuditTrailExposure < Exposures::API
     else
       "#{record.created_by.name} #{event_name} #{record.parent_document_type}"
     end
+  end
+
+  attribute :document_change_affected do
+    case record.item_type
+    when "YesBankVendor"
+      "Vendor"
+    else
+      record.item_type&.underscore&.split("_")&.map(&:humanize)&.join(' ')
+    end
+  end
+
+  attribute :action_performed do
+    record.event.capitalize
   end
 
 end

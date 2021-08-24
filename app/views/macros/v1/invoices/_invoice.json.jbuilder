@@ -15,6 +15,7 @@ json.line_items do
     json.product_type item.inventory_line_item&.product_type&.name
     json.item_code item.inventory_line_item&.item_number
     json.description item.description
+    json.comment item.comment
     json.category item.category
     json.department item.department
     json.cost_center item.cost_center
@@ -39,6 +40,14 @@ json.attachments do
     json.file_size attachment.file_file_size
     json.url attachment.file.url(:original, timestamp: false)
     json.content_type attachment&.file_content_type
+  end
+end
+json.comments do
+  json.array! record.comments do |comment|
+    json.user comment.user&.as_json
+    json.user_name comment.user&.name
+    json.body comment.body
+    json.commented_at comment.created_at
   end
 end
 json.erp_sync_status record.erp_sync_status&.name

@@ -13,6 +13,11 @@ json.results do
       json.purpose item.purpose
       json.rate_contract_number item&.rate_contract_item&.rate_contract&.rate_contract_number
       json.rate_contract_id item&.rate_contract_item&.rate_contract_id
+      
+      json.base_currency item&.purchase_request&.get_base_currency
+      json.reporting_currency item&.purchase_request&.get_reporting_currency
+
+
       # json.per_unit_estimated_amount_attributes do
       #   json.currency_id line_item&.per_unit_estimated_amount&.currency_id
       #   json.value line_item&.per_unit_estimated_amount&.value
@@ -53,6 +58,15 @@ json.results do
         json.name item&.cost_center&.name
         json.id item&.cost_center&.id
       end
+    end
+  end
+
+  json.currencies do
+    json.array!(Currency.all) do |currency|
+      json.id currency.id
+      # json.country currency.country
+      json.symbol currency.symbol
+      json.country_code currency.country_code
     end
   end
   json.count @result.count

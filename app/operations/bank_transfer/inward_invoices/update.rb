@@ -118,19 +118,18 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
         next if po_item.blank? # temp workaround
         next if po_item.inventory_line_item&.product_type_id == ProductType.id_for(:service)
         item_q =  po_item.accepted
-        item_amount = po_item.taxable_amount.value
+        item_amount = po_item.taxable_amount&.value&.to_f&.round(2)
         unless user.company.feature_subscription.grn_enabled
           item_q = po_item.quantity
-          item_amount = po_item.taxable_amount.value
+          item_amount =  po_item.taxable_amount&.value&.to_f&.round(2)
         end
 
-        invoiced_line_items = procurement.invoices.joins(items: :taxable_amount).where('invoice_line_items.purchase_order_item_id = ?', invoice_line_item.purchase_order_item_id)
+        invoiced_line_items = procurement.invoices.scope_all_except_voided.joins(items: :taxable_amount).where('invoice_line_items.purchase_order_item_id = ?', invoice_line_item.purchase_order_item_id)
         #invoiced_line_items holding joined active record query on line item
         invoiced_line_items_except_current_item = invoiced_line_items.where('invoice_line_items.id != ?', item[:id])
         invoiced_total_qty = 0
         invoiced_total_qty = invoiced_line_items_except_current_item.sum('invoice_line_items.quantity').to_f
-        invoiced_total_amount = invoiced_line_items_except_current_item.sum('amounts.value')
-
+        invoiced_total_amount = invoiced_line_items_except_current_item.sum('amounts.value')&.round(2)
         if item_q < (invoiced_total_qty + item[:quantity].to_f)
           add_message :error, "Invoiced item quantity should be on par with the Purchase Order quantity."
           break
@@ -312,9 +311,9 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
     # Adding default currency as per form structure.
 
-    self.inward_invoice.reporting_currency = user.company.reporting_currency_code
-    self.inward_invoice.base_currency = user.company.reporting_currency.id
-    self.inward_invoice.conversion_rate = 1
+    # self.inward_invoice.reporting_currency = user.company.reporting_currency_code
+    # self.inward_invoice.base_currency = user.company.reporting_currency.id
+    # self.inward_invoice.conversion_rate = 1
 
   end
 

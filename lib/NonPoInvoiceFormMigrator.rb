@@ -143,7 +143,7 @@ class NonPoInvoiceMigrator
     })
 
     choices = Choices['list'].()
-    choices.form_entity = form_entity
+    choices.entity = form_entity
     form_entity.update(choices_scope: choices )
     
     # create options
@@ -252,8 +252,8 @@ class NonPoInvoiceMigrator
 
     update_params = {
 
-      base_currency: Currency.find_by(country_code: 'INR').id,
-      reporting_currency: 'INR',
+      base_currency_id: Currency.find_by(country_code: 'INR').id,
+      reporting_currency_id: Currency.find_by(country_code: 'INR').id,
       conversion_rate: 1,
       retrieve_conversion_rate: true,
 
@@ -278,7 +278,7 @@ class NonPoInvoiceMigrator
       conversion_date: document&.date&.to_date,
 
       # VENDOR DETAILS
-      vendor_country: document&.vendor&.vendor_country,
+      vendor_country_id: Country.id_for(document&.vendor&.vendor_country),
       vendor_trade_name:  document&.vendor&.trade_name || document&.vendor&.business_name,
       vendor_sequence_id: document&.vendor&.vendor_id,
       vendor_gstin: document&.gstin_location&.gstin,
@@ -288,6 +288,13 @@ class NonPoInvoiceMigrator
       vendor_bank_account_number: document&.receiving_account&.account_number,
       vendor_bank_account_ifsc: document&.receiving_account&.ifsc,
       vendor_bank_account_swift_code: document&.receiving_account&.swift_code,
+
+
+      billing_address_name: document&.location&.name,
+      billing_address_gstin: document&.location&.gstin,
+
+      shipping_address_name: document&.delivery_location&.name,
+      shipping_address_gstin: document&.delivery_location&.gstin,
 
       # receiving_account_id: document&.receiving_account_id,
       # receiving_account_type: document&.receiving_account_type,

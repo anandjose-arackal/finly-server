@@ -4,8 +4,8 @@ class AmountUtils
     options = {} if options.nil?
     return options[:placeholder] if value.nil?
     currency = options[:currency] || Currency.currency_for(:INR)
-    symbol = currency.symbol || currency.country_code
-    "#{symbol}#{value}"
+    prefix = currency.country_code || currency.symbol 
+    "#{prefix} #{value}"
   end
 
 	def self.to_words(num)

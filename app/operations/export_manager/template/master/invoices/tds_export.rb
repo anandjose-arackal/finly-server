@@ -15,6 +15,9 @@ class ExportManager::Template::Master::Invoices::TdsExport < ExportManager::Buil
 
   roles [:admin, :finance_manager]
 
+  custom_fields :invoice, template_prefix: 'record'
+  form_custom_fields :invoices, template_prefix: 'record'
+
   attribute :invoice_number, template: '{{ record.invoice_number }}'
   attribute :finly_ref_no, template: '{{ record.invoice_id }}'
   attribute :invoice_date, template: "{{ record.date | date: '%d-%b-%y' }}"
@@ -38,7 +41,7 @@ class ExportManager::Template::Master::Invoices::TdsExport < ExportManager::Buil
 
 
   attribute :reporting_net_total, template: '{{ record.reporting_invoice_net_total_amount }}', toggle: { if: [ NonPoInvoiceToggle, :enabled?] }
-  attribute :reporting_payable_amount, template: '{{ record.reporting_invoice_balance_due }}', toggle: { if: [ NonPoInvoiceToggle, :enabled?] }
+  attribute :reporting_payable_amount, template: "{% if record.base_currency_code == 'INR' and record.reporting_currency_code == 'INR' %}{{ record.reporting_invoice_balance_due | round }}{% else %}{{ record.reporting_invoice_balance_due | round: 2 }}{% endif %}", toggle: { if: [ NonPoInvoiceToggle, :enabled?] }
   attribute :conversion_rate, template: '{{ record.conversion_rate }}', toggle: { if: [ NonPoInvoiceToggle, :enabled?] }
   attribute :base_currency, template: '{{ record.base_currency_code }}', toggle: { if: [ NonPoInvoiceToggle, :enabled?] }
   attribute :reporting_currency, template: '{{ record.reporting_currency_code }}', toggle: { if: [ NonPoInvoiceToggle, :enabled?] }

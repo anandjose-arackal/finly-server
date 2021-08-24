@@ -183,10 +183,9 @@ class InvoiceLineItem < ApplicationRecord
   
   # Updating this for forms, due to some unknown issue 
   before_save :set_tds_applicable
-  # after_commit :set_tds_applicable, on: [:create, :update]
-
   after_save :budget_trail_entry
   after_save :sync_amounts, unless: :skip_callback
+  after_save :set_currency_for_amount, unless: :skip_callback
   after_destroy :budget_trail_destroy
 
   TEMPLATE_COLUMNS = %w{ description quantity rate tax discount category_id gst_type_id hsn_sac parent_type parent_id inventory_line_item_id item_info comment account tax_rate_id cost_center_id unit_of_measurement department_id sgst cgst igst }
@@ -227,12 +226,19 @@ class InvoiceLineItem < ApplicationRecord
   scope :with_invoice_id, -> (invoice_id) {where invoice_id: invoice_id}
 
   def before_tax_amount
-    self.taxable_amount&.value.to_f
+    if parent_forms_enabled
+      self.reporting_item_taxable_amount&.to_f
+    else
+      self.taxable_amount&.value.to_f
+    end
   end
 
   def after_tax_amount
-
-    self.net_amount&.value.to_f
+    if parent_forms_enabled
+      self.reporting_item_net_amount&.to_f
+    else
+      self.net_amount&.value.to_f
+    end
   end
 
 
@@ -287,7 +293,7 @@ class InvoiceLineItem < ApplicationRecord
     if self.taxable_amount.present?
       self.taxable_amount.update_column('value', taxable_amt)
     else
-      self.create_taxable_amount(value: taxable_amt, currency_id: 1)
+      self.create_taxable_amount(value: taxable_amt, currency_id: self.get_base_currency.id)
     end
   end
 
@@ -298,7 +304,7 @@ class InvoiceLineItem < ApplicationRecord
     if self.net_amount.present?
       self.net_amount.update(value: net_value)
     else
-      self.create_net_amount(value: net_value, currency_id: 1)      
+      self.create_net_amount(value: net_value, currency_id: self.get_base_currency.id)
     end
   end
 
@@ -309,7 +315,7 @@ class InvoiceLineItem < ApplicationRecord
     if self.tax_amount.present?
       self.tax_amount.update(value: tax_value)
     else
-      self.create_tax_amount(value: tax_value, currency_id: 1)
+      self.create_tax_amount(value: tax_value, currency_id: self.get_base_currency.id)
     end
   end
 
@@ -395,9 +401,18 @@ class InvoiceLineItem < ApplicationRecord
     }
   end
 
-  def retrieve_value(entity)
+  def retrieve_value(entity)    
     send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
   end
+
+  def parent_forms_enabled
+    invoice_forms_enabled = false
+    if parent.respond_to?(:forms_enabled) && parent.forms_enabled
+      invoice_forms_enabled = true
+    end
+    invoice_forms_enabled
+  end
+
 
   private
 
@@ -430,10 +445,11 @@ class InvoiceLineItem < ApplicationRecord
 
   # Syncs amounts from new forms structure to legacy amounts table
   def sync_amounts
-    self.skip_callback = true
-    sync_to_old_structure
+    if parent.respond_to?(:forms_enabled) && parent.forms_enabled
+      self.skip_callback = true
+      sync_to_old_structure
+    end
     
-    # if parent.respond_to?(:forms_enabled)
     #   if parent.forms_enabled
     #     sync_to_old_structure
     #   else
@@ -457,6 +473,27 @@ class InvoiceLineItem < ApplicationRecord
         )
       end
     end
+
+    unless parent.cost_allocation_items
+      self.department_id = parent&.department_id
+      self.cost_center_id = parent&.cost_center_id
+    end
+
+    self.tax_percentage = self.tax_rate&.rate.to_f # workaround to update tax_percentage
+    
+    conversion_rate = self.parent.conversion_rate
+
+    self.skip_callback = true
+    self.save
+
+    if parent.payments.present?
+      if self.tds_applicable?
+        item_tds = ( self.item_taxable_amount.to_f * self.parent&.tds_slab&.tds.to_f ) / 100
+        self.item_tds_amount = item_tds.to_f.round(2)
+        self.reporting_item_tds_amount = (item_tds * conversion_rate.to_f).round(2)
+      end
+    end
+
     self.skip_callback = true
     self.save
   end
@@ -467,6 +504,7 @@ class InvoiceLineItem < ApplicationRecord
       self.send("reporting_#{key}=", amount_value)
       self.send("#{key}=", amount_value)
     end
+
     self.save
   end
 
@@ -480,5 +518,19 @@ class InvoiceLineItem < ApplicationRecord
       item_net_amount: 'net_amount',
       item_billable_amount: 'billable_amount'
     }
+  end
+
+  def set_currency_for_amount
+    amount_attr = [:discount_amount, :net_amount, :taxable_amount, :tax_amount, :billable_amount, :amount]
+    base_currency_id =  self.parent.get_base_currency.id
+
+    amount_attr.each do |amount_attribute|
+      amount_attr_id = self.send("#{amount_attribute}_id")
+      if amount_attr_id.present?
+        Amount.find_by(id: amount_attr_id).update(currency_id: base_currency_id)
+      end
+    end
+    self.skip_callback = true
+    self.save
   end
 end

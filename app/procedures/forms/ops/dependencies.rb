@@ -7,6 +7,8 @@ class Forms::Ops::Dependencies < Transactions::API
   pass :init_form_computations
   pass :init_lookup_computations
   pass :init_lookup_filters
+  pass :init_lookup_assignments
+  pass :init_triggers
   pass :init_choice_dependencies
   pass :init_predictions
 
@@ -61,6 +63,32 @@ class Forms::Ops::Dependencies < Transactions::API
       json = entity.form_reference_json
       json[:filters] = entity.filters.as_ransack
       json
+    end
+  end
+
+  def init_lookup_assignments(context, dependencies:, model:, **)
+    dependencies[:lookup_assignments] = []
+    model.entities.each do |entity|
+      json = entity.form_reference_json
+      json['assignments'] = {}
+      model.entities.where(compute_lookup_entity: entity).where.not(compute_lookup_assignments: nil).each do |dependent_entity|
+        json['assignments'][dependent_entity.entity_path] = dependent_entity.compute_lookup_assignments
+      end
+
+      next unless json['assignments'].present?
+
+      dependencies[:lookup_assignments] << json
+    end
+  end
+
+  def init_triggers(context, dependencies:, model:, **)
+    dependencies[:triggers] = []
+    model.entities.where.not(triggers: nil).each do |entity|
+      if entity.triggers.present?
+        json = entity.form_reference_json
+        json[:triggers] = entity.triggers
+        dependencies[:triggers] << json
+      end
     end
   end
 

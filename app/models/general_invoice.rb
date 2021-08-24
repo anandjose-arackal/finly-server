@@ -109,7 +109,8 @@
 # Make columns consistent with that in 'Invoices' table as this model acts as a template to actual "Invoice"
 
 class GeneralInvoice < ApplicationRecord
-  include SoftDeletable, MathUtil
+  attr_accessor :skip_callback
+  include SoftDeletable, MathUtil, GetCurrency
   include Sequenced::ActsAsSequenced
 
   acts_as_sequenced column: :invoice_id, purpose: :general_invoice, editable: false, prefix: 'GENINV'
@@ -150,6 +151,8 @@ class GeneralInvoice < ApplicationRecord
   belongs_to :template_invoice, optional: true, class_name: 'GeneralInvoice'
   belongs_to :total_invoice_amount, optional: true, class_name: 'Amount'
   belongs_to :available_invoice_amount, optional: true, class_name: 'Amount'
+  belongs_to :base_currency, optional: true, class_name: 'Currency'
+  belongs_to :reporting_currency, optional: true, class_name: 'Currency'
 
   has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
   has_many :items, class_name: "InvoiceLineItem", as: :parent
@@ -251,7 +254,13 @@ class GeneralInvoice < ApplicationRecord
   CLONE_RECORDS = %w{ discount_amount gross_amount net_amount amount original_amount balance_due taxable_amount  tds_amount tax_amount}
 
   # before_create :set_company, :set_creator
-
+  before_create :set_currency
+  after_save :set_currency_for_amount, unless: :skip_callback
+  
+  def set_currency
+    self.reporting_currency_id = self.company.reporting_currency.id if self.reporting_currency_id.blank? 
+    self.base_currency_id = self.company.reporting_currency.id if self.base_currency_id.blank? 
+  end
 
   def invoice_frequency_for_fix_periodic
     if self.billing_type_id == BillingType.id_for(:fixed_periodic) && (self.invoice_frequency.number.blank? || self.invoice_frequency.period_id.blank?)
@@ -353,7 +362,9 @@ class GeneralInvoice < ApplicationRecord
         total_invoice_amount_attributes: { id: self.total_invoice_amount_id, value: get_total_invoice_amount },
         available_invoice_amount: get_available_invoice_amount,
         invoice_number: self.get_invoice_number,
-        include_tax_and_tds: !!self.include_tax_and_tds
+        include_tax_and_tds: !!self.include_tax_and_tds,
+        base_currency: get_base_currency,
+        reporting_currency: get_reporting_currency
     }
   end
 
@@ -375,8 +386,9 @@ class GeneralInvoice < ApplicationRecord
         start_date: self.start_date,
         end_date: self.end_date,
         allow_add_invoice: allowed_to_add_invoice?,
-        invoice_created: agreement_invoice_created?
-
+        invoice_created: agreement_invoice_created?,
+        base_currency: get_base_currency,
+        reporting_currency: get_reporting_currency
     }
   end
 
@@ -422,6 +434,19 @@ class GeneralInvoice < ApplicationRecord
     user = RequestStore.store[:current_user]
     agreement_invoice = user.company.inward_invoices.find_by_agreement_item_id self.id
     agreement_invoice.present?
+  end
+
+  def set_currency_for_amount
+    amount_attr = [:gross_amount, :net_amount, :tds_amount, :tax_amount, :discount_amount, :original_amount, :advance_amount, :freight_amount, :balance_due, :taxable_amount, :remaining_amount, :amount, :remaining_amount, :total_invoice_amount, :available_invoice_amount]
+
+    amount_attr.each do |amount_attribute|
+      amount_attr_id = self.send("#{amount_attribute}_id")
+      if amount_attr_id.present?
+        Amount.find_by(id: amount_attr_id).update(currency_id: get_base_currency.id)
+      end
+    end
+    self.skip_callback = true
+    self.save
   end
 
 end

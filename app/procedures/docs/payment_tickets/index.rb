@@ -58,11 +58,13 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
   IndexBuilder::API::ColumnTemplate::ControllingLevel(self)
 
   column :requested, default: true, includes: [payment_order: { amount_requested: :currency }] do
-    amount value: -> (context) { context[:exposure].payment_order.amount_requested }, tool_tip: :format_amount_requested_tool_tip
+    amount value: -> (context) { context[:exposure].payment_order.amount_requested }
+      # , tool_tip: :format_amount_requested_tool_tip
   end
 
   column :processed, default: true, includes: [payment_order: { amount_processed: :currency }] do
-    amount value: -> (context) { context[:exposure].payment_order.amount_processed }, tool_tip: :format_amount_processed_tool_tip
+    amount value: -> (context) { context[:exposure].payment_order.amount_processed }
+      # , tool_tip: :format_amount_processed_tool_tip
   end
 
   column :scheduled_date, sort: :payment_order_scheduled_at, default: true, includes: [:payment_order] do
@@ -175,31 +177,31 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     format
   end
 
-  def self.format_amount_requested_tool_tip(context)
-    user = context[:user]
-    value = context[:record].payment_order&.amount_requested&.value.to_f
+  # def self.format_amount_requested_tool_tip(context)
+  #   user = context[:user]
+  #   value = context[:record].payment_order&.amount_requested&.value.to_f
     
-    if user.present? && user.non_po_invoice_form_enabled 
-      country_code = context[:record].base_currency&.country_code
-      "#{country_code} #{value}"
-    else
-      country_sym = context[:record].base_currency&.symbol
-      "#{country_sym} #{value}"
-    end
-  end
+  #   if user.present? && user.non_po_invoice_form_enabled 
+  #     country_code = context[:record].base_currency&.country_code
+  #     "#{country_code} #{value}"
+  #   else
+  #     country_sym = context[:record].base_currency&.symbol
+  #     "#{country_sym} #{value}"
+  #   end
+  # end
 
-  def self.format_amount_processed_tool_tip(context)
-    user = context[:user]
-    value = context[:record].payment_order&.amount_processed&.value.to_f
+  # def self.format_amount_processed_tool_tip(context)
+  #   user = context[:user]
+  #   value = context[:record].payment_order&.amount_processed&.value.to_f
 
-    if user.present? && user.non_po_invoice_form_enabled 
-      country_code = context[:record].base_currency&.country_code
-      "#{country_code} #{value}"
-    else
-      country_sym = context[:record].base_currency&.symbol
-      "#{country_sym} #{value}"
-    end
-  end
+  #   if user.present? && user.non_po_invoice_form_enabled 
+  #     country_code = context[:record].base_currency&.country_code
+  #     "#{country_code} #{value}"
+  #   else
+  #     country_sym = context[:record].base_currency&.symbol
+  #     "#{country_sym} #{value}"
+  #   end
+  # end
 
   def self.is_accessable( user )
     user.present? && user.non_po_invoice_form_enabled 

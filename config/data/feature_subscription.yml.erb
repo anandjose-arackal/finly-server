@@ -1,10 +1,17 @@
 company:
   name: <%= current_company.name %>
   id: <%= current_company.id %>
+  reporting_currency: 
+    id: <%= current_company.reporting_currency.id %>
+    country: <%= current_company.reporting_currency.country %>
+    country_code: <%= current_company.reporting_currency.country_code %>
+    symbol: <%= current_company.reporting_currency.symbol %>
+      
   logo:
   <% if current_company.configuration.logo.present? %>
     url: <%= current_company.configuration.logo.url(:thumb)%>
   <% end %>
+
   features:
     expense_card: <%= current_company.feature_subscription.expense_card_enabled %>
     meal_card: <%= current_company.feature_subscription.meal_card_enabled %>
@@ -24,6 +31,8 @@ user:
       vp: <%=  VpOldUiToggle.new(current_user).old_ui_enabled? %>
     export_manager:
       templates_enabled: <%=  ExportManagerToggle.new(current_user).templates_enabled? %>
+    simple_masters:
+      simple_masters_enabled: <%=  SimpleMastersToggle.new(current_user).simple_masters_enabled? %>
     theme:
       vp: <%= current_user.profile.vp_web_client_theme %>
       em: <%= current_user.profile.em_web_client_theme %>

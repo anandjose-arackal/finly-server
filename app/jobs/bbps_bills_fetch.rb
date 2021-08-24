@@ -4,21 +4,27 @@ class BbpsBillsFetch < BaseJob
     puts " ----------------------------- PERFORMING #{self.name} at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
 
     # Fetch bills where automatic fetching is enabled
+    expired_status_id = BbpsBillStatus.id_for(:expired)
+
     status_ids = BbpsBillerSubscription.status_ids(:approved, :auto_approved, :reactivated)
     bbps_subscriptions = BbpsBillerSubscription.where(status_id: status_ids, auto_generate_bill: true, auto_fetch_enabled: true).where(expected_bill_day: nil, deleted_at: nil)
     autofetched = true
+
 
     bbps_subscriptions.each do |subscription|
       last_bill = subscription.bbps_bills.reorder('created_at asc').last
       will_create = false
 
-      if subscription.last_bill_bill_date.present? and subscription.last_bill_bill_date != Date.parse("01-01-0001")
-        if Date.today > (subscription.last_bill_bill_date + 1.month)
+      if (subscription.last_bill_bill_date.present? and subscription.last_bill_bill_date != Date.parse("01-01-0001")) || (subscription.last_bill_due_date.present? and subscription.last_bill_due_date != Date.parse("01-01-9999"))
+        if subscription.last_bill_bill_date.present?
+          if Date.today > (subscription.last_bill_bill_date + 1.month)
           will_create = true
+          end
         end
-      elsif subscription.last_bill_due_date.present? and subscription.last_bill_due_date != Date.parse("01-01-9999")
-        if Date.today >= (subscription.last_bill_due_date + 5.days)
-          will_create = true
+        if subscription.last_bill_due_date.present?
+          if Date.today >= (subscription.last_bill_due_date + 5.days)
+            will_create = true
+          end
         end
       elsif last_bill.present?
         if Date.today >= (last_bill.created_at + 21.days)
@@ -27,6 +33,12 @@ class BbpsBillsFetch < BaseJob
       else
         will_create = true
       end
+
+      last_bill_status_id = last_bill&.status_id
+      if last_bill.present? && last_bill_status_id == expired_status_id
+        will_create = true
+      end
+
 
       # if last_bill.present?
       #   if last_bill.bill_date.present? && last_bill.bill_date != Date.parse('01-01-0001')

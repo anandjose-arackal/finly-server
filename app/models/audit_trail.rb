@@ -27,6 +27,22 @@ class AuditTrail < PaperTrail::Version
   include Ransacker
   include SoftDeletable
 
+  #### definition of ApplicationRecord  starts here
+  acts_as_tenant(:company, options = {
+      has_global_records: false,
+  })
+
+  before_validation Proc.new {|m|
+    if ActsAsTenant.current_tenant && m.company_id.nil?
+      m.company_id = ActsAsTenant.current_tenant.id
+    end
+  }, :on => :update
+
+  singleton_class.send(:alias_method, :filter_active, :exclude_deleted)
+  singleton_class.send(:alias_method, :filter_unique_check, :exclude_deleted)
+
+  #### definition of ApplicationRecord  ends here
+
   default_scope {order(created_at: :desc)}
   belongs_to :created_by, optional: true, class_name: "User"
   belongs_to :item, optional: true, polymorphic: true
@@ -34,7 +50,11 @@ class AuditTrail < PaperTrail::Version
   scope :with_user_transaction_id, -> (ref_id) { where user_transaction_id: ref_id }
 
   def changes_less
-    self.get_change_statement(less: true).map{|change| "#{change&.first&.to_s&.titlecase} Changed #{(change&.last)&.join(' -> ')}"}&.join(' , ')
+    self.get_change_statement(less: true).map{|change| "#{change&.first.to_s&.titlecase} Changed #{(change&.last)&.join(' -> ')}"}&.join(' , ')
+  end
+
+  def changes_all
+    self.get_change_statement(less: false).map{|change| "#{change&.first.to_s&.titlecase} Changed #{(change&.last)&.join(' -> ')}"}&.join(' , ')
   end
 
   def get_document_number

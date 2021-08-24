@@ -105,6 +105,7 @@ class Expense::Index < Expense::Base
       ScopeUtils.fix_for_scoping(params, :filter_report_status_id, :array)
       ScopeUtils.fix_for_scoping(params, :filter_custom_drop_down_selection, :array)
       self.expenses = params[:expenses]
+      self.expenses.includes(:receipts,:tds_slab,:spent_from,:category,:tds_slab,:expense_tax_type,:manual_expense,:card_expense,:distance_expense,:time_expense, amount: :currency)
       unless expenses.nil?
         self.expenses = apply_scopes(expenses, params)
 

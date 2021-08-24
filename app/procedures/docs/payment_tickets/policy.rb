@@ -21,6 +21,7 @@ class Docs::PaymentTickets::Policy < ApplicationPolicy
   def credit?
     return false unless BankPaymentRequestStatus.ids_for(:open, :retracted, :rejected, :processing, :approved, :auto_approved).include?(record.status_id)
     return false unless user.has_permission?(:bank_payment_request_creditor)
+    return false unless record.get_base_currency.id == Currency.id_for('INR')
 
     true
   end

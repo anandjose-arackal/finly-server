@@ -42,10 +42,12 @@
 #
 
 class CreditNote < ApplicationRecord
-  include SoftDeletable, Templatable, Transitionable, MathUtil, CustomFieldFilterSupport
+  attr_accessor :skip_callback
+  include SoftDeletable, Templatable, Transitionable, MathUtil, CustomFieldFilterSupport, GetCurrency
   include Sequenced::ActsAsSequenced
   include EventProducer
   include Concerns::ErpSyncConcern
+  include ErpSyncable
 
   acts_as_sequenced column: :sequence_id, purpose: :credit_note, editable: false, prefix: 'CN'
 
@@ -72,6 +74,8 @@ class CreditNote < ApplicationRecord
   belongs_to :freight_amount, class_name: 'Amount', optional: true
   belongs_to :previously_adjusted_amount, class_name: 'Amount', optional: true
   belongs_to :net_adjustable_amount, class_name: 'Amount', optional: true
+  belongs_to :base_currency, optional: true, class_name: 'Currency'
+  belongs_to :reporting_currency, optional: true, class_name: 'Currency'
 
   belongs_to :tds_rate, class_name: 'TdsRatesList', optional: true
 
@@ -83,9 +87,16 @@ class CreditNote < ApplicationRecord
   # before_save :calculate_amount
   after_create :calculate_from_items_values, unless: :skip_callback
   before_save :calculate_from_item_methods
+  after_save :set_currency_for_amount, unless: :skip_callback
   after_touch :update_adjustments
+  before_create :set_currency
 
   delegate :draft?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :voided?, :adjusted?, :partially_adjusted?, :unadjusted?, to: :status
+
+  def set_currency
+    self.reporting_currency_id = self.company.reporting_currency.id if self.reporting_currency_id.blank? 
+    self.base_currency_id = self.company.reporting_currency.id if self.base_currency_id.blank? 
+  end
 
   def as_json(options = {})
     if options[:index]
@@ -113,7 +124,9 @@ class CreditNote < ApplicationRecord
           user_email: user&.email,
           user_employee_id: user.employee_id,
           previously_adjusted_amount: previously_adjusted_amount.as_json({rounded: true}),
-          net_adjustable_amount: net_adjustable_amount.as_json({rounded: true})
+          net_adjustable_amount: net_adjustable_amount.as_json({rounded: true}),
+          base_currency: get_base_currency,
+          reporting_currency: get_reporting_currency
       }
     else
       data = {
@@ -152,7 +165,9 @@ class CreditNote < ApplicationRecord
           net_adjustable_amount: net_adjustable_amount.as_json,
           user: user.as_json,
           invoice_gst_type: tax_type_name,
-          approved_at: approved_at&.strftime('%d %b %Y')
+          approved_at: approved_at&.strftime('%d %b %Y'),
+          base_currency: get_base_currency,
+          reporting_currency: get_reporting_currency
       }
     end
 
@@ -625,6 +640,18 @@ class CreditNote < ApplicationRecord
       self.status_id = CreditNoteStatus.id_for(:unadjusted)
     end
     save(validation: false)
+  end
+
+  def set_currency_for_amount
+    amount_attr = [:gross_receivable_amount, :tax_amount, :discount_amount, :net_receivable_amount, :tds_amount, :freight_amount, :previously_adjusted_amount, :net_adjustable_amount]
+    amount_attr.each do |amount_attribute|
+      amount_attr_id = self.send("#{amount_attribute}_id")
+      if amount_attr_id.present?
+        Amount.find_by(id: amount_attr_id).update(currency_id: get_base_currency.id)
+      end
+    end
+    self.skip_callback = true
+    self.save
   end
 
 end

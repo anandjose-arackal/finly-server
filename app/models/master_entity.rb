@@ -1,0 +1,182 @@
+# == Schema Information
+#
+# Table name: master_entities
+#
+#  id                        :bigint           not null, primary key
+#  master_schema_id          :string(255)      not null
+#  company_id                :integer
+#  type                      :string(255)      not null
+#  hint                      :string(255)
+#  required                  :boolean
+#  unique                    :boolean
+#  position                  :string(255)
+#  entity_key                :string(255)      not null
+#  system_entity             :boolean          default(FALSE)
+#  label                     :string(255)      not null
+#  active                    :string(255)
+#  options                   :text(65535)
+#  can_label_be_changed      :boolean
+#  can_uniqueness_be_changed :boolean
+#  can_required_be_changed   :boolean
+#  can_active_be_changed     :boolean
+#  can_be_destroyed          :boolean
+#  show_in_lookup            :boolean
+#  deleted_at                :datetime
+#  created_at                :datetime         not null
+#  updated_at                :datetime         not null
+#  choices_scope             :text(65535)
+#  primary_key               :boolean
+#
+
+class MasterEntity < ApplicationRecord
+  include SoftDeletable, TemplateClonable
+  include DynamicAttributes
+  include Dry::Monads[:result]
+  include Masters::Entity::Schema
+  include Masters::Entity::Filters
+
+  TRUTHY_VALUES ||= ['true', true, 1, '1', 'TRUE'].freeze
+
+  belongs_to :company
+  belongs_to :master_schema
+
+  has_many :choices, class_name: 'MasterEntityChoice', dependent: :destroy
+
+  scope :system_fields, -> { where system_entity: true }
+  scope :custom_fields, -> { where.not system_entity: true }
+  scope :show_in_lookup, -> { where show_in_lookup: true }
+  scope :only_active, -> { where active: true }
+
+  set :hint, 'Enter Value'
+
+  class_attr :registered_type
+
+  class_attr :contract_evaluators, default: {}
+
+  serialize :options, JSON
+  serialize :choices_scope, JSON
+
+  SYSTEM_MASTER_CUSTOM_FIELDS = %w(field_1 field_2 field_3 field_4 field_5)
+  CUSTOM_MASTER_CUSTOM_FIELDS = %w(field_1 field_2 field_3 field_4 field_5 field_6 field_7 field_8 field_9 field_10)
+
+  def self.register(key)
+    Masters::Entity::Registry.register self, key
+  end
+
+  # Contract evaluators are executed in the context of the dynamically generated contract class
+  # which is used for validations at the time of create and update of the records
+  def self.contract_eval(name, &block)
+    contract_evaluators[name] = block if block_given?
+  end
+
+  contract_eval "Required check" do |contract:, entity:, **|
+    if entity.required
+      contract.validate do
+        unless send(entity.entity_key).present?
+          errors.add entity.label, "must be present"
+        end
+      end
+      # contract.validates entity.entity_key, presence: true
+    end
+  end
+
+  contract_eval "Uniqueness check" do |contract:, entity:, **|
+    if entity.unique
+      contract.validate do
+        if send(entity.entity_key).present?
+          recs = contract_root.model.class.where("#{entity.entity_key} = ?", send(entity.entity_key))
+          id = send(:id)
+          recs = recs.where.not(id: id) if id.present?
+          if recs.present?
+            errors.add entity.label, "must be unique"
+          end
+        end
+      end
+    end
+    # scopes = [:company_id]
+    # unless entity.master_schema.system_master
+    #   scopes << :master_schema_id
+    # end
+
+    # if entity.unique
+    #   contract.validates_uniqueness_of entity.entity_key, message: "should have unique value", scope: scopes, conditions: -> { where deleted_at: nil }, allow_nil: true, allow_blank: true
+    # end
+  end
+
+  contract_eval "Choices Scope" do |contract:, entity:, **|
+    if entity.choices_scope.present? and entity.entity_type == 'lookup'
+      contract.validate do
+        id = send(entity.entity_key)
+        if id.present?
+          # If the master has a created by, use the created by field for scoping down the master
+          user = contract_root.respond_to?(:created_by) ? contract_root.created_by : RequestStoreUtil.current_user
+          unless entity.choices_scope.valid?(id: id, user: user)
+            errors.add entity.label, 'is invalid'
+          end
+        end
+      end
+    end
+  end
+
+  def choices_scope
+    val = super()&.with_indifferent_access
+    return nil unless val.present?
+    if entity_type == 'dropdown' and choices.present?
+      val[:type] = :list
+      val[:config] = {
+        choices: choices.map do |choice|
+          choice.as_json
+        end
+      }.with_indifferent_access
+    end
+    Choices[val[:type]].new(val[:config], entity: self)
+  end
+
+  def type?(name)
+    self.class.registered_type.to_s == name.to_s
+  end
+
+  def entity_type
+    self.class.registered_type.to_s
+  end
+
+  def as_json(opts = {})
+    registered_type = self.class.registered_type
+    if registered_type.nil? and type.present?
+      registered_type = Object.const_get(type).registered_type
+    end
+    data = {
+        id: id,
+        label: label,
+        hint: hint,
+        entity_type: registered_type,
+        position: position,
+        required: required,
+        unique: unique,
+        primary_key: primary_key,
+        entity_key: entity_key,
+        options: options,
+        default_value: default_value,
+        active: TRUTHY_VALUES.include?(active) ? true : false,
+    }
+
+    if type == 'MasterEntity::DropDown'
+      if choices_scope.type == :enum
+        data[:choices] = choices_scope.choices
+      else
+        data[:choices] = choices.map do |choice|
+          choice.as_json
+        end
+      end
+    end
+
+    if type == "MasterEntity::Lookup"
+      data[:choices_scope] = choices_scope
+      data[:choices_data] = choices_scope.build(user: RequestStoreUtil.current_user)
+      data[:autocomplete_url] = 'lookup/' + choices_scope.route.gsub('.', '/')
+    end
+
+    data
+  end
+
+end

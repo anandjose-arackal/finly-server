@@ -35,7 +35,7 @@ class BankTransfer::BankAccounts::CheckValidity < BankTransfer::BankAccounts::Ba
         amount_attributes: {
            value: 1,
            # value: 0.1,
-           currency_id: Currency.first.id
+           currency_id:  (self.company&.reporting_currency&.id || Currency.first.id)
        }
     )
   end

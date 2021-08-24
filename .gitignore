@@ -29,6 +29,7 @@ config/icici_prepaid_card.yml
 config/finly_macros.yml
 public/*
 public/system/import_job/*
+.yardoc/*
 config/feature_flipper.yml
 config/meilisearch.yml
 config/posthog.yml
@@ -39,6 +40,7 @@ config/cubejs.yml
 config/mailtrain.yml
 config/open_exchange_rates.yml
 config/message_template.yml
+config/appsmith.yml
 
 # .rubocop.yml
 .vscode/
@@ -79,6 +81,7 @@ config/gstin_verification_config.yml
 config/hutch.yml
 public/system/temporary_files/
 public/system/admin_implementation_requests/*
+public/system/import_job/*
 
 /yes_bank_api_call_logs
 .vagrant/
@@ -110,6 +113,9 @@ config/integrations.yml
 /yarn-error.log
 yarn-debug.log*
 .yarn-integrity
+
+coverage
+
 /config/sso_provider_credentials.yml
 
 storage/

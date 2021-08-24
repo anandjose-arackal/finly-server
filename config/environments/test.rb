@@ -43,4 +43,6 @@ Rails.application.configure do
 
   #For paperclip to work in windows
   Paperclip.options[:command_path] = 'C:\Ruby\GnuWin32\bin'
+
+  config.bullet_train = nil
 end

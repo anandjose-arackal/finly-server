@@ -56,6 +56,10 @@ class Trail < ApplicationRecordBackwardCompatibility
     where action_id: TrailAction.id_for(:retract)
   }
 
+  scope :only_reject, -> {
+    where action_id: TrailAction.id_for(:reject)
+  }
+
   scope :with_action_user_id, -> (id) {
     where(action_user_id: id)
   }
@@ -146,7 +150,9 @@ class Trail < ApplicationRecordBackwardCompatibility
     when TrailAction.id_for(:create)
         action = " created"
     when TrailAction.id_for(:take_control)
-        action = " took control"
+        action = " took control of"
+    when TrailAction.id_for(:return_control)
+      action = " returned control of"
     when TrailAction.id_for(:update)
         action = " updated"
     when TrailAction.id_for(:approve)
@@ -196,11 +202,23 @@ class Trail < ApplicationRecordBackwardCompatibility
     end
     if self.parent_type == 'YesBankVendor'
       doc = 'Vendor'
-      body += action + " the #{doc}."    
+      body += action + " the #{doc}."
+    elsif self.parent_type == 'BbpsBill'
+      doc = 'Bill'
+      body += action + " the #{doc}."
     else
-      body += action + " the #{self.parent_type}."    
+      body += action + " the #{self.parent_type}"
     end
 
     body
   end
+
+  def generate_trail_body_note(user = nil)
+    trail_body = self.generate_trail_body(user)
+    if self.note.present?
+      trail_body += " with note: #{self.note&.strip}"
+    end
+    trail_body
+  end
+
 end

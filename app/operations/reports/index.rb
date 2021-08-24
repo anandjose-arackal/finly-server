@@ -189,9 +189,9 @@ class Reports::Index < Reports::Base
           self.reports = self.reports.filter_status(params[:filter_status], user.id)
         end
         if personal_view?
-          self.reports = self.reports.order_by(:created_at).order_by(:controlling_user, user.id)
+          self.reports = self.reports.order_by(:created_at)
         else
-          self.reports = self.reports.order_by(:submitted_at).order_by(:manager_controlling_user, user.id)
+          self.reports = self.reports.order_by(:submitted_at)
         end
       end
       self.count = self.reports.count
