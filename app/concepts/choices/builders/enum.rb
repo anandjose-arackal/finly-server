@@ -37,7 +37,7 @@ class Choices::Builders::Enum < Choices::Builders::Base
   # end
 
   def find_by_id(id, params: {}, user: nil)
-    choices(params: params, user: user).where(id: id).first
+    choices(params: params, user: user).find {|item| item[:id] == id}
   end
 
   def find_by_name(name, params: {}, user: nil)

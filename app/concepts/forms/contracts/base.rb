@@ -1,5 +1,26 @@
 class Forms::Contracts::Base < Reform::Form
 
+  # Fetch extracts the data from the form using entity or entity_path
+  def fetch(entity: nil, entity_path: nil, raw_values: false, user: nil)
+    entity_path = entity.entity_path if entity.present?
+    return nil unless entity_path.present?
+
+    path = entity_path.split(".")
+    value = to_form.dig(*path)
+    if !raw_values and entity.present? and value.present?
+      if entity.choices_scope.present?
+        user ||= RequestStoreUtil.current_user
+        choice = entity.choices_scope.find_by_id(value, params: {}, user: user)
+        if choice.present?
+          value = choice[:name]
+        else
+          value = nil
+        end
+      end
+    end
+    value
+  end
+
   def bulk_validate_choice(entity, value)
     entity_choice_validations = choice_validations(entity)
     entity_choice_validations << value unless entity_choice_validations.include?(value)

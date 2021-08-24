@@ -9,12 +9,31 @@ class Forms::API
   class_attr :validations, default: {}
   class_attr :dependencies, default: {}
   class_attr :model
+  class_attr :policy
   class_attr :predictions, default: {}
 
   def self.form
     @form ||= ActsAsTenant.without_tenant do
       Form.new(klass_name: self, model: self.model)
     end
+  end
+
+  def self.policy(policy_klass = NoObject, action = NoObject)
+    # In case the devs forget to add the action along with the policy
+    if policy_klass != NoObject and action == NoObject
+      raise "Action has not been provided for policy #{policy_klass}"
+    end
+    @policy = [policy_klass, action] unless policy_klass == NoObject or action == NoObject
+    @policy
+  end
+
+  def self.authorized?(record, user = nil)
+    return false if record.blank?
+    return true if policy.blank?
+
+    user ||= RequestStoreUtil.current_user
+
+    policy[0].new(user, record).send(policy[1])
   end
 
   def self.meta(form_meta = NoObject)

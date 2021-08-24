@@ -28,7 +28,8 @@ module Forms::Entity::Schema
       can_choices_be_changed: true,
       allow_clearing_default_value: true,
       options: {},
-      config: {}
+      config: {},
+      data_card_config: {}
   }
 
   class_methods do
@@ -152,6 +153,13 @@ module Forms::Entity::Schema
               required(:value).filled
               required(:position).value(:int?)
               required(:active).value(:bool?)
+            end
+          end
+
+          optional(:data_card_config) do
+            hash do
+              optional(:icon)
+              optional(:type).filled(inclusion?: DataCards::API::TYPES)
             end
           end
           instance_exec &block if block_given?

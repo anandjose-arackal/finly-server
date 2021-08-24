@@ -72,8 +72,13 @@ class Form < ApplicationRecord
     Object.const_get(klass_name) if klass_name.present?
   end
 
-  def contract(user)
+  def contract(user = nil)
+    user ||= RequestStoreUtil.current_user
     Forms::Contracts::Builders::Form.(self, user)
+  end
+
+  def authorized?(record, user = nil)
+    form_klass.authorized?(record, user)
   end
 
   def as_json(options = {})
