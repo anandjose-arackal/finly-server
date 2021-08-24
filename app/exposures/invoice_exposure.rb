@@ -253,8 +253,8 @@ class InvoiceExposure < Exposures::API
   end
 
   attribute :approval_levels, record_attribute: :dlrms, exposure: true, includes: [:dlrms]
-  attribute :approved_levels, exposure: :true,  includes: [:dlrms] do
-    record.dlrms.action_performed_levels.group_by{ |l| l.level_id }.transform_values(&:first)
+  attribute :approved_trails, exposure: :true,  includes: [:trails] do
+    record.trails.where(action_id: TrailAction.id_for(:approve))
   end
 
   # def vendor_ref_num(invoice_line_item)

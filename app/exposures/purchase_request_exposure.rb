@@ -21,8 +21,8 @@ class PurchaseRequestExposure < Exposures::API
   attribute :items, record_attribute: true, exposure: true
   attribute :controlling_level, record_attribute: true, exposure: true, includes: [:controlling_level]
   attribute :approval_levels, record_attribute: :dlrms, exposure: true, includes: [:dlrms]
-  attribute :approved_levels, exposure: :true,  includes: [:dlrms] do
-    record.dlrms.action_performed_levels.group_by{ |l| l.level_id }.transform_values(&:first)
+  attribute :approved_trails, exposure: :true,  includes: [:trails] do
+    record.trails.where(action_id: TrailAction.id_for(:approve))
   end
   attribute :get_reviewers_names do
     record.get_reviewers&.map(&:name)&.join(", ")

@@ -48,8 +48,8 @@ class YesBankVendorExposure < Exposures::API
 
   attribute :deactivated, record_attribute: :deactivated?
 
-  attribute :approved_levels, exposure: :true,  includes: [:dlrms] do
-    record.dlrms.action_performed_levels.group_by{ |l| l.level_id }.transform_values(&:first)
+  attribute :approved_trails, exposure: :true,  includes: [:trails] do
+    record.trails.where(action_id: TrailAction.id_for(:approve))
   end
 
   # attribute :vendor_tds_rates, record_attribute: true, exposure: true
