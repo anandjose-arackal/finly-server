@@ -253,6 +253,9 @@ class InvoiceExposure < Exposures::API
   end
 
   attribute :approval_levels, record_attribute: :dlrms, exposure: true, includes: [:dlrms]
+  attribute :approved_levels, exposure: :true,  includes: [:dlrms] do
+    record.dlrms.action_performed_levels.group_by{ |l| l.level_id }.transform_values(&:first)
+  end
 
   # def vendor_ref_num(invoice_line_item)
   #   invoice_line_item.parent&.vendor_id
