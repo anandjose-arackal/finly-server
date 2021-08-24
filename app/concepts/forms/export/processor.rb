@@ -128,7 +128,7 @@ class Forms::Export::Processor
 
   def build_export(input, request)
     file = Tempfile.new(["#{form.label}_", '.xlsx'])
-    workbook = ::WriteXLSX.new(file)
+    workbook = ::WriteXLSX.new(file, strings_to_urls: false)
 
     worksheets = {}
     worksheets_length = Hash.new(0)
