@@ -63,6 +63,7 @@ class Docs::UtilityBills::Subscriptions::Ops::Review < Transactions::API
   end
 
   def validate_subscription_uniqueness(options, params:, current_user:, model:, **)
+    return true if params[:aasm_event].to_sym == :deactivate
     unique_subscription =  BbpsBillerSubscription.filter_unique_check.where.not(id: model.id).where(bbps_biller_id: model.bbps_biller_id,
                                                                                               customer_param_key_1: model.customer_param_key_1,
                                                                                               customer_param_value_1: model.customer_param_value_1,
