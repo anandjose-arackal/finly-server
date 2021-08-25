@@ -68,6 +68,7 @@ class DocumentLevelReviewerMapping < ApplicationRecordBackwardCompatibility
   scope :with_viewable, -> {where viewable: true}
   scope :with_document_id, -> (document_ids) {where document_reviewer_mappable_id: document_ids}
   scope :with_action_taken_nil, ->{where action_taken_at: nil}
+  scope :action_performed_levels, -> { where.not action_taken_by_id: nil }
   scope :with_level_number_gt, -> (number) {
     if number.present?
       where("level_number > ?", number.to_i)

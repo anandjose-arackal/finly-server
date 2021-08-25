@@ -48,6 +48,10 @@ class YesBankVendorExposure < Exposures::API
 
   attribute :deactivated, record_attribute: :deactivated?
 
+  attribute :approved_trails, exposure: :true,  includes: [:trails] do
+    record.trails.where(action_id: TrailAction.id_for(:approve))
+  end
+
   # attribute :vendor_tds_rates, record_attribute: true, exposure: true
   attribute :approved_timeline, includes: [{dlrms: [:taken_control_by, :forwarded_to, :reviewer]}] do
     approvers = record.dlrms.map do |dlrm|
