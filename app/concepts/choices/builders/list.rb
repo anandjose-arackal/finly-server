@@ -33,7 +33,7 @@ class Choices::Builders::List < Choices::Builders::Base
       list.find_by(name: name)
     elsif list.respond_to?(:filter)
       (list.filter do |item|
-        item[:name] == name || item["name"] == name
+        (item[:name]&.downcase == name&.downcase) || (item["name"]&.downcase == name&.downcase)
       end).first
     end
   end

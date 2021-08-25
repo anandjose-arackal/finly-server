@@ -45,8 +45,10 @@ class ImportJob < ApplicationRecord
   ransack_scopes :with_status_id
 
   has_attached_file :attachment, :use_timestamp => false
-  validates_attachment_content_type :attachment,
-                                    content_type: %w(application/vnd.ms-excel application/vnd.openxmlformats-officedocument.spreadsheetml.sheet text/csv text/plain)
+  validates_attachment :attachment, content_type: {content_type: []}
+
+  has_attached_file :result_file, :use_timestamp => false
+  validates_attachment :result_file, content_type: {content_type: []}
 
   serialize :request_params, JSON
   serialize :options, JSON
@@ -66,6 +68,7 @@ class ImportJob < ApplicationRecord
       completed_records: (completed_records || 0),
       completion_percentage: (completion_percentage || 0),
       attachment: attachment&.url,
+      result_file: result_file&.url,
       created_at: created_at&.strftime("%I:%M%p, %d-%m-%Y"),
       status: status&.name
     }

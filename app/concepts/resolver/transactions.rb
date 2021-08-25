@@ -21,6 +21,10 @@ class Resolver::Transactions
 
       raise "Resolver is not defined correctly for #{circuit_options[:exec_context]&.class&.name}" if klass.blank? and route_path.blank?
 
+      unless context[:params]&.dig(:paginate).nil?
+        paginate = context[:params]&.dig(:paginate)
+      end
+
       Resolve.with(context, klass: klass, route: route_path, paginate: paginate, filter: filter, includes: includes)
     end
   end
