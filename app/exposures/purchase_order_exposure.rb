@@ -34,6 +34,9 @@ class PurchaseOrderExposure < Exposures::API
   attribute :created_at, record_attribute: true
   attribute :created_by, record_attribute: true, exposure: true
   attribute :created_by_id, record_attribute: :user_id
+  attribute :discount_type_id, record_attribute: true
+  attribute :gst_type_id, record_attribute: :true
+
   attribute :gross_amount, record_attribute: true, exposure: true, includes: [:gross_amount]
   attribute :gross_amount_value, includes: [:gross_amount] do
     record.gross_amount&.value || 0

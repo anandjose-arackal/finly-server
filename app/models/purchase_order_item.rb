@@ -44,8 +44,11 @@
 #
 
 class PurchaseOrderItem < ApplicationRecord
+  include LiquidDroppable
+  include Exposures::Model::Exposable
+  include FormsHelper
+
   validates :inventory_line_item_id, presence: true
-  # validates :purchase_order_id, presence: true
 
   belongs_to :company, optional: true
   belongs_to :tax_rate, optional: true
@@ -135,6 +138,10 @@ class PurchaseOrderItem < ApplicationRecord
 
   def set_tds_applicable
     self.tds_applicable = self.inventory_line_item.tds_applicable
+  end
+
+  def retrieve_value(entity)  
+    send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
   end
 
   private

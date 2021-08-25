@@ -80,13 +80,19 @@
 
 class PurchaseOrder < ApplicationRecord
   attr_accessor :skip_callback
+
   include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport, ControllingUser, GetCurrency
   include Sequenced::ActsAsSequenced
-  # include SearchIndex::Concerns::Document
   include Searchkick::Api
   include Concerns::ErpSyncConcern
   include ErpSyncable
 
+  include LiquidDroppable
+  include Exposures::Model::Exposable
+  include FormsHelper
+
+  # # Multicurrency Support
+  # include Monetizable
 
   acts_as_sequenced column: :po_number, purpose: :purchase_order, editable: false, prefix: 'PO/{fiscal_year_start}-{fiscal_year_end}/', min_length: 4
 
@@ -153,6 +159,7 @@ class PurchaseOrder < ApplicationRecord
 
   has_many :trails, as: :parent
   has_many :purchase_request_items
+  has_many :form_custom_fields, class_name: 'FormCustomField', as: :document, dependent: :destroy
 
   has_many :quotations, dependent: :destroy
 
@@ -528,6 +535,10 @@ class PurchaseOrder < ApplicationRecord
   scope :non_voided, ->{
     where.not(purchase_order_status_id: PurchaseOrderStatus.id_for(:voided))
   }
+
+  # scope :includes_for_contract, -> {
+  #   includes(:created_by, :invoice_type, :form_custom_fields, :items)
+  # }
 
   before_save :calculate_line_items
   after_create :purchase_request_tasks
@@ -944,6 +955,72 @@ class PurchaseOrder < ApplicationRecord
   def review_in_progress?
     PurchaseOrderStatus.ids_for(:processing).include?(purchase_order_status_id)
   end
+
+  def form_klass
+    Forms::Router.klass(:purchase_orders)&.name
+  end
+
+  def retrieve_value(entity)  
+    return get_discount_type if entity.entity_key == 'discount_type_id'
+    send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
+  end
+
+  def get_discount_type
+    if discount_type_id == 1
+      'Percentage' 
+    else
+      'Amount'
+    end
+  end
+
+  def po_budget_contributions_before_update
+    if self.company.enforce_budget_configuration.enforce_purchase_order_budget?
+      op = BudgetManager::BudgetLimitValidator::PurchaseOrder.({invoice: self, ignore_unbudgetables: true, current_user: self.created_by })
+      op['result'][:budget_contributions] rescue {}
+    end
+    {}
+  end
+
+  def purchase_order_budgets
+    op = BudgetManager::BudgetsCalculator::ApplicableBudgets.({document: self, current_user: User.first})
+    budgets = op["result"][:budgets]
+    budgets
+  end
+
+  def forms_enabled
+    if RequestStoreUtil.current_user.blank?
+      feature_flag_enabled = true
+    else
+      feature_flag_enabled = PurchaseOrderToggle.new(RequestStoreUtil.current_user).enabled?
+    end
+    feature_flag_enabled
+  end
+
+  def sync_amounts
+    if forms_enabled
+      self.skip_callback = true
+    end
+  end
+
+  def amounts_attributes_map
+    # todo - I2P change it to converted values post multicurrency setup
+    {  
+      po_taxable_amount: 'gross_amount',
+      po_discount_amount: 'discount_amount',
+      po_freight_amount: 'freight_amount',
+      po_tax_amount: 'tax_amount',
+      po_tds_amount: 'tds_amount',
+      po_paid_outside_amount: 'advance_amount',
+      po_balance_due: 'balance_due'
+    }
+  end
+
+  def amount_direct_attribute_map
+    {
+      po_roundoff_amount: 'roundoff_amount'
+    }
+  end
+
 
   private
 
