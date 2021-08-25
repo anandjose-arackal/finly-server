@@ -102,7 +102,6 @@ class FormEntity < ApplicationRecord
   serialize :compute_formula, JSON
   serialize :compute_lookup_assignments, JSON
   serialize :triggers, JSON
-  serialize :data_card_config, JSON
 
   scope :root, -> { where parent_id: nil }
   scope :system_fields, -> { where system_field: true }
@@ -312,8 +311,7 @@ class FormEntity < ApplicationRecord
         entity_key: entity_key,
         parent: attributes[:parent],
         options: {},
-        config: {},
-        data_card_config: {}
+        config: {}
       )
     end
     schema = DEFAULT_SYSTEM_SCHEMA.deep_dup

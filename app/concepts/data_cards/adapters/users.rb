@@ -32,13 +32,12 @@ class DataCards::Adapters::Users < DataCards::API
     private
   
     def retrieve(context, key)
-      entities = context[:master_entities].select {|entity| entity.data_card_config&.dig('type') == key}
+      entities = context[:master_entities].select {|entity| entity.show_in_data_card_as == key}
       result = []
       entities.each do |entity|
         value = context['contract.default'].fetch(entity: entity, user: context[:current_user])
         label = entity.label
-        icon = entity.data_card_config[:icon] # TODO Default icon in case the icon isn't configured
-        result << {value: value, label: label, icon: icon}
+        result << {value: value, label: label}
       end
       result
     end

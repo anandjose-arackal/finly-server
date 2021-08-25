@@ -7,7 +7,7 @@
 # 
 class DataCards::API < Transactions::API
 
-  TYPES ||= ["title", "subtitle", "status", "body"].freeze
+  TYPES ||= ["title", "subtitle", "status", "body", nil, ""].freeze
 
   schema do
     params do

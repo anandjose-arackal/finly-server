@@ -6,8 +6,7 @@ module Masters::Entity::Schema
       can_uniqueness_be_changed: false,
       can_required_be_changed: false,
       can_active_be_changed: false,
-      can_be_destroyed: false,
-      data_card_config: {}
+      can_be_destroyed: false
   }
 
   included do
