@@ -7,6 +7,7 @@ module Masters::Entity::Schema
       can_required_be_changed: false,
       can_active_be_changed: false,
       can_be_destroyed: false,
+      data_card_config: {}
   }
 
   included do

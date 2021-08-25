@@ -55,6 +55,7 @@ class MasterEntity < ApplicationRecord
 
   serialize :options, JSON
   serialize :choices_scope, JSON
+  serialize :data_card_config, JSON
 
   SYSTEM_MASTER_CUSTOM_FIELDS = %w(field_1 field_2 field_3 field_4 field_5)
   CUSTOM_MASTER_CUSTOM_FIELDS = %w(field_1 field_2 field_3 field_4 field_5 field_6 field_7 field_8 field_9 field_10)

@@ -92,6 +92,11 @@ class Masters::Schema::Entity::Contract < Reform::Form
   property :can_be_destroyed, deserializer: -> (input, represented, **) {
     represented.can_be_destroyed = true unless represented.system_entity
   }
+  property :data_card_config, deserializer: -> (input, represented, **) {
+    represented.data_card_config ||= {}.with_indifferent_access
+    represented.data_card_config['icon'] = input['icon'] if input['icon'].present?
+    represented.data_card_config['type'] = input['type'] if input['type'].present?
+  }
 
   def choices!(collection:, fragment:, index:, options:, **)
     choice = choices.find {|choice| choice.key.to_s == fragment["id"].to_s}
@@ -111,11 +116,20 @@ class Masters::Schema::Entity::Contract < Reform::Form
   validates :entity_key, presence: true
   # validates_uniqueness_of :entity_key, scope: [:master_schema]
   validates :label, presence: true
-
+  
+  validate :data_card_config_validation
   validate :primary_key_should_be_unique
   validate :primary_key_should_be_required
   validate :cannot_deactivate_primary_key
   validate :non_system_entity_keys
+
+  def data_card_config_validation
+    return if data_card_config.blank?
+    return if data_card_config['type'].blank?
+    return if DataCards::API::TYPES.includes?(data_card_config['type'])
+    
+    errors.add :data_card, "configuration is invalid"
+  end
 
   def primary_key_should_be_unique
     if primary_key and not unique

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_08_20_023802) do
+ActiveRecord::Schema.define(version: 2021_08_24_131454) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -4674,7 +4674,7 @@ ActiveRecord::Schema.define(version: 2021_08_20_023802) do
     t.text "compute_lookup_assignments"
     t.boolean "virtual", default: false
     t.text "triggers"
-    t.string "show_in_card_as"
+    t.text "data_card_config"
     t.index ["company_id"], name: "index_form_entities_on_company_id"
     t.index ["created_at"], name: "index_form_entities_on_created_at"
     t.index ["created_by_user_id"], name: "index_form_entities_on_created_by_user_id"
@@ -6135,6 +6135,7 @@ ActiveRecord::Schema.define(version: 2021_08_20_023802) do
     t.text "choices_scope"
     t.boolean "primary_key"
     t.string "default_value"
+    t.text "data_card_config"
     t.index ["active"], name: "index_master_entities_on_active"
     t.index ["company_id"], name: "index_master_entities_on_company_id"
     t.index ["created_at"], name: "index_master_entities_on_created_at"

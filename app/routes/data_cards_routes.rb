@@ -6,4 +6,10 @@ DataCards::Router.draw do
     end
   end
 
+  scope "masters" do
+    route "*" do
+      to DataCards::Adapters::Masters
+    end
+  end
+
 end
