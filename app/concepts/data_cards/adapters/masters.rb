@@ -32,7 +32,7 @@ class DataCards::Adapters::Masters < DataCards::API
   end
 
   def build(context, master:, builder:, **)
-    builder.icon = defaults[:header][:icon] # TODO
+    # builder.icon = defaults[:header][:icon] # TODO
     builder.title = retrieve(context, "title")&.first&.dig(:value)
     builder.subtitle = retrieve(context, "subtitle")&.first&.dig(:value)
     builder.type = context[:model].class.name
@@ -49,7 +49,8 @@ class DataCards::Adapters::Masters < DataCards::API
     entities.each do |entity|
       value = context['contract.default'].fetch(entity: entity, user: context[:current_user])
       label = entity.label
-      icon = entity.data_card_config[:icon] # TODO Default icon in case the icon isn't configured
+      icon = nil
+      # icon = entity.data_card_config[:icon] # TODO Default icon in case the icon isn't configured
       result << {value: value, label: label, icon: icon}
     end
     result

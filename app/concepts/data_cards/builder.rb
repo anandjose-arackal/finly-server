@@ -3,9 +3,9 @@ class DataCards::Builder
   attr_reader :status
 
   INDICATOR = {
-    success: ['approved', 'closed'],
-    warning: ['in_progress', 'awaiting_approval'],
-    failure: ['rejected'],
+    success: ['approved', 'closed', 'active'],
+    warning: ['in_progress', 'awaiting_approval', 'pending'],
+    failure: ['rejected', 'inactive'],
     info: []
   }
 
@@ -48,8 +48,8 @@ class DataCards::Builder
   protected
 
   def indicator_for(value)
-    INDICATOR.each do |key, value|
-      return key if value.include?(value.to_s)
+    INDICATOR.each do |key, val|
+      return key if val.include?(value.to_s.downcase.underscore)
     end
 
     # Return 'warning' if indicatory is not found

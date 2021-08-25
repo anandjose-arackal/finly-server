@@ -12,4 +12,8 @@ DataCards::Router.draw do
     end
   end
 
+  route "users" do
+    to DataCards::Adapters::Users
+  end
+
 end
