@@ -1,3 +1,4 @@
+# This generates data cards for all simple masters
 class DataCards::Adapters::Masters < DataCards::API
 
   def init(context, args)
