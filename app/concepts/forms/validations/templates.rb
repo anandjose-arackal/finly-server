@@ -14,8 +14,15 @@ class Forms::Validations::Templates
   end
 
   validate :regex_match do |contract:, entity:, **|
-    format = entity.options['regex']&.dig('format')
-    message = entity.options['regex']&.dig('message')
+    next unless entity.options['regex'].present?
+
+    if entity.options['regex'].is_a?(String)
+      format = entity.options['regex']
+      message = nil
+    else
+      format = entity.options['regex']&.dig('format')
+      message = entity.options['regex']&.dig('message')
+    end
 
     if format.present?
       contract.validate do

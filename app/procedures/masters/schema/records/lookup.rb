@@ -30,15 +30,18 @@ class Masters::Schema::Records::Lookup < Lookup::API
 
     @attributes = {}
     @attributes[:id] = Lookup::Attribute.new(id: :id, visible: false, primary: true)
-    context[:model].entities.only_active.show_in_lookup.each do |entity|
+    context[:model].entities.only_active.entities_for_lookup.each do |entity|
       @attributes[entity.entity_key] = Lookup::Attribute.new(id: entity.entity_key, label: entity.label)
     end
     @attributes
   end
 
   def render_record(context, record:, model:, **)
-    json = {id: record.id}
-    model.entities.only_active.show_in_lookup.each do |entity|
+    json = {
+      id: record.id,
+      name: record.primary_entity_value,
+    }
+    model.entities.only_active.entities_for_lookup.each do |entity|
       json[entity.entity_key] = record.send(entity.entity_key)
     end
     json
