@@ -17,10 +17,6 @@ class DataCards::Adapters::Users < DataCards::API
     end
   
     def build(context, model:, builder:, **)
-      # builder.title = retrieve(context, "title")&.first&.dig(:value)
-      # builder.subtitle = retrieve(context, "subtitle")&.first&.dig(:value)
-      # builder.type = context[:model].class.name
-      # builder.details = retrieve(context, "body")
       builder.title = model.name
       builder.type = 'User'
       builder.status = model.status
