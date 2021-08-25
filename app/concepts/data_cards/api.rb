@@ -1,22 +1,9 @@
-# DataCards::API is the base class used for building DataCard JSON
-# The goal of the API is to build a JSON response in the following format:
-# {
-#   "icon": "", # Icon which shows up at the top of the card
-#   "tag": "",
-#   "title": "",
-#   "sub_title": "",
-#   "status": {
-#     "value": "Approved",
-#     "format": "success/failure/warning/info"
-#   },
-#   "details": [
-#     {
-#       "icon": "",
-#       "label": "",
-#       "value": ""
-#     }
-#   ]
-# }
+# DataCards::API is the base class used for building DataCard adapters
+# 
+# While its not necessary to inherit this for building new DataCard adapters,
+# inheriting it simplifies and standardises the code.
+#
+# The goal of this API is to use the builder to build the data card JSON
 # 
 class DataCards::API < Transactions::API
 
@@ -29,9 +16,15 @@ class DataCards::API < Transactions::API
     end
   end
 
+  # Run all initializations here
   step :init
+
+  # You can add any validations if required here
   step :validate
+  # This should ideally be overridden in the sub-class where the logic of building the datacard using the builder is defined
   step :build
+
+  # This is a standard code for building the JSON from the builder
   step :build_result
 
   def init(context, params:, **)
@@ -47,7 +40,7 @@ class DataCards::API < Transactions::API
   end
 
   def build(context, builder:, **)
-    # TODO in the inheriting classes
+    # Implement me in the inheriting classes
     false
   end
 
@@ -55,14 +48,6 @@ class DataCards::API < Transactions::API
     context[:result] = builder.as_json
 
     true
-  end
-
-  def defaults
-    {
-      header: {
-        icon: ""
-      }
-    }
   end
 
 end

@@ -1,5 +1,4 @@
-# Params
-# {route: "forms/YesBankVendors", id: "120"}
+# This generates data cards for all forms
 class DataCards::Adapters::Forms < DataCards::API
 
   def init(context, args)

@@ -1,3 +1,5 @@
+# This is the simple PORO which helps in building a DataCard. 
+# You can use an instance of +DataCards::Builder+ for creating DataCard JSONs.
 class DataCards::Builder
   attr_accessor :title, :icon, :subtitle, :type
   attr_reader :status

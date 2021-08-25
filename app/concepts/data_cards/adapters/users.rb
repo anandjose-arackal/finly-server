@@ -1,3 +1,4 @@
+# Responsible for creating user data cards
 class DataCards::Adapters::Users < DataCards::API
 
     def init(context, args)
