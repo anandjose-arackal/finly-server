@@ -33,25 +33,44 @@ class DataCards::Adapters::Masters < DataCards::API
   end
 
   def build(context, master:, builder:, **)
-    # builder.icon = defaults[:header][:icon] # TODO
-    builder.title = retrieve(context, "title")&.first&.dig(:value)
-    builder.subtitle = retrieve(context, "subtitle")&.first&.dig(:value)
+    builder.title = build_title(context)
+    builder.subtitle = build_subtitle(context)
     builder.type = context[:model].class.name
-    builder.details = retrieve(context, "body")
-
+    builder.details = build_body(context)
     true
   end
 
   private
 
-  def retrieve(context, key)
-    entities = context[:master_entities].select {|entity| entity.show_in_data_card_as == key}
+  # We build the title by fetching the value of the entity which has the primary_key as true
+  # In case no entities have primary_key set as true, then we set the first entity as the title entity
+  def build_title(context)
+    title_entity = context[:master_entities].select {|entity| entity.primary_key }&.first
+    if title_entity.blank?
+      title_entity = context[:master_entities].first
+    end
+    return nil if title_entity.blank?
+
+    context['contract.default'].fetch(entity: title_entity, user: context[:current_user])
+  end
+
+  # We build subtitle value using the Sequence Entity. In case a master does not have any sequence entity,
+  # then we do not set subtitle.
+  def build_subtitle(context)
+    subtitle_entity = context[:master_entities].select {|entity| entity.type == "MasterEntity::Sequence" }&.first
+    return nil if subtitle_entity.blank?
+
+    context['contract.default'].fetch(entity: subtitle_entity, user: context[:current_user])
+  end
+
+  # We build the body with all the fields available in the master
+  def build_body(context)
+    entities = context[:master_entities] # TODO skip if flag do not show in cards is set
     result = []
     entities.each do |entity|
       value = context['contract.default'].fetch(entity: entity, user: context[:current_user])
       label = entity.label
-      icon = nil
-      result << {value: value, label: label}
+      result << {label: label, value: value}
     end
     result
   end

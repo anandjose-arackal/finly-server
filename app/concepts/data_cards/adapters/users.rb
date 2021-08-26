@@ -29,17 +29,4 @@ class DataCards::Adapters::Users < DataCards::API
       true
     end
   
-    private
-  
-    def retrieve(context, key)
-      entities = context[:master_entities].select {|entity| entity.show_in_data_card_as == key}
-      result = []
-      entities.each do |entity|
-        value = context['contract.default'].fetch(entity: entity, user: context[:current_user])
-        label = entity.label
-        result << {value: value, label: label}
-      end
-      result
-    end
-  
 end
