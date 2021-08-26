@@ -26,17 +26,17 @@ class Docs::I2P::PurchaseOrders::Ops::Update < Transactions::API
     fail RollbackStep
   }
 
-  def budget_limit_validation(options, params, ** )
-    current_user = options[:current_user]
-    model = options[:model]
-    if current_user.company.enforce_budget_configuration.enforce_invoice_budget?
-      op = return BudgetManager::BudgetLimitValidator::PurchaseOrder.({purchase_order: purchase_order, previous_budget_contributions: model.po_budget_contributions_before_update, current_user: user})
-      unless op.success?
-        add_message options, :error, :base, op.messages[:errors]
-        return false 
-      end
-    end
-    return true
-  end
+  # def budget_limit_validation(options, params, ** )
+  #   current_user = options[:current_user]
+  #   model = options[:model]
+  #   if current_user.company.enforce_budget_configuration.enforce_invoice_budget?
+  #     op = return BudgetManager::BudgetLimitValidator::PurchaseOrder.({purchase_order: purchase_order, previous_budget_contributions: model.po_budget_contributions_before_update, current_user: user})
+  #     unless op.success?
+  #       add_message options, :error, :base, op.messages[:errors]
+  #       return false 
+  #     end
+  #   end
+  #   return true
+  # end
 
 end
