@@ -13,7 +13,7 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
       id: '{{record.id}}',
       args: {
         procurement_id: '{{record.procurement_id}}',
-        procurement_type: "po"
+        procurement_type: "po",
         # forms_enabled: "{% if record.forms_enabled == true %}{{true}}{% else %}{{ false }}{% endif %}"
         # forms_enabled: "{% if record.forms_enabled == true %}{{true}}{% else %}{{ false }}{% endif %}"
         forms_enabled: "true"
