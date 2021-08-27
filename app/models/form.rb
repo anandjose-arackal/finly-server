@@ -84,7 +84,7 @@ class Form < ApplicationRecord
   def as_json(options = {})
     {
       id: id,
-      sections: sections
+      sections: sections.as_json(options)
     }
   end
 

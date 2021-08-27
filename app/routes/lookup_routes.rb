@@ -3,6 +3,7 @@ Lookup::Router.draw do
 
 
   # Masters
+  # Todo Simple Masters don't need lookups as it should ideally be handled by masters.*
   route 'policies', Masters::Policies::Lookup
   route "departments", Masters::Departments::Lookup
   route "locations", Masters::Locations::Lookup

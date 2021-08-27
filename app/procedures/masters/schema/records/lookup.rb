@@ -44,4 +44,11 @@ class Masters::Schema::Records::Lookup < Lookup::API
     json
   end
 
+  def self.data_card_route(value = NoObject, options: {})
+    route = options[:route]
+    return nil if route.blank?
+
+    "masters.#{route}"
+  end
+
 end
