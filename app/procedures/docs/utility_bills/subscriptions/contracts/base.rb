@@ -69,6 +69,9 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
 
   validate :poc_presence
 
+  validate :validate_subscription_uniqueness
+
+
   def poc_presence
     errors.add(:subscription_pocs, "You need to provide at least One POC") if subscription_pocs.blank?
   end
@@ -225,4 +228,26 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
     pur = PolicyUserRole.find_or_initialize_by(user_id: user_id, policy_id: self.policy_id, user_role_id: UserRole.id_for(:utility_bill_initiator))
     pur.save
   end
+
+
+  def validate_subscription_uniqueness
+    valid = true
+    unique_subscription =  BbpsBillerSubscription.filter_unique_check.where(bbps_biller_id: bbps_biller_id,
+                                                                            customer_param_key_1: customer_param_key_1,
+                                                                            customer_param_value_1: customer_param_value_1,
+                                                                            customer_param_key_2: customer_param_key_2,
+                                                                            customer_param_value_2: customer_param_value_2,
+                                                                            customer_param_key_3: customer_param_key_3,
+                                                                            customer_param_value_3: customer_param_value_3,
+                                                                            customer_param_key_4: customer_param_key_4,
+                                                                            customer_param_value_4: customer_param_value_4,
+                                                                            customer_param_key_5: customer_param_key_5,
+                                                                            customer_param_value_5: customer_param_value_5).first
+    if unique_subscription.present?
+      errors.add(:active_subscription,"already exist for this biller with Subscription ID #{unique_subscription.sequence_id}")
+      valid = false
+    end
+    valid
+  end
+
 end

@@ -43,12 +43,18 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
 
   def build_headers(context, params:, master_schema:, **)
     context[:headers] = {}.with_indifferent_access
+    context[:entity_types] = {}.with_indifferent_access
     context[:identifier_key] = master_schema.sequence_entity&.entity_key
+    # if master_schema.has_nesting
+    #   context[:headers][:parent_id] = "Parent Id"
+    # end
     if master_schema.has_nesting
-      context[:headers][:parent_id] << "Parent Id"
+      context[:headers]['parent_id'] = 'Parent ID'
+      context[:entity_types]['parent_id'] = 'text'
     end
-    master_schema.entities.only_active.each do |entity|
-      context[:headers][entity.entity_key] = entity.label
+    master_schema.entities.only_active.only_import_entities.each do |entity|
+      context[:headers][entity.entity_key] = entity.import_label
+      context[:entity_types][entity.entity_key] = entity.entity_type
     end
 
     true
@@ -112,13 +118,39 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
   #   end
   # end
 
+  def format_cell_value(value, type)
+    return value unless value.present?
+
+    case type
+    when 'datetime'
+      if value.is_a?(::DateTime)
+        value.strftime(MasterEntity::DateTime::DATETIME_FORMAT)
+      else
+        value.to_s
+      end
+    when 'date'
+      if value.is_a?(::Date)
+        value.strftime(MasterEntity::Date::DATE_FORMAT)
+      else
+        value.to_s
+      end
+    else
+      value.to_s
+    end
+  end
+
   def import_data(context, contract:, master_schema:, params:, model:, model_class:, **)
     context[:result] = []
     created_records = 0
     updated_records = 0
     failed_records = 0
     skipped_records = 0
+    model.update(total_records: context[:input].count)
+
     context[:input].each do |row|
+      row.keys.each do |key|
+        row[key] = format_cell_value(row[key], context[:entity_types][key])
+      end
       data = row.values
       # pre_process_result = pre_process(context, row)
 
@@ -148,6 +180,8 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
       progress_update(model, created_records, updated_records, skipped_records, failed_records)
       context[:result] << data
     end
+
+    model.update(status_id: ImportJobStatus.id_for(:completed))
 
     true
   end
@@ -181,6 +215,8 @@ class Masters::Schema::Records::Import::Job < Masters::Schema::Records::Base
     end
     context[:'result.file'] = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 1.day)
 
+    model.result_file = context[:'result.file'].file
+    model.save
     true
   end
 

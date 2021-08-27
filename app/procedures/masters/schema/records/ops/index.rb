@@ -9,6 +9,6 @@ class Masters::Schema::Records::Ops::Index < Masters::Schema::Records::Base
   # This is defined in base class
   step RecordModelClass()
   step Policy::Pundit(Masters::Schema::Records::Policy, :index?)
-  step Resolver::Transactions::Load(klass: Masters::Schema::Records::Resolver, paginate: false)
+  step Resolver::Transactions::Load(klass: Masters::Schema::Records::Resolver, paginate: true)
 
 end

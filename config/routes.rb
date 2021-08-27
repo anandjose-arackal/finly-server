@@ -4289,6 +4289,7 @@ Rails.application.routes.draw do
       put 'update_and_submit', to: 'bills#update_and_submit'
       patch 'bill_validate', to: 'bills#bill_validate'
       get 'download_receipt', to: 'bills#download_receipt'
+      patch 'expire_bill', to: 'bills#expire_bill'
     end
 
     resources :complaints
@@ -4416,6 +4417,7 @@ Rails.application.routes.draw do
           post '', to: "records#import"
           get 'template', to: "records#import_template"
         end
+        get '/count', to: 'records#count'
         post '/', to: 'records#create'
         get '/', to: 'records#index'
         get '/:id', to: 'records#show'
