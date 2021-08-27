@@ -17,6 +17,7 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
         # forms_enabled: "{% if record.forms_enabled == true %}{{true}}{% else %}{{ false }}{% endif %}"
         # forms_enabled: "{% if record.forms_enabled == true %}{{true}}{% else %}{{ false }}{% endif %}"
         forms_enabled: "true"
+        # forms_enabled: "false"
       }
     }
   end

@@ -47,7 +47,7 @@ class PurchaseOrderMigrator
 
   def self.update_custome_fields form, document, company
     document.custom_fields.each do |custom_field|
-      field_name = custom_field.field_configuration.field_name
+      field_name = custom_field.field_configuration.field_name.split(" ").join("_").underscore
 
       form_custom_field = document.form_custom_fields.where(field_key: field_name).order(updated_at: :asc).last
 
@@ -197,6 +197,7 @@ class PurchaseOrderMigrator
         items_department_id: item&.department_id,
         items_cost_center_id: item&.cost_center_id,
         product_type_id: item&.inventory_line_item&.product_type_id,
+
         item_rate: item&.rate.to_f,
         rate: item&.rate.to_f,
 
@@ -207,10 +208,10 @@ class PurchaseOrderMigrator
         reporting_item_discount_amount:  item&.discount_amount&.value.to_f,
         item_taxable_amount:  item&.taxable_amount.value.to_f,
         reporting_item_taxable_amount:  item&.taxable_amount.value.to_f ,        
-        item_tax_amount: item&.tax_amount_id&.value.to_f ,
-        reporting_item_tax_amount: item&.tax_amount_id&.value.to_f,
-        item_net_amount: item&.total_amount_id&.value.to_f,
-        reporting_item_net_amount: item&.total_amount_id&.value.to_f,
+        item_tax_amount: item&.tax_amount&.value.to_f ,
+        reporting_item_tax_amount: item&.tax_amount&.value.to_f,
+        item_net_amount: item&.total_amount&.value.to_f,
+        reporting_item_net_amount: item&.total_amount&.value.to_f,
 
         # item_billable_amount:  nil,
         # reporting_item_billable_amount:  nil
@@ -221,37 +222,63 @@ class PurchaseOrderMigrator
   end
 
   def self.update_invoice_details document
-    
-
-    invoice_sub_total_amount = document&.item_amounts_total.to_f - document&.discount_amount&.value.to_f + document&.tax_amount&.value.to_f + document&.freight_amount&.value.to_f
-    if document&.rcm_enabled
-      invoice_sub_total_amount = invoice_sub_total_amount.to_f - document&.tax_amount&.value.to_f
-    end
-    invoice_total_amount = invoice_sub_total_amount + document&.roundoff_amount.to_f - document&.tds_amount&.value.to_f - document&.advance_amount&.value.to_f 
-
     update_params = {
 
       base_currency_id: Currency.find_by(country_code: 'INR').id,
       reporting_currency_id: Currency.find_by(country_code: 'INR').id,
       conversion_rate: 1,
-      # retrieve_conversion_rate: true,
+      retrieve_conversion_rate: true,
 
       payment_term_days: document&.payment_term&.days_after,
       gst_type_id: document&.gst_type_id,
       conversion_date: document&.date&.to_date,
 
-      # VENDOR DETAILS
-      vendor_country: document&.vendor&.vendor_country,
+      # *************************** VENDOR DETAILS *************************** 
+      vendor_country_id: document&.vendor&.vendor_country,
       vendor_trade_name:  document&.vendor&.trade_name || document&.vendor&.business_name,
       vendor_sequence_id: document&.vendor&.vendor_id,
       vendor_gstin: document&.gstin_location&.gstin,
       vendor_pan: document&.vendor&.pan,
       
       gstin_location_id: document&.gstin_location_id,
+
+      vendor_poc_name: document&.gstin_location&.vendor_poc_name,
+      vendor_poc_email: document&.gstin_location&.vendor_poc_email,
+      vendor_poc_mobile_number: document&.gstin_location&.vendor_poc_mobile_number,
+
       vendor_bank_account_number: document&.receiving_account&.account_number,
       vendor_bank_account_ifsc: document&.receiving_account&.ifsc,
       vendor_bank_account_swift_code: document&.receiving_account&.swift_code,
+      # *************************** VENDOR DETAILS *************************** 
 
+      billing_address_name: document&.location&.name,
+      billing_address_gstin: document&.location&.gstin,
+
+      shipping_address_name: document&.delivery_location&.name,
+      shipping_address_gstin: document&.delivery_location&.gstin,
+
+
+
+      # *************************** Document Advance ***************************
+      
+      # po_requested_advance_amount: document.advance_amount_required,
+      
+      po_requested_advance_amount: document&.requested_advance_amount&.value.to_f,
+      reporting_po_requested_advance_amount: document&.requested_advance_amount&.value.to_f,
+      
+      # advance_tds_slab_id: document&.advance_tds_slab_id ,
+      po_advance_tds_percentage: document&.advance_tds_slab&.tds ,
+      
+      po_advance_tds_amount: document&.advance_tds_amount&.value.to_f,
+      reporting_po_advance_tds_amount: document&.advance_tds_amount&.value.to_f,
+      
+      po_advance_amount: document&.advance_amount&.value.to_f,
+      reporting_po_advance_amount: document&.advance_amount&.value.to_f,
+      
+      # advance_amount_status_id: document.advance_amount_status_id,
+
+      # *************************** Document Advance ***************************
+      
       # INVOICE SUMMARY
       po_gross_amount: (document&.total_before_tax&.value.to_f + document&.discount_amount&.value.to_f),
       reporting_po_gross_amount: (document&.total_before_tax&.value.to_f + document&.discount_amount&.value.to_f),
@@ -276,7 +303,7 @@ class PurchaseOrderMigrator
 
       po_balance_due: document&.balance_amount&.value.to_f,
       reporting_po_balance_due: document&.balance_amount&.value.to_f
-     
+
     }
     document.skip_callback = true
     document.update_columns(update_params)

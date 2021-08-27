@@ -81,7 +81,8 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
   end
 
   # PURCHASE ORDER DETAILS
-  section :purchas_order_details, title: "Order Details", associate_custom_fields: true do
+  section :invoice_details, title: "Order Details", associate_custom_fields: true do
+  # section :purchase_order_details, title: "Order Details", associate_custom_fields: true do
     auto_number :po_number,
                 label: "Sequence Number", editable: false,
                 sequence: { prefix: "PO-", start_at: '00001' }
@@ -102,7 +103,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
            visible: false
 
     date :delivery_date,
-         computed: Forms::Compute::Form('{% assign assigne_days = form.payment_term_days | times: 86400 %}{% assign calculated_date = form.date | date: "%s" | plus: assigne_days %}{{ calculated_date  | date: "%Y-%m-%d" }}'),
+         computed: Forms::Compute::Form('{% assign assigne_days = form.payment_term_days | times: 86400 %}{% assign calculated_date = form.created_at | date: "%s" | plus: assigne_days %}{{ calculated_date  | date: "%Y-%m-%d" }}'),
          visible: true, required: true, editable: true
 
     switch :cost_allocation_items, label: 'Cost Allocation (Item Level)', required: true, default_value: false
@@ -142,11 +143,11 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
            editable: true, visible: true, required: true
 
     text :vendor_poc_name, label: 'Poc Name', visible: true, editable: false, can_editable_be_changed: false,
-          computed: Forms::Compute::Lookup('gstin_location_id', '{{record.vendor_poc_name}}')
+           computed: Forms::Compute::Lookup('gstin_location_id', '{{record.poc_name}}')
     text :vendor_poc_email, label: 'Poc Emal', visible: true, editable: false, can_editable_be_changed: false,
-          computed: Forms::Compute::Lookup('gstin_location_id', '{{record.vendor_poc_email}}')
+           computed: Forms::Compute::Lookup('gstin_location_id', '{{record.poc_email}}')
     text :vendor_poc_mobile_number, label: 'Poc Mobile Number', visible: true, editable: false, can_editable_be_changed: false,
-          computed: Forms::Compute::Lookup('gstin_location_id', '{{record.vendor_poc_mobile_number}}')
+           computed: Forms::Compute::Lookup('gstin_location_id', '{{record.poc_mobile_number}}')
 
     # need to add these fields as system fields
     text :vendor_bank_account_number, editable: false, can_editable_be_changed: false, computed: Forms::Compute::Lookup('bank_account_id', '{{record.account_number}}')
@@ -216,7 +217,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
              computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.rate | default: 0 | round: 2 }}')
 
       amount :rate, label: "Rate", can_editable_be_changed: false, can_visible_be_changed: false, required: true, visible: true, editable: true,
-             computed: Forms::Compute::Form('{{ row.item_rate | divided_by: form.conversion_rate | round: 2 }}')
+             computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.rate_in_base_currency | default: 0 | round: 2 }}', assignments: {conversion_date: "{{form.conversion_date}}", base_currency_id: "{{form.base_currency_id}}", reporting_currency_id: "{{form.reporting_currency_id}}", conversion_rate: "{{form.conversion_rate}}"})
 
       # gross_amount = rate x quantity
       amount :item_gross_amount, label: 'Item Gross Amount', editable: false, visible: false,

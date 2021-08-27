@@ -31,8 +31,8 @@ class UpdatePurchaseOrderForForms < ActiveRecord::Migration[6.0]
       add_column :purchase_orders, :vendor_sequence_id, :string
     end
     
-    unless ActiveRecord::Base.connection.column_exists?(:purchase_orders, :vendor_country)
-      add_column :purchase_orders, :vendor_country, :string
+    unless ActiveRecord::Base.connection.column_exists?(:purchase_orders, :vendor_country_id)
+      add_column :purchase_orders, :vendor_country_id, :string
     end
     
     unless ActiveRecord::Base.connection.column_exists?(:purchase_orders, :vendor_gstin)

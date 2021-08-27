@@ -109,11 +109,13 @@ class PurchaseOrder < ApplicationRecord
   belongs_to :payment_term, optional: true
   belongs_to :procurement_term, optional: true
   belongs_to :status, optional: true, class_name: 'PurchaseOrderStatus', foreign_key: :purchase_order_status_id
+  belongs_to :purchase_order_status, optional: true, class_name: 'PurchaseOrderStatus'
   belongs_to :advance_amount_status, optional: true
   belongs_to :department, optional: true
   belongs_to :sub_department, optional: true, class_name: "Department", foreign_key: :sub_department_id
   belongs_to :cost_center, optional: true
   belongs_to :gst_type, optional: true
+  belongs_to :vendor_country, optional: true, class_name: 'Country'
   belongs_to :base_currency, optional: true, class_name: 'Currency'
   belongs_to :reporting_currency, optional: true, class_name: 'Currency'
 
@@ -542,6 +544,7 @@ class PurchaseOrder < ApplicationRecord
 
   before_save :calculate_line_items
   after_create :purchase_request_tasks
+  after_save :sync_amounts, unless: :skip_callback
   after_save :set_currency_for_amount, unless: :skip_callback
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
@@ -999,19 +1002,47 @@ class PurchaseOrder < ApplicationRecord
   def sync_amounts
     if forms_enabled
       self.skip_callback = true
+      base_currency_id = get_base_currency&.id
+      
+
+      if self.procurement.invoices.count == 0
+
+        amounts_attributes_map.each do |key, value|
+          amount_value = self.send(key)
+          amount_attr = self.send("#{value}_id")
+          if amount_attr.present?
+            Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: base_currency_id)
+          else
+            amount_id = Amount.create(value: amount_value, currency_id: base_currency_id).id
+            self.send("#{value}_id=", amount_id)
+          end
+        end
+
+        amount_direct_attribute_map.each do |key, value|
+          amount_value = self.send(key)
+          self.send("#{value}=", amount_value)
+        end
+      end
+      self.save
     end
   end
 
   def amounts_attributes_map
     # todo - I2P change it to converted values post multicurrency setup
+    
     {  
-      po_taxable_amount: 'gross_amount',
+      # po_gross_amount: 'total_before_tax', 'discount_amount'
       po_discount_amount: 'discount_amount',
-      po_freight_amount: 'freight_amount',
+      po_taxable_amount: 'total_before_tax',
       po_tax_amount: 'tax_amount',
-      po_tds_amount: 'tds_amount',
-      po_paid_outside_amount: 'advance_amount',
-      po_balance_due: 'balance_due'
+      po_sub_total_amount: 'total_after_tax',
+      # po_total_amount: 'balance_amount',
+      po_balance_due: 'balance_amount',
+
+      # Purchase Order Advance
+      po_requested_advance_amount: 'requested_advance_amount',
+      po_advance_tds_amount: 'advance_tds_amount',
+      po_advance_amount: 'advance_amount'
     }
   end
 
@@ -1023,14 +1054,6 @@ class PurchaseOrder < ApplicationRecord
 
 
   private
-
-  # def populate_advance_amount
-  #   if self.advance_amount.blank?
-  #     # no change in net amount
-  #     self.advance_amount = Amount.new(value: 0, currency_id: 1)
-  #     return
-  #   end
-  # end
 
   def calculate_line_items(skip_adv_calculation = false)
     total_before_tax_amount = 0

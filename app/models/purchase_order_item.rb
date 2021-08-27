@@ -44,6 +44,7 @@
 #
 
 class PurchaseOrderItem < ApplicationRecord
+  attr_accessor :skip_callback
   include LiquidDroppable
   include Exposures::Model::Exposable
   include FormsHelper
@@ -120,6 +121,7 @@ class PurchaseOrderItem < ApplicationRecord
   scope :include_for_show,  -> {includes(:inventory_line_item,:category,:purchase_request_item,:taxable_amount,:tax_amount, :discount_amount,:total_amount,:tax_rate)}
 
   before_save :set_tds_applicable
+  after_save :sync_amounts, unless: :skip_callback
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
 
@@ -129,11 +131,19 @@ class PurchaseOrderItem < ApplicationRecord
   end
 
   def before_tax_amount
-    self.taxable_amount&.value.to_f
+    if parent_forms_enabled
+      self.taxable_amount&.value.to_f
+    else
+      self.reporting_item_taxable_amount.to_f
+    end
   end
 
   def after_tax_amount
-    self.total_amount&.value.to_f
+    if parent_forms_enabled
+      self.total_amount&.value.to_f
+    else
+      self.reporting_item_net_amount.to_f
+    end
   end
 
   def set_tds_applicable
@@ -142,6 +152,53 @@ class PurchaseOrderItem < ApplicationRecord
 
   def retrieve_value(entity)  
     send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
+  end
+
+  def parent_forms_enabled
+    purchase_order.forms_enabled
+    
+    # purchase_order_forms_enabled = false
+    # purchase_order_forms_enabled = true if 
+    # purchase_order_forms_enabled
+  end
+
+
+  def sync_amounts
+    if parent_forms_enabled
+      self.skip_callback = true
+      base_currency_id = purchase_order.get_base_currency&.id
+      
+      if self.purchase_order.procurement.invoices.count == 0
+
+        amounts_attributes_map.each do |key, value|
+          amount_value = self.send(key)
+          amount_attr = self.send("#{value}_id")
+          if amount_attr.present?
+            Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: base_currency_id)
+          else
+            amount_id = Amount.create(value: amount_value, currency_id: base_currency_id).id
+            self.send("#{value}_id=", amount_id)
+          end
+        end
+
+        unless purchase_order.cost_allocation_items
+          self.department_id = purchase_order&.department_id
+          self.cost_center_id = purchase_order&.cost_center_id
+        end
+
+        self.tax_percentage = self.tax_rate&.rate.to_f
+      end
+      self.save
+    end
+  end
+
+  def amounts_attributes_map
+    {
+      item_discount_amount: 'discount_amount',
+      item_taxable_amount: 'taxable_amount',
+      item_tax_amount: 'tax_amount',
+      item_net_amount: 'total_amount'
+    }
   end
 
   private
