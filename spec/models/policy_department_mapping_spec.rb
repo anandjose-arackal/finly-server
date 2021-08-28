@@ -9,6 +9,7 @@
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
 #  deleted_at    :datetime
+#  company_id    :integer
 #
 
 require 'rails_helper'

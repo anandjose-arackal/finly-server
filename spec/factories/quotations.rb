@@ -17,6 +17,7 @@
 #  is_deleted              :boolean
 #  deleted_at              :datetime
 #  quotation_number        :string(255)
+#  company_id              :integer
 #
 
 FactoryBot.define do

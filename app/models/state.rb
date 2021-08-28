@@ -9,6 +9,11 @@
 #  updated_at :datetime         not null
 #  state_code :string(255)
 #  deleted_at :datetime
+#  field_1    :string(255)
+#  field_2    :string(255)
+#  field_3    :string(255)
+#  field_4    :string(255)
+#  field_5    :string(255)
 #
 
 class State < NonTenantedApplicationRecord

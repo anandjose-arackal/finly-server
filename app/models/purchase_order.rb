@@ -76,6 +76,8 @@
 #  vlpm_id                      :integer
 #  vendor_note                  :text(65535)
 #  erp_sync_status_id           :integer
+#  base_currency_id             :integer
+#  reporting_currency_id        :integer
 #
 
 class PurchaseOrder < ApplicationRecord

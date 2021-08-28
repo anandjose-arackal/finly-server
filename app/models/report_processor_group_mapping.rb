@@ -18,6 +18,7 @@
 #  marked_as_closed           :boolean
 #  bank_reference_number      :string(255)
 #  deleted_at                 :datetime
+#  company_id                 :integer
 #
 
 class ReportProcessorGroupMapping < ApplicationRecord

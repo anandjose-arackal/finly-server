@@ -15,6 +15,7 @@
 #  min          :decimal(20, 5)   default(0.0)
 #  max          :decimal(20, 5)
 #  deleted_at   :datetime
+#  company_id   :integer
 #
 
 FactoryBot.define do

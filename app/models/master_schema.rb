@@ -12,6 +12,7 @@
 #  system_master              :boolean
 #  can_name_be_changed        :boolean
 #  can_attributes_be_changed  :boolean
+#  can_primary_key_be_changed :boolean
 #  deleted_at                 :datetime
 #  owner_id                   :integer
 #  created_at                 :datetime         not null
@@ -19,7 +20,9 @@
 #  primary_entity_key         :string(255)      not null
 #  last_migration_at          :datetime
 #  is_table_created           :boolean          default(FALSE)
-#  can_primary_key_be_changed :boolean
+#  has_nesting                :boolean          default(FALSE)
+#  can_nesting_be_changed     :boolean
+#  created_by_id              :integer
 #
 
 class MasterSchema < ApplicationRecord

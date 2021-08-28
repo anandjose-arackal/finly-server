@@ -12,6 +12,7 @@
 #  limit_type_id       :integer
 #  allowed             :boolean
 #  deleted_at          :datetime
+#  company_id          :integer
 #
 
 class CardLimit < ApplicationRecord

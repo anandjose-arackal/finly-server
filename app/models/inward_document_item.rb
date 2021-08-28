@@ -23,6 +23,7 @@
 #  previously_billed_amount :decimal(20, 5)   default(0.0)
 #  product_type_id          :integer          default(1)
 #  accepting_item_amount_id :integer
+#  company_id               :integer
 #
 
 class InwardDocumentItem < ApplicationRecord

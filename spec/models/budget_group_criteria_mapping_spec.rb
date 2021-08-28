@@ -6,9 +6,10 @@
 #  budget_group_criterium_id :integer
 #  budgetable_id             :integer
 #  budgetable_type           :string(255)
+#  deleted_at                :datetime
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
-#  deleted_at                :datetime
+#  company_id                :integer
 #
 
 require 'rails_helper'

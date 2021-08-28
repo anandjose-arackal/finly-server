@@ -19,6 +19,7 @@
 #  expense_data_extract_source_id :integer
 #  status_id                      :integer          not null
 #  deleted_at                     :datetime
+#  company_id                     :integer
 #
 
 class ExpenseDataExtract < ApplicationRecord

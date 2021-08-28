@@ -60,6 +60,8 @@
 #  erp_sync_reference_id          :text(65535)
 #  erp_sync_attempts_count        :integer          default(0)
 #  erp_sync_attempted_at          :datetime
+#  base_currency_id               :integer
+#  reporting_currency_id          :integer
 #
 
 class Payment < ApplicationRecord

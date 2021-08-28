@@ -12,6 +12,7 @@
 #  is_deleted             :boolean          default(FALSE)
 #  message_type           :string(255)
 #  deleted_at             :datetime
+#  company_id             :integer
 #
 
 class SystemMessage < ApplicationRecord
