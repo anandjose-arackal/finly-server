@@ -1,5 +1,5 @@
 class Expense::Index < Expense::Base
-  attr_accessor :role_id, :expenses, :expense_filters
+  attr_accessor :role_id, :expenses, :expense_filters, :custom_fields_config
 
   def authorized_user_types
     [:employee, :manager, :finance_manager, :admin, :auditor]
@@ -69,10 +69,22 @@ class Expense::Index < Expense::Base
     unless self.expenses.nil?
       self.expenses = self.expenses.exclude_deleted rescue self.expenses
     end
+    load_custom_fields_config
+  end
+
+  def load_custom_fields_config
+    configurations = user.company.field_configurations.includes(:field_type).exclude_deleted.root_fields.order_created_at_desc
+    self.custom_fields_config = {}
+    self.custom_fields_config[:manual_expense] = configurations.with_parent_type(FieldParentType.id_for(:manual_expense))
+    self.custom_fields_config[:card_expense] = configurations.with_parent_type(FieldParentType.id_for(:card_expense))
+    self.custom_fields_config[:distance_expense] = configurations.with_parent_type(FieldParentType.id_for(:distance_expense)) if distance_config[:enabled]
+    self.custom_fields_config[:time_expense] = configurations.with_parent_type(FieldParentType.id_for(:time_expense)) if time_config[:enabled]
+    self.custom_fields_config[:per_diem_expense] = configurations.with_parent_type(FieldParentType.id_for(:per_diem_expense)) if per_diem_config[:enabled]
   end
 
   def success
     params[:expenses] = self.expenses
+    params[:custom_fields_config] = self.custom_fields_config
     Expense::Index::ListPresenter.new(user, params, messages)
   end
 
@@ -80,7 +92,7 @@ class Expense::Index < Expense::Base
     include HasScope
 
     attr_accessor :expenses, :paginated_expenses, :categories, :unreported_expenses, :count,
-                  :gst_state_codes, :tax_rates
+                  :gst_state_codes, :tax_rates,:custom_fields_config
 
 
     # scopes for filters
@@ -105,6 +117,7 @@ class Expense::Index < Expense::Base
       ScopeUtils.fix_for_scoping(params, :filter_report_status_id, :array)
       ScopeUtils.fix_for_scoping(params, :filter_custom_drop_down_selection, :array)
       self.expenses = params[:expenses]
+      self.custom_fields_config = params[:custom_fields_config]
       self.expenses.includes(:receipts,:tds_slab,:spent_from,:category,:tds_slab,:expense_tax_type,:manual_expense,:card_expense,:distance_expense,:time_expense, amount: :currency)
       unless expenses.nil?
         self.expenses = apply_scopes(expenses, params)

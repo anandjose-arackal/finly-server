@@ -204,33 +204,33 @@ class CustomField < ApplicationRecordBackwardCompatibility
       options = []
       dependent_field_configuration_ids = []
       has_dependent_cf = false
-      if field_configuration.field_type_id == FieldType::TYPES[:drop_down]
-        if user_level_custom_fields
-          option_ids = field_configuration.drop_down_items.exclude_deleted.filter_user_id(RequestStore.store[:current_user]&.id).includes(:dependent_field_configurations).find_each(batch_size: 100).reject(&:nil?)
-          options = FieldDropDownItem.where(id: option_ids)
-        else
-          options = field_configuration.drop_down_items.exclude_deleted
-        end
-        # options.each do |option|
-        #   if option.dependent_field_configurations.present?
-        #     dependent_field_configuration_ids += option.dependent_field_configurations.pluck(:id)
-        #     has_dependent_cf = true
-        #   end
-        # end
-        has_dependent_cf = true if options.pluck(:has_dependent_cf).any?
-
-      elsif field_configuration.field_type_id == FieldType::TYPES[:multiselect]
-        options = field_configuration.multiselect_items
-      end
+      #if field_configuration.field_type_id == FieldType::TYPES[:drop_down]
+      #  #if user_level_custom_fields
+      #  #  option_ids = field_configuration.drop_down_items.exclude_deleted.filter_user_id(RequestStore.store[:current_user]&.id).includes(:dependent_field_configurations).find_each(batch_size: 100).reject(&:nil?)
+      #  #  options = FieldDropDownItem.where(id: option_ids)
+      #  #else
+      #  #  options = field_configuration.drop_down_items.exclude_deleted
+      #  #end
+      #  ## options.each do |option|
+      #  ##   if option.dependent_field_configurations.present?
+      #  ##     dependent_field_configuration_ids += option.dependent_field_configurations.pluck(:id)
+      #  ##     has_dependent_cf = true
+      #  ##   end
+      #  ## end
+      #  #has_dependent_cf = true if options.pluck(:has_dependent_cf).any?
+      #
+      #elsif field_configuration.field_type_id == FieldType::TYPES[:multiselect]
+      #  options = field_configuration.multiselect_items
+      #end
       json = {id: field_configuration.id,
               label: field_configuration.field_name,
               field_type: {id: field_configuration.field_type.id,
                            name: field_configuration.field_type.name},
               mandatory: field_configuration.mandatory,
-              options: options,
+               options: {},
               root_field: self.field_configuration.root_field,
-              #dependent_field_configuration_ids: dependent_field_configuration_ids&.uniq,
-               has_dependent_cf: has_dependent_cf
+              # dependent_field_configuration_ids: dependent_field_configuration_ids&.uniq,
+              #  has_dependent_cf: has_dependent_cf
       }
       case self.field_configuration.field_type_id
       when FieldType.id_for(:multiselect)
