@@ -80,6 +80,7 @@ class Expense::Index < Expense::Base
     self.custom_fields_config[:distance_expense] = configurations.with_parent_type(FieldParentType.id_for(:distance_expense))
     self.custom_fields_config[:time_expense] = configurations.with_parent_type(FieldParentType.id_for(:time_expense))
     self.custom_fields_config[:per_diem_expense] = configurations.with_parent_type(FieldParentType.id_for(:per_diem_expense))
+  end
 
   def success
     params[:expenses] = self.expenses
