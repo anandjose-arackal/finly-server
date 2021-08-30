@@ -3029,6 +3029,7 @@ Rails.application.routes.draw do
         resources :payments
         resources :purchase_orders
         get 'bank_transfers', to: 'payments#all_payments'
+        get 'vendors', to: 'vendors#index'
       end
       scope :vendors do
         #todo vendor Emp
