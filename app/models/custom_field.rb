@@ -203,7 +203,6 @@ class CustomField < ApplicationRecordBackwardCompatibility
     else
       options = []
       dependent_field_configuration_ids = []
-      has_dependent_cf = false
       #if field_configuration.field_type_id == FieldType::TYPES[:drop_down]
       #  #if user_level_custom_fields
       #  #  option_ids = field_configuration.drop_down_items.exclude_deleted.filter_user_id(RequestStore.store[:current_user]&.id).includes(:dependent_field_configurations).find_each(batch_size: 100).reject(&:nil?)
@@ -230,7 +229,7 @@ class CustomField < ApplicationRecordBackwardCompatibility
                options: options,
               root_field: self.field_configuration.root_field,
               # dependent_field_configuration_ids: dependent_field_configuration_ids&.uniq,
-              #  has_dependent_cf: has_dependent_cf
+              has_dependent_cf: field_configuration.has_dependent_cf
       }
       case self.field_configuration.field_type_id
       when FieldType.id_for(:multiselect)

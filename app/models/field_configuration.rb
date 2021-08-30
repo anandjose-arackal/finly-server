@@ -226,17 +226,7 @@ class FieldConfiguration < ApplicationRecord
         options: options,
         root_field: self.root_field
     }
-    #if [FieldType.id_for(:drop_down)].include?(self.field_type_id)
-      #if self.drop_down_items.joins(:dependent_field_configurations).present?
-        result[:has_dependent_cf] = true
-      #end
-      # self.drop_down_items.each do |drop_down|
-      #   if drop_down.dependent_field_configurations.present?
-           result[:has_dependent_cf] = self.has_dependent_cf
-      #     break
-      #   end
-      # end
-    #end
+    result[:has_dependent_cf] = self.has_dependent_cf
     return result
   end
 
