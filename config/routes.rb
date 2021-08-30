@@ -3027,6 +3027,7 @@ Rails.application.routes.draw do
         patch 'bank_accounts/disable', to: 'bank_accounts#disable', as: :bank_account_disable
         resources :bank_accounts
         resources :payments
+        resources :purchase_orders
         get 'bank_transfers', to: 'payments#all_payments'
       end
       scope :vendors do
