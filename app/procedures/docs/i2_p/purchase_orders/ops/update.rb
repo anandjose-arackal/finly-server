@@ -15,16 +15,16 @@ end
 class Docs::I2P::PurchaseOrders::Ops::Update < Transactions::API
 
   step Model(PurchaseOrder, :find_by)
-  step Policy::Pundit(Docs::P2P::PurchaseOrders::Policy, :show?)
+  step Policy::Pundit(Docs::P2P::PurchaseOrders::Policy, :update?)
   step Forms::Model::Find()
   step Forms::Contracts::Build()
   step Contract::Validate()
-  step Transactions::Messages::SuccessMessage('Purchase Order Updated')
   step Wrap(TransactionStep){
     step Contract::Persist()
-    step :budget_limit_validation
+    # step :budget_limit_validation
     fail RollbackStep
   }
+  step Transactions::Messages::SuccessMessage('Purchase Order Updated')
 
   def budget_limit_validation(options, params, ** )
     current_user = options[:current_user]

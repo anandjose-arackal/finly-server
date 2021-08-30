@@ -24,6 +24,9 @@ class ApprovalMatrix::Index < BaseOperation
       else
         # do nothing
       end
+    when 'purchase_orders', 'po'
+      role = :purchase_order_initiator
+      self.provider_name = 'PurchaseOrderProvider'
     end
 
     if role.present?

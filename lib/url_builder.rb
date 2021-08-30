@@ -52,6 +52,10 @@ class UrlBuilder
       if user.non_po_invoice_form_enabled
         path = 'procure_invoices/{{record_id}}/params={"procurement_id":"{{procurement_id}}","procurement_type":"{{procurement_type}}"}'
       end
+    elsif route.first.to_s == 'purchase_orders' and route.second.to_s == 'show'
+      if user.po_form_enabled
+        path = 'procure_purchase_orders/{{record_id}}/params={"procurement_id":"{{procurement_id}}","procurement_type":"{{procurement_type}}"}'
+      end
     end
 
     variables.each do |key, value|

@@ -22,6 +22,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
       item_taxable_amount: "{{ row.item_gross_amount | minus: row.item_discount_amount | default: 0 | round: 2  }}",
       item_tax_amount: "{{ row.item_taxable_amount | times: row.tax_percentage | divided_by: 100.00 | default: 0 | round: 2  }}",
       item_net_amount: "{{ row.item_taxable_amount | plus: row.item_tax_amount | default: 0 | round: 2 }}",
+      # item_billable_amount: "{{ row.item_taxable_amount | plus: row.item_tax_amount | default: 0 | round: 2 }}",
         
       # CONVERTED VALUES
       reporting_item_gross_amount: "{{ row.item_gross_amount | times: form.conversion_rate | default: 0 | round: 2}}",
@@ -29,6 +30,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
       reporting_item_taxable_amount: "{{ row.item_taxable_amount | times: form.conversion_rate | default: 0 | round: 2}}",
       reporting_item_tax_amount: "{{ row.item_tax_amount | times: form.conversion_rate | default: 0 | round: 2  }}",
       reporting_item_net_amount: "{{ row.item_net_amount | times: form.conversion_rate | default: 0 | round: 2  }}",
+      # item_billable_amount: "{{ row.item_net_amount | times: form.conversion_rate | default: 0 | round: 2  }}",
     },
 
     # PURCHASE ORDER SUMMARY
@@ -45,11 +47,11 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
       po_balance_due: "{{ form.po_total_amount | default: 0 | round: 2}}",
 
       #Advance Calculation
-      po_requested_advance_amount: "{{ form.po_requested_advance_amount | default: 0 | round: 2}}",
+      # po_requested_advance_amount: "{{ form.po_requested_advance_amount | default: 0 | round: 2}}",
       # find the max amount on which tds is applicable. 
       # check the the po_requested_advance_amount is less than max_amount then apply tds on po_requested_advance_amount else apply tds on max_applicable_amount
-      po_advance_tds_amount: "{% assign max_tds_applicable_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% elsif item.tds_applicable == 'true' %}{% assign max_tds_applicable_amount = max_tds_applicable_amount | plus: item.item_tax_amount %}{% endif %}{% endfor %}{% if form.po_requested_advance_amount <= max_tds_applicable_amount  %}{{ form.po_requested_advance_amount | times: form.po_advance_tds_percentage | default: 0 | ceil }}{% else  %}{{ max_tds_applicable_amount | times: form.po_advance_tds_percentage | default: 0 | ceil }}{% endif %}",
-      po_advance_amount: "{{ form.po_requested_advance_amount | minus: form.po_advance_tds_amount | default: 0 | round: 2 }}",
+      # po_advance_tds_amount: "{% assign max_tds_applicable_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% elsif item.tds_applicable == 'true' %}{% assign max_tds_applicable_amount = max_tds_applicable_amount | plus: item.item_tax_amount %}{% endif %}{% endfor %}{% if form.po_requested_advance_amount <= max_tds_applicable_amount  %}{{ form.po_requested_advance_amount | times: form.po_advance_tds_percentage | default: 0 | ceil }}{% else  %}{{ max_tds_applicable_amount | times: form.po_advance_tds_percentage | default: 0 | ceil }}{% endif %}",
+      # po_advance_amount: "{{ form.po_requested_advance_amount | minus: form.po_advance_tds_amount | default: 0 | round: 2 }}",
 
 
 
@@ -65,9 +67,9 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
       reporting_po_balance_due: "{{ form.po_balance_due | times: form.conversion_rate | default: 0 | round: 2}}",
 
       # Advance Calculation
-      reporting_po_requested_advance_amount: "{{ form.po_requested_advance_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_po_advance_tds_amount: "{{ form.po_advance_tds_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_po_advance_amount: "{{ form.po_advance_amount | times: form.conversion_rate | default: 0 | round: 2}}",
+      # reporting_po_requested_advance_amount: "{{ form.po_requested_advance_amount | times: form.conversion_rate | default: 0 | round: 2}}",
+      # reporting_po_advance_tds_amount: "{{ form.po_advance_tds_amount | times: form.conversion_rate | default: 0 | round: 2}}",
+      # reporting_po_advance_amount: "{{ form.po_advance_amount | times: form.conversion_rate | default: 0 | round: 2}}",
     }
   }
 
@@ -203,7 +205,8 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
       text :hsn_sac, label: "HSN/SAC", editable: true, visible: true,
         computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.hsn_sac}}')
 
-      lookup :tds_applicable, visible: true, editable: false, can_editable_be_changed: false, can_visible_be_changed: false,
+      lookup :tds_applicable, visible: true, editable: false, can_editable_be_changed: false, can_visible_be_changed: false, 
+             choices_scope: Choices[:list].({ id: true, name: 'true' }, { id: false, name: 'false' }),
              computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.tds_applicable }}')
 
       number :quantity, label: "Quantity", editable: true, visible: true, required: true, min_value: 1, default_value: 1 # todo - condition
@@ -213,13 +216,15 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
                required: true, editable: true, visible: true,
                computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.unit_of_measurement}}')
 
-      amount :item_rate, label: "Item Rate", visible: true,
-             computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.rate | default: 0 | round: 2 }}')
+      amount :item_rate, label: "Item Rate (Reporting Currency)", visible: true, editable: false,
+             computed: Forms::Compute::Form('{{ row.rate | times: form.conversion_rate | round: 2 }}')
 
-      amount :rate, label: "Rate", can_editable_be_changed: false, can_visible_be_changed: false, required: true, visible: true, editable: true,
+      amount :rate, label: "Rate (Base Currency)",
+             can_editable_be_changed: false, can_visible_be_changed: false,
+             required: true, visible: true, editable: true,
              computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.rate_in_base_currency | default: 0 | round: 2 }}', assignments: {conversion_date: "{{form.conversion_date}}", base_currency_id: "{{form.base_currency_id}}", reporting_currency_id: "{{form.reporting_currency_id}}", conversion_rate: "{{form.conversion_rate}}"})
 
-      # gross_amount = rate x quantity
+      # # gross_amount = rate x quantity
       amount :item_gross_amount, label: 'Item Gross Amount', editable: false, visible: false,
              can_visible_be_changed: false, can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_gross_amount])
@@ -230,15 +235,14 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
 
       number :discount, visible: true, editable: true, default_value: 0
 
-      # discount_amount = gross_amount x discount / 100
-      amount :item_discount_amount, label: 'Item Discount Amount', editable: false, visible: false, can_editable_be_changed: false,
+      amount :item_discount_amount, label: 'Item Discount Amount', editable: false, visible: false,
+             can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_discount_amount])
 
       amount :reporting_item_discount_amount, label: 'Item Discount Amount(Reporting Currency)', editable: false, visible: false,
              can_visible_be_changed: false, can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_discount_amount])
 
-      # taxable_amount = gross_amount - discount_amount
       amount :item_taxable_amount, label: 'Item Taxable Amount', editable: false, visible: false, can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_taxable_amount])
 
@@ -266,13 +270,13 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
              can_visible_be_changed: false, can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_net_amount])
 
-      amount :item_billable_amount, label: "Billable Amount", editable: false, visible: false,
-             can_editable_be_changed: false, active: false, can_visible_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_billable_amount])
+      # amount :item_billable_amount, label: "Billable Amount", editable: false, visible: false,
+      #        can_editable_be_changed: false, active: false, can_visible_be_changed: false,
+      #        computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_billable_amount])
 
-      amount :reporting_item_billable_amount, label: "Billable Amount(Reporting Currency)", editable: false, visible: false,
-             can_visible_be_changed: false, can_editable_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_billable_amount])
+      # amount :reporting_item_billable_amount, label: "Billable Amount(Reporting Currency)", editable: false, visible: false,
+      #        can_visible_be_changed: false, can_editable_be_changed: false,
+      #        computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_billable_amount])
     end
   end
 
@@ -347,43 +351,43 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
   end
 
   # Advance Payment
-  section :document_advance, title: "Document Advance" do
-    dropdown :advance_amount_required, label: "Required ", editable: true, visible: true, required: true, choices_scope: Choices[:list].({ id: 'true', name: 'Yes' }, { id: 'false', name: 'No' }), default_value: 'false'
+  # section :document_advance, title: "Document Advance" do
+  #   dropdown :advance_amount_required, label: "Required ", editable: true, visible: true, required: true, choices_scope: Choices[:list].({ id: 'true', name: 'Yes' }, { id: 'false', name: 'No' }), default_value: 'false'
       
-    amount :po_requested_advance_amount, label: "Amount", editable: false, visible: true,
-           can_editable_be_changed: false, can_visible_be_changed: false,
-           computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:po_requested_advance_amount])
+  #   amount :po_requested_advance_amount, label: "Amount", editable: false, visible: true,
+  #          can_editable_be_changed: false, can_visible_be_changed: false,
+  #          computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:po_requested_advance_amount])
 
-    amount :reporting_po_requested_advance_amount, label: "Reporting Amount", editable: false, visible: true,
-           can_editable_be_changed: false,
-           computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_requested_advance_amount])
+  #   amount :reporting_po_requested_advance_amount, label: "Reporting Amount", editable: false, visible: true,
+  #          can_editable_be_changed: false,
+  #          computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_requested_advance_amount])
 
-    lookup :advance_tds_slab_id, label: 'Tds Rate-(%)', choices_scope: Choices[:lookup].('tds_slabs'), 
-           visible: true, editable: false
+  #   lookup :advance_tds_slab_id, label: 'Tds Rate-(%)', choices_scope: Choices[:lookup].('tds_slabs'), 
+  #          visible: true, editable: false
 
-    number :po_advance_tds_percentage, internal: true, editable: false, visible: true,
-           can_editable_be_changed: false, can_visible_be_changed: false,
-           computed: Forms::Compute::Lookup('advance_tds_slab_id', '{{record.tds}}')
+  #   number :po_advance_tds_percentage, internal: true, editable: false, visible: true,
+  #          can_editable_be_changed: false, can_visible_be_changed: false,
+  #          computed: Forms::Compute::Lookup('advance_tds_slab_id', '{{record.tds}}')
 
-    amount :po_advance_tds_amount, label: "Tds Amount", editable: false, visible: true,
-           can_editable_be_changed: false, can_visible_be_changed: false,
-           computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:po_advance_tds_amount])
+  #   amount :po_advance_tds_amount, label: "Tds Amount", editable: false, visible: true,
+  #          can_editable_be_changed: false, can_visible_be_changed: false,
+  #          computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:po_advance_tds_amount])
     
-    amount :reporting_po_advance_tds_amount, label: "Reporting Tds Amount", editable: false, visible: true,
-           can_editable_be_changed: false, can_visible_be_changed: false,
-           computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_advance_tds_amount])
+  #   amount :reporting_po_advance_tds_amount, label: "Reporting Tds Amount", editable: false, visible: true,
+  #          can_editable_be_changed: false, can_visible_be_changed: false,
+  #          computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_advance_tds_amount])
 
-    amount :po_advance_amount, label: "Net Advance Amount", editable: false, visible: true,
-           can_editable_be_changed: false, can_visible_be_changed: false,
-           computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:po_advance_amount])
+  #   amount :po_advance_amount, label: "Net Advance Amount", editable: false, visible: true,
+  #          can_editable_be_changed: false, can_visible_be_changed: false,
+  #          computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:po_advance_amount])
 
-    amount :reporting_po_advance_amount, label: "Reporting Net Advance Amount", editable: false, visible: true,
-           can_editable_be_changed: false, can_visible_be_changed: false,
-           computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_advance_amount])
+  #   amount :reporting_po_advance_amount, label: "Reporting Net Advance Amount", editable: false, visible: true,
+  #          can_editable_be_changed: false, can_visible_be_changed: false,
+  #          computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_advance_amount])
 
-    lookup :advance_amount_status_id, label: 'Status', editable: false, visible: true,
-           can_editable_be_changed: false, can_visible_be_changed: false
-  end
+  #   lookup :advance_amount_status_id, label: 'Status', editable: false, visible: true,
+  #          can_editable_be_changed: false, can_visible_be_changed: false
+  # end
 
 
   # ATTACHMENTS
@@ -398,11 +402,11 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
     rule Rules::Builder['delivery_date'].lt(entity: "created_at")
   end
 
-  validation validation_id: "Advance Amount Can not be greater than Balance Payable" do
-    reference 'po_requested_advance_amount'
-    error_message "Advance Amount Can not be greater than Balance Payable"
-    rule Rules::Builder['po_requested_advance_amount'].gt(entity: "items_summary.po_balance_due")
-  end
+  # validation validation_id: "Advance Amount Can not be greater than Balance Payable" do
+  #   reference 'po_requested_advance_amount'
+  #   error_message "Advance Amount Can not be greater than Balance Payable"
+  #   rule Rules::Builder['po_requested_advance_amount'].gt(entity: "items_summary.po_balance_due")
+  # end
 
   # CONDITIONS
   condition condition_id: "Policy should not be editable once unless in editable status" do
@@ -509,17 +513,17 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
     action :visible, false
   end
 
-  condition condition_id: "Make Advance Amount Editable" do
-    reference :entity, 'po_requested_advance_amount'
-    rule Rules::Builder[:advance_amount_required].eq(value: 'true')
-    action :editable, true
-  end
+  # condition condition_id: "Make Advance Amount Editable" do
+  #   reference :entity, 'po_requested_advance_amount'
+  #   rule Rules::Builder[:advance_amount_required].eq(value: 'true')
+  #   action :editable, true
+  # end
 
-  condition condition_id: "Make Tds applied Editable" do
-    reference :entity, 'advance_tds_slab_id'
-    rule Rules::Builder[:advance_amount_required].eq(value: 'true')
-    action :editable, true
-  end
+  # condition condition_id: "Make Tds applied Editable" do
+  #   reference :entity, 'advance_tds_slab_id'
+  #   rule Rules::Builder[:advance_amount_required].eq(value: 'true')
+  #   action :editable, true
+  # end
 
   condition condition_id: "Disable Shipping address gstin for International" do
     reference :entity, 'shipping_address_gstin'

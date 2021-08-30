@@ -413,7 +413,6 @@ class InvoiceLineItem < ApplicationRecord
     invoice_forms_enabled
   end
 
-
   private
 
   def budget_trail_entry

@@ -1864,6 +1864,11 @@ class User < ApplicationRecord
     feature_flag_enabled = NonPoInvoiceToggle.new(self || RequestStoreUtil.current_user).enabled?
     feature_flag_enabled
   end
+  
+  def po_form_enabled
+    feature_flag_enabled = PurchaseOrderToggle.new(self || RequestStoreUtil.current_user).enabled?
+    feature_flag_enabled
+  end
 
   protected
 

@@ -11,7 +11,7 @@ class PurchaseOrderFormsController < BaseControllers::WebBase
   end
 
   def save_and_submit
-    @op = Docs::I2P::Invoices::Ops::PurchaseOrders.({params: params.to_unsafe_h, current_user: current_user})
+    @op = Docs::I2P::PurchaseOrders::Ops::SaveAndSubmit.({params: params.to_unsafe_h, current_user: current_user})
     respond_to do |format|
       format.json {}
     end

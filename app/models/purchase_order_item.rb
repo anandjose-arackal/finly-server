@@ -66,7 +66,26 @@ class PurchaseOrderItem < ApplicationRecord
 
   alias_attribute :items_department_id, :department_id
   alias_attribute :items_cost_center_id, :cost_center_id
+
+  alias_method :items_department, :department
+  alias_method :items_cost_center, :cost_center
+
+  def get_reporting_currency
+    self.purchase_order.get_reporting_currency rescue self.company.reporting_currency
+  end
+
+  def get_base_currency
+    self.purchase_order.get_base_currency rescue self.company.reporting_currency
+  end
   
+  def exchange_rate
+    ExchangeRate.get_rate(
+        self.purchase_order.conversion_date,
+        self.purchase_order.reporting_currency,
+        self.purchase_order.get_base_currency&.country_code || "INR"
+    )
+  end
+
   # link to budget trails table
   has_many :budget_trails, as: :entity
   has_paper_trail(
@@ -125,7 +144,6 @@ class PurchaseOrderItem < ApplicationRecord
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
 
-
   def tax
     self.tax_rate&.rate || super
   end
@@ -147,7 +165,8 @@ class PurchaseOrderItem < ApplicationRecord
   end
 
   def set_tds_applicable
-    self.tds_applicable = self.inventory_line_item.tds_applicable
+    self.tds_applicable = self&.inventory_line_item&.tds_applicable
+    true
   end
 
   def retrieve_value(entity)  
@@ -156,10 +175,6 @@ class PurchaseOrderItem < ApplicationRecord
 
   def parent_forms_enabled
     purchase_order.forms_enabled
-    
-    # purchase_order_forms_enabled = false
-    # purchase_order_forms_enabled = true if 
-    # purchase_order_forms_enabled
   end
 
 
