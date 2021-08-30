@@ -270,7 +270,6 @@ gem 'money-open-exchange-rates', '~> 1.4.0'
 gem 'paper_trail', '~> 11.0.0'
 gem 'paper_trail-association_tracking', '~> 2.1.1'
 gem 'paper_trail-globalid', '~> 0.2.0'
-gem 'active_record_query_trace', '~> 1.5.4'
 
 
 group :development, :test do
