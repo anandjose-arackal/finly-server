@@ -225,7 +225,7 @@ class CustomField < ApplicationRecordBackwardCompatibility
               field_type: {id: field_configuration.field_type.id,
                            name: field_configuration.field_type.name},
               mandatory: field_configuration.mandatory,
-               options: options,
+               options: options.as_json({from_custom_field: true}),
               root_field: self.field_configuration.root_field,
               dependent_field_configuration_ids: dependent_field_configuration_ids&.uniq,
               has_dependent_cf: field_configuration.has_dependent_cf
