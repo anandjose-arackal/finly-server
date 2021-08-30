@@ -210,12 +210,11 @@ class CustomField < ApplicationRecordBackwardCompatibility
       #  #else
         options = field_configuration.drop_down_items.exclude_deleted
       end
-      #  ## options.each do |option|
-      #  ##   if option.dependent_field_configurations.present?
-      #  ##     dependent_field_configuration_ids += option.dependent_field_configurations.pluck(:id)
-      #  ##     has_dependent_cf = true
-      #  ##   end
-      #  ## end
+         options.each do |option|
+           if option.dependent_field_configurations.present?
+             dependent_field_configuration_ids += option.dependent_field_configurations.pluck(:id)
+           end
+         end
       #  #has_dependent_cf = true if options.pluck(:has_dependent_cf).any?
       #
       #elsif field_configuration.field_type_id == FieldType::TYPES[:multiselect]
@@ -228,7 +227,7 @@ class CustomField < ApplicationRecordBackwardCompatibility
               mandatory: field_configuration.mandatory,
                options: options,
               root_field: self.field_configuration.root_field,
-              # dependent_field_configuration_ids: dependent_field_configuration_ids&.uniq,
+               dependent_field_configuration_ids: dependent_field_configuration_ids&.uniq,
               has_dependent_cf: field_configuration.has_dependent_cf
       }
       case self.field_configuration.field_type_id
