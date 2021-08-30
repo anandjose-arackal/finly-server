@@ -181,7 +181,15 @@ class Forms::Import::Processor
           form_data = {}.with_indifferent_access
           header_details.values.each do |header_data|
             if ['dropdown'].include?(header_data[:entity_type])
-              form_data[header_data[:entity_key]] = parse_value(header_data[:entity].choices_scope.find_by_id(row_data[header_data[:name]], user: user)&.dig(:id), header_data[:entity])
+              choice = header_data[:entity].choices_scope.find_by_id(row_data[header_data[:name]], user: user)
+              if choice.present?
+                if choice.respond_to?(:dig)
+                  choice_id = choice&.dig(:id)
+                else
+                  choice_id = choice&.id
+                end
+                form_data[header_data[:entity_key]] = parse_value(choice_id, header_data[:entity])
+              end
             elsif ['lookup'].include?(header_data[:entity_type])
               form_data[header_data[:entity_key]] = parse_value(header_data[:entity].choices_scope.find_by_id(row_data[header_data[:name]], user: user)&.id, header_data[:entity])
             elsif ['attachment'].include?(header_data[:entity_type])
