@@ -1,6 +1,7 @@
 class Forms::Import::Ops::Create < Transactions::API
   step :set_form
   step :find_or_new_model
+  step AssignModelUser(key: :created_by)
   step Forms::Contracts::Build()
   step Contract::Validate()
   step Contract::Persist()

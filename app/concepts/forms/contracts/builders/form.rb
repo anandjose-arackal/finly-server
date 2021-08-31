@@ -16,13 +16,13 @@ class Forms::Contracts::Builders::Form
 
       if form.model.has_attribute?(:created_by_id)
         property :created_by_id, deserializer: -> (input, represented, **) do
-          represented.created_by_id = RequestStoreUtil.current_user.id if represented.created_by_id.blank?
+          represented.created_by_id = RequestStoreUtil.current_user.id if RequestStoreUtil.current_user.is_a?(User) && represented.created_by_id.blank?
         end
       end
 
       if form.model.has_attribute?(:company_id)
         property :company_id, deserializer: -> (input, represented, **) do
-          represented.company_id = RequestStoreUtil.current_user.company_id if represented.company_id.blank?
+          represented.company_id = RequestStoreUtil.current_user.company_id if RequestStoreUtil.current_user.is_a?(User) && represented.company_id.blank?
         end
       end
 

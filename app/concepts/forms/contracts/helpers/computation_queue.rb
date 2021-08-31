@@ -47,6 +47,7 @@ class Forms::Contracts::Helpers::ComputationQueue
       # Use the document owner or the current user for fetching the lookup choices
       user ||= contract.respond_to?(:created_by) ? contract.created_by : RequestStoreUtil.current_user
       return unless user.present?
+      return unless user.is_a?(User)
 
       lookup_records = entity.compute_lookup_entity.choices_scope.with_id(lookup_values.values, params: {}, user: user)
       lookup_exposures = {}
