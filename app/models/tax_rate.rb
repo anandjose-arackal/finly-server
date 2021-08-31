@@ -26,6 +26,7 @@ class TaxRate < ApplicationRecord
   include EventProducer
 
   belongs_to :company, optional: true
+  belongs_to :created_by, class_name: 'User', optional: true
 
   validates :rate, presence: true
 
