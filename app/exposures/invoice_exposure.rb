@@ -257,6 +257,13 @@ class InvoiceExposure < Exposures::API
     record.trails.where(action_id: TrailAction.id_for(:approve))
   end
 
+  attribute :completed_payments, record_attribute: true, exposure: :true,  includes: [:payments] do
+    record.payments.completed
+  end
+
+  attribute :payments, record_attribute: true, exposure: :payments,  includes: [:payments]
+
+
   # def vendor_ref_num(invoice_line_item)
   #   invoice_line_item.parent&.vendor_id
   # end
