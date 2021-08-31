@@ -210,9 +210,9 @@ class FieldConfiguration < ApplicationRecord
   # Global - When expense is split, used to determine if the custom field should appear in the split or in the root
   def as_json(options = {})
     options = []
-    if field_type_id == FieldType.id_for(:drop_down)
+    if field_type_id == FieldType::TYPES[:drop_down]
       options = drop_down_items.exclude_deleted
-    elsif field_type_id == FieldType.id_for(:multiselect)
+    elsif field_type_id == FieldType::TYPES[:multiselect]
       options = multiselect_items.non_deleted
     end
     result = {
@@ -226,17 +226,7 @@ class FieldConfiguration < ApplicationRecord
         options: options,
         root_field: self.root_field
     }
-    if [FieldType.id_for(:drop_down)].include?(self.field_type_id)
-      if self.drop_down_items.joins(:dependent_field_configurations).present?
-        result[:has_dependent_cf] = true
-      end
-      # self.drop_down_items.each do |drop_down|
-      #   if drop_down.dependent_field_configurations.present?
-      #     result[:has_dependent_cf] = true
-      #     break
-      #   end
-      # end
-    end
+    result[:has_dependent_cf] = self.has_dependent_cf
     return result
   end
 
