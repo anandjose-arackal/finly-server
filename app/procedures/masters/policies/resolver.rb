@@ -26,7 +26,7 @@ class Masters::Policies::Resolver < Resolver::API
     policies
     
 
-    if params[:permissions].present?  
+    if params[:permissions].present? && ['vp', :vp].include?(app) && !(user.company_admin? || user.auditor? || user.vendor_payments_admin?)
       policies = Policy::VendorPayments::Index.(user, {filter_role_id: [UserRole.ids_for(params[:permissions])]}).policies
     end
     policies
