@@ -147,7 +147,7 @@ class Forms::Export::Processor
 
         content << {
           name: entity.label,
-          data: entity.choices_scope.build(user: self.user).as_json
+          data: entity.choices_scope.build(user: self.user, params: { paginate: false }).as_json
         }.with_indifferent_access
       end
     end
