@@ -815,6 +815,12 @@ include Searchkick::Api
     end
   end
 
+  def processed_at
+    return super() unless super().blank?
+    return nil if self.payment_status_id != PaymentStatus::VALUES[:completed]
+    self.reference_resources.first&.created_at
+  end
+
   private
 
   def recalculate_order_summary
