@@ -138,7 +138,7 @@ class Forms::Export::Processor
     content = []
 
     form.sections.each do |section|
-      next unless section.associate_custom_fields
+      # next unless section.associate_custom_fields
 
       section.entities.each do |entity|
         next unless entity.visible
