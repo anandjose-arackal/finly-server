@@ -18,15 +18,19 @@ class Choices::Builders::Enum < Choices::Builders::Base
     config[:name]
   end
 
-  def choices(params: {}, user: nil)
-    list = []
+  def choice_records(params: {}, user: nil)
     filtered_list = params.dig(:q, :id_in)&.map(&:to_i)
     records = klass.all
     records = records.where(id: filtered_list) unless filtered_list.nil?
-    records.each do |item|
+    records
+  end
+
+  def choices(params: {}, user: nil)
+    list = []
+    choice_records(params: params, user: user).each do |item|
       list << {
-          id: item.send(id),
-          name: item.send(name).titleize,
+          id: item.id,
+          name: item.name&.titleize,
       }
     end
     list
@@ -37,11 +41,23 @@ class Choices::Builders::Enum < Choices::Builders::Base
   # end
 
   def find_by_id(id, params: {}, user: nil)
-    choices(params: params, user: user).find {|item| item[:id] == id}
+    rec = choice_records(params: params, user: user).where(id: id).first
+    return unless rec
+
+    {
+      id: rec.id,
+      name: rec.name&.titleize,
+    }
   end
 
   def find_by_name(name, params: {}, user: nil)
-    choices(params: params, user: user).where(name: name).first
+    rec = choice_records(params: params, user: user).where('LOWER(name) LIKE LOWER(?)', name).first
+    return unless rec
+
+    {
+      id: rec.id,
+      name: rec.name&.titleize,
+    }
   end
 
   def build(params: {}, user: {})

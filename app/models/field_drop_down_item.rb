@@ -46,12 +46,23 @@ class FieldDropDownItem < ApplicationRecord
   default_scope { include_soft_deleted }
 
   def as_json(options={})
-    {
+    json = {}
+    if options[:from_custom_field]
+      json = {
         id: id,
         name: name,
-        dependent_field_configurations: dependent_field_configurations,
-        dependent_cf_present: self.dependent_field_configurations.exists?
-    }
+        #dependent_field_configurations: dependent_field_configurations,
+        dependent_cf_present: self.has_dependent_cf
+      }
+    else
+      json = {
+          id: id,
+          name: name,
+          dependent_field_configurations: dependent_field_configurations,
+          dependent_cf_present: self.has_dependent_cf
+      }
+    end
+    json
   end
 
 end

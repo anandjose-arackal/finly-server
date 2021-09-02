@@ -52,7 +52,7 @@ class Exposures::API < Liquid::Drop
     if record.respond_to? :form_custom_fields
       custom_field = record.form_custom_fields.joins(:form_entity).where("form_entities.entity_key = ?", method.to_s).first
       if custom_field.present?
-        return custom_field.retrieve_text_value
+        return custom_field.retrieve_export_text_value
       end
     end
 

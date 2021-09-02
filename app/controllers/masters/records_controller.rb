@@ -21,6 +21,10 @@ class Masters::RecordsController < BaseControllers::WebBase
     endpoint Masters::Schema::Records::Ops::Index
   end
 
+  def count
+    endpoint Masters::Schema::Records::Ops::Count
+  end
+
   def show
     endpoint Masters::Schema::Records::Ops::Show
   end

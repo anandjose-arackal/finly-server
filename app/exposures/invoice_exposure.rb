@@ -254,6 +254,18 @@ class InvoiceExposure < Exposures::API
     trail_texts.compact.join(', ')
   end
 
+  attribute :approval_levels, record_attribute: :dlrms, exposure: true, includes: [:dlrms]
+  attribute :approved_trails, exposure: :true,  includes: [:trails] do
+    record.trails.where(action_id: TrailAction.id_for(:approve))
+  end
+
+  attribute :completed_payments, exposure: true,  includes: [:payments] do
+    record.payments.completed
+  end
+
+  attribute :payments, record_attribute: true, exposure: true,  includes: [:payments]
+
+
   # def vendor_ref_num(invoice_line_item)
   #   invoice_line_item.parent&.vendor_id
   # end

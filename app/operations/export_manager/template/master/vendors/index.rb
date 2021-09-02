@@ -1,6 +1,4 @@
 class ExportManager::Template::Master::Vendors::Index < ExportManager::Builders::Template
-  attr_accessor :vendor_ba
-
   label 'Export'
   description 'Vendor Export'
   export_format 'xls'
@@ -8,6 +6,7 @@ class ExportManager::Template::Master::Vendors::Index < ExportManager::Builders:
   subscribe 'vendors'
   default true
 
+  iter_field field: :gstin_locations, template_prefix: 'gstin_location'
   form_custom_fields :vendors, template_prefix: 'record'
 
   attribute :vendor_business_name, template: '{{ record.business_name }}'
@@ -20,26 +19,26 @@ class ExportManager::Template::Master::Vendors::Index < ExportManager::Builders:
   attribute :email, template: '{{ record.email }}'
   attribute :created_by, template: '{{ record.created_by.name }}'
   attribute :pan, template: '{{ record.pan }}'
-  attribute :poc_name, template: '{{ record.gstin_location.poc_name }}'
-  attribute :poc_email, template: '{{ record.gstin_location.poc_email }}'
-  attribute :gstin_location_address, template: '{{ record.gstin_location.address }}'
-  attribute :gstin, template: '{{ record.gstin_location.gstin }}'
+  attribute :poc_name, template: '{{ gstin_location.poc_name }}'
+  attribute :poc_email, template: '{{ gstin_location.poc_email }}'
+  attribute :gstin_location_address, template: '{{ gstin_location.address }}'
+  attribute :gstin, template: '{{ gstin_location.gstin }}'
   attribute :tds_percentage, template: ''
   attribute :state_code, template: '{{ record.state_code.name }} - {{ record.state_code.code }}'
   attribute :description, template: '{{ record.description }}'
   attribute :vendor_type, template: '{{ record.vendor_type.name }}'
-  attribute :default_account_number, template: '{{ record.default_bank_account.account_number }}'
-  attribute :default_account_name, template: '{{ record.default_bank_account.name }}'
-  attribute :default_account_ifsc, template: '{{ record.default_bank_account.ifsc }}'
-  #attribute :second_account_number, template: '{{ record.bank_accounts[1].account_number }}'
-  #attribute :second_account_name, template: '{{ record.bank_accounts[1].name }}'
-  #attribute :second_account_ifsc, template: '{{ record.bank_accounts[1].ifsc }}'
-  #attribute :third_account_number, template: '{{ record.bank_accounts[2].account_number }}'
-  #attribute :third_account_name, template: '{{ record.bank_accounts[2].name }}'
-  #attribute :third_account_ifsc, template: '{{ record.bank_accounts[2].ifsc }}'
-  #attribute :fourth_account_number, template: '{{ record.bank_accounts[3].account_number }}'
-  #attribute :fourth_account_name, template: '{{ record.bank_accounts[3].name }}'
-  #attribute :fourth_account_ifsc, template: '{{ record.bank_accounts[3].ifsc }}'
+  attribute :default_account_number, template: '{{ record.bank_accounts.first.account_number }}'
+  attribute :default_account_name, template: '{{ record.bank_accounts.first.name }}'
+  attribute :default_account_ifsc, template: '{{ record.bank_accounts.first.ifsc }}'
+  attribute :second_account_number, template: '{{ record.bank_accounts.second.account_number }}'
+  attribute :second_account_name, template: '{{ record.bank_accounts.second.name }}'
+  attribute :second_account_ifsc, template: '{{ record.bank_accounts.second.ifsc }}'
+  attribute :third_account_number, template: '{{ record.bank_accounts.third.account_number }}'
+  attribute :third_account_name, template: '{{ record.bank_accounts.third.name }}'
+  attribute :third_account_ifsc, template: '{{ record.bank_accounts.third.ifsc }}'
+  attribute :fourth_account_number, template: '{{ record.bank_accounts.fourth.account_number }}'
+  attribute :fourth_account_name, template: '{{ record.bank_accounts.fourth.name }}'
+  attribute :fourth_account_ifsc, template: '{{ record.bank_accounts.fourth.ifsc }}'
   attribute :created_at, template: "{{ record.created_at | date: '%d-%b-%Y' }}"
   attribute :active, template: '{% if record.deactivated %}FALSE{% else %}TRUE{% endif %}'
 end

@@ -300,7 +300,7 @@ class PaymentAgreements::CreateUpcomingInvoiceBackground < BackgroundOperation
 
   def setup_upcoming_invoices_params(reference_invoice_ids, options={})
     # This invoice gets common values like department location etc
-    initial_reference_invoice = self.payment_agreement.send(invoice_type.pluralize.to_sym).where(id: reference_invoice_ids).order(:start_date).first
+    initial_reference_invoice = self.payment_agreement.send(invoice_type.pluralize.to_sym).where(id: reference_invoice_ids, vendor_id: self.vendor_id).order(:start_date).first
     upcoming_invoice_dates = options[:upcoming_invoice_dates]
     upcoming_invoice_dates.each do |upcoming_invoice_date|
       options[:invoice_start_date] = upcoming_invoice_date[0]

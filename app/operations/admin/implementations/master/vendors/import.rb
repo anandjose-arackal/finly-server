@@ -1,5 +1,8 @@
 class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::Processor::Import
 
+  # attr_accessor :vendor_params, :form, :form_import
+  attr_accessor :vendor_params
+
   bus Admin::Implementations::Master::BaseMaster
   subscribe 'vendors.import'
   headers ({
@@ -23,7 +26,20 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
       :destroy => "Destroy"
   })
 
-  attr_accessor :vendor_params
+  # def init
+  #   super
+
+  #   self.form = Form.where(company_id: self.company.id, klass_name: "Masters::Vendors::Form").first
+  #   self.form_import = Forms::Import::Processor.(self.form, company.admins.first)
+  # end
+
+  # def headers
+  #   form_import.headers
+  # end
+
+  # def process
+  #   form_import.process_import(self.implementation_request)
+  # end
 
   def create_record(data)
     vendor_params, messages = set_params(data)
