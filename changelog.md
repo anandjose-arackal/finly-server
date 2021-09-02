@@ -5,6 +5,9 @@ beginning of this file.
 ## 2021-09-02
   - Fix: HDFC Payment file format added with beneficiary email in em
 
+## 2011-09-02
+  - Fix Payment attribute overrided to handle different scenario ot UTR upload and API payment
+
 ## 2021-09-01
   - Fix: Payments and completed payments relation defined in Invoice exposure
 
