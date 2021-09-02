@@ -108,6 +108,9 @@ class MlModel < ApplicationRecord
     data = prepare_data
     return false if data.blank?
 
+    # Limiting the number of records used for building the prediction
+    data = data.last(100000)
+
     begin
       model = Eps::Model.new(data, target: target_key, algorithm: algorithm.to_sym)
     rescue StandardError => e
