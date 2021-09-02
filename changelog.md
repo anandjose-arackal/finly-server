@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file. Always add new logs to 
 beginning of this file.
 
+## 2021-09-01
+  - Fix: Payments and completed payments relation defined in Invoice exposure
+
 ## 2021-06-22
   - Fix: two way sync, update and column issue fix.
 
