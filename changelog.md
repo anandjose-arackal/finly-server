@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file. Always add new logs to 
 beginning of this file.
 
+## 2021-09-02
+  - Fix: HDFC Payment file format added with beneficiary email in em
+
 ## 2021-09-01
   - Fix: Payments and completed payments relation defined in Invoice exposure
 
