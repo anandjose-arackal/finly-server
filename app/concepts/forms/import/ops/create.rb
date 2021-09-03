@@ -5,6 +5,7 @@ class Forms::Import::Ops::Create < Transactions::API
   step Forms::Contracts::Build()
   step Contract::Validate()
   step Contract::Persist()
+  step :set_approval_workflow!
   step Transactions::Messages::SuccessMessage('Record Saved')
 
   def set_form(context, params:, current_user:, **)
@@ -18,6 +19,23 @@ class Forms::Import::Ops::Create < Transactions::API
                       else
                         form.model.new
                       end
+    true
+  end
+
+  def set_approval_workflow!(context, model:, form:, params:, current_user:, **)
+    if model.is_a?(YesBankVendor) && model.status&.awaiting_approval? && !model.dlrms.present?
+      document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(current_user, {reviewal_document: model})
+      unless document_reviewer_mappings_op.success?
+        return on_error context, :workflow, document_reviewer_mappings_op.messages[:error]
+      end
+
+      next_level = model.dlrms.with_level_number(1).first&.level
+      if next_level.present?
+        model.dlrms.with_level_id(next_level&.id).update_all(viewable: true)
+        model.update(controlling_level_id: next_level&.id)
+      end
+    end
+
     true
   end
 end
