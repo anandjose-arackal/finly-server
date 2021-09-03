@@ -30,7 +30,7 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
     super
 
     self.form = Form.where(company_id: self.company.id, klass_name: "Masters::Vendors::Form").first
-    self.form_import = Forms::Import::Processor.(self.form, company.admins.active.first)
+    self.form_import = Forms::Import::Processor.(self.form, company.users.only_vendor_payment_admins.active.first)
   end
 
   def headers
