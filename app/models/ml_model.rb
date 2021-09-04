@@ -34,12 +34,13 @@ class MlModel < ApplicationRecord
   belongs_to :parent, optional: true, polymorphic: true
   belongs_to :company
 
-  has_many :predictions, class_name: 'MlModelPrediction'
-  has_one :model_pmml, class_name: "MlModelPmml"
+  has_many :predictions, class_name: "MlModelPrediction"
+  has_many :model_pmmls, class_name: "MlModelPmml"
 
   serialize :config, JSON
+  serialize :pivot_keys, JSON
 
-  FIELD_TYPES = { number: 'number', text: 'text', category: 'category', datetime: 'datetime' }
+  FIELD_TYPES = { number: "number", text: "text", category: "category", datetime: "datetime" }
   SCHEDULES = %w[hourly daily weekly monthly].freeze
 
   validates :algorithm, presence: { in: %w[naive_bayes] }, allow_nil: true
@@ -71,16 +72,27 @@ class MlModel < ApplicationRecord
   end
 
   # Provides all the records which will be used for training models and for tracking predictions
-  def records
+  def records(after: nil)
     records = Object.const_get(model_klass).all.where(company_id: company_id)
     records = includes(records)
-    # This will limit the records to just the last 12 months
-    # records = records.where("#{split_key} > #{1.year.ago}") if split_key.present?
+    
+    # Scope records with split_key timestamp after the model was built.
+    # This is to ensure we are not tracking predictions for records which
+    # were used for training the model
+    if split_key.present?
+      records = records.where.not(:"#{split_key}" => nil)
+      if after.present?
+        records = records.where("#{split_key} > ?", after)
+      end
+    end
+
+    records = records.reorder(id: :desc)
+
     records
   end
 
   def prepare_record(record, options = {})
-    record_data = {}
+    record_data = {}.with_indifferent_access
     record_data[split_key] = split_value(record)
     record_data[target_key] = target_value(record)
     record_data
@@ -94,56 +106,33 @@ class MlModel < ApplicationRecord
     format(record.send(target_key), target_key_type)
   end
 
-  def model
+  def model(data={})
+    data = data.with_indifferent_access
+    pivot_key = ""
+    pivot_keys.each do |pk|
+      pivot_key += "/" unless pivot_key.blank?
+      pivot_key += "#{pk}#{data[pk]}"
+    end
+    return nil if pivot_key.blank?
+    model_pmml = model_pmmls.find_by(pivot: pivot_key)
     return nil unless model_pmml.present? and model_pmml.pmml.present?
 
-    # TODO cache permanently
-    @model ||= Eps::Model.load_pmml(model_pmml.pmml)
-  end
-
-  def clear_model_cache
-    @model = nil
-  end
-
-  def build_model(options = {})
-    start_time = Time.now
-    data = prepare_data
-    return false if data.blank?
-
-    # # Limiting the number of records used for building the prediction
-    # data = data.last(100000)
-
-    begin
-      model = Eps::Model.new(data, target: target_key, algorithm: algorithm.to_sym)
-    rescue StandardError => e
-      raise e
-    end
-    if model_pmml.nil?
-      return false unless self.create_model_pmml(pmml: model.to_pmml, company_id: self.company_id)
-    else
-      return false unless self.model_pmml.update(pmml: model.to_pmml)
-    end
-    return false unless update(built_at: DateTime.now, build_duration: (Time.now - start_time))
-
-    # Clear the cache
-    @model = model
-
-    true
+    Eps::Model.load_pmml(model_pmml.pmml)
   end
 
   def predict(data = {}, options = {})
-    return nil unless model.present?
-
     data ||= {}
     data = data.with_indifferent_access
-    model.predict(prepare_prediction(data))
+    data = prepare_prediction(data)
+    model = self.model(data)
+    return nil if model.blank?
+
+    model.predict(data)
   end
 
   # Runs through all records which were created since the last time the model was built to measure the prediction
   # Captures the accuracy and prediction in models/MlModelPrediction
   def track_predictions(options = {})
-    return false if model.blank?
-
     # Predictions will be tracked from the last build time
     return false if built_at.blank?
 
@@ -152,7 +141,7 @@ class MlModel < ApplicationRecord
     records = records.where.not(
       "id in (#{predictions.where(record_type: records.model).select(:record_id).to_sql})"
     )
-    records = records.or(records.where('updated_at > ?', tracked_at))
+    records = records.or(records.where("updated_at > ?", tracked_at))
 
     # Scope records with split_key timestamp after the model was built.
     # This is to ensure we are not tracking predictions for records which were used for training
@@ -170,9 +159,8 @@ class MlModel < ApplicationRecord
 
         record_dataset = [record_dataset] unless record_dataset.is_a?(Array)
         record_dataset.each do |record_data|
-
           actual = record_data[target_key]
-          prediction = model.predict(record_data.except(target_key))
+          prediction = model(record_data).predict(record_data.except(target_key))
 
           # Bulk import to improve performance
           import_data << {
@@ -182,7 +170,7 @@ class MlModel < ApplicationRecord
             company_id: self.company_id,
             actual_value: actual,
             predicted_value: prediction,
-            is_accurate_prediction: (actual.to_s == prediction.to_s)
+            is_accurate_prediction: (actual.to_s == prediction.to_s),
           }
           predicted_records << record.id
         end
@@ -194,21 +182,23 @@ class MlModel < ApplicationRecord
     true
   end
 
-  def prepare_data(after: nil, records: nil, options: {})
+  def build_model(options = {})
+    return if pivot_keys.blank? # Pivot is required for modelling to ensure models do not grow to large sizes
+
+    start_time = Time.now
+
+    records = self.records
+    data = prepare_data(records)
+    pivot_and_build_models(records, data)
+
+    update(built_at: DateTime.now, build_duration: (Time.now - start_time))
+
+    true
+  end
+
+  # Transforms ActiveRecords collection into array of hash which can be consumed by EPS
+  def prepare_data(records)
     data = []
-    records = self.records if records.nil?
-
-    # Scope records with split_key timestamp after the model was built.
-    # This is to ensure we are not tracking predictions for records which
-    # were used for training the model
-    if split_key.present?
-      records = records.where.not(:"#{split_key}" => nil)
-      if after.present?
-        records = records.where("#{split_key} > ?", after)
-      end
-    end
-
-    records = records.reorder(id: :desc).limit(RECORD_LIMIT)
 
     records.find_each do |record|
       record_dataset = prepare_record(record)
@@ -219,7 +209,56 @@ class MlModel < ApplicationRecord
         data << record_data if record_data.present?
       end
     end
+
     data
+  end
+
+  def pivot_and_build_models(records, data)
+    unique_pivot_values = {}
+
+    # Supporting just 2 pivot keys at the moment to minimise the possible combinations
+    self.pivot_keys.first(2).each do |pivot_key|
+      unique_pivot_values[pivot_key] = records.distinct.select(pivot_key).map(&pivot_key.to_sym)
+    end
+
+    pivot_1_key = pivot_keys.first
+    pivot_1_unique_values = unique_pivot_values[pivot_1_key]
+    pivot_2_key = pivot_keys.second
+    pivot_2_unique_values = pivot_2_key.present? ? unique_pivot_values[pivot_2_key] : nil
+
+    pivot_1_unique_values.each do |pivot_1_value|
+      if pivot_2_unique_values.present?
+        pivot_2_unique_values.each do |pivot_2_value|
+          filtered_data = data.select { |rec|
+            (rec[pivot_1_key.to_s].present? and rec[pivot_1_key.to_s].to_s == pivot_1_value.to_s) || (rec[pivot_2_key.to_s].present? and rec[pivot_2_key.to_s].to_s == pivot_2_value.to_s)
+          }
+          pivot_key = "#{pivot_1_key}#{pivot_1_value}/#{pivot_2_key}#{pivot_2_value}"
+
+          build_model_pmml(pivot_key, filtered_data)
+        end
+      else
+        filtered_data = data.select { |rec|
+          (rec[pivot_1_key.to_s].present? and rec[pivot_1_key.to_s].to_s == pivot_1_value.to_s)
+        }
+        pivot_key = "#{pivot_1_key}#{pivot_1_value}"
+
+        build_model_pmml(pivot_key, filtered_data)
+      end
+    end
+
+    true
+  end
+
+  def build_model_pmml(pivot, data)
+    return if data.blank?
+
+    begin
+      model = Eps::Model.new(data, target: target_key, algorithm: algorithm.to_sym)
+    rescue StandardError => e
+      raise e
+    end
+
+    self.model_pmmls.find_or_initialize_by(pivot: pivot).update(pmml: model.to_pmml, company_id: self.company_id)
   end
 
   def prepare_prediction(data, options = {})
@@ -232,15 +271,14 @@ class MlModel < ApplicationRecord
 
   def format(value, type)
     return value.to_s if %w[text category].include?(type.to_s)
-    return value.strftime('%Y-%m-%d').to_s if %w[datetime].include?(type.to_s) and value.present?
+    return value.strftime("%Y-%m-%d").to_s if %w[datetime].include?(type.to_s) and value.present? and !value.is_a?(String)
 
     value
   end
 
   def validate_schema
     unless valid_schema?.success?
-      errors.add :schema, 'is invalid'
+      errors.add :schema, "is invalid"
     end
   end
-
 end

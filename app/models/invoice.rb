@@ -195,6 +195,8 @@ class Invoice < ApplicationRecord
     )
   end
 
+  alias_attribute :created_by_id, :created_by_user_id
+
   # Multicurrency Attributes
 
   # include EventProducer
