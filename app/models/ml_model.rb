@@ -176,6 +176,8 @@ class MlModel < ApplicationRecord
         end
       end
       update(tracked_at: DateTime.now)
+
+      # TODO Issue: if uniquness constraint fails in mysql db, then only record_id and record_type will be updated. This seems wrong
       MlModelPrediction.import import_data, on_duplicate_key_update: [:record_id, :record_type]
     end
 
@@ -226,6 +228,7 @@ class MlModel < ApplicationRecord
     pivot_2_key = pivot_keys.second
     pivot_2_unique_values = pivot_2_key.present? ? unique_pivot_values[pivot_2_key] : nil
 
+    models = []
     pivot_1_unique_values.each do |pivot_1_value|
       if pivot_2_unique_values.present?
         pivot_2_unique_values.each do |pivot_2_value|
@@ -234,7 +237,7 @@ class MlModel < ApplicationRecord
           }
           pivot_key = "#{pivot_1_key}#{pivot_1_value}/#{pivot_2_key}#{pivot_2_value}"
 
-          build_model_pmml(pivot_key, filtered_data)
+          models << build_model_pmml(pivot_key, filtered_data)
         end
       else
         filtered_data = data.select { |rec|
@@ -242,11 +245,11 @@ class MlModel < ApplicationRecord
         }
         pivot_key = "#{pivot_1_key}#{pivot_1_value}"
 
-        build_model_pmml(pivot_key, filtered_data)
+        models << build_model_pmml(pivot_key, filtered_data)
       end
     end
 
-    true
+    MlModelPmml.import(models, on_duplicate_key_update: [:pmml])
   end
 
   def build_model_pmml(pivot, data)
@@ -258,7 +261,15 @@ class MlModel < ApplicationRecord
       raise e
     end
 
-    self.model_pmmls.find_or_initialize_by(pivot: pivot).update(pmml: model.to_pmml, company_id: self.company_id)
+    # Returning hash for bulk update
+    {
+      pivot: pivot,
+      pmml: model.to_pmml,
+      company_id: self.company_id,
+      ml_model_id: self.id
+    }
+
+    # self.model_pmmls.find_or_initialize_by(pivot: pivot).update(pmml: model.to_pmml, company_id: self.company_id).as_json.except('created_at', 'updated_at', "id")
   end
 
   def prepare_prediction(data, options = {})
