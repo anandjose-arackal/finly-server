@@ -29,6 +29,8 @@ class MlModel < ApplicationRecord
   include MlModels::Schema
   include Dry::Monads[:result]
 
+  RECORD_LIMIT = 10000
+
   belongs_to :parent, optional: true, polymorphic: true
   belongs_to :company
 
@@ -108,8 +110,8 @@ class MlModel < ApplicationRecord
     data = prepare_data
     return false if data.blank?
 
-    # Limiting the number of records used for building the prediction
-    data = data.last(100000)
+    # # Limiting the number of records used for building the prediction
+    # data = data.last(100000)
 
     begin
       model = Eps::Model.new(data, target: target_key, algorithm: algorithm.to_sym)
@@ -205,6 +207,8 @@ class MlModel < ApplicationRecord
         records = records.where("#{split_key} > ?", after)
       end
     end
+
+    records = records.reorder(id: :desc).limit(RECORD_LIMIT)
 
     records.find_each do |record|
       record_dataset = prepare_record(record)
