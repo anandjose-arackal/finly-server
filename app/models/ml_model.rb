@@ -177,8 +177,7 @@ class MlModel < ApplicationRecord
       end
       update(tracked_at: DateTime.now)
 
-      # TODO Issue: if uniquness constraint fails in mysql db, then only record_id and record_type will be updated. This seems wrong
-      MlModelPrediction.import import_data, on_duplicate_key_update: [:record_id, :record_type]
+      MlModelPrediction.import import_data, on_duplicate_key_update: [:actual_value, :predicted_value, :is_accurate_prediction]
     end
 
     true
