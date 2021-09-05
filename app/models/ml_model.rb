@@ -258,9 +258,13 @@ class MlModel < ApplicationRecord
       end
     end
 
-    # Import in batches of 1000
-    models.each_slice(1000) do |batch|
-      MlModelPmml.import(batch, on_duplicate_key_update: [:pmml])
+    models.reject! {|item| item.blank?}
+
+    if models.present?
+      # Import in batches of 1000
+      models.each_slice(1000) do |batch|
+        MlModelPmml.import(batch, on_duplicate_key_update: [:pmml])
+      end
     end
   end
 
