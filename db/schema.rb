@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_09_04_064437) do
+ActiveRecord::Schema.define(version: 2021_09_05_070801) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -4225,6 +4225,7 @@ ActiveRecord::Schema.define(version: 2021_09_04_064437) do
     t.boolean "enforce_budget_limit", default: false
     t.integer "company_id"
     t.boolean "awaiting_approval_summary_enabled", default: false
+    t.boolean "predictions_enabled", default: false
     t.index ["grn_enabled"], name: "index_feature_subscriptions_on_grn_enabled"
     t.index ["srn_enabled"], name: "index_feature_subscriptions_on_srn_enabled"
     t.index ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id"
@@ -6313,6 +6314,7 @@ ActiveRecord::Schema.define(version: 2021_09_04_064437) do
     t.index ["created_at"], name: "index_ml_model_pmmls_on_created_at"
     t.index ["deleted_at"], name: "index_ml_model_pmmls_on_deleted_at"
     t.index ["ml_model_id"], name: "index_ml_model_pmmls_on_ml_model_id"
+    t.index ["pivot", "company_id"], name: "index_ml_model_pmmls_on_pivot_and_company_id", unique: true
     t.index ["updated_at"], name: "index_ml_model_pmmls_on_updated_at"
   end
 
@@ -6331,6 +6333,7 @@ ActiveRecord::Schema.define(version: 2021_09_04_064437) do
     t.index ["created_at"], name: "index_ml_model_predictions_on_created_at"
     t.index ["deleted_at"], name: "index_ml_model_predictions_on_deleted_at"
     t.index ["ml_model_id"], name: "index_ml_model_predictions_on_ml_model_id"
+    t.index ["record_id", "record_type"], name: "index_ml_model_predictions_on_record_id_and_record_type", unique: true
     t.index ["record_type", "record_id"], name: "index_ml_model_predictions_on_record_type_and_record_id"
     t.index ["updated_at"], name: "index_ml_model_predictions_on_updated_at"
   end

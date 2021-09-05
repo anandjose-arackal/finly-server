@@ -57,9 +57,14 @@ class MlModel < ApplicationRecord
   validates :model_klass, presence: true
   validate :validate_schema
 
+  scope :enabled, -> {
+    prediction_enabled_company_ids = FeatureSubscription.where(predictions_enabled: true).pluck(:company_id)
+    where(company_id: prediction_enabled_company_ids)
+  }
+
   # Rebuilds all models
   def self.build(options = {})
-    self.all.find_each do |model|
+    self.all.enabled.find_each do |model|
       model.build_model(options)
     end
 
