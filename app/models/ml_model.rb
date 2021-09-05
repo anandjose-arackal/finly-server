@@ -140,6 +140,7 @@ class MlModel < ApplicationRecord
   def track_predictions(options = {})
     # Predictions will be tracked from the last build time
     return false if built_at.blank?
+    return false if model_pmmls.count == 0
 
     records = self.records
     # Scope records which have not been synced or have been updated after the last build
