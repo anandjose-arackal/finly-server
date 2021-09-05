@@ -188,6 +188,10 @@ class MlModel < ApplicationRecord
 
     start_time = Time.now
 
+    # This will ensure models are rebuilt only for companies which have new records created since
+    # the last build
+    return unless self.records(after: built_at).count > 0
+
     records = self.records
     data = prepare_data(records)
     pivot_and_build_models(records, data)
