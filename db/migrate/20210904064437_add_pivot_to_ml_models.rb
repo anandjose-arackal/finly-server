@@ -6,8 +6,14 @@ class AddPivotToMlModels < ActiveRecord::Migration[6.0]
     
     # This is to facilitate upsert logic
     ActsAsTenant.without_tenant do
-      MlModelPrediction.delete_all
+      MlModelPrediction.unscoped.delete_all
+      MlModelPmml.unscoped.delete_all
+      MlModel.unscoped.delete_all
     end
     add_index :ml_model_predictions, [:record_id, :record_type], :unique => true
+
+    ActsAsTenant.without_tenant do
+      MlModel::Monitor.seed_data
+    end
   end
 end
