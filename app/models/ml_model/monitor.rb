@@ -42,7 +42,8 @@ class MlModel::Monitor < MlModel
   end
 
   def self.seed_data
-    Company.all.find_each do |company|
+    prediction_enabled_company_ids = FeatureSubscription.where(predictions_enabled: true).pluck(:company_id)
+    Company.where(id: prediction_enabled_company_ids).find_each do |company|
        [{"config"=>{"fields"=>[{"name"=>"created_by_id", "type"=>"category", "value"=>"{{record.created_by_id}}"}, {"name"=>"vendor_id", "type"=>"category"}]}, "build_schedule"=>"weekly", "track_schedule"=>nil, "algorithm"=>"naive_bayes", "target_key"=>"policy_id", "target_key_type"=>"category", "split_key"=>"submitted_at", "split_key_type"=>"datetime", "model_klass"=>"Invoice", "pivot_keys": ["vendor_id", "created_by_id"]}, 
        {"config"=>{"fields"=>[{"name"=>"created_by_id", "type"=>"category", "value"=>"{{record.created_by_id}}"}, {"name"=>"policy_id", "type"=>"category"}, {"name"=>"vendor_id", "type"=>"category"}]}, "build_schedule"=>"weekly", "track_schedule"=>nil, "algorithm"=>"naive_bayes", "target_key"=>"department_id", "target_key_type"=>"category", "split_key"=>"submitted_at", "split_key_type"=>"datetime", "model_klass"=>"Invoice", "pivot_keys": ["vendor_id", "created_by_id"]}, 
        {"config"=>{"fields"=>[{"name"=>"created_by_id", "type"=>"category", "value"=>"{{record.created_by_id}}"}, {"name"=>"policy_id", "type"=>"category"}, {"name"=>"cost_center_id", "type"=>"category"}]}, "build_schedule"=>"weekly", "track_schedule"=>nil, "algorithm"=>"naive_bayes", "target_key"=>"cost_center_id", "target_key_type"=>"category", "split_key"=>"submitted_at", "split_key_type"=>"datetime", "model_klass"=>"Invoice", "pivot_keys": ["vendor_id", "created_by_id"]}, 
