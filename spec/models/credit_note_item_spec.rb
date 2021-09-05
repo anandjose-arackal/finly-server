@@ -29,6 +29,7 @@
 #  deleted_at                 :datetime
 #  tax_amount_id              :integer
 #  tds_applicable             :boolean          default(FALSE)
+#  company_id                 :integer
 #
 
 require 'rails_helper'

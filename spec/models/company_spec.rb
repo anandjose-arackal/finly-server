@@ -14,6 +14,7 @@
 #  group_id                :integer
 #  deleted_at              :datetime
 #  reporting_currency_code :string(255)      default("INR")
+#  country_id              :integer
 #
 require 'rails_helper'
 

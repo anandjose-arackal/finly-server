@@ -20,6 +20,7 @@
 #  original_track_id         :integer
 #  cash_on_hand_deduction_id :integer
 #  deleted_at                :datetime
+#  company_id                :integer
 #
 
 class Trail < ApplicationRecordBackwardCompatibility

@@ -9,12 +9,13 @@
 #  form_id        :string(255)      not null
 #  form_entity_id :string(255)      not null
 #  field_key      :string(255)      not null
-#  value          :string(255)
+#  value          :text(65535)
 #  value_text     :string(255)
 #  deleted_at     :datetime
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
 #  entity_type    :string(255)
+#  company_id     :integer
 #
 
 class FormCustomField < ApplicationRecord

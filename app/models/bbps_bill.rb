@@ -55,6 +55,13 @@
 #  api_response               :text(16777215)
 #  generated_at               :datetime
 #  biller_response            :text(65535)
+#  erp_sync_status_id         :integer
+#  erp_sync_message           :text(65535)
+#  erp_sync_reference_id      :string(255)
+#  erp_sync_attempts_count    :integer          default("0")
+#  erp_sync_attempted_at      :datetime
+#  base_currency_id           :integer
+#  reporting_currency_id      :integer
 #
 
 class BbpsBill < ApplicationRecord

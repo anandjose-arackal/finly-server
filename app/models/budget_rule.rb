@@ -16,6 +16,7 @@
 #  with_receipt_amount_id    :integer
 #  without_receipt_amount_id :integer
 #  deleted_at                :datetime
+#  company_id                :integer
 #
 
 # expense_type_id: contains details about whether the budget is scoped to a particular

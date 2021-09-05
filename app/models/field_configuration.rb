@@ -27,6 +27,7 @@
 #  deleted_at              :datetime
 #  printable               :boolean          default(TRUE)
 #  user_level_field        :boolean          default(FALSE)
+#  has_dependent_cf        :boolean          default(FALSE)
 #
 
 class FieldConfiguration < ApplicationRecord

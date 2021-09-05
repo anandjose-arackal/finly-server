@@ -11,6 +11,7 @@
 #  configurable_type :string(255)
 #  is_deleted        :boolean          default(FALSE)
 #  deleted_at        :datetime
+#  company_id        :integer
 #
 
 class PerDiem < ApplicationRecord

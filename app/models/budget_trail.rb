@@ -54,6 +54,7 @@
 #  cn_adjusted_amount_after_tax_value         :decimal(20, 10)  default(0.0)
 #  credit_note_tax_amount_value               :decimal(20, 10)  default(0.0)
 #  date                                       :datetime
+#  company_id                                 :integer
 #
 
 class BudgetTrail < ApplicationRecordBackwardCompatibility

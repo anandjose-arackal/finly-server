@@ -13,6 +13,7 @@
 #  travel_request            :boolean          default(FALSE)
 #  deleted_at                :datetime
 #  weekly_summary_enabled    :boolean          default(FALSE)
+#  company_id                :integer
 #
 
 class UserPanelSubscription < ApplicationRecord

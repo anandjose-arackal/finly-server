@@ -38,6 +38,8 @@
 #  ticket_type                  :string(255)
 #  transfer_mode_id             :integer
 #  is_domestic                  :boolean          default(TRUE)
+#  base_currency_id             :integer
+#  reporting_currency_id        :integer
 #
 
 class BankPaymentRequest < ApplicationRecord

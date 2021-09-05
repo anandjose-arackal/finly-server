@@ -26,6 +26,7 @@
 #  hsn_sac                      :string(255)
 #  rate_contract_item_id        :integer
 #  deleted_at                   :datetime
+#  company_id                   :integer
 #
 
 # table_name => purchase_request_items

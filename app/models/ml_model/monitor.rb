@@ -23,6 +23,7 @@
 #  form_id         :string(255)
 #  parent_id       :string(255)
 #  parent_type     :string(255)
+#  pivot_keys      :string(255)
 #
 class MlModel::Monitor < MlModel
 
