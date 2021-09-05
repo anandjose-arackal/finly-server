@@ -36,6 +36,8 @@ class PurchaseRequest < ApplicationRecord
 
   acts_as_sequenced column: :order_number, purpose: :purchase_request, editable: false, prefix: 'PR'
 
+  alias_attribute :created_by_id, :creator_id
+
   default_scope { order(created_at: :desc) }
 
   # belongs_to :purchase_request_status, optional: true
