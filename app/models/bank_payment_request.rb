@@ -433,6 +433,8 @@ class BankPaymentRequest < ApplicationRecord
     joins(payment_order: {payments: :amount}).sum('amounts.value').to_f.round(2)
   }
 
+  alias_attribute :created_by_id, :owner_id
+
   attr_accessor :cache_users
 
   before_save do
