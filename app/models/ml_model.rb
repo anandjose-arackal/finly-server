@@ -57,9 +57,14 @@ class MlModel < ApplicationRecord
   validates :model_klass, presence: true
   validate :validate_schema
 
+  scope :enabled, -> {
+    prediction_enabled_company_ids = FeatureSubscription.where(predictions_enabled: true).pluck(:company_id)
+    where(company_id: prediction_enabled_company_ids)
+  }
+
   # Rebuilds all models
   def self.build(options = {})
-    self.all.find_each do |model|
+    self.all.enabled.find_each do |model|
       model.build_model(options)
     end
 
@@ -187,6 +192,10 @@ class MlModel < ApplicationRecord
     return if pivot_keys.blank? # Pivot is required for modelling to ensure models do not grow to large sizes
 
     start_time = Time.now
+
+    # This will ensure models are rebuilt only for companies which have new records created since
+    # the last build
+    return unless self.records(after: built_at).count > 0
 
     records = self.records
     data = prepare_data(records)
