@@ -166,8 +166,7 @@ class MlModel < ApplicationRecord
         record_dataset = [record_dataset] unless record_dataset.is_a?(Array)
         record_dataset.each do |record_data|
           actual = record_data[target_key]
-          prediction = model(record_data).predict(record_data.except(target_key)) rescue nil
-          next if prediction.nil?
+          prediction = model(record_data).predict(record_data.except(target_key))
 
           # Bulk import to improve performance
           import_data << {
