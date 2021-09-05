@@ -13,6 +13,7 @@
 #  mcc_group_id         :integer
 #  mcc_restriction_type :string(255)
 #  deleted_at           :datetime
+#  company_id           :integer
 #
 
 class CardRestriction < ApplicationRecord

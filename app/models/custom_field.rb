@@ -15,6 +15,7 @@
 #  field_key              :string(255)
 #  configured_field_value :text(65535)
 #  deleted_at             :datetime
+#  company_id             :integer
 #
 
 class CustomField < ApplicationRecordBackwardCompatibility

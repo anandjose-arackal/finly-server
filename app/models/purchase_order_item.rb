@@ -41,6 +41,7 @@
 #  taxable_amount_id        :integer
 #  previously_billed_amount :decimal(20, 5)   default(0.0)
 #  tds_applicable           :boolean          default(FALSE)
+#  company_id               :integer
 #
 
 class PurchaseOrderItem < ApplicationRecord

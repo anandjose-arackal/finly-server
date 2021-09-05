@@ -21,6 +21,7 @@
 #  gst_expiry_date     :date
 #  verified            :boolean
 #  gstin_fetch_details :text(65535)
+#  company_id          :integer
 #
 
 FactoryBot.define do

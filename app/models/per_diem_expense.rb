@@ -10,6 +10,7 @@
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
 #  deleted_at  :datetime
+#  company_id  :integer
 #
 
 class PerDiemExpense < ApplicationRecord

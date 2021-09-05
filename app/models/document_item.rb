@@ -24,6 +24,7 @@
 #  purchase_order_item_id :integer
 #  product_id             :string(255)
 #  deleted_at             :datetime
+#  company_id             :integer
 #
 
 class DocumentItem < ApplicationRecord

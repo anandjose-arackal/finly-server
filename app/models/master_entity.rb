@@ -26,6 +26,8 @@
 #  updated_at                :datetime         not null
 #  choices_scope             :text(65535)
 #  primary_key               :boolean
+#  default_value             :string(255)
+#  do_not_show_in_data_cards :boolean          default(FALSE)
 #
 
 class MasterEntity < ApplicationRecord

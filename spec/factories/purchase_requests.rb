@@ -6,22 +6,24 @@
 #  description                :text(65535)
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
-#  purchase_request_status_id :integer
-#  note                       :text(65535)
-#  creator_id                 :integer
-#  submitted_at               :datetime
-#  approved_at                :datetime
 #  location_id                :integer
 #  department_id              :integer
 #  policy_id                  :integer
 #  controlling_level_id       :integer
 #  company_id                 :integer
+#  purchase_request_status_id :integer
+#  note                       :text(65535)
+#  creator_id                 :integer
+#  submitted_at               :datetime
+#  approved_at                :datetime
 #  order_number               :string(255)
 #  reject_note                :text(65535)
 #  cost_center_id             :integer
 #  total_amount_id            :integer
 #  cost_allocation_items      :boolean          not null
 #  deleted_at                 :datetime
+#  base_currency_id           :integer
+#  reporting_currency_id      :integer
 #
 
 FactoryBot.define do

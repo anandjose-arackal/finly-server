@@ -12,6 +12,7 @@
 #  associated_account_id   :integer
 #  associated_account_type :string(255)
 #  deleted_at              :datetime
+#  company_id              :integer
 #
 
 # Transaction type: credit, debit

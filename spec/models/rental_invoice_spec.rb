@@ -101,6 +101,8 @@
 #  escalation_percentage                 :float(24)
 #  override_invoice_id                   :string(255)
 #  rcm_enabled                           :boolean
+#  base_currency_id                      :integer
+#  reporting_currency_id                 :integer
 #
 
 require 'rails_helper'

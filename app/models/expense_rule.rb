@@ -13,6 +13,7 @@
 #  policy_id              :integer
 #  is_deleted             :boolean          default(FALSE)
 #  deleted_at             :datetime
+#  company_id             :integer
 #
 
 class ExpenseRule < ApplicationRecord

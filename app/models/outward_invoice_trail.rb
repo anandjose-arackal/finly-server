@@ -16,6 +16,7 @@
 #  associated_transaction_type :string(255)
 #  date                        :date
 #  deleted_at                  :datetime
+#  company_id                  :integer
 #
 
 class OutwardInvoiceTrail < ApplicationRecord

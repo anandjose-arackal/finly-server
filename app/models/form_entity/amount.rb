@@ -50,6 +50,9 @@
 #  filters                      :text(65535)
 #  config_path                  :string(255)
 #  compute_lookup_assignments   :text(65535)
+#  virtual                      :boolean          default(FALSE)
+#  triggers                     :text(65535)
+#  show_in_data_card_as         :string(255)
 #
 
 class FormEntity::Amount < FormEntity

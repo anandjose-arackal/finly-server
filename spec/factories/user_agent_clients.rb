@@ -16,6 +16,7 @@
 #  updated_at                        :datetime         not null
 #  user_finly_id                     :string(255)
 #  deleted_at                        :datetime
+#  company_id                        :integer
 #
 
 FactoryBot.define do
