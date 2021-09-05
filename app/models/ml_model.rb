@@ -61,7 +61,6 @@ class MlModel < ApplicationRecord
   def self.build(options = {})
     self.all.find_each do |model|
       model.build_model(options)
-      model.clear_model_cache
     end
 
     true
