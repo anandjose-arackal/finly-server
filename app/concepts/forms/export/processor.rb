@@ -60,40 +60,40 @@ class Forms::Export::Processor
       if entity.visible
         if entity.entity_type == 'switch'
           headers[entity.entity_key.to_s] = {
-            name: "#{entity.label} (TRUE/FALSE)",
+            name: "#{entity.label}#{entity.required ? '*' : ''} (TRUE/FALSE)",
             entity_key: entity.entity_key,
             entity_type: entity.entity_type,
             entity: entity,
           }
         elsif ['lookup', 'dropdown'].include?(entity.entity_type)
           headers[entity.entity_key.to_s] = {
-            name: "#{entity.label} ID",
+            name: "#{entity.label} ID#{entity.required ? '*' : ''}",
             entity_key: entity.entity_key,
             entity_type: entity.entity_type,
             entity: entity,
           }
           headers["#{entity.entity_key}_value"] = {
-            name: entity.label,
+            name: "#{entity.label}#{entity.required ? '*' : ''}",
             entity_key: "#{entity.entity_key}_value",
             entity_type: 'text',
           }
         elsif entity.entity_type == 'date'
           headers[entity.entity_key.to_s] = {
-            name: "#{entity.label} (YYYY-MM-DD)",
+            name: "#{entity.label}#{entity.required ? '*' : ''} (YYYY-MM-DD)",
             entity_key: entity.entity_key,
             entity_type: entity.entity_type,
             entity: entity,
           }
         elsif entity.entity_type == 'datetime'
           headers[entity.entity_key.to_s] = {
-            name: "#{entity.label} (YYYY-MM-DD HH:MM:SS)",
+            name: "#{entity.label}#{entity.required ? '*' : ''} (YYYY-MM-DD HH:MM:SS)",
             entity_key: entity.entity_key,
             entity_type: entity.entity_type,
             entity: entity,
           }
         else
           headers[entity.entity_key.to_s] = {
-            name: entity.label,
+            name: "#{entity.label}#{entity.required ? '*' : ''}",
             entity_key: entity.entity_key,
             entity_type: entity.entity_type,
             entity: entity,
