@@ -79,7 +79,7 @@ class MlModel < ApplicationRecord
 
   # Provides all the records which will be used for training models and for tracking predictions
   def records(after: nil)
-    records = Object.const_get(model_klass).all.where(company_id: company_id)
+    records = Object.const_get(model_klass).all.where(company_id: company_id).where('created_at > ?', 18.months.ago)
     records = includes(records)
 
     # Scope records with split_key timestamp after the model was built.
