@@ -43,7 +43,7 @@ class PurchaseOrderItemExposure < Exposures::API
   end
 
   attribute :pending_invoice_amount, record_attribute: false,exposure: false do
-    (record.invoiced_total_amount - record.taxable_amount&.value)
+    (record.invoiced_total_amount - record.taxable_amount&.value).abs
   end
 
 
