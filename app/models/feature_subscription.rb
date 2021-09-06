@@ -46,6 +46,7 @@
 #  enforce_budget_limit              :boolean          default(FALSE)
 #  company_id                        :integer
 #  awaiting_approval_summary_enabled :boolean          default(FALSE)
+#  predictions_enabled               :boolean          default(FALSE)
 #
 
 class FeatureSubscription < ApplicationRecord

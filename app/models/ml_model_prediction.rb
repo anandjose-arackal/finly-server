@@ -13,6 +13,7 @@
 #  deleted_at             :datetime
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
+#  ml_model_pmml_id       :integer
 #
 class MlModelPrediction < ApplicationRecord
   belongs_to :company
