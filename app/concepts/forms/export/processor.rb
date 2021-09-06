@@ -73,7 +73,7 @@ class Forms::Export::Processor
             entity: entity,
           }
           headers["#{entity.entity_key}_value"] = {
-            name: "#{entity.label}#{entity.required ? '*' : ''}",
+            name: entity.label,
             entity_key: "#{entity.entity_key}_value",
             entity_type: 'text',
           }
