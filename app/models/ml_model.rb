@@ -31,6 +31,7 @@ class MlModel < ApplicationRecord
   include Dry::Monads[:result]
 
   RECORD_LIMIT = 10000
+  MINIMUM_RECORDS_FOR_BEST_MODEL = 10
 
   belongs_to :parent, optional: true, polymorphic: true
   belongs_to :company
@@ -58,9 +59,9 @@ class MlModel < ApplicationRecord
   validate :validate_schema
 
   scope :enabled, -> {
-    prediction_enabled_company_ids = FeatureSubscription.where(predictions_enabled: true).pluck(:company_id)
-    where(company_id: prediction_enabled_company_ids)
-  }
+          prediction_enabled_company_ids = FeatureSubscription.where(predictions_enabled: true).pluck(:company_id)
+          where(company_id: prediction_enabled_company_ids)
+        }
 
   # Rebuilds all models
   def self.build(options = {})
@@ -80,7 +81,7 @@ class MlModel < ApplicationRecord
   def records(after: nil)
     records = Object.const_get(model_klass).all.where(company_id: company_id)
     records = includes(records)
-    
+
     # Scope records with split_key timestamp after the model was built.
     # This is to ensure we are not tracking predictions for records which
     # were used for training the model
@@ -111,18 +112,19 @@ class MlModel < ApplicationRecord
     format(record.send(target_key), target_key_type)
   end
 
-  def model(data={})
+  def model(data = {})
     data = data.with_indifferent_access
-    pivot_key = ""
+    keys = []
     pivot_keys.each do |pk|
-      pivot_key += "/" unless pivot_key.blank?
-      pivot_key += "#{pk}#{data[pk]}"
+      pivot_key = "#{pk}#{data[pk]}"
+      keys << pivot_key
     end
-    return nil if pivot_key.blank?
-    model_pmml = model_pmmls.find_by(pivot: pivot_key)
-    return nil unless model_pmml.present? and model_pmml.pmml.present?
 
-    Eps::Model.load_pmml(model_pmml.pmml)
+    models = model_pmmls.where(pivot: keys).sort_by_accuracy
+
+    # Find the most accurate model which has atleast MINIMUM_RECORDS_FOR_BEST_MODEL records
+    # Use the highest accuracy model if no models has MINIMUM_RECORDS_FOR_BEST_MODEL records
+    models.where("predicted_records > #{MINIMUM_RECORDS_FOR_BEST_MODEL}").first || models.first
   end
 
   def predict(data = {}, options = {})
@@ -156,6 +158,8 @@ class MlModel < ApplicationRecord
       records = records.where.not(:"#{split_key}" => nil).where("#{split_key} > ?", built_at)
     end
 
+    # These models accuracy will be recomputed
+    pmmls_used = [] 
     records.find_in_batches do |batch|
       predicted_records = []
       import_data = []
@@ -165,26 +169,41 @@ class MlModel < ApplicationRecord
 
         record_dataset = [record_dataset] unless record_dataset.is_a?(Array)
         record_dataset.each do |record_data|
-          actual = record_data[target_key]
-          prediction = model(record_data).predict(record_data.except(target_key))
 
-          # Bulk import to improve performance
-          import_data << {
-            record_id: record.id,
-            record_type: record.class.name,
-            ml_model_id: self.id,
-            company_id: self.company_id,
-            actual_value: actual,
-            predicted_value: prediction,
-            is_accurate_prediction: (actual.to_s == prediction.to_s),
-          }
-          predicted_records << record.id
+          pivot_keys.each do |pk|
+            pivot_key = "#{pk}#{record_data[pk]}"
+            model = model_pmmls.find_by(pivot: pivot_key)
+            next if model.blank? or model.pmml.blank?
+
+            actual = record_data[target_key]
+            prediction = model.predict(record_data.except(target_key))
+  
+            # Bulk import to improve performance
+            import_data << {
+              record_id: record.id,
+              record_type: record.class.name,
+              ml_model_id: self.id,
+              ml_model_pmml_id: model.id,
+              company_id: self.company_id,
+              actual_value: actual,
+              predicted_value: prediction,
+              is_accurate_prediction: (actual.to_s == prediction.to_s),
+            }
+            predicted_records << record.id
+            pmmls_used << model
+          end
         end
       end
       update(tracked_at: DateTime.now)
 
       MlModelPrediction.import import_data, on_duplicate_key_update: [:actual_value, :predicted_value, :is_accurate_prediction]
     end
+
+    pmmls_used.uniq!
+    pmmls_used.each do |pmml|
+      pmml.compute_accuracy
+    end
+    pmmls_used = []
 
     true
   end
@@ -224,41 +243,23 @@ class MlModel < ApplicationRecord
     data
   end
 
+  # Builds a model for every unique value of the pivot_key attribute in records
   def pivot_and_build_models(records, data)
-    unique_pivot_values = {}
-
-    # Supporting just 2 pivot keys at the moment to minimise the possible combinations
-    self.pivot_keys.first(2).each do |pivot_key|
-      unique_pivot_values[pivot_key] = records.distinct.select(pivot_key).map(&pivot_key.to_sym)
-    end
-
-    pivot_1_key = pivot_keys.first
-    pivot_1_unique_values = unique_pivot_values[pivot_1_key]
-    pivot_2_key = pivot_keys.second
-    pivot_2_unique_values = pivot_2_key.present? ? unique_pivot_values[pivot_2_key] : nil
-
     models = []
-    pivot_1_unique_values.each do |pivot_1_value|
-      if pivot_2_unique_values.present?
-        pivot_2_unique_values.each do |pivot_2_value|
-          filtered_data = data.select { |rec|
-            (rec[pivot_1_key.to_s].present? and rec[pivot_1_key.to_s].to_s == pivot_1_value.to_s) || (rec[pivot_2_key.to_s].present? and rec[pivot_2_key.to_s].to_s == pivot_2_value.to_s)
-          }
-          pivot_key = "#{pivot_1_key}#{pivot_1_value}/#{pivot_2_key}#{pivot_2_value}"
+    self.pivot_keys.each do |pivot_key|
+      unique_values = records.distinct.select(pivot_key).map(&pivot_key.to_sym)
 
-          models << build_model_pmml(pivot_key, filtered_data)
-        end
-      else
+      unique_values.each do |unique_value|
         filtered_data = data.select { |rec|
-          (rec[pivot_1_key.to_s].present? and rec[pivot_1_key.to_s].to_s == pivot_1_value.to_s)
+          (rec[pivot_key.to_s].present? and rec[pivot_key.to_s].to_s == unique_value.to_s)
         }
-        pivot_key = "#{pivot_1_key}#{pivot_1_value}"
+        formatted_pivot_key = "#{pivot_key}#{unique_value}"
 
-        models << build_model_pmml(pivot_key, filtered_data)
+        models << build_model_pmml(formatted_pivot_key, filtered_data)
       end
     end
 
-    models.reject! {|item| item.blank?}
+    models.reject! { |item| item.blank? }
 
     if models.present?
       # Import in batches of 1000
@@ -282,7 +283,7 @@ class MlModel < ApplicationRecord
       pivot: pivot,
       pmml: model.to_pmml,
       company_id: self.company_id,
-      ml_model_id: self.id
+      ml_model_id: self.id,
     }
 
     # self.model_pmmls.find_or_initialize_by(pivot: pivot).update(pmml: model.to_pmml, company_id: self.company_id).as_json.except('created_at', 'updated_at', "id")

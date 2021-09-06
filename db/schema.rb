@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_09_05_070801) do
+ActiveRecord::Schema.define(version: 2021_09_05_190602) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -6310,11 +6310,12 @@ ActiveRecord::Schema.define(version: 2021_09_05_070801) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "pivot"
+    t.float "accuracy", default: 0.0
     t.index ["company_id"], name: "index_ml_model_pmmls_on_company_id"
     t.index ["created_at"], name: "index_ml_model_pmmls_on_created_at"
     t.index ["deleted_at"], name: "index_ml_model_pmmls_on_deleted_at"
     t.index ["ml_model_id"], name: "index_ml_model_pmmls_on_ml_model_id"
-    t.index ["pivot", "company_id"], name: "index_ml_model_pmmls_on_pivot_and_company_id", unique: true
+    t.index ["pivot", "company_id", "ml_model_id"], name: "index_ml_model_pmmls_on_pivot_and_company_id_and_ml_model_id", unique: true
     t.index ["updated_at"], name: "index_ml_model_pmmls_on_updated_at"
   end
 
@@ -6329,11 +6330,12 @@ ActiveRecord::Schema.define(version: 2021_09_05_070801) do
     t.datetime "deleted_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "ml_model_pmml_id"
     t.index ["company_id"], name: "index_ml_model_predictions_on_company_id"
     t.index ["created_at"], name: "index_ml_model_predictions_on_created_at"
     t.index ["deleted_at"], name: "index_ml_model_predictions_on_deleted_at"
     t.index ["ml_model_id"], name: "index_ml_model_predictions_on_ml_model_id"
-    t.index ["record_id", "record_type"], name: "index_ml_model_predictions_on_record_id_and_record_type", unique: true
+    t.index ["record_id", "record_type", "ml_model_id"], name: "index_ml_model_predictions_on_record_and_ml_model_id", unique: true
     t.index ["record_type", "record_id"], name: "index_ml_model_predictions_on_record_type_and_record_id"
     t.index ["updated_at"], name: "index_ml_model_predictions_on_updated_at"
   end
