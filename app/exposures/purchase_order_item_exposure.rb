@@ -22,4 +22,20 @@ class PurchaseOrderItemExposure < Exposures::API
     (record.purchase_order.cost_allocation_items ? record.cost_center : record.purchase_order.cost_center)
   end
 
+  attribute :accepted_quantity, record_attribute: false,exposure: false do
+    (record.inventory_line_item&.product_type_id ==  ProductType.id_for(:goods) ? record.accepted : "")
+  end
+
+  attribute :billed_amount, record_attribute: false,exposure: false do
+    (record.inventory_line_item&.product_type_id ==  ProductType.id_for(:service) ? record.previously_billed_amount : "")
+  end
+
+  attribute :pending_grn_quantity, record_attribute: false,exposure: false do
+    (record.inventory_line_item&.product_type_id ==  ProductType.id_for(:goods) ? (record.quantity - record.accepted) : "")
+  end
+
+  attribute :pending_billed_amount, record_attribute: false,exposure: false do
+    (record.inventory_line_item&.product_type_id ==  ProductType.id_for(:service) ? (record.taxable_amount&.value - record.previously_billed_amount)&.to_f&.round(2) : "")
+  end
+
 end
