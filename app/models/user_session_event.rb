@@ -21,6 +21,7 @@
 #  mouse_pos_y               :integer
 #  ip                        :string(255)
 #  deleted_at                :datetime
+#  company_id                :integer
 #
 
 class UserSessionEvent < ApplicationRecordBackwardCompatibility

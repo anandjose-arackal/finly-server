@@ -8,6 +8,7 @@
 #  updated_at         :datetime         not null
 #  default_company_id :integer
 #  deleted_at         :datetime
+#  subdomain          :string(255)
 #
 
 require 'rails_helper'

@@ -13,6 +13,7 @@
 #  attachment_url                   :text(65535)
 #  attachment_url_file_name         :string(255)
 #  deleted_at                       :datetime
+#  company_id                       :integer
 #
 
 class ReceiptEmailAttachment < ApplicationRecord

@@ -13,6 +13,7 @@
 #  updated_at                   :datetime         not null
 #  identifier                   :string(255)
 #  deleted_at                   :datetime
+#  company_id                   :integer
 #
 
 class KycDocument < ApplicationRecord

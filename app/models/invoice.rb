@@ -102,11 +102,9 @@
 #  invoice_discount_amount               :decimal(20, 5)
 #  invoice_tax_amount                    :decimal(20, 5)
 #  invoice_tds_amount                    :decimal(20, 5)
-#  base_currency                         :string(255)
 #  vendor_sequence_id                    :text(65535)
 #  vendor_gstin                          :string(255)
 #  invoice_freight_amount                :decimal(20, 5)
-#  reporting_currency                    :string(255)
 #  conversion_date                       :date
 #  conversion_rate                       :decimal(10, 5)
 #  retrieve_conversion_rate              :boolean          default(TRUE)
@@ -142,11 +140,17 @@
 #  invoice_total_amount                  :decimal(20, 5)
 #  payment_term_days                     :integer          default(0)
 #  vendor_bank_account_swift_code        :string(255)      default("")
-#  vendor_country                        :string(255)      default("")
 #  discount_type                         :string(255)      default("")
 #  overall_discount_amount               :decimal(10, )    default(0)
 #  total_line_item_discount_amount       :decimal(10, )    default(0)
 #  is_domestic                           :boolean          default(TRUE)
+#  billing_address_name                  :string(255)      default("")
+#  billing_address_gstin                 :string(255)      default("")
+#  shipping_address_name                 :string(255)      default("")
+#  shipping_address_gstin                :string(255)      default("")
+#  base_currency_id                      :integer
+#  reporting_currency_id                 :integer
+#  vendor_country_id                     :integer
 #
 
 class Invoice < ApplicationRecord
@@ -194,6 +198,8 @@ class Invoice < ApplicationRecord
       get_base_currency&.country_code || "INR"
     )
   end
+
+  alias_attribute :created_by_id, :created_by_user_id
 
   # Multicurrency Attributes
 

@@ -15,6 +15,7 @@
 #  action_for_user_id      :integer
 #  action_for_user_role_id :integer
 #  deleted_at              :datetime
+#  company_id              :integer
 #
 
 class BankPaymentRequestTrail < ApplicationRecordBackwardCompatibility

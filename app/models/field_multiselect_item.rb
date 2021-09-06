@@ -9,6 +9,7 @@
 #  field_configuration_id :integer
 #  is_deleted             :boolean
 #  deleted_at             :datetime
+#  company_id             :integer
 #
 
 class FieldMultiselectItem < ApplicationRecord

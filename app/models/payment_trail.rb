@@ -17,6 +17,7 @@
 #  receiving_user_id       :integer
 #  receiving_user_type     :string(255)
 #  deleted_at              :datetime
+#  company_id              :integer
 #
 
 class PaymentTrail < ApplicationRecord

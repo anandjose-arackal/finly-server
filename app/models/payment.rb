@@ -60,6 +60,8 @@
 #  erp_sync_reference_id          :text(65535)
 #  erp_sync_attempts_count        :integer          default(0)
 #  erp_sync_attempted_at          :datetime
+#  base_currency_id               :integer
+#  reporting_currency_id          :integer
 #
 
 class Payment < ApplicationRecord
@@ -813,6 +815,12 @@ include Searchkick::Api
     else
       return (self.reference_resources.first&.utr || self.reference_resource&.utr) rescue nil
     end
+  end
+
+  def processed_at
+    return super() unless super().blank?
+    return nil if self.payment_status_id != PaymentStatus::VALUES[:completed]
+    self.reference_resources.first&.created_at
   end
 
   private

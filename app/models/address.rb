@@ -18,6 +18,7 @@
 #  address_name :string(255)
 #  landmark     :text(65535)
 #  deleted_at   :datetime
+#  company_id   :integer
 #
 
 class Address < ApplicationRecord

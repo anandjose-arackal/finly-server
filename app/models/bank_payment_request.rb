@@ -38,6 +38,8 @@
 #  ticket_type                  :string(255)
 #  transfer_mode_id             :integer
 #  is_domestic                  :boolean          default(TRUE)
+#  base_currency_id             :integer
+#  reporting_currency_id        :integer
 #
 
 class BankPaymentRequest < ApplicationRecord
@@ -430,6 +432,8 @@ class BankPaymentRequest < ApplicationRecord
   scope :total_requested_amount, -> {
     joins(payment_order: {payments: :amount}).sum('amounts.value').to_f.round(2)
   }
+
+  alias_attribute :created_by_id, :owner_id
 
   attr_accessor :cache_users
 
