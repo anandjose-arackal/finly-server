@@ -31,19 +31,19 @@ class PurchaseOrderItemExposure < Exposures::API
   end
 
   attribute :pending_grn_quantity, record_attribute: false,exposure: false do
-    (record.inventory_line_item&.product_type_id ==  ProductType.id_for(:goods) ? (record.quantity - record.accepted) : "")
+    (record.inventory_line_item&.product_type_id ==  ProductType.id_for(:goods) ? (record.quantity - record.accepted) : "") rescue ""
   end
 
   attribute :pending_billed_amount, record_attribute: false,exposure: false do
-    (record.inventory_line_item&.product_type_id ==  ProductType.id_for(:service) ? (record.taxable_amount&.value - record.previously_billed_amount)&.to_f&.round(2) : "")
+    (record.inventory_line_item&.product_type_id ==  ProductType.id_for(:service) ? (record.taxable_amount&.value - record.previously_billed_amount)&.to_f&.round(2) : "") rescue ""
   end
 
   attribute :invoiced_amount, record_attribute: false,exposure: false do
-    record.invoiced_total_amount
+    record.invoiced_total_amount rescue ""
   end
 
   attribute :pending_invoice_amount, record_attribute: false,exposure: false do
-    (record.invoiced_total_amount - record.taxable_amount&.value).abs
+    (record.invoiced_total_amount - record.taxable_amount&.value).abs rescue ""
   end
 
 
