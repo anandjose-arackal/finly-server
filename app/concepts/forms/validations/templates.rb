@@ -1,18 +1,28 @@
 class Forms::Validations::Templates
 
+  include DynamicAttributes
+
+  class_attr :validates, default: {}
+
   def self.[](key)
     validates[key]
   end
 
-  def self.validates(key = NoObject, &block)
-    @validates ||= {}
-    @validates[key] = block if key != NoObject and block_given?
-    @validates
+  def self.validate(key = NoObject, &block)
+    validates[key] = block if key != NoObject and block_given?
+    validates
   end
 
-  validates :regex_match do |contract:, entity:, **|
-    format = entity.options['regex']&.dig('format')
-    message = entity.options['regex']&.dig('message')
+  validate :regex_match do |contract:, entity:, **|
+    next unless entity.options['regex'].present?
+
+    if entity.options['regex'].is_a?(String)
+      format = entity.options['regex']
+      message = nil
+    else
+      format = entity.options['regex']&.dig('format')
+      message = entity.options['regex']&.dig('message')
+    end
 
     if format.present?
       contract.validate do
@@ -32,7 +42,7 @@ class Forms::Validations::Templates
     end
   end
 
-  validates :max_value do |contract:, entity:, **|
+  validate :max_value do |contract:, entity:, **|
     if entity.options['max_value'].present?
       contract.validate do
         value = send(entity.entity_key)
@@ -52,7 +62,7 @@ class Forms::Validations::Templates
     end
   end
 
-  validates :min_value do |contract:, entity:, **|
+  validate :min_value do |contract:, entity:, **|
     if entity.options['min_value'].present?
       contract.validate do
         value = send(entity.entity_key)
@@ -65,6 +75,27 @@ class Forms::Validations::Templates
         else
           if value < entity.options['min_value']
             errors.add entity.label, "must be greater than or equal to #{entity.options['min_value']}"
+          end
+        end
+      end
+      # contract.validates entity.entity_key.to_sym, numericality: {greater_than_or_equal_to: entity.options['min_value']}
+    end
+  end
+
+  validates :max_decimal_places do |contract:, entity:, **|
+    if entity.options['max_decimal_places'].present?
+      contract.validate do
+        value = send(entity.entity_key)
+        next unless value.present?
+
+        value = BigDecimal(value.to_s).to_s('F') rescue nil  # using BigDecimal as large numbers will be in exponential form
+
+        if value.nil?
+          errors.add entity.label, "must be numeric"
+        else
+          splits = value.split('.')
+          if splits.count == 2 && splits[1].to_i != 0 && splits[1].length > entity.options['max_decimal_places']
+            errors.add entity.label, "must contain maximum of #{entity.options['max_decimal_places']} decimal places"
           end
         end
       end
@@ -92,7 +123,7 @@ class Forms::Validations::Templates
     end
   end
 
-  validates :maximum do |contract:, entity:, **|
+  validate :maximum do |contract:, entity:, **|
     if entity.options['maximum'].present? and entity.options['maximum'].to_i > 0
       contract.validate do
         value = send(entity.entity_key)

@@ -10,6 +10,8 @@
 #  is_deleted             :boolean          default(FALSE)
 #  field_key              :string(255)
 #  deleted_at             :datetime
+#  company_id             :integer
+#  has_dependent_cf       :boolean          default(FALSE)
 #
 
 class FieldDropDownItem < ApplicationRecord
@@ -45,25 +47,23 @@ class FieldDropDownItem < ApplicationRecord
   default_scope { include_soft_deleted }
 
   def as_json(options={})
-    dependent_field_ids = ParentDependentFieldConfigurationMapping.where(parent_type: "FieldDropDownItem", parent_id: self.id).pluck(:dependent_field_configuration_id)
-    # dependent_field_configs = FieldConfiguration.where(id: dependent_field_ids)
-    # dependent = dependent_field_configurations
-    # {
-    #     id: id,
-    #     name: name,
-    #     # dependent_field_configurations: dependent_field_configurations,
-    #     # dependent_cf_present: self.dependent_field_configurations.exists?
-    #     dependent_field_configurations: dependent,
-    #     # custom_field_name: self.field_configuration&.field_name,
-    #     dependent_cf_present: dependent.present?
-    # }
-    {
+    json = {}
+    if options[:from_custom_field]
+      json = {
         id: id,
         name: name,
-        dependent_field_configurations: dependent_field_configurations.as_json(called_from_drop_down: true),
-        custom_field_name: self.field_configuration&.field_name,
-        dependent_cf_present: dependent_field_ids.present?
-    }
+        #dependent_field_configurations: dependent_field_configurations,
+        dependent_cf_present: self.has_dependent_cf
+      }
+    else
+      json = {
+          id: id,
+          name: name,
+          dependent_field_configurations: dependent_field_configurations,
+          dependent_cf_present: self.has_dependent_cf
+      }
+    end
+    json
   end
 
 end

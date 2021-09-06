@@ -55,6 +55,13 @@
 #  api_response               :text(16777215)
 #  generated_at               :datetime
 #  biller_response            :text(65535)
+#  erp_sync_status_id         :integer
+#  erp_sync_message           :text(65535)
+#  erp_sync_reference_id      :string(255)
+#  erp_sync_attempts_count    :integer          default("0")
+#  erp_sync_attempted_at      :datetime
+#  base_currency_id           :integer
+#  reporting_currency_id      :integer
 #
 
 class BbpsBill < ApplicationRecord
@@ -67,6 +74,7 @@ class BbpsBill < ApplicationRecord
   # include SearchIndex::Concerns::Document
   include Searchkick::Api
   include Concerns::ErpSyncConcern
+  include ErpSyncable
 
   acts_as_sequenced column: :sequence_id, purpose: :bbps_bill, editable: false, prefix: 'UB'
 
@@ -293,7 +301,7 @@ class BbpsBill < ApplicationRecord
 
   scope :pending_erp_sync, -> (*args) {
     with_erp_sync_status_pending.
-        where(invoice_status_id: BbpsBillStatus.ids_for(:approved, :auto_approved, :payment_ticket_created, :payment_initiated, :payment_ticket_deleted, :paid))
+        where(status_id: BbpsBillStatus.ids_for(:approved, :auto_approved, :payment_ticket_created, :payment_initiated, :payment_ticket_deleted, :paid))
   }
 
   ransack_scopes :with_status_id
@@ -638,6 +646,4 @@ class BbpsBill < ApplicationRecord
     self.skip_callback = true
     self.save
   end
-
-
 end

@@ -116,6 +116,10 @@ class Bbps::BillsController < BaseControllers::WebBase
     end
   end
 
+  def expire_bill
+    endpoint Docs::UtilityBills::Bills::Ops::ExpireBill
+  end
+
   private
 
   def resolve_layout

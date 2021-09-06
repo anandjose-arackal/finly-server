@@ -23,6 +23,14 @@
 #  gst_applicable             :boolean          default(FALSE)
 #  tds_applicable             :boolean
 #  deleted_at                 :datetime
+#  created_by_id              :integer
+#  start_date                 :date
+#  end_date                   :date
+#  field_1                    :string(255)
+#  field_2                    :string(255)
+#  field_3                    :string(255)
+#  field_4                    :string(255)
+#  field_5                    :string(255)
 #
 
 class Category < ApplicationRecord
@@ -38,6 +46,7 @@ include Searchkick::Api
   has_ancestry
 
   belongs_to :company, optional: true
+  belongs_to :created_by, optional: true, class_name: 'User'
 
   has_one :quickbooks_category, dependent: :destroy
 
@@ -45,7 +54,7 @@ include Searchkick::Api
   has_many :budgets, through: :budget_criteria_mappings
 
   validates :company_id, presence: true
-  validates :name, presence: true, uniqueness: {scope: [:company_id, :ancestry, :active], case_sensitive: false}
+  # validates :name, presence: true, uniqueness: {scope: [:company_id, :ancestry, :active], case_sensitive: false}
   # validate :at_least_one_application
 
   default_scope { order(name: :asc) }

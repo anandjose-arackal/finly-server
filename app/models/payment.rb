@@ -60,6 +60,8 @@
 #  erp_sync_reference_id          :text(65535)
 #  erp_sync_attempts_count        :integer          default(0)
 #  erp_sync_attempted_at          :datetime
+#  base_currency_id               :integer
+#  reporting_currency_id          :integer
 #
 
 class Payment < ApplicationRecord
@@ -815,6 +817,12 @@ include Searchkick::Api
     end
   end
 
+  def processed_at
+    return super() unless super().blank?
+    return nil if self.payment_status_id != PaymentStatus::VALUES[:completed]
+    self.reference_resources.first&.created_at
+  end
+
   private
 
   def recalculate_order_summary
@@ -1206,12 +1214,13 @@ include Searchkick::Api
       balance_due: {value: precision_value( self.parent.balance_due&.value - self.parent&.paid_amount.to_f ), editable: false}, # Invoice AMOUNT
       available_credits: available_credits_amount,
 
-      invoice_balance_due: {value: precision_value( self.parent&.invoice_balance_due ), editable: false}, 
-      reporting_invoice_balance_due: {value: precision_value( self.parent&.reporting_invoice_balance_due ), editable: false},     
-      invoice_sub_total_amount: {value: precision_value( self.parent&.invoice_sub_total_amount ), editable: false}, 
+      invoice_balance_due: {value: precision_value( self.parent&.invoice_balance_due ), editable: false},
+      reporting_invoice_balance_due: {value: precision_value( self.parent&.reporting_invoice_balance_due ), editable: false},
+      invoice_sub_total_amount: {value: precision_value( self.parent&.invoice_sub_total_amount ), editable: false},
       reporting_invoice_sub_total_amount: {value: precision_value( self.parent&.reporting_invoice_sub_total_amount ), editable: false},
       invoice_net_total_amount: {value: precision_value( self.parent&.invoice_net_total_amount ), editable: false},
-      reporting_invoice_net_total_amount: {value: precision_value( self.parent&.reporting_invoice_net_total_amount ), editable: false} 
+      reporting_invoice_net_total_amount: {value: precision_value( self.parent&.reporting_invoice_net_total_amount ), editable: false},
+      conversion_rate: {value: self.parent&.conversion_rate.to_f, editable: false} 
     }
   end
 

@@ -50,6 +50,9 @@
 #  filters                      :text(65535)
 #  config_path                  :string(255)
 #  compute_lookup_assignments   :text(65535)
+#  virtual                      :boolean          default(FALSE)
+#  triggers                     :text(65535)
+#  show_in_data_card_as         :string(255)
 #
 
 class FormEntity::Number < FormEntity
@@ -62,11 +65,13 @@ class FormEntity::Number < FormEntity
   option :min_value
   # option :decimal, default: false
   option :format
+  option :max_decimal_places
 
   operators :gteq, :lteq, :not_null, :null
 
   contract_eval 'Max Value Limit Check', &Forms::Validations::Templates[:max_value]
   contract_eval 'Min Value Limit Check', &Forms::Validations::Templates[:min_value]
+  contract_eval 'Number of Decimal Places', &Forms::Validations::Templates[:max_decimal_places]
 
   schema_validation do
     required(:options) do
@@ -74,6 +79,7 @@ class FormEntity::Number < FormEntity
         optional(:min_value)
         optional(:max_value)
         optional(:format).value(included_in?: FORMAT)
+        optional(:max_decimal_places)
       end
     end
   end
@@ -87,6 +93,7 @@ class FormEntity::Number < FormEntity
               optional(:min_value)
               optional(:max_value)
               optional(:format)
+              optional(:max_decimal_places)
             end
           end
         end
@@ -94,6 +101,7 @@ class FormEntity::Number < FormEntity
           max = value[:max_value]
           min = value[:min_value]
           format = value[:format]
+          max_decimal_places = value[:max_decimal_places]
 
           if format.present?
             key.failure("> formats must be one of #{FormEntity::Number::FORMAT.join(", ")}") if FormEntity::Number::FORMAT.exclude?(format)

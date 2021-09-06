@@ -11,6 +11,11 @@ json.user do
   json.partial! 'macros/v1/users/user', record: record.user
   json.bank_account record.user.default_bank_account
 end
+custom_fields = {}
+record.custom_fields.each do |custom_field|
+  custom_fields[custom_field.field_configuration.field_name] = custom_field.configured_field_value
+end
+json.custom_fields custom_fields
 json.expenses record.expenses do |expense|
   json.partial! 'expense', record: expense
 end

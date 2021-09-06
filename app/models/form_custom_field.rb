@@ -9,12 +9,13 @@
 #  form_id        :string(255)      not null
 #  form_entity_id :string(255)      not null
 #  field_key      :string(255)      not null
-#  value          :string(255)
+#  value          :text(65535)
 #  value_text     :string(255)
 #  deleted_at     :datetime
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
 #  entity_type    :string(255)
+#  company_id     :integer
 #
 
 class FormCustomField < ApplicationRecord
@@ -88,6 +89,40 @@ class FormCustomField < ApplicationRecord
       selections.map(&:form_entity_choice).map(&:name)
     when 'attachment'
       attachments.as_json if self.persisted?
+    when 'number'
+      form_entity.options['format'] == 'number' ? value.to_i.to_s :  sprintf( "%0.02f", value.to_f)
+    when 'date'
+      value.present? ? value.to_datetime.strftime('%Y-%m-%d') : value
+    when 'datetime'
+      value.present? ? value.to_datetime.strftime('%Y-%m-%d %H:%M:%S') : value
+    when 'switch'
+      FormEntity::Switch::TRUTHY_VALUES.include? value
+    else
+      value
+    end
+  end
+
+  def retrieve_export_text_value
+    if entity_type.present?
+      field_type = entity_type
+    else
+      field_type = FormEntity.include_soft_deleted.where(uuid: self.form_entity_id)&.first.entity_type
+    end
+    # FormEntity.where(uuid: self.form_entity_id)
+
+    case field_type
+    when 'text'
+      value || value_text
+    when 'dropdown'
+      selection&.form_entity_choice&.name
+    when 'multiselect'
+      selections.map(&:form_entity_choice).map(&:name)
+    when 'attachment'
+      if self.persisted?
+        (attachments.as_json.map do |att_json|
+          att_json[:url]
+        end).join("\n")
+      end
     when 'number'
       form_entity.options['format'] == 'number' ? value.to_i.to_s :  sprintf( "%0.02f", value.to_f)
     when 'date'

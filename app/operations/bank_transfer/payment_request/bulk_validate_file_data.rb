@@ -93,6 +93,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
 
   def process
     self.order_details.each do |item|
+      name = item[:name]
       bank_account_no = item[:bank_account_number] || item["bank_account_number"]
       ifsc = item[:ifsc] || item["ifsc"]
       name = item[:name].present? ? item[:name] : item[:bank_account_name]
@@ -288,6 +289,15 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
           self.issue_item[:advance_amount] = 'Advance amount is more than the original amount'
         end
       end
+
+      # check if pt name present
+      if name.blank?
+        self.valid = false
+        self.valid = false
+        self.error_messages << 'Name cannot be blank'
+        self.issue_item[:name] =  'Name cannot be blank'
+      end
+      #
 
       # check if the ifsc is present
       if ifsc.blank?

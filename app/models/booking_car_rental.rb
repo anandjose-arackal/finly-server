@@ -25,6 +25,7 @@
 #  is_deleted      :boolean          default(FALSE)
 #  booking_id      :integer
 #  deleted_at      :datetime
+#  company_id      :integer
 #
 
 class BookingCarRental < ApplicationRecord

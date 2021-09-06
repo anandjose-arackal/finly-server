@@ -205,12 +205,13 @@ class InvoiceExposure < Exposures::API
   end
 
   attribute :base_currency_code do    
-    country_code = Currency.find_by(id: record.base_currency).country_code rescue 'INR'
-    country_code
+    # country_code = Currency.find_by(id: record.get_base_currency.id).country_code rescue 'INR'
+    # country_code
+    record.get_base_currency.country_code
   end
 
   attribute :reporting_currency_code do
-    record.reporting_currency
+    record.get_reporting_currency.country_code
   end
 
   attribute :conversion_rate do
@@ -226,6 +227,42 @@ class InvoiceExposure < Exposures::API
   end
 
   attribute :payment_term, record_attribute: true, exposure: true, includes: [:payment_term]
+
+  attribute :payments_utr, includes: [:payments] do
+    utrs =[]
+    record.payments.each do |payment|
+      utrs << payment.utr
+    end
+    utrs.compact.join(', ')
+  end
+
+  attribute :invoice_comments, includes: [:comments] do
+    comment_texts =[]
+    record.comments.each do |comment|
+      comment_texts  << comment.generate_body
+    end
+    comment_texts.compact.join(', ')
+  end
+
+  attribute :invoice_rejection_comments, includes: [:trails] do
+    trail_texts =[]
+    record.trails.only_reject.each do |trail|
+      trail_texts  << trail.generate_trail_body_note(nil)
+    end
+    trail_texts.compact.join(', ')
+  end
+
+  attribute :approval_levels, record_attribute: :dlrms, exposure: true, includes: [:dlrms]
+  attribute :approved_trails, exposure: :true,  includes: [:trails] do
+    record.trails.where(action_id: TrailAction.id_for(:approve))
+  end
+
+  attribute :completed_payments, exposure: true,  includes: [:payments] do
+    record.payments.completed
+  end
+
+  attribute :payments, record_attribute: true, exposure: true,  includes: [:payments]
+
 
   # def vendor_ref_num(invoice_line_item)
   #   invoice_line_item.parent&.vendor_id

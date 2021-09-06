@@ -39,6 +39,12 @@ class ExportResource < NonTenantedApplicationRecord
       route: 'purchase_requests.index'
     },
     {
+        name: 'Purchase Request Items',
+        value: 'purchase_request_items',
+        resolver: 'purchase_request_items.default',
+        route: 'purchase_requests.index'
+    },
+    {
       name: 'Purchase Orders',
       value: 'purchase_orders',
       resolver: 'purchase_orders.default',
@@ -85,6 +91,12 @@ class ExportResource < NonTenantedApplicationRecord
       value: 'utility_subscriptions',
       resolver: 'utility_subscriptions.default',
       route: 'utility_subscriptions.index'
+    },
+    {
+        name: 'Audit Trails',
+        value: 'audit_trails',
+        resolver: 'audit_trails.default',
+        route: 'audit_trails.index'
     }
   ]
 

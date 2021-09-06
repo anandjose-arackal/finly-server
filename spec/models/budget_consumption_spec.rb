@@ -9,12 +9,13 @@
 #  payment_processing_amount_id :integer
 #  paid_amount_id               :integer
 #  budget_id                    :integer
+#  deleted_at                   :datetime
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
 #  budget_amount_id             :integer
 #  remaining_amount_id          :integer
-#  deleted_at                   :datetime
 #  total_consumed_amount_id     :integer
+#  company_id                   :integer
 #
 
 require 'rails_helper'

@@ -30,7 +30,6 @@ class Forms::Contracts::Builders::CustomField
       # represented.custom_fields = represented.model.present? ? represented.model.custom_fields : []
       represented.form_custom_fields = []
       form_custom_fields.each do |custom_field_entity|
-        # debugger
         custom_field = represented.form_custom_fields.find_by(form_entity_id: custom_field_entity.uuid)
         if custom_field.nil?
           custom_field = build_custom_field custom_field_entity
@@ -51,10 +50,14 @@ class Forms::Contracts::Builders::CustomField
           input[custom_field_entity.entity_key].present? && input[custom_field_entity.entity_key].is_a?(Array) && input[custom_field_entity.entity_key].each do |attachment_obj|
             attachment = CustomFieldAttachment.find_by uuid: attachment_obj[:id]
 
+            # Rails.logger.error("********************** #{custom_field_entity.entity_key} - #{attachment_obj[:name]}**********************")
+
             if attachment.present?
+              
               if attachment_obj[:_destroy]
                 attachment.destroy
               else
+                attachment.update(form_custom_field_id: custom_field&.uuid)
                 custom_field.attachments << attachment
               end
               # debugger

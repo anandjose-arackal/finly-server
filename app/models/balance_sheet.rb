@@ -10,6 +10,7 @@
 #  updated_at                :datetime         not null
 #  pending_advance_id        :integer
 #  deleted_at                :datetime
+#  company_id                :integer
 #
 
 class BalanceSheet < ApplicationRecord

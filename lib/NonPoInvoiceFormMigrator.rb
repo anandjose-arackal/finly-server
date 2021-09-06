@@ -143,7 +143,7 @@ class NonPoInvoiceMigrator
     })
 
     choices = Choices['list'].()
-    choices.form_entity = form_entity
+    choices.entity = form_entity
     form_entity.update(choices_scope: choices )
     
     # create options
@@ -252,8 +252,8 @@ class NonPoInvoiceMigrator
 
     update_params = {
 
-      base_currency: Currency.find_by(country_code: 'INR').id,
-      reporting_currency: 'INR',
+      base_currency_id: Currency.find_by(country_code: 'INR').id,
+      reporting_currency_id: Currency.find_by(country_code: 'INR').id,
       conversion_rate: 1,
       retrieve_conversion_rate: true,
 
@@ -278,7 +278,7 @@ class NonPoInvoiceMigrator
       conversion_date: document&.date&.to_date,
 
       # VENDOR DETAILS
-      vendor_country: document&.vendor&.vendor_country,
+      vendor_country_id: Country.id_for(document&.vendor&.vendor_country),
       vendor_trade_name:  document&.vendor&.trade_name || document&.vendor&.business_name,
       vendor_sequence_id: document&.vendor&.vendor_id,
       vendor_gstin: document&.gstin_location&.gstin,

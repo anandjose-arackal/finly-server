@@ -124,7 +124,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
           item_amount =  po_item.taxable_amount&.value&.to_f&.round(2)
         end
 
-        invoiced_line_items = procurement.invoices.joins(items: :taxable_amount).where('invoice_line_items.purchase_order_item_id = ?', invoice_line_item.purchase_order_item_id)
+        invoiced_line_items = procurement.invoices.scope_all_except_voided.joins(items: :taxable_amount).where('invoice_line_items.purchase_order_item_id = ?', invoice_line_item.purchase_order_item_id)
         #invoiced_line_items holding joined active record query on line item
         invoiced_line_items_except_current_item = invoiced_line_items.where('invoice_line_items.id != ?', item[:id])
         invoiced_total_qty = 0
@@ -311,9 +311,9 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
     # Adding default currency as per form structure.
 
-    self.inward_invoice.reporting_currency = user.company.reporting_currency_code
-    self.inward_invoice.base_currency = user.company.reporting_currency.id
-    self.inward_invoice.conversion_rate = 1
+    # self.inward_invoice.reporting_currency = user.company.reporting_currency_code
+    # self.inward_invoice.base_currency = user.company.reporting_currency.id
+    # self.inward_invoice.conversion_rate = 1
 
   end
 

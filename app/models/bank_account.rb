@@ -141,6 +141,7 @@ class BankAccount < ApplicationRecord
         id: id,
         account_number: account_number,
         ifsc: ifsc,
+        swift_code: swift_code,
         name: name,
         default_account: default_account,
         disabled: disabled

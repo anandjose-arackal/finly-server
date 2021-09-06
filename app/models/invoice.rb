@@ -102,11 +102,9 @@
 #  invoice_discount_amount               :decimal(20, 5)
 #  invoice_tax_amount                    :decimal(20, 5)
 #  invoice_tds_amount                    :decimal(20, 5)
-#  base_currency                         :string(255)
 #  vendor_sequence_id                    :text(65535)
 #  vendor_gstin                          :string(255)
 #  invoice_freight_amount                :decimal(20, 5)
-#  reporting_currency                    :string(255)
 #  conversion_date                       :date
 #  conversion_rate                       :decimal(10, 5)
 #  retrieve_conversion_rate              :boolean          default(TRUE)
@@ -142,16 +140,22 @@
 #  invoice_total_amount                  :decimal(20, 5)
 #  payment_term_days                     :integer          default(0)
 #  vendor_bank_account_swift_code        :string(255)      default("")
-#  vendor_country                        :string(255)      default("")
 #  discount_type                         :string(255)      default("")
 #  overall_discount_amount               :decimal(10, )    default(0)
 #  total_line_item_discount_amount       :decimal(10, )    default(0)
 #  is_domestic                           :boolean          default(TRUE)
+#  billing_address_name                  :string(255)      default("")
+#  billing_address_gstin                 :string(255)      default("")
+#  shipping_address_name                 :string(255)      default("")
+#  shipping_address_gstin                :string(255)      default("")
+#  base_currency_id                      :integer
+#  reporting_currency_id                 :integer
+#  vendor_country_id                     :integer
 #
 
 class Invoice < ApplicationRecord
   attr_accessor :skip_callback
-  include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport, ControllingUser
+  include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport, ControllingUser, GetCurrency
   include LiquidDroppable
   include Exposures::Model::Exposable
   include Sequenced::ActsAsSequenced
@@ -174,14 +178,14 @@ class Invoice < ApplicationRecord
   money :invoice_roundoff_amount, :get_reporting_currency
   money :invoice_balance_due, :get_reporting_currency
 
-  def get_reporting_currency
-    Currency.currency_for(self.reporting_currency ) rescue self.company.reporting_currency.country_code
-  end
+  # def get_reporting_currency
+  #   Currency.currency_for(self.reporting_currency ) rescue self.company.reporting_currency.country_code
+  # end
 
-  def get_base_currency
-    currency_code = Currency.find(self.base_currency)&.country_code rescue nil
-    Currency.currency_for(currency_code || "INR")
-  end
+  # def get_base_currency
+  #   currency_code = Currency.find(self.base_currency)&.country_code rescue nil
+  #   Currency.currency_for(currency_code || "INR")
+  # end
 
 
   exchange_bank :get_reporting_currency, :get_base_currency, :exchange_rate
@@ -190,10 +194,12 @@ class Invoice < ApplicationRecord
   def exchange_rate
     ExchangeRate.get_rate(
       self.conversion_date,
-      self.reporting_currency,
+      self.get_reporting_currency.country_code,
       get_base_currency&.country_code || "INR"
     )
   end
+
+  alias_attribute :created_by_id, :created_by_user_id
 
   # Multicurrency Attributes
 
@@ -241,6 +247,7 @@ class Invoice < ApplicationRecord
   belongs_to :remaining_amount, optional: true, class_name: "Amount"
   belongs_to :invoice_type, optional: true, class_name: "InwardInvoiceType"
   belongs_to :gst_type, optional: true
+  belongs_to :tax_type, optional: true
   belongs_to :tds_slab, optional: true, class_name: 'TdsRatesList'
   belongs_to :payment_term, optional: true
 
@@ -259,6 +266,9 @@ class Invoice < ApplicationRecord
   belongs_to :vendor_location, class_name: "GstinLocation", optional: true
   belongs_to :payment_agreement, optional: true
   belongs_to :agreement_item, optional: true, polymorphic: true
+  belongs_to :base_currency, optional: true, class_name: 'Currency'
+  belongs_to :reporting_currency, optional: true, class_name: 'Currency'
+  belongs_to :vendor_country, optional: true, class_name: 'Country'
 
   has_one :credit_note
   has_many :document_level_reviewer_mappings, as: :document_reviewer_mappable
@@ -341,8 +351,8 @@ class Invoice < ApplicationRecord
   before_create :set_currency
 
   def set_currency
-    self.reporting_currency = self.company.reporting_currency_code if self.reporting_currency.blank? 
-    self.base_currency = self.company.reporting_currency.id if self.base_currency.blank? 
+    self.reporting_currency_id = self.company.reporting_currency.id if self.reporting_currency.blank? 
+    self.base_currency_id = self.company.reporting_currency.id if self.base_currency.blank? 
     self.conversion_rate = 1
   end
 
@@ -422,7 +432,7 @@ class Invoice < ApplicationRecord
   }
 
 
-  scope :filter_base_currency, -> (base_currency_id) { where base_currency: base_currency_id }
+  scope :filter_base_currency, -> (base_currency_id) { where base_currency_id: base_currency_id }
 
   # scope :filter_awaiting_approval, -> (enabled) {
   #   if StringUtils.to_bool(enabled)
@@ -792,7 +802,11 @@ class Invoice < ApplicationRecord
   end
 
   def tds_rate
-    self.tds
+    if forms_enabled
+      self.tds_percentage
+    else
+      self.tds
+    end
   end
 
   def discount_rate
@@ -874,7 +888,11 @@ class Invoice < ApplicationRecord
   end
 
   def balance_payable
-    balance_due&.value.to_f - paid_amount_value
+    if self.forms_enabled
+      self.invoice_balance_due
+    else
+      balance_due&.value.to_f - paid_amount_value
+    end
   end
 
   def paid_amount_value
@@ -911,19 +929,19 @@ class Invoice < ApplicationRecord
   end
 
   def invoice_balance_due
-    # if self.forms_enabled
-    self[:invoice_balance_due].to_f - self.invoice_advance_paid_amount.to_f
-    # else
-    #   self.balance_due&.value.to_f
-    # end
+    if self.forms_enabled
+      self[:invoice_balance_due].to_f - self.invoice_advance_paid_amount.to_f
+    else
+      balance_due&.value.to_f - paid_amount_value
+    end
   end
 
   def reporting_invoice_balance_due
-    # if self.forms_enabled
-    self[:reporting_invoice_balance_due].to_f - self.reporting_invoice_advance_paid_amount.to_f 
-    # else
-    #   self.balance_due&.value.to_f
-    # end
+    if self.forms_enabled
+      self[:reporting_invoice_balance_due].to_f - self.reporting_invoice_advance_paid_amount.to_f 
+    else
+      balance_due&.value.to_f - paid_amount_value
+    end
   end
 
   def invoice_sub_total_amount
@@ -1396,11 +1414,19 @@ class Invoice < ApplicationRecord
   end
 
   def tds_per_item
-    self.tds_amount&.value.to_f / self.items.count
+    if forms_enabled
+      (self.reporting_invoice_tds_amount.to_f / self.items.count.to_f) rescue 0
+    else
+      (self.tds_amount&.value.to_f / self.items.count.to_f) rescue 0
+    end
   end
 
   def advance_per_item
-    self.advance_amount&.value.to_f / self.items.count
+    if forms_enabled
+      (self.reporting_invoice_paid_outside_amount.to_f / self.items.count.to_f) rescue 0
+    else
+      (self.advance_amount&.value.to_f / self.items.count.to_f) rescue 0
+    end
   end
 
   def cn_adjustment_per_item
@@ -1526,9 +1552,18 @@ class Invoice < ApplicationRecord
   end
 
   def retrieve_value(entity)
-    return get_base_currency.country_code if entity.entity_key == 'base_currency'
-
+    return tds_slab&.dispaly_name if entity.entity_key == 'tds_slab_id'
+    return get_discount_type if entity.entity_key == 'discount_type_id'
+  
     send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
+  end
+
+  def get_discount_type
+    if discount_type_id == 1
+      'Percentage' 
+    else
+      'Amount'
+    end
   end
 
   def forms_enabled
@@ -1546,6 +1581,27 @@ class Invoice < ApplicationRecord
     role_filter[:filter_role_id] = [UserRole.id_for(:bank_payment_request_initiator)]
     bank_payment_request_policies = Policy::VendorPayments::Index.(user, role_filter).policies rescue Policy.none
     bank_payment_request_policies
+  end
+
+  def invoice_budgets
+    op = BudgetManager::BudgetsCalculator::ApplicableBudgets.({document: self, current_user: User.first})
+    budgets = op["result"][:budgets]
+    budgets
+  end
+
+  def invoice_budget_contributions_before_update
+    if self.company.enforce_budget_configuration.enforce_invoice_budget?
+      op = BudgetManager::BudgetLimitValidator::Invoice.({invoice: self, ignore_unbudgetables: true, current_user: self.created_by })
+      
+      op['result'][:budget_contributions] rescue {}
+    end
+    {}
+  end
+
+  def invoice_budget_limit_validation
+    if self.company.enforce_budget_configuration.enforce_invoice_budget?
+      return BudgetManager::BudgetLimitValidator::Invoice.({invoice: self, previous_budget_contributions: self.invoice_budget_contributions_before_update, current_user: self.company.users.first })
+    end
   end
 
   private
@@ -1861,7 +1917,7 @@ class Invoice < ApplicationRecord
 
           # if the payment is present, user can update the tds only from payment screen, ie from old to new tds structure 
           if self.payments.present? && key.to_s == 'invoice_tds_amount'
-            updated_tds_to_new_structure 
+            updated_values_to_new_structure
             next
           end
 
@@ -1900,23 +1956,26 @@ class Invoice < ApplicationRecord
       end
 
 
-
-      # FOR NET AMOUNT
-      net_amount_attr = self.net_amount_id
-      # invoice_net_total_amount - invoice_paid_outside_amount
-      # cant use invoice_net_amount because net amount converts to round value in new ui for base currency == 1
-      net_amount_value = self.invoice_total_amount.to_f + self.invoice_paid_outside_amount.to_f - self.invoice_roundoff_amount.to_f
-      self.skip_callback = true
-      if net_amount_attr.present?
-        Amount.find_by(id: net_amount_attr).update(value: net_amount_value, currency_id: base_currency_id)
-      else
-        amount_id = Amount.create(value: net_amount_value, currency_id: base_currency_id).id
-        self.send("net_amount_id=", amount_id)
+      if self.payments.blank?
+        # FOR NET AMOUNT
+        net_amount_attr = self.net_amount_id
+        # invoice_net_total_amount - invoice_paid_outside_amount
+        # cant use invoice_net_amount because net amount converts to round value in new ui for base currency == 1
+        net_amount_value = self.invoice_total_amount.to_f + self.invoice_paid_outside_amount.to_f - self.invoice_roundoff_amount.to_f
+        self.skip_callback = true
+        if net_amount_attr.present?
+          Amount.find_by(id: net_amount_attr).update(value: net_amount_value, currency_id: base_currency_id)
+        else
+          amount_id = Amount.create(value: net_amount_value, currency_id: base_currency_id).id
+          self.send("net_amount_id=", amount_id)
+        end
       end
-
+      if TaxType.where(tax_name: ['igst', 'cgst_sgst'] ).pluck(:id).include?(tax_type_id)
+        self.gst_type_id = self.tax_type_id
+      end
       # update attachments 
       update_attachments
-
+      self.save
       # update custom fields
     end
   end
@@ -1968,19 +2027,6 @@ class Invoice < ApplicationRecord
     {
       invoice_roundoff_amount: 'roundoff_amount'
     }
-
-    # Invoice amount meanings. Picked from Invoice Calculation Utils
-    # amount => raw amount, rate * qty
-    # discount_amount => discount total of items
-    # gross_amount => discounts included or taxable amount or after_discount_amount
-    # tax_amount => tax total of items
-    # tds_amount => tds total of tds_applicable items' tds
-    # net_amount => gross_amount + tax_amount - tds_amount
-    # advance_amount => advance paid
-
-    # New Structure
-    # invoice_sub_total_amount => old structure net_amount
-    # invoice_net_total_amount: invoice_total_amount - invoice_paid_outside_amount - invoice_advance_paid_amount
   end
 
   def item_quantity_validation
@@ -1988,7 +2034,7 @@ class Invoice < ApplicationRecord
     quantities = invoice_items.map(&:quantity).map(&:to_f)
     quantities.each do |quantity|
       flag = true if quantity <= 0
-      break
+      break if flag
     end
     
     errors.add(:invoice_items, "quantity must be greater than 0") if flag
@@ -1999,27 +2045,52 @@ class Invoice < ApplicationRecord
     rates = invoice_items.map(&:rate).map(&:to_f)
     rates.each do |rate|
       flag = true if rate <= 0
-      break
+      break if flag
     end
     
     errors.add(:invoice_items, "rate must be greater than 0") if flag
   end
 
-  def updated_tds_to_new_structure 
-    tds_amount = self.tds_amount&.value&.to_f
-    self.invoice_tds_amount = tds_amount
-    self.tds_percentage = self&.tds_slab&.tds.to_f
-    # update tds for each line item also
+  def updated_values_to_new_structure 
 
-    self.items.each do |item|
-      item_tds = 0
-      if item&.tds_applicable
-        item_tds = ( item&.taxable_amount&.value.to_f * self&.tds_slab&.tds.to_f ) / 100
-        item_tds = item_tds.to_f.round(2)
-      end
-      self.skip_callback = true
-      item.save
-    end
+    # update_tds
+    old_tds_amount = self.invoice_tds_amount
+    old_reporting_tds_amount = self.reporting_invoice_tds_amount
+
+    tds_amount = self.tds_amount&.value&.to_f
+
+    self.invoice_tds_amount = tds_amount
+    self.reporting_invoice_tds_amount = (tds_amount.to_f * self.conversion_rate.to_f).round(2)
+    self.tds_percentage = tds_slab&.tds.to_f
+    # update tds for each line item also
+    
+    # self.items.each do |item|
+    #   item_tds = item.item_tds_amount
+    #   if item&.tds_applicable
+    #     item_tds = ( item&.taxable_amount&.value.to_f * tds_slab&.tds.to_f ) / 100
+    #     binding.pry
+    #     item.item_tds_amount = item_tds.to_f.round(2)
+    #     item.reporting_item_tds_amount = (item_tds * self.conversion_rate.to_f).round(2)
+    #   end
+    #   item.save
+    #   self.skip_callback = true
+    # end
+
+
+    # update invoice_total_amount
+    self.invoice_total_amount = (self.invoice_total_amount.to_f + old_tds_amount.to_f - self.invoice_tds_amount.to_f).round(2)
+    self.reporting_invoice_total_amount = (self.reporting_invoice_total_amount.to_f + old_reporting_tds_amount.to_f - self.reporting_invoice_tds_amount.to_f).round(2)
+    
+    # update invoice_net_total_amount
+    self.invoice_net_total_amount = (self.invoice_net_total_amount.to_f + old_tds_amount.to_f - self.invoice_tds_amount.to_f).round(2)
+    self.reporting_invoice_net_total_amount = (self.reporting_invoice_net_total_amount.to_f + old_reporting_tds_amount.to_f - self.reporting_invoice_tds_amount.to_f).round(2)
+
+    # update invoice_balance_due
+    self.invoice_balance_due = (self[:invoice_balance_due].to_f + old_tds_amount.to_f - self.invoice_tds_amount.to_f).round(2)
+    self.reporting_invoice_balance_due = (self[:reporting_invoice_balance_due].to_f + old_reporting_tds_amount.to_f - self.reporting_invoice_tds_amount.to_f).round(2)
+    
+    # update
+
     self.skip_callback = true
     self.save
   end
@@ -2031,7 +2102,7 @@ class Invoice < ApplicationRecord
     if form_attachments_field.present?
       form_attachments_field.attachments.each do |new_attachment|
         old_attachment = self.attachments.find_or_initialize_by(file_file_name: new_attachment.attachment_file_name )
-
+        next
         if old_attachment.new_record?
           old_attachment.file_file_name = new_attachment.attachment_file_name
           old_attachment.file_content_type = new_attachment.attachment_content_type
@@ -2113,9 +2184,7 @@ class Invoice < ApplicationRecord
   #         field_configuration.field_name        = form_custom_field.form_entity.label
   #         field_configuration.field_key         = form_custom_field.form_entity.entity_key
   #         field_configuration.save
-  #       end
-      
-
+  #       end    
   #       value = form_custom_field.selection.form_entity_choice.name
 
   #       custom_field.value = FieldText.create({ value: form_custom_field.value, company_id: self.company_id })
@@ -2124,11 +2193,8 @@ class Invoice < ApplicationRecord
       
   #       custom_field.save
   #       end
-
-
   #     end
   #   end
   # end
 
 end
-

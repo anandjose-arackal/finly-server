@@ -30,7 +30,19 @@ Rails.application.configure do
   redis_config = Rails.application.config_for(:redis_config)&.with_indifferent_access
   redis_creds = redis_config&.slice('url', 'password')
   config.redis = Redis.new(redis_creds)
-
+  posthog_config = Rails.application.config_for(:posthog)&.with_indifferent_access
+  if posthog_config.present? and posthog_config['enabled']
+    config.posthog = PostHog::Client.new(
+      {
+        api_key: posthog_config['api_key'],
+        api_host: posthog_config['api_host'],
+        # Todo log errors
+        on_error: Proc.new { |status, msg| print msg }
+      }
+    )
+  else
+    config.posthog = nil
+  end
   if redis_config[:cache_enabled]
     config.cache_store = :redis_cache_store, redis_creds
   else

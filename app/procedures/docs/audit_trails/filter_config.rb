@@ -11,6 +11,7 @@ class Docs::AuditTrails::FilterConfig < Filters::API
       {id: "create", name: "Create"},
       {id: "Submit", name: "Submit"},
       {id: "update", name: "Update"},
+      {id: "destroy", name: "Destroy"},
       {id: "Approve", name: "Approve"},
       {id: "Un Approve", name: "Un Approve"},
       {id: "Retract", name: "Retract"},

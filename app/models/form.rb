@@ -7,9 +7,10 @@
 #  klass_name :string(255)      not null
 #  model      :string(255)      not null
 #  company_id :integer          not null
+#  deleted_at :datetime
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
-#  deleted_at :datetime
+#  label      :string(255)
 #
 
 class Form < ApplicationRecord
@@ -85,6 +86,25 @@ class Form < ApplicationRecord
 
   def model
     Object.const_get(super()) if super()
+  end
+
+  def sync_sequence_numbers
+    return unless self.model.sequenced_options.present?
+
+    self.model.sequenced_options.each do |seq_options|
+      record = self.model.new(company_id: self.company_id)
+      generator = Sequenced::Generator.new(record, seq_options)
+      sequence_number = generator.next_unique_id_in_sequence - 1
+      prefix = generator.get_prefix
+
+      sequence_entity = (self.entities.where(type: 'FormEntity::AutoNumber').filter do |e|
+        e.config.dig("sequence", "prefix") == prefix
+      end).first
+
+      next unless sequence_entity.present?
+
+      REDIS.set("FormEntity::AutoNumber##{sequence_entity.id}##{prefix}", sequence_number)
+    end
   end
 
 end

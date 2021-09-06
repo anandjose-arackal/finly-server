@@ -2,7 +2,7 @@ class Choices::Builders::Base
   include DynamicAttributes
 
   class_attr :type
-  attr_accessor :config, :form_entity
+  attr_accessor :config, :entity
 
   def self.register!(type)
     Choices::Builder.register(type, self)
@@ -18,9 +18,9 @@ class Choices::Builders::Base
     self.class.type
   end
 
-  def initialize(config, form_entity: nil)
+  def initialize(config, entity: nil)
     self.config = config
-    self.form_entity = form_entity
+    self.entity = entity
   end
 
   def find_by_id(id, params: {}, user: nil)

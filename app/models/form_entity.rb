@@ -50,6 +50,9 @@
 #  filters                      :text(65535)
 #  config_path                  :string(255)
 #  compute_lookup_assignments   :text(65535)
+#  virtual                      :boolean          default(FALSE)
+#  triggers                     :text(65535)
+#  show_in_data_card_as         :string(255)
 #
 
 class FormEntity < ApplicationRecord
@@ -101,6 +104,7 @@ class FormEntity < ApplicationRecord
   serialize :config, JSON
   serialize :compute_formula, JSON
   serialize :compute_lookup_assignments, JSON
+  serialize :triggers, JSON
 
   scope :root, -> { where parent_id: nil }
   scope :system_fields, -> { where system_field: true }
@@ -122,7 +126,7 @@ class FormEntity < ApplicationRecord
     val = super()&.with_indifferent_access
     return nil unless val.present?
 
-    Choices[val[:type]].new(val[:config], form_entity: self)
+    Choices[val[:type]].new(val[:config], entity: self)
   end
 
   def contract(contract, user)
@@ -213,6 +217,7 @@ class FormEntity < ApplicationRecord
         required: required,
         active: active,
         visible: visible,
+        unique: unique
       },
       unique: unique,
       position: position,
@@ -286,6 +291,7 @@ class FormEntity < ApplicationRecord
         required: required,
         active: active,
         visible: visible,
+        unique: unique
       },
       options: options
     }

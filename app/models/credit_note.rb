@@ -39,6 +39,12 @@
 #  last_adjusted_at              :datetime
 #  review_note                   :text(65535)
 #  erp_sync_status_id            :integer
+#  erp_sync_message              :text(65535)
+#  erp_sync_reference_id         :string(255)
+#  erp_sync_attempts_count       :integer          default("0")
+#  erp_sync_attempted_at         :datetime
+#  base_currency_id              :integer
+#  reporting_currency_id         :integer
 #
 
 class CreditNote < ApplicationRecord
@@ -47,6 +53,7 @@ class CreditNote < ApplicationRecord
   include Sequenced::ActsAsSequenced
   include EventProducer
   include Concerns::ErpSyncConcern
+  include ErpSyncable
 
   acts_as_sequenced column: :sequence_id, purpose: :credit_note, editable: false, prefix: 'CN'
 

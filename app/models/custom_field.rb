@@ -15,6 +15,7 @@
 #  field_key              :string(255)
 #  configured_field_value :text(65535)
 #  deleted_at             :datetime
+#  company_id             :integer
 #
 
 class CustomField < ApplicationRecordBackwardCompatibility
@@ -200,27 +201,24 @@ class CustomField < ApplicationRecordBackwardCompatibility
       return report_show
     when options[:report_mailer_show] # Show page when user navigates from email
       return report_mailer_show
+    when options[:from_app]
+      return expense_app_partial
     else
       options = []
       dependent_field_configuration_ids = []
-      has_dependent_cf = false
-      if field_configuration.field_type_id == FieldType.id_for(:drop_down)
+      if field_configuration.field_type_id == FieldType::TYPES[:drop_down]
         if user_level_custom_fields
           option_ids = field_configuration.drop_down_items.exclude_deleted.filter_user_id(RequestStore.store[:current_user]&.id).includes(:dependent_field_configurations).find_each(batch_size: 100).reject(&:nil?)
           options = FieldDropDownItem.where(id: option_ids)
         else
-          options = field_configuration.drop_down_items.exclude_deleted
+         options = field_configuration.drop_down_items.exclude_deleted
         end
-        # options.each do |option|
-        #   if option.dependent_field_configurations.present?
-        #     dependent_field_configuration_ids += option.dependent_field_configurations.pluck(:id)
-        #     has_dependent_cf = true
-        #   end
-        # end
-        dependent_field_configuration_ids = options.joins(:dependent_field_configurations).pluck('field_configurations.id')
-        has_dependent_cf = true if dependent_field_configuration_ids.present?
-
-      elsif field_configuration.field_type_id == FieldType.id_for(:multiselect)
+         options.each do |option|
+           if option.dependent_field_configurations.present?
+             dependent_field_configuration_ids += option.dependent_field_configurations.pluck(:id)
+           end
+         end
+      elsif field_configuration.field_type_id == FieldType::TYPES[:multiselect]
         options = field_configuration.multiselect_items
       end
       json = {id: field_configuration.id,
@@ -228,10 +226,10 @@ class CustomField < ApplicationRecordBackwardCompatibility
               field_type: {id: field_configuration.field_type.id,
                            name: field_configuration.field_type.name},
               mandatory: field_configuration.mandatory,
-              options: options,
+               options: options.as_json({from_custom_field: true}),
               root_field: self.field_configuration.root_field,
               dependent_field_configuration_ids: dependent_field_configuration_ids&.uniq,
-              has_dependent_cf: has_dependent_cf
+              has_dependent_cf: field_configuration.has_dependent_cf
       }
       case self.field_configuration.field_type_id
       when FieldType.id_for(:multiselect)
@@ -266,6 +264,19 @@ class CustomField < ApplicationRecordBackwardCompatibility
     }
     json["#{field_configuration.field_type.name.to_sym}_field_value"] = self.value
     return json
+  end
+
+  def expense_app_partial
+    {
+        id: field_configuration.id,
+        label: field_configuration.field_name,
+        field_type: {id: field_configuration.field_type.id,
+                    name: field_configuration.field_type.name},
+        mandatory: field_configuration.mandatory,
+        options: [],
+        root_field: self.field_configuration.root_field,
+        has_dependent_cf: field_configuration.has_dependent_cf
+    }
   end
 
   def set_field_key

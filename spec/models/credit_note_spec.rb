@@ -39,6 +39,12 @@
 #  last_adjusted_at              :datetime
 #  review_note                   :text(65535)
 #  erp_sync_status_id            :integer
+#  erp_sync_message              :text(65535)
+#  erp_sync_reference_id         :string(255)
+#  erp_sync_attempts_count       :integer          default("0")
+#  erp_sync_attempted_at         :datetime
+#  base_currency_id              :integer
+#  reporting_currency_id         :integer
 #
 
 require 'rails_helper'

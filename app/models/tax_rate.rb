@@ -17,6 +17,9 @@
 #  igst_internal_id :string(255)
 #  cgst_internal_id :string(255)
 #  sgst_internal_id :string(255)
+#  start_date       :date
+#  end_date         :date
+#  created_by_id    :integer
 #
 
 class TaxRate < ApplicationRecord
@@ -26,6 +29,7 @@ class TaxRate < ApplicationRecord
   include EventProducer
 
   belongs_to :company, optional: true
+  belongs_to :created_by, class_name: 'User', optional: true
 
   validates :rate, presence: true
 
@@ -51,8 +55,16 @@ class TaxRate < ApplicationRecord
         sgst_internal_id: self.sgst_internal_id,
         cgst_internal_id: self.cgst_internal_id,
         igst_internal_id: self.igst_internal_id,
-        display_name: "#{self.rate}% - #{self.name}",
+        display_name: "#{self.rate}% - #{self[:name]}",
         is_deleted: self.is_deleted
     }
   end
+
+  # def name
+  #   if RequestStoreUtil.current_user.non_po_invoice_form_enabled
+  #     "#{self.rate}% - #{self[:name]}"
+  #   else
+  #     self[:name]
+  #   end
+  # end
 end

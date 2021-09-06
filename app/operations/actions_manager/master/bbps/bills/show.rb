@@ -4,8 +4,7 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
 
   register_handle :bbps_bills_show
   register_actions [:update_and_submit, :edit, :policy_editable, :retract, :approve, :reject, :take_control,
-                    :return_control, :destroy, :view_payment_ticket, :raise_dispute,
-                    :bill_validate, :download_receipt, :transaction_status]
+                    :return_control, :destroy, :view_payment_ticket, :raise_dispute, :bill_validate, :download_receipt, :transaction_status, :audit_trail,  :expire_bill]
 
   def initialize(user = nil, params = {})
     super
@@ -76,6 +75,10 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
     BbpsBill.status_ids(:failed, :paid).include?(bbps_bill.status_id)
   end
 
+  def expire_bill
+    !bbps_bill.expired? && !bbps_bill.paid? && bbps_bill.autofetched
+  end
+
   private
 
   def has_taken_control?
@@ -92,5 +95,9 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
 
   def transaction_status
     BbpsBill.status_ids(:payment_initiated, :paid, :failed).include?(bbps_bill.status_id)
+  end
+
+  def audit_trail
+    true
   end
 end

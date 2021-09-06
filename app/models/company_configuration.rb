@@ -24,8 +24,10 @@
 #  legal_entity_name                :string(255)
 #  show_custom_fields_in_pdf        :boolean          default(TRUE)
 #  show_po_approved_trail           :boolean          default(FALSE)
-#  deleted_at                       :datetime
 #  email_purchase_order_initiator   :boolean
+#  deleted_at                       :datetime
+#  start_date                       :date
+#  end_date                         :date
 #
 
 class CompanyConfiguration < ApplicationRecord
@@ -36,6 +38,6 @@ class CompanyConfiguration < ApplicationRecord
   has_attached_file :logo, styles: {large: "2160x2160>", normal: "1080x1080>", thumb: "500x500>"}
   validates_attachment_content_type :logo, :content_type => ["image/jpg", "image/jpeg", "image/png", "image/gif"]
 
-  validates :company_id, presence: true, uniqueness: true
+  validates :company_id, uniqueness: true
 
 end

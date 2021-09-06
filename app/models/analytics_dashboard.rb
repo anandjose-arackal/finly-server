@@ -16,6 +16,7 @@
 #  deleted_at            :datetime
 #  created_at            :datetime         not null
 #  updated_at            :datetime         not null
+#  feature_toggle        :string(255)
 #
 class AnalyticsDashboard < ApplicationRecordBackwardCompatibility
   belongs_to :created_by, class_name: 'User', optional: true

@@ -2,22 +2,31 @@
 #
 # Table name: payment_terms
 #
-#  id          :integer          not null, primary key
-#  name        :text(65535)
-#  created_at  :datetime         not null
-#  updated_at  :datetime         not null
-#  days_after  :integer
-#  description :text(65535)
-#  company_id  :integer
-#  default     :boolean
-#  is_deleted  :boolean          default(FALSE), not null
-#  deleted_at  :datetime
+#  id            :integer          not null, primary key
+#  name          :text(65535)
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#  days_after    :integer
+#  description   :text(65535)
+#  company_id    :integer
+#  default       :boolean
+#  is_deleted    :boolean          default(FALSE), not null
+#  deleted_at    :datetime
+#  start_date    :date
+#  end_date      :date
+#  created_by_id :integer
+#  field_1       :string(255)
+#  field_2       :string(255)
+#  field_3       :string(255)
+#  field_4       :string(255)
+#  field_5       :string(255)
 #
 
 class PaymentTerm < ApplicationRecord
   include SoftDeletable
 
   belongs_to :company, optional: true
+  belongs_to :created_by, class_name: 'User', optional: true
 
 
   # contains the attributes of a few common payment terms

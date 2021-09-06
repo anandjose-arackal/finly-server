@@ -40,6 +40,10 @@ class TdsRatesList < ApplicationRecord
     }
   end
 
+  def dispaly_name
+    "#{tds}% - #{name}"
+  end
+
   # For Olx
   # DEFAULTS = [
   #     {

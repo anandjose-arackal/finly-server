@@ -1,0 +1,2 @@
+module Appsmith::CompaniesHelper
+end

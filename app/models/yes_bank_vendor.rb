@@ -84,6 +84,7 @@ class YesBankVendor < ApplicationRecord
   belongs_to :currency, optional: true
   belongs_to :payment_term, optional: true
   belongs_to :tax_rate, optional: true
+  # belongs_to :vendor_country, optional: true, class_name: 'Country'
 
   has_many :bank_accounts, as: :account_owner, dependent: :destroy
   has_many :receiving_payments, as: :receiving_user, class_name: 'Payment'
@@ -287,6 +288,18 @@ class YesBankVendor < ApplicationRecord
       self.build_vendor_account(balance_attributes: {value: 0, currency_id: 1}).save
     end
   end
+
+  before_save :set_vendor_country
+
+  def set_vendor_country
+    unless ["India", "International"].include?(self.vendor_country) 
+      vendor_country = FormEntityChoice.find_by(uuid: self.vendor_country)&.name
+      if vendor_country.present?
+        self.vendor_country = vendor_country
+      end
+    end
+  end
+
 
   ransack_scopes :with_status_id
   ransack_scopes :with_status_ids

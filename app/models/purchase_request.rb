@@ -6,22 +6,24 @@
 #  description                :text(65535)
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
-#  purchase_request_status_id :integer
-#  note                       :text(65535)
-#  creator_id                 :integer
-#  submitted_at               :datetime
-#  approved_at                :datetime
 #  location_id                :integer
 #  department_id              :integer
 #  policy_id                  :integer
 #  controlling_level_id       :integer
 #  company_id                 :integer
+#  purchase_request_status_id :integer
+#  note                       :text(65535)
+#  creator_id                 :integer
+#  submitted_at               :datetime
+#  approved_at                :datetime
 #  order_number               :string(255)
 #  reject_note                :text(65535)
 #  cost_center_id             :integer
 #  total_amount_id            :integer
 #  cost_allocation_items      :boolean          not null
 #  deleted_at                 :datetime
+#  base_currency_id           :integer
+#  reporting_currency_id      :integer
 #
 
 class PurchaseRequest < ApplicationRecord
@@ -33,6 +35,8 @@ class PurchaseRequest < ApplicationRecord
 
 
   acts_as_sequenced column: :order_number, purpose: :purchase_request, editable: false, prefix: 'PR'
+
+  alias_attribute :created_by_id, :creator_id
 
   default_scope { order(created_at: :desc) }
 
@@ -68,11 +72,10 @@ class PurchaseRequest < ApplicationRecord
 
   accepts_nested_attributes_for :purchase_request_items, :custom_fields, :attachments, allow_destroy: true
 
+  before_create :set_currency
   after_save :budget_trail_entry
   after_save :set_currency_for_amount, unless: :skip_callback
-
   after_destroy :budget_trail_destroy
-  before_create :set_currency
 
   has_paper_trail(
       meta: {
@@ -156,6 +159,8 @@ class PurchaseRequest < ApplicationRecord
       end
     when PurchaseRequestStatus::GROUP_APPROVED
       where purchase_request_status_id: PurchaseRequestStatus.ids_for(:approved, :auto_approved, :po_created, :partially_closed, :order_initiated)
+    when PurchaseRequestStatus::GROUP_APPROVED_ITEM
+      joins(:purchase_request_items).where('purchase_request_items.status_id IN (?)', [PurchaseRequestItemStatus.id_for(:approved)])
     else
       where purchase_request_status_id: status_ids
     end
@@ -529,11 +534,9 @@ class PurchaseRequest < ApplicationRecord
   def set_currency_for_amount
     amount_attr = [:total_amount]
     amount_attr.each do |amount_attribute|
-      
-      amount_value = self.send(amount_attribute)
       amount_attr_id = self.send("#{amount_attribute}_id")
       if amount_attr_id.present?
-        Amount.find_by(id: amount_attr_id).update(value: amount_value, currency_id: get_base_currency.id)
+        Amount.find_by(id: amount_attr_id).update(currency_id: get_base_currency.id)
       end
     end
     self.skip_callback = true

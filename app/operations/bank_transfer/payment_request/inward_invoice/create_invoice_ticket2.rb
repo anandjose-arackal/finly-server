@@ -86,7 +86,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
     # since previous state can be more than one type, this is a clean way to handle this
     self.inward_invoices.pluck(:id,:invoice_status_id).map { |id, st| self.invoices_status[id.to_i] = st }
     self.is_domestic = inward_invoices.first.is_domestic
-    base_currency_id = Currency.find_by(id: inward_invoices.first.base_currency).id rescue Currency.find_by(country_code: 'INR').id
+    base_currency_id = Currency.find_by(id: inward_invoices.first.get_base_currency.id).id rescue Currency.find_by(country_code: 'INR').id
     self.base_currency_id = base_currency_id
 
     Rails.logger.fatal "invoices_status,\n #{invoices_status.inspect}"
@@ -130,7 +130,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
 
     # condition for same currency check
     if self.inward_invoices.present?
-      if inward_invoices.pluck(:base_currency).compact.uniq.length != 1
+      if inward_invoices.pluck(:base_currency_id).compact.uniq.length != 1
         add_message :error, "Please add invoices with same base currency"
         return
       end
@@ -324,11 +324,11 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
         company_id: user.company_id,
         amount_requested_attributes: {
             value: self.requested_amount,
-            currency_id: user.company.reporting_currency.id
+            currency_id: self.base_currency_id
         },
         amount_processed_attributes: {
             value: 0,
-            currency_id: user.company.reporting_currency.id
+            currency_id: self.base_currency_id
         },
         payment_mode: self.payment_mode,
         transfer_mode_id: self.transfer_mode_id,
@@ -346,7 +346,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
         controlling_user_id: user.id,
         requested_amount_attributes: {
           value: self.requested_amount,
-          currency_id: user.company.reporting_currency.id
+          currency_id: self.base_currency_id
         },
         description: self.description,
         beneficiary_type_id: 2, # this is because an invoice will always come from a vendor

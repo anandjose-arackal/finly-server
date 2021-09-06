@@ -30,6 +30,7 @@
 #  deleted_at                      :datetime
 #  tat                             :integer
 #  tat_added_by_script             :boolean          default(FALSE)
+#  company_id                      :integer
 #
 
 FactoryBot.define do

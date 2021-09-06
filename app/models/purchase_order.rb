@@ -76,6 +76,8 @@
 #  vlpm_id                      :integer
 #  vendor_note                  :text(65535)
 #  erp_sync_status_id           :integer
+#  base_currency_id             :integer
+#  reporting_currency_id        :integer
 #
 
 class PurchaseOrder < ApplicationRecord
@@ -85,9 +87,12 @@ class PurchaseOrder < ApplicationRecord
   # include SearchIndex::Concerns::Document
   include Searchkick::Api
   include Concerns::ErpSyncConcern
+  include ErpSyncable
 
 
   acts_as_sequenced column: :po_number, purpose: :purchase_order, editable: false, prefix: 'PO/{fiscal_year_start}-{fiscal_year_end}/', min_length: 4
+
+  alias_attribute :created_by_id, :user_id
 
   default_scope { order(created_at: :desc) }
 
@@ -1296,7 +1301,7 @@ class PurchaseOrder < ApplicationRecord
     quantities = items.map(&:quantity).map(&:to_f)
     quantities.each do |quantity|
       flag = true if quantity <= 0
-      break
+      break if flag
     end
     
     errors.add(:items, "quantity must be greater than 0") if flag
@@ -1307,7 +1312,7 @@ class PurchaseOrder < ApplicationRecord
     rates = items.map(&:rate).map(&:to_f)
     rates.each do |rate|
       flag = true if rate <= 0
-      break
+      break if flag
     end
     
     errors.add(:items, "rate must be greater than 0") if flag

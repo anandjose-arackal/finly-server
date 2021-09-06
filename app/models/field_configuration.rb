@@ -27,6 +27,7 @@
 #  deleted_at              :datetime
 #  printable               :boolean          default(TRUE)
 #  user_level_field        :boolean          default(FALSE)
+#  has_dependent_cf        :boolean          default(FALSE)
 #
 
 class FieldConfiguration < ApplicationRecord
@@ -209,26 +210,10 @@ class FieldConfiguration < ApplicationRecord
 
   # Global - When expense is split, used to determine if the custom field should appear in the split or in the root
   def as_json(options = {})
-    if options[:called_from_drop_down]
-      result = {
-          field_type: {id: field_type.id,
-                       name: field_type.name},
-          label: field_name
-      }
-      return super.merge(result)
-    end
     options = []
-    # user_level_custom_fields = RequestStore.store[:current_user]&.company&.feature_subscription&.user_level_custom_fields? ? true : false
-    user_level_custom_fields = self.user_level_field
-    if field_type_id == FieldType.id_for(:drop_down)
-      # options = drop_down_items.exclude_deleted
-      # options = drop_down_items.non_deleted
-      if user_level_custom_fields
-        options = drop_down_items.exclude_deleted.filter_user_id(RequestStore.store[:current_user]&.id).includes(:dependent_field_configurations).find_each(batch_size: 100).reject(&:nil?)
-      else
-        options = drop_down_items.exclude_deleted.includes(:dependent_field_configurations).find_each(batch_size: 100).reject(&:nil?)
-      end
-    elsif field_type_id == FieldType.id_for(:multiselect)
+    if field_type_id == FieldType::TYPES[:drop_down]
+      options = drop_down_items.exclude_deleted
+    elsif field_type_id == FieldType::TYPES[:multiselect]
       options = multiselect_items.non_deleted
     end
     result = {
@@ -238,26 +223,11 @@ class FieldConfiguration < ApplicationRecord
                      name: field_type.name},
         mandatory: mandatory,
         global: self.global,
-        # value: self.default_value,
+        value: self.default_value,
         options: options,
-        root_field: self.root_field,
-        parent_drop_down_items: parent_drop_down_items
+        root_field: self.root_field
     }
-    if [FieldType.id_for(:drop_down)].include?(self.field_type_id)
-      # if self.drop_down_items.joins(:dependent_field_configurations).count > 0
-      #   result[:has_dependent_cf] = true
-      # end
-
-      # ddi = drop_down_items.pluck :id
-      result[:has_dependent_cf] = true if ParentDependentFieldConfigurationMapping.where(parent_id: drop_down_items).present?
-
-      # self.drop_down_items.each do |drop_down|
-      #   if drop_down.dependent_field_configurations.present?
-      #     result[:has_dependent_cf] = true
-      #     break
-      #   end
-      # end
-    end
+    result[:has_dependent_cf] = self.has_dependent_cf
     return result
   end
 

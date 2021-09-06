@@ -29,6 +29,14 @@
 #  active               :boolean          default(TRUE)
 #  item_expense_type_id :integer
 #  tds_applicable       :boolean          default(TRUE)
+#  start_date           :date
+#  end_date             :date
+#  created_by_id        :integer
+#  field_1              :string(255)
+#  field_2              :string(255)
+#  field_3              :string(255)
+#  field_4              :string(255)
+#  field_5              :string(255)
 #
 
 class Item < ApplicationRecord
@@ -36,6 +44,7 @@ class Item < ApplicationRecord
   include Sequenced::ActsAsSequenced
   include MathUtil
   include EventProducer
+
   # include SearchIndex::Concerns::Document
   include Searchkick::Api
 
@@ -43,6 +52,8 @@ class Item < ApplicationRecord
 
   default_scope { include_soft_deleted.order(created_at: :desc) }
   belongs_to :company, optional: true
+  belongs_to :created_by, class_name: 'User', optional: true
+
   belongs_to :category, optional: true
   belongs_to :tax_rate, optional: true
   belongs_to :supply_item_type, optional: true
@@ -112,7 +123,7 @@ class Item < ApplicationRecord
 
   after_save :budget_trail_entry
 
-  def as_json
+  def as_json(options={})
     {
       id: id,
       company_id: company_id,

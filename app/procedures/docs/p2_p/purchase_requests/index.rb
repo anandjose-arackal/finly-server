@@ -23,7 +23,7 @@ class Docs::P2P::PurchaseRequests::Index < IndexBuilder::API
   end
 
   column :amount, default: true, sort: :total_amount_value, includes: [total_amount: :currency] do
-    amount value: :total_amount, currency_code: :set_currency_code, currency_symbol: :set_currency_symbol
+    amount value: :total_amount
   end
 
   IndexBuilder::API::ColumnTemplate::ReviewProgress(self)
@@ -76,6 +76,11 @@ class Docs::P2P::PurchaseRequests::Index < IndexBuilder::API
     if user.has_permission?(:purchase_request_reviewer)
       counter.add PurchaseRequestStatus::GROUP_AWAITING_APPROVAL, 'Awaiting Approval',
                   collection.awaiting_action_items(user.id).count
+    end
+
+    if user.has_permission?(:purchase_request_reviewer)
+      counter.add PurchaseRequestStatus::GROUP_APPROVED_ITEM, 'Awaiting PO Creation',
+                  collection.joins(:purchase_request_items).where('purchase_request_items.status_id IN (?) and purchase_request_items.rejected = false', [PurchaseRequestItemStatus.id_for(:approved)]).count
     end
 
     # :processing
@@ -134,15 +139,6 @@ class Docs::P2P::PurchaseRequests::Index < IndexBuilder::API
     return "Multiple" if context[:exposure].cost_allocation_items
 
     context[:exposure].department&.name
-  end
-
-
-  def self.set_currency_code(context)
-    context[:record].get_base_currency.country_code
-  end
-
-  def self.set_currency_symbol(context)
-    context[:record].get_base_currency.symbol
   end
 
 end

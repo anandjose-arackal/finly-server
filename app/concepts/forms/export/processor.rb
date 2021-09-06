@@ -1,0 +1,216 @@
+class Forms::Export::Processor
+  attr_accessor :form, :user
+
+  def initialize(form, user)
+    self.form = form
+    self.user = user
+  end
+
+  def self.call(form, user)
+    self.new(form, user)
+  end
+
+  def headers
+    @headers ||= build_headers
+  end
+
+  def lookup_content
+    @lookup_content ||= build_lookup_content
+  end
+
+  def form_sections
+    @form_sections ||= form.sections.includes(entities: { entities: { entities: { entities: :entities } } })
+  end
+
+  def build_headers
+    sheets_headers = {}
+    sheets_headers[form.model.name] = {
+      name: form.label,
+      key: form.model.name,
+      headers: {
+        id: {
+          name: 'ID',
+          entity_key: 'id',
+          entity_type: 'text'
+        }
+      }
+    }
+
+    form_sections.each do |section|
+      section.entities.each do |entity|
+        next unless entity.parent_id.blank?
+        next unless entity.visible
+
+        sheets_headers[form.model.name][:headers].merge!(build_headers_for_entity(sheets_headers, form.label, entity, user))
+      end
+    end
+
+    sheets_headers.with_indifferent_access
+  end
+
+  def build_headers_for_entity(sheets_headers, parent_sheet_label, entity, user)
+    headers = {}
+
+    if entity.entities.blank?
+      if entity.visible
+        if entity.entity_type == 'switch'
+          headers[entity.entity_key.to_s] = {
+            name: "#{entity.label} (true/false)",
+            entity_key: entity.entity_key,
+            entity_type: entity.entity_type,
+            entity: entity,
+          }
+        elsif ['lookup', 'dropdown'].include?(entity.entity_type)
+          headers["#{entity.entity_key}_value"] = {
+            name: entity.label,
+            entity_key: entity.entity_key,
+            entity_type: entity.entity_type,
+            entity: entity,
+          }
+        else
+          headers[entity.entity_key.to_s] = {
+            name: entity.label,
+            entity_key: entity.entity_key,
+            entity_type: entity.entity_type,
+            entity: entity,
+          }
+        end
+      end
+    else
+      child_sheet_headers = {
+        parent_id: {
+          name: "#{parent_sheet_label.singularize} ID",
+          entity_key: 'parent_id',
+          entity_type: 'text'
+        },
+        id: {
+          name: 'ID',
+          entity_key: 'id',
+          entity_type: 'text'
+        }
+      }
+      entity.entities.each do |child_entity|
+        next unless child_entity.visible
+
+        child_sheet_headers.merge!(build_headers_for_entity(sheets_headers, entity.entity_key, child_entity, user))
+      end
+      sheets_headers[entity.entity_key] = {
+        name: entity.label,
+        key: entity.entity_key,
+        headers: child_sheet_headers,
+        entity: entity,
+      }
+    end
+
+    headers
+  end
+
+  def build_lookup_content
+    content = []
+
+    form.sections.each do |section|
+      next unless section.associate_custom_fields
+
+      section.entities.each do |entity|
+        next unless entity.visible
+        next unless ['lookup', 'dropdown'].include?(entity.entity_type)
+        next unless entity.choices_scope.present?
+
+        content << {
+          name: entity.label,
+          data: entity.choices_scope.build(user: self.user).as_json
+        }.with_indifferent_access
+      end
+    end
+
+    content
+  end
+
+  def build_export(input, request)
+    file = Tempfile.new(["#{form.label}_", '.xlsx'])
+    workbook = ::WriteXLSX.new(file, strings_to_urls: false)
+
+    worksheets = {}
+    worksheets_length = Hash.new(0)
+
+    self.headers.values.each do |sheet_data|
+      sheet_name = sheet_data[:name]
+      sheet_key = sheet_data[:key]
+      worksheets[sheet_key] = workbook.add_worksheet(sheet_name)
+      worksheets_length[sheet_key] = 0
+      self.headers[sheet_key][:headers].values.each_with_index do |header_data, header_index|
+        worksheets[sheet_key].write(0, header_index, header_data[:name])
+      end
+    end
+
+    input.each_with_index do |record, row_index|
+      form_data = record.form_data(form).with_indifferent_access
+      form_data['id'] = record.id
+
+      self.headers.values.each do |sheet_data|
+        sheet_name = sheet_data[:name]
+        sheet_key = sheet_data[:key]
+        if sheet_key == form.model.name
+          worksheets_length[sheet_key] += 1
+          self.headers[sheet_key][:headers].keys.each_with_index do |key, header_index|
+            column_data = form_data[key]
+            # get urls if attachments
+            if column_data.is_a?(Array) && column_data.present? && column_data[0].is_a?(Hash) && column_data[0].has_key?(:url)
+              column_data = (column_data.map { |d| d[:url] }).join("\n")
+            end
+            worksheets[sheet_key].write(1 + row_index, header_index, column_data)
+          end
+        else
+          parent_data = form_data
+          form_data[sheet_key]&.each do |child_data|
+            worksheets_length[sheet_key] += 1
+            self.headers[sheet_key][:headers].keys.each_with_index do |key, header_index|
+              column_data = child_data[key]
+              if key.to_s == 'parent_id'
+                column_data = parent_data['id']
+              end
+              # get urls if attachments
+              if column_data.is_a?(Array) && column_data.present? && column_data[0].is_a?(Hash) && column_data[0].has_key?(:url)
+                column_data = (column_data.map { |d| d[:url] }).join("\n")
+              end
+              worksheets[sheet_key].write(worksheets_length[sheet_key], header_index, column_data)
+            end
+          end
+        end
+      end
+      request.item_complete(true)
+    end
+
+    lookup_content.each_with_index do |content, index|
+      worksheet = workbook.add_worksheet(content[:name])
+
+      sheet_header_keys = []
+
+      if content[:data][:headers].present?
+        content[:data][:headers].each_with_index do |key_value, index|
+          sheet_header_keys << key_value[0]
+          worksheet.write(0, index, key_value[1][:label])
+        end
+      elsif content[:data][:choices].first.present?
+        content[:data][:choices].first.each_with_index do |key_value, index|
+          sheet_header_keys << key_value[0]
+          worksheet.write(0, index, key_value[0].titleize)
+        end
+      end
+
+      content[:data][:choices].each_with_index do |row, row_index|
+        sheet_header_keys.each_with_index do |header_key, header_index|
+          worksheet.write(1 + row_index, header_index, row[header_key.to_sym])
+        end
+      end
+    end
+
+    workbook.close
+
+    file.rewind
+
+    request.result_file = file
+    request.save
+    request.progress_update(:completed)
+  end
+end

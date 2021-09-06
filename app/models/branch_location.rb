@@ -2,29 +2,37 @@
 #
 # Table name: branch_locations
 #
-#  id                    :integer          not null, primary key
-#  name                  :string(255)
-#  gstin                 :string(255)
-#  pan                   :string(255)
-#  company_id            :integer
-#  address_1             :text(65535)
-#  address_2             :text(65535)
-#  city                  :string(255)
-#  state_id              :integer
-#  country               :string(255)
-#  pin                   :string(255)
-#  created_at            :datetime         not null
-#  updated_at            :datetime         not null
-#  contact_name          :string(255)
-#  contact_mobile_number :string(255)
-#  is_deleted            :boolean          default(FALSE), not null
-#  deleted_at            :datetime
-#  location_code         :string(255)
-#  ancestry              :string(255)
-#  nature_of_office      :string(255)
-#  billable_location     :boolean          default(TRUE)
-#  shippable_location    :boolean          default(TRUE)
-#  gl_code               :string(255)
+#  id                      :integer          not null, primary key
+#  name                    :string(255)
+#  tax_registration_number :string(255)
+#  pan                     :string(255)
+#  company_id              :integer
+#  address_1               :text(65535)
+#  address_2               :text(65535)
+#  city                    :string(255)
+#  state_id                :integer
+#  country                 :string(255)
+#  pin_code                :string(255)
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
+#  contact_name            :string(255)
+#  contact_mobile_number   :string(255)
+#  is_deleted              :boolean          default(FALSE), not null
+#  deleted_at              :datetime
+#  location_code           :string(255)
+#  ancestry                :string(255)
+#  nature_of_office        :string(255)
+#  billable_location       :boolean          default(TRUE)
+#  shippable_location      :boolean          default(TRUE)
+#  gl_code                 :string(255)
+#  start_date              :datetime
+#  end_date                :datetime
+#  created_by_id           :integer
+#  field_1                 :string(255)
+#  field_2                 :string(255)
+#  field_3                 :string(255)
+#  field_4                 :string(255)
+#  field_5                 :string(255)
 #
 
 class BranchLocation < ApplicationRecord
@@ -39,9 +47,16 @@ include Searchkick::Api
   event_channel 'locations'
 
   acts_as_sequenced column: :location_code, purpose: :branch_location, editable: false, prefix: 'LOC'
+
   has_ancestry
 
+  # This is support for old attributes which we were renamed during the masters generalization
+  alias_attribute :pin, :pin_code
+  alias_attribute :gstin, :tax_registration_number
+
   belongs_to :company, optional: true
+  belongs_to :created_by, class_name: 'User', optional: true
+
   belongs_to :state, optional: true
   has_many :company_location_departments
   has_many :company_departments, through: :company_location_departments
@@ -91,9 +106,9 @@ include Searchkick::Api
 
   # end
 
-  def pin
+  # def pin
 
-  end
+  # end
 
   # def as_json
   #   {

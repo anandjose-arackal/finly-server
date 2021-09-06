@@ -9,6 +9,7 @@
 #  deleted_at  :datetime
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
+#  pivot       :string(255)
 #
 class MlModelPmml < ApplicationRecord
   belongs_to :company

@@ -54,7 +54,7 @@ class PaymentFiles::Formats::HdfcBank::Process < PaymentFiles::Formats::BaseForm
           payment[:beneficiary_ifsc],
           payment[:beneficiary_account_name],
           '',
-          (self.beneficiary_email.present? ? self.beneficiary_email : payment[:receiving_user_email])
+          (self.beneficiary_email.present? ? self.beneficiary_email : (payment[:em_beneficiary_email].present? ? payment[:em_beneficiary_email] : payment[:receiving_user_email]))
       ]
     end
     self.contents = content
