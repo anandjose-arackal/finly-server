@@ -38,4 +38,13 @@ class PurchaseOrderItemExposure < Exposures::API
     (record.inventory_line_item&.product_type_id ==  ProductType.id_for(:service) ? (record.taxable_amount&.value - record.previously_billed_amount)&.to_f&.round(2) : "")
   end
 
+  attribute :invoiced_amount, record_attribute: false,exposure: false do
+    record.invoiced_total_amount
+  end
+
+  attribute :pending_invoice_amount, record_attribute: false,exposure: false do
+    (record.invoiced_total_amount - record.taxable_amount&.value)
+  end
+
+
 end
