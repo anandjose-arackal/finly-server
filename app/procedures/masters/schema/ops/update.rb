@@ -5,6 +5,7 @@ class Masters::Schema::Ops::Update < Masters::Schema::Ops::Base
   step Policy::Pundit(Masters::Schema::Policy, :update?)
   step Contract::Build(constant: Masters::Schema::Contract)
   step :set_entity_keys!
+  step :check_lookup_scopes
   step Contract::Validate()
   step Contract::Persist()
   # step Masters::Schema::Ops::MigrationRunner::Build()
@@ -50,5 +51,16 @@ class Masters::Schema::Ops::Update < Masters::Schema::Ops::Base
     true
   end
 
-
+  def check_lookup_scopes(context, model:, params:, **)
+    if params[:entities].present?
+      params[:entities].each do |entity|
+        if entity.dig(:choices_scope, :config, :route).present?
+          if entity.dig(:choices_scope, :config, :route).split('.')[-1] == model.master_key
+            return on_error context, entity[:label], "Lookup resource cannot be same as current master"
+          end
+        end
+      end
+    end
+    true
+  end
 end

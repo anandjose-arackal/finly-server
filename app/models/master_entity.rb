@@ -26,6 +26,8 @@
 #  updated_at                :datetime         not null
 #  choices_scope             :text(65535)
 #  primary_key               :boolean
+#  default_value             :string(255)
+#  do_not_show_in_data_cards :boolean          default(FALSE)
 #
 
 class MasterEntity < ApplicationRecord
@@ -45,7 +47,11 @@ class MasterEntity < ApplicationRecord
   scope :system_fields, -> { where system_entity: true }
   scope :custom_fields, -> { where.not system_entity: true }
   scope :show_in_lookup, -> { where show_in_lookup: true }
+  scope :primary_fields, -> { where primary_key: true }
+  scope :entities_for_lookup, -> { show_in_lookup.or(primary_fields) }
   scope :only_active, -> { where active: true }
+  scope :only_lookup_entities, -> { where type: 'MasterEntity::Lookup' }
+  scope :only_import_entities, -> { where.not type: 'MasterEntity::Sequence' }
 
   set :hint, 'Enter Value'
 
@@ -104,7 +110,7 @@ class MasterEntity < ApplicationRecord
   end
 
   contract_eval "Choices Scope" do |contract:, entity:, **|
-    if entity.choices_scope.present? and entity.entity_type == 'lookup'
+    if entity.choices_scope.present?
       contract.validate do
         id = send(entity.entity_key)
         if id.present?
@@ -161,12 +167,12 @@ class MasterEntity < ApplicationRecord
     }
 
     if type == 'MasterEntity::DropDown'
-      if choices_scope.type == :enum
-        data[:choices] = choices_scope.choices
-      else
+      if choices.present?
         data[:choices] = choices.map do |choice|
           choice.as_json
         end
+      else
+        data[:choices] = choices_scope.choices
       end
     end
 
@@ -174,9 +180,26 @@ class MasterEntity < ApplicationRecord
       data[:choices_scope] = choices_scope
       data[:choices_data] = choices_scope.build(user: RequestStoreUtil.current_user)
       data[:autocomplete_url] = 'lookup/' + choices_scope.route.gsub('.', '/')
+      data[:route] = choices_scope.route.split(".")[1]
     end
 
     data
   end
 
+  def import_label
+    case entity_type
+    when 'switch'
+      "#{label} (TRUE/FALSE)"
+    when 'sequence'
+      "#{label} (Auto-populated)"
+    when 'lookup', 'dropdown'
+      "#{label} ID"
+    when 'date'
+      "#{label} (YYYY-MM-DD)"
+    when 'datetime'
+      "#{label} (YYYY-MM-DD HH:MM:SS)"
+    else
+      label
+    end
+  end
 end

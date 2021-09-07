@@ -11,6 +11,7 @@
 #  company_department_id :integer
 #  branch_location_id    :integer
 #  deleted_at            :datetime
+#  company_id            :integer
 #
 
 class UserRoleMapping < ApplicationRecord

@@ -15,6 +15,7 @@
 #  parent_booking_id  :integer
 #  reject_reason      :text(65535)
 #  deleted_at         :datetime
+#  company_id         :integer
 #
 
 class Booking < ApplicationRecord

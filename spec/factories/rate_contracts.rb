@@ -16,6 +16,8 @@
 #  company_id              :integer
 #  rate_contract_number    :string(255)
 #  deleted_at              :datetime
+#  base_currency_id        :integer
+#  reporting_currency_id   :integer
 #
 
 FactoryBot.define do

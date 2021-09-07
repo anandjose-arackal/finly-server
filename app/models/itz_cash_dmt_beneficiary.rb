@@ -25,6 +25,7 @@
 #  default                :boolean
 #  reimbursement          :boolean          default(FALSE)
 #  deleted_at             :datetime
+#  company_id             :integer
 #
 
 class ItzCashDmtBeneficiary < ApplicationRecord

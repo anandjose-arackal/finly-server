@@ -26,6 +26,8 @@
 #  updated_at                :datetime         not null
 #  choices_scope             :text(65535)
 #  primary_key               :boolean
+#  default_value             :string(255)
+#  do_not_show_in_data_cards :boolean          default(FALSE)
 #
 
 class MasterEntity::Date < MasterEntity
@@ -42,7 +44,22 @@ class MasterEntity::Date < MasterEntity
     not_in_the_past
   ).freeze
 
+  DATE_FORMAT = '%Y-%m-%d'
+
   option :restriction
+
+  contract_eval 'Date validity' do |contract:, entity:, **|
+    contract.validate do
+      value = send(entity.entity_key)
+      next unless value.present?
+
+      begin
+        ::Date.strptime(value, DATE_FORMAT)
+      rescue ArgumentError
+        errors.add entity.label, 'invalid Date format'
+      end
+    end
+  end
 
   contract_eval 'Restriction' do |contract:, entity:, **|
     if entity.options['restriction'].present?
@@ -50,6 +67,13 @@ class MasterEntity::Date < MasterEntity
         value = send(entity.entity_key)
 
         next unless value.present?
+
+        # skip validation if date is invalid format as it is checked separately
+        begin
+          ::Date.strptime(value, DATE_FORMAT)
+        rescue ArgumentError
+          next
+        end
 
         case entity.options['restriction']
         when 'in_the_future'

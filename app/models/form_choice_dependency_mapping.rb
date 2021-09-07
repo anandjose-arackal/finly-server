@@ -9,6 +9,7 @@
 #  created_at            :datetime         not null
 #  updated_at            :datetime         not null
 #  controlling_choice_id :string(255)
+#  company_id            :integer
 #
 
 class FormChoiceDependencyMapping < ApplicationRecord

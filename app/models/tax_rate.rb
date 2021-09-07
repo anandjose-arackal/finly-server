@@ -17,6 +17,9 @@
 #  igst_internal_id :string(255)
 #  cgst_internal_id :string(255)
 #  sgst_internal_id :string(255)
+#  start_date       :date
+#  end_date         :date
+#  created_by_id    :integer
 #
 
 class TaxRate < ApplicationRecord
@@ -26,6 +29,7 @@ class TaxRate < ApplicationRecord
   include EventProducer
 
   belongs_to :company, optional: true
+  belongs_to :created_by, class_name: 'User', optional: true
 
   validates :rate, presence: true
 

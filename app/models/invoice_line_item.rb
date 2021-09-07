@@ -71,7 +71,8 @@
 #  item_billable_amount           :decimal(20, 5)
 #  reporting_item_billable_amount :decimal(20, 5)
 #  tax_type                       :string(255)      default("")
-#  item_rate                      :decimal(10, )    default(0)
+#  item_rate                      :decimal(20, 5)   default(0.0)
+#  company_id                     :integer
 #
 
 class InvoiceLineItem < ApplicationRecord

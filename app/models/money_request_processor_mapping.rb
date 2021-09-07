@@ -17,6 +17,7 @@
 #  note                       :text(65535)
 #  bank_reference_number      :string(255)
 #  deleted_at                 :datetime
+#  company_id                 :integer
 #
 
 class MoneyRequestProcessorMapping < ApplicationRecord

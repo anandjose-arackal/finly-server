@@ -1,3 +1,11 @@
+# == Schema Information
+#
+# Table name: countries
+#
+#  id         :bigint           not null, primary key
+#  name       :string(255)
+#  deleted_at :datetime
+#
 class Country < NonTenantedApplicationRecord
 
   def self.id_for(country)

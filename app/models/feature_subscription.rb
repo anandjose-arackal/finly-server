@@ -2,48 +2,51 @@
 #
 # Table name: feature_subscriptions
 #
-#  id                             :integer          not null, primary key
-#  subscribable_id                :integer          not null
-#  subscribable_type              :string(255)      not null
-#  ocr_enabled                    :boolean          default(FALSE), not null
-#  expense_management_enabled     :boolean          default(FALSE), not null
-#  gift_card_enabled              :boolean          default(FALSE), not null
-#  gift_voucher_enabled           :boolean          default(FALSE), not null
-#  meal_card_enabled              :boolean          default(FALSE), not null
-#  fuel_card_enabled              :boolean          default(FALSE), not null
-#  medical_card_enabled           :boolean          default(FALSE), not null
-#  created_at                     :datetime         not null
-#  updated_at                     :datetime         not null
-#  expense_card_enabled           :boolean          default(FALSE)
-#  reimbursement_card_enabled     :boolean          default(FALSE)
-#  hard_copy_receipt              :boolean          default(FALSE)
-#  itz_cash_d_code_enabled        :boolean          default(FALSE)
-#  yes_bank_account               :boolean
-#  bank_account_reimbursement     :boolean
-#  payroll_card_enabled           :boolean          default(FALSE)
-#  current_account_connected      :boolean
-#  invoicing_system               :boolean          default(FALSE)
-#  travel_request                 :boolean          default(FALSE)
-#  budgeting_system               :boolean          default(FALSE)
-#  em_tax_tracking                :boolean          default(FALSE)
-#  procurement                    :boolean          default(FALSE)
-#  custom_currency_conversion     :boolean          default(FALSE)
-#  vendor_empanelment_workflow    :boolean          default(FALSE)
-#  purchase_requisition_system    :boolean
-#  bank_service_provider          :string(255)
-#  group_entity_structure         :boolean          default(FALSE)
-#  grn_enabled                    :boolean          default(TRUE)
-#  srn_enabled                    :boolean          default(FALSE)
-#  vendor_portal                  :boolean          default(FALSE)
-#  agreement_based_payment_system :boolean          default(FALSE)
-#  gstin_verification_enabled     :boolean          default(FALSE)
-#  utility_bills_enabled          :boolean          default(FALSE)
-#  analytics_system               :boolean
-#  request_encryption_enabled     :boolean          default(FALSE)
-#  user_level_custom_fields       :boolean          default(FALSE)
-#  deleted_at                     :datetime
-#  sso_login_enforced             :boolean          default(FALSE)
-#  enforce_budget_limit           :boolean          default(FALSE)
+#  id                                :integer          not null, primary key
+#  subscribable_id                   :integer          not null
+#  subscribable_type                 :string(255)      not null
+#  ocr_enabled                       :boolean          default(FALSE), not null
+#  expense_management_enabled        :boolean          default(FALSE), not null
+#  gift_card_enabled                 :boolean          default(FALSE), not null
+#  gift_voucher_enabled              :boolean          default(FALSE), not null
+#  meal_card_enabled                 :boolean          default(FALSE), not null
+#  fuel_card_enabled                 :boolean          default(FALSE), not null
+#  medical_card_enabled              :boolean          default(FALSE), not null
+#  created_at                        :datetime         not null
+#  updated_at                        :datetime         not null
+#  expense_card_enabled              :boolean          default(FALSE)
+#  reimbursement_card_enabled        :boolean          default(FALSE)
+#  hard_copy_receipt                 :boolean          default(FALSE)
+#  itz_cash_d_code_enabled           :boolean          default(FALSE)
+#  yes_bank_account                  :boolean
+#  bank_account_reimbursement        :boolean
+#  payroll_card_enabled              :boolean          default(FALSE)
+#  current_account_connected         :boolean
+#  invoicing_system                  :boolean          default(FALSE)
+#  travel_request                    :boolean          default(FALSE)
+#  budgeting_system                  :boolean          default(FALSE)
+#  em_tax_tracking                   :boolean          default(FALSE)
+#  procurement                       :boolean          default(FALSE)
+#  custom_currency_conversion        :boolean          default(FALSE)
+#  vendor_empanelment_workflow       :boolean          default(FALSE)
+#  purchase_requisition_system       :boolean
+#  bank_service_provider             :string(255)
+#  group_entity_structure            :boolean          default(FALSE)
+#  grn_enabled                       :boolean          default(TRUE)
+#  srn_enabled                       :boolean          default(FALSE)
+#  vendor_portal                     :boolean          default(FALSE)
+#  agreement_based_payment_system    :boolean          default(FALSE)
+#  gstin_verification_enabled        :boolean          default(FALSE)
+#  utility_bills_enabled             :boolean          default(FALSE)
+#  analytics_system                  :boolean
+#  request_encryption_enabled        :boolean          default(FALSE)
+#  user_level_custom_fields          :boolean          default(FALSE)
+#  deleted_at                        :datetime
+#  sso_login_enforced                :boolean          default(FALSE)
+#  enforce_budget_limit              :boolean          default(FALSE)
+#  company_id                        :integer
+#  awaiting_approval_summary_enabled :boolean          default(FALSE)
+#  predictions_enabled               :boolean          default(FALSE)
 #
 
 class FeatureSubscription < ApplicationRecord
