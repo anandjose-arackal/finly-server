@@ -50,10 +50,13 @@ class Bbps::Api < ServiceApi
   def body
     m1 = "{\"chId\":1,\"custDetails\":{\"mobileNo\":\"8879397255\",\"customerTags\":[{\"name\":\"EMAIL\",\"value\":\"mk.chekuri@gmail.com\"},{\"name\":\"AADHAAR\",\"value\":\"499118665246\"},{\"name\":\"PAN\",\"value\":\"BXXCG7754K\"}]},\"agentDetails\":{\"agentId\":\"YB31YB41MOB521611569\",\"deviceTags\":[{\"name\":\"IP\",\"value\":\"124.170.23.24\"},{\"name\":\"MAC\",\"value\":\"01-23-45-67-89-ab\"}]},\"billDetails\":{\"billerId\":\"ASCE00000NATGK\",\"customerParams\":[{\"name\":\"Loan number\",\"value\":\"17000036\"}]}}"
     m2 = "sample"
-    message = "FCEtV3bbmRQqRPDe++Exq4c5eAcgD+xEE8313baqaxOzfvoqw/gQsG4LbOMABfRySPe3WTynow1NRJ6gNjnhWi9ujU4X4Jxl1YiMCB1fGXa1snS1acHr5h3981JB6KvahHOeGfp7zVd5w96Sc+bWwOi24fWGV+n8lGvMa+SDQPNqmhhDJbmAfPAdzxm/TPy9UNw5IWaOL7hXAxdKzQNO1qZIldpoXbdLn5GAvBJY9PdGkiXwVxtNwp9UIPemKQAfnvLYx5tV80WkZlp+c/EqWVrlaxQ1Dm7Gg7rXNdJiTx10tVRpjQ+LUEgdwWRd/ZeS7I3eVU0PavZ7kD5iY1rl+ouoriV5mWRcGceTwUeGRWMb1R6MqEd8xNeI/06B89ioRCfMjtRuoQpcvvql0RL3bvYxUdwSBz7OPcLxV1UAuj451kvEe9kmyRu3P6Vm0kDDYxvfGxo27ecH8xp0Rq7CyuVB37kL2X4CqW6eub7MUVknXbtuknj8wLzQvqrUFvATBWoX7rqus5WFH48pxntwy2aP0GZ+fpmHbBUFc1uTJXZo3aqbPt2B7Tgk0ZC1mLQx38pdfyijERo6emqD2/LS5A=="
+    message = generate_message
+    #fetch : message = "FCEtV3bbmRQqRPDe++Exq4c5eAcgD+xEE8313baqaxOzfvoqw/gQsG4LbOMABfRySPe3WTynow1NRJ6gNjnhWi9ujU4X4Jxl1YiMCB1fGXa1snS1acHr5h3981JB6KvahHOeGfp7zVd5w96Sc+bWwOi24fWGV+n8lGvMa+SDQPNqmhhDJbmAfPAdzxm/TPy9UNw5IWaOL7hXAxdKzQNO1qZIldpoXbdLn5GAvBJY9PdGkiXwVxtNwp9UIPemKQAfnvLYx5tV80WkZlp+c/EqWVrlaxQ1Dm7Gg7rXNdJiTx10tVRpjQ+LUEgdwWRd/ZeS7I3eVU0PavZ7kD5iY1rl+ouoriV5mWRcGceTwUeGRWMb1R6MqEd8xNeI/06B89ioRCfMjtRuoQpcvvql0RL3bvYxUdwSBz7OPcLxV1UAuj451kvEe9kmyRu3P6Vm0kDDYxvfGxo27ecH8xp0Rq7CyuVB37kL2X4CqW6eub7MUVknXbtuknj8wLzQvqrUFvATBWoX7rqus5WFH48pxntwy2aP0GZ+fpmHbBUFc1uTJXZo3aqbPt2B7Tgk0ZC1mLQx38pdfyijERo6emqD2/LS5A=="
+    #status
+    message = "Mspt9PGdqqUm1MVwjlLBgeU9Fj37gtaTTPYGim1yvm9vAFG98+Lb8Ij8+Kp7Eg3B0HKYWlpmU2lK2YuHxxjeAKXGa0SXI6Fqw7BhCpfwf1gq7Ls7uHuNG/rHM7bgIWJ3" 
     Rails.logger.info("Encryption key :: #{self.class.encryption_key}")
     encrypted_message = encrypt(m1)
-
+    byebug
     Rails.logger.info("Encrypted message :: #{encrypted_message}")
     body = {request: message, agentInstitutionId: agent_institution_id}
     log_generator.merge({request_raw_message: message})
@@ -61,7 +64,6 @@ class Bbps::Api < ServiceApi
   end
 
   def generate_message
-    
     req = []
     fetch(:request_fields).each do |field|
       val = (self.respond_to?(field) ? self.send(field) : nil)
@@ -79,12 +81,14 @@ class Bbps::Api < ServiceApi
     result = nil
     Open3.popen3("java UPISecurity.java \"#{message}\" \"#{self.class.encryption_key}\"") do |stdin, stdout, strerr|
        result = stdout.read
+       result = strerr.read
     end
     result
   end
 
   # Map the response splits with the respective headers provided by response_fields
   def parse_response(user, params, response)
+    byebug
     Rails.logger.info "BBPS response :: #{response}"
        Rails.logger.info "BBPS response :: #{response.inspect}"
     return Failure("Invalid response") unless response.status == 200

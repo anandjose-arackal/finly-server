@@ -9,7 +9,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class App {
     public static void main(String[] args) throws Exception {
-        String message = "{\"chId\":1,\"custDetails\":{\"mobileNo\":\"7406032047\",\"customerTags\":[{\"name\":\"EMAIL\",\"value\":\"mk.chekuri@gmail.com\"},{\"name\":\"AADHAAR\",\"value\":\"499118665246\"},{\"name\":\"PAN\",\"value\":\"BXXCG7754K\"}]},\"agentDetails\":{\"agentId\":\"YB31YB41MOB521611569\",\"deviceTags\":[{\"name\":\"INITIATING_CHANNEL\",\"value\":\"INT\"},{\"name\":\"IP\",\"value\":\"124.170.23.24\"},{\"name\":\"MAC\",\"value\":\"01-23-45-67-89-ab\"}]},\"billDetails\":{\"billerId\":\"TATASKY00NAT01\",\"billerName\":\"Tata Sky\",\"customerParams\":[{\"name\":\"Subscriber Number\",\"value\":\"1146681844\"}]}}";
+        String message = "{\"chId\":1,\"custDetails\":{\"mobileNo\":\"8879397255\",\"customerTags\":[{\"name\":\"EMAIL\",\"value\":\"mk.chekuri@gmail.com\"},{\"name\":\"AADHAAR\",\"value\":\"499118665246\"},{\"name\":\"PAN\",\"value\":\"BXXCG7754K\"}]},\"agentDetails\":{\"agentId\":\"YB31YB41MOB521611569\",\"deviceTags\":[{\"name\":\"INITIATING_CHANNEL\",\"value\":\"INT\"},{\"name\":\"IP\",\"value\":\"124.170.23.24\"},{\"name\":\"MAC\",\"value\":\"01-23-45-67-89-ab\"}]},\"billDetails\":{\"billerId\":\"ASCE00000NATGK\",\"billerName\":\"Ascend Capital\",\"customerParams\":[{\"name\":\"Loan number\",\"value\":\"17000036\"}]}}"
         String secretKey = "2321bd46f297a35241efe1744df7898c";
         String base64EncryptedString;
         MessageDigest md = MessageDigest.getInstance("SHA-256"); 
@@ -27,3 +27,4 @@ public class App {
         System.out.print(base64EncryptedString);
     }
 }
+
