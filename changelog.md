@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file. Always add new logs to 
 beginning of this file.
+
+## 2021-09-08
+ - Fix: Reviewers and Pending Reviewers added in vendor exposure
 ## 2021-09-07
   - Fix: Invoices in Initiated status not visible for Reviewer only roles
 
@@ -12,7 +15,6 @@ beginning of this file.
 
 ## 2011-09-02
   - Fix Payment attribute overrided to handle different scenario ot UTR upload and API payment
-
 ## 2021-09-01
   - Fix: Payments and completed payments relation defined in Invoice exposure
 
