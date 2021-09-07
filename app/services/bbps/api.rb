@@ -79,7 +79,9 @@ class Bbps::Api < ServiceApi
   def encrypt(message)
     result = nil
     Open3.popen3("java UPISecurity.java \"#{message}\" \"#{self.class.encryption_key}\"") do |stdin, stdout, strerr|
-       result = stdout.read
+       result = "message \n"
+       result << stdout.read
+       result << "\nerror\n"
        result << strerr.read
     end
     result
