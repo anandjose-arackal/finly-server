@@ -56,7 +56,6 @@ class Bbps::Api < ServiceApi
     message = "Mspt9PGdqqUm1MVwjlLBgeU9Fj37gtaTTPYGim1yvm9vAFG98+Lb8Ij8+Kp7Eg3B0HKYWlpmU2lK2YuHxxjeAKXGa0SXI6Fqw7BhCpfwf1gq7Ls7uHuNG/rHM7bgIWJ3" 
     Rails.logger.info("Encryption key :: #{self.class.encryption_key}")
     encrypted_message = encrypt(m1)
-    byebug
     Rails.logger.info("Encrypted message :: #{encrypted_message}")
     body = {request: message, agentInstitutionId: agent_institution_id}
     log_generator.merge({request_raw_message: message})
@@ -88,9 +87,8 @@ class Bbps::Api < ServiceApi
 
   # Map the response splits with the respective headers provided by response_fields
   def parse_response(user, params, response)
-    byebug
     Rails.logger.info "BBPS response :: #{response}"
-       Rails.logger.info "BBPS response :: #{response.inspect}"
+    Rails.logger.info "BBPS response :: #{response.inspect}"
     return Failure("Invalid response") unless response.status == 200
     json = JSON.parse response.body
     return Failure("Invalid response") unless json&.dig('responseMsg').present?
