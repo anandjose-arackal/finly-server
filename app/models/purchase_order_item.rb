@@ -97,8 +97,8 @@ class PurchaseOrderItem < ApplicationRecord
 
   # removing for now
   # validates_presence_of :unit_of_measurement
-  validates_presence_of :department
-  validates_presence_of :rate
+  # validates_presence_of :department
+  # validates_presence_of :rate
 
   accepts_nested_attributes_for :tax_amount, :discount_amount, :taxable_amount,
                                 :total_amount

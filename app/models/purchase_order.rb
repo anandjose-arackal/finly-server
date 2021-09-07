@@ -82,20 +82,17 @@
 
 class PurchaseOrder < ApplicationRecord
   attr_accessor :skip_callback
-
   include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport, ControllingUser, GetCurrency
-  include Sequenced::ActsAsSequenced
-  include Searchkick::Api
   include Concerns::ErpSyncConcern
-  include ErpSyncable
-
   include LiquidDroppable
   include Exposures::Model::Exposable
+  include Sequenced::ActsAsSequenced
   include FormsHelper
+  include ErpSyncable
+  include Searchkick::Api
 
   # # Multicurrency Support
   # include Monetizable
-
   acts_as_sequenced column: :po_number, purpose: :purchase_order, editable: false, prefix: 'PO/{fiscal_year_start}-{fiscal_year_end}/', min_length: 4
 
   alias_attribute :created_by_id, :user_id
