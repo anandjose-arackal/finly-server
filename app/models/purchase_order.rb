@@ -1030,20 +1030,17 @@ class PurchaseOrder < ApplicationRecord
 
   def amounts_attributes_map
     # todo - I2P change it to converted values post multicurrency setup
-    
     {  
-      # po_gross_amount: 'total_before_tax', 'discount_amount'
       po_discount_amount: 'discount_amount',
       po_taxable_amount: 'total_before_tax',
       po_tax_amount: 'tax_amount',
       po_sub_total_amount: 'total_after_tax',
-      # po_total_amount: 'balance_amount',
       po_balance_due: 'balance_amount',
 
       # Purchase Order Advance
-      po_requested_advance_amount: 'requested_advance_amount',
-      po_advance_tds_amount: 'advance_tds_amount',
-      po_advance_amount: 'advance_amount'
+      # po_requested_advance_amount: 'requested_advance_amount',
+      # po_advance_tds_amount: 'advance_tds_amount',
+      # po_advance_amount: 'advance_amount'
     }
   end
 

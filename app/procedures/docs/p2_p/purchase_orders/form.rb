@@ -411,7 +411,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
   # CONDITIONS
   condition condition_id: "Policy should not be editable once unless in editable status" do
     reference :entity, :policy_id
-    rule Rules::Builder[:status_id].eq_any(*PurchaseOrderStatus.ids_for(:open).map { |item| { value: item } })
+    rule Rules::Builder[:purchase_order_status_id].eq_any(*PurchaseOrderStatus.ids_for(:open).map { |item| { value: item } })
     action :editable, true
     action :required, true
   end
