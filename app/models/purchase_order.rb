@@ -1140,9 +1140,39 @@ class PurchaseOrder < ApplicationRecord
         else
           item.total_amount = Amount.new(value: item_total_amount, currency_id: get_base_currency.id)
         end
+      end
 
+      migrate_new_column_data
+    end
 
-        # end
+    def migrate_new_column_data
+      self.items.each do |item|
+        update_params = {
+          tax_percentage: item&.tax_rate&.rate,
+          gl_code: item&.gl_code.present? ? item&.gl_code :  ( item&.category&.gl_code.present? ? item&.category&.gl_code : item&.inventory_line_item&.item_number),
+          item_number: item&.inventory_line_item&.item_number,
+        
+          items_department_id: item&.department_id,
+          items_cost_center_id: item&.cost_center_id,
+          product_type_id: item&.inventory_line_item&.product_type_id,
+
+          item_rate: item&.rate.to_f,
+          rate: item&.rate.to_f,
+
+          item_gross_amount: item&.quantity.to_f * item&.rate.to_f,
+          reporting_item_gross_amount: item&.quantity.to_f * item&.rate.to_f,
+        
+          item_discount_amount:  item&.discount_amount&.value.to_f,
+          reporting_item_discount_amount:  item&.discount_amount&.value.to_f,
+          item_taxable_amount:  item&.taxable_amount&.value.to_f,
+          reporting_item_taxable_amount:  item&.taxable_amount&.value.to_f ,        
+          item_tax_amount: item&.tax_amount&.value.to_f ,
+          reporting_item_tax_amount: item&.tax_amount&.value.to_f,
+          item_net_amount: item&.total_amount&.value.to_f,
+          reporting_item_net_amount: item&.total_amount&.value.to_f,
+        }
+        item.skip_callback = true
+        item.update_columns(update_params)
       end
     end
 
