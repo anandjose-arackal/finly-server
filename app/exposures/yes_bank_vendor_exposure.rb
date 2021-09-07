@@ -94,4 +94,12 @@ class YesBankVendorExposure < Exposures::API
   attribute :approval_pending_reviewers, includes: [:level, :document_level_reviewer_mappings] do
     record.get_reviewers&.map(&:name)&.join(", ")
   end
+
+  attribute :rejection_comments, includes: [:trails] do
+    trail_texts =[]
+    record.trails.only_reject.each do |trail|
+      trail_texts  << trail.generate_trail_body_note(nil)
+    end
+    trail_texts.compact.join(', ')
+  end
 end
