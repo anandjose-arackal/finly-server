@@ -29,14 +29,14 @@ class PurchaseOrderMigrator
           # Migrate Custom Fields
           update_custome_fields form, document, company
           
-          # First migrate invoice line items
+          # First migrate po line items
           update_item document
 
-          # Migrate Invoice Data
-          update_invoice_details document
+          # Migrate po Data
+          update_po_details document
           
           # Migrate Attachments
-          update_invoice_attachments( form, document)
+          update_po_attachments( form, document)
 
         end
       end
@@ -80,7 +80,7 @@ class PurchaseOrderMigrator
 
   def self.create_text_custom_field form, custom_field, company
     form_id = form.uuid
-    section_id = FormSection.where(section_id: 'invoice_details', company_id: company.id, form_id: form_id).first.uuid
+    section_id = FormSection.where(section_id: 'po_details', company_id: company.id, form_id: form_id).first.uuid
     required = custom_field.field_configuration.mandatory
     active = custom_field.field_configuration.enabled
     label = custom_field.field_configuration.field_name
@@ -119,7 +119,7 @@ class PurchaseOrderMigrator
   def self.create_drop_down_custom_field form, custom_field, company
 
     form_id = form.uuid
-    section_id = FormSection.where(section_id: 'invoice_details', company_id: company.id, form_id: form_id).first.uuid
+    section_id = FormSection.where(section_id: 'purchase_order_details', company_id: company.id, form_id: form_id).first.uuid
     required = custom_field.field_configuration.mandatory
     active = custom_field.field_configuration.enabled
     label = custom_field.field_configuration.field_name
@@ -206,8 +206,8 @@ class PurchaseOrderMigrator
         
         item_discount_amount:  item&.discount_amount&.value.to_f,
         reporting_item_discount_amount:  item&.discount_amount&.value.to_f,
-        item_taxable_amount:  item&.taxable_amount.value.to_f,
-        reporting_item_taxable_amount:  item&.taxable_amount.value.to_f ,        
+        item_taxable_amount:  item&.taxable_amount&.value.to_f,
+        reporting_item_taxable_amount:  item&.taxable_amount&.value.to_f ,        
         item_tax_amount: item&.tax_amount&.value.to_f ,
         reporting_item_tax_amount: item&.tax_amount&.value.to_f,
         item_net_amount: item&.total_amount&.value.to_f,
@@ -221,7 +221,7 @@ class PurchaseOrderMigrator
     end
   end
 
-  def self.update_invoice_details document
+  def self.update_po_details document
     update_params = {
 
       base_currency_id: Currency.find_by(country_code: 'INR').id,
@@ -231,7 +231,7 @@ class PurchaseOrderMigrator
 
       payment_term_days: document&.payment_term&.days_after,
       gst_type_id: document&.gst_type_id,
-      conversion_date: document&.date&.to_date,
+      # conversion_date: document&.date&.to_date,
 
       # *************************** VENDOR DETAILS *************************** 
       vendor_country_id: document&.vendor&.vendor_country,
@@ -242,13 +242,13 @@ class PurchaseOrderMigrator
       
       gstin_location_id: document&.gstin_location_id,
 
-      vendor_poc_name: document&.gstin_location&.vendor_poc_name,
-      vendor_poc_email: document&.gstin_location&.vendor_poc_email,
-      vendor_poc_mobile_number: document&.gstin_location&.vendor_poc_mobile_number,
+      vendor_poc_name: document&.gstin_location&.poc_name,
+      vendor_poc_email: document&.gstin_location&.poc_email,
+      vendor_poc_mobile_number: document&.gstin_location&.poc_mobile_number,
 
-      vendor_bank_account_number: document&.receiving_account&.account_number,
-      vendor_bank_account_ifsc: document&.receiving_account&.ifsc,
-      vendor_bank_account_swift_code: document&.receiving_account&.swift_code,
+      vendor_bank_account_number: document&.bank_account&.account_number,
+      vendor_bank_account_ifsc: document&.bank_account&.ifsc,
+      vendor_bank_account_swift_code: document&.bank_account&.swift_code,
       # *************************** VENDOR DETAILS *************************** 
 
       billing_address_name: document&.location&.name,
@@ -279,18 +279,18 @@ class PurchaseOrderMigrator
 
       # *************************** Document Advance ***************************
       
-      # INVOICE SUMMARY
+      # PO SUMMARY
       po_gross_amount: (document&.total_before_tax&.value.to_f + document&.discount_amount&.value.to_f),
       reporting_po_gross_amount: (document&.total_before_tax&.value.to_f + document&.discount_amount&.value.to_f),
 
       po_discount_amount: document&.discount_amount&.value.to_f,
       reporting_po_discount_amount: document&.discount_amount&.value.to_f,
       
-      po_taxable_amount: document&.total_before_tax.value.to_f,
-      reporting_po_taxable_amount: document&.total_before_tax.value.to_f,
+      po_taxable_amount: document&.total_before_tax&.value.to_f,
+      reporting_po_taxable_amount: document&.total_before_tax&.value.to_f,
 
-      po_tax_amount: document&.tax_amount.value.to_f,
-      reporting_po_tax_amount: document&.tax_amount.value.to_f,
+      po_tax_amount: document&.tax_amount&.value.to_f,
+      reporting_po_tax_amount: document&.tax_amount&.value.to_f,
       
       po_sub_total_amount: document&.total_after_tax&.value.to_f,
       reporting_po_sub_total_amount: document&.total_after_tax&.value.to_f,
@@ -309,28 +309,28 @@ class PurchaseOrderMigrator
     document.update_columns(update_params)
   end
 
-  def self.update_invoice_attachments( form, document)
+  def self.update_po_attachments(form, document)
     document.attachments.each do |old_attachment|
-      relevant_custom_field = document.form_custom_fields.where(field_key: 'invoice_attachments').first
+      relevant_custom_field = document.form_custom_fields.where(field_key: 'po_attachments').first
 
       if relevant_custom_field.present?
-        new_attachment = add_attachment_to_new_invoice( old_attachment, relevant_custom_field )
+        new_attachment = add_attachment_to_new_po( old_attachment, relevant_custom_field )
       else
-        entity  = form.entities.where(entity_key: 'invoice_attachments').first
+        entity  = form.entities.where(entity_key: 'attachments').first
         document.form_custom_fields.create({
-            document_type: 'Invoice', document_id: document.id, form_id: form.id, form_entity_id: entity.id,
-            field_key: 'invoice_attachments', value: "", value_text: nil, entity_type: 'attachments',
+            document_type: 'PurchaseOrder', document_id: document.id, form_id: form.id, form_entity_id: entity.id,
+            field_key: 'po_attachments', value: "", value_text: nil, entity_type: 'attachments',
          })
 
-        relevant_custom_field = document.form_custom_fields.where(field_key: 'invoice_attachments').first
-        new_attachment = add_attachment_to_new_invoice( old_attachment, relevant_custom_field )
+        relevant_custom_field = document.form_custom_fields.where(field_key: 'po_attachments').first
+        new_attachment = add_attachment_to_new_po( old_attachment, relevant_custom_field )
       end
       
       new_attachment.update_attribute(:attachment_updated_at,  old_attachment.created_at )
     end    
   end
 
-  def self.add_attachment_to_new_invoice( old_attachment, relevant_custom_field )
+  def self.add_attachment_to_new_po( old_attachment, relevant_custom_field )
     new_attachment = relevant_custom_field.attachments.new()
     if Rails.env.production?
       begin
