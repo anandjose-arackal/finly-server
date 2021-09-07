@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file. Always add new logs to 
 beginning of this file.
+## 2021-09-07
+  - Fix: Invoices in Initiated status not visible for Reviewer only roles
+
+## 2022-09-07
+ - Fix: Purchase Order - GRN - Invoice combined export exposure addeed
 
 ## 2021-09-02
   - Fix: HDFC Payment file format added with beneficiary email in em
