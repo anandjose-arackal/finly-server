@@ -65,7 +65,7 @@ gem 'health-monitor-rails', '~> 8.4.0'
 
 # puma web server
 gem 'figaro', '~> 1.2'
-gem 'puma', '~> 5.0'
+gem 'puma', '~> 5.2.1'
 
 gem 'resque', '~> 2.0.0'
 gem 'ransack', '~> 2.3'
