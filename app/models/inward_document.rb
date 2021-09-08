@@ -19,6 +19,8 @@
 #  user_id                     :integer
 #  deleted_at                  :datetime
 #  grn_number                  :string(255)
+#  base_currency_id            :integer
+#  reporting_currency_id       :integer
 #
 
 class InwardDocument < ApplicationRecord

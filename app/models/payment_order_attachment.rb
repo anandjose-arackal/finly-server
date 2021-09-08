@@ -12,8 +12,9 @@
 #  payment_order_id           :integer
 #  description                :text(65535)
 #  uploader_id                :integer
-#  deleted_at                 :datetime
 #  allow_delete               :boolean          default(TRUE)
+#  deleted_at                 :datetime
+#  company_id                 :integer
 #
 
 class PaymentOrderAttachment < ApplicationRecord

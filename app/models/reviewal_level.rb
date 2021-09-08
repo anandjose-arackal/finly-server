@@ -11,6 +11,7 @@
 #  name                   :string(255)
 #  is_deleted             :boolean          default(FALSE), not null
 #  deleted_at             :datetime
+#  company_id             :integer
 #
 
 class ReviewalLevel < ApplicationRecord

@@ -9,6 +9,7 @@
 #  updated_at :datetime         not null
 #  is_deleted :boolean          default(FALSE)
 #  deleted_at :datetime
+#  company_id :integer
 #
 
 class ManualExpense < ApplicationRecord

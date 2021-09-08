@@ -8,6 +8,7 @@
 #  updated_at        :datetime         not null
 #  location_id       :integer
 #  deleted_at        :datetime
+#  company_id        :integer
 #
 
 class TravelRequestDestination < ApplicationRecord

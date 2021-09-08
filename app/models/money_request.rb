@@ -35,6 +35,7 @@
 #  controlling_level_id               :integer
 #  bank_reference_number              :string(255)
 #  source_account                     :string(255)
+#  company_id                         :integer
 #
 
 class MoneyRequest < ApplicationRecord

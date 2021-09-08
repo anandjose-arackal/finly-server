@@ -101,7 +101,7 @@ class Reports::Expenses::Add < Reports::Base
   end
 
   def process
-    expenses.update_all(report_id: report.id, expense_status_id: ExpenseStatus.unsubmitted_id, manager_memo: nil, rejecting_manager_id: nil)
+    expenses.unscope(:order).update_all(report_id: report.id, expense_status_id: ExpenseStatus.unsubmitted_id, manager_memo: nil, rejecting_manager_id: nil)
     expenses.each do |expense|
       calculate_amounts(expense) # method that calculates the amount for all distance, time and Per Diem expenses
       # unless expense.update_attributes(report_id: report.id, expense_status_id: ExpenseStatus.unsubmitted_id, manager_memo: nil, rejecting_manager: nil)

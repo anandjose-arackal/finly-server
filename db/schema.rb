@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_08_24_062852) do
+ActiveRecord::Schema.define(version: 2021_09_05_190602) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -4063,6 +4063,7 @@ ActiveRecord::Schema.define(version: 2021_08_24_062852) do
     t.boolean "enforce_budget_limit", default: false
     t.integer "company_id"
     t.boolean "awaiting_approval_summary_enabled", default: false
+    t.boolean "predictions_enabled", default: false
     t.index ["grn_enabled"], name: "index_feature_subscriptions_on_grn_enabled"
     t.index ["srn_enabled"], name: "index_feature_subscriptions_on_srn_enabled"
     t.index ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id"
@@ -4141,6 +4142,7 @@ ActiveRecord::Schema.define(version: 2021_08_24_062852) do
     t.datetime "deleted_at"
     t.boolean "printable", default: true
     t.boolean "user_level_field", default: false
+    t.boolean "has_dependent_cf", default: false
     t.index ["company_id"], name: "index_field_configurations_on_company_id"
     t.index ["configurable_id"], name: "index_field_configurations_on_configurable_id"
     t.index ["configurable_type"], name: "index_field_configurations_on_configurable_type"
@@ -4200,6 +4202,7 @@ ActiveRecord::Schema.define(version: 2021_08_24_062852) do
     t.string "field_key"
     t.datetime "deleted_at"
     t.integer "company_id"
+    t.boolean "has_dependent_cf", default: false
     t.index ["field_configuration_id"], name: "index_field_drop_down_items_on_field_configuration_id"
   end
 
@@ -5077,6 +5080,10 @@ ActiveRecord::Schema.define(version: 2021_08_24_062852) do
     t.integer "status_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "result_file_file_name"
+    t.string "result_file_content_type"
+    t.bigint "result_file_file_size"
+    t.datetime "result_file_updated_at"
     t.index ["company_id"], name: "index_import_jobs_on_company_id"
     t.index ["completed_at"], name: "index_import_jobs_on_completed_at"
     t.index ["created_at"], name: "index_import_jobs_on_created_at"
@@ -5394,6 +5401,7 @@ ActiveRecord::Schema.define(version: 2021_08_24_062852) do
     t.string "tax_type", default: ""
     t.decimal "item_rate", precision: 20, scale: 5, default: "0.0"
     t.integer "company_id"
+    t.decimal "unbilled_quantity", precision: 20, scale: 10, default: "0.0"
     t.index ["category_id"], name: "index_invoice_line_items_on_category_id"
     t.index ["department_id"], name: "index_invoice_line_items_on_department_id"
     t.index ["discount_amount_id"], name: "index_invoice_line_items_on_discount_amount_id"
@@ -5595,6 +5603,7 @@ ActiveRecord::Schema.define(version: 2021_08_24_062852) do
     t.decimal "po_invoice_adjusted_advance", precision: 20, scale: 10, default: "0.0"
     t.decimal "invoice_credit_note_adjusted_amount", precision: 20, scale: 10, default: "0.0"
     t.decimal "invoice_balance_due_without_cn", precision: 20, scale: 10, default: "0.0"
+    t.boolean "credit_notes_presence", default: false
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["agreement_item_id"], name: "index_invoices_on_agreement_item_id"
     t.index ["company_id", "controlling_level_id", "deleted_at"], name: "index_invoice_ct_lvl_cmpny_id"
@@ -6252,10 +6261,14 @@ ActiveRecord::Schema.define(version: 2021_08_24_062852) do
     t.datetime "deleted_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "pivot"
+    t.float "accuracy", default: 0.0
+    t.integer "predicted_records", default: 0
     t.index ["company_id"], name: "index_ml_model_pmmls_on_company_id"
     t.index ["created_at"], name: "index_ml_model_pmmls_on_created_at"
     t.index ["deleted_at"], name: "index_ml_model_pmmls_on_deleted_at"
     t.index ["ml_model_id"], name: "index_ml_model_pmmls_on_ml_model_id"
+    t.index ["pivot", "company_id", "ml_model_id"], name: "index_ml_model_pmmls_on_pivot_and_company_id_and_ml_model_id", unique: true
     t.index ["updated_at"], name: "index_ml_model_pmmls_on_updated_at"
   end
 
@@ -6270,10 +6283,12 @@ ActiveRecord::Schema.define(version: 2021_08_24_062852) do
     t.datetime "deleted_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "ml_model_pmml_id"
     t.index ["company_id"], name: "index_ml_model_predictions_on_company_id"
     t.index ["created_at"], name: "index_ml_model_predictions_on_created_at"
     t.index ["deleted_at"], name: "index_ml_model_predictions_on_deleted_at"
     t.index ["ml_model_id"], name: "index_ml_model_predictions_on_ml_model_id"
+    t.index ["record_id", "record_type", "ml_model_id", "ml_model_pmml_id"], name: "index_ml_model_predictions_on_record_and_ml_model", unique: true
     t.index ["record_type", "record_id"], name: "index_ml_model_predictions_on_record_type_and_record_id"
     t.index ["updated_at"], name: "index_ml_model_predictions_on_updated_at"
   end
@@ -6299,6 +6314,7 @@ ActiveRecord::Schema.define(version: 2021_08_24_062852) do
     t.string "form_id"
     t.string "parent_id"
     t.string "parent_type"
+    t.string "pivot_keys"
     t.index ["built_at"], name: "index_ml_models_on_built_at"
     t.index ["company_id"], name: "index_ml_models_on_company_id"
     t.index ["created_at"], name: "index_ml_models_on_created_at"
@@ -7689,7 +7705,6 @@ ActiveRecord::Schema.define(version: 2021_08_24_062852) do
     t.decimal "conversion_rate", precision: 20, scale: 5
     t.string "vendor_trade_name"
     t.string "vendor_sequence_id"
-    t.string "vendor_country"
     t.string "vendor_gstin"
     t.string "vendor_pan"
     t.string "vendor_bank_account_number"
@@ -7723,6 +7738,7 @@ ActiveRecord::Schema.define(version: 2021_08_24_062852) do
     t.decimal "reporting_po_advance_tds_amount", precision: 20, scale: 10, default: "0.0"
     t.decimal "reporting_po_advance_amount", precision: 20, scale: 10, default: "0.0"
     t.decimal "po_advance_tds_percentage", precision: 20, scale: 10, default: "0.0"
+    t.integer "vendor_country_id"
     t.index ["advance_amount_id"], name: "index_purchase_orders_on_advance_amount_id"
     t.index ["advance_amount_status_id"], name: "index_purchase_orders_on_advance_amount_status_id"
     t.index ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id"
@@ -8852,6 +8868,7 @@ ActiveRecord::Schema.define(version: 2021_08_24_062852) do
     t.string "sgst_internal_id"
     t.date "start_date"
     t.date "end_date"
+    t.integer "created_by_id"
     t.index ["company_id"], name: "index_tax_rates_on_company_id"
   end
 

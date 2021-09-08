@@ -76,25 +76,26 @@
 #  vlpm_id                      :integer
 #  vendor_note                  :text(65535)
 #  erp_sync_status_id           :integer
+#  base_currency_id             :integer
+#  reporting_currency_id        :integer
 #
 
 class PurchaseOrder < ApplicationRecord
   attr_accessor :skip_callback
-
   include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport, ControllingUser, GetCurrency
-  include Sequenced::ActsAsSequenced
-  include Searchkick::Api
   include Concerns::ErpSyncConcern
-  include ErpSyncable
-
   include LiquidDroppable
   include Exposures::Model::Exposable
+  include Sequenced::ActsAsSequenced
   include FormsHelper
+  include ErpSyncable
+  include Searchkick::Api
 
   # # Multicurrency Support
   # include Monetizable
-
   acts_as_sequenced column: :po_number, purpose: :purchase_order, editable: false, prefix: 'PO/{fiscal_year_start}-{fiscal_year_end}/', min_length: 4
+
+  alias_attribute :created_by_id, :user_id
 
   default_scope { order(created_at: :desc) }
 
@@ -1029,20 +1030,17 @@ class PurchaseOrder < ApplicationRecord
 
   def amounts_attributes_map
     # todo - I2P change it to converted values post multicurrency setup
-    
     {  
-      # po_gross_amount: 'total_before_tax', 'discount_amount'
       po_discount_amount: 'discount_amount',
       po_taxable_amount: 'total_before_tax',
       po_tax_amount: 'tax_amount',
       po_sub_total_amount: 'total_after_tax',
-      # po_total_amount: 'balance_amount',
       po_balance_due: 'balance_amount',
 
       # Purchase Order Advance
-      po_requested_advance_amount: 'requested_advance_amount',
-      po_advance_tds_amount: 'advance_tds_amount',
-      po_advance_amount: 'advance_amount'
+      # po_requested_advance_amount: 'requested_advance_amount',
+      # po_advance_tds_amount: 'advance_tds_amount',
+      # po_advance_amount: 'advance_amount'
     }
   end
 

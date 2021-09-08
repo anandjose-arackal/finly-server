@@ -8,6 +8,7 @@
 #  updated_at        :datetime         not null
 #  tds_rates_list_id :integer
 #  deleted_at        :datetime
+#  company_id        :integer
 #
 
 FactoryBot.define do
