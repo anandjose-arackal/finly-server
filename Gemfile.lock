@@ -902,7 +902,7 @@ DEPENDENCIES
   capistrano-sentry
   capistrano-sidekiq (~> 1.0.2)
   capistrano-yarn
-  capistrano3-puma (~> 5.0.3)
+  capistrano3-puma (= 5.0.3)
   capybara (~> 3.29)
   coffee-rails (~> 4.2.2)
   cronex (~> 0.10)
