@@ -15,14 +15,12 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
         procurement_id: '{{record.procurement_id}}',
         procurement_type: "po",
         # forms_enabled: "{% if record.forms_enabled == true %}{{true}}{% else %}{{ false }}{% endif %}"
-        forms_enabled: "{% if record.forms_enabled == true %}{{true}}{% else %}{{ false }}{% endif %}"
-        # forms_enabled: "true"
-        # forms_enabled: "false"
+        # forms_enabled: "{% if record.forms_enabled == true %}{{ true }}{% else %}{{ false }}{% endif %}"
+        forms_enabled: "{{ record.forms_enabled }}"
       }
     }
   end
 
-  # reference '{{record.id}}', procurement_id: '{{record.procurement_id}}', procurement_type: 'po'
   custom_fields :purchase_order
 
   # Fixed column is always default true

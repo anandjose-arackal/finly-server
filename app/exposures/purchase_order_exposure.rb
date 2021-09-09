@@ -23,6 +23,9 @@ class PurchaseOrderExposure < Exposures::API
 
     days
   end
+  attribute :forms_enabled do
+    record.forms_enabled
+  end
   attribute :policy, exposure: true, record_attribute: true, includes: [:policy]
   attribute :controlling_level, record_attribute: true, exposure: true, includes: [:controlling_level]
   attribute :cost_center, record_attribute: true, exposure: true, includes: [:cost_center]
