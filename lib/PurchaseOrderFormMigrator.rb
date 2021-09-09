@@ -5,7 +5,8 @@ class PurchaseOrderMigrator
     company = Company.find company_id
 
     ActsAsTenant.with_tenant(company) do
-      documents = PurchaseOrder.where(company_id: company.id)
+      # documents = PurchaseOrder.where(company_id: company.id)
+      documents = PurchaseOrder.where(id: 469)
 
       # FormCustomField.where(company_id: company_id).destroy_all
       form = Form.where(klass_name: 'Docs::P2P::PurchaseOrders::Form', company_id: company_id).first
@@ -311,7 +312,7 @@ class PurchaseOrderMigrator
 
   def self.update_po_attachments(form, document)
     document.attachments.each do |old_attachment|
-      relevant_custom_field = document.form_custom_fields.where(field_key: 'po_attachments').first
+      relevant_custom_field = document.form_custom_fields.where(field_key: 'attachments').first
 
       if relevant_custom_field.present?
         new_attachment = add_attachment_to_new_po( old_attachment, relevant_custom_field )
@@ -319,10 +320,10 @@ class PurchaseOrderMigrator
         entity  = form.entities.where(entity_key: 'attachments').first
         document.form_custom_fields.create({
             document_type: 'PurchaseOrder', document_id: document.id, form_id: form.id, form_entity_id: entity.id,
-            field_key: 'po_attachments', value: "", value_text: nil, entity_type: 'attachments',
+            field_key: 'attachments', value: "", value_text: nil, entity_type: 'attachments',
          })
 
-        relevant_custom_field = document.form_custom_fields.where(field_key: 'po_attachments').first
+        relevant_custom_field = document.form_custom_fields.where(field_key: 'attachments').first
         new_attachment = add_attachment_to_new_po( old_attachment, relevant_custom_field )
       end
       
