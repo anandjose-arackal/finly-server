@@ -7,7 +7,7 @@ class Company::Locations::Create < Company::Locations::Base
   end
 
   def validate
-    if ( self.company.locations.where(name: location_parameters[:name]).count > 0 )
+    if ( self.company.locations.non_deleted.where(name: location_parameters[:name]).count > 0 )
       add_message :error, 'Location with the given name already present'
       return
     end
