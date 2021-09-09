@@ -28,6 +28,11 @@ class Forms::Export::Processor
       name: form.label,
       key: form.model.name,
       headers: {
+        import_sequence_number: {
+          name: "Import Sequence Number",
+          entity_key: 'import_sequence_number',
+          entity_type: 'text'
+        },
         id: {
           name: 'ID',
           entity_key: 'id',
@@ -55,21 +60,40 @@ class Forms::Export::Processor
       if entity.visible
         if entity.entity_type == 'switch'
           headers[entity.entity_key.to_s] = {
-            name: "#{entity.label} (true/false)",
+            name: "#{entity.label}#{entity.required ? '*' : ''} (TRUE/FALSE)",
             entity_key: entity.entity_key,
             entity_type: entity.entity_type,
             entity: entity,
           }
         elsif ['lookup', 'dropdown'].include?(entity.entity_type)
+          headers[entity.entity_key.to_s] = {
+            name: "#{entity.label} ID#{entity.required ? '*' : ''}",
+            entity_key: entity.entity_key,
+            entity_type: entity.entity_type,
+            entity: entity,
+          }
           headers["#{entity.entity_key}_value"] = {
             name: entity.label,
+            entity_key: "#{entity.entity_key}_value",
+            entity_type: 'text',
+          }
+        elsif entity.entity_type == 'date'
+          headers[entity.entity_key.to_s] = {
+            name: "#{entity.label}#{entity.required ? '*' : ''} (YYYY-MM-DD)",
+            entity_key: entity.entity_key,
+            entity_type: entity.entity_type,
+            entity: entity,
+          }
+        elsif entity.entity_type == 'datetime'
+          headers[entity.entity_key.to_s] = {
+            name: "#{entity.label}#{entity.required ? '*' : ''} (YYYY-MM-DD HH:MM:SS)",
             entity_key: entity.entity_key,
             entity_type: entity.entity_type,
             entity: entity,
           }
         else
           headers[entity.entity_key.to_s] = {
-            name: entity.label,
+            name: "#{entity.label}#{entity.required ? '*' : ''}",
             entity_key: entity.entity_key,
             entity_type: entity.entity_type,
             entity: entity,
@@ -78,6 +102,11 @@ class Forms::Export::Processor
       end
     else
       child_sheet_headers = {
+        parent_sequence_number: {
+          name: "#{parent_sheet_label.singularize} Sequence Number",
+          entity_key: 'parent_sequence_number',
+          entity_type: 'text'
+        },
         parent_id: {
           name: "#{parent_sheet_label.singularize} ID",
           entity_key: 'parent_id',
@@ -109,7 +138,7 @@ class Forms::Export::Processor
     content = []
 
     form.sections.each do |section|
-      next unless section.associate_custom_fields
+      # next unless section.associate_custom_fields
 
       section.entities.each do |entity|
         next unless entity.visible
@@ -118,7 +147,7 @@ class Forms::Export::Processor
 
         content << {
           name: entity.label,
-          data: entity.choices_scope.build(user: self.user).as_json
+          data: entity.choices_scope.build(user: self.user, params: { paginate: false }).as_json
         }.with_indifferent_access
       end
     end
@@ -139,6 +168,7 @@ class Forms::Export::Processor
       worksheets[sheet_key] = workbook.add_worksheet(sheet_name)
       worksheets_length[sheet_key] = 0
       self.headers[sheet_key][:headers].values.each_with_index do |header_data, header_index|
+        worksheets[sheet_key].set_column(header_index, header_index, header_data[:name].length+10)
         worksheets[sheet_key].write(0, header_index, header_data[:name])
       end
     end
@@ -168,6 +198,8 @@ class Forms::Export::Processor
               column_data = child_data[key]
               if key.to_s == 'parent_id'
                 column_data = parent_data['id']
+              elsif key.to_s == 'parent_sequence_number'
+                column_data = ''
               end
               # get urls if attachments
               if column_data.is_a?(Array) && column_data.present? && column_data[0].is_a?(Hash) && column_data[0].has_key?(:url)
@@ -189,11 +221,13 @@ class Forms::Export::Processor
       if content[:data][:headers].present?
         content[:data][:headers].each_with_index do |key_value, index|
           sheet_header_keys << key_value[0]
+          worksheet.set_column(index, index, key_value[1][:label].length+10)
           worksheet.write(0, index, key_value[1][:label])
         end
       elsif content[:data][:choices].first.present?
         content[:data][:choices].first.each_with_index do |key_value, index|
           sheet_header_keys << key_value[0]
+          worksheet.set_column(index, index, key_value[0].titleize.length+10)
           worksheet.write(0, index, key_value[0].titleize)
         end
       end
