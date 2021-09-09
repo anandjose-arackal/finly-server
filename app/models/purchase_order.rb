@@ -1214,7 +1214,6 @@ class PurchaseOrder < ApplicationRecord
 
   def migrate_new_column_data
     self.items.each do |item|
-      byebug
       update_params = {
         tax_percentage: item&.tax_rate&.rate,
         gl_code: item&.gl_code.present? ? item&.gl_code :  ( item&.category&.gl_code.present? ? item&.category&.gl_code : item&.inventory_line_item&.item_number),
