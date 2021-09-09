@@ -190,6 +190,17 @@ namespace :deploy do
     end
   end
 end
+
+namespace :deploy do
+  desc 'Restart application'
+  task :restart do
+    on roles(:app) do
+      invoke 'puma:restart'
+    end
+  end
+end
+
+after 'deploy:finished', 'deploy:restart'
 # before 'disable_secure_storage', 'runner:restart'
 #
 # # Restart runner
