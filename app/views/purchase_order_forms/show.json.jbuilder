@@ -1,6 +1,8 @@
 json.form_data do
   json.id @op['model'].id
   json.merge! @op['model'].form_data(@op['form'])
+  json.procurement_term_id @op['model'].procurement_term_id
+  json.procurement_term_text @op['model'].procurement_term_text
 end
 
 json.meta @op['model'].form_metadata

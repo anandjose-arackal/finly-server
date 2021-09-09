@@ -97,8 +97,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
   end
 
   # PURCHASE ORDER DETAILS
-  section :invoice_details, title: "Order Details", associate_custom_fields: true do
-  # section :purchase_order_details, title: "Order Details", associate_custom_fields: true do
+  section :purchase_order_details, title: "Order Details", associate_custom_fields: true do
     auto_number :po_number,
                 label: "Sequence Number", editable: false,
                 sequence: { prefix: "PO-", start_at: '00001' }
