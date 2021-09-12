@@ -539,11 +539,20 @@ class PurchaseOrder < ApplicationRecord
     where.not(purchase_order_status_id: PurchaseOrderStatus.id_for(:voided))
   }
 
+  SUMMARY_ATTRIBUTES = {
+    'po_gross_amount': 'gross_amount',
+    'po_discount_amount': 'discount_amount',
+    'po_tax_amount': 'tax_amount',
+    'po_sub_total_amount': 'net_amount',
+    'po_balance_due': 'balance_amount'
+  }.freeze
+
   # scope :includes_for_contract, -> {
   #   includes(:created_by, :invoice_type, :form_custom_fields, :items)
   # }
 
   before_save :calculate_line_items
+  before_commit :calculate_summary, 
   after_create :purchase_request_tasks
   after_save :sync_amounts, unless: :skip_callback
   after_save :set_currency_for_amount, unless: :skip_callback
@@ -1103,12 +1112,14 @@ class PurchaseOrder < ApplicationRecord
         else
           item.tax_amount = Amount.new(value: item_tax_amount, currency_id: get_base_currency.id)
         end
+        item.item_tax_amount = item_tax_amount
 
         if item.taxable_amount.present?
           item.taxable_amount.value = item_taxable_amount
         else
           item.taxable_amount = Amount.new(value: item_taxable_amount, currency_id: get_base_currency.id)
         end
+        item.item_taxable_amount = item_taxable_amount
 
         # also set the CGST, SGST, and IGST amounts in the PO Line item
         case self.gst_type_id
@@ -1132,15 +1143,15 @@ class PurchaseOrder < ApplicationRecord
         else
           item.discount_amount = Amount.new(value: item_discount_amount, currency_id: get_base_currency.id)
         end
+        item.item_discount_amount = item_discount_amount
 
         if item.total_amount.present?
           item.total_amount.value = item_total_amount
         else
           item.total_amount = Amount.new(value: item_total_amount, currency_id: get_base_currency.id)
         end
+        item.item_net_amount = item_total_amount
       end
-
-      migrate_new_column_data
     end
 
     roundoff_amount = self.roundoff_amount.to_f
@@ -1208,38 +1219,11 @@ class PurchaseOrder < ApplicationRecord
       self.advance_amount = Amount.new(value: 0, currency_id: get_base_currency.id)
       self.requested_advance_amount = Amount.new(value: 0, currency_id: get_base_currency.id)
     end
-
-    # self.save
   end
 
-  def migrate_new_column_data
-    self.items.each do |item|
-      update_params = {
-        tax_percentage: item&.tax_rate&.rate,
-        gl_code: item&.gl_code.present? ? item&.gl_code :  ( item&.category&.gl_code.present? ? item&.category&.gl_code : item&.inventory_line_item&.item_number),
-        item_number: item&.inventory_line_item&.item_number,
-      
-        items_department_id: item&.department_id,
-        items_cost_center_id: item&.cost_center_id,
-        product_type_id: item&.inventory_line_item&.product_type_id,
-
-        item_rate: item&.rate.to_f,
-        rate: item&.rate.to_f,
-
-        item_gross_amount: item&.quantity.to_f * item&.rate.to_f,
-        reporting_item_gross_amount: item&.quantity.to_f * item&.rate.to_f,
-      
-        item_discount_amount:  item&.discount_amount&.value.to_f,
-        reporting_item_discount_amount:  item&.discount_amount&.value.to_f,
-        item_taxable_amount:  item&.taxable_amount&.value.to_f,
-        reporting_item_taxable_amount:  item&.taxable_amount&.value.to_f ,        
-        item_tax_amount: item&.tax_amount&.value.to_f ,
-        reporting_item_tax_amount: item&.tax_amount&.value.to_f,
-        item_net_amount: item&.total_amount&.value.to_f,
-        reporting_item_net_amount: item&.total_amount&.value.to_f,
-      }
-      item.skip_callback = true
-      # item.update_columns(update_params)
+  def calculate_summary
+    SUMMARY_ATTRIBUTES.each do |attr, value|
+      self.send("#{attr}=", self.send(value)&.value)
     end
   end
 
