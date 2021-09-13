@@ -392,6 +392,24 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
   # end
 
 
+  # PURCHASE ORDER ITEMS
+  section :quotatios, associate_custom_fields: true do
+    table :quotations, populate_if_empty: Quotation do
+
+      number :id, visible: false, editable: false, internal: true, can_visible_be_changed: false, can_editable_be_changed: false
+      text :vendor_name, label: 'Vendor Name', editable: true, visible: true, required: true
+      text :vendor_location, label: 'Vendor Location', editable: true, visible: true, required: true
+      date :estimated_delivery_time, label: 'Estd. Delivery Date', editable: true, visible: true, required: true
+      number :total_amount, label: 'Total Amount', editable: true, visible: true, required: true
+      number :advance_amount, label: 'Advance Amount', editable: true, visible: true
+      number :credit_period, label: 'Credit Period', editable: true, visible: true
+
+      large_text :note, editable: true, visible: true, required: true
+      dropdown :selected, editable: true, visible: true, choices_scope: Choices[:list].({ id: true, name: 'true' }, { id: false, name: 'false' }), default_value: false
+
+    end
+  end
+
   # ATTACHMENTS
   section :attachments, associate_custom_fields: true do
     attachment :attachments, system_field: false
