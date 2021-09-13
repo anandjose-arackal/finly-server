@@ -14,8 +14,8 @@ json.reviewal_chain @op['model'].get_reviewal_chain
 json.transfer_modes @op['model']&.created_by&.company&.transfer_modes.as_json
 json.budgets @op['model']&.purchase_order_budgets.as_json
 
-# json.bank_payment_request_policies do
-#   json.array! @op['model']&.bank_payment_request_policies(current_user) do |policy|
-#     json.extract! policy, :id, :name
-#   end
-# end
+json.payment_ticket_policies do
+  json.array! @op['model']&.payment_ticket_policies(current_user) do |policy|
+    json.extract! policy, :id, :name
+  end
+end

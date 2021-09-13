@@ -5,7 +5,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :approve, :remind, :retract,
                     :remind_approver, :void, :save_btn, :save_and_submit, :delete, :more_actions, :audit_trail, :download,
                     :send_btn, :export_po_items, :update_btn, :mark_send_to_vendor, :po_revision, :close, :reopen, :unapprove,
-                    :take_control, :return_control, :forward, :mark_vendor_confirmed, :make_payment, :upload_attachment, :create_items
+                    :take_control, :return_control, :forward, :mark_vendor_confirmed, :make_payment, :upload_attachment, :create_items, :add_inward_doc, :add_po_invoice
   ]
 
   def initialize(user = nil, params = {})
@@ -357,6 +357,14 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
     # If the user is an admin and the admin has explicitly taken control of the document, 
     # only then they can approve or reject
     purchase_order.get_reviewers.include?(user) && user.vendor_payment_admin?
+  end
+
+  def add_inward_doc
+    send_btn
+  end
+
+  def add_po_invoice
+    send_btn
   end
 
 end

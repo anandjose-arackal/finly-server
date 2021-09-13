@@ -22,7 +22,6 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
       item_taxable_amount: "{{ row.item_gross_amount | minus: row.item_discount_amount | default: 0 | round: 2  }}",
       item_tax_amount: "{{ row.item_taxable_amount | times: row.tax_percentage | divided_by: 100.00 | default: 0 | round: 2  }}",
       item_net_amount: "{{ row.item_taxable_amount | plus: row.item_tax_amount | default: 0 | round: 2 }}",
-      # item_billable_amount: "{{ row.item_taxable_amount | plus: row.item_tax_amount | default: 0 | round: 2 }}",
         
       # CONVERTED VALUES
       reporting_item_gross_amount: "{{ row.item_gross_amount | times: form.conversion_rate | default: 0 | round: 2}}",
@@ -30,21 +29,21 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
       reporting_item_taxable_amount: "{{ row.item_taxable_amount | times: form.conversion_rate | default: 0 | round: 2}}",
       reporting_item_tax_amount: "{{ row.item_tax_amount | times: form.conversion_rate | default: 0 | round: 2  }}",
       reporting_item_net_amount: "{{ row.item_net_amount | times: form.conversion_rate | default: 0 | round: 2  }}",
-      # item_billable_amount: "{{ row.item_net_amount | times: form.conversion_rate | default: 0 | round: 2  }}",
     },
 
     # PURCHASE ORDER SUMMARY
     summary: {
       po_gross_amount: "{% assign gross_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign gross_amount = gross_amount | plus: item.item_gross_amount %}{% endif %}{% endfor %}{{ gross_amount | default: 0 | round: 2 }}",
       po_discount_amount: "{% assign discount_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign discount_amount = discount_amount | plus: item.item_discount_amount %}{% endif %}{% endfor %}{{ discount_amount | default: 0 | round: 2 }}",
-      po_taxable_amount: "{{ form.po_gross_amount | minus: form.po_discount_amount | default: 0 | round: 2}}",
       po_tax_amount: "{% assign tax_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign tax_amount = tax_amount | plus: item.item_tax_amount %}{% endif %}{% endfor %}{{ tax_amount  | default: 0 | round: 2}}",
+      po_taxable_amount: "{{ form.po_gross_amount | minus: form.po_discount_amount | default: 0 | round: 2}}",
       
       # NET AMOUNT
-      po_sub_total_amount: "{% assign inv_sub_total_amount = form.po_gross_amount | minus: form.po_discount_amount | plus: form.po_tax_amount | round: 2 %}{{ inv_sub_total_amount | default: 0 | round: 2 }}",
+      po_sub_total_amount: "{% assign po_sub_total_amount = form.po_gross_amount | minus: form.po_discount_amount | plus: form.po_tax_amount | round: 2 %}{{ po_sub_total_amount | default: 0 | round: 2 }}",
       po_roundoff_amount: "{% assign net_total_amount = form.po_sub_total_amount %}{% assign round_amount = net_total_amount | round %}{% assign amount = round_amount | minus: net_total_amount %}{% if form.base_currency_id != '1' %}{% assign amount = 0 %}{% endif %}{{ amount | default: 0 | round: 2 }}",
       po_total_amount: "{{ form.po_sub_total_amount | plus: form.po_roundoff_amount | default: 0 | round: 2}}",
       po_balance_due: "{{ form.po_total_amount | default: 0 | round: 2}}",
+      
 
       #Advance Calculation
       # po_requested_advance_amount: "{{ form.po_requested_advance_amount | default: 0 | round: 2}}",
@@ -66,8 +65,6 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
       #   {{ max_tds_applicable_amount | times: form.po_advance_tds_percentage | default: 0 | ceil }}
       # {% endif %}",
       # po_advance_amount: "{{ form.po_requested_advance_amount | minus: form.po_advance_tds_amount | default: 0 | round: 2 }}",
-
-
 
 
       # CONVERTED VALUES
@@ -282,14 +279,6 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
       amount :reporting_item_net_amount, label: "Net Amount(Reporting Currency)", editable: false, visible: false,
              can_visible_be_changed: false, can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_net_amount])
-
-      # amount :item_billable_amount, label: "Billable Amount", editable: false, visible: false,
-      #        can_editable_be_changed: false, active: false, can_visible_be_changed: false,
-      #        computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_billable_amount])
-
-      # amount :reporting_item_billable_amount, label: "Billable Amount(Reporting Currency)", editable: false, visible: false,
-      #        can_visible_be_changed: false, can_editable_be_changed: false,
-      #        computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_billable_amount])
     end
   end
 
