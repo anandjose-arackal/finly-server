@@ -552,7 +552,7 @@ class PurchaseOrder < ApplicationRecord
   # }
 
   before_save :calculate_line_items
-  before_commit :calculate_summary, 
+  before_commit :calculate_summary
   after_create :purchase_request_tasks
   after_save :sync_amounts, unless: :skip_callback
   after_save :set_currency_for_amount, unless: :skip_callback
