@@ -1444,6 +1444,11 @@ class PurchaseOrder < ApplicationRecord
       item.send("#{attr}=", item.send(value)&.value)
       item.send("reporting_#{attr}=", reporting_currency_amount(item.send(value)&.value))
     end
+
+    # values not available through associations
+    item.item_gross_amount = item.item_taxable_amount + item.item_discount_amount
+    item.reporting_item_gross_amount = item.reporting_item_taxable_amount + item.reporting_item_discount_amount
+    item.item_rate = reporting_currency_amount(item.rate)
   end
 
   def calculate_summary_amounts
@@ -1454,7 +1459,7 @@ class PurchaseOrder < ApplicationRecord
 
     # values not available through associations
     self.po_gross_amount = self.po_taxable_amount + self.po_discount_amount
-    self.reporting_po_gross_amount = self.reporting_po_taxable_amount.to_f + self.reporting_po_discount_amount.to_f
+    self.reporting_po_gross_amount = self.reporting_po_taxable_amount + self.reporting_po_discount_amount
   end
 
   def reporting_currency_amount(value)
