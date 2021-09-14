@@ -1448,7 +1448,6 @@ class PurchaseOrder < ApplicationRecord
 
   def calculate_summary_amounts
     SUMMARY_ATTRIBUTES.each do |attr, value|
-      byebug
       self.send("#{attr}=", self.send(value)&.value)
       self.send("reporting_#{attr}=", reporting_currency_amount(self.send(value)&.value))
     end
