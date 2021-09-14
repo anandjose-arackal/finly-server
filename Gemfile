@@ -65,7 +65,8 @@ gem 'health-monitor-rails', '~> 8.4.0'
 
 # puma web server
 gem 'figaro', '~> 1.2'
-gem 'puma', '~> 5.0'
+gem 'puma', '5.2.1'
+gem 'capistrano3-puma', '5.1.1'
 
 gem 'resque', '~> 2.0.0'
 gem 'ransack', '~> 2.3'
@@ -271,12 +272,12 @@ gem 'paper_trail', '~> 11.0.0'
 gem 'paper_trail-association_tracking', '~> 2.1.1'
 gem 'paper_trail-globalid', '~> 0.2.0'
 
+
 group :development, :test do
   gem 'byebug'
   gem 'pry', '~> 0.12.2'
   gem 'rb-readline', '~> 0.5'
   gem 'capistrano', '~> 3.11.0'
-  gem 'capistrano3-puma', '~> 5.0'
   gem 'capistrano-rails', '~> 1.4.0', require: false
   gem 'capistrano-bundler', '~> 1.5.0', require: false
   gem 'capistrano-rvm', '~> 0.1.2'

@@ -12,6 +12,7 @@
 #  policy_id           :integer          not null
 #  enforce_category    :boolean          default(FALSE)
 #  deleted_at          :datetime
+#  company_id          :integer
 #
 
 class DistanceExpenseConfig < ApplicationRecord

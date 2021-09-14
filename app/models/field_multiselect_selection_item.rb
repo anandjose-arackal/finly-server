@@ -8,6 +8,7 @@
 #  updated_at                     :datetime         not null
 #  field_multiselect_selection_id :integer
 #  deleted_at                     :datetime
+#  company_id                     :integer
 #
 
 class FieldMultiselectSelectionItem < ApplicationRecord

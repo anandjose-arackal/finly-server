@@ -33,6 +33,7 @@
 #  vp_web_client_theme    :string(255)
 #  em_web_client_version  :string(255)
 #  em_web_client_theme    :string(255)
+#  company_id             :integer
 #
 
 class UserProfile < ApplicationRecord

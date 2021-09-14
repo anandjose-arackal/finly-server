@@ -86,6 +86,7 @@ class Settlement::SReport::Processing::GeneratePaymentFile < Settlement::SReport
     data[:report_amount] = mapping.reports.find_by(id: data[:report_id])&.total_amount
     data[:reimbursable_amount] = mapping.reports.find_by(id: data[:report_id])&.total_amount([:reimbursable])
     data[:employee_id] = mapping.user.profile.employee_id
+    data[:em_beneficiary_email] =  mapping.user.email
     if [144].include? user.company.id # StanzaCare or L&C
       data[:description] = retrieve_description(first_report)
       data[:approved_by] = retrieve_approved_by(first_report)

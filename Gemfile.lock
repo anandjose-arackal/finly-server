@@ -218,7 +218,7 @@ GEM
       sidekiq (>= 3.4, < 6.0)
     capistrano-yarn (2.0.2)
       capistrano (~> 3.0)
-    capistrano3-puma (5.0.3)
+    capistrano3-puma (5.1.1)
       capistrano (~> 3.7)
       capistrano-bundler
       puma (>= 4.0, < 6.0)
@@ -902,7 +902,7 @@ DEPENDENCIES
   capistrano-sentry
   capistrano-sidekiq (~> 1.0.2)
   capistrano-yarn
-  capistrano3-puma (~> 5.0)
+  capistrano3-puma (= 5.1.1)
   capybara (~> 3.29)
   coffee-rails (~> 4.2.2)
   cronex (~> 0.10)
@@ -983,7 +983,7 @@ DEPENDENCIES
   parslet (~> 1.8.2)
   posthog-ruby (~> 1.0)
   pry (~> 0.12.2)
-  puma (~> 5.0)
+  puma (= 5.2.1)
   pundit (~> 2.1)
   quickbooks-ruby!
   rack!

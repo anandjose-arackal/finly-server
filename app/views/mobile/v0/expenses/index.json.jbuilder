@@ -4,6 +4,7 @@ json.expenses do
     json.partial! 'expense', expense: expense, cash_pockets: cash_pockets
   end
 end
+json.custom_fields_config @result.custom_fields_config
 json.tax_rates @result.tax_rates
 json.state_codes @result.gst_state_codes
 json.filter do

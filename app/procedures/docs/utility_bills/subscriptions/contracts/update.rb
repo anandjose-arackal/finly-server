@@ -177,7 +177,8 @@ class Docs::UtilityBills::Subscriptions::Contracts::Update < Reform::Form
                                                                             customer_param_key_4: customer_param_key_4,
                                                                             customer_param_value_4: customer_param_value_4,
                                                                             customer_param_key_5: customer_param_key_5,
-                                                                            customer_param_value_5: customer_param_value_5).first
+                                                                            customer_param_value_5: customer_param_value_5,
+                                                                            company_id: current_user.company_id).first
     if unique_subscription.present?
       errors.add(:active_subscription,"already exist for this biller with Subscription ID #{unique_subscription.sequence_id}")
       valid = false

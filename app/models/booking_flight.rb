@@ -24,6 +24,7 @@
 #  arrival_time     :time
 #  booking_id       :integer
 #  deleted_at       :datetime
+#  company_id       :integer
 #
 
 class BookingFlight < ApplicationRecord

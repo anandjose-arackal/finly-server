@@ -925,7 +925,7 @@ module Transitionable
         when :vendor_auditor, 'vendor_auditor'
           data = data.or(role_based_auditor_associated_items(user, role_id))
         when :vendor_manager, 'vendor_manager'
-          # data = []
+          data = data.or(role_based_auditor_associated_items(user, role_id))
         when :policy_admin, 'policy_admin'
           # data = []
         when :bank_payment_request_auditor, 'bank_payment_request_auditor'

@@ -17,6 +17,7 @@
 #  payment_id               :integer
 #  delegated_action_user_id :integer
 #  deleted_at               :datetime
+#  company_id               :integer
 #
 
 class ReportComment < ApplicationRecord

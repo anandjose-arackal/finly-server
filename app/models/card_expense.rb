@@ -13,6 +13,7 @@
 #  cancelled           :boolean          default(FALSE)
 #  atm_surcharge       :boolean          default(FALSE)
 #  deleted_at          :datetime
+#  company_id          :integer
 #
 
 class CardExpense < ApplicationRecord

@@ -11,6 +11,7 @@
 #  updated_at              :datetime         not null
 #  is_deleted              :boolean          default(FALSE), not null
 #  deleted_at              :datetime
+#  company_id              :integer
 #
 
 class ProcurementComment < ApplicationRecord
