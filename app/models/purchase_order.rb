@@ -539,20 +539,11 @@ class PurchaseOrder < ApplicationRecord
     where.not(purchase_order_status_id: PurchaseOrderStatus.id_for(:voided))
   }
 
-  SUMMARY_ATTRIBUTES = {
-    'po_gross_amount': 'gross_amount',
-    'po_discount_amount': 'discount_amount',
-    'po_tax_amount': 'tax_amount',
-    'po_sub_total_amount': 'net_amount',
-    'po_balance_due': 'balance_amount'
-  }.freeze
-
   # scope :includes_for_contract, -> {
   #   includes(:created_by, :invoice_type, :form_custom_fields, :items)
   # }
 
   before_save :calculate_line_items
-  before_commit :calculate_summary
   after_create :purchase_request_tasks
   after_save :sync_amounts, unless: :skip_callback
   after_save :set_currency_for_amount, unless: :skip_callback
@@ -1062,7 +1053,7 @@ class PurchaseOrder < ApplicationRecord
 
   private
 
-  def calculate_line_items(skip_adv_calculation = false)
+  def calculate_line_items(skip_adv_calculation = false, params = {})
     total_before_tax_amount = 0
     total_after_tax_amount = 0
     tax_amount = 0
@@ -1112,14 +1103,12 @@ class PurchaseOrder < ApplicationRecord
         else
           item.tax_amount = Amount.new(value: item_tax_amount, currency_id: get_base_currency.id)
         end
-        item.item_tax_amount = item_tax_amount
 
         if item.taxable_amount.present?
           item.taxable_amount.value = item_taxable_amount
         else
           item.taxable_amount = Amount.new(value: item_taxable_amount, currency_id: get_base_currency.id)
         end
-        item.item_taxable_amount = item_taxable_amount
 
         # also set the CGST, SGST, and IGST amounts in the PO Line item
         case self.gst_type_id
@@ -1143,15 +1132,15 @@ class PurchaseOrder < ApplicationRecord
         else
           item.discount_amount = Amount.new(value: item_discount_amount, currency_id: get_base_currency.id)
         end
-        item.item_discount_amount = item_discount_amount
 
         if item.total_amount.present?
           item.total_amount.value = item_total_amount
         else
           item.total_amount = Amount.new(value: item_total_amount, currency_id: get_base_currency.id)
         end
-        item.item_net_amount = item_total_amount
       end
+
+      calculate_item_total_amounts(item) if params[:associated_resource] == "purchase_request_item"
     end
 
     roundoff_amount = self.roundoff_amount.to_f
@@ -1218,12 +1207,6 @@ class PurchaseOrder < ApplicationRecord
     else
       self.advance_amount = Amount.new(value: 0, currency_id: get_base_currency.id)
       self.requested_advance_amount = Amount.new(value: 0, currency_id: get_base_currency.id)
-    end
-  end
-
-  def calculate_summary
-    SUMMARY_ATTRIBUTES.each do |attr, value|
-      self.send("#{attr}=", self.send(value)&.value)
     end
   end
 
@@ -1353,7 +1336,8 @@ class PurchaseOrder < ApplicationRecord
       perform_status_transition({document_name: 'purchase_request', status_to: 'po_created', user: user, params: parameters, item_ids: item_ids})
       associate_purchase_request_items(params: parameters, user: user, item_ids: item_ids)
       self.reload
-      calculate_line_items(true)
+      calculate_line_items(true, parameters)
+      calculate_summary_amounts
       self.save
     end
   end
@@ -1437,5 +1421,44 @@ class PurchaseOrder < ApplicationRecord
     end
     self.skip_callback = true
     self.save
+  end
+
+  # Amounts calculation on creating from PR items
+  SUMMARY_ATTRIBUTES = {
+    'po_discount_amount': 'discount_amount',
+    'po_tax_amount': 'tax_amount',
+    'po_sub_total_amount': 'total_after_tax',
+    'po_balance_due': 'balance_amount',
+    'po_taxable_amount': 'total_before_tax'
+  }.freeze
+
+  ITEM_ATTRIBUTES = {
+    'item_discount_amount': 'discount_amount',
+    'item_taxable_amount': 'taxable_amount',
+    'item_tax_amount': 'tax_amount',
+    'item_net_amount': 'total_amount'
+  }.freeze
+
+  def calculate_item_total_amounts(item)
+    ITEM_ATTRIBUTES.each do |attr, value|
+      item.send("#{attr}=", item.send(value)&.value)
+      item.send("reporting_#{attr}=", reporting_currency_amount(item.send(value)&.value))
+    end
+  end
+
+  def calculate_summary_amounts
+    SUMMARY_ATTRIBUTES.each do |attr, value|
+      byebug
+      self.send("#{attr}=", self.send(value)&.value)
+      self.send("reporting_#{attr}=", reporting_currency_amount(self.send(value)&.value))
+    end
+
+    # values not available through associations
+    self.po_gross_amount = self.po_taxable_amount + self.po_discount_amount
+    self.reporting_po_gross_amount = self.reporting_po_taxable_amount.to_f + self.reporting_po_discount_amount.to_f
+  end
+
+  def reporting_currency_amount(value)
+    return (value.to_f * self.conversion_rate.to_f).round(2)
   end
 end
