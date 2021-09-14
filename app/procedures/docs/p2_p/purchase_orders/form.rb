@@ -394,7 +394,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
 
   # PURCHASE ORDER ITEMS
   section :quotatios, associate_custom_fields: true do
-    table :quotations, populate_if_empty: Quotation do
+    table :quotatios, populate_if_empty: Quotation do
 
       number :id, visible: false, editable: false, internal: true, can_visible_be_changed: false, can_editable_be_changed: false
       text :vendor_name, label: 'Vendor Name', editable: true, visible: true, required: true
