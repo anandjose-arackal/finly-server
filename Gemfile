@@ -122,6 +122,8 @@ gem 'jquery-ui-rails', '~> 6.0.1'
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 6.0'
 
+gem 'execjs', '~> 2.7.0'
+
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '~> 4.1.20'
 # Use CoffeeScript for .coffee assets and views
