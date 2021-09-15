@@ -5,8 +5,7 @@ class PurchaseOrderMigrator
     company = Company.find company_id
 
     ActsAsTenant.with_tenant(company) do
-      # documents = PurchaseOrder.where(company_id: company.id)
-      documents = PurchaseOrder.where(id: 469)
+      documents = PurchaseOrder.where(company_id: company.id)
 
       # FormCustomField.where(company_id: company_id).destroy_all
       form = Form.where(klass_name: 'Docs::P2P::PurchaseOrders::Form', company_id: company_id).first
