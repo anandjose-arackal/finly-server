@@ -6,6 +6,7 @@ class PurchaseOrderMigrator
 
     ActsAsTenant.with_tenant(company) do
       documents = PurchaseOrder.where(company_id: company.id)
+      # documents = PurchaseOrder.where(id: 374, company_id: company.id)
 
       # FormCustomField.where(company_id: company_id).destroy_all
       form = Form.where(klass_name: 'Docs::P2P::PurchaseOrders::Form', company_id: company_id).first
@@ -231,7 +232,7 @@ class PurchaseOrderMigrator
 
       payment_term_days: document&.payment_term&.days_after,
       gst_type_id: document&.gst_type_id,
-      # conversion_date: document&.date&.to_date,
+      conversion_date: document&.created_at&.to_date,
 
       # *************************** VENDOR DETAILS *************************** 
       vendor_country_id: document&.vendor&.vendor_country,

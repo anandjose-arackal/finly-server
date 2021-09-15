@@ -178,7 +178,6 @@ class PurchaseOrderItem < ApplicationRecord
     purchase_order.forms_enabled
   end
 
-
   def sync_amounts
     if parent_forms_enabled
       self.skip_callback = true

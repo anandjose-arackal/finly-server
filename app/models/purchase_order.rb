@@ -1050,6 +1050,13 @@ class PurchaseOrder < ApplicationRecord
     }
   end
 
+  def payment_ticket_policies(user)
+    params = {}
+    params[:filter_role_id] = UserRole.id_for(:bank_payment_request_initiator)
+    result = Policy::VendorPayments::Index.(user, params)
+    pt_policies = result.policies rescue Policy.none
+    pt_policies
+  end
 
   private
 

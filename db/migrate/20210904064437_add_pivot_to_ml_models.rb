@@ -13,8 +13,8 @@ class AddPivotToMlModels < ActiveRecord::Migration[6.0]
     # add_index :ml_model_predictions, [:record_id, :record_type, :ml_model_id], unique: true, name: "index_ml_model_predictions_on_record_and_ml_model_id"
     # remove_index :ml_model_predictions, name: "index_ml_model_predictions_on_record_and_ml_model_id"
 
-    ActsAsTenant.without_tenant do
-      MlModel::Monitor.seed_data
-    end
+    # ActsAsTenant.without_tenant do
+    #   MlModel::Monitor.seed_data
+    # end
   end
 end

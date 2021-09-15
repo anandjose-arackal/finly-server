@@ -55,9 +55,8 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def forward
-    if invoice.is_non_po_reviewing_user? || user.is_agreement_invoice_reviewer?
-      invoice.processing? && user_in_level?
-    end
+    provider_name = invoice.get_invoice_provider_name
+    invoice.processing? && invoice.get_reviewers(nil, provider_name).include?(user)
   end
 
   def take_control

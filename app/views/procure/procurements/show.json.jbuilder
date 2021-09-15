@@ -102,6 +102,7 @@ json.trail do
         json.revision_of item.revision_of_id
         json.revision_number item.revision_number
         json.base_currency item.get_base_currency
+        json.forms_enabled item.forms_enabled
       end
 
     elsif item.is_a?(PurchaseOrder)
@@ -116,6 +117,7 @@ json.trail do
         json.amount item&.balance_amount&.value
         json.items_count item.items.count
         json.base_currency item.get_base_currency
+        json.forms_enabled item.forms_enabled
       end
 
     elsif item.is_a?(InwardDocument)
