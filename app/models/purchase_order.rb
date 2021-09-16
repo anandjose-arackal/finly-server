@@ -556,7 +556,6 @@ class PurchaseOrder < ApplicationRecord
 
   # backward compatible fields
   def po_balance_due
-    byebug
     forms_enabled ? self[:po_balance_due].to_f : self.balance_amount.value.to_f
   end
 
