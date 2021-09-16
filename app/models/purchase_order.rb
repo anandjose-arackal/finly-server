@@ -553,6 +553,25 @@ class PurchaseOrder < ApplicationRecord
   before_create :set_currency
 
   ransack_scopes :with_status_ids, :with_grn_status_id
+
+  # backward compatible fields
+  def po_balance_due
+    byebug
+    forms_enabled ? self[:po_balance_due].to_f : self.balance_amount.value.to_f
+  end
+
+  def reporting_po_balance_due
+    forms_enabled ? self[:reporting_po_balance_due].to_f : self.balance_amount.value.to_f
+  end
+
+  def po_sub_total_amount
+    forms_enabled ? self[:po_sub_total_amount].to_f : self.total_after_tax.value.to_f
+  end
+
+  def reporting_po_sub_total_amount
+    forms_enabled ? self[:reporting_po_sub_total_amount].to_f : self.total_after_tax.value.to_f
+  end
+
   
   def set_currency
     self.reporting_currency_id = self.company.reporting_currency.id if self.reporting_currency_id.blank? 
