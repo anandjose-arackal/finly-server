@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file. Always add new logs to 
 beginning of this file.
 
+## 2021-09-17
+  - Fix: Payment Agreement added in invoice exposure
 ## 2021-09-13
   - Fix: Document Forwardable logic make uniq across invoices
 ## 2021-09-08
