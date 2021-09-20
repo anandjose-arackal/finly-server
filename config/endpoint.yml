@@ -163,7 +163,7 @@ production:
     base: "https://sky.yesbank.in:444"
     path: "app/live/fundsTransferByCustomerService2"
   finly_collect:
-    base: 'http://172.33.74.252'
+    base: 'http://192.168.1.27'
     path: 'receivables'
   icici_bank_registration:
     base: 'https://apibankingone.icicibank.com/api/Corporate/CIB/v1'
