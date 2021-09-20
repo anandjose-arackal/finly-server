@@ -171,8 +171,8 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
   section :billing_address do
     lookup :location_id, label: 'Company Address', choices_scope: Choices[:lookup].('locations'),
            filters: Rules::Builder['billable_location'].true, required: true
-    text :billing_address_name, editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.gstin}}')
-    text :billing_address_gstin, editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.name}}')
+    text :billing_address_name, editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.name}}')
+    text :billing_address_gstin, editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.gstin}}')
     large_text :billing_address, computed: Forms::Compute::Lookup('location_id', '{{record.address}}')
   end
 
@@ -180,8 +180,8 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
   section :shipping_address do
     lookup :delivery_location_id, label: 'Delivery Address', choices_scope: Choices[:lookup].('locations'),
            filters: Rules::Builder['shippable_location'].true, required: true
-    text :shipping_address_name, editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.gstin}}')
-    text :shipping_address_gstin, editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.name}}')
+    text :shipping_address_name, editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.name}}')
+    text :shipping_address_gstin, editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.gstin}}')
     large_text :shipping_address, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.address}}')
   end
 
@@ -474,7 +474,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
   condition condition_id: "Base Currency non editable for Indian vendor" do
     reference :entity, 'base_currency_id'
     rule Rules::Builder[:vendor_country_id_value].not_eq(value: 'India')
-    action :editable, false
+    action :editable, true
   end
 
   condition condition_id: "Disable item department > Item department not for Header Cost Allocation Items" do
@@ -517,7 +517,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
 
   condition condition_id: "Hide Roundoff for different currency" do
     reference :entity, 'items_summary.po_roundoff_amount'
-    rule Rules::Builder[:base_currency_id].eq(entity: "reporting_currency_id")
+    rule Rules::Builder[:base_currency_id].not_eq(entity: "reporting_currency_id")
     action :visible, false
   end
 
