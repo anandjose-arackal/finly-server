@@ -42,16 +42,16 @@ class Authenticator::SsoConfig < Transactions::API
   end
 
   def google_sso_config
-    # redirect_uri = "#{Rails.application.config_for(:sso_provider_credentials)[:omniauth][:google][:base_url]}/auth/google_oauth2/callback"
-    # client_id = Rails.application.config_for(:sso_provider_credentials)[:omniauth][:google][:client_id]
-    # sso_configs = {
-    #   'issuer': "Finly",
-    #   'logo': "https://img.icons8.com/color/24/000000/google-logo.png",
-    #   'auth_url': "https://accounts.google.com/o/oauth2/auth?response_type=code&state=&client_id=#{client_id}&scope=email&redirect_uri=#{redirect_uri}",
-    #   'label': "Google",
-    #   "provider": "google_oauth2",
-    #   'sso_type': "oauth2"
-    # }
-    # sso_configs
+    redirect_uri = "#{Rails.application.config_for(:sso_provider_credentials)[:omniauth][:google][:base_url]}/auth/google_oauth2/callback"
+    client_id = Rails.application.config_for(:sso_provider_credentials)[:omniauth][:google][:client_id]
+    sso_configs = {
+      'issuer': "Finly",
+      'logo': "https://img.icons8.com/color/24/000000/google-logo.png",
+      'auth_url': "https://accounts.google.com/o/oauth2/auth?response_type=code&state=&client_id=#{client_id}&scope=email&redirect_uri=#{redirect_uri}",
+      'label': "Google",
+      "provider": "google_oauth2",
+      'sso_type': "oauth2"
+    }
+    sso_configs
   end
 end
