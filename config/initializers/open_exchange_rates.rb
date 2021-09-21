@@ -26,4 +26,4 @@ LATEST_EXCHANGE_RATES.cache = Proc.new do |text|
     redis.get(OXR_CACHE_KEY)
   end
 end
-# LATEST_EXCHANGE_RATES.update_rates
+LATEST_EXCHANGE_RATES.update_rates
