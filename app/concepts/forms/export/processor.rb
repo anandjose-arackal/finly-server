@@ -34,7 +34,7 @@ class Forms::Export::Processor
           entity_type: 'text'
         },
         id: {
-          name: 'ID',
+          name: "#{form.label.singularize} Internal ID",
           entity_key: 'id',
           entity_type: 'text'
         }
@@ -108,12 +108,12 @@ class Forms::Export::Processor
           entity_type: 'text'
         },
         parent_id: {
-          name: "#{parent_sheet_label.singularize} ID",
+          name: "#{parent_sheet_label.singularize} Internal ID",
           entity_key: 'parent_id',
           entity_type: 'text'
         },
         id: {
-          name: 'ID',
+          name: "#{entity.label.singularize} Internal ID",
           entity_key: 'id',
           entity_type: 'text'
         }
