@@ -120,11 +120,13 @@ class WorkflowManager::Aasm::YesBankVendorProvider < WorkflowManager::Aasm::Base
     end
 
     if should_check_gstin
-      document_gstins = document.gstin_locations.pluck(:gstin)&.reject { |c| c.empty? }
-      similar_gstins = GstinLocation.where(vendor_id: user.company.yes_bank_vendors.non_deleted.filter_unique_check).where(gstin: document_gstins)
-      if similar_gstins.present?
-        self.messages[:error].push "GSTIN details for \"#{similar_gstins.first.gstin}\" already exists in the system. See vendor - #{similar_gstins.first.vendor.display_name}"
-        return false
+      document_gstins = document.gstin_locations.pluck(:gstin)&.reject { |c| c&.empty? }
+      if document_gstins.present?
+        similar_gstins = GstinLocation.where(vendor_id: user.company.yes_bank_vendors.non_deleted.filter_unique_check).where(gstin: document_gstins)
+        if similar_gstins.present?
+          self.messages[:error].push "GSTIN details for \"#{similar_gstins.first.gstin}\" already exists in the system. See vendor - #{similar_gstins.first.vendor.display_name}"
+          return false
+        end
       end
     end
     true
