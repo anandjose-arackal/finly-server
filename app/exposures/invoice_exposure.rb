@@ -264,6 +264,7 @@ class InvoiceExposure < Exposures::API
   end
 
   attribute :payments, record_attribute: true, exposure: true,  includes: [:payments]
+  attribute :agreement_item, record_attribute: true, exposure: true, includes: [:agreement_item]
 
 
   # def vendor_ref_num(invoice_line_item)

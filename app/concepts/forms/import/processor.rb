@@ -36,6 +36,7 @@ class Forms::Import::Processor
       worksheets[sheet_key] = workbook.add_worksheet(sheet_name)
       worksheets_length[sheet_key] = 0
       self.headers[sheet_key][:headers].values.each_with_index do |header_data, header_index|
+        worksheets[sheet_key].set_column(header_index, header_index, header_data[:name].length+10)
         worksheets[sheet_key].write(0, header_index, header_data[:name])
       end
     end
@@ -48,11 +49,13 @@ class Forms::Import::Processor
       if content[:data][:headers].present?
         content[:data][:headers].each_with_index do |key_value, index|
           sheet_header_keys << key_value[0]
+          worksheet.set_column(index, index, key_value[1][:label].length+10)
           worksheet.write(0, index, key_value[1][:label])
         end
       elsif content[:data][:choices].first.present?
         content[:data][:choices].first.each_with_index do |key_value, index|
           sheet_header_keys << key_value[0]
+          worksheet.set_column(index, index, key_value[0].titleize.length+10)
           worksheet.write(0, index, key_value[0].titleize)
         end
       end
@@ -72,7 +75,7 @@ class Forms::Import::Processor
     temp_file.file
   end
 
-  def process_import(request)
+  def process_import(request, attachments: nil)
     path = Rails.env.production? ? request.request_file&.url : request.request_file&.path
     imported_sheet = Roo::Spreadsheet.open(path)
 
@@ -111,13 +114,31 @@ class Forms::Import::Processor
         end
         header_details.values.each do |header_data|
           if ['dropdown'].include?(header_data[:entity_type])
-            data[header_data[:entity_key]] = header_data[:entity].choices_scope.find_by_name(row_data[header_data[:name]])&.dig(:id)
+            choice = header_data[:entity].choices_scope.find_by_id(row_data[header_data[:name]], user: user)
+            if choice.present?
+              if choice.respond_to?(:dig)
+                choice_id = choice&.dig(:id)
+              else
+                choice_id = choice&.id
+              end
+              data[header_data[:entity_key]] = parse_value(choice_id, header_data[:entity])
+            end
           elsif ['lookup'].include?(header_data[:entity_type])
-            data[header_data[:entity_key]] = header_data[:entity].choices_scope.find_by_name(row_data[header_data[:name]], user: user)&.id
+            data[header_data[:entity_key]] = parse_value(header_data[:entity].choices_scope.find_by_id(row_data[header_data[:name]], user: user)&.id, header_data[:entity])
           elsif ['attachment'].include?(header_data[:entity_type])
             if existing_record.present?
               field = existing_record.form_custom_fields.joins(:form_entity).where("form_entities.entity_key = ?", header_data[:entity_key]).first
               data[header_data[:entity_key]] = field.attachments.as_json if field.present?
+            else
+              data[header_data[:entity_key]] = []
+            end
+            if attachments.present? && row_data[header_data[:name]].present?
+              filenames = row_data[header_data[:name]].split("\n")
+              filenames.each do |filename|
+                if attachments[filename].present?
+                  data[header_data[:entity_key]] << attachments[filename].as_json
+                end
+              end
             end
           else
             data[header_data[:entity_key]] = parse_value(row_data[header_data[:name]], header_data[:entity])
@@ -128,8 +149,9 @@ class Forms::Import::Processor
           data.delete(:id)
         end
 
-        if data[:parent_id].present?
+        if data[:parent_id].present? || data[:parent_sequence_number].present?
           key = data[:parent_id].to_s
+          key = "Seq#{data[:parent_sequence_number]}" unless key.present?
           nested_data[data_headers[sheet_name]][key] = [] unless nested_data[data_headers[sheet_name]][key].present?
           nested_data[data_headers[sheet_name]][key] << data
         end
@@ -145,6 +167,7 @@ class Forms::Import::Processor
       end
 
       worksheet_headers.each_with_index do |header_name, header_index|
+        worksheet.set_column(header_index, header_index, header_name.length+10)
         worksheet.write(0, header_index, header_name)
       end
 
@@ -166,13 +189,31 @@ class Forms::Import::Processor
           form_data = {}.with_indifferent_access
           header_details.values.each do |header_data|
             if ['dropdown'].include?(header_data[:entity_type])
-              form_data[header_data[:entity_key]] = header_data[:entity].choices_scope.find_by_name(row_data[header_data[:name]], user: user)&.dig(:id)
+              choice = header_data[:entity].choices_scope.find_by_id(row_data[header_data[:name]], user: user)
+              if choice.present?
+                if choice.respond_to?(:dig)
+                  choice_id = choice&.dig(:id)
+                else
+                  choice_id = choice&.id
+                end
+                form_data[header_data[:entity_key]] = parse_value(choice_id, header_data[:entity])
+              end
             elsif ['lookup'].include?(header_data[:entity_type])
-              form_data[header_data[:entity_key]] = header_data[:entity].choices_scope.find_by_name(row_data[header_data[:name]], user: user)&.id
+              form_data[header_data[:entity_key]] = parse_value(header_data[:entity].choices_scope.find_by_id(row_data[header_data[:name]], user: user)&.id, header_data[:entity])
             elsif ['attachment'].include?(header_data[:entity_type])
               if existing_record.present?
                 field = existing_record.form_custom_fields.joins(:form_entity).where("form_entities.entity_key = ?", header_data[:entity_key]).first
                 form_data[header_data[:entity_key]] = field.attachments.as_json if field.present?
+              else
+                form_data[header_data[:entity_key]] = []
+              end
+              if attachments.present? && row_data[header_data[:name]].present?
+                filenames = row_data[header_data[:name]].split("\n")
+                filenames.each do |filename|
+                  if attachments[filename].present?
+                    form_data[header_data[:entity_key]] << attachments[filename].as_json
+                  end
+                end
               end
             else
               form_data[header_data[:entity_key]] = parse_value(row_data[header_data[:name]], header_data[:entity])
@@ -182,6 +223,8 @@ class Forms::Import::Processor
           nested_data.keys.each do |key|
             if form_data[:id].present?
               form_data[key] = nested_data[key][form_data[:id]]
+            elsif form_data[:import_sequence_number].present?
+              form_data[key] = nested_data[key]["Seq#{form_data[:import_sequence_number]}"]
             end
           end
 
@@ -196,7 +239,7 @@ class Forms::Import::Processor
           result = Forms::Import::Ops::Create.(params: form_data, current_user: user)
           if result.success?
             request.item_complete(true)
-            row[0] = result[:model].id
+            row[1] = result[:model].id
             row << result.messages[:success].to_s
           else
             request.item_complete(false)
@@ -315,23 +358,22 @@ class Forms::Import::Processor
   end
 
   def parse_value(value, entity)
-    unless entity.present?
-      return value.to_s.strip
-    end
+    return value.to_s.strip unless entity.present?
+    return entity.default_value unless value.present?
 
-    if value.present?
-      if value.is_a?(Float) || value.is_a?(Integer)
-        if ['number', 'amount'].include?(entity.entity_type)
-          return value
-        end
-
-        value = value.to_i.to_s
+    case value
+    when Float, Integer
+      if ['number', 'amount'].include?(entity.entity_type)
+        value
+      else
+        value.to_i.to_s.strip
       end
-
-      value = value.to_s.strip
-      return value
+    when ::Date
+      value.strftime('%Y-%m-%d')
+    when ::DateTime
+      value.strftime('%Y-%m-%d %H:%M:%S')
+    else
+      value.to_s.strip
     end
-
-    entity.default_value
   end
 end

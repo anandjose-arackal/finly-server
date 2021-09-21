@@ -4136,6 +4136,7 @@ ActiveRecord::Schema.define(version: 2021_08_26_035631) do
     t.boolean "default", default: false
     t.boolean "modified", default: false
     t.string "master"
+    t.text "iter_field", size: :long
     t.index ["active"], name: "index_export_template_news_on_active"
     t.index ["company_id"], name: "index_export_template_news_on_company_id"
     t.index ["created_by_id"], name: "index_export_template_news_on_created_by_id"
@@ -4224,6 +4225,7 @@ ActiveRecord::Schema.define(version: 2021_08_26_035631) do
     t.boolean "enforce_budget_limit", default: false
     t.integer "company_id"
     t.boolean "awaiting_approval_summary_enabled", default: false
+    t.boolean "predictions_enabled", default: false
     t.index ["grn_enabled"], name: "index_feature_subscriptions_on_grn_enabled"
     t.index ["srn_enabled"], name: "index_feature_subscriptions_on_srn_enabled"
     t.index ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id"
@@ -4302,6 +4304,7 @@ ActiveRecord::Schema.define(version: 2021_08_26_035631) do
     t.datetime "deleted_at"
     t.boolean "printable", default: true
     t.boolean "user_level_field", default: false
+    t.boolean "has_dependent_cf", default: false
     t.index ["company_id"], name: "index_field_configurations_on_company_id"
     t.index ["configurable_id"], name: "index_field_configurations_on_configurable_id"
     t.index ["configurable_type"], name: "index_field_configurations_on_configurable_type"
@@ -4361,6 +4364,7 @@ ActiveRecord::Schema.define(version: 2021_08_26_035631) do
     t.string "field_key"
     t.datetime "deleted_at"
     t.integer "company_id"
+    t.boolean "has_dependent_cf", default: false
     t.index ["field_configuration_id"], name: "index_field_drop_down_items_on_field_configuration_id"
   end
 
@@ -4813,6 +4817,7 @@ ActiveRecord::Schema.define(version: 2021_08_26_035631) do
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "label"
     t.index ["company_id"], name: "index_forms_on_company_id"
     t.index ["created_at"], name: "index_forms_on_created_at"
     t.index ["deleted_at"], name: "index_forms_on_deleted_at"
@@ -5127,6 +5132,10 @@ ActiveRecord::Schema.define(version: 2021_08_26_035631) do
     t.integer "status_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "result_file_file_name"
+    t.string "result_file_content_type"
+    t.bigint "result_file_file_size"
+    t.datetime "result_file_updated_at"
     t.index ["company_id"], name: "index_import_jobs_on_company_id"
     t.index ["completed_at"], name: "index_import_jobs_on_completed_at"
     t.index ["created_at"], name: "index_import_jobs_on_created_at"
@@ -6300,10 +6309,13 @@ ActiveRecord::Schema.define(version: 2021_08_26_035631) do
     t.datetime "deleted_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "pivot"
+    t.float "accuracy", default: 0.0
     t.index ["company_id"], name: "index_ml_model_pmmls_on_company_id"
     t.index ["created_at"], name: "index_ml_model_pmmls_on_created_at"
     t.index ["deleted_at"], name: "index_ml_model_pmmls_on_deleted_at"
     t.index ["ml_model_id"], name: "index_ml_model_pmmls_on_ml_model_id"
+    t.index ["pivot", "company_id", "ml_model_id"], name: "index_ml_model_pmmls_on_pivot_and_company_id_and_ml_model_id", unique: true
     t.index ["updated_at"], name: "index_ml_model_pmmls_on_updated_at"
   end
 
@@ -6318,10 +6330,12 @@ ActiveRecord::Schema.define(version: 2021_08_26_035631) do
     t.datetime "deleted_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "ml_model_pmml_id"
     t.index ["company_id"], name: "index_ml_model_predictions_on_company_id"
     t.index ["created_at"], name: "index_ml_model_predictions_on_created_at"
     t.index ["deleted_at"], name: "index_ml_model_predictions_on_deleted_at"
     t.index ["ml_model_id"], name: "index_ml_model_predictions_on_ml_model_id"
+    t.index ["record_id", "record_type", "ml_model_id"], name: "index_ml_model_predictions_on_record_and_ml_model_id", unique: true
     t.index ["record_type", "record_id"], name: "index_ml_model_predictions_on_record_type_and_record_id"
     t.index ["updated_at"], name: "index_ml_model_predictions_on_updated_at"
   end
@@ -6347,6 +6361,7 @@ ActiveRecord::Schema.define(version: 2021_08_26_035631) do
     t.string "form_id"
     t.string "parent_id"
     t.string "parent_type"
+    t.string "pivot_keys"
     t.index ["built_at"], name: "index_ml_models_on_built_at"
     t.index ["company_id"], name: "index_ml_models_on_company_id"
     t.index ["created_at"], name: "index_ml_models_on_created_at"
@@ -8830,6 +8845,7 @@ ActiveRecord::Schema.define(version: 2021_08_26_035631) do
     t.string "sgst_internal_id"
     t.date "start_date"
     t.date "end_date"
+    t.integer "created_by_id"
     t.index ["company_id"], name: "index_tax_rates_on_company_id"
   end
 

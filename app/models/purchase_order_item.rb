@@ -135,6 +135,18 @@ class PurchaseOrderItem < ApplicationRecord
     self.tds_applicable = self.inventory_line_item.tds_applicable
   end
 
+  def invoiced_total_amount
+    invoiced_amount = 0.0
+    if self.inventory_line_item&.product_type_id ==  ProductType.id_for(:goods)
+      invoiced_line_items = self.purchase_order.procurement.invoices.scope_all_except_voided.joins(items: :taxable_amount).where('invoice_line_items.purchase_order_item_id = ?', self.id)
+      invoiced_amount = invoiced_line_items.sum('amounts.value')&.round(2)
+    else
+      invoiced_line_items = self.purchase_order.procurement.invoices.scope_all_except_voided.joins(items: :billable_amount).where('invoice_line_items.purchase_order_item_id = ?', self.id)
+      invoiced_amount = invoiced_line_items.sum('amounts.value')&.round(2)
+    end
+    invoiced_amount
+  end
+
   private
 
   def budget_trail_entry

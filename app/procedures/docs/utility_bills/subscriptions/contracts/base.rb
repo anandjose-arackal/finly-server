@@ -232,7 +232,7 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
 
   def validate_subscription_uniqueness
     valid = true
-    unique_subscription =  BbpsBillerSubscription.filter_unique_check.where(bbps_biller_id: bbps_biller_id,
+    unique_subscription =  BbpsBillerSubscription.non_deleted.filter_unique_check.where(bbps_biller_id: bbps_biller_id,
                                                                             customer_param_key_1: customer_param_key_1,
                                                                             customer_param_value_1: customer_param_value_1,
                                                                             customer_param_key_2: customer_param_key_2,
@@ -242,7 +242,8 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
                                                                             customer_param_key_4: customer_param_key_4,
                                                                             customer_param_value_4: customer_param_value_4,
                                                                             customer_param_key_5: customer_param_key_5,
-                                                                            customer_param_value_5: customer_param_value_5).first
+                                                                            customer_param_value_5: customer_param_value_5,
+                                                                            company_id: current_user.company_id).first
     if unique_subscription.present?
       errors.add(:active_subscription,"already exist for this biller with Subscription ID #{unique_subscription.sequence_id}")
       valid = false

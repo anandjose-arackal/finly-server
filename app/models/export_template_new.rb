@@ -19,6 +19,7 @@
 #  default       :boolean          default(FALSE)
 #  modified      :boolean          default(FALSE)
 #  master        :string(255)
+#  iter_field    :text(4294967295)
 #
 
 class ExportTemplateNew < ApplicationRecord
