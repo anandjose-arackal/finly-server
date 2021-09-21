@@ -296,7 +296,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   end
 
   def po_modifiable?
-    (procurement.invoices.blank? && procurement.inward_documents.blank?)
+    (procurement.invoices.scope_all_except_voided.blank? && procurement.inward_documents.blank?)
   end
 
   def document_owner?
