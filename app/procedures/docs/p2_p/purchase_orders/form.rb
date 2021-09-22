@@ -115,6 +115,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
            visible: false
 
     date :delivery_date,
+         label: "Due Date",
          computed: Forms::Compute::Form('{% assign assigne_days = form.payment_term_days | times: 86400 %}{% assign calculated_date = form.created_at | date: "%s" | plus: assigne_days %}{{ calculated_date  | date: "%Y-%m-%d" }}'),
          visible: true, required: true, editable: true
 
@@ -197,6 +198,8 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
 
       text :description, editable: false, can_editable_be_changed: false, can_visible_be_changed: false,
           visible: false, computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.description}}')
+
+      # text :pr_number, label: "PR Number", editable: false, visible: false
 
       text :comment, label: "Narration"
       text :item_number, label: "Item Code", editable: false, 
@@ -327,7 +330,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
              can_visible_be_changed: false, can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_sub_total_amount]) # todo - changd name
 
-      amount :po_roundoff_amount, label: 'Roundoff Amount', visible: true, editable: false,
+      number :po_roundoff_amount, label: 'Roundoff Amount', visible: true, editable: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:po_roundoff_amount]) # todo - changd name
 
       amount :reporting_po_roundoff_amount, label: 'Roundoff Amount(Reporting Currency)', editable: false, visible: false,
@@ -559,4 +562,9 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
     action :required, false
   end
 
+  # condition condition_id: "Disable PR Number for POs without PR" do
+  #   reference :entity, 'pr_number'
+  #   # rule Rules::Builder[:purchase_order_item_id].eq(value: nil)
+  #   action :visible, false
+  # end
 end
