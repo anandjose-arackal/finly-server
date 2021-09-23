@@ -40,7 +40,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
       
       # NET AMOUNT
       po_sub_total_amount: "{% assign po_sub_total_amount = form.po_gross_amount | minus: form.po_discount_amount | plus: form.po_tax_amount | round: 2 %}{{ po_sub_total_amount | default: 0 | round: 2 }}",
-      po_roundoff_amount: "{% assign net_total_amount = form.po_sub_total_amount %}{% assign round_amount = net_total_amount | round %}{% assign amount = round_amount | minus: net_total_amount %}{% if form.base_currency_id != '1' %}{% assign amount = 0 %}{% endif %}{{ amount | default: 0 | round: 2 }}",
+      po_roundoff_amount: "{% assign net_total_amount = form.po_sub_total_amount %}{% assign round_amount = net_total_amount | round %}{% assign amount = round_amount | minus: net_total_amount %}{% if form.base_currency_id == '1' and form.reporting_currency_id == '1' %}{{ amount | default: 0 | round: 2 }}{% else %}{{ 0 }}{% endif %}",
       po_total_amount: "{{ form.po_sub_total_amount | plus: form.po_roundoff_amount | default: 0 | round: 2}}",
       po_balance_due: "{{ form.po_total_amount | default: 0 | round: 2}}",
       
