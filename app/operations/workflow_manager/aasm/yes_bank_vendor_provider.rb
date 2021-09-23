@@ -120,7 +120,7 @@ class WorkflowManager::Aasm::YesBankVendorProvider < WorkflowManager::Aasm::Base
     end
 
     if should_check_gstin
-      document_gstins = document.gstin_locations.pluck(:gstin)&.reject { |c| c&.empty? }
+      document_gstins = document.gstin_locations.pluck(:gstin).compact&.reject { |c| c&.empty? }
       if document_gstins.present?
         similar_gstins = GstinLocation.where(vendor_id: user.company.yes_bank_vendors.non_deleted.filter_unique_check).where(gstin: document_gstins)
         if similar_gstins.present?
