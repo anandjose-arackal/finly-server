@@ -411,7 +411,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
       number :credit_period, label: 'Credit Period', editable: true, visible: true
 
       large_text :note, editable: true, visible: true, required: true
-      dropdown :selected, editable: true, visible: true, choices_scope: Choices[:list].({ id: true, name: 'true' }, { id: false, name: 'false' }), default_value: false
+      dropdown :selected, editable: true, visible: true, choices_scope: Choices[:list].({ id: 1, name: 'true' }, { id: 2, name: 'false' }), default_value: 2
 
     end
   end
