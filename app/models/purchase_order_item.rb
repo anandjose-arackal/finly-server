@@ -228,6 +228,10 @@ class PurchaseOrderItem < ApplicationRecord
     invoiced_amount
   end
 
+  def pr_number
+    self.purchase_request_item&.purchase_request.order_number
+  end
+
   private
 
   def budget_trail_entry

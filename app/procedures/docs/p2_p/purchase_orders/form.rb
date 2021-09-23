@@ -195,11 +195,13 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
              can_visible_be_changed: false, can_editable_be_changed: false,
              choices_scope: Choices[:lookup].('items'),
              required: true, editable: true, visible: true
+            
+      text :purchase_request_item_id, visible: false, editable: false
 
       text :description, editable: false, can_editable_be_changed: false, can_visible_be_changed: false,
           visible: false, computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.description}}')
 
-      text :pr_number, label: "PR Number", editable: false, visible: true,
+      lookup :pr_number, label: "Purchase Request Number", editable: false, visible: true,
             computed: Forms::Compute::Lookup('items.purchase_request_item_id', "{{record.pr_number}}")
 
       text :comment, label: "Narration"
