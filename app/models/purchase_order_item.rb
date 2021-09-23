@@ -151,17 +151,17 @@ class PurchaseOrderItem < ApplicationRecord
 
   def before_tax_amount
     if parent_forms_enabled
-      self.taxable_amount&.value.to_f
-    else
       self.reporting_item_taxable_amount.to_f
+    else
+      self.taxable_amount&.value.to_f
     end
   end
 
   def after_tax_amount
     if parent_forms_enabled
-      self.total_amount&.value.to_f
-    else
       self.reporting_item_net_amount.to_f
+    else
+      self.total_amount&.value.to_f
     end
   end
 

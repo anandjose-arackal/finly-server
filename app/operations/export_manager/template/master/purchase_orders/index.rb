@@ -83,4 +83,9 @@ class ExportManager::Template::Master::PurchaseOrders::Index < ExportManager::Bu
   attribute :invoice_purchase_address, template: ''
   attribute :invoice_delivery_address, template: ''
   attribute :invoice_custom_fields, template: ''
+  attribute :reporting_net_amount, template: '{{ record.reporting_po_sub_total_amount }}', toggle: {if: [ PurchaseOrderToggle, :enabled?]}
+  attribute :reporting_balance_due, template: '{{ record.reporting_po_balance_due }}', toggle: {if: [ PurchaseOrderToggle, :enabled?]}
+  attribute :conversion_rate, template: '{{ record.conversion_rate }}', toggle: {if: [ PurchaseOrderToggle, :enabled?]}
+  attribute :reporting_currency, template: '{{ record.reporting_currency_code }}', toggle: {if: [ PurchaseOrderToggle, :enabled?]}
+  attribute :base_currency, template: '{{ record.base_currency_code }}', toggle: {if: [ PurchaseOrderToggle, :enabled?]}
 end
