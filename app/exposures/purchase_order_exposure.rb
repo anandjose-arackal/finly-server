@@ -164,4 +164,24 @@ class PurchaseOrderExposure < Exposures::API
     end
     approvers.reject { |e| e.to_s.empty? }.join(", ")
   end
+
+  attribute :conversion_rate do
+    record.conversion_rate
+  end
+  
+  attribute :reporting_po_sub_total_amount do
+    record.reporting_po_sub_total_amount
+  end
+  
+  attribute :reporting_po_balance_due do
+    record.reporting_po_balance_due
+  end
+
+  attribute :base_currency_code do    
+    record.get_base_currency.country_code
+  end
+
+  attribute :reporting_currency_code do
+    record.get_reporting_currency.country_code
+  end
 end
