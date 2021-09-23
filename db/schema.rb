@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_09_05_190602) do
+ActiveRecord::Schema.define(version: 2021_09_07_114538) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -7739,6 +7739,7 @@ ActiveRecord::Schema.define(version: 2021_09_05_190602) do
     t.decimal "reporting_po_advance_amount", precision: 20, scale: 10, default: "0.0"
     t.decimal "po_advance_tds_percentage", precision: 20, scale: 10, default: "0.0"
     t.integer "vendor_country_id"
+    t.boolean "retrieve_conversion_rate"
     t.index ["advance_amount_id"], name: "index_purchase_orders_on_advance_amount_id"
     t.index ["advance_amount_status_id"], name: "index_purchase_orders_on_advance_amount_status_id"
     t.index ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id"
@@ -7848,8 +7849,6 @@ ActiveRecord::Schema.define(version: 2021_09_05_190602) do
     t.integer "total_amount_id"
     t.boolean "cost_allocation_items", null: false
     t.datetime "deleted_at"
-    t.string "creator_name"
-    t.string "creator_email"
     t.date "conversion_date"
     t.integer "reporting_currency_id"
     t.integer "base_currency_id"

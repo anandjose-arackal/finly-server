@@ -27,6 +27,7 @@ json.documents do
         json.procurement_id document.procurement_id
       end
       json.base_currency document.get_base_currency
+      json.form_enabled document.forms_enabled
     when 'PurchaseRequest'
       json.document_number document.order_number
       json.date document.updated_at.strftime("%d-%b-%Y")
