@@ -18,4 +18,7 @@ class PurchaseRequestItemExposure < Exposures::API
   attribute :cost_center, record_attribute: true, exposure: true
   attribute :category, record_attribute: true, exposure: true
   attribute :hsn_sac, record_attribute: true
+  attribute :pr_number, exposure: true do
+    record.purchase_request&.item&.order_number
   end
+end

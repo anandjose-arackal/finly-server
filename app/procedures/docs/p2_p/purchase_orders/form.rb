@@ -199,7 +199,8 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
       text :description, editable: false, can_editable_be_changed: false, can_visible_be_changed: false,
           visible: false, computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.description}}')
 
-      # text :pr_number, label: "PR Number", editable: false, visible: false
+      text :pr_number, label: "PR Number", editable: false, visible: true,
+            computed: Forms::Compute::Lookup('items.purchase_request_item_id', "{{record.pr_number}}")
 
       text :comment, label: "Narration"
       text :item_number, label: "Item Code", editable: false, 
@@ -563,8 +564,8 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
   end
 
   # condition condition_id: "Disable PR Number for POs without PR" do
-  #   reference :entity, 'pr_number'
-  #   # rule Rules::Builder[:purchase_order_item_id].eq(value: nil)
+  #   reference :entity, 'items.pr_number'
+  #   rule Rules::Builder[:purchase_request_item_id].eq(value: nil)
   #   action :visible, false
   # end
 end
