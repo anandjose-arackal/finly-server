@@ -74,6 +74,12 @@ class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOr
       if obj.present?
         # self.duplicate_po.__send__("#{k}=", self.purchase_order.__send__(k))
         obj.each do |po|
+          if k == :form_custom_fields
+            custom_field = FormCustomField.new(po.dup.attributes.except([:id, :uuid]))
+            custom_field[:document_id] = self.duplicate_po.id
+            self.duplicate_po.form_custom_fields << custom_field
+            next
+          end
           self.duplicate_po.__send__(k) << po.dup
           
           if k == :quotations
