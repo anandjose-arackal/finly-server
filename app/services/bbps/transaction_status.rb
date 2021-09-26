@@ -6,7 +6,7 @@ class Bbps::TransactionStatus < Bbps::Api
     end
   end
 
-  path "getTxnStatus"
+  path "txnStatusCheck"
 
   # Message Code(B4000)|Ref No| Agent institution Id | Channel Id|Agent Id | Complaint Type|
   # Order No|Mobile No| From Date|To Date|
@@ -72,14 +72,14 @@ class Bbps::TransactionStatus < Bbps::Api
   )
 
   def self.build_matcher(options, result)
+    byebug
     Dry::Matcher.new(
       success: Dry::Matcher::Case.new(
         match: -> (result) {
-          if result['response.parsed']&.dig('status') == 'Y'
+          if result['response.parsed']&.dig('status') == 'SUCCESS'
             parsed_response = result['response.parsed'] || {}
-            if parsed_response['status'] == 'Y' and parsed_response['transaction_details'].present?
-              transaction_details = JSON.parse(parsed_response['transaction_details'])
-              transaction_details&.dig('TxnStatusComplainResp', 'txnList', 'txnDetail')&.first&.dig('txnStatus') == 'SUCCESS'
+            if parsed_response['status'] == 'SUCCESS' and parsed_response['txn_date'].present?
+              transaction_details = parsed_response
             else
               false
             end
@@ -91,13 +91,12 @@ class Bbps::TransactionStatus < Bbps::Api
       ),
       error: Dry::Matcher::Case.new(
         match: -> (result) {
-          if result['response.parsed']&.dig('status') == 'N'
+          if result['response.parsed']&.dig('status') == "FAILURE"
             true
-          elsif result['response.parsed']&.dig('status') == 'Y'
+          elsif result['response.parsed']&.dig('status') == "SUCCESS"
             parsed_response = result['response.parsed'] || {}
-            if parsed_response['status'] == 'Y' and parsed_response['transaction_details'].present?
-              transaction_details = JSON.parse(parsed_response['transaction_details'])
-              transaction_details&.dig('TxnStatusComplainResp', 'txnList', 'txnDetail')&.first&.dig('txnStatus') == 'FAILURE'
+            if parsed_response['status'] == 'SUCCESS' and parsed_response['txn_date'].nil?
+              true
             else
               false
             end
@@ -126,7 +125,18 @@ class Bbps::TransactionStatus < Bbps::Api
     params[:order_number]
   end
 
+  def biller_id
+    params[:biller_id]
+  end
+
+  def bbps_ref_id
+    params[:bbps_ref_id]
+  end
+
+
+
   def self.handle_success(result)
+    byebug
     OpenStruct.new(result['response.parsed'])
     #     {
     #         message_code: result['response.parsed']['message_code'],
@@ -159,11 +169,37 @@ class Bbps::TransactionStatus < Bbps::Api
   end
 
   def self.handle_error(data)
-    if data['error_desc'].downcase == 'success'
-      data['error_desc'] = "The payment was not accepted by the biller."
-    elsif data['error_desc'].downcase == 'must be filled'
-      data['error_desc'] = "The biller faced an error processing this payment. Please try again."
-    end
+    byebug
     data
   end
+
+  def generate_message
+    message = {}
+    message['billerId'] = biller_id
+    message['txnReferenceId'] = bbps_ref_id
+    message['xchangeId'] = 402 #fixed
+    message.to_json
+  end
+
+  def parse_response(user, params, response)
+    parsed_response = {}
+    received_response = JSON.parse(response.body)
+    received_response = {
+"respCode": "1",
+"response": "Transaction not Found",
+"status": "SUCCESS"
+}
+byebug
+   # return Failure("Invalid response") unless response.status == 200
+    return Failure("Invalid response") unless received_response&.dig(:response).present?
+    parsed_response["status"] = received_response[:status] #this will contain error message if failure/error
+    if (received_response[:response].is_a? String)
+      parsed_response["response"] = received_response[:response]
+      return parsed_response
+    end
+    return Failure("Error connecting with BBPS") if received_response&.dig(:status)!= "SUCCESS"
+    parsed_response["txn_date"] = received_response[:response][:ts]
+    parsed_response
+  end
 end
+

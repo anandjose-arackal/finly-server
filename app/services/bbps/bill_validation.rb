@@ -37,7 +37,7 @@ class Bbps::BillValidation < Bbps::Api
     end
   end
 
-  path "billValidate"
+  path "fetch"
 
   # Message Code (B1100) | Order No | Agent institution Id | Channel Id | Agent Id | Customer mobile | Biller Id |
   # Customer Param 1 | Customer Param 2 | Customer Param 3 | Customer Param 4 | Customer Param 5 |
@@ -76,6 +76,23 @@ class Bbps::BillValidation < Bbps::Api
           :additional_field, :additional_field, :additional_field, :additional_field, :additional_field,
       ]
   )
+
+  def self.build_matcher(options, result)
+    Dry::Matcher.new(
+        success: Dry::Matcher::Case.new(
+            match: -> (result) {p "Matcher:Success", result; result['response.parsed']&.dig('status') == 'SUCCESS'},
+            resolve: -> (result) { handle_success(result) }
+        ),
+        error: Dry::Matcher::Case.new(
+            match: -> (result) {p "Matcher:Error", result; result['response.parsed']&.dig('status') == 'FAILURE'},
+            resolve: -> (result) { handle_error(result['response.parsed']) }
+        ),
+        failure: Dry::Matcher::Case.new(
+            match: -> (result) {p "Matcher:Failure", result; true},
+            resolve: -> (result) {result}
+        )
+    )
+  end
 
   def message_code
     'B1100'
@@ -139,6 +156,19 @@ class Bbps::BillValidation < Bbps::Api
             error_description: result['response.parsed']['error_desc']
         }
     )
+  end
+
+  def parse_response(user, params, response)
+    parsed_response = {}
+    received_response = JSON.parse(response.body)
+    return Failure("Invalid response") unless response.status == 200
+    return Failure("Invalid response") unless received_response&.dig("response").present?
+    return Failure("Error connecting with BBPS") if received_response&.dig("response")["status"]!= "SUCCESS"
+    parsed_response["status"] = received_response&.dig("response")["status"]
+    parsed_response["bbps_ref_id"] = received_response["response"]["response"]["refId"]
+    parsed_response["error_code"] = received_response["response"]["response"]["billDetails"]["complianceRespCd"]
+    parsed_response["error_desc"] = received_response["response"]["response"]["billDetails"]["complianceReason"]
+    parsed_response
   end
 
 end

@@ -75,6 +75,8 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
 
   # validate :company_specific_entities
 
+  #below changed for local
+
   def company_entities
     params = {filter_role_id: [UserRole.id_for(:utility_bill_master_initiator), UserRole.id_for(:utility_bill_master_reviewer)], current_app: :vp}
     errors.add(:department_id, "Invalid Department") unless Company::Departments::Index.(current_user, params).policy_department_filter_mapping&.leaves&.pluck(:id)&.include?(department_id.to_i)
@@ -91,7 +93,6 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
   def validate_customer_params
     valid = true
     op = Docs::UtilityBills::Billers::Ops::Show.(params: {id: bbps_biller_id}, "current_user" => current_user)
-
     if op.success?
       bbps_biller = op['model']
       biller_customer_params = bbps_biller.biller_customer_params
@@ -107,12 +108,13 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
     valid = true
     if config.present?
       if label.present? && value.present?
-        if config['param_name'] != label
+        if config['param_name'] || config['paramName'] != label #needs to be changed to paramName, dataType etc..
           errors.add("customer_param_key_#{a}", "Expected Label #{config['param_name']}, got #{label}")
           valid = false
           return valid
         end
-        case config['data_type']
+        data_type = config['data_type'] || config['dataType']
+        case data_type
         when 'ALPHANUMERIC'
           errors.add("customer_param_key_#{a}", 'Invalid Data Provided') unless check_alphanumeric(value)
           valid = false
@@ -121,13 +123,15 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
           valid = false
         end
 
-        if config['min_length'].present?
-          errors.add("customer_param_key_#{a}", "#{label} should at least be of #{config['min_length']} characters") unless value&.to_s&.length >= config['min_length'].to_i
+        min_len = config['min_length'] || config['minLength']
+        if min_len.present?
+          errors.add("customer_param_key_#{a}", "#{label} should at least be of #{min_len} characters") unless value&.to_s&.length >= config['min_length'].to_i
           valid = false
         end
 
-        if config['max_length'].present?
-          errors.add("customer_param_key_#{a}", "#{label} should not exceed #{config['max_length']} characters") unless value&.to_s&.length <= config['max_length'].to_i
+        max_len = config['max_length'] || config['maxLength']
+        if max_len.present?
+          errors.add("customer_param_key_#{a}", "#{label} should not exceed #{max_len} characters") unless value&.to_s&.length <= config['max_length'].to_i
           valid = false
         end
 
