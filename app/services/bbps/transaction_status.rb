@@ -7,6 +7,17 @@ class Bbps::TransactionStatus < Bbps::Api
   end
 
   path "txnStatusCheck"
+  url 'http://180.179.170.6:1012/portal/service/npciservice'
+
+  def body
+    message = generate_message
+    encoded_message = Base64.strict_encode64(message)
+    encrypted_message = encrypt(encoded_message)
+    Rails.logger.info("Encrypted message :: #{encrypted_message}")
+    body = {request: encrypted_message}
+    log_generator.merge({request_raw_message: message})
+    body
+  end
 
   # Message Code(B4000)|Ref No| Agent institution Id | Channel Id|Agent Id | Complaint Type|
   # Order No|Mobile No| From Date|To Date|
@@ -72,7 +83,6 @@ class Bbps::TransactionStatus < Bbps::Api
   )
 
   def self.build_matcher(options, result)
-    byebug
     Dry::Matcher.new(
       success: Dry::Matcher::Case.new(
         match: -> (result) {
@@ -136,7 +146,6 @@ class Bbps::TransactionStatus < Bbps::Api
 
 
   def self.handle_success(result)
-    byebug
     OpenStruct.new(result['response.parsed'])
     #     {
     #         message_code: result['response.parsed']['message_code'],
@@ -169,37 +178,34 @@ class Bbps::TransactionStatus < Bbps::Api
   end
 
   def self.handle_error(data)
-    byebug
     data
   end
 
   def generate_message
     message = {}
     message['billerId'] = biller_id
-    message['txnReferenceId'] = bbps_ref_id
-    message['xchangeId'] = 402 #fixed
+    message['txnReferenceId'] = "YB311070CFPPGB4NMMS6"  #order_number check this
+    message['xchangeId'] = 402 #fixed 
     message.to_json
   end
 
   def parse_response(user, params, response)
     parsed_response = {}
     received_response = JSON.parse(response.body)
-    received_response = {
-"respCode": "1",
-"response": "Transaction not Found",
-"status": "SUCCESS"
-}
-byebug
-   # return Failure("Invalid response") unless response.status == 200
-    return Failure("Invalid response") unless received_response&.dig(:response).present?
-    parsed_response["status"] = received_response[:status] #this will contain error message if failure/error
-    if (received_response[:response].is_a? String)
-      parsed_response["response"] = received_response[:response]
-      return parsed_response
-    end
-    return Failure("Error connecting with BBPS") if received_response&.dig(:status)!= "SUCCESS"
-    parsed_response["txn_date"] = received_response[:response][:ts]
+    return Failure("Invalid response") unless response.status == 200
+    return Failure("Invalid response") unless received_response&.dig("response").present?
+
+    parsed_response["error_code"] = received_response["response"]["complianceRespCd"]
+    parsed_response["error_desc"] = received_response["response"]["complianceReason"]
+    parsed_response["status"] = received_response&.dig("status")
+    return Failure("Error connecting with BBPS") if received_response&.dig("status")!= "SUCCESS"
+
+    parsed_response["bbps_ref_id"] = received_response["response"]["refId"]
+    parsed_response["ref_no"] = received_response["response"]["txnReferenceId"]
+    parsed_response["txn_date"] = DateTime.now #received_response["response"]["ts"] change this
+    
     parsed_response
   end
+
 end
 

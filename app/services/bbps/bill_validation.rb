@@ -38,6 +38,7 @@ class Bbps::BillValidation < Bbps::Api
   end
 
   path "fetch"
+  url 'http://180.179.170.6:1012/portal/service/npciservice'
 
   # Message Code (B1100) | Order No | Agent institution Id | Channel Id | Agent Id | Customer mobile | Biller Id |
   # Customer Param 1 | Customer Param 2 | Customer Param 3 | Customer Param 4 | Customer Param 5 |
@@ -146,6 +147,39 @@ class Bbps::BillValidation < Bbps::Api
     amount_for(:amount_5)
   end
 
+  def body
+    message = generate_message
+    encoded_message = Base64.strict_encode64(message)
+    encrypted_message = encrypt(encoded_message)
+    Rails.logger.info("Encrypted message :: #{encrypted_message}")
+    body = {request: encrypted_message}
+    log_generator.merge({request_raw_message: message})
+    body
+  end
+
+  def generate_message
+    message = {}
+    message["custDetails"] = {}
+    message["custDetails"]["mobileNo"] = params["mobile_number"] || "1231231231"
+    message["custDetails"]["customerTags"] = []
+    message["agentDetails"] = {}
+    message["agentDetails"]["agentId"] = "YB31YB41MOB521611569"
+    message["agentDetails"]["deviceTags"] = []
+    message["agentDetails"]["deviceTags"] << { "name" => "IP", "value" => "13.232.176.84" }
+    message["agentDetails"]["deviceTags"] << { "name" => "IMEI", "value" => "1234~OS=Android~APP=Finly" }
+    message["billDetails"] = {}
+    message["billDetails"]["billerId"] = biller_id
+    message["billDetails"]["customerParams"] = []
+    (1..5).to_a.each do |i|
+      value = self.send("customer_param_#{i}")
+      customer_param_message = value.split('=')
+      if value.present? && value!= "NA"
+        message["billDetails"]["customerParams"] << { "name"=>customer_param_message[0], "value"=> customer_param_message[1]}
+      end
+    end
+    message.to_json
+  end
+
   def self.handle_success(result)
     OpenStruct.new(
         {
@@ -163,11 +197,13 @@ class Bbps::BillValidation < Bbps::Api
     received_response = JSON.parse(response.body)
     return Failure("Invalid response") unless response.status == 200
     return Failure("Invalid response") unless received_response&.dig("response").present?
-    return Failure("Error connecting with BBPS") if received_response&.dig("response")["status"]!= "SUCCESS"
-    parsed_response["status"] = received_response&.dig("response")["status"]
-    parsed_response["bbps_ref_id"] = received_response["response"]["response"]["refId"]
-    parsed_response["error_code"] = received_response["response"]["response"]["billDetails"]["complianceRespCd"]
-    parsed_response["error_desc"] = received_response["response"]["response"]["billDetails"]["complianceReason"]
+
+    parsed_response["error_code"] = received_response["response"]["complianceRespCd"]
+    parsed_response["error_desc"] = received_response["response"]["complianceReason"]
+    parsed_response["status"] = received_response&.dig("status")
+    return Failure("Error connecting with BBPS") if received_response&.dig("status")!= "SUCCESS"
+
+    parsed_response["bbps_ref_id"] = received_response["response"]["refId"]
     parsed_response
   end
 
