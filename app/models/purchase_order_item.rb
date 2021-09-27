@@ -63,6 +63,7 @@ class PurchaseOrderItem < ApplicationRecord
   belongs_to :category, optional: true
   belongs_to :cost_center, optional: true
   belongs_to :department, optional: true
+  belongs_to :product_type, optional: true
   belongs_to :purchase_request_item, optional: true
 
   alias_attribute :items_department_id, :department_id
