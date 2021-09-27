@@ -45,7 +45,7 @@
 #
 
 class PurchaseOrderItem < ApplicationRecord
-  attr_accessor :skip_callback
+  attr_accessor :skip_callback, :pr_number
   include LiquidDroppable
   include Exposures::Model::Exposable
   include FormsHelper
