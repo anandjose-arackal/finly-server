@@ -230,7 +230,7 @@ class PurchaseOrderItem < ApplicationRecord
   end
 
   def pr_number
-    self.purchase_request_item&.purchase_request.order_number
+    self.purchase_request_item&.purchase_request&.order_number
   end
 
   private
