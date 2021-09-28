@@ -2,7 +2,7 @@ module ExportManager::DSL::Generator
   extend ActiveSupport::Concern
 
   class Background < BackgroundOperation
-    sidekiq_options queue: :exports
+    sidekiq_options queue: :low
 
     def process
       export_job = ExportJob.find_by(id: params[:export_job_id])
