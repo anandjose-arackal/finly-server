@@ -1,4 +1,4 @@
-class Macros::V1::ReportProcessorsGroupsController < BaseControllers::MacrosBase
+class Macros::V1::ReportProcessorGroupsController < BaseControllers::MacrosBase
 
   def index
     params[:route] = 'report_processor_groups.default'
