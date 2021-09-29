@@ -24,7 +24,6 @@ json.items do
     json.utr utr
     json.reports do
       json.array! item.reports.sort do |report|
-        report_count += 1
         json.extract! report, :id, :policy, :date_as_string
         json.name "#{report.id} - #{report.name}"
         json.submitted_on DateUtils.date_formatted(report.submitted_at)
