@@ -1,6 +1,6 @@
 class Docs::ExpenseManagement::ReportProcessorGroups::Resolver < Resolver::API
 
-  entity Report
+  entity ReportProcessorGroup
 
   # Todo - this was quickly implemented for macros. This is not thought through well and might require a re-write
   # Currently this will only return company reports or personal reports

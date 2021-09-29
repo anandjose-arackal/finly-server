@@ -1,4 +1,4 @@
-json.id group.id
+json.id record.id
 json.created_by_user record.created_by_user
 json.status record.status
 json.created_at DateUtils.date_formatted record.created_at
