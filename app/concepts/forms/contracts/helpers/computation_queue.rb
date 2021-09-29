@@ -49,11 +49,9 @@ class Forms::Contracts::Helpers::ComputationQueue
       return unless user.present?
       return unless user.is_a?(User)
       
+      lookup_records = entity.compute_lookup_entity.choices_scope.with_id(lookup_values.values, params: {}, user: user)
       lookup_exposures = {}
-      unless entity.compute_lookup_entity.choices_scope.nil?
-        lookup_records = entity.compute_lookup_entity.choices_scope.with_id(lookup_values.values, params: {}, user: user)
-        lookup_records.each {|record| lookup_exposures[record.id.to_s] = record.to_exposure }
-      end
+      lookup_records.each {|record| lookup_exposures[record.id.to_s] = record.to_exposure }
 
       represented_list.each do |represented|
         lookup_value = lookup_values[represented]

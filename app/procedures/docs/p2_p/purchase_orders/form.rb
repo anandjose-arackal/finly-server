@@ -198,7 +198,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
              choices_scope: Choices[:lookup].('items'),
              required: true, editable: true, visible: true
             
-      text :purchase_request_item_id, visible: false, editable: false
+      text :purchase_request_item_id, visible: false, editable: false, choices_scope: Choices[:lookup].('purchase_requests')
 
       text :description, editable: false, can_editable_be_changed: false, can_visible_be_changed: false,
           visible: false, computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.description}}')
