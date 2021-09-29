@@ -28,7 +28,8 @@
 #
 
 class ReportProcessorGroup < ApplicationRecord
-
+  include Concerns::ErpSyncConcern
+  include ErpSyncable
   has_many :mappings, class_name: 'ReportProcessorGroupMapping', foreign_key: :processor_group_id, dependent: :destroy
   has_many :users, through: :mappings
   belongs_to :total_amount, optional: true, class_name: 'Amount', dependent: :destroy
@@ -140,6 +141,10 @@ class ReportProcessorGroup < ApplicationRecord
     end
   end
   # to here
+  scope :pending_erp_sync, -> (*args) {
+    with_erp_sync_status_pending.
+        where(status_id: ReportProcessorGroupStatus.id_for(:completed)) 
+  }
 
   default_scope { order created_at: :desc }
 
