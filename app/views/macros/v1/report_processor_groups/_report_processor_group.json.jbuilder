@@ -22,7 +22,6 @@ json.items do
     json.note item.note
     utr = (item.bank_reference_number.present?) ? item.bank_reference_number : item.payment&.utr
     json.utr utr
-    json.actions @result.item_actions(item)
     json.reports do
       json.array! item.reports.sort do |report|
         report_count += 1
