@@ -91,6 +91,8 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
            required: false, editable: false,
            default_value: PurchaseOrderStatus.id_for(:open),
            can_editable_be_changed: false
+    large_text :procurement_term_text, visible: false
+    number :procurement_term_id, visible: false 
   end
 
   # PURCHASE ORDER DETAILS
@@ -201,8 +203,8 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
       text :description, editable: false, can_editable_be_changed: false, can_visible_be_changed: false,
           visible: false, computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.description}}')
 
-      lookup :pr_number, label: "PR Number", editable: false, visible: false,
-            computed: Forms::Compute::Lookup('items.purchase_request_item_id', "{{record.pr_number}}")
+      number :pr_number, label: "PR Number", editable: false, visible: false,
+              computed: Forms::Compute::Lookup('items.purchase_request_item_id', "{{record.pr_number}}")
 
       text :comment, label: "Narration"
       text :item_number, label: "Item Code", editable: false, 
