@@ -7,11 +7,13 @@ class Docs::ExpenseManagement::ReportProcessorGroups::Resolver < Resolver::API
   def load(params)
     report_processor_groups = nil
     if user.admin?(:em)
-      report_processor_groups = ReportProcessorGroup.where(company_id: user.company_id)
+      report_processor_groups = ::ReportProcessorGroup.where(company_id: user.company_id)
     else
-      report_processor_groups = ReportProcessorGroup.where(company_id: user.company_id).created_by_user(user.id)
+      report_processor_groups = ::ReportProcessorGroup.where(company_id: user.company_id).created_by_user(user.id)
     end
-    report_processor_groups
+
+    return report_processor_groups unless report_processor_groups.nil?
+    ::ReportProcessorGroup.none
   end
 
 
