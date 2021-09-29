@@ -1,4 +1,4 @@
-class Docs::ExpenseManagement::ReportProcessorGroup::Resolver < Resolver::API
+class Docs::ExpenseManagement::ReportProcessorGroups::Resolver < Resolver::API
 
   entity Report
 

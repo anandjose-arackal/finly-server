@@ -221,7 +221,7 @@ Resolver::Router.draw do
   end
 
   scope :report_processor_groups do
-    route 'default', Docs::ExpenseManagement::ReportProcessorGroup::Resolver
+    route 'default', Docs::ExpenseManagement::ReportProcessorGroups::Resolver
   end
 
   route 'masters.*', Masters::Schema::Records::Resolver
