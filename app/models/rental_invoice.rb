@@ -368,7 +368,7 @@ class RentalInvoice < ApplicationRecord
     payment_term_days = self.payment_term&.days_after
     eligible_date = self.payment_agreement_upcoming_date
     if payment_term_days.present? && payment_term_days  < 0
-      eligible_date = (Date.today - payment_term_days.abs.days)
+      eligible_date = (eligible_date - payment_term_days.abs.days)
     end
     eligible_date <= Date.today
   end
