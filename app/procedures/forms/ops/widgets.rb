@@ -1,5 +1,4 @@
 class Forms::Ops::Widgets < Transactions::API
-  step :find_model
   step :find_document
   step :generate_data
 
@@ -8,18 +7,12 @@ class Forms::Ops::Widgets < Transactions::API
     about_document: {
       submitted_at:     "submitted_at",
       approved_at:      "approved_at",
-      controlling_user: "controlling_user"
+      controlling_user: "controlling_user.name"
     }
   }.freeze
 
-  def find_model(context, params:, current_user:, **)
-    context[:model] = Form.where.not(klass_name: nil).find_by(klass_name: Forms::Router.klass(params[:model])&.name, company_id: current_user.company_id)
-    return on_error context, :base, 'Form not found' unless context[:model].present?
-    true
-  end
-
   def find_document(context, params:, current_user:, **)
-    klass = params[:model].classify.constantize
+    klass = params[:model].singularize.downcase == 'vendor' ? YesBankVendor : params[:model].classify.constantize rescue nil
     context[:document] = klass.present? && klass.find_by(id: params[:document_id]) if params[:document_id].present?
     return on_error context, :base, 'Document not found' unless context[:document].present?
     true
@@ -35,7 +28,8 @@ class Forms::Ops::Widgets < Transactions::API
       if split_attributes.size > 1
         value = document
         split_attributes.each do |next_value|
-          value = value.send(next_value)
+          value = value.try(next_value)
+          break if value.nil?
         end
         data[key] = value
       else
