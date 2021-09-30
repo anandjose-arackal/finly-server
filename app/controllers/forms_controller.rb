@@ -50,6 +50,12 @@ class FormsController < BaseControllers::WebBase
     endpoint Forms::Ops::SyncPositions
   end
 
+  def form_widgets
+    endpoint Forms::Ops::Widgets do |m|
+      m.success { |result| render json: result[:widget_data], status: 200 }
+    end
+  end
+
   private
 
   def resolve_layout
