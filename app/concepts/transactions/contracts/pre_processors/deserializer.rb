@@ -17,11 +17,11 @@ class Transactions::Contracts::PreProcessors::Deserializer < Transactions::Contr
         parse_pipeline: ->(*) {
           ->(input, represented:, **) {
             if deserializer.is_a?(Symbol)
-              klass.send(deserializer, input, represented, **input)
+              klass.send(deserializer, input&.with_indifferent_access, represented, **input)
             elsif deserializer.is_a?(Class)
               # Todo
             else
-              deserializer.call(input, represented, **input&.symbolize_keys)
+              deserializer.call(input&.with_indifferent_access, represented, **input&.symbolize_keys)
             end
           }
         }

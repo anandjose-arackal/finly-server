@@ -17,6 +17,20 @@ Rails.application.configure do
     config.bullet_train = nil
   end
 
+  posthog_config = Rails.application.config_for(:posthog)&.with_indifferent_access
+  if posthog_config.present? and posthog_config['enabled']
+    config.posthog = PostHog::Client.new(
+      {
+        api_key: posthog_config['api_key'],
+        api_host: posthog_config['api_host'],
+        # Todo log errors
+        on_error: Proc.new { |status, msg| print msg }
+      }
+    )
+  else
+    config.posthog = nil
+  end
+
   config.active_storage.service = :local
   # Full error reports are disabled and caching is turned on.
   config.consider_all_requests_local       = false
