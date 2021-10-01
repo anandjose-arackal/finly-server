@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_09_05_190602) do
+ActiveRecord::Schema.define(version: 2021_09_29_041613) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -7608,6 +7608,7 @@ ActiveRecord::Schema.define(version: 2021_09_05_190602) do
     t.decimal "reporting_item_net_amount", precision: 20, scale: 5
     t.decimal "item_billable_amount", precision: 20, scale: 5
     t.decimal "reporting_item_billable_amount", precision: 20, scale: 5
+    t.string "pr_number"
     t.index ["department_id"], name: "index_purchase_order_items_on_department_id"
     t.index ["discount_amount_id"], name: "index_purchase_order_items_on_discount_amount_id"
     t.index ["inventory_line_item_id"], name: "index_purchase_order_items_on_inventory_line_item_id"
@@ -7739,6 +7740,7 @@ ActiveRecord::Schema.define(version: 2021_09_05_190602) do
     t.decimal "reporting_po_advance_amount", precision: 20, scale: 10, default: "0.0"
     t.decimal "po_advance_tds_percentage", precision: 20, scale: 10, default: "0.0"
     t.integer "vendor_country_id"
+    t.boolean "retrieve_conversion_rate"
     t.index ["advance_amount_id"], name: "index_purchase_orders_on_advance_amount_id"
     t.index ["advance_amount_status_id"], name: "index_purchase_orders_on_advance_amount_status_id"
     t.index ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id"
@@ -7848,8 +7850,6 @@ ActiveRecord::Schema.define(version: 2021_09_05_190602) do
     t.integer "total_amount_id"
     t.boolean "cost_allocation_items", null: false
     t.datetime "deleted_at"
-    t.string "creator_name"
-    t.string "creator_email"
     t.date "conversion_date"
     t.integer "reporting_currency_id"
     t.integer "base_currency_id"
@@ -8377,6 +8377,11 @@ ActiveRecord::Schema.define(version: 2021_09_05_190602) do
     t.boolean "marked_as_closed"
     t.boolean "tally_exported", default: false
     t.datetime "deleted_at"
+    t.integer "erp_sync_status_id"
+    t.text "erp_sync_message"
+    t.string "erp_sync_reference_id"
+    t.integer "erp_sync_attempts_count", default: 0
+    t.datetime "erp_sync_attempted_at"
     t.index ["company_id"], name: "index_report_processor_groups_on_company_id"
     t.index ["created_by_user_id"], name: "index_report_processor_groups_on_created_by_user_id"
     t.index ["payment_order_id"], name: "index_report_processor_groups_on_payment_order_id"
