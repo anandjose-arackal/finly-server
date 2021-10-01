@@ -1,7 +1,7 @@
 class FeatureSubscriptionType < NonTenantedApplicationRecord
   include Seedable
   def self.values
-    %w( expense_management vendor_payments disburse insights)
+    %w( expense_management vendor_payments disburse )
   end
 
   def  as_json

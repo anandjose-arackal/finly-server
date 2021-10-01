@@ -26,7 +26,7 @@ class UserPanelSubscription < ApplicationRecord
   validate :at_least_one_panel
 
   def default_subscription
-    self.default_subscription_type.name  if self.default_subscription_type_id.present?
+    return self.default_subscription_type.name  if self.default_subscription_type_id.present?
     feature = ''
     if self.expense_management
       feature = 'expense_management'
