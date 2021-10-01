@@ -949,6 +949,10 @@ class PurchaseOrder < ApplicationRecord
     PurchaseOrderStatus.ids_for(:processing).include?(purchase_order_status_id)
   end
 
+  def controlling_user
+    self.get_reviewers&.first
+  end
+
   private
 
   # def populate_advance_amount

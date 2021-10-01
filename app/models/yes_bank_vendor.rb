@@ -312,6 +312,10 @@ class YesBankVendor < ApplicationRecord
     self.business_name.blank? ? self.name : self.business_name
   end
 
+  def controlling_user
+    self.get_reviewers&.first
+  end
+
   def generate_sequential_id?
     # if the vendor is authorized or if the vendor already has a vendor ID from the frontend,
     # do NOT generate a custom sequential ID for them
