@@ -20,8 +20,23 @@ class UserPanelSubscription < ApplicationRecord
   belongs_to :user, optional: true
 
   belongs_to :company, optional: true
+  belongs_to :default_subscription_type, foreign_key: :default_subscription_type_id, class_name: 'FeatureSubscriptionType', optional: true
+
 
   validate :at_least_one_panel
+
+  def default_subscription
+    return self.default_subscription_type.name  if self.default_subscription_type_id.present?
+    feature = ''
+    if self.expense_management
+      feature = 'expense_management'
+    elsif  self.yes_bank_account_transfer
+      feature = 'vendor_payments'
+    elsif self.disburse
+      feature = 'disburse'
+    end
+    feature
+  end
 
   private
 
@@ -30,4 +45,6 @@ class UserPanelSubscription < ApplicationRecord
       errors.add(:user, "must belong to at least one of the features")
     end
   end
+
+\
 end

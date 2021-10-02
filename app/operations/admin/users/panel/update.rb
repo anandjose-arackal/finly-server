@@ -41,6 +41,6 @@ class Admin::Users::Panel::Update < Admin::Users::Base
   private
 
   def subscription_params
-    params.require(:user_panel_config).permit(:disburse, :expense_management, :yes_bank_account_transfer, :invoicing_system, :travel_request)
+    params.require(:user_panel_config).permit(:disburse, :expense_management, :yes_bank_account_transfer, :invoicing_system, :travel_request,:default_subscription_type_id)
   end
 end
