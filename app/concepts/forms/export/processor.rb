@@ -44,7 +44,7 @@ class Forms::Export::Processor
     form_sections.each do |section|
       section.entities.each do |entity|
         next unless entity.parent_id.blank?
-        next unless entity.visible
+        next unless (entity.visible || entity.conditions.joins(:actions).where(form_condition_actions: {property: :visible, value: true}).present?)
 
         sheets_headers[form.model.name][:headers].merge!(build_headers_for_entity(sheets_headers, form.label, entity, user))
       end
@@ -57,7 +57,7 @@ class Forms::Export::Processor
     headers = {}
 
     if entity.entities.blank?
-      if entity.visible
+      if (entity.visible || entity.conditions.joins(:actions).where(form_condition_actions: {property: :visible, value: true}).present?)
         if entity.entity_type == 'switch'
           headers[entity.entity_key.to_s] = {
             name: "#{entity.label}#{entity.required ? '*' : ''} (TRUE/FALSE)",
@@ -119,7 +119,7 @@ class Forms::Export::Processor
         }
       }
       entity.entities.each do |child_entity|
-        next unless child_entity.visible
+        next unless (child_entity.visible || child_entity.conditions.joins(:actions).where(form_condition_actions: {property: :visible, value: true}).present?)
 
         child_sheet_headers.merge!(build_headers_for_entity(sheets_headers, entity.entity_key, child_entity, user))
       end
@@ -141,7 +141,7 @@ class Forms::Export::Processor
       # next unless section.associate_custom_fields
 
       section.entities.each do |entity|
-        next unless entity.visible
+        next unless (entity.visible || entity.conditions.joins(:actions).where(form_condition_actions: {property: :visible, value: true}).present?)
         next unless ['lookup', 'dropdown'].include?(entity.entity_type)
         next unless entity.choices_scope.present?
 
