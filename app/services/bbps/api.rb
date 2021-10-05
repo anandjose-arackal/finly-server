@@ -23,7 +23,6 @@ class Bbps::Api < ServiceApi
   url Rails.application.config_for(:bbps_config)&.with_indifferent_access&.dig('base_url')
   header 'X-IBM-Client-Id', Rails.application.config_for(:bbps_config)&.with_indifferent_access&.dig('client_id')
   header 'X-IBM-Client-Secret', Rails.application.config_for(:bbps_config)&.with_indifferent_access&.dig('client_secret')
-  header "AUTH","7ljbVcKc1Ka5tpaGAyAvR/vNDcTzk1C+BRhUdM9zB3s="
   body -> (user, params) { body }
   client -> (user, params) { client }
   parse -> (user, params, response) { parse_response(user, params, response) }

@@ -7,7 +7,7 @@ class BbpsBillStatusChecker < BaseJob
 
     puts " ----------------------------- FINISHED #{self.name} ------------------------------"
   end
-
+ 
   class BbpsBillStatusChecker::Background
     include Sidekiq::Worker
     sidekiq_options queue: :payments_critical_queue
@@ -21,22 +21,25 @@ class BbpsBillStatusChecker < BaseJob
             next unless bill.present? && bill.class.name == "BbpsBill"
             order_number = bill.order_number
             bank_transaction = payment.bbps_bank_transaction
-            params = {
-                order_number: order_number
-            }
-            Bbps::TransactionStatus.call_async({params: params, "current_user" => payment.initiating_user}, {wait: true}) do |op|
-              op.success do |result|
+              params = {
+                  order_number: order_number,
+                  biller_id: bill.biller.biller_id,
+                  bbps_ref_id: "YB311070CFPPGB4NMMS6" #check format in supervisor
+                  #txn_ref_id: payment&.bbps_bank_transaction&.bbps_ref_id
+              }
+            Bbps::TransactionStatus.call_async({params: params, "current_user" => payment.initiating_user}, {wait: true}) do |op
+               op.success do |result|
                 puts "SUCCESS: #{result}"
                 payment.update(payment_status_id: PaymentStatus.id_for(:completed))
                 payment.payment_order.update_order_status
                 payment.payment_order.update_processed_amount
                 bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed))
                 bill.update(status_id: BbpsBillStatus.id_for(:paid))
-
+                
                 # Update last paid on date for subscription
                 # transaction_date = result&.transaction_details&.
-                transaction_details = JSON.parse result.transaction_details rescue {}
-                date = transaction_details&.dig("TxnStatusComplainResp")&.dig("txnList")&.dig("txnDetail")&.first&.dig("txnDate")
+                transaction_details = result
+                date = transaction_details&.dig("txn_date")
                 parsed_datetime = DateUtils.parse_datetime(date)
                 if date.present? && parsed_datetime.present?
                   payment&.parent&.update(paid_at: parsed_datetime)
@@ -57,7 +60,7 @@ class BbpsBillStatusChecker < BaseJob
 
                 payment.system_messages.destroy_all
                 # add error message to the ticket
-                error_message = result['error_desc']
+                error_message = result['response']
                 payment.system_messages.create(
                   system_message_type_id: SystemMessageType.id_for(:error),
                   content: "#{error_message}."

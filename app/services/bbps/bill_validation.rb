@@ -39,6 +39,7 @@ class Bbps::BillValidation < Bbps::Api
 
   path "fetch"
   url 'http://180.179.170.6:1012/portal/service/npciservice'
+  header "AUTH","7ljbVcKc1Ka5tpaGAyAvR/vNDcTzk1C+BRhUdM9zB3s="
 
   # Message Code (B1100) | Order No | Agent institution Id | Channel Id | Agent Id | Customer mobile | Biller Id |
   # Customer Param 1 | Customer Param 2 | Customer Param 3 | Customer Param 4 | Customer Param 5 |

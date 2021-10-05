@@ -50,6 +50,7 @@ class Bbps::BillFetch < Bbps::Api
 
   path "fetch"
   url 'http://180.179.170.6:1012/portal/service/npciservice'
+  header "AUTH","7ljbVcKc1Ka5tpaGAyAvR/vNDcTzk1C+BRhUdM9zB3s="
 
   def body
     message = generate_message
