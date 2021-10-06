@@ -20,7 +20,7 @@ class ExportManager::Master::Budgets::UsageSummary < ExportManager::Builders::Sp
 
   def input
     budget_group_id = params[:budget_group_id]
-    op = BudgetManager::BudgetGroupCriteria::Ops::Index.(params: {id: budget_group_id, include_children: true}, "current_user" => user)
+    op = BudgetManager::BudgetGroupCriteria::Ops::Index.(params: {id: budget_group_id, include_children: true}, current_user:  user)
     unless op.success?
       add_message :error, op.messages[:error]
       return
