@@ -5,7 +5,7 @@ class Admin::Users::Base < Admin::Base
     attr_accessor :created_user, :selected_user, :cards, :policies, :mapping,
                   :managers, :finance_managers, :wallet, :user_panel_subscription,
                   :itz_cash_card_programs, :reviewers, :creditors,
-                  :mapping_em, :mapping_vp, :company
+                  :mapping_em, :mapping_vp, :company,:feature_subscription_types
 
     def init
       self.created_user = params[:created_user]
@@ -15,6 +15,7 @@ class Admin::Users::Base < Admin::Base
       self.cards = retrieve_card_data
       self.policies = selected_user.policies
       self.user_panel_subscription = selected_user.user_panel_subscription
+      self.feature_subscription_types = FeatureSubscriptionType.all
 
       self.mapping = []
       self.policies.each do |policy|

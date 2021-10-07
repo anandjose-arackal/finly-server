@@ -88,6 +88,8 @@ json.subscriptions do
   json.yes_bank_account_transfer @result.user_panel_subscription&.yes_bank_account_transfer
   json.invoicing_system @result.user_panel_subscription&.invoicing_system
   json.travel_request @result.user_panel_subscription&.travel_request
+  json.default_subscription_type_id @result.user_panel_subscription&.default_subscription_type_id
+  json.feature_subscription_types @result.feature_subscription_types.as_json
 end
 
 json.individual_kyc @result.individual_kyc_data

@@ -8,7 +8,7 @@ class ActionsManager::Master::CreditNotes::Show < ActionsManager::Master::Base
 
   def initialize(user = nil, params = {})
     super
-    op_show = Docs::P2P::CreditNotes::Ops::Show.(params: params, current_user:  user)
+    op_show = Docs::P2P::CreditNotes::Ops::Show.(params: params, current_user: user)
 
     if op_show.success?
       self.credit_note = op_show['model']
