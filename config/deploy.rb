@@ -3,7 +3,7 @@ lock '~> 3.11'
 
 if ['api_production',
     'background_production', 'background_production_bgp', 'yes_bank_balance_poller',
-    'console_production'].include?(fetch(:stage)&.to_s)
+    'console_production', 'background_production_bgl'].include?(fetch(:stage)&.to_s)
   load_secure_storage(:production)
 elsif ['background_production_console'].include?(fetch(:stage)&.to_s)
   load_secure_storage(:background_production_console)
@@ -17,7 +17,7 @@ set :branch, ENV['REFERENCE'] || ENV['BRANCH'] || :master
 
 case fetch(:stage)
 when :aws_production, :background_production, :foreground_production, :console_production,
-    :api_production, :background_production_bgg, :background_production_bgp, :background_production_bgpc, :background_production_console
+    :api_production, :background_production_bgg, :background_production_bgp, :background_production_bgpc, :background_production_console, :background_production_bgl
   branch = fetch :branch
   unless ['master', :master].include?(branch)
     raise 'This branch cannot be deploy to production. Please select the correct branch'
@@ -105,7 +105,7 @@ linked_files = %w{
 }
 case fetch(:stage)
 when :itzcash_production, :aws_production, :background_production, :foreground_production, :console_production, :api_production, :background_production_console,
-    :background_production_bgg, :background_production_bgp, :background_production_bgpc
+    :background_production_bgg, :background_production_bgp, :background_production_bgpc, :background_production_bgl
   linked_files << 'config/elastic_apm.yml'
   linked_files << 'config/bunny.yml'
   linked_files << 'config/master_users.yml'

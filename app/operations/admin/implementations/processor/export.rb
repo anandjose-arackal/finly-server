@@ -1,4 +1,5 @@
 class Admin::Implementations::Processor::Export < Admin::Implementations::Processor::Base
+  sidekiq_options queue: :low
 
   def input
     # Implement me
