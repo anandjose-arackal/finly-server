@@ -67,33 +67,21 @@ class Masters::Schema::Contract < Reform::Form
         contract_parent: self,
         contract_root: self.contract_root,
     }
-    value.schema_contract.new(value, options.merge(properties))
+#    value.schema_contract.new(value, options.merge(properties))
   end
 
   def set_primary_key
-    self.primary_entity_key = nil
-    entities.each do |entity|
-      if entity.primary_key
-        if self.primary_entity_key.present?
-          errors.add :primary_key, 'is set for more than one entities'
-        else
-          self.primary_entity_key = entity.entity_key
-        end
-      end
-    end
-    if self.primary_entity_key.blank?
-      errors.add :primary_key, 'is not set'
-    end
+    #
   end
 
   def entity_key_uniqueness
-    used_keys = []
-    entities.each do |entity|
-      if used_keys.include?(entity.entity_key)
-        errors.add :base, "Entity Key #{entity.entity_key} is not unique"
-      end
+    # used_keys = []
+    # entities.each do |entity|
+    #   if used_keys.include?(entity.entity_key)
+    #     errors.add :base, "Entity Key #{entity.entity_key} is not unique"
+    #   end
 
-      used_keys << entity.entity_key
+    #   used_keys << entity.entity_key
     end
   end
 
