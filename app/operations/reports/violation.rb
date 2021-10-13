@@ -71,6 +71,8 @@ class Reports::Violation < Reports::Base
 
     expense_rules = policy.expense_rules.non_deleted.includes(:greater_than_amount,:category)
     budget_rules = policy.budget_rules.non_deleted.includes(:amount,:without_receipt_amount, :period, :budget_rule_category_mappings)
+    expenses = report.expenses.includes(:receipts,:amount,:tds_amount, :gst_amount, :card_expense,:distance_expense,:time_expense,:per_diem_expense)
+
     selected_drop_down_items = nil
 
     # For performance optimization, filtering down budget rules based on selected report custom fields
@@ -91,6 +93,13 @@ class Reports::Violation < Reports::Base
     rules_with_relevant_mappings =  rule_field_mappings.where(field_drop_down_item_id: expenses_selected_drop_down_items).pluck(:budget_rule_id)
     budget_rules = budget_rules.with_id((budgets_without_field_mappings + rules_with_relevant_mappings))
     report.expenses.each do |expense|
+      unless self.warning_messages[expense.id].present?
+        self.warning_messages[expense.id] = {}
+        self.warning_messages[expense.id]['expense_warning'] = []
+        self.warning_messages[expense.id]['expense_blocking'] = []
+        self.warning_messages[expense.id]['budget_warning'] = []
+        self.warning_messages[expense.id]['budget_blocking'] = []
+      end
       # because the incompatible expense violation needs to be calculated irrespective of the
       # existence of a policy
       check_compatible_expenses(expense)
@@ -231,24 +240,14 @@ class Reports::Violation < Reports::Base
     user = expense.user
     report = expense.report
     total_expenses = 0
-    # all user reports with the associated budget
-    report_ids = user.reports.processing_and_above.with_policy_id(rule.policy_id).pluck(:id) + [report.id]
+    report_ids = [report.id]
 
-    # Identify reports with the selected custom fields
-    if field_drop_down_item_ids.present?
-      reports = Report.with_id(report_ids).filter_custom_drop_down_selection(field_drop_down_item_ids)
-      report_ids = reports.pluck(:id)
-    end
     #checking for expense level custom_fields
     expense_with_custom_field = []
     if field_drop_down_item_ids.present?
       expense.custom_fields.where(value_type: "FieldDropDownSelection").map {|cf| expense_with_custom_field << expense.id if field_drop_down_item_ids.include?(cf.value.value.id) }
     end
 
-    if field_drop_down_item_ids.present?
-      reports = Report.with_id(report_ids).filter_custom_drop_down_selection(field_drop_down_item_ids)
-      report_ids = reports.pluck(:id)
-    end
      expenses = Expense.with_report_id(report_ids).or(Expense.where(id: expense_with_custom_field))
     expense_arrays  = []
     expense_types = rule.expense_types.pluck(:id)
