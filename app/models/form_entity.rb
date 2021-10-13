@@ -293,7 +293,8 @@ class FormEntity < ApplicationRecord
         visible: visible,
         unique: unique
       },
-      options: options
+      options: options,
+      currency_entity: currency_entity
     }
     if choices_scope.present?
       data[:choices] = choices_scope.build(params: opts[:params], user: opts[:current_user])
@@ -420,6 +421,10 @@ class FormEntity < ApplicationRecord
     end
 
     false
+  end
+
+  def currency_entity
+    return self.entity_type != 'amount' ? nil : self.entity_key.start_with?('reporting') ? 'reporting_currency' : 'base_currency'
   end
 
   private
