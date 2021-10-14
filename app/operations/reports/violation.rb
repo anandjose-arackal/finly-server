@@ -93,6 +93,13 @@ class Reports::Violation < Reports::Base
     rules_with_relevant_mappings =  rule_field_mappings.where(field_drop_down_item_id: expenses_selected_drop_down_items).pluck(:budget_rule_id)
     budget_rules = budget_rules.with_id((budgets_without_field_mappings + rules_with_relevant_mappings))
     expenses.each do |expense|
+      unless self.warning_messages[expense.id].present?
+        self.warning_messages[expense.id] = {}
+        self.warning_messages[expense.id]['expense_warning'] = []
+        self.warning_messages[expense.id]['expense_blocking'] = []
+        self.warning_messages[expense.id]['budget_warning'] = []
+        self.warning_messages[expense.id]['budget_blocking'] = []
+      end
       # because the incompatible expense violation needs to be calculated irrespective of the
       # existence of a policy
       check_compatible_expenses(expense)
