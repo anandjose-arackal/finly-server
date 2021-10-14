@@ -9,22 +9,22 @@ class Appsmith::Companies::ResetPassword < Transactions::API
 
     user_model(AdminUser)
     #this feature must not work in production so this function
-    step :checking_envirnoment
+    step :verify_non_prod_environment
     #this function reset all(uat) users password
-    step :process_data
+    step :reset_password
  
-    def checking_envirnoment(context, **)
+    def verify_non_prod_environment(context, **)
       return unauthorized!(context) if Rails.env.production?
       true
     end
 
-    def process_data(context, params:, **)
+    def reset_password(context, params:, **)
         if params[:set_password].blank? or params[:users_data].blank?
             #if appsmith user(s) by mistake edit the settings in appsmith then this function will check for empty password and users
             context[:error] = "password must not blank or users must be selected"
             return true
         else
-        params[:users_data].each do |user|
+            params[:users_data].each do |user|
                 ActsAsTenant.current_tenant = Company.find(user[:company_id])
                 context[:user_data] =  Company.find(user[:company_id]).users.find(user[:user_id])
                 context[:user_data].password = params[:set_password]
