@@ -3,9 +3,15 @@ class Appsmith::Companies::ResetPassword < Transactions::API
     schema do
         params do
           required(:set_password)
-          required(:users_data)
+          required(:users_data).array do
+            hash do
+              required(:company_id)
+              required(:user_id)
+            end
+          end
         end
     end
+    
 
     user_model(AdminUser)
     #this feature must not work in production so this function
