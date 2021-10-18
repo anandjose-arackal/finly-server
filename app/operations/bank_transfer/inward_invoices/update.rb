@@ -87,6 +87,15 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
       return
     end
 
+    unless self.cost_allocation_items
+      if self.inward_invoice_params[:department_id].blank?
+        add_message :error, "Please specify a Department."
+      end
+      if self.inward_invoice_params[:cost_center_id].blank?
+        add_message :error, "Please specify a Cost Center."
+      end
+    end
+
     if self.purchase_order&.advance_payments.blank? && StringUtils.to_bool(params[:invoice][:advance_amount_required])
       params[:invoice][:advance_amount_required] = false
     end
