@@ -31,7 +31,7 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
 
   def input
     budget_id = params[:budget_id]
-    op = ::BudgetManager::BudgetsTrb::Ops::Show.(params: {id: budget_id}, "current_user" => user, calculate_buckets: false)
+    op = ::BudgetManager::BudgetsTrb::Ops::Show.(params: {id: budget_id}, current_user:  user, calculate_buckets: false)
     unless op.success?
       add_message :error, op.messages[:error]
       return

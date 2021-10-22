@@ -13,11 +13,15 @@
 #  deleted_at             :datetime
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
+#  ml_model_pmml_id       :integer
 #
 class MlModelPrediction < ApplicationRecord
   belongs_to :company
   belongs_to :ml_model
+  belongs_to :ml_model_pmml
   belongs_to :record, polymorphic: true
+
+  scope :accurate, -> { where(is_accurate_prediction: true) }
 
   before_save do
     self.is_accurate_prediction = (actual_value.to_s == predicted_value.to_s)

@@ -1,13 +1,29 @@
 # Changelog
 All notable changes to this project will be documented in this file. Always add new logs to 
 beginning of this file.
+## 2021-09-30
+ - Feature: Macro API Report Processor group added
+ - Feature: Resolver For Report Processor group Added
+## 2021-09-17
+  - Fix: Payment Agreement added in invoice exposure
+## 2021-09-17
+  - Fix: Bbps Validation not including deleted subscription, default scope including deleted items on subscription
+## 2021-09-13
+  - Fix: Document Forwardable logic make uniq across invoices
+## 2021-09-08
+  - Fix: Deleted location excluded from validation
+ - Fix: Reviewers and Pending Reviewers added in vendor exposure
+## 2021-09-07
+  - Fix: Invoices in Initiated status not visible for Reviewer only roles
+
+## 2022-09-07
+ - Fix: Purchase Order - GRN - Invoice combined export exposure added
 
 ## 2021-09-02
   - Fix: HDFC Payment file format added with beneficiary email in em
 
 ## 2011-09-02
   - Fix Payment attribute overrided to handle different scenario ot UTR upload and API payment
-
 ## 2021-09-01
   - Fix: Payments and completed payments relation defined in Invoice exposure
 

@@ -8,7 +8,7 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
 
   def initialize(user = nil, params = {})
     super
-    op_show = Docs::UtilityBills::Bills::Ops::Show.(params: params, "current_user" => user)
+    op_show = Docs::UtilityBills::Bills::Ops::Show.(params: params, current_user:  user)
 
     if op_show.success?
       self.bbps_bill = op_show['model']

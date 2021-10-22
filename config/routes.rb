@@ -3044,6 +3044,8 @@ Rails.application.routes.draw do
   scope :appsmith do
     scope :companies do
       post '', to: "appsmith/companies#create"
+      post 'virtual_accounts', to: "appsmith/virtual_accounts#create"
+      post 'reset_password', to: "appsmith/users#reset_password"
     end
   end
 
@@ -4384,6 +4386,9 @@ Rails.application.routes.draw do
       get 'bills', to: 'bbps_bills#index'
       get 'bills/count', to: 'bbps_bills#count'
       post 'bills/new_sync_attempt', to: 'bbps_bills#new_sync_attempt'
+      get 'report_processor_groups/count', to: 'report_processor_groups#count'
+      post 'report_processor_groups/new_sync_attempt', to: 'report_processor_groups#new_sync_attempt'
+      resources :report_processor_groups, only: [:index]
     end
   end
 

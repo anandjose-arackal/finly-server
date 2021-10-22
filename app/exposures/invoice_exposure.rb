@@ -163,6 +163,19 @@ class InvoiceExposure < Exposures::API
     precision_value(value)
   end
 
+  attribute :paid_advance_amount, includes: [:advance_amount, {procurement: {purchase_order: :advance_amount}}] do
+    if record.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)
+      value = record.advance_amount&.value || 0
+    else
+      if record.procurement&.purchase_order&.advance_amount_status_id == AdvanceAmountStatus.id_for(:paid)
+        value = record.procurement&.purchase_order&.advance_amount&.value || 0
+      else
+        value = 0
+      end
+    end
+    precision_value(value)
+  end
+
   attribute :approvers, includes: [{dlrms: [:taken_control_by, :forwarded_to, :reviewer]}] do
     approvers = record.dlrms.map do |dlrm|
       taken_control_by = forwarded_to = reviewer = nil
@@ -262,6 +275,7 @@ class InvoiceExposure < Exposures::API
   end
 
   attribute :payments, record_attribute: true, exposure: true,  includes: [:payments]
+  attribute :agreement_item, record_attribute: true, exposure: true, includes: [:agreement_item]
 
 
   # def vendor_ref_num(invoice_line_item)
