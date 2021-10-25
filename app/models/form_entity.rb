@@ -424,6 +424,8 @@ class FormEntity < ApplicationRecord
   end
 
   def currency_entity
+    return 'reporting_currency_id' if self.entity_key == 'item_rate'
+
     return self.entity_type != 'amount' ? nil : self.entity_key.start_with?('reporting') ? 'reporting_currency_id' : 'base_currency_id'
   end
 
