@@ -11,6 +11,7 @@
 #  field_key              :string(255)
 #  deleted_at             :datetime
 #  company_id             :integer
+#  has_dependent_cf       :boolean          default(FALSE)
 #
 
 class FieldDropDownItem < ApplicationRecord

@@ -93,8 +93,8 @@ class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
     params[:credit_note][:invoice_id] = invoice.id
     params[:credit_note][:procurement_id] = invoice.procurement&.id
     params[:credit_note][:tds_rate_id] = invoice.tds_slab_id
-    params[:credit_note][:department_id] = invoice.department_id
-    params[:credit_note][:cost_center_id] = invoice.cost_center_id
+    params[:credit_note][:department_id] = (invoice.department_id.present? ? invoice.department_id : invoice.items.first.department_id)
+    params[:credit_note][:cost_center_id] = (invoice.cost_center_id.present? ? invoice.cost_center_id : invoice.items.first.cost_center_id)
     params[:credit_note][:shipping_location_id] = invoice.delivery_location_id
     params[:credit_note][:billing_location_id] = invoice.location_id
     params[:credit_note][:vendor_id] = invoice.vendor_id

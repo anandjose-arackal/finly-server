@@ -179,6 +179,10 @@ class BankTransfer::PaymentRequest::UtilityBills::CreateUtilityBillsTicket < Ban
             value: self.requested_amount,
             currency_id: (user&.company&.reporting_currency&.id || Currency.first.id)
         },
+        amount_processed_attributes: {
+            value: 0,
+            currency_id: (user&.company&.reporting_currency&.id || Currency.first.id)
+        },
         payment_mode: self.payment_mode,
         transfer_mode_id: self.transfer_mode_id,
         initiating_account_type: initiating_account&.class&.name,

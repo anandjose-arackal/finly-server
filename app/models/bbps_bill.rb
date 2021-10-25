@@ -259,12 +259,13 @@ class BbpsBill < ApplicationRecord
     subscription_ids = BbpsSubscriptionPoc.where(user_id: id).pluck(:subscription_id)
 
     bills = where(subscription_id: subscription_ids)
+    poc_bills_id = bills.pluck(:id)
 
     bill_ids = bills.where(user_id: nil).or(bills.where(user_id: id)).pluck(:id)
 
     user_bill_ids = BbpsBill.where(user_id: id).pluck(:id)
 
-    ids = bill_ids + user_bill_ids
+    ids = bill_ids + user_bill_ids + poc_bills_id
 
     where(id: ids)
   }

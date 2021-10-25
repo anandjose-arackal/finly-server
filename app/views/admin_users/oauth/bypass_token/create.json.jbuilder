@@ -28,6 +28,7 @@ json.data do
       end
     end
     json.user do
+      json.default_subscribed_type @user.user_panel_subscription.default_subscription
       json.expense_management @user.user_panel_subscription.expense_management
       json.disburse @user.user_panel_subscription.disburse
       json.payments @user.user_panel_subscription.yes_bank_account_transfer

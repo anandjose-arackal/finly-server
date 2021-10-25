@@ -122,7 +122,7 @@ class Dashboard::IndexCard < Transactions::API
 
   def build_path(item, rule, context = {})
     params = {
-        filter_status: {_id: item[:filter_id]&.to_s, identifier: item[:label]},
+        filter_status: {_id: item[:filter_id]&.to_s, identifier: "with_status_id"},
         id: (self.class.id || self.class.path)
     }
     if rule.present?
