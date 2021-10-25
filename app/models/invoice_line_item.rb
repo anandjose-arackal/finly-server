@@ -230,7 +230,7 @@ class InvoiceLineItem < ApplicationRecord
     if parent_forms_enabled
       self.reporting_item_taxable_amount&.to_f
     else
-      self.taxable_amount&.value.to_f
+      (self.taxable_amount.nil? ? 0 :self.taxable_amount&.value.to_f)
     end
   end
 
@@ -238,7 +238,7 @@ class InvoiceLineItem < ApplicationRecord
     if parent_forms_enabled
       self.reporting_item_net_amount&.to_f
     else
-      self.net_amount&.value.to_f
+      (self.net_amount.nil? ? 0 : self.net_amount&.value.to_f)
     end
   end
 
