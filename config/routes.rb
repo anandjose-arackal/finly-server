@@ -3045,7 +3045,7 @@ Rails.application.routes.draw do
   scope :appsmith do
     scope :companies do
       post '', to: "appsmith/companies#create"
-      post 'virtual_accounts', to: "appsmith/companies/virtual_bank_accounts#create"
+      post 'virtual_accounts', to: "appsmith/virtual_accounts#create"
       post 'reset_password', to: "appsmith/users#reset_password"
     end
   end
