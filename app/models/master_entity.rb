@@ -146,6 +146,17 @@ class MasterEntity < ApplicationRecord
     self.class.registered_type.to_s
   end
 
+  def data_card_route
+    # Applicable only for lookup/masters component
+    return nil unless choices_scope.respond_to?(:klass)
+
+    choices_scope_klass = choices_scope&.klass
+    if choices_scope_klass.present? and choices_scope_klass.respond_to?(:data_card_route)
+      return choices_scope_klass.data_card_route
+    end
+    nil
+  end
+
   def as_json(opts = {})
     registered_type = self.class.registered_type
     if registered_type.nil? and type.present?
@@ -181,6 +192,10 @@ class MasterEntity < ApplicationRecord
       data[:choices_data] = choices_scope.build(user: RequestStoreUtil.current_user)
       data[:autocomplete_url] = 'lookup/' + choices_scope.route.gsub('.', '/')
       data[:route] = choices_scope.route.split(".")[1]
+    end
+
+    if data_card_route.present?
+      data[:data_card] = data_card_route
     end
 
     data

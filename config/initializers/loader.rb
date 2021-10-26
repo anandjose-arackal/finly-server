@@ -20,6 +20,8 @@ Loader.watch! "Forms Types", dir: 'app/models/form_entity/**/*.rb'
 Loader.watch! "Master Types", dir: 'app/models/master_entity/**/*.rb'
 Loader.watch! "Choices", dir: 'app/concepts/choices/builders/**/*.rb'
 
+Loader.watch! "QuickView", dir: "app/procedures/quick_view/builders/*.rb"
+
 Loader.watch! "Form Contract Transformers", dir: "app/concepts/forms/generators/contracts/entity_builder/validations/**/*.rb"
 Loader.watch! "Form Contract Transformers", dir: "app/concepts/index_builder/content_types/**/*.rb"
 

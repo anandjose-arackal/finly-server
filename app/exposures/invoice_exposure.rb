@@ -30,6 +30,8 @@ class InvoiceExposure < Exposures::API
   attribute :department, record_attribute: true, exposure: true, includes: [:department]
   attribute :billing_location, record_attribute: :location, exposure: true, includes: [:location]
   attribute :shipping_location, record_attribute: :delivery_location, exposure: true, includes: [:delivery_location]
+  attribute :billing_address, record_attribute: true
+  attribute :shipping_address, record_attribute: true
   attribute :narration, record_attribute: true
   attribute :invoice_number, record_attribute: true
   attribute :created_at, record_attribute: true
@@ -159,6 +161,19 @@ class InvoiceExposure < Exposures::API
       value = record.advance_amount&.value || 0
     else
       value = record.procurement&.purchase_order&.advance_amount&.value || 0
+    end
+    precision_value(value)
+  end
+
+  attribute :paid_advance_amount, includes: [:advance_amount, {procurement: {purchase_order: :advance_amount}}] do
+    if record.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)
+      value = record.advance_amount&.value || 0
+    else
+      if record.procurement&.purchase_order&.advance_amount_status_id == AdvanceAmountStatus.id_for(:paid)
+        value = record.procurement&.purchase_order&.advance_amount&.value || 0
+      else
+        value = 0
+      end
     end
     precision_value(value)
   end

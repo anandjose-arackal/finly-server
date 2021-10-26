@@ -15,10 +15,18 @@ class Routers::Registry
   # Fixme: This is required to clear previous routes when the loader is loading the files in development env. Need to figure out a better way
   def self.routers
     @routers ||= [
+        ActionManager::Router,
+        Drawer::Router,
         Lookup::Router,
         Filters::Router,
         IndexBuilder::Router,
         Resolver::Router,
+        DataCards::Router,
+        Events::Router,
+        Forms::Router,
+        HoverCard::Router,
+        Masters::Router,
+        Resolver::Router
     ]
   end
 

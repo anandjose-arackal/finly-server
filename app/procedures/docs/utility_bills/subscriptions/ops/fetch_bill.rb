@@ -45,7 +45,7 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchBill < Transactions::API
   def bill_fetch(options, model:, **)
     # op = Bbps::BillFetch.call_async({params: fetch_params, "current_user" => User.first}, {wait: true})
     options['result'] = {}
-    Bbps::BillFetch.call_async({params: model.generate_billfetch_params, "current_user" => User.first}, {wait: true, wait_timeout: 180.seconds}) do |op|
+    Bbps::BillFetch.call_async({params: model.generate_billfetch_params, current_user: User.first}, {wait: true, wait_timeout: 180.seconds}) do |op|
       op.success do |result|
         options['result']['data'] = result
       end

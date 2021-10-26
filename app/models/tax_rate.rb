@@ -21,7 +21,6 @@
 #  end_date         :date
 #  created_by_id    :integer
 #
-
 class TaxRate < ApplicationRecord
   include SoftDeletable
   include LiquidDroppable

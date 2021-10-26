@@ -145,6 +145,7 @@ module Forms::Entity::Schema
           optional(:can_label_be_renamed).filled(:bool?)
           optional(:can_choices_be_changed).filled(:bool?)
           optional(:allow_clearing_default_value).filled(:bool?)
+          optional(:show_in_data_card_as).value(included_in?: DataCards::API::TYPES)
 
           optional(:choices).array do
             hash do

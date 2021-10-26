@@ -1,6 +1,7 @@
 class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
   model Invoice
+  policy Docs::P2P::Invoices::Policy, :show?
 
   meta ->(record) {
     {

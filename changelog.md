@@ -1,7 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file. Always add new logs to 
 beginning of this file.
-
+## 2021-09-30
+ - Feature: Macro API Report Processor group added
+ - Feature: Resolver For Report Processor group Added
 ## 2021-09-17
   - Fix: Payment Agreement added in invoice exposure
 ## 2021-09-17
