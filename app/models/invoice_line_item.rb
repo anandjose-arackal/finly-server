@@ -228,7 +228,7 @@ class InvoiceLineItem < ApplicationRecord
 
   def before_tax_amount
     if parent_forms_enabled
-      calculated_before_tax_amount  = (self.reporting_item_taxable_amount.nil? ? 0 : self.reporting_item_taxable_amoun.to_f)
+      calculated_before_tax_amount  = (self.reporting_item_taxable_amount.nil? ? 0 : self.reporting_item_taxable_amount.to_f)
     else
       calculated_before_tax_amount = (self.taxable_amount.nil? ? 0 : self.taxable_amount&.value.to_f)
     end
