@@ -3030,6 +3030,7 @@ Rails.application.routes.draw do
         resources :purchase_orders
         get 'bank_transfers', to: 'payments#all_payments'
         get 'vendors', to: 'vendors#index'
+        get 'invoices', to: 'inward_invoices#index'
       end
       scope :vendors do
         #todo vendor Emp
