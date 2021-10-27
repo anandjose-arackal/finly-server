@@ -23,6 +23,17 @@ class Procurements::PurchaseOrders::Create < Procurements::PurchaseOrders::Base
       return
     end
 
+    pr_item_ids = []
+    self.params[:purchase_order][:purchase_request_items_attributes].each{ |x| pr_item_ids << x.pluck('id') } if params[:purchase_order].present? && self.params[:purchase_order][:purchase_request_items_attributes].present?
+    if pr_item_ids.present?
+      pr_item_ids = pr_item_ids.flatten.compact
+      currency_ids = PurchaseRequestItem.where(id: pr_item_ids).map{ |item| item.purchase_request.base_currency_id }
+      if currency_ids.compact.uniq.size > 1
+        add_message :error, "Can't create PO with items of different currency"
+        return
+      end
+    end
+
   end
 
   def pre_process
