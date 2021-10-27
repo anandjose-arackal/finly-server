@@ -21,14 +21,14 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
       item_discount_amount:  "{% if form.discount_type_id == 1 %}{{ row.item_gross_amount | times: row.discount | divided_by: 100.00 | default: 0 | round: 2  }}{% else %}{{ row.discount | default: 0 }}{% endif %}",
       item_taxable_amount: "{{ row.item_gross_amount | minus: row.item_discount_amount | default: 0 | round: 2  }}",
       item_tax_amount: "{{ row.item_taxable_amount | times: row.tax_percentage | divided_by: 100.00 | default: 0 | round: 2  }}",
-      item_net_amount: "{{ row.item_taxable_amount | plus: row.item_tax_amount | default: 0 | round: 2 }}",
+      item_net_amount: "{{ row.item_taxable_amount | plus: row.item_tax_amount | default: 0 | round: 2 | at_least: 0 }}",
         
       # CONVERTED VALUES
       reporting_item_gross_amount: "{{ row.item_gross_amount | times: form.conversion_rate | default: 0 | round: 2}}",
       reporting_item_discount_amount: " {{ row.item_discount_amount | times: form.conversion_rate | default: 0 | round: 2}}",
       reporting_item_taxable_amount: "{{ row.item_taxable_amount | times: form.conversion_rate | default: 0 | round: 2}}",
       reporting_item_tax_amount: "{{ row.item_tax_amount | times: form.conversion_rate | default: 0 | round: 2  }}",
-      reporting_item_net_amount: "{{ row.item_net_amount | times: form.conversion_rate | default: 0 | round: 2  }}",
+      reporting_item_net_amount: "{{ row.item_net_amount | times: form.conversion_rate | default: 0 | round: 2 | at_least: 0  }}",
     },
 
     # PURCHASE ORDER SUMMARY
@@ -428,6 +428,12 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
     reference 'delivery_date'
     error_message "Order Date Cannot be Later than Delivery Date"
     rule Rules::Builder['delivery_date'].lt(entity: "created_at")
+  end
+
+  validation validation_id: "Items > Item net amount cannot be less than 0" do
+    reference 'items.item_net_amount'
+    error_message "Item net amount cannot be less than 0"
+    rule Rules::Builder['items.net_amount'].lt(value: 0)
   end
 
   # validation validation_id: "Advance Amount Can not be greater than Balance Payable" do
