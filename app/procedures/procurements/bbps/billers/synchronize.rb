@@ -51,30 +51,74 @@ class Procurements::Bbps::Billers::Synchronize < Transactions::API
 
     # Limit biller fetching to 100
     billers = billers.first(20) unless Rails.env.production? or Rails.env.uat? or Rails.env.staging?
+    #biller_config["biller_payment_modes"] = biller_config["biller_pymt_modes"]
+    #biller_config["biller_payment_channels"] = biller_config["biller_pymt_chnls"]
+    #biller_config["biller_customer_params"] = biller_config["customer_params"]
+    #biller_config["biller_response_params"] = biller_config["response_params"]
+    #biller_config["biller_additional_info"] = biller_config["additonal_info"]
+    #biller_config["interchange_fee_conf"] = biller_config["int_fee_conf"]
+    #biller_config["interchange_fee"] = biller_config["int_chng_fee"]
+      
+    
+     # biller_config.delete("biller_pymt_modes")
+     #  biller_config.delete("biller_pymt_chnls")
+     #biller_config.delete("customer_params")
+      #biller_config.delete("response_params")
+      #biller_config.delete("additonal_info")
+      #biller_config.delete("int_fee_conf")
+      #biller_config.delete("int_chng_fee")
 
     billers.each do |biller_config|
-      ::Bbps::BillerDetails.(params: {biller_id: biller_config['biller_id']}, 'current_user' => nil) do |m|
-        m.success do |result|
-          error_message = create_or_update_biller(result)
-          if error_message.blank?
-            options['billers.success'] << biller_config['biller_id']
-          else
-            deactivate(biller_config['biller_id'])
-            options['billers.failed'] << biller_config.merge({errors: error_message})
-          end
-        end
 
-        m.error do |result|
-          deactivate(biller_config['biller_id'])
-          options['billers.failed'] << biller_config.merge({errors: result})
-        end
+    biller_config["biller_payment_modes"] = biller_config["biller_pymt_modes"]
+    biller_config["biller_payment_channels"] = biller_config["biller_pymt_chnls"]
+    biller_config["biller_customer_params"] = biller_config["customer_params"]
+    biller_config["biller_response_params"] = biller_config["reponse_params"] #change to response
+    biller_config["biller_additional_info"] = biller_config["additonal_info"]
+    biller_config["interchange_fee_conf"] = biller_config["int_fee_conf"]
+    biller_config["interchange_fee"] = biller_config["int_chng_fee"]
+      
+    
+     biller_config.delete("biller_pymt_modes")
+      biller_config.delete("biller_pymt_chnls")
+     biller_config.delete("customer_params")
+      biller_config.delete("reponse_params") #change to response
+      biller_config.delete("additonal_info")
+      biller_config.delete("int_fee_conf")
+      biller_config.delete("int_chng_fee")
 
-        m.failure do |result|
-          deactivate(biller_config['biller_id'])
-          options['billers.failed'] << biller_config.merge({errors: result})
-        end
+      error_message = create_or_update_biller(biller_config)
+      if error_message.blank?
+        options['billers.success'] << biller_config['biller_id']
+      else
+        deactivate(biller_config['biller_id'])
+        options['billers.failed'] << biller_config.merge({errors: error_message})
       end
     end
+
+    # billers.each do |biller_config|
+    #   ::Bbps::BillerDetails.(params: {biller_id: biller_config['biller_id']}, 'current_user' => nil) do |m|
+    #     m.success do |result|
+    #       error_message = create_or_update_biller(result)
+    #       if error_message.blank?
+    #         options['billers.success'] << biller_config['biller_id']
+    #       else
+    #         deactivate(biller_config['biller_id'])
+    #         options['billers.failed'] << biller_config.merge({errors: error_message})
+    #       end
+    #     end
+
+    #     m.error do |result|
+    #       deactivate(biller_config['biller_id'])
+    #       options['billers.failed'] << biller_config.merge({errors: result})
+    #     end
+
+    #     m.failure do |result|
+    #       deactivate(biller_config['biller_id'])
+    #       options['billers.failed'] << biller_config.merge({errors: result})
+    #     end
+    #   end
+    # end
     true
   end
 

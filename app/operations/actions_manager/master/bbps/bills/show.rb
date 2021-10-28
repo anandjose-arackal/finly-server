@@ -83,6 +83,7 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
   end
 
   def bill_validate
+    return true
     bbps_bill.bill_validation_required? && (bbps_bill.subscription.user_id == user.id || bbps_bill.subscription.pocs.include?(user) || bbps_bill.get_reviewers.include?(user))
   end
 
@@ -91,6 +92,7 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
   end
 
   def transaction_status
+    return true
     BbpsBill.status_ids(:payment_initiated, :paid, :failed).include?(bbps_bill.status_id)
   end
 
