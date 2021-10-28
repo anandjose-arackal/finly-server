@@ -26,17 +26,17 @@ module Masters::Entity::Registry
     entity.assign_attributes Masters::Entity::Schema::SYSTEM_DEFAULTS
     entity_key = entity.entity_key
 
-    # contract = klass.build_schema_contract.new(entity)
-    # params = klass.schema.deep_dup
-    # params[:position] = entities.size
-    # unless contract.validate(params.deep_merge(opts))
-    #   raise "Invalid MasterEntity: #{self}##{entity_key} (#{klass}) Failure: #{contract.errors.full_messages}"
-    # end
-    # unless type == :multi_lookup || model.columns.find {|col| col.name.to_s == entity_key.to_s}.present?
-    #   raise "Invalid MasterEntity: #{self}##{entity_key} (#{klass}) Failure: column #{entity_key} is not defined for #{model}"
-    # end
+    contract = klass.build_schema_contract.new(entity)
+    params = klass.schema.deep_dup
+    params[:position] = entities.size
+    unless contract.validate(params.deep_merge(opts))
+      raise "Invalid MasterEntity: #{self}##{entity_key} (#{klass}) Failure: #{contract.errors.full_messages}"
+    end
+    unless type == :multi_lookup || model.columns.find {|col| col.name.to_s == entity_key.to_s}.present?
+      raise "Invalid MasterEntity: #{self}##{entity_key} (#{klass}) Failure: column #{entity_key} is not defined for #{model}"
+    end
 
-    # contract.sync
+    contract.sync
 
     entities << entity
   end

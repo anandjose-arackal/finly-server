@@ -1,14 +1,13 @@
-class BbpsBillsFetch1 < BaseJob
+class BbpsBillsFetch < BaseJob
 
   def self.perform_job
-    ActsAsTenant.current_tenant = Company.first
     puts " ----------------------------- PERFORMING #{self.name} at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
 
     # Fetch bills where automatic fetching is enabled
     expired_status_id = BbpsBillStatus.id_for(:expired)
 
     status_ids = BbpsBillerSubscription.status_ids(:approved, :auto_approved, :reactivated)
-    bbps_subscriptions = BbpsBillerSubscription.where(id: 40)
+    bbps_subscriptions = BbpsBillerSubscription.where(status_id: status_ids, auto_generate_bill: true, auto_fetch_enabled: true).where(expected_bill_day: nil, deleted_at: nil)
     autofetched = true
 
 
@@ -53,10 +52,10 @@ class BbpsBillsFetch1 < BaseJob
 
       if will_create
         parameters = customer_params(subscription).with_indifferent_access
-        Bbps::BillFetch.call({params: parameters, "current_user" => User.first}, {wait: false, wait_timeout: 180.seconds}) do |op|
+        Bbps::BillFetch.call_async({params: parameters, "current_user" => User.first}, {wait: true, wait_timeout: 180.seconds}) do |op|
           op.success do |result|
             ap result
-            create_bill(result, subscription, true)
+            create_bill(result, subscription, autofetched)
           end
           op.error do |result|
             # Will never enter here
@@ -75,13 +74,14 @@ class BbpsBillsFetch1 < BaseJob
     autofetched = false
     bill_day = (Date.today + 2.days).day
     bbps_subscriptions = BbpsBillerSubscription.where(status_id: status_ids, auto_generate_bill: true).where(expected_bill_day: bill_day)
-    bbps_subscriptions.each {|subscription| create_bill({}, subscription, true)}
+    bbps_subscriptions.each {|subscription| create_bill({}, subscription, autofetched)}
 
     puts " ----------------------------- FINISHED #{self.name} ------------------------------"
   end
 
   def self.create_bill(result, subscription, autofetched)
     if autofetched
+
       bill_parse_op = Docs::UtilityBills::Bills::Ops::BillParser.(params: {data: result}, current_user: User.first)
 
       parsed_bill_data = bill_parse_op[:result].merge({autofetched: autofetched, subscription_id: subscription.id})
