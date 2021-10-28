@@ -217,8 +217,9 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
 
       lookup :category_id, label: "Category", required: true, visible: true, editable: true, choices_scope: Choices[:lookup].('categories'), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.category_id}}')
 
-      text :gl_code, label: "GL Code", editable: false, visible: false, 
-        computed: Forms::Compute::Lookup('items.category_id', '{{record.gl_code}}')
+      # Prakash implemented this with items.category but for some reason it always return '' even if value is present in db
+      text :gl_code, label: "GL Code", editable: false, visible: true, 
+          computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.gl_code}}')
       
       text :hsn_sac, label: "HSN/SAC", editable: true, visible: true,
         computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.hsn_sac}}')
