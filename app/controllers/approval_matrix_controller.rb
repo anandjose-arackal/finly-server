@@ -5,4 +5,9 @@ class ApprovalMatrixController < BaseControllers::WebBase
     respond
   end
 
+  def vp_workflow_config
+    @result = ActionsManager::Processor.(current_user, params)
+    respond
+  end
+
 end
