@@ -68,9 +68,9 @@ class Masters::API
     ActsAsTenant.without_tenant do
       @schema.instance_eval &block if block_given?
     end
-#    contract = Masters::Schema::Contract.new(@schema)
-#    raise "Invalid Master Schema: #{contract.errors}" unless contract.validate({})
-#    contract.sync
+    contract = Masters::Schema::Contract.new(@schema)
+    raise "Invalid Master Schema: #{contract.errors}" unless contract.validate({})
+    contract.sync
 
     @schema
   end

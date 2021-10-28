@@ -360,9 +360,13 @@ class ApplicationController < ActionController::Base
 
     set_tokens_in_header
 
-   # doorkeeper_authorize! *scopes
+    doorkeeper_authorize! *scopes
 
- 
+    unless doorkeeper_token&.status_id == UserSessionStatus.id_for(:authorized)
+      head 401
+      return
+    end
+
     load_global_variables
 
     if current_user.present? && current_user.active?
@@ -413,7 +417,6 @@ class ApplicationController < ActionController::Base
   end
 
   def verify_user_session(doorkeeper_token)
-    return true
     user_session = UserSession.find_by_access_token_id(doorkeeper_token.id)
     if user_session.nil?
       # if doorkeeper_token.scopes.include?('web')

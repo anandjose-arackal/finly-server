@@ -30,8 +30,6 @@ class Company::Departments::Index < Company::Departments::Base
   end
 
   def process
-    self.departments = user.company.departments.non_deleted
-    return
     if user.company_admin? || user.vp_admin_or_auditor?
       self.departments = user.company.departments.non_deleted
     elsif ["fi", :fi].include?(RequestStore.store[:current_app])
