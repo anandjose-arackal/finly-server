@@ -6,7 +6,7 @@ class UpdatePurchaseOrderLineItemForForms < ActiveRecord::Migration[6.0]
     end
 
     unless ActiveRecord::Base.connection.column_exists?(:purchase_order_items, :product_type_id)
-      add_column :purchase_order_items, :product_type_id, :boolean
+      add_column :purchase_order_items, :product_type_id, :integer
     end
 
     unless ActiveRecord::Base.connection.column_exists?(:purchase_order_items, :gl_code)
