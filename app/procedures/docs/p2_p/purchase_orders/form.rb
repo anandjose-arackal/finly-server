@@ -289,6 +289,9 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
              can_visible_be_changed: false, can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_net_amount])
     end
+
+    large_text :vendor_note, label: "Vendor Note", editable: true, visible: true,
+          can_visible_be_changed: false, can_editable_be_changed: false
   end
 
   # PURCHASE ORDER ITEMS SUMMARY
