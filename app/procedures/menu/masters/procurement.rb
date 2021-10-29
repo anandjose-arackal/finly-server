@@ -54,14 +54,6 @@ class Menu::Masters::Procurement < Menu::API
            features: :invoice_to_pay_system,
            function: "non_po_invoice_forms_create"
 
-    action :template,
-           :new_non_po_invoice_form,
-           permissions: :po_invoice_initiator,
-           toggle: {if: [PoInvoiceToggle, :enabled?]},
-           model: ::Invoice,
-           label: 'New PO Invoice',
-           function: "po_invoice_forms_create"
-
     action :redirect,
            :new_payment_ticket,
            policy: ::Docs::PaymentTickets::Policy,
