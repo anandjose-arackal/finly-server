@@ -36,6 +36,7 @@ json.documents do
       json.amount document.total_amount&.value
       json.additional_information({})
       json.base_currency document.get_base_currency
+      json.forms_enabled document.forms_enabled
     end
 
   end

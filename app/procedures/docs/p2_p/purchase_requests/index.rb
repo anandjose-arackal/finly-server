@@ -4,7 +4,18 @@ class Docs::P2P::PurchaseRequests::Index < IndexBuilder::API
   feature_subscription :purchase_requisition_system
   permissions :purchase_request_initiator, :purchase_request_reviewer, :purchase_request_auditor, :admin
   resolver 'purchase_requests.default'
-  reference '{{record.id}}'
+  
+  def self.reference(id = nil, args = {})
+    {
+      id: '{{record.id}}',
+      args: {
+        # procurement_id: '{{record.procurement_id}}',
+        # procurement_type: "{{record.invoice_type.config_key}}",  
+        forms_enabled: "{% if record.forms_enabled == true %}{{true}}{% else %}{{ false }}{% endif %}"
+      }
+    }
+  end
+
   custom_fields :purchase_request
 
   # Fixed column is always default true

@@ -3,17 +3,28 @@ class Menu::Masters::Procurement < Menu::API
   def self.accept?(user)
     user.user_panel_subscription&.yes_bank_account_transfer
   end
+
   app :vp
 
   item :global_search, label: "Search (Alt+/)", icon: 'https://img.icons8.com/windows/20/ffffff/search.png',
        toggle: [GlobalSearchToggle, :enabled?]
   item :create, icon: 'https://img.icons8.com/windows/20/ffffff/plus-math.png' do
+    
     action :redirect,
            :new_purchase_request,
            permissions: :purchase_request_initiator,
            features: :procurement,
            label: 'New Purchase Request',
+           toggle: {unless: [PurchaseRequestToggle, :enabled?]},
            url: 'purchase_request'
+
+    action :redirect,
+           :new_form_purchase_request,
+           permissions: :purchase_request_initiator,
+           features: :procurement,
+           label: 'New Purchase Request',
+           toggle: {if: [PurchaseRequestToggle, :enabled?]},
+           url: 'purchase_request_form/add'
 
     action :template,
            :new_purchase_order,

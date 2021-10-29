@@ -38,7 +38,7 @@ class FormSection < ApplicationRecord
 
   def as_json(options = {})
     data = {
-      title: title,
+      title: title || section_id.titleize.to_s,
       active: active,
       config_path: section_id.to_s,
       entities: {},

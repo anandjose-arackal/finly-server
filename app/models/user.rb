@@ -1875,6 +1875,11 @@ class User < ApplicationRecord
     feature_flag_enabled
   end
 
+  def purchase_request_form_enabled
+    feature_flag_enabled = PurchaseRequestToggle.new(self || RequestStoreUtil.current_user).enabled?
+    feature_flag_enabled
+  end
+
   protected
 
   # Checks whether a password is needed or not. For validations only.

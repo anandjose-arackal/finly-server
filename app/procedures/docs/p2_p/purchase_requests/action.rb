@@ -45,12 +45,21 @@ class Docs::P2P::PurchaseRequests::Action < ActionManager::API
 
     action :redirect,
            :create,
-           format: 'primary',
            permissions: :purchase_request_initiator,
+           features: :procurement,
            label: 'New Purchase Request',
-           icon: 'https://img.icons8.com/windows/17/708090/--checkmark-yes.png',
+           format: 'primary',
+           toggle: {unless: [PurchaseRequestToggle, :enabled?]},
            url: 'purchase_request'
 
+    action :redirect,
+           :create_form,
+           permissions: :purchase_request_initiator,
+           features: :procurement,
+           format: 'primary',
+           label: 'New Purchase Request',
+           toggle: {if: [PurchaseRequestToggle, :enabled?]},
+           url: 'purchase_request_form/add'
   end
 
 end

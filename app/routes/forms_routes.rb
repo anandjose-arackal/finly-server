@@ -11,4 +11,5 @@ Forms::Router.draw do
   route 'invoices', Docs::P2P::Invoices::NonPo::Form
   route 'purchase_orders', Docs::P2P::PurchaseOrders::Form
   route 'po', Docs::P2P::PurchaseOrders::Form
+  route 'purchase_requests', Docs::P2P::PurchaseRequests::Form
 end

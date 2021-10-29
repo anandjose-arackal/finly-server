@@ -4204,6 +4204,13 @@ Rails.application.routes.draw do
   
   # resources :po_invoice_forms, only: [:show, :update]
 
+  ######### NEW PURCHASE REQUEST FORMS ###################
+  resources :purchase_request_forms, only: [:show, :update]
+  post 'purchase_request_forms/save_and_submit', to: "purchase_request_forms#save_and_submit"
+  post 'purchase_request_forms/create_and_submit', to: "purchase_request_forms#create_and_submit"
+  post 'purchase_request_forms/create', to: "purchase_request_forms#create"
+
+
   ######### Rate Contract API start #############
   resources :rate_contracts do
     collection do

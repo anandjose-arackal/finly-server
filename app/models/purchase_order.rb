@@ -888,7 +888,8 @@ class PurchaseOrder < ApplicationRecord
             file_name: self.attachments.first&.file_file_name
         },
         base_currency: get_base_currency,
-        reporting_currency: get_reporting_currency
+        reporting_currency: get_reporting_currency,
+        pr_forms_enabled: self.user.purchase_request_form_enabled
         # balance_due: {
         #   value: precision_value(self.balance_amount&.value),
         #   id: self.balance_amount&.id,

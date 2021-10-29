@@ -21,4 +21,6 @@ class PurchaseRequestItemExposure < Exposures::API
   attribute :pr_number do
     record.purchase_request&.item&.order_number
   end
+  attribute :po_creator, record_attribute: true, exposure: true
+  attribute :po_number, record_attribute: true, exposure: true
 end

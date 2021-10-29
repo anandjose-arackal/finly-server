@@ -283,7 +283,7 @@ class FormEntity < ApplicationRecord
       placeholder: placeholder,
       hint: hint,
       entity_type: entity_type,
-      default_value: default_value,
+      default_value: is_purchase_request_cost_allocations ? false : default_value,
       position: position,
       filters: filters&.as_ransack(do_not_interpolate: true),
       behavior: {
@@ -433,5 +433,9 @@ class FormEntity < ApplicationRecord
     # Set entity path & config path
     self.entity_path = generate_entity_path.join(".")
     self.config_path = generate_config_path.join(".")
+  end
+
+  def is_purchase_request_cost_allocations
+    self.form.klass_name == 'Docs::P2P::PurchaseRequests::Form' && self.entity_key == 'cost_allocation_items'
   end
 end
