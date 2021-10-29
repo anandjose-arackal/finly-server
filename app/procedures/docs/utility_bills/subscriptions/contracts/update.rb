@@ -70,7 +70,7 @@ class Docs::UtilityBills::Subscriptions::Contracts::Update < Reform::Form
 
   def validate_customer_params
     valid = true
-    op = Docs::UtilityBills::Billers::Ops::Show.(params: {id: bbps_biller_id}, "current_user" => current_user)
+    op = Docs::UtilityBills::Billers::Ops::Show.(params: {id: bbps_biller_id}, current_user:  current_user)
 
     if op.success?
       bbps_biller = op['model']

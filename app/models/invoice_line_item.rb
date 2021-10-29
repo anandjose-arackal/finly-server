@@ -229,18 +229,20 @@ class InvoiceLineItem < ApplicationRecord
 
   def before_tax_amount
     if parent_forms_enabled
-      self.reporting_item_taxable_amount&.to_f
+      calculated_before_tax_amount  = (self.reporting_item_taxable_amount.nil? ? 0 : self.reporting_item_taxable_amount.to_f)
     else
-      self.taxable_amount&.value.to_f
+      calculated_before_tax_amount = (self.taxable_amount.nil? ? 0 : self.taxable_amount&.value.to_f)
     end
+    calculated_before_tax_amount
   end
 
   def after_tax_amount
     if parent_forms_enabled
-      self.reporting_item_net_amount&.to_f
+      calculated_after_tax_amount  = (self.reporting_item_net_amount.nil? ? 0 : self.reporting_item_net_amount.to_f)
     else
-      self.net_amount&.value.to_f
+      calculated_after_tax_amount = (self.net_amount.nil? ? 0 : self.net_amount&.value.to_f)
     end
+    calculated_after_tax_amount
   end
 
 

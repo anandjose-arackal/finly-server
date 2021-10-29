@@ -1165,7 +1165,7 @@ class User < ApplicationRecord
 
   def employee?
     mapping = role_mapping
-    mapping.expense_management.employee.present?
+    mapping.expense_management.employee.present? || mapping.vendor_payments.employee.present?
   end
 
   def auditor?

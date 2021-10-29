@@ -2,12 +2,12 @@ class ActionsManager::Master::PolicyUserRoles::RoleConfig < ActionsManager::Mast
 
   register_handle :vp_role_config
   register_actions [:bank_payment_request_initiator, :purchase_request_initiator, :purchase_request_reviewer, :purchase_order_initiator,
-                    :purchase_order_reviewer, :goods_receiver, :invoice_initiator, :invoice_reviewer, :bank_payment_request_reviewer,
+                    :purchase_order_reviewer, :goods_receiver, :po_invoice_initiator, :po_invoice_reviewer, :bank_payment_request_reviewer,
                     :bank_payment_request_creditor, :item_master_manager, :inventory_manager, :vendor_creator, :vendor_manager,
                     :vendor_reviewer, :policy_admin, :vendor_manager, :budget_manager, :non_po_initiator,
-                    :purchase_order_auditor, :bank_payment_request_auditor, :purchase_request_auditor, :invoice_auditor, :vendor_auditor, :payment_agreement_initiator, :payment_agreement_reviewer, :payment_agreement_auditor,
+                    :purchase_order_auditor, :bank_payment_request_auditor, :purchase_request_auditor, :po_invoice_auditor, :vendor_auditor, :payment_agreement_initiator, :payment_agreement_reviewer, :payment_agreement_auditor,
                     :utility_bill_master_initiator, :utility_bill_master_reviewer, :utility_bill_initiator, :utility_bill_reviewer,
-                    :credit_note_initiator, :credit_note_reviewer, :credit_note_auditor, :agreement_invoice_initiator, :agreement_invoice_reviewer, :agreement_invoice_auditor
+                    :credit_note_initiator, :credit_note_reviewer, :credit_note_auditor, :agreement_invoice_initiator, :agreement_invoice_reviewer, :agreement_invoice_auditor, :non_po_reviewer, :non_po_initiator, :non_po_auditor
   ]
 
   def purchase_request_initiator
@@ -30,11 +30,15 @@ class ActionsManager::Master::PolicyUserRoles::RoleConfig < ActionsManager::Mast
     user.company.procurement_enabled?
   end
 
-  def invoice_initiator
+  def po_invoice_initiator
     user.company.procurement_enabled?
   end
 
-  def invoice_reviewer
+  def po_invoice_reviewer
+    user.company.procurement_enabled?
+  end
+
+  def po_invoice_auditor
     user.company.procurement_enabled?
   end
 
@@ -74,15 +78,20 @@ class ActionsManager::Master::PolicyUserRoles::RoleConfig < ActionsManager::Mast
     user.company.vendor_empanelment_workflow_enabled?
   end
 
-  def bank_payment_request_auditor
-  end
-
   def budget_manager
     user.company.budgeting_system_enabled?
   end
 
   def non_po_initiator
-    user.company.procurement_enabled?
+    user.company.invoice_to_pay_system_enabled?
+  end
+
+  def non_po_reviewer
+    user.company.invoice_to_pay_system_enabled?
+  end
+
+  def non_po_auditor
+    user.company.invoice_to_pay_system_enabled?
   end
 
   def purchase_order_auditor
@@ -97,40 +106,36 @@ class ActionsManager::Master::PolicyUserRoles::RoleConfig < ActionsManager::Mast
     user.company.purchase_requisition_enabled?
   end
 
-  def invoice_auditor
-    user.company.procurement_enabled?
-  end
-
   def vendor_auditor
     user.company.vendor_empanelment_workflow_enabled?
   end
 
   def payment_agreement_initiator
-    true
+    user.company.agreement_based_payment_system_enabled?
   end
 
   def payment_agreement_reviewer
-    true
+    user.company.agreement_based_payment_system_enabled?
   end
 
   def payment_agreement_auditor
-    true
+    user.company.agreement_based_payment_system_enabled?
   end
 
   def utility_bill_master_initiator
-    true
+    user.company.utility_bills_enabled?
   end
 
   def utility_bill_master_reviewer
-    true
+    user.company.utility_bills_enabled?
   end
 
   def utility_bill_initiator
-    true
+    user.company.utility_bills_enabled?
   end
 
   def utility_bill_reviewer
-    true
+    user.company.utility_bills_enabled?
   end
 
   def credit_note_initiator
@@ -146,14 +151,14 @@ class ActionsManager::Master::PolicyUserRoles::RoleConfig < ActionsManager::Mast
   end
 
   def agreement_invoice_initiator
-    true
+    user.company.agreement_based_payment_system_enabled?
   end
 
   def agreement_invoice_reviewer
-    true
+    user.company.agreement_based_payment_system_enabled?
   end
 
   def agreement_invoice_auditor
-    true
+    user.company.agreement_based_payment_system_enabled?
   end
 end

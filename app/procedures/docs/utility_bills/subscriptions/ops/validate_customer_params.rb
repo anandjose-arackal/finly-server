@@ -20,7 +20,7 @@ class Docs::UtilityBills::Subscriptions::Ops::ValidateCustomerParams < Trailblaz
 
 
   def bill_validate(options, params:, current_user:, **)
-    op = Bbps::BillValidation.(params, "current_user" => current_user)
+    op = Bbps::BillValidation.(params, current_user:  current_user)
     options['result'] = {
         'success' => op.success?,
     }

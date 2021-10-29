@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_09_23_192514) do
+ActiveRecord::Schema.define(version: 2021_09_29_041613) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -4017,15 +4017,6 @@ ActiveRecord::Schema.define(version: 2021_09_23_192514) do
     t.index ["name"], name: "index_export_templates_on_name"
     t.index ["personal"], name: "index_export_templates_on_personal"
     t.index ["template_type"], name: "index_export_templates_on_template_type"
-  end
-
-  create_table "feature_subscription_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.string "name"
-    t.datetime "deleted_at"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["created_at"], name: "index_feature_subscription_types_on_created_at"
-    t.index ["updated_at"], name: "index_feature_subscription_types_on_updated_at"
   end
 
   create_table "feature_subscriptions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -9793,8 +9784,6 @@ ActiveRecord::Schema.define(version: 2021_09_23_192514) do
     t.datetime "deleted_at"
     t.boolean "weekly_summary_enabled", default: false
     t.integer "company_id"
-    t.bigint "default_subscription_type_id"
-    t.index ["default_subscription_type_id"], name: "index_user_panel_subscriptions_on_default_subscription_type_id"
     t.index ["user_id"], name: "index_user_panel_subscriptions_on_user_id"
   end
 
@@ -10997,7 +10986,6 @@ ActiveRecord::Schema.define(version: 2021_09_23_192514) do
   add_foreign_key "user_manager_mappings", "users"
   add_foreign_key "user_manager_type_mappings", "manager_types"
   add_foreign_key "user_manager_type_mappings", "users"
-  add_foreign_key "user_panel_subscriptions", "feature_subscription_types", column: "default_subscription_type_id"
   add_foreign_key "user_panel_subscriptions", "users"
   add_foreign_key "user_permissions", "companies"
   add_foreign_key "user_permissions", "users"

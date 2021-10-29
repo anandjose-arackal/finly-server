@@ -1,0 +1,1 @@
+json.actions @result.actions_configuration
