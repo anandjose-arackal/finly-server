@@ -4196,6 +4196,13 @@ Rails.application.routes.draw do
   ######### NEW PURCHASE ORDER ###################
   post 'purchase_order_forms/save_and_submit', to: "purchase_order_forms#save_and_submit"
   resources :purchase_order_forms, only: [:show, :update]
+  
+  ######### NEW PO INVOICE FORMS ###################
+  post 'po_invoice_forms/save_and_submit', to: "invoice_forms#save_and_submit"
+  get 'po_invoice_forms/:id', to: "invoice_forms#show"
+  put 'po_invoice_forms/:id(.:format)', to: "invoice_forms#update"
+  
+  # resources :po_invoice_forms, only: [:show, :update]
 
   ######### Rate Contract API start #############
   resources :rate_contracts do
@@ -4243,9 +4250,10 @@ Rails.application.routes.draw do
   # resources :form_entities
   get 'forms', to: 'forms#index'
   get 'forms/entities/:entity_id', to: 'forms#entity_config'
+  
   get 'forms/:route/config', to: 'forms#form_config'
-
   get 'forms/:route/dependencies', to: 'forms#form_dependencies'
+  
   post 'forms/choices', to: 'forms#form_entity_choices'
   post 'forms/lookup_details', to: 'forms#form_lookup_details'
   post 'forms/:route/predict', to: 'forms#form_prediction'
@@ -4387,6 +4395,9 @@ Rails.application.routes.draw do
       get 'bills', to: 'bbps_bills#index'
       get 'bills/count', to: 'bbps_bills#count'
       post 'bills/new_sync_attempt', to: 'bbps_bills#new_sync_attempt'
+      get 'report_processor_groups/count', to: 'report_processor_groups#count'
+      post 'report_processor_groups/new_sync_attempt', to: 'report_processor_groups#new_sync_attempt'
+      resources :report_processor_groups, only: [:index]
     end
   end
 

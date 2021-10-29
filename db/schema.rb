@@ -4019,6 +4019,15 @@ ActiveRecord::Schema.define(version: 2021_09_23_192514) do
     t.index ["template_type"], name: "index_export_templates_on_template_type"
   end
 
+  create_table "feature_subscription_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "name"
+    t.datetime "deleted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["created_at"], name: "index_feature_subscription_types_on_created_at"
+    t.index ["updated_at"], name: "index_feature_subscription_types_on_updated_at"
+  end
+
   create_table "feature_subscriptions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.integer "subscribable_id", null: false
     t.string "subscribable_type", null: false
@@ -8377,6 +8386,11 @@ ActiveRecord::Schema.define(version: 2021_09_23_192514) do
     t.boolean "marked_as_closed"
     t.boolean "tally_exported", default: false
     t.datetime "deleted_at"
+    t.integer "erp_sync_status_id"
+    t.text "erp_sync_message"
+    t.string "erp_sync_reference_id"
+    t.integer "erp_sync_attempts_count", default: 0
+    t.datetime "erp_sync_attempted_at"
     t.index ["company_id"], name: "index_report_processor_groups_on_company_id"
     t.index ["created_by_user_id"], name: "index_report_processor_groups_on_created_by_user_id"
     t.index ["payment_order_id"], name: "index_report_processor_groups_on_payment_order_id"
@@ -9779,6 +9793,8 @@ ActiveRecord::Schema.define(version: 2021_09_23_192514) do
     t.datetime "deleted_at"
     t.boolean "weekly_summary_enabled", default: false
     t.integer "company_id"
+    t.bigint "default_subscription_type_id"
+    t.index ["default_subscription_type_id"], name: "index_user_panel_subscriptions_on_default_subscription_type_id"
     t.index ["user_id"], name: "index_user_panel_subscriptions_on_user_id"
   end
 
@@ -10981,6 +10997,7 @@ ActiveRecord::Schema.define(version: 2021_09_23_192514) do
   add_foreign_key "user_manager_mappings", "users"
   add_foreign_key "user_manager_type_mappings", "manager_types"
   add_foreign_key "user_manager_type_mappings", "users"
+  add_foreign_key "user_panel_subscriptions", "feature_subscription_types", column: "default_subscription_type_id"
   add_foreign_key "user_panel_subscriptions", "users"
   add_foreign_key "user_permissions", "companies"
   add_foreign_key "user_permissions", "users"

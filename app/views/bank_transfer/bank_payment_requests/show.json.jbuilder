@@ -62,7 +62,8 @@ json.summary do
   json.base_currency_id @result.bank_payment_request.base_currency_id
   json.is_domestic @result.bank_payment_request.is_domestic
 
-  json.reporting_currency_code @result.user.company.reporting_currency_code
+  json.reporting_currency_code @result.bank_payment_request.reporting_currency.country_code rescue 'INR'
+  # json.reporting_currency_code @result.user.company.reporting_currency_code
 end
 
 json.invoice_categories do

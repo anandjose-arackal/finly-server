@@ -1870,6 +1870,11 @@ class User < ApplicationRecord
     feature_flag_enabled
   end
 
+  def po_invoice_form_enabled
+    feature_flag_enabled = PoInvoiceToggle.new(self || RequestStoreUtil.current_user).enabled?
+    feature_flag_enabled
+  end
+
   protected
 
   # Checks whether a password is needed or not. For validations only.

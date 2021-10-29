@@ -30,9 +30,9 @@ class BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor 
       else
         billed_ratio = (invoice_item.billable_amount&.value.to_f / po_item.taxable_amount&.value.to_f) rescue 1
       end
-
-      billed_amount_after_tax = po_item.after_tax_amount * billed_ratio
-      billed_amount_before_tax = po_item.before_tax_amount * billed_ratio
+      invoice_conversion_rate = invoice.conversion_rate rescue 1
+      billed_amount_after_tax = po_item.after_tax_amount * billed_ratio * invoice_conversion_rate rescue 0
+      billed_amount_before_tax = po_item.before_tax_amount * billed_ratio * invoice_conversion_rate rescue 0
     else
       po_item = nil
       billed_quantity = 0

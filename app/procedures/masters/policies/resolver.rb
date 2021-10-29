@@ -24,7 +24,6 @@ class Masters::Policies::Resolver < Resolver::API
       policies = Policy.with_id(ids)
     end
     policies
-    
 
     if params[:permissions].present?
       op = Policy::VendorPayments::Index.(user, {filter_role_id: [UserRole.ids_for(params[:permissions])]})

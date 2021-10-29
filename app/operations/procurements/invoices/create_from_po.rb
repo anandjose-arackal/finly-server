@@ -2,7 +2,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
 
   attr_accessor :procurement, :purchase_order, :invoice_params, :invoice, :po_revision, :previous_invoices, :advance,
                 :po_advance, :po_prev_adjusted_advance, :po_adjusted_advance, :last_invoice, :proforma_advance, :custom_fields, :total_adjusted_advance,
-                :grn_enabled, :grn_disabled, :srn_enabled, :srn_disabled
+                :grn_enabled, :grn_disabled, :srn_enabled, :srn_disabled, :vendor, :rcm_enabled, :invoice_gross_amount, :invoice_discount_amount, :invoice_tax_amount
 
 
   def personalizer
@@ -63,6 +63,75 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     
     if self.invoice.save
       InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.invoice_params, nil, self.invoice)
+
+
+      # Update attribute for from invoice structure.
+
+      self.invoice.save
+      self.invoice.items.each do |item|
+        item.item_discount_amount = item.goods? ? item&.discount_amount&.value&.to_f : 0
+        item.reporting_item_discount_amount = item.goods? ? item&.discount_amount&.value&.to_f : 0
+
+        item.item_tax_amount = item&.tax_amount&.value.to_f
+        item.reporting_item_tax_amount = item&.tax_amount&.value.to_f
+        
+        item.item_net_amount = (self.rcm_enabled ? (item&.taxable_amount&.value.to_f) : (item&.taxable_amount&.value.to_f + item&.tax_amount&.value.to_f) )
+        item.reporting_item_net_amount = ( self.rcm_enabled ? (item&.taxable_amount&.value.to_f) : (item&.taxable_amount&.value.to_f + item&.tax_amount&.value.to_f) )
+
+        item.item_taxable_amount = item.goods? ? item.taxable_amount&.value.to_f : item.billable_amount&.value.to_f
+        item.reporting_item_taxable_amount = item.goods? ? item.taxable_amount&.value.to_f : item.billable_amount&.value.to_f
+
+        unless item.goods?
+          item.item_net_amount = (self.rcm_enabled ? (item&.billable_amount&.value.to_f) : (item&.billable_amount&.value.to_f + item&.tax_amount&.value.to_f) )
+          item.reporting_item_net_amount = ( self.rcm_enabled ? (item&.billable_amount&.value.to_f) : (item&.billable_amount&.value.to_f + item&.tax_amount&.value.to_f) )
+        end        
+
+        item.save
+      end
+
+      invoice_gross_amount = 0 
+      self.invoice.items.each do |item|
+        invoice_gross_amount += item.goods? ? item.item_gross_amount : item.item_billable_amount
+      end
+
+      invoice_discount_amount = self.invoice.items.map(&:item_discount_amount).map(&:to_f).sum
+      invoice_taxable_amount = invoice_gross_amount.to_f - invoice_discount_amount.to_f
+      invoice_tax_amount = self.invoice.items.map(&:item_tax_amount).map(&:to_f).sum
+      roundoff_amount = self.invoice.roundoff_amount.to_f
+
+      self.invoice.invoice_gross_amount = invoice_gross_amount
+      self.invoice.reporting_invoice_gross_amount = invoice_gross_amount
+
+      self.invoice.invoice_discount_amount = invoice_discount_amount
+      self.invoice.reporting_invoice_discount_amount = invoice_discount_amount
+
+      self.invoice.invoice_taxable_amount = invoice_taxable_amount
+      self.invoice.reporting_invoice_taxable_amount = invoice_taxable_amount
+
+      self.invoice.invoice_tax_amount = invoice_tax_amount
+      self.invoice.reporting_invoice_tax_amount = invoice_tax_amount
+
+      self.invoice.invoice_roundoff_amount = roundoff_amount
+      self.invoice.reporting_invoice_roundoff_amount = roundoff_amount
+
+      self.invoice.invoice_sub_total_amount = ( self.rcm_enabled ? invoice_taxable_amount.to_f : invoice_taxable_amount.to_f + invoice_tax_amount.to_f )
+      self.invoice.reporting_invoice_sub_total_amount = ( self.rcm_enabled ? invoice_taxable_amount.to_f : invoice_taxable_amount.to_f + invoice_tax_amount.to_f )
+      
+      self.invoice.invoice_tds_amount = self.invoice&.tds_amount&.value&.to_f
+      self.invoice.reporting_invoice_tds_amount = self.invoice&.tds_amount&.value&.to_f
+      
+      self.invoice.invoice_total_amount = self.invoice.invoice_sub_total_amount + roundoff_amount
+      self.invoice.reporting_invoice_total_amount = self.invoice.invoice_sub_total_amount + roundoff_amount
+
+      self.invoice.invoice_net_total_amount = self.invoice.invoice_total_amount
+      self.invoice.reporting_invoice_net_total_amount = self.invoice.invoice_total_amount
+
+      self.invoice.invoice_advance_paid_amount = self.invoice&.advance_amount&.value.to_f
+      self.invoice.reporting_invoice_advance_paid_amount = self.invoice&.advance_amount&.value.to_f
+
+      self.invoice.invoice_balance_due = self.invoice&.balance_due&.value.to_f
+      self.invoice.reporting_invoice_balance_due = self.invoice&.balance_due&.value.to_f
+    
       self.invoice.save
 
       if self.advance.present? && (params[:document_type].blank? && params[:document_type] != 'proforma_invoice')
@@ -104,6 +173,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
   private
 
   def set_invoice_parameters
+
     if self.procurement.blank? || self.purchase_order.blank?
       return nil
     end
@@ -119,6 +189,9 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
 
     self.srn_enabled = configuration.srn_enabled == true
     self.srn_disabled = configuration.srn_enabled == false
+    self.vendor =  self.purchase_order.vendor
+
+    # mapping values for new forms structure
 
     if self.grn_enabled && self.srn_disabled
       invoice_items_attributes =  create_grn
@@ -140,46 +213,96 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       # this way the user knows how much was paid and how much he has to adjust in new invoice
       if self.previous_invoices.present?
          # if last_invoice.po_prev_adjusted_advance == last_invoice.po_advance
+
         self.last_invoice = self.previous_invoices.last
         self.total_adjusted_advance = self.last_invoice.po_prev_adjusted_advance.to_i + self.last_invoice.po_adjusted_advance&.value&.to_i
         self.po_prev_adjusted_advance = total_adjusted_advance
         self.po_advance = ( self.advance.present? ) ? self.advance.value : nil
         current_adjustment = self.po_advance - total_adjusted_advance
         self.po_adjusted_advance = Amount.new(value: 0, currency_id: 1)
+
+        # Added for po forms
+
+        # if user.po_invoice_form_enabled
+        #   self.po_advance = ( self.advance.present? ) ? self.advance.value : nil
+
+        #   self.total_adjusted_advance = self.previous_invoices.map(&:po_invoice_adjusted_advance).sum
+        #   self.total_adjusted_advance_tds = self.previous_invoices.map(&:po_invoice_adjusted_advance_tds).sum
+
+        #   self.po_remaining_adjusted_advance = self.purchase_order&.advance_amount&.value&.to_f -  self.total_adjusted_advance.to_f
+        #   self.po_remaining_adjusted_advance_tds = self.purchase_order&.advance_tds_amount&.value&.to_f - self.total_adjusted_advance_tds.to_f
+
+        #   self.po_invoice_adjusted_advance = 0
+        #   self.po_invoice_adjusted_advance_tds = 0
+        # end
       else
         self.po_prev_adjusted_advance = 0
         self.po_advance = ( self.advance.present? ) ? self.advance.value : nil
         self.po_adjusted_advance = Amount.new(value: 0, currency_id: 1)
+
+        # Added for po forms
+        # if user.po_invoice_form_enabled
+        #   self.po_advance = ( self.advance.present? ) ? self.advance.value : nil
+
+        #   self.po_remaining_adjusted_advance = self.purchase_order&.advance_amount&.value&.to_f
+        #   self.po_remaining_adjusted_advance_tds = self.purchase_order&.advance_tds_amount&.value&.to_f
+
+        #   self.po_invoice_adjusted_advance = 0
+        #   self.po_invoice_adjusted_advance_tds = 0
+        # end
       end
     end
 
-    invoice_type = ::InwardInvoiceType.id_for(:tax_invoice)
+    self.rcm_enabled = self.purchase_order.vendor.rcm_enabled
+    # invoice_taxable_amount = self.invoice_gross_amount - self.invoice_discount_amount
+    # invoice_sub_total_amount = (self.rcm_enabled ? (invoice_taxable_amount) : ( invoice_taxable_amount + self.invoice_tax_amount))
+    
 
+    invoice_type = ::InwardInvoiceType.id_for(:tax_invoice)
+    vendor_country_id = Country.id_for(self.vendor&.vendor_country)
     invoice_params = {
-      vendor_id: self.purchase_order.vendor_id,
+      vendor_id: self.purchase_order&.vendor_id,
+      vendor_trade_name: self.vendor&.trade_name,
+      vendor_country_id: vendor_country_id,
+      vendor_sequence_id: self.vendor&.vendor_id,
+      vendor_pan: self.vendor&.pan,
+      vendor_gstin: self.purchase_order&.gstin_location&.gstin,
       invoice_status_id: ::InwardInvoiceStatus.id_for(:open),
       created_by_user_id: user.id,
       invoice_type_id: invoice_type,
       payment_term_id: self.purchase_order.payment_term_id,
+      payment_term_days: self.vendor&.payment_term&.days_after.to_i,
       due_date: self.purchase_order.delivery_date,
       receiving_account: receiving_account,
-      gst_type_id: self.purchase_order.gst_type_id,
-      location_id: self.purchase_order.location_id,
-      delivery_location_id: self.purchase_order.delivery_location_id,
-      billing_address: self.purchase_order.billing_address,
-      shipping_address: self.purchase_order.shipping_address,
-      department_id: self.purchase_order.department_id,
-      sub_department_id: self.purchase_order.sub_department_id,
-      cost_center_id: self.purchase_order.cost_center_id,
+      gst_type_id: self.purchase_order&.gst_type_id,
+      tax_type_id: self.purchase_order&.gst_type_id,
+      location_id: self.purchase_order&.location_id,
+      delivery_location_id: self.purchase_order&.delivery_location_id,
+      billing_address: self.purchase_order&.billing_address,
+      shipping_address: self.purchase_order&.shipping_address,
+      department_id: self.purchase_order&.department_id,
+      sub_department_id: self.purchase_order&.sub_department_id,
+      cost_center_id: self.purchase_order&.cost_center_id,
       invoice_items_attributes: invoice_items_attributes,
-      policy_id: self.purchase_order.policy_id,
-      gstin_location_id: self.purchase_order.gstin_location_id,
-      cost_allocation_items: self.purchase_order.cost_allocation_items,
-      po_number: self.purchase_order.po_number,
+      policy_id: self.purchase_order&.policy_id,
+      gstin_location_id: self.purchase_order&.gstin_location_id,
+      cost_allocation_items: self.purchase_order&.cost_allocation_items,
+      po_number: self.purchase_order&.po_number,
       discount_type_id: self.purchase_order.discount_type_id,
-      tds_slab_id: self.purchase_order.advance_tds_slab_id,
-      rcm_enabled: self.purchase_order.vendor.rcm_enabled
-
+      rcm_enabled: self.purchase_order&.vendor&.rcm_enabled,
+      is_domestic: ( vendor_country_id != user&.company.country_id ? false : true ),
+      base_currency_id: self.purchase_order&.base_currency_id,
+      reporting_currency_id: self.purchase_order&.reporting_currency_id,
+      
+      vendor_bank_account_number: self.purchase_order&.bank_account.account_number,
+      vendor_bank_account_ifsc: self.purchase_order&.bank_account.ifsc,
+      vendor_bank_account_swift_code: self.purchase_order&.bank_account&.swift_code,
+      billing_address_name: self.purchase_order&.location&.name,
+      billing_address_gstin: self.purchase_order&.location&.gstin,
+      shipping_address_name: self.purchase_order&.delivery_location&.name,
+      shipping_address_gstin: self.purchase_order&.delivery_location&.gstin,
+      tds_slab_id: self.purchase_order&.advance_tds_slab_id,
+      tds_percentage: self.purchase_order&.advance_tds_slab&.tds.to_f
     }
 
     if self.advance.present?
@@ -254,11 +377,22 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
           real_q = item.quantity
         end
       end
+
+      item_gross_amount = real_q.to_f  * item.rate.to_f
+      
+
       data = {
-          tax: item.tax,
-          discount: item.discount,
-          unit_of_measurement: item.unit_of_measurement,
+          item_number: item.inventory_line_item.item_code,
+          product_type_id: item.inventory_line_item.product_type_id,
+          items_department_id: item.department_id,
+          items_cost_center_id: item.cost_center_id,
+          gl_code: item.category&.gl_code,
+          tds_applicable: item.inventory_line_item.tds_applicable,
+          item_rate: item.rate,
           rate: item.rate,
+          tax: item.tax,
+          unit_of_measurement: item.unit_of_measurement,
+          unbilled_quantity: real_q,
           quantity: real_q,
           hsn_sac: item.hsn_sac,
           description: item.description,
@@ -268,19 +402,22 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
           department_id: item.department_id,
           cost_center_id: item.cost_center_id,
           tax_rate_id: item.tax_rate_id,
+          tax_percentage: item.tax_rate.rate,
           category_id: item.category_id,
           cgst: item.cgst,
           sgst: item.sgst,
           igst: item.igst,
-          purchase_order_item_id: item.id, #,
-          # billable_amount_attributes: {
-          #     value: get_billable_amount(item),
-          #     currency_id: 1
-          # }
+          purchase_order_item_id: item.id,
           billable_amount_attributes: { # billable amount needs to be always present even if it is a good
               value: item.taxable_amount&.value.to_f,
               currency_id: 1
-          }
+          },
+          item_gross_amount: item_gross_amount, # quantity * rate 
+          reporting_item_gross_amount: item_gross_amount,
+
+          item_billable_amount: item.taxable_amount&.value,
+          reporting_item_billable_amount: item.taxable_amount&.value,
+          discount: item.discount,
       }
       if item.inventory_line_item.service?
         data[:billable_amount_attributes] = {value: item.taxable_amount&.value.to_f, currency_id: 1}
@@ -341,11 +478,23 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
           real_amount = previously_billed_amount
         end
       end
+
+      item_gross_amount = real_q.to_f  * item.rate.to_f
+      
+
       invoice_items_attributes << {
+
+          item_number: item.inventory_line_item.item_code,
+          product_type_id: item.inventory_line_item.product_type_id,
+          items_department_id: item.department_id,
+          items_cost_center_id: item.cost_center_id,
+          gl_code: item.category&.gl_code,
+          tds_applicable: item.inventory_line_item.tds_applicable,
+          item_rate: item.rate,
           tax: item.tax,
-          discount: item.discount,
           unit_of_measurement: item.unit_of_measurement,
           rate: item.rate,
+          unbilled_quantity: real_q,
           quantity: real_q,
           hsn_sac: item.hsn_sac,
           description: item.description,
@@ -355,15 +504,23 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
           department_id: item.department_id,
           cost_center_id: item.cost_center_id,
           tax_rate_id: item.tax_rate_id,
+          tax_percentage: item.tax_rate.rate,
           category_id: item.category_id,
           cgst: item.cgst,
           sgst: item.sgst,
           igst: item.igst,
           purchase_order_item_id: item.id,
-          billable_amount_attributes: {
-              value: real_amount,
+          billable_amount_attributes: { # billable amount needs to be always present even if it is a good
+              value: real_amount.to_f,
               currency_id: 1
-          }
+          },
+          item_gross_amount: item_gross_amount, # quantity * rate 
+          reporting_item_gross_amount: item_gross_amount,
+
+          item_billable_amount: real_amount,
+          reporting_item_billable_amount: real_amount,
+
+          discount: item.discount,
       }
     end
     invoice_items_attributes
@@ -420,11 +577,22 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
           real_amount = previously_billed_amount
         end
       end
+
+      item_gross_amount = real_q.to_f  * item.rate.to_f
+      
+
       invoice_items_attributes << {
+          item_number: item.inventory_line_item&.item_number,
+          product_type_id: item.inventory_line_item.product_type_id,
+          items_department_id: item.department_id,
+          items_cost_center_id: item.cost_center_id,
+          gl_code: item.category&.gl_code,
+          tds_applicable: item.inventory_line_item.tds_applicable,
+          item_rate: item.rate,
           tax: item.tax,
-          discount: item.discount,
           unit_of_measurement: item.unit_of_measurement,
           rate: item.rate,
+          unbilled_quantity: real_q,
           quantity: real_q,
           hsn_sac: item.hsn_sac,
           description: item.description,
@@ -434,15 +602,24 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
           department_id: item.department_id,
           cost_center_id: item.cost_center_id,
           tax_rate_id: item.tax_rate_id,
+          tax_percentage: item.tax_rate&.rate,
           category_id: item.category_id,
           cgst: item.cgst,
           sgst: item.sgst,
           igst: item.igst,
           purchase_order_item_id: item.id,
-          billable_amount_attributes: {
-              value: real_amount,
+          billable_amount_attributes: { # billable amount needs to be always present even if it is a good
+              value: real_amount.to_f,
               currency_id: 1
-          }
+          },
+          item_gross_amount: item_gross_amount, # quantity * rate 
+          reporting_item_gross_amount: item_gross_amount,
+
+          item_billable_amount: real_amount,
+          reporting_item_billable_amount: real_amount,
+
+          discount: item.discount,
+
       }
     end
     invoice_items_attributes
@@ -487,11 +664,22 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
           real_q = item.quantity
         end
       end
+
+      item_gross_amount = real_q.to_f  * item.rate.to_f
+      
+
       invoice_items_attributes << {
+          item_number: item.inventory_line_item.item_code,
+          product_type_id: item.inventory_line_item.product_type_id,
+          items_department_id: item.department_id,
+          items_cost_center_id: item.cost_center_id,
+          gl_code: item.category&.gl_code,
+          tds_applicable: item.inventory_line_item.tds_applicable,
+          item_rate: item.rate,
           tax: item.tax,
-          discount: item.discount,
           unit_of_measurement: item.unit_of_measurement,
           rate: item.rate,
+          unbilled_quantity: real_q,
           quantity: real_q,
           hsn_sac: item.hsn_sac,
           description: item.description,
@@ -501,22 +689,27 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
           department_id: item.department_id,
           cost_center_id: item.cost_center_id,
           tax_rate_id: item.tax_rate_id,
+          tax_percentage: item.tax_rate.rate,
           category_id: item.category_id,
           cgst: item.cgst,
           sgst: item.sgst,
           igst: item.igst,
           purchase_order_item_id: item.id,
-          billable_amount_attributes: {
+          billable_amount_attributes: { # billable amount needs to be always present even if it is a good
               value: item.taxable_amount&.value.to_f,
               currency_id: 1
-          }
+          },
+          item_gross_amount: item_gross_amount, # quantity * rate 
+          reporting_item_gross_amount: item_gross_amount,
+
+          item_billable_amount: item.taxable_amount&.value.to_f,
+          reporting_item_billable_amount: item.taxable_amount&.value.to_f,
+          
+          discount: item.discount,
       }
     end
     invoice_items_attributes
   end
-
-
-
 
   def calculcate_po_adjusted_advance
     self.total_adjusted_advance = 0

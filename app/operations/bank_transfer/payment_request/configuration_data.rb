@@ -26,7 +26,7 @@ class BankTransfer::PaymentRequest::ConfigurationData < BankTransfer::PaymentReq
     }
 
     params[:transfer_modes] = user.company.transfer_modes
-    params[:non_po_invoice_form_enabled] = user.non_po_invoice_form_enabled rescue false
+    params[:non_po_invoice_form_enabled] = (user.non_po_invoice_form_enabled || user.po_invoice_form_enabled ) rescue false
 
   end
 

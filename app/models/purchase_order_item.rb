@@ -146,6 +146,8 @@ class PurchaseOrderItem < ApplicationRecord
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
 
+  delegate :goods?, :service?, to: :inventory_line_item, allow_nil: true
+  
   def tax
     self.tax_rate&.rate || super
   end

@@ -815,8 +815,9 @@ class Invoice < ApplicationRecord
 
   def item_amounts_total
     if self.invoice_items.present?
-      user = RequestStore.store[:current_user]
-      configuration = user.company.feature_subscription.srn_enabled rescue false
+      # user = RequestStore.store[:current_user]
+      # configuration = user.company.feature_subscription.srn_enabled rescue false
+      configuration = self.company.feature_subscription.srn_enabled rescue false
       if self.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice) && configuration # if srn feature enabled for company, return sum of billable amount for services, amount for goods
         return self.invoice_items.includes(:inventory_line_item, :amount).map { |p|
           if p.inventory_line_item&.product_type_id == ProductType.id_for(:service) then
@@ -1126,7 +1127,8 @@ class Invoice < ApplicationRecord
         is_domestic: self.is_domestic,
         reporting_currency_id: self.get_reporting_currency.id,
         reporting_currency_code: self.get_reporting_currency.country_code,
-        non_po_invoice_form_enabled: self.forms_enabled
+        non_po_invoice_form_enabled: self.forms_enabled,
+        form_enabled: self.forms_enabled
       }
     end
   end
@@ -1569,11 +1571,15 @@ class Invoice < ApplicationRecord
   def forms_enabled
     if RequestStoreUtil.current_user.blank?
       feature_flag_enabled = true
+      po_feature_flag_enabled = true
     else
       feature_flag_enabled = NonPoInvoiceToggle.new(RequestStoreUtil.current_user).enabled?
+      po_feature_flag_enabled = PoInvoiceToggle.new(RequestStoreUtil.current_user).enabled?
     end
     is_non_po_invoice = self&.invoice_type&.non_po_invoice? || false
-    feature_flag_enabled && is_non_po_invoice
+    is_tax_invoice = self&.invoice_type&.tax_invoice? || false
+
+    (feature_flag_enabled && is_non_po_invoice ) || ( po_feature_flag_enabled && is_tax_invoice )
   end
 
   def bank_payment_request_policies(user)
@@ -2007,19 +2013,6 @@ class Invoice < ApplicationRecord
       invoice_tds_amount: 'tds_amount',
       invoice_paid_outside_amount: 'advance_amount',
       invoice_balance_due: 'balance_due'
-
-
-      # invoice_gross_amount: 'amount',
-      # invoice_discount_amount: 'discount_amount',
-      # invoice_taxable_amount: 'gross_amount',
-      # invoice_tax_amount: 'tax_amount',
-      # invoice_freight_amount: 'freight_amount',
-      # invoice_sub_total_amount: 'net_amount',
-
-      # invoice_tds_amount: 'tds_amount',
-      # invoice_paid_outside_amount: 'advance_amount',
-      # # invoice_advance_paid_amount: 'advance_amount',
-      # invoice_balance_due: 'balance_due'
     }
   end
 
@@ -2068,7 +2061,6 @@ class Invoice < ApplicationRecord
     #   item_tds = item.item_tds_amount
     #   if item&.tds_applicable
     #     item_tds = ( item&.taxable_amount&.value.to_f * tds_slab&.tds.to_f ) / 100
-    #     binding.pry
     #     item.item_tds_amount = item_tds.to_f.round(2)
     #     item.reporting_item_tds_amount = (item_tds * self.conversion_rate.to_f).round(2)
     #   end
@@ -2132,11 +2124,15 @@ class Invoice < ApplicationRecord
     self.save
   end
 
+  # def update_amount_after_cn_adjustment
+  #   cna_added_amount = precision_value(self.credit_note_adjustments.joins(:amount).sum(:value))
+  #   self.invoice_balance_due -= cna_added_amount
+  #   self.reporting_invoice_balance_due = self.invoice_balance_due * conversion_rate
+  #   self.invoice_credit_note_adjusted_amount = cna_added_amount
+  #   self.save
+  # end
 
-
-
-  #  We are keeping this aside for now.
-  
+  # We are keeping this aside for now.
   # def update_custom_fields
   #   form_custom_fields = self.form_custom_fields.where.not(field_key: 'invoice_attachments')
 

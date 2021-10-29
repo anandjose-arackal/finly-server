@@ -53,4 +53,10 @@ class FormSection < ApplicationRecord
     end
     data
   end
+
+  def display_name
+    return 'Line Items' if section_id == 'items'
+    section_id.titleize
+  end
+
 end
