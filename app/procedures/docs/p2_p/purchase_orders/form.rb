@@ -118,7 +118,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
 
     date :delivery_date,
          label: "Due Date",
-         computed: Forms::Compute::Form('{% unless form.delivery_date %}{% assign assigne_days = form.payment_term_days | times: 86400 %}{% assign calculated_date = form.created_at | date: "%s" | plus: assigne_days %}{{ calculated_date  | date: "%Y-%m-%d" }}{{% endunless %}}'),
+         computed: Forms::Compute::Form('{% if form.delivery_date %}{{form.delivery_date}}{% else %}{% assign assigne_days = form.payment_term_days | times: 86400 %}{% assign calculated_date = form.created_at | date: "%s" | plus: assigne_days %}{{ calculated_date  | date: "%Y-%m-%d" }}{{% endif %}}'),
          visible: true, required: true, editable: true
 
     switch :cost_allocation_items, label: 'Cost Allocation (Item Level)', required: true, default_value: false
@@ -159,7 +159,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
 
     text :vendor_poc_name, label: 'Poc Name', visible: true, editable: false, can_editable_be_changed: false,
            computed: Forms::Compute::Lookup('gstin_location_id', '{{record.poc_name}}')
-    text :vendor_poc_email, label: 'Poc Emal', visible: true, editable: false, can_editable_be_changed: false,
+    text :vendor_poc_email, label: 'Poc Email', visible: true, editable: false, can_editable_be_changed: false,
            computed: Forms::Compute::Lookup('gstin_location_id', '{{record.poc_email}}')
     text :vendor_poc_mobile_number, label: 'Poc Mobile Number', visible: true, editable: false, can_editable_be_changed: false,
            computed: Forms::Compute::Lookup('gstin_location_id', '{{record.poc_mobile_number}}')
@@ -203,7 +203,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
       text :description, editable: false, can_editable_be_changed: false, can_visible_be_changed: false,
           visible: false, computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.description}}')
 
-      number :pr_number, label: "PR Number", editable: false, visible: false,
+      text :pr_number, label: "PR Number", editable: false, visible: false,
               computed: Forms::Compute::Lookup('items.purchase_request_item_id', "{{record.pr_number}}")
 
       text :comment, label: "Narration"
@@ -244,11 +244,11 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
              computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.rate_in_base_currency | default: 0 | round: 2 }}', assignments: {conversion_date: "{{form.conversion_date}}", base_currency_id: "{{form.base_currency_id}}", reporting_currency_id: "{{form.reporting_currency_id}}", conversion_rate: "{{form.conversion_rate}}"})
 
       # # gross_amount = rate x quantity
-      amount :item_gross_amount, label: 'Item Gross Amount', editable: false, visible: false,
+      amount :item_gross_amount, label: 'Item Gross Amount', editable: false, visible: true,
              can_visible_be_changed: false, can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_gross_amount])
 
-      amount :reporting_item_gross_amount, label: 'Item Gross Amount(Reporting Currency)', editable: false, visible: false,
+      amount :reporting_item_gross_amount, label: 'Item Gross Amount(Reporting Currency)', editable: false, visible: true,
              can_visible_be_changed: false, can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_gross_amount])
 
@@ -262,7 +262,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
              can_visible_be_changed: false, can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_discount_amount])
 
-      amount :item_taxable_amount, label: 'Item Taxable Amount', editable: false, visible: false, can_editable_be_changed: false,
+      amount :item_taxable_amount, label: 'Item Taxable Amount', editable: false, visible: true, can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_taxable_amount])
 
       amount :reporting_item_taxable_amount, label: 'Item Taxable Amount(Reporting Currency)', editable: false, visible: false,
@@ -576,7 +576,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
 
   condition condition_id: "Enable PR Number for POs from PR" do
     reference :entity, 'items.pr_number'
-    rule Rules::Builder['item.pr_number'].present
+    rule Rules::Builder['items.purchase_request_item_id'].present
     action :visible, true
   end
 end
