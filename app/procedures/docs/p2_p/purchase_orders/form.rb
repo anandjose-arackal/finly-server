@@ -40,7 +40,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
       
       # NET AMOUNT
       po_sub_total_amount: "{% assign po_sub_total_amount = form.po_gross_amount | minus: form.po_discount_amount | plus: form.po_tax_amount | round: 2 %}{{ po_sub_total_amount | default: 0 | round: 2 }}",
-      po_roundoff_amount: "{% assign net_total_amount = form.po_sub_total_amount %}{% assign round_amount = net_total_amount | round %}{% assign amount = round_amount | minus: net_total_amount %}{% if form.base_currency_id == '1' and form.reporting_currency_id == '1' %}{{ amount | default: 0 | round: 2 }}{% else %}{{ 0 }}{% endif %}",
+      po_roundoff_amount: "{% assign net_total_amount = form.po_sub_total_amount %}{% assign round_amount = net_total_amount | round: 2 %}{% assign amount = round_amount | minus: net_total_amount %}{% if form.base_currency_id == '1' and form.reporting_currency_id == '1' %}{{ amount | default: 0 | round: 2 }}{% else %}{{ 0 }}{% endif %}",
       po_total_amount: "{{ form.po_sub_total_amount | plus: form.po_roundoff_amount | default: 0 | round: 2}}",
       po_balance_due: "{{ form.po_total_amount | default: 0 | round: 2}}",
       
@@ -132,7 +132,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
     dropdown :discount_type_id, label: "Discount Type", editable: true, visible: true, required: true, choices_scope: Choices[:list].({ id: 1, name: 'Percentage' }, { id: 2, name: 'Amount' }), default_value: 1
     dropdown :gst_type_id, label: "Tax Type", editable: true, visible: true, choices_scope: Choices[:list].(*TaxType.all.map { |v| { id: v.id, name: v.name } })
 
-    date :conversion_date, label: "Conversion Date", editable: true, visible: true, computed: Forms::Compute::Form('{{form.created_at}}'), triggers: {on_change: {lookup_details: [:base_currency_id]},on_compute: {lookup_details: [:base_currency_id]}}
+    date :conversion_date, label: "Conversion Date", editable: false, visible: true, computed: Forms::Compute::Form('{{form.created_at}}'), triggers: {on_change: {lookup_details: [:base_currency_id]},on_compute: {lookup_details: [:base_currency_id]}}
     lookup :reporting_currency_id, label: "Reporting Currency", choices_scope: Choices[:lookup].('currencies'), visible: true, editable: false, can_editable_be_changed: false
     lookup :base_currency_id, label: "Base Currency", choices_scope: Choices[:lookup].('currencies'), visible: true, editable: true
     # switch :retrieve_conversion_rate, label: "Auto Populate Conversion Rate", default_value: true, visible: false
@@ -411,7 +411,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
       date :estimated_delivery_time, label: 'Estd. Delivery Date', editable: true, visible: true, required: true
       number :total_amount, label: 'Total Amount', editable: true, visible: true, required: true
       number :advance_amount, label: 'Advance Amount', editable: true, visible: true
-      text :credit_period, label: 'Credit Period', editable: true, visible: true
+      number :credit_period, label: 'Credit Period', editable: true, visible: true
 
       large_text :note, editable: true, visible: true, required: true
       dropdown :selected, editable: true, visible: true, choices_scope: Choices[:list].({ id: 1, name: 'true' }, { id: 2, name: 'false' }), default_value: 2
@@ -477,6 +477,24 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
     rule Rules::Builder[:vendor_country_id_value].not_eq(value: 'India')
     action :visible, false
     action :required, false
+  end
+
+  condition condition_id: "Disable Vendor POC name for international vendors" do
+    reference :entity, 'vendor_poc_name'
+    rule Rules::Builder[:vendor_country_id_value].not_eq(value: 'India')
+    action :visible, false
+  end
+
+  condition condition_id: "Disable Vendor POC email for international vendors" do
+    reference :entity, 'vendor_poc_email'
+    rule Rules::Builder[:vendor_country_id_value].not_eq(value: 'India')
+    action :visible, false
+  end
+
+  condition condition_id: "Disable Vendor POC mobile for international vendors" do
+    reference :entity, 'vendor_poc_mobile_number'
+    rule Rules::Builder[:vendor_country_id_value].not_eq(value: 'India')
+    action :visible, false
   end
 
   condition condition_id: "Disable Bank Accounts > IFS Code for International Vendors" do
