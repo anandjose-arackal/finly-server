@@ -603,7 +603,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
 
   condition condition_id: "Enable PR Number for POs from PR" do
     reference :entity, 'items.pr_number'
-    rule Rules::Builder['items.purchase_request_item_id'].present
+    rule Rules::Builder['row.purchase_request_item_id'].present.and(Rules::Builder['row.purchase_request_item_id'].not_eq(value: ''))
     action :visible, true
   end
 end
