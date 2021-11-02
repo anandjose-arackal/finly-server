@@ -64,26 +64,30 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     if self.invoice.save
       InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.invoice_params, nil, self.invoice)
 
+      conversion_rate = self.purchase_order&.base_currency&.currency_conversion_rate(Date.today, self.purchase_order.reporting_currency.country_code) rescue 1
+      self.invoice.conversion_rate = conversion_rate.to_f
 
       # Update attribute for from invoice structure.
 
       self.invoice.save
       self.invoice.items.each do |item|
         item.item_discount_amount = item.goods? ? item&.discount_amount&.value&.to_f : 0
-        item.reporting_item_discount_amount = item.goods? ? item&.discount_amount&.value&.to_f : 0
+        item.reporting_item_discount_amount = (item.goods? ? item&.discount_amount&.value&.to_f : 0) * conversion_rate
 
         item.item_tax_amount = item&.tax_amount&.value.to_f
-        item.reporting_item_tax_amount = item&.tax_amount&.value.to_f
+        item.reporting_item_tax_amount = item&.tax_amount&.value.to_f * conversion_rate
         
         item.item_net_amount = (self.rcm_enabled ? (item&.taxable_amount&.value.to_f) : (item&.taxable_amount&.value.to_f + item&.tax_amount&.value.to_f) )
-        item.reporting_item_net_amount = ( self.rcm_enabled ? (item&.taxable_amount&.value.to_f) : (item&.taxable_amount&.value.to_f + item&.tax_amount&.value.to_f) )
+        item.reporting_item_net_amount = ( self.rcm_enabled ? (item&.taxable_amount&.value.to_f) : (item&.taxable_amount&.value.to_f + item&.tax_amount&.value.to_f) ) * conversion_rate
 
         item.item_taxable_amount = item.goods? ? item.taxable_amount&.value.to_f : item.billable_amount&.value.to_f
-        item.reporting_item_taxable_amount = item.goods? ? item.taxable_amount&.value.to_f : item.billable_amount&.value.to_f
+        item.reporting_item_taxable_amount = ( item.goods? ? item.taxable_amount&.value.to_f : item.billable_amount&.value.to_f ) * conversion_rate
+
+        item.item_rate = item.rate * conversion_rate
 
         unless item.goods?
           item.item_net_amount = (self.rcm_enabled ? (item&.billable_amount&.value.to_f) : (item&.billable_amount&.value.to_f + item&.tax_amount&.value.to_f) )
-          item.reporting_item_net_amount = ( self.rcm_enabled ? (item&.billable_amount&.value.to_f) : (item&.billable_amount&.value.to_f + item&.tax_amount&.value.to_f) )
+          item.reporting_item_net_amount = ( self.rcm_enabled ? (item&.billable_amount&.value.to_f) : (item&.billable_amount&.value.to_f + item&.tax_amount&.value.to_f) ) * conversion_rate
         end        
 
         item.save
@@ -100,37 +104,37 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       roundoff_amount = self.invoice.roundoff_amount.to_f
 
       self.invoice.invoice_gross_amount = invoice_gross_amount
-      self.invoice.reporting_invoice_gross_amount = invoice_gross_amount
+      self.invoice.reporting_invoice_gross_amount = invoice_gross_amount * conversion_rate
 
       self.invoice.invoice_discount_amount = invoice_discount_amount
-      self.invoice.reporting_invoice_discount_amount = invoice_discount_amount
+      self.invoice.reporting_invoice_discount_amount = invoice_discount_amount * conversion_rate
 
       self.invoice.invoice_taxable_amount = invoice_taxable_amount
-      self.invoice.reporting_invoice_taxable_amount = invoice_taxable_amount
+      self.invoice.reporting_invoice_taxable_amount = invoice_taxable_amount * conversion_rate
 
       self.invoice.invoice_tax_amount = invoice_tax_amount
-      self.invoice.reporting_invoice_tax_amount = invoice_tax_amount
+      self.invoice.reporting_invoice_tax_amount = invoice_tax_amount * conversion_rate
 
       self.invoice.invoice_roundoff_amount = roundoff_amount
-      self.invoice.reporting_invoice_roundoff_amount = roundoff_amount
+      self.invoice.reporting_invoice_roundoff_amount = roundoff_amount * conversion_rate
 
       self.invoice.invoice_sub_total_amount = ( self.rcm_enabled ? invoice_taxable_amount.to_f : invoice_taxable_amount.to_f + invoice_tax_amount.to_f )
-      self.invoice.reporting_invoice_sub_total_amount = ( self.rcm_enabled ? invoice_taxable_amount.to_f : invoice_taxable_amount.to_f + invoice_tax_amount.to_f )
+      self.invoice.reporting_invoice_sub_total_amount = ( self.rcm_enabled ? invoice_taxable_amount.to_f : invoice_taxable_amount.to_f + invoice_tax_amount.to_f ) * conversion_rate
       
       self.invoice.invoice_tds_amount = self.invoice&.tds_amount&.value&.to_f
-      self.invoice.reporting_invoice_tds_amount = self.invoice&.tds_amount&.value&.to_f
+      self.invoice.reporting_invoice_tds_amount = self.invoice&.tds_amount&.value&.to_f * conversion_rate
       
       self.invoice.invoice_total_amount = self.invoice.invoice_sub_total_amount + roundoff_amount
-      self.invoice.reporting_invoice_total_amount = self.invoice.invoice_sub_total_amount + roundoff_amount
+      self.invoice.reporting_invoice_total_amount = (self.invoice.invoice_sub_total_amount + roundoff_amount) * conversion_rate
 
       self.invoice.invoice_net_total_amount = self.invoice.invoice_total_amount
-      self.invoice.reporting_invoice_net_total_amount = self.invoice.invoice_total_amount
+      self.invoice.reporting_invoice_net_total_amount = self.invoice.invoice_total_amount * conversion_rate
 
       self.invoice.invoice_advance_paid_amount = self.invoice&.advance_amount&.value.to_f
-      self.invoice.reporting_invoice_advance_paid_amount = self.invoice&.advance_amount&.value.to_f
+      self.invoice.reporting_invoice_advance_paid_amount = self.invoice&.advance_amount&.value.to_f * conversion_rate
 
       self.invoice.invoice_balance_due = self.invoice&.balance_due&.value.to_f
-      self.invoice.reporting_invoice_balance_due = self.invoice&.balance_due&.value.to_f
+      self.invoice.reporting_invoice_balance_due = self.invoice&.balance_due&.value.to_f * conversion_rate
     
       self.invoice.save
 
