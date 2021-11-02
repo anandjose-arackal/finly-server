@@ -24,7 +24,7 @@ class AmountUtils
 			rem = decimal % 10
 			paise += [ numbers(decimal - rem), numbers(rem) ].join(' ')
 		end
-		paise += ' paise only' if curr == 'INR'
+		paise += curr == 'INR' ? ' paise only' : ' only'
 	end
 
 	def self.numbers(int)
