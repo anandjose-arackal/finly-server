@@ -78,6 +78,7 @@ json.invoice do
   json.created_from_payment_agreement invoice.payment_agreement_id.present?
   json.agreement_number invoice&.payment_agreement&.get_agreement_number
 
+  json.created_by invoice.created_by.as_json rescue nil
   json.payment_agreement_id invoice.payment_agreement_id
   json.po_advance invoice.po_advance
   json.po_prev_adjusted_advance invoice.po_prev_adjusted_advance
