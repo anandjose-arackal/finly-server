@@ -8,12 +8,12 @@ class AmountUtils
     "#{prefix} #{value}"
   end
 
-	def self.to_words(num)
+	def self.to_words(num, curr = 'INR')
 		return '' if num.blank?
-		numbers(num) + decimal(num)
+		numbers(num) + decimal(num, curr)
 	end
 
-	def self.decimal(num)
+	def self.decimal(num, curr = 'INR')
 		decimal = (BigDecimal(num.to_s).frac * 100).to_i
 		paise = ' and '
 		if decimal == 0
@@ -24,7 +24,7 @@ class AmountUtils
 			rem = decimal % 10
 			paise += [ numbers(decimal - rem), numbers(rem) ].join(' ')
 		end
-		paise += ' paise only'
+		paise += ' paise only' if curr == 'INR'
 	end
 
 	def self.numbers(int)
