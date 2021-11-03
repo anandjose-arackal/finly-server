@@ -129,7 +129,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
     lookup :policy_id, choices_scope: Choices[:lookup].('policies', permissions: [:purchase_order_initiator]), required: true, editable: false
     lookup :department_id, label: "Department", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('departments', assignments: { form: true })
     lookup :cost_center_id, label: "Cost Center", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('cost_centers')
-    dropdown :discount_type_id, label: "Discount Type", editable: true, visible: true, required: true, choices_scope: Choices[:list].({ id: 1, name: 'Percentage' }, { id: 2, name: 'Amount' }), default_value: 1
+    dropdown :discount_type_id, label: "Discount Type", editable: false, visible: true, required: true, choices_scope: Choices[:list].({ id: 1, name: 'Percentage' }, { id: 2, name: 'Amount' }), default_value: 1
     dropdown :gst_type_id, label: "Tax Type", editable: true, visible: true, choices_scope: Choices[:list].(*TaxType.all.map { |v| { id: v.id, name: v.name } })
 
     date :conversion_date, label: "Conversion Date", editable: false, visible: true, computed: Forms::Compute::Form('{{form.created_at}}'), triggers: {on_change: {lookup_details: [:base_currency_id]},on_compute: {lookup_details: [:base_currency_id]}}
