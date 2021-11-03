@@ -172,7 +172,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
 
   # BILLING ADDRESS
   section :billing_address do
-    lookup :location_id, label: 'Company Address', choices_scope: Choices[:lookup].('locations'),
+    lookup :location_id, label: 'Company Address', choices_scope: Choices[:lookup].('locations', assignments: { form: true }),
            filters: Rules::Builder['billable_location'].true, required: true
     text :billing_address_name, editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.name}}')
     text :billing_address_gstin, editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.gstin}}')
