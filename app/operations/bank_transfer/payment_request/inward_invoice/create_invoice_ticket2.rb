@@ -123,7 +123,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
       return
     end
 
-    if (self.payment_mode.blank? or self.transfer_mode.blank?) && self.invoices.any{ |inv| inv.is_domestic }
+    if (self.payment_mode.blank? or self.transfer_mode.blank?) && self.inward_invoices.any{ |inv| inv.is_domestic }
       add_message :error, "Payment mode cannot be blank"
       return
     end
