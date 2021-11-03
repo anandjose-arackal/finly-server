@@ -97,7 +97,7 @@ class PurchaseOrder < ApplicationRecord
 
   alias_attribute :created_by_id, :user_id
 
-  default_scope { order(created_at: :desc) }
+  default_scope { order(po_number: :desc, created_at: :desc) }
 
   belongs_to :company, optional: true
   belongs_to :user, optional: true
@@ -1164,6 +1164,9 @@ class PurchaseOrder < ApplicationRecord
         else
           item.total_amount = Amount.new(value: item_total_amount, currency_id: get_base_currency.id)
         end
+
+        item.gl_code = item.category&.gl_code
+        
       end
 
       calculate_item_total_amounts(item) if params[:associated_resource] == "purchase_request_item"

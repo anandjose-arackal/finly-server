@@ -41,7 +41,7 @@ class PurchaseRequest < ApplicationRecord
 
   alias_attribute :created_by_id, :creator_id
 
-  default_scope { order(created_at: :desc) }
+  default_scope { order(order_no: :desc, created_at: :desc) }
 
   # belongs_to :purchase_request_status, optional: true
   belongs_to :status, optional: true, class_name: 'PurchaseRequestStatus', foreign_key: :purchase_request_status_id
@@ -532,6 +532,10 @@ class PurchaseRequest < ApplicationRecord
       return BudgetManager::BudgetLimitValidator::PurchaseRequest.({ purchase_request: self, previous_budget_contributions: self.purchase_request_budget_contributions_before_update, current_user: self.company.users.first })
     end
   end
+
+  # def purchase_request_status_id
+  #   !can_approve? && awaiting_approval? ? PurchaseRequestStatus.id_for(:processing) : super
+  # end
 
   private
 
