@@ -17,6 +17,7 @@ json.documents do
         json.due_date document.due_date
       end
       json.base_currency document.get_base_currency
+      json.forms_enabled document.forms_enabled
     when 'PurchaseOrder'
       json.document_number document.po_number
       json.date document.delivery_date
