@@ -77,7 +77,7 @@
 
 class InvoiceLineItem < ApplicationRecord
 
-  attr_accessor :skip_callback
+  attr_accessor :skip_callback, :forms_enabled
 
   include LiquidDroppable
   include Exposures::Model::Exposable
@@ -416,6 +416,8 @@ class InvoiceLineItem < ApplicationRecord
     end
     invoice_forms_enabled
   end
+
+  alias forms_enabled parent_forms_enabled
 
   private
 
