@@ -41,7 +41,7 @@ class PurchaseRequest < ApplicationRecord
 
   alias_attribute :created_by_id, :creator_id
 
-  default_scope { order(order_no: :desc, created_at: :desc) }
+  default_scope { order(order_number: :desc, created_at: :desc) }
 
   # belongs_to :purchase_request_status, optional: true
   belongs_to :status, optional: true, class_name: 'PurchaseRequestStatus', foreign_key: :purchase_request_status_id
