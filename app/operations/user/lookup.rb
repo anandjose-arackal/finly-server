@@ -21,6 +21,7 @@ class User::Lookup < User::Base
   end
 
   def process
+
     if selected_user.nil?
       # Do not throw an error message if user is not found
       # add_message :error, 'User not found'
@@ -34,6 +35,17 @@ class User::Lookup < User::Base
       add_message :error, 'You have not signed up with Finly yet! Please contact your manager for further details'
       return
     else
+      toggle = AuthenticationToggle.new(selected_user)
+      unless toggle.password_enabled?
+        provider = []
+        if toggle.sso_google_enabled?
+          provider << "Google"
+        elsif toggle.sso_okta_enabled?
+          provider << "Octa"
+        end
+        add_message :error, "Please login with #{provider.join(' or ')} single signon "
+        return
+      end
       if selected_user.default_password
         self.default_password = true
       end
