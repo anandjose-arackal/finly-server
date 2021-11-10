@@ -2,14 +2,7 @@ class Forms::Ops::Widgets < Transactions::API
   step :find_document
   step :generate_data
 
-  # key to path mapper
-  WIDGET_PARAM_MAPPER = {
-    about_document: {
-      submitted_at:     "submitted_at",
-      approved_at:      "approved_at",
-      controlling_user: "controlling_user.name"
-    }
-  }.freeze
+  VALID_WIDGETS = %w(about_document recent_invoices) 
 
   def find_document(context, params:, current_user:, **)
     klass = params[:model].singularize.downcase == 'vendor' ? YesBankVendor : params[:model].classify.constantize rescue nil
@@ -19,25 +12,28 @@ class Forms::Ops::Widgets < Transactions::API
   end
 
   def generate_data(context, params:, current_user:, **)
-    params_list = WIDGET_PARAM_MAPPER[params[:widget].to_sym]
     document = context[:document]
-
     data = {}
-    params_list.each do |key, path|
-      split_attributes = path.split('.')
-      if split_attributes.size > 1
-        value = document
-        split_attributes.each do |next_value|
-          value = value.try(next_value)
-          break if value.nil?
-        end
-        data[key] = value
-      else
-        data[key] = document.send(path)
-      end
+    if VALID_WIDGETS.include?(params[:widget].to_s)
+      data = send(params[:widget].to_s, document)
+    else
+      return false
     end
     context[:widget_data] = {params[:widget].to_sym => data}
-
     true
+  end
+
+  private
+
+  def about_document(document)
+    {
+      submitted_at:     document.submitted_at,
+      approved_at:      document.approved_at,
+      controlling_user: document.controlling_user.name
+    }
+  end
+
+  def recent_invoices(document)
+    Invoice.with_vendor_ids(document.vendor_id).not_open
   end
 end
