@@ -37,13 +37,7 @@ class User::Lookup < User::Base
     else
       toggle = AuthenticationToggle.new(selected_user)
       unless toggle.password_enabled?
-        provider = []
-        if toggle.sso_google_enabled?
-          provider << "Google"
-        elsif toggle.sso_okta_enabled?
-          provider << "Octa"
-        end
-        add_message :error, "Please login with #{provider.join(' or ')} single signon "
+        add_message :error, "Please use the Single Sign-On feature to login "
         return
       end
       if selected_user.default_password
