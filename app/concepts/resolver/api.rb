@@ -31,8 +31,6 @@ class Resolver::API
 
   def resolve(params: {}, filter: true, paginate: false, includes: [])
     collection = load params
-    return self.entity.none if collection.nil?
-
     collection = filter collection, params if filter
     collection = paginate collection, params if paginate
     collection = include collection, includes if includes.present?
