@@ -4246,6 +4246,7 @@ Rails.application.routes.draw do
 
   get 'forms/:route/dependencies', to: 'forms#form_dependencies'
   get 'forms/:model/:document_id/widgets/:widget', to: 'forms#form_widgets'
+  get 'forms/:model/:document_id/recent_documents', to: 'forms#recent_documents'
   post 'forms/choices', to: 'forms#form_entity_choices'
   post 'forms/lookup_details', to: 'forms#form_lookup_details'
   post 'forms/:route/predict', to: 'forms#form_prediction'
