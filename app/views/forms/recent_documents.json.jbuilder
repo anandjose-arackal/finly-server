@@ -6,6 +6,7 @@ json.recent_documents do
     json.created_at item.created_at.strftime("%b %d, %Y")
     json.created_at_time item.created_at.strftime("%I:%M%p")
     json.type item.class.name
+		json.procurement_id item.procurement_id
 		json.user do
       if item.is_a?(Invoice)
         json.id item&.created_by&.id
