@@ -5,7 +5,11 @@ json.recent_documents do
     json.extract! item, :id
     json.created_at item.created_at.strftime("%b %d, %Y")
     json.created_at_time item.created_at.strftime("%I:%M%p")
-    json.type item.class.name
+		if item.is_a?(Invoice)
+			json.type item.invoice_type&.name
+		else
+			json.type item.class.name.underscore
+		end
 		json.procurement_id item.procurement_id
 		json.user do
       if item.is_a?(Invoice)
