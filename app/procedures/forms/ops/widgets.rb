@@ -2,7 +2,7 @@ class Forms::Ops::Widgets < Transactions::API
   step :find_document
   step :generate_data
 
-  VALID_WIDGETS = %w(about_document recent_invoices) 
+  VALID_WIDGETS = %w(about_document) 
 
   def find_document(context, params:, current_user:, **)
     klass = params[:model].singularize.downcase == 'vendor' ? YesBankVendor : params[:model].classify.constantize rescue nil
@@ -31,9 +31,5 @@ class Forms::Ops::Widgets < Transactions::API
       approved_at:      document.approved_at,
       controlling_user: document.controlling_user.name
     }
-  end
-
-  def recent_invoices(document)
-    Invoice.with_vendor_ids(document.vendor_id).not_open
   end
 end

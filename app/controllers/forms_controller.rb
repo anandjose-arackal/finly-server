@@ -56,6 +56,10 @@ class FormsController < BaseControllers::WebBase
     end
   end
 
+  def recent_documents
+    endpoint Forms::Ops::RecentDocuments
+  end
+
   private
 
   def resolve_layout
