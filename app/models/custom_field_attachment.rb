@@ -28,6 +28,7 @@ class CustomFieldAttachment < ApplicationRecord
   CONTENT_TYPES = {content_type: []}
 
   has_attached_file :attachment, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
+  has_attached_file :pdf_preview, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png',  class_name: 'Attachment'
   validates_attachment :attachment, content_type: CONTENT_TYPES
 
   def as_json(options = {})
@@ -38,7 +39,11 @@ class CustomFieldAttachment < ApplicationRecord
         name: self.attachment_file_name,
         url: self.attachment&.url,
         file_name: self.attachment&.original_filename,
-        created_at: self.attachment_updated_at&.strftime("%d-%m-%Y")
+        created_at: self.attachment_updated_at&.strftime("%d-%m-%Y"),
+        
+        preview_file_name: self.pdf_preview&.original_filename,
+        preview_url: self.pdf_preview&.url,
+        preview_name: self.pdf_preview&.original_filename
     }
   end
 end
