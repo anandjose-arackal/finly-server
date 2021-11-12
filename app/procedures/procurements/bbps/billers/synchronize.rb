@@ -24,7 +24,7 @@ class Procurements::Bbps::Billers::Synchronize < Transactions::API
   )
 
   def fetch_all_billers(context, options)
-    ::Bbps::BillersList.(params: {}, 'current_user' => nil) do |m|
+    ::Bbps::BillersList.(params: {}, current_user: nil) do |m|
       m.success do |result|
         context['billers'] = result
       end
