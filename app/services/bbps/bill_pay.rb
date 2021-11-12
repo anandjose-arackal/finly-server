@@ -53,7 +53,9 @@ class Bbps::BillPay < Bbps::Api
     end
   end
 
-  path "billPay"
+  path 'pay'
+  url 'https://yesbbps.transxt.in:9443/portal/service/npciservice'
+  header "AUTH","/WT/ijy7z5abJBM/LAwbmA=="
 
   # Message Code(B2000) | Order No |Agent institution Id |Channel Id |Agent Id |
   # Quick Pay |Split Pay |Split Pay Amt |Customer name|Customermobile|
@@ -262,6 +264,88 @@ class Bbps::BillPay < Bbps::Api
 
   def customer_param_5
     customer_param_for(:customer_param_5)
+  end
+
+
+  def body
+    message = generate_message
+    Rails.logger.info("Raw message :: #{message}")
+    encoded_message = Base64.strict_encode64(message)
+    encrypted_message = encrypt(encoded_message)
+    Rails.logger.info("Encrypted message :: #{encrypted_message}")
+    body = {request: encrypted_message}
+    log_generator.merge({request_raw_message: message})
+    body
+  end
+
+  def generate_message
+    message = {}
+    message["custDetails"] = {}
+    message["custDetails"]["mobileNo"] = params["mobile_number"]
+    message["custDetails"]["customerTags"] = []
+    message["custDetails"]["customerTags"] << {"name"=> "EMAIL", "value"=> customer_email}
+    message["custDetails"]["customerTags"] << {"name"=> "AADHAAR", "value"=> customer_aadhar_no}
+    message["custDetails"]["customerTags"] << {"name"=> "PAN", "value"=> customer_pan_id}
+    message["agentDetails"] = {}
+    message["agentDetails"]["agentId"] = "YB01YB28MOB519101711"
+    message["agentDetails"]["deviceTags"] = []
+    message["agentDetails"]["deviceTags"] << { "name" => "IP", "value" => "13.232.176.84" }
+    message["agentDetails"]["deviceTags"] << { "name" => "IMEI", "value" => "1234" }
+    message["agentDetails"]["deviceTags"] << { "name" => "OS", "value" => "Android" }
+    message["agentDetails"]["deviceTags"] << { "name" => "APP", "value" => "FINLY" }
+    message["agentDetails"]["deviceTags"] << { "name" => "INITIATING_CHANNEL", "value" => "MOB" }
+    message["amountDetails"] = {}
+    message["amountDetails"]["amount"] = amount
+    message["amountDetails"]["currency"] = 356 #INR
+    message["amountDetails"]["custConvFee"] = convenience_fee
+    message["amountDetails"]["couCustConvFee"] = convenience_fee_desc
+    message["billDetails"] = {}
+    message["billDetails"]["billerId"] = biller_id
+    message["billDetails"]["customerParams"] = []
+    (1..5).to_a.each do |i|
+      value = self.send("customer_param_#{i}")
+      customer_param_message = value.split('=')
+      if value.present? && value!= "NA"
+        message["billDetails"]["customerParams"] << { "name"=>customer_param_message[0], "value"=> customer_param_message[1]}
+      end
+    end
+    message.to_json
+  end
+
+  def parse_response(user, params, response)
+    received_response = JSON.parse(response.body)
+    parsed_response = {}
+    return Failure("Invalid response") unless response.status == 200
+    return Failure("Invalid response") unless received_response&.dig("response").present?
+
+    parsed_response["error_code"] = received_response["response"]["complianceRespCd"]
+    parsed_response["error_desc"] = received_response["response"]["complianceReason"]
+
+    parsed_response["status"] = received_response["status"]
+    parsed_response["bbps_ref_id"] = received_response["response"]["refId"]
+    parsed_response["responseCode"] = received_response["response"]["responseCode"]
+    parsed_response["amount"] = received_response["response"]["billerResponse"]["amount"]
+    parsed_response["due_date"] = received_response["response"]["billerResponse"]["dueDate"]
+    parsed_response["bill_date"] = received_response["response"]["billerResponse"]["billDate"]
+    parsed_response["bill_period"] = received_response["response"]["billerResponse"]["billPeriod"]
+    parsed_response["amount"] = received_response["response"]["billerResponse"]["amount"]
+    parsed_response["bill_date"] = received_response["response"]["txnDateTime"]
+    parsed_response["bill_number"] = received_response["response"]["billNumber"]
+    parsed_response["convenience_fee"] = received_response["response"]["billerResponse"]["CustConvFee"]
+    parsed_response["convenience_fee_desc"] = received_response["response"]["billerResponse"]["CustConvDesc"]
+    parsed_response["biller_id"] = received_response["response"]["billDetails"]["billerId"]
+
+    parsed_response["customer_name"] = received_response["response"]["billerResponse"]["customerName"]
+    parsed_response["customer_email"] = received_response["response"]["billerResponse"]["customerEmail"]
+    parsed_response["customer_aadhar_no"] = received_response["response"]["billerResponse"]["customerAadhar"]
+
+    #map customer params?
+    if received_response["response"]["additionalInfo"].present?
+      received_response["response"]["additionalInfo"].each_with_index do |add_info, index|
+        parsed_response["addition_info_#{index}"] = add_info
+      end
+    end
+    parsed_response
   end
 
   def self.handle_success(result)

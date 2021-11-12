@@ -298,10 +298,6 @@ class Bbps::BillFetch < Bbps::Api
     message.to_json
   end
 
-  #{"custDetails":{"mobileNo":"9137792927","customerTags":[{"name":"EMAIL","value":""},{"name":"AADHAAR","value":""},{"name":"PAN","value":""}]},"agentDetails":{"agentId":"YB01YB28MOB519101711","deviceTags":[{"name":"IP","value":"13.232.176.84"},{"name":"IMEI","value":"1234~OS=Android~APP=Finly"}]},"billDetails":{"billerId":"BWSSB0000KAR01","customerParams":[{"name":"RR Number","value":"S-156391"}]}}
-# #{
-#     "response": "{\"respCode\":\"0\",\"status\":\"FAILURE\",\"response\":{\"chId\":0,\"refId\":\"YBL2F3E508F20B94BD4BA0DBF0ECBF0BD05\",\"responseCode\":\"200\",\"responseReason\":\"VALIDATION_ERR\",\"errorList\":[{\"errorCd\":\"CUS006\",\"errorDtl\":\"For EMAIL Customer Tag value Mandatory\"},{\"errorCd\":\"DEV015\",\"errorDtl\":\"Agent Device Tag value should be INT/INTB/MOB/MOBB/POS/MPOS/ATM/KIOSK/BNKBRNCH/AGT/BSC for INITIATING_CHANNEL\"},{\"errorCd\":\"PMD016\",\"errorDtl\":\"Biller Unsupported Payment Channel\"},{\"errorCd\":\"PMD020\",\"errorDtl\":\"Agent Unsupported Payment Channel\"}]},\"errorList\":[{\"errorCd\":\"CUS006\",\"errorDtl\":\"For EMAIL Customer Tag value Mandatory\"},{\"errorCd\":\"DEV015\",\"errorDtl\":\"Agent Device Tag value should be INT/INTB/MOB/MOBB/POS/MPOS/ATM/KIOSK/BNKBRNCH/AGT/BSC for INITIATING_CHANNEL\"},{\"errorCd\":\"PMD016\",\"errorDtl\":\"Biller Unsupported Payment Channel\"},{\"errorCd\":\"PMD020\",\"errorDtl\":\"Agent Unsupported Payment Channel\"}]}"
-# }
   def parse_response(user, params, response)
     received_response = JSON.parse(response.body)
     parsed_response = {}
@@ -335,12 +331,7 @@ class Bbps::BillFetch < Bbps::Api
         parsed_response["addition_info_#{index}"] = add_info
       end
     end
-
-    #agent_id missing
-    
-
     parsed_response
-
   end
 
 end
