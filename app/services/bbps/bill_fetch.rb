@@ -326,11 +326,11 @@ class Bbps::BillFetch < Bbps::Api
     parsed_response["customer_aadhar_no"] = received_response["response"]["billerResponse"]["customerAadhar"]
 
     #map customer params?
-    if received_response["response"]["additionalInfo"].present?
-      received_response["response"]["additionalInfo"].each_with_index do |add_info, index|
-        parsed_response["addition_info_#{index}"] = add_info
-      end
-    end
+    # if received_response["response"]["additionalInfo"].present? && 
+    #   received_response["response"]["additionalInfo"].each_with_index do |add_info, index|
+    #     parsed_response["addition_info_#{index}"] = add_info
+    #   end
+    # end
     parsed_response
   end
 
