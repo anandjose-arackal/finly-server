@@ -281,11 +281,10 @@ class Bbps::BillPay < Bbps::Api
   def generate_message
     message = {}
     message["custDetails"] = {}
-    message["custDetails"]["mobileNo"] = params["mobile_number"]
     message["custDetails"]["customerTags"] = []
-    message["custDetails"]["customerTags"] << {"name"=> "EMAIL", "value"=> customer_email}
-    message["custDetails"]["customerTags"] << {"name"=> "AADHAAR", "value"=> customer_aadhar_no}
-    message["custDetails"]["customerTags"] << {"name"=> "PAN", "value"=> customer_pan_id}
+    message["custDetails"]["customerTags"] << {"name"=> "EMAIL", "value"=> customer_email} if customer_email.present?
+    message["custDetails"]["customerTags"] << {"name"=> "AADHAAR", "value"=> customer_aadhar_no} if customer_aadhar_no.present?
+    message["custDetails"]["customerTags"] << {"name"=> "PAN", "value"=> customer_pan_id} if customer_pan_id.present?
     message["agentDetails"] = {}
     message["agentDetails"]["agentId"] = "YB01YB28MOB519101711"
     message["agentDetails"]["deviceTags"] = []
