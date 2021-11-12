@@ -8,8 +8,8 @@ class Bbps::BillersList < Bbps::Api
 
   http_method :get
   path "biller/readbillermdmdata"
-  url "http://180.179.170.6:1012/portal/service"
-  header "AUTH","7ljbVcKc1Ka5tpaGAyAvR/vNDcTzk1C+BRhUdM9zB3s="
+  url 'https://yesbbps.transxt.in:9443/portal/service/npciservice'
+  header "AUTH","/WT/ijy7z5abJBM/LAwbmA=="
 
   def self.build_matcher(options, result)
     Dry::Matcher.new(

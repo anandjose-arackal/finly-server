@@ -10,7 +10,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class App {
     public static void main(String[] args) throws Exception {
-        String secretKey = "2321bd46f297a35241efe1744df7898c";
+        String secretKey = "083d0fb5ccec3b7b96ef2f1919f14d3c";
         try {
             String encoded_message = args[0];
             String base64EncryptedString;

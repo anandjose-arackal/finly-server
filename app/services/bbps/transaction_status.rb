@@ -7,7 +7,8 @@ class Bbps::TransactionStatus < Bbps::Api
   end
 
   path "txnStatusCheck"
-  url 'http://180.179.170.6:1012/portal/service/npciservice'
+  url 'https://yesbbps.transxt.in:9443/portal/service/npciservice'
+  header "AUTH","/WT/ijy7z5abJBM/LAwbmA=="
 
   def body
     message = generate_message

@@ -38,8 +38,8 @@ class Bbps::BillValidation < Bbps::Api
   end
 
   path "fetch"
-  url 'http://180.179.170.6:1012/portal/service/npciservice'
-  header "AUTH","7ljbVcKc1Ka5tpaGAyAvR/vNDcTzk1C+BRhUdM9zB3s="
+  url 'https://yesbbps.transxt.in:9443/portal/service/npciservice'
+  header "AUTH","/WT/ijy7z5abJBM/LAwbmA=="
 
   # Message Code (B1100) | Order No | Agent institution Id | Channel Id | Agent Id | Customer mobile | Biller Id |
   # Customer Param 1 | Customer Param 2 | Customer Param 3 | Customer Param 4 | Customer Param 5 |
@@ -165,10 +165,13 @@ class Bbps::BillValidation < Bbps::Api
     message["custDetails"]["mobileNo"] = params["mobile_number"] || "1231231231"
     message["custDetails"]["customerTags"] = []
     message["agentDetails"] = {}
-    message["agentDetails"]["agentId"] = "YB31YB41MOB521611569"
+    message["agentDetails"]["agentId"] = "YB01YB28MOB519101711"
     message["agentDetails"]["deviceTags"] = []
     message["agentDetails"]["deviceTags"] << { "name" => "IP", "value" => "13.232.176.84" }
-    message["agentDetails"]["deviceTags"] << { "name" => "IMEI", "value" => "1234~OS=Android~APP=Finly" }
+    message["agentDetails"]["deviceTags"] << { "name" => "IMEI", "value" => "1234" }
+    message["agentDetails"]["deviceTags"] << { "name" => "OS", "value" => "Android" }
+    message["agentDetails"]["deviceTags"] << { "name" => "APP", "value" => "FINLY" }
+    message["agentDetails"]["deviceTags"] << { "name" => "INITIATING_CHANNEL", "value" => "MOB" }
     message["billDetails"] = {}
     message["billDetails"]["billerId"] = biller_id
     message["billDetails"]["customerParams"] = []

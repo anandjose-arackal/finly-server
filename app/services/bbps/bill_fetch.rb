@@ -27,7 +27,7 @@ class Bbps::BillFetch < Bbps::Api
           required(:value).filled
         end
       end
-      optional(:customer_param_3) do
+      optional(:customer_param_3) do 
         hash do
           required(:key).filled
           required(:value).filled
@@ -48,9 +48,9 @@ class Bbps::BillFetch < Bbps::Api
     end
   end
 
-  path "fetch"
-  url 'http://180.179.170.6:1012/portal/service/npciservice'
-  header "AUTH","7ljbVcKc1Ka5tpaGAyAvR/vNDcTzk1C+BRhUdM9zB3s="
+  path 'fetch'
+  url 'https://yesbbps.transxt.in:9443/portal/service/npciservice'
+  header "AUTH","/WT/ijy7z5abJBM/LAwbmA=="
 
   def body
     message = generate_message
@@ -281,7 +281,10 @@ class Bbps::BillFetch < Bbps::Api
     message["agentDetails"]["agentId"] = "YB01YB28MOB519101711"
     message["agentDetails"]["deviceTags"] = []
     message["agentDetails"]["deviceTags"] << { "name" => "IP", "value" => "13.232.176.84" }
-    message["agentDetails"]["deviceTags"] << { "name" => "IMEI", "value" => "1234~OS=Android~APP=Finly" }
+    message["agentDetails"]["deviceTags"] << { "name" => "IMEI", "value" => "1234" }
+    message["agentDetails"]["deviceTags"] << { "name" => "OS", "value" => "Android" }
+    message["agentDetails"]["deviceTags"] << { "name" => "APP", "value" => "FINLY" }
+    message["agentDetails"]["deviceTags"] << { "name" => "INITIATING_CHANNEL", "value" => "MOB" }
     message["billDetails"] = {}
     message["billDetails"]["billerId"] = biller_id
     message["billDetails"]["customerParams"] = []
@@ -295,6 +298,10 @@ class Bbps::BillFetch < Bbps::Api
     message.to_json
   end
 
+  #{"custDetails":{"mobileNo":"9137792927","customerTags":[{"name":"EMAIL","value":""},{"name":"AADHAAR","value":""},{"name":"PAN","value":""}]},"agentDetails":{"agentId":"YB01YB28MOB519101711","deviceTags":[{"name":"IP","value":"13.232.176.84"},{"name":"IMEI","value":"1234~OS=Android~APP=Finly"}]},"billDetails":{"billerId":"BWSSB0000KAR01","customerParams":[{"name":"RR Number","value":"S-156391"}]}}
+# #{
+#     "response": "{\"respCode\":\"0\",\"status\":\"FAILURE\",\"response\":{\"chId\":0,\"refId\":\"YBL2F3E508F20B94BD4BA0DBF0ECBF0BD05\",\"responseCode\":\"200\",\"responseReason\":\"VALIDATION_ERR\",\"errorList\":[{\"errorCd\":\"CUS006\",\"errorDtl\":\"For EMAIL Customer Tag value Mandatory\"},{\"errorCd\":\"DEV015\",\"errorDtl\":\"Agent Device Tag value should be INT/INTB/MOB/MOBB/POS/MPOS/ATM/KIOSK/BNKBRNCH/AGT/BSC for INITIATING_CHANNEL\"},{\"errorCd\":\"PMD016\",\"errorDtl\":\"Biller Unsupported Payment Channel\"},{\"errorCd\":\"PMD020\",\"errorDtl\":\"Agent Unsupported Payment Channel\"}]},\"errorList\":[{\"errorCd\":\"CUS006\",\"errorDtl\":\"For EMAIL Customer Tag value Mandatory\"},{\"errorCd\":\"DEV015\",\"errorDtl\":\"Agent Device Tag value should be INT/INTB/MOB/MOBB/POS/MPOS/ATM/KIOSK/BNKBRNCH/AGT/BSC for INITIATING_CHANNEL\"},{\"errorCd\":\"PMD016\",\"errorDtl\":\"Biller Unsupported Payment Channel\"},{\"errorCd\":\"PMD020\",\"errorDtl\":\"Agent Unsupported Payment Channel\"}]}"
+# }
   def parse_response(user, params, response)
     received_response = JSON.parse(response.body)
     parsed_response = {}
@@ -328,8 +335,6 @@ class Bbps::BillFetch < Bbps::Api
         parsed_response["addition_info_#{index}"] = add_info
       end
     end
-
-
 
     #agent_id missing
     
