@@ -7,9 +7,10 @@
 #  klass_name :string(255)      not null
 #  model      :string(255)      not null
 #  company_id :integer          not null
+#  deleted_at :datetime
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
-#  deleted_at :datetime
+#  label      :string(255)
 #
 
 require 'rails_helper'

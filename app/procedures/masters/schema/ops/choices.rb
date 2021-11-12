@@ -4,6 +4,7 @@ class Masters::Schema::Ops::Choices < Transactions::API
   pass :fetch
 
   def fetch(context, params:, current_user:, **)
+    params[:paginate] = false
     context[:choices] = Choices[:lookup].('master_schemas').build(params: params, user: current_user)
 
     true

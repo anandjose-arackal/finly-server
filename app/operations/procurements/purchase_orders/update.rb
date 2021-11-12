@@ -117,6 +117,9 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       add_message :error, "Please select a department"
     end
 
+    if self.purchase_order_params[:cost_center_id].blank? && !self.cost_allocation_items
+      add_message :error, "Please select a cost center"
+    end
     if self.purchase_order.procurement.invoices.present? && self.purchase_order.procurement.inward_documents.present?
       add_message :error, "Can't modify a purchase order which has a Receipt Note or Invoice attached."
     end

@@ -14,6 +14,7 @@
 #  updated_at             :datetime         not null
 #  latitude               :decimal(20, 10)
 #  longitude              :decimal(20, 10)
+#  company_id             :integer
 #
 
 class MapLocationUserQuery < ApplicationRecordBackwardCompatibility

@@ -50,6 +50,9 @@
 #  filters                      :text(65535)
 #  config_path                  :string(255)
 #  compute_lookup_assignments   :text(65535)
+#  virtual                      :boolean          default(FALSE)
+#  triggers                     :text(65535)
+#  show_in_data_card_as         :string(255)
 #
 
 class FormEntity < ApplicationRecord
@@ -214,6 +217,7 @@ class FormEntity < ApplicationRecord
         required: required,
         active: active,
         visible: visible,
+        unique: unique
       },
       unique: unique,
       position: position,
@@ -287,6 +291,7 @@ class FormEntity < ApplicationRecord
         required: required,
         active: active,
         visible: visible,
+        unique: unique
       },
       options: options
     }

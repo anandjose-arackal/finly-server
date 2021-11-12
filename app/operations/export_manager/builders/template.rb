@@ -9,6 +9,7 @@ class ExportManager::Builders::Template
   class_attr :description
   class_attr :export_format
   class_attr :resource
+  class_attr :iter_field, default: {}
   class_attr :default, default: false
   class_attr :query, default: {}
   class_attr :roles, default: []
@@ -74,6 +75,7 @@ class ExportManager::Builders::Template
           attr.build
         end
       }),
+      iter_field: iter_field,
       query: query,
       default: default,
       master: master,

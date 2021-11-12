@@ -50,6 +50,8 @@ class Docs::UtilityBills::Subscriptions::Contracts::Update < Reform::Form
   validate :validate_customer_params
 
   validate :poc_presence
+  validate :validate_subscription_uniqueness
+
 
   def poc_presence
     errors.add(:subscription_pocs, "You need to provide at least One POC") if subscription_pocs.blank?
@@ -68,7 +70,7 @@ class Docs::UtilityBills::Subscriptions::Contracts::Update < Reform::Form
 
   def validate_customer_params
     valid = true
-    op = Docs::UtilityBills::Billers::Ops::Show.(params: {id: bbps_biller_id}, "current_user" => current_user)
+    op = Docs::UtilityBills::Billers::Ops::Show.(params: {id: bbps_biller_id}, current_user:  current_user)
 
     if op.success?
       bbps_biller = op['model']
@@ -161,5 +163,26 @@ class Docs::UtilityBills::Subscriptions::Contracts::Update < Reform::Form
     user_id = params[:user_id]
     pur = PolicyUserRole.find_or_initialize_by(user_id: user_id, policy_id: self.policy_id, user_role_id: UserRole.id_for(:utility_bill_initiator))
     pur.save
+  end
+
+  def validate_subscription_uniqueness
+    valid = true
+    unique_subscription =  BbpsBillerSubscription.non_deleted.filter_unique_check.where.not(id: id).where(bbps_biller_id: bbps_biller_id,
+                                                                            customer_param_key_1: customer_param_key_1,
+                                                                            customer_param_value_1: customer_param_value_1,
+                                                                            customer_param_key_2: customer_param_key_2,
+                                                                            customer_param_value_2: customer_param_value_2,
+                                                                            customer_param_key_3: customer_param_key_3,
+                                                                            customer_param_value_3: customer_param_value_3,
+                                                                            customer_param_key_4: customer_param_key_4,
+                                                                            customer_param_value_4: customer_param_value_4,
+                                                                            customer_param_key_5: customer_param_key_5,
+                                                                            customer_param_value_5: customer_param_value_5,
+                                                                            company_id: current_user.company_id).first
+    if unique_subscription.present?
+      errors.add(:active_subscription,"already exist for this biller with Subscription ID #{unique_subscription.sequence_id}")
+      valid = false
+    end
+    valid
   end
 end

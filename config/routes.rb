@@ -3027,7 +3027,10 @@ Rails.application.routes.draw do
         patch 'bank_accounts/disable', to: 'bank_accounts#disable', as: :bank_account_disable
         resources :bank_accounts
         resources :payments
+        resources :purchase_orders
         get 'bank_transfers', to: 'payments#all_payments'
+        get 'vendors', to: 'vendors#index'
+        get 'invoices', to: 'inward_invoices#index'
       end
       scope :vendors do
         #todo vendor Emp
@@ -3042,6 +3045,8 @@ Rails.application.routes.draw do
   scope :appsmith do
     scope :companies do
       post '', to: "appsmith/companies#create"
+      post 'virtual_accounts', to: "appsmith/virtual_accounts#create"
+      post 'reset_password', to: "appsmith/users#reset_password"
     end
   end
 
@@ -3647,6 +3652,7 @@ Rails.application.routes.draw do
   get 'procurement_action_config', to: 'procure/procurements#actions_configuration'
   get 'vp_user_action_config', to: 'bank_transfer/users#actions_configuration'
   get 'policy_user_role_config', to: 'policy_user_roles#vp_role_config'
+  get 'approval_matrix_config', to: 'approval_matrix#vp_workflow_config'
   post 'bulk_assign_policy', to: 'policy_user_roles#bulk_assign'
   namespace :bank_transfer do
     get 'payment_orders/count', to: 'payment_orders#count'
@@ -4289,6 +4295,7 @@ Rails.application.routes.draw do
       put 'update_and_submit', to: 'bills#update_and_submit'
       patch 'bill_validate', to: 'bills#bill_validate'
       get 'download_receipt', to: 'bills#download_receipt'
+      patch 'expire_bill', to: 'bills#expire_bill'
     end
 
     resources :complaints
@@ -4380,6 +4387,9 @@ Rails.application.routes.draw do
       get 'bills', to: 'bbps_bills#index'
       get 'bills/count', to: 'bbps_bills#count'
       post 'bills/new_sync_attempt', to: 'bbps_bills#new_sync_attempt'
+      get 'report_processor_groups/count', to: 'report_processor_groups#count'
+      post 'report_processor_groups/new_sync_attempt', to: 'report_processor_groups#new_sync_attempt'
+      resources :report_processor_groups, only: [:index]
     end
   end
 
@@ -4416,6 +4426,7 @@ Rails.application.routes.draw do
           post '', to: "records#import"
           get 'template', to: "records#import_template"
         end
+        get '/count', to: 'records#count'
         post '/', to: 'records#create'
         get '/', to: 'records#index'
         get '/:id', to: 'records#show'

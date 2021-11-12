@@ -9,6 +9,7 @@
 #  updated_at         :datetime         not null
 #  user_team_id       :integer
 #  deleted_at         :datetime
+#  company_id         :integer
 #
 
 class UserTeamGroupItemMapping < ApplicationRecord

@@ -64,7 +64,7 @@ class Reports::Destroy < Reports::Base
 
   def post_process
     # marking all the report's expenses as unreported
-    self.report_expenses.update_all(expense_status_id: ExpenseStatus.id_for(:unreported))
+    self.report_expenses.unscope(:order).update_all(expense_status_id: ExpenseStatus.id_for(:unreported))
 
     add_message :success, 'Report deleted'
   end

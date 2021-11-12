@@ -14,6 +14,7 @@
 #  group_id                :integer
 #  deleted_at              :datetime
 #  reporting_currency_code :string(255)      default("INR")
+#  country_id              :integer
 #
 
 class Company < NonTenantedApplicationRecord
@@ -455,6 +456,10 @@ class Company < NonTenantedApplicationRecord
 
   def analytics_system_enabled?
     self.feature_subscription.analytics_system_enabled
+  end
+
+  def invoice_to_pay_system_enabled?
+    self.feature_subscription.invoice_to_pay_system
   end
 
   def more_than_one_subscription?

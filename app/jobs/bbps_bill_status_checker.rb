@@ -24,7 +24,7 @@ class BbpsBillStatusChecker < BaseJob
               params = {
                   order_number: order_number,
                   biller_id: bill.biller.biller_id,
-                  bbps_ref_id: "YB311070CFPPGB4NMMS6" #check format in supervisor
+                  bbps_ref_id: bill.api_response[0]["bbps_ref_id"] #check format in supervisor
                   #txn_ref_id: payment&.bbps_bank_transaction&.bbps_ref_id
               }
             Bbps::TransactionStatus.call_async({params: params, "current_user" => payment.initiating_user}, {wait: true}) do |op

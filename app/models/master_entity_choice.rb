@@ -11,6 +11,7 @@
 #  deleted_at       :datetime
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
+#  key              :string(255)
 #
 
 class MasterEntityChoice < ApplicationRecord

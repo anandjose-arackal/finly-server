@@ -101,6 +101,8 @@
 #  available_invoice_amount_id           :integer
 #  include_tax_and_tds                   :boolean          default(FALSE)
 #  rcm_enabled                           :boolean
+#  base_currency_id                      :integer
+#  reporting_currency_id                 :integer
 #
 
 FactoryBot.define do

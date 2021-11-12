@@ -71,7 +71,8 @@
 #  item_billable_amount           :decimal(20, 5)
 #  reporting_item_billable_amount :decimal(20, 5)
 #  tax_type                       :string(255)      default("")
-#  item_rate                      :decimal(10, )    default(0)
+#  item_rate                      :decimal(20, 5)   default(0.0)
+#  company_id                     :integer
 #
 
 class InvoiceLineItem < ApplicationRecord
@@ -227,18 +228,20 @@ class InvoiceLineItem < ApplicationRecord
 
   def before_tax_amount
     if parent_forms_enabled
-      self.reporting_item_taxable_amount&.to_f
+      calculated_before_tax_amount  = (self.reporting_item_taxable_amount.nil? ? 0 : self.reporting_item_taxable_amount.to_f)
     else
-      self.taxable_amount&.value.to_f
+      calculated_before_tax_amount = (self.taxable_amount.nil? ? 0 : self.taxable_amount&.value.to_f)
     end
+    calculated_before_tax_amount
   end
 
   def after_tax_amount
     if parent_forms_enabled
-      self.reporting_item_net_amount&.to_f
+      calculated_after_tax_amount  = (self.reporting_item_net_amount.nil? ? 0 : self.reporting_item_net_amount.to_f)
     else
-      self.net_amount&.value.to_f
+      calculated_after_tax_amount = (self.net_amount.nil? ? 0 : self.net_amount&.value.to_f)
     end
+    calculated_after_tax_amount
   end
 
 
@@ -327,20 +330,20 @@ class InvoiceLineItem < ApplicationRecord
   def cn_adjusted_amount_with_tax
     # applied_credit_notes = self.parent.credit_notes
     # adjusted_amount = (applied_credit_notes.joins(:gross_receivable_amount).sum(:value) + applied_credit_notes.joins(:tax_amount).sum(:value)) * ((self.after_tax_amount) / (self.parent.amount_after_tax)) rescue 0
-    adjusted_amount = self.parent.credit_note_adjustments.joins(:amount).sum(:value) * ((self.after_tax_amount) / (self.parent.amount_after_tax)) rescue 0
-    adjusted_amount.nan? ? 0 : adjusted_amount
+    adjusted_amount = self.parent.credit_note_adjustments.joins(:amount).sum(:value) * ((self.after_tax_amount) / (self.parent.amount_after_tax))
+    return 0 if adjusted_amount == 'NaN'
   end
 
   def cn_adjusted_amount_without_tax
     applied_credit_notes = self.parent.credit_notes
-    adjusted_amount = [(self.parent.credit_note_adjustments.joins(:amount).sum(:value) - applied_credit_notes.joins(:tax_amount).sum(:value)), 0].max * ((self.before_tax_amount) / (self.parent.amount_before_tax)) rescue 0
-    adjusted_amount.nan? ? 0 : adjusted_amount
+    adjusted_amount = [(self.parent.credit_note_adjustments.joins(:amount).sum(:value) - applied_credit_notes.joins(:tax_amount).sum(:value)), 0].max * ((self.before_tax_amount) / (self.parent.amount_before_tax))
+    return 0 if adjusted_amount == 'NaN'
   end
 
   def cn_tax_amount
     applied_credit_notes = self.parent.credit_notes
-    tax_amount = applied_credit_notes.joins(:tax_amount).sum(:value) * ((self.before_tax_amount) / (self.parent.amount_before_tax)) rescue 0
-    tax_amount.nan? ? 0 : tax_amount
+    tax_amount = applied_credit_notes.joins(:tax_amount).sum(:value) * ((self.before_tax_amount) / (self.parent.amount_before_tax))
+    return 0 if tax_amount == 'NaN'
   end
 
   def set_tds_applicable

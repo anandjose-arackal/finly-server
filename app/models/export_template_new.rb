@@ -19,6 +19,7 @@
 #  default       :boolean          default(FALSE)
 #  modified      :boolean          default(FALSE)
 #  master        :string(255)
+#  iter_field    :text(4294967295)
 #
 
 class ExportTemplateNew < ApplicationRecord
@@ -28,6 +29,7 @@ class ExportTemplateNew < ApplicationRecord
   has_many :role_mappings, class_name: 'ExportTemplateUserRoleMapping', foreign_key: 'template_id', dependent: :destroy
   has_many :user_roles, through: :role_mappings, dependent: :destroy
 
+  serialize :iter_field, JSON
   serialize :query, JSON
 
   scope :filter_resource, -> (resource) { where resource: resource }

@@ -83,6 +83,7 @@ public/system/temporary_files/
 public/system/admin_implementation_requests/*
 public/system/import_job/*
 
+.solargraph.yml
 /yes_bank_api_call_logs
 .vagrant/
 #Vagrantfile

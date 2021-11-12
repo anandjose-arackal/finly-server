@@ -86,6 +86,7 @@
 class Masters::Vendors::Form < Forms::API
 
   model YesBankVendor
+  label 'Vendors'
 
   meta ->(record) {
     {
@@ -190,7 +191,7 @@ class Masters::Vendors::Form < Forms::API
       text :account_number, required: true, unique: false, regex: {format: "\\A[A-Za-z0-9]{3,32}\\z", message: "is not in valid format"}
       text :confirm_account_number, required: true, system_field: false
       text :ifsc, label: "IFSC", required: true, regex: {format: "\\A[A-Za-z]{4}[a-zA-Z0-9]{7}\\z", message: "is not valid"}
-      text :swift_code, label: "Swift / Bank Code", required: false, visible: false, editable: false, regex: {format: "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$", message: "is not valid"}
+      text :swift_code, label: "Swift / Bank Code", required: true, visible: true, editable: true, regex: {format: "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$", message: "is not valid"}
       switch :default_account
       switch :disabled, default_value: false
       switch :verified, visible: false, default_value: false
@@ -463,12 +464,12 @@ class Masters::Vendors::Form < Forms::API
     action :visible, false
     action :required, false
   end
-  condition condition_id: "Enable Bank Accounts > Swift / BIC Code for International Vendors" do
+  condition condition_id: "Disable Bank Accounts > Swift / BIC Code for Indian Vendors" do
     reference :entity, 'bank_accounts.swift_code'
-    rule Rules::Builder[:vendor_country].not_eq(value: 'India')
-    action :editable, true
-    action :visible, true
-    action :required, true
+    rule Rules::Builder[:vendor_country].eq_any(value: 'India')
+    action :editable, false
+    action :visible, false
+    action :required, false
   end
 
   condition condition_id: "Disable Bank Accounts > IFS Code for International Vendors" do

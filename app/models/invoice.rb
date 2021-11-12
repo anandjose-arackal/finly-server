@@ -102,11 +102,9 @@
 #  invoice_discount_amount               :decimal(20, 5)
 #  invoice_tax_amount                    :decimal(20, 5)
 #  invoice_tds_amount                    :decimal(20, 5)
-#  base_currency                         :string(255)
 #  vendor_sequence_id                    :text(65535)
 #  vendor_gstin                          :string(255)
 #  invoice_freight_amount                :decimal(20, 5)
-#  reporting_currency                    :string(255)
 #  conversion_date                       :date
 #  conversion_rate                       :decimal(10, 5)
 #  retrieve_conversion_rate              :boolean          default(TRUE)
@@ -142,11 +140,17 @@
 #  invoice_total_amount                  :decimal(20, 5)
 #  payment_term_days                     :integer          default(0)
 #  vendor_bank_account_swift_code        :string(255)      default("")
-#  vendor_country                        :string(255)      default("")
 #  discount_type                         :string(255)      default("")
 #  overall_discount_amount               :decimal(10, )    default(0)
 #  total_line_item_discount_amount       :decimal(10, )    default(0)
 #  is_domestic                           :boolean          default(TRUE)
+#  billing_address_name                  :string(255)      default("")
+#  billing_address_gstin                 :string(255)      default("")
+#  shipping_address_name                 :string(255)      default("")
+#  shipping_address_gstin                :string(255)      default("")
+#  base_currency_id                      :integer
+#  reporting_currency_id                 :integer
+#  vendor_country_id                     :integer
 #
 
 class Invoice < ApplicationRecord
@@ -194,6 +198,8 @@ class Invoice < ApplicationRecord
       get_base_currency&.country_code || "INR"
     )
   end
+
+  alias_attribute :created_by_id, :created_by_user_id
 
   # Multicurrency Attributes
 
@@ -1713,11 +1719,11 @@ class Invoice < ApplicationRecord
     if user.policy_user_roles.pluck(:user_role_id).uniq.present?
       user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
         if [UserRole.id_for(:po_invoice_initiator), UserRole.id_for(:non_po_invoice_initiator), UserRole.id_for(:invoice_initiator), UserRole.id_for(:agreement_invoice_initiator)].include?(role_id)
-          statuses += [:unpaid, :partially_paid, :paid, :open, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending]
+          statuses += [:unpaid, :partially_paid, :paid, :open, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending, :initiated]
         elsif [UserRole.id_for(:po_invoice_reviewer), UserRole.id_for(:non_po_invoice_reviewer), UserRole.id_for(:invoice_reviewer), UserRole.id_for(:agreement_invoice_reviewer)].include?(role_id)
-          statuses += [:unpaid, :partially_paid, :paid, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending]
+          statuses += [:unpaid, :partially_paid, :paid, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending, :initiated]
         elsif UserRole.id_for(:admin) == role_id.to_i
-          statuses += [:unpaid, :partially_paid, :paid, :open, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending]
+          statuses += [:unpaid, :partially_paid, :paid, :open, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending, :initiated]
         end
       end
     end
@@ -2096,7 +2102,7 @@ class Invoice < ApplicationRecord
     if form_attachments_field.present?
       form_attachments_field.attachments.each do |new_attachment|
         old_attachment = self.attachments.find_or_initialize_by(file_file_name: new_attachment.attachment_file_name )
-
+        next
         if old_attachment.new_record?
           old_attachment.file_file_name = new_attachment.attachment_file_name
           old_attachment.file_content_type = new_attachment.attachment_content_type
@@ -2178,9 +2184,7 @@ class Invoice < ApplicationRecord
   #         field_configuration.field_name        = form_custom_field.form_entity.label
   #         field_configuration.field_key         = form_custom_field.form_entity.entity_key
   #         field_configuration.save
-  #       end
-      
-
+  #       end    
   #       value = form_custom_field.selection.form_entity_choice.name
 
   #       custom_field.value = FieldText.create({ value: form_custom_field.value, company_id: self.company_id })

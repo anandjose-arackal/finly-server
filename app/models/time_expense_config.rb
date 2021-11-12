@@ -11,6 +11,7 @@
 #  period_id           :integer
 #  policy_id           :integer          not null
 #  deleted_at          :datetime
+#  company_id          :integer
 #
 
 class TimeExpenseConfig < ApplicationRecord

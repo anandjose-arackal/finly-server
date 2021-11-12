@@ -31,6 +31,8 @@
 #  revision_of_pa_id     :integer
 #  revision_reason       :text(65535)
 #  revised_by_id         :integer
+#  base_currency_id      :integer
+#  reporting_currency_id :integer
 #
 
 require 'rails_helper'

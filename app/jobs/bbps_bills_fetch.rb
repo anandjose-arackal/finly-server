@@ -15,13 +15,16 @@ class BbpsBillsFetch < BaseJob
       last_bill = subscription.bbps_bills.reorder('created_at asc').last
       will_create = false
 
-      if subscription.last_bill_bill_date.present? and subscription.last_bill_bill_date != Date.parse("01-01-0001")
-        if Date.today > (subscription.last_bill_bill_date + 1.month)
+      if (subscription.last_bill_bill_date.present? and subscription.last_bill_bill_date != Date.parse("01-01-0001")) || (subscription.last_bill_due_date.present? and subscription.last_bill_due_date != Date.parse("01-01-9999"))
+        if subscription.last_bill_bill_date.present?
+          if Date.today > (subscription.last_bill_bill_date + 1.month)
           will_create = true
+          end
         end
-      elsif subscription.last_bill_due_date.present? and subscription.last_bill_due_date != Date.parse("01-01-9999")
-        if Date.today >= (subscription.last_bill_due_date + 5.days)
-          will_create = true
+        if subscription.last_bill_due_date.present?
+          if Date.today >= (subscription.last_bill_due_date + 5.days)
+            will_create = true
+          end
         end
       elsif last_bill.present?
         if Date.today >= (last_bill.created_at + 21.days)
@@ -52,7 +55,7 @@ class BbpsBillsFetch < BaseJob
 
       if will_create
         parameters = customer_params(subscription).with_indifferent_access
-        Bbps::BillFetch.call_async({params: parameters, "current_user" => User.first}, {wait: true, wait_timeout: 180.seconds}) do |op|
+        Bbps::BillFetch.call_async({params: parameters, current_user: User.first}, {wait: true, wait_timeout: 180.seconds}) do |op|
           op.success do |result|
             ap result
             create_bill(result, subscription, autofetched)

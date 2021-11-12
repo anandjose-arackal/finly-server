@@ -381,10 +381,10 @@ module Transitionable
 
     # In case reviewer wants to reject it to a particular user who had previously approved
     def reject_to_users
-      previous_dlrms = self.document_level_reviewer_mappings.where('level_id < ?', self.level&.id)
+      approved_trails= self.trails.with_action_id([TrailAction.id_for(:approve),TrailAction.id_for(:approve_and_forward)])
       reject_to = {} # {dlrm_level_id => reviewer, dlrm_level_id => reviewer, ...}
-      previous_dlrms.each do |dlrm|
-        reject_to[dlrm.level_id] = get_reviewers(dlrm&.level_id)&.first
+      approved_trails.each do |trail|
+        reject_to[trail.action_level_id] = trail.action_user
       end
       reject_to
     end
@@ -925,7 +925,7 @@ module Transitionable
         when :vendor_auditor, 'vendor_auditor'
           data = data.or(role_based_auditor_associated_items(user, role_id))
         when :vendor_manager, 'vendor_manager'
-          # data = []
+          data = data.or(role_based_auditor_associated_items(user, role_id))
         when :policy_admin, 'policy_admin'
           # data = []
         when :bank_payment_request_auditor, 'bank_payment_request_auditor'

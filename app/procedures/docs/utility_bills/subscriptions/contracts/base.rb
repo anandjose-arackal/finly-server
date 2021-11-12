@@ -69,13 +69,14 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
 
   validate :poc_presence
 
+  validate :validate_subscription_uniqueness
+
+
   def poc_presence
     errors.add(:subscription_pocs, "You need to provide at least One POC") if subscription_pocs.blank?
   end
 
   # validate :company_specific_entities
-
-  #below changed for local
 
   def company_entities
     params = {filter_role_id: [UserRole.id_for(:utility_bill_master_initiator), UserRole.id_for(:utility_bill_master_reviewer)], current_app: :vp}
@@ -92,7 +93,8 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
 
   def validate_customer_params
     valid = true
-    op = Docs::UtilityBills::Billers::Ops::Show.(params: {id: bbps_biller_id}, "current_user" => current_user)
+    op = Docs::UtilityBills::Billers::Ops::Show.(params: {id: bbps_biller_id}, current_user:  current_user)
+
     if op.success?
       bbps_biller = op['model']
       biller_customer_params = bbps_biller.biller_customer_params
@@ -108,13 +110,12 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
     valid = true
     if config.present?
       if label.present? && value.present?
-        if config['param_name'] || config['paramName'] != label #needs to be changed to paramName, dataType etc..
+        if config['param_name'] != label
           errors.add("customer_param_key_#{a}", "Expected Label #{config['param_name']}, got #{label}")
           valid = false
           return valid
         end
-        data_type = config['data_type'] || config['dataType']
-        case data_type
+        case config['data_type']
         when 'ALPHANUMERIC'
           errors.add("customer_param_key_#{a}", 'Invalid Data Provided') unless check_alphanumeric(value)
           valid = false
@@ -123,15 +124,13 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
           valid = false
         end
 
-        min_len = config['min_length'] || config['minLength']
-        if min_len.present?
-          errors.add("customer_param_key_#{a}", "#{label} should at least be of #{min_len} characters") unless value&.to_s&.length >= config['min_length'].to_i
+        if config['min_length'].present?
+          errors.add("customer_param_key_#{a}", "#{label} should at least be of #{config['min_length']} characters") unless value&.to_s&.length >= config['min_length'].to_i
           valid = false
         end
 
-        max_len = config['max_length'] || config['maxLength']
-        if max_len.present?
-          errors.add("customer_param_key_#{a}", "#{label} should not exceed #{max_len} characters") unless value&.to_s&.length <= config['max_length'].to_i
+        if config['max_length'].present?
+          errors.add("customer_param_key_#{a}", "#{label} should not exceed #{config['max_length']} characters") unless value&.to_s&.length <= config['max_length'].to_i
           valid = false
         end
 
@@ -156,7 +155,7 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
   end
 
   def bbps_biller_params
-    op = Docs::UtilityBills::Billers::Ops::Show.({id: bbps_biller_id}, "current_user" => current_user)
+    op = Docs::UtilityBills::Billers::Ops::Show.({id: bbps_biller_id}, current_user:  current_user)
 
     if op.success?
       bbps_biller = op['model']
@@ -229,4 +228,27 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
     pur = PolicyUserRole.find_or_initialize_by(user_id: user_id, policy_id: self.policy_id, user_role_id: UserRole.id_for(:utility_bill_initiator))
     pur.save
   end
+
+
+  def validate_subscription_uniqueness
+    valid = true
+    unique_subscription =  BbpsBillerSubscription.non_deleted.filter_unique_check.where(bbps_biller_id: bbps_biller_id,
+                                                                            customer_param_key_1: customer_param_key_1,
+                                                                            customer_param_value_1: customer_param_value_1,
+                                                                            customer_param_key_2: customer_param_key_2,
+                                                                            customer_param_value_2: customer_param_value_2,
+                                                                            customer_param_key_3: customer_param_key_3,
+                                                                            customer_param_value_3: customer_param_value_3,
+                                                                            customer_param_key_4: customer_param_key_4,
+                                                                            customer_param_value_4: customer_param_value_4,
+                                                                            customer_param_key_5: customer_param_key_5,
+                                                                            customer_param_value_5: customer_param_value_5,
+                                                                            company_id: current_user.company_id).first
+    if unique_subscription.present?
+      errors.add(:active_subscription,"already exist for this biller with Subscription ID #{unique_subscription.sequence_id}")
+      valid = false
+    end
+    valid
+  end
+
 end

@@ -41,6 +41,8 @@
 #  creator_id                      :integer
 #  payment_agreement_upcoming_date :date
 #  deleted_at                      :datetime
+#  base_currency_id                :integer
+#  reporting_currency_id           :integer
 #
 
 #                 :id => :integer,

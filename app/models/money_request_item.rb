@@ -10,6 +10,7 @@
 #  updated_at                     :datetime         not null
 #  money_request_item_category_id :integer
 #  deleted_at                     :datetime
+#  company_id                     :integer
 #
 
 class MoneyRequestItem < ApplicationRecord

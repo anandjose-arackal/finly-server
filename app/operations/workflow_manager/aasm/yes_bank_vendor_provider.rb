@@ -77,6 +77,7 @@ class WorkflowManager::Aasm::YesBankVendorProvider < WorkflowManager::Aasm::Base
     should_check_gstin = false
     should_check_pan = false
     should_check_bank_account = false
+    
 
     if VendorToggle.new(user).forms_enabled?
       form = Form.where(model: 'YesBankVendor', company_id: user.company.id).first
@@ -103,7 +104,7 @@ class WorkflowManager::Aasm::YesBankVendorProvider < WorkflowManager::Aasm::Base
     end
 
     if should_check_pan
-      similar_pan_vendors = YesBankVendor.where(pan: document.pan, company_id: user.company_id).filter_active
+      similar_pan_vendors = YesBankVendor.non_deleted.where(pan: document.pan, company_id: user.company_id).filter_unique_check
       if similar_pan_vendors.present?
         self.messages[:error].push "Vendor with pan: \"#{similar_pan_vendors.first.pan}\" already exists in the system. See vendor - #{similar_pan_vendors.first.display_name}"
         return false
@@ -119,11 +120,13 @@ class WorkflowManager::Aasm::YesBankVendorProvider < WorkflowManager::Aasm::Base
     end
 
     if should_check_gstin
-      document_gstins = document.gstin_locations.pluck(:gstin)&.reject { |c| c.empty? }
-      similar_gstins = GstinLocation.where(vendor_id: user.company.yes_bank_vendors.non_deleted.filter_unique_check).where(gstin: document_gstins)
-      if similar_gstins.present?
-        self.messages[:error].push "GSTIN details for \"#{similar_gstins.first.gstin}\" already exists in the system. See vendor - #{similar_gstins.first.vendor.display_name}"
-        return false
+      document_gstins = document.gstin_locations.pluck(:gstin).compact&.reject { |c| c&.empty? }
+      if document_gstins.present?
+        similar_gstins = GstinLocation.where(vendor_id: user.company.yes_bank_vendors.non_deleted.filter_unique_check).where(gstin: document_gstins)
+        if similar_gstins.present?
+          self.messages[:error].push "GSTIN details for \"#{similar_gstins.first.gstin}\" already exists in the system. See vendor - #{similar_gstins.first.vendor.display_name}"
+          return false
+        end
       end
     end
     true

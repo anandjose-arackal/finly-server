@@ -36,7 +36,8 @@ class Admin::Companies::Base < Admin::Base
                                       :gstin_verification_enabled,
                                       :utility_bills_enabled,
                                       :analytics_system,
-                                      :enforce_budget_limit
+                                      :enforce_budget_limit,
+                                      :invoice_to_pay_system
     ])
   end
 

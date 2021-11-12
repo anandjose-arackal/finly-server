@@ -10,6 +10,7 @@ class Docs::UtilityBills::Subscriptions::Ops::Review < Transactions::API
   step Model(BbpsBillerSubscription, :find_by)
   step :verify_policy
   # step :set_default_params
+  step :validate_subscription_uniqueness
   step :transition
   step :post_process
 
@@ -59,5 +60,26 @@ class Docs::UtilityBills::Subscriptions::Ops::Review < Transactions::API
 
 
   def check(options, params:, **)
+  end
+
+  def validate_subscription_uniqueness(options, params:, current_user:, model:, **)
+    return true  if [:deactivate, :retract].include?(params[:aasm_event].to_sym)
+    unique_subscription =  BbpsBillerSubscription.non_deleted.filter_unique_check.where.not(id: model.id).where(bbps_biller_id: model.bbps_biller_id,
+                                                                                              customer_param_key_1: model.customer_param_key_1,
+                                                                                              customer_param_value_1: model.customer_param_value_1,
+                                                                                              customer_param_key_2: model.customer_param_key_2,
+                                                                                              customer_param_value_2: model.customer_param_value_2,
+                                                                                              customer_param_key_3: model.customer_param_key_3,
+                                                                                              customer_param_value_3: model.customer_param_value_3,
+                                                                                              customer_param_key_4: model.customer_param_key_4,
+                                                                                              customer_param_value_4: model.customer_param_value_4,
+                                                                                              customer_param_key_5: model.customer_param_key_5,
+                                                                                              customer_param_value_5: model.customer_param_value_5,
+                                                                                              company_id: model.company_id).first
+    if unique_subscription.present?
+      add_message options, :error, :base, "Active Subscription already exist for this biller with Subscription ID #{unique_subscription.sequence_id}"
+      return
+    end
+    true
   end
 end

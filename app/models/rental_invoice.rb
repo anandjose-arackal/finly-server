@@ -101,6 +101,8 @@
 #  escalation_percentage                 :float(24)
 #  override_invoice_id                   :string(255)
 #  rcm_enabled                           :boolean
+#  base_currency_id                      :integer
+#  reporting_currency_id                 :integer
 #
 
 class RentalInvoice < ApplicationRecord
@@ -362,8 +364,17 @@ class RentalInvoice < ApplicationRecord
     self.override_invoice_id.present? ? self.override_invoice_id : self.invoice_id
   end
 
+  def payment_date_passed
+    payment_term_days = self.payment_term&.days_after
+    eligible_date = self.payment_agreement_upcoming_date
+    if payment_term_days.present? && payment_term_days  < 0
+      eligible_date = (eligible_date - payment_term_days.abs.days)
+    end
+    eligible_date <= Date.today
+  end
+
   def allowed_to_add_invoice?
-    self.is_payment_agreement_upcoming_invoice && self.payment_agreement_upcoming_date <= Date.today && self.payment_agreement.is_agreement_invoice_initiating_user? && self.payment_agreement.approved?
+    self.is_payment_agreement_upcoming_invoice && self.payment_date_passed && self.payment_agreement.is_agreement_invoice_initiating_user? && self.payment_agreement.approved?
   end
 
   def agreement_invoice_created?

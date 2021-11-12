@@ -9,6 +9,7 @@
 #  updated_at     :datetime         not null
 #  time_object_id :integer
 #  deleted_at     :datetime
+#  company_id     :integer
 #
 
 class TimeExpense < ApplicationRecord

@@ -220,5 +220,9 @@ Resolver::Router.draw do
     route 'default', ImportJobs::Resolver
   end
 
+  scope :report_processor_groups do
+    route 'default', Docs::ExpenseManagement::ReportProcessorGroups::Resolver
+  end
+
   route 'masters.*', Masters::Schema::Records::Resolver
 end

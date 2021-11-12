@@ -101,6 +101,8 @@
 #  available_invoice_amount_id           :integer
 #  include_tax_and_tds                   :boolean          default(FALSE)
 #  rcm_enabled                           :boolean
+#  base_currency_id                      :integer
+#  reporting_currency_id                 :integer
 #
 
 # These are temporary invoices to get an idea what real invoice will be like. Payment are not made against them
@@ -425,8 +427,17 @@ class GeneralInvoice < ApplicationRecord
     end
   end
 
+  def payment_date_passed
+    payment_term_days = self.payment_term&.days_after
+    eligible_date = self.payment_agreement_upcoming_date
+    if payment_term_days.present? && payment_term_days  < 0
+      eligible_date = (eligible_date - payment_term_days.abs.days)
+    end
+    eligible_date <= Date.today
+  end
+
   def allowed_to_add_invoice?
-    self.is_payment_agreement_upcoming_invoice && self.payment_agreement_upcoming_date <= Date.today && self.payment_agreement.is_agreement_invoice_initiating_user? && self.payment_agreement.approved?
+    self.is_payment_agreement_upcoming_invoice && self.payment_date_passed && self.payment_agreement.is_agreement_invoice_initiating_user? && self.payment_agreement.approved?
   end
 
   def agreement_invoice_created?

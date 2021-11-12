@@ -11,6 +11,7 @@
 #  status_id       :integer          not null
 #  otp_verified    :boolean          default(FALSE), not null
 #  deleted_at      :datetime
+#  company_id      :integer
 #
 
 class ItzCashDmtSender < ApplicationRecord

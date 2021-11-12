@@ -15,6 +15,7 @@
 #  company_pocket_template_id :integer
 #  active                     :boolean          default(TRUE)
 #  deleted_at                 :datetime
+#  company_id                 :integer
 #
 
 class UserPocket < ApplicationRecord
