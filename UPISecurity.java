@@ -21,7 +21,7 @@ public class App {
             MessageDigest md = MessageDigest.getInstance("SHA-256"); 
             byte[] digestOfPassword = md.digest(secretKey.getBytes("UTF8"));
             byte[] keyBytes = Arrays.copyOf(digestOfPassword, 24);
-            byte []iv = new byte[]{106,21,89,46,-4,95,75,-87,-109,76,-77,49,0,78,63,96};
+            byte []iv = new byte[]{-19, 101, -71, -44, -61, -88, 112, 70, 5, 81, -5, -88, 77, 12, 102, 3};
             SecretKey key = new SecretKeySpec(keyBytes, "AES");
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding"); 
             IvParameterSpec ivParameterSpec = new IvParameterSpec(iv); 
