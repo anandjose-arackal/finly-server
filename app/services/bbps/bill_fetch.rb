@@ -272,7 +272,7 @@ class Bbps::BillFetch < Bbps::Api
   def generate_message
     message = {}
     message["custDetails"] = {}
-    message["custDetails"]["mobileNo"] = params["mobile_number"]
+    message["custDetails"]["mobileNo"] = customer_mobile
     message["custDetails"]["customerTags"] = []
     message["custDetails"]["customerTags"] << {"name"=> "EMAIL", "value"=> customer_email} if customer_email.present?
     message["custDetails"]["customerTags"] << {"name"=> "AADHAAR", "value"=> customer_aadhar_no} if customer_aadhar_no.present?

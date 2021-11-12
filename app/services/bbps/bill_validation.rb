@@ -162,7 +162,7 @@ class Bbps::BillValidation < Bbps::Api
   def generate_message
     message = {}
     message["custDetails"] = {}
-    message["custDetails"]["mobileNo"] = params["mobile_number"] || "1231231231"
+    message["custDetails"]["mobileNo"] = customer_mobile
     message["custDetails"]["customerTags"] = []
     message["agentDetails"] = {}
     message["agentDetails"]["agentId"] = "YB01YB28MOB519101711"
