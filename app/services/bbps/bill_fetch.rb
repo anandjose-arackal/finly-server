@@ -54,6 +54,7 @@ class Bbps::BillFetch < Bbps::Api
 
   def body
     message = generate_message
+    Rails.logger.info("Raw message :: #{message}")
     encoded_message = Base64.strict_encode64(message)
     encrypted_message = encrypt(encoded_message)
     Rails.logger.info("Encrypted message :: #{encrypted_message}")
