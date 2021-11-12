@@ -28,7 +28,7 @@ class BbpsBillStatusChecker < BaseJob
                   #txn_ref_id: payment&.bbps_bank_transaction&.bbps_ref_id
               }
             Bbps::TransactionStatus.call_async({params: params, "current_user" => payment.initiating_user}, {wait: true}) do |op|
-               op.success do |result|
+              op.success do |result|
                 puts "SUCCESS: #{result}"
                 payment.update(payment_status_id: PaymentStatus.id_for(:completed))
                 payment.payment_order.update_order_status
