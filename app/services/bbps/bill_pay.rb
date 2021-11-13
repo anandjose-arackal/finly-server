@@ -178,7 +178,10 @@ class Bbps::BillPay < Bbps::Api
   end
 
   def quick_pay
-    params[:quick_pay] || "N"
+    if params[:quick_pay] && params[:quick_pay] == "Y"
+      return "Yes"
+    else
+      return "No"
   end
 
   def customer_mobile
@@ -219,7 +222,7 @@ class Bbps::BillPay < Bbps::Api
 
   # this is because the payments need to be sent in paisa
   def amount
-    (params[:amount]&.to_f * 100).round(0)
+    params[:amount]
   end
 
   def payment_mode
@@ -269,7 +272,7 @@ class Bbps::BillPay < Bbps::Api
 
   def body
     message = generate_message
-    Rails.logger.info("Raw message :: #{message}")
+    Rails.logger.info("Raw message :: #{message.to_json}")
     encoded_message = Base64.strict_encode64(message)
     encrypted_message = encrypt(encoded_message)
     Rails.logger.info("Encrypted message :: #{encrypted_message}")
@@ -290,18 +293,20 @@ class Bbps::BillPay < Bbps::Api
     message["refId"] = bbps_ref_id 
 
     message["paymentDetails"] = {}
+    message["paymentDetails"]["paymentMode"] = "Internet Banking"
     message["paymentDetails"]["quickPay"] = quick_pay
     message["paymentDetails"]["splitPay"] = "No"
     message["paymentDetails"]["offusPay"] = "Yes" #change to fn
     message["paymentDetails"]["paymentInfo"] = [] #requirednew fill this
-    message["paymentDetails"]["paymentInfo"] << { "name": "IFSC|AccountNo", "value": "|002281300008292" }
+    message["paymentDetails"]["paymentInfo"] << { "name": "IFSC|AccountNo", "value": "YESB0000022|002281300008292" }
+
 
     message["paycustomerDetails"] = {}
-    message["paycustomerDetails"]["emailId"] = "manoj.chekuri@npci.org.in" #requirednew check this
-    message["paycustomerDetails"]["mobileNo"] = "9012345002"#requirednew check this
+    message["paycustomerDetails"]["mobileNo"] = customer_mobile#
 
     message["agentDetails"] = {}
     message["agentDetails"]["agentId"] = "YB01YB28MOB519101711"
+    message["agentDetails"]["partnerId"] = "YB01YB28MOB519101711"
     message["agentDetails"]["deviceTags"] = []
     message["agentDetails"]["deviceTags"] << { "name" => "IP", "value" => "13.232.176.84" }
     message["agentDetails"]["deviceTags"] << { "name" => "IMEI", "value" => "1234" }
@@ -317,7 +322,7 @@ class Bbps::BillPay < Bbps::Api
 
     message["bbpsPGName"] = "YesPay" #fixed for yesbank payment gateway
     message["bbpsPGResponse"] = {}
-    message["bbpsPGResponse"]["txRefNo"] = self.class.generate_unique_secure_token #requirednew check this 
+    message["bbpsPGResponse"]["txRefNo"] = self.class.generate_unique_secure_token
     message["bbpsPGResponse"]["txnDateTime"] = DateTime.now.strftime("%Y-%m-%d %I:%M:%S")
     
     message["billDetails"] = {}
