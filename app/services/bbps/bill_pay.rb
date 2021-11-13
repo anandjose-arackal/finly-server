@@ -286,6 +286,20 @@ class Bbps::BillPay < Bbps::Api
     message["custDetails"]["customerTags"] << {"name"=> "EMAIL", "value"=> customer_email} if customer_email.present?
     message["custDetails"]["customerTags"] << {"name"=> "AADHAAR", "value"=> customer_aadhar_no} if customer_aadhar_no.present?
     message["custDetails"]["customerTags"] << {"name"=> "PAN", "value"=> customer_pan_id} if customer_pan_id.present?
+    
+    message["refId"] = bbps_ref_id 
+
+    message["paymentDetails"] = {}
+    message["paymentDetails"]["quickPay"] = quick_pay
+    message["paymentDetails"]["splitPay"] = "No"
+    message["paymentDetails"]["offusPay"] = "Yes" #change to fn
+    message["paymentDetails"]["paymentInfo"] = [] #requirednew fill this
+    message["paymentDetails"]["paymentInfo"] << { "name": "IFSC|AccountNo", "value": "|002281300008292" }
+
+    message["paycustomerDetails"] = {}
+    message["paycustomerDetails"]["emailId"] = "manoj.chekuri@npci.org.in" #requirednew check this
+    message["paycustomerDetails"]["mobileNo"] = "9012345002"#requirednew check this
+
     message["agentDetails"] = {}
     message["agentDetails"]["agentId"] = "YB01YB28MOB519101711"
     message["agentDetails"]["deviceTags"] = []
@@ -294,15 +308,18 @@ class Bbps::BillPay < Bbps::Api
     message["agentDetails"]["deviceTags"] << { "name" => "OS", "value" => "Android" }
     message["agentDetails"]["deviceTags"] << { "name" => "APP", "value" => "FINLY" }
     message["agentDetails"]["deviceTags"] << { "name" => "INITIATING_CHANNEL", "value" => "MOB" }
+    
     message["amountDetails"] = {}
     message["amountDetails"]["amount"] = amount
     message["amountDetails"]["currency"] = 356 #INR
     message["amountDetails"]["custConvFee"] = convenience_fee
     message["amountDetails"]["couCustConvFee"] = convenience_fee_desc
+
     message["bbpsPGName"] = "YesPay" #fixed for yesbank payment gateway
     message["bbpsPGResponse"] = {}
-    message["bbpsPGResponse"]["txRefNo"] = self.class.generate_unique_secure_token
+    message["bbpsPGResponse"]["txRefNo"] = self.class.generate_unique_secure_token #requirednew check this 
     message["bbpsPGResponse"]["txnDateTime"] = DateTime.now.strftime("%Y-%m-%d %I:%M:%S")
+    
     message["billDetails"] = {}
     message["billDetails"]["billerId"] = biller_id
     message["billDetails"]["customerParams"] = []
