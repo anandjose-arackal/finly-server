@@ -68,7 +68,8 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         bill_period: bank_transaction.bill_period,
         biller_id: bank_transaction.biller_id,
         quick_pay: bank_transaction.quick_pay,
-        order_number: bill.order_number
+        order_number: bill.order_number,
+        bbps_ref_id: bill.api_response.last["bbps_ref_id"]
     }
 
     params.merge!(customer_params(bill.subscription))

@@ -227,6 +227,10 @@ class Bbps::BillPay < Bbps::Api
     params[:amount]
   end
 
+  def bbps_ref_id
+    params[:bbps_ref_id]
+  end
+
   def payment_mode
     # currently hard coded, but will become dynamically done based on the
     # beneficiary's details in the future
@@ -284,6 +288,7 @@ class Bbps::BillPay < Bbps::Api
   end
 
   def generate_message
+    Rails.logger.info("Bill pay params:: #{params}")
     #check card details
     message = {}
     message["custDetails"] = {}
