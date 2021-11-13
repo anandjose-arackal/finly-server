@@ -1,4 +1,5 @@
 class Bbps::Api < ServiceApi
+  include ActiveRecord::SecureToken
   include Transactions::BackgroundWorker
   sidekiq_options queue: :yes_bank_bbps
   # Matcher = Dry::Matcher.new(

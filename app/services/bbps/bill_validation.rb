@@ -198,8 +198,12 @@ class Bbps::BillValidation < Bbps::Api
   end
 
   def parse_response(user, params, response)
-    parsed_response = {}
-    received_response = JSON.parse(response.body)
+    message = JSON.parse(response.body)["response"]
+    message = message.gsub('"[','[')
+    message = message.gsub(']"',']')
+    message = message.gsub('"{','{')
+    message = message.gsub('}"','}')
+    received_response = JSON.parse(message)
     return Failure("Invalid response") unless response.status == 200
     return Failure("Invalid response") unless received_response&.dig("response").present?
 

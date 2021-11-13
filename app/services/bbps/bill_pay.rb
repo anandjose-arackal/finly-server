@@ -279,6 +279,7 @@ class Bbps::BillPay < Bbps::Api
   end
 
   def generate_message
+    #check card details
     message = {}
     message["custDetails"] = {}
     message["custDetails"]["customerTags"] = []
@@ -298,6 +299,10 @@ class Bbps::BillPay < Bbps::Api
     message["amountDetails"]["currency"] = 356 #INR
     message["amountDetails"]["custConvFee"] = convenience_fee
     message["amountDetails"]["couCustConvFee"] = convenience_fee_desc
+    message["bbpsPGName"] = "YesPay" #fixed for yesbank payment gateway
+    message["bbpsPGResponse"] = {}
+    message["bbpsPGResponse"]["txRefNo"] = self.class.generate_unique_secure_token
+    message["bbpsPGResponse"]["txnDateTime"] = DateTime.now.strftime("%Y-%m-%d %I:%M:%S")
     message["billDetails"] = {}
     message["billDetails"]["billerId"] = biller_id
     message["billDetails"]["customerParams"] = []
@@ -312,7 +317,12 @@ class Bbps::BillPay < Bbps::Api
   end
 
   def parse_response(user, params, response)
-    received_response = JSON.parse(response.body)
+    message = JSON.parse(response.body)["response"]
+    message = message.gsub('"[','[')
+    message = message.gsub(']"',']')
+    message = message.gsub('"{','{')
+    message = message.gsub('}"','}')
+    received_response = JSON.parse(message)
     parsed_response = {}
     return Failure("Invalid response") unless response.status == 200
     return Failure("Invalid response") unless received_response&.dig("response").present?
