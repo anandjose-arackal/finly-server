@@ -182,6 +182,8 @@ class Bbps::BillPay < Bbps::Api
       return "Yes"
     else
       return "No"
+    end
+    "No"
   end
 
   def customer_mobile
