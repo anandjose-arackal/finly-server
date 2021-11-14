@@ -350,12 +350,14 @@ class Bbps::BillPay < Bbps::Api
   end
 
   def parse_response(user, params, response)
+    Rails.logger.info("Bill pay response:: #{response}")
     message = JSON.parse(response.body)["response"]
     message = message.gsub('"[','[')
     message = message.gsub(']"',']')
     message = message.gsub('"{','{')
     message = message.gsub('}"','}')
     received_response = JSON.parse(message)
+    Rails.logger.info("Bill pay parsed response:: #{received_response}")
     parsed_response = {}
     return Failure("Invalid response") unless received_response["status"] == "SUCCESS"
     return Failure("Invalid response") unless received_response&.dig("response").present?
