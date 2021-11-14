@@ -179,7 +179,7 @@ class Bbps::BillPay < Bbps::Api
   end
 
   def quick_pay
-    if params[:quick_pay] && params[:quick_pay] == "Y"
+    if params[:quick_pay] && ( params[:quick_pay] == "Y" || params[:quick_pay] == "Yes" )
       return "Yes"
     else
       return "No"
@@ -322,9 +322,9 @@ class Bbps::BillPay < Bbps::Api
     message["agentDetails"]["deviceTags"] << { "name" => "OS", "value" => "Android" }
     message["agentDetails"]["deviceTags"] << { "name" => "APP", "value" => "FINLY" }
     message["agentDetails"]["deviceTags"] << { "name" => "INITIATING_CHANNEL", "value" => "MOB" }
-    
+    byebug
     message["amountDetails"] = {}
-    message["amountDetails"]["amount"] = amount
+    message["amountDetails"]["amount"] = amount.to_i
     message["amountDetails"]["currency"] = 356 #INR
     message["amountDetails"]["custConvFee"] = BbpsBill.first.convenience_fee
     message["amountDetails"]["couCustConvFee"] = BbpsBill.first.api_response.last["convenience_fee_desc"]
