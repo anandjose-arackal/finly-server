@@ -15,9 +15,10 @@ class Bbps::BillPay < Bbps::Api
       required(:amount).filled
       required(:bill_date).filled
       required(:due_date).filled
-      required(:bill_number).filled
-      required(:bill_period).filled
+      #required(:bill_number).filled
+      #required(:bill_period).filled
       required(:biller_id).filled
+      required(:bbps_ref_id).filled
 
       # Atleast one param is required
       required(:customer_param_1) do
@@ -292,6 +293,7 @@ class Bbps::BillPay < Bbps::Api
     #check card details
     message = {}
     message["custDetails"] = {}
+    message["custDetails"]["mobileNo"] = customer_mobile
     message["custDetails"]["customerTags"] = []
     message["custDetails"]["customerTags"] << {"name"=> "EMAIL", "value"=> customer_email} if customer_email.present?
     message["custDetails"]["customerTags"] << {"name"=> "AADHAAR", "value"=> customer_aadhar_no} if customer_aadhar_no.present?
@@ -324,13 +326,15 @@ class Bbps::BillPay < Bbps::Api
     message["amountDetails"] = {}
     message["amountDetails"]["amount"] = amount
     message["amountDetails"]["currency"] = 356 #INR
-    message["amountDetails"]["custConvFee"] = convenience_fee
-    message["amountDetails"]["couCustConvFee"] = convenience_fee_desc
+    message["amountDetails"]["custConvFee"] = BbpsBill.first.convenience_fee
+    message["amountDetails"]["couCustConvFee"] = BbpsBill.first.api_response.last["convenience_fee_desc"]
 
     message["bbpsPGName"] = "YesPay" #fixed for yesbank payment gateway
     message["bbpsPGResponse"] = {}
-    message["bbpsPGResponse"]["txRefNo"] = self.class.generate_unique_secure_token
+    message["bbpsPGResponse"]["txRefNo"] = SecureRandom.hex(10)
     message["bbpsPGResponse"]["txnDateTime"] = DateTime.now.strftime("%Y-%m-%d %I:%M:%S")
+
+    message["clientRequestId"] =  SecureRandom.hex(12)
     
     message["billDetails"] = {}
     message["billDetails"]["billerId"] = biller_id
@@ -353,7 +357,7 @@ class Bbps::BillPay < Bbps::Api
     message = message.gsub('}"','}')
     received_response = JSON.parse(message)
     parsed_response = {}
-    return Failure("Invalid response") unless response.status == 200
+    return Failure("Invalid response") unless received_response["status"] == "SUCCESS"
     return Failure("Invalid response") unless received_response&.dig("response").present?
 
     parsed_response["error_code"] = received_response["response"]["complianceRespCd"]
@@ -361,6 +365,7 @@ class Bbps::BillPay < Bbps::Api
 
     parsed_response["status"] = received_response["status"]
     parsed_response["bbps_ref_id"] = received_response["response"]["refId"]
+    parsed_response["order_number"] = received_response["response"]["txnReferenceId"]
     parsed_response["responseCode"] = received_response["response"]["responseCode"]
     parsed_response["amount"] = received_response["response"]["billerResponse"]["amount"]
     parsed_response["due_date"] = received_response["response"]["billerResponse"]["dueDate"]
