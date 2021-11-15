@@ -64,6 +64,9 @@ when :uat_2, :bbps
 when :us_uat
   set :deploy_to, '/home/uat/app'
   set :rails_env, 'uat'
+when :us_uat_2
+  set :deploy_to, '/home/uat/app_2'
+  set :rails_env, 'uat'
 when :pre_uat
   set :deploy_to, '/home/centos/app'
   set :rails_env, 'staging'
