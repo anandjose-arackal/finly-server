@@ -4223,6 +4223,17 @@ Rails.application.routes.draw do
   post 'exports/:type', to: 'export_jobs#create'
   resources :export_jobs, only: [:index]
   resources :import_jobs, only: [:index]
+  post 'import_jobs', to: 'import_jobs#create'
+  get 'import_jobs/template', to: 'import_jobs#template'
+  get 'import_jobs/:id', to: 'import_jobs#show'
+  post 'import_jobs/:import_job_id/attachments', to: 'import_jobs#add_attachment'
+  delete 'import_job_attachments/:id', to: 'import_jobs#delete_attachment'
+  post 'import_jobs/:id/submit', to: 'import_jobs#submit'
+  get 'import_jobs/:id/records', to: 'import_jobs#records'
+  get 'import_records/:id', to: 'import_jobs#record_show'
+  post 'import_records/:id', to: 'import_jobs#record_update'
+
+
   get 'maps/config/:type', to: 'google_maps#maps_config'
 
   scope :streamsets do

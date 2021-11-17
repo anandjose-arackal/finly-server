@@ -38,6 +38,8 @@ class ImportJob < ApplicationRecord
   include UUIDHelper
   include Exposures::Model::Exposable
 
+  MODES = %w(create create_update)
+
   belongs_to :created_by, class_name: 'User', optional: true
   belongs_to :company
   belongs_to :status, class_name: 'ImportJobStatus'
@@ -54,8 +56,12 @@ class ImportJob < ApplicationRecord
   has_attached_file :result_file, :use_timestamp => false
   validates_attachment :result_file, content_type: {content_type: []}
 
+  has_many :records, class_name: 'ImportRecord'
+  has_many :import_job_attachments
+
   serialize :request_params, JSON
   serialize :options, JSON
+  serialize :meta_data, JSON
 
   def as_json(options = {})
     {
@@ -74,8 +80,37 @@ class ImportJob < ApplicationRecord
       attachment: attachment&.url,
       result_file: result_file&.url,
       created_at: created_at&.strftime("%I:%M%p, %d-%m-%Y"),
-      status: status&.name
+      status: status&.name,
+      options: self.options,
+      meta_data: meta_data,
+      require_attachments: require_attachments,
     }
+  end
+
+  def item_complete(success)
+    self.completed_records = 0 if self.completed_records.nil?
+    self.created_records = 0 if self.created_records.nil?
+    self.failed_records = 0 if self.failed_records.nil?
+    self.completed_records += 1
+    self.created_records += 1 if success
+    self.failed_records += 1 unless success
+    self.completion_percentage = ((self.completed_records * 100 / self.total_records) rescue 0)
+    self.save
+  end
+
+  def progress_update(status, message: nil)
+    self.status_id = ImportJobStatus.id_for(status)
+    # self.message = message if message
+
+    case status
+    when :failed, :error
+      add_message :error, message || 'Unknown error occurred'
+      self.completed_at = DateTime.now
+    when :completed
+      self.completed_at = DateTime.now
+    end
+
+    self.save
   end
 
 end

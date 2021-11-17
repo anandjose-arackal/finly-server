@@ -6,7 +6,11 @@ class Routers::Route
     self.options = options
   end
 
-  def dispatch(params)
-    klass.(params)
+  def dispatch(params, async=false)
+    if async
+      klass.call_async(params)
+    else
+      klass.(params)
+    end
   end
 end

@@ -27,6 +27,7 @@ class Forms::Export::Processor
     sheets_headers[form.model.name] = {
       name: form.label,
       key: form.model.name,
+      nested_entities: [],
       headers: {
         import_sequence_number: {
           name: "Import Sequence Number",
@@ -46,14 +47,14 @@ class Forms::Export::Processor
         next unless entity.parent_id.blank?
         next unless (entity.visible || entity.conditions.joins(:actions).where(form_condition_actions: {property: :visible, value: true}).present?)
 
-        sheets_headers[form.model.name][:headers].merge!(build_headers_for_entity(sheets_headers, form.label, entity, user))
+        sheets_headers[form.model.name][:headers].merge!(build_headers_for_entity(sheets_headers, form.label, form.model.name, entity, user))
       end
     end
 
     sheets_headers.with_indifferent_access
   end
 
-  def build_headers_for_entity(sheets_headers, parent_sheet_label, entity, user)
+  def build_headers_for_entity(sheets_headers, parent_sheet_label, parent_sheet_key, entity, user)
     headers = {}
 
     if entity.entities.blank?
@@ -118,17 +119,19 @@ class Forms::Export::Processor
           entity_type: 'text'
         }
       }
-      entity.entities.each do |child_entity|
-        next unless (child_entity.visible || child_entity.conditions.joins(:actions).where(form_condition_actions: {property: :visible, value: true}).present?)
-
-        child_sheet_headers.merge!(build_headers_for_entity(sheets_headers, entity.entity_key, child_entity, user))
-      end
       sheets_headers[entity.entity_key] = {
         name: entity.label,
         key: entity.entity_key,
-        headers: child_sheet_headers,
         entity: entity,
+        nested_entities: [],
       }
+      entity.entities.each do |child_entity|
+        next unless (child_entity.visible || child_entity.conditions.joins(:actions).where(form_condition_actions: {property: :visible, value: true}).present?)
+
+        child_sheet_headers.merge!(build_headers_for_entity(sheets_headers, entity.entity_key, entity.entity_key, child_entity, user))
+      end
+      sheets_headers[entity.entity_key][:headers] = child_sheet_headers
+      sheets_headers[parent_sheet_key][:nested_entities] << entity
     end
 
     headers
@@ -214,7 +217,11 @@ class Forms::Export::Processor
     end
 
     lookup_content.each_with_index do |content, index|
-      worksheet = workbook.add_worksheet(content[:name])
+      begin
+        worksheet = workbook.add_worksheet(content[:name])
+      rescue
+        next
+      end
 
       sheet_header_keys = []
 

@@ -12,6 +12,6 @@
 class ImportJobStatus < NonTenantedApplicationRecord
   include Seedable
 
-  set_values :pending, :in_progress, :completed, :failed
+  set_values :preprocessing, :pending, :in_progress, :completed, :failed
 
 end

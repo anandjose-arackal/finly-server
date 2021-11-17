@@ -109,7 +109,7 @@ class Masters::Vendors::Form < Forms::API
   end
 
   section :business_details, associate_custom_fields: true do
-    auto_number :vendor_id,unique: true,editable: false, label: "Vendor ID", sequence: {prefix: "VNDR.", start_at: '000001'}, placeholder: "System Generated Field", hint: "System Generated Field"
+    auto_number :vendor_id,unique: true,editable: false, label: "Vendor ID", sequence: {prefix: "VNDR.", start_at: '000001'}, placeholder: "System Generated Field", hint: "System Generated Field", display_key: true
     switch :autogenerate_vendor_id, default_value: true, label: "Auto-Generate Vendor ID", system_field: false
     dropdown :vendor_country, choices_scope: Choices[:list].({id: 'India', name: "India"}, {id: 'International', name: "International"}),
              required: true, default_value: 'India'
@@ -118,7 +118,7 @@ class Masters::Vendors::Form < Forms::API
            required: true
     # text :name, computed: Forms::Compute::Lookup('policy_id', '{{record.name}}'), editable: false
 
-    text :business_name, label: 'Legal Name', required: true
+    text :business_name, label: 'Legal Name', required: true, display_key: true
     text :trade_name, label: 'Trade Name', required: true
     switch :gst_registered, label: "GST Registered"
     large_text :address, label: "Full Address"
@@ -165,7 +165,7 @@ class Masters::Vendors::Form < Forms::API
 
   section :location_details, associate_custom_fields: true do
     data_map :gstin_locations, populate_if_empty: GstinLocation, min_items: 1, associate_custom_fields: true do
-      text :location
+      text :location, display_key: true
       dropdown :state_id, required: true,
                choices_scope: Choices[:enum].(GstStateCode, name: :name)
       text :poc_name, label: "Point of Contact"
@@ -187,7 +187,7 @@ class Masters::Vendors::Form < Forms::API
 
   section :account_details, associate_custom_fields: true do
     data_map :bank_accounts, populate_if_empty: BankAccount, min_items: 1, associate_custom_fields: true do
-      text :name, required: true
+      text :name, required: true, display_key: true
       text :account_number, required: true, unique: false, regex: {format: "\\A[A-Za-z0-9]{3,32}\\z", message: "is not in valid format"}
       text :confirm_account_number, required: true, system_field: false
       text :ifsc, label: "IFSC", required: true, regex: {format: "\\A[A-Za-z]{4}[a-zA-Z0-9]{7}\\z", message: "is not valid"}
