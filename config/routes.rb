@@ -3030,6 +3030,7 @@ Rails.application.routes.draw do
         resources :purchase_orders
         get 'bank_transfers', to: 'payments#all_payments'
         get 'vendors', to: 'vendors#index'
+        get 'invoices', to: 'inward_invoices#index'
       end
       scope :vendors do
         #todo vendor Emp
@@ -3651,6 +3652,7 @@ Rails.application.routes.draw do
   get 'procurement_action_config', to: 'procure/procurements#actions_configuration'
   get 'vp_user_action_config', to: 'bank_transfer/users#actions_configuration'
   get 'policy_user_role_config', to: 'policy_user_roles#vp_role_config'
+  get 'approval_matrix_config', to: 'approval_matrix#vp_workflow_config'
   post 'bulk_assign_policy', to: 'policy_user_roles#bulk_assign'
   namespace :bank_transfer do
     get 'payment_orders/count', to: 'payment_orders#count'

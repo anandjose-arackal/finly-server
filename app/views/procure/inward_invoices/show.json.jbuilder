@@ -38,6 +38,8 @@ json.status do
 end
 
 json.invoice_payment_status invoice.invoice_payment_status
+json.created_by invoice.created_by.as_json rescue nil
+
 
 # do
 #   if current_user.vendor_payment_creditor?
