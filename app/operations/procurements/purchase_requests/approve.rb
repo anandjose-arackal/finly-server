@@ -32,8 +32,8 @@ class Procurements::PurchaseRequests::Approve < Procurements::PurchaseRequests::
 
           # Mark rejected line items
           params[:approved_purchase_request_items] = purchase_request.purchase_request_items.collect(&:id)
-          params[:rejected_purchase_request_items] ||= []
-          params[:rejected_purchase_request_items] += params[:items].select{|item| item[:reject_item] == "true"}.pluck(:id)
+          #params[:rejected_purchase_request_items] ||= []
+          #params[:rejected_purchase_request_items] += params[:items].select{|item| item[:reject_item] == "true"}.pluck(:id)
           params[:approved_purchase_request_items] -= params[:rejected_purchase_request_items] if params[:rejected_purchase_request_items].present?
           rejected = purchase_request.reject_purchase_request_items(params, user) if params[:rejected_purchase_request_items].present?
           # Remove line items from rejected status
