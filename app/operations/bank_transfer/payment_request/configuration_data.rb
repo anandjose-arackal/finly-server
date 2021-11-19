@@ -16,7 +16,7 @@ class BankTransfer::PaymentRequest::ConfigurationData < BankTransfer::PaymentReq
     load_custom_fields_config
     params[:custom_fields_config] = self.custom_fields_config
 
-    procurement_enabled = user.company.procurement_enabled?
+    procurement_enabled = user.company.procurement_enabled? || user.company.invoice_to_pay_system_enabled?
     params[:tabs] = {
         invoices: procurement_enabled,
         po_advances: procurement_enabled,
