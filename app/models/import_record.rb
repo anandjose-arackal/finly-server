@@ -4,6 +4,7 @@ class ImportRecord < ApplicationRecord
   belongs_to :company
   belongs_to :import_job
   belongs_to :status, class_name: 'ImportRecordStatus'
+  belongs_to :document, polymorphic: true, optional: true
 
   serialize :record_data, JSON
   serialize :processed_data, JSON
@@ -44,4 +45,17 @@ class ImportRecord < ApplicationRecord
       processed_data: processed_data,
     }
   end
+
+  def update_status(success, message, internal_message, error_trace)
+    if success
+      self.status_id = ImportRecordStatus.id_for(:success)
+    else
+      self.status_id = ImportRecordStatus.id_for(:failed)
+    end
+    self.message = message
+    self.internal_message = internal_message
+    self.error_trace = error_trace
+    self.save!
+  end
+
 end

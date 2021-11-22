@@ -140,12 +140,12 @@ class Forms::Export::Processor
   def build_lookup_content
     content = []
 
-    form.sections.each do |section|
+    form_sections.each do |section|
       # next unless section.associate_custom_fields
 
       section.entities.each do |entity|
-        next unless (entity.visible || entity.conditions.joins(:actions).where(form_condition_actions: {property: :visible, value: true}).present?)
         next unless ['lookup', 'dropdown'].include?(entity.entity_type)
+        next unless (entity.visible || entity.conditions.joins(:actions).where(form_condition_actions: {property: :visible, value: true}).present?)
         next unless entity.choices_scope.present?
 
         content << {
@@ -159,22 +159,48 @@ class Forms::Export::Processor
   end
 
   def build_export(input, request)
-    file = Tempfile.new(["#{form.label}_", '.xlsx'])
+    export_base = build_export_base(form.label)
+
+    file = export_base[:file]
+    workbook = export_base[:workbook]
+    worksheets = export_base[:worksheets]
+
+    set_lookup_content_in_export(workbook)
+    set_documents_content_in_export(workbook, worksheets, input, request)
+
+    workbook.close
+    file.rewind
+
+    request.result_file = file
+    request.save
+    request.progress_update(:completed)
+  end
+
+  def build_export_base(filename)
+    file = Tempfile.new(["#{filename}_", '.xlsx'])
     workbook = ::WriteXLSX.new(file, strings_to_urls: false)
 
     worksheets = {}
-    worksheets_length = Hash.new(0)
 
     self.headers.values.each do |sheet_data|
       sheet_name = sheet_data[:name]
       sheet_key = sheet_data[:key]
       worksheets[sheet_key] = workbook.add_worksheet(sheet_name)
-      worksheets_length[sheet_key] = 0
       self.headers[sheet_key][:headers].values.each_with_index do |header_data, header_index|
         worksheets[sheet_key].set_column(header_index, header_index, header_data[:name].length+10)
         worksheets[sheet_key].write(0, header_index, header_data[:name])
       end
     end
+
+    {
+      file: file,
+      workbook: workbook,
+      worksheets: worksheets,
+    }
+  end
+
+  def set_documents_content_in_export(workbook, worksheets, input, request)
+    worksheets_length = Hash.new(0)
 
     input.each_with_index do |record, row_index|
       form_data = record.form_data(form).with_indifferent_access
@@ -215,7 +241,9 @@ class Forms::Export::Processor
       end
       request.item_complete(true)
     end
+  end
 
+  def set_lookup_content_in_export(workbook)
     lookup_content.each_with_index do |content, index|
       begin
         worksheet = workbook.add_worksheet(content[:name])
@@ -245,13 +273,5 @@ class Forms::Export::Processor
         end
       end
     end
-
-    workbook.close
-
-    file.rewind
-
-    request.result_file = file
-    request.save
-    request.progress_update(:completed)
   end
 end
