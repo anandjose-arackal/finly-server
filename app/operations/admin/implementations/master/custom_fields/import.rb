@@ -219,15 +219,15 @@ class Admin::Implementations::Master::CustomFields::Import < Admin::Implementati
       while(lower_limit < size)
         field_name = drop_down_items[drop_down_count][:field_name]
         dependable = row[lower_limit+1].to_s == 'Y' ? true : false
-        if field_configuration.has_dependent_cf == false
-          field_configuration.update_columns(has_dependent_cf: true)
-        end
         if ddi.present?
           field_configuration = ddi.dependent_field_configurations.where(field_name: field_name).first
         else
           field_configuration = FieldConfiguration.non_deleted.find drop_down_items[drop_down_count][:id]
         end
         if field_configuration.present?
+          if field_configuration.has_dependent_cf == false
+            field_configuration.update_columns(has_dependent_cf: true)
+          end
           unless field_configuration.drop_down_items.pluck(:name).include?(row[lower_limit])
             ddi = field_configuration.drop_down_items.create(name: row[lower_limit],has_dependent_cf: dependable)
             previous_field = field_configuration
