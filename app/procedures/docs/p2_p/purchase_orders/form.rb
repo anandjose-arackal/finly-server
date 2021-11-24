@@ -181,7 +181,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
 
   # SHIPPING ADDRESS
   section :shipping_address do
-    lookup :delivery_location_id, label: 'Delivery Address', choices_scope: Choices[:lookup].('locations'),
+    lookup :delivery_location_id, label: 'Delivery Address', choices_scope: Choices[:lookup].('locations', assignments: { form: true }),
            filters: Rules::Builder['shippable_location'].true, required: true
     text :shipping_address_name, editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.name}}')
     text :shipping_address_gstin, editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.gstin}}')
