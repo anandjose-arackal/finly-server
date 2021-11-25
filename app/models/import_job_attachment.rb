@@ -14,11 +14,13 @@ class ImportJobAttachment < ApplicationRecord
       {
         id: uuid,
         identifier: identifier,
-        url: attachment&.url
+        url: attachment&.url,
+        filename: self.attachment_file_name,
       }
     else
       att_data = super
       att_data['url'] = attachment&.url
+      att_data['filename'] = self.attachment_file_name
       att_data
     end
   end
