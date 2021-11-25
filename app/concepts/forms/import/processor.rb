@@ -120,7 +120,7 @@ class Forms::Import::Processor
     end
 
     ImportRecord.insert_all!(records_data)
-    import_job.update(status_id: ImportJobStatus.id_for(:pending))
+    import_job.update(status_id: ImportJobStatus.id_for(:pending), total_records: records_data.count)
 
     records_data
   end
