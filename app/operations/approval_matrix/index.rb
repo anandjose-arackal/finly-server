@@ -33,7 +33,12 @@ class ApprovalMatrix::Index < BaseOperation
     end
 
     if role.present?
-      self.policies = Policy::VendorPayments::Index.(user, {filter_role_id: [UserRole.id_for(role)]}).policies
+      op = Policy::VendorPayments::Index.(user, {filter_role_id: [UserRole.id_for(role)]})
+      if user.company_admin? || user.auditor? || user.vendor_payments_admin?
+        self.policies = op.admin_policies
+      else
+        self.policies = op.policies
+      end
     else
       add_message :error, "Not able to retrieve approval matrix"
     end
