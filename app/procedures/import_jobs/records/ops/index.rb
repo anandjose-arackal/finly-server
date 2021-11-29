@@ -3,6 +3,7 @@ class ImportJobs::Records::Ops::Index < Transactions::API
   step :set_filter_params
   step Resolver::Transactions::Load(klass: ImportJobs::Records::Resolver, paginate: true)
   step :set_status_counts
+  step :set_total_count
 
   def set_filter_params(context, params:, model:, current_user:, **)
     params[:q] = {}
@@ -29,6 +30,12 @@ class ImportJobs::Records::Ops::Index < Transactions::API
 
     context['statuses'] = statuses
 
+    true
+  end
+
+  def set_total_count(context, model:, params:, current_user:, **)
+    filter_records = ImportJobs::Records::Resolver.(params: params.merge(filter: true, paginate: false), current_user: current_user)
+    context['count'] = filter_records&.count
     true
   end
 
