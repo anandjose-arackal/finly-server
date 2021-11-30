@@ -186,6 +186,11 @@ class Forms::Import::Processor
             existing_record = form.model.find(row_data[header_details[:id][:name]])
           end
 
+          old_form_data = nil
+          if existing_record.present?
+            old_form_data = existing_record.form_data(form).with_indifferent_access
+          end
+
           form_data = {}.with_indifferent_access
           header_details.values.each do |header_data|
             if ['dropdown'].include?(header_data[:entity_type])
@@ -222,7 +227,21 @@ class Forms::Import::Processor
 
           nested_data.keys.each do |key|
             if form_data[:id].present?
-              form_data[key] = nested_data[key][form_data[:id]]
+              form_data[key] = nested_data[key][form_data[:id]] || []
+              if old_form_data.present? and old_form_data[key].present?
+                nested_ids = []
+                form_data[key].each do |n_data|
+                  next unless n_data[:id].present?
+                  nested_ids << n_data[:id]
+                end
+
+                old_form_data[key].each do |old_n_data|
+                  next if nested_ids.include?(old_n_data[:id])
+                  next if nested_ids.include?(old_n_data[:id].to_s)
+
+                  form_data[key] << old_n_data
+                end
+              end
             elsif form_data[:import_sequence_number].present?
               form_data[key] = nested_data[key]["Seq#{form_data[:import_sequence_number]}"]
             end
