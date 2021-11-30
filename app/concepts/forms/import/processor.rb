@@ -327,8 +327,16 @@ class Forms::Import::Processor
     end
 
     header_details.values.each do |header_data|
+      next if header_data[:import_skip]
+
       if ['attachment'].include?(header_data[:entity_type])
         form_data[header_data[:entity_key]] = get_attachment_entity_value(row_data[header_data[:name]], row_data['_ref'], header_data[:name], header_data[:entity_key], existing_record, import_record)
+      elsif ['lookup', 'dropdown'].include?(header_data[:entity_type])
+        choice_data = get_entity_value(row_data[header_data[:name]], header_data[:entity], header_data[:entity_type])
+        if choice_data.present?
+          form_data[header_data[:entity_key]] = choice_data[:id]
+          form_data["#{header_data[:entity_key]}_value"] = choice_data[:value]
+        end
       else
         form_data[header_data[:entity_key]] = get_entity_value(row_data[header_data[:name]], header_data[:entity], header_data[:entity_type])
       end
@@ -350,8 +358,16 @@ class Forms::Import::Processor
         end
 
         header_details.values.each do |header_data|
+          next if header_data[:import_skip]
+
           if ['attachment'].include?(header_data[:entity_type])
             data[header_data[:entity_key]] = get_attachment_entity_value(nested_row[header_data[:name]], nested_row['_ref'], header_data[:name], header_data[:entity_key], existing_record, import_record)
+          elsif ['lookup', 'dropdown'].include?(header_data[:entity_type])
+            choice_data = get_entity_value(nested_row[header_data[:name]], header_data[:entity], header_data[:entity_type])
+            if choice_data.present?
+              data[header_data[:entity_key]] = choice_data[:id]
+              data["#{header_data[:entity_key]}_value"] = choice_data[:value]
+            end
           else
             data[header_data[:entity_key]] = get_entity_value(nested_row[header_data[:name]], header_data[:entity], header_data[:entity_type])
           end
@@ -418,13 +434,19 @@ class Forms::Import::Processor
 
     choice = entity.choices_scope.find_by_id(raw_value, user: user)
     return unless choice.present?
-    
+
     if choice.respond_to?(:dig)
       choice_id = choice&.dig(:id)
+      choice_value = choice&.dig(:name)
     else
       choice_id = choice&.id
+      choice_value = choice&.name
     end
-    parse_value(choice_id, entity)
+
+    {
+      id: parse_value(choice_id, entity),
+      value: choice_value,
+    }.with_indifferent_access
   end
 
   def get_lookup_entity_value(raw_value, entity)
@@ -432,8 +454,18 @@ class Forms::Import::Processor
 
     choice = entity.choices_scope.find_by_id(raw_value, user: user)
     return unless choice.present?
-    
-    parse_value(choice.id, entity)
+
+    choice_name = nil
+    if choice.respond_to?(:name)
+      choice_value = choice.name
+    elsif choice.respond_to?(:display_name)
+      choice_value = choice.display_name
+    end
+
+    {
+      id: parse_value(choice.id, entity),
+      value: choice_value,
+    }.with_indifferent_access
   end
 
   def get_attachment_entity_value(raw_value, reference_id, header_name, entity_key, existing_record, import_record)

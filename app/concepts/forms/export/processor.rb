@@ -77,6 +77,7 @@ class Forms::Export::Processor
             name: entity.label,
             entity_key: "#{entity.entity_key}_value",
             entity_type: 'text',
+            import_skip: true
           }
         elsif entity.entity_type == 'date'
           headers[entity.entity_key.to_s] = {
