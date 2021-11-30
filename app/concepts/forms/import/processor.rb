@@ -1,10 +1,11 @@
 class Forms::Import::Processor
-  attr_accessor :form, :user, :export_processor
+  attr_accessor :form, :user, :export_processor, :is_import_submission_stage
 
   def initialize(form, user)
     self.form = form
     self.user = user
     self.export_processor = Forms::Export::Processor.(form, user)
+    self.is_import_submission_stage = false
   end
 
   def self.call(form, user)
@@ -64,6 +65,8 @@ class Forms::Import::Processor
   end
 
   def process_admin_import(request, attachments: nil)
+    self.is_import_submission_stage = true
+
     path = Rails.env.production? ? request.request_file&.url : request.request_file&.path
     imported_sheet = Roo::Spreadsheet.open(path)
 
@@ -201,6 +204,7 @@ class Forms::Import::Processor
   end
 
   def process_import_records(import_job)
+    self.is_import_submission_stage = true
     return if import_job.status_id == ImportJobStatus.id_for(:in_progress)
 
     import_job.progress_update(:in_progress)
@@ -320,6 +324,11 @@ class Forms::Import::Processor
     if row_data[header_details[:id][:name]].present?
       existing_record = form.model.find(row_data[header_details[:id][:name]])
     end
+        
+    old_form_data = nil
+    if existing_record.present?
+      old_form_data = existing_record.form_data(form).with_indifferent_access
+    end
 
     header_details.values.each do |header_data|
       next if header_data[:import_skip]
@@ -340,8 +349,7 @@ class Forms::Import::Processor
     headers[form.model.name][:nested_entities].each do |nested_entity|
       nested_data = row_data.delete(nested_entity.entity_key)
       unless nested_data.present?
-        form_data[nested_entity.entity_key] = []
-        next
+        nested_data = []
       end
 
       form_nested_data = []
@@ -378,6 +386,25 @@ class Forms::Import::Processor
         end
 
         form_nested_data << data
+      end
+
+      # if form_data is generated before submission process and existing nested records are missing in excel sheet, add them to form data to show them in Review page of bulk import process
+      # if form_data is generated during submission process, we don't need to explicitly add existing records as they will be kept as it is.
+      unless self.is_import_submission_stage
+        if old_form_data.present? and old_form_data[nested_entity.entity_key].present?
+          nested_ids = []
+          form_nested_data.each do |n_data|
+            next unless n_data[:id].present?
+            nested_ids << n_data[:id]
+          end
+
+          old_form_data[nested_entity.entity_key].each do |old_n_data|
+            next if nested_ids.include?(old_n_data[:id])
+            next if nested_ids.include?(old_n_data[:id].to_s)
+
+            form_nested_data << old_n_data
+          end
+        end
       end
 
       form_data[nested_entity.entity_key] = form_nested_data
