@@ -58,7 +58,7 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
 
           # Get max for all reviewers
           max_thresholds = level_reviewers_data.map{|item| item['max']}
-          # min_thresholds = level_reviewers_data.map{|item| item['min']}
+          min_thresholds = level_reviewers_data.map{|item| item['min']}
 
 
           # If level doesn't have reviewers
@@ -66,6 +66,13 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
             if !max_thresholds.include?(nil) && document_amount.to_f > max_thresholds.compact.map(&:to_f).max.to_f
               document_class_name = document.class.human_name rescue document.model_name.human.titleize
               add_message :error, "#{document_class_name}'s amount is greater than maximum limit set in Level - #{level.level_number} (#{level.name})"
+            end
+          end
+
+          if min_thresholds.compact.present?
+            if !min_thresholds.include?(nil) && document_amount.to_f < min_thresholds.compact.map(&:to_f).min.to_f
+              document_class_name = document.class.human_name rescue document.model_name.human.titleize
+              add_message :error, "#{document_class_name}'s amount is smaller than minimum limit set in Level - #{level.level_number} (#{level.name})"
             end
           end
 
