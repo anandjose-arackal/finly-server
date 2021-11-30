@@ -352,7 +352,9 @@ class Forms::Import::Processor
           end
         end
 
-        unless data[:id].present?
+        if data[:id].present?
+          data[:collection_id] = data[:id]
+        else
           data.delete(:id)
         end
 
