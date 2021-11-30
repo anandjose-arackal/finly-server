@@ -7,7 +7,7 @@ class ImportJobs::Records::Ops::Index < Transactions::API
 
   def set_filter_params(context, params:, model:, current_user:, **)
     params[:q] = {}
-    if params[:status_id].present?
+    if params[:status_id].present? and params[:status_id] != 'null'
       params[:q][:status_id_eq_any] = params[:status_id]
     end
 
