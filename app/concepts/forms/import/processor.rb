@@ -243,7 +243,7 @@ class Forms::Import::Processor
     worksheets[form.model.name].write(0, self.headers[form.model.name][:headers].keys.count, "Message")
 
     import_job.records.each do |import_record|
-      add_record_to_result_file(import_record.record_data, import_record.document.id, import_record.message, worksheets, worksheets_length)
+      add_record_to_result_file(import_record.record_data, import_record.document&.id, import_record.message, worksheets, worksheets_length)
     end
 
     workbook.close
