@@ -137,7 +137,7 @@ class PurchaseOrderExposure < Exposures::API
   attribute :shipping_address, record_attribute: true
   attribute :approval_levels, record_attribute: :dlrms, exposure: true, includes: [:dlrms]
   attribute :approved_trails, exposure: :true,  includes: [:trails] do
-    record.trails.where(action_id: TrailAction.id_for(:approve))
+    record.trails.where(action_id: TrailAction.id_for(:approve)).group(:action_level_id)
   end
 
   attribute :approved_timeline, includes: [{dlrms: [:taken_control_by, :forwarded_to, :reviewer]}] do
