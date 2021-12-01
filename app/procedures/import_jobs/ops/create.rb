@@ -10,7 +10,7 @@ class ImportJobs::Ops::Create < Transactions::API
 
 
   def run_preprocessing_job(context, model:, current_user:, **)
-    ImportJobs::Router.dispatch(model.options['route'], {params: {id: model.id, uuid: model.id, route: model.options['route'], preprocess_import_job: true}, current_user: current_user}, async=true)
+    ImportJobs::Router.dispatch(model.options['route'], {params: {id: model.id, uuid: model.id, route: model.options['route'], preprocess_import_job: true}, current_user: current_user})
 
     true
   end
