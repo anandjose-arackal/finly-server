@@ -167,7 +167,7 @@ class Forms::Import::Processor
       end
 
       worksheet_headers.each_with_index do |header_name, header_index|
-        worksheet.set_column(header_index, header_index, header_name.length+10)
+        worksheet.set_column(header_index, header_index, (header_name&.length.to_i) +10)
         worksheet.write(0, header_index, header_name)
       end
 
