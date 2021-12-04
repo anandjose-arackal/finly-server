@@ -222,9 +222,9 @@ class Forms::Import::Processor
 
           nested_data.keys.each do |key|
             if form_data[:id].present?
-              form_data[key] = nested_data[key][form_data[:id]]
+              form_data[key] = nested_data[key][form_data[:id]] || []
             elsif form_data[:import_sequence_number].present?
-              form_data[key] = nested_data[key]["Seq#{form_data[:import_sequence_number]}"]
+              form_data[key] = nested_data[key]["Seq#{form_data[:import_sequence_number]}"] || []
             end
           end
 
