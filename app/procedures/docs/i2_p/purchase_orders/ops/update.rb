@@ -17,6 +17,7 @@ class Docs::I2P::PurchaseOrders::Ops::Update < Transactions::API
   step Model(PurchaseOrder, :find_by)
   step Policy::Pundit(Docs::P2P::PurchaseOrders::Policy, :update?)
   step Forms::Model::Find()
+  step :validate_quotations
   step Forms::Contracts::Build()
   step Contract::Validate()
   step Wrap(TransactionStep){
@@ -25,6 +26,31 @@ class Docs::I2P::PurchaseOrders::Ops::Update < Transactions::API
     fail RollbackStep
   }
   step Transactions::Messages::SuccessMessage('Purchase Order Updated')
+
+  def validate_quotations(options, params, ** )
+    quotations_params = params[:params][:quotations] rescue nil
+    return true if quotations_params.nil?
+
+    quotations_params.reject! {|param| param[:_destroy] && param[:id]=="" }
+    errors = false
+    
+    if quotations_params.pluck(:vendor_name).any? {|vendor_name| vendor_name.to_s.length < 3}
+      add_message options, :error, :base, "Quotations > vendor name should be at least 3 characters long"
+      errors = true
+    end
+
+    if quotations_params.pluck(:vendor_location).any? {|vendor_location| vendor_location.to_s.length < 3}
+      add_message options, :error, :base, "Quotations > vendor location should be at least 3 characters long"
+      errors = true
+    end
+    
+    if quotations_params.pluck(:note).any? {|note| note.to_s.length < 5}
+      add_message options, :error, :base, "Quotations > note should be at least 5 characters long"
+      errors = true
+    end
+
+    return !errors
+  end
 
   def budget_limit_validation(options, params, ** )
     current_user = options[:current_user]
