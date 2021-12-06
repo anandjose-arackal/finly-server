@@ -1,4 +1,4 @@
-class PoInvoiceMigrator
+class PoInvoiceFormMigrator
   def self.perform(company_id)
 
     result = []
