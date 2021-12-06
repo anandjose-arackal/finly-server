@@ -28,10 +28,11 @@ class Docs::I2P::PurchaseOrders::Ops::Update < Transactions::API
   step Transactions::Messages::SuccessMessage('Purchase Order Updated')
 
   def validate_quotations(options, params, ** )
+    params[:params][:quotations].reject! {|param| param[:_destroy] && param[:id] == "" }
+
     quotations_params = params[:params][:quotations] rescue nil
     return true if quotations_params.nil?
 
-    quotations_params.reject! {|param| param[:_destroy] && param[:id]=="" }
     errors = false
     
     if quotations_params.pluck(:vendor_name).any? {|vendor_name| vendor_name.to_s.length < 3}
