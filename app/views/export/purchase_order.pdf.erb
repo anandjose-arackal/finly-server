@@ -44,7 +44,7 @@
         </table>
       </div>
     </div>
-    <% if @result.purchase_order.company.configuration.show_custom_fields_in_pdf %>
+    <% if @result.purchase_order.company.configuration.show_custom_fields_in_pdf && !@result.purchase_order.forms_enabled %>
       <% field_configurations = FieldConfiguration.with_id(@result.purchase_order.custom_fields.pluck(:field_configuration_id)) %>
       <% if field_configurations.present? && field_configurations.pluck(:printable).include?(true) %>
         <div class="col col-xs-12 no-padding">
