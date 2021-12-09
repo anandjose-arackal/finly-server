@@ -94,10 +94,10 @@ class Event::EInvoice::Approve < Event::EInvoice::Base
             return "Congratulations! Your invoice #{invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id}) has been approved"
           end
         elsif self.invoice.document_role_users(:creditor).include?(user)
-          "#{approving_user.name} has approved the invoice: #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id}) and is waiting your approval"
+          "#{approving_user.name} has approved the invoice: #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id}) and is awaiting your approval"
         end
       elsif self.invoice.document_role_users(:creditor).include?(user) || self.invoice.get_reviewers.include?(user)
-        return "#{approving_user.name} has approved the invoice: #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id}) and is waiting your approval"
+        return "#{approving_user.name} has approved the invoice: #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id}) and is awaiting your approval"
       else
         return "#{approving_user.name} has approved the invoice: #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id})"
       end
@@ -116,10 +116,10 @@ class Event::EInvoice::Approve < Event::EInvoice::Base
             message = "Congratulations! Your invoice #{invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id}) has been approved"
           end
         elsif self.invoice.document_role_users(:creditor).include?(user)
-          message = "#{approving_user.name} has approved the invoice: #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id}) and is waiting your approval"
+          message = "#{approving_user.name} has approved the invoice: #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id}) and is awaiting your approval"
         end
       elsif self.invoice.document_role_users(:creditor).include?(user) || self.invoice.get_reviewers.include?(user)
-        message = "#{approving_user.name} has approved the invoice: #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id}) and is waiting your approval"
+        message = "#{approving_user.name} has approved the invoice: #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id}) and is awaiting your approval"
       else
         message = "#{approving_user.name} has approved the invoice #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id})"
       end
