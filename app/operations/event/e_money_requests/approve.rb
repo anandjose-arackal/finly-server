@@ -122,12 +122,12 @@ class Event::EMoneyRequests::Approve < Event::EMoneyRequests::Base
             message = "Congratulations! Your Money Request #{money_request.name} has been approved"
           end
         elsif self.money_request.document_role_users(:finance_manager).include?(user)
-          message = "#{approving_user.name} has approved the Money Request: #{self.money_request.name} and is currently waiting for your approval"
+          message = "#{approving_user.name} has approved the Money Request: #{self.money_request.name} and is currently awaiting for your approval"
         else
           message = "#{approving_user.name} has approved the Money Request: #{self.money_request.name}"
         end
       else
-        message = "#{approving_user.name} has approved the Money Request: #{self.money_request.name} and is currently waiting for your approval"
+        message = "#{approving_user.name} has approved the Money Request: #{self.money_request.name} and is currently awaiting for your approval"
       end 
     end
     message
@@ -146,12 +146,12 @@ class Event::EMoneyRequests::Approve < Event::EMoneyRequests::Base
             message = "Congratulations! Your Money Request #{money_request.name} has been approved"
           end
         elsif self.money_request.document_role_users(:finance_manager).include?(user)
-          message = "#{approving_user.name} has approved the Money Request: #{self.money_request.name} and is currently waiting for your approval"
+          message = "#{approving_user.name} has approved the Money Request: #{self.money_request.name} and is currently awaiting for your approval"
         else
-          message = "#{approving_user.name} has approved the Money Request '#{self.money_request.name}' and is currently waiting for your approval"
+          message = "#{approving_user.name} has approved the Money Request '#{self.money_request.name}' and is currently awaiting for your approval"
         end
       else
-        message = "#{approving_user.name} has approved the Money Request: #{self.money_request.name} and is currently waiting for your approval"
+        message = "#{approving_user.name} has approved the Money Request: #{self.money_request.name} and is currently awaiting for your approval"
       end
     end
     message
