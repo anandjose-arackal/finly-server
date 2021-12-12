@@ -13,8 +13,8 @@ class Bbps::BillPay < Bbps::Api
       # required(:initiating_channel).filled
 
       required(:amount).filled
-      required(:bill_date).filled
-      required(:due_date).filled
+      # required(:bill_date).filled
+      # required(:due_date).filled
       #required(:bill_number).filled
       #required(:bill_period).filled
       required(:biller_id).filled
@@ -54,9 +54,13 @@ class Bbps::BillPay < Bbps::Api
     end
   end
 
-  path 'pay'
-  url 'https://yesbbps.transxt.in:9443/portal/service/npciservice'
-  header "AUTH","/WT/ijy7z5abJBM/LAwbmA=="
+  # path 'pay'
+  # url 'https://yesbbps.transxt.in:9443/portal/service/npciservice'
+  # header "AUTH","/WT/ijy7z5abJBM/LAwbmA=="
+
+  path "pay"
+  url 'http://180.179.170.6:1012/portal/service/npciservice'
+  header "AUTH","7ljbVcKc1Ka5tpaGAyAvR/vNDcTzk1C+BRhUdM9zB3s="
 
   # Message Code(B2000) | Order No |Agent institution Id |Channel Id |Agent Id |
   # Quick Pay |Split Pay |Split Pay Amt |Customer name|Customermobile|
@@ -302,7 +306,7 @@ class Bbps::BillPay < Bbps::Api
     message["refId"] = bbps_ref_id 
 
     message["paymentDetails"] = {}
-    message["paymentDetails"]["paymentMode"] = "Internet Banking"
+    message["paymentDetails"]["paymentMode"] = "NEFT"
     message["paymentDetails"]["quickPay"] = quick_pay
     message["paymentDetails"]["splitPay"] = "No"
     message["paymentDetails"]["offusPay"] = "Yes" #change to fn
@@ -314,21 +318,21 @@ class Bbps::BillPay < Bbps::Api
     message["paycustomerDetails"]["mobileNo"] = customer_mobile#
 
     message["agentDetails"] = {}
-    message["agentDetails"]["agentId"] = "YB01YB28MOB519101711"
-    message["agentDetails"]["partnerId"] = "YB01YB28MOB519101711"
+    # message["agentDetails"]["agentId"] = "YB01YB28MOB519101711"
+    # message["agentDetails"]["partnerId"] = "YB01YB28MOB519101711" for prod
+    message["agentDetails"]["agentId"] = "YB31YB41MOB521611569"
+    message["agentDetails"]["partnerId"] = "YB31YB41MOB521611569"
     message["agentDetails"]["deviceTags"] = []
     message["agentDetails"]["deviceTags"] << { "name" => "IP", "value" => "13.232.176.84" }
     message["agentDetails"]["deviceTags"] << { "name" => "IMEI", "value" => "1234" }
     message["agentDetails"]["deviceTags"] << { "name" => "OS", "value" => "Android" }
     message["agentDetails"]["deviceTags"] << { "name" => "APP", "value" => "FINLY" }
     message["agentDetails"]["deviceTags"] << { "name" => "INITIATING_CHANNEL", "value" => "MOB" }
-    byebug
     message["amountDetails"] = {}
     message["amountDetails"]["amount"] = amount.to_i
     message["amountDetails"]["currency"] = 356 #INR
-    message["amountDetails"]["custConvFee"] = BbpsBill.first.convenience_fee
-    message["amountDetails"]["couCustConvFee"] = BbpsBill.first.api_response.last["convenience_fee_desc"]
-
+    message["amountDetails"]["custConvFee"] = params["convenience_fee"]
+    # message["amountDetails"]["couCustConvFee"] = BbpsBill.first.api_response.last["convenience_fee_desc"] || 0
     message["bbpsPGName"] = "YesPay" #fixed for yesbank payment gateway
     message["bbpsPGResponse"] = {}
     message["bbpsPGResponse"]["txRefNo"] = SecureRandom.hex(10)
@@ -351,12 +355,13 @@ class Bbps::BillPay < Bbps::Api
 
   def parse_response(user, params, response)
     Rails.logger.info("Bill pay response:: #{response}")
-    message = JSON.parse(response.body)["response"]
-    message = message.gsub('"[','[')
-    message = message.gsub(']"',']')
-    message = message.gsub('"{','{')
-    message = message.gsub('}"','}')
-    received_response = JSON.parse(message)
+    message = JSON.parse(response.body)
+    # message = message.gsub('"[','[')
+    # message = message.gsub(']"',']')
+    # message = message.gsub('"{','{')
+    # message = message.gsub('}"','}')
+    # received_response = JSON.parse(message), for prod
+    received_response = message
     Rails.logger.info("Bill pay parsed response:: #{received_response}")
     parsed_response = {}
     return Failure("Invalid response") unless received_response["status"] == "SUCCESS"
@@ -369,20 +374,19 @@ class Bbps::BillPay < Bbps::Api
     parsed_response["bbps_ref_id"] = received_response["response"]["refId"]
     parsed_response["order_number"] = received_response["response"]["txnReferenceId"]
     parsed_response["responseCode"] = received_response["response"]["responseCode"]
-    parsed_response["amount"] = received_response["response"]["billerResponse"]["amount"]
     parsed_response["due_date"] = received_response["response"]["billerResponse"]["dueDate"]
     parsed_response["bill_date"] = received_response["response"]["billerResponse"]["billDate"]
     parsed_response["bill_period"] = received_response["response"]["billerResponse"]["billPeriod"]
-    parsed_response["amount"] = received_response["response"]["billerResponse"]["amount"]
-    parsed_response["bill_date"] = received_response["response"]["txnDateTime"]
-    parsed_response["bill_number"] = received_response["response"]["billNumber"]
-    parsed_response["convenience_fee"] = received_response["response"]["billerResponse"]["CustConvFee"]
-    parsed_response["convenience_fee_desc"] = received_response["response"]["billerResponse"]["CustConvDesc"]
-    parsed_response["biller_id"] = received_response["response"]["billDetails"]["billerId"]
+    parsed_response["amount"] = amount
+    # parsed_response["bill_date"] = received_response["response"]["txnDateTime"]
+    # parsed_response["bill_number"] = received_response["response"]["billNumber"]
+    # parsed_response["convenience_fee"] = received_response["response"]["billerResponse"]["CustConvFee"]
+    # parsed_response["convenience_fee_desc"] = received_response["response"]["billerResponse"]["CustConvDesc"]
+    # parsed_response["biller_id"] = received_response["response"]["billDetails"]["billerId"]
 
-    parsed_response["customer_name"] = received_response["response"]["billerResponse"]["customerName"]
-    parsed_response["customer_email"] = received_response["response"]["billerResponse"]["customerEmail"]
-    parsed_response["customer_aadhar_no"] = received_response["response"]["billerResponse"]["customerAadhar"]
+    # parsed_response["customer_name"] = received_response["response"]["billerResponse"]["customerName"]
+    # parsed_response["customer_email"] = received_response["response"]["billerResponse"]["customerEmail"]
+    # parsed_response["customer_aadhar_no"] = received_response["response"]["billerResponse"]["customerAadhar"]
 
     #map customer params?
     if received_response["response"]["additionalInfo"].present?
@@ -398,22 +402,22 @@ class Bbps::BillPay < Bbps::Api
     # :convenience_fee_desc, :late_payment_fee, :early_payment_fee
     OpenStruct.new(
         {
-            message_code: result['response.parsed']['message_code'],
+            message_code: message_code,
             status: result['response.parsed']['status'],
             error_code: result['response.parsed']['error_code'],
             error_desc: result['response.parsed']['error_desc'],
             order_number: result['response.parsed']['order_number'],
             agent_institution_id: result['response.parsed']['agent_institution_id'],
-            channel_id: result['response.parsed']['channel_id'],
+            # channel_id: result['response.parsed']['channel_id'], #check this
             bbps_ref_id: result['response.parsed']['bbps_ref_id'],
-            agent_id: result['response.parsed']['agent_id'],
+            agent_id: "YB31YB41MOB521611569", #for prod change this
             customer_name: result['response.parsed']['customer_name'],
             customer_mobile: result['response.parsed']['customer_mobile'],
-            customer_email: result['response.parsed']['customer_email'],
-            customer_aadhar_no: result['response.parsed']['customer_aadhar_no'],
-            customer_pan_id: result['response.parsed']['customer_pan_id'],
-            channel: result['response.parsed']['channel'],
-            payment_mode: result['response.parsed']['payment_mode'],
+            customer_email: customer_email if customer_email.present?,
+            customer_aadhar_no: customer_aadhar_no if customer_aadhar_no.present?,
+            customer_pan_id: customer_pan_id if customer_pan_id.present?,
+            channel: "MOB",
+            payment_mode: "NEFT",
             additional_field_1: result['response.parsed']['additional_field_1'],
             additional_field_2: result['response.parsed']['additional_field_2'],
             additional_field_3: result['response.parsed']['additional_field_3'],
@@ -422,7 +426,7 @@ class Bbps::BillPay < Bbps::Api
             additional_field_6: result['response.parsed']['additional_field_6'],
             additional_field_7: result['response.parsed']['additional_field_7'],
             additional_field_8: result['response.parsed']['additional_field_8'],
-            on_us_off_us_flag: result['response.parsed']['on_us_off_us_flag'],
+            on_us_off_us_flag: on_us_off_us,
             ccf2_charges: result['response.parsed']['ccf2_charges']
         }
     )

@@ -48,6 +48,7 @@ class Bbps::Api < ServiceApi
 
   def body
     message = generate_message
+
     encrypted_message = encrypt(message)
     body = {requestMsg: encrypted_message, agentInstitutionId: agent_institution_id}
     log_generator.merge({request_raw_message: message})
@@ -72,7 +73,7 @@ class Bbps::Api < ServiceApi
 
   def encrypt(message)
     result = nil
-    Open3.popen3("java UPISecurity.java \"#{message}\" \"#{self.class.encryption_key}\"") do |stdin, stdout, strerr|
+    Open3.popen3("java UPISecurity.java \"#{message}\"") do |stdin, stdout, strerr|
       result = stdout.read
     end
     result

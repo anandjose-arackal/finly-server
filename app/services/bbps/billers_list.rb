@@ -7,9 +7,12 @@ class Bbps::BillersList < Bbps::Api
   end
 
   http_method :get
+  #path "biller/readbillermdmdata" for prod
+  #url 'https://yesbbps.transxt.in:9443/portal/service/' for prod
+  #header "AUTH","/WT/ijy7z5abJBM/LAwbmA==" for prod
   path "biller/readbillermdmdata"
-  url 'https://yesbbps.transxt.in:9443/portal/service/'
-  header "AUTH","/WT/ijy7z5abJBM/LAwbmA=="
+  url 'http://180.179.170.6:1012/portal/service/'
+  header "AUTH","7ljbVcKc1Ka5tpaGAyAvR/vNDcTzk1C+BRhUdM9zB3s="
 
   def self.build_matcher(options, result)
     Dry::Matcher.new(
@@ -51,6 +54,9 @@ class Bbps::BillersList < Bbps::Api
 
   def category
     params[:category]
+  end
+
+  def body
   end
 
   def parse_response(user, params, response)

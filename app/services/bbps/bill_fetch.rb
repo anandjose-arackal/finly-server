@@ -46,15 +46,19 @@ class Bbps::BillFetch < Bbps::Api
     end
   end
 
-  path 'fetch'
-  url 'https://yesbbps.transxt.in:9443/portal/service/npciservice'
-  header "AUTH","/WT/ijy7z5abJBM/LAwbmA=="
+  # path 'fetch'
+  # url 'https://yesbbps.transxt.in:9443/portal/service/npciservice'
+  # header "AUTH","/WT/ijy7z5abJBM/LAwbmA==" for prod all
+  path "fetch"
+  url 'http://180.179.170.6:1012/portal/service/npciservice'
+  header "AUTH","7ljbVcKc1Ka5tpaGAyAvR/vNDcTzk1C+BRhUdM9zB3s="
 
   def body
     message = generate_message
     Rails.logger.info("Raw message :: #{message.to_json}")
     encoded_message = Base64.strict_encode64(message)
     encrypted_message = encrypt(encoded_message)
+    #encrypted_message = "FCEtV3bbmRQqRPDe++Exq4c5eAcgD+xEE8313baqaxOzfvoqw/gQsG4LbOMABfRySPe3WTynow1NRJ6gNjnhWi9ujU4X4Jxl1YiMCB1fGXa1snS1acHr5h3981JB6KvahHOeGfp7zVd5w96Sc+bWwOi24fWGV+n8lGvMa+SDQPNqmhhDJbmAfPAdzxm/TPy9UNw5IWaOL7hXAxdKzQNO1qZIldpoXbdLn5GAvBJY9PdGkiXwVxtNwp9UIPemKQAfnvLYx5tV80WkZlp+c/EqWVrlaxQ1Dm7Gg7rXNdJiTx10tVRpjQ+LUEgdwWRd/ZeS7I3eVU0PavZ7kD5iY1rl+jpZhgv/auW+Va+OXIrdTyEZIOs06E6TVebDMMrcr8lCduwbFt7lDOiYXxQUUA0MR5Px9ij1A9Dfijy3Cyqks7jgwzaFErA0BDCF/ycOWdlOLuQE/zJNz63Fsq1M5wHwlUqZdhz5a3v4HMRUZMXYY8veBb1drVm92ESramUvoN9RvE/kevQDe2BkUPYm0+2Jll+Yf4CC0BBK7W6MwGxq564ubHGsHa0uwe2qRNclSSppULlTDUYPYjuVM+08vCb8JmuCQUK5vRQw8ADNidi4qRTUgz0iKu2TiCuOdiJzt55HbF0Jl5C3HHwouoMHvrBpUQ==" #sample
     Rails.logger.info("Encrypted message :: #{encrypted_message}")
     body = {request: encrypted_message}
     log_generator.merge({request_raw_message: message})
@@ -276,7 +280,8 @@ class Bbps::BillFetch < Bbps::Api
     message["custDetails"]["customerTags"] << {"name"=> "AADHAAR", "value"=> customer_aadhar_no} if customer_aadhar_no.present?
     message["custDetails"]["customerTags"] << {"name"=> "PAN", "value"=> customer_pan_id} if customer_pan_id.present?
     message["agentDetails"] = {}
-    message["agentDetails"]["agentId"] = "YB01YB28MOB519101711"
+    message["agentDetails"]["agentId"] = "YB31YB41MOB521611569"
+    #message["agentDetails"]["agentId"] = "YB01YB28MOB519101711" for prod
     message["agentDetails"]["deviceTags"] = []
     message["agentDetails"]["deviceTags"] << { "name" => "IP", "value" => "13.232.176.84" }
     message["agentDetails"]["deviceTags"] << { "name" => "IMEI", "value" => "1234" }
@@ -297,21 +302,22 @@ class Bbps::BillFetch < Bbps::Api
   end
 
   def parse_response(user, params, response)
-    message = JSON.parse(response.body)["response"]
-    message = message.gsub('"[','[')
-    message = message.gsub(']"',']')
-    message = message.gsub('"{','{')
-    message = message.gsub('}"','}')
-    received_response = JSON.parse(message)
+    message = JSON.parse(response.body)
+    #message = JSON.parse(response.body)["response"]
+    # message = message.gsub('"[','[')
+    # message = message.gsub(']"',']')
+    # message = message.gsub('"{','{')
+    # message = message.gsub('}"','}') 
+#    received_response = JSON.parse(message)for prod
+    received_response = message
     parsed_response = {}
+    parsed_response["error_code"] = received_response["response"]["complianceRespCd"]
+    parsed_response["error_desc"] = received_response["response"]["complianceReason"]
+    parsed_response["status"] = received_response["status"]
     return Failure("Invalid response") unless response.status == 200
     return Failure("Invalid response") unless received_response&.dig("response").present?
 
-    parsed_response["error_code"] = received_response["response"]["complianceRespCd"]
-    parsed_response["error_desc"] = received_response["response"]["complianceReason"]
-
     parsed_response["agent_id"] = "YB01YB28MOB519101711"
-    parsed_response["status"] = received_response["status"]
     parsed_response["bbps_ref_id"] = received_response["response"]["refId"]
     parsed_response["ref_no"] = received_response["response"]["refId"]
     parsed_response["responseCode"] = received_response["response"]["responseCode"]

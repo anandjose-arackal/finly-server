@@ -186,14 +186,20 @@ class Bbps::TransactionStatus < Bbps::Api
   def generate_message
     message = {}
     message['billerId'] = biller_id
-    message['txnReferenceId'] = "YB311070CFPPGB4NMMS6"  #order_number check this
+    message['txnReferenceId'] = order_number  #order_number check this
     message['xchangeId'] = 402 #fixed 
     message.to_json
   end
 
   def parse_response(user, params, response)
-    parsed_response = {}
-    received_response = JSON.parse(response.body)
+    Rails.logger.info("Transaction status response:: #{response}")
+    message = JSON.parse(response.body)
+    # message = message.gsub('"[','[')
+    # message = message.gsub(']"',']')
+    # message = message.gsub('"{','{')
+    # message = message.gsub('}"','}')
+    # received_response = JSON.parse(message), for prod
+    received_response = message
     return Failure("Invalid response") unless response.status == 200
     return Failure("Invalid response") unless received_response&.dig("response").present?
 

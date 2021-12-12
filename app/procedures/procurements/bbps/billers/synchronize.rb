@@ -50,7 +50,7 @@ class Procurements::Bbps::Billers::Synchronize < Transactions::API
     options['billers.failed'] = []
 
     # Limit biller fetching to 100
-    billers = billers.first(20) unless Rails.env.production? or Rails.env.uat? or Rails.env.staging?
+    #billers = billers.first(20) unless Rails.env.production? or Rails.env.uat? or Rails.env.staging?
 
     billers.each do |biller_config|
       biller_config["biller_payment_modes"] = biller_config["biller_pymt_modes"]
