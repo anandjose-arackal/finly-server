@@ -16,11 +16,11 @@ class Event::ETravelRequest::ApproveSelection < Event::ETravelRequest::Base
 
   def mailer_subject(user)
     # "#{self.travel_request.user.name} has approved selection request for the trip #{self.travel_request.trip_id}"
-    "#{self.travel_request.user.name} has approved booking options selection request for the trip #{self.travel_request.trip_id} and is currently awaiting for your approval"
+    "#{self.travel_request.user.name} has approved booking options selection request for the trip #{self.travel_request.trip_id} and is currently waiting for your approval"
   end
 
   def mailer_body(user)
-    "#{self.travel_request.user.name} has approved booking options selection request for the trip #{self.travel_request.trip_id} and is currently awaiting for your approval"
+    "#{self.travel_request.user.name} has approved booking options selection request for the trip #{self.travel_request.trip_id} and is currently waiting for your approval"
   end
 
   def travel_request_view_role(user)

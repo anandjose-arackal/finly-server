@@ -64,6 +64,6 @@ class Event::EPurchaseOrder::Remind < Event::EPurchaseOrder::Base
   end
 
   def mailer_body(user)
-    "Purchase Order - '#{self.purchase_order.po_number}' is currently awaiting for your approval"
+    "Purchase Order - '#{self.purchase_order.po_number}' is currently waiting for your approval"
   end
 end

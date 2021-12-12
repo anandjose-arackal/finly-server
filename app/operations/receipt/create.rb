@@ -49,6 +49,10 @@ class Receipt::Create < Receipt::Base
       #############################################
     end
 
+    # if attachment is a pdf format then convert each page to an image file and store in +DocumentSlice+
+    if receipt.is_pdf?
+      DocumentSlice::Create.call_async(user.id, {receipt_id: receipt.id})
+    end
   end
 
   def success

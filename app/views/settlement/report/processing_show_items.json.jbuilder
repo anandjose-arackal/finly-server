@@ -48,4 +48,4 @@ json.items do
 end
 json.user_count user_count
 json.report_count report_count
-json.count @result.mappings.count
+json.count item_count
