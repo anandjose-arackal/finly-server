@@ -37,19 +37,7 @@ class Event::EReport::Approve < Event::EReport::Base
   end
 
   def affected_users
-    # if approved
-    #   if auto_approve
-    #     return [self.report.user]
-    #   end
-    #   [self.report.tracks.last.action_user, self.report.user]
-    # else
-    #   [self.report.tracks.last.action_user, self.report.controlling_user]
-    # end
-    if self.report.document_role_users(:finance_manager).present? && (self.report.approved? || self.report.auto_approved?)
-      self.report.affected_users(:approve, {ignore_reviewer: true}) + self.report.document_role_users(:finance_manager)
-    else
-      self.report.affected_users(:approve, {ignore_reviewer: true})
-    end
+    self.report.affected_users(:approve, {ignore_reviewer: true})
   end
 
   def get_token(user)
