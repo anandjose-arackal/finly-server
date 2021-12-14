@@ -100,7 +100,7 @@ class Event::EBankPaymentRequest::Approve < Event::EBankPaymentRequest::Base
           #return
         end
       elsif self.bank_payment_request.affected_users(:approve).present? && self.bank_payment_request.affected_users(:approve).include?(user)
-        message = "#{approving_user.name} has approved the payment order '#{self.bank_payment_request.name}' and is currently waiting for your approval"
+        message = "#{approving_user.name} has approved the payment order '#{self.bank_payment_request.name}' and is currently awaiting for your approval"
       elsif parent_document_creator.include?(user)
         message = "#{approving_user.name} has approved the payment order '#{self.bank_payment_request.name}'"
       end

@@ -37,11 +37,7 @@ class Event::EReport::Approve < Event::EReport::Base
   end
 
   def affected_users
-    if self.report.document_role_users(:finance_manager).present? && (self.report.approved? || self.report.auto_approved?)
-      self.report.affected_users(:approve, {ignore_reviewer: true}) + self.report.document_role_users(:finance_manager)
-    else
-      self.report.affected_users(:approve, {ignore_reviewer: true})
-    end
+    self.report.affected_users(:approve, {ignore_reviewer: true})
   end
 
   def get_token(user)
@@ -109,12 +105,12 @@ class Event::EReport::Approve < Event::EReport::Base
             return "Congratulations! Your report #{report.name} has been approved"
           end
         elsif self.report.document_role_users(:finance_manager).include?(user)
-          message = "#{approving_user.name} has approved the report: #{self.report.name} and is currently waiting for your approval"
+          message = "#{approving_user.name} has approved the report: #{self.report.name} and is currently awaiting for your approval"
         else
           message = "#{approving_user.name} has approved the report: #{self.report.name}"
         end
       else
-        message = "#{approving_user.name} has approved the report: #{self.report.name} and is currently waiting for your approval"
+        message = "#{approving_user.name} has approved the report: #{self.report.name} and is currently awaiting for your approval"
       end  
     end
   end
@@ -136,9 +132,9 @@ class Event::EReport::Approve < Event::EReport::Base
           message = "#{message} and has been closed"
         end
       elsif self.report.document_role_users(:finance_manager).include?(user)
-        message = "#{approving_user.name} has approved the report: #{self.report.name} and is currently waiting for your approval"
+        message = "#{approving_user.name} has approved the report: #{self.report.name} and is currently awaiting for your approval"
       else
-        message = "#{approving_user.name} has approved the report '#{self.report.name}' and is currently waiting for your approval"
+        message = "#{approving_user.name} has approved the report '#{self.report.name}' and is currently awaiting for your approval"
       end
     end
     message
