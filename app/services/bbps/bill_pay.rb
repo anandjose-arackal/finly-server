@@ -413,9 +413,9 @@ class Bbps::BillPay < Bbps::Api
             agent_id: "YB31YB41MOB521611569", #for prod change this
             customer_name: result['response.parsed']['customer_name'],
             customer_mobile: result['response.parsed']['customer_mobile'],
-            customer_email: customer_email if customer_email.present?,
-            customer_aadhar_no: customer_aadhar_no if customer_aadhar_no.present?,
-            customer_pan_id: customer_pan_id if customer_pan_id.present?,
+            customer_email: customer_email,
+            customer_aadhar_no: customer_aadhar_no,
+            customer_pan_id: customer_pan_id,
             channel: "MOB",
             payment_mode: "NEFT",
             additional_field_1: result['response.parsed']['additional_field_1'],
