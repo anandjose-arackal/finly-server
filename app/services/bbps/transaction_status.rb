@@ -203,10 +203,11 @@ class Bbps::TransactionStatus < Bbps::Api
     # message = message.gsub('"{','{')
     # message = message.gsub('}"','}')
     # received_response = JSON.parse(message), for prod
+    Rails.logger.info("Transaction status parsed response :: #{message.inspect}")
     received_response = message
     return Failure("Invalid response") unless response.status == 200
     return Failure("Invalid response") unless received_response&.dig("response").present?
-
+    parsed_response = {}
     parsed_response["error_code"] = received_response["response"]["complianceRespCd"]
     parsed_response["error_desc"] = received_response["response"]["complianceReason"]
     parsed_response["status"] = received_response&.dig("status")
