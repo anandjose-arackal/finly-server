@@ -153,6 +153,23 @@ class Bbps::BillPay < Bbps::Api
     ]
   )
 
+  def self.build_matcher(options, result)
+    Dry::Matcher.new(
+        success: Dry::Matcher::Case.new(
+            match: -> (result) {p "Matcher:Success", result; result['response.parsed']&.dig('status') == 'SUCCESS'},
+            resolve: -> (result) { handle_success(result) }
+        ),
+        error: Dry::Matcher::Case.new(
+            match: -> (result) {p "Matcher:Error", result; result['response.parsed']&.dig('status') == 'FAILURE'},
+            resolve: -> (result) { handle_error(result['response.parsed']) }
+        ),
+        failure: Dry::Matcher::Case.new(
+            match: -> (result) {p "Matcher:Failure", result; true},
+            resolve: -> (result) {result}
+        )
+    )
+  end
+
   def message_code
     'B2000'
   end
@@ -354,7 +371,7 @@ class Bbps::BillPay < Bbps::Api
   end
 
   def parse_response(user, params, response)
-    Rails.logger.info("Bill pay response:: #{response}")
+    Rails.logger.info("Bill pay response:: #{response.inspect}")
     message = JSON.parse(response.body)
     # message = message.gsub('"[','[')
     # message = message.gsub(']"',']')
@@ -374,9 +391,11 @@ class Bbps::BillPay < Bbps::Api
     parsed_response["bbps_ref_id"] = received_response["response"]["refId"]
     parsed_response["order_number"] = received_response["response"]["txnReferenceId"]
     parsed_response["responseCode"] = received_response["response"]["responseCode"]
-    parsed_response["due_date"] = received_response["response"]["billerResponse"]["dueDate"]
-    parsed_response["bill_date"] = received_response["response"]["billerResponse"]["billDate"]
-    parsed_response["bill_period"] = received_response["response"]["billerResponse"]["billPeriod"]
+    if received_response["response"]["billerResponse"].present?
+      parsed_response["due_date"] = received_response["response"]["billerResponse"]["dueDate"]
+      parsed_response["bill_date"] = received_response["response"]["billerResponse"]["billDate"]
+      parsed_response["bill_period"] = received_response["response"]["billerResponse"]["billPeriod"]
+    end
     parsed_response["amount"] = amount
     # parsed_response["bill_date"] = received_response["response"]["txnDateTime"]
     # parsed_response["bill_number"] = received_response["response"]["billNumber"]
