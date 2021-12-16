@@ -105,46 +105,46 @@ class Bbps::TransactionStatus < Bbps::Api
       ]
   )
 
-  def self.build_matcher(options, result)
-    Dry::Matcher.new(
-      success: Dry::Matcher::Case.new(
-        match: -> (result) {
-          if result['response.parsed']&.dig('status') == 'SUCCESS'
-            parsed_response = result['response.parsed'] || {}
-            if parsed_response['status'] == 'SUCCESS' and parsed_response['txn_date'].present?
-              transaction_details = parsed_response
-            else
-              false
-            end
-          else
-            false
-          end
-        },
-        resolve: -> (result) { handle_success(result) }
-      ),
-      error: Dry::Matcher::Case.new(
-        match: -> (result) {
-          if result['response.parsed']&.dig('status') == "FAILURE"
-            true
-          elsif result['response.parsed']&.dig('status') == "SUCCESS"
-            parsed_response = result['response.parsed'] || {}
-            if parsed_response['status'] == 'SUCCESS' and parsed_response['txn_date'].nil?
-              true
-            else
-              false
-            end
-          else
-            false
-          end
-        },
-        resolve: -> (result) { handle_error(result['response.parsed']) }
-      ),
-      failure: Dry::Matcher::Case.new(
-        match: -> (result) { true },
-        resolve: -> (result) { result }
-      )
-    )
-  end
+  # def self.build_matcher(options, result)
+  #   Dry::Matcher.new(
+  #     success: Dry::Matcher::Case.new(
+  #       match: -> (result) {
+  #         if result['response.parsed']&.dig('status') == 'SUCCESS'
+  #           parsed_response = result['response.parsed'] || {}
+  #           if parsed_response['status'] == 'SUCCESS' and parsed_response['txn_date'].present?
+  #             transaction_details = parsed_response
+  #           else
+  #             false
+  #           end
+  #         else
+  #           false
+  #         end
+  #       },
+  #       resolve: -> (result) { handle_success(result) }
+  #     ),
+  #     error: Dry::Matcher::Case.new(
+  #       match: -> (result) {
+  #         if result['response.parsed']&.dig('status') == "FAILURE"
+  #           true
+  #         elsif result['response.parsed']&.dig('status') == "SUCCESS"
+  #           parsed_response = result['response.parsed'] || {}
+  #           if parsed_response['status'] == 'SUCCESS' and parsed_response['txn_date'].nil?
+  #             true
+  #           else
+  #             false
+  #           end
+  #         else
+  #           false
+  #         end
+  #       },
+  #       resolve: -> (result) { handle_error(result['response.parsed']) }
+  #     ),
+  #     failure: Dry::Matcher::Case.new(
+  #       match: -> (result) { true },
+  #       resolve: -> (result) { result }
+  #     )
+  #   )
+  # end
 
   def message_code
     'B4000'
