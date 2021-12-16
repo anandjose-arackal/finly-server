@@ -84,11 +84,11 @@ class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
 
     if po.present? && self.advance_payments.present?
       self.advance_payments.update(parent_id: po.id, purchase_order_id: po.id)
+      po.advance_payments.each do |payment|
+        payment.save
+      end
     end
 
-    self.po.advance_payments.each do |payment|
-      payment.save
-    end
   end
 
   private
