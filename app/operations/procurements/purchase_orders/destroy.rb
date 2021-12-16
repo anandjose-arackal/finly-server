@@ -1,10 +1,11 @@
 class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
-  attr_accessor :purchase_order, :procurement, :purchase_order_params, :po_available, :po_previous_status, :previously_active_po
+  attr_accessor :purchase_order, :procurement, :purchase_order_params, :po_available, :po_previous_status, :previously_active_po, :advance_payments
 
   def init
     purchase_order_id = params[:id] || params[:purchase_order_id]
     self.purchase_order = user.company.purchase_orders.find_by id: purchase_order_id
     self.procurement = self.purchase_order.procurement
+    self.advance_payments = self.purchase_order.advance_payments
 
     if self.procurement.po_revisions.present?
       if is_approve?
@@ -77,6 +78,16 @@ class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
           update_purchase_request_item
         end
       end
+    end
+
+    po = self.procurement.reload.po_revisions.last
+
+    if po.present? && self.advance_payments.present?
+      self.advance_payments.update(parent_id: po.id, purchase_order_id: po.id)
+    end
+
+    self.po.advance_payments.each do |payment|
+      payment.save
     end
   end
 
