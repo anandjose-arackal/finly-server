@@ -192,7 +192,7 @@ class Bbps::TransactionStatus < Bbps::Api
   end
 
   def parse_response(user, params, response)
-    Rails.logger.info("Transaction status response:: #{response}")
+    Rails.logger.info("Transaction status response:: #{response.inspect}")
     message = JSON.parse(response.body)
     # message = message.gsub('"[','[')
     # message = message.gsub(']"',']')

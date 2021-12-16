@@ -421,7 +421,6 @@ class Bbps::BillPay < Bbps::Api
     # :convenience_fee_desc, :late_payment_fee, :early_payment_fee
     OpenStruct.new(
         {
-            message_code: message_code,
             status: result['response.parsed']['status'],
             error_code: result['response.parsed']['error_code'],
             error_desc: result['response.parsed']['error_desc'],
@@ -432,9 +431,6 @@ class Bbps::BillPay < Bbps::Api
             agent_id: "YB31YB41MOB521611569", #for prod change this
             customer_name: result['response.parsed']['customer_name'],
             customer_mobile: result['response.parsed']['customer_mobile'],
-            customer_email: customer_email,
-            customer_aadhar_no: customer_aadhar_no,
-            customer_pan_id: customer_pan_id,
             channel: "MOB",
             payment_mode: "NEFT",
             additional_field_1: result['response.parsed']['additional_field_1'],
@@ -445,7 +441,6 @@ class Bbps::BillPay < Bbps::Api
             additional_field_6: result['response.parsed']['additional_field_6'],
             additional_field_7: result['response.parsed']['additional_field_7'],
             additional_field_8: result['response.parsed']['additional_field_8'],
-            on_us_off_us_flag: on_us_off_us,
             ccf2_charges: result['response.parsed']['ccf2_charges']
         }
     )
