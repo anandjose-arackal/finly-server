@@ -1556,7 +1556,7 @@ class Invoice < ApplicationRecord
   def retrieve_value(entity)
     return tds_slab&.dispaly_name if entity.entity_key == 'tds_slab_id'
     return get_discount_type if entity.entity_key == 'discount_type_id'
-    return 'Awaiting approval' if entity.entity_key == 'invoice_status_id' && self.purchase_order_status_id == PurchaseOrderStatus.id_for(:processing) && can_really_approve?
+    return 'Awaiting approval' if entity.entity_key == 'invoice_status_id' && self.invoice_status_id == InvoiceStatus.id_for(:processing) && can_really_approve?
   
     send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
   end
