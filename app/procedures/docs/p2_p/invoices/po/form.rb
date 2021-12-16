@@ -20,7 +20,7 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
       item_billable_amount: "{% if row.product_type_id == '2' %}{{ row.item_billable_amount| default: 0 | round: 2 }}{% else %}{{ 0 }}{% endif %}", # todo - I2P will be different for PO invoice
     
       # item_discount_amount: "{% if form.discount_type_id == 1 %}{{ row.item_gross_amount | times: row.discount | divided_by: 100.00 | default: 0 | round: 2 }}{% else %}{{ row.discount | default: 0 }}{% endif %}",
-      item_discount_amount: "{% if row.product_type_id == '2' %}{{ row.item_discount_amount | default: 0 }}{% else %}{% if form.discount_type_id == 1 %}{{ row.item_gross_amount | times: row.discount | divided_by: 100.00 | default: 0 | round: 2 }}{% else %}{{ row.discount | default: 0 }}{% endif %}{% endif %}", 
+      item_discount_amount: "{% if row.product_type_id == '2' %}{{ row.item_discount_amount | default: 0 }}{% else %}{% if form.discount_type_id == 'Percent' %}{{ row.item_gross_amount | times: row.discount | divided_by: 100.00 | default: 0 | round: 2 }}{% else %}{{ row.discount | default: 0 }}{% endif %}{% endif %}", 
     
       # item_taxable_amount: "{{ row.item_gross_amount | minus: row.item_discount_amount | default: 0 | round: 2  }}",
       item_taxable_amount: "{% if row.product_type_id == '1' %}{{ row.item_gross_amount | minus: row.item_discount_amount | default: 0 | round: 2  }}{% else %}{{ row.item_billable_amount }}{% endif %}",
@@ -130,7 +130,8 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
     lookup :policy_id, choices_scope: Choices[:lookup].('policies', permissions: [:po_invoice_initiator]), required: true, editable: false
     lookup :department_id, label: "Department", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('departments', assignments: { form: true }) #, editable: false, visible: false
     lookup :cost_center_id, label: "Cost Center", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('cost_centers')
-    dropdown :discount_type_id, label: "Discount Type", editable: false, can_editable_be_changed: false, visible: true, required: true, choices_scope: Choices[:list].({ id: 1, name: 'Percentage' }, { id: 2, name: 'Amount' }), default_value: 1
+#     dropdown :discount_type_id, label: "Discount Type", editable: false, can_editable_be_changed: false, visible: true, required: true, choices_scope: Choices[:list].({ id: 1, name: 'Percentage' }, { id: 2, name: 'Amount' }), default_value: 1
+    text :discount_type, label: "Discount Type", editable: false, can_editable_be_changed: false, visible: true, required: true, default_value: 'Percentage'
 
     dropdown :tax_type_id, label: "Tax Type", editable: true, visible: true, choices_scope: Choices[:list].(*TaxType.all.map { |v| { id: v.id, name: v.name } })
     
