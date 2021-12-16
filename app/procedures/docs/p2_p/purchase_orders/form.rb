@@ -132,7 +132,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
     dropdown :discount_type_id, label: "Discount Type", editable: false, visible: true, required: true, choices_scope: Choices[:list].({ id: "1", name: 'Percentage' }, { id: "2", name: 'Amount' }), default_value: 1
     dropdown :gst_type_id, label: "Tax Type", editable: true, visible: true, choices_scope: Choices[:list].(*TaxType.all.map { |v| { id: v.id, name: v.name } })
 
-    date :conversion_date, label: "Conversion Date", editable: true, visible: true, computed: Forms::Compute::Form('{{form.created_at}}'), triggers: {on_change: {lookup_details: [:base_currency_id]},on_compute: {lookup_details: [:base_currency_id]}}
+    date :conversion_date, label: "Conversion Date", editable: true, visible: true, triggers: {on_change: {lookup_details: [:base_currency_id]},on_compute: {lookup_details: [:base_currency_id]}}#, computed: Forms::Compute::Form('{{form.created_at}}')
     lookup :reporting_currency_id, label: "Reporting Currency", choices_scope: Choices[:lookup].('currencies'), visible: true, editable: false, can_editable_be_changed: false
     lookup :base_currency_id, label: "Base Currency", choices_scope: Choices[:lookup].('currencies'), visible: true, editable: true
     # switch :retrieve_conversion_rate, label: "Auto Populate Conversion Rate", default_value: true, visible: false
