@@ -118,7 +118,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
 
     date :delivery_date,
          label: "Due Date",
-         computed: Forms::Compute::Form('{% if form.delivery_date %}{{form.delivery_date}}{% else %}{% assign assigne_days = form.payment_term_days | times: 86400 %}{% assign calculated_date = form.created_at | date: "%s" | plus: assigne_days %}{{ calculated_date  | date: "%Y-%m-%d" }}{{% endif %}}'),
+         computed: Forms::Compute::Form('{% if form.delivery_date %}{{form.delivery_date}}{% else %}{% assign assigne_days = form.payment_term_days | times: 86400 %}{% assign calculated_date = form.created_at | date: "%s" | plus: assigne_days %}{{ calculated_date  | date: "%Y-%m-%d" }}{% endif %}'),
          visible: true, required: true, editable: true
 
     switch :cost_allocation_items, label: 'Cost Allocation (Item Level)', required: true, default_value: false
