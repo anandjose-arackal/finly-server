@@ -66,7 +66,7 @@ class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
       if self.procurement.po_revisions.reload.present?
         po = self.procurement.reload.po_revisions.last
         po.purchase_order_status_id = self.po_previous_status
-        update_status(po)
+        # update_status(po)
         if po.save
           update_purchase_request_item
         end
