@@ -293,7 +293,6 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       cost_allocation_items: self.purchase_order&.cost_allocation_items,
       po_number: self.purchase_order&.po_number,
       discount_type_id: self.purchase_order.discount_type_id,
-      discount_type: self.purchase_order.discount_type_id == 1 ? 'Percentage' : 'Amount',
       rcm_enabled: self.purchase_order&.vendor&.rcm_enabled,
       is_domestic: ( vendor_country_id != user&.company.country_id ? false : true ),
       base_currency_id: self.purchase_order&.base_currency_id,
