@@ -6,9 +6,13 @@ class Bbps::TransactionStatus < Bbps::Api
     end
   end
 
+  # path "txnStatusCheck"
+  # url 'https://yesbbps.transxt.in:9443/portal/service/npciservice'
+  # header "AUTH","/WT/ijy7z5abJBM/LAwbmA==", for prod
+
   path "txnStatusCheck"
-  url 'https://yesbbps.transxt.in:9443/portal/service/npciservice'
-  header "AUTH","/WT/ijy7z5abJBM/LAwbmA=="
+  url 'http://180.179.170.6:1012/portal/service/npciservice'
+  header "AUTH","7ljbVcKc1Ka5tpaGAyAvR/vNDcTzk1C+BRhUdM9zB3s="
 
   def body
     message = generate_message
