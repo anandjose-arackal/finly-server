@@ -95,7 +95,7 @@ json.trail do
 
         json.po_number item.po_number
         json.delivery_date item.delivery_date&.strftime("%b %d, %Y")
-        json.amount item&.balance_amount&.value
+        json.amount item&.po_balance_due
         json.items_count item.items.count
         json.revision true
         json.revision_for item.revised_po_id
@@ -114,7 +114,7 @@ json.trail do
 
         json.po_number item.po_number
         json.delivery_date item.delivery_date&.strftime("%b %d, %Y")
-        json.amount item&.balance_amount&.value
+        json.amount item&.po_balance_due
         json.items_count item.items.count
         json.base_currency item.get_base_currency
         json.forms_enabled item.forms_enabled

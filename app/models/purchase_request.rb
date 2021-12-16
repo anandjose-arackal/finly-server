@@ -500,7 +500,9 @@ class PurchaseRequest < ApplicationRecord
     Forms::Router.klass(:purchase_requests)&.name
   end
 
-  def retrieve_value(entity)  
+  def retrieve_value(entity) 
+    return 'Processing' if entity.entity_key == 'purchase_request_status_id' && self.purchase_order_status_id == PurchaseOrderStatus.id_for(:awaiting_approval) && !can_really_approve?
+ 
     send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
   end
 
