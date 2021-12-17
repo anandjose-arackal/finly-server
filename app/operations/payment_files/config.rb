@@ -21,7 +21,9 @@ class PaymentFiles::Config
         {name: 'Axis Bank', key: :axis_bank, operation: PaymentFiles::Formats::AxisBank::Process, validator: PaymentFiles::Formats::AxisBank::ValidateConfig},
         {name: 'IDFC Bank', key: :idfc_bank, operation: PaymentFiles::Formats::IdfcBank::Process, validator: PaymentFiles::Formats::IdfcBank::ValidateConfig},
         {name: 'Citi Bank', key: :citi_bank, operation: PaymentFiles::Formats::CitiBank::Process, validator: PaymentFiles::Formats::CitiBank::ValidateConfig},
-        {name: 'Stanza Payment', key: :stanza, operation: PaymentFiles::Formats::Stanza::Process, validator: PaymentFiles::Formats::Stanza::ValidateConfig}
+        {name: 'Stanza Payment', key: :stanza, operation: PaymentFiles::Formats::Stanza::Process, validator: PaymentFiles::Formats::Stanza::ValidateConfig},
+        {name: 'HSBC', key: :hsbc_bank, operation: PaymentFiles::Formats::HsbcBank::Process, validator: PaymentFiles::Formats::HsbcBank::ValidateConfig}
+
     ]
   end
 
