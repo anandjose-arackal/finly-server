@@ -36,21 +36,7 @@ class Event::EInvoice::Approve < Event::EInvoice::Base
   end
 
   def affected_users
-    # if approved
-    #   if auto_approve
-    #     return [self.invoice.created_by]
-    #   end
-    #   [self.invoice.trails.last.action_user, self.invoice.created_by]
-    # else
-    #   users = [self.invoice.trails.last.action_user]
-    #   if controlling_users.present?
-    #     controlling_users.each do |user|
-    #       users.push(user)
-    #     end
-    #   end
-    #   users
-    # end
-    affected_user = (self.invoice.document_role_users(:creditor).present?  && self.invoice.approved? ? ( self.invoice.affected_users(:approve) + self.invoice.document_role_users(:creditor) + [self.invoice.created_by] ) : self.invoice.affected_users(:approve) + [self.invoice.created_by])
+    affected_user =  (self.invoice.affected_users(:approve) + [self.invoice.created_by])
     return affected_user.uniq
   end
 
