@@ -37,7 +37,7 @@ class PaymentFiles::Formats::HsbcBank::Process < PaymentFiles::Formats::BaseForm
           "",
           "",
           "",
-          Date.today.strftime("d/m/Y"),
+          Date.today.strftime("%d/%m/%Y"),
           payment[:amount],
           "",
           payment[:receiving_user_email],
