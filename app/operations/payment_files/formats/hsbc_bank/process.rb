@@ -23,7 +23,7 @@ class PaymentFiles::Formats::HsbcBank::Process < PaymentFiles::Formats::BaseForm
   end
 
   def process
-    self.headers = retrieve_icici_headers
+    self.headers = retrieve_hsbc_headers
     content = []
     self.payment_file_data.each do |payment|
       content << [
