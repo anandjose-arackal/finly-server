@@ -315,7 +315,7 @@ class Bbps::BillFetch < Bbps::Api
     parsed_response["error_desc"] = received_response["response"]["complianceReason"]
     parsed_response["status"] = received_response["status"]
     return Failure("Invalid response") unless response.status == 200
-    return Failure("Invalid response") unless received_response&.dig("response").present?
+    return Failure("Invalid response") if parsed_response["status"] == "FAILURE"
 
     parsed_response["agent_id"] = "YB01YB28MOB519101711"
     parsed_response["bbps_ref_id"] = received_response["response"]["refId"]
