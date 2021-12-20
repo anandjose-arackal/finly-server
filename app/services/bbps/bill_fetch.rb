@@ -46,19 +46,19 @@ class Bbps::BillFetch < Bbps::Api
     end
   end
 
-  # path 'fetch'
-  # url 'https://yesbbps.transxt.in:9443/portal/service/npciservice'
-  # header "AUTH","/WT/ijy7z5abJBM/LAwbmA==" for prod all
-  path "fetch"
-  url 'http://180.179.170.6:1012/portal/service/npciservice'
-  header "AUTH","7ljbVcKc1Ka5tpaGAyAvR/vNDcTzk1C+BRhUdM9zB3s="
+  path 'fetch'
+  url 'https://yesbbps.transxt.in:9443/portal/service/npciservice'
+  header "AUTH","/WT/ijy7z5abJBM/LAwbmA==" 
+  # path "fetch"
+  # url 'http://180.179.170.6:1012/portal/service/npciservice'
+  # header "AUTH","7ljbVcKc1Ka5tpaGAyAvR/vNDcTzk1C+BRhUdM9zB3s=", for sandbox
 
   def body
     message = generate_message
     Rails.logger.info("Raw message :: #{message.to_json}")
     encoded_message = Base64.strict_encode64(message)
     encrypted_message = encrypt(encoded_message)
-    #encrypted_message = "FCEtV3bbmRQqRPDe++Exq4c5eAcgD+xEE8313baqaxOzfvoqw/gQsG4LbOMABfRySPe3WTynow1NRJ6gNjnhWi9ujU4X4Jxl1YiMCB1fGXa1snS1acHr5h3981JB6KvahHOeGfp7zVd5w96Sc+bWwOi24fWGV+n8lGvMa+SDQPNqmhhDJbmAfPAdzxm/TPy9UNw5IWaOL7hXAxdKzQNO1qZIldpoXbdLn5GAvBJY9PdGkiXwVxtNwp9UIPemKQAfnvLYx5tV80WkZlp+c/EqWVrlaxQ1Dm7Gg7rXNdJiTx10tVRpjQ+LUEgdwWRd/ZeS7I3eVU0PavZ7kD5iY1rl+jpZhgv/auW+Va+OXIrdTyEZIOs06E6TVebDMMrcr8lCduwbFt7lDOiYXxQUUA0MR5Px9ij1A9Dfijy3Cyqks7jgwzaFErA0BDCF/ycOWdlOLuQE/zJNz63Fsq1M5wHwlUqZdhz5a3v4HMRUZMXYY8veBb1drVm92ESramUvoN9RvE/kevQDe2BkUPYm0+2Jll+Yf4CC0BBK7W6MwGxq564ubHGsHa0uwe2qRNclSSppULlTDUYPYjuVM+08vCb8JmuCQUK5vRQw8ADNidi4qRTUgz0iKu2TiCuOdiJzt55HbF0Jl5C3HHwouoMHvrBpUQ==" #sample
+    #encrypted_message = "VMRoNkTNjgJvebidMVsaHXCiLwtSM6Vpl+yPlMHog0jTnL1uy5l5PlK6d504as9LTnMVJqp06a/zza3cpHM4hwQCjk+TwpepSOAcFjBpb2jvcSDBmFKjp1U5fBLvH2oZnUUzY5Z/2lUhCisTWnCi3D+VUpVnWTo+ecMOgTeI9alLg1RPhvYONYpV3id5wVkKeCi68swv7HtUzQMZAgQVIR4EsTcmNnhVhhmS1SeGo6cWxx2bQuh5t4Ev9LNJDQQ1BlxokWJTemEAKLI1v56R/q2lz2OwoUusYC3u8J2HiqwvBgoAeQKKwNAwXQRW1U9D+9VpBnNf9SGFWH/S+H0yLeJ1k0/S1nXmVgznO+fbj+a3U/YHcCS/z5Z48YtvaJUegaW3ivYrHtnTUVF0itbs2FTFcBFIqB5jkcErTmnKiEPzVz3PD5CWTFZqDLH7B9hExbgtkcLhxhVI2pl6jPWV6fSr7cgfPP4aRxacRmhGhYs2QaeVwe5Dvl1fCv8yLqQVVz8c9G+4mgw4VD/4D1FHBIeMD02IC+IQvIqtbDsz2YcFXKr2olhMlItFUIts+Y/k"
     Rails.logger.info("Encrypted message :: #{encrypted_message}")
     body = {request: encrypted_message}
     log_generator.merge({request_raw_message: message})
@@ -280,8 +280,8 @@ class Bbps::BillFetch < Bbps::Api
     message["custDetails"]["customerTags"] << {"name"=> "AADHAAR", "value"=> customer_aadhar_no} if customer_aadhar_no.present?
     message["custDetails"]["customerTags"] << {"name"=> "PAN", "value"=> customer_pan_id} if customer_pan_id.present?
     message["agentDetails"] = {}
-    message["agentDetails"]["agentId"] = "YB31YB41MOB521611569"
-    #message["agentDetails"]["agentId"] = "YB01YB28MOB519101711" for prod
+    # message["agentDetails"]["agentId"] = "YB31YB41MOB521611569"
+    message["agentDetails"]["agentId"] = "YB01YB28MOB519101711" 
     message["agentDetails"]["deviceTags"] = []
     message["agentDetails"]["deviceTags"] << { "name" => "IP", "value" => "13.232.176.84" }
     message["agentDetails"]["deviceTags"] << { "name" => "IMEI", "value" => "1234" }

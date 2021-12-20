@@ -54,13 +54,13 @@ class Bbps::BillPay < Bbps::Api
     end
   end
 
-  # path 'pay'
-  # url 'https://yesbbps.transxt.in:9443/portal/service/npciservice'
-  # header "AUTH","/WT/ijy7z5abJBM/LAwbmA=="
+  path 'pay'
+  url 'https://yesbbps.transxt.in:9443/portal/service/npciservice'
+  header "AUTH","/WT/ijy7z5abJBM/LAwbmA=="
 
-  path "pay"
-  url 'http://180.179.170.6:1012/portal/service/npciservice'
-  header "AUTH","7ljbVcKc1Ka5tpaGAyAvR/vNDcTzk1C+BRhUdM9zB3s="
+  # path "pay"
+  # url 'http://180.179.170.6:1012/portal/service/npciservice'
+  # header "AUTH","7ljbVcKc1Ka5tpaGAyAvR/vNDcTzk1C+BRhUdM9zB3s="
 
   # Message Code(B2000) | Order No |Agent institution Id |Channel Id |Agent Id |
   # Quick Pay |Split Pay |Split Pay Amt |Customer name|Customermobile|
@@ -335,10 +335,10 @@ class Bbps::BillPay < Bbps::Api
     message["paycustomerDetails"]["mobileNo"] = customer_mobile#
 
     message["agentDetails"] = {}
-    # message["agentDetails"]["agentId"] = "YB01YB28MOB519101711"
-    # message["agentDetails"]["partnerId"] = "YB01YB28MOB519101711" for prod
-    message["agentDetails"]["agentId"] = "YB31YB41MOB521611569"
-    message["agentDetails"]["partnerId"] = "YB31YB41MOB521611569"
+    message["agentDetails"]["agentId"] = "YB01YB28MOB519101711"
+    message["agentDetails"]["partnerId"] = "YB01YB28MOB519101711" 
+    # message["agentDetails"]["agentId"] = "YB31YB41MOB521611569"
+    # message["agentDetails"]["partnerId"] = "YB31YB41MOB521611569"
     message["agentDetails"]["deviceTags"] = []
     message["agentDetails"]["deviceTags"] << { "name" => "IP", "value" => "13.232.176.84" }
     message["agentDetails"]["deviceTags"] << { "name" => "IMEI", "value" => "1234" }
@@ -428,7 +428,7 @@ class Bbps::BillPay < Bbps::Api
             agent_institution_id: result['response.parsed']['agent_institution_id'],
             # channel_id: result['response.parsed']['channel_id'], #check this
             bbps_ref_id: result['response.parsed']['bbps_ref_id'],
-            agent_id: "YB31YB41MOB521611569", #for prod change this
+            agent_id: "YB01YB28MOB519101711",
             customer_name: result['response.parsed']['customer_name'],
             customer_mobile: result['response.parsed']['customer_mobile'],
             channel: "MOB",

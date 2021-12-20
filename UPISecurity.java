@@ -10,8 +10,8 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class App {
     public static void main(String[] args) throws Exception {
-        //String secretKey = "083d0fb5ccec3b7b96ef2f1919f14d3c"; for prod
-        String secretKey = "2321bd46f297a35241efe1744df7898c";
+        String secretKey = "083d0fb5ccec3b7b96ef2f1919f14d3c"; 
+        // String secretKey = "2321bd46f297a35241efe1744df7898c";
         try {
             String encoded_message = args[0];
             String base64EncryptedString;
@@ -22,8 +22,8 @@ public class App {
             MessageDigest md = MessageDigest.getInstance("SHA-256"); 
             byte[] digestOfPassword = md.digest(secretKey.getBytes("UTF8"));
             byte[] keyBytes = Arrays.copyOf(digestOfPassword, 24);
-            //byte []iv = new byte[]{-19, 101, -71, -44, -61, -88, 112, 70, 5, 81, -5, -88, 77, 12, 102, 3}; for prod
-            byte []iv = new byte[]{106,21,89,46,-4,95,75,-87,-109,76,-77,49,0,78,63,96};
+            byte []iv = new byte[]{-19, 101, -71, -44, -61, -88, 112, 70, 5, 81, -5, -88, 77, 12, 102, 3}; 
+            // byte []iv = new byte[]{106,21,89,46,-4,95,75,-87,-109,76,-77,49,0,78,63,96};
             SecretKey key = new SecretKeySpec(keyBytes, "AES");
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding"); 
             IvParameterSpec ivParameterSpec = new IvParameterSpec(iv); 

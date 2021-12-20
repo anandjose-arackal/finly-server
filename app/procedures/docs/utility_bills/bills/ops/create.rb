@@ -43,45 +43,44 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
     due_date, bill_date = params[:due_date], params[:bill_date]
     bill_month, bill_period = params[:bill_month], params[:bill_period]
     early_payment_date = DateUtils.parse_date(params[:early_payment_date])
-    bill = subscription.bbps_bills.last #for prod remove, because sandbox not sending date
 
-    # if (due_date.present? && due_date != "NA" && due_date != "9999-01-01") && (due_date.present? && due_date != "NA" && due_date != "0001-01-01")
-    #   bill = subscription.bbps_bills.where("bill_date = ? AND due_date = ?", Date.parse(bill_date), Date.parse(due_date)).first
-    # elsif due_date.present? && due_date != "NA" && due_date != "9999-01-01"
-    #   bill = subscription.bbps_bills.where("due_date = ?", Date.parse(due_date)).first
-    # elsif bill_date.present? && bill_date != "NA" && bill_date != "0000-01-01"
-    #   bill = subscription.bbps_bills.where("bill_date = ?", Date.parse(bill_date)).first
-    # elsif bill_month.present?
-    #   bill = subscription.bbps_bills.where(bill_month: bill_month)
-    # elsif early_payment_date.present?
-    #   bill = subscription.bbps_bills.where(early_payment_date: early_payment_date)
-    # elsif bill_period.present?
-    #   # Received the following kinds of bill numbers
-    #   # ["1", nil, "december", "march", "may", "Monthly", "JANUARY", "MONTHLY", "FEBRUARY", "0.0", "JAN 20", "202002", "DECEMBER"]
-    #   if bill_periods.include?(bill_period&.to_s.downcase) # Deals with different months
-    #     bill = subscription.bbps_bills.where(bill_period: bill_period).first
-    #   elsif ["monthly"].includes?(bill_period.to_s.downcase) # Deals with "Monthly"; Also changes it to current month
-    #     bill_period = Date.today.strftime("%b")
-    #     bill = subscription.bbps_bills.where(bill_period: bill_period).first
-    #   elsif bill_periods.filter {|month| period.downcase.index(month)}.present? # Deals with format 'JAN 20'
-    #     bill_period = bill_periods.filter {|month| period.downcase.index(month)}[0]
-    #     bill = subscription.bbps_bills.where(bill_period: bill_period).first
-    #   else
-    #     # None of the attributes for checking for existing bills exist in the response
-    #     Event::EAlert::Create.(nil,
-    #       title: "Ambiguous Bill Creation #{subscription.id} . #{bill&.id}",
-    #       description: "Subscription: #{subscription.as_json} \n Bills: #{subscription.bbps_bills.last.as_json} \n Response: #{result.as_json["table"]}",
-    #       subject: "Ambiguous Bill Creation #{subscription.id} . #{bill&.id}"
-    #     )
-    #   end
-    # else
-    #   # None of the attributes for checking for existing bills exist in the response
-    #   Event::EAlert::Create.(nil,
-    #     title: "Ambiguous Bill Creation #{subscription.id} . #{bill&.id}",
-    #     description: "Subscription: #{subscription.as_json} \n Bills: #{subscription.bbps_bills.last.as_json} \n Response: #{result.as_json["table"]}",
-    #     subject: "Ambiguous Bill Creation #{subscription.id} . #{bill&.id}"
-    #   )
-    # end
+    if (due_date.present? && due_date != "NA" && due_date != "9999-01-01") && (due_date.present? && due_date != "NA" && due_date != "0001-01-01")
+      bill = subscription.bbps_bills.where("bill_date = ? AND due_date = ?", Date.parse(bill_date), Date.parse(due_date)).first
+    elsif due_date.present? && due_date != "NA" && due_date != "9999-01-01"
+      bill = subscription.bbps_bills.where("due_date = ?", Date.parse(due_date)).first
+    elsif bill_date.present? && bill_date != "NA" && bill_date != "0000-01-01"
+      bill = subscription.bbps_bills.where("bill_date = ?", Date.parse(bill_date)).first
+    elsif bill_month.present?
+      bill = subscription.bbps_bills.where(bill_month: bill_month)
+    elsif early_payment_date.present?
+      bill = subscription.bbps_bills.where(early_payment_date: early_payment_date)
+    elsif bill_period.present?
+      # Received the following kinds of bill numbers
+      # ["1", nil, "december", "march", "may", "Monthly", "JANUARY", "MONTHLY", "FEBRUARY", "0.0", "JAN 20", "202002", "DECEMBER"]
+      if bill_periods.include?(bill_period&.to_s.downcase) # Deals with different months
+        bill = subscription.bbps_bills.where(bill_period: bill_period).first
+      elsif ["monthly"].includes?(bill_period.to_s.downcase) # Deals with "Monthly"; Also changes it to current month
+        bill_period = Date.today.strftime("%b")
+        bill = subscription.bbps_bills.where(bill_period: bill_period).first
+      elsif bill_periods.filter {|month| period.downcase.index(month)}.present? # Deals with format 'JAN 20'
+        bill_period = bill_periods.filter {|month| period.downcase.index(month)}[0]
+        bill = subscription.bbps_bills.where(bill_period: bill_period).first
+      else
+        # None of the attributes for checking for existing bills exist in the response
+        Event::EAlert::Create.(nil,
+          title: "Ambiguous Bill Creation #{subscription.id} . #{bill&.id}",
+          description: "Subscription: #{subscription.as_json} \n Bills: #{subscription.bbps_bills.last.as_json} \n Response: #{result.as_json["table"]}",
+          subject: "Ambiguous Bill Creation #{subscription.id} . #{bill&.id}"
+        )
+      end
+    else
+      # None of the attributes for checking for existing bills exist in the response
+      Event::EAlert::Create.(nil,
+        title: "Ambiguous Bill Creation #{subscription.id} . #{bill&.id}",
+        description: "Subscription: #{subscription.as_json} \n Bills: #{subscription.bbps_bills.last.as_json} \n Response: #{result.as_json["table"]}",
+        subject: "Ambiguous Bill Creation #{subscription.id} . #{bill&.id}"
+      )
+    end
 
     if bill.present? && !bill.paid? && !bill.expired?
       api_response = bill.get_api_responses
