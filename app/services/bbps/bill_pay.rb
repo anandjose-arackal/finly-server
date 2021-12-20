@@ -300,17 +300,17 @@ class Bbps::BillPay < Bbps::Api
 
   def body
     message = generate_message
-    Rails.logger.info("Raw message :: #{message.to_json}")
+    #Rails.logger.info("Raw message :: #{message.to_json}")
     encoded_message = Base64.strict_encode64(message)
     encrypted_message = encrypt(encoded_message)
-    Rails.logger.info("Encrypted message :: #{encrypted_message}")
+    #Rails.logger.info("Encrypted message :: #{encrypted_message}")
     body = {request: encrypted_message}
     log_generator.merge({request_raw_message: message})
     body
   end
 
   def generate_message
-    Rails.logger.info("Bill pay params:: #{params}")
+    #Rails.logger.info("Bill pay params:: #{params}")
     #check card details
     message = {}
     message["custDetails"] = {}
@@ -371,7 +371,7 @@ class Bbps::BillPay < Bbps::Api
   end
 
   def parse_response(user, params, response)
-    Rails.logger.info("Bill pay response:: #{response.inspect}")
+    #Rails.logger.info("Bill pay response:: #{response.inspect}")
     message = JSON.parse(response.body)
     # message = message.gsub('"[','[')
     # message = message.gsub(']"',']')
@@ -379,7 +379,7 @@ class Bbps::BillPay < Bbps::Api
     # message = message.gsub('}"','}')
     # received_response = JSON.parse(message), for prod
     received_response = message
-    Rails.logger.info("Bill pay parsed response:: #{received_response}")
+    #Rails.logger.info("Bill pay parsed response:: #{received_response}")
     parsed_response = {}
     return Failure("Invalid response") unless received_response["status"] == "SUCCESS"
     return Failure("Invalid response") unless received_response&.dig("response").present?

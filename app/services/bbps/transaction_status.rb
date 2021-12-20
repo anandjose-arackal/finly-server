@@ -33,10 +33,10 @@ class Bbps::TransactionStatus < Bbps::Api
 
   def body
     message = generate_message
-    Rails.logger.info("Raw message :: #{message.to_json}")
+    #Rails.logger.info("Raw message :: #{message.to_json}")
     encoded_message = Base64.strict_encode64(message)
     encrypted_message = encrypt(encoded_message)
-    Rails.logger.info("Encrypted message :: #{encrypted_message}")
+    #Rails.logger.info("Encrypted message :: #{encrypted_message}")
     body = {request: encrypted_message}
     log_generator.merge({request_raw_message: message})
     body
@@ -213,14 +213,14 @@ class Bbps::TransactionStatus < Bbps::Api
   end
 
   def parse_response(user, params, response)
-    Rails.logger.info("Transaction status response:: #{response.inspect}")
+    #Rails.logger.info("Transaction status response:: #{response.inspect}")
     message = JSON.parse(response.body)
     # message = message.gsub('"[','[')
     # message = message.gsub(']"',']')
     # message = message.gsub('"{','{')
     # message = message.gsub('}"','}')
     # received_response = JSON.parse(message), for prod
-    Rails.logger.info("Transaction status parsed response :: #{message.inspect}")
+    #Rails.logger.info("Transaction status parsed response :: #{message.inspect}")
 
     received_response = message
     return Failure("Invalid response") unless response.status == 200
