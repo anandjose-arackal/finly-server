@@ -105,12 +105,12 @@ class Event::EReport::Approve < Event::EReport::Base
             return "Congratulations! Your report #{report.name} has been approved"
           end
         elsif self.report.document_role_users(:finance_manager).include?(user)
-          message = "#{approving_user.name} has approved the report: #{self.report.name} and is currently waiting for your approval"
+          message = "#{approving_user.name} has approved the report: #{self.report.name} and is currently awaiting for your approval"
         else
           message = "#{approving_user.name} has approved the report: #{self.report.name}"
         end
       else
-        message = "#{approving_user.name} has approved the report: #{self.report.name} and is currently waiting for your approval"
+        message = "#{approving_user.name} has approved the report: #{self.report.name} and is currently awaiting for your approval"
       end  
     end
   end
@@ -132,9 +132,9 @@ class Event::EReport::Approve < Event::EReport::Base
           message = "#{message} and has been closed"
         end
       elsif self.report.document_role_users(:finance_manager).include?(user)
-        message = "#{approving_user.name} has approved the report: #{self.report.name} and is currently waiting for your approval"
+        message = "#{approving_user.name} has approved the report: #{self.report.name} and is currently awaiting for your approval"
       else
-        message = "#{approving_user.name} has approved the report '#{self.report.name}' and is currently waiting for your approval"
+        message = "#{approving_user.name} has approved the report '#{self.report.name}' and is currently awaiting for your approval"
       end
     end
     message
