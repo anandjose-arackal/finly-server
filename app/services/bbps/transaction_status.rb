@@ -221,6 +221,7 @@ class Bbps::TransactionStatus < Bbps::Api
     # message = message.gsub('}"','}')
     # received_response = JSON.parse(message), for prod
     Rails.logger.info("Transaction status parsed response :: #{message.inspect}")
+
     received_response = message
     return Failure("Invalid response") unless response.status == 200
     return Failure("Invalid response") unless received_response&.dig("response").present?
@@ -232,7 +233,8 @@ class Bbps::TransactionStatus < Bbps::Api
 
     parsed_response["bbps_ref_id"] = received_response["response"]["refId"]
     parsed_response["ref_no"] = received_response["response"]["txnReferenceId"]
-    parsed_response["txn_date"] = DateTime.now #received_response["response"]["ts"] change this
+    parsed_response["txn_date"] = received_response["response"]["billerResponse"]["billDate"]
+    parsed_response["bill_number"] = received_response["response"]["billerResponse"]["billNumber"]
     
     parsed_response
   end
