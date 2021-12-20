@@ -348,7 +348,7 @@ class Bbps::BillPay < Bbps::Api
     message["amountDetails"] = {}
     message["amountDetails"]["amount"] = amount.to_i
     message["amountDetails"]["currency"] = 356 #INR
-    message["amountDetails"]["custConvFee"] = params["convenience_fee"] || 0
+    message["amountDetails"]["custConvFee"] = params["convenience_fee"].nil?? 0 : params["convenience_fee"]
     # message["amountDetails"]["couCustConvFee"] = BbpsBill.first.api_response.last["convenience_fee_desc"] || 0
     message["bbpsPGName"] = "YesPay" #fixed for yesbank payment gateway
     message["bbpsPGResponse"] = {}
