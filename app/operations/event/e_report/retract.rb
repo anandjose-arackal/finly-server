@@ -11,10 +11,14 @@ class Event::EReport::Retract < Event::EReport::Base
   end
 
   def affected_users
+    # users = Reports::AssociatedUsers.(self.user, report: self.report, user_before: self.report.tracks.last.modified_user)
+    # users.reject { |r| r == self.user}
     self.report.affected_users(:retract)
   end
 
   def notification_affected_users
+    # users = Reports::AssociatedUsers.(self.user, report: self.report, user_before: self.report.tracks.last.modified_user)
+    # users.reject { |r| r == self.user}
     self.report.notification_affected_users(:retract)
   end
 
@@ -65,6 +69,8 @@ class Event::EReport::Retract < Event::EReport::Base
   end
 
   def report_view_role(user)
+    # self.roles = Reports::ActionUserRole.(user, {report: report, user_id: user.id})
+    # return roles.first
     (report.affected_users(:retract).include? user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
   end
 

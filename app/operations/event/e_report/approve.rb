@@ -37,7 +37,19 @@ class Event::EReport::Approve < Event::EReport::Base
   end
 
   def affected_users
-    self.report.affected_users(:approve, {ignore_reviewer: true})
+    # if approved
+    #   if auto_approve
+    #     return [self.report.user]
+    #   end
+    #   [self.report.tracks.last.action_user, self.report.user]
+    # else
+    #   [self.report.tracks.last.action_user, self.report.controlling_user]
+    # end
+    if self.report.document_role_users(:finance_manager).present? && (self.report.approved? || self.report.auto_approved?)
+      self.report.affected_users(:approve, {ignore_reviewer: true}) + self.report.document_role_users(:finance_manager)
+    else
+      self.report.affected_users(:approve, {ignore_reviewer: true})
+    end
   end
 
   def get_token(user)
@@ -78,6 +90,8 @@ class Event::EReport::Approve < Event::EReport::Base
     else
       notify_type = NotificationActionType.id_for(:notify_awaiting_approval)
     end
+    # view_role_id = report.controlling_user_role_id
+    # view_role_id = UserRole.id_for("manager")
     notification = user.notifications.create(notification_type_id: NotificationType.id_for(:report),
                                               action_type_id: notify_type,
                                               action_user_id: (report.trails.last.action_user.id rescue nil),
