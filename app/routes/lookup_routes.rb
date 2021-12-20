@@ -26,6 +26,7 @@ Lookup::Router.draw do
   route "purchase_request_statuses", Masters::PurchaseRequestStatuses::Lookup
   route "currencies", Masters::Currencies::Lookup
   route "countries", Masters::Countries::Lookup
+  route "advance_amount_statuses", Masters::AdvanceAmountStatuses::Lookup
 
   # Docs
   route 'purchase_requests', Docs::P2P::PurchaseRequests::Lookup
