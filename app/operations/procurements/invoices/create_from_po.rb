@@ -322,8 +322,8 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         invoice_params[:po_advance] = self.po_advance
         invoice_params[:po_prev_adjusted_advance] = self.po_prev_adjusted_advance
         invoice_params[:po_adjusted_advance] = self.po_adjusted_advance
-        # invoice_params[:advance_amount_required] = true
-        invoice_params[:advance_amount_required] = (self.po_prev_adjusted_advance == self.po_advance) ? false : true
+        invoice_params[:advance_amount_required] = false
+        # invoice_params[:advance_amount_required] = (self.po_prev_adjusted_advance == self.po_advance) ? false : true
 
       if user.po_invoice_form_enabled
         invoice_params[:adjusted_po_advance_payable_amount] = 0
@@ -747,14 +747,14 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         when (self.invoice&.balance_due&.value.present? && self.invoice&.balance_due&.value >= allowed_current_adjustment) || (user.po_invoice_form_enabled && self.invoice.invoice_balance_due >= allowed_current_adjustment)
           # Substract PO advance amount from balance due amount
           bal_due_amount = self.invoice&.balance_due&.value - allowed_current_adjustment
-          bal_due_amount = self.invoice.invoice_balance_due - allowed_current_adjustment if user.po_invoice_form_enabled
+          bal_due_amount = self.invoice.invoice_balance_due if user.po_invoice_form_enabled
           current_adjustment = allowed_current_adjustment
         when (self.invoice&.balance_due&.value.present? &&  self.invoice&.balance_due&.value < allowed_current_adjustment) || (user.po_invoice_form_enabled && self.invoice.invoice_balance_due < allowed_current_adjustment)
           current_adjustment = self.invoice&.balance_due&.value
           current_adjustment = self.invoice.invoice_balance_due.to_f if user.po_invoice_form_enabled
           bal_due_amount = 0
       end
-      set_advance_amount_required
+      # set_advance_amount_required
     end
     unless bal_due_amount.blank?
       self.invoice.balance_due.update(value: bal_due_amount)

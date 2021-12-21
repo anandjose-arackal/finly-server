@@ -60,7 +60,8 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
       #### net payable amount has roundoff value added
       # invoice_net_total_amount: "{% if form.base_currency_id != form.reporting_currency_id %}{{ form.invoice_total_amount | default: 0 | round: 2 }}{% else %}{{ form.invoice_total_amount | default: 0 | round }}{% endif %}",
       invoice_net_total_amount: "{% if form.base_currency_id == '1' and form.reporting_currency_id == '1' %}{{ form.invoice_total_amount | default: 0 | round }}{% else %}{{ form.invoice_total_amount | default: 0 | round: 2 }}{% endif %}",
-      invoice_advance_paid_amount: "{{ form.adjusted_po_advance_payable_amount | default: 0 | round: 2}}",
+      # invoice_advance_paid_amount: "{% form.advance_amount_required == false %}{{0}}{% else %}{{ form.adjusted_po_advance_payable_amount | default: 0 | round: 2}}{% endif %}",
+			invoice_advance_paid_amount: "{{ form.adjusted_po_advance_payable_amount | default: 0 | round: 2}}",
       invoice_balance_due: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | default: 0 | round: 2}}",
 
       # CONVERTED VALUES
@@ -456,7 +457,7 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
   end
 
   section :document_advance, title: "Document Advance" do
-       switch :advance_amount_required, label: "Required ", editable: true, visible: true, required: true, default_value: true
+       switch :advance_amount_required, label: "Required", editable: true, visible: true, required: true, default_value: false
 
        amount :po_advance, label: "PO Advance", editable: false, visible: true, required: false
 
@@ -469,7 +470,7 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
               computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_prev_adjusted_advance])
 
        amount :adjusted_po_advance_payable_amount, label: "Current Adjustment", editable: true, visible: true, required: false
-       
+
        amount :reporting_adjusted_po_advance_payable_amount, label: "Current Adjustment (reporting currency)", editable: false, visible: true, required: false,
               computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_adjusted_po_advance_payable_amount])
   end
@@ -646,6 +647,24 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
 
   condition condition_id: "Hide Net Amount (Reporting Currency)" do
     reference :entity, 'items_summary.reporting_invoice_sub_total_amount'
+    rule Rules::Builder[:base_currency_id].eq(entity: "reporting_currency_id")
+    action :visible, false
+  end
+
+  condition condition_id: "Hide PO advance (Reporting Currency)" do
+    reference :entity, 'reporting_po_advance'
+    rule Rules::Builder[:base_currency_id].eq(entity: "reporting_currency_id")
+    action :visible, false
+  end
+
+	condition condition_id: "Hide prev adjusted PO advance (Reporting Currency)" do
+    reference :entity, 'reporting_po_prev_adjusted_advance'
+    rule Rules::Builder[:base_currency_id].eq(entity: "reporting_currency_id")
+    action :visible, false
+  end
+
+	condition condition_id: "Hide current adjusted PO advance (Reporting Currency)" do
+    reference :entity, 'reporting_adjusted_po_advance_payable_amount'
     rule Rules::Builder[:base_currency_id].eq(entity: "reporting_currency_id")
     action :visible, false
   end
