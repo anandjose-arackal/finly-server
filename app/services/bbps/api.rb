@@ -48,6 +48,7 @@ class Bbps::Api < ServiceApi
 
   def body
     message = generate_message
+
     encrypted_message = encrypt(message)
     body = {requestMsg: encrypted_message, agentInstitutionId: agent_institution_id}
     log_generator.merge({request_raw_message: message})
@@ -72,7 +73,7 @@ class Bbps::Api < ServiceApi
 
   def encrypt(message)
     result = nil
-    Open3.popen3("java UPISecurity.java \"#{message}\" \"#{self.class.encryption_key}\"") do |stdin, stdout, strerr|
+    Open3.popen3("java UPISecurity.java \"#{message}\"") do |stdin, stdout, strerr|
       result = stdout.read
     end
     result
@@ -136,8 +137,8 @@ class Bbps::Api < ServiceApi
     verify = true #Rails.env.production? ? true : false
     # since we're using the default keystore, no need to import Yes Bank's certificates as they're signed
     ssl_options = {
-        client_cert: OpenSSL::X509::Certificate.new(File.read(ENV['HOME'] + '/certificates/finly.crt')),
-        client_key: OpenSSL::PKey::RSA.new(File.read(ENV['HOME'] + '/certificates/finly.key')),
+        #client_cert: OpenSSL::X509::Certificate.new(File.read(ENV['HOME'] + '/certificates/finly.crt')),
+        #client_key: OpenSSL::PKey::RSA.new(File.read(ENV['HOME'] + '/certificates/finly.key')),
         verify: verify,
         version: :SSLv23
     }

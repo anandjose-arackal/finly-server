@@ -68,7 +68,9 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         bill_period: bank_transaction.bill_period,
         biller_id: bank_transaction.biller_id,
         quick_pay: bank_transaction.quick_pay,
-        order_number: bill.order_number
+        order_number: bill.order_number,
+        bbps_ref_id: bill.api_response.last["bbps_ref_id"],
+        convenience_fee: bill.convenience_fee.value
     }
 
     params.merge!(customer_params(bill.subscription))
@@ -87,7 +89,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         api_response = bill.api_response.is_a?(Array) ? bill.api_response : []
         api_response.push(result.as_json&.dig('table').merge({created_at: DateTime.now, api_type: "BillPay"}))
 
-        bill.update(api_response: api_response)
+        bill.update(api_response: api_response, order_number: result.order_number)
 
         # clearing old system messages as well
         payment.system_messages.destroy_all

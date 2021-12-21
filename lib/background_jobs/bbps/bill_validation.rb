@@ -6,7 +6,7 @@ class BackgroundJobs::Bbps::BillValidation
   def perform(response_handle, params)
     queue = Struct.new(:queue).new(response_handle)
     begin
-      op = ::Bbps::BillValidation.call_async(params: params, current_user: User.first, wait: true)
+      op = ::Bbps::BillFetch.call_async(params: params, current_user: User.first, wait: true)
       if op.success?
         ::Resque.enqueue(queue, {success: true, response: op})
       else
