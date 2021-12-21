@@ -60,8 +60,9 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
       #### net payable amount has roundoff value added
       # invoice_net_total_amount: "{% if form.base_currency_id != form.reporting_currency_id %}{{ form.invoice_total_amount | default: 0 | round: 2 }}{% else %}{{ form.invoice_total_amount | default: 0 | round }}{% endif %}",
       invoice_net_total_amount: "{% if form.base_currency_id == '1' and form.reporting_currency_id == '1' %}{{ form.invoice_total_amount | default: 0 | round }}{% else %}{{ form.invoice_total_amount | default: 0 | round: 2 }}{% endif %}",
-      invoice_advance_paid_amount: "{{ form.invoice_advance_paid_amount | default: 0 | round: 2}}",
+      invoice_advance_paid_amount: "{{ form.adjusted_po_advance_payable_amount | default: 0 | round: 2}}",
       invoice_balance_due: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | default: 0 | round: 2}}",
+      invoice_paid_outside_amount: "{{ form.po_advance | default: 0 | round: 2 }}",
 
       # CONVERTED VALUES
       reporting_invoice_gross_amount: "{{ form.invoice_gross_amount | times: form.conversion_rate | default: 0 | round: 2}}",
@@ -396,7 +397,8 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
              can_visible_be_changed: false, can_editable_be_changed: false, editable: false, visible: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_tds_amount])
 
-      amount :invoice_paid_outside_amount, label: "Advance Paid", default_value: 0, visible: true, editable: true
+      amount :invoice_paid_outside_amount, label: "Advance Paid", default_value: 0, visible: true, editable: true,
+              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_paid_outside_amount])
 
       amount :reporting_invoice_paid_outside_amount, label: "Advance Paid(Reporting Currency)", editable: false, visible: false,
              can_visible_be_changed: false,
@@ -450,6 +452,14 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_balance_due]),
              can_visible_be_changed: false, can_editable_be_changed: false
     end
+  end
+
+  section :document_advance, title: "Document Advance" do
+       switch :advance_amount_required, label: "Required ", editable: true, visible: true, required: true, default_value: true
+
+       amount :po_advance, label: "PO Advance", editable: false, visible: true, required: false
+       amount :po_prev_adjusted_advance, label: "Po Prev Adjusted Advance", editable: false, visible: true, required: false
+       amount :adjusted_po_advance_payable_amount, label: "Current Adjustment", editable: true, visible: true, required: false
   end
 
   # ATTACHMENTS
