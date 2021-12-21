@@ -1,6 +1,5 @@
 class Bbps::BillFetch < Bbps::Api
-
-  schema do
+  schema do 
     params do
       # Todo filled from user
       optional(:customer_name).filled
@@ -26,7 +25,7 @@ class Bbps::BillFetch < Bbps::Api
           required(:value).filled
         end
       end
-      optional(:customer_param_3) do
+      optional(:customer_param_3) do 
         hash do
           required(:key).filled
           required(:value).filled
@@ -47,7 +46,41 @@ class Bbps::BillFetch < Bbps::Api
     end
   end
 
-  path "billFetch"
+  path 'fetch'
+  url 'https://yesbbps.transxt.in:9443/portal/service/npciservice'
+  header "AUTH","/WT/ijy7z5abJBM/LAwbmA==" 
+  # path "fetch"
+  # url 'http://180.179.170.6:1012/portal/service/npciservice'
+  # header "AUTH","7ljbVcKc1Ka5tpaGAyAvR/vNDcTzk1C+BRhUdM9zB3s=", for sandbox
+
+  def body
+    message = generate_message
+    #Rails.logger.info("Raw message :: #{message.to_json}")
+    encoded_message = Base64.strict_encode64(message)
+    encrypted_message = encrypt(encoded_message)
+    #encrypted_message = "VMRoNkTNjgJvebidMVsaHXCiLwtSM6Vpl+yPlMHog0jTnL1uy5l5PlK6d504as9LTnMVJqp06a/zza3cpHM4hwQCjk+TwpepSOAcFjBpb2jvcSDBmFKjp1U5fBLvH2oZnUUzY5Z/2lUhCisTWnCi3D+VUpVnWTo+ecMOgTeI9alLg1RPhvYONYpV3id5wVkKeCi68swv7HtUzQMZAgQVIR4EsTcmNnhVhhmS1SeGo6cWxx2bQuh5t4Ev9LNJDQQ1BlxokWJTemEAKLI1v56R/q2lz2OwoUusYC3u8J2HiqwvBgoAeQKKwNAwXQRW1U9D+9VpBnNf9SGFWH/S+H0yLeJ1k0/S1nXmVgznO+fbj+a3U/YHcCS/z5Z48YtvaJUegaW3ivYrHtnTUVF0itbs2FTFcBFIqB5jkcErTmnKiEPzVz3PD5CWTFZqDLH7B9hExbgtkcLhxhVI2pl6jPWV6fSr7cgfPP4aRxacRmhGhYs2QaeVwe5Dvl1fCv8yLqQVVz8c9G+4mgw4VD/4D1FHBIeMD02IC+IQvIqtbDsz2YcFXKr2olhMlItFUIts+Y/k"
+    #Rails.logger.info("Encrypted message :: #{encrypted_message}")
+    body = {request: encrypted_message}
+    log_generator.merge({request_raw_message: message})
+    body
+  end
+
+  def self.build_matcher(options, result)
+    Dry::Matcher.new(
+        success: Dry::Matcher::Case.new(
+            match: -> (result) {p "Matcher:Success", result; result['response.parsed']&.dig('status') == 'SUCCESS'},
+            resolve: -> (result) { handle_success(result) }
+        ),
+        error: Dry::Matcher::Case.new(
+            match: -> (result) {p "Matcher:Error", result; result['response.parsed']&.dig('status') == 'FAILURE'},
+            resolve: -> (result) { handle_error(result['response.parsed']) }
+        ),
+        failure: Dry::Matcher::Case.new(
+            match: -> (result) {p "Matcher:Failure", result; true},
+            resolve: -> (result) {result}
+        )
+    )
+  end
 
   # Message Code(B1000)|Ref No |Agent Institution Id|Channel Id |AgentId |Customer name |Customer mobile |Customer email |Customer Aadhar No |Customer PAN id |
   #   INITIATING_CHANNEL:
@@ -194,7 +227,7 @@ class Bbps::BillFetch < Bbps::Api
       {
           # Add Order ID
         amount: result['response.parsed']['amount'],
-        status: result['response.parsed']['status'],
+        status: 'Y',
         bill_date: result['response.parsed']['bill_date'],
         due_date: result['response.parsed']['due_date'],
         bill_number: result['response.parsed']['bill_number'],
@@ -230,11 +263,85 @@ class Bbps::BillFetch < Bbps::Api
   def self.handle_error(result)
     OpenStruct.new(
       {
-        status: result['status'],
+        status: 'N',
         error_code: result['error_code'],
         error_desc: result['error_desc'],
         ref_no: result['ref_no']
       }
     )
   end
+
+  def generate_message
+    message = {}
+    message["custDetails"] = {}
+    message["custDetails"]["mobileNo"] = customer_mobile
+    message["custDetails"]["customerTags"] = []
+    message["custDetails"]["customerTags"] << {"name"=> "EMAIL", "value"=> customer_email} if customer_email.present?
+    message["custDetails"]["customerTags"] << {"name"=> "AADHAAR", "value"=> customer_aadhar_no} if customer_aadhar_no.present?
+    message["custDetails"]["customerTags"] << {"name"=> "PAN", "value"=> customer_pan_id} if customer_pan_id.present?
+    message["agentDetails"] = {}
+    # message["agentDetails"]["agentId"] = "YB31YB41MOB521611569"
+    message["agentDetails"]["agentId"] = "YB01YB28MOB519101711" 
+    message["agentDetails"]["deviceTags"] = []
+    message["agentDetails"]["deviceTags"] << { "name" => "IP", "value" => "13.232.176.84" }
+    message["agentDetails"]["deviceTags"] << { "name" => "IMEI", "value" => "1234" }
+    message["agentDetails"]["deviceTags"] << { "name" => "OS", "value" => "Android" }
+    message["agentDetails"]["deviceTags"] << { "name" => "APP", "value" => "FINLY" }
+    message["agentDetails"]["deviceTags"] << { "name" => "INITIATING_CHANNEL", "value" => "MOB" }
+    message["billDetails"] = {}
+    message["billDetails"]["billerId"] = biller_id
+    message["billDetails"]["customerParams"] = []
+    (1..5).to_a.each do |i|
+      value = self.send("customer_param_#{i}")
+      customer_param_message = value.split('=')
+      if value.present? && value!= "NA"
+        message["billDetails"]["customerParams"] << { "name"=>customer_param_message[0], "value"=> customer_param_message[1]}
+      end
+    end
+    message.to_json
+  end
+
+  def parse_response(user, params, response)
+    message = JSON.parse(response.body)
+    #message = JSON.parse(response.body)["response"]
+    # message = message.gsub('"[','[')
+    # message = message.gsub(']"',']')
+    # message = message.gsub('"{','{')
+    # message = message.gsub('}"','}') 
+#    received_response = JSON.parse(message)for prod
+    received_response = message
+    parsed_response = {}
+    parsed_response["error_code"] = received_response["response"]["complianceRespCd"]
+    parsed_response["error_desc"] = received_response["response"]["complianceReason"]
+    parsed_response["status"] = received_response["status"]
+    return Failure("Invalid response") unless response.status == 200
+    return Failure("Invalid response") if parsed_response["status"] == "FAILURE"
+
+    parsed_response["agent_id"] = "YB01YB28MOB519101711"
+    parsed_response["bbps_ref_id"] = received_response["response"]["refId"]
+    parsed_response["ref_no"] = received_response["response"]["refId"]
+    parsed_response["responseCode"] = received_response["response"]["responseCode"]
+    parsed_response["amount"] = received_response["response"]["billerResponse"]["amount"]
+    parsed_response["due_date"] = received_response["response"]["billerResponse"]["dueDate"]
+    parsed_response["bill_number"] = received_response["response"]["billerResponse"]["billNumber"]
+    parsed_response["bill_date"] = received_response["response"]["billerResponse"]["billDate"]
+    parsed_response["bill_period"] = received_response["response"]["billerResponse"]["billPeriod"]
+    parsed_response["amount"] = received_response["response"]["billerResponse"]["amount"] + "00" #change this
+    parsed_response["convenience_fee"] = received_response["response"]["billerResponse"]["CustConvFee"]
+    parsed_response["convenience_fee_desc"] = received_response["response"]["billerResponse"]["CustConvDesc"]
+    parsed_response["biller_id"] = biller_id
+
+    parsed_response["customer_name"] = received_response["response"]["billerResponse"]["customerName"]
+    parsed_response["customer_email"] = received_response["response"]["billerResponse"]["customerEmail"]
+    parsed_response["customer_aadhar_no"] = received_response["response"]["billerResponse"]["customerAadhar"]
+
+    #map customer params?
+    # if received_response["response"]["additionalInfo"].present? && 
+    #   received_response["response"]["additionalInfo"].each_with_index do |add_info, index|
+    #     parsed_response["addition_info_#{index}"] = add_info
+    #   end
+    # end
+    parsed_response
+  end
+
 end
