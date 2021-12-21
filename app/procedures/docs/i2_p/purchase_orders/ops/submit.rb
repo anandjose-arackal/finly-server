@@ -63,6 +63,8 @@ class Docs::I2P::PurchaseOrders::Ops::Submit < Transactions::API
       end
     end
 
+    reviewal_document.update(advance_amount_status_id: AdvanceAmountStatus.id_for(:to_be_processed)) if reviewal_document.advance_amount_required
+
     reviewal_document.update(rejection_note: "")
     options[:workflow_output] = op.workflow_output
     true

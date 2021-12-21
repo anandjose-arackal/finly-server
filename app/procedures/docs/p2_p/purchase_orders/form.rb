@@ -406,9 +406,9 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
 
   # PO advances using old logic
   section :document_advance, title: "Document Advance" do
-    switch :advance_amount_required, label: "Required ", editable: true, visible: true, required: true, default_value: true
+    switch :advance_amount_required, label: "Required", editable: true, visible: true, required: true, default_value: false
 
-    amount :po_requested_advance_amount, label: "Amount", editable: true, visible: true,
+    amount :po_requested_advance_amount, label: "Amount", editable: false, visible: true, required: true,
            can_editable_be_changed: false, can_visible_be_changed: false,
            computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:po_requested_advance_amount])
 
@@ -417,7 +417,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
            computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_requested_advance_amount])
 
     lookup :advance_tds_slab_id, label: 'Tds Rate-(%)', choices_scope: Choices[:lookup].('tds_slabs'), 
-           visible: true, editable: true
+           visible: true, editable: false
 
     number :po_advance_tds_percentage, internal: true, editable: false, visible: false,
            can_editable_be_changed: false, can_visible_be_changed: false,
@@ -435,6 +435,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
            can_editable_be_changed: false, can_visible_be_changed: false,
            computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_advance_amount])
 
+    date :advance_scheduled_date, label: "Scheduled Date", editable: true, visible: true
     lookup :advance_amount_status_id, label: 'Status', editable: false, visible: true,
            can_editable_be_changed: false, can_visible_be_changed: false, choices_scope: Choices[:lookup].('advance_amount_statuses'), 
            default_value: AdvanceAmountStatus.id_for(:new)
@@ -476,6 +477,12 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
     reference 'items.item_net_amount'
     error_message "Item net amount cannot be less than 0"
     rule Rules::Builder['items.net_amount'].lt(value: 0)
+  end
+
+  validation validation_id: "Advance amount should be less than payable amount" do
+    reference 'po_requested_advance_amount'
+    error_message "Advance can not be more than Balance Payable"
+    rule Rules::Builder['po_requested_advance_amount'].gt(entity: "po_balance_due")
   end
 
   # validation validation_id: "Advance Amount Can not be greater than Balance Payable" do
@@ -611,6 +618,38 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
     reference :entity, 'items_summary.reporting_po_balance_due'
     rule Rules::Builder[:base_currency_id].eq(entity: "reporting_currency_id")
     action :visible, false
+  end
+
+  condition condition_id: "Hide Reporting Advance Amount for Indian Currency" do
+    reference :entity, 'reporting_po_requested_advance_amount'
+    rule Rules::Builder[:base_currency_id].eq(entity: "reporting_currency_id")
+    action :visible, false
+  end
+
+  condition condition_id: "Hide Reporting Advance payable amount for Indian Currency" do
+    reference :entity, 'reporting_po_advance_amount'
+    rule Rules::Builder[:base_currency_id].eq(entity: "reporting_currency_id")
+    action :visible, false
+  end
+
+  condition condition_id: "make advance editable and required for document advance true" do
+    reference :entity, 'po_requested_advance_amount'
+    rule Rules::Builder[:advance_amount_required].eq_any(value: true)
+    action :required, true
+    action :editable, true
+  end
+
+  condition condition_id: "make advance tds editable for document advance true" do
+    reference :entity, 'advance_tds_slab_id'
+    rule Rules::Builder[:advance_amount_required].eq_any(value: true)
+    action :editable, true
+  end
+
+  condition condition_id: "make advance scheduled date required for document advance true" do
+    reference :entity, 'advance_scheduled_date'
+    rule Rules::Builder[:advance_amount_required].eq_any(value: true)
+    action :editable, true
+    action :required, true
   end
 
   # condition condition_id: "Make Advance Amount Editable" do
