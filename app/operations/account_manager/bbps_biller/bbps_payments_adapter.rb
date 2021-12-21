@@ -70,10 +70,12 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         quick_pay: bank_transaction.quick_pay,
         order_number: bill.order_number,
         bbps_ref_id: bill.api_response.last["bbps_ref_id"],
-        convenience_fee: bill.convenience_fee.value
+        convenience_fee: get_convenience_fee(bill)
     }
 
     params.merge!(customer_params(bill.subscription))
+
+    puts "BillPay:Params: #{params}"
 
     Bbps::BillPay.call_async({params: params, current_user: payment.initiating_user}, {wait: true, wait_timeout: 180 }) do |op|
       op.success do |result|
@@ -217,6 +219,14 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
     bill = payment.parent
     order_number = bill.order_number || generate_order_number
     order_number
+  end
+
+  def get_convenience_fee(bill)
+    if bill.convenience_fee.present?
+      return bill.convenience_fee.value
+    else
+      return 0
+    end
   end
 
   def generate_order_number
