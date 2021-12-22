@@ -108,7 +108,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         payment.system_messages.destroy_all
         if result["error_desc"].present?
           self.errors << result['error_desc']
-          payment.system_messages.build(content: result.order_number || "no response", system_message_type_id: SystemMessageType.id_for(:error)).save
+          payment.system_messages.build(content: result.inspect.to_s, system_message_type_id: SystemMessageType.id_for(:error)).save
         else
           self.errors << 'Unable to reach bbps. Please try again later'
           payment.system_messages.build(content: 'Unable to reach bbps. Please try again later', system_message_type_id: SystemMessageType.id_for(:error)).save
