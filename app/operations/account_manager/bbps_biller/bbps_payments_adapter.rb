@@ -119,7 +119,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         puts "Failure:Result: #{result}"
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:possible_failure))
         payment.update(payment_status_id: PaymentStatus.id_for(:possible_failure))
-        payment.system_messages.build(content: result[:error_desc], system_message_type_id: SystemMessageType.id_for(:error)).save
+        payment.system_messages.build(content: result.inspect.to_s, system_message_type_id: SystemMessageType.id_for(:error)).save
         
         # result["errors"]&.values&.flatten&.each do |error|
         #   # add_error_message( payment, error )
