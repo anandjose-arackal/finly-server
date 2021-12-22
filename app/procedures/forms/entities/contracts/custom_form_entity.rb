@@ -7,7 +7,6 @@ class Forms::Entities::Contracts::CustomFormEntity < Forms::Entities::Contracts:
   property :system_field, deserializer: -> (input, represented, *args) {represented.system_field = false}
   property :company_id, deserializer: -> (input, represented, *args) {represented.company_id = represented.current_user.company_id}
 
-
   property :created_by_user_id, deserializer: -> (input, represented, *args) {represented.created_by_user_id = represented.contract_root.current_user.id}
   property  :can_visible_be_changed, deserializer: -> (input, represented, *args) {represented.can_visible_be_changed = true}
   property  :can_editable_be_changed, deserializer: -> (input, represented, *args) {represented.can_editable_be_changed = true}
