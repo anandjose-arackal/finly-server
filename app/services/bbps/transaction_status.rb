@@ -223,12 +223,12 @@ class Bbps::TransactionStatus < Bbps::Api
     #Rails.logger.info("Transaction status parsed response :: #{message.inspect}")
 
     received_response = message
-    return Failure("Invalid response") unless response.status == 200
-    return Failure("Invalid response") unless received_response&.dig("response").present?
-    parsed_response = {}
     parsed_response["error_code"] = received_response["response"]["complianceRespCd"]
     parsed_response["error_desc"] = received_response["response"]["complianceReason"]
     parsed_response["status"] = received_response&.dig("status")
+    return Failure("Invalid response") unless received_response["status"] == "SUCCESS"
+    return Failure("Invalid response") unless received_response&.dig("response").present?
+    parsed_response = {}
     return Failure("Error connecting with BBPS") if received_response&.dig("status")!= "SUCCESS"
 
     parsed_response["bbps_ref_id"] = received_response["response"]["refId"]

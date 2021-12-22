@@ -83,7 +83,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         # a 200 OK response
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:processing),
                                 bbps_ref_id: result.bbps_ref_id,
-                                order_number: bill.order_number)
+                                order_number: result.order_number)
 
         # Add log to api response in bill
         api_response = bill.api_response.is_a?(Array) ? bill.api_response : []
@@ -108,7 +108,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         payment.system_messages.destroy_all
         if result["error_desc"].present?
           self.errors << result['error_desc']
-          payment.system_messages.build(content: result['error_desc'], system_message_type_id: SystemMessageType.id_for(:error)).save
+          payment.system_messages.build(content: result.order_number || "no response", system_message_type_id: SystemMessageType.id_for(:error)).save
         else
           self.errors << 'Unable to reach bbps. Please try again later'
           payment.system_messages.build(content: 'Unable to reach bbps. Please try again later', system_message_type_id: SystemMessageType.id_for(:error)).save
