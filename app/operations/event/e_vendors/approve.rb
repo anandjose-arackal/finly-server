@@ -86,7 +86,7 @@ class Event::EVendors::Approve < Event::EVendors::Base
           message = "Congratulations! Vendor #{document.business_name} has been approved"
         end
       else
-        message = "#{approving_user.name} has approved the vendor '#{self.document.business_name}' and is currently waiting for your approval"
+        message = "#{approving_user.name} has approved the vendor '#{self.document.business_name}' and is currently awaiting for your approval"
       end
     end
     message
