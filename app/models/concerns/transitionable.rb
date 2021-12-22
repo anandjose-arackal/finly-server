@@ -105,7 +105,7 @@ module Transitionable
           user_ids += self.get_reviewers(:next)&.map(&:id)
           user_ids.push self.document_owner_id
         else
-          user_ids += self.get_reviewers(:nex)&.map(&:id)
+          user_ids += self.get_reviewers(:next)&.map(&:id)
         end
       when :comment, 'comment'
         user_ids.push self.document_owner_id

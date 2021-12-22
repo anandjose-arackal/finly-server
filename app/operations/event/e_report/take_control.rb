@@ -9,8 +9,6 @@ class Event::EReport::TakeControl < Event::EReport::Base
   end
 
   def affected_users
-    # [self.report.controlling_user, self.report.controlling_for_user]
-    # [self.report.controlling_user, self.report.controlling_for_user]
     self.report.affected_users(:take_control)
   end
 
@@ -30,11 +28,6 @@ class Event::EReport::TakeControl < Event::EReport::Base
   end
 
   def set_notification(user)
-    # if report.notification_affected_users(:take_control).include? user
-    #   view_role_id = UserRole.id_for(:manager)
-    # else
-    #   view_role_id = nil
-    # end
     last_trail = report.trails&.last
     notification = user.notifications.create(notification_type_id: NotificationType.id_for(:report),
                                              action_type_id: NotificationActionType.id_for(:notify_take_control),
@@ -53,7 +46,6 @@ class Event::EReport::TakeControl < Event::EReport::Base
 
   def mailer_subject(user)
     if user.id == report.trails.last.action_user_id
-    # if user.id == report.controlling_user_id
       "You have taken control of the report: #{self.report.name}"
     else
       "#{self.report.trails.last.action_user.name} has taken control of the report: #{self.report.name}"
@@ -69,8 +61,6 @@ class Event::EReport::TakeControl < Event::EReport::Base
   end
 
   def report_view_role(user)
-    # roles = Reports::ActionUserRole.(user, {report: report, user_id: user.id})
-    # roles.first
     if self.user.id == user.id
       UserRole.id_for(:admin)
     elsif report.user.id == user.id
@@ -78,7 +68,6 @@ class Event::EReport::TakeControl < Event::EReport::Base
     else
       UserRole.id_for(:manager)
     end
-    # report.get_reviewers.include?(user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
   end
 
 end

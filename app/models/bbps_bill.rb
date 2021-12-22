@@ -390,7 +390,8 @@ class BbpsBill < ApplicationRecord
         attachments: attachments.as_json,
         selected_amount_type: selected_amount_type,
         reporting_currency: get_reporting_currency,
-        base_currency: get_base_currency
+        base_currency: get_base_currency,
+        note: subscription.note
     }
 
     if self.late_payment_fee&.value.to_f > 0

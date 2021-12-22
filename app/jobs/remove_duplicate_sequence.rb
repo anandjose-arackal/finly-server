@@ -2,7 +2,6 @@ class RemoveDuplicateSequence < BaseJob
 
   def self.perform_job
     puts " ----------------------------- PERFORMING #{self.name} at #{Time.now.strftime("%d-%B-%Y %H:%M:%S")} ------------------------------"
-    Rails.logger.level =0
     Company.all.each do |company|
       ActsAsTenant.current_tenant = Company.find(company.id)
       RequestStoreUtil.set_current_company Company.find(company.id)

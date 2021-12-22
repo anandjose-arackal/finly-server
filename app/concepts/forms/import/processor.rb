@@ -167,7 +167,7 @@ class Forms::Import::Processor
       end
 
       worksheet_headers.each_with_index do |header_name, header_index|
-        worksheet.set_column(header_index, header_index, header_name.length+10)
+        worksheet.set_column(header_index, header_index, (header_name&.length.to_i) +10)
         worksheet.write(0, header_index, header_name)
       end
 
@@ -222,9 +222,9 @@ class Forms::Import::Processor
 
           nested_data.keys.each do |key|
             if form_data[:id].present?
-              form_data[key] = nested_data[key][form_data[:id]]
+              form_data[key] = nested_data[key][form_data[:id]] || []
             elsif form_data[:import_sequence_number].present?
-              form_data[key] = nested_data[key]["Seq#{form_data[:import_sequence_number]}"]
+              form_data[key] = nested_data[key]["Seq#{form_data[:import_sequence_number]}"] || []
             end
           end
 
