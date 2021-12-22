@@ -6,14 +6,6 @@ class Forms::Entities::Contracts::CustomFormEntity < Forms::Entities::Contracts:
   property :entity_type, deserializer: -> (input, represented, *args) {represented.entity_type = input[:entity_type] if represented.model.entity_type.blank?}
   property :system_field, deserializer: -> (input, represented, *args) {represented.system_field = false}
   property :company_id, deserializer: -> (input, represented, *args) {represented.company_id = represented.current_user.company_id}
-  property :choices_scope, deserializer: -> (input, represented, *args) {
-    if input[:choices_scope].present?
-      represented.choices_scope = {
-        type: "lookup",
-        config: {"choice_params"=>{}}.merge(input[:choices_scope])
-      }
-    end
-  }
 
 
   property :created_by_user_id, deserializer: -> (input, represented, *args) {represented.created_by_user_id = represented.contract_root.current_user.id}
