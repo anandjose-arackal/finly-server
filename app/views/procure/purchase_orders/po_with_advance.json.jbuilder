@@ -11,11 +11,16 @@ json.results do
     # json.po_advance_amount_value purchase_order.advance_amount.value
     # json.po_advance_amount_currency purchase_order.advance_amount.currency.country_code
     if purchase_order.forms_enabled
-      json.po_advance_amount do 
+      json.po_requested_advance_amount do 
         json.value purchase_order.po_requested_advance_amount
-        json.currency purchase_order.get_reporting_currency
+        json.currency purchase_order.get_base_currency
+      end
+      json.po_advance_amount do 
+        json.value purchase_order.po_advance_amount
+        json.currency purchase_order.get_base_currency
       end
     else
+      json.po_requested_advance_amount purchase_order.advance_amount
       json.po_advance_amount purchase_order.advance_amount
     end
     json.po_total_after_tax purchase_order.total_after_tax
