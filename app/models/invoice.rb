@@ -903,7 +903,7 @@ class Invoice < ApplicationRecord
   # this method updates the invoice status based on the associated
   # payments made against this particular invoice
   def update_invoice_status
-    balance_due = self.balance_due&.value.to_f
+    balance_due = self.forms_enabled ? self.invoice_balance_due.to_f : self.balance_due&.value.to_f 
     paid_amount = self.payments.successful.joins(:amount).sum(:value)
 
     if paid_amount == 0
@@ -921,12 +921,11 @@ class Invoice < ApplicationRecord
     conversion_rate = self.conversion_rate.to_f
 
     invoice_paid_outside_amount = paid_amount.to_f
-    reporting_invoice_paid_outside_amount = invoice_advance_paid_amount * conversion_rate.to_f
+    reporting_invoice_paid_outside_amount = invoice_paid_outside_amount * conversion_rate.to_f
 
-    
     self.update({
-      invoice_paid_outside_amount: invoice_advance_paid_amount,  
-      reporting_invoice_paid_outside_amount: reporting_invoice_advance_paid_amount
+      invoice_paid_outside_amount: invoice_paid_outside_amount,  
+      reporting_invoice_paid_outside_amount: reporting_invoice_paid_outside_amount
     })
   end
 
