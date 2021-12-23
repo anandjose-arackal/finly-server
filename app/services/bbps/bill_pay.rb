@@ -381,15 +381,15 @@ class Bbps::BillPay < Bbps::Api
     received_response = message
     #Rails.logger.info("Bill pay parsed response:: #{received_response}")
     parsed_response = {}
+    parsed_response["order_number"] = received_response["response"]["txnReferenceId"]
+    
+    parsed_response["error_code"] = received_response["response"]["complianceRespCd"]
+    parsed_response["error_desc"] = received_response["response"]["complianceReason"]
     return Failure("Invalid response") unless received_response["status"] == "SUCCESS"
     return Failure("Invalid response") unless received_response&.dig("response").present?
 
-    parsed_response["error_code"] = received_response["response"]["complianceRespCd"]
-    parsed_response["error_desc"] = received_response["response"]["complianceReason"]
-
     parsed_response["status"] = received_response["status"]
     parsed_response["bbps_ref_id"] = received_response["response"]["refId"]
-    parsed_response["order_number"] = received_response["response"]["txnReferenceId"]
     parsed_response["responseCode"] = received_response["response"]["responseCode"]
     if received_response["response"]["billerResponse"].present?
       parsed_response["due_date"] = received_response["response"]["billerResponse"]["dueDate"]
