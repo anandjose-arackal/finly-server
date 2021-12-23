@@ -920,12 +920,13 @@ class Invoice < ApplicationRecord
   def update_paid_and_balance_payable paid_amount
     conversion_rate = self.conversion_rate.to_f
 
-    invoice_advance_paid_amount = paid_amount.to_f
-    reporting_invoice_advance_paid_amount = invoice_advance_paid_amount * conversion_rate.to_f
+    invoice_paid_outside_amount = paid_amount.to_f
+    reporting_invoice_paid_outside_amount = invoice_advance_paid_amount * conversion_rate.to_f
+
     
     self.update({
-      invoice_advance_paid_amount: invoice_advance_paid_amount,  
-      reporting_invoice_advance_paid_amount: reporting_invoice_advance_paid_amount
+      invoice_paid_outside_amount: invoice_advance_paid_amount,  
+      reporting_invoice_paid_outside_amount: reporting_invoice_advance_paid_amount
     })
   end
 
