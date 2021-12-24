@@ -63,6 +63,7 @@ class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
   end
 
   def post_process
+    po = nil
     if po_available & self.po_previous_status.present?
       if self.procurement.po_revisions.reload.present?
         po = self.procurement.reload.po_revisions.last
@@ -80,9 +81,7 @@ class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
       end
     end
 
-    po = self.procurement.reload.po_revisions.last
-
-    if po.present? && self.advance_payments.present?
+    if self.advance_payments.present? && po.present?
       self.advance_payments.update(parent_id: po.id, purchase_order_id: po.id)
       po.advance_payments.each do |payment|
         payment.save
