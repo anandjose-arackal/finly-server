@@ -931,7 +931,7 @@ class Invoice < ApplicationRecord
 
   def invoice_balance_due
     if self.forms_enabled
-      self[:invoice_balance_due].to_f - self.invoice_advance_paid_amount.to_f
+      self[:invoice_balance_due].to_f
     else
       balance_due&.value.to_f - paid_amount_value
     end
@@ -939,7 +939,7 @@ class Invoice < ApplicationRecord
 
   def reporting_invoice_balance_due
     if self.forms_enabled
-      self[:reporting_invoice_balance_due].to_f - self.reporting_invoice_advance_paid_amount.to_f 
+      self[:reporting_invoice_balance_due].to_f
     else
       balance_due&.value.to_f - paid_amount_value
     end
