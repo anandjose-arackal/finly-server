@@ -61,8 +61,8 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
       # invoice_net_total_amount: "{% if form.base_currency_id != form.reporting_currency_id %}{{ form.invoice_total_amount | default: 0 | round: 2 }}{% else %}{{ form.invoice_total_amount | default: 0 | round }}{% endif %}",
       invoice_net_total_amount: "{% if form.base_currency_id == '1' and form.reporting_currency_id == '1' %}{{ form.invoice_total_amount | default: 0 | round }}{% else %}{{ form.invoice_total_amount | default: 0 | round: 2 }}{% endif %}",
       # invoice_advance_paid_amount: "{% form.advance_amount_required == false %}{{0}}{% else %}{{ form.adjusted_po_advance_payable_amount | default: 0 | round: 2}}{% endif %}",
-			invoice_advance_paid_amount: "{% if form.advance_amount_required == true %}{{ form.adjusted_po_advance_payable_amount | default: 0 | round: 2}}{% endif %}",
-      invoice_balance_due: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | default: 0 | round: 2}}",
+	invoice_advance_paid_amount: "{% if form.advance_amount_required == true %}{{ form.adjusted_po_advance_payable_amount | default: 0 | round: 2}}{% endif %}",
+      invoice_balance_due: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | minus: form.invoice_paid_outside_amount | default: 0 | round: 2}}",
 
       # CONVERTED VALUES
       reporting_invoice_gross_amount: "{{ form.invoice_gross_amount | times: form.conversion_rate | default: 0 | round: 2}}",
@@ -400,9 +400,9 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
              can_visible_be_changed: false, can_editable_be_changed: false, editable: false, visible: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_tds_amount])
 
-      amount :invoice_paid_outside_amount, label: "Advance Paid", default_value: 0, visible: true, editable: true
+      amount :invoice_paid_outside_amount, label: "Total Partial-Payment", default_value: 0, visible: true, editable: true
 
-      amount :reporting_invoice_paid_outside_amount, label: "Advance Paid(Reporting Currency)", editable: false, visible: false,
+      amount :reporting_invoice_paid_outside_amount, label: "Total Partial-Payment(Reporting Currency)", editable: false, visible: false,
              can_visible_be_changed: false,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_paid_outside_amount])
@@ -433,11 +433,11 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_net_total_amount])
 
-      amount :invoice_advance_paid_amount, label: "Total Partial-Payment",
+      amount :invoice_advance_paid_amount, label: "Advance Paid",
              default_value: 0, editable: false, visible: true,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_advance_paid_amount])
 
-      amount :reporting_invoice_advance_paid_amount, label: "Total Partial-Payment(Reporting Currency)", editable: false, visible: false,
+      amount :reporting_invoice_advance_paid_amount, label: "Advance Paid(Reporting Currency)", editable: false, visible: false,
              can_visible_be_changed: false,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_advance_paid_amount])
@@ -457,7 +457,7 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
   end
 
   section :document_advance, title: "Document Advance" do
-       switch :advance_amount_required, label: "Required", editable: true, visible: true, required: true, default_value: false
+       switch :advance_amount_required, label: "Adjust Amount", editable: true, visible: true, required: true, default_value: false
 
        amount :po_advance, label: "PO Advance", editable: false, visible: true, required: false
 

@@ -103,6 +103,12 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       invoice_tax_amount = self.invoice.items.map(&:item_tax_amount).map(&:to_f).sum
       roundoff_amount = self.invoice.roundoff_amount.to_f
 
+      tds_amount = 0
+      if user.po_invoice_form_enabled
+        self.invoice.tds_slab_id = self.purchase_order&.advance_tds_slab_id
+        self.invoice.tds_percentage = self.purchase_order&.po_advance_tds_percentage
+        tds_amount = (self.invoice.items.except(tds_applicable: false).map(&:item_taxable_amount).map(&:to_f).sum * self.invoice.tds_percentage) / 100
+      end
       self.invoice.invoice_gross_amount = invoice_gross_amount
       self.invoice.reporting_invoice_gross_amount = invoice_gross_amount * conversion_rate
 
@@ -121,8 +127,8 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       self.invoice.invoice_sub_total_amount = ( self.rcm_enabled ? invoice_taxable_amount.to_f : invoice_taxable_amount.to_f + invoice_tax_amount.to_f )
       self.invoice.reporting_invoice_sub_total_amount = ( self.rcm_enabled ? invoice_taxable_amount.to_f : invoice_taxable_amount.to_f + invoice_tax_amount.to_f ) * conversion_rate
       
-      self.invoice.invoice_tds_amount = self.invoice&.tds_amount&.value&.to_f
-      self.invoice.reporting_invoice_tds_amount = self.invoice&.tds_amount&.value&.to_f * conversion_rate
+      self.invoice.invoice_tds_amount = user.po_invoice_form_enabled ? tds_amount : self.invoice&.tds_amount&.value&.to_f
+      self.invoice.reporting_invoice_tds_amount = user.po_invoice_form_enabled ? tds_amount * conversion_rate : self.invoice&.tds_amount&.value&.to_f * conversion_rate
       
       self.invoice.invoice_total_amount = self.invoice.invoice_sub_total_amount + roundoff_amount
       self.invoice.reporting_invoice_total_amount = (self.invoice.invoice_sub_total_amount + roundoff_amount) * conversion_rate
