@@ -482,7 +482,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
   validation validation_id: "Advance amount should be less than payable amount" do
     reference 'po_requested_advance_amount'
     error_message "Advance can not be more than Balance Payable"
-    rule Rules::Builder['po_requested_advance_amount'].gt(entity: "po_balance_due")
+    rule Rules::Builder['po_requested_advance_amount'].gt(entity: "form.po_balance_due")
   end
 
   # validation validation_id: "Advance Amount Can not be greater than Balance Payable" do
