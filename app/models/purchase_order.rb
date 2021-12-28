@@ -843,7 +843,11 @@ class PurchaseOrder < ApplicationRecord
   end
 
   def total_adv_amount
-    (self.advance_amount&.value + self.advance_tds_amount&.value) rescue nil
+    if user.po_form_enabled
+      self.po_requested_advance_amount
+    else
+      (self.advance_amount&.value + self.advance_tds_amount&.value) rescue nil
+    end
   end
 
   def entity_date

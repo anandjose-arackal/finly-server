@@ -17,6 +17,8 @@ json.ifsc payment.receiving_account.ifsc
 json.swift_code payment.receiving_account.swift_code
 json.amount precision_value payment.amount_value
 json.payment_amount payment.amount_value
+conversion_rate = parent.conversion_rate.to_f rescue 1
+json.reporting_payment_amount = payment.amount_value * conversion_rate
 json.net_amount precision_value payment.amount_value
 json.invoice_amount precision_value payment.invoice_amount
 json.status payment.payment_status_name
@@ -172,9 +174,11 @@ else
       when 'PurchaseOrder'
         json.item_amounts_total (parent.total_before_tax&.value + parent.discount_amount&.value).round(2) rescue 0
         json.tds_amount parent.advance_tds_amount&.value rescue 0
+        json.tds_amount parent.po_advance_tds_amount.to_f if user.po_form_enabled
         json.net_payable_amount parent.balance_amount&.value
         # json.paid_amount parent.advance_payments.successful.joins(:amount).sum(:value)
         json.paid_amount parent.requested_advance_amount.value.round(2)
+        json.paid_amount parent.po_requested_advance_amount.to_f.round(2) if user.po_form_enabled
         # json.remaining_amount (parent.balance_amount&.value.to_f - parent.advance_payments.successful.joins(:amount).sum(:value))
         json.remaining_amount (parent.balance_amount&.value.to_f - parent.requested_advance_amount.value.round(2))
       end
