@@ -922,7 +922,7 @@ class Invoice < ApplicationRecord
 
     invoice_paid_outside_amount = paid_amount.to_f
     reporting_invoice_paid_outside_amount = invoice_paid_outside_amount * conversion_rate.to_f
-    invoice_total_amount -= paid_amount.to_f
+    invoice_total_amount = self.invoice_total_amount - paid_amount.to_f
     reporting_invoice_total_amount = invoice_total_amount * conversion_rate.to_f
 
     self.update({
