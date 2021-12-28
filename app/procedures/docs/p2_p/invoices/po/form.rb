@@ -517,12 +517,6 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
     rule Rules::Builder["row.quantity"].gt(entity: "row.unbilled_quantity")
   end
 
-  validation validation_id: "Advance adjustment can not be greater than balance due" do
-    reference "adjusted_po_advance_payable_amount"
-    error_message "Advance adjustment cannot be greater than payable amount"
-    rule Rules::Builder["adjusted_po_advance_payable_amount"].gt(entity: "form.invoice_balance_due")
-  end
-
 
   # Add Validation so that user can not increase item quantity and user can not decrease quantity to zero
   # validation validation_id: "Invoice Discount Cannot be greater than Invoice Gross Amount" do

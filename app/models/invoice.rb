@@ -922,14 +922,10 @@ class Invoice < ApplicationRecord
 
     invoice_paid_outside_amount = paid_amount.to_f
     reporting_invoice_paid_outside_amount = invoice_paid_outside_amount * conversion_rate.to_f
-    invoice_balance_due = (self.invoice_balance_due - paid_amount.to_f)
-    reporting_invoice_balance_due = invoice_balance_due * conversion_rate.to_f
 
     self.update({
       invoice_paid_outside_amount: invoice_paid_outside_amount,  
-      reporting_invoice_paid_outside_amount: reporting_invoice_paid_outside_amount,
-      invoice_balance_due: invoice_balance_due,
-      reporting_invoice_balance_due: reporting_invoice_balance_due
+      reporting_invoice_paid_outside_amount: reporting_invoice_paid_outside_amount
     })
   end
 
