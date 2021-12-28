@@ -225,6 +225,7 @@ json.payments do
         json.net_amount precision_value payment.amount&.value
         json.roundoff_amount 0
         json.balance_due payment.amount&.value
+        json.invoice_net_total_amount precision_value payment.amount&.value
       end
     end
 
