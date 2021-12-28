@@ -176,11 +176,13 @@ else
         json.tds_amount parent.advance_tds_amount&.value rescue 0
         json.tds_amount parent.po_advance_tds_amount.to_f if parent.user.po_form_enabled
         json.net_payable_amount parent.balance_amount&.value
+        json.net_payable_amount parent.po_balance_due.to_f if parent.user.po_form_enabled
         # json.paid_amount parent.advance_payments.successful.joins(:amount).sum(:value)
         json.paid_amount parent.requested_advance_amount.value.round(2)
         json.paid_amount parent.po_requested_advance_amount.to_f.round(2) if parent.user.po_form_enabled
         # json.remaining_amount (parent.balance_amount&.value.to_f - parent.advance_payments.successful.joins(:amount).sum(:value))
         json.remaining_amount (parent.balance_amount&.value.to_f - parent.requested_advance_amount.value.round(2))
+        json.remaining_amount (parent.po_balance_due.to_f - parent.po_requested_advance_amount.to_f.round(2)) if parent.user.po_form_enabled
       end
     end
   end
