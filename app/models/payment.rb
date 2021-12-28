@@ -1145,8 +1145,8 @@ include Searchkick::Api
   def get_po_advance_amount_details
     parameters = RequestStore.store[:params]
     tds_slabs = TdsSlabs::Index.(self.purchase_order.user, parameters).tds_slabs rescue nil
-    total_amount = user.po_form_enabled ? precision_value(self.purchase_order&.po_requested_advance_amount&.to_f) : precision_value(self.purchase_order&.requested_advance_amount&.value)
-    tds_amount = user.po_form_enabled ? self.purchase_order&.po_advance_tds_amount&.to_f : self.purchase_order&.advance_tds_amount&.value
+    total_amount = self.purchase_order.user.po_form_enabled ? precision_value(self.purchase_order&.po_requested_advance_amount&.to_f) : precision_value(self.purchase_order&.requested_advance_amount&.value)
+    tds_amount = self.purchase_order.user.po_form_enabled ? self.purchase_order&.po_advance_tds_amount&.to_f : self.purchase_order&.advance_tds_amount&.value
     {
         total_amount: {value: total_amount, editable: false}, # TOTAL
         inclusive_of_taxes: "",
