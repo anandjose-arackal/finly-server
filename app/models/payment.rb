@@ -736,7 +736,11 @@ include Searchkick::Api
       precision_value self.parent.balance_due&.value
     when 'PurchaseOrder'
       # PurchaseOrder.find_by(id: self.parent_id).as_json(tree: true) # because somewhere we got as_json for PO already. running on deadline. dont have time to remodify.
-      precision_value self.parent.advance_amount&.value
+      if user.po_form_enabled
+        precision_value self.parent.po_requested_advance_amount
+      else
+        precision_value self.parent.advance_amount&.value
+      end
     else
       if self.invoice.present?
         precision_value self.invoice.balance_due&.value
@@ -1141,12 +1145,14 @@ include Searchkick::Api
   def get_po_advance_amount_details
     parameters = RequestStore.store[:params]
     tds_slabs = TdsSlabs::Index.(self.purchase_order.user, parameters).tds_slabs rescue nil
+    total_amount = user.po_form_enabled ? precision_value(self.purchase_order&.po_requested_advance_amount&.to_f) : precision_value(self.purchase_order&.requested_advance_amount&.value)
+    tds_amount = user.po_form_enabled ? self.purchase_order&.po_advance_tds_amount&.to_f : self.purchase_order&.advance_tds_amount&.value
     {
-        total_amount: {value: precision_value(self.purchase_order&.requested_advance_amount&.value), editable: false}, # TOTAL
+        total_amount: {value: total_amount, editable: false}, # TOTAL
         inclusive_of_taxes: "",
         discount: "",
         tax: "",
-        tds: {tds_slab_id: self.purchase_order.advance_tds_slab_id, tds_amount: self.purchase_order&.advance_tds_amount&.value, editable: true, tds_slab_rate: self.purchase_order&.advance_tds_slab&.tds},
+        tds: {tds_slab_id: self.purchase_order.advance_tds_slab_id, tds_amount: tds_amount, editable: true, tds_slab_rate: self.purchase_order&.advance_tds_slab&.tds},
         advance_amount: "", # Advance
         freight_amount: "",
         net_payable_amount: "",
