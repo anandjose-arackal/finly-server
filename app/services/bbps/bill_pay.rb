@@ -13,11 +13,12 @@ class Bbps::BillPay < Bbps::Api
       # required(:initiating_channel).filled
 
       required(:amount).filled
-      required(:bill_date).filled
-      required(:due_date).filled
-      required(:bill_number).filled
-      required(:bill_period).filled
+      # required(:bill_date).filled
+      # required(:due_date).filled
+      #required(:bill_number).filled
+      #required(:bill_period).filled
       required(:biller_id).filled
+      required(:bbps_ref_id).filled
 
       # Atleast one param is required
       required(:customer_param_1) do
@@ -53,7 +54,13 @@ class Bbps::BillPay < Bbps::Api
     end
   end
 
-  path "billPay"
+  path 'pay'
+  url 'https://yesbbps.transxt.in:9443/portal/service/npciservice'
+  header "AUTH","/WT/ijy7z5abJBM/LAwbmA=="
+
+  # path "pay"
+  # url 'http://180.179.170.6:1012/portal/service/npciservice'
+  # header "AUTH","7ljbVcKc1Ka5tpaGAyAvR/vNDcTzk1C+BRhUdM9zB3s="
 
   # Message Code(B2000) | Order No |Agent institution Id |Channel Id |Agent Id |
   # Quick Pay |Split Pay |Split Pay Amt |Customer name|Customermobile|
@@ -146,6 +153,23 @@ class Bbps::BillPay < Bbps::Api
     ]
   )
 
+  def self.build_matcher(options, result)
+    Dry::Matcher.new(
+        success: Dry::Matcher::Case.new(
+            match: -> (result) {p "Matcher:Success", result; result['response.parsed']&.dig('status') == 'SUCCESS'},
+            resolve: -> (result) { handle_success(result) }
+        ),
+        error: Dry::Matcher::Case.new(
+            match: -> (result) {p "Matcher:Error", result; result['response.parsed']&.dig('status') == 'FAILURE'},
+            resolve: -> (result) { handle_error(result['response.parsed']) }
+        ),
+        failure: Dry::Matcher::Case.new(
+            match: -> (result) {p "Matcher:Failure", result; true},
+            resolve: -> (result) {result}
+        )
+    )
+  end
+
   def message_code
     'B2000'
   end
@@ -176,7 +200,12 @@ class Bbps::BillPay < Bbps::Api
   end
 
   def quick_pay
-    params[:quick_pay] || "N"
+    if params[:quick_pay] && ( params[:quick_pay] == "Y" || params[:quick_pay] == "Yes" )
+      return "Yes"
+    else
+      return "No"
+    end
+    "No"
   end
 
   def customer_mobile
@@ -217,7 +246,11 @@ class Bbps::BillPay < Bbps::Api
 
   # this is because the payments need to be sent in paisa
   def amount
-    (params[:amount]&.to_f * 100).round(0)
+    params[:amount]
+  end
+
+  def bbps_ref_id
+    params[:bbps_ref_id]
   end
 
   def payment_mode
@@ -264,27 +297,142 @@ class Bbps::BillPay < Bbps::Api
     customer_param_for(:customer_param_5)
   end
 
+
+  def body
+    message = generate_message
+    #Rails.logger.info("Raw message :: #{message.to_json}")
+    encoded_message = Base64.strict_encode64(message)
+    encrypted_message = encrypt(encoded_message)
+    #Rails.logger.info("Encrypted message :: #{encrypted_message}")
+    body = {request: encrypted_message}
+    log_generator.merge({request_raw_message: message})
+    body
+  end
+
+  def generate_message
+    #Rails.logger.info("Bill pay params:: #{params}")
+    #check card details
+    message = {}
+    message["custDetails"] = {}
+    message["custDetails"]["mobileNo"] = customer_mobile
+    message["custDetails"]["customerTags"] = []
+    message["custDetails"]["customerTags"] << {"name"=> "EMAIL", "value"=> customer_email} if customer_email.present?
+    message["custDetails"]["customerTags"] << {"name"=> "AADHAAR", "value"=> customer_aadhar_no} if customer_aadhar_no.present?
+    message["custDetails"]["customerTags"] << {"name"=> "PAN", "value"=> customer_pan_id} if customer_pan_id.present?
+    
+    message["refId"] = bbps_ref_id 
+
+    message["paymentDetails"] = {}
+    message["paymentDetails"]["paymentMode"] = "NEFT"
+    message["paymentDetails"]["quickPay"] = quick_pay
+    message["paymentDetails"]["splitPay"] = "No"
+    message["paymentDetails"]["offusPay"] = "Yes" #change to fn
+    message["paymentDetails"]["paymentInfo"] = [] #requirednew fill this
+    message["paymentDetails"]["paymentInfo"] << { "name": "IFSC|AccountNo", "value": "YESB0000022|002281300008292" }
+
+
+    message["paycustomerDetails"] = {}
+    message["paycustomerDetails"]["mobileNo"] = customer_mobile#
+
+    message["agentDetails"] = {}
+    message["agentDetails"]["agentId"] = "YB01YB28MOB519101711"
+    message["agentDetails"]["partnerId"] = "YB01YB28MOB519101711" 
+    # message["agentDetails"]["agentId"] = "YB31YB41MOB521611569"
+    # message["agentDetails"]["partnerId"] = "YB31YB41MOB521611569"
+    message["agentDetails"]["deviceTags"] = []
+    message["agentDetails"]["deviceTags"] << { "name" => "IP", "value" => "13.232.176.84" }
+    message["agentDetails"]["deviceTags"] << { "name" => "IMEI", "value" => "1234" }
+    message["agentDetails"]["deviceTags"] << { "name" => "OS", "value" => "Android" }
+    message["agentDetails"]["deviceTags"] << { "name" => "APP", "value" => "FINLY" }
+    message["agentDetails"]["deviceTags"] << { "name" => "INITIATING_CHANNEL", "value" => "MOB" }
+    message["amountDetails"] = {}
+    message["amountDetails"]["amount"] = amount.to_i
+    message["amountDetails"]["currency"] = 356 #INR
+    message["amountDetails"]["custConvFee"] = params["convenience_fee"].nil?? 0 : params["convenience_fee"]
+    message["amountDetails"]["couCustConvFee"] = 0
+    message["bbpsPGName"] = "YesPay" #fixed for yesbank payment gateway
+    message["bbpsPGResponse"] = {}
+    message["bbpsPGResponse"]["txRefNo"] = SecureRandom.hex(10)
+    message["bbpsPGResponse"]["txnDateTime"] = DateTime.now.strftime("%Y-%m-%d %I:%M:%S")
+
+    message["clientRequestId"] =  SecureRandom.hex(12)
+    
+    message["billDetails"] = {}
+    message["billDetails"]["billerId"] = biller_id
+    message["billDetails"]["customerParams"] = []
+    (1..5).to_a.each do |i|
+      value = self.send("customer_param_#{i}")
+      customer_param_message = value.split('=')
+      if value.present? && value!= "NA"
+        message["billDetails"]["customerParams"] << { "name"=>customer_param_message[0], "value"=> customer_param_message[1]}
+      end
+    end
+    message.to_json
+  end
+
+  def parse_response(user, params, response)
+    #Rails.logger.info("Bill pay response:: #{response.inspect}")
+    message = JSON.parse(response.body)
+    # message = message.gsub('"[','[')
+    # message = message.gsub(']"',']')
+    # message = message.gsub('"{','{')
+    # message = message.gsub('}"','}')
+    # received_response = JSON.parse(message), for prod
+    received_response = message
+    #Rails.logger.info("Bill pay parsed response:: #{received_response}")
+    parsed_response = {}
+    parsed_response["order_number"] = received_response["response"]["txnReferenceId"]
+    
+    parsed_response["error_code"] = received_response["response"]["complianceRespCd"]
+    parsed_response["error_desc"] = received_response["response"]["complianceReason"]
+    return Failure("Invalid response") unless received_response["status"] == "SUCCESS"
+    return Failure("Invalid response") unless received_response&.dig("response").present?
+
+    parsed_response["status"] = received_response["status"]
+    parsed_response["bbps_ref_id"] = received_response["response"]["refId"]
+    parsed_response["responseCode"] = received_response["response"]["responseCode"]
+    if received_response["response"]["billerResponse"].present?
+      parsed_response["due_date"] = received_response["response"]["billerResponse"]["dueDate"]
+      parsed_response["bill_date"] = received_response["response"]["billerResponse"]["billDate"]
+      parsed_response["bill_period"] = received_response["response"]["billerResponse"]["billPeriod"]
+    end
+    parsed_response["amount"] = amount
+    # parsed_response["bill_date"] = received_response["response"]["txnDateTime"]
+    # parsed_response["bill_number"] = received_response["response"]["billNumber"]
+    # parsed_response["convenience_fee"] = received_response["response"]["billerResponse"]["CustConvFee"]
+    # parsed_response["convenience_fee_desc"] = received_response["response"]["billerResponse"]["CustConvDesc"]
+    # parsed_response["biller_id"] = received_response["response"]["billDetails"]["billerId"]
+
+    # parsed_response["customer_name"] = received_response["response"]["billerResponse"]["customerName"]
+    # parsed_response["customer_email"] = received_response["response"]["billerResponse"]["customerEmail"]
+    # parsed_response["customer_aadhar_no"] = received_response["response"]["billerResponse"]["customerAadhar"]
+
+    #map customer params?
+    if received_response["response"]["additionalInfo"].present?
+      received_response["response"]["additionalInfo"].each_with_index do |add_info, index|
+        parsed_response["addition_info_#{index}"] = add_info
+      end
+    end
+    parsed_response
+  end
+
   def self.handle_success(result)
     # customer_bbps_name, :amount, :bill_date, :due_date, :bill_number, :bill_period, :convenience_fee,
     # :convenience_fee_desc, :late_payment_fee, :early_payment_fee
     OpenStruct.new(
         {
-            message_code: result['response.parsed']['message_code'],
             status: result['response.parsed']['status'],
             error_code: result['response.parsed']['error_code'],
             error_desc: result['response.parsed']['error_desc'],
             order_number: result['response.parsed']['order_number'],
             agent_institution_id: result['response.parsed']['agent_institution_id'],
-            channel_id: result['response.parsed']['channel_id'],
+            # channel_id: result['response.parsed']['channel_id'], #check this
             bbps_ref_id: result['response.parsed']['bbps_ref_id'],
-            agent_id: result['response.parsed']['agent_id'],
+            agent_id: "YB01YB28MOB519101711",
             customer_name: result['response.parsed']['customer_name'],
             customer_mobile: result['response.parsed']['customer_mobile'],
-            customer_email: result['response.parsed']['customer_email'],
-            customer_aadhar_no: result['response.parsed']['customer_aadhar_no'],
-            customer_pan_id: result['response.parsed']['customer_pan_id'],
-            channel: result['response.parsed']['channel'],
-            payment_mode: result['response.parsed']['payment_mode'],
+            channel: "MOB",
+            payment_mode: "NEFT",
             additional_field_1: result['response.parsed']['additional_field_1'],
             additional_field_2: result['response.parsed']['additional_field_2'],
             additional_field_3: result['response.parsed']['additional_field_3'],
@@ -293,7 +441,6 @@ class Bbps::BillPay < Bbps::Api
             additional_field_6: result['response.parsed']['additional_field_6'],
             additional_field_7: result['response.parsed']['additional_field_7'],
             additional_field_8: result['response.parsed']['additional_field_8'],
-            on_us_off_us_flag: result['response.parsed']['on_us_off_us_flag'],
             ccf2_charges: result['response.parsed']['ccf2_charges']
         }
     )

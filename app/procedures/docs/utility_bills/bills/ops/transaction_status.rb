@@ -25,7 +25,8 @@ class Docs::UtilityBills::Bills::Ops::TransactionStatus < Transactions::API
 
   def set_params(options, model:, params:, **)
     param = {
-        order_number: model.order_number
+        order_number: model.order_number,
+        biller_id: model.biller.biller_id
     }
 
     options[:transaction_status_params] = param
