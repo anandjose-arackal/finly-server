@@ -20,7 +20,7 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
 
   def update_and_submit
     # !bbps_bill.bill_validation_required? && (bbps_bill.open? || bbps_bill.retracted? || bbps_bill.rejected?) && bbps_bill.subscription.pocs.include?(user) && bbps_bill.autofetched
-    !bbps_bill.bill_validation_required? && (bbps_bill.open? || bbps_bill.retracted? || bbps_bill.rejected?) && bbps_bill.subscription.pocs.include?(user)
+    (bbps_bill.open? || bbps_bill.retracted? || bbps_bill.rejected?) && bbps_bill.subscription.pocs.include?(user)
   end
 
   # def submit
