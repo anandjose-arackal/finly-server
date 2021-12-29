@@ -238,8 +238,10 @@ json.payments do
         # json.payable_amount payment.get_payable_amount
         json.payable_amount precision_value payment.amount.value
 
-        if payment.parent_type == 'Invoice'
+
+        if payment.parent_type == 'Invoice' || payment.parent_type == 'PurchaseOrder'
           conversion_rate = payment&.parent_details.with_indifferent_access[:conversion_rate].to_f rescue 1
+          json.conversion_rate conversion_rate
           json.reporting_payable_amount payment&.amount&.value.to_f * conversion_rate.to_f
         end
         if payment.parent&.is_a?(BbpsBill)
