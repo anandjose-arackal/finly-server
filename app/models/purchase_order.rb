@@ -868,8 +868,9 @@ class PurchaseOrder < ApplicationRecord
         original_amount: precision_value(self.total_after_tax&.value),
         total_advance_amount: total_adv_amount,
         # advance_amount: precision_value(self.advance_amount&.value),
-        payable_advance_amount: precision_value(self.advance_amount&.value),
-        balance_due: precision_value(self.balance_amount&.value),
+        payable_advance_amount: payable_advance_amount,
+        reporting_payable_advance_amount: reporting_payable_advance_amount,
+        balance_due: balance_amount,
         procurement_id: self.procurement_id,
         tds_amount: user.po_form_enabled ? self.po_advance_tds_amount.to_f : self.advance_tds_amount&.value,
         tds: self.advance_tds_slab&.tds,
@@ -903,6 +904,18 @@ class PurchaseOrder < ApplicationRecord
   end
 
   # Public Method
+
+  def payable_advance_amount
+    user.po_form_enabled ? (self.po_requested_advance_amount.to_f - self.po_advance_tds_amount.to_f) : precision_value(self.advance_amount&.value)
+  end
+
+  def reporting_payable_advance_amount
+    user.po_form_enabled ? (self.payable_advance_amount * self.conversion_rate) : 0
+  end
+
+  def balance_amount
+    user.po_form_enabled ? precision_value(self.po_balance_due) : precision_value(self.balance_amount&.value)
+  end
 
   def process_line_item_calculation(skip_adv_calculation = false)
     calculate_line_items(skip_adv_calculation)
