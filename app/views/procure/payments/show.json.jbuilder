@@ -169,6 +169,8 @@ else
     json.net_amount precision_value payment.amount&.value
     json.roundoff_amount 0
     json.balance_due payment.amount&.value
+    json.base_currency parent.base_currency
+    json.reporting_currency parent.reporting_currency
     if parent.present?
       case parent.class.name
       when 'PurchaseOrder'
@@ -188,8 +190,6 @@ else
           json.paid_amount parent.po_requested_advance_amount.to_f.round(2)
           json.remaining_amount (parent.po_balance_due.to_f - parent.po_requested_advance_amount.to_f.round(2))
           json.reporting_remaining_amount ((parent.po_balance_due.to_f - parent.po_requested_advance_amount.to_f.round(2)) * parent.conversion_rate)
-          json.base_currency parent.base_currency
-          json.reporting_currency parent.reporting_currency
         end
       end
     end
