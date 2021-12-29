@@ -224,8 +224,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       # this way the user knows how much was paid and how much he has to adjust in new invoice
       if self.previous_invoices.present?
          # if last_invoice.po_prev_adjusted_advance == last_invoice.po_advance
-
-        self.last_invoice = self.previous_invoices.last
+        self.last_invoice = self.previous_invoices.first
         self.total_adjusted_advance = self.last_invoice.po_prev_adjusted_advance.to_i + self.last_invoice.po_adjusted_advance&.value&.to_i
         self.po_prev_adjusted_advance = total_adjusted_advance
         self.po_advance = ( self.advance.present? ) ? self.advance.value : nil
