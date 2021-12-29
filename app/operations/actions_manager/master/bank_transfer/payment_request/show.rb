@@ -177,7 +177,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
       return false
     end
 
-    unless bank_payment_request.base_currency_id == Currency.id_for('INR') && bank_payment_request.reporting_currency_id == Currency.id_for('INR')
+    if bank_payment_request.base_currency_id != Currency.id_for('INR') && bank_payment_request.reporting_currency_id != Currency.id_for('INR')
       return false
     end
 
