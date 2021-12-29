@@ -63,6 +63,12 @@ json.summary do
   json.is_domestic @result.bank_payment_request.is_domestic
 
   json.reporting_currency_code @result.bank_payment_request.reporting_currency.country_code rescue 'INR'
+
+  if @result.bank_payment_request.payments.first&.parent_type == 'PurchaseOrder'
+    json.base_currency_code       @result.bank_payment_request.payments.first&.parent&.base_currency&.country_code
+    json.reporting_currency_code  @result.bank_payment_request.payments.first&.parent&.reporting_currency&.country_code
+    json.base_currency_id         @result.bank_payment_request.payments.first&.parent&.base_currency_id
+  end
   # json.reporting_currency_code @result.user.company.reporting_currency_code
 end
 
