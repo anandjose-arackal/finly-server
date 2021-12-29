@@ -435,7 +435,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
            can_editable_be_changed: false, can_visible_be_changed: false,
            computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_advance_amount])
 
-    date :advance_scheduled_date, label: "Scheduled Date", editable: true, visible: true, required: true
+    date :advance_scheduled_date, label: "Scheduled Date", editable: false, visible: true, required: true
     lookup :advance_amount_status_id, label: 'Status', editable: false, visible: true,
            can_editable_be_changed: false, can_visible_be_changed: false, choices_scope: Choices[:lookup].('advance_amount_statuses'), 
            default_value: AdvanceAmountStatus.id_for(:new)
@@ -470,7 +470,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
   validation validation_id: "Order Date Cannot be Later than Delivery Date" do
     reference 'delivery_date'
     error_message "Order Date Cannot be Later than Delivery Date"
-    rule Rules::Builder['delivery_date'].lt(entity: "created_at")
+    rule Rules::Builder['delivery_date'].lt(entity: "created_at").and(Rules::Builder[:base_currency_id].not_eq(entity: "reporting_currency_id"))
   end
 
   validation validation_id: "Items > Item net amount cannot be less than 0" do
@@ -604,7 +604,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
 
   condition condition_id: "Hide Roundoff for different currency" do
     reference :entity, 'items_summary.po_roundoff_amount'
-    rule Rules::Builder[:base_currency_id].not_eq(entity: "reporting_currency_id")
+    rule Rules::Builder[:base_currency_id].not_eq(entity: "reporting_currency_id").and(Rules::Builder[:base_currency_id].not_eq(value: Currency.id_for('INR')))
     action :visible, false
   end
 
