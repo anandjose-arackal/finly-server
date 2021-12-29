@@ -895,7 +895,10 @@ class PurchaseOrder < ApplicationRecord
         },
         base_currency: get_base_currency,
         reporting_currency: get_reporting_currency,
-        pr_forms_enabled: self.user.purchase_request_form_enabled
+        pr_forms_enabled: self.user.purchase_request_form_enabled,
+        non_po_invoice_form_enabled: forms_enabled
+        # todo: this flag is used to show reporting currency values in payment, change when fixed in FE
+
         # balance_due: {
         #   value: precision_value(self.balance_amount&.value),
         #   id: self.balance_amount&.id,
