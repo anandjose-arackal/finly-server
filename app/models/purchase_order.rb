@@ -871,6 +871,7 @@ class PurchaseOrder < ApplicationRecord
         payable_advance_amount: payable_advance_amount,
         reporting_payable_advance_amount: reporting_payable_advance_amount,
         balance_due: balance_amount,
+        conversion_rate: self.conversion_rate,
         procurement_id: self.procurement_id,
         tds_amount: user.po_form_enabled ? self.po_advance_tds_amount.to_f : self.advance_tds_amount&.value,
         tds: self.advance_tds_slab&.tds,
