@@ -870,7 +870,7 @@ class PurchaseOrder < ApplicationRecord
         # advance_amount: precision_value(self.advance_amount&.value),
         payable_advance_amount: payable_advance_amount,
         reporting_payable_advance_amount: reporting_payable_advance_amount,
-        balance_due: balance_amount,
+        balance_due: balance_due,
         conversion_rate: self.conversion_rate,
         procurement_id: self.procurement_id,
         tds_amount: user.po_form_enabled ? self.po_advance_tds_amount.to_f : self.advance_tds_amount&.value,
@@ -895,7 +895,8 @@ class PurchaseOrder < ApplicationRecord
         },
         base_currency: get_base_currency,
         reporting_currency: get_reporting_currency,
-        pr_forms_enabled: self.user.purchase_request_form_enabled
+        pr_forms_enabled: self.user.purchase_request_form_enabled,
+        non_po_invoice_form_enabled: forms_enabled
         # balance_due: {
         #   value: precision_value(self.balance_amount&.value),
         #   id: self.balance_amount&.id,
@@ -914,7 +915,7 @@ class PurchaseOrder < ApplicationRecord
     user.po_form_enabled ? (self.payable_advance_amount * self.conversion_rate) : 0
   end
 
-  def balance_amount
+  def balance_due
     user.po_form_enabled ? precision_value(self.po_balance_due) : precision_value(self.balance_amount&.value)
   end
 
