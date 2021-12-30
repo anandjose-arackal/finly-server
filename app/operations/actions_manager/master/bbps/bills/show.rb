@@ -40,7 +40,7 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
   end
 
   def approve
-    !bbps_bill.bill_validation_required? && bbps_bill.awaiting_approval? && bbps_bill.get_reviewers.include?(user)
+    bbps_bill.awaiting_approval? && bbps_bill.get_reviewers.include?(user)
   end
 
   def reject
