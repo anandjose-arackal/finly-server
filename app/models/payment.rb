@@ -1162,7 +1162,8 @@ include Searchkick::Api
         tax_rates: self.purchase_order.company.tax_rates,
         #gst_type_id: {value: self.purchase_order.gst_type_id, editable: false},
         payment_amount: {value: self.amount_value, editable: true}, #Payable Amount
-        balance_due: {value: self.amount&.value, editable: false} # Invoice AMOUNT
+        balance_due: {value: self.amount&.value, editable: false}, # Invoice AMOUNT
+        invoice_net_total_amount: {value: self.amount&.value, editable: false}
     }
   end
 
