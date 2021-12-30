@@ -1,6 +1,6 @@
 class PaymentFiles::Formats::HsbcBank::Process < PaymentFiles::Formats::BaseFormat
 
-  attr_accessor :payment_requests, :debit_account_number, :second_email, :third_email
+  attr_accessor :payment_requests, :debit_account_number, :second_email, :third_email, :entity_name
 
   def pre_validate
     return if has_errors?
@@ -12,6 +12,7 @@ class PaymentFiles::Formats::HsbcBank::Process < PaymentFiles::Formats::BaseForm
     self.debit_account_number = self.options[:debit_account_number]
     self.second_email = self.options[:second_email]
     self.third_email = self.options[:third_email]
+    self.entity_name = self.options[:entity_name]
   end
 
   def validate
@@ -25,6 +26,7 @@ class PaymentFiles::Formats::HsbcBank::Process < PaymentFiles::Formats::BaseForm
   def process
     self.headers = retrieve_hsbc_headers
     content = []
+    content << retrieve_second_headers
     self.payment_file_data.each do |payment|
       content << [
           "NEFT",
@@ -61,12 +63,15 @@ class PaymentFiles::Formats::HsbcBank::Process < PaymentFiles::Formats::BaseForm
   end
 
   def retrieve_hsbc_headers
-    ["Transaction Type",	"Reference Number",	"Dr Account No",	"Payment Narration",	"Beneficiary Name",	"Bene Add 1",
-     "Bene Add 2",	"Bene Add 3",	"Payment Location",	"Cheque No",	"Value Date",	"Amount",	"Print Branch Location",
-     "Email Add-1",	"Email Add-2",	"Email Add-3",	"FreeText",	"NA",	"NA",	"NA",	"NA","NA",	"Bene Bank Account #",
-     "Bene Bank IFSC /  BANK Code",	"NA",	"Deliver To",	",Ordering Party Name",	"Ordering_Party Add1",	"Ordering_Party Add2",
-     "Ordering_Party Add3",	",Ordering_party_Account",	"BANK_NAME",	"Bank_to_Bank_Info"]
+    ["Customer Name:#{entity_name}"]
   end
 
+  def retrieve_second_headers
+    ["Transaction Type",	"Reference Number",	"Dr Account No",	"Payment Narration",	"Beneficiary Name",	"Bene Add 1",
+    "Bene Add 2",	"Bene Add 3",	"Payment Location",	"Cheque No",	"Value Date",	"Amount",	"Print Branch Location",
+    "Email Add-1",	"Email Add-2",	"Email Add-3",	"FreeText",	"NA",	"NA",	"NA",	"NA","NA",	"Bene Bank Account #",
+    "Bene Bank IFSC /  BANK Code",	"NA",	"Deliver To",	",Ordering Party Name",	"Ordering_Party Add1",	"Ordering_Party Add2",
+    "Ordering_Party Add3",	",Ordering_party_Account",	"BANK_NAME",	"Bank_to_Bank_Info"]
+  end
 
 end
