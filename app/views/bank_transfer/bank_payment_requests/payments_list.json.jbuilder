@@ -226,6 +226,9 @@ json.payments do
         json.roundoff_amount 0
         json.balance_due payment.amount&.value
         json.invoice_net_total_amount precision_value payment.amount&.value
+        json.base_currency payment.parent&.base_currency
+        json.reporting_currency payment.parent&.reporting_currency
+        json.forms_enabled parent.forms_enabled
       end
     end
 
