@@ -12,6 +12,10 @@ json.name payment.receiving_account&.name
 json.account_number payment.receiving_account.account_number
 json.base_currency payment.bank_payment_request.base_currency
 json.reporting_currency payment.company.reporting_currency
+if payment.parent_type == 'PurchaseOrder'
+  json.base_currency payment.parent.base_currency
+  json.reporting_currency payment.parent.reporting_currency
+end
 json.disabled payment.receiving_account&.disabled
 json.ifsc payment.receiving_account.ifsc
 json.swift_code payment.receiving_account.swift_code
