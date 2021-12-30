@@ -177,8 +177,9 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
       return false
     end
 
-    if bank_payment_request.base_currency_id != Currency.id_for('INR') && bank_payment_request.reporting_currency_id != Currency.id_for('INR')
-      return false
+    if bank_payment_request.payments.first.present? && bank_payment_request.payments.first.parent_type == 'PurchaseOrder'
+      po = bank_payment_request.payments.first.parent
+      return false if po.reporting_currency_id != Currency.id_for('INR') || po.base_currency_id = Currency.id_for('INR')
     end
 
     if user.vendor_payments_admin?
