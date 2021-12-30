@@ -1154,6 +1154,7 @@ include Searchkick::Api
         discount: "",
         tax: "",
         tds: {tds_slab_id: self.purchase_order.advance_tds_slab_id, tds_amount: tds_amount, editable: true, tds_slab_rate: self.purchase_order&.advance_tds_slab&.tds},
+        tds_applicable_amount: tds_amount,
         advance_amount: "", # Advance
         freight_amount: "",
         net_payable_amount: "",
