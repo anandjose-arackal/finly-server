@@ -385,7 +385,7 @@ class Bbps::BillPay < Bbps::Api
     
     parsed_response["error_code"] = received_response["response"]["complianceRespCd"]
     parsed_response["error_desc"] = received_response["response"]["complianceReason"]
-    return Failure("Invalid response") unless received_response["status"] == "SUCCESS"
+    return Failure(received_response["response"]["complianceReason"].to_s + " refID: " + received_response["response"]["txnReferenceId"].to_s) unless received_response["status"] == "SUCCESS"
     return Failure("Invalid response") unless received_response&.dig("response").present?
 
     parsed_response["status"] = received_response["status"]
