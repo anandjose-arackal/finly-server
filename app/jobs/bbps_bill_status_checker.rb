@@ -19,8 +19,8 @@ class BbpsBillStatusChecker < BaseJob
           ActsAsTenant.with_tenant payment.company do
             bill = payment.parent
             next unless bill.present? && bill.class.name == "BbpsBill"
-            order_number = bill.order_number
             bank_transaction = payment.bbps_bank_transaction
+            order_number = bank_transaction.order_number
               params = {
                   order_number: order_number,
                   biller_id: bill.biller.biller_id,

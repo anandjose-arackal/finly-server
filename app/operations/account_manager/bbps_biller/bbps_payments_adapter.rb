@@ -70,10 +70,12 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         quick_pay: bank_transaction.quick_pay,
         order_number: bill.order_number,
         bbps_ref_id: bill.api_response.last["bbps_ref_id"],
-        convenience_fee: bill.convenience_fee.value
+        convenience_fee: get_convenience_fee(bill)
     }
 
     params.merge!(customer_params(bill.subscription))
+
+    puts "BillPay:Params: #{params}"
 
     Bbps::BillPay.call_async({params: params, current_user: payment.initiating_user}, {wait: true, wait_timeout: 180 }) do |op|
       op.success do |result|
@@ -83,7 +85,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         # a 200 OK response
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:processing),
                                 bbps_ref_id: result.bbps_ref_id,
-                                order_number: bill.order_number)
+                                order_number: result.order_number)
 
         # Add log to api response in bill
         api_response = bill.api_response.is_a?(Array) ? bill.api_response : []
@@ -108,7 +110,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         payment.system_messages.destroy_all
         if result["error_desc"].present?
           self.errors << result['error_desc']
-          payment.system_messages.build(content: result['error_desc'], system_message_type_id: SystemMessageType.id_for(:error)).save
+          payment.system_messages.build(content: result.inspect.to_s, system_message_type_id: SystemMessageType.id_for(:error)).save
         else
           self.errors << 'Unable to reach bbps. Please try again later'
           payment.system_messages.build(content: 'Unable to reach bbps. Please try again later', system_message_type_id: SystemMessageType.id_for(:error)).save
@@ -119,7 +121,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         puts "Failure:Result: #{result}"
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:possible_failure))
         payment.update(payment_status_id: PaymentStatus.id_for(:possible_failure))
-        payment.system_messages.build(content: result[:error_desc], system_message_type_id: SystemMessageType.id_for(:error)).save
+        payment.system_messages.build(content: result.inspect.to_s, system_message_type_id: SystemMessageType.id_for(:error)).save
         
         # result["errors"]&.values&.flatten&.each do |error|
         #   # add_error_message( payment, error )
@@ -217,6 +219,14 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
     bill = payment.parent
     order_number = bill.order_number || generate_order_number
     order_number
+  end
+
+  def get_convenience_fee(bill)
+    if bill.convenience_fee.present?
+      return bill.convenience_fee.value
+    else
+      return 0
+    end
   end
 
   def generate_order_number
