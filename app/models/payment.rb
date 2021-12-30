@@ -983,8 +983,8 @@ include Searchkick::Api
       custom_field_config: get_custom_field_config(document_type),
       payment_id: self.id,
       attachment_details: get_attachment_details(document_type),
-      base_currency: self.bank_payment_request.base_currency,
-      reporting_currency: self.company.reporting_currency,
+      base_currency: self.parent_type == 'PurchaseOrder' ? self.parent.base_currency : self.bank_payment_request.base_currency,
+      reporting_currency: self.parent_type == 'PurchaseOrder' ? self.parent.reporting_currency : self.company.reporting_currency,
       is_domestic: self.bank_payment_request&.is_domestic,
       non_po_invoice_form_enabled: (self.parent&.forms_enabled rescue false)
     }
@@ -1147,6 +1147,7 @@ include Searchkick::Api
     tds_slabs = TdsSlabs::Index.(self.purchase_order.user, parameters).tds_slabs rescue nil
     total_amount = self.purchase_order.user.po_form_enabled ? precision_value(self.purchase_order&.po_requested_advance_amount&.to_f) : precision_value(self.purchase_order&.requested_advance_amount&.value)
     tds_amount = self.purchase_order.user.po_form_enabled ? self.purchase_order&.po_advance_tds_amount&.to_f : self.purchase_order&.advance_tds_amount&.value
+    conversion_rate = self.purchase_order.conversion_rate rescue 1
     {
         total_amount: {value: total_amount, editable: false}, # TOTAL
         inclusive_of_taxes: "",
@@ -1164,7 +1165,9 @@ include Searchkick::Api
         payment_amount: {value: self.amount_value, editable: true}, #Payable Amount
         balance_due: {value: self.amount&.value, editable: false}, # Invoice AMOUNT
         invoice_net_total_amount: {value: (total_amount - tds_amount), editable: false},
-        invoice_balance_due: {value: (total_amount - tds_amount), editable: false}
+        reporting_invoice_net_total_amount: {value: (total_amount - tds_amount)*conversion_rate, editable: false},
+        invoice_balance_due: {value: (total_amount - tds_amount), editable: false},
+        reporting_invoice_balance_due: {value: (total_amount - tds_amount)*conversion_rate, editable: false}
     }
   end
 
