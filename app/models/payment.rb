@@ -1163,7 +1163,8 @@ include Searchkick::Api
         #gst_type_id: {value: self.purchase_order.gst_type_id, editable: false},
         payment_amount: {value: self.amount_value, editable: true}, #Payable Amount
         balance_due: {value: self.amount&.value, editable: false}, # Invoice AMOUNT
-        invoice_net_total_amount: {value: (total_amount - tds_amount), editable: false}
+        invoice_net_total_amount: {value: (total_amount - tds_amount), editable: false},
+        invoice_balance_due: {value: (total_amount - tds_amount), editable: false}
     }
   end
 
