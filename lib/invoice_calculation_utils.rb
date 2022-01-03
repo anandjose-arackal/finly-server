@@ -70,8 +70,8 @@ class InvoiceCalculationUtils
             unless invoice.forms_enabled
               self.tds_amount = [(self.tds_amount - purchase_order.advance_tds_amount&.value.to_f), 0].max
             end
-            if invoice.forms_enabled
-              self.balance_due_amount = [(self.balance_due_amount + purchase_order.po_advance_tds_amount.to_f - self.invoice.po_adjusted_advance&.value.to_f), 0].max
+            if self.invoice.forms_enabled
+              self.balance_due_amount = [(self.balance_due_amount + purchase_order.po_advance_tds_amount.to_f - self.invoice.adjusted_po_advance_payable_amount.to_f), 0].max
             else
               self.balance_due_amount = [(self.balance_due_amount + purchase_order.advance_tds_amount&.value.to_f - self.invoice.po_adjusted_advance&.value.to_f), 0].max
             end
