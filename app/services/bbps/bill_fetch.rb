@@ -321,12 +321,11 @@ class Bbps::BillFetch < Bbps::Api
     parsed_response["bbps_ref_id"] = received_response["response"]["refId"]
     parsed_response["ref_no"] = received_response["response"]["refId"]
     parsed_response["responseCode"] = received_response["response"]["responseCode"]
-    parsed_response["amount"] = received_response["response"]["billerResponse"]["amount"]
     parsed_response["due_date"] = received_response["response"]["billerResponse"]["dueDate"]
     parsed_response["bill_number"] = received_response["response"]["billerResponse"]["billNumber"]
     parsed_response["bill_date"] = received_response["response"]["billerResponse"]["billDate"]
     parsed_response["bill_period"] = received_response["response"]["billerResponse"]["billPeriod"]
-    parsed_response["amount"] = received_response["response"]["billerResponse"]["amount"] + "00" #change this
+    parsed_response["amount"] = (received_response["response"]["billerResponse"]["amount"].to_f * 100).to_s #change this
     parsed_response["convenience_fee"] = received_response["response"]["billerResponse"]["CustConvFee"]
     parsed_response["convenience_fee_desc"] = received_response["response"]["billerResponse"]["CustConvDesc"]
     parsed_response["biller_id"] = biller_id
