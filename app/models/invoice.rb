@@ -1914,7 +1914,9 @@ class Invoice < ApplicationRecord
   # Syncs amounts from new forms structure to legacy amounts table
   def sync_amounts
     if forms_enabled
-      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(RequestStore.store[:params], nil, self)
+      # calculate the advance and adjusted tds
+      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(RequestStore.store[:params], nil, self) if self.advance_amount_required
+      
       self.skip_callback = true
       base_currency_id = get_base_currency&.id
 
