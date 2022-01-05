@@ -130,7 +130,8 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
     lookup :policy_id, choices_scope: Choices[:lookup].('policies', permissions: [:po_invoice_initiator]), required: true, editable: false
     lookup :department_id, label: "Department", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('departments', assignments: { form: true }) #, editable: false, visible: false
     lookup :cost_center_id, label: "Cost Center", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('cost_centers')
-    dropdown :discount_type_id, label: "Discount Type", editable: false, can_editable_be_changed: false, visible: true, required: true, choices_scope: Choices[:list].({ id: 1, name: 'Percentage' }, { id: 2, name: 'Amount' }), default_value: 1
+    dropdown :discount_type_id, label: "Discount Type", editable: false, can_editable_be_changed: false, visible: false, required: true, choices_scope: Choices[:list].({ id: 1, name: 'Percentage' }, { id: 2, name: 'Amount' }), default_value: 1
+    text :discount_type_text, label: "Discount Type", editable: false, visible: true, can_editable_be_changed: false
 
     dropdown :tax_type_id, label: "Tax Type", editable: true, visible: true, choices_scope: Choices[:list].(*TaxType.all.map { |v| { id: v.id, name: v.name } })
     
