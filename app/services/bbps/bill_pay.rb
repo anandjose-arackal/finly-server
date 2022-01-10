@@ -346,7 +346,7 @@ class Bbps::BillPay < Bbps::Api
     message["agentDetails"]["deviceTags"] << { "name" => "APP", "value" => "FINLY" }
     message["agentDetails"]["deviceTags"] << { "name" => "INITIATING_CHANNEL", "value" => "MOB" }
     message["amountDetails"] = {}
-    message["amountDetails"]["amount"] = amount.to_i
+    message["amountDetails"]["amount"] = amount.to_f
     message["amountDetails"]["currency"] = 356 #INR
     message["amountDetails"]["custConvFee"] = params["convenience_fee"].nil?? 0 : params["convenience_fee"]
     message["amountDetails"]["couCustConvFee"] = 0
