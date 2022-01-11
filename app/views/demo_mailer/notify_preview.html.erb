@@ -10,7 +10,7 @@
     <h4>Company: <%= @preview_registration.company %></h4>
     <br/>
   <% if @sales_person %>
-    <h3>URL (page from which user sign up): <%= @preview_registration.url %></h3>
+    <h3>URL (page from which user sign up): <%= @preview_registration.url || @preview_registration.referrer %></h3>
   <% end %>
 <% end %>
 
