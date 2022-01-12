@@ -77,9 +77,6 @@ class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOr
           if k == :form_custom_fields
             custom_field = FormCustomField.new(po.dup.attributes.except([:id, :uuid]))
             custom_field[:document_id] = self.duplicate_po.id
-            obj.where(entity_type: 'attachment').each do |entity|
-              custom_field.attachments += entity.attachments.map{|attachment| attachment.dup.except!(:id)}
-            end
             self.duplicate_po.form_custom_fields << custom_field
             next
           end
