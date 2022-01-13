@@ -6,7 +6,41 @@ class Bbps::TransactionStatus < Bbps::Api
     end
   end
 
-  path "getTxnStatus"
+  path "txnStatusCheck"
+  url 'https://yesbbps.transxt.in:9443/portal/service/npciservice'
+  header "AUTH","/WT/ijy7z5abJBM/LAwbmA=="
+
+  # path "txnStatusCheck"
+  # url 'http://180.179.170.6:1012/portal/service/npciservice'
+  # header "AUTH","7ljbVcKc1Ka5tpaGAyAvR/vNDcTzk1C+BRhUdM9zB3s="
+
+  def self.build_matcher(options, result)
+    Dry::Matcher.new(
+        success: Dry::Matcher::Case.new(
+            match: -> (result) {p "Matcher:Success", result; result['response.parsed']&.dig('status') == 'SUCCESS'},
+            resolve: -> (result) { handle_success(result) }
+        ),
+        error: Dry::Matcher::Case.new(
+            match: -> (result) {p "Matcher:Error", result; result['response.parsed']&.dig('status') == 'FAILURE'},
+            resolve: -> (result) { handle_error(result['response.parsed']) }
+        ),
+        failure: Dry::Matcher::Case.new(
+            match: -> (result) {p "Matcher:Failure", result; true},
+            resolve: -> (result) {result}
+        )
+    )
+  end
+
+  def body
+    message = generate_message
+    #Rails.logger.info("Raw message :: #{message.to_json}")
+    encoded_message = Base64.strict_encode64(message)
+    encrypted_message = encrypt(encoded_message)
+    #Rails.logger.info("Encrypted message :: #{encrypted_message}")
+    body = {request: encrypted_message}
+    log_generator.merge({request_raw_message: message})
+    body
+  end
 
   # Message Code(B4000)|Ref No| Agent institution Id | Channel Id|Agent Id | Complaint Type|
   # Order No|Mobile No| From Date|To Date|
@@ -71,48 +105,46 @@ class Bbps::TransactionStatus < Bbps::Api
       ]
   )
 
-  def self.build_matcher(options, result)
-    Dry::Matcher.new(
-      success: Dry::Matcher::Case.new(
-        match: -> (result) {
-          if result['response.parsed']&.dig('status') == 'Y'
-            parsed_response = result['response.parsed'] || {}
-            if parsed_response['status'] == 'Y' and parsed_response['transaction_details'].present?
-              transaction_details = JSON.parse(parsed_response['transaction_details'])
-              transaction_details&.dig('TxnStatusComplainResp', 'txnList', 'txnDetail')&.first&.dig('txnStatus') == 'SUCCESS'
-            else
-              false
-            end
-          else
-            false
-          end
-        },
-        resolve: -> (result) { handle_success(result) }
-      ),
-      error: Dry::Matcher::Case.new(
-        match: -> (result) {
-          if result['response.parsed']&.dig('status') == 'N'
-            true
-          elsif result['response.parsed']&.dig('status') == 'Y'
-            parsed_response = result['response.parsed'] || {}
-            if parsed_response['status'] == 'Y' and parsed_response['transaction_details'].present?
-              transaction_details = JSON.parse(parsed_response['transaction_details'])
-              transaction_details&.dig('TxnStatusComplainResp', 'txnList', 'txnDetail')&.first&.dig('txnStatus') == 'FAILURE'
-            else
-              false
-            end
-          else
-            false
-          end
-        },
-        resolve: -> (result) { handle_error(result['response.parsed']) }
-      ),
-      failure: Dry::Matcher::Case.new(
-        match: -> (result) { true },
-        resolve: -> (result) { result }
-      )
-    )
-  end
+  # def self.build_matcher(options, result)
+  #   Dry::Matcher.new(
+  #     success: Dry::Matcher::Case.new(
+  #       match: -> (result) {
+  #         if result['response.parsed']&.dig('status') == 'SUCCESS'
+  #           parsed_response = result['response.parsed'] || {}
+  #           if parsed_response['status'] == 'SUCCESS' and parsed_response['txn_date'].present?
+  #             transaction_details = parsed_response
+  #           else
+  #             false
+  #           end
+  #         else
+  #           false
+  #         end
+  #       },
+  #       resolve: -> (result) { handle_success(result) }
+  #     ),
+  #     error: Dry::Matcher::Case.new(
+  #       match: -> (result) {
+  #         if result['response.parsed']&.dig('status') == "FAILURE"
+  #           true
+  #         elsif result['response.parsed']&.dig('status') == "SUCCESS"
+  #           parsed_response = result['response.parsed'] || {}
+  #           if parsed_response['status'] == 'SUCCESS' and parsed_response['txn_date'].nil?
+  #             true
+  #           else
+  #             false
+  #           end
+  #         else
+  #           false
+  #         end
+  #       },
+  #       resolve: -> (result) { handle_error(result['response.parsed']) }
+  #     ),
+  #     failure: Dry::Matcher::Case.new(
+  #       match: -> (result) { true },
+  #       resolve: -> (result) { result }
+  #     )
+  #   )
+  # end
 
   def message_code
     'B4000'
@@ -125,6 +157,16 @@ class Bbps::TransactionStatus < Bbps::Api
   def order_number
     params[:order_number]
   end
+
+  def biller_id
+    params[:biller_id]
+  end
+
+  def bbps_ref_id
+    params[:bbps_ref_id]
+  end
+
+
 
   def self.handle_success(result)
     OpenStruct.new(result['response.parsed'])
@@ -159,11 +201,43 @@ class Bbps::TransactionStatus < Bbps::Api
   end
 
   def self.handle_error(data)
-    if data['error_desc'].downcase == 'success'
-      data['error_desc'] = "The payment was not accepted by the biller."
-    elsif data['error_desc'].downcase == 'must be filled'
-      data['error_desc'] = "The biller faced an error processing this payment. Please try again."
-    end
     data
   end
+
+  def generate_message
+    message = {}
+    message['billerId'] = biller_id
+    message['txnReferenceId'] = order_number  #order_number check this
+    message['xchangeId'] = 402 #fixed 
+    message.to_json
+  end
+
+  def parse_response(user, params, response)
+    #Rails.logger.info("Transaction status response:: #{response.inspect}")
+    message = JSON.parse(response.body)
+    # message = message.gsub('"[','[')
+    # message = message.gsub(']"',']')
+    # message = message.gsub('"{','{')
+    # message = message.gsub('}"','}')
+    # received_response = JSON.parse(message), for prod
+    #Rails.logger.info("Transaction status parsed response :: #{message.inspect}")
+
+    received_response = message
+    parsed_response = {}
+    parsed_response["error_code"] = received_response["response"]["complianceRespCd"]
+    parsed_response["error_desc"] = received_response["response"]["complianceReason"]
+    parsed_response["status"] = received_response&.dig("status")
+    return Failure("Invalid response") unless received_response["status"] == "SUCCESS"
+    return Failure("Invalid response") unless received_response&.dig("response").present?
+    return Failure("Error connecting with BBPS") if received_response&.dig("status")!= "SUCCESS"
+
+    parsed_response["bbps_ref_id"] = received_response["response"]["refId"]
+    parsed_response["ref_no"] = received_response["response"]["txnReferenceId"]
+    parsed_response["txn_date"] = received_response["response"]["billerResponse"]["billDate"]
+    parsed_response["bill_number"] = received_response["response"]["billerResponse"]["billNumber"]
+    
+    parsed_response
+  end
+
 end
+
