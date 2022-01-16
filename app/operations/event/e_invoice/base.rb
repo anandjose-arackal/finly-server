@@ -184,7 +184,7 @@ class Event::EInvoice::Base < Event::SetNotifier
     end
 
     def to
-      self.user.email
+      "sandeep.shankar@lockstep.io"
     end
 
     def subject

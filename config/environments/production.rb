@@ -1,4 +1,7 @@
 Rails.application.configure do
+  # Prepare the ingress controller used to receive mail
+  # config.action_mailbox.ingress = :relay
+
   # Settings specified here will take precedence over those in config/application.rb.
   # Code is not reloaded between requests.
   config.cache_classes = true
@@ -13,6 +16,7 @@ Rails.application.configure do
   config.active_record.enable_retry = true
   config.active_record.execution_tries = 5 # times
   config.active_record.execution_retry_wait = 1.5 # sec
+  config.action_mailbox.ingress = :postmark
 
   # config.logstasher.enabled = true
   # config.logstasher.field_renaming = {

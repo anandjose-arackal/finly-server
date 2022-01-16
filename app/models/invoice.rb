@@ -277,6 +277,8 @@ class Invoice < ApplicationRecord
   has_many :payments
   has_many :successful_payments, -> { successful }, class_name: 'Payment'
 
+  has_many :email_approvals, as: :documentable
+
   has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
   has_many :items, class_name: "InvoiceLineItem", as: :parent
   has_many :line_items, class_name: "InvoiceLineItem", as: :parent

@@ -30,7 +30,7 @@ class Event::EInvoice::Submit < Event::EInvoice::Base
     #   end
     # end
     # users
-    self.invoice.affected_users(:submit)
+    self.invoice.affected_users(:submit) 
   end
 
   # def get_token(user)
@@ -76,10 +76,11 @@ class Event::EInvoice::Submit < Event::EInvoice::Base
   end
 
   def mailer_body(user)
+    reply_id = self.invoice.email_approvals&.last&.approval_uuid
     if user.id == invoice.created_by.id
-      "Congratulations, you have successfully submitted the invoice : #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id})"
+      "Congratulations, you have successfully submitted the invoice : #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id}) reply-to id : #{reply_id}.approval.test.finly.email"
     else
-      "#{self.invoice.created_by.name} has submitted invoice: #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id}) and is currently awaiting your approval."
+      "#{self.invoice.created_by.name} has submitted invoice: #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id}) reply-to id : #{reply_id}.approval.test.finly.email and is currently awaiting your approval."
     end
   end
 

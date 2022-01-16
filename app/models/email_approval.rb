@@ -1,0 +1,22 @@
+#  t.string "approval_uuid"
+# t.integer "email_approval_status_id"
+# t.datetime "deleted_at"
+# t.integer "company_id"
+# t.datetime "created_at", precision: 6, null: false
+# t.datetime "updated_at", precision: 6, null: false
+# t.string "documentable_type"
+# t.bigint "documentable_id"
+
+
+class EmailApproval < ApplicationRecord
+  belongs_to :email_approval_status, optional: true
+  belongs_to :status, optional: true, foreign_key: :email_approval_status_id, class_name: 'EmailApprovalStatus'
+  belongs_to :documentable, polymorphic: true
+
+  def self.generate_email_approval(document_id, document_type_class)
+    new_approval = self.new(approval_uuid: SecureRandom.uuid, documentable_id: document_id, documentable_type: EmailApprovalDocumentType.name_for(document_type_class), email_approval_status_id: EmailApprovalStatus.id_for(:pending))
+    new_approval.save!
+    new_approval
+  end
+
+end
