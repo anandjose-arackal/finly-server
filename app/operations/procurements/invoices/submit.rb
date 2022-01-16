@@ -95,6 +95,7 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
     update_agreement_available_limit
     role_id = self.workflow_output[:role_id]
     email_approval = EmailApproval.generate_email_approval(invoice.id, invoice.class.to_s)
+    Rails.logger.info "generating::email:: #{email_approval.inspect} "
     Event::EInvoice::Submit.(user, {invoice: invoice, workflow_output: workflow_output, role_id: role_id, email_approval: email_approval})
     # Email to vendor that invoice is generated when the invoice is approved/auto_approved
     # Event::EInvoice::VendorMail.(user, invoice: invoice, workflow_output: workflow_output) if self.invoice.approved? || self.invoice.auto_approved?
