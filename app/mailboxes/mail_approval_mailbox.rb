@@ -5,10 +5,28 @@ class MailApprovalMailbox < ApplicationMailbox
 
   def process
     return if @user.nil?
-    body = mail.decoded.split("\n")[0] #check approve
-    comment =  mail.decoded.split("\n")[1] #check nil
-    approval_mail_uid = mail.in_reply_to
-    @result = Procurements::Invoices::Approve.(@user, params)
+    approval_uuid =  mail.recipients_addresses.to_sentence.split(".approval")[0]
+    email_approval = EmailApproval.where(approval_uuid: approval_uuid)&.first
+    if email_approval.nil?
+      Rails.logger.info "Email approval not found"
+      return false
+    end
+    body = mail.decode_body.split("\n")
+    if body.nil?
+      Rails.logger.info "Body is nil"
+      return false
+    end
+    params = {id: email_approval.documentable_id}
+    if email_approval.status.name != "pending"
+      Rails.logger.info "Email approval is not in pending state"
+      return false
+    elsif body[0].downcase == "approve" && email_approval.status.name == "pending"
+      @result = Procurements::Invoices::Approve.(@user, params)
+      email_approval.update(email_approval_status_id: EmailApprovalStatus.id_for(:approved))
+    elsif body[0].downcase == "reject" && email_approval.status.name == "pending"
+      @result = Procurements::Invoices::Reject.(@user, params)
+      email_approval.update(email_approval_status_id: EmailApprovalStatus.id_for(:rejected))
+    end
   end
 
 
