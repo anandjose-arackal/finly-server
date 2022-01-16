@@ -76,8 +76,8 @@ class Event::EInvoice::Submit < Event::EInvoice::Base
   end
 
   def mailer_body(user)
-    Rails.logger.info "inside::mailer::body::reply-to id : #{reply_id}.approval.test.finly.email"
     reply_id = self.invoice.email_approvals&.last&.approval_uuid
+    Rails.logger.info "inside::mailer::body::reply-to id : #{reply_id}.approval.test.finly.email"
     if user.id == invoice.created_by.id
       "Congratulations, you have successfully submitted the invoice : #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id}) reply-to id : #{reply_id}.approval.test.finly.email"
     else
