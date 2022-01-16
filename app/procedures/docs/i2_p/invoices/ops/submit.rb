@@ -74,7 +74,7 @@ class Docs::I2P::Invoices::Ops::Submit < Transactions::API
     # budget_limit_validation( invoice )
     # update_agreement_available_limit
     role_id = options[:workflow_output][:role_id]
-    email_approval = EmailApproval.generate_email_approval(invoice.id, invoice.class.to_s)
+    email_approval = EmailApproval.generate_email_approval(reviewal_document.id, reviewal_document.class.to_s)
     Rails.logger.info "inside::mailer::body::reply-to id : #{email_approval}.approval.test.finly.email"
     Event::EInvoice::Submit.(current_user, {invoice: reviewal_document,
                                             workflow_output: options[:workflow_output], role_id: role_id})
