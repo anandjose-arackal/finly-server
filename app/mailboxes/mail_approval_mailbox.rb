@@ -6,9 +6,10 @@ class MailApprovalMailbox < ApplicationMailbox
   def process
     return if @user.nil?
     approval_uuid =  mail.recipients_addresses.to_sentence.split(".approval")[0]
+    Rails.logger.info "Email::Approval::processing methods : #{mail.methods}"
     email_approval = EmailApproval.where(approval_uuid: approval_uuid)&.first
     if email_approval.nil?
-      Rails.logger.info "Email approval not found"
+      Rails.logger.info "Email approval not found for uuid::#{mail.recipients_addresses.to_sentence}"
       return false
     end
     body = mail.decode_body.split("\n")
@@ -18,7 +19,7 @@ class MailApprovalMailbox < ApplicationMailbox
     end
     params = {id: email_approval.documentable_id}
     invoice = Invoice.find(email_approval.documentable_id)
-    Rails.logger.info "Email::Approval::processing methods : #{mail.methods}"
+    
     Rails.logger.info "Email::Approval::processing mail::decode::string : #{mail.decode_body.to_s}"
     Rails.logger.info "Email::Approval::processing mail::decode::inspect : #{mail.decode_body.to_s.downcase.include?("approve")}"
     if !invoice.processing?
