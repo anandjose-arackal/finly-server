@@ -23,7 +23,11 @@ class MailApprovalMailbox < ApplicationMailbox
     invoice = Invoice.find(email_approval.documentable_id)
     
     Rails.logger.info "Email::Approval::processing mail::decode::string : #{mail.decode_body.to_s}"
-    Rails.logger.info "Email::Approval::processing mail::decode::inspect : #{mail.decode_body.to_s.downcase.include?("approve")}"
+    Rails.logger.info "Email::Approval::processing mail::decode::inspect::approve : #{mail.decode_body.to_s.downcase.include?("approve")}"
+    Rails.logger.info "Email::Approval::processing mail::decode::inspect::reject : #{mail.decode_body.to_s.downcase.include?("reject")}"
+    
+    Rails.logger.info "Email::Approval::processing can::approve #{can_approve(invoice)}"
+    Rails.logger.info "Email::Approval::processing can::approve #{can_reject(invoice)}"
     if !invoice.processing?
       Rails.logger.info "Invoice is not in processing state"
       return false
@@ -38,15 +42,11 @@ class MailApprovalMailbox < ApplicationMailbox
   end
 
   def can_approve(invoice)
-    if invoice.is_po_reviewing_user?(@user)
-      invoice.processing? && user_in_level?(invoice)
-    end
+    invoice.processing? && user_in_level?(invoice)
   end
 
   def can_reject(invoice)
-    if invoice.is_po_reviewing_user?(@user)
-      invoice.processing? && user_in_level?(invoice)
-    end
+    invoice.processing? && user_in_level?(invoice)
   end
 
   def user_in_level?(invoice)
