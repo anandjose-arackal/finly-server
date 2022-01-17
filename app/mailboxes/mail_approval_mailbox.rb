@@ -5,11 +5,12 @@ class MailApprovalMailbox < ApplicationMailbox
 
   def process
     return if @user.nil?
-    approval_uuid =  mail.recipients_addresses.to_sentence.split(".approval")[0]
+    approval_uuid =  mail.recipients_addresses.to_sentence.to_s.split(".approval")[0]
     Rails.logger.info "Email::Approval::processing methods : #{mail.methods}"
     email_approval = EmailApproval.where(approval_uuid: approval_uuid)&.first
     if email_approval.nil?
-      Rails.logger.info "Email approval not found for uuid::#{mail.recipients_addresses.to_sentence}"
+      Rails.logger.info "Email approval not found for sentence::#{mail.recipients_addresses.to_sentence}"
+      Rails.logger.info "Email approval not found for uuid::#{approval_uuid}"
       return false
     end
     body = mail.decode_body.split("\n")
