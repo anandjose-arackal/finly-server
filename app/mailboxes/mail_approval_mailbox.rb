@@ -18,6 +18,7 @@ class MailApprovalMailbox < ApplicationMailbox
     end
     params = {id: email_approval.documentable_id}
     invoice = Invoice.find(email_approval.documentable_id)
+    Rails.logger.info "Email::Approval::processing body : #{body.inspect}"
     if !invoice.processing?
       Rails.logger.info "Invoice is not in processing state"
       return false
