@@ -17,22 +17,47 @@ class MailApprovalMailbox < ApplicationMailbox
       return false
     end
     params = {id: email_approval.documentable_id}
-    if email_approval.status.name != "pending"
-      Rails.logger.info "Email approval is not in pending state"
+    invoice = Invoice.find(email_approval.documentable_id)
+    if !invoice.processing?
+      Rails.logger.info "Invoice is not in processing state"
       return false
-    elsif body[0].downcase == "approve" && email_approval.status.name == "pending"
+    elsif body[0].downcase.include?("approve") && can_approve(invoice)
       @result = Procurements::Invoices::Approve.(@user, params)
-      email_approval.update(email_approval_status_id: EmailApprovalStatus.id_for(:approved))
-    elsif body[0].downcase == "reject" && email_approval.status.name == "pending"
+      #email_approval.update(email_approval_status_id: EmailApprovalStatus.id_for(:approved))
+    elsif body[0].downcase.include?("reject") && can_reject(invoice)
+      params[:note] = "Email has been rejected by #{mail.from&.first} on #{DateTime.now}"
       @result = Procurements::Invoices::Reject.(@user, params)
-      email_approval.update(email_approval_status_id: EmailApprovalStatus.id_for(:rejected))
+      #email_approval.update(email_approval_status_id: EmailApprovalStatus.id_for(:rejected))
     end
+  end
+
+  def can_approve(invoice)
+    if invoice.is_po_reviewing_user?(@user)
+      invoice.processing? && user_in_level?(invoice)
+    end
+  end
+
+  def can_reject(invoice)
+    if invoice.is_po_reviewing_user?(@user)
+      invoice.processing? && user_in_level?(invoice)
+    end
+  end
+
+  def user_in_level?(invoice)
+    # level = invoice.level
+    # amount = invoice.net_amount.value rescue 0
+    # allowed = level.present? ? level.level_reviewer_mappings.with_threshold(amount).pluck(:reviewer_id).include?(user.id) : false
+    provider_name = invoice.get_invoice_provider_name
+    invoice.get_reviewers(nil, provider_name).include?(@user)
   end
 
 
   def ensure_user
     ActsAsTenant.without_tenant do
       @user = User.find_by(email: mail.from)
+    end
+    if @user.nil?
+      return false
     end
     ActsAsTenant.current_tenant = @user.company
   end

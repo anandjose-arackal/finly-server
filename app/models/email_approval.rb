@@ -19,4 +19,11 @@ class EmailApproval < ApplicationRecord
     new_approval
   end
 
+  def self.delete_email_approval(document_id)
+    email_approvals = self.where(documentable_id: document_id)
+    email_approvals.each do |ea|
+      ea.delete
+    end
+  end
+
 end
