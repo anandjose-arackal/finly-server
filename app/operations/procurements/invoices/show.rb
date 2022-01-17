@@ -35,7 +35,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
         end
       end
 
-#      self.departments = Company::Departments::Index.(invoice.created_by, params).policy_department_filter_mapping&.leaves
+      self.departments = Company::Departments::Index.(invoice.created_by, params).policy_department_filter_mapping&.leaves
       self.locations = Company::Locations::Index.(invoice.created_by, params).policy_location_filter_mapping&.leaves
 
       if invoice.created_by&.departments.present?
