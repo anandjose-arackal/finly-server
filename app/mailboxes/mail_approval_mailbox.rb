@@ -6,7 +6,7 @@ class MailApprovalMailbox < ApplicationMailbox
   def process
     return if @user.nil?
     approval_uuid =  mail.recipients_addresses.to_sentence.to_s.split(".approval")[0]
-    approval_uuid.gsub('"','') #outlook has some extra quotes
+    approval_uuid = approval_uuid.gsub('"','') #outlook has some extra quotes
     Rails.logger.info "Email::Approval::processing methods : #{mail.methods}"
     email_approval = EmailApproval.where(approval_uuid: approval_uuid)&.first
     if email_approval.nil?
