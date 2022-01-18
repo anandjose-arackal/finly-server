@@ -100,7 +100,8 @@ class ProcurementMailer < ApplicationMailer
       # attachments["invoice-#{@data.invoice.invoice_number}.pdf"] = WickedPdf.new.pdf_from_string(
       #    render_to_string(pdf: "invoice-#{@data.invoice.invoice_number}", template: "export/inward_invoice", layout: "pdf.html.erb", print_media_type: true)
       # )
-      mail to: presenter.to, subject: presenter.subject, template_name: 'template_invoice'
+      Rails.logger.info "Mailer::render::to #{ presenter.to}"
+      mail to: presenter.to, subject: presenter.subject, template_name: 'email_based_approval'
     end
   end
 
