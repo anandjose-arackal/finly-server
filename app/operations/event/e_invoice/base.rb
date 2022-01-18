@@ -24,7 +24,7 @@ class Event::EInvoice::Base < Event::SetNotifier
     self.workflow_output = params[:workflow_output]
     self.controlling_users = []
     self.role_id = params[:role_id]
-    self.email_approval_mail = params[:email_approval_mail]
+    self.email_approval_mail = params[:email_based_approval]
   end
 
   def validate
@@ -132,7 +132,7 @@ class Event::EInvoice::Base < Event::SetNotifier
       self.view_url = generate_url
       self.company = user.company
       self.to_name = user.name
-      self.email_approval_mail = params[:email_approval_mail]
+      self.email_approval_mail = params[:email_based_approval]
       self.reply_to = (self.invoice.email_approvals.last&.approval_uuid&.to_s || "") + ".approval@test.finly.email"
       # if params[:action_url_token]
       #   self.action_url_token = params[:action_url_token]
