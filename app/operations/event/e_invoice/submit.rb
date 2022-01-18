@@ -77,7 +77,7 @@ class Event::EInvoice::Submit < Event::EInvoice::Base
 
   def mailer_body(user)
     Rails.logger.info "render::result #{render_to_string "email_approval_mailer/email_based_invoice_approval.html.erb"}"
-    return render_to_string "email_approval_mailer/email_based_invoice_approval.html.erb"
+    return render "email_approval_mailer/email_based_invoice_approval.html.erb"
     # reply_id = self.invoice.email_approvals&.last&.approval_uuid
     # Rails.logger.info "inside::mailer::body::reply-to id : #{reply_id}.approval.test.finly.email"
     # if user.id == invoice.created_by.id
