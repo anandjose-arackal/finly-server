@@ -3,7 +3,7 @@ class ProcurementMailerPreview < ActionMailer::Preview
     ActsAsTenant.current_tenant = Company.first
     user = User.first
     params = {
-      invoice: Invoice.last,
+      invoice: Invoice.find(10593),
       body: "boyd",
       subject: "sub",
       button_name: "bottun",

@@ -131,7 +131,7 @@ class Event::EInvoice::Base < Event::SetNotifier
       self.view_url = generate_url
       self.company = user.company
       self.to_name = user.name
-      self.reply_to = self.invoice.email_approvals.last&.approval_uuid&.to_s || "" + ".approval@test.finly.email"
+      self.reply_to = (self.invoice.email_approvals.last&.approval_uuid&.to_s || "") + ".approval@test.finly.email"
       # if params[:action_url_token]
       #   self.action_url_token = params[:action_url_token]
       #   action_url = generate_action_url(user, role_id)
