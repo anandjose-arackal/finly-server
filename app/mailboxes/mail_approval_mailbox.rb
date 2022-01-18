@@ -27,7 +27,7 @@ class MailApprovalMailbox < ApplicationMailbox
     Rails.logger.info "Email::Approval::processing mail::decode::inspect::reject : #{mail.decode_body.to_s.downcase.include?("reject")}"
     
     Rails.logger.info "Email::Approval::processing can::approve #{can_approve(invoice)}"
-    Rails.logger.info "Email::Approval::processing can::approve #{can_reject(invoice)}"
+    Rails.logger.info "Email::Approval::processing can::reject #{can_reject(invoice)}"
     if !invoice.processing?
       Rails.logger.info "Invoice is not in processing state"
       return false
