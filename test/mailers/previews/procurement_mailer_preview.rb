@@ -9,7 +9,8 @@ class ProcurementMailerPreview < ActionMailer::Preview
       button_name: "bottun",
       event_id: "evnt",
       action_name: "action",
-      comment_body: "comment"
+      comment_body: "comment",
+      email_approval_mail: true
     }
     ProcurementMailer.send_invoice_mail(Event::EInvoice::Base::MailerPresenter.new(user, params))
 
