@@ -77,7 +77,7 @@ class Docs::I2P::Invoices::Ops::Submit < Transactions::API
     email_approval = EmailApproval.generate_email_approval(reviewal_document.id, reviewal_document.class.to_s)
     Rails.logger.info "inside::mailer::body::reply-to id : #{email_approval}.approval.test.finly.email"
     Event::EInvoice::Submit.(current_user, {invoice: reviewal_document,
-                                            workflow_output: options[:workflow_output], role_id: role_id})
+                                            workflow_output: options[:workflow_output], role_id: role_id, email_based_approval: true})
 
     # Email to vendor that invoice is generated when the invoice is approved/auto_approved
     # Event::EInvoice::VendorMail.(user, invoice: invoice, workflow_output: workflow_output) if self.invoice.approved? || self.invoice.auto_approved?
