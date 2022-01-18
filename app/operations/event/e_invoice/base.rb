@@ -117,7 +117,7 @@ class Event::EInvoice::Base < Event::SetNotifier
 
   class Event::EInvoice::Base::MailerPresenter < Event::SetNotifier::MailerPresenter
     attr_accessor :invoice, :user, :body_val, :subject_val, :button_val, :event_id,
-                  :action_name, :comment_body, :view_url, :company, :action_url_token, :action_url
+                  :action_name, :comment_body, :view_url, :company, :action_url_token, :action_url, :to_name, :reply_to
 
     def initialize(user, params)
       self.invoice = params[:invoice]
@@ -130,6 +130,8 @@ class Event::EInvoice::Base < Event::SetNotifier
       self.comment_body = params[:comment_body]
       self.view_url = generate_url
       self.company = user.company
+      self.to_name = user.name
+      self.reply_to = self.invoice.email_approvals.last.approval_uuid.to_s + ".approval@test.finly.email"
       # if params[:action_url_token]
       #   self.action_url_token = params[:action_url_token]
       #   action_url = generate_action_url(user, role_id)
@@ -147,10 +149,9 @@ class Event::EInvoice::Base < Event::SetNotifier
         view = 'reviewer'
       end
 
-      suffix = URI.escape("{\"document_type\":\"invoice\",\"document_id\":#{invoice.id}}")
-      # path = "reports/#{report.id}"
-      path = "procurements/#{invoice.procurement.id}/params="
-      url = Constants::BASE_URL_VP + path + suffix
+      suffix = URI.escape("\"procurement_id\":\"#{invoice.procurement.id}\",\"procurement_type\":\"non_po_invoice\"")
+      path = "procure_invoices/#{invoice.id}/params={"
+      url = Constants::BASE_URL_VP + path + suffix + "}"
     end
 
     # def generate_action_url(user, role_id)

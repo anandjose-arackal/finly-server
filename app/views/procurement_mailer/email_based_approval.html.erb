@@ -1,28 +1,102 @@
-<% content_for :body do %>
-  <head>
-    <title><%=@data.invoice%></title>
-  </head>
-  <body style="background-color: #f3f3f3; height: auto;">
-  <div style="height: 80px; width: 100%; margin: auto; background-color: #2980b9; color: white; display: table;">
-    <p style="font-size: 22px; display: table-cell; vertical-align: middle; padding-left: 3%;"><%=@data.invoice%></p>
-  </div>
-  <div style="width: 100%; height: auto; margin: auto; background-color: white;">
-    <!--<p style="font-size: 20px; padding-top: 3%; margin-top: 0px; margin-left: 3%;"><span style="color: #2980b9;">Abhinash1354@gmail.com</span> has shared 'New Expense Report' with you.</p>-->
-    <p style="font-size: 17px; margin-left: 3%;text-align: left"><%= @data.body_val.html_safe %></p>
-    <br>
-
-      <div style="text-align: center;">
-        <a href='https://www.finly.io/payments' style="height: 33px; width: 200px; background-color: #3adb76; color: white; border: none; font-size: 16px;padding: 10px 20px;
-          border-radius: 2px;
-          text-decoration: none;">Go to Finly</a>
-      </div>
-
-    <br>
-    <div style="text-align: right; padding-right: 3%;">
-      <label style="font-size: 20px; font-weight: bold;">Invoice Total new&nbsp;:&nbsp;&#8377;<%= @data.invoice.net_amount&.value%></label>
-    </div>
-    <br>
-  </div>
-  </body>
-<% end %>
-
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Invoice Mailer
+        </title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+            <style type="text/css">
+                
+                body, table, td, a, p, span{font-family: 'Arial' !important; font-size: 14px;}
+            </style>
+    </head>
+    <body style="padding:0;margin:0;">
+        <div class="container" style="width: 80%;margin: 0 auto;height: auto; position: relative;">
+            <div class="header" style="margin: 14px 0 14px 0">
+            
+            </div>
+            <div class="email-header-container" style="width: 100%;background: #E1F0FA; border-radius: 2px; margin-bottom: 20px;">
+                <div class="email-header--content" style="padding: 20px;">
+                    <span style="font-family: 'work sans'; font-size: 24px; font-weight: 600;color: #0F3044;">Invoice Submitted</span><br/>
+                    <div style="margin: 10px 0 10px 0;">
+                    <span style="font-family:'work sans';font-weight: 400;font-size: 14px;color: #143B52;"> You have a new invoice that needs your approval <a style="color: #2D9DE7;"href="<%= %>" target="_blank"><%= %></a></span>
+                    </div>
+                    <div style="margin: 24px 0 24px 0;" class="btn-container">
+                        <a href="mailto:<%= @data.reply_to%>?subject=Appoving invoice&body=Approve," id="btn-success" style="background: #143B52;color: #FFFFFF;min-width: 88px;height: 35px; border-radius: 2px; text-decoration: none; padding: 14px;border: none;font-weight: 600;" class="btn btn-success">Approve</a>&nbsp;&nbsp;
+                        <a href="mailto:<%= @data.reply_to%>?subject=Rejecting invoice&body=Reject," id = "btn-default" style="color: #143B52;background:#F7F7FB;min-width: 88px;height: 35px;border-radius: 2px;text-decoration: none;margin-left: 5px;padding: 14px;border: none;font-weight: 600;" class="btn btn-default">Reject</a>
+                    </div>
+                </div>
+            </div>
+            <div class="email-body" style="width: 100%;padding-bottom: 30px;">
+                <div>
+                <span class="email-salutation" style="font-size: 16px;font-weight: 400;">Hi <%=@data.to_name %>,</span>
+                </div>
+                <p style="margin: 5px 0 10px 0; font-size: 14px;line-height: 20px;">
+                    <span style="font-size: 14px;font-weight: 600;"><%= %></span>
+                    <%= %> This invoice is waiting on your approval <a style="color: #2D9DE7;" href="<%= %>" target="_blank"><%= %></a>
+                    in Lockstep. Below is the summary for the same,
+                </p>
+                <div class="email-body--invoice-details">
+                    
+                        <table style="width:100%;font-weight: 400;border-collapse: collapse;">
+                            <tr style="font-weight: 400;border-bottom: 1px solid #F0F0F0; ">
+                                <th style="text-align:left; font-size: 14px;font-weight: 400;">Vendor Name</th>
+                                <td style="font-size: 14px;text-align: right; padding: 10px 0 10px 0;"><%= @data.invoice.vendor.name%></td>
+                            </tr>
+                            <tr style="font-weight: 400;border-bottom: 1px solid #F0F0F0; ">
+                                <th style="text-align:left;font-size: 14px;font-weight: 400;">Invoice Number</th>
+                                <td style="font-size: 14px;text-align: right; padding: 10px 0 10px 0;"><%= @data.invoice.invoice_number%></td>
+                            </tr>
+                            <tr style="font-weight: 400;border-bottom: 1px solid #F0F0F0; ">
+                                <th style="text-align:left;font-size: 14px;font-weight: 400;">Invoice date</th>
+                                <td style="font-size: 14px;text-align: right; padding: 10px 0 10px 0;"><%= @data.invoice.date%></td>
+                            </tr>
+                            <tr style="font-weight: 400;border-bottom: 1px solid #F0F0F0; ">
+                                <th style="text-align:left;font-size: 14px;font-weight: 400;">Invoice Amount</th>
+                                <td style="font-size: 14px;text-align: right; padding: 10px 0 10px 0;"><%=@data.invoice.amount&.value %></td>
+                              </tr>
+                            </tr>
+                            <tr style="font-weight: 600;border-bottom: 1px solid #F0F0F0; ">
+                                <th style=" text-align:left;font-size: 14px;font-weight: 600;">Net Payable Amount</th>
+                                <td style="font-size: 14px; text-align: right; padding: 10px 0 10px 0;"><%=@data.invoice.net_amount&.value %></td>
+                            </tr>
+                          </table>
+                </div>
+                <div class="more-details-section" style="width:100%; margin-top: 20px;">
+                    <table style="width:100%;font-weight: 400; border-collapse: collapse;">
+                        <tr style="font-weight: 400;">
+                            <th style=" text-align:left;font-size: 14px;font-weight: 400;">
+                                More details on invoice can be viewed on <span style="font-weight: 600;padding: 0;margin: 0;">Lockstep</span>
+                            </th>
+                            <td style="font-size: 14px; width:150px;white-space: nowrap; text-align: right;font-weight: 600;">
+                                <a style="font-size:14px ;color: #143B52; background:#F7F7FB; width: 70px;height: 35px ;border-radius: 2px;text-decoration: none;padding: 12px 5px 12px 5px;border: none;"class="btn view-invoice" href="<%= @data.view_url%>" target="_blank">View Invoice </a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div style="bottom:5px;position: relative; margin: 10px 0 10px 0;border-top: 1px solid #F0F0F0;width: 100%;">
+                <div style="margin: 10px 0 10px 0;">
+                    <table style="width:100%;border-collapse: collapse;">
+                        <tr>
+                            <th>
+                                
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>
+                                <span style="line-height: 20px; font-size: 14px;font-weight: 500;">Connected by Lockstep</span>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>
+                                <span style="line-height: 16px; font-size: 12px; color: #6F828E;font-weight: 400;">The connected accounting network</span>
+                            </th>
+                        </tr>
+                    </table>
+                </div>    
+            </div>
+        </div>
+    </body>
+</html>
