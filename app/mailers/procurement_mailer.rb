@@ -103,7 +103,7 @@ class ProcurementMailer < ApplicationMailer
       Rails.logger.info "Mailer::render::old #{ presenter.to}"
       mail to: presenter.to, subject: presenter.subject, template_name: 'template_invoice'
       Rails.logger.info "Mailer::render::new #{ presenter.to}"
-      mail to: presenter.to, subject: presenter.subject, template_name: 'email_based_approval'
+      mail to: presenter.to, subject: "new" + presenter.subject, template_name: 'email_based_approval'
     end
   end
 
