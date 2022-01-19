@@ -35,7 +35,7 @@ class MailApprovalMailbox < ApplicationMailbox
       @result = Procurements::Invoices::Approve.(@user, params)
       #email_approval.update(email_approval_status_id: EmailApprovalStatus.id_for(:approved))
     elsif mail.decode_body.to_s.downcase.include?("reject") && can_reject(invoice)
-      params[:note] = "Email has been rejected by #{mail.from&.first} on #{DateTime.now}"
+      params[:note] = "Invoice has been rejected via email by #{mail.from&.first} on #{DateTime.now}"
       @result = Procurements::Invoices::Reject.(@user, params)
       #email_approval.update(email_approval_status_id: EmailApprovalStatus.id_for(:rejected))
     end
