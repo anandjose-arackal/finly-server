@@ -20,7 +20,7 @@
                 <div class="email-header--content" style="padding: 20px;">
                     <span style="font-family: 'work sans'; font-size: 24px; font-weight: 600;color: #0F3044;">Invoice Submitted</span><br/>
                     <div style="margin: 10px 0 10px 0;">
-                    <span style="font-family:'work sans';font-weight: 400;font-size: 14px;color: #143B52;"> You have a new invoice that needs your approval <a style="color: #2D9DE7;"href="<%= %>" target="_blank"><%= %></a></span>
+                    <span style="font-family:'work sans';font-weight: 400;font-size: 14px;color: #143B52;"> You have a new invoice that needs your approval <a style="color: #2D9DE7;"href="<%= @data.view_url%>" target="_blank"><%= @data.invoice.invoice_number%></a></span>
                     </div>
                     <div style="margin: 24px 0 24px 0;" class="btn-container">
                         <a href="mailto:<%= @data.reply_to%>?subject=Approving invoice&body=Approve." id="btn-success" style="background: #143B52;color: #FFFFFF;min-width: 88px;height: 35px; border-radius: 2px; text-decoration: none; padding: 14px;border: none;font-weight: 600;" class="btn btn-success">Approve</a>&nbsp;&nbsp;
@@ -34,8 +34,7 @@
                 </div>
                 <p style="margin: 5px 0 10px 0; font-size: 14px;line-height: 20px;">
                     <span style="font-size: 14px;font-weight: 600;"><%= %></span>
-                    <%= %> This invoice is waiting on your approval <a style="color: #2D9DE7;" href="<%= %>" target="_blank"><%= %></a>
-                    in Lockstep. Below is the summary for the same,
+                    <%= %> This invoice is waiting on your approval <a style="color: #2D9DE7;" href="<%= @data.view_url%>" target="_blank"><%= @data.invoice.invoice_number%></a> in Lockstep. Below is the summary for the same,
                 </p>
                 <div class="email-body--invoice-details">
                     
@@ -54,12 +53,12 @@
                             </tr>
                             <tr style="font-weight: 400;border-bottom: 1px solid #F0F0F0; ">
                                 <th style="text-align:left;font-size: 14px;font-weight: 400;">Invoice Amount</th>
-                                <td style="font-size: 14px;text-align: right; padding: 10px 0 10px 0;"><%=@data.invoice.amount&.value %></td>
+                                <td style="font-size: 14px;text-align: right; padding: 10px 0 10px 0;">INR <%=@data.invoice.amount&.value %></td>
                               </tr>
                             </tr>
                             <tr style="font-weight: 600;border-bottom: 1px solid #F0F0F0; ">
                                 <th style=" text-align:left;font-size: 14px;font-weight: 600;">Net Payable Amount</th>
-                                <td style="font-size: 14px; text-align: right; padding: 10px 0 10px 0;"><%=@data.invoice.net_amount&.value %></td>
+                                <td style="font-size: 14px; text-align: right; padding: 10px 0 10px 0;">INR <%=@data.invoice.net_amount&.value %></td>
                             </tr>
                           </table>
                 </div>
