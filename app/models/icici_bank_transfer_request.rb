@@ -58,6 +58,8 @@ class IciciBankTransferRequest < NonPersistentModel
         break
       end
     end
+    # appending remaining with zero's,totaly 35 chars, this to avoid appover name in ICICI statement
+    ref += "0" * 22
     ref
   end
 
