@@ -21,7 +21,7 @@ class Procurements::Invoices::Index < Procurements::Invoices::Base
       return
     else
       invoices = ::Invoice.associated_items(user, ::Invoice.roles)
-      invoices = invoices.non_beneficiary.created_at_desc rescue ::Invoice.none
+      self.invoices = invoices.non_beneficiary.created_at_desc rescue ::Invoice.none
     end
   end
 
