@@ -40,6 +40,8 @@ class MailApprovalMailbox < ApplicationMailbox
       #email_approval.update(email_approval_status_id: EmailApprovalStatus.id_for(:rejected))
     end
     error_logger.error("Mailbox Item failed to create: #{item.errors.full_messages}") rescue nil
+    #@result.success?
+    #@result.params["document"].status
   end
 
   def can_approve(invoice)

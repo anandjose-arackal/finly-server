@@ -195,7 +195,7 @@ class Event::EInvoice::Base < Event::SetNotifier
     end
 
     def set_email_approval_mail
-      self.email_approval_mail && (invoice.created_by.id != user.id)
+      self.email_approval_mail && (invoice.created_by.id != user.id) && invoice.status.processing?
     end
 
     def body
