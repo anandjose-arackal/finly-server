@@ -19,9 +19,7 @@ class Procurements::Invoices::Index < Procurements::Invoices::Base
       deactivated_users_open_invoices = user.deactivated_users_open_invoices
       self.invoices = self.invoices.or( deactivated_users_open_invoices )
       return
-    end
-
-    unless user.policy_user_roles.pluck(:user_role_id).uniq.blank?
+    else
       invoices = ::Invoice.associated_items(user, ::Invoice.roles)
       invoices = invoices.non_beneficiary.created_at_desc rescue ::Invoice.none
     end
