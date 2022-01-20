@@ -128,6 +128,11 @@ module Constants
     authorizer_url = "http://staging.finly.io/authorizer#"
     vendor_payments_url = "http://staging.finly.io/payments#"
     assets_url = "https://www.staging.finly.io"
+  elsif Rails.env.uat?
+    url = "http://uat2.finly.io/#"
+    authorizer_url = "http://uat2.finly.io/authorizer#"
+    vendor_payments_url = "http://uat2.finly.io/payments#"
+    assets_url = "https://www.uat2.finly.io"
   elsif Rails.env.itzcash_uat?
     url = "http://demo.finly.io/#"
     authorizer_url = "http://demo.finly.io/authorizer#"
