@@ -68,7 +68,11 @@ class Procurements::Invoices::Approve < Procurements::Invoices::Base
 
   def post_process
     update_agreement_available_limit
-    Event::EInvoice::Approve.(user, invoice: invoice, workflow_output: workflow_output, email_based_approval: true)
+    if invoice.invoice_type.id == InwardInvoiceType.id_for("non_po_invoice")
+      EmailApproval.generate_email_approval(invoice.id, invoice.class.to_s)
+      email_based_approval = true
+    end
+    Event::EInvoice::Approve.(user, invoice: invoice, workflow_output: workflow_output, email_based_approval: email_based_approval)
     # Email to vendor that invoice is generated when the invoice is approved
     # Event::EInvoice::VendorMail.(user, invoice: invoice, workflow_output: workflow_output) if self.invoice.approved? || self.invoice.auto_approved?
     add_message :success, 'Successfully Approved Invoice'
