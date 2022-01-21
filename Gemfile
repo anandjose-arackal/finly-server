@@ -9,6 +9,8 @@ gem 'wkhtmltopdf-binary', '0.12.5'
 gem 'nokogiri', '~> 1.10.0'
 gem 'autoprefixer-rails', '~> 9.4.4'
 
+gem 'actionmailbox'
+
 gem 'eps', '~> 0.3'
 
 gem 'fiscali', '~> 2.4'

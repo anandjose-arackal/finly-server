@@ -74,8 +74,13 @@ class Docs::I2P::Invoices::Ops::Submit < Transactions::API
     # budget_limit_validation( invoice )
     # update_agreement_available_limit
     role_id = options[:workflow_output][:role_id]
+    email_based_approval = false
+    if reviewal_document.invoice_type.id == InwardInvoiceType.id_for("non_po_invoice")
+      EmailApproval.generate_email_approval(reviewal_document.id, reviewal_document.class.to_s)
+      email_based_approval = true
+    end
     Event::EInvoice::Submit.(current_user, {invoice: reviewal_document,
-                                            workflow_output: options[:workflow_output], role_id: role_id})
+                                            workflow_output: options[:workflow_output], role_id: role_id, email_based_approval: email_based_approval})
 
     # Email to vendor that invoice is generated when the invoice is approved/auto_approved
     # Event::EInvoice::VendorMail.(user, invoice: invoice, workflow_output: workflow_output) if self.invoice.approved? || self.invoice.auto_approved?

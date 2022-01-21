@@ -9,6 +9,7 @@ Rails.application.configure do
   # and those relying on copy on write to perform better.
   # Rake tasks automatically ignore this option for performance.
   config.eager_load = true
+  config.action_mailbox.ingress = :postmark
 
   feature_flipper_config = Rails.application.config_for(:feature_flipper)&.with_indifferent_access
   if feature_flipper_config.dig('api_key').present? and feature_flipper_config.dig('url').present?
