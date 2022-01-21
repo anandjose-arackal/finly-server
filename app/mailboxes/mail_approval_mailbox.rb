@@ -9,7 +9,6 @@ class MailApprovalMailbox < ApplicationMailbox
     approval_uuid =  mail.recipients_addresses.to_sentence.to_s.split(".approval")[0]
     approval_uuid = approval_uuid.gsub('"','') #outlook has some extra quotes
     email_approval = EmailApproval.where(approval_uuid: approval_uuid)&.first
-    byebug
     if email_approval.nil?
       @error_logger.info("Email approval not found for approval::uuid #{approval_uuid}")
       return false
@@ -25,13 +24,11 @@ class MailApprovalMailbox < ApplicationMailbox
       @error_logger.info("Invoice not found for approval::uuid #{approval_uuid}")
       return false
     end
-    byebug
     if !invoice.processing?
       @error_logger.info("Invoice #{invoice.id} failed because it is in #{invoice.status.name} not in processing state")
       return false
     elsif mail.decode_body.to_s.downcase.include?("approve") && can_approve(invoice)
       @result = Procurements::Invoices::Approve.(@user, params)
-      byebug
       if @result.success? && !@result.params["document"].processing?
         EmailApproval.delete_email_approval(@result.params["document"].id)
       else

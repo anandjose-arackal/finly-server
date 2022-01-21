@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_01_16_071630) do
+ActiveRecord::Schema.define(version: 2022_01_21_090506) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3717,16 +3717,8 @@ ActiveRecord::Schema.define(version: 2022_01_16_071630) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
-  create_table "email_approval_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.string "name"
-    t.datetime "deleted_at"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-  end
-
   create_table "email_approvals", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "approval_uuid"
-    t.integer "email_approval_status_id"
     t.datetime "deleted_at"
     t.integer "company_id"
     t.string "documentable_type"
