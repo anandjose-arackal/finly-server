@@ -195,7 +195,7 @@ class Event::EInvoice::Base < Event::SetNotifier
     end
 
     def set_email_approval_mail
-      self.email_approval_mail && invoice.status.processing? && self.body_val.include?("awaiting your approval")
+      self.email_approval_mail && invoice.status.processing? && self.body_val.include?("awaiting your approval") && invoice.invoice_type.id == InwardInvoiceType.id_for("non_po_invoice")
     end
 
     def body

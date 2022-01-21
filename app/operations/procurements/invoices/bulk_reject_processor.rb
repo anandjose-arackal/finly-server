@@ -37,7 +37,7 @@ class Procurements::Invoices::BulkRejectProcessor < BackgroundOperation
         data_success[:department] = invoice&.department&.name
         data_success[:user] = invoice&.created_by&.name
         data_success[:amount] = invoice&.net_amount&.value
-        EmailApproval.delete_email_approval(invoice&.id) unless invoice&.processing?
+        EmailApproval.delete_email_approval(invoice&.id) unless invoice&.processing? && invoice.invoice_type.id == InwardInvoiceType.id_for("non_po_invoice")
         self.result[:success].push(data_success)
       end
     end
