@@ -13,7 +13,7 @@ class ProcurementMailerPreview < ActionMailer::Preview
       email_based_approval: true
     }
     ProcurementMailer.send_invoice_mail(Event::EInvoice::Base::MailerPresenter.new(user, params))
-
+#also set set_email_approval_mail as true in event/e_invoice/base.rb
   end
 
 end

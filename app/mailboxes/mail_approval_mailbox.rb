@@ -1,45 +1,52 @@
 class MailApprovalMailbox < ApplicationMailbox
-  error_logger = Logger.new("#{Rails.root}/log/mail_approval_errors.log")
+  
 
   before_processing :ensure_user
 
   def process
     return if @user.nil?
+    @error_logger = Logger.new("#{Rails.root}/log/mail_approval_errors.log")
     approval_uuid =  mail.recipients_addresses.to_sentence.to_s.split(".approval")[0]
     approval_uuid = approval_uuid.gsub('"','') #outlook has some extra quotes
     email_approval = EmailApproval.where(approval_uuid: approval_uuid)&.first
+    byebug
     if email_approval.nil?
-      #log error
+      @error_logger.info("Email approval not found for approval::uuid #{approval_uuid}")
       return false
     end
     body = mail.decode_body.split("\n")
     if body.nil?
-      #add log Rails.logger.info "Body is nil"
+      @error_logger.info("body not found for approval::uuid #{approval_uuid}")
       return false
     end
     params = {id: email_approval.documentable_id}
-    invoice = Invoice.find(email_approval.documentable_id)
+    invoice = Invoice.find_by_id(email_approval.documentable_id)
+    if invoice.nil?
+      @error_logger.info("Invoice not found for approval::uuid #{approval_uuid}")
+      return false
+    end
+    byebug
     if !invoice.processing?
-      #add log Rails.logger.info "Invoice is not in processing state"
+      @error_logger.info("Invoice #{invoice.id} failed because it is in #{invoice.status.name} not in processing state")
       return false
     elsif mail.decode_body.to_s.downcase.include?("approve") && can_approve(invoice)
       @result = Procurements::Invoices::Approve.(@user, params)
+      byebug
       if @result.success? && !@result.params["document"].processing?
         EmailApproval.delete_email_approval(@result.params["document"].id)
-        #else add error log
+      else
+        @error_logger.error("Invoice #{@result.params["document"].id} failed to approve by #{mail.from} because #{@result.inspect}")
       end
     elsif mail.decode_body.to_s.downcase.include?("reject") && can_reject(invoice)
       params[:note] = "Invoice has been rejected via email by #{mail.from&.first} on #{Time.now.strftime("%Y-%d-%m %H:%M:%S %Z")}"
       @result = Procurements::Invoices::Reject.(@user, params)
       if @result.success? && !@result.params["document"].processing?
         EmailApproval.delete_email_approval(@result.params["document"].id)
-        #else add error log
+      else
+        @error_logger.error("Invoice #{@result.params["document"].id} failed to reject by #{mail.from} because #{@result.inspect}")
       end
-      #email_approval.update(email_approval_status_id: EmailApprovalStatus.id_for(:rejected))
     end
-    #error_logger.error("Mailbox Item failed to create: #{item.errors.full_messages}") rescue nil
-    #@result.success?
-    #@result.params["document"].status
+    
   end
 
   def can_approve(invoice)
