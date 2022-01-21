@@ -14,6 +14,7 @@ class ProcurementMailerPreview < ActionMailer::Preview
     }
     ProcurementMailer.send_invoice_mail(Event::EInvoice::Base::MailerPresenter.new(user, params))
 #also set set_email_approval_mail as true in event/e_invoice/base.rb
+#hit http://localhost:3001/rails/mailers/procurement_mailer/procure_mail to test
   end
 
 end
