@@ -223,7 +223,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "advance_amount_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "advance_amount_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "advance_amount_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "advance_amount_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -435,7 +443,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "analytics_dashboard_schedule_user_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "analytics_dashboard_schedule_user_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "analytics_dashboard_schedule_user_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "analytics_dashboard_schedule_user_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -454,7 +470,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "analytics_dashboard_schedules", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "analytics_dashboard_schedules", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "analytics_dashboard_schedules", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "analytics_dashboard_schedules", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -485,7 +509,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "analytics_dashboards", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "analytics_dashboards", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "analytics_dashboards", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "analytics_dashboards", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -552,7 +584,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "artifacts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "artifacts", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "artifacts", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "artifacts", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -574,7 +614,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -1155,7 +1203,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "beneficiary_payment_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "beneficiary_payment_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "beneficiary_payment_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "beneficiary_payment_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -1166,7 +1222,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "beneficiary_payments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "beneficiary_payments", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "beneficiary_payments", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "beneficiary_payments", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -1678,7 +1742,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "budget_rule_branch_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "budget_rule_branch_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "budget_rule_branch_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "budget_rule_branch_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -1704,7 +1776,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "budget_rule_department_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "budget_rule_department_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "budget_rule_department_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "budget_rule_department_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -1719,7 +1799,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "budget_rule_expense_type_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "budget_rule_expense_type_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "budget_rule_expense_type_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "budget_rule_expense_type_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -2759,8 +2847,18 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.datetime "deleted_at"
     t.integer "company_id"
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
     t.decimal "cn_adjustment_amount", precision: 20, scale: 10, default: "0.0"
     t.decimal "cn_net_adjustable_amount", precision: 20, scale: 10, default: "0.0"
+=======
+    t.decimal "cn_net_adjustable_amount", precision: 20, scale: 10, default: "0.0"
+    t.decimal "cn_adjustment_amount", precision: 20, scale: 10, default: "0.0"
+>>>>>>> Stashed changes
+=======
+    t.decimal "cn_net_adjustable_amount", precision: 20, scale: 10, default: "0.0"
+    t.decimal "cn_adjustment_amount", precision: 20, scale: 10, default: "0.0"
+>>>>>>> Stashed changes
 =======
     t.decimal "cn_net_adjustable_amount", precision: 20, scale: 10, default: "0.0"
     t.decimal "cn_adjustment_amount", precision: 20, scale: 10, default: "0.0"
@@ -3412,7 +3510,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "document_message_receipts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "document_message_receipts", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "document_message_receipts", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "document_message_receipts", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -3442,7 +3548,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "document_message_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "document_message_types", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "document_message_types", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "document_message_types", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -3454,7 +3568,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "document_messages", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "document_messages", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "document_messages", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "document_messages", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -3526,8 +3648,14 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "duplicate_expense_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
 =======
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
   create_table "duplicate_expense_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8_unicode_ci", force: :cascade do |t|
 >>>>>>> Stashed changes
     t.integer "expense_id", null: false
@@ -3576,8 +3704,14 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "email_authorizations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
 =======
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
   create_table "email_approval_document_types", options: "ENGINE=InnoDB DEFAULT CHARSET=armscii8", force: :cascade do |t|
     t.string "name"
     t.datetime "deleted_at"
@@ -3614,7 +3748,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "email_bodies", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+=======
+  create_table "email_bodies", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "email_bodies", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "email_bodies", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -3754,7 +3896,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "exchange_rates", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+=======
+  create_table "exchange_rates", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "exchange_rates", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "exchange_rates", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -3939,7 +4089,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "export_formats", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "export_formats", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "export_formats", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "export_formats", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -4035,7 +4193,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "export_resources", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "export_resources", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "export_resources", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "export_resources", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -4050,7 +4216,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "export_template_news", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "export_template_news", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "export_template_news", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "export_template_news", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -4082,7 +4256,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "export_template_user_role_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "export_template_user_role_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "export_template_user_role_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "export_template_user_role_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -4120,8 +4302,14 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "feature_subscriptions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
 =======
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
   create_table "feature_subscription_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.string "name"
     t.datetime "deleted_at"
@@ -4404,7 +4592,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "finbox_item_joins", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "finbox_item_joins", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "finbox_item_joins", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "finbox_item_joins", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -4418,7 +4614,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "finbox_items", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "finbox_items", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "finbox_items", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "finbox_items", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -4571,7 +4775,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "form_currencies", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+=======
+  create_table "form_currencies", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "form_currencies", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "form_currencies", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -4722,11 +4934,23 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.boolean "virtual", default: false
     t.text "triggers"
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
     t.boolean "cn_dependent", default: false
     t.string "show_in_data_card_as"
     t.string "size"
     t.boolean "display_key", default: false
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     t.index ["company_id"], name: "index_form_entities_on_company_id"
     t.index ["created_at"], name: "index_form_entities_on_created_at"
@@ -4816,6 +5040,12 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
 =======
   create_table "form_rules", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.string "uuid", limit: 36, null: false
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     t.bigint "company_id", null: false
     t.string "form_id", null: false
@@ -4882,7 +5112,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "gatekeeper_blocks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "gatekeeper_blocks", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "gatekeeper_blocks", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "gatekeeper_blocks", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -5033,7 +5271,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "gstin_locations", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "gstin_locations", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "gstin_locations", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "gstin_locations", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -5060,7 +5306,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "gstins", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "gstins", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "gstins", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "gstins", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -5173,6 +5427,8 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "icici_virtual_accounts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "company_id"
     t.integer "balance_id"
@@ -5192,6 +5448,10 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
 
   create_table "import_job_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
 =======
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
   create_table "import_job_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.string "uuid", limit: 36, null: false
     t.string "import_job_id", null: false
@@ -5215,6 +5475,12 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
   create_table "import_job_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     t.string "name", null: false
     t.datetime "deleted_at"
@@ -5227,7 +5493,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "import_jobs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+=======
+  create_table "import_jobs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "import_jobs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "import_jobs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -5275,8 +5549,14 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "index_view_segments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
 =======
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
   create_table "import_record_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "deleted_at"
@@ -5498,6 +5778,8 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "invites", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "vendor_id", null: false
@@ -5525,6 +5807,10 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
 
   create_table "invoice_attachments", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
 =======
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
   create_table "invoice_attachments", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8_unicode_ci", force: :cascade do |t|
 >>>>>>> Stashed changes
     t.string "attached_file_file_name"
@@ -5818,17 +6104,29 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.integer "reporting_currency_id"
     t.integer "vendor_country_id"
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
     t.decimal "po_invoice_adjusted_advance", precision: 20, scale: 10, default: "0.0"
     t.decimal "invoice_credit_note_adjusted_amount", precision: 20, scale: 10, default: "0.0"
     t.decimal "invoice_balance_due_without_cn", precision: 20, scale: 10, default: "0.0"
     t.boolean "credit_notes_presence", default: false
 =======
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
     t.decimal "invoice_credit_note_adjusted_amount", precision: 20, scale: 10, default: "0.0"
     t.decimal "invoice_balance_due_without_cn", precision: 20, scale: 10, default: "0.0"
     t.decimal "po_invoice_adjusted_advance", precision: 20, scale: 10, default: "0.0"
     t.decimal "reporting_po_advance", precision: 20, scale: 10, default: "0.0"
     t.decimal "reporting_po_prev_adjusted_advance", precision: 20, scale: 10, default: "0.0"
     t.decimal "reporting_adjusted_po_advance_payable_amount", precision: 20, scale: 10, default: "0.0"
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["agreement_item_id"], name: "index_invoices_on_agreement_item_id"
@@ -6297,7 +6595,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "master_entities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+=======
+  create_table "master_entities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "master_entities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "master_entities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -6337,7 +6643,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "master_entity_choices", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+=======
+  create_table "master_entity_choices", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "master_entity_choices", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "master_entity_choices", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -6361,7 +6675,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "master_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+=======
+  create_table "master_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "master_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "master_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -6384,7 +6706,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "master_records", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+=======
+  create_table "master_records", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "master_records", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "master_records", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -6428,7 +6758,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "master_schemas", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+=======
+  create_table "master_schemas", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "master_schemas", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "master_schemas", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -6482,7 +6820,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "ml_model_dependent_entities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+=======
+  create_table "ml_model_dependent_entities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "ml_model_dependent_entities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "ml_model_dependent_entities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -6503,7 +6849,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "ml_model_pmmls", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+=======
+  create_table "ml_model_pmmls", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "ml_model_pmmls", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "ml_model_pmmls", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -6525,7 +6879,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "ml_model_predictions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+=======
+  create_table "ml_model_predictions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "ml_model_predictions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "ml_model_predictions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -6550,7 +6912,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "ml_models", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+=======
+  create_table "ml_models", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "ml_models", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "ml_models", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -6947,8 +7317,14 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "old_passwords", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
 =======
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
   create_table "ocr_documents", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.string "uuid", limit: 36, null: false
     t.string "name", null: false
@@ -6975,6 +7351,12 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
   create_table "old_passwords", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     t.string "encrypted_password", null: false
     t.string "password_archivable_type", null: false
@@ -7516,8 +7898,14 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "physical_units", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
 =======
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
   create_table "physical_units", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8_unicode_ci", force: :cascade do |t|
 >>>>>>> Stashed changes
     t.string "name"
@@ -7588,15 +7976,27 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "policy_department_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "policy_id"
     t.integer "department_id"
     t.boolean "enabled"
 =======
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
   create_table "policy_department_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.integer "policy_id", null: false
     t.integer "location_id", null: false
     t.integer "department_id", null: false
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -7618,8 +8018,14 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "policy_field_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
 =======
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
   create_table "policy_field_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8_unicode_ci", force: :cascade do |t|
 >>>>>>> Stashed changes
     t.integer "field_configuration_id", null: false
@@ -7633,7 +8039,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "policy_location_department_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "policy_location_department_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "policy_location_department_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "policy_location_department_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -7648,7 +8062,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "policy_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "policy_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "policy_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "policy_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -7662,8 +8084,14 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "policy_user_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
 =======
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
   create_table "policy_user_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8_unicode_ci", force: :cascade do |t|
 >>>>>>> Stashed changes
     t.integer "user_id", null: false
@@ -7859,7 +8287,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "product_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "product_types", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "product_types", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "product_types", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -7909,7 +8345,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.integer "company_id"
     t.string "item_number"
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
     t.boolean "product_type_id"
+=======
+    t.integer "product_type_id"
+>>>>>>> Stashed changes
+=======
+    t.integer "product_type_id"
+>>>>>>> Stashed changes
 =======
     t.integer "product_type_id"
 >>>>>>> Stashed changes
@@ -7927,9 +8371,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.decimal "item_net_amount", precision: 20, scale: 5
     t.decimal "reporting_item_net_amount", precision: 20, scale: 5
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
     t.decimal "item_billable_amount", precision: 20, scale: 5
     t.decimal "reporting_item_billable_amount", precision: 20, scale: 5
     t.string "pr_number"
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
     t.index ["department_id"], name: "index_purchase_order_items_on_department_id"
@@ -8023,8 +8473,20 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.date "conversion_date"
     t.integer "reporting_currency_id"
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
     t.integer "base_currency_id"
     t.decimal "conversion_rate", precision: 20, scale: 5
+=======
+    t.date "conversion_date"
+    t.decimal "conversion_rate", precision: 20, scale: 5
+    t.integer "payment_term_days", default: 0
+>>>>>>> Stashed changes
+=======
+    t.date "conversion_date"
+    t.decimal "conversion_rate", precision: 20, scale: 5
+    t.integer "payment_term_days", default: 0
+>>>>>>> Stashed changes
 =======
     t.date "conversion_date"
     t.decimal "conversion_rate", precision: 20, scale: 5
@@ -8054,16 +8516,28 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.decimal "po_roundoff_amount", precision: 20, scale: 5
     t.decimal "reporting_po_roundoff_amount", precision: 20, scale: 5
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
     t.decimal "po_balance_due", precision: 20, scale: 5
     t.decimal "reporting_po_balance_due", precision: 20, scale: 5
     t.decimal "po_total_amount", precision: 20, scale: 5
     t.decimal "reporting_po_total_amount", precision: 20, scale: 5
     t.integer "payment_term_days", default: 0
 =======
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
     t.decimal "po_total_amount", precision: 20, scale: 5
     t.decimal "reporting_po_total_amount", precision: 20, scale: 5
     t.decimal "po_balance_due", precision: 20, scale: 5
     t.decimal "reporting_po_balance_due", precision: 20, scale: 5
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     t.decimal "po_requested_advance_amount", precision: 20, scale: 10, default: "0.0"
     t.decimal "po_advance_tds_amount", precision: 20, scale: 10, default: "0.0"
@@ -8075,6 +8549,14 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.integer "vendor_country_id"
     t.boolean "retrieve_conversion_rate"
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+    t.datetime "advance_scheduled_date"
+>>>>>>> Stashed changes
+=======
+    t.datetime "advance_scheduled_date"
+>>>>>>> Stashed changes
 =======
     t.datetime "advance_scheduled_date"
 >>>>>>> Stashed changes
@@ -8107,7 +8589,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "purchase_request_item_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "purchase_request_item_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "purchase_request_item_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "purchase_request_item_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -8118,7 +8608,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "purchase_request_items", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "purchase_request_items", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "purchase_request_items", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "purchase_request_items", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -8167,7 +8665,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "purchase_request_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "purchase_request_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "purchase_request_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "purchase_request_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -8178,7 +8684,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "purchase_requests", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "purchase_requests", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "purchase_requests", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "purchase_requests", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -8204,7 +8718,19 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.date "conversion_date"
     t.integer "reporting_currency_id"
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
     t.integer "base_currency_id"
+=======
+    t.string "creator_name"
+    t.string "creator_email"
+    t.date "conversion_date"
+>>>>>>> Stashed changes
+=======
+    t.string "creator_name"
+    t.string "creator_email"
+    t.date "conversion_date"
+>>>>>>> Stashed changes
 =======
     t.string "creator_name"
     t.string "creator_email"
@@ -8351,7 +8877,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "rate_contract_line_items", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "rate_contract_line_items", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "rate_contract_line_items", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "rate_contract_line_items", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -8368,7 +8902,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "rate_contracts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "rate_contracts", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "rate_contracts", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "rate_contracts", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -8871,7 +9413,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "request_impressions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "request_impressions", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "request_impressions", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "request_impressions", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -8979,8 +9529,14 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "rule_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
 =======
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
   create_table "rule_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8_unicode_ci", force: :cascade do |t|
 >>>>>>> Stashed changes
     t.string "name"
@@ -9252,7 +9808,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "tax_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+=======
+  create_table "tax_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "tax_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "tax_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -9749,7 +10313,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "units", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+=======
+  create_table "units", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "units", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "units", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -9762,7 +10334,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "user_agent_client_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "user_agent_client_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "user_agent_client_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "user_agent_client_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -9774,7 +10354,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "user_agent_clients", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "user_agent_clients", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "user_agent_clients", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "user_agent_clients", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -9847,7 +10435,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "user_branch_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "user_branch_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "user_branch_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "user_branch_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -9901,7 +10497,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "user_device_browsers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "user_device_browsers", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "user_device_browsers", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "user_device_browsers", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -9944,7 +10548,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "user_device_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "user_device_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "user_device_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "user_device_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -9956,7 +10568,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "user_devices", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "user_devices", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "user_devices", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "user_devices", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -10081,7 +10701,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "user_ip_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "user_ip_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "user_ip_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "user_ip_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -10093,7 +10721,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "user_ips", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "user_ips", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "user_ips", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "user_ips", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -10185,8 +10821,14 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "user_panel_subscriptions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
 =======
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
   create_table "user_panel_subscriptions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8_unicode_ci", force: :cascade do |t|
 >>>>>>> Stashed changes
     t.integer "user_id"
@@ -10346,7 +10988,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "user_session_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "user_session_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "user_session_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "user_session_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -10637,6 +11287,8 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "vendor_location_poc_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "gstin_location_id"
     t.integer "vendor_id"
@@ -10648,6 +11300,10 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
 
   create_table "vendor_payment_wallets", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
 =======
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
   create_table "vendor_payment_wallets", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8_unicode_ci", force: :cascade do |t|
 >>>>>>> Stashed changes
     t.integer "balance_id"
@@ -10660,6 +11316,8 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["user_id"], name: "index_vendor_payment_wallets_on_user_id"
   end
 
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
   create_table "vendor_pocs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "email", default: "", null: false
@@ -10698,6 +11356,12 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
 =======
   create_table "vendor_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
 >>>>>>> Stashed changes
+=======
+  create_table "vendor_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "vendor_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -10705,7 +11369,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   create_table "vendor_tds_rates", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "vendor_tds_rates", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
+=======
+  create_table "vendor_tds_rates", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
 =======
   create_table "vendor_tds_rates", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
 >>>>>>> Stashed changes
@@ -11023,7 +11695,13 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.text "reject_note"
     t.boolean "rcm_enabled", default: false
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
     t.integer "erp_sync_status_id"
     t.text "erp_sync_message"
     t.text "erp_sync_reference_id"
