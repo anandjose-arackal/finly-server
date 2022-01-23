@@ -36,7 +36,7 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["company_id"], name: "index_accounting_system_configurations_on_company_id"
   end
 
-  create_table "action_mailbox_inbound_emails", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "action_mailbox_inbound_emails", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.integer "status", default: 0, null: false
     t.string "message_id", null: false
     t.string "message_checksum", null: false
@@ -222,7 +222,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
   end
 
+<<<<<<< Updated upstream
   create_table "advance_amount_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "advance_amount_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -430,7 +434,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["currency_id"], name: "index_amounts_on_currency_id"
   end
 
+<<<<<<< Updated upstream
   create_table "analytics_dashboard_schedule_user_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "analytics_dashboard_schedule_user_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "company_id", null: false
     t.integer "analytics_dashboard_id", null: false
     t.integer "user_id", null: false
@@ -445,7 +453,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["user_id"], name: "index_analytics_dashboard_schedule_user_mappings_on_user_id"
   end
 
+<<<<<<< Updated upstream
   create_table "analytics_dashboard_schedules", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "analytics_dashboard_schedules", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "company_id", null: false
     t.integer "analytics_dashboard_id", null: false
     t.datetime "start_date"
@@ -472,7 +484,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["updated_at"], name: "index_analytics_dashboard_schedules_on_updated_at"
   end
 
+<<<<<<< Updated upstream
   create_table "analytics_dashboards", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "analytics_dashboards", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.string "app", null: false
     t.integer "company_id"
     t.integer "created_by_id"
@@ -535,7 +551,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["user_id"], name: "index_approval_routes_on_user_id"
   end
 
+<<<<<<< Updated upstream
   create_table "artifacts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "artifacts", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "resource_id"
     t.string "resource_type"
     t.string "attachment_file_name"
@@ -553,7 +573,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["resource_id", "resource_type"], name: "index_artifacts_on_resource_id_and_resource_type"
   end
 
+<<<<<<< Updated upstream
   create_table "attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "resource_id"
     t.string "resource_type"
     t.string "file_file_name"
@@ -1052,10 +1076,6 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.datetime "generated_at"
     t.text "biller_response"
     t.integer "erp_sync_status_id"
-    t.text "erp_sync_message"
-    t.string "erp_sync_reference_id"
-    t.integer "erp_sync_attempts_count", default: 0
-    t.datetime "erp_sync_attempted_at"
     t.integer "base_currency_id"
     t.integer "reporting_currency_id"
     t.index ["amount_id"], name: "index_bbps_bills_on_amount_id"
@@ -1130,19 +1150,26 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.integer "amount_id"
     t.string "quick_pay", default: "N"
     t.datetime "deleted_at"
-    t.integer "reference_payment_id"
     t.index ["bill_id"], name: "index_bbps_yes_bank_transactions_on_bill_id"
     t.index ["company_id"], name: "index_bbps_yes_bank_transactions_on_company_id"
   end
 
+<<<<<<< Updated upstream
   create_table "beneficiary_payment_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "beneficiary_payment_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
   end
 
+<<<<<<< Updated upstream
   create_table "beneficiary_payments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "beneficiary_payments", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.string "name"
     t.integer "vendor_id"
     t.integer "bank_account_id"
@@ -1170,13 +1197,12 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.date "invoice_date"
     t.date "invoice_due_date"
     t.integer "advance_amount_id"
+    t.text "payment_notification_users"
     t.integer "payment_agreement_id"
     t.string "note"
     t.integer "location_id"
     t.integer "vendor_location_id"
     t.integer "tax_rate_id"
-    t.text "payment_notification_users"
-    t.integer "freight_amount_id"
     t.integer "resource_template_id"
     t.integer "creator_id"
     t.date "payment_agreement_upcoming_date"
@@ -1191,7 +1217,6 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["cost_center_id"], name: "index_beneficiary_payments_on_cost_center_id"
     t.index ["creator_id"], name: "index_beneficiary_payments_on_creator_id"
     t.index ["department_id"], name: "index_beneficiary_payments_on_department_id"
-    t.index ["freight_amount_id"], name: "index_beneficiary_payments_on_freight_amount_id"
     t.index ["gross_amount_id"], name: "index_beneficiary_payments_on_gross_amount_id"
     t.index ["gst_type_id"], name: "index_beneficiary_payments_on_gst_type_id"
     t.index ["invoice_date"], name: "index_beneficiary_payments_on_invoice_date"
@@ -1551,16 +1576,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.integer "payment_processing_amount_id"
     t.integer "paid_amount_id"
     t.integer "budget_id"
-    t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "budget_amount_id"
     t.integer "remaining_amount_id"
+    t.datetime "deleted_at"
     t.integer "total_consumed_amount_id"
     t.integer "company_id"
     t.index ["budget_id"], name: "index_budget_consumptions_on_budget_id"
     t.index ["committed_amount_id"], name: "index_budget_consumptions_on_committed_amount_id"
-    t.index ["deleted_at"], name: "index_budget_consumptions_on_deleted_at"
     t.index ["paid_amount_id"], name: "index_budget_consumptions_on_paid_amount_id"
     t.index ["payment_processing_amount_id"], name: "index_budget_consumptions_on_payment_processing_amount_id"
     t.index ["pending_amount_id"], name: "index_budget_consumptions_on_pending_amount_id"
@@ -1589,7 +1613,6 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.string "name"
     t.integer "budget_group_id"
     t.string "ancestry"
-    t.datetime "deleted"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "created_by_user_id"
@@ -1597,24 +1620,21 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.datetime "deleted_at"
     t.boolean "budget_creation_in_progress", default: false
     t.index ["budget_group_id"], name: "index_budget_group_criteria_on_budget_group_id"
-    t.index ["deleted"], name: "index_budget_group_criteria_on_deleted"
   end
 
   create_table "budget_group_criteria_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "budget_group_criterium_id"
     t.integer "budgetable_id"
     t.string "budgetable_type"
-    t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
     t.integer "company_id"
-    t.index ["deleted_at"], name: "index_budget_group_criteria_mappings_on_deleted_at"
   end
 
   create_table "budget_groups", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "company_id"
     t.integer "created_by_user_id"
-    t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "period_id"
@@ -1626,12 +1646,12 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.string "name"
     t.datetime "start_date"
     t.datetime "end_date"
+    t.datetime "deleted_at"
     t.integer "budget_date_type_id"
     t.boolean "active", default: true
     t.boolean "calculated_before_tax_amount", default: false
     t.index ["company_id"], name: "index_budget_groups_on_company_id"
     t.index ["created_by_user_id"], name: "index_budget_groups_on_created_by_user_id"
-    t.index ["deleted_at"], name: "index_budget_groups_on_deleted_at"
   end
 
   create_table "budget_modification_actions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -1657,7 +1677,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["budget_id"], name: "index_budget_modification_trails_on_budget_id"
   end
 
+<<<<<<< Updated upstream
   create_table "budget_rule_branch_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "budget_rule_branch_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "budget_rule_id", null: false
     t.integer "branch_location_id", null: false
     t.datetime "created_at", null: false
@@ -1679,7 +1703,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["category_id"], name: "index_budget_rule_category_mappings_on_category_id"
   end
 
+<<<<<<< Updated upstream
   create_table "budget_rule_department_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "budget_rule_department_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "budget_rule_id", null: false
     t.integer "department_id", null: false
     t.datetime "created_at", null: false
@@ -1690,7 +1718,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["department_id"], name: "index_budget_rule_department_mappings_on_department_id"
   end
 
+<<<<<<< Updated upstream
   create_table "budget_rule_expense_type_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "budget_rule_expense_type_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "budget_rule_id", null: false
     t.integer "expense_type_id", null: false
     t.datetime "created_at", null: false
@@ -1753,15 +1785,15 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.integer "procurement_id"
     t.integer "spent_amount_id"
     t.integer "committed_amount_id"
+    t.integer "entity_status_id"
+    t.integer "amount_before_tax_id"
+    t.integer "amount_after_tax_id"
     t.datetime "deleted_at"
     t.decimal "payment_processing_amount_before_tax_value", precision: 20, scale: 10, default: "0.0"
     t.decimal "payment_processing_amount_after_tax_value", precision: 20, scale: 10, default: "0.0"
     t.decimal "tds_value", precision: 20, scale: 10, default: "0.0"
     t.boolean "billed", default: false
-    t.integer "entity_status_id"
     t.boolean "reimbursable", default: false
-    t.integer "amount_before_tax_id"
-    t.integer "amount_after_tax_id"
     t.datetime "entity_created_at"
     t.datetime "entity_submitted_at"
     t.integer "purchase_order_id"
@@ -2726,8 +2758,13 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
     t.integer "company_id"
+<<<<<<< Updated upstream
     t.decimal "cn_adjustment_amount", precision: 20, scale: 10, default: "0.0"
     t.decimal "cn_net_adjustable_amount", precision: 20, scale: 10, default: "0.0"
+=======
+    t.decimal "cn_net_adjustable_amount", precision: 20, scale: 10, default: "0.0"
+    t.decimal "cn_adjustment_amount", precision: 20, scale: 10, default: "0.0"
+>>>>>>> Stashed changes
     t.index ["amount_id"], name: "index_credit_note_adjustments_on_amount_id"
     t.index ["credit_note_id"], name: "index_credit_note_adjustments_on_credit_note_id"
     t.index ["invoice_id"], name: "index_credit_note_adjustments_on_invoice_id"
@@ -3374,7 +3411,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["viewable"], name: "index_document_level_reviewer_mappings_on_viewable"
   end
 
+<<<<<<< Updated upstream
   create_table "document_message_receipts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "document_message_receipts", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "user_id", null: false
     t.integer "receiptable_document_id", null: false
     t.string "receiptable_document_type", null: false
@@ -3400,7 +3441,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["user_id"], name: "index_document_message_receipts_on_user_id"
   end
 
+<<<<<<< Updated upstream
   create_table "document_message_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "document_message_types", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -3408,7 +3453,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["name"], name: "index_document_message_types_on_name"
   end
 
+<<<<<<< Updated upstream
   create_table "document_messages", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "document_messages", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "order"
     t.integer "user_id"
     t.integer "type_id"
@@ -3476,7 +3525,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.datetime "deleted_at"
   end
 
+<<<<<<< Updated upstream
   create_table "duplicate_expense_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+=======
+  create_table "duplicate_expense_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "expense_id", null: false
     t.integer "duplicate_expense_id", null: false
     t.datetime "created_at", null: false
@@ -3522,7 +3575,30 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["vendor_id"], name: "index_e_way_bills_on_vendor_id"
   end
 
+<<<<<<< Updated upstream
   create_table "email_authorizations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+=======
+  create_table "email_approval_document_types", options: "ENGINE=InnoDB DEFAULT CHARSET=armscii8", force: :cascade do |t|
+    t.string "name"
+    t.datetime "deleted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "email_approvals", options: "ENGINE=InnoDB DEFAULT CHARSET=armscii8", force: :cascade do |t|
+    t.string "approval_uuid"
+    t.datetime "deleted_at"
+    t.integer "company_id"
+    t.string "documentable_type"
+    t.bigint "documentable_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["approval_uuid"], name: "index_email_approvals_on_approval_uuid"
+    t.index ["documentable_type", "documentable_id"], name: "index_email_approvals_on_documentable_type_and_documentable_id"
+  end
+
+  create_table "email_authorizations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "user_id"
     t.integer "authorizable_id", null: false
     t.string "authorizable_type", null: false
@@ -3537,7 +3613,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["user_id"], name: "index_email_authorizations_on_user_id"
   end
 
+<<<<<<< Updated upstream
   create_table "email_bodies", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+=======
+  create_table "email_bodies", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "company_id"
     t.integer "email_id", null: false
     t.text "body", size: :long, collation: "utf8mb4_bin"
@@ -3673,7 +3753,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["updated_at"], name: "index_erp_sync_statuses_on_updated_at"
   end
 
+<<<<<<< Updated upstream
   create_table "exchange_rates", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+=======
+  create_table "exchange_rates", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.string "from"
     t.string "to"
     t.float "rate"
@@ -3854,7 +3938,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.datetime "deleted_at"
   end
 
+<<<<<<< Updated upstream
   create_table "export_formats", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "export_formats", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.string "name"
     t.string "value"
     t.datetime "deleted_at"
@@ -3946,7 +4034,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["user_id"], name: "index_export_requests_on_user_id"
   end
 
+<<<<<<< Updated upstream
   create_table "export_resources", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "export_resources", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.string "name"
     t.string "value"
     t.datetime "deleted_at"
@@ -3957,7 +4049,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["deleted_at"], name: "index_export_resources_on_deleted_at"
   end
 
+<<<<<<< Updated upstream
   create_table "export_template_news", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "export_template_news", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.string "name", null: false
     t.text "description"
     t.string "export_format", null: false
@@ -3985,7 +4081,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["resource"], name: "index_export_template_news_on_resource"
   end
 
+<<<<<<< Updated upstream
   create_table "export_template_user_role_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "export_template_user_role_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "template_id"
     t.integer "user_role_id", null: false
     t.datetime "deleted_at"
@@ -4019,7 +4119,20 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["template_type"], name: "index_export_templates_on_template_type"
   end
 
+<<<<<<< Updated upstream
   create_table "feature_subscriptions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+=======
+  create_table "feature_subscription_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+    t.string "name"
+    t.datetime "deleted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["created_at"], name: "index_feature_subscription_types_on_created_at"
+    t.index ["updated_at"], name: "index_feature_subscription_types_on_updated_at"
+  end
+
+  create_table "feature_subscriptions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "subscribable_id", null: false
     t.string "subscribable_type", null: false
     t.boolean "ocr_enabled", default: false, null: false
@@ -4047,11 +4160,10 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.boolean "custom_currency_conversion", default: false
     t.boolean "vendor_empanelment_workflow", default: false
     t.boolean "purchase_requisition_system"
-    t.string "bank_service_provider"
     t.boolean "group_entity_structure", default: false
+    t.string "bank_service_provider"
     t.boolean "grn_enabled", default: true
     t.boolean "srn_enabled", default: false
-    t.boolean "vendor_portal", default: false
     t.boolean "agreement_based_payment_system", default: false
     t.boolean "gstin_verification_enabled", default: false
     t.boolean "utility_bills_enabled", default: false
@@ -4068,7 +4180,6 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["srn_enabled"], name: "index_feature_subscriptions_on_srn_enabled"
     t.index ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id"
     t.index ["subscribable_type"], name: "index_feature_subscriptions_on_subscribable_type"
-    t.index ["vendor_portal"], name: "index_feature_subscriptions_on_vendor_portal"
   end
 
   create_table "feedback_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -4292,7 +4403,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.datetime "deleted_at"
   end
 
+<<<<<<< Updated upstream
   create_table "finbox_item_joins", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "finbox_item_joins", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "finbox_item_id"
     t.integer "viewer_id"
     t.string "viewer_type"
@@ -4302,7 +4417,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["viewer_id", "viewer_type"], name: "index_finbox_item_joins_on_viewer_id_and_viewer_type"
   end
 
+<<<<<<< Updated upstream
   create_table "finbox_items", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "finbox_items", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.string "message_id"
     t.text "subject"
     t.text "description"
@@ -4451,7 +4570,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["uuid"], name: "index_form_conditions_on_uuid"
   end
 
+<<<<<<< Updated upstream
   create_table "form_currencies", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+=======
+  create_table "form_currencies", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.string "currency"
     t.string "currency_code"
     t.string "symbol"
@@ -4473,10 +4596,10 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.string "field_key", null: false
     t.text "value", collation: "utf8_bin"
     t.string "value_text"
-    t.datetime "deleted_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "entity_type"
+    t.datetime "deleted_at"
     t.integer "company_id"
     t.index ["document_id"], name: "index_form_custom_fields_on_document_id"
     t.index ["document_type", "document_id"], name: "index_form_custom_fields_on_document_type_and_document_id"
@@ -4577,7 +4700,6 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.boolean "can_choices_be_changed"
     t.boolean "allow_clearing_default_value"
     t.text "options"
-    t.text "data_provider"
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -4599,6 +4721,13 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.text "compute_lookup_assignments"
     t.boolean "virtual", default: false
     t.text "triggers"
+<<<<<<< Updated upstream
+=======
+    t.boolean "cn_dependent", default: false
+    t.string "show_in_data_card_as"
+    t.string "size"
+    t.boolean "display_key", default: false
+>>>>>>> Stashed changes
     t.index ["company_id"], name: "index_form_entities_on_company_id"
     t.index ["created_at"], name: "index_form_entities_on_created_at"
     t.index ["created_by_user_id"], name: "index_form_entities_on_created_by_user_id"
@@ -4682,7 +4811,12 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["updated_at"], name: "index_form_rule_types_on_updated_at"
   end
 
+<<<<<<< Updated upstream
   create_table "form_rules", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "form_rules", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
+>>>>>>> Stashed changes
     t.bigint "company_id", null: false
     t.string "form_id", null: false
     t.string "rule_parent_id", null: false
@@ -4696,7 +4830,6 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "uuid", limit: 36, null: false
     t.index ["company_id"], name: "index_form_rules_on_company_id"
     t.index ["created_at"], name: "index_form_rules_on_created_at"
     t.index ["deleted_at"], name: "index_form_rules_on_deleted_at"
@@ -4708,6 +4841,7 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["rule_parent_type"], name: "index_form_rules_on_rule_parent_type"
     t.index ["rule_type_id"], name: "index_form_rules_on_rule_type_id"
     t.index ["updated_at"], name: "index_form_rules_on_updated_at"
+    t.index ["uuid"], name: "index_form_rules_on_uuid"
   end
 
   create_table "form_sections", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -4747,7 +4881,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["uuid"], name: "index_forms_on_uuid"
   end
 
+<<<<<<< Updated upstream
   create_table "gatekeeper_blocks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "gatekeeper_blocks", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "user_id"
     t.integer "company_id"
     t.text "params", size: :medium, collation: "utf8_bin"
@@ -4894,7 +5032,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["name"], name: "index_gst_types_on_name"
   end
 
+<<<<<<< Updated upstream
   create_table "gstin_locations", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "gstin_locations", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "vendor_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -4917,7 +5059,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["vendor_id"], name: "index_gstin_locations_on_vendor_id"
   end
 
+<<<<<<< Updated upstream
   create_table "gstins", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "gstins", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.string "gstin"
     t.string "legal_name_of_business"
     t.string "state"
@@ -5026,6 +5172,7 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.datetime "deleted_at"
   end
 
+<<<<<<< Updated upstream
   create_table "icici_virtual_accounts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "company_id"
     t.integer "balance_id"
@@ -5044,6 +5191,31 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
   create_table "import_job_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+=======
+  create_table "import_job_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
+    t.string "import_job_id", null: false
+    t.integer "created_by_id"
+    t.bigint "company_id", null: false
+    t.string "attachment_file_name"
+    t.string "attachment_content_type"
+    t.bigint "attachment_file_size"
+    t.datetime "attachment_updated_at"
+    t.datetime "deleted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.string "identifier"
+    t.index ["company_id"], name: "index_import_job_attachments_on_company_id"
+    t.index ["created_at"], name: "index_import_job_attachments_on_created_at"
+    t.index ["created_by_id"], name: "index_import_job_attachments_on_created_by_id"
+    t.index ["deleted_at"], name: "index_import_job_attachments_on_deleted_at"
+    t.index ["import_job_id"], name: "index_import_job_attachments_on_import_job_id"
+    t.index ["updated_at"], name: "index_import_job_attachments_on_updated_at"
+    t.index ["uuid"], name: "index_import_job_attachments_on_uuid"
+  end
+
+  create_table "import_job_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.string "name", null: false
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
@@ -5054,7 +5226,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["updated_at"], name: "index_import_job_statuses_on_updated_at"
   end
 
+<<<<<<< Updated upstream
   create_table "import_jobs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+=======
+  create_table "import_jobs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.string "uuid", limit: 36, null: false
     t.string "name", null: false
     t.string "type"
@@ -5084,6 +5260,8 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.string "result_file_content_type"
     t.bigint "result_file_file_size"
     t.datetime "result_file_updated_at"
+    t.boolean "require_attachments", default: false
+    t.text "meta_data"
     t.index ["company_id"], name: "index_import_jobs_on_company_id"
     t.index ["completed_at"], name: "index_import_jobs_on_completed_at"
     t.index ["created_at"], name: "index_import_jobs_on_created_at"
@@ -5096,7 +5274,45 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["uuid"], name: "index_import_jobs_on_uuid"
   end
 
+<<<<<<< Updated upstream
   create_table "index_view_segments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "import_record_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "deleted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["created_at"], name: "index_import_record_statuses_on_created_at"
+    t.index ["deleted_at"], name: "index_import_record_statuses_on_deleted_at"
+    t.index ["name"], name: "index_import_record_statuses_on_name"
+    t.index ["updated_at"], name: "index_import_record_statuses_on_updated_at"
+  end
+
+  create_table "import_records", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
+    t.bigint "company_id", null: false
+    t.string "import_job_id", null: false
+    t.text "record_data", size: :long
+    t.text "processed_data", size: :long
+    t.datetime "deleted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.string "message"
+    t.string "internal_message"
+    t.text "error_trace"
+    t.integer "status_id"
+    t.string "document_id"
+    t.string "document_type"
+    t.index ["company_id"], name: "index_import_records_on_company_id"
+    t.index ["created_at"], name: "index_import_records_on_created_at"
+    t.index ["deleted_at"], name: "index_import_records_on_deleted_at"
+    t.index ["import_job_id"], name: "index_import_records_on_import_job_id"
+    t.index ["updated_at"], name: "index_import_records_on_updated_at"
+    t.index ["uuid"], name: "index_import_records_on_uuid"
+  end
+
+  create_table "index_view_segments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.string "uuid", limit: 36, null: false
     t.string "screen", null: false
     t.string "name", null: false
@@ -5226,7 +5442,6 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.datetime "kyc_2_back_updated_at"
     t.string "kyc_1_number"
     t.string "kyc_2_number"
-    t.datetime "deleted_at"
     t.boolean "initiated"
     t.string "id_proof_front_file_name"
     t.string "id_proof_front_content_type"
@@ -5236,6 +5451,7 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.string "id_proof_back_content_type"
     t.bigint "id_proof_back_file_size"
     t.datetime "id_proof_back_updated_at"
+    t.datetime "deleted_at"
     t.index ["admin_review_workflow_id"], name: "index_individual_kycs_on_admin_review_workflow_id"
     t.index ["company_id"], name: "index_individual_kycs_on_company_id"
     t.index ["user_id"], name: "index_individual_kycs_on_user_id"
@@ -5281,6 +5497,7 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["uuid"], name: "index_insight_dashboards_on_uuid"
   end
 
+<<<<<<< Updated upstream
   create_table "invites", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "vendor_id", null: false
@@ -5307,6 +5524,9 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
   create_table "invoice_attachments", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+=======
+  create_table "invoice_attachments", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.string "attached_file_file_name"
     t.string "attached_file_content_type"
     t.integer "attached_file_file_size"
@@ -5384,19 +5604,19 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.string "item_number"
     t.string "product_type_id"
     t.string "gl_code"
+    t.decimal "item_gross_amount", precision: 20, scale: 5
+    t.decimal "item_discount_amount", precision: 20, scale: 5
+    t.decimal "item_taxable_amount", precision: 20, scale: 5
+    t.decimal "item_tax_amount", precision: 20, scale: 5
     t.decimal "item_tds_amount", precision: 20, scale: 5
     t.decimal "item_net_amount", precision: 20, scale: 5
-    t.decimal "item_tax_amount", precision: 20, scale: 5
-    t.decimal "item_taxable_amount", precision: 20, scale: 5
-    t.decimal "item_discount_amount", precision: 20, scale: 5
-    t.decimal "item_gross_amount", precision: 20, scale: 5
+    t.decimal "item_billable_amount", precision: 20, scale: 5
     t.decimal "reporting_item_gross_amount", precision: 20, scale: 5
     t.decimal "reporting_item_discount_amount", precision: 20, scale: 5
     t.decimal "reporting_item_taxable_amount", precision: 20, scale: 5
     t.decimal "reporting_item_tax_amount", precision: 20, scale: 5
     t.decimal "reporting_item_tds_amount", precision: 20, scale: 5
     t.decimal "reporting_item_net_amount", precision: 20, scale: 5
-    t.decimal "item_billable_amount", precision: 20, scale: 5
     t.decimal "reporting_item_billable_amount", precision: 20, scale: 5
     t.string "tax_type", default: ""
     t.decimal "item_rate", precision: 20, scale: 5, default: "0.0"
@@ -5531,34 +5751,41 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.integer "proforma_advance"
     t.decimal "total_proforma_advance", precision: 20, scale: 2
     t.boolean "cost_allocation_items", default: false
-    t.string "po_number"
     t.text "narration"
-    t.integer "bank_account_id"
+    t.string "po_number"
     t.integer "payment_agreement_id"
-    t.integer "vendor_location_id"
+    t.integer "bank_account_id"
     t.text "rejection_note"
+    t.integer "vendor_location_id"
     t.integer "billing_type_id"
-    t.integer "vendor_poc_id"
-    t.integer "vlpm_id"
-    t.text "client_note"
     t.string "agreement_item_type"
     t.integer "agreement_item_id"
     t.boolean "payable", default: false
-    t.integer "cn_adjusted_amount_id"
     t.boolean "rcm_enabled", default: false
+    t.integer "cn_adjusted_amount_id"
+    t.integer "erp_sync_status_id"
+    t.text "erp_sync_message"
+    t.text "erp_sync_reference_id"
+    t.integer "erp_sync_attempts_count", default: 0
+    t.datetime "erp_sync_attempted_at"
     t.decimal "tds_percentage", precision: 20, scale: 5
+    t.date "conversion_date"
+    t.decimal "conversion_rate", precision: 10, scale: 5
+    t.boolean "retrieve_conversion_rate", default: true
+    t.string "vendor_sequence_id"
+    t.string "vendor_trade_name"
+    t.string "vendor_gstin"
+    t.string "vendor_pan"
     t.string "vendor_bank_account_number"
     t.string "vendor_bank_account_ifsc"
     t.decimal "invoice_gross_amount", precision: 20, scale: 5
     t.decimal "invoice_discount_amount", precision: 20, scale: 5
     t.decimal "invoice_tax_amount", precision: 20, scale: 5
     t.decimal "invoice_tds_amount", precision: 20, scale: 5
-    t.text "vendor_sequence_id"
-    t.string "vendor_gstin"
     t.decimal "invoice_freight_amount", precision: 20, scale: 5
-    t.date "conversion_date"
-    t.decimal "conversion_rate", precision: 10, scale: 5
-    t.boolean "retrieve_conversion_rate", default: true
+    t.decimal "invoice_paid_outside_amount", precision: 20, scale: 5
+    t.decimal "invoice_sub_total_amount", precision: 20, scale: 5
+    t.decimal "invoice_total_amount", precision: 20, scale: 5
     t.decimal "invoice_taxable_amount", precision: 20, scale: 5
     t.decimal "invoice_roundoff_amount", precision: 20, scale: 5
     t.decimal "invoice_balance_due", precision: 20, scale: 5
@@ -5577,16 +5804,6 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.decimal "reporting_invoice_net_total_amount", precision: 20, scale: 5
     t.decimal "reporting_invoice_paid_outside_amount", precision: 20, scale: 5
     t.decimal "reporting_invoice_balance_due", precision: 20, scale: 5
-    t.integer "erp_sync_status_id"
-    t.text "erp_sync_message"
-    t.text "erp_sync_reference_id"
-    t.integer "erp_sync_attempts_count", default: 0
-    t.datetime "erp_sync_attempted_at"
-    t.string "vendor_trade_name"
-    t.string "vendor_pan"
-    t.decimal "invoice_paid_outside_amount", precision: 20, scale: 5
-    t.decimal "invoice_sub_total_amount", precision: 20, scale: 5
-    t.decimal "invoice_total_amount", precision: 20, scale: 5
     t.integer "payment_term_days", default: 0
     t.string "vendor_bank_account_swift_code", default: ""
     t.string "discount_type", default: ""
@@ -5600,10 +5817,19 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.integer "base_currency_id"
     t.integer "reporting_currency_id"
     t.integer "vendor_country_id"
+<<<<<<< Updated upstream
     t.decimal "po_invoice_adjusted_advance", precision: 20, scale: 10, default: "0.0"
     t.decimal "invoice_credit_note_adjusted_amount", precision: 20, scale: 10, default: "0.0"
     t.decimal "invoice_balance_due_without_cn", precision: 20, scale: 10, default: "0.0"
     t.boolean "credit_notes_presence", default: false
+=======
+    t.decimal "invoice_credit_note_adjusted_amount", precision: 20, scale: 10, default: "0.0"
+    t.decimal "invoice_balance_due_without_cn", precision: 20, scale: 10, default: "0.0"
+    t.decimal "po_invoice_adjusted_advance", precision: 20, scale: 10, default: "0.0"
+    t.decimal "reporting_po_advance", precision: 20, scale: 10, default: "0.0"
+    t.decimal "reporting_po_prev_adjusted_advance", precision: 20, scale: 10, default: "0.0"
+    t.decimal "reporting_adjusted_po_advance_payable_amount", precision: 20, scale: 10, default: "0.0"
+>>>>>>> Stashed changes
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["agreement_item_id"], name: "index_invoices_on_agreement_item_id"
     t.index ["company_id", "controlling_level_id", "deleted_at"], name: "index_invoice_ct_lvl_cmpny_id"
@@ -5625,8 +5851,6 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["tax_type_id"], name: "index_invoices_on_tax_type_id"
     t.index ["transaction_service_period_from"], name: "index_invoices_on_transaction_service_period_from"
     t.index ["transaction_service_period_to"], name: "index_invoices_on_transaction_service_period_to"
-    t.index ["vendor_poc_id"], name: "index_invoices_on_vendor_poc_id"
-    t.index ["vlpm_id"], name: "index_invoices_on_vlpm_id"
   end
 
   create_table "inward_document_items", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -5909,7 +6133,7 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.integer "level_id"
     t.integer "reviewer_id"
     t.decimal "threshold", precision: 20, scale: 5, default: "0.0"
-    t.boolean "exception", default: true
+    t.boolean "exception", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "is_deleted", default: false, null: false
@@ -5930,7 +6154,7 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.decimal "threshold", precision: 20, scale: 5, default: "0.0"
-    t.boolean "exception", default: true
+    t.boolean "exception", default: false
     t.boolean "wo_exception", default: true
     t.decimal "min", precision: 20, scale: 5, default: "0.0"
     t.decimal "max", precision: 20, scale: 5
@@ -6072,7 +6296,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["uuid"], name: "index_map_location_user_queries_on_uuid"
   end
 
+<<<<<<< Updated upstream
   create_table "master_entities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+=======
+  create_table "master_entities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.string "master_schema_id", null: false
     t.integer "company_id"
     t.string "type", null: false
@@ -6108,7 +6336,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["updated_at"], name: "index_master_entities_on_updated_at"
   end
 
+<<<<<<< Updated upstream
   create_table "master_entity_choices", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+=======
+  create_table "master_entity_choices", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "company_id", null: false
     t.string "name", null: false
     t.integer "position"
@@ -6128,7 +6360,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["updated_at"], name: "index_master_entity_choices_on_updated_at"
   end
 
+<<<<<<< Updated upstream
   create_table "master_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+=======
+  create_table "master_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "company_id"
     t.integer "created_by_id"
     t.integer "master_entity_id", null: false
@@ -6147,7 +6383,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["updated_at"], name: "index_master_mappings_on_updated_at"
   end
 
+<<<<<<< Updated upstream
   create_table "master_records", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+=======
+  create_table "master_records", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "master_schema_id", null: false
     t.string "ancestry"
     t.datetime "start_date"
@@ -6187,7 +6427,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["updated_at"], name: "index_master_records_on_updated_at"
   end
 
+<<<<<<< Updated upstream
   create_table "master_schemas", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+=======
+  create_table "master_schemas", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "company_id"
     t.string "name", null: false
     t.string "master_key", null: false
@@ -6237,7 +6481,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.datetime "deleted_at"
   end
 
+<<<<<<< Updated upstream
   create_table "ml_model_dependent_entities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+=======
+  create_table "ml_model_dependent_entities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "company_id", null: false
     t.integer "ml_model_id", null: false
     t.string "form_id", null: false
@@ -6254,7 +6502,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["updated_at"], name: "index_ml_model_dependent_entities_on_updated_at"
   end
 
+<<<<<<< Updated upstream
   create_table "ml_model_pmmls", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+=======
+  create_table "ml_model_pmmls", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "company_id", null: false
     t.integer "ml_model_id", null: false
     t.text "pmml", size: :long, collation: "utf8mb4_bin"
@@ -6272,7 +6524,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["updated_at"], name: "index_ml_model_pmmls_on_updated_at"
   end
 
+<<<<<<< Updated upstream
   create_table "ml_model_predictions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+=======
+  create_table "ml_model_predictions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "company_id", null: false
     t.bigint "ml_model_id"
     t.string "record_type"
@@ -6293,7 +6549,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["updated_at"], name: "index_ml_model_predictions_on_updated_at"
   end
 
+<<<<<<< Updated upstream
   create_table "ml_models", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+=======
+  create_table "ml_models", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "company_id", null: false
     t.string "type", null: false
     t.text "config", size: :long
@@ -6686,7 +6946,36 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["uid"], name: "index_oauth_applications_on_uid", unique: true
   end
 
+<<<<<<< Updated upstream
   create_table "old_passwords", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "ocr_documents", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
+    t.string "name", null: false
+    t.string "type"
+    t.integer "created_by_id"
+    t.bigint "company_id", null: false
+    t.datetime "deleted_at"
+    t.string "provider"
+    t.string "file_file_name"
+    t.string "file_content_type"
+    t.bigint "file_file_size"
+    t.datetime "file_updated_at"
+    t.text "extracted_data", size: :long
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["company_id"], name: "index_ocr_documents_on_company_id"
+    t.index ["created_at"], name: "index_ocr_documents_on_created_at"
+    t.index ["created_by_id"], name: "index_ocr_documents_on_created_by_id"
+    t.index ["deleted_at"], name: "index_ocr_documents_on_deleted_at"
+    t.index ["name"], name: "index_ocr_documents_on_name"
+    t.index ["type"], name: "index_ocr_documents_on_type"
+    t.index ["updated_at"], name: "index_ocr_documents_on_updated_at"
+    t.index ["uuid"], name: "index_ocr_documents_on_uuid"
+  end
+
+  create_table "old_passwords", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.string "encrypted_password", null: false
     t.string "password_archivable_type", null: false
     t.integer "password_archivable_id", null: false
@@ -6911,8 +7200,8 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.datetime "terminated_at"
     t.integer "terminated_by_id"
     t.text "termination_reason"
-    t.datetime "deleted_at"
     t.integer "revision_of_pa_id"
+    t.datetime "deleted_at"
     t.text "revision_reason"
     t.integer "revised_by_id"
     t.integer "base_currency_id"
@@ -7226,7 +7515,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.datetime "deleted_at"
   end
 
+<<<<<<< Updated upstream
   create_table "physical_units", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+=======
+  create_table "physical_units", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.string "name"
     t.string "symbol"
     t.datetime "created_at", null: false
@@ -7294,14 +7587,25 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.boolean "enabled"
   end
 
+<<<<<<< Updated upstream
   create_table "policy_department_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "policy_id"
     t.integer "department_id"
     t.boolean "enabled"
+=======
+  create_table "policy_department_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.integer "policy_id", null: false
+    t.integer "location_id", null: false
+    t.integer "department_id", null: false
+>>>>>>> Stashed changes
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "enabled"
     t.datetime "deleted_at"
     t.integer "company_id"
+    t.index ["department_id"], name: "index_policy_department_mappings_on_department_id"
+    t.index ["location_id"], name: "index_policy_department_mappings_on_location_id"
+    t.index ["policy_id"], name: "index_policy_department_mappings_on_policy_id"
   end
 
   create_table "policy_designation_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -7313,7 +7617,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["policy_id"], name: "index_policy_designation_mappings_on_policy_id"
   end
 
+<<<<<<< Updated upstream
   create_table "policy_field_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+=======
+  create_table "policy_field_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "field_configuration_id", null: false
     t.integer "policy_id", null: false
     t.datetime "created_at", null: false
@@ -7324,7 +7632,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["policy_id"], name: "index_policy_field_mappings_on_policy_id"
   end
 
+<<<<<<< Updated upstream
   create_table "policy_location_department_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "policy_location_department_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "location_id"
     t.integer "department_id"
     t.integer "policy_id"
@@ -7335,7 +7647,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.datetime "deleted_at"
   end
 
+<<<<<<< Updated upstream
   create_table "policy_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "policy_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "policy_id"
     t.integer "location_id"
     t.boolean "enabled"
@@ -7345,7 +7661,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.integer "company_id"
   end
 
+<<<<<<< Updated upstream
   create_table "policy_user_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+=======
+  create_table "policy_user_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "user_id", null: false
     t.integer "policy_id", null: false
     t.boolean "admin", default: false, null: false
@@ -7398,7 +7718,7 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.datetime "updated_at", null: false
     t.text "source"
     t.text "source_description"
-    t.string "referrer"
+    t.text "referrer"
     t.datetime "deleted_at"
     t.text "url"
   end
@@ -7416,11 +7736,9 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "user_id"
-    t.integer "vendor_poc_id"
     t.datetime "deleted_at"
     t.index ["procurement_document_id", "procurement_document_type"], name: "index_procurement_attachments_on_procurement_document"
     t.index ["user_id"], name: "index_procurement_attachments_on_user_id"
-    t.index ["vendor_poc_id"], name: "index_procurement_attachments_on_vendor_poc_id"
   end
 
   create_table "procurement_charges", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -7510,16 +7828,12 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.string "procurement_type"
     t.string "transaction_id"
     t.datetime "deleted_at"
-    t.integer "vendor_poc_id"
-    t.integer "vlpm_id"
     t.index ["company_id"], name: "index_procurements_on_company_id"
     t.index ["procurement_status_id"], name: "index_procurements_on_procurement_status_id"
     t.index ["procurement_track_id"], name: "index_procurements_on_procurement_track_id"
     t.index ["procurement_type"], name: "index_procurements_on_procurement_type"
     t.index ["user_id"], name: "index_procurements_on_user_id"
     t.index ["vendor_id"], name: "index_procurements_on_vendor_id"
-    t.index ["vendor_poc_id"], name: "index_procurements_on_vendor_poc_id"
-    t.index ["vlpm_id"], name: "index_procurements_on_vlpm_id"
   end
 
   create_table "product_combinations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -7544,7 +7858,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.datetime "deleted_at"
   end
 
+<<<<<<< Updated upstream
   create_table "product_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "product_types", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -7579,8 +7897,6 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.string "account"
     t.integer "tax_rate_id"
     t.datetime "deleted_at"
-    t.datetime "submitted_at"
-    t.datetime "approved_at"
     t.string "unit_of_measurement"
     t.integer "purchase_request_item_id"
     t.integer "department_id"
@@ -7592,7 +7908,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.boolean "tds_applicable", default: false
     t.integer "company_id"
     t.string "item_number"
+<<<<<<< Updated upstream
     t.boolean "product_type_id"
+=======
+    t.integer "product_type_id"
+>>>>>>> Stashed changes
     t.string "gl_code"
     t.decimal "item_rate", precision: 20, scale: 5
     t.decimal "tax_percentage", precision: 20, scale: 5
@@ -7606,9 +7926,12 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.decimal "reporting_item_tax_amount", precision: 20, scale: 5
     t.decimal "item_net_amount", precision: 20, scale: 5
     t.decimal "reporting_item_net_amount", precision: 20, scale: 5
+<<<<<<< Updated upstream
     t.decimal "item_billable_amount", precision: 20, scale: 5
     t.decimal "reporting_item_billable_amount", precision: 20, scale: 5
     t.string "pr_number"
+=======
+>>>>>>> Stashed changes
     t.index ["department_id"], name: "index_purchase_order_items_on_department_id"
     t.index ["discount_amount_id"], name: "index_purchase_order_items_on_discount_amount_id"
     t.index ["inventory_line_item_id"], name: "index_purchase_order_items_on_inventory_line_item_id"
@@ -7674,13 +7997,13 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.datetime "deleted_at"
     t.datetime "submitted_at"
     t.datetime "approved_at"
+    t.integer "revised_po_id"
+    t.integer "revision_of_id"
+    t.integer "revision_number", default: 0
     t.integer "advance_amount_id"
     t.date "due_date"
     t.integer "advance_amount_status_id"
     t.integer "bank_account_id"
-    t.integer "revised_po_id"
-    t.integer "revision_of_id"
-    t.integer "revision_number", default: 0
     t.text "note"
     t.integer "advance_tds_slab_id"
     t.integer "advance_tds_amount_id"
@@ -7691,19 +8014,22 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.text "internal_note"
     t.integer "taxable_amount_id"
     t.text "vendor_address"
-    t.integer "discount_type_id"
     t.string "vendor_poc_name"
     t.string "vendor_poc_email"
     t.string "vendor_poc_mobile_number"
+    t.integer "discount_type_id"
     t.text "rejection_note"
-    t.integer "vendor_poc_id"
-    t.integer "vlpm_id"
-    t.text "vendor_note"
     t.integer "erp_sync_status_id"
     t.date "conversion_date"
     t.integer "reporting_currency_id"
+<<<<<<< Updated upstream
     t.integer "base_currency_id"
     t.decimal "conversion_rate", precision: 20, scale: 5
+=======
+    t.date "conversion_date"
+    t.decimal "conversion_rate", precision: 20, scale: 5
+    t.integer "payment_term_days", default: 0
+>>>>>>> Stashed changes
     t.string "vendor_trade_name"
     t.string "vendor_sequence_id"
     t.string "vendor_gstin"
@@ -7727,11 +8053,18 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.decimal "reporting_po_sub_total_amount", precision: 20, scale: 5
     t.decimal "po_roundoff_amount", precision: 20, scale: 5
     t.decimal "reporting_po_roundoff_amount", precision: 20, scale: 5
+<<<<<<< Updated upstream
     t.decimal "po_balance_due", precision: 20, scale: 5
     t.decimal "reporting_po_balance_due", precision: 20, scale: 5
     t.decimal "po_total_amount", precision: 20, scale: 5
     t.decimal "reporting_po_total_amount", precision: 20, scale: 5
     t.integer "payment_term_days", default: 0
+=======
+    t.decimal "po_total_amount", precision: 20, scale: 5
+    t.decimal "reporting_po_total_amount", precision: 20, scale: 5
+    t.decimal "po_balance_due", precision: 20, scale: 5
+    t.decimal "reporting_po_balance_due", precision: 20, scale: 5
+>>>>>>> Stashed changes
     t.decimal "po_requested_advance_amount", precision: 20, scale: 10, default: "0.0"
     t.decimal "po_advance_tds_amount", precision: 20, scale: 10, default: "0.0"
     t.decimal "po_advance_amount", precision: 20, scale: 10, default: "0.0"
@@ -7741,6 +8074,10 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.decimal "po_advance_tds_percentage", precision: 20, scale: 10, default: "0.0"
     t.integer "vendor_country_id"
     t.boolean "retrieve_conversion_rate"
+<<<<<<< Updated upstream
+=======
+    t.datetime "advance_scheduled_date"
+>>>>>>> Stashed changes
     t.index ["advance_amount_id"], name: "index_purchase_orders_on_advance_amount_id"
     t.index ["advance_amount_status_id"], name: "index_purchase_orders_on_advance_amount_status_id"
     t.index ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id"
@@ -7767,18 +8104,24 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["transaction_amount_id"], name: "index_purchase_orders_on_transaction_amount_id"
     t.index ["user_id"], name: "index_purchase_orders_on_user_id"
     t.index ["vendor_id"], name: "index_purchase_orders_on_vendor_id"
-    t.index ["vendor_poc_id"], name: "index_purchase_orders_on_vendor_poc_id"
-    t.index ["vlpm_id"], name: "index_purchase_orders_on_vlpm_id"
   end
 
+<<<<<<< Updated upstream
   create_table "purchase_request_item_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "purchase_request_item_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
   end
 
+<<<<<<< Updated upstream
   create_table "purchase_request_items", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "purchase_request_items", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "purchase_request_id"
     t.integer "item_id"
     t.integer "vendor_id"
@@ -7823,28 +8166,36 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["vendor_id"], name: "index_purchase_request_items_on_vendor_id"
   end
 
+<<<<<<< Updated upstream
   create_table "purchase_request_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "purchase_request_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
   end
 
+<<<<<<< Updated upstream
   create_table "purchase_requests", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "purchase_requests", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "location_id"
-    t.integer "department_id"
-    t.integer "policy_id"
-    t.integer "controlling_level_id"
-    t.integer "company_id"
     t.integer "purchase_request_status_id"
     t.text "note"
     t.integer "creator_id"
     t.datetime "submitted_at"
     t.datetime "approved_at"
     t.string "order_number"
+    t.integer "location_id"
+    t.integer "department_id"
+    t.integer "policy_id"
+    t.integer "controlling_level_id"
+    t.integer "company_id"
     t.text "reject_note"
     t.integer "cost_center_id"
     t.integer "total_amount_id"
@@ -7852,7 +8203,13 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.datetime "deleted_at"
     t.date "conversion_date"
     t.integer "reporting_currency_id"
+<<<<<<< Updated upstream
     t.integer "base_currency_id"
+=======
+    t.string "creator_name"
+    t.string "creator_email"
+    t.date "conversion_date"
+>>>>>>> Stashed changes
     t.decimal "conversion_rate", precision: 20, scale: 5
     t.decimal "pr_gross_amount", precision: 20, scale: 5
     t.decimal "reporting_pr_gross_amount", precision: 20, scale: 5
@@ -7979,7 +8336,7 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.decimal "advance_amount", precision: 20, scale: 2
     t.string "credit_period"
     t.text "note"
-    t.boolean "selected", default: false
+    t.integer "selected", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "purchase_order_id"
@@ -7993,7 +8350,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["quotation_number"], name: "index_quotations_on_quotation_number"
   end
 
+<<<<<<< Updated upstream
   create_table "rate_contract_line_items", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "rate_contract_line_items", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "location_id"
     t.integer "item_id"
     t.datetime "start_date"
@@ -8006,7 +8367,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.integer "company_id"
   end
 
+<<<<<<< Updated upstream
   create_table "rate_contracts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "rate_contracts", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.string "name"
     t.integer "vendor_id"
     t.boolean "renewable"
@@ -8457,7 +8822,7 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.integer "controlling_user_role_id"
     t.integer "controlling_for_user_id"
     t.integer "controlling_for_user_role_id"
-    t.string "memo"
+    t.text "memo"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "reimbursement_id"
@@ -8505,7 +8870,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["user_id"], name: "index_reports_on_user_id"
   end
 
+<<<<<<< Updated upstream
   create_table "request_impressions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "request_impressions", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.string "ip", null: false
     t.string "ip_type"
     t.string "user_agent"
@@ -8539,7 +8908,7 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.string "action"
     t.string "view"
     t.boolean "blocked"
-    t.string "blocked_by"
+    t.string "block_by"
     t.string "block_reason"
     t.decimal "response_code", precision: 10
     t.decimal "response_time", precision: 10
@@ -8549,13 +8918,14 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.integer "user_ip_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "blocked_by"
     t.datetime "deleted_at"
     t.index ["access_token_id"], name: "index_request_impressions_on_access_token_id"
     t.index ["action"], name: "index_request_impressions_on_action"
     t.index ["app"], name: "index_request_impressions_on_app"
+    t.index ["block_by"], name: "index_request_impressions_on_block_by"
     t.index ["block_reason"], name: "index_request_impressions_on_block_reason"
     t.index ["blocked"], name: "index_request_impressions_on_blocked"
-    t.index ["blocked_by"], name: "index_request_impressions_on_blocked_by"
     t.index ["company_id"], name: "index_request_impressions_on_company_id"
     t.index ["controller"], name: "index_request_impressions_on_controller"
     t.index ["country_name"], name: "index_request_impressions_on_country_name"
@@ -8608,7 +8978,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["policy_id"], name: "index_reviewal_levels_on_policy_id"
   end
 
+<<<<<<< Updated upstream
   create_table "rule_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+=======
+  create_table "rule_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -8877,7 +9251,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["company_id"], name: "index_tax_rates_on_company_id"
   end
 
+<<<<<<< Updated upstream
   create_table "tax_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+=======
+  create_table "tax_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.string "country_name", default: ""
     t.string "name", default: ""
     t.string "tax_name", default: ""
@@ -8953,7 +9331,6 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.integer "parent_id"
     t.string "parent_type"
     t.integer "action_user_id"
-    t.string "action_user_type"
     t.integer "action_id"
     t.integer "action_user_role_id"
     t.integer "action_level_id"
@@ -8972,7 +9349,6 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["action_level_id"], name: "index_trails_on_action_level_id"
     t.index ["action_user_id"], name: "index_trails_on_action_user_id"
     t.index ["action_user_role_id"], name: "index_trails_on_action_user_role_id"
-    t.index ["action_user_type"], name: "index_trails_on_action_user_type"
     t.index ["modified_level_id"], name: "index_trails_on_modified_level_id"
     t.index ["parent_type", "parent_id"], name: "index_trails_on_parent_type_and_parent_id"
   end
@@ -9372,7 +9748,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["purpose_id"], name: "index_unique_identifiers_on_purpose_id"
   end
 
+<<<<<<< Updated upstream
   create_table "units", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+=======
+  create_table "units", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.string "name", default: ""
     t.string "value", default: ""
     t.datetime "deleted_at"
@@ -9381,7 +9761,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["deleted_at"], name: "index_units_on_deleted_at"
   end
 
+<<<<<<< Updated upstream
   create_table "user_agent_client_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "user_agent_client_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -9389,7 +9773,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["name"], name: "index_user_agent_client_statuses_on_name"
   end
 
+<<<<<<< Updated upstream
   create_table "user_agent_clients", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "user_agent_clients", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.string "user_agent", null: false
     t.integer "user_id", null: false
     t.integer "status_id", null: false
@@ -9458,7 +9846,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["user_id"], name: "index_user_balance_histories_on_user_id"
   end
 
+<<<<<<< Updated upstream
   create_table "user_branch_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "user_branch_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "user_id", null: false
     t.integer "branch_location_id", null: false
     t.datetime "created_at", null: false
@@ -9508,7 +9900,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["user_id"], name: "index_user_department_mappings_on_user_id"
   end
 
+<<<<<<< Updated upstream
   create_table "user_device_browsers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "user_device_browsers", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.datetime "timestamp"
     t.string "user_agent"
     t.string "timezone"
@@ -9547,7 +9943,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.datetime "deleted_at"
   end
 
+<<<<<<< Updated upstream
   create_table "user_device_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "user_device_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -9555,7 +9955,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["name"], name: "index_user_device_statuses_on_name"
   end
 
+<<<<<<< Updated upstream
   create_table "user_devices", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "user_devices", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "user_id"
     t.integer "company_id"
     t.string "fingerprint"
@@ -9676,7 +10080,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["name"], name: "index_user_groups_on_name"
   end
 
+<<<<<<< Updated upstream
   create_table "user_ip_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "user_ip_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -9684,7 +10092,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["name"], name: "index_user_ip_statuses_on_name"
   end
 
+<<<<<<< Updated upstream
   create_table "user_ips", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "user_ips", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.string "ip", null: false
     t.string "ip_type", null: false
     t.integer "user_id", null: false
@@ -9772,7 +10184,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["user_id"], name: "index_user_manager_type_mappings_on_user_id"
   end
 
+<<<<<<< Updated upstream
   create_table "user_panel_subscriptions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+=======
+  create_table "user_panel_subscriptions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "user_id"
     t.boolean "disburse"
     t.boolean "expense_management"
@@ -9929,7 +10345,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["view"], name: "index_user_session_notifications_on_view"
   end
 
+<<<<<<< Updated upstream
   create_table "user_session_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "user_session_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -10216,6 +10636,7 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["yes_bank_vendor_id"], name: "index_vendor_attachments_on_yes_bank_vendor_id"
   end
 
+<<<<<<< Updated upstream
   create_table "vendor_location_poc_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "gstin_location_id"
     t.integer "vendor_id"
@@ -10226,6 +10647,9 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
   create_table "vendor_payment_wallets", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+=======
+  create_table "vendor_payment_wallets", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "balance_id"
     t.integer "user_id"
     t.datetime "created_at", null: false
@@ -10236,6 +10660,7 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.index ["user_id"], name: "index_vendor_payment_wallets_on_user_id"
   end
 
+<<<<<<< Updated upstream
   create_table "vendor_pocs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -10270,13 +10695,20 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   end
 
   create_table "vendor_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "vendor_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
   end
 
+<<<<<<< Updated upstream
   create_table "vendor_tds_rates", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+=======
+  create_table "vendor_tds_rates", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+>>>>>>> Stashed changes
     t.integer "vendor_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -10590,17 +11022,21 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
     t.string "trade_name"
     t.text "reject_note"
     t.boolean "rcm_enabled", default: false
+<<<<<<< Updated upstream
+=======
+    t.integer "erp_sync_status_id"
+    t.text "erp_sync_message"
+    t.text "erp_sync_reference_id"
+    t.integer "erp_sync_attempts_count", default: 0
+    t.datetime "erp_sync_attempted_at"
+    t.string "vendor_country"
+>>>>>>> Stashed changes
     t.date "ldc_effective_start_date"
     t.date "ldc_effective_end_date"
     t.date "tds_effective_start_date"
     t.date "tds_effective_end_date"
     t.string "bank_code"
     t.integer "tax_rate_id"
-    t.integer "erp_sync_status_id"
-    t.text "erp_sync_message"
-    t.text "erp_sync_reference_id"
-    t.integer "erp_sync_attempts_count", default: 0
-    t.datetime "erp_sync_attempted_at"
     t.decimal "ldc_upper_limit_amount", precision: 20, scale: 5
     t.string "vendor_country"
     t.index ["company_id", "controlling_level_id", "deleted_at"], name: "index_vendors_ct_lvl_cmpny_id"
@@ -10885,6 +11321,7 @@ ActiveRecord::Schema.define(version: 2021_09_29_041613) do
   add_foreign_key "per_diem_expenses", "per_diems"
   add_foreign_key "policies", "companies"
   add_foreign_key "policy_configurations", "policies"
+  add_foreign_key "policy_department_mappings", "policies"
   add_foreign_key "policy_designation_mappings", "policies"
   add_foreign_key "policy_field_mappings", "field_configurations"
   add_foreign_key "policy_field_mappings", "policies"
