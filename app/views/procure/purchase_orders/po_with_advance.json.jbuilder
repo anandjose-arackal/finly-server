@@ -11,6 +11,7 @@ json.results do
     # json.po_advance_amount_value purchase_order.advance_amount.value
     # json.po_advance_amount_currency purchase_order.advance_amount.currency.country_code
     if purchase_order.forms_enabled
+      json.po_due_date purchase_order.advance_scheduled_date&.strftime("%d-%m-%Y")
       json.po_requested_advance_amount do 
         json.value purchase_order.po_requested_advance_amount
         json.currency purchase_order.get_base_currency
