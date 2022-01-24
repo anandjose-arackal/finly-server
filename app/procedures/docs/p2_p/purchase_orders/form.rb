@@ -435,7 +435,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
            can_editable_be_changed: false, can_visible_be_changed: false,
            computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_advance_amount])
 
-    date :advance_scheduled_date, label: "Scheduled Date", editable: true, visible: true, required: true
+    date :due_date, label: "Scheduled Date", editable: true, visible: true, required: true
     lookup :advance_amount_status_id, label: 'Status', editable: false, visible: true,
            can_editable_be_changed: false, can_visible_be_changed: false, choices_scope: Choices[:lookup].('advance_amount_statuses'), 
            default_value: AdvanceAmountStatus.id_for(:new)
@@ -646,7 +646,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
   end
 
   condition condition_id: "make advance scheduled date required for document advance true" do
-    reference :entity, 'advance_scheduled_date'
+    reference :entity, 'due_date'
     rule Rules::Builder[:advance_amount_required].eq_any(value: false)
     action :editable, false
     action :required, false
