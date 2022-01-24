@@ -140,7 +140,6 @@ class InvoiceCalculationUtils
 
     unless self.invoice.class.name == 'OutwardInvoice'
       if self.invoice.forms_enabled
-        self.invoice.invoice_sub_total_amount = self.net_amount
         self.invoice.invoice_tds_amount = self.tds_amount
         self.invoice.invoice_taxable_amount = taxable_amount
         self.invoice.invoice_gross_amount = self.gross_amount

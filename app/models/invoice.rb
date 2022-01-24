@@ -337,7 +337,7 @@ class Invoice < ApplicationRecord
            :approved?, :retracted?, :auto_approved?, :initiated?, :closed?, :voided?, to: :invoice_status, allow_nil: true
   delegate :payment?, :advance?, :tax_invoice?, to: :invoice_type
 
-  attr_accessor :invoice_custom_fields
+  attr_accessor :invoice_custom_fields, :display_tds_amount
 
   # validates :gross_amount, presence: true
   # validates :net_amount, presence: true
@@ -1429,6 +1429,10 @@ class Invoice < ApplicationRecord
     else
       (self.advance_amount&.value.to_f / self.items.count.to_f) rescue 0
     end
+  end
+
+  def display_tds_amount
+    self.items.pluck(:item_tds_amount).sum&.to_f
   end
 
   def cn_adjustment_per_item

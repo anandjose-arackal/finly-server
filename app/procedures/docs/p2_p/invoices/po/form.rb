@@ -50,12 +50,13 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
       # NET AMOUNT
       invoice_sub_total_amount: "{% assign inv_sub_total_amount = form.invoice_gross_amount | minus: form.invoice_discount_amount | plus: form.invoice_tax_amount | plus: form.invoice_freight_amount | round: 2 %}{% if form.rcm_enabled == true %}{{ inv_sub_total_amount | minus: form.invoice_tax_amount | default: 0 | round: 2}}{% else %}{{ inv_sub_total_amount | default: 0 | round: 2 }}{% endif %}",
       invoice_paid_outside_amount: "{{ form.invoice_paid_outside_amount | default: 0 | round: 2}}",
-      invoice_tds_amount: "{% assign tds_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign tds_amount = tds_amount | plus: item.item_tds_amount %}{% endif %}{% endfor %}{{ tds_amount  | default: 0 | ceil}}",
+      # invoice_tds_amount: "{% assign tds_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign tds_amount = tds_amount | plus: item.item_tds_amount %}{% endif %}{% endfor %}{{ tds_amount  | default: 0 | ceil}}",
+      display_tds_amount: "{% assign tds_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign tds_amount = tds_amount | plus: item.item_tds_amount %}{% endif %}{% endfor %}{{ tds_amount  | default: 0 | ceil}}",
       
       #### net payable amount 
       # invoice_roundoff_amount: "{% assign net_total_amount = form.invoice_sub_total_amount | minus: form.invoice_paid_outside_amount | minus: form.invoice_tds_amount %}{% assign round_amount = net_total_amount | round %}{% assign amount = round_amount | minus: net_total_amount %}{% if form.base_currency_id != form.reporting_currency_id %}{% assign amount = 0 %}{% endif %}{{ amount | default: 0 | round: 2 }}",
       invoice_roundoff_amount: "{% assign net_total_amount = form.invoice_sub_total_amount | minus: form.invoice_paid_outside_amount | minus: form.invoice_tds_amount %}{% assign round_amount = net_total_amount | round %}{% assign amount = round_amount | minus: net_total_amount %}{% if form.base_currency_id == '#{Currency.id_for('INR')}' and form.reporting_currency_id == '#{Currency.id_for('INR')}' %}{{ amount | default: 0 | round: 2 }}{% else %}{{ 0 }}{% endif %}",
-      invoice_total_amount: "{{ form.invoice_sub_total_amount | plus: form.invoice_roundoff_amount | minus: form.invoice_tds_amount | minus: form.invoice_paid_outside_amount | default: 0 | round: 2}}",
+      invoice_total_amount: "{{ form.invoice_sub_total_amount | plus: form.invoice_roundoff_amount | minus: form.display_tds_amount | minus: form.invoice_paid_outside_amount | default: 0 | round: 2}}",
       
       #### net payable amount has roundoff value added
       # invoice_net_total_amount: "{% if form.base_currency_id != form.reporting_currency_id %}{{ form.invoice_total_amount | default: 0 | round: 2 }}{% else %}{{ form.invoice_total_amount | default: 0 | round }}{% endif %}",
@@ -72,7 +73,7 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
       reporting_invoice_freight_amount: "{{ form.invoice_freight_amount | times: form.conversion_rate | default: 0 | round: 2}}",
       reporting_invoice_sub_total_amount: "{{ form.invoice_sub_total_amount | times: form.conversion_rate | default: 0 | round: 2}}",
       reporting_invoice_paid_outside_amount: "{{ form.invoice_paid_outside_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_invoice_tds_amount: "{{ form.invoice_tds_amount | times: form.conversion_rate | default: 0 | round: 2}}",
+      reporting_invoice_tds_amount: "{{ form.display_tds_amount | times: form.conversion_rate | default: 0 | round: 2}}",
       reporting_invoice_roundoff_amount: "{% assign amount = form.reporting_invoice_sub_total_amount | round %}{% assign amount = amount | minus: form.reporting_invoice_sub_total_amount %}{% if form.base_currency_id == '1' and form.reporting_currency_id == '1' %}{{ amount | default: 0 | round: 2}}{% else %}{{ 0 }}{% endif %}",
       reporting_invoice_total_amount: "{{ form.invoice_total_amount | times: form.conversion_rate | default: 0 | round: 2}}",
       
@@ -392,9 +393,13 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Lookup('items_summary.tds_slab_id', '{{record.tds}}')
 
-      amount :invoice_tds_amount, label: 'Tds Amount', editable: false, visible: true, # todo - condition when reporting currency is in INR
+      amount :invoice_tds_amount, label: 'Tds Amount', editable: false, visible: false, # todo - condition when reporting currency is in INR
+             can_editable_be_changed: false
+             # computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_tds_amount])
+       
+      amount :display_tds_amount, label: 'Tds Amount', editable: false, visible: true, # todo - condition when reporting currency is in INR
              can_editable_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_tds_amount])
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:display_tds_amount])
 
       amount :reporting_invoice_tds_amount, label: 'Tds Amount(Reporting Currency)', 
              can_visible_be_changed: false, can_editable_be_changed: false, editable: false, visible: false,
