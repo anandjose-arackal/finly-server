@@ -134,7 +134,7 @@ class Procurements::InwardDocuments::CreateGrnAndSrn < Procurements::InwardDocum
 
   def create_inward_document_params
     {
-        company_id: self.procurement&.company.id,
+        company_id: self.procurement&.company&.id,
         vendor_id: self.purchase_order&.vendor&.id,
         user: user
     }
