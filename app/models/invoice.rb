@@ -1432,7 +1432,7 @@ class Invoice < ApplicationRecord
   end
 
   def display_tds_amount
-    (self.invoice.items.except(tds_applicable: false).map(&:item_taxable_amount).map(&:to_f).sum * self.invoice.tds_percentage) / 100  
+    (self.items.except(tds_applicable: false).map(&:item_taxable_amount).map(&:to_f).sum * self.tds_percentage) / 100  
   end
 
   def cn_adjustment_per_item
