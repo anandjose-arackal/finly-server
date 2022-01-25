@@ -1432,7 +1432,7 @@ class Invoice < ApplicationRecord
   end
 
   def display_tds_amount
-    self.items.pluck(:item_tds_amount).sum&.to_f
+    self.items.pluck(:item_tds_amount).map(&:to_f).sum&.to_f
   end
 
   def cn_adjustment_per_item
@@ -1916,6 +1916,11 @@ class Invoice < ApplicationRecord
   # end
 
   # Syncs amounts from new forms structure to legacy amounts table
+  def calculate_advance
+    invoice_tds_amount = self.invoice_tds_amount
+
+  end
+
   def sync_amounts
     if forms_enabled
       # calculate the advance and adjusted tds
