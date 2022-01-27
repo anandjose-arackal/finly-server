@@ -12,11 +12,17 @@ json.name payment.receiving_account&.name
 json.account_number payment.receiving_account.account_number
 json.base_currency payment.bank_payment_request.base_currency
 json.reporting_currency payment.company.reporting_currency
+if payment.parent_type == 'PurchaseOrder'
+  json.base_currency payment.parent.base_currency
+  json.reporting_currency payment.parent.reporting_currency
+end
 json.disabled payment.receiving_account&.disabled
 json.ifsc payment.receiving_account.ifsc
 json.swift_code payment.receiving_account.swift_code
 json.amount precision_value payment.amount_value
 json.payment_amount payment.amount_value
+conversion_rate = parent.conversion_rate.to_f rescue 1
+json.reporting_payment_amount = payment.amount_value * conversion_rate
 json.net_amount precision_value payment.amount_value
 json.invoice_amount precision_value payment.invoice_amount
 json.status payment.payment_status_name
@@ -167,16 +173,32 @@ else
     json.net_amount precision_value payment.amount&.value
     json.roundoff_amount 0
     json.balance_due payment.amount&.value
+    json.base_currency parent.base_currency
+    json.reporting_currency parent.reporting_currency
     if parent.present?
       case parent.class.name
       when 'PurchaseOrder'
         json.item_amounts_total (parent.total_before_tax&.value + parent.discount_amount&.value).round(2) rescue 0
         json.tds_amount parent.advance_tds_amount&.value rescue 0
         json.net_payable_amount parent.balance_amount&.value
+        json.net_payable_amount parent.po_balance_due.to_f if parent.user.po_form_enabled
         # json.paid_amount parent.advance_payments.successful.joins(:amount).sum(:value)
         json.paid_amount parent.requested_advance_amount.value.round(2)
         # json.remaining_amount (parent.balance_amount&.value.to_f - parent.advance_payments.successful.joins(:amount).sum(:value))
         json.remaining_amount (parent.balance_amount&.value.to_f - parent.requested_advance_amount.value.round(2))
+        if parent.user.po_form_enabled
+          json.non_po_invoice_form_enabled true
+          json.invoice_sub_total_amount precision_value parent.total_adv_amount
+          json.invoice_net_total_amount precision_value parent.po_total_amount
+          json.invoice_balance_due precision_value (parent.po_total_amount - parent.total_adv_amount)
+          json.conversion_rate parent.conversion_rate
+          json.tds_amount parent.po_advance_tds_amount.to_f
+          json.net_payable_amount parent.po_balance_due.to_f
+          json.reporting_net_payable_amount (parent.po_balance_due.to_f * parent.conversion_rate)
+          json.paid_amount parent.po_requested_advance_amount.to_f.round(2)
+          json.remaining_amount (parent.po_balance_due.to_f - parent.po_requested_advance_amount.to_f.round(2))
+          json.reporting_remaining_amount ((parent.po_balance_due.to_f - parent.po_requested_advance_amount.to_f.round(2)) * parent.conversion_rate)
+        end
       end
     end
   end

@@ -339,7 +339,7 @@ class Invoice < ApplicationRecord
            :approved?, :retracted?, :auto_approved?, :initiated?, :closed?, :voided?, to: :invoice_status, allow_nil: true
   delegate :payment?, :advance?, :tax_invoice?, to: :invoice_type
 
-  attr_accessor :invoice_custom_fields
+  attr_accessor :invoice_custom_fields, :display_tds_amount
 
   # validates :gross_amount, presence: true
   # validates :net_amount, presence: true
@@ -905,7 +905,7 @@ class Invoice < ApplicationRecord
   # this method updates the invoice status based on the associated
   # payments made against this particular invoice
   def update_invoice_status
-    balance_due = self.balance_due&.value.to_f
+    balance_due = self.forms_enabled ? self.invoice_balance_due.to_f : self.balance_due&.value.to_f 
     paid_amount = self.payments.successful.joins(:amount).sum(:value)
 
     if paid_amount == 0
@@ -922,18 +922,18 @@ class Invoice < ApplicationRecord
   def update_paid_and_balance_payable paid_amount
     conversion_rate = self.conversion_rate.to_f
 
-    invoice_advance_paid_amount = paid_amount.to_f
-    reporting_invoice_advance_paid_amount = invoice_advance_paid_amount * conversion_rate.to_f
-    
+    invoice_paid_outside_amount = paid_amount.to_f
+    reporting_invoice_paid_outside_amount = invoice_paid_outside_amount * conversion_rate.to_f
+
     self.update({
-      invoice_advance_paid_amount: invoice_advance_paid_amount,  
-      reporting_invoice_advance_paid_amount: reporting_invoice_advance_paid_amount
+      invoice_paid_outside_amount: invoice_paid_outside_amount,  
+      reporting_invoice_paid_outside_amount: reporting_invoice_paid_outside_amount
     })
   end
 
   def invoice_balance_due
     if self.forms_enabled
-      self[:invoice_balance_due].to_f - self.invoice_advance_paid_amount.to_f
+      self[:invoice_balance_due].to_f - self[:invoice_paid_outside_amount].to_f
     else
       balance_due&.value.to_f - paid_amount_value
     end
@@ -941,7 +941,7 @@ class Invoice < ApplicationRecord
 
   def reporting_invoice_balance_due
     if self.forms_enabled
-      self[:reporting_invoice_balance_due].to_f - self.reporting_invoice_advance_paid_amount.to_f 
+      self[:reporting_invoice_balance_due].to_f
     else
       balance_due&.value.to_f - paid_amount_value
     end
@@ -1433,6 +1433,10 @@ class Invoice < ApplicationRecord
     end
   end
 
+  def display_tds_amount
+    (self.items.except(tds_applicable: false).map(&:item_taxable_amount).map(&:to_f).sum * self.tds_percentage) / 100  
+  end
+
   def cn_adjustment_per_item
     precision_value(self.invoice.credit_note_adjustments.joins(:amount).sum(:value) / self.items.count)
   end
@@ -1914,8 +1918,16 @@ class Invoice < ApplicationRecord
   # end
 
   # Syncs amounts from new forms structure to legacy amounts table
+  def calculate_advance
+    invoice_tds_amount = self.invoice_tds_amount
+
+  end
+
   def sync_amounts
     if forms_enabled
+      # calculate the advance and adjusted tds
+      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(RequestStore.store[:params], nil, self) if self.advance_amount_required
+      
       self.skip_callback = true
       base_currency_id = get_base_currency&.id
 

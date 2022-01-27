@@ -99,7 +99,7 @@ class Form < ApplicationRecord
 
       sequence_entity = (self.entities.where(type: 'FormEntity::AutoNumber').filter do |e|
         e.config.dig("sequence", "prefix") == prefix
-      end).first
+      end).last
 
       next unless sequence_entity.present?
 

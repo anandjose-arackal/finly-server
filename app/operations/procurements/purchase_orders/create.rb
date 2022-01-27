@@ -76,6 +76,7 @@ class Procurements::PurchaseOrders::Create < Procurements::PurchaseOrders::Base
     self.purchase_order.reporting_currency_id = user.company.reporting_currency.id
     self.purchase_order.base_currency_id = user.company.reporting_currency.id
     self.purchase_order.conversion_rate = 1
+    self.purchase_order.advance_amount_status_id = AdvanceAmountStatus.id_for(:new)
 
     if self.vendor.payment_term_id.present?
       self.purchase_order.payment_term_id = self.vendor.payment_term_id

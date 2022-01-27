@@ -51,6 +51,10 @@ Resolver::Router.draw do
   scope :purchase_request_statuses do
     route 'default', Masters::PurchaseRequestStatuses::Resolver
   end
+
+  scope :advance_amount_statuses do
+    route 'default', Masters::AdvanceAmountStatuses::Resolver
+  end
   
   scope :departments do
     route 'default', Masters::Departments::Resolver

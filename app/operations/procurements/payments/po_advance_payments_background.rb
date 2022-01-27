@@ -167,6 +167,6 @@ class Procurements::Payments::PoAdvancePaymentsBackground < BackgroundOperation
       purchase_order.process_line_item_calculation
       purchase_order.save
     end
-    payment[:requested_amount] = purchase_order.advance_amount&.value
+    payment[:requested_amount] = user.po_form_enabled ? purchase_order.po_advance_amount.to_f : purchase_order.advance_amount&.value
   end
 end

@@ -50,18 +50,20 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
       # NET AMOUNT
       invoice_sub_total_amount: "{% assign inv_sub_total_amount = form.invoice_gross_amount | minus: form.invoice_discount_amount | plus: form.invoice_tax_amount | plus: form.invoice_freight_amount | round: 2 %}{% if form.rcm_enabled == true %}{{ inv_sub_total_amount | minus: form.invoice_tax_amount | default: 0 | round: 2}}{% else %}{{ inv_sub_total_amount | default: 0 | round: 2 }}{% endif %}",
       invoice_paid_outside_amount: "{{ form.invoice_paid_outside_amount | default: 0 | round: 2}}",
-      invoice_tds_amount: "{% assign tds_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign tds_amount = tds_amount | plus: item.item_tds_amount %}{% endif %}{% endfor %}{{ tds_amount  | default: 0 | ceil}}",
+      # invoice_tds_amount: "{% assign tds_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign tds_amount = tds_amount | plus: item.item_tds_amount %}{% endif %}{% endfor %}{{ tds_amount  | default: 0 | ceil}}",
+      display_tds_amount: "{% assign tds_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign tds_amount = tds_amount | plus: item.item_tds_amount %}{% endif %}{% endfor %}{{ tds_amount  | default: 0 | ceil}}",
       
       #### net payable amount 
       # invoice_roundoff_amount: "{% assign net_total_amount = form.invoice_sub_total_amount | minus: form.invoice_paid_outside_amount | minus: form.invoice_tds_amount %}{% assign round_amount = net_total_amount | round %}{% assign amount = round_amount | minus: net_total_amount %}{% if form.base_currency_id != form.reporting_currency_id %}{% assign amount = 0 %}{% endif %}{{ amount | default: 0 | round: 2 }}",
       invoice_roundoff_amount: "{% assign net_total_amount = form.invoice_sub_total_amount | minus: form.invoice_paid_outside_amount | minus: form.invoice_tds_amount %}{% assign round_amount = net_total_amount | round %}{% assign amount = round_amount | minus: net_total_amount %}{% if form.base_currency_id == '#{Currency.id_for('INR')}' and form.reporting_currency_id == '#{Currency.id_for('INR')}' %}{{ amount | default: 0 | round: 2 }}{% else %}{{ 0 }}{% endif %}",
-      invoice_total_amount: "{{ form.invoice_sub_total_amount | plus: form.invoice_roundoff_amount | minus: form.invoice_tds_amount | minus: form.invoice_paid_outside_amount | default: 0 | round: 2}}",
+      invoice_net_total_amount: "{% if form.base_currency_id == '#{Currency.id_for('INR')}' and form.reporting_currency_id == '#{Currency.id_for('INR')}' %}{{ form.invoice_total_amount | default: 0 | round }}{% else %}{{ form.invoice_total_amount | default: 0 | round: 2 }}{% endif %}",
+      invoice_total_amount: "{{ form.invoice_sub_total_amount | plus: form.invoice_roundoff_amount | minus: form.display_tds_amount | minus: form.invoice_paid_outside_amount | default: 0 | round: 2}}",
       
       #### net payable amount has roundoff value added
       # invoice_net_total_amount: "{% if form.base_currency_id != form.reporting_currency_id %}{{ form.invoice_total_amount | default: 0 | round: 2 }}{% else %}{{ form.invoice_total_amount | default: 0 | round }}{% endif %}",
-      invoice_net_total_amount: "{% if form.base_currency_id == '#{Currency.id_for('INR')}' and form.reporting_currency_id == '#{Currency.id_for('INR')}' %}{{ form.invoice_total_amount | default: 0 | round }}{% else %}{{ form.invoice_total_amount | default: 0 | round: 2 }}{% endif %}",
-      invoice_advance_paid_amount: "{{ form.invoice_advance_paid_amount | default: 0 | round: 2}}",
-      invoice_balance_due: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | default: 0 | round: 2}}",
+      # invoice_advance_paid_amount: "{% form.advance_amount_required == false %}{{0}}{% else %}{{ form.adjusted_po_advance_payable_amount | default: 0 | round: 2}}{% endif %}",
+      invoice_advance_paid_amount: "{% if form.advance_amount_required == true %}{{ form.adjusted_po_advance_payable_amount | default: 0 | round: 2}}{% endif %}",
+      invoice_balance_due: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | default: 0 | round: 2 | at_least: 0 }}",
 
       # CONVERTED VALUES
       reporting_invoice_gross_amount: "{{ form.invoice_gross_amount | times: form.conversion_rate | default: 0 | round: 2}}",
@@ -71,13 +73,16 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
       reporting_invoice_freight_amount: "{{ form.invoice_freight_amount | times: form.conversion_rate | default: 0 | round: 2}}",
       reporting_invoice_sub_total_amount: "{{ form.invoice_sub_total_amount | times: form.conversion_rate | default: 0 | round: 2}}",
       reporting_invoice_paid_outside_amount: "{{ form.invoice_paid_outside_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_invoice_tds_amount: "{{ form.invoice_tds_amount | times: form.conversion_rate | default: 0 | round: 2}}",
       reporting_invoice_roundoff_amount: "{% assign amount = form.reporting_invoice_sub_total_amount | round %}{% assign amount = amount | minus: form.reporting_invoice_sub_total_amount %}{% if form.base_currency_id == '#{Currency.id_for('INR')}' and form.reporting_currency_id == '#{Currency.id_for('INR')}' %}{{ amount | default: 0 | round: 2}}{% else %}{{ 0 }}{% endif %}",
+      reporting_invoice_tds_amount: "{{ form.display_tds_amount | times: form.conversion_rate | default: 0 | round: 2}}",
       reporting_invoice_total_amount: "{{ form.invoice_total_amount | times: form.conversion_rate | default: 0 | round: 2}}",
       
       reporting_invoice_net_total_amount: "{{ form.invoice_net_total_amount | times: form.conversion_rate | default: 0 | round: 2}}",
       reporting_invoice_advance_paid_amount: "{{ form.invoice_advance_paid_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_invoice_balance_due: "{{ form.invoice_balance_due | times: form.conversion_rate | default: 0 | round: 2}}"
+      reporting_invoice_balance_due: "{{ form.invoice_balance_due | times: form.conversion_rate | default: 0 | round: 2}}",
+      reporting_po_advance: "{{ form.po_advance | times: form.conversion_rate | default: 0 | round: 2}}",
+      reporting_po_prev_adjusted_advance: "{{ form.po_prev_adjusted_advance | times: form.conversion_rate | default: 0 | round: 2}}",
+      reporting_adjusted_po_advance_payable_amount: "{{ form.adjusted_po_advance_payable_amount | times: form.conversion_rate | default: 0 | round: 2}}"
     }
   }
 
@@ -389,17 +394,21 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Lookup('items_summary.tds_slab_id', '{{record.tds}}')
 
-      amount :invoice_tds_amount, label: 'Tds Amount', editable: false, visible: true, # todo - condition when reporting currency is in INR
+      amount :invoice_tds_amount, label: 'Tds Amount', editable: false, visible: false, # todo - condition when reporting currency is in INR
+             can_editable_be_changed: false
+             # computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_tds_amount])
+       
+      amount :display_tds_amount, label: 'Tds Amount', editable: false, visible: true, # todo - condition when reporting currency is in INR
              can_editable_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_tds_amount])
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:display_tds_amount])
 
       amount :reporting_invoice_tds_amount, label: 'Tds Amount(Reporting Currency)', 
              can_visible_be_changed: false, can_editable_be_changed: false, editable: false, visible: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_tds_amount])
 
-      amount :invoice_paid_outside_amount, label: "Advance Paid", default_value: 0, visible: true, editable: true
+      amount :invoice_paid_outside_amount, label: "Total Partial-Payment", default_value: 0, visible: true, editable: true
 
-      amount :reporting_invoice_paid_outside_amount, label: "Advance Paid(Reporting Currency)", editable: false, visible: false,
+      amount :reporting_invoice_paid_outside_amount, label: "Total Partial-Payment(Reporting Currency)", editable: false, visible: false,
              can_visible_be_changed: false,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_paid_outside_amount])
@@ -430,11 +439,11 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_net_total_amount])
 
-      amount :invoice_advance_paid_amount, label: "Total Partial-Payment",
+      amount :invoice_advance_paid_amount, label: "Advance Paid",
              default_value: 0, editable: false, visible: true,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_advance_paid_amount])
 
-      amount :reporting_invoice_advance_paid_amount, label: "Total Partial-Payment(Reporting Currency)", editable: false, visible: false,
+      amount :reporting_invoice_advance_paid_amount, label: "Advance Paid(Reporting Currency)", editable: false, visible: false,
              can_visible_be_changed: false,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_advance_paid_amount])
@@ -451,6 +460,25 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_balance_due]),
              can_visible_be_changed: false, can_editable_be_changed: false
     end
+  end
+
+  section :document_advance, title: "Document Advance" do
+       switch :advance_amount_required, label: "Adjust Amount", editable: true, visible: true, required: true, default_value: false
+
+       amount :po_advance, label: "PO Advance", editable: false, visible: true, required: false
+
+       amount :reporting_po_advance, label: "PO Advance (reporting currency)", editable: false, visible: true, required: false,
+              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_advance])
+
+       amount :po_prev_adjusted_advance, label: "Previous Adjusted Advance", editable: false, visible: true, required: false
+
+       amount :reporting_po_prev_adjusted_advance, label: "Previous Adjusted Advance (reporting currency)", editable: false, visible: true, required: false,
+              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_prev_adjusted_advance])
+
+       amount :adjusted_po_advance_payable_amount, label: "Current Adjustment", editable: true, visible: true, required: false
+
+       amount :reporting_adjusted_po_advance_payable_amount, label: "Current Adjustment (reporting currency)", editable: false, visible: true, required: false,
+              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_adjusted_po_advance_payable_amount])
   end
 
   # ATTACHMENTS
@@ -625,6 +653,24 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
 
   condition condition_id: "Hide Net Amount (Reporting Currency)" do
     reference :entity, 'items_summary.reporting_invoice_sub_total_amount'
+    rule Rules::Builder[:base_currency_id].eq(entity: "reporting_currency_id")
+    action :visible, false
+  end
+
+  condition condition_id: "Hide PO advance (Reporting Currency)" do
+    reference :entity, 'reporting_po_advance'
+    rule Rules::Builder[:base_currency_id].eq(entity: "reporting_currency_id")
+    action :visible, false
+  end
+
+	condition condition_id: "Hide prev adjusted PO advance (Reporting Currency)" do
+    reference :entity, 'reporting_po_prev_adjusted_advance'
+    rule Rules::Builder[:base_currency_id].eq(entity: "reporting_currency_id")
+    action :visible, false
+  end
+
+	condition condition_id: "Hide current adjusted PO advance (Reporting Currency)" do
+    reference :entity, 'reporting_adjusted_po_advance_payable_amount'
     rule Rules::Builder[:base_currency_id].eq(entity: "reporting_currency_id")
     action :visible, false
   end

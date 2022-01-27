@@ -213,6 +213,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       # self.payment_params[:amount_attributes][:value] = purchase_order.advance_amount&.value
 
       payment.amount.update(value: purchase_order.advance_amount&.value)
+      payment.amount.update(value: purchase_order.po_advance_amount&.to_f) if purchase_order.forms_enabled
     end
 
   end

@@ -225,11 +225,8 @@ class Admin::Implementations::Master::CustomFields::Import < Admin::Implementati
           field_configuration = FieldConfiguration.non_deleted.find drop_down_items[drop_down_count][:id]
         end
         if field_configuration.present?
-          if field_configuration.has_dependent_cf == false
-            field_configuration.update_columns(has_dependent_cf: true)
-          end
           unless field_configuration.drop_down_items.pluck(:name).include?(row[lower_limit])
-            ddi = field_configuration.drop_down_items.create(name: row[lower_limit],has_dependent_cf: dependable)
+            ddi = field_configuration.drop_down_items.create(name: row[lower_limit])
             previous_field = field_configuration
           else
             ddi = field_configuration.drop_down_items.where(name: row[lower_limit]).first

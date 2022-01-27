@@ -51,12 +51,12 @@ class Event::ETravelRequest::Approve < Event::ETravelRequest::Base
             message = "Congratulations! Your trip #{travel_request.trip_id} has been has been approved"
           end
         elsif self.travel_request.document_role_users(:travel_manager).include?(user)
-          "#{self.approving_user.name&.titleize} has approved the trip: #{travel_request.trip_id} and is currently awaiting for your approval"
+          "#{self.approving_user.name&.titleize} has approved the trip: #{travel_request.trip_id} and is currently waiting for your approval"
         else
           "#{self.approving_user.name&.titleize} has approved the trip: #{travel_request.trip_id}"
         end
       elsif self.travel_request.document_role_users(:travel_manager).include?(user)
-          "#{self.approving_user.name&.titleize} has approved the trip: #{travel_request.trip_id} and is currently awaiting for your approval"
+          "#{self.approving_user.name&.titleize} has approved the trip: #{travel_request.trip_id} and is currently waiting for your approval"
       end
     end
   end
@@ -75,12 +75,12 @@ class Event::ETravelRequest::Approve < Event::ETravelRequest::Base
             message = "Congratulations! Your trip has been approved"
           end
         elsif self.travel_request.document_role_users(:travel_manager).include?(user)
-          message = "#{self.approving_user.name&.titleize} has approved the trip '#{self.travel_request.trip_id}' and is currently awaiting for your approval"
+          message = "#{self.approving_user.name&.titleize} has approved the trip '#{self.travel_request.trip_id}' and is currently waiting for your approval"
         else
           "#{self.approving_user.name&.titleize} has approved the trip: #{travel_request.trip_id}"
         end
       elsif self.travel_request.document_role_users(:travel_manager).include?(user)
-          message = "#{self.approving_user.name&.titleize} has approved the trip '#{self.travel_request.trip_id}' and is currently awaiting for your approval"
+          message = "#{self.approving_user.name&.titleize} has approved the trip '#{self.travel_request.trip_id}' and is currently waiting for your approval"
       end
     end
     message

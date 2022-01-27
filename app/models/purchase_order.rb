@@ -843,7 +843,11 @@ class PurchaseOrder < ApplicationRecord
   end
 
   def total_adv_amount
-    (self.advance_amount&.value + self.advance_tds_amount&.value) rescue nil
+    if user.po_form_enabled
+      self.po_requested_advance_amount
+    else
+      (self.advance_amount&.value + self.advance_tds_amount&.value) rescue nil
+    end
   end
 
   def entity_date
@@ -864,10 +868,12 @@ class PurchaseOrder < ApplicationRecord
         original_amount: precision_value(self.total_after_tax&.value),
         total_advance_amount: total_adv_amount,
         # advance_amount: precision_value(self.advance_amount&.value),
-        payable_advance_amount: precision_value(self.advance_amount&.value),
-        balance_due: precision_value(self.balance_amount&.value),
+        payable_advance_amount: payable_advance_amount,
+        reporting_payable_advance_amount: reporting_payable_advance_amount,
+        balance_due: balance_due,
+        conversion_rate: self.conversion_rate,
         procurement_id: self.procurement_id,
-        tds_amount: self.advance_tds_amount&.value,
+        tds_amount: user.po_form_enabled ? self.po_advance_tds_amount.to_f : self.advance_tds_amount&.value,
         tds: self.advance_tds_slab&.tds,
         tds_slab_id: self.advance_tds_slab_id,
         tds_slab_name: self.advance_tds_slab&.name,
@@ -875,8 +881,8 @@ class PurchaseOrder < ApplicationRecord
         cost_center: self.cost_center.as_json,
         po_number: self.po_number,
         delivery_location: self.delivery_location.as_json,
-        requested_advance_amount: self.requested_advance_amount&.value,
-        purchase_order_total: precision_value(self.balance_amount&.value),
+        requested_advance_amount: user.po_form_enabled ? self.po_requested_advance_amount.to_f : self.requested_advance_amount&.value,
+        purchase_order_total: user.po_form_enabled ? precision_value(self.po_balance_due) : precision_value(self.balance_amount&.value),
         editable: true,
         attachments: self.attachments.map(&:as_json),
         # since in FE as of now key name expected is invoice_attachment,
@@ -889,7 +895,8 @@ class PurchaseOrder < ApplicationRecord
         },
         base_currency: get_base_currency,
         reporting_currency: get_reporting_currency,
-        pr_forms_enabled: self.user.purchase_request_form_enabled
+        pr_forms_enabled: self.user.purchase_request_form_enabled,
+        non_po_invoice_form_enabled: forms_enabled
         # balance_due: {
         #   value: precision_value(self.balance_amount&.value),
         #   id: self.balance_amount&.id,
@@ -899,6 +906,18 @@ class PurchaseOrder < ApplicationRecord
   end
 
   # Public Method
+
+  def payable_advance_amount
+    user.po_form_enabled ? (self.po_requested_advance_amount.to_f - self.po_advance_tds_amount.to_f) : precision_value(self.advance_amount&.value)
+  end
+
+  def reporting_payable_advance_amount
+    user.po_form_enabled ? (self.payable_advance_amount * self.conversion_rate) : 0
+  end
+
+  def balance_due
+    user.po_form_enabled ? precision_value(self.po_balance_due) : precision_value(self.balance_amount&.value)
+  end
 
   def process_line_item_calculation(skip_adv_calculation = false)
     calculate_line_items(skip_adv_calculation)

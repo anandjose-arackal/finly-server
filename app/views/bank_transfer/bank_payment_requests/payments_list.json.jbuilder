@@ -225,6 +225,10 @@ json.payments do
         json.net_amount precision_value payment.amount&.value
         json.roundoff_amount 0
         json.balance_due payment.amount&.value
+        json.invoice_net_total_amount precision_value payment.amount&.value
+        json.base_currency payment.parent&.base_currency
+        json.reporting_currency payment.parent&.reporting_currency
+        json.forms_enabled payment.parent.forms_enabled
       end
     end
 
@@ -237,8 +241,10 @@ json.payments do
         # json.payable_amount payment.get_payable_amount
         json.payable_amount precision_value payment.amount.value
 
-        if payment.parent_type == 'Invoice'
+
+        if payment.parent_type == 'Invoice' || payment.parent_type == 'PurchaseOrder'
           conversion_rate = payment&.parent_details.with_indifferent_access[:conversion_rate].to_f rescue 1
+          json.conversion_rate conversion_rate
           json.reporting_payable_amount payment&.amount&.value.to_f * conversion_rate.to_f
         end
         if payment.parent&.is_a?(BbpsBill)
