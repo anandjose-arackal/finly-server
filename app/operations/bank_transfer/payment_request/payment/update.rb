@@ -9,7 +9,6 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
   def init
     super
     id = params[:payment_id] || params[:payment][:id]
-    p params
     self.payment = self.payment_order.payments.find_by(id: id)
     self.payment_params = payment_attributes
     self.payment_amount = self.payment_params&.dig(:amount_attributes).present? ? self.payment_params&.dig(:amount_attributes, :value).to_f : self.payment.amount.value.round(2)
@@ -214,6 +213,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       # self.payment_params[:amount_attributes][:value] = purchase_order.advance_amount&.value
 
       payment.amount.update(value: purchase_order.advance_amount&.value)
+      payment.amount.update(value: purchase_order.po_advance_amount&.to_f) if purchase_order.forms_enabled
     end
 
   end
