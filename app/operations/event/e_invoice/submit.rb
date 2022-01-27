@@ -4,7 +4,7 @@ class Event::EInvoice::Submit < Event::EInvoice::Base
   end
 
   def action_name
-    'Invoice Submitted'
+    'Invoice Submitted' 
   end
 
   def affected_users
@@ -30,7 +30,7 @@ class Event::EInvoice::Submit < Event::EInvoice::Base
     #   end
     # end
     # users
-    self.invoice.affected_users(:submit)
+    self.invoice.affected_users(:submit) 
   end
 
   # def get_token(user)
@@ -71,7 +71,7 @@ class Event::EInvoice::Submit < Event::EInvoice::Base
     if user.id == invoice.created_by.id
       "Invoice submitted : #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id})"
     else
-      "#{self.invoice.created_by.name} has submitted Invoice : #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id})"
+      "#{self.invoice.created_by.name} has submitted Invoice : #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id}) and is currently awaiting your approval"
     end
   end
 

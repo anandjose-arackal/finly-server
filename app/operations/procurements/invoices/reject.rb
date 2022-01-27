@@ -18,7 +18,6 @@ class Procurements::Invoices::Reject < Procurements::Invoices::Base
       add_message :error, 'Invoice not found'
     end
 
-
     if params[:reject_to_user].present? && params[:reject_to_level].present?
       reject_to_details = self.invoice.reject_to_users # {dlrm_level_id => reviewer, dlrm_level_id => reviewer, ...}
       
@@ -46,6 +45,7 @@ class Procurements::Invoices::Reject < Procurements::Invoices::Base
 
   def post_process
     role_id = self.workflow_output[:role_id]
+    EmailApproval.delete_email_approval(invoice.id) unless invoice.processing? && invoice.invoice_type.id == InwardInvoiceType.id_for("non_po_invoice")
     Event::EInvoice::Reject.(user, invoice: invoice, workflow_output: workflow_output, role_id: role_id)
     add_message :success, 'Successfully Rejected Invoice'
   end
