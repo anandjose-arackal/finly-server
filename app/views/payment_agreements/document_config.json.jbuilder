@@ -43,7 +43,7 @@ end
 json.gst_types do
   json.merge! @result.gst_types.to_json if @result.gst_types.present?
 end
-json.reporting_currency @result.payment_agreement&.company&.reporting_currency
+json.reporting_currency @result.reporting_currency
 json.general_invoice_custom_fields_config @result.custom_fields_config[:general_invoice]
 json.rental_invoice_custom_fields_config @result.custom_fields_config[:rental_invoice]
 json.payment_agreement_custom_fields_config @result.custom_fields_config[:payment_agreement]
