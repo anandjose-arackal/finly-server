@@ -7,7 +7,7 @@ class InvoiceCalculationUtils
                 :gross_amount, :net_amount, :invoice,
                 :discount_amount, :tds_amount, :tax_amount, :original_amount, :after_discount_amount,
                 :advance, :advance_amount, :invoice_total, :freight_amount,
-                :roundoff_amount, :balance_due_amount, :payment_amount, :tds_applicable_amount, :cn_adjustment_amount
+                :roundoff_amount, :balance_due_amount, :payment_amount, :tds_applicable_amount, :cn_adjustment_amount, :current_tds_adjustment
 
   # don't go by the name - this calculates the Freight paid as well
   def calculate_tds_and_advance(params, taxable_amount, invoice_amount, tds_applicable_amount, payment = nil, invoice = nil, payment_amount = nil)
@@ -47,7 +47,8 @@ class InvoiceCalculationUtils
             self.tds_amount = [(self.tds_amount - purchase_order.advance_tds_amount&.value.to_f), 0].max
           end 
           if invoice.forms_enabled
-            self.tds_amount = [(self.tds_amount - purchase_order.po_advance_tds_amount.to_f), 0].max
+            self.current_tds_adjustment = [self.tds_amount, purchase_order.advance_tds_amount&.value.to_f].max
+            self.tds_amount = [(self.tds_amount - self.current_tds_adjustment), 0].max
             self.balance_due_amount = [(self.balance_due_amount + purchase_order.po_advance_tds_amount.to_f - self.invoice.po_invoice_adjusted_advance.to_f), 0].max
           else
             self.balance_due_amount = [(self.balance_due_amount + purchase_order.advance_tds_amount&.value.to_f - self.invoice.po_adjusted_advance&.value.to_f), 0].max
@@ -67,11 +68,14 @@ class InvoiceCalculationUtils
             # self.tds_amount = self.tds_amount
             self.balance_due_amount = self.balance_due_amount
           else
+            previously_adjusted_tds = self.invoice.procurement.invoices.where.not(id: invoice.id).pluck(:adjusted_advance_tds).map(&:to_f).sum
+            remaining_adjustable_tds = purchase_order.advance_tds_amount&.value.to_f - previously_adjusted_tds
+            self.current_tds_adjustment = [self.tds_amount, remaining_adjustable_tds].max  # max of inv tds and remaining tds
             unless invoice.forms_enabled
               self.tds_amount = [(self.tds_amount - purchase_order.advance_tds_amount&.value.to_f), 0].max
             end
             if self.invoice.forms_enabled
-              self.balance_due_amount = [(self.balance_due_amount + purchase_order.po_advance_tds_amount.to_f - self.invoice.adjusted_po_advance_payable_amount.to_f), 0].max
+              self.balance_due_amount = [(self.balance_due_amount + (purchase_order.po_advance_tds_amount.to_f - self.current_tds_adjustment) - self.invoice.adjusted_po_advance_payable_amount.to_f), 0].max
             else
               self.balance_due_amount = [(self.balance_due_amount + purchase_order.advance_tds_amount&.value.to_f - self.invoice.po_adjusted_advance&.value.to_f), 0].max
             end
@@ -144,6 +148,7 @@ class InvoiceCalculationUtils
         self.invoice.invoice_taxable_amount = taxable_amount
         self.invoice.invoice_gross_amount = self.gross_amount
         self.invoice.invoice_balance_due = self.balance_due_amount
+        self.invoice.adjusted_advance_tds = self.current_tds_adjustment
       end
     end
 
