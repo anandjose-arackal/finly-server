@@ -479,6 +479,8 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
 
        amount :reporting_adjusted_po_advance_payable_amount, label: "Current Adjustment (reporting currency)", editable: false, visible: true, required: false,
               computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_adjusted_po_advance_payable_amount])
+       
+       amount :adjusted_advance_tds, label: "Current TDS adjustment", editable: false, visible: true
   end
 
   # ATTACHMENTS
