@@ -68,7 +68,7 @@ class Procurements::Invoices::Approve < Procurements::Invoices::Base
 
   def post_process
     update_agreement_available_limit
-    if invoice.invoice_type.id == InwardInvoiceType.id_for("non_po_invoice")
+    if invoice.invoice_type.id == InwardInvoiceType.id_for("non_po_invoice") && NonPoInvoiceToggle.new(user).enabled?
       EmailApproval.generate_email_approval(invoice.id, invoice.class.to_s)
       email_based_approval = true
     end
