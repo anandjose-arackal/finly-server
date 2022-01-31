@@ -47,7 +47,7 @@ class InvoiceCalculationUtils
             self.tds_amount = [(self.tds_amount - purchase_order.advance_tds_amount&.value.to_f), 0].max
           end 
           if invoice.forms_enabled
-            self.current_tds_adjustment = [self.tds_amount, purchase_order.advance_tds_amount&.value.to_f].min
+            self.current_tds_adjustment = [self.tds_amount, purchase_order.po_advance_tds_amount.to_f].min
             self.tds_amount = [(self.tds_amount - self.current_tds_adjustment), 0].max
             self.balance_due_amount = [(self.balance_due_amount + purchase_order.po_advance_tds_amount.to_f - self.invoice.po_invoice_adjusted_advance.to_f), 0].max
           else
