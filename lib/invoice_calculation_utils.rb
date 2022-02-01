@@ -68,13 +68,13 @@ class InvoiceCalculationUtils
             # self.tds_amount = self.tds_amount
             if invoice.forms_enabled
               previously_adjusted_tds = self.invoice.procurement.invoices.where.not(id: invoice.id).pluck(:adjusted_advance_tds).map(&:to_f).sum
-              remaining_adjustable_tds = [(purchase_order.advance_tds_amount&.value.to_f - previously_adjusted_tds),0].max
+              remaining_adjustable_tds = [(purchase_order.po_advance_tds_amount.to_f - previously_adjusted_tds),0].max
               self.current_tds_adjustment = [self.tds_amount, remaining_adjustable_tds].min
             end
             self.balance_due_amount = self.balance_due_amount
           else
             previously_adjusted_tds = self.invoice.procurement.invoices.where.not(id: invoice.id).pluck(:adjusted_advance_tds).map(&:to_f).sum
-            remaining_adjustable_tds = [(purchase_order.advance_tds_amount&.value.to_f - previously_adjusted_tds),0].max
+            remaining_adjustable_tds = [(purchase_order.po_advance_tds_amount.to_f - previously_adjusted_tds),0].max
             self.current_tds_adjustment = [self.tds_amount, remaining_adjustable_tds].min  # min of inv tds and remaining tds
             unless invoice.forms_enabled
               self.tds_amount = [(self.tds_amount - purchase_order.advance_tds_amount&.value.to_f), 0].max
