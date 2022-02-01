@@ -2016,9 +2016,9 @@ class Invoice < ApplicationRecord
 
   def calculate_advance
     if self.advance_amount_required && self.forms_enabled
-      unless self.invoice.class.name == 'OutwardInvoice'
-        if self.invoice.advance_amount_required
-          if self.invoice.procurement.invoices.count < 2
+      unless self.class.name == 'OutwardInvoice'
+        if self.advance_amount_required
+          if self.procurement.invoices.count < 2
             # first invoice calculation
             self.current_tds_adjustment = [self.invoice_tds_amount, self.po_advance_tds].min
             self.adjusted_po_advance_payable_amount = [self.invoice_balance_due, self.po_advance].min
