@@ -1938,8 +1938,7 @@ class Invoice < ApplicationRecord
   def sync_amounts
     if forms_enabled
       # calculate the advance and adjusted tds
-      # InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(RequestStore.store[:params], nil, self) if self.advance_amount_required
-      calculate_advance
+      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(RequestStore.store[:params], nil, self) if self.advance_amount_required
       
       self.skip_callback = true
       base_currency_id = get_base_currency&.id
@@ -2014,37 +2013,37 @@ class Invoice < ApplicationRecord
     end
   end
 
-  def calculate_advance
-    if self.advance_amount_required && self.forms_enabled
-      unless self.class.name == 'OutwardInvoice'
-        if self.advance_amount_required
-          if self.procurement.invoices.count < 2
-            # first invoice calculation
-            adjusted_advance_tds = [self.invoice_tds_amount, self.po_advance_tds].min
-            adjusted_po_advance_payable_amount = [self.invoice_balance_due, self.po_advance].min
-            invoice_tds_amount = self.invoice_tds_amount - adjusted_advance_tds
-            invoice_balance_due = [self.invoice_sub_total_amount - adjusted_po_advance_payable_amount - invoice_tds_amount, 0].max
-          else
-            # subsequent invoices
-            adjusted_advance_tds = [self.invoice_tds_amount, self.remaining_adjustable_tds].min
-            adjusted_po_advance_payable_amount = [self.invoice_balance_due, self.remaining_adjustable_advance].min
-            invoice_tds_amount = self.invoice_tds_amount - adjusted_advance_tds
-            invoice_balance_due = [self.invoice_sub_total_amount - adjusted_po_advance_payable_amount - invoice_tds_amount, 0].max
-          end
-          # update_params = {
-          #   adjusted_advance_tds: adjusted_advance_tds,
-          #   adjusted_po_advance_payable_amount: adjusted_po_advance_payable_amount,
-          #   invoice_tds_amount: invoice_tds_amount,
-          #   invoice_balance_due: invoice_balance_due
-          # }
-          self.update_column('adjusted_advance_tds', adjusted_advance_tds)
-          self.update_column('adjusted_po_advance_payable_amount', adjusted_po_advance_payable_amount)
-          self.update_column('invoice_tds_amount', invoice_tds_amount)
-          self.update_column('invoice_balance_due', invoice_balance_due)
-        end
-      end
-    end
-  end
+  # def calculate_advance
+  #   if self.advance_amount_required && self.forms_enabled
+  #     unless self.class.name == 'OutwardInvoice'
+  #       if self.advance_amount_required
+  #         if self.procurement.invoices.count < 2
+  #           # first invoice calculation
+  #           adjusted_advance_tds = [self.invoice_tds_amount, self.po_advance_tds].min
+  #           adjusted_po_advance_payable_amount = [self.invoice_balance_due, self.po_advance].min
+  #           invoice_tds_amount = self.invoice_tds_amount - adjusted_advance_tds
+  #           invoice_balance_due = [self.invoice_sub_total_amount - adjusted_po_advance_payable_amount - invoice_tds_amount, 0].max
+  #         else
+  #           # subsequent invoices
+  #           adjusted_advance_tds = [self.invoice_tds_amount, self.remaining_adjustable_tds].min
+  #           adjusted_po_advance_payable_amount = [self.invoice_balance_due, self.remaining_adjustable_advance].min
+  #           invoice_tds_amount = self.invoice_tds_amount - adjusted_advance_tds
+  #           invoice_balance_due = [self.invoice_sub_total_amount - adjusted_po_advance_payable_amount - invoice_tds_amount, 0].max
+  #         end
+  #         # update_params = {
+  #         #   adjusted_advance_tds: adjusted_advance_tds,
+  #         #   adjusted_po_advance_payable_amount: adjusted_po_advance_payable_amount,
+  #         #   invoice_tds_amount: invoice_tds_amount,
+  #         #   invoice_balance_due: invoice_balance_due
+  #         # }
+  #         self.update_column('adjusted_advance_tds', adjusted_advance_tds)
+  #         self.update_column('adjusted_po_advance_payable_amount', adjusted_po_advance_payable_amount)
+  #         self.update_column('invoice_tds_amount', invoice_tds_amount)
+  #         self.update_column('invoice_balance_due', invoice_balance_due)
+  #       end
+  #     end
+  #   end
+  # end
 
   def sync_to_forms_structure
     amounts_attributes_map.each do |key, value|
