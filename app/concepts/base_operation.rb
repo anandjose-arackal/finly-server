@@ -18,6 +18,9 @@ class BaseOperation
     else
       self.params = (ActionController::Parameters.new(params) or {})
     end
+    if self.params[:x_finly_rp_attributes].present?
+      self.params.delete(:x_finly_rp_attributes)
+    end
   end
 
   def self.call(user, params={})
