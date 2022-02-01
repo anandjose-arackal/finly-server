@@ -64,7 +64,7 @@ class InvoiceCalculationUtils
 
           # we dont capture tds adjustment per invoice, like we do for po advance adjustment
           all_adjusted = (max_tds - currently_adjusted_tds)&.abs&.between?(0,1)
-          if all_adjusted && self.invoice.po_adjusted_advance&.value.to_f < 1
+          if all_adjusted && (self.invoice.po_adjusted_advance&.value.to_f < 1 || self.invoice.adjusted_po_advance_payable_amount.to_f < 1)
             # self.tds_amount = self.tds_amount
             if invoice.forms_enabled
               previously_adjusted_tds = self.invoice.procurement.invoices.where.not(id: invoice.id).pluck(:adjusted_advance_tds).map(&:to_f).sum
