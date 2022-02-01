@@ -2020,18 +2020,24 @@ class Invoice < ApplicationRecord
         if self.advance_amount_required
           if self.procurement.invoices.count < 2
             # first invoice calculation
-            self.adjusted_advance_tds = [self.invoice_tds_amount, self.po_advance_tds].min
-            self.adjusted_po_advance_payable_amount = [self.invoice_balance_due, self.po_advance].min
-            self.invoice_tds_amount = self.invoice_tds_amount - self.adjusted_advance_tds
-            self.invoice_balance_due = [self.invoice_sub_total_amount - self.adjusted_po_advance_payable_amount - self.invoice_tds_amount, 0].max
+            adjusted_advance_tds = [self.invoice_tds_amount, self.po_advance_tds].min
+            adjusted_po_advance_payable_amount = [self.invoice_balance_due, self.po_advance].min
+            invoice_tds_amount = self.invoice_tds_amount - adjusted_advance_tds
+            invoice_balance_due = [self.invoice_sub_total_amount - adjusted_po_advance_payable_amount - invoice_tds_amount, 0].max
           else
             # subsequent invoices
-            self.adjusted_advance_tds = [self.invoice_tds_amount, self.remaining_adjustable_tds].min
-            self.adjusted_po_advance_payable_amount = [self.invoice_balance_due, self.remaining_adjustable_advance].min
-            self.invoice_tds_amount = self.invoice_tds_amount - self.adjusted_advance_tds
-            self.invoice_balance_due = [self.invoice_sub_total_amount - self.adjusted_po_advance_payable_amount - self.invoice_tds_amount, 0].max
+            adjusted_advance_tds = [self.invoice_tds_amount, self.remaining_adjustable_tds].min
+            adjusted_po_advance_payable_amount = [self.invoice_balance_due, self.remaining_adjustable_advance].min
+            invoice_tds_amount = self.invoice_tds_amount - adjusted_advance_tds
+            invoice_balance_due = [self.invoice_sub_total_amount - adjusted_po_advance_payable_amount - invoice_tds_amount, 0].max
           end
-          self.save
+          update_params = {
+            adjusted_advance_tds: adjusted_advance_tds,
+            adjusted_po_advance_payable_amount: adjusted_po_advance_payable_amount,
+            invoice_tds_amount: invoice_tds_amount,
+            invoice_balance_due: invoice_balance_due
+          }
+          self.update_columns(update_params)
         end
       end
     end
