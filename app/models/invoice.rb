@@ -2020,13 +2020,13 @@ class Invoice < ApplicationRecord
         if self.advance_amount_required
           if self.procurement.invoices.count < 2
             # first invoice calculation
-            self.current_tds_adjustment = [self.invoice_tds_amount, self.po_advance_tds].min
+            self.adjusted_advance_tds = [self.invoice_tds_amount, self.po_advance_tds].min
             self.adjusted_po_advance_payable_amount = [self.invoice_balance_due, self.po_advance].min
             self.invoice_tds_amount = self.invoice_tds_amount - current_tds_adjustment
             self.invoice_balance_due = [self.invoice_sub_total_amount - self.adjusted_po_advance_payable_amount - self.invoice_tds_amount, 0].max
           else
             # subsequent invoices
-            self.current_tds_adjustment = [self.invoice_tds_amount, self.remaining_adjustable_tds].min
+            self.adjusted_advance_tds = [self.invoice_tds_amount, self.remaining_adjustable_tds].min
             self.adjusted_po_advance_payable_amount = [self.invoice_balance_due, self.remaining_adjustable_advance].min
             self.invoice_tds_amount = self.invoice_tds_amount - current_tds_adjustment
             self.invoice_balance_due = [self.invoice_sub_total_amount - self.adjusted_po_advance_payable_amount - self.invoice_tds_amount, 0].max
