@@ -2031,13 +2031,16 @@ class Invoice < ApplicationRecord
             invoice_tds_amount = self.invoice_tds_amount - adjusted_advance_tds
             invoice_balance_due = [self.invoice_sub_total_amount - adjusted_po_advance_payable_amount - invoice_tds_amount, 0].max
           end
-          update_params = {
-            adjusted_advance_tds: adjusted_advance_tds,
-            adjusted_po_advance_payable_amount: adjusted_po_advance_payable_amount,
-            invoice_tds_amount: invoice_tds_amount,
-            invoice_balance_due: invoice_balance_due
-          }
-          self.update_columns(update_params)
+          # update_params = {
+          #   adjusted_advance_tds: adjusted_advance_tds,
+          #   adjusted_po_advance_payable_amount: adjusted_po_advance_payable_amount,
+          #   invoice_tds_amount: invoice_tds_amount,
+          #   invoice_balance_due: invoice_balance_due
+          # }
+          self.update_column(adjusted_advance_tds: adjusted_advance_tds)
+          self.update_column(adjusted_po_advance_payable_amount: adjusted_po_advance_payable_amount)
+          self.update_column(invoice_tds_amount: invoice_tds_amount)
+          self.update_column(invoice_balance_due: invoice_balance_due)
         end
       end
     end
