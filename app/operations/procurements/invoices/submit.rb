@@ -95,7 +95,7 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
     update_agreement_available_limit
     role_id = self.workflow_output[:role_id]
     email_based_approval = false
-    if invoice.invoice_type.id == InwardInvoiceType.id_for("non_po_invoice")
+    if invoice.invoice_type.id == InwardInvoiceType.id_for("non_po_invoice") && NonPoInvoiceToggle.new(user).enabled?
       EmailApproval.generate_email_approval(invoice.id, invoice.class.to_s)
       email_based_approval = true
     end

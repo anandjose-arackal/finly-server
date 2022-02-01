@@ -179,7 +179,6 @@ class Bbps::BillPay < Bbps::Api
   end
 
   def order_number
-    # needs to be generated from the adapter and sent here
     params[:order_number]
   end
 
@@ -352,7 +351,7 @@ class Bbps::BillPay < Bbps::Api
     message["amountDetails"]["couCustConvFee"] = 0
     message["bbpsPGName"] = "YesPay" #fixed for yesbank payment gateway
     message["bbpsPGResponse"] = {}
-    message["bbpsPGResponse"]["txRefNo"] = SecureRandom.hex(10)
+    message["bbpsPGResponse"]["txRefNo"] = order_number
     message["bbpsPGResponse"]["txnDateTime"] = DateTime.now.strftime("%Y-%m-%d %I:%M:%S")
 
     message["clientRequestId"] =  SecureRandom.hex(12)

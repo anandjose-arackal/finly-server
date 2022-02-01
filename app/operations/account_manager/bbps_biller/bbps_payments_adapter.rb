@@ -68,7 +68,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         bill_period: bank_transaction.bill_period,
         biller_id: bank_transaction.biller_id,
         quick_pay: bank_transaction.quick_pay,
-        order_number: bill.order_number,
+        order_number: bank_transaction.order_number,
         bbps_ref_id: bill.api_response.last["bbps_ref_id"],
         convenience_fee: get_convenience_fee(bill)
     }
@@ -216,9 +216,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
   # this particular method returns the order number if it's already generated,
   # or generates one on the fly if not present
   def retrieve_order_number(payment)
-    bill = payment.parent
-    order_number = bill.order_number || generate_order_number
-    order_number
+    order_number = generate_order_number
   end
 
   def get_convenience_fee(bill)
@@ -230,7 +228,14 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
   end
 
   def generate_order_number
-    "O#{DateTime.now.strftime("%d%m%y%H%M%S")}#{rand(10000..99999)}"
+    ref =nil
+    loop do
+      ref = "FI#{SecureRandom.hex(8)}"
+      if BbpsYesBankTransaction.find_by(order_number: ref).blank?
+        break
+      end
+    end
+    ref
   end
 
   def customer_params(subscription)

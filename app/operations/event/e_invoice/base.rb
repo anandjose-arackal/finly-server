@@ -133,7 +133,7 @@ class Event::EInvoice::Base < Event::SetNotifier
       self.company = user.company
       self.to_name = user.name
       self.email_approval_mail = params[:email_based_approval]
-      self.reply_to = (self.invoice.email_approvals.last&.approval_uuid&.to_s || "") + "@approval.finly.email"
+      self.reply_to = (self.invoice.email_approvals.last&.approval_uuid&.to_s || "") + "@test.finly.email"
       # if params[:action_url_token]
       #   self.action_url_token = params[:action_url_token]
       #   action_url = generate_action_url(user, role_id)
@@ -150,10 +150,16 @@ class Event::EInvoice::Base < Event::SetNotifier
       else
         view = 'reviewer'
       end
-
-      suffix = URI.escape("\"procurement_id\":\"#{invoice.procurement.id}\",\"procurement_type\":\"non_po_invoice\"")
-      path = "procure_invoices/#{invoice.id}/params={"
-      url = Constants::BASE_URL_VP + path + suffix + "}"
+      if NonPoInvoiceToggle.new(user).enabled?
+        suffix = URI.escape("\"procurement_id\":\"#{invoice.procurement.id}\",\"procurement_type\":\"non_po_invoice\"")
+        path = "procure_invoices/#{invoice.id}/params={"
+        url = Constants::BASE_URL_VP + path + suffix + "}"
+      else
+        suffix = URI.escape("{\"document_type\":\"invoice\",\"document_id\":#{invoice.id}}")
+        # path = "reports/#{report.id}"
+        path = "procurements/#{invoice.procurement.id}/params="
+        url = Constants::BASE_URL_VP + path + suffix
+      end
     end
 
     # def generate_action_url(user, role_id)
@@ -195,7 +201,7 @@ class Event::EInvoice::Base < Event::SetNotifier
     end
 
     def set_email_approval_mail
-      self.email_approval_mail && invoice.status.processing? && self.body_val.include?("awaiting your approval") && invoice.invoice_type.id == InwardInvoiceType.id_for("non_po_invoice")
+      self.email_approval_mail && invoice.status.processing? && self.body_val.include?("awaiting your approval") && invoice.invoice_type.id == InwardInvoiceType.id_for("non_po_invoice") && NonPoInvoiceToggle.new(user).enabled?
     end
 
     def body
