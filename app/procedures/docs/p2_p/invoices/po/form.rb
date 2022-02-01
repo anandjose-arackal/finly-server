@@ -64,6 +64,7 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
       # invoice_advance_paid_amount: "{% form.advance_amount_required == false %}{{0}}{% else %}{{ form.adjusted_po_advance_payable_amount | default: 0 | round: 2}}{% endif %}",
       invoice_advance_paid_amount: "{% if form.advance_amount_required == true %}{{ form.adjusted_po_advance_payable_amount | default: 0 | round: 2}}{% endif %}",
       invoice_balance_due: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | default: 0 | round: 2 | at_least: 0 }}",
+      adjusted_advance_tds: "{% if form.advance_amount_required == true %}{{form.display_tds_amount | at_least: form.remaining_adjustable_tds}}{% endif %}",
 
       # CONVERTED VALUES
       reporting_invoice_gross_amount: "{{ form.invoice_gross_amount | times: form.conversion_rate | default: 0 | round: 2}}",
@@ -480,7 +481,9 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
        amount :reporting_adjusted_po_advance_payable_amount, label: "Current Adjustment (reporting currency)", editable: false, visible: true, required: false,
               computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_adjusted_po_advance_payable_amount])
        
-       amount :adjusted_advance_tds, label: "Current TDS adjustment", editable: false, visible: true
+       amount :adjusted_advance_tds, label: "Current TDS Adjustment", editable: false, visible: true, computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:adjusted_advance_tds])
+       amount :remaining_adjustable_tds, label: "Remaining Adjustable TDS", editable: false, visible: true
+       amount :remaining_adjustable_advance, label: "Remaining Adjustable Advance", editable: false, visible: true 
   end
 
   # ATTACHMENTS

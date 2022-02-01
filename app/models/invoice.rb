@@ -154,7 +154,7 @@
 #
 
 class Invoice < ApplicationRecord
-  attr_accessor :skip_callback
+  attr_accessor :skip_callback, :remaining_adjustable_tds, :remaining_adjustable_advance, :po_advance_tds
   include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport, ControllingUser, GetCurrency
   include LiquidDroppable
   include Exposures::Model::Exposable
@@ -1615,6 +1615,22 @@ class Invoice < ApplicationRecord
     if self.company.enforce_budget_configuration.enforce_invoice_budget?
       return BudgetManager::BudgetLimitValidator::Invoice.({invoice: self, previous_budget_contributions: self.invoice_budget_contributions_before_update, current_user: self.company.users.first })
     end
+  end
+
+  def remaining_adjustable_tds
+    prev_adjusted_tds = self.procurement.invoices.where.not(id: self.id).pluck(:adjusted_advance_tds).map(&:to_f).sum
+
+    (self.po_advance_tds - prev_adjusted_tds).to_f
+  end
+
+  def remaining_adjustable_advance
+    prev_adjusted_advance = self.procurement.invoices.where.not(id: self.id).pluck(:adjusted_po_advance_payable_amount).map(&:to_f).sum
+
+    (self.po_advance - prev_adjusted_advance).to_f
+  end
+
+  def po_advance_tds
+    self.procurement.purchase_order&.po_advance_tds_amount.to_f
   end
 
   private
