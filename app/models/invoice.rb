@@ -1934,15 +1934,12 @@ class Invoice < ApplicationRecord
   # end
 
   # Syncs amounts from new forms structure to legacy amounts table
-  def calculate_advance
-    invoice_tds_amount = self.invoice_tds_amount
-
-  end
 
   def sync_amounts
     if forms_enabled
       # calculate the advance and adjusted tds
-      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(RequestStore.store[:params], nil, self) if self.advance_amount_required
+      # InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(RequestStore.store[:params], nil, self) if self.advance_amount_required
+      calculate_advance
       
       self.skip_callback = true
       base_currency_id = get_base_currency&.id
@@ -2014,6 +2011,29 @@ class Invoice < ApplicationRecord
       update_attachments
       self.save
       # update custom fields
+    end
+  end
+
+  def calculate_advance
+    if self.advance_amount_required && self.forms_enabled
+      unless self.invoice.class.name == 'OutwardInvoice'
+        if self.invoice.advance_amount_required
+          if self.invoice.procurement.invoices.count < 2
+            # first invoice calculation
+            self.current_tds_adjustment = [self.invoice_tds_amount, self.po_advance_tds].min
+            self.adjusted_po_advance_payable_amount = [self.invoice_balance_due, self.po_advance].min
+            self.invoice_tds_amount = self.invoice_tds_amount - current_tds_adjustment
+            self.invoice_balance_due = [self.invoice_sub_total_amount - self.adjusted_po_advance_payable_amount - self.invoice_tds_amount, 0].max
+          else
+            # subsequent invoices
+            self.current_tds_adjustment = [self.invoice_tds_amount, self.remaining_adjustable_tds].min
+            self.adjusted_po_advance_payable_amount = [self.invoice_balance_due, self.remaining_adjustable_advance].min
+            self.invoice_tds_amount = self.invoice_tds_amount - current_tds_adjustment
+            self.invoice_balance_due = [self.invoice_sub_total_amount - self.adjusted_po_advance_payable_amount - self.invoice_tds_amount, 0].max
+          end
+          self.save
+        end
+      end
     end
   end
 
