@@ -145,7 +145,7 @@ class InvoiceCalculationUtils
       unless self.invoice.forms_enabled
         self.invoice.balance_due.value = self.balance_due_amount
       else
-        self.invoice_balance_due = self.balance_due_amount
+        self.invoice.invoice_balance_due = self.balance_due_amount
       end
     else
       self.invoice.balance_due = Amount.new(value: self.balance_due_amount, currency_id: 1)
