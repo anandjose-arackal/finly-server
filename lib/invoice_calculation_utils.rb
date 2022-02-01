@@ -142,7 +142,11 @@ class InvoiceCalculationUtils
 
     # assign balance due
     if self.invoice.balance_due.present?
-      self.invoice.balance_due.value = self.balance_due_amount
+      unless self.invoice.forms_enabled
+        self.invoice.balance_due.value = self.balance_due_amount
+      else
+        self.invoice_balance = self.balance_due_amount
+      end
     else
       self.invoice.balance_due = Amount.new(value: self.balance_due_amount, currency_id: 1)
     end
