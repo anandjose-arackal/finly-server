@@ -31,7 +31,7 @@ class InvoiceCalculationUtils
       self.balance_due_amount = precision_value self.net_amount
     end
 
-    self.balance_due_amount = self.balance_due_amount - self.advance_amount
+    # self.balance_due_amount = self.balance_due_amount - self.advance_amount
     # If po invoice has po advance, then adjust the balance due
     unless self.invoice.class.name == 'OutwardInvoice'
       if (self.invoice.po_advance.present? && self.invoice.advance_amount_required && self.invoice.po_adjusted_advance[:value].present?) || (self.invoice.forms_enabled && self.invoice.advance_amount_required)
@@ -87,6 +87,8 @@ class InvoiceCalculationUtils
           end
         end
       end
+    else
+      self.balance_due_amount = self.balance_due_amount - self.advance_amount
     end
 
     # # Applying Credit Note
@@ -142,11 +144,7 @@ class InvoiceCalculationUtils
 
     # assign balance due
     if self.invoice.balance_due.present?
-      unless self.invoice.forms_enabled
-        self.invoice.balance_due.value = self.balance_due_amount
-      else
-        self.invoice.invoice_balance_due = self.balance_due_amount
-      end
+      self.invoice.balance_due.value = self.balance_due_amount
     else
       self.invoice.balance_due = Amount.new(value: self.balance_due_amount, currency_id: 1)
     end
