@@ -189,7 +189,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     end
 
     self.advance = self.purchase_order.requested_advance_amount
-    self.form_advance = self.purchase_order.po_requested_advance_amount
+    self.form_advance = self.purchase_order.po_advance_amount
 
     receiving_account = self.purchase_order&.bank_account || self.purchase_order.vendor&.bank_accounts&.first # todo - change this later to the one selected at the time of initiating payment. CHANGED.
 
