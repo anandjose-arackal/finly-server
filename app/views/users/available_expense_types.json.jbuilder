@@ -59,7 +59,10 @@ json.cash_pockets do
       when UserPocketType.id_for(:reimbursement)
         adapter = AccountManager::ReimbursementPockets::ReimbursementPocketsAdapter.new(pocket)
         json.display_balance false
-      else
+      when UserPocketType.id_for(:paid_by_company)
+        adapter = AccountManager::PaidByCompanyPockets::PaidByCompanyPocketsAdapter.new(pocket)
+        json.display_balance false
+    else
         adapter = nil
     end
     json.name pocket.name
