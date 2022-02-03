@@ -6,7 +6,7 @@ class MailApprovalMailbox < ApplicationMailbox
   def process
     return if @user.nil?
     @error_logger = Logger.new("#{Rails.root}/log/mail_approval_errors.log")
-    approval_uuid =  mail.recipients_addresses.to_sentence.to_s.split("@approval")[0]
+    approval_uuid =  mail.recipients_addresses.to_sentence.to_s.split("@test")[0]
     approval_uuid = approval_uuid.gsub('"','') #outlook has some extra quotes
     email_approval = EmailApproval.where(approval_uuid: approval_uuid)&.first
     if email_approval.nil?
@@ -26,6 +26,10 @@ class MailApprovalMailbox < ApplicationMailbox
     end
     if !invoice.processing?
       @error_logger.info("Invoice #{invoice.id} failed because it is in #{invoice.status.name} not in processing state")
+      return false
+    elsif !NonPoInvoiceToggle.new(@user).enabled?
+      @error_logger.info("Invoice #{invoice.id} failed because NonPoInvoice toggle is not enabled")
+      EmailApproval.delete_email_approval(invoice.id)
       return false
     elsif mail.decode_body.to_s.downcase.include?("approve") && can_approve(invoice)
       @result = Procurements::Invoices::Approve.(@user, params)

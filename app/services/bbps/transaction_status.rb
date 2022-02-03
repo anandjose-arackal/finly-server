@@ -233,6 +233,7 @@ class Bbps::TransactionStatus < Bbps::Api
 
     parsed_response["bbps_ref_id"] = received_response["response"]["refId"]
     parsed_response["ref_no"] = received_response["response"]["txnReferenceId"]
+    return Failure("Invalid response") if received_response["response"]["billerResponse"].nil?
     parsed_response["txn_date"] = received_response["response"]["billerResponse"]["billDate"]
     parsed_response["bill_number"] = received_response["response"]["billerResponse"]["billNumber"]
     

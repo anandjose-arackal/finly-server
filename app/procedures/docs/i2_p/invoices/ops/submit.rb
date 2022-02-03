@@ -75,7 +75,7 @@ class Docs::I2P::Invoices::Ops::Submit < Transactions::API
     # update_agreement_available_limit
     role_id = options[:workflow_output][:role_id]
     email_based_approval = false
-    if reviewal_document.invoice_type.id == InwardInvoiceType.id_for("non_po_invoice")
+    if reviewal_document.invoice_type.id == InwardInvoiceType.id_for("non_po_invoice") && NonPoInvoiceToggle.new(current_user).enabled?
       EmailApproval.generate_email_approval(reviewal_document.id, reviewal_document.class.to_s)
       email_based_approval = true
     end
