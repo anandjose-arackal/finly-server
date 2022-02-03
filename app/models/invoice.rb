@@ -154,7 +154,7 @@
 #
 
 class Invoice < ApplicationRecord
-  attr_accessor :skip_callback, :remaining_adjustable_tds, :remaining_adjustable_advance, :po_advance_tds, :net_po_advance, :prev_adjusted_advance_tds
+  attr_accessor :skip_callback, :remaining_adjustable_tds, :remaining_adjustable_advance, :po_advance_tds, :net_po_advance, :prev_adjusted_advance_tds, :advance_paid
   include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport, ControllingUser, GetCurrency
   include LiquidDroppable
   include Exposures::Model::Exposable
@@ -1639,6 +1639,10 @@ class Invoice < ApplicationRecord
 
   def po_advance_tds
     self.procurement.purchase_order&.po_advance_tds_amount.to_f
+  end
+
+  def advance_paid
+    self.procurement.purchase_order.advance_payments.present?
   end
 
   private

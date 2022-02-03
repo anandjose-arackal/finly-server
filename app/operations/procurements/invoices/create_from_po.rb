@@ -191,6 +191,11 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     self.advance = self.purchase_order.requested_advance_amount
     self.form_advance = self.purchase_order.po_advance_amount
 
+    if self.purchase_order.advance_payments.present? && user.po_invoice_form_enabled
+      self.advance = 0
+      self.form_advance = 0
+    end
+
     receiving_account = self.purchase_order&.bank_account || self.purchase_order.vendor&.bank_accounts&.first # todo - change this later to the one selected at the time of initiating payment. CHANGED.
 
     configuration = user.company.feature_subscription
@@ -217,7 +222,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     if (invoice_items_attributes.pluck(:quantity).sum == 0) then add_message :error, "Invoice can't be created. Either all items are billed or you need to add a Receipt Note first." end
     
 
-    if self.advance.present? || self.form_advance.present?
+    if self.purchase_order.advance_payments.present? && (self.advance.present? || self.form_advance.present?)
 
       # for the new invoice where they want to adjust the advance,
       # in prev adjusted amount, we store the sum of last invoices prev adjusted and its current adjusted advance
