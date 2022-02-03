@@ -62,8 +62,8 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
       #### net payable amount has roundoff value added
       # invoice_net_total_amount: "{% if form.base_currency_id != form.reporting_currency_id %}{{ form.invoice_total_amount | default: 0 | round: 2 }}{% else %}{{ form.invoice_total_amount | default: 0 | round }}{% endif %}",
       # invoice_advance_paid_amount: "{% form.advance_amount_required == false %}{{0}}{% else %}{{ form.adjusted_po_advance_payable_amount | default: 0 | round: 2}}{% endif %}",
-      invoice_advance_paid_amount: "{% assign payable_balance = form.invoice_balance_due %}{% assign adjustable_advance = form.remaining_adjustable_advance %}{% if payable_balance <= adjustable_advance and form.advance_amount_required == true %}{{ payable_balance }}{% elsif payable_balance > adjustable_advance and form.advance_amount_required == true %}{{ adjustable_advance }}{% endif %}",
-      invoice_balance_due: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | minus: form.display_tds_amount | plus: form.adjusted_advance_tds | default: 0 | round: 2 | at_least: 0 }}",
+      invoice_advance_paid_amount: "{% if form.advance_amount_required == true %}{{ form.adjusted_po_advance_payable_amount | default: 0 | round: 2}}{% endif %}",
+      invoice_balance_due: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | default: 0 | round: 2 | at_least: 0 }}",
       adjusted_advance_tds: "{% assign invoice_tds = form.display_tds_amount %}{% assign adjustable_tds = form.remaining_adjustable_tds %}{% if invoice_tds <= adjustable_tds and form.advance_amount_required == true %}{{ invoice_tds }}{% elsif invoice_tds > adjustable_tds and form.advance_amount_required == true %}{{ adjustable_tds }}{% endif %}",
       adjusted_po_advance_payable_amount: "{% assign payable_balance = form.invoice_balance_due %}{% assign adjustable_advance = form.remaining_adjustable_advance %}{% if payable_balance <= adjustable_advance and form.advance_amount_required == true %}{{ payable_balance }}{% elsif payable_balance > adjustable_advance and form.advance_amount_required == true %}{{ adjustable_advance }}{% endif %}",
 
