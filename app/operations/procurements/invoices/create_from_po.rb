@@ -145,7 +145,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       self.invoice.save
 
       if self.advance.present? && (params[:document_type].blank? && params[:document_type] != 'proforma_invoice')
-        if ((user.po_invoice_form_enabled && self.invoice.adjusted_po_advance_payable_amount.zero?) || (self.po_adjusted_advance.value.zero? || self.po_adjusted_advance_id.blank?)) && self.purchase_order.advance_payments.present?
+        if ((user.po_invoice_form_enabled && self.invoice.adjusted_po_advance_payable_amount.zero?) || (self.po_adjusted_advance.value.zero? || self.po_adjusted_advance_id.blank?)) # && self.purchase_order.advance_payments.present?
           calculcate_po_adjusted_advance
         end
       end
@@ -753,11 +753,11 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         when (self.invoice&.balance_due&.value.present? && self.invoice&.balance_due&.value >= allowed_current_adjustment) || (user.po_invoice_form_enabled && self.invoice.invoice_balance_due >= allowed_current_adjustment)
           # Substract PO advance amount from balance due amount
           bal_due_amount = self.invoice&.balance_due&.value - allowed_current_adjustment
-          bal_due_amount = self.invoice.invoice_balance_due if user.po_invoice_form_enabled
+          bal_due_amount = 0 if user.po_invoice_form_enabled
           current_adjustment = allowed_current_adjustment
         when (self.invoice&.balance_due&.value.present? &&  self.invoice&.balance_due&.value < allowed_current_adjustment) || (user.po_invoice_form_enabled && self.invoice.invoice_balance_due < allowed_current_adjustment)
           current_adjustment = self.invoice&.balance_due&.value
-          current_adjustment = self.invoice.invoice_balance_due.to_f if user.po_invoice_form_enabled
+          current_adjustment = 0 if user.po_invoice_form_enabled
           bal_due_amount = 0
       end
       # set_advance_amount_required

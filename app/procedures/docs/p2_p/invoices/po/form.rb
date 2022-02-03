@@ -64,7 +64,8 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
       # invoice_advance_paid_amount: "{% form.advance_amount_required == false %}{{0}}{% else %}{{ form.adjusted_po_advance_payable_amount | default: 0 | round: 2}}{% endif %}",
       invoice_advance_paid_amount: "{% if form.advance_amount_required == true %}{{ form.adjusted_po_advance_payable_amount | default: 0 | round: 2}}{% endif %}",
       invoice_balance_due: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | default: 0 | round: 2 | at_least: 0 }}",
-      adjusted_advance_tds: "{% if form.advance_amount_required == true %}{{form.display_tds_amount | at_least: form.remaining_adjustable_tds}}{% endif %}",
+      adjusted_advance_tds: "{% assign invoice_tds = form.display_tds_amount %}{% assign adjustable_tds = form.remaining_adjustable_tds %}{% if invoice_tds <= adjustable_tds and form.advance_amount_required == true %}{{ invoice_tds }}{% elsif invoice_tds > adjustable_tds and form.advance_amount_required == true %}{{ adjustable_tds }}{% endif %}",
+      adjusted_po_advance_payable_amount: "{% assign payable_balance = form.invoice_balance_due %}{% assign adjustable_advance = form.remaining_adjustable_advance %}{% if payable_balance <= adjustable_advance and form.advance_amount_required == true %}{{ payable_balance }}{% elsif payable_balance > adjustable_advance and form.advance_amount_required == true %}{{ adjustable_advance }}{% endif %}",
 
 
       # CONVERTED VALUES
@@ -467,17 +468,20 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
   section :document_advance, title: "Document Advance" do
        switch :advance_amount_required, label: "Adjust Amount", editable: true, visible: true, required: true, default_value: false
 
-       amount :po_advance, label: "PO Advance", editable: false, visible: true, required: false
+       amount :po_advance, label: "PO Advance payable amount", editable: false, visible: false, required: false
+
+       amount :net_po_advance, label: "PO Advance", editable: false, visible: true, required: true
 
        amount :reporting_po_advance, label: "PO Advance (reporting currency)", editable: false, visible: true, required: false,
               computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_advance])
 
        amount :po_prev_adjusted_advance, label: "Previous Adjusted Advance", editable: false, visible: true, required: false
+       amount :prev_adjusted_advance_tds, label: "Previous Adjusted AdvanceTDS", editable: false, visible: true, required: false
 
        amount :reporting_po_prev_adjusted_advance, label: "Previous Adjusted Advance (reporting currency)", editable: false, visible: true, required: false,
               computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_prev_adjusted_advance])
 
-       amount :adjusted_po_advance_payable_amount, label: "Current Adjustment", editable: true, visible: true, required: false
+       amount :adjusted_po_advance_payable_amount, label: "Current Adjustment", editable: true, visible: true, required: false, computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:adjusted_po_advance_payable_amount])
 
        amount :reporting_adjusted_po_advance_payable_amount, label: "Current Adjustment (reporting currency)", editable: false, visible: true, required: false,
               computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_adjusted_po_advance_payable_amount])
