@@ -466,7 +466,7 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
   end
 
   section :document_advance, title: "Document Advance" do
-       switch :advance_amount_required, label: "Adjust Amount", editable: true, visible: true, required: true, default_value: false
+       switch :advance_amount_required, label: "Adjust Amount", editable: false, visible: true, required: true, default_value: false
 
        amount :po_advance, label: "PO Advance payable amount", editable: false, visible: false, required: false
 
@@ -489,6 +489,8 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
        amount :adjusted_advance_tds, label: "Current TDS Adjustment", editable: false, visible: true, computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:adjusted_advance_tds])
        amount :remaining_adjustable_tds, label: "Remaining Adjustable TDS", editable: false, visible: true
        amount :remaining_adjustable_advance, label: "Remaining Adjustable Advance", editable: false, visible: true
+
+       switch :advance_paid, editable: false, visible: false
   end
 
   # ATTACHMENTS
@@ -502,6 +504,12 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
     error_message "Invoice Due Date must be After Invoice Date"
     rule Rules::Builder['due_date'].lt(entity: "date")
   end
+
+#   validation validation_id: "Adjusted amount should be less than remaining adjustable amount" do
+#     reference 'adjusted_po_advance_payable_amount'
+#     error_message "Adjusted amount should be less than remaining adjustable amount"
+#     rule Rules::Builder['adjusted_po_advance_payable_amount'].lt(entity: "remaining_adjustable_advance")
+#   end
 
   validation validation_id: "To date cannot be before From date" do 
     reference 'transaction_service_period_to'
@@ -569,6 +577,12 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
   #   rule Rules::Builder[:vendor_country_id_value].eq(value: 'India')
   #   action :editable, false
   # end
+
+  condition condition_id: "Disable advance adjustment if advance not paid" do
+    reference :entity, 'advance_amount_required'
+    rule Rules::Builder[:advance_paid].not_eq(value: true)
+    action :editable, false
+  end
 
   condition condition_id: "Disable Vendor Location > No Location for International Vendors" do
     reference :entity, 'gstin_location_id'
