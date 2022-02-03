@@ -1638,7 +1638,7 @@ class Invoice < ApplicationRecord
   end
 
   def po_advance_tds
-    self.procurement.purchase_order&.po_advance_tds_amount.to_f
+    advance_paid ? self.procurement.purchase_order&.po_advance_tds_amount.to_f : 0
   end
 
   def advance_paid
