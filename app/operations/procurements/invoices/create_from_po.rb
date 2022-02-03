@@ -145,7 +145,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       self.invoice.save
 
       if self.advance.present? && (params[:document_type].blank? && params[:document_type] != 'proforma_invoice')
-        if ((user.po_invoice_form_enabled && self.invoice.adjusted_po_advance_payable_amount.zero?) || (self.po_adjusted_advance.value.zero? || self.po_adjusted_advance_id.blank?)) # && self.purchase_order.advance_payments.present?
+        if ((user.po_invoice_form_enabled && self.invoice.adjusted_po_advance_payable_amount.zero?) || (self.po_adjusted_advance.value.zero? || self.po_adjusted_advance_id.blank?)) && self.purchase_order.advance_payments.present?
           calculcate_po_adjusted_advance
         end
       end
