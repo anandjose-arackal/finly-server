@@ -55,6 +55,10 @@ class UserPocket < ApplicationRecord
   }
   scope :non_bank_card_transfer_pockets, -> {
     where user_pocket_type_id: [UserPocketType.id_for(:cash), UserPocketType.id_for(:credit_card),
+                                UserPocketType.id_for(:reimbursement), UserPocketType.id_for(:paid_by_company)]
+  }
+  scope :reimbursement_cash_credit_pockets_pockets, -> {
+    where user_pocket_type_id: [UserPocketType.id_for(:cash), UserPocketType.id_for(:credit_card),
                                 UserPocketType.id_for(:reimbursement)]
   }
   scope :reimbursement_pocket_only,->{
