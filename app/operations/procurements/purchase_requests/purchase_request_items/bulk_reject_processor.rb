@@ -1,4 +1,6 @@
 class Procurements::PurchaseRequests::PurchaseRequestItems::BulkRejectProcessor < BackgroundOperation
+  sidekiq_options queue: :critical_workflow_queue
+
   attr_accessor :purchase_request_item_ids, :result, :purchase_request_item
 
   def init

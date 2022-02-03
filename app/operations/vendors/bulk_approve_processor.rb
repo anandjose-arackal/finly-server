@@ -1,4 +1,6 @@
 class Vendors::BulkApproveProcessor < BackgroundOperation
+  sidekiq_options queue: :critical_workflow_queue
+
 
   attr_accessor :vendor_ids, :result
 
