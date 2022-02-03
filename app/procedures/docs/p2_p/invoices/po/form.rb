@@ -466,7 +466,7 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
   end
 
   section :document_advance, title: "Document Advance" do
-       switch :advance_amount_required, label: "Adjust Amount", editable: false, visible: true, required: true, default_value: false
+       switch :advance_amount_required, label: "Adjust Amount", editable: false, visible: true, default_value: false
 
        amount :po_advance, label: "PO Advance payable amount", editable: false, visible: false, required: false
 
@@ -580,8 +580,8 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
 
   condition condition_id: "Disable advance adjustment if advance not paid" do
     reference :entity, 'advance_amount_required'
-    rule Rules::Builder[:advance_paid].not_eq(value: true)
-    action :editable, false
+    rule Rules::Builder[:advance_paid].eq_any(value: true)
+    action :editable, true
   end
 
   condition condition_id: "Disable Vendor Location > No Location for International Vendors" do
