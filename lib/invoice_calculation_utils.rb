@@ -34,7 +34,7 @@ class InvoiceCalculationUtils
     # self.balance_due_amount = self.balance_due_amount - self.advance_amount
     # If po invoice has po advance, then adjust the balance due
     unless self.invoice.class.name == 'OutwardInvoice'
-      if (self.invoice.po_advance.present? && self.invoice.advance_amount_required && self.invoice.po_adjusted_advance[:value].present?) || (self.invoice.forms_enabled && self.invoice.advance_amount_required)
+      if (self.invoice.forms_enabled && self.invoice.advance_amount_required && self.invoice.advance_paid) || (self.invoice.po_advance.present? && self.invoice.advance_amount_required && self.invoice.po_adjusted_advance.present? && self.invoice.po_adjusted_advance[:value].present?)
         purchase_order = self.invoice.procurement.purchase_order
         if self.invoice.procurement.po_revisions.present?
           po_revision = self.invoice.procurement.po_revisions.last
