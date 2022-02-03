@@ -8,9 +8,14 @@ class PaymentAgreements::Update < PaymentAgreements::Base
     self.document_reviewer_mappings_params = params[:document_reviewer_mappings]
     self.custom_fields = params&.dig(:custom_fields) || params&.dig(:invoice, :custom_fields)
   end
+  def pre_validate
+    existing_users = self.payment_agreement&.notify_users&.pluck(:user_id)
+    return if existing_users.blank?
+    payment_agreement_params[:payment_agreement][:notify_users_attributes].reject!{|h| (existing_users.include?(h[:user_id]) && h[:_destroy] != true)}
+  end
 
   def validate
-    self.payment_agreement.assign_attributes(payment_agreement_parameters)
+    self.payment_agreement.assign_attributes(payment_agreement_params)
     if self.payment_agreement.general_invoices.present?
       self.payment_agreement.general_invoices.each do |general_invoice|
         general_invoice.set_creator_and_company(user)
