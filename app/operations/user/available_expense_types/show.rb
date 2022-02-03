@@ -21,7 +21,11 @@ class User::AvailableExpenseTypes::Show < User::Base
       self.currencies = Currency.all
       self.em_tax_tracking = params[:em_tax_tracking]
       self.tds_slabs = params[:tds_slabs]
-      self.cash_and_credit_pockets = user.user_pockets.non_bank_card_transfer_pockets.active
+      if user.company.feature_subscription.paid_by_company_pocket_enabled
+        self.cash_and_credit_pockets = user.user_pockets.non_bank_card_transfer_pockets.active
+      else
+        self.cash_and_credit_pockets = user.user_pockets.reimbursement_cash_credit_pockets_pockets.active
+      end
       self.custom_currency_conversion = user.company.feature_subscription.custom_currency_conversion
       self.gst_state_codes = GstStateCode.all
       user.company.categories.active.pluck(:gst_applicable).uniq == [true] ? self.all_categories_gst_enabled = true : self.all_categories_gst_enabled = false
