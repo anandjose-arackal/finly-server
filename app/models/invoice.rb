@@ -1634,7 +1634,7 @@ class Invoice < ApplicationRecord
   end
 
   def prev_adjusted_advance_tds
-    self.procurement.invoices.where.not(id: self.id).where.not(id: self.id).pluck(:adjusted_po_advance_payable_amount).map(&:to_f).sum
+    self.procurement.invoices.where.not(id: self.id).where.not(id: self.id).pluck(:adjusted_advance_tds).map(&:to_f).sum
   end
 
   def po_advance_tds
