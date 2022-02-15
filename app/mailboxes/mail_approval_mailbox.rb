@@ -27,6 +27,10 @@ class MailApprovalMailbox < ApplicationMailbox
     if !invoice.processing?
       @error_logger.info("Invoice #{invoice.id} failed because it is in #{invoice.status.name} not in processing state")
       return false
+    elsif !NonPoInvoiceToggle.new(@user).enabled?
+      @error_logger.info("Invoice #{invoice.id} failed because NonPoInvoice toggle is not enabled")
+      EmailApproval.delete_email_approval(invoice.id)
+      return false
     elsif mail.decode_body.to_s.downcase.include?("approve") && can_approve(invoice)
       @result = Procurements::Invoices::Approve.(@user, params)
       if @result.success? && !@result.params["document"].processing?

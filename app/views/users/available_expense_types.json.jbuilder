@@ -62,7 +62,7 @@ json.cash_pockets do
       when UserPocketType.id_for(:paid_by_company)
         adapter = AccountManager::PaidByCompanyPockets::PaidByCompanyPocketsAdapter.new(pocket)
         json.display_balance false
-      else
+    else
         adapter = nil
     end
     json.name pocket.name

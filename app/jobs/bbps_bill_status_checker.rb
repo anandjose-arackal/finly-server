@@ -10,7 +10,7 @@ class BbpsBillStatusChecker < BaseJob
  
   class BbpsBillStatusChecker::Background
     include Sidekiq::Worker
-    sidekiq_options queue: :payments_critical_queue
+    sidekiq_options queue: :payments_critical_queue, retry: 5
 
     def perform
       ActsAsTenant.without_tenant do
