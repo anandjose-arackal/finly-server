@@ -202,11 +202,6 @@ class FormEntity < ApplicationRecord
       choices_data = { choices: choices.as_json }
     end
 
-    # 'Processing' and 'Awaiting approval' has same status entity
-    # if STATUS_ENTITIES.include? (opts&.dig(:entity_key)&.to_s)
-      choices_data[:choices] << { id: -1, name: 'Awaiting Approval' }
-    # end
-
     data = {
       id: id,
       uuid: uuid,
@@ -311,6 +306,10 @@ class FormEntity < ApplicationRecord
       entities.each do |ent|
         data[:entities][ent.entity_key] = ent.as_json(opts)
       end
+    end
+    # 'Processing' and 'Awaiting approval' has same status entity
+    if STATUS_ENTITIES.include? (ent.entity_key)
+      data[:choices] << { id: -1, name: 'Awaiting Approval' }
     end
     data
   end
