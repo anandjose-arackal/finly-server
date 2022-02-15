@@ -158,4 +158,8 @@ class PurchaseOrderExposure < Exposures::API
     end
     approvers.reject { |e| e.to_s.empty? }.join(", ")
   end
+
+  attribute :attachments, includes: [:attachments] do
+    record.attachments.map {|a| a.file.url(:original, timestamp: false)}.compact.join(", ")
+  end
 end
