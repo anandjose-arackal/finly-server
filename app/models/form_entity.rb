@@ -88,6 +88,9 @@ class FormEntity < ApplicationRecord
 
   before_save :sanitize
 
+  STATUS_ENTITIES = %w[purchase_order_status_id purchase_request_status_id invoice_status_id]
+
+
   # Fixme: Delete this as it is available in Forms::Entity::Registry. Kept it commented for testing purpose
   # def find_entity(entity_path)
   #   entities.each do |entity|
@@ -197,6 +200,11 @@ class FormEntity < ApplicationRecord
       end
     else
       choices_data = { choices: choices.as_json }
+    end
+
+    # 'Processing' and 'Awaiting approval' has same status entity
+    if STATUS_ENTITIES.include? (opts&.dig(:entity_key)&.to_s)
+      choices_data['choices'] << { id: -1, name: 'awaiting_approval' }
     end
 
     data = {
