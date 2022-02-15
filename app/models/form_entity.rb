@@ -204,7 +204,7 @@ class FormEntity < ApplicationRecord
 
     # 'Processing' and 'Awaiting approval' has same status entity
     if STATUS_ENTITIES.include? (opts&.dig(:entity_key)&.to_s)
-      choices_data['choices'] << { id: -1, name: 'awaiting_approval' }
+      choices_data[:choices] << { id: -1, name: 'Awaiting Approval' }
     end
 
     data = {
