@@ -49,7 +49,7 @@ class FormSection < ApplicationRecord
       # Root entities only. N+1's if this is made into a query
       next if ent.parent_id.present?
 
-      data[:entities][ent.entity_key] = ent.as_json(options.merge({ config_path: "#{section_id}/entities", entity_key: ent.entity_key.to_s }))
+      data[:entities][ent.entity_key] = ent.as_json(options.merge(config_path: "#{section_id}/entities"))
     end
     data
   end
