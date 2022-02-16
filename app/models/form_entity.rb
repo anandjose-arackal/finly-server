@@ -303,7 +303,7 @@ class FormEntity < ApplicationRecord
     end
     # 'Processing' and 'Awaiting approval' has same status entity
     if STATUS_ENTITIES.include? (entity_key)
-      data[:choices].merge({ id: -1, name: 'Awaiting Approval' })
+      data[:choices][:choices] << ({ id: -1, name: 'Awaiting Approval' })
     end
 
     if entities.present?
