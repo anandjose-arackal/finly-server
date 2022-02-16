@@ -301,14 +301,15 @@ class FormEntity < ApplicationRecord
     if choices_scope.present?
       data[:choices] = choices_scope.build(params: opts[:params], user: opts[:current_user])
     end
+    # 'Processing' and 'Awaiting approval' has same status entity
+    if STATUS_ENTITIES.include? (entity_key)
+      data[:choices] << { id: -1, name: 'Awaiting Approval' }
+    end
+
     if entities.present?
       data[:entities] = {}
       entities.each do |ent|
         data[:entities][ent.entity_key] = ent.as_json(opts)
-        # 'Processing' and 'Awaiting approval' has same status entity
-        if STATUS_ENTITIES.include? (ent.entity_key)
-          data[:choices] << { id: -1, name: 'Awaiting Approval' }
-        end
       end
     end
 
