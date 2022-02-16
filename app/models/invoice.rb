@@ -1434,7 +1434,7 @@ class Invoice < ApplicationRecord
   end
 
   def display_tds_amount
-    (self.items.where(tds_applicable: true).map(&:item_taxable_amount).map(&:to_f).sum * self.tds_percentage) / 100  
+    (self.items.where(tds_applicable: true).map(&:item_taxable_amount).map(&:to_f).sum * self.tds_percentage.to_f) / 100
   end
 
   def cn_adjustment_per_item
