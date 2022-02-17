@@ -489,7 +489,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
   end
 
   def validate_invoice_number(invoice_number)
-    ( /\A[a-zA-Z0-9 \\\/\-\#\&]*\Z/.match(invoice_number) ) ? true : false
+    ( /\A[a-zA-Z0-9\\\/\-\_]*\Z/.match(invoice_number) ) ? true : false
   end
 
   # def validate_amount(amount)
