@@ -88,6 +88,9 @@ class FormEntity < ApplicationRecord
 
   before_save :sanitize
 
+  STATUS_ENTITIES = %w[purchase_order_status_id purchase_request_status_id invoice_status_id]
+
+
   # Fixme: Delete this as it is available in Forms::Entity::Registry. Kept it commented for testing purpose
   # def find_entity(entity_path)
   #   entities.each do |entity|
@@ -299,12 +302,14 @@ class FormEntity < ApplicationRecord
     if choices_scope.present?
       data[:choices] = choices_scope.build(params: opts[:params], user: opts[:current_user])
     end
+
     if entities.present?
       data[:entities] = {}
       entities.each do |ent|
         data[:entities][ent.entity_key] = ent.as_json(opts)
       end
     end
+
     data
   end
 

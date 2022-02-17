@@ -20,6 +20,7 @@ class Docs::P2P::PurchaseOrders::FilterConfig < Filters::API
   attribute :controlling_level_level_number, label: "Controlling Level", type: :number, simple: true
   attribute :controlling_user, label: "Controlling User", type: :dropdown, simple: true, choices: Choices[:lookup].("users")
   attribute :status, type: :dropdown, simple: false, choices: Choices[:list].(*STATUS_TYPES)
+  attribute :purchase_order_status_id, type: :dropdown, simple: false, choices: Choices[:list].(*STATUS_TYPES)
   attribute :base_currency_id, label: 'Base Currency', type: :dropdown, choices: Choices[:lookup].("currencies"), active: :is_accessable
 
   custom_fields :purchase_order
