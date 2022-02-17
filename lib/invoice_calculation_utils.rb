@@ -88,7 +88,7 @@ class InvoiceCalculationUtils
         if self.invoice.procurement.purchase_order.all_items_accepted? && self.invoice.procurement.purchase_order.all_items_billed?
           previously_adjusted_tds = self.invoice.procurement.invoices.where.not(id: invoice.id).pluck(:adjusted_advance_tds).map(&:to_f).sum
           remaining_adjustable_tds = [(purchase_order.po_advance_tds_amount.to_f - previously_adjusted_tds), 0].max
-          self.current_tds_adjustment = remaining_adjustable_tds
+          self.current_tds_adjustment += remaining_adjustable_tds
         end
       end
     else
@@ -153,12 +153,14 @@ class InvoiceCalculationUtils
       self.invoice.balance_due = Amount.new(value: self.balance_due_amount, currency_id: 1)
     end
 
-    if self.invoice.class.name != 'OutwardInvoice' && self.invoice.forms_enabled
-      self.invoice.invoice_tds_amount     = self.tds_amount
-      self.invoice.invoice_taxable_amount = taxable_amount
-      self.invoice.invoice_gross_amount   = self.gross_amount
-      self.invoice.invoice_balance_due    = self.balance_due_amount
-      self.invoice.adjusted_advance_tds   = self.current_tds_adjustment
+    unless self.invoice.class.name == 'OutwardInvoice'
+      if self.invoice.forms_enabled
+        self.invoice.invoice_tds_amount = self.tds_amount
+        self.invoice.invoice_taxable_amount = taxable_amount
+        self.invoice.invoice_gross_amount = self.gross_amount
+        self.invoice.invoice_balance_due = self.balance_due_amount
+        self.invoice.adjusted_advance_tds = self.current_tds_adjustment
+      end
     end
 
     # set total payable if it's an outward invoice
@@ -377,14 +379,13 @@ class InvoiceCalculationUtils
   end
 
   def calculate_freight_charges
-    if self.invoice.freight_amount.blank? && !self.invoice.forms_enabled
+    if self.invoice.freight_amount.blank?
       # no change in net amount
       self.freight_amount = 0
       return
     end
     original_net_amount = self.net_amount
     self.freight_amount = self.invoice.freight_amount&.value.to_f
-    self.freight_amount = self.invoice.invoice_freight_amount.to_f if self.invoice.forms_enabled
     self.net_amount = original_net_amount + self.freight_amount
   end
 
