@@ -47,7 +47,6 @@ class Macros::UpdatePaymentsUtr::Update < Transactions::API
         else
           context[:error] = "#{payments_data[:payment_id]} - This payment utr and processed_date not updated because #{self.assign_utr_date.errors.full_messages}"
         end
-      end
     end
     true
   end
