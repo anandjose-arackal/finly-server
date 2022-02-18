@@ -672,23 +672,23 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
     action :visible, false
   end
 
-  condition condition_id: 'Hide PO advance (Reporting Currency)' do
-    reference :entity, 'reporting_po_advance'
-    rule Rules::Builder[:base_currency_id].eq(entity: 'reporting_currency_id')
-    action :visible, false
-  end
+  # condition condition_id: 'Hide PO advance (Reporting Currency)' do
+  #   reference :entity, 'reporting_po_advance'
+  #   rule Rules::Builder[:base_currency_id].eq(entity: 'reporting_currency_id')
+  #   action :visible, false
+  # end
 
-  condition condition_id: 'Hide prev adjusted PO advance (Reporting Currency)' do
-    reference :entity, 'reporting_po_prev_adjusted_advance'
-    rule Rules::Builder[:base_currency_id].eq(entity: 'reporting_currency_id')
-    action :visible, false
-  end
+  # condition condition_id: 'Hide prev adjusted PO advance (Reporting Currency)' do
+  #   reference :entity, 'reporting_po_prev_adjusted_advance'
+  #   rule Rules::Builder[:base_currency_id].eq(entity: 'reporting_currency_id')
+  #   action :visible, false
+  # end
 
-  condition condition_id: 'Hide current adjusted PO advance (Reporting Currency)' do
-    reference :entity, 'reporting_adjusted_po_advance_payable_amount'
-    rule Rules::Builder[:base_currency_id].eq(entity: 'reporting_currency_id')
-    action :visible, false
-  end
+  # condition condition_id: 'Hide current adjusted PO advance (Reporting Currency)' do
+  #   reference :entity, 'reporting_adjusted_po_advance_payable_amount'
+  #   rule Rules::Builder[:base_currency_id].eq(entity: 'reporting_currency_id')
+  #   action :visible, false
+  # end
 
   condition condition_id: 'Hide Reporting Balance Payable for Indian currency' do
     reference :entity, 'items_summary.reporting_invoice_balance_due'
