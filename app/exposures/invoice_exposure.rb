@@ -196,7 +196,8 @@ class InvoiceExposure < Exposures::API
   end
 
   attribute :attachments, includes: [:attachments] do
-    record.attachments.map {|a| a.file.url(:original, timestamp: false)}.compact.join(", ")
+    attachments = record.attachments.map {|a| a.file.url(:original, timestamp: false)}.compact.join(", ")
+    attachments += record.form_custom_fields.where(entity_type: "attachment").map {|a| a.retrieve_export_text_value}.compact.join(", ")
   end
 
   attribute :approval_pending_reviewers, includes: [:level, :document_level_reviewer_mappings] do

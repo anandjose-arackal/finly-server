@@ -143,7 +143,7 @@ class PurchaseOrderExposure < Exposures::API
   attribute :shipping_address, record_attribute: true
   attribute :approval_levels, record_attribute: :dlrms, exposure: true, includes: [:dlrms]
   attribute :approved_trails, exposure: :true,  includes: [:trails] do
-    record.trails.where(action_id: TrailAction.id_for(:approve))
+    record.trails.where(action_id: TrailAction.id_for(:approve)).where('created_at > ?', record.submitted_at).group(:action_level_id)
   end
 
   attribute :approved_timeline, includes: [{dlrms: [:taken_control_by, :forwarded_to, :reviewer]}] do
@@ -165,19 +165,23 @@ class PurchaseOrderExposure < Exposures::API
     approvers.reject { |e| e.to_s.empty? }.join(", ")
   end
 
+  attribute :attachments, includes: [:attachments] do
+    record.attachments.map {|a| a.file.url(:original, timestamp: false)}.compact.join(", ")
+  end
+
   attribute :conversion_rate do
     record.conversion_rate
   end
-  
+
   attribute :reporting_po_sub_total_amount do
     record.reporting_po_sub_total_amount
   end
-  
+
   attribute :reporting_po_balance_due do
     record.reporting_po_balance_due
   end
 
-  attribute :base_currency_code do    
+  attribute :base_currency_code do
     record.get_base_currency.country_code
   end
 
