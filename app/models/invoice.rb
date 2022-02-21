@@ -815,6 +815,10 @@ class Invoice < ApplicationRecord
     self.discount
   end
 
+  def po_advance_tds
+    self.forms_enabled ? self.procurement.purchase_order.po_advance_tds_amount.to_f : 0
+  end
+
   def item_amounts_total
     if self.invoice_items.present?
       # user = RequestStore.store[:current_user]
