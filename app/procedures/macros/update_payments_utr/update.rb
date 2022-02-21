@@ -1,6 +1,6 @@
 class Macros::UpdatePaymentsUtr::Update < Transactions::API
 
-  attr_accessor :payment, :assign_utr_date
+  attr_accessor :payment
 
   schema do
     params do
@@ -28,25 +28,26 @@ class Macros::UpdatePaymentsUtr::Update < Transactions::API
   end
 
   def init(context, params:, current_user:, record_class:, **)
-    context[:payments_data] = payment_params
+    context[:payments_data] = params[:payment_utr_date]
   end
 
-  def validate(context, params:, payments_data:, current_user:, record_class:, **)
+  def validate(context, payments_data:, current_user:, record_class:, **)
     if payments_data.empty?
       context[:error] = "payments data must not blank"
       return true
     end
   end
 
-  def process(context, payments_data:, params:, current_user:, record_class:, **)
+  def process(context, payments_data:, current_user:, record_class:, **)
     self.payment = record_class.find(payments_data[:payment_id])
     if self.payment.present? && (self.payment.completed? || self.payment.failed?)
-      self.assign_utr_date = self.payment.assign_attributes({:utr => payments_data[:utr],:processed_at => payments_data[:processed_date]})
-        if self.assign_utr_date.save
-          update_invoice_payment_status
-        else
-          context[:error] = "#{payments_data[:payment_id]} - This payment utr and processed_date not updated because #{self.assign_utr_date.errors.full_messages}"
-        end
+      self.payment =  payments_data[:utr]
+      self.payment =  payments_data[:processed_date]
+      if self.payment.save
+        update_invoice_payment_status
+      else
+        context[:error] = "#{payments_data[:payment_id]} - This payment utr and processed_date not updated because #{self.payment.errors.full_messages}"
+      end
     end
     true
   end
@@ -62,12 +63,6 @@ class Macros::UpdatePaymentsUtr::Update < Transactions::API
     self.payment.payment_order.update_order_status
     self.payment.payment_order.update_processed_amount
     self.payment.system_messages.destroy_all
-  end
-
-  private
-
-  def payment_params
-    params.require(:payment_utr_date).permit(:payment_id, :utr, :processed_date)
   end
 
 end
