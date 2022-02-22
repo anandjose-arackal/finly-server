@@ -487,7 +487,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
 
   validation validation_id: "PO date Cannot be Later than Scheduled date" do
     reference 'advance_scheduled_date'
-    error_message "Scheduled date cannot be before po date"
+    error_message "Scheduled Date cannot be before Purchase Order Date"
     rule Rules::Builder['advance_scheduled_date'].lt(entity: "created_at")
   end
 
@@ -688,5 +688,23 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
     reference :entity, 'items.pr_number'
     rule Rules::Builder['row.purchase_request_item_id'].present.and(Rules::Builder['row.purchase_request_item_id'].not_eq(value: ''))
     action :visible, true
+  end
+
+  condition condition_id: "Items quantity should not be editable once unless in editable status" do
+    reference :entity, 'items.quantity'
+    rule Rules::Builder[:purchase_order_status_id].not_eq(*PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).map { |item| { value: item } })
+    action :editable, false
+  end
+
+  condition condition_id: "Items discount amount should not be editable once unless in editable status" do
+    reference :entity, 'items.item_discount_amount'
+    rule Rules::Builder[:purchase_order_status_id].not_eq(*PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).map { |item| { value: item } })
+    action :editable, false
+  end
+
+  condition condition_id: "TDS rate should not be editable once unless in editable status" do
+    reference :entity, :advance_tds_slab_id
+    rule Rules::Builder[:purchase_order_status_id].not_eq(*PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).map { |item| { value: item } })
+    action :editable, false
   end
 end
