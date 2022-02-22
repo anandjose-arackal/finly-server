@@ -77,6 +77,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     # if it already exists in the database
     if self.payment&.invoice.present? && self.payment_params[:invoice_attributes].present?
       self.payment_params[:invoice_attributes][:id] = self.payment.invoice.id
+      self.payment_params[:invoice_attributes][:tds_slab_id] = self.payment_params.dig(:invoice_attributes, :tds_slab_id)
     end
 
     # adding id for original_amount and freight_amount so that new copies aren't created every time
