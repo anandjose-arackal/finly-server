@@ -746,8 +746,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       if (self.invoice&.balance_due&.value.present? && self.invoice&.balance_due&.value >= allowed_current_adjustment) || (user.po_invoice_form_enabled && self.invoice.invoice_balance_due >= allowed_current_adjustment)
         # Substract PO advance amount from balance due amount
         bal_due_amount = self.invoice&.balance_due&.value - allowed_current_adjustment
-        bal_due_amount = 0 if user.po_invoice_form_enabled
-        current_adjustment = allowed_current_adjustment
+        current_adjustment = 0 if user.po_invoice_form_enabled
       elsif (self.invoice&.balance_due&.value.present? && self.invoice&.balance_due&.value < allowed_current_adjustment) || (user.po_invoice_form_enabled && self.invoice.invoice_balance_due < allowed_current_adjustment)
         current_adjustment = self.invoice&.balance_due&.value
         current_adjustment = 0 if user.po_invoice_form_enabled
