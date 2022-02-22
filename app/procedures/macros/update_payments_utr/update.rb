@@ -4,13 +4,9 @@ class Macros::UpdatePaymentsUtr::Update < Transactions::API
 
   schema do
     params do
-      required(:payment_utr_date) do
-        hash do
-          required(:payment_id).filled
-          required(:utr).filled
-          required(:processed_date).filled
-        end
-      end
+      required(:payment_id)
+      required(:utr)
+      required(:processed_date)
     end
   end
  
@@ -28,7 +24,7 @@ class Macros::UpdatePaymentsUtr::Update < Transactions::API
   end
 
   def init(context, params:, current_user:, record_class:, **)
-    context[:payments_data] = params[:payment_utr_date]
+    context[:payments_data] = params
   end
 
   def validate(context, payments_data:, current_user:, record_class:, **)
