@@ -142,7 +142,7 @@ json.payments do
         json.reporting_invoice_discount_amount precision_value invoice&.reporting_invoice_discount_amount.to_f
         json.invoice_tax_amount precision_value invoice&.invoice_tax_amount.to_f
         json.reporting_invoice_tax_amount precision_value invoice&.reporting_invoice_tax_amount.to_f
-        json.invoice_tds_amount precision_value invoice&.invoice_tds_amount.to_f
+        json.invoice_tds_amount precision_value invoice&.display_tds_amount.to_f
         json.reporting_invoice_tds_amount precision_value invoice&.reporting_invoice_tds_amount.to_f
         json.invoice_freight_amount precision_value invoice&.invoice_freight_amount.to_f
         json.reporting_invoice_freight_amount precision_value invoice&.reporting_invoice_freight_amount.to_f
