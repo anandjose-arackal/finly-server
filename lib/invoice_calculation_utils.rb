@@ -156,9 +156,7 @@ class InvoiceCalculationUtils
     if self.invoice.class.name != 'OutwardInvoice' && self.invoice.forms_enabled
       self.invoice.invoice_tds_amount     = self.tds_amount
       self.invoice.invoice_taxable_amount = taxable_amount
-      # self.invoice.invoice_gross_amount   = self.gross_amount
-      round_off = self.invoice.invoice_roundoff_amount.to_f if self.invoice.forms_enabled
-      self.invoice.invoice_balance_due    = self.balance_due_amount + round_off
+      self.invoice.invoice_balance_due    = self.balance_due_amount
       self.invoice.adjusted_advance_tds   = self.current_tds_adjustment
     end
 
@@ -218,6 +216,7 @@ class InvoiceCalculationUtils
       calculate_freight_charges
     end
     self.roundoff_amount = self.invoice.roundoff_amount.to_f # even if it's nil, it gets converted to 0
+    self.roundoff_amount = self.invoice_roundoff_amount.to_f if self.invoice.forms_enabled
     self.balance_due_amount = if self.roundoff_amount != 0
                                 precision_value (self.net_amount + self.roundoff_amount)
                               else
