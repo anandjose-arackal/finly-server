@@ -71,7 +71,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     when 'PurchaseOrder'
       construct_po_params
       validate_po_params
-    end  
+    end
 
     # adding the invoice id so that it gets updated and not created again
     # if it already exists in the database
@@ -202,6 +202,13 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       bp.save
     when 'PurchaseOrder'
       purchase_order = PurchaseOrder.find_by(id: payment.parent_id)
+      requested_advance_amount = purchase_order&.po_requested_advance_amount
+      tds_percentage = TdsRatesList.find(self.po_params[:advance_tds_slab_id])&.tds.to_f
+      if tds_percentage != 0 && requested_advance_amount != 0
+        self.po_params[:po_advance_tds_amount] = (requested_advance_amount * tds_percentage) / 100
+        self.po_params[:po_advance_amount] = requested_advance_amount - self.po_params[:po_advance_tds_amount]
+        self.po_params[:po_advance_tds_percentage] = tds_percentage
+      end
       # trigger the calculation only if tds sent and it is different from po tds
       # if self.payment_params[:invoice_attributes][:tds_slab_id].present? && (self.payment_params[:invoice_attributes][:tds_slab_id].to_i != purchase_order.advance_tds_slab_id)
       if self.incoming_tds_for_po != purchase_order.advance_tds_slab_id
