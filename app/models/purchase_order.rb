@@ -869,7 +869,7 @@ class PurchaseOrder < ApplicationRecord
         total_advance_amount: total_adv_amount,
         # advance_amount: precision_value(self.advance_amount&.value),
         payable_advance_amount: payable_advance_amount.round(2),
-        reporting_payable_advance_amount: reporting_payable_advance_amount,
+        reporting_payable_advance_amount: reporting_payable_advance_amount.round(2),
         balance_due: balance_due,
         conversion_rate: self.conversion_rate,
         procurement_id: self.procurement_id,
