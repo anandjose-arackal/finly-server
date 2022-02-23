@@ -470,7 +470,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
   validation validation_id: "Order Date Cannot be Later than Delivery Date" do
     reference 'delivery_date'
     error_message "Order Date Cannot be Later than Delivery Date"
-    rule Rules::Builder['delivery_date'].lt(entity: "created_at").and(Rules::Builder[:base_currency_id].not_eq(entity: "reporting_currency_id"))
+    rule Rules::Builder['delivery_date'].lt(entity: "created_at").and(Rules::Builder[:base_currency_id].not_eq(entity: "reporting_currency_id")).and(Rules::Builder[:payment_term_id].present)
   end
 
   validation validation_id: "Items > Item net amount cannot be less than 0" do
