@@ -1107,7 +1107,7 @@ class Invoice < ApplicationRecord
         reporting_invoice_discount_amount: self.reporting_invoice_discount_amount,
         invoice_tax_amount: self.invoice_tax_amount,
         reporting_invoice_tax_amount: self.reporting_invoice_tax_amount,
-        invoice_tds_amount: self.invoice_tds_amount,
+        invoice_tds_amount: self.display_tds_amount,
         reporting_invoice_tds_amount: self.reporting_invoice_tds_amount,
         invoice_freight_amount: self.invoice_freight_amount,
         reporting_invoice_freight_amount: self.reporting_invoice_freight_amount,
@@ -1652,7 +1652,8 @@ class Invoice < ApplicationRecord
   end
 
   def advance_paid
-    self.procurement.purchase_order.advance_payments.present?
+    # self.procurement.purchase_order.advance_payments.present?
+    true
   end
 
   private
