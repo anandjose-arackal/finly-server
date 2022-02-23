@@ -432,7 +432,7 @@ class BbpsBill < ApplicationRecord
         bill_number: bill_number,
         bill_date: bill_date,
         due_date: due_date,
-        transaction_ref_id: correct_payment&.bbps_bank_transaction&.bbps_ref_id,
+        transaction_ref_id: correct_payment&.bbps_bank_transaction&.order_number,
         payment_mode: "BSC",
         bill_amount: correct_payment&.amount.as_json,
         transaction_date: paid_at&.strftime("%I:%M %p, %d %b %Y"),
