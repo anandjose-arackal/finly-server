@@ -345,7 +345,7 @@ class Invoice < ApplicationRecord
   # validates :net_amount, presence: true
   # validates :amount, presence: true
 
-  validates :invoice_number, :format => {with: /\A[a-zA-Z0-9 \\\/\-\#\&]*\Z/, :message => ' can only have letters, numbers, dashes and forward slash and no other special characters'}, :length => {minimum: 0, maximum: 30}, :allow_blank => true
+  validates :invoice_number, :format => {with: /\A[a-zA-Z0-9 \\\/\-\#\&\_]*\Z/, :message => ' can only have letters, numbers, spaces, -,#,&,/ and underscore. No other special characters'}, :length => {minimum: 0, maximum: 30}, :allow_blank => true
   validate :item_quantity_validation
   validate :item_rate_validation
 
