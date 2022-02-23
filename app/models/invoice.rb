@@ -1032,7 +1032,7 @@ class Invoice < ApplicationRecord
         advance_amount: self.advance_amount&.value.to_f ,
         # + self&.reporting_invoice_paid_outside_amount.to_f,
         tax_amount: precision_value(self.tax_amount&.value.to_f),
-        tds_amount: precision_value(self.tds_amount&.value.to_f),
+        tds_amount: self.forms_enabled ? precision_value(self.display_tds_amount.to_f) : precision_value(self.tds_amount&.value.to_f),
         tax: precision_value(self.tax.to_f),
         tds: precision_value(self.tds.to_f),
         gst_type_id: self.gst_type_id.to_i,
