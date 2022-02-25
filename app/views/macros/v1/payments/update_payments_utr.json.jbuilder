@@ -1,1 +1,0 @@
-json.data @op[:result_data]
