@@ -228,7 +228,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
 
         # Added for po forms
         if user.po_invoice_form_enabled
-          self.total_adjusted_advance = self.last_invoice.po_prev_adjusted_advance.to_i + self.last_invoice.adjusted_po_advance_payable_amount&.to_i
+          self.total_adjusted_advance = self.last_invoice.po_prev_adjusted_advance.to_f + self.last_invoice.adjusted_po_advance_payable_amount&.to_f
           self.po_prev_adjusted_advance = total_adjusted_advance
           self.po_advance = self.form_advance.to_f
           current_adjustment = self.po_advance - total_adjusted_advance
