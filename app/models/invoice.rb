@@ -1624,7 +1624,7 @@ class Invoice < ApplicationRecord
   def remaining_adjustable_tds
     prev_adjusted_tds = self.procurement.invoices.where('created_at < ?', self.created_at).pluck(:adjusted_advance_tds).map(&:to_f).sum
     if self.advance_amount_required
-      prev_adjusted_tds + self.adjusted_advance_tds
+      prev_adjusted_tds += self.adjusted_advance_tds
     end
 
     (self.po_advance_tds.to_f - prev_adjusted_tds).to_f
@@ -1633,7 +1633,7 @@ class Invoice < ApplicationRecord
   def remaining_adjustable_advance
     prev_adjusted_advance = self.procurement.invoices.where('created_at < ?', self.created_at).pluck(:adjusted_po_advance_payable_amount).map(&:to_f).sum
     if self.advance_amount_required
-      prev_adjusted_advance + self.adjusted_po_advance_payable_amount
+      prev_adjusted_advance += self.adjusted_po_advance_payable_amount
     end
 
     (self.po_advance.to_f - prev_adjusted_advance).to_f
