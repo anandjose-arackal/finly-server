@@ -50,6 +50,9 @@ json.payments do
       bank_transaction = bank_transaction_class.find_by(reference_payment_id: payment.id)
       credited_at = bank_transaction&.created_at&.strftime("%B %d, %Y - %H:%M:%S") if bank_transaction.present?
     end
+    if credited_at.blank?
+      credited_at = payment&.processed_at&.strftime("%B %d, %Y - %H:%M:%S")
+    end
 
     json.credited_at credited_at
     json.payment_notification_users payment&.parent&.payment_notification_users rescue nil

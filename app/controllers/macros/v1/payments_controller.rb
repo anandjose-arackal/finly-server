@@ -18,4 +18,11 @@ class Macros::V1::PaymentsController < BaseControllers::MacrosBase
     ]
   end
 
+  def update_payments_utr
+    endpoint Macros::UpdatePaymentsUtr::Update, args: [
+      params: params.to_unsafe_h,
+      current_user: current_user,
+      record_class: Payment
+    ]
+  end
 end
