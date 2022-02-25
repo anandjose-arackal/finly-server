@@ -24,7 +24,13 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
       # item_taxable_amount: "{{ row.item_gross_amount | minus: row.item_discount_amount | default: 0 | round: 2  }}",
       item_taxable_amount: "{% if row.product_type_id == '1' %}{{ row.item_gross_amount | minus: row.item_discount_amount | default: 0 | round: 2  }}{% else %}{{ row.item_billable_amount }}{% endif %}",
       item_tax_amount: '{{ row.item_taxable_amount | times: row.tax_percentage | divided_by: 100.00 | default: 0 | round: 2  }}',
-      item_tds_amount: "{% if row.tds_applicable == 'true' %}{{ row.item_taxable_amount | times: form.tds_percentage | divided_by: 100.00 | default: 0 | round: 2  }}{% else %}{{ 0 }}{% endif %}",
+      item_tds_amount: "
+      {% if row.tds_applicable == 'true' %}
+        {{ row.item_taxable_amount | times: form.tds_percentage | divided_by: 100.00 | default: 0 | round: 2  }}
+      {% else %}
+        {{ 0 }}
+      {% endif %}
+      ",
       item_net_amount: '{% if form.rcm_enabled == true %}{{ row.item_taxable_amount | default: 0 | round: 2 }}{% else %}{{ row.item_taxable_amount | plus: row.item_tax_amount | default: 0 | round: 2 }}{% endif %}',
 
       # CONVERTED VALUES
@@ -49,7 +55,17 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
       invoice_sub_total_amount: '{% assign inv_sub_total_amount = form.invoice_gross_amount | minus: form.invoice_discount_amount | plus: form.invoice_tax_amount | plus: form.invoice_freight_amount | round: 2 %}{% if form.rcm_enabled == true %}{{ inv_sub_total_amount | minus: form.invoice_tax_amount | default: 0 | round: 2}}{% else %}{{ inv_sub_total_amount | default: 0 | round: 2 }}{% endif %}',
       invoice_paid_outside_amount: '{{ form.invoice_paid_outside_amount | default: 0 | round: 2}}',
       # invoice_tds_amount: "{% assign tds_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign tds_amount = tds_amount | plus: item.item_tds_amount %}{% endif %}{% endfor %}{{ tds_amount  | default: 0 | ceil}}",
-      display_tds_amount: '{% assign tds_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign tds_amount = tds_amount | plus: item.item_tds_amount %}{% endif %}{% endfor %}{{ tds_amount  | default: 0 | ceil}}',
+      display_tds_amount: "
+      {% assign tds_amount = 0 %}
+      {% for item in form.items %}
+        {% if item._destroy == true or item.tds_applicable == 'true'%}
+          {% continue %}
+        {% else %}
+          {% assign tds_amount = tds_amount | plus: item.item_tds_amount %}
+        {% endif %}
+      {% endfor %}
+      {{ tds_amount  | default: 0 | ceil}}
+      ",
 
       #### net payable amount
       # invoice_roundoff_amount: "{% assign net_total_amount = form.invoice_sub_total_amount | minus: form.invoice_paid_outside_amount | minus: form.invoice_tds_amount %}{% assign round_amount = net_total_amount | round %}{% assign amount = round_amount | minus: net_total_amount %}{% if form.base_currency_id != form.reporting_currency_id %}{% assign amount = 0 %}{% endif %}{{ amount | default: 0 | round: 2 }}",
@@ -66,34 +82,34 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
       {% assign payable_balance = form.invoice_sub_total_amount | plus: form.invoice_roundoff_amount | minus: form.display_tds_amount | minus: form.invoice_paid_outside_amount | default: 0 | round: 2 %}
       {% assign adjustable_advance = form.po_advance | minus: form.po_prev_adjusted_advance %}
       {% if payable_balance <= adjustable_advance and form.advance_amount_required == true %}
-        {{ payable_balance }}
+        {{ payable_balance | round: 2}}
       {% elsif payable_balance > adjustable_advance and form.advance_amount_required == true %}
-        {{ adjustable_advance }}
+        {{ adjustable_advance| round: 2}}
       {% endif %}
       ',
       adjusted_advance_tds: '
       {% assign invoice_tds = form.display_tds_amount %}
       {% assign adjustable_tds = form.po_advance_tds | minus: form.prev_adjusted_advance_tds %}
       {% if invoice_tds <= adjustable_tds and form.advance_amount_required == true %}
-        {{ invoice_tds }}
+        {{ invoice_tds | round: 2}}
       {% elsif invoice_tds > adjustable_tds and form.advance_amount_required == true %}
-        {{ adjustable_tds }}
+        {{ adjustable_tds | round: 2}}
       {% endif %}
       ',
       remaining_adjustable_advance: '
       {% assign remaining_advance = form.po_advance | minus: form.po_prev_adjusted_advance %}
       {% if form.advance_amount_required == true %}
-        {{ remaining_advance | minus: form.adjusted_po_advance_payable_amount }}
+        {{ remaining_advance | minus: form.adjusted_po_advance_payable_amount | round: 2}}
       {% else %}
-        {{ remaining_advance }}
+        {{ remaining_advance | round: 2}}
       {% endif %}
       ',
       remaining_adjustable_tds: '
       {% assign remaining_tds = form.po_advance_tds | minus: form.prev_adjusted_advance_tds %}
       {% if form.advance_amount_required == true %}
-        {{ remaining_tds | minus: form.adjusted_advance_tds }}
+        {{ remaining_tds | minus: form.adjusted_advance_tds | round: 2}}
       {% else %}
-        {{ remaining_tds }}
+        {{ remaining_tds | round: 2}}
       {% endif %}
       ',
 

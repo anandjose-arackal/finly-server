@@ -1652,8 +1652,7 @@ class Invoice < ApplicationRecord
   end
 
   def advance_paid
-    # self.procurement.purchase_order.advance_payments.present?
-    true
+    self.procurement.purchase_order.advance_payments.present?
   end
 
   private
