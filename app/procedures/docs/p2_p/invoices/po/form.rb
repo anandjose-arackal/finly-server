@@ -58,7 +58,7 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
       display_tds_amount: "
       {% assign tds_amount = 0 %}
       {% for item in form.items %}
-        {% if item._destroy == true or item.tds_applicable == 'true'%}
+        {% if item._destroy == true or item.tds_applicable == 'false'%}
           {% continue %}
         {% else %}
           {% assign tds_amount = tds_amount | plus: item.item_tds_amount %}
