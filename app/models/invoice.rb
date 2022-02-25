@@ -1116,7 +1116,7 @@ class Invoice < ApplicationRecord
         invoice_roundoff_amount: self.invoice_roundoff_amount,
         reporting_invoice_roundoff_amount: self.reporting_invoice_roundoff_amount,
         invoice_balance_due: self.invoice_balance_due,
-        reporting_invoice_balance_due: self.reporting_invoice_balance_due,
+        reporting_invoice_balance_due: ((self.invoice_balance_due.to_f * self.conversion_rate.to_f)/100).round(2),
         invoice_sub_total_amount: self.invoice_sub_total_amount,
         reporting_invoice_sub_total_amount: self.reporting_invoice_sub_total_amount,
         invoice_advance_paid_amount: self.invoice_advance_paid_amount,
