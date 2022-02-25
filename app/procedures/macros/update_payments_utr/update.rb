@@ -20,14 +20,17 @@ class Macros::UpdatePaymentsUtr::Update < Transactions::API
     true
   end
 
-  def init(context, params:,record_class:, **)
+  def init(context, params:,current_user:, record_class:, **)
     context[:record] = record_class.find_by(id: params[:payment_id])
     true
   end
 
-  def update_utr_date_payment(context, params:, record:, **)
+  def update_utr_date_payment(context, params:, current_user:, record:, **)
     if record.nil?
-      context[:result_data] = "Failure"
+      context[:result_data] = "Failure_Check_Payment_Id"
+      return true
+    elsif record.utr.present?
+      context[:result_data] = "Payment_UTR_Already_Exist"
       return true
     end
     if record.completed? || record.failed?
@@ -41,17 +44,18 @@ class Macros::UpdatePaymentsUtr::Update < Transactions::API
         elsif record.parent_type == "BbpsBill"
           record.parent.update(status_id: BbpsBillStatus.id_for(:paid))
         end
+        Payment.update_payment_status(record, current_user)
         record.payment_order.update_order_status
         record.payment_order.update_processed_amount
         record.system_messages.destroy_all
-        context[:result_data] = "Successfully_Updated"
+        context[:result_data] = "Payment_Successfully_Updated"
         return true
       else
-        context[:result_data] = "NotUpdatedError (#{record.errors.full_messages})"
+        context[:result_data] = "Payment_Not_Updated_Due_To (#{record.errors.full_messages})"
         return true
       end
     else
-      context[:result_data] = "NotUpdatedStateError (#{record.payment_status.name})"
+      context[:result_data] = "Payment_Not_Updated_Due_To_Payment_Status (#{record.payment_status.name})"
       return true
     end
     true

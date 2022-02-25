@@ -3038,6 +3038,7 @@ Rails.application.routes.draw do
       end
     end
   end
+  patch ':company_id/payments/update_utr', to: 'api/vp/v1/payments#bulk_update_utr'
 
   ################### Vendor Payments APIs end ########################
 

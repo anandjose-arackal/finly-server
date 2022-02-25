@@ -14,4 +14,8 @@ class Api::Vp::V1::PaymentsController < BaseControllers::ApiBase
     @result = BankTransfer::PaymentRequest::Show.(current_user, params)
     respond
   end
+
+  def bulk_update_utr
+    @result = BankTransfer::Payments::BulkUpdateUtr.(current_user, params)
+  end
 end
