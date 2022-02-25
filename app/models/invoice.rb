@@ -1092,7 +1092,7 @@ class Invoice < ApplicationRecord
         # remaining_amount: (self.balance_due&.value.to_f - self.payments.successful.joins(:amount).sum(:value))
         paid_amount: payment_amounts_total,
         remaining_amount: (self.balance_due&.value.to_f - payment_amounts_total(false)),
-        po_adjusted_advance: precision_value(self.po_adjusted_advance&.value),
+        po_adjusted_advance: self.forms_enabled ? precision_value(self.adjusted_po_advance_payable_amount.to_f) : precision_value(self.po_adjusted_advance&.value),
         invoice_items: invoice_items.as_json,
         note: self.note,
         discount_amount_attributes: { id: self.discount_amount_id, value: precision_value(self.discount_amount&.value), currency_id: self.discount_amount&.currency_id },
