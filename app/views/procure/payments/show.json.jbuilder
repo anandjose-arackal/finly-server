@@ -70,7 +70,8 @@ if payment.invoice.present?
                      end
     json.advance_amount precision_value advance_amount
     json.tax_amount precision_value invoice.tax_amount&.value
-    json.tds_amount precision_value invoice.tds_amount&.value
+    tds_amount = invoice.forms_enabled ? invoice.display_tds_amount : invoice.tds_amount&.value
+    json.tds_amount precision_value tds_amount
     json.tax precision_value invoice.tax
     json.tds precision_value invoice.tds
     json.gst_type_id invoice.gst_type_id
