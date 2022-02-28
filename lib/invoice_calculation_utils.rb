@@ -154,10 +154,11 @@ class InvoiceCalculationUtils
     end
 
     if self.invoice.class.name != 'OutwardInvoice' && self.invoice.forms_enabled
-      self.invoice.invoice_tds_amount     = self.tds_amount
-      self.invoice.invoice_taxable_amount = taxable_amount
-      self.invoice.invoice_balance_due    = self.balance_due_amount
-      self.invoice.adjusted_advance_tds   = self.current_tds_adjustment
+      self.invoice.invoice_tds_amount             = self.tds_amount
+      self.invoice.invoice_taxable_amount         = taxable_amount
+      self.invoice.invoice_balance_due            = self.balance_due_amount
+      self.invoice.reporting_invoice_balance_due  = self.balance_due_amount * self.invoice.conversion_rate
+      self.invoice.adjusted_advance_tds           = self.current_tds_adjustment
     end
 
     # set total payable if it's an outward invoice
