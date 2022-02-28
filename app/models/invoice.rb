@@ -914,9 +914,9 @@ class Invoice < ApplicationRecord
 
     if paid_amount == 0
       self.update(invoice_status_id: InwardInvoiceStatus.id_for(:unpaid))
-    elsif paid_amount >= balance_due - 0.99
+    elsif paid_amount >= balance_due - 0.99 || (balance_due > 0 && self.forms_enabled)
       self.update(invoice_status_id: InwardInvoiceStatus.id_for(:paid), payable: false)
-    elsif paid_amount <= balance_due
+    elsif paid_amount <= balance_due || (self.forms_enabled && self.invoice_paid_outside_amount.to_f > 0)
       self.update(invoice_status_id: InwardInvoiceStatus.id_for(:partially_paid))
     end
 
