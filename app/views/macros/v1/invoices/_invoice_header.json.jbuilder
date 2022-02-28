@@ -19,6 +19,9 @@ json.transaction_service_period_to record.transaction_service_period_to
 json.invoice_date record.date
 json.due_date record.due_date
 json.po_number exposure.po_number
+json.reporting_currency record.get_reporting_currency.country_code
+json.base_currency record.get_base_currency.country_code
+json.exchange_rate record.exchange_rate
 json.discount_amount exposure.discount_amount_value
 json.tax_type exposure.tax_type_name
 json.tax_amount exposure.tax_amount&.value
