@@ -3038,7 +3038,7 @@ Rails.application.routes.draw do
       end
     end
   end
-  patch ':company_id/payments/update_utr', to: 'api/vp/v1/payments#bulk_update_utr'
+
 
   ################### Vendor Payments APIs end ########################
 
@@ -4387,6 +4387,7 @@ Rails.application.routes.draw do
 
       get 'payments/count', to: 'payments#count'
       post 'payments/new_sync_attempt', to: 'payments#new_sync_attempt'
+      patch 'payments/update_payments_utr', to: 'payments#update_payments_utr'
       resources :payments, only: [:index, :show, :update]
 
       get 'users/count', to: 'users#count'
