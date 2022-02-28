@@ -52,6 +52,9 @@ json.payments do
     else
       credited_at = payment.processed_at&.strftime("%B %d, %Y - %H:%M:%S")
     end
+    if credited_at.blank?
+      credited_at = payment&.processed_at&.strftime("%B %d, %Y - %H:%M:%S")
+    end
 
     json.credited_at credited_at
     json.payment_notification_users payment&.parent&.payment_notification_users rescue nil
