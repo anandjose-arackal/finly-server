@@ -106,7 +106,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       if user.po_invoice_form_enabled
         self.invoice.tds_slab_id = self.purchase_order&.advance_tds_slab_id
         self.invoice.tds_percentage = self.purchase_order&.po_advance_tds_percentage
-        tds_amount = (self.invoice.items.except(tds_applicable: false).map(&:item_taxable_amount).map(&:to_f).sum * self.invoice.tds_percentage) / 100
+        tds_amount = (self.invoice.items.except(tds_applicable: false).map(&:item_taxable_amount).map(&:to_f).sum * self.invoice.tds_percentage.to_f) / 100
       end
       self.invoice.invoice_gross_amount = invoice_gross_amount
       self.invoice.reporting_invoice_gross_amount = invoice_gross_amount * conversion_rate
