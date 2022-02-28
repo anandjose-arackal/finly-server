@@ -64,7 +64,7 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
           {% assign tds_amount = tds_amount | plus: item.item_tds_amount %}
         {% endif %}
       {% endfor %}
-      {{ tds_amount  | default: 0 }}
+      {{ tds_amount  | default: 0 | ceil }}
       ",
 
       #### net payable amount
