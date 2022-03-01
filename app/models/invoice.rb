@@ -1630,6 +1630,10 @@ class Invoice < ApplicationRecord
     (self.po_advance_tds.to_f - prev_adjusted_tds).to_f
   end
 
+  def po_advance
+    self.advance_paid ? self.attributes['po_advance'] : 0
+  end
+
   def remaining_adjustable_advance
     prev_adjusted_advance = self.procurement.invoices.where('created_at < ?', self.created_at).pluck(:adjusted_po_advance_payable_amount).map(&:to_f).sum
     if self.advance_amount_required
