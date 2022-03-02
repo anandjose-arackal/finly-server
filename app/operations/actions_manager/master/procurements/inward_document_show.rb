@@ -73,6 +73,8 @@ class ActionsManager::Master::Procurements::InwardDocumentShow < ActionsManager:
       unless self.inward_document.id != self.procurement.inward_documents.last.id
         true
       end
+    elsif self.procurement.documents&.first&.class&.name == "Invoice" && self.inward_document.id == self.procurement.inward_documents.last&.id
+      true
     end
   end
 
