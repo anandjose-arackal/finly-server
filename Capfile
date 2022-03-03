@@ -24,9 +24,6 @@ require 'capistrano/rails/assets'
 require 'capistrano/rails/migrations'
 require 'capistrano/puma'
 require "whenever/capistrano"
-require 'capistrano/sidekiq'
-require 'capistrano/sidekiq/monit'
-
 install_plugin Capistrano::Puma # Default puma tasks
 install_plugin Capistrano::Puma::Workers
 install_plugin Capistrano::Puma::Systemd
@@ -36,10 +33,9 @@ install_plugin Capistrano::Puma::Systemd
 require 'capistrano/puma/monit'
 install_plugin Capistrano::Puma::Monit, load_hooks: false
 
-install_plugin Capistrano::Sidekiq
-#install_plugin Capistrano::Sidekiq::Monit
-
-
+require 'capistrano/sidekiq'
+require 'capistrano/sidekiq/monit'
+# install_plugin Capistrano::Sidekiq
 # install_plugin Capistrano::Sidekiq::Monit, load_hooks: false
 
 # require 'capistrano/sneakers'
