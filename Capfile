@@ -25,7 +25,7 @@ require 'capistrano/rails/migrations'
 require 'capistrano/puma'
 require "whenever/capistrano"
 require 'capistrano/sidekiq'
-#require 'capistrano/sidekiq/monit'
+require 'capistrano/sidekiq/monit'
 
 install_plugin Capistrano::Puma # Default puma tasks
 install_plugin Capistrano::Puma::Workers
