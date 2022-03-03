@@ -105,7 +105,7 @@ class Docs::P2P::PurchaseRequests::Form < Forms::API
       lookup :status_id, choices_scope: Choices[:enum].(PurchaseRequestItemStatus), required: false, editable: false,
              default_value: PurchaseRequestItemStatus.id_for(:draft), can_editable_be_changed: false
 
-      lookup :reject_item, label: ' ', visible: false, editable: false, choices_scope: Choices[:list].({ id: false, name: 'Accept' }, { id: true, name: 'Reject' })
+      lookup :reject_item, label: ' ', visible: false, editable: false, choices_scope: Choices[:list].({ id: 1, name: 'Accept' }, { id: 2, name: 'Reject' })
 
     end
   end
