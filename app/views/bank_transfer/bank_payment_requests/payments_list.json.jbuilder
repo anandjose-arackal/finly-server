@@ -111,6 +111,9 @@ json.payments do
         json.advance_amount precision_value invoice&.advance_amount&.value.to_f
         json.tax_amount precision_value invoice&.tax_amount&.value.to_f
         json.tds_amount precision_value invoice&.tds_amount&.value.to_f
+        if invoice.forms_enabled
+          json.tds_amount precision_value invoice.display_tds_amount.to_f
+        end
         json.tax precision_value invoice.tax
         json.tds precision_value invoice.tds
         json.gst_type_id invoice.gst_type_id
@@ -148,7 +151,7 @@ json.payments do
         json.reporting_invoice_discount_amount precision_value invoice&.reporting_invoice_discount_amount.to_f
         json.invoice_tax_amount precision_value invoice&.invoice_tax_amount.to_f
         json.reporting_invoice_tax_amount precision_value invoice&.reporting_invoice_tax_amount.to_f
-        json.invoice_tds_amount precision_value invoice&.invoice_tds_amount.to_f
+        json.invoice_tds_amount precision_value invoice&.display_tds_amount.to_f
         json.reporting_invoice_tds_amount precision_value invoice&.reporting_invoice_tds_amount.to_f
         json.invoice_freight_amount precision_value invoice&.invoice_freight_amount.to_f
         json.reporting_invoice_freight_amount precision_value invoice&.reporting_invoice_freight_amount.to_f

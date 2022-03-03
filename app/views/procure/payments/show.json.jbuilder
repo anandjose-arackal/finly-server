@@ -22,7 +22,7 @@ json.swift_code payment.receiving_account.swift_code
 json.amount precision_value payment.amount_value
 json.payment_amount payment.amount_value
 conversion_rate = parent.conversion_rate.to_f rescue 1
-json.reporting_payment_amount = payment.amount_value * conversion_rate
+json.reporting_payment_amount payment.amount_value * conversion_rate
 json.net_amount precision_value payment.amount_value
 json.invoice_amount precision_value payment.invoice_amount
 json.status payment.payment_status_name
@@ -63,10 +63,15 @@ if payment.invoice.present?
   json.invoice do
     json.id invoice.id
     json.advance invoice.advance
-    advance_amount = (invoice.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice)) ? invoice.po_adjusted_advance&.value : invoice.advance_amount&.value
+    advance_amount = if invoice.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice)
+                       invoice.forms_enabled ? invoice.adjusted_po_advance_payable_amount.to_f : invoice.po_adjusted_advance&.value
+                     else
+                       invoice.advance_amount&.value
+                     end
     json.advance_amount precision_value advance_amount
     json.tax_amount precision_value invoice.tax_amount&.value
-    json.tds_amount precision_value invoice.tds_amount&.value
+    tds_amount = invoice.forms_enabled ? invoice.display_tds_amount : invoice.tds_amount&.value
+    json.tds_amount precision_value tds_amount
     json.tax precision_value invoice.tax
     json.tds precision_value invoice.tds
     json.gst_type_id invoice.gst_type_id

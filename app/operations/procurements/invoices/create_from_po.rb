@@ -1,9 +1,7 @@
 class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
-
   attr_accessor :procurement, :purchase_order, :invoice_params, :invoice, :po_revision, :previous_invoices, :advance,
                 :po_advance, :po_prev_adjusted_advance, :po_adjusted_advance, :last_invoice, :proforma_advance, :custom_fields, :total_adjusted_advance,
                 :grn_enabled, :grn_disabled, :srn_enabled, :srn_disabled, :vendor, :rcm_enabled, :invoice_gross_amount, :invoice_discount_amount, :invoice_tax_amount, :form_advance
-
 
   def personalizer
     {
@@ -24,43 +22,42 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     #   end
     # end
 
-    self.previous_invoices = (self.procurement.invoices.scope_all_except_voided.present?) ? self.procurement.invoices.scope_all_except_voided.includes(:invoice_items) : nil
+    self.previous_invoices = self.procurement.invoices.scope_all_except_voided.present? ? self.procurement.invoices.scope_all_except_voided.includes(:invoice_items) : nil
 
     self.invoice_params = set_invoice_parameters
 
     self.custom_fields = params&.dig(:custom_fields) || params&.dig(:invoice, :custom_fields)
-
   end
 
   def validate
     return unless user_role_based_validation
+
     if self.procurement.blank?
-      add_message :success, "Procurement not found"
+      add_message :success, 'Procurement not found'
       return
     end
 
     if self.purchase_order.blank?
-      add_message :error, "Purchase order not present"
+      add_message :error, 'Purchase order not present'
       return
     end
 
     if self.invoice_params.blank?
-      add_message :error, "Procurement or purchase order not present"
+      add_message :error, 'Procurement or purchase order not present'
     end
   end
 
   def pre_process
-    
   end
 
   def process
     self.invoice = self.procurement.invoices.build(self.invoice_params)
-    
+
     self.invoice.company_id = user.company.id
-    
+
     validate_custom_fields_invoice
     return if has_errors?
-    
+
     if self.invoice.save
       InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.invoice_params, nil, self.invoice)
 
@@ -76,24 +73,26 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
 
         item.item_tax_amount = item&.tax_amount&.value.to_f
         item.reporting_item_tax_amount = item&.tax_amount&.value.to_f * conversion_rate
-        
-        item.item_net_amount = (self.rcm_enabled ? (item&.taxable_amount&.value.to_f) : (item&.taxable_amount&.value.to_f + item&.tax_amount&.value.to_f) )
-        item.reporting_item_net_amount = ( self.rcm_enabled ? (item&.taxable_amount&.value.to_f) : (item&.taxable_amount&.value.to_f + item&.tax_amount&.value.to_f) ) * conversion_rate
+
+        item.item_net_amount = (self.rcm_enabled ? item&.taxable_amount&.value.to_f : (item&.taxable_amount&.value.to_f + item&.tax_amount&.value.to_f))
+        item.reporting_item_net_amount = (self.rcm_enabled ? item&.taxable_amount&.value.to_f : (item&.taxable_amount&.value.to_f + item&.tax_amount&.value.to_f)) * conversion_rate
 
         item.item_taxable_amount = item.goods? ? item.taxable_amount&.value.to_f : item.billable_amount&.value.to_f
-        item.reporting_item_taxable_amount = ( item.goods? ? item.taxable_amount&.value.to_f : item.billable_amount&.value.to_f ) * conversion_rate
+        item.reporting_item_taxable_amount = (item.goods? ? item.taxable_amount&.value.to_f : item.billable_amount&.value.to_f) * conversion_rate
 
         item.item_rate = item.rate * conversion_rate
 
+        item.item_tds_amount = (self.purchase_order&.po_advance_tds_percentage.to_f * item.item_taxable_amount) / 100
+
         unless item.goods?
-          item.item_net_amount = (self.rcm_enabled ? (item&.billable_amount&.value.to_f) : (item&.billable_amount&.value.to_f + item&.tax_amount&.value.to_f) )
-          item.reporting_item_net_amount = ( self.rcm_enabled ? (item&.billable_amount&.value.to_f) : (item&.billable_amount&.value.to_f + item&.tax_amount&.value.to_f) ) * conversion_rate
-        end        
+          item.item_net_amount = (self.rcm_enabled ? item&.billable_amount&.value.to_f : (item&.billable_amount&.value.to_f + item&.tax_amount&.value.to_f))
+          item.reporting_item_net_amount = (self.rcm_enabled ? item&.billable_amount&.value.to_f : (item&.billable_amount&.value.to_f + item&.tax_amount&.value.to_f)) * conversion_rate
+        end
 
         item.save
       end
 
-      invoice_gross_amount = 0 
+      invoice_gross_amount = 0
       self.invoice.items.each do |item|
         invoice_gross_amount += item.goods? ? item.item_gross_amount : item.item_billable_amount
       end
@@ -107,7 +106,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       if user.po_invoice_form_enabled
         self.invoice.tds_slab_id = self.purchase_order&.advance_tds_slab_id
         self.invoice.tds_percentage = self.purchase_order&.po_advance_tds_percentage
-        tds_amount = (self.invoice.items.except(tds_applicable: false).map(&:item_taxable_amount).map(&:to_f).sum * self.invoice.tds_percentage) / 100
+        tds_amount = (self.invoice.items.except(tds_applicable: false).map(&:item_taxable_amount).map(&:to_f).sum * self.invoice.tds_percentage.to_f) / 100
       end
       self.invoice.invoice_gross_amount = invoice_gross_amount
       self.invoice.reporting_invoice_gross_amount = invoice_gross_amount * conversion_rate
@@ -124,12 +123,12 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       self.invoice.invoice_roundoff_amount = roundoff_amount
       self.invoice.reporting_invoice_roundoff_amount = roundoff_amount * conversion_rate
 
-      self.invoice.invoice_sub_total_amount = ( self.rcm_enabled ? invoice_taxable_amount.to_f : invoice_taxable_amount.to_f + invoice_tax_amount.to_f )
-      self.invoice.reporting_invoice_sub_total_amount = ( self.rcm_enabled ? invoice_taxable_amount.to_f : invoice_taxable_amount.to_f + invoice_tax_amount.to_f ) * conversion_rate
-      
+      self.invoice.invoice_sub_total_amount = (self.rcm_enabled ? invoice_taxable_amount.to_f : invoice_taxable_amount.to_f + invoice_tax_amount.to_f)
+      self.invoice.reporting_invoice_sub_total_amount = (self.rcm_enabled ? invoice_taxable_amount.to_f : invoice_taxable_amount.to_f + invoice_tax_amount.to_f) * conversion_rate
+
       self.invoice.invoice_tds_amount = user.po_invoice_form_enabled ? tds_amount : self.invoice&.tds_amount&.value&.to_f
       self.invoice.reporting_invoice_tds_amount = user.po_invoice_form_enabled ? tds_amount * conversion_rate : self.invoice&.tds_amount&.value&.to_f * conversion_rate
-      
+
       self.invoice.invoice_total_amount = self.invoice.invoice_sub_total_amount + roundoff_amount
       self.invoice.reporting_invoice_total_amount = (self.invoice.invoice_sub_total_amount + roundoff_amount) * conversion_rate
 
@@ -141,13 +140,11 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
 
       self.invoice.invoice_balance_due = self.invoice&.balance_due&.value.to_f
       self.invoice.reporting_invoice_balance_due = self.invoice&.balance_due&.value.to_f * conversion_rate
-    
+
       self.invoice.save
 
-      if self.advance.present? && (params[:document_type].blank? && params[:document_type] != 'proforma_invoice')
-        if ((user.po_invoice_form_enabled && self.invoice.adjusted_po_advance_payable_amount.zero?) || (self.po_adjusted_advance.value.zero? || self.po_adjusted_advance_id.blank?)) && self.purchase_order.advance_payments.present?
-          calculcate_po_adjusted_advance
-        end
+      if self.advance.present? && (params[:document_type].blank? && params[:document_type] != 'proforma_invoice') && (((user.po_invoice_form_enabled && self.invoice.adjusted_po_advance_payable_amount.zero?) || (self.po_adjusted_advance.value.zero? || self.po_adjusted_advance_id.blank?)) && self.purchase_order.advance_payments.present?)
+        calculcate_po_adjusted_advance
       end
 
       status_tag = StatusTag.find_by(id: StatusTag.id_for(:invoice_received))
@@ -157,14 +154,14 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
 
       # Create Trail for it
       invoice.trails.create action_user: user,
-                                   action_id: TrailAction.id_for(:create)
+                            action_id: TrailAction.id_for(:create)
     else
       add_message :error, self.invoice.errors.full_messages
     end
   end
 
   def post_process
-    add_message :success, "Invoice created successfully"
+    add_message :success, 'Invoice created successfully'
   end
 
   def success
@@ -183,7 +180,6 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
   private
 
   def set_invoice_parameters
-
     if self.procurement.blank? || self.purchase_order.blank?
       return nil
     end
@@ -191,7 +187,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     self.advance = self.purchase_order.requested_advance_amount
     self.form_advance = self.purchase_order.po_advance_amount
 
-    receiving_account = self.purchase_order&.bank_account || self.purchase_order.vendor&.bank_accounts&.first # todo - change this later to the one selected at the time of initiating payment. CHANGED.
+    receiving_account = self.purchase_order&.bank_account || self.purchase_order.vendor&.bank_accounts&.first # TODO: - change this later to the one selected at the time of initiating payment. CHANGED.
 
     configuration = user.company.feature_subscription
 
@@ -200,22 +196,21 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
 
     self.srn_enabled = configuration.srn_enabled == true
     self.srn_disabled = configuration.srn_enabled == false
-    self.vendor =  self.purchase_order.vendor
+    self.vendor = self.purchase_order.vendor
 
     # mapping values for new forms structure
 
-    if self.grn_enabled && self.srn_disabled
-      invoice_items_attributes =  create_grn
-    elsif self.grn_disabled && self.srn_enabled
-      invoice_items_attributes =  create_srn
-    elsif self.grn_enabled && self.srn_enabled
-      invoice_items_attributes =  create_grn_and_srn
-    else
-      invoice_items_attributes =  create_without_grn_and_srn
-    end
+    invoice_items_attributes = if self.grn_enabled && self.srn_disabled
+                                 create_grn
+                               elsif self.grn_disabled && self.srn_enabled
+                                 create_srn
+                               elsif self.grn_enabled && self.srn_enabled
+                                 create_grn_and_srn
+                               else
+                                 create_without_grn_and_srn
+                               end
 
-    if (invoice_items_attributes.pluck(:quantity).sum == 0) then add_message :error, "Invoice can't be created. Either all items are billed or you need to add a Receipt Note first." end
-    
+    if invoice_items_attributes.pluck(:quantity).sum == 0 then add_message :error, "Invoice can't be created. Either all items are billed or you need to add a Receipt Note first." end
 
     if self.advance.present? || self.form_advance.present?
 
@@ -223,22 +218,21 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       # in prev adjusted amount, we store the sum of last invoices prev adjusted and its current adjusted advance
       # this way the user knows how much was paid and how much he has to adjust in new invoice
       if self.previous_invoices.present?
-         # if last_invoice.po_prev_adjusted_advance == last_invoice.po_advance
+        # if last_invoice.po_prev_adjusted_advance == last_invoice.po_advance
         self.last_invoice = self.previous_invoices.first
         self.total_adjusted_advance = self.last_invoice.po_prev_adjusted_advance.to_i + self.last_invoice.po_adjusted_advance&.value&.to_i
         self.po_prev_adjusted_advance = total_adjusted_advance
-        self.po_advance = ( self.advance.present? ) ? self.advance.value : nil
+        self.po_advance = self.advance.present? ? self.advance.value : nil
         current_adjustment = self.po_advance - total_adjusted_advance
         self.po_adjusted_advance = Amount.new(value: 0, currency_id: 1)
 
         # Added for po forms
         if user.po_invoice_form_enabled
-          self.total_adjusted_advance = self.last_invoice.po_prev_adjusted_advance.to_i + self.last_invoice.adjusted_po_advance_payable_amount&.to_i
+          self.total_adjusted_advance = self.last_invoice.po_prev_adjusted_advance.to_f + self.last_invoice.adjusted_po_advance_payable_amount&.to_f
           self.po_prev_adjusted_advance = total_adjusted_advance
           self.po_advance = self.form_advance.to_f
           current_adjustment = self.po_advance - total_adjusted_advance
         end
-
 
         # if user.po_invoice_form_enabled
         #   self.po_advance = ( self.advance.present? ) ? self.advance.value : nil
@@ -254,7 +248,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         # end
       else
         self.po_prev_adjusted_advance = 0
-        self.po_advance = ( self.advance.present? ) ? self.advance.value : nil
+        self.po_advance = self.advance.present? ? self.advance.value : nil
         self.po_advance = self.form_advance.to_f if user.po_invoice_form_enabled
         self.po_adjusted_advance = Amount.new(value: 0, currency_id: 1)
 
@@ -274,7 +268,6 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     self.rcm_enabled = self.purchase_order.vendor.rcm_enabled
     # invoice_taxable_amount = self.invoice_gross_amount - self.invoice_discount_amount
     # invoice_sub_total_amount = (self.rcm_enabled ? (invoice_taxable_amount) : ( invoice_taxable_amount + self.invoice_tax_amount))
-    
 
     invoice_type = ::InwardInvoiceType.id_for(:tax_invoice)
     vendor_country_id = Country.id_for(self.vendor&.vendor_country)
@@ -309,10 +302,10 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       discount_type_id: self.purchase_order.discount_type_id,
       discount_type_text: self.purchase_order.discount_type_id == 1 ? 'Percentage' : 'Amount',
       rcm_enabled: self.purchase_order&.vendor&.rcm_enabled,
-      is_domestic: ( vendor_country_id != user&.company.country_id ? false : true ),
+      is_domestic: vendor_country_id == user&.company.country_id,
       base_currency_id: self.purchase_order&.base_currency_id,
       reporting_currency_id: self.purchase_order&.reporting_currency_id,
-      
+
       vendor_bank_account_number: self.purchase_order&.bank_account.account_number,
       vendor_bank_account_ifsc: self.purchase_order&.bank_account.ifsc,
       vendor_bank_account_swift_code: self.purchase_order&.bank_account&.swift_code,
@@ -325,25 +318,25 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     }
 
     if self.advance.present?
-        invoice_params[:po_advance] = self.po_advance
-        invoice_params[:po_prev_adjusted_advance] = self.po_prev_adjusted_advance
-        invoice_params[:po_adjusted_advance] = self.po_adjusted_advance
-        invoice_params[:advance_amount_required] = false
-        # invoice_params[:advance_amount_required] = (self.po_prev_adjusted_advance == self.po_advance) ? false : true
+      invoice_params[:po_advance] = self.po_advance
+      invoice_params[:po_prev_adjusted_advance] = self.po_prev_adjusted_advance
+      invoice_params[:po_adjusted_advance] = self.po_adjusted_advance
+      invoice_params[:advance_amount_required] = false
+      # invoice_params[:advance_amount_required] = (self.po_prev_adjusted_advance == self.po_advance) ? false : true
 
       if user.po_invoice_form_enabled
         invoice_params[:adjusted_po_advance_payable_amount] = 0
       end
     end
 
-    return invoice_params
+    invoice_params
   end
 
   def validate_custom_fields_invoice
     set_fields = set_custom_fields_invoice self.invoice, self.custom_fields, false
     unless set_fields.success?
       add_message :error, set_fields.messages[:error]
-      return
+      nil
     end
     # valid = CustomField::Validate.(self.invoice)
     # unless valid.success?
@@ -353,14 +346,12 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
   end
 
   def set_custom_fields_invoice(invoice, data, save)
-    custom_fields = {custom_fields: data}
+    custom_fields = { custom_fields: data }
     custom_fields[:user] = user
     custom_fields[:reset_fields] = true
     custom_fields[:save] = save
     CustomField::SetFields.(invoice, FieldParentType.id_for(:invoice), custom_fields)
   end
-
-
 
   # default configuration
   # considers goods accepted and service quantity
@@ -374,20 +365,21 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         # we sum previous invoices line item
         # if that turns out to be zero, invoice for this item is not created
         # awesome stuff.
-        it_cal = self.previous_invoices.map {|p21| p21.invoice_items.map{|ili| ili.quantity if ili.purchase_order_item_id == item.id } }.flatten.compact.sum
+        it_cal = self.previous_invoices.map { |p21| p21.invoice_items.map { |ili| ili.quantity if ili.purchase_order_item_id == item.id } }.flatten.compact.sum
         # if the item was in previous invoice
         # but the quantity was zero, that is, it was not billed
         # and most importantly,
         # item quantity billed in previous invoices were all delivered and accepted
         # then skip
         # we do this coz there is a chance that user would not pay for all the quantity delivered in one invoice
-        if it_cal == 0 && item_in_invoice && it_cal.to_f == item.accepted.to_f && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
+        if it_cal == 0 && item_in_invoice && it_cal.to_f == item.accepted.to_f && (item.inventory_line_item.product_type_id == ProductType.id_for(:goods))
           next
         else
           # i forgot what i did here, but this is important.
           real_q = item.accepted.to_f - it_cal.to_f
-          next if real_q <= 0  && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
-          if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
+          next if real_q <= 0 && (item.inventory_line_item.product_type_id == ProductType.id_for(:goods))
+
+          if item.inventory_line_item.product_type_id == ProductType.id_for(:service)
             real_q = item.quantity - it_cal
             next if real_q <= 0
           end
@@ -395,69 +387,67 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       else
         # vendor is billed only for what he delivered and what the user accepted
         real_q = item.accepted.to_f
-        next if real_q == 0 && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
-        if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
+        next if real_q == 0 && (item.inventory_line_item.product_type_id == ProductType.id_for(:goods))
+
+        if item.inventory_line_item.product_type_id == ProductType.id_for(:service)
           real_q = item.quantity
         end
       end
 
-      item_gross_amount = real_q.to_f  * item.rate.to_f
-      
+      item_gross_amount = real_q.to_f * item.rate.to_f
 
       data = {
-          item_number: item.inventory_line_item.item_code,
-          product_type_id: item.inventory_line_item.product_type_id,
-          items_department_id: item.department_id,
-          items_cost_center_id: item.cost_center_id,
-          gl_code: item.category&.gl_code,
-          tds_applicable: item.inventory_line_item.tds_applicable,
-          item_rate: item.rate,
-          rate: item.rate,
-          tax: item.tax,
-          unit_of_measurement: item.unit_of_measurement,
-          unbilled_quantity: real_q,
-          quantity: real_q,
-          hsn_sac: item.hsn_sac,
-          description: item.description,
-          gst_type_id: self.purchase_order.gst_type_id,
-          comment: item.comment,
-          inventory_line_item_id: item.inventory_line_item_id,
-          department_id: item.department_id,
-          cost_center_id: item.cost_center_id,
-          tax_rate_id: item.tax_rate_id,
-          tax_percentage: item.tax_rate.rate,
-          category_id: item.category_id,
-          cgst: item.cgst,
-          sgst: item.sgst,
-          igst: item.igst,
-          purchase_order_item_id: item.id,
-          billable_amount_attributes: { # billable amount needs to be always present even if it is a good
-              value: item.taxable_amount&.value.to_f,
-              currency_id: 1
-          },
-          item_gross_amount: item_gross_amount, # quantity * rate 
-          reporting_item_gross_amount: item_gross_amount,
+        item_number: item.inventory_line_item.item_code,
+        product_type_id: item.inventory_line_item.product_type_id,
+        items_department_id: item.department_id,
+        items_cost_center_id: item.cost_center_id,
+        gl_code: item.category&.gl_code,
+        tds_applicable: item.inventory_line_item.tds_applicable,
+        item_rate: item.rate,
+        rate: item.rate,
+        tax: item.tax,
+        unit_of_measurement: item.unit_of_measurement,
+        unbilled_quantity: real_q,
+        quantity: real_q,
+        hsn_sac: item.hsn_sac,
+        description: item.description,
+        gst_type_id: self.purchase_order.gst_type_id,
+        comment: item.comment,
+        inventory_line_item_id: item.inventory_line_item_id,
+        department_id: item.department_id,
+        cost_center_id: item.cost_center_id,
+        tax_rate_id: item.tax_rate_id,
+        tax_percentage: item.tax_rate.rate,
+        category_id: item.category_id,
+        cgst: item.cgst,
+        sgst: item.sgst,
+        igst: item.igst,
+        purchase_order_item_id: item.id,
+        billable_amount_attributes: { # billable amount needs to be always present even if it is a good
+          value: item.taxable_amount&.value.to_f,
+          currency_id: 1
+        },
+        item_gross_amount: item_gross_amount, # quantity * rate
+        reporting_item_gross_amount: item_gross_amount,
 
-          item_billable_amount: item.taxable_amount&.value,
-          reporting_item_billable_amount: item.taxable_amount&.value,
-          discount: item.discount,
+        item_billable_amount: item.taxable_amount&.value,
+        reporting_item_billable_amount: item.taxable_amount&.value,
+        discount: item.discount
       }
       if item.inventory_line_item.service?
-        data[:billable_amount_attributes] = {value: item.taxable_amount&.value.to_f, currency_id: 1}
+        data[:billable_amount_attributes] = { value: item.taxable_amount&.value.to_f, currency_id: 1 }
       end
       invoice_items_attributes << data
     end
     invoice_items_attributes
   end
 
-
-
   # considers goods quantity and service billable amount
   def create_srn
     invoice_items_attributes = []
     srn_item = self.procurement.inward_documents.joins(:items).select('inward_document_items.billable_amount, inward_document_items.purchase_order_item_id as poi_id')
     self.purchase_order.items.each do |item|
-      previously_billed_amount = srn_item.collect {|ii| ii if ii.poi_id == item.id}.compact.pluck(:billable_amount).sum.to_f
+      previously_billed_amount = srn_item.collect { |ii| ii if ii.poi_id == item.id }.compact.pluck(:billable_amount).sum.to_f
       real_q = 0
       real_amount = 0
       if self.previous_invoices.present?
@@ -466,97 +456,99 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         # we sum previous invoices line item
         # if that turns out to be zero, invoice for this item is not created
         # awesome stuff.
-        it_cal = self.previous_invoices.map {|p21| p21.invoice_items.map{|ili| ili.quantity if ili.purchase_order_item_id == item.id } }.flatten.compact.sum
+        it_cal = self.previous_invoices.map { |p21| p21.invoice_items.map { |ili| ili.quantity if ili.purchase_order_item_id == item.id } }.flatten.compact.sum
         # if the item was in previous invoice
         # but the quantity was zero, that is, it was not billed
         # and most importantly,
         # item quantity billed in previous invoices were all delivered and accepted
         # then skip
         # we do this coz there is a chance that user would not pay for all the quantity delivered in one invoice
-        if it_cal == 0 && item_in_invoice && it_cal.to_f == item.quantity.to_f && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
+        if it_cal == 0 && item_in_invoice && it_cal.to_f == item.quantity.to_f && (item.inventory_line_item.product_type_id == ProductType.id_for(:goods))
           next
         else
           # i forgot what i did here, but this is important.
           real_q = item.quantity.to_f - it_cal.to_f
-          next if real_q <= 0  && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
-          if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
+          next if real_q <= 0 && (item.inventory_line_item.product_type_id == ProductType.id_for(:goods))
+
+          if item.inventory_line_item.product_type_id == ProductType.id_for(:service)
             # here we sum billable amount for all service items in previous invoices
             # if they are not the same, we create the invoice, else
             # we skip it.
-            bill_cal = self.previous_invoices.map {|p21| p21.invoice_items.map{|ili| ili.billable_amount&.value if ili.purchase_order_item_id == item.id } }.flatten.compact.sum
+            bill_cal = self.previous_invoices.map { |p21| p21.invoice_items.map { |ili| ili.billable_amount&.value if ili.purchase_order_item_id == item.id } }.flatten.compact.sum
             # next if real_q <= 0
             next if bill_cal.to_f.round(2) == item.taxable_amount&.value.to_f.round(2)
+
             real_q = item.quantity
             real_amount = previously_billed_amount - bill_cal
-            next if real_amount <=0
+            next if real_amount <= 0
           end
         end
       else
         # vendor is billed only for what he delivered and what the user accepted
         real_q = item.quantity.to_f
-        next if real_q == 0 && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
-        if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
+        next if real_q == 0 && (item.inventory_line_item.product_type_id == ProductType.id_for(:goods))
+
+        if item.inventory_line_item.product_type_id == ProductType.id_for(:service)
           next unless previously_billed_amount > 0
+
           real_q = item.quantity
           real_amount = previously_billed_amount
         end
       end
 
-      item_gross_amount = real_q.to_f  * item.rate.to_f
-      
+      item_gross_amount = real_q.to_f * item.rate.to_f
 
       invoice_items_attributes << {
 
-          item_number: item.inventory_line_item.item_code,
-          product_type_id: item.inventory_line_item.product_type_id,
-          items_department_id: item.department_id,
-          items_cost_center_id: item.cost_center_id,
-          gl_code: item.category&.gl_code,
-          tds_applicable: item.inventory_line_item.tds_applicable,
-          item_rate: item.rate,
-          tax: item.tax,
-          unit_of_measurement: item.unit_of_measurement,
-          rate: item.rate,
-          unbilled_quantity: real_q,
-          quantity: real_q,
-          hsn_sac: item.hsn_sac,
-          description: item.description,
-          gst_type_id: self.purchase_order.gst_type_id,
-          comment: item.comment,
-          inventory_line_item_id: item.inventory_line_item_id,
-          department_id: item.department_id,
-          cost_center_id: item.cost_center_id,
-          tax_rate_id: item.tax_rate_id,
-          tax_percentage: item.tax_rate.rate,
-          category_id: item.category_id,
-          cgst: item.cgst,
-          sgst: item.sgst,
-          igst: item.igst,
-          purchase_order_item_id: item.id,
-          billable_amount_attributes: { # billable amount needs to be always present even if it is a good
-              value: real_amount.to_f,
-              currency_id: 1
-          },
-          item_gross_amount: item_gross_amount, # quantity * rate 
-          reporting_item_gross_amount: item_gross_amount,
+        item_number: item.inventory_line_item.item_code,
+        product_type_id: item.inventory_line_item.product_type_id,
+        items_department_id: item.department_id,
+        items_cost_center_id: item.cost_center_id,
+        gl_code: item.category&.gl_code,
+        tds_applicable: item.inventory_line_item.tds_applicable,
+        item_rate: item.rate,
+        tax: item.tax,
+        unit_of_measurement: item.unit_of_measurement,
+        rate: item.rate,
+        unbilled_quantity: real_q,
+        quantity: real_q,
+        hsn_sac: item.hsn_sac,
+        description: item.description,
+        gst_type_id: self.purchase_order.gst_type_id,
+        comment: item.comment,
+        inventory_line_item_id: item.inventory_line_item_id,
+        department_id: item.department_id,
+        cost_center_id: item.cost_center_id,
+        tax_rate_id: item.tax_rate_id,
+        tax_percentage: item.tax_rate.rate,
+        category_id: item.category_id,
+        cgst: item.cgst,
+        sgst: item.sgst,
+        igst: item.igst,
+        purchase_order_item_id: item.id,
+        billable_amount_attributes: { # billable amount needs to be always present even if it is a good
+          value: real_amount.to_f,
+          currency_id: 1
+        },
+        item_gross_amount: item_gross_amount, # quantity * rate
+        reporting_item_gross_amount: item_gross_amount,
 
-          item_billable_amount: real_amount,
-          reporting_item_billable_amount: real_amount,
+        item_billable_amount: real_amount,
+        reporting_item_billable_amount: real_amount,
 
-          discount: item.discount,
+        discount: item.discount
       }
     end
     invoice_items_attributes
   end
-
 
   # takes into account goods accepted and service billable amount
   def create_grn_and_srn
     invoice_items_attributes = []
     rn_item = self.procurement.inward_documents.joins(:items).select('inward_document_items.billable_amount, inward_document_items.purchase_order_item_id as poi_id, inward_document_items.accepted')
     self.purchase_order.items.each do |item|
-      previously_billed_amount = rn_item.collect {|ii| ii if ii.poi_id == item.id}.compact.pluck(:billable_amount).sum.to_f
-      accepted = rn_item.collect {|ii| ii if ii.poi_id == item.id}.compact.pluck(:accepted).sum.to_f
+      previously_billed_amount = rn_item.collect { |ii| ii if ii.poi_id == item.id }.compact.pluck(:billable_amount).sum.to_f
+      accepted = rn_item.collect { |ii| ii if ii.poi_id == item.id }.compact.pluck(:accepted).sum.to_f
       real_q = 0
       real_amount = 0
       if self.previous_invoices.present?
@@ -565,90 +557,91 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         # we sum previous invoices line item
         # if that turns out to be zero, invoice for this item is not created
         # awesome stuff.
-        it_cal = self.previous_invoices.map {|p21| p21.invoice_items.map{|ili| ili.quantity if ili.purchase_order_item_id == item.id } }.flatten.compact.sum
+        it_cal = self.previous_invoices.map { |p21| p21.invoice_items.map { |ili| ili.quantity if ili.purchase_order_item_id == item.id } }.flatten.compact.sum
         # if the item was in previous invoice
         # but the quantity was zero, that is, it was not billed
         # and most importantly,
         # item quantity billed in previous invoices were all delivered and accepted
         # then skip
         # we do this coz there is a chance that user would not pay for all the quantity delivered in one invoice
-        if it_cal == 0 && item_in_invoice && it_cal.to_f == accepted.to_f && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
+        if it_cal == 0 && item_in_invoice && it_cal.to_f == accepted.to_f && (item.inventory_line_item.product_type_id == ProductType.id_for(:goods))
           next
         else
           # i forgot what i did here, but this is important.
           real_q = accepted.to_f - it_cal.to_f
-          next if real_q <= 0  && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
-          if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
+          next if real_q <= 0 && (item.inventory_line_item.product_type_id == ProductType.id_for(:goods))
+
+          if item.inventory_line_item.product_type_id == ProductType.id_for(:service)
             # here we sum billable amount for all service items in previous invoices
             # if they are not the same, we create the invoice, else
             # we skip it.
-            bill_cal = self.previous_invoices.map {|p21| p21.invoice_items.map{|ili| ili.billable_amount&.value if ili.purchase_order_item_id == item.id } }.flatten.compact.sum
+            bill_cal = self.previous_invoices.map { |p21| p21.invoice_items.map { |ili| ili.billable_amount&.value if ili.purchase_order_item_id == item.id } }.flatten.compact.sum
             # next if real_q <= 0
             next if bill_cal.to_f.round(2) == item.taxable_amount&.value.to_f.round(2)
+
             real_q = item.quantity
             real_amount = previously_billed_amount - bill_cal
-            next if real_amount <=0
+            next if real_amount <= 0
           end
         end
       else
         # vendor is billed only for what he delivered and what the user accepted
         real_q = accepted.to_f
-        next if real_q == 0 && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
-        if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
+        next if real_q == 0 && (item.inventory_line_item.product_type_id == ProductType.id_for(:goods))
+
+        if item.inventory_line_item.product_type_id == ProductType.id_for(:service)
           next unless previously_billed_amount > 0
+
           real_q = item.quantity
           real_amount = previously_billed_amount
         end
       end
 
-      item_gross_amount = real_q.to_f  * item.rate.to_f
-      
+      item_gross_amount = real_q.to_f * item.rate.to_f
 
       invoice_items_attributes << {
-          item_number: item.inventory_line_item&.item_number,
-          product_type_id: item.inventory_line_item.product_type_id,
-          items_department_id: item.department_id,
-          items_cost_center_id: item.cost_center_id,
-          gl_code: item.category&.gl_code,
-          tds_applicable: item.inventory_line_item.tds_applicable,
-          item_rate: item.rate,
-          tax: item.tax,
-          unit_of_measurement: item.unit_of_measurement,
-          rate: item.rate,
-          unbilled_quantity: real_q,
-          quantity: real_q,
-          hsn_sac: item.hsn_sac,
-          description: item.description,
-          gst_type_id: self.purchase_order.gst_type_id,
-          comment: item.comment,
-          inventory_line_item_id: item.inventory_line_item_id,
-          department_id: item.department_id,
-          cost_center_id: item.cost_center_id,
-          tax_rate_id: item.tax_rate_id,
-          tax_percentage: item.tax_rate&.rate,
-          category_id: item.category_id,
-          cgst: item.cgst,
-          sgst: item.sgst,
-          igst: item.igst,
-          purchase_order_item_id: item.id,
-          billable_amount_attributes: { # billable amount needs to be always present even if it is a good
-              value: real_amount.to_f,
-              currency_id: 1
-          },
-          item_gross_amount: item_gross_amount, # quantity * rate 
-          reporting_item_gross_amount: item_gross_amount,
+        item_number: item.inventory_line_item&.item_number,
+        product_type_id: item.inventory_line_item.product_type_id,
+        items_department_id: item.department_id,
+        items_cost_center_id: item.cost_center_id,
+        gl_code: item.category&.gl_code,
+        tds_applicable: item.inventory_line_item.tds_applicable,
+        item_rate: item.rate,
+        tax: item.tax,
+        unit_of_measurement: item.unit_of_measurement,
+        rate: item.rate,
+        unbilled_quantity: real_q,
+        quantity: real_q,
+        hsn_sac: item.hsn_sac,
+        description: item.description,
+        gst_type_id: self.purchase_order.gst_type_id,
+        comment: item.comment,
+        inventory_line_item_id: item.inventory_line_item_id,
+        department_id: item.department_id,
+        cost_center_id: item.cost_center_id,
+        tax_rate_id: item.tax_rate_id,
+        tax_percentage: item.tax_rate&.rate,
+        category_id: item.category_id,
+        cgst: item.cgst,
+        sgst: item.sgst,
+        igst: item.igst,
+        purchase_order_item_id: item.id,
+        billable_amount_attributes: { # billable amount needs to be always present even if it is a good
+          value: real_amount.to_f,
+          currency_id: 1
+        },
+        item_gross_amount: item_gross_amount, # quantity * rate
+        reporting_item_gross_amount: item_gross_amount,
 
-          item_billable_amount: real_amount,
-          reporting_item_billable_amount: real_amount,
+        item_billable_amount: real_amount,
+        reporting_item_billable_amount: real_amount,
 
-          discount: item.discount,
+        discount: item.discount
 
       }
     end
     invoice_items_attributes
   end
-
-
 
   # only takes into account quantity for both goods and service
   def create_without_grn_and_srn
@@ -661,20 +654,21 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         # we sum previous invoices line item
         # if that turns out to be zero, invoice for this item is not created
         # awesome stuff.
-        it_cal = self.previous_invoices.map {|p21| p21.invoice_items.map{|ili| ili.quantity if ili.purchase_order_item_id == item.id } }.flatten.compact.sum
+        it_cal = self.previous_invoices.map { |p21| p21.invoice_items.map { |ili| ili.quantity if ili.purchase_order_item_id == item.id } }.flatten.compact.sum
         # if the item was in previous invoice
         # but the quantity was zero, that is, it was not billed
         # and most importantly,
         # item quantity billed in previous invoices were all delivered and accepted
         # then skip
         # we do this coz there is a chance that user would not pay for all the quantity delivered in one invoice
-        if it_cal == 0 && item_in_invoice && it_cal.to_f == item.quantity.to_f && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
+        if it_cal == 0 && item_in_invoice && it_cal.to_f == item.quantity.to_f && (item.inventory_line_item.product_type_id == ProductType.id_for(:goods))
           next
         else
           # i forgot what i did here, but this is important.
           real_q = item.quantity.to_f - it_cal.to_f
-          next if real_q <= 0  && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
-          if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
+          next if real_q <= 0 && (item.inventory_line_item.product_type_id == ProductType.id_for(:goods))
+
+          if item.inventory_line_item.product_type_id == ProductType.id_for(:service)
             real_q = item.quantity - it_cal
             next if real_q <= 0
           end
@@ -682,53 +676,53 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       else
         # vendor is billed only for what he delivered and what the user accepted
         real_q = item.quantity.to_f
-        next if real_q == 0 && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
-        if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
+        next if real_q == 0 && (item.inventory_line_item.product_type_id == ProductType.id_for(:goods))
+
+        if item.inventory_line_item.product_type_id == ProductType.id_for(:service)
           real_q = item.quantity
         end
       end
 
-      item_gross_amount = real_q.to_f  * item.rate.to_f
-      
+      item_gross_amount = real_q.to_f * item.rate.to_f
 
       invoice_items_attributes << {
-          item_number: item.inventory_line_item.item_code,
-          product_type_id: item.inventory_line_item.product_type_id,
-          items_department_id: item.department_id,
-          items_cost_center_id: item.cost_center_id,
-          gl_code: item.category&.gl_code,
-          tds_applicable: item.inventory_line_item.tds_applicable,
-          item_rate: item.rate,
-          tax: item.tax,
-          unit_of_measurement: item.unit_of_measurement,
-          rate: item.rate,
-          unbilled_quantity: real_q,
-          quantity: real_q,
-          hsn_sac: item.hsn_sac,
-          description: item.description,
-          gst_type_id: self.purchase_order.gst_type_id,
-          comment: item.comment,
-          inventory_line_item_id: item.inventory_line_item_id,
-          department_id: item.department_id,
-          cost_center_id: item.cost_center_id,
-          tax_rate_id: item.tax_rate_id,
-          tax_percentage: item.tax_rate.rate,
-          category_id: item.category_id,
-          cgst: item.cgst,
-          sgst: item.sgst,
-          igst: item.igst,
-          purchase_order_item_id: item.id,
-          billable_amount_attributes: { # billable amount needs to be always present even if it is a good
-              value: item.taxable_amount&.value.to_f,
-              currency_id: 1
-          },
-          item_gross_amount: item_gross_amount, # quantity * rate 
-          reporting_item_gross_amount: item_gross_amount,
+        item_number: item.inventory_line_item.item_code,
+        product_type_id: item.inventory_line_item.product_type_id,
+        items_department_id: item.department_id,
+        items_cost_center_id: item.cost_center_id,
+        gl_code: item.category&.gl_code,
+        tds_applicable: item.inventory_line_item.tds_applicable,
+        item_rate: item.rate,
+        tax: item.tax,
+        unit_of_measurement: item.unit_of_measurement,
+        rate: item.rate,
+        unbilled_quantity: real_q,
+        quantity: real_q,
+        hsn_sac: item.hsn_sac,
+        description: item.description,
+        gst_type_id: self.purchase_order.gst_type_id,
+        comment: item.comment,
+        inventory_line_item_id: item.inventory_line_item_id,
+        department_id: item.department_id,
+        cost_center_id: item.cost_center_id,
+        tax_rate_id: item.tax_rate_id,
+        tax_percentage: item.tax_rate.rate,
+        category_id: item.category_id,
+        cgst: item.cgst,
+        sgst: item.sgst,
+        igst: item.igst,
+        purchase_order_item_id: item.id,
+        billable_amount_attributes: { # billable amount needs to be always present even if it is a good
+          value: item.taxable_amount&.value.to_f,
+          currency_id: 1
+        },
+        item_gross_amount: item_gross_amount, # quantity * rate
+        reporting_item_gross_amount: item_gross_amount,
 
-          item_billable_amount: item.taxable_amount&.value.to_f,
-          reporting_item_billable_amount: item.taxable_amount&.value.to_f,
-          
-          discount: item.discount,
+        item_billable_amount: item.taxable_amount&.value.to_f,
+        reporting_item_billable_amount: item.taxable_amount&.value.to_f,
+
+        discount: item.discount
       }
     end
     invoice_items_attributes
@@ -737,11 +731,11 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
   def calculcate_po_adjusted_advance
     self.total_adjusted_advance = 0
     if self.last_invoice.present?
-      if user.po_invoice_form_enabled
-        self.total_adjusted_advance = self.last_invoice.po_prev_adjusted_advance.to_f + self.last_invoice.adjusted_po_advance_payable_amount&.to_f
-      else
-        self.total_adjusted_advance = self.last_invoice.po_prev_adjusted_advance.to_f + self.last_invoice.po_adjusted_advance&.value&.to_f
-      end
+      self.total_adjusted_advance = if user.po_invoice_form_enabled
+                                      self.last_invoice.po_prev_adjusted_advance.to_f + self.last_invoice.adjusted_po_advance_payable_amount&.to_f
+                                    else
+                                      self.last_invoice.po_prev_adjusted_advance.to_f + self.last_invoice.po_adjusted_advance&.value&.to_f
+                                    end
     end
     allowed_current_adjustment = self.po_advance - self.total_adjusted_advance rescue nil
     bal_due_amount = nil
@@ -749,16 +743,14 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     update_params = {}
     # Current allowed adjustment should be present and should not be previously exhausted
     if allowed_current_adjustment.present? && !allowed_current_adjustment.zero?
-      case
-        when (self.invoice&.balance_due&.value.present? && self.invoice&.balance_due&.value >= allowed_current_adjustment) || (user.po_invoice_form_enabled && self.invoice.invoice_balance_due >= allowed_current_adjustment)
-          # Substract PO advance amount from balance due amount
-          bal_due_amount = self.invoice&.balance_due&.value - allowed_current_adjustment
-          bal_due_amount = 0 if user.po_invoice_form_enabled
-          current_adjustment = allowed_current_adjustment
-        when (self.invoice&.balance_due&.value.present? &&  self.invoice&.balance_due&.value < allowed_current_adjustment) || (user.po_invoice_form_enabled && self.invoice.invoice_balance_due < allowed_current_adjustment)
-          current_adjustment = self.invoice&.balance_due&.value
-          current_adjustment = 0 if user.po_invoice_form_enabled
-          bal_due_amount = 0
+      if (self.invoice&.balance_due&.value.present? && self.invoice&.balance_due&.value >= allowed_current_adjustment) || (user.po_invoice_form_enabled && self.invoice.invoice_balance_due >= allowed_current_adjustment)
+        # Substract PO advance amount from balance due amount
+        bal_due_amount = self.invoice&.balance_due&.value - allowed_current_adjustment
+        current_adjustment = 0 if user.po_invoice_form_enabled
+      elsif (self.invoice&.balance_due&.value.present? && self.invoice&.balance_due&.value < allowed_current_adjustment) || (user.po_invoice_form_enabled && self.invoice.invoice_balance_due < allowed_current_adjustment)
+        current_adjustment = self.invoice&.balance_due&.value
+        current_adjustment = 0 if user.po_invoice_form_enabled
+        bal_due_amount = 0
       end
       # set_advance_amount_required
     end
@@ -788,14 +780,11 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
   def user_role_based_validation
     # Invoice created from PO will have same policy, hence check if that user has po_invoice_initiator role for that policy
     is_po_invoice_initiator = self.purchase_order.policy.policy_user_roles.with_user_id(user.id).with_role_id(UserRole.id_for(:po_invoice_initiator)).present? rescue false
-    
+
     unless is_po_invoice_initiator
-      add_message :error, "You are not allowed to take this action."
+      add_message :error, 'You are not allowed to take this action.'
       return
     end
     true
   end
-
-
 end
-

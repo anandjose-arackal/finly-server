@@ -24,7 +24,13 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
       # item_taxable_amount: "{{ row.item_gross_amount | minus: row.item_discount_amount | default: 0 | round: 2  }}",
       item_taxable_amount: "{% if row.product_type_id == '1' %}{{ row.item_gross_amount | minus: row.item_discount_amount | default: 0 | round: 2  }}{% else %}{{ row.item_billable_amount }}{% endif %}",
       item_tax_amount: '{{ row.item_taxable_amount | times: row.tax_percentage | divided_by: 100.00 | default: 0 | round: 2  }}',
-      item_tds_amount: "{% if row.tds_applicable == 'true' %}{{ row.item_taxable_amount | times: form.tds_percentage | divided_by: 100.00 | default: 0 | round: 2  }}{% else %}{{ 0 }}{% endif %}",
+      item_tds_amount: "
+      {% if row.tds_applicable == 'true' %}
+        {{ row.item_taxable_amount | times: form.tds_percentage | divided_by: 100.00 | default: 0 | round: 2  }}
+      {% else %}
+        {{ 0 }}
+      {% endif %}
+      ",
       item_net_amount: '{% if form.rcm_enabled == true %}{{ row.item_taxable_amount | default: 0 | round: 2 }}{% else %}{{ row.item_taxable_amount | plus: row.item_tax_amount | default: 0 | round: 2 }}{% endif %}',
 
       # CONVERTED VALUES
@@ -49,7 +55,17 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
       invoice_sub_total_amount: '{% assign inv_sub_total_amount = form.invoice_gross_amount | minus: form.invoice_discount_amount | plus: form.invoice_tax_amount | plus: form.invoice_freight_amount | round: 2 %}{% if form.rcm_enabled == true %}{{ inv_sub_total_amount | minus: form.invoice_tax_amount | default: 0 | round: 2}}{% else %}{{ inv_sub_total_amount | default: 0 | round: 2 }}{% endif %}',
       invoice_paid_outside_amount: '{{ form.invoice_paid_outside_amount | default: 0 | round: 2}}',
       # invoice_tds_amount: "{% assign tds_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign tds_amount = tds_amount | plus: item.item_tds_amount %}{% endif %}{% endfor %}{{ tds_amount  | default: 0 | ceil}}",
-      display_tds_amount: '{% assign tds_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign tds_amount = tds_amount | plus: item.item_tds_amount %}{% endif %}{% endfor %}{{ tds_amount  | default: 0 | ceil}}',
+      display_tds_amount: "
+      {% assign tds_amount = 0 %}
+      {% for item in form.items %}
+        {% if item._destroy == true or item.tds_applicable == 'false'%}
+          {% continue %}
+        {% else %}
+          {% assign tds_amount = tds_amount | plus: item.item_tds_amount %}
+        {% endif %}
+      {% endfor %}
+      {{ tds_amount  | default: 0 | ceil }}
+      ",
 
       #### net payable amount
       # invoice_roundoff_amount: "{% assign net_total_amount = form.invoice_sub_total_amount | minus: form.invoice_paid_outside_amount | minus: form.invoice_tds_amount %}{% assign round_amount = net_total_amount | round %}{% assign amount = round_amount | minus: net_total_amount %}{% if form.base_currency_id != form.reporting_currency_id %}{% assign amount = 0 %}{% endif %}{{ amount | default: 0 | round: 2 }}",
@@ -62,8 +78,40 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
       # invoice_advance_paid_amount: "{% form.advance_amount_required == false %}{{0}}{% else %}{{ form.adjusted_po_advance_payable_amount | default: 0 | round: 2}}{% endif %}",
       invoice_advance_paid_amount: '{% if form.advance_amount_required == true %}{{ form.adjusted_po_advance_payable_amount | default: 0 | round: 2}}{% endif %}',
       invoice_balance_due: '{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | default: 0 | round: 2 | at_least: 0 }}',
-      adjusted_po_advance_payable_amount: '{% assign payable_balance = form.invoice_sub_total_amount | plus: form.invoice_roundoff_amount | minus: form.display_tds_amount | minus: form.invoice_paid_outside_amount | default: 0 | round: 2 %}{% assign adjustable_advance = form.remaining_adjustable_advance %}{% if payable_balance <= adjustable_advance and form.advance_amount_required == true %}{{ payable_balance }}{% elsif payable_balance > adjustable_advance and form.advance_amount_required == true %}{{ adjustable_advance }}{% endif %}',
-      adjusted_advance_tds: '{% assign invoice_tds = form.display_tds_amount %}{% assign adjustable_tds = form.remaining_adjustable_tds %}{% if invoice_tds <= adjustable_tds and form.advance_amount_required == true %}{{ invoice_tds }}{% elsif invoice_tds > adjustable_tds and form.advance_amount_required == true %}{{ adjustable_tds }}{% endif %}',
+      adjusted_po_advance_payable_amount: '
+      {% assign payable_balance = form.invoice_sub_total_amount | plus: form.invoice_roundoff_amount | minus: form.display_tds_amount | minus: form.invoice_paid_outside_amount | default: 0 | round: 2 %}
+      {% assign adjustable_advance = form.po_advance | minus: form.po_prev_adjusted_advance %}
+      {% if payable_balance <= adjustable_advance and form.advance_amount_required == true %}
+        {{ payable_balance | round: 2}}
+      {% elsif payable_balance > adjustable_advance and form.advance_amount_required == true %}
+        {{ adjustable_advance| round: 2}}
+      {% endif %}
+      ',
+      adjusted_advance_tds: '
+      {% assign invoice_tds = form.display_tds_amount %}
+      {% assign adjustable_tds = form.po_advance_tds | minus: form.prev_adjusted_advance_tds %}
+      {% if invoice_tds <= adjustable_tds and form.advance_amount_required == true %}
+        {{ invoice_tds | round: 2}}
+      {% elsif invoice_tds > adjustable_tds and form.advance_amount_required == true %}
+        {{ adjustable_tds | round: 2}}
+      {% endif %}
+      ',
+      remaining_adjustable_advance: '
+      {% assign remaining_advance = form.po_advance | minus: form.po_prev_adjusted_advance %}
+      {% if form.advance_amount_required == true %}
+        {{ remaining_advance | minus: form.adjusted_po_advance_payable_amount | round: 2}}
+      {% else %}
+        {{ remaining_advance | round: 2}}
+      {% endif %}
+      ',
+      remaining_adjustable_tds: '
+      {% assign remaining_tds = form.po_advance_tds | minus: form.prev_adjusted_advance_tds %}
+      {% if form.advance_amount_required == true %}
+        {{ remaining_tds | minus: form.adjusted_advance_tds | round: 2}}
+      {% else %}
+        {{ remaining_tds | round: 2}}
+      {% endif %}
+      ',
 
       # CONVERTED VALUES
       reporting_invoice_gross_amount: '{{ form.invoice_gross_amount | times: form.conversion_rate | default: 0 | round: 2}}',
@@ -332,6 +380,35 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
   #   amount :po_remaining_adjusted_advance_tds, label: "Po Remaining Adjusted Advance TDS", editable: false, visible: true, required: false
   # end
 
+  section :document_advance, title: 'Document Advance' do
+    switch :advance_amount_required, label: 'Adjust Amount', editable: false, visible: true, default_value: false
+
+    amount :po_advance, label: 'PO Advance payable amount', editable: false, visible: false, required: false
+    amount :po_advance_tds, editable: false, visible: false, required: false
+
+    amount :net_po_advance, label: 'PO Advance', editable: false, visible: true, required: true
+
+    # amount :reporting_po_advance, label: 'PO Advance (reporting currency)', editable: false, visible: true, required: false,
+    #                               computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_advance])
+
+    amount :po_prev_adjusted_advance, label: 'Previous Adjusted Advance', editable: false, visible: true, required: false
+    amount :prev_adjusted_advance_tds, label: 'Previous Adjusted AdvanceTDS', editable: false, visible: true, required: false
+
+    # amount :reporting_po_prev_adjusted_advance, label: 'Previous Adjusted Advance (reporting currency)', editable: false, visible: true, required: false,
+    #                                             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_prev_adjusted_advance])
+
+    amount :adjusted_po_advance_payable_amount, label: 'Current Adjustment', editable: true, visible: true, required: false, computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:adjusted_po_advance_payable_amount])
+
+    # amount :reporting_adjusted_po_advance_payable_amount, label: 'Current Adjustment (reporting currency)', editable: false, visible: true, required: false,
+    #                                                       computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_adjusted_po_advance_payable_amount])
+
+    amount :adjusted_advance_tds, label: 'Current TDS Adjustment', editable: false, visible: true, computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:adjusted_advance_tds])
+    amount :remaining_adjustable_tds, label: 'Remaining Adjustable TDS', editable: false, visible: true, computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:remaining_adjustable_tds])
+    amount :remaining_adjustable_advance, label: 'Remaining Adjustable Advance', editable: false, visible: true, computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:remaining_adjustable_advance])
+
+    switch :advance_paid, editable: false, visible: false
+  end
+
   # INVOICE ITEMS SUMMARY
   section :summary do
     summary :items_summary do
@@ -456,34 +533,6 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
                                              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_balance_due]),
                                              can_visible_be_changed: false, can_editable_be_changed: false
     end
-  end
-
-  section :document_advance, title: 'Document Advance' do
-    switch :advance_amount_required, label: 'Adjust Amount', editable: false, visible: true, default_value: false
-
-    amount :po_advance, label: 'PO Advance payable amount', editable: false, visible: false, required: false
-
-    amount :net_po_advance, label: 'PO Advance', editable: false, visible: true, required: true
-
-    amount :reporting_po_advance, label: 'PO Advance (reporting currency)', editable: false, visible: true, required: false,
-                                  computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_advance])
-
-    amount :po_prev_adjusted_advance, label: 'Previous Adjusted Advance', editable: false, visible: true, required: false
-    amount :prev_adjusted_advance_tds, label: 'Previous Adjusted AdvanceTDS', editable: false, visible: true, required: false
-
-    amount :reporting_po_prev_adjusted_advance, label: 'Previous Adjusted Advance (reporting currency)', editable: false, visible: true, required: false,
-                                                computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_po_prev_adjusted_advance])
-
-    amount :adjusted_po_advance_payable_amount, label: 'Current Adjustment', editable: true, visible: true, required: false, computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:adjusted_po_advance_payable_amount])
-
-    amount :reporting_adjusted_po_advance_payable_amount, label: 'Current Adjustment (reporting currency)', editable: false, visible: true, required: false,
-                                                          computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_adjusted_po_advance_payable_amount])
-
-    amount :adjusted_advance_tds, label: 'Current TDS Adjustment', editable: false, visible: true, computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:adjusted_advance_tds])
-    amount :remaining_adjustable_tds, label: 'Remaining Adjustable TDS', editable: false, visible: true
-    amount :remaining_adjustable_advance, label: 'Remaining Adjustable Advance', editable: false, visible: true
-
-    switch :advance_paid, editable: false, visible: false
   end
 
   # ATTACHMENTS
@@ -672,23 +721,23 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
     action :visible, false
   end
 
-  condition condition_id: 'Hide PO advance (Reporting Currency)' do
-    reference :entity, 'reporting_po_advance'
-    rule Rules::Builder[:base_currency_id].eq(entity: 'reporting_currency_id')
-    action :visible, false
-  end
+  # condition condition_id: 'Hide PO advance (Reporting Currency)' do
+  #   reference :entity, 'reporting_po_advance'
+  #   rule Rules::Builder[:base_currency_id].eq(entity: 'reporting_currency_id')
+  #   action :visible, false
+  # end
 
-  condition condition_id: 'Hide prev adjusted PO advance (Reporting Currency)' do
-    reference :entity, 'reporting_po_prev_adjusted_advance'
-    rule Rules::Builder[:base_currency_id].eq(entity: 'reporting_currency_id')
-    action :visible, false
-  end
+  # condition condition_id: 'Hide prev adjusted PO advance (Reporting Currency)' do
+  #   reference :entity, 'reporting_po_prev_adjusted_advance'
+  #   rule Rules::Builder[:base_currency_id].eq(entity: 'reporting_currency_id')
+  #   action :visible, false
+  # end
 
-  condition condition_id: 'Hide current adjusted PO advance (Reporting Currency)' do
-    reference :entity, 'reporting_adjusted_po_advance_payable_amount'
-    rule Rules::Builder[:base_currency_id].eq(entity: 'reporting_currency_id')
-    action :visible, false
-  end
+  # condition condition_id: 'Hide current adjusted PO advance (Reporting Currency)' do
+  #   reference :entity, 'reporting_adjusted_po_advance_payable_amount'
+  #   rule Rules::Builder[:base_currency_id].eq(entity: 'reporting_currency_id')
+  #   action :visible, false
+  # end
 
   condition condition_id: 'Hide Reporting Balance Payable for Indian currency' do
     reference :entity, 'items_summary.reporting_invoice_balance_due'

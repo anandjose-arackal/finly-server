@@ -46,7 +46,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
       
 
       #Advance Calculation
-      po_requested_advance_amount: "{{ form.po_requested_advance_amount | default: 0 | round: 2}}",
+      po_requested_advance_amount: "{% if form.advance_amount_required == false %}{{ 0 }}{% else %}{{ form.po_requested_advance_amount | default: 0 | round: 2}}{% endif %}",
       po_advance_tds_amount: "{{ form.po_requested_advance_amount | times: form.po_advance_tds_percentage | divided_by: 100.00 | default: 0 }}",
       # find the max amount on which tds is applicable. 
       # check the the po_requested_advance_amount is less than max_amount then apply tds on po_requested_advance_amount else apply tds on max_applicable_amount
@@ -470,7 +470,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
   validation validation_id: "Order Date Cannot be Later than Delivery Date" do
     reference 'delivery_date'
     error_message "Order Date Cannot be Later than Delivery Date"
-    rule Rules::Builder['delivery_date'].lt(entity: "created_at").and(Rules::Builder[:base_currency_id].not_eq(entity: "reporting_currency_id"))
+    rule Rules::Builder['delivery_date'].lt(entity: "created_at").and(Rules::Builder[:base_currency_id].not_eq(entity: "reporting_currency_id")).and(Rules::Builder[:payment_term_id].present)
   end
 
   validation validation_id: "Items > Item net amount cannot be less than 0" do
@@ -479,10 +479,16 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
     rule Rules::Builder['items.net_amount'].lt(value: 0)
   end
 
-  validation validation_id: "Advance amount should be less than payable amount" do
-    reference 'po_requested_advance_amount'
-    error_message "Advance can not be more than Balance Payable"
-    rule Rules::Builder['po_requested_advance_amount'].gt(entity: "items_summary.po_balance_due")
+  # validation validation_id: "Advance amount should be less than payable amount" do
+  #   reference 'po_requested_advance_amount'
+  #   error_message "Advance can not be more than Balance Payable"
+  #   rule Rules::Builder['items_summary.po_balance_due'].lt(entity: 'po_requested_advance_amount')
+  # end
+
+  validation validation_id: "PO date Cannot be Later than Scheduled date" do
+    reference 'advance_scheduled_date'
+    error_message "Scheduled Date cannot be before Purchase Order Date"
+    rule Rules::Builder['advance_scheduled_date'].lt(entity: "created_at")
   end
 
   # validation validation_id: "Advance Amount Can not be greater than Balance Payable" do
@@ -682,5 +688,23 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
     reference :entity, 'items.pr_number'
     rule Rules::Builder['row.purchase_request_item_id'].present.and(Rules::Builder['row.purchase_request_item_id'].not_eq(value: ''))
     action :visible, true
+  end
+
+  condition condition_id: "Items quantity should not be editable once unless in editable status" do
+    reference :entity, 'items.quantity'
+    rule Rules::Builder[:purchase_order_status_id].not_eq(*PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).map { |item| { value: item } })
+    action :editable, false
+  end
+
+  condition condition_id: "Items discount amount should not be editable once unless in editable status" do
+    reference :entity, 'items.item_discount_amount'
+    rule Rules::Builder[:purchase_order_status_id].not_eq(*PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).map { |item| { value: item } })
+    action :editable, false
+  end
+
+  condition condition_id: "TDS rate should not be editable once unless in editable status" do
+    reference :entity, :advance_tds_slab_id
+    rule Rules::Builder[:purchase_order_status_id].not_eq(*PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).map { |item| { value: item } })
+    action :editable, false
   end
 end

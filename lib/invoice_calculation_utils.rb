@@ -23,7 +23,7 @@ class InvoiceCalculationUtils
     calculate_advance_paid
     calculate_freight_charges
     self.roundoff_amount = self.invoice.roundoff_amount.to_f # even if it's nil, it gets converted to 0
-
+    self.roundoff_amount = self.invoice.invoice_roundoff_amount.to_f if self.invoice.forms_enabled
     self.balance_due_amount = if self.roundoff_amount != 0
                                 precision_value (self.net_amount + self.roundoff_amount)
                               else
@@ -153,14 +153,12 @@ class InvoiceCalculationUtils
       self.invoice.balance_due = Amount.new(value: self.balance_due_amount, currency_id: 1)
     end
 
-    unless self.invoice.class.name == 'OutwardInvoice'
-      if self.invoice.forms_enabled
-        self.invoice.invoice_tds_amount = self.tds_amount
-        self.invoice.invoice_taxable_amount = taxable_amount
-        self.invoice.invoice_gross_amount = self.gross_amount
-        self.invoice.invoice_balance_due = self.balance_due_amount
-        self.invoice.adjusted_advance_tds = self.current_tds_adjustment
-      end
+    if self.invoice.class.name != 'OutwardInvoice' && self.invoice.forms_enabled
+      self.invoice.invoice_tds_amount             = self.tds_amount
+      self.invoice.invoice_taxable_amount         = taxable_amount
+      self.invoice.invoice_balance_due            = self.balance_due_amount
+      self.invoice.reporting_invoice_balance_due  = self.balance_due_amount * self.invoice.conversion_rate
+      self.invoice.adjusted_advance_tds           = self.current_tds_adjustment
     end
 
     # set total payable if it's an outward invoice
@@ -219,6 +217,7 @@ class InvoiceCalculationUtils
       calculate_freight_charges
     end
     self.roundoff_amount = self.invoice.roundoff_amount.to_f # even if it's nil, it gets converted to 0
+    self.roundoff_amount = self.invoice_roundoff_amount.to_f if self.invoice.forms_enabled
     self.balance_due_amount = if self.roundoff_amount != 0
                                 precision_value (self.net_amount + self.roundoff_amount)
                               else

@@ -815,6 +815,10 @@ class Invoice < ApplicationRecord
     self.discount
   end
 
+  def po_advance_tds
+    self.forms_enabled ? self.procurement.purchase_order.po_advance_tds_amount.to_f : 0
+  end
+
   def item_amounts_total
     if self.invoice_items.present?
       # user = RequestStore.store[:current_user]
@@ -910,9 +914,9 @@ class Invoice < ApplicationRecord
 
     if paid_amount == 0
       self.update(invoice_status_id: InwardInvoiceStatus.id_for(:unpaid))
-    elsif paid_amount >= balance_due - 0.99
+    elsif (!self.forms_enabled && paid_amount >= balance_due - 0.99) || (balance_due == 0 && self.forms_enabled)
       self.update(invoice_status_id: InwardInvoiceStatus.id_for(:paid), payable: false)
-    elsif paid_amount <= balance_due
+    elsif (!self.forms_enabled && paid_amount <= balance_due) || (self.forms_enabled && self.invoice_paid_outside_amount.to_f > 0)
       self.update(invoice_status_id: InwardInvoiceStatus.id_for(:partially_paid))
     end
 
@@ -1028,7 +1032,7 @@ class Invoice < ApplicationRecord
         advance_amount: self.advance_amount&.value.to_f ,
         # + self&.reporting_invoice_paid_outside_amount.to_f,
         tax_amount: precision_value(self.tax_amount&.value.to_f),
-        tds_amount: precision_value(self.tds_amount&.value.to_f),
+        tds_amount: self.forms_enabled ? precision_value(self.display_tds_amount.to_f) : precision_value(self.tds_amount&.value.to_f),
         tax: precision_value(self.tax.to_f),
         tds: precision_value(self.tds.to_f),
         gst_type_id: self.gst_type_id.to_i,
@@ -1088,7 +1092,7 @@ class Invoice < ApplicationRecord
         # remaining_amount: (self.balance_due&.value.to_f - self.payments.successful.joins(:amount).sum(:value))
         paid_amount: payment_amounts_total,
         remaining_amount: (self.balance_due&.value.to_f - payment_amounts_total(false)),
-        po_adjusted_advance: precision_value(self.po_adjusted_advance&.value),
+        po_adjusted_advance: self.forms_enabled ? precision_value(self.adjusted_po_advance_payable_amount.to_f) : precision_value(self.po_adjusted_advance&.value),
         invoice_items: invoice_items.as_json,
         note: self.note,
         discount_amount_attributes: { id: self.discount_amount_id, value: precision_value(self.discount_amount&.value), currency_id: self.discount_amount&.currency_id },
@@ -1103,7 +1107,7 @@ class Invoice < ApplicationRecord
         reporting_invoice_discount_amount: self.reporting_invoice_discount_amount,
         invoice_tax_amount: self.invoice_tax_amount,
         reporting_invoice_tax_amount: self.reporting_invoice_tax_amount,
-        invoice_tds_amount: self.invoice_tds_amount,
+        invoice_tds_amount: self.display_tds_amount,
         reporting_invoice_tds_amount: self.reporting_invoice_tds_amount,
         invoice_freight_amount: self.invoice_freight_amount,
         reporting_invoice_freight_amount: self.reporting_invoice_freight_amount,
@@ -1112,7 +1116,7 @@ class Invoice < ApplicationRecord
         invoice_roundoff_amount: self.invoice_roundoff_amount,
         reporting_invoice_roundoff_amount: self.reporting_invoice_roundoff_amount,
         invoice_balance_due: self.invoice_balance_due,
-        reporting_invoice_balance_due: self.reporting_invoice_balance_due,
+        reporting_invoice_balance_due: ((self.invoice_balance_due.to_f * self.conversion_rate.to_f)/100).round(2),
         invoice_sub_total_amount: self.invoice_sub_total_amount,
         reporting_invoice_sub_total_amount: self.reporting_invoice_sub_total_amount,
         invoice_advance_paid_amount: self.invoice_advance_paid_amount,
@@ -1434,7 +1438,7 @@ class Invoice < ApplicationRecord
   end
 
   def display_tds_amount
-    (self.items.where(tds_applicable: true).map(&:item_taxable_amount).map(&:to_f).sum * self.tds_percentage) / 100  
+    ((self.items.where(tds_applicable: true).map(&:item_taxable_amount).map(&:to_f).sum * self.tds_percentage.to_f) / 100).to_f.ceil
   end
 
   def cn_adjustment_per_item
@@ -1618,13 +1622,23 @@ class Invoice < ApplicationRecord
   end
 
   def remaining_adjustable_tds
-    prev_adjusted_tds = self.procurement.invoices.where.not(id: self.id).pluck(:adjusted_advance_tds).map(&:to_f).sum
+    prev_adjusted_tds = self.procurement.invoices.where('created_at < ?', self.created_at).pluck(:adjusted_advance_tds).map(&:to_f).sum
+    if self.advance_amount_required
+      prev_adjusted_tds += self.adjusted_advance_tds
+    end
 
     (self.po_advance_tds.to_f - prev_adjusted_tds).to_f
   end
 
+  def po_advance
+    self.advance_paid ? self.attributes['po_advance'] : 0
+  end
+
   def remaining_adjustable_advance
-    prev_adjusted_advance = self.procurement.invoices.where.not(id: self.id).pluck(:adjusted_po_advance_payable_amount).map(&:to_f).sum
+    prev_adjusted_advance = self.procurement.invoices.where('created_at < ?', self.created_at).pluck(:adjusted_po_advance_payable_amount).map(&:to_f).sum
+    if self.advance_amount_required
+      prev_adjusted_advance += self.adjusted_po_advance_payable_amount
+    end
 
     (self.po_advance.to_f - prev_adjusted_advance).to_f
   end
@@ -1634,7 +1648,7 @@ class Invoice < ApplicationRecord
   end
 
   def prev_adjusted_advance_tds
-    self.procurement.invoices.where.not(id: self.id).where.not(id: self.id).pluck(:adjusted_advance_tds).map(&:to_f).sum
+    self.procurement.invoices.where.not(id: self.id).where('created_at < ?', self.created_at).pluck(:adjusted_advance_tds).map(&:to_f).sum
   end
 
   def po_advance_tds

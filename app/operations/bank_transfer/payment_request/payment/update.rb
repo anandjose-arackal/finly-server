@@ -71,12 +71,13 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     when 'PurchaseOrder'
       construct_po_params
       validate_po_params
-    end  
+    end
 
     # adding the invoice id so that it gets updated and not created again
     # if it already exists in the database
     if self.payment&.invoice.present? && self.payment_params[:invoice_attributes].present?
       self.payment_params[:invoice_attributes][:id] = self.payment.invoice.id
+      self.payment_params[:invoice_attributes][:tds_slab_id] = self.payment_params.dig(:invoice_attributes, :tds_slab_id)
     end
 
     # adding id for original_amount and freight_amount so that new copies aren't created every time
@@ -201,6 +202,13 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       bp.save
     when 'PurchaseOrder'
       purchase_order = PurchaseOrder.find_by(id: payment.parent_id)
+      requested_advance_amount = purchase_order&.po_requested_advance_amount
+      tds_percentage = TdsRatesList.find(self.po_params[:advance_tds_slab_id])&.tds.to_f
+      if tds_percentage != 0 && requested_advance_amount != 0
+        self.po_params[:po_advance_tds_amount] = (requested_advance_amount * tds_percentage) / 100
+        self.po_params[:po_advance_amount] = requested_advance_amount - self.po_params[:po_advance_tds_amount]
+        self.po_params[:po_advance_tds_percentage] = tds_percentage
+      end
       # trigger the calculation only if tds sent and it is different from po tds
       # if self.payment_params[:invoice_attributes][:tds_slab_id].present? && (self.payment_params[:invoice_attributes][:tds_slab_id].to_i != purchase_order.advance_tds_slab_id)
       if self.incoming_tds_for_po != purchase_order.advance_tds_slab_id
@@ -363,7 +371,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       invoice = payment.parent
       invoice_amount = invoice.balance_due&.value.round(2)
       previous_payments = payment.parent.payments.where.not(id: payment.id).all_except_failed.joins(:amount).sum(:value).round(2)
-      if payment_amount.to_f + previous_payments.to_f > (invoice_amount + 1) || payment_amount.to_f > (invoice.reporting_invoice_balance_due.to_f + 1) # this is to allow for any rounding issues that might occur during the updates of TDS
+      if !invoice.forms_enabled && (payment_amount.to_f + previous_payments.to_f > (invoice_amount + 1) || payment_amount.to_f > (invoice.reporting_invoice_balance_due.to_f + 1)) # this is to allow for any rounding issues that might occur during the updates of TDS
         add_message :error, "Payable amount cannot be greater than balance due."
         return
       end
