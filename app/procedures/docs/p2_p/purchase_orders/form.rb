@@ -702,6 +702,12 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
     action :editable, false
   end
 
+  condition condition_id: "Items discount amount should not be editable once unless in editable status" do
+    reference :entity, 'items.discount'
+    rule Rules::Builder[:purchase_order_status_id].not_eq(*PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).map { |item| { value: item } })
+    action :editable, false
+  end
+
   condition condition_id: "TDS rate should not be editable once unless in editable status" do
     reference :entity, :advance_tds_slab_id
     rule Rules::Builder[:purchase_order_status_id].not_eq(*PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).map { |item| { value: item } })

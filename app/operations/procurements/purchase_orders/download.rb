@@ -14,7 +14,7 @@ class Procurements::PurchaseOrders::Download < Procurements::PurchaseOrders::Bas
   end
 
   def validate
-    if self.purcahse_order.blank?
+    if self.purchase_order.blank?
       add_message :error, "Purchase order not found"
       return
     end
