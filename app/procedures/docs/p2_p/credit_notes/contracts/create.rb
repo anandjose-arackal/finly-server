@@ -39,8 +39,6 @@ class Docs::P2P::CreditNotes::Contracts::Create < Reform::Form
       property :currency_id, validates: {presence: true}
     end
 
-    property :original_tax_rate_id, validates: {presence: true}
-    property :tax_rate_id, validates: {presence: true}
   end
 
   validate :company_entities # Checks for departments
