@@ -296,9 +296,11 @@
     </div>
     <div class="col col-xs-12 no-padding">
       <div class="col col-xs-8 no-padding">
-        <div class="amount_in_words">
-          <b>Net Total Amount in Words:</b> <%= AmountUtils.to_words(@result.purchase_order.balance_amount&.value&.to_d.round(2), @result.purchase_order.base_currency.country_code).titleize %>
+        <% if @result.purchase_order.base_currency_id == Currency.id_for('INR')%>
+          <div class="amount_in_words">
+            <b>Net Total Amount in Words:</b> <%= AmountUtils.to_words(@result.purchase_order.balance_amount&.value&.to_d.round(2), @result.purchase_order.base_currency.country_code).titleize %>
         </div>
+        <% else %>>
         <% if @result.taxes_applicable_flag %>
           <div class="taxes_as_applicable" style="vertical-align: bottom;">
             *Taxes as Applicable
