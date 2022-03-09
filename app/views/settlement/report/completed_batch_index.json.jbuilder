@@ -31,7 +31,7 @@ json.array! @result.paginated_report_processor_groups do |group|
           if item.status.completed?
             report_count += 1
           end
-          json.extract! report, :id, :date_as_string
+          json.extract! report, :id
           json.name "#{report.id} - #{report.name}"
           #json.submitted_on DateUtils.date_formatted(report.submitted_at)
           #json.approved_on DateUtils.date_formatted(report.approved_at)
