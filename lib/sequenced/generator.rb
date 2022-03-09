@@ -101,7 +101,7 @@ module Sequenced
     def find_last_record
       build_scope(*scope) do
         base_relation
-            .where("#{column} IS NOT NULL AND #{column} LIKE '#{@prefix}%'")
+            .where("#{column} IS NOT NULL")
             .order("created_at DESC")
       end.first
     end
