@@ -491,6 +491,18 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
     rule Rules::Builder['created_at'].gt(entity: "advance_scheduled_date")
   end
 
+  validation validation_id: "po amount cannot be less than 0" do
+    reference 'items_summary.po_balance_due'
+    error_message "Balance payable cannot be less than 0"
+    rule Rules::Builder['items_summary.po_balance_due'].lt(value: 0)
+  end
+
+  validation validation_id: "advance amount cannot be less than 0" do
+    reference 'po_requested_advance_amount'
+    error_message "Advance amount cannot be less than 0"
+    rule Rules::Builder['po_requested_advance_amount'].lt(value: 0)
+  end
+
   # validation validation_id: "Advance Amount Can not be greater than Balance Payable" do
   #   reference 'po_requested_advance_amount'
   #   error_message "Advance Amount Can not be greater than Balance Payable"
