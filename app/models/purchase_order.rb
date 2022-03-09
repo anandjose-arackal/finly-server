@@ -93,7 +93,7 @@ class PurchaseOrder < ApplicationRecord
 
   # # Multicurrency Support
   # include Monetizable
-  acts_as_sequenced column: :po_number, purpose: :purchase_order, editable: false, prefix: 'PO/{fiscal_year_start}-{fiscal_year_end}/', min_length: 4
+  acts_as_sequenced column: :po_number, purpose: :purchase_order, editable: false, prefix: 'PO', min_length: 4
 
   alias_attribute :created_by_id, :user_id
 
