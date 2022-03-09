@@ -47,7 +47,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
 
       #Advance Calculation
       po_requested_advance_amount: "{% if form.advance_amount_required == false %}{{ 0 }}{% else %}{{ form.po_requested_advance_amount | default: 0 | round: 2}}{% endif %}",
-      po_advance_tds_amount: "{{ form.po_requested_advance_amount | times: form.po_advance_tds_percentage | divided_by: 100.00 | default: 0 }}",
+      po_advance_tds_amount: "{{ form.po_requested_advance_amount | times: form.po_advance_tds_percentage | divided_by: 100.00 | default: 0 | round: 2 }}",
       # find the max amount on which tds is applicable. 
       # check the the po_requested_advance_amount is less than max_amount then apply tds on po_requested_advance_amount else apply tds on max_applicable_amount
       # po_advance_tds_amount: "{% assign max_tds_applicable_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% elsif item.tds_applicable == 'true' %}{% assign max_tds_applicable_amount = max_tds_applicable_amount | plus: item.item_tax_amount %}{% endif %}{% endfor %}{% if form.po_requested_advance_amount <= max_tds_applicable_amount  %}{{ form.po_requested_advance_amount | times: form.po_advance_tds_percentage | default: 0 | ceil }}{% else  %}{{ max_tds_applicable_amount | times: form.po_advance_tds_percentage | default: 0 | ceil }}{% endif %}",
@@ -488,7 +488,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
   validation validation_id: "PO date Cannot be Later than Scheduled date" do
     reference 'advance_scheduled_date'
     error_message "Scheduled Date cannot be before Purchase Order Date"
-    rule Rules::Builder['advance_scheduled_date'].lt(entity: "created_at")
+    rule Rules::Builder['created_at'].gt(entity: "advance_scheduled_date")
   end
 
   # validation validation_id: "Advance Amount Can not be greater than Balance Payable" do
