@@ -128,9 +128,7 @@ class FormEntity::AutoNumber < FormEntity
     min_length = entity.config['sequence']['start_at'].length
     start_at = entity.config['sequence']['start_at'].to_i - 1
     prefix = LiquidHelper.interpolate(prefix, {'record' => model})
-    # removing prefix from key as the prefix config in forms is different and is causing issues.
-    # TODO: implement dynamic prefix config in new forms
-    sequence = REDIS.incr("FormEntity::AutoNumber##{entity.id}") + start_at
+    sequence = REDIS.incr("FormEntity::AutoNumber##{entity.id}##{prefix}") + start_at
     sequence = sequence.to_s.rjust(min_length, "0")
     [prefix, sequence]
   end
