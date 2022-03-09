@@ -300,7 +300,7 @@
           <div class="amount_in_words">
             <b>Net Total Amount in Words:</b> <%= AmountUtils.to_words(@result.purchase_order.balance_amount&.value&.to_d.round(2), @result.purchase_order.base_currency.country_code).titleize %>
         </div>
-        <% else %>>
+        <% end %>
         <% if @result.taxes_applicable_flag %>
           <div class="taxes_as_applicable" style="vertical-align: bottom;">
             *Taxes as Applicable
