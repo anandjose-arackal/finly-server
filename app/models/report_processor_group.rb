@@ -73,7 +73,7 @@ class ReportProcessorGroup < ApplicationRecord
              [:user,
               {amount: [:currency]},
               :status,
-              :reports]
+              {reports:[expenses: :amount]}]
         },
         {total_amount: [:currency]},
         {processed_amount: [:currency]},
