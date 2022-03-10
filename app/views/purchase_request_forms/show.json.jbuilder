@@ -7,6 +7,6 @@ json.meta @op['model'].form_metadata
 
 # Additional Data
 json.created_by @op['model']&.created_by.as_json
-json.reviewal_chain @op['model'].get_reviewal_chain
+json.reviewal_chain @op['model']&.get_reviewal_chain
 # json.transfer_modes @op['model']&.created_by&.company&.transfer_modes.as_json
 json.budgets @op['model']&.purchase_request_budgets.as_json
