@@ -232,7 +232,7 @@ module Transitionable
 
       # Reject to level becomes false for some reason even if reject to user is present
       chain.each do |level|
-        skip unless level.present?
+        next unless level.present?
         level[:reject_to_level] = true if level[:reject_to_user].present?
       end
       chain.reject {|item| item.blank?}
