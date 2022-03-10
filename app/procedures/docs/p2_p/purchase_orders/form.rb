@@ -47,7 +47,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
 
       #Advance Calculation
       po_requested_advance_amount: "{% if form.advance_amount_required == false %}{{ 0 }}{% else %}{{ form.po_requested_advance_amount | default: 0 | round: 2}}{% endif %}",
-      po_advance_tds_amount: "{{ form.po_requested_advance_amount | times: form.po_advance_tds_percentage | divided_by: 100.00 | default: 0 | round: 2 }}",
+      po_advance_tds_amount: "{{ form.po_requested_advance_amount | times: form.po_advance_tds_percentage | divided_by: 100.00 | default: 0 | ceil }}",
       # find the max amount on which tds is applicable. 
       # check the the po_requested_advance_amount is less than max_amount then apply tds on po_requested_advance_amount else apply tds on max_applicable_amount
       # po_advance_tds_amount: "{% assign max_tds_applicable_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% elsif item.tds_applicable == 'true' %}{% assign max_tds_applicable_amount = max_tds_applicable_amount | plus: item.item_tax_amount %}{% endif %}{% endfor %}{% if form.po_requested_advance_amount <= max_tds_applicable_amount  %}{{ form.po_requested_advance_amount | times: form.po_advance_tds_percentage | default: 0 | ceil }}{% else  %}{{ max_tds_applicable_amount | times: form.po_advance_tds_percentage | default: 0 | ceil }}{% endif %}",
@@ -404,7 +404,6 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
   #          can_editable_be_changed: false, can_visible_be_changed: false
   # end
 
-  # PO advances using old logic
   section :document_advance, title: "Document Advance" do
     switch :advance_amount_required, label: "Required", editable: true, visible: true, required: true, default_value: false
 
