@@ -216,7 +216,6 @@ module Transitionable
               email: dlrm.rejected_by&.email
           }
         end
-
         chain[level_number - 1] = data
       end
 
@@ -230,6 +229,11 @@ module Transitionable
       # end
 
       # Do NOT Send Skipped Level Data
+
+      # Reject to level becomes false for some reason even if reject to user is present
+      chain.each do |level|
+        level[:reject_to_level] = true if level[:reject_to_user].present?
+      end
       chain.reject {|item| item.blank?}
     end
 
