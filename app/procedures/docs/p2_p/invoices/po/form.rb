@@ -305,7 +305,7 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
 
       amount :rate, label: 'Rate (Base Currency)',
                     can_editable_be_changed: false, can_visible_be_changed: false,
-                    required: true, visible: true, editable: false
+                    required: true, visible: true, editable: true
       # computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.rate_in_base_currency | default: 0 | round: 2 }}', assignments: {conversion_date: "{{form.conversion_date}}", base_currency_id: "{{form.base_currency_id}}", reporting_currency_id: "{{form.reporting_currency_id}}", conversion_rate: "{{form.conversion_rate}}"})
 
       # gross_amount = rate x quantity
