@@ -492,9 +492,9 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
   end
 
   validation validation_id: "Balance payable cannot be less than 0" do
-    reference 'po_balance_due'
+    reference 'items_summary.po_balance_due'
     error_message "Balance Payable cannot be less than 0"
-    rule Rules::Builder['po_balance_due'].lt(value: 0).or(Rules::Builder['po_balance_due'].eq(value: 0))
+    rule Rules::Builder['items_summary.po_balance_due'].lt(value: 0).or(Rules::Builder['items_summary.po_balance_due'].eq(value: 0))
   end
 
   # validation validation_id: "Advance amount should be less than payable amount" do
