@@ -722,31 +722,36 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
 
   condition condition_id: "Items quantity should not be editable once unless in editable status" do
     reference :entity, 'items.quantity'
-    rule Rules::Builder[:purchase_order_status_id].not_eq(*PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).map { |item| { value: item } })
+    # rule Rules::Builder[:purchase_order_status_id].not_eq(*PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).map { |item| { value: item } })
+    rule Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:open)).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:retracted))).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:rejected)))
     action :editable, false
   end
 
   condition condition_id: "Items discount amount should not be editable once unless in editable status" do
     reference :entity, 'items.item_discount_amount'
-    rule Rules::Builder[:purchase_order_status_id].not_eq(*PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).map { |item| { value: item } })
+    # rule Rules::Builder[:purchase_order_status_id].not_eq(*PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).map { |item| { value: item } })
+    rule Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:open)).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:retracted))).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:rejected)))
     action :editable, false
   end
 
   condition condition_id: "Items discount should not be editable once unless in editable status" do
     reference :entity, 'items.discount'
-    rule Rules::Builder[:purchase_order_status_id].not_eq(*PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).map { |item| { value: item } })
+    # rule Rules::Builder[:purchase_order_status_id].not_eq(*PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).map { |item| { value: item } })
+    rule Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:open)).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:retracted))).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:rejected)))
     action :editable, false
   end
 
   condition condition_id: "TDS rate should not be editable once unless in editable status" do
     reference :entity, :advance_tds_slab_id
-    rule Rules::Builder[:purchase_order_status_id].not_eq(*PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).map { |item| { value: item } })
+    # rule Rules::Builder[:purchase_order_status_id].not_eq(*PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).map { |item| { value: item } })
+    rule Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:open)).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:retracted))).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:rejected)))
     action :editable, false
   end
 
   condition condition_id: "conversion rate should not be editable once unless in editable status" do
     reference :entity, :conversion_rate
-    rule Rules::Builder[:purchase_order_status_id].not_eq(*PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).map { |item| { value: item } })
+    # rule Rules::Builder[:purchase_order_status_id].not_eq(*PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).map { |item| { value: item } })
+    rule Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:open)).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:retracted))).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:rejected)))
     action :editable, false
   end
 end
