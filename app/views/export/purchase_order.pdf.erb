@@ -82,16 +82,17 @@
             <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.vendor.trade_name %></div>
           <% end %>
         </div>
-        <% if @result.purchase_order.vendor_country_id == Country.id_for("India") %>>
-          <div class="col col-xs-12 no-padding mg-botm-8">
-            <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
-            <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.vendor.pan %></div>
-          </div>
-          <div class="col col-xs-12 no-padding">
-            <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GSTIN</div>
-            <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.gstin_location&.gstin %></div>
-          </div>
-        <% end %>>
+<!--        Hiding these as these are not required-->
+<!--        <%# if @result.purchase_order.vendor_country_id == Country.id_for("India") %>>-->
+<!--          <div class="col col-xs-12 no-padding mg-botm-8">-->
+<!--            <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>-->
+<!--            <div class="col col-xs-12 no-padding font-dark-gray"><%#= @result.purchase_order.vendor.pan %></div>-->
+<!--          </div>-->
+<!--          <div class="col col-xs-12 no-padding">-->
+<!--            <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GSTIN</div>-->
+<!--            <div class="col col-xs-12 no-padding font-dark-gray"><%#= @result.purchase_order.gstin_location&.gstin %></div>-->
+<!--          </div>-->
+        <%# end %>
         <div class="col col-xs-12 no-padding">
           <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">Point of Contact</div>
           <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order&.vendor_poc_name %></div>
