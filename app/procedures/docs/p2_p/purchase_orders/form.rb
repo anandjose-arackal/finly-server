@@ -518,7 +518,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
   validation validation_id: "advance amount cannot be less than 0" do
     reference 'po_requested_advance_amount'
     error_message "Advance amount cannot be less than 0"
-    rule Rules::Builder['po_requested_advance_amount'].lt(value: 0)
+    rule Rules::Builder['po_requested_advance_amount'].lt(value: 0).or(Rules::Builder['po_requested_advance_amount'].eq(value: 0))
   end
 
   # validation validation_id: "Advance Amount Can not be greater than Balance Payable" do

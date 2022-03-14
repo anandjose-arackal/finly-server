@@ -202,14 +202,14 @@
         <div class="col col-xs-12 no-padding mg-botm-8">
           <div class="col col-xs-12 no-padding font-light-gray mg-botm-8"><%= @result.purchase_order.gstin_location&.address %></div>
         </div>
-        <div class="col col-xs-12 no-padding">
-          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GST Number</div>
-          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.gstin_location&.gstin %></div>
-        </div>
-        <div class="col col-xs-12 no-padding mg-botm-8">
-          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
-          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.vendor.pan %></div>
-        </div>
+<!--        <div class="col col-xs-12 no-padding">-->
+<!--          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GST Number</div>-->
+<!--          <div class="col col-xs-12 no-padding font-dark-gray"><%#= @result.purchase_order.gstin_location&.gstin %></div>-->
+<!--        </div>-->
+<!--        <div class="col col-xs-12 no-padding mg-botm-8">-->
+<!--          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>-->
+<!--          <div class="col col-xs-12 no-padding font-dark-gray"><%#= @result.purchase_order.vendor.pan %></div>-->
+<!--        </div>-->
       </div>
       <div class="col col-xs-3 billing-address">
         <h4 class="section-title">Buyer Billing Address</h4>
@@ -223,14 +223,14 @@
             <%= @result.purchase_order.location&.address %>
           <% end %>
         </div>
-        <div class="col col-xs-12 no-padding mg-botm-8">
-          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GST Number</div>
-          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.location&.gstin %></div>
-        </div>
-        <div class="col col-xs-12 no-padding">
-          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
-          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.location&.pan %></div>
-        </div>
+<!--        <div class="col col-xs-12 no-padding mg-botm-8">-->
+<!--          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GST Number</div>-->
+<!--          <div class="col col-xs-12 no-padding font-dark-gray"><%#= @result.purchase_order.location&.gstin %></div>-->
+<!--        </div>-->
+<!--        <div class="col col-xs-12 no-padding">-->
+<!--          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>-->
+<!--          <div class="col col-xs-12 no-padding font-dark-gray"><%#= @result.purchase_order.location&.pan %></div>-->
+<!--        </div>-->
       </div>
       <div class="col col-xs-3 shipping-address">
         <h4 class="section-title">Buyer Shipping Address</h4>
@@ -244,14 +244,14 @@
               <%= @result.purchase_order.delivery_location.address %>
           <% end %>
         </div>
-        <div class="col col-xs-12 no-padding mg-botm-8">
-          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GST Number</div>
-          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.delivery_location&.gstin %></div>
-        </div>
-        <div class="col col-xs-12 no-padding">
-          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
-          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.delivery_location&.pan %></div>
-        </div>
+<!--        <div class="col col-xs-12 no-padding mg-botm-8">-->
+<!--          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GST Number</div>-->
+<!--          <div class="col col-xs-12 no-padding font-dark-gray"><%#= @result.purchase_order.delivery_location&.gstin %></div>-->
+<!--        </div>-->
+<!--        <div class="col col-xs-12 no-padding">-->
+<!--          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>-->
+<!--          <div class="col col-xs-12 no-padding font-dark-gray"><%#= @result.purchase_order.delivery_location&.pan %></div>-->
+<!--        </div>-->
       </div>
     </div><br> <br>
 
