@@ -515,10 +515,28 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
     rule Rules::Builder['items_summary.po_balance_due'].lt(value: 0)
   end
 
+  validation validation_id: "discount can't be more than 100 if discount_type is percentage" do
+    reference 'items.discount'
+    error_message "Discount cannot be more than 100 if discount type is Percentage"
+    rule Rules::Builder['discount_type_id_value'].eq(value: 'Percentage').and(Rules::Builder['items.discount'].gt(value: 100))
+  end
+
   validation validation_id: "advance amount cannot be less than 0" do
-    reference 'po_requested_advance_amount'
+    reference :po_requested_advance_amount
     error_message "Advance amount cannot be less than 0"
-    rule Rules::Builder['po_requested_advance_amount'].lt(value: 0)
+    rule Rules::Builder[:po_requested_advance_amount].eq(value: 0).and(Rules::Builder[:advance_amount_required].eq_any(value: true))
+  end
+
+  validation validation_id: "Item taxable amount should not be less than 0" do
+    reference 'items.item_taxable_amount'
+    error_message "Item taxable amount cannot be less than 0"
+    rule Rules::Builder['items.item_taxable_amount'].lt(value: 0).or(Rules::Builder['items.item_taxable_amount'].eq(value: 0))
+  end
+
+  validation validation_id: "Items > Net amount cannot be less than 0" do
+    reference 'items.item_net_amount'
+    error_message "Item Net amount cannot be less than or equal to 0"
+    rule Rules::Builder['items.item_net_amount'].lt(value: 0).or(Rules::Builder['items.item_net_amount'].eq(value: 0))
   end
 
   # validation validation_id: "Advance Amount Can not be greater than Balance Payable" do
@@ -720,7 +738,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
     action :visible, true
   end
 
-  condition condition_id: "Items quantity should not be editable once unless in editable status" do
+  condition condition_id: "Items quantity  not be editable once unless in editable status" do
     reference :entity, 'items.quantity'
     # rule Rules::Builder[:purchase_order_status_id].not_eq(*PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).map { |item| { value: item } })
     rule Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:open)).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:retracted))).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:rejected)))

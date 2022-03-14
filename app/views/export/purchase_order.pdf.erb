@@ -354,7 +354,7 @@
           <% end %>
           <tr>
             <td class="font-light-gray text-left">Net Total</td>
-            <td class="font-dark-gray text-right currency"><i class='fa fa-<%= @result.purchase_order.base_currency.country_code.downcase %>'></i><%= number_with_delimiter(@result.purchase_order.balance_amount&.value&.to_d, delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
+            <td class="font-dark-gray text-right currency"><i class='fa fa-<%= @result.purchase_order.base_currency.country_code.downcase %>'></i><%if @result.purchase_order.forms_enabled %><%= number_with_delimiter(@result.purchase_order.po_balance_due.to_f, delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %><%else %><%= number_with_delimiter(@result.purchase_order.balance_amount&.value&.to_d, delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %><%end %></td>
           </tr>
           </tbody>
         </table>
