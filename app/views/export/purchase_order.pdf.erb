@@ -349,7 +349,7 @@
           <% if @result.purchase_order.advance_amount_required %>
             <tr>
               <td class="font-light-gray text-left">Advance Amount</td>
-              <td class="font-dark-gray text-right currency"><i class='fa fa-<%= @result.purchase_order.base_currency.country_code.downcase %>'></i><% if @result.purchase_order.forms_enabled %><%= number_with_delimiter(@result.purchase_order.advance_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %><% else %><%= number_with_delimiter(@result.purchase_order.po_requested_advance_amount.to_f, delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %><% end %></td>
+              <td class="font-dark-gray text-right currency"><i class='fa fa-<%= @result.purchase_order.base_currency.country_code.downcase %>'></i><% if @result.purchase_order.forms_enabled %><%= number_with_delimiter(@result.purchase_order.po_requested_advance_amount.to_f, delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %><% else %><%= number_with_delimiter(@result.purchase_order.advance_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %><% end %></td>
             </tr>
           <% end %>
           <tr>
