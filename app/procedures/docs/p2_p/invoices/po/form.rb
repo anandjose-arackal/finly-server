@@ -70,7 +70,7 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
       #### net payable amount
       # invoice_roundoff_amount: "{% assign net_total_amount = form.invoice_sub_total_amount | minus: form.invoice_paid_outside_amount | minus: form.invoice_tds_amount %}{% assign round_amount = net_total_amount | round %}{% assign amount = round_amount | minus: net_total_amount %}{% if form.base_currency_id != form.reporting_currency_id %}{% assign amount = 0 %}{% endif %}{{ amount | default: 0 | round: 2 }}",
       invoice_roundoff_amount: "
-      {% assign net_total_amount = form.invoice_sub_total_amount | minus: form.invoice_paid_outside_amount | minus: form.invoice_tds_amount | round: 2 %}
+      {% assign net_total_amount = form.invoice_sub_total_amount | minus: form.invoice_paid_outside_amount | round: 2 %}
       {% assign round_amount = net_total_amount | round %}
       {% assign amount = round_amount | minus: net_total_amount %}
       {% if form.base_currency_id == '#{Currency.id_for('INR')}' and form.reporting_currency_id == '#{Currency.id_for('INR')}' %}
