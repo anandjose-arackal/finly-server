@@ -19,8 +19,8 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
     items: {
       item_gross_amount: "{{ row.rate | times: row.quantity | default: 0 | round: 2  }}",
       item_discount_amount:  "{% if form.discount_type_id == 1 %}{{ row.item_gross_amount | times: row.discount | divided_by: 100.00 | default: 0 | round: 2  }}{% else %}{{ row.discount | default: 0 }}{% endif %}",
-      item_taxable_amount: "{{ row.item_gross_amount | minus: row.item_discount_amount | default: 0 | round: 2  }}",
-      item_tax_amount: "{{ row.item_taxable_amount | times: row.tax_percentage | divided_by: 100.00 | default: 0 | round: 2  }}",
+      item_taxable_amount: "{{ row.item_gross_amount | minus: row.item_discount_amount | default: 0 | round: 2 | at_least: 0 }}",
+      item_tax_amount: "{{ row.item_taxable_amount | times: row.tax_percentage | divided_by: 100.00 | default: 0 | round: 2 | at_least: 0 }}",
       item_net_amount: "{{ row.item_taxable_amount | plus: row.item_tax_amount | default: 0 | round: 2 | at_least: 0 }}",
         
       # CONVERTED VALUES
@@ -35,14 +35,14 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
     summary: {
       po_gross_amount: "{% assign gross_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign gross_amount = gross_amount | plus: item.item_gross_amount %}{% endif %}{% endfor %}{{ gross_amount | default: 0 | round: 2 }}",
       po_discount_amount: "{% assign discount_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign discount_amount = discount_amount | plus: item.item_discount_amount %}{% endif %}{% endfor %}{{ discount_amount | default: 0 | round: 2 }}",
-      po_tax_amount: "{% assign tax_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign tax_amount = tax_amount | plus: item.item_tax_amount %}{% endif %}{% endfor %}{{ tax_amount  | default: 0 | round: 2}}",
-      po_taxable_amount: "{{ form.po_gross_amount | minus: form.po_discount_amount | default: 0 | round: 2}}",
+      po_tax_amount: "{% assign tax_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign tax_amount = tax_amount | plus: item.item_tax_amount %}{% endif %}{% endfor %}{{ tax_amount  | default: 0 | round: 2 | at_least: 0}}",
+      po_taxable_amount: "{{ form.po_gross_amount | minus: form.po_discount_amount | default: 0 | round: 2 | at_least: 0}}",
       
       # NET AMOUNT
-      po_sub_total_amount: "{% assign po_sub_total_amount = form.po_gross_amount | minus: form.po_discount_amount | plus: form.po_tax_amount | round: 2 %}{{ po_sub_total_amount | default: 0 | round: 2 }}",
+      po_sub_total_amount: "{% assign po_sub_total_amount = form.po_gross_amount | minus: form.po_discount_amount | plus: form.po_tax_amount | round: 2 %}{{ po_sub_total_amount | default: 0 | round: 2 | at_least: 0}}",
       po_roundoff_amount: "{% assign net_total_amount = form.po_sub_total_amount %}{% assign round_amount = net_total_amount | round %}{% assign amount = round_amount | minus: net_total_amount %}{% if form.base_currency_id == '#{Currency.id_for('INR')}' and form.reporting_currency_id == '#{Currency.id_for('INR')}' %}{{ amount | default: 0 | round: 2 }}{% endif %}",
-      po_total_amount: "{{ form.po_sub_total_amount | plus: form.po_roundoff_amount | default: 0 | round: 2}}",
-      po_balance_due: "{{ form.po_total_amount | default: 0 | round: 2}}",
+      po_total_amount: "{{ form.po_sub_total_amount | plus: form.po_roundoff_amount | default: 0 | round: 2 | at_least: 0}}",
+      po_balance_due: "{{ form.po_total_amount | default: 0 | round: 2 | at_least: 0 }}",
       
 
       #Advance Calculation
