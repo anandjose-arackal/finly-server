@@ -24,11 +24,11 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
       item_net_amount: "{{ row.item_taxable_amount | plus: row.item_tax_amount | default: 0 | round: 2 | at_least: 0 }}",
         
       # CONVERTED VALUES
-      reporting_item_gross_amount: "{{ row.item_gross_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_item_discount_amount: " {{ row.item_discount_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_item_taxable_amount: "{{ row.item_taxable_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_item_tax_amount: "{{ row.item_tax_amount | times: form.conversion_rate | default: 0 | round: 2  }}",
-      reporting_item_net_amount: "{{ row.item_net_amount | times: form.conversion_rate | default: 0 | round: 2 | at_least: 0  }}",
+      reporting_item_gross_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ row.item_gross_amount | times: conv_rate | default: 0 | round: 2}}",
+      reporting_item_discount_amount: " {% assign conv_rate = form.conversion_rate | round: 5 %}{{ row.item_discount_amount | times: conv_rate | default: 0 | round: 2}}",
+      reporting_item_taxable_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ row.item_taxable_amount | times: conv_rate | default: 0 | round: 2}}",
+      reporting_item_tax_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ row.item_tax_amount | times: conv_rate | default: 0 | round: 2  }}",
+      reporting_item_net_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ row.item_net_amount | times: conv_rate | default: 0 | round: 2 | at_least: 0  }}",
     },
 
     # PURCHASE ORDER SUMMARY
@@ -70,19 +70,19 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
 
 
       # CONVERTED VALUES
-      reporting_po_gross_amount: "{{ form.po_gross_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_po_discount_amount: "{{ form.po_discount_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_po_taxable_amount: "{{ form.po_taxable_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_po_tax_amount: "{{ form.po_tax_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_po_sub_total_amount: "{{ form.po_sub_total_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_po_roundoff_amount: "{{ form.po_roundoff_amount | times: form.conversion_rate | default: 0 | round: 2}}", # This is wrong calculation need to correct it later
-      reporting_po_total_amount: "{{ form.po_total_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_po_balance_due: "{{ form.po_balance_due | times: form.conversion_rate | default: 0 | round: 2}}",
+      reporting_po_gross_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_gross_amount | times: conv_rate | default: 0 | round: 2}}",
+      reporting_po_discount_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_discount_amount | times: conv_rate | default: 0 | round: 2}}",
+      reporting_po_taxable_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_taxable_amount | times: conv_rate | default: 0 | round: 2}}",
+      reporting_po_tax_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_tax_amount | times: times: conv_rate | default: 0 | round: 2}}",
+      reporting_po_sub_total_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_sub_total_amount | times: conv_rate | default: 0 | round: 2}}",
+      reporting_po_roundoff_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_roundoff_amount | times: conv_rate | default: 0 | round: 2}}", # This is wrong calculation need to correct it later
+      reporting_po_total_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_total_amount | times: times: conv_rate | default: 0 | round: 2}}",
+      reporting_po_balance_due: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_balance_due | times: times: conv_rate | default: 0 | round: 2}}",
 
       # Advance Calculation
-      reporting_po_requested_advance_amount: "{{ form.po_requested_advance_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_po_advance_tds_amount: "{{ form.po_advance_tds_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_po_advance_amount: "{{ form.po_advance_amount | times: form.conversion_rate | default: 0 | round: 2}}",
+      reporting_po_requested_advance_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_requested_advance_amount | times: conv_rate | default: 0 | round: 2}}",
+      reporting_po_advance_tds_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_advance_tds_amount | times: conv_rate | default: 0 | round: 2}}",
+      reporting_po_advance_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_advance_amount | times: conv_rate | default: 0 | round: 2}}",
     }
   }
 
