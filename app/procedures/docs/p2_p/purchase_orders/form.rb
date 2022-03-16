@@ -94,7 +94,8 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
            default_value: PurchaseOrderStatus.id_for(:open),
            can_editable_be_changed: false
     large_text :procurement_term_text, visible: false
-    number :procurement_term_id, visible: false 
+    number :procurement_term_id, visible: false
+    switch :form_migrated, visible: false, editable: false, required: false, default_value: true
   end
 
   # PURCHASE ORDER DETAILS

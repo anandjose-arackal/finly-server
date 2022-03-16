@@ -151,6 +151,7 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
            required: false, editable: false,
            default_value: InwardInvoiceStatus.id_for(:open),
            can_editable_be_changed: false
+    switch :form_migrated, visible: false, editable: false, required: false, default_value: true
   end
 
   # INVOICE DETAILS
