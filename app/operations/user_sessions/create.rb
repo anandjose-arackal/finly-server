@@ -101,21 +101,21 @@ class UserSessions::Create < BaseOperation
   end
 
   def enrich_request(args)
-    args[:referrer] = RequestStoreUtil.current_request.referer
-    args[:ip] = RequestStoreUtil.current_request.remote_ip
-    args[:user_agent] = RequestStoreUtil.current_request.user_agent
+    args[:referrer] = RequestStoreUtil.current_request&.referer
+    args[:ip] = RequestStoreUtil.current_request&.remote_ip
+    args[:user_agent] = RequestStoreUtil.current_request&.user_agent
     ip_type = nil
-    if RequestStoreUtil.current_request.remote_ip =~ Resolv::IPv4::Regex
+    if RequestStoreUtil.current_request&.remote_ip =~ Resolv::IPv4::Regex
       ip_type = 'ipv4'
-    elsif RequestStoreUtil.current_request.remote_ip =~ Resolv::IPv6::Regex
+    elsif RequestStoreUtil.current_request&.remote_ip =~ Resolv::IPv6::Regex
       ip_type = 'ipv6'
     end
     args[:ip_type] = ip_type
-    args[:landing_page] = RequestStoreUtil.current_request.original_url
+    args[:landing_page] = RequestStoreUtil.current_request&.original_url
   end
 
   def enrich_geo_location(args)
-    geo_ip = Geocoder.search(RequestStoreUtil.current_request.remote_ip)
+    geo_ip = Geocoder.search(RequestStoreUtil.current_request&.remote_ip)
     # geo_ip = Geocoder.search('106.51.71.232')
     geo_ip = geo_ip.first if geo_ip.respond_to?(:each)
     data = geo_ip&.data
