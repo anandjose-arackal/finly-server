@@ -1355,7 +1355,7 @@ class Invoice < ApplicationRecord
     # if self.net_amount.present?
     #   self.net_amount.update(value: net_value)
     # else
-    #   self.create_net_amount(value: net_value, currency_id: 1)      
+    #   self.create_net_amount(value: net_value, currency_id: 1)
     # end
   end
 
@@ -1564,10 +1564,11 @@ class Invoice < ApplicationRecord
   end
 
   def retrieve_value(entity)
-    return tds_slab&.dispaly_name if entity.entity_key == 'tds_slab_id'
+    return tds_slab&.display_name if entity.entity_key == 'tds_slab_id'
     return get_discount_type if entity.entity_key == 'discount_type_id'
     return 'Awaiting approval' if entity.entity_key == 'invoice_status_id' && self.invoice_status_id == InwardInvoiceStatus.id_for(:processing) && can_really_approve?
-  
+    return (self.invoice_balance_due * self.conversion_rate).round(2) if entity.entity_key == 'reporting_invoice_balance_due'
+
     send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
   end
 
