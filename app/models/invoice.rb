@@ -945,7 +945,7 @@ class Invoice < ApplicationRecord
 
   def reporting_invoice_balance_due
     if self.forms_enabled
-      self[:reporting_invoice_balance_due].to_f
+      invoice_balance_due.to_f * self.conversion_rate.to_f
     else
       balance_due&.value.to_f - paid_amount_value
     end
@@ -1567,7 +1567,6 @@ class Invoice < ApplicationRecord
     return tds_slab&.display_name if entity.entity_key == 'tds_slab_id'
     return get_discount_type if entity.entity_key == 'discount_type_id'
     return 'Awaiting approval' if entity.entity_key == 'invoice_status_id' && self.invoice_status_id == InwardInvoiceStatus.id_for(:processing) && can_really_approve?
-    return (self.invoice_balance_due * self.conversion_rate).round(2) if entity.entity_key == 'reporting_invoice_balance_due'
 
     send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
   end
