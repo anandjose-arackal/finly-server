@@ -4378,6 +4378,10 @@ Rails.application.routes.draw do
       post 'reports/new_sync_attempt', to: 'reports#new_sync_attempt'
       resources :reports, only: [:index, :show, :update]
 
+      get 'money_requests/count', to: 'money_requests#count'
+      post 'money_requests/new_sync_attempt', to: 'money_requests#new_sync_attempt'
+      resources :money_requests, only: [:index, :show, :update]
+
       get 'purchase_orders/count', to: 'purchase_orders#count'
       post 'purchase_orders/new_sync_attempt', to: 'purchase_orders#new_sync_attempt'
       resources :purchase_orders, only: [:index]
