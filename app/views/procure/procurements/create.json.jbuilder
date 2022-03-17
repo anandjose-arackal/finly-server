@@ -1,2 +1,2 @@
 json.merge! @result.procurement.as_json
-json.forms_enabled  @result.procurement&.purchase_order&.forms_enabled || false
+json.forms_enabled  PurchaseOrderToggle.new(RequestStoreUtil.current_user).enabled?
