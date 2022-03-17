@@ -73,7 +73,7 @@ class Docs::P2P::PurchaseRequests::Form < Forms::API
       text :item_number, label: "Item Code", editable: false, computed: Forms::Compute::Lookup('items.item_id', '{{record.item_number}}')
 
       text :po_creator, label: "PO Creator", editable: false, can_visible_be_changed: false, can_editable_be_changed: false
-      text :po_number, label: "PO Number", editable: false, can_visible_be_changed: false, can_editable_be_changed: false
+      link :po_number, label: "PO Number", editable: false, can_visible_be_changed: false, can_editable_be_changed: false
       
       lookup :vendor_id, label: "Preferred Vendor", can_visible_be_changed: false, can_editable_be_changed: false, choices_scope: Choices[:lookup].('vendors'), editable: true, visible: true
       lookup :items_department_id, label: "Department", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('departments', assignments: { form: true })
