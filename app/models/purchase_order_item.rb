@@ -233,7 +233,7 @@ class PurchaseOrderItem < ApplicationRecord
 
   def pr_number
     if self.purchase_request_item&.purchase_request&.forms_enabled
-      url = "payments#purchase_request_form/#{self.purchase_request_item&.purchase_request&.id}/params={\"forms_enabled\":\"true\"}"
+      url = "purchase_request_form/#{self.purchase_request_item&.purchase_request&.id}/params={\"forms_enabled\":\"true\"}"
       {
         label: self.purchase_request_item&.purchase_request&.order_number,
         url: url
