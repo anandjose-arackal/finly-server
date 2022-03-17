@@ -232,10 +232,13 @@ class PurchaseOrderItem < ApplicationRecord
   end
 
   def pr_number
-    {
-      label: self.purchase_request_item&.purchase_request&.order_number,
-      url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" # placeholder url
-    }
+    if self.purchase_request_item&.purchase_request&.forms_enabled
+      {
+        label: self.purchase_request_item&.purchase_request&.order_number,
+        url: "payments#purchase_request_form/#{self.purchase_request_item&.purchase_request&.id}/params={\"forms_enabled\":\"true\"}"
+      }
+    else
+      self.purchase_request_item&.purchase_request&.order_number
   end
 
   private
