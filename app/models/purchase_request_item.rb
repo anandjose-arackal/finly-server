@@ -239,10 +239,12 @@ class PurchaseRequestItem < ApplicationRecord
   end
 
   def po_number
-    {
-      label: self.purchase_order&.po_number,
-      url: "procure_purchase_orders/#{self.purchase_order&.id}/params={\"procurement_id\": \"#{self.purchase_order&.procurement.id}\"}"
-    }
+    if self.purchase_order.present?
+      {
+        label: self.purchase_order&.po_number,
+        url: "procure_purchase_orders/#{self.purchase_order&.id}/params={\"procurement_id\": \"#{self.purchase_order&.procurement.id}\"}"
+      }
+    end
   end
 
   def reject_item
