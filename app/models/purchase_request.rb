@@ -512,7 +512,7 @@ class PurchaseRequest < ApplicationRecord
     else
       feature_flag_enabled = PurchaseRequestToggle.new(RequestStoreUtil.current_user).enabled?
     end
-    feature_flag_enabled
+    feature_flag_enabled && self.form_migrated
   end
 
   def purchase_request_budgets

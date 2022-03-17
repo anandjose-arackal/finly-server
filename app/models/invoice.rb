@@ -1590,7 +1590,7 @@ class Invoice < ApplicationRecord
     is_non_po_invoice = self&.invoice_type&.non_po_invoice? || false
     is_tax_invoice = self&.invoice_type&.tax_invoice? || false
 
-    (feature_flag_enabled && is_non_po_invoice ) || ( po_feature_flag_enabled && is_tax_invoice )
+    (feature_flag_enabled && is_non_po_invoice ) || ( po_feature_flag_enabled && is_tax_invoice && self.form_migrated)
   end
 
   def bank_payment_request_policies(user)

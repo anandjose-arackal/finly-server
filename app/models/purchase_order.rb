@@ -1036,7 +1036,7 @@ class PurchaseOrder < ApplicationRecord
     else
       feature_flag_enabled = PurchaseOrderToggle.new(RequestStoreUtil.current_user).enabled?
     end
-    feature_flag_enabled
+    feature_flag_enabled && self.form_migrated
   end
 
   def sync_amounts
