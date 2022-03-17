@@ -239,7 +239,14 @@ class PurchaseRequestItem < ApplicationRecord
   end
 
   def po_number
-    self.purchase_order&.po_number
+    if self.purchase_order.forms_enabled
+      {
+        label: self.purchase_order&.po_number,
+        url: "procure_purchase_order/#{self.purchase_order&.id}/params={\"procurement_id\": \"#{self.purchase_order&.procurement.id}\"}"
+      }
+    else
+      self.purchase_order&.po_number
+    end
   end
 
   def reject_item
