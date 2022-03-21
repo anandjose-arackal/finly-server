@@ -44,7 +44,8 @@ class MoneyRequest < ApplicationRecord
           SoftDeletable,
           FieldCustomizer::CustomizableValidation,
           FindByOrderedIds,
-          Transitionable
+          Transitionable,
+          ErpSyncable
 
   belongs_to :company, optional: true
   has_many :email_authorizations, as: :authorizable
