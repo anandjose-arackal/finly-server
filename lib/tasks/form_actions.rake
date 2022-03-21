@@ -1,4 +1,5 @@
 namespace :form_actions do
+  # rake form_actions:reset_form\[1,po\]
   desc 'Reset Form'
   task :reset_form, [:company_id, :model] => [:environment] do |task, args|
     company_id = args[:company_id].to_i
@@ -40,6 +41,8 @@ namespace :form_actions do
     end
   end
 
+  # rake form_actions:show_field\[1,po,gl_code\]
+  desc 'Makes Field visible, wont be useful if field is hidden by a condition'
   task :show_field, [:company_id, :model, :entity_key] => [:environment] do |task, args|
     company_id = args[:company_id].to_i
     if company_id.nil?
