@@ -82,4 +82,19 @@ namespace :form_actions do
       p "Entity made visible: #{entity.label}"
     end
   end
+
+  # rake form_actions:change_reporting_currency\[1,INR\]
+  desc 'Change reporting Currency'
+  task :change_reporting_currency, [:company_id, :reporting_currency_code] => [:environment] do |task, args|
+    rpc = args[:reporting_currency_code]
+    company_id = args[:company_id].to_i
+    if company_id.nil?
+      p 'No company id provided'
+      return
+    end
+    ActsAsTenant.current_tenant = Company.find(company_id)
+    company = Company.find(company_id)
+    company.update(reporting_currency_code: rpc)
+    p "Done"
+  end
 end
