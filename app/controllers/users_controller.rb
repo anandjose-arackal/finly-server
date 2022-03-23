@@ -207,6 +207,11 @@ class UsersController < BaseControllers::WebBase
   end
 
   def saml_validator
+    unless params[:sso_config_id].present?
+      subdomain = params[:subdomain] || self.request.subdomain
+      company = Company.find_by(subdomain: subdomain)
+      params[:sso_config_id] = company.single_sign_on_configurations.first&.id
+    end
     @result = Users::SamlValidator.(current_user, params)
     respond
   end
