@@ -29,6 +29,11 @@ class SingleSignOnController < Oauth::TokenController
   # this will be the catch-all controller for SAML as well as Ouath strategies
   # The logic for choosing between the strategies will be held in the Authenticator::Processor operation
   def create
+    unless params[:sso_config_id].present?
+      subdomain = params[:subdomain] || self.request.subdomain
+      company = Company.find_by(subdomain: subdomain)
+      params[:sso_config_id] = company.single_sign_on_configurations.first&.id
+    end
     RequestStore.store[:sso] = true
     RequestStore.store[:saml] = true
     set_grant_type
