@@ -1039,6 +1039,10 @@ class PurchaseOrder < ApplicationRecord
     feature_flag_enabled && self.form_migrated
   end
 
+  def forms_flag_enabled
+    RequestStoreUtil.current_user.blank? ? true : PurchaseOrderToggle.new(RequestStoreUtil.current_user).enabled?
+  end
+
   def sync_amounts
     if forms_enabled
       self.skip_callback = true
