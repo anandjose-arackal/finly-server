@@ -200,6 +200,10 @@ Resolver::Router.draw do
     route 'default', Docs::ExpenseManagement::Reports::Resolver
   end
 
+  scope :money_requests do
+    route 'default', Docs::ExpenseManagement::MoneyRequests::Resolver
+  end
+
   scope :audit_trails do
     route 'default', Docs::AuditTrails::Resolver
   end
