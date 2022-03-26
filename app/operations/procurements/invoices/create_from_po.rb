@@ -141,6 +141,8 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       self.invoice.invoice_balance_due = self.invoice&.balance_due&.value.to_f
       self.invoice.reporting_invoice_balance_due = self.invoice&.balance_due&.value.to_f * conversion_rate
 
+      self.invoice.form_migrated = true if PoInvoiceToggle.new(RequestStoreUtil.current_user).enabled?
+
       self.invoice.save
 
       if self.advance.present? && (params[:document_type].blank? && params[:document_type] != 'proforma_invoice') && (((user.po_invoice_form_enabled && self.invoice.adjusted_po_advance_payable_amount.zero?) || (self.po_adjusted_advance.value.zero? || self.po_adjusted_advance_id.blank?)) && self.purchase_order.advance_payments.present?)
