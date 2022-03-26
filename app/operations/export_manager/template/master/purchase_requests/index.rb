@@ -8,6 +8,8 @@ class ExportManager::Template::Master::PurchaseRequests::Index < ExportManager::
   subscribe 'purchase_requests'
   default true
 
+  custom_fields :purchase_request, template_prefix: 'record'
+  
   attribute :request_id, template: '{{ record.request_id }}'
   attribute :description, template: '{{ record.description }}'
   attribute :department, template: '{{ record.department.name }}'
