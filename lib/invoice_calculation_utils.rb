@@ -23,14 +23,12 @@ class InvoiceCalculationUtils
     calculate_advance_paid
     calculate_freight_charges
     self.roundoff_amount = self.invoice.roundoff_amount.to_f # even if it's nil, it gets converted to 0
-    if invoice.forms_enabled
-      self.roundoff_amount = self.invoice.invoice_roundoff_amount.to_f if self.invoice.forms_enabled
-      self.balance_due_amount = if self.roundoff_amount != 0
-                                  precision_value (self.net_amount + self.roundoff_amount)
-                                else
-                                  precision_value self.net_amount
-                                end
-    end
+    self.roundoff_amount = self.invoice.invoice_roundoff_amount.to_f if self.invoice.forms_enabled
+    self.balance_due_amount = if self.roundoff_amount != 0
+                                precision_value (self.net_amount + self.roundoff_amount)
+                              else
+                                precision_value self.net_amount
+                              end
 
     self.balance_due_amount = self.balance_due_amount - self.advance_amount unless invoice.forms_enabled
     # If po invoice has po advance, then adjust the balance due

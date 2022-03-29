@@ -735,7 +735,6 @@ include Searchkick::Api
     when 'Invoice'
       precision_value self.parent.balance_due&.value
     when 'PurchaseOrder'
-      # PurchaseOrder.find_by(id: self.parent_id).as_json(tree: true) # because somewhere we got as_json for PO already. running on deadline. dont have time to remodify.
       if user.po_form_enabled
         precision_value self.parent.po_requested_advance_amount
       else
