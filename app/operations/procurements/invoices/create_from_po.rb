@@ -58,7 +58,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     validate_custom_fields_invoice
     return if has_errors?
 
-    if self.invoice.forms_enabled
+    if user.po_invoice_form_enabled
       if self.invoice.save
         InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.invoice_params, nil, self.invoice)
 
