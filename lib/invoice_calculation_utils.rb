@@ -30,7 +30,7 @@ class InvoiceCalculationUtils
                                 precision_value self.net_amount
                               end
 
-    self.balance_due_amount = self.balance_due_amount - self.advance_amount unless invoice.forms_enabled
+    self.balance_due_amount = self.balance_due_amount - self.advance_amount unless invoice.try(:forms_enabled)
     # If po invoice has po advance, then adjust the balance due
     unless self.invoice.class.name == 'OutwardInvoice'
       if (self.invoice.po_advance.present? && self.invoice.advance_amount_required && self.invoice.po_adjusted_advance[:value].present?) || (self.invoice.try(:forms_enabled) && self.invoice.advance_amount_required)
@@ -42,7 +42,7 @@ class InvoiceCalculationUtils
           end
         end
         if self.invoice.procurement.invoices.count < 2
-          if invoice.forms_enabled
+          if invoice.try(:forms_enabled)
             self.current_tds_adjustment = [self.tds_amount, purchase_order.po_advance_tds_amount.to_f].min
             self.tds_amount = [(self.tds_amount - self.current_tds_adjustment), 0].max
             self.balance_due_amount = [self.balance_due_amount - self.invoice.adjusted_po_advance_payable_amount, 0].max
@@ -56,7 +56,7 @@ class InvoiceCalculationUtils
 
           prev = self.invoice.procurement.invoices.where.not(id: invoice.id).joins(:tds_amount).sum(:value)
           currently_adjusted_tds = (prev + purchase_order.advance_tds_amount&.value.to_f + self.tds_amount).ceil
-          if invoice.forms_enabled
+          if invoice.try(:forms_enabled)
             currently_adjusted_tds = (prev + purchase_order.po_advance_tds_amount.to_f + self.tds_amount).ceil
 
             previously_adjusted_tds = self.invoice.procurement.invoices.where.not(id: invoice.id).pluck(:adjusted_advance_tds).map(&:to_f).sum
@@ -65,17 +65,17 @@ class InvoiceCalculationUtils
 
           # we dont capture tds adjustment per invoice, like we do for po advance adjustment
           all_adjusted = (max_tds - currently_adjusted_tds)&.abs&.between?(0,1)
-          if all_adjusted && (self.invoice.po_adjusted_advance&.value.to_f < 1 || (invoice.forms_enabled && self.invoice.adjusted_po_advance_payable_amount.to_f < 1))
+          if all_adjusted && (self.invoice.po_adjusted_advance&.value.to_f < 1 || (invoice.try(:forms_enabled) && self.invoice.adjusted_po_advance_payable_amount.to_f < 1))
             # self.tds_amount = self.tds_amount
             self.balance_due_amount = self.balance_due_amount
-            if invoice.forms_enabled
+            if invoice.try(:forms_enabled)
               self.current_tds_adjustment = [self.tds_amount, remaining_adjustable_tds].min
               self.balance_due_amount = [(self.balance_due_amount - self.invoice.adjusted_po_advance_payable_amount), 0].max
             end
           else
-            if invoice.forms_enabled
+            if invoice.try(:forms_enabled)
               self.current_tds_adjustment = [self.tds_amount, remaining_adjustable_tds].min # min of inv tds and remaining tds
-              unless invoice.forms_enabled
+              unless invoice.try(:forms_enabled)
                 self.tds_amount = [(self.tds_amount - purchase_order.advance_tds_amount&.value.to_f), 0].max
               end
               self.balance_due_amount = if self.invoice.try(:forms_enabled)
@@ -96,7 +96,7 @@ class InvoiceCalculationUtils
         # end
       end
     else
-      self.balance_due_amount = self.balance_due_amount - self.advance_amount if invoice.forms_enabled
+      self.balance_due_amount = self.balance_due_amount - self.advance_amount if invoice.try(:forms_enabled)
     end
 
     # # Applying Credit Note
