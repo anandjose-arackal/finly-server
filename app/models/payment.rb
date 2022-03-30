@@ -935,8 +935,6 @@ include Searchkick::Api
       when 'PurchaseOrder'
         parent_details = initiating_user.company.purchase_orders.find_by(id: self.parent_id)
         parent_details.update(advance_amount_status_id: AdvanceAmountStatus.id_for(:failed))
-      end
-      
       when 'Invoice'
         parent_details = initiating_user.company.inward_invoices.non_beneficiary.find_by(id: self.parent_id)
         total_payments = parent_details.payments.all_except_failed.joins(:amount).sum(:value).round(2)
