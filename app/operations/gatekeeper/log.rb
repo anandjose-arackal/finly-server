@@ -57,10 +57,11 @@ class Gatekeeper::Log < BaseOperation
     unless blocker.valid?
       puts blocker.errors.full_messages
     end
-    blocker.save
-
     # Logstash logger
     logger.info(logstash_params)
+    blocker.save
+
+
 
     # Slack
     notify_slack(base_params)
