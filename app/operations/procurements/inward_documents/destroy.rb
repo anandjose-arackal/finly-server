@@ -139,7 +139,7 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
   def previous_state
     ps = self.purchase_order.trails.where(action_id: [TrailAction.id_for(:approve), TrailAction.id_for(:auto_approve), TrailAction.id_for(:send_to_vendor), TrailAction.id_for(:vendor_confirmed)])
     ps.last&.action_id
-    TrailAction.id_for(:approve) if ps.nil?
+    TrailAction.id_for(:approve) if ps.last.nil?
   end
 
   def is_approve?(state=false)
