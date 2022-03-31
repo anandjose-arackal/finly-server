@@ -73,11 +73,11 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
       reporting_po_gross_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_gross_amount | times: conv_rate | default: 0 | round: 2}}",
       reporting_po_discount_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_discount_amount | times: conv_rate | default: 0 | round: 2}}",
       reporting_po_taxable_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_taxable_amount | times: conv_rate | default: 0 | round: 2}}",
-      reporting_po_tax_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_tax_amount | times: times: conv_rate | default: 0 | round: 2}}",
+      reporting_po_tax_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_tax_amount | times: conv_rate | default: 0 | round: 2}}",
       reporting_po_sub_total_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_sub_total_amount | times: conv_rate | default: 0 | round: 2}}",
       reporting_po_roundoff_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_roundoff_amount | times: conv_rate | default: 0 | round: 2}}", # This is wrong calculation need to correct it later
-      reporting_po_total_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_total_amount | times: times: conv_rate | default: 0 | round: 2}}",
-      reporting_po_balance_due: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_balance_due | times: times: conv_rate | default: 0 | round: 2}}",
+      reporting_po_total_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_total_amount | times: conv_rate | default: 0 | round: 2}}",
+      reporting_po_balance_due: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_balance_due | times: conv_rate | default: 0 | round: 2}}",
 
       # Advance Calculation
       reporting_po_requested_advance_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_requested_advance_amount | times: conv_rate | default: 0 | round: 2}}",
