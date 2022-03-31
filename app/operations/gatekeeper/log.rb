@@ -77,8 +77,6 @@ class Gatekeeper::Log < BaseOperation
       sanitized_params.delete(:SAMLResponse)
     end
     {
-        params: sanitized_params,
-        headers: headers,
         act: self.verdict.act.to_s,
         premise: self.verdict.premise.to_s,
         rule: self.verdict.rule.to_s,
