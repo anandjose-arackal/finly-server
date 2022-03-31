@@ -1392,15 +1392,16 @@ class Invoice < ApplicationRecord
   end
 
   def amount_before_tax
-    self.gross_amount&.value.to_f
+    self.forms_enabled ? self.invoice_gross_amount.to_f : self.gross_amount&.value.to_f
   end
 
   def amount_after_tax
     if self.rcm_enabled
-      self.gross_amount&.value.to_f
+      res = self.forms_enabled ? self.invoice_gross_amount.to_f : self.gross_amount&.value.to_f
     else
-      self.gross_amount&.value.to_f + self.tax_amount&.value.to_f
+      res = self.forms_enabled ? (self.invoice_gross_amount.to_f + self.invoice_tax_amount.to_f) : (self.gross_amount&.value.to_f + self.tax_amount&.value.to_f)
     end
+    res
   end
 
   def invoice_payment_status
