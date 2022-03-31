@@ -71,8 +71,12 @@ class Gatekeeper::Log < BaseOperation
     level = 1 if level < 1
     x_finly_rp = RequestStoreUtil.current_request.headers['X-Finly-RP'] || ''
     headers = Base64.decode64(x_finly_rp)
+    sanitized_params = RequestStoreUtil.request_params
+    if sanitized_params.present? && sanitized_params[:SAMLResponse].present?
+      sanitized_params.delete(:SAMLResponse)
+    end
     {
-        params: RequestStoreUtil.request_params,
+        params: sanitized_params,
         headers: headers,
         act: self.verdict.act.to_s,
         premise: self.verdict.premise.to_s,
