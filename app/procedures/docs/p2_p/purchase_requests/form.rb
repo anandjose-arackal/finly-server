@@ -33,6 +33,7 @@ class Docs::P2P::PurchaseRequests::Form < Forms::API
            required: false, editable: false,
            default_value: PurchaseRequestStatus.id_for(:draft),
            can_editable_be_changed: false
+    switch :form_migrated, visible: false, editable: false, required: false, default_value: true
   end
 
   # REQUEST DETAILS

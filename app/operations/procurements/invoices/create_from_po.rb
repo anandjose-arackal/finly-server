@@ -24,7 +24,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
 
     self.previous_invoices = self.procurement.invoices.scope_all_except_voided.present? ? self.procurement.invoices.scope_all_except_voided.includes(:invoice_items) : nil
 
-    self.invoice_params = set_invoice_parameters
+    self.invoice_params = user.po_invoice_form_enabled ? set_invoice_parameters : set_invoice_parameters_old_logic
 
     self.custom_fields = params&.dig(:custom_fields) || params&.dig(:invoice, :custom_fields)
   end
@@ -58,105 +58,131 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     validate_custom_fields_invoice
     return if has_errors?
 
-    if self.invoice.save
-      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.invoice_params, nil, self.invoice)
+    if user.po_invoice_form_enabled
+      if self.invoice.save
+        InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.invoice_params, nil, self.invoice)
 
-      conversion_rate = self.purchase_order&.base_currency&.currency_conversion_rate(Date.today, self.purchase_order.reporting_currency.country_code) rescue 1
-      self.invoice.conversion_rate = conversion_rate.to_f
+        conversion_rate = self.purchase_order&.base_currency&.currency_conversion_rate(Date.today, self.purchase_order.reporting_currency.country_code) rescue 1
+        self.invoice.conversion_rate = conversion_rate.to_f
 
-      # Update attribute for from invoice structure.
+        # Update attribute for from invoice structure.
 
-      self.invoice.save
-      self.invoice.items.each do |item|
-        item.item_discount_amount = item.goods? ? item&.discount_amount&.value&.to_f : 0
-        item.reporting_item_discount_amount = (item.goods? ? item&.discount_amount&.value&.to_f : 0) * conversion_rate
+        self.invoice.save
+        self.invoice.items.each do |item|
+          item.item_discount_amount = item.goods? ? item&.discount_amount&.value&.to_f : 0
+          item.reporting_item_discount_amount = (item.goods? ? item&.discount_amount&.value&.to_f : 0) * conversion_rate
 
-        item.item_tax_amount = item&.tax_amount&.value.to_f
-        item.reporting_item_tax_amount = item&.tax_amount&.value.to_f * conversion_rate
+          item.item_tax_amount = item&.tax_amount&.value.to_f
+          item.reporting_item_tax_amount = item&.tax_amount&.value.to_f * conversion_rate
 
-        item.item_net_amount = (self.rcm_enabled ? item&.taxable_amount&.value.to_f : (item&.taxable_amount&.value.to_f + item&.tax_amount&.value.to_f))
-        item.reporting_item_net_amount = (self.rcm_enabled ? item&.taxable_amount&.value.to_f : (item&.taxable_amount&.value.to_f + item&.tax_amount&.value.to_f)) * conversion_rate
+          item.item_net_amount = (self.rcm_enabled ? item&.taxable_amount&.value.to_f : (item&.taxable_amount&.value.to_f + item&.tax_amount&.value.to_f))
+          item.reporting_item_net_amount = (self.rcm_enabled ? item&.taxable_amount&.value.to_f : (item&.taxable_amount&.value.to_f + item&.tax_amount&.value.to_f)) * conversion_rate
 
-        item.item_taxable_amount = item.goods? ? item.taxable_amount&.value.to_f : item.billable_amount&.value.to_f
-        item.reporting_item_taxable_amount = (item.goods? ? item.taxable_amount&.value.to_f : item.billable_amount&.value.to_f) * conversion_rate
+          item.item_taxable_amount = item.goods? ? item.taxable_amount&.value.to_f : item.billable_amount&.value.to_f
+          item.reporting_item_taxable_amount = (item.goods? ? item.taxable_amount&.value.to_f : item.billable_amount&.value.to_f) * conversion_rate
 
-        item.item_rate = item.rate * conversion_rate
+          item.item_rate = item.rate * conversion_rate
 
-        item.item_tds_amount = (self.purchase_order&.po_advance_tds_percentage.to_f * item.item_taxable_amount) / 100
+          item.item_tds_amount = (self.purchase_order&.po_advance_tds_percentage.to_f * item.item_taxable_amount) / 100
 
-        unless item.goods?
-          item.item_net_amount = (self.rcm_enabled ? item&.billable_amount&.value.to_f : (item&.billable_amount&.value.to_f + item&.tax_amount&.value.to_f))
-          item.reporting_item_net_amount = (self.rcm_enabled ? item&.billable_amount&.value.to_f : (item&.billable_amount&.value.to_f + item&.tax_amount&.value.to_f)) * conversion_rate
+          unless item.goods?
+            item.item_net_amount = (self.rcm_enabled ? item&.billable_amount&.value.to_f : (item&.billable_amount&.value.to_f + item&.tax_amount&.value.to_f))
+            item.reporting_item_net_amount = (self.rcm_enabled ? item&.billable_amount&.value.to_f : (item&.billable_amount&.value.to_f + item&.tax_amount&.value.to_f)) * conversion_rate
+          end
+
+          item.save
         end
 
-        item.save
+        invoice_gross_amount = 0
+        self.invoice.items.each do |item|
+          invoice_gross_amount += item.goods? ? item.item_gross_amount : item.item_billable_amount
+        end
+
+        invoice_discount_amount = self.invoice.items.map(&:item_discount_amount).map(&:to_f).sum
+        invoice_taxable_amount = invoice_gross_amount.to_f - invoice_discount_amount.to_f
+        invoice_tax_amount = self.invoice.items.map(&:item_tax_amount).map(&:to_f).sum
+        roundoff_amount = self.invoice.roundoff_amount.to_f
+
+        tds_amount = 0
+        if user.po_invoice_form_enabled
+          self.invoice.tds_slab_id = self.purchase_order&.advance_tds_slab_id
+          self.invoice.tds_percentage = self.purchase_order&.po_advance_tds_percentage
+          tds_amount = (self.invoice.items.except(tds_applicable: false).map(&:item_taxable_amount).map(&:to_f).sum * self.invoice.tds_percentage.to_f) / 100
+        end
+        self.invoice.invoice_gross_amount = invoice_gross_amount
+        self.invoice.reporting_invoice_gross_amount = invoice_gross_amount * conversion_rate
+
+        self.invoice.invoice_discount_amount = invoice_discount_amount
+        self.invoice.reporting_invoice_discount_amount = invoice_discount_amount * conversion_rate
+
+        self.invoice.invoice_taxable_amount = invoice_taxable_amount
+        self.invoice.reporting_invoice_taxable_amount = invoice_taxable_amount * conversion_rate
+
+        self.invoice.invoice_tax_amount = invoice_tax_amount
+        self.invoice.reporting_invoice_tax_amount = invoice_tax_amount * conversion_rate
+
+        self.invoice.invoice_roundoff_amount = roundoff_amount
+        self.invoice.reporting_invoice_roundoff_amount = roundoff_amount * conversion_rate
+
+        self.invoice.invoice_sub_total_amount = (self.rcm_enabled ? invoice_taxable_amount.to_f : invoice_taxable_amount.to_f + invoice_tax_amount.to_f)
+        self.invoice.reporting_invoice_sub_total_amount = (self.rcm_enabled ? invoice_taxable_amount.to_f : invoice_taxable_amount.to_f + invoice_tax_amount.to_f) * conversion_rate
+
+        self.invoice.invoice_tds_amount = user.po_invoice_form_enabled ? tds_amount : self.invoice&.tds_amount&.value&.to_f
+        self.invoice.reporting_invoice_tds_amount = user.po_invoice_form_enabled ? tds_amount * conversion_rate : self.invoice&.tds_amount&.value&.to_f * conversion_rate
+
+        self.invoice.invoice_total_amount = self.invoice.invoice_sub_total_amount + roundoff_amount
+        self.invoice.reporting_invoice_total_amount = (self.invoice.invoice_sub_total_amount + roundoff_amount) * conversion_rate
+
+        self.invoice.invoice_net_total_amount = self.invoice.invoice_total_amount
+        self.invoice.reporting_invoice_net_total_amount = self.invoice.invoice_total_amount * conversion_rate
+
+        self.invoice.invoice_advance_paid_amount = self.invoice&.advance_amount&.value.to_f
+        self.invoice.reporting_invoice_advance_paid_amount = self.invoice&.advance_amount&.value.to_f * conversion_rate
+
+        self.invoice.invoice_balance_due = self.invoice&.balance_due&.value.to_f
+        self.invoice.reporting_invoice_balance_due = self.invoice&.balance_due&.value.to_f * conversion_rate
+
+        self.invoice.form_migrated = true if PoInvoiceToggle.new(RequestStoreUtil.current_user).enabled?
+
+        self.invoice.save
+
+        if self.advance.present? && (params[:document_type].blank? && params[:document_type] != 'proforma_invoice') && (((user.po_invoice_form_enabled && self.invoice.adjusted_po_advance_payable_amount.zero?) || (self.po_adjusted_advance.value.zero? || self.po_adjusted_advance_id.blank?)) && self.purchase_order.advance_payments.present?)
+          calculate_forms_po_advance
+        end
+
+        status_tag = StatusTag.find_by(id: StatusTag.id_for(:invoice_received))
+        unless procurement.status_tags.include? status_tag
+          procurement.status_tags << status_tag
+        end
+
+        # Create Trail for it
+        invoice.trails.create action_user: user,
+                              action_id: TrailAction.id_for(:create)
+      else
+        add_message :error, self.invoice.errors.full_messages
       end
-
-      invoice_gross_amount = 0
-      self.invoice.items.each do |item|
-        invoice_gross_amount += item.goods? ? item.item_gross_amount : item.item_billable_amount
-      end
-
-      invoice_discount_amount = self.invoice.items.map(&:item_discount_amount).map(&:to_f).sum
-      invoice_taxable_amount = invoice_gross_amount.to_f - invoice_discount_amount.to_f
-      invoice_tax_amount = self.invoice.items.map(&:item_tax_amount).map(&:to_f).sum
-      roundoff_amount = self.invoice.roundoff_amount.to_f
-
-      tds_amount = 0
-      if user.po_invoice_form_enabled
-        self.invoice.tds_slab_id = self.purchase_order&.advance_tds_slab_id
-        self.invoice.tds_percentage = self.purchase_order&.po_advance_tds_percentage
-        tds_amount = (self.invoice.items.except(tds_applicable: false).map(&:item_taxable_amount).map(&:to_f).sum * self.invoice.tds_percentage.to_f) / 100
-      end
-      self.invoice.invoice_gross_amount = invoice_gross_amount
-      self.invoice.reporting_invoice_gross_amount = invoice_gross_amount * conversion_rate
-
-      self.invoice.invoice_discount_amount = invoice_discount_amount
-      self.invoice.reporting_invoice_discount_amount = invoice_discount_amount * conversion_rate
-
-      self.invoice.invoice_taxable_amount = invoice_taxable_amount
-      self.invoice.reporting_invoice_taxable_amount = invoice_taxable_amount * conversion_rate
-
-      self.invoice.invoice_tax_amount = invoice_tax_amount
-      self.invoice.reporting_invoice_tax_amount = invoice_tax_amount * conversion_rate
-
-      self.invoice.invoice_roundoff_amount = roundoff_amount
-      self.invoice.reporting_invoice_roundoff_amount = roundoff_amount * conversion_rate
-
-      self.invoice.invoice_sub_total_amount = (self.rcm_enabled ? invoice_taxable_amount.to_f : invoice_taxable_amount.to_f + invoice_tax_amount.to_f)
-      self.invoice.reporting_invoice_sub_total_amount = (self.rcm_enabled ? invoice_taxable_amount.to_f : invoice_taxable_amount.to_f + invoice_tax_amount.to_f) * conversion_rate
-
-      self.invoice.invoice_tds_amount = user.po_invoice_form_enabled ? tds_amount : self.invoice&.tds_amount&.value&.to_f
-      self.invoice.reporting_invoice_tds_amount = user.po_invoice_form_enabled ? tds_amount * conversion_rate : self.invoice&.tds_amount&.value&.to_f * conversion_rate
-
-      self.invoice.invoice_total_amount = self.invoice.invoice_sub_total_amount + roundoff_amount
-      self.invoice.reporting_invoice_total_amount = (self.invoice.invoice_sub_total_amount + roundoff_amount) * conversion_rate
-
-      self.invoice.invoice_net_total_amount = self.invoice.invoice_total_amount
-      self.invoice.reporting_invoice_net_total_amount = self.invoice.invoice_total_amount * conversion_rate
-
-      self.invoice.invoice_advance_paid_amount = self.invoice&.advance_amount&.value.to_f
-      self.invoice.reporting_invoice_advance_paid_amount = self.invoice&.advance_amount&.value.to_f * conversion_rate
-
-      self.invoice.invoice_balance_due = self.invoice&.balance_due&.value.to_f
-      self.invoice.reporting_invoice_balance_due = self.invoice&.balance_due&.value.to_f * conversion_rate
-
-      self.invoice.save
-
-      if self.advance.present? && (params[:document_type].blank? && params[:document_type] != 'proforma_invoice') && (((user.po_invoice_form_enabled && self.invoice.adjusted_po_advance_payable_amount.zero?) || (self.po_adjusted_advance.value.zero? || self.po_adjusted_advance_id.blank?)) && self.purchase_order.advance_payments.present?)
-        calculcate_po_adjusted_advance
-      end
-
-      status_tag = StatusTag.find_by(id: StatusTag.id_for(:invoice_received))
-      unless procurement.status_tags.include? status_tag
-        procurement.status_tags << status_tag
-      end
-
-      # Create Trail for it
-      invoice.trails.create action_user: user,
-                            action_id: TrailAction.id_for(:create)
     else
-      add_message :error, self.invoice.errors.full_messages
+      if self.invoice.save
+        InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.invoice_params, nil, self.invoice)
+        self.invoice.save
+
+        if self.advance.present? && (params[:document_type].blank? && params[:document_type] != 'proforma_invoice')
+          if (self.po_adjusted_advance.value.zero? || self.po_adjusted_advance_id.blank?) && self.purchase_order.advance_payments.present?
+            calculate_po_advance_old_logic
+          end
+        end
+
+        status_tag = StatusTag.find_by(id: StatusTag.id_for(:invoice_received))
+        unless procurement.status_tags.include? status_tag
+          procurement.status_tags << status_tag
+        end
+
+        # Create Trail for it
+        invoice.trails.create action_user: user,
+                              action_id: TrailAction.id_for(:create)
+      else
+        add_message :error, self.invoice.errors.full_messages
+      end
     end
   end
 
@@ -179,6 +205,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
 
   private
 
+  # TODO: remove old forms logic
   def set_invoice_parameters
     if self.procurement.blank? || self.purchase_order.blank?
       return nil
@@ -330,6 +357,97 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     end
 
     invoice_params
+  end
+
+  # TODO: remove this after all the accounts are migrated
+  def set_invoice_parameters_old_logic
+    if self.procurement.blank? || self.purchase_order.blank?
+      return nil
+    end
+
+    self.advance = self.purchase_order.requested_advance_amount
+
+    receiving_account = self.purchase_order&.bank_account || self.purchase_order.vendor&.bank_accounts&.first # todo - change this later to the one selected at the time of initiating payment. CHANGED.
+
+    configuration = user.company.feature_subscription
+
+    self.grn_enabled = configuration.grn_enabled == true
+    self.grn_disabled = configuration.grn_enabled == false
+
+    self.srn_enabled = configuration.srn_enabled == true
+    self.srn_disabled = configuration.srn_enabled == false
+
+    if self.grn_enabled && self.srn_disabled
+      invoice_items_attributes =  create_grn
+    elsif self.grn_disabled && self.srn_enabled
+      invoice_items_attributes =  create_srn
+    elsif self.grn_enabled && self.srn_enabled
+      invoice_items_attributes =  create_grn_and_srn
+    else
+      invoice_items_attributes =  create_without_grn_and_srn
+    end
+
+    if (invoice_items_attributes.pluck(:quantity).sum == 0) then add_message :error, "Invoice can't be created. Either all items are billed or you need to add a Receipt Note first." end
+
+
+    if self.advance.present?
+
+      # for the new invoice where they want to adjust the advance,
+      # in prev adjusted amount, we store the sum of last invoices prev adjusted and its current adjusted advance
+      # this way the user knows how much was paid and how much he has to adjust in new invoice
+      if self.previous_invoices.present?
+        # if last_invoice.po_prev_adjusted_advance == last_invoice.po_advance
+        self.last_invoice = self.previous_invoices.last
+        self.total_adjusted_advance = self.last_invoice.po_prev_adjusted_advance.to_i + self.last_invoice.po_adjusted_advance&.value&.to_i
+        self.po_prev_adjusted_advance = total_adjusted_advance
+        self.po_advance = ( self.advance.present? ) ? self.advance.value : nil
+        current_adjustment = self.po_advance - total_adjusted_advance
+        self.po_adjusted_advance = Amount.new(value: 0, currency_id: 1)
+      else
+        self.po_prev_adjusted_advance = 0
+        self.po_advance = ( self.advance.present? ) ? self.advance.value : nil
+        self.po_adjusted_advance = Amount.new(value: 0, currency_id: 1)
+      end
+    end
+
+    invoice_type = ::InwardInvoiceType.id_for(:tax_invoice)
+
+    invoice_params = {
+      vendor_id: self.purchase_order.vendor_id,
+      invoice_status_id: ::InwardInvoiceStatus.id_for(:open),
+      created_by_user_id: user.id,
+      invoice_type_id: invoice_type,
+      payment_term_id: self.purchase_order.payment_term_id,
+      due_date: self.purchase_order.delivery_date,
+      receiving_account: receiving_account,
+      gst_type_id: self.purchase_order.gst_type_id,
+      location_id: self.purchase_order.location_id,
+      delivery_location_id: self.purchase_order.delivery_location_id,
+      billing_address: self.purchase_order.billing_address,
+      shipping_address: self.purchase_order.shipping_address,
+      department_id: self.purchase_order.department_id,
+      sub_department_id: self.purchase_order.sub_department_id,
+      cost_center_id: self.purchase_order.cost_center_id,
+      invoice_items_attributes: invoice_items_attributes,
+      policy_id: self.purchase_order.policy_id,
+      gstin_location_id: self.purchase_order.gstin_location_id,
+      cost_allocation_items: self.purchase_order.cost_allocation_items,
+      po_number: self.purchase_order.po_number,
+      discount_type_id: self.purchase_order.discount_type_id,
+      tds_slab_id: self.purchase_order.advance_tds_slab_id,
+      rcm_enabled: self.purchase_order.vendor.rcm_enabled
+
+    }
+
+    if self.advance.present?
+      invoice_params[:po_advance] = self.po_advance
+      invoice_params[:po_prev_adjusted_advance] = self.po_prev_adjusted_advance
+      invoice_params[:po_adjusted_advance] = self.po_adjusted_advance
+      # invoice_params[:advance_amount_required] = true
+      invoice_params[:advance_amount_required] = (self.po_prev_adjusted_advance == self.po_advance) ? false : true
+    end
+
+    return invoice_params
   end
 
   def validate_custom_fields_invoice
@@ -728,7 +846,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     invoice_items_attributes
   end
 
-  def calculcate_po_adjusted_advance
+  def calculate_forms_po_advance
     self.total_adjusted_advance = 0
     if self.last_invoice.present?
       self.total_adjusted_advance = if user.po_invoice_form_enabled
@@ -771,6 +889,38 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       update_params[:invoice_advance_paid_amount] = self.invoice.adjusted_po_advance_payable_amount
       self.invoice.update(update_params)
     end
+  end
+
+  def calculate_po_advance_old_logic
+    self.total_adjusted_advance = 0
+    if self.last_invoice.present?
+      self.total_adjusted_advance = self.last_invoice.po_prev_adjusted_advance.to_f + self.last_invoice.po_adjusted_advance&.value&.to_f
+    end
+    allowed_current_adjustment = self.po_advance - self.total_adjusted_advance rescue nil
+    bal_due_amount = nil
+    current_adjustment = nil
+    # Current allowed adjustment should be present and should not be previously exhausted
+    if allowed_current_adjustment.present? && !allowed_current_adjustment.zero?
+      case
+      when self.invoice&.balance_due&.value.present? && self.invoice&.balance_due&.value >= allowed_current_adjustment
+        # Substract PO advance amount from balance due amount
+        bal_due_amount = self.invoice&.balance_due&.value - allowed_current_adjustment
+        current_adjustment = allowed_current_adjustment
+      when self.invoice&.balance_due&.value.present? &&  self.invoice&.balance_due&.value < allowed_current_adjustment
+        current_adjustment = self.invoice&.balance_due&.value
+        bal_due_amount = 0
+      end
+      set_advance_amount_required
+    end
+    unless bal_due_amount.blank?
+      self.invoice.balance_due.update(value: bal_due_amount)
+    end
+
+    if current_adjustment.present?
+      self.invoice.po_adjusted_advance.update(value: current_adjustment)
+      invoice_params[:po_adjusted_advance] = self.po_adjusted_advance
+    end
+
   end
 
   def set_advance_amount_required

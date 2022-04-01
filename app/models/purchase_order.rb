@@ -93,7 +93,7 @@ class PurchaseOrder < ApplicationRecord
 
   # # Multicurrency Support
   # include Monetizable
-  acts_as_sequenced column: :po_number, purpose: :purchase_order, editable: false, prefix: 'PO/{fiscal_year_start}-{fiscal_year_end}/', min_length: 4
+  acts_as_sequenced column: :po_number, purpose: :purchase_order, editable: false, prefix: 'PO', min_length: 4
 
   alias_attribute :created_by_id, :user_id
 
@@ -1036,7 +1036,11 @@ class PurchaseOrder < ApplicationRecord
     else
       feature_flag_enabled = PurchaseOrderToggle.new(RequestStoreUtil.current_user).enabled?
     end
-    feature_flag_enabled
+    feature_flag_enabled && self.form_migrated
+  end
+
+  def forms_flag_enabled
+    RequestStoreUtil.current_user.blank? ? true : PurchaseOrderToggle.new(RequestStoreUtil.current_user).enabled?
   end
 
   def sync_amounts

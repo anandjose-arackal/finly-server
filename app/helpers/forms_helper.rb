@@ -71,7 +71,8 @@ module FormsHelper
             # form_data.merge!({entity.entity_key => model.send(entity.entity_key).to_s})
             form_data.merge!({"#{entity.entity_key}_value" => model.retrieve_value(entity)})
           elsif entity.entity_type == 'amount' || entity.entity_type == 'number'
-            form_data.merge!({entity.entity_key => model.send(entity.entity_key).to_f.round(2)})
+            max_decimal_place = (form_entity.entity_key == 'conversion_rate' ? 5 : 2)
+            form_data.merge!({entity.entity_key => model.send(entity.entity_key).to_f.round(max_decimal_place)})
           end
         else
           if model.respond_to?(:form_custom_fields)
@@ -90,7 +91,8 @@ module FormsHelper
           # form_data.merge!({form_entity.entity_key => model.send(form_entity.entity_key).to_s})
           form_data.merge!({"#{form_entity.entity_key}_value" => model.retrieve_value(form_entity)})
         elsif form_entity.entity_type == 'amount'|| form_entity.entity_type == 'number'
-          form_data.merge!({form_entity.entity_key => model.send(form_entity.entity_key).to_f.round(2)})
+          max_decimal_place = (form_entity.entity_key == 'conversion_rate' ? 5 : 2)
+          form_data.merge!({form_entity.entity_key => model.send(form_entity.entity_key).to_f.round(max_decimal_place)})
         end
       else
         if model.respond_to?(:form_custom_fields)

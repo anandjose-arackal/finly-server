@@ -19,35 +19,36 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
     items: {
       item_gross_amount: "{{ row.rate | times: row.quantity | default: 0 | round: 2  }}",
       item_discount_amount:  "{% if form.discount_type_id == 1 %}{{ row.item_gross_amount | times: row.discount | divided_by: 100.00 | default: 0 | round: 2  }}{% else %}{{ row.discount | default: 0 }}{% endif %}",
-      item_taxable_amount: "{{ row.item_gross_amount | minus: row.item_discount_amount | default: 0 | round: 2  }}",
-      item_tax_amount: "{{ row.item_taxable_amount | times: row.tax_percentage | divided_by: 100.00 | default: 0 | round: 2  }}",
+      item_taxable_amount: "{{ row.item_gross_amount | minus: row.item_discount_amount | default: 0 | round: 2 | at_least: 0 }}",
+      item_tax_amount: "{{ row.item_taxable_amount | times: row.tax_percentage | divided_by: 100.00 | default: 0 | round: 2 | at_least: 0 }}",
       item_net_amount: "{{ row.item_taxable_amount | plus: row.item_tax_amount | default: 0 | round: 2 | at_least: 0 }}",
         
       # CONVERTED VALUES
-      reporting_item_gross_amount: "{{ row.item_gross_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_item_discount_amount: " {{ row.item_discount_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_item_taxable_amount: "{{ row.item_taxable_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_item_tax_amount: "{{ row.item_tax_amount | times: form.conversion_rate | default: 0 | round: 2  }}",
-      reporting_item_net_amount: "{{ row.item_net_amount | times: form.conversion_rate | default: 0 | round: 2 | at_least: 0  }}",
+      reporting_item_gross_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ row.item_gross_amount | times: conv_rate | default: 0 | round: 2}}",
+      reporting_item_discount_amount: " {% assign conv_rate = form.conversion_rate | round: 5 %}{{ row.item_discount_amount | times: conv_rate | default: 0 | round: 2}}",
+      reporting_item_taxable_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ row.item_taxable_amount | times: conv_rate | default: 0 | round: 2}}",
+      reporting_item_tax_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ row.item_tax_amount | times: conv_rate | default: 0 | round: 2  }}",
+      reporting_item_net_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ row.item_net_amount | times: conv_rate | default: 0 | round: 2 | at_least: 0  }}",
     },
 
     # PURCHASE ORDER SUMMARY
     summary: {
       po_gross_amount: "{% assign gross_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign gross_amount = gross_amount | plus: item.item_gross_amount %}{% endif %}{% endfor %}{{ gross_amount | default: 0 | round: 2 }}",
       po_discount_amount: "{% assign discount_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign discount_amount = discount_amount | plus: item.item_discount_amount %}{% endif %}{% endfor %}{{ discount_amount | default: 0 | round: 2 }}",
-      po_tax_amount: "{% assign tax_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign tax_amount = tax_amount | plus: item.item_tax_amount %}{% endif %}{% endfor %}{{ tax_amount  | default: 0 | round: 2}}",
-      po_taxable_amount: "{{ form.po_gross_amount | minus: form.po_discount_amount | default: 0 | round: 2}}",
+      po_tax_amount: "{% assign tax_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign tax_amount = tax_amount | plus: item.item_tax_amount %}{% endif %}{% endfor %}{{ tax_amount  | default: 0 | round: 2 | at_least: 0}}",
+      po_taxable_amount: "{{ form.po_gross_amount | minus: form.po_discount_amount | default: 0 | round: 2 | at_least: 0}}",
       
       # NET AMOUNT
-      po_sub_total_amount: "{% assign po_sub_total_amount = form.po_gross_amount | minus: form.po_discount_amount | plus: form.po_tax_amount | round: 2 %}{{ po_sub_total_amount | default: 0 | round: 2 }}",
+      po_sub_total_amount: "{% assign po_sub_total_amount = form.po_gross_amount | minus: form.po_discount_amount | plus: form.po_tax_amount | round: 2 %}{{ po_sub_total_amount | default: 0 | round: 2 | at_least: 0}}",
       po_roundoff_amount: "{% assign net_total_amount = form.po_sub_total_amount %}{% assign round_amount = net_total_amount | round %}{% assign amount = round_amount | minus: net_total_amount %}{% if form.base_currency_id == '#{Currency.id_for('INR')}' and form.reporting_currency_id == '#{Currency.id_for('INR')}' %}{{ amount | default: 0 | round: 2 }}{% endif %}",
-      po_total_amount: "{{ form.po_sub_total_amount | plus: form.po_roundoff_amount | default: 0 | round: 2}}",
-      po_balance_due: "{{ form.po_total_amount | default: 0 | round: 2}}",
+      po_total_amount: "{{ form.po_sub_total_amount | plus: form.po_roundoff_amount | default: 0 | round: 2 | at_least: 0}}",
+      po_balance_due: "{{ form.po_total_amount | default: 0 | round: 2 | at_least: 0 }}",
       
 
       #Advance Calculation
       po_requested_advance_amount: "{% if form.advance_amount_required == false %}{{ 0 }}{% else %}{{ form.po_requested_advance_amount | default: 0 | round: 2}}{% endif %}",
-      po_advance_tds_amount: "{{ form.po_requested_advance_amount | times: form.po_advance_tds_percentage | divided_by: 100.00 | default: 0 }}",
+
+      po_advance_tds_amount: "{{ form.po_requested_advance_amount | times: form.po_advance_tds_percentage | divided_by: 100.00 | default: 0 | ceil }}",
       # find the max amount on which tds is applicable. 
       # check the the po_requested_advance_amount is less than max_amount then apply tds on po_requested_advance_amount else apply tds on max_applicable_amount
       # po_advance_tds_amount: "{% assign max_tds_applicable_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% elsif item.tds_applicable == 'true' %}{% assign max_tds_applicable_amount = max_tds_applicable_amount | plus: item.item_tax_amount %}{% endif %}{% endfor %}{% if form.po_requested_advance_amount <= max_tds_applicable_amount  %}{{ form.po_requested_advance_amount | times: form.po_advance_tds_percentage | default: 0 | ceil }}{% else  %}{{ max_tds_applicable_amount | times: form.po_advance_tds_percentage | default: 0 | ceil }}{% endif %}",
@@ -69,19 +70,19 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
 
 
       # CONVERTED VALUES
-      reporting_po_gross_amount: "{{ form.po_gross_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_po_discount_amount: "{{ form.po_discount_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_po_taxable_amount: "{{ form.po_taxable_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_po_tax_amount: "{{ form.po_tax_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_po_sub_total_amount: "{{ form.po_sub_total_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_po_roundoff_amount: "{{ form.po_roundoff_amount | times: form.conversion_rate | default: 0 | round: 2}}", # This is wrong calculation need to correct it later
-      reporting_po_total_amount: "{{ form.po_total_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_po_balance_due: "{{ form.po_balance_due | times: form.conversion_rate | default: 0 | round: 2}}",
+      reporting_po_gross_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_gross_amount | times: conv_rate | default: 0 | round: 2}}",
+      reporting_po_discount_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_discount_amount | times: conv_rate | default: 0 | round: 2}}",
+      reporting_po_taxable_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_taxable_amount | times: conv_rate | default: 0 | round: 2}}",
+      reporting_po_tax_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_tax_amount | times: conv_rate | default: 0 | round: 2}}",
+      reporting_po_sub_total_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_sub_total_amount | times: conv_rate | default: 0 | round: 2}}",
+      reporting_po_roundoff_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_roundoff_amount | times: conv_rate | default: 0 | round: 2}}", # This is wrong calculation need to correct it later
+      reporting_po_total_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_total_amount | times: conv_rate | default: 0 | round: 2}}",
+      reporting_po_balance_due: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_balance_due | times: conv_rate | default: 0 | round: 2}}",
 
       # Advance Calculation
-      reporting_po_requested_advance_amount: "{{ form.po_requested_advance_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_po_advance_tds_amount: "{{ form.po_advance_tds_amount | times: form.conversion_rate | default: 0 | round: 2}}",
-      reporting_po_advance_amount: "{{ form.po_advance_amount | times: form.conversion_rate | default: 0 | round: 2}}",
+      reporting_po_requested_advance_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_requested_advance_amount | times: conv_rate | default: 0 | round: 2}}",
+      reporting_po_advance_tds_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_advance_tds_amount | times: conv_rate | default: 0 | round: 2}}",
+      reporting_po_advance_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_advance_amount | times: conv_rate | default: 0 | round: 2}}",
     }
   }
 
@@ -93,7 +94,8 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
            default_value: PurchaseOrderStatus.id_for(:open),
            can_editable_be_changed: false
     large_text :procurement_term_text, visible: false
-    number :procurement_term_id, visible: false 
+    number :procurement_term_id, visible: false
+    switch :form_migrated, visible: false, editable: false, required: false, default_value: true
   end
 
   # PURCHASE ORDER DETAILS
@@ -404,7 +406,6 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
   #          can_editable_be_changed: false, can_visible_be_changed: false
   # end
 
-  # PO advances using old logic
   section :document_advance, title: "Document Advance" do
     switch :advance_amount_required, label: "Required", editable: true, visible: true, required: true, default_value: false
 
@@ -476,7 +477,25 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
   validation validation_id: "Items > Item net amount cannot be less than 0" do
     reference 'items.item_net_amount'
     error_message "Item net amount cannot be less than 0"
-    rule Rules::Builder['items.net_amount'].lt(value: 0)
+    rule Rules::Builder['items.net_amount'].lt(value: 0).or(Rules::Builder['items.net_amount'].eq(value: 0))
+  end
+
+  validation validation_id: "Items > Item quantity cannot be less than 0" do
+    reference 'items.quantity'
+    error_message "Item quantity cannot be less than 0"
+    rule Rules::Builder['items.quantity'].lt(value: 0).or(Rules::Builder['items.quantity'].eq(value: 0))
+  end
+
+  validation validation_id: "Items > Item rate cannot be less than 0" do
+    reference 'items.rate'
+    error_message "Item rate cannot be less than 0"
+    rule Rules::Builder['items.rate'].lt(value: 0).or(Rules::Builder['items.rate'].eq(value: 0))
+  end
+
+  validation validation_id: "Balance payable cannot be less than 0" do
+    reference 'items_summary.po_balance_due'
+    error_message "Balance Payable cannot be less than 0"
+    rule Rules::Builder['items_summary.po_balance_due'].lt(value: 0).or(Rules::Builder['items_summary.po_balance_due'].eq(value: 0))
   end
 
   # validation validation_id: "Advance amount should be less than payable amount" do
@@ -488,7 +507,37 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
   validation validation_id: "PO date Cannot be Later than Scheduled date" do
     reference 'advance_scheduled_date'
     error_message "Scheduled Date cannot be before Purchase Order Date"
-    rule Rules::Builder['advance_scheduled_date'].lt(entity: "created_at")
+    rule Rules::Builder['created_at'].gt(entity: "advance_scheduled_date")
+  end
+
+  validation validation_id: "po amount cannot be less than 0" do
+    reference 'items_summary.po_balance_due'
+    error_message "Balance payable cannot be less than 0"
+    rule Rules::Builder['items_summary.po_balance_due'].lt(value: 0)
+  end
+
+  validation validation_id: "discount can't be more than 100 if discount_type is percentage" do
+    reference 'items.discount'
+    error_message "Discount cannot be more than 100 if discount type is Percentage"
+    rule Rules::Builder['discount_type_id_value'].eq(value: 'Percentage').and(Rules::Builder['items.discount'].gt(value: 100))
+  end
+
+  validation validation_id: "advance amount cannot be less than 0" do
+    reference :po_requested_advance_amount
+    error_message "Advance amount cannot be less than 0"
+    rule Rules::Builder[:po_requested_advance_amount].eq(value: 0).and(Rules::Builder[:advance_amount_required].eq_any(value: true))
+  end
+
+  validation validation_id: "Item taxable amount should not be less than 0" do
+    reference 'items.item_taxable_amount'
+    error_message "Item taxable amount cannot be less than 0"
+    rule Rules::Builder['items.item_taxable_amount'].lt(value: 0).or(Rules::Builder['items.item_taxable_amount'].eq(value: 0))
+  end
+
+  validation validation_id: "Items > Net amount cannot be less than 0" do
+    reference 'items.item_net_amount'
+    error_message "Item Net amount cannot be less than or equal to 0"
+    rule Rules::Builder['items.item_net_amount'].lt(value: 0).or(Rules::Builder['items.item_net_amount'].eq(value: 0))
   end
 
   # validation validation_id: "Advance Amount Can not be greater than Balance Payable" do
@@ -690,27 +739,38 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
     action :visible, true
   end
 
-  condition condition_id: "Items quantity should not be editable once unless in editable status" do
+  condition condition_id: "Items quantity  not be editable once unless in editable status" do
     reference :entity, 'items.quantity'
-    rule Rules::Builder[:purchase_order_status_id].not_eq(*PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).map { |item| { value: item } })
+    # rule Rules::Builder[:purchase_order_status_id].not_eq(*PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).map { |item| { value: item } })
+    rule Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:open)).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:retracted))).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:rejected)))
     action :editable, false
   end
 
   condition condition_id: "Items discount amount should not be editable once unless in editable status" do
     reference :entity, 'items.item_discount_amount'
-    rule Rules::Builder[:purchase_order_status_id].not_eq(*PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).map { |item| { value: item } })
+    # rule Rules::Builder[:purchase_order_status_id].not_eq(*PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).map { |item| { value: item } })
+    rule Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:open)).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:retracted))).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:rejected)))
     action :editable, false
   end
 
   condition condition_id: "Items discount should not be editable once unless in editable status" do
     reference :entity, 'items.discount'
-    rule Rules::Builder[:purchase_order_status_id].not_eq(*PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).map { |item| { value: item } })
+    # rule Rules::Builder[:purchase_order_status_id].not_eq(*PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).map { |item| { value: item } })
+    rule Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:open)).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:retracted))).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:rejected)))
     action :editable, false
   end
 
   condition condition_id: "TDS rate should not be editable once unless in editable status" do
     reference :entity, :advance_tds_slab_id
-    rule Rules::Builder[:purchase_order_status_id].not_eq(*PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).map { |item| { value: item } })
+    # rule Rules::Builder[:purchase_order_status_id].not_eq(*PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).map { |item| { value: item } })
+    rule Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:open)).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:retracted))).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:rejected)))
+    action :editable, false
+  end
+
+  condition condition_id: "conversion rate should not be editable once unless in editable status" do
+    reference :entity, :conversion_rate
+    # rule Rules::Builder[:purchase_order_status_id].not_eq(*PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).map { |item| { value: item } })
+    rule Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:open)).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:retracted))).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:rejected)))
     action :editable, false
   end
 end

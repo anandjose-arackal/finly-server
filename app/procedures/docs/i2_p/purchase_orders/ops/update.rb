@@ -51,7 +51,7 @@ class Docs::I2P::PurchaseOrders::Ops::Update < Transactions::API
     end
 
     # This validation should be added in the form but tried all combination of fields, it just isn't working
-    if params[:params][:po_balance_due].to_f < params[:params][:po_requested_advance_amount].to_f
+    if params[:params][:po_balance_due].to_f < params[:params][:po_requested_advance_amount].to_f && params[:params][:advance_amount_required]
       add_message options, :error, :base, "Advance amount can not be more than balance payable"
       errors = true
     end
