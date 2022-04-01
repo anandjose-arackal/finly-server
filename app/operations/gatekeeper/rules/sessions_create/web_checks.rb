@@ -11,6 +11,7 @@ Gatekeeper::Checker.new 'On Web Authentication' do
       # Web specific checks
       rule 'X-Finly-RP is required for all web requests' do
         headers = RequestStoreUtil.current_request.headers
+        next if RequestStoreUtil.current_session&.access_token&.authentication_type == "sso"
         next if headers['X-Finly-RP'].present?
         level 5
         response_code 401
