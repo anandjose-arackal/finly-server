@@ -18,6 +18,7 @@ Gatekeeper::Checker.new 'On Web Authentication' do
       end
 
       rule 'Associated device is required for all requests' do
+        next if RequestStoreUtil.current_session&.access_token&.authentication_type == "sso"
         if RequestStoreUtil.current_session.user_device.blank?
           response_code 401
           level 5
@@ -71,6 +72,7 @@ Gatekeeper::Checker.new 'On Web Authentication' do
 
     section 'UserSession' do
       rule 'User agent is required for a session to be created' do
+        next if RequestStoreUtil.current_session&.access_token&.authentication_type == "sso"
         if RequestStoreUtil.current_request.user_agent.nil?
           level 10
           response_code 401
