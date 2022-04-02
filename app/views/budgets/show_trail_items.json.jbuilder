@@ -1,8 +1,9 @@
-expenses = @op["result"][:expenses] || []
-payments = @op["result"][:payments] || []
-purchase_request_items = @op["result"][:purchase_request_items] || []
-purchase_order_items = @op["result"][:purchase_order_items] || []
-invoice_items = @op["result"][:invoice_items] || []
+
+expenses = @op["result"][:expenses] rescue []
+payments = @op["result"][:payments] rescue []
+purchase_request_items = @op["result"][:purchase_request_items] rescue []
+purchase_order_items = @op["result"][:purchase_order_items] rescue []
+invoice_items = @op["result"][:invoice_items] rescue []
 
 # # TODO - change the below code to reflect the actual data
 # expenses = Expense.all.reorder(created_at: :desc).limit(10)

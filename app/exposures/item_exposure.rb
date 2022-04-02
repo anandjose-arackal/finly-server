@@ -54,4 +54,8 @@ class ItemExposure < Exposures::API
     end
   end
 
+  attribute :gl_code do
+    record.category&.gl_code
+  end
+
 end

@@ -18,7 +18,7 @@ class Admin::Users::Index < Admin::Users::Base
   end
 
   def init
-    self.users = User.all.includes_for_admin_panel
+    self.users = User.all.include_soft_deleted.includes_for_admin_panel
     self.companies = Company.all
   end
 

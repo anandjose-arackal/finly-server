@@ -83,18 +83,21 @@
 class PurchaseOrder < ApplicationRecord
   attr_accessor :skip_callback
   include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport, ControllingUser, GetCurrency
-  include Sequenced::ActsAsSequenced
-  # include SearchIndex::Concerns::Document
-  include Searchkick::Api
   include Concerns::ErpSyncConcern
+  include LiquidDroppable
+  include Exposures::Model::Exposable
+  include Sequenced::ActsAsSequenced
+  include FormsHelper
   include ErpSyncable
+  include Searchkick::Api
 
-
-  acts_as_sequenced column: :po_number, purpose: :purchase_order, editable: false, prefix: 'PO/{fiscal_year_start}-{fiscal_year_end}/', min_length: 4
+  # # Multicurrency Support
+  # include Monetizable
+  acts_as_sequenced column: :po_number, purpose: :purchase_order, editable: false, prefix: 'PO', min_length: 4
 
   alias_attribute :created_by_id, :user_id
 
-  default_scope { order(created_at: :desc) }
+  default_scope { order(po_number: :desc, created_at: :desc) }
 
   belongs_to :company, optional: true
   belongs_to :user, optional: true
@@ -107,11 +110,13 @@ class PurchaseOrder < ApplicationRecord
   belongs_to :payment_term, optional: true
   belongs_to :procurement_term, optional: true
   belongs_to :status, optional: true, class_name: 'PurchaseOrderStatus', foreign_key: :purchase_order_status_id
+  belongs_to :purchase_order_status, optional: true, class_name: 'PurchaseOrderStatus'
   belongs_to :advance_amount_status, optional: true
   belongs_to :department, optional: true
   belongs_to :sub_department, optional: true, class_name: "Department", foreign_key: :sub_department_id
   belongs_to :cost_center, optional: true
   belongs_to :gst_type, optional: true
+  belongs_to :vendor_country, optional: true, class_name: 'Country'
   belongs_to :base_currency, optional: true, class_name: 'Currency'
   belongs_to :reporting_currency, optional: true, class_name: 'Currency'
 
@@ -157,6 +162,7 @@ class PurchaseOrder < ApplicationRecord
 
   has_many :trails, as: :parent
   has_many :purchase_request_items
+  has_many :form_custom_fields, class_name: 'FormCustomField', as: :document, dependent: :destroy
 
   has_many :quotations, dependent: :destroy
 
@@ -533,8 +539,13 @@ class PurchaseOrder < ApplicationRecord
     where.not(purchase_order_status_id: PurchaseOrderStatus.id_for(:voided))
   }
 
+  # scope :includes_for_contract, -> {
+  #   includes(:created_by, :invoice_type, :form_custom_fields, :items)
+  # }
+
   before_save :calculate_line_items
   after_create :purchase_request_tasks
+  after_save :sync_amounts, unless: :skip_callback
   after_save :set_currency_for_amount, unless: :skip_callback
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
@@ -542,6 +553,24 @@ class PurchaseOrder < ApplicationRecord
   before_create :set_currency
 
   ransack_scopes :with_status_ids, :with_grn_status_id
+
+  # backward compatible fields
+  def po_balance_due
+    forms_enabled ? self[:po_balance_due].to_f : self.balance_amount.value.to_f
+  end
+
+  def reporting_po_balance_due
+    forms_enabled ? self[:reporting_po_balance_due].to_f : self.balance_amount.value.to_f
+  end
+
+  def po_sub_total_amount
+    forms_enabled ? self[:po_sub_total_amount].to_f : self.total_after_tax.value.to_f
+  end
+
+  def reporting_po_sub_total_amount
+    forms_enabled ? self[:reporting_po_sub_total_amount].to_f : self.total_after_tax.value.to_f
+  end
+
   
   def set_currency
     self.reporting_currency_id = self.company.reporting_currency.id if self.reporting_currency_id.blank? 
@@ -814,7 +843,11 @@ class PurchaseOrder < ApplicationRecord
   end
 
   def total_adv_amount
-    (self.advance_amount&.value + self.advance_tds_amount&.value) rescue nil
+    if user.po_form_enabled
+      self.po_requested_advance_amount
+    else
+      (self.advance_amount&.value + self.advance_tds_amount&.value) rescue nil
+    end
   end
 
   def entity_date
@@ -835,10 +868,12 @@ class PurchaseOrder < ApplicationRecord
         original_amount: precision_value(self.total_after_tax&.value),
         total_advance_amount: total_adv_amount,
         # advance_amount: precision_value(self.advance_amount&.value),
-        payable_advance_amount: precision_value(self.advance_amount&.value),
-        balance_due: precision_value(self.balance_amount&.value),
+        payable_advance_amount: payable_advance_amount.round(2),
+        reporting_payable_advance_amount: reporting_payable_advance_amount.to_f.round(2),
+        balance_due: balance_due,
+        conversion_rate: self.conversion_rate,
         procurement_id: self.procurement_id,
-        tds_amount: self.advance_tds_amount&.value,
+        tds_amount: user.po_form_enabled ? self.po_advance_tds_amount.to_f : self.advance_tds_amount&.value,
         tds: self.advance_tds_slab&.tds,
         tds_slab_id: self.advance_tds_slab_id,
         tds_slab_name: self.advance_tds_slab&.name,
@@ -846,8 +881,8 @@ class PurchaseOrder < ApplicationRecord
         cost_center: self.cost_center.as_json,
         po_number: self.po_number,
         delivery_location: self.delivery_location.as_json,
-        requested_advance_amount: self.requested_advance_amount&.value,
-        purchase_order_total: precision_value(self.balance_amount&.value),
+        requested_advance_amount: user.po_form_enabled ? self.po_requested_advance_amount.to_f : self.requested_advance_amount&.value,
+        purchase_order_total: user.po_form_enabled ? precision_value(self.po_balance_due) : precision_value(self.balance_amount&.value),
         editable: true,
         attachments: self.attachments.map(&:as_json),
         # since in FE as of now key name expected is invoice_attachment,
@@ -859,7 +894,9 @@ class PurchaseOrder < ApplicationRecord
             file_name: self.attachments.first&.file_file_name
         },
         base_currency: get_base_currency,
-        reporting_currency: get_reporting_currency
+        reporting_currency: get_reporting_currency,
+        pr_forms_enabled: self.user.purchase_request_form_enabled,
+        non_po_invoice_form_enabled: forms_enabled
         # balance_due: {
         #   value: precision_value(self.balance_amount&.value),
         #   id: self.balance_amount&.id,
@@ -869,6 +906,18 @@ class PurchaseOrder < ApplicationRecord
   end
 
   # Public Method
+
+  def payable_advance_amount
+    user.po_form_enabled ? (self.po_requested_advance_amount.to_f - self.po_advance_tds_amount.to_f) : precision_value(self.advance_amount&.value)
+  end
+
+  def reporting_payable_advance_amount
+    user.po_form_enabled ? (self.payable_advance_amount * self.conversion_rate) : 0
+  end
+
+  def balance_due
+    user.po_form_enabled ? precision_value(self.po_balance_due) : precision_value(self.balance_amount&.value)
+  end
 
   def process_line_item_calculation(skip_adv_calculation = false)
     calculate_line_items(skip_adv_calculation)
@@ -949,17 +998,112 @@ class PurchaseOrder < ApplicationRecord
     PurchaseOrderStatus.ids_for(:processing).include?(purchase_order_status_id)
   end
 
+  def form_klass
+    Forms::Router.klass(:purchase_orders)&.name
+  end
+
+  def retrieve_value(entity)  
+    return get_discount_type if entity.entity_key == 'discount_type_id'
+    return 'Awaiting approval' if entity.entity_key == 'purchase_order_status_id' && self.purchase_order_status_id == PurchaseOrderStatus.id_for(:processing) && can_really_approve?
+    send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
+  end
+
+  def get_discount_type
+    if discount_type_id == 1
+      'Percentage' 
+    else
+      'Amount'
+    end
+  end
+
+  def po_budget_contributions_before_update
+    if self.company.enforce_budget_configuration.enforce_purchase_order_budget?
+      op = BudgetManager::BudgetLimitValidator::PurchaseOrder.({invoice: self, ignore_unbudgetables: true, current_user: self.created_by })
+      op['result'][:budget_contributions] rescue {}
+    end
+    {}
+  end
+
+  def purchase_order_budgets
+    op = BudgetManager::BudgetsCalculator::ApplicableBudgets.({document: self, current_user: User.first})
+    budgets = op["result"][:budgets]
+    budgets
+  end
+
+  def forms_enabled
+    if RequestStoreUtil.current_user.blank?
+      feature_flag_enabled = true
+    else
+      feature_flag_enabled = PurchaseOrderToggle.new(RequestStoreUtil.current_user).enabled?
+    end
+    feature_flag_enabled && self.form_migrated
+  end
+
+  def forms_flag_enabled
+    RequestStoreUtil.current_user.blank? ? true : PurchaseOrderToggle.new(RequestStoreUtil.current_user).enabled?
+  end
+
+  def sync_amounts
+    if forms_enabled
+      self.skip_callback = true
+      base_currency_id = get_base_currency&.id
+      
+
+      if self.procurement.invoices.count == 0
+
+        amounts_attributes_map.each do |key, value|
+          amount_value = self.send(key)
+          amount_attr = self.send("#{value}_id")
+          if amount_attr.present?
+            Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: base_currency_id)
+          else
+            amount_id = Amount.create(value: amount_value, currency_id: base_currency_id).id
+            self.send("#{value}_id=", amount_id)
+          end
+        end
+
+        amount_direct_attribute_map.each do |key, value|
+          amount_value = self.send(key)
+          self.send("#{value}=", amount_value)
+        end
+      end
+      self.save
+    end
+  end
+
+  def amounts_attributes_map
+    # todo - I2P change it to converted values post multicurrency setup
+    {  
+      po_discount_amount: 'discount_amount',
+      po_taxable_amount: 'total_before_tax',
+      po_tax_amount: 'tax_amount',
+      po_sub_total_amount: 'total_after_tax',
+      po_balance_due: 'balance_amount',
+
+      # Purchase Order Advance
+      # po_requested_advance_amount: 'requested_advance_amount',
+      # po_advance_tds_amount: 'advance_tds_amount',
+      # po_advance_amount: 'advance_amount'
+    }
+  end
+
+  def amount_direct_attribute_map
+    {
+      po_roundoff_amount: 'roundoff_amount'
+    }
+  end
+
+  def payment_ticket_policies(user)
+    params = {}
+    params[:filter_role_id] = UserRole.id_for(:bank_payment_request_initiator)
+    result = Policy::VendorPayments::Index.(user, params)
+    pt_policies = result.policies rescue Policy.none
+    pt_policies
+  end
+
   private
 
-  # def populate_advance_amount
-  #   if self.advance_amount.blank?
-  #     # no change in net amount
-  #     self.advance_amount = Amount.new(value: 0, currency_id: 1)
-  #     return
-  #   end
-  # end
-
-  def calculate_line_items(skip_adv_calculation = false)
+  def calculate_line_items(skip_adv_calculation = false, params = {})
     total_before_tax_amount = 0
     total_after_tax_amount = 0
     tax_amount = 0
@@ -1045,9 +1189,11 @@ class PurchaseOrder < ApplicationRecord
           item.total_amount = Amount.new(value: item_total_amount, currency_id: get_base_currency.id)
         end
 
-
-        # end
+        item.gl_code = item.category&.gl_code
+        
       end
+
+      calculate_item_total_amounts(item) if params[:associated_resource] == "purchase_request_item"
     end
 
     roundoff_amount = self.roundoff_amount.to_f
@@ -1115,8 +1261,6 @@ class PurchaseOrder < ApplicationRecord
       self.advance_amount = Amount.new(value: 0, currency_id: get_base_currency.id)
       self.requested_advance_amount = Amount.new(value: 0, currency_id: get_base_currency.id)
     end
-
-    # self.save
   end
 
   def budget_trail_entry
@@ -1227,7 +1371,7 @@ class PurchaseOrder < ApplicationRecord
     {
         # purchase_order_id: pr_item.purchase_order_id, inventory_line_item_id: pr_item.item_id, product_id: nil, description: pr_item&.item&.description, hsn_sac: pr_item&.item&.hsn_sac, quantity: pr_item.quantity, rate: pr_item&.item&.rate, tax: nil, tds: nil, discount: nil, tax_amount_id: nil, tds_amount_id: nil, discount_amount_id: nil, total_amount_id: pr_item.estimated_amount_id, delivery_date: nil, comment: nil, created_at: nil, updated_at: nil, delivered: 0, accepted: 0, rejected: 0, category_id: nil, cost_center_id: nil, is_deleted: false, account: nil, tax_rate_id: nil, deleted_at: nil, unit_of_measurement: nil
 
-        purchase_order_id: pr_item.purchase_order_id, inventory_line_item_id: pr_item.item_id, product_id: nil, description: pr_item&.item&.description, hsn_sac: item_hsn_sac, quantity: pr_item.quantity, rate: pr_item&.per_unit_estimated_amount&.value, purchase_request_item_id: pr_item.id, tax_rate_id: pr_item&.item&.tax_rate_id, unit_of_measurement: pr_item.unit_of_measurement, department_id: pr_item.department_id, cost_center_id: pr_item.cost_center_id, category_id: pr_item.category_id, comment: pr_item.purpose
+        purchase_order_id: pr_item.purchase_order_id, inventory_line_item_id: pr_item.item_id, product_id: nil, description: pr_item&.item&.description, hsn_sac: item_hsn_sac, quantity: pr_item.quantity, rate: pr_item&.per_unit_estimated_amount&.value, purchase_request_item_id: pr_item.id, tax_rate_id: pr_item&.item&.tax_rate_id, unit_of_measurement: pr_item.unit_of_measurement, department_id: pr_item.department_id, cost_center_id: pr_item.cost_center_id, category_id: pr_item.category_id, comment: pr_item.purpose, item_number: pr_item&.item&.item_number, product_type_id: pr_item&.item&.product_type_id
     }
   end
 
@@ -1245,7 +1389,8 @@ class PurchaseOrder < ApplicationRecord
       perform_status_transition({document_name: 'purchase_request', status_to: 'po_created', user: user, params: parameters, item_ids: item_ids})
       associate_purchase_request_items(params: parameters, user: user, item_ids: item_ids)
       self.reload
-      calculate_line_items(true)
+      calculate_line_items(true, parameters)
+      calculate_summary_amounts
       self.save
     end
   end
@@ -1329,5 +1474,48 @@ class PurchaseOrder < ApplicationRecord
     end
     self.skip_callback = true
     self.save
+  end
+
+  # Amounts calculation on creating from PR items
+  SUMMARY_ATTRIBUTES = {
+    'po_discount_amount': 'discount_amount',
+    'po_tax_amount': 'tax_amount',
+    'po_sub_total_amount': 'total_after_tax',
+    'po_balance_due': 'balance_amount',
+    'po_taxable_amount': 'total_before_tax'
+  }.freeze
+
+  ITEM_ATTRIBUTES = {
+    'item_discount_amount': 'discount_amount',
+    'item_taxable_amount': 'taxable_amount',
+    'item_tax_amount': 'tax_amount',
+    'item_net_amount': 'total_amount'
+  }.freeze
+
+  def calculate_item_total_amounts(item)
+    ITEM_ATTRIBUTES.each do |attr, value|
+      item.send("#{attr}=", item.send(value)&.value)
+      item.send("reporting_#{attr}=", reporting_currency_amount(item.send(value)&.value))
+    end
+
+    # values not available through associations
+    item.item_gross_amount = item.item_taxable_amount + item.item_discount_amount
+    item.reporting_item_gross_amount = item.reporting_item_taxable_amount + item.reporting_item_discount_amount
+    item.item_rate = reporting_currency_amount(item.rate)
+  end
+
+  def calculate_summary_amounts
+    SUMMARY_ATTRIBUTES.each do |attr, value|
+      self.send("#{attr}=", self.send(value)&.value)
+      self.send("reporting_#{attr}=", reporting_currency_amount(self.send(value)&.value))
+    end
+
+    # values not available through associations
+    self.po_gross_amount = self.po_taxable_amount + self.po_discount_amount
+    self.reporting_po_gross_amount = self.reporting_po_taxable_amount + self.reporting_po_discount_amount
+  end
+
+  def reporting_currency_amount(value)
+    return (value.to_f * self.conversion_rate.to_f).round(2)
   end
 end

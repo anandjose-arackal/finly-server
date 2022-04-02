@@ -2,6 +2,8 @@ class Docs::P2P::PurchaseRequests::FilterConfig < Filters::API
 
   index_builder Docs::P2P::PurchaseRequests::Index
 
+  STATUS_TYPES = PurchaseRequestStatus.all.map{ |pos| {id: pos.id, name: pos.name.titleize } }
+
   attribute :order_number, label: 'Purchase Request ID', type: :text, simple: true
   attribute :policy_id, type: :dropdown, simple: true, choices: Choices[:lookup].('policies')
   attribute :created_at, type: :datetime, simple: true
@@ -16,5 +18,5 @@ class Docs::P2P::PurchaseRequests::FilterConfig < Filters::API
   attribute :creator_id, label: "Created By", type: :dropdown, choices: Choices[:lookup].("users")
   attribute :controlling_level_level_number, label: "Controlling Level", type: :number, simple: true
   attribute :controlling_user, label: "Controlling User", type: :dropdown, simple: true, choices: Choices[:lookup].("users")
-
+  attribute :purchase_request_status_id, type: :dropdown, simple: false, choices: Choices[:list].(*STATUS_TYPES)
 end

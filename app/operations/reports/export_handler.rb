@@ -32,7 +32,7 @@ class Reports::ExportHandler < Reports::Show
       base_path = "#{Rails.root}/public/system"
       FileUtils::mkdir_p base_path
       self.report.expenses.each do |expense|
-        expense.receipts.each do |receipt|
+        expense.receipts.includes(:document_slices).each do |receipt|
           if receipt.is_pdf?
             # As ImageMagick was throwing an exception while trying to read the file from S3, resorted to this alternate.
             tempfile = Tempfile.new('temp_export')

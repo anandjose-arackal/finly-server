@@ -8,6 +8,13 @@ class BudgetManager::BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProc
       trail_id = nil
     end
 
+    tax_amount_value = purchase_order_item.tax_amount&.value.to_f
+    total_amount_value = purchase_order_item.total_amount&.value.to_f
+    if purchase_order_item.parent_forms_enabled
+      tax_amount_value = purchase_order_item&.reporting_item_tax_amount.to_f
+      total_amount_value = purchase_order_item&.reporting_item_net_amount.to_f
+    end
+
     self.trail_hash = {
         id: trail_id,
         entity: purchase_order_item,
@@ -26,10 +33,10 @@ class BudgetManager::BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProc
         remaining_amount_after_tax_value: purchase_order_item.after_tax_amount,
         remaining_quantity: purchase_order_item.quantity,
         revised: purchase_order_item.purchase_order.po_revised?,
-        tax_amount_value: purchase_order_item.tax_amount&.value.to_f,
+        tax_amount_value: tax_amount_value,
         amount_attributes: {
             id: trail&.amount&.id,
-            value: purchase_order_item.total_amount&.value,
+            value: total_amount_value,
             currency_id: purchase_order_item.total_amount&.currency_id
         },
         amount_before_tax_attributes: {

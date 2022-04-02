@@ -204,7 +204,7 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
   # end
 
   def self.is_accessable( user )
-    user.present? && user.non_po_invoice_form_enabled 
+    user.present? && (user.non_po_invoice_form_enabled || user.po_invoice_form_enabled )
   end
 
 end

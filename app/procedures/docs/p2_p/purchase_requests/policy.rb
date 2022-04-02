@@ -1,5 +1,18 @@
 class Docs::P2P::PurchaseRequests::Policy < ApplicationPolicy
 
+
+  def create?
+    user.present?
+  end
+
+  def show?
+    user.present? && user.company.id == record.company_id
+  end
+
+  def update?
+    user.present?
+  end
+
   def review?
     return false if user.blank?
     return false unless record.purchase_request_status_id == PurchaseRequestStatus.id_for(:awaiting_approval)

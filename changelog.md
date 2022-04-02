@@ -1,9 +1,6 @@
 # Changelog
 All notable changes to this project will be documented in this file. Always add new logs to 
 beginning of this file.
-
-## 2021-11-24
- - Removed Pdf slice and storing logic, deprecated logic as we move to bg report creation
 ## 2021-09-30
  - Feature: Macro API Report Processor group added
  - Feature: Resolver For Report Processor group Added
@@ -34,8 +31,10 @@ beginning of this file.
   - Fix: two way sync, update and column issue fix.
 
 ## 2021-05-17
-  - Feat: Updating migration, fixing lookup issue and stabilizing the invoice forms.
+  - Fix: Currency and tax_type lookup fix.
 
+## 2021-05-17
+  - Feat: Updating migration, fixing lookup issue and stabilizing the invoice forms.
 
 ## 2021-05-17
 - Fix: Added filter_unique_check method for models to use it for scoping records for uniqueness check. And updated forms unique validation to use the same

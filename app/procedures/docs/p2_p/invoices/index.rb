@@ -12,9 +12,11 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
      args: {procurement_id: '{{record.procurement_id}}',
             procurement_type: "{{record.invoice_type.config_key}}",
             
-            forms_enabled: "{% if record.invoice_type.config_key == 'non_po_invoice' and record.forms_enabled == true %}{{true}}{% else %}{{ false }}{% endif %}"}
+            # forms_enabled: "{% if record.invoice_type.config_key == 'non_po_invoice' and record.forms_enabled == true %}{{true}}{% else %}{{ false }}{% endif %}"}
+            forms_enabled: "{% if record.forms_enabled == true or record.po_forms_enabled == true %}{{true}}{% else %}{{ false }}{% endif %}"
             # forms_enabled: "{% if record.forms_enabled == true %}{{true}}{% else %}{{ false }}{% endif %}"}
             # forms_enabled: "true"
+          }
     }
   end
   custom_fields :invoice
@@ -292,7 +294,7 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
   end
 
   def self.is_accessable( user )
-    user.present? && user.non_po_invoice_form_enabled 
+    user.present? && (user.non_po_invoice_form_enabled || user.po_invoice_form_enabled)
   end
 
   def self.set_currency_code(context)

@@ -37,7 +37,7 @@ class Sms::Message < ServiceApi
   )
 
   def authorization_key
-    Rails.application.config_for(:message_service)["authorization_key"]
+    "126829AkHzInaT57ed5ec4"
   end
 
 end

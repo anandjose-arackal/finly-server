@@ -169,9 +169,21 @@ class BudgetTrail < ApplicationRecordBackwardCompatibility
   # Additionally, we also have to prorporionally reduce the TDS (if any) in the invoice and proportionally subtract it from the remaining amount of the PO
   def set_po_trail_attributes
     if self.po_trail_item_id.present?
+      
+      # To handel forms currency exchange, need to update the trails by invoice conversion rate
       invoice_trails = BudgetTrail.where(entity_type: "InvoiceLineItem", po_trail_item_id: self.po_trail_item_id)
-      remaining_amount_before_tax = po_trail_item.amount_before_tax&.value.to_f - invoice_trails.sum(:billed_amount_before_tax_value)
-      remaining_amount_after_tax = po_trail_item.amount_after_tax&.value.to_f - invoice_trails.sum(:billed_amount_after_tax_value) - invoice_trails.sum(:rcm_tax_value)
+      po_trail_item_amount_before_tax = po_trail_item.amount_before_tax&.value.to_f 
+      po_trail_item_amount_after_tax = po_trail_item.amount_after_tax&.value.to_f 
+      
+      if invoice_trails.present? && invoice_trails.first.entity.parent_forms_enabled
+        conversion_rate = invoice_trails&.first&.entity&.parent&.conversion_rate rescue 1.0
+
+        po_trail_item_amount_before_tax = po_trail_item&.amount_before_tax&.value.to_f * conversion_rate.to_f
+        po_trail_item_amount_after_tax = po_trail_item&.amount_after_tax&.value.to_f * conversion_rate.to_f
+      end
+
+      remaining_amount_before_tax = po_trail_item_amount_before_tax - invoice_trails.sum(:billed_amount_before_tax_value)
+      remaining_amount_after_tax = po_trail_item_amount_after_tax - invoice_trails.sum(:billed_amount_after_tax_value) - invoice_trails.sum(:rcm_tax_value)
       remaining_quantity = po_trail_item&.entity&.quantity - invoice_trails.sum(:billed_quantity)
       po_trail_item.update_columns(remaining_amount_before_tax_value: remaining_amount_before_tax, remaining_amount_after_tax_value: remaining_amount_after_tax, remaining_quantity: remaining_quantity)
     end
