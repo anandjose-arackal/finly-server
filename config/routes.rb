@@ -3039,6 +3039,7 @@ Rails.application.routes.draw do
     end
   end
 
+
   ################### Vendor Payments APIs end ########################
 
   ################### AppSmith APIs start ########################
@@ -4197,6 +4198,24 @@ Rails.application.routes.draw do
   post 'invoice_forms/save_and_submit', to: "invoice_forms#save_and_submit"
   resources :invoice_forms, only: [:show, :update]
 
+  ######### NEW PURCHASE ORDER ###################
+  post 'purchase_order_forms/save_and_submit', to: "purchase_order_forms#save_and_submit"
+  resources :purchase_order_forms, only: [:show, :update]
+  
+  ######### NEW PO INVOICE FORMS ###################
+  post 'po_invoice_forms/save_and_submit', to: "invoice_forms#save_and_submit"
+  get 'po_invoice_forms/:id', to: "invoice_forms#show"
+  put 'po_invoice_forms/:id(.:format)', to: "invoice_forms#update"
+  
+  # resources :po_invoice_forms, only: [:show, :update]
+
+  ######### NEW PURCHASE REQUEST FORMS ###################
+  resources :purchase_request_forms, only: [:show, :update]
+  post 'purchase_request_forms/save_and_submit', to: "purchase_request_forms#save_and_submit"
+  post 'purchase_request_forms/create_and_submit', to: "purchase_request_forms#create_and_submit"
+  post 'purchase_request_forms/create', to: "purchase_request_forms#create"
+
+
   ######### Rate Contract API start #############
   resources :rate_contracts do
     collection do
@@ -4243,9 +4262,10 @@ Rails.application.routes.draw do
   # resources :form_entities
   get 'forms', to: 'forms#index'
   get 'forms/entities/:entity_id', to: 'forms#entity_config'
+  
   get 'forms/:route/config', to: 'forms#form_config'
-
   get 'forms/:route/dependencies', to: 'forms#form_dependencies'
+  
   post 'forms/choices', to: 'forms#form_entity_choices'
   post 'forms/lookup_details', to: 'forms#form_lookup_details'
   post 'forms/:route/predict', to: 'forms#form_prediction'

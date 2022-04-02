@@ -11,6 +11,7 @@ class Forms::Ops::Dependencies < Transactions::API
   pass :init_triggers
   pass :init_choice_dependencies
   pass :init_predictions
+  pass :init_section_positions
 
   def find_form(context, params:, current_user:, **)
     result = Forms::Ops::Config.(params: params, current_user: current_user)
@@ -117,6 +118,21 @@ class Forms::Ops::Dependencies < Transactions::API
         }
       }
     end
+  end
+
+  def init_section_positions(context, dependencies:, model:, **)
+    dependencies[:section_positions] = []
+    position = 0
+    model.sections.where.not(section_id: ['status', 'attachments']).sort_by(&:created_at).each do |section|
+      position_details = { 
+        section_key: section.section_id,
+        position: position,
+        display_name: section.display_name,
+      }
+      position += 1
+      dependencies[:section_positions] << position_details
+    end
+    dependencies[:section_positions]
   end
 
 end

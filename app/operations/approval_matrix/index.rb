@@ -10,7 +10,7 @@ class ApprovalMatrix::Index < BaseOperation
     when 'vendors'
       role = :vendor_creator
       self.provider_name = 'YesBankVendorProvider'
-    when 'invoices'
+    when 'invoices', 'po_invoices'
       document = current_user.company.inward_invoices.find_by(params[:document_id])
 
       self.provider_name = document.get_invoice_provider_name
@@ -24,10 +24,21 @@ class ApprovalMatrix::Index < BaseOperation
       else
         # do nothing
       end
+    when 'purchase_orders', 'po'
+      role = :purchase_order_initiator
+      self.provider_name = 'PurchaseOrderProvider'
+    when 'purchase_requests'
+      role = :purchase_request_initiator
+      self.provider_name = 'PurchaseRequestProvider'
     end
 
     if role.present?
-      self.policies = Policy::VendorPayments::Index.(user, {filter_role_id: [UserRole.id_for(role)]}).policies
+      op = Policy::VendorPayments::Index.(user, {filter_role_id: [UserRole.id_for(role)]})
+      if user.company_admin? || user.auditor? || user.vendor_payments_admin?
+        self.policies = op.admin_policies
+      else
+        self.policies = op.policies
+      end
     else
       add_message :error, "Not able to retrieve approval matrix"
     end

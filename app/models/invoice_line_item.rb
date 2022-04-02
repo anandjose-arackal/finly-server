@@ -146,6 +146,7 @@ class InvoiceLineItem < ApplicationRecord
   belongs_to :tax_rate, optional: true
   belongs_to :cost_center, optional: true
   belongs_to :department, optional: true
+  belongs_to :product_type, optional: true, class_name: "ProductType"
 
   alias_method :items_department, :department
   alias_method :items_cost_center, :cost_center
@@ -329,20 +330,20 @@ class InvoiceLineItem < ApplicationRecord
 
   def cn_adjusted_amount_with_tax
     # applied_credit_notes = self.parent.credit_notes
-    # adjusted_amount = (applied_credit_notes.joins(:gross_receivable_amount).sum(:value) + applied_credit_notes.joins(:tax_amount).sum(:value)) * ((self.after_tax_amount) / (self.parent.amount_after_tax)) rescue 0
-    adjusted_amount = self.parent.credit_note_adjustments.joins(:amount).sum(:value) * ((self.after_tax_amount) / (self.parent.amount_after_tax))
+    adjusted_amount = (applied_credit_notes.joins(:gross_receivable_amount).sum(:value) + applied_credit_notes.joins(:tax_amount).sum(:value)) * ((self.after_tax_amount) / (self.parent.amount_after_tax)) rescue 0
     return 0 if adjusted_amount == 'NaN'
   end
 
   def cn_adjusted_amount_without_tax
     applied_credit_notes = self.parent.credit_notes
-    adjusted_amount = [(self.parent.credit_note_adjustments.joins(:amount).sum(:value) - applied_credit_notes.joins(:tax_amount).sum(:value)), 0].max * ((self.before_tax_amount) / (self.parent.amount_before_tax))
+
+    adjusted_amount = [(self.parent.credit_note_adjustments.joins(:amount).sum(:value) - applied_credit_notes.joins(:tax_amount).sum(:value)), 0].max * ((self.before_tax_amount) / (self.parent.amount_before_tax)) rescue 0
     return 0 if adjusted_amount == 'NaN'
   end
 
   def cn_tax_amount
     applied_credit_notes = self.parent.credit_notes
-    tax_amount = applied_credit_notes.joins(:tax_amount).sum(:value) * ((self.before_tax_amount) / (self.parent.amount_before_tax))
+    tax_amount = applied_credit_notes.joins(:tax_amount).sum(:value) * ((self.before_tax_amount) / (self.parent.amount_before_tax)) rescue 0
     return 0 if tax_amount == 'NaN'
   end
 
@@ -404,7 +405,7 @@ class InvoiceLineItem < ApplicationRecord
     }
   end
 
-  def retrieve_value(entity)    
+  def retrieve_value(entity)   
     send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
   end
 
@@ -415,7 +416,6 @@ class InvoiceLineItem < ApplicationRecord
     end
     invoice_forms_enabled
   end
-
 
   private
 
@@ -452,13 +452,6 @@ class InvoiceLineItem < ApplicationRecord
       self.skip_callback = true
       sync_to_old_structure
     end
-    
-    #   if parent.forms_enabled
-    #     sync_to_old_structure
-    #   else
-    #     sync_to_forms_structure
-    #   end
-    # end
   end
 
   def sync_to_old_structure
