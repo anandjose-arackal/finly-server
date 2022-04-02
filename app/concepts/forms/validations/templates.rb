@@ -143,11 +143,12 @@ class Forms::Validations::Templates
     end
   end
 
-  validates :min_items do |contract:, entity:, **|
+  validate :min_items do |contract:, entity:, **|
     if entity.options['min_items'].present? and entity.options['min_items'].to_i > 0
       contract.validate do
         value = send(entity.entity_key)
-        if value.to_s.length < entity.options['min_items'].to_i
+        value_length = value.is_a?(Array) ? value.size : value.to_s.length
+        if value_length < entity.options['min_items'].to_i
           errors.add entity.label, "must have atleast #{entity.options['min_items'].to_i} record"
         end
       end

@@ -95,13 +95,14 @@ json.trail do
 
         json.po_number item.po_number
         json.delivery_date item.delivery_date&.strftime("%b %d, %Y")
-        json.amount item&.balance_amount&.value
+        json.amount item&.po_balance_due
         json.items_count item.items.count
         json.revision true
         json.revision_for item.revised_po_id
         json.revision_of item.revision_of_id
         json.revision_number item.revision_number
         json.base_currency item.get_base_currency
+        json.forms_enabled item.forms_enabled
       end
 
     elsif item.is_a?(PurchaseOrder)
@@ -113,9 +114,10 @@ json.trail do
 
         json.po_number item.po_number
         json.delivery_date item.delivery_date&.strftime("%b %d, %Y")
-        json.amount item&.balance_amount&.value
+        json.amount item&.po_balance_due
         json.items_count item.items.count
         json.base_currency item.get_base_currency
+        json.forms_enabled item.forms_enabled
       end
 
     elsif item.is_a?(InwardDocument)
@@ -129,6 +131,9 @@ json.trail do
         json.payment_mode item.payment_mode
         json.bank_payment_order_id item&.payment_order&.bank_payment_request&.id
         json.base_currency item.bank_payment_request.base_currency
+        if item.bank_payment_request.payments.first&.parent_type == 'PurchaseOrder'
+          json.base_currency item.bank_payment_request.payments.first&.parent&.base_currency
+        end
         json.forms_enabled item&.parent&.forms_enabled if item.parent.is_a?(Invoice)
         json.status do
           json.id item.payment_status&.id

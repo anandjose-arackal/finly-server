@@ -44,6 +44,9 @@
 
 class Quotation < ApplicationRecord
 	include SoftDeletable
+  include Exposures::Model::Exposable
+  include FormsHelper
+
 	# include Sequenced::ActsAsSequenced
 
  #  	acts_as_sequenced column: :quotation_number, purpose: :quotation, editable: false, prefix: 'Q-'
@@ -59,21 +62,28 @@ class Quotation < ApplicationRecord
 
 	accepts_nested_attributes_for :attachments, allow_destroy: true
 
+  def retrieve_value(entity)  
+    send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
+  end
+
+  def parent_forms_enabled
+    purchase_order.forms_enabled
+  end
 
 	def as_json
 		{
 
-            id: self.id,
-            vendor_name: self.vendor_name,
-            vendor_location: self.vendor_location,
-            estimated_delivery_time: self.estimated_delivery_time,
-            total_amount: self.total_amount,
-            advance_amount: self.advance_amount,
-            credit_period: self.credit_period,
-            note: self.note,
-            selected: self.selected,
-            purchase_order: self.purchase_order_id
+        id: self.id,
+        vendor_name: self.vendor_name,
+        vendor_location: self.vendor_location,
+        estimated_delivery_time: self.estimated_delivery_time,
+        total_amount: self.total_amount,
+        advance_amount: self.advance_amount,
+        credit_period: self.credit_period,
+        note: self.note,
+        selected: self.selected,
+        purchase_order: self.purchase_order_id
 
-        }
+    }
 	end
 end

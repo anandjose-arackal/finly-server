@@ -494,7 +494,7 @@ class CreditNote < ApplicationRecord
   private
 
   def calculate_from_items_values
-    currency_id = company&.base_currency_id || 1
+    currency_id = self&.base_currency_id || 1
 
     # Gross Receivable Amount
     # Only picks from the items where item type is QTY Change / Price Drop
@@ -559,7 +559,7 @@ class CreditNote < ApplicationRecord
   end
 
   def calculate_from_item_methods
-    currency_id = company&.base_currency_id || 1
+    currency_id = self&.get_base_currency.id || 1
 
     # Gross Receivable Amount
     # gross_receivable_amount_value = items.map {|item| item.taxable_amount&.value}.compact.sum

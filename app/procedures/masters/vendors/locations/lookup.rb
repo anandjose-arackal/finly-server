@@ -7,5 +7,8 @@ class Masters::Vendors::Locations::Lookup < Lookup::API
   attribute :name, value: :location
   attribute :address
   attribute :gstin
+  attribute :poc_name
+  attribute :poc_mobile_number
+  attribute :poc_email
 
 end

@@ -6,7 +6,6 @@ class NonPoInvoiceMigrator
     
     ActsAsTenant.with_tenant(company) do
       documents = Invoice.where(invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)).where(company_id: company.id)
-      # documents = Invoice.where(id: 490).where(company_id: company.id)
 
       # FormCustomField.where(company_id: company_id).destroy_all
       form = Form.where(klass_name: 'Docs::P2P::Invoices::NonPo::Form', company_id: company_id).first

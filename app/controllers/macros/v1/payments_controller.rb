@@ -17,7 +17,7 @@ class Macros::V1::PaymentsController < BaseControllers::MacrosBase
         record_class: Payment
     ]
   end
-
+  
   def update_payments_utr
     endpoint Macros::UpdatePaymentsUtr::Update, args: [
       params: params.to_unsafe_h,

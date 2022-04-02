@@ -21,7 +21,7 @@
 #
 
 class RateContract < ApplicationRecord
-  include Sequenced::ActsAsSequenced
+  include Sequenced::ActsAsSequenced,GetCurrency
 
   acts_as_sequenced column: :rate_contract_number, purpose: :rate_contract, editable: false, prefix: 'RTCT-'
 

@@ -34,7 +34,7 @@ class Docs::P2P::Invoices::FilterConfig < Filters::API
 
 
   def self.is_accessable( user )
-    user.present? && user.non_po_invoice_form_enabled 
+    user.present? && (user.non_po_invoice_form_enabled || user.po_invoice_form_enabled)
   end
 
 end

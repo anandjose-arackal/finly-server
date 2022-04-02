@@ -49,11 +49,13 @@ json.payments do
     if credited_at.blank?
       bank_transaction = bank_transaction_class.find_by(reference_payment_id: payment.id)
       credited_at = bank_transaction&.created_at&.strftime("%B %d, %Y - %H:%M:%S") if bank_transaction.present?
+    else
+      credited_at = payment.processed_at&.strftime("%B %d, %Y - %H:%M:%S")
     end
+
     if (credited_at.present? && payment&.processed_at&.present?) || credited_at.blank?
       credited_at = payment&.processed_at&.strftime("%B %d, %Y - %H:%M:%S")
     end
-
 
     json.credited_at credited_at
     json.payment_notification_users payment&.parent&.payment_notification_users rescue nil
@@ -109,6 +111,9 @@ json.payments do
         json.advance_amount precision_value invoice&.advance_amount&.value.to_f
         json.tax_amount precision_value invoice&.tax_amount&.value.to_f
         json.tds_amount precision_value invoice&.tds_amount&.value.to_f
+        if invoice.forms_enabled
+          json.tds_amount precision_value invoice.display_tds_amount.to_f
+        end
         json.tax precision_value invoice.tax
         json.tds precision_value invoice.tds
         json.gst_type_id invoice.gst_type_id
@@ -146,7 +151,7 @@ json.payments do
         json.reporting_invoice_discount_amount precision_value invoice&.reporting_invoice_discount_amount.to_f
         json.invoice_tax_amount precision_value invoice&.invoice_tax_amount.to_f
         json.reporting_invoice_tax_amount precision_value invoice&.reporting_invoice_tax_amount.to_f
-        json.invoice_tds_amount precision_value invoice&.invoice_tds_amount.to_f
+        json.invoice_tds_amount precision_value invoice&.display_tds_amount.to_f
         json.reporting_invoice_tds_amount precision_value invoice&.reporting_invoice_tds_amount.to_f
         json.invoice_freight_amount precision_value invoice&.invoice_freight_amount.to_f
         json.reporting_invoice_freight_amount precision_value invoice&.reporting_invoice_freight_amount.to_f
@@ -229,6 +234,10 @@ json.payments do
         json.net_amount precision_value payment.amount&.value
         json.roundoff_amount 0
         json.balance_due payment.amount&.value
+        json.invoice_net_total_amount precision_value payment.amount&.value
+        json.base_currency payment.parent&.base_currency
+        json.reporting_currency payment.parent&.reporting_currency
+        json.forms_enabled payment.parent.forms_enabled
       end
     end
 
@@ -241,8 +250,10 @@ json.payments do
         # json.payable_amount payment.get_payable_amount
         json.payable_amount precision_value payment.amount.value
 
-        if payment.parent_type == 'Invoice'
+
+        if payment.parent_type == 'Invoice' || payment.parent_type == 'PurchaseOrder'
           conversion_rate = payment&.parent_details.with_indifferent_access[:conversion_rate].to_f rescue 1
+          json.conversion_rate conversion_rate
           json.reporting_payable_amount payment&.amount&.value.to_f * conversion_rate.to_f
         end
         if payment.parent&.is_a?(BbpsBill)

@@ -32,6 +32,6 @@ class Docs::PaymentTickets::FilterConfig < Filters::API
   custom_fields :invoice, prefix: :payment_order_payments_invoice
 
   def self.is_accessable( user )
-    user.present? && user.non_po_invoice_form_enabled 
+    user.present? && (user.non_po_invoice_form_enabled || user.po_invoice_form_enabled )
   end
 end
