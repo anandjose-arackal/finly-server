@@ -441,7 +441,7 @@ class Notification < ApplicationRecordBackwardCompatibility
           suffix = "/params={"
         else
           path = "procure_purchase_order/#{document.id}"
-          if document.form_enabled
+          if document.forms_enabled
             path = "procure_purchase_orders/#{document.id}"
           end
           suffix = "/params={\"procurement_id\":#{document.procurement_id}"
