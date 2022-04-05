@@ -314,6 +314,14 @@ class PurchaseOrder < ApplicationRecord
     where payment_term_id: ids
   }
 
+  scope :filter_base_currency, ->(ids) {
+    where base_currency_id: ids
+  }
+
+  scope :filter_reporting_currency, ->(ids) {
+    where reporting_currency_id: ids
+  }
+
   scope :filter_payable_advances, -> {
     where(purchase_order_status_id: [
         PurchaseOrderStatus.id_for(:approved),
