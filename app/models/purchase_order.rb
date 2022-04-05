@@ -93,7 +93,7 @@ class PurchaseOrder < ApplicationRecord
 
   # # Multicurrency Support
   # include Monetizable
-  acts_as_sequenced column: :po_number, purpose: :purchase_order, editable: false, prefix: 'PO', min_length: 4
+  acts_as_sequenced column: :po_number, purpose: :purchase_order, editable: false, prefix: 'PO/{fiscal_year_start}-{fiscal_year_end}/', min_length: 4
 
   alias_attribute :created_by_id, :user_id
 
@@ -943,6 +943,25 @@ class PurchaseOrder < ApplicationRecord
       filtered_item_ids = user.company.purchase_requests.joins(:purchase_request_items).where("purchase_request_items.id IN (?)", item_ids).pluck("purchase_request_items.id")
       return filtered_item_ids.uniq
     end
+  end
+
+  def get_form_based_next_sequence(seq_prefix)
+    forms_enabled = PurchaseOrderToggle.new(RequestStoreUtil.current_user).enabled?
+    return nil unless forms_enabled
+
+    po_form_class_name = Forms::Router.klass(:purchase_orders)&.name
+
+    po_form = Form.find_by(klass_name: po_form_class_name, company_id: self.company_id)
+    return nil unless po_form.present?
+
+    sequence_entity = (po_form.entities.where(type: 'FormEntity::AutoNumber').filter do |e|
+      e.config.dig("sequence", "prefix") == seq_prefix
+    end).first
+
+    return nil unless sequence_entity.present?
+
+    prefix, sequence = FormEntity::AutoNumber.fetch_autonumber(sequence_entity, self)
+    prefix + sequence
   end
 
 
