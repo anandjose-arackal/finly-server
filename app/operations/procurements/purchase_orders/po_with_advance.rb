@@ -18,6 +18,8 @@ class Procurements::PurchaseOrders::PoWithAdvance < Procurements::PurchaseOrders
     has_scope :filter_payable_advances, type: :boolean
     has_scope :filter_user_id
     has_scope :filter_po_advance_status
+    has_scope :filter_base_currency
+    has_scope :filter_reporting_currency
     # These two filters created because two different indexes requires data to be handles differently by design
     has_scope :po_advances_date, using: [:from, :to], type: :hash
     has_scope :due_date, using: [:from, :to], type: :hash
