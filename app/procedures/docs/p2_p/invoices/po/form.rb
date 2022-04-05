@@ -34,13 +34,13 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
       item_net_amount: '{% if form.rcm_enabled == true %}{{ row.item_taxable_amount | default: 0 | round: 2 }}{% else %}{{ row.item_taxable_amount | plus: row.item_tax_amount | default: 0 | round: 2 }}{% endif %}',
 
       # CONVERTED VALUES
-      reporting_item_gross_amount: '{{ row.item_gross_amount | times: form.conversion_rate | default: 0 | round: 2}}',
-      reporting_item_billable_amount: ' {{ row.item_billable_amount | times: form.conversion_rate | default: 0 | round: 2  }}',
-      reporting_item_discount_amount: ' {{ row.item_discount_amount | times: form.conversion_rate | default: 0 | round: 2}}',
-      reporting_item_taxable_amount: '{{ row.item_taxable_amount | times: form.conversion_rate | default: 0 | round: 2}}',
-      reporting_item_tax_amount: '{{ row.item_tax_amount | times: form.conversion_rate | default: 0 | round: 2  }}',
-      reporting_item_tds_amount: '{{ row.item_tds_amount | times: form.conversion_rate | default: 0 | round: 2  }}',
-      reporting_item_net_amount: '{{ row.item_net_amount | times: form.conversion_rate | default: 0 | round: 2  }}'
+      reporting_item_gross_amount: '{% assign conv_rate = form.conversion_rate | round: 5 %}{{ row.item_gross_amount | times: conv_rate | default: 0 | round: 2}}',
+      reporting_item_billable_amount: '{% assign conv_rate = form.conversion_rate | round: 5 %} {{ row.item_billable_amount | times: conv_rate | default: 0 | round: 2  }}',
+      reporting_item_discount_amount: ' {% assign conv_rate = form.conversion_rate | round: 5 %}{{ row.item_discount_amount | times: conv_rate | default: 0 | round: 2}}',
+      reporting_item_taxable_amount: '{% assign conv_rate = form.conversion_rate | round: 5 %}{{ row.item_taxable_amount | times: conv_rate | default: 0 | round: 2}}',
+      reporting_item_tax_amount: '{% assign conv_rate = form.conversion_rate | round: 5 %}{{ row.item_tax_amount | times: conv_rate | default: 0 | round: 2  }}',
+      reporting_item_tds_amount: '{% assign conv_rate = form.conversion_rate | round: 5 %}{{ row.item_tds_amount | times: conv_rate | default: 0 | round: 2  }}',
+      reporting_item_net_amount: '{% assign conv_rate = form.conversion_rate | round: 5 %}{{ row.item_net_amount | times: conv_rate | default: 0 | round: 2  }}'
     },
 
     # INVOICE SUMMARY
@@ -124,23 +124,23 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
       ',
 
       # CONVERTED VALUES
-      reporting_invoice_gross_amount: '{{ form.invoice_gross_amount | times: form.conversion_rate | default: 0 | round: 2}}',
-      reporting_invoice_discount_amount: '{{ form.invoice_discount_amount | times: form.conversion_rate | default: 0 | round: 2}}',
-      reporting_invoice_taxable_amount: '{{ form.invoice_taxable_amount | times: form.conversion_rate | default: 0 | round: 2}}',
-      reporting_invoice_tax_amount: '{{ form.invoice_tax_amount | times: form.conversion_rate | default: 0 | round: 2}}',
-      reporting_invoice_freight_amount: '{{ form.invoice_freight_amount | times: form.conversion_rate | default: 0 | round: 2}}',
-      reporting_invoice_sub_total_amount: '{{ form.invoice_sub_total_amount | times: form.conversion_rate | default: 0 | round: 2}}',
-      reporting_invoice_paid_outside_amount: '{{ form.invoice_paid_outside_amount | times: form.conversion_rate | default: 0 | round: 2}}',
-      reporting_invoice_roundoff_amount: "{% assign amount = form.reporting_invoice_sub_total_amount | round %}{% assign amount = amount | minus: form.reporting_invoice_sub_total_amount %}{% if form.base_currency_id == '#{Currency.id_for('INR')}' and form.reporting_currency_id == '#{Currency.id_for('INR')}' %}{{ amount | default: 0 | round: 2}}{% else %}{{ 0 }}{% endif %}",
-      reporting_invoice_tds_amount: '{{ form.display_tds_amount | times: form.conversion_rate | default: 0 | round: 2}}',
-      reporting_invoice_total_amount: '{{ form.invoice_total_amount | times: form.conversion_rate | default: 0 | round: 2}}',
+      reporting_invoice_gross_amount: '{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.invoice_gross_amount | times: conv_rate | default: 0 | round: 2}}',
+      reporting_invoice_discount_amount: '{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.invoice_discount_amount | times: conv_rate | default: 0 | round: 2}}',
+      reporting_invoice_taxable_amount: '{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.invoice_taxable_amount | times: conv_rate | default: 0 | round: 2}}',
+      reporting_invoice_tax_amount: '{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.invoice_tax_amount | times: conv_rate | default: 0 | round: 2}}',
+      reporting_invoice_freight_amount: '{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.invoice_freight_amount | times: conv_rate | default: 0 | round: 2}}',
+      reporting_invoice_sub_total_amount: '{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.invoice_sub_total_amount | times: conv_rate | default: 0 | round: 2}}',
+      reporting_invoice_paid_outside_amount: '{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.invoice_paid_outside_amount | times: conv_rate | default: 0 | round: 2}}',
+      reporting_invoice_roundoff_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{% assign amount = form.reporting_invoice_sub_total_amount | round %}{% assign amount = amount | minus: form.reporting_invoice_sub_total_amount %}{% if form.base_currency_id == '#{Currency.id_for('INR')}' and form.reporting_currency_id == '#{Currency.id_for('INR')}' %}{{ amount | default: 0 | round: 2}}{% else %}{{ 0 }}{% endif %}",
+      reporting_invoice_tds_amount: '{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.display_tds_amount | times: conv_rate | default: 0 | round: 2}}',
+      reporting_invoice_total_amount: '{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.invoice_total_amount | times: conv_rate | default: 0 | round: 2}}',
 
-      reporting_invoice_net_total_amount: '{{ form.invoice_net_total_amount | times: form.conversion_rate | default: 0 | round: 2}}',
-      reporting_invoice_advance_paid_amount: '{{ form.invoice_advance_paid_amount | times: form.conversion_rate | default: 0 | round: 2}}',
-      reporting_invoice_balance_due: '{{ form.invoice_balance_due | times: form.conversion_rate | default: 0 | round: 2}}',
-      reporting_po_advance: '{{ form.po_advance | times: form.conversion_rate | default: 0 | round: 2}}',
-      reporting_po_prev_adjusted_advance: '{{ form.po_prev_adjusted_advance | times: form.conversion_rate | default: 0 | round: 2}}',
-      reporting_adjusted_po_advance_payable_amount: '{{ form.adjusted_po_advance_payable_amount | times: form.conversion_rate | default: 0 | round: 2}}'
+      reporting_invoice_net_total_amount: '{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.invoice_net_total_amount | times: conv_rate | default: 0 | round: 2}}',
+      reporting_invoice_advance_paid_amount: '{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.invoice_advance_paid_amount | times: conv_rate | default: 0 | round: 2}}',
+      reporting_invoice_balance_due: '{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.invoice_balance_due | times: conv_rate | default: 0 | round: 2}}',
+      reporting_po_advance: '{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_advance | times: conv_rate | default: 0 | round: 2}}',
+      reporting_po_prev_adjusted_advance: '{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_prev_adjusted_advance | times: conv_rate | default: 0 | round: 2}}',
+      reporting_adjusted_po_advance_payable_amount: '{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.adjusted_po_advance_payable_amount | times: conv_rate | default: 0 | round: 2}}'
     }
   }
 
@@ -151,7 +151,6 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
            required: false, editable: false,
            default_value: InwardInvoiceStatus.id_for(:open),
            can_editable_be_changed: false
-    switch :form_migrated, visible: false, editable: false, required: false, default_value: true
   end
 
   # INVOICE DETAILS
@@ -301,7 +300,7 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
                                      computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.unit_of_measurement}}')
 
       amount :item_rate, label: 'Item Rate (Reporting Currency)',
-                         computed: Forms::Compute::Form('{{ row.rate | times: form.conversion_rate | round: 2 }}'),
+                         computed: Forms::Compute::Form('{% assign conv_rate = form.conversion_rate | round: 5 %}{{ row.rate | times: conv_rate | round: 2 }}'),
                          visible: true, editable: false
 
       amount :rate, label: 'Rate (Base Currency)',
