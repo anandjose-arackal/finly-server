@@ -97,10 +97,13 @@ class Form < ApplicationRecord
       sequence_number = generator.next_unique_id_in_sequence - 1
       prefix = generator.get_prefix
 
-      sequence_entity = self.entities.where(type: 'FormEntity::AutoNumber').last
+      sequence_entity = (self.entities.where(type: 'FormEntity::AutoNumber').filter do |e|
+        e.config.dig("sequence", "prefix") == prefix
+      end).last
+
       next unless sequence_entity.present?
 
-      REDIS.set("FormEntity::AutoNumber##{sequence_entity.id}#{sequence_entity}", sequence_number)
+      REDIS.set("FormEntity::AutoNumber##{sequence_entity.id}##{prefix}", sequence_number)
     end
   end
 

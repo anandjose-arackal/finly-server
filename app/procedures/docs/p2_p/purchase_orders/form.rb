@@ -29,6 +29,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
       reporting_item_taxable_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ row.item_taxable_amount | times: conv_rate | default: 0 | round: 2}}",
       reporting_item_tax_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ row.item_tax_amount | times: conv_rate | default: 0 | round: 2  }}",
       reporting_item_net_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ row.item_net_amount | times: conv_rate | default: 0 | round: 2 | at_least: 0  }}",
+      item_rate: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ row.rate | times: conv_rate | default: 0 | round: 2 | at_least: 0  }}",
     },
 
     # PURCHASE ORDER SUMMARY
@@ -94,15 +95,14 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
            default_value: PurchaseOrderStatus.id_for(:open),
            can_editable_be_changed: false
     large_text :procurement_term_text, visible: false
-    number :procurement_term_id, visible: false
-    switch :form_migrated, visible: false, editable: false, required: false, default_value: true
+    number :procurement_term_id, visible: false 
   end
 
   # PURCHASE ORDER DETAILS
   section :purchase_order_details, title: "Order Details", associate_custom_fields: true do
     auto_number :po_number,
                 label: "Sequence Number", editable: false,
-                sequence: { prefix: "PO-", start_at: '00001' }
+                sequence: { prefix: "PO", start_at: '00001' }
 
     date :created_at,
          label: "Purchase Order Date",
@@ -239,7 +239,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
                computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.unit_of_measurement}}')
 
       amount :item_rate, label: "Item Rate (Reporting Currency)", visible: true, editable: false,
-             computed: Forms::Compute::Form('{{ row.rate | times: form.conversion_rate | round: 2 }}')
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_rate])
 
       amount :rate, label: "Rate (Base Currency)",
              can_editable_be_changed: false, can_visible_be_changed: false,
@@ -742,35 +742,35 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
   condition condition_id: "Items quantity  not be editable once unless in editable status" do
     reference :entity, 'items.quantity'
     # rule Rules::Builder[:purchase_order_status_id].not_eq(*PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).map { |item| { value: item } })
-    rule Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:open)).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:retracted))).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:rejected)))
+    rule Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:open)).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:retracted))).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:rejected))).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:processing)))
     action :editable, false
   end
 
   condition condition_id: "Items discount amount should not be editable once unless in editable status" do
     reference :entity, 'items.item_discount_amount'
     # rule Rules::Builder[:purchase_order_status_id].not_eq(*PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).map { |item| { value: item } })
-    rule Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:open)).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:retracted))).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:rejected)))
+    rule Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:open)).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:retracted))).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:rejected))).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:processing)))
     action :editable, false
   end
 
   condition condition_id: "Items discount should not be editable once unless in editable status" do
     reference :entity, 'items.discount'
     # rule Rules::Builder[:purchase_order_status_id].not_eq(*PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).map { |item| { value: item } })
-    rule Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:open)).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:retracted))).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:rejected)))
+    rule Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:open)).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:retracted))).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:rejected))).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:processing)))
     action :editable, false
   end
 
   condition condition_id: "TDS rate should not be editable once unless in editable status" do
     reference :entity, :advance_tds_slab_id
     # rule Rules::Builder[:purchase_order_status_id].not_eq(*PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).map { |item| { value: item } })
-    rule Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:open)).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:retracted))).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:rejected)))
+    rule Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:open)).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:retracted))).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:rejected))).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:processing)))
     action :editable, false
   end
 
   condition condition_id: "conversion rate should not be editable once unless in editable status" do
     reference :entity, :conversion_rate
     # rule Rules::Builder[:purchase_order_status_id].not_eq(*PurchaseOrderStatus.ids_for(:open, :retracted, :rejected).map { |item| { value: item } })
-    rule Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:open)).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:retracted))).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:rejected)))
+    rule Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:open)).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:retracted))).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:rejected))).and(Rules::Builder[:purchase_order_status_id].not_eq(value: PurchaseOrderStatus.id_for(:processing)))
     action :editable, false
   end
 end
