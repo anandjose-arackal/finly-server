@@ -1154,7 +1154,7 @@ class PurchaseOrder < ApplicationRecord
           item_discount = (item.discount || 0).to_f
           item_discount_amount = item_amount * item_discount / 100
         when 2
-          item_discount_amount = item.discount
+          item_discount_amount = item.discount || 0
         else
           item_discount = (item.discount || 0).to_f
           item_discount_amount = item_amount * item_discount / 100
