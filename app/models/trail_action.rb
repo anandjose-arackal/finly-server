@@ -70,7 +70,7 @@ class TrailAction < NonTenantedApplicationRecord
   end
 
   def convert_to_past
-    self.name == approve ? "approved" : self.name
+    self.name == "approve" ? "approved" : self.name
   end
 
 end
