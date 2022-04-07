@@ -333,8 +333,8 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       base_currency_id: self.purchase_order&.base_currency_id,
       reporting_currency_id: self.purchase_order&.reporting_currency_id,
 
-      vendor_bank_account_number: self.purchase_order&.bank_account.account_number,
-      vendor_bank_account_ifsc: self.purchase_order&.bank_account.ifsc,
+      vendor_bank_account_number: self.purchase_order&.bank_account&.account_number,
+      vendor_bank_account_ifsc: self.purchase_order&.bank_account&.ifsc,
       vendor_bank_account_swift_code: self.purchase_order&.bank_account&.swift_code,
       billing_address_name: self.purchase_order&.location&.name,
       billing_address_gstin: self.purchase_order&.location&.gstin,
