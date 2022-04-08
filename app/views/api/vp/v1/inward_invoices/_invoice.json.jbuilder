@@ -1,4 +1,9 @@
 json.partial! 'invoice_header', record: record
+custom_fields = {}
+record.custom_fields.each do |custom_field|
+  custom_fields[custom_field.field_configuration.field_name] = custom_field.configured_field_value
+end
+json.custom_fields custom_fields
 json.line_items do
   json.array! record.items do |item|
     json.id item.id
