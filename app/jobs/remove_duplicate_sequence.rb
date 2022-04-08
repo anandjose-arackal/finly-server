@@ -15,7 +15,7 @@ class RemoveDuplicateSequence < BaseJob
 
       dup_po_ids =PurchaseOrder.where('created_at > ?', Date.parse('01-12-2021')).select(:company_id, :po_number).group(:po_number,:company_id).having('count(po_number) >1').pluck(:po_number)
       dup_po_ids.each do |po_number|
-        purchase_order = Invoice.where(po_number:  po_number).last
+        purchase_order = PurchaseOrder.where(po_number:  po_number).last
         purchase_order.po_number= nil
         purchase_order.save
       end

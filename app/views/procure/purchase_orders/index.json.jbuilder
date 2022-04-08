@@ -29,6 +29,7 @@ json.results do
     json.amount precision_value(po.balance_amount&.value || 0)
     json.base_currency po.get_base_currency
     json.reporting_currency po.get_reporting_currency
+    json.forms_enabled po&.forms_enabled
 
     json.bulk_actions do  
       # json.can_approve po.can_approve?

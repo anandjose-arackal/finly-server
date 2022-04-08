@@ -735,8 +735,11 @@ include Searchkick::Api
     when 'Invoice'
       precision_value self.parent.balance_due&.value
     when 'PurchaseOrder'
-      # PurchaseOrder.find_by(id: self.parent_id).as_json(tree: true) # because somewhere we got as_json for PO already. running on deadline. dont have time to remodify.
-      precision_value self.parent.advance_amount&.value
+      if user.po_form_enabled
+        precision_value self.parent.po_requested_advance_amount
+      else
+        precision_value self.parent.advance_amount&.value
+      end
     else
       if self.invoice.present?
         precision_value self.invoice.balance_due&.value
@@ -932,6 +935,9 @@ include Searchkick::Api
     # if PaymentStatus.all_except_failed.exclude? self.payment_status_id
     if self.failed?
       case self.parent_type
+      when 'PurchaseOrder'
+        parent_details = initiating_user.company.purchase_orders.find_by(id: self.parent_id)
+        parent_details.update(advance_amount_status_id: AdvanceAmountStatus.id_for(:failed))
       when 'Invoice'
         parent_details = initiating_user.company.inward_invoices.non_beneficiary.find_by(id: self.parent_id)
         total_payments = parent_details.payments.all_except_failed.joins(:amount).sum(:value).round(2)
@@ -979,8 +985,8 @@ include Searchkick::Api
       custom_field_config: get_custom_field_config(document_type),
       payment_id: self.id,
       attachment_details: get_attachment_details(document_type),
-      base_currency: self.bank_payment_request.base_currency,
-      reporting_currency: self.company.reporting_currency,
+      base_currency: self.parent_type == 'PurchaseOrder' ? self.parent.base_currency : self.bank_payment_request.base_currency,
+      reporting_currency: self.parent_type == 'PurchaseOrder' ? self.parent.reporting_currency : self.company.reporting_currency,
       is_domestic: self.bank_payment_request&.is_domestic,
       non_po_invoice_form_enabled: (self.parent&.forms_enabled rescue false)
     }
@@ -1141,12 +1147,16 @@ include Searchkick::Api
   def get_po_advance_amount_details
     parameters = RequestStore.store[:params]
     tds_slabs = TdsSlabs::Index.(self.purchase_order.user, parameters).tds_slabs rescue nil
+    total_amount = self.purchase_order.user.po_form_enabled ? precision_value(self.purchase_order&.po_requested_advance_amount&.to_f) : precision_value(self.purchase_order&.requested_advance_amount&.value)
+    tds_amount = self.purchase_order.user.po_form_enabled ? self.purchase_order&.po_advance_tds_amount&.to_f : self.purchase_order&.advance_tds_amount&.value
+    conversion_rate = self.purchase_order.conversion_rate rescue 1
     {
-        total_amount: {value: precision_value(self.purchase_order&.requested_advance_amount&.value), editable: false}, # TOTAL
+        total_amount: {value: total_amount, editable: false}, # TOTAL
         inclusive_of_taxes: "",
         discount: "",
         tax: "",
-        tds: {tds_slab_id: self.purchase_order.advance_tds_slab_id, tds_amount: self.purchase_order&.advance_tds_amount&.value, editable: true, tds_slab_rate: self.purchase_order&.advance_tds_slab&.tds},
+        tds: {tds_slab_id: self.purchase_order.advance_tds_slab_id, tds_amount: tds_amount, editable: true, tds_slab_rate: self.purchase_order&.advance_tds_slab&.tds},
+        tds_applicable_amount: tds_amount,
         advance_amount: "", # Advance
         freight_amount: "",
         net_payable_amount: "",
@@ -1156,7 +1166,11 @@ include Searchkick::Api
         tax_rates: self.purchase_order.company.tax_rates,
         #gst_type_id: {value: self.purchase_order.gst_type_id, editable: false},
         payment_amount: {value: self.amount_value, editable: true}, #Payable Amount
-        balance_due: {value: self.amount&.value, editable: false} # Invoice AMOUNT
+        balance_due: {value: self.amount&.value, editable: false}, # Invoice AMOUNT
+        invoice_net_total_amount: {value: (total_amount - tds_amount), editable: false},
+        reporting_invoice_net_total_amount: {value: (total_amount - tds_amount)*conversion_rate, editable: false},
+        invoice_balance_due: {value: (total_amount - tds_amount), editable: false},
+        reporting_invoice_balance_due: {value: (total_amount - tds_amount)*conversion_rate, editable: false}
     }
   end
 

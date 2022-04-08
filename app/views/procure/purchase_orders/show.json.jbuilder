@@ -4,6 +4,7 @@ json.extract! @result.purchase_order, :id, :po_number, :delivery_date, :gst_type
               :payment_term_id, :procurement_term_id, :procurement_term_text, :policy_id, :department_id, :sub_department_id, :cost_center_id,
               :billing_address, :shipping_address, :note, :gstin_location_id, :cost_allocation_items, :internal_note, :vendor_poc_name, :vendor_poc_email, :vendor_poc_mobile_number, :discount_type_id
 
+json.pr_forms_enabled @result.purchase_order&.user&.purchase_request_form_enabled rescue false
 json.vendor @result.purchase_order.vendor.as_json
 json.purchase_request_present @result.purchase_order.items.pluck('purchase_order_items.purchase_request_item_id').compact.present? rescue false
 tax_ids = []

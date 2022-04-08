@@ -43,7 +43,7 @@ class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOr
     self.duplicate_po.approved_at = nil
     self.duplicate_po.submitted_at = nil
     # self.duplicate_po.advance_amount_status_id = nil
-    self.duplicate_po.advance_amount_status_id = self.purchase_order.advance_payments.present? ? self.purchase_order.advance_amount_status_id : nil
+    self.duplicate_po.advance_amount_status_id = self.purchase_order.advance_payments.present? ? self.purchase_order.advance_amount_status_id : AdvanceAmountStatus.id_for(:to_be_processed)
     self.duplicate_po.purchase_order_status_id = (user.vendor_payment_admin? && !document_owner?? PurchaseOrderStatus.id_for(:auto_approved) : PurchaseOrderStatus.id_for(:open))
     # op = Procurements::DocumentNumbers::Generate.(user, {document: self.duplicate_po})
     # if op.success?
@@ -74,6 +74,15 @@ class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOr
       if obj.present?
         # self.duplicate_po.__send__("#{k}=", self.purchase_order.__send__(k))
         obj.each do |po|
+          if k == :form_custom_fields
+            custom_field = FormCustomField.new(po.dup.attributes.except([:id, :uuid]))
+            custom_field[:document_id] = self.duplicate_po.id
+            obj.where(entity_type: 'attachment').each do |entity|
+              custom_field.attachments += entity.attachments
+            end
+            self.duplicate_po.form_custom_fields << custom_field
+            next
+          end
           self.duplicate_po.__send__(k) << po.dup
           
           if k == :quotations

@@ -1,7 +1,7 @@
 class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsManager::Master::Base
 
   register_handle :purchase_request_show
-  register_actions [ :save_btn, :submit, :retract, :reject, :approve, :unapprove, :take_control, :delete_pr_line_item, :reject_pr_line_item, :return_control, :add_new_line_item, :delete , :more_actions, :audit_trail]
+  register_actions [ :save_btn, :submit, :retract, :reject, :approve, :unapprove, :take_control, :delete_pr_line_item, :reject_pr_line_item, :return_control, :add_new_line_item, :delete , :update_btn, :more_actions, :audit_trail]
 
   def initialize(user=nil, params=nil)
     super
@@ -35,6 +35,10 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
     if purchase_request.is_reviewing_user? || user.vendor_payments_admin?
       return purchase_request.action_users(:approve).include?(user)
     end
+  end
+
+  def update_btn
+    save_btn
   end
 
   def submit

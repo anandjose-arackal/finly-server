@@ -88,6 +88,9 @@ class FormEntity < ApplicationRecord
 
   before_save :sanitize
 
+  STATUS_ENTITIES = %w[purchase_order_status_id purchase_request_status_id invoice_status_id]
+
+
   # Fixme: Delete this as it is available in Forms::Entity::Registry. Kept it commented for testing purpose
   # def find_entity(entity_path)
   #   entities.each do |entity|
@@ -283,7 +286,7 @@ class FormEntity < ApplicationRecord
       placeholder: placeholder,
       hint: hint,
       entity_type: entity_type,
-      default_value: default_value,
+      default_value: is_purchase_request_cost_allocations ? false : default_value,
       position: position,
       filters: filters&.as_ransack(do_not_interpolate: true),
       behavior: {
@@ -293,17 +296,20 @@ class FormEntity < ApplicationRecord
         visible: visible,
         unique: unique
       },
-      options: options
+      options: options,
+      currency_entity: currency_entity
     }
     if choices_scope.present?
       data[:choices] = choices_scope.build(params: opts[:params], user: opts[:current_user])
     end
+
     if entities.present?
       data[:entities] = {}
       entities.each do |ent|
         data[:entities][ent.entity_key] = ent.as_json(opts)
       end
     end
+
     data
   end
 
@@ -422,11 +428,19 @@ class FormEntity < ApplicationRecord
     false
   end
 
+  def currency_entity
+    return self.entity_type != 'amount' ? nil : self.entity_key.start_with?('reporting') ? 'reporting_currency' : 'base_currency'
+  end
+
   private
 
   def sanitize
     # Set entity path & config path
     self.entity_path = generate_entity_path.join(".")
     self.config_path = generate_config_path.join(".")
+  end
+
+  def is_purchase_request_cost_allocations
+    self.form.klass_name == 'Docs::P2P::PurchaseRequests::Form' && self.entity_key == 'cost_allocation_items'
   end
 end

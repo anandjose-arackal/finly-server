@@ -180,7 +180,7 @@ module Transitionable
             tat: dlrm.tat,
             tat_added_by_s: dlrm.tat_added_by_script,
             action_taken: (dlrm.reviewer_id == dlrm.action_taken_by_id),
-            action_name: dlrm.action&.name&.split("_")&.map(&:capitalize)&.join(" ")
+            action_name: dlrm.action&.convert_to_past&.split("_")&.map(&:capitalize)&.join(" ")
         }
         data[:reviewers].push(reviewer)
 
@@ -216,7 +216,6 @@ module Transitionable
               email: dlrm.rejected_by&.email
           }
         end
-
         chain[level_number - 1] = data
       end
 
@@ -230,6 +229,12 @@ module Transitionable
       # end
 
       # Do NOT Send Skipped Level Data
+
+      # Reject to level becomes false for some reason even if reject to user is present
+      chain.each do |level|
+        next unless level.present?
+        level[:reject_to_level] = true if level[:reject_to_user].present?
+      end
       chain.reject {|item| item.blank?}
     end
 

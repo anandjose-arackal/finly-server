@@ -57,7 +57,7 @@ Gatekeeper::Checker.new 'On New Request' do
     rule 'X-Finly-RP is required for all web requests' do
       next if RequestStoreUtil.x_finly_rp_attributes.present?
       next if RequestStoreUtil.skip_x_finly_rp_check?
-
+      next if RequestStoreUtil.current_session&.access_token&.authentication_type == "sso"
       message 'X-Finly-RP not sent'
       session_status_id UserSessionStatus.id_for(:blocked)
       response_code 401

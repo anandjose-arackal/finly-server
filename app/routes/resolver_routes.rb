@@ -44,6 +44,18 @@ Resolver::Router.draw do
   scope :inward_invoice_statuses do
     route 'default', Masters::InwardInvoiceStatuses::Resolver
   end
+  scope :purchase_order_statuses do
+    route 'default', Masters::PurchaseOrderStatuses::Resolver
+  end
+
+  scope :purchase_request_statuses do
+    route 'default', Masters::PurchaseRequestStatuses::Resolver
+  end
+
+  scope :advance_amount_statuses do
+    route 'default', Masters::AdvanceAmountStatuses::Resolver
+  end
+  
   scope :departments do
     route 'default', Masters::Departments::Resolver
   end
@@ -198,6 +210,10 @@ Resolver::Router.draw do
 
   scope :reports do
     route 'default', Docs::ExpenseManagement::Reports::Resolver
+  end
+
+  scope :money_requests do
+    route 'default', Docs::ExpenseManagement::MoneyRequests::Resolver
   end
 
   scope :audit_trails do

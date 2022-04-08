@@ -39,8 +39,11 @@ class UserDevices::XFinlyRPProcessor
     if request_properties.present?
       request_properties = Base64.decode64(request_properties)&.encode!('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '')
       request_properties = request_properties&.encode!('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '') if request_properties.is_a?(String)
-
+      begin
       request_properties = JSON.parse(request_properties) if request_properties.is_a?(String)
+      rescue JSON::ParserError
+        return nil
+      end
     else
       # todo fallback to user-agent instead of not creating the properties
       request_properties = {}
