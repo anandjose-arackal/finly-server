@@ -417,6 +417,14 @@ class InvoiceLineItem < ApplicationRecord
     invoice_forms_enabled
   end
 
+  def form_custom_fields
+    self.parent.form_custom_fields || []
+  end
+
+  def form_custom_fields=(value)
+    self.parent.form_custom_fields = value
+  end
+
   private
 
   def budget_trail_entry
