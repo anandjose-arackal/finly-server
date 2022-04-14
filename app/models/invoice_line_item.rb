@@ -418,11 +418,11 @@ class InvoiceLineItem < ApplicationRecord
   end
 
   def form_custom_fields
-    self.parent.form_custom_fields || []
+    self.parent&.form_custom_fields || []
   end
 
   def form_custom_fields=(value)
-    self.parent.form_custom_fields = value
+    self.parent&.form_custom_fields = value
   end
 
   private
