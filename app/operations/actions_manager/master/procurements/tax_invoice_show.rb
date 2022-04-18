@@ -122,9 +122,7 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
   end
 
   def save_btn
-    # (user.vendor_payments_admin?) || ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) ) ||
-    # (invoice.processing? && user_in_level?)
-    (document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?)) || user.vendor_payments_admin?
+    (document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?)) || user.vendor_payments_admin? || (invoice.processing? && user_in_level?)
   end
 
   def save_and_submit
