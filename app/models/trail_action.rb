@@ -68,4 +68,9 @@ class TrailAction < NonTenantedApplicationRecord
         :reactivate
     ]
   end
+
+  def convert_to_past
+    self.name == "approve" ? "approved" : self.name
+  end
+
 end
