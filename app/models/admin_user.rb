@@ -138,6 +138,10 @@ class AdminUser < NonTenantedApplicationRecord
     @feature_toggle ||= FeatureToggle.new(self)
   end
 
+  def analytics_id
+    "user:#{id}"
+  end
+
   def as_json(options = {})
     {
         name: name,
