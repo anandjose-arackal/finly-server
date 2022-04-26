@@ -201,7 +201,7 @@ json.locations do
 end
 
 json.payment_terms do
-  json.array! @result.payment_terms, :id, :name, :days_after, :description, :default
+  json.array! @result.payment_terms
 end
 
 json.procurement_terms do
