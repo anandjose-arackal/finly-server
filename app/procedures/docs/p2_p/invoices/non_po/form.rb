@@ -214,34 +214,35 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_visible_be_changed: false,
              can_editable_be_changed: false,
              choices_scope: Choices[:lookup].('items'),
-             required: true, editable: true, visible: true
+             required: true, editable: true, visible: true, size: FormEntity::SIZES[:large]
 
       text :description, editable: false,
            can_editable_be_changed: false,
            can_visible_be_changed: false, visible: false,
            computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.description}}')
 
-      text :comment, label: "Narration"
+      text :comment, label: "Narration", size: FormEntity::SIZES[:medium]
       text :item_number, label: "Item Code", editable: false, 
-        computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.item_number}}')
+        computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.item_number}}'),
+          size: FormEntity::SIZES[:small]
 
-      lookup :product_type_id, label: "Product Type", choices_scope: Choices[:enum].(ProductType), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.product_type_id}}'), editable: false, required: true, visible: true
+      lookup :product_type_id, label: "Product Type", choices_scope: Choices[:enum].(ProductType), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.product_type_id}}'), editable: false, required: true, visible: true, size: FormEntity::SIZES[:small]
 
       lookup :items_department_id, label: "Department", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('departments', assignments: { form: true })
       lookup :items_cost_center_id, label: "Cost Center", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('cost_centers')
 
-      lookup :category_id, label: "Category", required: true, visible: true, editable: true, choices_scope: Choices[:lookup].('categories', scope: :inward_invoice_line_items_only), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.category_id}}'), triggers: {on_compute: {lookup_details: [:category_id]}}
+      lookup :category_id, label: "Category", required: true, visible: true, editable: true, choices_scope: Choices[:lookup].('categories', scope: :inward_invoice_line_items_only), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.category_id}}'), triggers: {on_compute: {lookup_details: [:category_id]}}, size: FormEntity::SIZES[:medium]
 
       text :gl_code, label: "GL Code", editable: false, visible: false, 
         computed: Forms::Compute::Lookup('items.category_id', '{{record.gl_code_or_item_number}}', assignments: {item_number: "{{row.item_number}}"})
       
       text :hsn_sac, label: "HSN/SAC", editable: true, visible: true,
-            computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.hsn_sac}}')
+            computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.hsn_sac}}'), size: FormEntity::SIZES[:small]
 
       lookup :tds_applicable, visible: true, editable: false,
              can_editable_be_changed: false,
              can_visible_be_changed: false, choices_scope: Choices[:list].({ id: true, name: 'true' }, { id: false, name: 'false' }),
-             computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.tds_applicable }}')
+             computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.tds_applicable }}'), size: FormEntity::SIZES[:small]
 
       # currency :currency_code, editable: false, visible: false, computed: Forms::Compute::Form("{{ form.currency_code }}")
       number :quantity, label: "Quantity", editable: true, visible: true, required: true, min_value: 1, default_value: 1, size: FormEntity::SIZES[:small] # todo - condition
@@ -249,7 +250,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       dropdown :unit_of_measurement, label: "Unit of Measurement",
                choices_scope: Choices[:list].(*Unit.all.map { |v| { id: v.value, name: v.name } }),
                required: true, editable: true, visible: true,
-               computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.unit_of_measurement}}')
+               computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.unit_of_measurement}}'), size: FormEntity::SIZES[:medium]
 
       amount :item_rate,
              label: "Item Rate (Reporting Currency)",
