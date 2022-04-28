@@ -174,7 +174,7 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
 
     number :payment_term_days,
            label: 'Payment Term Days', visible: false,
-           computed: Forms::Compute::Lookup('payment_term_id', '{{record.days_after | default: 0 }}')
+           computed: Forms::Compute::Lookup('payment_term_id', '{{record.calculated_days_after | default: 0 }}')
 
     date :due_date,
          computed: Forms::Compute::Form('{% assign assigne_days = form.payment_term_days | times: 86400 %}{% assign calculated_date = form.date | date: "%s" | plus: assigne_days %}{{ calculated_date  | date: "%Y-%m-%d" }}'),
