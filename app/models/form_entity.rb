@@ -68,6 +68,15 @@ class FormEntity < ApplicationRecord
 
   class_attr :registered_type
 
+  SIZES = {
+    nil: nil, 
+    empty: "", 
+    small: "small", 
+    medium: "medium", 
+    large: "large"
+  }
+
+
   belongs_to :company
   belongs_to :section, class_name: "FormSection", foreign_key: :form_section_id
   belongs_to :form
@@ -275,6 +284,8 @@ class FormEntity < ApplicationRecord
   end
 
   def form_json(opts = {})
+    size = self.size || "medium" # defaults to medium
+
     data = {
       id: uuid,
       entity_key: entity_key,
@@ -288,6 +299,7 @@ class FormEntity < ApplicationRecord
       entity_type: entity_type,
       default_value: is_purchase_request_cost_allocations ? false : default_value,
       position: position,
+      size: size,
       filters: filters&.as_ransack(do_not_interpolate: true),
       behavior: {
         editable: editable,

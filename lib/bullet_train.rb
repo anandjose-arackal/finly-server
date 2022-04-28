@@ -135,6 +135,7 @@ class BulletTrain
   # end
 
   def transform_flags(flags)
+    flags ||= []
     flags.map do |flag|
       {
         name: flag['feature']['name'],
