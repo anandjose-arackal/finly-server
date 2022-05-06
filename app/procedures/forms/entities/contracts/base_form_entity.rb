@@ -20,6 +20,7 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
       optional(:placeholder)
       optional(:hint)
       optional(:position) # Position will be saved in a different API Call
+      optional(:size).filled(included_in?: FormEntity::SIZES.values)
       required(:behavior).filled do
         hash do
           required(:editable).filled
@@ -50,6 +51,8 @@ class Forms::Entities::Contracts::BaseFormEntity < Reform::Form
   property :behavior, virtual: true
 
   property :behavior, virtual: true
+
+  property :size
 
   property :editable, deserializer: -> (input, represented, *args) {represented.editable = input.dig(:behavior, :editable) if (represented.model.persisted? and represented.model.can_editable_be_changed) or true}
   property :required, deserializer: -> (input, represented, *args) {represented.required = input.dig(:behavior, :required) if (represented.model.persisted? and represented.model.can_required_be_changed) or true}

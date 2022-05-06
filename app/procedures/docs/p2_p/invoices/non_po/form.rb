@@ -208,140 +208,157 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
   # INVOICE ITEMS
   section :items, associate_custom_fields: true do
     table :items, min_items: 1, populate_if_empty: InvoiceLineItem do
-      number :id, visible: false, editable: false, internal: true, can_visible_be_changed: false, can_editable_be_changed: false
+      number :id, visible: false, editable: false, internal: true, can_visible_be_changed: false, can_editable_be_changed: false, size: FormEntity::SIZES[:small]
 
       lookup :inventory_line_item_id, label: "Item",
              can_visible_be_changed: false,
              can_editable_be_changed: false,
              choices_scope: Choices[:lookup].('items'),
-             required: true, editable: true, visible: true
+             required: true, editable: true, visible: true, size: FormEntity::SIZES[:large]
 
       text :description, editable: false,
            can_editable_be_changed: false,
            can_visible_be_changed: false, visible: false,
            computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.description}}')
 
-      text :comment, label: "Narration"
+      text :comment, label: "Narration", size: FormEntity::SIZES[:medium]
       text :item_number, label: "Item Code", editable: false, 
-        computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.item_number}}')
+        computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.item_number}}'),
+          size: FormEntity::SIZES[:small]
 
-      lookup :product_type_id, label: "Product Type", choices_scope: Choices[:enum].(ProductType), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.product_type_id}}'), editable: false, required: true, visible: true
+      lookup :product_type_id, label: "Product Type", choices_scope: Choices[:enum].(ProductType), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.product_type_id}}'), editable: false, required: true, visible: true, size: FormEntity::SIZES[:small]
 
       lookup :items_department_id, label: "Department", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('departments', assignments: { form: true })
       lookup :items_cost_center_id, label: "Cost Center", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('cost_centers')
 
-      lookup :category_id, label: "Category", required: true, visible: true, editable: true, choices_scope: Choices[:lookup].('categories', scope: :inward_invoice_line_items_only), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.category_id}}'), triggers: {on_compute: {lookup_details: [:category_id]}}
+      lookup :category_id, label: "Category", required: true, visible: true, editable: true, choices_scope: Choices[:lookup].('categories', scope: :inward_invoice_line_items_only), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.category_id}}'), triggers: {on_compute: {lookup_details: [:category_id]}}, size: FormEntity::SIZES[:medium]
 
       text :gl_code, label: "GL Code", editable: false, visible: false, 
         computed: Forms::Compute::Lookup('items.category_id', '{{record.gl_code_or_item_number}}', assignments: {item_number: "{{row.item_number}}"})
       
       text :hsn_sac, label: "HSN/SAC", editable: true, visible: true,
-        computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.hsn_sac}}')
+            computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.hsn_sac}}'), size: FormEntity::SIZES[:small]
 
       lookup :tds_applicable, visible: true, editable: false,
              can_editable_be_changed: false,
              can_visible_be_changed: false, choices_scope: Choices[:list].({ id: true, name: 'true' }, { id: false, name: 'false' }),
-             computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.tds_applicable }}')
+             computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.tds_applicable }}'), size: FormEntity::SIZES[:small]
 
       # currency :currency_code, editable: false, visible: false, computed: Forms::Compute::Form("{{ form.currency_code }}")
-      number :quantity, label: "Quantity", editable: true, visible: true, required: true, min_value: 1, default_value: 1 # todo - condition
+      number :quantity, label: "Quantity", editable: true, visible: true, required: true, min_value: 1, default_value: 1, size: FormEntity::SIZES[:small] # todo - condition
 
       dropdown :unit_of_measurement, label: "Unit of Measurement",
                choices_scope: Choices[:list].(*Unit.all.map { |v| { id: v.value, name: v.name } }),
                required: true, editable: true, visible: true,
-               computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.unit_of_measurement}}')
+               computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.unit_of_measurement}}'), size: FormEntity::SIZES[:medium]
 
       amount :item_rate,
              label: "Item Rate (Reporting Currency)",
              computed: Forms::Compute::Form('{{ row.rate | times: form.conversion_rate | round: 2 }}'),
              visible: true,
-             editable: false
+             editable: false,
+             size: FormEntity::SIZES[:small]
 
       amount :rate, label: "Rate (Base Currency)",
              can_editable_be_changed: false,
              can_visible_be_changed: false,
              required: true, visible: true, editable: true,
-             computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.rate_in_base_currency | default: 0 | round: 2 }}', assignments: {conversion_date: "{{form.conversion_date}}", base_currency_id: "{{form.base_currency_id}}", reporting_currency_id: "{{form.reporting_currency_id}}", conversion_rate: "{{form.conversion_rate}}"})
+             computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.rate_in_base_currency | default: 0 | round: 2 }}', assignments: {conversion_date: "{{form.conversion_date}}", base_currency_id: "{{form.base_currency_id}}", reporting_currency_id: "{{form.reporting_currency_id}}", conversion_rate: "{{form.conversion_rate}}"}),
+             size: FormEntity::SIZES[:small]
 
       # gross_amount = rate x quantity
       amount :item_gross_amount, label: 'Item Gross Amount', editable: false, visible: false,
              can_visible_be_changed: false,
              can_editable_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_gross_amount])
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_gross_amount]),
+             size: FormEntity::SIZES[:small]
 
       amount :reporting_item_gross_amount, label: 'Item Gross Amount(Reporting Currency)', editable: false, visible: false,
              can_visible_be_changed: false,
              can_editable_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_gross_amount])
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_gross_amount]),
+             size: FormEntity::SIZES[:small]
 
       # discount # discount percentage
-      number :discount, visible: true, editable: true, default_value: 0
+      number :discount, visible: true, editable: true, default_value: 0, size: FormEntity::SIZES[:small]
 
       # discount_amount = gross_amount x discount / 100
       amount :item_discount_amount, label: 'Item Discount Amount', editable: false, visible: false,
              can_editable_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_discount_amount])
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_discount_amount]),
+             size: FormEntity::SIZES[:small]
 
       amount :reporting_item_discount_amount, label: 'Item Discount Amount(Reporting Currency)', editable: false, visible: false,
              can_visible_be_changed: false,
              can_editable_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_discount_amount])
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_discount_amount]),
+             size: FormEntity::SIZES[:small]
 
       # taxable_amount = gross_amount - discount_amount
       amount :item_taxable_amount, label: 'Item Taxable Amount', editable: false, visible: false,
              can_editable_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_taxable_amount])
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_taxable_amount]),
+             size: FormEntity::SIZES[:small]
 
       amount :reporting_item_taxable_amount, label: 'Item Taxable Amount(Reporting Currency)', editable: false, visible: false,
              can_visible_be_changed: false,
              can_editable_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_taxable_amount])
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_taxable_amount]),
+             size: FormEntity::SIZES[:small]
 
       lookup :tax_rate_id, label: "Tax Rate", editable: true, visible: true, choices_scope: Choices[:lookup].('tax_rates'), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.tax_rate_id}}')
 
       # tax # tax percentage
-      number :tax_percentage, editable: false, visible: true, computed: Forms::Compute::Lookup('items.tax_rate_id', '{{record.rate}}')
+      number :tax_percentage, editable: false, visible: true, computed: Forms::Compute::Lookup('items.tax_rate_id', '{{record.rate}}'), size: FormEntity::SIZES[:small]
 
       # tax_amount = taxable_amount x tax / 100
       amount :item_tax_amount, label: 'Item Tax Amount', editable: false, visible: true,
              can_editable_be_changed: false,
              can_visible_be_changed: false, 
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_tax_amount])
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_tax_amount]),
+             size: FormEntity::SIZES[:small]
 
       amount :reporting_item_tax_amount, label: 'Item Tax Amount(Reporting Currency)', editable: false, visible: false,
              can_visible_be_changed: false,
              can_editable_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_tax_amount])
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_tax_amount]),
+             size: FormEntity::SIZES[:small]
 
       amount :item_tds_amount, label: 'Tds Amount', editable: false, visible: false,
              can_editable_be_changed: false,
              can_visible_be_changed: false, 
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_tds_amount])
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_tds_amount]),
+             size: FormEntity::SIZES[:small]
 
       amount :reporting_item_tds_amount, label: 'Tds Amount(Reporting Currency)', editable: false, visible: false,
              can_visible_be_changed: false,
              can_editable_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_tds_amount])
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_tds_amount]),
+             size: FormEntity::SIZES[:small]
 
       amount :item_net_amount, label: "Net Amount", editable: false, visible: true,
              can_editable_be_changed: false,
              can_visible_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_net_amount])
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_net_amount]),
+             size: FormEntity::SIZES[:small]
 
       amount :reporting_item_net_amount, label: "Net Amount(Reporting Currency)", editable: false, visible: false,
              can_visible_be_changed: false,
              can_editable_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_net_amount])
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_net_amount]),
+             size: FormEntity::SIZES[:small]
 
       amount :item_billable_amount, label: "Billable Amount", editable: false, visible: false,
              can_editable_be_changed: false, active: false,
              can_visible_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_billable_amount])
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_billable_amount]),
+             size: FormEntity::SIZES[:small]
 
       amount :reporting_item_billable_amount, label: "Billable Amount(Reporting Currency)", editable: false, visible: false,
              can_visible_be_changed: false,
              can_editable_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_billable_amount])
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_billable_amount]),
+             size: FormEntity::SIZES[:small]
 
       meta ->(record) { # TODO: ID is only for testing. Update this with required meta data.
         {
