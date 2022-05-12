@@ -1,0 +1,37 @@
+class ExportManager::Template::Master::CreditNotes::Index < ExportManager::Builders::Template
+
+  label 'Export'
+  description 'Credit Notes Export'
+  export_format 'xls'
+  resource 'credit_notes'
+  subscribe 'credit_notes'
+  default true
+
+  attribute :vendor_id, template: '{{ record.vendor.vendor_id }}'
+  attribute :vendor_name, template: '{{ record.vendor.business_name, }}'
+  attribute :credit_note_id, template: '{{ record.sequence_id }}'
+  attribute :created_by, template: '{{ record.created_by.user_name }}'
+  attribute :status, template: '{{ record.status.name }}'
+  attribute :credit_note_date, template: '{{ record.credit_note_date }}'
+  attribute :created_at, template: '{{ record.created_at }}'
+  attribute :updated_at, template: '{{ record.updated_at }}'
+  attribute :submitted_at, template: '{{ record.submitted_at }}'
+  attribute :approved_at, template: '{{ record.approved_at }}'
+  attribute :narration, template: '{{ record.narration }}'
+  attribute :billing_location, template: '{{ record.billing_location.name }}'
+  attribute :shipping_location, template: '{{ record.shipping_location.name }}'
+  attribute :tax_amount, template: '{{ record.tax_amount }}'
+  attribute :discount_amount, template: '{{ record.discount_amount }}'
+  attribute :tds_rate, template: '{{ record.tds_rate.tds }}'
+  attribute :tds_amount, template: '{{ record.tds_amount }}'
+  attribute :freight_amount, template: '{{ record.freight_amount }}'
+  attribute :previously_adjusted_amount, template: '{{ record.previously_adjusted_amount }}'
+  attribute :net_adjustable_amount, template: '{{ record.net_adjustable_amount }}'
+  attribute :cost_center, template: '{{ record.cost_center.name }}'
+  attribute :department, template: '{{ record.department.name }}'
+  attribute :approval_progress, template: '{{ record.review_progress }}'
+  attribute :policy, template: '{{ record.policy.name }}'
+  attribute :gross_receivable_amount, template: '{{ record.gross_receivable_amount }}'
+  attribute :net_receivable_amount, template: '{{ record.net_receivable_amount }}'
+
+end
