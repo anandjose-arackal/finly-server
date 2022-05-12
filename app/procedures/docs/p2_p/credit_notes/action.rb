@@ -8,4 +8,10 @@ class Docs::P2P::CreditNotes::Action < ActionManager::API
          label: "Jobs",
          icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png"
 
+  action :export,
+         :export,
+         label: "Export",
+         icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
+         route: "credit_notes.index"
+
 end
