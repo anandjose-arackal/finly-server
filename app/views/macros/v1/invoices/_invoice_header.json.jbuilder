@@ -27,7 +27,7 @@ json.tax_type exposure.tax_type_name
 json.tax_amount exposure.tax_amount&.value
 json.tds_slab record.tds_slab
 json.tds_rate record.tds_slab&.tds
-json.tds_amount exposure.display_tds_amount
+json.tds_amount (record.forms_enabled ?  record.display_tds_amount : exposure.tds_amount_value )
 json.freight_amount exposure.freight_amount_value
 json.net_amount exposure.net_amount_value
 json.paid_amount exposure.paid_amount_value
