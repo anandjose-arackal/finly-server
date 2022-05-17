@@ -1,6 +1,6 @@
 class ProcurementMailer < ApplicationMailer
   # for explicitly sending to vendor or other people
-  sidekiq_options queue: :procurements_notification
+  # sidekiq_options queue: :procurements_notification
 
   def send_mail(presenter)
     @data = presenter
