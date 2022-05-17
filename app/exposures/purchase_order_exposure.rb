@@ -188,4 +188,12 @@ class PurchaseOrderExposure < Exposures::API
   attribute :reporting_currency_code do
     record.get_reporting_currency.country_code
   end
+
+  attribute :purchase_order_comments, includes: [:comments] do
+    comment_texts =[]
+    record.comments.each do |comment|
+      comment_texts  << comment.generate_body
+    end
+    comment_texts.compact.join(', ')
+  end
 end

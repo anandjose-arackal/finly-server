@@ -1355,7 +1355,11 @@ include Searchkick::Api
         paid_percent_after_tax = paid_amount / invoice.amount_after_tax
         processing_percent_before_tax = payment_processing_amount / invoice.amount_before_tax
         processing_percent_after_tax = payment_processing_amount / invoice.amount_after_tax
-
+        return true if paid_amount.nil?
+        return true if paid_percent_before_tax.nil?
+        return true if paid_percent_after_tax.nil?
+        return true if processing_percent_after_tax.nil?
+        return true if processing_percent_before_tax.nil?
         effective_sql_before_tax = "UPDATE `budget_trails` SET `effective_paid_amount_before_tax_value` = (GREATEST((#{paid_percent_before_tax} * (billed_amount_before_tax_value) - tax_amount_value), 0) + #{invoice.advance_per_item})
                                                 WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
         ActiveRecord::Base.connection.execute(effective_sql_before_tax)
