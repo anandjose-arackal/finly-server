@@ -20,7 +20,7 @@ class Event::EPurchaseOrder::BulkApprove < Event::EPurchaseOrder::Base
     set_presenter_params(user)
     return unless params[:subject].present? && params[:body].present?
     params[:bulk_approve_result] = self.bulk_approve_result
-    ProcurementMailer.delay.purchase_order_bulk_approval(Event::EPurchaseOrder::BulkApprove::MailerPresenter.new(user, params))
+    ProcurementMailer.perform_async.purchase_order_bulk_approval(Event::EPurchaseOrder::BulkApprove::MailerPresenter.new(user, params))
   end
 
   def process

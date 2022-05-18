@@ -51,7 +51,7 @@ class Event::EDocument::RemindAwaitingApproval < BaseOperation
     params[:purchase_orders] = self.purchase_orders
     params[:po_awaiting_approval_columns] = po_awaiting_approval_columns
 
-    ProcurementMailer.delay.send_awaiting_approval_mail(Event::EDocument::RemindAwaitingApproval::MailerPresenter.new(user, params))
+    ProcurementMailer.perform_async.send_awaiting_approval_mail(Event::EDocument::RemindAwaitingApproval::MailerPresenter.new(user, params))
   end
 
   def set_presenter_params(user)

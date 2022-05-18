@@ -41,7 +41,7 @@ class Event::EInvoice::Base < Event::SetNotifier
     return if user.blank?
     set_presenter_params(user)
     return unless params[:subject].present? and params[:body].present?
-    ProcurementMailer.delay.send_invoice_mail(Event::EInvoice::Base::MailerPresenter.new(user, params))
+    ProcurementMailer.perform_async.send_invoice_mail(Event::EInvoice::Base::MailerPresenter.new(user, params))
   end
 
   def mailer_subject(user)

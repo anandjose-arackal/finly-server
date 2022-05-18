@@ -20,7 +20,7 @@ class Event::EInvoice::BulkApprove < Event::EInvoice::Base
     set_presenter_params(user)
     return unless params[:subject].present? && params[:body].present?
     params[:bulk_approve_result] = self.bulk_approve_result
-    ProcurementMailer.delay.invoice_bulk_approval(Event::EInvoice::BulkApprove::MailerPresenter.new(user, params))
+    ProcurementMailer.perform_async.invoice_bulk_approval(Event::EInvoice::BulkApprove::MailerPresenter.new(user, params))
   end
 
   def process

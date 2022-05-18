@@ -25,7 +25,7 @@ class Event::EPurchaseRequest::RemindAwaitingApproval < Event::EPurchaseRequest:
     return unless params[:subject].present? && params[:body].present?
     params[:action_name] = action_name
     params[:awaiting_approval_columns] = awaiting_approval_columns
-    ProcurementMailer.delay.send_awaiting_approval_mail(Event::EPurchaseRequest::RemindAwaitingApproval::MailerPresenter.new(user, params))
+    ProcurementMailer.perform_async.send_awaiting_approval_mail(Event::EPurchaseRequest::RemindAwaitingApproval::MailerPresenter.new(user, params))
   end
 
   def validate
