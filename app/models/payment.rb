@@ -1149,7 +1149,7 @@ include Searchkick::Api
     tds_slabs = TdsSlabs::Index.(self.purchase_order.user, parameters).tds_slabs rescue nil
     total_amount = self.purchase_order.user.po_form_enabled ? precision_value(self.purchase_order&.po_requested_advance_amount&.to_f) : precision_value(self.purchase_order&.requested_advance_amount&.value)
     tds_amount = self.purchase_order.user.po_form_enabled ? self.purchase_order&.po_advance_tds_amount&.to_f : self.purchase_order&.advance_tds_amount&.value
-    conversion_rate = self.purchase_order.conversion_rate rescue 1
+    conversion_rate = (self.purchase_order&.conversion_rate.blank? ? 1.0 : self.purchase_order.conversion_rate)
     {
         total_amount: {value: total_amount, editable: false}, # TOTAL
         inclusive_of_taxes: "",

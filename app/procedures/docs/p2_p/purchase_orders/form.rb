@@ -116,7 +116,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
 
     number :payment_term_days,
            label: "Payment Term Days",
-           computed: Forms::Compute::Lookup('payment_term_id', '{{record.days_after | default: 0 }}'),
+           computed: Forms::Compute::Lookup('payment_term_id', '{{record.calculated_days_after | default: 0 }}'),
            visible: false
 
     date :delivery_date,
