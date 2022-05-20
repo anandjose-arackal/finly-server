@@ -68,10 +68,12 @@ class ProcurementMailer < ApplicationMailer
   end
 
   def send_purchase_request_mail(presenter)
+    puts "---------------- At Mailer ---------------"
     @data = presenter
     if presenter.success?
       mail to: presenter.to, subject: presenter.subject, template_name: 'template_purchase_request'
     end
+    puts "---------------- Finished Mailer ---------------"
   end
 
 
