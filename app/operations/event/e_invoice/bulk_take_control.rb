@@ -20,7 +20,7 @@ class Event::EInvoice::BulkTakeControl < Event::EInvoice::Base
     set_presenter_params(user)
     return unless params[:subject].present? && params[:body].present?
     params[:bulk_take_control_result] = self.bulk_take_control_result
-    ProcurementMailer.perform_async.invoice_bulk_take_control(Event::EInvoice::BulkTakeControl::MailerPresenter.new(user, params))
+    ProcurementMailer.delay(queue: 'procurements_notification').invoice_bulk_take_control(Event::EInvoice::BulkTakeControl::MailerPresenter.new(user, params))
   end
 
   def process

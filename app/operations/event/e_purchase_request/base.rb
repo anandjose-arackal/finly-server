@@ -34,7 +34,7 @@ class Event::EPurchaseRequest::Base < Event::SetNotifier
     return if user.blank?
     set_presenter_params(user)
     return unless params[:subject].present? and params[:body].present?
-    ProcurementMailer.perform_async.send_purchase_request_mail(Event::EPurchaseRequest::Base::MailerPresenter.new(user, params))
+    ProcurementMailer.delay(queue: 'procurements_notification').send_purchase_request_mail(Event::EPurchaseRequest::Base::MailerPresenter.new(user, params))
   end
 
   def mailer_subject(user)

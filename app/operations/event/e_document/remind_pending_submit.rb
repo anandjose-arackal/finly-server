@@ -40,7 +40,7 @@ class Event::EDocument::RemindPendingSubmit < BaseOperation
     params[:non_po_invoices] = self.non_po_invoices
     params[:non_po_pending_submit_columns] = self.non_po_pending_submit_columns
 
-    ProcurementMailer.perform_async.send_submit_reminder_mail(Event::EDocument::RemindPendingSubmit::MailerPresenter.new(user, params))
+    ProcurementMailer.delay(queue: 'procurements_notification').send_submit_reminder_mail(Event::EDocument::RemindPendingSubmit::MailerPresenter.new(user, params))
   end
 
   def set_presenter_params(user)

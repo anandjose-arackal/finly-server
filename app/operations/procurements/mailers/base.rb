@@ -44,7 +44,7 @@ class Procurements::Mailers::Base < BaseOperation
     params[:attachments] = self.attachments
     op = Procurements::Mailers::Base::MailerPresenter.new(user, params, messages)
     # ProcurementMailer.delay.send_mail(document, email_options, user)
-    ProcurementMailer.perform_async.send_mail(op)
+    ProcurementMailer.delay(queue: 'procurements_notification').send_mail(op)
   end
 
   def post_process

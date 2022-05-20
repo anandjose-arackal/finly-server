@@ -31,7 +31,7 @@ class Event::EPurchaseOrder::BulkForward < Event::EPurchaseOrder::Base
     return unless params[:subject].present? && params[:body].present?
     params[:result] = self.result
     params[:display_errors] = true unless user.id == forwarded_to_user.id
-    ProcurementMailer.perform_async.purchase_order_bulk_forward(Event::EPurchaseOrder::BulkForward::MailerPresenter.new(user, params))
+    ProcurementMailer.delay(queue: 'procurements_notification').purchase_order_bulk_forward(Event::EPurchaseOrder::BulkForward::MailerPresenter.new(user, params))
   end
 
   def process

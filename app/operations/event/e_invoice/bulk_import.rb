@@ -20,7 +20,7 @@ class Event::EInvoice::BulkImport < Event::EPurchaseOrder::Base
     set_presenter_params(user)
     return unless params[:subject].present? && params[:body].present?
     params[:bulk_approve_result] = self.bulk_approve_result
-    ProcurementMailer.perform_async.invoices_bulk_import(Event::EInvoice::BulkImport::MailerPresenter.new(user, params))
+    ProcurementMailer.delay(queue: 'procurements_notification').invoices_bulk_import(Event::EInvoice::BulkImport::MailerPresenter.new(user, params))
   end
 
   def process
