@@ -11,6 +11,8 @@ class YesBankStatusCheckerBackground
         pending_transactions = YesBankTransaction.processing_transactions.non_penny_test.all
         pending_transactions.find_each do |trans|
           ActsAsTenant.with_tenant trans.company do
+            RequestStoreUtil.set_current_company(trans.company)
+            RequestStoreUtil.set_current_user(trans.company&.users&.only_admins&.first)
             # where all the magic happens!
             BankTransfer::YesBank::CheckStatus.(trans)
           end
