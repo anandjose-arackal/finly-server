@@ -11,6 +11,8 @@ class IciciBankStatusCheckerBackground
         pending_transactions = IciciBankTransaction.processing_transactions
         pending_transactions.each do |bank_transaction|
           ActsAsTenant.with_tenant bank_transaction.company do
+            RequestStoreUtil.set_current_company(bank_transaction.company)
+            RequestStoreUtil.set_current_user(bank_transaction.company&.users&.only_admins&.first)
             BankTransfer::Icici::Transactions::CheckStatus.(bank_transaction)
           end
         end

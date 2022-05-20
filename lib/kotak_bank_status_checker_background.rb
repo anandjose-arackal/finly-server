@@ -12,6 +12,8 @@ class KotakBankStatusCheckerBackground
 
         bank_transactions.each do |bank_transaction|
           ActsAsTenant.with_tenant bank_transaction.company do
+            RequestStoreUtil.set_current_company(bank_transaction.company)
+            RequestStoreUtil.set_current_user(bank_transaction.company&.users&.only_admins&.first)
             parameters = {
                 unique_reference_number: bank_transaction.unique_reference_number,
                 company_id: bank_transaction.company_id,
