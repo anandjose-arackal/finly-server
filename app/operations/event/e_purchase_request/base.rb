@@ -34,9 +34,9 @@ class Event::EPurchaseRequest::Base < Event::SetNotifier
     return if user.blank?
     set_presenter_params(user)
     return unless params[:subject].present? and params[:body].present?
-    puts "---------------- Before PR Mail _---------------"
+    Rails.logger.info  "---------------- Before PR Mail _---------------"
     ProcurementMailer.delay(queue: 'procurements_notification').send_purchase_request_mail(Event::EPurchaseRequest::Base::MailerPresenter.new(user, params))
-    puts "---------------- After PR Mail _---------------"
+    Rails.logger.info  "---------------- After PR Mail _---------------"
   end
 
   def mailer_subject(user)
