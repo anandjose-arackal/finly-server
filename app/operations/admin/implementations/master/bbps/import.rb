@@ -60,7 +60,7 @@ class Admin::Implementations::Master::BBPS::Import < Admin::Implementations::Pro
     unless subscription_model.present?
       return result false, "Subscription not found"
     end
-    subscription = Docs::UtilityBills::Subscriptions::Contracts::Base.new(subscription_model)
+    subscription = Docs::UtilityBills::Subscriptions::Contracts::Update.new(subscription_model)
     format_data = build_params data
     unless format_data.success?
       return result false, format_data.failure
