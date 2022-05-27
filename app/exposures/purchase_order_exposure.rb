@@ -189,6 +189,11 @@ class PurchaseOrderExposure < Exposures::API
     record.get_reporting_currency.country_code
   end
 
+  attribute :po_advance_tds_amount,  record_attribute: true
+  attribute :po_advance_amount,  record_attribute: true
+  attribute :po_advance_tds_percentage,  record_attribute: true
+  attribute :po_requested_advance_amount,  record_attribute: true
+
   attribute :purchase_order_comments, includes: [:comments] do
     comment_texts =[]
     record.comments.each do |comment|
