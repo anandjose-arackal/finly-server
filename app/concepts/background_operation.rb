@@ -18,13 +18,6 @@ class BackgroundOperation < BaseOperation
       user_id = user_id.id
     end
     request_store_hash = RequestStoreUtil.to_hash
-    if RequestStore.store[:current_user].nil?
-      if user_id.present?
-        ActsAsTenant.without_tenant do
-          RequestStore.store[:current_user] = User.find_by_id(user_id)
-        end
-      end
-    end
     # this calls the super method of Sidekiq::Worker which calls the perfoem method
     super(user_id, params, request_store_hash)
   end
@@ -42,14 +35,6 @@ class BackgroundOperation < BaseOperation
     end
 
     self.params = params
-    if RequestStore.store[:current_user].nil?
-      if user_id.present?
-        ActsAsTenant.without_tenant do
-          RequestStore.store[:current_user] = User.find_by_id(user_id)
-          RequestStore.store[:current_company] = User.find_by_id(user_id)&.company
-        end
-      end
-    end
 
     if RequestStore.store[:current_user]&.class&.name == "AdminUser"
       ActsAsTenant.without_tenant_if_not_set do
