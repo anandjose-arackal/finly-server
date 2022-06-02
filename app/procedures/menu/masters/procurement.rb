@@ -132,10 +132,10 @@ class Menu::Masters::Procurement < Menu::API
     item :analytics_dashboards, label: 'Insights', permissions: [:admin], toggle: [AnalyticsToggle, :enabled?]
     item :vendors, permissions: Masters::Vendors::Index.permissions
     item :items, permissions: Masters::Items::Index.permissions
-    item :rate_contracts, permissions: Masters::RateContracts::Index.permissions, features: [:procurement,:invoice_to_pay_system]
+    item :rate_contracts, permissions: Masters::RateContracts::Index.permissions, features: [:invoice_enabled]
     item :agreements, features: :agreement_based_payment_system,
          permissions: Docs::P2P::Agreements::Index.permissions
-    item :credit_notes, permissions: Docs::P2P::CreditNotes::Index.permissions, features: [:procurement, :invoice_to_pay_system]
+    item :credit_notes, permissions: Docs::P2P::CreditNotes::Index.permissions, features: [:invoice_enabled]
     item :utility_subscriptions, permissions: Docs::UtilityBills::Subscriptions::Index.permissions, features: :utility_bills_enabled
     item :users, permissions: [:admin]
     item :audit_trails, permissions: Docs::AuditTrails::Index.permissions, toggle: [AuditTrailsToggle, :enabled?]

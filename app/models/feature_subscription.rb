@@ -84,6 +84,10 @@ class FeatureSubscription < ApplicationRecord
     end
   end
 
+  def invoice_enabled
+    self.procurement || self.invoice_to_pay_system
+  end
+
   def create_company_utiity_bank_account
     if utility_bills_enabled?
       if subscribable_type == "Company"
