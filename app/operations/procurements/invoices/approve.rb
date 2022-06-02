@@ -31,7 +31,9 @@ class Procurements::Invoices::Approve < Procurements::Invoices::Base
   end
 
   def process
-    call_save(params) if self.invoice.forms_enabled
+    # invoice can approve through bulk action and from mail, saving updated params cant perform here.
+    # form have seperate update button
+    #call_save(params) if self.invoice.forms_enabled
     return unless self.flag_save
     params[:document] = self.invoice
     params[:aasm_event] = 'approve'
