@@ -46,6 +46,7 @@ class BackgroundOperation < BaseOperation
       if user_id.present?
         ActsAsTenant.without_tenant do
           RequestStore.store[:current_user] = User.find_by_id(user_id)
+          RequestStore.store[:current_company] = User.find_by_id(user_id)&.company
         end
       end
     end
