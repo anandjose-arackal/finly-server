@@ -116,7 +116,7 @@ class Menu::Masters::Procurement < Menu::API
 
   item :payables, features: [:yes_bank_account], icon: "https://img.icons8.com/windows/20/ffffff/sales-performance.png" do
     item :po_advances, label: 'PO Advances', permissions: Docs::P2P::PurchaseOrders::Advances::Index.permissions, features: :procurement
-    item :invoices, permissions: Docs::P2P::Invoices::Index.permissions, features: [:procurement, :invoice_to_pay_system]
+    item :invoices, permissions: Docs::P2P::Invoices::Index.permissions,  features: [:invoice_enabled]
     item :utility_bills, permissions: Docs::UtilityBills::Subscriptions::Index.permissions, features: :utility_bills_enabled
     item :upcoming_invoices, permissions: Docs::P2P::Invoices::Agreement::UpcomingInvoices::Index.permissions, features: :agreement_based_payment_system
     # item :unbilled_items, permissions: [] # todo
@@ -132,10 +132,10 @@ class Menu::Masters::Procurement < Menu::API
     item :analytics_dashboards, label: 'Insights', permissions: [:admin], toggle: [AnalyticsToggle, :enabled?]
     item :vendors, permissions: Masters::Vendors::Index.permissions
     item :items, permissions: Masters::Items::Index.permissions
-    item :rate_contracts, permissions: Masters::RateContracts::Index.permissions, features: [:procurement,:invoice_to_pay_system]
+    item :rate_contracts, permissions: Masters::RateContracts::Index.permissions, features: [:invoice_enabled]
     item :agreements, features: :agreement_based_payment_system,
          permissions: Docs::P2P::Agreements::Index.permissions
-    item :credit_notes, permissions: Docs::P2P::CreditNotes::Index.permissions, features: [:procurement, :invoice_to_pay_system]
+    item :credit_notes, permissions: Docs::P2P::CreditNotes::Index.permissions, features: [:invoice_enabled]
     item :utility_subscriptions, permissions: Docs::UtilityBills::Subscriptions::Index.permissions, features: :utility_bills_enabled
     item :users, permissions: [:admin]
     item :audit_trails, permissions: Docs::AuditTrails::Index.permissions, toggle: [AuditTrailsToggle, :enabled?]
