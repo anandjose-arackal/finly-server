@@ -143,7 +143,7 @@ class PurchaseOrderItem < ApplicationRecord
 
   before_save :set_tds_applicable
   after_save :sync_amounts, unless: :skip_callback
-  after_save :budget_trail_entry
+  after_save :budget_trail_entry if RequestStore.store[:current_company].feature_subscription.budgeting_system
   after_destroy :budget_trail_destroy
 
   delegate :goods?, :service?, to: :inventory_line_item, allow_nil: true

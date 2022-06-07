@@ -555,7 +555,7 @@ class PurchaseOrder < ApplicationRecord
   after_create :purchase_request_tasks
   after_save :sync_amounts, unless: :skip_callback
   after_save :set_currency_for_amount, unless: :skip_callback
-  after_save :budget_trail_entry
+  after_save :budget_trail_entry if RequestStore.store[:current_company].feature_subscription.budgeting_system
   after_destroy :budget_trail_destroy
 
   before_create :set_currency
