@@ -239,16 +239,19 @@ class Reports::Violation < Reports::Base
   def available_budget(expense, rule, start_date, end_date, categories, field_drop_down_item_ids)
     user = expense.user
     report = expense.report
-    total_expenses = 0
-    report_ids = [report.id]
+    #total_expenses = 0
+    non_receipt_reports_used_amount = 0
+    receipt_reports_used_amount = 0
+    # report_ids = [report.id]
 
     #checking for expense level custom_fields
-    expense_with_custom_field = []
-    if field_drop_down_item_ids.present?
-      expense.custom_fields.where(value_type: "FieldDropDownSelection").map {|cf| expense_with_custom_field << expense.id if field_drop_down_item_ids.include?(cf.value.value.id) }
-    end
-
-     expenses = Expense.with_report_id(report_ids).or(Expense.where(id: expense_with_custom_field))
+    # expense_with_custom_field = []
+    # if field_drop_down_item_ids.present?
+    #   expense.custom_fields.where(value_type: "FieldDropDownSelection").map {|cf| expense_with_custom_field << expense.id if field_drop_down_item_ids.include?(cf.value.value.id) }
+    # end
+    
+    # expenses = Expense.with_report_id(report_ids).or(Expense.where(id: expense_with_custom_field))
+    
     expense_arrays  = []
     expense_types = rule.expense_types.pluck(:id)
     expense_arrays << ExpenseType.id_for(:manual) if expense_types.include?(1)
@@ -256,18 +259,50 @@ class Reports::Violation < Reports::Base
     expense_arrays << ExpenseType.id_for(:distance) if expense_types.include?(3)
     expense_arrays << ExpenseType.id_for(:time) if expense_types.include?(4)
     expense_arrays << ExpenseType.id_for(:per_diem) if expense_types.include?(5)
+    
+    # expenses = expenses.selected_expense_types(expense_arrays)
 
-    expenses = expenses.selected_expense_types(expense_arrays)
+    #if rule is for day start_date and end_date will be beginning_of_day and end_of_day
+    if rule.period_id == 1
+      start_date = start_date.beginning_of_day
+      end_date = end_date.end_of_day
+    end
 
-    # Expenses with different usage_date ranges from expense date
-    total_expenses += number_with_precision(expenses.without_usage_date_type.with_date_range(start_date, end_date)
-                                                .filter_category_id(categories&.pluck(:id)).joins(:amount).sum(base_currency_code.to_sym), :precision => 2).to_f
+    #to limit rule amount use the previously approved, auto_approved, retracted, settlement_confirmed, closed, settled reports data
+    filter_reports = Report.where(:created_at => start_date..end_date,user_id: user.id,report_status_id: [2,3,5,6,7,8], policy_id: report&.policy_id)&.pluck(:id)
+
+    #take presently open report and for warning reports consider only open report only in open status
+    if rule.type == 'Warning' || rule.type == 'Blocking'
+      if report.report_status_id == 1
+        filter_reports << report&.id
+      end
+    end
+
+    actual_expenses_ids = []
+    filter_reports.each do |each_report_id|
+      actual_expenses_ids << Report.find(each_report_id).expenses&.pluck(:id)
+    end
+    
+    actual_expenses_ids = actual_expenses_ids.flatten
+      
+    expense_receipt_present = !expense.receipts.empty?
 
     # Expenses without different usage_date ranges from expense date
-    expenses.with_usage_date_type.usage_date_within(start_date, end_date).filter_category_id(categories&.pluck(:id)).each do |exp|
+    if expense_receipt_present
+      receipt_reports_used_amount += number_with_precision(Expense.with_id(actual_expenses_ids).selected_expense_types(expense_arrays).filter_receipt( expense_receipt_present ? "present" : "absent" ).without_usage_date_type.with_date_range(start_date, end_date).filter_category_id(categories&.pluck(:id)).joins(:amount).sum(base_currency_code.to_sym), :precision => 2).to_f
+    else
+      non_receipt_reports_used_amount += number_with_precision(Expense.with_id(actual_expenses_ids).selected_expense_types(expense_arrays).filter_receipt( expense_receipt_present ? "present" : "absent" ).without_usage_date_type.with_date_range(start_date, end_date).filter_category_id(categories&.pluck(:id)).joins(:amount).sum(base_currency_code.to_sym), :precision => 2).to_f
+    end
+
+    # Expenses with different usage_date ranges from expense date
+    Expense.with_id(actual_expenses_ids).selected_expense_types(expense_arrays).filter_receipt( expense_receipt_present ? "present" : "absent" ).with_usage_date_type.usage_date_within(start_date, end_date).filter_category_id(categories&.pluck(:id)).each do |exp|
       if exp.usage_date_end.blank?
         # If only a single date is defined in usage_date range, add the cost to current budget
-        total_expenses += exp.amount.send(base_currency_code.to_sym)
+        if expense_receipt_present
+          receipt_reports_used_amount += exp.amount.send(base_currency_code.to_sym)
+        else
+          non_receipt_reports_used_amount += exp.amount.send(base_currency_code.to_sym)
+        end
       else
         # If the usage date is partially/completely overlapping with budget date, then (add number of overlapping days with budget)*(cost per date)
         usage_days = exp.usage_days
@@ -275,26 +310,27 @@ class Reports::Violation < Reports::Base
         total_number_of_days = usage_days.count
         number_of_overlapping_days = ([end_date, usage_days.last].min.to_date - [start_date, usage_days.first].max.to_date).to_i + 1
         cost_per_date = exp.amount.send(base_currency_code.to_sym) / total_number_of_days
-        total_expenses += cost_per_date * number_of_overlapping_days
+        if expense_receipt_present
+          receipt_reports_used_amount += cost_per_date * number_of_overlapping_days
+        else 
+          non_receipt_reports_used_amount += cost_per_date * number_of_overlapping_days
+        end
       end
     end
-    # the expenses that will be considered for the receipt rule are only those that fit the criteria for this particular rule
-    expenses = expenses.filter_category_id(categories&.pluck(:id))
 
     if rule.amount.present?
       # Rule is independent of receipt
-      return (rule.amount.value - total_expenses), :total
+      return (rule.amount.value - non_receipt_reports_used_amount), :total
     else
       # Rule contains condition of with and without receipt
-      all_receipts_avaialble = (Receipt.with_expense_id(expenses.pluck(:id)).pluck(:parent_id).uniq.size == expenses.count)
-      if all_receipts_avaialble
+      if expense_receipt_present
         # All expenses have receipts
         return 0 if rule.with_receipt_amount.blank?
-        return (rule.with_receipt_amount.value - total_expenses), :with_receipt
+        return (rule.with_receipt_amount.value - receipt_reports_used_amount), :with_receipt
       else
         # Expenses are present which do not have receipts
         return 0 if rule.without_receipt_amount.blank?
-        return (rule.without_receipt_amount.value - total_expenses), :without_receipt
+        return (rule.without_receipt_amount.value - non_receipt_reports_used_amount), :without_receipt
       end
     end
   end
