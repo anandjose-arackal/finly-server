@@ -715,7 +715,7 @@ class Invoice < ApplicationRecord
   after_create :set_defaults
   after_save :sync_amounts, unless: :skip_callback
   after_save :set_currency_for_amount, unless: :skip_callback
-  after_save :budget_trail_entry
+  after_save :budget_trail_entry, if: :budget_enabled?
   # the below callback deals with cases where the PO advance has been paid, and then an invoice is being raised
   # after_save :handle_po_advance_budget_trails
   after_destroy :budget_trail_destroy
@@ -2207,6 +2207,10 @@ class Invoice < ApplicationRecord
     end
     self.skip_callback = true
     self.save
+  end
+
+  def budget_enabled?
+    RequestStore.store[:current_company].feature_subscription.budgeting_system
   end
 
   # def update_amount_after_cn_adjustment

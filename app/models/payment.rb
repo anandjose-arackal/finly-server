@@ -518,7 +518,7 @@ include Searchkick::Api
     self.reference_id = Generator.reference_id_for(initiating_account, receiving_account, date)
   end
 
-  after_save :budget_trail_entry
+  after_save :budget_trail_entry, if: :budget_enabled?
   after_save :recalculate_order_summary
   after_save :add_company_id
   after_save :calculate_paid_amount_in_parent_trails
@@ -1470,5 +1470,8 @@ include Searchkick::Api
     self.save
   end
 
+  def budget_enabled?
+    RequestStore.store[:current_company].feature_subscription.budgeting_system
+  end
 
 end

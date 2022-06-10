@@ -86,7 +86,7 @@ class PurchaseRequestItem < ApplicationRecord
       }
   )
 
-  after_save :budget_trail_entry
+  after_save :budget_trail_entry, if: :budget_enabled?
   after_destroy :budget_trail_destroy
 
   validates :item, :quantity, :per_unit_estimated_amount, :required_by_date, :delivery_location, presence: true, unless: :parent_forms_enabled
@@ -320,5 +320,8 @@ class PurchaseRequestItem < ApplicationRecord
     self.save
   end
 
+  def budget_enabled?
+    RequestStore.store[:current_company].feature_subscription.budgeting_system
+  end
 
 end
