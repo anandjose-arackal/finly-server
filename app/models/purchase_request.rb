@@ -79,7 +79,7 @@ class PurchaseRequest < ApplicationRecord
 
   before_create :set_creator
   before_create :set_currency
-  after_save :budget_trail_entry
+  after_save :budget_trail_entry, if: :budget_enabled?
   after_save :sync_amounts, unless: :skip_callback
   after_save :set_currency_for_amount, unless: :skip_callback
   after_destroy :budget_trail_destroy
@@ -626,6 +626,10 @@ class PurchaseRequest < ApplicationRecord
     end
     self.skip_callback = true
     self.save
+  end
+
+  def budget_enabled?
+    RequestStore.store[:current_company].feature_subscription.budgeting_system
   end
 
 end
