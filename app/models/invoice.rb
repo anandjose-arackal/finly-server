@@ -670,21 +670,21 @@ class Invoice < ApplicationRecord
   scope :sort_invoice_id, -> (type) {
     type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
-      reorder("invoices.invoice_id #{type}")
+      reorder("invoices.invoice_id ?", type)
     end
   }
 
   scope :sort_date, -> (type) {
     type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
-      reorder("invoices.date #{type}")
+      reorder("invoices.date ?", type)
     end
   }
 
   scope :sort_due_date, -> (type) {
     type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
-      reorder("invoices.due_date #{type}")
+      reorder("invoices.due_date ?", type)
     end
   }
 

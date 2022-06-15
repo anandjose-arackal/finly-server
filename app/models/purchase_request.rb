@@ -207,21 +207,21 @@ class PurchaseRequest < ApplicationRecord
   scope :sort_order_number, -> (type) {
     type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
-      reorder("purchase_requests.order_number #{type}")
+      reorder("purchase_requests.order_number ?", type)
     end
   }
 
   scope :sort_description, -> (type) {
     type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
-      reorder("purchase_requests.description #{type}")
+      reorder("purchase_requests.description ?", type)
     end
   }
 
   scope :sort_date, -> (type) {
     type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
-      reorder("purchase_requests.created_at #{type}")
+      reorder("purchase_requests.created_at ?", type)
     end
   }
 
