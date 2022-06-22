@@ -844,7 +844,7 @@ GEM
       execjs
 
 PLATFORMS
-  -darwin-21
+  ruby
 
 DEPENDENCIES
   aasm (~> 5.0.1)
