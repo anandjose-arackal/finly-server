@@ -6,18 +6,6 @@ GIT
       aws-sdk-ec2 (>= 1.24.0)
       rails (>= 4.2)
 
-GIT
-  remote: https://github.com/ruckus/quickbooks-ruby.git
-  revision: 22c8df58bbed441207f3d0d8ac5a786cdb4821a5
-  ref: 22c8df58bbed441207f3d0d8ac5a786cdb4821a5
-  specs:
-    quickbooks-ruby (0.4.6)
-      activemodel
-      multipart-post
-      nokogiri
-      oauth (= 0.5.1)
-      roxml (= 3.3.1)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -111,7 +99,7 @@ GEM
       execjs
     awesome_print (1.8.0)
     aws-eventstream (1.2.0)
-    aws-partitions (1.600.0)
+    aws-partitions (1.601.0)
     aws-sdk-core (3.131.2)
       aws-eventstream (~> 1, >= 1.0.2)
       aws-partitions (~> 1, >= 1.525.0)
@@ -508,7 +496,7 @@ GEM
     nokogiri (1.13.6)
       mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
-    oauth (0.5.1)
+    oauth (0.5.10)
     oj (3.7.12)
     omniauth (2.0.4)
       hashie (>= 3.4.6)
@@ -550,7 +538,7 @@ GEM
     paranoia (2.6.0)
       activerecord (>= 5.1, < 7.1)
     parslet (1.8.2)
-    posthog-ruby (1.2.4)
+    posthog-ruby (1.3.0)
       concurrent-ruby
     power_assert (2.0.1)
     pry (0.12.2)
@@ -571,8 +559,8 @@ GEM
       rack (>= 1.2.0)
     rack-protection (2.2.0)
       rack
-    rack-test (1.1.0)
-      rack (>= 1.0, < 3)
+    rack-test (2.0.0)
+      rack (>= 1.3)
     rails (6.0.5)
       actioncable (= 6.0.5)
       actionmailbox (= 6.0.5)
@@ -614,7 +602,7 @@ GEM
       msgpack (>= 0.4.3)
       optimist (>= 3.0.0)
     rbtree (0.4.5)
-    redis (4.6.0)
+    redis (4.7.0)
     redis-namespace (1.8.2)
       redis (>= 3.0.4)
     reform (2.6.2)
@@ -652,9 +640,6 @@ GEM
       nokogiri
       roo (>= 2.0.0, < 3)
       spreadsheet (> 0.9.0)
-    roxml (3.3.1)
-      activesupport (>= 2.3.0)
-      nokogiri (>= 1.3.3)
     rspec-core (3.9.3)
       rspec-support (~> 3.9.3)
     rspec-expectations (3.9.4)
@@ -741,7 +726,7 @@ GEM
     spring-watcher-listen (2.0.1)
       listen (>= 2.7, < 4.0)
       spring (>= 1.2, < 3.0)
-    sprockets (4.0.3)
+    sprockets (4.1.0)
       concurrent-ruby (~> 1.0)
       rack (> 1, < 3)
     sprockets-rails (3.4.2)
@@ -964,7 +949,6 @@ DEPENDENCIES
   pry (~> 0.12.2)
   puma (~> 5.6)
   pundit (~> 2.1)
-  quickbooks-ruby!
   rack (~> 2.2.3)
   rack-attack (= 5.4.2)
   rack-mini-profiler (~> 1.0.1)
