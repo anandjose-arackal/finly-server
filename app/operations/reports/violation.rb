@@ -249,7 +249,15 @@ class Reports::Violation < Reports::Base
     report_status_ids << ReportStatus.id_for(:settlement_confirmed)
     report_status_ids <<  ReportStatus.id_for(:closed)
 
-    report_ids = Report.selected_report_statuses(report_status_ids).created_date_within(start_date,end_date).with_user_id(user&.id).filter_policy(report&.policy_id)&.pluck(:id)
+    #to limit rule amount use the previously approved, auto_approved, retracted, settlement_confirmed, closed, settled reports data
+    report_ids = Report.with_user_id(user&.id).filter_policy(report&.policy_id).created_date_within(start_date,end_date).selected_report_statuses(report_status_ids)&.pluck(:id)
+
+    #take presently open report and for warning reports consider only open report only in open status
+    if rule.type == 'Warning' || rule.type == 'Blocking'
+      if report.report_status_id == 1
+        report_ids << report&.id
+      end
+    end
 
     #checking for expense level custom_fields
     expense_with_custom_field = []
