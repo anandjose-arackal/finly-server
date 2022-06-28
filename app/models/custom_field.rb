@@ -48,7 +48,9 @@ class CustomField < ApplicationRecordBackwardCompatibility
     # )
 
     # This performs the same as above, easier to read
-    Arel.sql("`custom_fields`.`field_configuration_id` IN (#{field_configuration_id.join(",")}) AND `custom_fields`.`configured_field_value`")
+    query = "`custom_fields`.`field_configuration_id` IN (#{field_configuration_id.join(",")}) AND `custom_fields`.`configured_field_value`"
+    query = ActiveRecord::Base.sanitize_sql(query)
+    Arel.sql(query)
   end
 
   # validate :validate_field
