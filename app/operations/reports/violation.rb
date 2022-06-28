@@ -240,7 +240,16 @@ class Reports::Violation < Reports::Base
     user = expense.user
     report = expense.report
     total_expenses = 0
-    report_ids = [report.id]
+
+    report_status_ids = []
+    report_status_ids <<   ReportStatus.id_for(:processing)
+    report_status_ids << ReportStatus.id_for(:approved) 
+    report_status_ids << ReportStatus.id_for(:retracted)
+    report_status_ids << ReportStatus.id_for(:settled)
+    report_status_ids << ReportStatus.id_for(:settlement_confirmed)
+    report_status_ids <<  ReportStatus.id_for(:closed)
+
+    report_ids = Report.selected_report_statuses(report_status_ids).created_date_within(start_date,end_date).with_user_id(user&.id).filter_policy(report&.policy_id)&.pluck(:id)
 
     #checking for expense level custom_fields
     expense_with_custom_field = []
