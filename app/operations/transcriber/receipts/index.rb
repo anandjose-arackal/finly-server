@@ -42,13 +42,13 @@ class Transcriber::Receipts::Index < Transcriber::Base
     if params[:filter_parent] == '1'
       self.receipts = Receipt.untranscribed.joins(:user => [:company])
                           .where('companies.id IN (?)', companies.pluck(:id))
-                          .reorder("receipts.#{self.sort_by} #{self.sort_order}")
+                          .reorder(ActiveRecord::Base.sanitize_sql("receipts.#{self.sort_by} #{self.sort_order}"))
     elsif params[:filter_parent] == '2'
       self.receipts = Receipt.joins(:user => [:company, :expenses])
                           .where('companies.id IN (?)', companies.pluck(:id))
                           .where(expenses: {transcribed: true})
                           .where(expenses: {expense_status_id: ExpenseStatus.ids_for([:unreported, :unsubmitted, :rejected])})
-                          .reorder(Arel.sql("expenses.updated_at  #{self.sort_order}"))
+                          .reorder(Arel.sql(ActiveRecord::Base.sanitize_sql("expenses.updated_at  #{self.sort_order}")))
     end
   end
 
