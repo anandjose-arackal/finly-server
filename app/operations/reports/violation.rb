@@ -265,13 +265,13 @@ class Reports::Violation < Reports::Base
 
     #to limit rule amount use the previously approved, auto_approved, retracted, settlement_confirmed, closed, settled reports data 
     #filter_reports = Report.with_user_id(user&.id).filter_policy(report&.policy_id).created_date_within(start_date,end_date)&.pluck(:id)
-    filter_reports = [353962,353963,353964]
+    filter_reports = [ 353962,353963,353964]
     #take presently open report and for warning reports consider only open report only in open status
-    if rule.type == 'Warning' || rule.type == 'Blocking'
-      if report.report_status_id == 1
-        filter_reports << report&.id
-      end
-    end
+    # if rule.type == 'Warning' || rule.type == 'Blocking'
+    #   if report.report_status_id == 1
+    #     filter_reports << report&.id
+    #   end
+    # end
 
     #all the expenses used before creation of report(current)
     expenses = Expense.with_report_id(filter_reports).or(Expense.where(id: expense_with_custom_field))
@@ -285,7 +285,7 @@ class Reports::Violation < Reports::Base
     expense_arrays << ExpenseType.id_for(:per_diem) if expense_types.include?(5)
 
     #select accroding to rule categories, expense_type and receipt condition
-    expenses = expenses.selected_expense_types(expense_arrays)
+    #expenses = expenses.selected_expense_types(expense_arrays)
 
     # sum value of expenses
     total_expenses += number_with_precision(expenses.without_usage_date_type.with_date_range(start_date, end_date)
