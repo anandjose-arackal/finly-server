@@ -240,26 +240,9 @@ class Reports::Violation < Reports::Base
     user = expense.user
     report = expense.report
     total_expenses = 0
+    #expense_receipt_present = !expense.receipts.empty?
 
-    report_status_ids = []
-    report_status_ids << ReportStatus.id_for(:processing)
-    report_status_ids << ReportStatus.id_for(:approved) 
-    report_status_ids << ReportStatus.id_for(:retracted)
-    report_status_ids << ReportStatus.id_for(:settled)
-    report_status_ids << ReportStatus.id_for(:settlement_confirmed)
-    report_status_ids <<  ReportStatus.id_for(:closed)
-
-    #to limit rule amount use the previously approved, auto_approved, retracted, settlement_confirmed, closed, settled reports data
-    report_ids = Report.with_user_id(user&.id).filter_policy(report&.policy_id).created_date_within(start_date,end_date)
-    report_ids = report_ids.selected_report_statuses(report_status_ids)&.pluck(:id)
-
-    #take presently open report and for warning reports consider only open report only in open status
-    if rule.type == 'Warning' || rule.type == 'Blocking'
-      if report.report_status_id == 1
-        report_ids << report&.id
-      end
-    end
-
+    #if rule is for day start_date and end_date will be beginning_of_day and end_of_day
     if rule.period_id == 1
       start_date = start_date.beginning_of_day
       end_date = end_date.end_of_day
@@ -271,7 +254,27 @@ class Reports::Violation < Reports::Base
       expense.custom_fields.where(value_type: "FieldDropDownSelection").map {|cf| expense_with_custom_field << expense.id if field_drop_down_item_ids.include?(cf.value.value.id) }
     end
 
-    expenses = Expense.with_report_id(report_ids).or(Expense.where(id: expense_with_custom_field))
+    report_status_ids = []
+    report_status_ids <<   ReportStatus.id_for(:processing)
+    report_status_ids << ReportStatus.id_for(:approved) 
+    report_status_ids << ReportStatus.id_for(:retracted)
+    report_status_ids << ReportStatus.id_for(:settled)
+    report_status_ids << ReportStatus.id_for(:settlement_confirmed)
+    report_status_ids <<  ReportStatus.id_for(:closed)
+
+    #to limit rule amount use the previously approved, auto_approved, retracted, settlement_confirmed, closed, settled reports data
+    filter_reports = Report.selected_report_statuses(report_status_ids).created_date_within(start_date,end_date).with_user_id(user&.id).filter_policy(report&.policy_id)&.pluck(:id)
+
+    #take presently open report and for warning reports consider only open report only in open status
+    if rule.type == 'Warning' || rule.type == 'Blocking'
+      if report.report_status_id == 1
+        filter_reports << report&.id
+      end
+    end
+
+    #all the expenses used before creation of report(current)
+    expenses = Expense.with_report_id(filter_reports).or(Expense.where(id: expense_with_custom_field))
+    
     expense_arrays  = []
     expense_types = rule.expense_types.pluck(:id)
     expense_arrays << ExpenseType.id_for(:manual) if expense_types.include?(1)
@@ -280,9 +283,10 @@ class Reports::Violation < Reports::Base
     expense_arrays << ExpenseType.id_for(:time) if expense_types.include?(4)
     expense_arrays << ExpenseType.id_for(:per_diem) if expense_types.include?(5)
 
+    #select accroding to rule categories, expense_type and receipt condition
     expenses = expenses.selected_expense_types(expense_arrays)
 
-    # Expenses with different usage_date ranges from expense date
+    # sum value of expenses
     total_expenses += number_with_precision(expenses.without_usage_date_type.with_date_range(start_date, end_date)
                                                 .filter_category_id(categories&.pluck(:id)).joins(:amount).sum(base_currency_code.to_sym), :precision => 2).to_f
 
@@ -309,8 +313,7 @@ class Reports::Violation < Reports::Base
       return (rule.amount.value - total_expenses), :total
     else
       # Rule contains condition of with and without receipt
-      all_receipts_avaialble = (Receipt.with_expense_id(expenses.pluck(:id)).pluck(:parent_id).uniq.size == expenses.count)
-      if all_receipts_avaialble
+      if !expense.receipts.empty?
         # All expenses have receipts
         return 0 if rule.with_receipt_amount.blank?
         return (rule.with_receipt_amount.value - total_expenses), :with_receipt
