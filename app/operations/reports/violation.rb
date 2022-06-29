@@ -262,10 +262,10 @@ class Reports::Violation < Reports::Base
     # report_status_ids << ReportStatus.id_for(:settlement_confirmed)
     # report_status_ids <<  ReportStatus.id_for(:closed)
     # selected_report_statuses(report_status_ids)
-    
-    #to limit rule amount use the previously approved, auto_approved, retracted, settlement_confirmed, closed, settled reports data 
-    filter_reports = Report.with_user_id(user&.id).filter_policy(report&.policy_id).created_date_within(start_date,end_date)&.pluck(:id)
 
+    #to limit rule amount use the previously approved, auto_approved, retracted, settlement_confirmed, closed, settled reports data 
+    #filter_reports = Report.with_user_id(user&.id).filter_policy(report&.policy_id).created_date_within(start_date,end_date)&.pluck(:id)
+    filter_reports = [353962,353963,353964]
     #take presently open report and for warning reports consider only open report only in open status
     if rule.type == 'Warning' || rule.type == 'Blocking'
       if report.report_status_id == 1
