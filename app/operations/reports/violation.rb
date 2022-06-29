@@ -254,16 +254,17 @@ class Reports::Violation < Reports::Base
       expense.custom_fields.where(value_type: "FieldDropDownSelection").map {|cf| expense_with_custom_field << expense.id if field_drop_down_item_ids.include?(cf.value.value.id) }
     end
 
-    report_status_ids = []
-    report_status_ids <<   ReportStatus.id_for(:processing)
-    report_status_ids << ReportStatus.id_for(:approved) 
-    report_status_ids << ReportStatus.id_for(:retracted)
-    report_status_ids << ReportStatus.id_for(:settled)
-    report_status_ids << ReportStatus.id_for(:settlement_confirmed)
-    report_status_ids <<  ReportStatus.id_for(:closed)
-
-    #to limit rule amount use the previously approved, auto_approved, retracted, settlement_confirmed, closed, settled reports data
-    filter_reports = Report.selected_report_statuses(report_status_ids).created_date_within(start_date,end_date).with_user_id(user&.id).filter_policy(report&.policy_id)&.pluck(:id)
+    # report_status_ids = []
+    # report_status_ids << ReportStatus.id_for(:processing)
+    # report_status_ids << ReportStatus.id_for(:approved) 
+    # report_status_ids << ReportStatus.id_for(:retracted)
+    # report_status_ids << ReportStatus.id_for(:settled)
+    # report_status_ids << ReportStatus.id_for(:settlement_confirmed)
+    # report_status_ids <<  ReportStatus.id_for(:closed)
+    # selected_report_statuses(report_status_ids)
+    
+    #to limit rule amount use the previously approved, auto_approved, retracted, settlement_confirmed, closed, settled reports data 
+    filter_reports = Report.with_user_id(user&.id).filter_policy(report&.policy_id).created_date_within(start_date,end_date)&.pluck(:id)
 
     #take presently open report and for warning reports consider only open report only in open status
     if rule.type == 'Warning' || rule.type == 'Blocking'
