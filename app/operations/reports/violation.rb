@@ -291,20 +291,20 @@ class Reports::Violation < Reports::Base
     #                                             .filter_category_id(categories&.pluck(:id)).joins(:amount).sum(base_currency_code.to_sym), :precision => 2).to_f
     total_expenses = -25000
     # Expenses without different usage_date ranges from expense date
-    expenses.with_usage_date_type.usage_date_within(start_date, end_date).filter_category_id(categories&.pluck(:id)).each do |exp|
-      if exp.usage_date_end.blank?
-        # If only a single date is defined in usage_date range, add the cost to current budget
-        total_expenses += exp.amount.send(base_currency_code.to_sym)
-      else
-        # If the usage date is partially/completely overlapping with budget date, then (add number of overlapping days with budget)*(cost per date)
-        usage_days = exp.usage_days
-        next if usage_days.nil?
-        total_number_of_days = usage_days.count
-        number_of_overlapping_days = ([end_date, usage_days.last].min.to_date - [start_date, usage_days.first].max.to_date).to_i + 1
-        cost_per_date = exp.amount.send(base_currency_code.to_sym) / total_number_of_days
-        total_expenses += cost_per_date * number_of_overlapping_days
-      end
-    end
+    # expenses.with_usage_date_type.usage_date_within(start_date, end_date).filter_category_id(categories&.pluck(:id)).each do |exp|
+    #   if exp.usage_date_end.blank?
+    #     # If only a single date is defined in usage_date range, add the cost to current budget
+    #     total_expenses += exp.amount.send(base_currency_code.to_sym)
+    #   else
+    #     # If the usage date is partially/completely overlapping with budget date, then (add number of overlapping days with budget)*(cost per date)
+    #     usage_days = exp.usage_days
+    #     next if usage_days.nil?
+    #     total_number_of_days = usage_days.count
+    #     number_of_overlapping_days = ([end_date, usage_days.last].min.to_date - [start_date, usage_days.first].max.to_date).to_i + 1
+    #     cost_per_date = exp.amount.send(base_currency_code.to_sym) / total_number_of_days
+    #     total_expenses += cost_per_date * number_of_overlapping_days
+    #   end
+    # end
     # the expenses that will be considered for the receipt rule are only those that fit the criteria for this particular rule
     #expenses = expenses.filter_category_id(categories&.pluck(:id))
 
