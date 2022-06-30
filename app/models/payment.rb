@@ -1389,7 +1389,7 @@ include Searchkick::Api
 
         sql_after_tax = "UPDATE budget_trails SET `payment_processing_amount_after_tax_value` = (? * (billed_amount_after_tax_value))
                                              WHERE `budget_trails`.`id` IN (?)"
-        sql_after_tax = ActiveRecord::Base::sanitize_sql([sql_after_tax, processing_percent_after_tax, parent_trails.pluck(:id)])clear
+        sql_after_tax = ActiveRecord::Base::sanitize_sql([sql_after_tax, processing_percent_after_tax, parent_trails.pluck(:id)])
         ActiveRecord::Base.connection.execute(sql_after_tax)
       when "PurchaseOrder"
         purchase_order = self.parent
