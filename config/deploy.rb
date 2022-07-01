@@ -15,6 +15,8 @@ set :repo_url, 'git@gitlab.com:finlycore/finly-server.git'
 
 set :branch, ENV['REFERENCE'] || ENV['BRANCH'] || :master
 
+set :sidekiq_service_unit_user, :system
+
 case fetch(:stage)
 when :aws_production, :background_production, :foreground_production, :console_production,
     :api_production, :background_production_bgg, :background_production_bgp, :background_production_bgpc, :background_production_console, :background_production_bgl
@@ -36,24 +38,31 @@ when :staging, :development
   set :rails_env, 'staging'
 when :development_2
   set :deploy_to, '/home/centos/app_2'
+  set :sidekiq_service_unit_name, 'sidekiq_2'
   set :rails_env, 'staging'
 when :development_3
   set :deploy_to, '/home/centos/app_3'
+  set :sidekiq_service_unit_name, 'sidekiq_3'
   set :rails_env, 'staging'
 when :development_4
   set :deploy_to, '/home/centos/app_4'
+  set :sidekiq_service_unit_name, 'sidekiq_4'
   set :rails_env, 'staging'
 when :development_5
   set :deploy_to, '/home/centos/app_5'
+  set :sidekiq_service_unit_name, 'sidekiq_5'
   set :rails_env, 'staging'
 when :development_6
   set :deploy_to, '/home/centos/app_6'
+  set :sidekiq_service_unit_name, 'sidekiq_6'
   set :rails_env, 'staging'
 when :development_7
   set :deploy_to, '/home/centos/app_7'
+  set :sidekiq_service_unit_name, 'sidekiq_7'
   set :rails_env, 'staging'
 when :development_8
   set :deploy_to, '/home/centos/app_8'
+  set :sidekiq_service_unit_name, 'sidekiq_8'
   set :rails_env, 'staging'
 when :uat
   set :deploy_to, '/home/centos/app'
