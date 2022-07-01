@@ -35,6 +35,7 @@ install_plugin Capistrano::Puma::Monit, load_hooks: false
 
 require 'capistrano/sidekiq'
 require 'capistrano/sidekiq/monit'
+require 'capistrano/sidekiq/systemd'
 # install_plugin Capistrano::Sidekiq
 # install_plugin Capistrano::Sidekiq::Monit, load_hooks: false
 
