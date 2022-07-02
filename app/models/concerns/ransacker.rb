@@ -35,7 +35,9 @@ module Ransacker
 
     def ransack_date(attribute)
       ransacker attribute do
-        Arel.sql("date(#{table_name}.#{attribute})")
+        query = "date(#{table_name}.#{attribute})"
+        query = ActiveRecord::Base.sanitize_sql(query)
+        Arel.sql(query)
       end
     end
 
