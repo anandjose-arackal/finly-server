@@ -2133,7 +2133,7 @@ class Invoice < ApplicationRecord
   def multiple_invoice_validation
     current_company_invoices = self.company.inward_invoices.scope_all_except_voided_rejected_retracted
     invoice_number = self.invoice_number
-    vendor_id = self.inward_invoice.vendor_id || self.vendor_id
+    vendor_id = self.vendor_id
     duplicate_invoices = current_company_invoices.with_invoice_number(invoice_number).with_vendor_ids(vendor_id).without_id(self.inward_invoice.id)
     multiple_invoices = current_company_invoices.where(invoice_number: self.invoice_number).count > 1
     if invoice_number.present? && duplicate_invoices.present? && multiple_invoices
