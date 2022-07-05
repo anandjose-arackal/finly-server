@@ -31,6 +31,9 @@ set :email_tracker_role, :email_tracker_role
 # role-based syntax
 # ==================
 
+before 'deploy:updating',  'sidekiq:monit:unmonitor'
+before  'deploy:cleanup', 'sidekiq:monit:monitor'
+
 before 'deploy:updating', 'puma:monit:unmonitor'
 after 'deploy:published', 'puma:monit:monitor'
 
