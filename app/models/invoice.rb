@@ -670,6 +670,7 @@ class Invoice < ApplicationRecord
   scope :sort_invoice_id, -> (type) {
     type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
+      # nosqli - The incoming var is checked to be ASC or DESC and then only substituted, not other value other than "ASC" or "DESC" possible
       reorder("invoices.invoice_id #{type}")
     end
   }
@@ -677,6 +678,7 @@ class Invoice < ApplicationRecord
   scope :sort_date, -> (type) {
     type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
+      # nosqli - The incoming var is checked to be ASC or DESC and then only substituted, not other value other than "ASC" or "DESC" possible
       reorder("invoices.date #{type}")
     end
   }
@@ -684,6 +686,7 @@ class Invoice < ApplicationRecord
   scope :sort_due_date, -> (type) {
     type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
+      # nosqli - The incoming var is checked to be ASC or DESC and then only substituted, not other value other than "ASC" or "DESC" possible
       reorder("invoices.due_date #{type}")
     end
   }

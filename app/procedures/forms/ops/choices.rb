@@ -68,7 +68,7 @@ class Forms::Ops::Choices < Transactions::API
       query += " AND " unless query.blank?
       query += "(`form_entities`.`entity_path` = '#{controlling_entity_path}' AND controlling_choice_id = '#{value}')"
     end
-
+    # nosqli - Not a user provided input, derived from an AR object
     context[:dependency_mapping] = FormChoiceDependencyMapping.
         joins(dependency: :controlling_entity).
         where("form_choice_dependencies.dependent_entity_id = '#{entity.id}'").

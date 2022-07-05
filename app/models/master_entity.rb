@@ -90,6 +90,7 @@ class MasterEntity < ApplicationRecord
     if entity.unique
       contract.validate do
         if send(entity.entity_key).present?
+          # nosqli - not a user provided input
           recs = contract_root.model.class.where("#{entity.entity_key} = ?", send(entity.entity_key))
           id = send(:id)
           recs = recs.where.not(id: id) if id.present?
