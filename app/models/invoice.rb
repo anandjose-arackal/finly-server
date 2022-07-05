@@ -2134,7 +2134,7 @@ class Invoice < ApplicationRecord
     current_company_invoices = self.company.inward_invoices.scope_all_except_voided_rejected_retracted
     invoice_number = self.invoice_number
     vendor_id = self.vendor_id
-    duplicate_invoices = current_company_invoices.with_invoice_number(invoice_number).with_vendor_ids(vendor_id).without_id(self.inward_invoice.id)
+    duplicate_invoices = current_company_invoices.with_invoice_number(invoice_number).with_vendor_ids(vendor_id).without_id(self.invoice_id)
     multiple_invoices = current_company_invoices.where(invoice_number: self.invoice_number).count > 1
     if invoice_number.present? && duplicate_invoices.present? && multiple_invoices
       errors.add(:inward_invoice, "There is a similar invoice added with the same invoice number in our records. Please re-check your invoice details.")
