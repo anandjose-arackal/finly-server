@@ -26,8 +26,8 @@ set :email_tracker_role, :email_tracker_role
 set :whenever_cron, :whenever_cron
 set :sidekiq_service_unit_name, 'sidekiq'
 
-before 'deploy:updating',  'sidekiq:monit:unmonitor'
-before  'deploy:cleanup', 'sidekiq:monit:monitor'
+# before 'deploy:updating',  'sidekiq:monit:unmonitor'
+# before  'deploy:cleanup', 'sidekiq:monit:monitor'
 
 # set :sidekiq_config => File.join(shared_path, 'config', 'sidekiq.yml')
 # set :sidekiq_roles, :sidekiq_app

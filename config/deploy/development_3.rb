@@ -22,8 +22,8 @@ set :puma_service_unit_name, 'puma_3'
 set :sidekiq_service_unit_name, 'sidekiq_3'
 
 
-before 'deploy:updating',  'sidekiq:monit:unmonitor'
-before  'deploy:cleanup', 'sidekiq:monit:monitor'
+# before 'deploy:updating',  'sidekiq:monit:unmonitor'
+# before  'deploy:cleanup', 'sidekiq:monit:monitor'
 
 # role-based syntax
 # ==================
