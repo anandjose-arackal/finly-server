@@ -491,6 +491,7 @@ class PurchaseOrder < ApplicationRecord
     to = Date.today if to.blank?
     from = Date.parse(from) unless from.is_a?(Date)
     to = Date.parse(to) unless to.is_a?(Date)
+    # nosqli - The incoming vars are substituted using AR's safe substitute
     where('created_at >= ? && created_at <= ?', from, to)
   }
 
@@ -504,6 +505,7 @@ class PurchaseOrder < ApplicationRecord
   # Sorting
   scope :sort_po_number, -> (type) {
     type = type&.strip&.upcase
+    # nosqli - The incoming var is checked to be ASC or DESC and then only substituted, not other value other than "ASC" or "DESC" possible
     if type && ['ASC', 'DESC'].include?(type)
       reorder("purchase_orders.po_number #{type}")
     end
@@ -512,6 +514,7 @@ class PurchaseOrder < ApplicationRecord
   scope :sort_po_name, -> (type) {
     type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
+      # nosqli - The incoming var is checked to be ASC or DESC and then only substituted, not other value other than "ASC" or "DESC" possible
       includes(:procurement).reorder("procurements.name #{type}")
     end
   }
