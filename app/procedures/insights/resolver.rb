@@ -61,7 +61,7 @@ class Insights::Resolver < Resolver::API
       query += " OR (company_id = #{company.id} AND user_id is NULL and policy_id = #{policy_id} and user_role_id IN (#{role_ids.join(',')}))"
     end
     query += ")"
-
+    # nosqli - Not a user provided input
     self.entity.where(query)
   end
 end
