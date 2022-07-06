@@ -15,8 +15,6 @@ set :repo_url, 'git@gitlab.com:finlycore/finly-server.git'
 
 set :branch, ENV['REFERENCE'] || ENV['BRANCH'] || :master
 
-set :sidekiq_service_unit_user, :system
-
 case fetch(:stage)
 when :aws_production, :background_production, :foreground_production, :console_production,
     :api_production, :background_production_bgg, :background_production_bgp, :background_production_bgpc, :background_production_console, :background_production_bgl
