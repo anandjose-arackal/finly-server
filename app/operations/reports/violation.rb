@@ -240,7 +240,6 @@ class Reports::Violation < Reports::Base
     user = expense.user
     report = expense.report
     total_expenses = 0
-    #expense_receipt_present = !expense.receipts.empty?
 
     #if rule is for day start_date and end_date will be beginning_of_day and end_of_day
     if rule.period_id == Period.id_for(:day)
@@ -305,13 +304,17 @@ class Reports::Violation < Reports::Base
         total_expenses += cost_per_date * number_of_overlapping_days
       end
     end
+    
+    # the expenses that will be considered for the receipt rule are only those that fit the criteria for this particular rule
+    expenses = expenses.filter_category_id(categories&.pluck(:id))
 
     if rule.amount.present?
       # Rule is independent of receipt
       return (rule.amount.value - total_expenses), :total
     else
       # Rule contains condition of with and without receipt
-      if !expense.receipts.empty?
+      all_receipts_avaialble = (Receipt.with_expense_id(expenses.pluck(:id)).pluck(:parent_id).uniq.size == expenses.count)
+      if all_receipts_avaialble
         # All expenses have receipts
         return 0 if rule.with_receipt_amount.blank?
         return (rule.with_receipt_amount.value - total_expenses), :with_receipt
