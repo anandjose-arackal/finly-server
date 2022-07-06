@@ -7,7 +7,7 @@
 # server 'example.com', user: 'deploy', roles: %w{app web}, other_property: :other_value
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
-server '13.126.31.9', user: 'centos', roles: %w{web app db}, port: 22
+server ENV['BBPS_SERVER_IP'], user: 'centos', roles: %w{web app db}, port: 22
 set :stage, 'uat'
 set :use_sudo, false
 set :rbenv_type, :user

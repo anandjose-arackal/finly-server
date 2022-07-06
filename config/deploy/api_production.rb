@@ -7,7 +7,7 @@
 # server 'example.com', user: 'deploy', roles: %w{app web}, other_property: :other_value
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
-server '172.33.190.79', user: 'centos', roles: %w{web app}
+server ENV['API_PRODUCTION_SERVER_IP'], user: 'centos', roles: %w{web app}
 
 set :stage, 'production'
 # set :stage, 'staging'
