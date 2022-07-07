@@ -6,7 +6,7 @@ ruby '~> 2.6'
 gem 'wicked_pdf', '~> 1.1.0'
 gem 'wkhtmltopdf-binary', '0.12.5'
 
-gem 'nokogiri', '~> 1.13' #'~> 1.10.0'
+gem 'nokogiri', '~> 1.10.0'
 gem 'autoprefixer-rails', '~> 9.4.4'
 
 gem 'actionmailbox'
@@ -16,7 +16,7 @@ gem 'eps', '~> 0.3'
 gem 'fiscali', '~> 2.4'
 gem 'redis', '~> 4.1'
 gem 'parslet', '~> 1.8.2'
-gem 'rack', '~> 2.2.3'#github: 'rack/rack', :ref => 'f690bb71425aa31d7b9b3113829af773950d8ab5'
+gem 'rack', github: 'rack/rack', :ref => 'f690bb71425aa31d7b9b3113829af773950d8ab5'
 gem 'rufus-scheduler', '~> 3.6'
 # gem 'clockwork', '~> 2.0'
 gem 'cronex', '~> 0.10'
@@ -67,36 +67,36 @@ gem 'health-monitor-rails', '~> 8.4.0'
 
 # puma web server
 gem 'figaro', '~> 1.2'
-gem 'puma', '~> 5.6' #'5.2.1'
+gem 'puma', '5.2.1'
 gem 'capistrano3-puma', '5.1.1'
 
 gem 'resque', '~> 2.0.0'
 gem 'ransack', '~> 2.3'
 gem 'crono', '~> 1.1.2'
 # gem 'haml', '~> 5.0.4'
-gem 'sinatra', '~> 2.2.0'#, require: nil, github: 'sinatra/sinatra', branch: 'master'
+gem 'sinatra', '~> 3.0.0', require: nil, github: 'sinatra/sinatra', branch: 'master'
 gem 'gyoku', '~> 1.3'
 gem 'request_store', '~> 1.4.1'
 gem 'simpleconfig', '~> 2.0.1'
 
 gem 'slack-notifier', '~> 2.3'
 # gems for quickbooks integration
-gem 'omniauth', '~> 2.0.0'
+gem 'omniauth', '~> 1.9.0'
 gem 'omniauth-quickbooks', '~> 0.0.2'
 
 
 
-# gem 'quickbooks-ruby', git: 'https://github.com/ruckus/quickbooks-ruby.git', ref: '22c8df58bbed441207f3d0d8ac5a786cdb4821a5'
+gem 'quickbooks-ruby', git: 'https://github.com/ruckus/quickbooks-ruby.git', ref: '22c8df58bbed441207f3d0d8ac5a786cdb4821a5'
 
 # gem 'finly-secure_storage-sdk', git: 'git@bitbucket.org:vivek_a17/finly-secure_storage-sdk.git'
 gem 'finly-secure_storage-sdk', git: 'git@gitlab.com:finlycore/finly-secure_storage-sdk.git'
 
 # gem for SAML SSO
 gem 'ruby-saml', '~> 1.11'
-gem 'omniauth-saml', '~> 2.0' #'~> 1.10'
+gem 'omniauth-saml', '~> 1.10'
 gem 'omniauth-multi-provider', '~> 0.2'
 
-gem 'rubyzip', '~> 1.3' #'~> 1.2.2'
+gem 'rubyzip', '~> 1.2.2'
 
 # gem to import from excel
 gem 'roo', '~> 2.7.1'
@@ -107,7 +107,7 @@ gem 'saxlsx', '~> 1.9'
 gem 'annotate', '~> 3.1', '>= 3.1.1'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 6.0', '>= 6.0.4.8' #'>= 6.0.3.2'
+gem 'rails', '~> 6.0', '>= 6.0.3.2'
 # Use mysql as the database for Active Record
 gem 'mysql2', '~> 0.5'
 gem 'thor', '~> 0.19'
@@ -134,7 +134,7 @@ gem 'coffee-rails', '~> 4.2.2'
 # gem 'therubyracer', platforms: :ruby
 
 # Use jquery as the JavaScript library
-gem 'jquery-rails', '~> 4.4' #'~> 4.3.3'
+gem 'jquery-rails', '~> 4.3.3'
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 # gem 'turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
@@ -182,7 +182,7 @@ gem 'bootbox-rails', '0.5.0'
 
 # gem 'bootbox-rails'
 
-gem 'sidekiq', '~> 6.0'
+gem 'sidekiq', '~> 5.2.3'
 
 gem 'paranoia', '~> 2.4'
 
@@ -223,13 +223,13 @@ gem 'hooks', '~> 0.4.1'
 gem 'snowplow-tracker', '~> 0.6.1'
 
 gem 'maxminddb', '~> 0.1.22'
-gem 'geocoder', '~> 1.6.1'#'~> 1.5.0'
+gem 'geocoder', '~> 1.5.0'
 gem 'device_detector', '~> 1.0.1'
 
 # gem 'logstasher', '~> 1.3.0'
 gem 'lograge', '~> 0.10.0'
 gem 'logstash-event', '~> 1.2.02'
-gem 'sidekiq-logstash', '~> 2.0'
+gem 'sidekiq-logstash', '~> 1.0.1'
 gem 'logstash-logger', '~> 0.26.1'
 
 gem 'ancestry', '~> 3.0.5'
@@ -239,7 +239,7 @@ gem 'aasm', '~> 5.0.1'
 gem 'activerecord-import', '~> 1.0', '>= 1.0.3'
 gem 'parallel', '~> 1.18'
 gem 'string_pattern', '~> 2.2', '>= 2.2.1'
-gem 'image_processing', '~> 1.12.2' #'~> 1.2'
+gem 'image_processing', '~> 1.2'
 # gem 'bullet-train-client', '~> 1.1'
 # gem 'slackistrano'
 
@@ -303,12 +303,12 @@ group :development, :test do
   gem 'active_record_query_trace', '~> 1.5.4'
   # gem 'better_errors'
   # gem 'binding_of_caller'
-  # gem 'rubocop-rails', require: false
-  gem 'spring-commands-rspec', '~> 1.0.4'
+  gem 'rubocop-rails', require: false
 end
 
 group :test do
   gem 'rspec-rails', '~> 3.8'
+  gem 'spring-commands-rspec', '~> 1.0.4'
   gem 'capybara', '~> 3.29'
   gem 'simplecov'
 end
@@ -328,12 +328,13 @@ group :development do
   gem 'listen', '>= 3.0.5', '< 3.2'
   gem 'spring', '~> 2.1.0'
   gem 'spring-watcher-listen', '~> 2.0.0'
+  gem 'spring-commands-rspec', '~> 1.0.4'
   # gem "lol_dba"
 end
 
 gem 'yard', '~> 0.9'
 gem 'yard-activerecord'
-# gem 'rdoc', '~> 6.2'
+gem 'rdoc', '~> 6.2'
 
 
 # gem 'backup'

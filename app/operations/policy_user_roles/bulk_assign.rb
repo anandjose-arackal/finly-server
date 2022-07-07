@@ -91,6 +91,7 @@ class PolicyUserRoles::BulkAssign < PolicyUserRoles::Base
     # Bulk insert into table, 
     # much faster  
     begin
+      # nosqli - Substituted value is derived from a column, not a user provided input
       sql = "INSERT INTO policy_user_roles (policy_id, user_id, user_role_id, created_at, updated_at) VALUES #{self.assignable}"
       ActiveRecord::Base.connection.execute(sql)
     rescue => e

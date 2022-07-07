@@ -207,21 +207,24 @@ class PurchaseRequest < ApplicationRecord
   scope :sort_order_number, -> (type) {
     type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
-      reorder("purchase_requests.order_number ?", type)
+      # nosqli - The incoming var is checked to be ASC or DESC and then only substituted, not other value other than "ASC" or "DESC" possible
+      reorder("purchase_requests.order_number #{type}")
     end
   }
 
   scope :sort_description, -> (type) {
     type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
-      reorder("purchase_requests.description ?", type)
+      # nosqli - The incoming var is checked to be ASC or DESC and then only substituted, not other value other than "ASC" or "DESC" possible
+      reorder("purchase_requests.description #{type}")
     end
   }
 
   scope :sort_date, -> (type) {
     type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
-      reorder("purchase_requests.created_at ?", type)
+      # nosqli - The incoming var is checked to be ASC or DESC and then only substituted, not other value other than "ASC" or "DESC" possible
+      reorder("purchase_requests.created_at #{type}")
     end
   }
 
