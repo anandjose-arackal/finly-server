@@ -348,6 +348,7 @@ class Invoice < ApplicationRecord
   validates :invoice_number, :format => {with: /\A[a-zA-Z0-9 \\\/\-\#\&\_]*\Z/, :message => ' can only have letters, numbers, spaces, -,#,&,/ and underscore. No other special characters'}, :length => {minimum: 0, maximum: 30}, :allow_blank => true
   validate :item_quantity_validation
   validate :item_rate_validation
+  validate :multiple_invoice_validation
 
   before_destroy :rollback_agreement_invoice
   before_create :set_currency
@@ -2130,6 +2131,18 @@ class Invoice < ApplicationRecord
     end
 
     errors.add(:invoice_items, "rate must be greater than 0") if flag
+  end
+
+  def multiple_invoice_validation
+    current_company_invoices = self.company.inward_invoices.scope_all_except_voided_rejected_retracted
+    invoice_number = self.invoice_number
+    vendor_id = self.vendor_id
+    duplicate_invoices = current_company_invoices.with_invoice_number(invoice_number).with_vendor_ids(vendor_id).without_id(self.id)
+    multiple_invoices = current_company_invoices.where(invoice_number: self.invoice_number).count > 1
+    if invoice_number.present? && duplicate_invoices.present? && multiple_invoices
+      errors.add(:inward_invoice, "There is a similar invoice added with the same invoice number in our records. Please re-check your invoice details.")
+      return
+    end
   end
 
   def updated_values_to_new_structure
