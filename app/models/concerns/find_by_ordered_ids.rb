@@ -4,6 +4,7 @@ module FindByOrderedIds
     def find_ordered(ids)
       sanitized_id_string = ids.map {|id| connection.quote(id)}.join(",")
       if sanitized_id_string.present?
+        # nosqli - Table name derived from AR, the other variable is being quoted and sanitised
         where(id: ids).reorder("FIELD(#{self.table_name}.id, #{sanitized_id_string})")
       else
         where(id: ids)
