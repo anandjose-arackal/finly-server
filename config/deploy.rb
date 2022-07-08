@@ -77,7 +77,6 @@ end
 
 set :pty, false
 linked_files = %w{
-  config/database.yml
   config/application.yml
   config/data/bypass_authorized_users.yml
   config/mailer_config.yml
@@ -106,6 +105,7 @@ linked_files = %w{
   config/appsmith.yml
   config/sentry.yml
   config/message_service.yml
+  config/ip_addresses.yml
 }
 case fetch(:stage)
 when :itzcash_production, :aws_production, :background_production, :foreground_production, :console_production, :api_production, :background_production_console,
