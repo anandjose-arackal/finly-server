@@ -41,7 +41,7 @@ config/mailtrain.yml
 config/open_exchange_rates.yml
 config/message_template.yml
 config/appsmith.yml
-
+config/bills.yml
 # .rubocop.yml
 .vscode/
 reference_resource_migration.log

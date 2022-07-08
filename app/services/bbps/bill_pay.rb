@@ -56,11 +56,9 @@ class Bbps::BillPay < Bbps::Api
 
   path 'pay'
   url 'https://yesbbps.transxt.in:9443/portal/service/npciservice'
-  header "AUTH","/WT/ijy7z5abJBM/LAwbmA=="
+  header "AUTH", ENV['BILL_PAY_AUTH']
 
-  # path "pay"
-  # url 'http://180.179.170.6:1012/portal/service/npciservice'
-  # header "AUTH","7ljbVcKc1Ka5tpaGAyAvR/vNDcTzk1C+BRhUdM9zB3s="
+
 
   # Message Code(B2000) | Order No |Agent institution Id |Channel Id |Agent Id |
   # Quick Pay |Split Pay |Split Pay Amt |Customer name|Customermobile|

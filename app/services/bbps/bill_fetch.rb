@@ -48,10 +48,7 @@ class Bbps::BillFetch < Bbps::Api
 
   path 'fetch'
   url 'https://yesbbps.transxt.in:9443/portal/service/npciservice'
-  header "AUTH","/WT/ijy7z5abJBM/LAwbmA==" 
-  # path "fetch"
-  # url 'http://180.179.170.6:1012/portal/service/npciservice'
-  # header "AUTH","7ljbVcKc1Ka5tpaGAyAvR/vNDcTzk1C+BRhUdM9zB3s=", for sandbox
+  header "AUTH", ENV['BILL_FETCH_AUTH']
 
   def body
     message = generate_message
