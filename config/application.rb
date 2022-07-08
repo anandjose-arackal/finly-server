@@ -44,7 +44,11 @@ module Finly
     config.before_configuration do
       ip_file = File.join(Rails.root, 'config', 'deploy.yml')
       YAML.load(File.open(ip_file)).each do |key, value|
-        ENV[key] = value
+        if key.start_with?("PROD")
+          ENV[key] = value if Rails.env.production?
+        else
+          ENV[key] = value
+        end
       end if File.exists?(ip_file)
     end
 

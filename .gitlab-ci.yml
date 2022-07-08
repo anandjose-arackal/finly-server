@@ -24,7 +24,6 @@ rspec:
   variables:
     # Configure mysql service (https://hub.docker.com/_/mysql/)
     MYSQL_DATABASE: finly_test
-    MYSQL_ROOT_PASSWORD: admin123
   before_script:
     - apt-get update
     - apt-get install -y nodejs default-mysql-client unzip
