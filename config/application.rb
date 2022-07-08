@@ -39,7 +39,15 @@ module Finly
       YAML.load(File.open(ip_file)).each do |key, value|
         ENV[key] = value
       end if File.exists?(ip_file)
-      end
+    end
+
+    config.before_configuration do
+      ip_file = File.join(Rails.root, 'config', 'deploy.yml')
+      YAML.load(File.open(ip_file)).each do |key, value|
+        ENV[key] = value
+      end if File.exists?(ip_file)
+    end
+
 
     end
 end
