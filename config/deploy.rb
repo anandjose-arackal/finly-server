@@ -108,6 +108,8 @@ linked_files = %w{
   config/message_service.yml
   config/gstin_verification_config.yml
   config/ip_addresses.yml
+  config/bills.yml
+  config/deploy.yml
 }
 case fetch(:stage)
 when :itzcash_production, :aws_production, :background_production, :foreground_production, :console_production, :api_production, :background_production_console,
