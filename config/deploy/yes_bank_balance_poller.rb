@@ -20,7 +20,6 @@ set :sidekiq_config, -> {File.join(shared_path, 'config', 'sidekiq_yes_bank_bala
 set :sidekiq_pid, -> {File.join(shared_path, 'tmp', 'pids', 'sidekiq_yes_bank_balance.pid')}
 set :sidekiq_log, -> {File.join(shared_path, 'log', 'sidekiq_yes_bank_balance.log')}
 set :sidekiq_roles, :sidekiq_app
-set :sidekiq_service_unit_name, 'sidekiq_yb_balance'
 # role-based syntax
 # ==================
 

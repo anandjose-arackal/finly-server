@@ -765,7 +765,7 @@ class BankPaymentRequest < ApplicationRecord
 
       bank_payment_requests = bank_payment_requests.or(pur_bank_payment_requests)
     end
-
+    # nosqli - These values come from the table, not user provided values
     bank_payment_requests = bank_payment_requests.where("#{self.document_status_attribute} in (?)", self.finance_associated_status_ids)
   end
 

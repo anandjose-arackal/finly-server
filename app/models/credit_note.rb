@@ -288,16 +288,19 @@ class CreditNote < ApplicationRecord
 
   scope :order_previously_adjustable_amount, -> (order_type = "ASC") {
     order_type = format_order_type(order_type)
+    # nosqli - The substituted string is force formatted through the function call to format_order_type, not other value other than "ASC" or "DESC" possible
     joins(:previously_adjusted_amount).reorder("amounts.value #{order_type}")
   }
 
   scope :order_net_adjustable_amount, -> (order_type = "ASC") {
     order_type = format_order_type(order_type)
+    # nosqli - The substituted string is force formatted through the function call to format_order_type, not other value other than "ASC" or "DESC" possible
     joins(:net_adjustable_amount).reorder("amounts.value #{order_type}")
   }
 
   scope :order_created_at, -> (order_type = "ASC") {
     order_type = format_order_type(order_type)
+    # nosqli - The substituted string is force formatted through the function call to format_order_type, not other value other than "ASC" or "DESC" possible
     reorder("credit_notes.created_at #{order_type}")
   }
 

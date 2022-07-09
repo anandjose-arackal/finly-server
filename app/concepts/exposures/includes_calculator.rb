@@ -62,7 +62,7 @@ class Exposures::IncludesCalculator
       next unless association.present?
 
       class_names = if association.polymorphic?
-                      model_klass.distinct.unscope(:order).pluck("#{name}_type")
+                      model_klass.distinct.unscope(:order).pluck("#{name}_type".to_sym)
                     else
                       [association.class_name]
                     end

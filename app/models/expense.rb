@@ -428,6 +428,7 @@ class Expense < ApplicationRecord
   scope :includes_budget_show, -> {includes(:category, :user,
                                             {amount: [:currency]}, :expense_status)}
   scope :includes_amount, -> {includes :amount}
+  # nosqli - Not a user provided input
   scope :sum_amounts, -> (currency_code = :INR) {includes_amount.sum("amounts.#{currency_code}")}
   scope :includes_tds_amount, -> {includes :tds_amount}
   scope :sum_tds_amounts, -> (currency_code = :INR) do
