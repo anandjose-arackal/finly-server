@@ -39,7 +39,7 @@ class Bbps::BillValidation < Bbps::Api
 
   path "fetch"
   url 'https://yesbbps.transxt.in:9443/portal/service/npciservice'
-  header "AUTH","/WT/ijy7z5abJBM/LAwbmA=="
+  header "AUTH", ENV['BILL_VALIDATION_AUTH']
 
   # Message Code (B1100) | Order No | Agent institution Id | Channel Id | Agent Id | Customer mobile | Biller Id |
   # Customer Param 1 | Customer Param 2 | Customer Param 3 | Customer Param 4 | Customer Param 5 |

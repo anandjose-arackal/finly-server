@@ -71,19 +71,19 @@ module Constants
 
 
   if Rails.env.production?
-    WELCOME_MESSAGE_AUTH_KEY = "126829AkHzInaT57ed5ec4"
+    WELCOME_MESSAGE_AUTH_KEY = ENV['PROD_WELCOME_MESSAGE_AUTH_KEY']
   else
     WELCOME_MESSAGE_AUTH_KEY = ""
   end
 
-  # CURRENCY_LAYER_ACCESS_KEY = "149cdc66258ab026ca6d0c4841827503"
+
   # using the below one because the above one's monthly quota was crossed
   if Rails.env.production?
-    CURRENCY_LAYER_ACCESS_KEY = "5ca7968931344d3315596dc05a7249d1"
+    CURRENCY_LAYER_ACCESS_KEY = ENV['PROD_CURRENCY_LAYER_ACCESS_KEY']
     # above and below are the two keys we use. In case one runs out, please comment it out and use the other temporarily
-    # CURRENCY_LAYER_ACCESS_KEY = "149cdc66258ab026ca6d0c4841827503"
+    # REFER TO TEMP in the YAML file
   else
-    CURRENCY_LAYER_ACCESS_KEY = "149cdc66258ab026ca6d0c4841827503"
+    CURRENCY_LAYER_ACCESS_KEY = ENV['CURRENCY_LAYER_ACCESS_KEY']
   end
 
   # PayU Payment Gateway URL
@@ -156,13 +156,13 @@ module Constants
   BASE_URL_VP = vendor_payments_url
   BASE_ASSETS_URL = assets_url
 
-  DEFAULT_PASSWORD = "lqskmclkmsal1k"
+  DEFAULT_PASSWORD = ENV['CONSTANTS_DEFAULT_PASSWORD']
 
   class Constants::ItzCash
 
     ICW_CODE = 'D000000360'
     DMT_USERNAME = 'itzic20000'
-    DMT_PASSWORD = '03jqURp0OO0aVkssyuy01g=='
+    DMT_PASSWORD = ENV['DMT_PASSWORD']
     EASY_WALLET_ID = 'IFTSPL IMPS Wallet'
     EASY_WALLET_TYPE = 'IMPS'
 

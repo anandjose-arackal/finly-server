@@ -5,6 +5,7 @@ RSpec.describe Admin::CompanyGroupsController, type: :request do
   before :all do
     @doorkeeper_application = create :doorkeeper_application, scopes: 'admin'
     @admin_user1 = create :admin_user, email: generate(:admin_user_email), mobile_number: generate(:user_mobile_number)
+    # nosqli - These are TDD test cases that mock behavior for unit testing, these are not real credentials that work in Prod
     @password = 'FW1g$18j0t!k2'
 
     @user_agent = Faker::Internet.user_agent

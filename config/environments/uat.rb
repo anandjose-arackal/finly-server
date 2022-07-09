@@ -149,7 +149,7 @@ Rails.application.configure do
         port:                 587,
         domain:               'staging.finly.io',
         user_name:            'vivekagb',
-        password:             'idAr5APhk61X',
+        password:             ENV['UAT_PASSWORD'],
         # ssl:                  true,
         # tls:                  true,
         authentication:       :plain,
