@@ -18,7 +18,7 @@ set :rbenv_ruby, '2.6.1' # Edit this if you are using MRI Ruby
 set :sidekiq_config => File.join(shared_path, 'config', 'sidekiq.yml')
 set :sidekiq_roles, :sidekiq_app
 set :puma_service_unit_name, 'puma_6'
-set :sidekiq_service_unit_name, 'sidekiq_6'
+# set :sidekiq_service_unit_name, 'sidekiq_6'
 
 # role-based syntax
 # ==================

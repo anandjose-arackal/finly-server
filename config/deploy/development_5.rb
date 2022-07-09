@@ -19,7 +19,7 @@ set :whenever_cron, :whenever_cron
 set :sidekiq_config => File.join(shared_path, 'config', 'sidekiq.yml')
 set :sidekiq_roles, :sidekiq_app
 set :puma_service_unit_name, 'puma_5'
-set :sidekiq_service_unit_name, 'sidekiq_5'
+# set :sidekiq_service_unit_name, 'sidekiq_5'
 
 # role-based syntax
 # ==================
