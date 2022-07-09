@@ -22,6 +22,7 @@ RSpec.describe 'OtpVerification' do
 
       @doorkeeper_application = create :doorkeeper_application
 
+      # nosqli - These are TDD test cases that mock behavior for unit testing, these are not real credentials that work in Prod
       @correct_password = 'FW1g$18j0t!k2'
 
       @headers = authentication_headers_for(:web)

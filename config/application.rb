@@ -38,5 +38,25 @@ module Finly
     # Application configuration can go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded after loading
     # the framework and any gems in your application.
-  end
+
+    config.before_configuration do
+      ip_file = File.join(Rails.root, 'config', 'bills.yml')
+      YAML.load(File.open(ip_file)).each do |key, value|
+        ENV[key] = value
+      end if File.exists?(ip_file)
+    end
+
+    config.before_configuration do
+      ip_file = File.join(Rails.root, 'config', 'deploy.yml')
+      YAML.load(File.open(ip_file)).each do |key, value|
+        if key.start_with?("PROD")
+          ENV[key] = value if Rails.env.production?
+        else
+          ENV[key] = value
+        end
+      end if File.exists?(ip_file)
+    end
+
+
+    end
 end

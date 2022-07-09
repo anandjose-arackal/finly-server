@@ -77,6 +77,7 @@ end
 
 set :pty, false
 linked_files = %w{
+  config/database.yml
   config/application.yml
   config/data/bypass_authorized_users.yml
   config/mailer_config.yml
@@ -105,6 +106,7 @@ linked_files = %w{
   config/appsmith.yml
   config/sentry.yml
   config/message_service.yml
+  config/gstin_verification_config.yml
   config/ip_addresses.yml
 }
 case fetch(:stage)
@@ -181,7 +183,7 @@ set :whenever_roles, ["whenever_cron"]
 set :slackistrano, {
     channel: '#general',
     team: 'finlyteam',
-    token: 'xoxb-69742039698-481828577170-pL7adrfoCVs74cggPFKiRNhj',
+    token: ENV['SLACKISTRANO_TOKEN'],
     slack_via_slackbot: true
 }
 
