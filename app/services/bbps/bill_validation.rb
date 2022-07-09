@@ -167,7 +167,7 @@ class Bbps::BillValidation < Bbps::Api
     message["agentDetails"] = {}
     message["agentDetails"]["agentId"] = "YB01YB28MOB519101711"
     message["agentDetails"]["deviceTags"] = []
-    message["agentDetails"]["deviceTags"] << { "name" => "IP", "value" => "13.232.176.84" }
+    message["agentDetails"]["deviceTags"] << { "name" => "IP", "value" => ENV['BILL_VALIDATION_AGENT_IP'] }
     message["agentDetails"]["deviceTags"] << { "name" => "IMEI", "value" => "1234" }
     message["agentDetails"]["deviceTags"] << { "name" => "OS", "value" => "Android" }
     message["agentDetails"]["deviceTags"] << { "name" => "APP", "value" => "FINLY" }
