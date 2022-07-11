@@ -3,7 +3,7 @@ module Admin::CompanyMailHelper
   def random_ip_address(company)
     case company.id
       when 29
-        return "1.23.161.61"
+        return ENV['COMPANY_MAILER_HELPER_IP']
       else
         ips = Constants::JUNK_IP_ADDRESSES
         ips[random_integer(0, 19)]

@@ -106,6 +106,10 @@ linked_files = %w{
   config/appsmith.yml
   config/sentry.yml
   config/message_service.yml
+  config/gstin_verification_config.yml
+  config/ip_addresses.yml
+  config/bills.yml
+  config/deploy.yml
 }
 case fetch(:stage)
 when :itzcash_production, :aws_production, :background_production, :foreground_production, :console_production, :api_production, :background_production_console,
@@ -181,7 +185,7 @@ set :whenever_roles, ["whenever_cron"]
 set :slackistrano, {
     channel: '#general',
     team: 'finlyteam',
-    token: 'xoxb-69742039698-481828577170-pL7adrfoCVs74cggPFKiRNhj',
+    token: ENV['SLACKISTRANO_TOKEN'],
     slack_via_slackbot: true
 }
 
