@@ -8,11 +8,7 @@ class Bbps::TransactionStatus < Bbps::Api
 
   path "txnStatusCheck"
   url 'https://yesbbps.transxt.in:9443/portal/service/npciservice'
-  header "AUTH","/WT/ijy7z5abJBM/LAwbmA=="
-
-  # path "txnStatusCheck"
-  # url 'http://180.179.170.6:1012/portal/service/npciservice'
-  # header "AUTH","7ljbVcKc1Ka5tpaGAyAvR/vNDcTzk1C+BRhUdM9zB3s="
+  header "AUTH", ENV['TRANSACTION_STATUS_AUTH']
 
   def self.build_matcher(options, result)
     Dry::Matcher.new(
