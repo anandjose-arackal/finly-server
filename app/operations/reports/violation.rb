@@ -240,7 +240,8 @@ class Reports::Violation < Reports::Base
     user = expense.user
     report = expense.report
     total_expenses = 0
-
+    filter_reports = []
+    
     #if rule is for day start_date and end_date will be beginning_of_day and end_of_day
     if rule.period_id == Period.id_for(:day)
       start_date = start_date.beginning_of_day
@@ -262,7 +263,7 @@ class Reports::Violation < Reports::Base
     report_status_ids << ReportStatus.id_for(:closed)
 
     #to limit rule amount use the previously approved, auto_approved, retracted, settlement_confirmed, closed, settled reports data 
-    filter_reports = Report.with_user_id(user&.id).filter_policy(report&.policy_id).created_date_within(start_date,end_date).selected_report_statuses(report_status_ids)&.pluck(:id)
+    #filter_reports = Report.with_user_id(user&.id).filter_policy(report&.policy_id).created_date_within(start_date,end_date).selected_report_statuses(report_status_ids)&.pluck(:id)
 
     #take presently open report and for warning reports consider only open report only in open status
     if rule.type == 'Warning' || rule.type == 'Blocking'
