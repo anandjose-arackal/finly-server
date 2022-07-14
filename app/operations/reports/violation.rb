@@ -256,7 +256,7 @@ class Reports::Violation < Reports::Base
       expense.custom_fields.where(value_type: "FieldDropDownSelection").map {|cf| expense_with_custom_field << expense.id if field_drop_down_item_ids.include?(cf.value.value.id) }
     end
 
-    report_status_ids << ReportStatus.ids_for([:processing,:approved,:retracted,:settled,:settlement_confirmed,:closed,:auto_approved])
+    report_status_ids = ReportStatus.ids_for([:processing,:approved,:retracted,:settled,:settlement_confirmed,:closed,:auto_approved])
 
     #to limit rule amount use the previously approved, auto_approved, retracted, settlement_confirmed, closed, settled reports data 
     filter_reports = Report.with_user_id(user&.id).filter_policy(report&.policy_id).custom_report_select(start_date, end_date, report_status_ids)&.pluck(:id)
