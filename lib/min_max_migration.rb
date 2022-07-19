@@ -137,6 +137,7 @@ class MinMaxMigration
 
     document_types.each do |row|
       sql = "#{row["status_field"]} IN (1,2)"
+      # nosqli - Is a hard coded string derived from docment_types, not a user provided input
       documents = row["document_name"].constantize.where(sql)
       documents.each do |document|
         dlrms = document.dlrms

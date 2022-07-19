@@ -39,7 +39,7 @@ class Bbps::BillValidation < Bbps::Api
 
   path "fetch"
   url 'https://yesbbps.transxt.in:9443/portal/service/npciservice'
-  header "AUTH","/WT/ijy7z5abJBM/LAwbmA=="
+  header "AUTH", ENV['BILL_VALIDATION_AUTH']
 
   # Message Code (B1100) | Order No | Agent institution Id | Channel Id | Agent Id | Customer mobile | Biller Id |
   # Customer Param 1 | Customer Param 2 | Customer Param 3 | Customer Param 4 | Customer Param 5 |
@@ -167,7 +167,7 @@ class Bbps::BillValidation < Bbps::Api
     message["agentDetails"] = {}
     message["agentDetails"]["agentId"] = "YB01YB28MOB519101711"
     message["agentDetails"]["deviceTags"] = []
-    message["agentDetails"]["deviceTags"] << { "name" => "IP", "value" => "13.232.176.84" }
+    message["agentDetails"]["deviceTags"] << { "name" => "IP", "value" => ENV['BILL_VALIDATION_AGENT_IP'] }
     message["agentDetails"]["deviceTags"] << { "name" => "IMEI", "value" => "1234" }
     message["agentDetails"]["deviceTags"] << { "name" => "OS", "value" => "Android" }
     message["agentDetails"]["deviceTags"] << { "name" => "APP", "value" => "FINLY" }

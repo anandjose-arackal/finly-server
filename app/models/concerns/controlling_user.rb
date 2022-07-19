@@ -13,7 +13,7 @@ module ControllingUser
           document_level_reviewer_mappings.level_id = #{parent.table.name}.controlling_level_id AND
           document_level_reviewer_mappings.document_reviewer_mappable_id = #{parent.table.name}.id
           WHERE document_level_reviewer_mappings.reviewer_id  "
-
+      # nosqli - The value (parent.table.name) is from AR object, not user provided input
       Arel.sql(query)
     end
   end

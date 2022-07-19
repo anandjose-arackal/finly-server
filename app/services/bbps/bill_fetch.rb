@@ -48,10 +48,7 @@ class Bbps::BillFetch < Bbps::Api
 
   path 'fetch'
   url 'https://yesbbps.transxt.in:9443/portal/service/npciservice'
-  header "AUTH","/WT/ijy7z5abJBM/LAwbmA==" 
-  # path "fetch"
-  # url 'http://180.179.170.6:1012/portal/service/npciservice'
-  # header "AUTH","7ljbVcKc1Ka5tpaGAyAvR/vNDcTzk1C+BRhUdM9zB3s=", for sandbox
+  header "AUTH", ENV['BILL_FETCH_AUTH']
 
   def body
     message = generate_message
@@ -283,7 +280,7 @@ class Bbps::BillFetch < Bbps::Api
     # message["agentDetails"]["agentId"] = "YB31YB41MOB521611569"
     message["agentDetails"]["agentId"] = "YB01YB28MOB519101711" 
     message["agentDetails"]["deviceTags"] = []
-    message["agentDetails"]["deviceTags"] << { "name" => "IP", "value" => "13.232.176.84" }
+    message["agentDetails"]["deviceTags"] << { "name" => "IP", "value" => ENV['BILL_FETCH_AGENT_DETAILS'] }
     message["agentDetails"]["deviceTags"] << { "name" => "IMEI", "value" => "1234" }
     message["agentDetails"]["deviceTags"] << { "name" => "OS", "value" => "Android" }
     message["agentDetails"]["deviceTags"] << { "name" => "APP", "value" => "FINLY" }

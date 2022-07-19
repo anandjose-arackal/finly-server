@@ -17,6 +17,12 @@ module Finly
     config.active_record.default_timezone = :local
     config.middleware.use Rack::Attack
 
+    config.before_configuration do
+      ip_file = File.join(Rails.root, 'config', 'ip_addresses.yml')
+      YAML.load(File.open(ip_file)).each do |key, value|
+        ENV[key] = value
+      end if File.exists?(ip_file)
+    end
 
     # config.autoload_paths += %W(#{config.root}/lib)
 
@@ -28,10 +34,29 @@ module Finly
     end
 
     config.filter_parameters << :password
-
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration can go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded after loading
     # the framework and any gems in your application.
-  end
+
+    config.before_configuration do
+      ip_file = File.join(Rails.root, 'config', 'bills.yml')
+      YAML.load(File.open(ip_file)).each do |key, value|
+        ENV[key] = value
+      end if File.exists?(ip_file)
+    end
+
+    config.before_configuration do
+      ip_file = File.join(Rails.root, 'config', 'deploy.yml')
+      YAML.load(File.open(ip_file)).each do |key, value|
+        if key.start_with?("PROD")
+          ENV[key] = value if Rails.env.production?
+        else
+          ENV[key] = value
+        end
+      end if File.exists?(ip_file)
+    end
+
+
+    end
 end

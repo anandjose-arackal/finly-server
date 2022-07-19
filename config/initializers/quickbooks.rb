@@ -13,4 +13,4 @@ end
   :access_token_path    => "/oauth/v1/get_access_token"
 })
 
-Quickbooks.log = true
+# Quickbooks.log = true

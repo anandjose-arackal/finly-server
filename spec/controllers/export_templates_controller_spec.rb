@@ -7,6 +7,7 @@ RSpec.describe ExportTemplatesController, type: :request do
     @company1 = create :company
     @user1 = create :vp_user, company: @company1, mobile_number: generate(:user_mobile_number), email: generate(:finly_user_email), finly_id: 'test1'
     @user_profile1 = create :user_profile, user: @user1
+    # nosqli - These are TDD test cases that mock behavior for unit testing, these are not real credentials that work in Prod
     @password = 'FW1g$18j0t!k2'
 
     @user_agent = Faker::Internet.user_agent
