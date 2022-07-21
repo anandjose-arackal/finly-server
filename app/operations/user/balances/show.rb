@@ -152,7 +152,7 @@ class User::Balances::Show < User::Base
   end
 
   def retrieve_balances
-    itz_cash_company_adapter = retrieve_adapter selected_user.company.itz_cash_company_account
+    # itz_cash_company_adapter = retrieve_adapter selected_user.company.itz_cash_company_account
     if self.company.bank_service_provider == "YES"
       company_account_adapter = retrieve_adapter self.company.yes_bank_company_account
     elsif self.company.bank_service_provider == "ICICI"
@@ -160,20 +160,19 @@ class User::Balances::Show < User::Base
     else
       company_account_adapter = retrieve_adapter self.company.yes_bank_company_account
     end
-    wallet_adapter = retrieve_adapter user.wallet
     bank_wallet_adapter = retrieve_adapter user.bank_wallet
     utility_account_adapter = retrieve_adapter self.company.utility_bills_account
 
     self.card_info = {}
-    selected_user.cards.each do |card|
-      card_adapter = retrieve_adapter(card)
-      self.card_info[card.id] =
-         {
-             balance: (card_adapter.balance rescue nil),
-             eligibility: (card_adapter.credit_eligibility rescue nil)
-         }
-    end
-    comp_balance = itz_cash_company_adapter.balance rescue nil
+    #selected_user.cards.each do |card|
+    # card_adapter = retrieve_adapter(card)
+    # self.card_info[card.id] =
+          #   {
+             #       balance: (card_adapter.balance rescue nil),
+             #       eligibility: (card_adapter.credit_eligibility rescue nil)
+      #   }
+    #end
+    comp_balance = 0
     unless comp_balance
       comp_balance = "Temporarily unavailable"
     end
@@ -193,7 +192,7 @@ class User::Balances::Show < User::Base
             balance: bank_wallet_adapter.balance
         },
         itz_cash: {
-            balance: wallet_adapter.balance
+            balance: 0
         }
     }
     self.selected_user.user_pockets.each do |pocket|
