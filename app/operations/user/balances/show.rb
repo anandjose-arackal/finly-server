@@ -28,10 +28,10 @@ class User::Balances::Show < User::Base
     case current_app
       when 'em'
         # Adding expense management balances in this section if it's enabled for that user
-        if selected_user.company.d_code_enabled? && selected_user.expense_management_enabled?
+        if false
           set_itz_cash_balances
         end
-        if selected_user.cards.present?
+        if false
           set_card_balances
         end
         # adding vendor payment balances in this section if it is enabled for that selected_user
@@ -66,10 +66,10 @@ class User::Balances::Show < User::Base
         end
       when 'ft'
         # Adding expense management balances in this section if it's enabled for that user
-        if selected_user.company.cards_enabled? && selected_user.disburse_enabled?
+        if false
           set_itz_cash_balances
         end
-        if selected_user.cards.present?
+        if false
           set_card_balances
         end
       when 'fc'
