@@ -28,10 +28,10 @@ class User::Balances::Show < User::Base
     case current_app
       when 'em'
         # Adding expense management balances in this section if it's enabled for that user
-        if selected_user.company.d_code_enabled? && selected_user.expense_management_enabled?
+        if false
           set_itz_cash_balances
         end
-        if selected_user.cards.present?
+        if false
           set_card_balances
         end
         # adding vendor payment balances in this section if it is enabled for that selected_user
@@ -66,10 +66,10 @@ class User::Balances::Show < User::Base
         end
       when 'ft'
         # Adding expense management balances in this section if it's enabled for that user
-        if selected_user.company.cards_enabled? && selected_user.disburse_enabled?
+        if false
           set_itz_cash_balances
         end
-        if selected_user.cards.present?
+        if false
           set_card_balances
         end
       when 'fc'
@@ -204,7 +204,8 @@ class User::Balances::Show < User::Base
   end
 
   def set_itz_cash_balances
-    if selected_user.admin?
+    #itz cash feature discontinued
+    if false
       self.balances[:company_credits] = [] if self.balances[:company_credits].blank?
       self.balances[:company_credits] << {
           name: "Card Transfer Credits",
@@ -213,7 +214,8 @@ class User::Balances::Show < User::Base
       }
     end
     # adding finly money
-    if selected_user.cards.present?
+    # itz cash feature discontinued
+    if false
       self.balances[:finly_money] = [] if self.balances[:finly_money].blank?
       self.balances[:finly_money] << {
           name: "Card Transfer Pocket",
@@ -281,7 +283,8 @@ class User::Balances::Show < User::Base
   end
 
   def set_card_balances
-    if selected_user.cards.present?
+    # expense card feature discontinued
+    if false
       selected_user.cards.each do |card|
         # card.manager_view_balance false for reimbursement cards
         # Reimbursement card balance only visible for owner
@@ -326,7 +329,8 @@ class User::Balances::Show < User::Base
     credit_actions = {initiating_accounts: [], receiving_accounts: []}
     debit_actions = {initiating_accounts: [], receiving_accounts: []}
     meta = {base_url: nil}
-    if expense_management? && selected_user.expense_management_enabled?
+    #itz cash feature discontinued
+    if false
       # first add wallet balance
       wallet_action = {
           type: "wallet",
@@ -341,7 +345,8 @@ class User::Balances::Show < User::Base
       debit_actions[:receiving_accounts] << wallet_action
 
       # now add card balances
-      if selected_user.cards.expense_cards.present?
+      # card feature discontinued
+      if false
         selected_user.cards.expense_cards.each do |card|
           disabler = card.disabled_by_user&.name
           disabler_role = card.disabled_by_role&.name
@@ -363,7 +368,8 @@ class User::Balances::Show < User::Base
       end
 
       # now based on whether the user is an admin or not, add company credits
-      if selected_user.admin?
+      #itz cash feature discontinued
+      if false
         company_action = {
             type: "company",
             id: selected_user.company.itz_cash_company_account.id,
