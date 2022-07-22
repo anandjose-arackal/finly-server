@@ -12,7 +12,7 @@ server ENV['UAT_SERVER_IP'], user: 'centos', roles: %w{web app db hutch}, port: 
 set :stage, 'uat'
 set :use_sudo, false
 set :rbenv_type, :user
-set :rbenv_ruby, '2.6.1' # Edit this if you are using MRI Ruby
+set :rbenv_ruby, '2.7.1' # Edit this if you are using MRI Ruby
 set :puma_service_unit_name, 'puma'
 
 # role-based syntax
