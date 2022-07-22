@@ -2134,6 +2134,8 @@ class Invoice < ApplicationRecord
   end
 
   def multiple_invoice_validation
+    next if self.invoice_type_id == InwardInvoiceType.id_for(:beneficiary)
+    next if InwardInvoiceStatus.ids_for(:retracted, :rejected).include?(self.invoice_status_id)
     current_company_invoices = self.company.inward_invoices.scope_all_except_voided_rejected_retracted
     invoice_number = self.invoice_number
     vendor_id = self.vendor_id
