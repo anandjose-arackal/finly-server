@@ -107,7 +107,7 @@ gem 'saxlsx', '~> 1.9'
 gem 'annotate', '~> 3.1', '>= 3.1.1'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 6.0', '>= 6.0.4.8' #'>= 6.0.3.2'
+gem 'rails', '~> 6.0.5' #'>= 6.0.3.2'
 # Use mysql as the database for Active Record
 gem 'mysql2', '~> 0.5'
 gem 'thor', '~> 0.19'
