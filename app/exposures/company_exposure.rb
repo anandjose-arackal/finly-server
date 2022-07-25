@@ -5,5 +5,7 @@ class CompanyExposure < Exposures::API
   attribute :active, record_attribute: true
   attribute :configuration, record_attribute: true, exposure: true
   attribute :base_currency, record_attribute: true, exposure: true
-
+  attribute :reporting_currency do
+    record.reporting_currency
+  end
 end
