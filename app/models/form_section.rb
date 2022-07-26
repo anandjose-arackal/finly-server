@@ -58,5 +58,4 @@ class FormSection < ApplicationRecord
     return 'Line Items' if section_id == 'items'
     section_id.titleize
   end
-
 end

@@ -4,7 +4,16 @@ class Docs::P2P::CreditNotes::Index < IndexBuilder::API
   system_subscription :vp
   permissions :credit_note_initiator, :credit_note_reviewer, :credit_note_auditor
   resolver 'credit_notes.default'
-  reference '{{record.id}}', procurement_id: '{{record.procurement_id}}'
+  
+  def self.reference(id = nil, args = {})
+    {
+      id: '{{record.id}}',
+      args: {
+        procurement_id: '{{record.procurement_id}}',
+        forms_enabled: '{{record.forms_enabled}}'
+      }
+    }
+  end
 
   # Fixed column is always default true
   column :vendor, label: 'Vendor Details', fixed: true, sort: :vendor_business_name, includes: [:vendor] do

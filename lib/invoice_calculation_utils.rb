@@ -7,7 +7,8 @@ class InvoiceCalculationUtils
                 :gross_amount, :net_amount, :invoice,
                 :discount_amount, :tds_amount, :tax_amount, :original_amount, :after_discount_amount,
                 :advance, :advance_amount, :invoice_total, :freight_amount,
-                :roundoff_amount, :balance_due_amount, :payment_amount, :tds_applicable_amount, :cn_adjustment_amount, :current_tds_adjustment
+                :roundoff_amount, :balance_due_amount, :payment_amount, :tds_applicable_amount, :cn_adjustment_amount, :current_tds_adjustment,
+                :invoice_credit_note_adjusted_amount
 
   # don't go by the name - this calculates the Freight paid as well
   def calculate_tds_and_advance(params, taxable_amount, invoice_amount, tds_applicable_amount, payment = nil, invoice = nil, payment_amount = nil)
@@ -24,6 +25,7 @@ class InvoiceCalculationUtils
     calculate_freight_charges
     self.roundoff_amount = self.invoice.roundoff_amount.to_f # even if it's nil, it gets converted to 0
     self.roundoff_amount = self.invoice.invoice_roundoff_amount.to_f if self.invoice.try(:forms_enabled)
+    self.invoice_credit_note_adjusted_amount = self.invoice.invoice_credit_note_adjusted_amount.to_f if self.invoice.try(:forms_enabled)
     self.balance_due_amount = if self.roundoff_amount != 0
                                 precision_value (self.net_amount + self.roundoff_amount)
                               else
@@ -45,7 +47,7 @@ class InvoiceCalculationUtils
           if invoice.try(:forms_enabled)
             self.current_tds_adjustment = [self.tds_amount, purchase_order.po_advance_tds_amount.to_f].min
             self.tds_amount = [(self.tds_amount - self.current_tds_adjustment), 0].max
-            self.balance_due_amount = [self.balance_due_amount - self.invoice.adjusted_po_advance_payable_amount, 0].max
+            self.balance_due_amount = [self.balance_due_amount - self.invoice.adjusted_po_advance_payable_amount - self.invoice_credit_note_adjusted_amount.to_f, 0].max
           else
             self.balance_due_amount = [(self.balance_due_amount + purchase_order.advance_tds_amount&.value.to_f - self.invoice.po_adjusted_advance&.value.to_f), 0].max
           end
@@ -70,7 +72,7 @@ class InvoiceCalculationUtils
             self.balance_due_amount = self.balance_due_amount
             if invoice.try(:forms_enabled)
               self.current_tds_adjustment = [self.tds_amount, remaining_adjustable_tds].min
-              self.balance_due_amount = [(self.balance_due_amount - self.invoice.adjusted_po_advance_payable_amount), 0].max
+              self.balance_due_amount = [(self.balance_due_amount - self.invoice.adjusted_po_advance_payable_amount - self.invoice_credit_note_adjusted_amount.to_f), 0].max
             end
           else
             if invoice.try(:forms_enabled)
@@ -81,7 +83,7 @@ class InvoiceCalculationUtils
               self.balance_due_amount = if self.invoice.try(:forms_enabled)
                                           [(self.balance_due_amount - self.invoice.adjusted_po_advance_payable_amount), 0].max
                                         else
-                                          [(self.balance_due_amount + purchase_order.advance_tds_amount&.value.to_f - self.invoice.po_adjusted_advance&.value.to_f), 0].max
+                                          [(self.balance_due_amount + purchase_order.advance_tds_amount&.value.to_f - self.invoice.po_adjusted_advance&.value.to_f - self.invoice_credit_note_adjusted_amount.to_f), 0].max
                                         end
             else
               self.balance_due_amount = [(self.balance_due_amount + purchase_order.advance_tds_amount&.value.to_f - self.invoice.po_adjusted_advance&.value.to_f), 0].max
@@ -96,7 +98,7 @@ class InvoiceCalculationUtils
         # end
       end
     else
-      self.balance_due_amount = self.balance_due_amount - self.advance_amount if invoice.try(:forms_enabled)
+      self.balance_due_amount = self.balance_due_amount - self.advance_amount - self.invoice_credit_note_adjusted_amount if invoice.try(:forms_enabled)
     end
 
     # # Applying Credit Note
@@ -447,7 +449,7 @@ class InvoiceCalculationUtils
     balance_due_amount = balance_due_amount - cna_added_amount
     balance_due_amount = precision_value balance_due_amount
 
-    if self.invoice.balance_due.present?
+    if self.invoice.balance_due.present? and !self.invoice.try(:forms_enabled)
       self.invoice.balance_due.value = balance_due_amount
     end
   end

@@ -8,7 +8,8 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
         name: record.created_by&.name,
         email: record.created_by&.email
       },
-      company_country_id: record.company.country_id.to_s
+      company_country_id: record.company.country_id.to_s,
+      credit_note_adjustments: record.credit_note_adjustments_meta
     }
   }
 
@@ -87,7 +88,9 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
       # invoice_net_total_amount: "{% if form.base_currency_id != form.reporting_currency_id %}{{ form.invoice_total_amount | default: 0 | round: 2 }}{% else %}{{ form.invoice_total_amount | default: 0 | round }}{% endif %}",
       # invoice_advance_paid_amount: "{% form.advance_amount_required == false %}{{0}}{% else %}{{ form.adjusted_po_advance_payable_amount | default: 0 | round: 2}}{% endif %}",
       invoice_advance_paid_amount: '{% if form.advance_amount_required == true %}{{ form.adjusted_po_advance_payable_amount | default: 0 | round: 2}}{% endif %}',
-      invoice_balance_due: '{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | default: 0 | round: 2 | at_least: 0 }}',
+      invoice_balance_due_without_cn: '{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | default: 0 | round: 2 | at_least: 0 }}',
+      invoice_credit_note_adjusted_amount: "{% assign cn_amount = 0 %}{% for cn in form.credit_note_adjustments %}{% if cn._destroy == true %}{% continue %}{% else %}{% assign cn_amount = cn_amount | plus: cn.cn_adjustment_amount %}{% endif %}{% endfor %}{{ cn_amount | default: 0 | round: 2 }}",
+      invoice_balance_due: '{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | minus: form.invoice_credit_note_adjusted_amount | default: 0 | round: 2 | at_least: 0 }}',
       adjusted_po_advance_payable_amount: '
       {% assign payable_balance = form.invoice_sub_total_amount | plus: form.invoice_roundoff_amount | minus: form.display_tds_amount | minus: form.invoice_paid_outside_amount | default: 0 | round: 2 %}
       {% assign adjustable_advance = form.po_advance | minus: form.po_prev_adjusted_advance %}
@@ -141,6 +144,10 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
       reporting_po_advance: '{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_advance | times: conv_rate | default: 0 | round: 2}}',
       reporting_po_prev_adjusted_advance: '{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_prev_adjusted_advance | times: conv_rate | default: 0 | round: 2}}',
       reporting_adjusted_po_advance_payable_amount: '{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.adjusted_po_advance_payable_amount | times: conv_rate | default: 0 | round: 2}}'
+    },
+    credit_notes: {
+      cn_net_adjustable_amount: "{{ row.cn_net_adjustable_amount | default: 0 | round: 2}}",
+      cn_adjustment_amount: "{{ row.cn_adjustment_amount | default: 0 | round: 2}}"
     }
   }
 
@@ -291,7 +298,7 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
                               can_visible_be_changed: false, choices_scope: Choices[:list].({ id: true, name: 'true' }, { id: false, name: 'false' }),
                               computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.tds_applicable }}'), size: FormEntity::SIZES[:small]
 
-      number :unbilled_quantity, label: 'Unbiled Quantity', editable: false, visible: false, required: false, min_value: 1 # TODO: - condition
+      number :unbilled_quantity, label: 'Unbilled Quantity', editable: false, visible: false, required: false, min_value: 0 # TODO: - condition
       number :quantity, label: 'Quantity', editable: true, visible: true, required: true, default_value: 1, size: FormEntity::SIZES[:small] # TODO: - condition
 
       dropdown :unit_of_measurement, label: 'Unit of Measurement',
@@ -419,6 +426,26 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
     switch :advance_paid, editable: false, visible: false
   end
 
+  # Credit Notes
+  section :credit_note_adjustments, associate_custom_fields: true do
+    table :credit_note_adjustments, min_items: 0, populate_if_empty: CreditNoteAdjustment do
+      number :id, visible: false, editable: false, internal: true, can_visible_be_changed: false, can_editable_be_changed: false
+
+      lookup :credit_note_id, label: "Credit Note",
+             can_visible_be_changed: false, can_editable_be_changed: false,
+             required: true, editable: false, visible: true
+
+      amount :cn_net_adjustable_amount, label: "Available Credits", editable: false, visible: true,
+             can_editable_be_changed: false, can_visible_be_changed: false,
+             computed: Forms::Compute::Lookup('credit_note_adjustments.credit_note_id', '{{ record.cn_net_adjustable_amount | default: 0 | round: 2 }}')
+
+      amount :cn_adjustment_amount, label: "Applied Credit Note Adjustment", editable: true, visible: true,
+             can_visible_be_changed: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:credit_notes][:cn_adjustment_amount])
+
+    end
+  end
+
   # INVOICE ITEMS SUMMARY
   section :summary do
     summary :items_summary do
@@ -535,6 +562,14 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
       # amount :po_invoice_adjusted_advance, label: "Current Adjustment", editable: true, visible: true, required: false
       # amount :po_invoice_adjusted_advance_tds, label: "Current Adjustment Tds", editable: true, visible: true, required: false
 
+      amount :invoice_balance_due_without_cn, editable: false,
+                                   can_editable_be_changed: false, visible: false, can_visible_be_changed: false,
+                                   computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_balance_due_without_cn])
+
+      amount :invoice_credit_note_adjusted_amount, editable: false,
+                                   can_editable_be_changed: false, visible: true, can_visible_be_changed: false,
+                                   computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_credit_note_adjusted_amount])
+
       amount :invoice_balance_due, label: 'Balance Payable', editable: false,
                                    can_editable_be_changed: false, visible: true,
                                    computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_balance_due])
@@ -591,6 +626,12 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
     reference 'items.quantity'
     error_message 'Item Qunatity Cannot be greater than Unbilled quantity'
     rule Rules::Builder['row.quantity'].gt(entity: 'row.unbilled_quantity')
+  end
+
+  validation validation_id: "Invoice Credit Note Adjustment can not be greater than invoice Balance Due " do
+    reference 'items_summary.invoice_credit_note_adjusted_amount'
+    error_message "Invoice Credit Note Adjustment can not be greater than Invoice Balance Due "
+    rule Rules::Builder['invoice_credit_note_adjusted_amount'].gt(entity: "invoice_balance_due_without_cn")
   end
 
   # Add Validation so that user can not increase item quantity and user can not decrease quantity to zero
