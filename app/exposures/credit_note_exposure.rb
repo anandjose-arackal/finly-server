@@ -3,7 +3,10 @@ class CreditNoteExposure < Exposures::API
   attribute :id, record_attribute: true
   attribute :procurement_id, record_attribute: true
   attribute :vendor, record_attribute: true, exposure: true
+  attribute :name, record_attribute: :sequence_id
   attribute :credit_note_id, record_attribute: :sequence_id
+  attribute :sequence_id, record_attribute: true
+  attribute :credit_note_number, record_attribute: true
   attribute :created_by, record_attribute: true, exposure: true
   attribute :status, record_attribute: true, exposure: true
   attribute :credit_note_date, record_attribute: true
@@ -27,5 +30,13 @@ class CreditNoteExposure < Exposures::API
   attribute :previously_adjusted_amount, record_attribute: true, exposure: true
   attribute :net_adjustable_amount, record_attribute: true, exposure: true
   attribute :invoice, record_attribute: true, exposure: true
+
+  attribute :cn_net_adjustable_amount do
+    record&.net_adjustable_amount&.value.to_f
+  end
+
+  attribute :forms_enabled do
+    record.forms_enabled
+  end
 
 end

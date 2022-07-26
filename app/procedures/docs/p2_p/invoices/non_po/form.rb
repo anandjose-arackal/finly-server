@@ -9,7 +9,10 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
         name: record.created_by&.name,
         email: record.created_by&.email,
       },
-      company_country_id: record.company.country_id.to_s
+      company_country_id: record.company.country_id.to_s,
+      credit_note_adjustments: record.credit_note_adjustments_meta
+      # credit_notes_presence: record.credit_notes_presence
+      # (record.vendor.credit_notes.filter_adjustables.present? || record.credit_note_adjustments.present? ) ? true : false 
     }
   }
 
@@ -55,11 +58,10 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       # invoice_net_total_amount: "{% if form.base_currency_id != form.reporting_currency_id %}{{ form.invoice_total_amount | default: 0 | round: 2 }}{% else %}{{ form.invoice_total_amount | default: 0 | round }}{% endif %}",
       invoice_net_total_amount: "{% if form.base_currency_id == '1' and form.reporting_currency_id == '1' %}{{ form.invoice_total_amount | default: 0 | round }}{% else %}{{ form.invoice_total_amount | default: 0 | round: 2 }}{% endif %}",
       invoice_advance_paid_amount: "{{ form.invoice_advance_paid_amount | default: 0 | round: 2}}",
-      invoice_balance_due: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | default: 0 | round: 2}}",
       
-      # total_line_item_discount_amount: "{% assign discount_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign discount_amount = discount_amount | plus: item.item_discount_amount %}{% endif %}{% endfor %}{{ discount_amount | default: 0 | round: 2 }}",
-      # overall_discount_amount: "{{ form.overall_discount_amount | default: 0 | round: 2 }}",
-      # todo - Issue : Roundoff should be automatically calulated everytime user inputs something, even if its the round off itself
+      invoice_balance_due_without_cn: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | default: 0 | round: 2}}",
+      invoice_credit_note_adjusted_amount: "{% assign cn_amount = 0 %}{% for cn in form.credit_note_adjustments %}{% if cn._destroy == true %}{% continue %}{% else %}{% assign cn_amount = cn_amount | plus: cn.cn_adjustment_amount %}{% endif %}{% endfor %}{{ cn_amount | default: 0 | round: 2 }}",
+      invoice_balance_due: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | minus: form.invoice_credit_note_adjusted_amount | default: 0 | round: 2}}",
       
 
       # CONVERTED VALUES
@@ -72,13 +74,26 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       reporting_invoice_paid_outside_amount: "{{ form.invoice_paid_outside_amount | times: form.conversion_rate | default: 0 | round: 2}}",
       reporting_invoice_tds_amount: "{{ form.invoice_tds_amount | times: form.conversion_rate | default: 0 | round: 2}}",
       reporting_invoice_roundoff_amount: "{% assign amount = form.reporting_invoice_sub_total_amount | round %}{% assign amount = amount | minus: form.reporting_invoice_sub_total_amount %}{% if form.base_currency_id == '1' and form.reporting_currency_id == '1' %}{{ amount | default: 0 | round: 2}}{% else %}{{ 0 }}{% endif %}",
-      # reporting_invoice_total_amount: "{% assign amount = form.reporting_invoice_sub_total_amount | plus: form.reporting_invoice_roundoff_amount %}{% if form.base_currency != '1' %}{% assign amount = form.reporting_invoice_sub_total_amount %}{% endif %}{{ amount | default: 0 | round: 2 }}",
       reporting_invoice_total_amount: "{{ form.invoice_total_amount | times: form.conversion_rate | default: 0 | round: 2}}",
       
       reporting_invoice_net_total_amount: "{{ form.invoice_net_total_amount | times: form.conversion_rate | default: 0 | round: 2}}",
       reporting_invoice_advance_paid_amount: "{{ form.invoice_advance_paid_amount | times: form.conversion_rate | default: 0 | round: 2}}",
       reporting_invoice_balance_due: "{{ form.invoice_balance_due | times: form.conversion_rate | default: 0 | round: 2}}"
+    },
+    credit_notes: {
+      cn_net_adjustable_amount: "{{ row.cn_net_adjustable_amount | default: 0 | round: 2}}",
+      cn_adjustment_amount: "{{ row.cn_adjustment_amount | default: 0 | round: 2}}"
+      
+      # - if (credit_note_adjustment_amount + net_credit_note) <= invoice_balance_due_without_cn
+      #   - net_credit_note
+      # - else 
+      #   - invoice_balance_due_without_cn - credit_note_adjustment_amount
+
+      # cn_adjustment_amount: "{% if form.invoice_balance_due >= row.cn_net_adjustable_amount %}{{ row.cn_net_adjustable_amount }}{% else %}{{ form.invoice_balance_due }}{% endif %}"
+
+      # cn_adjustment_amount: "{% assign total_credit_amount = form.invoice_credit_note_adjusted_amount | plus: row.cn_net_adjustable_amount %}{% if total_credit_amount <= form.invoice_balance_due_without_cn %}{{ row.cn_net_adjustable_amount }}{% else %}{{ form.invoice_balance_due_without_cn | minus: form.invoice_credit_note_adjusted_amount }}{% endif %}"
     }
+
   }
 
   # INVOICE STATUS
@@ -93,6 +108,8 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
   # INVOICE DETAILS
   section :invoice_details, title: "Invoice Details", associate_custom_fields: true do
+    # lookup :credit_notes_presence, visible: false, editable: false, can_visible_be_changed: false, can_editable_be_changed: false
+
     auto_number :invoice_id,
                 label: "Sequence Number",
                 editable: false,
@@ -282,7 +299,6 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       # discount # discount percentage
       number :discount, visible: true, editable: true, default_value: 0, size: FormEntity::SIZES[:small]
 
-      # discount_amount = gross_amount x discount / 100
       amount :item_discount_amount, label: 'Item Discount Amount', editable: false, visible: false,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_discount_amount]),
@@ -294,7 +310,6 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_discount_amount]),
              size: FormEntity::SIZES[:small]
 
-      # taxable_amount = gross_amount - discount_amount
       amount :item_taxable_amount, label: 'Item Taxable Amount', editable: false, visible: false,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:item_taxable_amount]),
@@ -311,7 +326,6 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       # tax # tax percentage
       number :tax_percentage, editable: false, visible: true, computed: Forms::Compute::Lookup('items.tax_rate_id', '{{record.rate}}'), size: FormEntity::SIZES[:small]
 
-      # tax_amount = taxable_amount x tax / 100
       amount :item_tax_amount, label: 'Item Tax Amount', editable: false, visible: true,
              can_editable_be_changed: false,
              can_visible_be_changed: false, 
@@ -368,12 +382,32 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
     end
   end
 
+# Credit Notes
+  section :credit_note_adjustments, associate_custom_fields: true do
+    table :credit_note_adjustments, min_items: 0, populate_if_empty: CreditNoteAdjustment do
+      number :id, visible: false, editable: false, internal: true, can_visible_be_changed: false, can_editable_be_changed: false
+
+      lookup :credit_note_id, label: "Credit Note",
+             can_visible_be_changed: false, can_editable_be_changed: false,
+             required: true, editable: false, visible: true
+             
+      amount :cn_net_adjustable_amount, label: "Available Credits", editable: false, visible: true,
+             can_editable_be_changed: false, can_visible_be_changed: false, 
+             computed: Forms::Compute::Lookup('credit_note_adjustments.credit_note_id', '{{ record.cn_net_adjustable_amount | default: 0 | round: 2 }}')
+
+      amount :cn_adjustment_amount, label: "Applied Credit Note Adjustment", editable: true, visible: true,
+             can_visible_be_changed: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:credit_notes][:cn_adjustment_amount])
+
+    end
+  end
+
+
   # INVOICE ITEMS SUMMARY
   section :summary do
     summary :items_summary do
       amount :invoice_gross_amount, label: 'Gross Amount', editable: false, visible: true,
-             can_editable_be_changed: false,
-             can_visible_be_changed: false,
+             can_editable_be_changed: false, can_visible_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_gross_amount])
 
       amount :reporting_invoice_gross_amount, label: 'Gross Amount(Reporting Currency)', editable: false, visible: false,
@@ -403,8 +437,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_taxable_amount])
 
       amount :reporting_invoice_taxable_amount, label: 'Taxable Amount(Reporting Currency)', editable: false, visible: false,
-             can_editable_be_changed: false,
-             can_visible_be_changed: false,
+             can_editable_be_changed: false, can_visible_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_taxable_amount])
 
       amount :invoice_tax_amount, label: 'Tax Amount', editable: false, visible: true,
@@ -412,8 +445,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_tax_amount])
 
       amount :reporting_invoice_tax_amount, label: 'Tax Amount(Reporting Currency)', editable: false, visible: false,
-             can_visible_be_changed: false,
-             can_editable_be_changed: false,
+             can_visible_be_changed: false, can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_tax_amount])
 
       amount :invoice_freight_amount, label: "Freight",
@@ -431,8 +463,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_sub_total_amount]) # todo - changd name
 
       amount :reporting_invoice_sub_total_amount, label: 'Net Amount(Reporting Currency)', editable: false, visible: true,
-             can_visible_be_changed: false,
-             can_editable_be_changed: false,
+             can_visible_be_changed: false, can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_sub_total_amount]) # todo - changd name
 
       lookup :tds_slab_id, choices_scope: Choices[:lookup].('tds_slabs'), visible: true # todo - condition when reporting currency is in INR
@@ -492,6 +523,14 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_visible_be_changed: false,
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_advance_paid_amount])
+             
+      amount :invoice_balance_due_without_cn, label: "Balance Payable without CN", editable: false, visible: false,
+              can_editable_be_changed: false, can_visible_be_changed: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_balance_due_without_cn])
+
+      amount :invoice_credit_note_adjusted_amount, label: "Credit Note Adjustment",
+             default_value: 0, editable: false, visible: true, can_visible_be_changed: false,
+             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_credit_note_adjusted_amount])
 
       amount :invoice_balance_due, label: "Balance Payable", editable: false,
              can_editable_be_changed: false, visible: true,
@@ -507,7 +546,6 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
   section :attachments, associate_custom_fields: true do
     attachment :invoice_attachments, system_field: false, required: true
   end
-  # If reporting currency & base currency are same, then hide conversion_rate
 
   # VALIDATIONS
   validation validation_id: "Invoice Date Cannot be Later than Due Date" do
@@ -526,6 +564,30 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
     reference 'items.item_discount_amount'
     error_message "Item Discount Amount Cannot be greater than Item Gross Amount"
     rule Rules::Builder['items.item_discount_amount'].gt(entity: "items.item_gross_amount")
+  end
+
+  validation validation_id: "Invoice Credit Note Adjustment can not be greater than invoice Balance Due " do
+    reference 'items_summary.invoice_credit_note_adjusted_amount'
+    error_message "Invoice Credit Note Adjustment can not be greater than Invoice Balance Due "
+    rule Rules::Builder['invoice_credit_note_adjusted_amount'].gt(entity: "invoice_balance_due_without_cn")
+  end
+
+  validation validation_id: "Invoice Balance Due can not be lesser than Invoice Credit Note Adjustment " do
+    reference 'items_summary.invoice_balance_due_without_cn'
+    error_message "Invoice Credit Note Adjustment can not be greater than Invoice Balance Due "
+    rule Rules::Builder['invoice_credit_note_adjusted_amount'].gt(entity: "invoice_balance_due_without_cn")
+  end
+
+  # validation validation_id: "Applied Credit Note Adjustment Cannot be greater than Available Credit Note " do
+  #   reference 'credit_note_adjustments.cn_adjustment_amount'
+  #   error_message "Applied Credit Note Adjustment Cannot be greater than Available Credit Note"
+  #   rule Rules::Builder['row.cn_adjustment_amount'].gt(entity: "row.cn_net_adjustable_amount")
+  # end
+
+  validation validation_id: "Balance due can not be less then 0" do
+    reference 'items_summary.invoice_balance_due'
+    error_message "Invoice Due Date must be After Invoice Date"
+    rule Rules::Builder['items_summary.invoice_balance_due'].lt(value: 0)
   end
   
   # CONDITIONS
@@ -659,6 +721,23 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
     action :visible, false
   end
 
+  # condition condition_id: "Hide Credit Note for International and Non presence" do
+  #   reference :entity, 'credit_note_adjustments.credit_note_id'
+  #   rule Rules::Builder[:credit_notes_presence].eq_any(value: true )
+  #   action :visible, false
+  # end
+  
+  # condition condition_id: "Hide Credit Note Net Adjustment Amount  for International and Non presence" do
+  #   reference :entity, 'credit_note_adjustments.cn_net_adjustable_amount'
+  #   rule Rules::Builder[:credit_notes_presence].eq_any(value: true )
+  #   action :visible, false
+  # end
+
+  # condition condition_id: "Hide Credit Note Adjustment Amount for International and Non presence" do
+  #   reference :entity, 'credit_note_adjustments.cn_adjustment_amount'
+  #   rule Rules::Builder[:credit_notes_presence].eq_any(value: true )
+  #   action :visible, false
+  # end
 
   # condition condition_id: "Hide Reporting Roundoff for different currency" do
   #   reference :entity, 'items_summary.reporting_invoice_roundoff_amount'
