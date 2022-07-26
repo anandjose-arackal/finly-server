@@ -85,7 +85,7 @@ GEM
       request_store (>= 1.0.5)
     addressable (2.8.0)
       public_suffix (>= 2.0.2, < 5.0)
-    airbrussh (1.4.0)
+    airbrussh (1.4.1)
       sshkit (>= 1.6.1, != 1.7.0)
     amoeba (3.1.0)
       activerecord (>= 3.2.6)
@@ -99,13 +99,13 @@ GEM
       execjs
     awesome_print (1.8.0)
     aws-eventstream (1.2.0)
-    aws-partitions (1.609.0)
+    aws-partitions (1.610.0)
     aws-sdk-core (3.131.3)
       aws-eventstream (~> 1, >= 1.0.2)
       aws-partitions (~> 1, >= 1.525.0)
       aws-sigv4 (~> 1.1)
       jmespath (~> 1, >= 1.6.1)
-    aws-sdk-ec2 (1.323.0)
+    aws-sdk-ec2 (1.324.0)
       aws-sdk-core (~> 3, >= 3.127.0)
       aws-sigv4 (~> 1.1)
     aws-sdk-sqs (1.38.0)
@@ -193,7 +193,7 @@ GEM
       capistrano (~> 3.7)
       capistrano-bundler
       puma (>= 4.0, < 6.0)
-    capybara (3.37.1)
+    capybara (3.36.0)
       addressable
       matrix
       mini_mime (>= 0.1.3)
@@ -273,16 +273,17 @@ GEM
       unf (>= 0.0.5, < 1.0.0)
     doorkeeper (5.0.3)
       railties (>= 4.2)
-    dry-configurable (0.15.0)
+    dry-configurable (0.13.0)
       concurrent-ruby (~> 1.0)
       dry-core (~> 0.6)
-    dry-container (0.10.0)
+    dry-container (0.9.0)
       concurrent-ruby (~> 1.0)
-    dry-core (0.8.0)
+      dry-configurable (~> 0.13, >= 0.13.0)
+    dry-core (0.7.1)
       concurrent-ruby (~> 1.0)
     dry-equalizer (0.3.0)
-    dry-inflector (0.3.0)
-    dry-initializer (3.1.1)
+    dry-inflector (0.2.1)
+    dry-initializer (3.0.4)
     dry-logic (1.2.0)
       concurrent-ruby (~> 1.0)
       dry-core (~> 0.5, >= 0.5)
@@ -292,7 +293,7 @@ GEM
       concurrent-ruby (~> 1.0)
       dry-core (~> 0.4, >= 0.4.4)
       dry-equalizer
-    dry-schema (1.9.3)
+    dry-schema (1.8.0)
       concurrent-ruby (~> 1.0)
       dry-configurable (~> 0.13, >= 0.13.0)
       dry-core (~> 0.5, >= 0.5)
@@ -305,7 +306,7 @@ GEM
       dry-core (~> 0.5, >= 0.5)
       dry-inflector (~> 0.1, >= 0.1.2)
       dry-logic (~> 1.0, >= 1.0.2)
-    dry-validation (1.8.1)
+    dry-validation (1.7.0)
       concurrent-ruby (~> 1.0)
       dry-container (~> 0.7, >= 0.7.1)
       dry-core (~> 0.5, >= 0.5)
@@ -477,7 +478,7 @@ GEM
     money-open-exchange-rates (1.4.0)
       money (~> 6.12)
     mono_logger (1.1.1)
-    msgpack (1.5.3)
+    msgpack (1.5.4)
     multi_json (1.15.0)
     multi_xml (0.6.0)
     multipart-post (2.2.3)
@@ -485,14 +486,14 @@ GEM
       activerecord (>= 4.2)
       activesupport (>= 4.2)
       railties (>= 4.2)
-    mustermann (1.1.2)
+    mustermann (2.0.2)
       ruby2_keywords (~> 0.0.1)
     mysql2 (0.5.4)
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
     net-ssh (7.0.1)
     nio4r (2.5.8)
-    nokogiri (1.13.7)
+    nokogiri (1.13.8)
       mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
     oauth (0.5.10)
@@ -556,7 +557,7 @@ GEM
       rack (>= 1.0, < 3)
     rack-mini-profiler (1.0.2)
       rack (>= 1.2.0)
-    rack-protection (2.2.1)
+    rack-protection (2.2.2)
       rack
     rack-test (2.0.2)
       rack (>= 1.3)
@@ -707,10 +708,10 @@ GEM
       simplecov_json_formatter (~> 0.1)
     simplecov-html (0.12.3)
     simplecov_json_formatter (0.1.4)
-    sinatra (2.2.1)
-      mustermann (~> 1.0)
+    sinatra (2.2.2)
+      mustermann (~> 2.0)
       rack (~> 2.2)
-      rack-protection (= 2.2.1)
+      rack-protection (= 2.2.2)
       tilt (~> 2.0)
     slack-notifier (2.4.0)
     snowplow-tracker (0.6.1)
@@ -749,7 +750,7 @@ GEM
       power_assert
     thor (0.20.3)
     thread_safe (0.3.6)
-    tilt (2.0.10)
+    tilt (2.0.11)
     trailblazer (2.1.0)
       trailblazer-macro (>= 2.1.0, < 2.2.0)
       trailblazer-macro-contract (>= 2.1.0, < 2.2.0)
@@ -829,7 +830,7 @@ GEM
       execjs
 
 PLATFORMS
-  ruby
+  -darwin-21
 
 DEPENDENCIES
   aasm (~> 5.0.1)
@@ -1016,7 +1017,7 @@ DEPENDENCIES
   yard-activerecord
 
 RUBY VERSION
-   ruby 2.7.1p83
+   ruby 2.6.1p33
 
 BUNDLED WITH
    2.3.16
