@@ -7,7 +7,20 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
               :bank_payment_request_initiator, :bank_payment_request_reviewer, :bank_payment_request_creditor, :bank_payment_request_auditor
               :admin
   resolver 'purchase_orders.default'
-  reference '{{record.id}}', procurement_id: '{{record.procurement_id}}', procurement_type: 'po'
+  
+  def self.reference(id = nil, args = {})
+    {
+      id: '{{record.id}}',
+      args: {
+        procurement_id: '{{record.procurement_id}}',
+        procurement_type: "po",
+        # forms_enabled: "{% if record.forms_enabled == true %}{{true}}{% else %}{{ false }}{% endif %}"
+        # forms_enabled: "{% if record.forms_enabled == true %}{{ true }}{% else %}{{ false }}{% endif %}"
+        forms_enabled: "{{ record.forms_enabled }}"
+      }
+    }
+  end
+
   custom_fields :purchase_order
 
   # Fixed column is always default true
@@ -97,6 +110,18 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
 
   column :payment_status, default: true, includes: [procurement: [:status_tags, :invoices]] do
     indicator value: :payment_status_text, format: :payment_status_format
+  end
+
+  column :base_currency, label: "Base Currency", active: :is_accessable do
+    text value: "{{record.base_currency_code}}"
+  end
+  
+  column :reporting_currency, label: "Reporting Currency", active: :is_accessable do
+    text value: "{{record.reporting_currency_code}}"
+  end
+
+  column :conversion_rate, label: "Conversion Rate", active: :is_accessable do
+    text value: "{{record.conversion_rate}}"
   end
 
   counter -> (user, collection) do
@@ -251,6 +276,10 @@ class Docs::P2P::PurchaseOrders::Index < IndexBuilder::API
 
   def self.set_currency_symbol(context)
     context[:record].get_base_currency.symbol
+  end
+
+  def self.is_accessable( user )
+    user.present? && user.po_form_enabled 
   end
 
 end

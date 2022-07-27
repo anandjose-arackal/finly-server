@@ -59,7 +59,8 @@ class PaymentTerm < ApplicationRecord
         },
         {
             name: "EOM",
-            description: "Payment to be made by end of month"
+            description: "Payment to be made by end of month",
+            key: "eom"
         },
         {
             name: "15 MFI",
@@ -87,10 +88,19 @@ class PaymentTerm < ApplicationRecord
   def as_json(options={})
     {
       id: self.id, 
-      name: self.name, 
-      days_after: self.days_after,
+      name: self.name,
+      days_after: self.calculate_days_after,
       description: self.description,
       default: self.default      
     }
+  end
+
+  def calculate_days_after
+    return self.days_after if days_after
+    if days_after.nil? && self.key == "eom"
+      Time.now.end_of_month.day - Time.now.day
+    else
+      return nil
+    end
   end
 end

@@ -64,6 +64,9 @@ when :uat_2, :bbps
 when :us_uat
   set :deploy_to, '/home/uat/app'
   set :rails_env, 'uat'
+when :us_uat_2
+  set :deploy_to, '/home/uat/app_2'
+  set :rails_env, 'uat'
 when :pre_uat
   set :deploy_to, '/home/centos/app'
   set :rails_env, 'staging'
@@ -102,6 +105,11 @@ linked_files = %w{
   config/sso_provider_credentials.yml
   config/appsmith.yml
   config/sentry.yml
+  config/message_service.yml
+  config/gstin_verification_config.yml
+  config/ip_addresses.yml
+  config/bills.yml
+  config/deploy.yml
 }
 case fetch(:stage)
 when :itzcash_production, :aws_production, :background_production, :foreground_production, :console_production, :api_production, :background_production_console,
@@ -170,14 +178,14 @@ set :puma_user, fetch(:user)
 set :sidekiq_user, fetch(:user)
 
 # Since we do not run monit on all instances, we skip default_hooks so it can be manually set in required env
-set :sidekiq_monit_default_hooks, false
+#set :sidekiq_monit_default_hooks, false
 
 set :whenever_roles, ["whenever_cron"]
 
 set :slackistrano, {
     channel: '#general',
     team: 'finlyteam',
-    token: 'xoxb-69742039698-481828577170-pL7adrfoCVs74cggPFKiRNhj',
+    token: ENV['SLACKISTRANO_TOKEN'],
     slack_via_slackbot: true
 }
 

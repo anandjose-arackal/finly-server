@@ -79,6 +79,7 @@ class Company < NonTenantedApplicationRecord
   has_many :icici_statements
   has_many :insight_dashboards
   has_many :master_schemas
+  has_many :credit_notes
 
   has_many :payments
   has_many :invoices
@@ -456,6 +457,10 @@ class Company < NonTenantedApplicationRecord
 
   def analytics_system_enabled?
     self.feature_subscription.analytics_system_enabled
+  end
+
+  def invoice_to_pay_system_enabled?
+    self.feature_subscription.invoice_to_pay_system
   end
 
   def more_than_one_subscription?

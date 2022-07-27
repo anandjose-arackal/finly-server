@@ -46,8 +46,12 @@
 
 
 class PurchaseRequestItem < ApplicationRecord
-  attr_accessor :skip_callback
+  attr_accessor :skip_callback, :po_creator, :po_number, :reject_item
   include FieldCustomizer::CustomizableValidation
+  include LiquidDroppable
+  include Exposures::Model::Exposable
+  include FormsHelper
+  include MathUtil
   # include Transitionable
 
   field_customization_key :purchase_request_item
@@ -70,6 +74,10 @@ class PurchaseRequestItem < ApplicationRecord
   has_one :purchase_order_item
   has_many :trails, as: :parent
 
+
+  alias_attribute :items_department_id, :department_id
+  alias_attribute :items_cost_center_id, :cost_center_id
+
   has_many :custom_fields, as: :parent, dependent: :destroy
 
   has_paper_trail(
@@ -78,15 +86,16 @@ class PurchaseRequestItem < ApplicationRecord
       }
   )
 
-  after_save :budget_trail_entry
+  after_save :budget_trail_entry, if: :budget_enabled?
   after_destroy :budget_trail_destroy
 
-  validates :item, :quantity, :per_unit_estimated_amount, :required_by_date, :delivery_location, presence: true
+  validates :item, :quantity, :per_unit_estimated_amount, :required_by_date, :delivery_location, presence: true, unless: :parent_forms_enabled
   validates_presence_of :cost_center, :department, if: :cost_allocation_items?
 
   accepts_nested_attributes_for :per_unit_estimated_amount, :attachment, allow_destroy: true
 
   after_create :add_attachment
+  after_save :sync_amounts, unless: :skip_callback
   after_save :set_currency_for_amount, unless: :skip_callback
 
   scope :with_ids, -> (ids) { where id: ids }
@@ -214,9 +223,71 @@ class PurchaseRequestItem < ApplicationRecord
 
   def cost_allocation_items?
     self.purchase_request.cost_allocation_items
+    false if parent_forms_enabled
+  end
+
+  def retrieve_value(entity)  
+    send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
+  end  
+
+  def parent_forms_enabled
+    self.purchase_request.forms_enabled
+  end
+
+  def po_creator
+    self.purchase_order&.user&.name
+  end
+
+  def po_number
+    if self.purchase_order.present?
+      {
+        label: self.purchase_order&.po_number,
+        url: "procure_purchase_orders/#{self.purchase_order&.id}/params={\"procurement_id\": \"#{self.purchase_order&.procurement.id}\"}"
+      }
+    end
+  end
+
+  def reject_item
+    rejected ? "Reject" : "Approve"
   end
 
   private
+
+  def sync_amounts
+    if parent_forms_enabled
+      sync_to_old_structure
+    end
+  end
+
+  def sync_to_old_structure
+    self.skip_callback = true
+    base_currency_id = purchase_request.get_base_currency.id
+    amounts_attributes_map.each do |key, value|
+      amount_value = self.send(key)
+      amount_attr = self.send("#{value}_id")
+      if amount_attr.present?
+        Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: base_currency_id)
+      else
+        amount_id = Amount.create(value: amount_value, currency_id: base_currency_id).id
+        self.send("#{value}_id=", amount_id)
+      end
+    end
+
+    unless purchase_request.cost_allocation_items
+      self.department_id = purchase_request&.department_id
+      self.cost_center_id = purchase_request&.cost_center_id
+    end
+
+    self.save
+  end
+
+  def amounts_attributes_map
+    {  
+      rate: 'per_unit_estimated_amount',
+      item_gross_amount: 'estimated_amount' 
+    }
+  end
+
 
   def budget_trail_entry
     # if PurchaseOrderStatus.ids_for([:approved, :auto_approved, :sent_to_vendor, :closed]).include?(self.purchase_order&.purchase_order_status_id)
@@ -249,5 +320,8 @@ class PurchaseRequestItem < ApplicationRecord
     self.save
   end
 
+  def budget_enabled?
+    RequestStore.store[:current_company].feature_subscription.budgeting_system
+  end
 
 end

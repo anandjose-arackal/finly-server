@@ -10,6 +10,8 @@ json.created_by do
   json.employee_id record.created_by&.profile&.employee_id
 end
 
+json.advance_amount record.advance_amount
+json.advance_tds_amount record.advance_tds_amount
 json.status record.status
 json.submitted_at record.submitted_at
 json.approved_at record.approved_at

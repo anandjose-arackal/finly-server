@@ -17,8 +17,9 @@ class BankTransfer::PaymentRequest::ConfigurationData < BankTransfer::PaymentReq
     params[:custom_fields_config] = self.custom_fields_config
 
     procurement_enabled = user.company.procurement_enabled?
+    invoice_to_pay_enabled = user.company.invoice_to_pay_system_enabled?
     params[:tabs] = {
-        invoices: procurement_enabled,
+        invoices: (procurement_enabled || invoice_to_pay_enabled),
         po_advances: procurement_enabled,
         utility_bills: user.company.utility_bills_enabled?,
         beneficaries: true,
@@ -26,7 +27,7 @@ class BankTransfer::PaymentRequest::ConfigurationData < BankTransfer::PaymentReq
     }
 
     params[:transfer_modes] = user.company.transfer_modes
-    params[:non_po_invoice_form_enabled] = user.non_po_invoice_form_enabled rescue false
+    params[:non_po_invoice_form_enabled] = (user.non_po_invoice_form_enabled || user.po_invoice_form_enabled ) rescue false
 
   end
 

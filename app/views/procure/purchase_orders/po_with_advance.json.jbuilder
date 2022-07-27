@@ -10,7 +10,20 @@ json.results do
     json.po_created_at purchase_order.created_at.strftime("%d-%m-%Y")
     # json.po_advance_amount_value purchase_order.advance_amount.value
     # json.po_advance_amount_currency purchase_order.advance_amount.currency.country_code
-    json.po_advance_amount purchase_order.advance_amount
+    if purchase_order.forms_enabled
+      json.po_due_date purchase_order.advance_scheduled_date&.strftime("%d-%m-%Y")
+      json.po_requested_advance_amount do 
+        json.value purchase_order.po_requested_advance_amount
+        json.currency purchase_order.get_base_currency
+      end
+      json.po_advance_amount do 
+        json.value purchase_order.po_advance_amount
+        json.currency purchase_order.get_base_currency
+      end
+    else
+      json.po_requested_advance_amount purchase_order.advance_amount
+      json.po_advance_amount purchase_order.advance_amount
+    end
     json.po_total_after_tax purchase_order.total_after_tax
     json.purchase_order_id purchase_order.id
     json.procurement_id purchase_order.procurement_id

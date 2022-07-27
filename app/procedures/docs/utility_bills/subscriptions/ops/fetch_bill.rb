@@ -89,8 +89,7 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchBill < Transactions::API
       add_message(options, :error, :base, "No New Bills Available with Processable Amount")
       return
     end
-
-    bill_date_year = Date.parse(data.bill_date).strftime("%Y")
+    bill_date_year = Date.parse(data.bill_date).strftime("%Y") if data.bill_date.present?
     bill_period = data.bill_period
     bill = nil
 
@@ -116,14 +115,14 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchBill < Transactions::API
         # bill = model.bbps_bills.where("extract(year from created_at) = ?", Date.today.strftime("%Y")).where("extract(month from created_at) = ?", Date.today.strftime("%b"))
         Event::EAlert::Create.(nil,
             title: "Ambiguous Bill Creation #{model.id} . #{bill&.id}",
-            description: "Subscription: #{model.as_json} \n Bills: #{model.bbps_bills.last.as_json} \n Response: #{data.as_json["table"]}",
+            description: "Subscription: #{model.as_json} \n Bills: #{model.bbps_bills.last.inspect} \n Response: #{data.as_json["table"]}",
             subject: "Ambiguous Bill Creation #{model.id} . #{bill&.id}"
         )
       end
     else
       Event::EAlert::Create.(nil,
           title: "Ambiguous Bill Creation #{model.id} . #{bill&.id}",
-          description: "Subscription: #{model.as_json} \n Bills: #{model.bbps_bills.last.as_json} \n Response: #{data.as_json["table"]}",
+          description: "Subscription: #{model.as_json} \n Bills: #{model.bbps_bills.last.inspect} \n Response: #{data.as_json["table"]}",
           subject: "Ambiguous Bill Creation #{model.id} . #{bill&.id}"
       )
     end

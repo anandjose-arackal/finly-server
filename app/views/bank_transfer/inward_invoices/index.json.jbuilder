@@ -161,5 +161,7 @@ json.results do
   end
 end
 
-json.non_po_invoice_form_enabled @result&.invoices&.first&.forms_enabled
+json.non_po_invoice_form_enabled @result&.invoices.where(invoice_type_id: InwardInvoiceType.ids_for(:non_po_invoice, :tax_invoice))&.first&.forms_enabled rescue false
+# json.po_invoice_form_enabled @result&.invoices.where(invoice_type_id: InwardInvoiceType.id_for(:tax_invoice))&.first&.forms_enabled rescue false
+
 json.count @result.invoices.count

@@ -1,4 +1,5 @@
 class Procurements::Invoices::BulkApproveProcessor < BackgroundOperation
+  sidekiq_options queue: :critical_workflow_queue
 
   attr_accessor :invoice_ids, :result
 

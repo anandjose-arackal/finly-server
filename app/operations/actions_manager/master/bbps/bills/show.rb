@@ -20,7 +20,7 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
 
   def update_and_submit
     # !bbps_bill.bill_validation_required? && (bbps_bill.open? || bbps_bill.retracted? || bbps_bill.rejected?) && bbps_bill.subscription.pocs.include?(user) && bbps_bill.autofetched
-    !bbps_bill.bill_validation_required? && (bbps_bill.open? || bbps_bill.retracted? || bbps_bill.rejected?) && bbps_bill.subscription.pocs.include?(user)
+    (bbps_bill.open? || bbps_bill.retracted? || bbps_bill.rejected?) && bbps_bill.subscription.pocs.include?(user)
   end
 
   # def submit
@@ -40,7 +40,7 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
   end
 
   def approve
-    !bbps_bill.bill_validation_required? && bbps_bill.awaiting_approval? && bbps_bill.get_reviewers.include?(user)
+    bbps_bill.awaiting_approval? && bbps_bill.get_reviewers.include?(user)
   end
 
   def reject
@@ -86,7 +86,8 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
   end
 
   def bill_validate
-    bbps_bill.bill_validation_required? && (bbps_bill.subscription.user_id == user.id || bbps_bill.subscription.pocs.include?(user) || bbps_bill.get_reviewers.include?(user))
+    return false #not supported by new apis
+    #bbps_bill.bill_validation_required? && (bbps_bill.subscription.user_id == user.id || bbps_bill.subscription.pocs.include?(user) || bbps_bill.get_reviewers.include?(user))
   end
 
   def download_receipt

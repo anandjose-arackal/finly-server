@@ -3,17 +3,28 @@ class Menu::Masters::Procurement < Menu::API
   def self.accept?(user)
     user.user_panel_subscription&.yes_bank_account_transfer
   end
+
   app :vp
 
   item :global_search, label: "Search (Alt+/)", icon: 'https://img.icons8.com/windows/20/ffffff/search.png',
        toggle: [GlobalSearchToggle, :enabled?]
   item :create, icon: 'https://img.icons8.com/windows/20/ffffff/plus-math.png' do
+    
     action :redirect,
            :new_purchase_request,
            permissions: :purchase_request_initiator,
            features: :procurement,
            label: 'New Purchase Request',
+           toggle: {unless: [PurchaseRequestToggle, :enabled?]},
            url: 'purchase_request'
+
+    action :redirect,
+           :new_form_purchase_request,
+           permissions: :purchase_request_initiator,
+           features: :procurement,
+           label: 'New Purchase Request',
+           toggle: {if: [PurchaseRequestToggle, :enabled?]},
+           url: 'purchase_request_form/add'
 
     action :template,
            :new_purchase_order,
@@ -31,6 +42,7 @@ class Menu::Masters::Procurement < Menu::API
            policy: ::Docs::P2P::Invoices::Policy,
            model: ::Invoice,
            label: 'New Non PO Invoice',
+           features: :invoice_to_pay_system,
            function: "non_po_invoice_create"
 
     action :template,
@@ -39,7 +51,16 @@ class Menu::Masters::Procurement < Menu::API
            toggle: {if: [NonPoInvoiceToggle, :enabled?]},
            model: ::Invoice,
            label: 'New Non PO Invoice',
+           features: :invoice_to_pay_system,
            function: "non_po_invoice_forms_create"
+
+    # action :template,
+    #        :new_non_po_invoice_form,
+    #        permissions: :po_invoice_initiator,
+    #        toggle: {if: [PoInvoiceToggle, :enabled?]},
+    #        model: ::Invoice,
+    #        label: 'New PO Invoice',
+    #        function: "po_invoice_forms_create"
 
     action :redirect,
            :new_payment_ticket,
@@ -93,11 +114,11 @@ class Menu::Masters::Procurement < Menu::API
     item :receive_history, path: 'receive/history'
   end
 
-  item :payables, features: :procurement, icon: "https://img.icons8.com/windows/20/ffffff/sales-performance.png" do
-    item :po_advances, label: 'PO Advances', permissions: Docs::P2P::PurchaseOrders::Advances::Index.permissions
-    item :invoices, permissions: Docs::P2P::Invoices::Index.permissions
-    item :utility_bills, permissions: Docs::UtilityBills::Subscriptions::Index.permissions
-    item :upcoming_invoices, permissions: Docs::P2P::Invoices::Agreement::UpcomingInvoices::Index.permissions
+  item :payables, features: [:yes_bank_account], icon: "https://img.icons8.com/windows/20/ffffff/sales-performance.png" do
+    item :po_advances, label: 'PO Advances', permissions: Docs::P2P::PurchaseOrders::Advances::Index.permissions, features: :procurement
+    item :invoices, permissions: Docs::P2P::Invoices::Index.permissions,  features: [:invoice_enabled]
+    item :utility_bills, permissions: Docs::UtilityBills::Subscriptions::Index.permissions, features: :utility_bills_enabled
+    item :upcoming_invoices, permissions: Docs::P2P::Invoices::Agreement::UpcomingInvoices::Index.permissions, features: :agreement_based_payment_system
     # item :unbilled_items, permissions: [] # todo
   end
 
@@ -111,10 +132,10 @@ class Menu::Masters::Procurement < Menu::API
     item :analytics_dashboards, label: 'Insights', permissions: [:admin], toggle: [AnalyticsToggle, :enabled?]
     item :vendors, permissions: Masters::Vendors::Index.permissions
     item :items, permissions: Masters::Items::Index.permissions
-    item :rate_contracts, permissions: Masters::RateContracts::Index.permissions, features: :procurement
+    item :rate_contracts, permissions: Masters::RateContracts::Index.permissions, features: [:invoice_enabled]
     item :agreements, features: :agreement_based_payment_system,
          permissions: Docs::P2P::Agreements::Index.permissions
-    item :credit_notes, permissions: Docs::P2P::CreditNotes::Index.permissions, features: :procurement
+    item :credit_notes, permissions: Docs::P2P::CreditNotes::Index.permissions, features: [:invoice_enabled]
     item :utility_subscriptions, permissions: Docs::UtilityBills::Subscriptions::Index.permissions, features: :utility_bills_enabled
     item :users, permissions: [:admin]
     item :audit_trails, permissions: Docs::AuditTrails::Index.permissions, toggle: [AuditTrailsToggle, :enabled?]

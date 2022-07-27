@@ -7,10 +7,10 @@
 # server 'example.com', user: 'deploy', roles: %w{app web}, other_property: :other_value
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
-server '13.127.123.168', user: 'centos', roles: %w{web app db}
-server '13.127.232.50', user: 'centos', roles: %w{web app}
-server '13.126.56.205', user: 'centos', roles: %w{web app}
-server '13.126.17.227', user: 'centos', roles: %w{sidekiq_app}
+server ENV['NEW_PRODUCTION_IP_1'], user: 'centos', roles: %w{web app db}
+server ENV['NEW_PRODUCTION_IP_2'], user: 'centos', roles: %w{web app}
+server ENV['NEW_PRODUCTION_IP_3'], user: 'centos', roles: %w{web app}
+server ENV['NEW_PRODUCTION_IP_4'], user: 'centos', roles: %w{sidekiq_app}
 set :stage, 'production'
 set :use_sudo, false
 set :rbenv_type, :user

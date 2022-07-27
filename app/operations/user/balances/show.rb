@@ -28,10 +28,10 @@ class User::Balances::Show < User::Base
     case current_app
       when 'em'
         # Adding expense management balances in this section if it's enabled for that user
-        if selected_user.company.d_code_enabled? && selected_user.expense_management_enabled?
+        if false
           set_itz_cash_balances
         end
-        if selected_user.cards.present?
+        if false
           set_card_balances
         end
         # adding vendor payment balances in this section if it is enabled for that selected_user
@@ -66,10 +66,10 @@ class User::Balances::Show < User::Base
         end
       when 'ft'
         # Adding expense management balances in this section if it's enabled for that user
-        if selected_user.company.cards_enabled? && selected_user.disburse_enabled?
+        if false
           set_itz_cash_balances
         end
-        if selected_user.cards.present?
+        if false
           set_card_balances
         end
       when 'fc'
@@ -152,7 +152,7 @@ class User::Balances::Show < User::Base
   end
 
   def retrieve_balances
-    itz_cash_company_adapter = retrieve_adapter selected_user.company.itz_cash_company_account
+    # itz_cash_company_adapter = retrieve_adapter selected_user.company.itz_cash_company_account
     if self.company.bank_service_provider == "YES"
       company_account_adapter = retrieve_adapter self.company.yes_bank_company_account
     elsif self.company.bank_service_provider == "ICICI"
@@ -160,20 +160,19 @@ class User::Balances::Show < User::Base
     else
       company_account_adapter = retrieve_adapter self.company.yes_bank_company_account
     end
-    wallet_adapter = retrieve_adapter user.wallet
     bank_wallet_adapter = retrieve_adapter user.bank_wallet
     utility_account_adapter = retrieve_adapter self.company.utility_bills_account
 
     self.card_info = {}
-    selected_user.cards.each do |card|
-      card_adapter = retrieve_adapter(card)
-      self.card_info[card.id] =
-         {
-             balance: (card_adapter.balance rescue nil),
-             eligibility: (card_adapter.credit_eligibility rescue nil)
-         }
-    end
-    comp_balance = itz_cash_company_adapter.balance rescue nil
+    #selected_user.cards.each do |card|
+    # card_adapter = retrieve_adapter(card)
+    # self.card_info[card.id] =
+          #   {
+             #       balance: (card_adapter.balance rescue nil),
+             #       eligibility: (card_adapter.credit_eligibility rescue nil)
+      #   }
+    #end
+    comp_balance = 0
     unless comp_balance
       comp_balance = "Temporarily unavailable"
     end
@@ -193,7 +192,7 @@ class User::Balances::Show < User::Base
             balance: bank_wallet_adapter.balance
         },
         itz_cash: {
-            balance: wallet_adapter.balance
+            balance: 0
         }
     }
     self.selected_user.user_pockets.each do |pocket|
@@ -204,7 +203,8 @@ class User::Balances::Show < User::Base
   end
 
   def set_itz_cash_balances
-    if selected_user.admin?
+    #itz cash feature discontinued
+    if false
       self.balances[:company_credits] = [] if self.balances[:company_credits].blank?
       self.balances[:company_credits] << {
           name: "Card Transfer Credits",
@@ -213,7 +213,8 @@ class User::Balances::Show < User::Base
       }
     end
     # adding finly money
-    if selected_user.cards.present?
+    # itz cash feature discontinued
+    if false
       self.balances[:finly_money] = [] if self.balances[:finly_money].blank?
       self.balances[:finly_money] << {
           name: "Card Transfer Pocket",
@@ -281,7 +282,8 @@ class User::Balances::Show < User::Base
   end
 
   def set_card_balances
-    if selected_user.cards.present?
+    # expense card feature discontinued
+    if false
       selected_user.cards.each do |card|
         # card.manager_view_balance false for reimbursement cards
         # Reimbursement card balance only visible for owner
@@ -326,7 +328,8 @@ class User::Balances::Show < User::Base
     credit_actions = {initiating_accounts: [], receiving_accounts: []}
     debit_actions = {initiating_accounts: [], receiving_accounts: []}
     meta = {base_url: nil}
-    if expense_management? && selected_user.expense_management_enabled?
+    #itz cash feature discontinued
+    if false
       # first add wallet balance
       wallet_action = {
           type: "wallet",
@@ -341,7 +344,8 @@ class User::Balances::Show < User::Base
       debit_actions[:receiving_accounts] << wallet_action
 
       # now add card balances
-      if selected_user.cards.expense_cards.present?
+      # card feature discontinued
+      if false
         selected_user.cards.expense_cards.each do |card|
           disabler = card.disabled_by_user&.name
           disabler_role = card.disabled_by_role&.name
@@ -363,7 +367,8 @@ class User::Balances::Show < User::Base
       end
 
       # now based on whether the user is an admin or not, add company credits
-      if selected_user.admin?
+      #itz cash feature discontinued
+      if false
         company_action = {
             type: "company",
             id: selected_user.company.itz_cash_company_account.id,

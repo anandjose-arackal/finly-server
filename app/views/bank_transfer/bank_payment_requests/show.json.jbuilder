@@ -24,6 +24,11 @@ json.summary do
   json.amount_processed precision_value @result.payment_order.amount_processed&.value
   json.amount_processed_currency @result.payment_order.amount_processed&.currency&.country_code rescue 'INR'
 
+  if @result.bank_payment_request.payments.first&.parent_type == 'PurchaseOrder'
+    json.amount_requested_currency       @result.bank_payment_request.payments.first&.parent&.base_currency&.country_code
+    json.amount_processed_currency       @result.bank_payment_request.payments.first&.parent&.base_currency&.country_code
+  end
+
 
   # json.amount_requested do
   #   amount = @result.payment_order.amount_requested
@@ -62,7 +67,9 @@ json.summary do
   json.base_currency_id @result.bank_payment_request.base_currency_id
   json.is_domestic @result.bank_payment_request.is_domestic
 
-  json.reporting_currency_code @result.user.company.reporting_currency_code
+  json.reporting_currency_code @result.bank_payment_request.reporting_currency.country_code rescue 'INR'
+
+  # json.reporting_currency_code @result.user.company.reporting_currency_code
 end
 
 json.invoice_categories do

@@ -138,7 +138,7 @@ class Docs::UtilityBills::Subscriptions::Contracts::Update < Reform::Form
   end
 
   def check_numeric(string)
-    string.match(/^\d+$/)
+    string.to_s.match(/^\d+$/)
   end
 
   def customer_fields!(collection:, fragment:, index:, options:, **)

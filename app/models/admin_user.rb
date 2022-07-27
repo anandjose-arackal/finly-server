@@ -134,6 +134,14 @@ class AdminUser < NonTenantedApplicationRecord
     (hashed_password == password)
   end
 
+  def feature_toggle
+    @feature_toggle ||= FeatureToggle.new(self)
+  end
+
+  def analytics_id
+    "user:#{id}"
+  end
+
   def as_json(options = {})
     {
         name: name,

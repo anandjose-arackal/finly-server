@@ -44,7 +44,7 @@
         </table>
       </div>
     </div>
-    <% if @result.purchase_order.company.configuration.show_custom_fields_in_pdf %>
+    <% if @result.purchase_order.company.configuration.show_custom_fields_in_pdf && !@result.purchase_order.forms_enabled %>
       <% field_configurations = FieldConfiguration.with_id(@result.purchase_order.custom_fields.pluck(:field_configuration_id)) %>
       <% if field_configurations.present? && field_configurations.pluck(:printable).include?(true) %>
         <div class="col col-xs-12 no-padding">
@@ -82,14 +82,16 @@
             <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.vendor.trade_name %></div>
           <% end %>
         </div>
-        <div class="col col-xs-12 no-padding mg-botm-8">
-          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
-          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.vendor.pan %></div>
-        </div>
-        <div class="col col-xs-12 no-padding">
-          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GSTIN</div>
-          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.gstin_location&.gstin %></div>
-        </div>
+        <% if @result.purchase_order.vendor_country_id.to_i == Country.id_for("India") %>
+          <div class="col col-xs-12 no-padding mg-botm-8">
+            <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
+            <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.vendor.pan %></div>
+          </div>
+          <div class="col col-xs-12 no-padding">
+            <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GSTIN</div>
+            <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.gstin_location&.gstin %></div>
+          </div>
+        <% end %>
         <div class="col col-xs-12 no-padding">
           <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">Point of Contact</div>
           <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order&.vendor_poc_name %></div>
@@ -163,14 +165,16 @@
             <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.vendor.trade_name %></div>
           <% end %>
         </div>
-        <!-- <div class="col col-xs-12 no-padding mg-botm-8">
-          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
-          <div class="col col-xs-12 no-padding font-dark-gray"><%#= @result.purchase_order.vendor.pan %></div>
-        </div>
-        <div class="col col-xs-12 no-padding">
-          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GSTIN</div>
-          <div class="col col-xs-12 no-padding font-dark-gray"><%#= @result.purchase_order.gstin_location&.gstin %></div>
-        </div> -->
+        <% if @result.purchase_order.vendor_country_id.to_i == Country.id_for("India") %>
+          <div class="col col-xs-12 no-padding mg-botm-8">
+            <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
+            <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.vendor.pan %></div>
+          </div>
+          <div class="col col-xs-12 no-padding">
+            <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GSTIN</div>
+            <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.gstin_location&.gstin %></div>
+          </div>
+        <% end %>
         <div class="col col-xs-12 no-padding">
           <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">Point of Contact</div>
           <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order&.vendor_poc_name %></div>
@@ -199,6 +203,7 @@
         <div class="col col-xs-12 no-padding mg-botm-8">
           <div class="col col-xs-12 no-padding font-light-gray mg-botm-8"><%= @result.purchase_order.gstin_location&.address %></div>
         </div>
+        <% if @result.purchase_order.vendor_country_id.to_i == Country.id_for("India") %>
         <div class="col col-xs-12 no-padding">
           <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GST Number</div>
           <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.gstin_location&.gstin %></div>
@@ -207,6 +212,7 @@
           <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
           <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.vendor.pan %></div>
         </div>
+        <% end %>
       </div>
       <div class="col col-xs-3 billing-address">
         <h4 class="section-title">Buyer Billing Address</h4>
@@ -220,6 +226,7 @@
             <%= @result.purchase_order.location&.address %>
           <% end %>
         </div>
+        <% if @result.purchase_order.vendor_country_id.to_i == Country.id_for("India") %>
         <div class="col col-xs-12 no-padding mg-botm-8">
           <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GST Number</div>
           <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.location&.gstin %></div>
@@ -228,6 +235,7 @@
           <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
           <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.location&.pan %></div>
         </div>
+        <% end %>
       </div>
       <div class="col col-xs-3 shipping-address">
         <h4 class="section-title">Buyer Shipping Address</h4>
@@ -241,6 +249,7 @@
               <%= @result.purchase_order.delivery_location.address %>
           <% end %>
         </div>
+        <% if @result.purchase_order.vendor_country_id.to_i == Country.id_for("India") %>
         <div class="col col-xs-12 no-padding mg-botm-8">
           <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GST Number</div>
           <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.delivery_location&.gstin %></div>
@@ -249,6 +258,7 @@
           <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
           <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.delivery_location&.pan %></div>
         </div>
+        <% end %>
       </div>
     </div><br> <br>
 
@@ -282,11 +292,11 @@
             <td class="font-dark-gray fw-bold"><%= item.description %></td>
             <td class="font-light-gray"><div><%= item.comment %></div></td>
             <td class="text-center font-light-gray"><%= item.quantity %></td>
-            <td class="text-right currency"><i class='fa fa-rupee'></i><%= number_with_delimiter(item.rate, delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) %></td>
-            <td class="text-right currency"><i class='fa fa-rupee'></i><%= number_with_delimiter(item.discount_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
-            <td class="text-right currency"><i class='fa fa-rupee'></i><%= number_with_delimiter(item.tax_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
+            <td class="text-right currency"><i class='fa fa-<%= @result.purchase_order.base_currency.country_code.downcase %>'></i><%= number_with_delimiter(item.rate, delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) %></td>
+            <td class="text-right currency"><i class='fa fa-<%= @result.purchase_order.base_currency.country_code.downcase %>'></i><%= number_with_delimiter(item.discount_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
+            <td class="text-right currency"><i class='fa fa-<%= @result.purchase_order.base_currency.country_code.downcase %>'></i><%= number_with_delimiter(item.tax_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
             <td> <%= number_with_delimiter(item.tax&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/)  rescue 0 %> %</td>
-            <td class="text-right fw-bold currency"><i class='fa fa-rupee'></i><%= number_with_delimiter(item.total_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
+            <td class="text-right fw-bold currency"><i class='fa fa-<%= @result.purchase_order.base_currency.country_code.downcase %>'></i><%= number_with_delimiter(item.total_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
           </tr>
         <% end %>
         </tbody>
@@ -294,9 +304,11 @@
     </div>
     <div class="col col-xs-12 no-padding">
       <div class="col col-xs-8 no-padding">
-        <div class="amount_in_words">
-          <b>Net Total Amount in Words:</b> <%= AmountUtils.to_words(@result.purchase_order.balance_amount&.value&.to_d.round(2)).titleize %>
+        <% if @result.purchase_order.base_currency_id == Currency.id_for('INR')%>
+          <div class="amount_in_words">
+            <b>Net Total Amount in Words:</b> <%= AmountUtils.to_words(@result.purchase_order.balance_amount&.value&.to_d.round(2), @result.purchase_order.base_currency.country_code).titleize %>
         </div>
+        <% end %>
         <% if @result.taxes_applicable_flag %>
           <div class="taxes_as_applicable" style="vertical-align: bottom;">
             *Taxes as Applicable
@@ -308,11 +320,11 @@
           <tbody>
           <tr>
             <td class="font-light-gray text-left">Total</td>
-            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= number_with_delimiter((@result.purchase_order.total_before_tax&.value + @result.purchase_order.discount_amount&.value).round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
+            <td class="font-dark-gray text-right currency"><i class='fa fa-<%= @result.purchase_order.base_currency.country_code.downcase %>'></i><%= number_with_delimiter((@result.purchase_order.total_before_tax&.value + @result.purchase_order.discount_amount&.value).round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
           </tr>
           <tr>
             <td class="font-light-gray text-left">Discount</td>
-            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= number_with_delimiter(@result.purchase_order.discount_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
+            <td class="font-dark-gray text-right currency"><i class='fa fa-<%= @result.purchase_order.base_currency.country_code.downcase %>'></i><%= number_with_delimiter(@result.purchase_order.discount_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
           </tr>
           <tr>
             <% if @result.taxes_applicable_flag %>
@@ -332,17 +344,17 @@
               <% end %>
               </td>
             <% end %>
-            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= number_with_delimiter(@result.purchase_order.tax_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
+            <td class="font-dark-gray text-right currency"><i class='fa fa-<%= @result.purchase_order.base_currency.country_code.downcase %>'></i><%= number_with_delimiter(@result.purchase_order.tax_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
           </tr>
           <% if @result.purchase_order.advance_amount_required %>
             <tr>
               <td class="font-light-gray text-left">Advance Amount</td>
-              <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= number_with_delimiter(@result.purchase_order.advance_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
+              <td class="font-dark-gray text-right currency"><i class='fa fa-<%= @result.purchase_order.base_currency.country_code.downcase %>'></i><% if @result.purchase_order.forms_enabled %><%= number_with_delimiter(@result.purchase_order.po_requested_advance_amount.to_f, delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %><% else %><%= number_with_delimiter(@result.purchase_order.advance_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %><% end %></td>
             </tr>
           <% end %>
           <tr>
             <td class="font-light-gray text-left">Net Total</td>
-            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= number_with_delimiter(@result.purchase_order.balance_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
+            <td class="font-dark-gray text-right currency"><i class='fa fa-<%= @result.purchase_order.base_currency.country_code.downcase %>'></i><%if @result.purchase_order.forms_enabled %><%= number_with_delimiter(@result.purchase_order.po_balance_due.to_f, delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %><%else %><%= number_with_delimiter(@result.purchase_order.balance_amount&.value&.to_d, delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %><%end %></td>
           </tr>
           </tbody>
         </table>

@@ -6,9 +6,9 @@ require 'awesome_print'
 URL = 'https://uatsky.yesbank.in/app/uat/ssl/fundsTransferByCustomerSevice2'
 
 BASIC_AUTH_USERNAME = "testclient"
-BASIC_AUTH_PASSWORD = "test@123"
+BASIC_AUTH_PASSWORD = ENV['BASIC_AUTH_PASSWORD']
 DP_CLIENT_ID        = "7b1f3f3e-c77a-445f-8471-1fe808b7836c"
-DP_CLIENT_SECRET    = "eI5bR5yL5tT3jO0yP0wO8cT1xI4dD7uS1mU3rW8nN1bN0iI2iM"
+DP_CLIENT_SECRET    = ENV['DP_CLIENT_SECRET']
 CUSTOMER_ID         = "448995"
 ACCOUNT_NUMBER      = "000690600003544"
 

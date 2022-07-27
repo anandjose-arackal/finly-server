@@ -148,7 +148,7 @@ class Event::EPurchaseOrder::Approve < Event::EPurchaseOrder::Base
       # elsif self.purchase_order.document_role_users(:creditor).include?(user)
       #    message = "#{approving_user.name} has approved the purchase order: #{self.purchase_order.po_number} and is waiting for your approval"
       elsif purchase_order.affected_users(:approve).include?(user)
-        message = "#{approving_user.name} has approved the purchase order '#{self.purchase_order.po_number}' and is currently waiting for your approval"
+        message = "#{approving_user.name} has approved the purchase order '#{self.purchase_order.po_number}' and is currently awaiting for your approval"
       elsif purchase_request_creator.present? && purchase_request_creator.include?(user)
         message = "#{approving_user.name} has approved the purchase order: #{self.purchase_order.po_number} containing your purchase request item"       
       end

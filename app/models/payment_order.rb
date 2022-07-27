@@ -287,7 +287,7 @@ class PaymentOrder < ApplicationRecord
       # now further check if there are successes / initiated as well
       if status_ids.include?(PaymentStatus.id_for(:completed)) || status_ids.include?(PaymentStatus.id_for(:initiated)) || status_ids.include?(PaymentStatus.id_for(:processing))
         self.update(payment_order_status_id: PaymentOrderStatus.id_for(:partially_completed))
-      else # i.e. if there are only failures in this payment order
+      elsif status_ids.uniq&.count == 1 && status_ids.uniq&.first == PaymentStatus.id_for(:failed)
         self.update(payment_order_status_id: PaymentOrderStatus.id_for(:failed))
       end
     else

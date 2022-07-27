@@ -50,4 +50,8 @@ class PurchaseRequestExposure < Exposures::API
     approvers.reject { |e| e.to_s.empty? }.join(", ")
   end
 
+  attribute :forms_enabled do
+    record.forms_enabled
+  end
+
 end

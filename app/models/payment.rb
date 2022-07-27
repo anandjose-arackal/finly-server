@@ -518,7 +518,7 @@ include Searchkick::Api
     self.reference_id = Generator.reference_id_for(initiating_account, receiving_account, date)
   end
 
-  after_save :budget_trail_entry
+  after_save :budget_trail_entry, if: :budget_enabled?
   after_save :recalculate_order_summary
   after_save :add_company_id
   after_save :calculate_paid_amount_in_parent_trails
@@ -735,8 +735,11 @@ include Searchkick::Api
     when 'Invoice'
       precision_value self.parent.balance_due&.value
     when 'PurchaseOrder'
-      # PurchaseOrder.find_by(id: self.parent_id).as_json(tree: true) # because somewhere we got as_json for PO already. running on deadline. dont have time to remodify.
-      precision_value self.parent.advance_amount&.value
+      if user.po_form_enabled
+        precision_value self.parent.po_requested_advance_amount
+      else
+        precision_value self.parent.advance_amount&.value
+      end
     else
       if self.invoice.present?
         precision_value self.invoice.balance_due&.value
@@ -930,8 +933,11 @@ include Searchkick::Api
     end
 
     # if PaymentStatus.all_except_failed.exclude? self.payment_status_id
-    if self.failed? ||  self.possible_failure?
+    if self.failed?
       case self.parent_type
+      when 'PurchaseOrder'
+        parent_details = initiating_user.company.purchase_orders.find_by(id: self.parent_id)
+        parent_details.update(advance_amount_status_id: AdvanceAmountStatus.id_for(:failed))
       when 'Invoice'
         parent_details = initiating_user.company.inward_invoices.non_beneficiary.find_by(id: self.parent_id)
         total_payments = parent_details.payments.all_except_failed.joins(:amount).sum(:value).round(2)
@@ -979,8 +985,8 @@ include Searchkick::Api
       custom_field_config: get_custom_field_config(document_type),
       payment_id: self.id,
       attachment_details: get_attachment_details(document_type),
-      base_currency: self.bank_payment_request.base_currency,
-      reporting_currency: self.company.reporting_currency,
+      base_currency: self.parent_type == 'PurchaseOrder' ? self.parent.base_currency : self.bank_payment_request.base_currency,
+      reporting_currency: self.parent_type == 'PurchaseOrder' ? self.parent.reporting_currency : self.company.reporting_currency,
       is_domestic: self.bank_payment_request&.is_domestic,
       non_po_invoice_form_enabled: (self.parent&.forms_enabled rescue false)
     }
@@ -1141,12 +1147,16 @@ include Searchkick::Api
   def get_po_advance_amount_details
     parameters = RequestStore.store[:params]
     tds_slabs = TdsSlabs::Index.(self.purchase_order.user, parameters).tds_slabs rescue nil
+    total_amount = self.purchase_order.user.po_form_enabled ? precision_value(self.purchase_order&.po_requested_advance_amount&.to_f) : precision_value(self.purchase_order&.requested_advance_amount&.value)
+    tds_amount = self.purchase_order.user.po_form_enabled ? self.purchase_order&.po_advance_tds_amount&.to_f : self.purchase_order&.advance_tds_amount&.value
+    conversion_rate = (self.purchase_order&.conversion_rate.blank? ? 1.0 : self.purchase_order.conversion_rate)
     {
-        total_amount: {value: precision_value(self.purchase_order&.requested_advance_amount&.value), editable: false}, # TOTAL
+        total_amount: {value: total_amount, editable: false}, # TOTAL
         inclusive_of_taxes: "",
         discount: "",
         tax: "",
-        tds: {tds_slab_id: self.purchase_order.advance_tds_slab_id, tds_amount: self.purchase_order&.advance_tds_amount&.value, editable: true, tds_slab_rate: self.purchase_order&.advance_tds_slab&.tds},
+        tds: {tds_slab_id: self.purchase_order.advance_tds_slab_id, tds_amount: tds_amount, editable: true, tds_slab_rate: self.purchase_order&.advance_tds_slab&.tds},
+        tds_applicable_amount: tds_amount,
         advance_amount: "", # Advance
         freight_amount: "",
         net_payable_amount: "",
@@ -1156,7 +1166,11 @@ include Searchkick::Api
         tax_rates: self.purchase_order.company.tax_rates,
         #gst_type_id: {value: self.purchase_order.gst_type_id, editable: false},
         payment_amount: {value: self.amount_value, editable: true}, #Payable Amount
-        balance_due: {value: self.amount&.value, editable: false} # Invoice AMOUNT
+        balance_due: {value: self.amount&.value, editable: false}, # Invoice AMOUNT
+        invoice_net_total_amount: {value: (total_amount - tds_amount), editable: false},
+        reporting_invoice_net_total_amount: {value: (total_amount - tds_amount)*conversion_rate, editable: false},
+        invoice_balance_due: {value: (total_amount - tds_amount), editable: false},
+        reporting_invoice_balance_due: {value: (total_amount - tds_amount)*conversion_rate, editable: false}
     }
   end
 
@@ -1341,31 +1355,41 @@ include Searchkick::Api
         paid_percent_after_tax = paid_amount / invoice.amount_after_tax
         processing_percent_before_tax = payment_processing_amount / invoice.amount_before_tax
         processing_percent_after_tax = payment_processing_amount / invoice.amount_after_tax
-
-        effective_sql_before_tax = "UPDATE `budget_trails` SET `effective_paid_amount_before_tax_value` = (GREATEST((#{paid_percent_before_tax} * (billed_amount_before_tax_value) - tax_amount_value), 0) + #{invoice.advance_per_item})
-                                                WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
+        return true if paid_amount.nil?
+        return true if paid_percent_before_tax.nil?
+        return true if paid_percent_after_tax.nil?
+        return true if processing_percent_after_tax.nil?
+        return true if processing_percent_before_tax.nil?
+        effective_sql_before_tax = "UPDATE `budget_trails` SET `effective_paid_amount_before_tax_value` = (GREATEST(( ? * (billed_amount_before_tax_value) - tax_amount_value), 0) + ?)
+                                                WHERE `budget_trails`.`id` IN (?)"
+        effective_sql_before_tax = ActiveRecord::Base::sanitize_sql([effective_sql_before_tax, paid_percent_before_tax, invoice.advance_per_item, parent_trails.pluck(:id)])
         ActiveRecord::Base.connection.execute(effective_sql_before_tax)
 
-        sql_before_tax = "UPDATE `budget_trails` SET `net_paid_amount_before_tax_value` = (#{paid_percent_before_tax} * (billed_amount_before_tax_value)), `paid_tds_value` = (#{paid_percent_before_tax} * (tds_value))
-                                                WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
+        sql_before_tax = "UPDATE `budget_trails` SET `net_paid_amount_before_tax_value` = (? * (billed_amount_before_tax_value)), `paid_tds_value` = (? * (tds_value))
+                                                WHERE `budget_trails`.`id` IN (?)"
+        sql_before_tax = ActiveRecord::Base::sanitize_sql([sql_before_tax, paid_percent_before_tax, paid_percent_before_tax, parent_trails.pluck(:id)])
         ActiveRecord::Base.connection.execute(sql_before_tax)
 
-        sql_before_tax = "UPDATE budget_trails SET `payment_processing_amount_before_tax_value` = GREATEST((#{processing_percent_before_tax} * (billed_amount_before_tax_value) - tax_amount_value + net_paid_amount_before_tax_value), 0), `processing_tds_value` = (#{processing_percent_before_tax} * (tds_value))
-                                              WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})
+        sql_before_tax = "UPDATE budget_trails SET `payment_processing_amount_before_tax_value` = GREATEST((? * (billed_amount_before_tax_value) - tax_amount_value + net_paid_amount_before_tax_value), 0), `processing_tds_value` = (? * (tds_value))
+                                              WHERE `budget_trails`.`id` IN (?)
                                               AND (net_paid_amount_before_tax_value < tax_amount_value)"
+        sql_before_tax = ActiveRecord::Base::sanitize_sql([sql_before_tax, processing_percent_before_tax, processing_percent_before_tax, parent_trails.pluck(:id)])
         ActiveRecord::Base.connection.execute(sql_before_tax)
 
-        sql_before_tax = "UPDATE budget_trails SET `payment_processing_amount_before_tax_value` = GREATEST((#{processing_percent_before_tax} * (billed_amount_before_tax_value)), 0), `processing_tds_value` = (#{processing_percent_before_tax} * (tds_value))
-                                              WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})
+        sql_before_tax = "UPDATE budget_trails SET `payment_processing_amount_before_tax_value` = GREATEST((? * (billed_amount_before_tax_value)), 0), `processing_tds_value` = (? * (tds_value))
+                                              WHERE `budget_trails`.`id` IN (?)
                                               AND (net_paid_amount_before_tax_value >= tax_amount_value)"
+        sql_before_tax = ActiveRecord::Base::sanitize_sql([sql_before_tax, processing_percent_before_tax, processing_percent_before_tax, parent_trails.pluck(:id)])
         ActiveRecord::Base.connection.execute(sql_before_tax)
 
-        sql_after_tax = "UPDATE `budget_trails` SET `paid_amount_after_tax_value` = (#{paid_percent_after_tax} * (billed_amount_after_tax_value) + #{invoice.advance_per_item})
-                                                WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
+        sql_after_tax = "UPDATE `budget_trails` SET `paid_amount_after_tax_value` = (? * (billed_amount_after_tax_value) + ?)
+                                                WHERE `budget_trails`.`id` IN (?)"
+        sql_after_tax = ActiveRecord::Base::sanitize_sql([sql_after_tax, paid_percent_after_tax, invoice.advance_per_item, parent_trails.pluck(:id)])
         ActiveRecord::Base.connection.execute(sql_after_tax)
 
-        sql_after_tax = "UPDATE budget_trails SET `payment_processing_amount_after_tax_value` = (#{processing_percent_after_tax} * (billed_amount_after_tax_value))
-                                             WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
+        sql_after_tax = "UPDATE budget_trails SET `payment_processing_amount_after_tax_value` = (? * (billed_amount_after_tax_value))
+                                             WHERE `budget_trails`.`id` IN (?)"
+        sql_after_tax = ActiveRecord::Base::sanitize_sql([sql_after_tax, processing_percent_after_tax, parent_trails.pluck(:id)])
         ActiveRecord::Base.connection.execute(sql_after_tax)
       when "PurchaseOrder"
         purchase_order = self.parent
@@ -1380,17 +1404,24 @@ include Searchkick::Api
         processing_percent_before_tax = payment_processing_amount / purchase_order.amount_before_tax
         processing_percent_after_tax = payment_processing_amount / purchase_order.amount_after_tax
 
-        sql_before_tax = "UPDATE `budget_trails` SET `effective_paid_amount_before_tax_value` = (#{paid_percent_before_tax} * remaining_amount_before_tax_value)
-                                                WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
+        sql_before_tax = "UPDATE `budget_trails` SET `effective_paid_amount_before_tax_value` = (? * remaining_amount_before_tax_value)
+                                                WHERE `budget_trails`.`id` IN (?)"
+        sql_before_tax = ActiveRecord::Base::sanitize_sql([sql_before_tax, paid_percent_before_tax, parent_trails.pluck(:id)])
         ActiveRecord::Base.connection.execute(sql_before_tax)
-        sql_before_tax = "UPDATE budget_trails SET `payment_processing_amount_before_tax_value` = (#{processing_percent_before_tax} * remaining_amount_before_tax_value)
-                                              WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
+
+        sql_before_tax = "UPDATE budget_trails SET `payment_processing_amount_before_tax_value` = (? * remaining_amount_before_tax_value)
+                                              WHERE `budget_trails`.`id` IN (?)"
+        sql_before_tax = ActiveRecord::Base::sanitize_sql([sql_before_tax, processing_percent_before_tax, parent_trails.pluck(:id)])
         ActiveRecord::Base.connection.execute(sql_before_tax)
-        sql_after_tax = "UPDATE `budget_trails` SET `paid_amount_after_tax_value` = (#{paid_percent_after_tax} * remaining_amount_after_tax_value)
-                                                WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
+
+        sql_after_tax = "UPDATE `budget_trails` SET `paid_amount_after_tax_value` = (? * remaining_amount_after_tax_value)
+                                                WHERE `budget_trails`.`id` IN (?)"
+        sql_after_tax = ActiveRecord::Base::sanitize_sql([sql_after_tax, paid_percent_after_tax, parent_trails.pluck(:id)])
         ActiveRecord::Base.connection.execute(sql_after_tax)
-        sql_after_tax = "UPDATE budget_trails SET `payment_processing_amount_after_tax_value` = (#{processing_percent_after_tax} * remaining_amount_after_tax_value)
-                                             WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
+
+        sql_after_tax = "UPDATE budget_trails SET `payment_processing_amount_after_tax_value` = (? * remaining_amount_after_tax_value)
+                                             WHERE `budget_trails`.`id` IN (?)"
+        sql_after_tax = ActiveRecord::Base::sanitize_sql([sql_after_tax, processing_percent_after_tax, parent_trails.pluck(:id)])
         ActiveRecord::Base.connection.execute(sql_after_tax)
       else
         # yet to handle security deposit and rental invoice TODO
@@ -1452,5 +1483,8 @@ include Searchkick::Api
     self.save
   end
 
+  def budget_enabled?
+    RequestStore.store[:current_company].feature_subscription.budgeting_system
+  end
 
 end

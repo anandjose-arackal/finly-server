@@ -1,5 +1,5 @@
 class Procurements::Invoices::Approve < Procurements::Invoices::Base
-  attr_accessor :invoice, :procurement, :invoice_params
+  attr_accessor :invoice, :procurement, :invoice_params, :flag_save
 
   def personalizer
     {
@@ -14,6 +14,7 @@ class Procurements::Invoices::Approve < Procurements::Invoices::Base
     self.invoice = user.company.inward_invoices.scope_all_except_voided.find_by id: invoice_id
 
     self.procurement = self.invoice&.procurement
+    self.flag_save = true
   end
 
   def validate
@@ -30,6 +31,10 @@ class Procurements::Invoices::Approve < Procurements::Invoices::Base
   end
 
   def process
+    # invoice can approve through bulk action and from mail, saving updated params cant perform here.
+    # form have seperate update button
+    #call_save(params) if self.invoice.forms_enabled
+    return unless self.flag_save
     params[:document] = self.invoice
     params[:aasm_event] = 'approve'
     params[:violation_present] = false #todo Check violations
@@ -68,9 +73,24 @@ class Procurements::Invoices::Approve < Procurements::Invoices::Base
 
   def post_process
     update_agreement_available_limit
-    Event::EInvoice::Approve.(user, invoice: invoice, workflow_output: workflow_output)
+    if invoice.invoice_type.id == InwardInvoiceType.id_for("non_po_invoice") && NonPoInvoiceToggle.new(user).enabled?
+      EmailApproval.generate_email_approval(invoice.id, invoice.class.to_s)
+      email_based_approval = true
+    end
+    Event::EInvoice::Approve.(user, invoice: invoice, workflow_output: workflow_output, email_based_approval: email_based_approval)
     # Email to vendor that invoice is generated when the invoice is approved
     # Event::EInvoice::VendorMail.(user, invoice: invoice, workflow_output: workflow_output) if self.invoice.approved? || self.invoice.auto_approved?
     add_message :success, 'Successfully Approved Invoice'
+  end
+
+  private
+
+  def call_save(params)
+    op = Docs::I2P::Invoices::Ops::Update.(params: params, current_user: current_user)
+
+    unless op.success?
+      add_message :error, op.messages[:errors]
+      self.flag_save = false
+    end
   end
 end

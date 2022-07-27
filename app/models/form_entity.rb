@@ -68,6 +68,15 @@ class FormEntity < ApplicationRecord
 
   class_attr :registered_type
 
+  SIZES = {
+    nil: nil, 
+    empty: "", 
+    small: "small", 
+    medium: "medium", 
+    large: "large"
+  }
+
+
   belongs_to :company
   belongs_to :section, class_name: "FormSection", foreign_key: :form_section_id
   belongs_to :form
@@ -87,6 +96,9 @@ class FormEntity < ApplicationRecord
   has_many :choice_controlling_entities, through: :choice_dependencies, class_name: 'FormEntity', source: :controlling_entity
 
   before_save :sanitize
+
+  STATUS_ENTITIES = %w[purchase_order_status_id purchase_request_status_id invoice_status_id]
+
 
   # Fixme: Delete this as it is available in Forms::Entity::Registry. Kept it commented for testing purpose
   # def find_entity(entity_path)
@@ -287,6 +299,8 @@ class FormEntity < ApplicationRecord
   end
 
   def form_json(opts = {})
+    size = self.size || "medium" # defaults to medium
+
     data = {
       id: uuid,
       entity_key: entity_key,
@@ -298,8 +312,9 @@ class FormEntity < ApplicationRecord
       placeholder: placeholder,
       hint: hint,
       entity_type: entity_type,
-      default_value: default_value,
+      default_value: is_purchase_request_cost_allocations ? false : default_value,
       position: position,
+      size: size,
       filters: filters&.as_ransack(do_not_interpolate: true),
       behavior: {
         editable: editable,
@@ -314,14 +329,14 @@ class FormEntity < ApplicationRecord
     if choices_scope.present?
       data[:choices] = choices_scope.build(params: opts[:params], user: opts[:current_user])
     end
+
     if entities.present?
       data[:entities] = {}
       entities.each do |ent|
         data[:entities][ent.entity_key] = ent.as_json(opts)
       end
     end
-    data_card = self.data_card_route
-    data[:data_card] = data_card if data_card.present?
+    data[:data_card] = self.data_card_route if self.data_card_route.present?
     data
   end
 
@@ -452,5 +467,9 @@ class FormEntity < ApplicationRecord
     # Set entity path & config path
     self.entity_path = generate_entity_path.join(".")
     self.config_path = generate_config_path.join(".")
+  end
+
+  def is_purchase_request_cost_allocations
+    self.form.klass_name == 'Docs::P2P::PurchaseRequests::Form' && self.entity_key == 'cost_allocation_items'
   end
 end

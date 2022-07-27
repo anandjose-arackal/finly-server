@@ -198,7 +198,11 @@ class InvoiceExposure < Exposures::API
   end
 
   attribute :attachments, includes: [:attachments] do
-    record.attachments.map {|a| a.file.url(:original, timestamp: false)}.compact.join(", ")
+    attachments = record.attachments.map {|a| a.file.url(:original, timestamp: false)}.compact.join(", ")
+    if record.form_custom_fields.present?
+      attachments = record.form_custom_fields.where(entity_type: "attachment").map {|a| a.retrieve_export_text_value}.compact.join(", ")
+    end
+    attachments
   end
 
   attribute :approval_pending_reviewers, includes: [:level, :document_level_reviewer_mappings] do
@@ -278,6 +282,10 @@ class InvoiceExposure < Exposures::API
 
   attribute :payments, record_attribute: true, exposure: true,  includes: [:payments]
   attribute :agreement_item, record_attribute: true, exposure: true, includes: [:agreement_item]
+  attribute :receiving_account, record_attribute: true, exposure: true,  includes: [:receiving_account]
+  attribute :display_tds_amount, record_attribute: false, exposure: false do
+    record.display_tds_amount&.to_f
+  end
 
 
   # def vendor_ref_num(invoice_line_item)

@@ -48,7 +48,9 @@ class ActionsManager::Master::Base
       bbps_bills_show: '::ActionsManager::Master::Bbps::Bills::Show',
       bbps_bills_index: '::ActionsManager::Master::Bbps::Bills::Index',
       credit_notes_index: '::ActionsManager::Master::CreditNotes::Index',
-      credit_note_show: '::ActionsManager::Master::CreditNotes::Show'
+      credit_note_show: '::ActionsManager::Master::CreditNotes::Show',
+      vp_workflow_config: '::ActionsManager::Master::ApprovalMatrices::WorkflowConfig'
+
   }.with_indifferent_access
 
   def self.set_data_map

@@ -32,16 +32,20 @@ class PurchaseRequest < ApplicationRecord
   include Sequenced::ActsAsSequenced
   # include SearchIndex::Concerns::Document
   include Searchkick::Api
-
+  include LiquidDroppable
+  include Exposures::Model::Exposable
+  include FormsHelper
+  
 
   acts_as_sequenced column: :order_number, purpose: :purchase_request, editable: false, prefix: 'PR'
 
   alias_attribute :created_by_id, :creator_id
 
-  default_scope { order(created_at: :desc) }
+  default_scope { order(order_number: :desc, created_at: :desc) }
 
   # belongs_to :purchase_request_status, optional: true
   belongs_to :status, optional: true, class_name: 'PurchaseRequestStatus', foreign_key: :purchase_request_status_id
+  belongs_to :purchase_request_status, optional: true
   belongs_to :department, optional: true
   belongs_to :location, optional: true, class_name: "BranchLocation"
   belongs_to :policy, optional: true
@@ -62,6 +66,7 @@ class PurchaseRequest < ApplicationRecord
   has_many :line_items, class_name: "PurchaseRequestItem", dependent: :destroy
   has_many :custom_fields, as: :parent, dependent: :destroy
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
+  has_many :form_custom_fields, class_name: 'FormCustomField', as: :document, dependent: :destroy
 
   validates :description, :location, :policy, presence: true
   validates_presence_of :cost_center, :department, unless: :cost_allocation_items?
@@ -72,8 +77,10 @@ class PurchaseRequest < ApplicationRecord
 
   accepts_nested_attributes_for :purchase_request_items, :custom_fields, :attachments, allow_destroy: true
 
+  before_create :set_creator
   before_create :set_currency
-  after_save :budget_trail_entry
+  after_save :budget_trail_entry, if: :budget_enabled?
+  after_save :sync_amounts, unless: :skip_callback
   after_save :set_currency_for_amount, unless: :skip_callback
   after_destroy :budget_trail_destroy
 
@@ -200,6 +207,7 @@ class PurchaseRequest < ApplicationRecord
   scope :sort_order_number, -> (type) {
     type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
+      # nosqli - The incoming var is checked to be ASC or DESC and then only substituted, not other value other than "ASC" or "DESC" possible
       reorder("purchase_requests.order_number #{type}")
     end
   }
@@ -207,6 +215,7 @@ class PurchaseRequest < ApplicationRecord
   scope :sort_description, -> (type) {
     type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
+      # nosqli - The incoming var is checked to be ASC or DESC and then only substituted, not other value other than "ASC" or "DESC" possible
       reorder("purchase_requests.description #{type}")
     end
   }
@@ -214,6 +223,7 @@ class PurchaseRequest < ApplicationRecord
   scope :sort_date, -> (type) {
     type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
+      # nosqli - The incoming var is checked to be ASC or DESC and then only substituted, not other value other than "ASC" or "DESC" possible
       reorder("purchase_requests.created_at #{type}")
     end
   }
@@ -240,6 +250,10 @@ class PurchaseRequest < ApplicationRecord
     end
   }
 
+  scope :includes_for_contract, -> {
+    includes(:form_custom_fields, :items)
+  }
+
   ransack_scopes :with_status_ids
 
   # scope :sort_amount, -> (type){
@@ -250,7 +264,7 @@ class PurchaseRequest < ApplicationRecord
   # }
 
   def add_company
-    self.company_id = self.creator.company_id
+    self.company_id = self.creator.company_id if self.company_id.blank?
   end
 
   def entity_date
@@ -485,8 +499,82 @@ class PurchaseRequest < ApplicationRecord
     self.base_currency_id = self.company.reporting_currency.id if self.base_currency_id.blank? 
   end
 
+  def set_creator
+    self.creator_id = RequestStore.store[:current_user]&.id if self.creator_id.blank?
+  end
+
+  def form_klass
+    Forms::Router.klass(:purchase_requests)&.name
+  end
+
+  def retrieve_value(entity) 
+    return 'Processing' if entity.entity_key == 'purchase_request_status_id' && self.purchase_request_status_id == PurchaseRequestStatus.id_for(:awaiting_approval) && !can_approve?
+ 
+    send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
+  end
+
+  def forms_enabled
+    if RequestStoreUtil.current_user.blank?
+      feature_flag_enabled = true
+    else
+      feature_flag_enabled = PurchaseRequestToggle.new(RequestStoreUtil.current_user).enabled?
+    end
+    feature_flag_enabled && self.form_migrated
+  end
+
+  def purchase_request_budgets
+    op = BudgetManager::BudgetsCalculator::ApplicableBudgets.({document: self, current_user: User.first})
+    budgets = op["result"][:budgets]
+    budgets
+  end
+
+  def purchase_request_budget_contributions_before_update
+    if self.company.enforce_budget_configuration.enforce_purchase_request_budget?
+      op = BudgetManager::BudgetLimitValidator::PurchaseRequest.({ purchase_request: self, ignore_unbudgetables: true, current_user: self.created_by })
+      op['result'][:budget_contributions] rescue {}
+    end
+    {}
+  end
+
+  def purchase_request_budget_limit_validation
+    if self.company.enforce_budget_configuration.enforce_purchase_request_budget?
+      return BudgetManager::BudgetLimitValidator::PurchaseRequest.({ purchase_request: self, previous_budget_contributions: self.purchase_request_budget_contributions_before_update, current_user: self.company.users.first })
+    end
+  end
+
+  # def purchase_request_status_id
+  #   !can_approve? && awaiting_approval? ? PurchaseRequestStatus.id_for(:processing) : super
+  # end
+
   private
 
+  def sync_amounts
+    if forms_enabled
+      sync_to_old_structure
+    end
+  end
+
+  def sync_to_old_structure
+    self.skip_callback = true
+
+    amounts_attributes_map.each do |key, value|
+      amount_value = self.send(key)
+      amount_attr = self.send("#{value}_id")
+      if amount_attr.present?
+        Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: base_currency_id)
+      else
+        amount_id = Amount.create(value: amount_value, currency_id: base_currency_id).id
+        self.send("#{value}_id=", amount_id)
+      end
+    end
+    self.save
+  end
+
+  def amounts_attributes_map
+    {  
+      pr_gross_amount: 'total_amount'
+    }
+  end
 
   def self.process_location_id(location_id, user_id)
     user = User.find_by_id user_id
@@ -545,6 +633,10 @@ class PurchaseRequest < ApplicationRecord
     end
     self.skip_callback = true
     self.save
+  end
+
+  def budget_enabled?
+    RequestStore.store[:current_company].feature_subscription.budgeting_system
   end
 
 end

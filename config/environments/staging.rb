@@ -15,6 +15,7 @@ Rails.application.configure do
   # and those relying on copy on write to perform better.
   # Rake tasks automatically ignore this option for performance.
   config.eager_load = true
+  config.action_mailbox.ingress = :postmark
 
   feature_flipper_config = Rails.application.config_for(:feature_flipper)
   if feature_flipper_config['api_key'].present? and feature_flipper_config['url'].present?
@@ -150,7 +151,7 @@ Rails.application.configure do
         port: 587,
         domain: 'staging.finly.io',
         user_name: 'vivekagb',
-        password: 'idAr5APhk61X',
+        password: ENV['STAGING_PASSWORD'],
         # ssl:                  true,
         # tls:                  true,
         authentication: :plain,

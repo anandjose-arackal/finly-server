@@ -125,7 +125,9 @@ class Script::MissedCardTransactionCreate < BaseOperation
 
           return true unless card.card_program.create_expense
           payment = Payment.where(reference_resource_id: transaction.id, reference_resource_type: 'CardTransaction', receiving_account_type: 'UserPocket', payment_type_id: PaymentType.id_for(:credit)).first
-          if payment.blank?
+          finly_transaction = nil
+          finly_transaction = FinlyTransaction.where(payment_id: payment.id).first if payment.present?
+          if payment.blank? || finly_transaction.nil?
             # add to cash on hand
             atm_pocket = user.user_pockets.atm_withdrawal_pockets.first
             payment_request = PaymentRequest.(user, nil, UserPocket.name, :credit, :atm_withdrawal)

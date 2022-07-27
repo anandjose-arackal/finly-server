@@ -38,6 +38,8 @@ json.status do
 end
 
 json.invoice_payment_status invoice.invoice_payment_status
+json.created_by invoice.created_by.as_json rescue nil
+
 
 # do
 #   if current_user.vendor_payment_creditor?
@@ -63,7 +65,7 @@ json.invoice do
   json.transaction_service_period_from invoice.transaction_service_period_from&.strftime('%d/%b/%Y')
   json.transaction_service_period_to invoice.transaction_service_period_to&.strftime('%d/%b/%Y')
   # json.po_number invoice.procurement&.purchase_order&.po_number
-  json.po_number invoice.po_number
+  json.po_number invoice.procurement&.purchase_order&.po_number
 
   location_id = invoice.location_id
   gstin_location_id = invoice.gstin_location_id

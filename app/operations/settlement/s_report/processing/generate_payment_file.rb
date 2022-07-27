@@ -73,6 +73,7 @@ class Settlement::SReport::Processing::GeneratePaymentFile < Settlement::SReport
     data[:beneficiary_account_name] = BankDetailsMaster.where(ifsc_prefix: ifsc_prefix)&.first&.name
     data[:beneficiary_account_number] = mapping.processor_accountable.account_number
     data[:receiving_user_name] = mapping.user.name
+    data[:receiving_user_email] = mapping.user.email
     data[:amount] = mapping.amount.value
     data[:payment_mode] = 'NEFT'
     data[:date] = Date.today

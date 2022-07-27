@@ -88,7 +88,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
     if self.purchase_order.quotations.present?
       quotes = self.purchase_order.quotations
-      selected_quotes = quotes.map { |q| q if q.selected }.compact
+      selected_quotes = quotes.select(&:selected?)
       if selected_quotes.count > 1
         add_message :error, "Please select atmost one quotation"
         return
@@ -117,6 +117,9 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       add_message :error, "Please select a department"
     end
 
+    if self.purchase_order_params[:cost_center_id].blank? && !self.cost_allocation_items
+      add_message :error, "Please select a cost center"
+    end
     if self.purchase_order.procurement.invoices.present? && self.purchase_order.procurement.inward_documents.present?
       add_message :error, "Can't modify a purchase order which has a Receipt Note or Invoice attached."
     end

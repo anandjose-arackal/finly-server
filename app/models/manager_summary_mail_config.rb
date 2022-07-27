@@ -46,6 +46,7 @@ class ManagerSummaryMailConfig < ApplicationRecord
     query << ')'
     query << " AND "
     query << "scheduled_time = '#{time_slot}'"
+    query = ActiveRecord::Base.sanitize_sql(query)
     where(query.string)
   end
   scope :group_by_user, -> { group(:user_id) }

@@ -84,7 +84,15 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
     if self.inward_invoice_params[:delivery_location_id].blank?
       add_message :error, "Please specify a Shipping Address."
-      return
+    end
+
+    unless self.cost_allocation_items
+      if self.inward_invoice_params[:department_id].blank?
+        add_message :error, "Please specify a Department."
+      end
+      if self.inward_invoice_params[:cost_center_id].blank?
+        add_message :error, "Please specify a Cost Center."
+      end
     end
 
     if self.purchase_order&.advance_payments.blank? && StringUtils.to_bool(params[:invoice][:advance_amount_required])
@@ -411,7 +419,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
     # if the vendor receiving account is not set here, set it explicitly as bank account
     if self.inward_invoice.receiving_account_type.blank?
-      self.inward_invoice_params[:receiving_account_type] = BankAccount.name
+      self.inward_invoice.receiving_account_type = BankAccount.name
     end
 
     receiving_account = self.inward_invoice.vendor&.bank_accounts&.find_by(id: self.inward_invoice_params[:bank_account_id])

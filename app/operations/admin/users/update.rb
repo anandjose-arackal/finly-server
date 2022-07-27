@@ -21,7 +21,7 @@ class Admin::Users::Update < Admin::Users::Base
 
   def pre_process
     if params[:user][:gl_config].present?
-      params[:user][:gl_config] = eval(params[:user][:gl_config])
+      params[:user][:gl_config] = JSON.parse(params[:user][:gl_config]).transform_keys(&:to_sym)
     end
   end
 

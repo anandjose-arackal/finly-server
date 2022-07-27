@@ -6,7 +6,6 @@ class NonPoInvoiceMigrator
     
     ActsAsTenant.with_tenant(company) do
       documents = Invoice.where(invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)).where(company_id: company.id)
-      # documents = Invoice.where(id: 490).where(company_id: company.id)
 
       # FormCustomField.where(company_id: company_id).destroy_all
       form = Form.where(klass_name: 'Docs::P2P::Invoices::NonPo::Form', company_id: company_id).first
@@ -36,6 +35,7 @@ class NonPoInvoiceMigrator
 
           # Migrate Invoice Data
           update_invoice_details document
+          update_credit_note_adjustements_details document
           
           # Migrate Attachments
           update_invoice_attachments( form, document)
@@ -352,6 +352,8 @@ class NonPoInvoiceMigrator
       invoice_advance_paid_amount: document&.payments&.successful&.joins(:amount)&.sum(:value),
       reporting_invoice_advance_paid_amount: document&.payments&.successful&.joins(:amount)&.sum(:value),
 
+      invoice_credit_note_adjusted_amount: document&.credit_note_adjustments&.joins(:amount)&.sum(:value).to_f,
+
       invoice_balance_due: document&.balance_due&.value.to_f,
        # - document&.payments&.successful&.joins(:amount)&.sum(:value).to_f ,
       reporting_invoice_balance_due: document&.balance_due&.value.to_f
@@ -359,6 +361,16 @@ class NonPoInvoiceMigrator
     }
     document.skip_callback = true
     document.update_columns(update_params)
+  end
+
+  def self.update_credit_note_adjustements_details document
+    cnas = document.credit_note_adjustments
+    cnas.each do |cna|
+      update_params = {
+        cn_adjustment_amount: cna&.amount&.value.to_f
+      }
+      cna.update_columns(update_params)
+    end
   end
 
   def self.update_invoice_attachments( form, document)

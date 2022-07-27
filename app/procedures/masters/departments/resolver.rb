@@ -6,6 +6,7 @@ class Masters::Departments::Resolver < Resolver::API
     if params.dig(:assignments, :form) == true
       doc_user = params[:document_type]&.classify&.constantize.find(params[:document_id]).created_by rescue user
       departments = Company::Departments::Index.(doc_user, params).policy_department_filter_mapping
+      departments ||= Department.none
       departments
     else
       if user.admin?

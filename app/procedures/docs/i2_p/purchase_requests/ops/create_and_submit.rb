@@ -1,0 +1,35 @@
+class Docs::I2P::PurchaseRequests::Ops::CreateAndSubmit < Transactions::API
+
+  step :create
+  step :submit
+
+
+  def create(options, params:, current_user:, **)
+    op = Docs::I2P::PurchaseRequests::Ops::Create.(params: params, current_user: current_user)
+
+
+    unless op.success?
+      add_message options, :error, :base, op.messages[:errors]
+      return
+    end
+
+    options['model'] = op['model']
+
+    true
+  end
+
+  def submit(options, params:, current_user:, model:, **)
+    submit_params = {
+        reviewal_document: model,
+        document_reviewer_mappings: params[:document_reviewer_mappings]
+    }
+    op = Docs::I2P::PurchaseRequests::Ops::Submit.(params: submit_params, current_user: current_user)
+
+    unless op.success?
+      add_message options, :error, :base, op.messages[:errors]
+    end
+
+    true
+  end
+
+end
