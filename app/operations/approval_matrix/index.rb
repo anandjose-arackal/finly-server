@@ -30,6 +30,9 @@ class ApprovalMatrix::Index < BaseOperation
     when 'purchase_requests'
       role = :purchase_request_initiator
       self.provider_name = 'PurchaseRequestProvider'
+    when 'credit_notes'
+      role = :credit_note_initiator
+      self.provider_name = 'CreditNoteProvider'
     end
 
     if role.present?

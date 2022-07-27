@@ -438,7 +438,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
 
     date :advance_scheduled_date, label: "Scheduled Date", editable: true, visible: true, required: true
     lookup :advance_amount_status_id, label: 'Status', editable: false, visible: true,
-           can_editable_be_changed: false, can_visible_be_changed: false, choices_scope: Choices[:lookup].('advance_amount_statuses'), 
+           can_editable_be_changed: false, can_visible_be_changed: false, choices_scope: Choices[:lookup].('advance_amount_statuses'),
            default_value: AdvanceAmountStatus.id_for(:new)
        
   end

@@ -4215,6 +4215,9 @@ Rails.application.routes.draw do
   post 'purchase_request_forms/create_and_submit', to: "purchase_request_forms#create_and_submit"
   post 'purchase_request_forms/create', to: "purchase_request_forms#create"
 
+  ######## NEW CREDIT NOTE FORMS #########################
+  resources :credit_note_forms, only: [:show, :update]
+  post 'credit_note_forms/save_and_submit', to: "credit_note_forms#save_and_submit"
 
   ######### Rate Contract API start #############
   resources :rate_contracts do
