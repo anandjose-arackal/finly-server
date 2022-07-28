@@ -67,6 +67,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket < BankTra
     self.payable_amounts.each do |invoice_id, payable_amount|
       invoice = self.inward_invoices.find_by(id: invoice_id)
       remaining_amount = (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
+      remaining_amount = invoice.invoice_balance_due if invoice.forms_enabled
       if remaining_amount.blank?
         next
       end
