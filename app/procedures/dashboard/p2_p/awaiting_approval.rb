@@ -48,7 +48,7 @@ class Dashboard::P2P::AwaitingApproval < Dashboard::IndexCard
               date: :submitted_at
           },
           permission: -> (context, current_user:, **) {
-            current_user.company.procurement_enabled? and current_user.has_permission?([:non_po_invoice_reviewer, :po_invoice_reviewer, :agreement_invoice_reviewer])
+            (current_user.company.procurement_enabled? || current_user.company.invoice_to_pay_system_enabled?) and current_user.has_permission?([:non_po_invoice_reviewer, :po_invoice_reviewer, :agreement_invoice_reviewer])
           }
       },
       {
