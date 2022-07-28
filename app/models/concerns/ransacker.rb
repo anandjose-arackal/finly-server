@@ -35,6 +35,7 @@ module Ransacker
 
     def ransack_date(attribute)
       ransacker attribute do
+        # nosqli - table_name and attribute are Ransacker defined values in the form and are not user provided input
         query = "date(#{table_name}.#{attribute})"
         query = ActiveRecord::Base.sanitize_sql(query)
         Arel.sql(query)

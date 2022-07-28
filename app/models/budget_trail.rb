@@ -82,6 +82,7 @@ class BudgetTrail < ApplicationRecordBackwardCompatibility
   accepts_nested_attributes_for :amount, :amount_after_tax, :amount_before_tax
 
   scope :within_date, -> (start_date, end_date, date_to_be_considered) {
+    # nosqli - date_to_be_considered is an attribute from the BudgetsComputer AR object. Not user input data
     where("#{ActiveRecord::Base.connection.quote_column_name(date_to_be_considered)} >= ? AND #{ActiveRecord::Base.connection.quote_column_name(date_to_be_considered)} <= ?", start_date.beginning_of_day, end_date.end_of_day)
   }
 

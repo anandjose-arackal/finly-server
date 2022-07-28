@@ -40,14 +40,15 @@ class ManagerSummaryMailConfig < ApplicationRecord
     query << '('
     query << "(period_id = #{Period.id_for(:day)})"
     query << " OR "
-    query << "(period_id = #{Period.id_for(:week)} AND scheduled_day_of_week = '#{day_of_week}')"
+    query << "(period_id = #{Period.id_for(:week)} AND scheduled_day_of_week = ?)"
     query << " OR "
-    query << "(period_id = #{Period.id_for(:month)} AND scheduled_day_of_month = '#{day_of_month}')"
+    query << "(period_id = #{Period.id_for(:month)} AND scheduled_day_of_month = ?)"
     query << ')'
     query << " AND "
-    query << "scheduled_time = '#{time_slot}'"
-    query = ActiveRecord::Base.sanitize_sql(query)
-    where(query.string)
+    query << "scheduled_time = ?"
+    # nosqli - Function called after instantiating Date class, not user input data
+    query = ActiveRecord::Base.sanitize_sql([query.string, day_of_week, day_of_month, time_slot])
+    where(query)
   end
   scope :group_by_user, -> { group(:user_id) }
   scope :reports, -> { where entity_type: 'report' }

@@ -30,7 +30,7 @@ class Transcriber::Receipts::Index < Transcriber::Base
     end
     self.receipts = []
     self.sort_by = params[:sort_by] || 'id'
-    self.sort_order = params[:sort_order] || 'desc'
+    self.sort_order = params[:sort_order].upcase.include?('ASC') || params[:sort_order].upcase.include?('DESC')? params[:sort_order].upcase : 'DESC'
   end
 
   def authorize
@@ -42,13 +42,13 @@ class Transcriber::Receipts::Index < Transcriber::Base
     if params[:filter_parent] == '1'
       self.receipts = Receipt.untranscribed.joins(:user => [:company])
                           .where('companies.id IN (?)', companies.pluck(:id))
-                          .reorder(ActiveRecord::Base.sanitize_sql("receipts.#{self.sort_by} #{self.sort_order}"))
+                          .reorder("`receipts`.#{ActiveRecord::Base.connection.quote_column_name(self.sort_by)} #{self.sort_order}"))
     elsif params[:filter_parent] == '2'
       self.receipts = Receipt.joins(:user => [:company, :expenses])
                           .where('companies.id IN (?)', companies.pluck(:id))
                           .where(expenses: {transcribed: true})
                           .where(expenses: {expense_status_id: ExpenseStatus.ids_for([:unreported, :unsubmitted, :rejected])})
-                          .reorder(Arel.sql(ActiveRecord::Base.sanitize_sql("expenses.updated_at  #{self.sort_order}")))
+                          .reorder(Arel.sql("expenses.updated_at  #{self.sort_order}")) # nosqli - Sort Order being coerced to ASC or DESC thorugh check on line # 33
     end
   end
 
