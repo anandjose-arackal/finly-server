@@ -46,7 +46,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::Add < BankTransfer::PaymentRe
       if invoice.remaining_amount.blank?
         next
       end
-      if payable_amount > invoice.remaining_amount&.value.to_f
+      if payable_amount > invoice.remaining_amount&.value.to_f && !invoice.forms_enabled
         add_message :error, "You cannot pay more than the remaining amount in an invoice"
       end
     end
