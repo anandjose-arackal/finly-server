@@ -114,11 +114,12 @@ class BankTransfer::PaymentRequest::Review::Approve < BankTransfer::PaymentReque
         next
       end
 
-      if payable_amount.round(2) > remaining_amount
+      #TODO: Need to revisit balance due logic in new forms structure
+      if payable_amount.round(2) > remaining_amount && !invoice.forms_enabled
         add_message :error, "You cannot pay more than the remaining amount in an invoice. Payment with id, #{self.payment_to_invoices[invoice.id]&.id}, cannot be processed."
       end
 
-      if paid_amount >= invoice.balance_due&.value.to_f
+      if paid_amount >= invoice.balance_due&.value.to_f && !invoice.forms_enabled
         add_message :error, "Invoice has been credited. Payment with id, #{self.payment_to_invoices[invoice.id]&.id}, cannot be processed."
         return
       end

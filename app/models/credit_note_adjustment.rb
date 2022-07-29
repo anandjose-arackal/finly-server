@@ -16,6 +16,10 @@ class CreditNoteAdjustment < ApplicationRecord
   attr_accessor :skip_callback
   include SoftDeletable, MathUtil
 
+  include LiquidDroppable
+  include Exposures::Model::Exposable
+  include FormsHelper
+
   belongs_to :company, optional: true
   belongs_to :amount, optional: true
   belongs_to :credit_note, optional: true, touch: 'last_adjusted_at'
@@ -28,7 +32,7 @@ class CreditNoteAdjustment < ApplicationRecord
   #
   # # before_update :calculate_adjustable_amount
   # after_destroy :calculate_adjustable_amount
-
+  after_save :sync_amounts, unless: :skip_callback
   after_save :set_currency_for_amount, unless: :skip_callback
 
   def as_json(options = {})
@@ -38,6 +42,63 @@ class CreditNoteAdjustment < ApplicationRecord
       credit_note_number: self.credit_note&.credit_note_number,
       credit_note_sequence_id: self.credit_note&.sequence_id,
       amount: self.amount.as_json
+    }
+  end
+
+  def sync_amounts
+    if invoice.respond_to?(:forms_enabled) && invoice.forms_enabled
+      self.skip_callback = true
+      sync_to_old_structure
+    end
+  end
+
+  # Sync amounts with CreditNote on deletion
+  def update_cn
+    self.credit_note.update_adjustments
+  end
+
+  def forms_extra_data(type = nil, entity_key = nil)
+    if type.nil? || entity_key.nil?
+      return {}
+    end
+
+    case entity_key
+    when :credit_note_id, 'credit_note_id'
+      data = {
+          "id": credit_note_id,
+          "name": credit_note&.credit_note_number,
+      }
+    else
+      data = {}
+    end
+  end
+
+  def retrieve_value(entity)
+    send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
+  end
+
+  def sync_to_old_structure
+    amounts_attributes_map.each do |key, value|
+      amount_value = self.send("#{key}")
+      amount_attr = self.send("#{value}_id")
+      base_currency_id = self.credit_note&.get_base_currency&.id
+      if amount_attr.present?
+        Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: base_currency_id)
+      else
+        self.assign_attributes(
+          {
+            "#{value}_id": Amount.create(value: amount_value, currency_id: base_currency_id).id
+          }
+        )
+      end
+    end
+    self.skip_callback = true
+    self.save
+  end
+
+  def amounts_attributes_map
+    {
+      cn_adjustment_amount: 'amount',
     }
   end
 

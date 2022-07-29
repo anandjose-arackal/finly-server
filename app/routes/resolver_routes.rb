@@ -38,6 +38,9 @@ Resolver::Router.draw do
   scope :countries do
     route 'default', Masters::Countries::Resolver
   end
+  scope :adjustable_credit_notes do
+    route 'default', Masters::AdjustableCreditNotes::Resolver
+  end
   scope :currencies do
     route 'default', Masters::Currencies::Resolver
   end
@@ -55,7 +58,15 @@ Resolver::Router.draw do
   scope :advance_amount_statuses do
     route 'default', Masters::AdvanceAmountStatuses::Resolver
   end
-  
+
+  scope :credit_note_statuses do
+    route 'default', Masters::CreditNoteStatuses::Resolver
+  end
+
+  scope :credit_note_item_types do
+    route 'default', Masters::CreditNoteItemTypes::Resolver
+  end
+
   scope :departments do
     route 'default', Masters::Departments::Resolver
   end

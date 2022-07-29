@@ -151,7 +151,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
       entity: entity,
       contract: contract
     }
-
+    
     entity.class.contract_evaluators.each do |name, evaluator|
       evaluator.call(context)
     end
