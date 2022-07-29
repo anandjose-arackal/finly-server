@@ -30,7 +30,7 @@ class Transcriber::Receipts::Index < Transcriber::Base
     end
     self.receipts = []
     self.sort_by = params[:sort_by] || 'id'
-    self.sort_order = params[:sort_order].upcase.include?('ASC') || params[:sort_order].upcase.include?('DESC')? params[:sort_order].upcase : 'DESC'
+    self.sort_order = ['ASC', 'DESC'].include?(params[:sort_order].upcase) ? params[:sort_order] : 'DESC'
   end
 
   def authorize
