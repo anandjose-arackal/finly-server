@@ -48,9 +48,8 @@ class AdminSummaryMailConfig < ApplicationRecord
     query << "(period_id = #{Period.id_for(:month)} AND scheduled_day_of_month = ?)"
     query << ')'
     query << " AND "
-    query << "scheduled_time = ?"
-    # nosqli - Function called after instantiating Date class, not user input data
-    query = ActiveRecord::Base.sanitize_sql([query.string, day_of_week,day_of_month, time_slot])
+    query << "scheduled_time = ?" # nosqli - Function called after instantiating Date class, not user input data
+    query = ActiveRecord::Base.sanitize_sql([query.string, day_of_week,day_of_month, time_slot]) # nosqli - Function called after instantiating Date class, not user input data
     where(query)
   end
   scope :group_by_user, -> { group(:user_id) }
