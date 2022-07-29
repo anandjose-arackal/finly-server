@@ -48,8 +48,8 @@ class CustomField < ApplicationRecordBackwardCompatibility
     # )
 
     # This performs the same as above, easier to read
-    query = "`custom_fields`.`field_configuration_id` IN (#{field_configuration_id.join(",")}) AND `custom_fields`.`configured_field_value`"
-    query = ActiveRecord::Base.sanitize_sql(query)
+    query = "`custom_fields`.`field_configuration_id` IN (?) AND `custom_fields`.`configured_field_value`" # nosqli - field_configuration_id is being checked for Hash & then converted to Array. Not a user input too.
+    query = ActiveRecord::Base.sanitize_sql([query, field_configuration_id.join(",")]) # nosqli - field_configuration_id is being checked for Hash & then converted to Array. Not a user input too.
     Arel.sql(query)
   end
 
