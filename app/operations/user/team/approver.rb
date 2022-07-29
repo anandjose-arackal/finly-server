@@ -28,7 +28,7 @@ class User::Team::Approver < User::Team::Base
   end
 
   def process
-    mapping = self.mappings.send(params[:type]).policy(self.policy_id).with_purpose(self.purpose_id).amount(self.currency_id, self.amount_value).first rescue nil
+    mapping = self.mappings.send(params[:type]).policy(self.policy_id).with_purpose(self.purpose_id).amount(self.currency_id, self.amount_value).first rescue nil # nosqli - params[:type] being checked for predefined user types and then called, else returned
     
     # Handling condition where approver is required only if violations exists
     unless params[:has_violations] or params[:report].blank?

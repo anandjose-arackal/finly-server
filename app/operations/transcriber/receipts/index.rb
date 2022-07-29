@@ -42,7 +42,7 @@ class Transcriber::Receipts::Index < Transcriber::Base
     if params[:filter_parent] == '1'
       self.receipts = Receipt.untranscribed.joins(:user => [:company])
                           .where('companies.id IN (?)', companies.pluck(:id))
-                          .reorder("`receipts`.#{ActiveRecord::Base.connection.quote_column_name(self.sort_by)} #{self.sort_order}"))
+                          .reorder("`receipts`.#{ActiveRecord::Base.connection.quote_column_name(self.sort_by)} #{self.sort_order}") # nosqli - Sort Order being coerced to ASC or DESC thorugh check on line # 33 and sort column quoted
     elsif params[:filter_parent] == '2'
       self.receipts = Receipt.joins(:user => [:company, :expenses])
                           .where('companies.id IN (?)', companies.pluck(:id))
