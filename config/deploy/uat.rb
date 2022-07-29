@@ -8,7 +8,7 @@
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
 # server 'uat.finly.io', user: 'centos', roles: %w{web app db hutch whenever_cron}, port: 22
-server ENV['UAT_SERVER_IP'], user: 'centos', roles: %w{web app db hutch}, port: 22 #uat_server_ip
+server 'uat.finly.io ', user: 'centos', roles: %w{web app db hutch}, port: 22 #uat_server_ip
 set :stage, 'uat'
 set :use_sudo, false
 set :rbenv_type, :user
