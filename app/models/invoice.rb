@@ -941,7 +941,8 @@ class Invoice < ApplicationRecord
 
   def invoice_balance_due
     if self.forms_enabled
-      self.invoice_type.tax_invoice? ? self[:invoice_balance_due].to_f - self[:invoice_paid_outside_amount].to_f : self[:invoice_balance_due].to_f
+      # self.invoice_type.tax_invoice? ? self[:invoice_balance_due].to_f - self[:invoice_paid_outside_amount].to_f : self[:invoice_balance_due].to_f
+      self[:invoice_balance_due].to_f
     else
       balance_due&.value.to_f - paid_amount_value
     end

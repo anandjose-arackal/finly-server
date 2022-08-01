@@ -517,7 +517,7 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
                                             can_visible_be_changed: false, can_editable_be_changed: false, editable: false, visible: false,
                                             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_tds_amount])
 
-      amount :invoice_paid_outside_amount, label: 'Total Partial-Payment', default_value: 0, visible: true, editable: true
+      amount :invoice_paid_outside_amount, label: 'Total Partial-Payment', default_value: 0, visible: true, editable: false, can_editable_be_changed: false
 
       amount :reporting_invoice_paid_outside_amount, label: 'Total Partial-Payment(Reporting Currency)', editable: false, visible: false,
                                                      can_visible_be_changed: false,
