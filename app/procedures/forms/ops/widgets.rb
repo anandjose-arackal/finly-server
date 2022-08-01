@@ -29,7 +29,7 @@ class Forms::Ops::Widgets < Transactions::API
     {
       submitted_at:     document.submitted_at,
       approved_at:      document.approved_at,
-      controlling_user: document.controlling_user.name
+      controlling_user: document.controlling_user&.name
     }
   end
 end

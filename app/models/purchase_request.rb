@@ -546,6 +546,10 @@ class PurchaseRequest < ApplicationRecord
   #   !can_approve? && awaiting_approval? ? PurchaseRequestStatus.id_for(:processing) : super
   # end
 
+  def controlling_user
+    self.get_reviewers&.first
+  end
+
   private
 
   def sync_amounts
