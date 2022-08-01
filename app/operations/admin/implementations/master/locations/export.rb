@@ -24,7 +24,7 @@ class Admin::Implementations::Master::Locations::Export < Admin::Implementations
   end
 
   def input
-    company.locations
+    company.locations.non_deleted
   end
 
   def id(location)

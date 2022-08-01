@@ -36,7 +36,7 @@ class Admin::Implementations::Master::Users::Export < Admin::Implementations::Pr
   end
 
   def input
-    company.users
+    company.users.unscoped
   end
 
   def id(user)
