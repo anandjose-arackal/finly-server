@@ -589,6 +589,12 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
     error_message "Invoice Due Date must be After Invoice Date"
     rule Rules::Builder['items_summary.invoice_balance_due'].lt(value: 0)
   end
+
+  validation validation_id: "Items > rate can not be eq to 0" do
+    reference 'items.rate'
+    error_message "Item rate cannot be equal to 0"
+    rule Rules::Builder['items.rate'].eq(value: 0)
+  end
   
   # CONDITIONS
   condition condition_id: "Policy should not be editable once unless in editable status" do
