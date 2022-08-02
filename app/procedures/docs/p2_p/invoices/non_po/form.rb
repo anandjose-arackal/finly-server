@@ -593,7 +593,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
   validation validation_id: "Items > rate can not be eq to 0" do
     reference 'items.rate'
     error_message "Item rate cannot be equal to 0"
-    rule Rules::Builder['items.rate'].eq(value: 0)
+    rule Rules::Builder['items.rate'].eq_any(value: 0)
   end
   
   # CONDITIONS
