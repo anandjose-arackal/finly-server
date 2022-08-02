@@ -18,7 +18,7 @@ class Admin::Implementations::Master::ConveyanceMaster::Export < Admin::Implemen
 
   def input
     policy_ids  = company.policies.pluck(:id)
-    VehicleRate.where(policy_id: policy_ids).includes(:rate,policy: {distance_expense_config: :default_category}).reorder(policy_id: :asc)
+    VehicleRate.where(policy_id: policy_ids).includes(:rate,policy: {distance_expense_config: :default_category}).reorder(policy_id: :asc).non_deleted
   end
 
   def id(vehicle_rate)
