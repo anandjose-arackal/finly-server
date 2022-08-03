@@ -15,7 +15,7 @@ class Admin::Implementations::Master::MoneyRequestCategories::Export < Admin::Im
   end
 
   def input
-    company.money_request_item_categories
+    company.money_request_item_categories.non_deleted
   end
 
   def id(money_request_category)

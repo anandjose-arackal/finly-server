@@ -2721,6 +2721,8 @@ ActiveRecord::Schema.define(version: 2022_07_28_082706) do
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
     t.integer "company_id"
+    t.decimal "cn_adjustment_amount", precision: 20, scale: 10, default: "0.0"
+    t.decimal "cn_net_adjustable_amount", precision: 20, scale: 10, default: "0.0"
     t.index ["amount_id"], name: "index_credit_note_adjustments_on_amount_id"
     t.index ["credit_note_id"], name: "index_credit_note_adjustments_on_credit_note_id"
     t.index ["invoice_id"], name: "index_credit_note_adjustments_on_invoice_id"
@@ -5610,6 +5612,8 @@ ActiveRecord::Schema.define(version: 2022_07_28_082706) do
     t.string "discount_type_text"
     t.decimal "adjusted_advance_tds", precision: 20, scale: 10
     t.boolean "form_migrated"
+    t.decimal "invoice_credit_note_adjusted_amount", precision: 20, scale: 10, default: "0.0"
+    t.decimal "invoice_balance_due_without_cn", precision: 20, scale: 10, default: "0.0"
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["agreement_item_id"], name: "index_invoices_on_agreement_item_id"
     t.index ["company_id", "controlling_level_id", "deleted_at"], name: "index_invoice_ct_lvl_cmpny_id"

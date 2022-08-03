@@ -157,6 +157,8 @@ json.trail do
           json.id item.status&.id
           json.name item.status&.name
         end
+        forms_enabled = item.forms_enabled == 'true'
+        json.forms_enabled forms_enabled
       end
 
     elsif item.is_a?(BillOfSupply)

@@ -664,7 +664,7 @@ class Invoice < ApplicationRecord
   }
 
   scope :includes_for_contract, -> {
-    includes(:created_by, :invoice_type, :form_custom_fields, :items)
+    includes(:created_by, :invoice_type, :form_custom_fields, :items, :credit_note_adjustments)
   }
 
   # Sorting
@@ -941,7 +941,8 @@ class Invoice < ApplicationRecord
 
   def invoice_balance_due
     if self.forms_enabled
-      self.invoice_type.tax_invoice? ? self[:invoice_balance_due].to_f - self[:invoice_paid_outside_amount].to_f : self[:invoice_balance_due].to_f
+      # self.invoice_type.tax_invoice? ? self[:invoice_balance_due].to_f - self[:invoice_paid_outside_amount].to_f : self[:invoice_balance_due].to_f
+      self[:invoice_balance_due].to_f
     else
       balance_due&.value.to_f - paid_amount_value
     end
@@ -986,6 +987,19 @@ class Invoice < ApplicationRecord
     else
       self.invoice_net_total_amount.to_f
     end
+  end
+
+  def credit_note_adjustments_meta
+    details = []
+    self.credit_note_adjustments.each do |cna|
+      details << {
+        id: cna.id,
+        cn_adjustment_amount: cna.cn_adjustment_amount,
+        cn_net_adjustable_amount: cna.cn_net_adjustable_amount,
+        credit_note_id: cna.credit_note_id,
+      }
+    end
+    details
   end
 
 
@@ -1626,6 +1640,18 @@ class Invoice < ApplicationRecord
     end
   end
 
+  def credit_notes_presence
+    # return false for international invoice 
+    return false unless self.is_domestic
+    # if approved or beyound check if cnas is present 
+    if InwardInvoiceStatus.ids_for_paid_amount_consideration.include?(self.invoice_status_id) && self.credit_note_adjustments.present?
+      return true 
+    elsif !InwardInvoiceStatus.ids_for_paid_amount_consideration.include?(self.invoice_status_id) && ( ( self.vendor.credit_notes.filter_adjustables.present? || self.credit_note_adjustments.present? ))
+      return true 
+    end
+    return false
+  end
+  
   def remaining_adjustable_tds
     prev_adjusted_tds = self.procurement.invoices.where('created_at < ?', self.created_at).pluck(:adjusted_advance_tds).map(&:to_f).sum
     if self.advance_amount_required

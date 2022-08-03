@@ -15,7 +15,7 @@ class Admin::Implementations::Master::TdsSlabs::Export < Admin::Implementations:
   end
 
   def input
-    company.tds_slabs
+    company.tds_slabs.non_deleted
   end
 
   def id(tds_slab)
