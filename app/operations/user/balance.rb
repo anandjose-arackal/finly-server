@@ -41,7 +41,7 @@ class User::Balance < User::Base
     # id, name, balance
 
     # Virtual Account
-    if params[:virtual_account] and user.company_admin?
+    if false
       op = Company::ItzCashVirtualAccount::Balance.(user)
       self.balances[:virtual_account] = {id: user.company.id, name: 'Company Credits', balance: op.balance} rescue nil
     end
@@ -50,7 +50,7 @@ class User::Balance < User::Base
     self.balances[:current_user][:wallet] = {type: :wallet, name: 'Finly Money', id: user.wallet.id, balance: User::Wallet::Balance.(user)} if params[:current_user_wallet] or params[:current_user_all]
 
     # Card
-    if current_user_card_assigned and (params[:current_user_card] or params[:current_user_all])
+    if false
       self.balances[:current_user][:card] = {}
 
       card_id = params[:current_user_card_id]
@@ -101,7 +101,7 @@ class User::Balance < User::Base
       self.balances[:target_user][:wallet] = {type: :wallet, name: 'Finly Money', id: target_user.wallet.id, balance: User::Wallet::Balance.(user, for_user: target_user, view: params[:view])} if params[:target_user_wallet] or params[:target_user_all]
 
       # Card
-      if target_user_card_assigned and (params[:target_user_card] or params[:target_user_all])
+      if false
         self.balances[:target_user][:card] = {}
 
         card_id = params[:target_user_card_id]

@@ -267,12 +267,12 @@ class MoneyRequests::Base < BaseOperation
         end
 
         # Wallet
-        balance = balances[:current_user][:wallet][:balance] rescue nil
-        initiating_actions << {type: :wallet, id: user.wallet.id, name: "#{from_user_name} Finly Money",
-                               balance: balance, active: true}
+        #balance = balances[:current_user][:wallet][:balance] rescue nil
+        #initiating_actions << {type: :wallet, id: user.wallet.id, name: "#{from_user_name} Finly Money",
+        #                       balance: balance, active: true}
 
         # Cards
-        if from_user_transferable_cards.present?
+        if false
           from_user_transferable_cards.each do |card|
             balance = balances[:current_user][:card][card.id][:balance] rescue nil
             eligibility = balances[:current_user][:card][card.id][:eligibility] rescue nil
@@ -283,11 +283,11 @@ class MoneyRequests::Base < BaseOperation
 
         # To Actions
         # Wallet
-        balance = balances[:target_user][:wallet][:balance] rescue nil
-        receiving_actions << {type: :wallet, id: money_request.user.wallet.id, name: "#{to_user_name} Finly Money", balance: balance, active: true}
+        #balance = balances[:target_user][:wallet][:balance] rescue nil
+        #receiving_actions << {type: :wallet, id: money_request.user.wallet.id, name: "#{to_user_name} Finly Money", balance: balance, active: true}
 
         # Cards
-        if to_user_creditable_cards.present?
+        if false
           to_user_creditable_cards.each do |card|
             balance = balances[:target_user][:card][card.id][:balance] rescue nil
             eligibility = balances[:target_user][:card][card.id][:eligibility] rescue nil
