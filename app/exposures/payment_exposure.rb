@@ -38,10 +38,10 @@ class PaymentExposure < Exposures::API
   end
   attribute :invoice_parent, record_attribute: true, exposure: true
   attribute :bbps_bill, exposure: true, includes: [:parent] do
-    record.bbps_bill_parent&.to_exposure
+    record.bbps_bill_parent
   end
   attribute :security_deposit_parent, exposure: true, includes: [:parent] do
-    record.security_deposit_parent&.to_exposure
+    record.security_deposit_parent
   end
   attribute :initiating_account_number do
     account_name(record, :initiating_account)
