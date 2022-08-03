@@ -17,7 +17,6 @@ class Vendors::Support::GstrFiling < Vendors::Support::Base
     super
     @gstin = params[:gstin]
     @for_date = Date.parse(params[:for_date], "%Y-%m-%d")
-    # @financial_year = params[:financial_year]
     @gstin_location_id = params[:gstin_location_id]
     @invoice_id = params[:invoice_id]
     @vendor_id = params[:vendor_id]
