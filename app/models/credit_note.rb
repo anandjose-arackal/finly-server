@@ -556,6 +556,10 @@ class CreditNote < ApplicationRecord
     self.get_reviewers&.first
   end
 
+  def creator
+    self.user
+  end
+
   private
 
   def calculate_from_items_values
