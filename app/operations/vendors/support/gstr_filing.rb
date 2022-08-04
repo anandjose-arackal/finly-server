@@ -1,7 +1,7 @@
 class Vendors::Support::GstrFiling < Vendors::Support::Base
 
   attr_accessor :gst_api_call_log, :gst_filing_records, :gstin, :for_date,
-                :gstin_location_id, :invoice_id, :vendor_id
+                :gstin_location_id, :invoice_id, :vendor_id, :feature_enabled
 
   class Vendors::Support::GstrFiling::DefaultPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :gst_filing_records_response
@@ -15,14 +15,19 @@ class Vendors::Support::GstrFiling < Vendors::Support::Base
 
   def init
     super
+    @feature_enabled = GstinFilingToggle.new(current_user).enabled?
+
     @gstin = params[:gstin]
     @for_date = Date.parse(params[:for_date], "%Y-%m-%d")
     @gstin_location_id = params[:gstin_location_id]
     @invoice_id = params[:invoice_id]
     @vendor_id = params[:vendor_id]
 
-    @config_data = ApiToken.with_name('gstin_masters_india').first rescue nil
-    Rails.logger.debug @config_data
+    if @feature_enabled
+      @config_data = ApiToken.with_name('gstin_masters_india').first rescue nil
+      Rails.logger.debug @config_data
+    end
+
     @gst_api_call_log = nil
   end
 
@@ -210,6 +215,9 @@ class Vendors::Support::GstrFiling < Vendors::Support::Base
   end
 
   def process
+    unless @feature_enabled
+      raise GstAPIError.new 'Feature not enabled'
+    end
     self.gst_filing_records = get_gst_filing_records params[:forced_refresh]
   rescue GstAPIError => err
     Rails.logger.error err
