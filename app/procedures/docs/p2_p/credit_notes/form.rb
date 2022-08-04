@@ -5,9 +5,9 @@ class Docs::P2P::CreditNotes::Form < Forms::API
   meta ->(record) {
     {
       created_by: {
-        id: record.creator.id,
-        name: record.creator.name,
-        email: record.creator.email
+        id: record.creator&.id,
+        name: record.creator&.name,
+        email: record.creator&.email
       }
     }
   }
