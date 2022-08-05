@@ -16,6 +16,7 @@ module Finly
     config.time_zone = 'Kolkata'
     config.active_record.default_timezone = :local
     config.middleware.use Rack::Attack
+    config.active_record.yaml_column_permitted_classes = [Symbol, Hash, Array, ActiveSupport::HashWithIndifferentAccess]
 
     config.before_configuration do
       ip_file = File.join(Rails.root, 'config', 'ip_addresses.yml')
