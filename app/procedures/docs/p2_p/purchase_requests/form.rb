@@ -48,6 +48,8 @@ class Docs::P2P::PurchaseRequests::Form < Forms::API
     lookup :cost_center_id, label: "Cost Center", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('cost_centers')
     large_text :note, label: "Note", visible: true
     date :created_at , label: "Created Date", visible: true, editable: false, computed: Forms::Compute::Form('{{ form.created_at | default: "now" | date: "%Y-%m-%d" }}')
+    lookup :reporting_currency_id, label: "Reporting Currency", choices_scope: Choices[:lookup].('currencies'), visible: true, editable: false, can_editable_be_changed: false
+    lookup :base_currency_id, label: "Base Currency", choices_scope: Choices[:lookup].('currencies'), visible: true, editable: true
   end
     
   # section :creator_details, title: "Creator Details", associate_custom_fields: true do

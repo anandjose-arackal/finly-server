@@ -616,7 +616,7 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
     rule Rules::Builder['items_summary.invoice_discount_amount'].gt(entity: 'items_summary.invoice_gross_amount')
   end
 
-  validation validation_id: 'Item Qunatity Cannot be less then 0' do
+  validation validation_id: 'Item Quantity Cannot be less then 0' do
     reference 'items.quantity'
     error_message 'Item cannot be less then or equal to 0'
     rule Rules::Builder['row.quantity'].lt(value: 0).or(Rules::Builder['row.quantity'].eq(value: 0))
