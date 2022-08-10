@@ -157,11 +157,18 @@ class Vendors::Support::GstrFiling < Vendors::Support::Base
     gst_filing_record ||= GstFilingRecord.new
 
     gst_filing_record.gstin = @gstin
+    gst_filing_record.requested_financial_year = financial_year
     gst_filing_record.financial_year = financial_year
     gst_filing_record.date_of_filing = filing_hash[:dof]
     gst_filing_record.mode_of_filing = filing_hash[:mof]
     gst_filing_record.return_period = filing_hash[:ret_prd]
+
     gst_filing_record.return_period_date = parse_return_period_to_date(filing_hash[:ret_prd])
+    gst_filing_record.financial_year = DateUtils.fin_year_starting_with_year(
+      gst_filing_record.return_period_date.financial_year,
+      format = :long
+    )
+
     gst_filing_record.status = filing_hash[:status]
     gst_filing_record.valid_text = filing_hash[:valid]
     gst_filing_record.return_type = filing_hash[:rtntype]
@@ -183,24 +190,29 @@ class Vendors::Support::GstrFiling < Vendors::Support::Base
   end
 
   def get_required_financial_years
-    this_year = @for_date.year
-    prev_year = this_year - 1
+    return [DateUtils.fin_year_starting_with_year(@for_date.financial_year)]
 
-    month = @for_date.month
+    # We might require the below logic because there is a possibility of change in req
+    #
+    # this_year = @for_date.year
+    # prev_year = this_year - 1
+    #
+    # month = @for_date.month
+    #
+    # fin_year_starting_with_curr_year = DateUtils.fin_year_starting_with_year this_year
+    # fin_year_starting_with_prev_year = DateUtils.fin_year_starting_with_year prev_year
+    #
 
-    fin_year_starting_with_curr_year = DateUtils.fin_year_starting_with_year this_year
-    fin_year_starting_with_prev_year = DateUtils.fin_year_starting_with_year prev_year
-
-    case month
-    when 5
-      return [fin_year_starting_with_curr_year, fin_year_starting_with_prev_year]
-    when 6..12
-      return [fin_year_starting_with_curr_year]
-    when 1..4
-      return [fin_year_starting_with_prev_year]
-    else
-      return []
-    end
+    # case month
+    # when 5
+    #   return [fin_year_starting_with_curr_year, fin_year_starting_with_prev_year]
+    # when 6..12
+    #   return [fin_year_starting_with_curr_year]
+    # when 1..4
+    #   return [fin_year_starting_with_prev_year]
+    # else
+    #   return []
+    # end
   end
 
   def handle_api_call(financial_year)

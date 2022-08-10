@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_07_28_082706) do
+ActiveRecord::Schema.define(version: 2022_08_10_091901) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -2721,8 +2721,8 @@ ActiveRecord::Schema.define(version: 2022_07_28_082706) do
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
     t.integer "company_id"
-    t.decimal "cn_adjustment_amount", precision: 20, scale: 10, default: "0.0"
     t.decimal "cn_net_adjustable_amount", precision: 20, scale: 10, default: "0.0"
+    t.decimal "cn_adjustment_amount", precision: 20, scale: 10, default: "0.0"
     t.index ["amount_id"], name: "index_credit_note_adjustments_on_amount_id"
     t.index ["credit_note_id"], name: "index_credit_note_adjustments_on_credit_note_id"
     t.index ["invoice_id"], name: "index_credit_note_adjustments_on_invoice_id"
@@ -2761,6 +2761,16 @@ ActiveRecord::Schema.define(version: 2022_07_28_082706) do
     t.integer "tax_amount_id"
     t.boolean "tds_applicable", default: false
     t.integer "company_id"
+    t.decimal "cn_original_taxable_amount", precision: 20, scale: 10
+    t.decimal "cn_taxable_amount", precision: 20, scale: 10
+    t.decimal "cn_total_amount", precision: 20, scale: 10
+    t.decimal "original_item_tax_amount", precision: 20, scale: 10
+    t.decimal "item_tax_amount", precision: 20, scale: 10
+    t.string "item_number"
+    t.decimal "original_tax_percentage", precision: 20, scale: 10
+    t.decimal "tax_percentage", precision: 20, scale: 10
+    t.decimal "item_total_amount", precision: 20, scale: 10
+    t.decimal "revised_tax_percentage", precision: 20, scale: 10
     t.index ["category_id"], name: "index_credit_note_items_on_category_id"
     t.index ["credit_note_id"], name: "index_credit_note_items_on_credit_note_id"
     t.index ["credit_note_item_type_id"], name: "index_credit_note_items_on_credit_note_item_type_id"
@@ -2825,6 +2835,33 @@ ActiveRecord::Schema.define(version: 2022_07_28_082706) do
     t.datetime "erp_sync_attempted_at"
     t.integer "base_currency_id"
     t.integer "reporting_currency_id"
+    t.decimal "cn_gross_receivable_amount", precision: 20, scale: 10
+    t.decimal "cn_tax_amount", precision: 20, scale: 10
+    t.decimal "cn_tds_amount", precision: 20, scale: 10
+    t.decimal "cn_net_receivable_amount", precision: 20, scale: 10
+    t.decimal "cn_previously_adjusted_amount", precision: 20, scale: 10
+    t.decimal "cn_net_adjustable_amount", precision: 20, scale: 10
+    t.decimal "cn_roundoff_amount", precision: 20, scale: 10
+    t.string "vendor_trade_name"
+    t.string "vendor_sequence_id"
+    t.string "vendor_pan"
+    t.string "billing_address_gstin"
+    t.string "billing_address_name"
+    t.string "shipping_address_gstin"
+    t.string "shipping_address_name"
+    t.decimal "cn_tds_rate", precision: 20, scale: 10
+    t.decimal "net_adjusted_amount", precision: 20, scale: 10
+    t.decimal "conversion_rate", precision: 20, scale: 10
+    t.datetime "conversion_date"
+    t.decimal "reporting_cn_gross_receivable_amount", precision: 20, scale: 10
+    t.decimal "reporting_cn_tax_amount", precision: 20, scale: 10
+    t.decimal "reporting_cn_net_receivable_amount", precision: 20, scale: 10
+    t.decimal "reporting_cn_previously_adjusted_amount", precision: 20, scale: 10
+    t.decimal "reporting_net_adjusted_amount", precision: 20, scale: 10
+    t.integer "gstin_location_id"
+    t.integer "vendor_country_id"
+    t.string "vendor_gstin"
+    t.text "rejection_note"
     t.index ["billing_location_id"], name: "index_credit_notes_on_billing_location_id"
     t.index ["company_id"], name: "index_credit_notes_on_company_id"
     t.index ["controlling_level_id"], name: "index_credit_notes_on_controlling_level_id"
@@ -4876,6 +4913,7 @@ ActiveRecord::Schema.define(version: 2022_07_28_082706) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
+    t.string "requested_financial_year"
     t.index ["company_id", "gstin", "return_period", "return_type"], name: "index_gst_company_gstin_ret_prd", unique: true
     t.index ["company_id"], name: "index_gst_filing_records_on_company_id"
     t.index ["gstin_location_id"], name: "index_gst_filing_records_on_gstin_location_id"
