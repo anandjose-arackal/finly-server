@@ -18,13 +18,13 @@ class User::Show < User::Base
         self.selected_user = result.with_id(id).first rescue nil
         if self.selected_user.blank?
           add_message :error, 'User not found'
-        elsif self.selected_user.cards.present?
-          self.balances = User::Balance.(self.user, target_user: selected_user, target_user_wallet: true,
-              target_user_card: true, current_user_card: true, current_user_wallet: true, virtual_account: true,
-              target_user_cash_in_hand: true, view: params[:view]).balances
+        #elsif self.selected_user.cards.present?
+        #  self.balances = User::Balance.(self.user, target_user: selected_user, target_user_wallet: true,
+        #      target_user_card: true, current_user_card: true, current_user_wallet: true, virtual_account: true,
+        #      target_user_cash_in_hand: true, view: params[:view]).balances
         else
           self.balances = User::Balance.(self.user, target_user: selected_user, target_user_wallet: true,
-              current_user_card: true, current_user_wallet: true, virtual_account: true,
+              current_user_card: false, current_user_wallet: true, virtual_account: true,
               target_user_cash_in_hand: true, view: params[:view]).balances
         end
       else
@@ -71,7 +71,7 @@ class User::Show < User::Base
       }
       self.cards = []
       personal = (selected_user == user)
-      if balances.present?
+      if false
         selected_user.cards.each do |card|
           ItzCash::AccountDetails.(card.user, card: card)
           actions = {}
