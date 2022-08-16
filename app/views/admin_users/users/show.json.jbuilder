@@ -1,6 +1,6 @@
 if @result.selected_user.first_name.present?
   json.extract! @result.selected_user, :first_name, :last_name, :mobile_number, :email, :address_1, :address_2, :pin_code, :city, :state_name,
-                                     :company_name, :id, :mothers_maiden_name, :active, :employee_id, :payroll_id, :gl_config
+                                     :company_name, :id, :mothers_maiden_name, :active, :employee_id, :payroll_id
 
 
 

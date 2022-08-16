@@ -67,6 +67,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
         self.reviewal_chains = []
         params[:reviewal_document] = invoice
         params[:provider_name] = get_invoice_provider_name
+        policies = self.policies.includes(levels: [{level_user_reviewer_mappings: [:reviewer,:user]}, {level_reviewer_mappings: :reviewer}])
         policies.each do |policy|
           params[:policy_id] = policy.id
           chain = {
