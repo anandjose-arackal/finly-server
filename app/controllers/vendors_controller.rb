@@ -151,6 +151,11 @@ class VendorsController < BaseControllers::WebBase
     respond
   end
 
+  def fetch_gst_filings
+    @result = Vendors::Support::GstrFiling.(current_user, params)
+    respond
+  end
+
     # def resolve_layout
     #   if ["create", "update"].include?(action_name)
     #     'trailblazers'
