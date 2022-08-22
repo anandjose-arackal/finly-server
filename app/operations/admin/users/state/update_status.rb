@@ -19,6 +19,9 @@ class Admin::Users::State::UpdateStatus < Admin::Users::Base
   end
 
   def process
+    if update_params[:active] == "0"
+      update_params[:default_password] == false
+    end
     unless selected_user.update(update_params)
       add_message :error, selected_user.errors.full_messages
     end
