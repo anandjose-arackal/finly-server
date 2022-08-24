@@ -61,7 +61,9 @@ class KotakBankTransaction < ApplicationRecord
         BankTransferStatus.id_for(:completed),
         BankTransferStatus.id_for(:processing),
         BankTransferStatus.id_for(:pending_utr),
-        BankTransferStatus.id_for(:pending)
+        BankTransferStatus.id_for(:pending),
+        BankTransferStatus.id_for(:pending_for_processing),
+        BankTransferStatus.id_for(:possible_failure)
     ]
   }
 

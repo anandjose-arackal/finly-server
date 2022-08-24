@@ -24,6 +24,7 @@ class PopulateTatDlrms
 
     result.each do |document_type, hash|
       klass = document_type.to_s.constantize
+      # nosqli - Derived value from constantize method of Ruby, not a user provided input
       docs = klass.where.not("#{klass.document_status_attribute} in (?)", hash[:open_status_ids]).where(id: DocumentLevelReviewerMapping.select(:document_reviewer_mappable_id).where(document_reviewer_mappable_type: document_type.to_s))
 
       count = docs.count - 1

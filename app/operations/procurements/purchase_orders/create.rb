@@ -23,6 +23,17 @@ class Procurements::PurchaseOrders::Create < Procurements::PurchaseOrders::Base
       return
     end
 
+    pr_item_ids = []
+    self.params[:purchase_order][:purchase_request_items_attributes].each{ |x| pr_item_ids << x.pluck('id') } if params[:purchase_order].present? && self.params[:purchase_order][:purchase_request_items_attributes].present?
+    if pr_item_ids.present?
+      pr_item_ids = pr_item_ids.flatten.compact
+      currency_ids = PurchaseRequestItem.where(id: pr_item_ids).map{ |item| item.purchase_request.base_currency_id }
+      if currency_ids.compact.uniq.size > 1
+        add_message :error, "Can't create PO with items of different currency"
+        return
+      end
+    end
+
   end
 
   def pre_process
@@ -49,6 +60,25 @@ class Procurements::PurchaseOrders::Create < Procurements::PurchaseOrders::Base
     self.purchase_order.user = user
     self.purchase_order.company = user.company
     self.purchase_order.controlling_user = user
+
+    self.purchase_order.vendor_id = vendor.id
+    self.purchase_order.vendor_pan = vendor&.pan
+    self.purchase_order.vendor_sequence_id = vendor&.vendor_id
+    self.purchase_order.vendor_country_id = Country.id_for(vendor&.vendor_country)
+    self.purchase_order.vendor_trade_name = vendor&.trade_name
+
+    self.purchase_order.discount_type_id = 1
+    # self.purchase_order.is_domestic = false if self.purchase_order.vendor_country_id != user.company&.country_id
+
+    self.purchase_order.payment_term_days = vendor&.payment_term&.days_after.to_i
+    self.purchase_order.delivery_date = Date.today + vendor&.payment_term&.days_after.to_i.days
+        
+    self.purchase_order.reporting_currency_id = user.company.reporting_currency.id
+    self.purchase_order.base_currency_id = user.company.reporting_currency.id
+    self.purchase_order.conversion_rate = 1
+    self.purchase_order.advance_amount_status_id = AdvanceAmountStatus.id_for(:new)
+    self.purchase_order.form_migrated = user.po_form_enabled ? true : false
+
     if self.vendor.payment_term_id.present?
       self.purchase_order.payment_term_id = self.vendor.payment_term_id
     end

@@ -21,6 +21,9 @@ class PaymentExposure < Exposures::API
   attribute :receiving_account_bbps_biller, exposure: true, record_attribute: true
   attribute :receiving_account_cash_on_hand, exposure: true, record_attribute: true
   attribute :status, record_attribute: true, exposure: true
+  attribute :status_name,  includes: [payment_order: :bank_payment_request] do
+    record.payment_status_name
+  end
   attribute :payment_order_id, record_attribute: true, exposure: true
   attribute :payment_order, record_attribute: true, exposure: true
   attribute :payment_mode, record_attribute: true
@@ -35,10 +38,10 @@ class PaymentExposure < Exposures::API
   end
   attribute :invoice_parent, record_attribute: true, exposure: true
   attribute :bbps_bill, exposure: true, includes: [:parent] do
-    record.bbps_bill_parent&.to_exposure
+    record.bbps_bill_parent
   end
   attribute :security_deposit_parent, exposure: true, includes: [:parent] do
-    record.security_deposit_parent&.to_exposure
+    record.security_deposit_parent
   end
   attribute :initiating_account_number do
     account_name(record, :initiating_account)

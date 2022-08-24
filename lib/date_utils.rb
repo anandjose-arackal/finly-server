@@ -86,4 +86,13 @@ class DateUtils
     now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)
   end
 
+  def self.fin_year_starting_with_year(year, format = :short)
+    if format == :short
+      short_next = "#{year + 1}"[2, 2]
+      return "#{year}-#{short_next}"
+    elsif format == :long
+      return "#{year} - #{year + 1}"
+    end
+  end
+
 end

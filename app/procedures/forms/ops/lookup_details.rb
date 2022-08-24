@@ -58,6 +58,7 @@ class Forms::Ops::LookupDetails < Transactions::API
         entity_path = entity.entity_path
         params_hash = params.merge!({value: value, entity_path: entity&.entity_path})
 
+
         Rails.logger.error("#{params_hash}")
         new_data = Forms::Ops::LookupDetails.(params: params_hash, current_user: current_user) || {}
         Rails.logger.error("#{new_data[:data]}")

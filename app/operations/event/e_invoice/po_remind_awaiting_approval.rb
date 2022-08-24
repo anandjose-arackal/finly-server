@@ -23,7 +23,7 @@ class Event::EInvoice::PoRemindAwaitingApproval < Event::EInvoice::Base
     return unless params[:subject].present? && params[:body].present?
     params[:action_name] = action_name
     params[:awaiting_approval_columns] = awaiting_approval_columns
-    ProcurementMailer.delay.send_awaiting_approval_mail(Event::EInvoice::PoRemindAwaitingApproval::MailerPresenter.new(user, params))
+    ProcurementMailer.delay(queue: 'procurements_notification').send_awaiting_approval_mail(Event::EInvoice::PoRemindAwaitingApproval::MailerPresenter.new(user, params))
   end
 
   def validate

@@ -30,6 +30,7 @@ class MoneyRequests::AssociatedUsers < MoneyRequests::Base
       # Order is MySQL Specific
       user_ids = user_ids.reverse!
       user_ids.reject! { |id| id.blank? }
+      # nosqli - user_ids is an array, which is a result of query. Not a user provided input
       self.associated_users = User.with_id(user_ids).with_company_id(self.user.company_id).order("field(id,#{user_ids.join(',')})")
     end
   end

@@ -13,7 +13,10 @@ class Docs::P2P::CreditNotes::Contracts::Update < Reform::Form
     property :comment
     property :quantity, validates: {presence: true}
     property :rate, validates: {presence: true}
-    property :tax_rate_id, validates: {presence: true}
+    property :tax_rate_id
+    property :item_tax_amount
+    property :cn_taxable_amount
+    property :item_number
   end
 
   validate :items_validation

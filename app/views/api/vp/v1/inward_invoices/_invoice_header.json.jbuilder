@@ -11,6 +11,8 @@ json.created_by do
   json.mobile_number record.created_by&.mobile_number
   json.employee_id record.created_by&.profile&.employee_id
 end
+
+json.po_adjusted_advance record.po_adjusted_advance
 json.status record.status
 json.submitted_at record.submitted_at
 json.approved_at record.approved_at

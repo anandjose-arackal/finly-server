@@ -23,6 +23,9 @@ class PurchaseOrderExposure < Exposures::API
 
     days
   end
+  attribute :forms_enabled do
+    record.forms_enabled
+  end
   attribute :policy, exposure: true, record_attribute: true, includes: [:policy]
   attribute :controlling_level, record_attribute: true, exposure: true, includes: [:controlling_level]
   attribute :cost_center, record_attribute: true, exposure: true, includes: [:cost_center]
@@ -34,6 +37,9 @@ class PurchaseOrderExposure < Exposures::API
   attribute :created_at, record_attribute: true
   attribute :created_by, record_attribute: true, exposure: true
   attribute :created_by_id, record_attribute: :user_id
+  attribute :discount_type_id, record_attribute: true
+  attribute :gst_type_id, record_attribute: :true
+
   attribute :gross_amount, record_attribute: true, exposure: true, includes: [:gross_amount]
   attribute :gross_amount_value, includes: [:gross_amount] do
     record.gross_amount&.value || 0
@@ -137,7 +143,7 @@ class PurchaseOrderExposure < Exposures::API
   attribute :shipping_address, record_attribute: true
   attribute :approval_levels, record_attribute: :dlrms, exposure: true, includes: [:dlrms]
   attribute :approved_trails, exposure: :true,  includes: [:trails] do
-    record.trails.where(action_id: TrailAction.id_for(:approve))
+    record.trails.where(action_id: TrailAction.id_for(:approve)).where('created_at > ?', record.submitted_at).group(:action_level_id)
   end
 
   attribute :approved_timeline, includes: [{dlrms: [:taken_control_by, :forwarded_to, :reviewer]}] do
@@ -157,5 +163,42 @@ class PurchaseOrderExposure < Exposures::API
       end
     end
     approvers.reject { |e| e.to_s.empty? }.join(", ")
+  end
+
+  attribute :attachments, includes: [:attachments] do
+    record.attachments.map {|a| a.file.url(:original, timestamp: false)}.compact.join(", ")
+  end
+
+  attribute :conversion_rate do
+    record.conversion_rate
+  end
+
+  attribute :reporting_po_sub_total_amount do
+    record.reporting_po_sub_total_amount
+  end
+
+  attribute :reporting_po_balance_due do
+    record.reporting_po_balance_due
+  end
+
+  attribute :base_currency_code do
+    record.get_base_currency.country_code
+  end
+
+  attribute :reporting_currency_code do
+    record.get_reporting_currency.country_code
+  end
+
+  attribute :po_advance_tds_amount,  record_attribute: true
+  attribute :po_advance_amount,  record_attribute: true
+  attribute :po_advance_tds_percentage,  record_attribute: true
+  attribute :po_requested_advance_amount,  record_attribute: true
+
+  attribute :purchase_order_comments, includes: [:comments] do
+    comment_texts =[]
+    record.comments.each do |comment|
+      comment_texts  << comment.generate_body
+    end
+    comment_texts.compact.join(', ')
   end
 end

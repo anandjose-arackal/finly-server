@@ -13,6 +13,7 @@ module CustomFieldFilterSupport
             id = parsed_hash[:id]
             value = parsed_hash[:value]
             if id.present? && value.present?
+              # nosqli - Derived value, not a user provided input
               custom_field_filtered_documents = custom_field_filtered_documents.joins("INNER JOIN custom_fields AS tcf#{index} ON tcf#{index}.parent_id = #{parent_table_name}.id INNER JOIN field_texts AS ft#{index} ON ft#{index}.id = tcf#{index}.value_id").where("tcf#{index}.field_configuration_id = ?", id).where("ft#{index}.value LIKE ?", "%#{value}%")
             end
           end
@@ -32,6 +33,7 @@ module CustomFieldFilterSupport
             id = parsed_hash[:id]
             value_id = parsed_hash[:value]
             if id.present? && value_id.present?
+              # nosqli - Derived value, not a user provided input
               custom_field_filtered_documents = custom_field_filtered_documents.joins("INNER JOIN custom_fields AS dcf#{index} ON dcf#{index}.parent_id = #{parent_table_name}.id INNER JOIN field_drop_down_selections AS fds#{index} ON fds#{index}.id = dcf#{index}.value_id").where("dcf#{index}.field_configuration_id = ?", id).where("fds#{index}.value_id = ?", value_id)
             end
           end

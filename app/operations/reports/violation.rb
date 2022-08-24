@@ -248,7 +248,7 @@ class Reports::Violation < Reports::Base
       expense.custom_fields.where(value_type: "FieldDropDownSelection").map {|cf| expense_with_custom_field << expense.id if field_drop_down_item_ids.include?(cf.value.value.id) }
     end
 
-     expenses = Expense.with_report_id(report_ids).or(Expense.where(id: expense_with_custom_field))
+    expenses = Expense.with_report_id(report_ids).or(Expense.where(id: expense_with_custom_field))
     expense_arrays  = []
     expense_types = rule.expense_types.pluck(:id)
     expense_arrays << ExpenseType.id_for(:manual) if expense_types.include?(1)

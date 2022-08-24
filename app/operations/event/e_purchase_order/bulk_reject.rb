@@ -20,7 +20,7 @@ class Event::EPurchaseOrder::BulkReject < Event::EPurchaseOrder::Base
     set_presenter_params(user)
     return unless params[:subject].present? && params[:body].present?
     params[:bulk_reject_result] = self.bulk_reject_result
-    ProcurementMailer.delay.purchase_order_bulk_reject(Event::EPurchaseOrder::BulkReject::MailerPresenter.new(user, params))
+    ProcurementMailer.delay(queue: 'procurements_notification').purchase_order_bulk_reject(Event::EPurchaseOrder::BulkReject::MailerPresenter.new(user, params))
   end
 
   def process

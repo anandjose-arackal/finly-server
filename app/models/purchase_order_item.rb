@@ -45,8 +45,12 @@
 #
 
 class PurchaseOrderItem < ApplicationRecord
+  attr_accessor :skip_callback, :pr_number
+  include LiquidDroppable
+  include Exposures::Model::Exposable
+  include FormsHelper
+
   validates :inventory_line_item_id, presence: true
-  # validates :purchase_order_id, presence: true
 
   belongs_to :company, optional: true
   belongs_to :tax_rate, optional: true
@@ -59,7 +63,30 @@ class PurchaseOrderItem < ApplicationRecord
   belongs_to :category, optional: true
   belongs_to :cost_center, optional: true
   belongs_to :department, optional: true
+  belongs_to :product_type, optional: true
   belongs_to :purchase_request_item, optional: true
+
+  alias_attribute :items_department_id, :department_id
+  alias_attribute :items_cost_center_id, :cost_center_id
+
+  alias_method :items_department, :department
+  alias_method :items_cost_center, :cost_center
+
+  def get_reporting_currency
+    self.purchase_order.get_reporting_currency rescue self.company.reporting_currency
+  end
+
+  def get_base_currency
+    self.purchase_order.get_base_currency rescue self.company.reporting_currency
+  end
+  
+  def exchange_rate
+    ExchangeRate.get_rate(
+        self.purchase_order.conversion_date,
+        self.purchase_order.reporting_currency,
+        self.purchase_order.get_base_currency&.country_code || "INR"
+    )
+  end
 
   # link to budget trails table
   has_many :budget_trails, as: :entity
@@ -71,8 +98,8 @@ class PurchaseOrderItem < ApplicationRecord
 
   # removing for now
   # validates_presence_of :unit_of_measurement
-  validates_presence_of :department
-  validates_presence_of :rate
+  # validates_presence_of :department
+  # validates_presence_of :rate
 
   accepts_nested_attributes_for :tax_amount, :discount_amount, :taxable_amount,
                                 :total_amount
@@ -115,24 +142,81 @@ class PurchaseOrderItem < ApplicationRecord
   scope :include_for_show,  -> {includes(:inventory_line_item,:category,:purchase_request_item,:taxable_amount,:tax_amount, :discount_amount,:total_amount,:tax_rate)}
 
   before_save :set_tds_applicable
-  after_save :budget_trail_entry
+  after_save :sync_amounts, unless: :skip_callback
+  after_save :budget_trail_entry, if: :budget_enabled?
   after_destroy :budget_trail_destroy
 
-
+  delegate :goods?, :service?, to: :inventory_line_item, allow_nil: true
+  
   def tax
     self.tax_rate&.rate || super
   end
 
   def before_tax_amount
-    self.taxable_amount&.value.to_f
+    if parent_forms_enabled
+      self.reporting_item_taxable_amount.to_f
+    else
+      self.taxable_amount&.value.to_f
+    end
   end
 
   def after_tax_amount
-    self.total_amount&.value.to_f
+    if parent_forms_enabled
+      self.reporting_item_net_amount.to_f
+    else
+      self.total_amount&.value.to_f
+    end
   end
 
   def set_tds_applicable
-    self.tds_applicable = self.inventory_line_item.tds_applicable
+    self.tds_applicable = self&.inventory_line_item&.tds_applicable
+    true
+  end
+
+  def retrieve_value(entity)  
+    send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
+  end
+
+  def parent_forms_enabled
+    purchase_order.forms_enabled
+  end
+
+  def sync_amounts
+    if parent_forms_enabled
+      self.skip_callback = true
+      base_currency_id = purchase_order.get_base_currency&.id
+      
+      if self.purchase_order.procurement.invoices.count == 0
+
+        amounts_attributes_map.each do |key, value|
+          amount_value = self.send(key)
+          amount_attr = self.send("#{value}_id")
+          if amount_attr.present?
+            Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: base_currency_id)
+          else
+            amount_id = Amount.create(value: amount_value, currency_id: base_currency_id).id
+            self.send("#{value}_id=", amount_id)
+          end
+        end
+
+        unless purchase_order.cost_allocation_items
+          self.department_id = purchase_order&.department_id
+          self.cost_center_id = purchase_order&.cost_center_id
+        end
+
+        self.tax_percentage = self.tax_rate&.rate.to_f
+      end
+      self.save
+    end
+  end
+
+  def amounts_attributes_map
+    {
+      item_discount_amount: 'discount_amount',
+      item_taxable_amount: 'taxable_amount',
+      item_tax_amount: 'tax_amount',
+      item_net_amount: 'total_amount'
+    }
   end
 
   def invoiced_total_amount
@@ -145,6 +229,18 @@ class PurchaseOrderItem < ApplicationRecord
       invoiced_amount = invoiced_line_items.sum('amounts.value')&.round(2)
     end
     invoiced_amount
+  end
+
+  def pr_number
+    if self.purchase_request_item&.purchase_request&.forms_enabled
+      url = "purchase_request_form/#{self.purchase_request_item&.purchase_request&.id}/params={\"forms_enabled\":\"true\"}"
+      {
+        label: self.purchase_request_item&.purchase_request&.order_number,
+        url: url
+      }
+    else
+      self.purchase_request_item&.purchase_request&.order_number
+    end
   end
 
   private
@@ -173,6 +269,9 @@ class PurchaseOrderItem < ApplicationRecord
     end
     self.skip_callback = true
     self.save
+  end
+  def budget_enabled?
+    RequestStore.store[:current_company].feature_subscription.budgeting_system
   end
 
 end

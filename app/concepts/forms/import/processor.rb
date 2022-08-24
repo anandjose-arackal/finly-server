@@ -169,6 +169,14 @@ class Forms::Import::Processor
 
     imported_sheet.each_with_pagename do |sheet_name, sheet|
       worksheet_headers = sheet.row(1)
+      if sheet_name == form.label
+        worksheet_headers << 'Message'
+      end
+
+      worksheet_headers.each_with_index do |header_name, header_index|
+        worksheet.set_column(header_index, header_index, (header_name&.length.to_i) +10)
+        worksheet.write(0, header_index, header_name)
+      end
 
       if sheet_name == form.label
         (2..sheet.last_row).each do |index|

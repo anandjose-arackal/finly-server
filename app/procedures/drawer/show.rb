@@ -29,6 +29,7 @@ class Drawer::Show < Transactions::API
   def find_model(context, params:, current_user:, **)
     find_by_key = context[:builder].find_by_key
     query = "#{find_by_key} = ?"
+    # nosqli - not a user provided input
     context['model'] = context['result.model'] = context[:builder].model.where(query, params[:id])
     context['model'].present?
   end

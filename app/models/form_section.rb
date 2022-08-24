@@ -38,7 +38,7 @@ class FormSection < ApplicationRecord
 
   def as_json(options = {})
     data = {
-      title: title,
+      title: title || section_id.titleize.to_s,
       active: active,
       config_path: section_id.to_s,
       entities: {},
@@ -52,5 +52,10 @@ class FormSection < ApplicationRecord
       data[:entities][ent.entity_key] = ent.as_json(options.merge(config_path: "#{section_id}/entities"))
     end
     data
+  end
+
+  def display_name
+    return 'Line Items' if section_id == 'items'
+    section_id.titleize
   end
 end

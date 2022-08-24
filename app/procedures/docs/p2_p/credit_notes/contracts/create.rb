@@ -11,8 +11,25 @@ class Docs::P2P::CreditNotes::Contracts::Create < Reform::Form
   property :billing_location_id, validates: {presence: true}
   property :shipping_location_id, validates: {presence: true}
   property :vendor_id, validates: {presence: true}
+  property :vendor_country_id
   property :narration
   property :tds_rate_id
+  property :vendor_trade_name
+  property :vendor_sequence_id
+  property :vendor_pan
+  property :gstin_location_id
+  property :vendor_gstin
+  property :billing_address_gstin
+  property :shipping_address_gstin
+  property :shipping_address_name
+  property :billing_address_name
+  property :billing_address
+  property :shipping_address
+  property :conversion_rate
+  property :conversion_date
+  property :base_currency_id
+  property :reporting_currency_id
+  property :cn_tds_rate
 
   property :current_user, virtual: true
   property :status_id, default: CreditNoteStatus.id_for(:draft)
@@ -33,14 +50,23 @@ class Docs::P2P::CreditNotes::Contracts::Create < Reform::Form
       property :value, validates: {presence: true}
       property :currency_id, validates: {presence: true}
     end
+    property :cn_original_taxable_amount
+    property :cn_taxable_amount
+    property :rate
+    property :quantity
+    property :tax_rate_id
+    property :original_item_tax_amount
+    property :item_tax_amount
+    property :original_tax_percentage
+    property :revised_tax_percentage
     property :taxable_amount, populate_if_empty: Amount do
       property :id
       property :value, validates: {presence: true}
       property :currency_id, validates: {presence: true}
     end
-
-    property :original_tax_rate_id, validates: {presence: true}
-    property :tax_rate_id, validates: {presence: true}
+    property :original_tax_rate_id
+    property :tax_rate_id
+    property :item_number
   end
 
   validate :company_entities # Checks for departments

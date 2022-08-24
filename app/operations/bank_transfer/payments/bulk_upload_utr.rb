@@ -69,7 +69,7 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
         self.result_array[index] << "Only completed or failed payments can have an attached UTR"
         next
       end
-      if payment.reference_resources.present? && payment.utr.present?
+      if (payment.reference_resources.present? && payment.utr.present?) || payment.utr.present?
         self.result_array[index] << "This payment already has an associated UTR"
         next
       end
@@ -86,6 +86,7 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
           reference_resource.utr = utr
         end
         payment.utr  = utr
+        payment.processed_at = credited_at
         payments << payment
         
         existing_transactions << reference_resource
@@ -105,6 +106,7 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
           end
 
         payment.utr  = utr
+        payment.processed_at = credited_at
         payments << payment
       end
       # add a success message to the result array

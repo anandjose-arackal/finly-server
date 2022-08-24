@@ -4,7 +4,7 @@ class ActionsManager::Master::CreditNotes::Show < ActionsManager::Master::Base
 
   register_handle :credit_note_show
   register_actions [:update_and_submit, :edit, :policy_editable, :retract, :approve, :reject, :take_control, :return_control,
-                    :void, :destroy, :tds_editable]
+                    :void, :destroy, :tds_editable, :create_items, :delete, :save_btn, :upload_attachment, :update_btn, :submit]
 
   def initialize(user = nil, params = {})
     super
@@ -58,8 +58,30 @@ class ActionsManager::Master::CreditNotes::Show < ActionsManager::Master::Base
     (CreditNote.open_statuses.include?(credit_note.status_id) && credit_note.user_id == user.id)
   end
 
+  alias_method :delete, :destroy
+
+  def create_items
+    false
+  end
+
+  def save_btn
+    edit
+  end
+
+  def update_btn
+    save_btn
+  end
+
+  def upload_attachment
+    credit_note.get_reviewers.include?(user)
+  end
+
   def tds_editable
     false
+  end
+
+  def submit
+    update_and_submit
   end
 
   private

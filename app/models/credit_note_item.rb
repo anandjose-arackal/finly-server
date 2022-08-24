@@ -108,6 +108,10 @@ class CreditNoteItem < ApplicationRecord
     end
   end
 
+  def retrieve_value(entity)
+    send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
+  end
+
   private
 
   def calculate_total
@@ -139,6 +143,7 @@ class CreditNoteItem < ApplicationRecord
       self.rate = original_rate
     end
   end
+
 
   def calculate_qty_rate_change
     currency_id = parent&.company&.base_currency_id || Currency.id_for("INR")

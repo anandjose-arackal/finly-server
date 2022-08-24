@@ -3039,6 +3039,7 @@ Rails.application.routes.draw do
     end
   end
 
+
   ################### Vendor Payments APIs end ########################
 
   ################### AppSmith APIs start ########################
@@ -4163,6 +4164,7 @@ Rails.application.routes.draw do
   post 'vendors/create_and_submit', to: "vendors#create_and_submit"
   post 'vendors/penny_test', to: 'vendors#penny_test'
   post 'vendors/validate_gstin', to: 'vendors#validate_gstin'
+  post 'vendors/fetch_gst_filings', to: 'vendors#fetch_gst_filings'
   get 'vendors/actions_config', to: 'vendors#actions_config'
 
   put 'vendors/bulk_approve', to: 'vendors#bulk_approve'
@@ -4196,6 +4198,27 @@ Rails.application.routes.draw do
   ######### NEW INVOICE FORMS ###################
   post 'invoice_forms/save_and_submit', to: "invoice_forms#save_and_submit"
   resources :invoice_forms, only: [:show, :update]
+
+  ######### NEW PURCHASE ORDER ###################
+  post 'purchase_order_forms/save_and_submit', to: "purchase_order_forms#save_and_submit"
+  resources :purchase_order_forms, only: [:show, :update]
+  
+  ######### NEW PO INVOICE FORMS ###################
+  post 'po_invoice_forms/save_and_submit', to: "invoice_forms#save_and_submit"
+  get 'po_invoice_forms/:id', to: "invoice_forms#show"
+  put 'po_invoice_forms/:id(.:format)', to: "invoice_forms#update"
+  
+  # resources :po_invoice_forms, only: [:show, :update]
+
+  ######### NEW PURCHASE REQUEST FORMS ###################
+  resources :purchase_request_forms, only: [:show, :update]
+  post 'purchase_request_forms/save_and_submit', to: "purchase_request_forms#save_and_submit"
+  post 'purchase_request_forms/create_and_submit', to: "purchase_request_forms#create_and_submit"
+  post 'purchase_request_forms/create', to: "purchase_request_forms#create"
+
+  ######## NEW CREDIT NOTE FORMS #########################
+  resources :credit_note_forms, only: [:show, :update]
+  post 'credit_note_forms/save_and_submit', to: "credit_note_forms#save_and_submit"
 
   ######### Rate Contract API start #############
   resources :rate_contracts do
@@ -4254,9 +4277,10 @@ Rails.application.routes.draw do
   # resources :form_entities
   get 'forms', to: 'forms#index'
   get 'forms/entities/:entity_id', to: 'forms#entity_config'
+  
   get 'forms/:route/config', to: 'forms#form_config'
-
   get 'forms/:route/dependencies', to: 'forms#form_dependencies'
+  
   post 'forms/choices', to: 'forms#form_entity_choices'
   post 'forms/lookup_details', to: 'forms#form_lookup_details'
   post 'forms/:route/predict', to: 'forms#form_prediction'
@@ -4378,6 +4402,7 @@ Rails.application.routes.draw do
 
       get 'payments/count', to: 'payments#count'
       post 'payments/new_sync_attempt', to: 'payments#new_sync_attempt'
+      patch 'payments/update_payments_utr', to: 'payments#update_payments_utr'
       resources :payments, only: [:index, :show, :update]
 
       get 'users/count', to: 'users#count'
@@ -4387,6 +4412,10 @@ Rails.application.routes.draw do
       get 'reports/count', to: 'reports#count'
       post 'reports/new_sync_attempt', to: 'reports#new_sync_attempt'
       resources :reports, only: [:index, :show, :update]
+
+      get 'money_requests/count', to: 'money_requests#count'
+      post 'money_requests/new_sync_attempt', to: 'money_requests#new_sync_attempt'
+      resources :money_requests, only: [:index, :show, :update]
 
       get 'purchase_orders/count', to: 'purchase_orders#count'
       post 'purchase_orders/new_sync_attempt', to: 'purchase_orders#new_sync_attempt'

@@ -390,7 +390,8 @@ class BbpsBill < ApplicationRecord
         attachments: attachments.as_json,
         selected_amount_type: selected_amount_type,
         reporting_currency: get_reporting_currency,
-        base_currency: get_base_currency
+        base_currency: get_base_currency,
+        note: subscription.note
     }
 
     if self.late_payment_fee&.value.to_f > 0
@@ -418,17 +419,25 @@ class BbpsBill < ApplicationRecord
   end
 
   def generate_receipt
+    #if there are multiple payments we choose latest one, unless there was a successful payment before that, in which case we choose that
+    correct_payment = payments&.first
+    payments.each do |pay|
+      if pay.completed?
+        correct_payment = pay
+        break
+      end
+    end
     {
         biller_name: subscription.biller&.biller_name,
         mobile_number: subscription.mobile_number,
         bill_number: bill_number,
         bill_date: bill_date,
         due_date: due_date,
-        transaction_ref_id: payments&.first&.bbps_bank_transaction&.bbps_ref_id,
+        transaction_ref_id: correct_payment&.bbps_bank_transaction&.order_number,
         payment_mode: "BSC",
-        bill_amount: payments&.first&.amount.as_json,
+        bill_amount: correct_payment&.amount.as_json,
         transaction_date: paid_at&.strftime("%I:%M %p, %d %b %Y"),
-        status: payments&.first&.payment_status&.name
+        status: correct_payment&.payment_status&.name
     }
   end
 

@@ -26,7 +26,7 @@ class Event::EInvoice::SubmitPending < BaseOperation
     return unless params[:subject].present? && params[:body].present?
     params[:action_name] = action_name
     params[:submit_pending_columns] = submit_pending_columns
-    ProcurementMailer.delay.send_submit_reminder_mail(Event::EInvoice::SubmitPending::MailerPresenter.new(user, params))
+    ProcurementMailer.delay(queue: 'procurements_notification').send_submit_reminder_mail(Event::EInvoice::SubmitPending::MailerPresenter.new(user, params))
   end
 
   def validate

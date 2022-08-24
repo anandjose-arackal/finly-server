@@ -44,7 +44,8 @@ class MoneyRequest < ApplicationRecord
           SoftDeletable,
           FieldCustomizer::CustomizableValidation,
           FindByOrderedIds,
-          Transitionable
+          Transitionable,
+          ErpSyncable
 
   belongs_to :company, optional: true
   has_many :email_authorizations, as: :authorizable
@@ -230,6 +231,11 @@ class MoneyRequest < ApplicationRecord
   }
   scope :include_details, -> {includes(:user, :policy, :status, :payment_mode, :controlling_user, :user, {destination_pocket: :base_currency}, {items: [{amount: [:currency]}]})}
 
+  scope :pending_erp_sync, -> (*args) {
+    with_erp_sync_status_pending.
+    where(status_id: MoneyRequestStatus.ids_for(:approved, :credited, :auto_approved, :trip_approved))
+  }
+    
   accepts_nested_attributes_for :custom_fields
 
   accepts_nested_attributes_for :items

@@ -63,7 +63,9 @@ class GstinLocation < ApplicationRecord
         poc: {
             name: poc_name,
             email: poc_email,
-            mobile_number: poc_mobile_number
+            mobile_number: poc_mobile_number,
+            fax: poc_fax,
+            designation: poc_designation
         }
     }
   end

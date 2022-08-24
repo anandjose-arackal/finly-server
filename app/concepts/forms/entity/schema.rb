@@ -27,6 +27,7 @@ module Forms::Entity::Schema
       can_label_be_renamed: true,
       can_choices_be_changed: true,
       allow_clearing_default_value: true,
+      size: "medium",
       options: {},
       config: {}
   }

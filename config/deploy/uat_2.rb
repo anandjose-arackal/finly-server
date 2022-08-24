@@ -7,7 +7,7 @@
 # server 'example.com', user: 'deploy', roles: %w{app web}, other_property: :other_value
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
-server '192.168.4.8', user: 'centos', roles: %w{web app db}, port: 22
+server 'uat.finly.io', user: 'centos', roles: %w{web app db}, port: 22 #uat_2_server_ip
 set :stage, 'uat'
 set :use_sudo, false
 set :rbenv_type, :user

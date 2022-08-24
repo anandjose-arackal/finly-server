@@ -65,7 +65,7 @@ json.invoice do
   json.transaction_service_period_from invoice.transaction_service_period_from&.strftime('%d/%b/%Y')
   json.transaction_service_period_to invoice.transaction_service_period_to&.strftime('%d/%b/%Y')
   # json.po_number invoice.procurement&.purchase_order&.po_number
-  json.po_number invoice.po_number
+  json.po_number invoice.procurement&.purchase_order&.po_number
 
   location_id = invoice.location_id
   gstin_location_id = invoice.gstin_location_id

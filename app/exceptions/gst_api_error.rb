@@ -1,0 +1,3 @@
+class GstAPIError < StandardError
+
+end

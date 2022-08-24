@@ -57,4 +57,26 @@ class ApplicationMailer < ActionMailer::Base
     end
     email
   end
+
+  def process_action(*args)
+    mail_logger = LogStashLogger.new(type: :file, path: "log/mail_logs.log", sync: true)
+    begin
+      mail_logger.info({ log_type: "mailer_obj_size_tracker",
+                         class_name: self.class.name,
+                         method: args[0],
+                         params_size: ObjectSpace.memsize_of(args[1]),
+                         params_parts_size: args[1].map{|k,v|"#{k}- #{v.to_s.size}"}.join(" | ")
+
+                       })
+    rescue => detail
+      mail_logger.info({ log_type: "mailer_obj_size_tracker",
+                         class_name: self.class.name,
+                         comment: "Error Occurred, hence logging only object size",
+                         method: args[0],
+                         params_size: ObjectSpace.memsize_of(args[1])
+                       })
+    end
+
+    super
+  end
 end

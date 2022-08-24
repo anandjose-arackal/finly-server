@@ -1,13 +1,13 @@
 class TransactionStep
 
-  def self.call(_ctx, *)
+  def self.call((ctx), *, &block)
     ActiveRecord::Base.transaction { yield }&.first
   end
 end
 
 class RollbackStep
   
-  def self.call(*)
+  def self.call((ctx), *, &block)
     raise ActiveRecord::Rollback
   end
 end
@@ -17,11 +17,13 @@ class Docs::I2P::Invoices::Ops::Update < Transactions::API
   step Model(Invoice, :find_by)
   step Policy::Pundit(Docs::I2P::Invoices::Policy, :update?)
   step Forms::Model::Find()
-  step Forms::Contracts::Build()
+  step Forms::Contracts::Build() 
   step Contract::Validate()
+  step :validate_credit_note
   step Wrap(TransactionStep){
     step Contract::Persist()
     step :budget_limit_validation
+    step :update_credit_notes_data
     fail RollbackStep
   }
   step Transactions::Messages::SuccessMessage('Invoice Updated')
@@ -38,6 +40,27 @@ class Docs::I2P::Invoices::Ops::Update < Transactions::API
       end
     end
     return true
+  end
+
+  def update_credit_notes_data(options, params, **)
+    model = options[:model]
+    model.credit_note_adjustments.each do |cna|
+      cna.update_cn
+    end
+    return true
+  end
+
+  def validate_credit_note(options, params, **)
+    current_user = options[:current_user]
+
+    credit_note_adjustments =  options[:params][:credit_note_adjustments]&.select{ |item| item unless item[:_destroy]} || []
+    credit_note_ids =  credit_note_adjustments.map{ |item| item[:credit_note_id] if item[:credit_note_id].present? }.compact
+
+    unless credit_note_ids.uniq.length == credit_note_ids.length 
+      add_message options, :error, :base, "Applied Credit Note has duplicate"
+      return false
+    end
+    true
   end
 
 end
