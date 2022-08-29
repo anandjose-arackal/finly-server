@@ -174,8 +174,8 @@ class Forms::Import::Processor
       end
 
       worksheet_headers.each_with_index do |header_name, header_index|
-        worksheet.set_column(header_index, header_index, (header_name&.length.to_i) +10)
-        worksheet.write(0, header_index, header_name)
+        sheet.set_column(header_index, header_index, (header_name&.length.to_i) +10)
+        sheet.write(0, header_index, header_name)
       end
 
       if sheet_name == form.label
