@@ -710,6 +710,12 @@ class Invoice < ApplicationRecord
                                   InwardInvoiceStatus.id_for(:rejected),
                                   InwardInvoiceStatus.id_for(:retracted)]
   }
+  scope :scope_all_except_voided_rejected_open, -> {
+    where.not invoice_status_id: [InwardInvoiceStatus.id_for(:voided),
+                                  InwardInvoiceStatus.id_for(:rejected),
+                                  InwardInvoiceStatus.id_for(:open),
+                                  InwardInvoiceStatus.id_for(:retracted)]
+  }
 
   scope :pending_erp_sync, -> (*args) {
     with_erp_sync_status_pending.
@@ -2162,7 +2168,7 @@ class Invoice < ApplicationRecord
   def multiple_invoice_validation
     return true if self.invoice_type_id == InwardInvoiceType.id_for(:beneficiary)
     return true if InwardInvoiceStatus.ids_for(:retracted, :rejected).include?(self.invoice_status_id)
-    current_company_invoices = self.company.inward_invoices.scope_all_except_voided_rejected_retracted
+    current_company_invoices = company.inward_invoices.scope_all_except_voided_rejected_open
     invoice_number = self.invoice_number
     vendor_id = self.vendor_id
     duplicate_invoices = current_company_invoices.with_invoice_number(invoice_number).with_vendor_ids(vendor_id).without_id(self.id)
