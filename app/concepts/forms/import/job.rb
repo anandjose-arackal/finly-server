@@ -16,6 +16,7 @@ class Forms::Import::Job < Transactions::API
   end
 
   def process_meta_data(context, params:, model:, current_user:, form:, **)
+    Rails.logger.info "process_meta_data"
     return true unless params[:process_meta_data]
 
     context[:form_import] = Forms::Import::Processor.(form, current_user)
@@ -23,6 +24,7 @@ class Forms::Import::Job < Transactions::API
   end
 
   def preprocess_import_job(context, params:, model:, current_user:, form:, **)
+    Rails.logger.info "preprocess import job"
     return true unless params[:preprocess_import_job]
 
     context[:form_import] = Forms::Import::Processor.(form, current_user)
@@ -30,6 +32,7 @@ class Forms::Import::Job < Transactions::API
   end
 
   def preprocess_import_record(context, params:, model:, current_user:, form:, **)
+    Rails.logger.info "preprocess import record"
     return true unless params[:preprocess_import_record]
 
     record = model.records.find_by(uuid: params[:record_id])
@@ -43,6 +46,7 @@ class Forms::Import::Job < Transactions::API
   end
 
   def process_import(context, params:, model:, current_user:, form:, **)
+    Rails.logger.info "process import"
     return true unless params[:process_import]
 
     context[:form_import] = Forms::Import::Processor.(form, current_user)

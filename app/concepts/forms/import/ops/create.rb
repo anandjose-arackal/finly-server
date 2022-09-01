@@ -10,6 +10,7 @@ class Forms::Import::Ops::Create < Transactions::API
 
   def set_form(context, params:, current_user:, **)
     context[:form] = params.delete(:form)
+    Rails.logger.info "Import::#{context[:form].label}_form"
     true
   end
 
@@ -19,6 +20,7 @@ class Forms::Import::Ops::Create < Transactions::API
                       else
                         form.model.new
                       end
+    Rails.logger.info "Import::#{context[:model]}"
     true
   end
 
