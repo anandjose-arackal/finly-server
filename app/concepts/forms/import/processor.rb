@@ -128,7 +128,7 @@ class Forms::Import::Processor
     records_data
   end
 
-  def build_nested_data(imported_sheet)
+  def build_nested_data(imported_sheet, data_headers)
     nested_data = {}.with_indifferent_access
 
     imported_sheet.each_with_pagename do |sheet_name, sheet|
@@ -170,7 +170,7 @@ class Forms::Import::Processor
     records_data = []
 
     # nested_data = {}.with_indifferent_access
-    nested_data = build_nested_data(imported_sheet)
+    nested_data = build_nested_data(imported_sheet, data_headers)
 
     # imported_sheet.each_with_pagename do |sheet_name, sheet|
     #   next if sheet_name == form.label
