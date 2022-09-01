@@ -33,6 +33,7 @@ class InvoiceCalculationUtils
                               end
 
     self.balance_due_amount = self.balance_due_amount - self.advance_amount unless invoice.try(:forms_enabled)
+    self.balance_due_amount = self.balance_due_amount - self.invoice.invoice_paid_outside_amount.to_f if self.invoice.is_a?(Invoice) && self.invoice.invoice_paid_outside_amount.to_f >= 0
     # If po invoice has po advance, then adjust the balance due
     unless self.invoice.class.name == 'OutwardInvoice'
       if (self.invoice.po_advance.present? && self.invoice.advance_amount_required && self.invoice.po_adjusted_advance[:value].present?) || (self.invoice.try(:forms_enabled) && self.invoice.advance_amount_required)

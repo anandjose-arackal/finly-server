@@ -151,6 +151,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
 
       # remaining_amount = (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
       remaining_amount = (invoice_amount - previous_payments).round(2)
+      remaining_amount = invoice_amount if invoice.forms_enabled
 
       if remaining_amount.blank?
         next

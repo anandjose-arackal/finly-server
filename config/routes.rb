@@ -4164,6 +4164,7 @@ Rails.application.routes.draw do
   post 'vendors/create_and_submit', to: "vendors#create_and_submit"
   post 'vendors/penny_test', to: 'vendors#penny_test'
   post 'vendors/validate_gstin', to: 'vendors#validate_gstin'
+  post 'vendors/fetch_gst_filings', to: 'vendors#fetch_gst_filings'
   get 'vendors/actions_config', to: 'vendors#actions_config'
 
   put 'vendors/bulk_approve', to: 'vendors#bulk_approve'

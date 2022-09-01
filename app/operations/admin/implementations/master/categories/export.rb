@@ -21,7 +21,7 @@ class Admin::Implementations::Master::Categories::Export < Admin::Implementation
   end
 
   def input
-    company.categories
+    company.categories.non_deleted
   end
 
   def id(category)

@@ -79,7 +79,7 @@ class Admin::Implementations::Master::Users::Import < Admin::Implementations::Pr
       return result false, "User not found"
     end
     if data[:destroy]&.to_s&.downcase  == 'y'
-      unless user.update(active: false)
+      unless user.update(active: false, default_password: false)
         return result false, user.errors.full_messages
       end
       user.user_sessions.where(status_id: UserSessionStatus.id_for(:authorized)).update_all(status_id:  UserSessionStatus.id_for(:blocked))

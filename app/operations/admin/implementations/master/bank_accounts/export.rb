@@ -20,7 +20,7 @@ class Admin::Implementations::Master::BankAccounts::Export < Admin::Implementati
   def input
     BankAccount.where(:account_owner_id => company.users.pluck(:id),
                                 :account_owner_type => "User",
-                                :company_id => company.id)
+                                :company_id => company.id).non_deleted
   end
 
   def id(bank_account)

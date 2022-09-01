@@ -44,9 +44,13 @@ class UserOnboarding::ConfigurationData < UserOnboarding::Base
         self.document_list << 'purchase_order'
         self.document_list << 'po_invoice'
         self.document_list << 'goods'
-      elsif user.company.invoice_to_pay_system_enabled?
+      end
+
+      if user.company.invoice_to_pay_system_enabled?
         self.document_list << 'non_po_invoice'
-      elsif  user.company.procurement_enabled? || user.company.invoice_to_pay_system_enabled?
+      end
+
+      if user.company.procurement_enabled? || user.company.invoice_to_pay_system_enabled?
         self.document_list << 'inventory'
         self.document_list << 'item_master'
       end
