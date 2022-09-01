@@ -128,16 +128,9 @@ class Forms::Import::Processor
     records_data
   end
 
-  def build_records_data(imported_sheet)
-    data_headers = {}
-    self.headers.values.each do |sheet_data|
-      data_headers[sheet_data[:name]] = sheet_data[:key]
-    end
-    
-    records_data = []
-
+  def build_nested_data(imported_sheet)
     nested_data = {}.with_indifferent_access
-    
+
     imported_sheet.each_with_pagename do |sheet_name, sheet|
       next if sheet_name == form.label
       next unless data_headers[sheet_name].present?
@@ -163,9 +156,50 @@ class Forms::Import::Processor
           nested_data[data_headers[sheet_name]][key] = [] unless nested_data[data_headers[sheet_name]][key].present?
           nested_data[data_headers[sheet_name]][key] << row_data
         end
-
       end
     end
+    nested_data
+  end
+
+  def build_records_data(imported_sheet)
+    data_headers = {}
+    self.headers.values.each do |sheet_data|
+      data_headers[sheet_data[:name]] = sheet_data[:key]
+    end
+    
+    records_data = []
+
+    # nested_data = {}.with_indifferent_access
+    nested_data = build_nested_data(imported_sheet)
+
+    # imported_sheet.each_with_pagename do |sheet_name, sheet|
+    #   next if sheet_name == form.label
+    #   next unless data_headers[sheet_name].present?
+    #
+    #   worksheet_headers = sheet.row(1)
+    #
+    #   nested_data[data_headers[sheet_name]] = {}
+    #
+    #   (2..sheet.last_row).each do |index|
+    #     row_data = {}.with_indifferent_access
+    #     row = sheet.row(index)
+    #     row.each_with_index do |value, index|
+    #       row_data[worksheet_headers[index]] = value
+    #     end
+    #
+    #     row_data['_ref'] = UUIDTools::UUID.timestamp_create().to_s.upcase
+    #
+    #     header_details = headers[data_headers[sheet_name]][:headers]
+    #
+    #     if row_data[header_details[:parent_id][:name]].present? || row_data[header_details[:parent_sequence_number][:name]].present?
+    #       key = row_data[header_details[:parent_id][:name]]
+    #       key = "Seq#{row_data[header_details[:parent_sequence_number][:name]]}" unless key.present?
+    #       nested_data[data_headers[sheet_name]][key] = [] unless nested_data[data_headers[sheet_name]][key].present?
+    #       nested_data[data_headers[sheet_name]][key] << row_data
+    #     end
+    #
+    #   end
+    # end
 
     imported_sheet.each_with_pagename do |sheet_name, sheet|
       worksheet_headers = sheet.row(1)
@@ -186,6 +220,11 @@ class Forms::Import::Processor
           row.each_with_index do |value, column_index|
             row_data[worksheet_headers[column_index]] = value
           end
+          # row_data = {
+          #   ...
+          #   "Vendor Country Id": 'India'
+          #   ...
+          # }
 
           row_data['_ref'] = UUIDTools::UUID.timestamp_create().to_s.upcase
 
