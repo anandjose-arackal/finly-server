@@ -169,37 +169,7 @@ class Forms::Import::Processor
     
     records_data = []
 
-    # nested_data = {}.with_indifferent_access
     nested_data = build_nested_data(imported_sheet, data_headers)
-
-    # imported_sheet.each_with_pagename do |sheet_name, sheet|
-    #   next if sheet_name == form.label
-    #   next unless data_headers[sheet_name].present?
-    #
-    #   worksheet_headers = sheet.row(1)
-    #
-    #   nested_data[data_headers[sheet_name]] = {}
-    #
-    #   (2..sheet.last_row).each do |index|
-    #     row_data = {}.with_indifferent_access
-    #     row = sheet.row(index)
-    #     row.each_with_index do |value, index|
-    #       row_data[worksheet_headers[index]] = value
-    #     end
-    #
-    #     row_data['_ref'] = UUIDTools::UUID.timestamp_create().to_s.upcase
-    #
-    #     header_details = headers[data_headers[sheet_name]][:headers]
-    #
-    #     if row_data[header_details[:parent_id][:name]].present? || row_data[header_details[:parent_sequence_number][:name]].present?
-    #       key = row_data[header_details[:parent_id][:name]]
-    #       key = "Seq#{row_data[header_details[:parent_sequence_number][:name]]}" unless key.present?
-    #       nested_data[data_headers[sheet_name]][key] = [] unless nested_data[data_headers[sheet_name]][key].present?
-    #       nested_data[data_headers[sheet_name]][key] << row_data
-    #     end
-    #
-    #   end
-    # end
 
     imported_sheet.each_with_pagename do |sheet_name, sheet|
       worksheet_headers = sheet.row(1)
@@ -232,7 +202,7 @@ class Forms::Import::Processor
 
           nested_data.keys.each do |key|
             if row_data[header_details[:id][:name]].present?
-              row_data[key] = nested_data[key][row_data[header_details[:id][:name]]]
+              row_data[key] = nested_data[key][row_data[header_details[:id][:name]]].to_s
             elsif row_data[header_details[:import_sequence_number][:name]].present?
               row_data[key] = nested_data[key]["Seq#{row_data[header_details[:import_sequence_number][:name]]}"]
             end
