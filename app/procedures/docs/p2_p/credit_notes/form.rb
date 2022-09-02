@@ -119,7 +119,7 @@ class Docs::P2P::CreditNotes::Form < Forms::API
       text :item_number, label: 'Item Code', editable: false, can_editable_be_changed: false,
            computed: Forms::Compute::Lookup('items.invoice_item_id', '{{record.item_number}}')
       text :comment, label: 'Comment', editable: true, visible: true, required: false
-      amount :original_quantity, label: 'Original Quantity', can_editable_be_changed: false,
+      number :original_quantity, label: 'Original Quantity', can_editable_be_changed: false,
              editable: false, visible: true
       number :quantity, label: 'Credit Note Quantity',
              editable: true, visible: true, computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:quantity])
