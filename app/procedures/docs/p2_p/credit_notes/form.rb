@@ -121,7 +121,7 @@ class Docs::P2P::CreditNotes::Form < Forms::API
       text :comment, label: 'Comment', editable: true, visible: true, required: false
       amount :original_quantity, label: 'Original Quantity', can_editable_be_changed: false,
              editable: false, visible: true
-      amount :quantity, label: 'Credit Note Quantity',
+      number :quantity, label: 'Credit Note Quantity',
              editable: true, visible: true, computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:quantity])
       amount :original_rate, label: 'Original Rate', editable: false, required: false, visible: true, can_editable_be_changed: false
       amount :rate, label: 'Credit Note Rate', editable: false, required: false, visible: true, computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:rate])
