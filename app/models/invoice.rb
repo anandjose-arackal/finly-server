@@ -924,7 +924,7 @@ class Invoice < ApplicationRecord
 
     if paid_amount == 0
       self.update(invoice_status_id: InwardInvoiceStatus.id_for(:unpaid))
-    elsif ((!self.forms_enabled || self.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)) && paid_amount >= balance_due - 0.99) || (balance_due == 0 && self.forms_enabled)
+    elsif ((!self.forms_enabled || self.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)) && paid_amount >= balance_due - 0.99) || ((balance_due == 0 || paid_amount >= balance_due - 0.99) && self.forms_enabled)
       self.update(invoice_status_id: InwardInvoiceStatus.id_for(:paid), payable: false)
     elsif (!self.forms_enabled && paid_amount <= balance_due) || (self.forms_enabled && self.invoice_paid_outside_amount.to_f > 0)
       self.update(invoice_status_id: InwardInvoiceStatus.id_for(:partially_paid))
@@ -2001,8 +2001,8 @@ class Invoice < ApplicationRecord
   def sync_amounts
     if forms_enabled
       # calculate the advance and adjusted tds
-      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(RequestStore.store[:params], nil, self) if self.advance_amount_required && PoInvoiceToggle.new(RequestStoreUtil.current_user).enabled?
       self.skip_callback = true
+      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(RequestStore.store[:params], nil, self) if self.advance_amount_required && PoInvoiceToggle.new(RequestStoreUtil.current_user).enabled?
       base_currency_id = get_base_currency&.id
 
       if invoice_gross_amount.present?
