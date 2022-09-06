@@ -103,19 +103,19 @@ end
 json.invoice_custom_fields @result.invoice_custom_fields
 
 json.invoice_line_items_custom_fields @result.invoice_line_items_custom_fields
-
-json.attachments do
-  json.array!(@result.payment_order.payment_order_attachments) do |attachment|
-    json.id attachment.id
-    json.url attachment.attached_file.url(:original, timestamp: false)
-    json.thumb attachment.attached_file.url(:thumb)
-    json.description attachment.description
-    json.file_type attachment.file_format(attachment.attached_file)
-    json.content_type attachment.attached_file.content_type
-    json.file_name attachment.attached_file.original_filename
-    json.allow_delete attachment.allow_delete
-  end
-end
+json.attachments nil
+#json.attachments do
+#  json.array!(@result.payment_order.payment_order_attachments) do |attachment|
+#    json.id attachment.id
+#    json.url attachment.attached_file.url(:original, timestamp: false)
+#    json.thumb attachment.attached_file.url(:thumb)
+#    json.description attachment.description
+#    json.file_type attachment.file_format(attachment.attached_file)
+#    json.content_type attachment.attached_file.content_type
+#    json.file_name attachment.attached_file.original_filename
+#    json.allow_delete attachment.allow_delete
+#  end
+#end
 
 json.comments do
   json.array!(@result.bank_payment_request.comments) do |comment|
