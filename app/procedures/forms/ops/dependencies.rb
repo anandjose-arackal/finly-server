@@ -26,7 +26,7 @@ class Forms::Ops::Dependencies < Transactions::API
   end
 
   def init_conditions(context, dependencies:, model:, **)
-    dependencies[:conditions] = model.conditions.includes(:referencable_entity).where(form_entities: {internal: false})
+    dependencies[:conditions] = model.conditions.includes(:referencable_entity, :actions).where(form_entities: {internal: false})
   end
 
   def init_validations(context, model:, dependencies:, **)
@@ -69,16 +69,23 @@ class Forms::Ops::Dependencies < Transactions::API
 
   def init_lookup_assignments(context, dependencies:, model:, **)
     dependencies[:lookup_assignments] = []
-    model.entities.each do |entity|
-      json = entity.form_reference_json
-      json['assignments'] = {}
-      model.entities.where(compute_lookup_entity: entity).where.not(compute_lookup_assignments: nil).each do |dependent_entity|
-        json['assignments'][dependent_entity.entity_path] = dependent_entity.compute_lookup_assignments
+    child_compute_lookup_entities = FormEntity.includes(:parent, :compute_lookup_entity).where(compute_lookup_entity_id: [model.entities]).where.not(compute_lookup_assignments: nil)
+
+    main_entities = {}
+    child_compute_lookup_entities.each do |dependent_entity|
+      unless main_entities.key? dependent_entity.compute_lookup_entity_id
+        main_entities[dependent_entity.compute_lookup_entity_id] = dependent_entity.compute_lookup_entity.form_reference_json
+        main_entities[dependent_entity.compute_lookup_entity_id]['assignments'] = {}
       end
 
-      next unless json['assignments'].present?
+      main_entities[dependent_entity.compute_lookup_entity_id]['assignments'][dependent_entity.entity_path] = dependent_entity.compute_lookup_assignments
+    end
 
-      dependencies[:lookup_assignments] << json
+    main_entities.each do|key, value|
+      Rails.logger.debug value
+      if value['assignments'].present?
+        dependencies[:lookup_assignments] << value
+      end
     end
   end
 
