@@ -16,6 +16,7 @@ class Forms::Ops::Dependencies < Transactions::API
 
   def init_performance_toggle(context, params:, current_user:, **)
     context[:better_performance_enabled] = DependenciesPerformanceToggle.new(current_user).enabled?
+    true
   end
 
   def find_form(context, params:, current_user:, **)
