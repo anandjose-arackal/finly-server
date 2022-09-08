@@ -103,7 +103,6 @@ end
 json.invoice_custom_fields @result.invoice_custom_fields
 
 json.invoice_line_items_custom_fields @result.invoice_line_items_custom_fields
-
 json.attachments do
   json.array!(@result.payment_order.payment_order_attachments) do |attachment|
     json.id attachment.id
