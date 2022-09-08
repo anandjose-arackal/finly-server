@@ -14,7 +14,7 @@ class Forms::Ops::Dependencies < Transactions::API
   pass :init_predictions
   pass :init_section_positions
 
-  def init_performance_toggle
+  def init_performance_toggle(context, params:, current_user:, **)
     context[:better_performance_enabled] = DependenciesPerformanceToggle.new(current_user).enabled?
   end
 
