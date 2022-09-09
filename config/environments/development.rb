@@ -176,6 +176,7 @@ Rails.application.configure do
   config.after_initialize do
     Bullet.enable = true
     Bullet.bullet_logger = true
+    Prosopite.prosopite_logger = true
   end
 
   ###################### S3 for local attachments ########################
