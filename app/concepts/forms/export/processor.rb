@@ -77,7 +77,9 @@ class Forms::Export::Processor
             name: entity.label,
             entity_key: "#{entity.entity_key}_value",
             entity_type: 'text',
-            import_skip: true
+            import_skip: true,
+            lookup_value: true,
+            choices_array: choices_array(entity)
           }
         elsif entity.entity_type == 'date'
           headers[entity.entity_key.to_s] = {
@@ -138,6 +140,11 @@ class Forms::Export::Processor
     headers
   end
 
+  def choices_array(entity, user = self.user)
+    return [] unless entity.choices_scope.present?
+    entity.choices_scope.build(user: user, params: { paginate: false }).as_json[:choices].pluck(:name)
+  end
+
   def build_lookup_content
     content = []
 
@@ -190,6 +197,12 @@ class Forms::Export::Processor
       self.headers[sheet_key][:headers].values.each_with_index do |header_data, header_index|
         worksheets[sheet_key].set_column(header_index, header_index, header_data[:name].length+10)
         worksheets[sheet_key].write(0, header_index, header_data[:name])
+        if header_data[:lookup_value]
+          worksheets[sheet_key].data_validation(1,header_index, 100, header_index, {
+            :validate => 'list',
+            :source => header_data[:choices_array]
+          })
+        end
       end
     end
 
