@@ -142,7 +142,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         self.invoice.invoice_balance_due = self.invoice&.balance_due&.value.to_f
         self.invoice.reporting_invoice_balance_due = self.invoice&.balance_due&.value.to_f * conversion_rate
 
-        self.invoice.form_migrated = true if PoInvoiceToggle.new(RequestStoreUtil.current_user).enabled?
+        self.invoice.form_migrated = PoInvoiceToggle.new(RequestStoreUtil.current_user).enabled? && self.purchase_order&.forms_enabled
 
         self.invoice.save
 
