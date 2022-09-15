@@ -32,6 +32,7 @@ class Forms::Import::Processor
     worksheets = export_base[:worksheets]
 
     self.export_processor.set_lookup_content_in_export(workbook)
+    self.export_processor.add_vlookup_for_ids(workbook)
 
     workbook.close
     file.rewind

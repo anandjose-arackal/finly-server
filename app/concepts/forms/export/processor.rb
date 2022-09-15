@@ -1,5 +1,13 @@
 class Forms::Export::Processor
+  include Writexlsx::Utility
+
   attr_accessor :form, :user
+
+  NAME_MAP = {
+    'Vendors': 'YesBankVendor',
+    'Gstin locations': 'gstin_locations',
+    'Bank accounts': 'bank_accounts'
+  }
 
   def initialize(form, user)
     self.form = form
@@ -293,6 +301,21 @@ class Forms::Export::Processor
       content[:data][:choices].each_with_index do |row, row_index|
         sheet_header_keys.each_with_index do |header_key, header_index|
           worksheet.write(1 + row_index, header_index, row[header_key.to_sym])
+        end
+      end
+    end
+  end
+
+  def add_vlookup_for_ids(workbook)
+    sections = self.headers.values.pluck(:name)
+    workbook.sheets.select {|x| sections.include? x.name }.each do |sheet|
+      sheet_name = sheet.name
+      data = self.headers[NAME_MAP[sheet_name.to_sym]]
+      next unless header.present?
+
+      data['headers'].each_with_index.each do |header, index|
+        if header[:entity_type] == 'lookup'
+          (2..100).times {|i| worksheet.write_formula(i, index, "=VLOOKUP(#{sheet_name.gsub(' id', '')}!#{xl_rowcol_to_cell(i, index+1)},A1:B1001,2,0)")}
         end
       end
     end
