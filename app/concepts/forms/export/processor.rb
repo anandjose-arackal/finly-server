@@ -311,11 +311,11 @@ class Forms::Export::Processor
     workbook.sheets.select {|x| sections.include? x.name }.each do |sheet|
       sheet_name = sheet.name
       data = self.headers[NAME_MAP[sheet_name.to_sym]]
-      next unless header.present?
+      next unless data.present?
 
       data['headers'].each_with_index.each do |header, index|
         if header[:entity_type] == 'lookup'
-          (2..100).times {|i| worksheet.write_formula(i, index, "=VLOOKUP(#{sheet_name.gsub(' id', '')}!#{xl_rowcol_to_cell(i, index+1)},A1:B1001,2,0)")}
+          (2..100).times {|i| worksheet.write_formula(i, index, "=VLOOKUP(#{header[:name].gsub(' id', '')}!#{xl_rowcol_to_cell(i, index + 1)},A1:B1001,2,0)")}
         end
       end
     end
