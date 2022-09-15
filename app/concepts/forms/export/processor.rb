@@ -316,7 +316,7 @@ class Forms::Export::Processor
       data['headers'].keys.each_with_index.each do |key, index|
         if data['headers'][key]['entity_type'] == 'lookup'
           (2..100).each do |row|
-            worksheet.write_formula(row, index, "=VLOOKUP(#{header[:name].gsub(' id', '')}!#{xl_rowcol_to_cell(row, index + 1)},A1:B1001,2,0)")
+            sheet.write_formula(row, index, "=VLOOKUP(#{header[:name].gsub(' id', '')}!#{xl_rowcol_to_cell(row, index + 1)},A1:B1001,2,0)")
           end
         end
       end
