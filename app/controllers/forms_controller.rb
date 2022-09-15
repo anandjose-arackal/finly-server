@@ -30,11 +30,15 @@ class FormsController < BaseControllers::WebBase
   end
 
   def form_config
-    endpoint Forms::Ops::Config
+    unless SaviourCachesToggle.new(current_user).enabled?
+      endpoint Forms::Ops::Config
+      return
+    end
+
+
   end
 
   def form_dependencies
-    current_user = params[:current_user]
 
     unless SaviourCachesToggle.new(current_user).enabled?
       endpoint Forms::Ops::Dependencies do |m|
