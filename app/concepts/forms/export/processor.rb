@@ -318,7 +318,7 @@ class Forms::Export::Processor
         name = data['headers'][key]['name']
         if entity_key == 'lookup'
           (2..100).each do |row|
-            sheet.write_formula(row, index, "=VLOOKUP(#{name.gsub(' id', '')}!#{xl_rowcol_to_cell(row, index + 1)},A1:B1001,2,0)")
+            sheet.write_formula(row, index, "=XLOOKUP(#{xl_rowcol_to_cell(row, index + 1)},'#{name.gsub(" id", "")}'!B2:B1001,'#{name.gsub(" id", "")}'!A2:A1001,0,0)")
           end
         end
       end
