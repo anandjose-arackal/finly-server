@@ -217,7 +217,7 @@ class Forms::Export::Processor
         if header_data[:lookup_value] || header_data[:entity_type] == 'switch'
           worksheets[sheet_key].data_validation(1, header_index, 1048575, header_index, {
             :validate => 'list',
-            :source => header_data[:choices_array]
+            :source => ['one', 'two', 'three']
           })
         end
       end
