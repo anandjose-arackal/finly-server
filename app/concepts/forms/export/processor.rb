@@ -159,7 +159,7 @@ class Forms::Export::Processor
   def choices_array(entity, user = self.user)
     return [] unless entity.choices_scope.present?
 
-    entity.choices_scope.build(user: user, params: { paginate: false }).as_json[:choices].pluck(:name)
+    entity.choices_scope.build(user: user, params: { paginate: false }).as_json[:choices].pluck(:name).map{|c| c[0..9]} rescue []
   end
 
   def build_lookup_content
@@ -217,7 +217,7 @@ class Forms::Export::Processor
         if header_data[:lookup_value] || header_data[:entity_type] == 'switch'
           worksheets[sheet_key].data_validation(1, header_index, 1048575, header_index, {
             :validate => 'list',
-            :source => ['one', 'two', 'three']
+            :source => header_data[:choices_array]
           })
         end
       end
