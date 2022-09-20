@@ -150,6 +150,7 @@ class Report < ApplicationRecord
   scope :without_payment, -> {where reimbursement_id: nil}
   scope :pending_settlement, -> {where(report_status_id: ReportStatus.approved_id).where(accounted: false)}
   scope :with_controlling_user_id, ->(user_id) {where controlling_user_id: user_id}
+  scope :custom_report_select, -> (start_date,end_date,report_status_ids) {where(:created_at => start_date..end_date, :report_status_id => report_status_ids)} #for checking budget voilation
 
   # todo - having issues, where amounts are not matching actual expense amounts
   scope :expenses_total, -> {joins(expenses: :amount).sum(:'amounts.INR')}

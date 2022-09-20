@@ -240,30 +240,42 @@ class Reports::Violation < Reports::Base
     user = expense.user
     report = expense.report
     total_expenses = 0
-    report_ids = [report.id]
+    filter_reports = []
+    expense_types = []
+    report_status_ids = []
+    expense_with_custom_field = []
+
+    #if rule is for day start_date and end_date will be beginning_of_day and end_of_day
+    if rule.period_id == Period.id_for(:day)
+      start_date = start_date.beginning_of_day
+      end_date = end_date.end_of_day
+    end
 
     #checking for expense level custom_fields
-    expense_with_custom_field = []
     if field_drop_down_item_ids.present?
       expense.custom_fields.where(value_type: "FieldDropDownSelection").map {|cf| expense_with_custom_field << expense.id if field_drop_down_item_ids.include?(cf.value.value.id) }
     end
 
-    expenses = Expense.with_report_id(report_ids).or(Expense.where(id: expense_with_custom_field))
-    expense_arrays  = []
+    report_status_ids = ReportStatus.ids_for([:processing,:approved,:retracted,:settled,:settlement_confirmed,:closed,:auto_approved])
+
+    #to limit rule amount use the previously approved, auto_approved, retracted, settlement_confirmed, closed, settled reports data 
+    filter_reports = Report.with_user_id(user&.id).filter_policy(report&.policy_id).custom_report_select(start_date, end_date, report_status_ids)&.pluck(:id)
+    
+    #take presently open report and for warning reports consider only open report only in open status
+    if (rule.type == 'Warning' || rule.type == 'Blocking') && report.report_status_id == ReportStatus.id_for(:open)
+      filter_reports << report&.id
+    end
+
     expense_types = rule.expense_types.pluck(:id)
-    expense_arrays << ExpenseType.id_for(:manual) if expense_types.include?(1)
-    expense_arrays << ExpenseType.id_for(:card) if expense_types.include?(2)
-    expense_arrays << ExpenseType.id_for(:distance) if expense_types.include?(3)
-    expense_arrays << ExpenseType.id_for(:time) if expense_types.include?(4)
-    expense_arrays << ExpenseType.id_for(:per_diem) if expense_types.include?(5)
 
-    expenses = expenses.selected_expense_types(expense_arrays)
+    #all the expenses used before creation of report(current) and select accroding to expense_type
+    expenses = (Expense.with_report_id(filter_reports).or(Expense.where(id: expense_with_custom_field))).selected_expense_types(expense_types)
 
-    # Expenses with different usage_date ranges from expense date
+    # sum value of expenses
     total_expenses += number_with_precision(expenses.without_usage_date_type.with_date_range(start_date, end_date)
                                                 .filter_category_id(categories&.pluck(:id)).joins(:amount).sum(base_currency_code.to_sym), :precision => 2).to_f
-
-    # Expenses without different usage_date ranges from expense date
+  
+    #Expenses without different usage_date ranges from expense date
     expenses.with_usage_date_type.usage_date_within(start_date, end_date).filter_category_id(categories&.pluck(:id)).each do |exp|
       if exp.usage_date_end.blank?
         # If only a single date is defined in usage_date range, add the cost to current budget
@@ -278,6 +290,7 @@ class Reports::Violation < Reports::Base
         total_expenses += cost_per_date * number_of_overlapping_days
       end
     end
+    
     # the expenses that will be considered for the receipt rule are only those that fit the criteria for this particular rule
     expenses = expenses.filter_category_id(categories&.pluck(:id))
 
