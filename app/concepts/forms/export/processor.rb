@@ -3,12 +3,6 @@ class Forms::Export::Processor
 
   attr_accessor :form, :user
 
-  NAME_MAP = {
-    'Vendors': 'YesBankVendor',
-    'Gstin locations': 'gstin_locations',
-    'Bank accounts': 'bank_accounts'
-  }
-
   def initialize(form, user)
     self.form = form
     self.user = user

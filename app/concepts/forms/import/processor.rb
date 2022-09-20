@@ -148,7 +148,10 @@ class Forms::Import::Processor
         end
 
         row_data['_ref'] = UUIDTools::UUID.timestamp_create().to_s.upcase
+
+        # FE uses this for indexing
         row_data['id'] = row_data['_ref']
+        row_data['collection_id'] = row_data['_ref']
 
         header_details = headers[data_headers[sheet_name]][:headers]
 
