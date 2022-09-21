@@ -158,7 +158,7 @@ class Forms::Export::Processor
   def choices_array(entity, user = self.user)
     return [] unless entity.choices_scope.present?
 
-    entity.choices_scope.build(user: user, params: { paginate: false }).as_json[:choices].map(&:symbolize_keys).pluck(:name) rescue []
+    entity.choices_scope.build(user: user, params: { paginate: false }).as_json[:choices].map(&:symbolize_keys).pluck(:name).map{|c| c[0..19]} rescue []
   end
 
   def build_lookup_content
