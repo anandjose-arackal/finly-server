@@ -215,7 +215,7 @@ class Forms::Export::Processor
         worksheets[sheet_key].set_column(header_index, header_index, header_data[:name].length+10)
         worksheets[sheet_key].write(0, header_index, header_data[:name])
         if header_data[:lookup_value] || header_data[:entity_type] == 'switch'
-          Rails.logger.debug "ListValidation::#{header_data[:name]}::#{xl_rowcol_to_cell(1, header_index)}::#{header_data[:choices_array]}::#{Header data - header_data}"
+          Rails.logger.debug "ListValidation::#{header_data[:name]}::#{xl_rowcol_to_cell(1, header_index)}::#{header_data[:choices_array]}::Header data - #{header_data}"
           worksheets[sheet_key].data_validation(1, header_index, 1048575, header_index, {
             :validate => 'list',
             :source => header_data[:choices_array]
@@ -319,10 +319,8 @@ class Forms::Export::Processor
         if entity_key == 'lookup'
           name = data['headers'][key]['name']
           look_up_sheet_name = name.gsub(" ID", "").gsub(" ID*", "")
-          # (2..100).each do |row|
           Rails.logger.debug "Adding formula: =XLOOKUP(#{xl_rowcol_to_cell(2, index + 1)},'#{look_up_sheet_name}'!B2:B1001,'#{look_up_sheet_name}'!A2:A1001,0,0)"
           sheet.write_formula(2, index, "=XLOOKUP(#{xl_rowcol_to_cell(2, index + 1)},'#{look_up_sheet_name}'!B2:B1001,'#{look_up_sheet_name}'!A2:A1001,0,0)")
-          # end
         end
       end
     end
