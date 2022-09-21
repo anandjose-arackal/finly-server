@@ -215,7 +215,7 @@ class Forms::Export::Processor
         worksheets[sheet_key].write(0, header_index, header_data[:name])
         if header_data[:lookup_value] || header_data[:entity_type] == 'switch'
           options = header_data[:choices_array] || ['True', 'False']
-          Rails.logger.debug "ListValidation::#{header_data[:name]}::#{xl_rowcol_to_cell(1, header_index)}::#{header_data[:choices_array]}"
+          Rails.logger.debug "ListValidation::#{header_data[:name]}::#{xl_rowcol_to_cell(1, header_index)}::#{options}"
           worksheets[sheet_key].data_validation(1, header_index, 1048575, header_index, {
             :validate => 'list',
             :source => options
