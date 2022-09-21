@@ -308,7 +308,7 @@ class Forms::Export::Processor
 
       data['headers'].keys.each_with_index.each do |key, index|
         entity_type = data['headers'][key]['entity_type']
-        if entity_type == 'lookup'
+        if %w[lookup dropdown].include?(entity_type)
           name = data['headers'][key]['name']
           look_up_sheet_name = name.gsub(" ID*", "").gsub(" ID", "")
           Rails.logger.debug "Formula::=XLOOKUP(#{xl_rowcol_to_cell(2, index + 1)},'#{look_up_sheet_name}'!$B$2:$B$1048576,'#{look_up_sheet_name}'!$A$2:$A$1048576,0,0)"
@@ -320,7 +320,7 @@ class Forms::Export::Processor
           Rails.logger.debug "ListValidation::#{name}::#{xl_rowcol_to_cell(1, index)}::#{"'#{look_up_sheet_name}'!B2:B1048576"}"
           sheet.data_validation(1, index, 1048575, index, {
             :validate => 'list',
-            :source => "'#{look_up_sheet_name}'!B2:B1048576"
+            :source => "'#{look_up_sheet_name}'!$B$2:$B$1048576"
           })
         elsif entity_type == 'switch'
           sheet.data_validation(1, index, 1048575, index, {
