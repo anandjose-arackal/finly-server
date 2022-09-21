@@ -159,7 +159,7 @@ class Forms::Export::Processor
   def choices_array(entity, user = self.user)
     return [] unless entity.choices_scope.present?
 
-    entity.choices_scope.build(user: user, params: { paginate: false }).as_json[:choices].pluck(:name).map{|c| c[0..9]} rescue []
+    entity.choices_scope.build(user: user, params: { paginate: false }).as_json[:choices]..map(&:symbolize_keys).pluck(:name) rescue []
   end
 
   def build_lookup_content
@@ -215,7 +215,7 @@ class Forms::Export::Processor
         worksheets[sheet_key].set_column(header_index, header_index, header_data[:name].length+10)
         worksheets[sheet_key].write(0, header_index, header_data[:name])
         if header_data[:lookup_value] || header_data[:entity_type] == 'switch'
-          Rails.logger.debug "ListValidation::#{header_data[:name]}::#{xl_rowcol_to_cell(1, header_index)}::#{header_data[:choices_array]}"
+          Rails.logger.debug "ListValidation::#{header_data[:name]}::#{xl_rowcol_to_cell(1, header_index)}::#{header_data[:choices_array]}::#{Header data - header_data}"
           worksheets[sheet_key].data_validation(1, header_index, 1048575, header_index, {
             :validate => 'list',
             :source => header_data[:choices_array]
