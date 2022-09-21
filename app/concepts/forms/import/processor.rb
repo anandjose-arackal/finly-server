@@ -405,7 +405,8 @@ class Forms::Import::Processor
         if data[:id].present?
           data[:collection_id] = data[:id]
         else
-          data.delete(:id)
+          data[:id] = UUIDTools::UUID.timestamp_create.to_s.upcase
+          data[:collection_id] = data[:id]
         end
 
         form_nested_data << data
