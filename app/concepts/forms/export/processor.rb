@@ -317,8 +317,8 @@ class Forms::Export::Processor
           # options = header_data[:choices_array] || ['True', 'False']
           name = data['headers'][key]['name']
           look_up_sheet_name = name.gsub(" ID*", "").gsub(" ID", "")
-          Rails.logger.debug "ListValidation::#{header_data[:name]}::#{xl_rowcol_to_cell(1, header_index)}::#{"'#{look_up_sheet_name}'!B2:B1048576"}"
-          worksheets[sheet_key].data_validation(1, header_index, 1048575, header_index, {
+          Rails.logger.debug "ListValidation::#{name}::#{xl_rowcol_to_cell(1, index)}::#{"'#{look_up_sheet_name}'!B2:B1048576"}"
+          worksheets[sheet_key].data_validation(1, index, 1048575, index, {
             :validate => 'list',
             :source => "'#{look_up_sheet_name}'!B2:B1048576"
           })
