@@ -214,6 +214,7 @@ class Forms::Export::Processor
       self.headers[sheet_key][:headers].values.each_with_index do |header_data, header_index|
         worksheets[sheet_key].set_column(header_index, header_index, header_data[:name].length+10)
         worksheets[sheet_key].write(0, header_index, header_data[:name])
+        Rails.logger.debug "ListValidation::#{xl_rowcol_to_cell(1, header_index)}::#{header_data[:choices_array]}"
         if header_data[:lookup_value] || header_data[:entity_type] == 'switch'
           worksheets[sheet_key].data_validation(1, header_index, 1048575, header_index, {
             :validate => 'list',
