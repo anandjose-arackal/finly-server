@@ -2,6 +2,17 @@ class FormsController < BaseControllers::WebBase
 
   layout :resolve_layout
 
+  unless Rails.env.production?
+    around_action :n_plus_one_detection
+
+    def n_plus_one_detection
+      Prosopite.scan
+      yield
+    ensure
+      Prosopite.finish
+    end
+  end
+
   # Form Renderer
   # def show
   #   endpoint Forms::Ops::Show do |m|
