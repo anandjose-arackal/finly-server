@@ -312,7 +312,7 @@ class Forms::Export::Processor
           name = data['headers'][key]['name']
           look_up_sheet_name = name.gsub(" ID*", "").gsub(" ID", "")
           Rails.logger.debug "Formula::=XLOOKUP(#{xl_rowcol_to_cell(2, index + 1)},'#{look_up_sheet_name}'!$B$2:$B$1048576,'#{look_up_sheet_name}'!$A$2:$A$1048576,0,0)"
-          sheet.write_formula(2, index, "=XLOOKUP(#{xl_rowcol_to_cell(2, index + 1)},'#{look_up_sheet_name}'!$B$2:$B$1048576,'#{look_up_sheet_name}'!$A$2:$A$1048576,0,0)")
+          sheet.write_formula(1, index, "=XLOOKUP(#{xl_rowcol_to_cell(1, index + 1)},'#{look_up_sheet_name}'!$B$2:$B$1048576,'#{look_up_sheet_name}'!$A$2:$A$1048576,0,0)")
         elsif data['headers'][key][:lookup_value]
           # options = header_data[:choices_array] || ['True', 'False']
           name = data['headers'][key]['name']
