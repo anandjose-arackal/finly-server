@@ -1,0 +1,2 @@
+class ApplicationCacheAccessError < StandardError
+end
