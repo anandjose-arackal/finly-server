@@ -1,30 +1,26 @@
 class BaseApplicationCache
   attr_accessor :company, :current_user
 
-  def initialize(company, current_user)
-    @company = company
+  def initialize(current_user)
+    @company = ActsAsTenant.current_tenant
     @current_user = current_user
 
     cache_init
   end
 
-  def self.enabled?
+  def enabled?
     true
   end
 
-  def self.company_scoped?
+  def company_scoped?
     true
   end
 
-  def self.user_scoped?
+  def user_scoped?
     false
   end
 
-  def self.eager_load?
-    !(self.user_scoped?)
-  end
-
-  def self.skip_nil?
+  def skip_nil?
     true
   end
 
@@ -37,35 +33,40 @@ class BaseApplicationCache
   end
 
   def validate_access
-    if @company.nil?
+    if company_scoped?
       if ActsAsTenant.current_tenant.nil?
         raise ApplicationCacheAccessError.new "Company scoped cache is being accessed without a current company scope"
       end
       @company = ActsAsTenant.current_tenant
     end
 
-    if self.user_scoped? and @current_user.nil?
+    if user_scoped? && @current_user.nil?
       raise ApplicationCacheAccessError.new "User scoped cache is being accessed without a current user scope"
+    end
+
+    if (!@current_user.nil?) && @current_user.company.id != @company.id
+      raise ApplicationCacheAccessError.new "Cache being accessed by unauthorized user"
     end
   end
 
   def final_cache_key
+    cache_key_tokens = []
+
     # Overloading this will defeat the entire purpose of this framework
-    final_key = "#{cache_name_key}"
+    cache_key_tokens << "#{cache_name_key}"
 
-    if self.company_scoped? and !@company.nil?
-      final_key << "#{@company.id}#"
+    if company_scoped? && !@company.nil?
+      cache_key_tokens << "#{@company.id}"
     end
 
-    if self.user_scoped? and !@current_user.nil?
-      final_key << "#{@current_user.id}#"
+    if user_scoped? && !@current_user.nil?
+      cache_key_tokens << "#{@current_user.id}"
     end
-
-    final_key << cache_instance_id
-    final_key
+    cache_key_tokens << cache_instance_id
+    ActiveSupport::Cache.expand_cache_key cache_key_tokens
   end
 
-  def self.expires_in
+  def expires_in
     if Rails.env.production?
       15.minutes
     else
@@ -73,56 +74,34 @@ class BaseApplicationCache
     end
   end
 
-  def load_data
+  def eager_load_data
     # Fetch data from main datasource
     # Returns query set / data objects
-
   end
 
-  def access
-    # This is always supposed to be a lazy loaded cache access
-    # In case this cache is not enabled, it should return data from main source
-    # Do not override
-
-    unless self.enabled?
-      return load_data
+  def write(&block)
+    unless enabled?
+      return
     end
+    value = block.call
 
-    Rails.cache.fetch(@final_cache_key_const, expires_in: self.expires_in, skip_nil: self.skip_nil?) do
-      if self.company_scoped?
-        ActsAsTenant.with_tenant(@company) do
-          load_data
-        end
-      else
-        load_data
-      end
-    end
+    Rails.cache.write(@final_cache_key_const, value, expires_in: expires_in, skip_nil: skip_nil?)
+  end
+
+  def read
+    Rails.cache.read(@final_cache_key_const)
   end
 
   def cache_init
     validate_access
 
-    if self.eager_load? and self.user_scoped?
-      raise ApplicationCacheAccessError.new "User scoped caches cannot be eager loaded"
-    end
-
     @final_cache_key_const = final_cache_key().freeze
-
-    if self.eager_load?
-      self.access
-    end
+    Rails.logger.debug "Initialized cache with key #{@final_cache_key_const}"
   end
 
   def invalidate
     # Do not override
     Rails.cache.delete(@final_cache_key_const)
-  end
-
-  def refresh
-    invalidate
-    if eager_load?
-      access
-    end
   end
 
 end

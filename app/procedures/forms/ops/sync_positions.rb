@@ -43,6 +43,8 @@ class Forms::Ops::SyncPositions < Transactions::API
     true
   end
 
+  step :invalidate_caches
+
   # step :persist
   #
   # def persist(options, model:, **)
@@ -86,4 +88,9 @@ class Forms::Ops::SyncPositions < Transactions::API
   #   dynamic_contract.new(model, current_user: current_user)
   # end
 
+  def invalidate_caches(ctx, model:, params:, current_user:, **)
+    klass_name = model.klass_name
+    FormDependenciesCache.new(current_user, klass_name=klass_name).invalidate
+    FormDocsConfigCache.new(current_user, klass_name=klass_name).invalidate
+  end
 end

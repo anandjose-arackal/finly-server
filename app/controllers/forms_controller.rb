@@ -30,32 +30,41 @@ class FormsController < BaseControllers::WebBase
   end
 
   def form_config
+    # TODO: Remove this part after Cache is enabled and verified for some companies
+    # Cache Framework class already takes care of this
     unless SaviourCachesToggle.new(current_user).enabled?
       endpoint Forms::Ops::Config
       return
     end
 
+    custom_cache = FormDocsConfigCache.new(current_user, document_type: params[:document_type], document_id: params[:document_id])
+    value_modifier = -> (cached_value) {
+      cached_hash = JSON.parse(cached_value)
+      cached_hash[:created_by] = custom_cache.retrieve_user
+      JSON.generate(cached_hash)
+    }
 
+    through_cache cached_data_modifier: value_modifier, custom_cache: custom_cache do
+      endpoint Forms::Ops::Config
+      render
+    end
   end
 
   def form_dependencies
 
-    unless SaviourCachesToggle.new(current_user).enabled?
+    if !(SaviourCachesToggle.new(current_user).enabled?) or params[:no_cache]
       endpoint Forms::Ops::Dependencies do |m|
         m.success { |op| render json: op[:dependencies], status: 200 }
       end
       return
     end
 
-    cache_instance = FormDependenciesCache.new current_user.company, current_user, params
-    deps = cache_instance.access
-
-    if cache_instance.op_success
-      render json: deps, status: 200
-    else
-      render json: {success: false, messages: cache_instance.op_result.messages.as_json}, status: 422
+    custom_cache = FormDependenciesCache.new(current_user, form_route=params[:route], ignore_cache=params[:ignore_cache])
+    through_cache custom_cache do
+      endpoint Forms::Ops::Dependencies do |m|
+        m.success { |op| render json: op[:dependencies], status: 200 }
+      end
     end
-
 
   end
 
@@ -79,6 +88,7 @@ class FormsController < BaseControllers::WebBase
 
   def sync_positions
     endpoint Forms::Ops::SyncPositions
+
   end
 
   private
