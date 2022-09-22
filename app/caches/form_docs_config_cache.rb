@@ -16,7 +16,7 @@ class FormDocsConfigCache < BaseApplicationCache
     super(current_user)
   end
 
-  def self.enabled?
+  def enabled?
     SaviourCachesToggle.new(@current_user).enabled?
   end
 

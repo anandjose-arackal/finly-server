@@ -44,7 +44,7 @@ class FormsController < BaseControllers::WebBase
       JSON.generate(cached_hash)
     }
 
-    through_cache cached_data_modifier: value_modifier, custom_cache: custom_cache do
+    through_cache custom_cache=custom_cache, cached_data_modifier=value_modifier do
       endpoint Forms::Ops::Config
       render
     end
