@@ -60,6 +60,13 @@ class Docs::P2P::PurchaseRequests::Action < ActionManager::API
            label: 'New Purchase Request',
            toggle: {if: [PurchaseRequestToggle, :enabled?]},
            url: 'purchase_request_form/add'
+
+    action :redirect,
+           :import_form,
+           permissions: :purchase_request_initiator,
+           toggle: {if: [PurchaseRequestToggle, :bulk_import_enabled?]},
+           label: 'Bulk Import',
+           url: 'bulk_import/params={"route":"forms.invoices"}'
   end
 
 end

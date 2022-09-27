@@ -4,4 +4,7 @@ class NonPoInvoiceToggle < ApplicationToggle
     feature_flag 'release/non_po_invoice#forms_enabled', false
   end
 
+  def bulk_import_enabled?
+    feature_flag 'release/non_po_invoice#bulk_import_enabled', false
+  end
 end
