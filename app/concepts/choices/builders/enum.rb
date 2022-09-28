@@ -29,7 +29,7 @@ class Choices::Builders::Enum < Choices::Builders::Base
     list = []
     choice_records(params: params, user: user).each do |item|
       list << {
-          id: item.id,
+          id: item.send(id),
           name: item.name&.titleize,
       }
     end
