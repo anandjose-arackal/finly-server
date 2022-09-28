@@ -167,7 +167,7 @@ class Masters::Vendors::Form < Forms::API
     data_map :gstin_locations, populate_if_empty: GstinLocation, min_items: 1, associate_custom_fields: true do
       text :location, display_key: true
       dropdown :state_id, required: true,
-               choices_scope: Choices[:enum].(GstStateCode, id: :name, name: :name)
+               choices_scope: Choices[:enum].(GstStateCode, name: :name)
       text :poc_name, label: "Point of Contact"
       text :poc_mobile_number
       text :poc_email
