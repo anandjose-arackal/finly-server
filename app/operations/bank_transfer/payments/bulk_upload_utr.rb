@@ -88,7 +88,7 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
         payment.utr  = utr
         payment.processed_at = credited_at
         payments << payment
-        
+        payment.save
         existing_transactions << reference_resource
       else
         # create a bank transaction for this particular payment
@@ -107,6 +107,7 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
 
         payment.utr  = utr
         payment.processed_at = credited_at
+        payment.save
         payments << payment
       end
       # add a success message to the result array

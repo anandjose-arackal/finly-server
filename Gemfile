@@ -360,3 +360,5 @@ group :production do
   gem 'elastic-apm', '~> 3.13.0'
   # gem 'scout_apm', '~> 2.4'
 end
+
+gem 'prosopite', '~> 1.1.2'

@@ -158,7 +158,7 @@ class YesBankVendor < ApplicationRecord
 
   scope :filter_name_search, -> (term) {
     ids = self.pluck(:id)
-    vendor_ids = where(id: ids).where("yes_bank_vendors.name like ? OR yes_bank_vendors.email like ? OR yes_bank_vendors.mobile_number like ? OR
+    vendor_ids = where(id: ids).where("yes_bank_vendors.status_id != ?",VendorStatus.id_for(:deactivated)).where("yes_bank_vendors.name like ? OR yes_bank_vendors.email like ? OR yes_bank_vendors.mobile_number like ? OR
                                       yes_bank_vendors.description like ? OR yes_bank_vendors.business_name like ? OR yes_bank_vendors.vendor_id like ? OR yes_bank_vendors.trade_name like ?",
                                       "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
     bank_account_ids = BankAccount.where("bank_accounts.account_number like ? OR bank_accounts.ifsc like ? OR bank_accounts.name like ?", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
