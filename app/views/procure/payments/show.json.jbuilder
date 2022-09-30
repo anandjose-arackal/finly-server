@@ -193,9 +193,9 @@ else
         json.remaining_amount (parent.balance_amount&.value.to_f - parent.requested_advance_amount.value.round(2))
         if parent.user.po_form_enabled
           json.non_po_invoice_form_enabled true
-          json.invoice_sub_total_amount precision_value parent.total_adv_amount
-          json.invoice_net_total_amount precision_value parent.po_total_amount
-          json.invoice_balance_due precision_value (parent.po_total_amount - parent.total_adv_amount)
+          json.invoice_sub_total_amount precision_value parent.total_adv_amount.to_f
+          json.invoice_net_total_amount precision_value parent.po_total_amount.to_f
+          json.invoice_balance_due precision_value (parent.po_total_amount.to_f - parent.total_adv_amount.to_f)
           json.conversion_rate parent.conversion_rate
           json.tds_amount parent.po_advance_tds_amount.to_f
           json.net_payable_amount parent.po_balance_due.to_f
