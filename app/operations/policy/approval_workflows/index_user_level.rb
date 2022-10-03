@@ -81,7 +81,7 @@ class Policy::ApprovalWorkflows::IndexUserLevel < Policy::ApprovalWorkflows::Bas
         user_ids = PolicyUserRole.where(policy_id: policy.id, user_role_id: UserRole.id_for(:non_po_invoice_initiator)).pluck(:user_id).uniq rescue []
         user_ids += [user.id] if user.vp_admin_or_auditor? && user_ids.exclude?(user.id)
       when 'AgreementInvoiceProvider', :AgreementInvoiceProvider
-        user_ids = PolicyUserRole.where(policy_id: policy.id, user_role_id: UserRole.id_for(:agreement_invoice_reviewer)).pluck(:user_id).uniq rescue []
+        user_ids = PolicyUserRole.where(policy_id: policy.id, user_role_id: UserRole.id_for(:agreement_invoice_initiator)).pluck(:user_id).uniq rescue []
         user_ids += [user.id] if user.vp_admin_or_auditor? && user_ids.exclude?(user.id)
       when 'BankPaymentRequestProvider', :BankPaymentRequestProvider
         user_ids = PolicyUserRole.where(policy_id: policy.id, user_role_id: UserRole.id_for(:bank_payment_request_initiator)).pluck(:user_id).uniq rescue []
