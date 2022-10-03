@@ -18,7 +18,7 @@ class FormDependenciesCache < BaseApplicationCache
 
   def expires_in
     if Rails.env.production?
-      15.minutes
+      30.minutes
     else
       15.minutes
     end

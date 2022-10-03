@@ -37,14 +37,14 @@ class FormsController < BaseControllers::WebBase
       return
     end
 
-    custom_cache = FormDocsConfigCache.new(current_user, document_type: params[:document_type], document_id: params[:document_id])
-    value_modifier = -> (cached_value) {
-      cached_hash = JSON.parse(cached_value)
-      cached_hash[:created_by] = custom_cache.retrieve_user
-      JSON.generate(cached_hash)
-    }
+    custom_cache = FormDocsConfigCache.new(current_user, form_route=params[:document_type], document_id=params[:document_id])
+    # value_modifier = -> (cached_value) {
+    #   cached_hash = JSON.parse(cached_value)
+    #   cached_hash[:created_by] = custom_cache.retrieve_user&.as_json
+    #   JSON.generate(cached_hash)
+    # }
 
-    through_cache custom_cache=custom_cache, cached_data_modifier=value_modifier do
+    through_cache custom_cache=custom_cache do
       endpoint Forms::Ops::Config
       render
     end
