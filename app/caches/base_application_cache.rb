@@ -68,7 +68,7 @@ class BaseApplicationCache
 
   def expires_in
     if Rails.env.production?
-      15.minutes
+      30.minutes
     else
       1.minute
     end

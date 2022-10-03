@@ -5,7 +5,7 @@ class FormDocsConfigCache < BaseApplicationCache
     @document_id = document_id
 
     if form_route.nil? && klass_name.nil?
-      raise ApplicationCacheAccessError.new "FormDependenciesCache needs either form_route or klass_name"
+      raise ApplicationCacheAccessError.new "FormDocsConfigCache needs either form_route or klass_name"
     end
 
     @form_route = form_route
@@ -14,6 +14,14 @@ class FormDocsConfigCache < BaseApplicationCache
     end
 
     super(current_user)
+  end
+
+  def expires_in
+    if Rails.env.production?
+      30.minutes
+    else
+      15.minutes
+    end
   end
 
   def enabled?
