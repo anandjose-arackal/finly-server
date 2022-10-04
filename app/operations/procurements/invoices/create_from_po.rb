@@ -168,6 +168,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
 
         if self.advance.present? && (params[:document_type].blank? && params[:document_type] != 'proforma_invoice')
           if (self.po_adjusted_advance.value.zero? || self.po_adjusted_advance_id.blank?) && self.purchase_order.advance_payments.present?
+            Rails.logger.debug "Calling calculate_po_advance_old_logic"
             calculate_po_advance_old_logic
           end
         end
@@ -892,6 +893,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
   end
 
   def calculate_po_advance_old_logic
+    Rails.logger.debug "calculate_po_advance_old_logic::self.advance = #{self.advance}"
     self.total_adjusted_advance = 0
     if self.last_invoice.present?
       self.total_adjusted_advance = self.last_invoice.po_prev_adjusted_advance.to_f + self.last_invoice.po_adjusted_advance&.value&.to_f
