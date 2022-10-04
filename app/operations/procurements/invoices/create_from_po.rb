@@ -12,6 +12,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
   end
 
   def init
+    Rails.logger.debug "DEBUG_ADVANCE:: init"
     id = params[:id] || params[:procurement_id]
     self.procurement = user.company.procurements.find_by(id: id)
     self.purchase_order = self.procurement.purchase_order
