@@ -37,14 +37,14 @@ class FormsController < BaseControllers::WebBase
       return
     end
 
-    custom_cache = FormDocsConfigCache.new(current_user, form_route=params[:document_type], document_id=params[:document_id])
+    custom_cache = FormDocsConfigCache.new(current_user, form_route: params[:document_type], document_id: params[:document_id])
     # value_modifier = -> (cached_value) {
     #   cached_hash = JSON.parse(cached_value)
     #   cached_hash[:created_by] = custom_cache.retrieve_user&.as_json
     #   JSON.generate(cached_hash)
     # }
 
-    through_cache custom_cache=custom_cache do
+    through_cache custom_cache do
       endpoint Forms::Ops::Config
       render
     end
@@ -52,14 +52,14 @@ class FormsController < BaseControllers::WebBase
 
   def form_dependencies
 
-    if !(SaviourCachesToggle.new(current_user).enabled?) or params[:no_cache]
+    if !(SaviourCachesToggle.new(current_user).enabled?) or params[:ignore_cache]
       endpoint Forms::Ops::Dependencies do |m|
         m.success { |op| render json: op[:dependencies], status: 200 }
       end
       return
     end
 
-    custom_cache = FormDependenciesCache.new(current_user, form_route=params[:route], ignore_cache=params[:ignore_cache])
+    custom_cache = FormDependenciesCache.new(current_user, form_route: params[:route], ignore_cache: params[:ignore_cache])
     through_cache custom_cache do
       endpoint Forms::Ops::Dependencies do |m|
         m.success { |op| render json: op[:dependencies], status: 200 }

@@ -585,7 +585,7 @@ class ApplicationController < ActionController::Base
     }
   end
 
-  def through_cache(custom_cache, cached_data_modifier = nil, &block)
+  def through_cache(custom_cache, cached_data_modifier: nil, &block)
     unless custom_cache.enabled?
       block.call
       return

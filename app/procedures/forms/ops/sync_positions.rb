@@ -90,7 +90,7 @@ class Forms::Ops::SyncPositions < Transactions::API
 
   def invalidate_caches(ctx, model:, params:, current_user:, **)
     klass_name = model.klass_name
-    FormDependenciesCache.new(current_user, klass_name=klass_name).invalidate
-    FormDocsConfigCache.new(current_user, klass_name=klass_name).invalidate
+    FormDependenciesCache.new(current_user, klass_name: klass_name).invalidate
+    FormDocsConfigCache.new(current_user, klass_name: klass_name).invalidate
   end
 end
