@@ -1,7 +1,7 @@
 class FormDependenciesCache < BaseApplicationCache
   attr_accessor :params, :op_result, :op_success
 
-  def initialize(current_user, form_route = nil, klass_name = nil, ignore_cache = false)
+  def initialize(current_user, form_route: nil, klass_name: nil, ignore_cache: false)
     if form_route.nil? && klass_name.nil?
       raise ApplicationCacheAccessError.new "FormDependenciesCache needs either form_route or klass_name"
     end

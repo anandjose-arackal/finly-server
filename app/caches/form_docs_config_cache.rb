@@ -1,7 +1,7 @@
 class FormDocsConfigCache < BaseApplicationCache
   attr_accessor :params, :op_result, :op_success
 
-  def initialize(current_user, form_route = nil, document_id = nil, klass_name = nil)
+  def initialize(current_user, form_route: nil, document_id: nil, klass_name: nil)
     @document_id = document_id
 
     if form_route.nil? && klass_name.nil?
@@ -29,7 +29,7 @@ class FormDocsConfigCache < BaseApplicationCache
   end
 
   def cache_instance_id
-    if !@klass_name.nil?
+    if !(@klass_name.nil?)
       klass_name = @klass_name
     else
       klass_name = Forms::Router.klass(@form_route)&.name
