@@ -166,6 +166,8 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.invoice_params, nil, self.invoice)
         self.invoice.save
 
+        Rails.logger.debug "DEBUG_ADVANCE::advance.present?-#{self.advance.present?}::params[:document_type].blank?-#{params[:document_type].blank?}::params[:document_type] != 'proforma_invoice'-#{params[:document_type] != 'proforma_invoice'}::self.po_adjusted_advance.value.zero?-#{self.po_adjusted_advance.value.zero?}::self.po_adjusted_advance_id.blank?-#{self.po_adjusted_advance_id.blank?}::self.purchase_order.advance_payments.present?-#{self.purchase_order.advance_payments.present?}"
+        Rails.logger.debug "OVERALL-#{(self.advance.present? && (params[:document_type].blank? && params[:document_type] != 'proforma_invoice')) && ((self.po_adjusted_advance.value.zero? || self.po_adjusted_advance_id.blank?) && self.purchase_order.advance_payments.present?)}"
         if self.advance.present? && (params[:document_type].blank? && params[:document_type] != 'proforma_invoice')
           if (self.po_adjusted_advance.value.zero? || self.po_adjusted_advance_id.blank?) && self.purchase_order.advance_payments.present?
             Rails.logger.debug "Calling calculate_po_advance_old_logic"
