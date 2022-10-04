@@ -1,9 +1,10 @@
 class Forms::Import::Processor
-  attr_accessor :form, :user, :export_processor, :is_import_submission_stage
+  attr_accessor :form, :user, :export_processor, :is_import_submission_stage, :model
 
   def initialize(form, user)
     self.form = form
     self.user = user
+    self.model = form.model
     self.export_processor = Forms::Export::Processor.(form, user)
     self.is_import_submission_stage = false
   end
@@ -171,7 +172,7 @@ class Forms::Import::Processor
     self.headers.values.each do |sheet_data|
       data_headers[sheet_data[:name]] = sheet_data[:key]
     end
-    
+
     records_data = []
 
     nested_data = build_nested_data(imported_sheet, data_headers)
@@ -231,7 +232,7 @@ class Forms::Import::Processor
     return if import_job.status_id == ImportJobStatus.id_for(:in_progress)
 
     import_job.progress_update(:in_progress)
-
+    records_to_save = []
     import_job.records.each do |import_record|
       next if import_record.status_id == ImportRecordStatus.id_for(:success)
       next if import_record.status_id == ImportRecordStatus.id_for(:in_progress)
@@ -242,10 +243,11 @@ class Forms::Import::Processor
         result = process_import_record(import_record)
         raise unless result.present?
         if result.success?
-          import_job.item_complete(true)
-          import_record.update_status(true, result.messages[:success].to_s, '', '')
-          import_record.document = result[:model]
-          import_record.save!
+          records_to_save << [result[:model], import_record]
+          # import_job.item_complete(true)
+          # import_record.update_status(true, result.messages[:success].to_s, '', '')
+          # import_record.document = result[:model]
+          # import_record.save!
         else
           import_job.item_complete(false)
           import_record.update_status(false, result.messages[:errors].to_s, '', '')
@@ -256,8 +258,36 @@ class Forms::Import::Processor
       end
     end
 
+    save_records(records_to_save)
+
     generate_result_file(import_job)
     import_job.progress_update(:completed)
+  end
+
+  def save_records(records_to_save, save_in_batches = true)
+    if save_in_batches
+      # save in batches
+      records_to_save.in_batches(10) do |batch|
+        begin
+          records = records_to_save.map {|arr| arr[0] }
+          results = self.model.import records
+        rescue => exception
+          Rails.logger.debug "Batch failed::#{batch}::#{exception}"
+          save_records(batch, false)
+        end
+      end
+    else
+      # save one by one
+      batch.each do |record|
+        import_entity = record[0]
+        import_record = record[1]
+        begin
+          import_entity.save!
+        rescue => exception
+          import_record.update_status(false, 'Unable to process', exception.message, exception.backtrace)
+        end
+      end
+    end
   end
 
   def generate_result_file(import_job)
