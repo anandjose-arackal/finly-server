@@ -24,7 +24,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
 
     self.previous_invoices = self.procurement.invoices.scope_all_except_voided.present? ? self.procurement.invoices.scope_all_except_voided.includes(:invoice_items) : nil
 
-    self.invoice_params = user.po_invoice_form_enabled ? set_invoice_parameters : set_invoice_parameters_old_logic
+    self.invoice_params = (user.po_invoice_form_enabled && self.purchase_order&.forms_enabled) ? set_invoice_parameters : set_invoice_parameters_old_logic
 
     self.custom_fields = params&.dig(:custom_fields) || params&.dig(:invoice, :custom_fields)
   end
@@ -58,7 +58,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     validate_custom_fields_invoice
     return if has_errors?
 
-    if user.po_invoice_form_enabled
+    if user.po_invoice_form_enabled && self.purchase_order&.forms_enabled
       if self.invoice.save
         InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.invoice_params, nil, self.invoice)
 
@@ -142,7 +142,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         self.invoice.invoice_balance_due = self.invoice&.balance_due&.value.to_f
         self.invoice.reporting_invoice_balance_due = self.invoice&.balance_due&.value.to_f * conversion_rate
 
-        self.invoice.form_migrated = PoInvoiceToggle.new(RequestStoreUtil.current_user).enabled? && self.purchase_order&.forms_enabled
+        self.invoice.form_migrated = user.po_invoice_form_enabled && self.purchase_order&.forms_enabled
 
         self.invoice.save
 
@@ -254,7 +254,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         self.po_adjusted_advance = Amount.new(value: 0, currency_id: 1)
 
         # Added for po forms
-        if user.po_invoice_form_enabled
+        if user.po_invoice_form_enabled && self.purchase_order&.forms_enabled
           self.total_adjusted_advance = self.previous_invoices.joins(:po_adjusted_advance).sum('amounts.value').to_f
           self.po_prev_adjusted_advance = total_adjusted_advance
           self.po_advance = self.form_advance.to_f
