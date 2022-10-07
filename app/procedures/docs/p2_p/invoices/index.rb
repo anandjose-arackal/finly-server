@@ -54,7 +54,7 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
   IndexBuilder::API::ColumnTemplate::ReviewProgress(self)
 
   column :net_amount, includes: [net_amount: :currency], default: true do
-    amount value: :set_net_amount_value
+    amount value: :set_net_amount_value, currency_code: :set_currency_code, currency_symbol: :set_currency_symbol
   end
 
   IndexBuilder::API::ColumnTemplate::ControllingUser(self)
