@@ -24,6 +24,7 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
 
   # Fixed column is always default true
   column :vendor, label: 'Vendor Details', fixed: true, sort: :vendor_business_name, includes: [:vendor, :invoice_type] do
+    data_card value: "{{record.vendor.business_name}}", id: "{{record.vendor_id}}", route: 'forms.vendors'
     text value: "{{record.vendor.business_name}}", format: 'primary'
     text value: "Vendor ID: {{record.vendor.vendor_id}}"
   end
@@ -35,7 +36,7 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
   end
 
   column :created_by, default: false, includes: [:created_by] do
-    user value: :created_by
+    data_card value: "{{record.created_by.name}}", id: "{{record.created_by.id}}", route: 'users'
   end
 
   column :invoice_type, label: "Type", default: false, includes: [:invoice_type] do

@@ -585,6 +585,33 @@ class ApplicationController < ActionController::Base
     }
   end
 
+  def through_cache(custom_cache, cached_data_modifier: nil, &block)
+    unless custom_cache.enabled?
+      block.call
+      return
+    end
+
+    cached_value = custom_cache.read
+
+    unless cached_value.nil?
+      final_return_value = cached_value
+      unless cached_data_modifier.nil?
+        final_return_value = cached_data_modifier.call cached_value
+      end
+
+      render json: final_return_value, status: 200
+      return
+    end
+
+    block.call
+
+    if response.status >= 200 and response.status <= 299
+      custom_cache.write do
+        response.body
+      end
+    end
+  end
+
   # Used by sentry
   # def set_raven_context
   #   Raven.user_context(id: current_user&.id) # or anything else in session

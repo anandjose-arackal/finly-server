@@ -300,6 +300,10 @@ class PurchaseRequest < ApplicationRecord
     }
   end
 
+  def controlling_user
+    self.get_reviewers&.first
+  end
+
   def self.awaiting_records user
     user_id = user.id
     if user_id.present?
@@ -541,6 +545,10 @@ class PurchaseRequest < ApplicationRecord
   # def purchase_request_status_id
   #   !can_approve? && awaiting_approval? ? PurchaseRequestStatus.id_for(:processing) : super
   # end
+
+  def controlling_user
+    self.get_reviewers&.first
+  end
 
   private
 

@@ -1028,7 +1028,7 @@ class PurchaseOrder < ApplicationRecord
   def review_in_progress?
     PurchaseOrderStatus.ids_for(:processing).include?(purchase_order_status_id)
   end
-
+  
   def form_klass
     Forms::Router.klass(:purchase_orders)&.name
   end
