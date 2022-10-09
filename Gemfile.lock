@@ -95,6 +95,7 @@ GEM
     annotate (3.2.0)
       activerecord (>= 3.2, < 8.0)
       rake (>= 10.4, < 14.0)
+    ast (2.4.2)
     autoprefixer-rails (9.4.10.2)
       execjs
     awesome_print (1.8.0)
@@ -537,6 +538,8 @@ GEM
     parallel (1.22.1)
     paranoia (2.6.0)
       activerecord (>= 5.1, < 7.1)
+    parser (3.1.2.1)
+      ast (~> 2.4.1)
     parslet (1.8.2)
     posthog-ruby (1.3.0)
       concurrent-ruby
@@ -685,6 +688,8 @@ GEM
     saxlsx (1.10.0)
       ox (~> 2.1)
       rubyzip (~> 1.0)
+    scout_apm (5.3.1)
+      parser
     searchkick (4.6.3)
       activemodel (>= 5)
       elasticsearch (>= 6, < 7.14)
@@ -979,6 +984,7 @@ DEPENDENCIES
   rufus-scheduler (~> 3.6)
   sass-rails (~> 6.0)
   saxlsx (~> 1.9)
+  scout_apm
   searchkick (~> 4.4)
   sendgrid-ruby (~> 6.0)
   sentry-raven (~> 2.13)
