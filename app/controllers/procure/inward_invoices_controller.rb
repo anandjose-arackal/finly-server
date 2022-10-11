@@ -3,7 +3,7 @@ class Procure::InwardInvoicesController < BaseControllers::WebBase
 
   # this action is to create one from a purchase order
   def create_from_po
-    puts "DEBUG_ADVANCE::Inside controller"
+    Rails.logger.info("DEBUG_ADVANCE::Inside controller")
     @result = Procurements::Invoices::CreateFromPO.(current_user, params)
     # if @result.success?
     #   respond response: :success, message: @result.messages[:success]
