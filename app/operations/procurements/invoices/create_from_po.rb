@@ -12,7 +12,6 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
   end
 
   def init
-    Rails.logger.info("DEBUG_ADVANCE:: init")
     id = params[:id] || params[:procurement_id]
     self.procurement = user.company.procurements.find_by(id: id)
     self.purchase_order = self.procurement.purchase_order
@@ -163,16 +162,12 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         add_message :error, self.invoice.errors.full_messages
       end
     else
-      Rails.logger.info("DEBUG_ADVANCE")
       if self.invoice.save
         InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.invoice_params, nil, self.invoice)
         self.invoice.save
 
-        Rails.logger.info("DEBUG_ADVANCE::advance.present?-#{self.advance.present?}::params[:document_type].blank?-#{params[:document_type].blank?}::params[:document_type] != 'proforma_invoice'-#{params[:document_type] != 'proforma_invoice'}::self.po_adjusted_advance.value.zero?-#{self.po_adjusted_advance.value.zero?}::self.po_adjusted_advance_id.blank?-#{self.po_adjusted_advance_id.blank?}::self.purchase_order.advance_payments.present?-#{self.purchase_order.advance_payments.present?}")
-        Rails.logger.info("DEBUG_ADVANCE-#{(self.advance.present? && (params[:document_type].blank? && params[:document_type] != 'proforma_invoice')) && ((self.po_adjusted_advance.value.zero? || self.po_adjusted_advance_id.blank?) && self.purchase_order.advance_payments.present?)}")
         if self.advance.present? && (params[:document_type].blank? && params[:document_type] != 'proforma_invoice')
           if (self.po_adjusted_advance.value.zero? || self.po_adjusted_advance_id.blank?) && self.purchase_order.advance_payments.present?
-            Rails.logger.info("DEBUG_ADVANCE::Calling calculate_po_advance_old_logic")
             calculate_po_advance_old_logic
           end
         end
@@ -366,7 +361,6 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
 
   # TODO: remove this after all the accounts are migrated
   def set_invoice_parameters_old_logic
-    Rails.logger.info("DEBUG_ADVANCE::in set_invoice_parameters_old_logic")
     if self.procurement.blank? || self.purchase_order.blank?
       return nil
     end
@@ -898,7 +892,6 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
   end
 
   def calculate_po_advance_old_logic
-    Rails.logger.info("DEBUG_ADVANCE::calculate_po_advance_old_logic::self.advance = #{self.advance}")
     self.total_adjusted_advance = 0
     if self.last_invoice.present?
       self.total_adjusted_advance = self.last_invoice.po_prev_adjusted_advance.to_f + self.last_invoice.po_adjusted_advance&.value&.to_f
