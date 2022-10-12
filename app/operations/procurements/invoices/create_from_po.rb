@@ -59,6 +59,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     return if has_errors?
 
     if user.po_invoice_form_enabled && self.purchase_order&.forms_enabled
+      Rails.logger.info "in if of process::#{user.po_invoice_form_enabled}::#{self.purchase_order&.forms_enabled}"
       if self.invoice.save
         InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.invoice_params, nil, self.invoice)
 
@@ -162,6 +163,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         add_message :error, self.invoice.errors.full_messages
       end
     else
+      Rails.logger.info "in else of process::#{user.po_invoice_form_enabled}::#{self.purchase_order&.forms_enabled}"
       if self.invoice.save
         InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.invoice_params, nil, self.invoice)
         self.invoice.save
