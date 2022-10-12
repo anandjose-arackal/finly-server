@@ -435,8 +435,8 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       po_number: self.purchase_order.po_number,
       discount_type_id: self.purchase_order.discount_type_id,
       tds_slab_id: self.purchase_order.advance_tds_slab_id,
-      rcm_enabled: self.purchase_order.vendor.rcm_enabled
-
+      rcm_enabled: self.purchase_order.vendor.rcm_enabled,
+      form_migrated: false
     }
 
     if self.advance.present?
