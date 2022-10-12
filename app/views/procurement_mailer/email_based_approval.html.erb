@@ -54,12 +54,12 @@
                             </tr>
                             <tr style="font-weight: 400;border-bottom: 1px solid #F0F0F0; ">
                                 <th style="text-align:left;font-size: 14px;font-weight: 400;">Invoice Amount</th>
-                                <td style="font-size: 14px;text-align: right; padding: 10px 0 10px 0;"><%=@data.invoice.amount&.currency.country_code%>  <%=@data.invoice.amount&.value.to_f.round(2) %></td>
+                                <td style="font-size: 14px;text-align: right; padding: 10px 0 10px 0;"><%=@data.invoice.base_currency&y.country_code%>  <%=@data.invoice.amount&.value.to_f.round(2) %></td>
                               </tr>
                             </tr>
                             <tr style="font-weight: 600;border-bottom: 1px solid #F0F0F0; ">
                                 <th style=" text-align:left;font-size: 14px;font-weight: 600;">Net Payable Amount</th>
-                                <td style="font-size: 14px; text-align: right; padding: 10px 0 10px 0;"><%=@data.invoice.amount&.currency.country_code%>  <%=@data.invoice.net_amount&.value.to_f.round(2) %></td>
+                                <td style="font-size: 14px; text-align: right; padding: 10px 0 10px 0;"><%=@data.invoice.base_currency&.country_code%>  <%=@data.invoice.net_amount&.value.to_f.round(2) %></td>
                             </tr>
                           </table>
                 </div>
