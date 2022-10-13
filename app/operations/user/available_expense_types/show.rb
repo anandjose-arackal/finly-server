@@ -132,7 +132,12 @@ class User::AvailableExpenseTypes::Show < User::Base
       end
     end
 
-    load_custom_fields_config
+    if AvailableExpenseTypePfToggle.new(user).enabled?
+      load_custom_fields_config_faster
+    else
+      load_custom_fields_config
+    end
+
   end
 
   def load_custom_fields_config
@@ -143,6 +148,41 @@ class User::AvailableExpenseTypes::Show < User::Base
     self.custom_fields_config[:distance_expense] = configurations.with_parent_type(FieldParentType.id_for(:distance_expense)) if distance_config[:enabled]
     self.custom_fields_config[:time_expense] = configurations.with_parent_type(FieldParentType.id_for(:time_expense)) if time_config[:enabled]
     self.custom_fields_config[:per_diem_expense] = configurations.with_parent_type(FieldParentType.id_for(:per_diem_expense)) if per_diem_config[:enabled]
+  end
+
+
+  def load_custom_fields_config_faster
+    configurations = user.company.field_configurations.
+      joins(:parent_dependent_field_configuration_mappings).
+      includes(:field_type, :drop_down_items).
+      exclude_deleted.root_fields.order_created_at_desc.
+      with_parent_type(FieldParentType.expense_ids).
+      select('field_configurations.*, field_parent_mappings.field_parent_type_id as field_parent_type_id')
+
+    self.custom_fields_config = {
+      manual_expense: [],
+      card_expense: [],
+      distance_expense: [],
+      time_expense: [],
+      per_diem_expense: []
+    }
+
+    configurations.each do |config|
+      Rails.logger.debug config.field_name
+
+      case config.field_parent_type_id
+      when FieldParentType.id_for(:manual_expense)
+        self.custom_fields_config[:manual_expense] << config
+      when FieldParentType.id_for(:card_expense)
+        self.custom_fields_config[:card_expense] << config
+      when FieldParentType.id_for(:distance_expense)
+        self.custom_fields_config[:distance_expense] << config
+      when FieldParentType.id_for(:time_expense)
+        self.custom_fields_config[:time_expense] << config
+      when FieldParentType.id_for(:per_diem_expense)
+        self.custom_fields_config[:per_diem_expense] << config
+      end
+    end
   end
 
   def retrieve_policies

@@ -1,5 +1,16 @@
 class UsersController < BaseControllers::WebBase
 
+  unless Rails.env.production?
+    around_action :n_plus_one_detection
+
+    def n_plus_one_detection
+      Prosopite.scan
+      yield
+    ensure
+      Prosopite.finish
+    end
+  end
+
   skip_authentication_actions :lookup, :send_verification_otp, :verify_user_otp, :group_entities_login, :saml_validator
   before_action :load_global_variables, only: :lookup
 
