@@ -264,7 +264,7 @@ class Forms::Import::Processor
     failed_records = []
     if save_in_batches
       # save in batches
-      records_to_save.in_batches(10) do |batch|
+      records_to_save.in_groups_of(5) do |batch|
         begin
           records = records_to_save.map {|arr| arr[0] }
           results = self.model.import records
