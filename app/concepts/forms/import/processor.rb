@@ -269,12 +269,18 @@ class Forms::Import::Processor
           records = records_to_save.map {|arr| arr[0] }
           results = self.model.import records
           failed_records << results.failed_instances
+          Rails.logger.debug "FailedRecords::#{failed_records}"
+          p "FailedRecords::#{failed_records}"
           failed_import_records = records_to_save.map{|x| failed_records.include?(x[0]) ? x[1] : nil}
+          Rails.logger.debug "FailedImportRecords::#{failed_import_records}"
+          p "FailedImportRecords::#{failed_import_records}"
           failed_import_records.each do |failed_record|
             failed_record.update_status(false, 'Unable to process', exception.message, exception.backtrace)
           end
 
           finished_records = records_to_save.map{|x| (records-failed_records).include?(x[0]) ? x : nil}
+          Rails.logger.debug "FinishedRecords::#{finished_records}"
+          p "FinishedRecords::#{finished_records}"
           finished_records.each do |finished_record, finished_import_record|
             finished_import_record.update_status(true, result.messages[:success].to_s, '', '')
             finished_import_record.document = finished_record
