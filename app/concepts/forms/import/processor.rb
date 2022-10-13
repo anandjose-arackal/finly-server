@@ -287,8 +287,10 @@ class Forms::Import::Processor
             finished_import_record.save!
           end
           Rails.logger.info "BulkImport::FailedRecords-#{failed_records}"
+          p "BulkImport::FailedRecords-#{failed_records}"
         rescue => exception
           Rails.logger.debug "Batch failed::#{batch}::#{exception}"
+          p "Batch failed::#{batch}::#{exception}"
           save_records(import_job, batch, false)
         end
       end
