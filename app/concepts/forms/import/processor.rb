@@ -272,6 +272,7 @@ class Forms::Import::Processor
           Rails.logger.debug "FailedRecords::#{failed_records}"
           p "FailedRecords::#{failed_records}"
           failed_import_records = records_to_save.map{|x| failed_records.include?(x[0]) ? x[1] : nil}
+          failed_import_records.reject!(&:nil?)
           Rails.logger.debug "FailedImportRecords::#{failed_import_records}"
           p "FailedImportRecords::#{failed_import_records}"
           failed_import_records.each do |failed_record|
@@ -291,7 +292,6 @@ class Forms::Import::Processor
         rescue => exception
           Rails.logger.debug "Batch failed::#{batch}::#{exception}"
           p "Batch failed::#{batch}::#{exception}"
-          save_records(import_job, batch, false)
         end
       end
     else
