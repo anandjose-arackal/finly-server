@@ -1,12 +1,10 @@
 class Forms::Import::Processor
-  attr_accessor :form, :user, :export_processor, :is_import_submission_stage, :model
+  attr_accessor :form, :user, :export_processor
 
   def initialize(form, user)
     self.form = form
     self.user = user
-    self.model = form.model
     self.export_processor = Forms::Export::Processor.(form, user)
-    self.is_import_submission_stage = false
   end
 
   def self.call(form, user)
@@ -26,111 +24,69 @@ class Forms::Import::Processor
   end
 
   def build_import_template
-    export_base = self.export_processor.build_export_base("#{form.label}_template")
+    file = Tempfile.new([form.model.name, '.xlsx'])
+    workbook  = ::WriteXLSX.new(file, strings_to_urls: false)
 
-    file = export_base[:file]
-    workbook = export_base[:workbook]
-    worksheets = export_base[:worksheets]
+    worksheets = {}
+    worksheets_length = Hash.new(0)
 
-    self.export_processor.set_lookup_content_in_export(workbook)
-    self.export_processor.add_xlookup_for_ids(workbook)
+    self.headers.values.each do |sheet_data|
+      sheet_name = sheet_data[:name]
+      sheet_key = sheet_data[:key]
+      worksheets[sheet_key] = workbook.add_worksheet(sheet_name)
+      worksheets_length[sheet_key] = 0
+      self.headers[sheet_key][:headers].values.each_with_index do |header_data, header_index|
+        worksheets[sheet_key].set_column(header_index, header_index, header_data[:name].length+10)
+        worksheets[sheet_key].write(0, header_index, header_data[:name])
+      end
+    end
+
+    lookup_content.each_with_index do |content, index|
+      worksheet = workbook.add_worksheet(content[:name])
+
+      sheet_header_keys = []
+
+      if content[:data][:headers].present?
+        content[:data][:headers].each_with_index do |key_value, index|
+          sheet_header_keys << key_value[0]
+          worksheet.set_column(index, index, key_value[1][:label].length+10)
+          worksheet.write(0, index, key_value[1][:label])
+        end
+      elsif content[:data][:choices].first.present?
+        content[:data][:choices].first.each_with_index do |key_value, index|
+          sheet_header_keys << key_value[0]
+          worksheet.set_column(index, index, key_value[0].titleize.length+10)
+          worksheet.write(0, index, key_value[0].titleize)
+        end
+      end
+
+      content[:data][:choices].each_with_index do |row, row_index|
+        sheet_header_keys.each_with_index do |header_key, header_index|
+          worksheet.write(1 + row_index, header_index, row[header_key.to_sym])
+        end
+      end
+    end
 
     workbook.close
+
     file.rewind
 
     temp_file = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 1.day)
     temp_file.file
   end
 
-  def process_meta_data(import_job)
-    attachment_keys = {}
-    display_keys = {}
-    self.headers.each do |key1, value1|
-      key1 = 'main' if key1 == form.model.name
-      attachment_keys[key1] = []
-      display_keys[key1] = []
-      value1[:headers].each do |key2, value2|
-        if value2[:entity_type] == 'attachment'
-          attachment_keys[key1] << value2[:name]
-        end
-
-        if value2[:entity]&.display_key
-          display_keys[key1] << value2[:name]
-        end
-      end
-    end
-
-    import_job.update(meta_data: {
-      attachment_keys: attachment_keys,
-      display_keys: display_keys,
-    })
-  end
-
-  def process_admin_import(request, attachments: nil)
-    self.is_import_submission_stage = true
-
+  def process_import(request, attachments: nil)
     path = Rails.env.production? ? request.request_file&.url : request.request_file&.path
     imported_sheet = Roo::Spreadsheet.open(path)
 
-    export_base = self.export_processor.build_export_base(form.label)
+    file = Tempfile.new([form.model.name, '.xlsx'])
+    workbook = ::WriteXLSX.new(file, strings_to_urls: false)
 
-    file = export_base[:file]
-    workbook = export_base[:workbook]
-    worksheets = export_base[:worksheets]
-    worksheets_length = Hash.new(0)
-
-    worksheets[form.model.name].write(0, self.headers[form.model.name][:headers].keys.count, "Message")
-
-    records_data = build_records_data(imported_sheet)
-    records_data.each_with_index do |record_data, row_index|
-      begin
-        form_data = build_form_data(record_data[:record_data], nil)
-        result = process_form_data(form_data)
-        raise unless result.present?
-
-        if result.success?
-          message = result.messages[:success].to_s
-          request.item_complete(true)
-        else
-          message = result.messages[:errors].to_s
-          request.item_complete(false)
-        end
-      rescue => exception
-        message = "Unable to process"
-      end
-
-      add_record_to_result_file(record_data[:record_data], result[:model].id, message, worksheets, worksheets_length)
+    data_headers = {}
+    self.headers.values.each do |sheet_data|
+      data_headers[sheet_data[:name]] = sheet_data[:key]
     end
 
-    workbook.close
-
-    file.rewind
-
-    request.result_file = file
-    request.save
-    request.progress_update(:completed)
-  end
-
-  def preprocess_import_job(import_job)
-    path = Rails.env.production? ? import_job.attachment&.url : import_job.attachment&.path
-    imported_sheet = Roo::Spreadsheet.open(path)
-
-    records_data = build_records_data(imported_sheet)
-    records_data.each do |record_data|
-      record_data.merge!({
-        company_id: import_job.company_id,
-        import_job_id: import_job.id,
-        status_id: ImportRecordStatus.id_for(:pending),
-      })
-    end
-
-    ImportRecord.insert_all!(records_data)
-    import_job.update(status_id: ImportJobStatus.id_for(:pending), total_records: records_data.count)
-
-    records_data
-  end
-
-  def build_nested_data(imported_sheet, data_headers)
     nested_data = {}.with_indifferent_access
 
     imported_sheet.each_with_pagename do |sheet_name, sheet|
@@ -148,46 +104,72 @@ class Forms::Import::Processor
           row_data[worksheet_headers[index]] = value
         end
 
-        row_data['_ref'] = UUIDTools::UUID.timestamp_create().to_s.upcase
-
-        # FE uses this for indexing
-        row_data['id'] = row_data['_ref']
-        row_data['collection_id'] = row_data['_ref']
+        data = {}.with_indifferent_access
 
         header_details = headers[data_headers[sheet_name]][:headers]
 
-        if row_data[header_details[:parent_id][:name]].present? || row_data[header_details[:parent_sequence_number][:name]].present?
-          key = row_data[header_details[:parent_id][:name]]
-          key = "Seq#{row_data[header_details[:parent_sequence_number][:name]]}" unless key.present?
+        existing_record = nil
+        if row_data[header_details[:id][:name]].present?
+          existing_record = headers[data_headers[sheet_name]][:entity].populate_if_empty&.find(row_data[header_details[:id][:name]])
+        end
+        header_details.values.each do |header_data|
+          if ['dropdown'].include?(header_data[:entity_type])
+            choice = header_data[:entity].choices_scope.find_by_id(row_data[header_data[:name]], user: user)
+            if choice.present?
+              if choice.respond_to?(:dig)
+                choice_id = choice&.dig(:id)
+              else
+                choice_id = choice&.id
+              end
+              data[header_data[:entity_key]] = parse_value(choice_id, header_data[:entity])
+            end
+          elsif ['lookup'].include?(header_data[:entity_type])
+            data[header_data[:entity_key]] = parse_value(header_data[:entity].choices_scope.find_by_id(row_data[header_data[:name]], user: user)&.id, header_data[:entity])
+          elsif ['attachment'].include?(header_data[:entity_type])
+            if existing_record.present?
+              field = existing_record.form_custom_fields.joins(:form_entity).where("form_entities.entity_key = ?", header_data[:entity_key]).first
+              data[header_data[:entity_key]] = field.attachments.as_json if field.present?
+            else
+              data[header_data[:entity_key]] = []
+            end
+            if attachments.present? && row_data[header_data[:name]].present?
+              filenames = row_data[header_data[:name]].split("\n")
+              filenames.each do |filename|
+                if attachments[filename].present?
+                  data[header_data[:entity_key]] << attachments[filename].as_json
+                end
+              end
+            end
+          else
+            data[header_data[:entity_key]] = parse_value(row_data[header_data[:name]], header_data[:entity])
+          end
+        end
+
+        unless data[:id].present?
+          data.delete(:id)
+        end
+
+        if data[:parent_id].present? || data[:parent_sequence_number].present?
+          key = data[:parent_id].to_s
+          key = "Seq#{data[:parent_sequence_number]}" unless key.present?
           nested_data[data_headers[sheet_name]][key] = [] unless nested_data[data_headers[sheet_name]][key].present?
-          nested_data[data_headers[sheet_name]][key] << row_data
+          nested_data[data_headers[sheet_name]][key] << data
         end
       end
     end
-    nested_data
-  end
-
-  def build_records_data(imported_sheet)
-    data_headers = {}
-    self.headers.values.each do |sheet_data|
-      data_headers[sheet_data[:name]] = sheet_data[:key]
-    end
-
-    records_data = []
-
-    nested_data = build_nested_data(imported_sheet, data_headers)
 
     imported_sheet.each_with_pagename do |sheet_name, sheet|
+      worksheet = workbook.add_worksheet(sheet_name)
+
       worksheet_headers = sheet.row(1)
       if sheet_name == form.label
         worksheet_headers << 'Message'
       end
 
-      # No idea whats happening here
-      # worksheet_headers.each_with_index do |header_name, header_index|
-      #   worksheet.set_column(header_index, header_index, (header_name&.length.to_i) +10)
-      #   worksheet.sheet.write(0, header_index, header_name)
-      # end
+      worksheet_headers.each_with_index do |header_name, header_index|
+        worksheet.set_column(header_index, header_index, (header_name&.length.to_i) +10)
+        worksheet.write(0, header_index, header_name)
+      end
 
       if sheet_name == form.label
         (2..sheet.last_row).each do |index|
@@ -196,24 +178,49 @@ class Forms::Import::Processor
           row.each_with_index do |value, column_index|
             row_data[worksheet_headers[column_index]] = value
           end
-          # row_data = {
-          #   ...
-          #   "Vendor Country Id": 'India'
-          #   ...
-          # }
-
-          row_data['_ref'] = UUIDTools::UUID.timestamp_create().to_s.upcase
 
           header_details = headers[data_headers[sheet_name]][:headers]
 
-          nested_data.keys.each do |key|
-            if row_data[header_details[:id][:name]].present?
-              row_data[key] = nested_data[key][row_data[header_details[:id][:name]]].to_s
-            elsif row_data[header_details[:import_sequence_number][:name]].present?
-              row_data[key] = nested_data[key]["Seq#{row_data[header_details[:import_sequence_number][:name]]}"]
-            end
+          existing_record = nil
+          if row_data[header_details[:id][:name]].present?
+            existing_record = form.model.find(row_data[header_details[:id][:name]])
           end
 
+<<<<<<< Updated upstream
+          form_data = {}.with_indifferent_access
+          header_details.values.each do |header_data|
+            if ['dropdown'].include?(header_data[:entity_type])
+              choice = header_data[:entity].choices_scope.find_by_id(row_data[header_data[:name]], user: user)
+              if choice.present?
+                if choice.respond_to?(:dig)
+                  choice_id = choice&.dig(:id)
+                else
+                  choice_id = choice&.id
+                end
+                form_data[header_data[:entity_key]] = parse_value(choice_id, header_data[:entity])
+              end
+            elsif ['lookup'].include?(header_data[:entity_type])
+              form_data[header_data[:entity_key]] = parse_value(header_data[:entity].choices_scope.find_by_id(row_data[header_data[:name]], user: user)&.id, header_data[:entity])
+            elsif ['attachment'].include?(header_data[:entity_type])
+              if existing_record.present?
+                field = existing_record.form_custom_fields.joins(:form_entity).where("form_entities.entity_key = ?", header_data[:entity_key]).first
+                form_data[header_data[:entity_key]] = field.attachments.as_json if field.present?
+              else
+                form_data[header_data[:entity_key]] = []
+              end
+              if attachments.present? && row_data[header_data[:name]].present?
+                filenames = row_data[header_data[:name]].split("\n")
+                filenames.each do |filename|
+                  if attachments[filename].present?
+                    form_data[header_data[:entity_key]] << attachments[filename].as_json
+                  end
+                end
+              end
+            else
+              form_data[header_data[:entity_key]] = parse_value(row_data[header_data[:name]], header_data[:entity])
+            end
+          end
+=======
           records_data << {
             uuid: row_data['_ref'],
             record_data: row_data,
@@ -244,7 +251,6 @@ class Forms::Import::Processor
         raise unless result.present?
         if result.success?
           records_to_save << [result[:model], import_record]
-          # import_job.item_complete(true)
           # import_record.update_status(true, result.messages[:success].to_s, '', '')
           # import_record.document = result[:model]
           # import_record.save!
@@ -258,22 +264,36 @@ class Forms::Import::Processor
       end
     end
 
-    save_records(records_to_save)
+    save_records(import_job, records_to_save)
 
     generate_result_file(import_job)
     import_job.progress_update(:completed)
   end
 
-  def save_records(records_to_save, save_in_batches = true)
+  def save_records(import_job, records_to_save, save_in_batches = true)
+    failed_records = []
     if save_in_batches
       # save in batches
       records_to_save.in_batches(10) do |batch|
         begin
           records = records_to_save.map {|arr| arr[0] }
           results = self.model.import records
+          failed_records << results.failed_instances
+          failed_import_records = records_to_save.map{|x| failed_records.include?(x[0]) ? x[1] : nil}
+          failed_import_records.each do |failed_record|
+            failed_record.update_status(false, 'Unable to process', exception.message, exception.backtrace)
+          end
+
+          finished_records =  records_to_save.map{|x| (records-failed_records).include?(x[0]) ? x : nil}
+          finished_records.each do |finished_record, finished_import_record|
+            finished_import_record.update_status(true, result.messages[:success].to_s, '', '')
+            finished_import_record.document = finished_record
+            finished_import_record.save!
+          end
+          Rails.logger.info "BulkImport::FailedRecords-#{failed_records}"
         rescue => exception
           Rails.logger.debug "Batch failed::#{batch}::#{exception}"
-          save_records(batch, false)
+          save_records(import_job, batch, false)
         end
       end
     else
@@ -285,8 +305,14 @@ class Forms::Import::Processor
           import_entity.save!
         rescue => exception
           import_record.update_status(false, 'Unable to process', exception.message, exception.backtrace)
+          import_job.item_complete(false)
         end
       end
+    end
+    if failed_instances.nil?
+      import_job.item_complete(true)
+    else
+      import_job.item_complete(false)
     end
   end
 
@@ -302,260 +328,143 @@ class Forms::Import::Processor
     import_job.records.each do |import_record|
       add_record_to_result_file(import_record.record_data, import_record.document&.id, import_record.message, worksheets, worksheets_length)
     end
+>>>>>>> Stashed changes
+
+          nested_data.keys.each do |key|
+            if form_data[:id].present?
+              form_data[key] = nested_data[key][form_data[:id]] || []
+            elsif form_data[:import_sequence_number].present?
+              form_data[key] = nested_data[key]["Seq#{form_data[:import_sequence_number]}"] || []
+            end
+          end
+
+          form_data[:form] = form
+          form_data[:is_import_process] = true
+
+          if form_data[:id].present?
+            form_data[:record_query] = { id: form_data[:id] }
+          end
+
+          # byebug
+          result = Forms::Import::Ops::Create.(params: form_data, current_user: user)
+          if result.success?
+            request.item_complete(true)
+            row[1] = result[:model].id
+            row << result.messages[:success].to_s
+          else
+            request.item_complete(false)
+            row << result.messages[:errors].to_s
+          end
+          worksheet_headers.each_with_index do |header_name, header_index|
+            worksheet.write(index - 1, header_index, row[header_index])
+          end
+        end
+      else
+        (2..sheet.last_row).each do |index|
+          row = sheet.row(index)
+          worksheet_headers.each_with_index do |header_name, header_index|
+            worksheet.write(index - 1, header_index, row[header_index])
+          end
+        end
+      end
+    end
+
+    # imported_sheet.each_with_pagename do |sheet_name, sheet|
+    #   worksheet = workbook.add_worksheet(sheet_name)
+
+    #   worksheet_headers = sheet.row(1)
+    #   if sheet_name == form.model.name
+    #     worksheet_headers << 'Message'
+    #   end
+
+    #   worksheet_headers.each_with_index do |header_name, header_index|
+    #     worksheet.write(0, header_index, header_name)
+    #   end
+
+    #   if sheet_name == form.model.name
+
+    #     request.update(requested_items: sheet.last_row - 1)
+
+    #     (2..sheet.last_row).each do |index|
+    #       row = sheet.row(index)
+    #       result = process_row(row, worksheet_headers)
+    #       if result.success?
+    #         request.item_complete(true)
+    #         row[0] = result[:model].id
+    #         row << result.messages[:success].to_s
+    #       else
+    #         request.item_complete(false)
+    #         row << result.messages[:errors].to_s
+    #       end
+    #       worksheet_headers.each_with_index do |header_name, header_index|
+    #         worksheet.write(index - 1, header_index, row[header_index])
+    #       end
+    #     end
+    #   else
+    #   end
+    # end
 
     workbook.close
+
     file.rewind
 
-    import_job.result_file = file
-    import_job.save
+    request.result_file = file
+    request.save
+    request.progress_update(:completed)
   end
 
-  def add_record_to_result_file(record_data, document_id, message, worksheets, worksheets_length)
-    self.headers.values.each do |sheet_data|
-      sheet_name = sheet_data[:name]
-      sheet_key = sheet_data[:key]
-      if sheet_key == form.model.name
-        worksheets_length[sheet_key] += 1
-        self.headers[sheet_key][:headers].keys.each_with_index do |key, header_index|
-          column_data = record_data[self.headers[sheet_key][:headers][key][:name]]
-          if key.to_s == 'id' and document_id.present?
-            column_data = document_id
-          end
-
-          if column_data.is_a?(Array) && column_data.present? && column_data[0].is_a?(Hash) && column_data[0].has_key?(:url)
-            column_data = (column_data.map { |d| d[:url] }).join("\n")
-          end
-          worksheets[sheet_key].write(worksheets_length[sheet_key], header_index, column_data)
-        end
-        worksheets[sheet_key].write(worksheets_length[sheet_key], self.headers[form.model.name][:headers].keys.count, message)
-      else
-        parent_data = record_data
-        record_data[sheet_key]&.each do |child_data|
-          worksheets_length[sheet_key] += 1
-          self.headers[sheet_key][:headers].keys.each_with_index do |key, header_index|
-            column_data = child_data[self.headers[sheet_key][:headers][key][:name]]
-            if key.to_s == 'parent_id'
-              if document_id.present?
-                column_data = document_id
-              else
-                column_data = parent_data[self.headers[sheet_key][:headers][:id][:name]]
-              end
-            end
-            if column_data.is_a?(Array) && column_data.present? && column_data[0].is_a?(Hash) && column_data[0].has_key?(:url)
-              column_data = (column_data.map { |d| d[:url] }).join("\n")
-            end
-            worksheets[sheet_key].write(worksheets_length[sheet_key], header_index, column_data)
-          end
-        end
-      end
-    end
-  end
-
-  def preprocess_import_record(import_record)
-    if import_record.processed_data.nil?
-      form_data = build_form_data(import_record.record_data, import_record)
-    else
-      form_data = import_record.processed_data.with_indifferent_access
+  def process_row(row, worksheet_headers)
+    header_keys = {}
+    headers.each do |key, value|
+      header_keys[value] = key
     end
 
-    form_data
-  end
+    row_data = {}.with_indifferent_access
+    row.each_with_index do |value, index|
+      row_data[header_keys[worksheet_headers[index]]] = value
+    end
 
-  def process_import_record(import_record)
-    form_data = preprocess_import_record(import_record)
-    process_form_data(form_data)
-  end
-
-  def build_form_data(record_data, import_record)
-    form_data = {}.with_indifferent_access
-
-    row_data = record_data.with_indifferent_access
-
-    header_details = headers[form.model.name][:headers]
+    form_data = { id: row_data[:id] }.with_indifferent_access
 
     existing_record = nil
-    if row_data[header_details[:id][:name]].present?
-      existing_record = form.model.find(row_data[header_details[:id][:name]])
-    end
-        
-    old_form_data = nil
-    if existing_record.present?
-      old_form_data = existing_record.form_data(form).with_indifferent_access
+    if row_data[:id].present?
+      existing_record = form.model.find(row_data[:id])
     end
 
-    header_details.values.each do |header_data|
-      next if header_data[:import_skip]
+    form_sections.each do |section|
+      section.entities.each do |entity|
+        next unless entity.parent_id.blank?
+        next if entity.type == 'FormEntity::Attachment'
 
-      if ['attachment'].include?(header_data[:entity_type])
-        form_data[header_data[:entity_key]] = get_attachment_entity_value(row_data[header_data[:name]], row_data['_ref'], header_data[:name], header_data[:entity_key], existing_record, import_record)
-      elsif ['lookup', 'dropdown'].include?(header_data[:entity_type])
-        choice_data = get_entity_value(row_data[header_data[:name]], header_data[:entity], header_data[:entity_type])
-        if choice_data.present?
-          form_data[header_data[:entity_key]] = choice_data[:id]
-          form_data["#{header_data[:entity_key]}_value"] = choice_data[:value]
-        end
-      else
-        form_data[header_data[:entity_key]] = get_entity_value(row_data[header_data[:name]], header_data[:entity], header_data[:entity_type])
+        form_data.merge!(get_entity_value(row_data, entity, existing_record))
       end
     end
 
-    headers[form.model.name][:nested_entities].each do |nested_entity|
-      nested_data = row_data.delete(nested_entity.entity_key)
-      unless nested_data.present?
-        nested_data = []
-      end
-
-      form_nested_data = []
-
-      nested_data.each do |nested_row|
-        data = {}.with_indifferent_access
-        header_details = headers[nested_entity.entity_key][:headers]
-
-        existing_record = nil
-        if nested_row[header_details[:id][:name]].present?
-          existing_record = headers[nested_entity.entity_key][:entity].populate_if_empty&.find(nested_row[header_details[:id][:name]])
-        end
-
-        header_details.values.each do |header_data|
-          next if header_data[:import_skip]
-
-          if ['attachment'].include?(header_data[:entity_type])
-            data[header_data[:entity_key]] = get_attachment_entity_value(nested_row[header_data[:name]], nested_row['_ref'], header_data[:name], header_data[:entity_key], existing_record, import_record)
-          elsif ['lookup', 'dropdown'].include?(header_data[:entity_type])
-            choice_data = get_entity_value(nested_row[header_data[:name]], header_data[:entity], header_data[:entity_type])
-            if choice_data.present?
-              data[header_data[:entity_key]] = choice_data[:id]
-              data["#{header_data[:entity_key]}_value"] = choice_data[:value]
-            end
-          else
-            data[header_data[:entity_key]] = get_entity_value(nested_row[header_data[:name]], header_data[:entity], header_data[:entity_type])
-          end
-        end
-
-        if data[:id].present?
-          data[:collection_id] = data[:id]
-        else
-          data[:id] = UUIDTools::UUID.timestamp_create.to_s.upcase
-          data[:collection_id] = data[:id]
-        end
-
-        form_nested_data << data
-      end
-
-      # if form_data is generated before submission process and existing nested records are missing in excel sheet, add them to form data to show them in Review page of bulk import process
-      # if form_data is generated during submission process, we don't need to explicitly add existing records as they will be kept as it is.
-      unless self.is_import_submission_stage
-        if old_form_data.present? and old_form_data[nested_entity.entity_key].present?
-          nested_ids = []
-          form_nested_data.each do |n_data|
-            next unless n_data[:id].present?
-            nested_ids << n_data[:id]
-          end
-
-          old_form_data[nested_entity.entity_key].each do |old_n_data|
-            next if nested_ids.include?(old_n_data[:id])
-            next if nested_ids.include?(old_n_data[:id].to_s)
-
-            form_nested_data << old_n_data
-          end
-        end
-      end
-
-      form_data[nested_entity.entity_key] = form_nested_data
-    end
-
-    form_data
-  end
-
-  def process_form_data(form_data)
     form_data[:form] = form
-    form_data[:is_import_process] = true
 
     if form_data[:id].present?
       form_data[:record_query] = { id: form_data[:id] }
     end
 
-    result = Forms::Import::Ops::Create.(params: form_data, current_user: user)
-
-    return result
+    Forms::Import::Ops::Create.(params: form_data, current_user: user)
   end
 
-  def get_entity_value(raw_value, entity, entity_type)
-    if ['dropdown'].include?(entity_type)
-      get_dropdown_entity_value(raw_value, entity)
-    elsif ['lookup'].include?(entity_type)
-      get_lookup_entity_value(raw_value, entity)
-    elsif ['attachment'].include?(entity_type)
-      raise "process attachment using 'get_attachment_entity_value' method"
+  def get_entity_value(row_data, entity, existing_record)
+    data = {}.with_indifferent_access
+    return data if entity.entity_type == 'attachment'
+
+    if entity.entities.blank?
+      data[entity.entity_key.to_s] = parse_value(row_data[entity.entity_path], entity)
     else
-      parse_value(raw_value, entity)
-    end
-  end
-
-  def get_dropdown_entity_value(raw_value, entity)
-    return unless raw_value
-
-    choice = entity.choices_scope.find_by_id(raw_value, user: user)
-    return unless choice.present?
-
-    if choice.respond_to?(:dig)
-      choice_id = choice&.dig(:id)
-      choice_value = choice&.dig(:name)
-    else
-      choice_id = choice&.id
-      choice_value = choice&.name
+      children_data = {}.with_indifferent_access
+      record_finder_query = {}
+      entity.entities.each do |child_entity|
+        children_data.merge!(get_entity_value(row_data, child_entity, existing_record))
+      end
+      data[entity.entity_key.to_s] = [children_data]
     end
 
-    {
-      id: parse_value(choice_id, entity),
-      value: choice_value,
-    }.with_indifferent_access
-  end
-
-  def get_lookup_entity_value(raw_value, entity)
-    return unless raw_value
-
-    choice = entity.choices_scope.find_by_id(raw_value, user: user)
-    return unless choice.present?
-
-    choice_name = nil
-    if choice.respond_to?(:name)
-      choice_value = choice.name
-    elsif choice.respond_to?(:display_name)
-      choice_value = choice.display_name
-    end
-
-    {
-      id: parse_value(choice.id, entity),
-      value: choice_value,
-    }.with_indifferent_access
-  end
-
-  def get_attachment_entity_value(raw_value, reference_id, header_name, entity_key, existing_record, import_record)
-    atts_json = []
-
-    if existing_record.present?
-      field = existing_record.form_custom_fields.joins(:form_entity).where("form_entities.entity_key = ?", entity_key).first
-      atts_json = field.attachments.as_json if field.present?
-    end
-
-    return atts_json unless import_record.present?
-
-    atts = import_record.import_job.import_job_attachments.where(identifier: "#{reference_id}_#{header_name}")
-
-    if raw_value.present?
-      atts = atts.or(import_record.import_job.import_job_attachments.where(identifier: raw_value.split("\n")))
-    end
-
-    atts.each do |att|
-      attachment = CustomFieldAttachment.new
-      attachment.attachment = att.attachment
-      attachment.save
-      
-      atts_json << attachment.as_json
-    end
-
-    atts_json
+    data
   end
 
   def parse_value(value, entity)
