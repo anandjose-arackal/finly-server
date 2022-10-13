@@ -299,7 +299,7 @@ class Forms::Import::Processor
         end
       end
     end
-    if failed_instances.nil?
+    if failed_records.nil?
       import_job.item_complete(true)
     else
       import_job.item_complete(false)
