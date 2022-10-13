@@ -92,6 +92,7 @@ class Masters::Schema::Entity::Contract < Reform::Form
   property :can_be_destroyed, deserializer: -> (input, represented, **) {
     represented.can_be_destroyed = true unless represented.system_entity
   }
+  property :do_not_show_in_data_cards
 
   def choices!(collection:, fragment:, index:, options:, **)
     choice = collection.find {|choice| fragment["id"].present? and (choice.key.to_s == fragment["id"].to_s) }
@@ -111,7 +112,7 @@ class Masters::Schema::Entity::Contract < Reform::Form
   validates :entity_key, presence: true
   # validates_uniqueness_of :entity_key, scope: [:master_schema]
   validates :label, presence: true
-
+  
   validate :primary_key_should_be_unique
   validate :primary_key_should_be_required
   validate :cannot_deactivate_primary_key

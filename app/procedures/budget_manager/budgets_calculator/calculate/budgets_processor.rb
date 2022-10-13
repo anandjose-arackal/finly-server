@@ -7,7 +7,9 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsProcessor
   end
 
   def save_trail
-
+    self.trail_hash.keys.each do |k| 
+      self.trail_hash[k.to_sym] = 0 if self.trail_hash[k.to_sym].is_a?(Float) && self.trail_hash[k.to_sym]&.nan?
+    end
     if self.trail_hash[:id].present?
       budget_trail = BudgetTrail.find_by(id: self.trail_hash[:id])
       budget_trail.update(self.trail_hash)

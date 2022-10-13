@@ -193,7 +193,10 @@ class PurchaseOrderExposure < Exposures::API
   attribute :po_advance_amount,  record_attribute: true
   attribute :po_advance_tds_percentage,  record_attribute: true
   attribute :po_requested_advance_amount,  record_attribute: true
-
+  attribute :bank_account, record_attribute: true, exposure: true,  includes: [:bank_account]
+  attribute :latest_invoice, includes: [procurement: :invoices] do
+    record.procurement.invoices.first
+  end
   attribute :purchase_order_comments, includes: [:comments] do
     comment_texts =[]
     record.comments.each do |comment|

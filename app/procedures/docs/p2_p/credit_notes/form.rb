@@ -5,9 +5,9 @@ class Docs::P2P::CreditNotes::Form < Forms::API
   meta ->(record) {
     {
       created_by: {
-        id: '{{record.creator.id}}',
-        name: '{{record.creator.name}}',
-        email: '{{record.creator.email}}'
+        id: record.creator&.id,
+        name: record.creator&.name,
+        email: record.creator&.email
       }
     }
   }
@@ -119,9 +119,9 @@ class Docs::P2P::CreditNotes::Form < Forms::API
       text :item_number, label: 'Item Code', editable: false, can_editable_be_changed: false,
            computed: Forms::Compute::Lookup('items.invoice_item_id', '{{record.item_number}}')
       text :comment, label: 'Comment', editable: true, visible: true, required: false
-      amount :original_quantity, label: 'Original Quantity', can_editable_be_changed: false,
+      number :original_quantity, label: 'Original Quantity', can_editable_be_changed: false,
              editable: false, visible: true
-      amount :quantity, label: 'Credit Note Quantity',
+      number :quantity, label: 'Credit Note Quantity',
              editable: true, visible: true, computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:quantity])
       amount :original_rate, label: 'Original Rate', editable: false, required: false, visible: true, can_editable_be_changed: false
       amount :rate, label: 'Credit Note Rate', editable: false, required: false, visible: true, computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:rate])

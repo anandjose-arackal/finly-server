@@ -1,3 +1,4 @@
+require 'rmagick'
 class Attachments::CreateCustomFieldAttachment < Attachments::Base
 
   attr_accessor :attachment
@@ -8,6 +9,8 @@ class Attachments::CreateCustomFieldAttachment < Attachments::Base
   def process
     self.attachment = CustomFieldAttachment.new
     self.attachment.attachment = params[:file]
+    self.attachment.pdf_preview = create_preview(params[:file]) if params[:file].content_type == "application/pdf"
+
     # self.attachment.creator_id = user.id
     # self.attachment.company = user.company
     # self.attachment.resource_type = params[:resource_type] if params[:resource_type].present?
@@ -24,6 +27,16 @@ class Attachments::CreateCustomFieldAttachment < Attachments::Base
   def success
     params[:attachment] = self.attachment
     Attachments::CreateCustomFieldAttachment::CreatePresenter.new(user, params, messages)
+  end
+
+  private
+
+  def create_preview(file)
+    pdf_path = file&.tempfile&.path.to_s + "[0]"
+    pdf_page = Magick::Image.read( pdf_path ).first 
+    temp_file = Tempfile.new(['tmp', '.png'])
+    pdf_page.write( temp_file.path )
+    temp_file
   end
 
   class Attachments::CreateCustomFieldAttachment::CreatePresenter < BaseOperation::BasePresenter::SuccessPresenter
