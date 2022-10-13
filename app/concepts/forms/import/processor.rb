@@ -254,7 +254,7 @@ class Forms::Import::Processor
         import_record.update_status(false, 'Unable to process', exception.message, exception.backtrace)
       end
     end
-    save_records(import_job, records_to_save)
+    save_records(import_job, records_to_save, true)
 
     generate_result_file(import_job)
     import_job.progress_update(:completed)
@@ -288,7 +288,7 @@ class Forms::Import::Processor
       end
     else
       # save one by one
-      batch.each do |record|
+      records_to_save.each do |record|
         import_entity = record[0]
         import_record = record[1]
         begin
