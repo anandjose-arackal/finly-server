@@ -132,8 +132,8 @@ class User::AvailableExpenseTypes::Show < User::Base
       end
     end
 
-    if AvailableExpenseTypePfToggle.new(user).enabled?
-      load_custom_fields_config_faster
+    if EmFieldConfigCacheToggle.new(user).enabled?
+      load_custom_fields_config_from_cache
     else
       load_custom_fields_config
     end
@@ -151,37 +151,15 @@ class User::AvailableExpenseTypes::Show < User::Base
   end
 
 
-  def load_custom_fields_config_faster
-    configurations = user.company.field_configurations.
-      joins(:parent_dependent_field_configuration_mappings).
-      includes(:field_type, :drop_down_items).
-      exclude_deleted.root_fields.order_created_at_desc.
-      with_parent_type(FieldParentType.expense_ids).
-      select('field_configurations.*, field_parent_mappings.field_parent_type_id as field_parent_type_id')
+  def load_custom_fields_config_from_cache
+    cache = ExpenseTypeFieldConfigCache.new user
+    custom_fields_config_json = cache.custom_fields_config_json
 
-    self.custom_fields_config = {
-      manual_expense: [],
-      card_expense: [],
-      distance_expense: [],
-      time_expense: [],
-      per_diem_expense: []
-    }
-
-    configurations.each do |config|
-      Rails.logger.debug config.field_name
-
-      case config.field_parent_type_id
-      when FieldParentType.id_for(:manual_expense)
-        self.custom_fields_config[:manual_expense] << config
-      when FieldParentType.id_for(:card_expense)
-        self.custom_fields_config[:card_expense] << config
-      when FieldParentType.id_for(:distance_expense)
-        self.custom_fields_config[:distance_expense] << config
-      when FieldParentType.id_for(:time_expense)
-        self.custom_fields_config[:time_expense] << config
-      when FieldParentType.id_for(:per_diem_expense)
-        self.custom_fields_config[:per_diem_expense] << config
-      end
+    if custom_fields_config_json.blank?
+      Rails.logger.error "Expense Type Config Cache - This case should never occur unless there's bug in cache code"
+      self.custom_fields_config = {}
+    else
+      self.custom_fields_config = JSON.parse custom_fields_config_json
     end
   end
 
