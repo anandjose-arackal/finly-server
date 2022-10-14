@@ -268,7 +268,7 @@ class Forms::Import::Processor
         begin
           records = records_to_save.map {|arr| arr[0] }
           results = self.model.import records
-          failed_records << results.failed_instances
+          failed_records += results.failed_instances
           Rails.logger.debug "FailedRecords::#{failed_records}"
           p "FailedRecords::#{failed_records}"
           failed_import_records = records_to_save.map{|x| failed_records.include?(x[0]) ? x[1] : nil}
@@ -283,7 +283,7 @@ class Forms::Import::Processor
           Rails.logger.debug "FinishedRecords::#{finished_records}"
           p "FinishedRecords::#{finished_records}"
           finished_records.each do |finished_record, finished_import_record|
-            finished_import_record.update_status(true, result.messages[:success].to_s, '', '')
+            finished_import_record.update_status(true, 'Record created successfully', '', '')
             finished_import_record.document = finished_record
             finished_import_record.save!
           end
