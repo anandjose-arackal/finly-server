@@ -104,4 +104,21 @@ class BaseApplicationCache
     Rails.cache.delete(@final_cache_key_const)
   end
 
+  def invalidate_instances(company_specific = true, user_specific = false)
+    # Do not override
+    cache_key_tokens = []
+
+    cache_key_tokens << "#{cache_name_key}"
+
+    if company_specific && company_scoped? && !@company.nil?
+      cache_key_tokens << "#{@company.id}"
+    end
+
+    if user_specific && user_scoped? && !@current_user.nil?
+      cache_key_tokens << "#{@current_user.id}"
+    end
+
+    part_key = ActiveSupport::Cache.expand_cache_key cache_key_tokens
+    Rails.cache.delete_matched("#{part_key}/*")
+  end
 end
