@@ -106,6 +106,6 @@ class BaseApplicationCache
 
   def invalidate_all_instances
     # Do not override
-    Rails.cache.delete_if {|k, v| k.start_with? cache_name_key }
+    Rails.cache.delete_matched("#{cache_name_key}/*")
   end
 end

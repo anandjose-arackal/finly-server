@@ -7,7 +7,7 @@ class CustomFieldsController < BaseControllers::WebBase
 
   def invalidate_caches
     ExpenseTypeFieldConfigCacheRefreshJob.perform_later current_user.company.id, current_user.id
-    EmCustomFieldIndexCache.new(current_user).invalidate
+    EmCustomFieldIndexCache.new(current_user, nil).invalidate_all_instances
   end
 
   def invalidate_show_cache(id)
@@ -29,7 +29,7 @@ class CustomFieldsController < BaseControllers::WebBase
       return
     end
 
-    custom_cache = EmCustomFieldIndexCache.new current_user
+    custom_cache = EmCustomFieldIndexCache.new current_user, params_cache_key(params)
     through_cache custom_cache do
       @result = CustomField::Configuration::Index.(current_user, params)
       respond

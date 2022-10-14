@@ -612,6 +612,25 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  # Return a cache key based on params hash
+  # Copied from StackOverflow: https://stackoverflow.com/a/42783894
+  # Imp: Does not handle nested arrays / objects
+  # Should be fine for most simple params APIs
+  # Use your own judgement before using this, do you really need this?
+  def params_cache_key(x_params)
+    if x_params.is_a? ActionController::Parameters
+      x_params = x_params.to_unsafe_h
+    end
+    # Normalize parameter hash, change keys to a string, normalize key order, sort array values
+    normalized = x_params.transform_keys(&:to_s)
+                       .transform_values { |v| v.is_a?(Array) ? v.sort : v }
+                       .sort_by { |k, _| k }.each_with_object('') do |(k, v), cache_key|
+      cache_key << "#{k}:#{v}"
+    end
+    Digest::SHA1.hexdigest(normalized)
+  end
+
+
   # Used by sentry
   # def set_raven_context
   #   Raven.user_context(id: current_user&.id) # or anything else in session
