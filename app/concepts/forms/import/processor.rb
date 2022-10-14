@@ -267,7 +267,10 @@ class Forms::Import::Processor
       records_to_save.in_groups_of(5) do |batch|
         begin
           records = records_to_save.map {|arr| arr[0] }
-          results = self.model.import records
+          results = self.model.import records, on_duplicate_key_ignore: true
+          p "RECORDS::#{records}"
+          p "RESULTS::#{results}"
+
           failed_records += results.failed_instances
           Rails.logger.debug "FailedRecords::#{failed_records}"
           p "FailedRecords::#{failed_records}"
