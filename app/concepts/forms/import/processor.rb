@@ -1,6 +1,8 @@
 class Forms::Import::Processor
   attr_accessor :form, :user, :export_processor, :is_import_submission_stage, :model
 
+  BATCH_SIZE = 5.freeze
+
   def initialize(form, user)
     self.form = form
     self.user = user
@@ -246,7 +248,7 @@ class Forms::Import::Processor
           records_to_save << [result[:model], import_record]
           # import_record.update_status(true, result.messages[:success].to_s, '', '')
           # import_record.document = result[:model]        # import_record.save!      else
-          import_job.item_complete(false)
+          # import_job.item_complete(false)
           import_record.update_status(false, result.messages[:errors].to_s, '', '')
         end
       rescue => exception
@@ -262,40 +264,21 @@ class Forms::Import::Processor
 
   def save_records(import_job, records_to_save, save_in_batches = true)
     failed_records = []
+    failed_import_records = []
     if save_in_batches
-      # save in batches
-      records_to_save.in_groups_of(5) do |batch|
-        begin
-          records = records_to_save.map {|arr| arr[0] }
-          results = self.model.import records, on_duplicate_key_ignore: true
-          p "RECORDS::#{records}"
-          p "RESULTS::#{results}"
-
-          failed_records += results.failed_instances
-          Rails.logger.debug "FailedRecords::#{failed_records}"
-          p "FailedRecords::#{failed_records}"
-          failed_import_records = records_to_save.map{|x| failed_records.include?(x[0]) ? x[1] : nil}
-          failed_import_records.reject!(&:nil?)
-          Rails.logger.debug "FailedImportRecords::#{failed_import_records}"
-          p "FailedImportRecords::#{failed_import_records}"
-          failed_import_records.each do |failed_record|
-            failed_record.update_status(false, 'Unable to process', exception.message, exception.backtrace)
-          end
-
-          finished_records = records_to_save.map{|x| (records-failed_records).include?(x[0]) ? x : nil}
-          Rails.logger.debug "FinishedRecords::#{finished_records}"
-          p "FinishedRecords::#{finished_records}"
-          finished_records.each do |finished_record, finished_import_record|
-            finished_import_record.update_status(true, 'Record created successfully', '', '')
-            finished_import_record.document = finished_record
-            finished_import_record.save!
-          end
-          Rails.logger.info "BulkImport::FailedRecords-#{failed_records}"
-          p "BulkImport::FailedRecords-#{failed_records}"
-        rescue => exception
-          Rails.logger.debug "Batch failed::#{batch}::#{exception}"
-          p "Batch failed::#{batch}::#{exception}"
-        end
+      record_models = records_to_save.map {|arr| arr[0] }
+      results = self.model.import record_models, on_duplicate_key_ignore: true, batch_size: BATCH_SIZE
+      failed_records += results.failed_instances
+      failed_import_records += records_to_save.map{|x| failed_records.include?(x[0]) ? x[1] : nil}.reject!(&:nil?)
+      failed_import_records.each do |failed_record|
+        failed_record.update_status(false, 'Unable to process', exception.message, exception.backtrace)
+      end
+      finished_records = records_to_save.map{|x| (record_models-failed_records).include?(x[0]) ? x : nil}
+      finished_records.each do |finished_record, finished_import_record|
+        finished_import_record.update_status(true, 'Record created successfully', '', '')
+        finished_import_record.document = finished_record
+        import_job.item_complete(true)
+        finished_import_record.save!
       end
     else
       # save one by one
@@ -309,11 +292,6 @@ class Forms::Import::Processor
           import_job.item_complete(false)
         end
       end
-    end
-    if failed_records.nil?
-      import_job.item_complete(true)
-    else
-      import_job.item_complete(false)
     end
   end
 
