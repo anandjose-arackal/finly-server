@@ -1,7 +1,7 @@
 class Forms::Import::Processor
   attr_accessor :form, :user, :export_processor, :is_import_submission_stage, :model
 
-  BATCH_SIZE = 5.freeze
+  BATCH_SIZE = Rails.application.config_for(:bulk_import)['batch_size'].freeze
 
   def initialize(form, user)
     self.form = form
@@ -116,6 +116,7 @@ class Forms::Import::Processor
   def preprocess_import_job(import_job)
     path = Rails.env.production? ? import_job.attachment&.url : import_job.attachment&.path
     imported_sheet = Roo::Spreadsheet.open(path)
+    raise unless imported_sheet.last_row > 1
 
     records_data = build_records_data(imported_sheet)
     records_data.each do |record_data|
