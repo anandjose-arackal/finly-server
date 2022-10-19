@@ -6,5 +6,8 @@ class Masters::Items::Lookup < Lookup::API
   attribute :id, visible: false
   attribute :item_number
   attribute :name, value: :description
-
+  attribute :product_type_id
+  attribute :category_id
+  attribute :unit_of_measurement
+  attribute :rate
 end
