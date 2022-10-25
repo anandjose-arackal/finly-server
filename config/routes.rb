@@ -3981,6 +3981,7 @@ Rails.application.routes.draw do
     put 'purchase_orders/bulk_reject', to: 'purchase_orders#bulk_reject'
     put 'purchase_orders/bulk_take_control', to: 'purchase_orders#bulk_take_control'
 
+    get 'purchase_orders/form_enabled/:id', to: "purchase_orders#forms_enabled"
     get 'purchase_orders/templates', to: 'purchase_orders#template_index'
     get 'purchase_orders/templates/:id', to: 'purchase_orders#template_show'
     # post 'purchase_orders/templates', to: 'purchase_orders#template_create'
