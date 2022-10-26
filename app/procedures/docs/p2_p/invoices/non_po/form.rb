@@ -482,8 +482,8 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_tds_amount])
 
-      amount :invoice_paid_outside_amount, label: "Advance Paid",
-             default_value: 0, visible: true, editable: true
+      amount :invoice_paid_outside_amount, label: "Total Partial-Payment",
+             default_value: 0, visible: true, editable: false
 
       amount :reporting_invoice_paid_outside_amount, label: "Advance Paid(Reporting Currency)", editable: false, visible: false,
              can_visible_be_changed: false,
@@ -516,8 +516,8 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_net_total_amount])
 
-      amount :invoice_advance_paid_amount, label: "Total Partial-Payment",
-             default_value: 0, editable: false, visible: true,
+      amount :invoice_advance_paid_amount, label: "Advance Paid",
+             default_value: 0, editable: true, visible: true,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_advance_paid_amount])
 
       amount :reporting_invoice_advance_paid_amount, label: "Total Partial-Payment(Reporting Currency)", editable: false, visible: false,
