@@ -87,7 +87,8 @@ class Forms::Export::Processor
             entity_type: 'text',
             import_skip: true,
             lookup_value: true,
-            choices_array: choices_array(entity)
+            choices_array: choices_array(entity),
+            hidden: true
           }
         elsif entity.entity_type == 'date'
           headers[entity.entity_key.to_s] = {
@@ -211,7 +212,8 @@ class Forms::Export::Processor
       sheet_key = sheet_data[:key]
       worksheets[sheet_key] = workbook.add_worksheet(sheet_name)
       self.headers[sheet_key][:headers].values.each_with_index do |header_data, header_index|
-        worksheets[sheet_key].set_column(header_index, header_index, header_data[:name].length+10)
+        width = header_data[:hidden] ? 0 : header_data[:name].length+10
+        worksheets[sheet_key].set_column(header_index, header_index, width)
         worksheets[sheet_key].write(0, header_index, header_data[:name])
       end
     end
