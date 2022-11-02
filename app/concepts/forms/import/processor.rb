@@ -251,6 +251,8 @@ class Forms::Import::Processor
           # import_record.update_status(true, result.messages[:success].to_s, '', '')
           # import_record.document = result[:model]        # import_record.save!      else
           # import_job.item_complete(false)
+        else
+          import_job.item_complete(false)
           import_record.update_status(false, result.messages[:errors].to_s, '', '')
         end
       rescue => exception
@@ -273,6 +275,7 @@ class Forms::Import::Processor
       failed_records += results.failed_instances
       failed_import_records += records_to_save.map{|x| failed_records.include?(x[0]) ? x[1] : nil}.reject!(&:nil?)
       failed_import_records.each do |failed_record|
+        import_job.item_complete(false)
         failed_record.update_status(false, 'Unable to process', exception.message, exception.backtrace)
       end
       finished_records = records_to_save.map{|x| (record_models-failed_records).include?(x[0]) ? x : nil}
