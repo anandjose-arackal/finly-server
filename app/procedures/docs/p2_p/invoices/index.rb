@@ -144,6 +144,10 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
     amount value: :balance_payable_value, currency_code: :set_currency_code, currency_symbol: :set_currency_symbol
   end
 
+  column :narration, default: false do
+    text value: :narration
+  end
+
   column :cost_center, default: true, includes: [:cost_center] do
     text value: :cost_center_name
   end
