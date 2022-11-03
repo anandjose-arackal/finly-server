@@ -69,6 +69,8 @@ include Searchkick::Api
   has_many :budget_rule_branch_location_mappings
   has_many :budget_rules, through: :budget_rule_branch_location_mappings
 
+  has_many :policy_location_mappings, dependent: :destroy, foreign_key: :location_id
+
   has_many :users
 
   scope :with_company_id, -> (company_id) { where company_id: company_id }
