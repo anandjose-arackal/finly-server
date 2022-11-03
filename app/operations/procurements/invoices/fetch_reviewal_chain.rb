@@ -3,7 +3,7 @@ class Procurements::Invoices::FetchReviewalChain < Procurements::Invoices::Base
 
   def init
     invoice_id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
-    self.invoice = user.company.inward_invoices.find_by id: invoice_id
+    @invoice = user.company.inward_invoices.find_by id: invoice_id
   end
 
   def validate
@@ -11,7 +11,7 @@ class Procurements::Invoices::FetchReviewalChain < Procurements::Invoices::Base
   end
 
   def validate_presence
-    if invoice.blank?
+    if self.invoice.blank?
       add_message :error, 'Record not found'
       return false
     end
@@ -27,10 +27,12 @@ class Procurements::Invoices::FetchReviewalChain < Procurements::Invoices::Base
     Procurements::Invoices::FetchReviewalChain::ShowPresenter.new(user, params, messages)
   end
 
-  class Procurements::Invoices::FetchReviewalChain::ShowPresenter
+  class Procurements::Invoices::FetchReviewalChain::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :invoice, :chain
+
     def init
       self.invoice = params[:invoice]
-      params[:reviewal_document] = self.invoice
+      params[:reviewal_document] = params[:invoice]
       params[:provider_name] = get_invoice_provider_name
       # params[:policy_id] is assumed to be present
 
