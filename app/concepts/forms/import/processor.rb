@@ -267,6 +267,7 @@ class Forms::Import::Processor
   end
 
   def save_records(import_job, records_to_save, save_in_batches = true)
+    return if records_to_save.empty?
     failed_records = []
     failed_import_records = []
     if save_in_batches
