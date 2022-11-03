@@ -379,7 +379,7 @@ class InvoiceCalculationUtils
     end
     original_net_amount = self.net_amount
     self.advance_amount = self.invoice.advance_amount&.value.to_f
-    self.advance_amount = self.invoice.procurement.purchase_order.po_requested_advance_amount.to_f if self.invoice.try(:forms_enabled)
+    self.advance_amount = self.invoice.procurement&.purchase_order&.po_requested_advance_amount.to_f if self.invoice.try(:forms_enabled)
     # todo: create a new field to store this data
     # self.net_amount = original_net_amount - self.advance_amount # net amount should be without previously paid advance
   end
