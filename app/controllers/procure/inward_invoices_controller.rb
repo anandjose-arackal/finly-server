@@ -185,4 +185,9 @@ class Procure::InwardInvoicesController < BaseControllers::WebBase
     respond
   end
 
+
+  def fetch_reviewal_chain
+    @result = Procurements::Invoices::FetchReviewalChain.(current_user, params)
+    respond
+  end
 end

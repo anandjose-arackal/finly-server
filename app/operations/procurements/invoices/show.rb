@@ -63,7 +63,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
       op = BudgetManager::BudgetsCalculator::ApplicableBudgets.({document: self.invoice, current_user: User.first})
       self.budgets = op["result"][:budgets]
 
-      if self.invoice.created_by_user_id == user.id && Invoice.status_ids(:open, :retracted, :rejected).include?(self.invoice.invoice_status_id)
+      if (!ReviewalChainAsyncToggle.new(user).enabled?) && self.invoice.created_by_user_id == user.id && Invoice.status_ids(:open, :retracted, :rejected).include?(self.invoice.invoice_status_id)
         self.reviewal_chains = []
         params[:reviewal_document] = invoice
         params[:provider_name] = get_invoice_provider_name
