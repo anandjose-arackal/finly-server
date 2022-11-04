@@ -45,6 +45,7 @@ user:
       gstin_filing_enabled: <%= GstinFilingToggle.new(current_user).enabled? %>
     performance_fix_flags:
       dependencies_ui_cache_enabled: <%= DependenciesUiCacheToggle.new(current_user).enabled? %>
+      reviewal_chain_async: <%= ReviewalChainAsyncToggle.new(current_user).enabled? %>
 customer_specific:
   invoice_minimal_ui: <%=  MinimalInvoiceUiToggle.new(current_user).minimal_invoice_ui_enabled? %>
   dummy_bank_account: <%= current_company.yes_bank_vendors&.first&.id %>
