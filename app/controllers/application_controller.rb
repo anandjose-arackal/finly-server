@@ -563,6 +563,13 @@ class ApplicationController < ActionController::Base
     ElasticAPM.set_label(:app, current_app)
     ElasticAPM.set_label(:device, current_device)
     ElasticAPM.set_label(:view, params&.dig(:view))
+
+    ScoutApm::Context.add_user(id: current_user.id, email: current_user.email, user_name: current_user.name)
+    ScoutApm::Context.add(company_id: current_user.company_id)
+    ScoutApm::Context.add(company_name: current_user.company_name)
+    ScoutApm::Context.add(app: current_app)
+    ScoutApm::Context.add(device: current_device)
+    ScoutApm::Context.add(view: params&.dig(:view))
   end
 
   def after_finly_authorize
