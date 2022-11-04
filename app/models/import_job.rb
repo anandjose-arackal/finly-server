@@ -94,7 +94,7 @@ class ImportJob < ApplicationRecord
     self.completed_records += 1
     self.created_records += 1 if success
     self.failed_records += 1 unless success
-    self.completion_percentage = ((self.completed_records * 100 / self.total_records) rescue 0)
+    self.completion_percentage = [((self.completed_records * 100 / self.total_records) rescue 0), 100].min
     self.save
   end
 
