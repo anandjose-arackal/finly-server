@@ -176,6 +176,7 @@ class SecurityPolicy::Config
     inventory_manager: :medium,
     vendor_creator: :medium,
     vendor_reviewer: :medium,
+    vendor_bulk_importer: :medium,
     policy_admin: :high,
     vendor_manager: :high,
     bank_payment_request_auditor: :high,
@@ -257,7 +258,7 @@ class SecurityPolicy::Config
     policy = build_policy(user)
 
     roles.each do |role|
-      values << (policy[ROLE_LEVELS[role]] || HIGH)&.dig(*keys) # Default to high unless specified
+      values << (policy[ROLE_LEVELS[role]] || policy[:high])&.dig(*keys) # Default to high unless specified
     end
     values = values.reject { |value| value.blank? }
     values
