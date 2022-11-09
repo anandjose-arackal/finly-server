@@ -281,10 +281,18 @@ class Forms::Import::Processor
       end
       finished_records = records_to_save.map{|x| (record_models-failed_records).include?(x[0]) ? x : nil}
       finished_records.each do |finished_record, finished_import_record|
-        finished_import_record.update_status(true, 'Record created successfully', '', '')
-        finished_import_record.document = finished_record
-        import_job.item_complete(true)
-        finished_import_record.save!
+        submit_params = {
+          reviewal_document: finished_record
+        }
+        op = Docs::P2P::Vendors::Ops::Submit.(params: submit_params, current_user: user)
+        if op.success?
+          finished_import_record.update_status(true, 'Record created successfully', '', '')
+          finished_import_record.document = finished_record
+          import_job.item_complete(true)
+        else
+          import_job.item_complete(false)
+          finished_import_record.update_status(false, 'Unable to process', op.messages[:errors].to_s, '')
+        end
       end
     else
       # save one by one
