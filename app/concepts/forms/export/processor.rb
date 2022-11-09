@@ -111,6 +111,14 @@ class Forms::Export::Processor
             entity_type: entity.entity_type,
             entity: entity
           }
+        elsif entity.entity_type == 'attachment'
+          headers[entity.entity_key.to_s] = {
+            name: "#{entity.label}#{entity.required ? '*' : ''}",
+            entity_key: entity.entity_key,
+            entity_type: entity.entity_type,
+            entity: entity,
+            hidden: true
+          }
         else
           headers[entity.entity_key.to_s] = {
             name: "#{entity.label}#{entity.required ? '*' : ''}",
@@ -212,7 +220,7 @@ class Forms::Export::Processor
       sheet_key = sheet_data[:key]
       worksheets[sheet_key] = workbook.add_worksheet(sheet_name)
       self.headers[sheet_key][:headers].values.each_with_index do |header_data, header_index|
-        width = header_data[:hidden] ? 0 : header_data[:name].length+10
+        width = (header_data[:hidden] || header_data[:entity_key] == 'status_id') ? 0 : header_data[:name].length+10
         worksheets[sheet_key].set_column(header_index, header_index, width)
         worksheets[sheet_key].write(0, header_index, header_data[:name])
       end
