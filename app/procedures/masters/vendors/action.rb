@@ -45,7 +45,7 @@ class Masters::Vendors::Action < ActionManager::API
 
     action :redirect,
            :import_form,
-           permissions: [:vendor_creator, :vendor_manager],
+           permissions: [:vendor_creator, :vendor_manager, :vendor_bulk_importer],
            toggle: {if: [VendorToggle, :bulk_import_enabled?]},
            label: 'Bulk Import',
            url: 'bulk_import/params={"route":"forms.vendors"}'
