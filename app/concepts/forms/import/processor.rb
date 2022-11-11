@@ -149,6 +149,9 @@ class Forms::Import::Processor
         row_data = {}.with_indifferent_access
         row = sheet.row(index)
         row.each_with_index do |value, index|
+          if sheet.row(1)[index].include? '(TRUE/FALSE)'
+            value = value == "Yes" ? true : false
+          end
           row_data[worksheet_headers[index]] = value
         end
 
@@ -198,13 +201,11 @@ class Forms::Import::Processor
           row_data = {}.with_indifferent_access
           row = sheet.row(index)
           row.each_with_index do |value, column_index|
+            if sheet.row(1)[column_index].include? '(TRUE/FALSE)'
+              value = value == "Yes" ? true : false
+            end
             row_data[worksheet_headers[column_index]] = value
           end
-          # row_data = {
-          #   ...
-          #   "Vendor Country Id": 'India'
-          #   ...
-          # }
 
           row_data['_ref'] = UUIDTools::UUID.timestamp_create().to_s.upcase
 

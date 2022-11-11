@@ -335,7 +335,7 @@ class Forms::Export::Processor
         elsif entity_type == 'switch'
           sheet.data_validation(1, index, 1048575, index, {
             :validate => 'list',
-            :source => %w[True False]
+            :source => %w[Yes No]
           })
         end
       end
