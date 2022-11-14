@@ -69,7 +69,7 @@ class Forms::Export::Processor
       if (entity.visible || entity.conditions.joins(:actions).where(form_condition_actions: {property: :visible, value: true}).present?)
         if entity.entity_type == 'switch'
           headers[entity.entity_key.to_s] = {
-            name: "#{entity.label}#{entity.required ? '*' : ''} (TRUE/FALSE)",
+            name: "#{entity.label}#{entity.required ? '*' : ''} (Yes/No)",
             entity_key: entity.entity_key,
             entity_type: entity.entity_type,
             entity: entity,
