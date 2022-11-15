@@ -133,7 +133,7 @@ class Event::EInvoice::Base < Event::SetNotifier
       self.company = user.company
       self.to_name = user.name
       self.email_approval_mail = params[:email_based_approval]
-      self.reply_to = (self.invoice.email_approvals.last&.approval_uuid&.to_s || "") + "@approval.finly.email"
+      self.reply_to = (self.invoice.email_approvals.last&.approval_uuid&.to_s || "") + "@approval.email.finly.io"
       # if params[:action_url_token]
       #   self.action_url_token = params[:action_url_token]
       #   action_url = generate_action_url(user, role_id)
