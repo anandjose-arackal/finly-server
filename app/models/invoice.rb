@@ -2265,7 +2265,7 @@ class Invoice < ApplicationRecord
   end
 
   def budget_enabled?
-    RequestStore.store[:current_company].feature_subscription.budgeting_system
+    RequestStore.store[:current_company]&.feature_subscription&.budgeting_system || false
   end
 
   # def update_amount_after_cn_adjustment
