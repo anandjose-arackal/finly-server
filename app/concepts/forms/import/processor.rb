@@ -150,7 +150,7 @@ class Forms::Import::Processor
         row = sheet.row(index)
         row.each_with_index do |value, index|
           if sheet.row(1)[index].include? '(Yes/No)'
-            value = value == 'Yes' ? true : false
+            value = value == 'Yes' ? 'TRUE' : 'FALSE'
           end
           row_data[worksheet_headers[index]] = value
         end
@@ -202,7 +202,7 @@ class Forms::Import::Processor
           row = sheet.row(index)
           row.each_with_index do |value, column_index|
             if sheet.row(1)[column_index].include? '(Yes/No)'
-              value = value == 'Yes' ? true : false
+              value = value == 'Yes' ? 'TRUE' : 'FALSE'
             end
             row_data[worksheet_headers[column_index]] = value
           end

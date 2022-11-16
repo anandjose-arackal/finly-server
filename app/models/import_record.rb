@@ -42,7 +42,7 @@ class ImportRecord < ApplicationRecord
       status: status&.name,
       message: message,
       record_data: data_with_attachments,
-      processed_data: processed_data,
+      processed_data: bool_corrected_processed_data,
     }
   end
 
@@ -56,6 +56,26 @@ class ImportRecord < ApplicationRecord
     self.internal_message = internal_message
     self.error_trace = error_trace
     self.save!
+  end
+
+  def bool_corrected_processed_data
+    json_data = processed_data
+    if json_data != nil
+      json_data.keys.each do |k|
+        if json_data[k] != nil && json_data[k].kind_of?(Array)
+          json_data[k].each do |p|
+            if p != nil
+              p.keys.each do |k1|
+                p[k1] = p[k1] == 'TRUE' if %w[TRUE FALSE].include? p[k1]
+              end
+            end
+          end
+        else
+          json_data[k] = json_data[k] == 'TRUE' if json_data[k] != nil && %w[TRUE FALSE].include?(json_data[k])
+        end
+      end
+    end
+    json_data
   end
 
 end

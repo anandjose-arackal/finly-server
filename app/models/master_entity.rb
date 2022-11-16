@@ -190,7 +190,7 @@ class MasterEntity < ApplicationRecord
   def import_label
     case entity_type
     when 'switch'
-      "#{label} (Yes/No)"
+      "#{label} (TRUE/FALSE)"
     when 'sequence'
       "#{label} (Auto-populated)"
     when 'lookup', 'dropdown'
