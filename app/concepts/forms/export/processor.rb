@@ -139,12 +139,14 @@ class Forms::Export::Processor
         parent_id: {
           name: "#{parent_sheet_label.singularize} Internal ID",
           entity_key: 'parent_id',
-          entity_type: 'text'
+          entity_type: 'text',
+          hidden: true
         },
         id: {
           name: "#{entity.label.singularize} Internal ID",
           entity_key: 'id',
-          entity_type: 'text'
+          entity_type: 'text',
+          hidden: true
         }
       }
       sheets_headers[entity.entity_key] = {
