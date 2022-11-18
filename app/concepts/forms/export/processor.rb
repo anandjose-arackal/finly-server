@@ -281,8 +281,6 @@ class Forms::Export::Processor
 
   def set_lookup_content_in_export(workbook)
     lookup_content.each_with_index do |content, index|
-      next if ['Status'].include? content[:name]
-
       begin
         worksheet = workbook.add_worksheet(content[:name])
       rescue
@@ -310,6 +308,8 @@ class Forms::Export::Processor
           worksheet.write(1 + row_index, header_index, row[header_key.to_sym])
         end
       end
+
+      worksheet.hide if ['Status'].include? content[:name]
     end
   end
 
