@@ -178,7 +178,6 @@ class Forms::Export::Processor
 
     form_sections.each do |section|
       # next unless section.associate_custom_fields
-
       section.entities.each do |entity|
         next unless ['lookup', 'dropdown'].include?(entity.entity_type)
         next unless (entity.visible || entity.conditions.joins(:actions).where(form_condition_actions: {property: :visible, value: true}).present?)
@@ -282,6 +281,8 @@ class Forms::Export::Processor
 
   def set_lookup_content_in_export(workbook)
     lookup_content.each_with_index do |content, index|
+      next if ['Status'].include? content[:name]
+
       begin
         worksheet = workbook.add_worksheet(content[:name])
       rescue
