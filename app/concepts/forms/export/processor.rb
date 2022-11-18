@@ -309,7 +309,7 @@ class Forms::Export::Processor
         end
       end
 
-      worksheet.hide if ['Status'].include? content[:name]
+      # worksheet.hide if ['Status'].include? content[:name]
     end
   end
 
