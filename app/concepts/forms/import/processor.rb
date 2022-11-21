@@ -282,17 +282,22 @@ class Forms::Import::Processor
       end
       finished_records = records_to_save.map{|x| (record_models-failed_records).include?(x[0]) ? x : nil}
       finished_records.each do |finished_record, finished_import_record|
-        submit_params = {
-          reviewal_document: finished_record
-        }
-        op = Docs::P2P::Vendors::Ops::Submit.(params: submit_params, current_user: user)
-        if op.success?
-          finished_import_record.update_status(true, 'Record created successfully', '', '')
-        else
-          finished_import_record.update_status(true, 'Record created successfully But could not submit for approval', '', '')
-        end
+        # ToDo: following logic is corrupting the bank accounts and location data, have to fix this code later
+        # submit_params = {
+        #   reviewal_document: finished_record
+        # }
+        # op = Docs::P2P::Vendors::Ops::Submit.(params: submit_params, current_user: user)
+        # if op.success?
+        #   finished_import_record.update_status(true, 'Record created successfully', '', '')
+        # else
+        #   finished_import_record.update_status(true, 'Record created successfully But could not submit for approval', '', '')
+        # end
+        # finished_import_record.document = finished_record
+        # import_job.item_complete(true)
+        finished_import_record.update_status(true, 'Record created successfully', '', '')
         finished_import_record.document = finished_record
         import_job.item_complete(true)
+        finished_import_record.save!
       end
     else
       # save one by one
