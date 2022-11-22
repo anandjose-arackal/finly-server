@@ -51,6 +51,7 @@ user:
       pr_api_improvements: <%= PrApiImprovementsToggle.new(current_user).enabled? %>
     currency_flags:
       amount_prop_only_load_enabled: <%= AmountPropOnlyLoadToggle.new(current_user).enabled? %>
+      currency_comma_separation_enabled: <%= CurrencyCommaSeparationToggle.new(current_user).enabled? %>>
     common_imports:
       lurm_enabled: <%= LurmEnabledToggle.new(current_user).enabled? %>
       user_bulk_upload_enabled: <%= UserWorkFlowBulkUploadEnabledToggle.new(current_user).enabled? %>
