@@ -236,6 +236,12 @@ class Forms::Import::Processor
     self.is_import_submission_stage = true
     return if import_job.status_id == ImportJobStatus.id_for(:in_progress)
 
+    # updates record count on restarting failed jobs
+    import_job.update({
+                        failed_records: 0,
+                        completed_records: import_job.created_records
+                      })
+
     import_job.progress_update(:in_progress)
     records_to_save = []
     import_job.records.each do |import_record|
