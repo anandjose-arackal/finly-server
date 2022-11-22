@@ -267,55 +267,30 @@ class Forms::Import::Processor
         import_record.update_status(false, 'Unable to process', exception.message, exception.backtrace)
       end
     end
-    save_records(import_job, records_to_save, true)
+    save_records(import_job, records_to_save)
 
     generate_result_file(import_job)
     import_job.progress_update(:completed)
   end
 
-  def save_records(import_job, records_to_save, save_in_batches = true)
+  def save_records(import_job, records_to_save)
     return if records_to_save.empty?
-    failed_records = []
-    failed_import_records = []
-    if save_in_batches
-      record_models = records_to_save.map {|arr| arr[0] }
-      results = self.model.import record_models, on_duplicate_key_ignore: true, batch_size: BATCH_SIZE
-      failed_records += results.failed_instances
-      failed_import_records += records_to_save.map{|x| failed_records.include?(x[0]) ? x[1] : nil}.reject!(&:nil?)
-      failed_import_records.each do |failed_record|
-        import_job.item_complete(false)
-        failed_record.update_status(false, op.messages[:errors].to_s, '', '')
-      end
-      finished_records = records_to_save.map{|x| (record_models-failed_records).include?(x[0]) ? x : nil}
-      finished_records.each do |finished_record, finished_import_record|
-        # ToDo: following logic is corrupting the bank accounts and location data, have to fix this code later
-        # submit_params = {
-        #   reviewal_document: finished_record
-        # }
-        # op = Docs::P2P::Vendors::Ops::Submit.(params: submit_params, current_user: user)
-        # if op.success?
-        #   finished_import_record.update_status(true, 'Record created successfully', '', '')
-        # else
-        #   finished_import_record.update_status(true, 'Record created successfully But could not submit for approval', '', '')
-        # end
-        # finished_import_record.document = finished_record
-        # import_job.item_complete(true)
-        finished_import_record.update_status(true, 'Record created successfully', '', '')
-        finished_import_record.document_id = finished_record.id
-        import_job.item_complete(true)
-        finished_import_record.save!
-      end
-    else
-      # save one by one
-      records_to_save.each do |record|
-        import_entity = record[0]
-        import_record = record[1]
-        begin
-          import_entity.save!
-        rescue => exception
-          import_record.update_status(false, 'Unable to process', exception.message, exception.backtrace)
-          import_job.item_complete(false)
+
+    records_to_save.each do |record, import_record|
+      if record.save
+        submit_params = { reviewal_document: record }
+        op = Docs::P2P::Vendors::Ops::Submit.(params: submit_params, current_user: user)
+        if op.success?
+          import_record.update_status(true, 'Record created successfully', '', '')
+        else
+          import_record.update_status(true, 'Record created successfully But could not submit for approval', '', '')
         end
+        import_record.document_id = record.id
+        import_record.save
+        import_job.item_complete(true)
+      else
+        import_job.item_complete(false)
+        import_record.update_status(false, op.messages[:errors].to_s, '', '')
       end
     end
   end
