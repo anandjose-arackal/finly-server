@@ -330,6 +330,9 @@ class Forms::Import::Processor
           if column_data.is_a?(Array) && column_data.present? && column_data[0].is_a?(Hash) && column_data[0].has_key?(:url)
             column_data = (column_data.map { |d| d[:url] }).join("\n")
           end
+          if self.headers[sheet_key][:headers][key][:name].include? '(Yes/No)'
+            column_data = column_data == 'TRUE' ? 'Yes' : 'No'
+          end
           worksheets[sheet_key].write(worksheets_length[sheet_key], header_index, column_data)
         end
         worksheets[sheet_key].write(worksheets_length[sheet_key], self.headers[form.model.name][:headers].keys.count, message)
