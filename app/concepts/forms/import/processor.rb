@@ -295,7 +295,7 @@ class Forms::Import::Processor
         # finished_import_record.document = finished_record
         # import_job.item_complete(true)
         finished_import_record.update_status(true, 'Record created successfully', '', '')
-        finished_import_record.document = finished_record
+        finished_import_record.document_id = finished_record.id
         import_job.item_complete(true)
         finished_import_record.save!
       end
