@@ -114,7 +114,7 @@ class Masters::Vendors::Form < Forms::API
     dropdown :vendor_country, choices_scope: Choices[:list].({id: 'India', name: "India"}, {id: 'International', name: "International"}),
              required: true, default_value: 'India'
     lookup :policy_id,
-           choices_scope: Choices[:lookup].('policies', permissions: [:vendor_creator, :vendor_manager]),
+           choices_scope: Choices[:lookup].('policies', permissions: [:vendor_creator, :vendor_manager, :vendor_bulk_importer]),
            required: true
     # text :name, computed: Forms::Compute::Lookup('policy_id', '{{record.name}}'), editable: false
 
