@@ -924,7 +924,7 @@ class PurchaseOrder < ApplicationRecord
   end
 
   def reporting_payable_advance_amount
-    user.po_form_enabled ? (self.payable_advance_amount * self.conversion_rate) : 0
+    user.po_form_enabled ? (self.payable_advance_amount.to_f * self.conversion_rate.to_f) : 0
   end
 
   def balance_due
@@ -1028,7 +1028,7 @@ class PurchaseOrder < ApplicationRecord
   def review_in_progress?
     PurchaseOrderStatus.ids_for(:processing).include?(purchase_order_status_id)
   end
-
+  
   def form_klass
     Forms::Router.klass(:purchase_orders)&.name
   end
@@ -1551,6 +1551,6 @@ class PurchaseOrder < ApplicationRecord
   end
 
   def budget_enabled?
-    RequestStore.store[:current_company].feature_subscription.budgeting_system
+    RequestStore.store[:current_company]&.feature_subscription&.budgeting_system || false
   end
 end

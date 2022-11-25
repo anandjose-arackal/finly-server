@@ -31,6 +31,11 @@ module Lookup::DSL
       end
       config
     end
+
+    def data_card_route(value = NoObject, options: {})
+      @data_card_route = value unless value == NoObject
+      @data_card_route
+    end
   end
 
 end

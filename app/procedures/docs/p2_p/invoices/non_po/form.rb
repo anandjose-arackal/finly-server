@@ -1,6 +1,7 @@
 class Docs::P2P::Invoices::NonPo::Form < Forms::API
 
   model Invoice
+  policy Docs::P2P::Invoices::Policy, :show?
 
   meta ->(record) {
     {
@@ -183,15 +184,15 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
     lookup :vendor_id, label: "Vendor", choices_scope: Choices[:lookup].('vendors'), required: true, editable: false,
            can_editable_be_changed: false, can_be_disabled: false, can_required_be_changed: false, can_visible_be_changed: false
 
-    lookup :vendor_trade_name, label: 'Vendor Trade Name', editable: false, visible: true, computed: Forms::Compute::Lookup('vendor_id', '{{record.trade_name}}', assignments: { created_by_id: "{{meta.created_by_id}}" })
-    lookup :vendor_country_id, editable: false, visible: true, choices_scope: Choices[:lookup].('countries')
+    lookup :vendor_trade_name, label: 'Vendor Trade Name', editable: false, visible: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.trade_name}}', assignments: { created_by_id: "{{meta.created_by_id}}" })
+    lookup :vendor_country_id, editable: false, visible: false, choices_scope: Choices[:lookup].('countries')
 
-    text :vendor_sequence_id, "Vendor ID", editable: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.vendor_id}}')
+    text :vendor_sequence_id, "Vendor ID", editable: false, visible: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.vendor_id}}')
 
     lookup :gstin_location_id, label: 'Vendor Location', choices_scope: Choices[:lookup].('vendor_locations'), # todo - condition to hide for international
            filters: Rules::Builder[:vendor_id].eq(entity: :vendor_id)
-    text :vendor_gstin, "Vendor GSTIN", editable: false, computed: Forms::Compute::Lookup('gstin_location_id', '{{record.gstin}}') # todo - condition
-    text :vendor_pan, "Vendor PAN", editable: false # todo - add condition
+    text :vendor_gstin, "Vendor GSTIN", editable: false, visible: false, computed: Forms::Compute::Lookup('gstin_location_id', '{{record.gstin}}') # todo - condition
+    text :vendor_pan, "Vendor PAN", editable: false, visible: false # todo - add condition
     lookup :receiving_account_id, label: "Vendor Account", choices_scope: Choices[:lookup].('vendor_bank_accounts'),
            filters: Rules::Builder[:account_owner_id].eq(entity: 'vendor_id').and(Rules::Builder[:account_owner_type].eq(value: 'YesBankVendor')),
            editable: true, visible: true, required: true
@@ -199,8 +200,8 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
     text :receiving_account_type, visible: false, internal: true, editable: false, computed: Forms::Compute::Form('BankAccount')
     switch :rcm_enabled, label: "RCM Enabled", editable: true, visible: true, computed: Forms::Compute::Lookup('vendor_id', '{{record.rcm_enabled}}'), default_value: true
 
-    text :vendor_bank_account_number, editable: false, can_editable_be_changed: false, computed: Forms::Compute::Lookup('receiving_account_id', '{{record.account_number}}')
-    text :vendor_bank_account_ifsc, editable: false, required: true, can_editable_be_changed: false, computed: Forms::Compute::Lookup('receiving_account_id', '{{record.ifsc}}')
+    text :vendor_bank_account_number, editable: false, visible: false, can_editable_be_changed: false, computed: Forms::Compute::Lookup('receiving_account_id', '{{record.account_number}}')
+    text :vendor_bank_account_ifsc, editable: false, required: true, visible: false, can_editable_be_changed: false, computed: Forms::Compute::Lookup('receiving_account_id', '{{record.ifsc}}')
     text :vendor_bank_account_swift_code, editable: false, visible: false, required: false, can_editable_be_changed: false, computed: Forms::Compute::Lookup('receiving_account_id', '{{record.swift_code}}')
   end
 
@@ -208,8 +209,8 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
   section :billing_address do
     lookup :location_id, label: 'Billing Address', choices_scope: Choices[:lookup].('locations', assignments: { form: true }),
            filters: Rules::Builder['billable_location'].true, required: true
-    text :billing_address_name, label: 'Name', editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.name}}')
-    text :billing_address_gstin, label: 'Gstin', editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.gstin}}')
+    text :billing_address_name, label: 'Name', editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.name}}'), visible: false
+    text :billing_address_gstin, label: 'Gstin', editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.gstin}}'), visible: false
     large_text :billing_address, computed: Forms::Compute::Lookup('location_id', '{{record.address}}')
   end
 
@@ -217,8 +218,8 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
   section :shipping_address do
     lookup :delivery_location_id, label: 'Shipping Address', choices_scope: Choices[:lookup].('locations', assignments: { form: true }),
            filters: Rules::Builder['shippable_location'].true, required: true
-    text :shipping_address_name, label: 'Name', editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.name}}')
-    text :shipping_address_gstin, label: 'Gstin', editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.gstin}}') 
+    text :shipping_address_name, label: 'Name', editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.name}}'), visible: false
+    text :shipping_address_gstin, label: 'Gstin', editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.gstin}}'), visible: false
     large_text :shipping_address, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.address}}')
   end
 
@@ -256,7 +257,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       text :hsn_sac, label: "HSN/SAC", editable: true, visible: true,
             computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.hsn_sac}}'), size: FormEntity::SIZES[:small]
 
-      lookup :tds_applicable, visible: true, editable: false,
+      lookup :tds_applicable, visible: false, editable: false,
              can_editable_be_changed: false,
              can_visible_be_changed: false, choices_scope: Choices[:list].({ id: true, name: 'true' }, { id: false, name: 'false' }),
              computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.tds_applicable }}'), size: FormEntity::SIZES[:small]
@@ -481,8 +482,8 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_tds_amount])
 
-      amount :invoice_paid_outside_amount, label: "Advance Paid",
-             default_value: 0, visible: true, editable: true
+      amount :invoice_paid_outside_amount, label: "Total Partial-Payment",
+             default_value: 0, visible: true, editable: false
 
       amount :reporting_invoice_paid_outside_amount, label: "Advance Paid(Reporting Currency)", editable: false, visible: false,
              can_visible_be_changed: false,
@@ -515,8 +516,8 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
              can_editable_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_net_total_amount])
 
-      amount :invoice_advance_paid_amount, label: "Total Partial-Payment",
-             default_value: 0, editable: false, visible: true,
+      amount :invoice_advance_paid_amount, label: "Advance Paid",
+             default_value: 0, editable: true, visible: true,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_advance_paid_amount])
 
       amount :reporting_invoice_advance_paid_amount, label: "Total Partial-Payment(Reporting Currency)", editable: false, visible: false,

@@ -321,7 +321,7 @@ class PurchaseRequestItem < ApplicationRecord
   end
 
   def budget_enabled?
-    RequestStore.store[:current_company].feature_subscription.budgeting_system
+    RequestStore.store[:current_company]&.feature_subscription&.budgeting_system || false
   end
 
 end

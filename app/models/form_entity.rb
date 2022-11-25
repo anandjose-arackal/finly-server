@@ -189,6 +189,17 @@ class FormEntity < ApplicationRecord
     splits.last
   end
 
+  def data_card_route
+    # Applicable only for lookup/masters component
+    return nil unless choices_scope.respond_to?(:klass)
+
+    choices_scope_klass = choices_scope&.klass
+    if choices_scope_klass.present? and choices_scope_klass.respond_to?(:data_card_route)
+      return choices_scope_klass.data_card_route
+    end
+    nil
+  end
+
   # def choices(params: {}, user:)
   #   choices_scope&.choices(params: params, user: user)
   # end
@@ -265,8 +276,12 @@ class FormEntity < ApplicationRecord
       conditions: conditions.as_json(opts),
       # choices: choices_scope(params: options[:params], user: options[:current_user]),
       choices: choices_data,
-      choices_scope: choices_scope_config
+      choices_scope: choices_scope_config,
     }
+  
+    data_card = self.data_card_route
+    data[:data_card] = data_card if data_card.present?
+    data
   end
 
   def form_reference_json(opts = {})
@@ -321,7 +336,7 @@ class FormEntity < ApplicationRecord
         data[:entities][ent.entity_key] = ent.as_json(opts)
       end
     end
-
+    data[:data_card] = self.data_card_route if self.data_card_route.present?
     data
   end
 
@@ -441,7 +456,9 @@ class FormEntity < ApplicationRecord
   end
 
   def currency_entity
-    return self.entity_type != 'amount' ? nil : self.entity_key.start_with?('reporting') ? 'reporting_currency' : 'base_currency'
+    return 'reporting_currency_id' if self.entity_key == 'item_rate'
+
+    return self.entity_type != 'amount' ? nil : self.entity_key.start_with?('reporting') ? 'reporting_currency_id' : 'base_currency_id'
   end
 
   private

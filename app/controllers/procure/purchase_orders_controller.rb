@@ -268,4 +268,9 @@ class Procure::PurchaseOrdersController < BaseControllers::WebBase
     respond
   end
 
+  def forms_enabled
+    is_forms_enabled = PurchaseOrder.find(params[:id])&.forms_enabled
+    render json: { forms_enabled: is_forms_enabled }
+  end
+
 end

@@ -717,6 +717,11 @@ class Invoice < ApplicationRecord
                                   InwardInvoiceStatus.id_for(:retracted)]
   }
 
+  scope :scope_all_except_voided_rejected, -> {
+    where.not invoice_status_id: [InwardInvoiceStatus.id_for(:voided),
+                                  InwardInvoiceStatus.id_for(:rejected)]
+  }
+
   scope :pending_erp_sync, -> (*args) {
     with_erp_sync_status_pending.
       where(invoice_status_id: InwardInvoiceStatus.ids_for(:unpaid, :partially_paid, :paid, :approved, :auto_approved, :closed, :initiated))
@@ -924,7 +929,7 @@ class Invoice < ApplicationRecord
 
     if paid_amount == 0
       self.update(invoice_status_id: InwardInvoiceStatus.id_for(:unpaid))
-    elsif ((!self.forms_enabled || self.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)) && paid_amount >= balance_due - 0.99) || (balance_due == 0 && self.forms_enabled)
+    elsif ((!self.forms_enabled || self.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)) && paid_amount >= balance_due - 0.99) || ((balance_due == 0 || paid_amount >= balance_due - 0.99) && self.forms_enabled)
       self.update(invoice_status_id: InwardInvoiceStatus.id_for(:paid), payable: false)
     elsif (!self.forms_enabled && paid_amount <= balance_due) || (self.forms_enabled && self.invoice_paid_outside_amount.to_f > 0)
       self.update(invoice_status_id: InwardInvoiceStatus.id_for(:partially_paid))
@@ -2001,8 +2006,8 @@ class Invoice < ApplicationRecord
   def sync_amounts
     if forms_enabled
       # calculate the advance and adjusted tds
-      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(RequestStore.store[:params], nil, self) if self.advance_amount_required && PoInvoiceToggle.new(RequestStoreUtil.current_user).enabled?
       self.skip_callback = true
+      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(RequestStore.store[:params], nil, self) if self.advance_amount_required && PoInvoiceToggle.new(RequestStoreUtil.current_user).enabled?
       base_currency_id = get_base_currency&.id
 
       if invoice_gross_amount.present?
@@ -2167,8 +2172,8 @@ class Invoice < ApplicationRecord
 
   def multiple_invoice_validation
     return true if self.invoice_type_id == InwardInvoiceType.id_for(:beneficiary)
-    return true if InwardInvoiceStatus.ids_for(:retracted, :rejected).include?(self.invoice_status_id)
-    current_company_invoices = company.inward_invoices.scope_all_except_voided_rejected_open
+    return true if InwardInvoiceStatus.ids_for( :rejected).include?(self.invoice_status_id)
+    current_company_invoices = company.inward_invoices.scope_all_except_voided_rejected
     invoice_number = self.invoice_number
     vendor_id = self.vendor_id
     duplicate_invoices = current_company_invoices.with_invoice_number(invoice_number).with_vendor_ids(vendor_id).without_id(self.id)
@@ -2260,7 +2265,7 @@ class Invoice < ApplicationRecord
   end
 
   def budget_enabled?
-    RequestStore.store[:current_company].feature_subscription.budgeting_system
+    RequestStore.store[:current_company]&.feature_subscription&.budgeting_system || false
   end
 
   # def update_amount_after_cn_adjustment

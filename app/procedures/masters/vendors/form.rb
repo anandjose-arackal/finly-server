@@ -101,7 +101,7 @@ class Masters::Vendors::Form < Forms::API
   section :status do
     dropdown :status_id, choices_scope: Choices[:enum].(VendorStatus),
              required: false, editable: true, default_value: VendorStatus.id_for(:draft),
-             can_editable_be_changed: false
+             can_editable_be_changed: false, show_in_data_card_as: 'status'
 
     switch :authorized, default_value: true,
            visible: false, editable: false, required: true,
@@ -109,19 +109,19 @@ class Masters::Vendors::Form < Forms::API
   end
 
   section :business_details, associate_custom_fields: true do
-    auto_number :vendor_id,unique: true,editable: false, label: "Vendor ID", sequence: {prefix: "VNDR.", start_at: '000001'}, placeholder: "System Generated Field", hint: "System Generated Field", display_key: true
+    auto_number :vendor_id,unique: true,editable: false, label: "Vendor ID", sequence: {prefix: "VNDR.", start_at: '000001'}, placeholder: "System Generated Field", hint: "System Generated Field", show_in_data_card_as: 'subtitle', display_key: true
     switch :autogenerate_vendor_id, default_value: true, label: "Auto-Generate Vendor ID", system_field: false
     dropdown :vendor_country, choices_scope: Choices[:list].({id: 'India', name: "India"}, {id: 'International', name: "International"}),
-             required: true, default_value: 'India'
+             required: true, default_value: 'India', show_in_data_card_as: 'body'
     lookup :policy_id,
            choices_scope: Choices[:lookup].('policies', permissions: [:vendor_creator, :vendor_manager, :vendor_bulk_importer]),
-           required: true
+           required: true, show_in_data_card_as: 'body'
     # text :name, computed: Forms::Compute::Lookup('policy_id', '{{record.name}}'), editable: false
 
-    text :business_name, label: 'Legal Name', required: true, display_key: true
-    text :trade_name, label: 'Trade Name', required: true
+    text :business_name, label: 'Legal Name', required: true, show_in_data_card_as: 'body'
+    text :trade_name, label: 'Trade Name', required: true, show_in_data_card_as: 'title'
     switch :gst_registered, label: "GST Registered"
-    large_text :address, label: "Full Address"
+    large_text :address, label: "Full Address", show_in_data_card_as: 'body'
     lookup :vendor_type_id, choices_scope: Choices[:lookup].('vendor_types'), label: "Vendor Type"
     lookup :payment_term_id, choices_scope: Choices[:lookup].('payment_terms'), label: "Payment Term"
   end

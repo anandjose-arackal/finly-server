@@ -132,7 +132,12 @@ class User::AvailableExpenseTypes::Show < User::Base
       end
     end
 
-    load_custom_fields_config
+    if EmFieldConfigCacheToggle.new(user).enabled?
+      load_custom_fields_config_from_cache
+    else
+      load_custom_fields_config
+    end
+
   end
 
   def load_custom_fields_config
@@ -143,6 +148,19 @@ class User::AvailableExpenseTypes::Show < User::Base
     self.custom_fields_config[:distance_expense] = configurations.with_parent_type(FieldParentType.id_for(:distance_expense)) if distance_config[:enabled]
     self.custom_fields_config[:time_expense] = configurations.with_parent_type(FieldParentType.id_for(:time_expense)) if time_config[:enabled]
     self.custom_fields_config[:per_diem_expense] = configurations.with_parent_type(FieldParentType.id_for(:per_diem_expense)) if per_diem_config[:enabled]
+  end
+
+
+  def load_custom_fields_config_from_cache
+    cache = ExpenseTypeFieldConfigCache.new user
+    custom_fields_config_json = cache.custom_fields_config_json
+
+    if custom_fields_config_json.blank?
+      Rails.logger.error "Expense Type Config Cache - This case should never occur unless there's bug in cache code"
+      self.custom_fields_config = {}
+    else
+      self.custom_fields_config = JSON.parse custom_fields_config_json
+    end
   end
 
   def retrieve_policies

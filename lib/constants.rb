@@ -2,13 +2,13 @@ module Constants
   VALID_DATE_FORMAT = /\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])/
   VALID_EMAIL_FORMAT = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
   VALID_DOMAIN = /\A(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z0-9]{1,5}(.[a-z0-9]{1,5})?(:[0-9]{1,5})?(\/.*)?$\z/i
-  VALID_MOBILE_NUMBER = /\A(?:(?:\+|0{0,2})91(\s*[\-]\s*)?|[0]?)?[6789]\d{9}\z/i
+  VALID_MOBILE_NUMBER = /\A(?:\+?\d{1,3}\s*-?)?\(?(?:\d{3})?\)?[- ]?\d{3}[- ]?\d{4}\z/i
   VALID_PIN_CODE = /\A[1-9][0-9]{5}\z/i
   VALID_GENDER = /\A[MmFf]\z/i
   VALID_DECIMAL =/[\-\+]?[0-9]*(\.[0-9]+)?/i
   VALID_IFSC = /\A[A-Za-z]{4}[a-zA-Z0-9]{7}\z/i
   VALID_BANK_ACCOUNT = /\A[A-Za-z0-9]{3,32}\z/i
-  VALID_GSTIN = /\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}[Z]{1}[A-Z\d]{1}/i
+  VALID_GSTIN = /\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}[A-Z\d]{2}/i
   VALID_FY = /\d{4}-\d{2}/
   VALID_SWIFT_CODE = /^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$/i
   # VALID_PAN = /^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$/

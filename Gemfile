@@ -362,3 +362,4 @@ group :production do
 end
 
 gem 'prosopite', '~> 1.1.2'
+gem 'scout_apm' # Scout APM monitoring

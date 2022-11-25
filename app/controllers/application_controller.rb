@@ -563,6 +563,13 @@ class ApplicationController < ActionController::Base
     ElasticAPM.set_label(:app, current_app)
     ElasticAPM.set_label(:device, current_device)
     ElasticAPM.set_label(:view, params&.dig(:view))
+
+    ScoutApm::Context.add_user(id: current_user.id, email: current_user.email, user_name: current_user.name)
+    ScoutApm::Context.add(company_id: current_user.company_id)
+    ScoutApm::Context.add(company_name: current_user.company_name)
+    ScoutApm::Context.add(app: current_app)
+    ScoutApm::Context.add(device: current_device)
+    ScoutApm::Context.add(view: params&.dig(:view))
   end
 
   def after_finly_authorize
@@ -584,6 +591,52 @@ class ApplicationController < ActionController::Base
         user_transaction_id: AuditTrail.generate_transaction_id
     }
   end
+
+  def through_cache(custom_cache, cached_data_modifier: nil, &block)
+    unless custom_cache.enabled?
+      block.call
+      return
+    end
+
+    cached_value = custom_cache.read
+
+    unless cached_value.nil?
+      final_return_value = cached_value
+      unless cached_data_modifier.nil?
+        final_return_value = cached_data_modifier.call cached_value
+      end
+
+      render json: final_return_value, status: 200
+      return
+    end
+
+    block.call
+
+    if response.status >= 200 and response.status <= 299
+      custom_cache.write do
+        response.body
+      end
+    end
+  end
+
+  # Return a cache key based on params hash
+  # Copied from StackOverflow: https://stackoverflow.com/a/42783894
+  # Imp: Does not handle nested arrays / objects
+  # Should be fine for most simple params APIs
+  # Use your own judgement before using this, do you really need this?
+  def params_cache_key(x_params)
+    if x_params.is_a? ActionController::Parameters
+      x_params = x_params.to_unsafe_h
+    end
+    # Normalize parameter hash, change keys to a string, normalize key order, sort array values
+    normalized = x_params.transform_keys(&:to_s)
+                       .transform_values { |v| v.is_a?(Array) ? v.sort : v }
+                       .sort_by { |k, _| k }.each_with_object('') do |(k, v), cache_key|
+      cache_key << "#{k}:#{v}"
+    end
+    Digest::SHA1.hexdigest(normalized)
+  end
+
 
   # Used by sentry
   # def set_raven_context
