@@ -43,7 +43,7 @@ class Forms::Export::Processor
           entity_type: 'text'
         },
         id: {
-          name: "#{form.label.singularize} Internal ID",
+          name: "#{form.label&.singularize} Internal ID",
           entity_key: 'id',
           entity_type: 'text',
           hidden: true
