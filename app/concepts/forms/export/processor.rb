@@ -132,18 +132,18 @@ class Forms::Export::Processor
     else
       child_sheet_headers = {
         parent_sequence_number: {
-          name: "#{parent_sheet_label.singularize} Sequence Number",
+          name: "#{parent_sheet_label&.singularize} Sequence Number",
           entity_key: 'parent_sequence_number',
           entity_type: 'text'
         },
         parent_id: {
-          name: "#{parent_sheet_label.singularize} Internal ID",
+          name: "#{parent_sheet_label&.singularize} Internal ID",
           entity_key: 'parent_id',
           entity_type: 'text',
           hidden: true
         },
         id: {
-          name: "#{entity.label.singularize} Internal ID",
+          name: "#{entity.label&.singularize} Internal ID",
           entity_key: 'id',
           entity_type: 'text',
           hidden: true
