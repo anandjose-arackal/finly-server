@@ -482,7 +482,7 @@ class Forms::Import::Processor
     form_data
   end
 
-  def process_form_data(form_data, is_admin: false)
+  def process_form_data(form_data, is_admin = false)
     Rails.logger.debug "in process form data"
     p 'in process form data'
 
