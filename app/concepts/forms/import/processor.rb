@@ -86,7 +86,7 @@ class Forms::Import::Processor
 
     records_data = build_records_data(imported_sheet)
     records_data.each_with_index do |record_data, row_index|
-      # begin
+      begin
         form_data = build_form_data(record_data[:record_data], nil)
         result = process_form_data(form_data, true)
         raise unless result.present?
@@ -101,12 +101,9 @@ class Forms::Import::Processor
         end
 
         add_record_to_result_file(record_data[:record_data], result[:model].id, message, worksheets, worksheets_length)
-      # rescue => exception
-      #   p exception
-      #   Rails.logger.info exception
-      #   message = "Unable to process"
-      #   next
-      # end
+      rescue => exception
+        message = "Unable to process"
+      end
     end
 
     workbook.close
@@ -483,8 +480,6 @@ class Forms::Import::Processor
   end
 
   def process_form_data(form_data, is_admin = false)
-    Rails.logger.debug "in process form data"
-    p 'in process form data'
 
     form_data[:form] = form
     form_data[:is_import_process] = true
@@ -495,12 +490,8 @@ class Forms::Import::Processor
 
     #ToDo: use same operation once batch saving is resolved
     result = if is_admin
-               Rails.logger.debug "admin import"
-               p 'processing admin import'
                Forms::Import::Ops::AdminCreate.(params: form_data, current_user: user)
              else
-               Rails.logger.debug "user import"
-               p 'processing import by user'
                Forms::Import::Ops::Create.(params: form_data, current_user: user)
              end
 
