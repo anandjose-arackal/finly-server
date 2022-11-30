@@ -99,11 +99,11 @@ class Forms::Import::Processor
           message = result.messages[:errors].to_s
           request.item_complete(false)
         end
+
+        add_record_to_result_file(record_data[:record_data], result[:model].id, message, worksheets, worksheets_length)
       rescue => exception
         message = "Unable to process"
       end
-
-      add_record_to_result_file(record_data[:record_data], result[:model].id, message, worksheets, worksheets_length)
     end
 
     workbook.close
