@@ -488,8 +488,10 @@ class Forms::Import::Processor
 
     #ToDo: use same operation once batch saving is resolved
     result = if is_admin
+               p 'processing admin import'
                Forms::Import::Ops::AdminCreate.(params: form_data, current_user: user)
              else
+               p 'processing import by user'
                Forms::Import::Ops::Create.(params: form_data, current_user: user)
              end
 
