@@ -478,7 +478,7 @@ class Forms::Import::Processor
     form_data
   end
 
-  def process_form_data(form_data, is_admin = false)
+  def process_form_data(form_data, is_admin: false)
     form_data[:form] = form
     form_data[:is_import_process] = true
 
