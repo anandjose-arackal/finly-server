@@ -88,7 +88,7 @@ class Forms::Import::Processor
     records_data.each_with_index do |record_data, row_index|
       begin
         form_data = build_form_data(record_data[:record_data], nil)
-        result = process_form_data(form_data)
+        result = process_form_data(form_data, true)
         raise unless result.present?
 
         if result.success?
@@ -478,7 +478,7 @@ class Forms::Import::Processor
     form_data
   end
 
-  def process_form_data(form_data)
+  def process_form_data(form_data, is_admin = false)
     form_data[:form] = form
     form_data[:is_import_process] = true
 
@@ -486,7 +486,12 @@ class Forms::Import::Processor
       form_data[:record_query] = { id: form_data[:id] }
     end
 
-    result = Forms::Import::Ops::Create.(params: form_data, current_user: user)
+    #ToDo: use same operation once batch saving is resolved
+    result = if is_admin
+               Forms::Import::Ops::AdminCreate.(params: form_data, current_user: user)
+             else
+               Forms::Import::Ops::Create.(params: form_data, current_user: user)
+             end
 
     return result
   end
