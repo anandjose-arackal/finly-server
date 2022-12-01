@@ -134,6 +134,7 @@ class InvoiceLineItemsCalculationUtils
     # now calculate the TDS and the advance amount of this particular invoice, and return the store the new payment params here
     InvoiceCalculationUtils.new.calculate_tds_and_advance(params, self.taxable_amount, self.invoice_total, self.tds_applicable_amount, payment, invoice, payment_amount)
     InvoiceCalculationUtils.new.calculate_cn_adjustments(params, payment, invoice)
+    # invoice.update_invoice_status if invoice.try(:forms_enabled)
     params
   end
 
@@ -158,7 +159,7 @@ class InvoiceLineItemsCalculationUtils
             po_item_amount = po_item.rate.to_f * po_item.quantity.to_f
           end
           item_amount = po_item.present? ? po_item_amount : self.invoice_item_amount
-          rate = ((item.discount.to_f / item_amount) * 100) rescue 0
+          rate = (po_item.present? ? ((po_item.discount.to_f / item_amount) * 100) : ((item.discount.to_f / item_amount) * 100)) rescue 0
           self.discount_amount = (rate.to_f * self.invoice_item_amount.to_f) / 100
         else
           self.discount_amount = (item.discount.to_f * self.invoice_item_amount.to_f)/100

@@ -20,7 +20,7 @@ class Event::EPurchaseOrder::BulkTakeControl < Event::EPurchaseOrder::Base
     set_presenter_params(user)
     return unless params[:subject].present? && params[:body].present?
     params[:bulk_take_control_result] = self.bulk_take_control_result
-    ProcurementMailer.delay.purchase_order_bulk_take_control(Event::EPurchaseOrder::BulkTakeControl::MailerPresenter.new(user, params))
+    ProcurementMailer.delay(queue: 'procurements_notification').purchase_order_bulk_take_control(Event::EPurchaseOrder::BulkTakeControl::MailerPresenter.new(user, params))
   end
 
   def process

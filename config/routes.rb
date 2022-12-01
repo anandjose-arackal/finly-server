@@ -3981,6 +3981,7 @@ Rails.application.routes.draw do
     put 'purchase_orders/bulk_reject', to: 'purchase_orders#bulk_reject'
     put 'purchase_orders/bulk_take_control', to: 'purchase_orders#bulk_take_control'
 
+    get 'purchase_orders/form_enabled/:id', to: "purchase_orders#forms_enabled"
     get 'purchase_orders/templates', to: 'purchase_orders#template_index'
     get 'purchase_orders/templates/:id', to: 'purchase_orders#template_show'
     # post 'purchase_orders/templates', to: 'purchase_orders#template_create'
@@ -4078,6 +4079,8 @@ Rails.application.routes.draw do
     get 'inward_invoices/template_bulk_import_items', to: 'inward_invoices#template_bulk_import_items'
     put 'inward_invoices/forward', to: 'inward_invoices#bulk_forward'
     get 'inward_invoices/filter_config', to: 'inward_invoices#filter_config'
+    get 'inward_invoices/fetch_reviewal_chain', to: 'inward_invoices#fetch_reviewal_chain'
+
     resources :inward_invoices do
       put 'submit', to: 'inward_invoices#submit'
       put 'retract', to: 'inward_invoices#retract'
@@ -4164,6 +4167,7 @@ Rails.application.routes.draw do
   post 'vendors/create_and_submit', to: "vendors#create_and_submit"
   post 'vendors/penny_test', to: 'vendors#penny_test'
   post 'vendors/validate_gstin', to: 'vendors#validate_gstin'
+  post 'vendors/fetch_gst_filings', to: 'vendors#fetch_gst_filings'
   get 'vendors/actions_config', to: 'vendors#actions_config'
 
   put 'vendors/bulk_approve', to: 'vendors#bulk_approve'
@@ -4215,6 +4219,9 @@ Rails.application.routes.draw do
   post 'purchase_request_forms/create_and_submit', to: "purchase_request_forms#create_and_submit"
   post 'purchase_request_forms/create', to: "purchase_request_forms#create"
 
+  ######## NEW CREDIT NOTE FORMS #########################
+  resources :credit_note_forms, only: [:show, :update]
+  post 'credit_note_forms/save_and_submit', to: "credit_note_forms#save_and_submit"
 
   ######### Rate Contract API start #############
   resources :rate_contracts do
@@ -4265,7 +4272,8 @@ Rails.application.routes.draw do
   
   get 'forms/:route/config', to: 'forms#form_config'
   get 'forms/:route/dependencies', to: 'forms#form_dependencies'
-  
+  get 'forms/:model/:document_id/widgets/:widget', to: 'forms#form_widgets'
+  get 'forms/:model/:document_id/recent_documents', to: 'forms#recent_documents'
   post 'forms/choices', to: 'forms#form_entity_choices'
   post 'forms/lookup_details', to: 'forms#form_lookup_details'
   post 'forms/:route/predict', to: 'forms#form_prediction'
@@ -4480,60 +4488,5 @@ Rails.application.routes.draw do
     get '/:id', to: 'schemas#show'
   end
 
-  # The priority is based upon order of creation: first created -> highest priority.
-  # See how all your routes lay out with "rake routes".
-  # The priority is based upon order of creation: first created -> highest priority.
-  # See how all your routes lay out with "rake routes".
-
-  # You can have the root of your site routed with "root"
-  # root 'welcome#index'
-
-  # Example of regular route:
-  #   get 'products/:id' => 'catalog#view'
-
-  # Example of named route that can be invoked with purchase_url(id: product.id)
-  #   get 'products/:id/purchase' => 'catalog#purchase', as: :purchase
-
-  # Example resource route (maps HTTP verbs to controller actions automatically):
-  #   resources :products
-
-  # Example resource route with options:
-  #   resources :products do
-  #     member do
-  #       get 'short'
-  #       post 'toggle'
-  #     end
-  #
-  #     collection do
-  #       get 'sold'
-  #     end
-  #   end
-
-  # Example resource route with sub-resources:
-  #   resources :products do
-  #     resources :comments, :sales
-  #     resource :seller
-  #   end
-
-  # Example resource route with more complex sub-resources:
-  #   resources :products do
-  #     resources :comments
-  #     resources :sales do
-  #       get 'recent', on: :collection
-  #     end
-  #   end
-
-  # Example resource route with concerns:
-  #   concern :toggleable do
-  #     post 'toggle'
-  #   end
-  #   resources :posts, concerns: :toggleable
-  #   resources :photos, concerns: :toggleable
-
-  # Example resource route within a namespace:
-  #   namespace :admin do
-  #     # Directs /admin/products/* to Admin::ProductsController
-  #     # (app/controllers/admin/products_controller.rb)
-  #     resources :products
-  #   end
+  get 'data_cards', to: "data_cards#show"
 end

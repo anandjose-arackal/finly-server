@@ -155,7 +155,7 @@ class MlModel < ApplicationRecord
     # This is to ensure we are not tracking predictions for records which were used for training
     # the model
     if split_key.present?
-      records = records.where.not(:"#{split_key}" => nil).where("#{split_key} > ?", built_at)
+      records = records.where.not(:"#{split_key}" => nil).where("#{ActiveRecord::Base.connection.quote_column_name(split_key)} > ?", built_at) # nosqli - Quote Column being used to make sure only columns are queried, and not SQLi vul
     end
 
     # These models accuracy will be recomputed

@@ -2,6 +2,7 @@ require 'rails_helper'
 RSpec.describe 'UserAuthentication > Expiry' do
 
   before :all do
+    # nosqli - These are TDD test cases that mock behavior for unit testing, these are not real credentials that work in Prod
     @password = 'FW1g$18j0t!k19TJ'
     @company = create :company
     @user = create :em_admin_user, company: @company, last_activity_at: DateTime.now, password_changed_at: DateTime.now, otp_verified: true
@@ -112,6 +113,7 @@ RSpec.describe 'UserAuthentication > Expiry' do
       #   expect(@user.otp_verified).to_not be_truthy
       #   expect(@session.status_id).to eq(UserSessionStatus.id_for(:authorized))
       #   headers = {'Authorization': "Bearer #{@token_value}", REMOTE_ADDR: @ip, HTTP_USER_AGENT: @user_agent}
+      # # nosqli - These are TDD test cases that mock behavior for unit testing, these are not real credentials that work in Prod
       #   @new_password = 'FW1g$18j0t!k19TRe'
       #   post '/users/password.json', headers: headers, params: {password: @new_password, password_confirmation: @new_password}
       #   expect(response).to have_http_status(:unauthorized)
@@ -175,6 +177,7 @@ RSpec.describe 'UserAuthentication > Expiry' do
 
   describe '> User with old passwords' do
     it 'should mark the user as expired' do
+      # nosqli - These are TDD test cases that mock behavior for unit testing, these are not real credentials that work in Prod
       password = 'FW1g$18j0t!k19TJjL'
       @user.assign_attributes(
           {
@@ -218,6 +221,7 @@ RSpec.describe 'UserAuthentication > Expiry' do
 
   describe '> Users with no activity' do
     it 'should mark the user as expired' do
+      # nosqli - These are TDD test cases that mock behavior for unit testing, these are not real credentials that work in Prod
       password = 'FW1g$18j0t!t19TJjL'
       @user.assign_attributes(
           {
@@ -261,6 +265,7 @@ RSpec.describe 'UserAuthentication > Expiry' do
 
   describe '> Active User' do
     it 'should update users last_activity_at' do
+      # nosqli - These are TDD test cases that mock behavior for unit testing, these are not real credentials that work in Prod
       password = 'FW1g$18jRt!t19TJjL'
       old_last_activity = 10.minutes.ago
       @user.assign_attributes(

@@ -373,8 +373,7 @@ class TravelRequest < ApplicationRecord
         else
           # Models like Report doesn't has company_id attribute
           user_ids = user.company.users.pluck(:id)
-
-          controlling_level_ids = self.where("#{self.document_owner_attribute} in (?)", user_ids).pluck(:controlling_level_id).reject {|document_id| document_id.nil?}
+          controlling_level_ids = self.where("#{self.document_owner_attribute} in (?)", user_ids).pluck(:controlling_level_id).reject {|document_id| document_id.nil?} # nosqli - Table attribute being substituted, not a user provided input
         end
 
         # Get all the documents without viewable

@@ -348,6 +348,7 @@ class Invoice < ApplicationRecord
   validates :invoice_number, :format => {with: /\A[a-zA-Z0-9 \\\/\-\#\&\_]*\Z/, :message => ' can only have letters, numbers, spaces, -,#,&,/ and underscore. No other special characters'}, :length => {minimum: 0, maximum: 30}, :allow_blank => true
   validate :item_quantity_validation
   validate :item_rate_validation
+  validate :multiple_invoice_validation
 
   before_destroy :rollback_agreement_invoice
   before_create :set_currency
@@ -663,13 +664,14 @@ class Invoice < ApplicationRecord
   }
 
   scope :includes_for_contract, -> {
-    includes(:created_by, :invoice_type, :form_custom_fields, :items)
+    includes(:created_by, :invoice_type, :form_custom_fields, :items, :credit_note_adjustments)
   }
 
   # Sorting
   scope :sort_invoice_id, -> (type) {
     type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
+      # nosqli - The incoming var is checked to be ASC or DESC and then only substituted, not other value other than "ASC" or "DESC" possible
       reorder("invoices.invoice_id #{type}")
     end
   }
@@ -677,6 +679,7 @@ class Invoice < ApplicationRecord
   scope :sort_date, -> (type) {
     type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
+      # nosqli - The incoming var is checked to be ASC or DESC and then only substituted, not other value other than "ASC" or "DESC" possible
       reorder("invoices.date #{type}")
     end
   }
@@ -684,6 +687,7 @@ class Invoice < ApplicationRecord
   scope :sort_due_date, -> (type) {
     type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
+      # nosqli - The incoming var is checked to be ASC or DESC and then only substituted, not other value other than "ASC" or "DESC" possible
       reorder("invoices.due_date #{type}")
     end
   }
@@ -706,6 +710,17 @@ class Invoice < ApplicationRecord
                                   InwardInvoiceStatus.id_for(:rejected),
                                   InwardInvoiceStatus.id_for(:retracted)]
   }
+  scope :scope_all_except_voided_rejected_open, -> {
+    where.not invoice_status_id: [InwardInvoiceStatus.id_for(:voided),
+                                  InwardInvoiceStatus.id_for(:rejected),
+                                  InwardInvoiceStatus.id_for(:open),
+                                  InwardInvoiceStatus.id_for(:retracted)]
+  }
+
+  scope :scope_all_except_voided_rejected, -> {
+    where.not invoice_status_id: [InwardInvoiceStatus.id_for(:voided),
+                                  InwardInvoiceStatus.id_for(:rejected)]
+  }
 
   scope :pending_erp_sync, -> (*args) {
     with_erp_sync_status_pending.
@@ -715,7 +730,7 @@ class Invoice < ApplicationRecord
   after_create :set_defaults
   after_save :sync_amounts, unless: :skip_callback
   after_save :set_currency_for_amount, unless: :skip_callback
-  after_save :budget_trail_entry
+  after_save :budget_trail_entry, if: :budget_enabled?
   # the below callback deals with cases where the PO advance has been paid, and then an invoice is being raised
   # after_save :handle_po_advance_budget_trails
   after_destroy :budget_trail_destroy
@@ -914,7 +929,7 @@ class Invoice < ApplicationRecord
 
     if paid_amount == 0
       self.update(invoice_status_id: InwardInvoiceStatus.id_for(:unpaid))
-    elsif (!self.forms_enabled && paid_amount >= balance_due - 0.99) || (balance_due == 0 && self.forms_enabled)
+    elsif ((!self.forms_enabled || self.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)) && paid_amount >= balance_due - 0.99) || ((balance_due == 0 || paid_amount >= balance_due - 0.99) && self.forms_enabled)
       self.update(invoice_status_id: InwardInvoiceStatus.id_for(:paid), payable: false)
     elsif (!self.forms_enabled && paid_amount <= balance_due) || (self.forms_enabled && self.invoice_paid_outside_amount.to_f > 0)
       self.update(invoice_status_id: InwardInvoiceStatus.id_for(:partially_paid))
@@ -937,7 +952,8 @@ class Invoice < ApplicationRecord
 
   def invoice_balance_due
     if self.forms_enabled
-      self[:invoice_balance_due].to_f - self[:invoice_paid_outside_amount].to_f
+      # self.invoice_type.tax_invoice? ? self[:invoice_balance_due].to_f - self[:invoice_paid_outside_amount].to_f : self[:invoice_balance_due].to_f
+      self[:invoice_balance_due].to_f
     else
       balance_due&.value.to_f - paid_amount_value
     end
@@ -982,6 +998,19 @@ class Invoice < ApplicationRecord
     else
       self.invoice_net_total_amount.to_f
     end
+  end
+
+  def credit_note_adjustments_meta
+    details = []
+    self.credit_note_adjustments.each do |cna|
+      details << {
+        id: cna.id,
+        cn_adjustment_amount: cna.cn_adjustment_amount,
+        cn_net_adjustable_amount: cna.cn_net_adjustable_amount,
+        credit_note_id: cna.credit_note_id,
+      }
+    end
+    details
   end
 
 
@@ -1622,6 +1651,18 @@ class Invoice < ApplicationRecord
     end
   end
 
+  def credit_notes_presence
+    # return false for international invoice 
+    return false unless self.is_domestic
+    # if approved or beyound check if cnas is present 
+    if InwardInvoiceStatus.ids_for_paid_amount_consideration.include?(self.invoice_status_id) && self.credit_note_adjustments.present?
+      return true 
+    elsif !InwardInvoiceStatus.ids_for_paid_amount_consideration.include?(self.invoice_status_id) && ( ( self.vendor.credit_notes.filter_adjustables.present? || self.credit_note_adjustments.present? ))
+      return true 
+    end
+    return false
+  end
+  
   def remaining_adjustable_tds
     prev_adjusted_tds = self.procurement.invoices.where('created_at < ?', self.created_at).pluck(:adjusted_advance_tds).map(&:to_f).sum
     if self.advance_amount_required
@@ -1965,8 +2006,8 @@ class Invoice < ApplicationRecord
   def sync_amounts
     if forms_enabled
       # calculate the advance and adjusted tds
-      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(RequestStore.store[:params], nil, self) if self.advance_amount_required && PoInvoiceToggle.new(RequestStoreUtil.current_user).enabled?
       self.skip_callback = true
+      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(RequestStore.store[:params], nil, self) if self.advance_amount_required && PoInvoiceToggle.new(RequestStoreUtil.current_user).enabled?
       base_currency_id = get_base_currency&.id
 
       if invoice_gross_amount.present?
@@ -2129,6 +2170,20 @@ class Invoice < ApplicationRecord
     errors.add(:invoice_items, "rate must be greater than 0") if flag
   end
 
+  def multiple_invoice_validation
+    return true if self.invoice_type_id == InwardInvoiceType.id_for(:beneficiary)
+    return true if InwardInvoiceStatus.ids_for( :rejected).include?(self.invoice_status_id)
+    current_company_invoices = company.inward_invoices.scope_all_except_voided_rejected
+    invoice_number = self.invoice_number
+    vendor_id = self.vendor_id
+    duplicate_invoices = current_company_invoices.with_invoice_number(invoice_number).with_vendor_ids(vendor_id).without_id(self.id)
+    multiple_invoices = current_company_invoices.where(invoice_number: self.invoice_number).count > 1
+    if invoice_number.present? && duplicate_invoices.present? && multiple_invoices
+      errors.add(:inward_invoice, "There is a similar invoice added with the same invoice number in our records. Please re-check your invoice details.")
+      return
+    end
+  end
+
   def updated_values_to_new_structure
 
     # update_tds
@@ -2207,6 +2262,10 @@ class Invoice < ApplicationRecord
     end
     self.skip_callback = true
     self.save
+  end
+
+  def budget_enabled?
+    RequestStore.store[:current_company]&.feature_subscription&.budgeting_system || false
   end
 
   # def update_amount_after_cn_adjustment

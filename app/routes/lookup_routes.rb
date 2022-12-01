@@ -3,6 +3,7 @@ Lookup::Router.draw do
 
 
   # Masters
+  # Todo Simple Masters don't need lookups as it should ideally be handled by masters.*
   route 'policies', Masters::Policies::Lookup
   route "departments", Masters::Departments::Lookup
   route "locations", Masters::Locations::Lookup
@@ -26,7 +27,10 @@ Lookup::Router.draw do
   route "purchase_request_statuses", Masters::PurchaseRequestStatuses::Lookup
   route "currencies", Masters::Currencies::Lookup
   route "countries", Masters::Countries::Lookup
+  route "adjustable_credit_notes", Masters::AdjustableCreditNotes::Lookup
   route "advance_amount_statuses", Masters::AdvanceAmountStatuses::Lookup
+  route "credit_note_statuses", Masters::CreditNoteStatuses::Lookup
+  route "credit_note_item_types", Masters::CreditNoteItemTypes::Lookup
 
   # Docs
   route 'purchase_requests', Docs::P2P::PurchaseRequests::Lookup

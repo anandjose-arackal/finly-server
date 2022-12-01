@@ -93,6 +93,7 @@ class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
     params[:credit_note][:invoice_id] = invoice.id
     params[:credit_note][:procurement_id] = invoice.procurement&.id
     params[:credit_note][:tds_rate_id] = invoice.tds_slab_id
+    params[:credit_note][:cn_tds_rate] = invoice.tds_slab&.tds.to_f
     params[:credit_note][:department_id] = (invoice.department_id.present? ? invoice.department_id : invoice.items.first.department_id)
     params[:credit_note][:cost_center_id] = (invoice.cost_center_id.present? ? invoice.cost_center_id : invoice.items.first.cost_center_id)
     params[:credit_note][:shipping_location_id] = invoice.delivery_location_id
@@ -100,8 +101,32 @@ class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
     params[:credit_note][:vendor_id] = invoice.vendor_id
     params[:credit_note][:billing_address] = invoice.billing_address
     params[:credit_note][:shipping_address] = invoice.shipping_address
+    params[:credit_note][:base_currency_id ] = invoice&.get_base_currency&.id
+    params[:credit_note][:reporting_currency_id] = invoice&.get_reporting_currency&.id
+    params[:credit_note][:conversion_rate] = invoice&.conversion_rate
+    params[:credit_note][:conversion_date] = invoice&.conversion_date
+    params[:credit_note][:gstin_location_id] = invoice&.gstin_location_id
+    params[:credit_note][:vendor_location_id] = invoice&.vendor_location_id
+    params[:credit_note][:vendor_gstin] = invoice&.vendor_gstin
+
+    params[:credit_note][:vendor_trade_name] = invoice&.vendor_trade_name
+    params[:credit_note][:vendor_sequence_id] = invoice&.vendor_sequence_id
+    params[:credit_note][:vendor_pan] = invoice&.vendor_pan
+    params[:credit_note][:vendor_country_id] = invoice&.vendor_country_id
+    params[:credit_note][:billing_address_gstin] = invoice&.billing_address_gstin
+    params[:credit_note][:shipping_address_gstin] = invoice&.shipping_address_gstin
+    params[:credit_note][:shipping_address_name] = invoice&.shipping_address_name
+    params[:credit_note][:billing_address_name] = invoice&.billing_address_name
+    params[:credit_note][:cn_gross_receivable_amount] = 0
+    params[:credit_note][:cn_tax_amount] = 0
+    params[:credit_note][:cn_tds_amount] = 0
+    params[:credit_note][:cn_net_receivable_amount] = 0
+    params[:credit_note][:cn_roundoff_amount] = 0
+    params[:credit_note][:cn_previously_adjusted_amount] = 0
+    params[:credit_note][:net_adjusted_amount] = 0
 
     # Credit Note Items Attributes
+    base_currency_id = invoice&.get_base_currency&.id
     items = []
     invoice.items.each do |item|
       if item.discount_amount.present? && item.discount_amount.value > 0
@@ -125,6 +150,8 @@ class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
       else
         tax_rate_id = current_user.company.tax_rates.with_rate(0)&.first&.id
       end
+      tax_rate = item.tax_rate&.rate.to_f
+      tax_amount = (taxable_amount * tax_rate/100).round(2)
       item_attr = {
           item_id: item.inventory_line_item_id,
           invoice_item_id: item.id,
@@ -133,18 +160,28 @@ class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
           hsn_sac: item.hsn_sac,
           original_quantity: quantity,
           quantity: quantity,
+          revised_quantity: quantity,
           original_rate: rate,
+          revised_rate: rate,
           rate: rate,
           original_taxable_amount: {
               value: taxable_amount,
-              currency_id: item.taxable_amount.currency_id
+              currency_id: base_currency_id
           },
+          cn_original_taxable_amount: taxable_amount,
+          cn_revised_taxable_amount: taxable_amount,
+          original_tax_percentage: tax_rate,
+          revised_tax_percentage: tax_rate,
+          original_item_tax_amount: tax_amount,
+          revised_item_tax_amount: tax_amount,
           taxable_amount: {
               value: taxable_amount,
-              currency_id: item.taxable_amount.currency_id
+              currency_id: base_currency_id
           },
           original_tax_rate_id: tax_rate_id,
-          tax_rate_id: tax_rate_id
+          revised_tax_rate_id: tax_rate_id,
+          tax_rate_id: tax_rate_id,
+          item_number: item.item_number
       }
       items.push(item_attr)
     end

@@ -180,7 +180,7 @@ module Transitionable
             tat: dlrm.tat,
             tat_added_by_s: dlrm.tat_added_by_script,
             action_taken: (dlrm.reviewer_id == dlrm.action_taken_by_id),
-            action_name: dlrm.action&.name&.split("_")&.map(&:capitalize)&.join(" ")
+            action_name: dlrm.action&.convert_to_past&.split("_")&.map(&:capitalize)&.join(" ")
         }
         data[:reviewers].push(reviewer)
 
@@ -494,6 +494,7 @@ module Transitionable
           controlling_level_ids = self.select(:controlling_level_id).where(company_id: user.company.id).where.not(controlling_level_id: nil)
         else
           user_ids = User.select(:id).where(company_id: user.company_id)
+          # nosqli - Substituted values are from AR object, and not user provided input
           controlling_level_ids = self.select(:controlling_level_id).where("#{self.table_name}.#{self.document_owner_attribute}" => user_ids).where.not(controlling_level_id: nil)
         end
         document_ids = DocumentLevelReviewerMapping.where(
@@ -511,6 +512,7 @@ module Transitionable
             document_reviewer_mappable_type: self.name,
             taken_control_by_id: user.id
         ))
+        # nosqli - Substituted value not user provided input
         self.where("#{table_name}.id" => document_ids.select("document_reviewer_mappable_id"))
       end
 
@@ -585,31 +587,39 @@ module Transitionable
       forwarded_document_ids_from_dlrms = DocumentLevelReviewerMapping.with_document_type(self.name).where(forwarded: true, forwarded_to_id: user.id)
 
       if self.column_names.include? 'company_id'
+        # nosqli - Substituted values are from AR objects, and not user provided input
         document_ids = self.select(:id).where("#{table_name}.id in (#{document_ids_from_dlrms.select("document_reviewer_mappable_id").to_sql})").where(company_id: user.company_id).where(controlling_level_id: all_level_ids)
 
         # Find controlling level of all those documents
         controlling_level_ids = self.select(:controlling_level_id).where(company_id: user.company_id).where(controlling_level_id: all_level_ids)
 
         if admin
+          # nosqli - Substituted values are from AR object, and not user provided input
           taken_control_document_ids = self.where(company_id: user.company_id).where("#{table_name}.id IN (#{taken_control_document_ids_from_dlrms.select('document_reviewer_mappable_id').to_sql})").where(controlling_level_id: taken_control_level_ids)
           taken_control_controlling_level_ids = self.select(:controlling_level_id).where(company_id: user.company_id).with_controlling_level_id(taken_control_level_ids)
         end
 
+        # nosqli - Substituted values are from AR object, and not user provided input
         forwarded_document_ids = self.select(:id).where(company_id: user.company_id).where("#{table_name}.id IN (#{forwarded_document_ids_from_dlrms.select("document_reviewer_mappable_id").to_sql})").where(controlling_level_id: forwarded_level_ids)
         forwarded_controlling_level_ids = self.select(:controlling_level_id).where(company_id: user.company_id).with_controlling_level_id(forwarded_level_ids)
       else
         user_ids = User.select(:id).where(company_id: user.company_id)
+        # nosqli - Substituted values are from AR object, and not user provided input
         document_ids = self.select(:id).where("#{table_name}.id in (#{document_ids_from_dlrms.select("document_reviewer_mappable_id").to_sql})").where("#{self.table_name}.#{self.document_owner_attribute}" => user_ids).where(controlling_level_id: all_level_ids)
 
         # Find controlling level of all those documents
+        # nosqli - Substituted values are from AR object, and not user provided input
         controlling_level_ids = self.select(:controlling_level_id).where("#{self.table_name}.#{self.document_owner_attribute}" => user_ids).where(controlling_level_id: all_level_ids)
 
         if admin
+          # nosqli - Substituted values are from AR object, and not user provided input
           taken_control_document_ids = self.select(:id).where("#{table_name}.id in (#{taken_control_document_ids_from_dlrms.select("document_reviewer_mappable_id").to_sql})").where("#{self.table_name}.#{self.document_owner_attribute}" => user_ids).where(controlling_level_id: taken_control_level_ids)
+          # nosqli - Substituted values are from AR object, and not user provided input
           taken_control_controlling_level_ids = self.select(:controlling_level_id).where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).where(controlling_level_id: taken_control_level_ids)
         end
-
+        # nosqli - Substituted values are from AR object, and not user provided input
         forwarded_document_ids = self.select(:id).where("#{table_name}.id IN (#{forwarded_document_ids_from_dlrms.select("document_reviewer_mappable_id").to_sql})").where("#{self.table_name}.#{self.document_owner_attribute}" => user_ids).where(controlling_level_id: forwarded_level_ids)
+        # nosqli - Substituted values are from AR object, and not user provided input
         forwarded_controlling_level_ids = self.select(:controlling_level_id).where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).where(controlling_level_id: forwarded_level_ids)
       end
 
@@ -637,7 +647,7 @@ module Transitionable
           where(taken_control: false, action_taken_by_id: nil).
           with_document_type(self.name).
           where(document_reviewer_mappable_id: document_ids))
-
+      # nosqli - Substituted values are from AR object, and not user provided input
       self.where("#{table_name}.id" => ids.select("document_reviewer_mappable_id"))
 
     end
@@ -746,15 +756,17 @@ module Transitionable
       forwarded_document_ids_from_dlrms = DocumentLevelReviewerMapping.with_document_type(self.name).where(forwarded: true, forwarded_to_id: user.id)
 
       if self.column_names.include? 'company_id'
+        # nosqli - Substituted values are from AR object, and not user provided input
         document_ids = self.where("#{table_name}.id in (#{document_ids_from_dlrms.select("document_reviewer_mappable_id").to_sql})").where(company_id: user.company_id).with_controlling_level_id(all_level_ids.uniq).pluck(:id).uniq
         # Find controlling level of all those documents
         controlling_level_ids = self.where(company_id: user.company_id).with_controlling_level_id(all_level_ids).pluck(:controlling_level_id).uniq
 
         if admin
+          # nosqli - Substituted values are from AR object, and not user provided input
           taken_control_document_ids = self.where(company_id: user.company_id).where("#{table_name}.id IN (#{taken_control_document_ids_from_dlrms.select('document_reviewer_mappable_id').to_sql})").with_controlling_level_id(taken_control_level_ids)
           taken_control_controlling_level_ids = self.where(company_id: user.company_id).with_controlling_level_id(taken_control_level_ids).pluck(:controlling_level_id).uniq
         end
-
+        # nosqli - Substituted values are from AR object, and not user provided input
         forwarded_document_ids = self.where(company_id: user.company_id).where("#{table_name}.id IN (#{forwarded_document_ids_from_dlrms.select("document_reviewer_mappable_id").to_sql})").with_controlling_level_id(forwarded_level_ids).pluck(:id)
         forwarded_controlling_level_ids = self.where(company_id: user.company_id).with_controlling_level_id(forwarded_level_ids).pluck(:controlling_level_id).uniq
       else
@@ -764,11 +776,14 @@ module Transitionable
         controlling_level_ids = self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(all_level_ids).pluck(:controlling_level_id).uniq
 
         if admin
+          # nosqli - Substituted values are from AR object, and not user provided input
           taken_control_document_ids = self.where("#{table_name}.id in (#{taken_control_document_ids_from_dlrms.select("document_reviewer_mappable_id").to_sql})").where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(taken_control_level_ids)
+          # nosqli - Substituted values are from AR object, and not user provided input
           taken_control_controlling_level_ids = self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(taken_control_level_ids).pluck(:controlling_level_id).uniq
         end
-
+        # nosqli - Substituted values are from AR object, and not user provided input
         forwarded_document_ids = self.where("#{table_name}.id IN (#{forwarded_document_ids_from_dlrms.select("document_reviewer_mappable_id").to_sql})").where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(forwarded_level_ids)
+        # nosqli - Substituted values are from AR object, and not user provided input
         forwarded_controlling_level_ids = self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(forwarded_level_ids).pluck(:controlling_level_id).uniq
       end
 
@@ -802,7 +817,7 @@ module Transitionable
           where(taken_control: false, action_taken_by_id: nil).
           with_document_type(self.name).
           with_document_id(document_ids))
-
+      # nosqli - Substituted values are from AR object, and not user provided input
       self.where("#{table_name}.id in (#{ids.select("document_reviewer_mappable_id").to_sql})")
     end
 
@@ -814,6 +829,7 @@ module Transitionable
           self.where(company_id: user.company.id)
         else
           user_ids = user.company.users.pluck(:id)
+          # nosqli - Substituted values are from AR object, and not user provided input
           self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids)
         end
         # self.where(id: document_ids)
@@ -823,6 +839,7 @@ module Transitionable
     def finance_associated_items(user)
       if user.instance_of?(User)
         policy_ids = PolicyUserRole.with_role_id(UserRole.id_for(:finance_manager)).where(user_id: user.id).pluck(:policy_id)
+        # nosqli - Substituted values are from AR object, and not user provided input
         self.where(policy_id: policy_ids)
             .where("#{self.document_status_attribute} in (?)", self.finance_associated_status_ids)
       end
@@ -831,6 +848,7 @@ module Transitionable
     def creditor_associated_items(user)
       if user.instance_of?(User)
         policy_ids = PolicyUserRole.select(:policy_id).with_role_id(UserRole.id_for(:creditor)).where(user_id: user.id)
+        # nosqli - Substituted values are from AR object, and not user provided input
         self.where(policy_id: policy_ids)
             .where("#{self.document_status_attribute} in (?)", self.finance_associated_status_ids)
       end
@@ -840,6 +858,7 @@ module Transitionable
     def travel_associated_items(user)
       if user.instance_of?(User)
         policy_ids = PolicyUserRole.select(:policy_id).with_role_id(UserRole.id_for(:travel_manager)).where(user_id: user.id)
+        # nosqli - Substituted values are from AR object, and not user provided input
         self.where(policy_id: policy_ids)
             .where("#{self.document_status_attribute} in (?)", self.travel_associated_status_ids)
       end
@@ -849,6 +868,7 @@ module Transitionable
       # Only those documents which contain policies with user in it
       policy_ids = user.policy_user_roles.with_role_id(role_id).pluck(:policy_id)&.uniq rescue nil
       unless policy_ids.blank?
+        # nosqli - Substituted values are from AR object, and not user provided input
         self.where(policy_id: policy_ids)
             .where("#{self.document_status_attribute} in (?)", self.role_based_associated_status_ids(user))
       end
@@ -973,6 +993,7 @@ module Transitionable
       if user.instance_of?(User)
         if self.column_names.include? 'company_id'
           if admin_restricted_status_ids.present?
+            # nosqli - Substituted values are from AR object, and not user provided input
             self.where(company_id: user.company.id).where.not("#{self.table_name}.#{self.document_status_attribute} in (?)", admin_restricted_status_ids)
           else
             self.where(company_id: user.company.id)
@@ -981,6 +1002,7 @@ module Transitionable
           user_ids = user.company.users.pluck(:id)
           user_ids = User.select(:id).where(company_id: user.company_id)
           if admin_restricted_status_ids.present?
+            # nosqli - Substituted values are from AR object, and not user provided input
             self.where("#{self.table_name}.#{self.document_owner_attribute}" => user_ids).where.not("#{self.table_name}.#{self.document_status_attribute} in (?)", admin_restricted_status_ids)
           else
             self.where("#{self.table_name}.#{self.document_owner_attribute}" => user_ids)
@@ -1009,17 +1031,20 @@ module Transitionable
       else
         # Models like Report doesn't has company_id attribute
         user_ids = User.select(:id).where(company_id: user.company_id)
+        # nosqli - Substituted values are from AR object, and not user provided input
         controlling_level_ids = self.select(:controlling_level_id).where("#{self.table_name}.#{self.document_owner_attribute}" => user_ids).where.not(controlling_level_id: nil)
       end
 
       # consolidated above 4 queries into 1
+      # nosqli - Substituted values are from AR object, and not user provided input
       dlrms = DocumentLevelReviewerMapping.
           where(document_reviewer_mappable_type: self.name).
           where("(reviewer_id = #{user.id} AND (level_id IN (?) OR viewable IS TRUE)) OR (taken_control IS TRUE AND taken_control_by_id = #{user.id}) OR (forwarded IS TRUE AND forwarded_to_id = #{user.id})", controlling_level_ids)
 
-
+      # nosqli - Substituted values are from AR object, and not user provided input
       documents = self.status_based_associated_items(user, role_id).where("#{table_name}.id IN (#{dlrms.select('document_reviewer_mappable_id').to_sql})").where(policy_id: policy_ids)
       open_status_ids = self.open_status_ids(user)
+      # nosqli - Substituted values are from AR object, and not user provided input
       documents = documents.where.not("#{self.table_name}.#{self.document_status_attribute} in (?)", open_status_ids).or(documents.where("#{self.table_name}.#{self.document_status_attribute} in (?)", open_status_ids).where("#{self.table_name}.#{self.document_owner_attribute} = ?", user.id)) rescue self.none
       documents
     end
@@ -1028,6 +1053,7 @@ module Transitionable
     def role_based_creditor_associated_items(user, role_id, options={})
       policy_ids = user.policy_user_roles.with_role_id(role_id).pluck(:policy_id)&.uniq
       if policy_ids.present?
+        # nosqli - Substituted values are from AR object, and not user provided input
         self.where(policy_id: policy_ids)
             .where("#{self.document_status_attribute} in (?)", self.finance_associated_status_ids)
       end
@@ -1036,6 +1062,7 @@ module Transitionable
     def role_based_auditor_associated_items(user, role_id, options={})
       policy_ids = user.policy_user_roles.with_role_id(role_id).pluck(:policy_id)&.uniq
       if policy_ids.present?
+        # nosqli - Substituted values are from AR object, and not user provided input
         self.where(policy_id: policy_ids)
             .where("#{self.document_status_attribute} in (?)", self.auditor_associated_status_ids)
       end

@@ -1,0 +1,2 @@
+module DataCardsHelper
+end

@@ -25,7 +25,7 @@ class Users::Deactivate < Users::Base
   end
 
   def process
-    self.selected_user.update(active: false)
+    self.selected_user.update(active: false, default_password: false)
   end
 
   def post_process

@@ -74,6 +74,26 @@ class Masters::Schema::Records::Contract
           instance_exec context, &evaluator
         end
       end
+      
+      # Fetch extracts the data from the form using entity or entity_key
+      def fetch(entity: nil, entity_key: nil, raw_values: false, user: nil)
+        entity_key = entity.entity_key if entity.present?
+        return nil unless entity_key.present?
+
+        value = to_form.dig(entity_key)
+        if !raw_values and entity.present? and value.present?
+          if entity.choices_scope.present?
+            user ||= RequestStoreUtil.current_user
+            choice = entity.choices_scope.find_by_id(value, params: {}, user: user)
+            if choice.present?
+              value = choice[:name]
+            else
+              value = nil
+            end
+          end
+        end
+        value
+      end
     end
   end
 

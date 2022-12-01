@@ -114,7 +114,7 @@ class Docs::UtilityBills::Subscriptions::Contracts::Update < Reform::Form
         if config['regex'].present?
           regex = Regexp.new config['regex']
 
-          errors.add("customer_param_key_#{a}", "Please provide #{label} in the correct format") unless value&.match(regex)
+          errors.add("customer_param_key_#{a}", "Please provide #{label} in the correct format") unless value.to_s&.match(regex)
           valid = false
         end
       else
@@ -138,7 +138,7 @@ class Docs::UtilityBills::Subscriptions::Contracts::Update < Reform::Form
   end
 
   def check_numeric(string)
-    string.match(/^\d+$/)
+    string.to_s.match(/^\d+$/)
   end
 
   def customer_fields!(collection:, fragment:, index:, options:, **)

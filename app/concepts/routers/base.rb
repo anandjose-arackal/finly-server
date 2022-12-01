@@ -33,10 +33,12 @@ class Routers::Base
   end
 
   def self.route(key, *args, options: {}, &block)
-    if not allow_multiple_associations? and map(key).present?
-      return if args.count == 1 and map(key).first.klass == args.first
+    scoped_key_val = scoped_key(key)
+    if not allow_multiple_associations? and map[scoped_key_val].present?
+      return if args.count == 1 and map[scoped_key_val].first.klass == args.first
 
-      raise "#{key} is already defined for the router #{self.name}"
+      map.delete(scoped_key_val)
+      # raise "#{scoped_key_val} is already defined for the router #{self.name}"
     end
 
     context_key(key)

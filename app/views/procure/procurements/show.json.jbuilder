@@ -157,6 +157,8 @@ json.trail do
           json.id item.status&.id
           json.name item.status&.name
         end
+        forms_enabled = item.forms_enabled == 'true'
+        json.forms_enabled forms_enabled
       end
 
     elsif item.is_a?(BillOfSupply)
@@ -201,7 +203,7 @@ json.locations do
 end
 
 json.payment_terms do
-  json.array! @result.payment_terms, :id, :name, :days_after, :description, :default
+  json.array! @result.payment_terms
 end
 
 json.procurement_terms do

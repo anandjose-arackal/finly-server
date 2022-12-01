@@ -68,7 +68,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
     
     # checking for duplicates within this particular company
-    current_company_invoices = current_company.inward_invoices.scope_all_except_voided_rejected_retracted
+    current_company_invoices = current_company.inward_invoices.scope_all_except_voided_rejected
     invoice_number = self.inward_invoice_params[:invoice_number]
     vendor_id = self.inward_invoice.vendor_id || params[:vendor_id]
     duplicate_invoices = current_company_invoices.with_invoice_number(invoice_number).with_vendor_ids(vendor_id).without_id(self.inward_invoice.id)
@@ -143,7 +143,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
           break
         end
 
-        if item_amount < (invoiced_total_amount + item.dig(:taxable_amount_attributes, :value)&.to_f)
+        if item_amount < (invoiced_total_amount&.to_f + item.dig(:taxable_amount_attributes, :value)&.to_f)
           add_message :error, "Invoiced Item Taxable Amount should be on par with the Purchase Order Item Taxable Amount"
           break
         end

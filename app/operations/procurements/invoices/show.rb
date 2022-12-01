@@ -63,18 +63,22 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
       op = BudgetManager::BudgetsCalculator::ApplicableBudgets.({document: self.invoice, current_user: User.first})
       self.budgets = op["result"][:budgets]
 
-      if self.invoice.created_by_user_id == user.id && Invoice.status_ids(:open, :retracted, :rejected).include?(self.invoice.invoice_status_id)
-        self.reviewal_chains = []
-        params[:reviewal_document] = invoice
-        params[:provider_name] = get_invoice_provider_name
-        policies.each do |policy|
-          params[:policy_id] = policy.id
-          chain = {
+      self.reviewal_chains = []
+      unless ReviewalChainAsyncToggle.new(user).enabled?
+        if self.invoice.created_by_user_id == user.id && Invoice.status_ids(:open, :retracted, :rejected).include?(self.invoice.invoice_status_id)
+          self.reviewal_chains = []
+          params[:reviewal_document] = invoice
+          params[:provider_name] = get_invoice_provider_name
+          policies = self.policies.includes(levels: [{level_user_reviewer_mappings: [:reviewer,:user]}, {level_reviewer_mappings: :reviewer}])
+          policies.each do |policy|
+            params[:policy_id] = policy.id
+            chain = {
               policy_id: policy.id,
               reviewal_chain: get_reviewal_chain
-          }
+            }
 
-          self.reviewal_chains.push(chain)
+            self.reviewal_chains.push(chain)
+          end
         end
       end
 

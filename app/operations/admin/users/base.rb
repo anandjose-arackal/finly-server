@@ -33,30 +33,31 @@ class Admin::Users::Base < Admin::Base
     def retrieve_card_data
       cards = self.selected_user.cards
       data = []
-      cards.each do |card|
-        result = ItzCash::AccountDetails.(card.user, card: card)
-        request = {
-            card: card,
-            proxy: card.proxy,
-            balance: (result.balance rescue 0),
-            eligibility: (result.available_card_eligibility rescue 0),
-            active: ((result.suspended_status rescue nil) == 'N' ? true : false),
-            status: {id: card.card_status.id, name: card.card_status.name}
-        }
-        unless card.assigned?
-          assign_request = card.card_assign_requests.with_card_owner_id(selected_user.id).first
-          if assign_request.present?
-            request[:assign_request] = {
-                id: assign_request.id,
-                status: {
-                    id: assign_request.status.id,
-                    name: assign_request.status.name
-                }
-            }
-          end
-        end
-        data << request
-      end
+      #card feature discontinued
+      #cards.each do |card|
+      #  result = ItzCash::AccountDetails.(card.user, card: card)
+      #  request = {
+      #      card: card,
+      #      proxy: card.proxy,
+      #      balance: (result.balance rescue 0),
+      #      eligibility: (result.available_card_eligibility rescue 0),
+      #      active: ((result.suspended_status rescue nil) == 'N' ? true : false),
+      #      status: {id: card.card_status.id, name: card.card_status.name}
+      #  }
+      #  unless card.assigned?
+      #    assign_request = card.card_assign_requests.with_card_owner_id(selected_user.id).first
+      #    if assign_request.present?
+      #      request[:assign_request] = {
+      #          id: assign_request.id,
+      #          status: {
+      #              id: assign_request.status.id,
+      #              name: assign_request.status.name
+      #          }
+      #      }
+      #    end
+      #  end
+      #  data << request
+      #end
       data
     end
 

@@ -323,7 +323,8 @@ class PurchaseOrder < ApplicationRecord
   }
 
   scope :filter_payable_advances, -> {
-    where(purchase_order_status_id: [
+    where(advance_amount_required: true,
+          purchase_order_status_id: [
         PurchaseOrderStatus.id_for(:approved),
         PurchaseOrderStatus.id_for(:auto_approved),
         PurchaseOrderStatus.id_for(:sent_to_vendor),
@@ -491,6 +492,7 @@ class PurchaseOrder < ApplicationRecord
     to = Date.today if to.blank?
     from = Date.parse(from) unless from.is_a?(Date)
     to = Date.parse(to) unless to.is_a?(Date)
+    # nosqli - The incoming vars are substituted using AR's safe substitute
     where('created_at >= ? && created_at <= ?', from, to)
   }
 
@@ -504,6 +506,7 @@ class PurchaseOrder < ApplicationRecord
   # Sorting
   scope :sort_po_number, -> (type) {
     type = type&.strip&.upcase
+    # nosqli - The incoming var is checked to be ASC or DESC and then only substituted, not other value other than "ASC" or "DESC" possible
     if type && ['ASC', 'DESC'].include?(type)
       reorder("purchase_orders.po_number #{type}")
     end
@@ -512,6 +515,7 @@ class PurchaseOrder < ApplicationRecord
   scope :sort_po_name, -> (type) {
     type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
+      # nosqli - The incoming var is checked to be ASC or DESC and then only substituted, not other value other than "ASC" or "DESC" possible
       includes(:procurement).reorder("procurements.name #{type}")
     end
   }
@@ -555,7 +559,7 @@ class PurchaseOrder < ApplicationRecord
   after_create :purchase_request_tasks
   after_save :sync_amounts, unless: :skip_callback
   after_save :set_currency_for_amount, unless: :skip_callback
-  after_save :budget_trail_entry
+  after_save :budget_trail_entry, if: :budget_enabled?
   after_destroy :budget_trail_destroy
 
   before_create :set_currency
@@ -920,7 +924,7 @@ class PurchaseOrder < ApplicationRecord
   end
 
   def reporting_payable_advance_amount
-    user.po_form_enabled ? (self.payable_advance_amount * self.conversion_rate) : 0
+    user.po_form_enabled ? (self.payable_advance_amount.to_f * self.conversion_rate.to_f) : 0
   end
 
   def balance_due
@@ -1024,7 +1028,7 @@ class PurchaseOrder < ApplicationRecord
   def review_in_progress?
     PurchaseOrderStatus.ids_for(:processing).include?(purchase_order_status_id)
   end
-
+  
   def form_klass
     Forms::Router.klass(:purchase_orders)&.name
   end
@@ -1154,7 +1158,7 @@ class PurchaseOrder < ApplicationRecord
           item_discount = (item.discount || 0).to_f
           item_discount_amount = item_amount * item_discount / 100
         when 2
-          item_discount_amount = item.discount
+          item_discount_amount = item.discount || 0
         else
           item_discount = (item.discount || 0).to_f
           item_discount_amount = item_amount * item_discount / 100
@@ -1544,5 +1548,9 @@ class PurchaseOrder < ApplicationRecord
 
   def reporting_currency_amount(value)
     return (value.to_f * self.conversion_rate.to_f).round(2)
+  end
+
+  def budget_enabled?
+    RequestStore.store[:current_company]&.feature_subscription&.budgeting_system || false
   end
 end

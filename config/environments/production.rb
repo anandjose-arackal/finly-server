@@ -40,7 +40,7 @@ Rails.application.configure do
   config.redis = Redis.new(redis_creds)
 
   if redis_config[:cache_enabled]
-    config.cache_store = :redis_cache_store, redis_creds
+    config.cache_store = :redis_cache_store, redis_creds&.symbolize_keys
   else
     config.action_controller.perform_caching = false
     config.cache_store = :null_store

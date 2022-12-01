@@ -7,7 +7,7 @@ require 'faraday_middleware'
 class BulletTrain
   attr_reader :bt_api
 
-  TIMEOUT = 15
+  TIMEOUT = (Rails.env.production? ? 15 : 1)
 
   def self.logger
     @logger ||= LogStashLogger.new(type: :file, path: 'log/bullet_train_api.log', sync: true)
@@ -135,6 +135,7 @@ class BulletTrain
   # end
 
   def transform_flags(flags)
+    flags ||= []
     flags.map do |flag|
       {
         name: flag['feature']['name'],

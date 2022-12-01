@@ -16,7 +16,7 @@ class Admin::Implementations::Master::Departments::Export < Admin::Implementatio
   end
 
   def input
-    company.departments
+    company.departments.non_deleted
   end
 
   def id(department)

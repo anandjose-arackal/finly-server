@@ -106,17 +106,24 @@ linked_files = %w{
   config/appsmith.yml
   config/sentry.yml
   config/message_service.yml
+  config/gstin_verification_config.yml
+  config/ip_addresses.yml
+  config/bills.yml
+  config/deploy.yml
+  config/secrets.yml
 }
 case fetch(:stage)
 when :itzcash_production, :aws_production, :background_production, :foreground_production, :console_production, :api_production, :background_production_console,
     :background_production_bgg, :background_production_bgp, :background_production_bgpc, :background_production_bgl
   linked_files << 'config/elastic_apm.yml'
+  linked_files << 'config/scout_apm.yml'
   linked_files << 'config/bunny.yml'
   linked_files << 'config/master_users.yml'
   # linked_files << "config/sentry.yml"
 when :yes_bank_balance_poller
   linked_files << "config/sidekiq_yes_bank_balance_poller.yml"
   linked_files << "config/elastic_apm.yml"
+  linked_files << 'config/scout_apm.yml'
   linked_files << 'config/bunny.yml'
 when :development_6
   linked_files << 'config/master_users.yml'
@@ -181,7 +188,7 @@ set :whenever_roles, ["whenever_cron"]
 set :slackistrano, {
     channel: '#general',
     team: 'finlyteam',
-    token: 'xoxb-69742039698-481828577170-pL7adrfoCVs74cggPFKiRNhj',
+    token: ENV['SLACKISTRANO_TOKEN'],
     slack_via_slackbot: true
 }
 

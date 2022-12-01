@@ -20,9 +20,9 @@ class CreateApiTokens < ActiveRecord::Migration[5.2]
       base_url: 'https://commonapi.mastersindia.co',
       content_type: "application/json",
       username: "veekshith.rai@finly.io",
-      password: "Veek@123#",
+      password: ENV['CREATE_API_TEMP_TOKEN'],
       client_id: "pwvTXWlwizCcfzUYzq",
-      client_secret: "TkKJ8ZVYFHvVtutBfSxizimc",
+      client_secret: ENV['CREATE_API_TEMP_CLIENT_SECRET'],
       grant_type: "password",
       token: "6628ed73edc01bc23c2f599bae834360e25893ef"
     }).save

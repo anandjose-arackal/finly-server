@@ -79,7 +79,7 @@ class PurchaseRequest < ApplicationRecord
 
   before_create :set_creator
   before_create :set_currency
-  after_save :budget_trail_entry
+  after_save :budget_trail_entry, if: :budget_enabled?
   after_save :sync_amounts, unless: :skip_callback
   after_save :set_currency_for_amount, unless: :skip_callback
   after_destroy :budget_trail_destroy
@@ -207,6 +207,7 @@ class PurchaseRequest < ApplicationRecord
   scope :sort_order_number, -> (type) {
     type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
+      # nosqli - The incoming var is checked to be ASC or DESC and then only substituted, not other value other than "ASC" or "DESC" possible
       reorder("purchase_requests.order_number #{type}")
     end
   }
@@ -214,6 +215,7 @@ class PurchaseRequest < ApplicationRecord
   scope :sort_description, -> (type) {
     type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
+      # nosqli - The incoming var is checked to be ASC or DESC and then only substituted, not other value other than "ASC" or "DESC" possible
       reorder("purchase_requests.description #{type}")
     end
   }
@@ -221,6 +223,7 @@ class PurchaseRequest < ApplicationRecord
   scope :sort_date, -> (type) {
     type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
+      # nosqli - The incoming var is checked to be ASC or DESC and then only substituted, not other value other than "ASC" or "DESC" possible
       reorder("purchase_requests.created_at #{type}")
     end
   }
@@ -295,6 +298,10 @@ class PurchaseRequest < ApplicationRecord
         base_currency: get_base_currency,
         reporting_currency: get_reporting_currency
     }
+  end
+
+  def controlling_user
+    self.get_reviewers&.first
   end
 
   def self.awaiting_records user
@@ -539,6 +546,10 @@ class PurchaseRequest < ApplicationRecord
   #   !can_approve? && awaiting_approval? ? PurchaseRequestStatus.id_for(:processing) : super
   # end
 
+  def controlling_user
+    self.get_reviewers&.first
+  end
+
   private
 
   def sync_amounts
@@ -626,6 +637,10 @@ class PurchaseRequest < ApplicationRecord
     end
     self.skip_callback = true
     self.save
+  end
+
+  def budget_enabled?
+    RequestStore.store[:current_company]&.feature_subscription&.budgeting_system || false
   end
 
 end

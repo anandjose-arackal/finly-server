@@ -116,7 +116,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
 
     number :payment_term_days,
            label: "Payment Term Days",
-           computed: Forms::Compute::Lookup('payment_term_id', '{{record.days_after | default: 0 }}'),
+           computed: Forms::Compute::Lookup('payment_term_id', '{{record.calculated_days_after | default: 0 }}'),
            visible: false
 
     date :delivery_date,
@@ -147,7 +147,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
     lookup :vendor_id, label: "Vendor", choices_scope: Choices[:lookup].('vendors'), required: true, editable: false,
            can_editable_be_changed: false, can_be_disabled: false, can_required_be_changed: false, can_visible_be_changed: false
 
-    lookup :vendor_trade_name, label: 'Vendor Trade Name', editable: false, visible: true, computed: Forms::Compute::Lookup('vendor_id', '{{record.business_name}}', assignments: { created_by_id: "{{meta.user_id}}" })
+    lookup :vendor_trade_name, label: 'Vendor Trade Name', editable: false, visible: true, computed: Forms::Compute::Lookup('vendor_id', '{{record.trade_name}}', assignments: { created_by_id: "{{meta.user_id}}" })
     lookup :vendor_country_id, editable: false, visible: true, choices_scope: Choices[:lookup].('countries')
 
     text :vendor_sequence_id, "Vendor ID", editable: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.vendor_id}}')
@@ -438,7 +438,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
 
     date :advance_scheduled_date, label: "Scheduled Date", editable: true, visible: true, required: true
     lookup :advance_amount_status_id, label: 'Status', editable: false, visible: true,
-           can_editable_be_changed: false, can_visible_be_changed: false, choices_scope: Choices[:lookup].('advance_amount_statuses'), 
+           can_editable_be_changed: false, can_visible_be_changed: false, choices_scope: Choices[:lookup].('advance_amount_statuses'),
            default_value: AdvanceAmountStatus.id_for(:new)
        
   end

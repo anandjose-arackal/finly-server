@@ -54,6 +54,7 @@ class CreditNote < ApplicationRecord
   include EventProducer
   include Concerns::ErpSyncConcern
   include ErpSyncable
+  include FormsHelper
 
   acts_as_sequenced column: :sequence_id, purpose: :credit_note, editable: false, prefix: 'CN'
 
@@ -84,11 +85,13 @@ class CreditNote < ApplicationRecord
   belongs_to :reporting_currency, optional: true, class_name: 'Currency'
 
   belongs_to :tds_rate, class_name: 'TdsRatesList', optional: true
+  belongs_to :vendor_country, optional: true, class_name: 'Country'
 
   has_many :items, class_name: 'CreditNoteItem', dependent: :destroy
   has_many :adjustments, class_name: 'CreditNoteAdjustment' #, dependent: :destroy
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
   has_many :attachments, class_name: "ProcurementAttachment", as: :procurement_document
+  has_many :form_custom_fields, class_name: 'FormCustomField', as: :document, dependent: :destroy
 
   # before_save :calculate_amount
   after_create :calculate_from_items_values, unless: :skip_callback
@@ -96,12 +99,13 @@ class CreditNote < ApplicationRecord
   after_save :set_currency_for_amount, unless: :skip_callback
   after_touch :update_adjustments
   before_create :set_currency
+  after_save :sync_to_old_forms
 
   delegate :draft?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :voided?, :adjusted?, :partially_adjusted?, :unadjusted?, to: :status
 
   def set_currency
-    self.reporting_currency_id = self.company.reporting_currency.id if self.reporting_currency_id.blank? 
-    self.base_currency_id = self.company.reporting_currency.id if self.base_currency_id.blank? 
+    self.reporting_currency_id = self.company.reporting_currency.id if self.reporting_currency_id.blank?
+    self.base_currency_id = self.company.reporting_currency.id if self.base_currency_id.blank?
   end
 
   def as_json(options = {})
@@ -132,7 +136,8 @@ class CreditNote < ApplicationRecord
           previously_adjusted_amount: previously_adjusted_amount.as_json({rounded: true}),
           net_adjustable_amount: net_adjustable_amount.as_json({rounded: true}),
           base_currency: get_base_currency,
-          reporting_currency: get_reporting_currency
+          reporting_currency: get_reporting_currency,
+          forms_enabled: forms_enabled
       }
     else
       data = {
@@ -173,7 +178,8 @@ class CreditNote < ApplicationRecord
           invoice_gst_type: tax_type_name,
           approved_at: approved_at&.strftime('%d %b %Y'),
           base_currency: get_base_currency,
-          reporting_currency: get_reporting_currency
+          reporting_currency: get_reporting_currency,
+          forms_enabled: forms_enabled
       }
     end
 
@@ -185,7 +191,7 @@ class CreditNote < ApplicationRecord
         currency: gross_receivable_amount&.currency.as_json,
     }
 
-    if self.invoice.rcm_enabled
+    if self.invoice&.rcm_enabled
       data[:value] = gross_receivable_amount&.value.to_f
     else
       data[:value] = precision_value(gross_receivable_amount&.value.to_f + tax_amount&.value.to_f)
@@ -288,16 +294,19 @@ class CreditNote < ApplicationRecord
 
   scope :order_previously_adjustable_amount, -> (order_type = "ASC") {
     order_type = format_order_type(order_type)
+    # nosqli - The substituted string is force formatted through the function call to format_order_type, not other value other than "ASC" or "DESC" possible
     joins(:previously_adjusted_amount).reorder("amounts.value #{order_type}")
   }
 
   scope :order_net_adjustable_amount, -> (order_type = "ASC") {
     order_type = format_order_type(order_type)
+    # nosqli - The substituted string is force formatted through the function call to format_order_type, not other value other than "ASC" or "DESC" possible
     joins(:net_adjustable_amount).reorder("amounts.value #{order_type}")
   }
 
   scope :order_created_at, -> (order_type = "ASC") {
     order_type = format_order_type(order_type)
+    # nosqli - The substituted string is force formatted through the function call to format_order_type, not other value other than "ASC" or "DESC" possible
     reorder("credit_notes.created_at #{order_type}")
   }
 
@@ -399,6 +408,14 @@ class CreditNote < ApplicationRecord
     return statuses.uniq
   end
 
+  def retrieve_value(entity)
+    send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
+  end
+
+  def form_klass
+    Forms::Router.klass(:credit_notes)&.name
+  end
+
   def self.open_status_ids(user)
     CreditNoteStatus.ids_for(:draft)
   end
@@ -491,6 +508,58 @@ class CreditNote < ApplicationRecord
     CreditNoteStatus.ids_for(:awaiting_approval).include?(status_id)
   end
 
+  def name
+    self.sequence_id
+  end
+
+  def forms_enabled
+    CreditNoteToggle.new(RequestStoreUtil.current_user).enabled? ? 'true' : 'false'   #TODO: check why it's string
+  end
+
+  def update_adjustments
+    update_adjustable_amount
+    sync_to_old_forms
+    update_status
+  end
+
+  def sync_to_old_forms
+    if self.forms_enabled == 'true'
+      self.amounts_attributes_map.each do |key, value|
+        amount_value = self.send("#{key}")
+        amount_attr = self.send("#{value}_id")
+        base_currency_id = self.get_base_currency&.id
+        if amount_attr.present?
+          Amount.find_by(id: amount_attr).update(value: amount_value, currency_id: base_currency_id)
+        else
+          self.assign_attributes(
+            {
+              "#{value}_id": Amount.create(value: amount_value, currency_id: base_currency_id).id
+            }
+          )
+        end
+      end
+    end
+  end
+
+  def amounts_attributes_map
+    {
+      cn_gross_receivable_amount: 'gross_receivable_amount',
+      cn_tax_amount: 'tax_amount',
+      cn_net_receivable_amount: 'net_receivable_amount',
+      cn_tds_amount: 'tds_amount',
+      cn_previously_adjusted_amount: 'previously_adjusted_amount',
+      cn_net_adjustable_amount: 'net_adjustable_amount'
+    }
+  end
+
+  def controlling_user
+    self.get_reviewers&.first
+  end
+
+  def creator
+    self.user
+  end
+
   private
 
   def calculate_from_items_values
@@ -551,11 +620,6 @@ class CreditNote < ApplicationRecord
     update_adjustable_amount
     self.skip_callback = true
     self.save(validation: false)
-  end
-
-  def update_adjustments
-    update_adjustable_amount
-    update_status
   end
 
   def calculate_from_item_methods
@@ -635,6 +699,13 @@ class CreditNote < ApplicationRecord
     else
       self.net_adjustable_amount = Amount.create(value: net_adjustable_amount_value, currency_id: currency_id)
     end
+    if self.forms_enabled == 'true'
+      previously_adjusted_amount_value = precision_value(adjustments.sum(:cn_adjustment_amount)).to_f
+      net_adjustable_amount_value = [precision_value(cn_net_receivable_amount.to_f - previously_adjusted_amount_value), 0].max
+      self.cn_previously_adjusted_amount = previously_adjusted_amount_value
+      self.cn_net_adjustable_amount = net_adjustable_amount_value
+      self.adjustments.update_all(cn_net_adjustable_amount: net_adjustable_amount_value)
+    end
   end
 
   def update_status
@@ -659,5 +730,4 @@ class CreditNote < ApplicationRecord
     self.skip_callback = true
     self.save
   end
-
 end

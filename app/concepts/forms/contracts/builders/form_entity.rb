@@ -84,9 +84,9 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
 
           records = contract_root.current_user.company.
               send(association_name).non_deleted.filter_unique_check.
-              where("#{entity.entity_key} = ?", send(entity.entity_key))
+              where(entity.entity_key.to_sym => send(entity.entity_key))
 
-          records = records.where.not("#{association_name}.id = ?", id) if id.present?
+          records = records.where.not((association_name + ".id").to_sym => id) if id.present?
 
           if records.present?
             errors.add entity.label, "must be unique"
@@ -151,7 +151,7 @@ class Forms::Contracts::Builders::FormEntity < Transactions::API
       entity: entity,
       contract: contract
     }
-
+    
     entity.class.contract_evaluators.each do |name, evaluator|
       evaluator.call(context)
     end

@@ -30,6 +30,8 @@ class InvoiceExposure < Exposures::API
   attribute :department, record_attribute: true, exposure: true, includes: [:department]
   attribute :billing_location, record_attribute: :location, exposure: true, includes: [:location]
   attribute :shipping_location, record_attribute: :delivery_location, exposure: true, includes: [:delivery_location]
+  attribute :billing_address, record_attribute: true
+  attribute :shipping_address, record_attribute: true
   attribute :narration, record_attribute: true
   attribute :invoice_number, record_attribute: true
   attribute :created_at, record_attribute: true
@@ -197,7 +199,10 @@ class InvoiceExposure < Exposures::API
 
   attribute :attachments, includes: [:attachments] do
     attachments = record.attachments.map {|a| a.file.url(:original, timestamp: false)}.compact.join(", ")
-    attachments += record.form_custom_fields.where(entity_type: "attachment").map {|a| a.retrieve_export_text_value}.compact.join(", ")
+    if record.form_custom_fields.present?
+      attachments = record.form_custom_fields.where(entity_type: "attachment").map {|a| a.retrieve_export_text_value}.compact.join(", ")
+    end
+    attachments
   end
 
   attribute :approval_pending_reviewers, includes: [:level, :document_level_reviewer_mappings] do
@@ -278,6 +283,9 @@ class InvoiceExposure < Exposures::API
   attribute :payments, record_attribute: true, exposure: true,  includes: [:payments]
   attribute :agreement_item, record_attribute: true, exposure: true, includes: [:agreement_item]
   attribute :receiving_account, record_attribute: true, exposure: true,  includes: [:receiving_account]
+  attribute :display_tds_amount, record_attribute: false, exposure: false do
+    record.display_tds_amount&.to_f
+  end
 
 
   # def vendor_ref_num(invoice_line_item)

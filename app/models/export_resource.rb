@@ -97,6 +97,12 @@ class ExportResource < NonTenantedApplicationRecord
         value: 'audit_trails',
         resolver: 'audit_trails.default',
         route: 'audit_trails.index'
+    },
+    {
+      name: 'Credit Notes',
+      value: 'credit_notes',
+      resolver: 'credit_notes.default',
+      route: 'credit_notes.index'
     }
   ]
 

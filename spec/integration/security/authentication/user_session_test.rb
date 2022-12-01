@@ -8,6 +8,7 @@ RSpec.describe 'UserSession' do
 
     @doorkeeper_application = create :doorkeeper_application
 
+    # nosqli - These are TDD test cases that mock behavior for unit testing, these are not real credentials that work in Prod
     @correct_password = 'FW1g$18j0t!k2'
     @wrong_password = 'wrong_password'
 

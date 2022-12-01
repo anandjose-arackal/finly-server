@@ -20,10 +20,12 @@ class Choices::Builders::Switch < Choices::Builders::Base
   end
 
   def find_by_id(id, params: {}, user: nil)
+    # nosqli - Not a user provided input
     choices(params: params, user: user).find_by("name = #{id} OR id = #{id}")
   end
 
   def find_by_name(name, params: {}, user: nil)
+    # nosqli - Not a user provided input
     choices(params: params, user: user).find_by("name = #{name} OR id = #{name}")
   end
 

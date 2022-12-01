@@ -8,6 +8,7 @@ class ExportManager::Template::Master::PurchaseOrders::Index < ExportManager::Bu
   default true
 
   custom_fields :purchase_order, template_prefix: 'record'
+  form_custom_fields :purchase_order, template_prefix: 'record'
 
   attribute :procurement_name, template: '{{ record.name }}'
   attribute :vendor_name, template: '{{ record.vendor.display_name }}'
