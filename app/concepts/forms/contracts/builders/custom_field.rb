@@ -35,16 +35,37 @@ class Forms::Contracts::Builders::CustomField
           custom_field = build_custom_field custom_field_entity
         end
 
+        collection_custom_fields = []
+        if custom_field_entity.parent.present? && custom_field_entity.parent.class.collection?
+          input[custom_field_entity.parent.entity_key].each_with_index do |line_item, index|
+            if line_item['collection_uuid'] == ""
+              input[custom_field_entity.parent.entity_key][index]['collection_uuid'] = SecureRandom.uuid
+            end
+            collection_custom_fields << build_custom_field(custom_field_entity, input[custom_field_entity.parent.entity_key][index]['collection_uuid'])
+          end
+        end
+
         # Method 2
         case custom_field_entity.entity_type
         when 'dropdown'
-
-          custom_field.value = nil
-          if custom_field.selection.present?
-            custom_field.selection.assign_attributes(form_entity_choice_id: input[custom_field_entity.entity_key])
+          if custom_field_entity.parent.present? && custom_field_entity.parent.class.collection?
+            collection_custom_fields.each do |cf|
+              cf.value = nil
+              if cf.selection.present?
+                cf.selection.assign_attributes(form_entity_choice_id: input[custom_field_entity.parent.entity_key].select{|item| item['collection_id'] == cf.collection_id}.first[custom_field_entity.entity_key])
+              else
+                cf.selection = CustomFieldSelection.new(form_entity_choice_id: input[custom_field_entity.parent.entity_key].select{|item| item['collection_id'] == cf.collection_id}.first[custom_field_entity.entity_key]) if input[custom_field_entity.entity_key].present?
+              end
+            end
           else
-            custom_field.selection = CustomFieldSelection.new(form_entity_choice_id: input[custom_field_entity.entity_key]) if input[custom_field_entity.entity_key].present?
+            custom_field.value = nil
+            if custom_field.selection.present?
+              custom_field.selection.assign_attributes(form_entity_choice_id: input[custom_field_entity.entity_key])
+            else
+              custom_field.selection = CustomFieldSelection.new(form_entity_choice_id: input[custom_field_entity.entity_key]) if input[custom_field_entity.entity_key].present?
+            end
           end
+
         when 'attachment'
           custom_field.value = ""
           input[custom_field_entity.entity_key].present? && input[custom_field_entity.entity_key].is_a?(Array) && input[custom_field_entity.entity_key].each do |attachment_obj|
@@ -53,7 +74,6 @@ class Forms::Contracts::Builders::CustomField
             # Rails.logger.error("********************** #{custom_field_entity.entity_key} - #{attachment_obj[:name]}**********************")
 
             if attachment.present?
-              
               if attachment_obj[:_destroy]
                 attachment.destroy
               else
@@ -85,20 +105,33 @@ class Forms::Contracts::Builders::CustomField
         when 'multiselect'
           # Implement later - #todo
         else
-          custom_field.value = input[custom_field_entity.entity_key]
+          if custom_field_entity.parent.present? && custom_field_entity.parent.class.collection?
+            collection_custom_fields.each do |cf|
+              cf.value = input[custom_field_entity.parent.entity_key].select{ |item| item['collection_id'] == cf.collection_id}.first[custom_field_entity.entity_key] rescue nil
+            end
+          else
+            custom_field.value = input[custom_field_entity.entity_key]
+          end
         end
-        represented.form_custom_fields.append(custom_field)
+        if custom_field_entity.parent.present? && custom_field_entity.parent.class.collection?
+          collection_custom_fields.each do |cf|
+            represented.form_custom_fields.append(cf)
+          end
+        else
+          represented.form_custom_fields.append(custom_field)
+        end
       end
     end
   end
 
-  def self.build_custom_field(custom_field_entity)
+  def self.build_custom_field(custom_field_entity, collection_id = nil)
     FormCustomField.new(
       {
         form_entity: custom_field_entity,
         form_id: custom_field_entity.form_id,
         field_key: custom_field_entity.entity_key,
-        entity_type: custom_field_entity.entity_type
+        entity_type: custom_field_entity.entity_type,
+        collection_id: collection_id
       }
     )
   end
