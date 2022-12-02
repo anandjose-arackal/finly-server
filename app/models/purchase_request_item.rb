@@ -221,6 +221,10 @@ class PurchaseRequestItem < ApplicationRecord
     end
   end
 
+  def form_custom_fields
+    self.parent&.form_custom_fields.where(collection_uuid: self.collection_uuid) || []
+  end
+
   def cost_allocation_items?
     self.purchase_request.cost_allocation_items
     false if parent_forms_enabled

@@ -107,7 +107,7 @@ class Forms::Contracts::Builders::CustomField
         else
           if custom_field_entity.parent.present? && custom_field_entity.parent.class.collection?
             collection_custom_fields.each do |cf|
-              cf.value = input[custom_field_entity.parent.entity_key].select{ |item| item['collection_id'] == cf.collection_id}.first[custom_field_entity.entity_key] rescue nil
+              cf.value = input[custom_field_entity.parent.entity_key].select{ |item| item['collection_uuid'] == cf.collection_uuid}.first[custom_field_entity.entity_key] rescue nil
             end
           else
             custom_field.value = input[custom_field_entity.entity_key]
@@ -124,14 +124,14 @@ class Forms::Contracts::Builders::CustomField
     end
   end
 
-  def self.build_custom_field(custom_field_entity, collection_id = nil)
+  def self.build_custom_field(custom_field_entity, collection_uuid = nil)
     FormCustomField.new(
       {
         form_entity: custom_field_entity,
         form_id: custom_field_entity.form_id,
         field_key: custom_field_entity.entity_key,
         entity_type: custom_field_entity.entity_type,
-        collection_id: collection_id
+        collection_uuid: collection_uuid
       }
     )
   end

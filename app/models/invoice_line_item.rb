@@ -419,7 +419,7 @@ class InvoiceLineItem < ApplicationRecord
   end
 
   def form_custom_fields
-    self.parent&.form_custom_fields.where(collection_id: self.collection_uuid) || []
+    self.parent&.form_custom_fields.where(collection_uuid: self.collection_uuid) || []
   end
 
   def form_custom_fields=(value)
