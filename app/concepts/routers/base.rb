@@ -105,14 +105,14 @@ class Routers::Base
     nil
   end
 
-  def self.dispatch(key, options)
+  def self.dispatch(key, options, async=false)
     routes = resolve(key)
     # Todo raise exception?
     return Failure("Route not found") if routes.blank?
 
     results = []
     resolve(key)&.each do |route|
-      results << route.dispatch(options)
+      results << route.dispatch(options, async=async)
     end
     allow_multiple_associations? ? results : results.first
   end

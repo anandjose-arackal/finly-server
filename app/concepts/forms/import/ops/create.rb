@@ -4,12 +4,13 @@ class Forms::Import::Ops::Create < Transactions::API
   step AssignModelUser(key: :created_by)
   step Forms::Contracts::Build()
   step Contract::Validate()
-  step Contract::Persist()
-  step :set_approval_workflow!
+  step Contract::Persist(method: :sync)
+  # step :set_approval_workflow!
   step Transactions::Messages::SuccessMessage('Record Saved')
 
   def set_form(context, params:, current_user:, **)
     context[:form] = params.delete(:form)
+    Rails.logger.info "Import::#{context[:form].label}_form"
     true
   end
 
@@ -19,9 +20,11 @@ class Forms::Import::Ops::Create < Transactions::API
                       else
                         form.model.new
                       end
+    Rails.logger.info "Import::#{context[:model]}"
     true
   end
 
+  # Skipping this step for now
   def set_approval_workflow!(context, model:, form:, params:, current_user:, **)
     if model.is_a?(YesBankVendor) && model.status&.awaiting_approval? && !model.dlrms.present?
       document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(current_user, {reviewal_document: model})

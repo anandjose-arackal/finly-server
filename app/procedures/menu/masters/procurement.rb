@@ -148,6 +148,7 @@ class Menu::Masters::Procurement < Menu::API
   end
 
   item :download_manager, icon: "https://img.icons8.com/windows/20/ffffff/software-installer.png"
+  item :import_manager, icon: "https://img.icons8.com/windows/20/ffffff/software-installer.png"
   item :settings, path: 'organization_account', permissions: [:admin], icon: "https://img.icons8.com/windows/20/ffffff/settings.png"
 
   footer_item :switch_version, icon: 'https://img.icons8.com/windows/20/ffffff/versions.png', options: {do_not_build_path: true}

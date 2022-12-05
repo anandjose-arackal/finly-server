@@ -36,6 +36,19 @@ class FormCustomField < ApplicationRecord
     if entity_type == 'dropdown'
       return selection&.form_entity_choice&.name
     end
+
+    if entity_type == 'lookup' and value.present?
+      obj = form_entity.choices_scope.find_by_id(value, user: RequestStoreUtil.current_user)
+
+      if obj.present?
+        if obj.respond_to?(:name)
+          return obj.name
+        elsif obj.respond_to?(:display_name)
+          return obj.display_name
+        end
+      end
+    end
+
     value
   end
 

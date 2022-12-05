@@ -14,4 +14,11 @@ class Docs::P2P::CreditNotes::Action < ActionManager::API
          icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
          route: "credit_notes.index"
 
+  action :redirect,
+         :import_form,
+         permissions: :credit_note_initiator,
+         toggle: {if: [CreditNoteToggle, :bulk_import_enabled?]},
+         label: 'Bulk Import',
+         url: 'bulk_import/params={"route":"forms.invoices"}'
+
 end

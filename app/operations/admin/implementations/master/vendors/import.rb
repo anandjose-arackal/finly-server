@@ -38,7 +38,7 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
   end
 
   def process
-    form_import.process_import(self.implementation_request)
+    form_import.process_admin_import(self.implementation_request)
   end
 
   # def create_record(data)

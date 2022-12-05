@@ -1,0 +1,8 @@
+development:
+  batch_size: 5
+
+production:
+  batch_size: 100
+
+staging:
+  batch_size: 100

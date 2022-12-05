@@ -68,6 +68,12 @@ class Docs::P2P::Invoices::Action < ActionManager::API
            icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
            function: "non_po_invoice_forms_create"
 
+    action :redirect,
+           :import_form,
+           permissions: :non_po_invoice_initiator,
+           toggle: {if: [NonPoInvoiceToggle, :bulk_import_enabled?]},
+           label: 'Bulk Import',
+           url: 'bulk_import/params={"route":"forms.invoices"}'
   end
 
 end

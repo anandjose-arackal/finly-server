@@ -58,6 +58,13 @@ class Docs::P2P::PurchaseOrders::Action < ActionManager::API
            icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
            function: "po_create"
 
+    action :redirect,
+           :import_form,
+           permissions: :purchase_order_initiator,
+           toggle: {if: [PurchaseOrderToggle, :bulk_import_enabled?]},
+           label: 'Bulk Import',
+           url: 'bulk_import/params={"route":"forms.invoices"}'
+
   end
 
 end

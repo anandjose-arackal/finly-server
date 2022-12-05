@@ -153,6 +153,7 @@ class Company < NonTenantedApplicationRecord
   has_many :locations, class_name: "BranchLocation"
   has_many :bank_payment_requests
   has_many :attachments, dependent: :nullify
+  has_many :import_jobs, foreign_key: :company_id
 
   has_many :admin_implementation_requests
 
