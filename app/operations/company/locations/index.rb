@@ -35,7 +35,7 @@ class Company::Locations::Index < Company::Locations::Base
 
     # Locations which are mapped to policies to which user is part of
     unless user.class.name =='AdminUser'
-      if QueryOptBranchDeptNonForm.new(user).enabled?
+      if QueryOptBranchDeptNonFormToggle.new(user).enabled?
         self.policy_location_filter_mapping = faster_location_filter_mapping user_role_id
       else
         self.policy_location_filter_mapping = slower_old_location_filter_mapping user_role_id

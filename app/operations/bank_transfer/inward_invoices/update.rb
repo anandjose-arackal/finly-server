@@ -143,7 +143,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
           break
         end
 
-        if item_amount < (invoiced_total_amount + item.dig(:taxable_amount_attributes, :value)&.to_f)
+        if item_amount < (invoiced_total_amount&.to_f + item.dig(:taxable_amount_attributes, :value)&.to_f)
           add_message :error, "Invoiced Item Taxable Amount should be on par with the Purchase Order Item Taxable Amount"
           break
         end
