@@ -398,7 +398,9 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
   end
 
   def validate_document_access
-    Procurements::PurchaseOrders::Show.(user, params).success?
+    validation_params = params.clone
+    validation_params[:lean_fetch_call] = true
+    Procurements::PurchaseOrders::Show.(user, validation_params).success?
   end
 
   def validate_association

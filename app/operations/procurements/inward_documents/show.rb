@@ -71,7 +71,8 @@ class Procurements::InwardDocuments::Show < Procurements::InwardDocuments::Base
   end
 
   def validate_po_access
-    po_params = params
+    po_params = params.clone
+    po_params[:lean_fetch_call] = true
     po_params["id"] = inward_document.procurement.purchase_order.id rescue nil
     Procurements::PurchaseOrders::Show.(user, po_params).success? if po_params["id"].present?
   end
