@@ -542,9 +542,8 @@ class Forms::Import::Processor
     elsif choice.respond_to?(:display_name)
       choice_value = choice.display_name
     end
-
     {
-      id: parse_value(choice.id, entity),
+      id: parse_value(choice[:id], entity),
       value: choice_value,
     }.with_indifferent_access
   end
