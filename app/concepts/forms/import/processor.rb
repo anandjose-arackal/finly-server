@@ -182,7 +182,6 @@ class Forms::Import::Processor
     end
 
     records_data = []
-
     nested_data = build_nested_data(imported_sheet, data_headers)
 
     imported_sheet.each_with_pagename do |sheet_name, sheet|
@@ -211,15 +210,13 @@ class Forms::Import::Processor
           row_data['_ref'] = UUIDTools::UUID.timestamp_create().to_s.upcase
 
           header_details = headers[data_headers[sheet_name]][:headers]
-
           nested_data.keys.each do |key|
             if row_data[header_details[:id][:name]].present?
-              row_data[key] = nested_data[key][row_data[header_details[:id][:name]]].to_s
+              row_data[key] = (nested_data[key][row_data[header_details[:id][:name]]] || nested_data[key][row_data["seq#{header_details[:import_sequence_number][:name]}"]])
             elsif row_data[header_details[:import_sequence_number][:name]].present?
               row_data[key] = nested_data[key]["Seq#{row_data[header_details[:import_sequence_number][:name]]}"]
             end
           end
-
           records_data << {
             uuid: row_data['_ref'],
             record_data: row_data,
