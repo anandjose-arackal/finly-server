@@ -38,7 +38,7 @@ module Admin::Implementations::Processor::Finders
 
   def find_cost_center(identifier, required: false)
     find error_key: 'Cost_center', required: required do
-      company.cost_centers.find_by(name: identifier)
+      company.cost_centers.non_deleted.find_by(name: identifier)
     end
   end
 
