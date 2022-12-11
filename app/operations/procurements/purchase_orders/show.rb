@@ -30,10 +30,11 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
   end
 
   class Procurements::PurchaseOrders::Show::ShowPresenterForLeanFetch < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :purchase_order, :taxes_applicable_flag
+    attr_accessor :purchase_order, :purchase_order_items, :taxes_applicable_flag
 
     def init
       self.purchase_order = params[:purchase_order]
+      self.purchase_order_items = self.purchase_order.items.include_for_show
       self.taxes_applicable_flag = taxes_applicable_flag?
     end
 
