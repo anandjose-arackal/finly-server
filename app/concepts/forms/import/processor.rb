@@ -101,7 +101,7 @@ class Forms::Import::Processor
       rescue => exception
         message = "Unable to process, #{exception}"
         request.item_complete(false)
-        add_record_to_result_file(record_data[:record_data], result[:model].id, message, worksheets, worksheets_length)
+        add_record_to_result_file(record_data[:record_data], nil, message, worksheets, worksheets_length)
       end
     end
 
