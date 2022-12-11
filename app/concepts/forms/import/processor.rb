@@ -89,8 +89,6 @@ class Forms::Import::Processor
       begin
         form_data = build_form_data(record_data[:record_data], nil)
         result = process_form_data(form_data, true)
-        Rails.logger.debug "Result::#{result.messages}"
-        p "Result::#{result.messages}"
         if result.success?
           message = result.messages[:success].to_s
           request.item_complete(true)
@@ -101,9 +99,9 @@ class Forms::Import::Processor
 
         add_record_to_result_file(record_data[:record_data], result[:model].id, message, worksheets, worksheets_length)
       rescue => exception
-        message = "Unable to process"
-        Rails.logger.debug "Result::#{"Unable to process"}::#{exception}"
-        p "Result::#{"Unable to process"}::#{exception}"
+        message = "Unable to process, #{exception}"
+        request.item_complete(false)
+        add_record_to_result_file(record_data[:record_data], result[:model].id, message, worksheets, worksheets_length)
       end
     end
 
