@@ -89,7 +89,6 @@ class Forms::Import::Processor
       begin
         form_data = build_form_data(record_data[:record_data], nil)
         result = process_form_data(form_data, true)
-        raise unless result.present?
         Rails.logger.debug "Result::#{result.messages}"
         p "Result::#{result.messages}"
         if result.success?
