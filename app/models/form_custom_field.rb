@@ -64,6 +64,7 @@ class FormCustomField < ApplicationRecord
     when 'text'
       value || value_text
     when 'dropdown'
+      # This id here represents the choice id, which is needed as value for the UI Select component to work properly while rendering forms
       selection&.form_entity_choice&.id
       # selection&.form_entity_choice&.name
     when 'multiselect'
@@ -83,8 +84,7 @@ class FormCustomField < ApplicationRecord
     end
   end
 
-  # temporarily  added to get text value against custom field
-  # to support in macro
+  #To be used by Index builder for form custom fields
   def retrieve_text_value
     if entity_type.present?
       field_type = entity_type

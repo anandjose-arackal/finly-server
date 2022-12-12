@@ -205,7 +205,7 @@ class IndexBuilder::API
       custom_fields = record.form_custom_fields
       if custom_fields.size > 0
         required_cf = custom_fields.select { |cf| ids.include?(cf.form_entity_id.to_s) }&.first
-        value = required_cf&.retrieve_value.to_s
+        value = required_cf&.retrieve_text_value.to_s
         value = value.join(', ') if value.respond_to?(:each)
         text_field = IndexBuilder::ContentTypes::Text.new({ value: value })
         map[custom_field_column] = [text_field.build(self, user, record, record_exposure)]
