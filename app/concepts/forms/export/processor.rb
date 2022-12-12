@@ -130,6 +130,8 @@ class Forms::Export::Processor
         end
       end
     else
+      return {} if ['credit_note_adjustments'].include? entity.entity_key
+
       child_sheet_headers = {
         parent_sequence_number: {
           name: "#{parent_sheet_label&.singularize} Sequence Number",
