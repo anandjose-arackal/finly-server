@@ -13,6 +13,18 @@ class ImportRecord < ApplicationRecord
     where status_id: status_id
   }
 
+  after_save :run_computations
+
+  def run_computations
+    return unless self.import_job[:options]["route"] == "forms.invoices"
+    computed_items = []
+    self.processed_data["items"].each do |item|
+      computed_items << item.merge({
+
+      })
+    end
+  end
+
   def data_with_attachments
     json_data = record_data
 

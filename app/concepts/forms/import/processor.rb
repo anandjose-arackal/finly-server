@@ -453,7 +453,6 @@ class Forms::Import::Processor
 
         form_nested_data << data
       end
-
       # if form_data is generated before submission process and existing nested records are missing in excel sheet, add them to form data to show them in Review page of bulk import process
       # if form_data is generated during submission process, we don't need to explicitly add existing records as they will be kept as it is.
       unless self.is_import_submission_stage
@@ -472,8 +471,11 @@ class Forms::Import::Processor
           end
         end
       end
-
-      form_data[nested_entity.entity_key] = form_nested_data
+      if nested_entity.entity_key == 'items_summary'
+        form_data.merge!(form_nested_data[0])
+      else
+        form_data[nested_entity.entity_key] = form_nested_data
+      end
     end
 
     form_data
