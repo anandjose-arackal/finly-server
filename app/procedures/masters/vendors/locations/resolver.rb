@@ -4,10 +4,7 @@ class Masters::Vendors::Locations::Resolver < Masters::Vendors::Resolver
 
   def load(params)
     vendors = super(params)
-    if vendors.count > 10
-      vendors = vendors.first(10)
-    end
-    GstinLocation.where("`gstin_locations`.`vendor_id` IN (#{vendors.pluck(:id).join(',')})")
+    GstinLocation.where("`gstin_locations`.`vendor_id` IN (#{vendors.select(:id).to_sql})")
   end
 
 end
