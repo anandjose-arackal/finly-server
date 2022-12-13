@@ -2,6 +2,7 @@ class ActionsManager::Master::Procurements::PurchaseOrders::Base < ActionsManage
 
   def initialize(user=nil, params={})
     super
+    params[:lean_fetch_call] = true
     result = ::Procurements::PurchaseOrders::Show.(user, params)
     unless result.success?
       add_message :error, result.messages[:error]

@@ -21,7 +21,34 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
 
   def success
     params[:purchase_order] = self.purchase_order
+
+    if params[:lean_fetch_call] and LeanFetchCallToggle.new(user).enabled?
+      return Procurements::PurchaseOrders::Show::ShowPresenterForLeanFetch.new(user, params, messages)
+    end
+
     Procurements::PurchaseOrders::Show::ShowPresenter.new(user, params, messages)
+  end
+
+  class Procurements::PurchaseOrders::Show::ShowPresenterForLeanFetch < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :purchase_order, :purchase_order_items, :taxes_applicable_flag
+
+    def init
+      self.purchase_order = params[:purchase_order]
+      self.purchase_order_items = self.purchase_order.items.include_for_show
+      self.taxes_applicable_flag = taxes_applicable_flag?
+    end
+
+    def taxes_applicable_flag?
+      # Shows "Taxes as applicable" text on pdf if true
+      flag = false
+      self.purchase_order_items.each do |item|
+        if item.tax_rate.blank? || item.tax_rate&.rate == 0
+          flag = true
+          break
+        end
+      end
+      flag
+    end
   end
 
   class Procurements::PurchaseOrders::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter

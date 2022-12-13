@@ -47,7 +47,7 @@ class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
   def init(options, current_user:, params:, **)
     invoice_id = params[:credit_note][:invoice_id]
 
-    invoice = Procurements::Invoices::Show.(current_user, {id: invoice_id}).invoice rescue nil
+    invoice = Procurements::Invoices::Show.(current_user, {id: invoice_id, lean_fetch: true}).invoice rescue nil
     options[:invoice] = invoice
     true
   end

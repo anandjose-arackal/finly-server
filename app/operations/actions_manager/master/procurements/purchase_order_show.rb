@@ -10,12 +10,13 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
 
   def initialize(user = nil, params = {})
     super
+    params[:lean_fetch_call] = true
     result = ::Procurements::PurchaseOrders::Show.(user, params)
     unless result.success?
       add_message :error, result.messages[:error]
       return
     end
-    self.procurement = result.procurement
+    self.procurement = result.purchase_order.procurement
     self.purchase_order = result.purchase_order
   end
 
