@@ -70,7 +70,7 @@ class Docs::P2P::Invoices::Action < ActionManager::API
 
     action :redirect,
            :import_form,
-           permissions: :non_po_invoice_initiator,
+           permissions: [:non_po_invoice_initiator, :invoice_bulk_importer],
            toggle: {if: [NonPoInvoiceToggle, :bulk_import_enabled?]},
            label: 'Bulk Import',
            url: 'bulk_import/params={"route":"forms.invoices"}'
