@@ -31,6 +31,7 @@ class ImportRecord < ApplicationRecord
       discount_amount = self.processed_data['discount_type_id'] == 1 ? item_gross_amount * discount : discount
       item_taxable_amount = item_gross_amount.to_f - discount_amount.to_f
       tax_percentage = item_record.tax_rate&.rate.to_f
+      item_tax_amount = ((item_taxable_amount * tax_percentage)/100).to_f
       computed_items << {
         'item_number': item_record.item_number,
         'unit_of_measurement': item_record.unit_of_measurement,
@@ -38,7 +39,7 @@ class ImportRecord < ApplicationRecord
         'item_discount_amount': discount_amount.to_f,
         'item_taxable_amount': item_taxable_amount.to_f,
         'tax_percentage': tax_percentage.to_f,
-        'item_tax_amount': ((item_taxable_amount * tax_percentage)/100).to_f,
+        'item_tax_amount': item_tax_amount,
         'item_tds_amount': (item['tds_applicable'] ? (processed_data['tds_percentage']*item_taxable_amount)/100 : 0).to_f,
         'item_net_amount': (processed_data['rcm_enabled'] ? item_taxable_amount : item_taxable_amount + item_tax_amount).to_f,
         'item_billable_amount': item_taxable_amount.to_f
