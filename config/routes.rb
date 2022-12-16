@@ -3672,8 +3672,10 @@ Rails.application.routes.draw do
     patch 'payment_requests/update_details', to: 'bank_payment_requests#update_details'
     get 'export/payment_file(.:format)', to: 'bank_payment_requests#payment_file', as: :export_payment_file
     post 'export/payment_file(.:format)', to: 'bank_payment_requests#payment_file', as: :export_payment_file_post
-    patch 'mark_as_credited', to: 'bank_payment_requests#mark_as_credited', as: :mark_as_credited_bulk
-    put 'mark_as_credited', to: 'bank_payment_requests#mark_as_credited'
+    # patch 'mark_as_credited', to: 'bank_payment_requests#mark_as_credited', as: :mark_as_credited_bulk
+    patch 'mark_as_credited', to: 'bank_payment_requests#mark_as_credited_faster', as: :mark_as_credited_bulk
+    put 'mark_as_credited', to: 'bank_payment_requests#mark_as_credited_faster'
+    #put 'mark_as_credited', to: 'bank_payment_requests#mark_as_credited'
     patch 'mark_all_pending', to: 'bank_payment_requests#mark_all_pending', as: :mark_all_pending
     put 'mark_all_pending', to: 'bank_payment_requests#mark_all_pending'
     patch 'bulk_approve_validate', to: 'bank_payment_requests#bulk_approve_validate', as: :bulk_approve_validate
@@ -3713,7 +3715,8 @@ Rails.application.routes.draw do
       patch 'add_beneficiary', to: 'bank_payment_requests#add_beneficiary', as: :add_beneficiary
       patch 'add_invoice', to: 'bank_payment_requests#add_invoice', as: :add_invoice
       patch 'remove_beneficiary', to: 'bank_payment_requests#remove_beneficiary', as: :remove_beneficiary
-      patch 'mark_as_credited', to: 'bank_payment_requests#mark_as_credited', as: :mark_as_credited
+      patch 'mark_as_credited', to: 'bank_payment_requests#mark_as_credited_faster', as: :mark_as_credited
+      # patch 'mark_as_credited', to: 'bank_payment_requests#mark_as_credited', as: :mark_as_credited
       patch 'retry', to: 'bank_payment_requests#retry', as: :retry
       get 'within_timeframe', to: 'bank_payment_requests#within_timeframe'
       patch 'update_payment', to: 'bank_payment_requests#update_payment'

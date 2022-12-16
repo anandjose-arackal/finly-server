@@ -1,7 +1,7 @@
 class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
 
   set_tokens_in_header :download_pending_attachment, :download_selected_attachment, :download_all_attachment
-
+  
   def show
     @result = BankTransfer::PaymentRequest::Show.(current_user, params)
     respond
@@ -113,6 +113,13 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
   def mark_as_credited
     @result = BankTransfer::PaymentRequest::Review::MarkAsCredited.(current_user, params)
     respond
+  end
+
+  def mark_as_credited_faster
+    endpoint BankTransfer::PaymentRequest::MarkAsCreditedFaster
+    respond_to do |format|
+      format.json {}
+    end
   end
 
   def count
@@ -536,7 +543,6 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
       respond response: :failure, message: @result.messages[:error]
     end
   end
-
 
 end
 
