@@ -50,6 +50,7 @@ class BankTransfer::PaymentRequest::MarkAsCreditedFaster < Transactions::API
   end
 
   def process(options, params:, bank_payment_requests:, current_user:, **)
+    add_message options, :success, :base, "Marked as credited initiated, please check back in some time"
     bank_payment_requests.each do |payment_request|
 
       parameters = {
@@ -61,9 +62,7 @@ class BankTransfer::PaymentRequest::MarkAsCreditedFaster < Transactions::API
 
       if op.success?
         payment_request.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
-        params[:payment_request] = payment_request
-        BankTransfer::PaymentRequest::MarkAsCreditedBackground.call_async(params: params, current_user: current_user)
-        add_message options, :success, :base, "Marked as credited initiated, please check back in some time"
+        BankTransfer::PaymentRequest::MarkAsCreditedBackground.call_async(payment_request: payment_request, current_user: current_user)
       else
         add_message options, :error, :base, op.messages[:error]
         return false
