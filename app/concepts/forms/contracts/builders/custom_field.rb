@@ -52,9 +52,9 @@ class Forms::Contracts::Builders::CustomField
             collection_custom_fields.each do |cf|
               cf.value = nil
               if cf.selection.present?
-                cf.selection.assign_attributes(form_entity_choice_id: input[custom_field_entity.parent.entity_key].select{|item| item['collection_id'] == cf.collection_id}.first[custom_field_entity.entity_key])
+                cf.selection.assign_attributes(form_entity_choice_id: input[custom_field_entity.parent.entity_key].select{|item| item['collection_uuid'] == cf.collection_uuid}.first[custom_field_entity.entity_key])
               else
-                cf.selection = CustomFieldSelection.new(form_entity_choice_id: input[custom_field_entity.parent.entity_key].select{|item| item['collection_id'] == cf.collection_id}.first[custom_field_entity.entity_key]) if input[custom_field_entity.entity_key].present?
+                cf.selection = CustomFieldSelection.new(form_entity_choice_id: input[custom_field_entity.parent.entity_key].select{|item| item['collection_uuid'] == cf.collection_uuid}.first[custom_field_entity.entity_key])
               end
             end
           else
