@@ -4,10 +4,24 @@ class BankTransfer::PaymentRequest::MarkAsCreditedBackground < Transactions::API
 
   sidekiq_options queue: :payments_queue
 
-  step :process
-  step :post_process
+  step Rescue( RuntimeError, handler: :rollback! ) {
+    step :update_payments_invoices
+  }
 
-  def process(options, payment_request:, **)
+  step :send_credit_mail
+
+  def rollback!(exception, options, payment_request:, payment_request_status_id:)
+    if exception.class == NilClass
+      payment_request.payment_order.update(payment_order_status_id: payment_request_status_id)
+      puts "=========================================================="
+      puts "Exception class is #{exception.class}"
+      puts "Exception message is #{exception.message}"
+      puts "Exception backtrace is #{ exception.backtrace}"
+      puts "=========================================================="
+    end
+  end
+
+  def update_payments_invoices(options, payment_request:, current_user:, **)
     payment_request.payment_order.payments.each do |payment|
       payment.update(payment_status_id: PaymentStatus.id_for(:completed))
       update_agreement_beneficiary(payment)
@@ -20,15 +34,17 @@ class BankTransfer::PaymentRequest::MarkAsCreditedBackground < Transactions::API
         invoice.update_invoice_status
       end
     end
-    true
-  end
 
-  def post_process(options, current_user:, payment_request:, **)
     new_amount = payment_request.payment_order.payments.completed.joins(:amount).sum(:value)
     payment_request.payment_order.assign_attributes({amount_processed_attributes: {value: new_amount, currency_id: ( payment_request&.get_base_currency&.id rescue 1) }})
     payment_request.comments.new user_id: current_user.id,
                                     action_id: BankPaymentRequestCommentAction.id_for(:mark_as_credited)
     payment_request.save
+
+    true
+  end
+
+  def send_credit_mail(options, current_user:, payment_request:, **)
 
     Event::EBankPaymentRequest::Credit.(current_user, bank_payment_request: payment_request)
 
