@@ -222,7 +222,7 @@ class PurchaseRequestItem < ApplicationRecord
   end
 
   def form_custom_fields
-    self.parent&.form_custom_fields.where(collection_uuid: self.collection_uuid) || []
+    self.purchase_request&.form_custom_fields.where(collection_uuid: self.collection_uuid) || []
   end
 
   def cost_allocation_items?
