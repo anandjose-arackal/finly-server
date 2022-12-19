@@ -149,7 +149,7 @@ class PurchaseOrderItem < ApplicationRecord
   delegate :goods?, :service?, to: :inventory_line_item, allow_nil: true
 
   def form_custom_fields
-    self.parent&.form_custom_fields.where(collection_uuid: self.collection_uuid) || []
+    self.purchase_order&.form_custom_fields.where(collection_uuid: self.collection_uuid) || []
   end
 
   def tax
