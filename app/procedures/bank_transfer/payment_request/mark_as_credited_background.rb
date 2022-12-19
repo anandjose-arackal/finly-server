@@ -8,7 +8,6 @@ class BankTransfer::PaymentRequest::MarkAsCreditedBackground < Transactions::API
   step :post_process
 
   def process(options, payment_request:, **)
-    byebug
     payment_request.payment_order.payments.each do |payment|
       payment.update(payment_status_id: PaymentStatus.id_for(:completed))
       update_agreement_beneficiary(payment)
