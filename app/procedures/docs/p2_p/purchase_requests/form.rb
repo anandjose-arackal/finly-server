@@ -70,6 +70,7 @@ class Docs::P2P::PurchaseRequests::Form < Forms::API
   
       number :id, visible: false, editable: false, internal: true, can_visible_be_changed: false, can_editable_be_changed: false
 
+      text :collection_uuid, editable: false, visible: false, can_editable_be_changed: false, can_visible_be_changed: false
       lookup :item_id, label: "Item", can_visible_be_changed: false, can_editable_be_changed: false, choices_scope: Choices[:lookup].('items'), required: true, editable: true, visible: true
       text :item_description, editable: false, can_editable_be_changed: false, can_visible_be_changed: false, visible: false, computed: Forms::Compute::Lookup('items.item_id', '{{record.description}}')
       text :item_number, label: "Item Code", editable: false, computed: Forms::Compute::Lookup('items.item_id', '{{record.item_number}}')

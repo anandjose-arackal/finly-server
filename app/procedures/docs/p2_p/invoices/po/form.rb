@@ -265,6 +265,7 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
     table :items, min_items: 1, populate_if_empty: InvoiceLineItem, associate_custom_fields: true do
       number :id, visible: false, editable: false, internal: true, can_visible_be_changed: false, can_editable_be_changed: false
 
+      text :collection_uuid, editable: false, visible: false, can_editable_be_changed: false, can_visible_be_changed: false
       lookup :inventory_line_item_id, label: 'Item',
                                       can_visible_be_changed: false,
                                       can_editable_be_changed: false,
