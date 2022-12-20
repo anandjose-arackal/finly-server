@@ -1,7 +1,7 @@
 class Forms::Contracts::Builders::Form
 
   def self.call(form, user)
-    form  = form.preload_for_contract!
+    form = form.preload_for_contract!
     # FixMe : proper inclusion of conditions, validations and dependencies to avoid N+1
     sections = form.sections
     Class.new(Forms::Contracts::Base) do
@@ -38,7 +38,7 @@ class Forms::Contracts::Builders::Form
         end
       end
 
-      Forms::Contracts::Builders::CustomField.(self, form.entities.root.custom_fields) if associate_custom_fields.present?
+      Forms::Contracts::Builders::CustomField.(self, form.entities.custom_fields) if associate_custom_fields.present?
     end
   end
 

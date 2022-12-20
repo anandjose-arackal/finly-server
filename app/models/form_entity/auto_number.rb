@@ -88,7 +88,7 @@ class FormEntity::AutoNumber < FormEntity
         custom_field = model.form_custom_fields.find_by(field_key: entity.entity_key)
         if custom_field&.value.blank?
           prefix, sequence = FormEntity::AutoNumber.fetch_autonumber(entity, model)
-          custom_field.value =  "#{prefix}#{sequence}"
+          custom_field.value = "#{prefix}#{sequence}"
           custom_field.save
         end
       end
