@@ -61,10 +61,7 @@ class BankTransfer::PaymentRequest::MarkAsCreditedFaster < Transactions::API
       op = WorkflowManager::Base.(current_user, parameters)
 
       if op.success?
-        #this id will help in reverting the bank payment request to previous status in case of exceptions in background job
-        payment_request_status_id = payment_request.status_id
-        payment_request.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
-        BankTransfer::PaymentRequest::MarkAsCreditedBackground.call_async(payment_request: payment_request, current_user: current_user, payment_request_status_id: payment_request_status_id)
+        BankTransfer::PaymentRequest::MarkAsCreditedBackground.call_async(payment_request: payment_request, current_user: current_user)
       else
         add_message options, :error, :base, op.messages[:error]
         return false
