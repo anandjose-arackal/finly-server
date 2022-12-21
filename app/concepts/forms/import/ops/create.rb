@@ -16,7 +16,8 @@ class Forms::Import::Ops::Create < Transactions::API
 
   def find_or_new_model(context, form:, params:, current_user:, **)
     context[:model] = if params[:record_query].present?
-                        form.model.find_by(params[:record_query])
+                        model = form.model.find_by(params[:record_query])
+                        model.nil? ? form.model.new : model
                       else
                         form.model.new
                       end

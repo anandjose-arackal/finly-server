@@ -776,7 +776,7 @@ class Invoice < ApplicationRecord
   ransack_scopes :with_status_ids
 
   def form_klass
-    invoice_type = self.invoice_type.name.to_sym
+    invoice_type = self.invoice_type&.name&.to_sym || :non_po_invoice
     Forms::Router.klass(invoice_type)&.name
   end
 
