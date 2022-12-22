@@ -36,7 +36,7 @@ class Forms::Contracts::Builders::CustomField
         end
 
         collection_custom_fields = []
-        if custom_field_entity.parent.present? && custom_field_entity.parent.class.collection? && input[custom_field_entity.parent.entity_key].present?
+        if custom_field_entity.parent.present? && custom_field_entity.parent.class.collection?
           input[custom_field_entity.parent.entity_key].each_with_index do |line_item, index|
             if line_item['collection_uuid'] == ""
               input[custom_field_entity.parent.entity_key][index]['collection_uuid'] = SecureRandom.uuid
