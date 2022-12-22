@@ -112,7 +112,6 @@ class InvoiceLineItem < ApplicationRecord
     self.parent.get_reporting_currency rescue self.company.reporting_currency
   end
 
-
   def get_base_currency
     self.parent.get_base_currency rescue self.company.reporting_currency
   end
@@ -416,14 +415,6 @@ class InvoiceLineItem < ApplicationRecord
       invoice_forms_enabled = true
     end
     invoice_forms_enabled
-  end
-
-  def form_custom_fields
-    self.parent&.form_custom_fields.where(collection_uuid: self.collection_uuid) || []
-  end
-
-  def form_custom_fields=(value)
-    self.parent&.form_custom_fields = value
   end
 
   private
