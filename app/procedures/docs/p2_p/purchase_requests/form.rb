@@ -66,7 +66,7 @@ class Docs::P2P::PurchaseRequests::Form < Forms::API
 
   # PURCHASE REQUEST ITEMS
   section :items, associate_custom_fields: true do
-    table :items, min_items: 1, populate_if_empty: PurchaseRequestItem do
+    table :items, min_items: 1, populate_if_empty: PurchaseRequestItem, associate_custom_fields: true do
   
       number :id, visible: false, editable: false, internal: true, can_visible_be_changed: false, can_editable_be_changed: false
 
