@@ -4128,6 +4128,15 @@ Rails.application.routes.draw do
   resources :audit_trails, only: [:index]
   ### Audit Trails End ##
 
+
+  ### Common Imports ###
+  resources :common_imports do
+    collection do
+      get :get_template
+    end
+  end
+
+
   ######## Dashboards ##################
   # Fixme: old routes for supporting v1 of dashboards in dynamic index. This can deleted when the support is removed
   namespace :dashboards do
