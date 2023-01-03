@@ -3,7 +3,7 @@ class PurchaseOrderExposure < Exposures::API
 
   attribute :id, record_attribute: true
   attribute :procurement_id, record_attribute: true
-  attribute :procurement,  includes: [:procurement]
+  attribute :procurement, record_attribute: true,  includes: [:procurement]
   attribute :name, includes: [:procurement] do
     record.procurement&.name
   end
