@@ -3,6 +3,7 @@ class PurchaseOrderExposure < Exposures::API
 
   attribute :id, record_attribute: true
   attribute :procurement_id, record_attribute: true
+  attribute :procurement,  includes: [:procurement]
   attribute :name, includes: [:procurement] do
     record.procurement&.name
   end
@@ -100,6 +101,7 @@ class PurchaseOrderExposure < Exposures::API
   attribute :line_items, record_attribute: :items, exposure: true, includes: [:items]
   attribute :cost_allocation_items, record_attribute: true
   attribute :status, record_attribute: true, exposure: true, includes: [:status]
+  attribute :vendor_note, record_attribute: true
 
   attribute :get_reviewers_names do 
     # TODO: having includes for attribute is not useful since we are doing additional query in the following. Update the following to not make addition query
