@@ -4,7 +4,8 @@ class CommonImportsController < BaseControllers::WebBase
   before_action :authorize_common_import
 
   def authorize_common_import
-    import_type = params&[:request_key].to_s.split(".")[0]
+    # import_type = params[:request_key].to_s.split(".")[0]
+    import_type = params.dig(:request_key)&.to_s.split(".")[0]
     unless current_user.admin? and ALLOWED_IMPORT_TYPES.includes? import_type
       head 403
     end
