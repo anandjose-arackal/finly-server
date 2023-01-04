@@ -15,5 +15,6 @@ class GstinLocationExposure < Exposures::API
   attribute :created_at, record_attribute: true
   attribute :updated_at, record_attribute: true
   attribute :deleted_at, record_attribute: true
+  attribute :state_id, record_attribute: true
 
 end
