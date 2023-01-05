@@ -667,7 +667,7 @@ class Expense < ApplicationRecord
           rate = simple ? " @ " : " at "
           rate += "#{self.distance_expense&.vehicle_rate&.rate&.currency&.symbol}#{self.distance_expense&.vehicle_rate&.rate&.value} #{self.distance_expense&.vehicle_rate&.rate&.currency&.country_code} per KM"
         end
-        return "#{self.distance_expense.distance_value} KM#{rate}"
+        return "#{self.distance_expense&.distance_value} KM#{rate}"
       elsif self.time_expense?
         rate = ''
         if (not self.report.nil?) and report.policy.time_expense_config.rate_value.present?
