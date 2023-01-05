@@ -148,6 +148,9 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
     credit_notes: {
       cn_net_adjustable_amount: "{{ row.cn_net_adjustable_amount | default: 0 | round: 2}}",
       cn_adjustment_amount: "{{ row.cn_adjustment_amount | default: 0 | round: 2}}"
+    },
+    form: {
+      tax_type: "{% if form.vendor_country_id_value != 'India' %}{{'#{TaxType.id_for(:vat)}'}}{% elsif form.vendor_state_id == form.shipping_state_id %}{{'#{TaxType.id_for(:'cgst+sgst')}'}}{% else %}{{'#{TaxType.id_for(:igst)}'}}{% endif %}"
     }
   }
 
@@ -203,7 +206,7 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
     dropdown :discount_type_id, label: 'Discount Type', editable: false, can_editable_be_changed: false, visible: false, required: true, choices_scope: Choices[:list].({ id: 1, name: 'Percentage' }, { id: 2, name: 'Amount' }), default_value: 1
     text :discount_type_text, label: 'Discount Type', editable: false, visible: true, can_editable_be_changed: false
 
-    dropdown :tax_type_id, label: 'Tax Type', editable: true, visible: true, choices_scope: Choices[:list].(*TaxType.all.map { |v| { id: v.id, name: v.name } })
+    dropdown :tax_type_id, label: 'Tax Type', editable: true, visible: true, choices_scope: Choices[:list].(*TaxType.all.map { |v| { id: v.id, name: v.name } }), computed: Forms::Compute::Form(LIQUID_FORMULAE[:form][:tax_type])
 
     date :conversion_date, label: 'Conversion Date', editable: false, visible: true, computed: Forms::Compute::Form('{{form.date}}'), triggers: { on_change: { lookup_details: [:base_currency_id] }, on_compute: { lookup_details: [:base_currency_id] } }
 
@@ -227,6 +230,7 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
     lookup :gstin_location_id, label: 'Vendor Location', choices_scope: Choices[:lookup].('vendor_locations'), # TODO: - condition to hide for international
                                filters: Rules::Builder[:vendor_id].eq(entity: :vendor_id)
     text :vendor_gstin, 'Vendor GSTIN', editable: false, computed: Forms::Compute::Lookup('gstin_location_id', '{{record.gstin}}') # TODO: - condition
+    lookup :vendor_state_id, visible: true, computed: Forms::Compute::Lookup('gstin_location_id', '{{record.state_id}}'), visible: false
 
     text :vendor_pan, 'Vendor PAN', editable: false # TODO: - add condition
 
@@ -257,6 +261,7 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
                                   filters: Rules::Builder['shippable_location'].true, required: true
     text :shipping_address_name, label: 'Name', editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.name}}')
     text :shipping_address_gstin, label: 'Gstin', editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.gstin}}')
+    lookup :shipping_state_id, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.state_id}}'), visible: false
     large_text :shipping_address, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.address}}')
   end
 
