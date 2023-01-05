@@ -152,7 +152,7 @@ Gatekeeper::Checker.new 'On Web Authentication' do
         if authorized_web_sessions.size > max_concurrent_sessions
           authorized_web_sessions[0..-(max_concurrent_sessions + 1)].each do |session|
             session.update(status_id: UserSessionStatus.id_for(:revoked), message: "A user cannot have more than #{max_concurrent_sessions} active web sessions")
-            session.access_token.update(status_id: UserSessionStatus.id_for(:revoked), message: "A user cannot have more than #{max_concurrent_sessions} active web sessions")
+            session.access_token&.update(status_id: UserSessionStatus.id_for(:revoked), message: "A user cannot have more than #{max_concurrent_sessions} active web sessions")
           end
         end
       end
