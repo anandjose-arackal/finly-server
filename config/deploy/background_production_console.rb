@@ -17,7 +17,8 @@ set :sidekiq_config => File.join(shared_path, 'config', 'sidekiq.yml')
 set :sidekiq_roles, :sidekiq_app
 set :crono_role, :crono_role
 set :balance_poller_role, :poller_role
-set :transaction_poller_role, :poller_role
+
+# set :transaction_poller_role, :poller_role
 set :usage_tracker_role, :poller_role
 set :email_tracker_role, :email_tracker_role
 
