@@ -150,7 +150,7 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
       cn_adjustment_amount: "{{ row.cn_adjustment_amount | default: 0 | round: 2}}"
     },
     form: {
-      tax_type: "{% if form.vendor_country_id_value != 'India' %}{{'#{TaxType.id_for(:vat)}'}}{% elsif form.vendor_state_id == form.shipping_state_id %}{{'#{TaxType.id_for(:'cgst+sgst')}'}}{% else %}{{'#{TaxType.id_for(:igst)}'}}{% endif %}"
+      tax_type: "{% if form.vendor_country_id_value != 'India' %}{{#{TaxType.id_for(:vat)}}}{% elsif form.vendor_state_id == form.shipping_state_id %}{{#{TaxType.id_for(:'cgst+sgst')}}}{% else %}{{#{TaxType.id_for(:igst)}}}{% endif %}"
     }
   }
 
