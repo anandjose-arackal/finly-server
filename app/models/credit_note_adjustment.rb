@@ -25,6 +25,8 @@ class CreditNoteAdjustment < ApplicationRecord
   belongs_to :credit_note, optional: true, touch: 'last_adjusted_at'
   belongs_to :invoice, optional: true
 
+  has_many :form_custom_fields, class_name: 'FormCustomField', as: :document, dependent: :destroy
+
   accepts_nested_attributes_for :amount
 
   # before_create :calculate_credit_note_amounts

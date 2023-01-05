@@ -66,6 +66,8 @@ class PurchaseOrderItem < ApplicationRecord
   belongs_to :product_type, optional: true
   belongs_to :purchase_request_item, optional: true
 
+  has_many :form_custom_fields, class_name: 'FormCustomField', as: :document, dependent: :destroy
+
   alias_attribute :items_department_id, :department_id
   alias_attribute :items_cost_center_id, :cost_center_id
 
