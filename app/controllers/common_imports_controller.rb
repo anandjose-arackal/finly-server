@@ -1,18 +1,13 @@
 class CommonImportsController < BaseControllers::WebBase
 
-  ALLOWED_IMPORT_TYPES = %w[ lrms lurms ]
-  before_action :authorize_common_import
+  before_action :add_company
 
-  def authorize_common_import
-    # import_type = params[:request_key].to_s.split(".")[0]
-    import_type = params.dig(:request_key)&.to_s.split(".")[0]
-    unless current_user.admin? and ALLOWED_IMPORT_TYPES.includes? import_type
-      head 403
-    end
+  def add_company
+    params[:company_id] = current_user.company
   end
 
   def create
-    @result = Admin::Implementations::RequestHandler.(current_user, params)
+    @result = CommonImports::RequestHandler.(current_user, params)
     if @result.success?
       respond response: :success, message: @result.messages[:success]
     else
@@ -21,12 +16,12 @@ class CommonImportsController < BaseControllers::WebBase
   end
 
   def index
-    @result = Admin::Implementations::Index.(current_user, params)
+    @result = CommonImports::Index.(current_user, params)
     respond
   end
 
   def get_template
-    @result = Admin::Implementations::ImportTemplate.(current_user, params)
+    @result = CommonImports::ImportTemplate.(current_user, params)
     respond
   end
 
