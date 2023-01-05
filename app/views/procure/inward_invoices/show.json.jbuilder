@@ -261,8 +261,6 @@ json.invoice do
   json.base_currency invoice.get_base_currency
   json.reporting_currency invoice.get_reporting_currency
 
-  json.custom_fields invoice.custom_fields
-
   json.vendor do
     json.extract! invoice&.vendor
 
