@@ -85,6 +85,7 @@ class InvoiceLineItem < ApplicationRecord
   include FormsHelper
 
   belongs_to :company, optional: true
+  has_many :form_custom_fields, class_name: 'FormCustomField', as: :document
 
   # Multicurrency Support
   include Monetizable

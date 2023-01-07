@@ -50,7 +50,10 @@ class ExportField < NonTenantedApplicationRecord
       34 => "SGST",
       35 => "Department",
       36 => "Location",
-      37 => "CostCenter"
+      37 => "CostCenter",
+      38 => "Reporting Currency",
+      39 => "Reporting Amount",
+      40 => "Conversion"
   }
 
   def self.id_for(name_in_sym)

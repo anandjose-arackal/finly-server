@@ -36,7 +36,7 @@ default: &default
     base: 'http://staging.itzcash.com'
     path: 'api/customer/register'
   yes_bank:
-    base: 'https://uatsky.yesbank.in:444'
+    base: 'https://uatskyway.yesbank.in:4443'
     path: 'app/uat/ssl/fundsTransferByCustomerSevice2'
 #  finly_collect:
 #    base: 'http://localhost:3002/'
@@ -160,7 +160,7 @@ production:
     base: "http://apilayer.net"
     path: "api/historical"
   yes_bank:
-    base: "https://sky.yesbank.in:444"
+    base: "https://skyway.yesbank.in:443"
     path: "app/live/fundsTransferByCustomerService2"
   finly_collect:
     base: 'http://192.168.1.27'

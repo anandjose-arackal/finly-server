@@ -47,6 +47,13 @@ class Export::Expense::Base < Export::Base
           data_arr << expense.user.email
         when ExportField.id_for(:employee_mobile_number)
           data_arr << expense.user.mobile_number
+        when ExportField.id_for(:reporting_currency)
+          data_arr << expense.report.policy.base_currency.country_code
+        when ExportField.id_for(:reporting_amount)
+          data_arr << expense.report.total_amount
+        when ExportField.id_for(:conversion)
+          sym = expense.report.policy.base_currency.country_code
+          data_arr << (expense.amount.value/ expense.amount[sym] rescue 0)
         when ExportField.id_for(:distance_expense_source)
           if expense.distance_expense?
             data_arr << expense.distance_expense.locations&.first&.name
