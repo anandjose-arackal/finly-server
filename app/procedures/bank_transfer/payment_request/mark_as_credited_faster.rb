@@ -4,6 +4,7 @@ class BankTransfer::PaymentRequest::MarkAsCreditedFaster < Transactions::API
   step :init 
   step :validate
   step :process
+
   
   def pre_validate(options, params:, current_user:, **)
     if params[:password].blank?
@@ -51,8 +52,9 @@ class BankTransfer::PaymentRequest::MarkAsCreditedFaster < Transactions::API
 
   def process(options, params:, bank_payment_requests:, current_user:, **)
     add_message options, :success, :base, "Marked as credited initiated, please check back in some time"
+     
     bank_payment_requests.each do |payment_request|
-
+      payment_request_status_id = payment_request.status_id
       parameters = {
         document: payment_request,
         aasm_event: 'mark_as_credited',
@@ -61,7 +63,9 @@ class BankTransfer::PaymentRequest::MarkAsCreditedFaster < Transactions::API
       op = WorkflowManager::Base.(current_user, parameters)
 
       if op.success?
-        BankTransfer::PaymentRequest::MarkAsCreditedBackground.call_async(payment_request: payment_request, current_user: current_user)
+        payment_order_status_id = payment_request.payment_order.payment_order_status_id
+        payment_request.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
+        BankTransfer::PaymentRequest::MarkAsCreditedBackground.call_async(payment_request: payment_request, current_user: current_user, payment_order_status_id: payment_order_status_id, payment_request_status_id: payment_request_status_id)
       else
         add_message options, :error, :base, op.messages[:error]
         return false

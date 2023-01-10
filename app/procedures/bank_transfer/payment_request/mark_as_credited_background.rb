@@ -1,19 +1,49 @@
-class BankTransfer::PaymentRequest::MarkAsCreditedBackground < Transactions::API
+class MyTransaction
+  def self.call((options, flow_options), **)
+    handler_signal = nil
 
+    ActiveRecord::Base.transaction do
+      signal, (options, flow_options) = yield
+      terminus_semantic = signal.to_h[:semantic]
+
+      if [:success, :pass_fast].include?(terminus_semantic)
+        handler_signal = Trailblazer::Activity::Right
+      else
+        handler_signal = Trailblazer::Activity::Left
+        raise ActiveRecord::Rollback
+      end
+    end
+
+    return handler_signal, [options, flow_options]
+  end
+end
+
+
+class BankTransfer::PaymentRequest:: MarkAsCreditedBackground < Transactions::API
+  
   include Transactions::BackgroundWorker
 
   sidekiq_options queue: :payments_queue
+  
+  step Wrap(MyTransaction){
+    step :update_payments_invoices
+  }
 
-  step :update_bank_payments_invoices
+  fail :after_rollback!
 
   step :send_credit_mail
 
-  def update_bank_payments_invoices(options, payment_request:, current_user:, **)
+  def after_rollback!(options, payment_request:, payment_order_status_id:, payment_request_status_id:, **)
+    payment_request.payment_order.update(payment_order_status_id: payment_order_status_id)
+    payment_request.update(status_id: payment_request_status_id)
+  end
+
+  
+  def update_payments_invoices(options, payment_request:, current_user:, payment_order_status_id:, payment_request_status_id:, **)
     payment_request.payment_order.payments.each do |payment|
       payment.update(payment_status_id: PaymentStatus.id_for(:completed))
       update_agreement_beneficiary(payment)
       update_agreement_security_deposit(payment)
-      payment.payment_order.update_order_status
     end
     payments = payment_request.payment_order.payments
     payments.each do |payment|
@@ -22,17 +52,16 @@ class BankTransfer::PaymentRequest::MarkAsCreditedBackground < Transactions::API
         invoice.update_invoice_status
       end
     end
-
+   
     new_amount = payment_request.payment_order.payments.completed.joins(:amount).sum(:value)
     payment_request.payment_order.assign_attributes({amount_processed_attributes: {value: new_amount, currency_id: ( payment_request&.get_base_currency&.id rescue 1) }})
     payment_request.comments.new user_id: current_user.id,
                                     action_id: BankPaymentRequestCommentAction.id_for(:mark_as_credited)
     payment_request.save
-    true
   end
 
   def send_credit_mail(options, current_user:, payment_request:, **)
-
+    
     Event::EBankPaymentRequest::Credit.(current_user, bank_payment_request: payment_request)
 
     payments = Payment.where(payment_order_id: payment_request.payment_order_id)
@@ -56,7 +85,7 @@ class BankTransfer::PaymentRequest::MarkAsCreditedBackground < Transactions::API
       end
     end
   end
-  
+
   def update_agreement_beneficiary(payment)
     if payment.parent_type == "BeneficiaryPayment" && payment.parent.payment_agreement_id.present?
       unless payment.parent.status_id == BeneficiaryPaymentStatus.id_for(:paid)
@@ -74,4 +103,3 @@ class BankTransfer::PaymentRequest::MarkAsCreditedBackground < Transactions::API
   end
 
 end
-
