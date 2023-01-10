@@ -4453,6 +4453,7 @@ Rails.application.routes.draw do
 
   post 'search', to: 'global_search#create'
   get 'search', to: 'global_search#index'
+  get 'search/form_features_state', to: 'global_search#form_features_state'
 
   # todo - I2P : For invoices
   # resources :invoices, only: [:create, :update, :show]

@@ -29,6 +29,12 @@ class GlobalSearchController < BaseControllers::WebBase
     end
   end
 
+  def form_features_state
+    forms_configured = feature_value("forms_features")
+    enabled = forms_configured.map{ |feature| feature_flag(feature, false)}
+    render json: forms_configured.zip(enabled).to_h
+  end
+
   def set_client_version
     # Displaying to reduce the query
   end
