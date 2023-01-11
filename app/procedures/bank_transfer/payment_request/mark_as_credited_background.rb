@@ -34,6 +34,12 @@ class BankTransfer::PaymentRequest:: MarkAsCreditedBackground < Transactions::AP
   step :send_credit_mail
 
   def after_rollback!(options, payment_request:, payment_order_status_id:, payment_request_status_id:, **)
+    payment_request.payment_order.payments.each do |payment|
+      invoice = payment.invoice
+      if invoice.present?
+        invoice.update_invoice_status
+      end
+    end
     payment_request.payment_order.update(payment_order_status_id: payment_order_status_id)
     payment_request.update(status_id: payment_request_status_id)
   end
@@ -44,9 +50,7 @@ class BankTransfer::PaymentRequest:: MarkAsCreditedBackground < Transactions::AP
       payment.update(payment_status_id: PaymentStatus.id_for(:completed))
       update_agreement_beneficiary(payment)
       update_agreement_security_deposit(payment)
-    end
-    payments = payment_request.payment_order.payments
-    payments.each do |payment|
+
       invoice = payment.invoice
       if invoice.present?
         invoice.update_invoice_status
