@@ -1059,11 +1059,13 @@ class Expense < ApplicationRecord
 
   def set_gst_amount(value)
     if self.expense_tax_type_id == ExpenseTaxType.id_for(:none)
-      if self.gst_amount.present?
-        self.gst_amount.destroy
+        self.gst_amount&.destroy
+        self.tds_amount&.destroy
         self.gst_percentage = nil
-        self.tax_rate_id =nil
-      end
+        self.tds_percentage = nil
+        self.tax_rate_id = nil
+        self.tds_slab_id = nil
+        self.gst_type_id = nil
       return
     end
     if value.nil?
