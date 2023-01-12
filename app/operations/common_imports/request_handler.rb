@@ -45,8 +45,8 @@ class CommonImports::RequestHandler < CommonImports::Base
       return
     end
     if self.common_import_request.save
-      params[:implementation_request_id] =common_import_request.id
-      data ={user_id: user.id, company_id: params[:company_id], implementation_request_id: common_import_request.id}
+      params[:common_import_request_id] = common_import_request.id
+      data ={user_id: user.id, company_id: params[:company_id], common_import_request_id: common_import_request.id}
       data[:with_id] = params[:with_id] if params[:with_id].present?
       self.master.call_async(user, data)
       # self.master.call(user, data)
@@ -79,7 +79,7 @@ class CommonImports::RequestHandler < CommonImports::Base
   end
 
   def implementation_params
-    params&.permit(:implementation_request_id, :country)
+    params&.permit(:common_import_request_id, :country)
   end
 
 end
