@@ -216,7 +216,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
     text :billing_address_name, label: 'Name', editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.name}}'), visible: false
     text :billing_address_gstin, label: 'Gstin', editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.gstin}}'), visible: false
     large_text :billing_address, computed: Forms::Compute::Lookup('location_id', '{{record.address}}')
-    lookup :billing_state_id, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.state_id}}'), visible: false
+    lookup :billing_state_id, computed: Forms::Compute::Lookup('location_id', '{{record.state_id}}'), visible: false
   end
 
   # SHIPPING ADDRESS
