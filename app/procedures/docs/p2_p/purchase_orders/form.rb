@@ -84,6 +84,10 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
       reporting_po_requested_advance_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_requested_advance_amount | times: conv_rate | default: 0 | round: 2}}",
       reporting_po_advance_tds_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_advance_tds_amount | times: conv_rate | default: 0 | round: 2}}",
       reporting_po_advance_amount: "{% assign conv_rate = form.conversion_rate | round: 5 %}{{ form.po_advance_amount | times: conv_rate | default: 0 | round: 2}}",
+    },
+
+    form: {
+      tax_type: "{% if form.vendor_country_id_value != 'India' %}{{#{TaxType.id_for(:vat)}}}{% elsif form.vendor_state_id == form.billing_state_id %}{{#{TaxType.id_for(:'cgst+sgst')}}}{% else %}{{#{TaxType.id_for(:igst)}}}{% endif %}"
     }
   }
 
@@ -133,7 +137,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
     lookup :department_id, label: "Department", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('departments', assignments: { form: true })
     lookup :cost_center_id, label: "Cost Center", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('cost_centers')
     dropdown :discount_type_id, label: "Discount Type", editable: false, visible: true, required: true, choices_scope: Choices[:list].({ id: 1, name: 'Percentage' }, { id: 2, name: 'Amount' }), default_value: 1
-    dropdown :gst_type_id, label: "Tax Type", editable: true, visible: true, choices_scope: Choices[:list].(*TaxType.all.map { |v| { id: v.id, name: v.name } })
+    dropdown :gst_type_id, label: "Tax Type", editable: true, visible: true, choices_scope: Choices[:list].(*TaxType.all.map { |v| { id: v.id, name: v.name } }), computed: Forms::Compute::Form(LIQUID_FORMULAE[:form][:tax_type])
 
     date :conversion_date, label: "Conversion Date", editable: true, visible: true, triggers: {on_change: {lookup_details: [:base_currency_id]},on_compute: {lookup_details: [:base_currency_id]}}#, computed: Forms::Compute::Form('{{form.created_at}}')
     lookup :reporting_currency_id, label: "Reporting Currency", choices_scope: Choices[:lookup].('currencies'), visible: true, editable: false, can_editable_be_changed: false
@@ -155,6 +159,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
            filters: Rules::Builder[:vendor_id].eq(entity: :vendor_id)
     text :vendor_gstin, "Vendor GSTIN", editable: false, computed: Forms::Compute::Lookup('gstin_location_id', '{{record.gstin}}') # todo - condition
     text :vendor_pan, "Vendor PAN", editable: false # todo - add condition
+    lookup :vendor_state_id, visible: true, computed: Forms::Compute::Lookup('gstin_location_id', '{{record.state_id}}'), visible: false
 
     lookup :bank_account_id, label: "Bank Account", choices_scope: Choices[:lookup].('vendor_bank_accounts'),
            filters: Rules::Builder[:account_owner_id].eq(entity: 'vendor_id').and(Rules::Builder[:account_owner_type].eq(value: 'YesBankVendor')),
@@ -180,6 +185,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
     text :billing_address_name, editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.name}}')
     text :billing_address_gstin, editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.gstin}}')
     large_text :billing_address, computed: Forms::Compute::Lookup('location_id', '{{record.address}}')
+    lookup :billing_state_id, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.state_id}}'), visible: false
   end
 
   # SHIPPING ADDRESS

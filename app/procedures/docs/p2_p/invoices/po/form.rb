@@ -150,7 +150,7 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
       cn_adjustment_amount: "{{ row.cn_adjustment_amount | default: 0 | round: 2}}"
     },
     form: {
-      tax_type: "{% if form.vendor_country_id_value != 'India' %}{{#{TaxType.id_for(:vat)}}}{% elsif form.vendor_state_id == form.shipping_state_id %}{{#{TaxType.id_for(:'cgst+sgst')}}}{% else %}{{#{TaxType.id_for(:igst)}}}{% endif %}"
+      tax_type: "{% if form.vendor_country_id_value != 'India' %}{{#{TaxType.id_for(:vat)}}}{% elsif form.vendor_state_id == form.billing_state_id %}{{#{TaxType.id_for(:'cgst+sgst')}}}{% else %}{{#{TaxType.id_for(:igst)}}}{% endif %}"
     }
   }
 
@@ -253,6 +253,7 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
     text :billing_address_name, label: 'Name', editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.name}}')
     text :billing_address_gstin, label: 'Gstin', editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.gstin}}')
     large_text :billing_address, computed: Forms::Compute::Lookup('location_id', '{{record.address}}')
+    lookup :billing_state_id, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.state_id}}'), visible: false
   end
 
   # SHIPPING ADDRESS
@@ -261,7 +262,6 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
                                   filters: Rules::Builder['shippable_location'].true, required: true
     text :shipping_address_name, label: 'Name', editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.name}}')
     text :shipping_address_gstin, label: 'Gstin', editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.gstin}}')
-    lookup :shipping_state_id, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.state_id}}'), visible: false
     large_text :shipping_address, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.address}}')
   end
 
