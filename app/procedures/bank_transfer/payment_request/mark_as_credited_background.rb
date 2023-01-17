@@ -36,9 +36,7 @@ class BankTransfer::PaymentRequest:: MarkAsCreditedBackground < Transactions::AP
       payment.update(payment_status_id: PaymentStatus.id_for(:completed))
       update_agreement_beneficiary(payment)
       update_agreement_security_deposit(payment)
-    end
-    payments = payment_request.payment_order.payments
-    payments.each do |payment|
+
       invoice = payment.invoice
       if invoice.present?
         invoice.update_invoice_status
