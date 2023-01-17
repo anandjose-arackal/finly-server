@@ -62,7 +62,7 @@ class Docs::UtilityBills::Subscriptions::Contracts::Update < Reform::Form
     params = {filter_role_id: [UserRole.id_for(:utility_bill_master_initiator),UserRole.id_for(:utility_bill_master_reviewer)], current_app: :vp}
     errors.add(:department_id, "Invalid Department") unless Company::Departments::Index.(current_user, params).policy_department_filter_mapping&.leaves&.pluck(:id)&.include?(department_id.to_i)
     errors.add(:cost_center_id, "Invalid Cost Center") unless current_user.company.cost_centers&.non_deleted&.pluck(:id).include?(cost_center_id.to_i)
-    errors.add(:location_id, "Invalid Location") unless Company::Locations::Index.(current_user, params).policy_location_filter_mapping&.leaves&.pluck(:id)&.include?(location_id.to_i)
+    errors.add(:location_id, "Invalid Location") unless current_user.company.locations&.pluck(:id).include?(location_id.to_i)
     params = {current_app: :vp} if current_user.vendor_payments_admin?
     errors.add(:policy_id, "Invalid Policy") unless ::Policy::VendorPayments::Index.(current_user, params).policies.find_by(id: policy_id).present?
   end
