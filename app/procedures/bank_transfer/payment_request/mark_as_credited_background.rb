@@ -29,15 +29,7 @@ class BankTransfer::PaymentRequest:: MarkAsCreditedBackground < Transactions::AP
     step :update_payments_invoices
   }
 
-  fail :after_rollback!
-
   step :send_credit_mail
-
-  def after_rollback!(options, payment_request:, payment_order_status_id:, payment_request_status_id:, **)
-    payment_request.payment_order.update(payment_order_status_id: payment_order_status_id)
-    payment_request.update(status_id: payment_request_status_id)
-  end
-
   
   def update_payments_invoices(options, payment_request:, current_user:, payment_order_status_id:, payment_request_status_id:, **)
     payment_request.payment_order.payments.each do |payment|
