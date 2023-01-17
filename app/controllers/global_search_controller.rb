@@ -30,8 +30,9 @@ class GlobalSearchController < BaseControllers::WebBase
   end
 
   def form_features_state
-    forms_configured = feature_value("forms_features")&.split(',')&.to_a
-    enabled = forms_configured.map{ |feature| feature_flag(feature, false)}
+    forms_state = FormsState.new(user)
+    forms_configured = forms_state.form_configurations("forms_features")&.split(',')&.to_a
+    enabled = forms_configured.map{ |feature| forms_state.feature_enabled?(feature)}
     render json: forms_configured.zip(enabled).to_h unless forms_configured.to_s.empty?
   end
 
