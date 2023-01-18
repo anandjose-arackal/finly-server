@@ -40,6 +40,13 @@ json.line_items do
     json.tax_rate item.tax_rate
     json.tax_amount item.tax_amount&.value
     json.net_amount item.net_amount&.value
+    json.item_form_custom_fields do
+      json.array! item.form_custom_fields.each do |form_custom_field|
+        json.name form_custom_field.form_entity&.label
+        json.field_key form_custom_field.field_key
+        json.field_value form_custom_field.retrieve_text_value
+      end
+    end
   end
 end
 json.attachments do
