@@ -87,7 +87,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
     },
 
     form: {
-      tax_type: "{% if form.vendor_country_id_value != 'India' %}{{#{TaxType.id_for(:vat)}}}{% elsif form.vendor_state_name == form.billing_state_name %}{{#{TaxType.id_for(:'cgst+sgst')}}}{% else %}{{#{TaxType.id_for(:igst)}}}{% endif %}"
+      tax_type: "{% if form.vendor_country_id_value != 'India' %}{{'#{TaxType.id_for(:vat)}'}}{% elsif form.vendor_state_name == form.billing_state_name %}{{'#{TaxType.id_for(:'cgst+sgst')}'}}{% else %}{{'#{TaxType.id_for(:igst)}'}}{% endif %}"
     }
   }
 
