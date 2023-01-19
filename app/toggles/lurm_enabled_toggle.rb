@@ -1,7 +1,7 @@
-# release/approval_workflow_bulk_upload_enabled
+# release/approval_workflow#bulk_import
 class LrumEnabledToggle < ApplicationToggle
     def enabled?
-      feature_flag 'release/approval_workflow_bulk_upload_enabled', false
+      feature_flag 'release/approval_workflow#bulk_import', false
     end
 end
   
