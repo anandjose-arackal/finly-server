@@ -20,6 +20,7 @@ class ExportManager::Master::Statements::Index < ExportManager::Builders::Spread
   attribute :status
   attribute :transaction_id
   attribute :note
+  attribute :reference_id
 
   def input
     result = ::Statements::Show.(user, params)
@@ -89,4 +90,9 @@ class ExportManager::Master::Statements::Index < ExportManager::Builders::Spread
   def note(transaction)
     transaction.transaction_detail&.get_note
   end
+
+  def reference_id(transaction)
+    transaction.bbps_bank_transaction.bbps_ref_id if payment.parent_type == "BbpsBill"
+  end
+
 end
