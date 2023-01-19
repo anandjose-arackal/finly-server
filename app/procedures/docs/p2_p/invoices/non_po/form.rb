@@ -95,7 +95,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
       # cn_adjustment_amount: "{% assign total_credit_amount = form.invoice_credit_note_adjusted_amount | plus: row.cn_net_adjustable_amount %}{% if total_credit_amount <= form.invoice_balance_due_without_cn %}{{ row.cn_net_adjustable_amount }}{% else %}{{ form.invoice_balance_due_without_cn | minus: form.invoice_credit_note_adjusted_amount }}{% endif %}"
     },
     form: {
-      tax_type: "{% if form.vendor_country_id_value != 'India' %}{{#{TaxType.id_for(:vat)}}}{% elsif form.vendor_state_id == form.billing_state_id %}{{#{TaxType.id_for(:'cgst+sgst')}}}{% else %}{{#{TaxType.id_for(:igst)}}}{% endif %}"
+      tax_type: "{% if form.vendor_country_id_value != 'India' %}{{#{TaxType.id_for(:vat)}}}{% elsif form.vendor_state_name == form.billing_state_name %}{{#{TaxType.id_for(:'cgst+sgst')}}}{% else %}{{#{TaxType.id_for(:igst)}}}{% endif %}"
     }
 
   }
@@ -195,7 +195,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
     lookup :gstin_location_id, label: 'Vendor Location', choices_scope: Choices[:lookup].('vendor_locations'), # todo - condition to hide for international
            filters: Rules::Builder[:vendor_id].eq(entity: :vendor_id)
     text :vendor_gstin, "Vendor GSTIN", editable: false, visible: false, computed: Forms::Compute::Lookup('gstin_location_id', '{{record.gstin}}') # todo - condition
-    lookup :vendor_state_id, visible: true, computed: Forms::Compute::Lookup('gstin_location_id', '{{record.state_id}}'), visible: false
+    text :vendor_state_name, visible: true, computed: Forms::Compute::Lookup('gstin_location_id', '{{record.state_name}}'), visible: false
     text :vendor_pan, "Vendor PAN", editable: false, visible: false # todo - add condition
     lookup :receiving_account_id, label: "Vendor Account", choices_scope: Choices[:lookup].('vendor_bank_accounts'),
            filters: Rules::Builder[:account_owner_id].eq(entity: 'vendor_id').and(Rules::Builder[:account_owner_type].eq(value: 'YesBankVendor')),
@@ -216,7 +216,7 @@ class Docs::P2P::Invoices::NonPo::Form < Forms::API
     text :billing_address_name, label: 'Name', editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.name}}'), visible: false
     text :billing_address_gstin, label: 'Gstin', editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.gstin}}'), visible: false
     large_text :billing_address, computed: Forms::Compute::Lookup('location_id', '{{record.address}}')
-    lookup :billing_state_id, computed: Forms::Compute::Lookup('location_id', '{{record.state_id}}'), visible: false
+    text :billing_state_name, computed: Forms::Compute::Lookup('location_id', '{{record.state_name}}'), visible: false
   end
 
   # SHIPPING ADDRESS

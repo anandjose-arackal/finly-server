@@ -87,7 +87,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
     },
 
     form: {
-      tax_type: "{% if form.vendor_country_id_value != 'India' %}{{#{TaxType.id_for(:vat)}}}{% elsif form.vendor_state_id == form.billing_state_id %}{{#{TaxType.id_for(:'cgst+sgst')}}}{% else %}{{#{TaxType.id_for(:igst)}}}{% endif %}"
+      tax_type: "{% if form.vendor_country_id_value != 'India' %}{{#{TaxType.id_for(:vat)}}}{% elsif form.vendor_state_name == form.billing_state_name %}{{#{TaxType.id_for(:'cgst+sgst')}}}{% else %}{{#{TaxType.id_for(:igst)}}}{% endif %}"
     }
   }
 
@@ -159,7 +159,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
            filters: Rules::Builder[:vendor_id].eq(entity: :vendor_id)
     text :vendor_gstin, "Vendor GSTIN", editable: false, computed: Forms::Compute::Lookup('gstin_location_id', '{{record.gstin}}') # todo - condition
     text :vendor_pan, "Vendor PAN", editable: false # todo - add condition
-    lookup :vendor_state_id, visible: true, computed: Forms::Compute::Lookup('gstin_location_id', '{{record.state_id}}'), visible: false
+    text :vendor_state_name, visible: true, computed: Forms::Compute::Lookup('gstin_location_id', '{{record.state_name}}'), visible: false
 
     lookup :bank_account_id, label: "Bank Account", choices_scope: Choices[:lookup].('vendor_bank_accounts'),
            filters: Rules::Builder[:account_owner_id].eq(entity: 'vendor_id').and(Rules::Builder[:account_owner_type].eq(value: 'YesBankVendor')),
@@ -185,7 +185,7 @@ class Docs::P2P::PurchaseOrders::Form < Forms::API
     text :billing_address_name, editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.name}}')
     text :billing_address_gstin, editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.gstin}}')
     large_text :billing_address, computed: Forms::Compute::Lookup('location_id', '{{record.address}}')
-    lookup :billing_state_id, computed: Forms::Compute::Lookup('location_id', '{{record.state_id}}'), visible: false
+    text :billing_state_name, computed: Forms::Compute::Lookup('location_id', '{{record.state_name}}'), visible: false
   end
 
   # SHIPPING ADDRESS

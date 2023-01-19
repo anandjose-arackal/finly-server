@@ -15,6 +15,8 @@ class GstinLocationExposure < Exposures::API
   attribute :created_at, record_attribute: true
   attribute :updated_at, record_attribute: true
   attribute :deleted_at, record_attribute: true
-  attribute :state_id, record_attribute: true
+  attribute :state_name, includes: [:gst_state_codes] do
+    record.state.name.downcase
+  end
 
 end

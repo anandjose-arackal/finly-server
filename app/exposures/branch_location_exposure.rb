@@ -9,6 +9,8 @@ class BranchLocationExposure < Exposures::API
   attribute :address_1, record_attribute: true
   attribute :address_2, record_attribute: true
   attribute :address, record_attribute: true
-  attribute :state_id, record_attribute: true
+  attribute :state_name, includes: [:states] do
+    record.state.name.downcase
+  end
 
 end

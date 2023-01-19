@@ -150,7 +150,7 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
       cn_adjustment_amount: "{{ row.cn_adjustment_amount | default: 0 | round: 2}}"
     },
     form: {
-      tax_type: "{% if form.vendor_country_id_value != 'India' %}{{#{TaxType.id_for(:vat)}}}{% elsif form.vendor_state_id == form.billing_state_id %}{{#{TaxType.id_for(:'cgst+sgst')}}}{% else %}{{#{TaxType.id_for(:igst)}}}{% endif %}"
+      tax_type: "{% if form.vendor_country_id_value != 'India' %}{{#{TaxType.id_for(:vat)}}}{% elsif form.vendor_state_name == form.billing_state_name %}{{#{TaxType.id_for(:'cgst+sgst')}}}{% else %}{{#{TaxType.id_for(:igst)}}}{% endif %}"
     }
   }
 
@@ -230,7 +230,7 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
     lookup :gstin_location_id, label: 'Vendor Location', choices_scope: Choices[:lookup].('vendor_locations'), # TODO: - condition to hide for international
                                filters: Rules::Builder[:vendor_id].eq(entity: :vendor_id)
     text :vendor_gstin, 'Vendor GSTIN', editable: false, computed: Forms::Compute::Lookup('gstin_location_id', '{{record.gstin}}') # TODO: - condition
-    lookup :vendor_state_id, visible: true, computed: Forms::Compute::Lookup('gstin_location_id', '{{record.state_id}}'), visible: false
+    text :vendor_state_name, visible: true, computed: Forms::Compute::Lookup('gstin_location_id', '{{record.state_name}}'), visible: false
 
     text :vendor_pan, 'Vendor PAN', editable: false # TODO: - add condition
 
@@ -253,7 +253,7 @@ class Docs::P2P::Invoices::Po::Form < Forms::API
     text :billing_address_name, label: 'Name', editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.name}}')
     text :billing_address_gstin, label: 'Gstin', editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.gstin}}')
     large_text :billing_address, computed: Forms::Compute::Lookup('location_id', '{{record.address}}')
-    lookup :billing_state_id, computed: Forms::Compute::Lookup('location_id', '{{record.state_id}}'), visible: false
+    text :billing_state_name, computed: Forms::Compute::Lookup('location_id', '{{record.state_name}}'), visible: false
   end
 
   # SHIPPING ADDRESS
