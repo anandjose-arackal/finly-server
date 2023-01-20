@@ -48,6 +48,10 @@ user:
       reviewal_chain_async: <%= ReviewalChainAsyncToggle.new(current_user).enabled? %>
     currency_flags:
       amount_prop_only_load_enabled: <%= AmountPropOnlyLoadToggle.new(current_user).enabled? %>
+    common_imports:
+      lurm_enabled: <%= LrumEnabledToggle.new(current_user).enabled? %>
+    global_search:
+      forms_config_enabled: <%= GlobalSearchFormsConfigToggle.new(current_user).enabled? %>
 customer_specific:
   invoice_minimal_ui: <%=  MinimalInvoiceUiToggle.new(current_user).minimal_invoice_ui_enabled? %>
   dummy_bank_account: <%= current_company.yes_bank_vendors&.first&.id %>

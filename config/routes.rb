@@ -4128,6 +4128,15 @@ Rails.application.routes.draw do
   resources :audit_trails, only: [:index]
   ### Audit Trails End ##
 
+
+  ### Common Imports ###
+  resources :common_imports do
+    collection do
+      get :get_template
+    end
+  end
+
+
   ######## Dashboards ##################
   # Fixme: old routes for supporting v1 of dashboards in dynamic index. This can deleted when the support is removed
   namespace :dashboards do
@@ -4453,6 +4462,7 @@ Rails.application.routes.draw do
 
   post 'search', to: 'global_search#create'
   get 'search', to: 'global_search#index'
+  get 'search/form_features_state', to: 'global_search#form_features_state'
 
   # todo - I2P : For invoices
   # resources :invoices, only: [:create, :update, :show]
