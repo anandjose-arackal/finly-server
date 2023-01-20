@@ -92,7 +92,7 @@ class ExportManager::Master::Statements::Index < ExportManager::Builders::Spread
   end
 
   def reference_id(transaction)
-    transaction.bbps_bank_transaction.bbps_ref_id if payment.parent_type == "BbpsBill"
+    transaction.payment&.bbps_bank_transaction&.bbps_ref_id if transaction.payment&.parent_type == "BbpsBill"
   end
 
 end
