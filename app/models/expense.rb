@@ -667,7 +667,7 @@ class Expense < ApplicationRecord
           rate = simple ? " @ " : " at "
           rate += "#{self.distance_expense&.vehicle_rate&.rate&.currency&.symbol}#{self.distance_expense&.vehicle_rate&.rate&.value} #{self.distance_expense&.vehicle_rate&.rate&.currency&.country_code} per KM"
         end
-        return "#{self.distance_expense.distance_value} KM#{rate}"
+        return "#{self.distance_expense&.distance_value} KM#{rate}"
       elsif self.time_expense?
         rate = ''
         if (not self.report.nil?) and report.policy.time_expense_config.rate_value.present?
@@ -1050,7 +1050,7 @@ class Expense < ApplicationRecord
   end
 
   def compute_gst_amount
-    return unless has_gst? and self.gst_percentage.present?
+    return unless self.gst_percentage.present?
 
     gst_amount_value = (self.amount.value * self.gst_percentage) / (100.0 + self.gst_percentage)
     # gst_amount_value = self.amount.value * self.gst_percentage / 100
@@ -1058,6 +1058,16 @@ class Expense < ApplicationRecord
   end
 
   def set_gst_amount(value)
+    if self.expense_tax_type_id == ExpenseTaxType.id_for(:none)
+        self.gst_amount&.destroy
+        self.tds_amount&.destroy
+        self.gst_percentage = nil
+        self.tds_percentage = nil
+        self.tax_rate_id = nil
+        self.tds_slab_id = nil
+        self.gst_type_id = nil
+      return
+    end
     if value.nil?
       if self.gst_amount.present?
         self.gst_amount.destroy
