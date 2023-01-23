@@ -25,4 +25,10 @@ class CommonImportsController < BaseControllers::WebBase
     respond
   end
 
+  def user_import
+    @result = CommonImports::UserImport.(current_user, params)
+    respond
+  end
+
+
 end
