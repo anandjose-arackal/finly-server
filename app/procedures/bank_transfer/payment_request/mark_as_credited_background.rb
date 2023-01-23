@@ -1,53 +1,45 @@
-class MyTransaction
-  def self.call((options, flow_options), **)
-    handler_signal = nil
-
-    ActiveRecord::Base.transaction do
-      signal, (options, flow_options) = yield
-      terminus_semantic = signal.to_h[:semantic]
-
-      if [:success, :pass_fast].include?(terminus_semantic)
-        handler_signal = Trailblazer::Activity::Right
-      else
-        handler_signal = Trailblazer::Activity::Left
-        raise ActiveRecord::Rollback
-      end
-    end
-
-    return handler_signal, [options, flow_options]
-  end
-end
-
-
 class BankTransfer::PaymentRequest:: MarkAsCreditedBackground < Transactions::API
   
   include Transactions::BackgroundWorker
 
   sidekiq_options queue: :payments_queue
-  
-  step Wrap(MyTransaction){
-    step :update_payments_invoices
-  }
 
+  step :update_payments_invoices!
   step :send_credit_mail
-  
-  def update_payments_invoices(options, payment_request:, current_user:, payment_order_status_id:, payment_request_status_id:, **)
-    payment_request.payment_order.payments.each do |payment|
-      payment.update(payment_status_id: PaymentStatus.id_for(:completed))
-      update_agreement_beneficiary(payment)
-      update_agreement_security_deposit(payment)
 
-      invoice = payment.invoice
-      if invoice.present?
-        invoice.update_invoice_status
+  fail :after_rollback
+
+  def update_payments_invoices!(options, payment_request:, current_user:, payment_order_status_id:, payment_request_status_id:, **)
+    options[:transaction_rolled_back] = false
+
+    ActiveRecord::Base.transaction do
+      payment_request.payment_order.payments.each do |payment|
+        payment.update(payment_status_id: PaymentStatus.id_for(:completed))
+        update_agreement_beneficiary(payment)
+        update_agreement_security_deposit(payment)
+
+        invoice = payment.invoice
+        if invoice.present?
+          invoice.update_invoice_status
+        end
       end
+
+      new_amount = payment_request.payment_order.payments.completed.joins(:amount).sum(:value)
+      payment_request.payment_order.assign_attributes({amount_processed_attributes: {value: new_amount, currency_id: ( payment_request&.get_base_currency&.id rescue 1) }})
+      payment_request.comments.new user_id: current_user.id,
+                                   action_id: BankPaymentRequestCommentAction.id_for(:mark_as_credited)
+      payment_request.save
+    rescue
+      options[:transaction_rolled_back] = true
+      raise ActiveRecord::Rollback
     end
-   
-    new_amount = payment_request.payment_order.payments.completed.joins(:amount).sum(:value)
-    payment_request.payment_order.assign_attributes({amount_processed_attributes: {value: new_amount, currency_id: ( payment_request&.get_base_currency&.id rescue 1) }})
-    payment_request.comments.new user_id: current_user.id,
-                                    action_id: BankPaymentRequestCommentAction.id_for(:mark_as_credited)
-    payment_request.save
+
+    !options[:transaction_rolled_back]
+  end
+
+  def after_rollback(options, payment_request:, payment_order_status_id:, payment_request_status_id:, **)
+    payment_request.payment_order.update(payment_order_status_id: payment_order_status_id)
+    payment_request.update(status_id: payment_request_status_id)
   end
 
   def send_credit_mail(options, current_user:, payment_request:, **)
