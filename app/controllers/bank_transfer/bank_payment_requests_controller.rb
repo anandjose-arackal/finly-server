@@ -111,15 +111,17 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
   end
 
   def mark_as_credited
+    if MarkAsCreditedAsyncToggle.new(current_user).enabled?
+      endpoint BankTransfer::PaymentRequest::MarkAsCreditedFaster
+      respond_to do |format|
+        format.json {}
+      end
+
+      return
+    end
+
     @result = BankTransfer::PaymentRequest::Review::MarkAsCredited.(current_user, params)
     respond
-  end
-
-  def mark_as_credited_faster
-    endpoint BankTransfer::PaymentRequest::MarkAsCreditedFaster
-    respond_to do |format|
-      format.json {}
-    end
   end
 
   def count
