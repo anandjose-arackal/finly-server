@@ -91,7 +91,6 @@ class PurchaseRequestItem < ApplicationRecord
   after_destroy :budget_trail_destroy
 
   validates :item, :quantity, :per_unit_estimated_amount, :required_by_date, :delivery_location, presence: true, unless: :parent_forms_enabled
-  validates_presence_of :cost_center, :department, if: :cost_allocation_items?
 
   accepts_nested_attributes_for :per_unit_estimated_amount, :attachment, allow_destroy: true
 

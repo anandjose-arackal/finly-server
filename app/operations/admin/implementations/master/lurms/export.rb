@@ -8,7 +8,7 @@ class Admin::Implementations::Master::Lurms::Export < Admin::Implementations::Pr
       :id => 'ID',
       :policy => 'Policy Name',
       :policy_creation_flag => 'For New Policy Y / or Blank',
-      :user_id => 'User Employee ID / Email / Mobile',
+      :user_id => 'Email / Mobile / User Employee ID ',
       :level_name => 'Level Name',
       :level_number => 'Level Number',
       :reviewer_email_mobile => 'Reviewer Employee ID / Email / Mobile',
@@ -54,14 +54,9 @@ class Admin::Implementations::Master::Lurms::Export < Admin::Implementations::Pr
   end
 
   def reviewer_email_mobile(lurm)
+    return lurm.reviewer&.email if lurm.reviewer&.email&.present?
     identifier = lurm.reviewer&.profile&.employee_id
-    if identifier.blank?
-      identifier = lurm.reviewer&.email
-    end
-    if identifier.blank?
-      identifier = lurm.reviewer&.mobile_number
-    end
-    identifier
+    (identifier.present? ? identifier : lurm.reviewer&.mobile_number)
   end
 
   def with_exception(lurm)
@@ -73,9 +68,9 @@ class Admin::Implementations::Master::Lurms::Export < Admin::Implementations::Pr
   end
 
   def user_id(lurm)
+    return lurm.user&.email if lurm.user&.email&.present?
     identifier = lurm.user&.profile&.employee_id
-    return identifier if identifier.present?
-    lurm.user&.email&.present? ? lurm.user&.email : lurm.user&.mobile_number
+    (identifier.present? ? identifier : lurm.user&.mobile_number)
   end
 
   def min(lurm)
