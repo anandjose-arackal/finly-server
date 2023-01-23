@@ -28,7 +28,7 @@ class BankTransfer::PaymentRequest:: MarkAsCreditedBackground < Transactions::AP
       payment_request.payment_order.assign_attributes({amount_processed_attributes: {value: new_amount, currency_id: ( payment_request&.get_base_currency&.id rescue 1) }})
       payment_request.comments.new user_id: current_user.id,
                                    action_id: BankPaymentRequestCommentAction.id_for(:mark_as_credited)
-      payment_request.save
+      payment_request.save!
     rescue
       options[:transaction_rolled_back] = true
       raise ActiveRecord::Rollback
