@@ -41,7 +41,8 @@ class Admin::Implementations::Master::PolicyUserRole::Import < Admin::Implementa
                                     :credit_note_auditor => 'Credit Note Auditor',
                                     :agreement_invoice_initiator => 'Agreement Invoice Initiator',
                                     :agreement_invoice_reviewer => 'Agreement Invoice Reviewer',
-                                    :agreement_invoice_auditor => 'Agreement Invoice Auditor'
+                                    :agreement_invoice_auditor => 'Agreement Invoice Auditor',
+                                    :vendor_bulk_importer => 'Vendor Bulk Importer'
               },
               "Expense Management" => {
                   :policy_name => 'Policy Name',
