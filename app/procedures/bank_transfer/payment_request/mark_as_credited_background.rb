@@ -37,8 +37,8 @@ class BankTransfer::PaymentRequest:: MarkAsCreditedBackground < Transactions::AP
     !options[:transaction_rolled_back]
   end
 
-  def after_rollback(options, payment_request:, payment_order_status_id:, payment_request_status_id:,current_user:, **)
-    BankTransfer::PaymentRequest::MarkAsCreditedRollbackBackground.call_async(payment_request: payment_request, current_user: current_user, payment_order_status_id: payment_order_status_id, payment_request_status_id: payment_request_status_id)
+  def after_rollback(options, payment_request:, payment_order_status_id:, payment_request_status_id:,current_user:,controlling_level_id:, **)
+    BankTransfer::PaymentRequest::MarkAsCreditedRollbackBackground.call_async(payment_request: payment_request, current_user: current_user, payment_order_status_id: payment_order_status_id, payment_request_status_id: payment_request_status_id,controlling_level_id: controlling_level_id)
   end
 
   def send_credit_mail(options, current_user:, payment_request:, **)

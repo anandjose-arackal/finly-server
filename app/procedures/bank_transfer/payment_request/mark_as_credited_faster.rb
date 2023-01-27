@@ -54,18 +54,23 @@ class BankTransfer::PaymentRequest::MarkAsCreditedFaster < Transactions::API
     add_message options, :success, :base, "Payment ticket status updation has been initiated. Status for all the invoices will be updated in Sometime. You may see the Payment ticket status as completed."
      
     bank_payment_requests.each do |payment_request|
+      #These parameters help to change the status of a payment request to its original status(before mark as credited) if some exception is raise in the background job.
       payment_request_status_id = payment_request.status_id
+      controlling_level_id = payment_request.controlling_level_id
+
       parameters = {
         document: payment_request,
         aasm_event: 'mark_as_credited',
       }
 
+    
       op = WorkflowManager::Base.(current_user, parameters)
 
       if op.success?
+        #This parameter help to change the status of a payment order to its original status(before mark as credited) if some exception is raise in the background job.
         payment_order_status_id = payment_request.payment_order.payment_order_status_id
         payment_request.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
-        BankTransfer::PaymentRequest::MarkAsCreditedBackground.call_async(payment_request: payment_request, current_user: current_user, payment_order_status_id: payment_order_status_id, payment_request_status_id: payment_request_status_id)
+        BankTransfer::PaymentRequest::MarkAsCreditedBackground.call_async(payment_request: payment_request, current_user: current_user, payment_order_status_id: payment_order_status_id, payment_request_status_id: payment_request_status_id, controlling_level_id: controlling_level_id)
       else
         add_message options, :error, :base, op.messages[:error]
         return false
