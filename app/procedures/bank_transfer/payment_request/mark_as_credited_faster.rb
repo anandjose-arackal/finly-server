@@ -51,7 +51,7 @@ class BankTransfer::PaymentRequest::MarkAsCreditedFaster < Transactions::API
   end
 
   def process(options, params:, bank_payment_requests:, current_user:, **)
-    add_message options, :success, :base, "Payment ticket status updation has been initiated. Status for all the invoices will be updated in Sometime. You may see the Payment ticket status as completed."
+    add_message options, :success, :base, "Payment ticket status updation has been initiated. Status for all the invoices will be updated in sometime. You may see the Payment ticket status as completed."
      
     bank_payment_requests.each do |payment_request|
       #These parameters help to change the status of a payment request to its original status(before mark as credited) if some exception is raise in the background job.
