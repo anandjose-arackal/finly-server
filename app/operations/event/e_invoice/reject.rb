@@ -70,9 +70,9 @@ class Event::EInvoice::Reject < Event::EInvoice::Base
 
   def mailer_body(user)
     if user == self.rejecting_user
-      "You have rejected the invoice: #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id})"
+      "You have rejected the invoice: #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id}) <p> Rejection Note: #{self.invoice.rejection_note} </p>"
     else
-      "#{self.rejecting_user.name} has rejected the invoice: #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id})"
+      "#{self.rejecting_user.name} has rejected the invoice: #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id}) <p> Rejection Note: #{self.invoice.rejection_note} </p>"
     end
   end
 
