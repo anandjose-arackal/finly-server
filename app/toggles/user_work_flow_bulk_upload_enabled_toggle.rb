@@ -1,5 +1,5 @@
 # release/user_workflow#bulk_import
-class UserWorkFlowBulkUploadEnabled < ApplicationToggle
+class UserWorkFlowBulkUploadEnabledToggle < ApplicationToggle
     def enabled?
       feature_flag 'release/user_workflow#bulk_import', false
     end
