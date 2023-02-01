@@ -16,6 +16,7 @@ class Admin::Implementations::Master::ItemMasters::Export < Admin::Implementatio
       :tds_applicable => "TDS Applicable (Y/N)",
       :discount => "Discount",
       :rate => "Rate",
+      :unit_of_measurement => "UOM",
       :destroy => "Destroy"
   })
   def valid_request
@@ -72,6 +73,10 @@ class Admin::Implementations::Master::ItemMasters::Export < Admin::Implementatio
 
   def tds_applicable(item)
     (item.tds_applicable? ? 'Y' : 'N')
+  end
+
+  def unit_of_measurement(item)
+    item.unit_of_measurement
   end
 
   def destroy(item)
