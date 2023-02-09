@@ -1,6 +1,15 @@
 class Expense::Show < Expense::Base
   attr_accessor :expense
 
+  def init
+    id = (params[:expense_id] or params[:id])
+    if ExpenseShowFasterLookupToggle.new(user).enabled?
+      self.expense = Expense.find_by id: id
+    else
+      self.expense = Expense::Index.(user, params)&.expenses&.find_by(id: id)
+    end
+  end
+
   def pre_validate
     super
     if params[:expense_id].blank? && params[:id].blank?
@@ -15,10 +24,6 @@ class Expense::Show < Expense::Base
       add_message :error, 'Expense not found'
       return
     end
-  end
-
-  def process
-    expense = user.expenses.find_by params[:expense_id]
   end
 
 end
