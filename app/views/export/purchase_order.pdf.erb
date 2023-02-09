@@ -372,6 +372,18 @@
       </div>
     </div>
   <% end %>
+  <% unless @result.purchase_order.vendor_note.blank? %>
+    <div class="col col-xs-12 notes-container mg-top-5">
+      <h4 class="section-title">Vendor Note</h4>
+      <div class="col col-xs-12 no-padding term-text font-light-gray mg-top-5 mg-botm-8">
+        <% if @result.purchase_order.vendor_note.blank? %>
+          <%= simple_format "<i>Empty </i>", {}, wrapper_tag: "div" %>
+        <% else %>
+          <%= simple_format @result.purchase_order.vendor_note, {}, wrapper_tag: "div" %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
   <div class="text-center font-dark-small" style="margin-top: 50%; padding-top: 80%">
     Please refer the next page for the terms and conditions
   </div>
