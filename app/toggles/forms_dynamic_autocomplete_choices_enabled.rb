@@ -2,7 +2,7 @@
 class FormsDynamicAutocompleteChoicesEnabled < ApplicationToggle
 
   def enabled?
-    feature_flag 'release/forms#autocomplete_choices', false
+    feature_flag 'release/forms#dynamic_autocomplete_choicess', false
   end
 
 end
