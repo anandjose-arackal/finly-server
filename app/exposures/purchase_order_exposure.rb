@@ -206,4 +206,6 @@ class PurchaseOrderExposure < Exposures::API
     end
     comment_texts.compact.join(', ')
   end
+
+  attribute :revision_of, record_attribute: true
 end
