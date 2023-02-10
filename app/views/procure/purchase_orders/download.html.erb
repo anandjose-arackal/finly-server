@@ -35,10 +35,6 @@
             <td class="font-light-gray">Payment Term</td>
             <td class="font-dark-gray"><%= @result.purchase_order.payment_term&.name %></td>
           </tr>
-          <tr>
-            <td class="font-light-gray">Sub Department</td>
-            <td class="font-dark-gray"><%= @result.purchase_order.sub_department&.name %></td>
-          </tr>
           </tbody>
         </table>
       </div>
@@ -181,6 +177,18 @@
       </div>
     </div>
   </div>
+  <% unless @result.purchase_order.vendor_note.blank? %>
+    <div class="col col-xs-12 notes-container mg-top-5">
+      <h4 class="section-title">Vendor Note</h4>
+      <div class="col col-xs-12 no-padding term-text font-light-gray mg-top-5 mg-botm-8">
+        <% if @result.purchase_order.vendor_note.blank? %>
+          <%= simple_format "<i>Empty </i>", {}, wrapper_tag: "div" %>
+        <% else %>
+          <%= simple_format @result.purchase_order.vendor_note, {}, wrapper_tag: "div" %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
   <div class="col col-xs-12 terms-and-conditions-container mg-top-5">
     <h4 class="section-title">Terms and Conditions</h4>
     <div class="col col-xs-12 no-padding term-text font-light-gray mg-top-5 mg-botm-8">
