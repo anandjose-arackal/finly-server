@@ -18,7 +18,7 @@
         <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;"><%=expense.date%></td>
         <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;"><%=expense.merchant_name %></td>
         <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;"><%=expense.category_name%></td>
-        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;"><%=expense.amount.currency.symbol%> <%=expense.amount_value%></td>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;"><%=expense.report.base_currency.symbol%> <%=expense.amount_value%></td>
       </tr>
       <% end %>
     </table><br>
