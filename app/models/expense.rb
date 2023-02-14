@@ -1164,6 +1164,7 @@ class Expense < ApplicationRecord
   def self.as_json(options = {})
     {
         id: id,
+        uuid_key: uuid_key,
         note: note,
         amount_value: amount_value,
         currency_symbol: currency_symbol,
