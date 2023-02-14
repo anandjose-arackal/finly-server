@@ -53,6 +53,12 @@ class Expense < ApplicationRecord
           FieldCustomizer::CustomizableValidation,
           MathUtil
 
+  before_validation :create_uuid_key, on: :create
+
+  def create_uuid_key
+    self.uuid_key = SecureRandom.uuid
+  end
+
   belongs_to :company, optional: true
   belongs_to :amount, optional: true
   belongs_to :expense_status, optional: true
