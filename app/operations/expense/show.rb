@@ -3,11 +3,23 @@ class Expense::Show < Expense::Base
 
   def init
     id = (params[:expense_id] or params[:id])
-    if ExpenseShowFasterLookupToggle.new(user).enabled?
-      self.expense = Expense.find_by uuid_key: id
+
+    if params[:normal_key_sent]
+      if ExpenseShowFasterLookupToggle.new(user).enabled?
+        self.expense = Expense.find_by id: id
+      else
+        self.expense = Expense::Index.(user, params)&.expenses&.find_by(id: id)
+      end
     else
-      self.expense = Expense::Index.(user, params)&.expenses&.find_by(uuid_key: id)
+      if ExpenseShowFasterLookupToggle.new(user).enabled?
+        self.expense = Expense.find_by uuid_key: id
+      else
+        self.expense = Expense::Index.(user, params)&.expenses&.find_by(uuid_key: id)
+      end
     end
+
+
+
   end
 
   def pre_validate
