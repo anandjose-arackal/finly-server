@@ -67,7 +67,10 @@ class ExpensesController < BaseControllers::WebBase
 
       # params[:id] = @result.expense&.id
       # @result = Expense::Show.(current_user, params)
-
+      Rails.logger.debug "======================================"
+      Rails.logger.debug @result.expenses
+      Rails.logger.debug @result.expenses.uuid
+      Rails.logger.debug "======================================"
       respond
     else
       respond response: :success
