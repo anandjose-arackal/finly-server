@@ -4133,6 +4133,7 @@ Rails.application.routes.draw do
   resources :common_imports do
     collection do
       get :get_template
+      post :user_import
     end
   end
 

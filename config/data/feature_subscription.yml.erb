@@ -49,7 +49,8 @@ user:
     currency_flags:
       amount_prop_only_load_enabled: <%= AmountPropOnlyLoadToggle.new(current_user).enabled? %>
     common_imports:
-      lurm_enabled: <%= LrumEnabledToggle.new(current_user).enabled? %>
+      lurm_enabled: <%= LurmEnabledToggle.new(current_user).enabled? %>
+      user_bulk_upload_enabled: <%= UserWorkFlowBulkUploadEnabledToggle.new(current_user).enabled? %>
     global_search:
       forms_config_enabled: <%= GlobalSearchFormsConfigToggle.new(current_user).enabled? %>
 customer_specific:

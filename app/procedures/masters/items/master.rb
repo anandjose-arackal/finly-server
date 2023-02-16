@@ -1,6 +1,6 @@
 class Masters::Items::Master < Masters::API
 
-  UNITS_OF_MEASUREMENT = ["BOU", "Bags", "Bale", "Bottles", "Boxes", "Buckles", "Bunches", "Bundles", "Cans", "Carat", "Cartons", "Centimeter", "Cubic Centimeter", "Cubic Meter", "Dozen", "Drums", "Grams", "Great Gross", "Gross", "Gross Yards", "Kilograms", "Kiloliter", "Kilometers", "Liters", "Lump Sum", "Meter", "Metric Ton", "Milliliters", "Month", "Numbers", "Others", "Packs", "Pairs", "Pieces", "Quintal", "Rolls", "Sets", "Square Feet", "Square Meter", "Square Yards", "Tablets", "Ten Grams", "Thousands", "Tonnes", "Tubes", "US Gallons", "Units", "Yards", "Years", "Quarter"]
+  UNITS_OF_MEASUREMENT = ["BOU", "Bags", "Bale", "Bottles", "Boxes", "Buckles", "Bunches", "Bundles", "Cans", "Carat", "Cartons", "Centimeter", "Cubic Centimeter", "Cubic Meter", "Dozen", "Drums", "Grams", "Great Gross", "Gross", "Gross Yards", "Kilograms", "Kiloliter", "Kilometers", "Liters", "Lump Sum", "Meter", "Metric Ton", "Milliliters", "Month", "Numbers", "Others", "Packs", "Pairs", "Pieces", "Quintal", "Rfeet", "Rolls", "Sets", "Square Feet", "Square Meter", "Square Yards", "Tablets", "Ten Grams", "Thousands", "Tonnes", "Tubes", "Truck Load", "US Gallons", "Units", "Yards", "Years", "Quarter"]
 
   model Item
   name "Items"
