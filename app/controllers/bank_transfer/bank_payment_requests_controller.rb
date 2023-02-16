@@ -121,6 +121,7 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
     end
     
     @result = BankTransfer::PaymentRequest::Review::MarkAsCredited.(current_user, params)
+    @op = @result
     respond
   end
 
