@@ -59,6 +59,12 @@ class User::Configuration::UpdateState < BaseOperation
     end
   end
 
+  def pre_process
+    if StringUtils.to_bool(params[:active]) == false
+      to_user.default_password = false
+    end
+  end
+
   def process
     if to_user.update(state_params)
       update_card
@@ -76,7 +82,7 @@ class User::Configuration::UpdateState < BaseOperation
   private
 
   def state_params
-    params.permit(:active)
+    params.permit(:active, :default_password)
   end
 
   def update_card
