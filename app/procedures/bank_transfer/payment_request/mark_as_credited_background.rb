@@ -29,7 +29,9 @@ class BankTransfer::PaymentRequest:: MarkAsCreditedBackground < Transactions::AP
       payment_request.comments.new user_id: current_user.id,
                                    action_id: BankPaymentRequestCommentAction.id_for(:mark_as_credited)
       payment_request.save!
-    rescue
+    rescue  Exception => e
+      Rails.logger.info "message #{ e.message }"
+      Rails.logger.info "backtrace #{ e.backtrace.inspect }"
       options[:transaction_rolled_back] = true
       raise ActiveRecord::Rollback
     end
