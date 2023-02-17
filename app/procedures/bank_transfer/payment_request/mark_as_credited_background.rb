@@ -7,41 +7,62 @@ class BankTransfer::PaymentRequest:: MarkAsCreditedBackground < Transactions::AP
   step :update_payments_invoices!
   step :send_credit_mail
 
-  fail :after_rollback
 
-  def update_payments_invoices!(options, payment_request:, current_user:, payment_order_status_id:, payment_request_status_id:, **)
-    options[:transaction_rolled_back] = false
+  def update_payments_invoices!(options, payment_request:, current_user:, payment_order_status_id:, payment_request_status_id:, controlling_level_id:, **)
+    transaction_rolled_back = false
 
+    Rails.logger.info "Trying to update payment orders in payment ticket id #{payment_request.id}"
     ActiveRecord::Base.transaction do
-      payment_request.payment_order.payments.each do |payment|
-        payment.update(payment_status_id: PaymentStatus.id_for(:completed))
-        update_agreement_beneficiary(payment)
-        update_agreement_security_deposit(payment)
+      begin
+        payment_request.payment_order.payments.each do |payment|
+          payment.update(payment_status_id: PaymentStatus.id_for(:completed))
+          update_agreement_beneficiary(payment)
+          update_agreement_security_deposit(payment)
 
-        invoice = payment.invoice
-        if invoice.present?
-          invoice.update_invoice_status
+          invoice = payment.invoice
+          if invoice.present?
+            invoice.update_invoice_status
+          end
         end
-      end
 
-      new_amount = payment_request.payment_order.payments.completed.joins(:amount).sum(:value)
-      payment_request.payment_order.assign_attributes({amount_processed_attributes: {value: new_amount, currency_id: ( payment_request&.get_base_currency&.id rescue 1) }})
-      payment_request.comments.new user_id: current_user.id,
-                                   action_id: BankPaymentRequestCommentAction.id_for(:mark_as_credited)
-      payment_request.save!
-    rescue  Exception => e
-      Rails.logger.info "message #{ e.message }"
-      Rails.logger.info "backtrace #{ e.backtrace.inspect }"
-      options[:transaction_rolled_back] = true
-      raise ActiveRecord::Rollback
+        Rails.logger.info "Payment Order Invoices updated"
+
+        new_amount = payment_request.payment_order.payments.completed.joins(:amount).sum(:value)
+        payment_request.payment_order.assign_attributes({amount_processed_attributes: {value: new_amount, currency_id: ( payment_request&.get_base_currency&.id rescue 1) }})
+        payment_request.comments.new user_id: current_user.id,
+                                     action_id: BankPaymentRequestCommentAction.id_for(:mark_as_credited)
+
+        Rails.logger.info "Amount calculations done!"
+
+        res = payment_request.save!
+
+        Rails.logger.info "Payment Request Saved successfully"
+        Rails.logger.info res
+
+        res
+      rescue Exception => e
+        Rails.logger.info "message #{ e.message }"
+        Rails.logger.info "backtrace #{ e.backtrace.inspect }"
+        transaction_rolled_back = true
+        raise ActiveRecord::Rollback
+      end
     end
 
-    !options[:transaction_rolled_back]
+    if transaction_rolled_back
+      BankTransfer::PaymentRequest::MarkAsCreditedRollbackBackground.call_async(
+        payment_request: payment_request,
+        current_user: current_user,
+        payment_order_status_id: payment_order_status_id,
+        payment_request_status_id: payment_request_status_id,
+        controlling_level_id: controlling_level_id
+      )
+    else
+      Rails.logger.info "We didn't need to trigger rollback!"
+    end
+
+    !transaction_rolled_back
   end
 
-  def after_rollback(options, payment_request:, payment_order_status_id:, payment_request_status_id:,current_user:,controlling_level_id:, **)
-    BankTransfer::PaymentRequest::MarkAsCreditedRollbackBackground.call_async(payment_request: payment_request, current_user: current_user, payment_order_status_id: payment_order_status_id, payment_request_status_id: payment_request_status_id,controlling_level_id: controlling_level_id)
-  end
 
   def send_credit_mail(options, current_user:, payment_request:, **)
     
