@@ -1,4 +1,10 @@
 <% content_for :body do %>
+  <head>
+    <style>
+        h3{text-align: left;}
+        h4{text-align: left;}
+    </style>
+  </head>
     <h3><%= "#{@resource_request.name}" %> has downloaded the resource <%=@resource_request.resource_file_name%> from our website. The details are as follows: </h3>
 
     <h4>Downloader Name: <%= @resource_request.name %></h4>
