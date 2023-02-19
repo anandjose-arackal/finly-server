@@ -61,7 +61,7 @@ class User::Configuration::UpdateState < BaseOperation
 
   def pre_process
     if StringUtils.to_bool(params[:active]) == false
-      to_user.default_password = false
+      params[:default_password] = false
     end
   end
 
