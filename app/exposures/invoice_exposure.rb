@@ -258,7 +258,7 @@ class InvoiceExposure < Exposures::API
   attribute :payments_processed_at, includes: [:payments] do
     processed_ats =[]
     record.payments.each do |payment|
-      processed_ats << payment.processed_at
+      processed_ats << payment.processed_at&.strftime("%d-%b-%Y")
     end
     processed_ats.compact.join(', ')
   end
