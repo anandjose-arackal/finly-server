@@ -106,7 +106,7 @@ class Menu::Masters::Procurement < Menu::API
 
   item :procure, features: :procurement, icon: 'https://img.icons8.com/windows/20/ffffff/add-shopping-cart.png' do
     item :purchase_orders, permissions: Docs::P2P::PurchaseOrders::Index.permissions
-    item :pr_approved_items, label: "PR Approved Items", permissions: [:purchase_order_initiator, :admin]
+    item :pr_approved_items, label: "PR Approved Items", permissions: [:purchase_order_initiator, :admin], features: :purchase_requisition_system
   end
 
   item :receive, features: [:procurement, :grn_enabled], permissions: Docs::P2P::Inwards::Received::Index.permissions, icon: 'https://img.icons8.com/windows/20/ffffff/borrow-book.png' do
