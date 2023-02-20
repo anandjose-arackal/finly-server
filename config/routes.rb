@@ -3917,6 +3917,7 @@ Rails.application.routes.draw do
 
     get 'filters', to: "filters#index"
     get 'views', to: "index_view_segments#index"
+    get 'views/:route', to: "index_view_segments#index"
 
     get 'company_groups/lookup', to: "company_groups#lookup"
     resources :company_groups, only: [:create, :update, :index, :show]
@@ -4143,6 +4144,7 @@ Rails.application.routes.draw do
   namespace :dashboards do
     get 'vp/awaiting_action', to: 'vendor_payments#awaiting_action'
     get 'vp/configs', to: 'vendor_payments#configs'
+    get 'vp/filter_configs', to: 'vendor_payments#filter_configs'
     get 'vp/purchase_orders', to: 'vendor_payments#purchase_orders'
     get 'vp/purchase_requests', to: 'vendor_payments#purchase_requests'
     get 'vp/payment_tickets', to: 'vendor_payments#payment_tickets'
@@ -4168,6 +4170,7 @@ Rails.application.routes.draw do
   end
 
   get 'dashboards/configs', to: 'dashboards#configs'
+  get 'dashboards/filter_configs', to: 'dashboards#filter_configs'
   get 'dashboards/:route', to: 'dashboards#show'
   ######## Dashbaord Ends ##############
 
@@ -4374,6 +4377,7 @@ Rails.application.routes.draw do
 
   get 'index/config', to: 'index#fetch_config'
   post 'index/config', to: 'index#fetch_config'
+  get 'index/:route/config', to: 'index#fetch_config'
   # get 'index/:route/config', to: "index#fetch_old_config"
   # post 'index/:route/config', to: "index#fetch_config"
   get 'index/:route/record_counts', to: 'index#record_counts'
@@ -4391,7 +4395,7 @@ Rails.application.routes.draw do
   post 'actions/:route/validate', to: "actions#validate"
 
   resources :views, controller: 'index_view_segments', except: [:show]
-
+  get ':route/views', to: 'index_view_segments#index'
   get 'cards/:id', to: 'hover_card#route'
   get 'cards/:route/:id', to: 'hover_card#route'
 

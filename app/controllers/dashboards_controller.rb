@@ -6,6 +6,11 @@ class DashboardsController < BaseControllers::WebBase
     respond
   end
 
+  def filter_configs
+    @result = Dashboard::P2P::FilterConfigs.(current_user, params)
+    respond
+  end
+
   def show
     handler = nil
     case params[:route].to_s
