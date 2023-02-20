@@ -46,6 +46,7 @@ user:
     performance_fix_flags:
       dependencies_ui_cache_enabled: <%= DependenciesUiCacheToggle.new(current_user).enabled? %>
       reviewal_chain_async: <%= ReviewalChainAsyncToggle.new(current_user).enabled? %>
+      dynamic_comments_loading: <%= FormsDynamicCommentsLoadingToggle.new(current_user).enabled? %>
     currency_flags:
       amount_prop_only_load_enabled: <%= AmountPropOnlyLoadToggle.new(current_user).enabled? %>
     common_imports:
