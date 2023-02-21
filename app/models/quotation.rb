@@ -54,6 +54,7 @@ class Quotation < ApplicationRecord
 	belongs_to :company, optional: true
 	belongs_to :purchase_order, optional: true
 	has_many :attachments, class_name: "ProcurementAttachment", as: :procurement_document
+	has_many :form_custom_fields, class_name: 'FormCustomField', as: :document, dependent: :destroy
 
 	validates :vendor_name, length: {minimum: 3, maximum: 50}
 	validates :vendor_location, length: {minimum: 3, maximum: 100}
