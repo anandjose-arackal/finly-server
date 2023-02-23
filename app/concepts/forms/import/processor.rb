@@ -472,7 +472,7 @@ class Forms::Import::Processor
         end
       end
       if nested_entity.entity_key == 'items_summary'
-        form_data.merge!(form_nested_data[0])
+        # form_data.merge!(form_nested_data[0])
       else
         form_data[nested_entity.entity_key] = form_nested_data
       end
