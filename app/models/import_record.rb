@@ -56,6 +56,7 @@ class ImportRecord < ApplicationRecord
     import_job.meta_data["attachment_keys"]&.each do |key, values|
       nodes = [json_data]
       nodes = json_data[key] unless key == 'main'
+      next unless nodes.present?
       nodes&.each do |node|
         values.each do |value|
           atts = import_job.import_job_attachments.where(identifier: "#{node['_ref']}_#{value}")

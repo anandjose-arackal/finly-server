@@ -89,9 +89,6 @@ class Forms::Import::Processor
       begin
         form_data = build_form_data(record_data[:record_data], nil)
         result = process_form_data(form_data, true)
-        raise unless result.present?
-        Rails.logger.debug "Result::#{result.messages}"
-        p "Result::#{result.messages}"
         if result.success?
           message = result.messages[:success].to_s
           request.item_complete(true)
@@ -102,7 +99,9 @@ class Forms::Import::Processor
 
         add_record_to_result_file(record_data[:record_data], result[:model].id, message, worksheets, worksheets_length)
       rescue => exception
-        message = "Unable to process"
+        message = "Unable to process, #{exception}"
+        request.item_complete(false)
+        add_record_to_result_file(record_data[:record_data], nil, message, worksheets, worksheets_length)
       end
     end
 
@@ -182,7 +181,6 @@ class Forms::Import::Processor
     end
 
     records_data = []
-
     nested_data = build_nested_data(imported_sheet, data_headers)
 
     imported_sheet.each_with_pagename do |sheet_name, sheet|
@@ -211,15 +209,13 @@ class Forms::Import::Processor
           row_data['_ref'] = UUIDTools::UUID.timestamp_create().to_s.upcase
 
           header_details = headers[data_headers[sheet_name]][:headers]
-
           nested_data.keys.each do |key|
             if row_data[header_details[:id][:name]].present?
-              row_data[key] = nested_data[key][row_data[header_details[:id][:name]]].to_s
+              row_data[key] = (nested_data[key][row_data[header_details[:id][:name]]] || nested_data[key][row_data["seq#{header_details[:import_sequence_number][:name]}"]])
             elsif row_data[header_details[:import_sequence_number][:name]].present?
               row_data[key] = nested_data[key]["Seq#{row_data[header_details[:import_sequence_number][:name]]}"]
             end
           end
-
           records_data << {
             uuid: row_data['_ref'],
             record_data: row_data,

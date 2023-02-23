@@ -156,6 +156,7 @@ class Company < NonTenantedApplicationRecord
   has_many :import_jobs, foreign_key: :company_id
 
   has_many :admin_implementation_requests
+  has_many :common_import_requests
 
   has_many :transfer_mode_company_mappings
   alias_attribute :transfer_modes, :transfer_mode_company_mappings

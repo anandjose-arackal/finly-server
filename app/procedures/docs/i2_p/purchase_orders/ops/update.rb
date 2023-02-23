@@ -21,6 +21,7 @@ class Docs::I2P::PurchaseOrders::Ops::Update < Transactions::API
   step Forms::Contracts::Build()
   step Contract::Validate()
   step Wrap(TransactionStep){
+    step :save_quotations
     step Contract::Persist()
     # step :budget_limit_validation
     fail RollbackStep
@@ -28,9 +29,8 @@ class Docs::I2P::PurchaseOrders::Ops::Update < Transactions::API
   step Transactions::Messages::SuccessMessage('Purchase Order Updated')
 
   def validate_quotations(options, params, ** )
-    params[:params][:quotations].reject! {|param| param[:_destroy] && param[:id] == "" }
+    quotations_params = params[:params][:quotations].reject {|param| param[:_destroy] && param[:id] == "" } rescue nil
 
-    quotations_params = params[:params][:quotations] rescue nil
     return true if quotations_params.nil?
 
     errors = false
@@ -57,6 +57,25 @@ class Docs::I2P::PurchaseOrders::Ops::Update < Transactions::API
     end
 
     return !errors
+  end
+
+  # Contract::persist only saving the last quote, so creating them manually and deleting the last one
+  def save_quotations(options, params, **)
+    quotation = nil
+    begin
+      params[:params][:quotations].each do |q|
+        if q[:id] == ""
+          quotation_params = q.except(:collection_uuid, :collection_id, :selected_value, :_destroy, :selected_lookup_data)
+          quotation = Quotation.new(quotation_params)
+          quotation.purchase_order_id = params[:params][:id]
+          if quotation.save
+            q[:id] = quotation.id
+          end
+        end
+      end
+    ensure
+        quotation.delete if quotation.present?
+    end
   end
 
   def budget_limit_validation(options, params, ** )

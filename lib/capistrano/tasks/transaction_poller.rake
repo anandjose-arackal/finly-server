@@ -49,6 +49,7 @@ namespace :transaction_poller do
   end
 end
 
-after 'deploy:updated', 'transaction_poller:stop'
-after 'deploy:reverted', 'transaction_poller:stop'
-after 'deploy:published', 'transaction_poller:start'
+# expense card discontinued, transaction_poller meant to fetch ATM transaction from ebix finly middle man server
+#after 'deploy:updated', 'transaction_poller:stop'
+#after 'deploy:reverted', 'transaction_poller:stop'
+#after 'deploy:published', 'transaction_poller:start'

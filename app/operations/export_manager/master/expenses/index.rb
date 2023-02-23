@@ -42,6 +42,9 @@ class ExportManager::Master::Expenses::Index < ExportManager::Builders::Spreadsh
   attribute :receipt_link
   attribute :expense_igst
   attribute :expense_sgst_cgst
+  attribute :reporting_currency
+  attribute :reporting_amount
+  attribute :conversion_rate
 
   section :expense_custom_fields do
     attribute :expense_custom_fields, dynamic: true
@@ -211,6 +214,19 @@ class ExportManager::Master::Expenses::Index < ExportManager::Builders::Spreadsh
   def expense_sgst_cgst(expense)
     gst_applicable = expense.category&.gst_applicable?
     ((gst_applicable ? (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value) / 2).round(2) : '') : '') rescue '')
+  end
+
+  def reporting_currency(expense)
+    expense&.report.policy.base_currency.country_code
+  end
+
+  def reporting_amount(expense)
+    expense&.report.total_amount
+  end
+
+  def conversion_rate(expense)
+    sym = expense&.report&.base_currency&.country_code
+    (expense&.amount.value / expense&.amount[sym] rescue 0)
   end
 
 

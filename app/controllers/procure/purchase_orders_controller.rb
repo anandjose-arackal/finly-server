@@ -157,6 +157,7 @@ class Procure::PurchaseOrdersController < BaseControllers::WebBase
 
 
   def download
+    params[:lean_fetch_call] = true
     @result = Procurements::PurchaseOrders::Show.(current_user, params)
     @purchase_order = @result.purchase_order
     @company = @purchase_order.company

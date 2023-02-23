@@ -10,6 +10,7 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
 
   def initialize(user = nil, params = {})
     super
+    params[:lean_fetch_call] = true
     result = ::Procurements::Invoices::Show.(user, params)
     unless result.success?
       add_message :error, result.messages[:error]
@@ -133,7 +134,7 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
   end
 
   def delete
-    (document_owner? || user.vendor_payments_admin?)   && (invoice.open? || invoice.retracted? || invoice.rejected?)
+    (document_owner? || user.vendor_payments_admin?)   && (invoice.open? || invoice.retracted?)
   end
 
   def more_actions

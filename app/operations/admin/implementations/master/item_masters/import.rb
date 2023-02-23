@@ -15,6 +15,7 @@ class Admin::Implementations::Master::ItemMasters::Import < Admin::Implementatio
       :tds_applicable => "TDS Applicable (Y/N)",
       :discount => "Discount",
       :rate => "Rate",
+      :unit_of_measurement => "UOM",
       :destroy => "Destroy"
   })or :item_params
   def create_record(data)
@@ -110,6 +111,8 @@ class Admin::Implementations::Master::ItemMasters::Import < Admin::Implementatio
       messages << "Item Type Goods/Service Need to specify"
     end
 
+    unit_of_measurement = data[:unit_of_measurement]
+
     [{
          description: description,
          category_id: category_id,
@@ -120,7 +123,8 @@ class Admin::Implementations::Master::ItemMasters::Import < Admin::Implementatio
          product_type_id: product_type_id,
          discount: discount,
          rate: rate,
-         tds_applicable: tds_applicable
+         tds_applicable: tds_applicable,
+         unit_of_measurement: unit_of_measurement
     }, messages]
   end
 

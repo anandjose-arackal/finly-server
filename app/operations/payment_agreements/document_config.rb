@@ -8,9 +8,8 @@ class PaymentAgreements::DocumentConfig < PaymentAgreements::Base
 
     def init
       self.payment_agreement = params[:payment_agreement]
-      params[:filter_role_id] = [UserRole.id_for(:payment_agreement_initiator)]
-      initiating_user = self.payment_agreement.present? ? payment_agreement.creator : user
-      self.policies = Policy::VendorPayments::Index.(initiating_user, params).policies
+      params[:filter_role_id] = [UserRole.id_for(:payment_agreement_initiator), UserRole.id_for(:payment_agreement_reviewer)]
+      self.policies = Policy::VendorPayments::Index.(self.user, params).policies
       self.payment_agreement_types = ::PaymentAgreement::AGREEMENT_TYPES
       self.tax_rates = user.company.tax_rates
       self.payment_terms = user.company.payment_terms.where.not(days_after: nil)
@@ -18,7 +17,7 @@ class PaymentAgreements::DocumentConfig < PaymentAgreements::Base
       self.period = Period.where(name: 'month')
       self.gst_types = GstType.all
       params[:filter_role_id] = [UserRole.id_for(:bank_payment_request_initiator)]
-      self.bank_payment_request_policies = Policy::VendorPayments::Index.(initiating_user, params).policies
+      self.bank_payment_request_policies = Policy::VendorPayments::Index.(self.user, params).policies
       self.reporting_currency = user.company&.reporting_currency
       # params[:field_parent_type_id] = FieldParentType.id_for(:invoice)
       custom_field_configurations

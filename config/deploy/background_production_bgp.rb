@@ -20,7 +20,8 @@ set :sidekiq_roles, :sidekiq_app
 
 # set :status_index_monitor_role, :poller_role
 set :balance_poller_role, :poller_role
-set :transaction_poller_role, :poller_role
+# Removing this poller as it has no purpose on this server
+# set :transaction_poller_role, :poller_role
 set :usage_tracker_role, :poller_role
 set :email_tracker_role, :email_tracker_role
 # set :sidekiq_service_unit_name, 'sidekiq'

@@ -61,14 +61,9 @@ class Admin::Implementations::Master::Lrms::Export < Admin::Implementations::Pro
   end
 
   def reviewer_email_mobile(lrm)
+    return lrm.reviewer&.email if lrm.reviewer&.email&.present?
     identifier = lrm.reviewer&.profile&.employee_id
-    if identifier.blank?
-      identifier = lrm.reviewer&.email
-    end
-    if identifier.blank?
-      identifier = lrm.reviewer&.mobile_number
-    end
-    identifier
+    (identifier.present? ? identifier : lrm.reviewer&.mobile_number)
   end
 
   def with_exception(lrm)

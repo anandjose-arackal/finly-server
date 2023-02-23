@@ -13,8 +13,20 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
 
   def success
     params[:invoice] = self.invoice
+    if params[:lean_fetch_call] and LeanFetchCallToggle.new(user).enabled?
+      return Procurements::Invoices::Show::ShowPresenterForLeanFetch.new(user, params, messages)
+    end
     Procurements::Invoices::Show::ShowPresenter.new(user, params, messages)
   end
+
+  class Procurements::Invoices::Show::ShowPresenterForLeanFetch < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :invoice
+
+    def init
+      self.invoice = params[:invoice]
+    end
+  end
+
 
   class Procurements::Invoices::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :invoice, :actions, :departments, :sub_departments, :cost_centers, :reviewal_chains, :policies,
@@ -280,7 +292,8 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
   end
 
   def validate_po_access
-    po_params = params
+    po_params = params.clone
+    po_params[:lean_fetch_call] = true
     po_params["id"] = invoice.procurement.purchase_order.id rescue nil
     Procurements::PurchaseOrders::Show.(user, po_params).success? if po_params["id"].present?
   end

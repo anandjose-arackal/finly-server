@@ -8,7 +8,7 @@ class ProcurementMailer < ApplicationMailer
     @purchase_order = presenter.document
     @user = presenter.user
     @company = @user.company
-    @result = Procurements::PurchaseOrders::Show.(@data.user, {purchase_order_id: @data.document.id })
+    @result = Procurements::PurchaseOrders::Show.(@data.user, {purchase_order_id: @data.document.id, lean_fetch_call: true })
 
     attachments["purchase_order-#{@document.po_number}.pdf"] = WickedPdf.new.pdf_from_string(
          render_to_string(
@@ -43,7 +43,7 @@ class ProcurementMailer < ApplicationMailer
     @include_attachments = presenter.include_attachments
     #### variables required for the attachment pdf #########
     if @include_attachments
-    @result = Procurements::PurchaseOrders::Show.(@data.user, {purchase_order_id: @data.purchase_order.id, skip_for_mailer: true })
+    @result = Procurements::PurchaseOrders::Show.(@data.user, {purchase_order_id: @data.purchase_order.id, skip_for_mailer: true, lean_fetch_call: true })
       if @result.success?
         @purchase_order = @data.purchase_order
         @curr_user = @data.user
@@ -81,7 +81,7 @@ class ProcurementMailer < ApplicationMailer
     @data = presenter
     @company = @data.user.company
     #### variables required for the attachment pdf #########
-    @result = Procurements::Invoices::Show.(@data.user, {invoice_id: @data.invoice.id })
+    @result = Procurements::Invoices::Show.(@data.user, {invoice_id: @data.invoice.id, lean_fetch_call: true })
     if @result.success?
       @invoice = @data.invoice
       @curr_user = @data.user

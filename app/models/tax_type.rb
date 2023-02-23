@@ -11,6 +11,9 @@
 #  updated_at   :datetime         not null
 #
 class TaxType < NonTenantedApplicationRecord
+
+  include Seedable
+
   TAXTYPE = [
     {country_name:"india", name: 'IGST', tax_name: 'igst' },
     {country_name:"india", name: 'CGST+SGST', tax_name: 'cgst_sgst' },

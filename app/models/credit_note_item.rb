@@ -148,7 +148,7 @@ class CreditNoteItem < ApplicationRecord
   def calculate_qty_rate_change
     currency_id = parent&.company&.base_currency_id || Currency.id_for("INR")
     taxable_amount_value = quantity * rate
-    tax_amount_value = taxable_amount_value * self.tax_rate.rate / 100
+    tax_amount_value = taxable_amount_value * self.tax_rate&.rate.to_f / 100
 
     if self.taxable_amount.present?
       self.taxable_amount.update(value: get_taxable_amount)
@@ -172,7 +172,7 @@ class CreditNoteItem < ApplicationRecord
 
   def calculate_gst_change
     currency_id = parent&.company&.base_currency_id || Currency.id_for("INR")
-    tax_rate_to_apply = self.original_tax_rate.rate - self.tax_rate.rate
+    tax_rate_to_apply = self.original_tax_rate.rate - self.tax_rate&.rate.to_f
 
 
     taxable_amount_value = quantity * rate

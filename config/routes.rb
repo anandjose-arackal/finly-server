@@ -3917,6 +3917,7 @@ Rails.application.routes.draw do
 
     get 'filters', to: "filters#index"
     get 'views', to: "index_view_segments#index"
+    get 'views/:route', to: "index_view_segments#index"
 
     get 'company_groups/lookup', to: "company_groups#lookup"
     resources :company_groups, only: [:create, :update, :index, :show]
@@ -4128,11 +4129,22 @@ Rails.application.routes.draw do
   resources :audit_trails, only: [:index]
   ### Audit Trails End ##
 
+
+  ### Common Imports ###
+  resources :common_imports do
+    collection do
+      get :get_template
+      post :user_import
+    end
+  end
+
+
   ######## Dashboards ##################
   # Fixme: old routes for supporting v1 of dashboards in dynamic index. This can deleted when the support is removed
   namespace :dashboards do
     get 'vp/awaiting_action', to: 'vendor_payments#awaiting_action'
     get 'vp/configs', to: 'vendor_payments#configs'
+    get 'vp/filter_configs', to: 'vendor_payments#filter_configs'
     get 'vp/purchase_orders', to: 'vendor_payments#purchase_orders'
     get 'vp/purchase_requests', to: 'vendor_payments#purchase_requests'
     get 'vp/payment_tickets', to: 'vendor_payments#payment_tickets'
@@ -4158,6 +4170,7 @@ Rails.application.routes.draw do
   end
 
   get 'dashboards/configs', to: 'dashboards#configs'
+  get 'dashboards/filter_configs', to: 'dashboards#filter_configs'
   get 'dashboards/:route', to: 'dashboards#show'
   ######## Dashbaord Ends ##############
 
@@ -4364,6 +4377,7 @@ Rails.application.routes.draw do
 
   get 'index/config', to: 'index#fetch_config'
   post 'index/config', to: 'index#fetch_config'
+  get 'index/:route/config', to: 'index#fetch_config'
   # get 'index/:route/config', to: "index#fetch_old_config"
   # post 'index/:route/config', to: "index#fetch_config"
   get 'index/:route/record_counts', to: 'index#record_counts'
@@ -4381,7 +4395,7 @@ Rails.application.routes.draw do
   post 'actions/:route/validate', to: "actions#validate"
 
   resources :views, controller: 'index_view_segments', except: [:show]
-
+  get ':route/views', to: 'index_view_segments#index'
   get 'cards/:id', to: 'hover_card#route'
   get 'cards/:route/:id', to: 'hover_card#route'
 
@@ -4453,6 +4467,7 @@ Rails.application.routes.draw do
 
   post 'search', to: 'global_search#create'
   get 'search', to: 'global_search#index'
+  get 'search/form_features_state', to: 'global_search#form_features_state'
 
   # todo - I2P : For invoices
   # resources :invoices, only: [:create, :update, :show]
