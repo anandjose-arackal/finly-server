@@ -17,10 +17,12 @@ class ReportCommentsFix < BaseJob
           reviewer = first_dlrm.reviewer
         end
 
-        comment = report.comments.where('created_at > ?', report.submitted_at).where(user_id: reviewer.id,report_comment_action_id: ReportCommentAction.id_for(:report_approve)).first
-        next if comment.present?
-        comment = report.comments.build user: reviewer, report_comment_action_id: ReportCommentAction.id_for(:report_approve), created_at: first_dlrm&.action_taken_at, updated_at: first_dlrm.action_taken_at
-        comment.save
+        if reviewer.present? && first_dlrm.present?
+          comment = report.comments.where('created_at > ?', report.submitted_at).where(user_id: reviewer.id,report_comment_action_id: ReportCommentAction.id_for(:report_approve)).first
+          next if comment.present?
+          comment = report.comments.build user: reviewer, report_comment_action_id: ReportCommentAction.id_for(:report_approve), created_at: first_dlrm&.action_taken_at, updated_at: first_dlrm.action_taken_at
+          comment.save
+        end
       end
     end
   end
