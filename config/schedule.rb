@@ -119,9 +119,14 @@ every 1.day, at: '3:00 pm', roles: [:whenever_cron] do
   runner 'SummaryMailersProcessor.process_em_notification'
 end
 
+every 1.day, at: '12:30 am', roles: [:whenever_cron] do
+  runner "ReportCommentsFix.perform"
+end
+
 every :hour, roles: [:whenever_cron] do
   runner "RemoveDuplicateSequence.perform"
 end
+
 
 # every '0,15,30,45 * * * *', roles: [:whenever_cron] do
 #   runner 'AnalyticsDashboard::Scheduler.perform'
