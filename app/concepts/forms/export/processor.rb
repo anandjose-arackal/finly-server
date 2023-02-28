@@ -76,21 +76,32 @@ class Forms::Export::Processor
             entity: entity,
           }
         elsif ['lookup', 'dropdown'].include?(entity.entity_type)
-          headers[entity.entity_key.to_s] = {
-            name: "#{entity.label} ID#{entity.required ? '*' : ''}",
-            entity_key: entity.entity_key,
-            entity_type: entity.entity_type,
-            entity: entity,
-          }
-          headers["#{entity.entity_key}_value"] = {
-            name: entity.label,
-            entity_key: "#{entity.entity_key}_value",
-            entity_type: 'text',
-            import_skip: true,
-            lookup_value: true,
-            choices_array: choices_array(entity),
-            hidden: true
-          }
+          if parent_sheet_key == 'vendor'
+            headers[entity.entity_key.to_s] = {
+              name: "#{entity.label} ID#{entity.required ? '*' : ''}",
+              entity_key: entity.entity_key,
+              entity_type: entity.entity_type,
+              entity: entity,
+            }
+            headers["#{entity.entity_key}_value"] = {
+              name: entity.label,
+              entity_key: "#{entity.entity_key}_value",
+              entity_type: 'text',
+              import_skip: true,
+              lookup_value: true,
+              choices_array: choices_array(entity),
+              hidden: true
+            }
+          else
+            headers["#{entity.entity_key.to_s}"] = {
+              name: entity.label,
+              entity_key: "#{entity.entity_key}",
+              entity_type: 'text',
+              import_skip: true,
+              lookup_value: true,
+              choices_array: choices_array(entity)
+            }
+          end
         elsif entity.entity_type == 'date'
           headers[entity.entity_key.to_s] = {
             name: "#{entity.label}#{entity.required ? '*' : ''} (YYYY-MM-DD)",
@@ -159,6 +170,7 @@ class Forms::Export::Processor
       }
       entity.entities.each do |child_entity|
         next unless (child_entity.visible || child_entity.conditions.joins(:actions).where(form_condition_actions: {property: :visible, value: true}).present?)
+        next if child_entity.hide_in_import
 
         child_sheet_headers.merge!(build_headers_for_entity(sheets_headers, entity.entity_key, entity.entity_key, child_entity, user))
       end
