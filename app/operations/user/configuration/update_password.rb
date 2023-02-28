@@ -28,7 +28,7 @@ class User::Configuration::UpdatePassword < BaseOperation
   def process
     params[:user][:current_password] = Base64.decode64(params[:user][:current_password])
     params[:user][:password] = Base64.decode64(params[:user][:password])
-    params[:user][:password_confirmation] = Base64.decode64(params[:user][:current_password])
+    params[:user][:password_confirmation] = Base64.decode64(params[:user][:password_confirmation])
 
     unless user.update_with_password(password_params)
       messages[:error] = user.errors.full_messages
