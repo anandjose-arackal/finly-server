@@ -23,7 +23,8 @@ class ImportRecord < ApplicationRecord
     computed_items = []
     return if self.processed_data["items"].nil?
     self.processed_data["items"].each do |item|
-      item_record = Item.find(item['inventory_line_item_id'].to_i)
+      item_record = Item.find(item['inventory_line_item_id'].to_i) rescue nil
+      return unless item_record
       next if item_record.nil?
 
       item_gross_amount = (item['rate'] * item['quantity']).round(2)
