@@ -53,6 +53,7 @@ class Expense < ApplicationRecord
           FieldCustomizer::CustomizableValidation,
           MathUtil
 
+  self.primary_key = 'id'
   before_validation :create_uuid_key, on: :create
 
   def create_uuid_key
