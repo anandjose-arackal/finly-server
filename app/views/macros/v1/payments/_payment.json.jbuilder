@@ -28,7 +28,7 @@ json.document do
     if record.parent_type == "PurchaseOrder"
       purchase_order = record.purchase_order_parent
       if purchase_order.present?
-        json.id invoice.purchase_order&.id
+        json.id purchase_order&.id
         json.po_number purchase_order&.po_number
         json.original_amount precision_value(purchase_order.total_after_tax&.value)
         json.total_advance_amount purchase_order.total_adv_amount
