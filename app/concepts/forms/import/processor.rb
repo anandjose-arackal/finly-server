@@ -401,8 +401,7 @@ class Forms::Import::Processor
       if ['attachment'].include?(header_data[:entity_type])
         form_data[header_data[:entity_key]] = get_attachment_entity_value(row_data[header_data[:name]], row_data['_ref'], header_data[:name], header_data[:entity_key], existing_record, import_record)
       elsif ['lookup', 'dropdown'].include?(header_data[:entity_type])
-        entity_label = header_data[:name].gsub('*', '')
-        choice_id = get_id_from_value(row_data[entity_label], entity_label)
+        choice_id = get_id_from_value(row_data[header_data[:name]], header_data[:name])
         if choice_id.present?
           form_data[header_data[:entity_key]] = choice_id
           form_data["#{header_data[:entity_key]}_value"] = row_data[header_data[:name]]
@@ -441,8 +440,7 @@ class Forms::Import::Processor
           if ['attachment'].include?(header_data[:entity_type])
             data[header_data[:entity_key]] = get_attachment_entity_value(nested_row[header_data[:name]], nested_row['_ref'], header_data[:name], header_data[:entity_key], existing_record, import_record)
           elsif ['lookup', 'dropdown'].include?(header_data[:entity_type])
-            entity_label = header_data[:name].gsub('*', '')
-            choice_id = get_id_from_value(nested_row[entity_label], entity_label)
+            choice_id = get_id_from_value(nested_row[header_data[:name]], header_data[:name])
             if choice_id.present?
               data[header_data[:entity_key]] = choice_id
               data["#{header_data[:entity_key]}_value"] = nested_row[header_data[:name]]
@@ -527,11 +525,12 @@ class Forms::Import::Processor
   end
 
   def get_id_from_value(raw_value, entity)
-    value_id_map[entity][raw_value] rescue nil
+    value_id_map[entity.gsub('*', '')][raw_value] rescue nil
   end
 
   def get_dropdown_entity_value(raw_value, entity)
     return unless raw_value
+    return unless entity
 
     choice = entity.choices_scope.find_by_id(raw_value, user: user)
     return unless choice.present?
@@ -552,6 +551,7 @@ class Forms::Import::Processor
 
   def get_lookup_entity_value(raw_value, entity)
     return unless raw_value
+    return unless entity
 
     choice = entity.choices_scope.find_by_id(raw_value, user: user)
     return unless choice.present?
