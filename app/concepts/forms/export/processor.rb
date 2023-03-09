@@ -94,10 +94,9 @@ class Forms::Export::Processor
             }
           else
             headers["#{entity.entity_key.to_s}"] = {
-              name: entity.label,
+              name: "#{entity.label}#{entity.required ? '*' : ''}",
               entity_key: "#{entity.entity_key}",
-              entity_type: 'text',
-              import_skip: true,
+              entity_type: entity.entity_type,
               lookup_value: true,
               choices_array: choices_array(entity)
             }

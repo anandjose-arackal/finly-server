@@ -23,6 +23,10 @@ class Forms::Import::Processor
     export_processor.lookup_content
   end
 
+  def value_id_map
+    @value_id_map || lookup_content.map{|data| [data[:name], data[:data][:choices].map{ |choice| [choice[:name], choice[:id]]}.to_h]}.to_h
+  end
+
   def form_sections
     @form_sections ||= form.sections.includes(entities: { entities: { entities: { entities: :entities } } })
   end
@@ -397,10 +401,17 @@ class Forms::Import::Processor
       if ['attachment'].include?(header_data[:entity_type])
         form_data[header_data[:entity_key]] = get_attachment_entity_value(row_data[header_data[:name]], row_data['_ref'], header_data[:name], header_data[:entity_key], existing_record, import_record)
       elsif ['lookup', 'dropdown'].include?(header_data[:entity_type])
-        choice_data = get_entity_value(row_data[header_data[:name]], header_data[:entity], header_data[:entity_type])
-        if choice_data.present?
-          form_data[header_data[:entity_key]] = choice_data[:id]
-          form_data["#{header_data[:entity_key]}_value"] = choice_data[:value]
+        entity_label = header_data[:name].gsub('*', '')
+        choice_id = get_id_from_value(row_data[entity_label], entity_label)
+        if choice_id.present?
+          form_data[header_data[:entity_key]] = choice_id
+          form_data["#{header_data[:entity_key]}_value"] = row_data[header_data[:name]]
+        else
+          choice_data = get_entity_value(row_data[header_data[:name]], header_data[:entity], header_data[:entity_type])
+          if choice_data.present?
+            form_data[header_data[:entity_key]] = choice_data[:id]
+            form_data["#{header_data[:entity_key]}_value"] = choice_data[:value]
+          end
         end
       else
         form_data[header_data[:entity_key]] = get_entity_value(row_data[header_data[:name]], header_data[:entity], header_data[:entity_type])
@@ -430,10 +441,17 @@ class Forms::Import::Processor
           if ['attachment'].include?(header_data[:entity_type])
             data[header_data[:entity_key]] = get_attachment_entity_value(nested_row[header_data[:name]], nested_row['_ref'], header_data[:name], header_data[:entity_key], existing_record, import_record)
           elsif ['lookup', 'dropdown'].include?(header_data[:entity_type])
-            choice_data = get_entity_value(nested_row[header_data[:name]], header_data[:entity], header_data[:entity_type])
-            if choice_data.present?
-              data[header_data[:entity_key]] = choice_data[:id]
-              data["#{header_data[:entity_key]}_value"] = choice_data[:value]
+            entity_label = header_data[:name].gsub('*', '')
+            choice_id = get_id_from_value(nested_row[entity_label], entity_label)
+            if choice_id.present?
+              data[header_data[:entity_key]] = choice_id
+              data["#{header_data[:entity_key]}_value"] = nested_row[header_data[:name]]
+            else
+              choice_data = get_entity_value(nested_row[header_data[:name]], header_data[:entity], header_data[:entity_type])
+              if choice_data.present?
+                data[header_data[:entity_key]] = choice_data[:id]
+                data["#{header_data[:entity_key]}_value"] = choice_data[:value]
+              end
             end
           else
             data[header_data[:entity_key]] = get_entity_value(nested_row[header_data[:name]], header_data[:entity], header_data[:entity_type])
@@ -506,6 +524,10 @@ class Forms::Import::Processor
     else
       parse_value(raw_value, entity)
     end
+  end
+
+  def get_id_from_value(raw_value, entity)
+    value_id_map[entity][raw_value] rescue nil
   end
 
   def get_dropdown_entity_value(raw_value, entity)
