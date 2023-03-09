@@ -1066,6 +1066,7 @@ class Expense < ApplicationRecord
         self.tax_rate_id = nil
         self.tds_slab_id = nil
         self.gst_type_id = nil
+        self.state_of_expense_id = nil
       return
     end
     if value.nil?
