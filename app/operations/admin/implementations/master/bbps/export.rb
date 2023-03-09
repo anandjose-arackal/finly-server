@@ -21,6 +21,7 @@ class Admin::Implementations::Master::BBPS::Export < Admin::Implementations::Pro
               :cost_center => "Cost Center",
               :policy => "Policy*",
               :poc => "POCs Email(Separated by commas)*",
+              :reminder_before_days => "Reminder Before Days",
               :destroy => "Destroy"
           })
 
@@ -98,6 +99,10 @@ class Admin::Implementations::Master::BBPS::Export < Admin::Implementations::Pro
 
   def poc(subscription)
     subscription.pocs.pluck(:email).join(", ")
+  end
+
+  def reminder_before_days(subscription)
+    subscription.reminder_before_days
   end
 
   def destroy(subscription)
