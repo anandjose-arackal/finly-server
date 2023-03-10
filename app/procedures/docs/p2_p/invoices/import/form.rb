@@ -138,18 +138,18 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
            computed: Forms::Compute::Lookup('payment_term_id', '{{record.calculated_days_after | default: 0 }}'),
            visible: false
 
-    date :due_date,
-         computed: Forms::Compute::Form('{% assign assigne_days = form.payment_term_days | times: 86400 %}{% assign calculated_date = form.date | date: "%s" | plus: assigne_days %}{{ calculated_date  | date: "%Y-%m-%d" }}'),
-         # computed: Forms::Compute::Form('
-         #  {% assign assigne_days = form.payment_term_days | times: 86400 %}
-         #  {% assign calculated_date = form.date | date: "%s" | plus: assigne_days %}
-         #  {% assign default_due_date = "now" |date: "%s" | plus: 84600 %}
-         #  {% if calculated_date < default_due_date %}
-         #    {{ default_due_date  | date: "%Y-%m-%d" }}
-         #  {% else %}
-         #    {{ calculated_date  | date: "%Y-%m-%d" }}
-         #  {% endif %}'),
-         visible: true, required: true, editable: true
+    # date :due_date,
+    #      computed: Forms::Compute::Form('{% assign assigne_days = form.payment_term_days | times: 86400 %}{% assign calculated_date = form.date | date: "%s" | plus: assigne_days %}{{ calculated_date  | date: "%Y-%m-%d" }}'),
+    #      # computed: Forms::Compute::Form('
+    #      #  {% assign assigne_days = form.payment_term_days | times: 86400 %}
+    #      #  {% assign calculated_date = form.date | date: "%s" | plus: assigne_days %}
+    #      #  {% assign default_due_date = "now" |date: "%s" | plus: 84600 %}
+    #      #  {% if calculated_date < default_due_date %}
+    #      #    {{ default_due_date  | date: "%Y-%m-%d" }}
+    #      #  {% else %}
+    #      #    {{ calculated_date  | date: "%Y-%m-%d" }}
+    #      #  {% endif %}'),
+    #      visible: true, required: true, editable: true
 
 
     switch :cost_allocation_items, label: 'Cost Allocation (Item Level)', required: true, default_value: false
@@ -554,11 +554,11 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
   end
 
   # VALIDATIONS
-  validation validation_id: "Invoice Date Cannot be Later than Due Date" do
-    reference 'due_date'
-    error_message "Invoice Due Date must be After Invoice Date"
-    rule Rules::Builder['due_date'].lt(entity: "date")
-  end
+  # validation validation_id: "Invoice Date Cannot be Later than Due Date" do
+  #   reference 'due_date'
+  #   error_message "Invoice Due Date must be After Invoice Date"
+  #   rule Rules::Builder['due_date'].lt(entity: "date")
+  # end
 
   validation validation_id: "Invoice Discount Cannot be greater than Invoice Gross Amount" do
     reference 'items_summary.invoice_discount_amount'
