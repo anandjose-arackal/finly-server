@@ -289,10 +289,15 @@ class Forms::Import::Processor
     return if records_to_save.empty?
 
     records_to_save.each do |record, import_record|
+      record.items&.each do |item|
+        item.id = nil
+      end
       if record.save
         submit_params = { reviewal_document: record }
-        op = Docs::P2P::Vendors::Ops::Submit.(params: submit_params, current_user: user)
-        if op.success?
+        if record.class == YesBankVendor
+          op = Docs::P2P::Vendors::Ops::Submit.(params: submit_params, current_user: user) if record.is
+        end
+        if op&.success?
           import_record.update_status(true, 'Record created successfully', '', '')
         else
           import_record.update_status(true, 'Record created successfully But could not submit for approval', '', '')
@@ -302,7 +307,7 @@ class Forms::Import::Processor
         import_job.item_complete(true)
       else
         import_job.item_complete(false)
-        import_record.update_status(false, op.messages[:errors].to_s, '', '')
+        import_record.update_status(false, '[Could not save record]', '', '')
       end
     end
   end
