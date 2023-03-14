@@ -22,6 +22,10 @@ class Forms::Import::Processor
   def lookup_content
     export_processor.lookup_content
   end
+  #
+  # def lookup_labels
+  #   @lookup_labels || lookup_content.pluck(:name)
+  # end
 
   def value_id_map
     @value_id_map || lookup_content.map{|data| [data[:name], data[:data][:choices].map{ |choice| [choice[:name], choice[:id]]}.to_h]}.to_h
@@ -156,6 +160,9 @@ class Forms::Import::Processor
           if sheet.row(1)[index].include? '(Yes/No)'
             value = value == 'Yes' ? 'TRUE' : 'FALSE'
           end
+          # if lookup_labels.include? sheet.row(1)[index].gsub('*', '')
+          #   row_data["#{worksheet_headers[index].gsub('*', '')} ID"] = get_id_from_value(value, sheet.row(1)[index])
+          # end
           row_data[worksheet_headers[index]] = value
         end
 
@@ -207,6 +214,10 @@ class Forms::Import::Processor
             if sheet.row(1)[column_index].include? '(Yes/No)'
               value = value == 'Yes' ? 'TRUE' : 'FALSE'
             end
+
+            # if lookup_labels.include? sheet.row(1)[column_index].gsub('*', '')
+            #   row_data["#{worksheet_headers[column_index].gsub('*', '')} ID"] = get_id_from_value(value, sheet.row(1)[column_index])
+            # end
             row_data[worksheet_headers[column_index]] = value
           end
 
@@ -265,7 +276,7 @@ class Forms::Import::Processor
         end
       rescue => exception
         import_job.item_complete(false)
-        import_record.update_status(false, 'Unable to process', exception.message, exception.backtrace)
+        import_record.update_status(false, '[Unable to process]', exception.message, exception.backtrace)
       end
     end
     save_records(import_job, records_to_save)
