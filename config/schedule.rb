@@ -119,7 +119,7 @@ every 1.day, at: '3:00 pm', roles: [:whenever_cron] do
   runner 'SummaryMailersProcessor.process_em_notification'
 end
 
-every 1.day, at: '12:30 am', roles: [:whenever_cron] do
+every 3.hours, roles: [:whenever_cron] do
   runner "ReportCommentsFix.perform"
 end
 
