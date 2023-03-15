@@ -16,6 +16,7 @@ class Admin::Implementations::Master::ItemMasters::Export < Admin::Implementatio
       :tds_applicable => "TDS Applicable (Y/N)",
       :discount => "Discount",
       :rate => "Rate",
+      :tax_rate_id => "Tax Rate Id",
       :unit_of_measurement => "UOM",
       :destroy => "Destroy"
   })
@@ -78,6 +79,11 @@ class Admin::Implementations::Master::ItemMasters::Export < Admin::Implementatio
   def unit_of_measurement(item)
     item.unit_of_measurement
   end
+
+  def tax_rate_id(item)
+    item.tax_rate_id
+  end
+
 
   def destroy(item)
     ''
