@@ -296,6 +296,7 @@ class Forms::Import::Processor
         submit_params = { reviewal_document: record }
         if record.class == YesBankVendor
           op = Docs::P2P::Vendors::Ops::Submit.(params: submit_params, current_user: user)
+        end
         if op&.success?
           import_record.update_status(true, 'Record created successfully', '', '')
         else
