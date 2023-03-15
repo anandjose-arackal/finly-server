@@ -52,6 +52,7 @@ include Searchkick::Api
 
   has_many :budget_criteria_mappings, as: :budgetable
   has_many :budgets, through: :budget_criteria_mappings
+  has_many :expenses
 
   validates :company_id, presence: true
   # validates :name, presence: true, uniqueness: {scope: [:company_id, :ancestry, :active], case_sensitive: false}
