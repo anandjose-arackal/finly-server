@@ -117,11 +117,11 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
     auto_number :invoice_id,
                 label: "Sequence Number",
                 editable: false,
-                sequence: { prefix: "INV", start_at: '00001' }
+                sequence: { prefix: "INV", start_at: '00001' }, display_key: true
 
     text :invoice_number,
          label: "Invoice Number",
-         required: true
+         required: true, display_key: true
 
     date :date,
          label: "Invoice Date",
@@ -185,7 +185,7 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
   # VENDOR DETAILS
   section :vendor_details, title: "Vendor Details", associate_custom_fields: true do
     lookup :vendor_id, label: "Vendor", choices_scope: Choices[:lookup].('vendors'), required: true, editable: false,
-           can_editable_be_changed: false, can_be_disabled: false, can_required_be_changed: false, can_visible_be_changed: false
+           can_editable_be_changed: false, can_be_disabled: false, can_required_be_changed: false, can_visible_be_changed: false, display_key: true
 
     lookup :vendor_trade_name, label: 'Vendor Trade Name', editable: false, visible: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.trade_name}}', assignments: { created_by_id: "{{meta.created_by_id}}" })
     lookup :vendor_country_id, editable: false, visible: false, choices_scope: Choices[:lookup].('countries')
@@ -677,13 +677,13 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
   #   action :required, false
   # end
 
-  condition condition_id: "Disable item department > Item department not for Header Cost Allocation Items" do
-    reference :entity, 'items.items_department_id'
-    rule Rules::Builder[:cost_allocation_items].eq_any(value: true)
-    action :visible, true
-    action :required, true
-    action :editable, true
-  end
+  # condition condition_id: "Disable item department > Item department not for Header Cost Allocation Items" do
+  #   reference :entity, 'items.items_department_id'
+  #   rule Rules::Builder[:cost_allocation_items].eq_any(value: true)
+  #   action :visible, true
+  #   action :required, true
+  #   action :editable, true
+  # end
 
   condition condition_id: "Enable item department > Item Cost Center for Header Cost Allocation Items" do
     reference :entity, 'department_id'
@@ -693,13 +693,13 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
     action :editable, false
   end
 
-  condition condition_id: "Disable item Cost Center > Item Cost Center not for Header Cost Allocation Items" do
-    reference :entity, 'items.items_cost_center_id'
-    rule Rules::Builder[:cost_allocation_items].eq_any(value: true)
-    action :visible, true
-    action :required, true
-    action :editable, true
-  end
+  # condition condition_id: "Disable item Cost Center > Item Cost Center not for Header Cost Allocation Items" do
+  #   reference :entity, 'items.items_cost_center_id'
+  #   rule Rules::Builder[:cost_allocation_items].eq_any(value: true)
+  #   action :visible, true
+  #   action :required, true
+  #   action :editable, true
+  # end
 
   condition condition_id: "Enable item Cost Center > Item Cost Center for Header Cost Allocation Items" do
     reference :entity, 'cost_center_id'
