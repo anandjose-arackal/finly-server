@@ -4,13 +4,13 @@ class PaymentAgreements::PolicyConfig < PaymentAgreements::Base
 
   class PaymentAgreements::PolicyConfig::PolicyConfigPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :locations, :departments, :policies, :reviewal_chains, :payment_agreement, :cost_centers, :department_mappings, :location_mappings, :policy, :policy_reviewal_chain, :payment_terms, :cost_centers
+    attr_accessor :locations, :departments, :policies, :reviewal_chains, :payment_agreement, :cost_centers, :department_mappings, :location_mappings, :policy, :policy_reviewal_chain, :payment_terms, :cost_centers, :initiating_user
 
     def init
       self.policy = params[:policy]
       self.payment_agreement = params[:payment_agreement]
       params[:filter_role_id] = [UserRole.id_for(:payment_agreement_initiator)]
-      initiating_user = self.payment_agreement.present? ? payment_agreement.creator : user
+      self.initiating_user = self.payment_agreement.present? ? payment_agreement.creator : user
       self.departments = self.policy.departments&.leaves
       self.locations = self.policy.locations&.leaves
       self.reviewal_chains = policy_reviewal_chain
@@ -24,7 +24,7 @@ class PaymentAgreements::PolicyConfig < PaymentAgreements::Base
           provider_name: "PaymentAgreementProvider",
           reviewal_document: self.payment_agreement
       }
-      op = ::ReviewalManager::ReviewalChain.(user, params)
+      op = ::ReviewalManager::ReviewalChain.(self.initiating_user, params)
       if op.success?
         policy_chain = op.chain
       else
