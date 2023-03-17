@@ -417,7 +417,7 @@ class Forms::Import::Processor
       if ['attachment'].include?(header_data[:entity_type])
         form_data[header_data[:entity_key]] = get_attachment_entity_value(row_data[header_data[:name]], row_data['_ref'], header_data[:name], header_data[:entity_key], existing_record, import_record)
       elsif ['lookup', 'dropdown'].include?(header_data[:entity_type])
-        choice_id = get_id_from_value(row_data[header_data[:name]], header_data[:name])
+        choice_id = row_data[header_data[:name]].nil? ? nil : get_id_from_value(row_data[header_data[:name]], header_data[:name])
         if choice_id.present?
           form_data[header_data[:entity_key]] = choice_id
           form_data["#{header_data[:entity_key]}_value"] = row_data[header_data[:name]]
@@ -456,7 +456,7 @@ class Forms::Import::Processor
           if ['attachment'].include?(header_data[:entity_type])
             data[header_data[:entity_key]] = get_attachment_entity_value(nested_row[header_data[:name]], nested_row['_ref'], header_data[:name], header_data[:entity_key], existing_record, import_record)
           elsif ['lookup', 'dropdown'].include?(header_data[:entity_type])
-            choice_id = get_id_from_value(nested_row[header_data[:name]], header_data[:name])
+            choice_id = nested_row[header_data[:name]].nil? ? nil : get_id_from_value(nested_row[header_data[:name]], header_data[:name])
             if choice_id.present?
               data[header_data[:entity_key]] = choice_id
               data["#{header_data[:entity_key]}_value"] = nested_row[header_data[:name]]
