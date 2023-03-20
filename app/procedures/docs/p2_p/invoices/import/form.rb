@@ -62,7 +62,7 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
       
       invoice_balance_due_without_cn: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | default: 0 | round: 2}}",
       invoice_credit_note_adjusted_amount: "{% assign cn_amount = 0 %}{% for cn in form.credit_note_adjustments %}{% if cn._destroy == true %}{% continue %}{% else %}{% assign cn_amount = cn_amount | plus: cn.cn_adjustment_amount %}{% endif %}{% endfor %}{{ cn_amount | default: 0 | round: 2 }}",
-      invoice_balance_due: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | minus: form.invoice_credit_note_adjusted_amount | default: 0 | round: 2}}",
+      invoice_balance_due: "{{ form.invoice_total_amount | minus: form.invoice_advance_paid_amount | default: 0 | round: 2}}",
       
 
       # CONVERTED VALUES
@@ -534,9 +534,9 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
               can_editable_be_changed: false, can_visible_be_changed: false,
              computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_balance_due_without_cn]), hide_in_import: true
 
-      amount :invoice_credit_note_adjusted_amount, label: "Credit Note Adjustment",
-             default_value: 0, editable: false, visible: true, can_visible_be_changed: false,
-             computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_credit_note_adjusted_amount]), hide_in_import: true
+      # amount :invoice_credit_note_adjusted_amount, label: "Credit Note Adjustment",
+      #        default_value: 0, editable: false, visible: true, can_visible_be_changed: false,
+      #        computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:invoice_credit_note_adjusted_amount]), hide_in_import: true
 
       amount :invoice_balance_due, label: "Balance Payable", editable: false,
              can_editable_be_changed: false, visible: true,
@@ -572,17 +572,17 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
     rule Rules::Builder['items.item_discount_amount'].gt(entity: "items.item_gross_amount")
   end
 
-  validation validation_id: "Invoice Credit Note Adjustment can not be greater than invoice Balance Due " do
-    reference 'items_summary.invoice_credit_note_adjusted_amount'
-    error_message "Invoice Credit Note Adjustment can not be greater than Invoice Balance Due "
-    rule Rules::Builder['invoice_credit_note_adjusted_amount'].gt(entity: "invoice_balance_due_without_cn")
-  end
+  # validation validation_id: "Invoice Credit Note Adjustment can not be greater than invoice Balance Due " do
+  #   reference 'items_summary.invoice_credit_note_adjusted_amount'
+  #   error_message "Invoice Credit Note Adjustment can not be greater than Invoice Balance Due "
+  #   rule Rules::Builder['invoice_credit_note_adjusted_amount'].gt(entity: "invoice_balance_due_without_cn")
+  # end
 
-  validation validation_id: "Invoice Balance Due can not be lesser than Invoice Credit Note Adjustment " do
-    reference 'items_summary.invoice_balance_due_without_cn'
-    error_message "Invoice Credit Note Adjustment can not be greater than Invoice Balance Due "
-    rule Rules::Builder['invoice_credit_note_adjusted_amount'].gt(entity: "invoice_balance_due_without_cn")
-  end
+  # validation validation_id: "Invoice Balance Due can not be lesser than Invoice Credit Note Adjustment " do
+  #   reference 'items_summary.invoice_balance_due_without_cn'
+  #   error_message "Invoice Credit Note Adjustment can not be greater than Invoice Balance Due "
+  #   rule Rules::Builder['invoice_credit_note_adjusted_amount'].gt(entity: "invoice_balance_due_without_cn")
+  # end
 
   # validation validation_id: "Applied Credit Note Adjustment Cannot be greater than Available Credit Note " do
   #   reference 'credit_note_adjustments.cn_adjustment_amount'
