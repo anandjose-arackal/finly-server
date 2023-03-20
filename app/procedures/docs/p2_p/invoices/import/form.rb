@@ -193,7 +193,7 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
     text :vendor_sequence_id, "Vendor ID", editable: false, visible: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.vendor_id}}')
 
     lookup :gstin_location_id, label: 'Vendor Location', choices_scope: Choices[:lookup].('vendor_locations'), # todo - condition to hide for international
-           filters: Rules::Builder[:vendor_id].eq(entity: :vendor_id)
+           filters: Rules::Builder[:vendor_id].eq(entity: :vendor_id), required: false
     text :vendor_gstin, "Vendor GSTIN", editable: false, visible: false, computed: Forms::Compute::Lookup('gstin_location_id', '{{record.gstin}}') # todo - condition
     text :vendor_state_name, visible: true, computed: Forms::Compute::Lookup('gstin_location_id', '{{record.state_name}}'), visible: false
     text :vendor_pan, "Vendor PAN", editable: false, visible: false # todo - add condition
@@ -251,8 +251,8 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
 
       # lookup :product_type_id, label: "Product Type", choices_scope: Choices[:enum].(ProductType), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.product_type_id}}'), editable: false, required: true, visible: true, size: FormEntity::SIZES[:small]
 
-      lookup :items_department_id, label: "Department", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('departments', assignments: { form: true })
-      lookup :items_cost_center_id, label: "Cost Center", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('cost_centers')
+      # lookup :items_department_id, label: "Department", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('departments', assignments: { form: true })
+      # lookup :items_cost_center_id, label: "Cost Center", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('cost_centers')
 
       lookup :category_id, label: "Category", required: true, visible: true, editable: true, choices_scope: Choices[:lookup].('categories', scope: :inward_invoice_line_items_only), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.category_id}}'), triggers: {on_compute: {lookup_details: [:category_id]}}, size: FormEntity::SIZES[:medium]
 
@@ -630,12 +630,12 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
     action :editable, false
   end
 
-  condition condition_id: "Disable Vendor Location > No Location for International Vendors" do
-    reference :entity, 'gstin_location_id'
-    rule Rules::Builder[:vendor_country_id_value].not_eq(value: 'India')
-    action :visible, false
-    action :required, false
-  end
+  # condition condition_id: "Disable Vendor Location > No Location for International Vendors" do
+  #   reference :entity, 'gstin_location_id'
+  #   rule Rules::Builder[:vendor_country_id_value].not_eq(value: 'India')
+  #   action :visible, false
+  #   action :required, false
+  # end
 
   condition condition_id: "Disable Vendor Gstin > No Gstin for International Vendors" do
     reference :entity, 'vendor_gstin'

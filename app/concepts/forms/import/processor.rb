@@ -298,9 +298,9 @@ class Forms::Import::Processor
           op = Docs::P2P::Vendors::Ops::Submit.(params: submit_params, current_user: user)
         end
         if op&.success?
-          import_record.update_status(true, 'Record created successfully', '', '')
+          import_record.update_status(true, ['Record created successfully'].to_s, '', '')
         else
-          import_record.update_status(true, 'Record created successfully But could not submit for approval', '', '')
+          import_record.update_status(true, ['Record created successfully But could not submit for approval'].to_s, '', '')
         end
         import_record.document_id = record.id
         import_record.save
