@@ -74,6 +74,7 @@ class Forms::Export::Processor
             entity_key: entity.entity_key,
             entity_type: entity.entity_type,
             entity: entity,
+            hide_in_sheet: entity.hide_in_import
           }
         elsif ['lookup', 'dropdown'].include?(entity.entity_type)
           if parent_sheet_key == 'vendor'
@@ -98,7 +99,8 @@ class Forms::Export::Processor
               entity_key: "#{entity.entity_key}",
               entity_type: entity.entity_type,
               lookup_value: true,
-              choices_array: choices_array(entity)
+              choices_array: choices_array(entity),
+              hide_in_sheet: entity.hide_in_import
             }
           end
         elsif entity.entity_type == 'date'
@@ -107,6 +109,7 @@ class Forms::Export::Processor
             entity_key: entity.entity_key,
             entity_type: entity.entity_type,
             entity: entity,
+            hide_in_sheet: entity.hide_in_import
           }
         elsif entity.entity_type == 'datetime'
           headers[entity.entity_key.to_s] = {
@@ -114,13 +117,15 @@ class Forms::Export::Processor
             entity_key: entity.entity_key,
             entity_type: entity.entity_type,
             entity: entity,
+            hide_in_sheet: entity.hide_in_import
           }
         elsif entity.entity_type == 'switch'
           headers[entity.entity_key.to_s] = {
             name: "#{entity.label}#{entity.required ? '*' : ''}",
             entity_key: entity.entity_key,
             entity_type: entity.entity_type,
-            entity: entity
+            entity: entity,
+            hide_in_sheet: entity.hide_in_import
           }
         elsif entity.entity_type == 'attachment'
           headers[entity.entity_key.to_s] = {
@@ -128,7 +133,8 @@ class Forms::Export::Processor
             entity_key: entity.entity_key,
             entity_type: entity.entity_type,
             entity: entity,
-            hidden: true
+            hidden: true,
+            hide_in_sheet: entity.hide_in_import
           }
         else
           headers[entity.entity_key.to_s] = {
@@ -136,6 +142,7 @@ class Forms::Export::Processor
             entity_key: entity.entity_key,
             entity_type: entity.entity_type,
             entity: entity,
+            hide_in_sheet: entity.hide_in_import
           }
         end
       end
@@ -169,7 +176,7 @@ class Forms::Export::Processor
       }
       entity.entities.each do |child_entity|
         next unless (child_entity.visible || child_entity.conditions.joins(:actions).where(form_condition_actions: {property: :visible, value: true}).present?)
-        next if child_entity.hide_in_import
+        # next if child_entity.hide_in_import
 
         child_sheet_headers.merge!(build_headers_for_entity(sheets_headers, entity.entity_key, entity.entity_key, child_entity, user))
       end
@@ -234,7 +241,8 @@ class Forms::Export::Processor
       sheet_name = sheet_data[:name]
       sheet_key = sheet_data[:key]
       worksheets[sheet_key] = workbook.add_worksheet(sheet_name)
-      self.headers[sheet_key][:headers].values.each_with_index do |header_data, header_index|
+      self.headers[sheet_key][:headers].values.select{|header| header["hide_in_sheet"] == nil}.each_with_index do |header_data, header_index|
+        next if header_data[:hide_in_sheet]
         width = (header_data[:hidden] || header_data[:entity_key] == 'status_id') ? 0 : header_data[:name].length+10
         worksheets[sheet_key].set_column(header_index, header_index, width)
         worksheets[sheet_key].write(0, header_index, header_data[:name])
