@@ -276,7 +276,7 @@ class Forms::Import::Processor
         end
       rescue => exception
         import_job.item_complete(false)
-        import_record.update_status(false, '[Unable to process]', exception.message, exception.backtrace)
+        import_record.update_status(false, ["Unable to process"].to_s, exception.message, exception.backtrace)
       end
     end
     save_records(import_job, records_to_save)
