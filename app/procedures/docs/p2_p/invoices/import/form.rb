@@ -164,7 +164,7 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
 
   # ACCOUNTING DETAILS
   section :accounting_details, title: "Accounting Details", associate_custom_fields: true do
-    lookup :policy_id, choices_scope: Choices[:lookup].('policies', permissions: [:non_po_invoice_initiator]), required: true, editable: false
+    lookup :policy_id, choices_scope: Choices[:lookup].('policies', permissions: [:non_po_invoice_initiator, :invoice_bulk_importer]), required: true, editable: false
     lookup :department_id, label: "Department", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('departments', assignments: { form: true }) #, editable: false, visible: false
     lookup :cost_center_id, label: "Cost Center", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('cost_centers')
     dropdown :discount_type_id, label: "Discount Type", editable: true, visible: true, required: true, choices_scope: Choices[:list].({ id: 1, name: 'Percentage' }, { id: 2, name: 'Amount' }), default_value: 1
