@@ -127,6 +127,8 @@ when :yes_bank_balance_poller
   linked_files << 'config/bunny.yml'
 when :development_6
   linked_files << 'config/master_users.yml'
+when :development_7
+  linked_files << 'config/elastic_apm.yml'
 end
 set :linked_files, linked_files
 set :linked_dirs, %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/uploads node_modules client/node_modules}
