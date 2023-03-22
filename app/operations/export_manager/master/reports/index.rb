@@ -46,6 +46,9 @@ class ExportManager::Master::Reports::Index < ExportManager::Builders::Spreadshe
   attribute :source_account
   attribute :settlement_date
   attribute :finance_approved_date
+  attribute :reporting_currency
+  attribute :reporting_amount
+  attribute :conversion_rate
 
   section :expense_custom_fields do
     attribute :expense_custom_fields, dynamic: true
@@ -262,6 +265,19 @@ class ExportManager::Master::Reports::Index < ExportManager::Builders::Spreadshe
     else
       report.status_name
     end
+  end
+
+  def reporting_currency(expense)
+    expense&.report.policy.base_currency.country_code
+  end
+
+  def reporting_amount(expense)
+    expense&.report.total_amount
+  end
+
+  def conversion_rate(expense)
+    sym = expense&.report&.base_currency&.country_code
+    (expense&.amount.value / expense&.amount[sym] rescue 0)
   end
 
 end

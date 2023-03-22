@@ -39,7 +39,7 @@ module Constants
 
   # RESOURCE_DOWNLOAD_EMAIL_ID = ['sreeram.nr@finly.io']
   # RESOURCE_DOWNLOAD_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io', 'kartik.k@finly.io', 'venu.reddy@finly.io']
-  RESOURCE_DOWNLOAD_EMAIL_ID = ['venu.reddy@finly.io']
+  RESOURCE_DOWNLOAD_EMAIL_ID = ['venu.reddy@finly.io', 'business@finlyhq.com']
 
   SUPERADMIN_ACCOUNTS = ['sreeram.nr@finly.io', 'vivek.a@finly.io', 'veekshith.rai@finly.io', 'admin@finlytest.io']
 

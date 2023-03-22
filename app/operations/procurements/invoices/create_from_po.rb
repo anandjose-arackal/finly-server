@@ -343,7 +343,9 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       shipping_address_name: self.purchase_order&.delivery_location&.name,
       shipping_address_gstin: self.purchase_order&.delivery_location&.gstin,
       tds_slab_id: self.purchase_order&.advance_tds_slab_id,
-      tds_percentage: self.purchase_order&.advance_tds_slab&.tds.to_f
+      tds_percentage: self.purchase_order&.advance_tds_slab&.tds.to_f,
+      billing_state_name: self.purchase_order&.billing_state_name,
+      vendor_state_name: self.purchase_order&.vendor_state_name
     }
 
     if self.advance.present?
@@ -537,7 +539,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         department_id: item.department_id,
         cost_center_id: item.cost_center_id,
         tax_rate_id: item.tax_rate_id,
-        tax_percentage: item.tax_rate.rate,
+        tax_percentage: item.tax_rate&.rate,
         category_id: item.category_id,
         cgst: item.cgst,
         sgst: item.sgst,
@@ -640,7 +642,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         department_id: item.department_id,
         cost_center_id: item.cost_center_id,
         tax_rate_id: item.tax_rate_id,
-        tax_percentage: item.tax_rate.rate,
+        tax_percentage: item.tax_rate&.rate,
         category_id: item.category_id,
         cgst: item.cgst,
         sgst: item.sgst,
@@ -826,7 +828,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         department_id: item.department_id,
         cost_center_id: item.cost_center_id,
         tax_rate_id: item.tax_rate_id,
-        tax_percentage: item.tax_rate.rate,
+        tax_percentage: item.tax_rate&.rate,
         category_id: item.category_id,
         cgst: item.cgst,
         sgst: item.sgst,

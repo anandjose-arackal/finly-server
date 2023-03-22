@@ -24,6 +24,7 @@ class Admin::Implementations::Master::BBPS::Import < Admin::Implementations::Pro
               :cost_center => "Cost Center",
               :policy => "Policy*",
               :poc => "POCs Email(Separated by commas)*",
+              :reminder_before_days => "Reminder Before Days",
               :destroy => "Destroy"
           })
   attr_accessor :bank_account_params
@@ -87,7 +88,7 @@ class Admin::Implementations::Master::BBPS::Import < Admin::Implementations::Pro
     params[:department_id] = (yield find_department(data[:department]))&.id
     params[:location_id] = (yield find_location(data[:location]))&.id
     params[:cost_center_id] = (yield find_cost_center(data[:cost_center]))&.id
-    params[:category_id] = (yield find_category(data[:category]))&.id
+    params[:category_id] = (yield find_category(data[:category_id]))&.id
     params[:tax_rate_id] = (yield find_tax_rate(data[:tax_rate]))&.id
     biller = yield find_bbps_biller(data[:bbps_biller_id], required: true)
     params[:bbps_biller_id] = biller.id
@@ -100,6 +101,7 @@ class Admin::Implementations::Master::BBPS::Import < Admin::Implementations::Pro
     params[:customer_param_key_4] = biller.biller_customer_params[3]&.dig('param_name')
     params[:customer_param_key_5] = biller.biller_customer_params[4]&.dig('param_name')
     params[:subscription_pocs] = yield find_pocs(data[:poc], required: true)
+    params[:reminder_before_days]= data[:reminder_before_days]
 
     Success(params)
   end

@@ -5,6 +5,11 @@ class Dashboards::VendorPaymentsController < BaseControllers::WebBase
     respond
   end
 
+  def filter_configs
+    @result = Dashboard::VendorPayments::FilterConfigs.(current_user, params)
+    respond
+  end
+
   def awaiting_action
     @result = Dashboard::VendorPayments::AwaitingAction.(current_user, params)
     respond

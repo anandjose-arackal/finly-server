@@ -15,6 +15,11 @@ class DemoMailer < ApplicationMailer
     mail to: recipient, subject: "New Resource Download"
   end
 
+  def notify_prospect(resource_request, recipient)
+    @resource_request = resource_request
+    mail to: recipient, subject: "Thanks for downloading #{@resource_request.resource_file_name} | Finly"
+  end
+
   def signedup_user(signedup_user, recipient)
     @signedup_user = signedup_user
     mail to: recipient, subject: "Someone Self-Signed Up"
