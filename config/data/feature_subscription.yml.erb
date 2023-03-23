@@ -46,8 +46,12 @@ user:
     performance_fix_flags:
       dependencies_ui_cache_enabled: <%= DependenciesUiCacheToggle.new(current_user).enabled? %>
       reviewal_chain_async: <%= ReviewalChainAsyncToggle.new(current_user).enabled? %>
+      dynamic_comments_loading: <%= FormsDynamicCommentsLoadingToggle.new(current_user).enabled? %>
+      dashboard_config_api_trim: <%= DashboardConfigApiTrim.new(current_user).enabled? %>
+      pr_api_improvements: <%= PrApiImprovementsToggle.new(current_user).enabled? %>
     currency_flags:
       amount_prop_only_load_enabled: <%= AmountPropOnlyLoadToggle.new(current_user).enabled? %>
+      currency_comma_separation_enabled: <%= CurrencyCommaSeparationToggle.new(current_user).enabled? %>
     common_imports:
       lurm_enabled: <%= LurmEnabledToggle.new(current_user).enabled? %>
       user_bulk_upload_enabled: <%= UserWorkFlowBulkUploadEnabledToggle.new(current_user).enabled? %>

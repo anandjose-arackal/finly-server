@@ -437,7 +437,7 @@ class GeneralInvoice < ApplicationRecord
   end
 
   def allowed_to_add_invoice?
-    self.is_payment_agreement_upcoming_invoice && self.payment_date_passed && self.payment_agreement.is_agreement_invoice_initiating_user? && self.payment_agreement.approved?
+    self.is_payment_agreement_upcoming_invoice && self.payment_date_passed && self.payment_agreement.is_agreement_invoice_initiating_user? && self.payment_agreement.approved? && !self.payment_agreement.terminated?
   end
 
   def agreement_invoice_created?

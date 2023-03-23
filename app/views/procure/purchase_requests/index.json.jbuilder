@@ -20,6 +20,7 @@ json.results do
     json.can_take_control purchase_request.can_take_control?
     json.can_delete purchase_request.can_delete?
     json.rejection_note purchase_request.reject_note
+    json.forms_enabled purchase_request.forms_enabled
     if purchase_request.purchase_request_items.present?
       json.line_items do
         json.array!(purchase_request.purchase_request_items) do |line_item|

@@ -1,0 +1,17 @@
+<% content_for :body do %>
+  <head>
+    <style>
+        h4{text-align: left;}
+    </style>
+  </head>
+  <h4>
+    Hi <%= @resource_request.name %>,
+    <br/>
+    Thanks for downloading our content (<%= @resource_request.resource_file_name %>) and we hope you like it.<br/><br/>If you need any additional details, you can also schedule demo with one of our product experts through our website.
+    <br/>
+    Website link: https://www.finly.io/
+    <br/>
+  </h4>
+<% end %>
+
+<%= render 'application_mailer/template' %>

@@ -15,6 +15,7 @@ class Admin::Implementations::Master::ItemMasters::ImportTemplates < Admin::Impl
       :tds_applicable => "TDS Applicable (Y/N)",
       :discount => "Discount",
       :rate => "Rate",
+      :tax_rate_id => "Tax Rate Id",
       :unit_of_measurement => "UOM",
       :destroy => "Destroy"
   })

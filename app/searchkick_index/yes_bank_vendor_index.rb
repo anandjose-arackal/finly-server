@@ -16,6 +16,7 @@ class YesBankVendorIndex < Searchkick::Api::DSL
   field :description, value: -> (record) { record.description }
   field :tax_id, value: -> (record) { record.pan }
   field :tax_registration_number, value: -> (record) { record.gstin_locations.pluck(:gstin).join(", ") }
+  field :forms_enabled, value: -> (record) { record.forms_enabled }
 
   # included do
   #   scope :searchkick_import, -> {

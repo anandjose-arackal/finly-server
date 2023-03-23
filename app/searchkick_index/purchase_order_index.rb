@@ -30,6 +30,7 @@ class PurchaseOrderIndex < Searchkick::Api::DSL
   field :vendor_name, value: -> (record) { record.vendor&.business_name }
   field :vendor_trade_name, value: -> (record) { record.vendor&.trade_name }
   field :vendor_id, value: -> (record) { record.vendor&.vendor_id }
+  field :forms_enabled, value: -> (record){ record.forms_enabled }
 
   # included do
   #   scope :searchkick_import, -> {

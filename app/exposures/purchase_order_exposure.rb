@@ -207,5 +207,7 @@ class PurchaseOrderExposure < Exposures::API
     comment_texts.compact.join(', ')
   end
 
-  attribute :revision_of, record_attribute: true
+  attribute :revision_of_po_number do
+    record.revision_of&.po_number
+  end
 end
