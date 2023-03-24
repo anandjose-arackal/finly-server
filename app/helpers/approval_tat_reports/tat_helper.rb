@@ -19,6 +19,7 @@ module ApprovalTatReports::TatHelper
     end
 
     def invoice_tat_report(documents, tat_reports)
+      documents = documents.where.not(invoice_status_id: InwardInvoiceStatus.id_for(:open))
       documents&.each do |document|
         data = {}
         data[:invoice_id] = document&.invoice_id
@@ -58,7 +59,7 @@ module ApprovalTatReports::TatHelper
         pt_approval_levels&.each do |each_level|
           if pt_actual_approval_levels.include?(each_level)
             selected_level_reviewer = pt_reviewal_chain&.select { |review_chain| review_chain[:level_number].to_s == each_level.to_s }&.first
-            data["level_#{each_level}_payment_ticket_approver_name"] =  selected_level_reviewer[:action_taken] ? fetch_approver_name(review_chain) : ""
+            data["level_#{each_level}_payment_ticket_approver_name"] =  selected_level_reviewer[:action_taken] ? fetch_approver_name(selected_level_reviewer) : ""
             current_level_approval_date = selected_level_reviewer[:action_taken] ? selected_level_reviewer[:action_taken_at]&.to_date&.strftime("%d-%m-%Y") : ""
             data["level_#{each_level}_payment_ticket_approval_date"] = current_level_approval_date
             data["level_#{each_level}_payment_ticket_interval_from_last_level"] = (current_level_approval_date.present? && last_level_approval_date.present?) ? (current_level_approval_date&.to_date - last_level_approval_date&.to_date).to_i : ""
@@ -77,6 +78,7 @@ module ApprovalTatReports::TatHelper
     end
 
     def purchase_request_tat_report(documents, tat_reports)
+      documents = documents.where.not(purchase_request_status_id: PurchaseRequestStatus.id_for(:draft))
       documents&.each do |document|
         data = {}
         data[:purchase_request_no] = document&.order_number
@@ -100,6 +102,7 @@ module ApprovalTatReports::TatHelper
     end
 
     def purchase_order_tat_report(documents, tat_reports)
+      documents = documents.where.not(purchase_order_status_id: PurchaseOrderStatus.id_for(:open))
       documents&.each do |document|
         data = {}
         data[:purchase_order_no] = document&.po_number
@@ -124,6 +127,7 @@ module ApprovalTatReports::TatHelper
     end
 
     def bank_payment_request_tat_report(documents, tat_reports)
+      documents = documents.where.not(status_id: BankPaymentRequestStatus.id_for(:open))
       documents&.each do |document|
         data = {}
         data[:payment_ticket_created_by] = "#{document&.created_by&.first_name} #{document.created_by&.last_name}"
@@ -146,6 +150,7 @@ module ApprovalTatReports::TatHelper
     end
 
     def payment_agreement_tat_report(documents, tat_reports)
+      documents = documents.where.not(status_id: PaymentAgreementStatus.id_for(:draft))
       documents&.each do |document|
         data = {}
         data[:agreement_no] = document&.order_number
@@ -170,12 +175,12 @@ module ApprovalTatReports::TatHelper
     end
 
     def bbps_biller_subscriptions_tat_report(documents, tat_reports)
+      documents = documents.where.not(status_id: BbpsBillerSubscriptionStatus.id_for(:draft))
       documents&.each do |document|
         data = {}
         data[:utility_id] = document&.sequence_id
         data[:vendor_name] = document&.biller&.biller_name
         data[:policy_name] = document&.policy&.name
-        data[:po_amount] = document&.total_after_tax&.value
         data[:utility_master_submitted_by] = "#{document&.created_by&.first_name} #{document.created_by&.last_name}"
         data[:utility_master_submitted_date] = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")   
 
