@@ -165,7 +165,7 @@ class Event::EReport::Base < Event::SetNotifier
     def expenses_category_sorted_faster
       categorized_expenses = []
       expenses_sum_by_category = self.expenses.with_amount.group(:category_id).sum(report.base_currency_code)
-      self.categories.include(:expenses).each do |category|
+      self.categories.includes(:expenses).each do |category|
         item_expenses = category.expenses
         if item_expenses.present?
           item_name = category.name
