@@ -87,6 +87,7 @@ json.purchase_order do
   json.vendor do
     json.extract! @result.purchase_order.vendor, :id, :name, :email, :mobile_number, :authorized, :description, :pan, :gst, :state
   end
+  json.shipping_address @result.purchase_order&.shipping_address
   json.total_before_tax do
     json.id @result.purchase_order.total_before_tax&.id
     json.value @result.purchase_order.total_before_tax&.value
