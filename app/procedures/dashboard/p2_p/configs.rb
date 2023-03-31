@@ -23,7 +23,8 @@ class Dashboard::P2P::Configs < Dashboard::VendorPayments::Base
         payment_agreements: false,
         approved_purchase_request_items: false,
         utility_bill_masters: false,
-        utility_bills: false
+        utility_bills: false,
+        invoices: false
     }
 
     reviewer_role_ids = UserRole.ids_for(:admin, :purchase_request_reviewer, :purchase_order_reviewer, :non_po_invoice_reviewer, :po_invoice_reviewer, :agreement_invoice_reviewer, :vendor_reviewer, :bank_payment_request_reviewer, :payment_agreement_reviewer, :utility_bill_master_reviewer, :utility_bill_reviewer)
@@ -37,6 +38,7 @@ class Dashboard::P2P::Configs < Dashboard::VendorPayments::Base
         request_types[:non_po_invoices] = false
         request_types[:agreement_invoices] = false
         request_types[:grns] = false
+        request_types[:invoices] = false
       end
 
       # Disabled vendors as the card was not providing any useful information
