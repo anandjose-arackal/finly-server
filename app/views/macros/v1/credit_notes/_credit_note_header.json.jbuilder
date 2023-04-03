@@ -1,4 +1,4 @@
-json.merge! record.to_exposure
+json.merge! record.as_json
 invoice =  record.invoice
 if invoice.present?
   json.invoice_id invoice.invoice_id
