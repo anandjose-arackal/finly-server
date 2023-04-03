@@ -18,6 +18,7 @@ class ApprovalTatReports::TatExport < Transactions::API
   end
 
   def build_report_export_send_mail(options, params:, current_user:, **)
+    Rails.logger.info "Before temp file creation"
     file = Tempfile.new(["#{params.dig(:route)}_approval_tat_reports", '.xlsx'])
     workbook = ::WriteXLSX.new(file)
     worksheet = workbook.add_worksheet('Sheet 1')
@@ -44,7 +45,7 @@ class ApprovalTatReports::TatExport < Transactions::API
 
     workbook.close
     file.rewind
-
+    Rails.logger.info "After temp file creation"
     subject = "#{params.dig(:route).titleize} tat file  generated at #{DateTime.now.strftime("%d-%m-%Y %T")}"
     body = "You have a new notification on Finly"
     ApprovalTatReportsMailer.delay.send_mail(current_user.email, subject, body, "#{params.dig(:route)}_approval_tat_reports", file)
