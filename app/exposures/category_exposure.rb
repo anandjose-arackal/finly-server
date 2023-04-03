@@ -13,4 +13,8 @@ class CategoryExposure < Exposures::API
     end
   end
 
+  attribute :full_name do
+    record.full_name
+  end
+
 end
