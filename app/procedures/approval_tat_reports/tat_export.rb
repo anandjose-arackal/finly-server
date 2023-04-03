@@ -14,12 +14,11 @@ class ApprovalTatReports::TatExport < Transactions::API
     result = IndexBuilder::Show.(params: params["document_filters"], current_user: current_user)
     return false  unless result['model.records'].present?
     options[:spreadsheet_data] = export_report(result['model.records'], params.dig(:route))
-    options[:file_name] = params.dig(:route)
     true
   end
 
   def build_report_export_send_mail(options, params:, current_user:, **)
-    file = Tempfile.new(["#{options[:file_name]}_approval_tat_reports", '.xlsx'])
+    file = Tempfile.new(["#{params.dig(:route)}_approval_tat_reports", '.xlsx'])
     workbook = ::WriteXLSX.new(file)
     worksheet = workbook.add_worksheet('Sheet 1')
 
@@ -48,14 +47,14 @@ class ApprovalTatReports::TatExport < Transactions::API
 
     subject = "#{params.dig(:route).titleize} tat file  generated at #{DateTime.now.strftime("%d-%m-%Y %T")}"
     body = "You have a new notification on Finly"
-    ApprovalTatReportsMailer.send_mail(current_user.email, subject, body, file.path, "#{options[:file_name]}_approval_tat_reports.xlsx").deliver_now
+    ApprovalTatReportsMailer.delay.send_mail(current_user.email, subject, body, file.path, "#{params.dig(:route)}_approval_tat_reports")
     true
   end
 
   def send_mail_data_not_found(options, params:, current_user:, **)
     subject = "#{params.dig(:route).titleize} tat file from Finly"
     body = "Something went wrong, try again"
-    ApprovalTatReportsMailer.send_mail(current_user.email, subject, body, nil, nil).deliver_now
+    ApprovalTatReportsMailer.delay.send_mail(current_user.email, subject, body, nil, nil)
     true
   end
 
