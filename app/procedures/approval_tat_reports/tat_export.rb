@@ -47,13 +47,13 @@ class ApprovalTatReports::TatExport < Transactions::API
 
     subject = "#{params.dig(:route).titleize} tat file  generated at #{DateTime.now.strftime("%d-%m-%Y %T")}"
     body = "You have a new notification on Finly"
-    ApprovalTatReportsMailer.delay.send_mail(current_user.email, subject, body, file.path, "#{params.dig(:route)}_approval_tat_reports")
+    ApprovalTatReportsMailer.delay.send_mail(current_user.email, subject, body, "#{params.dig(:route)}_approval_tat_reports", file)
     true
   end
 
   def send_mail_data_not_found(options, params:, current_user:, **)
     subject = "#{params.dig(:route).titleize} tat file from Finly"
-    body = "Something went wrong, try again"
+    body = "Failed to generate tat report"
     ApprovalTatReportsMailer.delay.send_mail(current_user.email, subject, body, nil, nil)
     true
   end
