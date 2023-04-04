@@ -11,9 +11,12 @@ class ApprovalTatReports::TatExport < Transactions::API
   fail :send_mail_data_not_found
 
   def tat_reports_data(options, params:, current_user:, **)
+    Rails.logger.info "Before document fetch"
     result = IndexBuilder::Show.(params: params["document_filters"], current_user: current_user)
     return false  unless result['model.records'].present?
+    Rails.logger.info "In the middle of document fetch"
     options[:spreadsheet_data] = export_report(result['model.records'], params.dig(:route))
+    Rails.logger.info "After document fetch"
     true
   end
 
@@ -53,6 +56,7 @@ class ApprovalTatReports::TatExport < Transactions::API
   end
 
   def send_mail_data_not_found(options, params:, current_user:, **)
+    Rails.logger.info "failed email"
     subject = "#{params.dig(:route).titleize} tat file from Finly"
     body = "Failed to generate tat report"
     ApprovalTatReportsMailer.delay.send_mail(current_user.email, subject, body, nil, nil)
