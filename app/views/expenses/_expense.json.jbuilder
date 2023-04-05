@@ -4,9 +4,9 @@ json.extract! expense, :id, :note, :merchant_name, :user_name, :amount_value, :c
               :reimbursable_amount_value, :usage_date_type
 
 if expense.category&.parent&.present?
-  json.category_name "#{expense.category.parent.name} - #{expense.category.name}"
+  json.category_name "#{expense.category&.parent&.name} - #{expense.category&.name}"
 else
-  json.category_name expense.category.name
+  json.category_name expense.category&.name
 end
 
 if expense.spent_from.present?
