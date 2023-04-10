@@ -145,11 +145,6 @@ class Event::EReport::Base < Event::SetNotifier
     end
 
     def expenses_category_sorted
-
-      if ExpenseSortedByCategoryFasterToggle.new(user).enabled?
-        return self.expenses_category_sorted_faster
-      end
-
       categorized_expenses = []
       self.categories.each do |category|
         item_expenses = self.expenses.with_category(category.id)
