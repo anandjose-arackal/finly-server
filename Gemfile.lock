@@ -998,7 +998,7 @@ DEPENDENCIES
   spring (~> 2.1.0)
   spring-commands-rspec (~> 1.0.4)
   spring-watcher-listen (~> 2.0.0)
-  stackprof (~> 0.2.12)
+  stackprof (~> 0.2.7)
   string_pattern (~> 2.2, >= 2.2.1)
   test-unit (~> 3.2.9)
   thor (~> 0.19)
@@ -1025,7 +1025,7 @@ DEPENDENCIES
   yard-activerecord
 
 RUBY VERSION
-   ruby 2.6.1p33
+   ruby 2.7.1
 
 BUNDLED WITH
-   2.3.16
+   2.4.7
