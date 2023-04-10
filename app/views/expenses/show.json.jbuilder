@@ -1,5 +1,5 @@
 expense = @result.expense
-json.extract! @result.expense, :id, :note, :merchant_name, :user_id, :user_name, :category_name, :category_id, :expense_type_id,
+json.extract! @result.expense, :id, :uuid_key, :note, :merchant_name, :user_id, :user_name, :category_name, :category_id, :expense_type_id,
                                     :transcribed, :reimbursable, :report_status, :split_link, :from_cash_on_hand, :synced_with_quickbooks,
                                     :expense_tax_type_id, :gst_type_id, :gst_percentage, :tds_slab_id, :usage_date_type, :usage_date_start, :usage_date_end
 json.usage_date_start DateUtils.date_formatted @result.expense.usage_date_start

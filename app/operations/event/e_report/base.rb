@@ -157,6 +157,20 @@ class Event::EReport::Base < Event::SetNotifier
       categorized_expenses
     end
 
+    def expenses_category_sorted_faster
+      categorized_expenses = []
+      expenses_sum_by_category = self.expenses.with_amount.group(:category_id).sum(report.base_currency_code)
+      self.categories.includes(:expenses).each do |category|
+        item_expenses = category.expenses
+        if item_expenses.present?
+          item_name = category.name
+          item_sum = precision_value expenses_sum_by_category[category.id]
+          categorized_expenses << {section_name: item_name, expenses: item_expenses, section_total: item_sum}
+        end
+      end
+      categorized_expenses
+    end
+
     def generate_url(role_id)
       view = ""
       case role_id
