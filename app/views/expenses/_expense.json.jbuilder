@@ -3,10 +3,10 @@ json.extract! expense, :id, :note, :merchant_name, :user_name, :amount_value, :c
               :currency_country_code, :partially_transcribed, :report_status, :expense_tax_type, :gst_percentage, :tds_percentage, :reimbursable,
               :reimbursable_amount_value, :usage_date_type
 
-if expense.category.parent.present?
-  json.category_name "#{expense.category.parent.name} - #{expense.category.name}"
+if expense.category&.parent&.present?
+  json.category_name "#{expense.category&.parent&.name} - #{expense.category&.name}"
 else
-  json.category_name expense.category.name
+  json.category_name expense.category&.name
 end
 
 if expense.spent_from.present?

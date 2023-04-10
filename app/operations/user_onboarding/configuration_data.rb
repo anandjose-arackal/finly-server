@@ -72,6 +72,11 @@ class UserOnboarding::ConfigurationData < UserOnboarding::Base
         self.document_list << 'budget'
       end
 
+      if user.company.utility_bills_enabled?
+        self.document_list << 'utility_bill_master'
+        self.document_list << 'utility_bill'
+      end
+
     when 'em', :em
       self.document_list = []
     end
