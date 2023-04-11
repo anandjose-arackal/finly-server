@@ -296,7 +296,7 @@ group :development, :test do
   # gem 'meta_request'
   gem 'rack-mini-profiler', '~> 1.0.1'
   # gem 'flamegraph'
-  gem 'stackprof', '2.7' # ruby 2.1+ only
+  gem 'stackprof', '0.2.7' # ruby 2.1+ only
   # gem 'memory_profiler', '~> 0.9.12'
   gem 'brakeman'
   gem 'active_record_query_trace', '~> 1.5.4'
