@@ -57,6 +57,8 @@ class Report < ApplicationRecord
           FindByOrderedIds, Transitionable
   include ErpSyncable
 
+  self.primary_key = 'id'
+
   has_many :email_authorizations, as: :authorizable
   belongs_to :user, optional: true, inverse_of: :reports
   belongs_to :company

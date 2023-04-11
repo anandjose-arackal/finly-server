@@ -53,6 +53,13 @@ class Expense < ApplicationRecord
           FieldCustomizer::CustomizableValidation,
           MathUtil
 
+  self.primary_key = 'id'
+  before_validation :create_uuid_key, on: :create
+
+  def create_uuid_key
+    self.uuid_key = SecureRandom.uuid
+  end
+
   belongs_to :company, optional: true
   belongs_to :amount, optional: true
   belongs_to :expense_status, optional: true
@@ -1159,6 +1166,7 @@ class Expense < ApplicationRecord
   def self.as_json(options = {})
     {
         id: id,
+        uuid_key: uuid_key,
         note: note,
         amount_value: amount_value,
         currency_symbol: currency_symbol,

@@ -61,13 +61,13 @@ class ExpensesController < BaseControllers::WebBase
 
       expense_ids.each do |expense_id|
         params[:id] = expense_id
+        params[:normal_key_sent] = true
         result = Expense::Show.(current_user, params)
         @expenses.push(result)
       end
 
       # params[:id] = @result.expense&.id
       # @result = Expense::Show.(current_user, params)
-
       respond
     else
       respond response: :success
@@ -75,6 +75,7 @@ class ExpensesController < BaseControllers::WebBase
   end
 
   def show
+    params[:normal_key_sent] = false
     @result = Expense::Show.(current_user, params)
     respond
   end
@@ -108,6 +109,7 @@ class ExpensesController < BaseControllers::WebBase
     # if current_user.company.id == 129 || current_user.company.id == 1
     if @result.success?
       messages = @result.messages
+      params[:normal_key_sent] = true
       @result = Expense::Show.(current_user, params)
 
       @result.messages = messages

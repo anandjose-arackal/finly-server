@@ -355,10 +355,7 @@ group :test do
   # gem 'minitest-spec-rails', '~> 5.5.0'
 end
 
-group :production do
-  gem 'elastic-apm', '~> 3.13.0'
-  # gem 'scout_apm', '~> 2.4'
-end
+gem 'elastic-apm', '~> 3.13.0'
 
 gem 'prosopite', '~> 1.1.2'
 gem 'scout_apm' # Scout APM monitoring

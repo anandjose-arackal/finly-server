@@ -49,6 +49,7 @@ user:
       dynamic_comments_loading: <%= FormsDynamicCommentsLoadingToggle.new(current_user).enabled? %>
       dashboard_config_api_trim: <%= DashboardConfigApiTrim.new(current_user).enabled? %>
       pr_api_improvements: <%= PrApiImprovementsToggle.new(current_user).enabled? %>
+      clone_deep_removed: <%= FormsRemoveClonedeepToggle.new(current_user).enabled? %>
     currency_flags:
       amount_prop_only_load_enabled: <%= AmountPropOnlyLoadToggle.new(current_user).enabled? %>
       currency_comma_separation_enabled: <%= CurrencyCommaSeparationToggle.new(current_user).enabled? %>
