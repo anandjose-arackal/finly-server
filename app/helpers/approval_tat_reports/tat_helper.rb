@@ -15,6 +15,8 @@ module ApprovalTatReports::TatHelper
         return payment_agreement_tat_report(documents, tat_reports)
       when "UTILITY_SUBSCRIPTIONS"
         return bbps_biller_subscriptions_tat_report(documents, tat_reports)
+      when "VENDORS"
+        return vendors_tat_report(documents, tat_reports)
       end
     end
 
@@ -203,6 +205,32 @@ module ApprovalTatReports::TatHelper
         tat_reports.push(data.with_indifferent_access)
       end
       return tat_data(tat_reports)
+    end
+
+    def vendors_tat_report(documents, tat_reports)
+      documents = documents.where.not(status_id: VendorStatus.id_for(:draft))
+      documents&.each do |document|
+        data = {}
+        data[:vendor_number] = document&.vendor_id
+        data[:vendor_legal_name] = document&.business_name
+        data[:vendor_trade_name] = document&.trade_name
+        data[:policy_name] = document&.policy&.name
+        data[:status] = document&.status&.name
+        data[:vendor_submitted_by] = "#{document&.created_by&.first_name} #{document.created_by&.last_name}"
+        data[:venodr_submitted_date] = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")   
+
+        last_level_approval_date = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")
+        vendor_reviewal_chain = document&.get_reviewal_chain
+        vendor_last_approval_level = vendor_reviewal_chain&.last ? vendor_reviewal_chain&.last[:level_number] : ""
+        vendor_approval_levels = (1..vendor_last_approval_level&.to_i).to_a
+        vendor_actual_approval_levels = vendor_reviewal_chain&.map { |review_chain|  review_chain[:level_number]}
+
+        assign_reviewers_data(data, vendor_approval_levels, vendor_actual_approval_levels, vendor_reviewal_chain, last_level_approval_date)
+
+        data[:vendor_ageing ] = (document&.submitted_at && last_level_approval_date) ? (last_level_approval_date&.to_date - document&.submitted_at&.to_date)&.to_i : ""
+        data[:vendor_last_modified] = document&.updated_at&.to_date&.strftime("%d-%m-%Y")
+        tat_reports.push(data.with_indifferent_access)
+      end
     end
 
     def fetch_approver_name(review_chain)
