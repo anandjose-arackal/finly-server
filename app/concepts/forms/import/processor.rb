@@ -428,6 +428,12 @@ class Forms::Import::Processor
             form_data["#{header_data[:entity_key]}_value"] = choice_data[:value]
           end
         end
+        if header_data[:has_dependents]
+          params_hash = {:entity_path => header_data[:entity_path], :route => form.label.underscore.to_s, :value => choice_data[:id]}
+          current_user = user
+          lookup_data = Forms::Ops::LookupDetails.(params: params_hash, current_user: current_user)
+          form_data.merge!(lookup_data)
+        end
       else
         form_data[header_data[:entity_key]] = get_entity_value(row_data[header_data[:name]], header_data[:entity], header_data[:entity_type])
       end
@@ -466,6 +472,12 @@ class Forms::Import::Processor
                 data[header_data[:entity_key]] = choice_data[:id]
                 data["#{header_data[:entity_key]}_value"] = choice_data[:value]
               end
+            end
+            if header_data[:has_dependents]
+              params_hash = {:entity_path => header_data[:entity_path], :route => form.label.underscore.to_s, :value => choice_data[:id]}
+              current_user = user
+              lookup_data = Forms::Ops::LookupDetails.(params: params_hash, current_user: current_user)
+              data.merge!(lookup_data)
             end
           else
             data[header_data[:entity_key]] = get_entity_value(nested_row[header_data[:name]], header_data[:entity], header_data[:entity_type])
