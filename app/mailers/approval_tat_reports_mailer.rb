@@ -1,9 +1,13 @@
 class ApprovalTatReportsMailer < ApplicationMailer
 
-  def send_mail(email, subject, body, file_name, file_path )
-    attachments[file_name.to_s] = File.read(file_path) unless file_name.nil? 
-    @body = body
-    mail to: email, subject: subject, template_name: 'template'
+  def send_mail(tat_params)
+    @route = tat_params[:route_name].titleize.singularize
+    if tat_params.include?(:file_path)
+      attachments["#{tat_params[:route_name]}_approval_tat_reports.xlsx"] = File.read(tat_params[:file_path]) 
+      mail to: tat_params[:email], subject: "Your #{@route} TAT report is ready.", template_name: 'success_template'
+    else
+      mail to: tat_params[:email], subject: "Your #{@route} TAT report export has failed.", template_name: 'failure_template'
+    end
   end
 
 end
