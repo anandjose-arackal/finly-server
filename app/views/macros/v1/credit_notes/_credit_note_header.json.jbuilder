@@ -1,4 +1,4 @@
-json.merge! record.macro_json
+json.merge! record.as_json(macro: true)
 invoice =  record.invoice
 if invoice.present?
   json.invoice_id invoice.invoice_id
