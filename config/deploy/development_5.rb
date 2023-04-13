@@ -13,7 +13,7 @@ server 'dev.finly.io', user: 'centos', roles: %w{web app db sidekiq_app}, port: 
 set :stage, 'development'
 set :use_sudo, false
 set :rbenv_type, :user
-set :rbenv_ruby, '2.6.1' # Edit this if you are using MRI Ruby
+set :rbenv_ruby, '2.7.1' # Edit this if you are using MRI Ruby
 set :whenever_cron, :whenever_cron
 
 set :sidekiq_config => File.join(shared_path, 'config', 'sidekiq.yml')
