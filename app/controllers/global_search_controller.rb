@@ -20,6 +20,9 @@ class GlobalSearchController < BaseControllers::WebBase
   def index
     RequestStoreUtil.set_current_request(request)
     RequestStoreUtil.set_request_params(params)
+    RequestStoreUtil.set_current_user(current_user)
+    RequestStoreUtil.set_current_company(current_user&.company)
+
     endpoint GlobalSearch::Query
     if @op.success?
     # Going with direct rendering as it is faster than jbuilder
