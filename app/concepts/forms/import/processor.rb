@@ -428,8 +428,9 @@ class Forms::Import::Processor
             form_data["#{header_data[:entity_key]}_value"] = choice_data[:value]
           end
         end
-        if header_data[:has_dependents]
-          params_hash = {:entity_path => header_data[:entity_path], :route => form.label.underscore.to_s, :value => choice_data[:id]}
+        # running lookup fetch on all dropdowns
+        if true #header_data[:entity].has_dependents
+          params_hash = {:entity_path => header_data[:entity_path], :route => form.label.underscore.to_s, :value => form_data[:id]}
           current_user = user
           lookup_data = Forms::Ops::LookupDetails.(params: params_hash, current_user: current_user)
           form_data.merge!(lookup_data)
@@ -473,8 +474,10 @@ class Forms::Import::Processor
                 data["#{header_data[:entity_key]}_value"] = choice_data[:value]
               end
             end
-            if header_data[:has_dependents]
-              params_hash = {:entity_path => header_data[:entity_path], :route => form.label.underscore.to_s, :value => choice_data[:id]}
+
+            # running lookup fetch on all dropdowns
+            if true #header_data[:entity].has_dependents
+              params_hash = {:entity_path => header_data[:entity_path], :route => form.label.underscore.to_s, :value => data[:id]}
               current_user = user
               lookup_data = Forms::Ops::LookupDetails.(params: params_hash, current_user: current_user)
               data.merge!(lookup_data)
@@ -543,6 +546,7 @@ class Forms::Import::Processor
         form_data[entity.entity_key.to_s] = LiquidHelper.interpolate(entity.compute_formula, {'form'=>form_data})
       end
     end
+    form_data
   end
 
   def process_form_data(form_data, is_admin = false)
