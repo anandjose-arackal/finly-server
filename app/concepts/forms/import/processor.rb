@@ -518,7 +518,31 @@ class Forms::Import::Processor
       end
     end
 
+    form_data = perform_form_calculations(form_data) if form.model == Invoice
+
     form_data
+  end
+
+  # Specific use case for invoices and PO items
+  def perform_form_calculations(form_data)
+    form.entities.each do |entity|
+      next unless entity.compute_enabled && entity.compute_type == 1
+      if entity.class.collection
+        collection_data = form_data[entity.entity_key.to_s]
+        next if collection_data.empty?
+        child_results = []
+        collection_data.each do |item|
+          result = {}
+          entity.entities.each do |child_entity|
+            result[child_entity.entity_key] = LiquidHelper.interpolate(entity.compute_formula, {'form'=>form_data, 'row'=>item})
+          end
+          child_results << result.reverse_merge(item)
+        end
+        form_data[entity.entity_key.to_s] = child_results
+      elsif entity.parent.nil?
+        form_data[entity.entity_key.to_s] = LiquidHelper.interpolate(entity.compute_formula, {'form'=>form_data})
+      end
+    end
   end
 
   def process_form_data(form_data, is_admin = false)
