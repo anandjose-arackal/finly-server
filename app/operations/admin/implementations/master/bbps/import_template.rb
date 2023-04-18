@@ -20,6 +20,7 @@ class Admin::Implementations::Master::BBPS::ImportTemplate < Admin::Implementati
       :cost_center => "Cost Center",
       :policy => "Policy*",
       :poc => "POCs Email(Separated by commas)*",
+      :reminder_before_days => "Reminder Before Days",
       :destroy => "Destroy"
   })
 

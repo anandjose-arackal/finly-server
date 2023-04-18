@@ -24,6 +24,7 @@ class PurchaseRequestIndex < Searchkick::Api::DSL
   field :department_codes, value: -> (record) { record.line_items.map { |line_item| line_item.department&.department_code } }
   field :line_items, value: -> (record) { record.line_items.map { |line_item| line_item.item&.description } }
   field :line_item_numbers, value: -> (record) { record.line_items.map { |line_item| line_item.item&.item_number } }
+  field :forms_enabled, value: -> (record) { record.forms_enabled }
 
   # included do
   #   scope :searchkick_import, -> {

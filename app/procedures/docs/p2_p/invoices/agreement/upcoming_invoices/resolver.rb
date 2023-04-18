@@ -15,14 +15,14 @@ class Docs::P2P::Invoices::Agreement::UpcomingInvoices::Resolver < Resolver::API
   end
 
   def load_rental_invoices(params)
-    one_time_ri_invoices = user.company.rental_invoices.where(billing_type_id: BillingType.id_for(:one_time)).where("start_date <= ? AND end_date >= ? AND payment_agreement_upcoming_date <= ?", Date.today, Date.today, Date.today).where(is_payment_agreement_upcoming_invoice: true) rescue RentalInvoice.none
-    fixed_periodic_ri_invoices = user.company.fixed_periodic_rental_invoices.where(billing_type_id: BillingType.id_for(:fixed_periodic), is_payment_agreement_upcoming_invoice: true).where("payment_agreement_upcoming_date <= ?", Date.today).where(fixed_periodic_template: true) rescue RentalInvoice.none
+    one_time_ri_invoices = user.company.rental_invoices.joins(:payment_agreement).where('payment_agreements.status_id != ?', PaymentAgreementStatus.id_for(:terminated)).where(billing_type_id: BillingType.id_for(:one_time)).where("rental_invoices.start_date <= ? AND rental_invoices.end_date >= ? AND payment_agreement_upcoming_date <= ?", Date.today, Date.today, Date.today).where(is_payment_agreement_upcoming_invoice: true) rescue RentalInvoice.none
+    fixed_periodic_ri_invoices = user.company.fixed_periodic_rental_invoices.joins(:payment_agreement).where('payment_agreements.status_id != ?', PaymentAgreementStatus.id_for(:terminated)).where(billing_type_id: BillingType.id_for(:fixed_periodic), is_payment_agreement_upcoming_invoice: true).where("payment_agreement_upcoming_date <= ?", Date.today).where(fixed_periodic_template: true) rescue RentalInvoice.none
     one_time_ri_invoices.or(fixed_periodic_ri_invoices)
   end
 
   def load_general_invoices(params)
-    one_time_gi_invoices = user.company.general_invoices.where(billing_type_id: BillingType.id_for(:one_time)).where("start_date <= ? AND end_date >= ? AND payment_agreement_upcoming_date <= ?", Date.today, Date.today, Date.today).where(is_payment_agreement_upcoming_invoice: true) rescue GeneralInvoice.none
-    fixed_periodic_gi_invoices = user.company.fixed_periodic_general_invoices.where(billing_type_id: BillingType.id_for(:fixed_periodic), is_payment_agreement_upcoming_invoice: true).where("payment_agreement_upcoming_date <= ?", Date.today).where(fixed_periodic_template: true) rescue GeneralInvoice.none
+    one_time_gi_invoices = user.company.general_invoices.joins(:payment_agreement).where('payment_agreements.status_id != ?', PaymentAgreementStatus.id_for(:terminated)).where(billing_type_id: BillingType.id_for(:one_time)).where("general_invoices.start_date <= ? AND general_invoices.end_date >= ? AND payment_agreement_upcoming_date <= ?", Date.today, Date.today, Date.today).where(is_payment_agreement_upcoming_invoice: true) rescue GeneralInvoice.none
+    fixed_periodic_gi_invoices = user.company.fixed_periodic_general_invoices.joins(:payment_agreement).where('payment_agreements.status_id != ?', PaymentAgreementStatus.id_for(:terminated)).where(billing_type_id: BillingType.id_for(:fixed_periodic), is_payment_agreement_upcoming_invoice: true).where("payment_agreement_upcoming_date <= ?", Date.today).where(fixed_periodic_template: true) rescue GeneralInvoice.none
     one_time_gi_invoices.or(fixed_periodic_gi_invoices)
   end
 

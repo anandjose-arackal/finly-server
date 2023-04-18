@@ -46,6 +46,7 @@ class ResourceRequests::Create < BaseOperation
 
     Constants::RESOURCE_DOWNLOAD_EMAIL_ID.each do |recipient|
       DemoMailer.delay.notify_resource_download(resource_request, recipient)
+      DemoMailer.delay.notify_prospect(resource_request, resource_request.email)
     end
   end
 

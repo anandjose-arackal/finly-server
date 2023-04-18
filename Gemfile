@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby '~> 2.6'
+ruby '~> 2.7.1'
 
 # gem for pdf export and its executable
 gem 'wicked_pdf', '~> 1.1.0'
@@ -296,7 +296,7 @@ group :development, :test do
   # gem 'meta_request'
   gem 'rack-mini-profiler', '~> 1.0.1'
   # gem 'flamegraph'
-  gem 'stackprof', '~> 0.2.12' # ruby 2.1+ only
+  gem 'stackprof', '0.2.7' # ruby 2.1+ only
   # gem 'memory_profiler', '~> 0.9.12'
   gem 'brakeman'
   gem 'active_record_query_trace', '~> 1.5.4'
@@ -355,10 +355,7 @@ group :test do
   # gem 'minitest-spec-rails', '~> 5.5.0'
 end
 
-group :production do
-  gem 'elastic-apm', '~> 3.13.0'
-  # gem 'scout_apm', '~> 2.4'
-end
+gem 'elastic-apm', '~> 3.13.0'
 
 gem 'prosopite', '~> 1.1.2'
 gem 'scout_apm' # Scout APM monitoring

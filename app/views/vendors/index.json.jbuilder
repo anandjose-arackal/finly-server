@@ -22,6 +22,7 @@ json.result do
     json.description vendor.description
     json.created_by vendor.created_by&.name
     json.created_at vendor.created_at.strftime "%d %b %y"
+    json.forms_enabled vendor.forms_enabled
 
     json.bank_accounts do
       # json.array!(vendor.bank_accounts.non_deleted) do |bank_account|

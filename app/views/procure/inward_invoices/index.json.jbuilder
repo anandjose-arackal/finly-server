@@ -6,4 +6,5 @@ json.array! @result.invoices do |invoice|
   json.vendor_name invoice.vendor&.display_name
   json.amount invoice.net_amount&.value
   json.procurement_name invoice.procurement&.name
+  json.forms_enabled invoice.forms_enabled
 end
