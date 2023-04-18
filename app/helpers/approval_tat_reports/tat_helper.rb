@@ -231,6 +231,7 @@ module ApprovalTatReports::TatHelper
         data[:vendor_last_modified] = document&.updated_at&.to_date&.strftime("%d-%m-%Y")
         tat_reports.push(data.with_indifferent_access)
       end
+      return tat_data(tat_reports)
     end
 
     def fetch_approver_name(review_chain)

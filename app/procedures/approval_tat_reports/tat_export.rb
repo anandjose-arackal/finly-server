@@ -12,6 +12,7 @@ class ApprovalTatReports::TatExport < Transactions::API
 
   def tat_reports_data(options, params:, current_user:, **)
     params[:paginate] = false
+    RequestStoreUtil.set_current_user(current_user)
     result = IndexBuilder::Show.(params: params, current_user: current_user)
     return false  unless result['model.records'].present?
     options[:spreadsheet_data] = export_report(result['model.records'], params.dig(:route))
