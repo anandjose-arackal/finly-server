@@ -479,9 +479,6 @@ class Forms::Import::Processor
             if header_data[:entity_type] == 'lookup' && data[header_data[:entity_key]].present? #header_data[:entity].has_dependents
               params_hash = {:entity_path => header_data[:entity].entity_path, :route => form.label.underscore.to_s, :value => data[header_data[:entity_key]]}
               current_user = user
-              if header_data[:entity_key] == 'tds_slab_id'
-                binding.pry
-              end
               lookup_data = Forms::Ops::LookupDetails.(params: params_hash, current_user: current_user)[:data].map{|k, v| [k.split('.').last, v]}.to_h rescue {}
               data.merge!(lookup_data)
             end
