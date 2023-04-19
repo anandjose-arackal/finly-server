@@ -91,7 +91,8 @@ class Forms::Export::Processor
               import_skip: true,
               lookup_value: true,
               choices_array: choices_array(entity),
-              hidden: true
+              hidden: true,
+              entity: entity
             }
           else
             headers["#{entity.entity_key.to_s}"] = {
@@ -100,7 +101,8 @@ class Forms::Export::Processor
               entity_type: entity.entity_type,
               lookup_value: true,
               choices_array: choices_array(entity),
-              hide_in_sheet: entity.hide_in_import
+              hide_in_sheet: entity.hide_in_import,
+              entity: entity
             }
           end
         elsif entity.entity_type == 'date'
