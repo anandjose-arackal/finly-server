@@ -228,7 +228,7 @@ module ApprovalTatReports::TatHelper
         assign_reviewers_data(data, vendor_approval_levels, vendor_actual_approval_levels, vendor_reviewal_chain, last_level_approval_date)
 
         data[:vendor_ageing ] = (document&.submitted_at && last_level_approval_date) ? (last_level_approval_date&.to_date - document&.submitted_at&.to_date)&.to_i : ""
-        data[:vendor_last_modified] = document&.updated_at&.to_date&.strftime("%d-%m-%Y %T")
+        data[:vendor_last_modified] = document&.updated_at&.to_date&.strftime("%d-%m-%Y %H:%M:%S")
         tat_reports.push(data.with_indifferent_access)
       end
       return tat_data(tat_reports)
