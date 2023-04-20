@@ -433,10 +433,12 @@ class Forms::Import::Processor
           params_hash = {:entity_path => header_data[:entity].entity_path, :route => form.label.underscore.to_s, :value => form_data[header_data[:entity_key]]}
           current_user = user
           lookup_data = Forms::Ops::LookupDetails.(params: params_hash, current_user: current_user)[:data]
-          form_data.merge!(lookup_data)
+          form_data = lookup_data.merge!(form_data)
         end
       else
-        form_data[header_data[:entity_key]] = get_entity_value(row_data[header_data[:name]], header_data[:entity], header_data[:entity_type])
+        if row_data[header_data[:name]].present?
+          form_data[header_data[:entity_key]] = get_entity_value(row_data[header_data[:name]], header_data[:entity], header_data[:entity_type])
+        end
       end
     end
 
@@ -480,10 +482,13 @@ class Forms::Import::Processor
               params_hash = {:entity_path => header_data[:entity].entity_path, :route => form.label.underscore.to_s, :value => data[header_data[:entity_key]]}
               current_user = user
               lookup_data = Forms::Ops::LookupDetails.(params: params_hash, current_user: current_user)[:data].map{|k, v| [k.split('.').last, v]}.to_h rescue {}
-              data.merge!(lookup_data)
+              data = lookup_data.merge!(data)
             end
           else
-            data[header_data[:entity_key]] = get_entity_value(nested_row[header_data[:name]], header_data[:entity], header_data[:entity_type])
+            # Set value from sheet if lookup returned 0 or nil but sheet has data
+            if nested_row[header_data[:name]].present?
+              data[header_data[:entity_key]] = get_entity_value(nested_row[header_data[:name]], header_data[:entity], header_data[:entity_type])
+            end
           end
         end
 
@@ -493,7 +498,6 @@ class Forms::Import::Processor
           data[:id] = UUIDTools::UUID.timestamp_create.to_s.upcase
           data[:collection_id] = data[:id]
         end
-
         form_nested_data << data
       end
       # if form_data is generated before submission process and existing nested records are missing in excel sheet, add them to form data to show them in Review page of bulk import process
@@ -529,20 +533,23 @@ class Forms::Import::Processor
   # Specific use case for invoices and PO items
   def perform_form_calculations(form_data)
     form.entities.each do |entity|
-      next unless entity.compute_enabled && entity.compute_type == 1
-      if entity.class.collection
+      if entity.class.collection?
         collection_data = form_data[entity.entity_key.to_s]
         next if collection_data.empty?
         child_results = []
         collection_data.each do |item|
           result = {}
           entity.entities.each do |child_entity|
-            result[child_entity.entity_key] = LiquidHelper.interpolate(entity.compute_formula, {'form'=>form_data, 'row'=>item})
+            next unless child_entity.compute_enabled && child_entity.compute_type_id == 1
+            result[child_entity.entity_key] = LiquidHelper.interpolate(child_entity.compute_formula, {'form'=>form_data, 'row'=>item})
+            item[child_entity.entity_key] = result[child_entity.entity_key]
           end
-          child_results << result.reverse_merge(item)
+          child_results << item
         end
         form_data[entity.entity_key.to_s] = child_results
-      elsif entity.parent.nil?
+      else
+        next unless entity.compute_enabled && entity.compute_type_id == 1
+        next if entity.parent.present? && entity.parent.class.collection? # This is already computed in the if block
         form_data[entity.entity_key.to_s] = LiquidHelper.interpolate(entity.compute_formula, {'form'=>form_data})
       end
     end
