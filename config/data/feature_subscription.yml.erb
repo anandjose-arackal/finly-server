@@ -61,6 +61,7 @@ user:
       forms_config_enabled: <%= GlobalSearchFormsConfigToggle.new(current_user).enabled? %>
     vp_reports:
       approval_tat_reports: <%= ApprovalTatReportsToggle.new(current_user).enabled? %>
+      approval_tat_reports_max_limit: <%= (ApprovalTatReportsToggle.new(current_user).max_limit.nil? || ApprovalTatReportsToggle.new(current_user).max_limit == 0) ? 1000 : ApprovalTatReportsToggle.new(current_user).max_limit %>
 customer_specific:
   invoice_minimal_ui: <%=  MinimalInvoiceUiToggle.new(current_user).minimal_invoice_ui_enabled? %>
   dummy_bank_account: <%= current_company.yes_bank_vendors&.first&.id %>
