@@ -1,5 +1,5 @@
 class Forms::Import::Processor
-  attr_accessor :form, :user, :export_processor, :is_import_submission_stage, :model
+  attr_accessor :form, :user, :export_processor, :is_import_submission_stage, :model, :value_id_map
 
   BATCH_SIZE = Rails.application.config_for(:bulk_import)['batch_size'].freeze
 
@@ -9,6 +9,7 @@ class Forms::Import::Processor
     self.model = form.model
     self.export_processor = Forms::Export::Processor.(form, user)
     self.is_import_submission_stage = false
+    self.value_id_map = export_processor.lookup_content.map{|data| [data[:name], data[:data][:choices].map{ |choice| [choice[:name], choice[:id]]}.to_h]}.to_h
   end
 
   def self.call(form, user)
@@ -26,10 +27,6 @@ class Forms::Import::Processor
   # def lookup_labels
   #   @lookup_labels || lookup_content.pluck(:name)
   # end
-
-  def value_id_map
-    @value_id_map || lookup_content.map{|data| [data[:name], data[:data][:choices].map{ |choice| [choice[:name], choice[:id]]}.to_h]}.to_h
-  end
 
   def form_sections
     @form_sections ||= form.sections.includes(entities: { entities: { entities: { entities: :entities } } })
@@ -428,6 +425,15 @@ class Forms::Import::Processor
             form_data["#{header_data[:entity_key]}_value"] = choice_data[:value]
           end
         end
+
+        if header_data[:entity_key] == 'vendor_id'
+          form.entities.where(entity_key: ['receiving_account_id', 'gstin_location_id']).each do |field|
+            filter = field.entity_key == 'gstin_location_id' ? { vendor_id_in: [form_data['vendor_id']]} : {account_owner_id_in: [form_data['vendor_id']] }
+            value_id_map.delete(field.label)
+            value_id_map[field.label] = form.entities.where(entity_key: field.entity_key).first.choices_scope.build(user: self.user, params: { paginate: false, q: filter }).as_json[:choices].map{ |x| [x[:name], x[:id]] }.to_h
+          end
+        end
+        
         # running lookup fetch on all lookups
         if header_data[:entity_type] == 'lookup' && form_data[header_data[:entity_key]].present? #header_data[:entity].has_dependents
           params_hash = {:entity_path => header_data[:entity].entity_path, :route => form.label.underscore.to_s, :value => form_data[header_data[:entity_key]]}
