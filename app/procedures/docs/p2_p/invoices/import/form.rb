@@ -117,7 +117,7 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
     auto_number :invoice_id,
                 label: "Sequence Number",
                 editable: false,
-                sequence: { prefix: "INV", start_at: '00001' }, display_key: true
+                sequence: { prefix: "INV", start_at: '00001' }
 
     text :invoice_number,
          label: "Invoice Number",
