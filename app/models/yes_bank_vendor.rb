@@ -530,4 +530,14 @@ class YesBankVendor < ApplicationRecord
     }
   end
 
+  def forms_enabled
+    feature_flag_enabled = nil
+    if RequestStoreUtil.current_user.blank?
+      feature_flag_enabled = true
+    else
+      feature_flag_enabled = vendortoggle.new(requeststoreutil.current_user).enabled?
+    end
+      feature_flag_enabled
+  end
+
 end
