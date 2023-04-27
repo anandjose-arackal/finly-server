@@ -119,6 +119,13 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
                 editable: false,
                 sequence: { prefix: "INV", start_at: '00001' }
 
+    switch :form_migrated,
+           default_value: true,
+           visible: false,
+           editable: false,
+           can_editable_be_changed: false,
+           can_visible_be_changed: false
+
     text :invoice_number,
          label: "Invoice Number",
          required: true, display_key: true
@@ -138,18 +145,9 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
            computed: Forms::Compute::Lookup('payment_term_id', '{{record.calculated_days_after | default: 0 }}'),
            visible: false
 
-    # date :due_date,
-    #      computed: Forms::Compute::Form('{% assign assigne_days = form.payment_term_days | times: 86400 %}{% assign calculated_date = form.date | date: "%s" | plus: assigne_days %}{{ calculated_date  | date: "%Y-%m-%d" }}'),
-    #      # computed: Forms::Compute::Form('
-    #      #  {% assign assigne_days = form.payment_term_days | times: 86400 %}
-    #      #  {% assign calculated_date = form.date | date: "%s" | plus: assigne_days %}
-    #      #  {% assign default_due_date = "now" |date: "%s" | plus: 84600 %}
-    #      #  {% if calculated_date < default_due_date %}
-    #      #    {{ default_due_date  | date: "%Y-%m-%d" }}
-    #      #  {% else %}
-    #      #    {{ calculated_date  | date: "%Y-%m-%d" }}
-    #      #  {% endif %}'),
-    #      visible: true, required: true, editable: true
+    date :due_date,
+         computed: Forms::Compute::Form('{% assign assigned_days = form.payment_term_days | times: 86400 %}{% assign calculated_date = form.date | date: "%s" | plus: assigned_days %}{{ calculated_date  | date: "%Y-%m-%d" }}'),
+         visible: true, required: true, editable: true
 
 
     switch :cost_allocation_items, label: 'Cost Allocation (Item Level)', required: true, default_value: false, editable: false
@@ -249,7 +247,7 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
       #   computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.item_number}}'),
       #     size: FormEntity::SIZES[:small]
 
-      # lookup :product_type_id, label: "Product Type", choices_scope: Choices[:enum].(ProductType), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.product_type_id}}'), editable: false, required: true, visible: true, size: FormEntity::SIZES[:small]
+      lookup :product_type_id, label: "Product Type", choices_scope: Choices[:enum].(ProductType), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.product_type_id}}'), editable: false, required: true, visible: true, size: FormEntity::SIZES[:small]
 
       # lookup :items_department_id, label: "Department", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('departments', assignments: { form: true })
       # lookup :items_cost_center_id, label: "Cost Center", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('cost_centers')
@@ -472,7 +470,7 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
       #        can_visible_be_changed: false, can_editable_be_changed: false,
       #        computed: Forms::Compute::Form(LIQUID_FORMULAE[:summary][:reporting_invoice_sub_total_amount]) # todo - changd name
 
-      lookup :tds_slab_id, choices_scope: Choices[:lookup].('tds_slabs'), visible: true # todo - condition when reporting currency is in INR
+      lookup :tds_slab_id, choices_scope: Choices[:lookup].('tds_slabs'), visible: true, editable: false # todo - condition when reporting currency is in INR
 
       number :tds_percentage, internal: true, editable: false, visible: true, # todo - condition when reporting currency is in INR
              can_editable_be_changed: false,
