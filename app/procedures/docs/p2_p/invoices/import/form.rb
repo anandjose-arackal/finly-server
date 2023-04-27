@@ -126,6 +126,13 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
            can_editable_be_changed: false,
            can_visible_be_changed: false
 
+    lookup :invoice_type_id,
+           default_value: InwardInvoiceType.id_for(:non_po_invoice),
+           visible: false,
+           editable: false,
+           can_editable_be_changed: false,
+           can_visible_be_changed: false
+
     text :invoice_number,
          label: "Invoice Number",
          required: true, display_key: true
@@ -243,9 +250,9 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
            computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.description}}')
 
       text :comment, label: "Narration", size: FormEntity::SIZES[:medium], editable: false
-      # text :item_number, label: "Item Code", editable: false,
-      #   computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.item_number}}'),
-      #     size: FormEntity::SIZES[:small]
+      text :item_number, label: "Item Code", editable: false,
+        computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.item_number}}'),
+          size: FormEntity::SIZES[:small]
 
       lookup :product_type_id, label: "Product Type", choices_scope: Choices[:enum].(ProductType), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.product_type_id}}'), editable: false, required: true, visible: true, size: FormEntity::SIZES[:small]
 
