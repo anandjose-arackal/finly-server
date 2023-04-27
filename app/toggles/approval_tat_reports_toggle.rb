@@ -5,7 +5,7 @@ class ApprovalTatReportsToggle < ApplicationToggle
   end
 
   def max_limit
-    feature_value 'release/approval_tat_reports#max_limit', 0
+    feature_value 'release/approval_tat_reports#max_limit', 10000
   end
 
 end
