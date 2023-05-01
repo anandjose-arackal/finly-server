@@ -45,7 +45,7 @@ module ApprovalTatReports::TatHelper
 
         assign_reviewers_data(data, invoice_approval_levels, invoice_actual_approval_levels, invoice_reviewal_chain, last_level_approval_date)
 
-        invoice_payment_ticket = document&.payments&.order(created_at: :desc)&.first&.payment_order&.bank_payment_request
+        invoice_payment_ticket = document&.payments&.order(submitted_at: :desc)&.first&.payment_order&.bank_payment_request
 
         data[:payment_ticket_created_by] = "#{invoice_payment_ticket&.created_by&.first_name} #{invoice_payment_ticket&.created_by&.last_name}"
         payment_ticket_created_at = invoice_payment_ticket&.submitted_at&.to_date&.strftime("%d-%m-%Y")
@@ -126,7 +126,7 @@ module ApprovalTatReports::TatHelper
 
         assign_reviewers_data(data, po_approval_levels, po_actual_approval_levels, po_reviewal_chain, last_level_approval_date)
 
-        data[:po_ageing] = (document&.created_at && last_level_approval_date) ? (last_level_approval_date&.to_date - document&.submitted_at&.to_date)&.to_i : ""
+        data[:po_ageing] = (document&.submitted_at && last_level_approval_date) ? (last_level_approval_date&.to_date - document&.submitted_at&.to_date)&.to_i : ""
         tat_reports.push(data.with_indifferent_access)
       end
       return tat_data(tat_reports)
@@ -137,12 +137,12 @@ module ApprovalTatReports::TatHelper
       documents&.each do |document|
         data = {}
         data[:payment_ticket_created_by] = "#{document&.created_by&.first_name} #{document.created_by&.last_name}"
-        payment_ticket_created_at = document&.created_at&.to_date&.strftime("%d-%m-%Y")
+        payment_ticket_created_at = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")
         data[:payment_ticket_created_date] = payment_ticket_created_at
         data[:payment_ticket_status] = document&.status&.name
         data[:interval_between_approval_to_payment_ticket_creation] = (payment_ticket_created_at && document&.approved_at) ? (payment_ticket_created_at.to_date - document&.approved_at&.to_date).to_i : "" 
 
-        last_level_approval_date = document&.created_at&.to_date&.strftime("%d-%m-%Y")
+        last_level_approval_date = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")
         bpr_reviewal_chain = document&.get_reviewal_chain
         bpr_last_approval_level = bpr_reviewal_chain&.last ? bpr_reviewal_chain&.last[:level_number] : ""
         bpr_approval_levels = (1..bpr_last_approval_level&.to_i).to_a
@@ -246,7 +246,7 @@ module ApprovalTatReports::TatHelper
     end
 
     def find_ageing_days(document)
-      payment = document&.payments&.order(created_at: :desc)&.first&.processed_at
+      payment = document&.payments&.order(submitted_at: :desc)&.first&.processed_at
       ( document&.date && payment ) ? (payment&.to_date - document&.date&.to_date).to_i : ""
     end
 
