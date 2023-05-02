@@ -4,6 +4,7 @@ class Forms::Import::Ops::Create < Transactions::API
   step AssignModelUser(key: :created_by)
   step Forms::Contracts::Build()
   step Contract::Validate()
+  step :create_procurements
   step Contract::Persist(method: :sync)
   # step :set_approval_workflow!
   step Transactions::Messages::SuccessMessage('Record Saved')
@@ -12,6 +13,16 @@ class Forms::Import::Ops::Create < Transactions::API
     context[:form] = params.delete(:form)
     Rails.logger.info "Import::#{context[:form].label}_form"
     true
+  end
+
+  # Invoices and Purchase Orders needs procurements
+  def create_procurements(context, form:, params:, current_user:, **)
+    return true if form.model == YesBankVendor
+    unless context[:model].procurement_id.present?
+      proc = Procurement.create({name: "#{params['invoice_number']}"})
+      context[:model].procurement_id = proc.id
+    end
+    return true
   end
 
   def find_or_new_model(context, form:, params:, current_user:, **)
