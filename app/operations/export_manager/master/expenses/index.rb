@@ -221,7 +221,7 @@ class ExportManager::Master::Expenses::Index < ExportManager::Builders::Spreadsh
   end
 
   def reporting_amount(expense)
-    expense&.report.total_amount
+    expense&.report&.total_amount
   end
 
   def conversion_rate(expense)
