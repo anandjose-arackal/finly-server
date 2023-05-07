@@ -332,40 +332,60 @@ class Forms::Export::Processor
         end
       end
 
+      vendor_associations = {}
+      if content[:name] == 'Vendor'
+        vendor_ids = content[:data][:choices].map{|x| x['id']}
+        vendor_associations = YesBankVendor.where(id: vendor_ids).includes(:bank_accounts, :gstin_locations).map{|x| [x.vendor_id, [x.gstin_locations.pluck(:location).join(', ' ),x.bank_accounts.pluck(:name).join(', ' )]]}.to_h
+        begin
+          association_worksheet = workbook.add_worksheet('Vendor Associations')
+        rescue
+          next
+        end
+        ['Vendor', 'Vendor Locations', 'Vendor Accounts'].each_with_index do |title, index|
+          association_worksheet.set_column(0, index, title.length+10)
+          association_worksheet.write(0, index, title)
+        end
+        vendor_associations.keys.each_with_index do |key, row_index|
+          association_worksheet.write(1 + row_index, 0, key)
+          association_worksheet.write(1 + row_index, 1, vendor_associations[key][0])
+          association_worksheet.write(1 + row_index, 2, vendor_associations[key][1])
+        end
+      end
+
       # worksheet.hide if ['Status'].include? content[:name]
     end
   end
 
-  def add_xlookup_for_ids(workbook)
-    sections = self.headers.values.pluck(:name)
-    workbook.sheets.select {|x| sections.include? x.name }.each do |sheet|
-      sheet_name = sheet.name
-      data = self.headers[NAME_MAP[sheet_name.to_sym]]
-      next unless data.present?
-
-      data['headers'].keys.each_with_index.each do |key, index|
-        entity_type = data['headers'][key]['entity_type']
-        if %w[lookup dropdown].include?(entity_type)
-          name = data['headers'][key]['name']
-          look_up_sheet_name = name.gsub(" ID*", "").gsub(" ID", "")
-          Rails.logger.debug "Formula::=XLOOKUP(#{xl_rowcol_to_cell(2, index + 1)},'#{look_up_sheet_name}'!$B$2:$B$1048576,'#{look_up_sheet_name}'!$A$2:$A$1048576,0,0)"
-          sheet.write_formula(1, index, "=XLOOKUP(#{xl_rowcol_to_cell(1, index + 1)},'#{look_up_sheet_name}'!$B$2:$B$1048576,'#{look_up_sheet_name}'!$A$2:$A$1048576,0,0)")
-        elsif data['headers'][key][:lookup_value]
-          # options = header_data[:choices_array] || ['True', 'False']
-          name = data['headers'][key]['name']
-          look_up_sheet_name = name.gsub(" ID*", "").gsub(" ID", "")
-          Rails.logger.debug "ListValidation::#{name}::#{xl_rowcol_to_cell(1, index)}::#{"'#{look_up_sheet_name}'!B2:B1048576"}"
-          sheet.data_validation(1, index, 1048575, index, {
-            :validate => 'list',
-            :source => "'#{look_up_sheet_name}'!$B$2:$B$1048576"
-          })
-        elsif entity_type == 'switch'
-          sheet.data_validation(1, index, 1048575, index, {
-            :validate => 'list',
-            :source => %w[Yes No]
-          })
-        end
-      end
-    end
-  end
+  # def add_xlookup_for_ids(workbook)
+  #   sections = self.headers.values.pluck(:name)
+  #   workbook.sheets.select {|x| sections.include? x.name }.each do |sheet|
+  #     sheet_name = sheet.name
+  #     data = self.headers[NAME_MAP[sheet_name.to_sym]]
+  #     next unless data.present?
+  #
+  #     data['headers'].keys.each_with_index.each do |key, index|
+  #       entity_type = data['headers'][key]['entity_type']
+  #       if %w[lookup dropdown].include?(entity_type)
+  #         name = data['headers'][key]['name']
+  #         look_up_sheet_name = name.gsub(" ID*", "").gsub(" ID", "")
+  #         Rails.logger.debug "Formula::=XLOOKUP(#{xl_rowcol_to_cell(2, index + 1)},'#{look_up_sheet_name}'!$B$2:$B$1048576,'#{look_up_sheet_name}'!$A$2:$A$1048576,0,0)"
+  #         sheet.write_formula(1, index, "=XLOOKUP(#{xl_rowcol_to_cell(1, index + 1)},'#{look_up_sheet_name}'!$B$2:$B$1048576,'#{look_up_sheet_name}'!$A$2:$A$1048576,0,0)")
+  #       elsif data['headers'][key][:lookup_value]
+  #         # options = header_data[:choices_array] || ['True', 'False']
+  #         name = data['headers'][key]['name']
+  #         look_up_sheet_name = name.gsub(" ID*", "").gsub(" ID", "")
+  #         Rails.logger.debug "ListValidation::#{name}::#{xl_rowcol_to_cell(1, index)}::#{"'#{look_up_sheet_name}'!B2:B1048576"}"
+  #         sheet.data_validation(1, index, 1048575, index, {
+  #           :validate => 'list',
+  #           :source => "'#{look_up_sheet_name}'!$B$2:$B$1048576"
+  #         })
+  #       elsif entity_type == 'switch'
+  #         sheet.data_validation(1, index, 1048575, index, {
+  #           :validate => 'list',
+  #           :source => %w[Yes No]
+  #         })
+  #       end
+  #     end
+  #   end
+  # end
 end
