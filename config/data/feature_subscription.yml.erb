@@ -60,6 +60,7 @@ user:
       forms_config_enabled: <%= GlobalSearchFormsConfigToggle.new(current_user).enabled? %>
     form_features:
       forms_dropdown_autoselect_single_choice: <%= FormsDropdownAutoselectOnSingleChoice.new(current_user).enabled? %>
+      forms_rich_text_editor_for_procurement_enabled: <%= FormsRichTextEditorProcurementTermToggle.new(current_user).enabled? %>
 customer_specific:
   invoice_minimal_ui: <%=  MinimalInvoiceUiToggle.new(current_user).minimal_invoice_ui_enabled? %>
   dummy_bank_account: <%= current_company.yes_bank_vendors&.first&.id %>
