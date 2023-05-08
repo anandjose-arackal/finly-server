@@ -291,8 +291,21 @@ class Forms::Import::Processor
       end
       if record.save
         submit_params = { reviewal_document: record }
+        # document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(current_user, submit_params)
+        # unless document_reviewer_mappings_op.success?
+        #   return on_error context, document_reviewer_mappings_op.messages[:error]
+        # end
+        #
+        # next_level = model.dlrms.with_level_number(1).first&.level
+        # if next_level.present?
+        #   model.dlrms.with_level_id(next_level&.id).update_all(viewable: true)
+        #   model.update(controlling_level_id: next_level&.id)
+        # end
+
         if record.class == YesBankVendor
           op = Docs::P2P::Vendors::Ops::Submit.(params: submit_params, current_user: user)
+        elsif record.class == Invoice
+          op = Procurements::Invoices::Submit.(user, { id: record.id })
         end
         if op&.success?
           import_record.update_status(true, ['Record created successfully'].to_s, '', '')
