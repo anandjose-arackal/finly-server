@@ -535,7 +535,7 @@ class YesBankVendor < ApplicationRecord
     if RequestStoreUtil.current_user.blank?
       feature_flag_enabled = true
     else
-      feature_flag_enabled = vendortoggle.new(requeststoreutil.current_user).enabled?
+      feature_flag_enabled = VendorToggle.new(RequestStoreUtil.current_user).forms_enabled?
     end
       feature_flag_enabled
   end
