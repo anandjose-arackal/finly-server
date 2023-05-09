@@ -21,6 +21,7 @@ module ApprovalTatReports::TatHelper
     end
 
     def invoice_tat_report(documents, tat_reports)
+      documents = documents.where.not(invoice_status_id: InwardInvoiceStatus.id_for(:open))
       documents&.each do |document|
         data = {}
         data[:invoice_id] = document&.invoice_id
@@ -81,6 +82,7 @@ module ApprovalTatReports::TatHelper
     end
 
     def purchase_request_tat_report(documents, tat_reports)
+      documents = documents.where.not(purchase_request_status_id: PurchaseRequestStatus.id_for(:draft))
       documents&.each do |document|
         data = {}
         data[:purchase_request_no] = document&.order_number
@@ -105,6 +107,7 @@ module ApprovalTatReports::TatHelper
     end
 
     def purchase_order_tat_report(documents, tat_reports)
+      documents = documents.where.not(purchase_order_status_id: PurchaseOrderStatus.id_for(:open))
       documents&.each do |document|
         data = {}
         data[:purchase_order_no] = document&.po_number
@@ -130,6 +133,7 @@ module ApprovalTatReports::TatHelper
     end
 
     def bank_payment_request_tat_report(documents, tat_reports)
+      documents = documents.where.not(status_id: BankPaymentRequestStatus.id_for(:open))
       documents&.each do |document|
         data = {}
         data[:payment_ticket_created_by] = "#{document&.created_by&.first_name} #{document.created_by&.last_name}"
@@ -153,6 +157,7 @@ module ApprovalTatReports::TatHelper
     end
 
     def payment_agreement_tat_report(documents, tat_reports)
+      documents = documents.where.not(status_id: PaymentAgreementStatus.id_for(:draft))
       documents&.each do |document|
         data = {}
         data[:agreement_no] = document&.order_number
@@ -178,6 +183,7 @@ module ApprovalTatReports::TatHelper
     end
 
     def bbps_biller_subscriptions_tat_report(documents, tat_reports)
+      documents = documents.where.not(status_id: BbpsBillerSubscriptionStatus.id_for(:draft))
       documents&.each do |document|
         data = {}
         data[:utility_id] = document&.sequence_id
@@ -202,6 +208,7 @@ module ApprovalTatReports::TatHelper
     end
 
     def vendors_tat_report(documents, tat_reports)
+      documents = documents.where.not(status_id: VendorStatus.id_for(:draft))
       documents&.each do |document|
         data = {}
         data[:vendor_number] = document&.vendor_id
