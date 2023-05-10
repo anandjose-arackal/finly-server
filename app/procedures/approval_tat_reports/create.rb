@@ -14,25 +14,11 @@ class ApprovalTatReports::Create < Transactions::API
 
   def check_open_status_records(options, params:, current_user:, **)
     params[:paginate] = false
-    result = IndexBuilder::Show.(params: params, current_user: current_user)
-    case params.dig(:route).upcase
-    when "INVOICES"
-      result = result['model.records'].where.not(invoice_status_id: InwardInvoiceStatus.id_for(:open))
-    when "PURCHASE_REQUESTS"
-      result = result['model.records'].where.not(purchase_request_status_id: PurchaseRequestStatus.id_for(:draft))
-    when "PURCHASE_ORDERS"
-      result = result['model.records'].where.not(purchase_order_status_id: PurchaseOrderStatus.id_for(:open))
-    when "PAYMENT_TICKETS"
-      result = result['model.records'].where.not(status_id: BankPaymentRequestStatus.id_for(:open))
-    when "AGREEMENTS"
-      result = result['model.records'].where.not(status_id: PaymentAgreementStatus.id_for(:draft))
-    when "UTILITY_SUBSCRIPTIONS"
-      result = result['model.records'].where.not(status_id: BbpsBillerSubscriptionStatus.id_for(:draft))
-    when "VENDORS"
-      result = result['model.records'].where.not(status_id: VendorStatus.id_for(:draft))
-    end
+    index_result = IndexBuilder::Show.(params: params, current_user: current_user)
+    total_index_result_count = index_result['model.records'].count
+    open_status_documents_count = result['model.records'].where(submitted_at: nil).count
 
-    if result.empty?
+    if total_index_result_count == open_status_documents_count
       add_message options, :error, :base, "Filter data only contain open status records, tat report won't export to only open status records"
       return false
     end
