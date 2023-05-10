@@ -16,7 +16,7 @@ class ApprovalTatReports::Create < Transactions::API
     params[:paginate] = false
     index_result = IndexBuilder::Show.(params: params, current_user: current_user)
     total_index_result_count = index_result['model.records'].count
-    open_status_documents_count = result['model.records'].where(submitted_at: nil).count
+    open_status_documents_count = index_result['model.records'].where(submitted_at: nil).count
 
     if total_index_result_count == open_status_documents_count
       add_message options, :error, :base, "Filter data only contain open status records, tat report won't export to only open status records"
