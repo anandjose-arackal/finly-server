@@ -45,7 +45,7 @@ module ApprovalTatReports::TatHelper
 
         assign_reviewers_data(data, invoice_approval_levels, invoice_actual_approval_levels, invoice_reviewal_chain, last_level_approval_date)
 
-        invoice_payment_ticket = document&.payments&.order(submitted_at: :desc)&.first&.payment_order&.bank_payment_request
+        invoice_payment_ticket = document&.payments&.order(created_at: :desc)&.first&.payment_order&.bank_payment_request
 
         data[:payment_ticket_created_by] = "#{invoice_payment_ticket&.created_by&.first_name} #{invoice_payment_ticket&.created_by&.last_name}"
         payment_ticket_created_at = invoice_payment_ticket&.submitted_at&.to_date&.strftime("%d-%m-%Y")
@@ -246,7 +246,7 @@ module ApprovalTatReports::TatHelper
     end
 
     def find_ageing_days(document)
-      payment = document&.payments&.order(submitted_at: :desc)&.first&.processed_at
+      payment = document&.payments&.order(created_at: :desc)&.first&.processed_at
       ( document&.date && payment ) ? (payment&.to_date - document&.date&.to_date).to_i : ""
     end
 

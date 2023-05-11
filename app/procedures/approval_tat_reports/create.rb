@@ -15,12 +15,8 @@ class ApprovalTatReports::Create < Transactions::API
   def check_open_status_records(options, params:, current_user:, **)
     params[:paginate] = false
     index_result = IndexBuilder::Show.(params: params, current_user: current_user)
-    total_index_result_count = index_result['model.records'].count
-    if params.dig(:route).upcase == "INVOICES"
-      open_status_documents_count = index_result['model.records'].where(invoice_status_id: InwardInvoiceStatus.id_for(:open)).count
-    else
-      open_status_documents_count = index_result['model.records'].where(submitted_at: nil).count
-    end
+    total_index_result_count = index_result['model.records']&.count
+    open_status_documents_count = index_result['model.records'].where(submitted_at: nil)&.count
 
     if total_index_result_count == open_status_documents_count
       add_message options, :error, :base, "Filter data only contain open status records, tat report won't export to only open status records"
