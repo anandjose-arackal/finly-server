@@ -11,7 +11,7 @@ class ApprovalTatReports::TatExport < Transactions::API
   fail :send_mail_data_not_found
 
   def tat_reports_data(options, params:, current_user:, **)
-    params[:paginate] = false
+    params[:tat_report_paginate] = true
     RequestStoreUtil.set_current_user(current_user)
     result = IndexBuilder::Show.(params: params, current_user: current_user)
     return false  unless result['model.records'].present?

@@ -1,5 +1,5 @@
 class ApprovalTatReports::Create < Transactions::API
-  
+
   step :check_feature_flag
   step :check_open_status_records
   step :run_background_job
@@ -13,7 +13,7 @@ class ApprovalTatReports::Create < Transactions::API
   end
 
   def check_open_status_records(options, params:, current_user:, **)
-    params[:paginate] = false
+    params[:tat_report_paginate] = true
     index_result = IndexBuilder::Show.(params: params, current_user: current_user)
     total_index_result_count = index_result['model.records']&.count
     open_status_documents_count = index_result['model.records'].where(submitted_at: nil)&.count

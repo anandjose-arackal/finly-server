@@ -98,9 +98,9 @@ module ApprovalTatReports::TatHelper
         pr_approval_levels = (1..pr_last_approval_level&.to_i).to_a
         pr_actual_approval_levels = pr_reviewal_chain&.map { |review_chain|  review_chain[:level_number]}
 
-        assign_reviewers_data(data, pr_approval_levels, pr_actual_approval_levels, pr_reviewal_chain, last_level_approval_date)
+        last_level_approval_date = assign_reviewers_data(data, pr_approval_levels, pr_actual_approval_levels, pr_reviewal_chain, last_level_approval_date)
 
-        data[:pr_ageing] = (document&.submitted_at && last_level_approval_date) ? (last_level_approval_date&.to_date - document&.submitted_at&.to_date)&.to_i : ""
+        data[:pr_ageing] = (document&.submitted_at && last_level_approval_date.present?) ? (last_level_approval_date&.to_date - document&.submitted_at&.to_date)&.to_i : ""
         tat_reports.push(data.with_indifferent_access)
       end
       return tat_data(tat_reports)
@@ -124,9 +124,9 @@ module ApprovalTatReports::TatHelper
         po_approval_levels = (1..po_last_approval_level&.to_i).to_a
         po_actual_approval_levels = po_reviewal_chain&.map { |review_chain|  review_chain[:level_number]}
 
-        assign_reviewers_data(data, po_approval_levels, po_actual_approval_levels, po_reviewal_chain, last_level_approval_date)
+        last_level_approval_date = assign_reviewers_data(data, po_approval_levels, po_actual_approval_levels, po_reviewal_chain, last_level_approval_date)
 
-        data[:po_ageing] = (document&.submitted_at && last_level_approval_date) ? (last_level_approval_date&.to_date - document&.submitted_at&.to_date)&.to_i : ""
+        data[:po_ageing] = (document&.submitted_at && last_level_approval_date.present?) ? (last_level_approval_date&.to_date - document&.submitted_at&.to_date)&.to_i : ""
         tat_reports.push(data.with_indifferent_access)
       end
       return tat_data(tat_reports)
@@ -148,9 +148,9 @@ module ApprovalTatReports::TatHelper
         bpr_approval_levels = (1..bpr_last_approval_level&.to_i).to_a
         bpr_actual_approval_levels = bpr_reviewal_chain&.map { |review_chain|  review_chain[:level_number]}
 
-        assign_reviewers_data(data, bpr_approval_levels, bpr_actual_approval_levels, bpr_reviewal_chain, last_level_approval_date)
+        last_level_approval_date = assign_reviewers_data(data, bpr_approval_levels, bpr_actual_approval_levels, bpr_reviewal_chain, last_level_approval_date)
 
-        data[:payment_ageing] = (document&.submitted_at && last_level_approval_date) ? ( last_level_approval_date&.to_date - document&.submitted_at&.to_date)&.to_i : ""
+        data[:payment_ageing] = (document&.submitted_at && last_level_approval_date.present?) ? ( last_level_approval_date&.to_date - document&.submitted_at&.to_date)&.to_i : ""
         tat_reports.push(data.with_indifferent_access)
       end
       return tat_data(tat_reports)
@@ -174,9 +174,9 @@ module ApprovalTatReports::TatHelper
         pa_approval_levels = (1..pa_last_approval_level&.to_i).to_a
         pa_actual_approval_levels = pa_reviewal_chain&.map { |review_chain|  review_chain[:level_number]}
 
-        assign_reviewers_data(data, pa_approval_levels, pa_actual_approval_levels, pa_reviewal_chain, last_level_approval_date)
+        last_level_approval_date = assign_reviewers_data(data, pa_approval_levels, pa_actual_approval_levels, pa_reviewal_chain, last_level_approval_date)
 
-        data[:agrement_ageing] = (document&.submitted_at && last_level_approval_date) ? ( last_level_approval_date&.to_date - document&.submitted_at&.to_date)&.to_i : ""
+        data[:agrement_ageing] = (document&.submitted_at && last_level_approval_date.present?) ? ( last_level_approval_date&.to_date - document&.submitted_at&.to_date)&.to_i : ""
         tat_reports.push(data.with_indifferent_access)
       end
       return tat_data(tat_reports)
@@ -199,9 +199,9 @@ module ApprovalTatReports::TatHelper
         bbps_approval_levels = (1..bbps_last_approval_level&.to_i).to_a
         bbps_actual_approval_levels = bbps_reviewal_chain&.map { |review_chain|  review_chain[:level_number]}
 
-        assign_reviewers_data(data, bbps_approval_levels, bbps_actual_approval_levels, bbps_reviewal_chain, last_level_approval_date)
+        last_level_approval_date = assign_reviewers_data(data, bbps_approval_levels, bbps_actual_approval_levels, bbps_reviewal_chain, last_level_approval_date)
 
-        data[:utility_ageing ] = (document&.submitted_at && last_level_approval_date) ? (last_level_approval_date&.to_date - document&.submitted_at&.to_date)&.to_i : ""
+        data[:utility_ageing ] = (document&.submitted_at && last_level_approval_date.present?) ? (last_level_approval_date&.to_date - document&.submitted_at&.to_date)&.to_i : ""
         tat_reports.push(data.with_indifferent_access)
       end
       return tat_data(tat_reports)
@@ -225,9 +225,9 @@ module ApprovalTatReports::TatHelper
         vendor_approval_levels = (1..vendor_last_approval_level&.to_i).to_a
         vendor_actual_approval_levels = vendor_reviewal_chain&.map { |review_chain|  review_chain[:level_number]}
 
-        assign_reviewers_data(data, vendor_approval_levels, vendor_actual_approval_levels, vendor_reviewal_chain, last_level_approval_date)
+        last_level_approval_date = assign_reviewers_data(data, vendor_approval_levels, vendor_actual_approval_levels, vendor_reviewal_chain, last_level_approval_date)
 
-        data[:vendor_ageing ] = (document&.submitted_at && last_level_approval_date) ? (last_level_approval_date&.to_date - document&.submitted_at&.to_date)&.to_i : ""
+        data[:vendor_ageing ] = (document&.submitted_at && last_level_approval_date.present?) ? (last_level_approval_date&.to_date - document&.submitted_at&.to_date)&.to_i : ""
         data[:vendor_last_modified] = document&.updated_at&.strftime("%d-%m-%Y %T")
         tat_reports.push(data.with_indifferent_access)
       end
@@ -239,9 +239,11 @@ module ApprovalTatReports::TatHelper
         
       if reviewer.present?
         return reviewer.first.dig(:name)
-      else
+      elsif review_chain.dig(:taken_control_by,:name).present?
         return review_chain.dig(:taken_control_by,:name)
-      end 
+      elsif review_chain.dig(:forwarded_to,:name).present?
+        return review_chain.dig(:forwarded_to,:name)
+      end
 
     end
 
@@ -266,6 +268,7 @@ module ApprovalTatReports::TatHelper
           data["level_#{each_level}_interval_from_last_level"] = ""
         end
       end
+      last_level_approval_date
     end
 
     def tat_data(tat_reports)
