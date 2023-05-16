@@ -19,14 +19,14 @@ class ApprovalTatReports::Create < Transactions::API
     open_status_documents_count = index_result['model.records'].where(submitted_at: nil)&.count
 
     if total_index_result_count == open_status_documents_count
-      add_message options, :error, :base, "Filter data only contain open status records, tat report won't export to only open status records"
+      add_message options, :error, :base, "Open Status transaction cannot be exported in the TAT report, please choose a different filter and try again."
       return false
     end
     true
   end
 
   def run_background_job(options, params:, current_user:, **)
-    add_message options, :success, :base, "Approval Tat report export file has been initiated. You will receive an email shortly."
+    add_message options, :success, :base, "You will receive an email on completion of the export with an attachment containing data. Transactions with Open Status will not be included in the TAT report."
     ApprovalTatReports::TatExport.call_async(params: params, current_user: current_user)
     true
   end
