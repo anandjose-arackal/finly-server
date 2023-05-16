@@ -448,7 +448,7 @@ class Forms::Import::Processor
         end
         
         # running lookup fetch on all lookups
-        if header_data[:entity_type] == 'lookup' && form_data[header_data[:entity_key]].present? #header_data[:entity].has_dependents
+        if header_data[:entity_type] == 'lookup' && header_data[:entity].choices_scope.present? && form_data[header_data[:entity_key]].present? #header_data[:entity].has_dependents
           params_hash = {:entity_path => header_data[:entity].entity_path, :route => form.label.underscore.to_s, :value => form_data[header_data[:entity_key]]}
           current_user = user
           lookup_data = Forms::Ops::LookupDetails.(params: params_hash, current_user: current_user)[:data]
@@ -497,7 +497,7 @@ class Forms::Import::Processor
             end
 
             # running lookup fetch on all lookups
-            if header_data[:entity_type] == 'lookup' && data[header_data[:entity_key]].present? #header_data[:entity].has_dependents
+            if header_data[:entity_type] == 'lookup' && header_data[:entity].choices_scope.present? && data[header_data[:entity_key]].present? #header_data[:entity].has_dependents
               params_hash = {:entity_path => header_data[:entity].entity_path, :route => form.label.underscore.to_s, :value => data[header_data[:entity_key]]}
               current_user = user
               lookup_data = Forms::Ops::LookupDetails.(params: params_hash, current_user: current_user)[:data].map{|k, v| [k.split('.').last, v]}.to_h rescue {}
