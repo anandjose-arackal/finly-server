@@ -102,12 +102,12 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
 
   # INVOICE STATUS
   section :status do
-    lookup :invoice_status_id,
-           choices_scope: Choices[:lookup].('inward_invoice_statuses'),
-           # Choices[:enum].(InwardInvoiceStatus),
-           required: false, editable: false,
-           default_value: InwardInvoiceStatus.id_for(:open),
-           can_editable_be_changed: false
+    # lookup :invoice_status_id,
+    #        choices_scope: Choices[:lookup].('inward_invoice_statuses'),
+    #        # Choices[:enum].(InwardInvoiceStatus),
+    #        required: false, editable: false,
+    #        default_value: InwardInvoiceStatus.id_for(:open),
+    #        can_editable_be_changed: false
   end
 
   # INVOICE DETAILS
