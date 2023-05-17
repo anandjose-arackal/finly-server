@@ -15,10 +15,25 @@ class ApprovalTatReports::Create < Transactions::API
   def check_open_status_records(options, params:, current_user:, **)
     params[:tat_report_paginate] = true
     index_result = IndexBuilder::Show.(params: params, current_user: current_user)
-    total_index_result_count = index_result['model.records']&.count
-    open_status_documents_count = index_result['model.records'].where(submitted_at: nil)&.count
+    index_result_documents = index_result['model.records']
+    total_documents_count = index_result_documents&.count
+    exclude_open_documents_count = 0
 
-    if total_index_result_count == open_status_documents_count
+    case params.dig(:route).upcase
+      when "INVOICES" || "PURCHASE_ORDERS" || "PAYMENT_TICKETS"
+        exclude_open_documents_count = index_result_documents.not_open.count
+      when "PURCHASE_REQUESTS" || "AGREEMENTS"
+        exclude_open_documents_count = index_result_documents.not_draft.count
+      when "VENDORS"
+        exclude_open_documents_count = index_result_documents.non_draft.count
+      when "UTILITY_SUBSCRIPTIONS"
+        exclude_open_documents_count = index_result_documents.where.not(status_id: BbpsBillerSubscriptionStatus.id_for(:draft)).count
+      end
+    end
+
+    open_documents_count = total_documents_count - exclude_open_documents_count
+
+    if total_documents_count == open_documents_count
       add_message options, :error, :base, "Open Status transaction cannot be exported in the TAT report, please choose a different filter and try again."
       return false
     end
