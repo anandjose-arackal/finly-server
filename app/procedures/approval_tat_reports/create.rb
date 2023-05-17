@@ -19,17 +19,17 @@ class ApprovalTatReports::Create < Transactions::API
     total_documents_count = index_result_documents&.count
     exclude_open_documents_count = 0
 
-    case params.dig(:route).upcase
-      when "INVOICES" || "PURCHASE_ORDERS" || "PAYMENT_TICKETS"
-        exclude_open_documents_count = index_result_documents.not_open.count
-      when "PURCHASE_REQUESTS" || "AGREEMENTS"
-        exclude_open_documents_count = index_result_documents.not_draft.count
-      when "VENDORS"
-        exclude_open_documents_count = index_result_documents.non_draft.count
-      when "UTILITY_SUBSCRIPTIONS"
-        exclude_open_documents_count = index_result_documents.where.not(status_id: BbpsBillerSubscriptionStatus.id_for(:draft)).count
+      case params.dig(:route).upcase
+        when "INVOICES" || "PURCHASE_ORDERS" || "PAYMENT_TICKETS"
+          exclude_open_documents_count = index_result_documents.not_open.count
+        when "PURCHASE_REQUESTS" || "AGREEMENTS"
+          exclude_open_documents_count = index_result_documents.not_draft.count
+        when "VENDORS"
+          exclude_open_documents_count = index_result_documents.non_draft.count
+        when "UTILITY_SUBSCRIPTIONS"
+          exclude_open_documents_count = index_result_documents.where.not(status_id: BbpsBillerSubscriptionStatus.id_for(:draft)).count
       end
-    end
+
 
     open_documents_count = total_documents_count - exclude_open_documents_count
 
