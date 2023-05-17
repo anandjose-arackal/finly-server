@@ -17,6 +17,7 @@ class Admin::Implementations::Master::ItemMasters::ImportTemplates < Admin::Impl
       :rate => "Rate",
       :tax_rate_id => "Tax Rate Id",
       :unit_of_measurement => "UOM",
+      :sku => "SKU",
       :destroy => "Destroy"
   })
   def valid_request

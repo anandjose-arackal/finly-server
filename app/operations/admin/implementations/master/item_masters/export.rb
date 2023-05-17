@@ -18,6 +18,7 @@ class Admin::Implementations::Master::ItemMasters::Export < Admin::Implementatio
       :rate => "Rate",
       :tax_rate_id => "Tax Rate Id",
       :unit_of_measurement => "UOM",
+      :sku => "SKU",
       :destroy => "Destroy"
   })
   def valid_request
@@ -82,6 +83,10 @@ class Admin::Implementations::Master::ItemMasters::Export < Admin::Implementatio
 
   def tax_rate_id(item)
     item.tax_rate_id
+  end
+
+  def sku(item)
+    item.sku
   end
 
 
