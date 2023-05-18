@@ -17,21 +17,24 @@ class ApprovalTatReports::Create < Transactions::API
     index_result = IndexBuilder::Show.(params: params, current_user: current_user)
     index_result_documents = index_result['model.records']
     total_documents_count = index_result_documents&.count
-    exclude_open_documents_count = 0
+    open_documents_count = 0
 
-      case params.dig(:route).upcase
-        when "INVOICES" || "PURCHASE_ORDERS" || "PAYMENT_TICKETS"
-          exclude_open_documents_count = index_result_documents.not_open.count
-        when "PURCHASE_REQUESTS" || "AGREEMENTS"
-          exclude_open_documents_count = index_result_documents.not_draft.count
-        when "VENDORS"
-          exclude_open_documents_count = index_result_documents.non_draft.count
-        when "UTILITY_SUBSCRIPTIONS"
-          exclude_open_documents_count = index_result_documents.where.not(status_id: BbpsBillerSubscriptionStatus.id_for(:draft)).count
-      end
-
-
-    open_documents_count = total_documents_count - exclude_open_documents_count
+    case params.dig(:route).upcase
+      when "INVOICES"
+        open_documents_count = index_result_documents.where(invoice_status_id: InwardInvoiceStatus.id_for(:open))&.count
+      when "PURCHASE_REQUESTS"
+        open_documents_count = index_result_documents.where(purchase_request_status_id: PurchaseRequestStatus.id_for(:draft))&.count
+      when "PURCHASE_ORDERS"
+        open_documents_count = index_result_documents.where(purchase_order_status_id: PurchaseOrderStatus.id_for(:open))&.count
+      when "PAYMENT_TICKETS"
+        open_documents_count = index_result_documents.where(status_id: BankPaymentRequestStatus.id_for(:open))&.count
+      when  "AGREEMENTS"
+        open_documents_count = index_result_documents.where(status_id: PaymentAgreementStatus.id_for(:draft))&.count
+      when "UTILITY_SUBSCRIPTIONS"
+        open_documents_count = index_result_documents.where(status_id: BbpsBillerSubscriptionStatus.id_for(:draft))&.count
+      when "VENDORS"
+        open_documents_count = index_result_documents.where(status_id: VendorStatus.id_for(:draft))&.count
+    end
 
     if total_documents_count == open_documents_count
       add_message options, :error, :base, "Open Status transaction cannot be exported in the TAT report, please choose a different filter and try again."
