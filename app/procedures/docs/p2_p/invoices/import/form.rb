@@ -220,7 +220,7 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
            filters: Rules::Builder['billable_location'].true, required: true
     text :billing_address_name, label: 'Name', editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.name}}'), visible: false
     text :billing_address_gstin, label: 'Gstin', editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.gstin}}'), visible: false
-    large_text :billing_address, computed: Forms::Compute::Lookup('location_id', '{{record.address}}')
+    large_text :billing_address, computed: Forms::Compute::Lookup('location_id', '{{record.address}}'), hide_in_import: true
     text :billing_state_name, computed: Forms::Compute::Lookup('location_id', '{{record.state_name}}'), visible: false
   end
 
@@ -230,7 +230,7 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
            filters: Rules::Builder['shippable_location'].true, required: true
     text :shipping_address_name, label: 'Name', editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.name}}'), visible: false
     text :shipping_address_gstin, label: 'Gstin', editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.gstin}}'), visible: false
-    large_text :shipping_address, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.address}}')
+    large_text :shipping_address, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.address}}'), hide_in_import: true
   end
 
   # INVOICE ITEMS
@@ -256,8 +256,8 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
 
       lookup :product_type_id, label: "Product Type", choices_scope: Choices[:enum].(ProductType), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.product_type_id}}'), editable: false, required: true, visible: true, size: FormEntity::SIZES[:small]
 
-      lookup :items_department_id, label: "Department", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('departments', assignments: { form: true })
-      lookup :items_cost_center_id, label: "Cost Center", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('cost_centers')
+      lookup :items_department_id, label: "Department", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('departments', assignments: { form: true })
+      lookup :items_cost_center_id, label: "Cost Center", editable: true, visible: true, required: true, choices_scope: Choices[:lookup].('cost_centers')
 
       lookup :category_id, label: "Category", required: true, visible: true, editable: false, choices_scope: Choices[:lookup].('categories', scope: :inward_invoice_line_items_only), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.category_id}}'), triggers: {on_compute: {lookup_details: [:category_id]}}, size: FormEntity::SIZES[:medium]
 
@@ -685,10 +685,10 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
 
   condition condition_id: "Disable item department > Item department not for Header Cost Allocation Items" do
     reference :entity, 'items.items_department_id'
-    rule Rules::Builder[:cost_allocation_items].eq_any(value: true)
-    action :visible, true
-    action :required, true
-    action :editable, true
+    rule Rules::Builder[:cost_allocation_items].eq_any(value: false)
+    action :visible, false
+    action :required, false
+    action :editable, false
   end
 
   condition condition_id: "Enable item department > Item Cost Center for Header Cost Allocation Items" do
@@ -701,10 +701,10 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
 
   condition condition_id: "Disable item Cost Center > Item Cost Center not for Header Cost Allocation Items" do
     reference :entity, 'items.items_cost_center_id'
-    rule Rules::Builder[:cost_allocation_items].eq_any(value: true)
-    action :visible, true
-    action :required, true
-    action :editable, true
+    rule Rules::Builder[:cost_allocation_items].eq_any(value: false)
+    action :visible, false
+    action :required, false
+    action :editable, false
   end
 
   condition condition_id: "Enable item Cost Center > Item Cost Center for Header Cost Allocation Items" do
