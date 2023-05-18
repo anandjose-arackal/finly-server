@@ -120,11 +120,7 @@ class IndexBuilder::API
     # context["params"].deep_merge!(resolver[:params])
 
     raise 'Resolver not found' if resolver[:route].blank?
-    
-    if context[:params][:tat_report_paginate]
-      paginate = false
-    end
-    
+
     Resolver::Transactions::Resolve.with(context, route: resolver[:route], paginate: paginate, filter: filter)
   end
 
