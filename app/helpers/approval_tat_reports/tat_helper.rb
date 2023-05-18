@@ -22,7 +22,7 @@ module ApprovalTatReports::TatHelper
 
     def invoice_tat_report(documents, tat_reports)
       filtered_documents = documents.not_open
-      filtered_documents&.each do |document|
+      filtered_documents&.includes(:payments,:vendor,:policy,:status)&.find_each do |document|
         data = {}
         data[:invoice_id] = document&.invoice_id
         data[:business_name] = document&.vendor&.business_name
