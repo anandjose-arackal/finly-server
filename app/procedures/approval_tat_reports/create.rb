@@ -1,10 +1,20 @@
 class ApprovalTatReports::Create < Transactions::API
 
+  user_model [User, AdminUser]
+
   step :check_feature_flag
+  step :find_builder
+  pass :resolve
   step :check_open_status_records
   step :run_background_job
 
-  def check_feature_flag(options,params:, current_user:, **)
+  schema do
+    params do
+      required(:route)
+    end
+  end
+
+  def check_feature_flag(context,params:, current_user:, **)
     unless ApprovalTatReportsToggle.new(current_user).enabled?
       add_message options, :error, :base, "Tat reports feature is not enabled"
       return false
@@ -12,10 +22,22 @@ class ApprovalTatReports::Create < Transactions::API
     true
   end
 
-  def check_open_status_records(options, params:, current_user:, **)
-    params[:tat_report_paginate] = true
-    index_result = IndexBuilder::Show.(params: params, current_user: current_user)
-    index_result_documents = index_result['model.records']
+  def find_builder(context, params:, **)
+    route = IndexBuilder::Router[params[:route]]&.first
+    unless route.present?
+      return on_error context, :route, 'not found'
+    end
+    
+    context[:builder] = route.klass
+    true
+  end
+
+  def resolve(context, builder:, params:, **)
+    builder.resolve(context, paginate: false)
+  end
+
+  def check_open_status_records(context, params:, current_user:, **)
+    index_result_documents = context['model.records']
     total_documents_count = index_result_documents&.count
     open_documents_count = 0
 
@@ -40,10 +62,11 @@ class ApprovalTatReports::Create < Transactions::API
       add_message options, :error, :base, "Open Status transaction cannot be exported in the TAT report, please choose a different filter and try again."
       return false
     end
+
     true
   end
 
-  def run_background_job(options, params:, current_user:, **)
+  def run_background_job(context, params:, current_user:, **)
     add_message options, :success, :base, "You will receive an email on completion of the export with an attachment containing data. Transactions with Open Status will not be included in the TAT report."
     ApprovalTatReports::TatExport.call_async(params: params, current_user: current_user)
     true
