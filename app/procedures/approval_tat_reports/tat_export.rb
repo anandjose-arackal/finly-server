@@ -4,7 +4,7 @@ class ApprovalTatReports::TatExport < Transactions::API
   include Writexlsx::Utility
   include ApprovalTatReports::TatHelper
 
-  sidekiq_options retry: 0
+  sidekiq_options queue: :tat_reports_queue, retry: 0
 
   step :find_builder
   step :tat_reports_data

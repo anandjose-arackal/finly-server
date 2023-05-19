@@ -21,8 +21,12 @@ module ApprovalTatReports::TatHelper
     end
 
     def invoice_tat_report(documents, tat_reports)
-      filtered_documents = documents.not_open
-      filtered_documents&.includes(:payments,:vendor,:policy,:status,:amount)&.find_each do |document|
+      if ApprovalTatReportsOptimizeToggle.new(current_user).enabled?
+        filtered_documents = documents&.not_open&.includes(:payments,:vendor,:policy,:status,:amount)
+      else
+        filtered_documents = documents&.not_open
+      end
+      filtered_documents&.find_each do |document|
         data = {}
         data[:invoice_id] = document&.invoice_id
         data[:business_name] = document&.vendor&.business_name
@@ -82,8 +86,12 @@ module ApprovalTatReports::TatHelper
     end
 
     def purchase_request_tat_report(documents, tat_reports)
-      filtered_documents = documents.not_draft
-      filtered_documents&.includes(:policy,:status)&.find_each do |document|
+      if ApprovalTatReportsOptimizeToggle.new(current_user).enabled?
+        filtered_documents = documents&.not_open&.includes(:policy,:status)
+      else
+        filtered_documents = documents.not_draft
+      end
+      filtered_documents&.find_each do |document|
         data = {}
         data[:purchase_request_no] = document&.order_number
         data[:policy_name] = document&.policy&.name
@@ -107,8 +115,12 @@ module ApprovalTatReports::TatHelper
     end
 
     def purchase_order_tat_report(documents, tat_reports)
-      filtered_documents = documents.not_open
-      filtered_documents&.includes(:policy,:status)&.find_each do |document|
+      if ApprovalTatReportsOptimizeToggle.new(current_user).enabled?
+        filtered_documents = documents&.not_open&.includes(:policy,:status)
+      else
+        filtered_documents = documents.not_open
+      end
+      filtered_documents&.find_each do |document|
         data = {}
         data[:purchase_order_no] = document&.po_number
         data[:vendor_name] = document&.vendor&.business_name
@@ -133,8 +145,12 @@ module ApprovalTatReports::TatHelper
     end
 
     def bank_payment_request_tat_report(documents, tat_reports)
-      filtered_documents = documents.not_open
-      filtered_documents&.includes(:status)&.find_each do |document|
+      if ApprovalTatReportsOptimizeToggle.new(current_user).enabled?
+        filtered_documents = documents&.not_open&.includes(:status)
+      else
+        filtered_documents = documents.not_open
+      end
+      filtered_documents&.find_each do |document|
         data = {}
         data[:payment_ticket_created_by] = "#{document&.created_by&.first_name} #{document.created_by&.last_name}"
         payment_ticket_created_at = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")
@@ -157,8 +173,12 @@ module ApprovalTatReports::TatHelper
     end
 
     def payment_agreement_tat_report(documents, tat_reports)
-      filtered_documents = documents.not_draft
-      filtered_documents&.includes(:policy,:status)&.find_each do |document|
+      if ApprovalTatReportsOptimizeToggle.new(current_user).enabled?
+        filtered_documents = documents&.not_draft&.includes(:policy,:status)
+      else
+        filtered_documents = documents&.not_draft
+      end
+      filtered_documents&.find_each do |document|
         data = {}
         data[:agreement_no] = document&.order_number
         # data[:vendor_name] = document&.vendor&.business_name
@@ -183,8 +203,12 @@ module ApprovalTatReports::TatHelper
     end
 
     def bbps_biller_subscriptions_tat_report(documents, tat_reports)
-      filtered_documents = documents.where.not(status_id: BbpsBillerSubscriptionStatus.id_for(:draft))
-      filtered_documents&.includes(:policy,:status)&.find_each do |document|
+      if ApprovalTatReportsOptimizeToggle.new(current_user).enabled?
+        filtered_documents = documents.where.not(status_id: BbpsBillerSubscriptionStatus.id_for(:draft))&.includes(:policy,:status)
+      else
+        filtered_documents = documents.not_draft
+      end
+      filtered_documents&.find_each do |document|
         data = {}
         data[:utility_id] = document&.sequence_id
         data[:vendor_name] = document&.biller&.biller_name
@@ -208,8 +232,12 @@ module ApprovalTatReports::TatHelper
     end
 
     def vendors_tat_report(documents, tat_reports)
-      filtered_documents = documents.non_draft
-      filtered_documents&.includes(:policy,:status)&.find_each do |document|
+      if ApprovalTatReportsOptimizeToggle.new(current_user).enabled?
+        filtered_documents =  documents.non_draft&.includes(:policy,:status)
+      else
+        filtered_documents = documents.non_draft
+      end
+      filtered_documents&.find_each do |document|
         data = {}
         data[:vendor_number] = document&.vendor_id
         data[:vendor_legal_name] = document&.business_name
