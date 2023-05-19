@@ -1,27 +1,27 @@
 module ApprovalTatReports::TatHelper
     
-    def export_report(documents,route)
+    def export_report(documents,route,optimize_tat_report)
       tat_reports = []
       case route.upcase
       when "INVOICES"
-        return invoice_tat_report(documents, tat_reports)
+        return invoice_tat_report(documents, tat_reports, optimize_tat_report)
       when "PURCHASE_REQUESTS"
-        return purchase_request_tat_report(documents, tat_reports)
+        return purchase_request_tat_report(documents, tat_reports, optimize_tat_report)
       when "PURCHASE_ORDERS"
-        return purchase_order_tat_report(documents, tat_reports)
+        return purchase_order_tat_report(documents, tat_reports, optimize_tat_report)
       when "PAYMENT_TICKETS"
-        return bank_payment_request_tat_report(documents, tat_reports)
+        return bank_payment_request_tat_report(documents, tat_reports, optimize_tat_report)
       when "AGREEMENTS"
-        return payment_agreement_tat_report(documents, tat_reports)
+        return payment_agreement_tat_report(documents, tat_reports, optimize_tat_report)
       when "UTILITY_SUBSCRIPTIONS"
-        return bbps_biller_subscriptions_tat_report(documents, tat_reports)
+        return bbps_biller_subscriptions_tat_report(documents, tat_reports, optimize_tat_report)
       when "VENDORS"
-        return vendors_tat_report(documents, tat_reports)
+        return vendors_tat_report(documents, tat_reports, optimize_tat_report)
       end
     end
 
-    def invoice_tat_report(documents, tat_reports)
-      if ApprovalTatReportsOptimizeToggle.new(current_user).enabled?
+    def invoice_tat_report(documents, tat_reports, optimize_tat_report)
+      if optimize_tat_report
         filtered_documents = documents&.not_open&.includes(:payments,:vendor,:policy,:status,:amount)
       else
         filtered_documents = documents&.not_open
@@ -85,8 +85,8 @@ module ApprovalTatReports::TatHelper
       return tat_data(tat_reports)
     end
 
-    def purchase_request_tat_report(documents, tat_reports)
-      if ApprovalTatReportsOptimizeToggle.new(current_user).enabled?
+    def purchase_request_tat_report(documents, tat_reports, optimize_tat_report)
+      if optimize_tat_report
         filtered_documents = documents&.not_open&.includes(:policy,:status)
       else
         filtered_documents = documents.not_draft
@@ -114,8 +114,8 @@ module ApprovalTatReports::TatHelper
       return tat_data(tat_reports)
     end
 
-    def purchase_order_tat_report(documents, tat_reports)
-      if ApprovalTatReportsOptimizeToggle.new(current_user).enabled?
+    def purchase_order_tat_report(documents, tat_reports, optimize_tat_report)
+      if optimize_tat_report
         filtered_documents = documents&.not_open&.includes(:policy,:status)
       else
         filtered_documents = documents.not_open
@@ -144,8 +144,8 @@ module ApprovalTatReports::TatHelper
       return tat_data(tat_reports)
     end
 
-    def bank_payment_request_tat_report(documents, tat_reports)
-      if ApprovalTatReportsOptimizeToggle.new(current_user).enabled?
+    def bank_payment_request_tat_report(documents, tat_reports, optimize_tat_report)
+      if optimize_tat_report
         filtered_documents = documents&.not_open&.includes(:status)
       else
         filtered_documents = documents.not_open
@@ -172,8 +172,8 @@ module ApprovalTatReports::TatHelper
       return tat_data(tat_reports)
     end
 
-    def payment_agreement_tat_report(documents, tat_reports)
-      if ApprovalTatReportsOptimizeToggle.new(current_user).enabled?
+    def payment_agreement_tat_report(documents, tat_reports, optimize_tat_report)
+      if optimize_tat_report
         filtered_documents = documents&.not_draft&.includes(:policy,:status)
       else
         filtered_documents = documents&.not_draft
@@ -202,8 +202,8 @@ module ApprovalTatReports::TatHelper
       return tat_data(tat_reports)
     end
 
-    def bbps_biller_subscriptions_tat_report(documents, tat_reports)
-      if ApprovalTatReportsOptimizeToggle.new(current_user).enabled?
+    def bbps_biller_subscriptions_tat_report(documents, tat_reports, optimize_tat_report)
+      if optimize_tat_report
         filtered_documents = documents.where.not(status_id: BbpsBillerSubscriptionStatus.id_for(:draft))&.includes(:policy,:status)
       else
         filtered_documents = documents.not_draft
@@ -231,8 +231,8 @@ module ApprovalTatReports::TatHelper
       return tat_data(tat_reports)
     end
 
-    def vendors_tat_report(documents, tat_reports)
-      if ApprovalTatReportsOptimizeToggle.new(current_user).enabled?
+    def vendors_tat_report(documents, tat_reports, optimize_tat_report)
+      if optimize_tat_report
         filtered_documents =  documents.non_draft&.includes(:policy,:status)
       else
         filtered_documents = documents.non_draft

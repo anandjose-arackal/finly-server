@@ -17,11 +17,11 @@ class ApprovalTatReports::TatExport < Transactions::API
     true
   end
 
-  def tat_reports_data(context, builder:, params:, current_user:, **)
+  def tat_reports_data(context, builder:, params:, current_user:,optimize_tat_report:, **)
     RequestStoreUtil.set_current_user(current_user)
     builder.resolve(context, paginate: false)
     return false  unless context['model.records'].present?
-    context[:spreadsheet_data] = export_report(context['model.records'], params.dig(:route))
+    context[:spreadsheet_data] = export_report(context['model.records'], params.dig(:route), optimize_tat_report)
     true
   end
 

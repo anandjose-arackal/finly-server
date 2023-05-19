@@ -2,6 +2,8 @@ class ApprovalTatReports::Create < Transactions::API
 
   user_model [User, AdminUser]
 
+  require_relative 'tat_export'
+
   step :check_feature_flag
   step :find_builder
   pass :resolve
@@ -68,7 +70,8 @@ class ApprovalTatReports::Create < Transactions::API
 
   def run_background_job(context, params:, current_user:, **)
     add_message context, :success, :base, "You will receive an email on completion of the export with an attachment containing data. Transactions with Open Status will not be included in the TAT report."
-    ApprovalTatReports::TatExport.call_async(params: params, current_user: current_user)
+    optimize_tat_report = ApprovalTatReportsOptimizeToggle.new(current_user).enabled?
+    ApprovalTatReports::TatExport.call_async(params: params, current_user: current_user, optimize_tat_report: optimize_tat_report)
     true
   end
 
