@@ -83,7 +83,7 @@ module ApprovalTatReports::TatHelper
 
     def purchase_request_tat_report(documents, tat_reports)
       filtered_documents = documents.not_draft
-      filtered_documents&.includes(:policy,:status,:amount)&.find_each do |document|
+      filtered_documents&.includes(:policy,:status)&.find_each do |document|
         data = {}
         data[:purchase_request_no] = document&.order_number
         data[:policy_name] = document&.policy&.name
@@ -108,7 +108,7 @@ module ApprovalTatReports::TatHelper
 
     def purchase_order_tat_report(documents, tat_reports)
       filtered_documents = documents.not_open
-      filtered_documents&.includes(:policy,:status,:amount)&.find_each do |document|
+      filtered_documents&.includes(:policy,:status)&.find_each do |document|
         data = {}
         data[:purchase_order_no] = document&.po_number
         data[:vendor_name] = document&.vendor&.business_name
@@ -158,7 +158,7 @@ module ApprovalTatReports::TatHelper
 
     def payment_agreement_tat_report(documents, tat_reports)
       filtered_documents = documents.not_draft
-      filtered_documents&.includes(:policy,:status,:amount)&.find_each do |document|
+      filtered_documents&.includes(:policy,:status)&.find_each do |document|
         data = {}
         data[:agreement_no] = document&.order_number
         # data[:vendor_name] = document&.vendor&.business_name
