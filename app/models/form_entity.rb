@@ -96,6 +96,7 @@ class FormEntity < ApplicationRecord
   has_many :choice_controlling_entities, through: :choice_dependencies, class_name: 'FormEntity', source: :controlling_entity
 
   before_save :sanitize
+  after_save :sync_with_import_form
 
   STATUS_ENTITIES = %w[purchase_order_status_id purchase_request_status_id invoice_status_id]
 
@@ -126,6 +127,28 @@ class FormEntity < ApplicationRecord
   scope :with_compute_type, -> (compute_type_id) { where compute_type_id: compute_type_id }
 
   serialize :filters, Rules::Adapters::Store
+
+  def sync_with_import_form
+    return if ["Docs::P2P::Invoices::Import::Form"].include? form.klass_name
+    import_form = Form.where(klass_name: Forms::Router.klass("#{form.label.downcase}_import")&.name).first
+    return if import_form.nil?
+
+    import_section = import_form.sections.where(section_id: self.section.section_id).first
+    return if import_section.nil?
+
+    if import_form.entities.where(entity_key: self.entity_key).present?
+      import_entity = import_form.entities.where(entity_key: self.entity_key).first
+      import_entity.attributes = self.attributes.except('id', 'form_section_id', 'form_id')
+      import_entity.form_section_id = import_section.uuid
+      import_entity.form_id = import_form.uuid
+      import_entity.save
+    else
+      import_entity = self.dup
+      import_entity.form_section_id = import_section.uuid
+      import_entity.form_id = import_form.uuid
+      import_entity.save
+    end
+  end
 
   def populate_if_empty
     val = super()
