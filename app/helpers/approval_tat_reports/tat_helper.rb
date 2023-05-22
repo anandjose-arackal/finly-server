@@ -87,9 +87,9 @@ module ApprovalTatReports::TatHelper
 
     def purchase_request_tat_report(documents, tat_reports, optimize_tat_report)
       if optimize_tat_report
-        filtered_documents = documents&.not_open&.includes(:policy,:status)
+        filtered_documents = documents&.not_draft&.includes(:policy,:status)
       else
-        filtered_documents = documents.not_draft
+        filtered_documents = documents&.not_draft
       end
       filtered_documents&.find_each do |document|
         data = {}
@@ -118,7 +118,7 @@ module ApprovalTatReports::TatHelper
       if optimize_tat_report
         filtered_documents = documents&.not_open&.includes(:policy,:status)
       else
-        filtered_documents = documents.not_open
+        filtered_documents = documents&.not_open
       end
       filtered_documents&.find_each do |document|
         data = {}
@@ -148,7 +148,7 @@ module ApprovalTatReports::TatHelper
       if optimize_tat_report
         filtered_documents = documents&.not_open&.includes(:status)
       else
-        filtered_documents = documents.not_open
+        filtered_documents = documents&.not_open
       end
       filtered_documents&.find_each do |document|
         data = {}
@@ -206,7 +206,7 @@ module ApprovalTatReports::TatHelper
       if optimize_tat_report
         filtered_documents = documents.where.not(status_id: BbpsBillerSubscriptionStatus.id_for(:draft))&.includes(:policy,:status)
       else
-        filtered_documents = documents.not_draft
+        filtered_documents = documents.where.not(status_id: BbpsBillerSubscriptionStatus.id_for(:draft))
       end
       filtered_documents&.find_each do |document|
         data = {}
@@ -233,9 +233,9 @@ module ApprovalTatReports::TatHelper
 
     def vendors_tat_report(documents, tat_reports, optimize_tat_report)
       if optimize_tat_report
-        filtered_documents =  documents.non_draft&.includes(:policy,:status)
+        filtered_documents =  documents&.non_draft&.includes(:policy,:status)
       else
-        filtered_documents = documents.non_draft
+        filtered_documents = documents&.non_draft
       end
       filtered_documents&.find_each do |document|
         data = {}
