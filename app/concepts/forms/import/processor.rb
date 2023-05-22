@@ -289,6 +289,7 @@ class Forms::Import::Processor
       record.items&.each do |item|
         item.id = nil
       end
+      record.import_job_id = import_job.id
       if record.save
         submit_params = { reviewal_document: record }
         # document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(current_user, submit_params)

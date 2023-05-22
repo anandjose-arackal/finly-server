@@ -1749,6 +1749,10 @@ class Invoice < ApplicationRecord
   end
 
   def set_defaults
+    if self.import_job_id.present?
+      self.update(invoice_status_id: InwardInvoiceStatus.id_for(:open))
+    end
+
     if self.invoice_status.blank?
       self.update(invoice_status_id: InwardInvoiceStatus.id_for(:unpaid))
       self.update_invoice_status
