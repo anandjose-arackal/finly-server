@@ -453,7 +453,7 @@ class Forms::Import::Processor
           params_hash = {:entity_path => header_data[:entity].entity_path, :route => form.label.underscore.to_s, :value => form_data[header_data[:entity_key]]}
           current_user = user
           lookup_data = Forms::Ops::LookupDetails.(params: params_hash, current_user: current_user)[:data]
-          form_data = lookup_data.merge!(form_data)
+          form_data = lookup_data.merge(form_data)
         end
       else
         if row_data[header_data[:name]].present?
@@ -502,11 +502,11 @@ class Forms::Import::Processor
               params_hash = {:entity_path => header_data[:entity].entity_path, :route => form.label.underscore.to_s, :value => data[header_data[:entity_key]]}
               current_user = user
               lookup_data = Forms::Ops::LookupDetails.(params: params_hash, current_user: current_user)[:data].map{|k, v| [k.split('.').last, v]}.to_h rescue {}
-              if nested_row['Tax Rate'] == nil
-                # Preference goes to nil value provided by user
-                lookup_data = lookup_data.except('tax_rate_id', 'tax_rate_id_value', 'tax_percentage')
-              end
-              data = lookup_data.merge!(data)
+              # if nested_row['Tax Rate'] == nil
+              #   # Preference goes to nil value provided by user
+              #   lookup_data = lookup_data.except('tax_rate_id', 'tax_rate_id_value', 'tax_percentage')
+              # end
+              data = lookup_data.merge(data)
             end
           else
             # Set value from sheet if lookup returned 0 or nil but sheet has data

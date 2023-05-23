@@ -227,7 +227,7 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
   # SHIPPING ADDRESS
   section :shipping_address do
     lookup :delivery_location_id, label: 'Shipping Address', choices_scope: Choices[:lookup].('locations', assignments: { form: true }),
-           filters: Rules::Builder['shippable_location'].true, required: true
+           filters: Rules::Builder['shippable_location'].true, required: true, hide_in_import: true
     text :shipping_address_name, label: 'Name', editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.name}}'), visible: false
     text :shipping_address_gstin, label: 'Gstin', editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.gstin}}'), visible: false
     large_text :shipping_address, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.address}}'), hide_in_import: true
@@ -250,9 +250,9 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
            computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.description}}')
 
       text :comment, label: "Narration", size: FormEntity::SIZES[:medium], editable: false
-      text :item_number, label: "Item Code", editable: false,
-        computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.item_number}}'),
-          size: FormEntity::SIZES[:small]
+      # text :item_number, label: "Item Code", editable: false,
+      #   computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.item_number}}'),
+      #     size: FormEntity::SIZES[:small]
 
       lookup :product_type_id, label: "Product Type", choices_scope: Choices[:enum].(ProductType), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.product_type_id}}'), editable: false, required: true, visible: true, size: FormEntity::SIZES[:small]
 
