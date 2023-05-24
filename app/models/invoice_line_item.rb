@@ -326,6 +326,8 @@ class InvoiceLineItem < ApplicationRecord
   end
 
   def tds_amount
+    #to support leagcy logic of tds amount in line item export
+    return item_tds_amount if item_tds_amount.present?
     service? ? calculate_tds(self.billable_amount&.value.to_f) : calculate_tds(self.taxable_amount&.value.to_f)
   end
 

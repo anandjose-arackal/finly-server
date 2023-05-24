@@ -178,10 +178,18 @@ json.payments do
 
         #############################
         json.invoice_attachment do
-          json.url invoice.invoice_attachments.first&.attached_file&.url
-          json.thumb invoice.invoice_attachments.first&.attached_file&.url(:thumb)
-          json.content_type invoice.invoice_attachments.first&.attached_file&.content_type
-          json.file_name invoice.invoice_attachments.first&.attached_file&.original_filename
+          if invoice.forms_enabled
+            attachment = invoice.form_custom_fields.where(field_key: "invoice_attachments").first&.attachments&.first&.attachment
+            json.url attachment&.url
+            json.thumb attachment&.url(:thumb)
+            json.content_type attachment&.content_type
+            json.file_name attachment&.original_filename
+          else
+            json.url invoice.invoice_attachments.first&.attached_file&.url
+            json.thumb invoice.invoice_attachments.first&.attached_file&.url(:thumb)
+            json.content_type invoice.invoice_attachments.first&.attached_file&.content_type
+            json.file_name invoice.invoice_attachments.first&.attached_file&.original_filename
+          end
         end
         json.net_amount precision_value invoice.net_amount&.value
         json.gross_amount precision_value invoice.gross_amount&.value

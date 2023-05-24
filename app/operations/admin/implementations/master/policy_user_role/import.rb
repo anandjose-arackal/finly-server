@@ -165,7 +165,7 @@ class Admin::Implementations::Master::PolicyUserRole::Import < Admin::Implementa
         if v == 'Y'
           case k
           when :initiator
-            existing_mapping = policy.user_mapping.where(user_id: entity_user.id).first
+            existing_mapping = policy.user_mapping.non_deleted.where(user_id: entity_user.id).first
             unless  existing_mapping
               policy.user_mapping.create(user_id: entity_user.id)
             end
@@ -184,7 +184,7 @@ class Admin::Implementations::Master::PolicyUserRole::Import < Admin::Implementa
         elsif v == 'N'
           case k
           when :initiator
-            existing_mapping = policy.user_mapping.where(user_id: entity_user.id).first
+            existing_mapping = policy.user_mapping.non_deleted.where(user_id: entity_user.id).first
             if  existing_mapping
               existing_mapping.destroy
             end

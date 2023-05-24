@@ -63,7 +63,11 @@ class Quotation < ApplicationRecord
 
 	accepts_nested_attributes_for :attachments, allow_destroy: true
 
-  def retrieve_value(entity)  
+  def retrieve_value(entity)
+		# Can't afford to change the column type as it might cause data loss
+		if entity.entity_key == 'selected'
+			return self.selected == 1 ? true : false
+		end
     send("#{entity.entity_key.gsub('_id', '')}")&.name rescue send(entity.entity_key)
   end
 

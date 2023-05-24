@@ -99,6 +99,8 @@ module Searchkick::Api
     end
 
     def self.search_data(record)
+      set_company_and_user_request_store_util(record)
+
       record_data = searchkick_data(record)
       return {} if record_data.blank?
 
@@ -139,6 +141,14 @@ module Searchkick::Api
         data[field_key] = value
       end
       data
+    end
+
+    def self.set_company_and_user_request_store_util(record)
+      company = Company.find_by id: record.company_id
+      default_user = company.users.first
+
+      RequestStoreUtil.set_current_user(default_user)
+      RequestStoreUtil.set_current_company(company)
     end
 
     def self.search_collaborators_data(record)
