@@ -193,7 +193,7 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
            can_editable_be_changed: false, can_be_disabled: false, can_required_be_changed: false, can_visible_be_changed: false, display_key: true
 
     lookup :vendor_trade_name, label: 'Vendor Trade Name', editable: false, visible: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.trade_name}}', assignments: { created_by_id: "{{meta.created_by_id}}" })
-    lookup :vendor_country_id, editable: false, visible: false, choices_scope: Choices[:lookup].('countries')
+    lookup :vendor_country_id, editable: false, visible: false, choices_scope: Choices[:lookup].('countries'), computed: Forms::Compute::Lookup('vendor_id', '{{record.vendor_country_id}}')
 
     text :vendor_sequence_id, "Vendor ID", editable: false, visible: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.vendor_id}}')
 

@@ -26,6 +26,9 @@ class YesBankVendorExposure < Exposures::API
   attribute :gl_name do
     record.business_name
   end
+  attribute :vendor_country_id do
+    record.vendor_country == 'India' ? 78 : 196
+  end
   attribute :payment_term, record_attribute: true, exposure: true
   attribute :display_name, record_attribute: true
   attribute :mobile_number, record_attribute: true

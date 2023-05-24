@@ -450,7 +450,7 @@ class Forms::Import::Processor
         
         # running lookup fetch on all lookups
         if header_data[:entity_type] == 'lookup' && form_data[header_data[:entity_key]].present? #header_data[:entity].has_dependents
-          params_hash = {:entity_path => header_data[:entity].entity_path, :route => form.label.underscore.to_s, :value => form_data[header_data[:entity_key]]}
+          params_hash = {:entity_path => header_data[:entity].entity_path, :route => "#{form.label.underscore.to_s}_import", :value => form_data[header_data[:entity_key]]}
           current_user = user
           lookup_data = Forms::Ops::LookupDetails.(params: params_hash, current_user: current_user)[:data]
           form_data = lookup_data.merge(form_data)
