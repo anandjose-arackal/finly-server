@@ -220,17 +220,17 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
            filters: Rules::Builder['billable_location'].true, required: true
     text :billing_address_name, label: 'Name', editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.name}}'), visible: false
     text :billing_address_gstin, label: 'Gstin', editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.gstin}}'), visible: false
-    large_text :billing_address, computed: Forms::Compute::Lookup('location_id', '{{record.address}}'), hide_in_import: true
+    large_text :billing_address, computed: Forms::Compute::Lookup('location_id', '{{record.address}}')
     text :billing_state_name, computed: Forms::Compute::Lookup('location_id', '{{record.state_name}}'), visible: false
   end
 
   # SHIPPING ADDRESS
   section :shipping_address do
     lookup :delivery_location_id, label: 'Shipping Address', choices_scope: Choices[:lookup].('locations', assignments: { form: true }),
-           filters: Rules::Builder['shippable_location'].true, required: true, hide_in_import: true
+           filters: Rules::Builder['shippable_location'].true, required: true
     text :shipping_address_name, label: 'Name', editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.name}}'), visible: false
     text :shipping_address_gstin, label: 'Gstin', editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.gstin}}'), visible: false
-    large_text :shipping_address, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.address}}'), hide_in_import: true
+    large_text :shipping_address, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.address}}')
   end
 
   # INVOICE ITEMS
