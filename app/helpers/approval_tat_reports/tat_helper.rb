@@ -21,17 +21,15 @@ module ApprovalTatReports::TatHelper
     end
 
     def invoice_tat_report(documents, tat_reports, optimize_tat_report)
-      if optimize_tat_report
-        required_includes = [
-          {payments: {purchase_order: [:bank_payment_request]}}
-        ]
-        not_open_documents = documents&.not_open
-        filtered_documents = not_open_documents&.includes(required_includes)
-      else
-        filtered_documents = documents&.not_open
-      end
+      required_includes = [ {payments: {purchase_order: [:bank_payment_request]}} ]
+      filtered_documents = documents&.not_open
+      filtered_documents = filtered_documents&.includes(required_includes) if optimize_tat_report
+
       filtered_documents&.find_each do |document|
         data = {}
+        invoice_reviewal_chain = document&.get_reviewal_chain
+        not_approved_level = invoice_reviewal_chain&.find { |each_level| !each_level.dig(:action_taken)}
+
         data[:invoice_id] = document&.invoice_id
         data[:business_name] = document&.vendor&.business_name
         data[:trade_name] = document&.vendor&.trade_name
@@ -39,6 +37,8 @@ module ApprovalTatReports::TatHelper
         data[:invoice_number] = document&.invoice_number
         data[:invoice_date] = document&.date&.to_date&.strftime("%d-%m-%Y")
         data[:invoice_status] = document&.status&.name
+        data[:invoice_pending_for_approval_at_level] = not_approved_level&.dig(:level_number)
+        data[:invoice_pending_with_approver] = not_approved_level&.dig(:reviewers)&.map { |reviewer| reviewer[:name] }.join(',')
         data[:invoice_amount] = document&.invoice_total_amount
         data[:po_number] = (document&.po_number ||= "")
         data[:invoice_submitted_by] = "#{document&.created_by&.first_name} #{document&.created_by&.last_name}"
@@ -46,7 +46,6 @@ module ApprovalTatReports::TatHelper
         data[:interval_between_invoice_date_to_invoice_submission] = (document&.date && document&.submitted_at) ? ((document&.date&.to_date - document&.submitted_at&.to_date).to_i)&.abs : ""
         
         last_level_approval_date = document.submitted_at&.to_date&.strftime("%d-%m-%Y")
-        invoice_reviewal_chain = document&.get_reviewal_chain
         invoice_last_approval_level = invoice_reviewal_chain&.last ? invoice_reviewal_chain&.last[:level_number] : ""
         invoice_approval_levels = (1..invoice_last_approval_level&.to_i).to_a
         invoice_actual_approval_levels = invoice_reviewal_chain&.map { |review_chain|  review_chain[:level_number]}
@@ -54,16 +53,19 @@ module ApprovalTatReports::TatHelper
         assign_reviewers_data(data, invoice_approval_levels, invoice_actual_approval_levels, invoice_reviewal_chain, last_level_approval_date)
 
         invoice_payment_ticket = document&.payments&.order(created_at: :desc)&.first&.payment_order&.bank_payment_request
+        pt_reviewal_chain = invoice_payment_ticket&.get_reviewal_chain
+        not_approved_level = pt_reviewal_chain&.find { |each_level| !each_level.dig(:action_taken)}
 
         data[:payment_ticket_created_by] = "#{invoice_payment_ticket&.created_by&.first_name} #{invoice_payment_ticket&.created_by&.last_name}"
         payment_ticket_created_at = invoice_payment_ticket&.submitted_at&.to_date&.strftime("%d-%m-%Y")
         data[:payment_ticket_created_date] = payment_ticket_created_at ? payment_ticket_created_at : ""
         data[:payment_ticket_status] = invoice_payment_ticket&.status&.name
+        data[:payment_ticket_pending_for_approval_at_level] = not_approved_level&.dig(:level_number)
+        data[:payment_ticket_pending_with_approver] = not_approved_level&.dig(:reviewers)&.map { |reviewer| reviewer[:name] }.join(',')
         data[:interval_between_approval_to_payment_ticket_creation] = (invoice_payment_ticket&.approved_at && payment_ticket_created_at) ? ( invoice_payment_ticket&.approved_at&.to_date - payment_ticket_created_at&.to_date ).to_i : ""
         
         last_level_approval_date = payment_ticket_created_at
         current_level_approval_date = ""
-        pt_reviewal_chain = invoice_payment_ticket&.get_reviewal_chain
         pt_last_level = pt_reviewal_chain&.last ? pt_reviewal_chain&.last[:level_number] : ""
         pt_approval_levels = (1..pt_last_level&.to_i).to_a
         pt_actual_approval_levels = pt_reviewal_chain&.map { |review_chain|  review_chain[:level_number]}
@@ -90,22 +92,25 @@ module ApprovalTatReports::TatHelper
     end
 
     def purchase_request_tat_report(documents, tat_reports, optimize_tat_report)
-      if optimize_tat_report
-        filtered_documents = documents&.not_draft&.includes(:policy,:status)
-      else
-        filtered_documents = documents&.not_draft
-      end
+      required_includes = [:policy, :status]
+      filtered_documents = documents&.not_draft
+      filtered_documents = filtered_documents&.includes(required_includes) if optimize_tat_report
+
       filtered_documents&.find_each do |document|
         data = {}
+        pr_reviewal_chain = document&.get_reviewal_chain
+        not_approved_level = pr_reviewal_chain&.find { |each_level| !each_level.dig(:action_taken)}
+
         data[:purchase_request_no] = document&.order_number
         data[:policy_name] = document&.policy&.name
         data[:purchase_request_status] = document&.status&.name
+        data[:pending_for_approval_at_level] = not_approved_level&.dig(:level_number)
+        data[:pending_with_approver] = not_approved_level&.dig(:reviewers)&.map { |reviewer| reviewer[:name] }.join(',')
         data[:pr_amount] = document&.total_amount&.value
         data[:pr_submitted_by] = "#{document&.creator&.first_name} #{document.creator&.last_name}"
         data[:pr_submitted_date] = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")   
 
         last_level_approval_date = document&.submitted_at&.to_date.strftime("%d-%m-%Y")
-        pr_reviewal_chain = document&.get_reviewal_chain
         pr_last_approval_level = pr_reviewal_chain&.last ? pr_reviewal_chain&.last[:level_number] : ""
         pr_approval_levels = (1..pr_last_approval_level&.to_i).to_a
         pr_actual_approval_levels = pr_reviewal_chain&.map { |review_chain|  review_chain[:level_number]}
@@ -119,23 +124,26 @@ module ApprovalTatReports::TatHelper
     end
 
     def purchase_order_tat_report(documents, tat_reports, optimize_tat_report)
-      if optimize_tat_report
-        filtered_documents = documents&.not_open&.includes(:policy,:status)
-      else
-        filtered_documents = documents&.not_open
-      end
+      required_includes = [:policy, :status]
+      filtered_documents = documents&.not_open
+      filtered_documents = not_open_documents&.includes(required_includes) if optimize_tat_report
+
       filtered_documents&.find_each do |document|
         data = {}
+        po_reviewal_chain = document&.get_reviewal_chain
+        not_approved_level = po_reviewal_chain&.find { |each_level| !each_level.dig(:action_taken)}
+
         data[:purchase_order_no] = document&.po_number
         data[:vendor_name] = document&.vendor&.business_name
         data[:policy_name] = document&.policy&.name
         data[:po_status] = document&.status&.name
+        data[:pending_for_approval_at_level] = not_approved_level&.dig(:level_number)
+        data[:pending_with_approver] = not_approved_level&.dig(:reviewers)&.map { |reviewer| reviewer[:name] }.join(',')
         data[:po_amount] = document&.total_after_tax&.value
         data[:po_submitted_by] = "#{document&.created_by&.first_name} #{document.created_by&.last_name}"
         data[:po_submitted_date] = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")   
 
         last_level_approval_date = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")
-        po_reviewal_chain = document&.get_reviewal_chain
         po_last_approval_level = po_reviewal_chain&.last ? po_reviewal_chain&.last[:level_number] : ""
         po_approval_levels = (1..po_last_approval_level&.to_i).to_a
         po_actual_approval_levels = po_reviewal_chain&.map { |review_chain|  review_chain[:level_number]}
@@ -149,21 +157,24 @@ module ApprovalTatReports::TatHelper
     end
 
     def bank_payment_request_tat_report(documents, tat_reports, optimize_tat_report)
-      if optimize_tat_report
-        filtered_documents = documents&.not_open&.includes(:status)
-      else
-        filtered_documents = documents&.not_open
-      end
+      required_includes = [:status]
+      filtered_documents = documents&.not_open
+      filtered_documents = filtered_documents&.includes(required_includes) if optimize_tat_report
+
       filtered_documents&.find_each do |document|
         data = {}
+        bpr_reviewal_chain = document&.get_reviewal_chain
+        not_approved_level = bpr_reviewal_chain&.find { |each_level| !each_level.dig(:action_taken)}
+
         data[:payment_ticket_created_by] = "#{document&.created_by&.first_name} #{document.created_by&.last_name}"
         payment_ticket_created_at = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")
         data[:payment_ticket_created_date] = payment_ticket_created_at
         data[:payment_ticket_status] = document&.status&.name
+        data[:pending_for_approval_at_level] = not_approved_level&.dig(:level_number)
+        data[:pending_with_approver] = not_approved_level&.dig(:reviewers)&.map { |reviewer| reviewer[:name] }.join(',')
         data[:interval_between_approval_to_payment_ticket_creation] = (payment_ticket_created_at && document&.approved_at) ? (payment_ticket_created_at.to_date - document&.approved_at&.to_date).to_i : "" 
 
         last_level_approval_date = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")
-        bpr_reviewal_chain = document&.get_reviewal_chain
         bpr_last_approval_level = bpr_reviewal_chain&.last ? bpr_reviewal_chain&.last[:level_number] : ""
         bpr_approval_levels = (1..bpr_last_approval_level&.to_i).to_a
         bpr_actual_approval_levels = bpr_reviewal_chain&.map { |review_chain|  review_chain[:level_number]}
@@ -177,23 +188,26 @@ module ApprovalTatReports::TatHelper
     end
 
     def payment_agreement_tat_report(documents, tat_reports, optimize_tat_report)
-      if optimize_tat_report
-        filtered_documents = documents&.not_draft&.includes(:policy,:status)
-      else
-        filtered_documents = documents&.not_draft
-      end
+      required_includes = [:policy, :status]
+      filtered_documents = documents&.not_draft
+      filtered_documents = filtered_documents&.includes(required_includes)  if optimize_tat_report
+
       filtered_documents&.find_each do |document|
         data = {}
+        pa_reviewal_chain = document&.get_reviewal_chain
+        not_approved_level = pa_reviewal_chain&.find { |each_level| !each_level.dig(:action_taken)}
+
         data[:agreement_no] = document&.order_number
         # data[:vendor_name] = document&.vendor&.business_name
         data[:agreement_policy_name] = document&.policy&.name
         data[:agreement_status] = document&.status&.name
+        data[:pending_for_approval_at_level] = not_approved_level&.dig(:level_number)
+        data[:pending_with_approver] = not_approved_level&.dig(:reviewers)&.map { |reviewer| reviewer[:name] }.join(',')
         data[:agrement_amount] = document&.total_amount&.value
         data[:agreement_submitted_by] = "#{document&.created_by&.first_name} #{document.created_by&.last_name}"
         data[:agreement_submitted_date] = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")   
 
         last_level_approval_date = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")
-        pa_reviewal_chain = document&.get_reviewal_chain
         pa_last_approval_level = pa_reviewal_chain&.last ? pa_reviewal_chain&.last[:level_number] : ""
         pa_approval_levels = (1..pa_last_approval_level&.to_i).to_a
         pa_actual_approval_levels = pa_reviewal_chain&.map { |review_chain|  review_chain[:level_number]}
@@ -207,22 +221,25 @@ module ApprovalTatReports::TatHelper
     end
 
     def bbps_biller_subscriptions_tat_report(documents, tat_reports, optimize_tat_report)
-      if optimize_tat_report
-        filtered_documents = documents.where.not(status_id: BbpsBillerSubscriptionStatus.id_for(:draft))&.includes(:policy,:status)
-      else
-        filtered_documents = documents.where.not(status_id: BbpsBillerSubscriptionStatus.id_for(:draft))
-      end
+      required_includes = [:policy, :status]
+      filtered_documents = documents.where.not(status_id: BbpsBillerSubscriptionStatus.id_for(:draft))
+      filtered_documents = filtered_documents&.includes(required_includes) if optimize_tat_report
+
       filtered_documents&.find_each do |document|
         data = {}
+        bbps_reviewal_chain = document&.get_reviewal_chain
+        not_approved_level = bbps_reviewal_chain&.find { |each_level| !each_level.dig(:action_taken)}
+
         data[:utility_id] = document&.sequence_id
         data[:vendor_name] = document&.biller&.biller_name
         data[:policy_name] = document&.policy&.name
         data[:status] = document&.status&.name
+        data[:pending_for_approval_at_level] = not_approved_level&.dig(:level_number)
+        data[:pending_with_approver] = not_approved_level&.dig(:reviewers)&.map { |reviewer| reviewer[:name] }.join(',')
         data[:utility_master_submitted_by] = "#{document&.created_by&.first_name} #{document.created_by&.last_name}"
         data[:utility_master_submitted_date] = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")   
 
         last_level_approval_date = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")
-        bbps_reviewal_chain = document&.get_reviewal_chain
         bbps_last_approval_level = bbps_reviewal_chain&.last ? bbps_reviewal_chain&.last[:level_number] : ""
         bbps_approval_levels = (1..bbps_last_approval_level&.to_i).to_a
         bbps_actual_approval_levels = bbps_reviewal_chain&.map { |review_chain|  review_chain[:level_number]}
@@ -236,23 +253,26 @@ module ApprovalTatReports::TatHelper
     end
 
     def vendors_tat_report(documents, tat_reports, optimize_tat_report)
-      if optimize_tat_report
-        filtered_documents =  documents&.non_draft&.includes(:policy,:status)
-      else
-        filtered_documents = documents&.non_draft
-      end
+      required_includes = [:policy, :status]
+      filtered_documents = documents&.non_draft
+      filtered_documents = filtered_documents&.includes(required_includes) if optimize_tat_report
+      
       filtered_documents&.find_each do |document|
         data = {}
+        vendor_reviewal_chain = document&.get_reviewal_chain
+        not_approved_level = vendor_reviewal_chain&.find { |each_level| !each_level.dig(:action_taken)}
+
         data[:vendor_number] = document&.vendor_id
         data[:vendor_legal_name] = document&.business_name
         data[:vendor_trade_name] = document&.trade_name
         data[:policy_name] = document&.policy&.name
         data[:status] = document&.status&.name
+        data[:pending_for_approval_at_level] = not_approved_level&.dig(:level_number)
+        data[:pending_with_approver] = not_approved_level&.dig(:reviewers)&.map { |reviewer| reviewer[:name] }.join(',')
         data[:vendor_submitted_by] = "#{document&.created_by&.first_name} #{document.created_by&.last_name}"
         data[:venodr_submitted_date] = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")   
 
         last_level_approval_date = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")
-        vendor_reviewal_chain = document&.get_reviewal_chain
         vendor_last_approval_level = vendor_reviewal_chain&.last ? vendor_reviewal_chain&.last[:level_number] : ""
         vendor_approval_levels = (1..vendor_last_approval_level&.to_i).to_a
         vendor_actual_approval_levels = vendor_reviewal_chain&.map { |review_chain|  review_chain[:level_number]}
