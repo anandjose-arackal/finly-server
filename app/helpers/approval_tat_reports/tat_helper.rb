@@ -22,7 +22,11 @@ module ApprovalTatReports::TatHelper
 
     def invoice_tat_report(documents, tat_reports, optimize_tat_report)
       if optimize_tat_report
-        filtered_documents = documents&.not_open&.includes(:payments,:vendor,:policy,:status,:amount)
+        required_includes = [
+          {payments: {purchase_order: {:bank_payment_request}}}
+        ]
+        not_open_documents = documents&.not_open
+        filtered_documents = not_open_documents&.includes(required_includes)
       else
         filtered_documents = documents&.not_open
       end
