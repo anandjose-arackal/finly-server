@@ -97,6 +97,7 @@ class FormEntity < ApplicationRecord
 
   before_save :sanitize
   after_save :sync_with_import_form
+  after_destroy :delete_import_form_entity
 
   STATUS_ENTITIES = %w[purchase_order_status_id purchase_request_status_id invoice_status_id]
 
@@ -147,6 +148,18 @@ class FormEntity < ApplicationRecord
       import_entity.form_section_id = import_section.uuid
       import_entity.form_id = import_form.uuid
       import_entity.save
+    end
+  end
+
+  def delete_import_form_entity
+    return if ['Docs::P2P::Invoices::Import::Form'].include? form.klass_name
+
+    import_form = Form.where(klass_name: Forms::Router.klass("#{form.label.downcase}_import")&.name).first
+    return if import_form.nil?
+
+    if import_form.entities.where(entity_key: self.entity_key).present?
+      import_entity = import_form.entities.where(entity_key: self.entity_key).first
+      import_entity.destroy
     end
   end
 
