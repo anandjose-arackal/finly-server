@@ -72,7 +72,7 @@ class ApprovalTatReports::Create < Transactions::API
     add_message context, :success, :base, "You will receive an email on completion of the export with an attachment containing data. Transactions with Open Status will not be included in the TAT report."
     optimize_tat_report = ApprovalTatReportsOptimizeToggle.new(current_user).enabled?
     job_log_object = ApprovalTatReportExecLog.create(company_id: current_user&.company_id, 
-                                              user_id: current_user&.user_id,
+                                              user_id: current_user&.id,
                                               document_type: params.dig(:route),
                                               record_count: total_documents_count,
                                               output_count: actual_export_count,
