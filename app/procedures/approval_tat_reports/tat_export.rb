@@ -25,7 +25,7 @@ class ApprovalTatReports::TatExport < Transactions::API
     true
   end
 
-  def build_report_export_send_mail(context, params:, current_user:, **)
+  def build_report_export_send_mail(context, params:, current_user:,job_log_object:, **)
     file = Tempfile.new(["#{params.dig(:route)}_approval_tat_reports", '.xlsx'])
     workbook = ::WriteXLSX.new(file)
     worksheet = workbook.add_worksheet('Sheet 1')
