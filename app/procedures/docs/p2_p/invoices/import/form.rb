@@ -184,7 +184,7 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
     lookup :base_currency_id, label: "Base Currency", choices_scope: Choices[:lookup].('currencies'), visible: true, editable: true
 
     switch :retrieve_conversion_rate, label: "Auto Populate Conversion Rate", default_value: true, visible: false
-    # number :conversion_rate, editable: true, format: 'decimal', max_decimal_places: 5, default_value: 1, computed: Forms::Compute::Lookup('base_currency_id', '{{ record.currency_conversion_rate }}', assignments: {conversion_date: "{{form.conversion_date}}", to_currency: "{{form.reporting_currency_id}}"}), visible: true
+    number :conversion_rate, editable: true, format: 'decimal', max_decimal_places: 5, default_value: 1, computed: Forms::Compute::Lookup('base_currency_id', '{{ record.currency_conversion_rate }}', assignments: {conversion_date: "{{form.conversion_date}}", to_currency: "{{form.reporting_currency_id}}"}), visible: true, hide_in_import: true
   end
 
   # VENDOR DETAILS
@@ -220,7 +220,7 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
            filters: Rules::Builder['billable_location'].true, required: true
     text :billing_address_name, label: 'Name', editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.name}}'), visible: false
     text :billing_address_gstin, label: 'Gstin', editable: false, computed: Forms::Compute::Lookup('location_id', '{{record.gstin}}'), visible: false
-    large_text :billing_address, computed: Forms::Compute::Lookup('location_id', '{{record.address}}')
+    large_text :billing_address, computed: Forms::Compute::Lookup('location_id', '{{record.address}}'), hide_in_import: true
     text :billing_state_name, computed: Forms::Compute::Lookup('location_id', '{{record.state_name}}'), visible: false
   end
 
@@ -230,7 +230,7 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
            filters: Rules::Builder['shippable_location'].true, required: true
     text :shipping_address_name, label: 'Name', editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.name}}'), visible: false
     text :shipping_address_gstin, label: 'Gstin', editable: false, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.gstin}}'), visible: false
-    large_text :shipping_address, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.address}}')
+    large_text :shipping_address, computed: Forms::Compute::Lookup('delivery_location_id', '{{record.address}}'), hide_in_import: true
   end
 
   # INVOICE ITEMS
@@ -280,13 +280,14 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
                required: true, editable: false, visible: true,
                computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.unit_of_measurement}}'), size: FormEntity::SIZES[:medium]
 
-      # amount :item_rate,
-      #        label: "Item Rate (Reporting Currency)",
-      #        label: "Item Rate (Reporting Currency)",
-      #        computed: Forms::Compute::Form('{{ row.rate | times: form.conversion_rate | round: 2 }}'),
-      #        visible: true,
-      #        editable: false,
-      #        size: FormEntity::SIZES[:small]
+      amount :item_rate,
+             label: "Item Rate (Reporting Currency)",
+             label: "Item Rate (Reporting Currency)",
+             computed: Forms::Compute::Form('{{ row.rate | times: form.conversion_rate | round: 2 }}'),
+             visible: true,
+             editable: false,
+             size: FormEntity::SIZES[:small],
+             hide_in_import: true
 
       amount :rate, label: "Rate (Base Currency)",
              can_editable_be_changed: false,
