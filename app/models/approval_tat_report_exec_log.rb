@@ -11,7 +11,7 @@
 #  start_time              :datetime
 #  end_time                :datetime
 #  total_time_sec          :integer
-#  filter_json             :string(255)
+#  filter_json             :text(65535)
 #  job_status              :string(255)
 #  deleted_at              :datetime
 #  created_at              :datetime         not null
