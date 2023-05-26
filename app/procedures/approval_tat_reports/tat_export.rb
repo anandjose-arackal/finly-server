@@ -17,7 +17,7 @@ class ApprovalTatReports::TatExport < Transactions::API
     true
   end
 
-  def tat_reports_data(context, builder:, params:, current_user:,optimize_tat_report:, **)
+  def tat_reports_data(context, builder:, params:, current_user:,optimize_tat_report:, job_log_object:, **)
     RequestStoreUtil.set_current_user(current_user)
     builder.resolve(context, paginate: false)
     return false  unless context['model.records'].present?
@@ -54,12 +54,20 @@ class ApprovalTatReports::TatExport < Transactions::API
     file.rewind
 
     ApprovalTatReportsMailer.delay.send_mail({email: current_user.email, route_name: params.dig(:route), file_path: file.path})
+    update_job_logs(job_log_object, "success")
     true
   end
 
   def send_mail_data_not_found(context, params:, current_user:, **)
     ApprovalTatReportsMailer.delay.send_mail({email: current_user.email, route_name: params.dig(:route)})
+    update_job_logs(job_log_object, "failure")
     true
+  end
+
+  def update_job_logs(job_log_object, status)
+    end_time = DateTime.now
+    duration_in_seconds = (end_time.to_i - job_log_object.start_time.to_i).to_i
+    job_log_object.update(end_time: end_time, total_time_sec: duration_in_seconds, job_status: status)
   end
 
 end

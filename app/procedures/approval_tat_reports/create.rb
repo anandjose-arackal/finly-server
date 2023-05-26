@@ -2,8 +2,6 @@ class ApprovalTatReports::Create < Transactions::API
 
   user_model [User, AdminUser]
 
-  require_relative 'tat_export'
-
   step :check_feature_flag
   step :find_builder
   pass :resolve
@@ -40,7 +38,7 @@ class ApprovalTatReports::Create < Transactions::API
 
   def check_open_status_records(context, params:, current_user:, **)
     index_result_documents = context['model.records']
-    total_documents_count = index_result_documents&.count
+    context[:total_documents_count] = index_result_documents&.count
     open_documents_count = 0
 
     case params.dig(:route).upcase
@@ -60,18 +58,28 @@ class ApprovalTatReports::Create < Transactions::API
         open_documents_count = index_result_documents.where(status_id: VendorStatus.id_for(:draft))&.count
     end
 
-    if total_documents_count == open_documents_count
+    if context[:total_documents_count] == open_documents_count
       add_message context, :error, :base, "Open Status transaction cannot be exported in the TAT report, please choose a different filter and try again."
       return false
     end
 
+    context[:actual_export_count] = context[:total_documents_count] - open_documents_count
+
     true
   end
 
-  def run_background_job(context, params:, current_user:, **)
+  def run_background_job(context, params:, current_user:,total_documents_count:, actual_export_count:, **)
     add_message context, :success, :base, "You will receive an email on completion of the export with an attachment containing data. Transactions with Open Status will not be included in the TAT report."
     optimize_tat_report = ApprovalTatReportsOptimizeToggle.new(current_user).enabled?
-    ApprovalTatReports::TatExport.call_async(params: params, current_user: current_user, optimize_tat_report: optimize_tat_report)
+    job_log_object = ApprovalTatReportExecLog.create(company_id: current_user&.company_id, 
+                                              user_id: current_user&.user_id,
+                                              document_type: params.dig(:route),
+                                              record_count: total_documents_count,
+                                              output_count: actual_export_count,
+                                              start_time: DateTime.now,
+                                              filter_json: params["q"]
+                                            )
+    ApprovalTatReports::TatExport.call_async(params: params, current_user: current_user, optimize_tat_report: optimize_tat_report, job_log_object: job_log_object)
     true
   end
 
