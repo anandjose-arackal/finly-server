@@ -318,7 +318,7 @@ class Forms::Import::Processor
         import_job.item_complete(true)
       else
         import_job.item_complete(false)
-        import_record.update_status(false, ['Could not save record'].to_s, '', '')
+        import_record.update_status(false, record.errors.messages.values.flatten.to_s, '', '')
       end
     end
   end

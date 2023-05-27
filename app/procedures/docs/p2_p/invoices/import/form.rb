@@ -189,7 +189,7 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
 
   # VENDOR DETAILS
   section :vendor_details, title: "Vendor Details", associate_custom_fields: true do
-    lookup :vendor_id, label: "Vendor", choices_scope: Choices[:lookup].('vendors'), required: true, editable: false,
+    lookup :vendor_id, label: "Vendor", choices_scope: Choices[:lookup].('approved_vendors'), required: true, editable: false,
            can_editable_be_changed: false, can_be_disabled: false, can_required_be_changed: false, can_visible_be_changed: false, display_key: true
 
     lookup :vendor_trade_name, label: 'Vendor Trade Name', editable: false, visible: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.trade_name}}', assignments: { created_by_id: "{{meta.created_by_id}}" })

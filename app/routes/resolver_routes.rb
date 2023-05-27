@@ -105,6 +105,7 @@ Resolver::Router.draw do
 
   scope :vendors do
     route "default", Masters::Vendors::Resolver
+    route "approved_vendors", Masters::Vendors::Approved::Resolver
     scope :locations do
       route "default", Masters::Vendors::Locations::Resolver
     end
