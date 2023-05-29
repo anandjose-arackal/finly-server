@@ -193,7 +193,8 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
            can_editable_be_changed: false, can_be_disabled: false, can_required_be_changed: false, can_visible_be_changed: false, display_key: true
 
     lookup :vendor_trade_name, label: 'Vendor Trade Name', editable: false, visible: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.trade_name}}', assignments: { created_by_id: "{{meta.created_by_id}}" })
-    lookup :vendor_country_id, editable: false, visible: false, choices_scope: Choices[:lookup].('countries'), computed: Forms::Compute::Lookup('vendor_id', '{{record.vendor_country_id}}')
+    text :vendor_country_id, editable: false, visible: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.vendor_country_id}}')
+    text :vendor_country_id_value, editable: false, visible: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.vendor_country_id_value}}')
 
     text :vendor_sequence_id, "Vendor ID", editable: false, visible: false, computed: Forms::Compute::Lookup('vendor_id', '{{record.vendor_id}}')
 
@@ -209,8 +210,8 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
     text :receiving_account_type, visible: false, internal: true, editable: false, computed: Forms::Compute::Form('BankAccount')
     switch :rcm_enabled, label: "RCM Enabled", editable: true, visible: true, computed: Forms::Compute::Lookup('vendor_id', '{{record.rcm_enabled}}'), default_value: true
 
-    # text :vendor_bank_account_number, editable: false, visible: false, can_editable_be_changed: false, computed: Forms::Compute::Lookup('receiving_account_id', '{{record.account_number}}')
-    # text :vendor_bank_account_ifsc, editable: false, required: true, visible: false, can_editable_be_changed: false, computed: Forms::Compute::Lookup('receiving_account_id', '{{record.ifsc}}')
+    text :vendor_bank_account_number, editable: false, visible: false, can_editable_be_changed: false, computed: Forms::Compute::Lookup('receiving_account_id', '{{record.account_number}}'), hide_in_import: true
+    text :vendor_bank_account_ifsc, editable: false, required: true, visible: false, can_editable_be_changed: false, computed: Forms::Compute::Lookup('receiving_account_id', '{{record.ifsc}}'), hide_in_import: true
     # text :vendor_bank_account_swift_code, editable: false, visible: false, required: false, can_editable_be_changed: false, computed: Forms::Compute::Lookup('receiving_account_id', '{{record.swift_code}}')
   end
 
