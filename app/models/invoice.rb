@@ -154,7 +154,7 @@
 #
 
 class Invoice < ApplicationRecord
-  attr_accessor :skip_callback, :remaining_adjustable_tds, :remaining_adjustable_advance, :po_advance_tds, :net_po_advance, :prev_adjusted_advance_tds, :advance_paid
+  attr_accessor :skip_callback, :remaining_adjustable_tds, :remaining_adjustable_advance, :po_advance_tds, :net_po_advance, :prev_adjusted_advance_tds, :advance_paid, :vendor_country_id_value
   include Templatable, Transitionable, MathUtil, CustomFieldFilterSupport, ControllingUser, GetCurrency
   include LiquidDroppable
   include Exposures::Model::Exposable
@@ -186,6 +186,11 @@ class Invoice < ApplicationRecord
   #   currency_code = Currency.find(self.base_currency)&.country_code rescue nil
   #   Currency.currency_for(currency_code || "INR")
   # end
+
+  
+  def vendor_country_id_value
+    self.vendor_country&.name
+  end
 
 
   exchange_bank :get_reporting_currency, :get_base_currency, :exchange_rate
