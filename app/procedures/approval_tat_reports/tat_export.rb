@@ -18,10 +18,15 @@ class ApprovalTatReports::TatExport < Transactions::API
   end
 
   def tat_reports_data(context, builder:, params:, current_user:,optimize_tat_report:, job_log_object:, **)
-    RequestStoreUtil.set_current_user(current_user)
-    builder.resolve(context, paginate: false)
-    return false  unless context['model.records'].present?
-    context[:spreadsheet_data] = export_report(context['model.records'], params.dig(:route), optimize_tat_report)
+    begin
+      RequestStoreUtil.set_current_user(current_user)
+      builder.resolve(context, paginate: false)
+      context[:spreadsheet_data] = export_report(context['model.records'], params.dig(:route), optimize_tat_report)
+    rescue StandardError => e
+      Rails.logger.info "Error occurred: #{e}"
+      Rails.logger.info "Stack trace: #{e.backtrace.join("\n")}"
+      return false
+    end
     true
   end
 

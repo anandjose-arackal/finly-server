@@ -98,6 +98,7 @@ module ApprovalTatReports::TatHelper
 
       filtered_documents&.find_each do |document|
         data = {}
+        Rails.logger.info "purchase request id #{ document.id }"
         pr_reviewal_chain = document&.get_reviewal_chain
         not_approved_level = pr_reviewal_chain&.find { |each_level| !each_level.dig(:action_taken)}
 
