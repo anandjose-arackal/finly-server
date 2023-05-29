@@ -63,7 +63,7 @@ class ApprovalTatReports::TatExport < Transactions::API
     true
   end
 
-  def send_mail_data_not_found(context, params:, current_user:, **)
+  def send_mail_data_not_found(context, params:, current_user:,job_log_object:, **)
     ApprovalTatReportsMailer.delay.send_mail({email: current_user.email, route_name: params.dig(:route)})
     update_job_logs(job_log_object, "failure")
     true

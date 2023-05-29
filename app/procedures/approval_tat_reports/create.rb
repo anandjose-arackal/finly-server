@@ -69,7 +69,7 @@ class ApprovalTatReports::Create < Transactions::API
   end
 
   def run_background_job(context, params:, current_user:,total_documents_count:, actual_export_count:, **)
-    add_message context, :success, :base, "You will receive an email on completion of the export with an attachment containing data. Transactions with Open Status will not be included in the TAT report."
+    add_message context, :success, :base, "You will receive an email on completion of the export with an attachment containing data. Transactions with Open Status will not be included in the TAT report. You will receive the email in approximately #{actual_export_count < 5000 ? 5 : 10} minutes."
     optimize_tat_report = ApprovalTatReportsOptimizeToggle.new(current_user).enabled?
     job_log_object = ApprovalTatReportExecLog.create(company_id: current_user&.company_id, 
                                               user_id: current_user&.id,
