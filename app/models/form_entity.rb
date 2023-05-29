@@ -130,7 +130,7 @@ class FormEntity < ApplicationRecord
   serialize :filters, Rules::Adapters::Store
 
   def sync_with_import_form
-    return if ["Docs::P2P::Invoices::Import::Form"].include? form.klass_name
+    return if ["Docs::P2P::Invoices::Import::Form", "Masters::Vendors::Form"].include? form.klass_name
     import_form = Form.where(klass_name: Forms::Router.klass("#{form.label.downcase}_import")&.name).first
     return if import_form.nil?
 
@@ -153,6 +153,7 @@ class FormEntity < ApplicationRecord
       end
     else
       import_entity = self.dup
+      import_entity.id = nil
       import_entity.form_section_id = import_section.uuid
       import_entity.form_id = import_form.uuid
       import_entity.save
