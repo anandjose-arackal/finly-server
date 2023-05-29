@@ -10,6 +10,12 @@ class TdsSlabs::Create < TdsSlabs::Base
 
   end
 
+  def validate
+    if self.tds_slab_parameters[:tds] < 0
+      add_message :error, 'TDS value should not be negative'
+    end
+  end
+
   def process
     self.tds_slab = user.company.tds_slabs.build(self.tds_slab_parameters)
     unless self.tds_slab.save
