@@ -30,6 +30,12 @@ module ApprovalTatReports::TatHelper
         invoice_reviewal_chain = document&.get_reviewal_chain
         not_approved_level = invoice_reviewal_chain&.find { |each_level| !each_level.dig(:action_taken)}
 
+        if not_approved_level&.dig(:forwarded_to)&.present?
+          pending_approver_names = not_approved_level&.dig(:forwarded_to,:name)
+        else
+          pending_approver_names = not_approved_level&.dig(:reviewers)&.map { |reviewer| reviewer[:name] }&.join(',')
+        end
+
         data[:invoice_id] = document&.invoice_id
         data[:business_name] = document&.vendor&.business_name
         data[:trade_name] = document&.vendor&.trade_name
@@ -38,7 +44,7 @@ module ApprovalTatReports::TatHelper
         data[:invoice_date] = document&.date&.to_date&.strftime("%d-%m-%Y")
         data[:invoice_status] = document&.status&.name
         data[:invoice_pending_for_approval_at_level] = document&.auto_approved? ? "" : not_approved_level&.dig(:level_number)
-        data[:invoice_pending_with_approver] = document&.auto_approved? ? "" : not_approved_level&.dig(:reviewers)&.map { |reviewer| reviewer[:name] }&.join(',')
+        data[:invoice_pending_with_approver] = document&.auto_approved? ? "" : pending_approver_names
         data[:invoice_amount] = document&.invoice_total_amount
         data[:po_number] = (document&.po_number ||= "")
         data[:invoice_submitted_by] = "#{document&.created_by&.first_name} #{document&.created_by&.last_name}"
@@ -56,12 +62,18 @@ module ApprovalTatReports::TatHelper
         pt_reviewal_chain = invoice_payment_ticket&.get_reviewal_chain
         not_approved_level = pt_reviewal_chain&.find { |each_level| !each_level.dig(:action_taken)}
 
+        if not_approved_level&.dig(:forwarded_to)&.present?
+          pending_approver_names = not_approved_level&.dig(:forwarded_to,:name)
+        else
+          pending_approver_names = not_approved_level&.dig(:reviewers)&.map { |reviewer| reviewer[:name] }&.join(',')
+        end
+
         data[:payment_ticket_created_by] = "#{invoice_payment_ticket&.created_by&.first_name} #{invoice_payment_ticket&.created_by&.last_name}"
         payment_ticket_created_at = invoice_payment_ticket&.submitted_at&.to_date&.strftime("%d-%m-%Y")
         data[:payment_ticket_created_date] = payment_ticket_created_at ? payment_ticket_created_at : ""
         data[:payment_ticket_status] = invoice_payment_ticket&.status&.name
         data[:payment_ticket_pending_for_approval_at_level] = document&.auto_approved? ? "" : not_approved_level&.dig(:level_number)
-        data[:payment_ticket_pending_with_approver] = document&.auto_approved? ? "" : not_approved_level&.dig(:reviewers)&.map { |reviewer| reviewer[:name] }&.join(',')
+        data[:payment_ticket_pending_with_approver] = document&.auto_approved? ? "" : pending_approver_names
         data[:interval_between_approval_to_payment_ticket_creation] = (invoice_payment_ticket&.approved_at && payment_ticket_created_at) ? ( invoice_payment_ticket&.approved_at&.to_date - payment_ticket_created_at&.to_date ).to_i : ""
         
         last_level_approval_date = payment_ticket_created_at
@@ -100,12 +112,17 @@ module ApprovalTatReports::TatHelper
         data = {}
         pr_reviewal_chain = document&.get_reviewal_chain
         not_approved_level = pr_reviewal_chain&.find { |each_level| !each_level.dig(:action_taken)}
+        if not_approved_level&.dig(:forwarded_to)&.present?
+          pending_approver_names = not_approved_level&.dig(:forwarded_to,:name)
+        else
+          pending_approver_names = not_approved_level&.dig(:reviewers)&.map { |reviewer| reviewer[:name] }&.join(',')
+        end
 
         data[:purchase_request_no] = document&.order_number
         data[:policy_name] = document&.policy&.name
         data[:purchase_request_status] = document&.status&.name
         data[:pending_for_approval_at_level] = document&.auto_approved? ? "" : not_approved_level&.dig(:level_number)
-        data[:pending_with_approver] = document&.auto_approved? ? "" : not_approved_level&.dig(:reviewers)&.map { |reviewer| reviewer[:name] }&.join(',')
+        data[:pending_with_approver] = document&.auto_approved? ? "" : pending_approver_names
         data[:pr_amount] = document&.total_amount&.value
         data[:pr_submitted_by] = "#{document&.creator&.first_name} #{document.creator&.last_name}"
         data[:pr_submitted_date] = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")   
@@ -132,13 +149,18 @@ module ApprovalTatReports::TatHelper
         data = {}
         po_reviewal_chain = document&.get_reviewal_chain
         not_approved_level = po_reviewal_chain&.find { |each_level| !each_level.dig(:action_taken)}
+        if not_approved_level&.dig(:forwarded_to)&.present?
+          pending_approver_names = not_approved_level&.dig(:forwarded_to,:name)
+        else
+          pending_approver_names = not_approved_level&.dig(:reviewers)&.map { |reviewer| reviewer[:name] }&.join(',')
+        end
 
         data[:purchase_order_no] = document&.po_number
         data[:vendor_name] = document&.vendor&.business_name
         data[:policy_name] = document&.policy&.name
         data[:po_status] = document&.status&.name
         data[:pending_for_approval_at_level] = document&.auto_approved? ? "" : not_approved_level&.dig(:level_number)
-        data[:pending_with_approver] = document&.auto_approved? ? "" : not_approved_level&.dig(:reviewers)&.map { |reviewer| reviewer[:name] }&.join(',')
+        data[:pending_with_approver] = document&.auto_approved? ? "" : pending_approver_names
         data[:po_amount] = document&.total_after_tax&.value
         data[:po_submitted_by] = "#{document&.created_by&.first_name} #{document.created_by&.last_name}"
         data[:po_submitted_date] = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")   
@@ -165,13 +187,18 @@ module ApprovalTatReports::TatHelper
         data = {}
         bpr_reviewal_chain = document&.get_reviewal_chain
         not_approved_level = bpr_reviewal_chain&.find { |each_level| !each_level.dig(:action_taken)}
+        if not_approved_level&.dig(:forwarded_to)&.present?
+          pending_approver_names = not_approved_level&.dig(:forwarded_to,:name)
+        else
+          pending_approver_names = not_approved_level&.dig(:reviewers)&.map { |reviewer| reviewer[:name] }&.join(',')
+        end
 
         data[:payment_ticket_created_by] = "#{document&.created_by&.first_name} #{document.created_by&.last_name}"
         payment_ticket_created_at = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")
         data[:payment_ticket_created_date] = payment_ticket_created_at
         data[:payment_ticket_status] = document&.status&.name
         data[:pending_for_approval_at_level] = document&.auto_approved? ? "" : not_approved_level&.dig(:level_number)
-        data[:pending_with_approver] = document&.auto_approved? ? "" : not_approved_level&.dig(:reviewers)&.map { |reviewer| reviewer[:name] }&.join(',')
+        data[:pending_with_approver] = document&.auto_approved? ? "" : pending_approver_names
         data[:interval_between_approval_to_payment_ticket_creation] = (payment_ticket_created_at && document&.approved_at) ? (payment_ticket_created_at.to_date - document&.approved_at&.to_date).to_i : "" 
 
         last_level_approval_date = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")
@@ -196,13 +223,18 @@ module ApprovalTatReports::TatHelper
         data = {}
         pa_reviewal_chain = document&.get_reviewal_chain
         not_approved_level = pa_reviewal_chain&.find { |each_level| !each_level.dig(:action_taken)}
+        if not_approved_level&.dig(:forwarded_to)&.present?
+          pending_approver_names = not_approved_level&.dig(:forwarded_to,:name)
+        else
+          pending_approver_names = not_approved_level&.dig(:reviewers)&.map { |reviewer| reviewer[:name] }&.join(',')
+        end
 
         data[:agreement_no] = document&.order_number
         # data[:vendor_name] = document&.vendor&.business_name
         data[:agreement_policy_name] = document&.policy&.name
         data[:agreement_status] = document&.status&.name
         data[:pending_for_approval_at_level] = document&.auto_approved? ? "" : not_approved_level&.dig(:level_number)
-        data[:pending_with_approver] = document&.auto_approved? ? "" : not_approved_level&.dig(:reviewers)&.map { |reviewer| reviewer[:name] }&.join(',')
+        data[:pending_with_approver] = document&.auto_approved? ? "" : pending_approver_names
         data[:agrement_amount] = document&.total_amount&.value
         data[:agreement_submitted_by] = "#{document&.created_by&.first_name} #{document.created_by&.last_name}"
         data[:agreement_submitted_date] = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")   
@@ -229,13 +261,18 @@ module ApprovalTatReports::TatHelper
         data = {}
         bbps_reviewal_chain = document&.get_reviewal_chain
         not_approved_level = bbps_reviewal_chain&.find { |each_level| !each_level.dig(:action_taken)}
+        if not_approved_level&.dig(:forwarded_to)&.present?
+          pending_approver_names = not_approved_level&.dig(:forwarded_to,:name)
+        else
+          pending_approver_names = not_approved_level&.dig(:reviewers)&.map { |reviewer| reviewer[:name] }&.join(',')
+        end
 
         data[:utility_id] = document&.sequence_id
         data[:vendor_name] = document&.biller&.biller_name
         data[:policy_name] = document&.policy&.name
         data[:status] = document&.status&.name
         data[:pending_for_approval_at_level] = document&.auto_approved? ? "" :  not_approved_level&.dig(:level_number)
-        data[:pending_with_approver] = document&.auto_approved? ? "" : not_approved_level&.dig(:reviewers)&.map { |reviewer| reviewer[:name] }&.join(',')
+        data[:pending_with_approver] = document&.auto_approved? ? "" : pending_approver_names
         data[:utility_master_submitted_by] = "#{document&.created_by&.first_name} #{document.created_by&.last_name}"
         data[:utility_master_submitted_date] = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")   
 
@@ -261,6 +298,11 @@ module ApprovalTatReports::TatHelper
         data = {}
         vendor_reviewal_chain = document&.get_reviewal_chain
         not_approved_level = vendor_reviewal_chain&.find { |each_level| !each_level.dig(:action_taken)}
+        if not_approved_level&.dig(:forwarded_to)&.present?
+          pending_approver_names = not_approved_level&.dig(:forwarded_to,:name)
+        else
+          pending_approver_names = not_approved_level&.dig(:reviewers)&.map { |reviewer| reviewer[:name] }&.join(',')
+        end
 
         data[:vendor_number] = document&.vendor_id
         data[:vendor_legal_name] = document&.business_name
@@ -268,7 +310,7 @@ module ApprovalTatReports::TatHelper
         data[:policy_name] = document&.policy&.name
         data[:status] = document&.status&.name
         data[:pending_for_approval_at_level] = document&.auto_approved? ? "" : not_approved_level&.dig(:level_number)
-        data[:pending_with_approver] = document&.auto_approved? ? "" : not_approved_level&.dig(:reviewers)&.map { |reviewer| reviewer[:name] }&.join(',')
+        data[:pending_with_approver] = document&.auto_approved? ? "" : pending_approver_names
         data[:vendor_submitted_by] = "#{document&.created_by&.first_name} #{document.created_by&.last_name}"
         data[:venodr_submitted_date] = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")   
 
