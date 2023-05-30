@@ -164,10 +164,10 @@ class ActionsManager::Master::PolicyUserRoles::RoleConfig < ActionsManager::Mast
   end
 
   def vendor_bulk_importer
-    true
+    VendorToggle.new(user).bulk_import_enabled?
   end
 
   def invoice_bulk_importer
-    true
+    NonPoInvoiceToggle.new(user).bulk_import_enabled?
   end
 end
