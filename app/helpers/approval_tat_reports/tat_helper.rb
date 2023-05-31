@@ -162,12 +162,11 @@ module ApprovalTatReports::TatHelper
       filtered_documents&.find_each do |document|
         data = {}
         po_reviewal_chain = document&.get_reviewal_chain
-        not_approved_level = po_reviewal_chain&.find { |each_level| !each_level.dig(:action_taken)}
         pending_approver_names = ""
         pending_approval_level = ""
 
         unless document&.rejected? || document&.retracted? || document&.auto_approved?
-          not_approved_level = pr_reviewal_chain&.find { |each_level| !each_level.dig(:action_taken)}
+          not_approved_level = po_reviewal_chain&.find { |each_level| !each_level.dig(:action_taken)}
           if not_approved_level&.dig(:forwarded_to)&.present?
             pending_approver_names = not_approved_level&.dig(:forwarded_to,:name)
           elsif 
