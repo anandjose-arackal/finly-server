@@ -251,5 +251,9 @@ Resolver::Router.draw do
     route 'default', Docs::ExpenseManagement::ReportProcessorGroups::Resolver
   end
 
+  scope :budgets do
+    route 'default', Docs::ExpenseManagement::Budgets::Resolver
+  end
+
   route 'masters.*', Masters::Schema::Records::Resolver
 end
