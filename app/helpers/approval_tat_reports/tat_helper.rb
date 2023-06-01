@@ -273,7 +273,7 @@ module ApprovalTatReports::TatHelper
     def assign_reviewers_data(document, data, reviewal_chain)
       last_level_approval_date = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")
       approval_levels = (1..reviewal_chain&.last[:level_number]&.to_i).to_a
-      actual_approval_levels =  invoice_reviewal_chain&.map { |review_chain|  review_chain[:level_number]}
+      actual_approval_levels =  reviewal_chain&.map { |review_chain|  review_chain[:level_number]}
 
       approval_levels&.each do |each_level|
         if actual_approval_levels.include?(each_level)
