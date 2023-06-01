@@ -320,6 +320,8 @@ class WorkflowManager::Aasm::BaseProvider
   end
 
   def reviewers_present?
+    return true if self.document.import_job_id.present?  # Skipping this validation if its an import job
+
     self.reviewers.present?
   end
 
