@@ -277,7 +277,7 @@ module ApprovalTatReports::TatHelper
 
       approval_levels&.each do |each_level|
         if actual_approval_levels.include?(each_level)
-          selected_level_reviewer = review_chain&.select { |review_chain| review_chain[:level_number].to_s == each_level.to_s }&.first
+          selected_level_reviewer = reviewal_chain&.select { |review_chain| review_chain[:level_number].to_s == each_level.to_s }&.first
           data["level_#{each_level}_approver_name"] = selected_level_reviewer[:action_taken] ? fetch_approver_name(selected_level_reviewer) : ""
           current_level_approval_date = (selected_level_reviewer[:action_taken] ? selected_level_reviewer[:action_taken_at] : "")
           data["level_#{each_level}_approval_date"]  = current_level_approval_date&.to_date&.strftime("%d-%m-%Y")
