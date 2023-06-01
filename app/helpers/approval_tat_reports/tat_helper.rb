@@ -223,7 +223,7 @@ module ApprovalTatReports::TatHelper
         data[:payment_ticket_created_by] = "#{document&.created_by&.first_name} #{document.created_by&.last_name}"
         payment_ticket_created_at = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")
         data[:payment_ticket_created_date] = payment_ticket_created_at
-        data[:payment_ticket_status] = document&.status&.name
+        data[:payment_ticket_status] = document&.payment_order&.payment_order_status&.name
         data[:pending_for_approval_at_level] = pending_approval_level
         data[:pending_with_approver] = pending_approver_names
         data[:interval_between_approval_to_payment_ticket_creation] = (payment_ticket_created_at && document&.approved_at) ? (document&.approved_at&.to_date - payment_ticket_created_at.to_date)&.abs : "" 
