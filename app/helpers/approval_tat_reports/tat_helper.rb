@@ -287,7 +287,7 @@ module ApprovalTatReports::TatHelper
     end
 
     def get_mark_as_credited_date(document)
-      document.comments.find { |each_comment| each_comment.action_id == BankPaymentRequestCommentAction.id_for(:mark_as_credited) }&.updated_at
+      document&.comments&.find { |each_comment| each_comment.action_id == BankPaymentRequestCommentAction.id_for(:mark_as_credited) }&.updated_at
     end
 
     def assign_reviewers_data(document, data, reviewal_chain)
