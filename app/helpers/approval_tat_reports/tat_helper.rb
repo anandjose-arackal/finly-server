@@ -28,7 +28,7 @@ module ApprovalTatReports::TatHelper
       filtered_documents&.find_each do |document|
         data = {}
         invoice_reviewal_chain = document&.dlrms&.any? { |dlrm| dlrm.level.nil? } ? "" : document&.get_reviewal_chain
-        pending_approval_level, pending_approver_names  = (invoice_reviewal_chain.present? && !document&.voided?) ? get_pending_approval_level_approver(document, invoice_reviewal_chain) : ["",""]
+        pending_approval_level, pending_approver_names  = (invoice_reviewal_chain&.present? && !document&.voided?) ? get_pending_approval_level_approver(document, invoice_reviewal_chain) : ["",""]
 
         data[:invoice_id] = document&.invoice_id
         data[:business_name] = document&.vendor&.business_name
@@ -50,7 +50,7 @@ module ApprovalTatReports::TatHelper
         payment = document&.payments&.order(created_at: :desc)&.first
         invoice_payment_ticket = payment&.payment_order&.bank_payment_request
         pt_reviewal_chain = invoice_payment_ticket&.dlrms&.any? { |dlrm| dlrm.level.nil? } ? "" : invoice_payment_ticket&.get_reviewal_chain
-        pending_approval_level, pending_approver_names  = pt_reviewal_chain.present? ? get_pending_approval_level_approver(document, pt_reviewal_chain) : ["",""]
+        pending_approval_level, pending_approver_names  = pt_reviewal_chain&.present? ? get_pending_approval_level_approver(document, pt_reviewal_chain) : ["",""]
 
         data[:payment_ticket_created_by] = "#{invoice_payment_ticket&.created_by&.first_name} #{invoice_payment_ticket&.created_by&.last_name}"
         payment_ticket_created_at = invoice_payment_ticket&.submitted_at&.to_date&.strftime("%d-%m-%Y")
@@ -98,7 +98,7 @@ module ApprovalTatReports::TatHelper
       filtered_documents&.find_each do |document|
         data = {}
         pr_reviewal_chain = document&.dlrms&.any? { |dlrm| dlrm.level.nil? } ? "" : document&.get_reviewal_chain
-        pending_approval_level, pending_approver_names  = pr_reviewal_chain.present? ? get_pending_approval_level_approver(document, pr_reviewal_chain) : ["",""]
+        pending_approval_level, pending_approver_names  = pr_reviewal_chain&.present? ? get_pending_approval_level_approver(document, pr_reviewal_chain) : ["",""]
 
         data[:purchase_request_no] = document&.order_number
         data[:policy_name] = document&.policy&.name
@@ -109,7 +109,7 @@ module ApprovalTatReports::TatHelper
         data[:pr_submitted_by] = "#{document&.creator&.first_name} #{document&.creator&.last_name}"
         data[:pr_submitted_date] = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")   
 
-        last_level_approval_date = assign_reviewers_data(document, data, pr_reviewal_chain) if pr_reviewal_chain.present?
+        last_level_approval_date = assign_reviewers_data(document, data, pr_reviewal_chain) if pr_reviewal_chain&.present?
 
         data[:pr_ageing] = (document&.submitted_at && last_level_approval_date&.present?) ? (last_level_approval_date&.to_date - document&.submitted_at&.to_date)&.abs : ""
         tat_reports.push(data.with_indifferent_access)
@@ -125,7 +125,7 @@ module ApprovalTatReports::TatHelper
       filtered_documents&.find_each do |document|
         data = {}
         po_reviewal_chain = document&.dlrms&.any? { |dlrm| dlrm.level.nil? } ? "" : document&.get_reviewal_chain
-        pending_approval_level, pending_approver_names = (po_reviewal_chain.present? && !document&.voided?) ? get_pending_approval_level_approver(document, po_reviewal_chain) : ["",""]
+        pending_approval_level, pending_approver_names = (po_reviewal_chain&.present? && !document&.voided?) ? get_pending_approval_level_approver(document, po_reviewal_chain) : ["",""]
 
         data[:purchase_order_no] = document&.po_number
         data[:vendor_name] = document&.vendor&.business_name
@@ -137,7 +137,7 @@ module ApprovalTatReports::TatHelper
         data[:po_submitted_by] = "#{document&.created_by&.first_name} #{document&.created_by&.last_name}"
         data[:po_submitted_date] = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")   
 
-        last_level_approval_date = assign_reviewers_data(document, data, po_reviewal_chain) if po_reviewal_chain.present?
+        last_level_approval_date = assign_reviewers_data(document, data, po_reviewal_chain) if po_reviewal_chain&.present?
 
         data[:po_ageing] = (document&.submitted_at && last_level_approval_date&.present?) ? (last_level_approval_date&.to_date - document&.submitted_at&.to_date)&.abs : ""
         tat_reports.push(data.with_indifferent_access)
@@ -153,7 +153,7 @@ module ApprovalTatReports::TatHelper
       filtered_documents&.find_each do |document|
         data = {}
         bpr_reviewal_chain = document&.dlrms&.any? { |dlrm| dlrm.level.nil? } ? "" : document&.get_reviewal_chain
-        pending_approval_level, pending_approver_names  = bpr_reviewal_chain.present? ? get_pending_approval_level_approver(document, bpr_reviewal_chain) : ["",""]
+        pending_approval_level, pending_approver_names  = bpr_reviewal_chain&.present? ? get_pending_approval_level_approver(document, bpr_reviewal_chain) : ["",""]
 
         data[:payment_ticket_id] = document&.id
         data[:payment_ticket_created_by] = "#{document&.created_by&.first_name} #{document.created_by&.last_name}"
@@ -162,7 +162,7 @@ module ApprovalTatReports::TatHelper
         data[:pending_for_approval_at_level] = pending_approval_level
         data[:pending_with_approver] = pending_approver_names
 
-        last_level_approval_date = assign_reviewers_data(document, data, bpr_reviewal_chain) if bpr_reviewal_chain.present?
+        last_level_approval_date = assign_reviewers_data(document, data, bpr_reviewal_chain) if bpr_reviewal_chain&.present?
         payment_date = get_bank_payment_request_payment_date(document)
         data[:payment_ageing] = (document&.submitted_at &&  payment_date&.present?) ? ( payment_date&.to_date - document&.submitted_at&.to_date)&.abs : ""
         tat_reports.push(data.with_indifferent_access)
@@ -178,7 +178,7 @@ module ApprovalTatReports::TatHelper
       filtered_documents&.find_each do |document|
         data = {}
         pa_reviewal_chain = document&.dlrms&.any? { |dlrm| dlrm.level.nil? } ? "" : document&.get_reviewal_chain
-        pending_approval_level, pending_approver_names  = pa_reviewal_chain.present? ? get_pending_approval_level_approver(document, pa_reviewal_chain) : ["",""]
+        pending_approval_level, pending_approver_names  = pa_reviewal_chain&.present? ? get_pending_approval_level_approver(document, pa_reviewal_chain) : ["",""]
 
         data[:agreement_no] = document&.order_number
         data[:agreement_policy_name] = document&.policy&.name
@@ -189,7 +189,7 @@ module ApprovalTatReports::TatHelper
         data[:agreement_submitted_by] = "#{document&.created_by&.first_name} #{document.created_by&.last_name}"
         data[:agreement_submitted_date] = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")   
 
-        last_level_approval_date = assign_reviewers_data(document, data, pa_reviewal_chain) if pa_reviewal_chain.present?
+        last_level_approval_date = assign_reviewers_data(document, data, pa_reviewal_chain) if pa_reviewal_chain&.present?
 
         data[:agrement_ageing] = (document&.submitted_at && last_level_approval_date&.present?) ? ( last_level_approval_date&.to_date - document&.submitted_at&.to_date)&.abs : ""
         tat_reports.push(data.with_indifferent_access)
@@ -205,7 +205,7 @@ module ApprovalTatReports::TatHelper
       filtered_documents&.find_each do |document|
         data = {}
         bbps_reviewal_chain = document&.dlrms&.any? { |dlrm| dlrm.level.nil? } ? "" : document&.get_reviewal_chain
-        pending_approval_level, pending_approver_names  = bbps_reviewal_chain.present? ? get_pending_approval_level_approver(document, bbps_reviewal_chain) : ["",""]
+        pending_approval_level, pending_approver_names  = bbps_reviewal_chain&.present? ? get_pending_approval_level_approver(document, bbps_reviewal_chain) : ["",""]
 
         data[:utility_id] = document&.sequence_id
         data[:vendor_name] = document&.biller&.biller_name
@@ -216,7 +216,7 @@ module ApprovalTatReports::TatHelper
         data[:utility_master_submitted_by] = "#{document&.created_by&.first_name} #{document.created_by&.last_name}"
         data[:utility_master_submitted_date] = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")   
 
-        last_level_approval_date = assign_reviewers_data(document, data, bbps_reviewal_chain) if bbps_reviewal_chain.present?
+        last_level_approval_date = assign_reviewers_data(document, data, bbps_reviewal_chain) if bbps_reviewal_chain&.present?
 
         data[:utility_ageing ] = (document&.submitted_at && last_level_approval_date&.present?) ? (last_level_approval_date&.to_date - document&.submitted_at&.to_date)&.abs : ""
         tat_reports.push(data.with_indifferent_access)
@@ -232,7 +232,7 @@ module ApprovalTatReports::TatHelper
       filtered_documents&.find_each do |document|
         data = {}
         vendor_reviewal_chain = document&.dlrms&.any? { |dlrm| dlrm.level.nil? } ? "" : document&.get_reviewal_chain
-        pending_approval_level, pending_approver_names  = vendor_reviewal_chain.present? ? get_pending_approval_level_approver(document, vendor_reviewal_chain) : ["",""]
+        pending_approval_level, pending_approver_names  = vendor_reviewal_chain&.present? ? get_pending_approval_level_approver(document, vendor_reviewal_chain) : ["",""]
         
         data[:vendor_number] = document&.vendor_id
         data[:vendor_legal_name] = document&.business_name
@@ -244,7 +244,7 @@ module ApprovalTatReports::TatHelper
         data[:vendor_submitted_by] = "#{document&.created_by&.first_name} #{document.created_by&.last_name}"
         data[:venodr_submitted_date] = document&.submitted_at&.to_date&.strftime("%d-%m-%Y") 
 
-        last_level_approval_date = assign_reviewers_data(document, data, vendor_reviewal_chain) if vendor_reviewal_chain.present?
+        last_level_approval_date = assign_reviewers_data(document, data, vendor_reviewal_chain) if vendor_reviewal_chain&.present?
 
         data[:vendor_ageing ] = (document&.submitted_at && last_level_approval_date&.present?) ? (last_level_approval_date&.to_date - document&.submitted_at&.to_date)&.abs : ""
         data[:vendor_last_modified] = document&.updated_at&.strftime("%d-%m-%Y %T")
@@ -254,14 +254,14 @@ module ApprovalTatReports::TatHelper
     end
 
     def fetch_approver_name(review_chain)
-      reviewer = review_chain.dig(:reviewers).select{ |each_reviewer| each_reviewer.dig(:action_taken)}
+      reviewer = review_chain&.dig(:reviewers)&.select{ |each_reviewer| each_reviewer.dig(:action_taken)}
         
-      if reviewer.present?
-        return reviewer.first.dig(:name)
-      elsif review_chain.dig(:taken_control_by,:name).present?
-        return review_chain.dig(:taken_control_by,:name)
-      elsif review_chain.dig(:forwarded_to,:name).present?
-        return review_chain.dig(:forwarded_to,:name)
+      if reviewer&.present?
+        return reviewer&.first&.dig(:name)
+      elsif review_chain&.dig(:taken_control_by,:name)&.present?
+        return review_chain&.dig(:taken_control_by,:name)
+      elsif review_chain&.dig(:forwarded_to,:name)&.present?
+        return review_chain&.dig(:forwarded_to,:name)
       end
 
     end
@@ -279,7 +279,7 @@ module ApprovalTatReports::TatHelper
       payments = document&.payment_order&.payments
       last_payment_processed_at = payments&.sort_by { |record| record.updated_at }&.reverse&.first
       
-      if last_payment_processed_at.present?
+      if last_payment_processed_at&.present?
         return last_payment_processed_at
       else
         return get_mark_as_credited_date(document)
