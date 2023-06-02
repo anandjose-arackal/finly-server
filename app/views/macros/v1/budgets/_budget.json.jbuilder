@@ -16,6 +16,8 @@ json.budget_consumption budget_consumption
 
 json.budget_group_details record.budget_group
 
+json.budget_details record.as_json
+
 json.erp_sync_status record.erp_sync_status&.name
 json.erp_sync_message record.erp_sync_message
 json.erp_sync_reference_id record.erp_sync_reference_id
