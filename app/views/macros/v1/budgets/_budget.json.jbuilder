@@ -14,8 +14,6 @@ json.end_date record.end_date&.strftime("%d-%b-%Y")
 budget_consumption = record.budget_consumption
 json.budget_consumption budget_consumption
 
-json.budget_criteria record.budget_criteria_as_json
-
 json.budget_group_details record.budget_group
 
 json.erp_sync_status record.erp_sync_status&.name
