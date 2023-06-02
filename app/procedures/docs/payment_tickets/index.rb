@@ -119,8 +119,7 @@ class Docs::PaymentTickets::Index < IndexBuilder::API
     # Approved / Auto Approved
     counter.add BankPaymentRequestStatus::GROUP_PENDING_CREDIT, 'Pending Credit', (
       counts[BankPaymentRequestStatus.id_for(:approved)].to_i +
-        counts[BankPaymentRequestStatus.id_for(:auto_approved)].to_i +
-        counts[BankPaymentRequestStatus.id_for(:pending)].to_i
+        counts[BankPaymentRequestStatus.id_for(:auto_approved)].to_i
     )
 
     counter.add BankPaymentRequestStatus::GROUP_SCHEDULED, 'Scheduled', collection.with_status_id(BankPaymentRequestStatus::GROUP_SCHEDULED).select(:id).count
