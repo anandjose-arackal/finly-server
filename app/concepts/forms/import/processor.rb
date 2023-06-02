@@ -102,11 +102,11 @@ class Forms::Import::Processor
           request.item_complete(false)
         end
 
-        add_record_to_result_file(record_data[:record_data], result[:model].id, message, worksheets, worksheets_length)
+        add_record_to_result_file(record_data[:record_data], {}, result[:model].id, message, worksheets, worksheets_length)
       rescue => exception
         message = "Unable to process, #{exception}"
         request.item_complete(false)
-        add_record_to_result_file(record_data[:record_data], nil, message, worksheets, worksheets_length)
+        add_record_to_result_file(record_data[:record_data],{}, nil, message, worksheets, worksheets_length)
       end
     end
 
@@ -291,22 +291,16 @@ class Forms::Import::Processor
       end
       record.import_job_id = import_job.id
       if record.save
-        submit_params = { reviewal_document: record }
-        # document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(current_user, submit_params)
-        # unless document_reviewer_mappings_op.success?
-        #   return on_error context, document_reviewer_mappings_op.messages[:error]
-        # end
-        #
-        # next_level = model.dlrms.with_level_number(1).first&.level
-        # if next_level.present?
-        #   model.dlrms.with_level_id(next_level&.id).update_all(viewable: true)
-        #   model.update(controlling_level_id: next_level&.id)
-        # end
-
         if record.class == YesBankVendor
+          submit_params = { reviewal_document: record }
           op = Docs::P2P::Vendors::Ops::Submit.(params: submit_params, current_user: user)
         elsif record.class == Invoice
-          op = Procurements::Invoices::Submit.(user, { id: record.id })
+          submit_params = {
+            reviewal_document: record,
+            # document_reviewer_mappings: params[:document_reviewer_mappings],
+            policy_id: record.policy_id
+          }
+          op = Docs::I2P::Invoices::Ops::Submit.(params: submit_params, current_user: user)
         end
         if op&.success?
           import_record.update_status(true, ['Record created successfully'].to_s, '', '')
@@ -333,7 +327,7 @@ class Forms::Import::Processor
     worksheets[form.model.name].write(0, self.headers[form.model.name][:headers].keys.count, "Message")
 
     import_job.records.each do |import_record|
-      add_record_to_result_file(import_record.record_data, import_record.document&.id, import_record.message, worksheets, worksheets_length)
+      add_record_to_result_file(import_record.record_data, import_record.processed_data, import_record.document&.id, import_record.message, worksheets, worksheets_length)
     end
 
     workbook.close
@@ -343,14 +337,19 @@ class Forms::Import::Processor
     import_job.save
   end
 
-  def add_record_to_result_file(record_data, document_id, message, worksheets, worksheets_length)
+  def add_record_to_result_file(record_data, processed_data, document_id, message, worksheets, worksheets_length)
     self.headers.values.each do |sheet_data|
       sheet_name = sheet_data[:name]
       sheet_key = sheet_data[:key]
       if sheet_key == form.model.name
         worksheets_length[sheet_key] += 1
+        skipped_count = 0
         self.headers[sheet_key][:headers].keys.each_with_index do |key, header_index|
-          column_data = record_data[self.headers[sheet_key][:headers][key][:name]]
+          if self.headers[sheet_key][:headers][key]["hide_in_sheet"]
+            skipped_count += 1
+            next
+          end
+          column_data = processed_data[self.headers[sheet_key][:headers][key][:entity_key].gsub('_id', '_id_value')] || record_data[self.headers[sheet_key][:headers][key][:name]]
           if key.to_s == 'id' and document_id.present?
             column_data = document_id
           end
@@ -361,15 +360,22 @@ class Forms::Import::Processor
           if self.headers[sheet_key][:headers][key][:name].include? '(Yes/No)'
             column_data = column_data == 'TRUE' ? 'Yes' : 'No'
           end
-          worksheets[sheet_key].write(worksheets_length[sheet_key], header_index, column_data)
+          worksheets[sheet_key].write(worksheets_length[sheet_key], header_index - skipped_count, column_data)
         end
-        worksheets[sheet_key].write(worksheets_length[sheet_key], self.headers[form.model.name][:headers].keys.count, message)
+        worksheets[sheet_key].write(worksheets_length[sheet_key], self.headers[form.model.name][:headers].keys.count - skipped_count, message)
       else
         parent_data = record_data
-        record_data[sheet_key]&.each do |child_data|
+        record_data[sheet_key]&.each_with_index do |child_data, child_index|
+          processed_child_data = sheet_key == "items_summary" ? processed_data : processed_data[sheet_key][child_index]
           worksheets_length[sheet_key] += 1
+          skipped_count = 0
           self.headers[sheet_key][:headers].keys.each_with_index do |key, header_index|
-            column_data = child_data[self.headers[sheet_key][:headers][key][:name]]
+            if self.headers[sheet_key][:headers][key]["hide_in_sheet"]
+              skipped_count += 1
+              next
+            end
+            
+            column_data = processed_child_data[self.headers[sheet_key][:headers][key][:entity_key].gsub('_id', '_id_value')] || child_data[self.headers[sheet_key][:headers][key][:name]]
             if key.to_s == 'parent_id'
               if document_id.present?
                 column_data = document_id
@@ -383,7 +389,7 @@ class Forms::Import::Processor
             if self.headers[sheet_key][:headers][key][:name].include? '(Yes/No)'
               column_data = column_data == 'TRUE' ? 'Yes' : 'No'
             end
-            worksheets[sheet_key].write(worksheets_length[sheet_key], header_index, column_data)
+            worksheets[sheet_key].write(worksheets_length[sheet_key], header_index - skipped_count, column_data)
           end
         end
       end
