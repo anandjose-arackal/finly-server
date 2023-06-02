@@ -15,6 +15,7 @@ class Procurements::Mailers::Base < BaseOperation
 
     self.email_options = {}
     self.email_options[:email_to] = params[:email_to]
+    self.email_options[:email_cc_to] = params[:email_cc_to]
     self.email_options[:email_bcc_to] = params[:email_bcc_to]
 
     self.email_options[:email_subject] = params[:subject]
@@ -56,13 +57,14 @@ class Procurements::Mailers::Base < BaseOperation
   end
 
   class Procurements::Mailers::Base::MailerPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :document, :user, :email_to, :email_bcc_to, :email_subject, :email_body, :company, :attachments
+    attr_accessor :document, :user, :email_to, :email_bcc_to, :email_cc_to, :email_subject, :email_body, :company, :attachments
 
     def init
       self.document = params[:document]
       # self.purchase_order = params[:document]
       self.email_body = params[:email_options][:email_body]
       self.email_to = params[:email_options][:email_to]
+      self.email_cc_to = params[:email_options][:email_cc_to]
       self.email_bcc_to = params[:email_options][:email_bcc_to]
       self.email_subject = params[:email_options][:email_subject]
       self.attachments = params[:attachments]
