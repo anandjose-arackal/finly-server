@@ -28,7 +28,7 @@ module ApprovalTatReports::TatHelper
       filtered_documents&.find_each do |document|
         data = {}
         invoice_reviewal_chain = document&.dlrms&.any? { |dlrm| dlrm.level.nil? } ? "" : document&.get_reviewal_chain
-        pending_approval_level, pending_approver_names  = (invoice_reviewal_chain&.present? && !document&.voided?) ? get_pending_approval_level_approver(document, invoice_reviewal_chain) : ["",""]
+        pending_approval_level, pending_approver_names  = (invoice_reviewal_chain&.present? && document&.processing?) ? get_pending_approval_level_approver(document, invoice_reviewal_chain) : ["",""]
 
         data[:invoice_id] = document&.invoice_id
         data[:business_name] = document&.vendor&.business_name
@@ -98,7 +98,7 @@ module ApprovalTatReports::TatHelper
       filtered_documents&.find_each do |document|
         data = {}
         pr_reviewal_chain = document&.dlrms&.any? { |dlrm| dlrm.level.nil? } ? "" : document&.get_reviewal_chain
-        pending_approval_level, pending_approver_names  = pr_reviewal_chain&.present? ? get_pending_approval_level_approver(document, pr_reviewal_chain) : ["",""]
+        pending_approval_level, pending_approver_names = (pr_reviewal_chain&.present? && document&.awaiting_approval?) ? get_pending_approval_level_approver(document, pr_reviewal_chain) : ["",""]
 
         data[:purchase_request_no] = document&.order_number
         data[:policy_name] = document&.policy&.name
@@ -125,7 +125,7 @@ module ApprovalTatReports::TatHelper
       filtered_documents&.find_each do |document|
         data = {}
         po_reviewal_chain = document&.dlrms&.any? { |dlrm| dlrm.level.nil? } ? "" : document&.get_reviewal_chain
-        pending_approval_level, pending_approver_names = (po_reviewal_chain&.present? && !document&.voided?) ? get_pending_approval_level_approver(document, po_reviewal_chain) : ["",""]
+        pending_approval_level, pending_approver_names = (po_reviewal_chain&.present? && document&.processing?) ? get_pending_approval_level_approver(document, po_reviewal_chain) : ["",""]
 
         data[:purchase_order_no] = document&.po_number
         data[:vendor_name] = document&.vendor&.business_name
@@ -153,7 +153,7 @@ module ApprovalTatReports::TatHelper
       filtered_documents&.find_each do |document|
         data = {}
         bpr_reviewal_chain = document&.dlrms&.any? { |dlrm| dlrm.level.nil? } ? "" : document&.get_reviewal_chain
-        pending_approval_level, pending_approver_names  = bpr_reviewal_chain&.present? ? get_pending_approval_level_approver(document, bpr_reviewal_chain) : ["",""]
+        pending_approval_level, pending_approver_names = (bpr_reviewal_chain&.present? && document&.processing?) ? get_pending_approval_level_approver(document, bpr_reviewal_chain) : ["",""]
 
         bpr_payment_order_status = document&.payment_order&.payment_order_status
 
@@ -180,7 +180,7 @@ module ApprovalTatReports::TatHelper
       filtered_documents&.find_each do |document|
         data = {}
         pa_reviewal_chain = document&.dlrms&.any? { |dlrm| dlrm.level.nil? } ? "" : document&.get_reviewal_chain
-        pending_approval_level, pending_approver_names  = pa_reviewal_chain&.present? ? get_pending_approval_level_approver(document, pa_reviewal_chain) : ["",""]
+        pending_approval_level, pending_approver_names = (pa_reviewal_chain&.present? &&  document&.awaiting_approval?) ? get_pending_approval_level_approver(document, pa_reviewal_chain) : ["",""]
 
         data[:agreement_no] = document&.order_number
         data[:agreement_policy_name] = document&.policy&.name
@@ -207,7 +207,7 @@ module ApprovalTatReports::TatHelper
       filtered_documents&.find_each do |document|
         data = {}
         bbps_reviewal_chain = document&.dlrms&.any? { |dlrm| dlrm.level.nil? } ? "" : document&.get_reviewal_chain
-        pending_approval_level, pending_approver_names  = bbps_reviewal_chain&.present? ? get_pending_approval_level_approver(document, bbps_reviewal_chain) : ["",""]
+        pending_approval_level, pending_approver_names  = (bbps_reviewal_chain&.present? && document&.awaiting_approval?) ? get_pending_approval_level_approver(document, bbps_reviewal_chain) : ["",""]
 
         data[:utility_id] = document&.sequence_id
         data[:vendor_name] = document&.biller&.biller_name
@@ -234,7 +234,7 @@ module ApprovalTatReports::TatHelper
       filtered_documents&.find_each do |document|
         data = {}
         vendor_reviewal_chain = document&.dlrms&.any? { |dlrm| dlrm.level.nil? } ? "" : document&.get_reviewal_chain
-        pending_approval_level, pending_approver_names  = vendor_reviewal_chain&.present? ? get_pending_approval_level_approver(document, vendor_reviewal_chain) : ["",""]
+        pending_approval_level, pending_approver_names  = (vendor_reviewal_chain&.present? && document&.awaiting_approval?) ? get_pending_approval_level_approver(document, vendor_reviewal_chain) : ["",""]
         
         data[:vendor_number] = document&.vendor_id
         data[:vendor_legal_name] = document&.business_name
@@ -311,18 +311,14 @@ module ApprovalTatReports::TatHelper
     end
 
     def get_pending_approval_level_approver(document, reviewal_chain)
-      pending_approval_level = ""
       pending_approver_names = ""
-      unless document&.rejected? || document&.retracted? || document&.auto_approved? || document&.approved_at&.present?
-        not_approved_level = reviewal_chain&.find { |each_level| !each_level.dig(:action_taken)}
-        if not_approved_level&.dig(:forwarded_to)&.present?
-          pending_approver_names = not_approved_level&.dig(:forwarded_to,:name)
-        elsif 
-          pending_approver_names = not_approved_level&.dig(:reviewers)&.map { |reviewer| reviewer[:name] }&.join(',')
-        end
-        pending_approval_level = not_approved_level&.dig(:level_number)
+      not_approved_level = reviewal_chain&.find { |each_level| !each_level.dig(:action_taken)}
+      if not_approved_level&.dig(:forwarded_to)&.present?
+        pending_approver_names = not_approved_level&.dig(:forwarded_to,:name)
+      elsif 
+        pending_approver_names = not_approved_level&.dig(:reviewers)&.map { |reviewer| reviewer[:name] }&.join(',')
       end
-      [pending_approval_level, pending_approver_names]
+      [not_approved_level&.dig(:level_number), pending_approver_names]
     end
   
 end
