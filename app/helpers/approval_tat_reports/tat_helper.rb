@@ -73,7 +73,7 @@ module ApprovalTatReports::TatHelper
               data["level_#{each_level}_payment_ticket_approver_name"] =  selected_level_reviewer[:action_taken] ? fetch_approver_name(selected_level_reviewer) : ""
               current_level_approval_date = selected_level_reviewer[:action_taken] ? selected_level_reviewer[:action_taken_at]&.to_date&.strftime("%d-%m-%Y") : ""
               data["level_#{each_level}_payment_ticket_approval_date"] = current_level_approval_date
-              data["level_#{each_level}_payment_ticket_interval_from_last_level"] = (current_level_approval_date&.to_date - last_level_approval_date&.to_date)&.abs
+              data["level_#{each_level}_payment_ticket_interval_from_last_level"] = ((current_level_approval_date&.present? && last_level_approval_date&.present?) ? (current_level_approval_date&.to_date - last_level_approval_date&.to_date)&.abs : "")
               last_level_approval_date = current_level_approval_date
             else
               data["level_#{each_level}_approver_name"] = ""
@@ -155,10 +155,12 @@ module ApprovalTatReports::TatHelper
         bpr_reviewal_chain = document&.dlrms&.any? { |dlrm| dlrm.level.nil? } ? "" : document&.get_reviewal_chain
         pending_approval_level, pending_approver_names  = bpr_reviewal_chain&.present? ? get_pending_approval_level_approver(document, bpr_reviewal_chain) : ["",""]
 
+        bpr_payment_order_status = document&.payment_order&.payment_order_status
+
         data[:payment_ticket_id] = document&.id
         data[:payment_ticket_created_by] = "#{document&.created_by&.first_name} #{document.created_by&.last_name}"
         data[:payment_ticket_created_date] = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")
-        data[:payment_ticket_status] = document&.payment_order&.payment_order_status&.name
+        data[:payment_ticket_status] = (bpr_payment_order_status&.id == PaymentOrderStatus.id_for(:failed)) ? bpr_payment_order_status&.name : document&.status&.name
         data[:pending_for_approval_at_level] = pending_approval_level
         data[:pending_with_approver] = pending_approver_names
 
@@ -277,10 +279,10 @@ module ApprovalTatReports::TatHelper
 
     def get_bank_payment_request_payment_date(document)
       payments = document&.payment_order&.payments
-      last_payment_processed_at = payments&.sort_by { |record| record.updated_at }&.reverse&.first
+      last_payment_processed_at = payments&.sort_by { |record| record.updated_at }&.reverse&.first&.processed_at
       
       if last_payment_processed_at&.present?
-        return last_payment_processed_at&.processed_at
+        return last_payment_processed_at
       else
         return get_mark_as_credited_date(document)
       end
