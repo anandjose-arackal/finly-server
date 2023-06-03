@@ -39,7 +39,7 @@ module ApprovalTatReports::TatHelper
         data[:invoice_status] = document&.status&.name
         data[:invoice_pending_for_approval_at_level] = pending_approval_level
         data[:invoice_pending_with_approver] = pending_approver_names
-        data[:invoice_amount] = document&.invoice_total_amount
+        data[:invoice_amount] = document&.invoice_net_total_amount
         data[:po_number] = (document&.po_number ||= "")
         data[:invoice_submitted_by] = "#{document&.created_by&.first_name} #{document&.created_by&.last_name}"
         data[:invoice_submitted_date] = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")
@@ -83,7 +83,7 @@ module ApprovalTatReports::TatHelper
           end
         end
 
-        payment_date = get_invoice_payment_date(payment)
+        payment_date = get_payment_date(invoice_payment_ticket, payment)
         data["invoice_ageing"] = (payment_date&.present? && document&.date&.to_date) ? (payment_date&.to_date - document&.date&.to_date)&.abs : ""
         tat_reports.push(data)
       end
@@ -165,7 +165,7 @@ module ApprovalTatReports::TatHelper
         data[:pending_with_approver] = pending_approver_names
 
         last_level_approval_date = assign_reviewers_data(document, data, bpr_reviewal_chain) if bpr_reviewal_chain&.present?
-        payment_date = get_bank_payment_request_payment_date(document)
+        payment_date = get_payment_date(document)
         data[:payment_ageing] = (document&.submitted_at &&  payment_date&.present?) ? ( payment_date&.to_date - document&.submitted_at&.to_date)&.abs : ""
         tat_reports.push(data.with_indifferent_access)
       end
@@ -268,28 +268,18 @@ module ApprovalTatReports::TatHelper
 
     end
 
-    def get_invoice_payment_date(payment)
-      if payment&.processed_at
-        return payment&.processed_at
+    def get_payment_date(bank_payment_request, payment = nil)
+      payment_date = bank_payment_request&.comments&.find { |each_comment| each_comment.action_id == BankPaymentRequestCommentAction.id_for(:mark_as_credited) }&.updated_at
+      if payment_date&.present?
+        return payment_date
       else
-        bank_payment_request = payment&.payment_order&.bank_payment_request
-        return get_mark_as_credited_date(bank_payment_request)
+        if payment
+          return payment&.processed_at
+        else
+          payments = bank_payment_request&.payment_order&.payments
+          return payments&.sort_by { |record| record.updated_at }&.reverse&.first&.processed_at
+        end
       end
-    end
-
-    def get_bank_payment_request_payment_date(document)
-      payments = document&.payment_order&.payments
-      last_payment_processed_at = payments&.sort_by { |record| record.updated_at }&.reverse&.first&.processed_at
-      
-      if last_payment_processed_at&.present?
-        return last_payment_processed_at
-      else
-        return get_mark_as_credited_date(document)
-      end
-    end
-
-    def get_mark_as_credited_date(document)
-      document&.comments&.find { |each_comment| each_comment.action_id == BankPaymentRequestCommentAction.id_for(:mark_as_credited) }&.updated_at
     end
 
     def assign_reviewers_data(document, data, reviewal_chain)
