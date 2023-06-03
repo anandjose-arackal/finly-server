@@ -280,7 +280,7 @@ module ApprovalTatReports::TatHelper
       last_payment_processed_at = payments&.sort_by { |record| record.updated_at }&.reverse&.first
       
       if last_payment_processed_at&.present?
-        return last_payment_processed_at
+        return last_payment_processed_at&.processed_at
       else
         return get_mark_as_credited_date(document)
       end
