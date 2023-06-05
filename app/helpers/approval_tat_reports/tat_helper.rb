@@ -39,7 +39,7 @@ module ApprovalTatReports::TatHelper
         data[:invoice_status] = document&.status&.name
         data[:invoice_pending_for_approval_at_level] = pending_approval_level
         data[:invoice_pending_with_approver] = pending_approver_names
-        data[:invoice_amount] = document&.forms_enabled ? document&.invoice_total_amount : document&.net_amount
+        data[:invoice_amount] = document&.forms_enabled ? document&.invoice_total_amount&.value : document&.net_amount
         data[:po_number] = (document&.po_number ||= "")
         data[:invoice_submitted_by] = "#{document&.created_by&.first_name} #{document&.created_by&.last_name}"
         data[:invoice_submitted_date] = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")
