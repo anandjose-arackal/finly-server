@@ -82,9 +82,12 @@ module ApprovalTatReports::TatHelper
             end
           end
         end
-
-        payment_date = get_payment_date(invoice_payment_ticket, payment)
-        data["invoice_ageing"] = (payment_date&.present? && document&.date&.to_date) ? (payment_date&.to_date - document&.date&.to_date)&.abs : ""
+        ageing_days = ""
+        if document&.paid? || document&.partially_paid?
+          payment_date = get_payment_date(invoice_payment_ticket, payment)
+          ageing_days = (payment_date&.present? && document&.date&.to_date) ? (payment_date&.to_date - document&.date&.to_date)&.abs : ""
+        end
+        data["invoice_ageing"] = ageing_days
         tat_reports.push(data)
       end
       return tat_data(tat_reports)
@@ -154,9 +157,10 @@ module ApprovalTatReports::TatHelper
         data = {}
         bpr_reviewal_chain = document&.dlrms&.any? { |dlrm| dlrm.level.nil? } ? "" : document&.get_reviewal_chain
         pending_approval_level, pending_approver_names = (bpr_reviewal_chain&.present? && document&.processing?) ? get_pending_approval_level_approver(document, bpr_reviewal_chain) : ["",""]
-
-        bpr_payment_order_status = document&.payment_order&.payment_order_status
-
+        
+        bpr_payment_order = document&.payment_order
+        bpr_payment_order_status = bpr_payment_order&.payment_order_status
+   
         data[:payment_ticket_id] = document&.id
         data[:payment_ticket_created_by] = "#{document&.created_by&.first_name} #{document.created_by&.last_name}"
         data[:payment_ticket_created_date] = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")
@@ -165,8 +169,12 @@ module ApprovalTatReports::TatHelper
         data[:pending_with_approver] = pending_approver_names
 
         last_level_approval_date = assign_reviewers_data(document, data, bpr_reviewal_chain) if bpr_reviewal_chain&.present?
-        payment_date = get_payment_date(document)
-        data[:payment_ageing] = (document&.submitted_at &&  payment_date&.present?) ? ( payment_date&.to_date - document&.submitted_at&.to_date)&.abs : ""
+        ageing_days = ""
+        if bpr_payment_order&.completed? || bpr_payment_order&.partially_completed?
+          payment_date = get_payment_date(document)
+          ageing_days = ( payment_date&.present? && document&.submitted_at) ? ( payment_date&.to_date - document&.submitted_at&.to_date)&.abs : ""
+        end
+        data[:payment_ageing] = ageing_days
         tat_reports.push(data.with_indifferent_access)
       end
       return tat_data(tat_reports)
@@ -269,7 +277,8 @@ module ApprovalTatReports::TatHelper
     end
 
     def get_payment_date(bank_payment_request, payment = nil)
-      payment_date = bank_payment_request&.comments&.find { |each_comment| each_comment.action_id == BankPaymentRequestCommentAction.id_for(:mark_as_credited) }&.updated_at
+      bank_payment_request_comment_action = BankPaymentRequestCommentAction.id_for(:mark_as_credited)
+      payment_date = bank_payment_request&.comments&.find { |each_comment| each_comment.action_id == bank_payment_request_comment_action }&.updated_at
       if payment_date&.present?
         return payment_date
       else
