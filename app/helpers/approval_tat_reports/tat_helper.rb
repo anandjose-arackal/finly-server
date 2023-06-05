@@ -39,11 +39,11 @@ module ApprovalTatReports::TatHelper
         data[:invoice_status] = document&.status&.name
         data[:invoice_pending_for_approval_at_level] = pending_approval_level
         data[:invoice_pending_with_approver] = pending_approver_names
-        data[:invoice_amount] = document&.invoice_net_total_amount
+        data[:invoice_amount] = document&.forms_enabled ? document&.invoice_total_amount : document&.net_amount
         data[:po_number] = (document&.po_number ||= "")
         data[:invoice_submitted_by] = "#{document&.created_by&.first_name} #{document&.created_by&.last_name}"
         data[:invoice_submitted_date] = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")
-        data[:interval_between_invoice_date_to_invoice_submission] = (document&.date&.to_date - document&.submitted_at&.to_date)&.abs
+        data[:interval_between_invoice_date_to_invoice_submission] = (document&.date&.present? && document&.submitted_at&.present?) ? (document&.date&.to_date - document&.submitted_at&.to_date)&.abs : ""
         
         assign_reviewers_data(document, data, invoice_reviewal_chain) if invoice_reviewal_chain.present?
         
@@ -277,7 +277,7 @@ module ApprovalTatReports::TatHelper
           return payment&.processed_at
         else
           payments = bank_payment_request&.payment_order&.payments
-          return payments&.sort_by { |record| record.updated_at }&.reverse&.first&.processed_at
+          return payments&.order(processed_at: :desc)&.first&.processed_at
         end
       end
     end
