@@ -1,0 +1,14 @@
+<% content_for :body do %>
+  <div class="primary block center" style="background-color: white;">
+    <br>
+      <p style="line-height: 160%; margin: 0 0 20px 0; text-align: left;">
+        Dear Sir/Ma'am,<br>
+        We are very Sorry to inform you, that the <%=@route%> TAT report export you were looking for has failed.<br>
+        We request you to download the same again. If the issue persist please contact Support@finly.io<br><br>
+        Note: This is an auto generated mail, please do not reply to this mail
+      </p>
+    <br>
+  </div>
+<% end %>
+
+<%= render 'application_mailer/template' %>
