@@ -11,7 +11,7 @@ class TdsSlabs::Create < TdsSlabs::Base
   end
 
   def validate
-    if self.tds_slab_parameters[:tds] < 0
+    if self.tds_slab_parameters[:tds]&.to_i < 0
       add_message :error, 'TDS value should not be negative'
     end
   end
