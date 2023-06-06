@@ -39,6 +39,13 @@ module ApprovalTatReports::TatHelper
         data[:invoice_status] = document&.status&.name
         data[:invoice_pending_for_approval_at_level] = pending_approval_level
         data[:invoice_pending_with_approver] = pending_approver_names
+        Rails.logger.info "form enabled: #{document&.forms_enabled}"
+        Rails.logger.info "invoice: #{document}"
+        Rails.logger.info "invoice class: #{document&.class}"
+        Rails.logger.info "invoice amount class: #{document&.invoice_total_amount&.class}"
+        Rails.logger.info "invoice net amount class: #{document&.net_amount&.class}"
+        Rails.logger.info "invoice total amount: #{document&.invoice_total_amount&.to_f}"
+        Rails.logger.info "invoice net amount: #{document&.net_amount&.to_f}"
         data[:invoice_amount] = document&.forms_enabled ? document&.invoice_total_amount&.to_f : document&.net_amount&.to_f
         data[:po_number] = (document&.po_number ||= "")
         data[:invoice_submitted_by] = "#{document&.created_by&.first_name} #{document&.created_by&.last_name}"
@@ -277,8 +284,8 @@ module ApprovalTatReports::TatHelper
     end
 
     def get_payment_date(bank_payment_request, payment = nil)
-      bank_payment_request_comment_action = BankPaymentRequestCommentAction.id_for(:mark_as_credited)
-      payment_date = bank_payment_request&.comments&.find { |each_comment| each_comment.action_id == bank_payment_request_comment_action }&.updated_at
+      mac_action_id = BankPaymentRequestCommentAction.id_for(:mark_as_credited)
+      payment_date = BankPaymentRequestComment.where(bank_payment_request_id: bank_payment_request&.id, action_id: mac_action_id)&.pluck(:updated_at)[0]
       if payment_date&.present?
         return payment_date
       else
