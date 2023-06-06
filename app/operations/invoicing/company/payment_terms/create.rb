@@ -14,7 +14,7 @@ class Invoicing::Company::PaymentTerms::Create < Invoicing::Company::PaymentTerm
   end
 
   def validate
-    if self.payment_term_parameters[:days_after] < 0
+    if self.payment_term_parameters[:days_after]&.to_i < 0
       add_message :error, 'Days After should not be negative'
     end
   end

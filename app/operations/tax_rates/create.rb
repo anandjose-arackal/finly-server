@@ -8,7 +8,7 @@ class TaxRates::Create < TaxRates::Base
   end
 
   def validate
-    if self.tax_rate_params[:rate] < 0
+    if self.tax_rate_params[:rate]&.to_i < 0
       add_message :error, 'Tax value should not be negative'
     end
   end
