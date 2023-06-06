@@ -1,5 +1,5 @@
 class MailApprovalMailbox < ApplicationMailbox
-  
+
 
   before_processing :ensure_user
 
@@ -10,8 +10,17 @@ class MailApprovalMailbox < ApplicationMailbox
     approval_uuid = approval_uuid.gsub('"','') #outlook has some extra quotes
     email_approval = EmailApproval.where(approval_uuid: approval_uuid)&.first
     if email_approval.nil?
-      @error_logger.info("Email approval not found for approval::uuid #{approval_uuid}")
-      return false
+      # User might belong to multiple entities, and if document is from one of those other entities
+      unless ensure_document_id_matches_user(approval_uuid)
+        @error_logger.info("Email approval not found for approval::uuid #{approval_uuid}")
+        return false
+      else
+        email_approval = EmailApproval.where(approval_uuid: approval_uuid)&.first
+        if email_approval.nil?
+          @error_logger.error("** approval::uuid #{approval_uuid} not found even after Multiple entities search")
+          return false
+        end
+      end
     end
     body = mail.decode_body.split("\n")
     if body.nil?
@@ -75,6 +84,19 @@ class MailApprovalMailbox < ApplicationMailbox
       return false
     end
     ActsAsTenant.current_tenant = @user.company
+  end
+
+  def ensure_document_id_matches_user(approval_uuid)
+    ### Basically ensure Document's Company ID matches with the Company ID of the email sender ###
+    email_approval = ActsAsTenant.without_tenant do EmailApproval.where(approval_uuid: approval_uuid)&.first end
+    user_company_ids = ActsAsTenant.without_tenant do User.where(email: mail.from).pluck(:company_id) end
+    if user_company_ids.include? email_approval.company_id
+      ActsAsTenant.current_tenant = Company.find(email_approval.company_id)
+      @user = User.find_by(email: mail.from)
+      return true unless @user.nil?
+      ActsAsTenant.current_tenant = nil
+      return false
+    end
   end
 
 end
