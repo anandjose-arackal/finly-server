@@ -17,7 +17,7 @@ class ImportRecord < ApplicationRecord
   }
 
   def sync_data
-    if self.processed_data['invoice_number'].present?
+    if self.processed_data.present? && self.processed_data['invoice_number'].present?
       self.record_data['Invoice Number*'] = self.processed_data['invoice_number']
     end
     self.skip_callback = true
