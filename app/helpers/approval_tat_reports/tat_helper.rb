@@ -123,7 +123,7 @@ module ApprovalTatReports::TatHelper
     def purchase_order_tat_report(documents, tat_reports, optimize_tat_report)
       required_includes = [:policy, :status]
       filtered_documents = documents&.not_open
-      filtered_documents = not_open_documents&.includes(required_includes) if optimize_tat_report
+      filtered_documents = filtered_documents&.includes(required_includes) if optimize_tat_report
 
       filtered_documents&.find_each do |document|
         data = {}
