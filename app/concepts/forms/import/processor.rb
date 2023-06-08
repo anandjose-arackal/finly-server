@@ -297,7 +297,6 @@ class Forms::Import::Processor
         elsif record.class == Invoice
           submit_params = {
             reviewal_document: record,
-            # document_reviewer_mappings: params[:document_reviewer_mappings],
             policy_id: record.policy_id
           }
           op = Docs::I2P::Invoices::Ops::Submit.(params: submit_params, current_user: user)
@@ -324,7 +323,6 @@ class Forms::Import::Processor
     workbook = export_base[:workbook]
     worksheets = export_base[:worksheets]
     worksheets_length = Hash.new(0)
-    worksheets[form.model.name].write(0, self.headers[form.model.name][:headers].keys.count, "Message")
 
     import_job.records.each do |import_record|
       add_record_to_result_file(import_record.record_data, import_record.processed_data, import_record.document&.id, import_record.message, worksheets, worksheets_length)
@@ -342,14 +340,15 @@ class Forms::Import::Processor
       sheet_name = sheet_data[:name]
       sheet_key = sheet_data[:key]
       if sheet_key == form.model.name
-        worksheets_length[sheet_key] += 1
         skipped_count = 0
+        worksheets_length[sheet_key] += 1
         self.headers[sheet_key][:headers].keys.each_with_index do |key, header_index|
           if self.headers[sheet_key][:headers][key]["hide_in_sheet"]
             skipped_count += 1
             next
           end
-          column_data = processed_data[self.headers[sheet_key][:headers][key][:entity_key].gsub('_id', '_id_value')] || record_data[self.headers[sheet_key][:headers][key][:name]]
+          data = processed_data[self.headers[sheet_key][:headers][key][:entity_key].gsub('_id', '_id_value')] rescue nil
+          column_data = data || record_data[self.headers[sheet_key][:headers][key][:name]]
           if key.to_s == 'id' and document_id.present?
             column_data = document_id
           end
@@ -362,20 +361,21 @@ class Forms::Import::Processor
           end
           worksheets[sheet_key].write(worksheets_length[sheet_key], header_index - skipped_count, column_data)
         end
+        worksheets[form.model.name].write(0, self.headers[form.model.name][:headers].keys.count - skipped_count, "Message")
         worksheets[sheet_key].write(worksheets_length[sheet_key], self.headers[form.model.name][:headers].keys.count - skipped_count, message)
       else
+        skipped_count = 0
         parent_data = record_data
         record_data[sheet_key]&.each_with_index do |child_data, child_index|
-          processed_child_data = sheet_key == "items_summary" ? processed_data : processed_data[sheet_key][child_index]
+          processed_child_data = sheet_key == "items_summary" ? processed_data : processed_data[sheet_key][child_index] rescue nil
           worksheets_length[sheet_key] += 1
-          skipped_count = 0
           self.headers[sheet_key][:headers].keys.each_with_index do |key, header_index|
             if self.headers[sheet_key][:headers][key]["hide_in_sheet"]
               skipped_count += 1
               next
             end
-            
-            column_data = processed_child_data[self.headers[sheet_key][:headers][key][:entity_key].gsub('_id', '_id_value')] || child_data[self.headers[sheet_key][:headers][key][:name]]
+            data = processed_child_data[self.headers[sheet_key][:headers][key][:entity_key].gsub('_id', '_id_value')] rescue nil
+            column_data = data || child_data[self.headers[sheet_key][:headers][key][:name]]
             if key.to_s == 'parent_id'
               if document_id.present?
                 column_data = document_id
