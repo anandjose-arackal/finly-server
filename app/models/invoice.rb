@@ -1156,7 +1156,7 @@ class Invoice < ApplicationRecord
         form_enabled: self.forms_enabled
       }
       if self.forms_enabled
-        attachment = invoice.form_custom_fields.where(field_key: "invoice_attachments").first&.attachments&.first&.attachment
+        attachment = self.form_custom_fields.where(field_key: "invoice_attachments").first&.attachments&.first&.attachment
         data[:invoice_attachment] = {
             url: attachment&.url,
             thumb: attachment&.url(:thumb),
