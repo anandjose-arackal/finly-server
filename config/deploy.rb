@@ -12,7 +12,7 @@ end
 set :application, 'finly-server'
 
 # set :repo_url, 'git@gitlab.com:finlycore/finly-server.git'
-# set :repo_url, 'git@ssh.dev.azure.com:v3/AnytimeCollect/Lockstep/finly-server'
+set :repo_url, 'git@ssh.dev.azure.com:v3/AnytimeCollect/Lockstep/finly-server'
 
 set :branch, ENV['REFERENCE'] || ENV['BRANCH'] || :master
 
