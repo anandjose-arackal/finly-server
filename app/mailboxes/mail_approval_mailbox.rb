@@ -12,7 +12,7 @@ class MailApprovalMailbox < ApplicationMailbox
     if email_approval.nil?
       # User might belong to multiple entities, and if document is from one of those other entities
       unless ensure_document_id_matches_user(approval_uuid)
-        @error_logger.info("Email approval not found for approval::uuid #{approval_uuid}")
+        @error_logger.info("Email approval not found for approval::uuid #{approval_uuid} under the company #{@user.company_id}")
         return false
       else
         email_approval = EmailApproval.where(approval_uuid: approval_uuid)&.first
