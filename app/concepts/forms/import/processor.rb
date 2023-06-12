@@ -258,6 +258,7 @@ class Forms::Import::Processor
       next if import_record.status_id == ImportRecordStatus.id_for(:in_progress)
 
       begin
+        RequestStoreUtil.set_current_user(user)
         import_record.status_id = ImportRecordStatus.id_for(:in_progress)
         import_record.save
         result = process_import_record(import_record)
