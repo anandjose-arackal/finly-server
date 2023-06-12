@@ -4515,4 +4515,5 @@ Rails.application.routes.draw do
   end
 
   get 'data_cards', to: "data_cards#show"
+  post 'approval_tat_reports/:route', to: "approval_tat_reports#export_reports"
 end

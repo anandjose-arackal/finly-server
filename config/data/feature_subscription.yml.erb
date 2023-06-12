@@ -60,9 +60,9 @@ user:
       user_bulk_upload_enabled: <%= UserWorkFlowBulkUploadEnabledToggle.new(current_user).enabled? %>
     global_search:
       forms_config_enabled: <%= GlobalSearchFormsConfigToggle.new(current_user).enabled? %>
-    form_features:
-      forms_dropdown_autoselect_single_choice: <%= FormsDropdownAutoselectOnSingleChoice.new(current_user).enabled? %>
-      forms_rich_text_editor_for_procurement_enabled: <%= FormsRichTextEditorProcurementTermToggle.new(current_user).enabled? %>
+    vp_reports:
+      approval_tat_reports: <%= ApprovalTatReportsToggle.new(current_user).enabled? %>
+      approval_tat_reports_max_limit: <%= (ApprovalTatReportsToggle.new(current_user).max_limit.nil? || (ApprovalTatReportsToggle.new(current_user).max_limit)&.to_i == 0) ? 10000 : ApprovalTatReportsToggle.new(current_user).max_limit %>
 customer_specific:
   invoice_minimal_ui: <%=  MinimalInvoiceUiToggle.new(current_user).minimal_invoice_ui_enabled? %>
   dummy_bank_account: <%= current_company.yes_bank_vendors&.first&.id %>
