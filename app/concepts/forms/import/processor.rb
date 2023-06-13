@@ -558,11 +558,10 @@ class Forms::Import::Processor
 
     form_data = perform_form_calculations(form_data) if form.model == Invoice
 
-    # Running lookup fetch once more to find values of newly calculated ids
     dropdowns = headers[form.model.name][:headers].values.select{|header_value| header_value['entity_type'] == 'dropdown'}
     dropdowns.each do |header_data|
       choices = header_data[:entity].choices_scope.build.data
-      form_data["#{header_data[:entity_key]}_value"] = choices.select{|x| x['id'] == 1}.first['name'] rescue nil
+      form_data["#{header_data[:entity_key]}_value"] = choices.select{|x| x['id'].to_i == form_data[header_data[:entity_key]].to_i}.first['name'] rescue nil
     end
 
     form_data
