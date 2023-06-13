@@ -296,9 +296,12 @@ class Forms::Import::Processor
           submit_params = { reviewal_document: record }
           op = Docs::P2P::Vendors::Ops::Submit.(params: submit_params, current_user: user)
         elsif record.class == Invoice
+          policy = record.policy
+          document_reviewer_mappings = policy.levels.non_deleted.with_entity_type('NonPoInvoiceProvider').reorder(:level_number).map{|x| {level_id: x.id}} rescue nil
           submit_params = {
             reviewal_document: record,
-            policy_id: record.policy_id
+            policy_id: record.policy_id,
+            document_reviewer_mappings: document_reviewer_mappings
           }
           op = Docs::I2P::Invoices::Ops::Submit.(params: submit_params, current_user: user)
         end
