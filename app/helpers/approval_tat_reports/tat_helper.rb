@@ -22,7 +22,7 @@ module ApprovalTatReports::TatHelper
 
     def invoice_tat_report(documents, tat_reports, optimize_tat_report)
       required_includes = [ {payments: {purchase_order: [:bank_payment_request]}} ]
-      filtered_documents = documents&.not_open
+      filtered_documents = documents&.where.not(invoice_status_id: InwardInvoiceStatus.id_for(:open))
       filtered_documents = filtered_documents&.includes(required_includes) if optimize_tat_report
 
       filtered_documents&.find_each do |document|

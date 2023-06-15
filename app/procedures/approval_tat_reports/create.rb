@@ -38,7 +38,7 @@ class ApprovalTatReports::Create < Transactions::API
 
   def check_open_status_records(context, params:, current_user:, **)
     index_result_documents = context['model.records']
-    context[:total_documents_count] = index_result_documents&.count
+    context[:total_documents_count] = index_result_documents&.ids&.count
     open_documents_count = 0
 
     case params.dig(:route).upcase
