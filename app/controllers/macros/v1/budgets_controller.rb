@@ -14,7 +14,7 @@ class Macros::V1::BudgetsController < BaseControllers::MacrosBase
     endpoint Macros::ErpSyncs::Create, args: [
         params: params.to_unsafe_h,
         current_user: current_user,
-        record_class: Budgets
+        record_class: Budget
     ]
   end
 
