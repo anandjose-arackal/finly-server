@@ -43,19 +43,19 @@ class ApprovalTatReports::Create < Transactions::API
 
     case params.dig(:route).upcase
       when "INVOICES"
-        open_documents_count = index_result_documents.where(invoice_status_id: InwardInvoiceStatus.id_for(:open))&.count
+        open_documents_count = index_result_documents.where(invoice_status_id: InwardInvoiceStatus.id_for(:open))&.ids&.count
       when "PURCHASE_REQUESTS"
-        open_documents_count = index_result_documents.where(purchase_request_status_id: PurchaseRequestStatus.id_for(:draft))&.count
+        open_documents_count = index_result_documents.where(purchase_request_status_id: PurchaseRequestStatus.id_for(:draft))&.ids&.count
       when "PURCHASE_ORDERS"
-        open_documents_count = index_result_documents.where(purchase_order_status_id: PurchaseOrderStatus.id_for(:open))&.count
+        open_documents_count = index_result_documents.where(purchase_order_status_id: PurchaseOrderStatus.id_for(:open))&.ids&.count
       when "PAYMENT_TICKETS"
-        open_documents_count = index_result_documents.where(status_id: BankPaymentRequestStatus.id_for(:open))&.count
+        open_documents_count = index_result_documents.where(status_id: BankPaymentRequestStatus.id_for(:open))&.ids&.count
       when  "AGREEMENTS"
-        open_documents_count = index_result_documents.where(status_id: PaymentAgreementStatus.id_for(:draft))&.count
+        open_documents_count = index_result_documents.where(status_id: PaymentAgreementStatus.id_for(:draft))&.ids&.count
       when "UTILITY_SUBSCRIPTIONS"
-        open_documents_count = index_result_documents.where(status_id: BbpsBillerSubscriptionStatus.id_for(:draft))&.count
+        open_documents_count = index_result_documents.where(status_id: BbpsBillerSubscriptionStatus.id_for(:draft))&.ids&.count
       when "VENDORS"
-        open_documents_count = index_result_documents.where(status_id: VendorStatus.id_for(:draft))&.count
+        open_documents_count = index_result_documents.where(status_id: VendorStatus.id_for(:draft))&.ids&.count
     end
 
     if context[:total_documents_count] == open_documents_count
