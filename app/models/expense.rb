@@ -1123,8 +1123,8 @@ class Expense < ApplicationRecord
   def usage_days
     return nil if usage_date_type.blank? or usage_date_type == 'none'
     if usage_date_type == 'hotel'
-      start_date = expense.usage_date_start.to_date
-      end_date = expense.usage_date_end.to_date
+      start_date = usage_date_start.to_date
+      end_date = usage_date_end.to_date
       if start_date != end_date
         end_date = end_date - 1.days
         days = (start_date..end_date).to_a
