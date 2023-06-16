@@ -255,6 +255,10 @@ class InvoiceExposure < Exposures::API
     utrs.compact.join(', ')
   end
 
+  attribute :payment_ids, includes: [:payments] do
+    record.payments&.pluck(:id)
+  end
+
   attribute :payments_processed_at, includes: [:payments] do
     processed_ats =[]
     record.payments.each do |payment|
