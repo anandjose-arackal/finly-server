@@ -35,7 +35,7 @@ class MailApprovalMailbox < ApplicationMailbox
 
     body = mail.decode_body.split("\n")
     @error_logger.info "------------ EMAIL BODY -----------------"
-    @error_logger.info "BODY PRESENT? : #{body.to_s.downcase.includes? "approval"}"
+    @error_logger.info "BODY PRESENT? : #{body.to_s.downcase.include? "approval"}"
     @error_logger.info "    ************* ************ ********* ******* "
     @error_logger.info "BODY: #{body.each do |b| puts b puts "\n" end }"
     @error_logger.info "    ************* ************ ********* ******* "
