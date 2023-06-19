@@ -35,7 +35,10 @@ class MailApprovalMailbox < ApplicationMailbox
 
     body = mail.decode_body.split("\n")
     @error_logger.info "------------ EMAIL BODY -----------------"
-    @error_logger.info "Invoice Object: #{body.downcase.includes? "approval"}"
+    @error_logger.info "BODY: #{body.to_s.downcase.includes? "approval"}"
+    @error_logger.info "    ************* ************ ********* ******* "
+    @error_logger.info "BODY: #{body.to_s.downcase.includes? "approval"}"
+    @error_logger.info "    ************* ************ ********* ******* "
     @error_logger.info "-----------------------------"
     if body.nil?
       @error_logger.info("body not found for approval::uuid #{approval_uuid}")
