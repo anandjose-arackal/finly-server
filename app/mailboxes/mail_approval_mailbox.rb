@@ -6,55 +6,39 @@ class MailApprovalMailbox < ApplicationMailbox
   def process
     return if @user.nil?
     @error_logger = Logger.new("#{Rails.root}/log/mail_approval_errors.log")
-    @error_logger.info "----------------------------"
-    @error_logger.info "------------- mail.text_part.body.decoded ---------------"
-    @error_logger.info mail.text_part.body.decoded
-    @error_logger.info "----------------------------"
     approval_uuid =  Rails.env.production?? mail.recipients_addresses.to_sentence.to_s.split("@approval")[0] : mail.recipients_addresses.to_sentence.to_s.split("@dev.approval")[0]
     approval_uuid = approval_uuid.gsub('"','') #outlook has some extra quotes
     email_approval = EmailApproval.where(approval_uuid: approval_uuid)&.first
     if email_approval.nil?
       # User might belong to multiple entities, and if document is from one of those other entities
       unless ensure_document_id_matches_user(approval_uuid)
-        @error_logger.info("Email approval not found for approval::uuid #{approval_uuid} under the company #{@user.company_id}")
+        @error_logger.error("Email approval not found for approval::uuid #{approval_uuid} under the company #{@user.company_id}")
         return false
       else
         email_approval = EmailApproval.where(approval_uuid: approval_uuid)&.first
-        @error_logger.info "Done with Email loookup"
         if email_approval.nil?
           @error_logger.error("** approval::uuid #{approval_uuid} not found even after Multiple entities search")
           return false
         end
       end
     end
-    @error_logger.info "------------ Final Object -----------------"
-    @error_logger.info "Email Approval Object: #{email_approval.inspect}"
-    @error_logger.info "-----------------------------"
 
     body = mail.text_part.decode_body.split("\n")
-    @error_logger.info "------------ EMAIL BODY -----------------"
-    @error_logger.info "Just the body:\n\n****** \n\n #{body.to_s}\n\n *****"
-    @error_logger.info "BODY PRESENT? : #{body.to_s.downcase.include? "approval"}"
-    @error_logger.info "    ************* ************ ********* ******* "
-    @error_logger.info "-----------------------------"
     if body.nil?
       @error_logger.info("body not found for approval::uuid #{approval_uuid}")
       return false
     end
     params = {id: email_approval.documentable_id}
     invoice = Invoice.find_by_id(email_approval.documentable_id)
-    @error_logger.info "------------ Invoice Object -----------------"
-    @error_logger.info "Invoice Object: #{invoice.invoice_number}"
-    @error_logger.info "-----------------------------"
     if invoice.nil?
-      @error_logger.info("Invoice not found for approval::uuid #{approval_uuid}")
+      @error_logger.error("Invoice not found for approval::uuid #{approval_uuid} under user: #{@user.email} ; company_id: #{@user.company_id}")
       return false
     end
     if !invoice.processing?
-      @error_logger.info("Invoice #{invoice.id} failed because it is in #{invoice.status.name} not in processing state")
+      @error_logger.error("Invoice #{invoice.id} failed because it is in #{invoice.status.name} not in processing state")
       return false
     elsif !NonPoInvoiceToggle.new(@user).enabled?
-      @error_logger.info("Invoice #{invoice.id} failed because NonPoInvoice toggle is not enabled")
+      @error_logger.error("Invoice #{invoice.id} failed because NonPoInvoice toggle is not enabled")
       EmailApproval.delete_email_approval(invoice.id)
       return false
     elsif mail.text_part.decode_body.to_s.downcase.include?("approve") && can_approve(invoice)
@@ -107,17 +91,9 @@ class MailApprovalMailbox < ApplicationMailbox
     ### Basically ensure Document's Company ID matches with the Company ID of the email sender ###
     email_approval = ActsAsTenant.without_tenant do EmailApproval.where(approval_uuid: approval_uuid)&.first end
     user_company_ids = ActsAsTenant.without_tenant do User.where(email: mail.from).pluck(:company_id) end
-    @error_logger.info "-----------------------------"
-    @error_logger.info "Approval UUID: #{approval_uuid}"
-    @error_logger.info "User Company IDs: #{user_company_ids}"
-    @error_logger.info "Email Approval Object: #{email_approval.inspect}"
-    @error_logger.info "-----------------------------"
     if user_company_ids.include? email_approval.company_id
       ActsAsTenant.current_tenant = Company.find(email_approval.company_id)
       @user = User.find_by(email: mail.from)
-      @error_logger.info "------------ User -----------------"
-      @error_logger.info "User: #{@user.email}"
-      @error_logger.info "-----------------------------"
       return true unless @user.nil?
       ActsAsTenant.current_tenant = nil
       return false
