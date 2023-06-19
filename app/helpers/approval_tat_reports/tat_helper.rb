@@ -26,6 +26,7 @@ module ApprovalTatReports::TatHelper
       filtered_documents = filtered_documents&.includes(required_includes) if optimize_tat_report
 
       filtered_documents&.find_each do |document|
+        Rails.logger.info "==============START=========================#{DateTime.now}============================================" 
         data = {}
         invoice_reviewal_chain = document&.dlrms&.any? { |dlrm| dlrm.level.nil? } ? "" : document&.get_reviewal_chain
         pending_approval_level, pending_approver_names  = (invoice_reviewal_chain&.present? && document&.processing?) ? get_pending_approval_level_approver(document, invoice_reviewal_chain) : ["",""]
@@ -89,6 +90,7 @@ module ApprovalTatReports::TatHelper
         end
         data["invoice_ageing"] = ageing_days
         tat_reports.push(data)
+        Rails.logger.info "=======================================#{DateTime.now}=========================END===================" 
       end
       return tat_data(tat_reports)
     end
