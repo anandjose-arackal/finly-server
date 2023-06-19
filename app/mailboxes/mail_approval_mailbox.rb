@@ -6,18 +6,11 @@ class MailApprovalMailbox < ApplicationMailbox
   def process
     return if @user.nil?
     @error_logger = Logger.new("#{Rails.root}/log/mail_approval_errors.log")
-    @error_logger.info "------------- Raw Recipients ---------------"
-    @error_logger.info mail.recipients_addresses.inspect
-    @error_logger.info "*** Recipients split one ***"
-    @error_logger.info Rails.env.production?? mail.recipients_addresses.to_sentence.to_s.split("@approval")[0] : mail.recipients_addresses.to_sentence.to_s.split("@dev.approval")[0]
-    @error_logger.info "-- Mail.From --"
-    @error_logger.info mail.from
-    @error_logger.info "--- Decoded to String ---"
-    @error_logger.info "Email Content: #{mail.decode_body.to_s.downcase}"
-    @error_logger.info "---- Mail Decoded -----"
-    @error_logger.info "Email Content: #{mail.body.decoded.to_s.downcase}"
-    @error_logger.info "---- Mail Content -----"
-    @error_logger.info "Email Content: #{mail.content}"
+    @error_logger.info "----------------------------"
+    @error_logger.info "------------- Mail.body ---------------"
+    @error_logger.info mail.body
+    @error_logger.info "------------- Mail.body.split ---------------"
+    @error_logger.info mail.decode_body.split("\n")
     @error_logger.info "----------------------------"
     approval_uuid =  Rails.env.production?? mail.recipients_addresses.to_sentence.to_s.split("@approval")[0] : mail.recipients_addresses.to_sentence.to_s.split("@dev.approval")[0]
     approval_uuid = approval_uuid.gsub('"','') #outlook has some extra quotes
