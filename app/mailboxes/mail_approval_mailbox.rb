@@ -8,9 +8,9 @@ class MailApprovalMailbox < ApplicationMailbox
     @error_logger = Logger.new("#{Rails.root}/log/mail_approval_errors.log")
     @error_logger.info "----------------------------"
     @error_logger.info "------------- Mail.body ---------------"
-    @error_logger.info mail.body
+    @error_logger.info mail.body.to_s
     @error_logger.info "------------- Mail.body.split ---------------"
-    @error_logger.info mail.decode_body.split("\n")
+    @error_logger.info mail.decode_body.to_s.split("\n")
     @error_logger.info "----------------------------"
     approval_uuid =  Rails.env.production?? mail.recipients_addresses.to_sentence.to_s.split("@approval")[0] : mail.recipients_addresses.to_sentence.to_s.split("@dev.approval")[0]
     approval_uuid = approval_uuid.gsub('"','') #outlook has some extra quotes
@@ -30,15 +30,22 @@ class MailApprovalMailbox < ApplicationMailbox
       end
     end
     @error_logger.info "------------ Final Object -----------------"
-    @error_logger.info "Email Approval Object: #{email_approval}"
+    @error_logger.info "Email Approval Object: #{email_approval.inspect}"
     @error_logger.info "-----------------------------"
+
     body = mail.decode_body.split("\n")
+    @error_logger.info "------------ EMAIL BODY -----------------"
+    @error_logger.info "Invoice Object: #{body.downcase.includes? "approval"}"
+    @error_logger.info "-----------------------------"
     if body.nil?
       @error_logger.info("body not found for approval::uuid #{approval_uuid}")
       return false
     end
     params = {id: email_approval.documentable_id}
     invoice = Invoice.find_by_id(email_approval.documentable_id)
+    @error_logger.info "------------ Invoice Object -----------------"
+    @error_logger.info "Invoice Object: #{Invoice.invoice_number}"
+    @error_logger.info "-----------------------------"
     if invoice.nil?
       @error_logger.info("Invoice not found for approval::uuid #{approval_uuid}")
       return false
