@@ -12,8 +12,6 @@ class MailApprovalMailbox < ApplicationMailbox
     @error_logger.info Rails.env.production?? mail.recipients_addresses.to_sentence.to_s.split("@approval")[0] : mail.recipients_addresses.to_sentence.to_s.split("@dev.approval")[0]
     @error_logger.info "-- Mail.From --"
     @error_logger.info mail.from
-    @error_logger.info "--- Mail.decode_body ---"
-    @error_logger.info mail.decode_body
     @error_logger.info "--- Decoded to String ---"
     @error_logger.info "Email Content: #{mail.decode_body.to_s.downcase}"
     @error_logger.info "----------------------------"
