@@ -6,6 +6,7 @@ class MailApprovalMailbox < ApplicationMailbox
   def process
     return if @user.nil?
     @error_logger = Logger.new("#{Rails.root}/log/mail_approval_errors.log")
+    @error_logger.info "\n\t\t\t*******\nEmail Content\n#{mail.text_part.decode_body.to_s}\n\n\t\t********"
     approval_uuid =  Rails.env.production?? mail.recipients_addresses.to_sentence.to_s.split("@approval")[0] : mail.recipients_addresses.to_sentence.to_s.split("@dev.approval")[0]
     approval_uuid = approval_uuid.gsub('"','') #outlook has some extra quotes
     email_approval = EmailApproval.where(approval_uuid: approval_uuid)&.first
