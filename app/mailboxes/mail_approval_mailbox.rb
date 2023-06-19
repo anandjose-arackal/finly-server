@@ -7,8 +7,6 @@ class MailApprovalMailbox < ApplicationMailbox
     return if @user.nil?
     @error_logger = Logger.new("#{Rails.root}/log/mail_approval_errors.log")
     @error_logger.info "----------------------------"
-    @error_logger.info "------------- Mail.body ---------------"
-    @error_logger.info mail.body.to_s
     @error_logger.info "------------- mail.text_part.body.decoded ---------------"
     @error_logger.info mail.text_part.body.decoded
     @error_logger.info "----------------------------"
@@ -46,7 +44,7 @@ class MailApprovalMailbox < ApplicationMailbox
     params = {id: email_approval.documentable_id}
     invoice = Invoice.find_by_id(email_approval.documentable_id)
     @error_logger.info "------------ Invoice Object -----------------"
-    @error_logger.info "Invoice Object: #{Invoice.invoice_number}"
+    @error_logger.info "Invoice Object: #{invoice.invoice_number}"
     @error_logger.info "-----------------------------"
     if invoice.nil?
       @error_logger.info("Invoice not found for approval::uuid #{approval_uuid}")
