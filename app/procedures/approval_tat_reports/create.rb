@@ -38,24 +38,24 @@ class ApprovalTatReports::Create < Transactions::API
 
   def check_open_status_records(context, params:, current_user:, **)
     index_result_documents = context['model.records']
-    context[:total_documents_count] = index_result_documents&.ids&.count
+    context[:total_documents_count] = index_result_documents&.count
     open_documents_count = 0
 
     case params.dig(:route).upcase
       when "INVOICES"
-        open_documents_count = index_result_documents.where(invoice_status_id: InwardInvoiceStatus.id_for(:open))&.ids&.count
+        open_documents_count = index_result_documents.where(invoice_status_id: InwardInvoiceStatus.id_for(:open))&.count
       when "PURCHASE_REQUESTS"
-        open_documents_count = index_result_documents.where(purchase_request_status_id: PurchaseRequestStatus.id_for(:draft))&.ids&.count
+        open_documents_count = index_result_documents.where(purchase_request_status_id: PurchaseRequestStatus.id_for(:draft))&.count
       when "PURCHASE_ORDERS"
-        open_documents_count = index_result_documents.where(purchase_order_status_id: PurchaseOrderStatus.id_for(:open))&.ids&.count
+        open_documents_count = index_result_documents.where(purchase_order_status_id: PurchaseOrderStatus.id_for(:open))&.count
       when "PAYMENT_TICKETS"
-        open_documents_count = index_result_documents.where(status_id: BankPaymentRequestStatus.id_for(:open))&.ids&.count
+        open_documents_count = index_result_documents.where(status_id: BankPaymentRequestStatus.id_for(:open))&.count
       when  "AGREEMENTS"
-        open_documents_count = index_result_documents.where(status_id: PaymentAgreementStatus.id_for(:draft))&.ids&.count
+        open_documents_count = index_result_documents.where(status_id: PaymentAgreementStatus.id_for(:draft))&.count
       when "UTILITY_SUBSCRIPTIONS"
-        open_documents_count = index_result_documents.where(status_id: BbpsBillerSubscriptionStatus.id_for(:draft))&.ids&.count
+        open_documents_count = index_result_documents.where(status_id: BbpsBillerSubscriptionStatus.id_for(:draft))&.count
       when "VENDORS"
-        open_documents_count = index_result_documents.where(status_id: VendorStatus.id_for(:draft))&.ids&.count
+        open_documents_count = index_result_documents.where(status_id: VendorStatus.id_for(:draft))&.count
     end
 
     if context[:total_documents_count] == open_documents_count
