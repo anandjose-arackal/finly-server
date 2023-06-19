@@ -25,6 +25,7 @@ class MailApprovalMailbox < ApplicationMailbox
         return false
       else
         email_approval = EmailApproval.where(approval_uuid: approval_uuid)&.first
+        @error_logger.info "Done with Email loookup"
         if email_approval.nil?
           @error_logger.error("** approval::uuid #{approval_uuid} not found even after Multiple entities search")
           return false
@@ -110,6 +111,9 @@ class MailApprovalMailbox < ApplicationMailbox
     if user_company_ids.include? email_approval.company_id
       ActsAsTenant.current_tenant = Company.find(email_approval.company_id)
       @user = User.find_by(email: mail.from)
+      @error_logger.info "------------ User -----------------"
+      @error_logger.info "User: #{@user.email}"
+      @error_logger.info "-----------------------------"
       return true unless @user.nil?
       ActsAsTenant.current_tenant = nil
       return false
