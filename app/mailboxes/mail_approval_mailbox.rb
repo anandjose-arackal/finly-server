@@ -14,6 +14,10 @@ class MailApprovalMailbox < ApplicationMailbox
     @error_logger.info mail.from
     @error_logger.info "--- Decoded to String ---"
     @error_logger.info "Email Content: #{mail.decode_body.to_s.downcase}"
+    @error_logger.info "---- Mail Decoded -----"
+    @error_logger.info "Email Content: #{mail.body.decoded.to_s.downcase}"
+    @error_logger.info "---- Mail Content -----"
+    @error_logger.info "Email Content: #{mail.content}"
     @error_logger.info "----------------------------"
     approval_uuid =  Rails.env.production?? mail.recipients_addresses.to_sentence.to_s.split("@approval")[0] : mail.recipients_addresses.to_sentence.to_s.split("@dev.approval")[0]
     approval_uuid = approval_uuid.gsub('"','') #outlook has some extra quotes
@@ -106,7 +110,7 @@ class MailApprovalMailbox < ApplicationMailbox
     @error_logger.info "-----------------------------"
     @error_logger.info "Approval UUID: #{approval_uuid}"
     @error_logger.info "User Company IDs: #{user_company_ids}"
-    @error_logger.info "Email Approval Object: #{email_approval}"
+    @error_logger.info "Email Approval Object: #{email_approval.inspect}"
     @error_logger.info "-----------------------------"
     if user_company_ids.include? email_approval.company_id
       ActsAsTenant.current_tenant = Company.find(email_approval.company_id)
