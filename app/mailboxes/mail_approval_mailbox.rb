@@ -9,8 +9,8 @@ class MailApprovalMailbox < ApplicationMailbox
     @error_logger.info "----------------------------"
     @error_logger.info "------------- Mail.body ---------------"
     @error_logger.info mail.body.to_s
-    @error_logger.info "------------- Mail.body.split ---------------"
-    @error_logger.info mail.decode_body.to_s.split("\n")
+    @error_logger.info "------------- mail.body.decoded ---------------"
+    @error_logger.info mail.body.decoded
     @error_logger.info "----------------------------"
     approval_uuid =  Rails.env.production?? mail.recipients_addresses.to_sentence.to_s.split("@approval")[0] : mail.recipients_addresses.to_sentence.to_s.split("@dev.approval")[0]
     approval_uuid = approval_uuid.gsub('"','') #outlook has some extra quotes
