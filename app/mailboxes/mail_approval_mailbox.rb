@@ -14,6 +14,8 @@ class MailApprovalMailbox < ApplicationMailbox
     @error_logger.info mail.from
     @error_logger.info "--- Mail.decode_body ---"
     @error_logger.info mail.decode_body
+    @error_logger.info "--- Decoded to String ---"
+    @error_logger.info "Email Content: #{mail.decode_body.to_s.downcase}"
     @error_logger.info "----------------------------"
     approval_uuid =  Rails.env.production?? mail.recipients_addresses.to_sentence.to_s.split("@approval")[0] : mail.recipients_addresses.to_sentence.to_s.split("@dev.approval")[0]
     approval_uuid = approval_uuid.gsub('"','') #outlook has some extra quotes
@@ -31,6 +33,9 @@ class MailApprovalMailbox < ApplicationMailbox
         end
       end
     end
+    @error_logger.info "------------ Final Object -----------------"
+    @error_logger.info "Email Approval Object: #{email_approval}"
+    @error_logger.info "-----------------------------"
     body = mail.decode_body.split("\n")
     if body.nil?
       @error_logger.info("body not found for approval::uuid #{approval_uuid}")
