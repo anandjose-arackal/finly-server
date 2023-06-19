@@ -255,12 +255,12 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
       #   computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.item_number}}'),
       #     size: FormEntity::SIZES[:small]
 
-      lookup :product_type_id, label: "Product Type", choices_scope: Choices[:enum].(ProductType), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.product_type_id}}'), editable: false, required: true, visible: true, size: FormEntity::SIZES[:small]
+      lookup :product_type_id, label: "Product Type", choices_scope: Choices[:enum].(ProductType), editable: false, required: true, visible: true, size: FormEntity::SIZES[:small]
 
       lookup :items_department_id, label: "Department", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('departments', assignments: { form: true })
       lookup :items_cost_center_id, label: "Cost Center", editable: false, visible: false, required: false, choices_scope: Choices[:lookup].('cost_centers')
 
-      lookup :category_id, label: "Category", required: true, visible: true, editable: false, choices_scope: Choices[:lookup].('categories', scope: :inward_invoice_line_items_only), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.category_id}}'), triggers: {on_compute: {lookup_details: [:category_id]}}, size: FormEntity::SIZES[:medium]
+      lookup :category_id, label: "Category", required: true, visible: true, editable: false, choices_scope: Choices[:lookup].('categories', scope: :inward_invoice_line_items_only), size: FormEntity::SIZES[:medium]
 
       # text :gl_code, label: "GL Code", editable: false, visible: false,
       #   computed: Forms::Compute::Lookup('items.category_id', '{{record.gl_code_or_item_number}}', assignments: {item_number: "{{row.item_number}}"})
@@ -278,8 +278,7 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
 
       dropdown :unit_of_measurement, label: "Unit of Measurement",
                choices_scope: Choices[:list].(*Unit.all.map { |v| { id: v.value, name: v.name } }),
-               required: true, editable: false, visible: true,
-               computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.unit_of_measurement}}'), size: FormEntity::SIZES[:medium]
+               required: true, editable: false, visible: true, size: FormEntity::SIZES[:medium]
 
       amount :item_rate,
              label: "Item Rate (Reporting Currency)",
@@ -335,7 +334,7 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
       #        computed: Forms::Compute::Form(LIQUID_FORMULAE[:items][:reporting_item_taxable_amount]),
       #        size: FormEntity::SIZES[:small]
 
-      lookup :tax_rate_id, label: "Tax Rate", editable: false, visible: true, choices_scope: Choices[:lookup].('tax_rates'), computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.tax_rate_id}}')
+      lookup :tax_rate_id, label: "Tax Rate", editable: false, visible: true, choices_scope: Choices[:lookup].('tax_rates')
 
       # tax # tax percentage
       number :tax_percentage, editable: false, visible: true, computed: Forms::Compute::Lookup('items.tax_rate_id', '{{record.rate}}'), size: FormEntity::SIZES[:small]
