@@ -38,8 +38,6 @@ class MailApprovalMailbox < ApplicationMailbox
     @error_logger.info "Just the body:\n\n****** \n\n #{body.to_s}\n\n *****"
     @error_logger.info "BODY PRESENT? : #{body.to_s.downcase.include? "approval"}"
     @error_logger.info "    ************* ************ ********* ******* "
-    @error_logger.info "BODY: #{body.each do |b| puts b puts "\n" end }"
-    @error_logger.info "    ************* ************ ********* ******* "
     @error_logger.info "-----------------------------"
     if body.nil?
       @error_logger.info("body not found for approval::uuid #{approval_uuid}")
