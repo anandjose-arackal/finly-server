@@ -9,8 +9,8 @@ class MailApprovalMailbox < ApplicationMailbox
     @error_logger.info "----------------------------"
     @error_logger.info "------------- Mail.body ---------------"
     @error_logger.info mail.body.to_s
-    @error_logger.info "------------- mail.body.decoded ---------------"
-    @error_logger.info mail.body.decoded
+    @error_logger.info "------------- mail.text_part.body.decoded ---------------"
+    @error_logger.info mail.text_part.body.decoded
     @error_logger.info "----------------------------"
     approval_uuid =  Rails.env.production?? mail.recipients_addresses.to_sentence.to_s.split("@approval")[0] : mail.recipients_addresses.to_sentence.to_s.split("@dev.approval")[0]
     approval_uuid = approval_uuid.gsub('"','') #outlook has some extra quotes
@@ -33,8 +33,9 @@ class MailApprovalMailbox < ApplicationMailbox
     @error_logger.info "Email Approval Object: #{email_approval.inspect}"
     @error_logger.info "-----------------------------"
 
-    body = mail.decode_body.split("\n")
+    body = mail.text_part.decode_body.split("\n")
     @error_logger.info "------------ EMAIL BODY -----------------"
+    @error_logger.info "Just the body:\n\n****** \n\n #{body.to_s}\n\n *****"
     @error_logger.info "BODY PRESENT? : #{body.to_s.downcase.include? "approval"}"
     @error_logger.info "    ************* ************ ********* ******* "
     @error_logger.info "BODY: #{body.each do |b| puts b puts "\n" end }"
@@ -60,14 +61,14 @@ class MailApprovalMailbox < ApplicationMailbox
       @error_logger.info("Invoice #{invoice.id} failed because NonPoInvoice toggle is not enabled")
       EmailApproval.delete_email_approval(invoice.id)
       return false
-    elsif mail.decode_body.to_s.downcase.include?("approve") && can_approve(invoice)
+    elsif mail.text_part.decode_body.to_s.downcase.include?("approve") && can_approve(invoice)
       @result = Procurements::Invoices::Approve.(@user, params)
       if @result.success? && !@result.params["document"].processing?
         EmailApproval.delete_email_approval(@result.params["document"].id)
       else
         @error_logger.error("Invoice #{@result.params["document"].id} failed to approve by #{mail.from} because #{@result.inspect}")
       end
-    elsif mail.decode_body.to_s.downcase.include?("reject") && can_reject(invoice)
+    elsif mail.text_part.decode_body.to_s.downcase.include?("reject") && can_reject(invoice)
       params[:note] = "Invoice has been rejected via email by #{mail.from&.first} on #{Time.now.strftime("%Y-%d-%m %H:%M:%S %Z")}"
       @result = Procurements::Invoices::Reject.(@user, params)
       if @result.success? && !@result.params["document"].processing?
