@@ -27,11 +27,15 @@ class Forms::Import::Ops::Create < Transactions::API
   end
 
   def validate_attachments(context, params:, model:, **)
+
+    params['invoice_attachments'].reject! {|attachment| attachment['_destroy'] == true}
+
     if model.class == Invoice
       unless params['invoice_attachments'].present?
         return on_error context, :invoice,'attachments cannot be blank'
       end
     end
+
     return true
   end
 
