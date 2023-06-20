@@ -28,7 +28,7 @@ module ApprovalTatReports::TatHelper
       filtered_documents&.find_each do |document|
         Rails.logger.info "==============START=========================#{DateTime.now}============================================" 
         data = {}
-        invoice_reviewal_chain = document&.dlrms&.any? { |dlrm| dlrm.level.nil? } ? "" : document&.get_reviewal_chain
+        invoice_reviewal_chain = document&.dlrms&.includes(:level)&.any? { |dlrm| dlrm.level.nil? } ? "" : document&.get_reviewal_chain
         pending_approval_level, pending_approver_names  = (invoice_reviewal_chain&.present? && document&.processing?) ? get_pending_approval_level_approver(document, invoice_reviewal_chain) : ["",""]
 
         data[:invoice_id] = document&.invoice_id
@@ -50,8 +50,8 @@ module ApprovalTatReports::TatHelper
         
         payment = document&.payments&.order(created_at: :desc)&.first
         invoice_payment_ticket = payment&.payment_order&.bank_payment_request
-        pt_reviewal_chain = invoice_payment_ticket&.dlrms&.any? { |dlrm| dlrm.level.nil? } ? "" : invoice_payment_ticket&.get_reviewal_chain
-        pending_approval_level, pending_approver_names  = pt_reviewal_chain&.present? ? get_pending_approval_level_approver(document, pt_reviewal_chain) : ["",""]
+        pt_reviewal_chain = invoice_payment_ticket&.dlrms&.includes(:level)&.any? { |dlrm| dlrm.level.nil? } ? "" : invoice_payment_ticket&.get_reviewal_chain
+        pending_approval_level, pending_approver_names  = (pt_reviewal_chain&.present? && document&.processing?)  ? get_pending_approval_level_approver(document, pt_reviewal_chain) : ["",""]
 
         data[:payment_ticket_created_by] = "#{invoice_payment_ticket&.created_by&.first_name} #{invoice_payment_ticket&.created_by&.last_name}"
         payment_ticket_created_at = invoice_payment_ticket&.submitted_at&.to_date&.strftime("%d-%m-%Y")
