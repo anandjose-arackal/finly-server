@@ -1053,7 +1053,7 @@ class Invoice < ApplicationRecord
     if options[:payment_history]
       return payment_history_json
     else
-      {
+      data = {
         id: self.id,
         invoice_type: self.invoice_type&.name,
         procurement_id: self.procurement_id,
@@ -1085,16 +1085,6 @@ class Invoice < ApplicationRecord
         tds_rate: precision_value(self.tds_rate.to_i),
         discount_rate: invoice_discount_rate,
         advance_rate: precision_value(self.advance_rate),
-        invoice_attachment: {
-          # url: self.invoice_attachments.first&.attached_file&.url,
-          # thumb: self.invoice_attachments.first&.attached_file&.url(:thumb),
-          # content_type: self.invoice_attachments.first&.attached_file&.content_type,
-          # file_name: self.invoice_attachments.first&.attached_file&.original_filename
-          url: self.attachments.first&.file&.url(:original, timestamp: false),
-          thumb: self.attachments.first&.file&.url(:thumb, timestamp: false),
-          content_type: self.attachments.first&.file_content_type,
-          file_name: self.attachments.first&.file_file_name
-        },
         net_amount: precision_value(self.net_amount&.value.to_f),
         original_amount: self.include_original_amount,
         gross_amount: precision_value(self.gross_amount&.value.to_f),
@@ -1165,6 +1155,23 @@ class Invoice < ApplicationRecord
         non_po_invoice_form_enabled: self.forms_enabled,
         form_enabled: self.forms_enabled
       }
+      if self.forms_enabled
+        attachment = self.form_custom_fields.where(field_key: "invoice_attachments").first&.attachments&.first&.attachment
+        data[:invoice_attachment] = {
+            url: attachment&.url,
+            thumb: attachment&.url(:thumb),
+            content_type: attachment&.content_type,
+            file_name: attachment&.original_filename,
+        }
+      else
+        data[:invoice_attachment] = {
+            url: self.attachments.first&.file&.url(:original, timestamp: false),
+            thumb: self.attachments.first&.file&.url(:thumb, timestamp: false),
+            content_type: self.attachments.first&.file_content_type,
+            file_name: self.attachments.first&.file_file_name
+        }
+      end
+      data
     end
   end
 

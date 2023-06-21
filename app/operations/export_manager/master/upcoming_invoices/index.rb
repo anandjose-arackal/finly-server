@@ -20,9 +20,7 @@ class ExportManager::Master::UpcomingInvoices::Index < ExportManager::Builders::
   attribute :agreement_expiry_date
   attribute :gross_amount
   attribute :discount_amount
-  attribute :cgst_amount
-  attribute :sgst_amount
-  attribute :igst
+  attribute :total_tax_amount
   attribute :tds_slab
   attribute :tds_rate
   attribute :tds_amount
@@ -98,15 +96,7 @@ class ExportManager::Master::UpcomingInvoices::Index < ExportManager::Builders::
     invoice&.discount_amount&.value.to_f
   end
 
-  def cgst_amount invoice
-    invoice&.tax_amount&.value.to_f
-  end
-
-  def sgst_amount invoice
-    invoice&.tax_amount&.value.to_f
-  end
-
-  def igst invoice
+  def total_tax_amount invoice
     invoice&.tax_amount&.value.to_f
   end
 
