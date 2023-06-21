@@ -28,7 +28,6 @@
 # elsif ['background_production_console'].include?(fetch(:stage)&.to_s)
 #   load_secure_storage(:background_production_console)
 # end
-set :environment, 'staging'
 env :PATH, ENV['PATH']
 
 set :output, "#{path}/log/whenever.log"
@@ -128,7 +127,7 @@ every :hour, roles: [:whenever_cron] do
   runner "RemoveDuplicateSequence.perform"
 end
 
-every 1.minute, roles: [:whenever_cron] do
+every :hour, roles: [:whenever_cron] do
   runner "BbpsReminders.perform"
 end
 
