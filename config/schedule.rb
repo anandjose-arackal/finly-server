@@ -28,16 +28,7 @@
 # elsif ['background_production_console'].include?(fetch(:stage)&.to_s)
 #   load_secure_storage(:background_production_console)
 # end
-environment = nil
-if Rails.env.production?
-  environment = 'production'
-elsif Rails.env.staging?
-  environment = 'staging'
-elsif Rails.env.uat?
-  environment = 'uat'
-end
-set :environment, environment
-
+set :environment, 'staging'
 env :PATH, ENV['PATH']
 
 set :output, "#{path}/log/whenever.log"
@@ -138,7 +129,7 @@ every :hour, roles: [:whenever_cron] do
 end
 
 every 1.minute, roles: [:whenever_cron] do
-  runner "BbpsReminder.perform"
+  runner "BbpsReminders.perform"
 end
 
 # every '0,15,30,45 * * * *', roles: [:whenever_cron] do
