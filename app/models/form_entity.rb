@@ -135,6 +135,10 @@ class FormEntity < ApplicationRecord
     return if import_form.nil?
 
     import_section = import_form.sections.where(section_id: self.section.section_id).first
+    import_parent = nil
+    if self.parent.present?
+      import_parent = import_form.entities.where(entity_key: self.parent.entity_key).first
+    end
     return if import_section.nil?
 
     if import_form.entities.where(entity_key: self.entity_key).present?
@@ -142,6 +146,7 @@ class FormEntity < ApplicationRecord
       import_entity.attributes = self.attributes.except('id', 'form_section_id', 'form_id')
       import_entity.form_section_id = import_section.uuid
       import_entity.form_id = import_form.uuid
+      import_entity.parent_id = import_parent.uuid
       import_entity.save
       self.choices.each do |choice|
         next import_entity.choices.pluck(:name).include? choice.name
@@ -156,6 +161,7 @@ class FormEntity < ApplicationRecord
       import_entity.id = nil
       import_entity.form_section_id = import_section.uuid
       import_entity.form_id = import_form.uuid
+      import_entity.parent_id = import_parent.uuid
       import_entity.save
       self.choices.each do |choice|
         dup_choice = choice.dup
