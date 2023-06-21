@@ -28,10 +28,20 @@
 # elsif ['background_production_console'].include?(fetch(:stage)&.to_s)
 #   load_secure_storage(:background_production_console)
 # end
+environment = nil
+if Rails.env.production?
+  environment = 'production'
+elsif Rails.env.staging?
+  environment = 'staging'
+elsif Rails.env.uat?
+  environment = 'uat'
+end
+set :environment, environment
 
 env :PATH, ENV['PATH']
 
 set :output, "#{path}/log/whenever.log"
+
 
 every 30.minutes, roles: [:whenever_cron] do
   runner "YesBankStatusChecker.perform", output: "#{path}/log/whenever/yes_bank_status_checker.log"
