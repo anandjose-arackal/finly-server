@@ -62,6 +62,8 @@ class Forms::Ops::Dependencies < Transactions::API
          .includes({ compute_lookup_entity: :parent }, :parent).each do |entity|
       json = entity.form_reference_json
       lookup_json = entity.compute_lookup_entity&.form_reference_json
+      return if lookup_json.nil?
+
       lookup_json.each_pair do |key, value|
         json["lookup_#{key}"] = value
       end
