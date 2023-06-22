@@ -337,7 +337,7 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
       lookup :tax_rate_id, label: "Tax Rate", editable: false, visible: true, choices_scope: Choices[:lookup].('tax_rates')
 
       # tax # tax percentage
-      number :tax_percentage, editable: false, visible: true, computed: Forms::Compute::Lookup('items.tax_rate_id', '{{record.rate}}'), size: FormEntity::SIZES[:small]
+      number :tax_percentage, editable: false, visible: true, computed: Forms::Compute::Lookup('items.tax_rate_id', '{{record.rate}}'), size: FormEntity::SIZES[:small], hide_in_import: true
 
       amount :item_tax_amount, label: 'Item Tax Amount', editable: false, visible: true,
              can_editable_be_changed: false,
