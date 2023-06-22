@@ -280,14 +280,14 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
                choices_scope: Choices[:list].(*Unit.all.map { |v| { id: v.value, name: v.name } }),
                required: true, editable: false, visible: true, size: FormEntity::SIZES[:medium]
 
-      amount :item_rate,
-             label: "Item Rate (Reporting Currency)",
-             label: "Item Rate (Reporting Currency)",
-             computed: Forms::Compute::Form('{{ row.rate | times: form.conversion_rate | round: 2 }}'),
-             visible: true,
-             editable: false,
-             size: FormEntity::SIZES[:small],
-             hide_in_import: true
+      # amount :item_rate,
+      #        label: "Item Rate (Reporting Currency)",
+      #        label: "Item Rate (Reporting Currency)",
+      #        computed: Forms::Compute::Form('{{ row.rate | times: form.conversion_rate | round: 2 }}'),
+      #        visible: true,
+      #        editable: false,
+      #        size: FormEntity::SIZES[:small],
+      #        hide_in_import: true
 
       amount :rate, label: "Rate (Base Currency)",
              can_editable_be_changed: false,

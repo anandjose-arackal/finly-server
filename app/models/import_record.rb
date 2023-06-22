@@ -20,6 +20,10 @@ class ImportRecord < ApplicationRecord
     if self.processed_data.present? && self.processed_data['invoice_number'].present?
       self.record_data['Invoice Number*'] = self.processed_data['invoice_number']
     end
+    # if self.processed_data['invoice_attachments'].present?
+    #   data = self.processed_data['invoice_attachments'].reject{ |attachment| attachment['_destroy'] == true }
+    #   self.processed_data['invoice_attachments'] = data
+    # end
     self.skip_callback = true
     self.save
   end

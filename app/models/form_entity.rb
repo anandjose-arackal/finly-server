@@ -146,7 +146,8 @@ class FormEntity < ApplicationRecord
       import_entity.attributes = self.attributes.except('id', 'form_section_id', 'form_id')
       import_entity.form_section_id = import_section.uuid
       import_entity.form_id = import_form.uuid
-      import_entity.parent_id = import_parent.uuid
+      import_entity.parent_id = import_parent&.uuid
+      import_entity.editable = false
       import_entity.save
       self.choices.each do |choice|
         next import_entity.choices.pluck(:name).include? choice.name
@@ -162,6 +163,7 @@ class FormEntity < ApplicationRecord
       import_entity.form_section_id = import_section.uuid
       import_entity.form_id = import_form.uuid
       import_entity.parent_id = import_parent&.uuid
+      import_entity.editable = false
       import_entity.save
       self.choices.each do |choice|
         dup_choice = choice.dup
