@@ -53,9 +53,10 @@ class NonPoInvoiceMigrator
 
   def self.update_custome_fields form, document, company
     document.custom_fields.each do |custom_field|
-      binding.pry
       field_name = custom_field.field_configuration.field_name.split(" ").join("_").underscore
-
+      if form.entities.system_fields.pluck(:entity_key).include? field_name
+        field_name+='1'
+      end
       form_custom_field = document.form_custom_fields.where(field_key: field_name).order(updated_at: :asc).last
 
       if form_custom_field.present?

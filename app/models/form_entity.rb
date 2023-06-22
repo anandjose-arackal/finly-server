@@ -161,7 +161,7 @@ class FormEntity < ApplicationRecord
       import_entity.id = nil
       import_entity.form_section_id = import_section.uuid
       import_entity.form_id = import_form.uuid
-      import_entity.parent_id = import_parent.uuid
+      import_entity.parent_id = import_parent&.uuid
       import_entity.save
       self.choices.each do |choice|
         dup_choice = choice.dup
