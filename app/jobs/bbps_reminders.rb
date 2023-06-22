@@ -18,22 +18,30 @@ class BbpsReminders < BaseJob
   end
 
   def self.get_list_of_bills
-    ## Subscription joins below tables:
-    # POCs - for email IDs
-    # Department
-    # Category
-    #
     @logger.info "Running only for Dunzo in staging mode\n***\n"
     if @companies.include?(324) # Spot where you'd fix Flagging per company
       ActsAsTenant.current_tenant = Company.find 324
-      bills = BbpsBill.where(due_date: Date.today-120...Date.today).includes(:subscription)
+      bills = BbpsBill.joins(:department, :category, :cost_center, :location, :amount)
+                      .select(" `bbps_bills`.*
+                      `departments`.`name` AS department,
+                      `categories`.`name` AS category,
+                      `cost_centers`.`name` AS cost_center,
+                      `branch_locations`.`name` AS location,
+                      `amounts`.`value` AS amount")
+                      .where(due_date: Date.today-120...Date.today).includes(subscription: :pocs)
       bills.each do |bill|
-        # name = bill.subscription.name
-        # department = Department.find bill.department_id
-        # amount = Amount.find bill.amount_id
-        # cost_center = CostCenter.find bill.cost_center
-        # location = Location.find bill.location_id
-        @logger.info "Bill due: #{name} -- ; -- Sending email(s) to #{bill.subscription.pocs.collect(&:email)}"
+        @payload = {}
+        @payload[:biller_name] = bill.subscription.name
+        @payload[:due_date] = bill.due_date
+        @payload[:department] = bill[:department]
+        @payload[:category] = bill[:category]
+        @params[:amount] = bill[:amount]
+        @payload[:cost_center] = bill[:cost_center]
+        @payload[:location] = bill[:location]
+        @payload[:amount] = bill[:amount]
+        @payload[:to] = bill.subscription.pocs.collect(&:email)
+        @logger.info "Bill due: #{@payload[:biller_name]} -- ; -- Sending email(s) to #{@payload[:to]} -- ; -- Location: #{@payload[:location]}"
+
       end
     end
     @logger.info "\n***\n"
@@ -55,10 +63,10 @@ end
 #     Department : (Department Name)
 #     Cost Center : (Cost Center Name)
 #     Location: (Location Name)
-
+#
 #     Click here for more Details.
-
+#
 #     If you have already submitted your payment, please disregard this reminder.
-
+#
 #     Thanks,
 #     Team Finly
