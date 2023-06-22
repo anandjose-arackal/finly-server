@@ -21,13 +21,13 @@ class BbpsReminders < BaseJob
     @logger.info "Running only for Dunzo in staging mode\n***\n"
     if @companies.include?(324) # Spot where you'd fix Flagging per company
       ActsAsTenant.current_tenant = Company.find 324
-      bills = BbpsBill.joins(:department, :category, :cost_center, :location, :amount)
-                      .select(" `bbps_bills`.*
-                      `departments`.`name` AS department,
-                      `categories`.`name` AS category,
-                      `cost_centers`.`name` AS cost_center,
-                      `branch_locations`.`name` AS location,
-                      `amounts`.`value` AS amount")
+      bills = BbpsBill.left_outer_joins(:department, :category, :cost_center, :location, :amount)
+                      .select( "`bbps_bills`.*,"\
+                               "`departments`.`name` AS department,"\
+                               "`categories`.`name` AS category,"\
+                               "`cost_centers`.`name` AS cost_center,"\
+                               "`branch_locations`.`name` AS location,"\
+                               "`amounts`.`value` AS amount")
                       .where(due_date: Date.today-120...Date.today).includes(subscription: :pocs)
       bills.each do |bill|
         @payload = {}
@@ -35,13 +35,13 @@ class BbpsReminders < BaseJob
         @payload[:due_date] = bill.due_date
         @payload[:department] = bill[:department]
         @payload[:category] = bill[:category]
-        @params[:amount] = bill[:amount]
+        @payload[:amount] = bill[:amount]
         @payload[:cost_center] = bill[:cost_center]
         @payload[:location] = bill[:location]
         @payload[:amount] = bill[:amount]
         @payload[:to] = bill.subscription.pocs.collect(&:email)
         @logger.info "Bill due: #{@payload[:biller_name]} -- ; -- Sending email(s) to #{@payload[:to]} -- ; -- Location: #{@payload[:location]}"
-
+        BbpsReminderEmail.send(@payload)
       end
     end
     @logger.info "\n***\n"
