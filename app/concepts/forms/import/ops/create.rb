@@ -5,7 +5,7 @@ class Forms::Import::Ops::Create < Transactions::API
   step Forms::Contracts::Build()
   step Contract::Validate()
   step :create_procurements
-  step :validate_attachments
+  # step :validate_attachments
   step Contract::Persist(method: :sync)
   # step :set_approval_workflow!
   step Transactions::Messages::SuccessMessage('Record Saved')
