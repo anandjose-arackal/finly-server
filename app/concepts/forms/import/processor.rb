@@ -512,7 +512,7 @@ class Forms::Import::Processor
               params_hash = {:entity_path => header_data[:entity].entity_path, :route => form.label.underscore.to_s, :value => data[header_data[:entity_key]]}
               current_user = user
               lookup_data = Forms::Ops::LookupDetails.(params: params_hash, current_user: current_user)[:data].map{|k, v| [k.split('.').last, v]}.to_h rescue {}
-              data = lookup_data.merge(data)
+              data = data.merge(lookup_data)
             end
           else
             # Set value from sheet if lookup returned 0 or nil but sheet has data
