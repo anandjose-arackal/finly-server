@@ -570,7 +570,7 @@ class Forms::Import::Processor
   def perform_form_calculations(form_data)
     form.entities.each do |entity|
       if entity.class.collection?
-        collection_data = form_data[entity.entity_key.to_s]
+        collection_data = form_data[entity.entity_key.to_s] || []
         next if collection_data.empty?
         child_results = []
         collection_data.each do |item|
