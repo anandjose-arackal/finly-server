@@ -274,9 +274,7 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
         "CreditNoteProvider" => "credit_note_reviewer"}
 
     entity_user = get_user_entity(reviewer_id)
-    if application == 'em' && entity_user.present? && entity_user&.roles&.pluck(:name)&.exclude?(role_provider_mapping[provider]&.to_sym)
-      entity_user.role_mapping.create(purpose_id: 1, user_role_id: UserRole.id_for(:manager))
-    elsif application == 'vp' && entity_user.present? && entity_user.policy_user_roles.where(user_role_id: UserRole.id_for(role_provider_mapping[provider]&.to_sym), policy_id: self.policy.id).first.nil?
+    if application == 'vp' && entity_user.present? && entity_user.policy_user_roles.where(user_role_id: UserRole.id_for(role_provider_mapping[provider]&.to_sym), policy_id: self.policy.id).first.nil?
       entity_user.policy_user_roles.create(policy_id: self.policy.id, user_role_id: UserRole.id_for(role_provider_mapping[provider]&.to_sym))
     end
     entity_user
