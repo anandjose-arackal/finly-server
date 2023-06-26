@@ -308,7 +308,7 @@ class Forms::Import::Processor
         if op&.success?
           import_record.update_status(true, ['Record created successfully'].to_s, '', '')
         else
-          import_record.update_status(true, ['Record created successfully But could not submit for approval'].to_s, '', '')
+          import_record.update_status(true, ['Record created successfully But could not submit for approval', op.messages[:errors].join(', ')].to_s, '', '')
         end
         import_record.document_id = record.id
         import_record.save
