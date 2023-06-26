@@ -22,7 +22,7 @@ module ApprovalTatReports::TatHelper
 
     def invoice_tat_report(documents, tat_reports, optimize_tat_report)
       required_includes = [ {payments: {purchase_order: [:bank_payment_request]}} ]
-      filtered_documents = documents&.not_open
+      filtered_documents = documents&.where.not(invoice_status_id: InwardInvoiceStatus.id_for(:open))
       filtered_documents = filtered_documents&.includes(required_includes) if optimize_tat_report
 
       filtered_documents&.find_each do |document|
@@ -39,18 +39,18 @@ module ApprovalTatReports::TatHelper
         data[:invoice_status] = document&.status&.name
         data[:invoice_pending_for_approval_at_level] = pending_approval_level
         data[:invoice_pending_with_approver] = pending_approver_names
-        data[:invoice_amount] = document&.invoice_net_total_amount
+        data[:invoice_amount] = document&.forms_enabled ? document&.invoice_total_amount : document&.net_amount&.value
         data[:po_number] = (document&.po_number ||= "")
         data[:invoice_submitted_by] = "#{document&.created_by&.first_name} #{document&.created_by&.last_name}"
         data[:invoice_submitted_date] = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")
-        data[:interval_between_invoice_date_to_invoice_submission] = (document&.date&.to_date - document&.submitted_at&.to_date)&.abs
+        data[:interval_between_invoice_date_to_invoice_submission] = (document&.date&.present? && document&.submitted_at&.present?) ? (document&.date&.to_date - document&.submitted_at&.to_date)&.abs : ""
         
         assign_reviewers_data(document, data, invoice_reviewal_chain) if invoice_reviewal_chain.present?
         
         payment = document&.payments&.order(created_at: :desc)&.first
         invoice_payment_ticket = payment&.payment_order&.bank_payment_request
         pt_reviewal_chain = invoice_payment_ticket&.dlrms&.any? { |dlrm| dlrm.level.nil? } ? "" : invoice_payment_ticket&.get_reviewal_chain
-        pending_approval_level, pending_approver_names  = pt_reviewal_chain&.present? ? get_pending_approval_level_approver(document, pt_reviewal_chain) : ["",""]
+        pending_approval_level, pending_approver_names  = (pt_reviewal_chain&.present? && document&.processing?)  ? get_pending_approval_level_approver(document, pt_reviewal_chain) : ["",""]
 
         data[:payment_ticket_created_by] = "#{invoice_payment_ticket&.created_by&.first_name} #{invoice_payment_ticket&.created_by&.last_name}"
         payment_ticket_created_at = invoice_payment_ticket&.submitted_at&.to_date&.strftime("%d-%m-%Y")
@@ -82,9 +82,12 @@ module ApprovalTatReports::TatHelper
             end
           end
         end
-
-        payment_date = get_payment_date(invoice_payment_ticket, payment)
-        data["invoice_ageing"] = (payment_date&.present? && document&.date&.to_date) ? (payment_date&.to_date - document&.date&.to_date)&.abs : ""
+        ageing_days = ""
+        if document&.paid? || document&.partially_paid?
+          payment_date = get_payment_date(invoice_payment_ticket, payment)
+          ageing_days = (payment_date&.present? && document&.date&.to_date) ? (payment_date&.to_date - document&.date&.to_date)&.abs : ""
+        end
+        data["invoice_ageing"] = ageing_days
         tat_reports.push(data)
       end
       return tat_data(tat_reports)
@@ -120,7 +123,7 @@ module ApprovalTatReports::TatHelper
     def purchase_order_tat_report(documents, tat_reports, optimize_tat_report)
       required_includes = [:policy, :status]
       filtered_documents = documents&.not_open
-      filtered_documents = not_open_documents&.includes(required_includes) if optimize_tat_report
+      filtered_documents = filtered_documents&.includes(required_includes) if optimize_tat_report
 
       filtered_documents&.find_each do |document|
         data = {}
@@ -154,9 +157,10 @@ module ApprovalTatReports::TatHelper
         data = {}
         bpr_reviewal_chain = document&.dlrms&.any? { |dlrm| dlrm.level.nil? } ? "" : document&.get_reviewal_chain
         pending_approval_level, pending_approver_names = (bpr_reviewal_chain&.present? && document&.processing?) ? get_pending_approval_level_approver(document, bpr_reviewal_chain) : ["",""]
-
-        bpr_payment_order_status = document&.payment_order&.payment_order_status
-
+        
+        bpr_payment_order = document&.payment_order
+        bpr_payment_order_status = bpr_payment_order&.payment_order_status
+   
         data[:payment_ticket_id] = document&.id
         data[:payment_ticket_created_by] = "#{document&.created_by&.first_name} #{document.created_by&.last_name}"
         data[:payment_ticket_created_date] = document&.submitted_at&.to_date&.strftime("%d-%m-%Y")
@@ -165,8 +169,12 @@ module ApprovalTatReports::TatHelper
         data[:pending_with_approver] = pending_approver_names
 
         last_level_approval_date = assign_reviewers_data(document, data, bpr_reviewal_chain) if bpr_reviewal_chain&.present?
-        payment_date = get_payment_date(document)
-        data[:payment_ageing] = (document&.submitted_at &&  payment_date&.present?) ? ( payment_date&.to_date - document&.submitted_at&.to_date)&.abs : ""
+        ageing_days = ""
+        if bpr_payment_order&.completed? || bpr_payment_order&.partially_completed?
+          payment_date = get_payment_date(document)
+          ageing_days = ( payment_date&.present? && document&.submitted_at) ? ( payment_date&.to_date - document&.submitted_at&.to_date)&.abs : ""
+        end
+        data[:payment_ageing] = ageing_days
         tat_reports.push(data.with_indifferent_access)
       end
       return tat_data(tat_reports)
@@ -269,7 +277,8 @@ module ApprovalTatReports::TatHelper
     end
 
     def get_payment_date(bank_payment_request, payment = nil)
-      payment_date = bank_payment_request&.comments&.find { |each_comment| each_comment.action_id == BankPaymentRequestCommentAction.id_for(:mark_as_credited) }&.updated_at
+      mac_action_id = BankPaymentRequestCommentAction.id_for(:mark_as_credited)
+      payment_date = BankPaymentRequestComment.where(bank_payment_request_id: bank_payment_request&.id, action_id: mac_action_id)&.pluck(:updated_at)[0]
       if payment_date&.present?
         return payment_date
       else
@@ -277,7 +286,7 @@ module ApprovalTatReports::TatHelper
           return payment&.processed_at
         else
           payments = bank_payment_request&.payment_order&.payments
-          return payments&.sort_by { |record| record.updated_at }&.reverse&.first&.processed_at
+          return payments&.order(processed_at: :desc)&.first&.processed_at
         end
       end
     end
