@@ -51,28 +51,6 @@ class User::Team::Index < User::Team::Base
     end
   end
 
-  def authorize
-    case role_id
-      when UserRole.admin_id, UserRole.id_for(:auditor)
-        unless user.admin? || user.vendor_payments_admin? || user.auditor?
-          messages[:error] << 'User is not an Admin'
-          raise_unauthorized_exception
-        end
-      when UserRole.finance_manager_id
-        unless user.finance_manager? || user.vendor_payments_creditor?
-          messages[:error] << 'User is not a Finance Manager'
-          raise_unauthorized_exception
-        end
-      when UserRole.manager_id
-        unless user.manager? || user.vendor_payments_reviewer?
-          messages[:error] << 'User is not a Manager'
-          raise_unauthorized_exception
-        end
-      else
-        #Nothing
-    end
-  end
-
   def validate
     unless role_id.present?
       messages[:error] << 'User role not defined'
