@@ -147,7 +147,9 @@ class FormEntity < ApplicationRecord
       import_entity.form_section_id = import_section.uuid
       import_entity.form_id = import_form.uuid
       import_entity.parent_id = import_parent&.uuid
-      import_entity.editable = false
+      if self.parent&.class&.collection?
+        import_entity.editable = false
+      end
       import_entity.save
       self.choices.each do |choice|
         next import_entity.choices.pluck(:name).include? choice.name
@@ -163,7 +165,9 @@ class FormEntity < ApplicationRecord
       import_entity.form_section_id = import_section.uuid
       import_entity.form_id = import_form.uuid
       import_entity.parent_id = import_parent&.uuid
-      import_entity.editable = false
+      if self.parent&.class&.collection?
+        import_entity.editable = false
+      end
       import_entity.save
       self.choices.each do |choice|
         dup_choice = choice.dup
