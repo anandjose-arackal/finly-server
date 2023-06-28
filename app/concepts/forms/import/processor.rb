@@ -512,6 +512,10 @@ class Forms::Import::Processor
               params_hash = {:entity_path => header_data[:entity].entity_path, :route => form.label.underscore.to_s, :value => data[header_data[:entity_key]]}
               current_user = user
               lookup_data = Forms::Ops::LookupDetails.(params: params_hash, current_user: current_user)[:data].map{|k, v| [k.split('.').last, v]}.to_h rescue {}
+
+              # Tax percentage should be 0 if not provided in sheet, removing from lookup data
+              lookup_data = lookup_data.except('tax_percentage', 'tax_rate_id', 'tax_rate_id_value') if header_data[:entity_key] != 'tax_rate_id'
+              
               data = data.merge(lookup_data)
             end
           else
