@@ -45,7 +45,7 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
       invoice_tax_amount: "{% assign tax_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign tax_amount = tax_amount | plus: item.item_tax_amount %}{% endif %}{% endfor %}{{ tax_amount  | default: 0 | round: 2}}",
       invoice_freight_amount: "{{ form.invoice_freight_amount | default: 0 | round: 2}}",
       # NET AMOUNT
-      invoice_sub_total_amount: "{% assign inv_sub_total_amount = form.invoice_gross_amount | minus: form.invoice_discount_amount | plus: form.invoice_tax_amount | plus: form.invoice_freight_amount | round: 2 %}{% if form.rcm_enabled == true  %}{{ inv_sub_total_amount | minus: form.invoice_tax_amount | default: 0 | round: 2}}{% else %}{{ inv_sub_total_amount | default: 0 | round: 2 }}{% endif %}",
+      invoice_sub_total_amount: "{% assign inv_sub_total_amount = form.invoice_gross_amount | minus: form.invoice_discount_amount | plus: form.invoice_tax_amount | plus: form.invoice_freight_amount | round: 2 %}{% if form.rcm_enabled == true or form.rcm_enabled == 'TRUE'  %}{{ inv_sub_total_amount | minus: form.invoice_tax_amount | default: 0 | round: 2}}{% else %}{{ inv_sub_total_amount | default: 0 | round: 2 }}{% endif %}",
       # invoice_paid_outside_amount: "{{ form.invoice_paid_outside_amount | default: 0 | round: 2}}",
       invoice_tds_amount: "{% assign tds_amount = 0 %}{% for item in form.items %}{% if item._destroy == true %}{% continue %}{% else %}{% assign tds_amount = tds_amount | plus: item.item_tds_amount %}{% endif %}{% endfor %}{{ tds_amount  | default: 0 | ceil}}",
 
@@ -268,10 +268,10 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
       # text :hsn_sac, label: "HSN/SAC", editable: true, visible: true,
       #       computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.hsn_sac}}'), size: FormEntity::SIZES[:small]
 
-      # lookup :tds_applicable, visible: false, editable: false,
-      #        can_editable_be_changed: false,
-      #        can_visible_be_changed: false, choices_scope: Choices[:list].({ id: true, name: 'true' }, { id: false, name: 'false' }),
-      #        computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.tds_applicable }}'), size: FormEntity::SIZES[:small]
+      lookup :tds_applicable, visible: false, editable: false,
+             can_editable_be_changed: false,
+             can_visible_be_changed: false, choices_scope: Choices[:list].({ id: true, name: 'true' }, { id: false, name: 'false' }),
+             computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{ record.tds_applicable }}'), size: FormEntity::SIZES[:small]
 
       # currency :currency_code, editable: false, visible: false, computed: Forms::Compute::Form("{{ form.currency_code }}")
       number :quantity, label: "Quantity", editable: false, visible: true, required: true, min_value: 1, default_value: 1, size: FormEntity::SIZES[:small] # todo - condition
