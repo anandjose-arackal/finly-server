@@ -720,11 +720,11 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
   #   action :visible, false
   # end
 
-  condition condition_id: "Hide Roundoff for different currency" do
-    reference :entity, 'items_summary.invoice_roundoff_amount'
-    rule Rules::Builder[:base_currency_id].not_eq(value: '1')
-    action :visible, false
-  end
+  # condition condition_id: "Hide Roundoff for different currency" do
+  #   reference :entity, 'items_summary.invoice_roundoff_amount'
+  #   rule Rules::Builder[:base_currency_id].not_eq(value: '1')
+  #   action :visible, false
+  # end
 
   # condition condition_id: "Hide Net Amount (Reporting Currency)" do
   #   reference :entity, 'items_summary.reporting_invoice_sub_total_amount'
