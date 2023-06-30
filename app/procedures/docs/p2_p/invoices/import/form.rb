@@ -251,9 +251,9 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
            computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.description}}')
 
       text :comment, label: "Narration", size: FormEntity::SIZES[:medium], editable: false
-      # text :item_number, label: "Item Code", editable: false,
-      #   computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.item_number}}'),
-      #     size: FormEntity::SIZES[:small]
+      text :item_number, label: "Item Code", editable: false, visible: false,
+        computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.item_number}}'),
+          size: FormEntity::SIZES[:small]
 
       lookup :product_type_id, label: "Product Type", choices_scope: Choices[:enum].(ProductType), editable: false, required: true, visible: true, size: FormEntity::SIZES[:small]
 
@@ -262,11 +262,11 @@ class Docs::P2P::Invoices::Import::Form < Forms::API
 
       lookup :category_id, label: "Category", required: true, visible: true, editable: false, choices_scope: Choices[:lookup].('categories', scope: :inward_invoice_line_items_only), size: FormEntity::SIZES[:medium]
 
-      # text :gl_code, label: "GL Code", editable: false, visible: false,
-      #   computed: Forms::Compute::Lookup('items.category_id', '{{record.gl_code_or_item_number}}', assignments: {item_number: "{{row.item_number}}"})
+      text :gl_code, label: "GL Code", editable: false, visible: false,
+        computed: Forms::Compute::Lookup('items.category_id', '{{record.gl_code_or_item_number}}', assignments: {item_number: "{{row.item_number}}"})
       
-      # text :hsn_sac, label: "HSN/SAC", editable: true, visible: true,
-      #       computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.hsn_sac}}'), size: FormEntity::SIZES[:small]
+      text :hsn_sac, label: "HSN/SAC", editable: true, visible: false,
+            computed: Forms::Compute::Lookup('items.inventory_line_item_id', '{{record.hsn_sac}}'), size: FormEntity::SIZES[:small]
 
       lookup :tds_applicable, visible: false, editable: false,
              can_editable_be_changed: false,
