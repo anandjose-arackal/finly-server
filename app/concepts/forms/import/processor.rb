@@ -154,6 +154,7 @@ class Forms::Import::Processor
         row_data = {}.with_indifferent_access
         row = sheet.row(index)
         row.each_with_index do |value, index|
+          next if sheet.row(1)[index].nil?
           if sheet.row(1)[index].include? '(Yes/No)'
             value = value == 'Yes' ? 'TRUE' : 'FALSE'
           end
@@ -208,6 +209,7 @@ class Forms::Import::Processor
           row_data = {}.with_indifferent_access
           row = sheet.row(index)
           row.each_with_index do |value, column_index|
+            next if sheet.row(1)[column_index].nil?
             if sheet.row(1)[column_index].include? '(Yes/No)'
               value = value == 'Yes' ? 'TRUE' : 'FALSE'
             end
