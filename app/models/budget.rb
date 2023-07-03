@@ -33,6 +33,7 @@
 class Budget < ApplicationRecord
   include SoftDeletable, AncestrySupport
   include EventProducer
+  include ErpSyncable
 
   has_ancestry
   has_many :budget_children, class_name: 'Budget', foreign_key: 'ancestry'

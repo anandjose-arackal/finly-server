@@ -8,7 +8,7 @@ class RemoveDuplicateSequence < BaseJob
       RequestStoreUtil.set_current_user(company.users.only_admins.first)
       dup_invoice_ids =Invoice.where.not(invoice_type_id:   InwardInvoiceType.id_for(:beneficiary)).where('created_at > ?', Date.parse('13-08-2021')).select(:company_id, :invoice_id).group(:invoice_id,:company_id).having('count(invoice_id) >1').pluck(:invoice_id)
       dup_invoice_ids.each do |invoice_id|
-        invoice = Invoice.where(invoice_id: invoice_id).last
+        invoice = Invoice.where(invoice_id: invoice_id).first
         invoice.invoice_id = nil
         invoice.save
       end
