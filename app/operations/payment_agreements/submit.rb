@@ -31,7 +31,7 @@ class PaymentAgreements::Submit < PaymentAgreements::Base
   end
 
   def post_process
-    add_message :success, "You've approved the agreement"
+    add_message :success, "You've submitted the agreement"
     if self.payment_agreement.status_id == PaymentAgreementStatus.id_for(:auto_approved)
      agreement_related_operations
     end
