@@ -1,6 +1,7 @@
 Forms::Router.draw do
   # route 'trips', Docs::Trips::Form
   route 'vendors', Masters::Vendors::Form
+  route 'vendors_import', Masters::Vendors::Form
   route 'test', Forms::TestForm
   route 'non_po_invoice', Docs::P2P::Invoices::NonPo::Form
   
@@ -14,4 +15,5 @@ Forms::Router.draw do
   route 'purchase_requests', Docs::P2P::PurchaseRequests::Form
 
   route 'credit_notes', Docs::P2P::CreditNotes::Form
+  route 'invoices_import', Docs::P2P::Invoices::Import::Form
 end

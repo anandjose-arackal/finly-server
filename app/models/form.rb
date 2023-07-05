@@ -93,6 +93,12 @@ class Form < ApplicationRecord
     Object.const_get(super()) if super()
   end
 
+  def import_form?
+    [
+      'Docs::P2P::Invoices::Import::Form'
+    ].include? form_klass.to_s
+  end
+
   def sync_sequence_numbers
     return unless self.model.sequenced_options.present?
 

@@ -3,7 +3,7 @@ class Forms::Import::Template < Transactions::API
   step :process_template
 
   def init_form(context, params:, current_user:, **)
-    form_key = params[:route].split(".")[1]
+    form_key = "#{params[:route].split(".")[1]}_import"
     context[:form] = Form.where(company_id: current_user.company.id, klass_name: Forms::Router.klass(form_key)&.name).first
   end
 

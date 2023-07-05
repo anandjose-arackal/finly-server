@@ -51,6 +51,7 @@ user:
       pr_api_improvements: <%= PrApiImprovementsToggle.new(current_user).enabled? %>
       clone_deep_removed: <%= FormsRemoveClonedeepToggle.new(current_user).enabled? %>
       debounce_on_field: <%= FormsDebounceOnFieldToggle.new(current_user).enabled? %>
+      dynamic_autocomplete_choices: <%= FormsDynamicAutocompleteChoicesEnabled.new(current_user).enabled? %>
       dashboard_card_expansion: <%= DashboardCardExpansionToggle.new(current_user).enabled? %>
       dashboard_auto_expand_cards: <%= DashboardAutoExpandCardsToggle.new(current_user).enabled? %>
     currency_flags:
