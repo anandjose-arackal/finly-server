@@ -62,7 +62,7 @@ class Docs::P2P::Invoices::Action < ActionManager::API
     action :template,
            :create_form,
            format: 'primary',
-           permissions: [:invoice_bulk_importer],
+           permissions: [:non_po_invoice_initiator],
            toggle: {if: [NonPoInvoiceToggle, :enabled?]},
            label: "Create Non PO Invoice",
            icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
