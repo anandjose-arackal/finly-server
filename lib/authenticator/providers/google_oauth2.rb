@@ -96,9 +96,9 @@ class Authenticator::Providers::GoogleOauth2 < Authenticator::Providers::Base
   end
 
   def on_inactive_user(message)
-    unless self.user_info[:user].status == 'Active'
-      params[:message] = message || "User Inactive"
-      UserSessions::Create.(:failed, params)
+    unless self.user_info[:user].status == 'Active' || self.user_info[:user].active
+       params[:message] = message || "User Inactive"
+       UserSessions::Create.(:failed, params)
     end
   end
 
