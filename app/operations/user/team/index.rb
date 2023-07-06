@@ -166,6 +166,8 @@ class User::Team::Index < User::Team::Base
       if policies.present?
         return users.with_id(PolicyUserMapping.with_policy(policies).pluck(:user_id))
       end
+    else
+      return user.company.users
     end
     messages[:error] << 'User is not an admin'
     false
